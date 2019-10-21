@@ -44,7 +44,6 @@ private:
 	size_t infraredSize = 0;
 	k4a_image_t point_cloud = NULL;
 	int colorRows = 0, colorCols = 0, colorBuffSize = 0;
-	int depthRows = 0, depthCols = 0;
 	k4a_device_configuration_t config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
 public:
 	~KinectCamera()
@@ -72,12 +71,9 @@ public:
 			colorBuffSize = colorRows * colorCols;
 			pointCloudBuffSize = colorBuffSize * 3 * (int) sizeof(int16_t);
 
-			depthRows = calibration.depth_camera_calibration.resolution_height;
-			depthCols = calibration.depth_camera_calibration.resolution_width;
-
-			k4a_image_create(K4A_IMAGE_FORMAT_CUSTOM, colorCols, colorRows, colorCols * (int)sizeof(int16_t), &depthInColor);
+			k4a_image_create(K4A_IMAGE_FORMAT_DEPTH16, colorCols, colorRows, colorCols * (int)sizeof(int16_t), &depthInColor);
 			k4a_image_create(K4A_IMAGE_FORMAT_CUSTOM, colorCols, colorRows, colorCols * 3 * (int)sizeof(int16_t), &point_cloud_image); // int16_t - not a mistake.
-			k4a_image_create(K4A_IMAGE_FORMAT_COLOR_BGRA32, colorCols, colorRows, colorCols * 3 * (int)sizeof(int16_t), &colorImage);
+			k4a_image_create(K4A_IMAGE_FORMAT_COLOR_BGRA32, colorCols, colorRows, colorCols * 4 * (int)sizeof(uint8_t), &colorImage);
 
 			k4a_device_start_cameras(device, &config);
 
@@ -118,6 +114,17 @@ public:
 			}
 		}
 
+		if (colorImage) k4a_image_release(colorImage);  // we want to keep the colorimage around between calls.
+		colorImage = k4a_capture_get_color_image(capture);
+		if (colorImage)
+		{
+			uint8_t* tmpColor = k4a_image_get_buffer(colorImage);
+			if (tmpColor == NULL) return 0; // just have to use the last buffers.  Nothing new...
+			Mat bgr = Mat(colorCols, colorRows, CV_8UC3, color);
+			Mat bgra = Mat(colorCols, colorRows, CV_8UC4, tmpColor);
+			cvtColor(bgra, bgr, COLOR_BGRA2BGR);
+		}
+
 		k4a_image_t depthImage = k4a_capture_get_depth_image(capture);
 		if (depthImage != NULL and depthImage->_rsvd != 0)
 		{
@@ -126,17 +133,7 @@ public:
 			dcptr->depth = Mat(colorRows, colorCols, CV_16U, depthBuffer);
 			dcptr->dst = Mat(colorRows, colorCols, CV_8UC3, depthRGB);
 			dcptr->Run();
-		}
-
-		if (colorImage) k4a_image_release(colorImage);  // we want to keep the colorimage around between calls.
-		colorImage = k4a_capture_get_color_image(capture);
-		if (colorImage)
-		{
-			uint8_t *tmpColor = k4a_image_get_buffer(colorImage);
-			if (tmpColor == NULL) return 0; // just have to use the last buffers.  Nothing new...
-			Mat bgr = Mat(colorCols, colorRows, CV_8UC3, color);
-			Mat bgra = Mat(colorCols, colorRows, CV_8UC4, tmpColor);
-			cvtColor(bgra, bgr, COLOR_BGRA2BGR);
+			imshow("depth", dcptr->dst);
 		}
 
 		k4a_transformation_depth_image_to_point_cloud(transformation, depthInColor, K4A_CALIBRATION_TYPE_COLOR, point_cloud_image);

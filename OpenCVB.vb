@@ -90,7 +90,7 @@ Public Class OpenCVB
         ' the depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
         ' Post an issue if this Is Not a valid assumption
-        Dim kinectDLL As New FileInfo("C:/Program Files/Azure Kinect SDK v1.1.0/tools/depthengine_1_0.dll")
+        Dim kinectDLL As New FileInfo("C:/Program Files/Azure Kinect SDK v1.3.0/tools/depthengine_2_0.dll")
         If kinectDLL.Exists = False Then
             MsgBox("The Microsoft installer for the Kinect camera proprietary portion was not installed in the right place (or it has changed.)" + vbCrLf +
                 "It was expected to be in " + kinectDLL.FullName + vbCrLf + "Update the code and restart.")
