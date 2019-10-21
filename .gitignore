@@ -31,3 +31,6 @@ unused_api.txt
 obj/x64/*
 bin/Debug/*
 bin/Release/*
+Azure-Kinect-Sensor-SDK/*
+librealsense/*
+OpenCV/*
