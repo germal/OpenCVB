@@ -29,3 +29,5 @@ Data/Filenames.txt
 Data/AlgorithmMapToOpenCV.txt
 unused_api.txt
 obj/x64/*
+bin/Debug/*
+bin/Release/*
