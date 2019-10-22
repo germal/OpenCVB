@@ -186,6 +186,7 @@ Public Class Python_SurfaceBlit : Implements IDisposable
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+        If PythonReady = False Then Exit Sub ' none of this was created if Python wasn't found
         memMap.Dispose()
         If pipe IsNot Nothing Then
             If pipe.IsConnected Then

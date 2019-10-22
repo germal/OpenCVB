@@ -133,7 +133,6 @@ public:
 			dcptr->depth = Mat(colorRows, colorCols, CV_16U, depthBuffer);
 			dcptr->dst = Mat(colorRows, colorCols, CV_8UC3, depthRGB);
 			dcptr->Run();
-			imshow("depth", dcptr->dst);
 		}
 
 		k4a_transformation_depth_image_to_point_cloud(transformation, depthInColor, K4A_CALIBRATION_TYPE_COLOR, point_cloud_image);
