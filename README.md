@@ -25,8 +25,8 @@ of these algorithms into a single application and streamlines the process of
 adding variants and experimenting with the example. The first objective is to
 get access to languages commonly used for computer vision projects - C++, C\#,
 Python, and VB.Net are currently supported. Secondly, it is important to get
-access to multiple libraries - OpenCV, OpenGL, OpenMP, and VTK. And lastly, it
-is important to use all the possible image representations - 3D, bitmaps, plots,
+access to multiple libraries - OpenCV, OpenGL, and OpenMP. And lastly, it is
+important to use all the possible image representations - 3D, bitmaps, plots,
 bar charts, spreadsheets, or text.
 
 Making these languages and libraries available while using the same
@@ -72,73 +72,47 @@ You will need to download and install the following before starting:
 
 **Installation – Windows 10 Only**
 
-Installing everything needed for OpenCVB is a lot of work. It might be useful to
-first review the images in the “Sample Results” section below. Installing OpenCV
-is a fair amount of work just by itself but vital to all the C++ code.
-Installing both the librealsense libraries and the Kinect libraries may seem
-duplicative and may be trimmed in future releases. However, for now, both are
-required even if one or the other camera is not available. For instance, the
-glfw code in librealsense is used for all the OpenGL examples. VTK is a lot work
-to install and has been made optional. The instructions to activate VTK appear
-when using any algorithms that require VTK if it is not already installed.
+The first step is to download OpenCVB from GitHub:
 
-1.  Clone the latest OpenCV 4 and OpenCV Contrib from:
+-   <https://github.com/bobdavies2000/OpenCVB>
 
-    -   <https://github.com/opencv/opencv>
+The second step is where all the work is.
 
-    -   <https://github.com/opencv/opencv_contrib>
+-   Run the “PrepareTree.bat” script in the OpenCVB directory that was just
+    downloaded.
 
-2.  Run CMAKE on OpenCV and specify a 64-bit compiler (only 64-bit is
-    supported.)
+The “PrepareTree.bat” script will download OpenCV, librealsense, and
+Kinect4Azure from there respective GitHub locations and install them in the
+right locations of the OpenCVB tree. In addition, the script will run the CMake
+command that sets up OpenCV, librealsense, and Kinect4Azure. The script will
+then open Visual Studio for each of the resulting solution files created by the
+CMake. Build both the Debug and Release versions of each and then close Visual
+Studio to open the next solution file.
 
-    -   NOTE: The OpenCV CMAKE option “OpenCV_Extra_Modules_Path” should point
-        to “c:\\opencv\\opencv_contrib\\modules”.
+After all the packages have been built, then there is one environmental variable
+that needs to be set and it will depend on which version of OpenCV was just
+downloaded and built.
 
-    -   “With_OpenGL” will create the OpenGL example include with OpenCV
+-   Environmental variable “OpenCV_Version” should be set it to 412
 
-    -   Turn off all test and performance measures (speeds up compile)
+The currently available OpenCV download is 4.12 so setting OpenCV_Version to 412
+reflects that but note that OpenCV is updated several times a year and the
+environmental variable may need to be updated.
 
-    -   gxChanging other options in the OpenCV configuration is not necessary
-        (and not recommended until you have OpenCVB running.)
+The last step before running OpenCVB is to download the proprietary binaries
+from Microsoft for their Kinect4Azure camera. The “PrepareTree.bat” script built
+the open source portion of the camera support. This step will complete the
+installation of the Kinect4Azure camera:
 
-3.  Clone the latest "librealsense" from:
+-   <https://docs.microsoft.com/en-us/azure/Kinect-dk/sensor-sdk-download>
 
-    -   <https://github.com/IntelRealSense/librealsense>
+    -   Download and open the “Microsoft Installer” (the proprietary code)
 
-4.  Run CMAKE on librealsense.
-
-    -   You MUST select a 64-bit compiler and check “Build_CSHARP_Bindings” in
-        CMAKE. Build in the “\$(IntelPERC_Lib_Dir)\\Build” directory as defined
-        in the environmental variables.
-
-    -   You will need to point CMAKE to the OpenCV build directory built in the
-        step 1 above – typically “C:\\OpenCV\\Build”
-
-    -   Optionally, select “Build_CV_EXAMPLES” to get the deep neural net (dnn)
-        database.
-
-5.  Download OpenCVB from GitHub. No CMAKE required.
-
-    -   <https://github.com/bobdavies2000/OpenCVB>
-
-6.  Kinect for Azure is required even if you don’t plan to run the Microsoft
-    Kinect camera. Run CMAKE after the download. There are 2 parts to the
-    installation (at this point - July 2019):
-
-    -   <https://docs.microsoft.com/en-us/azure/Kinect-dk/sensor-sdk-download>
-
-        -   Download the “Microsoft Installer” (the proprietary code) (Part 1)
-
-        -   Download the “GitHub source code” (the open source SDK.) (Part 2)
-
-7.  Open OpenCVB.sln and build the included projects.
-
-    -   Advanced users can consider removing the “KinectCamera” project from the
-        solution to avoid installing the Kinect software.
-
->   NOTE: OpenCL and Cuda are not included in the installation because it is
->   lengthy enough without them. Adding them to the installation should not be
->   difficult if needed.
+The last step is to open the OpenCVB.sln file and build OpenCVB. If there are
+problems linking, it is very likely that the OpenCV_Version environmental
+variable needs to be updated. If the Kinect4Azure camera support has recently
+been upgraded, then OpenCVB will display a message explaining how to reflect
+that support in the code.
 
 **NuGet**
 
@@ -149,11 +123,11 @@ details on the OpenCVSharp4 installation. Typically, the first build will appear
 to stall but the second build will work correctly.
 
 With the Visual Studio 2019 Community Edition, it seems that NuGet can fail and
-you may have to uninstall the OpenCVSharp for Windows and then reinstall it. To
-review the NuGet OpenCVSharp4 package, use the Visual Studio menus to navigate
-to “Tools/NuGet Package Manager/Manage NuGet Packages” and look at the
-“Installed” packages. Here is what it should look like once OpenCVSharp is
-installed properly:
+you may have to uninstall the OpenCVSharp for Windows and then reinstall it for
+the OpenCVB project. To review the NuGet OpenCVSharp4 package, use the Visual
+Studio menus to navigate to “Tools/NuGet Package Manager/Manage NuGet Packages”
+and look at the “Installed” packages. Here is what it should look like once
+OpenCVSharp is installed properly:
 
 ![](media/b898f2cad69aadc19c437317d4aa9830.png)
 
@@ -211,7 +185,7 @@ Box.
 **Why VB.Net?**
 
 VB.Net is not a language associated with computer vision algorithms. But the
-proliferation of examples in OpenCVB suggest this may be an oversight. Even the
+proliferation of examples in OpenCVB suggests this may be an oversight. Even the
 seasoned developer should recognize what is obvious to the beginner: VB.Net has
 the ability to provide clarity. VB.Net is a full-featured language just like C\#
 with lambda functions and multi-threading. VB.Net includes user interface tools
@@ -270,23 +244,22 @@ histograms, 3D drawing, and IMU usage. A code snippet (See ‘Build New
 Experiments’ above) provides everything needed to add a new OpenGL algorithm
 that will consume RGB and a point cloud.
 
-NOTE: it is easy to forget to include any new OpenGL (or VTK) project in the
-Project Dependencies. This can be confusing because the new project will not
-build automatically when restarting. The OpenCVB Project Dependencies need to be
+NOTE: it is easy to forget to include any new OpenGL project in the Project
+Dependencies. This can be confusing because the new project will not build
+automatically when restarting. The OpenCVB Project Dependencies need to be
 updated whenever a new OpenGL application is added to the OpenCV Solution file.
-To update dependencies, select “Project/Dependencies” from the menu and make
-sure that the “OpenCVB” project depends on any new OpenGL projects. This ensures
-that the new project will always be rebuilt when OpenCVB is restarted.
+To update dependencies, select “Project/Dependencies” from the Visual Studio
+menu and make sure that the “OpenCVB” project depends on any new OpenGL
+projects. This ensures that the new project will always be rebuilt when OpenCVB
+is restarted.
 
 **OpenCV’s OpenGL Interface**
 
-OpenCV also includes an OpenGL interface – see the “With OpenGL” option in the
-OpenCV CMAKE. If OpenCV has been configured with OpenGL (it is optional and the
-default is off), OpenCVB will use the OpenGL interface – see the OpenCVGL
-algorithm. The interface is sluggish and looks different from most OpenGL
-applications so the alternative interface to OpenGL (discussed above) is
-preferred. Both interfaces use the same sliders and options to control the
-OpenGL interface.
+The “PrepareTree.bat” script will have configured OpenCV with OpenGL support.
+OpenCVB will use the OpenGL interface – see the OpenCVGL algorithm. The
+interface is sluggish and looks different from most OpenGL applications so the
+alternative interface to OpenGL (discussed above) is preferred. Both interfaces
+use the same sliders and options to control the OpenGL interface.
 
 NOTE: why use sliders instead of OpenGL mouse or keyboard callbacks? The answer
 in a single word is precision. It is often desirable to set appropriate defaults
@@ -296,8 +269,8 @@ effect. Preconfiguring the sliders allows the user to program a specific setup
 for viewing 3D data.
 
 For those that prefer using the mouse to move the OpenGL display, the OpenGL
-code snippet provides a sample code. To see a working example of OpenGL using
-just the mouse interface, see the OpenGL_Callbacks algorithm.
+code snippet provides sample code. To see a working example of OpenGL using just
+the mouse interface, see the OpenGL_Callbacks algorithm.
 
 **Python Interface**
 
@@ -406,38 +379,6 @@ enable VTK with the following steps:
 As with new OpenGL projects, it is necessary to add any new VTK projects to the
 Project Dependencies for the OpenCVB project. This will ensure that the new VTK
 project is automatically rebuilt every time the application is started.
-
-**Installation Recap**
-
-The narrative above is intended to provide an understanding of how to configure
-OpenCVB but is not terribly useful for reference. Here is a much more succinct
-list that summarizes what was done to install OpenCVB:
-
--   Install Visual Studio Community Edition, Git, and TortoiseGit before
-    starting the install. All are free.
-
-    -   Make sure to specify that Visual Studio should include Python when
-        installing.
-
--   Define Environmental Variables:
-
-    -   “OpenCV_Dir” = “C:\\OpenCV\\”
-
-    -   “IntelPERC_Lib_Dir” = “c:\\librealsense\\”
-
-    -   “OpenCV_Contrib_Dir” = “c:\\OpenCV\\OpenCV_Contrib”
-
-    -   “OpenCV_Version” = 411
-
-    -   “kinect4AzureSDKdirectory” = “C:\\k4a\\”
-
--   Download from GitHub: OpenCV, OpenCV_Contrib, LibRealSense, and Kinect for
-    Azure (be sure to get both parts of K4A)
-
-    -   Run CMAKE and build 64-bit versions of each
-
--   Download OpenCVB from GitHub and build – paying attention to NuGet and the
-    OpenCVSharp package.
 
 **Sample Results**
 
