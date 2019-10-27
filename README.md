@@ -82,7 +82,7 @@ The second step is where all the work is.
     downloaded.
 
 The “PrepareTree.bat” script will download OpenCV, librealsense, and
-Kinect4Azure from there respective GitHub locations and install them in the
+Kinect4Azure from their respective GitHub locations and install them in the
 right locations of the OpenCVB tree. In addition, the script will run the CMake
 command that sets up OpenCV, librealsense, and Kinect4Azure. The script will
 then open Visual Studio for each of the resulting solution files created by the
@@ -311,22 +311,14 @@ and install the corresponding package.
 
 **Python Debugging**
 
-The GitHub site does not allow adding a Python project in addition to the
-OpenCVB solution, so a separate project was created to allow Python scripts to
-be debugged in the exact environment as OpenCVB. Python scripts are run in a
-separate address space when invoked by OpenCVB so Visual Studio’s Python debug
-environment is not available. When a Python script fails in OpenCVB, it may be
-placed in a separate PythonDebug project and tested there. Here are the steps to
-setup the PythonDebug project:
+Python scripts are run in a separate address space when invoked by OpenCVB so
+Visual Studio’s Python debug environment is not available. When a Python script
+fails in OpenCVB, it may be debugged in the PythonDebug project. Here are the
+steps to debug Python:
 
--   Download the PythonDebug project from GitHub:
+-   Open VB_Classes\\Python\\PythonDebug.pyproj a Visual Studio Python project.
 
-    -   <https://github.com/bobdavies2000/PythonDebug>
-
--   Copy the files to \<OpenCVB home directory\>/VB_Classes/Python
-
--   Open the PythonDebug project, copy any Python script into the PythonDebug.py
-    file, and run it.
+-   Copy the failing Python script into the PythonDebug.py file, and run it.
 
 The Python script will be running in the same environment as it were invoked
 from OpenCVB except the Python debugger will be active.
@@ -543,9 +535,9 @@ algorithms on the web but there is also the task to combine the different
 algorithms in OpenCVB. The current edition of the code contains examples of
 compound algorithms and more will arrive in future releases. The class-oriented
 structure of the code almost enforces reuse because any algorithm with sliders
-or check boxes suggests any developer reuse the existing class rather than
-provide another, similar set of sliders and check boxes. The options forms for
-combined algorithms are automatically cascaded for easy selection.
+or check boxes suggests reusing an existing class rather than provide another
+with similar set of sliders and check boxes. The options forms for combined
+algorithms are automatically cascaded for easy selection.
 
 **Acknowledgements**
 
@@ -570,4 +562,4 @@ varied organizations deserve most of the credit for this software.
 
 Fremont, California
 
-Summer 2019
+Fall 2019
