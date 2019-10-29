@@ -52,7 +52,7 @@ Public Class Mat_MatToPoint : Implements IDisposable
         Dim points(ocvb.color.Rows * ocvb.color.Cols - 1) As cv.Vec3b
         Dim vec As New cv.Vec3b
         Dim index As Int32 = 0
-        Dim m3b As New cv.MatOfByte3(ocvb.color)
+        Dim m3b = ocvb.color.Clone()
         Dim indexer = m3b.GetGenericIndexer(Of cv.Vec3b)()
         For y = 0 To ocvb.color.Rows - 1
             For x = 0 To ocvb.color.Cols - 1

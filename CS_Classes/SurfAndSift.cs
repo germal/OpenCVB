@@ -18,8 +18,8 @@ namespace CS_Classes
             var surf = SURF.Create(hessianThreshold, 4, 2, true);
 
             KeyPoint[] keypoints1, keypoints2;
-            var descriptors1 = new MatOfFloat();
-            var descriptors2 = new MatOfFloat();
+            var descriptors1 = new Mat();
+            var descriptors2 = new Mat();
             surf.DetectAndCompute(gray1, null, out keypoints1, descriptors1);
             surf.DetectAndCompute(gray2, null, out keypoints2, descriptors2);
 
@@ -52,8 +52,8 @@ namespace CS_Classes
             var sift = SIFT.Create(pointsToMatch);
 
             KeyPoint[] keypoints1, keypoints2;
-            var descriptors1 = new MatOfFloat();
-            var descriptors2 = new MatOfFloat();
+            var descriptors1 = new Mat();
+            var descriptors2 = new Mat();
             sift.DetectAndCompute(gray1, null, out keypoints1, descriptors1);
             sift.DetectAndCompute(gray2, null, out keypoints2, descriptors2);
 
@@ -65,12 +65,9 @@ namespace CS_Classes
             }
             else
             {
-                if (descriptors1.Count > 0 && descriptors2.Count > 0)
-                {
-                    var flannMatcher = new FlannBasedMatcher();
-                    DMatch[] flannMatches = flannMatcher.Match(descriptors1, descriptors2);
-                    Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, flannMatches, dst);
-                }
+                var flannMatcher = new FlannBasedMatcher();
+                DMatch[] flannMatches = flannMatcher.Match(descriptors1, descriptors2);
+                Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, flannMatches, dst);
             }
         }
     }

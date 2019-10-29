@@ -1,5 +1,11 @@
 "c:\Program Files\Git\bin\git.exe" clone "https://github.com/IntelRealSense/librealsense"
 "c:\Program Files\Git\bin\git.exe" clone "https://github.com/microsoft/Azure-Kinect-Sensor-SDK"
+
+"c:\Program Files\Git\bin\git.exe" clone "https://github.com/shimat/opencvsharp.git"
+cd opencvsharp
+git submodule update --init --recursive
+cd ..\
+
 "c:\Program Files\Git\bin\git.exe" clone "https://github.com/opencv/opencv"
 cd OpenCV
 "c:\Program Files\Git\bin\git.exe" clone "https://github.com/opencv/opencv_contrib"
@@ -11,4 +17,5 @@ cd ..\
 
 start Azure-Kinect-Sensor-SDK/Build/k4a.sln
 start librealsense/Build/librealsense2.sln
+start opencvsharp/OpenCvSharp.sln
 start OpenCV/Build/OpenCV.sln

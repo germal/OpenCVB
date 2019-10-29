@@ -1,4 +1,5 @@
 ﻿Imports cv = OpenCvSharp
+Imports OpenCvSharp.XImgProc
 
 'https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
 Public Class Binarize_OTSU : Implements IDisposable
@@ -15,7 +16,7 @@ Public Class Binarize_OTSU : Implements IDisposable
         mats2.externalUse = True
 
         ocvb.desc = "Binarize an image using Threshold with OTSU."
-        ocvb.label2 = "Note the benefit of Blur in lower right histogram"
+        ocvb.label2 = "Histograms correspond to images on the left"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result2.SetTo(0)

@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\OpenCvSharp4.runtime.win.4.1.0.20190416\build\net\OpenCvSharp4.runtime.win.props" Condition="Exists('..\packages\OpenCvSharp4.runtime.win.4.1.0.20190416\build\net\OpenCvSharp4.runtime.win.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -11,7 +10,7 @@
     <AssemblyName>VB_Classes</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -77,16 +76,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="OpenCvSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenCvSharp4.4.1.0.20190416\lib\net40\OpenCvSharp.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\opencvsharp\samples\packages\OpenCvSharp4.4.1.1.20191026\lib\net461\OpenCvSharp.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp.Blob, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenCvSharp4.4.1.0.20190416\lib\net40\OpenCvSharp.Blob.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\opencvsharp\samples\packages\OpenCvSharp4.4.1.1.20191026\lib\net461\OpenCvSharp.Blob.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenCvSharp4.4.1.0.20190416\lib\net40\OpenCvSharp.Extensions.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\opencvsharp\samples\packages\OpenCvSharp4.4.1.1.20191026\lib\net461\OpenCvSharp.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp.UserInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenCvSharp4.4.1.0.20190416\lib\net40\OpenCvSharp.UserInterface.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\opencvsharp\samples\packages\OpenCvSharp4.4.1.1.20191026\lib\net461\OpenCvSharp.UserInterface.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -316,7 +319,6 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CS_Classes\CS_Classes.csproj">
@@ -422,10 +424,4 @@ $(ProjectDir)\..\UI_Generator\bin\UI_Generator.exe
 $(ProjectDir)\..\UIindexer\bin\UIindexer.exe
 </PreBuildEvent>
   </PropertyGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\OpenCvSharp4.runtime.win.4.1.0.20190416\build\net\OpenCvSharp4.runtime.win.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenCvSharp4.runtime.win.4.1.0.20190416\build\net\OpenCvSharp4.runtime.win.props'))" />
-  </Target>
 </Project>

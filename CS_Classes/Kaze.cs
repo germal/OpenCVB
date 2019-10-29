@@ -146,8 +146,8 @@ namespace CS_Classes
         // fixed FromArray behavior
         static Point2d[] MyPerspectiveTransform2(Point2f[] yourData, Mat transformationMatrix)
         {
-            using (MatOfPoint2f s = MatOfPoint2f.FromArray(yourData))
-            using (MatOfPoint2f d = new MatOfPoint2f())
+            using (var s = Mat<Point2f>.FromArray(yourData))
+            using (var d = new Mat<Point2f>())
             {
                 Cv2.PerspectiveTransform(s, d, transformationMatrix);
                 Point2f[] f = d.ToArray();
@@ -156,13 +156,13 @@ namespace CS_Classes
         }
 
         // new API
-        public Point2d[] MyPerspectiveTransform3(Point2f[] yourData, Mat transformationMatrix)
+        static Point2d[] MyPerspectiveTransform3(Point2f[] yourData, Mat transformationMatrix)
         {
             Point2f[] ret = Cv2.PerspectiveTransform(yourData, transformationMatrix);
             return ret.Select(Point2fToPoint2d).ToArray();
         }
 
-        public int VoteForSizeAndOrientation(KeyPoint[] modelKeyPoints, KeyPoint[] observedKeyPoints, DMatch[][] matches, Mat mask, float scaleIncrement, int rotationBins)
+        static int VoteForSizeAndOrientation(KeyPoint[] modelKeyPoints, KeyPoint[] observedKeyPoints, DMatch[][] matches, Mat mask, float scaleIncrement, int rotationBins)
         {
             int idx = 0;
             int nonZeroCount = 0;
@@ -194,16 +194,14 @@ namespace CS_Classes
                     }
                 }
 
-                if (rotations.Count == 0) return 0;
-
                 int scaleBinSize = (int)Math.Ceiling((maxS - minS) / Math.Log10(scaleIncrement));
                 if (scaleBinSize < 2)
                     scaleBinSize = 2;
                 float[] scaleRanges = { (float)minS, (float)(minS + scaleBinSize + Math.Log10(scaleIncrement)) };
 
-                using (MatOfFloat scalesMat = new MatOfFloat(rows: logScale.Count, cols: 1, data: logScale.ToArray()))
-                using (MatOfFloat rotationsMat = new MatOfFloat(rows: rotations.Count, cols: 1, data: rotations.ToArray()))
-                using (MatOfFloat flagsMat = new MatOfFloat(logScale.Count, 1))
+                using (var scalesMat = new Mat<float>(rows: logScale.Count, cols: 1, data: logScale.ToArray()))
+                using (var rotationsMat = new Mat<float>(rows: rotations.Count, cols: 1, data: rotations.ToArray()))
+                using (var flagsMat = new Mat<float>(logScale.Count, 1))
                 using (Mat hist = new Mat())
                 {
                     flagsMat.SetTo(new Scalar(0.0f));
@@ -213,26 +211,30 @@ namespace CS_Classes
                     float[] rotationRanges = { 0.0f, 360.0f };
                     int[] channels = { 0, 1 };
                     Rangef[] ranges = { new Rangef(scaleRanges[0], scaleRanges[1]), new Rangef(rotations.Min(), rotations.Max()) };
-                    
-                    if (ranges[0].End != ranges[0].Start && ranges[1].Start != ranges[1].End)
+                    double minVal, maxVal;
+
+                    Mat[] arrs = { scalesMat, rotationsMat };
+                    Cv2.CalcHist(arrs, channels, null, hist, 2, histSize, ranges);
+                    Cv2.MinMaxLoc(hist, out minVal, out maxVal);
+
+                    Cv2.Threshold(hist, hist, maxVal * 0.5, 0, ThresholdTypes.Tozero);
+                    Cv2.CalcBackProject(arrs, channels, hist, flagsMat, ranges);
+
+                    MatIndexer<float> flagsMatIndexer = flagsMat.GetIndexer();
+
+                    for (int i = 0; i < maskMat.Length; i++)
                     {
-                        Mat[] arrs = { scalesMat, rotationsMat };
-                        Cv2.CalcHist(arrs, channels, null, hist, 2, histSize, ranges);
-                        double minVal, maxVal;
-                        Cv2.MinMaxLoc(hist, out minVal, out maxVal);
-
-                        Cv2.Threshold(hist, hist, maxVal * 0.5, 0, ThresholdTypes.Tozero);
-                        Cv2.CalcBackProject(arrs, channels, hist, flagsMat, ranges);
-
-                        MatIndexer<float> flagsMatIndexer = flagsMat.GetIndexer();
-
-                        for (int i = 0; i < maskMat.Length; i++)
+                        if (maskMat[i] > 0)
                         {
-                            if (maskMat[i] > 0)
-                                if (flagsMatIndexer[idx++] != 0.0f) nonZeroCount++; else maskMat[i] = 0;
+                            if (flagsMatIndexer[idx++] != 0.0f)
+                            {
+                                nonZeroCount++;
+                            }
+                            else
+                                maskMat[i] = 0;
                         }
-                        m.CopyTo(mask);
                     }
+                    m.CopyTo(mask);
                 }
             }
             maskHandle.Free();
@@ -240,7 +242,7 @@ namespace CS_Classes
             return nonZeroCount;
         }
 
-        public void VoteForUniqueness(DMatch[][] matches, Mat mask, float uniqnessThreshold = 0.80f)
+        private static void VoteForUniqueness(DMatch[][] matches, Mat mask, float uniqnessThreshold = 0.80f)
         {
             byte[] maskData = new byte[matches.Length];
             GCHandle maskHandle = GCHandle.Alloc(maskData, GCHandleType.Pinned);
@@ -249,14 +251,11 @@ namespace CS_Classes
                 mask.CopyTo(m);
                 for (int i = 0; i < matches.Length; i++)
                 {
-                    if (matches[i].Length > 1)
-                    {
-                        //This is also known as NNDR Nearest Neighbor Distance Ratio
-                        if ((matches[i][0].Distance / matches[i][1].Distance) <= uniqnessThreshold)
-                            maskData[i] = 255;
-                        else
-                            maskData[i] = 0;
-                    }
+                    //This is also known as NNDR Nearest Neighbor Distance Ratio
+                    if ((matches[i][0].Distance / matches[i][1].Distance) <= uniqnessThreshold)
+                        maskData[i] = 255;
+                    else
+                        maskData[i] = 0;
                 }
                 m.CopyTo(mask);
             }

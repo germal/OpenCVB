@@ -81,13 +81,12 @@ The second step is where all the work is.
 -   Run the “PrepareTree.bat” script in the OpenCVB directory that was just
     downloaded.
 
-The “PrepareTree.bat” script will download OpenCV, librealsense, and
-Kinect4Azure from their respective GitHub locations and install them in the
+The “PrepareTree.bat” script will download OpenCV, OpenCVSharp, librealsense,
+and Kinect4Azure from their respective GitHub locations and install them in the
 right locations of the OpenCVB tree. In addition, the script will run the CMake
 command that sets up OpenCV, librealsense, and Kinect4Azure. The script will
-then open Visual Studio for each of the resulting solution files created by the
-CMake. Build both the Debug and Release versions of each and then close Visual
-Studio to open the next solution file.
+then open Visual Studio for each solution file. Build both the Debug and Release
+versions of each and then close Visual Studio to open the next solution file.
 
 After all the packages have been built, then there is one environmental variable
 that needs to be set and it will depend on which version of OpenCV was just
@@ -101,7 +100,7 @@ environmental variable may need to be updated.
 
 The last step before running OpenCVB is to download the proprietary binaries
 from Microsoft for their Kinect4Azure camera. The “PrepareTree.bat” script built
-the open source portion of the camera support. This step will complete the
+the open source portion of the camera support but this step will complete the
 installation of the Kinect4Azure camera:
 
 -   <https://docs.microsoft.com/en-us/azure/Kinect-dk/sensor-sdk-download>
@@ -113,27 +112,6 @@ problems linking, it is very likely that the OpenCV_Version environmental
 variable needs to be updated. If the Kinect4Azure camera support has recently
 been upgraded, then OpenCVB will display a message explaining how to reflect
 that support in the code.
-
-**NuGet**
-
-The first time that OpenCVB is installed, NuGet may slow down the build while it
-automatically obtains the OpenCVSharp4 package. If there are any problems, go to
-*Tools/NuGet Package Manager/Manage NuGet Packages for Solution* and review the
-details on the OpenCVSharp4 installation. Typically, the first build will appear
-to stall but the second build will work correctly.
-
-With the Visual Studio 2019 Community Edition, it seems that NuGet can fail and
-you may have to uninstall the OpenCVSharp for Windows and then reinstall it for
-the OpenCVB project. To review the NuGet OpenCVSharp4 package, use the Visual
-Studio menus to navigate to “Tools/NuGet Package Manager/Manage NuGet Packages”
-and look at the “Installed” packages. Here is what it should look like once
-OpenCVSharp is installed properly:
-
-![](media/b898f2cad69aadc19c437317d4aa9830.png)
-
-OpenCVSharp is not used for all the projects (only CS_Classes, OpenCVB and
-VB_Classes need it) but it is easier to instruct the NuGet Package manager to
-install OpenCVSharp for all the projects in the solution file.
 
 **Build New Experiments**
 
@@ -544,17 +522,18 @@ algorithms are automatically cascaded for easy selection.
 The list of people who have made OpenCVB possible is long but starts with the
 OpenCV contributors – particularly, Gary Bradski, Victor Erukhimov, and Vadim
 Pisarevsky - and Intel’s decision to contribute the code to the open source
-community. Also, this code would not exist without the managed code interface to
-OpenCV provided by OpenCVSharp. There is a further Intel contribution to this
-software in the form of RealSense cameras – low-cost 3D cameras for the maker
-community as well as robotics developers and others. RealSense developers
-Sterling Orsten and Leo Keselman were helpful in educating this author. While
-others may disagree, there is no better platform than the one provided by
-Microsoft Visual Studio and VB.Net. And Microsoft’s Kinect for Azure camera is a
-valuable addition to the 3D camera effort. And lastly, it should be obvious that
-Google’s contribution to this effort was invaluable. Thanks to all the computer
-vision developers who posted algorithms where Google could find them. All these
-varied organizations deserve most of the credit for this software.
+community. Also, this code would not exist without OpenCVSharp managed code
+interface to OpenCV provided by user “shimat”. There is a further Intel
+contribution to this software in the form of RealSense cameras – low-cost 3D
+cameras for the maker community as well as robotics developers and others.
+RealSense developers Sterling Orsten and Leo Keselman were helpful in educating
+this author. While others may disagree, there is no better platform than the one
+provided by Microsoft Visual Studio and VB.Net. And Microsoft’s Kinect for Azure
+camera is a valuable addition to the 3D camera effort. And lastly, it should be
+obvious that Google’s contribution to this effort was invaluable. Thanks to all
+the computer vision developers who posted algorithms where Google could find
+them. All these varied organizations deserve most of the credit for this
+software.
 
 **MIT License**
 

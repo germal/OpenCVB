@@ -87,6 +87,12 @@ Public Class OpenCVB
         Kinect_Dir = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\"
         updatePath(Kinect_Dir, "Kinect camera support.")
 
+        Dim opencvsharp_Dir = HomeDir.FullName + "opencvsharp\samples\packages\OpenCvSharp4.4.1.1.20191026\lib\net461"
+        updatePath(opencvsharp_Dir, "OpenCVSharp support.")
+
+        Dim opencvsharpExtern_Dir = HomeDir.FullName + "opencvsharp\src\Release\x64\"
+        updatePath(opencvsharpExtern_Dir, "OpenCVSharpExtern support.")
+
         ' the depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
         ' Post an issue if this Is Not a valid assumption
