@@ -18,9 +18,9 @@ Module Python_Module
         Dim packageFiles = packageFolder.GetDirectories(packageName, IO.SearchOption.TopDirectoryOnly)
 
         If packageFiles.Count = 0 Then
-            ocvb.putText(New ActiveClass.TrueType("Python is present but the package " + packageName + " is not installed in this environment.", 10, 60, RESULT1))
+            ocvb.putText(New ActiveClass.TrueType("Python is present but the package opencv-python and numpy are not installed in this environment.", 10, 60, RESULT1))
             ocvb.putText(New ActiveClass.TrueType("Go to the Visual Studio menu 'Tools/Python/Python Environments'", 10, 90, RESULT1))
-            ocvb.putText(New ActiveClass.TrueType("Select 'Packages' in the combo box and search for 'opencv-python'", 10, 120, RESULT1))
+            ocvb.putText(New ActiveClass.TrueType("Select 'Packages' in the combo box and search for packages required by this script.", 10, 120, RESULT1))
             Return False
         End If
         Return True

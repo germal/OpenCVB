@@ -74,11 +74,18 @@ You will need to download and install the following before starting:
 
 The first step is to download OpenCVB from GitHub:
 
--   <https://github.com/bobdavies2000/OpenCVB>
+1.  <https://github.com/bobdavies2000/OpenCVB>
 
-The second step is where all the work is.
+The second step is to download the desired version of Python for use with
+OpenCVB. It is recommended to use only Python 3.x. The latest Python is
+available here:
 
--   Run the “PrepareTree.bat” script in the OpenCVB directory that was just
+1.  https://www.python.org/downloads/release/python-370/ - Install the x86-64
+    bit version.
+
+The third step is where all the work is.
+
+1.  Run the “PrepareTree.bat” script in the OpenCVB directory that was just
     downloaded.
 
 The “PrepareTree.bat” script will download OpenCV, OpenCVSharp, librealsense,
@@ -86,13 +93,14 @@ and Kinect4Azure from their respective GitHub locations and install them in the
 right locations of the OpenCVB tree. In addition, the script will run the CMake
 command that sets up OpenCV, librealsense, and Kinect4Azure. The script will
 then open Visual Studio for each solution file. Build both the Debug and Release
-versions of each and then close Visual Studio to open the next solution file.
+versions of each and then close each Visual Studio solution. It is recommended
+to use the Visual Studio “Build/Batch Build” menu entry.
 
 After all the packages have been built, then there is one environmental variable
 that needs to be set and it will depend on which version of OpenCV was just
 downloaded and built.
 
--   Environmental variable “OpenCV_Version” should be set it to 412
+-   Environmental variable “OpenCV_Version” should be set to 412
 
 The currently available OpenCV download is 4.12 so setting OpenCV_Version to 412
 reflects that but note that OpenCV is updated several times a year and the
@@ -105,13 +113,14 @@ installation of the Kinect4Azure camera:
 
 -   <https://docs.microsoft.com/en-us/azure/Kinect-dk/sensor-sdk-download>
 
-    -   Download and open the “Microsoft Installer” (the proprietary code)
+    -   Download and click “Microsoft Installer” (the proprietary code)
 
 The last step is to open the OpenCVB.sln file and build OpenCVB. If there are
 problems linking, it is very likely that the OpenCV_Version environmental
-variable needs to be updated. If the Kinect4Azure camera support has recently
-been upgraded, then OpenCVB will display a message explaining how to reflect
-that support in the code.
+variable needs to be updated. If there are problems running the camera
+initialization, it is like that the Kinect4Azure camera support has recently
+been upgraded. OpenCVB will display a message explaining how to reflect any
+camera change in the code.
 
 **Build New Experiments**
 

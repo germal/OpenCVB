@@ -5,6 +5,7 @@ Imports System.ComponentModel
 Imports System.Threading
 Imports System.Globalization
 Imports System.Text.RegularExpressions
+Imports System.Environment
 Public Class OpenCVB
 #Region "Globals"
     Const displayFrames As Int32 = 4
@@ -181,7 +182,11 @@ Public Class OpenCVB
 
         If intelCamera Is Nothing Then intelCamera = SetupIntelCamera(30, "", "")
         Dim usingIntelCamera As Boolean = optionsForm.IntelCamera.Checked
-        If intelCamera.deviceCount = 0 Then usingIntelCamera = False ' well, it has to be a Kinect system then.
+        If intelCamera.deviceCount = 0 Then
+            usingIntelCamera = False ' well, it has to be a Kinect system then.
+            optionsForm.IntelCamera.Checked = False
+            optionsForm.Kinect4Azure.Checked = True
+        End If
         If kinectCamera Is Nothing Then kinectCamera = New Kinect()
         If usingIntelCamera = False And kinectCamera.devicecount = 0 Then usingIntelCamera = True
         If kinectCamera.deviceCount = 0 And intelCamera.deviceCount = 0 Then
@@ -190,10 +195,10 @@ Public Class OpenCVB
         End If
 
         For i = 0 To TTtextData.Count - 1
-                TTtextData(i) = New List(Of VB_Classes.ActiveClass.TrueType)
-            Next
+            TTtextData(i) = New List(Of VB_Classes.ActiveClass.TrueType)
+        Next
 
-            For i = 0 To camPic.Length - 1
+        For i = 0 To camPic.Length - 1
             If camPic(i) Is Nothing Then camPic(i) = New PictureBox()
             camPic(i).Size = New Size(regWidth / resizeForDisplay, regHeight / resizeForDisplay)
             AddHandler camPic(i).DoubleClick, AddressOf campic_DoubleClick
@@ -208,10 +213,19 @@ Public Class OpenCVB
         LineUpCamPics()
     End Sub
     Private Sub FindPython()
-        ' Anaconda is distributed with Visual Studio.  That is the default Python.exe.  Override with the Options dialog.
-        Dim pythonFileInfo As New FileInfo("C:\Program Files (x86)\Microsoft Visual Studio\Shared\Anaconda3_64\Python.exe")
-        If pythonFileInfo.Exists Then
-            If optionsForm.PythonExeName.Text = "" Then SaveSetting("OpenCVB", "PythonExe", "PythonExe", pythonFileInfo.FullName)
+        Dim currentName = New FileInfo(GetSetting("OpenCVB", "PythonExe", "PythonExe", ""))
+        If currentName.Exists = False Then
+            For Each Dir As String In System.IO.Directory.GetDirectories("C:\")
+                Dim dirInfo As New System.IO.DirectoryInfo(Dir)
+                If dirInfo.FullName.StartsWith("C:\Python") Then
+                    Dim appData = GetFolderPath(SpecialFolder.ApplicationData)
+                    Dim pythonFileInfo = New FileInfo(appData + "\..\Local\Programs\Python\" + dirInfo.Name + "\Python.exe")
+                    If pythonFileInfo.Exists Then
+                        SaveSetting("OpenCVB", "PythonExe", "PythonExe", pythonFileInfo.FullName)
+                        optionsForm.PythonExeName.Text = pythonFileInfo.FullName
+                    End If
+                End If
+            Next
         End If
     End Sub
     Private Sub loadAlgorithmComboBoxes()
