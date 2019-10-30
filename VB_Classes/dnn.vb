@@ -21,10 +21,9 @@ Public Class DNN_Basics : Implements IDisposable
         dnnHeight = ocvb.color.Height
         crop = New cv.Rect(ocvb.color.Width / 2 - dnnWidth / 2, ocvb.color.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
 
-        Dim PERCdir = ocvb.parms.HomeDir + "librealsense/build/"
-        Dim infoText As New FileInfo(PERCdir + "\wrappers\opencv\dnn\MobileNetSSD_deploy.prototxt")
+        Dim infoText As New FileInfo(ocvb.parms.dataPath + "MobileNetSSD_deploy.prototxt")
         If infoText.Exists Then
-            Dim infoModel As New FileInfo(PERCdir + "\wrappers\opencv\dnn\MobileNetSSD_deploy.caffemodel")
+            Dim infoModel As New FileInfo(ocvb.parms.dataPath + "MobileNetSSD_deploy.caffemodel")
             If infoModel.Exists Then
                 net = dnn.CvDnn.ReadNetFromCaffe(infoText.FullName, infoModel.FullName)
                 dnnPrepared = True
