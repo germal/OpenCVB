@@ -215,15 +215,14 @@ Public Class OpenCVB
     Private Sub FindPython()
         Dim currentName = New FileInfo(GetSetting("OpenCVB", "PythonExe", "PythonExe", ""))
         If currentName.Exists = False Then
-            For Each Dir As String In System.IO.Directory.GetDirectories("C:\")
+            Dim appData = GetFolderPath(SpecialFolder.ApplicationData)
+            For Each Dir As String In System.IO.Directory.GetDirectories(appData + "\..\Local\Programs\Python\")
                 Dim dirInfo As New System.IO.DirectoryInfo(Dir)
-                If dirInfo.FullName.StartsWith("C:\Python") Then
-                    Dim appData = GetFolderPath(SpecialFolder.ApplicationData)
-                    Dim pythonFileInfo = New FileInfo(appData + "\..\Local\Programs\Python\" + dirInfo.Name + "\Python.exe")
-                    If pythonFileInfo.Exists Then
-                        SaveSetting("OpenCVB", "PythonExe", "PythonExe", pythonFileInfo.FullName)
-                        optionsForm.PythonExeName.Text = pythonFileInfo.FullName
-                    End If
+                Dim pythonFileInfo = New FileInfo(dirInfo.FullName + "\Python.exe")
+                If pythonFileInfo.Exists Then
+                    SaveSetting("OpenCVB", "PythonExe", "PythonExe", pythonFileInfo.FullName)
+                    optionsForm.PythonExeName.Text = pythonFileInfo.FullName
+                    Exit For
                 End If
             Next
         End If
