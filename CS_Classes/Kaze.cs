@@ -18,6 +18,9 @@ namespace CS_Classes
             var kaze = KAZE.Create();
             var kazeDescriptors = new Mat();
             kaze.DetectAndCompute(gray, null, out kazeKeyPoints, kazeDescriptors);
+
+            var dstKaze = new Mat();
+            Cv2.DrawKeypoints(gray, kazeKeyPoints, dstKaze);
         }
     }
     public class AKaze_Basics
@@ -26,6 +29,7 @@ namespace CS_Classes
         public void GetKeypoints(Mat gray)
         {
             var akaze = AKAZE.Create();
+
             var akazeDescriptors = new Mat();
             akaze.DetectAndCompute(gray, null, out akazeKeyPoints, akazeDescriptors);
         }
@@ -62,7 +66,7 @@ namespace CS_Classes
                         int nonZero = Cv2.CountNonZero(mask);
                         VoteForUniqueness(matches, mask);
                         nonZero = Cv2.CountNonZero(mask);
-                        nonZero = VoteForSizeAndOrientation(keypoints2, keypoints1, matches, mask, 1.5f, 20);
+                        nonZero = VoteForSizeAndOrientation(keypoints2, keypoints1, matches, mask, 1.5f, 10);
 
                         List<Point2f> obj = new List<Point2f>();
                         List<Point2f> scene = new List<Point2f>();
@@ -210,10 +214,12 @@ namespace CS_Classes
                     int[] histSize = { scaleBinSize, rotationBins };
                     float[] rotationRanges = { 0.0f, 360.0f };
                     int[] channels = { 0, 1 };
-                    Rangef[] ranges = { new Rangef(scaleRanges[0], scaleRanges[1]), new Rangef(rotations.Min(), rotations.Max()) };
+                    // with infrared left and right, rotation max = min and calchist fails.  Adding 1 to max enables all this to work!
+                    Rangef[] ranges = { new Rangef(scaleRanges[0], scaleRanges[1]), new Rangef(rotations.Min(), rotations.Max() + 1) };
                     double minVal, maxVal;
 
                     Mat[] arrs = { scalesMat, rotationsMat };
+ 
                     Cv2.CalcHist(arrs, channels, null, hist, 2, histSize, ranges);
                     Cv2.MinMaxLoc(hist, out minVal, out maxVal);
 

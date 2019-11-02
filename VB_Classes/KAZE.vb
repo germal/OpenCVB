@@ -45,7 +45,7 @@ End Class
 Public Class KAZE_Sample_CS : Implements IDisposable
     Dim box As New cv.Mat
     Dim box_in_scene As New cv.Mat
-    Dim CS_Kaze As New CS_Classes.Kaze_Sample
+    Dim CS_Kaze As New CS_Classes.KAZE_Sample
     Public Sub New(ocvb As AlgorithmData)
         box = cv.Cv2.ImRead(ocvb.parms.datapath + "box.png", cv.ImreadModes.Color)
         box_in_scene = cv.Cv2.ImRead(ocvb.parms.datapath + "box_in_scene.png", cv.ImreadModes.Color)
@@ -63,7 +63,7 @@ End Class
 
 Public Class KAZE_Match_CS : Implements IDisposable
     Dim red As InfraRed_Basics
-    Dim CS_Kaze As New CS_Classes.Kaze_Sample
+    Dim CS_Kaze As New CS_Classes.KAZE_Sample
     Public Sub New(ocvb As AlgorithmData)
         red = New InfraRed_Basics(ocvb)
         red.sliders.TrackBar1.Value = 45
