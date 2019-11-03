@@ -74,18 +74,18 @@ You will need to download and install the following before starting:
 
 The first step is to download OpenCVB from GitHub:
 
-1.  <https://github.com/bobdavies2000/OpenCVB>
+-   <https://github.com/bobdavies2000/OpenCVB>
 
 The second step is to download the desired version of Python for use with
 OpenCVB. It is recommended to use only Python 3.x. The latest Python is
 available here:
 
-1.  https://www.python.org/downloads/release/python-370/ - Install the x86-64
+-   https://www.python.org/downloads/release/python-370/ - Install the x86-64
     bit version.
 
 The third step is where all the work is.
 
-1.  Run the “PrepareTree.bat” script in the OpenCVB directory that was just
+-   Run the “PrepareTree.bat” script in the OpenCVB directory that was just
     downloaded.
 
 The “PrepareTree.bat” script will download OpenCV, OpenCVSharp, librealsense,
@@ -192,7 +192,7 @@ but the entire OpenCVB application does not need to be ported to other
 platforms. Only individual algorithms will need to be ported after they are
 debugged and polished and the algorithms consist almost entirely of OpenCV API’s
 which are already available everywhere. OpenCVB’s value lies in the ability to
-freely experiment and finish an OpenCV algorithms before even starting a port to
+freely experiment and finish an OpenCV algorithm before even starting a port to
 a different platform.
 
 **Camera Interface**
