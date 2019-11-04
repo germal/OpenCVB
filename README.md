@@ -19,15 +19,17 @@ Intel D4xx cameras. The D435i camera has an IMU as well.
 
 **The Objective**
 
-There are many computer vision examples on the web, but it is often the case
-that it is a lot of setup work to get each demo working. OpenCVB collects many
-of these algorithms into a single application and streamlines the process of
-adding variants and experimenting with the example. The first objective is to
-get access to languages commonly used for computer vision projects - C++, C\#,
-Python, and VB.Net are currently supported. Secondly, it is important to get
-access to multiple libraries - OpenCV, OpenGL, and OpenMP. And lastly, it is
-important to use all the possible image representations - 3D, bitmaps, plots,
-bar charts, spreadsheets, or text.
+There are many computer vision examples on the web but too often something is
+missing. And when the build is finally working, a filename or option is not
+known. OpenCVB collects many of these algorithms into a single application and
+guarantees that each will build and run. In addition, the process of adding
+variants and experimenting with the example is simplified.
+
+If this approach is to be credible, all the common languages used for computer
+vision projects - C++, C\#, Python, and VB.Net – need support. Secondly, it is
+important to get access to multiple libraries - OpenCV, OpenCVSharp, OpenGL, and
+OpenMP. And lastly, it is important to use all the possible image
+representations - 3D, bitmaps, plots, bar charts, spreadsheets, or text.
 
 Making these languages and libraries available while using the same
 infrastructure shaped a standardized class for computer vision examples.
@@ -85,8 +87,7 @@ available here:
 
 The third step is where all the work is.
 
--   Run the “PrepareTree.bat” script in the OpenCVB directory that was just
-    downloaded.
+-   Run the “PrepareTree.bat” script in the OpenCVB directory.
 
 The “PrepareTree.bat” script will download OpenCV, OpenCVSharp, librealsense,
 and Kinect4Azure from their respective GitHub locations and install them in the
@@ -164,7 +165,7 @@ The ability to create subsets from the hundreds of algorithms makes it easier to
 study examples of an OpenCV API or OpenCVB algorithm usage. All the OpenCV API’s
 that are used and all the OpenCVB algorithms are listed in the “Subset Combo
 Box”. In addition to all the OpenCV API’s and OpenCVB algorithms, several
-higher-level groupings are available. For instance, selecting “\<OpenGL\> will
+higher-level groupings are available. For instance, selecting “\<OpenGL\>” will
 select only the algorithms that use OpenGL. The “\<All\>” entry in the Subset
 Combo Box will restore the complete list of algorithms in the Algorithm Combo
 Box.
@@ -193,7 +194,8 @@ platforms. Only individual algorithms will need to be ported after they are
 debugged and polished and the algorithms consist almost entirely of OpenCV API’s
 which are already available everywhere. OpenCVB’s value lies in the ability to
 freely experiment and finish an OpenCV algorithm before even starting a port to
-a different platform.
+a different platform. Confining development to OpenCVB’s C++ interface should
+provide the most portable version of any algorithm.
 
 **Camera Interface**
 
@@ -212,8 +214,8 @@ Similarly, the Kinect for Azure camera support is isolated to the Kinect.vb
 class and a supporting KinectCamera DLL that provides all the interface code to
 the Kinect for Azure libraries. Since there is likely to be little interest in
 debugging the KinectCamera DLL, it is compiled with optimizations enabled even
-in the Debug configuration. Optimizations enable a much higher framerate than
-when running the Debug configuration of the Kinect camera DLL. As a result, the
+in the Debug configuration. Optimizations enable a higher framerate than when
+running the Debug configuration of the Kinect camera DLL. As a result, the
 VB.Net code in Debug mode often runs as fast as the Release configuration.
 
 **OpenGL Interface**
@@ -234,16 +236,16 @@ that will consume RGB and a point cloud.
 NOTE: it is easy to forget to include any new OpenGL project in the Project
 Dependencies. This can be confusing because the new project will not build
 automatically when restarting. The OpenCVB Project Dependencies need to be
-updated whenever a new OpenGL application is added to the OpenCV Solution file.
-To update dependencies, select “Project/Dependencies” from the Visual Studio
-menu and make sure that the “OpenCVB” project depends on any new OpenGL
-projects. This ensures that the new project will always be rebuilt when OpenCVB
-is restarted.
+updated whenever a new OpenGL application is added to the OpenCVB solution. To
+update dependencies, select “Project/Dependencies” from the Visual Studio menu
+and make sure that the “OpenCVB” project depends on any new OpenGL projects.
+This ensures that the new project will always be rebuilt when OpenCVB is
+restarted.
 
 **OpenCV’s OpenGL Interface**
 
 The “PrepareTree.bat” script will have configured OpenCV with OpenGL support.
-OpenCVB will use the OpenGL interface – see the OpenCVGL algorithm. The
+OpenCVB will use this OpenGL interface – see the OpenCVGL algorithm. The
 interface is sluggish and looks different from most OpenGL applications so the
 alternative interface to OpenGL (discussed above) is preferred. Both interfaces
 use the same sliders and options to control the OpenGL interface.
@@ -275,21 +277,21 @@ VB.Net wrapper: use the same name for both, i.e. the algorithm Python_RGBDepth
 is the companion for the Python_RGBDepth.py script.
 
 Python scripts show up in the list of algorithms in the OpenCVB user interface
-and each Python script will be run when performing a “Test All” regression.
-OpenCVB uses the Python provided by Microsoft’s Visual Studio but it is possible
-to install Visual Studio without Python support so if this occurs, a message
-will appear that explains how to obtain the Python support that comes with
-Visual Studio.
+and each Python script will be run when performing a “Test All” regression. To
+change which version of Python is used, open the “Options” for OptionCVB and in
+the “Python” section, there is a browse button to select any Python.exe
+available on the system.
 
-By default, the Python installed with Visual Studio does not include
-“opencv-python” or “NumPy” libraries. For Visual Studio, the cv2 and NumPy
-interfaces are installed through the Visual Studio menus:
+Typically, Python is not installed with “opencv-python” or “NumPy” libraries
+which are required for many of the OpenCVB Python scripts. To update the current
+version of Python in Visual Studio, the cv2 and NumPy interfaces are installed
+through the Visual Studio menus:
 
 -   “Tools/Python/Python Environments” – select “Packages” in the combo box then
     search for “opencv-python” or “numpy” and hit install.
 
-If opencv-python or NumPy are not installed, these instructions to install them
-will appear.
+If opencv-python or NumPy are not installed, the instructions to install them
+will appear when attempting to run a Python script.
 
 There are other optional Python packages that might be useful to install – there
 is at least one Python script using “PyOpenGL” and “pygame”. In general, if an
@@ -365,7 +367,8 @@ For those without any or all of the components above, a preview of some
 algorithms’ output is provided below.
 
 All algorithms present the RGB image in the top left and depth in the top right.
-Algorithm results are in the bottom left and right.
+Algorithm results are in the bottom left and right or additional HighGUI or
+OpenGL windows. Algorithm options will appear
 
 ![](media/69c6578e73d94f9941e3e19ad50ae4f4.jpg)
 
