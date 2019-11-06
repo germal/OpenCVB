@@ -34,8 +34,6 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VB_Classes", "VB_Classes\VB
 		{15CAF5DC-2743-480E-B164-47F0388943CB} = {15CAF5DC-2743-480E-B164-47F0388943CB}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPP_Algorithms", "CPP_Algorithms\CPP_Algorithms.vcxproj", "{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}"
-EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "UIindexer", "UIindexer\UIindexer.vbproj", "{15CAF5DC-2743-480E-B164-47F0388943CB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Camera_IntelD4xx", "Cameras\IntelD4xx\IntelD4xx.vcxproj", "{6F08EED2-F8F6-4320-BF0D-6E3738D28385}"
@@ -51,6 +49,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL_Callbacks", "OpenGL_Algorithms\OpenGL_Callbacks\OpenGL_Callbacks.vcxproj", "{4FD35AC4-B338-4BDC-B5F5-77594539EAD0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL_IMU", "OpenGL_Algorithms\OpenGL_IMU\OpenGL_IMU.vcxproj", "{E72A020D-1299-4A21-A3EB-EDD4D9BE1C4E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPP_Classes", "CPP_Classes\CPP_Classes.vcxproj", "{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -92,14 +92,6 @@ Global
 		{735A2264-8A36-4D0A-ADE0-2BFAD6734401}.Release|x64.Build.0 = Release|x64
 		{735A2264-8A36-4D0A-ADE0-2BFAD6734401}.Release|x86.ActiveCfg = Release|Any CPU
 		{735A2264-8A36-4D0A-ADE0-2BFAD6734401}.Release|x86.Build.0 = Release|Any CPU
-		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Debug|x64.ActiveCfg = Debug|x64
-		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Debug|x64.Build.0 = Debug|x64
-		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Debug|x86.ActiveCfg = Debug|Win32
-		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Debug|x86.Build.0 = Debug|Win32
-		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Release|x64.ActiveCfg = Release|x64
-		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Release|x64.Build.0 = Release|x64
-		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Release|x86.ActiveCfg = Release|Win32
-		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Release|x86.Build.0 = Release|Win32
 		{15CAF5DC-2743-480E-B164-47F0388943CB}.Debug|x64.ActiveCfg = Debug|x64
 		{15CAF5DC-2743-480E-B164-47F0388943CB}.Debug|x64.Build.0 = Debug|x64
 		{15CAF5DC-2743-480E-B164-47F0388943CB}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -164,6 +156,14 @@ Global
 		{E72A020D-1299-4A21-A3EB-EDD4D9BE1C4E}.Release|x64.Build.0 = Release|x64
 		{E72A020D-1299-4A21-A3EB-EDD4D9BE1C4E}.Release|x86.ActiveCfg = Release|Win32
 		{E72A020D-1299-4A21-A3EB-EDD4D9BE1C4E}.Release|x86.Build.0 = Release|Win32
+		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Debug|x64.ActiveCfg = Debug|x64
+		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Debug|x64.Build.0 = Debug|x64
+		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Debug|x86.ActiveCfg = Debug|Win32
+		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Debug|x86.Build.0 = Debug|Win32
+		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Release|x64.ActiveCfg = Release|x64
+		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Release|x64.Build.0 = Release|x64
+		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Release|x86.ActiveCfg = Release|Win32
+		{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

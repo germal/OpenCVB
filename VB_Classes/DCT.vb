@@ -241,16 +241,15 @@ Public Class DCT_CCompenents : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         dct = New DCT_FeatureLess_MT(ocvb)
         cc = New CComp_Basics(ocvb)
+        cc.externalUse = True
 
         ocvb.desc = "Find surfaces that lack any texture with DCT (less highest frequency) and use connected components to isolate those surfaces."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dct.Run(ocvb)
-        ' result1 is the binary mask and result2 is the color image after applying the mask
-        Dim srcGray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim binary = srcGray.Threshold(1, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
-        Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
-        cc.RenderBlobs(ocvb.result1)
+
+        cc.srcGray = ocvb.result1.Clone()
+        cc.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         dct.Dispose()

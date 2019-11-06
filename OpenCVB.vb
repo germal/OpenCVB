@@ -696,9 +696,11 @@ Public Class OpenCVB
             If stopAlgorithmThread Then Exit While
             If pauseUpdates Then Continue While
             If Me.Visible Then
-                Me.Invoke(Sub()
-                              Me.Refresh()
-                          End Sub)
+                Me.Invoke(
+                    Sub()
+                        Me.Refresh()
+                    End Sub
+                )
             End If
 
             camera.GetNextFrame()

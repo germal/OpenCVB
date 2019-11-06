@@ -14,13 +14,13 @@ Public Class CComp_Basics : Implements IDisposable
         End Function
     End Class
     Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "CComp Threshold", 0, 255, 0)
-        sliders.setupTrackBar2(ocvb, "CComp Min Area", 0, 10000, 5000)
+        sliders.setupTrackBar1(ocvb, "CComp Threshold", 0, 255, 10)
+        sliders.setupTrackBar2(ocvb, "CComp Min Area", 0, 10000, 500)
         If ocvb.parms.ShowOptions Then sliders.show()
 
         ocvb.desc = "Draw bounding boxes around RGB binarized connected Components"
         ocvb.label1 = "CComp binary"
-        ocvb.label2 = "Blob Rectangles"
+        ocvb.label2 = "Blob Rectangles and centroids"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -34,32 +34,24 @@ Public Class CComp_Basics : Implements IDisposable
         End If
         ocvb.result1 = binary.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
+
         cc.RenderBlobs(ocvb.result1)
         Dim grayMasks = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        Dim sortedBlob As New SortedList(Of Int32, cv.Rect)(New CompareArea)
-        For i = 1 To cc.Blobs.Count - 1
-            Dim blob = cc.Blobs.ElementAt(i)
-            If blob.Area >= sliders.TrackBar2.Value Then sortedBlob.Add(blob.Area, blob.Rect)
-        Next
-
         Dim grayDepth = ocvb.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ocvb.result2 = New cv.Mat(ocvb.result2.Size(), cv.MatType.CV_8U, 0)
-        ocvb.result1.SetTo(0)
-        For i = 0 To sortedBlob.Count - 1
-            Dim rect = sortedBlob.ElementAt(i).Value
-            If rect.X + rect.Width < grayDepth.Width And rect.Y + rect.Height < grayDepth.Height Then
-                Dim mask = grayMasks(rect)
-                Dim m = cv.Cv2.Moments(mask, True)
-                Dim centroid = New cv.Point(CInt(m.M10 / m.M00), CInt(m.M01 / m.M00))
-                Dim mean = grayDepth(rect).Mean(mask)
-                ocvb.result2(rect).SetTo(mean, mask)
-                ocvb.color(rect).CopyTo(ocvb.result1(rect), mask)
-                ocvb.result1(rect).Circle(centroid, 5, cv.Scalar.White, -1)
-                ocvb.result1.Rectangle(rect, cv.Scalar.White, 1)
-                ocvb.result2(rect).Circle(centroid, 5, cv.Scalar.White, -1)
-                ocvb.result2.Rectangle(rect, cv.Scalar.White, 1)
-            End If
+        ocvb.result1.CopyTo(ocvb.result2)
+        For Each blob In cc.Blobs
+            If blob.Area < sliders.TrackBar2.Value Then Continue For ' skip it if too small...
+            Dim rect = blob.Rect
+            ' if it covers everything, then forget it...
+            If rect.Width = srcGray.Width And rect.Height = srcGray.Height Then Continue For
+            If rect.X + rect.Width > srcGray.Width Or rect.Y + rect.Height > srcGray.Height Then Continue For
+            Dim mask = grayMasks(rect)
+            Dim m = cv.Cv2.Moments(mask, True)
+            If m.M00 = 0 Then Continue For ' avoid divide by zero...
+            Dim centroid = New cv.Point(CInt(m.M10 / m.M00), CInt(m.M01 / m.M00))
+
+            ocvb.result2(rect).Circle(centroid, 5, cv.Scalar.White, -1)
+            ocvb.result2.Rectangle(rect, cv.Scalar.White, 2)
         Next
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

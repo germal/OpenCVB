@@ -18,7 +18,7 @@
 #include <k4a/k4a.h>
 #include <k4a/k4a.hpp>
 #include <k4apixel.h>
-#include "../../CPP_Algorithms/DepthColorizer.hpp"
+#include "../../CPP_Classes/DepthColorizer.hpp"
 
 using namespace std;
 using namespace cv;

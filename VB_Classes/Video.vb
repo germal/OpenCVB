@@ -32,14 +32,15 @@ Public Class Video_CarCounting : Implements IDisposable
     Dim video As Video_Basics
     Dim mog As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData)
+        mog = New BGSubtract_MOG(ocvb)
+        mog.externalUse = True
+
         video = New Video_Basics(ocvb)
 
         flow = New Font_FlowText(ocvb)
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
-        mog = New BGSubtract_MOG(ocvb)
-        mog.externalUse = True
         ocvb.desc = "Count cars in a video file"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -94,6 +95,9 @@ Public Class Video_CarCComp : Implements IDisposable
     Dim video As Video_Basics
     Dim mog As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData)
+        mog = New BGSubtract_MOG(ocvb)
+        mog.externalUse = True
+
         cc = New CComp_Basics(ocvb)
         cc.externalUse = True
 
@@ -103,8 +107,6 @@ Public Class Video_CarCComp : Implements IDisposable
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
-        mog = New BGSubtract_MOG(ocvb)
-        mog.externalUse = True
         ocvb.desc = "Outline cars with a rectangle"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -113,9 +115,7 @@ Public Class Video_CarCComp : Implements IDisposable
             mog.src = video.image.Clone()
             mog.Run(ocvb)
 
-            ocvb.result2 = video.image.Clone()
-
-            cc.srcGray = mog.gray.Clone()
+            cc.srcGray = ocvb.result1.Clone()
             cc.Run(ocvb)
         End If
     End Sub
