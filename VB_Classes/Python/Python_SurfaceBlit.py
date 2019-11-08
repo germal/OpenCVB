@@ -76,13 +76,13 @@ try:
                 frameCount = arrayDoubles[0] 
                 rgb = pipeIn.read(int(rgbBufferSize))
 
-                surface = pygame.image.fromstring(rgb, (w, h), "RGB")
+                surface = pygame.image.frombuffer(rgb, (w, h), "RGB")
                 screen.blit(surface, (0, 0))
                 size = rows, cols, 3
-                img = np.fromstring(rgb, np.uint8).reshape(size)
+                img = np.frombuffer(rgb, np.uint8).reshape(size)
 
                 pointCloud = pipeIn.read(int(pointCloudSize))
-                #vertices = np.fromstring(pointCloud, np.float).reshape(size)
+                #vertices = np.frombuffer(pointCloud, np.float).reshape(size)
                 pygame.display.flip()
                 pygame.time.wait(1)
 

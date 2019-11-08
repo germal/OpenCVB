@@ -90,7 +90,7 @@ class App(object):
                     frameCount = arrayDoubles[0] 
                     rgb = pipeIn.read(int(rgbBufferSize))
                     rgbSize = rows, cols, 3
-                    vis = np.fromstring(rgb, np.uint8).reshape(rgbSize)
+                    vis = np.array(np.frombuffer(rgb, np.uint8).reshape(rgbSize))
                     hsv = cv.cvtColor(vis, cv.COLOR_BGR2HSV)
                     if frameCount == 0:
                         img = np.zeros(vis.shape, np.uint8)

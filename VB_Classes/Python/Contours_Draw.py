@@ -16,7 +16,7 @@ lower = np.array([20,0,155])
 upper = np.array([255,120,250])
 shapeMask = cv.inRange(image, lower, upper)
 size = image.shape[0], image.shape[1], 1
-mask = np.fromstring(shapeMask, np.uint8).reshape(size)
+mask = np.array(np.frombuffer(shapeMask, np.uint8).reshape(size))
 mask = cv.cvtColor(mask, cv.COLOR_GRAY2BGR)
 
 # find the contours in the mask

@@ -49,10 +49,10 @@ try:
                 rgb = pipeIn.read(int(rgbBufferSize))
                 depthData = pipeIn.read(int(depthBufferSize))
                 depthSize = rows, cols, 1
-                depth = np.fromstring(depthData, np.uint16).reshape(depthSize)
+                depth = np.array(np.frombuffer(depthData, np.uint16).reshape(depthSize))
                 depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth, alpha=0.03), cv.COLORMAP_JET)
                 rgbSize = rows, cols, 3
-                imgRGB = np.fromstring(rgb, np.uint8).reshape(rgbSize)
+                imgRGB = np.array(np.frombuffer(rgb, np.uint8).reshape(rgbSize))
 
                 images = np.vstack((imgRGB, depth_colormap))
                 cv.imshow("RGB and Depth Images", images)
