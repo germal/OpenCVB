@@ -25,5 +25,5 @@ start librealsense/Build/librealsense2.sln
 start opencvsharp/OpenCvSharp.sln
 start opencvsharp/samples/OpenCvSharpSamples.sln
 start eigen-git-mirror/Build/eigen3.sln
-start eigen-git-mirror/Build/vtk.sln
+start VTK/Build/vtk.sln
 start OpenCV/Build/OpenCV.sln
