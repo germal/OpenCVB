@@ -1,17 +1,17 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module OpenCVGL_Image_CPP_Module
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub OpenCVGL_Image_Open(w As Int32, h As Int32)
     End Sub
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub OpenCVGL_Image_Close()
     End Sub
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub OpenCVGL_Image_Control(ppx As Single, ppy As Single, fx As Single, fy As Single, FOV As Single, zNear As Single, zFar As Single, eye As cv.Vec3f,
                                     yaw As Single, roll As Single, pitch As Single, pointSize As Int32, zTrans As Single, textureWidth As Int32, textureHeight As Int32)
     End Sub
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub OpenCVGL_Image_Run(rgbPtr As IntPtr, pointCloud As IntPtr, pcBufferSize As Int32, rows As Int32, cols As Int32)
     End Sub
 End Module

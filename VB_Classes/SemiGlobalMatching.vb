@@ -2,13 +2,13 @@
 Imports System.Runtime.InteropServices
 
 Module SemiGlobalMatching_Exports
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function SemiGlobalMatching_Open(rows As Int32, cols As Int32) As IntPtr
     End Function
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub SemiGlobalMatching_Close(SemiGlobalMatchingPtr As IntPtr)
     End Sub
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function SemiGlobalMatching_Run(SemiGlobalMatchingPtr As IntPtr, leftPtr As IntPtr, rightPtr As IntPtr, rows As Int32, cols As Int32,
                                            disparityRange As Int32) As IntPtr
     End Function

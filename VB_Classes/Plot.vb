@@ -100,7 +100,7 @@ End Class
 
 
 Module Plot_OpenCV_Module
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Plot_OpenCVBasics(plota As IntPtr, plotb As IntPtr, rows As Int32, cols As Int32)
     End Sub
 

@@ -1,10 +1,10 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module FitEllipse_Exports
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub FitEllipse_AMS(inputPtr As IntPtr, numberOfPoints As Int32, outputTriangle As IntPtr)
     End Sub
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub FitEllipse_Direct(inputPtr As IntPtr, numberOfPoints As Int32, outputTriangle As IntPtr)
     End Sub
 End Module

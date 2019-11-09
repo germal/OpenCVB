@@ -3,13 +3,13 @@ Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 
 Module Annealing_Exports
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Annealing_Basics_Open(cityPositions As IntPtr, numberOfCities As Int32) As IntPtr
     End Function
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Annealing_Basics_Close(saPtr As IntPtr)
     End Sub
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Annealing_Basics_Run(saPtr As IntPtr, cityOrder As IntPtr, numberOfCities As Int32) As IntPtr
     End Function
 End Module

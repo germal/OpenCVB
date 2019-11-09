@@ -50,13 +50,13 @@ End Class
 
 
 Module xPhoto_OilPaint_CPP_Module
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function xPhoto_OilPaint_Open() As IntPtr
     End Function
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub xPhoto_OilPaint_Close(xPhoto_OilPaint_Ptr As IntPtr)
     End Sub
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function xPhoto_OilPaint_Run(xPhoto_OilPaint_Ptr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32,
                                        size As Int32, dynRatio As Int32, colorCode As Int32) As IntPtr
     End Function

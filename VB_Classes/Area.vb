@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module MinTriangle_Exports
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub MinTriangle_Run(inputPtr As IntPtr, numberOfPoints As Int32, outputTriangle As IntPtr)
     End Sub
 End Module

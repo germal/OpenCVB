@@ -2,13 +2,13 @@
 Imports System.Runtime.InteropServices
 
 Module RecursiveBilateralFilter_Exports
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function RecursiveBilateralFilter_Open() As IntPtr
     End Function
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub RecursiveBilateralFilter_Close(rbf As IntPtr)
     End Sub
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function RecursiveBilateralFilter_Run(rbf As IntPtr, inputPtr As IntPtr, rows As Int32, cols As Int32, recursions As Int32) As IntPtr
     End Function
 End Module

@@ -1,15 +1,15 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module fastLineDetector_Exports
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function lineDetectorFast_Run(image As IntPtr, rows As Int32, cols As Int32, length_threshold As Int32, distance_threshold As Single, canny_th1 As Int32, canny_th2 As Int32,
                             canny_aperture_size As Int32, do_merge As Boolean) As Int32
     End Function
 
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function lineDetector_Run(image As IntPtr, rows As Int32, cols As Int32) As Int32
     End Function
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function lineDetector_Lines() As IntPtr
     End Function
 

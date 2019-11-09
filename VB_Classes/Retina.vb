@@ -3,13 +3,13 @@ Imports System.Runtime.InteropServices
 Imports System.IO
 
 Module Retina_CPP_Module
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Retina_Basics_Open(rows As Int32, cols As Int32, useLogSampling As Boolean, samplingFactor As Single) As IntPtr
     End Function
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Retina_Basics_Close(RetinaPtr As IntPtr)
     End Sub
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Retina_Basics_Run(RetinaPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, magno As IntPtr, useLogSampling As Int32) As IntPtr
     End Function
 End Module

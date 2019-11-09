@@ -133,7 +133,7 @@ End Class
 
 
 Module corners_Exports
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Corners_ShiTomasi(grayPtr As IntPtr, dstPtr As IntPtr, rows As Int32, cols As Int32, blocksize As Int32, aperture As Int32)
     End Sub
 End Module

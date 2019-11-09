@@ -70,13 +70,13 @@ End Class
 
 
 Module puzzlePiece_Exports
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Puzzle_PieceCorrelation_Open(puzzlePieces As IntPtr, count As Int32) As IntPtr
     End Function
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Puzzle_PieceCorrelation_Close(saPtr As IntPtr)
     End Sub
-    <DllImport(("CPP_Algorithms.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Puzzle_PieceCorrelation_Run(saPtr As IntPtr, puzzleOrder As IntPtr, img As IntPtr, rows As Int32, cols As Int32, state As cv.Vec3i) As IntPtr
     End Function
 End Module

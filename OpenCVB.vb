@@ -70,28 +70,32 @@ Public Class OpenCVB
             SaveSetting("OpenCVB", "<All>", "<All>", algorithm)
             externalInvocation = True ' we don't need to start python because it started OpenCVB.
         End If
+
         Dim opencvsharp_Dir = HomeDir.FullName + "opencvsharp\samples\packages\OpenCvSharp4.4.1.1.20191026\lib\net461"
         updatePath(opencvsharp_Dir, "OpenCVSharp support.")
 
         Dim opencvsharpExtern_Dir = HomeDir.FullName + "opencvsharp\samples\SamplesCS\bin\Debug\dll\x64"
         updatePath(opencvsharpExtern_Dir, "OpenCVSharpExtern support.")
 
+        opencvsharpExtern_Dir = HomeDir.FullName + "opencvsharp\samples\SamplesCS\bin\Release\dll\x64"
+        updatePath(opencvsharpExtern_Dir, "OpenCVSharpExtern support.")
+
+        OpenCVfullPath = HomeDir.FullName + "OpenCV\Build\bin\Debug\"
+        updatePath(OpenCVfullPath, "OpenCV and OpenCV Contrib are needed for C++ classes.")
+
         OpenCVfullPath = HomeDir.FullName + "OpenCV\Build\bin\Release\"
         updatePath(OpenCVfullPath, "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
-        OpenCVfullPath = HomeDir.FullName + "OpenCV\Build\bin\debug\"
-        updatePath(OpenCVfullPath, "OpenCV and OpenCV Contrib are needed for C++ classes.")
-
-        Dim IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Release\"
+        Dim IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Debug\"
         updatePath(IntelPERC_Lib_Dir, "Realsense camera support.")
 
-        IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Debug\"
+        IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Release\"
         updatePath(IntelPERC_Lib_Dir, "Realsense camera support.")
 
-        Dim Kinect_Dir = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\"
+        Dim Kinect_Dir = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\"
         updatePath(Kinect_Dir, "Kinect camera support.")
 
-        Kinect_Dir = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\"
+        Kinect_Dir = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\"
         updatePath(Kinect_Dir, "Kinect camera support.")
 
         ' the depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
@@ -785,3 +789,5 @@ Public Class OpenCVB
         frameCount = 0
     End Sub
 End Class
+
+
