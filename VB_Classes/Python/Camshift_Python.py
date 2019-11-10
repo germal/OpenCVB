@@ -35,7 +35,7 @@ import array
 import argparse
 import numpy as np
 import cv2 as cv
-import os, time, sys
+import os, time
 import psutil
 from time import sleep
 import ctypes
@@ -140,7 +140,6 @@ if __name__ == '__main__':
     parser.add_argument('--MemMapLength', type=int, default=0, help='The number of bytes are in the memory mapped file.')
     parser.add_argument('--pipeName', default='', help='The name of the input pipe for image data.')
     args = parser.parse_args()
-    Mbox('args', 'args', 1)
 
     pid = 0 # pid of any spawned task
     MemMapLength = args.MemMapLength

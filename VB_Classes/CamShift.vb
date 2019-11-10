@@ -1,4 +1,9 @@
 ﻿Imports cv = OpenCvSharp
+Imports System.IO
+Imports System.Runtime.InteropServices
+Imports System.IO.MemoryMappedFiles
+Imports System.IO.Pipes
+
 ' https://docs.opencv.org/3.4.1/d2/dc1/camshiftdemo_8cpp-example.html
 Public Class CamShift_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
@@ -86,5 +91,65 @@ Public Class CamShift_Depth : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
         cam.Dispose()
         blob.Dispose()
+    End Sub
+End Class
+
+
+
+
+Public Class Camshift_Python : Implements IDisposable
+    Dim memMap As Python_MemMap
+    Dim pipeName As String
+    Dim pipeImages As NamedPipeServerStream
+    Dim rgbBuffer(1) As Byte
+    Dim pythonReady As Boolean
+    Public Sub New(ocvb As AlgorithmData)
+        pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
+        pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.Out)
+        PipeTaskIndex += 1
+
+        ' set the pythonfilename before initializing memMap (it indicates Python_MemMap is not running standalone.)
+        ocvb.PythonFileName = ocvb.parms.dataPath + "..\VB_Classes\Python\Camshift_Python.py"
+        memMap = New Python_MemMap(ocvb)
+
+        If ocvb.parms.externalInvocation Then
+            pythonReady = True ' python was already running and invoked OpenCVB.
+        Else
+            pythonReady = StartPython(ocvb, "--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
+        End If
+        If pythonReady Then pipeImages.WaitForConnection()
+        ocvb.desc = "Stream data to the Camshift_Python Python script"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If pythonReady Then
+            For i = 0 To memMap.memMapValues.Length - 1
+                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.color.Total * ocvb.color.ElemSize, ocvb.color.Rows, ocvb.color.Cols)
+            Next
+            memMap.Run(ocvb)
+
+            If rgbBuffer.Length <> ocvb.color.Total * ocvb.color.ElemSize Then ReDim rgbBuffer(ocvb.color.Total * ocvb.color.ElemSize - 1)
+            Marshal.Copy(ocvb.color.Data, rgbBuffer, 0, ocvb.color.Total * ocvb.color.ElemSize)
+            If pipeImages.IsConnected Then
+                On Error Resume Next
+                pipeImages.Write(rgbBuffer, 0, rgbBuffer.Length)
+            End If
+        End If
+        ocvb.putText(New ActiveClass.TrueType("Draw a rectangle anywhere on the 'camshift' (Python) window nearby.", 10, 140, RESULT1))
+        ocvb.putText(New ActiveClass.TrueType("Mouse down will show highlighted areas that may be used for tracking.", 10, 180, RESULT1))
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        memMap.Dispose()
+        If pipeImages IsNot Nothing Then
+            If pipeImages.IsConnected Then
+                pipeImages.Flush()
+                pipeImages.WaitForPipeDrain()
+                pipeImages.Disconnect()
+            End If
+        End If
+        On Error Resume Next
+        Dim proc = Process.GetProcessesByName("python")
+        For i = 0 To proc.Count - 1
+            proc(i).Kill()
+        Next i
     End Sub
 End Class
