@@ -341,25 +341,15 @@ algorithms using VTK will work with or without VTK installed but if it is not
 present, the VTK algorithms will simply display a message explaining how to
 enable VTK with the following steps:
 
--   Download and build VTK – the Visualization TookKit:
+-   Build VTK with VTK.sln in “\<OpenCVB Home Directory\>/VTK/Build”
 
-    -   <https://vtk.org/download/>
+-   Run CMake on OpenCV and add WITH_VTK and VTK_Dir.
 
--   Define the “vtkDirectory” environmental variable, i.e. “C:\\VTK-8.2.0\\”
+-   Add the VTK_Apps/DataExample to the OpenCVB.sln project
 
--   Run CMAKE for OpenCV. Update the VTK Directory option.
+-   Update the Project Dependencies for VB_Classes to include any VTK projects
 
--   Add the existing VTK project – OpenCVB/VTK/VTK_Data.vcxproj – to the
-    solution and remember to update the Project Dependencies for OpenCVB so the
-    new VTK project compiles automatically.
-
--   Rebuild the OpenCVB project. It will find the VTK environmental variable if
-    Visual Studio was restarted after defining it. OpenCVB will dynamically add
-    the OpenCV Viz DLL and VTK to the existing path.
-
-As with new OpenGL projects, it is necessary to add any new VTK projects to the
-Project Dependencies for the OpenCVB project. This will ensure that the new VTK
-project is automatically rebuilt every time the application is started.
+-   Rebuild OpenCVB and it will find VTK and OpenCV’s VIZ DLL
 
 **Sample Results**
 

@@ -1,5 +1,6 @@
 # https://pypi.org/project/opencv-rolling-ball/
 import cv2 as cv
+# be sure to add the package opencv-rolling-ball with Tools/Python/Environment/Packages
 from cv2_rolling_ball import subtract_background_rolling_ball
 img = cv.imread(f'PythonData/rolling-ball-input.png', 0)
 cv.imshow("Python input", img)

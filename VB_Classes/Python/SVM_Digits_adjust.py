@@ -1,147 +1,187 @@
 #!/usr/bin/env python
 
 '''
-Digit recognition adjustment.
-Grid search is used to find the best parameters for SVM and KNearest classifiers.
-SVM adjustment follows the guidelines given in
-http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
+SVM and KNearest digit recognition.
+
+Sample loads a dataset of handwritten digits from 'digits.png'.
+Then it trains a SVM and KNearest classifiers on it and evaluates
+their accuracy.
+
+Following preprocessing is applied to the dataset:
+ - Moment-based image deskew (see deskew())
+ - Digit images are split into 4 10x10 cells and 16-bin
+   histogram of oriented gradients is computed for each
+   cell
+ - Transform histograms to space with Hellinger metric (see [1] (RootSIFT))
+
+
+[1] R. Arandjelovic, A. Zisserman
+    "Three things everyone should know to improve object retrieval"
+    http://www.robots.ox.ac.uk/~vgg/publications/2012/Arandjelovic12/arandjelovic12.pdf
 
 Usage:
-  digits_adjust.py [--model {svm|knearest}]
-
-  --model {svm|knearest}   - select the classifier (SVM is the default)
-
+   digits.py
 '''
+
 
 # Python 2/3 compatibility
 from __future__ import print_function
-import sys
-import ctypes
-def Mbox(title, text, style):
-    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
-
-PY3 = sys.version_info[0] == 3
-
-if PY3:
-    xrange = range
 
 import numpy as np
 import cv2 as cv
 
+# built-in modules
 from multiprocessing.pool import ThreadPool
 
-from digits import *
+from numpy.linalg import norm
 
-def cross_validate(model_class, params, samples, labels, kfold = 3, pool = None):
-    n = len(samples)
-    folds = np.array_split(np.arange(n), kfold)
-    def f(i):
-        model = model_class(**params)
-        test_idx = folds[i]
-        train_idx = list(folds)
-        train_idx.pop(i)
-        train_idx = np.hstack(train_idx)
-        train_samples, train_labels = samples[train_idx], labels[train_idx]
-        test_samples, test_labels = samples[test_idx], labels[test_idx]
-        model.train(train_samples, train_labels)
-        resp = model.predict(test_samples)
-        score = (resp != test_labels).mean()
-        print(".", end='')
-        return score
-    if pool is None:
-        scores = list(map(f, xrange(kfold)))
-    else:
-        scores = pool.map(f, xrange(kfold))
-    return np.mean(scores)
+# local modules
+from common import clock, mosaic
 
 
-class App(object):
-    def __init__(self):
-        self._samples, self._labels = self.preprocess()
 
-    def preprocess(self):
-        digits, labels = load_digits(DIGITS_FN)
-        shuffle = np.random.permutation(len(digits))
-        digits, labels = digits[shuffle], labels[shuffle]
-        digits2 = list(map(deskew, digits))
-        samples = preprocess_hog(digits2)
-        return samples, labels
+SZ = 20 # size of each digit is SZ x SZ
+CLASS_N = 10
+DIGITS_FN = '../../Data/digits.png'
 
-    def get_dataset(self):
-        return self._samples, self._labels
+def split2d(img, cell_size, flatten=True):
+    h, w = img.shape[:2]
+    sx, sy = cell_size
+    cells = [np.hsplit(row, w//sx) for row in np.vsplit(img, h//sy)]
+    cells = np.array(cells)
+    if flatten:
+        cells = cells.reshape(-1, sy, sx)
+    return cells
 
-    def run_jobs(self, f, jobs):
-        pool = ThreadPool(processes=cv.getNumberOfCPUs())
-        ires = pool.imap_unordered(f, jobs)
-        return ires
+def load_digits(fn):
+    fn = cv.samples.findFile(fn)
+    print('loading "%s" ...' % fn)
+    digits_img = cv.imread(fn, cv.IMREAD_GRAYSCALE)
+    digits = split2d(digits_img, (SZ, SZ))
+    labels = np.repeat(np.arange(CLASS_N), len(digits)/CLASS_N)
+    return digits, labels
 
-    def adjust_SVM(self):
-        Cs = np.logspace(0, 10, 15, base=2)
-        gammas = np.logspace(-7, 4, 15, base=2)
-        scores = np.zeros((len(Cs), len(gammas)))
-        scores[:] = np.nan
+def deskew(img):
+    m = cv.moments(img)
+    if abs(m['mu02']) < 1e-2:
+        return img.copy()
+    skew = m['mu11']/m['mu02']
+    M = np.float32([[1, skew, -0.5*SZ*skew], [0, 1, 0]])
+    img = cv.warpAffine(img, M, (SZ, SZ), flags=cv.WARP_INVERSE_MAP | cv.INTER_LINEAR)
+    return img
 
-        print('adjusting SVM (may take a long time) ...')
-        def f(job):
-            i, j = job
-            samples, labels = self.get_dataset()
-            params = dict(C = Cs[i], gamma=gammas[j])
-            score = cross_validate(SVM, params, samples, labels)
-            return i, j, score
+class StatModel(object):
+    def load(self, fn):
+        self.model.load(fn)  # Known bug: https://github.com/opencv/opencv/issues/4969
+    def save(self, fn):
+        self.model.save(fn)
 
-        ires = self.run_jobs(f, np.ndindex(*scores.shape))
-        for count, (i, j, score) in enumerate(ires):
-            scores[i, j] = score
-            print('%d / %d (best error: %.2f %%, last: %.2f %%)' %
-                  (count+1, scores.size, np.nanmin(scores)*100, score*100))
-        print(scores)
+class KNearest(StatModel):
+    def __init__(self, k = 3):
+        self.k = k
+        self.model = cv.ml.KNearest_create()
 
-        print('writing score table to "svm_scores.npz"')
-        np.savez('svm_scores.npz', scores=scores, Cs=Cs, gammas=gammas)
+    def train(self, samples, responses):
+        self.model.train(samples, cv.ml.ROW_SAMPLE, responses)
 
-        i, j = np.unravel_index(scores.argmin(), scores.shape)
-        best_params = dict(C = Cs[i], gamma=gammas[j])
-        print('best params:', best_params)
-        print('best error: %.2f %%' % (scores.min()*100))
-        cv.waitKey()
-        return best_params
+    def predict(self, samples):
+        _retval, results, _neigh_resp, _dists = self.model.findNearest(samples, self.k)
+        return results.ravel()
 
-    def adjust_KNearest(self):
-        print('adjusting KNearest ...')
-        def f(k):
-            samples, labels = self.get_dataset()
-            err = cross_validate(KNearest, dict(k=k), samples, labels)
-            return k, err
-        best_err, best_k = np.inf, -1
-        for k, err in self.run_jobs(f, xrange(1, 9)):
-            if err < best_err:
-                best_err, best_k = err, k
-            print('k = %d, error: %.2f %%' % (k, err*100))
-        best_params = dict(k=best_k)
-        print('best params:', best_params, 'err: %.2f' % (best_err*100))
-        cv.waitKey()
-        return best_params
+class SVM(StatModel):
+    def __init__(self, C = 1, gamma = 0.5):
+        self.model = cv.ml.SVM_create()
+        self.model.setGamma(gamma)
+        self.model.setC(C)
+        self.model.setKernel(cv.ml.SVM_RBF)
+        self.model.setType(cv.ml.SVM_C_SVC)
+
+    def train(self, samples, responses):
+        self.model.train(samples, cv.ml.ROW_SAMPLE, responses)
+
+    def predict(self, samples):
+        return self.model.predict(samples)[1].ravel()
+
+
+def evaluate_model(model, digits, samples, labels):
+    resp = model.predict(samples)
+    err = (labels != resp).mean()
+    print('error: %.2f %%' % (err*100))
+
+    confusion = np.zeros((10, 10), np.int32)
+    for i, j in zip(labels, resp):
+        confusion[i, int(j)] += 1
+    print('confusion matrix:')
+    print(confusion)
+    print()
+
+    vis = []
+    for img, flag in zip(digits, resp == labels):
+        img = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
+        if not flag:
+            img[...,:2] = 0
+        vis.append(img)
+    return mosaic(25, vis)
+
+def preprocess_simple(digits):
+    return np.float32(digits).reshape(-1, SZ*SZ) / 255.0
+
+def preprocess_hog(digits):
+    samples = []
+    for img in digits:
+        gx = cv.Sobel(img, cv.CV_32F, 1, 0)
+        gy = cv.Sobel(img, cv.CV_32F, 0, 1)
+        mag, ang = cv.cartToPolar(gx, gy)
+        bin_n = 16
+        bin = np.int32(bin_n*ang/(2*np.pi))
+        bin_cells = bin[:10,:10], bin[10:,:10], bin[:10,10:], bin[10:,10:]
+        mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
+        hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]
+        hist = np.hstack(hists)
+
+        # transform to Hellinger kernel
+        eps = 1e-7
+        hist /= hist.sum() + eps
+        hist = np.sqrt(hist)
+        hist /= norm(hist) + eps
+
+        samples.append(hist)
+    return np.float32(samples)
 
 
 if __name__ == '__main__':
-    import getopt
-    import sys
-
     print(__doc__)
 
-    args, _ = getopt.getopt(sys.argv[1:], '', ['model='])
-    args = dict(args)
-    args.setdefault('--model', 'svm')
-    args.setdefault('--env', '')
-    if args['--model'] not in ['svm', 'knearest']:
-        print('unknown model "%s"' % args['--model'])
-        sys.exit(1)
+    digits, labels = load_digits(DIGITS_FN)
 
-    t = clock()
-    app = App()
-    if args['--model'] == 'knearest':
-        app.adjust_KNearest()
-    else:
-        app.adjust_SVM()
-    print('work time: %f s' % (clock() - t))
-    Mbox('Test', 'Test complete', 1)
+    print('preprocessing...')
+    # shuffle digits
+    rand = np.random.RandomState(321)
+    shuffle = rand.permutation(len(digits))
+    digits, labels = digits[shuffle], labels[shuffle]
+
+    digits2 = list(map(deskew, digits))
+    samples = preprocess_hog(digits2)
+
+    train_n = int(0.9*len(samples))
+    cv.imshow('test set', mosaic(25, digits[train_n:]))
+    digits_train, digits_test = np.split(digits2, [train_n])
+    samples_train, samples_test = np.split(samples, [train_n])
+    labels_train, labels_test = np.split(labels, [train_n])
+
+
+    print('training KNearest...')
+    model = KNearest(k=4)
+    model.train(samples_train, labels_train)
+    vis = evaluate_model(model, digits_test, samples_test, labels_test)
+    cv.imshow('KNearest test', vis)
+
+    print('training SVM...')
+    model = SVM(C=2.67, gamma=5.383)
+    model.train(samples_train, labels_train)
+    vis = evaluate_model(model, digits_test, samples_test, labels_test)
+    cv.imshow('SVM test', vis)
+    print('saving SVM as "digits_svm.dat"...')
+    model.save('digits_svm.dat')
+
+    cv.waitKey(0)
