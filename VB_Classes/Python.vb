@@ -68,7 +68,7 @@ Public Class Python_Run : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim proc = Process.GetProcessesByName("python")
         If proc.Count = 0 Then
-            If tryCount < 10 Then StartPython(ocvb, "")
+            If tryCount < 3 Then StartPython(ocvb, "")
             tryCount += 1
         End If
     End Sub
@@ -322,7 +322,7 @@ End Class
 
 
 
-Public Class Python_Camshift : Implements IDisposable
+Public Class Camshift_Python : Implements IDisposable
     Dim memMap As Python_MemMap
     Dim pipeName As String
     Dim pipeImages As NamedPipeServerStream

@@ -90,7 +90,7 @@ class App(object):
                     frameCount = arrayDoubles[0] 
                     rgb = pipeIn.read(int(rgbBufferSize))
                     rgbSize = rows, cols, 3
-                    vis = np.fromstring(rgb, np.uint8).reshape(rgbSize)
+                    vis = np.array(np.frombuffer(rgb, np.uint8).reshape(rgbSize))
                     hsv = cv.cvtColor(vis, cv.COLOR_BGR2HSV)
                     if frameCount == 0:
                         img = np.zeros(vis.shape, np.uint8)
@@ -140,6 +140,7 @@ if __name__ == '__main__':
     parser.add_argument('--MemMapLength', type=int, default=0, help='The number of bytes are in the memory mapped file.')
     parser.add_argument('--pipeName', default='', help='The name of the input pipe for image data.')
     args = parser.parse_args()
+    Mbox('args', 'args', 1)
 
     pid = 0 # pid of any spawned task
     MemMapLength = args.MemMapLength
@@ -148,8 +149,8 @@ if __name__ == '__main__':
         args.pipeName = 'OpenCVBImages0' # we always start with 0 and since it is only invoked once, 0 is all it will ever be.
         ocvb = os.getcwd() + '\\..\\..\\bin\Debug\OpenCVB.exe' # 
         if os.path.exists(ocvb):
-            pid = os.spawnv(os.P_NOWAIT, ocvb, 'Python_Camshift')
-
+            pid = os.spawnv(os.P_NOWAIT, ocvb, 'Camshift_Python')
+    
     pipeName = '\\\\.\\pipe\\' + args.pipeName 
     while True:
         try:

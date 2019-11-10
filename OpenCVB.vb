@@ -74,11 +74,13 @@ Public Class OpenCVB
         Dim opencvsharp_Dir = HomeDir.FullName + "opencvsharp\samples\packages\OpenCvSharp4.4.1.1.20191026\lib\net461"
         updatePath(opencvsharp_Dir, "OpenCVSharp support.")
 
+        Dim externDir As New DirectoryInfo(HomeDir.FullName + "opencvsharp\samples\SamplesCS\bin\Debug\dll")
         Dim opencvsharpExtern_Dir = HomeDir.FullName + "opencvsharp\samples\SamplesCS\bin\Debug\dll\x64"
-        updatePath(opencvsharpExtern_Dir, "OpenCVSharpExtern support.")
+        If externDir.Exists Then updatePath(opencvsharpExtern_Dir, "OpenCVSharpExtern support.")
 
+        externDir = New DirectoryInfo(HomeDir.FullName + "opencvsharp\samples\SamplesCS\bin\Release\dll")
         opencvsharpExtern_Dir = HomeDir.FullName + "opencvsharp\samples\SamplesCS\bin\Release\dll\x64"
-        updatePath(opencvsharpExtern_Dir, "OpenCVSharpExtern support.")
+        If externDir.Exists Then updatePath(opencvsharpExtern_Dir, "OpenCVSharpExtern support.")
 
         OpenCVfullPath = HomeDir.FullName + "OpenCV\Build\bin\Debug\"
         updatePath(OpenCVfullPath, "OpenCV and OpenCV Contrib are needed for C++ classes.")
