@@ -42,7 +42,7 @@ Public Class CamShift_Basics : Implements IDisposable
                 Dim maskROI = hsv(roi).InRange(sbins, New cv.Scalar(180, 255, max))
                 cv.Cv2.CalcHist(New cv.Mat() {hsv(roi)}, ch, maskROI, roi_hist, 1, hsize, ranges)
                 roi_hist = roi_hist.Normalize(0, 255, cv.NormTypes.MinMax)
-                'histogram2DPlot(roi_hist, ocvb.result2, bins, sbins)
+                'histogram2DPlot(roi_hist, ocvb.result2, bins, sbins.Val1)
             End If
         End If
         If roi_hist.Rows <> 0 Then
@@ -62,6 +62,9 @@ Public Class CamShift_Basics : Implements IDisposable
             End If
             ocvb.result1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         End If
+        Dim mask = hsv.InRange(New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255))
+        ocvb.result2.SetTo(0)
+        ocvb.color.CopyTo(ocvb.result2, mask)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
