@@ -1,0 +1,99 @@
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
+#include <iostream>
+
+using namespace std;
+#include "VTK_Data.h"
+
+#include <opencv2/viz.hpp>
+
+class vtkHist
+{
+private:
+public:
+	cv::Mat histogram;
+	double threshold;
+	cv::Ptr<cv::viz::Viz3d> fen3D;
+	int nbWidget;
+	double maxH;
+	int code;
+	cv::Mat dst;
+	int bins;
+
+	void DrawHistogram3D()
+	{
+		int planeSize = (int)histogram.step1(0);
+		int cols = (int)histogram.step1(1);
+		int rows = (int)planeSize / cols;
+		int planes = (int)histogram.total() / planeSize;
+		fen3D->removeAllWidgets();
+		fen3D->showWidget("Axis", cv::viz::WCoordinateSystem(10));
+		for (int k = 0; k < planes; k++)
+		{
+			for (int i = 0; i < rows; i++)
+			{
+				for (int j = 0; j < cols; j++)
+				{
+					double x = histogram.at<float>(k, i, j);
+					if (x >= threshold)
+					{
+						double r = std::max(x / maxH, 0.1);
+
+						cv::Point3d p1 = cv::Point3d(k - r / 2, i - r / 2, j - r / 2);
+						cv::Point3d p2 = cv::Point3d(k + r / 2, i + r / 2, j + r / 2);
+						cv::viz::Color c = cv::viz::Color(j / double(planes) * 255, i / double(rows) * 255, k / double(cols) * 255);
+
+						cv::viz::WCube s(p1, p2, false, c);
+						fen3D->showWidget(cv::format("I3d%d", nbWidget++), s);
+					}
+				}
+			}
+		}
+	}
+
+	vtkHist()
+	{
+		fen3D = new cv::viz::Viz3d("3D Histogram");
+		fen3D = cv::makePtr<cv::viz::Viz3d>("3D Histogram");
+	}
+
+	void Run(cv::Mat src)
+	{
+		float hRange[] = { 0, 256 };
+		const float* range[] = { hRange, hRange,hRange };
+		int hBins[] = { bins, bins, bins };
+		int channel[] = { 2, 1, 0 };
+		cv::calcHist(&src, 1, channel, cv::Mat(), histogram, 3, hBins, range, true, false);
+		cv::normalize(histogram, histogram, 100.0f / src.total(), 0, cv::NORM_MINMAX, -1, cv::Mat());
+		cv::minMaxIdx(histogram, NULL, &maxH, NULL, NULL);
+
+		fen3D = cv::makePtr<cv::viz::Viz3d>("3D Histogram");
+		nbWidget = 0;
+		DrawHistogram3D();
+	}
+};
+
+int main(int argc, char **argv)
+{
+	windowTitle << "OpenCVB VTK_Data Cloud"; // this will create the window title.
+	if (initializeNamedPipeAndMemMap(argc, argv) != 0) return -1;
+
+	vtkHist *v = new vtkHist();
+	while (1)
+	{
+		readPipeAndMemMap();
+		if (UserData[0] != v->bins || UserData[1] != v->threshold || UserData[2] != 0)
+		{
+			v->bins = (int)UserData[0];
+			v->threshold = UserData[1];
+			cv::Mat src(rgbHeight, rgbWidth, CV_8UC3, rgbBuffer);
+			v->Run(src);
+		}
+
+		v->fen3D->spinOnce(1);
+		v->DrawHistogram3D();
+		if (ackBuffers()) break;
+	}
+	return 0;
+}

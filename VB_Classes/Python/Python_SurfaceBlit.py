@@ -50,7 +50,7 @@ except Exception as exception:
     print(exception)
     Mbox('OpenCVB', 'Failure 1 - see print output', 1)    
 
-pygame.display.set_caption("OpenCVB - Python_SurfaceBlit")
+pygame.display.set_caption("OpenCVB - Python_SurfaceBlit.py")
 
 try:
     mm = mmap.mmap(0, MemMapLength, tagname='Python_MemMap')
