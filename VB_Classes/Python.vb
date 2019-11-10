@@ -279,7 +279,7 @@ Public Class Python_Send : Implements IDisposable
         pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.Out)
         PipeTaskIndex += 1
 
-        ocvb.PythonFileName = ocvb.parms.dataPath + "..\VB_Classes\Python\Python_Camshift.py"
+        ocvb.PythonFileName = ocvb.parms.dataPath + "..\VB_Classes\Python\Camshift_Python.py"
         memMap = New Python_MemMap(ocvb)
 
         pythonReady = StartPython(ocvb, "--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
