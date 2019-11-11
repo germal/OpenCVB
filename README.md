@@ -25,8 +25,8 @@ known. OpenCVB collects many of these algorithms into a single application and
 guarantees that each will build and run. In addition, the process of adding
 variants and experimenting with the example is simplified.
 
-If this approach is to be credible, all the common languages used for computer
-vision projects - C++, C\#, Python, and VB.Net – need support. Secondly, it is
+If this approach is to be useful, all the common languages for computer vision
+projects - C++, C\#, Python, and VB.Net – need support. Secondly, it is
 important to get access to multiple libraries - OpenCV, OpenCVSharp, OpenGL, and
 OpenMP. And lastly, it is important to use all the possible image
 representations - 3D, bitmaps, plots, bar charts, spreadsheets, or text.
