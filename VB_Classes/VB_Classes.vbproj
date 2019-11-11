@@ -244,6 +244,7 @@
     <Compile Include="SemiGlobalMatching.vb" />
     <Compile Include="Sift.vb" />
     <Compile Include="Annealing.vb" />
+    <Compile Include="Solve.vb" />
     <Compile Include="TextureFlow.vb" />
     <Compile Include="VB_Classes.vb" />
     <Compile Include="OptionsCheckbox.Designer.vb">
