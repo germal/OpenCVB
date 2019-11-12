@@ -114,14 +114,20 @@ installation of the Kinect4Azure camera:
 
 -   <https://docs.microsoft.com/en-us/azure/Kinect-dk/sensor-sdk-download>
 
-    -   Download and click “Microsoft Installer” (the proprietary code)
+    -   Click “Microsoft Installer” to download and install the proprietary
+        Kinect code from Microsoft
 
 The last step is to open the OpenCVB.sln file and build OpenCVB. If there are
 problems linking, it is very likely that the OpenCV_Version environmental
 variable needs to be updated. If there are problems running the camera
 initialization, it is like that the Kinect4Azure camera support has recently
 been upgraded. OpenCVB will display a message explaining how to reflect any
-camera change in the code.
+camera change in the code. If any of the Python scripts fail, review the import
+statements and make sure the package is installed. Typically, the Python scripts
+will require:
+
+-   Numpy, Opencv-Python, OpenglExample, Pygame (this is a list of typical
+    packages that Python algorithms require.)
 
 **Build New Experiments**
 
