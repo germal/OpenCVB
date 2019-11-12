@@ -166,3 +166,42 @@ Public Class Clone_Eagle : Implements IDisposable
         radio.Dispose()
     End Sub
 End Class
+
+
+
+
+' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Cv2.SeamlessClone(OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.Point,%20OpenCvSharp.OutputArray,%20OpenCvSharp.SeamlessCloneMethods)/
+Public Class Clone_Seamless : Implements IDisposable
+    Dim radio As New OptionsRadioButtons
+    Public Sub New(ocvb As AlgorithmData)
+        radio.Setup(ocvb, 3)
+        radio.check(0).Text = "Seamless Normal Clone"
+        radio.check(1).Text = "Seamless Mono Clone"
+        radio.check(2).Text = "Seamless Mixed Clone"
+        radio.check(0).Checked = True
+        radio.Show()
+        ocvb.label1 = "Mask for Clone"
+        ocvb.label2 = "Results for SeamlessClone"
+        ocvb.desc = "Use the seamlessclone API to merge color and depth..."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim center As New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
+        Dim radius = 100
+        ocvb.result1.SetTo(0)
+        ocvb.result1.Circle(center.X, center.Y, radius, cv.Scalar.White, -1)
+
+        Dim style = cv.SeamlessCloneMethods.NormalClone
+        For i = 0 To radio.check.Count - 1
+            If radio.check(i).Checked Then
+                style = Choose(i + 1, cv.SeamlessCloneMethods.NormalClone, cv.SeamlessCloneMethods.MonochromeTransfer, cv.SeamlessCloneMethods.MixedClone)
+                Exit For
+            End If
+        Next
+        ocvb.result2 = ocvb.color.Clone()
+        cv.Cv2.SeamlessClone(ocvb.depthRGB, ocvb.color, ocvb.result1, center, ocvb.result2, style)
+        ocvb.result2.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        radio.Dispose()
+    End Sub
+End Class

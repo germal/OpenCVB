@@ -53,3 +53,26 @@ Public Class MeanShift_Depth : Implements IDisposable
         blob.Dispose()
     End Sub
 End Class
+
+
+
+'http://study.marearts.com/2014/12/opencv-meanshiftfiltering-example.html
+Public Class MeanShift_PyrFilter : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "MeanShift Spatial Radius", 1, 100, 10)
+        sliders.setupTrackBar2(ocvb, "MeanShift color Radius", 1, 100, 15)
+        sliders.setupTrackBar3(ocvb, "MeanShift Max Pyramid level", 1, 8, 3)
+        sliders.Show()
+        ocvb.desc = "Use PyrMeanShiftFiltering to segment an image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim spatialRadius = sliders.TrackBar1.Value
+        Dim colorRadius = sliders.TrackBar2.Value
+        Dim maxPyrLevel = sliders.TrackBar3.Value
+        cv.Cv2.PyrMeanShiftFiltering(ocvb.color, ocvb.result1, spatialRadius, colorRadius, maxPyrLevel)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
+    End Sub
+End Class
