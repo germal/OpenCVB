@@ -190,6 +190,7 @@
     <Compile Include="MotionBlur.vb" />
     <Compile Include="Mouse.vb" />
     <Compile Include="MSER.vb" />
+    <Compile Include="MultiDimensionalScaling.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
