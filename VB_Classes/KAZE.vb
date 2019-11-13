@@ -47,8 +47,8 @@ Public Class KAZE_Sample_CS : Implements IDisposable
     Dim box_in_scene As New cv.Mat
     Dim CS_Kaze As New CS_Classes.KAZE_Sample
     Public Sub New(ocvb As AlgorithmData)
-        box = cv.Cv2.ImRead(ocvb.parms.datapath + "box.png", cv.ImreadModes.Color)
-        box_in_scene = cv.Cv2.ImRead(ocvb.parms.datapath + "box_in_scene.png", cv.ImreadModes.Color)
+        box = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/box.png", cv.ImreadModes.Color)
+        box_in_scene = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/box_in_scene.png", cv.ImreadModes.Color)
         ocvb.desc = "Match keypoints in 2 photos."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

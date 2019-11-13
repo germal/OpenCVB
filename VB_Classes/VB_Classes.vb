@@ -96,7 +96,6 @@ Public Class ActiveClass : Implements IDisposable
         Dim vtkDirectory As String
         Dim HomeDir As String
         Dim OpenCVfullPath As String
-        Dim dataPath As String
         Dim OpenCV_Version_ID As String
         Dim speedFactor As Int32
         Dim width As Int32

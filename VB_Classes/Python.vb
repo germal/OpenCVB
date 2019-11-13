@@ -56,7 +56,7 @@ End Module
 Public Class Python_Run : Implements IDisposable
     Dim tryCount As Int32
     Public Sub New(ocvb As AlgorithmData)
-        If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.dataPath + "..\VB_Classes\Python\Barebones.py"
+        If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Barebones.py"
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
         StartPython(ocvb, "")
         ocvb.desc = "Run Python app: " + pythonApp.Name
@@ -94,7 +94,7 @@ Public Class Python_MemMap : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         ocvb.parms.ShowConsoleLog = True
         If ocvb.PythonFileName Is Nothing Then
-            ocvb.PythonFileName = ocvb.parms.dataPath + "..\VB_Classes\Python\Python_MemMap.py"
+            ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_MemMap.py"
         Else
             externalUse = True ' external users will set the pythonfilename.
         End If
@@ -154,7 +154,7 @@ Public Class Python_SurfaceBlit : Implements IDisposable
 
         ' this Python script assumes that fast processing is off - the pointcloud is being used and cannot be resized.
         ocvb.parms.fastProcessing = False
-        ocvb.PythonFileName = ocvb.parms.dataPath + "..\VB_Classes\Python\Python_SurfaceBlit.py"
+        ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
         memMap = New Python_MemMap(ocvb)
 
         If ocvb.parms.externalInvocation Then
@@ -218,7 +218,7 @@ Public Class Python_RGBDepth : Implements IDisposable
         pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.Out)
         PipeTaskIndex += 1
 
-        ocvb.PythonFileName = ocvb.parms.dataPath + "..\VB_Classes\Python\Python_RGBDepth.py"
+        ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_RGBDepth.py"
         memMap = New Python_MemMap(ocvb)
 
         If ocvb.parms.externalInvocation Then
@@ -279,7 +279,7 @@ Public Class Python_Send : Implements IDisposable
         pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.Out)
         PipeTaskIndex += 1
 
-        ocvb.PythonFileName = ocvb.parms.dataPath + "..\VB_Classes\Python\Camshift_Python.py"
+        ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Camshift_Python.py"
         memMap = New Python_MemMap(ocvb)
 
         pythonReady = StartPython(ocvb, "--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)

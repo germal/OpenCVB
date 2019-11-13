@@ -3,11 +3,11 @@ Imports System.IO
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_Basics : Implements IDisposable
     Public videoOptions As New OptionsVideoName
-    Public optionsVideoName As String
+    Public srcVideo As String
     Public image As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
-        If optionsVideoName = "" Then optionsVideoName = ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4" ' default video...
-        videoOptions.fileinfo = New FileInfo(optionsVideoName)
+        If srcVideo = "" Then srcVideo = ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4" ' default video...
+        videoOptions.fileinfo = New FileInfo(srcVideo)
         If videoOptions.fileinfo.Exists = False Then videoOptions.fileinfo = New FileInfo(ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4")
 
         ocvb.label1 = videoOptions.fileinfo.Name
@@ -138,7 +138,7 @@ Public Class Video_MinRect : Implements IDisposable
     Public contours As cv.Point()()
     Public Sub New(ocvb As AlgorithmData)
         video = New Video_Basics(ocvb)
-        video.optionsVideoName = ocvb.parms.dataPath + "CarsDrivingUnderBridge.mp4"
+        video.srcVideo = ocvb.parms.HomeDir + "Data/CarsDrivingUnderBridge.mp4"
         video.Run(ocvb)
 
         mog = New BGSubtract_MOG(ocvb)

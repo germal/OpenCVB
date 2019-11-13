@@ -10,7 +10,7 @@ Public Class HOG_Basics : Implements IDisposable
         sliders.setupTrackBar3(ocvb, "Scale", 0, 2000, 300)
         If ocvb.parms.ShowOptions Then sliders.show()
         ocvb.desc = "Find people with Histogram of Gradients (HOG) 2D feature"
-        staticImage = cv.Cv2.ImRead(ocvb.parms.datapath + "Asahiyama.jpg", cv.ImreadModes.Color)
+        staticImage = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
         ocvb.result2 = staticImage.Resize(ocvb.result2.Size)
     End Sub
     Private Sub drawFoundRectangles(dst As cv.Mat, found() As cv.Rect)

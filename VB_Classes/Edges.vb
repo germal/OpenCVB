@@ -223,7 +223,7 @@ Public Class Edges_RandomForest_CPP : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType("If running 'Test All' and the duration of each test < load time, it will finish loading before continuing to the next algorithm.", 10, 140, RESULT2))
         End If
         If ocvb.frameCount = 5 Then
-            Dim modelInfo = New FileInfo(ocvb.parms.dataPath + "\model.yml.gz")
+            Dim modelInfo = New FileInfo(ocvb.parms.HomeDir + "Data/model.yml.gz")
             EdgesPtr = Edges_RandomForest_Open(modelInfo.FullName)
         End If
         If ocvb.frameCount > 5 Then ' the first images are skipped so the message above can be displayed.

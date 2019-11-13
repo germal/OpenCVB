@@ -128,10 +128,10 @@ Public Class Clone_Eagle : Implements IDisposable
         radio.check(2).Checked = True
         If ocvb.parms.ShowOptions Then radio.show()
 
-        sourceImage = cv.Cv2.ImRead(ocvb.parms.datapath + "/CloneSource.png")
+        sourceImage = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/CloneSource.png")
         srcROI = New cv.Rect(0, 40, sourceImage.Width, sourceImage.Height)
 
-        mask = cv.Cv2.ImRead(ocvb.parms.datapath + "/Clonemask.png")
+        mask = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/Clonemask.png")
         maskROI = New cv.Rect(srcROI.Width, 40, mask.Width, mask.Height)
 
         ocvb.result2(srcROI) = sourceImage

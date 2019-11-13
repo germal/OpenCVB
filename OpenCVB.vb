@@ -632,7 +632,6 @@ Public Class OpenCVB
         parms.UsingIntelCamera = optionsForm.IntelCamera.Checked
         parms.mainFormLoc = Me.Location
         parms.mainFormHeight = Me.Height
-        parms.dataPath = CurDir() + "/../../Data/"
         parms.OpenCV_Version_ID = Environment.GetEnvironmentVariable("OpenCV_Version")
         parms.useRecordedData = OpenCVkeyword.Text = "<All using recorded data>"
         Dim camera As Object = Nothing

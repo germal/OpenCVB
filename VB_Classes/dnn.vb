@@ -21,9 +21,9 @@ Imports System.IO
 '        dnnHeight = ocvb.color.Height
 '        crop = New cv.Rect(ocvb.color.Width / 2 - dnnWidth / 2, ocvb.color.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
 
-'        Dim infoText As New FileInfo(ocvb.parms.dataPath + "MobileNetSSD_deploy.prototxt")
+'        Dim infoText As New FileInfo(ocvb.parms.homedir + "Data/MobileNetSSD_deploy.prototxt")
 '        If infoText.Exists Then
-'            Dim infoModel As New FileInfo(ocvb.parms.dataPath + "MobileNetSSD_deploy.caffemodel")
+'            Dim infoModel As New FileInfo(ocvb.parms.homeDir + "Data/MobileNetSSD_deploy.caffemodel")
 '            If infoModel.Exists Then
 '                net = dnn.CvDnn.ReadNetFromCaffe(infoText.FullName, infoModel.FullName)
 '                dnnPrepared = True

@@ -14,8 +14,8 @@ Public Class Face_Haar_LBP : Implements IDisposable
     Dim haarCascade As cv.CascadeClassifier
     Dim lbpCascade As cv.CascadeClassifier
     Public Sub New(ocvb As AlgorithmData)
-        haarCascade = New cv.CascadeClassifier(ocvb.parms.datapath + "haarcascade_frontalface_default.xml")
-        lbpCascade = New cv.CascadeClassifier(ocvb.parms.datapath + "lbpcascade_frontalface.xml")
+        haarCascade = New cv.CascadeClassifier(ocvb.parms.HomeDir + "Data/haarcascade_frontalface_default.xml")
+        lbpCascade = New cv.CascadeClassifier(ocvb.parms.HomeDir + "Data/lbpcascade_frontalface.xml")
         ocvb.desc = "Detect faces in the video stream."
         ocvb.label1 = "Faces detected with Haar"
         ocvb.label2 = "Faces detected with LBP"
@@ -35,7 +35,7 @@ End Class
 Public Class Face_Haar_Alt : Implements IDisposable
     Dim haarCascade As cv.CascadeClassifier
     Public Sub New(ocvb As AlgorithmData)
-        haarCascade = New cv.CascadeClassifier(ocvb.parms.datapath + "haarcascade_frontalface_alt.xml")
+        haarCascade = New cv.CascadeClassifier(ocvb.parms.HomeDir + "Data/haarcascade_frontalface_alt.xml")
         ocvb.desc = "Detect faces Haar_alt database."
         ocvb.label1 = "Faces detected with Haar_Alt"
     End Sub

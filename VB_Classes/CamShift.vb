@@ -112,7 +112,7 @@ Public Class Camshift_Python : Implements IDisposable
         PipeTaskIndex += 1
 
         ' set the pythonfilename before initializing memMap (it indicates Python_MemMap is not running standalone.)
-        ocvb.PythonFileName = ocvb.parms.dataPath + "..\VB_Classes\Python\Camshift_Python.py"
+        ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes\Python\Camshift_Python.py"
         memMap = New Python_MemMap(ocvb)
 
         If ocvb.parms.externalInvocation Then
