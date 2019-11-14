@@ -20,6 +20,7 @@ Public Class OptionsDialog
         SaveSetting("OpenCVB", "PythonExe", "PythonExe", PythonExeName.Text)
         SaveSetting("OpenCVB", "ShowOptions", "ShowOptions", ShowOptions.Checked)
         SaveSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", ShowConsoleLog.Checked)
+        SaveSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", AvoidDNNCrashes.Checked)
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
@@ -56,6 +57,7 @@ Public Class OptionsDialog
         SnapToGrid.Checked = GetSetting("OpenCVB", "SnapToGrid", "SnapToGrid", True)
         ShowOptions.Checked = GetSetting("OpenCVB", "ShowOptions", "ShowOptions", False)
         ShowConsoleLog.Checked = GetSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", False)
+        AvoidDNNCrashes.Checked = GetSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", False)
 
         Dim selectionName = GetSetting("OpenCVB", "PythonExe", "PythonExe", "")
         Dim selectionInfo As FileInfo = Nothing

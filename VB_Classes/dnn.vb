@@ -27,7 +27,10 @@ Public Class DNN_Test : Implements IDisposable
         ocvb.result2 = image.Resize(ocvb.result2.Size())
         Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
         net.SetInput(inputBlob, "data")
-        'Dim prob = net.Forward("prob")
+        If ocvb.parms.AvoidDNNCrashes = False Then
+            Dim prob = net.Forward("prob")
+            ' finish this ...
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
@@ -48,7 +51,7 @@ Public Class DNN_Caffe_CS : Implements IDisposable
         Dim modelFile = ocvb.parms.HomeDir + "Opencvsharp/samples/SamplesCS/bin/Debug/bvlc_googlenet.caffemodel"
         Dim synsetWords = ocvb.parms.HomeDir + "Opencvsharp/samples/SamplesCore/Data/Text/synset_words.txt"
         Dim image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Opencvsharp/samples/SamplesCore/Data/Image/space_shuttle.jpg")
-        caffeCS.Run(protoTxt, modelFile, synsetWords, image)
+        caffeCS.Run(protoTxt, modelFile, synsetWords, image, ocvb.parms.AvoidDNNCrashes)
         ocvb.result2 = image.Resize(ocvb.result2.Size())
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -104,31 +107,33 @@ Public Class DNN_Basics : Implements IDisposable
             ocvb.color(crop).CopyTo(ocvb.result1(crop))
             net.SetInput(inputBlob, "data")
 
-            ' The Forward method fails or blue-screen's my main machine so it is commented here.
+            ' The Forward method fails or blue-screen's my main machine so it is conditional here.
             ' The test machines I have do not fail.  The blue screen is WHEA_UNCORRECTABLE_ERROR.
 
-            'Dim detection = net.Forward("detection_out")
-            'Dim detectionMat = New cv.Mat(detection.Size(2), detection.Size(3), cv.MatType.CV_32F, detection.Data)
+            If ocvb.parms.AvoidDNNCrashes = False Then
+                Dim detection = net.Forward("detection_out")
+                Dim detectionMat = New cv.Mat(detection.Size(2), detection.Size(3), cv.MatType.CV_32F, detection.Data)
 
-            'Dim confidenceThreshold = 0.8F
-            'Dim rows = ocvb.color.Rows
-            'Dim cols = ocvb.color.Cols
-            'ocvb.label2 = ""
-            'For i = 0 To detectionMat.Rows - 1
-            '    Dim confidence = detectionMat.At(Of Single)(i, 2)
-            '    If confidence > confidenceThreshold Then
-            '        Dim nextName = classNames(CInt(detectionMat.At(Of Single)(i, 1)))
-            '        ocvb.label2 += nextName + " "  ' display the name of what we found.
-            '        Dim vec = detectionMat.At(Of cv.Vec4f)(i, 3)
-            '        rect = New cv.Rect(vec.Item0 * cols + crop.Left, vec.Item1 * rows + crop.Top, (vec.Item2 - vec.Item0) * cols, (vec.Item3 - vec.Item1) * rows)
-            '        rect = New cv.Rect(rect.X, rect.Y, Math.Min(dnnWidth, rect.Width), Math.Min(dnnHeight, rect.Height))
-            '        ocvb.result2.Rectangle(rect, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)
-            '        rect.Width = 100
-            '        rect.Height = 30
-            '        ocvb.result2.Rectangle(rect, cv.Scalar.Black, -1)
-            '        ocvb.putText(New ActiveClass.TrueType(nextName, CInt(rect.X * ocvb.parms.imageToTrueTypeLoc), CInt(rect.Y * ocvb.parms.imageToTrueTypeLoc), RESULT2))
-            '    End If
-            'Next
+                Dim confidenceThreshold = 0.8F
+                Dim rows = ocvb.color.Rows
+                Dim cols = ocvb.color.Cols
+                ocvb.label2 = ""
+                For i = 0 To detectionMat.Rows - 1
+                    Dim confidence = detectionMat.At(Of Single)(i, 2)
+                    If confidence > confidenceThreshold Then
+                        Dim nextName = classNames(CInt(detectionMat.At(Of Single)(i, 1)))
+                        ocvb.label2 += nextName + " "  ' display the name of what we found.
+                        Dim vec = detectionMat.At(Of cv.Vec4f)(i, 3)
+                        rect = New cv.Rect(vec.Item0 * cols + crop.Left, vec.Item1 * rows + crop.Top, (vec.Item2 - vec.Item0) * cols, (vec.Item3 - vec.Item1) * rows)
+                        rect = New cv.Rect(rect.X, rect.Y, Math.Min(dnnWidth, rect.Width), Math.Min(dnnHeight, rect.Height))
+                        ocvb.result2.Rectangle(rect, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)
+                        rect.Width = 100
+                        rect.Height = 30
+                        ocvb.result2.Rectangle(rect, cv.Scalar.Black, -1)
+                        ocvb.putText(New ActiveClass.TrueType(nextName, CInt(rect.X * ocvb.parms.imageToTrueTypeLoc), CInt(rect.Y * ocvb.parms.imageToTrueTypeLoc), RESULT2))
+                    End If
+                Next
+            End If
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

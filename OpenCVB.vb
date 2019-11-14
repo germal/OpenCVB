@@ -648,6 +648,7 @@ Public Class OpenCVB
         parms.externalInvocation = externalInvocation
         If parms.testAllRunning Then parms.ShowOptions = optionsForm.ShowOptions.Checked Else parms.ShowOptions = True ' always show options when not running 'test all'
         parms.ShowConsoleLog = optionsForm.ShowConsoleLog.Checked
+        parms.AvoidDNNCrashes = optionsForm.AvoidDNNCrashes.Checked
 
         If parms.fastProcessing Then parms.speedFactor = 2 Else parms.speedFactor = 1
         parms.width = regWidth / parms.speedFactor

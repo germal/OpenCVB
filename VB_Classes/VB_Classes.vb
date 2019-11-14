@@ -90,6 +90,7 @@ Public Class ActiveClass : Implements IDisposable
         Dim testAllRunning As Boolean
         Dim ShowOptions As Boolean
         Dim ShowConsoleLog As Boolean
+        Dim AvoidDNNCrashes As Boolean
         Dim externalInvocation As Boolean
         Dim PythonExe As String
         Dim activeAlgorithm As String

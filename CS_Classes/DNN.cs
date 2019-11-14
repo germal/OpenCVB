@@ -9,7 +9,7 @@ namespace CS_Classes
 {
     public class DNN
     {
-        public void Run(string protoTxt, string caffeModel, string synsetWords, Mat image)
+        public void Run(string protoTxt, string caffeModel, string synsetWords, Mat image, bool AvoidDNNCrashes)
         {
             var classNames = File.ReadAllLines(synsetWords)
                 .Select(line => line.Split(' ').Last())
@@ -27,16 +27,19 @@ namespace CS_Classes
                 using (var inputBlob = CvDnn.BlobFromImage(image, 1, new Size(224, 224), new Scalar(104, 117, 123)))
                 {
                     net.SetInput(inputBlob, "data");
-                    //using (var prob = net.Forward("prob"))
-                    //{
-                    //    // find the best class
-                    //    GetMaxClass(prob, out int classId, out double classProb);
-                    //    Console.WriteLine("Best class: #{0} '{1}'", classId, classNames[classId]);
-                    //    Console.WriteLine("Probability: {0:P2}", classProb);
+                    if (AvoidDNNCrashes == false)
+                    {
+                        using (var prob = net.Forward("prob"))
+                        {
+                            // find the best class
+                            GetMaxClass(prob, out int classId, out double classProb);
+                            Console.WriteLine("Best class: #{0} '{1}'", classId, classNames[classId]);
+                            Console.WriteLine("Probability: {0:P2}", classProb);
 
-                    //    Console.WriteLine("Press any key to exit");
-                    //    Console.Read();
-                    //}
+                            Console.WriteLine("Press any key to exit");
+                            Console.Read();
+                        }
+                    }
                 }
             }
         }

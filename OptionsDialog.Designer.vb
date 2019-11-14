@@ -33,6 +33,7 @@ Partial Class OptionsDialog
         Me.AccurateProcessing = New System.Windows.Forms.RadioButton()
         Me.FastProcessing = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.ShowConsoleLog = New System.Windows.Forms.CheckBox()
         Me.ShowLabels = New System.Windows.Forms.CheckBox()
         Me.MinimizeMemoryFootprint = New System.Windows.Forms.CheckBox()
         Me.Filters = New System.Windows.Forms.GroupBox()
@@ -44,6 +45,7 @@ Partial Class OptionsDialog
         Me.ThresholdFilter = New System.Windows.Forms.CheckBox()
         Me.DecimationFilter = New System.Windows.Forms.CheckBox()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.ShowOptions = New System.Windows.Forms.CheckBox()
         Me.TestAllDuration = New System.Windows.Forms.NumericUpDown()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.GroupBox6 = New System.Windows.Forms.GroupBox()
@@ -51,8 +53,7 @@ Partial Class OptionsDialog
         Me.SelectPythonFile = New System.Windows.Forms.Button()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
-        Me.ShowOptions = New System.Windows.Forms.CheckBox()
-        Me.ShowConsoleLog = New System.Windows.Forms.CheckBox()
+        Me.AvoidDNNCrashes = New System.Windows.Forms.CheckBox()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.GroupBox5.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
@@ -71,7 +72,7 @@ Partial Class OptionsDialog
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.Cancel_Button, 1, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(740, 1048)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(813, 1192)
         Me.TableLayoutPanel1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
@@ -179,15 +180,27 @@ Partial Class OptionsDialog
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.AvoidDNNCrashes)
         Me.GroupBox2.Controls.Add(Me.ShowConsoleLog)
         Me.GroupBox2.Controls.Add(Me.ShowLabels)
         Me.GroupBox2.Controls.Add(Me.MinimizeMemoryFootprint)
         Me.GroupBox2.Location = New System.Drawing.Point(21, 312)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(936, 155)
+        Me.GroupBox2.Size = New System.Drawing.Size(936, 192)
         Me.GroupBox2.TabIndex = 5
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Global Options"
+        '
+        'ShowConsoleLog
+        '
+        Me.ShowConsoleLog.AutoSize = True
+        Me.ShowConsoleLog.Location = New System.Drawing.Point(16, 106)
+        Me.ShowConsoleLog.Name = "ShowConsoleLog"
+        Me.ShowConsoleLog.Size = New System.Drawing.Size(630, 24)
+        Me.ShowConsoleLog.TabIndex = 2
+        Me.ShowConsoleLog.Text = "Show Console Log for external processes - external process messages will not show" &
+    "."
+        Me.ShowConsoleLog.UseVisualStyleBackColor = True
         '
         'ShowLabels
         '
@@ -218,7 +231,7 @@ Partial Class OptionsDialog
         Me.Filters.Controls.Add(Me.DepthToDisparity)
         Me.Filters.Controls.Add(Me.ThresholdFilter)
         Me.Filters.Controls.Add(Me.DecimationFilter)
-        Me.Filters.Location = New System.Drawing.Point(21, 473)
+        Me.Filters.Location = New System.Drawing.Point(21, 510)
         Me.Filters.Name = "Filters"
         Me.Filters.Size = New System.Drawing.Size(936, 274)
         Me.Filters.TabIndex = 7
@@ -302,12 +315,22 @@ Partial Class OptionsDialog
         Me.GroupBox4.Controls.Add(Me.ShowOptions)
         Me.GroupBox4.Controls.Add(Me.TestAllDuration)
         Me.GroupBox4.Controls.Add(Me.Label1)
-        Me.GroupBox4.Location = New System.Drawing.Point(24, 760)
+        Me.GroupBox4.Location = New System.Drawing.Point(24, 797)
         Me.GroupBox4.Name = "GroupBox4"
         Me.GroupBox4.Size = New System.Drawing.Size(941, 139)
         Me.GroupBox4.TabIndex = 8
         Me.GroupBox4.TabStop = False
         Me.GroupBox4.Text = "Test All Options"
+        '
+        'ShowOptions
+        '
+        Me.ShowOptions.AutoSize = True
+        Me.ShowOptions.Location = New System.Drawing.Point(76, 94)
+        Me.ShowOptions.Name = "ShowOptions"
+        Me.ShowOptions.Size = New System.Drawing.Size(310, 24)
+        Me.ShowOptions.TabIndex = 7
+        Me.ShowOptions.Text = "Show algorithm options during 'Test All'"
+        Me.ShowOptions.UseVisualStyleBackColor = True
         '
         'TestAllDuration
         '
@@ -333,7 +356,7 @@ Partial Class OptionsDialog
         Me.GroupBox6.Controls.Add(Me.PythonExeName)
         Me.GroupBox6.Controls.Add(Me.SelectPythonFile)
         Me.GroupBox6.Controls.Add(Me.Label2)
-        Me.GroupBox6.Location = New System.Drawing.Point(21, 905)
+        Me.GroupBox6.Location = New System.Drawing.Point(21, 942)
         Me.GroupBox6.Name = "GroupBox6"
         Me.GroupBox6.Size = New System.Drawing.Size(941, 116)
         Me.GroupBox6.TabIndex = 9
@@ -369,26 +392,15 @@ Partial Class OptionsDialog
         '
         Me.OpenFileDialog1.FileName = "OpenFileDialog1"
         '
-        'ShowOptions
+        'AvoidDNNCrashes
         '
-        Me.ShowOptions.AutoSize = True
-        Me.ShowOptions.Location = New System.Drawing.Point(76, 94)
-        Me.ShowOptions.Name = "ShowOptions"
-        Me.ShowOptions.Size = New System.Drawing.Size(310, 24)
-        Me.ShowOptions.TabIndex = 7
-        Me.ShowOptions.Text = "Show algorithm options during 'Test All'"
-        Me.ShowOptions.UseVisualStyleBackColor = True
-        '
-        'ShowConsoleLog
-        '
-        Me.ShowConsoleLog.AutoSize = True
-        Me.ShowConsoleLog.Location = New System.Drawing.Point(16, 106)
-        Me.ShowConsoleLog.Name = "ShowConsoleLog"
-        Me.ShowConsoleLog.Size = New System.Drawing.Size(630, 24)
-        Me.ShowConsoleLog.TabIndex = 2
-        Me.ShowConsoleLog.Text = "Show Console Log for external processes - external process messages will not show" &
-    "."
-        Me.ShowConsoleLog.UseVisualStyleBackColor = True
+        Me.AvoidDNNCrashes.AutoSize = True
+        Me.AvoidDNNCrashes.Location = New System.Drawing.Point(15, 136)
+        Me.AvoidDNNCrashes.Name = "AvoidDNNCrashes"
+        Me.AvoidDNNCrashes.Size = New System.Drawing.Size(449, 24)
+        Me.AvoidDNNCrashes.TabIndex = 3
+        Me.AvoidDNNCrashes.Text = "DNN's crash some machines.  Check this to not run DNN's."
+        Me.AvoidDNNCrashes.UseVisualStyleBackColor = True
         '
         'OptionsDialog
         '
@@ -396,7 +408,7 @@ Partial Class OptionsDialog
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.Cancel_Button
-        Me.ClientSize = New System.Drawing.Size(976, 1111)
+        Me.ClientSize = New System.Drawing.Size(1049, 1255)
         Me.Controls.Add(Me.GroupBox6)
         Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.Filters)
@@ -460,4 +472,5 @@ Partial Class OptionsDialog
     Friend WithEvents OpenFileDialog1 As OpenFileDialog
     Friend WithEvents ShowOptions As CheckBox
     Friend WithEvents ShowConsoleLog As CheckBox
+    Friend WithEvents AvoidDNNCrashes As CheckBox
 End Class
