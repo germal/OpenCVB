@@ -11,7 +11,7 @@ Public Class DNN_Test : Implements IDisposable
         ocvb.desc = "Download and use a Caffe database"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim modelFile As New FileInfo(ocvb.parms.HomeDir + "Opencvsharp/samples/SamplesCS/bin/Debug/bvlc_googlenet.caffemodel")
+        Dim modelFile As New FileInfo(ocvb.parms.HomeDir + "Data/bvlc_googlenet.caffemodel")
         If File.Exists(modelFile.FullName) = False Then
             ' this site is apparently gone.  caffemodel is in the OpenCVSharp distribution.
             Dim client = HttpWebRequest.CreateHttp("http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel")
@@ -21,9 +21,9 @@ Public Class DNN_Test : Implements IDisposable
             responseStream.CopyTo(memory)
             File.WriteAllBytes(modelFile.FullName, memory.ToArray)
         End If
-        net = Net.ReadNetFromCaffe(ocvb.parms.HomeDir + "Opencvsharp/samples/SamplesCore/Data/Text/bvlc_googlenet.prototxt")
+        net = Net.ReadNetFromCaffe(ocvb.parms.HomeDir + "Data/bvlc_googlenet.prototxt")
 
-        Dim image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Opencvsharp/samples/SamplesCore/Data/Image/space_shuttle.jpg")
+        Dim image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/space_shuttle.jpg")
         ocvb.result2 = image.Resize(ocvb.result2.Size())
         Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
         net.SetInput(inputBlob, "data")
@@ -47,10 +47,10 @@ Public Class DNN_Caffe_CS : Implements IDisposable
         ocvb.desc = "Download and use a Caffe database"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim protoTxt = ocvb.parms.HomeDir + "Opencvsharp/samples/SamplesCore/Data/Text/bvlc_googlenet.prototxt"
-        Dim modelFile = ocvb.parms.HomeDir + "Opencvsharp/samples/SamplesCS/bin/Debug/bvlc_googlenet.caffemodel"
-        Dim synsetWords = ocvb.parms.HomeDir + "Opencvsharp/samples/SamplesCore/Data/Text/synset_words.txt"
-        Dim image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Opencvsharp/samples/SamplesCore/Data/Image/space_shuttle.jpg")
+        Dim protoTxt = ocvb.parms.HomeDir + "Data/bvlc_googlenet.prototxt"
+        Dim modelFile = ocvb.parms.HomeDir + "Data/bvlc_googlenet.caffemodel"
+        Dim synsetWords = ocvb.parms.HomeDir + "Data/synset_words.txt"
+        Dim image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/space_shuttle.jpg")
         caffeCS.Run(protoTxt, modelFile, synsetWords, image, ocvb.parms.AvoidDNNCrashes)
         ocvb.result2 = image.Resize(ocvb.result2.Size())
     End Sub
