@@ -115,8 +115,8 @@ Public Class DNN_Basics : Implements IDisposable
                 Dim detectionMat = New cv.Mat(detection.Size(2), detection.Size(3), cv.MatType.CV_32F, detection.Data)
 
                 Dim confidenceThreshold = 0.8F
-                Dim rows = ocvb.color.Rows
-                Dim cols = ocvb.color.Cols
+                Dim rows = ocvb.color(crop).Rows
+                Dim cols = ocvb.color(crop).Cols
                 ocvb.label2 = ""
                 For i = 0 To detectionMat.Rows - 1
                     Dim confidence = detectionMat.At(Of Single)(i, 2)
