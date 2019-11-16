@@ -109,6 +109,7 @@ Public Class OpenCVB
                 "It was expected to be in " + kinectDLL.FullName + vbCrLf + "Update the code and restart.")
         End If
         updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
+        Debug.WriteLine("system path = " + Environment.GetEnvironmentVariable("Path"))
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
 
         optionsForm = New OptionsDialog
@@ -322,7 +323,6 @@ Public Class OpenCVB
             MsgBox(neededDirectory + " was not found.  " + notFoundMessage)
         End If
         Environment.SetEnvironmentVariable("Path", systemPath)
-        Debug.WriteLine("system path = " + systemPath)
     End Sub
 
     Public Sub DisplayOfficeFile(ByVal WorkingDir As String, ByVal FileName As String)

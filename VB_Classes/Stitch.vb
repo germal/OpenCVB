@@ -14,11 +14,12 @@ Public Class Stitch_Basics : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim mats As New List(Of cv.Mat)
         Dim autoRand As New Random()
+        Dim imageCount = sliders.TrackBar1.Value
         Dim width = sliders.TrackBar2.Value
         Dim height = sliders.TrackBar3.Value
         If externalUse = False Then src = ocvb.color.Clone()
         ocvb.result1 = src.Clone()
-        For i = 0 To sliders.TrackBar1.Value - 1
+        For i = 0 To imageCount - 1
             Dim x1 = CInt(autoRand.NextDouble() * (src.Width - width))
             Dim x2 = CInt(autoRand.NextDouble() * (src.Height - height))
             Dim rect = New cv.Rect(x1, x2, width, height)
@@ -28,10 +29,16 @@ Public Class Stitch_Basics : Implements IDisposable
 
         Dim stitcher = cv.Stitcher.Create(cv.Stitcher.Mode.Scans)
         Dim pano As New cv.Mat
-        Dim status = stitcher.Stitch(mats, pano) ' stitcher may fail with an external exception if you make width and height too small.
+
+        ' stitcher may fail with an external exception if you make width and height too small.
+        Dim status = stitcher.Stitch(mats, pano)
+
         ocvb.result2.SetTo(0)
         If status = cv.Stitcher.Status.OK Then
-            pano.CopyTo(ocvb.result2(New cv.Rect(0, 0, pano.Width, pano.Height)))
+            Dim w = pano.Width, h = pano.Height
+            If w > ocvb.result1.Width Then w = ocvb.result1.Width
+            If h > ocvb.result1.Height Then h = ocvb.result1.Height
+            pano.CopyTo(ocvb.result2(New cv.Rect(0, 0, w, h)))
         Else
             If status = cv.Stitcher.Status.ErrorNeedMoreImgs Then
                 ocvb.result2.PutText("Need more images", New cv.Point(10, 60), cv.HersheyFonts.HersheySimplex, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
