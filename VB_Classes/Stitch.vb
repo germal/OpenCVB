@@ -41,22 +41,3 @@ Public Class Stitch_Basics : Implements IDisposable
         sliders.Dispose()
     End Sub
 End Class
-
-
-
-
-Public Class Stitch_Gray : Implements IDisposable
-    Dim stitch As Stitch_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        stitch = New Stitch_Basics(ocvb)
-        stitch.externalUse = True
-        ocvb.desc = "Stitch together random parts of a grayscale image."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        stitch.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        stitch.Run(ocvb)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        stitch.Dispose()
-    End Sub
-End Class
