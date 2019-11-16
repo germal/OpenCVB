@@ -17,6 +17,7 @@ Public Class Stitch_Basics : Implements IDisposable
         Dim width = sliders.TrackBar2.Value
         Dim height = sliders.TrackBar3.Value
         If externalUse = False Then src = ocvb.color.Clone()
+        ocvb.result1 = src.Clone()
         For i = 0 To sliders.TrackBar1.Value - 1
             Dim x1 = CInt(autoRand.NextDouble() * (src.Width - width))
             Dim x2 = CInt(autoRand.NextDouble() * (src.Height - height))
