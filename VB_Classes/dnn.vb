@@ -28,7 +28,8 @@ Public Class DNN_Test : Implements IDisposable
         Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
         net.SetInput(inputBlob, "data")
         If ocvb.parms.AvoidDNNCrashes = False Then
-            Dim prob = net.Forward("prob")
+            ocvb.putText(New ActiveClass.TrueType("This example is not working.  Forward fails with 'blobs.size() != 0'.", 10, 100))
+            'Dim prob = net.Forward("prob")
             ' finish this ...
         End If
     End Sub
