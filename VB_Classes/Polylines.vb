@@ -1,15 +1,17 @@
 ﻿Imports cv = OpenCvSharp
+Imports System.Collections.Generic
+Imports System.Linq
 Public Class Polylines_IEnumerableExample : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         ocvb.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim pts As New List(Of List(Of cv.Point))
-        Dim points As New List(Of cv.Point)
         Dim autoRand As New Random()
-        For i = 0 To 250 - 1
-            points.Add(New cv.Point(CInt((autoRand.NextDouble()) * ocvb.color.Width), CInt((autoRand.NextDouble()) * ocvb.color.Height)))
-        Next
+        Dim points = Enumerable.Range(0, 250).Select(Of cv.Point)(
+            Function(i)
+                Return New cv.Point(CInt(autoRand.NextDouble() * ocvb.color.Width), CInt(autoRand.NextDouble() * ocvb.color.Height))
+            End Function).ToList
+        Dim pts As New List(Of List(Of cv.Point))
         pts.Add(points)
 
         ocvb.result1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
