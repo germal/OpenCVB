@@ -5,7 +5,7 @@ Public Class Bitmap_ToMat : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         ocvb.label1 = "Convert color bitmap to Mat"
         ocvb.label2 = "Convert gray bitmap to Mat"
-        ocvb.desc = "Convert a bitmap to a cv.Mat"
+        ocvb.desc = "Convert a color and grayscale bitmap to a cv.Mat"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim bitmap = New Bitmap(ocvb.parms.HomeDir + "Data/space_shuttle.jpg")

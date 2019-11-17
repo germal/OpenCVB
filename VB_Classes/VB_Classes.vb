@@ -118,6 +118,10 @@ Public Class ActiveClass : Implements IDisposable
         ocvb.PythonExe = parms.PythonExe
         ocvb.parms = parms
         ActiveAlgorithm = algoList.createAlgorithm(parms.activeAlgorithm, ocvb)
+        If ActiveAlgorithm Is Nothing And parms.activeAlgorithm.EndsWith(".py") Then
+            parms.activeAlgorithm = parms.activeAlgorithm.Substring(0, Len(parms.activeAlgorithm) - 3)
+            ActiveAlgorithm = algoList.createAlgorithm(parms.activeAlgorithm, ocvb)
+        End If
         slidersOffset = New cv.Point
         radioOffset = New cv.Point
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)

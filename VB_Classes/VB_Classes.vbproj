@@ -117,6 +117,7 @@
     <Compile Include="AlgorithmData.vb" />
     <Compile Include="..\UI_Generator\AlgorithmList.vb" />
     <Compile Include="Bitmap.vb" />
+    <Compile Include="Bitwise.vb" />
     <Compile Include="Cartoonify.vb" />
     <Compile Include="Coherence.vb" />
     <Compile Include="Concat.vb" />

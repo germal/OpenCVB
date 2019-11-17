@@ -28,10 +28,12 @@ batchDistance
 BFMatcher
 BFMatcher_create
 bilateralFilter
+BitmapConverter
 bitwise_and
 bitwise_not
 bitwise_or
 bitwise_xor
+BitwiseNot
 blur
 borderInterpolate
 boundingRect
@@ -210,6 +212,7 @@ estimateAffine2D
 estimateAffine3D
 estimateAffinePartial2D
 exp
+Extensions
 extractChannel
 FarnebackOpticalFlow
 FarnebackOpticalFlow_create
@@ -480,6 +483,7 @@ SVDecomp
 textureFlattening
 threshold
 TickMeter
+ToBitmap
 Tonemap
 TonemapDrago
 TonemapMantiuk

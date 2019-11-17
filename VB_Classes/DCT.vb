@@ -45,7 +45,7 @@ Public Class DCT_DepthRGB : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 1)
         If ocvb.parms.ShowOptions Then sliders.show()
-
+        ocvb.label2 = "Subtract DCT inverse from Grayscale depth"
         ocvb.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
