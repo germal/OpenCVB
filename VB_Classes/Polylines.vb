@@ -2,12 +2,21 @@
 Imports System.Collections.Generic
 Imports System.Linq
 Public Class Polylines_IEnumerableExample : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Dim check As New OptionsCheckbox
     Public Sub New(ocvb As AlgorithmData)
+        check.Setup(ocvb, 2)
+        check.Box(0).Text = "Polyline closed if checked"
+        check.Box(0).Checked = True
+        check.Show()
+        sliders.setupTrackBar1(ocvb, "Polyline Count", 2, 500, 100)
+        sliders.setupTrackBar2(ocvb, "Polyline Thickness", 0, 10, 1)
+        sliders.Show()
         ocvb.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim autoRand As New Random()
-        Dim points = Enumerable.Range(0, 250).Select(Of cv.Point)(
+        Dim points = Enumerable.Range(0, sliders.TrackBar1.Value).Select(Of cv.Point)(
             Function(i)
                 Return New cv.Point(CInt(autoRand.NextDouble() * ocvb.color.Width), CInt(autoRand.NextDouble() * ocvb.color.Height))
             End Function).ToList
@@ -15,9 +24,12 @@ Public Class Polylines_IEnumerableExample : Implements IDisposable
         pts.Add(points)
 
         ocvb.result1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
-        ocvb.result1.Polylines(pts, False, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        ' NOTE: when there are 2 points, there will be 1 line.
+        ocvb.result1.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, sliders.TrackBar2.Value, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
+        check.Dispose()
     End Sub
 End Class
 
