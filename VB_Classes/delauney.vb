@@ -134,3 +134,54 @@ Public Class Delaunay_GoodFeatures : Implements IDisposable
         features.Dispose()
     End Sub
 End Class
+
+
+
+
+' https://github.com/shimat/opencvsharp/wiki/Subdiv2D
+Public Class Delauney_Subdiv2D : Implements IDisposable
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.label2 = "Voronoi facets for the same subdiv2D"
+        ocvb.desc = "Generate random points and divide the image around those points."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.frameCount Mod 100 <> 0 Then Exit Sub ' too fast otherwise...
+        Dim rand As New Random()
+        Dim points = Enumerable.Range(0, 100).Select(Of cv.Point2f)(
+            Function(i)
+                Return New cv.Point2f(rand.Next(0, ocvb.color.Width), rand.Next(0, ocvb.color.Height))
+            End Function).ToArray()
+        ocvb.result1.SetTo(0)
+        For Each p In points
+            ocvb.result1.Circle(p, 4, cv.Scalar.Red, -1)
+        Next
+
+        Dim subdiv = New cv.Subdiv2D()
+        subdiv.InitDelaunay(New cv.Rect(0, 0, ocvb.result2.Width, ocvb.result2.Height))
+        subdiv.Insert(points)
+
+        ' draw voronoi diagram
+        Dim facetList()() As cv.Point2f = Nothing
+        Dim facetCenters() As cv.Point2f = Nothing
+        subdiv.GetVoronoiFacetList(Nothing, facetList, facetCenters)
+
+        ocvb.result2 = ocvb.result1.Clone()
+        For Each list In facetList
+            Dim before = list.Last()
+            For Each p In list
+                ocvb.result2.Line(before, p, cv.Scalar.Green, 1)
+                before = p
+            Next
+        Next
+
+        ' draw the delauney diagram
+        Dim edgelist = subdiv.GetEdgeList()
+        For Each edge In edgelist
+            Dim p1 = New cv.Point(edge.Item0, edge.Item1)
+            Dim p2 = New cv.Point(edge.Item2, edge.Item3)
+            ocvb.result1.Line(p1, p2, cv.Scalar.Green, 1)
+        Next
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class
