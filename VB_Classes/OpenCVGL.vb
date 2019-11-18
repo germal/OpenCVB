@@ -30,11 +30,12 @@ Public Class OpenCVGL_Image_CPP : Implements IDisposable
     Public sliders2 As New OptionsSliders
     Public sliders3 As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        If ocvb.parms.testAllRunning Then Exit Sub
         If ocvb.parms.UsingIntelCamera Then cloud = New Depth_XYZ_OpenMP_CPP(ocvb)
 
         imu = New IMU_Basics(ocvb)
         imu.externalUse = True
+
+        If ocvb.parms.testAllRunning Then Exit Sub
 
         setOpenGLsliders(ocvb, sliders, sliders1, sliders2, sliders3)
         sliders2.TrackBar3.Value = -10 ' eye.z
