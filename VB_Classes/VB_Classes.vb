@@ -24,6 +24,13 @@ Module VB_Classes
             src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
     End Sub
+
+    <System.Runtime.CompilerServices.Extension()>
+    Private Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
+        Dim tempObj = thisObj
+        thisObj = withThisObj
+        withThisObj = tempObj
+    End Sub
 End Module
 
 Public Class ActiveClass : Implements IDisposable

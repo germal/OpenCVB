@@ -246,6 +246,7 @@ End Class
 
 
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/MatExpr/-/php-matexpr-class-examples.html
+' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/MatOperations.cs
 Public Class Mat_RowColRange : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         ocvb.label1 = "BitwiseNot of RowRange and ColRange"

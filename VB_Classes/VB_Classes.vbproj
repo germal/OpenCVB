@@ -232,6 +232,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Pencil.vb" />
+    <Compile Include="Pixel.vb" />
     <Compile Include="Plane.vb" />
     <Compile Include="Plot.vb" />
     <Compile Include="Polylines.vb" />
