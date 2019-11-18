@@ -240,3 +240,24 @@ Public Class Mat_ImageXYZ_MT : Implements IDisposable
         grid.Dispose()
     End Sub
 End Class
+
+
+
+
+
+' https://csharp.hotexamples.com/examples/OpenCvSharp/MatExpr/-/php-matexpr-class-examples.html
+Public Class Mat_RowColRange : Implements IDisposable
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.label1 = "BitwiseNot of RowRange and ColRange"
+        ocvb.desc = "Perform operation on a range of cols and/or Rows."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim midX = ocvb.color.Width / 2
+        Dim midY = ocvb.color.Height / 2
+        ocvb.result1 = ocvb.color.Clone()
+        cv.Cv2.BitwiseNot(ocvb.result1.RowRange(midY - 50, midY + 50), ocvb.result1.RowRange(midY - 50, midY + 50))
+        cv.Cv2.BitwiseNot(ocvb.result1.ColRange(midX - 50, midX + 50), ocvb.result1.ColRange(midX - 50, midX + 50))
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class

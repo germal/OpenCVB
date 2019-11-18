@@ -72,6 +72,7 @@ CirclesGridFinderParameters
 CLAHE
 clipLine
 colorChange
+ColRange
 compare
 compareHist
 completeSymm
@@ -423,6 +424,7 @@ resizeWindow
 Rodrigues
 rotate
 rotatedRectangleIntersection
+RowRange
 RQDecomp3x3
 sampsonDistance
 scaleAdd
