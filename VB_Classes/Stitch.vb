@@ -5,7 +5,7 @@ Public Class Stitch_Basics : Implements IDisposable
     Public src As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "Number of random images", 10, 50, 10)
+        sliders.setupTrackBar1(ocvb, "Number of random images", 10, 50, 20)
         sliders.setupTrackBar2(ocvb, "Rectangle width", ocvb.color.Width / 4, ocvb.color.Width - 1, ocvb.color.Width / 2)
         sliders.setupTrackBar3(ocvb, "Rectangle height", ocvb.color.Height / 4, ocvb.color.Height - 1, ocvb.color.Height / 2)
         sliders.Show()
