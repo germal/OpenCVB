@@ -3,10 +3,10 @@
 "c:\Program Files\Git\bin\git.exe" clone "https://github.com/eigenteam/eigen-git-mirror.git"
 "c:\Program Files\Git\bin\git.exe" clone "https://github.com/Kitware/VTK.git"
 
-"c:\Program Files\Git\bin\git.exe" clone "https://github.com/shimat/opencvsharp.git"
-cd opencvsharp
-git submodule update --init --recursive
-cd ..\
+rem "c:\Program Files\Git\bin\git.exe" clone "https://github.com/shimat/opencvsharp.git"
+rem cd opencvsharp
+rem git submodule update --init --recursive
+rem cd ..\
 
 "c:\Program Files\Git\bin\git.exe" clone "https://github.com/opencv/opencv"
 cd OpenCV
@@ -22,8 +22,8 @@ cd ..\
 
 start Azure-Kinect-Sensor-SDK/Build/k4a.sln
 start librealsense/Build/librealsense2.sln
-start opencvsharp/OpenCvSharp.sln
-start opencvsharp/samples/OpenCvSharpSamples.sln
-start eigen-git-mirror/Build/eigen3.sln
+rem start opencvsharp/OpenCvSharp.sln
+rem start opencvsharp/samples/OpenCvSharpSamples.sln
+rem start eigen-git-mirror/Build/eigen3.sln
 rem start VTK/Build/vtk.sln
-rem start OpenCV/Build/OpenCV.sln
+start OpenCV/Build/OpenCV.sln
