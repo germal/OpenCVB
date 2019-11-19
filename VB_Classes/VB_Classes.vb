@@ -26,10 +26,15 @@ Module VB_Classes
     End Sub
 
     <System.Runtime.CompilerServices.Extension()>
-    Private Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
+    Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
         Dim tempObj = thisObj
         thisObj = withThisObj
         withThisObj = tempObj
+    End Sub
+    Public Sub Swap(Of T)(ByRef a As T, ByRef b As T)
+        Dim temp = b
+        b = a
+        a = temp
     End Sub
 End Module
 
