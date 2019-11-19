@@ -100,6 +100,7 @@ cornerMinEigenVal
 cornerSubPix
 correctMatches
 countNonZero
+Create
 createAlignMTB
 createBackgroundSubtractorKNN
 createBackgroundSubtractorMOG2
@@ -126,6 +127,7 @@ cuda_GpuMat_Allocator
 cuda_HostMem
 cuda_Stream
 cuda_TargetArchs
+Compute
 cvtColor
 cvtColorTwoPlane
 dct
@@ -177,6 +179,9 @@ detail_Timelapser
 detail_TimelapserCrop
 detail_VoronoiSeamFinder
 detailEnhance
+Detect
+DetectAndCompute
+DetectRegions
 determinant
 dft
 dilate
@@ -250,6 +255,7 @@ FlannBasedMatcher
 FlannBasedMatcher_create
 flip
 floodFill
+FREAK
 GaussianBlur
 gemm
 GeneralizedHough

@@ -20,6 +20,10 @@ Public Class Solve_ByMat : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
 End Class
+
+
+
+
 ' https://github.com/shimat/opencvsharp/wiki/Solve-Equation
 Public Class Solve_ByArray : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)

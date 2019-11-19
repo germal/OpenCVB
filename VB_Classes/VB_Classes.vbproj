@@ -120,6 +120,7 @@
     <Compile Include="Concat.vb" />
     <Compile Include="EMax.vb" />
     <Compile Include="FeatureLess.vb" />
+    <Compile Include="FREAK.vb" />
     <Compile Include="Gabor.vb" />
     <Compile Include="Grayscale.vb" />
     <Compile Include="Harris.vb" />
