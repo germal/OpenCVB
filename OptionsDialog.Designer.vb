@@ -33,6 +33,7 @@ Partial Class OptionsDialog
         Me.AccurateProcessing = New System.Windows.Forms.RadioButton()
         Me.FastProcessing = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.AvoidDNNCrashes = New System.Windows.Forms.CheckBox()
         Me.ShowConsoleLog = New System.Windows.Forms.CheckBox()
         Me.ShowLabels = New System.Windows.Forms.CheckBox()
         Me.MinimizeMemoryFootprint = New System.Windows.Forms.CheckBox()
@@ -53,7 +54,6 @@ Partial Class OptionsDialog
         Me.SelectPythonFile = New System.Windows.Forms.Button()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
-        Me.AvoidDNNCrashes = New System.Windows.Forms.CheckBox()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.GroupBox5.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
@@ -190,6 +190,16 @@ Partial Class OptionsDialog
         Me.GroupBox2.TabIndex = 5
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Global Options"
+        '
+        'AvoidDNNCrashes
+        '
+        Me.AvoidDNNCrashes.AutoSize = True
+        Me.AvoidDNNCrashes.Location = New System.Drawing.Point(15, 136)
+        Me.AvoidDNNCrashes.Name = "AvoidDNNCrashes"
+        Me.AvoidDNNCrashes.Size = New System.Drawing.Size(449, 24)
+        Me.AvoidDNNCrashes.TabIndex = 3
+        Me.AvoidDNNCrashes.Text = "DNN's crash some machines.  Check this to not run DNN's."
+        Me.AvoidDNNCrashes.UseVisualStyleBackColor = True
         '
         'ShowConsoleLog
         '
@@ -392,16 +402,6 @@ Partial Class OptionsDialog
         '
         Me.OpenFileDialog1.FileName = "OpenFileDialog1"
         '
-        'AvoidDNNCrashes
-        '
-        Me.AvoidDNNCrashes.AutoSize = True
-        Me.AvoidDNNCrashes.Location = New System.Drawing.Point(15, 136)
-        Me.AvoidDNNCrashes.Name = "AvoidDNNCrashes"
-        Me.AvoidDNNCrashes.Size = New System.Drawing.Size(449, 24)
-        Me.AvoidDNNCrashes.TabIndex = 3
-        Me.AvoidDNNCrashes.Text = "DNN's crash some machines.  Check this to not run DNN's."
-        Me.AvoidDNNCrashes.UseVisualStyleBackColor = True
-        '
         'OptionsDialog
         '
         Me.AcceptButton = Me.OK_Button
@@ -416,13 +416,11 @@ Partial Class OptionsDialog
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.GroupBox5)
         Me.Controls.Add(Me.TableLayoutPanel1)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "OptionsDialog"
         Me.ShowInTaskbar = False
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
+        Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show
         Me.Text = "OpenCVB Global Settings"
         Me.TableLayoutPanel1.ResumeLayout(False)
         Me.GroupBox5.ResumeLayout(False)
