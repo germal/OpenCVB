@@ -209,7 +209,6 @@ Public Class OpenCVB
         LineUpCamPics()
     End Sub
     Private Sub FindPython()
-        SaveSetting("OpenCVB", "PythonExe", "PythonExe", "")
         Dim pythonStr = GetSetting("OpenCVB", "PythonExe", "PythonExe", "Python.exe")
         If pythonStr = "" Then pythonStr = "Python.exe" ' Legacy issue... New users won't hit this...
         Dim currentName = New FileInfo(pythonStr)
