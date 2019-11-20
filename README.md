@@ -126,7 +126,7 @@ camera change in the code. If any of the Python scripts fail, review the import
 statements and make sure the package is installed. Typically, the Python scripts
 will require:
 
--   Numpy, Opencv-Python, OpenglExample, Pygame (this is a list of typical
+-   Numpy, Opencv-Python, PyOpenGL, Pygame, psutil (this is a list of typical
     packages that Python algorithms require.)
 
 **Build New Experiments**
