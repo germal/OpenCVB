@@ -7,9 +7,8 @@ Module Python_Module
     Public Function checkPythonPackage(ocvb As AlgorithmData, packageName As String) As Boolean
         ' make sure that opencv-python and numpy are installed on this system.
         If ocvb.PythonExe = "" Then
-            ocvb.putText(New ActiveClass.TrueType("Python is not present but needs to be.", 10, 60, RESULT1))
-            ocvb.putText(New ActiveClass.TrueType("Python is distributed with Visual Studio.", 10, 90, RESULT1))
-            ocvb.putText(New ActiveClass.TrueType("Open the Visual Studio Install and be sure to select 'Python Development'.", 10, 120, RESULT1))
+            ocvb.putText(New ActiveClass.TrueType("Python is not present and needs to be installed.", 10, 60, RESULT1))
+            ocvb.putText(New ActiveClass.TrueType("Visit Python.org and download the latest version.", 10, 120, RESULT1))
             Return False
         End If
         Dim pythonFileInfo = New FileInfo(ocvb.PythonExe)
@@ -18,7 +17,7 @@ Module Python_Module
         Dim packageFiles = packageFolder.GetDirectories(packageName, IO.SearchOption.TopDirectoryOnly)
 
         If packageFiles.Count = 0 Then
-            ocvb.putText(New ActiveClass.TrueType("Python is present but the package " + packageName + " is not installed in this environment.", 10, 60, RESULT1))
+            ocvb.putText(New ActiveClass.TrueType("Python is present but the packages needed by this Python script are not present.", 10, 60, RESULT1))
             ocvb.putText(New ActiveClass.TrueType("Go to the Visual Studio menu 'Tools/Python/Python Environments'", 10, 90, RESULT1))
             ocvb.putText(New ActiveClass.TrueType("Select 'Packages' in the combo box and search for packages required by this script.", 10, 120, RESULT1))
             Return False
