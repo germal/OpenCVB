@@ -52,7 +52,7 @@ Partial Class OptionsDialog
         Me.Label2 = New System.Windows.Forms.Label()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.OKButton = New System.Windows.Forms.Button()
-        Me.CancelButton = New System.Windows.Forms.Button()
+        Me.Cancel_Button = New System.Windows.Forms.Button()
         Me.GroupBox5.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -372,21 +372,21 @@ Partial Class OptionsDialog
         Me.OKButton.Text = "OK"
         Me.OKButton.UseVisualStyleBackColor = True
         '
-        'CancelButton
+        'Cancel_Button
         '
-        Me.CancelButton.Location = New System.Drawing.Point(798, 83)
-        Me.CancelButton.Name = "CancelButton"
-        Me.CancelButton.Size = New System.Drawing.Size(142, 42)
-        Me.CancelButton.TabIndex = 11
-        Me.CancelButton.Text = "Cancel"
-        Me.CancelButton.UseVisualStyleBackColor = True
+        Me.Cancel_Button.Location = New System.Drawing.Point(798, 83)
+        Me.Cancel_Button.Name = "Cancel_Button"
+        Me.Cancel_Button.Size = New System.Drawing.Size(142, 42)
+        Me.Cancel_Button.TabIndex = 11
+        Me.Cancel_Button.Text = "Cancel"
+        Me.Cancel_Button.UseVisualStyleBackColor = True
         '
         'OptionsDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1049, 1127)
-        Me.Controls.Add(Me.CancelButton)
+        Me.Controls.Add(Me.Cancel_Button)
         Me.Controls.Add(Me.OKButton)
         Me.Controls.Add(Me.GroupBox6)
         Me.Controls.Add(Me.GroupBox4)
@@ -446,5 +446,5 @@ Partial Class OptionsDialog
     Friend WithEvents ShowConsoleLog As CheckBox
     Friend WithEvents AvoidDNNCrashes As CheckBox
     Friend WithEvents OKButton As Button
-    Friend WithEvents CancelButton As Button
+    Friend WithEvents Cancel_Button As Button
 End Class

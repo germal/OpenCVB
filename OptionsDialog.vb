@@ -21,10 +21,12 @@ Public Class OptionsDialog
         SaveSetting("OpenCVB", "ShowOptions", "ShowOptions", ShowOptions.Checked)
         SaveSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", ShowConsoleLog.Checked)
         SaveSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", AvoidDNNCrashes.Checked)
+        SaveSetting("OpenCVB", "OptionsHeight", "OptionsHeight", Me.Height)
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
     Public Sub Dialog1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.Height = GetSetting("OpenCVB", "OptionsHeight", "OptionsHeight", Me.Height)
         If GetSetting("OpenCVB", "FastAccurate", "FastAccurate", True) Then
             FastProcessing.Checked = True
         Else
@@ -63,7 +65,7 @@ Public Class OptionsDialog
     End Sub
     Private Sub OptionsDialog_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         Me.Hide()
-        If e.KeyCode = Keys.Escape Then CancelButton_Click(sender, e)
+        If e.KeyCode = Keys.Escape Then Cancel_Button_Click(sender, e)
     End Sub
     Private Sub IntelCamera_CheckedChanged(sender As Object, e As EventArgs) Handles IntelCamera.CheckedChanged
         DecimationFilter.Enabled = True
@@ -96,7 +98,7 @@ Public Class OptionsDialog
             PythonExeName.Text = pythonInfo.FullName
         End If
     End Sub
-    Private Sub CancelButton_Click(sender As Object, e As EventArgs) Handles CancelButton.Click
+    Private Sub Cancel_Button_Click(sender As Object, e As EventArgs) Handles Cancel_Button.Click
         Dialog1_Load(sender, e) ' restore the settings to what they were on entry...
         Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.Hide()
