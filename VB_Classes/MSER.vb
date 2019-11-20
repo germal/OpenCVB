@@ -169,3 +169,44 @@ Public Class MSER_TestSynthetic : Implements IDisposable
         synth.Dispose()
     End Sub
 End Class
+
+
+
+
+' https://github.com/shimat/opencvsharp/wiki/MSER
+' Results are surprisingly different from those in the example above.  
+' Code Is identical And so Is the input image - resize does not affect results (use an imshow to test it.)
+Public Class MSER_CPPStyle : Implements IDisposable
+    Dim gray As cv.Mat
+    Dim image As cv.Mat
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.label1 = "Contour regions from MSER"
+        ocvb.label2 = "Box regions from MSER"
+        ocvb.desc = "Maximally Stable Extremal Regions example - still image"
+        image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/01.jpg", cv.ImreadModes.Color)
+        gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim mser = cv.MSER.Create()
+        Dim msers()() As cv.Point = Nothing
+        Dim boxes() As cv.Rect = Nothing
+        mser.DetectRegions(image, msers, boxes)
+        Dim mat = image.Clone()
+        For Each pts In msers
+            Dim color = cv.Scalar.RandomColor
+            For Each pt In pts
+                mat.Circle(pt, 1, color)
+            Next
+        Next
+        ocvb.result1 = mat.Resize(ocvb.result1.Size())
+
+        mat = image.Clone()
+        For Each box In boxes
+            Dim color = cv.Scalar.RandomColor
+            mat.Rectangle(box, color, -1, cv.LineTypes.AntiAlias)
+        Next
+        ocvb.result2 = mat.Resize(ocvb.result2.Size())
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class

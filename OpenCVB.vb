@@ -209,7 +209,10 @@ Public Class OpenCVB
         LineUpCamPics()
     End Sub
     Private Sub FindPython()
-        Dim currentName = New FileInfo(GetSetting("OpenCVB", "PythonExe", "PythonExe", ""))
+        SaveSetting("OpenCVB", "PythonExe", "PythonExe", "")
+        Dim pythonStr = GetSetting("OpenCVB", "PythonExe", "PythonExe", "Python.exe")
+        If pythonStr = "" Then pythonStr = "Python.exe" ' Legacy issue... New users won't hit this...
+        Dim currentName = New FileInfo(pythonStr)
         If currentName.Exists = False Then
             Dim appData = GetFolderPath(SpecialFolder.ApplicationData)
             For Each Dir As String In System.IO.Directory.GetDirectories(appData + "\..\Local\Programs\Python\")
