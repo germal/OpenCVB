@@ -281,3 +281,45 @@ Public Class CComp_InRange : Implements IDisposable
         sliders.Dispose()
     End Sub
 End Class
+
+
+
+
+
+' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.ConnectedComponents.RenderBlobs(OpenCvSharp.Mat)/
+Public Class CComp_Shapes : Implements IDisposable
+    Dim shapes As cv.Mat
+    Public Sub New(ocvb As AlgorithmData)
+        shapes = New cv.Mat(ocvb.parms.HomeDir + "Data/Shapes.png", cv.ImreadModes.Color)
+        ocvb.label1 = "Largest connected component"
+        ocvb.label2 = "RectView, LabelView, Binary, grayscale"
+        ocvb.desc = "Use connected components to isolate objects in image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim gray = shapes.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu + cv.ThresholdTypes.Binary)
+        Dim labelview = shapes.EmptyClone()
+        Dim rectView = binary.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
+        If cc.LabelCount <= 1 Then Exit Sub
+
+        cc.RenderBlobs(labelview)
+        For Each blob In cc.Blobs.Skip(1)
+            rectView.Rectangle(blob.Rect, cv.Scalar.Red, 2)
+        Next
+
+        Dim maxBlob = cc.GetLargestBlob()
+        Dim filtered = New cv.Mat
+        cc.FilterByBlob(shapes, filtered, maxBlob)
+        ocvb.result1 = filtered.Resize(ocvb.result1.Size())
+
+        Dim matTop As New cv.Mat, matBot As New cv.Mat, mat As New cv.Mat
+        cv.Cv2.HConcat(rectView, labelview, matTop)
+        cv.Cv2.HConcat(binary, gray, matBot)
+        matBot = matBot.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.VConcat(matTop, matBot, mat)
+        ocvb.result2 = mat.Resize(ocvb.result2.Size())
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class
