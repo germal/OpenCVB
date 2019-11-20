@@ -214,7 +214,12 @@ Public Class OpenCVB
         Dim currentName = New FileInfo(pythonStr)
         If currentName.Exists = False Then
             Dim appData = GetFolderPath(SpecialFolder.ApplicationData)
-            For Each Dir As String In System.IO.Directory.GetDirectories(appData + "\..\Local\Programs\Python\")
+            Dim directoryInfo As New DirectoryInfo(appData + "\..\Local\Programs\Python\")
+            If directoryInfo.Exists = False Then
+                MsgBox("OpenCVB cannot find an active Python.  Use Options/Python to specify Python.exe.")
+                Exit Sub
+            End If
+            For Each Dir As String In System.IO.Directory.GetDirectories(directoryInfo.FullName)
                 Dim dirInfo As New System.IO.DirectoryInfo(Dir)
                 Dim pythonFileInfo = New FileInfo(dirInfo.FullName + "\Python.exe")
                 If pythonFileInfo.Exists Then
