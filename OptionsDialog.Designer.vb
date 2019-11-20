@@ -22,9 +22,6 @@ Partial Class OptionsDialog
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
-        Me.OK_Button = New System.Windows.Forms.Button()
-        Me.Cancel_Button = New System.Windows.Forms.Button()
         Me.GroupBox5 = New System.Windows.Forms.GroupBox()
         Me.SnapToGrid = New System.Windows.Forms.CheckBox()
         Me.Kinect4Azure = New System.Windows.Forms.RadioButton()
@@ -54,7 +51,8 @@ Partial Class OptionsDialog
         Me.SelectPythonFile = New System.Windows.Forms.Button()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
-        Me.TableLayoutPanel1.SuspendLayout()
+        Me.OKButton = New System.Windows.Forms.Button()
+        Me.CancelButton = New System.Windows.Forms.Button()
         Me.GroupBox5.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -64,43 +62,6 @@ Partial Class OptionsDialog
         Me.GroupBox6.SuspendLayout()
         Me.SuspendLayout()
         '
-        'TableLayoutPanel1
-        '
-        Me.TableLayoutPanel1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TableLayoutPanel1.ColumnCount = 2
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 0, 0)
-        Me.TableLayoutPanel1.Controls.Add(Me.Cancel_Button, 1, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(813, 1192)
-        Me.TableLayoutPanel1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
-        Me.TableLayoutPanel1.RowCount = 1
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(219, 45)
-        Me.TableLayoutPanel1.TabIndex = 0
-        '
-        'OK_Button
-        '
-        Me.OK_Button.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.OK_Button.Location = New System.Drawing.Point(4, 5)
-        Me.OK_Button.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.OK_Button.Name = "OK_Button"
-        Me.OK_Button.Size = New System.Drawing.Size(100, 35)
-        Me.OK_Button.TabIndex = 0
-        Me.OK_Button.Text = "OK"
-        '
-        'Cancel_Button
-        '
-        Me.Cancel_Button.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.Cancel_Button.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Cancel_Button.Location = New System.Drawing.Point(114, 5)
-        Me.Cancel_Button.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.Cancel_Button.Name = "Cancel_Button"
-        Me.Cancel_Button.Size = New System.Drawing.Size(100, 35)
-        Me.Cancel_Button.TabIndex = 1
-        Me.Cancel_Button.Text = "Cancel"
-        '
         'GroupBox5
         '
         Me.GroupBox5.Controls.Add(Me.SnapToGrid)
@@ -108,7 +69,7 @@ Partial Class OptionsDialog
         Me.GroupBox5.Controls.Add(Me.IntelCamera)
         Me.GroupBox5.Location = New System.Drawing.Point(21, 12)
         Me.GroupBox5.Name = "GroupBox5"
-        Me.GroupBox5.Size = New System.Drawing.Size(936, 160)
+        Me.GroupBox5.Size = New System.Drawing.Size(692, 160)
         Me.GroupBox5.TabIndex = 3
         Me.GroupBox5.TabStop = False
         Me.GroupBox5.Text = "Camera"
@@ -402,27 +363,43 @@ Partial Class OptionsDialog
         '
         Me.OpenFileDialog1.FileName = "OpenFileDialog1"
         '
+        'OKButton
+        '
+        Me.OKButton.Location = New System.Drawing.Point(798, 33)
+        Me.OKButton.Name = "OKButton"
+        Me.OKButton.Size = New System.Drawing.Size(142, 42)
+        Me.OKButton.TabIndex = 10
+        Me.OKButton.Text = "OK"
+        Me.OKButton.UseVisualStyleBackColor = True
+        '
+        'CancelButton
+        '
+        Me.CancelButton.Location = New System.Drawing.Point(798, 83)
+        Me.CancelButton.Name = "CancelButton"
+        Me.CancelButton.Size = New System.Drawing.Size(142, 42)
+        Me.CancelButton.TabIndex = 11
+        Me.CancelButton.Text = "Cancel"
+        Me.CancelButton.UseVisualStyleBackColor = True
+        '
         'OptionsDialog
         '
-        Me.AcceptButton = Me.OK_Button
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.CancelButton = Me.Cancel_Button
-        Me.ClientSize = New System.Drawing.Size(1049, 1255)
+        Me.ClientSize = New System.Drawing.Size(1049, 1127)
+        Me.Controls.Add(Me.CancelButton)
+        Me.Controls.Add(Me.OKButton)
         Me.Controls.Add(Me.GroupBox6)
         Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.Filters)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.GroupBox5)
-        Me.Controls.Add(Me.TableLayoutPanel1)
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimizeBox = False
         Me.Name = "OptionsDialog"
         Me.ShowInTaskbar = False
         Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show
         Me.Text = "OpenCVB Global Settings"
-        Me.TableLayoutPanel1.ResumeLayout(False)
         Me.GroupBox5.ResumeLayout(False)
         Me.GroupBox5.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
@@ -439,9 +416,6 @@ Partial Class OptionsDialog
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
-    Friend WithEvents OK_Button As System.Windows.Forms.Button
-    Friend WithEvents Cancel_Button As System.Windows.Forms.Button
     Friend WithEvents GroupBox5 As GroupBox
     Friend WithEvents SnapToGrid As CheckBox
     Friend WithEvents Kinect4Azure As RadioButton
@@ -471,4 +445,6 @@ Partial Class OptionsDialog
     Friend WithEvents ShowOptions As CheckBox
     Friend WithEvents ShowConsoleLog As CheckBox
     Friend WithEvents AvoidDNNCrashes As CheckBox
+    Friend WithEvents OKButton As Button
+    Friend WithEvents CancelButton As Button
 End Class
