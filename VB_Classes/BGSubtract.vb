@@ -1,10 +1,11 @@
 ﻿Imports cv = OpenCvSharp
+Imports System.Runtime.InteropServices
 Public Class BGSubtract_MotionDetect_MT : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim radio As New OptionsRadioButtons
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Correlation Threshold", 0, 1000, 980)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         radio.Setup(ocvb, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = CStr(2 ^ i) + " threads"
@@ -312,3 +313,50 @@ Public Class BGSubtract_DepthOrColorMotion : Implements IDisposable
         motion.Dispose()
     End Sub
 End Class
+
+
+
+
+
+
+Module BGSubtract_BGFG_CPP_Module
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function BGSubtract_BGFG_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub BGSubtract_BGFG_Close(bgfs As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function BGSubtract_BGFG_Run(bgfs As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, channels As Int32) As IntPtr
+    End Function
+End Module
+
+
+
+
+
+Public Class BGSubtract_BGFG_CPP : Implements IDisposable
+    Dim bgfs As IntPtr
+    Public Sub New(ocvb As AlgorithmData)
+        bgfs = BGSubtract_BGFG_Open()
+        ocvb.desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim src = ocvb.color
+        Dim srcData(src.Total * src.ElemSize) As Byte
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
+        Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
+        Dim imagePtr = BGSubtract_BGFG_Run(bgfs, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        handleSrc.Free()
+
+        If imagePtr <> 0 Then
+            Dim dstData(src.Total - 1) As Byte
+            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
+            ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        BGSubtract_BGFG_Close(bgfs)
+    End Sub
+End Class
+
