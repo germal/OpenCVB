@@ -4,17 +4,22 @@ Imports System.IO
 Public Class Video_Basics : Implements IDisposable
     Public videoOptions As New OptionsVideoName
     Public srcVideo As String
+    Dim currVideo As String
     Public image As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
-        If srcVideo = "" Then srcVideo = ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4" ' default video...
-        videoOptions.fileinfo = New FileInfo(srcVideo)
-        If videoOptions.fileinfo.Exists = False Then videoOptions.fileinfo = New FileInfo(ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4")
-
-        ocvb.label1 = videoOptions.fileinfo.Name
         videoOptions.Show()
+        If srcVideo = "" Then srcVideo = ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4" ' default video...
+        currVideo = srcVideo
+        videoOptions.NewVideo(ocvb, srcVideo)
+
+        ocvb.label1 = srcVideo
         ocvb.desc = "Show a video file"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If srcVideo <> currVideo Then
+            currVideo = srcVideo
+            videoOptions.NewVideo(ocvb, currVideo)
+        End If
         image = videoOptions.nextImage
         If image.Empty() = False Then ocvb.result1 = image.Resize(ocvb.color.Size())
     End Sub

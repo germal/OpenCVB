@@ -22,9 +22,15 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-BGSubtract_BGFG *BGSubtract_BGFG_Open() {
+BGSubtract_BGFG *BGSubtract_BGFG_Open(int currMethod) {
     BGSubtract_BGFG *bgfs = new BGSubtract_BGFG();
-	bgfs->algo = createBackgroundSubtractorGMG(20, 0.7);
+	if (currMethod == 0) bgfs->algo = createBackgroundSubtractorGMG(20, 0.7);
+	else if (currMethod == 1) bgfs->algo = createBackgroundSubtractorCNT();
+	else if (currMethod == 2) bgfs->algo = createBackgroundSubtractorKNN();
+	else if (currMethod == 3) bgfs->algo = createBackgroundSubtractorMOG();
+	else if (currMethod == 4) bgfs->algo = createBackgroundSubtractorMOG2();
+	else if (currMethod == 5) bgfs->algo = createBackgroundSubtractorGSOC();
+	else if (currMethod == 6) bgfs->algo = createBackgroundSubtractorLSBP();
 	return bgfs;
 }
 
