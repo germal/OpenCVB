@@ -20,7 +20,8 @@ Module Python_Module
             ocvb.putText(New ActiveClass.TrueType("Python is present but the packages needed by this Python script are not present.", 10, 60, RESULT1))
             ocvb.putText(New ActiveClass.TrueType("Go to the Visual Studio menu 'Tools/Python/Python Environments'", 10, 90, RESULT1))
             ocvb.putText(New ActiveClass.TrueType("Select 'Packages' in the combo box and search for packages required by this script.", 10, 120, RESULT1))
-            MsgBox("Be sure to install Python packages: opencv-python, NumPy, PyOpenGL, pygame, psutil.")
+            MsgBox("It looks liek the " + packageName + " package is missing." + vbCrLf +
+                   "Be sure to install Python packages: opencv-python, NumPy, PyOpenGL, pygame, psutil.")
             Return False
         End If
         Return True
