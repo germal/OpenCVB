@@ -101,5 +101,8 @@
     <ClCompile Include="BGSubtract.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Random_PatternGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

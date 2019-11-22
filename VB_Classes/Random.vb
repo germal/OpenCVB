@@ -1,4 +1,5 @@
 ﻿Imports cv = OpenCvSharp
+Imports System.Runtime.InteropServices
 
 Public Class Random_Points : Implements IDisposable
     Public sliders As New OptionsSliders
@@ -184,5 +185,47 @@ Public Class Random_CheckNormalDist : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
         normalDist.Dispose()
         histogram.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Module Random_PatternGenerator_CPP_Module
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Random_PatternGenerator_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Random_PatternGenerator_Close(Random_PatternGeneratorPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Random_PatternGenerator_Run(Random_PatternGeneratorPtr As IntPtr, rows As Int32, cols As Int32, channels As Int32) As IntPtr
+    End Function
+End Module
+
+
+
+
+Public Class Random_PatternGenerator_CPP : Implements IDisposable
+    Dim Random_PatternGenerator As IntPtr
+    Public Sub New(ocvb As AlgorithmData)
+        Random_PatternGenerator = Random_PatternGenerator_Open()
+        ocvb.desc = "Generate random patterns for use with 'Random Pattern Calibration'"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim src = ocvb.color
+        Dim srcData(src.Total * src.ElemSize) As Byte
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
+        Dim imagePtr = Random_PatternGenerator_Run(Random_PatternGenerator, src.Rows, src.Cols, src.Channels)
+
+        If imagePtr <> 0 Then
+            Dim dstData(src.Total - 1) As Byte
+            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
+            ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        Random_PatternGenerator_Close(Random_PatternGenerator)
     End Sub
 End Class
