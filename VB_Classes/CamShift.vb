@@ -8,63 +8,56 @@ Imports System.IO.Pipes
 Public Class CamShift_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "CamShift Red Min", 0, 255, 255)
-        sliders.setupTrackBar2(ocvb, "CamShift Red Max", 0, 255, 10)
-        sliders.setupTrackBar3(ocvb, "CamShift Smin (green min)", 0, 255, 30)
-        sliders.setupTrackBar4(ocvb, "CamShift Histogram bins", 16, 255, 32)
+        sliders.setupTrackBar1(ocvb, "CamShift vMin", 0, 255, 32)
+        sliders.setupTrackBar2(ocvb, "CamShift vMax", 0, 255, 255)
+        sliders.setupTrackBar3(ocvb, "CamShift Smin", 0, 255, 60)
+        sliders.setupTrackBar4(ocvb, "CamShift Histogram bins", 16, 255, 16)
+        sliders.Show()
+
         If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.label1 = "Draw on any area with hue"
+        ocvb.label1 = "Draw on any "
         ocvb.desc = "CamShift Demo - draw on the images to define the object to track."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static roi As New cv.Rect
-        Static minRed As Int32
-        Static maxRed As Int32
-        Static minGreen As Int32
+        Static trackBox As New cv.RotatedRect
+        Static vMinLast As Int32
+        Static vMaxLast As Int32
+        Static sBinsLast As cv.Scalar
         Static roi_hist As New cv.Mat
+        Dim mask As New cv.Mat
         ocvb.color.CopyTo(ocvb.result1)
         Dim hsv = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        Dim ch() As Int32 = {0, 1, 2}
+        Dim hue = hsv.EmptyClone()
         Dim bins = sliders.TrackBar4.Value
         Dim hsize() As Int32 = {bins, bins, bins}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180)}
+        Dim ranges() = {New cv.Rangef(0, 180)}
         Dim min = Math.Min(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
         Dim max = Math.Max(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
         Dim sbins = New cv.Scalar(0, sliders.TrackBar3.Value, min)
-        If roi <> New cv.Rect(0, 0, 0, 0) Or roi <> ocvb.drawRect Then
-            If roi <> ocvb.drawRect Or min <> minRed Or max <> maxRed Or sbins <> minGreen Then
-                minRed = min
-                maxRed = max
-                minGreen = sbins
-                roi = ocvb.drawRect
-                If roi.X + roi.Width > hsv.Width Then roi.Width = hsv.Width - roi.X
-                If roi.Y + roi.Height > hsv.Height Then roi.Height = hsv.Height - roi.Y
-                Dim maskROI = hsv(roi).InRange(sbins, New cv.Scalar(180, 255, max))
-                cv.Cv2.CalcHist(New cv.Mat() {hsv(roi)}, ch, maskROI, roi_hist, 1, hsize, ranges)
-                roi_hist = roi_hist.Normalize(0, 255, cv.NormTypes.MinMax)
-                'histogram2DPlot(roi_hist, ocvb.result2, bins, sbins.Val1)
-            End If
+
+        cv.Cv2.MixChannels({hsv}, {hue}, {0, 0})
+        mask = hsv.InRange(sbins, New cv.Scalar(180, 255, max))
+
+        If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
+            vMinLast = min
+            vMaxLast = max
+            sBinsLast = sbins
+            cv.Cv2.CalcHist(New cv.Mat() {hue(ocvb.drawRect)}, {0, 0}, mask(ocvb.drawRect), roi_hist, 1, hsize, ranges)
+            roi_hist = roi_hist.Normalize(0, 255, cv.NormTypes.MinMax)
+            roi = ocvb.drawRect
+            ocvb.drawRect = New cv.Rect(0, 0, 0, 0)
+            'histogram2DPlot(roi_hist, ocvb.result2, bins, sbins.Val1)
         End If
         If roi_hist.Rows <> 0 Then
-            cv.Cv2.CalcBackProject(New cv.Mat() {hsv}, ch, roi_hist, ocvb.result1, ranges)
-            Dim trackBox = cv.Cv2.CamShift(ocvb.result1, roi, cv.TermCriteria.Both(10, 1))
-            roi = trackBox.BoundingRect()
-            If roi.X < 0 Then roi.X = 0
-            If roi.Y < 0 Then roi.Y = 0
-            If roi.X + roi.Width > ocvb.color.Width Then roi.Width = ocvb.color.Width - roi.X
-            If roi.Y + roi.Height > ocvb.color.Height Then roi.Height = ocvb.color.Height - roi.Y
-            ' if we don't grow too big, then use the new roi.
-            If roi.Width < 300 And roi.Height < 300 Then
-                ocvb.drawRect = roi
-            Else
-                ocvb.drawRect.X = roi.X
-                ocvb.drawRect.Y = roi.Y
-            End If
-            ocvb.result1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+            Dim backproj As New cv.Mat
+            cv.Cv2.CalcBackProject({hue}, {0, 0}, roi_hist, backproj, ranges)
+            cv.Cv2.BitwiseAnd(backproj, mask, backproj)
+            trackBox = cv.Cv2.CamShift(backproj, roi, cv.TermCriteria.Both(10, 1))
         End If
-        Dim mask = hsv.InRange(New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255))
-        ocvb.result2.SetTo(0)
-        ocvb.color.CopyTo(ocvb.result2, mask)
+        ocvb.result1.SetTo(0)
+        If trackBox.Size.Width > 0 Then ocvb.result1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        ocvb.color.CopyTo(ocvb.result1, mask)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
@@ -75,24 +68,32 @@ End Class
 
 
 Public Class CamShift_Depth : Implements IDisposable
-    Dim cam As CamShift_Basics
+    Dim camshift As CamShift_Basics
     Dim blob As Depth_FindLargestBlob
     Public Sub New(ocvb As AlgorithmData)
-        cam = New CamShift_Basics(ocvb)
+        camshift = New CamShift_Basics(ocvb)
         blob = New Depth_FindLargestBlob(ocvb)
-        ocvb.desc = "CamShift Demo - use depth to find the head and start the camshift demo."
+        ocvb.label1 = "Automatically finding the head - top of nearest object"
+        ocvb.desc = "Use depth to find the head and start the camshift demo. "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim restartRequested As Boolean
-        Dim depthMin As Int32
-        Dim depthMax As Int32
-        If blob.trim.sliders.TrackBar1.Value <> depthMin Then restartRequested = True
-        If blob.trim.sliders.TrackBar2.Value <> depthMax Then restartRequested = True
-        If ocvb.drawRect.Width = 0 Or restartRequested Then blob.Run(ocvb)
-        cam.Run(ocvb)
+        Static depthMin As Int32
+        Static depthMax As Int32
+        If blob.trim.sliders.TrackBar1.Value <> depthMin Then
+            depthMin = blob.trim.sliders.TrackBar1.Value
+            restartRequested = True
+        End If
+        If blob.trim.sliders.TrackBar2.Value <> depthMax Then
+            depthMax = blob.trim.sliders.TrackBar2.Value
+            restartRequested = True
+        End If
+        If restartRequested Then blob.Run(ocvb)
+        camshift.Run(ocvb)
+        ocvb.label2 = "Mask of objects closer than " + Format(depthMax / 1000, "#0.0") + " meters"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        cam.Dispose()
+        camshift.Dispose()
         blob.Dispose()
     End Sub
 End Class
