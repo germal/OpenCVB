@@ -25,6 +25,44 @@ Module histogram_Functions
             Next
         Next
     End Sub
+
+    Public Sub Show_HSV_Hist(img As cv.Mat, hist As cv.Mat)
+        Dim binCount = hist.Height
+        Dim binWidth = img.Width / hist.Height
+        Dim minVal As Single, maxVal As Single
+        hist.MinMaxLoc(minVal, maxVal)
+        img.SetTo(0)
+        If maxVal = 0 Then Exit Sub
+        For i = 0 To binCount - 2
+            Dim h = img.Height * (hist.At(Of Single)(i, 0)) / maxVal
+            If h = 0 Then h = 5 ' show the color range in the plot
+            cv.Cv2.Rectangle(img, New cv.Rect(i * binWidth + 1, img.Height - h, binWidth - 2, h), New cv.Scalar(CInt(180.0 * i / binCount), 255, 255), -1)
+        Next
+    End Sub
+
+    Public Sub histogramPlot(hist As cv.Mat, dst As cv.Mat, savedMaxVal As Single)
+        Dim barWidth = Int(dst.Width / hist.Rows)
+        Dim minVal As Single, maxVal As Single
+        hist.MinMaxLoc(minVal, maxVal)
+
+        maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000
+
+        If maxVal < 0 Then maxVal = savedMaxVal
+        If Math.Abs((maxVal - savedMaxVal)) / maxVal < 0.2 Then maxVal = savedMaxVal Else savedMaxVal = Math.Max(maxVal, savedMaxVal)
+
+        dst.SetTo(cv.Scalar.Red)
+        If maxVal > 0 And hist.Rows > 0 Then
+            Dim incr = CInt(255 / hist.Rows)
+            For i = 0 To hist.Rows - 1
+                Dim offset = hist.Get(Of Single)(i)
+                If Single.IsNaN(offset) Then offset = 0
+                Dim h = CInt(offset * dst.Height / maxVal)
+                Dim color As cv.Scalar = cv.Scalar.Black
+                If hist.Rows <= 255 Then color = cv.Scalar.All((i Mod 255) * incr)
+                cv.Cv2.Rectangle(dst, New cv.Rect(i * barWidth, dst.Height - h, barWidth, h), color, -1)
+            Next
+        End If
+    End Sub
 End Module
 
 

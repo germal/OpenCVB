@@ -6,12 +6,16 @@ Imports System.IO.Pipes
 
 ' https://docs.opencv.org/3.4.1/d2/dc1/camshiftdemo_8cpp-example.html
 Public Class CamShift_Basics : Implements IDisposable
+    Public plotHist As Plot_Histogram
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
+        plotHist = New Plot_Histogram(ocvb)
+        plotHist.externalUse = True
+
         sliders.setupTrackBar1(ocvb, "CamShift vMin", 0, 255, 32)
         sliders.setupTrackBar2(ocvb, "CamShift vMax", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, "CamShift Smin", 0, 255, 60)
-        sliders.setupTrackBar4(ocvb, "CamShift Histogram bins", 16, 255, 16)
+        sliders.setupTrackBar4(ocvb, "CamShift Histogram bins", 16, 255, 32)
         sliders.Show()
 
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -47,17 +51,18 @@ Public Class CamShift_Basics : Implements IDisposable
             roi_hist = roi_hist.Normalize(0, 255, cv.NormTypes.MinMax)
             roi = ocvb.drawRect
             ocvb.drawRect = New cv.Rect(0, 0, 0, 0)
-            'histogram2DPlot(roi_hist, ocvb.result2, bins, sbins.Val1)
         End If
         If roi_hist.Rows <> 0 Then
             Dim backproj As New cv.Mat
             cv.Cv2.CalcBackProject({hue}, {0, 0}, roi_hist, backproj, ranges)
             cv.Cv2.BitwiseAnd(backproj, mask, backproj)
             trackBox = cv.Cv2.CamShift(backproj, roi, cv.TermCriteria.Both(10, 1))
+            Show_HSV_Hist(ocvb.result2, roi_hist)
+            ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         End If
         ocvb.result1.SetTo(0)
-        If trackBox.Size.Width > 0 Then ocvb.result1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         ocvb.color.CopyTo(ocvb.result1, mask)
+        If trackBox.Size.Width > 0 Then ocvb.result1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
