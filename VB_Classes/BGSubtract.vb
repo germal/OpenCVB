@@ -335,7 +335,7 @@ End Module
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
-Public Class BGSubtract_BGFG_CPP : Implements IDisposable
+Public Class BGSubtract_Basics_CPP : Implements IDisposable
     Dim radio As New OptionsRadioButtons
     Dim bgfs As IntPtr
     Dim currMethod As Int32 = -1
@@ -360,6 +360,7 @@ Public Class BGSubtract_BGFG_CPP : Implements IDisposable
                 If currMethod = i Then
                     Exit For
                 Else
+                    If ocvb.frameCount > 0 Then BGSubtract_BGFG_Close(bgfs)
                     currMethod = i
                     ocvb.label1 = "Method = " + radio.check(i).Text
                     bgfs = BGSubtract_BGFG_Open(currMethod)
@@ -391,10 +392,10 @@ End Class
 
 
 Public Class BGSubtract_Video : Implements IDisposable
-    Dim bgfg As BGSubtract_BGFG_CPP
+    Dim bgfg As BGSubtract_Basics_CPP
     Dim video As Video_Basics
     Public Sub New(ocvb As AlgorithmData)
-        bgfg = New BGSubtract_BGFG_CPP(ocvb)
+        bgfg = New BGSubtract_Basics_CPP(ocvb)
         bgfg.externalUse = True
 
         video = New Video_Basics(ocvb)
@@ -412,3 +413,99 @@ Public Class BGSubtract_Video : Implements IDisposable
     End Sub
 End Class
 
+
+
+
+
+
+Module BGSubtract_Synthetic_CPP_Module
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function BGSubtract_Synthetic_Open(rgbPtr As IntPtr, rows As Int32, cols As Int32, fgFilename As String, amplitude As Double,
+                                              magnitude As Double, wavespeed As Double, objectspeed As Double) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub BGSubtract_Synthetic_Close(synthPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function BGSubtract_Synthetic_Run(synthPtr As IntPtr) As IntPtr
+    End Function
+End Module
+
+
+
+
+
+Public Class BGSubtract_Synthetic_CPP : Implements IDisposable
+    Dim synthPtr As IntPtr
+    Dim sliders As New OptionsSliders
+    Dim amplitude As Double, magnitude As Double, waveSpeed As Double, objectSpeed As Double
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "Synthetic Amplitude x100", 1, 400, 200)
+        sliders.setupTrackBar2(ocvb, "Synthetic Magnitude", 1, 40, 20)
+        sliders.setupTrackBar3(ocvb, "Synthetic Wavespeed x100", 1, 400, 20)
+        sliders.setupTrackBar4(ocvb, "Synthetic ObjectSpeed", 1, 20, 15)
+        sliders.Show()
+        ocvb.label1 = ""
+        ocvb.label2 = "Synthetic background/foreground image."
+        ocvb.desc = "Generate a synthetic input to background subtraction method."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If amplitude <> sliders.TrackBar1.Value Or magnitude <> sliders.TrackBar2.Value Or waveSpeed <> sliders.TrackBar3.Value Or
+            objectSpeed <> sliders.TrackBar4.Value Then
+
+            If ocvb.frameCount <> 0 Then BGSubtract_Synthetic_Close(synthPtr)
+
+            amplitude = sliders.TrackBar1.Value
+            magnitude = sliders.TrackBar2.Value
+            waveSpeed = sliders.TrackBar3.Value
+            objectSpeed = sliders.TrackBar4.Value
+
+            Dim src = ocvb.color
+            Dim srcData(src.Total * src.ElemSize) As Byte
+            Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
+            Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
+
+            synthPtr = BGSubtract_Synthetic_Open(handleSrc.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols,
+                                                ocvb.parms.HomeDir + "VB_Classes/Python/PythonData/baboon.jpg",
+                                                amplitude / 100, magnitude, waveSpeed / 100, objectSpeed)
+            handleSrc.Free()
+        End If
+        Dim imagePtr = BGSubtract_Synthetic_Run(synthPtr)
+
+        If imagePtr <> 0 Then
+            Dim dstData(ocvb.result2.Total * ocvb.result2.ElemSize - 1) As Byte
+            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
+            ocvb.result2 = New cv.Mat(ocvb.result2.Rows, ocvb.result2.Cols, cv.MatType.CV_8UC3, dstData)
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        BGSubtract_Synthetic_Close(synthPtr)
+        sliders.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class BGSubtract_Synthetic : Implements IDisposable
+    Dim bgfg As BGSubtract_Basics_CPP
+    Dim synth As BGSubtract_Synthetic_CPP
+    Public Sub New(ocvb As AlgorithmData)
+        bgfg = New BGSubtract_Basics_CPP(ocvb)
+        bgfg.externalUse = True
+
+        synth = New BGSubtract_Synthetic_CPP(ocvb)
+        ocvb.desc = "Demonstrate background subtraction algorithms with synthetic images."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        synth.Run(ocvb)
+        bgfg.src = ocvb.result2.Clone()
+        bgfg.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        bgfg.Dispose()
+        synth.Dispose()
+    End Sub
+End Class
