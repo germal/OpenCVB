@@ -59,9 +59,9 @@ End Module
 '//extern "C" __declspec(dllexport)
 '//int *Anyname_Run(anyname *anynamePtr, int *rgbPtr, int rows, int cols, int channels)
 '//{
-'//    anynamePtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, rgbPtr);
-'//	   anynamePtr->Run();
-'//    return (int *) anynamePtr->dst.data; // return this C++ allocated data to managed code
+'//		anynamePtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, rgbPtr);
+'//		anynamePtr->Run();
+'//		return (int *) anynamePtr->dst.data; // return this C++ allocated data to managed code
 '//}
 
 Public Class AnyName_CPP : Implements IDisposable

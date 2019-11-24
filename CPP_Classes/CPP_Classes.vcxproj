@@ -48,6 +48,7 @@
     <ClCompile Include="Salience.cpp" />
     <ClCompile Include="SemiGlobalMatching.cpp" />
     <ClCompile Include="Stabilizer.cpp" />
+    <ClCompile Include="Trace.cpp" />
     <ClCompile Include="videostab.cpp" />
     <ClCompile Include="xPhoto_OilPaint.cpp" />
   </ItemGroup>

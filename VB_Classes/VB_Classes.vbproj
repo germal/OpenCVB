@@ -249,6 +249,7 @@
     <Compile Include="Solve.vb" />
     <Compile Include="Stitch.vb" />
     <Compile Include="TextureFlow.vb" />
+    <Compile Include="Trace.vb" />
     <Compile Include="VB_Classes.vb" />
     <Compile Include="OptionsCheckbox.Designer.vb">
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>
