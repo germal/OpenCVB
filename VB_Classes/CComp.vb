@@ -22,6 +22,13 @@ Public Class CComp_Basics : Implements IDisposable
         ocvb.label1 = "CComp binary"
         ocvb.label2 = "Blob Rectangles and centroids"
     End Sub
+    Private Function findNonZeroPixel(src As cv.Mat, startPt As cv.Point) As cv.Point
+        For y = src.Height / 4 To src.Height - 1
+            For x = src.Width / 4 To src.Width - 1
+                If src.At(Of cv.Vec3b)(y, x) <> cv.Scalar.All(0) Then Return New cv.Point(x, y)
+            Next
+        Next
+    End Function
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -35,6 +42,8 @@ Public Class CComp_Basics : Implements IDisposable
         ocvb.result1 = binary.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
 
+        Static lastImage As New cv.Mat
+
         cc.RenderBlobs(ocvb.result1)
         Dim grayMasks = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayDepth = ocvb.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -45,14 +54,28 @@ Public Class CComp_Basics : Implements IDisposable
             ' if it covers everything, then forget it...
             If rect.Width = srcGray.Width And rect.Height = srcGray.Height Then Continue For
             If rect.X + rect.Width > srcGray.Width Or rect.Y + rect.Height > srcGray.Height Then Continue For
+
             Dim mask = grayMasks(rect)
             Dim m = cv.Cv2.Moments(mask, True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
             Dim centroid = New cv.Point(CInt(m.M10 / m.M00), CInt(m.M01 / m.M00))
 
+            ' for the larger areas, try to keep with the same color.
+            'If ocvb.frameCount > 0 Then
+            '    Dim pt = findNonZeroPixel(ocvb.result1(rect), centroid)
+            '    pt.X += rect.X
+            '    pt.Y += rect.Y
+            '    Dim priorPixel = lastImage.At(Of cv.Vec3b)(pt.Y, pt.X)
+            '    Dim pixel = ocvb.result1.At(Of cv.Vec3b)(pt.Y, pt.X)
+            '    If priorPixel <> cv.Scalar.All(0) And pixel <> cv.Scalar.All(0) Then
+            '        ocvb.result1.FloodFill(pt, priorPixel)
+            '        ocvb.result2.FloodFill(pt, priorPixel)
+            '    End If
+            'End If
             ocvb.result2(rect).Circle(centroid, 5, cv.Scalar.White, -1)
             ocvb.result2.Rectangle(rect, cv.Scalar.White, 2)
         Next
+        lastImage = ocvb.result1.Clone()
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
@@ -85,6 +108,7 @@ Public Class CComp_EdgeMask : Implements IDisposable
         Else
             ccomp.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
+        cv.Cv2.ImShow("result1", ocvb.result1)
         ccomp.srcGray.SetTo(0, ocvb.result1)
         ccomp.Run(ocvb)
         ocvb.label1 = "Edges_CannyAndShadow (input to ccomp)"

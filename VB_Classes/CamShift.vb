@@ -19,7 +19,7 @@ Public Class CamShift_Basics : Implements IDisposable
         sliders.Show()
 
         If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.label1 = "Draw on any "
+        ocvb.label1 = "Draw anywhere to create histogram and start camshift"
         ocvb.desc = "CamShift Demo - draw on the images to define the object to track."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
