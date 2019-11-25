@@ -24,6 +24,9 @@ from common import splitfn
 
 # built-in modules
 import os
+import ctypes
+def Mbox(title, text, style):
+    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
 def main():
     import sys
@@ -114,6 +117,7 @@ def main():
         if img is None:
             continue
 
+        cv.imshow(img_found, img)
         h, w = img.shape[:2]
         newcameramtx, roi = cv.getOptimalNewCameraMatrix(camera_matrix, dist_coefs, (w, h), 1, (w, h))
 
@@ -123,13 +127,11 @@ def main():
         x, y, w, h = roi
         dst = dst[y:y+h, x:x+w]
 
-        print('Undistorted image written to: %s' % outfile)
+        #print('Undistorted image written to: %s' % outfile)
         #cv.imwrite(outfile, dst)
-
-    print('Done')
-    cv.waitKey(100000)
 
 
 if __name__ == '__main__':
     print(__doc__)
     main()
+    Mbox('Calibrate.py', 'Calibration complete...', 1)

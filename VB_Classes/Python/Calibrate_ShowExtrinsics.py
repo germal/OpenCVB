@@ -8,6 +8,9 @@ import numpy as np
 import cv2 as cv
 
 from numpy import linspace
+import ctypes
+def Mbox(title, text, style):
+    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
 def inverse_homogeneoux_matrix(M):
     R = M[0:3, 0:3]
@@ -188,7 +191,7 @@ def main():
 
     fig = plt.figure()
     ax = fig.gca(projection='3d')
-    ax.set_aspect("equal")
+    #ax.set_aspect("equal")
 
     cam_width = args.cam_width
     cam_height = args.cam_height
@@ -218,8 +221,7 @@ def main():
     ax.set_title('Extrinsic Parameters Visualization')
 
     plt.show()
-    print('Done')
-
+    Mbox('Calibrate_ShowExtrinsics', 'Plot complete.')
 
 if __name__ == '__main__':
     print(__doc__)

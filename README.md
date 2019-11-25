@@ -117,17 +117,22 @@ installation of the Kinect4Azure camera:
     -   Click “Microsoft Installer” to download and install the proprietary
         Kinect code from Microsoft
 
-The last step is to open the OpenCVB.sln file and build OpenCVB. If there are
-problems linking, it is very likely that the OpenCV_Version environmental
-variable needs to be updated. If there are problems running the camera
-initialization, it is like that the Kinect4Azure camera support has recently
-been upgraded. OpenCVB will display a message explaining how to reflect any
-camera change in the code. If any of the Python scripts fail, review the import
-statements and make sure the package is installed. Typically, the Python scripts
-will require:
+The last step is to open the OpenCVB.sln file and build OpenCVB.
 
--   Numpy, Opencv-Python, PyOpenGL, Pygame, psutil (this is a list of typical
-    packages that Python algorithms require.)
+**Trouble-Shooting New Install**
+
+Some typical problems with new installations:
+
+-   Link problems: check the OpenCV environmental variable for OpenCV version.
+    Make sure that OpenCV Debug and Release versions were built successfully.
+
+-   Camera Failure: check the Kinect4Azure/Intel D4xx installation, test camera
+    independently. Did the Kinect4Azure support get upgraded recently?
+
+-   Python Scripts Fail: check OpenCVB Options Python setting. Make sure it
+    points to the currently installed version in Visual Studio. Test Python
+    scripts independently using the PythonDebug.sln. Also review the list of
+    required packages in the Python section below.
 
 **Build New Experiments**
 
@@ -296,13 +301,10 @@ through the Visual Studio menus:
 -   “Tools/Python/Python Environments” – select “Packages” in the combo box then
     search for “opencv-python” or “numpy” and hit install.
 
-If opencv-python or NumPy are not installed, the instructions to install them
-will appear when attempting to run a Python script.
+Typically, the Python scripts will require:
 
-There are other optional Python packages that might be useful to install – there
-is at least one Python script using “PyOpenGL” and “pygame”. In general, if an
-existing Python script did not run, look at the import statements in that script
-and install the corresponding package.
+-   Numpy, Opencv-Python, PyOpenGL, Pygame, psutil, matplotlib (this is a list
+    of typical additional packages that existing Python algorithms require.)
 
 **Python Debugging**
 

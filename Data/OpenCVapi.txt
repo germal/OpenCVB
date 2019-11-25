@@ -211,6 +211,7 @@ eigenNonSymmetric
 ellipse
 ellipse2Poly
 EMD
+EmptyClone
 equalizeHist
 erode
 error

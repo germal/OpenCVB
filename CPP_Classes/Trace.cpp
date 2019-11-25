@@ -9,6 +9,7 @@
 
 using namespace std;
 using namespace cv;
+// https://github.com/opencv/opencv/wiki/Profiling-OpenCV-Applications
 class Trace_OpenCV
 {
 private:
@@ -24,7 +25,8 @@ public:
 
 extern "C" __declspec(dllexport)
 Trace_OpenCV *Trace_OpenCV_Open() {
-    Trace_OpenCV *Trace_OpenCVPtr = new Trace_OpenCV();
+	CV_TRACE_FUNCTION();
+	Trace_OpenCV *Trace_OpenCVPtr = new Trace_OpenCV();
 	CV_TRACE_REGION("Start");
 	return Trace_OpenCVPtr;
 }

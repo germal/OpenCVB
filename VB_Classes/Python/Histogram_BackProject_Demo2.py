@@ -2,6 +2,9 @@ from __future__ import print_function
 import cv2 as cv
 import numpy as np
 import argparse
+import ctypes
+def Mbox(title, text, style):
+    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
 low = 20
 up = 20
@@ -59,7 +62,7 @@ args = parser.parse_args()
 
 src = cv.imread(args.input)
 if src is None:
-    print('Could not open or find the image:', args.input)
+    Mbox('BackProjection Demo 2', 'Could not open or find the image:', args.input)
     exit(0)
 
 # Transform it to HSV

@@ -652,6 +652,8 @@ Public Class OpenCVB
         If parms.fastProcessing Then parms.imageToTrueTypeLoc *= parms.speedFactor
 
         AlgorithmDesc.Text = ""
+        Dim res() As String = GetType(OpenCVB).Assembly.GetManifestResourceNames()
+        ToolStripButton1.Image = New System.Drawing.Bitmap(GetType(OpenCVB).Assembly.GetManifestResourceStream(res(3)))
 
         While frameCount <> 0 ' previous thread must exit...
             Application.DoEvents()

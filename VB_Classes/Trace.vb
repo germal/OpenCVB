@@ -12,11 +12,16 @@ Module Trace_OpenCV_CPP_Module
     End Function
 End Module
 
+
+
+
+
+' https://github.com/opencv/opencv/wiki/Profiling-OpenCV-Applications
 Public Class Trace_OpenCV_CPP : Implements IDisposable
     Dim Trace_OpenCV As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         Trace_OpenCV = Trace_OpenCV_Open()
-        ocvb.desc = "Use OpenCV's Trace facility - applicable to C++ code."
+        ocvb.desc = "Use OpenCV's Trace facility - applicable to C++ code - and requires Intel's VTune (see link in code.)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src = ocvb.color
@@ -36,5 +41,7 @@ Public Class Trace_OpenCV_CPP : Implements IDisposable
         Trace_OpenCV_Close(Trace_OpenCV)
     End Sub
 End Class
+
+
 
 

@@ -1,4 +1,64 @@
 ﻿Imports cv = OpenCvSharp
+
+
+
+Public Class FloodFill_Basics : Implements IDisposable
+    Public sliders As New OptionsSliders
+    Public srcGray As New cv.Mat
+    Public externalUse As Boolean
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 500, 50)
+        sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
+        sliders.setupTrackBar3(ocvb, "FloodFill HiDiff", 1, 255, 5)
+        sliders.setupTrackBar4(ocvb, "Step Size", 1, ocvb.color.Width / 2, 20)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        ocvb.label1 = "Input image to floodfill"
+        ocvb.desc = "Use floodfill to build image segments in a grayscale image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim minFloodSize = sliders.TrackBar1.Value
+        Dim loDiff = cv.Scalar.All(sliders.TrackBar2.Value)
+        Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
+        Dim stepSize = sliders.TrackBar4.Value
+
+        If externalUse = False Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ocvb.result1 = srcGray.Clone()
+        ocvb.result2.SetTo(0)
+        Dim regionNum As Int32
+        Dim rect As New cv.Rect(0, 0, srcGray.Width, srcGray.Height)
+        Dim mask2 = New cv.Mat(New cv.Size(srcGray.Width + 2, srcGray.Height + 2), cv.MatType.CV_8UC1)
+        Dim maskRect = New cv.Rect(1, 1, mask2.Width - 2, mask2.Height - 2)
+        Dim seeds = New cv.Mat(srcGray.Size(), cv.MatType.CV_8UC1, 0)
+        For y = 0 To srcGray.Height - 1 Step stepSize
+            For x = 0 To srcGray.Width - 1 Step stepSize
+                Dim pixel = ocvb.result2.At(Of cv.Vec3b)(y, x)
+                If pixel = cv.Scalar.Black Then
+                    Dim seedPoint = New cv.Point(x, y)
+                    mask2.SetTo(0)
+                    Dim count = cv.Cv2.FloodFill(srcGray, mask2, seedPoint, cv.Scalar.White, rect, loDiff, hiDiff, cv.FloodFillFlags.FixedRange)
+                    If count > minFloodSize Then
+                        seeds.Circle(seedPoint, 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                        ocvb.result2.SetTo(colorScalar(regionNum), mask2(maskRect))
+                        regionNum += 1
+                        If regionNum > 255 Then Exit For
+                    End If
+                End If
+            Next
+            If regionNum > 255 Then Exit For
+        Next
+        ocvb.label2 = CStr(regionNum) + " labeled regions"
+        cv.Cv2.ImShow("seeds", seeds)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
+    End Sub
+End Class
+
+
+
+
+
 Public Class FloodFill_Basics_MT : Implements IDisposable
     Public sliders As New OptionsSliders
     Dim grid As Thread_Grid
