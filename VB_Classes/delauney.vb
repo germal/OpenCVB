@@ -70,9 +70,9 @@ Module Delaunay_Exports
             For j = 0 To facets(i).Length - 1
                 ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
             Next
-
-            cv.Cv2.FillConvexPoly(img, ifacet, colorScalar(i Mod colorScalar.Length), cv.LineTypes.AntiAlias)
+            Dim nextColor = colorScalar(i Mod colorScalar.Length)
             ifacets(0) = ifacet
+            cv.Cv2.FillConvexPoly(img, ifacet, nextColor, cv.LineTypes.AntiAlias)
             cv.Cv2.Polylines(img, ifacets, True, New cv.Scalar(0), 1, cv.LineTypes.AntiAlias, 0)
         Next
     End Sub
@@ -145,7 +145,7 @@ Public Class Delauney_Subdiv2D : Implements IDisposable
         ocvb.desc = "Generate random points and divide the image around those points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod 100 <> 0 Then Exit Sub ' too fast otherwise...
+        If ocvb.frameCount Mod 30 <> 0 Then Exit Sub ' too fast otherwise...
         Dim rand As New Random()
         Dim points = Enumerable.Range(0, 100).Select(Of cv.Point2f)(
             Function(i)
