@@ -14,7 +14,6 @@
 *.ilk
 .vs/*
 */obj/*
-packages/*
 *.exe
 *.iobj
 *.ipdb
@@ -36,4 +35,4 @@ librealsense
 OpenCV
 VTK
 eigen-git-mirror
-opencvsharp
+
