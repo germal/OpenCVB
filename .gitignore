@@ -35,4 +35,4 @@ librealsense
 OpenCV
 VTK
 eigen-git-mirror
-
+packages/*
