@@ -516,6 +516,12 @@ See the “Camera_calibration_show_extrinsics.py” algorithm.*
 the result of the Gabor filter while the bottom right figure shows the 32 Gabor
 kernels used to produce the result on the bottom left.*
 
+![](media/90c109da6fed62025777141efeffd0ed.png)
+
+*Emgu applications are supported as well. Here the planar subdivision of the
+image is shown for a random set of points with Voronoi facets and Delauney
+triangles.*
+
 **Future Work**
 
 The plan is to continue adding more algorithms. There are numerous published

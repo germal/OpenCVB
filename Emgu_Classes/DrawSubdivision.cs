@@ -23,7 +23,7 @@ namespace Emgu_Classes
         }
 
         /// <returns>An image representing the planar subvidision of the points</returns>
-        public static Mat Draw(int rows, int cols, int pointCount)
+        public static void Draw(int rows, int cols, int pointCount)
         {
             Triangle2DF[] delaunayTriangles;
             VoronoiFacet[] voronoiFacets;
@@ -61,7 +61,6 @@ namespace Emgu_Classes
             }
 
             CvInvoke.Imshow("Emgu Mat format of img", img);
-            return img;
         }
     }
 }
