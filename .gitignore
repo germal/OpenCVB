@@ -35,4 +35,5 @@ librealsense
 OpenCV
 VTK
 eigen-git-mirror
-packages/*
+CPP_Classes/Debug/*
+
