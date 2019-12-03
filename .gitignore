@@ -37,5 +37,3 @@ OpenCV
 VTK
 eigen-git-mirror
 opencvsharp
-Emgu_Classes/bin/*
-Emgu_Classes/packages/*
