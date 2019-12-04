@@ -13,7 +13,7 @@ namespace Emgu_Classes
         public static void CreateSubdivision(int rows, int cols, int pointCount, out Triangle2DF[] delaunayTriangles, out VoronoiFacet[] voronoiFacets)
         {
             var rand = new Random();
-            var pts = Enumerable.Range(0, pointCount).Select(_=>new PointF(rand.Next(0, cols), rand.Next(0, rows))).ToArray();
+            var pts = Enumerable.Range(0, pointCount).Select(_ => new PointF(rand.Next(0, cols), rand.Next(0, rows))).ToArray();
 
             using (Subdiv2D subdivision = new Subdiv2D(pts))
             {
@@ -23,7 +23,7 @@ namespace Emgu_Classes
         }
 
         /// <returns>An image representing the planar subvidision of the points</returns>
-        public static void Draw(int rows, int cols, int pointCount)
+        public static void Draw(int rows, int cols, int pointCount, Byte[] data)
         {
             Triangle2DF[] delaunayTriangles;
             VoronoiFacet[] voronoiFacets;
@@ -60,7 +60,7 @@ namespace Emgu_Classes
                 }
             }
 
-            CvInvoke.Imshow("Emgu Mat format of img", img);
+            img.CopyTo(data);
         }
     }
 }

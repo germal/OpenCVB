@@ -36,4 +36,5 @@ OpenCV
 VTK
 eigen-git-mirror
 CPP_Classes/Debug/*
+Emgu_Classes/bin/*
 

@@ -75,7 +75,6 @@
     <Compile Include="DrawSubdivision.cs" />
     <Compile Include="FaceDetection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VizDraw3D.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="License-LGPL.txt" />
