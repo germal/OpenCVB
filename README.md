@@ -89,13 +89,14 @@ The third step is where all the work is.
 
 -   Run the “PrepareTree.bat” script in the OpenCVB directory.
 
-The “PrepareTree.bat” script will download OpenCV, OpenCVSharp, librealsense,
-and Kinect4Azure from their respective GitHub locations and install them in the
-right locations of the OpenCVB tree. In addition, the script will run the CMake
-command that sets up OpenCV, librealsense, and Kinect4Azure. The script will
-then open Visual Studio for each solution file. Build both the Debug and Release
-versions of each and then close each Visual Studio solution. It is recommended
-to use the Visual Studio “Build/Batch Build” menu entry.
+The “PrepareTree.bat” script will download OpenCV, librealsense, and
+Kinect4Azure from their respective GitHub locations and install them in the
+OpenCVB tree. In addition, the script will run the CMake command that sets up
+OpenCV, librealsense, and Kinect4Azure. The script will then open Visual Studio
+for each solution file where the Debug and Release versions of each should be
+built with the “Build/Batch Build” menu entry. The download and CMake steps take
+about 20 minutes depending on the speed of the network connection. The Visual
+Studio builds should take about an hour depending on the speed of the machine.
 
 After all the packages have been built, then there is one environmental variable
 that needs to be set and it will depend on which version of OpenCV was just
@@ -107,7 +108,7 @@ The currently available OpenCV download is 4.12 so setting OpenCV_Version to 412
 reflects that but note that OpenCV is updated several times a year and the
 environmental variable may need to be updated.
 
-The last step before running OpenCVB is to download the proprietary binaries
+The last step before building OpenCVB is to download the proprietary binaries
 from Microsoft for their Kinect4Azure camera. The “PrepareTree.bat” script built
 the open source portion of the camera support but this step will complete the
 installation of the Kinect4Azure camera:
@@ -123,15 +124,18 @@ The last step is to open the OpenCVB.sln file and build OpenCVB.
 
 Some typical problems with new installations:
 
--   Link problems: check the OpenCV environmental variable for OpenCV version.
-    Make sure that OpenCV Debug and Release versions were built successfully.
+-   Link problems: check the “OpenCV_Version” environmental variable for OpenCV
+    version. Make sure that OpenCV Debug and Release versions were built
+    successfully.
 
 -   Camera Failure: check the Kinect4Azure/Intel D4xx installation, test camera
-    independently. Did the Kinect4Azure support get upgraded recently?
+    independently. Did the Kinect4Azure support get upgraded recently? Post if
+    some configuration problems prevent the camera from working in OpenCVB.
 
 -   Python Scripts Fail: check OpenCVB Options Python setting. Make sure it
     points to the currently installed version in Visual Studio. Test Python
-    scripts independently using the PythonDebug.sln. Also review the list of
+    scripts independently using \<OpenCVB Home
+    Director\>/VB_Classes/Python/PythonDebug.sln. Also review the list of
     required packages in the Python section below.
 
 **Build New Experiments**
@@ -281,11 +285,13 @@ convenient for edits to add any script to the VB_Classes project but, more
 importantly, any changes to a Python script will automatically show the new or
 renamed Python files in the user interface. Python scripts don’t require a
 VB.Net wrapper – just add them to the VB_Classes Project in the Python
-directory. However, to get the RGB, depth, or point cloud image data, a VB.Net
-wrapper is required. Examples are provided – see Python_SurfaceBlit or
-Python_RGBDepth. There is a simple naming convention for Python scripts with a
-VB.Net wrapper: use the same name for both, i.e. the algorithm Python_RGBDepth
-is the companion for the Python_RGBDepth.py script.
+directory.
+
+However, to send the RGB, depth, or point cloud image data from the camera to
+the Python script, a VB.Net wrapper is required. Examples are provided – see
+Python_SurfaceBlit or Python_RGBDepth. There is a simple naming convention for
+Python scripts with a VB.Net wrapper: use the same name for both, i.e. the
+algorithm Python_RGBDepth is the companion for the Python_RGBDepth.py script.
 
 Python scripts show up in the list of algorithms in the OpenCVB user interface
 and each Python script will be run when performing a “Test All” regression. To
