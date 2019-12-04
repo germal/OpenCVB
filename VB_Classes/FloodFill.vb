@@ -26,9 +26,9 @@ Public Class FloodFill_Basics : Implements IDisposable
 
         If externalUse = False Then
             srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            dst = ocvb.result2
             ocvb.result2.SetTo(0)
         End If
+        dst = ocvb.result2
         ocvb.result1 = srcGray.Clone()
         Dim regionNum As Int32
         Dim rect As New cv.Rect(0, 0, srcGray.Width, srcGray.Height)
@@ -208,6 +208,32 @@ Public Class FloodFill_WithDepth : Implements IDisposable
         ffill.dst = ocvb.result2
         ffill.dst.SetTo(0)
         ffill.dst.SetTo(New cv.Scalar(1, 1, 1), shadow.holeMask)
+        ffill.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class
+
+
+
+
+
+Public Class FloodFill_CComp : Implements IDisposable
+    Dim ccomp As CComp_Basics
+    Dim ffill As FloodFill_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        ccomp = New CComp_Basics(ocvb)
+        ccomp.externalUse = True
+        ffill = New FloodFill_Basics(ocvb)
+        ffill.externalUse = True
+
+        ocvb.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        ccomp.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ccomp.Run(ocvb)
+
+        ffill.srcGray = ccomp.dstGray
         ffill.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

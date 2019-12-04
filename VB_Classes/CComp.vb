@@ -6,6 +6,7 @@ Public Class CComp_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public externalUse As Boolean
     Public srcGray As New cv.Mat
+    Public dstGray As New cv.Mat
     Private Class CompareArea : Implements IComparer(Of Int32)
         Public Function Compare(ByVal a As Int32, ByVal b As Int32) As Integer Implements IComparer(Of Int32).Compare
             ' why have compare for just int32?  So we can get duplicates.  Nothing below returns a zero (equal)
@@ -42,10 +43,12 @@ Public Class CComp_Basics : Implements IDisposable
         ocvb.result1 = binary.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
 
+
+
         Static lastImage As New cv.Mat
 
         cc.RenderBlobs(ocvb.result1)
-        Dim grayMasks = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dstGray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayDepth = ocvb.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result1.CopyTo(ocvb.result2)
         For Each blob In cc.Blobs
@@ -55,25 +58,14 @@ Public Class CComp_Basics : Implements IDisposable
             If rect.Width = srcGray.Width And rect.Height = srcGray.Height Then Continue For
             If rect.X + rect.Width > srcGray.Width Or rect.Y + rect.Height > srcGray.Height Then Continue For
 
-            Dim mask = grayMasks(rect)
-            Dim m = cv.Cv2.Moments(mask, True)
-            If m.M00 = 0 Then Continue For ' avoid divide by zero...
-            Dim centroid = New cv.Point(CInt(m.M10 / m.M00), CInt(m.M01 / m.M00))
-
-            ' for the larger areas, try to keep with the same color.
-            'If ocvb.frameCount > 0 Then
-            '    Dim pt = findNonZeroPixel(ocvb.result1(rect), centroid)
-            '    pt.X += rect.X
-            '    pt.Y += rect.Y
-            '    Dim priorPixel = lastImage.At(Of cv.Vec3b)(pt.Y, pt.X)
-            '    Dim pixel = ocvb.result1.At(Of cv.Vec3b)(pt.Y, pt.X)
-            '    If priorPixel <> cv.Scalar.All(0) And pixel <> cv.Scalar.All(0) Then
-            '        ocvb.result1.FloodFill(pt, priorPixel)
-            '        ocvb.result2.FloodFill(pt, priorPixel)
-            '    End If
-            'End If
-            ocvb.result2(rect).Circle(centroid, 5, cv.Scalar.White, -1)
-            ocvb.result2.Rectangle(rect, cv.Scalar.White, 2)
+            If externalUse = False Then
+                Dim mask = dstGray(rect)
+                Dim m = cv.Cv2.Moments(mask, True)
+                If m.M00 = 0 Then Continue For ' avoid divide by zero...
+                Dim centroid = New cv.Point(CInt(m.M10 / m.M00), CInt(m.M01 / m.M00))
+                ocvb.result2(rect).Circle(centroid, 5, cv.Scalar.White, -1)
+                ocvb.result2.Rectangle(rect, cv.Scalar.White, 2)
+            End If
         Next
         lastImage = ocvb.result1.Clone()
     End Sub

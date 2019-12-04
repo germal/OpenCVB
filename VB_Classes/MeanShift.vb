@@ -1,27 +1,34 @@
 ﻿Imports cv = OpenCvSharp
 ' http://answers.opencv.org/question/175486/meanshift-sample-code-in-c/
 Public Class MeanShift_Basics : Implements IDisposable
-    Dim roi As New cv.Rect
-    Dim roi_hist As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
+        ocvb.label1 = "Draw anywhere to start mean shift tracking."
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.drawRect.Width = 0 And ocvb.drawRect.Height = 0 Then Exit Sub
-        ocvb.color.CopyTo(ocvb.result1)
         Dim hsv = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim ch() As Int32 = {0, 1, 2}
         Dim hsize() As Int32 = {16, 16, 16}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180)}
-        If roi <> ocvb.drawRect Then
-            roi = ocvb.drawRect ' save for later comparison
-            Dim maskROI = hsv(roi).InRange(New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255))
+        Static roi_hist As New cv.Mat
+        Static saveDrawRect As New cv.Rect
+        If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
+            saveDrawRect = ocvb.drawRect
+            Dim maskROI = hsv(ocvb.drawRect).InRange(New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255))
             cv.Cv2.CalcHist(New cv.Mat() {hsv(ocvb.drawRect)}, ch, maskROI, roi_hist, 1, hsize, ranges)
             roi_hist = roi_hist.Normalize(0, 255, cv.NormTypes.MinMax)
+            ocvb.drawRectClear = True
         End If
         If roi_hist.Rows <> 0 Then
-            cv.Cv2.CalcBackProject(New cv.Mat() {hsv}, ch, roi_hist, ocvb.result1, ranges)
-            cv.Cv2.MeanShift(ocvb.result1, ocvb.drawRect, cv.TermCriteria.Both(10, 1))
+            Dim backProj As New cv.Mat
+            cv.Cv2.CalcBackProject(New cv.Mat() {hsv}, ch, roi_hist, backProj, ranges)
+            cv.Cv2.MeanShift(backProj, saveDrawRect, cv.TermCriteria.Both(10, 1))
+            ocvb.result1 = backProj.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            ocvb.result1.Rectangle(saveDrawRect, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+            Show_HSV_Hist(ocvb.result2, roi_hist)
+            ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
+        Else
+            ocvb.result1 = ocvb.color
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

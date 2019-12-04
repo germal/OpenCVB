@@ -15,6 +15,7 @@ Public Class AlgorithmData
     Public result1 As New cv.Mat
     Public result2 As New cv.Mat
     Public drawRect As cv.Rect ' filled in if the user draws on any of the images.
+    Public drawRectClear As Boolean ' used to remove the drawing rectangle when it has been used to initialize a camshift or mean shift.
     Public mousePoint As cv.Point ' trace any mouse movements using this.
     Public mouseClickFlag As Boolean
     Public mouseClickPoint As cv.Point

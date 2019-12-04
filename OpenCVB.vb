@@ -743,6 +743,12 @@ Public Class OpenCVB
 
                 OpenCVB.RunAlgorithmTask()
 
+                If OpenCVB.ocvb.drawRectClear Then
+                    drawRect = New cv.Rect
+                    OpenCVB.ocvb.drawRect = drawRect
+                    OpenCVB.ocvb.drawRectClear = False
+                End If
+
                 picLabels(2) = OpenCVB.ocvb.label1
                 picLabels(3) = OpenCVB.ocvb.label2
                 If RefreshAvailable Then

@@ -50,7 +50,7 @@ Public Class CamShift_Basics : Implements IDisposable
             cv.Cv2.CalcHist(New cv.Mat() {hue(ocvb.drawRect)}, {0, 0}, mask(ocvb.drawRect), roi_hist, 1, hsize, ranges)
             roi_hist = roi_hist.Normalize(0, 255, cv.NormTypes.MinMax)
             roi = ocvb.drawRect
-            ocvb.drawRect = New cv.Rect(0, 0, 0, 0)
+            ocvb.drawRectClear = True
         End If
         If roi_hist.Rows <> 0 Then
             Dim backproj As New cv.Mat
