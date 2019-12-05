@@ -262,3 +262,30 @@ Public Class Mat_RowColRange : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
 End Class
+
+
+
+
+
+Public Class Mat_Managed : Implements IDisposable
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.desc = "There is a limited ability to use Mat data in Managed code directly."
+        ocvb.label1 = "Color change is in the managed cv.vec3b array"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static autoRand As New Random()
+        Static src(ocvb.color.Total) As cv.Vec3b
+        ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, src)
+        Static nextColor As cv.Vec3b
+        If ocvb.frameCount Mod 30 = 0 Then
+            If nextColor = New cv.Vec3b(0, 0, 255) Then nextColor = New cv.Vec3b(0, 255, 0) Else nextColor = New cv.Vec3b(0, 0, 255)
+        End If
+        For i = 0 To src.Length - 1
+            src(i) = nextColor
+        Next
+        Dim rect As New cv.Rect(autoRand.Next(0, ocvb.color.Width - 50), autoRand.Next(0, ocvb.color.Height - 50), 50, 50)
+        ocvb.result1(rect).SetTo(0)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class

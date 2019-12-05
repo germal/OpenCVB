@@ -116,6 +116,7 @@
     <Compile Include="Affine3D.vb" />
     <Compile Include="AlgorithmData.vb" />
     <Compile Include="..\UI_Generator\AlgorithmList.vb" />
+    <Compile Include="Aruco.vb" />
     <Compile Include="Bitmap.vb" />
     <Compile Include="Bitwise.vb" />
     <Compile Include="Cartoonify.vb" />
