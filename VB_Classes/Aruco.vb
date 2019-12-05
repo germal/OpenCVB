@@ -1,5 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports OpenCvSharp.Aruco.CvAruco
+
+' https://github.com/shimat/opencvsharp_samples/blob/master/SamplesCS/Samples/ArucoSample.cs
 Public Class Aruco_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         ocvb.desc = "Show how to use the Aruco markers and rotate the image accordingly."
@@ -13,7 +15,30 @@ Public Class Aruco_Basics : Implements IDisposable
         Dim corners()() As cv.Point2f = Nothing
         Dim ids() As Int32 = Nothing
         Dim rejectedPoints()() As cv.Point2f = Nothing
-        'cv.Aruco.CvAruco.DetectMarkers(src, dictionary, corners, ids, detectorParameters, rejectedPoints)
+        ' this fails!  Cannot cast a Mat to an InputArray!  Bug?
+        ' cv.Aruco.CvAruco.DetectMarkers(src, dictionary, corners, ids, detectorParameters, rejectedPoints)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class
+
+
+
+
+Public Class Aruco_CS : Implements IDisposable
+    Dim aruco As New CS_Classes.Aruco_Detect
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.label1 = "Original Image with marker ID's"
+        ocvb.label2 = "Normalized image after WarpPerspective."
+        ocvb.desc = "Testing the Aruco marker detection in C#"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static src = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/aruco_markers_photo.jpg")
+        aruco.Run(src)
+        ocvb.result1 = aruco.detectedMarkers.Resize(ocvb.result1.Size())
+
+        ocvb.result2(New cv.Rect(0, 0, ocvb.result2.Height, ocvb.result2.Height)) =
+                    aruco.normalizedImage.Resize(New cv.Size(ocvb.result2.Height, ocvb.result2.Height))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub

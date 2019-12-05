@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using OpenCvSharp;
 using OpenCvSharp.Dnn;
-
+ 
 namespace CS_Classes
 {
     public class DNN

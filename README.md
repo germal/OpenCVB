@@ -531,6 +531,12 @@ than OpenCVSharp. For instance, the Emgu Mat is not the same as the OpenCVSharp
 Mat. Nonetheless, there is considerable ongoing investment in the Emgu APIs’ and
 they are fully supported.*
 
+![](media/b675880a11fc9b9a94d6873b1bf40fa8.png)
+
+*The Aruco markers are found in an image allowing the image to be transformed
+using OpenCV’s WarpPerspective transform. This example is from the OpenCVSharp
+Sample programs.*
+
 **Future Work**
 
 The plan is to continue adding more algorithms. There are numerous published
