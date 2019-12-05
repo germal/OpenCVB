@@ -522,11 +522,14 @@ See the “Camera_calibration_show_extrinsics.py” algorithm.*
 the result of the Gabor filter while the bottom right figure shows the 32 Gabor
 kernels used to produce the result on the bottom left.*
 
-![](media/90c109da6fed62025777141efeffd0ed.png)
+![](media/cbabb4e31400daa77e482733a5b535f9.png)
 
 *Emgu applications are supported as well. Here the planar subdivision of the
 image is shown for a random set of points with Voronoi facets and Delauney
-triangles.*
+triangles. Emgu interfaces, while based on OpenCV, are significantly different
+than OpenCVSharp. For instance, the Emgu Mat is not the same as the OpenCVSharp
+Mat. Nonetheless, there is considerable ongoing investment in the Emgu APIs’ and
+they are fully supported.*
 
 **Future Work**
 

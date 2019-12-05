@@ -17,7 +17,7 @@ End Class
 
 
 
-Public Class Emgu_Factdetection : Implements IDisposable
+Public Class Emgu_Facedetection : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         ocvb.desc = "Use the simplest possible face detector in Emgu examples."
         ocvb.result1.SetTo(0)

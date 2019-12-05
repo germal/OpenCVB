@@ -57,6 +57,12 @@ Public Class FloodFill_Basics : Implements IDisposable
             Next
             If regionNum > 255 Then Exit For
         Next
+        'If ocvb.frameCount = 10 Then
+        '    For i = 0 To masks.Count - 1
+        '        Console.WriteLine(CStr(masks(i).CountNonZero()))
+        '        cv.Cv2.ImShow("mask " + CStr(i), masks(i).Threshold(0, 255, cv.ThresholdTypes.Binary))
+        '    Next
+        'End If
         lastImage = dst.Clone()
         ocvb.label2 = CStr(regionNum) + " labeled regions"
     End Sub
