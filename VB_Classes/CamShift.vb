@@ -16,7 +16,7 @@ Public Class CamShift_Basics : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "CamShift vMax", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, "CamShift Smin", 0, 255, 60)
         sliders.setupTrackBar4(ocvb, "CamShift Histogram bins", 16, 255, 32)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.label1 = "Draw anywhere to create histogram and start camshift"

@@ -351,7 +351,7 @@ Public Class BGSubtract_Basics_CPP : Implements IDisposable
         radio.check(5).Text = "GSOC"
         radio.check(6).Text = "LSBP"
         radio.check(4).Checked = True ' mog2 appears to be the best...
-        radio.Show()
+        If ocvb.parms.ShowOptions Then radio.Show()
         ocvb.desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -444,7 +444,7 @@ Public Class BGSubtract_Synthetic_CPP : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "Synthetic Magnitude", 1, 40, 20)
         sliders.setupTrackBar3(ocvb, "Synthetic Wavespeed x100", 1, 400, 20)
         sliders.setupTrackBar4(ocvb, "Synthetic ObjectSpeed", 1, 20, 15)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.label1 = ""
         ocvb.label2 = "Synthetic background/foreground image."
         ocvb.desc = "Generate a synthetic input to background subtraction method."

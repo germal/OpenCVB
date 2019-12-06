@@ -342,7 +342,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="License-LGPL.txt" />
     <Content Include="Python\Gabor_Filter.py" />
     <Content Include="Python\Kalman_EKF.py" />
     <Content Include="Python\KAZE_match.py" />

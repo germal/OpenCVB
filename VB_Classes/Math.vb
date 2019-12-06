@@ -120,3 +120,49 @@ Public Class Math_DepthMeanStdev : Implements IDisposable
         minMax.Dispose()
     End Sub
 End Class
+
+
+
+
+
+Public Class Math_RGBCorrelation : Implements IDisposable
+    Dim flow As Font_FlowText
+    Dim corr As MatchTemplate_Correlation
+    Public Sub New(ocvb As AlgorithmData)
+        flow = New Font_FlowText(ocvb)
+        flow.externalUse = True
+        flow.result1or2 = RESULT2
+
+        corr = New MatchTemplate_Correlation(ocvb)
+        corr.externalUse = True
+        corr.reportFreq = 1
+
+        ocvb.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim split = ocvb.color.Split()
+        corr.sample1 = split(0)
+        corr.sample2 = split(1)
+        corr.Run(ocvb)
+        Dim blueGreenCorrelation = "Blue-Green " + ocvb.label1
+
+        corr.sample1 = split(2)
+        corr.sample2 = split(1)
+        corr.Run(ocvb)
+        Dim redGreenCorrelation = "Red-Green " + ocvb.label1
+
+        corr.sample1 = split(2)
+        corr.sample2 = split(0)
+        corr.Run(ocvb)
+        Dim redBlueCorrelation = "Red-Blue " + ocvb.label1
+
+        flow.msgs.Add(blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation)
+        flow.Run(ocvb)
+        ocvb.label1 = ""
+        ocvb.label2 = "Log of " + corr.matchText
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        corr.Dispose()
+        flow.Dispose()
+    End Sub
+End Class

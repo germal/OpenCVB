@@ -44,9 +44,9 @@ Public Class FloodFill_Basics : Implements IDisposable
                     maskPlus.SetTo(0)
                     Dim count = cv.Cv2.FloodFill(srcGray, maskPlus, seedPoint, cv.Scalar.White, rect, loDiff, hiDiff, cv.FloodFillFlags.FixedRange)
                     If count > minFloodSize Then
-                        Dim nextColor = colorScalar(regionNum)
+                        Dim nextColor = ocvb.colorScalar(regionNum)
                         If ocvb.frameCount > 0 Then nextColor = lastImage.At(Of cv.Vec3b)(y, x)
-                        If nextColor = cv.Scalar.All(1) Or nextColor = cv.Scalar.All(0) Then nextColor = colorScalar(regionNum)
+                        If nextColor = cv.Scalar.All(1) Or nextColor = cv.Scalar.All(0) Then nextColor = ocvb.colorScalar(regionNum)
                         dst.SetTo(nextColor, maskPlus(maskRect))
                         srcGray.SetTo(pixel, maskPlus(maskRect)) ' this prevents the region from being floodfilled again.
                         regionNum += 1

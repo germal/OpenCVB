@@ -544,7 +544,7 @@ Public Class LineDetector_Basics : Implements IDisposable
     Dim ld As cv.XImgProc.FastLineDetector
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "LineDetector thickness of line", 1, 20, 2)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         ocvb.label1 = "Manually drawn with thickness"

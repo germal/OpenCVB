@@ -45,7 +45,7 @@ End Class
 
 
 Public Class Plot_Histogram : Implements IDisposable
-    Dim sliders As New OptionsSliders
+    Public sliders As New OptionsSliders
     Public hist As New cv.Mat
     Public dst As New cv.Mat
     Public bins As Int32 = 50

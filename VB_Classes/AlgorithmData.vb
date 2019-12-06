@@ -23,6 +23,7 @@ Public Class AlgorithmData
     Public rng = New cv.RNG()
     Public ms_rng As System.Random
     Public rColors(255) As cv.Vec3b
+    Public colorScalar(255) As cv.Scalar
     Public label1 As String
     Public label2 As String
     Public frameCount As Int32 = 0

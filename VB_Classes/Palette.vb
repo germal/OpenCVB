@@ -222,20 +222,16 @@ End Class
 
 
 Public Class Palette_Gradient : Implements IDisposable
-    Dim colorScalar(255) As cv.Scalar
     Public frameModulo As Int32 = 30 ' every 30 frames try a different pair of random colors.
     Public Sub New(ocvb As AlgorithmData)
         ocvb.label2 = "From and To colors"
-        For i = 0 To colorScalar.Length - 1
-            colorScalar(i) = New cv.Scalar(ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255))
-        Next
         ocvb.desc = "Create gradient image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod frameModulo = 0 Then
             Dim f As Double = 1.0
-            Dim a = colorScalar(ocvb.rng.uniform(0, 255))
-            Dim b = colorScalar(ocvb.rng.uniform(0, 255))
+            Dim a = ocvb.colorScalar(ocvb.rng.uniform(0, 255))
+            Dim b = ocvb.colorScalar(ocvb.rng.uniform(0, 255))
             ocvb.result2.SetTo(b)
             ocvb.result2(New cv.Rect(0, 0, ocvb.result2.Width, ocvb.result2.Height / 2)).SetTo(a)
 

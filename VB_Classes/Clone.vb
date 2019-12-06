@@ -179,7 +179,7 @@ Public Class Clone_Seamless : Implements IDisposable
         radio.check(1).Text = "Seamless Mono Clone"
         radio.check(2).Text = "Seamless Mixed Clone"
         radio.check(0).Checked = True
-        radio.Show()
+        If ocvb.parms.ShowOptions Then radio.Show()
         ocvb.label1 = "Mask for Clone"
         ocvb.label2 = "Results for SeamlessClone"
         ocvb.desc = "Use the seamlessclone API to merge color and depth..."

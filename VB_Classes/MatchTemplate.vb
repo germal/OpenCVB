@@ -8,6 +8,7 @@ Public Class MatchTemplate_Correlation : Implements IDisposable
     Public externalUse As Boolean
     Public matchText As String = ""
     Public correlationMat As New cv.Mat
+    Public reportFreq = 10 ' report the results every x number of iterations.
     Public Sub New(ocvb As AlgorithmData)
         flow = New Font_FlowText(ocvb)
         flow.externalUse = True
@@ -21,9 +22,9 @@ Public Class MatchTemplate_Correlation : Implements IDisposable
         radio.check(4).Text = "SqDiff"
         radio.check(5).Text = "SqDiffNormed"
         radio.check(1).Checked = True
-        If ocvb.parms.ShowOptions Then radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
         sliders.setupTrackBar1(ocvb, "Sample Size", 2, 10000, 100)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.label2 = "Log of correlation results"
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
@@ -33,6 +34,8 @@ Public Class MatchTemplate_Correlation : Implements IDisposable
             sample2 = New cv.Mat(New cv.Size(sliders.TrackBar1.Value, 1), cv.MatType.CV_32FC1)
             cv.Cv2.Randn(sample1, 100, 25)
             cv.Cv2.Randn(sample2, 0, 25)
+        Else
+            sliders.Visible = False
         End If
 
         Dim matchOption = cv.TemplateMatchModes.CCoeffNormed
@@ -44,16 +47,14 @@ Public Class MatchTemplate_Correlation : Implements IDisposable
             End If
         Next
         cv.Cv2.MatchTemplate(sample1, sample2, correlationMat, matchOption)
-        If ocvb.frameCount Mod 10 = 0 Then
+        If ocvb.frameCount Mod reportFreq = 0 Then
             Dim correlation = correlationMat.At(Of Single)(0, 0)
-            ocvb.label1 = matchText + " for " + CStr(sample1.Rows) + " samples each = " + Format(correlation, "#,##0.00")
-            flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
-            flow.Run(ocvb)
-            Static minCorrelation = Single.PositiveInfinity
-            Static maxCorrelation = Single.NegativeInfinity
-            If correlation < minCorrelation Then minCorrelation = correlation
-            If correlation > maxCorrelation Then maxCorrelation = correlation
-            ocvb.label1 = "Correlation Min = " + Format(minCorrelation, "#,##0.00") + " max = " + Format(maxCorrelation, "#,##0.0000")
+            ocvb.label1 = "Correlation = " + Format(correlation, "#,##0.000")
+            If externalUse = False Then
+                ocvb.label1 = matchText + " for " + CStr(sample1.Rows) + " samples each = " + Format(correlation, "#,##0.00")
+                flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
+                flow.Run(ocvb)
+            End If
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -65,7 +66,7 @@ End Class
 
 
 
-Public Class MatchTemplate_CorrelationRGB : Implements IDisposable
+Public Class MatchTemplate_RowCorrelation : Implements IDisposable
     Dim mathCor As MatchTemplate_Correlation
     Dim flow As Font_FlowText
     Public Sub New(ocvb As AlgorithmData)

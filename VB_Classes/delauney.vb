@@ -1,7 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 
 Module Delaunay_Exports
-    Public colorScalar(255) As cv.Scalar
     Public Sub draw_line(img As cv.Mat, org As cv.Point, dst As cv.Point, active_color As cv.Scalar)
         If org.X >= 0 And org.X <= img.Width Then
             If org.Y >= 0 And org.Y <= img.Height Then
@@ -57,7 +56,7 @@ Module Delaunay_Exports
 
         cv.Cv2.Circle(img, fp, 10, active_color, -1, cv.LineTypes.AntiAlias, 0)
     End Sub
-    Public Sub paint_voronoi(img As cv.Mat, subdiv As cv.Subdiv2D)
+    Public Sub paint_voronoi(ocvb As AlgorithmData, img As cv.Mat, subdiv As cv.Subdiv2D)
         Dim facets = New cv.Point2f()() {Nothing}
         Dim centers() As cv.Point2f = Nothing
         subdiv.GetVoronoiFacetList(New List(Of Int32)(), facets, centers)
@@ -70,7 +69,7 @@ Module Delaunay_Exports
             For j = 0 To facets(i).Length - 1
                 ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
             Next
-            Dim nextColor = colorScalar(i Mod colorScalar.Length)
+            Dim nextColor = ocvb.colorScalar(i Mod ocvb.colorScalar.Length)
             ifacets(0) = ifacet
             cv.Cv2.FillConvexPoly(img, ifacet, nextColor, cv.LineTypes.AntiAlias)
             cv.Cv2.Polylines(img, ifacets, True, New cv.Scalar(0), 1, cv.LineTypes.AntiAlias, 0)
@@ -83,9 +82,6 @@ End Module
 
 Public Class Delaunay_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
-        For i = 0 To colorScalar.Length - 1
-            colorScalar(i) = New cv.Scalar(ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255))
-        Next
         ocvb.desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -102,7 +98,7 @@ Public Class Delaunay_Basics : Implements IDisposable
             'draw_subdiv(ocvb.result1, subdiv, cv.scalar.white, ocvb.frameCount Mod 2)
         Next
 
-        paint_voronoi(ocvb.result1, subdiv)
+        paint_voronoi(ocvb, ocvb.result1, subdiv)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
@@ -128,7 +124,7 @@ Public Class Delaunay_GoodFeatures : Implements IDisposable
             subdiv.Insert(features.goodFeatures(i))
         Next
 
-        paint_voronoi(ocvb.result2, subdiv)
+        paint_voronoi(ocvb, ocvb.result2, subdiv)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         features.Dispose()

@@ -329,7 +329,7 @@ Public Class Depth_LocalMinMax_MT : Implements IDisposable
         For i = 0 To ptList.Count - 1
             subdiv.Insert(ptList(i))
         Next
-        paint_voronoi(ocvb.result2, subdiv)
+        paint_voronoi(ocvb, ocvb.result2, subdiv)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         grid.Dispose()

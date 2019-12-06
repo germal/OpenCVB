@@ -1,6 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
+
+
 Module histogram_Functions
     Public Sub histogram2DPlot(histogram As cv.Mat, dst As cv.Mat, aBins As Int32, bBins As Int32)
         Dim maxVal As Double
@@ -39,6 +41,19 @@ Module histogram_Functions
             cv.Cv2.Rectangle(img, New cv.Rect(i * binWidth + 1, img.Height - h, binWidth - 2, h), New cv.Scalar(CInt(180.0 * i / binCount), 255, 255), -1)
         Next
     End Sub
+    Public Sub histogramPlotValleys(img As cv.Mat, hist As cv.Mat, plotColors() As cv.Scalar)
+        Dim binCount = hist.Height
+        Dim binWidth = img.Width / hist.Height
+        Dim minVal As Single, maxVal As Single
+        hist.MinMaxLoc(minVal, maxVal)
+        img.SetTo(0)
+        If maxVal = 0 Then Exit Sub
+        For i = 0 To binCount - 2
+            Dim h = img.Height * (hist.At(Of Single)(i, 0)) / maxVal
+            If h = 0 Then h = 5 ' show the color range in the plot
+            cv.Cv2.Rectangle(img, New cv.Rect(i * binWidth + 1, img.Height - h, binWidth - 2, h), plotColors(i), -1)
+        Next
+    End Sub
 
     Public Sub histogramPlot(hist As cv.Mat, dst As cv.Mat, savedMaxVal As Single)
         Dim barWidth = Int(dst.Width / hist.Rows)
@@ -67,10 +82,75 @@ End Module
 
 
 
+
+' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
+Public Class Histogram_Basics : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Public src As New cv.Mat
+    Public dst As New cv.Mat
+    Public bins As Int32 = 50
+    Public minRange As Int32 = 0
+    Public maxRange As Int32 = 255
+    Public externalUse As Boolean
+    Dim indices As cv.Mat
+    Dim plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "Histogram Bins", 2, 255, 255)
+        sliders.setupTrackBar2(ocvb, "Histogram line thickness", 1, 20, 3)
+        sliders.setupTrackBar3(ocvb, "Scale Font Size x10", 1, 20, 10)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        indices = New cv.Mat(256, 1, cv.MatType.CV_32F)
+        For i = 0 To 255
+            indices.Set(Of Single)(i, 0, CSng(i))
+        Next
+        ocvb.desc = "Plot histograms for up to 3 channels."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim thickness = sliders.TrackBar2.Value
+        Dim bins = sliders.TrackBar1.Value
+        Dim dimensions() = New Integer() {bins}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
+        If externalUse = False Then
+            src = ocvb.color
+            dst = ocvb.result1
+        End If
+
+        dst.SetTo(0)
+        Dim pixelWidth = dst.Cols / bins
+
+        Dim maxVal As Double
+        For i = 0 To src.Channels - 1
+            Dim hist = New cv.Mat
+            cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {i}, New cv.Mat(), hist, 1, dimensions, ranges)
+            hist.MinMaxLoc(0, maxVal)
+            hist = hist.Normalize(0, dst.Rows, cv.NormTypes.MinMax)
+            Dim points = New List(Of cv.Point)
+            Dim listOfPoints = New List(Of List(Of cv.Point))
+            For j = 0 To bins - 1
+                points.Add(New cv.Point(CInt(j * pixelWidth), dst.Rows - hist.At(Of Single)(j, 0)))
+            Next
+            listOfPoints.Add(points)
+            dst.Polylines(listOfPoints, False, plotColors(i), thickness, cv.LineTypes.AntiAlias)
+        Next
+
+        maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
+
+        AddPlotScale(dst, maxVal, sliders.TrackBar3.Value / 10)
+        ocvb.label1 = "Histogram for Color image above - " + CStr(bins) + " bins"
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
+    End Sub
+End Class
+
+
+
+
 Public Class Histogram_NormalizeGray : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim check As New OptionsCheckbox
-    Dim histogram As Histogram_KalmanSmoothed
+    Public histogram As Histogram_KalmanSmoothed
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Min Gray", 0, 255, 0)
         sliders.setupTrackBar2(ocvb, "Max Gray", 0, 255, 255)
@@ -201,39 +281,6 @@ Public Class Histogram_2D_HueSaturation : Implements IDisposable
 End Class
 
 
-Public Class Histogram_Depth : Implements IDisposable
-    Dim inrange As Depth_InRangeTrim
-    Dim sliders As New OptionsSliders
-    Public plotHist As Plot_Histogram
-    Public Sub New(ocvb As AlgorithmData)
-        plotHist = New Plot_Histogram(ocvb)
-        plotHist.externalUse = True
-
-        inrange = New Depth_InRangeTrim(ocvb)
-        sliders.setupTrackBar1(ocvb, "Histogram Depth Bins", 1, ocvb.color.Width, 10) ' max is the number of columns we have.
-        If ocvb.parms.ShowOptions Then sliders.show()
-
-        ocvb.desc = "Show depth data as a histogram."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        inrange.Run(ocvb)
-        plotHist.minRange = inrange.sliders.TrackBar1.Value
-        plotHist.maxRange = inrange.sliders.TrackBar2.Value
-        plotHist.bins = sliders.TrackBar1.Value
-        Dim histSize() = {plotHist.bins}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
-
-        cv.Cv2.CalcHist(New cv.Mat() {ocvb.depth}, New Integer() {0}, New cv.Mat(), plotHist.hist, 1, histSize, ranges)
-
-        plotHist.dst = ocvb.result2
-        plotHist.Run(ocvb)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        inrange.Dispose()
-        plotHist.Dispose()
-    End Sub
-End Class
 
 
 Public Class Histogram_2D_XZ_YZ : Implements IDisposable
@@ -439,6 +486,7 @@ End Class
 
 Public Class Histogram_KalmanSmoothed : Implements IDisposable
     Public gray As cv.Mat
+    Public mask As New cv.Mat
     Public dst As New cv.Mat
     Public externalUse As Boolean
 
@@ -484,7 +532,7 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
 
         mykf.kf.kDimension = plotHist.bins
         Dim dimensions() = New Integer() {plotHist.bins}
-        cv.Cv2.CalcHist(New cv.Mat() {gray}, New Integer() {0}, New cv.Mat(), histogram, 1, dimensions, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gray}, New Integer() {0}, mask, histogram, 1, dimensions, ranges)
 
         ocvb.result1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "Plot Histogram bins = " + CStr(plotHist.bins)
@@ -510,63 +558,131 @@ End Class
 
 
 
-' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
-Public Class Histogram_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public src As New cv.Mat
-    Public dst As New cv.Mat
-    Public bins As Int32 = 50
-    Public minRange As Int32 = 0
-    Public maxRange As Int32 = 255
-    Public externalUse As Boolean
-    Dim indices As cv.Mat
-    Dim plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
+
+Public Class Histogram_Depth : Implements IDisposable
+    Public inrange As Depth_InRangeTrim
+    Public sliders As New OptionsSliders
+    Public plotHist As Plot_Histogram
     Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "Histogram Bins", 2, 255, 255)
-        sliders.setupTrackBar2(ocvb, "Histogram line thickness", 1, 20, 3)
-        sliders.setupTrackBar3(ocvb, "Scale Font Size x10", 1, 20, 10)
+        plotHist = New Plot_Histogram(ocvb)
+        plotHist.externalUse = True
+
+        inrange = New Depth_InRangeTrim(ocvb)
+        sliders.setupTrackBar1(ocvb, "Histogram Depth Bins", 1, ocvb.color.Width, 10) ' max is the number of columns we have.
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        indices = New cv.Mat(256, 1, cv.MatType.CV_32F)
-        For i = 0 To 255
-            indices.Set(Of Single)(i, 0, CSng(i))
-        Next
-        ocvb.desc = "Plot histograms for up to 3 channels."
+        ocvb.desc = "Show depth data as a histogram."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim thickness = sliders.TrackBar2.Value
-        Dim bins = sliders.TrackBar1.Value
-        Dim dimensions() = New Integer() {bins}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-        If externalUse = False Then
-            src = ocvb.color
-            dst = ocvb.result1
-        End If
+        inrange.Run(ocvb)
+        plotHist.minRange = inrange.sliders.TrackBar1.Value
+        plotHist.maxRange = inrange.sliders.TrackBar2.Value
+        plotHist.bins = sliders.TrackBar1.Value
+        Dim histSize() = {plotHist.bins}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
 
-        dst.SetTo(0)
-        Dim pixelWidth = dst.Cols / bins
+        cv.Cv2.CalcHist(New cv.Mat() {ocvb.depth}, New Integer() {0}, New cv.Mat(), plotHist.hist, 1, histSize, ranges)
 
-        Dim maxVal As Double
-        For i = 0 To src.Channels - 1
-            Dim hist = New cv.Mat
-            cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {i}, New cv.Mat(), hist, 1, dimensions, ranges)
-            hist.MinMaxLoc(0, maxVal)
-            hist = hist.Normalize(0, dst.Rows, cv.NormTypes.MinMax)
-            Dim points = New List(Of cv.Point)
-            Dim listOfPoints = New List(Of List(Of cv.Point))
-            For j = 0 To bins - 1
-                points.Add(New cv.Point(CInt(j * pixelWidth), dst.Rows - hist.At(Of Single)(j, 0)))
-            Next
-            listOfPoints.Add(points)
-            dst.Polylines(listOfPoints, False, plotColors(i), thickness, cv.LineTypes.AntiAlias)
-        Next
-
-        maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
-
-        AddPlotScale(dst, maxVal, sliders.TrackBar3.Value / 10)
-        ocvb.label1 = "Histogram for Color image above - " + CStr(bins) + " bins"
+        plotHist.dst = ocvb.result2
+        plotHist.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
+        inrange.Dispose()
+        plotHist.Dispose()
+    End Sub
+End Class
+
+
+
+
+Public Class Histogram_DepthValleys : Implements IDisposable
+    Dim mykf As Kalman_kDimension_Options
+    Dim hist As Histogram_Depth
+    Dim check As New OptionsCheckbox
+    Public depthBoundaries As New List(Of Int32)
+    Public Sub New(ocvb As AlgorithmData)
+        hist = New Histogram_Depth(ocvb)
+        hist.inrange.sliders.TrackBar2.Value = 5000 ' depth to 5 meters.
+        hist.sliders.TrackBar1.Value = 40 ' number of bins.
+
+        mykf = New Kalman_kDimension_Options(ocvb)
+
+        check.Setup(ocvb, 1)
+        check.Box(0).Text = "Use Kalman Filter to smooth histogram plot."
+        check.Box(0).Checked = True
+        If ocvb.parms.ShowOptions Then check.Show()
+
+        ocvb.label1 = "Histogram clustered by valleys"
+        ocvb.desc = "Identify valleys in the Depth histogram."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        hist.Run(ocvb)
+        If check.Box(0).Checked Then mykf.kf.kDimension = hist.plotHist.bins
+
+        Dim plotColors(hist.sliders.TrackBar1.Value - 1) As cv.Scalar
+        Dim plotIndex As Int32
+        Dim nextColor As cv.Scalar = ocvb.colorScalar(0)
+        depthBoundaries.Clear()
+        depthBoundaries.Add(1) ' skip zero - no depth...
+        Dim depthIncr = hist.inrange.sliders.TrackBar2.Value / hist.sliders.TrackBar1.Value ' each bar represents this number of millimeters
+        For i = 2 To hist.plotHist.hist.Rows - 3
+            Dim prev2 = hist.plotHist.hist.At(Of Single)(i - 2, 0)
+            Dim prev = hist.plotHist.hist.At(Of Single)(i - 1, 0)
+            Dim curr = hist.plotHist.hist.At(Of Single)(i, 0)
+            Dim post = hist.plotHist.hist.At(Of Single)(i + 1, 0)
+            Dim post2 = hist.plotHist.hist.At(Of Single)(i + 2, 0)
+            If curr < prev2 And curr < prev And curr < post And curr < post2 Then
+                plotIndex += 1
+                nextColor = ocvb.colorScalar(plotIndex Mod ocvb.colorScalar.Length)
+                depthBoundaries.Add(i * depthIncr)
+            End If
+            plotColors(i) = nextColor
+        Next
+
+        If check.Box(0).Checked Then
+            mykf.kf.inputReal = hist.plotHist.hist.Clone()
+            mykf.Run(ocvb)
+            If ocvb.frameCount > 0 Then hist.plotHist.hist = mykf.kf.statePoint
+        End If
+
+        depthBoundaries.Add(hist.inrange.sliders.TrackBar2.Value) ' capped at the max depth we are observing
+        histogramPlotValleys(ocvb.result1, hist.plotHist.hist, plotColors)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        hist.Dispose()
+        mykf.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class Histogram_DepthClusters : Implements IDisposable
+    Dim valleys As Histogram_DepthValleys
+    Public Sub New(ocvb As AlgorithmData)
+        valleys = New Histogram_DepthValleys(ocvb)
+
+        ocvb.label1 = "Histogram of Depth Clusters"
+        ocvb.label2 = "Backprojection of histogram clusters"
+        ocvb.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        valleys.Run(ocvb)
+
+        ocvb.result2.SetTo(0)
+        Dim mask As New cv.Mat
+        Dim tmp16 As New cv.Mat
+        For i = 1 To valleys.depthBoundaries.Count - 1
+            Dim low = valleys.depthBoundaries.ElementAt(i - 1)
+            Dim high = valleys.depthBoundaries.ElementAt(i)
+            cv.Cv2.InRange(ocvb.depth, low, high, tmp16)
+            cv.Cv2.ConvertScaleAbs(tmp16, mask)
+            ocvb.result2.SetTo(ocvb.colorScalar(i - 1), mask)
+        Next
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        valleys.Dispose()
     End Sub
 End Class

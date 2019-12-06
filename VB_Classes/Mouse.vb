@@ -1,10 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Mouse_Basics : Implements IDisposable
-    Dim colorScalar(255) As cv.Scalar
     Public Sub New(ocvb As AlgorithmData)
-        For i = 0 To colorScalar.Length - 1
-            colorScalar(i) = New cv.Scalar(ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255))
-        Next
         ocvb.desc = "Test the mousePoint interface"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -15,10 +11,10 @@ Public Class Mouse_Basics : Implements IDisposable
         Dim radius = 10
         Static colorIndex As Int32
         If colorIndex = 0 Then ocvb.result1.SetTo(0)
-        Dim nextColor = colorScalar(colorIndex)
+        Dim nextColor = ocvb.colorScalar(colorIndex)
         ocvb.result1.Circle(ocvb.mousePoint, radius, nextColor, -1, cv.LineTypes.AntiAlias)
         colorIndex += 1
-        If colorIndex >= colorScalar.Count Then colorIndex = 0
+        If colorIndex >= ocvb.colorScalar.Count Then colorIndex = 0
         ocvb.putText(New ActiveClass.TrueType("Move the mouse through this image to show mouse tracking.", 10, 50))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
