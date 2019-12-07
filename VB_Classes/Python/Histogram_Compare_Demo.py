@@ -6,7 +6,6 @@ import argparse
 import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)
-#Mbox('Test', 'Test 1', 1)
 
 ## [Load three images with different environment settings]
 parser = argparse.ArgumentParser(description='Code for Histogram Comparison tutorial.')

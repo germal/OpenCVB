@@ -48,7 +48,7 @@ try:
     screen.blit(surface, (0, 0))
 except Exception as exception:
     print(exception)
-    Mbox('OpenCVB', 'Failure 1 - see print output', 1)    
+    Mbox('Python_SurfaceBlit 1', 'Failure 1 - see print output', 1)    
 
 pygame.display.set_caption("OpenCVB - Python_SurfaceBlit.py")
 
@@ -88,5 +88,5 @@ try:
 
 except Exception as exception:
     print(exception)
-    Mbox('OpenCVB', 'Failure 2 - see print output', 1)    
+    Mbox('Python_SurfaceBlit 2', 'Failure 2 - see print output', 1)    
 

@@ -35,4 +35,4 @@ try:
  
 except Exception as exception:
     print(exception)
-    Mbox('OpenCVB', 'Failure - see print output', 1)    
+    Mbox('Python_MemMap', 'Failure - see print output', 1)    

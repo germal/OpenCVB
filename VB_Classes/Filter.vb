@@ -74,3 +74,47 @@ Public Class Filter_Normalized2D : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
 End Class
+
+
+
+
+'https://www.cc.gatech.edu/classes/AY2015/cs4475_summer/documents/smoothing_separable.py
+Public Class Filter_SepFilter2D : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Dim check As New OptionsCheckbox
+    Public Sub New(ocvb As AlgorithmData)
+        check.Setup(ocvb, 1)
+        check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"
+        check.Box(0).Checked = True
+        check.Show()
+
+        sliders.setupTrackBar1(ocvb, "Kernel X size", 1, 21, 5)
+        sliders.setupTrackBar2(ocvb, "Kernel Y size", 1, 21, 11)
+        sliders.Show()
+
+        ocvb.label1 = "Gaussian Blur result"
+        ocvb.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim xDim = sliders.TrackBar1.Value
+        Dim yDim = sliders.TrackBar2.Value
+        If xDim Mod 2 = 0 Then xDim += 1
+        If yDim Mod 2 = 0 Then yDim += 1
+        Dim kernel = cv.Cv2.GetGaussianKernel(xDim, 1.7)
+        ocvb.result1 = ocvb.color.GaussianBlur(New cv.Size(xDim, yDim), 1.7)
+        ocvb.result2 = ocvb.color.SepFilter2D(cv.MatType.CV_8UC3, kernel, kernel)
+        If check.Box(0).Checked Then
+            Dim graySep = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim grayGauss = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            ocvb.result2 = graySep - grayGauss
+            ocvb.result2 = ocvb.result2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            ocvb.label2 = "Gaussian - SepFilter2D " + CStr(ocvb.result2.CountNonZero()) + " pixels different."
+        Else
+            ocvb.label2 = "SepFilter2D Result"
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        check.Dispose()
+        sliders.Dispose()
+    End Sub
+End Class

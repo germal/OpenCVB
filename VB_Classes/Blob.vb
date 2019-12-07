@@ -150,3 +150,33 @@ Public Class Blob_RenderBlobs : Implements IDisposable
         input.Dispose()
     End Sub
 End Class
+
+
+
+
+
+Public Class Blob_DepthClusters : Implements IDisposable
+    Dim blobs As Histogram_DepthClusters
+    Dim flood As FloodFill_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        blobs = New Histogram_DepthClusters(ocvb)
+
+        flood = New FloodFill_Basics(ocvb)
+        flood.externalUse = True
+
+        ocvb.desc = "Highlight the distinct blobs found with depth clustering."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        blobs.Run(ocvb)
+
+        flood.srcGray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim clusters = ocvb.result2.Clone()
+        flood.Run(ocvb)
+        ocvb.result1 = clusters
+        ocvb.label1 = "Depth Clusters"
+        ocvb.label2 = "Backprojection with labeled regions"
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        blobs.Dispose()
+    End Sub
+End Class

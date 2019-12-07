@@ -50,7 +50,11 @@ try:
                 depthData = pipeIn.read(int(depthBufferSize))
                 depthSize = rows, cols, 1
                 depth = np.array(np.frombuffer(depthData, np.uint16).reshape(depthSize))
-                depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth, alpha=0.03), cv.COLORMAP_JET)
+                try:
+                    depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth, alpha=0.03), cv.COLORMAP_JET)
+                except ValueError:
+                    print("ApplyColorMap failed.")
+                    exit
                 rgbSize = rows, cols, 3
                 imgRGB = np.array(np.frombuffer(rgb, np.uint8).reshape(rgbSize))
 
@@ -60,4 +64,4 @@ try:
  
 except Exception as exception:
     print(exception)
-    Mbox('OpenCVB.py', 'Failure - see print output', 1)    
+    Mbox('Python_RGBDepth.py', 'Failure - see console output', 1)    
