@@ -170,11 +170,13 @@ Public Class Blob_DepthClusters : Implements IDisposable
         blobs.Run(ocvb)
 
         flood.srcGray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim mask0Depth = flood.srcGray.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        flood.dst.SetTo(1, mask0Depth)
         Dim clusters = ocvb.result2.Clone()
         flood.Run(ocvb)
         ocvb.result1 = clusters
         ocvb.label1 = "Depth Clusters"
-        ocvb.label2 = "Backprojection with labeled regions"
+        ocvb.label2 = "Backprojection with " + CStr(flood.maskSizes.Count) + " labeled regions"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         blobs.Dispose()

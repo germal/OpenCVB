@@ -8,6 +8,7 @@ Public Class FloodFill_Basics : Implements IDisposable
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public masks As New List(Of cv.Mat)
+    Public maskSizes As New List(Of Int32)
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
@@ -27,15 +28,17 @@ Public Class FloodFill_Basics : Implements IDisposable
         If externalUse = False Then
             srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             ocvb.result2.SetTo(0)
+            dst = ocvb.result2
+        Else
+            dst = New cv.Mat(ocvb.result2.Size(), cv.MatType.CV_8UC3, 0)
         End If
-        dst = ocvb.result2
         ocvb.result1 = srcGray.Clone()
         Dim regionNum As Int32
         Dim rect As New cv.Rect(0, 0, srcGray.Width, srcGray.Height)
         Dim maskPlus = New cv.Mat(New cv.Size(srcGray.Width + 2, srcGray.Height + 2), cv.MatType.CV_8UC1)
         Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
         masks.Clear()
-        Static lastImage As New cv.Mat
+        maskSizes.Clear()
         For y = 0 To srcGray.Height - 1 Step stepSize
             For x = 0 To srcGray.Width - 1 Step stepSize
                 Dim pixel = dst.At(Of cv.Vec3b)(y, x)
@@ -45,25 +48,18 @@ Public Class FloodFill_Basics : Implements IDisposable
                     Dim count = cv.Cv2.FloodFill(srcGray, maskPlus, seedPoint, cv.Scalar.White, rect, loDiff, hiDiff, cv.FloodFillFlags.FixedRange)
                     If count > minFloodSize Then
                         Dim nextColor = ocvb.colorScalar(regionNum)
-                        If ocvb.frameCount > 0 Then nextColor = lastImage.At(Of cv.Vec3b)(y, x)
                         If nextColor = cv.Scalar.All(1) Or nextColor = cv.Scalar.All(0) Then nextColor = ocvb.colorScalar(regionNum)
                         dst.SetTo(nextColor, maskPlus(maskRect))
                         srcGray.SetTo(pixel, maskPlus(maskRect)) ' this prevents the region from being floodfilled again.
                         regionNum += 1
                         masks.Add(maskPlus.Clone())
+                        maskSizes.Add(maskPlus.CountNonZero())
                         If regionNum > 255 Then regionNum = 0
                     End If
                 End If
             Next
             If regionNum > 255 Then Exit For
         Next
-        'If ocvb.frameCount = 10 Then
-        '    For i = 0 To masks.Count - 1
-        '        Console.WriteLine(CStr(masks(i).CountNonZero()))
-        '        cv.Cv2.ImShow("mask " + CStr(i), masks(i).Threshold(0, 255, cv.ThresholdTypes.Binary))
-        '    Next
-        'End If
-        lastImage = dst.Clone()
         ocvb.label2 = CStr(regionNum) + " labeled regions"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -211,10 +207,9 @@ Public Class FloodFill_WithDepth : Implements IDisposable
         shadow.Run(ocvb)
 
         ffill.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ffill.dst = ocvb.result2
-        ffill.dst.SetTo(0)
-        ffill.dst.SetTo(New cv.Scalar(1, 1, 1), shadow.holeMask)
         ffill.Run(ocvb)
+        ocvb.result2 = ffill.dst
+        ocvb.result2.SetTo(0, shadow.holeMask)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
