@@ -372,7 +372,14 @@ algorithms’ output is provided below.
 
 All algorithms present the RGB image in the top left and depth in the top right.
 Algorithm results are in the bottom left and right or additional HighGUI or
-OpenGL windows. Algorithm options will appear
+OpenGL windows. Algorithm options will appear below the main form.
+
+![](media/cd7e699a6192e4daf1d540a15e35005a.png)
+
+*Histogram valleys are used to create clusters in depth data. The bottom left is
+the histogram showing the different clusters. The bottom right is the
+back-projection of the different clusters into the image using the same colors
+as the histogram.*
 
 ![](media/69c6578e73d94f9941e3e19ad50ae4f4.jpg)
 

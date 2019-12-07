@@ -608,7 +608,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
             If h = 0 Then h = 1 ' show the color range in the plot
             Dim barRect As cv.Rect
             If binWidth > 3 Then
-                barRect = New cv.Rect(i * binWidth + 1, img.Height - h, binWidth - 2, h) ' add a column of space between bars.
+                barRect = New cv.Rect(CInt(i * binWidth + 1), img.Height - h, CInt(binWidth - 2), h) ' add a column of space between bars.
             Else
                 barRect = New cv.Rect(i * binWidth + 1, img.Height - h, binWidth, h)
             End If
@@ -634,7 +634,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         hist.Run(ocvb)
         If check.Box(0).Checked Then mykf.kf.kDimension = hist.plotHist.bins
 
-        Dim depthIncr = hist.inrange.sliders.TrackBar2.Value / hist.sliders.TrackBar1.Value ' each bar represents this number of millimeters
+        Dim depthIncr = CInt(hist.inrange.sliders.TrackBar2.Value / hist.sliders.TrackBar1.Value) ' each bar represents this number of millimeters
         Dim pointCount = hist.plotHist.hist.At(Of Single)(0, 0) + hist.plotHist.hist.At(Of Single)(1, 0)
         Dim startDepth = 1
         Dim startEndDepth As cv.Point
@@ -652,7 +652,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
                 startEndDepth = New cv.Point(startDepth, i * depthIncr)
                 depthBoundaries.Add(pointCount, startEndDepth)
                 pointCount = 0
-                startDepth = i * depthIncr + 1
+                startDepth = i * depthIncr + 0.1
             End If
         Next
 

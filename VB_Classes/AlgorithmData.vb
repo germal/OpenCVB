@@ -51,8 +51,8 @@ Public Class AlgorithmData
         rng = New cv.RNG
         ms_rng = New System.Random
         For i = 0 To rColors.Length - 1
-            rColors(i) = New cv.Vec3b(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255))
-            colorScalar(i) = New cv.Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255))
+            rColors(i) = New cv.Vec3b(rng.uniform(100, 255), rng.uniform(100, 255), rng.uniform(100, 255))
+            colorScalar(i) = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)
         Next
         For i = 0 To TTtextData.Count - 1
             TTtextData(i) = New List(Of ActiveClass.TrueType)
