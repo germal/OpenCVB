@@ -41,19 +41,6 @@ Module histogram_Functions
             cv.Cv2.Rectangle(img, New cv.Rect(i * binWidth + 1, img.Height - h, binWidth - 2, h), New cv.Scalar(CInt(180.0 * i / binCount), 255, 255), -1)
         Next
     End Sub
-    Public Sub histogramPlotValleys(img As cv.Mat, hist As cv.Mat, plotColors() As cv.Scalar)
-        Dim binCount = hist.Height
-        Dim binWidth = img.Width / hist.Height
-        Dim minVal As Single, maxVal As Single
-        hist.MinMaxLoc(minVal, maxVal)
-        img.SetTo(0)
-        If maxVal = 0 Then Exit Sub
-        For i = 0 To binCount - 2
-            Dim h = img.Height * (hist.At(Of Single)(i, 0)) / maxVal
-            If h = 0 Then h = 5 ' show the color range in the plot
-            cv.Cv2.Rectangle(img, New cv.Rect(i * binWidth + 1, img.Height - h, binWidth - 2, h), plotColors(i), -1)
-        Next
-    End Sub
 
     Public Sub histogramPlot(hist As cv.Mat, dst As cv.Mat, savedMaxVal As Single)
         Dim barWidth = Int(dst.Width / hist.Rows)
@@ -600,7 +587,34 @@ Public Class Histogram_DepthValleys : Implements IDisposable
     Dim mykf As Kalman_kDimension_Options
     Dim hist As Histogram_Depth
     Dim check As New OptionsCheckbox
-    Public depthBoundaries As New List(Of Int32)
+    Public boundaryInverse As New List(Of cv.Point)
+    Private Class CompareCounts : Implements IComparer(Of Single)
+        Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
+            ' why have compare for just int32?  So we can get duplicates.  Nothing below returns a zero (equal)
+            If a <= b Then Return -1
+            Return 1
+        End Function
+    End Class
+    Private Sub histogramPlotValleys(img As cv.Mat, hist As cv.Mat, plotColors() As cv.Scalar)
+        Dim binCount = hist.Height
+        Dim binWidth = img.Width / hist.Height
+        Dim minVal As Single, maxVal As Single
+        hist.MinMaxLoc(minVal, maxVal)
+        img.SetTo(0)
+        If maxVal = 0 Then Exit Sub
+        For i = 0 To binCount - 1
+            Dim nextHistCount = hist.At(Of Single)(i, 0)
+            Dim h = CInt(img.Height * nextHistCount / maxVal)
+            If h = 0 Then h = 1 ' show the color range in the plot
+            Dim barRect As cv.Rect
+            If binWidth > 3 Then
+                barRect = New cv.Rect(i * binWidth + 1, img.Height - h, binWidth - 2, h) ' add a column of space between bars.
+            Else
+                barRect = New cv.Rect(i * binWidth + 1, img.Height - h, binWidth, h)
+            End If
+            cv.Cv2.Rectangle(img, barRect, plotColors(i), -1)
+        Next
+    End Sub
     Public Sub New(ocvb As AlgorithmData)
         hist = New Histogram_Depth(ocvb)
         hist.inrange.sliders.TrackBar2.Value = 5000 ' depth to 5 meters.
@@ -620,24 +634,26 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         hist.Run(ocvb)
         If check.Box(0).Checked Then mykf.kf.kDimension = hist.plotHist.bins
 
-        Dim plotColors(hist.sliders.TrackBar1.Value - 1) As cv.Scalar
-        Dim plotIndex As Int32
-        Dim nextColor As cv.Scalar = ocvb.colorScalar(0)
-        depthBoundaries.Clear()
-        depthBoundaries.Add(1) ' skip zero - no depth...
         Dim depthIncr = hist.inrange.sliders.TrackBar2.Value / hist.sliders.TrackBar1.Value ' each bar represents this number of millimeters
+        Dim pointCount = hist.plotHist.hist.At(Of Single)(0, 0) + hist.plotHist.hist.At(Of Single)(1, 0)
+        Dim startDepth = 1
+        Dim startEndDepth As cv.Point
+        Dim depthBoundaries As New SortedList(Of Single, cv.Point)(New CompareCounts)
         For i = 2 To hist.plotHist.hist.Rows - 3
             Dim prev2 = hist.plotHist.hist.At(Of Single)(i - 2, 0)
             Dim prev = hist.plotHist.hist.At(Of Single)(i - 1, 0)
             Dim curr = hist.plotHist.hist.At(Of Single)(i, 0)
             Dim post = hist.plotHist.hist.At(Of Single)(i + 1, 0)
             Dim post2 = hist.plotHist.hist.At(Of Single)(i + 2, 0)
+            pointCount += hist.plotHist.hist.At(Of Single)(i, 0)
+            If prev2 < prev Then prev2 = prev
+            If post2 < post Then post2 = post
             If curr < prev2 And curr < prev And curr < post And curr < post2 Then
-                plotIndex += 1
-                nextColor = ocvb.colorScalar(plotIndex Mod ocvb.colorScalar.Length)
-                depthBoundaries.Add(i * depthIncr)
+                startEndDepth = New cv.Point(startDepth, i * depthIncr)
+                depthBoundaries.Add(pointCount, startEndDepth)
+                pointCount = 0
+                startDepth = i * depthIncr + 1
             End If
-            plotColors(i) = nextColor
         Next
 
         If check.Box(0).Checked Then
@@ -646,7 +662,25 @@ Public Class Histogram_DepthValleys : Implements IDisposable
             If ocvb.frameCount > 0 Then hist.plotHist.hist = mykf.kf.statePoint
         End If
 
-        depthBoundaries.Add(hist.inrange.sliders.TrackBar2.Value) ' capped at the max depth we are observing
+        startEndDepth = New cv.Point(startDepth, hist.inrange.sliders.TrackBar2.Value)
+        depthBoundaries.Add(pointCount, startEndDepth) ' capped at the max depth we are observing
+
+        boundaryInverse.Clear()
+        For i = depthBoundaries.Count - 1 To 0 Step -1
+            boundaryInverse.Add(depthBoundaries.ElementAt(i).Value)
+        Next
+
+        Dim plotColors(hist.plotHist.hist.Rows - 1) As cv.Scalar
+        For i = 0 To hist.plotHist.hist.Rows - 1
+            Dim depth = i * depthIncr + 1
+            For j = 0 To boundaryInverse.Count - 1
+                Dim startEnd = boundaryInverse.ElementAt(j)
+                If depth >= startEnd.X And depth < startEnd.Y Then
+                    plotColors(i) = ocvb.colorScalar(j Mod 255)
+                    Exit For
+                End If
+            Next
+        Next
         histogramPlotValleys(ocvb.result1, hist.plotHist.hist, plotColors)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -664,8 +698,6 @@ Public Class Histogram_DepthClusters : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         valleys = New Histogram_DepthValleys(ocvb)
 
-        ocvb.label1 = "Histogram of Depth Clusters"
-        ocvb.label2 = "Backprojection of histogram clusters"
         ocvb.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -674,13 +706,14 @@ Public Class Histogram_DepthClusters : Implements IDisposable
         ocvb.result2.SetTo(0)
         Dim mask As New cv.Mat
         Dim tmp16 As New cv.Mat
-        For i = 1 To valleys.depthBoundaries.Count - 1
-            Dim low = valleys.depthBoundaries.ElementAt(i - 1)
-            Dim high = valleys.depthBoundaries.ElementAt(i)
-            cv.Cv2.InRange(ocvb.depth, low, high, tmp16)
+        For i = 0 To valleys.boundaryInverse.Count - 1
+            Dim startEndDepth = valleys.boundaryInverse.ElementAt(i)
+            cv.Cv2.InRange(ocvb.depth, startEndDepth.X, startEndDepth.Y, tmp16)
             cv.Cv2.ConvertScaleAbs(tmp16, mask)
-            ocvb.result2.SetTo(ocvb.colorScalar(i - 1), mask)
+            ocvb.result2.SetTo(ocvb.colorScalar(i), mask)
         Next
+        ocvb.label1 = "Histogram of " + CStr(valleys.boundaryInverse.Count) + " Depth Clusters"
+        ocvb.label2 = "Backprojection of " + CStr(valleys.boundaryInverse.Count) + " histogram clusters"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         valleys.Dispose()
