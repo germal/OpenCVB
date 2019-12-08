@@ -587,7 +587,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
     Dim mykf As Kalman_kDimension_Options
     Dim hist As Histogram_Depth
     Dim check As New OptionsCheckbox
-    Public boundaryInverse As New List(Of cv.Point)
+    Public sortedBoundaries As New List(Of cv.Point)
     Private Class CompareCounts : Implements IComparer(Of Single)
         Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
             ' why have compare for just int32?  So we can get duplicates.  Nothing below returns a zero (equal)
@@ -665,16 +665,16 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         startEndDepth = New cv.Point(startDepth, hist.inrange.sliders.TrackBar2.Value)
         depthBoundaries.Add(pointCount, startEndDepth) ' capped at the max depth we are observing
 
-        boundaryInverse.Clear()
+        sortedBoundaries.Clear()
         For i = depthBoundaries.Count - 1 To 0 Step -1
-            boundaryInverse.Add(depthBoundaries.ElementAt(i).Value)
+            sortedBoundaries.Add(depthBoundaries.ElementAt(i).Value)
         Next
 
         Dim plotColors(hist.plotHist.hist.Rows - 1) As cv.Scalar
         For i = 0 To hist.plotHist.hist.Rows - 1
             Dim depth = i * depthIncr + 1
-            For j = 0 To boundaryInverse.Count - 1
-                Dim startEnd = boundaryInverse.ElementAt(j)
+            For j = 0 To sortedBoundaries.Count - 1
+                Dim startEnd = sortedBoundaries.ElementAt(j)
                 If depth >= startEnd.X And depth < startEnd.Y Then
                     plotColors(i) = ocvb.colorScalar(j Mod 255)
                     Exit For
@@ -694,7 +694,7 @@ End Class
 
 
 Public Class Histogram_DepthClusters : Implements IDisposable
-    Dim valleys As Histogram_DepthValleys
+    Public valleys As Histogram_DepthValleys
     Public Sub New(ocvb As AlgorithmData)
         valleys = New Histogram_DepthValleys(ocvb)
 
@@ -706,14 +706,14 @@ Public Class Histogram_DepthClusters : Implements IDisposable
         ocvb.result2.SetTo(0)
         Dim mask As New cv.Mat
         Dim tmp16 As New cv.Mat
-        For i = 0 To valleys.boundaryInverse.Count - 1
-            Dim startEndDepth = valleys.boundaryInverse.ElementAt(i)
+        For i = 0 To valleys.sortedBoundaries.Count - 1
+            Dim startEndDepth = valleys.sortedBoundaries.ElementAt(i)
             cv.Cv2.InRange(ocvb.depth, startEndDepth.X, startEndDepth.Y, tmp16)
             cv.Cv2.ConvertScaleAbs(tmp16, mask)
             ocvb.result2.SetTo(ocvb.colorScalar(i), mask)
         Next
-        ocvb.label1 = "Histogram of " + CStr(valleys.boundaryInverse.Count) + " Depth Clusters"
-        ocvb.label2 = "Backprojection of " + CStr(valleys.boundaryInverse.Count) + " histogram clusters"
+        ocvb.label1 = "Histogram of " + CStr(valleys.sortedBoundaries.Count) + " Depth Clusters"
+        ocvb.label2 = "Backprojection of " + CStr(valleys.sortedBoundaries.Count) + " histogram clusters"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         valleys.Dispose()

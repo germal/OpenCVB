@@ -156,18 +156,18 @@ End Class
 
 
 Public Class Blob_DepthClusters : Implements IDisposable
-    Dim blobs As Histogram_DepthClusters
+    Public histBlobs As Histogram_DepthClusters
     Dim flood As FloodFill_Basics
     Public Sub New(ocvb As AlgorithmData)
-        blobs = New Histogram_DepthClusters(ocvb)
+        histBlobs = New Histogram_DepthClusters(ocvb)
 
         flood = New FloodFill_Basics(ocvb)
         flood.externalUse = True
 
-        ocvb.desc = "Highlight the distinct blobs found with depth clustering."
+        ocvb.desc = "Highlight the distinct histogram blobs found with depth clustering."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        blobs.Run(ocvb)
+        histBlobs.Run(ocvb)
 
         flood.srcGray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim mask0Depth = flood.srcGray.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
@@ -175,10 +175,31 @@ Public Class Blob_DepthClusters : Implements IDisposable
         Dim clusters = ocvb.result2.Clone()
         flood.Run(ocvb)
         ocvb.result1 = clusters
-        ocvb.label1 = "Depth Clusters"
+        ocvb.label1 = CStr(histBlobs.valleys.sortedBoundaries.Count) + " Depth Clusters"
         ocvb.label2 = "Backprojection with " + CStr(flood.maskSizes.Count) + " labeled regions"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        blobs.Dispose()
+        histBlobs.Dispose()
     End Sub
 End Class
+
+
+
+
+
+'Public Class Blob_Nearest : Implements IDisposable
+'    Dim blobs As Blob_DepthClusters
+'    Public Sub New(ocvb As AlgorithmData)
+'        blobs = New Blob_DepthClusters(ocvb)
+
+'        ocvb.desc = "Display only the nearest blob that is large."
+'    End Sub
+'    Public Sub Run(ocvb As AlgorithmData)
+'        blobs.Run(ocvb)
+'        Dim blobList = blobs.histBlobs.valleys.sortedBoundaries
+
+'        ocvb.label1 = "Nearest of the "
+'    End Sub
+'    Public Sub Dispose() Implements IDisposable.Dispose
+'    End Sub
+'End Class
