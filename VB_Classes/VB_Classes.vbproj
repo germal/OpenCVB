@@ -422,7 +422,6 @@
     <Content Include="Python\Hough_LineProbalistic.py" />
     <Content Include="Python\Pyramids.py" />
     <Content Include="Python\Remap_Demo.py" />
-    <Content Include="Python\Python_RGBDepth.py" />
     <Content Include="Python\Rollingball.py" />
     <Content Include="Python\Smoothing.py" />
     <Content Include="Python\Sobel_demo.py" />
