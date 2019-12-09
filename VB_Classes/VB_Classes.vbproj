@@ -345,6 +345,7 @@
     <Content Include="Python\Gabor_Filter.py" />
     <Content Include="Python\Kalman_EKF.py" />
     <Content Include="Python\KAZE_match.py" />
+    <Content Include="Python\Python_RGBDepth.py" />
     <Content Include="Python\Sobel_AnisotropicSegmentation.py" />
     <Content Include="Python\WarpAffine_SIFT.py" />
     <Content Include="Python\BareBones.py" />
