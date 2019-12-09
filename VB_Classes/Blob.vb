@@ -157,7 +157,7 @@ End Class
 
 Public Class Blob_DepthClusters : Implements IDisposable
     Public histBlobs As Histogram_DepthClusters
-    Dim flood As FloodFill_Basics
+    Public flood As FloodFill_Basics
     Public Sub New(ocvb As AlgorithmData)
         histBlobs = New Histogram_DepthClusters(ocvb)
 
@@ -171,7 +171,6 @@ Public Class Blob_DepthClusters : Implements IDisposable
 
         flood.srcGray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim mask0Depth = flood.srcGray.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        flood.dst.SetTo(1, mask0Depth)
         Dim clusters = ocvb.result2.Clone()
         flood.Run(ocvb)
         ocvb.result1 = clusters
@@ -187,19 +186,36 @@ End Class
 
 
 
-'Public Class Blob_Nearest : Implements IDisposable
-'    Dim blobs As Blob_DepthClusters
-'    Public Sub New(ocvb As AlgorithmData)
-'        blobs = New Blob_DepthClusters(ocvb)
+Public Class Blob_LargestInDepth : Implements IDisposable
+    Dim blobs As Blob_DepthClusters
+    Public Sub New(ocvb As AlgorithmData)
+        blobs = New Blob_DepthClusters(ocvb)
 
-'        ocvb.desc = "Display only the nearest blob that is large."
-'    End Sub
-'    Public Sub Run(ocvb As AlgorithmData)
-'        blobs.Run(ocvb)
-'        Dim blobList = blobs.histBlobs.valleys.sortedBoundaries
+        ocvb.desc = "Display only the largest blob."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        blobs.Run(ocvb)
+        Dim blobList = blobs.histBlobs.valleys.sortedBoundaries
 
-'        ocvb.label1 = "Nearest of the "
-'    End Sub
-'    Public Sub Dispose() Implements IDisposable.Dispose
-'    End Sub
-'End Class
+        Dim maxSize As Int32
+        Dim maxIndex As Int32
+        Dim sizes = blobs.histBlobs.valleys.sortedSizes
+        For i = 0 To sizes.Count - 1
+            If maxSize < sizes(i) Then
+                maxSize = sizes(i)
+                maxIndex = i
+            End If
+        Next
+
+        ocvb.result1.SetTo(0)
+        Dim startEndDepth = blobs.histBlobs.valleys.sortedBoundaries.ElementAt(maxIndex)
+        Dim tmp16 As New cv.Mat, mask As New cv.Mat
+        cv.Cv2.InRange(ocvb.depth, startEndDepth.X, startEndDepth.Y, tmp16)
+        cv.Cv2.ConvertScaleAbs(tmp16, mask)
+        ocvb.color.CopyTo(ocvb.result1, mask)
+        ocvb.label1 = "Largest Depth Blob: " + Format(maxSize, "#,000") + " pixels (" + Format(maxSize / ocvb.color.Total, "#0.0%") + ")"
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        blobs.Dispose()
+    End Sub
+End Class

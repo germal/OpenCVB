@@ -52,7 +52,7 @@ Public Class FloodFill_Basics : Implements IDisposable
                         dst.SetTo(nextColor, maskPlus(maskRect))
                         srcGray.SetTo(pixel, maskPlus(maskRect)) ' this prevents the region from being floodfilled again.
                         regionNum += 1
-                        masks.Add(maskPlus.Clone())
+                        masks.Add(maskPlus(maskRect).Clone())
                         maskSizes.Add(maskPlus.CountNonZero())
                         If regionNum > 255 Then regionNum = 0
                     End If

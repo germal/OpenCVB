@@ -40,10 +40,10 @@ End Class
 
 Public Class MeanShift_Depth : Implements IDisposable
     Dim ms As MeanShift_Basics
-    Dim blob As Depth_FindLargestBlob
+    Dim blob As Depth_Foreground
     Public Sub New(ocvb As AlgorithmData)
         ms = New MeanShift_Basics(ocvb)
-        blob = New Depth_FindLargestBlob(ocvb)
+        blob = New Depth_Foreground(ocvb)
         ocvb.desc = "Use depth to start mean shift algorithm."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

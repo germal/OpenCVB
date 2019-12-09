@@ -588,6 +588,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
     Dim hist As Histogram_Depth
     Dim check As New OptionsCheckbox
     Public sortedBoundaries As New List(Of cv.Point)
+    Public sortedSizes As New List(Of Int32)
     Private Class CompareCounts : Implements IComparer(Of Single)
         Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
             ' why have compare for just int32?  So we can get duplicates.  Nothing below returns a zero (equal)
@@ -597,7 +598,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
     End Class
     Private Sub histogramPlotValleys(img As cv.Mat, hist As cv.Mat, plotColors() As cv.Scalar)
         Dim binCount = hist.Height
-        Dim binWidth = img.Width / hist.Height
+        Dim binWidth = CInt(img.Width / hist.Height)
         Dim minVal As Single, maxVal As Single
         hist.MinMaxLoc(minVal, maxVal)
         img.SetTo(0)
@@ -607,11 +608,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
             Dim h = CInt(img.Height * nextHistCount / maxVal)
             If h = 0 Then h = 1 ' show the color range in the plot
             Dim barRect As cv.Rect
-            If binWidth > 3 Then
-                barRect = New cv.Rect(CInt(i * binWidth + 1), img.Height - h, CInt(binWidth - 2), h) ' add a column of space between bars.
-            Else
-                barRect = New cv.Rect(i * binWidth + 1, img.Height - h, binWidth, h)
-            End If
+            barRect = New cv.Rect(i * binWidth, img.Height - h, binWidth, h)
             cv.Cv2.Rectangle(img, barRect, plotColors(i), -1)
         Next
     End Sub
@@ -639,16 +636,14 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         Dim startDepth = 1
         Dim startEndDepth As cv.Point
         Dim depthBoundaries As New SortedList(Of Single, cv.Point)(New CompareCounts)
-        For i = 2 To hist.plotHist.hist.Rows - 3
-            Dim prev2 = hist.plotHist.hist.At(Of Single)(i - 2, 0)
-            Dim prev = hist.plotHist.hist.At(Of Single)(i - 1, 0)
+        For i = 0 To hist.plotHist.hist.Rows - 1
+            Dim prev2 = If(i > 2, hist.plotHist.hist.At(Of Single)(i - 2, 0), 0)
+            Dim prev = If(i > 1, hist.plotHist.hist.At(Of Single)(i - 1, 0), 0)
             Dim curr = hist.plotHist.hist.At(Of Single)(i, 0)
-            Dim post = hist.plotHist.hist.At(Of Single)(i + 1, 0)
-            Dim post2 = hist.plotHist.hist.At(Of Single)(i + 2, 0)
+            Dim post = If(i < hist.plotHist.hist.Rows - 1, hist.plotHist.hist.At(Of Single)(i + 1, 0), 0)
+            Dim post2 = If(i < hist.plotHist.hist.Rows - 2, hist.plotHist.hist.At(Of Single)(i + 2, 0), 0)
             pointCount += hist.plotHist.hist.At(Of Single)(i, 0)
-            If prev2 < prev Then prev2 = prev
-            If post2 < post Then post2 = post
-            If curr < prev2 And curr < prev And curr < post And curr < post2 Then
+            If curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr Then
                 startEndDepth = New cv.Point(startDepth, i * depthIncr)
                 depthBoundaries.Add(pointCount, startEndDepth)
                 pointCount = 0
@@ -666,8 +661,10 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         depthBoundaries.Add(pointCount, startEndDepth) ' capped at the max depth we are observing
 
         sortedBoundaries.Clear()
+        sortedSizes.Clear()
         For i = depthBoundaries.Count - 1 To 0 Step -1
             sortedBoundaries.Add(depthBoundaries.ElementAt(i).Value)
+            sortedSizes.Add(depthBoundaries.ElementAt(i).Key)
         Next
 
         Dim plotColors(hist.plotHist.hist.Rows - 1) As cv.Scalar

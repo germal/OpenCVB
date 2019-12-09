@@ -72,12 +72,12 @@ End Class
 
 
 
-Public Class CamShift_Depth : Implements IDisposable
+Public Class CamShift_Foreground : Implements IDisposable
     Dim camshift As CamShift_Basics
-    Dim blob As Depth_FindLargestBlob
+    Dim blob As Depth_Foreground
     Public Sub New(ocvb As AlgorithmData)
         camshift = New CamShift_Basics(ocvb)
-        blob = New Depth_FindLargestBlob(ocvb)
+        blob = New Depth_Foreground(ocvb)
         ocvb.label1 = "Automatically finding the head - top of nearest object"
         ocvb.desc = "Use depth to find the head and start the camshift demo. "
     End Sub

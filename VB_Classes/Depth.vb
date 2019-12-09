@@ -454,7 +454,7 @@ End Class
 
 
 
-Public Class Depth_FindLargestBlob : Implements IDisposable
+Public Class Depth_Foreground : Implements IDisposable
     Public trim As Depth_InRangeTrim
     Public Sub New(ocvb As AlgorithmData)
         trim = New Depth_InRangeTrim(ocvb)
