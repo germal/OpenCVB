@@ -50,11 +50,7 @@ try:
                 depthData = pipeIn.read(int(depthBufferSize))
                 depthSize = rows, cols, 1
                 depth = np.array(np.frombuffer(depthData, np.uint16).reshape(depthSize))
-                try:
-                    depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth, alpha=0.03), cv.COLORMAP_JET)
-                except ValueError:
-                    print("ApplyColorMap failed.")
-                    exit
+                depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth, alpha=0.03), cv.COLORMAP_JET)
                 rgbSize = rows, cols, 3
                 imgRGB = np.array(np.frombuffer(rgb, np.uint8).reshape(rgbSize))
 

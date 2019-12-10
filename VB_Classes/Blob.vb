@@ -158,27 +158,35 @@ End Class
 Public Class Blob_DepthClusters : Implements IDisposable
     Public histBlobs As Histogram_DepthClusters
     Public flood As FloodFill_Basics
+    Dim shadow As Depth_Shadow
     Public Sub New(ocvb As AlgorithmData)
+        shadow = New Depth_Shadow(ocvb)
+        shadow.externalUse = True
+
         histBlobs = New Histogram_DepthClusters(ocvb)
 
         flood = New FloodFill_Basics(ocvb)
+        flood.sliders.TrackBar2.Value = 1 ' pixels are exact.
+        flood.sliders.TrackBar3.Value = 1 ' pixels are exact.
         flood.externalUse = True
 
         ocvb.desc = "Highlight the distinct histogram blobs found with depth clustering."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        shadow.Run(ocvb)
+
         histBlobs.Run(ocvb)
 
         flood.srcGray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim mask0Depth = flood.srcGray.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
         Dim clusters = ocvb.result2.Clone()
+        flood.initialMask = shadow.holeMask
         flood.Run(ocvb)
-        ocvb.result1 = clusters
         ocvb.label1 = CStr(histBlobs.valleys.sortedBoundaries.Count) + " Depth Clusters"
-        ocvb.label2 = "Backprojection with " + CStr(flood.maskSizes.Count) + " labeled regions"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         histBlobs.Dispose()
+        flood.Dispose()
+        shadow.Dispose()
     End Sub
 End Class
 
