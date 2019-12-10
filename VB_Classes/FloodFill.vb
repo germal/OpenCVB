@@ -9,9 +9,11 @@ Public Class FloodFill_Basics : Implements IDisposable
     Public externalUse As Boolean
     Public masks As New List(Of cv.Mat)
     Public maskSizes As New List(Of Int32)
+    Public maskRects As New List(Of cv.Rect)
     Public regionNum As Int32
     Public initialMask As New cv.Mat
     Public allMasks As New cv.Mat
+    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New(ocvb As AlgorithmData)
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Show the first 16 masks"
@@ -38,11 +40,12 @@ Public Class FloodFill_Basics : Implements IDisposable
         End If
         ocvb.result1 = srcGray.Clone()
         ocvb.result2.SetTo(0)
-        Dim rect As New cv.Rect(0, 0, srcGray.Width, srcGray.Height)
+        Dim rect As New cv.Rect
         Dim maskPlus = New cv.Mat(New cv.Size(srcGray.Width + 2, srcGray.Height + 2), cv.MatType.CV_8UC1)
         Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
         masks.Clear()
         maskSizes.Clear()
+        maskRects.Clear()
         regionNum = 0
         maskPlus.SetTo(0)
         maskPlus(maskRect).SetTo(255, initialMask)
@@ -54,7 +57,7 @@ Public Class FloodFill_Basics : Implements IDisposable
         For y = 0 To srcGray.Height - 1 Step stepSize
             For x = 0 To srcGray.Width - 1 Step stepSize
                 Dim seedPoint = New cv.Point(x, y)
-                Dim count = cv.Cv2.FloodFill(srcGray, maskPlus, seedPoint, cv.Scalar.White, rect, loDiff, hiDiff, cv.FloodFillFlags.FixedRange)
+                Dim count = cv.Cv2.FloodFill(srcGray, maskPlus, seedPoint, cv.Scalar.White, rect, loDiff, hiDiff, floodFlag)
                 If count > minFloodSize Then
                     Dim nextColor = ocvb.colorScalar(regionNum Mod 255)
                     If nextColor = cv.Scalar.All(1) Or nextColor = cv.Scalar.All(0) Then nextColor = ocvb.colorScalar(regionNum Mod 255)
@@ -77,6 +80,7 @@ Public Class FloodFill_Basics : Implements IDisposable
                         allCount += 1
                     End If
                     maskSizes.Add(masks(masks.Count - 1).CountNonZero())
+                    maskRects.Add(rect)
                     lastMask = maskPlus(maskRect).Clone()
                 Else
                     ' or in the unwanted object into the last mask.
@@ -218,26 +222,26 @@ End Class
 
 
 Public Class FloodFill_WithDepth : Implements IDisposable
-    Dim ffill As FloodFill_Basics
+    Dim flood As FloodFill_RelativeRange
     Dim shadow As Depth_Shadow
     Public Sub New(ocvb As AlgorithmData)
         shadow = New Depth_Shadow(ocvb)
         shadow.externalUse = True
 
-        ffill = New FloodFill_Basics(ocvb)
-        ffill.externalUse = True
+        flood = New FloodFill_RelativeRange(ocvb)
+        flood.fBasics.externalUse = True
 
         ocvb.desc = "Floodfill only the areas where there is depth"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
 
-        ffill.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ffill.initialMask = shadow.holeMask
-        ffill.Run(ocvb)
+        flood.fBasics.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        flood.fBasics.initialMask = shadow.holeMask
+        flood.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        ffill.Dispose()
+        flood.Dispose()
         shadow.Dispose()
     End Sub
 End Class
@@ -248,7 +252,7 @@ End Class
 
 Public Class FloodFill_CComp : Implements IDisposable
     Dim ccomp As CComp_Basics
-    Dim ffill As FloodFill_Basics
+    Dim flood As FloodFill_RelativeRange
     Dim shadow As Depth_Shadow
     Public Sub New(ocvb As AlgorithmData)
         shadow = New Depth_Shadow(ocvb)
@@ -257,8 +261,8 @@ Public Class FloodFill_CComp : Implements IDisposable
         ccomp = New CComp_Basics(ocvb)
         ccomp.externalUse = True
 
-        ffill = New FloodFill_Basics(ocvb)
-        ffill.externalUse = True
+        flood = New FloodFill_RelativeRange(ocvb)
+        flood.fBasics.externalUse = True
 
         ocvb.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
     End Sub
@@ -268,13 +272,43 @@ Public Class FloodFill_CComp : Implements IDisposable
         ccomp.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ccomp.Run(ocvb)
 
-        ffill.srcGray = ccomp.dstGray
-        ffill.initialMask = shadow.holeMask
-        ffill.Run(ocvb)
+        flood.fBasics.srcGray = ccomp.dstGray
+        flood.fBasics.initialMask = shadow.holeMask
+        flood.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         ccomp.Dispose()
-        ffill.Dispose()
+        flood.Dispose()
         shadow.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class FloodFill_RelativeRange : Implements IDisposable
+    Public fBasics As FloodFill_Basics
+    Dim check As New OptionsCheckbox
+    Public Sub New(ocvb As AlgorithmData)
+        fBasics = New FloodFill_Basics(ocvb)
+        check.Setup(ocvb, 3)
+        check.Box(0).Text = "Use Fixed range - off means use relative range "
+        check.Box(1).Text = "Use 4 nearest pixels (Link4) - off means use 8 nearest pixels (Link8)"
+        check.Box(1).Checked = True ' link4 produces better results.
+        check.Box(2).Text = "Use 'Mask Only'"
+        check.Show()
+        ocvb.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        fBasics.floodFlag = 0
+        If check.Box(0).Checked Then fBasics.floodFlag += cv.FloodFillFlags.FixedRange
+        If check.Box(1).Checked Then fBasics.floodFlag += cv.FloodFillFlags.Link4 Else fBasics.floodFlag += cv.FloodFillFlags.Link8
+        If check.Box(2).Checked Then fBasics.floodFlag += cv.FloodFillFlags.MaskOnly
+        fBasics.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        check.Dispose()
+        fBasics.Dispose()
     End Sub
 End Class
