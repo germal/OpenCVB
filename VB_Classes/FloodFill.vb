@@ -1,18 +1,21 @@
 ﻿Imports cv = OpenCvSharp
+Imports System.Text.RegularExpressions
 
 
-
-Public Class FloodFill_Basics : Implements IDisposable
+Public Class FloodFill_Basics1 : Implements IDisposable
     Dim check As New OptionsCheckbox
     Public sliders As New OptionsSliders
     Public srcGray As New cv.Mat
     Public externalUse As Boolean
+
     Public masks As New List(Of cv.Mat)
     Public maskSizes As New List(Of Int32)
     Public maskRects As New List(Of cv.Rect)
+    Public maskColors As New List(Of cv.Vec3b)
+
     Public regionNum As Int32
     Public initialMask As New cv.Mat
-    Public allMasks As New cv.Mat
+    Public thumbNails As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New(ocvb As AlgorithmData)
         check.Setup(ocvb, 1)
@@ -43,17 +46,22 @@ Public Class FloodFill_Basics : Implements IDisposable
         Dim rect As New cv.Rect
         Dim maskPlus = New cv.Mat(New cv.Size(srcGray.Width + 2, srcGray.Height + 2), cv.MatType.CV_8UC1)
         Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
+
         masks.Clear()
         maskSizes.Clear()
         maskRects.Clear()
+        maskColors.Clear()
+
         regionNum = 0
         maskPlus.SetTo(0)
         maskPlus(maskRect).SetTo(255, initialMask)
-        Dim lastMask = initialMask.Clone() 
-        allMasks = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
-        Dim allSize = New cv.Size(allMasks.Width / 4, allMasks.Height / 4) ' show the first 16 masks
+        Dim lastMask = initialMask.Clone()
+
+        thumbNails = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
+        Dim allSize = New cv.Size(thumbNails.Width / 4, thumbNails.Height / 4) ' show the first 16 masks
         Dim allRect = New cv.Rect(0, 0, allSize.Width, allSize.Height)
         Dim allCount As Int32
+
         For y = 0 To srcGray.Height - 1 Step stepSize
             For x = 0 To srcGray.Width - 1 Step stepSize
                 Dim seedPoint = New cv.Point(x, y)
@@ -70,10 +78,10 @@ Public Class FloodFill_Basics : Implements IDisposable
                     masks(masks.Count - 1).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
                     ocvb.result2.SetTo(nextColor, masks(masks.Count - 1))
                     If allCount < 16 Then
-                        allMasks(allRect) = masks(masks.Count - 1).Resize(allSize).Threshold(0, 255, cv.ThresholdTypes.Binary)
-                        allMasks.Rectangle(allRect, cv.Scalar.White, 1)
+                        thumbNails(allRect) = masks(masks.Count - 1).Resize(allSize).Threshold(0, 255, cv.ThresholdTypes.Binary)
+                        thumbNails.Rectangle(allRect, cv.Scalar.White, 1)
                         allRect.X += allSize.Width
-                        If allRect.X >= allMasks.Width Then
+                        If allRect.X >= thumbNails.Width Then
                             allRect.X = 0
                             allRect.Y += allSize.Height
                         End If
@@ -81,6 +89,8 @@ Public Class FloodFill_Basics : Implements IDisposable
                     End If
                     maskSizes.Add(masks(masks.Count - 1).CountNonZero())
                     maskRects.Add(rect)
+                    Dim colorVec As New cv.Vec3b(nextColor.Item(0), nextColor.Item(1), nextColor.Item(2))
+                    maskColors.Add(colorVec)
                     lastMask = maskPlus(maskRect).Clone()
                 Else
                     ' or in the unwanted object into the last mask.
@@ -88,7 +98,7 @@ Public Class FloodFill_Basics : Implements IDisposable
                 End If
             Next
         Next
-        If check.Box(0).Checked Then ocvb.result2 = allMasks
+        If check.Box(0).Checked Then ocvb.result2 = thumbNails
         ocvb.label2 = CStr(regionNum) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -310,5 +320,113 @@ Public Class FloodFill_RelativeRange : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
         check.Dispose()
         fBasics.Dispose()
+    End Sub
+End Class
+
+
+
+Public Class FloodFill_Basics : Implements IDisposable
+    Dim check As New OptionsCheckbox
+    Public sliders As New OptionsSliders
+    Public srcGray As New cv.Mat
+    Public externalUse As Boolean
+
+    Public masks As New List(Of cv.Mat)
+    Public maskSizes As New SortedList(Of Int32, Int32)(New CompareMaskSize)
+    Public maskRects As New List(Of cv.Rect)
+
+    Public initialMask As New cv.Mat
+    Public thumbNails As New cv.Mat
+    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+    Private Class CompareMaskSize : Implements IComparer(Of Int32)
+        Public Function Compare(ByVal a As Int32, ByVal b As Int32) As Integer Implements IComparer(Of Int32).Compare
+            If a <= b Then Return 1
+            Return -1
+        End Function
+    End Class
+    Public Sub New(ocvb As AlgorithmData)
+        check.Setup(ocvb, 1)
+        check.Box(0).Text = "Show the first 16 masks"
+        check.Show()
+
+        sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 5000, 2500)
+        sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
+        sliders.setupTrackBar3(ocvb, "FloodFill HiDiff", 1, 255, 5)
+        sliders.setupTrackBar4(ocvb, "Step Size", 1, ocvb.color.Width / 2, 20)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        ocvb.label1 = "Input image to floodfill"
+        ocvb.desc = "Use floodfill to build image segments in a grayscale image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim minFloodSize = sliders.TrackBar1.Value
+        Dim loDiff = cv.Scalar.All(sliders.TrackBar2.Value)
+        Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
+        Dim stepSize = sliders.TrackBar4.Value
+
+        If externalUse = False Then
+            srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            initialMask = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8U, 0)
+        End If
+        ocvb.result1 = srcGray.Clone()
+        ocvb.result2.SetTo(0)
+        Dim rect As New cv.Rect
+        Dim maskPlus = New cv.Mat(New cv.Size(srcGray.Width + 2, srcGray.Height + 2), cv.MatType.CV_8UC1)
+        Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
+
+        masks.Clear()
+        maskSizes.Clear()
+        maskRects.Clear()
+
+        maskPlus.SetTo(0)
+        maskPlus(maskRect).SetTo(255, initialMask)
+        Dim lastMask = initialMask.Clone()
+
+        thumbNails = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
+        Dim allSize = New cv.Size(thumbNails.Width / 4, thumbNails.Height / 4) ' show the first 16 masks
+        Dim allRect = New cv.Rect(0, 0, allSize.Width, allSize.Height)
+
+        For y = 0 To srcGray.Height - 1 Step stepSize
+            For x = 0 To srcGray.Width - 1 Step stepSize
+                Dim count = cv.Cv2.FloodFill(srcGray, maskPlus, New cv.Point(x, y), cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
+                If count > minFloodSize Then
+                    If masks.Count = 0 Then
+                        masks.Add(maskPlus(maskRect).Clone())
+                    Else
+                        masks.Add(maskPlus(maskRect).Clone() - lastMask) ' difference from all previous masks is what we want here.
+                    End If
+                    masks(masks.Count - 1).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
+                    maskSizes.Add(masks(masks.Count - 1).CountNonZero(), masks.Count - 1)
+                    maskRects.Add(rect)
+                    lastMask = maskPlus(maskRect).Clone()
+                Else
+                    ' or in the unwanted object into the last mask.
+                    cv.Cv2.BitwiseOr(lastMask, maskPlus(maskRect), lastMask)
+                End If
+            Next
+        Next
+
+        Dim thumbCount As Int32
+        For i = 0 To masks.Count - 1
+            Dim maskIndex = maskSizes.ElementAt(i).Value
+            Dim nextColor = ocvb.colorScalar(i Mod 255)
+            ocvb.result2.SetTo(nextColor, masks(maskIndex))
+            If thumbCount < 16 Then
+                thumbNails(allRect) = masks(maskIndex).Resize(allSize).Threshold(0, 255, cv.ThresholdTypes.Binary)
+                thumbNails.Rectangle(allRect, cv.Scalar.White, 1)
+                allRect.X += allSize.Width
+                If allRect.X >= thumbNails.Width Then
+                    allRect.X = 0
+                    allRect.Y += allSize.Height
+                End If
+                thumbCount += 1
+            End If
+        Next
+        If check.Box(0).Checked Then ocvb.result2 = thumbNails
+        ocvb.label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
+        check.Dispose()
     End Sub
 End Class

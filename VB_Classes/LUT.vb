@@ -47,9 +47,9 @@ Public Class LUT_Color : Implements IDisposable
         If externalUse = False Then
             paletteMap = ocvb.rColors
             src = ocvb.color
+            src /= 64
+            src *= 64
         End If
-        src /= 64
-        src *= 64
         Dim colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, paletteMap)
         ocvb.result1 = src.LUT(colorMat)
         ocvb.result2 = colorMat.Resize(src.Size())
