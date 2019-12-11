@@ -381,6 +381,13 @@ the histogram showing the different clusters. The bottom right is the
 back-projection of the different clusters into the image using the same colors
 as the histogram.*
 
+![](media/f3e144361b0ffeb85ff30f51af3eac3e.png)
+
+*Using the histogram to create clusters (see above example) allows a follow-on
+algorithm to segment an entire image, creating blobs that can be measured and
+tracked. The black segment has no depth. The number of blobs can be controlled
+with a lower limit on the size of the blob.*
+
 ![](media/69c6578e73d94f9941e3e19ad50ae4f4.jpg)
 
 *KAZE feature detection algorithm matching points on the left and right infrared
