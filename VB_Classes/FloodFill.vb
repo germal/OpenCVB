@@ -193,8 +193,8 @@ Public Class FloodFill_RelativeRange : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         fBasics = New FloodFill_Basics(ocvb)
         check.Setup(ocvb, 3)
-        check.Box(0).Text = "Use Fixed range - off means use relative range "
-        check.Box(1).Text = "Use 4 nearest pixels (Link4) - off means use 8 nearest pixels (Link8)"
+        check.Box(0).Text = "Use Fixed range - when off, it means use relative range "
+        check.Box(1).Text = "Use 4 nearest pixels (Link4) - when off, it means use 8 nearest pixels (Link8)"
         check.Box(1).Checked = True ' link4 produces better results.
         check.Box(2).Text = "Use 'Mask Only'"
         check.Show()
@@ -236,7 +236,7 @@ Public Class FloodFill_Basics : Implements IDisposable
     End Class
     Public Sub New(ocvb As AlgorithmData)
         check.Setup(ocvb, 1)
-        check.Box(0).Text = "Show the first 16 masks"
+        check.Box(0).Text = "Show the first 16 largest objects in view (in order of size)"
         check.Show()
 
         sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 5000, 2500)

@@ -3,7 +3,7 @@ Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Imports System.Threading
-Public Class IntelD4xx : Implements IDisposable
+Public Class IntelD400Series : Implements IDisposable
     Dim ctx As New rs.Context
     Dim cfg As New rs.Config
     Dim devices As rs.DeviceList

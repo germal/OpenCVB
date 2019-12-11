@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="IntelD4xx.cpp">
+    <ClCompile Include="IntelD400Series.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

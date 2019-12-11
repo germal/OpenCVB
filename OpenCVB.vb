@@ -142,7 +142,7 @@ Public Class OpenCVB
             playbackFile = fileInfo.FullName ' better looking name for debugging
         End If
 
-        Dim camera = New IntelD4xx(regWidth, regHeight, 30, "", "")
+        Dim camera = New IntelD400Series(regWidth, regHeight, 30, "", "")
 
         If camera.deviceCount = 0 Then Return camera
         camera.DecimationFilter = optionsForm.DecimationFilter.Checked
@@ -186,7 +186,7 @@ Public Class OpenCVB
         If kinectCamera Is Nothing Then kinectCamera = New Kinect()
         If usingIntelCamera = False And kinectCamera.devicecount = 0 Then usingIntelCamera = True
         If kinectCamera.deviceCount = 0 And intelCamera.deviceCount = 0 Then
-            MsgBox("OpenCVB supports either a Kinect for Azure 3D camera or an Intel D4xx 3D camera.  Neither is present.")
+            MsgBox("OpenCVB supports either a Kinect for Azure 3D camera or an Intel D400Series 3D camera.  Neither is present.")
             End
         End If
 

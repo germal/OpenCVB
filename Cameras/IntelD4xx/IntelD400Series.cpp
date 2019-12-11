@@ -13,7 +13,7 @@
 using namespace std;
 using namespace cv;
 
-class d4xxCamera
+class D400SeriesCamera
 {
 public:
 	// Declare pointcloud object, for calculating pointclouds and texture mappings
@@ -29,8 +29,8 @@ public:
 	cv::Mat redRightMat;
 private:
 public:
-	~d4xxCamera() {}
-	d4xxCamera() 
+	~D400SeriesCamera() {}
+	D400SeriesCamera() 
 	{ 
 		pipe.start(); 
 	} // Start streaming with default recommended configuration 
@@ -59,74 +59,74 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-int d4xxDeviceCount(d4xxCamera* kc)
+int D400SeriesDeviceCount(D400SeriesCamera* kc)
 {
 	return 1;
 }
 
 extern "C" __declspec(dllexport)
-int* d4xxOpen()
+int* D400SeriesOpen()
 {
-	d4xxCamera* rs = new d4xxCamera();
+	D400SeriesCamera* rs = new D400SeriesCamera();
 	return (int*)rs;
 }
 
 //extern "C" __declspec(dllexport)
-//int* d4xxExtrinsics(d4xxCamera* rs)
+//int* D400SeriesExtrinsics(D400SeriesCamera* rs)
 //{
 //	return (int*)& rs->calibration.extrinsics[K4A_CALIBRATION_TYPE_DEPTH][K4A_CALIBRATION_TYPE_COLOR];
 //}
 
 //extern "C" __declspec(dllexport)
-//int* d4xxIntrinsics(d4xxCamera* rs)
+//int* D400SeriesIntrinsics(D400SeriesCamera* rs)
 //{
 //	return (int*)& rs->calibration.color_camera_calibration.intrinsics.parameters;
 //}
 
 extern "C" __declspec(dllexport)
-int* d4xxPointCloud(d4xxCamera* rs)
+int* D400SeriesPointCloud(D400SeriesCamera* rs)
 {
 	return (int*)rs->points.get_vertices(); 
 }
 
 extern "C" __declspec(dllexport)
-int* d4xxColor(d4xxCamera* rs)
+int* D400SeriesColor(D400SeriesCamera* rs)
 {
 	return (int*)rs->colorMat.data;
 }
 
 extern "C" __declspec(dllexport)
-int* d4xxDepthRGB(d4xxCamera* rs)
+int* D400SeriesDepthRGB(D400SeriesCamera* rs)
 {
 	return (int*)rs->depthRGBMat.data;
 }
 
 extern "C" __declspec(dllexport)
-int* d4xxDepth(d4xxCamera* rs)
+int* D400SeriesDepth(D400SeriesCamera* rs)
 {
 	return (int*)rs->depthMat.data;
 }
 
 extern "C" __declspec(dllexport)
-int* d4xxRedLeft(d4xxCamera* rs)
+int* D400SeriesRedLeft(D400SeriesCamera* rs)
 {
 	return (int*)rs->redLeftMat.data;
 }
 
 extern "C" __declspec(dllexport)
-int* d4xxRedRight(d4xxCamera* rs)
+int* D400SeriesRedRight(D400SeriesCamera* rs)
 {
 	return (int*)rs->redRightMat.data;
 }
 
 extern "C" __declspec(dllexport)
-void d4xxWaitFrame(d4xxCamera* rs)
+void D400SeriesWaitFrame(D400SeriesCamera* rs)
 {
 	rs->waitForFrame();
 }
 
 extern "C" __declspec(dllexport)
-void d4xxClose(d4xxCamera* rs)
+void D400SeriesClose(D400SeriesCamera* rs)
 {
 	delete rs;
 }

@@ -103,7 +103,7 @@ Partial Class OptionsDialog
         Me.IntelCamera.Size = New System.Drawing.Size(222, 24)
         Me.IntelCamera.TabIndex = 0
         Me.IntelCamera.TabStop = True
-        Me.IntelCamera.Text = "Use Intel D4xx 3D Camera"
+        Me.IntelCamera.Text = "Use Intel D400Series 3D Camera"
         Me.IntelCamera.UseVisualStyleBackColor = True
         '
         'GroupBox1
