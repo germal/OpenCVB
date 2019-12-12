@@ -102,9 +102,9 @@ After all the packages have been built, then there is one environmental variable
 that needs to be set and it will depend on which version of OpenCV was just
 downloaded and built.
 
--   Environmental variable “OpenCV_Version” should be set to 412
+-   Environmental variable “OpenCV_Version” should be set to 420
 
-The currently available OpenCV download is 4.12 so setting OpenCV_Version to 412
+The currently available OpenCV download is 4.20 so setting OpenCV_Version to 420
 reflects that but note that OpenCV is updated several times a year and the
 environmental variable may need to be updated.
 
