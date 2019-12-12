@@ -5,8 +5,10 @@ Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 
 ' https://docs.opencv.org/3.4.1/d2/dc1/camshiftdemo_8cpp-example.html
+' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class CamShift_Basics : Implements IDisposable
     Public plotHist As Plot_Histogram
+    Public trackBox As New cv.RotatedRect
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         plotHist = New Plot_Histogram(ocvb)
@@ -25,7 +27,6 @@ Public Class CamShift_Basics : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static roi As New cv.Rect
-        Static trackBox As New cv.RotatedRect
         Static vMinLast As Int32
         Static vMaxLast As Int32
         Static sBinsLast As cv.Scalar
@@ -59,6 +60,7 @@ Public Class CamShift_Basics : Implements IDisposable
             cv.Cv2.BitwiseAnd(backproj, mask, backproj)
             trackBox = cv.Cv2.CamShift(backproj, roi, cv.TermCriteria.Both(10, 1))
             Show_HSV_Hist(ocvb.result2, roi_hist)
+            If ocvb.result2.Channels = 1 Then ocvb.result2 = ocvb.color.EmptyClone()
             ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         End If
         ocvb.result1.SetTo(0)
@@ -73,6 +75,7 @@ End Class
 
 
 
+' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class CamShift_Foreground : Implements IDisposable
     Dim camshift As CamShift_Basics
     Dim blob As Depth_Foreground
@@ -107,6 +110,7 @@ End Class
 
 
 
+' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class Camshift_Python : Implements IDisposable
     Dim memMap As Python_MemMap
     Dim pipeName As String
@@ -161,5 +165,90 @@ Public Class Camshift_Python : Implements IDisposable
         For i = 0 To proc.Count - 1
             proc(i).Kill()
         Next i
+    End Sub
+End Class
+
+
+
+
+
+' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
+Public Class Camshift_Object : Implements IDisposable
+    Dim blob As Blob_DepthClusters
+    Dim camshift As CamShift_Basics
+    Dim sliders As New OptionsSliders
+    Public Sub New(ocvb As AlgorithmData)
+        blob = New Blob_DepthClusters(ocvb)
+
+        camshift = New CamShift_Basics(ocvb)
+
+        sliders.setupTrackBar1(ocvb, "How often should camshift be reinitialized", 1, 500, 100)
+        sliders.Show()
+        ocvb.desc = "Use the blob depth cluster as input to initialize a camshift algorithm"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        blob.Run(ocvb)
+
+        Dim largestMask = blob.flood.fBasics.maskSizes.ElementAt(0).Value
+        If ocvb.frameCount Mod sliders.TrackBar1.Value = 0 Or camshift.trackBox.Size.Width = 0 Then ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
+        camshift.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        blob.Dispose()
+        camshift.Dispose()
+        sliders.Dispose()
+    End Sub
+End Class
+
+
+
+
+' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
+Public Class Camshift_TopObjects : Implements IDisposable
+    Dim blob As Blob_DepthClusters
+    Dim cams(3) As CamShift_Basics
+    Dim sliders As New OptionsSliders
+    Dim mats As Mat_4to1
+    Public Sub New(ocvb As AlgorithmData)
+        mats = New Mat_4to1(ocvb)
+        mats.externalUse = True
+
+        blob = New Blob_DepthClusters(ocvb)
+        sliders.setupTrackBar1(ocvb, "How often should camshift be reinitialized", 1, 500, 100)
+        sliders.Show()
+        For i = 0 To cams.Length - 1
+            cams(i) = New CamShift_Basics(ocvb)
+        Next
+        ocvb.desc = "Track"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        blob.Run(ocvb)
+
+        Dim updateFrequency = sliders.TrackBar1.Value
+        Dim trackBoxes As New List(Of cv.RotatedRect)
+        For i = 0 To cams.Length - 1
+            If blob.flood.fBasics.maskSizes.Count > i Then
+                Dim camIndex = blob.flood.fBasics.maskSizes.ElementAt(i).Value
+                If ocvb.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
+                    ocvb.drawRect = blob.flood.fBasics.maskRects(camIndex)
+                End If
+
+                cams(i).Run(ocvb)
+                mats.mat(i) = ocvb.result2.Clone()
+                trackBoxes.Add(cams(i).trackBox)
+            End If
+        Next
+        For i = 0 To trackBoxes.Count - 1
+            ocvb.result1.Ellipse(trackBoxes(i), cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        Next
+        mats.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        blob.Dispose()
+        For i = 0 To cams.Length - 1
+            cams(i).Dispose()
+        Next
+        sliders.Dispose()
+        mats.Dispose()
     End Sub
 End Class

@@ -155,7 +155,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="IntelD4xx.vb" />
+    <Compile Include="IntelD400Series.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="OptionsDialog.resx">

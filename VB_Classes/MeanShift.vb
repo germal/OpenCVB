@@ -1,6 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 ' http://answers.opencv.org/question/175486/meanshift-sample-code-in-c/
 Public Class MeanShift_Basics : Implements IDisposable
+    Public rectangleEdgeWidth As Int32 = 2
+    Public trackbox As New cv.Rect
     Public Sub New(ocvb As AlgorithmData)
         ocvb.label1 = "Draw anywhere to start mean shift tracking."
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track"
@@ -11,9 +13,8 @@ Public Class MeanShift_Basics : Implements IDisposable
         Dim hsize() As Int32 = {16, 16, 16}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180)}
         Static roi_hist As New cv.Mat
-        Static saveDrawRect As New cv.Rect
         If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
-            saveDrawRect = ocvb.drawRect
+            trackbox = ocvb.drawRect
             Dim maskROI = hsv(ocvb.drawRect).InRange(New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255))
             cv.Cv2.CalcHist(New cv.Mat() {hsv(ocvb.drawRect)}, ch, maskROI, roi_hist, 1, hsize, ranges)
             roi_hist = roi_hist.Normalize(0, 255, cv.NormTypes.MinMax)
@@ -22,9 +23,9 @@ Public Class MeanShift_Basics : Implements IDisposable
         If roi_hist.Rows <> 0 Then
             Dim backProj As New cv.Mat
             cv.Cv2.CalcBackProject(New cv.Mat() {hsv}, ch, roi_hist, backProj, ranges)
-            cv.Cv2.MeanShift(backProj, saveDrawRect, cv.TermCriteria.Both(10, 1))
+            cv.Cv2.MeanShift(backProj, trackbox, cv.TermCriteria.Both(10, 1))
             ocvb.result1 = backProj.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            ocvb.result1.Rectangle(saveDrawRect, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+            ocvb.result1.Rectangle(trackbox, cv.Scalar.Red, rectangleEdgeWidth, cv.LineTypes.AntiAlias)
             Show_HSV_Hist(ocvb.result2, roi_hist)
             ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         Else
@@ -81,5 +82,65 @@ Public Class MeanShift_PyrFilter : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
+Public Class Meanshift_TopObjects : Implements IDisposable
+    Dim blob As Blob_DepthClusters
+    Dim cams(3) As MeanShift_Basics
+    Dim sliders As New OptionsSliders
+    Dim mats1 As Mat_4to1
+    Dim mats2 As Mat_4to1
+    Public Sub New(ocvb As AlgorithmData)
+        mats1 = New Mat_4to1(ocvb)
+        mats1.externalUse = True
+
+        mats2 = New Mat_4to1(ocvb)
+        mats2.externalUse = True
+
+        blob = New Blob_DepthClusters(ocvb)
+        sliders.setupTrackBar1(ocvb, "How often should camshift be reinitialized", 1, 500, 100)
+        sliders.Show()
+        For i = 0 To cams.Length - 1
+            cams(i) = New MeanShift_Basics(ocvb)
+            cams(i).rectangleEdgeWidth = 8
+        Next
+        ocvb.desc = "Track"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        blob.Run(ocvb)
+
+        Dim updateFrequency = sliders.TrackBar1.Value
+        Dim trackBoxes As New List(Of cv.Rect)
+        For i = 0 To cams.Length - 1
+            If blob.flood.fBasics.maskSizes.Count > i Then
+                Dim camIndex = blob.flood.fBasics.maskSizes.ElementAt(i).Value
+                If ocvb.frameCount Mod updateFrequency = 0 Or cams(i).trackbox.Size.Width = 0 Or ocvb.frameCount < 3 Then
+                    ocvb.drawRect = blob.flood.fBasics.maskRects(camIndex)
+                End If
+
+                cams(i).Run(ocvb)
+                mats1.mat(i) = ocvb.result1.Clone()
+                mats2.mat(i) = ocvb.result2.Clone()
+                trackBoxes.Add(cams(i).trackbox)
+            End If
+        Next
+        mats1.Run(ocvb)
+        ocvb.result1 = ocvb.result2.Clone()
+        mats2.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        blob.Dispose()
+        For i = 0 To cams.Length - 1
+            cams(i).Dispose()
+        Next
+        sliders.Dispose()
+        mats1.Dispose()
+        mats2.Dispose()
     End Sub
 End Class

@@ -312,7 +312,7 @@ Public Class FloodFill_Basics : Implements IDisposable
                 thumbCount += 1
             End If
         Next
-        If check.Box(0).Checked Then ocvb.result2 = thumbNails
+        If check.Box(0).Checked Then ocvb.result2 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

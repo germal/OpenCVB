@@ -184,7 +184,8 @@ Public Class OpenCVB
             optionsForm.Kinect4Azure.Checked = True
         End If
         If kinectCamera Is Nothing Then kinectCamera = New Kinect()
-        If usingIntelCamera = False And kinectCamera.devicecount = 0 Then usingIntelCamera = True
+        If kinectCamera.devicecount = 0 Then usingIntelCamera = True
+        If usingIntelCamera Then optionsForm.IntelCamera.Checked = True Else optionsForm.Kinect4Azure.Checked = True
         If kinectCamera.deviceCount = 0 And intelCamera.deviceCount = 0 Then
             MsgBox("OpenCVB supports either a Kinect for Azure 3D camera or an Intel D400Series 3D camera.  Neither is present.")
             End

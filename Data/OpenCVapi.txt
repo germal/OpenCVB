@@ -430,6 +430,7 @@ resize
 resizeWindow
 Rodrigues
 rotate
+rotatedRect
 rotatedRectangleIntersection
 RowRange
 RQDecomp3x3
