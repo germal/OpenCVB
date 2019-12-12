@@ -388,6 +388,13 @@ algorithm to segment an entire image, creating blobs that can be measured and
 tracked. The black segment has no depth. The number of blobs can be controlled
 with a lower limit on the size of the blob.*
 
+![](media/3df8502dfd9e7ac7e50e5645cf8fe4ad.png)
+
+*Here the MeanShift algorithm is used to track the 4 largest blobs in the image.
+The lower left image shows the objects tracked by the algorithm while the lower
+right shows the different histograms used to identify the object to track. The
+histogram is for the hue portion of the HSV format of the image.*
+
 ![](media/69c6578e73d94f9941e3e19ad50ae4f4.jpg)
 
 *KAZE feature detection algorithm matching points on the left and right infrared
