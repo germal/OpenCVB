@@ -37,4 +37,5 @@ VTK
 eigen-git-mirror
 CPP_Classes/Debug/*
 Emgu_Classes/bin/*
+*FileListAbsolute.txt
 
