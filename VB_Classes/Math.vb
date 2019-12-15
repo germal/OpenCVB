@@ -5,7 +5,7 @@ Public Class Math_Subtract : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Red", 0, 255, 255)
         sliders.setupTrackBar2(ocvb, "Green", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, "Blue", 0, 255, 255)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -18,21 +18,6 @@ Public Class Math_Subtract : Implements IDisposable
     End Sub
 End Class
 
-
-
-
-
-Public Class Math_MeanSubtraction : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
-        ocvb.desc = "Subtract the mean from the image"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Dim meanScalar = cv.Cv2.Mean(ocvb.color)
-        cv.Cv2.Subtract(meanScalar, ocvb.color, ocvb.result1)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-    End Sub
-End Class
 
 
 
