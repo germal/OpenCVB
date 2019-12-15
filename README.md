@@ -299,18 +299,34 @@ change which version of Python is used, open the “Options” for OptionCVB and
 the “Python” section, there is a browse button to select any Python.exe
 available on the system.
 
-Typically, Python is not installed with “opencv-python” or “NumPy” libraries
-which are required for many of the OpenCVB Python scripts. To update the current
-version of Python in Visual Studio, the cv2 and NumPy interfaces are installed
-through the Visual Studio menus:
+**Python Packages (Optional but Cool!)**
+
+Python is not installed with the “opencv-python” or “NumPy” libraries which are
+required for many of the OpenCVB Python scripts. To update the current version
+of Python in Visual Studio, packages may be easily installed through the Visual
+Studio menus:
 
 -   “Tools/Python/Python Environments” – select “Packages” in the combo box then
-    search for “opencv-python” or “numpy” and hit install.
+    enter for “opencv-python” or “numpy” and select the package from the list.
 
-Typically, the Python scripts will require:
+Here is the complete list of the expected Python packages used by the Python
+scripts provided by OpenCVB.
 
--   Numpy, Opencv-Python, PyOpenGL, Pygame, psutil, matplotlib (this is a list
-    of typical additional packages that existing Python algorithms require.)
+-   Numpy
+
+-   Opencv-Python
+
+-   PyOpenGL
+
+-   Pygame
+
+-   Psutil
+
+-   Matplotlib
+
+-   Scikit-learn
+
+-   sklearn
 
 **Python Debugging**
 
@@ -334,7 +350,10 @@ Debugging” for the managed projects controls whether C\# or VB.Net code will
 step into C++ code while debugging. However, leaving that property enabled all
 the time means that the OpenCVB startup will take longer – approximately 5
 seconds vs. 3 seconds on a higher-end system. The default is to leave the
-“Enable Native Code Debugging” property off so OpenCVB will load faster.
+“Enable Native Code Debugging” property off so OpenCVB will load faster. Of
+course, if there is a problem in the C++ code that is best handled with a debug
+session, turn the “Enable Native Code Debugging” property on in the OpenCVB
+VB.Net application.
 
 **Record and Playback**
 
@@ -367,12 +386,10 @@ enable VTK with the following steps:
 
 **Sample Results**
 
-For those without any or all of the components above, a preview of some
-algorithms’ output is provided below.
+What follows is a preview of some algorithms’ output.
 
-All algorithms present the RGB image in the top left and depth in the top right.
-Algorithm results are in the bottom left and right or additional HighGUI or
-OpenGL windows. Algorithm options will appear below the main form.
+Top left image is the RGB and top right is depth. Algorithm results are in the
+bottom left and right or additional windows.
 
 ![](media/cd7e699a6192e4daf1d540a15e35005a.png)
 
@@ -426,7 +443,7 @@ see the impact of an edge-preserving filter applied to both.*
 *The bottom images are the output of a multi-threaded Hough lines algorithm that
 identifies featureless RGB surfaces (shown as white in the lower right image).
 The blue color in the lower right image is meant to highlight depth shadow where
-no data is available.*
+no depth data is available.*
 
 ![](media/d1b5776e1e2062cd4dd50ca206b2528e.png)
 
@@ -540,15 +557,15 @@ See the “Camera_calibration_show_extrinsics.py” algorithm.*
 ![](media/7410ae7a79c21c3f20aef18ee58750aa.png)
 
 *In this multi-threaded version of the Gabor filter, the bottom left image is
-the result of the Gabor filter while the bottom right figure shows the 32 Gabor
-kernels used to produce the result on the bottom left.*
+the Gabor result while the bottom right figure shows the 32 Gabor kernels used
+to produce the result on the bottom left.*
 
 ![](media/cbabb4e31400daa77e482733a5b535f9.png)
 
 *Emgu applications are supported as well. Here the planar subdivision of the
 image is shown for a random set of points with Voronoi facets and Delauney
 triangles. Emgu interfaces, while based on OpenCV, are significantly different
-than OpenCVSharp. For instance, the Emgu Mat is not the same as the OpenCVSharp
+from OpenCVSharp. For instance, the Emgu Mat is not the same as the OpenCVSharp
 Mat. Nonetheless, there is considerable ongoing investment in the Emgu APIs’ and
 they are fully supported.*
 
@@ -557,6 +574,11 @@ they are fully supported.*
 *The Aruco markers are found in an image allowing the image to be transformed
 using OpenCV’s WarpPerspective transform. This example is from the OpenCVSharp
 Sample programs.*
+
+![](media/08085bb3df8c48de755fc8e9e10074e7.png)
+
+*This synthetic problem demonstrates how to use the Python SciKit package to
+perform a gradient descent problem.*
 
 **Future Work**
 
