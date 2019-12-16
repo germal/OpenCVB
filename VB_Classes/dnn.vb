@@ -56,10 +56,12 @@ Public Class DNN_Caffe_CS : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/space_shuttle.jpg")
-        caffeCS.Run(image, ocvb.parms.AvoidDNNCrashes)
+        Dim str = caffeCS.Run(image, ocvb.parms.AvoidDNNCrashes)
         ocvb.result2 = image.Resize(ocvb.result2.Size())
         If ocvb.parms.AvoidDNNCrashes Then
             ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
+        Else
+            ocvb.putText(New ActiveClass.TrueType(str, 10, 100))
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
