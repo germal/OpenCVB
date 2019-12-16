@@ -44,17 +44,19 @@ End Class
 
 
 Public Class DNN_Caffe_CS : Implements IDisposable
-    Dim caffeCS As New CS_Classes.DNN
+    Dim caffeCS As CS_Classes.DNN
     Public Sub New(ocvb As AlgorithmData)
         ocvb.label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+
         Dim protoTxt = ocvb.parms.HomeDir + "Data/bvlc_googlenet.prototxt"
         Dim modelFile = ocvb.parms.HomeDir + "Data/bvlc_googlenet.caffemodel"
         Dim synsetWords = ocvb.parms.HomeDir + "Data/synset_words.txt"
+        caffeCS = New CS_Classes.DNN(protoTxt, modelFile, synsetWords)
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
         Dim image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/space_shuttle.jpg")
-        caffeCS.Run(protoTxt, modelFile, synsetWords, image, ocvb.parms.AvoidDNNCrashes)
+        caffeCS.Run(image, ocvb.parms.AvoidDNNCrashes)
         ocvb.result2 = image.Resize(ocvb.result2.Size())
         If ocvb.parms.AvoidDNNCrashes Then
             ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
@@ -147,31 +149,5 @@ Public Class DNN_Basics : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
         If net IsNot Nothing Then net.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-Public Class DNN_BlobFromImage : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "Scaling Factor = mean/scaling factor X100", 1, 500, 100)
-        sliders.Show()
-        ocvb.desc = "Prepare an image for use with DNN using BlobFromImage"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Dim mean = cv.Cv2.Mean(ocvb.color)
-        Dim scalingFactor = sliders.TrackBar1.Value / 100
-        Dim offset = (ocvb.color.Width - ocvb.color.Height) / 2
-        Dim rect As New cv.Rect(offset, 0, ocvb.color.Height, ocvb.color.Height)
-        Dim resized = ocvb.color(rect)
-        ocvb.result1 = ocvb.color.Clone()
-        resized = cv.Dnn.CvDnn.BlobFromImage(resized, scalingFactor, New cv.Size(ocvb.color.Height, ocvb.color.Height), mean, False, False)
-        ' ocvb.result1(rect) = resized
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
     End Sub
 End Class

@@ -9,39 +9,35 @@ namespace CS_Classes
 {
     public class DNN
     {
-        public void Run(string protoTxt, string caffeModel, string synsetWords, Mat image, bool AvoidDNNCrashes)
+        private string[] classNames;
+        Net net;
+        public DNN(string protoTxt, string caffeModel, string synsetWords)
         {
-            var classNames = File.ReadAllLines(synsetWords)
-                .Select(line => line.Split(' ').Last())
-                .ToArray();
+            classNames = File.ReadAllLines(synsetWords).Select(line => line.Split(' ').Last()).ToArray();
 
             PrepareModel(caffeModel);
-            Console.WriteLine(" Done");
-
-            using (var net = CvDnn.ReadNetFromCaffe(protoTxt, caffeModel))
+            net = CvDnn.ReadNetFromCaffe(protoTxt, caffeModel);
+            Console.WriteLine("Layer names: {0}", string.Join(", ", net.GetLayerNames()));
+            Console.WriteLine();
+            Console.WriteLine("Preparation complete");
+        }
+        public string Run(Mat image, bool AvoidDNNCrashes)
+        {
+            // Convert Mat to batch of images
+            using (var inputBlob = CvDnn.BlobFromImage(image, 1, new Size(224, 224), new Scalar(104, 117, 123)))
             {
-                Console.WriteLine("Layer names: {0}", string.Join(", ", net.GetLayerNames()));
-                Console.WriteLine();
-
-                // Convert Mat to batch of images
-                using (var inputBlob = CvDnn.BlobFromImage(image, 1, new Size(224, 224), new Scalar(104, 117, 123)))
+                net.SetInput(inputBlob, "data");
+                if (AvoidDNNCrashes == false)
                 {
-                    net.SetInput(inputBlob, "data");
-                    if (AvoidDNNCrashes == false)
+                    using (var prob = net.Forward("prob"))
                     {
-                        using (var prob = net.Forward("prob"))
-                        {
-                            // find the best class
-                            GetMaxClass(prob, out int classId, out double classProb);
-                            Console.WriteLine("Best class: #{0} '{1}'", classId, classNames[classId]);
-                            Console.WriteLine("Probability: {0:P2}", classProb);
-
-                            Console.WriteLine("Press any key to exit");
-                            Console.Read();
-                        }
+                        // find the best class
+                        GetMaxClass(prob, out int classId, out double classProb);
+                        return String.Format("Best class: #{0} '{1}' Probability: {0:P2}", classId, classNames[classId], classProb);
                     }
                 }
             }
+            return "Failed to identify object.";
         }
 
         private static byte[] DownloadBytes(string url)
