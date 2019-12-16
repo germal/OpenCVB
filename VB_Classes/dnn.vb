@@ -13,7 +13,7 @@ Public Class DNN_Test : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim modelFile As New FileInfo(ocvb.parms.HomeDir + "Data/bvlc_googlenet.caffemodel")
         If File.Exists(modelFile.FullName) = False Then
-            ' this site is apparently gone.  caffemodel is in the OpenCVSharp distribution.
+            ' this site is apparently gone.  caffemodel is in the Data directory in OpenCVB_HomeDir
             Dim client = HttpWebRequest.CreateHttp("http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel")
             Dim response = client.GetResponse()
             Dim responseStream = response.GetResponseStream()
@@ -29,8 +29,10 @@ Public Class DNN_Test : Implements IDisposable
         net.SetInput(inputBlob, "data")
         If ocvb.parms.AvoidDNNCrashes = False Then
             ocvb.putText(New ActiveClass.TrueType("This example is not working.  Forward fails with 'blobs.size() != 0'.", 10, 100))
-            'Dim prob = net.Forward("prob")
+            'Dim prob = net.Forward("prob") ' <--- this fails in VB.Net but works in C# (below)
             ' finish this ...
+        Else
+            ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -54,6 +56,9 @@ Public Class DNN_Caffe_CS : Implements IDisposable
         Dim image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/space_shuttle.jpg")
         caffeCS.Run(protoTxt, modelFile, synsetWords, image, ocvb.parms.AvoidDNNCrashes)
         ocvb.result2 = image.Resize(ocvb.result2.Size())
+        If ocvb.parms.AvoidDNNCrashes Then
+            ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
@@ -93,8 +98,7 @@ Public Class DNN_Basics : Implements IDisposable
         End If
         ocvb.result1.SetTo(0)
         If dnnPrepared = False Then
-            ocvb.putText(New ActiveClass.TrueType("librealsense caffe databases not found.", 10, 100))
-            ocvb.putText(New ActiveClass.TrueType("Run CMake on librealsense and select BUILD_CV_EXAMPLES.", 10, 125))
+            ocvb.putText(New ActiveClass.TrueType("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100))
         End If
         ocvb.desc = "Use OpenCV's dnn from Caffe file."
         ocvb.label1 = "Cropped Input Image - must be square!"
@@ -134,11 +138,40 @@ Public Class DNN_Basics : Implements IDisposable
                         ocvb.putText(New ActiveClass.TrueType(nextName, CInt(rect.X * ocvb.parms.imageToTrueTypeLoc), CInt(rect.Y * ocvb.parms.imageToTrueTypeLoc), RESULT2))
                     End If
                 Next
+            Else
+                ocvb.result1.SetTo(0)
+                ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
             End If
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
         If net IsNot Nothing Then net.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class DNN_BlobFromImage : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "Scaling Factor = mean/scaling factor X100", 1, 500, 100)
+        sliders.Show()
+        ocvb.desc = "Prepare an image for use with DNN using BlobFromImage"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim mean = cv.Cv2.Mean(ocvb.color)
+        Dim scalingFactor = sliders.TrackBar1.Value / 100
+        Dim offset = (ocvb.color.Width - ocvb.color.Height) / 2
+        Dim rect As New cv.Rect(offset, 0, ocvb.color.Height, ocvb.color.Height)
+        Dim resized = ocvb.color(rect)
+        ocvb.result1 = ocvb.color.Clone()
+        resized = cv.Dnn.CvDnn.BlobFromImage(resized, scalingFactor, New cv.Size(ocvb.color.Height, ocvb.color.Height), mean, False, False)
+        ' ocvb.result1(rect) = resized
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
     End Sub
 End Class

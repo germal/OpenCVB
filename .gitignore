@@ -36,6 +36,7 @@ OpenCV
 VTK
 eigen-git-mirror
 CPP_Classes/Debug/*
+CPP_Classes/Release/*
 Emgu_Classes/bin/*
 *FileListAbsolute.txt
 
