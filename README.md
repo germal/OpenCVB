@@ -72,6 +72,30 @@ You will need to download and install the following before starting:
 
     -   <https://git-scm.com/downloads>
 
+**Installation – Quick Reference**
+
+-   <https://github.com/bobdavies2000/OpenCVB> - Install OpenCVB from GitHub
+
+-   <https://www.python.org/downloads/release/python-380/> - Install the latest
+    Python (version 3.8)
+
+    -   In the Python section below, there is a list of Python packages to
+        install.
+
+-   Run the “PrepareTree.bat” script in the OpenCVB directory. – This downloads
+    OpenCV, OpenCV_Contrib, librealsense, and Kinect4Azure.
+
+    -   After the downloads and CMake’s complete, Visual Studio projects will
+        open. Run “Batch Build” in each Visual Studio project.
+
+-   Set Environmental variable OpenCV_Version to 420. – This depends on the
+    version of OpenCV, currently 4.20.
+
+-   <https://docs.microsoft.com/en-us/azure/Kinect-dk/sensor-sdk-download> –
+    Select “Windows Installer” to get proprietary Kinect4Azure support.
+
+-   Build and run OpenCVB.sln
+
 **Installation – Windows 10 Only**
 
 The first step is to download OpenCVB from GitHub:
@@ -82,7 +106,7 @@ The second step is to download the desired version of Python for use with
 OpenCVB. It is recommended to use only Python 3.x. The latest Python is
 available here:
 
--   https://www.python.org/downloads/release/python-370/ - Install the x86-64
+-   <https://www.python.org/downloads/release/python-380/> Install the x86-64
     bit version.
 
 The third step is where all the work is.
