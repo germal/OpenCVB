@@ -237,6 +237,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Pencil.vb" />
+    <Compile Include="PipeStream.vb" />
     <Compile Include="Pixel.vb" />
     <Compile Include="Plane.vb" />
     <Compile Include="Plot.vb" />
@@ -349,7 +350,6 @@
     <Content Include="Python\GradientDescent.py" />
     <Content Include="Python\Kalman_EKF.py" />
     <Content Include="Python\KAZE_match.py" />
-    <Content Include="Python\PipeStream.py" />
     <Content Include="Python\Python_RGBDepth.py" />
     <Content Include="Python\Sobel_AnisotropicSegmentation.py" />
     <Content Include="Python\WarpAffine_SIFT.py" />
