@@ -15,6 +15,8 @@ parser.add_argument('--pipeName', default='', help='The name of the input pipe f
 args = parser.parse_args()
 
 pid = 0 # pid of any spawned task
+
+# this apparently unnecessary code is quite useful!  When python script is invoked directly, it starts OpenCVB.exe.
 MemMapLength = args.MemMapLength
 if MemMapLength == 0:
     MemMapLength = 400 # these values have been generously padded (on both sides) but if they grow...

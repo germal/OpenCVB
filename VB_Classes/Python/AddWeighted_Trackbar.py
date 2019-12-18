@@ -24,5 +24,5 @@ def myCode(imgRGB, depth_colormap):
     cv.imshow(title_window, dst)
     cv.waitKey(1)
 
-from ocvbPipeStream import pipeStreamRun
+from PipeStream import pipeStreamRun
 pipeStreamRun(myCode)

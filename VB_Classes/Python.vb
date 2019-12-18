@@ -93,7 +93,6 @@ Public Class Python_MemMap : Implements IDisposable
     Public memMapbufferSize As Int32
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
-        ocvb.parms.ShowConsoleLog = True
         If ocvb.PythonFileName Is Nothing Then
             ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_MemMap.py"
         Else
