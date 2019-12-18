@@ -143,16 +143,10 @@ Public Class Python_SurfaceBlit : Implements IDisposable
     Dim pointCloudBuffer(1) As Byte
     Dim PythonReady As Boolean
     Public Sub New(ocvb As AlgorithmData)
-        ' this Python script requires pygame to be present...
-        If checkPythonPackage(ocvb, "pygame") = False Then
-            PythonReady = False
-            Exit Sub
-        End If
         pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
         pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut)
         PipeTaskIndex += 1
 
-        ' this Python script assumes that fast processing is off - the pointcloud is being used and cannot be resized.
         ocvb.parms.fastProcessing = False
         ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
         memMap = New Python_MemMap(ocvb)
@@ -206,115 +200,19 @@ End Class
 
 
 
+
+
 Public Class Python_RGBDepth : Implements IDisposable
-    Dim pipeName As String
-    Dim pipeImages As NamedPipeServerStream
-    Dim rgbBuffer(1) As Byte
-    Dim depthBuffer(1) As Byte
-    Dim pythonReady As Boolean
-    Dim memMap As Python_MemMap
+    Dim pipe As PipeStream_RGBDepth
     Public Sub New(ocvb As AlgorithmData)
-        pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
-        pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.Out)
-        PipeTaskIndex += 1
-
         ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_RGBDepth.py"
-        memMap = New Python_MemMap(ocvb)
-
-        If ocvb.parms.externalInvocation Then
-            pythonReady = True ' python was already running and invoked OpenCVB.
-        Else
-            pythonReady = StartPython(ocvb, "--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
-        End If
-        If pythonReady Then pipeImages.WaitForConnection()
-        ocvb.desc = "Stream data to the Python_RGBDepth Python script"
+        pipe = New PipeStream_RGBDepth(ocvb)
+        ocvb.desc = "Use Python to show RGB and Depth side by side."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If pythonReady Then
-            For i = 0 To memMap.memMapValues.Length - 1
-                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.color.Total * ocvb.color.ElemSize, ocvb.depth.Total * ocvb.depth.ElemSize, ocvb.color.Rows, ocvb.color.Cols)
-            Next
-            memMap.Run(ocvb)
-
-            If rgbBuffer.Length <> ocvb.color.Total * ocvb.color.ElemSize Then ReDim rgbBuffer(ocvb.color.Total * ocvb.color.ElemSize - 1)
-            If depthBuffer.Length <> ocvb.depth.Total * ocvb.depth.ElemSize Then ReDim depthBuffer(ocvb.depth.Total * ocvb.depth.ElemSize - 1)
-            Marshal.Copy(ocvb.color.Data, rgbBuffer, 0, ocvb.color.Total * ocvb.color.ElemSize)
-            Marshal.Copy(ocvb.depth.Data, depthBuffer, 0, ocvb.depth.Total * ocvb.depth.ElemSize - 1)
-            If pipeImages.IsConnected Then
-                On Error Resume Next
-                pipeImages.Write(rgbBuffer, 0, rgbBuffer.Length)
-                If pipeImages.IsConnected Then pipeImages.Write(depthBuffer, 0, depthBuffer.Length)
-            End If
-        End If
+        pipe.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        memMap.Dispose()
-        If pipeImages IsNot Nothing Then
-            If pipeImages.IsConnected Then
-                pipeImages.Flush()
-                pipeImages.WaitForPipeDrain()
-                pipeImages.Disconnect()
-            End If
-        End If
-        On Error Resume Next
-        Dim proc = Process.GetProcessesByName("python")
-        For i = 0 To proc.Count - 1
-            proc(i).Kill()
-        Next i
-    End Sub
-End Class
-
-
-
-
-Public Class Python_Send : Implements IDisposable
-    Dim pipeName As String
-    Dim pipeImages As NamedPipeServerStream
-    Dim rgbBuffer(1) As Byte
-    Dim pythonReady As Boolean
-    Dim memMap As Python_MemMap
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
-        pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.Out)
-        PipeTaskIndex += 1
-
-        ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Camshift_Python.py"
-        memMap = New Python_MemMap(ocvb)
-
-        pythonReady = StartPython(ocvb, "--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
-        If pythonReady Then pipeImages.WaitForConnection()
-        Dim pythonApp = New FileInfo(ocvb.PythonFileName)
-        ocvb.desc = "Send data to Python script: " + pythonApp.Name
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If pythonReady Then
-            For i = 0 To memMap.memMapValues.Length - 1
-                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.color.Total * ocvb.color.ElemSize, ocvb.color.Rows, ocvb.color.Cols)
-            Next
-            memMap.Run(ocvb)
-
-            If rgbBuffer.Length <> ocvb.color.Total * ocvb.color.ElemSize Then ReDim rgbBuffer(ocvb.color.Total * ocvb.color.ElemSize - 1)
-            Marshal.Copy(ocvb.color.Data, rgbBuffer, 0, ocvb.color.Total * ocvb.color.ElemSize)
-            If pipeImages.IsConnected Then
-                On Error Resume Next
-                pipeImages.Write(rgbBuffer, 0, rgbBuffer.Length)
-            End If
-        End If
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        memMap.Dispose()
-        If pipeImages IsNot Nothing Then
-            If pipeImages.IsConnected Then
-                pipeImages.Flush()
-                pipeImages.WaitForPipeDrain()
-                pipeImages.Disconnect()
-            End If
-        End If
-        On Error Resume Next
-        Dim proc = Process.GetProcessesByName("python")
-        For i = 0 To proc.Count - 1
-            proc(i).Kill()
-        Next i
+        pipe.Dispose()
     End Sub
 End Class

@@ -17,7 +17,7 @@ cv.createTrackbar(trackbar_name, title_window , 0, alpha_slider_max, on_trackbar
 on_trackbar(saveAlpha)
 ## [create_trackbar]
 
-def myCode(imgRGB, depth_colormap):
+def OpenCVCode(imgRGB, depth_colormap):
     alpha = saveAlpha / alpha_slider_max
     beta = ( 1.0 - alpha )
     dst = cv.addWeighted(imgRGB, alpha, depth_colormap, beta, 0.0)
@@ -25,4 +25,4 @@ def myCode(imgRGB, depth_colormap):
     cv.waitKey(1)
 
 from PipeStream import pipeStreamRun
-pipeStreamRun(myCode)
+pipeStreamRun(OpenCVCode)
