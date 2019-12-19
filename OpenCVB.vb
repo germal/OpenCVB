@@ -558,33 +558,6 @@ Public Class OpenCVB
         lastFrame = frameCount
         If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
     End Sub
-    Private Sub Options_Click(sender As Object, e As EventArgs) Handles Options.Click
-        pauseUpdates = True
-        optionsForm.IntelCamera.Enabled = intelCamera.deviceCount > 0
-        optionsForm.Kinect4Azure.Enabled = kinectCamera.deviceCount > 0
-
-        Dim cancel = optionsForm.ShowDialog()
-        Me.BringToFront()
-        pauseUpdates = False
-        If cancel = DialogResult.OK Then stopAlgorithmThread = True
-
-        TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
-
-        If optionsForm.SnapToGrid.Checked Then
-            For i = 0 To 3
-                camPic(i).Size = New Size(regWidth / 2, regHeight / 2)
-            Next
-            camPic(1).Left = camPic(0).Left + camPic(0).Width
-            camPic(2).Top = camPic(0).Top + camPic(0).Height
-            camPic(3).Left = camPic(2).Left + camPic(2).Width
-            camPic(3).Top = camPic(0).Top + camPic(0).Height
-
-            Me.Width = camPic(0).Width * 2 + 40
-            Me.Height = camPic(0).Height * 2 + 90
-        End If
-        saveLayout()
-        RunAlgorithmTask()
-    End Sub
     Private Sub saveLayout()
         SaveSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
         SaveSetting("OpenCVB", "OpenCVBTop", "OpenCVBTop", Me.Top)
@@ -662,7 +635,36 @@ Public Class OpenCVB
         algorithmThread = New Thread(AddressOf AlgorithmTask)
         algorithmThread.Start(parms)
     End Sub
+    Private Sub Options_Click(sender As Object, e As EventArgs) Handles Options.Click
+        pauseUpdates = True
+        optionsForm.IntelCamera.Enabled = intelCamera.deviceCount > 0
+        optionsForm.Kinect4Azure.Enabled = kinectCamera.deviceCount > 0
 
+        Dim OKcancel = optionsForm.ShowDialog()
+        Me.BringToFront()
+        pauseUpdates = False
+        If OKcancel = DialogResult.OK Then
+            stopAlgorithmThread = True
+            Thread.Sleep(10) ' this should give the task a chance to terminate.
+        End If
+
+        TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
+
+        If optionsForm.SnapToGrid.Checked Then
+            For i = 0 To 3
+                camPic(i).Size = New Size(regWidth / 2, regHeight / 2)
+            Next
+            camPic(1).Left = camPic(0).Left + camPic(0).Width
+            camPic(2).Top = camPic(0).Top + camPic(0).Height
+            camPic(3).Left = camPic(2).Left + camPic(2).Width
+            camPic(3).Top = camPic(0).Top + camPic(0).Height
+
+            Me.Width = camPic(0).Width * 2 + 40
+            Me.Height = camPic(0).Height * 2 + 90
+        End If
+        saveLayout()
+        If OKcancel = DialogResult.OK Then RunAlgorithmTask()
+    End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
         drawRect = New cv.Rect(0, 0, 0, 0)
         Dim saveFastProc As Boolean = parms.fastProcessing
