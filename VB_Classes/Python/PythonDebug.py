@@ -1,28 +1,38 @@
+import pygame
+from pygame.locals import *
+
+from OpenGL.GL import *
+from OpenGL.GLU import *
+
 import cv2 as cv
+import numpy as np
 
-alpha_slider_max = 100
-title_window = 'Linear Blend'
-saveAlpha = 0
-    
-## [on_trackbar]
-def on_trackbar(val):
-    global saveAlpha # force the callback to reference the global variable.
-    saveAlpha = val 
-## [on_trackbar]
+def OpenCVCode(imgRGB, depth_colormap):
+    global initialized, surface, screen
+    if initialized == False:
+        initialized = True
+        pygame.init()
+        pygame.display.set_caption("OpenCVB - Python_SurfaceBlit.py")
+        display = imgRGB.shape[1], imgRGB.shape[0]
+        screen = pygame.display.set_mode(display)
+        surface = pygame.Surface(display)
+    try:
+        #if event.type == pygame.QUIT:
+        #    pygame.quit()
+        #    quit()
+        surface = pygame.image.frombuffer(imgRGB, (imgRGB.shape[1], imgRGB.shape[0]), "RGB")
+        screen.blit(surface, (0, 0))
+        pygame.display.flip()
+        pygame.time.wait(1)
 
-cv.namedWindow(title_window)
-## [create_trackbar]
-trackbar_name = 'Alpha'
-cv.createTrackbar(trackbar_name, title_window , 0, alpha_slider_max, on_trackbar)
-on_trackbar(saveAlpha)
-## [create_trackbar]
+    except Exception as exception:
+        print(exception)
+        cv.waitKey(10000)
 
-def myCode(imgRGB, depth_colormap):
-    alpha = saveAlpha / alpha_slider_max
-    beta = ( 1.0 - alpha )
-    dst = cv.addWeighted(imgRGB, alpha, depth_colormap, beta, 0.0)
-    cv.imshow(title_window, dst)
-    cv.waitKey(1)
+# some initialization code
+initialized = False
+screen = None
+surface = None
 
-from ocvbPipeStream import pipeStreamRun
-pipeStreamRun(myCode)
+from PipeStream import pipeStreamRun
+pipeStreamRun(OpenCVCode)

@@ -9,7 +9,7 @@ import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
-def pipeStreamRun(myCode):
+def pipeStreamRun(OpenCVCode):
     parser = argparse.ArgumentParser(description='Pass in length of MemMap region.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--MemMapLength', type=int, default=0, help='The number of bytes are in the memory mapped file.')
     parser.add_argument('--pipeName', default='', help='The name of the input pipe for image data.')
@@ -22,7 +22,7 @@ def pipeStreamRun(myCode):
         args.pipeName = 'OpenCVBImages0' # we always start with 0 and since it is only invoked once, 0 is all it will ever be.
         ocvb = os.getcwd() + '\\..\\..\\bin\Debug\OpenCVB.exe'
         if os.path.exists(ocvb):
-            pid = os.spawnv(os.P_NOWAIT, ocvb, 'AddWeighted_Trackbar')
+            pid = os.spawnv(os.P_NOWAIT, ocvb, 'AddWeighted_Trackbar') # OpenCVB.exe will be run with this .py script
 
     pipeName = '\\\\.\\pipe\\' + args.pipeName
     while True:
@@ -54,8 +54,8 @@ def pipeStreamRun(myCode):
                     depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth, alpha=0.03), cv.COLORMAP_JET)
                     rgbSize = rows, cols, 3
                     imgRGB = np.array(np.frombuffer(rgb, np.uint8).reshape(rgbSize))
-                    myCode(imgRGB, depth_colormap)
+                    OpenCVCode(imgRGB, depth_colormap)
  
     except Exception as exception:
         print(exception)
-        Mbox('AddWeighted_Trackbar.py', 'Failure - see console output', 1)    
+        Mbox('PipeStream.py', 'Failure - see console output', 1)    
