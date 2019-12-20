@@ -16,21 +16,3 @@ Public Class AddWeighted_DepthRGB : Implements IDisposable
         sliders.Dispose()
     End Sub
 End Class
-
-
-
-
-Public Class AddWeighted_Trackbar : Implements IDisposable
-    Dim pipe As PipeStream_RGBDepth
-    Public Sub New(ocvb As AlgorithmData)
-        ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/AddWeighted_Trackbar.py"
-        pipe = New PipeStream_RGBDepth(ocvb)
-        ocvb.desc = "Use Python to build a Weighted image with RGB and Depth."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        pipe.Run(ocvb)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        pipe.Dispose()
-    End Sub
-End Class

@@ -55,11 +55,17 @@ End Module
 
 
 Public Class Python_Run : Implements IDisposable
+    Dim pipe As PyStream_Basics = Nothing
     Dim tryCount As Int32
     Public Sub New(ocvb As AlgorithmData)
         If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Barebones.py"
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
-        StartPython(ocvb, "")
+
+        If pythonApp.Name.StartsWith("PyStream") And pythonApp.Name.EndsWith(".py") Then
+            pipe = New PyStream_Basics(ocvb)
+        Else
+            StartPython(ocvb, "")
+        End If
         ocvb.desc = "Run Python app: " + pythonApp.Name
         ocvb.label1 = ""
         ocvb.label2 = ""
@@ -67,10 +73,14 @@ Public Class Python_Run : Implements IDisposable
         ocvb.result2.SetTo(0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim proc = Process.GetProcessesByName("python")
-        If proc.Count = 0 Then
-            If tryCount < 3 Then StartPython(ocvb, "")
-            tryCount += 1
+        If pipe IsNot Nothing Then
+            pipe.Run(ocvb)
+        Else
+            Dim proc = Process.GetProcessesByName("python")
+            If proc.Count = 0 Then
+                If tryCount < 3 Then StartPython(ocvb, "")
+                tryCount += 1
+            End If
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -79,6 +89,7 @@ Public Class Python_Run : Implements IDisposable
         For i = 0 To proc.Count - 1
             proc(i).Kill()
         Next i
+        pipe.Dispose()
     End Sub
 End Class
 
@@ -131,46 +142,6 @@ Public Class Python_MemMap : Implements IDisposable
         Next i
     End Sub
 End Class
-
-
-
-
-
-Public Class Python_RGBDepth : Implements IDisposable
-    Dim pipe As PipeStream_RGBDepth
-    Public Sub New(ocvb As AlgorithmData)
-        ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_RGBDepth.py"
-        pipe = New PipeStream_RGBDepth(ocvb)
-        ocvb.desc = "Use Python to show RGB and Depth side by side."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        pipe.Run(ocvb)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        pipe.Dispose()
-    End Sub
-End Class
-
-
-
-
-Public Class Python_SurfaceBlit : Implements IDisposable
-    Dim pipe As PipeStream_RGBDepth
-    Public Sub New(ocvb As AlgorithmData)
-        ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
-        pipe = New PipeStream_RGBDepth(ocvb)
-        ocvb.desc = "Use Python to show RGB with a surface Blit."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        ocvb.putText(New ActiveClass.TrueType("When blit is called in Python callback, it fails.", 10, 60, RESULT1))
-        ocvb.putText(New ActiveClass.TrueType("Edit 'Python_SurfaceBlit.py to uncomment the lines that cause the problem.", 10, 120, RESULT1))
-        pipe.Run(ocvb)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        pipe.Dispose()
-    End Sub
-End Class
-
 
 
 

@@ -5,5 +5,5 @@ def OpenCVCode(imgRGB, depth_colormap):
     cv.imshow("RGB and Depth Images", images)
     cv.waitKey(1)
 
-from PipeStream import pipeStreamRun
-pipeStreamRun(OpenCVCode)
+from PyStream import PyStreamRun
+PyStreamRun(OpenCVCode, 'PyStreamRGBDepth.py')

@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
-Public Class PipeStream_RGBDepth : Implements IDisposable
+Public Class PyStream_Basics : Implements IDisposable
     Dim pipeName As String
     Dim pipeImages As NamedPipeServerStream
     Dim rgbBuffer(1) As Byte
@@ -16,7 +16,7 @@ Public Class PipeStream_RGBDepth : Implements IDisposable
 
         ' Was this class invoked directly?  Then just run something that works with RGB and depth...
         If ocvb.PythonFileName Is Nothing Then
-            ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/AddWeighted_Trackbar.py"
+            ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/PyStreamAddWeighted_Trackbar.py"
         End If
 
         memMap = New Python_MemMap(ocvb)

@@ -31,6 +31,8 @@ def OpenCVCode(imgRGB, depth_colormap):
 
 # some initialization code
 surface = None
-
-from PipeStream import pipeStreamRun
-pipeStreamRun(OpenCVCode)
+print('This script is not working because the surface blit call does not work in a callback.')
+print('The Python_SurfaceBlitOld.py script works because the blit is inline - not in a callback.')
+print('To see the problem uncomment the lines above to see the hang...')
+from PyStream import PyStreamRun
+PyStreamRun(OpenCVCode, 'PyStreamSurfaceBlit.py')

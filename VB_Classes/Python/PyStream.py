@@ -9,7 +9,7 @@ import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
-def pipeStreamRun(OpenCVCode):
+def PyStreamRun(OpenCVCode, scriptName):
     parser = argparse.ArgumentParser(description='Pass in length of MemMap region.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--MemMapLength', type=int, default=0, help='The number of bytes are in the memory mapped file.')
     parser.add_argument('--pipeName', default='', help='The name of the input pipe for image data.')
@@ -22,7 +22,7 @@ def pipeStreamRun(OpenCVCode):
         args.pipeName = 'OpenCVBImages0' # we always start with 0 and since it is only invoked once, 0 is all it will ever be.
         ocvb = os.getcwd() + '\\..\\..\\bin\Debug\OpenCVB.exe'
         if os.path.exists(ocvb):
-            pid = os.spawnv(os.P_NOWAIT, ocvb, 'AddWeighted_Trackbar') # OpenCVB.exe will be run with this .py script
+            pid = os.spawnv(os.P_NOWAIT, ocvb, scriptName) # OpenCVB.exe will be run with this .py script
 
     pipeName = '\\\\.\\pipe\\' + args.pipeName
     while True:
