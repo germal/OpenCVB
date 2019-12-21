@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 import cv2 as cv
-
+# https://github.com/opencv/opencv_contrib/blob/master/modules/ximgproc/samples/dericheSample.py
 def AddSlider(sliderName,windowName,minSlider,maxSlider,valDefault, update=[]):
     if update is None:
         cv.createTrackbar(sliderName, windowName, valDefault,maxSlider-minSlider+1)
@@ -21,6 +21,7 @@ class Filtrage:
         self.dyimg=[]
         self.module=[]
     def DericheFilter(self):
+        self.dximg = cv.cv2
         self.dximg = cv.ximgproc.GradientDericheX(	self.img, self.alpha/100., self.omega/1000.	)
         self.dyimg = cv.ximgproc.GradientDericheY(	self.img, self.alpha/100., self.omega/1000.	)
         dx2=self.dximg*self.dximg
@@ -39,9 +40,9 @@ class Filtrage:
     def UpdateAlpha(self,x ):
         self.updateFiltre=True
         self.alpha=x
-    def run(self,argv):
+    def run(self):
         # Load the source image
-        self.filename = argv[0] if len(argv) > 0 else "PythonData/corridor_fld.jpg"
+        self.filename = "PythonData/corridor.jpg"
         self.img=cv.imread(self.filename,cv.IMREAD_GRAYSCALE)
         if self.img is None:
             print ('cannot read file')
@@ -57,4 +58,4 @@ class Filtrage:
             if code==27:
                 break
 if __name__ == '__main__':
-    Filtrage().run(sys.argv[1:])
+    Filtrage().run()

@@ -401,4 +401,3 @@ Public Class Edges_InfraredDots : Implements IDisposable
         sliders.Dispose()
     End Sub
 End Class
-

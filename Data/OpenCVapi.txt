@@ -295,6 +295,7 @@ GFTTDetector
 GFTTDetector_create
 goodFeaturesToTrack
 grabCut
+GradientDericheX
 groupRectangles
 haveImageReader
 haveImageWriter
@@ -525,4 +526,4 @@ warpPerspective
 warpPolar
 watershed
 writeOpticalFlow
-
+ximgproc

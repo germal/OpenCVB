@@ -336,17 +336,19 @@ Studio menus:
 Here is the complete list of the expected Python packages used by the Python
 scripts provided by OpenCVB.
 
--   Numpy
+-   matplotlib
 
--   Opencv-Python
+-   numpy
+
+-   opencv-python
+
+-   opencv-contrib-python
 
 -   PyOpenGL
 
 -   Pygame
 
 -   Psutil
-
--   Matplotlib
 
 -   Scikit-learn
 

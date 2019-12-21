@@ -237,7 +237,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Pencil.vb" />
-    <Compile Include="PipeStream.vb" />
+    <Compile Include="PyStream.vb" />
     <Compile Include="Pixel.vb" />
     <Compile Include="Plane.vb" />
     <Compile Include="Plot.vb" />
@@ -345,6 +345,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Python\DericheSample.py" />
     <Content Include="Python\PyStreamAddWeighted_Trackbar.py" />
     <Content Include="Python\PyStreamcolor_histogram.py" />
     <Content Include="Python\Gabor_Filter.py" />

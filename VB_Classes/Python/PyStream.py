@@ -31,7 +31,7 @@ def PyStreamRun(OpenCVCode, scriptName):
             break
         except Exception as exception:
             time.sleep(0.1) # sleep for a bit to wait for OpenCVB to start...
-    try:
+    try: 
         mm = mmap.mmap(0, MemMapLength, tagname='Python_MemMap')
         frameCount = -1
         while True:
