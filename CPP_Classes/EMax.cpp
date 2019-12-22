@@ -43,7 +43,7 @@ public:
 		Mat sample(1, 2, CV_32FC1);
 		for (int i = 0; i < dst.rows; i+=stepSize)
 		{
-#pragma omp parallel for
+//#pragma omp parallel for
 			for (int j = 0; j < dst.cols; j+= stepSize)
 			{
 				sample.at<float>(0) = (float)j;

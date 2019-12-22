@@ -9,15 +9,15 @@ def set_scale(val):
 
 def OpenCVCode(imgRGB, depth_colormap):
     global hsv_map, hist_scale, h, s
-    cv.imshow('imgRGB', imgRGB)
     small = cv.pyrDown(imgRGB)
     hsv = cv.cvtColor(small, cv.COLOR_BGR2HSV)
     dark = hsv[...,2] < 32
     hsv[dark] = 0
     h = cv.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
-
     h = np.clip(h*0.005*hist_scale, 0, 1)
     vis = hsv_map*h[:,:,np.newaxis] / 255.0
+    img = cv.resize(imgRGB, (int(vis.shape[1] * imgRGB.shape[1] / imgRGB.shape[0]), vis.shape[1]))
+    cv.imshow('img', img)
     cv.imshow('hist', vis)
     cv.waitKey(1)
 

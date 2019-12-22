@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <iostream>
 #include <algorithm>
+#include <opencv2/core.hpp>
 #include <opencv2/ximgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include "opencv2/core/utility.hpp"
@@ -54,4 +55,49 @@ int *Edges_RandomForest_Run(Edges_RandomForest *Edges_RandomForestPtr, int *rgbP
 {
 	Edges_RandomForestPtr->Run(Mat(rows, cols, CV_8UC3, rgbPtr));
 	return (int *) Edges_RandomForestPtr->gray8u.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
+}
+
+
+
+
+
+// https://github.com/opencv/opencv_contrib/blob/master/modules/ximgproc/samples/dericheSample.py
+class Edges_Deriche
+{
+private:
+public:
+	Mat src, dst;
+	Edges_Deriche() {}
+	void Run(float alpha, float omega) {
+		Mat xdst, ydst;
+		cv::ximgproc::GradientDericheX(src, xdst, alpha, omega);
+		cv::ximgproc::GradientDericheY(src, ydst, alpha, omega);
+		Mat dx2 = xdst.mul(xdst);
+		Mat dy2 = ydst.mul(ydst);
+		Mat d2 = dx2 + dy2;
+		cv::sqrt(d2, d2);
+		cv::normalize(d2, d2, 255, cv::NormTypes::NORM_MINMAX);
+		d2.convertTo(dst, CV_8UC3, 255, 0);
+	}
+};
+
+extern "C" __declspec(dllexport)
+Edges_Deriche * Edges_Deriche_Open()
+{
+	Edges_Deriche* dPtr = new Edges_Deriche();
+	return dPtr;
+}
+
+extern "C" __declspec(dllexport)
+void Edges_Deriche_Close(Edges_Deriche * dPtr)
+{
+	delete dPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Edges_Deriche_Run(Edges_Deriche * dPtr, int* rgbPtr, int rows, int cols, float alpha, float omega)
+{
+	dPtr->src = Mat(rows, cols, CV_8UC3, rgbPtr);
+	dPtr->Run(alpha, omega);
+	return (int*)dPtr->dst.data; // return this C++ allocated data to managed code
 }

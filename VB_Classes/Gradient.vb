@@ -1,4 +1,6 @@
 ﻿Imports cv = OpenCvSharp
+Imports System.Runtime.InteropServices
+
 Public Class Gradient_Basics : Implements IDisposable
     Public src As cv.Mat
     Public externalUse As Boolean

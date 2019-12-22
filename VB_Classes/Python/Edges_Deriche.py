@@ -15,7 +15,7 @@ class Filtrage:
         self.s =0
         self.alpha = 100
         self.omega = 100
-        self.updateFiltre=True
+        self.updateFilter=True
         self.img=[]
         self.dximg=[]
         self.dyimg=[]
@@ -35,10 +35,10 @@ class Filtrage:
         AddSlider("omega",self.filename,1,1000,self.omega,self.UpdateOmega)
 
     def UpdateOmega(self,x ):
-        self.updateFiltre=True
+        self.updateFilter=True
         self.omega=x
     def UpdateAlpha(self,x ):
-        self.updateFiltre=True
+        self.updateFilter=True
         self.alpha=x
     def run(self):
         # Load the source image
@@ -50,10 +50,10 @@ class Filtrage:
         self.SlideBarDeriche()
         while True:
             cv.imshow(self.filename,self.img)
-            if self.updateFiltre:
+            if self.updateFilter:
                 self.DericheFilter()
                 cv.imshow("module",self.module)
-                self.updateFiltre =False
+                self.updateFilter =False
             code = cv.waitKey(10)
             if code==27:
                 break

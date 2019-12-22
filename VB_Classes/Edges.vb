@@ -401,3 +401,54 @@ Public Class Edges_InfraredDots : Implements IDisposable
         sliders.Dispose()
     End Sub
 End Class
+
+
+
+
+
+Module Edges_Deriche_CPP_Module
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Edges_Deriche_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Edges_Deriche_Close(Edges_DerichePtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Edges_Deriche_Run(Edges_DerichePtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, alpha As Single, omega As Single) As IntPtr
+    End Function
+End Module
+
+
+
+
+' https://github.com/opencv/opencv_contrib/blob/master/modules/ximgproc/samples/dericheSample.py
+Public Class Edges_Deriche_CPP : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Dim Edges_Deriche As IntPtr
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "Deriche Alpha", 1, 400, 100)
+        sliders.setupTrackBar2(ocvb, "Deriche Omega", 1, 1000, 100)
+        sliders.Show()
+        Edges_Deriche = Edges_Deriche_Open()
+        ocvb.desc = "Edge detection using the Deriche X and Y gradients"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim src = ocvb.color
+        Dim srcData(src.Total * src.ElemSize) As Byte
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
+        Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
+        Dim alpha = sliders.TrackBar1.Value / 100
+        Dim omega = sliders.TrackBar2.Value / 1000
+        Dim imagePtr = Edges_Deriche_Run(Edges_Deriche, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, alpha, omega)
+        handleSrc.Free()
+
+        If imagePtr <> 0 Then
+            Dim dstData(src.Total * src.ElemSize() - 1) As Byte
+            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
+            ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        Edges_Deriche_Close(Edges_Deriche)
+    End Sub
+End Class

@@ -5,6 +5,7 @@
 #include "opencv2/bgsegm.hpp"
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/ximgproc.hpp>
 #include <atlstr.h>
 
 using namespace std;
