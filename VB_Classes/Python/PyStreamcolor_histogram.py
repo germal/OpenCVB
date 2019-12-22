@@ -19,7 +19,6 @@ def OpenCVCode(imgRGB, depth_colormap):
     img = cv.resize(imgRGB, (int(vis.shape[1] * imgRGB.shape[1] / imgRGB.shape[0]), vis.shape[1]))
     cv.imshow('img', img)
     cv.imshow('hist', vis)
-    cv.waitKey(1)
 
 hsv_map = np.zeros((180, 256, 3), np.uint8)
 h, s = np.indices(hsv_map.shape[:2])

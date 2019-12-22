@@ -22,7 +22,6 @@ def OpenCVCode(imgRGB, depth_colormap):
     beta = ( 1.0 - alpha )
     dst = cv.addWeighted(imgRGB, alpha, depth_colormap, beta, 0.0)
     cv.imshow(title_window, dst)
-    cv.waitKey(1)
 
 from PyStream import PyStreamRun
 PyStreamRun(OpenCVCode, 'PyStreamAddWeighted_Trackbar.py')
