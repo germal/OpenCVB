@@ -257,11 +257,14 @@ namespace CS_Classes
                 mask.CopyTo(m);
                 for (int i = 0; i < matches.Length; i++)
                 {
-                    //This is also known as NNDR Nearest Neighbor Distance Ratio
-                    if ((matches[i][0].Distance / matches[i][1].Distance) <= uniqnessThreshold)
-                        maskData[i] = 255;
-                    else
-                        maskData[i] = 0;
+                    if (matches[i][1].Distance > 0)
+                    {
+                        //This is also known as NNDR Nearest Neighbor Distance Ratio
+                        if ((matches[i][0].Distance / matches[i][1].Distance) <= uniqnessThreshold)
+                            maskData[i] = 255;
+                        else
+                            maskData[i] = 0;
+                    }
                 }
                 m.CopyTo(mask);
             }
