@@ -12,16 +12,6 @@ using namespace cv;
 using namespace cv::ximgproc;
 
 // https://docs.opencv.org/3.1.0/d0/da5/tutorial_ximgproc_prediction.html
-#include <cstdlib>
-#include <cstdio>
-#include <iostream>
-#include <algorithm>
-#include <opencv2/core.hpp>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/highgui.hpp>
-
-using namespace std;
-using namespace cv;
 class Edges_RandomForest
 {
 private:

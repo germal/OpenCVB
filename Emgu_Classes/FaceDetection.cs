@@ -17,7 +17,7 @@ namespace Emgu_Classes
 
             UMat imgGray = new UMat();
             CvInvoke.CvtColor(img, imgGray, ColorConversion.Bgr2Gray);
-            foreach (Rectangle face in faceDetector.DetectMultiScale(imgGray, 1.1, 10, new Size(20, 20), Size.Empty))
+            foreach (Rectangle face in faceDetector.DetectMultiScale(imgGray, 1.1,   10, new Size(20, 20), Size.Empty))
                 CvInvoke.Rectangle(img, face, new MCvScalar(255, 255, 255));
             img.CopyTo(data);
         }

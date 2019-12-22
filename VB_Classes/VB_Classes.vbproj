@@ -345,7 +345,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Python\PyStream_Edge.py" />
     <Content Include="Python\PyStream_Digits.py" />
+    <Content Include="Python\PyStream_Facedetect.py" />
     <Content Include="Python\PyStream_OpticalFlow.py" />
     <Content Include="Python\TextDetect_ExtremalRegion.py" />
     <Content Include="Python\Edges_Deriche.py" />

@@ -1,6 +1,7 @@
 from __future__ import print_function
 import cv2 as cv
 import argparse
+import numpy as np
 
 ## [Load image]
 parser = argparse.ArgumentParser(description='Code for Histogram Equalization tutorial.')
@@ -21,10 +22,8 @@ src = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
 dst = cv.equalizeHist(src)
 ## [Apply Histogram Equalization]
 
-## [Display results]
-cv.imshow('Source image', src)
-cv.imshow('Equalized Image', dst)
-## [Display results]
+images = np.vstack((src, dst))
+cv.imshow("Original (Top) and Equalized Image (bottom)", images)
 
 ## [Wait until user exits the program]
 cv.waitKey()
