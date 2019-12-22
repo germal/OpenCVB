@@ -1,18 +1,25 @@
-'''
-example to show optical flow estimation using DISOpticalFlow
-
-USAGE: dis_opt_flow.py [<video_source>]
-
-Keys:
- 1  - toggle HSV flow visualization
- 2  - toggle glitch
- 3  - toggle spatial propagation of flow vectors
- 4  - toggle temporal propagation of flow vectors
-ESC - exit
-'''
 import numpy as np
 import cv2 as cv
 import sys
+
+def set_ShowHSV(val):
+    global show_hsv 
+    show_hsv = val 
+    print('HSV flow visualization is', ['off', 'on'][show_hsv == 0])
+def set_ShowGlitch(val):
+    global show_glitch 
+    show_glitch = val 
+    print('glitch is', ['off', 'on'][show_glitch])
+def set_SpatialPropagation(val):
+    global inst, use_spatial_propagation 
+    use_spatial_propagation = val
+    inst.setUseSpatialPropagation(use_spatial_propagation == 1)
+    print('spatial propagation is', ['off', 'on'][val])
+def set_TemporalPropagation(val): # this doesn't do anything yet
+    global use_temporal_propagation 
+    use_temporal_propagation = val 
+    print('temporal propagation is', ['off', 'on'][use_temporal_propagation])
+
 
 def draw_flow(img, flow, step=16):
     h, w = img.shape[:2]
@@ -55,6 +62,12 @@ def OpenCVCode(imgRGB, depth_colormap):
         initialized = True
         prevgray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
         cur_glitch = imgRGB.copy()
+        cv.namedWindow('flow', cv.WINDOW_AUTOSIZE)
+        cv.createTrackbar('HSV Flow', 'flow', show_hsv, 1, set_ShowHSV)
+        cv.createTrackbar('Glitch Window', 'flow', show_glitch, 1, set_ShowGlitch)
+        cv.createTrackbar('Spatial Prop.', 'flow', use_spatial_propagation, 1, set_SpatialPropagation)
+        cv.createTrackbar('Temporal Prop.', 'flow', use_temporal_propagation, 1, set_TemporalPropagation)
+
     gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
     if flow is not None and use_temporal_propagation:
         #warp previous flow to get an initial approximation for the current flow:
@@ -70,37 +83,17 @@ def OpenCVCode(imgRGB, depth_colormap):
         cur_glitch = warp_flow(cur_glitch, flow)
         cv.imshow('glitch', cur_glitch)
 
-    ch = 0xFF & cv.waitKey(5)
-    if ch == 27:
-        exit
-    if ch == ord('1'):
-        show_hsv = not show_hsv
-        print('HSV flow visualization is', ['off', 'on'][show_hsv])
-    if ch == ord('2'):
-        show_glitch = not show_glitch
-        if show_glitch:
-            cur_glitch = imgRGB.copy()
-        print('glitch is', ['off', 'on'][show_glitch])
-    if ch == ord('3'):
-        use_spatial_propagation = not use_spatial_propagation
-        inst.setUseSpatialPropagation(use_spatial_propagation)
-        print('spatial propagation is', ['off', 'on'][use_spatial_propagation])
-    if ch == ord('4'):
-        use_temporal_propagation = not use_temporal_propagation
-        print('temporal propagation is', ['off', 'on'][use_temporal_propagation])
-
 if __name__ == '__main__':
     print(__doc__)
     initialized = False
     prevgray = None
-    show_hsv = False
+    show_hsv = 0
     show_glitch = False
     use_spatial_propagation = False
     use_temporal_propagation = True
     cur_glitch = None
     inst = cv.DISOpticalFlow.create(cv.DISOPTICAL_FLOW_PRESET_MEDIUM)
     inst.setUseSpatialPropagation(use_spatial_propagation)
-
     flow = None
 
 from PyStream import PyStreamRun
