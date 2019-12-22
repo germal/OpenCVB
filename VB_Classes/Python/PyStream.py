@@ -55,7 +55,8 @@ def PyStreamRun(OpenCVCode, scriptName):
                     rgbSize = rows, cols, 3
                     imgRGB = np.array(np.frombuffer(rgb, np.uint8).reshape(rgbSize))
                     OpenCVCode(imgRGB, depth_colormap)
- 
+                    cv.waitKey(1)
+                    
     except Exception as exception:
         print(exception)
         Mbox('PipeStream.py', 'Failure - see console output', 1)    

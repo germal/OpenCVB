@@ -345,6 +345,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Python\PyStreamDigits.py" />
     <Content Include="Python\TextDetect_ExtremalRegion.py" />
     <Content Include="Python\Edges_Deriche.py" />
     <Content Include="Python\PyStreamAddWeighted_Trackbar.py" />
@@ -380,8 +381,8 @@
     <Content Include="Python\OpenCV_API_Coverage.py" />
     <Content Include="Python\MotionBlurDeblur.py" />
     <Content Include="Python\DFT_Example1.py" />
-    <Content Include="Python\SVM_Digits.py" />
-    <Content Include="Python\SVM_Digits_adjust.py" />
+    <Content Include="Python\Digits_SVM_KNearest.py" />
+    <Content Include="Python\Digits_SVM_KNearest_adjust.py" />
     <Content Include="Python\DFT_Example2.py" />
     <Content Include="Python\Distance_LabeledTransform.py" />
     <Content Include="Python\EqualizeHist_Demo.py" />

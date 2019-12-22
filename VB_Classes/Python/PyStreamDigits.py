@@ -11,7 +11,6 @@ import sys
 
 # local modules
 from common import mosaic
-
 from digits import *
 
 def OpenCVCode(imgRGB, depth_colormap):
