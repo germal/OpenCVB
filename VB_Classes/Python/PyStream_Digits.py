@@ -66,11 +66,12 @@ def OpenCVCode(imgRGB, depth_colormap):
         digit = model.predict(sample)[1].ravel()
         cv.putText(imgRGB, '%d'%digit, (x, y), cv.FONT_HERSHEY_PLAIN, 1.0, (200, 0, 0), thickness = 1)
 
-    imgRGB = cv.resize(imgRGB, (int(imgRGB.shape[1] / 2),int(imgRGB.shape[0] / 2)))
-    bin = cv.resize(bin, (int(bin.shape[1] / 2),int(bin.shape[0] / 2)))
+    h, w = imgRGB.shape[:2]
+    imgRGB = cv.resize(imgRGB, (int(w / 2), int(h / 2)))
+    bin = cv.resize(bin, (int(w / 2), int(h / 2)))
     binRGB = np.empty(imgRGB.shape, imgRGB.dtype)
     cv.cvtColor(bin, cv.COLOR_GRAY2BGR, binRGB)
-    images = np.empty((imgRGB.shape[0], imgRGB.shape[1]*2, imgRGB.shape[2]), imgRGB.dtype)
+    images = np.empty((h, w*2, imgRGB.shape[2]), imgRGB.dtype)
     images = cv.hconcat([imgRGB, binRGB])
     cv.imshow('images', images)
 
@@ -88,4 +89,4 @@ if __name__ == '__main__':
         model.load_(classifier_fn) #Known bug: https://github.com/opencv/opencv/issues/4969
 
 from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'PyStreamDigits.py')
+PyStreamRun(OpenCVCode, 'PyStream_Digits.py')

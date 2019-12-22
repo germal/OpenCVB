@@ -24,4 +24,4 @@ def OpenCVCode(imgRGB, depth_colormap):
     cv.imshow(title_window, dst)
 
 from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'PyStreamAddWeighted_Trackbar.py')
+PyStreamRun(OpenCVCode, 'PyStream_AddWeighted_Trackbar.py')

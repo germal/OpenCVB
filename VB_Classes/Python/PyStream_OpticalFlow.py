@@ -13,10 +13,6 @@ ESC - exit
 import numpy as np
 import cv2 as cv
 import sys
-import ctypes
-def Mbox(title, text, style):
-    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
-Mbox('Test', 'Failure - see console output', 1)        
 
 def draw_flow(img, flow, step=16):
     h, w = img.shape[:2]
@@ -94,6 +90,7 @@ def OpenCVCode(imgRGB, depth_colormap):
         print('temporal propagation is', ['off', 'on'][use_temporal_propagation])
 
 if __name__ == '__main__':
+    print(__doc__)
     initialized = False
     prevgray = None
     show_hsv = False

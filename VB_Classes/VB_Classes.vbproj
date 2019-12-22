@@ -345,16 +345,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Python\PyStreamDigits.py" />
+    <Content Include="Python\PyStream_Digits.py" />
+    <Content Include="Python\PyStream_OpticalFlow.py" />
     <Content Include="Python\TextDetect_ExtremalRegion.py" />
     <Content Include="Python\Edges_Deriche.py" />
-    <Content Include="Python\PyStreamAddWeighted_Trackbar.py" />
-    <Content Include="Python\PyStreamcolor_histogram.py" />
+    <Content Include="Python\PyStream_AddWeighted_Trackbar.py" />
+    <Content Include="Python\PyStream_Color_Histogram.py" />
     <Content Include="Python\Gabor_Filter.py" />
     <Content Include="Python\GradientDescent.py" />
     <Content Include="Python\Kalman_EKF.py" />
     <Content Include="Python\KAZE_match.py" />
-    <Content Include="Python\PyStreamRGBDepth.py" />
+    <Content Include="Python\PyStream_RGBDepth.py" />
     <Content Include="Python\Python_SurfaceBlitOld.py" />
     <Content Include="Python\Sobel_AnisotropicSegmentation.py" />
     <Content Include="Python\WarpAffine_SIFT.py" />
@@ -417,7 +418,7 @@
     <Content Include="Python\Laplace_demo.py" />
     <Content Include="Python\ML_letters.py" />
     <Content Include="Python\Mat_mask_operations.py" />
-    <Content Include="Python\PyStreamSurfaceBlit.py" />
+    <Content Include="Python\PyStream_SurfaceBlit.py" />
     <Content Include="Python\Python_MemMap.py" />
     <Content Include="Python\Moments_demo.py" />
     <Content Include="Python\Morphology.py" />
