@@ -6,6 +6,7 @@ Module IndexMain
     Dim CSnames As New SortedList(Of String, String)
     Dim OpenGLnames As New SortedList(Of String, String)
     Dim PYnames As New SortedList(Of String, String)
+    Dim PYStreamNames As New SortedList(Of String, String)
     Dim Painterly As New SortedList(Of String, String)
     Private Function trimQuotes(line As String)
         While InStr(line, """")
@@ -48,6 +49,7 @@ Module IndexMain
             line = apiOCVB.ReadLine()
             If line.EndsWith(".py") Then
                 PYnames.Add(line, line)
+                If line.StartsWith("PyStream_") Then PYStreamNames.Add(line, line)
                 If line.EndsWith("_MT.py") Then MTnames.Add(line, line)
             Else
                 If line <> "" Then
@@ -74,6 +76,7 @@ Module IndexMain
                 If LCase(line).StartsWith("public class") And InStr(line, "Implements IDisposable") Then
                     classname = split(2) ' public class <classname>
                     If classname.StartsWith("Python_") Then PYnames.Add(classname, classname)
+                    If classname.StartsWith("PyStream_") Then PYStreamNames.Add(classname, classname)
                     If classname.EndsWith("_MT") Then MTnames.Add(classname, classname)
                     If classname.EndsWith("_CPP") Then CPPnames.Add(classname, classname)
                     If classname.EndsWith("_CS") Then CSnames.Add(classname, classname)
@@ -158,6 +161,12 @@ Module IndexMain
         sw.Write("<Python>")
         For i = 0 To PYnames.Count - 1
             sw.Write("," + PYnames.ElementAt(i).Key)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<PyStream>")
+        For i = 0 To PYStreamNames.Count - 1
+            sw.Write("," + PYStreamNames.ElementAt(i).Key)
         Next
         sw.WriteLine()
 
