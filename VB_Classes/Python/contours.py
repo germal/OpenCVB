@@ -34,7 +34,7 @@ def make_image():
                 x1, y1 = np.int32([dx+100+j*10-80*c, dy+100-90*s])
                 x2, y2 = np.int32([dx+100+j*10-30*c, dy+100-30*s])
                 cv.line(img, (x1, y1), (x2, y2), white)
-
+ 
         cv.ellipse( img, (dx+150, dy+100), (100,70), 0, 0, 360, white, -1 )
         cv.ellipse( img, (dx+115, dy+70), (30,20), 0, 0, 360, black, -1 )
         cv.ellipse( img, (dx+185, dy+70), (30,20), 0, 0, 360, black, -1 )
