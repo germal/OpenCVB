@@ -23,7 +23,6 @@ if PY3:
 import numpy as np
 import cv2 as cv
 
-import video
 from common import nothing, getsize
 
 def build_lappyr(img, leveln=6, dtype=np.int16):
@@ -45,38 +44,25 @@ def merge_lappyr(levels):
     return np.uint8(np.clip(img, 0, 255))
 
 
-def main():
-    import sys
-
-    try:
-        fn = sys.argv[1]
-    except:
-        fn = 0
-    cap = video.create_capture(fn)
-
-    leveln = 6
-    cv.namedWindow('level control')
+def OpenCVCode(imgRGB, depth_colormap):
+    global leveln
+    pyr = build_lappyr(imgRGB, leveln)
     for i in xrange(leveln):
-        cv.createTrackbar('%d'%i, 'level control', 5, 50, nothing)
+        switcher = { 0:"sharpest", 1:"blurryMin", 2:"blurryMed1", 3:"blurryMed2", 4:"blurryMax", 5:"Saturate"}
+        v = int(cv.getTrackbarPos(switcher.get(i, "invalid"), 'level control') / 5)
+        pyr[i] *= v
+    res = merge_lappyr(pyr)
 
-    while True:
-        ret, frame = cap.read()
-
-        pyr = build_lappyr(frame, leveln)
-        for i in xrange(leveln):
-            v = int(cv.getTrackbarPos('%d'%i, 'level control') / 5)
-            pyr[i] *= v
-        res = merge_lappyr(pyr)
-
-        cv.imshow('laplacian pyramid filter', res)
-
-        if cv.waitKey(1) == 27:
-            break
-
-    print('Done')
-
+    cv.imshow('laplacian pyramid filter', res)
 
 if __name__ == '__main__':
     print(__doc__)
-    main()
-    cv.destroyAllWindows()
+    leveln = 6
+    cv.namedWindow('level control')
+    for i in xrange(leveln):
+        switcher = { 0:"sharpest", 1:"blurryMin", 2:"blurryMed1", 3:"blurryMed2", 4:"blurryMax", 5:"Saturate"}
+        cv.createTrackbar(switcher.get(i, "invalid"), 'level control', 5, 50, nothing)
+
+
+from PyStream import PyStreamRun
+PyStreamRun(OpenCVCode, 'PyStream_RGBDepth.py')
