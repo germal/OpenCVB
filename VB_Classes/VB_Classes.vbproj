@@ -345,6 +345,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Python\grabcut.py" />
     <Content Include="Python\PyStream_Edge.py" />
     <Content Include="Python\PyStream_Digits.py" />
     <Content Include="Python\PyStream_Facedetect.py" />

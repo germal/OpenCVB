@@ -34,6 +34,9 @@ import numpy as np
 import cv2 as cv
 
 import sys
+import ctypes
+def Mbox(title, text, style):
+    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
 class App():
     BLUE = [255,0,0]        # rectangle color
@@ -113,18 +116,17 @@ class App():
         self.output = np.zeros(self.img.shape, np.uint8)           # output image to be shown
 
         # input and output windows
-        cv.namedWindow('output')
-        cv.namedWindow('input')
-        cv.setMouseCallback('input', self.onmouse)
-        cv.moveWindow('input', self.img.shape[1]+10,90)
+        cv.namedWindow('Original (Top) and Segmented Image')
+        cv.setMouseCallback('Original (Top) and Segmented Image', self.onmouse)
+        cv.moveWindow('Original (Top) and Segmented Image', self.img.shape[1]+10,90)
 
         print(" Instructions: \n")
         print(" Draw a rectangle around the object using right mouse button \n")
 
+        initialized = False
         while(1):
-
-            cv.imshow('output', self.output)
-            cv.imshow('input', self.img)
+            images = np.vstack((self.img, self.output))
+            cv.imshow('Original (Top) and Segmented Image', images)
             k = cv.waitKey(1)
 
             # key bindings
@@ -175,6 +177,9 @@ class App():
 
             mask2 = np.where((self.mask==1) + (self.mask==3), 255, 0).astype('uint8')
             self.output = cv.bitwise_and(self.img2, self.img2, mask=mask2)
+            if initialized == False:
+                initialized = True
+                Mbox('grabcut.py', __doc__, 1)
 
         print('Done')
 
