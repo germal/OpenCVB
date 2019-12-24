@@ -346,6 +346,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Python\grabcut.py" />
+    <Content Include="Python\PyStream_Camshift.py" />
     <Content Include="Python\PyStream_Edge.py" />
     <Content Include="Python\PyStream_Digits.py" />
     <Content Include="Python\PyStream_Facedetect.py" />
@@ -373,7 +374,6 @@
     <Content Include="Python\Histogram_Plot.py" />
     <Content Include="Python\Calibrate.py" />
     <Content Include="Python\Calibrate_ShowExtrinsics.py" />
-    <Content Include="Python\Camshift_Python.py" />
     <Content Include="Python\Edges_CannyDetector.py" />
     <Content Include="Python\Brightness_Contrast_Example2.py" />
     <Content Include="Python\Coherence.py" />
