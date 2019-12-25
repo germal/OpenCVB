@@ -67,9 +67,9 @@ class App(object):
         self.img = None
         print(__doc__)
         from PyStream import PyStreamRun
-        PyStreamRun(self.run, 'PyStream_Camshift.py')
+        PyStreamRun(self.OpenCVCode, 'Camshift_PY.py')
 
-    def run(self, vis, depth_colormap):
+    def OpenCVCode(self, vis, depth_colormap):
         if self.initialized == False:
             self.both = np.empty((vis.shape[0], vis.shape[1]*2, 3), vis.dtype)
             self.img = vis

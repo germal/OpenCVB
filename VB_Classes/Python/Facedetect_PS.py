@@ -46,4 +46,4 @@ if __name__ == '__main__':
     nested = cv.CascadeClassifier(cv.samples.findFile(nested_fn))
 
     from PyStream import PyStreamRun
-    PyStreamRun(OpenCVCode, 'PyStream_Facedetect.py')
+    PyStreamRun(OpenCVCode, 'Facedetect_PS.py')

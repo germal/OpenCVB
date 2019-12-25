@@ -61,7 +61,7 @@ Public Class Python_Run : Implements IDisposable
         If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Barebones.py"
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
-        If pythonApp.Name.StartsWith("PyStream") And pythonApp.Name.EndsWith(".py") Then
+        If pythonApp.Name.EndsWith("_PS.py") Then
             pipe = New PyStream_Basics(ocvb)
         Else
             StartPython(ocvb, "")

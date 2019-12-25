@@ -19,4 +19,4 @@ cv.namedWindow('edge')
 cv.createTrackbar('thrs1', 'edge', 2000, 5000, nothing)
 cv.createTrackbar('thrs2', 'edge', 4000, 5000, nothing)
 from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'PyStream_Edge.py')
+PyStreamRun(OpenCVCode, 'Edges_Canny_PS.py')

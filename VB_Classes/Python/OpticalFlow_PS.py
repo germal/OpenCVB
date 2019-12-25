@@ -97,5 +97,5 @@ if __name__ == '__main__':
     flow = None
 
 from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'PyStream_OpticalFlow.py')
+PyStreamRun(OpenCVCode, 'OpticalFlow_PS.py')
 
