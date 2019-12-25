@@ -16,7 +16,7 @@ Public Class PyStream_Basics : Implements IDisposable
 
         ' Was this class invoked directly?  Then just run something that works with RGB and depth...
         If ocvb.PythonFileName Is Nothing Then
-            ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/PyStream_AddWeighted_Trackbar.py"
+            ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/AddWeighted_Trackbar_PS.py"
         End If
 
         memMap = New Python_MemMap(ocvb)

@@ -49,7 +49,7 @@ Module IndexMain
             line = apiOCVB.ReadLine()
             If line.EndsWith(".py") Then
                 PYnames.Add(line, line)
-                If line.StartsWith("PyStream_") Then PYStreamNames.Add(line, line)
+                If line.EndsWith("_PS.py") Then PYStreamNames.Add(line, line)
                 If line.EndsWith("_MT.py") Then MTnames.Add(line, line)
             Else
                 If line <> "" Then
@@ -76,7 +76,7 @@ Module IndexMain
                 If LCase(line).StartsWith("public class") And InStr(line, "Implements IDisposable") Then
                     classname = split(2) ' public class <classname>
                     If classname.StartsWith("Python_") Then PYnames.Add(classname, classname)
-                    If classname.StartsWith("PyStream_") Then PYStreamNames.Add(classname, classname)
+                    If classname.EndsWith("_PS.py") Then PYStreamNames.Add(classname, classname)
                     If classname.EndsWith("_MT") Then MTnames.Add(classname, classname)
                     If classname.EndsWith("_CPP") Then CPPnames.Add(classname, classname)
                     If classname.EndsWith("_CS") Then CSnames.Add(classname, classname)

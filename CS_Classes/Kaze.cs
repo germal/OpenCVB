@@ -215,32 +215,35 @@ namespace CS_Classes
                     float[] rotationRanges = { 0.0f, 360.0f };
                     int[] channels = { 0, 1 };
                     // with infrared left and right, rotation max = min and calchist fails.  Adding 1 to max enables all this to work!
-                    Rangef[] ranges = { new Rangef(scaleRanges[0], scaleRanges[1]), new Rangef(rotations.Min(), rotations.Max() + 1) };
-                    double minVal, maxVal;
-
-                    Mat[] arrs = { scalesMat, rotationsMat };
- 
-                    Cv2.CalcHist(arrs, channels, null, hist, 2, histSize, ranges);
-                    Cv2.MinMaxLoc(hist, out minVal, out maxVal);
-
-                    Cv2.Threshold(hist, hist, maxVal * 0.5, 0, ThresholdTypes.Tozero);
-                    Cv2.CalcBackProject(arrs, channels, hist, flagsMat, ranges);
-
-                    MatIndexer<float> flagsMatIndexer = flagsMat.GetIndexer();
-
-                    for (int i = 0; i < maskMat.Length; i++)
+                    if (rotations.Count > 0)
                     {
-                        if (maskMat[i] > 0)
+                        Rangef[] ranges = { new Rangef(scaleRanges[0], scaleRanges[1]), new Rangef(rotations.Min(), rotations.Max() + 1) };
+                        double minVal, maxVal;
+
+                        Mat[] arrs = { scalesMat, rotationsMat };
+
+                        Cv2.CalcHist(arrs, channels, null, hist, 2, histSize, ranges);
+                        Cv2.MinMaxLoc(hist, out minVal, out maxVal);
+
+                        Cv2.Threshold(hist, hist, maxVal * 0.5, 0, ThresholdTypes.Tozero);
+                        Cv2.CalcBackProject(arrs, channels, hist, flagsMat, ranges);
+
+                        MatIndexer<float> flagsMatIndexer = flagsMat.GetIndexer();
+
+                        for (int i = 0; i < maskMat.Length; i++)
                         {
-                            if (flagsMatIndexer[idx++] != 0.0f)
+                            if (maskMat[i] > 0)
                             {
-                                nonZeroCount++;
+                                if (flagsMatIndexer[idx++] != 0.0f)
+                                {
+                                    nonZeroCount++;
+                                }
+                                else
+                                    maskMat[i] = 0;
                             }
-                            else
-                                maskMat[i] = 0;
                         }
+                        m.CopyTo(mask);
                     }
-                    m.CopyTo(mask);
                 }
             }
             maskHandle.Free();
