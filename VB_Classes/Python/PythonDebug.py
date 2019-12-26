@@ -1,23 +1,19 @@
 #!/usr/bin/env python
 
 '''
-Lucas-Kanade homography tracker
-===============================
+Lucas-Kanade tracker
+====================
 
 Lucas-Kanade sparse optical flow demo. Uses goodFeaturesToTrack
 for track initialization and back-tracking for match verification
-between frames. Finds homography between reference and current views.
+between frames.
+
+https://github.com/opencv/opencv/blob/master/samples/python/lk_track.py
 
 Usage
 -----
-lk_homography_PS.py 
+lk_track.py
 
-
-Keys
-----
-ESC   - exit
-SPACE - start tracking
-r     - toggle RANSAC
 '''
 
 # Python 2/3 compatibility
@@ -27,76 +23,64 @@ import numpy as np
 import cv2 as cv
 import sys
 
-from common import draw_str
+from common import anorm2, draw_str
 
-lk_params = dict( winSize  = (19, 19),
+lk_params = dict( winSize  = (15, 15),
                   maxLevel = 2,
                   criteria = (cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 0.03))
 
-feature_params = dict( maxCorners = 1000,
-                       qualityLevel = 0.01,
-                       minDistance = 8,
-                       blockSize = 19 )
-
-def checkedTrace(img0, img1, p0, back_threshold = 1.0):
-    p1, _st, _err = cv.calcOpticalFlowPyrLK(img0, img1, p0, None, **lk_params)
-    p0r, _st, _err = cv.calcOpticalFlowPyrLK(img1, img0, p1, None, **lk_params)
-    d = abs(p0-p0r).reshape(-1, 2).max(-1)
-    status = d < back_threshold
-    return p1, status
-
-green = (0, 255, 0)
-red = (0, 0, 255)
+feature_params = dict( maxCorners = 500,
+                       qualityLevel = 0.3,
+                       minDistance = 7,
+                       blockSize = 7 )
 
 class App:
     def Open(self):
-        self.p0 = None
-        self.use_ransac = True
+        self.track_len = 10
+        self.detect_interval = 5
+        self.tracks = []
+        self.frame_idx = 0
         print(__doc__)
         from PyStream import PyStreamRun
-        PyStreamRun(self.OpenCVCode, 'lk_homography_PS.py')
+        PyStreamRun(self.OpenCVCode, 'lk_track_PS.py')
 
     def OpenCVCode(self, frame, depth_colormap):
-            frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-            vis = frame.copy()
-            if self.p0 is not None:
-                p2, trace_status = checkedTrace(self.gray1, frame_gray, self.p1)
+        frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        vis = frame.copy()
 
-                self.p1 = p2[trace_status].copy()
-                self.p0 = self.p0[trace_status].copy()
-                self.gray1 = frame_gray
+        if len(self.tracks) > 0:
+            img0, img1 = self.prev_gray, frame_gray
+            p0 = np.float32([tr[-1] for tr in self.tracks]).reshape(-1, 1, 2)
+            p1, _st, _err = cv.calcOpticalFlowPyrLK(img0, img1, p0, None, **lk_params)
+            p0r, _st, _err = cv.calcOpticalFlowPyrLK(img1, img0, p1, None, **lk_params)
+            d = abs(p0-p0r).reshape(-1, 2).max(-1)
+            good = d < 1
+            new_tracks = []
+            for tr, (x, y), good_flag in zip(self.tracks, p1.reshape(-1, 2), good):
+                if not good_flag:
+                    continue
+                tr.append((x, y))
+                if len(tr) > self.track_len:
+                    del tr[0]
+                new_tracks.append(tr)
+                cv.circle(vis, (x, y), 2, (0, 255, 0), -1)
+            self.tracks = new_tracks
+            cv.polylines(vis, [np.int32(tr) for tr in self.tracks], False, (0, 255, 0))
+            draw_str(vis, (20, 20), 'track count: %d' % len(self.tracks))
 
-                if len(self.p0) < 4:
-                    self.p0 = None
-                    exit
-                H, status = cv.findHomography(self.p0, self.p1, (0, cv.RANSAC)[self.use_ransac], 10.0)
-                h, w = frame.shape[:2]
-                overlay = cv.warpPerspective(self.frame0, H, (w, h))
-                vis = cv.addWeighted(vis, 0.5, overlay, 0.5, 0.0)
+        if self.frame_idx % self.detect_interval == 0:
+            mask = np.zeros_like(frame_gray)
+            mask[:] = 255
+            for x, y in [np.int32(tr[-1]) for tr in self.tracks]:
+                cv.circle(mask, (x, y), 5, 0, -1)
+            p = cv.goodFeaturesToTrack(frame_gray, mask = mask, **feature_params)
+            if p is not None:
+                for x, y in np.float32(p).reshape(-1, 2):
+                    self.tracks.append([(x, y)])
 
-                for (x0, y0), (x1, y1), good in zip(self.p0[:,0], self.p1[:,0], status[:,0]):
-                    if good:
-                        cv.line(vis, (x0, y0), (x1, y1), (0, 128, 0))
-                    cv.circle(vis, (x1, y1), 2, (red, green)[good], -1)
-                draw_str(vis, (20, 20), 'track count: %d' % len(self.p1))
-                if self.use_ransac:
-                    draw_str(vis, (20, 40), 'RANSAC')
-            else:
-                p = cv.goodFeaturesToTrack(frame_gray, **feature_params)
-                if p is not None:
-                    for x, y in p[:,0]:
-                        cv.circle(vis, (x, y), 2, green, -1)
-                    draw_str(vis, (20, 20), 'feature count: %d' % len(p))
 
-            cv.imshow('lk_homography', vis)
-            if ch == ord(' '):
-                self.frame0 = frame.copy()
-                self.p0 = cv.goodFeaturesToTrack(frame_gray, **feature_params)
-                if self.p0 is not None:
-                    self.p1 = self.p0
-                    self.gray0 = frame_gray
-                    self.gray1 = frame_gray
-            if ch == ord('r'):
-                self.use_ransac = not self.use_ransac
+        self.frame_idx += 1
+        self.prev_gray = frame_gray
+        cv.imshow('lk_track', vis)
 
 App().Open()
