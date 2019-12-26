@@ -349,6 +349,9 @@
     <Content Include="Python\kalman_TinyEKF.py" />
     <Content Include="Python\Camshift_PS.py" />
     <Content Include="Python\Edges_Canny_PS.py" />
+    <Content Include="Python\lk_homography_PS.py" />
+    <Content Include="Python\lk_track_PS.py" />
+    <Content Include="Python\logpolar.py" />
     <Content Include="Python\SVM_Digits_PS.py" />
     <Content Include="Python\Facedetect_PS.py" />
     <Content Include="Python\Laplacian_PyramidFilter_PS.py" />
@@ -359,7 +362,6 @@
     <Content Include="Python\Histogram_Color_PS.py" />
     <Content Include="Python\Gabor_Filter.py" />
     <Content Include="Python\GradientDescent.py" />
-    <Content Include="Python\Kalman_EKF.py" />
     <Content Include="Python\KAZE_match.py" />
     <Content Include="Python\Depth_RGB_PS.py" />
     <Content Include="Python\Python_SurfaceBlitOld.py" />

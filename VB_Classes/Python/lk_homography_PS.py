@@ -8,14 +8,15 @@ Lucas-Kanade sparse optical flow demo. Uses goodFeaturesToTrack
 for track initialization and back-tracking for match verification
 between frames. Finds homography between reference and current views.
 
+https://github.com/opencv/opencv/blob/master/samples/python/lk_homography.py
+
 Usage
 -----
-lk_homography.py [<video_source>]
+lk_homography_PS.py 
 
 
 Keys
 ----
-ESC   - exit
 SPACE - start tracking
 r     - toggle RANSAC
 '''
@@ -25,10 +26,9 @@ from __future__ import print_function
 
 import numpy as np
 import cv2 as cv
+import sys
 
-import video
 from common import draw_str
-from video import presets
 
 lk_params = dict( winSize  = (19, 19),
                   maxLevel = 2,
@@ -50,14 +50,14 @@ green = (0, 255, 0)
 red = (0, 0, 255)
 
 class App:
-    def __init__(self, video_src):
-        self.cam = self.cam = video.create_capture(video_src, presets['book'])
+    def Open(self):
         self.p0 = None
         self.use_ransac = True
+        print(__doc__)
+        from PyStream import PyStreamRun
+        PyStreamRun(self.OpenCVCode, 'lk_homography_PS.py')
 
-    def run(self):
-        while True:
-            _ret, frame = self.cam.read()
+    def OpenCVCode(self, frame, depth_colormap):
             frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
             vis = frame.copy()
             if self.p0 is not None:
@@ -69,7 +69,7 @@ class App:
 
                 if len(self.p0) < 4:
                     self.p0 = None
-                    continue
+                    exit
                 H, status = cv.findHomography(self.p0, self.p1, (0, cv.RANSAC)[self.use_ransac], 10.0)
                 h, w = frame.shape[:2]
                 overlay = cv.warpPerspective(self.frame0, H, (w, h))
@@ -90,10 +90,7 @@ class App:
                     draw_str(vis, (20, 20), 'feature count: %d' % len(p))
 
             cv.imshow('lk_homography', vis)
-
             ch = cv.waitKey(1)
-            if ch == 27:
-                break
             if ch == ord(' '):
                 self.frame0 = frame.copy()
                 self.p0 = cv.goodFeaturesToTrack(frame_gray, **feature_params)
@@ -104,20 +101,4 @@ class App:
             if ch == ord('r'):
                 self.use_ransac = not self.use_ransac
 
-
-
-def main():
-    import sys
-    try:
-        video_src = sys.argv[1]
-    except:
-        video_src = 0
-
-    App(video_src).run()
-    print('Done')
-
-
-if __name__ == '__main__':
-    print(__doc__)
-    main()
-    cv.destroyAllWindows()
+App().Open()
