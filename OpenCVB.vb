@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
+Imports System.Runtime.InteropServices
 Imports System.IO
 Imports System.ComponentModel
 Imports System.Threading
@@ -52,6 +53,24 @@ Public Class OpenCVB
     Dim textDesc As String = ""
     Dim externalInvocation As Boolean
     Dim HomeDir As DirectoryInfo
+    <System.Runtime.InteropServices.DllImport("user32.dll")>
+    Public Shared Function GetCursorPos(ByRef point As System.Drawing.Point) As Boolean
+    End Function
+
+    <DllImport("user32.dll")>
+    Private Shared Function GetForegroundWindow() As IntPtr
+    End Function
+
+    <DllImport("user32.dll")>
+    Private Shared Function GetWindowRect(hWnd As IntPtr, ByRef rect As Rect) As IntPtr
+    End Function
+    <StructLayout(LayoutKind.Sequential)>
+    Private Structure Rect
+        Public Left As Integer
+        Public Top As Integer
+        Public Right As Integer
+        Public Bottom As Integer
+    End Structure
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         HomeDir = New DirectoryInfo(CurDir() + "\..\..\") ' running in OpenCVB/bin/Debug mostly...
@@ -480,24 +499,26 @@ Public Class OpenCVB
         End Try
     End Sub
 
-    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
         Dim res() As String = GetType(OpenCVB).Assembly.GetManifestResourceNames()
         If pauseUpdates Then
             pauseUpdates = False
-            ToolStripButton1.Image = New System.Drawing.Bitmap(GetType(OpenCVB).Assembly.GetManifestResourceStream(res(3)))
+            PausePlayButton.Image = New System.Drawing.Bitmap(GetType(OpenCVB).Assembly.GetManifestResourceStream(res(3)))
         Else
             pauseUpdates = True
-            ToolStripButton1.Image = New System.Drawing.Bitmap(GetType(OpenCVB).Assembly.GetManifestResourceStream(res(4)))
+            PausePlayButton.Image = New System.Drawing.Bitmap(GetType(OpenCVB).Assembly.GetManifestResourceStream(res(4)))
         End If
     End Sub
-    Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles testAllButton.Click
-        If testAllButton.Text = "Test All" Then
-            testAllButton.Text = "Stop Test"
+    Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
+        If TestAllButton.Text = "Test All" Then
+            TestAllButton.Text = "Stop Test"
+            TestAllButton.Image = Image.FromFile("../../Data/StopTest.png")
             TestAllTimer_Tick(sender, e)
             TestAllTimer.Enabled = True
         Else
             TestAllTimer.Enabled = False
-            testAllButton.Text = "Test All"
+            TestAllButton.Text = "Test All"
+            TestAllButton.Image = Image.FromFile("../../Data/testall.png")
         End If
     End Sub
     Private Sub opencvkeyword_dropdown(sender As Object, e As EventArgs) Handles OpenCVkeyword.DropDown
@@ -542,7 +563,7 @@ Public Class OpenCVB
     End Sub
     Private Sub ActivateTimer_Tick(sender As Object, e As EventArgs) Handles ActivateTimer.Tick
         ActivateTimer.Enabled = False
-        If testAllButton.Text <> "Stop Test" Then Me.Activate()
+        If TestAllButton.Text <> "Stop Test" Then Me.Activate()
         RefreshAvailable = True
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
@@ -569,6 +590,33 @@ Public Class OpenCVB
         picLabels(0) = "Input " + details
         picLabels(1) = "Depth " + details
     End Sub
+
+    Private Sub SnapShotButton_Click(sender As Object, e As EventArgs) Handles SnapShotButton.Click
+        'Dim graph As Graphics = Nothing
+        'Try
+        '    Dim bmp As Bitmap = New Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height)
+        '    graph = Graphics.FromImage(bmp)
+        '    graph.CopyFromScreen(0, 0, 0, 0, bmp.Size)
+        'Finally
+        '    graph.Dispose()
+        'End Try
+
+        'Dim screenImg As Screen = Screen.GetWorkingArea()
+        'Dim img As New Bitmap(screenImg.Bounds.Width, screenImg.Bounds.Height)
+        'Dim foregroundWindowsHandle = GetForegroundWindow()
+        'Dim rect = New Rect()
+        'GetWindowRect(foregroundWindowsHandle, rect)
+        'Dim gr As Graphics = Graphics.FromImage(img)
+        'gr.CopyFromScreen(screenImg.Bounds.Location, Point.Empty, screenImg.Bounds.Size)
+
+        Dim img As New Bitmap(Me.Width, Me.Height)
+        Me.DrawToBitmap(img, New Rectangle(0, 0, Me.Width, Me.Height))
+
+        Dim m = cv.Extensions.BitmapConverter.ToMat(img)
+        ' Dim r As New cv.Rect(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top)
+        cv.Cv2.ImShow("m", m)
+    End Sub
+
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopAlgorithmThread = True
         textDesc = ""
@@ -614,7 +662,7 @@ Public Class OpenCVB
         parms.imuGyro = camera.imuGyro
         parms.imuAccel = camera.imuAccel
         parms.imuTimeStamp = camera.imuTimeStamp
-        parms.testAllRunning = testAllButton.Text = "Stop Test"
+        parms.testAllRunning = TestAllButton.Text = "Stop Test"
         parms.externalInvocation = externalInvocation
         If parms.testAllRunning Then parms.ShowOptions = optionsForm.ShowOptions.Checked Else parms.ShowOptions = True ' always show options when not running 'test all'
         parms.ShowConsoleLog = optionsForm.ShowConsoleLog.Checked
@@ -627,7 +675,7 @@ Public Class OpenCVB
 
         AlgorithmDesc.Text = ""
         Dim res() As String = GetType(OpenCVB).Assembly.GetManifestResourceNames()
-        ToolStripButton1.Image = New System.Drawing.Bitmap(GetType(OpenCVB).Assembly.GetManifestResourceStream(res(3)))
+        PausePlayButton.Image = New System.Drawing.Bitmap(GetType(OpenCVB).Assembly.GetManifestResourceStream(res(3)))
 
         While frameCount <> 0 ' previous thread must exit...
             Application.DoEvents()
@@ -635,7 +683,7 @@ Public Class OpenCVB
         algorithmThread = New Thread(AddressOf AlgorithmTask)
         algorithmThread.Start(parms)
     End Sub
-    Private Sub Options_Click(sender As Object, e As EventArgs) Handles Options.Click
+    Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
         pauseUpdates = True
         optionsForm.IntelCamera.Enabled = intelCamera.deviceCount > 0
         optionsForm.Kinect4Azure.Enabled = kinectCamera.deviceCount > 0
