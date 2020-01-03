@@ -466,8 +466,10 @@ Public Class OpenCVB
                 If formColor IsNot Nothing Then
                     cvext.BitmapConverter.ToBitmap(formColor, camPic(0).Image)
                     cvext.BitmapConverter.ToBitmap(formDepRGB, camPic(1).Image)
-                    cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
-                    cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
+                    If cameraframeCount = 0 Then
+                        cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
+                        cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
+                    End If
                 End If
                 Dim pic = DirectCast(sender, PictureBox)
                 g.ScaleTransform(1, 1)
@@ -569,14 +571,15 @@ Public Class OpenCVB
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastFrame
-        Dim countFrames = cameraframeCount - lastFrame
+        Dim fcount = cameraframeCount ' frameCount ' cameraframecount
+        Dim countFrames = fcount - lastFrame
         Dim fps As Single = countFrames / (fpsTimer.Interval / 1000)
 
         Dim activeCameraName As String
         If optionsForm.IntelCamera.Checked Then activeCameraName = intelCamera.deviceName Else activeCameraName = kinectCamera.deviceName
         Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - fps = " +
                   Format(fps, "#0.0") + " " + activeCameraName
-        lastFrame = cameraframeCount
+        lastFrame = fcount
         If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
     End Sub
     Private Sub saveLayout()
@@ -663,8 +666,8 @@ Public Class OpenCVB
         While frameCount <> 0 ' previous thread must exit...
             Application.DoEvents()
         End While
-        ' algorithmThread = New Thread(AddressOf CameraTask)
-        algorithmThread = New Thread(AddressOf AlgorithmTask) ' RGBDepthTask
+        algorithmThread = New Thread(AddressOf CameraTask)
+        ' algorithmThread = New Thread(AddressOf AlgorithmTask)
         algorithmThread.Start(parms)
     End Sub
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
