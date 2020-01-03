@@ -23,6 +23,7 @@ Public Class OpenCVB
     Dim drawRect As New cv.Rect(0, 0, 0, 0)
 
     Dim frameCount As Int32
+    Dim cameraframeCount As Int32
     Dim algorithmThread As Thread = Nothing
     Dim stopAlgorithmThread As Boolean
     Dim pauseUpdates As Boolean
@@ -568,15 +569,14 @@ Public Class OpenCVB
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastFrame
-        Dim countFrames = frameCount - lastFrame
-        If countFrames < 0 Then countFrames = frameCount ' started a new algorithm!
+        Dim countFrames = cameraframeCount - lastFrame
         Dim fps As Single = countFrames / (fpsTimer.Interval / 1000)
 
         Dim activeCameraName As String
         If optionsForm.IntelCamera.Checked Then activeCameraName = intelCamera.deviceName Else activeCameraName = kinectCamera.deviceName
         Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - fps = " +
                   Format(fps, "#0.0") + " " + activeCameraName
-        lastFrame = frameCount
+        lastFrame = cameraframeCount
         If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
     End Sub
     Private Sub saveLayout()
@@ -600,6 +600,7 @@ Public Class OpenCVB
     End Sub
 
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        Application.DoEvents()
         stopAlgorithmThread = True
         textDesc = ""
         saveLayout()
@@ -662,7 +663,8 @@ Public Class OpenCVB
         While frameCount <> 0 ' previous thread must exit...
             Application.DoEvents()
         End While
-        algorithmThread = New Thread(AddressOf AlgorithmTask)
+        ' algorithmThread = New Thread(AddressOf CameraTask)
+        algorithmThread = New Thread(AddressOf AlgorithmTask) ' RGBDepthTask
         algorithmThread.Start(parms)
     End Sub
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
@@ -698,9 +700,10 @@ Public Class OpenCVB
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
         drawRect = New cv.Rect(0, 0, 0, 0)
         Dim saveFastProc As Boolean = parms.fastProcessing
-        Dim OpenCVB = New VB_Classes.ActiveClass(parms)
+        Dim OpenCVB = New VB_Classes.ActiveClass(parms, cameraTask:=False)
         textDesc = OpenCVB.ocvb.desc
-        ' some algorithms need to turn off the fastprocessing (OpenGL apps usually run at full resolution.)  Check to see if it changed here and setup related settings.
+        ' some algorithms need to turn off the fastprocessing (OpenGL apps run at full resolution.)  
+        ' Here we check to see if the algorithm constructor changed fastprocessing.
         If OpenCVB.ocvb.parms.fastProcessing <> saveFastProc Then
             If OpenCVB.ocvb.parms.fastProcessing Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
             OpenCVB.ocvb.parms.width = regWidth / OpenCVB.ocvb.parms.speedFactor
@@ -732,7 +735,7 @@ Public Class OpenCVB
             Application.DoEvents() ' this will permit any options forms in the algorithm thread to get updated and the pull-downs in the main thread to react quickly.
             If stopAlgorithmThread Then Exit While
             If pauseUpdates Then Continue While
-            If Me.Visible Then
+            If Me.Visible And Me.IsDisposed = False Then
                 Me.Invoke(
                     Sub()
                         Me.Refresh()
@@ -800,7 +803,6 @@ Public Class OpenCVB
                             End If
                         Next
                     End SyncLock
-                    If Me.IsDisposed Then Exit While
                     If OptionsBringToFront And TestAllTimer.Enabled = False Then
                         Try
                             For Each frm In Application.OpenForms
@@ -816,6 +818,7 @@ Public Class OpenCVB
                         OptionsBringToFront = False
                     End If
                 End If
+                If Me.IsDisposed Then Exit While
             Catch ex As Exception
                 ' MsgBox("hit error = '" + ex.Message + "' in algorithmThread.  Select algorithm again to restart.")
                 Exit While
@@ -826,6 +829,66 @@ Public Class OpenCVB
         End While
         OpenCVB.Dispose()
         frameCount = 0
+    End Sub
+    Private Sub CameraTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
+        drawRect = New cv.Rect(0, 0, 0, 0)
+        Dim OpenCVB = New VB_Classes.ActiveClass(parms, cameraTask:=True)
+        Dim camera As Object = Nothing
+        If parms.UsingIntelCamera Then camera = intelCamera Else camera = kinectCamera
+
+        stopAlgorithmThread = False
+        cameraframeCount = 0
+        While 1
+            If stopAlgorithmThread Then Exit While
+            If pauseUpdates Then Continue While
+            If Me.Visible And Me.IsDisposed = False Then
+                Me.Invoke(
+                    Sub()
+                        Me.Refresh()
+                    End Sub
+                )
+            End If
+
+            camera.GetNextFrame()
+            If camera.color Is Nothing Then Continue While ' at startup it may not be ready...
+            OpenCVB.ocvb.pointCloud = camera.pointCloud ' the point cloud is never resized.
+            If parms.fastProcessing Then
+                OpenCVB.ocvb.color = camera.color.Resize(New cv.Size(regWidth / 2, regHeight / 2))
+                OpenCVB.ocvb.depthRGB = camera.depthRGB.Resize(New cv.Size(regWidth / 2, regHeight / 2))
+                OpenCVB.ocvb.depth = camera.depth.Resize(New cv.Size(regWidth / 2, regHeight / 2))
+                OpenCVB.ocvb.disparity = camera.disparity.Resize(New cv.Size(regWidth / 2, regHeight / 2))
+                OpenCVB.ocvb.redLeft = camera.redLeft.Resize(New cv.Size(regWidth / 2, regHeight / 2))
+                OpenCVB.ocvb.redRight = camera.redRight.Resize(New cv.Size(regWidth / 2, regHeight / 2))
+            Else
+                OpenCVB.ocvb.color = camera.color
+                OpenCVB.ocvb.depthRGB = camera.depthRGB
+                OpenCVB.ocvb.depth = camera.depth
+                OpenCVB.ocvb.disparity = camera.disparity
+                OpenCVB.ocvb.redLeft = camera.redLeft
+                OpenCVB.ocvb.redRight = camera.redRight
+            End If
+
+            Try
+                If GrabRectangleData Then
+                    GrabRectangleData = False
+                    Dim ratio = camPic(0).Width / OpenCVB.ocvb.color.Width ' relative size of displayed image and algorithm size image.
+                    OpenCVB.ocvb.drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
+                    BothFirstAndLastReady = False
+                End If
+
+                If RefreshAvailable Then
+                    SyncLock camPic
+                        formColor = OpenCVB.ocvb.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
+                        formDepRGB = OpenCVB.ocvb.depthRGB.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
+                    End SyncLock
+                End If
+                If Me.IsDisposed Then Exit While
+            Catch ex As Exception
+                Exit While
+            End Try
+            cameraframeCount += 1
+        End While
+        OpenCVB.Dispose()
     End Sub
 End Class
 
