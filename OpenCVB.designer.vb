@@ -25,10 +25,10 @@ Partial Class OpenCVB
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OpenCVB))
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
-        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
-        Me.testAllButton = New System.Windows.Forms.ToolStripButton()
-        Me.Options = New System.Windows.Forms.ToolStripButton()
-        Me.RecordButton = New System.Windows.Forms.ToolStripButton()
+        Me.PausePlayButton = New System.Windows.Forms.ToolStripButton()
+        Me.OptionsButton = New System.Windows.Forms.ToolStripButton()
+        Me.TestAllButton = New System.Windows.Forms.ToolStripButton()
+        Me.SnapShotButton = New System.Windows.Forms.ToolStripButton()
         Me.AvailableAlgorithms = New System.Windows.Forms.ComboBox()
         Me.TestAllTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ActivateTimer = New System.Windows.Forms.Timer(Me.components)
@@ -36,6 +36,7 @@ Partial Class OpenCVB
         Me.AlgorithmDesc = New System.Windows.Forms.Label()
         Me.OpenCVkeyword = New System.Windows.Forms.ComboBox()
         Me.RestartCameraTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -43,54 +44,61 @@ Partial Class OpenCVB
         '
         Me.ToolStrip1.AutoSize = False
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.testAllButton, Me.Options, Me.RecordButton})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.SnapShotButton})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1779, 40)
+        Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1779, 58)
         Me.ToolStrip1.TabIndex = 0
         Me.ToolStrip1.Text = "ToolStrip1"
         '
-        'ToolStripButton1
+        'PausePlayButton
         '
-        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
-        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(34, 35)
-        Me.ToolStripButton1.Text = "ToolStripButton1"
+        Me.PausePlayButton.AutoToolTip = False
+        Me.PausePlayButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.PausePlayButton.Image = CType(resources.GetObject("PausePlayButton.Image"), System.Drawing.Image)
+        Me.PausePlayButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.PausePlayButton.Name = "PausePlayButton"
+        Me.PausePlayButton.Size = New System.Drawing.Size(34, 53)
+        Me.PausePlayButton.Text = "PausePlay"
+        Me.PausePlayButton.ToolTipText = "Pause/Play"
         '
-        'testAllButton
+        'OptionsButton
         '
-        Me.testAllButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
-        Me.testAllButton.Image = CType(resources.GetObject("testAllButton.Image"), System.Drawing.Image)
-        Me.testAllButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.testAllButton.Name = "testAllButton"
-        Me.testAllButton.Size = New System.Drawing.Size(71, 35)
-        Me.testAllButton.Text = "Test All"
+        Me.OptionsButton.AutoToolTip = False
+        Me.OptionsButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.OptionsButton.Image = CType(resources.GetObject("OptionsButton.Image"), System.Drawing.Image)
+        Me.OptionsButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.OptionsButton.Name = "OptionsButton"
+        Me.OptionsButton.Size = New System.Drawing.Size(34, 53)
+        Me.OptionsButton.Text = "Options"
+        Me.OptionsButton.ToolTipText = "Camera Settings and Global Options"
         '
-        'Options
+        'TestAllButton
         '
-        Me.Options.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
-        Me.Options.Image = CType(resources.GetObject("Options.Image"), System.Drawing.Image)
-        Me.Options.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.Options.Name = "Options"
-        Me.Options.Size = New System.Drawing.Size(80, 35)
-        Me.Options.Text = "Options"
+        Me.TestAllButton.AutoToolTip = False
+        Me.TestAllButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.TestAllButton.Image = CType(resources.GetObject("TestAllButton.Image"), System.Drawing.Image)
+        Me.TestAllButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.TestAllButton.Name = "TestAllButton"
+        Me.TestAllButton.Size = New System.Drawing.Size(34, 53)
+        Me.TestAllButton.Text = "Test All"
+        Me.TestAllButton.ToolTipText = "Test each algorithm in succession"
         '
-        'RecordButton
+        'SnapShotButton
         '
-        Me.RecordButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
-        Me.RecordButton.Image = CType(resources.GetObject("RecordButton.Image"), System.Drawing.Image)
-        Me.RecordButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.RecordButton.Name = "RecordButton"
-        Me.RecordButton.Size = New System.Drawing.Size(71, 35)
-        Me.RecordButton.Text = "Record"
-        Me.RecordButton.Visible = False
+        Me.SnapShotButton.AutoToolTip = False
+        Me.SnapShotButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.SnapShotButton.Image = CType(resources.GetObject("SnapShotButton.Image"), System.Drawing.Image)
+        Me.SnapShotButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.SnapShotButton.Name = "SnapShotButton"
+        Me.SnapShotButton.Size = New System.Drawing.Size(34, 53)
+        Me.SnapShotButton.Text = "Snapshot"
         '
         'AvailableAlgorithms
         '
         Me.AvailableAlgorithms.FormattingEnabled = True
-        Me.AvailableAlgorithms.Location = New System.Drawing.Point(218, 3)
+        Me.AvailableAlgorithms.Location = New System.Drawing.Point(194, 12)
         Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
         Me.AvailableAlgorithms.Size = New System.Drawing.Size(354, 28)
         Me.AvailableAlgorithms.TabIndex = 1
@@ -110,7 +118,7 @@ Partial Class OpenCVB
         '
         Me.AlgorithmDesc.AutoSize = True
         Me.AlgorithmDesc.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.AlgorithmDesc.Location = New System.Drawing.Point(912, 6)
+        Me.AlgorithmDesc.Location = New System.Drawing.Point(888, 15)
         Me.AlgorithmDesc.Name = "AlgorithmDesc"
         Me.AlgorithmDesc.Size = New System.Drawing.Size(119, 22)
         Me.AlgorithmDesc.TabIndex = 2
@@ -119,7 +127,7 @@ Partial Class OpenCVB
         'OpenCVkeyword
         '
         Me.OpenCVkeyword.FormattingEnabled = True
-        Me.OpenCVkeyword.Location = New System.Drawing.Point(578, 3)
+        Me.OpenCVkeyword.Location = New System.Drawing.Point(554, 12)
         Me.OpenCVkeyword.Name = "OpenCVkeyword"
         Me.OpenCVkeyword.Size = New System.Drawing.Size(328, 28)
         Me.OpenCVkeyword.TabIndex = 3
@@ -132,7 +140,7 @@ Partial Class OpenCVB
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1779, 1411)
+        Me.ClientSize = New System.Drawing.Size(1779, 1062)
         Me.Controls.Add(Me.OpenCVkeyword)
         Me.Controls.Add(Me.AlgorithmDesc)
         Me.Controls.Add(Me.AvailableAlgorithms)
@@ -148,14 +156,15 @@ Partial Class OpenCVB
 
     Friend WithEvents ToolStrip1 As ToolStrip
     Friend WithEvents AvailableAlgorithms As ComboBox
-    Friend WithEvents testAllButton As ToolStripButton
+    Friend WithEvents TestAllButton As ToolStripButton
     Friend WithEvents TestAllTimer As Timer
     Friend WithEvents ActivateTimer As Timer
     Friend WithEvents fpsTimer As Timer
     Friend WithEvents AlgorithmDesc As Label
-    Friend WithEvents Options As ToolStripButton
-    Friend WithEvents ToolStripButton1 As ToolStripButton
-    Friend WithEvents RecordButton As ToolStripButton
+    Friend WithEvents OptionsButton As ToolStripButton
+    Friend WithEvents PausePlayButton As ToolStripButton
+    Friend WithEvents SnapShotButton As ToolStripButton
     Friend WithEvents OpenCVkeyword As ComboBox
     Friend WithEvents RestartCameraTimer As Timer
+    Friend WithEvents ToolTip1 As ToolTip
 End Class

@@ -191,8 +191,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="PauseButton.png" />
-    <EmbeddedResource Include="PauseButtonRun.png" />
+    <EmbeddedResource Include="Data/PauseButton.png" />
+    <EmbeddedResource Include="Data/PauseButtonRun.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="realsense2.dll" />
