@@ -20,6 +20,7 @@ if PY3:
 
 import numpy as np
 import cv2 as cv
+title_window = 'Kalman.py'
 
 from math import cos, sin, sqrt
 import numpy as np

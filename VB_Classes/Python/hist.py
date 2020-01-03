@@ -20,6 +20,7 @@ from __future__ import print_function
 
 import numpy as np
 import cv2 as cv
+title_window = 'Hist.py'
 
 bins = np.arange(256).reshape(256,1)
 

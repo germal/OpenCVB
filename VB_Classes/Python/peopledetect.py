@@ -14,7 +14,7 @@ from __future__ import print_function
 
 import numpy as np
 import cv2 as cv
-
+title_window = 'Peopledetect.py'
 
 def inside(r, q):
     rx, ry, rw, rh = r

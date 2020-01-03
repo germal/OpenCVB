@@ -2,6 +2,7 @@ from __future__ import print_function
 import cv2 as cv
 import argparse
 import numpy as np
+title_window = 'EqualizedHist_Demo.py'
 
 ## [Load image]
 parser = argparse.ArgumentParser(description='Code for Histogram Equalization tutorial.')

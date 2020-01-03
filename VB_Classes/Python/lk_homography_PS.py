@@ -27,6 +27,7 @@ from __future__ import print_function
 import numpy as np
 import cv2 as cv
 import sys
+title_window = 'lk_homography_PS.py'
 
 from common import draw_str
 

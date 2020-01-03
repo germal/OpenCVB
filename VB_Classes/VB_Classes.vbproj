@@ -386,7 +386,6 @@
     <Content Include="Python\Harris_Detector_Demo.py" />
     <Content Include="Python\Harris_Corners.py" />
     <Content Include="Python\Corners_SubPix_Demo.py" />
-    <Content Include="Python\OpenCV_API_Coverage.py" />
     <Content Include="Python\MotionBlurDeblur.py" />
     <Content Include="Python\DFT_Example1.py" />
     <Content Include="Python\Digits_SVM_KNearest.py" />

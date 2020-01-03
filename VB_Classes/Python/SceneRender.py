@@ -8,6 +8,7 @@ import numpy as np
 from numpy import pi, sin, cos
 
 import cv2 as cv
+title_window = 'SceneRender.py'
 
 defaultSize = 512
 

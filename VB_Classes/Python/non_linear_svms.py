@@ -2,6 +2,7 @@ from __future__ import print_function
 import cv2 as cv
 import numpy as np
 import random as rng
+title_window = 'Non_linear_svms.py'
 
 NTRAINING_SAMPLES = 100 # Number of training samples per class
 FRAC_LINEAR_SEP = 0.9   # Fraction of samples which compose the linear separable part

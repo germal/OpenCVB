@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+title_window = 'Hough_example1.py'
 
 img = cv.imread(cv.samples.findFile('PythonData/sudoku.png'))
 gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)

@@ -29,6 +29,7 @@ import cv2 as cv
 import os, time
 import psutil
 from time import sleep
+title_window = 'Camshift_PS.py'
 
 class App(object):
     def onmouse(self, event, x, y, flags, param):

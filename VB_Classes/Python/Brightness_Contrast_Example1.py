@@ -3,6 +3,7 @@ from builtins import input
 import cv2 as cv
 import numpy as np
 import argparse
+title_window = 'Brightness_Contrast_Example1.py'
 
 # Read image given by user
 ## [basic-linear-transform-load]

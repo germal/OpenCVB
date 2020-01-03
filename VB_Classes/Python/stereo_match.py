@@ -11,6 +11,7 @@ from __future__ import print_function
 
 import numpy as np
 import cv2 as cv
+title_window = 'Stereo_match.py'
 
 ply_header = '''ply
 format ascii 1.0

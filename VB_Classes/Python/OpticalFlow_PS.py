@@ -1,6 +1,7 @@
 import numpy as np
 import cv2 as cv
 import sys
+title_window = 'OpticalFlow_PS.py'
 
 def set_ShowHSV(val):
     global show_hsv 

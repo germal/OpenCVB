@@ -26,6 +26,7 @@ Usage:
 
 # Python 2/3 compatibility
 from __future__ import print_function
+title_window = 'Digits_SVM_KNearest_adjust.py'
 
 import numpy as np
 import cv2 as cv

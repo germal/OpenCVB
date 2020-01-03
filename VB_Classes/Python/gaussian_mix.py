@@ -10,6 +10,7 @@ if PY3:
 
 import numpy as np
 import cv2 as cv
+title_window = 'Gaussian_mix.py'
 
 from numpy import random
 

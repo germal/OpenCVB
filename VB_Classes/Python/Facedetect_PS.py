@@ -4,6 +4,7 @@ import sys, getopt
 
 # local modules
 from common import clock, draw_str
+title_window = 'Facedetect_PS.py'
 
 def detect(img, cascade):
     rects = cascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=10, minSize=(20, 20),

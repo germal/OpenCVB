@@ -9,6 +9,7 @@ import array
 import argparse
 import cv2 as cv
 import numpy as np
+title_window = 'Python_SurfaceBlitOld.py'
 import ctypes
 import os, time, sys
 from time import sleep

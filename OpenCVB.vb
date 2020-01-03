@@ -592,28 +592,10 @@ Public Class OpenCVB
     End Sub
 
     Private Sub SnapShotButton_Click(sender As Object, e As EventArgs) Handles SnapShotButton.Click
-        'Dim graph As Graphics = Nothing
-        'Try
-        '    Dim bmp As Bitmap = New Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height)
-        '    graph = Graphics.FromImage(bmp)
-        '    graph.CopyFromScreen(0, 0, 0, 0, bmp.Size)
-        'Finally
-        '    graph.Dispose()
-        'End Try
-
-        'Dim screenImg As Screen = Screen.GetWorkingArea()
-        'Dim img As New Bitmap(screenImg.Bounds.Width, screenImg.Bounds.Height)
-        'Dim foregroundWindowsHandle = GetForegroundWindow()
-        'Dim rect = New Rect()
-        'GetWindowRect(foregroundWindowsHandle, rect)
-        'Dim gr As Graphics = Graphics.FromImage(img)
-        'gr.CopyFromScreen(screenImg.Bounds.Location, Point.Empty, screenImg.Bounds.Size)
-
         Dim img As New Bitmap(Me.Width, Me.Height)
         Me.DrawToBitmap(img, New Rectangle(0, 0, Me.Width, Me.Height))
 
         Dim m = cv.Extensions.BitmapConverter.ToMat(img)
-        ' Dim r As New cv.Rect(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top)
         cv.Cv2.ImShow("m", m)
     End Sub
 

@@ -35,6 +35,7 @@ import itertools as it
 
 # local modules
 from common import draw_str
+title_window = 'Fitline.py'
 
 
 w, h = 512, 256

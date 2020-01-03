@@ -1,5 +1,6 @@
 import numpy as np
 import cv2 as cv
+title_window = 'Histogram_Color_PS.py'
  
 # built-in modules
 import sys
