@@ -83,10 +83,8 @@ Public Class xPhoto_OilPaint_CPP : Implements IDisposable
         radio.check(0).Checked = True
         If ocvb.parms.ShowOptions Then radio.show()
 
-        ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
-
         xPhoto_OilPaint = xPhoto_OilPaint_Open()
-        ocvb.desc = "Use the xPhoto Oil Painting transform."
+        ocvb.desc = "Use the xPhoto Oil Painting transform - Painterly effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src As New cv.Mat

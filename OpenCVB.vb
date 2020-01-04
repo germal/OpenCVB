@@ -276,12 +276,15 @@ Public Class OpenCVB
         Dim usingIntelCamera As Boolean = optionsForm.IntelCamera.Checked
         If intelCamera.deviceCount = 0 Then
             usingIntelCamera = False ' well, it has to be a Kinect system then.
-            optionsForm.IntelCamera.Checked = False
             optionsForm.Kinect4Azure.Checked = True
+            SaveSetting("OpenCVB", "IntelCamera", "IntelCamera", False)
         End If
         If kinectCamera Is Nothing Then kinectCamera = New Kinect()
-        If kinectCamera.devicecount = 0 Then usingIntelCamera = True
-        If usingIntelCamera Then optionsForm.IntelCamera.Checked = True Else optionsForm.Kinect4Azure.Checked = True
+        If kinectCamera.devicecount = 0 Then
+            usingIntelCamera = True
+            optionsForm.IntelCamera.Checked = True
+            SaveSetting("OpenCVB", "IntelCamera", "IntelCamera", usingintelcamera)
+        End If
         If kinectCamera.deviceCount = 0 And intelCamera.deviceCount = 0 Then
             MsgBox("OpenCVB supports either a Kinect for Azure 3D camera or an Intel D400Series 3D camera.  Neither is present.")
             End
