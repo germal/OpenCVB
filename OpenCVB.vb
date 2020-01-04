@@ -25,6 +25,7 @@ Public Class OpenCVB
     Dim frameCount As Int32
     Dim formResultsUpdated As Boolean
     Dim stopAlgorithmThread As Boolean
+    Dim algorithmTaskHandle As Thread
     Dim stopCameraThread As Boolean
     Dim pauseUpdates As Boolean
 
@@ -614,6 +615,7 @@ Public Class OpenCVB
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         Application.DoEvents()
         stopAlgorithmThread = True
+        stopCameraThread = True
         textDesc = ""
         saveLayout()
         Dim sleepCount As Int32
@@ -706,25 +708,27 @@ Public Class OpenCVB
         Static firstPass = True
         Static saveUsingIntel As Boolean = parms.UsingIntelCamera
         Static fastprocessing As Boolean = parms.fastProcessing
+        Static cameraThreadHandle As Thread
         If saveUsingIntel <> parms.UsingIntelCamera Or fastprocessing <> parms.fastProcessing Or firstPass = True Then
+            stopCameraThread = True
             startCamera = True
+            If firstPass = False Then cameraThreadHandle.Abort()
             firstPass = False
-            stopCameraThread = True ' stop any current camera thread.
             Thread.Sleep(60)
         End If
 
-        While frameCount <> 0 ' previous threads must exit...
+        While frameCount <> 0  ' previous threads must exit...
             Application.DoEvents()
         End While
 
         If startCamera Then
             Dim cParms = New cameraParms(parms.UsingIntelCamera, parms.fastProcessing)
-            Dim cameraThreadHandle = New Thread(AddressOf CameraTask)
+            cameraThreadHandle = New Thread(AddressOf CameraTask)
             cameraThreadHandle.Start(cParms)
             saveUsingIntel = parms.UsingIntelCamera
             fastprocessing = parms.fastProcessing
         End If
-        Dim algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
+        algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
         algorithmTaskHandle.Start(parms)
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
