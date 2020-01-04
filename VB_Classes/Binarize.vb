@@ -133,7 +133,7 @@ Public Class Binarize_Bernson : Implements IDisposable
 
         ocvb.label1 = "Binarize Bernson (Draw Enabled)"
 
-        ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
+        ' ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
         ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -142,7 +142,11 @@ Public Class Binarize_Bernson : Implements IDisposable
 
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayBin = gray.Clone()
-        cv.Extensions.Binarizer.Bernsen(gray(ocvb.drawRect), grayBin(ocvb.drawRect), kernelSize, sliders.TrackBar2.Value, sliders.TrackBar3.Value)
+        If ocvb.drawRect = New cv.Rect() Then
+            cv.Extensions.Binarizer.Bernsen(gray, grayBin, kernelSize, sliders.TrackBar2.Value, sliders.TrackBar3.Value)
+        Else
+            cv.Extensions.Binarizer.Bernsen(gray(ocvb.drawRect), grayBin(ocvb.drawRect), kernelSize, sliders.TrackBar2.Value, sliders.TrackBar3.Value)
+        End If
         ocvb.result1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
