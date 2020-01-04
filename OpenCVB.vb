@@ -25,6 +25,7 @@ Public Class OpenCVB
     Dim frameCount As Int32
     Dim formResultsUpdated As Boolean
     Dim stopAlgorithmThread As Boolean
+    Dim stopCameraThread As Boolean
     Dim pauseUpdates As Boolean
 
     Dim RefreshAvailable As Boolean = True ' This variable allows us to dodge a refresh from the system after a move.  There is no synclock around that system refresh.
@@ -701,14 +702,28 @@ Public Class OpenCVB
         Dim res() As String = GetType(OpenCVB).Assembly.GetManifestResourceNames()
         PausePlayButton.Image = New System.Drawing.Bitmap(GetType(OpenCVB).Assembly.GetManifestResourceStream(res(3)))
 
-        While frameCount <> 0 ' previous thread must exit...
+        Dim startCamera As Boolean = False
+        Static firstPass = True
+        Static saveUsingIntel As Boolean = parms.UsingIntelCamera
+        Static fastprocessing As Boolean = parms.fastProcessing
+        If saveUsingIntel <> parms.UsingIntelCamera Or fastprocessing <> parms.fastProcessing Or firstPass = True Then
+            startCamera = True
+            firstPass = False
+            stopCameraThread = True ' stop any current camera thread.
+            Thread.Sleep(60)
+        End If
+
+        While frameCount <> 0 ' previous threads must exit...
             Application.DoEvents()
         End While
 
-        Dim cParms = New cameraParms(parms.UsingIntelCamera, parms.fastProcessing)
-        Dim cameraThreadHandle = New Thread(AddressOf CameraTask)
-        cameraThreadHandle.Start(cParms)
-
+        If startCamera Then
+            Dim cParms = New cameraParms(parms.UsingIntelCamera, parms.fastProcessing)
+            Dim cameraThreadHandle = New Thread(AddressOf CameraTask)
+            cameraThreadHandle.Start(cParms)
+            saveUsingIntel = parms.UsingIntelCamera
+            fastprocessing = parms.fastProcessing
+        End If
         Dim algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
         algorithmTaskHandle.Start(parms)
     End Sub
@@ -837,9 +852,9 @@ Public Class OpenCVB
         Dim camera As Object = Nothing
         If cParms.usingIntelCamera Then camera = intelCamera Else camera = kinectCamera
 
-        stopAlgorithmThread = False
+        stopCameraThread = False
         While 1
-            If stopAlgorithmThread Then Exit While
+            If stopCameraThread Then Exit While
             If pauseUpdates Then Continue While
             If Me.Visible And Me.IsDisposed = False Then
                 Me.Invoke(

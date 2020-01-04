@@ -7,12 +7,17 @@ Public Class Clone_Normal : Implements IDisposable
     Public cloneSpec As Int32 ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
     Public Sub New(ocvb As AlgorithmData)
         ocvb.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
+        ocvb.label1 = "Clone result - draw anywhere to clone a region"
         ocvb.label2 = "Clone Region Mask"
         ocvb.drawRect = New cv.Rect(ocvb.color.Width / 4, ocvb.color.Height / 4, ocvb.color.Width / 2, ocvb.color.Height / 2)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mask As New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
-        cv.Cv2.Rectangle(mask, ocvb.drawRect, cv.Scalar.White, -1)
+        If ocvb.drawRect = New cv.Rect Then
+            mask.SetTo(255)
+        Else
+            cv.Cv2.Rectangle(mask, ocvb.drawRect, cv.Scalar.White, -1)
+        End If
         ocvb.result2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Select Case cloneSpec
@@ -188,7 +193,12 @@ Public Class Clone_Seamless : Implements IDisposable
         Dim center As New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
         Dim radius = 100
         ocvb.result1.SetTo(0)
-        ocvb.result1.Circle(center.X, center.Y, radius, cv.Scalar.White, -1)
+        If ocvb.drawRect = New cv.Rect Then
+            ocvb.result1.SetTo(255)
+        Else
+            cv.Cv2.Rectangle(ocvb.result1, ocvb.drawRect, cv.Scalar.White, -1)
+            ' ocvb.result1.Circle(center.X, center.Y, radius, cv.Scalar.White, -1)
+        End If
 
         Dim style = cv.SeamlessCloneMethods.NormalClone
         For i = 0 To radio.check.Count - 1
