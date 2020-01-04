@@ -10,51 +10,52 @@ Imports System.Environment
 Public Class OpenCVB
 #Region "Globals"
     Const displayFrames As Int32 = 4
-    Dim camPic(displayFrames - 1) As PictureBox
-    Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
-
-    Dim mouseDownPoint As New cv.Point
-    Dim mouseMovePoint As New cv.Point
-    Dim DrawingRectangle As Boolean
-    Dim BothFirstAndLastReady As Boolean
-    Dim LastX As Int32
-    Dim LastY As Int32
-    Dim GrabRectangleData As Boolean
-    Dim drawRect As New cv.Rect(0, 0, 0, 0)
-
-    Dim frameCount As Int32
-    Dim formResultsUpdated As Boolean
-    Dim stopAlgorithmThread As Boolean
-    Dim stopCameraThread As Boolean
-    Dim pauseUpdates As Boolean
-
-    Dim RefreshAvailable As Boolean = True ' This variable allows us to dodge a refresh from the system after a move.  There is no synclock around that system refresh.
-
-    Dim picLabels() = {"RGB", "Depth", "Result1", "Result2"}
-    Dim myPen As New System.Drawing.Pen(System.Drawing.Color.White)
-    Dim myBrush = New SolidBrush(System.Drawing.Color.White)
-    Dim mousePoint As New cv.Point
-    Dim mouseClickPoint As New cv.Point
-    Dim mouseClickFlag As Boolean
-    Dim mousePicTag As Int32
-    Dim kinect As Kinect
+    Dim AlgorithmCount As Int32
+    Dim algorithmTaskHandle As Thread
     Dim border As Int32 = 6
-    Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.ActiveClass.TrueType)
+    Dim BothFirstAndLastReady As Boolean
+    Dim cameraFrameCount As Int32
+    Dim cameraThreadHandle As Thread
+    Dim camParms As cameraParms
+    Dim camPic(displayFrames - 1) As PictureBox
+    Dim CodeLineCount As Int32
+    Dim currentIndex As Int32
+    Dim DrawingRectangle As Boolean
+    Dim drawRect As New cv.Rect(0, 0, 0, 0)
+    Dim externalInvocation As Boolean
     Dim formColor As cv.Mat, formDepthRGB As cv.Mat, formResult1 As cv.Mat, formResult2 As cv.Mat
     Dim formDepth As cv.Mat, formPointCloud As cv.Mat, formDisparity As cv.Mat, formRedLeft As cv.Mat, formRedRight As cv.Mat
-    Dim CodeLineCount As Int32
-    Dim AlgorithmCount As Int32
+    Dim formResultsUpdated As Boolean
+    Dim frameCount As Int32
+    Dim GrabRectangleData As Boolean
+    Dim HomeDir As DirectoryInfo
+    Dim intelCamera As Object = Nothing
+    Dim kinect As Kinect
+    Dim kinectCamera As Object = Nothing
+    Dim lastFrame As Int32
+    Dim LastX As Int32
+    Dim LastY As Int32
+    Dim mouseClickFlag As Boolean
+    Dim mouseClickPoint As New cv.Point
+    Dim mouseDownPoint As New cv.Point
+    Dim mouseMovePoint As New cv.Point
+    Dim mousePicTag As Int32
+    Dim mousePoint As New cv.Point
+    Dim myBrush = New SolidBrush(System.Drawing.Color.White)
+    Dim myPen As New System.Drawing.Pen(System.Drawing.Color.White)
     Dim OpenCVfullPath As String
-    Dim vtkDirectory As String = ""
     Dim openCVKeywords As New List(Of String)
     Dim OptionsBringToFront As Boolean
-    Dim regWidth As Int32 = 1280, regHeight As Int32 = 720
-    Dim intelCamera As Object = Nothing
-    Dim kinectCamera As Object = Nothing
     Dim optionsForm As OptionsDialog
+    Dim picLabels() = {"RGB", "Depth", "Result1", "Result2"}
+    Dim RefreshAvailable As Boolean = True ' This variable allows us to dodge a refresh from the system after a move.  There is no synclock around that system refresh.
+    Dim regWidth As Int32 = 1280, regHeight As Int32 = 720
+    Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
+    Dim stopAlgorithmThread As Boolean
     Dim textDesc As String = ""
-    Dim externalInvocation As Boolean
-    Dim HomeDir As DirectoryInfo
+    Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.ActiveClass.TrueType)
+    Dim vtkDirectory As String = ""
+
     <System.Runtime.InteropServices.DllImport("user32.dll")>
     Public Shared Function GetCursorPos(ByRef point As System.Drawing.Point) As Boolean
     End Function
@@ -74,11 +75,11 @@ Public Class OpenCVB
         Public Bottom As Integer
     End Structure
     Private Structure cameraParms
-        Public Sub New(usingIntel As Boolean, fast As Boolean)
-            usingIntelCamera = usingIntel
+        Public Sub New(usingIntel As Boolean, fast As Boolean, intelCamera As Object, kinectCamera As Object)
             fastProcessing = fast
+            If usingIntel Then camera = intelCamera Else camera = kinectCamera
         End Sub
-        Public usingIntelCamera As Boolean
+        Public camera As Object
         Public fastProcessing As Boolean
     End Structure
 #End Region
@@ -138,6 +139,72 @@ Public Class OpenCVB
 
         TestAllTimer.Interval = optionsForm.TestAllDuration.Text * 1000
         FindPython()
+    End Sub
+    Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
+        Dim g As Graphics = e.Graphics
+        Try
+            SyncLock camPic ' avoid updating the image while copying into it in the algorithm task
+                If formColor IsNot Nothing Then
+                    If formColor.Width <> camPic(0).Width Or formColor.Height <> camPic(0).Height Or
+                       formDepthRGB.Width <> camPic(1).Width Or formDepthRGB.Height <> camPic(1).Height Then
+
+                        Dim color = formColor
+                        Dim depthRGB = formDepthRGB
+                        color = color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
+                        depthRGB = depthRGB.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
+                        cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
+                        cvext.BitmapConverter.ToBitmap(depthRGB, camPic(1).Image)
+                    Else
+                        cvext.BitmapConverter.ToBitmap(formColor, camPic(0).Image)
+                        cvext.BitmapConverter.ToBitmap(formDepthRGB, camPic(1).Image)
+                    End If
+
+                    If formResultsUpdated Then
+                        If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Or
+                            formResult2.Width <> camPic(3).Width Or formResult2.Height <> camPic(3).Height Then
+
+                            Dim result1 = formResult1
+                            Dim result2 = formResult2
+                            result1 = result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
+                            result2 = result2.Resize(New cv.Size(camPic(3).Size.Width, camPic(3).Size.Height))
+                            cvext.BitmapConverter.ToBitmap(result1, camPic(2).Image)
+                            cvext.BitmapConverter.ToBitmap(result2, camPic(3).Image)
+                        Else
+                            cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
+                            cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
+                        End If
+                        formResultsUpdated = False
+                    End If
+                End If
+                Dim pic = DirectCast(sender, PictureBox)
+                g.ScaleTransform(1, 1)
+                g.DrawImage(pic.Image, 0, 0)
+                g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
+
+                If optionsForm.ShowLabels.Checked Then
+                    ' with the low resolution display, we need to use the entire width of the image to display the RGB and Depth text area.
+                    Dim textRect As New Rectangle(0, 0, pic.Width / 2, If(resizeForDisplay = 4, 12, 20))
+                    If Len(picLabels(pic.Tag)) Then g.FillRectangle(myBrush, textRect)
+                    Dim black = System.Drawing.Color.Black
+                    Dim fontSize = If(resizeForDisplay = 4, 6, 10)
+                    g.DrawString(picLabels(pic.Tag), New Font("Microsoft Sans Serif", fontSize), New SolidBrush(black), 0, 0)
+                End If
+
+                ' draw any TrueType font data on the image 
+                Dim white = System.Drawing.Color.White
+                Dim maxline = 21
+                For Each tt In TTtextData(pic.Tag)
+                    g.DrawString(tt.text, New Font(tt.fontName, tt.fontSize), New SolidBrush(white), tt.x, tt.y)
+                    If tt.x >= camPic(pic.Tag).Width Or tt.y >= camPic(pic.Tag).Height Then
+                        Console.WriteLine("TrueType text off image!  " + tt.text + " is being written to " + CStr(tt.x) + " and " + CStr(tt.y))
+                    End If
+                    maxline -= 1
+                    If maxline <= 0 Then Exit For
+                Next
+            End SyncLock
+        Catch ex As Exception
+            Console.WriteLine("Paint exception occurred: " + ex.Message)
+        End Try
     End Sub
     Private Sub OpenCVB_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         If camPic Is Nothing Then Exit Sub ' when first opening, campic may not be built yet
@@ -209,12 +276,15 @@ Public Class OpenCVB
         Dim usingIntelCamera As Boolean = optionsForm.IntelCamera.Checked
         If intelCamera.deviceCount = 0 Then
             usingIntelCamera = False ' well, it has to be a Kinect system then.
-            optionsForm.IntelCamera.Checked = False
             optionsForm.Kinect4Azure.Checked = True
+            SaveSetting("OpenCVB", "IntelCamera", "IntelCamera", False)
         End If
         If kinectCamera Is Nothing Then kinectCamera = New Kinect()
-        If kinectCamera.devicecount = 0 Then usingIntelCamera = True
-        If usingIntelCamera Then optionsForm.IntelCamera.Checked = True Else optionsForm.Kinect4Azure.Checked = True
+        If kinectCamera.devicecount = 0 Then
+            usingIntelCamera = True
+            optionsForm.IntelCamera.Checked = True
+            SaveSetting("OpenCVB", "IntelCamera", "IntelCamera", usingintelcamera)
+        End If
         If kinectCamera.deviceCount = 0 And intelCamera.deviceCount = 0 Then
             MsgBox("OpenCVB supports either a Kinect for Azure 3D camera or an Intel D400Series 3D camera.  Neither is present.")
             End
@@ -296,6 +366,7 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "OpenCVkeyword", "OpenCVkeyword", OpenCVkeyword.Text)
     End Sub
     Private Sub OpenCVkeyword_SelectedIndexChanged(sender As Object, e As EventArgs) Handles OpenCVkeyword.SelectedIndexChanged
+        stopAlgorithmThread = True
         If OpenCVkeyword.Text = "<All>" Or OpenCVkeyword.Text = "<All using recorded data>" Then
             Dim AlgorithmListFileInfo = New FileInfo("../../Data/AlgorithmList.txt")
             Dim sr = New StreamReader(AlgorithmListFileInfo.FullName)
@@ -319,7 +390,6 @@ Public Class OpenCVB
                 AvailableAlgorithms.Items.Add(split(i))
             Next
             AvailableAlgorithms.Enabled = True
-            stopAlgorithmThread = True
         End If
         AvailableAlgorithms.Text = GetSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Items(0))
         Dim index = AvailableAlgorithms.Items.IndexOf(AvailableAlgorithms.Text)
@@ -468,57 +538,17 @@ Public Class OpenCVB
         mouseClickFlag = True
         mouseClickPoint = mousePoint
     End Sub
-    Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
-        Dim g As Graphics = e.Graphics
-        Try
-            SyncLock camPic ' avoid updating the image while copying into it in the algorithm task
-                If formColor IsNot Nothing Then
-                    cvext.BitmapConverter.ToBitmap(formColor, camPic(0).Image)
-                    cvext.BitmapConverter.ToBitmap(formDepthRGB, camPic(1).Image)
-                    If formResultsUpdated Then
-                        cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
-                        cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
-                        formResultsUpdated = False
-                    End If
-                End If
-                Dim pic = DirectCast(sender, PictureBox)
-                g.ScaleTransform(1, 1)
-                g.DrawImage(pic.Image, 0, 0)
-                g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
-
-                If optionsForm.ShowLabels.Checked Then
-                    ' with the low resolution display, we need to use the entire width of the image to display the RGB and Depth text area.
-                    Dim textRect As New Rectangle(0, 0, pic.Width / 2, If(resizeForDisplay = 4, 12, 20))
-                    If Len(picLabels(pic.Tag)) Then g.FillRectangle(myBrush, textRect)
-                    Dim black = System.Drawing.Color.Black
-                    Dim fontSize = If(resizeForDisplay = 4, 6, 10)
-                    g.DrawString(picLabels(pic.Tag), New Font("Microsoft Sans Serif", fontSize), New SolidBrush(black), 0, 0)
-                End If
-
-                ' draw any TrueType font data on the image 
-                Dim white = System.Drawing.Color.White
-                Dim maxline = 21
-                For Each tt In TTtextData(pic.Tag)
-                    g.DrawString(tt.text, New Font(tt.fontName, tt.fontSize), New SolidBrush(white), tt.x, tt.y)
-                    If tt.x >= camPic(pic.Tag).Width Or tt.y >= camPic(pic.Tag).Height Then
-                        Console.WriteLine("TrueType text off image!  " + tt.text + " is being written to " + CStr(tt.x) + " and " + CStr(tt.y))
-                    End If
-                    maxline -= 1
-                    If maxline <= 0 Then Exit For
-                Next
-            End SyncLock
-        Catch ex As Exception
-            Console.WriteLine("Paint exception occurred: " + ex.Message)
-        End Try
-    End Sub
-
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
         Dim res() As String = GetType(OpenCVB).Assembly.GetManifestResourceNames()
-        If pauseUpdates Then
-            pauseUpdates = False
+        Static saveTestAllState As Boolean
+        If stopAlgorithmThread Then
+            If saveTestAllState Then testAllButton_Click(sender, e)
+            RunAlgorithmTask()
             PausePlayButton.Image = New System.Drawing.Bitmap(GetType(OpenCVB).Assembly.GetManifestResourceStream(res(3)))
         Else
-            pauseUpdates = True
+            saveTestAllState = TestAllTimer.Enabled
+            If saveTestAllState Then testAllButton_Click(sender, e)
+            stopAlgorithmThread = True
             PausePlayButton.Image = New System.Drawing.Bitmap(GetType(OpenCVB).Assembly.GetManifestResourceStream(res(4)))
         End If
     End Sub
@@ -535,16 +565,20 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub opencvkeyword_dropdown(sender As Object, e As EventArgs) Handles OpenCVkeyword.DropDown
-        pauseUpdates = True
+        currentIndex = OpenCVkeyword.SelectedIndex
+        stopAlgorithmThread = True
     End Sub
     Private Sub opencvkeyword_dropdownclosed(sender As Object, e As EventArgs) Handles OpenCVkeyword.DropDownClosed
-        pauseUpdates = False
+        ' if the algorithm didn't change, then resume current algorithm.
+        If currentIndex = OpenCVkeyword.SelectedIndex Then RunAlgorithmTask()
     End Sub
     Private Sub algorithms_dropdown(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDown
-        pauseUpdates = True
+        currentIndex = AvailableAlgorithms.SelectedIndex
+        stopAlgorithmThread = True
     End Sub
     Private Sub algorithms_dropdownclosed(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDownClosed
-        pauseUpdates = False
+        ' if the algorithm didn't change, then resume current algorithm.
+        If currentIndex = AvailableAlgorithms.SelectedIndex Then RunAlgorithmTask()
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         stopAlgorithmThread = True
@@ -557,20 +591,16 @@ Public Class OpenCVB
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
         OptionsBringToFront = True
     End Sub
-    Dim savePauseState As Boolean
     Private Sub OpenCVB_ResizeBegin(sender As Object, e As EventArgs) Handles Me.ResizeBegin
-        savePauseState = pauseUpdates
-        pauseUpdates = True
+        stopAlgorithmThread = True
     End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         saveLayout()
-        pauseUpdates = savePauseState
+        RunAlgorithmTask()
     End Sub
-    Private Sub Algorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
+    Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If AvailableAlgorithms.Enabled Then
-            stopAlgorithmThread = True
             SaveSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Text)
-            Application.DoEvents() ' update the visible name.
             RunAlgorithmTask()
         End If
     End Sub
@@ -580,7 +610,6 @@ Public Class OpenCVB
         RefreshAvailable = True
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
-        Static lastFrame
         Dim countFrames = frameCount - lastFrame
         Dim fps As Single = countFrames / (fpsTimer.Interval / 1000)
 
@@ -612,31 +641,19 @@ Public Class OpenCVB
     End Sub
 
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        Application.DoEvents()
         stopAlgorithmThread = True
+        Application.DoEvents()
+        algorithmTaskHandle.Abort()
+        cameraThreadHandle.Abort()
         textDesc = ""
         saveLayout()
-        Dim sleepCount As Int32
-        ' allow time for the runAlgorithmTask to exit
-        While frameCount
-            Application.DoEvents()
-            sleepCount += 1
-            If sleepCount > 50 Then Exit While
-        End While
     End Sub
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
-        pauseUpdates = True
+        stopAlgorithmThread = True
         optionsForm.IntelCamera.Enabled = intelCamera.deviceCount > 0
         optionsForm.Kinect4Azure.Enabled = kinectCamera.deviceCount > 0
 
-        Dim OKcancel = optionsForm.ShowDialog()
-        Me.BringToFront()
-        pauseUpdates = False
-        If OKcancel = DialogResult.OK Then
-            stopAlgorithmThread = True
-            Thread.Sleep(10) ' this should give the task a chance to terminate.
-        End If
-
+        optionsForm.ShowDialog()
         TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
 
         If optionsForm.SnapToGrid.Checked Then
@@ -652,15 +669,29 @@ Public Class OpenCVB
             Me.Height = camPic(0).Height * 2 + 90
         End If
         saveLayout()
-        If OKcancel = DialogResult.OK Then RunAlgorithmTask()
+        RunAlgorithmTask()
     End Sub
     Private Sub RunAlgorithmTask()
+        If frameCount <> 0 Then
+            stopAlgorithmThread = True
+            Dim sleepCount As Int32
+            ' some algorithms can take a long time to finish a single iteration.  
+            ' Each algorithm must run dispose() - to kill options forms and external Python or OpenGL taskes.  Have to wait until exit...
+            While frameCount
+                Application.DoEvents()
+                Thread.Sleep(10)
+                sleepCount += 1
+                If sleepCount > 500 Then algorithmTaskHandle.Abort() ' if not restarted after 5 seconds, force the issue (not good.)
+            End While
+        End If
+        lastFrame = 0
         ActivateTimer.Enabled = True
         fpsTimer.Enabled = True
 
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
         parms.minimizeMemoryFootprint = optionsForm.MinimizeMemoryFootprint.Checked
         parms.fastProcessing = optionsForm.FastProcessing.Checked
+        parms.UsingIntelCamera = optionsForm.IntelCamera.Checked
         parms.activeAlgorithm = AvailableAlgorithms.Text
 
         ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
@@ -672,21 +703,11 @@ Public Class OpenCVB
         parms.vtkDirectory = vtkDirectory
         parms.HomeDir = HomeDir.FullName
         parms.OpenCVfullPath = OpenCVfullPath
-        parms.UsingIntelCamera = optionsForm.IntelCamera.Checked
         parms.mainFormLoc = Me.Location
         parms.mainFormHeight = Me.Height
         parms.OpenCV_Version_ID = Environment.GetEnvironmentVariable("OpenCV_Version")
-        parms.useRecordedData = OpenCVkeyword.Text = "<All using recorded data>"
-        Dim camera As Object = Nothing
-        If parms.UsingIntelCamera Then camera = intelCamera Else camera = kinectCamera
-        parms.IMUpresent = camera.IMUpresent
-        parms.pcBufferSize = camera.pcBufferSize
-        parms.intrinsics = camera.Intrinsics_VB
-        parms.extrinsics = camera.Extrinsics_VB
         parms.imageToTrueTypeLoc = 1 / resizeForDisplay
-        parms.imuGyro = camera.imuGyro
-        parms.imuAccel = camera.imuAccel
-        parms.imuTimeStamp = camera.imuTimeStamp
+        parms.useRecordedData = OpenCVkeyword.Text = "<All using recorded data>"
         parms.testAllRunning = TestAllButton.Text = "Stop Test"
         parms.externalInvocation = externalInvocation
         If parms.testAllRunning Then parms.ShowOptions = optionsForm.ShowOptions.Checked Else parms.ShowOptions = True ' always show options when not running 'test all'
@@ -702,29 +723,27 @@ Public Class OpenCVB
         Dim res() As String = GetType(OpenCVB).Assembly.GetManifestResourceNames()
         PausePlayButton.Image = New System.Drawing.Bitmap(GetType(OpenCVB).Assembly.GetManifestResourceStream(res(3)))
 
-        Dim startCamera As Boolean = False
-        Static firstPass = True
-        Static saveUsingIntel As Boolean = parms.UsingIntelCamera
-        Static fastprocessing As Boolean = parms.fastProcessing
-        If saveUsingIntel <> parms.UsingIntelCamera Or fastprocessing <> parms.fastProcessing Or firstPass = True Then
-            startCamera = True
-            firstPass = False
-            stopCameraThread = True ' stop any current camera thread.
-            Thread.Sleep(60)
-        End If
+        stopAlgorithmThread = False
 
-        While frameCount <> 0 ' previous threads must exit...
-            Application.DoEvents()
-        End While
+        camParms = New cameraParms(parms.UsingIntelCamera, parms.fastProcessing, intelCamera, kinectCamera)
 
-        If startCamera Then
-            Dim cParms = New cameraParms(parms.UsingIntelCamera, parms.fastProcessing)
-            Dim cameraThreadHandle = New Thread(AddressOf CameraTask)
-            cameraThreadHandle.Start(cParms)
-            saveUsingIntel = parms.UsingIntelCamera
-            fastprocessing = parms.fastProcessing
-        End If
-        Dim algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
+        parms.IMUpresent = camParms.camera.IMUpresent
+        parms.pcBufferSize = camParms.camera.pcBufferSize
+        parms.intrinsics = camParms.camera.Intrinsics_VB
+        parms.extrinsics = camParms.camera.Extrinsics_VB
+        parms.imuGyro = camParms.camera.imuGyro
+        parms.imuAccel = camParms.camera.imuAccel
+        parms.imuTimeStamp = camParms.camera.imuTimeStamp
+
+        Dim fastSize = If(camParms.fastProcessing, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
+        formResult1 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
+        formResult2 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
+        formResultsUpdated = True ' one time update to the results when starting a new camera or algorithm.
+
+        cameraThreadHandle = New Thread(AddressOf CameraTask)
+        cameraThreadHandle.Start(camParms)
+
+        algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
         algorithmTaskHandle.Start(parms)
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
@@ -757,11 +776,12 @@ Public Class OpenCVB
         OpenCVB.ocvb.fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
 
         frameCount = 0 ' restart the count... 
-        stopAlgorithmThread = False
+        Dim saveCameraFrameCount As Int32
         While 1
-            Application.DoEvents() ' this will permit any options forms in the algorithm thread to get updated and the pull-downs in the main thread to react quickly.
             If stopAlgorithmThread Then Exit While
-            If pauseUpdates Then Continue While
+            Do While saveCameraFrameCount = cameraFrameCount
+                Application.DoEvents() ' this will permit any options forms in the algorithm thread to get updated and the pull-downs in the main thread to react quickly.
+            Loop
             If Me.Visible And Me.IsDisposed = False Then
                 Me.Invoke(
                     Sub()
@@ -770,7 +790,7 @@ Public Class OpenCVB
                 )
             End If
 
-            If formRedRight Is Nothing Then Continue While ' at startup it may not be ready...
+            OpenCVB.UpdateHostLocation(Me.Left, Me.Top, Me.Height)
             SyncLock camPic
                 OpenCVB.ocvb.pointCloud = formPointCloud
                 OpenCVB.ocvb.color = formColor
@@ -781,7 +801,6 @@ Public Class OpenCVB
                 OpenCVB.ocvb.redRight = formRedRight
             End SyncLock
 
-            OpenCVB.UpdateHostLocation(Me.Left, Me.Top, Me.Height)
             Try
                 If GrabRectangleData Then
                     GrabRectangleData = False
@@ -796,7 +815,7 @@ Public Class OpenCVB
                 OpenCVB.ocvb.mouseClickPoint = mouseClickPoint
                 mouseClickFlag = False
 
-                OpenCVB.RunAlgorithmTask()
+                OpenCVB.RunAlgorithm()
 
                 If OpenCVB.ocvb.drawRectClear Then
                     drawRect = New cv.Rect
@@ -808,8 +827,8 @@ Public Class OpenCVB
                 picLabels(3) = OpenCVB.ocvb.label2
                 If RefreshAvailable Then
                     SyncLock camPic
-                        formResult1 = OpenCVB.ocvb.result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
-                        formResult2 = OpenCVB.ocvb.result2.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
+                        formResult1 = OpenCVB.ocvb.result1
+                        formResult2 = OpenCVB.ocvb.result2
                         formResultsUpdated = True
                         For i = VB_Classes.ActiveClass._RESULT1 To VB_Classes.ActiveClass._RESULT2
                             If OpenCVB.ocvb.TTtextData(i).Count Then
@@ -821,20 +840,20 @@ Public Class OpenCVB
                             End If
                         Next
                     End SyncLock
-                    If OptionsBringToFront And TestAllTimer.Enabled = False Then
-                        Try
-                            For Each frm In Application.OpenForms
-                                If frm.name.startswith("Option") Then frm.topmost = True
-                            Next
-                            Application.DoEvents()
-                            For Each frm In Application.OpenForms
-                                If frm.name.startswith("Option") Then frm.topmost = False
-                            Next
-                        Catch ex As Exception ' ignoring exceptions here.  It is a transition to another class and form was activated...
-                            Console.WriteLine("Error in OptionsBringToFront: " + ex.Message)
-                        End Try
-                        OptionsBringToFront = False
-                    End If
+                End If
+                If OptionsBringToFront And TestAllTimer.Enabled = False And frameCount > 100 Then
+                    Try
+                        For Each frm In Application.OpenForms
+                            If frm.name.startswith("Option") Then frm.topmost = True
+                        Next
+                        'Application.DoEvents()
+                        For Each frm In Application.OpenForms
+                            If frm.name.startswith("Option") Then frm.topmost = False
+                        Next
+                    Catch ex As Exception ' ignoring exceptions here.  It is a transition to another class and form was activated...
+                        Console.WriteLine("Error in OptionsBringToFront: " + ex.Message)
+                    End Try
+                    OptionsBringToFront = False
                 End If
                 If Me.IsDisposed Then Exit While
             Catch ex As Exception
@@ -842,20 +861,17 @@ Public Class OpenCVB
                 Exit While
             End Try
             If OpenCVB.ocvb.parms.minimizeMemoryFootprint Then GC.Collect() ' minimize memory footprint - helps to slow runaway memory usage.  
-
+            saveCameraFrameCount = cameraFrameCount
             frameCount += 1
         End While
         OpenCVB.Dispose()
         frameCount = 0
     End Sub
-    Private Sub CameraTask(cParms As cameraParms)
-        Dim camera As Object = Nothing
-        If cParms.usingIntelCamera Then camera = intelCamera Else camera = kinectCamera
-
-        stopCameraThread = False
+    Private Sub CameraTask(camParms As cameraParms)
+        Dim fastSize = If(camParms.fastProcessing, New cv.Size(regWidth / 2, regHeight / 2), Nothing)
+        cameraFrameCount = 0
         While 1
-            If stopCameraThread Then Exit While
-            If pauseUpdates Then Continue While
+            If stopAlgorithmThread Then Exit While
             If Me.Visible And Me.IsDisposed = False Then
                 Me.Invoke(
                     Sub()
@@ -864,28 +880,29 @@ Public Class OpenCVB
                 )
             End If
 
-            camera.GetNextFrame()
-            If camera.color Is Nothing Then Continue While ' at startup it may not be ready...
+            camParms.camera.GetNextFrame()
+            If camParms.camera.color Is Nothing Then Continue While ' at startup it may not be ready...
             SyncLock camPic
-                formPointCloud = camera.pointCloud ' the point cloud is never resized.
-                If cParms.fastProcessing Then
-                    formColor = camera.color.Resize(New cv.Size(regWidth / 2, regHeight / 2))
-                    formDepthRGB = camera.depthRGB.Resize(New cv.Size(regWidth / 2, regHeight / 2))
-                    formDepth = camera.depth.Resize(New cv.Size(regWidth / 2, regHeight / 2))
-                    formDisparity = camera.disparity.Resize(New cv.Size(regWidth / 2, regHeight / 2))
-                    formRedLeft = camera.redLeft.Resize(New cv.Size(regWidth / 2, regHeight / 2))
-                    formRedRight = camera.redRight.Resize(New cv.Size(regWidth / 2, regHeight / 2))
+                formPointCloud = camParms.camera.pointCloud ' the point cloud is never resized.
+                If camParms.fastProcessing Then
+                    formColor = camParms.camera.color.Resize(fastSize)
+                    formDepthRGB = camParms.camera.depthRGB.Resize(fastSize)
+                    formDepth = camParms.camera.depth.Resize(fastSize)
+                    formDisparity = camParms.camera.disparity.Resize(fastSize)
+                    formRedLeft = camParms.camera.redLeft.Resize(fastSize)
+                    formRedRight = camParms.camera.redRight.Resize(fastSize)
                 Else
-                    formColor = camera.color
-                    formDepthRGB = camera.depthRGB
-                    formDepth = camera.depth
-                    formDisparity = camera.disparity
-                    formRedLeft = camera.redLeft
-                    formRedRight = camera.redRight
+                    formColor = camParms.camera.color
+                    formDepthRGB = camParms.camera.depthRGB
+                    formDepth = camParms.camera.depth
+                    formDisparity = camParms.camera.disparity
+                    formRedLeft = camParms.camera.redLeft
+                    formRedRight = camParms.camera.redRight
                 End If
             End SyncLock
 
             If Me.IsDisposed Then Exit While
+            cameraFrameCount += 1
         End While
     End Sub
 End Class

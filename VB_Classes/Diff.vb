@@ -15,7 +15,7 @@ Public Class Diff_Basics : Implements IDisposable
             ocvb.result1 = lastFrame
             cv.Cv2.Absdiff(gray, lastFrame, ocvb.result2)
             ocvb.result2 = ocvb.result2.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
-            ocvb.result1 = ocvb.color.SetTo(0, ocvb.result2)
+            ocvb.result1 = ocvb.color.Clone().SetTo(0, ocvb.result2)
         End If
         lastFrame = gray.Clone()
     End Sub
