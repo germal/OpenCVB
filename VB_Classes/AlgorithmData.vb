@@ -1,17 +1,18 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+
 Public Class AlgorithmData
+    Public color As cv.Mat
+    Public depth As cv.Mat
+    Public disparity As cv.Mat
+    Public depthRGB As cv.Mat
+    Public pointCloud As cv.Mat
+    Public redLeft As cv.Mat
+    Public redRight As cv.Mat
     Public name As String
     Public desc As String
     Public optionsTop As Int32
     Public optionsLeft As Int32
-    Public color As New cv.Mat
-    Public depth As New cv.Mat
-    Public disparity As New cv.Mat
-    Public depthRGB As New cv.Mat
-    Public pointCloud As New cv.Mat
-    Public redLeft As New cv.Mat
-    Public redRight As New cv.Mat
     Public result1 As New cv.Mat
     Public result2 As New cv.Mat
     Public drawRect As cv.Rect ' filled in if the user draws on any of the images.

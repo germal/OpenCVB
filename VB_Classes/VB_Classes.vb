@@ -123,22 +123,20 @@ Public Class ActiveClass : Implements IDisposable
         Dim imuAccel As cv.Point3f
         Dim imuTimeStamp As Double
     End Structure
-    Public Sub New(parms As algorithmParameters, cameraTask As Boolean)
+    Public Sub New(parms As algorithmParameters)
         UpdateHostLocation(parms.mainFormLoc.X, parms.mainFormLoc.Y, parms.mainFormHeight)
         ocvb = New AlgorithmData(parms)
-        If cameraTask = False Then
-            If LCase(parms.activeAlgorithm).EndsWith(".py") Then ocvb.PythonFileName = parms.activeAlgorithm
-            ocvb.PythonExe = parms.PythonExe
-            ocvb.parms = parms
+        If LCase(parms.activeAlgorithm).EndsWith(".py") Then ocvb.PythonFileName = parms.activeAlgorithm
+        ocvb.PythonExe = parms.PythonExe
+        ocvb.parms = parms
+        ActiveAlgorithm = algoList.createAlgorithm(parms.activeAlgorithm, ocvb)
+        If ActiveAlgorithm Is Nothing And parms.activeAlgorithm.EndsWith(".py") Then
+            parms.activeAlgorithm = parms.activeAlgorithm.Substring(0, Len(parms.activeAlgorithm) - 3)
             ActiveAlgorithm = algoList.createAlgorithm(parms.activeAlgorithm, ocvb)
-            If ActiveAlgorithm Is Nothing And parms.activeAlgorithm.EndsWith(".py") Then
-                parms.activeAlgorithm = parms.activeAlgorithm.Substring(0, Len(parms.activeAlgorithm) - 3)
-                ActiveAlgorithm = algoList.createAlgorithm(parms.activeAlgorithm, ocvb)
-            End If
-            slidersOffset = New cv.Point
-            radioOffset = New cv.Point
-            If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
         End If
+        slidersOffset = New cv.Point
+        radioOffset = New cv.Point
+        If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
     End Sub
     Public Sub UpdateHostLocation(left As Int32, top As Int32, height As Int32)
         appLocation = New cv.Rect(left, top, 0, height)
