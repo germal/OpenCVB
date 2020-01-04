@@ -141,7 +141,7 @@ Public Class ActiveClass : Implements IDisposable
     Public Sub UpdateHostLocation(left As Int32, top As Int32, height As Int32)
         appLocation = New cv.Rect(left, top, 0, height)
     End Sub
-    Public Sub RunAlgorithmTask()
+    Public Sub RunAlgorithm()
         Try
             If ocvb.parms.useRecordedData Then recordedData.Run(ocvb)
             ActiveAlgorithm.Run(ocvb)
