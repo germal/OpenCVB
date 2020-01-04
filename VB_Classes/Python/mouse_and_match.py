@@ -23,7 +23,7 @@ import sys
 import glob
 import argparse
 from math import *
-
+title_window = 'Mouse_and_match.py'
 
 class App():
     drag_start = None

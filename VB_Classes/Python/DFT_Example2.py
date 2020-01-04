@@ -3,7 +3,7 @@ import sys
 
 import cv2 as cv
 import numpy as np
-
+title_window = 'DFT_Example2.py'
 
 def print_help():
     print('''

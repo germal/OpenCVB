@@ -1,6 +1,7 @@
 from __future__ import print_function
 import cv2 as cv
 import argparse
+title_window = 'BGSubtract.py'
 
 parser = argparse.ArgumentParser(description='This program shows how to use background subtraction methods provided by \
                                               OpenCV. You can process both videos and images.')
@@ -42,8 +43,8 @@ while True:
 
     ## [show]
     #show the current frame and the fg masks
-    cv.imshow('Frame', frame)
-    cv.imshow('FG Mask', fgMask)
+    cv.imshow(title_window + ' Frame', frame)
+    cv.imshow(title_window + ' FG Mask', fgMask)
     ## [show]
 
     keyboard = cv.waitKey(30)

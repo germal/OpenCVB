@@ -16,6 +16,7 @@ gabor_threads.py [image filename]
 
 # Python 2/3 compatibility
 from __future__ import print_function
+title_window = 'Gabor_Filter_MT.py'
 
 import numpy as np
 import cv2 as cv

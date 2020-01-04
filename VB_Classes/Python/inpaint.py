@@ -20,6 +20,7 @@ from __future__ import print_function
 
 import numpy as np
 import cv2 as cv
+title_window = 'Inpaint.py'
 
 from common import Sketcher
 

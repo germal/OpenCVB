@@ -22,6 +22,7 @@ if PY3:
 
 import numpy as np
 import cv2 as cv
+title_window = 'Polyline_Browse.py'
 
 # built-in modules
 import sys

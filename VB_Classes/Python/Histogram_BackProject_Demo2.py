@@ -2,6 +2,7 @@ from __future__ import print_function
 import cv2 as cv
 import numpy as np
 import argparse
+title_window = 'Histogram_BackProject_Demo2.py'
 import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)

@@ -3,6 +3,7 @@ from __future__ import division
 import cv2 as cv
 import numpy as np
 import argparse
+title_window = 'Histogram_BackProject_Demo1.py'
 
 def Hist_and_Backproj(val):
     ## [initialize]

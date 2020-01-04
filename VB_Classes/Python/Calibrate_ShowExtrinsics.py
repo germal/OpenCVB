@@ -6,6 +6,7 @@ from __future__ import print_function
 
 import numpy as np
 import cv2 as cv
+title_window = 'Calibrate_ShowExtrinsics.py'
 
 from numpy import linspace
 import ctypes

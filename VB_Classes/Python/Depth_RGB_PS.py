@@ -1,4 +1,5 @@
 import cv2 as cv
+title_window = 'Depth_RGB_PS.py'
 import numpy as np
 def OpenCVCode(imgRGB, depth_colormap):
     images = np.vstack((imgRGB, depth_colormap))

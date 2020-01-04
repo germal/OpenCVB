@@ -29,6 +29,7 @@ from __future__ import print_function
 
 import numpy as np
 import cv2 as cv
+title_window = 'Digits_SVM_KNearest.py'
 
 # built-in modules
 from multiprocessing.pool import ThreadPool

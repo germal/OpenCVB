@@ -13,6 +13,7 @@ inspired by
 from __future__ import print_function
 import sys
 PY3 = sys.version_info[0] == 3
+title_window = 'Coherence.py'
 
 if PY3:
     xrange = range

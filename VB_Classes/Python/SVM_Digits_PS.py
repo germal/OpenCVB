@@ -8,6 +8,7 @@ import cv2 as cv
 # built-in modules
 import os
 import sys
+title_window = 'SVM_Digits_PS.py'
 
 # local modules
 from common import mosaic

@@ -6,6 +6,7 @@ Alexander Mordvintsev 6/10/12
 import sys
 import numpy as np
 import cv2 as cv
+title_window = 'Laplacian_PyramidFilter_PS.py'
 
 from common import nothing, getsize
 

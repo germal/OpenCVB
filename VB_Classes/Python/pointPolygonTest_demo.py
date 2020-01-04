@@ -2,6 +2,7 @@ from __future__ import print_function
 from __future__ import division
 import cv2 as cv
 import numpy as np
+title_window = 'PointPolygonTest_demo.py'
 
 # Create an image
 r = 100

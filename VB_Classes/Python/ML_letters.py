@@ -30,6 +30,7 @@ from __future__ import print_function
 
 import numpy as np
 import cv2 as cv
+title_window = 'ML_letters.py'
 
 def load_base(fn):
     a = np.loadtxt(fn, np.float32, delimiter=',', converters={ 0 : lambda ch : ord(ch)-ord('A') })

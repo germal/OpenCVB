@@ -6,6 +6,7 @@ from OpenGL.GLU import *
 
 import cv2 as cv
 import numpy as np
+title_window = 'Python_SurfaceBlit_PS.py'
 
 def OpenCVCode(imgRGB, depth_colormap):
     global initialized, surface, screen

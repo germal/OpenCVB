@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 import sys
+title_window = 'Edges_Canny_PS.py'
 
 def nothing(*arg):
     pass

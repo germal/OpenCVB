@@ -1,7 +1,7 @@
 import cv2 as cv
 
 alpha_slider_max = 100
-title_window = 'Linear Blend'
+title_window = 'AddWeighted_Trackbar_PS.py - Linear Blend'
 saveAlpha = 0
     
 ## [on_trackbar]
