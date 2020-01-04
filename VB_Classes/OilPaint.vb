@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
+Imports System.Windows.Forms
+
 ' Source: https://hackernoon.com/https-medium-com-matteoronchetti-pointillism-with-python-and-opencv-f4274e6bbb7b
 Public Class OilPaint_Pointilism : Implements IDisposable
     Dim sliders As New OptionsSliders
@@ -7,7 +8,10 @@ Public Class OilPaint_Pointilism : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Stroke Scale", 1, 5, 3)
         sliders.setupTrackBar2(ocvb, "Smoothing Radius", 0, 100, 32)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        If ocvb.parms.ShowOptions Then
+            sliders.Show()
+            Application.DoEvents() ' because the rest of initialization takes so long, let the show take effect.
+        End If
 
         ' only need to create the mask to order the brush strokes once.
         randomMask = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32SC2)
