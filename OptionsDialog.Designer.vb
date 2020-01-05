@@ -100,7 +100,7 @@ Partial Class OptionsDialog
         Me.IntelCamera.AutoSize = True
         Me.IntelCamera.Location = New System.Drawing.Point(16, 40)
         Me.IntelCamera.Name = "IntelCamera"
-        Me.IntelCamera.Size = New System.Drawing.Size(222, 24)
+        Me.IntelCamera.Size = New System.Drawing.Size(271, 24)
         Me.IntelCamera.TabIndex = 0
         Me.IntelCamera.TabStop = True
         Me.IntelCamera.Text = "Use Intel D400Series 3D Camera"
@@ -311,16 +311,17 @@ Partial Class OptionsDialog
         Me.TestAllDuration.ReadOnly = True
         Me.TestAllDuration.Size = New System.Drawing.Size(89, 26)
         Me.TestAllDuration.TabIndex = 2
-        Me.TestAllDuration.Value = New Decimal(New Integer() {5, 0, 0, 0})
+        Me.TestAllDuration.Value = New Decimal(New Integer() {10, 0, 0, 0})
         '
         'Label1
         '
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(111, 52)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(405, 20)
+        Me.Label1.Size = New System.Drawing.Size(629, 20)
         Me.Label1.TabIndex = 1
-        Me.Label1.Text = "Duration in seconds of each test when running ""Test All"""
+        Me.Label1.Text = "Duration in seconds of each test when running ""Test All"" (there is a 10 second mi" &
+    "nimum)"
         '
         'GroupBox6
         '

@@ -87,4 +87,8 @@ Public Class OptionsDialog
         Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.Hide()
     End Sub
+
+    Private Sub TestAllDuration_ValueChanged(sender As Object, e As EventArgs) Handles TestAllDuration.ValueChanged
+        If TestAllDuration.Value < 10 Then TestAllDuration.Value = 10
+    End Sub
 End Class
