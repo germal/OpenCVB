@@ -644,8 +644,10 @@ Public Class OpenCVB
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopAlgorithmThread = True
         Application.DoEvents()
-        algorithmTaskHandle.Abort()
-        cameraThreadHandle.Abort()
+        If stopAllThreads() = False Then
+            algorithmTaskHandle.Abort()
+            cameraThreadHandle.Abort()
+        End If
         textDesc = ""
         saveLayout()
     End Sub
@@ -674,7 +676,7 @@ Public Class OpenCVB
         saveLayout()
         If saveTestAllState Then testAllButton_Click(sender, e) Else RunAlgorithmTask()
     End Sub
-    Private Sub RunAlgorithmTask()
+    Private Function stopAllThreads() As Boolean
         If frameCount <> 0 Then
             stopAlgorithmThread = True
             Dim sleepCount As Int32
@@ -684,9 +686,14 @@ Public Class OpenCVB
                 Application.DoEvents()
                 Thread.Sleep(10)
                 sleepCount += 1
-                If sleepCount > 500 Then algorithmTaskHandle.Abort() ' if not restarted after 5 seconds, force the issue (not good.)
+                If sleepCount > 500 Then Return False
             End While
         End If
+        Return True
+    End Function
+    Private Sub RunAlgorithmTask()
+        stopAllThreads()
+
         lastFrame = 0
         ActivateTimer.Enabled = True
         fpsTimer.Enabled = True
