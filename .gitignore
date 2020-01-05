@@ -39,4 +39,5 @@ CPP_Classes/Release/*
 Emgu_Classes/bin/*
 *FileListAbsolute.txt
 Data/svm_data.dat
+packages/EMGU*
 
