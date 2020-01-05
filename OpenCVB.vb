@@ -625,7 +625,7 @@ Public Class OpenCVB
         Dim activeCameraName As String
         If optionsForm.IntelCamera.Checked Then activeCameraName = intelCamera.deviceName Else activeCameraName = kinectCamera.deviceName
         Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " + activeCameraName +
-                  " FPS = " + Format(cameraFPS, "#0.0") + " Algorithm FPS = " + Format(fps, "#0.0")
+                  " FPS = " + Format(cameraFPS, "#0.0") + ", Algorithm FPS = " + Format(fps, "#0.0")
         If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
     End Sub
     Private Sub saveLayout()
@@ -893,37 +893,39 @@ Public Class OpenCVB
         Dim fastSize = If(camParms.fastProcessing, New cv.Size(regWidth / 2, regHeight / 2), Nothing)
         cameraFrameCount = 0
         While 1
-            If Me.Visible And Me.IsDisposed = False Then
-                Me.Invoke(
-                    Sub()
-                        Me.Refresh()
-                    End Sub
-                )
-            End If
-
-            camParms.camera.GetNextFrame()
-            If camParms.camera.color Is Nothing Then Continue While ' at startup it may not be ready...
-            SyncLock camPic
-                formPointCloud = camParms.camera.pointCloud ' the point cloud is never resized.
-                If camParms.fastProcessing Then
-                    formColor = camParms.camera.color.Resize(fastSize)
-                    formDepthRGB = camParms.camera.depthRGB.Resize(fastSize)
-                    formDepth = camParms.camera.depth.Resize(fastSize)
-                    formDisparity = camParms.camera.disparity.Resize(fastSize)
-                    formRedLeft = camParms.camera.redLeft.Resize(fastSize)
-                    formRedRight = camParms.camera.redRight.Resize(fastSize)
-                Else
-                    formColor = camParms.camera.color
-                    formDepthRGB = camParms.camera.depthRGB
-                    formDepth = camParms.camera.depth
-                    formDisparity = camParms.camera.disparity
-                    formRedLeft = camParms.camera.redLeft
-                    formRedRight = camParms.camera.redRight
+            If stopAlgorithmThread = False Then
+                If Me.Visible And Me.IsDisposed = False Then
+                    Me.Invoke(
+                        Sub()
+                            Me.Refresh()
+                        End Sub
+                    )
                 End If
-            End SyncLock
 
-            If Me.IsDisposed Then Exit While
-            cameraFrameCount += 1
+                camParms.camera.GetNextFrame()
+                If camParms.camera.color Is Nothing Then Continue While ' at startup it may not be ready...
+                SyncLock camPic
+                    formPointCloud = camParms.camera.pointCloud ' the point cloud is never resized.
+                    If camParms.fastProcessing Then
+                        formColor = camParms.camera.color.Resize(fastSize)
+                        formDepthRGB = camParms.camera.depthRGB.Resize(fastSize)
+                        formDepth = camParms.camera.depth.Resize(fastSize)
+                        formDisparity = camParms.camera.disparity.Resize(fastSize)
+                        formRedLeft = camParms.camera.redLeft.Resize(fastSize)
+                        formRedRight = camParms.camera.redRight.Resize(fastSize)
+                    Else
+                        formColor = camParms.camera.color
+                        formDepthRGB = camParms.camera.depthRGB
+                        formDepth = camParms.camera.depth
+                        formDisparity = camParms.camera.disparity
+                        formRedLeft = camParms.camera.redLeft
+                        formRedRight = camParms.camera.redRight
+                    End If
+                End SyncLock
+
+                If Me.IsDisposed Then Exit While
+                cameraFrameCount += 1
+            End If
         End While
     End Sub
 End Class
