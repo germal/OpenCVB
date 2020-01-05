@@ -62,7 +62,7 @@ svm.setC(2.67)
 svm.setGamma(5.383)
 
 svm.train(trainData, cv.ml.ROW_SAMPLE, responses)
-svm.save('svm_data.dat')
+svm.save('../../Data/svm_data.dat')
 
 ######     Now testing      ########################
 

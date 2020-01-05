@@ -2,7 +2,7 @@ import cv2 as cv
 
 alpha_slider_max = 100
 title_window = 'AddWeighted_Trackbar_PS.py - Linear Blend'
-saveAlpha = 0
+saveAlpha = 50
     
 ## [on_trackbar]
 def on_trackbar(val):
@@ -13,7 +13,7 @@ def on_trackbar(val):
 cv.namedWindow(title_window)
 ## [create_trackbar]
 trackbar_name = 'Alpha'
-cv.createTrackbar(trackbar_name, title_window , 0, alpha_slider_max, on_trackbar)
+cv.createTrackbar(trackbar_name, title_window , saveAlpha, alpha_slider_max, on_trackbar)
 on_trackbar(saveAlpha)
 ## [create_trackbar]
 
