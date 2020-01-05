@@ -183,6 +183,6 @@ if __name__ == '__main__':
     vis = evaluate_model(model, digits_test, samples_test, labels_test)
     cv.imshow('SVM test', vis)
     print('saving SVM as "digits_svm.dat"...')
-    model.save('digits_svm.dat')
+    #model.save('digits_svm.dat')
 
     cv.waitKey(0)

@@ -32,7 +32,6 @@ Public Class OpenCVB
     Dim intelCamera As Object = Nothing
     Dim kinect As Kinect
     Dim kinectCamera As Object = Nothing
-    Dim lastFrame As Int32
     Dim LastX As Int32
     Dim LastY As Int32
     Dim mouseClickFlag As Boolean
@@ -611,14 +610,22 @@ Public Class OpenCVB
         RefreshAvailable = True
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
+        Static lastFrame As Int32
+        If lastFrame > frameCount Then lastFrame = 0
         Dim countFrames = frameCount - lastFrame
+        lastFrame = frameCount
         Dim fps As Single = countFrames / (fpsTimer.Interval / 1000)
+
+        Static lastCameraFrame As Int32
+        If lastCameraFrame > cameraFrameCount Then lastCameraFrame = 0
+        Dim camFrames = cameraFrameCount - lastCameraFrame
+        lastCameraFrame = cameraFrameCount
+        Dim cameraFPS As Single = camFrames / (fpsTimer.Interval / 1000)
 
         Dim activeCameraName As String
         If optionsForm.IntelCamera.Checked Then activeCameraName = intelCamera.deviceName Else activeCameraName = kinectCamera.deviceName
-        Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - fps = " +
-                  Format(fps, "#0.0") + " " + activeCameraName
-        lastFrame = frameCount
+        Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " + activeCameraName +
+                  " fps = " + Format(cameraFPS, "#0.0") + " Algorithm FPS = " + Format(fps, "#0.0")
         If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
     End Sub
     Private Sub saveLayout()
@@ -694,7 +701,6 @@ Public Class OpenCVB
     Private Sub RunAlgorithmTask()
         stopAllThreads()
 
-        lastFrame = 0
         ActivateTimer.Enabled = True
         fpsTimer.Enabled = True
 

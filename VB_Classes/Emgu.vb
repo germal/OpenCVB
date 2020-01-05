@@ -25,8 +25,8 @@ Public Class Emgu_Facedetection : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim lena = New cv.Mat(ocvb.parms.HomeDir + "Data/Lena.jpg", cv.ImreadModes.Color)
         Dim data(lena.Rows * lena.Cols * lena.ElemSize) As Byte
-        Emgu_Classes.FaceDetection.Detect(ocvb.parms.HomeDir + "Data/Lena.jpg",
-                                          ocvb.parms.HomeDir + "Data/haarcascade_frontalface_alt.xml", data)
+        Emgu_Classes.FaceDetection.Detect(ocvb.parms.HomeDir + "Data\\Lena.jpg",
+                                          ocvb.parms.HomeDir + "Data\\haarcascade_frontalface_alt.xml", data)
         Dim tmp = New cv.Mat(lena.Rows, lena.Cols, cv.MatType.CV_8UC3, data)
         tmp = tmp.Resize(New cv.Size(ocvb.result1.Rows, ocvb.result1.Rows))
         ocvb.result1(New cv.Rect(0, 0, tmp.Rows, tmp.Cols)) = tmp
