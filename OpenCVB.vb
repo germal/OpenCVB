@@ -625,7 +625,7 @@ Public Class OpenCVB
         Dim activeCameraName As String
         If optionsForm.IntelCamera.Checked Then activeCameraName = intelCamera.deviceName Else activeCameraName = kinectCamera.deviceName
         Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " + activeCameraName +
-                  " fps = " + Format(cameraFPS, "#0.0") + " Algorithm FPS = " + Format(fps, "#0.0")
+                  " FPS = " + Format(cameraFPS, "#0.0") + " Algorithm FPS = " + Format(fps, "#0.0")
         If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
     End Sub
     Private Sub saveLayout()
@@ -651,10 +651,10 @@ Public Class OpenCVB
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopAlgorithmThread = True
         Application.DoEvents()
-        If stopAllThreads() = False Then
+        If algorithmStop() = False Then
             algorithmTaskHandle.Abort()
-            cameraThreadHandle.Abort()
         End If
+        cameraThreadHandle.Abort()
         textDesc = ""
         saveLayout()
     End Sub
@@ -664,8 +664,14 @@ Public Class OpenCVB
         stopAlgorithmThread = True
         optionsForm.IntelCamera.Enabled = intelCamera.deviceCount > 0
         optionsForm.Kinect4Azure.Enabled = kinectCamera.deviceCount > 0
+        Dim saveCurrentCamera = optionsForm.IntelCamera.Checked
 
         optionsForm.ShowDialog()
+
+        If saveCurrentCamera <> optionsForm.IntelCamera.Checked Then
+            cameraThreadHandle.Abort()
+            Thread.Sleep(100)
+        End If
         TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
 
         If optionsForm.SnapToGrid.Checked Then
@@ -683,7 +689,7 @@ Public Class OpenCVB
         saveLayout()
         If saveTestAllState Then testAllButton_Click(sender, e) Else RunAlgorithmTask()
     End Sub
-    Private Function stopAllThreads() As Boolean
+    Private Function algorithmStop() As Boolean
         If frameCount <> 0 Then
             stopAlgorithmThread = True
             Dim sleepCount As Int32
@@ -699,7 +705,7 @@ Public Class OpenCVB
         Return True
     End Function
     Private Sub RunAlgorithmTask()
-        stopAllThreads()
+        If algorithmStop() = False Then algorithmTaskHandle.Abort()
 
         ActivateTimer.Enabled = True
         fpsTimer.Enabled = True
@@ -887,7 +893,6 @@ Public Class OpenCVB
         Dim fastSize = If(camParms.fastProcessing, New cv.Size(regWidth / 2, regHeight / 2), Nothing)
         cameraFrameCount = 0
         While 1
-            If stopAlgorithmThread Then Exit While
             If Me.Visible And Me.IsDisposed = False Then
                 Me.Invoke(
                     Sub()
