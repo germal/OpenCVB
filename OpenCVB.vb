@@ -51,6 +51,7 @@ Public Class OpenCVB
     Dim regWidth As Int32 = 1280, regHeight As Int32 = 720
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Dim stopAlgorithmThread As Boolean
+    Dim stopCameraThread As Boolean
     Dim textDesc As String = ""
     Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.ActiveClass.TrueType)
     Dim vtkDirectory As String = ""
@@ -654,7 +655,7 @@ Public Class OpenCVB
         If algorithmStop() = False Then
             algorithmTaskHandle.Abort()
         End If
-        cameraThreadHandle.Abort()
+        cameraStop()
         textDesc = ""
         saveLayout()
     End Sub
@@ -668,10 +669,7 @@ Public Class OpenCVB
 
         optionsForm.ShowDialog()
 
-        If saveCurrentCamera <> optionsForm.IntelCamera.Checked Then
-            cameraThreadHandle.Abort()
-            Thread.Sleep(100)
-        End If
+        If saveCurrentCamera <> optionsForm.IntelCamera.Checked Then cameraStop()
         TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
 
         If optionsForm.SnapToGrid.Checked Then
@@ -696,6 +694,19 @@ Public Class OpenCVB
             ' some algorithms can take a long time to finish a single iteration.  
             ' Each algorithm must run dispose() - to kill options forms and external Python or OpenGL taskes.  Have to wait until exit...
             While frameCount
+                Application.DoEvents()
+                Thread.Sleep(10)
+                sleepCount += 1
+                If sleepCount > 500 Then Return False
+            End While
+        End If
+        Return True
+    End Function
+    Private Function cameraStop() As Boolean
+        If cameraFrameCount <> 0 Then
+            stopCameraThread = True
+            Dim sleepCount As Int32
+            While cameraFrameCount
                 Application.DoEvents()
                 Thread.Sleep(10)
                 sleepCount += 1
@@ -891,9 +902,10 @@ Public Class OpenCVB
     End Sub
     Private Sub CameraTask(camParms As cameraParms)
         Dim fastSize = If(camParms.fastProcessing, New cv.Size(regWidth / 2, regHeight / 2), Nothing)
-        cameraFrameCount = 0
+        stopCameraThread = False
         While 1
             If stopAlgorithmThread = False Then
+                If stopCameraThread Then Exit While
                 If Me.Visible And Me.IsDisposed = False Then
                     Me.Invoke(
                         Sub()
@@ -927,6 +939,7 @@ Public Class OpenCVB
                 cameraFrameCount += 1
             End If
         End While
+        cameraFrameCount = 0
     End Sub
 End Class
 
