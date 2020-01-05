@@ -8,7 +8,7 @@ title_window = 'Brightness_Contrast_Example1.py'
 # Read image given by user
 ## [basic-linear-transform-load]
 parser = argparse.ArgumentParser(description='Code for Changing the contrast and brightness of an image! tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='PythonData/lena.jpg')
+parser.add_argument('--input', help='Path to input image.', default='../../Data/lena.jpg')
 args = parser.parse_args()
 
 image = cv.imread(cv.samples.findFile(args.input))

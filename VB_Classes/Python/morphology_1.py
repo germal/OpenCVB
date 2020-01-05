@@ -43,7 +43,7 @@ def dilatation(val):
     cv.imshow(title_dilatation_window, dilatation_dst)
 
 parser = argparse.ArgumentParser(description='Code for Eroding and Dilating tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='PythonData/LinuxLogo.jpg')
+parser.add_argument('--input', help='Path to input image.', default='../../Data/LinuxLogo.jpg')
 args = parser.parse_args()
 
 src = cv.imread(cv.samples.findFile(args.input))

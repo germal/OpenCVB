@@ -29,7 +29,7 @@ def main():
     try:
         fn = sys.argv[1]
     except:
-        fn = 'PythonData/baboon.jpg'
+        fn = '../../Data/baboon.jpg'
 
     img = cv.imread(cv.samples.findFile(fn))
 

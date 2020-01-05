@@ -23,7 +23,7 @@ import math
 title_window = 'Hough_example5.py'
 
 def main():
-    fn = 'PythonData/pic1.png'
+    fn = '../../Data/pic1.png'
     src = cv.imread(cv.samples.findFile(fn))
     dst = cv.Canny(src, 50, 200)
     cdst = cv.cvtColor(dst, cv.COLOR_GRAY2BGR)

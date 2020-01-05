@@ -36,11 +36,11 @@ def main():
 
     args, img_mask = getopt.getopt(sys.argv[1:], '', ['debug=', 'square_size=', 'threads='])
     args = dict(args)
-    args.setdefault('--debug', 'PythonData/output/')
+    args.setdefault('--debug', '../../Data/output/')
     args.setdefault('--square_size', 1.0)
     args.setdefault('--threads', 4)
     if not img_mask:
-        img_mask = 'PythonData/left??.jpg'  # default
+        img_mask = '../../Data/left??.jpg'  # default
     else:
         img_mask = img_mask[0]
 

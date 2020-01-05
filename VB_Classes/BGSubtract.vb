@@ -466,7 +466,7 @@ Public Class BGSubtract_Synthetic_CPP : Implements IDisposable
             Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
 
             synthPtr = BGSubtract_Synthetic_Open(handleSrc.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols,
-                                                ocvb.parms.HomeDir + "VB_Classes/Python/PythonData/baboon.jpg",
+                                                ocvb.parms.HomeDir + "Data/baboon.jpg",
                                                 amplitude / 100, magnitude, waveSpeed / 100, objectSpeed)
             handleSrc.Free()
         End If

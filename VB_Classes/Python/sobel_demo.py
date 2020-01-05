@@ -24,7 +24,7 @@ def main(argv):
     #    return -1
 
     # Load the image
-    src = cv.imread('PythonData/Lena.jpg', cv.IMREAD_COLOR)
+    src = cv.imread('../../Data/Lena.jpg', cv.IMREAD_COLOR)
 
     # Check if image is loaded fine
     if src is None:

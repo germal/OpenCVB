@@ -36,7 +36,7 @@ def myShiTomasi_function(val):
 
 # Load source image and convert it to gray
 parser = argparse.ArgumentParser(description='Code for Creating your own corner detector tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='PythonData/building.jpg')
+parser.add_argument('--input', help='Path to input image.', default='../../Data/building.jpg')
 args = parser.parse_args()
 
 src = cv.imread(cv.samples.findFile(args.input))

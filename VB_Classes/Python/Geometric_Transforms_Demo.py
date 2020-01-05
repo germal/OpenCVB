@@ -6,7 +6,7 @@ title_window = 'Geometric_Transforms_Demo.py'
 
 ## [Load the image]
 parser = argparse.ArgumentParser(description='Code for Affine Transformations tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='PythonData/lena.jpg')
+parser.add_argument('--input', help='Path to input image.', default='../../Data/lena.jpg')
 args = parser.parse_args()
 
 src = cv.imread(cv.samples.findFile(args.input))

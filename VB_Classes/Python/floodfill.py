@@ -49,7 +49,7 @@ class App():
         try:
             fn = sys.argv[1]
         except:
-            fn = 'PythonData/fruits.jpg'
+            fn = '../../Data/fruits.jpg'
 
         self.img = cv.imread(cv.samples.findFile(fn))
         if self.img is None:

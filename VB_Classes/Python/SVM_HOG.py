@@ -37,7 +37,7 @@ def hog(img):
     return hist
 ## [hog]
 
-img = cv.imread('PythonData/digits.png',0)
+img = cv.imread('../../Data/digits.png',0)
 if img is None:
     raise Exception("we need the digits.png image from samples/data here !")
 cv.imshow("input data", img)

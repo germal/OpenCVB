@@ -62,7 +62,7 @@ def calcGST(inputIMG, w):
 #parser = argparse.ArgumentParser(description='Code for Anisotropic image segmentation tutorial.')
 #parser.add_argument('-i', '--input', help='Path to input image.', required=True)
 #args = parser.parse_args()
-imgName = 'PythonData/aero1.jpg'
+imgName = '../../Data/aero1.jpg'
 imgIn = cv.imread(imgName, cv.IMREAD_GRAYSCALE)
 if imgIn is None:
     print('Could not open or find the image: {}'.format(imgName))

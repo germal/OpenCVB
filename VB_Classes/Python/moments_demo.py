@@ -55,7 +55,7 @@ def thresh_callback(val):
 ## [setup]
 # Load source image
 parser = argparse.ArgumentParser(description='Code for Image Moments tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='PythonData/stuff.jpg')
+parser.add_argument('--input', help='Path to input image.', default='../../Data/stuff.jpg')
 args = parser.parse_args()
 
 src = cv.imread(cv.samples.findFile(args.input))

@@ -11,7 +11,7 @@ def main(argv):
     window_name = 'filter2D Demo'
 
     ## [load]
-    imageName = argv[0] if len(argv) > 0 else 'PythonData/lena.jpg'
+    imageName = argv[0] if len(argv) > 0 else '../../Data/lena.jpg'
 
     # Loads an image
     src = cv.imread(cv.samples.findFile(imageName), cv.IMREAD_COLOR)

@@ -72,7 +72,7 @@ def main():
     try:
         fn = args[0]
     except:
-        fn = 'PythonData/licenseplate_motion.jpg'
+        fn = '../../Data/licenseplate_motion.jpg'
 
     win = 'deconvolution'
 

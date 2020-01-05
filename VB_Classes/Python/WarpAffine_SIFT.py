@@ -115,8 +115,8 @@ def main():
     try:
         fn1, fn2 = args
     except:
-        fn1 = 'PythonData/aero1.jpg'
-        fn2 = 'PythonData/aero3.jpg'
+        fn1 = '../../Data/aero1.jpg'
+        fn2 = '../../Data/aero3.jpg'
 
     img1 = cv.imread(cv.samples.findFile(fn1), cv.IMREAD_GRAYSCALE)
     img2 = cv.imread(cv.samples.findFile(fn2), cv.IMREAD_GRAYSCALE)

@@ -3,7 +3,7 @@ import cv2 as cv
 title_window = 'Rollingball.py'
 # be sure to add the package opencv-rolling-ball with Tools/Python/Environment/Packages
 from cv2_rolling_ball import subtract_background_rolling_ball
-img = cv.imread(f'PythonData/rolling-ball-input.png', 0)
+img = cv.imread(f'../../Data/rolling-ball-input.png', 0)
 cv.imshow("Python input", img)
 cv.waitKey(100)
 

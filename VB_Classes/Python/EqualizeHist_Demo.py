@@ -6,7 +6,7 @@ title_window = 'EqualizedHist_Demo.py'
 
 ## [Load image]
 parser = argparse.ArgumentParser(description='Code for Histogram Equalization tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='PythonData/lena.jpg')
+parser.add_argument('--input', help='Path to input image.', default='../../Data/lena.jpg')
 args = parser.parse_args()
 
 src = cv.imread(cv.samples.findFile(args.input))

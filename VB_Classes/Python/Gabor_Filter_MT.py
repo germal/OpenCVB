@@ -56,7 +56,7 @@ def main():
     try:
         img_fn = sys.argv[1]
     except:
-        img_fn = 'PythonData/baboon.jpg'
+        img_fn = '../../Data/baboon.jpg'
 
     img = cv.imread(cv.samples.findFile(img_fn))
     if img is None:

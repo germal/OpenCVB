@@ -21,7 +21,7 @@ def main():
     try:
         fn = sys.argv[1]
     except IndexError:
-        fn = 'PythonData/board.jpg'
+        fn = '../../Data/board.jpg'
 
     src = cv.imread(cv.samples.findFile(fn))
     img = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
