@@ -29,9 +29,6 @@ Public Class OpenCVB
     Dim frameCount As Int32
     Dim GrabRectangleData As Boolean
     Dim HomeDir As DirectoryInfo
-    Dim intelCamera As Object = Nothing
-    Dim kinect As Kinect
-    Dim kinectCamera As Object = Nothing
     Dim LastX As Int32
     Dim LastY As Int32
     Dim mouseClickFlag As Boolean
@@ -74,14 +71,42 @@ Public Class OpenCVB
         Public Right As Integer
         Public Bottom As Integer
     End Structure
-    Private Structure cameraParms
-        Public Sub New(usingIntel As Boolean, fast As Boolean, intelCamera As Object, kinectCamera As Object)
-            fastProcessing = fast
+    Private Class cameraParms
+        Private Function SetupIntelCamera(fps As Int32, recordingFile As String, playbackFile As String, regWidth As Int32, regHeight As Int32) As Object
+            Dim fileInfo As FileInfo = Nothing
+            If recordingFile <> "" Then
+                fileInfo = New FileInfo(recordingFile)
+                recordingFile = fileInfo.FullName ' better looking name for debugging
+            End If
+            If playbackFile <> "" Then
+                fileInfo = New FileInfo(playbackFile)
+                playbackFile = fileInfo.FullName ' better looking name for debugging
+            End If
+
+            Dim camera = New IntelD400Series(regWidth, regHeight, 30, "", "")
+
+            If camera.deviceCount = 0 Then Return camera
+
+            Return camera
+        End Function
+        Public Sub updateCamera(usingIntel As Boolean)
             If usingIntel Then camera = intelCamera Else camera = kinectCamera
         End Sub
+        Public Sub New(usingIntel As Boolean, fast As Boolean, regWidth As Int32, regHeight As Int32)
+            fastProcessing = fast
+            kinectCamera = New Kinect()
+            intelCamera = SetupIntelCamera(30, "", "", regWidth, regHeight)
+            updateCamera(usingIntel)
+            If kinectCamera.deviceCount = 0 And intelCamera.deviceCount = 0 Then
+                MsgBox("OpenCVB supports either a Kinect for Azure 3D camera or an Intel D400Series 3D camera.  Neither is present.")
+                End
+            End If
+        End Sub
+        Public intelCamera As Object
+        Public kinectCamera As Object
         Public camera As Object
         Public fastProcessing As Boolean
-    End Structure
+    End Class
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         HomeDir = New DirectoryInfo(CurDir() + "\..\..\") ' running in OpenCVB/bin/Debug mostly...
@@ -227,34 +252,6 @@ Public Class OpenCVB
         Next
         saveLayout()
     End Sub
-    Private Function SetupIntelCamera(fps As Int32, recordingFile As String, playbackFile As String) As Object
-        Dim fileInfo As FileInfo = Nothing
-        If recordingFile <> "" Then
-            fileInfo = New FileInfo(recordingFile)
-            recordingFile = fileInfo.FullName ' better looking name for debugging
-        End If
-        If playbackFile <> "" Then
-            fileInfo = New FileInfo(playbackFile)
-            playbackFile = fileInfo.FullName ' better looking name for debugging
-        End If
-
-        Dim camera = New IntelD400Series(regWidth, regHeight, 30, "", "")
-
-        If camera.deviceCount = 0 Then Return camera
-        camera.DecimationFilter = optionsForm.DecimationFilter.Checked
-        camera.ThresholdFilter = optionsForm.ThresholdFilter.Checked
-        camera.DepthToDisparity = optionsForm.DepthToDisparity.Checked
-        camera.SpatialFilter = optionsForm.SpatialFilter.Checked
-        camera.TemporalFilter = optionsForm.TemporalFilter.Checked
-        camera.HoleFillingFilter = optionsForm.HoleFillingFilter.Checked
-        camera.DisparityToDepth = optionsForm.DisparityToDepth.Checked
-
-        Dim OptionsHeight = 300
-        If Screen.PrimaryScreen.Bounds.Height < regHeight * 2 + OptionsHeight Or Screen.PrimaryScreen.Bounds.Width < regWidth * 2 Then
-            If regWidth <> 1280 Then resizeForDisplay = 4
-        End If
-        Return camera
-    End Function
     Private Sub setupCamPicsAndCameras()
         Me.Left = GetSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
         Me.Top = GetSetting("OpenCVB", "OpenCVBTop", "OpenCVBTop", Me.Top)
@@ -272,22 +269,16 @@ Public Class OpenCVB
             Me.Height = defaultHeight
         End If
 
-        If intelCamera Is Nothing Then intelCamera = SetupIntelCamera(30, "", "")
-        Dim usingIntelCamera As Boolean = optionsForm.IntelCamera.Checked
-        If intelCamera.deviceCount = 0 Then
-            usingIntelCamera = False ' well, it has to be a Kinect system then.
+        camParms = New cameraParms(optionsForm.IntelCamera.Checked, optionsForm.FastProcessing.Checked, regWidth, regHeight)
+        If camParms.intelCamera.deviceCount = 0 Then
             optionsForm.Kinect4Azure.Checked = True
+            optionsForm.IntelCamera.Enabled = False
             SaveSetting("OpenCVB", "IntelCamera", "IntelCamera", False)
         End If
-        If kinectCamera Is Nothing Then kinectCamera = New Kinect()
-        If kinectCamera.devicecount = 0 Then
-            usingIntelCamera = True
+        If camParms.kinectCamera.devicecount = 0 Then
             optionsForm.IntelCamera.Checked = True
-            SaveSetting("OpenCVB", "IntelCamera", "IntelCamera", usingintelcamera)
-        End If
-        If kinectCamera.deviceCount = 0 And intelCamera.deviceCount = 0 Then
-            MsgBox("OpenCVB supports either a Kinect for Azure 3D camera or an Intel D400Series 3D camera.  Neither is present.")
-            End
+            optionsForm.Kinect4Azure.Enabled = False
+            SaveSetting("OpenCVB", "IntelCamera", "IntelCamera", True)
         End If
 
         For i = 0 To TTtextData.Count - 1
@@ -624,7 +615,7 @@ Public Class OpenCVB
         Dim cameraFPS As Single = camFrames / (fpsTimer.Interval / 1000)
 
         Dim activeCameraName As String
-        If optionsForm.IntelCamera.Checked Then activeCameraName = intelCamera.deviceName Else activeCameraName = kinectCamera.deviceName
+        If optionsForm.IntelCamera.Checked Then activeCameraName = camParms.intelCamera.deviceName Else activeCameraName = camParms.kinectCamera.deviceName
         Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " + activeCameraName +
                   " FPS = " + Format(cameraFPS, "#0.0") + ", Algorithm FPS = " + Format(fps, "#0.0")
         If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
@@ -652,10 +643,8 @@ Public Class OpenCVB
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopAlgorithmThread = True
         Application.DoEvents()
-        If algorithmStop() = False Then
-            algorithmTaskHandle.Abort()
-        End If
-        cameraStop()
+        If algorithmStop() = False Then algorithmTaskHandle.Abort()
+        If cameraStop() = False Then cameraThreadHandle.Abort()
         textDesc = ""
         saveLayout()
     End Sub
@@ -663,13 +652,15 @@ Public Class OpenCVB
         Dim saveTestAllState = TestAllTimer.Enabled
         If saveTestAllState Then testAllButton_Click(sender, e)
         stopAlgorithmThread = True
-        optionsForm.IntelCamera.Enabled = intelCamera.deviceCount > 0
-        optionsForm.Kinect4Azure.Enabled = kinectCamera.deviceCount > 0
         Dim saveCurrentCamera = optionsForm.IntelCamera.Checked
 
         optionsForm.ShowDialog()
 
-        If saveCurrentCamera <> optionsForm.IntelCamera.Checked Then cameraStop()
+        If saveCurrentCamera <> optionsForm.IntelCamera.Checked Then
+            camParms.updateCamera(optionsForm.IntelCamera.Checked)
+            If cameraStop() = False Then cameraThreadHandle.Abort()
+            cameraThreadHandle = Nothing
+        End If
         TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
 
         If optionsForm.SnapToGrid.Checked Then
@@ -695,9 +686,9 @@ Public Class OpenCVB
             ' Each algorithm must run dispose() - to kill options forms and external Python or OpenGL taskes.  Have to wait until exit...
             While frameCount
                 Application.DoEvents()
-                Thread.Sleep(10)
+                Thread.Sleep(100)
                 sleepCount += 1
-                If sleepCount > 500 Then Return False
+                If sleepCount > 50 Then Return False
             End While
         End If
         Return True
@@ -708,9 +699,9 @@ Public Class OpenCVB
             Dim sleepCount As Int32
             While cameraFrameCount
                 Application.DoEvents()
-                Thread.Sleep(10)
+                Thread.Sleep(100)
                 sleepCount += 1
-                If sleepCount > 500 Then Return False
+                If sleepCount > 50 Then Return False
             End While
         End If
         Return True
@@ -758,7 +749,23 @@ Public Class OpenCVB
 
         stopAlgorithmThread = False
 
-        camParms = New cameraParms(parms.UsingIntelCamera, parms.fastProcessing, intelCamera, kinectCamera)
+        Dim fastSize = If(camParms.fastProcessing, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
+        formResult1 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
+        formResult2 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
+        formResultsUpdated = True ' one time update to the results when starting a new camera or algorithm.
+
+        If cameraThreadHandle Is Nothing Then
+            cameraThreadHandle = New Thread(AddressOf CameraTask)
+            cameraThreadHandle.Priority = ThreadPriority.AboveNormal
+            cameraThreadHandle.Start(camParms)
+            While 1
+                If cameraFrameCount = 0 Then
+                    Application.DoEvents()
+                Else
+                    Exit While
+                End If
+            End While
+        End If
 
         parms.IMUpresent = camParms.camera.IMUpresent
         parms.pcBufferSize = camParms.camera.pcBufferSize
@@ -768,15 +775,8 @@ Public Class OpenCVB
         parms.imuAccel = camParms.camera.imuAccel
         parms.imuTimeStamp = camParms.camera.imuTimeStamp
 
-        Dim fastSize = If(camParms.fastProcessing, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
-        formResult1 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
-        formResult2 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
-        formResultsUpdated = True ' one time update to the results when starting a new camera or algorithm.
-
-        cameraThreadHandle = New Thread(AddressOf CameraTask)
-        cameraThreadHandle.Start(camParms)
-
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
+        algorithmTaskHandle.Priority = ThreadPriority.Lowest
         algorithmTaskHandle.Start(parms)
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
@@ -904,8 +904,8 @@ Public Class OpenCVB
         Dim fastSize = If(camParms.fastProcessing, New cv.Size(regWidth / 2, regHeight / 2), Nothing)
         stopCameraThread = False
         While 1
+            If stopCameraThread Then Exit While
             If stopAlgorithmThread = False Then
-                If stopCameraThread Then Exit While
                 If Me.Visible And Me.IsDisposed = False Then
                     Me.Invoke(
                         Sub()
@@ -937,6 +937,8 @@ Public Class OpenCVB
 
                 If Me.IsDisposed Then Exit While
                 cameraFrameCount += 1
+            Else
+                Application.DoEvents()
             End If
         End While
         cameraFrameCount = 0
