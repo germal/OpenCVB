@@ -67,22 +67,6 @@ Public Class OptionsDialog
         Me.Hide()
         If e.KeyCode = Keys.Escape Then Cancel_Button_Click(sender, e)
     End Sub
-    Private Sub IntelCamera_CheckedChanged(sender As Object, e As EventArgs) Handles IntelCamera.CheckedChanged
-        DecimationFilter.Enabled = True
-        ThresholdFilter.Enabled = True
-        SpatialFilter.Enabled = True
-        TemporalFilter.Enabled = True
-        HoleFillingFilter.Enabled = True
-        DisparityToDepth.Enabled = True
-    End Sub
-    Private Sub Kinect4Azure_CheckedChanged(sender As Object, e As EventArgs) Handles Kinect4Azure.CheckedChanged
-        DecimationFilter.Enabled = False
-        ThresholdFilter.Enabled = False
-        SpatialFilter.Enabled = False
-        TemporalFilter.Enabled = False
-        HoleFillingFilter.Enabled = False
-        DisparityToDepth.Enabled = False
-    End Sub
     Private Sub SelectPythonFile_Click(sender As Object, e As EventArgs) Handles SelectPythonFile.Click
         Dim pythonInfo As FileInfo
         OpenFileDialog1.FileName = "Python.exe"
