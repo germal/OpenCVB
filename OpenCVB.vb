@@ -581,6 +581,7 @@ Public Class OpenCVB
         If currentIndex = AvailableAlgorithms.SelectedIndex Then RunAlgorithmTask()
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
+        If stopAlgorithmThread = True Then Exit Sub ' they have paused.
         stopAlgorithmThread = True
         If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then AvailableAlgorithms.SelectedIndex += 1 Else AvailableAlgorithms.SelectedIndex = 0
     End Sub
@@ -649,6 +650,8 @@ Public Class OpenCVB
         saveLayout()
     End Sub
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
+        Dim saveTestAllState = TestAllTimer.Enabled
+        If saveTestAllState Then testAllButton_Click(sender, e)
         stopAlgorithmThread = True
         optionsForm.IntelCamera.Enabled = intelCamera.deviceCount > 0
         optionsForm.Kinect4Azure.Enabled = kinectCamera.deviceCount > 0
@@ -669,7 +672,7 @@ Public Class OpenCVB
             Me.Height = camPic(0).Height * 2 + 90
         End If
         saveLayout()
-        RunAlgorithmTask()
+        If saveTestAllState Then testAllButton_Click(sender, e) Else RunAlgorithmTask()
     End Sub
     Private Sub RunAlgorithmTask()
         If frameCount <> 0 Then

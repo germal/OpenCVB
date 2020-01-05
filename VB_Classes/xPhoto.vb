@@ -1,6 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports OpenCvSharp.XPhoto
 Imports System.Runtime.InteropServices
+Imports System.Windows.Forms
 
 Public Class xPhoto_Bm3dDenoise : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
@@ -70,8 +71,8 @@ Public Class xPhoto_OilPaint_CPP : Implements IDisposable
     Dim radio As New OptionsRadioButtons
     Dim xPhoto_OilPaint As IntPtr
     Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "xPhoto Dynamic Ratio", 1, 127, 1)
-        sliders.setupTrackBar2(ocvb, "xPhoto Block Size", 1, 100, 10)
+        sliders.setupTrackBar1(ocvb, "xPhoto Dynamic Ratio", 1, 127, 7)
+        sliders.setupTrackBar2(ocvb, "xPhoto Block Size", 1, 100, 3)
         If ocvb.parms.ShowOptions Then sliders.show()
 
         radio.Setup(ocvb, 5)
@@ -83,6 +84,7 @@ Public Class xPhoto_OilPaint_CPP : Implements IDisposable
         radio.check(0).Checked = True
         If ocvb.parms.ShowOptions Then radio.show()
 
+        Application.DoEvents() ' because the rest of initialization takes so long, let the show() above take effect.
         xPhoto_OilPaint = xPhoto_OilPaint_Open()
         ocvb.desc = "Use the xPhoto Oil Painting transform - Painterly effect"
     End Sub
