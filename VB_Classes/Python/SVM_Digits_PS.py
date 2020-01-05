@@ -74,11 +74,11 @@ def OpenCVCode(imgRGB, depth_colormap):
     cv.cvtColor(bin, cv.COLOR_GRAY2BGR, binRGB)
     images = np.empty((h, w*2, imgRGB.shape[2]), imgRGB.dtype)
     images = cv.hconcat([imgRGB, binRGB])
-    cv.imshow('images', images)
+    cv.imshow(title_window, images)
 
 
 if __name__ == '__main__':
-    classifier_fn = 'PythonData/digits_svm.dat'
+    classifier_fn = '../../Data/digits_svm.dat'
     if not os.path.exists(classifier_fn):
         print('"%s" not found, run digits.py first' % classifier_fn)
         exit
