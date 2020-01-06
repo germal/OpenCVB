@@ -278,7 +278,7 @@ End Module
 Public Class OpenGL_3Ddata : Implements IDisposable
     Public ogl As OpenGL_Options
     Dim sliders As New OptionsSliders
-    Dim rgbData() As Byte
+    Dim rgbData(1) As Byte
     Public rgbInput As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
@@ -292,20 +292,16 @@ Public Class OpenGL_3Ddata : Implements IDisposable
         ogl.sliders1.TrackBar3.Value = 5
         ogl.sliders.TrackBar3.Value = 10
 
-        rgbInput = ocvb.color.Clone()
-        ReDim rgbData(ocvb.color.Total() * ocvb.color.ElemSize - 1) ' this will not change in size
         ocvb.label1 = "Input to Histogram 3D"
         ocvb.desc = "Plot the results of a 3D histogram in OpenGL."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim bins = sliders.TrackBar1.Value
 
-        If externalUse Then
-            Marshal.Copy(rgbInput.Data, rgbData, 0, rgbData.Length)
-        Else
-            Marshal.Copy(ocvb.color.Data, rgbData, 0, rgbData.Length)
-            ocvb.result1 = ocvb.color.Clone()
-        End If
+        If externalUse = False Then rgbInput = ocvb.color.Clone()
+        If rgbData.Length <> rgbInput.Total * rgbInput.ElemSize Then ReDim rgbData(rgbInput.Total * rgbInput.ElemSize - 1)
+        Marshal.Copy(rgbInput.Data, rgbData, 0, rgbData.Length)
+
         Dim handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' and pin it as well
         Dim dstPtr = Histogram_3D_RGB(handleRGB.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols, bins)
         handleRGB.Free() ' free the pinned memory...
