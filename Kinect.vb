@@ -188,7 +188,6 @@ Public Class Kinect : Implements IDisposable
 
         Dim pc = New cv.Mat(h, w, cv.MatType.CV_16SC3, KinectPointCloud(kc))
         pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3) ' This is less efficient than using 16-bit pixels but consistent with Intel cameras (and more widely accepted as normal.)
-        pointCloud *= 0.001 ' units are millimeters.
     End Sub
 #Region "IDisposable Support"
     Private disposedValue As Boolean ' To detect redundant calls

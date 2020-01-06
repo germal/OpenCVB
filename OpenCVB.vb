@@ -91,8 +91,10 @@ Public Class OpenCVB
         End Function
         Public Sub updateCamera(usingIntel As Boolean)
             If usingIntel Then camera = intelCamera Else camera = kinectCamera
+            usingIntelCamera = usingIntel
         End Sub
         Public Sub New(usingIntel As Boolean, fast As Boolean, regWidth As Int32, regHeight As Int32)
+            usingIntelCamera = usingIntel
             fastProcessing = fast
             kinectCamera = New Kinect()
             intelCamera = SetupIntelCamera(30, "", "", regWidth, regHeight)
@@ -102,6 +104,7 @@ Public Class OpenCVB
                 End
             End If
         End Sub
+        Public usingIntelCamera As Boolean
         Public intelCamera As Object
         Public kinectCamera As Object
         Public camera As Object
@@ -520,8 +523,6 @@ Public Class OpenCVB
             Console.WriteLine("Error in camPic_MouseMove: " + ex.Message)
         End Try
     End Sub
-    Private Sub drawRegionOfInterest(g As Graphics, r As cv.Rect)
-    End Sub
     Private Sub campic_DoubleClick(sender As Object, e As EventArgs)
         DrawingRectangle = False
     End Sub
@@ -657,8 +658,8 @@ Public Class OpenCVB
         optionsForm.ShowDialog()
 
         If saveCurrentCamera <> optionsForm.IntelCamera.Checked Then
-            camParms.updateCamera(optionsForm.IntelCamera.Checked)
             If cameraStop() = False Then cameraThreadHandle.Abort()
+            camParms.updateCamera(optionsForm.IntelCamera.Checked)
             cameraThreadHandle = Nothing
         End If
         TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
@@ -913,10 +914,11 @@ Public Class OpenCVB
                         End Sub
                     )
                 End If
-
+                Console.WriteLine("GetNextFrame called " + CStr(Now))
                 camParms.camera.GetNextFrame()
                 If camParms.camera.color Is Nothing Then Continue While ' at startup it may not be ready...
                 SyncLock camPic
+                    If camParms.usingIntelCamera = False Then camParms.camera.pointCloud *= 0.001 ' units are millimeters.
                     formPointCloud = camParms.camera.pointCloud ' the point cloud is never resized.
                     If camParms.fastProcessing Then
                         formColor = camParms.camera.color.Resize(fastSize)

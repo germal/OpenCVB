@@ -11,11 +11,10 @@ Public Class OpenGL_Basics : Implements IDisposable
     Dim memMapbufferSize As Int32
     Dim memMapFile As MemoryMappedFile
     Dim memMapPtr As IntPtr
-    Dim rgbBuffer(1) As Byte
-    Dim dataBuffer(1) As Byte
-    Dim pointCloudBuffer(1) As Byte
+    Dim rgbBuffer(0) As Byte
+    Dim dataBuffer(0) As Byte
+    Dim pointCloudBuffer(0) As Byte
     Public memMapValues(49) As Double ' more than needed - buffer for growth.
-    Public usingDepthAndRGB As Boolean = True ' if false, we are using plotData, not ocvb.depth.
     Public pointSize As Int32 = 2
     Public rgbInput As New cv.Mat
     Public dataInput As New cv.Mat
@@ -60,21 +59,10 @@ Public Class OpenGL_Basics : Implements IDisposable
 
         memMapbufferSize = 8 * (memMapValues.Length - 1)
 
-        If usingDepthAndRGB = False Then ocvb.parms.pcBufferSize = 0
-
         startInfo.FileName = OpenGLTitle + ".exe"
         startInfo.Arguments = CStr(ocvb.openGLWidth) + " " + CStr(ocvb.openGLHeight) + " " + CStr(memMapbufferSize) + " " + pipeName + " " + CStr(ocvb.parms.pcBufferSize)
         If ocvb.parms.ShowConsoleLog = False Then startInfo.WindowStyle = ProcessWindowStyle.Hidden
         Process.Start(startInfo)
-
-        If usingDepthAndRGB Then
-            rgbInput = ocvb.color.Clone()
-            dataInput = ocvb.depth.Clone()
-        Else
-            ' minimize the data transfer (we still need the pipe to sync so just make a small buffer.)
-            rgbInput = New cv.Mat(1, 1, cv.MatType.CV_8UC3, 0)
-            dataInput = New cv.Mat(1, 1, cv.MatType.CV_32F, 0)
-        End If
 
         memMapPtr = Marshal.AllocHGlobal(memMapbufferSize)
         memMapFile = MemoryMappedFile.CreateOrOpen("OpenCVBControl", memMapbufferSize)
@@ -93,15 +81,12 @@ Public Class OpenGL_Basics : Implements IDisposable
             End If
         End If
 
-        If usingDepthAndRGB Then
-            rgbInput = ocvb.color.Clone()
-            dataInput = ocvb.depth.Clone()
-        Else
-            ocvb.parms.pcBufferSize = 0
-        End If
+        If rgbInput.Width = 0 Then rgbInput = ocvb.color
 
         If ocvb.parms.pcBufferSize <> 0 Then
-            If pointCloudBuffer.Length <> ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize Then ReDim pointCloudBuffer(ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize - 1)
+            If pointCloudBuffer.Length <> ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize Then
+                ReDim pointCloudBuffer(ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize - 1)
+            End If
         End If
         Dim rgb = rgbInput.CvtColor(cv.ColorConversionCodes.BGR2RGB) ' OpenGL needs RGB, not BGR
         If rgbBuffer.Length <> rgb.Total * rgb.ElemSize Then ReDim rgbBuffer(rgb.Total * rgb.ElemSize - 1)
@@ -111,11 +96,10 @@ Public Class OpenGL_Basics : Implements IDisposable
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length - 1)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
 
-        Marshal.Copy(rgb.Data, rgbBuffer, 0, rgbBuffer.Length)
-        Marshal.Copy(dataInput.Data, dataBuffer, 0, dataBuffer.Length)
-        If ocvb.parms.pcBufferSize > 0 Then
-            Marshal.Copy(ocvb.pointCloud.Data, pointCloudBuffer, 0, ocvb.parms.pcBufferSize)
-        End If
+        If rgb.Width > 0 Then Marshal.Copy(rgb.Data, rgbBuffer, 0, rgbBuffer.Length)
+        If dataInput.Width > 0 Then Marshal.Copy(dataInput.Data, dataBuffer, 0, dataBuffer.Length)
+        If ocvb.parms.pcBufferSize > 0 Then Marshal.Copy(ocvb.pointCloud.Data, pointCloudBuffer, 0, ocvb.parms.pcBufferSize)
+
         If pipe.IsConnected Then
             On Error Resume Next
             pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
@@ -165,7 +149,7 @@ Module OpenGL_Sliders_Module
         sliders.setupTrackBar2(ocvb, "OpenGL yaw (degrees)", -180, 180, -3)
         sliders.setupTrackBar3(ocvb, "OpenGL pitch (degrees)", -180, 180, 3)
         sliders.setupTrackBar4(ocvb, "OpenGL roll (degrees)", -180, 180, 0)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
     End Sub
 End Module
 
@@ -241,11 +225,11 @@ Public Class OpenGL_IMU : Implements IDisposable
     Public ogl As OpenGL_Options
     Public Sub New(ocvb As AlgorithmData)
         ogl = New OpenGL_Options(ocvb)
-        ogl.OpenGL.usingDepthAndRGB = False ' we are providing plotData - no depth data involved.
         ogl.OpenGL.OpenGLTitle = "OpenGL_IMU"
         ogl.sliders.TrackBar2.Value = 0 ' pitch
         ogl.sliders.TrackBar3.Value = 0 ' yaw
         ogl.sliders.TrackBar4.Value = 0 ' roll
+        ocvb.parms.pcBufferSize = 0 ' we are not using the point in this example.
         ocvb.desc = "Show how to use IMU coordinates in OpenGL"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -278,19 +262,18 @@ End Module
 Public Class OpenGL_3Ddata : Implements IDisposable
     Public ogl As OpenGL_Options
     Dim sliders As New OptionsSliders
-    Dim rgbData(1) As Byte
-    Public rgbInput As New cv.Mat
+    Dim histInput() As Byte
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
         If ocvb.parms.ShowOptions Then sliders.show()
 
         ogl = New OpenGL_Options(ocvb)
-        ogl.OpenGL.usingDepthAndRGB = False ' we are providing plotData - no depth data involved.
         ogl.OpenGL.OpenGLTitle = "OpenGL_3Ddata"
         ogl.sliders.TrackBar2.Value = -10
         ogl.sliders1.TrackBar3.Value = 5
         ogl.sliders.TrackBar3.Value = 10
+        ocvb.parms.pcBufferSize = 0 ' we are not using the point cloud when displaying data.
 
         ocvb.label1 = "Input to Histogram 3D"
         ocvb.desc = "Plot the results of a 3D histogram in OpenGL."
@@ -298,11 +281,10 @@ Public Class OpenGL_3Ddata : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim bins = sliders.TrackBar1.Value
 
-        If externalUse = False Then rgbInput = ocvb.color.Clone()
-        If rgbData.Length <> rgbInput.Total * rgbInput.ElemSize Then ReDim rgbData(rgbInput.Total * rgbInput.ElemSize - 1)
-        Marshal.Copy(rgbInput.Data, rgbData, 0, rgbData.Length)
+        If histInput Is Nothing Then ReDim histInput(ocvb.color.Total * ocvb.color.ElemSize - 1)
+        Marshal.Copy(ocvb.color.Data, histInput, 0, histInput.Length)
 
-        Dim handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' and pin it as well
+        Dim handleRGB = GCHandle.Alloc(histInput, GCHandleType.Pinned) ' and pin it as well
         Dim dstPtr = Histogram_3D_RGB(handleRGB.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols, bins)
         handleRGB.Free() ' free the pinned memory...
         Dim dstData(bins * bins * bins - 1) As Single
@@ -311,7 +293,6 @@ Public Class OpenGL_3Ddata : Implements IDisposable
         histogram = histogram.Normalize(255)
 
         ogl.OpenGL.dataInput = histogram.Clone()
-        ogl.OpenGL.rgbInput = New cv.Mat(1, ocvb.rColors.Length - 1, cv.MatType.CV_8UC3, ocvb.rColors.ToArray)
         ogl.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -331,13 +312,13 @@ Public Class OpenGL_Draw3D : Implements IDisposable
         circle.sliders.TrackBar1.Value = 5
 
         ogl = New OpenGL_Options(ocvb)
-        ogl.OpenGL.usingDepthAndRGB = False ' we are providing plotData - no depth data involved.
         ogl.OpenGL.OpenGLTitle = "OpenGL_3DShapes"
         ogl.sliders.TrackBar1.Value = 80
         ogl.sliders2.TrackBar1.Value = -140
         ogl.sliders2.TrackBar2.Value = -180
         ogl.sliders1.TrackBar3.Value = 16
         ogl.sliders2.TrackBar3.Value = -30
+        ocvb.parms.pcBufferSize = 0 ' we are not using the point cloud when displaying data.
         ocvb.label2 = "Grayscale image sent to OpenGL"
         ocvb.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
     End Sub
