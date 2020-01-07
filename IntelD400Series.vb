@@ -62,7 +62,7 @@ Public Class IntelD400Series : Implements IDisposable
             For Each p In blocks
                 If p.Info.Item(0) = "Decimation Filter" And DecimationFilter Then f = p.Process(f)
                 If p.Info.Item(0) = "Threshold Filter" And ThresholdFilter Then f = p.Process(f)
-                If p.Info.Item(0) = "Depth to Disparity" Then f = p.Process(f) ' always have depth to disparity
+                'If p.Info.Item(0) = "Depth to Disparity" Then f = p.Process(f) ' always have depth to disparity
                 If p.Info.Item(0) = "Spatial Filter" And SpatialFilter Then f = p.Process(f)
                 If p.Info.Item(0) = "Temporal Filter" And TemporalFilter Then f = p.Process(f)
                 If p.Info.Item(0) = "Hole Filling Filter" And HoleFillingFilter Then f = p.Process(f)
