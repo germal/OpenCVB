@@ -157,7 +157,7 @@ Public Class OpticalFlow_DenseBasics_MT : Implements IDisposable
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
-        grid.sliders.TrackBar3.Value = 5
+        grid.sliders.TrackBar3.Value = 0
 
         flow = New OpticalFlow_DenseOptions(ocvb)
         flow.sliders.TrackBar1.Value = 75

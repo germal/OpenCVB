@@ -15,7 +15,7 @@ Public Class OpenCVB
     Dim border As Int32 = 6
     Dim BothFirstAndLastReady As Boolean
     Dim cameraFrameCount As Int32
-    Dim cameraThreadHandle As Thread
+    Dim cameraTaskHandle As Thread
     Dim camParms As cameraParms
     Dim camPic(displayFrames - 1) As PictureBox
     Dim CodeLineCount As Int32
@@ -94,6 +94,7 @@ Public Class OpenCVB
             usingIntelCamera = usingIntel
         End Sub
         Public Sub New(usingIntel As Boolean, fast As Boolean, regWidth As Int32, regHeight As Int32)
+            fastSize = If(fast, New cv.Size(regWidth / 2, regHeight / 2), Nothing)
             usingIntelCamera = usingIntel
             fastProcessing = fast
             kinectCamera = New Kinect()
@@ -104,6 +105,8 @@ Public Class OpenCVB
                 End
             End If
         End Sub
+        Public fastSize As cv.Size
+        Public activeAlgorithm As String
         Public usingIntelCamera As Boolean
         Public intelCamera As Object
         Public kinectCamera As Object
@@ -644,8 +647,8 @@ Public Class OpenCVB
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopAlgorithmThread = True
         Application.DoEvents()
-        If algorithmStop() = False Then algorithmTaskHandle.Abort()
-        If cameraStop() = False Then cameraThreadHandle.Abort()
+        If threadStop(frameCount, stopAlgorithmThread) = False Then algorithmTaskHandle.Abort()
+        If threadStop(cameraFrameCount, stopCameraThread) = False Then cameraTaskHandle.Abort()
         textDesc = ""
         saveLayout()
     End Sub
@@ -658,9 +661,9 @@ Public Class OpenCVB
         optionsForm.ShowDialog()
 
         If saveCurrentCamera <> optionsForm.IntelCamera.Checked Then
-            If cameraStop() = False Then cameraThreadHandle.Abort()
+            If threadStop(cameraFrameCount, stopCameraThread) = False Then cameraTaskHandle.Abort()
             camParms.updateCamera(optionsForm.IntelCamera.Checked)
-            cameraThreadHandle = Nothing
+            cameraTaskHandle = Nothing
         End If
         TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
 
@@ -679,26 +682,13 @@ Public Class OpenCVB
         saveLayout()
         If saveTestAllState Then testAllButton_Click(sender, e) Else RunAlgorithmTask()
     End Sub
-    Private Function algorithmStop() As Boolean
-        If frameCount <> 0 Then
-            stopAlgorithmThread = True
+    Private Function threadStop(ByRef frame As Int32, ByRef stopFlag As Boolean) As Boolean
+        If frame <> 0 Then
+            stopFlag = True
             Dim sleepCount As Int32
             ' some algorithms can take a long time to finish a single iteration.  
             ' Each algorithm must run dispose() - to kill options forms and external Python or OpenGL taskes.  Have to wait until exit...
-            While frameCount
-                Application.DoEvents()
-                Thread.Sleep(100)
-                sleepCount += 1
-                If sleepCount > 50 Then Return False
-            End While
-        End If
-        Return True
-    End Function
-    Private Function cameraStop() As Boolean
-        If cameraFrameCount <> 0 Then
-            stopCameraThread = True
-            Dim sleepCount As Int32
-            While cameraFrameCount
+            While frame
                 Application.DoEvents()
                 Thread.Sleep(100)
                 sleepCount += 1
@@ -708,7 +698,7 @@ Public Class OpenCVB
         Return True
     End Function
     Private Sub RunAlgorithmTask()
-        If algorithmStop() = False Then algorithmTaskHandle.Abort()
+        If threadStop(frameCount, stopAlgorithmThread) = False Then algorithmTaskHandle.Abort()
 
         ActivateTimer.Enabled = True
         fpsTimer.Enabled = True
@@ -750,15 +740,15 @@ Public Class OpenCVB
 
         stopAlgorithmThread = False
 
-        Dim fastSize = If(camParms.fastProcessing, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
-        formResult1 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
-        formResult2 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
+        camParms.activeAlgorithm = parms.activeAlgorithm ' pass along info on OpenGL apps...
+        formResult1 = New cv.Mat(camParms.fastSize, cv.MatType.CV_8UC3, 0)
+        formResult2 = New cv.Mat(camParms.fastSize, cv.MatType.CV_8UC3, 0)
         formResultsUpdated = True ' one time update to the results when starting a new camera or algorithm.
 
-        If cameraThreadHandle Is Nothing Then
-            cameraThreadHandle = New Thread(AddressOf CameraTask)
-            cameraThreadHandle.Priority = ThreadPriority.AboveNormal
-            cameraThreadHandle.Start(camParms)
+        If cameraTaskHandle Is Nothing Then
+            cameraTaskHandle = New Thread(AddressOf CameraTask)
+            cameraTaskHandle.Priority = ThreadPriority.AboveNormal
+            cameraTaskHandle.Start(camParms)
             While 1
                 If cameraFrameCount = 0 Then
                     Application.DoEvents()
@@ -880,7 +870,6 @@ Public Class OpenCVB
                         For Each frm In Application.OpenForms
                             If frm.name.startswith("Option") Then frm.topmost = True
                         Next
-                        'Application.DoEvents()
                         For Each frm In Application.OpenForms
                             If frm.name.startswith("Option") Then frm.topmost = False
                         Next
@@ -902,7 +891,10 @@ Public Class OpenCVB
         frameCount = 0
     End Sub
     Private Sub CameraTask(camParms As cameraParms)
-        Dim fastSize = If(camParms.fastProcessing, New cv.Size(regWidth / 2, regHeight / 2), Nothing)
+        Dim fastsize = camParms.fastSize
+        If camParms.activeAlgorithm.StartsWith("OpenGL") Or camParms.activeAlgorithm.StartsWith("OpenCVGL") Then
+            camParms.fastProcessing = False ' OpenGL apps run only at full resolution...
+        End If
         stopCameraThread = False
         While 1
             If stopCameraThread Then Exit While
@@ -914,19 +906,23 @@ Public Class OpenCVB
                         End Sub
                     )
                 End If
-                Console.WriteLine("GetNextFrame called " + CStr(Now))
+
                 camParms.camera.GetNextFrame()
                 If camParms.camera.color Is Nothing Then Continue While ' at startup it may not be ready...
                 SyncLock camPic
-                    If camParms.usingIntelCamera = False Then camParms.camera.pointCloud *= 0.001 ' units are millimeters.
-                    formPointCloud = camParms.camera.pointCloud ' the point cloud is never resized.
+                    If camParms.usingIntelCamera = False Then
+                        formPointCloud = camParms.camera.pointCloud ' the point cloud is never resized - OpenGL apps.
+                        formPointCloud *= 0.001 ' units are millimeters for Kinect
+                    Else
+                        formPointCloud = camParms.camera.pointCloud ' the point cloud is never resized - OpenGL apps.
+                    End If
                     If camParms.fastProcessing Then
-                        formColor = camParms.camera.color.Resize(fastSize)
-                        formDepthRGB = camParms.camera.depthRGB.Resize(fastSize)
-                        formDepth = camParms.camera.depth.Resize(fastSize)
-                        formDisparity = camParms.camera.disparity.Resize(fastSize)
-                        formRedLeft = camParms.camera.redLeft.Resize(fastSize)
-                        formRedRight = camParms.camera.redRight.Resize(fastSize)
+                        formColor = camParms.camera.color.Resize(fastsize)
+                        formDepthRGB = camParms.camera.depthRGB.Resize(fastsize)
+                        formDepth = camParms.camera.depth.Resize(fastsize)
+                        formDisparity = camParms.camera.disparity.Resize(fastsize)
+                        formRedLeft = camParms.camera.redLeft.Resize(fastsize)
+                        formRedRight = camParms.camera.redRight.Resize(fastsize)
                     Else
                         formColor = camParms.camera.color
                         formDepthRGB = camParms.camera.depthRGB

@@ -128,7 +128,7 @@ End Class
 Module OpenGL_Sliders_Module
     Public Sub setOpenGLsliders(ocvb As AlgorithmData, sliders As OptionsSliders, sliders1 As OptionsSliders, sliders2 As OptionsSliders, sliders3 As OptionsSliders)
         sliders1.setupTrackBar1(ocvb, "OpenGL zNear", 0, 100, 0)
-        sliders1.setupTrackBar2(ocvb, "OpenGL zFar", -20, 200, 20)
+        sliders1.setupTrackBar2(ocvb, "OpenGL zFar", -50, 200, 20)
         sliders1.setupTrackBar3(ocvb, "OpenGL Point Size", 1, 20, 2)
         sliders1.setupTrackBar4(ocvb, "zTrans", -1000, 1000, 50)
         If ocvb.parms.ShowOptions Then sliders1.Show()

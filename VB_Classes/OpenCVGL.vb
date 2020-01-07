@@ -39,11 +39,10 @@ Public Class OpenCVGL_Image_CPP : Implements IDisposable
 
         setOpenGLsliders(ocvb, sliders, sliders1, sliders2, sliders3)
         sliders2.TrackBar3.Value = -10 ' eye.z
-        sliders.TrackBar1.Value = 8 ' FOV
+        sliders.TrackBar1.Value = 30 ' FOV
         sliders.TrackBar2.Value = 0 ' Yaw
         sliders.TrackBar3.Value = 0 ' pitch
         sliders.TrackBar4.Value = 0 ' roll
-        If ocvb.parms.UsingIntelCamera = False Then sliders.TrackBar1.Value = 35
 
         ReDim rgbData(ocvb.color.Total * ocvb.color.ElemSize - 1)
 
