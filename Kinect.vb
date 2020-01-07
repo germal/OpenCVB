@@ -159,13 +159,14 @@ Public Class Kinect : Implements IDisposable
             imuGyro = imuOutput.imuGyro
             imuAccel = imuOutput.imuAccel
 
+            ' make the imu consistent with the Intel IMU...
             Dim tmpVal = imuAccel.Z
             imuAccel.Z = imuAccel.X
             imuAccel.X = imuAccel.Y
             imuAccel.Y = tmpVal
 
             tmpVal = imuGyro.Z
-            imuGyro.Z = imuGyro.X
+            imuGyro.Z = -imuGyro.X
             imuGyro.X = imuGyro.Y
             imuGyro.Y = tmpVal
 

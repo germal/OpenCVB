@@ -29,6 +29,9 @@ Public Class OpenCVB
     Dim frameCount As Int32
     Dim GrabRectangleData As Boolean
     Dim HomeDir As DirectoryInfo
+    Dim imuGyro As cv.Point3f
+    Dim imuAccel As cv.Point3f
+    Dim imuTimeStamp As Double
     Dim LastX As Int32
     Dim LastY As Int32
     Dim mouseClickFlag As Boolean
@@ -762,9 +765,6 @@ Public Class OpenCVB
         parms.pcBufferSize = camParms.camera.pcBufferSize
         parms.intrinsics = camParms.camera.Intrinsics_VB
         parms.extrinsics = camParms.camera.Extrinsics_VB
-        parms.imuGyro = camParms.camera.imuGyro
-        parms.imuAccel = camParms.camera.imuAccel
-        parms.imuTimeStamp = camParms.camera.imuTimeStamp
 
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
         algorithmTaskHandle.Priority = ThreadPriority.Lowest
@@ -823,6 +823,9 @@ Public Class OpenCVB
                 OpenCVB.ocvb.disparity = formDisparity
                 OpenCVB.ocvb.redLeft = formRedLeft
                 OpenCVB.ocvb.redRight = formRedRight
+                OpenCVB.ocvb.parms.imuGyro = imuGyro
+                OpenCVB.ocvb.parms.imuAccel = imuAccel
+                OpenCVB.ocvb.parms.imuTimeStamp = imuTimeStamp
             End SyncLock
 
             Try
@@ -892,9 +895,6 @@ Public Class OpenCVB
     End Sub
     Private Sub CameraTask(camParms As cameraParms)
         Dim fastsize = camParms.fastSize
-        If camParms.activeAlgorithm.StartsWith("OpenGL") Or camParms.activeAlgorithm.StartsWith("OpenCVGL") Then
-            camParms.fastProcessing = False ' OpenGL apps run only at full resolution...
-        End If
         stopCameraThread = False
         While 1
             If stopCameraThread Then Exit While
@@ -908,14 +908,17 @@ Public Class OpenCVB
                 End If
 
                 camParms.camera.GetNextFrame()
+                ' The algorithm can change anytime.  The camera task run continuously.
+                If camParms.activeAlgorithm.StartsWith("OpenGL") Or camParms.activeAlgorithm.StartsWith("OpenCVGL") Then
+                    camParms.fastProcessing = False ' OpenGL apps run only at full resolution...
+                End If
                 If camParms.camera.color Is Nothing Then Continue While ' at startup it may not be ready...
                 SyncLock camPic
-                    If camParms.usingIntelCamera = False Then
-                        formPointCloud = camParms.camera.pointCloud ' the point cloud is never resized - OpenGL apps.
-                        formPointCloud *= 0.001 ' units are millimeters for Kinect
-                    Else
-                        formPointCloud = camParms.camera.pointCloud ' the point cloud is never resized - OpenGL apps.
-                    End If
+                    imuGyro = camParms.camera.imuGyro ' The data may not be present but just copy it...
+                    imuAccel = camParms.camera.imuaccel
+                    imuTimeStamp = camParms.camera.imutimestamp
+                    formPointCloud = camParms.camera.pointCloud ' the point cloud is never resized - OpenGL apps.
+                    If camParms.usingIntelCamera = False Then formPointCloud *= 0.001 ' units are millimeters for Kinect
                     If camParms.fastProcessing Then
                         formColor = camParms.camera.color.Resize(fastsize)
                         formDepthRGB = camParms.camera.depthRGB.Resize(fastsize)
