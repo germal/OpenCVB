@@ -99,7 +99,7 @@ Public Class OpenCVB
         Public Sub New(usingIntel As Boolean, fast As Boolean, regWidth As Int32, regHeight As Int32)
             fastSize = If(fast, New cv.Size(regWidth / 2, regHeight / 2), Nothing)
             usingIntelCamera = usingIntel
-            fastProcessing = fast
+            lowResolution = fast
             kinectCamera = New Kinect()
             intelCamera = SetupIntelCamera(30, "", "", regWidth, regHeight)
             updateCamera(usingIntel)
@@ -114,7 +114,7 @@ Public Class OpenCVB
         Public intelCamera As Object
         Public kinectCamera As Object
         Public camera As Object
-        Public fastProcessing As Boolean
+        Public lowResolution As Boolean
     End Class
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -278,7 +278,7 @@ Public Class OpenCVB
             Me.Height = defaultHeight
         End If
 
-        camParms = New cameraParms(optionsForm.IntelCamera.Checked, optionsForm.FastProcessing.Checked, regWidth, regHeight)
+        camParms = New cameraParms(optionsForm.IntelCamera.Checked, optionsForm.lowResolution.Checked, regWidth, regHeight)
         If camParms.intelCamera.deviceCount = 0 Then
             optionsForm.Kinect4Azure.Checked = True
             optionsForm.IntelCamera.Enabled = False
@@ -583,19 +583,15 @@ Public Class OpenCVB
         stopAlgorithmThread = True
         If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then AvailableAlgorithms.SelectedIndex += 1 Else AvailableAlgorithms.SelectedIndex = 0
     End Sub
-    Private Sub MainFrm_Move(sender As Object, e As EventArgs) Handles Me.Move
-        RefreshAvailable = False
-        ActivateTimer.Enabled = True
-    End Sub
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
         OptionsBringToFront = True
     End Sub
     Private Sub OpenCVB_ResizeBegin(sender As Object, e As EventArgs) Handles Me.ResizeBegin
-        stopAlgorithmThread = True
+        'stopAlgorithmThread = True
     End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         saveLayout()
-        RunAlgorithmTask()
+        'RunAlgorithmTask()
     End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If AvailableAlgorithms.Enabled Then
@@ -633,8 +629,8 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "OpenCVBWidth", "OpenCVBWidth", Me.Width)
         SaveSetting("OpenCVB", "OpenCVBHeight", "OpenCVBHeight", Me.Height)
 
-        Dim details = CStr(regWidth) + "x" + CStr(regHeight) + " display " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + " FastProcessing="
-        If optionsForm.FastProcessing.Checked Then details += "On" Else details += "Off"
+        Dim details = CStr(regWidth) + "x" + CStr(regHeight) + " display " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + " lowResolution="
+        If optionsForm.lowResolution.Checked Then details += "On" Else details += "Off"
         picLabels(0) = "Input " + details
         picLabels(1) = "Depth " + details
     End Sub
@@ -692,10 +688,9 @@ Public Class OpenCVB
             ' some algorithms can take a long time to finish a single iteration.  
             ' Each algorithm must run dispose() - to kill options forms and external Python or OpenGL taskes.  Have to wait until exit...
             While frame
-                Application.DoEvents()
                 Thread.Sleep(100)
                 sleepCount += 1
-                If sleepCount > 50 Then Return False
+                If sleepCount > 10 Then Return False
             End While
         End If
         Return True
@@ -708,13 +703,13 @@ Public Class OpenCVB
 
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
         parms.minimizeMemoryFootprint = optionsForm.MinimizeMemoryFootprint.Checked
-        parms.fastProcessing = optionsForm.FastProcessing.Checked
+        parms.lowResolution = optionsForm.lowResolution.Checked
         parms.UsingIntelCamera = optionsForm.IntelCamera.Checked
         parms.activeAlgorithm = AvailableAlgorithms.Text
 
         ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
         If parms.activeAlgorithm.Contains("OpenGL") Or parms.activeAlgorithm.Contains("OpenCVGL") Then
-            If parms.fastProcessing Then parms.fastProcessing = False
+            If parms.lowResolution Then parms.lowResolution = False
         End If
 
         parms.PythonExe = optionsForm.PythonExeName.Text
@@ -732,10 +727,10 @@ Public Class OpenCVB
         parms.ShowConsoleLog = optionsForm.ShowConsoleLog.Checked
         parms.AvoidDNNCrashes = optionsForm.AvoidDNNCrashes.Checked
 
-        If parms.fastProcessing Then parms.speedFactor = 2 Else parms.speedFactor = 1
+        If parms.lowResolution Then parms.speedFactor = 2 Else parms.speedFactor = 1
         parms.width = regWidth / parms.speedFactor
         parms.height = regHeight / parms.speedFactor
-        If parms.fastProcessing Then parms.imageToTrueTypeLoc *= parms.speedFactor
+        If parms.lowResolution Then parms.imageToTrueTypeLoc *= parms.speedFactor
 
         AlgorithmDesc.Text = ""
         Dim res() As String = GetType(OpenCVB).Assembly.GetManifestResourceNames()
@@ -762,7 +757,6 @@ Public Class OpenCVB
         End If
 
         parms.IMUpresent = camParms.camera.IMUpresent
-        parms.pcBufferSize = camParms.camera.pcBufferSize
         parms.intrinsics = camParms.camera.Intrinsics_VB
         parms.extrinsics = camParms.camera.Extrinsics_VB
 
@@ -772,21 +766,21 @@ Public Class OpenCVB
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
         drawRect = New cv.Rect(0, 0, 0, 0)
-        Dim saveFastProc As Boolean = parms.fastProcessing
+        Dim saveFastProc As Boolean = parms.lowResolution
         Dim OpenCVB = New VB_Classes.ActiveClass(parms)
         textDesc = OpenCVB.ocvb.desc
-        ' some algorithms need to turn off the fastprocessing (OpenGL apps run at full resolution.)  
-        ' Here we check to see if the algorithm constructor changed fastprocessing.
-        If OpenCVB.ocvb.parms.fastProcessing <> saveFastProc Then
-            If OpenCVB.ocvb.parms.fastProcessing Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
+        ' some algorithms need to turn off the lowResolution (OpenGL apps run at full resolution.)  
+        ' Here we check to see if the algorithm constructor changed lowResolution.
+        If OpenCVB.ocvb.parms.lowResolution <> saveFastProc Then
+            If OpenCVB.ocvb.parms.lowResolution Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
             OpenCVB.ocvb.parms.width = regWidth / OpenCVB.ocvb.parms.speedFactor
             OpenCVB.ocvb.parms.height = regHeight / OpenCVB.ocvb.parms.speedFactor
             OpenCVB.ocvb.parms.imageToTrueTypeLoc = 1 / resizeForDisplay
-            If OpenCVB.ocvb.parms.fastProcessing Then OpenCVB.ocvb.parms.imageToTrueTypeLoc *= OpenCVB.ocvb.parms.speedFactor
+            If OpenCVB.ocvb.parms.lowResolution Then OpenCVB.ocvb.parms.imageToTrueTypeLoc *= OpenCVB.ocvb.parms.speedFactor
         End If
 
         ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
-        If OpenCVB.ocvb.drawRect <> New cv.Rect(0, 0, 0, 0) Then ' the constructor defined drawrect.  Adjust it because fastProcessing selected
+        If OpenCVB.ocvb.drawRect <> New cv.Rect(0, 0, 0, 0) Then ' the constructor defined drawrect.  Adjust it because lowResolution selected
             drawRect = OpenCVB.ocvb.drawRect
             Dim ratio = OpenCVB.ocvb.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
             drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
@@ -895,6 +889,7 @@ Public Class OpenCVB
     End Sub
     Private Sub CameraTask(camParms As cameraParms)
         Dim fastsize = camParms.fastSize
+        Dim saveLowRes = camParms.lowResolution
         stopCameraThread = False
         While 1
             If stopCameraThread Then Exit While
@@ -906,41 +901,43 @@ Public Class OpenCVB
                         End Sub
                     )
                 End If
-
                 camParms.camera.GetNextFrame()
-                ' The algorithm can change anytime.  The camera task run continuously.
-                If camParms.activeAlgorithm.StartsWith("OpenGL") Or camParms.activeAlgorithm.StartsWith("OpenCVGL") Then
-                    camParms.fastProcessing = False ' OpenGL apps run only at full resolution...
-                End If
-                If camParms.camera.color Is Nothing Then Continue While ' at startup it may not be ready...
-                SyncLock camPic
-                    imuGyro = camParms.camera.imuGyro ' The data may not be present but just copy it...
-                    imuAccel = camParms.camera.imuaccel
-                    imuTimeStamp = camParms.camera.imutimestamp
-                    formPointCloud = camParms.camera.pointCloud ' the point cloud is never resized - OpenGL apps.
-                    If camParms.usingIntelCamera = False Then formPointCloud *= 0.001 ' units are millimeters for Kinect
-                    If camParms.fastProcessing Then
-                        formColor = camParms.camera.color.Resize(fastsize)
-                        formDepthRGB = camParms.camera.depthRGB.Resize(fastsize)
-                        formDepth = camParms.camera.depth.Resize(fastsize)
-                        formDisparity = camParms.camera.disparity.Resize(fastsize)
-                        formRedLeft = camParms.camera.redLeft.Resize(fastsize)
-                        formRedRight = camParms.camera.redRight.Resize(fastsize)
-                    Else
-                        formColor = camParms.camera.color
-                        formDepthRGB = camParms.camera.depthRGB
-                        formDepth = camParms.camera.depth
-                        formDisparity = camParms.camera.disparity
-                        formRedLeft = camParms.camera.redLeft
-                        formRedRight = camParms.camera.redRight
-                    End If
-                End SyncLock
-
-                If Me.IsDisposed Then Exit While
-                cameraFrameCount += 1
             Else
                 Application.DoEvents()
             End If
+
+            ' The algorithm can change anytime.  The camera task run continuously.
+            If camParms.activeAlgorithm.StartsWith("OpenGL") Or camParms.activeAlgorithm.StartsWith("OpenCVGL") Then
+                camParms.lowResolution = False ' OpenGL apps use the point cloud which is always at high resolution.
+            Else
+                camParms.lowResolution = saveLowRes
+            End If
+            If camParms.camera.color Is Nothing Then Continue While ' at startup it may not be ready...
+            SyncLock camPic
+                imuGyro = camParms.camera.imuGyro ' The data may not be present but just copy it...
+                imuAccel = camParms.camera.imuaccel
+                imuTimeStamp = camParms.camera.imutimestamp
+                formPointCloud = camParms.camera.pointCloud ' the point cloud is never resized - OpenGL apps.
+                If camParms.usingIntelCamera = False Then formPointCloud *= 0.001 ' units are millimeters for Kinect
+                If camParms.lowResolution Then
+                    formColor = camParms.camera.color.Resize(fastsize)
+                    formDepthRGB = camParms.camera.depthRGB.Resize(fastsize)
+                    formDepth = camParms.camera.depth.Resize(fastsize)
+                    formDisparity = camParms.camera.disparity.Resize(fastsize)
+                    formRedLeft = camParms.camera.redLeft.Resize(fastsize)
+                    formRedRight = camParms.camera.redRight.Resize(fastsize)
+                Else
+                    formColor = camParms.camera.color
+                    formDepthRGB = camParms.camera.depthRGB
+                    formDepth = camParms.camera.depth
+                    formDisparity = camParms.camera.disparity
+                    formRedLeft = camParms.camera.redLeft
+                    formRedRight = camParms.camera.redRight
+                End If
+            End SyncLock
+
+            If Me.IsDisposed Then Exit While
+            cameraFrameCount += 1
         End While
         cameraFrameCount = 0
     End Sub

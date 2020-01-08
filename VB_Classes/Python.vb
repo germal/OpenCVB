@@ -165,7 +165,7 @@ Public Class Python_SurfaceBlitOld : Implements IDisposable
         PipeTaskIndex += 1
 
         ' this Python script assumes that fast processing is off - the pointcloud is being used and cannot be resized.
-        ' ocvb.parms.fastProcessing = False
+        ' ocvb.parms.lowResolution = False
         ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_SurfaceBlitOld.py"
         memMap = New Python_MemMap(ocvb)
 
@@ -179,21 +179,20 @@ Public Class Python_SurfaceBlitOld : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If PythonReady Then
+            Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
             For i = 0 To memMap.memMapValues.Length - 1
-                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.color.Total * ocvb.color.ElemSize, ocvb.parms.pcBufferSize, ocvb.color.Rows, ocvb.color.Cols)
+                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.color.Total * ocvb.color.ElemSize, pcSize, ocvb.color.Rows, ocvb.color.Cols)
             Next
             memMap.Run(ocvb)
 
             Dim rgb = ocvb.color.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2RGB)
             If rgbBuffer.Length <> rgb.Total * rgb.ElemSize Then ReDim rgbBuffer(rgb.Total * rgb.ElemSize - 1)
-            'If pointCloudBuffer.Length <> ocvb.parms.pcBufferSize Then ReDim pointCloudBuffer(ocvb.parms.pcBufferSize - 1)
             Marshal.Copy(rgb.Data, rgbBuffer, 0, rgb.Total * rgb.ElemSize)
-            'Marshal.Copy(ocvb.pointCloud.Data, pointCloudBuffer, 0, ocvb.parms.pcBufferSize - 1)
 
             If pipe.IsConnected Then
                 On Error Resume Next
                 pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
-                If pipe.IsConnected Then pipe.Write(pointCloudBuffer, 0, ocvb.parms.pcBufferSize)
+                If pipe.IsConnected Then pipe.Write(pointCloudBuffer, 0, pcSize)
             End If
             ocvb.putText(New ActiveClass.TrueType("Blit works fine when run inline but fails with Python callback.", 10, 60, RESULT1))
         Else

@@ -81,12 +81,10 @@ Public Class Kinect : Implements IDisposable
     Public color As cv.Mat
     Public depth As cv.Mat
     Public depthRGB As cv.Mat
-    Public pointCloud As cv.Mat
+    Public pointCloud As New cv.Mat
     Public disparity As cv.Mat
     Public redLeft As cv.Mat
     Public redRight As cv.Mat
-
-    Public pcBufferSize As Int32
 
     Public colorBytes() As Byte
     Public depthBytes() As Byte
@@ -134,8 +132,6 @@ Public Class Kinect : Implements IDisposable
             ReDim colorBytes(w * h * 3 - 1)
             ReDim depthRGBBytes(w * h * 3 - 1)
             ReDim depthBytes(w * h * System.Runtime.InteropServices.Marshal.SizeOf(GetType(UShort)) - 1)
-            pcBufferSize = w * h * System.Runtime.InteropServices.Marshal.SizeOf(GetType(Single)) * 3 ' converted from short's to float's below...
-            pointCloud = New cv.Mat
         End If
     End Sub
 
@@ -159,7 +155,7 @@ Public Class Kinect : Implements IDisposable
             imuGyro = imuOutput.imuGyro
             imuAccel = imuOutput.imuAccel
 
-            ' make the imu consistent with the Intel IMU...
+            ' make the imu data consistent with the Intel IMU...
             Dim tmpVal = imuAccel.Z
             imuAccel.Z = imuAccel.X
             imuAccel.X = imuAccel.Y

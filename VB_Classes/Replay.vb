@@ -41,7 +41,6 @@ Module recordPlaybackCommon
         binWrite.Write(ocvb.pointCloud.Width)
         binWrite.Write(ocvb.pointCloud.Height)
         binWrite.Write(ocvb.pointCloud.ElemSize)
-        binWrite.Write(ocvb.parms.pcBufferSize)
     End Sub
     Public Sub readHeader(ByRef header As fileHeader, binRead As BinaryReader)
         header.colorWidth = binRead.ReadInt32()
@@ -59,7 +58,6 @@ Module recordPlaybackCommon
         header.cloudWidth = binRead.ReadInt32()
         header.cloudHeight = binRead.ReadInt32()
         header.cloudElemsize = binRead.ReadInt32()
-        header.pcBufferSize = binRead.ReadInt32()
     End Sub
 End Module
 
@@ -89,7 +87,8 @@ Public Class Replay_Record : Implements IDisposable
                 ReDim colorBytes(bytesPerColor - 1)
                 ReDim depthBytes(bytesPerDepth - 1)
                 ReDim depthRGBBytes(bytesPerDepthRGB - 1)
-                If ocvb.parms.pcBufferSize Then ReDim cloudBytes(ocvb.parms.pcBufferSize - 1)
+                Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
+                ReDim cloudBytes(pcSize - 1)
 
                 binWrite = New BinaryWriter(File.Open(recording.fileinfo.FullName, FileMode.Create))
                 recordingActive = True

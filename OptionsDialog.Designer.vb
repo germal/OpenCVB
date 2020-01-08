@@ -28,7 +28,7 @@ Partial Class OptionsDialog
         Me.IntelCamera = New System.Windows.Forms.RadioButton()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.AccurateProcessing = New System.Windows.Forms.RadioButton()
-        Me.FastProcessing = New System.Windows.Forms.RadioButton()
+        Me.lowResolution = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.AvoidDNNCrashes = New System.Windows.Forms.CheckBox()
         Me.ShowConsoleLog = New System.Windows.Forms.CheckBox()
@@ -109,7 +109,7 @@ Partial Class OptionsDialog
         'GroupBox1
         '
         Me.GroupBox1.Controls.Add(Me.AccurateProcessing)
-        Me.GroupBox1.Controls.Add(Me.FastProcessing)
+        Me.GroupBox1.Controls.Add(Me.lowResolution)
         Me.GroupBox1.Location = New System.Drawing.Point(21, 178)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(936, 128)
@@ -128,16 +128,16 @@ Partial Class OptionsDialog
         Me.AccurateProcessing.Text = "Run algorithm at 1280x720"
         Me.AccurateProcessing.UseVisualStyleBackColor = True
         '
-        'FastProcessing
+        'lowResolution
         '
-        Me.FastProcessing.AutoSize = True
-        Me.FastProcessing.Location = New System.Drawing.Point(16, 40)
-        Me.FastProcessing.Name = "FastProcessing"
-        Me.FastProcessing.Size = New System.Drawing.Size(482, 24)
-        Me.FastProcessing.TabIndex = 0
-        Me.FastProcessing.TabStop = True
-        Me.FastProcessing.Text = "Run algorithm after resizing image to 640x360 (FastProcessing)"
-        Me.FastProcessing.UseVisualStyleBackColor = True
+        Me.lowResolution.AutoSize = True
+        Me.lowResolution.Location = New System.Drawing.Point(16, 40)
+        Me.lowResolution.Name = "lowResolution"
+        Me.lowResolution.Size = New System.Drawing.Size(482, 24)
+        Me.lowResolution.TabIndex = 0
+        Me.lowResolution.TabStop = True
+        Me.lowResolution.Text = "Run algorithm after resizing image to 640x360 (lowResolution)"
+        Me.lowResolution.UseVisualStyleBackColor = True
         '
         'GroupBox2
         '
@@ -423,7 +423,7 @@ Partial Class OptionsDialog
     Friend WithEvents IntelCamera As RadioButton
     Friend WithEvents GroupBox1 As GroupBox
     Friend WithEvents AccurateProcessing As RadioButton
-    Friend WithEvents FastProcessing As RadioButton
+    Friend WithEvents lowResolution As RadioButton
     Friend WithEvents GroupBox2 As GroupBox
     Friend WithEvents ShowLabels As CheckBox
     Friend WithEvents MinimizeMemoryFootprint As CheckBox

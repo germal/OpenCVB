@@ -223,6 +223,9 @@ End Class
 
 Public Class Palette_Gradient : Implements IDisposable
     Public frameModulo As Int32 = 30 ' every 30 frames try a different pair of random colors.
+    Public color1 As cv.Scalar
+    Public color2 As cv.Scalar
+    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         ocvb.label2 = "From and To colors"
         ocvb.desc = "Create gradient image"
@@ -230,14 +233,17 @@ Public Class Palette_Gradient : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod frameModulo = 0 Then
             Dim f As Double = 1.0
-            Dim a = ocvb.colorScalar(ocvb.rng.uniform(0, 255))
-            Dim b = ocvb.colorScalar(ocvb.rng.uniform(0, 255))
-            ocvb.result2.SetTo(b)
-            ocvb.result2(New cv.Rect(0, 0, ocvb.result2.Width, ocvb.result2.Height / 2)).SetTo(a)
+            If externalUse = False Then
+                color1 = ocvb.colorScalar(ocvb.rng.uniform(0, 255))
+                color2 = ocvb.colorScalar(ocvb.rng.uniform(0, 255))
+            End If
+            ocvb.result2.SetTo(color1)
+            ocvb.result2(New cv.Rect(0, 0, ocvb.result2.Width, ocvb.result2.Height / 2)).SetTo(color2)
 
             Dim gradientColors As New cv.Mat(ocvb.result1.Rows, 1, cv.MatType.CV_64FC3)
             For i = 0 To ocvb.result1.Rows - 1
-                gradientColors.Set(Of cv.Scalar)(i, 0, New cv.Scalar(f * a(0) + (1 - f) * b(0), f * a(1) + (1 - f) * b(1), f * a(2) + (1 - f) * b(2)))
+                gradientColors.Set(Of cv.Scalar)(i, 0, New cv.Scalar(f * color2(0) + (1 - f) * color1(0), f * color2(1) + (1 - f) * color1(1),
+                                                                     f * color2(2) + (1 - f) * color1(2)))
                 f -= 1 / ocvb.result1.Rows
             Next
 

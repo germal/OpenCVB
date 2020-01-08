@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Public Class OptionsDialog
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
-        SaveSetting("OpenCVB", "FastAccurate", "FastAccurate", FastProcessing.Checked)
+        SaveSetting("OpenCVB", "FastAccurate", "FastAccurate", lowResolution.Checked)
         SaveSetting("OpenCVB", "IntelCamera", "IntelCamera", IntelCamera.Checked)
 
         SaveSetting("OpenCVB", "MinimizeMemoryFootprint", "MinimizeMemoryFootprint", MinimizeMemoryFootprint.Checked)
@@ -28,7 +28,7 @@ Public Class OptionsDialog
     Public Sub Dialog1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Height = GetSetting("OpenCVB", "OptionsHeight", "OptionsHeight", Me.Height)
         If GetSetting("OpenCVB", "FastAccurate", "FastAccurate", True) Then
-            FastProcessing.Checked = True
+            lowResolution.Checked = True
         Else
             AccurateProcessing.Checked = True
         End If

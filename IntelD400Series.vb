@@ -55,14 +55,13 @@ Public Class IntelD400Series : Implements IDisposable
 
     Dim vertices() As Byte
     Public pointCloud As cv.Mat
-    Public pcBufferSize As Int32 = 0
 
     Dim block As New rs.CustomProcessingBlock(
         Sub(f, src)
             For Each p In blocks
                 If p.Info.Item(0) = "Decimation Filter" And DecimationFilter Then f = p.Process(f)
                 If p.Info.Item(0) = "Threshold Filter" And ThresholdFilter Then f = p.Process(f)
-                'If p.Info.Item(0) = "Depth to Disparity" Then f = p.Process(f) ' always have depth to disparity
+                If p.Info.Item(0) = "Depth to Disparity" Then f = p.Process(f) ' always have depth to disparity
                 If p.Info.Item(0) = "Spatial Filter" And SpatialFilter Then f = p.Process(f)
                 If p.Info.Item(0) = "Temporal Filter" And TemporalFilter Then f = p.Process(f)
                 If p.Info.Item(0) = "Hole Filling Filter" And HoleFillingFilter Then f = p.Process(f)
@@ -89,10 +88,8 @@ Public Class IntelD400Series : Implements IDisposable
                     End If
                 Next
 
-                If pcBufferSize > 0 Then
-                    Dim points = pc.Process(depthFrame).As(Of rs.Points)
-                    Marshal.Copy(points.Data, vertices, 0, vertices.Length)
-                End If
+                Dim points = pc.Process(depthFrame).As(Of rs.Points)
+                Marshal.Copy(points.Data, vertices, 0, vertices.Length)
 
                 Marshal.Copy(colorFrame.Data, colorBytes, 0, colorBytes.Length)
                 Marshal.Copy(disparityFrame.Data, disparityBytes, 0, disparityBytes.Length)
@@ -119,6 +116,15 @@ Public Class IntelD400Series : Implements IDisposable
     Public Sub New(width As Int32, height As Int32, fps As Int32, recordingFile As String, playbackFile As String)
         devices = ctx.QueryDevices()
         deviceCount = devices.Count
+
+        DecimationFilter = GetSetting("OpenCVB", "DecimationFilter", "DecimationFilter", False)
+        ThresholdFilter = GetSetting("OpenCVB", "ThresholdFilter", "ThresholdFilter", False)
+        DepthToDisparity = GetSetting("OpenCVB", "DepthToDisparity", "DepthToDisparity", True)
+        SpatialFilter = GetSetting("OpenCVB", "SpatialFilter", "SpatialFilter", True)
+        TemporalFilter = GetSetting("OpenCVB", "TemporalFilter", "TemporalFilter", False)
+        HoleFillingFilter = GetSetting("OpenCVB", "HoleFillingFilter", "HoleFillingFilter", True)
+        DisparityToDepth = GetSetting("OpenCVB", "DisparityToDepth", "DisparityToDepth", True)
+
         If deviceCount = 0 Then Return
         device = devices(0)
         deviceName = device.Info.Item(rs.CameraInfo.Name)
@@ -175,7 +181,6 @@ Public Class IntelD400Series : Implements IDisposable
             ReDim redLeftBytes(w * h - 1)
             ReDim redRightBytes(w * h - 1)
             ReDim vertices(w * h * System.Runtime.InteropServices.Marshal.SizeOf(GetType(Single)) * 3 - 1) ' 3 floats per pixel.  
-            pcBufferSize = vertices.Length
         End If
     End Sub
     Public Sub GetNextFrame()
@@ -188,7 +193,7 @@ Public Class IntelD400Series : Implements IDisposable
         disparity = New cv.Mat(h, w, cv.MatType.CV_32F, disparityBytes)
         redLeft = New cv.Mat(h, w, cv.MatType.CV_8U, redLeftBytes)
         redRight = New cv.Mat(h, w, cv.MatType.CV_8U, redRightBytes)
-        If pcBufferSize > 0 Then pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
+        pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
     End Sub
     Private disposedValue As Boolean ' To detect redundant calls
 

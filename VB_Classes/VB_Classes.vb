@@ -94,7 +94,7 @@ Public Class ActiveClass : Implements IDisposable
         Public Property FOV As Single()
     End Structure
     Public Structure algorithmParameters
-        Dim fastProcessing As Boolean
+        Dim lowResolution As Boolean
         Dim minimizeMemoryFootprint As Boolean
         Dim useRecordedData As Boolean
         Dim UsingIntelCamera As Boolean
@@ -114,7 +114,6 @@ Public Class ActiveClass : Implements IDisposable
         Dim width As Int32
         Dim height As Int32
         Dim mainFormHeight As Int32
-        Dim pcBufferSize As Int32
         Dim mainFormLoc As Point
         Dim imageToTrueTypeLoc As Single
         Dim intrinsics As Intrinsics_VB

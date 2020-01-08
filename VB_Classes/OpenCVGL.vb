@@ -12,7 +12,7 @@ Module OpenCVGL_Image_CPP_Module
                                     yaw As Single, roll As Single, pitch As Single, pointSize As Int32, zTrans As Single, textureWidth As Int32, textureHeight As Int32)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub OpenCVGL_Image_Run(rgbPtr As IntPtr, pointCloud As IntPtr, pcBufferSize As Int32, rows As Int32, cols As Int32)
+    Public Sub OpenCVGL_Image_Run(rgbPtr As IntPtr, pointCloud As IntPtr, rows As Int32, cols As Int32)
     End Sub
 End Module
 
@@ -56,7 +56,8 @@ Public Class OpenCVGL_Image_CPP : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType("Skipping it during a 'Test All' just so all the other tests can be exercised.", 10, 100, RESULT1))
             Exit Sub
         End If
-        If ocvb.frameCount = 0 Then ReDim pointCloudData(ocvb.parms.pcBufferSize - 1)
+        Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
+        If ocvb.frameCount = 0 Then ReDim pointCloudData(pcSize - 1)
 
         imu.Run(ocvb)
         Dim FOV = sliders.TrackBar1.Value
@@ -69,14 +70,14 @@ Public Class OpenCVGL_Image_CPP : Implements IDisposable
         Dim eye As New cv.Vec3f(sliders2.TrackBar1.Value, sliders2.TrackBar2.Value, sliders2.TrackBar3.Value)
         Dim zTrans = sliders1.TrackBar4.Value / 100
 
-        OpenCVGL_Image_Control(ocvb.parms.intrinsics.ppx, ocvb.parms.intrinsics.ppy, ocvb.parms.intrinsics.fx, ocvb.parms.intrinsics.fy, FOV, zNear, zFar, eye, yaw, roll, pitch, pointSize, zTrans,
-                                       ocvb.color.Width, ocvb.color.Height)
+        OpenCVGL_Image_Control(ocvb.parms.intrinsics.ppx, ocvb.parms.intrinsics.ppy, ocvb.parms.intrinsics.fx, ocvb.parms.intrinsics.fy,
+                               FOV, zNear, zFar, eye, yaw, roll, pitch, pointSize, zTrans, ocvb.color.Width, ocvb.color.Height)
 
         Marshal.Copy(ocvb.color.Data, rgbData, 0, rgbData.Length)
-        Marshal.Copy(ocvb.pointCloud.Data, pointCloudData, 0, ocvb.parms.pcBufferSize)
+        Marshal.Copy(ocvb.pointCloud.Data, pointCloudData, 0, pcSize)
         Dim handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned)
         Dim handlePointCloud = GCHandle.Alloc(pointCloudData, GCHandleType.Pinned)
-        OpenCVGL_Image_Run(handleRGB.AddrOfPinnedObject(), handlePointCloud.AddrOfPinnedObject(), ocvb.parms.pcBufferSize, ocvb.color.Rows, ocvb.color.Cols)
+        OpenCVGL_Image_Run(handleRGB.AddrOfPinnedObject(), handlePointCloud.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols)
         handleRGB.Free()
         handlePointCloud.Free()
     End Sub

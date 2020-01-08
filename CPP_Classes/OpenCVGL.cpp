@@ -101,17 +101,11 @@ void OpenCVGL_Image_Control(float _ppx, float _ppy, float _fx, float _fy, float 
 }
 
 extern "C" __declspec(dllexport)
-void OpenCVGL_Image_Run(int *rgbPtr, int *pointCloud, int pcBufferSize, int rows, int cols)
+void OpenCVGL_Image_Run(int *rgbPtr, int *pointCloud, int rows, int cols)
 {
 	Mat rgb, depth;
-	Mat_<Vec3f> vertex = Mat_<Vec3f>(1, rows * cols);
 	rgb = Mat(rows, cols, CV_8UC3, rgbPtr);
-
-	float* pc = (float *)pointCloud;
-	for (int nbPix = 0; nbPix < rows * cols; nbPix++)
-	{
-		vertex.at<Vec3f>(0, nbPix) = Vec3f(pc[nbPix * 3], pc[nbPix * 3 + 1], pc[nbPix * 3 + 2]);
-	}
+	Mat vertex = Mat(rows, cols, CV_32FC3, pointCloud);
 
 	renderData->arr.setVertexArray(vertex);
 	renderData->arr.setTexCoordArray(texCoords); 
