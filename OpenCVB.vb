@@ -688,6 +688,7 @@ Public Class OpenCVB
             ' some algorithms can take a long time to finish a single iteration.  
             ' Each algorithm must run dispose() - to kill options forms and external Python or OpenGL taskes.  Have to wait until exit...
             While frame
+                Application.DoEvents() ' to allow the algorithm task to gracefully end and dispose OpenCVB.
                 Thread.Sleep(100)
                 sleepCount += 1
                 If sleepCount > 10 Then Return False
