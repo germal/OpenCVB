@@ -367,7 +367,7 @@ End Class
 
 
 
-Public Class Depth_Shadow : Implements IDisposable
+Public Class Depth_Holes : Implements IDisposable
     Public holeMask As New cv.Mat
     Public borderMask As New cv.Mat
     Public externalUse = False
@@ -375,7 +375,7 @@ Public Class Depth_Shadow : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         ocvb.label2 = "Shadow borders"
         element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
-        ocvb.desc = "Identify shadow in the depth image."
+        ocvb.desc = "Identify holes in the depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mask = ocvb.depth.Threshold(1, 20000, cv.ThresholdTypes.BinaryInv)
@@ -397,14 +397,14 @@ End Class
 
 
 
-Public Class Depth_ShadowRect : Implements IDisposable
+Public Class Depth_HolesRect : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Dim shadow As Depth_Shadow
+    Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "shadowRect Min Size", 1, 20000, 2000)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
-        shadow = New Depth_Shadow(ocvb)
+        shadow = New Depth_Holes(ocvb)
         shadow.externalUse = True
 
         ocvb.desc = "Identify the minimum rectangles of contours of the depth shadow"
@@ -557,10 +557,10 @@ End Class
 
 
 Public Class Depth_FlatData : Implements IDisposable
-    Dim shadow As Depth_Shadow
+    Dim shadow As Depth_Holes
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        shadow = New Depth_Shadow(ocvb)
+        shadow = New Depth_Holes(ocvb)
 
         sliders.setupTrackBar1(ocvb, "FlatData Region Count", 1, 250, 200)
         If ocvb.parms.ShowOptions Then sliders.show()
@@ -595,10 +595,10 @@ End Class
 
 
 Public Class Depth_FlatBackground : Implements IDisposable
-    Dim shadow As Depth_Shadow
+    Dim shadow As Depth_Holes
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        shadow = New Depth_Shadow(ocvb)
+        shadow = New Depth_Holes(ocvb)
         sliders.setupTrackBar1(ocvb, "FlatBackground Max Depth", 200, 10000, 2000)
         If ocvb.parms.ShowOptions Then sliders.show()
 
@@ -784,11 +784,11 @@ End Class
 
 
 Public Class Depth_MeanStdevPlot : Implements IDisposable
-    Dim shadow As Depth_Shadow
+    Dim shadow As Depth_Holes
     Dim plot1 As Plot_OverTime
     Dim plot2 As Plot_OverTime
     Public Sub New(ocvb As AlgorithmData)
-        shadow = New Depth_Shadow(ocvb)
+        shadow = New Depth_Holes(ocvb)
         shadow.externalUse = True
 
         plot1 = New Plot_OverTime(ocvb)

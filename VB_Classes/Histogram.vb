@@ -550,7 +550,11 @@ Public Class Histogram_Depth : Implements IDisposable
     Public inrange As Depth_InRangeTrim
     Public sliders As New OptionsSliders
     Public plotHist As Plot_Histogram
+    Dim holes As Depth_Holes
     Public Sub New(ocvb As AlgorithmData)
+        holes = New Depth_Holes(ocvb)
+        holes.externalUse = True
+
         plotHist = New Plot_Histogram(ocvb)
         plotHist.externalUse = True
 
@@ -561,6 +565,9 @@ Public Class Histogram_Depth : Implements IDisposable
         ocvb.desc = "Show depth data as a histogram."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        holes.Run(ocvb)
+        Dim mask As New cv.Mat
+        cv.Cv2.BitwiseNot(holes.holeMask, mask)
         inrange.Run(ocvb)
         plotHist.minRange = inrange.sliders.TrackBar1.Value
         plotHist.maxRange = inrange.sliders.TrackBar2.Value
@@ -568,7 +575,7 @@ Public Class Histogram_Depth : Implements IDisposable
         Dim histSize() = {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
 
-        cv.Cv2.CalcHist(New cv.Mat() {ocvb.depth}, New Integer() {0}, New cv.Mat(), plotHist.hist, 1, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {ocvb.depth}, New Integer() {0}, mask, plotHist.hist, 1, histSize, ranges)
 
         plotHist.dst = ocvb.result2
         plotHist.Run(ocvb)
@@ -631,18 +638,24 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         hist.Run(ocvb)
         If check.Box(0).Checked Then mykf.kf.kDimension = hist.plotHist.bins
 
+        If check.Box(0).Checked Then
+            mykf.kf.inputReal = hist.plotHist.hist.Clone()
+            mykf.Run(ocvb)
+            If ocvb.frameCount > 0 Then hist.plotHist.hist = mykf.kf.statePoint
+        End If
+
         Dim depthIncr = CInt(hist.inrange.sliders.TrackBar2.Value / hist.sliders.TrackBar1.Value) ' each bar represents this number of millimeters
         Dim pointCount = hist.plotHist.hist.At(Of Single)(0, 0) + hist.plotHist.hist.At(Of Single)(1, 0)
         Dim startDepth = 1
         Dim startEndDepth As cv.Point
         Dim depthBoundaries As New SortedList(Of Single, cv.Point)(New CompareCounts)
-        For i = 0 To hist.plotHist.hist.Rows - 1
-            Dim prev2 = If(i > 2, hist.plotHist.hist.At(Of Single)(i - 2, 0), 0)
-            Dim prev = If(i > 1, hist.plotHist.hist.At(Of Single)(i - 1, 0), 0)
-            Dim curr = hist.plotHist.hist.At(Of Single)(i, 0)
-            Dim post = If(i < hist.plotHist.hist.Rows - 1, hist.plotHist.hist.At(Of Single)(i + 1, 0), 0)
-            Dim post2 = If(i < hist.plotHist.hist.Rows - 2, hist.plotHist.hist.At(Of Single)(i + 2, 0), 0)
-            pointCount += hist.plotHist.hist.At(Of Single)(i, 0)
+        For i = 0 To mykf.kf.statePoint.Rows - 1
+            Dim prev2 = If(i > 2, mykf.kf.statePoint.At(Of Single)(i - 2, 0), 0)
+            Dim prev = If(i > 1, mykf.kf.statePoint.At(Of Single)(i - 1, 0), 0)
+            Dim curr = mykf.kf.statePoint.At(Of Single)(i, 0)
+            Dim post = If(i < mykf.kf.statePoint.Rows - 1, mykf.kf.statePoint.At(Of Single)(i + 1, 0), 0)
+            Dim post2 = If(i < mykf.kf.statePoint.Rows - 2, mykf.kf.statePoint.At(Of Single)(i + 2, 0), 0)
+            pointCount += mykf.kf.statePoint.At(Of Single)(i, 0)
             If curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr Then
                 startEndDepth = New cv.Point(startDepth, i * depthIncr)
                 depthBoundaries.Add(pointCount, startEndDepth)
@@ -650,12 +663,6 @@ Public Class Histogram_DepthValleys : Implements IDisposable
                 startDepth = i * depthIncr + 0.1
             End If
         Next
-
-        If check.Box(0).Checked Then
-            mykf.kf.inputReal = hist.plotHist.hist.Clone()
-            mykf.Run(ocvb)
-            If ocvb.frameCount > 0 Then hist.plotHist.hist = mykf.kf.statePoint
-        End If
 
         startEndDepth = New cv.Point(startDepth, hist.inrange.sliders.TrackBar2.Value)
         depthBoundaries.Add(pointCount, startEndDepth) ' capped at the max depth we are observing
@@ -695,7 +702,7 @@ Public Class Histogram_DepthClusters : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         valleys = New Histogram_DepthValleys(ocvb)
 
-        ocvb.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys"
+        ocvb.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         valleys.Run(ocvb)

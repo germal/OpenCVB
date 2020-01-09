@@ -47,7 +47,7 @@ End Class
 
 
 Public Class Edges_CannyAndShadow : Implements IDisposable
-    Dim shadow As Depth_Shadow
+    Dim shadow As Depth_Holes
     Dim canny As Edges_Canny
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData)
@@ -60,7 +60,7 @@ Public Class Edges_CannyAndShadow : Implements IDisposable
         canny.sliders.TrackBar2.Value = 100
         canny.externalUse = True
 
-        shadow = New Depth_Shadow(ocvb)
+        shadow = New Depth_Holes(ocvb)
         shadow.externalUse = True
 
         ocvb.desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."

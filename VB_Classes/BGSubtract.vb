@@ -98,12 +98,12 @@ End Class
 
 
 Public Class BGSubtract_Depth_MT : Implements IDisposable
-    Dim shadow As Depth_Shadow
+    Dim shadow As Depth_Holes
     Dim bgsub As BGSubtract_Basics_MT
     Public Sub New(ocvb As AlgorithmData)
         bgsub = New BGSubtract_Basics_MT(ocvb)
         bgsub.externalUse = True
-        shadow = New Depth_Shadow(ocvb)
+        shadow = New Depth_Holes(ocvb)
         shadow.externalUse = True
         ocvb.desc = "Detect Motion in the depth image"
         ocvb.label2 = "Accumulated 3D image"

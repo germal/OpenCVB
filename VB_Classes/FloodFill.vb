@@ -123,9 +123,9 @@ End Class
 
 Public Class FloodFill_WithDepth : Implements IDisposable
     Dim flood As FloodFill_RelativeRange
-    Dim shadow As Depth_Shadow
+    Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData)
-        shadow = New Depth_Shadow(ocvb)
+        shadow = New Depth_Holes(ocvb)
         shadow.externalUse = True
 
         flood = New FloodFill_RelativeRange(ocvb)
@@ -153,9 +153,9 @@ End Class
 Public Class FloodFill_CComp : Implements IDisposable
     Dim ccomp As CComp_Basics
     Dim flood As FloodFill_RelativeRange
-    Dim shadow As Depth_Shadow
+    Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData)
-        shadow = New Depth_Shadow(ocvb)
+        shadow = New Depth_Holes(ocvb)
         shadow.externalUse = True
 
         ccomp = New CComp_Basics(ocvb)

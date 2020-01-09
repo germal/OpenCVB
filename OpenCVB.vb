@@ -599,8 +599,12 @@ Public Class OpenCVB
         Dim img As New Bitmap(Me.Width, Me.Height)
         Me.DrawToBitmap(img, New Rectangle(0, 0, Me.Width, Me.Height))
 
+        Dim result1 As cv.Mat
+        SyncLock camPic
+            result1 = formResult1.Clone()
+        End SyncLock
         Dim m = cv.Extensions.BitmapConverter.ToMat(img)
-        cv.Cv2.ImShow("m", m)
+        cv.Cv2.ImShow("result1", result1)
     End Sub
     Public Sub updateCamera()
         If optionsForm.IntelCamera.Checked Then camera = cameraIntel Else camera = cameraKinect
@@ -654,7 +658,7 @@ Public Class OpenCVB
                 Application.DoEvents() ' to allow the algorithm task to gracefully end and dispose OpenCVB.
                 Thread.Sleep(100)
                 sleepCount += 1
-                If sleepCount > 20 Then Return False
+                If sleepCount > 10 Then Return False
             End While
         End If
         Return True
@@ -784,13 +788,13 @@ Public Class OpenCVB
 
         frameCount = 0 ' restart the count... 
         While 1
-            If stopAlgorithmThread Then Exit While
-
             ' wait until we have the latest camera data.
             While 1
+                If stopAlgorithmThread Then Exit While ' really exit the while loop below...
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 If cameraDataUpdated Then Exit While
             End While
+            If stopAlgorithmThread Then Exit While
 
             ' bring the data into the algorithm task.
             SyncLock camPic
@@ -864,7 +868,6 @@ Public Class OpenCVB
                 End If
                 If Me.IsDisposed Then Exit While
             Catch ex As Exception
-                MsgBox("hit error = '" + ex.Message + "' in algorithmThread.  Hit 'Play' button to restart.")
                 Exit While
             End Try
             frameCount += 1

@@ -197,9 +197,9 @@ End Class
 Public Class Blob_DepthClusters : Implements IDisposable
     Public histBlobs As Histogram_DepthClusters
     Public flood As FloodFill_RelativeRange
-    Dim shadow As Depth_Shadow
+    Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData)
-        shadow = New Depth_Shadow(ocvb)
+        shadow = New Depth_Holes(ocvb)
         shadow.externalUse = True
 
         histBlobs = New Histogram_DepthClusters(ocvb)

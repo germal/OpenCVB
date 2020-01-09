@@ -60,7 +60,7 @@ End Module
 
 
 Public Class ML_FillDepthRGB_MT : Implements IDisposable
-    Dim shadow As Depth_Shadow
+    Dim shadow As Depth_Holes
     Dim grid As Thread_Grid
 
     Public Sub New(ocvb As AlgorithmData)
@@ -68,7 +68,7 @@ Public Class ML_FillDepthRGB_MT : Implements IDisposable
         grid.sliders.TrackBar1.Value = 160
         grid.sliders.TrackBar2.Value = 120
         grid.externalUse = True ' we don't need any results.
-        shadow = New Depth_Shadow(ocvb)
+        shadow = New Depth_Holes(ocvb)
         ocvb.label2 = "ML filled shadow"
         ocvb.desc = "Same as ML_FillDepth above but display grayscale depth to confirm correctness of model."
     End Sub
@@ -94,12 +94,12 @@ End Class
 
 
 Public Class ML_FillDepthRGB : Implements IDisposable
-    Dim shadow As Depth_Shadow
+    Dim shadow As Depth_Holes
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "ML Min Learn Count", 2, 100, 5)
         If ocvb.parms.ShowOptions Then sliders.show()
-        shadow = New Depth_Shadow(ocvb)
+        shadow = New Depth_Holes(ocvb)
         ocvb.label2 = "ML filled shadow"
         ocvb.desc = "Same as ML_FillDepth above but display grayscale depth to confirm correctness of model."
     End Sub
@@ -201,7 +201,7 @@ End Class
 Public Class ML_DepthFromColor : Implements IDisposable
     Dim disp16 As Depth_Colorizer_CPP
     Dim mats As Mat_4to1
-    Dim shadow As Depth_Shadow
+    Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
@@ -211,7 +211,7 @@ Public Class ML_DepthFromColor : Implements IDisposable
         mats = New Mat_4to1(ocvb)
         mats.externalUse = True
 
-        shadow = New Depth_Shadow(ocvb)
+        shadow = New Depth_Holes(ocvb)
 
         sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 1000, 5000, 1500)
         If ocvb.parms.ShowOptions Then sliders.show()
@@ -292,7 +292,7 @@ End Class
 
 Public Class ML_DepthFromXYColor : Implements IDisposable
     Dim mats As Mat_4to1
-    Dim shadow As Depth_Shadow
+    Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
     Dim sliders As New OptionsSliders
     Dim disp16 As Depth_Colorizer_CPP
@@ -303,7 +303,7 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
         mats = New Mat_4to1(ocvb)
         mats.externalUse = True
 
-        shadow = New Depth_Shadow(ocvb)
+        shadow = New Depth_Holes(ocvb)
 
         sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 1000, 5000, 1500)
         If ocvb.parms.ShowOptions Then sliders.show()
