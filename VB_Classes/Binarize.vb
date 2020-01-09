@@ -162,8 +162,8 @@ Public Class Binarize_Bernson_MT : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = grid.sliders.TrackBar1.Maximum
-        grid.sliders.TrackBar2.Value = grid.sliders.TrackBar2.Minimum
+        grid.sliders.TrackBar1.Value = 32
+        grid.sliders.TrackBar2.Value = 32
 
         sliders.Label1.Text = "Kernel Size"
         sliders.setupTrackBar1(ocvb, "Kernel Size", 3, 500, 51)
@@ -184,11 +184,11 @@ Public Class Binarize_Bernson_MT : Implements IDisposable
 
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
-        Sub(roi)
-            Dim grayBin = gray(roi).Clone()
-            cv.Extensions.Binarizer.Bernsen(gray(roi), grayBin, kernelSize, contrastMin, bgThreshold)
-            ocvb.result1(roi) = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        End Sub)
+            Sub(roi)
+                Dim grayBin = gray(roi).Clone()
+                cv.Extensions.Binarizer.Bernsen(gray(roi), grayBin, kernelSize, contrastMin, bgThreshold)
+                ocvb.result1(roi) = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            End Sub)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()

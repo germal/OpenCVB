@@ -105,7 +105,7 @@ Public Class Meanshift_TopObjects : Implements IDisposable
 
         blob = New Blob_DepthClusters(ocvb)
         sliders.setupTrackBar1(ocvb, "How often should camshift be reinitialized", 1, 500, 100)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         For i = 0 To cams.Length - 1
             cams(i) = New MeanShift_Basics(ocvb)
             cams(i).rectangleEdgeWidth = 8

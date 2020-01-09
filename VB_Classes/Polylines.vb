@@ -8,7 +8,7 @@ Public Class Polylines_IEnumerableExample : Implements IDisposable
         check.Setup(ocvb, 2)
         check.Box(0).Text = "Polyline closed if checked"
         check.Box(0).Checked = True
-        check.Show()
+        If ocvb.parms.ShowOptions Then check.Show()
         sliders.setupTrackBar1(ocvb, "Polyline Count", 2, 500, 100)
         sliders.setupTrackBar2(ocvb, "Polyline Thickness", 0, 10, 1)
         If ocvb.parms.ShowOptions Then sliders.Show()

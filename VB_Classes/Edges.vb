@@ -428,7 +428,7 @@ Public Class Edges_Deriche_CPP : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Deriche Alpha", 1, 400, 100)
         sliders.setupTrackBar2(ocvb, "Deriche Omega", 1, 1000, 100)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         Edges_Deriche = Edges_Deriche_Open()
         ocvb.desc = "Edge detection using the Deriche X and Y gradients"
     End Sub

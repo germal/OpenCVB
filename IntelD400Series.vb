@@ -117,14 +117,6 @@ Public Class IntelD400Series : Implements IDisposable
         devices = ctx.QueryDevices()
         deviceCount = devices.Count
 
-        DecimationFilter = GetSetting("OpenCVB", "DecimationFilter", "DecimationFilter", False)
-        ThresholdFilter = GetSetting("OpenCVB", "ThresholdFilter", "ThresholdFilter", False)
-        DepthToDisparity = GetSetting("OpenCVB", "DepthToDisparity", "DepthToDisparity", True)
-        SpatialFilter = GetSetting("OpenCVB", "SpatialFilter", "SpatialFilter", True)
-        TemporalFilter = GetSetting("OpenCVB", "TemporalFilter", "TemporalFilter", False)
-        HoleFillingFilter = GetSetting("OpenCVB", "HoleFillingFilter", "HoleFillingFilter", True)
-        DisparityToDepth = GetSetting("OpenCVB", "DisparityToDepth", "DisparityToDepth", True)
-
         If deviceCount = 0 Then Return
         device = devices(0)
         deviceName = device.Info.Item(rs.CameraInfo.Name)

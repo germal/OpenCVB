@@ -89,6 +89,6 @@ Public Class OptionsDialog
     End Sub
 
     Private Sub TestAllDuration_ValueChanged(sender As Object, e As EventArgs) Handles TestAllDuration.ValueChanged
-        If TestAllDuration.Value < 10 Then TestAllDuration.Value = 10
+        If TestAllDuration.Value < 5 Then TestAllDuration.Value = 5
     End Sub
 End Class
