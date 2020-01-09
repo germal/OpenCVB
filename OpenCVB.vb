@@ -22,7 +22,6 @@ Public Class OpenCVB
     Dim cameraKinect As Object
     Dim cameraName As String
     Dim cameraTaskHandle As Thread
-    Dim cameraTaskPause As Boolean
     Dim camPic(displayFrames - 1) As PictureBox
     Dim CodeLineCount As Int32
     Dim saveAlgorithmIndex As Int32
@@ -650,12 +649,9 @@ Public Class OpenCVB
         If saveTestAllState Then testAllButton_Click(sender, e)
         stopAlgorithmThread = True
         Dim saveCurrentCamera = optionsForm.IntelCamera.Checked
-        cameraTaskPause = True
-        Thread.Sleep(100) ' make sure the camera task suspends the waitforframe (only important for Intel camera.) 
 
         optionsForm.ShowDialog()
 
-        cameraTaskPause = False ' this is just for the Intel camera which will fail in the waitforframe if not suspended.
         If saveCurrentCamera <> optionsForm.IntelCamera.Checked Then
             stopCameraThread = True
             If threadStop(cameraFrameCount) = False Then cameraTaskHandle.Abort()
@@ -914,7 +910,6 @@ Public Class OpenCVB
         While 1
             Application.DoEvents()
             If stopCameraThread Then Exit While
-            If cameraTaskPause Then Continue While
             If Me.Visible And Me.IsDisposed = False Then
                 Me.Invoke(
                     Sub()
@@ -957,7 +952,7 @@ Public Class OpenCVB
 
             If Me.IsDisposed Then Exit While
             cameraFrameCount += 1
-            If MinimizeMemoryFootprint Then GC.Collect() ' minimize memory footprint - the frames have just been sent so this task is lulled.
+            If MinimizeMemoryFootprint Then GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
         cameraFrameCount = 0
     End Sub
