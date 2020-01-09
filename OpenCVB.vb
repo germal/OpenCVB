@@ -627,7 +627,7 @@ Public Class OpenCVB
         End If
 
         Dim camera = New IntelD400Series(regWidth, regHeight, 30, "", "")
-        If camera.deviceCount = 0 Then Return Nothing
+        If camera.deviceCount = 0 Then Return camera
         Return camera
     End Function
     Public Sub updateCamera()
