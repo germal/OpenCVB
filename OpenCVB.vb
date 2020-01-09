@@ -134,8 +134,8 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.Dialog1_Load(sender, e)
 
-        cameraKinect = New Kinect()
-        cameraIntel = SetupIntelCamera(30, "", "", regWidth, regHeight)
+        cameraKinect = New Kinect(30, regWidth, regHeight)
+        cameraIntel = New IntelD400Series(30, regWidth, regHeight)
 
         If cameraKinect.deviceCount = 0 And cameraIntel.deviceCount = 0 Then
             MsgBox("OpenCVB supports either a Kinect for Azure 3D camera or an Intel D400Series 3D camera.  Neither is present.")
@@ -602,21 +602,6 @@ Public Class OpenCVB
         Dim m = cv.Extensions.BitmapConverter.ToMat(img)
         cv.Cv2.ImShow("m", m)
     End Sub
-    Public Function SetupIntelCamera(fps As Int32, recordingFile As String, playbackFile As String, regWidth As Int32, regHeight As Int32) As Object
-        Dim fileInfo As FileInfo = Nothing
-        If recordingFile <> "" Then
-            fileInfo = New FileInfo(recordingFile)
-            recordingFile = fileInfo.FullName ' better looking name for debugging
-        End If
-        If playbackFile <> "" Then
-            fileInfo = New FileInfo(playbackFile)
-            playbackFile = fileInfo.FullName ' better looking name for debugging
-        End If
-
-        Dim camera = New IntelD400Series(regWidth, regHeight, 30, "", "")
-        If camera.deviceCount = 0 Then Return camera
-        Return camera
-    End Function
     Public Sub updateCamera()
         If optionsForm.IntelCamera.Checked Then camera = cameraIntel Else camera = cameraKinect
         cameraName = camera.devicename
@@ -879,7 +864,7 @@ Public Class OpenCVB
                 End If
                 If Me.IsDisposed Then Exit While
             Catch ex As Exception
-                ' MsgBox("hit error = '" + ex.Message + "' in algorithmThread.  Select algorithm again to restart.")
+                MsgBox("hit error = '" + ex.Message + "' in algorithmThread.  Hit 'Play' button to restart.")
                 Exit While
             End Try
             frameCount += 1

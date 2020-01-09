@@ -115,7 +115,7 @@ Public Class IntelD400Series : Implements IDisposable
             End Using
         End Sub
     )
-    Public Sub New(width As Int32, height As Int32, fps As Int32, recordingFile As String, playbackFile As String)
+    Public Sub New(fps As Int32, width As Int32, height As Int32)
         devices = ctx.QueryDevices()
         deviceCount = devices.Count
 
@@ -135,9 +135,6 @@ Public Class IntelD400Series : Implements IDisposable
             IMUpresent = True
         End If
 
-        If recordingFile <> "" And playbackFile <> "" Then MsgBox("Both recording and playback are simultaneously enabled.  Only playback will execute.")
-        If recordingFile <> "" And playbackFile = "" Then cfg.EnableRecordToFile(recordingFile)
-        If playbackFile <> "" Then cfg.EnableDeviceFromFile(playbackFile)
         pipeline = New rs.Pipeline(ctx)
         pipeline_profile = pipeline.Start(cfg)
         align = New rs.Align(rs.Stream.Color)

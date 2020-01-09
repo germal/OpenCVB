@@ -89,14 +89,14 @@ Public Class Kinect : Implements IDisposable
     Public colorBytes() As Byte
     Public depthBytes() As Byte
     Public depthRGBBytes() As Byte
-    Public Sub New()
+    Public Sub New(fps As Int32, width As Int32, height As Int32)
         kc = KinectOpen()
         If kc <> 0 Then
             deviceCount = KinectDeviceCount(kc)
             Dim strPtr = KinectDeviceName(kc) ' The width and height of the image are set in the constructor.
             serialNumber = Marshal.PtrToStringAnsi(strPtr)
-            w = 1280
-            h = 720
+            w = width
+            h = height
             disparity = New cv.Mat
             redLeft = New cv.Mat
 
