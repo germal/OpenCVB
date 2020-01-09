@@ -10,12 +10,12 @@ Imports System.Environment
 Public Class OpenCVB
 #Region "Globals"
     Const displayFrames As Int32 = 4
+    Dim activeAlgorithm As String
     Dim AlgorithmCount As Int32
     Dim algorithmTaskHandle As Thread
     Dim border As Int32 = 6
     Dim BothFirstAndLastReady As Boolean
     Dim cameraFrameCount As Int32
-    Dim camParms As cameraParms
     Dim camera As Object
     Dim cameraDataUpdated As Boolean
     Dim cameraIntel As Object
@@ -39,6 +39,7 @@ Public Class OpenCVB
     Dim imuTimeStamp As Double
     Dim LastX As Int32
     Dim LastY As Int32
+    Dim lowResolution As Boolean
     Dim mouseClickFlag As Boolean
     Dim mouseClickPoint As New cv.Point
     Dim mouseDownPoint As New cv.Point
@@ -55,10 +56,12 @@ Public Class OpenCVB
     Dim RefreshAvailable As Boolean = True ' This variable allows us to dodge a refresh from the system after a move.  There is no synclock around that system refresh.
     Dim regWidth As Int32 = 1280, regHeight As Int32 = 720
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
+    Dim fastSize As cv.Size
     Dim stopAlgorithmThread As Boolean
     Dim stopCameraThread As Boolean
     Dim textDesc As String = ""
     Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.ActiveClass.TrueType)
+    Dim usingIntelCamera As Boolean
     Dim vtkDirectory As String = ""
 
     <System.Runtime.InteropServices.DllImport("user32.dll")>
@@ -79,22 +82,6 @@ Public Class OpenCVB
         Public Right As Integer
         Public Bottom As Integer
     End Structure
-    Private Class cameraParms
-        Public Sub New(_usingIntelCamera As Boolean, _lowResolution As Boolean, _activeAlgorithm As String, _regWidth As Int32, _regHeight As Int32)
-            activeAlgorithm = _activeAlgorithm
-            regWidth = _regWidth
-            regHeight = _regHeight
-            lowResolution = _lowResolution
-            fastSize = If(lowResolution, New cv.Size(regWidth / 2, regHeight / 2), Nothing)
-            usingIntelCamera = _usingIntelCamera
-        End Sub
-        Public activeAlgorithm As String
-        Public fastSize As cv.Size
-        Public lowResolution As Boolean
-        Public regHeight As Int32
-        Public regWidth As Int32
-        Public usingIntelCamera As Boolean
-    End Class
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         HomeDir = New DirectoryInfo(CurDir() + "\..\..\") ' running in OpenCVB/bin/Debug mostly...
@@ -644,8 +631,8 @@ Public Class OpenCVB
         saveLayout()
     End Sub
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
-        Dim saveTestAllState = TestAllTimer.Enabled
-        If saveTestAllState Then testAllButton_Click(sender, e)
+        If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
+        TestAllTimer.Enabled = False
         stopAlgorithmThread = True
         Dim saveCurrentCamera = optionsForm.IntelCamera.Checked
 
@@ -671,7 +658,7 @@ Public Class OpenCVB
             Me.Height = camPic(0).Height * 2 + 90
         End If
         saveLayout()
-        If saveTestAllState Then testAllButton_Click(sender, e) Else RunAlgorithmTask()
+        RunAlgorithmTask()
     End Sub
     Private Function threadStop(ByRef frame As Int32) As Boolean
         If frame <> 0 Then
@@ -700,7 +687,8 @@ Public Class OpenCVB
         cameraIntel.DisparityToDepth = GetSetting("OpenCVB", "DisparityToDepth", "DisparityToDepth", True)
 
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
-        parms.lowResolution = optionsForm.lowResolution.Checked
+        lowResolution = optionsForm.lowResolution.Checked
+        parms.lowResolution = lowResolution
         parms.UsingIntelCamera = optionsForm.IntelCamera.Checked
         parms.activeAlgorithm = AvailableAlgorithms.Text
 
@@ -735,14 +723,13 @@ Public Class OpenCVB
 
         stopAlgorithmThread = False
 
-        Dim fastSize = If(optionsForm.lowResolution.Checked, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
+        fastSize = If(optionsForm.lowResolution.Checked, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
         formResult1 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
         formResult2 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
         formResultsUpdated = True ' one time update to zero out the results when starting a new camera or algorithm.
 
         If cameraTaskHandle Is Nothing Then
             stopCameraThread = False
-            camParms = New cameraParms(optionsForm.IntelCamera.Checked, optionsForm.lowResolution.Checked, parms.activeAlgorithm, regWidth, regHeight)
             updateCamera()
 
             If cameraIntel.deviceCount = 0 Then
@@ -901,8 +888,6 @@ Public Class OpenCVB
         frameCount = 0
     End Sub
     Private Sub CameraTask()
-        Dim fastsize = camParms.fastSize
-        Dim saveLowRes = camParms.lowResolution
         While 1
             Application.DoEvents()
             If stopCameraThread Then Exit While
@@ -915,26 +900,20 @@ Public Class OpenCVB
             End If
             camera.GetNextFrame()
 
-            ' The algorithm can change anytime.  The camera task run continuously.
-            If camParms.activeAlgorithm.StartsWith("OpenGL") Or camParms.activeAlgorithm.StartsWith("OpenCVGL") Then
-                camParms.lowResolution = False ' OpenGL apps use the point cloud which is always at high resolution.
-            Else
-                camParms.lowResolution = saveLowRes
-            End If
             If camera.color Is Nothing Then Continue While ' at startup it may not be ready...
             SyncLock camPic
                 imuGyro = camera.imuGyro ' The data may not be present but just copy it...
                 imuAccel = camera.imuaccel
                 imuTimeStamp = camera.imutimestamp
                 formPointCloud = camera.pointCloud.clone() ' the point cloud is never resized - OpenGL apps.
-                If camParms.usingIntelCamera = False Then formPointCloud *= 0.001 ' units are millimeters for Kinect
-                If camParms.lowResolution Then
-                    formColor = camera.color.Resize(fastsize)
-                    formDepthRGB = camera.depthRGB.Resize(fastsize)
-                    formDepth = camera.depth.Resize(fastsize)
-                    formDisparity = camera.disparity.Resize(fastsize)
-                    formRedLeft = camera.redLeft.Resize(fastsize)
-                    formRedRight = camera.redRight.Resize(fastsize)
+                If usingIntelCamera = False Then formPointCloud *= 0.001 ' units are millimeters for Kinect
+                If lowResolution Then
+                    formColor = camera.color.Resize(fastSize)
+                    formDepthRGB = camera.depthRGB.Resize(fastSize)
+                    formDepth = camera.depth.Resize(fastSize)
+                    formDisparity = camera.disparity.Resize(fastSize)
+                    formRedLeft = camera.redLeft.Resize(fastSize)
+                    formRedRight = camera.redRight.Resize(fastSize)
                 Else
                     formColor = camera.color.clone()
                     formDepthRGB = camera.depthRGB.clone()

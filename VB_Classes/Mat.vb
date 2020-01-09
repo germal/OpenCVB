@@ -145,7 +145,7 @@ Public Class Mat_4to1 : Implements IDisposable
             mat4 = ocvb.redRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             mat = {mat1, mat2, mat3, mat4}
         End If
-        If mat(0).Channels <> ocvb.result2.Channels Then ocvb.result2 = New cv.Mat(ocvb.result2.Size(), mat(0).Type, 0)
+        If mat(0).Channels <> ocvb.result2.Channels Then ocvb.result2 = New cv.Mat(ocvb.color.Size(), mat(0).Type, 0)
         For i = 0 To 3
             Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
             ocvb.result2(roi) = mat(i).Resize(nSize)
