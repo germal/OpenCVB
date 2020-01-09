@@ -22,6 +22,7 @@ Public Class OpenCVB
     Dim cameraKinect As Object
     Dim cameraName As String
     Dim cameraTaskHandle As Thread
+    Dim cameraTaskPause As Boolean
     Dim camPic(displayFrames - 1) As PictureBox
     Dim CodeLineCount As Int32
     Dim saveAlgorithmIndex As Int32
@@ -39,6 +40,7 @@ Public Class OpenCVB
     Dim imuTimeStamp As Double
     Dim LastX As Int32
     Dim LastY As Int32
+    Dim MinimizeMemoryFootprint As Boolean
     Dim mouseClickFlag As Boolean
     Dim mouseClickPoint As New cv.Point
     Dim mouseDownPoint As New cv.Point
@@ -595,7 +597,6 @@ Public Class OpenCVB
         Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " + cameraName +
                   " FPS = " + Format(cameraFPS, "#0.0") + ", Algorithm FPS = " + Format(fps, "#0.0")
         If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
-        If optionsForm.MinimizeMemoryFootprint.Checked Then GC.Collect() ' minimize memory footprint - helps to slow any runaway memory usage.  
     End Sub
     Private Sub saveLayout()
         SaveSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
@@ -649,9 +650,12 @@ Public Class OpenCVB
         If saveTestAllState Then testAllButton_Click(sender, e)
         stopAlgorithmThread = True
         Dim saveCurrentCamera = optionsForm.IntelCamera.Checked
+        cameraTaskPause = True
+        Thread.Sleep(100) ' make sure the camera task suspends the waitforframe (only important for Intel camera.) 
 
         optionsForm.ShowDialog()
 
+        cameraTaskPause = False ' this is just for the Intel camera which will fail in the waitforframe if not suspended.
         If saveCurrentCamera <> optionsForm.IntelCamera.Checked Then
             stopCameraThread = True
             If threadStop(cameraFrameCount) = False Then cameraTaskHandle.Abort()
@@ -737,7 +741,7 @@ Public Class OpenCVB
 
         stopAlgorithmThread = False
 
-        Dim fastSize = If(optionsForm.lowResolution.Checked, New cv.Size(regWidth / 2, regHeight / 2), Nothing)
+        Dim fastSize = If(optionsForm.lowResolution.Checked, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
         formResult1 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
         formResult2 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
         formResultsUpdated = True ' one time update to zero out the results when starting a new camera or algorithm.
@@ -771,6 +775,8 @@ Public Class OpenCVB
             End While
         End If
 
+        MinimizeMemoryFootprint = optionsForm.MinimizeMemoryFootprint.Checked
+
         parms.IMUpresent = camera.IMUpresent
         parms.intrinsics = camera.Intrinsics_VB
         parms.extrinsics = camera.Extrinsics_VB
@@ -785,12 +791,12 @@ Public Class OpenCVB
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
         drawRect = New cv.Rect(0, 0, 0, 0)
-        Dim saveFastProc As Boolean = parms.lowResolution
+        Dim saveLowResSetting As Boolean = parms.lowResolution
         Dim OpenCVB = New VB_Classes.ActiveClass(parms)
         textDesc = OpenCVB.ocvb.desc
         ' some algorithms need to turn off the lowResolution (OpenGL apps run at full resolution.)  
         ' Here we check to see if the algorithm constructor changed lowResolution.
-        If OpenCVB.ocvb.parms.lowResolution <> saveFastProc Then
+        If OpenCVB.ocvb.parms.lowResolution <> saveLowResSetting Then
             If OpenCVB.ocvb.parms.lowResolution Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
             OpenCVB.ocvb.parms.width = regWidth / OpenCVB.ocvb.parms.speedFactor
             OpenCVB.ocvb.parms.height = regHeight / OpenCVB.ocvb.parms.speedFactor
@@ -908,6 +914,7 @@ Public Class OpenCVB
         While 1
             Application.DoEvents()
             If stopCameraThread Then Exit While
+            If cameraTaskPause Then Continue While
             If Me.Visible And Me.IsDisposed = False Then
                 Me.Invoke(
                     Sub()
@@ -928,7 +935,7 @@ Public Class OpenCVB
                 imuGyro = camera.imuGyro ' The data may not be present but just copy it...
                 imuAccel = camera.imuaccel
                 imuTimeStamp = camera.imutimestamp
-                formPointCloud = camera.pointCloud ' the point cloud is never resized - OpenGL apps.
+                formPointCloud = camera.pointCloud.clone() ' the point cloud is never resized - OpenGL apps.
                 If camParms.usingIntelCamera = False Then formPointCloud *= 0.001 ' units are millimeters for Kinect
                 If camParms.lowResolution Then
                     formColor = camera.color.Resize(fastsize)
@@ -938,18 +945,19 @@ Public Class OpenCVB
                     formRedLeft = camera.redLeft.Resize(fastsize)
                     formRedRight = camera.redRight.Resize(fastsize)
                 Else
-                    formColor = camera.color
-                    formDepthRGB = camera.depthRGB
-                    formDepth = camera.depth
-                    formDisparity = camera.disparity
-                    formRedLeft = camera.redLeft
-                    formRedRight = camera.redRight
+                    formColor = camera.color.clone()
+                    formDepthRGB = camera.depthRGB.clone()
+                    formDepth = camera.depth.clone()
+                    formDisparity = camera.disparity.clone()
+                    formRedLeft = camera.redLeft.clone()
+                    formRedRight = camera.redRight.clone()
                 End If
                 cameraDataUpdated = True
             End SyncLock
 
             If Me.IsDisposed Then Exit While
             cameraFrameCount += 1
+            If MinimizeMemoryFootprint Then GC.Collect() ' minimize memory footprint - the frames have just been sent so this task is lulled.
         End While
         cameraFrameCount = 0
     End Sub
