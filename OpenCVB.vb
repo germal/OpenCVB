@@ -795,13 +795,13 @@ Public Class OpenCVB
             ' bring the data into the algorithm task.
             SyncLock camPic
                 cameraDataUpdated = False
-                OpenCVB.ocvb.pointCloud = formPointCloud.Clone()
-                OpenCVB.ocvb.color = formColor.Clone()
-                OpenCVB.ocvb.depthRGB = formDepthRGB.Clone()
-                OpenCVB.ocvb.depth = formDepth.Clone()
-                OpenCVB.ocvb.disparity = formDisparity.Clone()
-                OpenCVB.ocvb.redLeft = formRedLeft.Clone()
-                OpenCVB.ocvb.redRight = formRedRight.Clone()
+                OpenCVB.ocvb.pointCloud = formPointCloud
+                OpenCVB.ocvb.color = formColor
+                OpenCVB.ocvb.depthRGB = formDepthRGB
+                OpenCVB.ocvb.depth = formDepth
+                OpenCVB.ocvb.disparity = formDisparity
+                OpenCVB.ocvb.redLeft = formRedLeft
+                OpenCVB.ocvb.redRight = formRedRight
                 OpenCVB.ocvb.parms.imuGyro = imuGyro
                 OpenCVB.ocvb.parms.imuAccel = imuAccel
                 OpenCVB.ocvb.parms.imuTimeStamp = imuTimeStamp
@@ -890,7 +890,7 @@ Public Class OpenCVB
                 imuGyro = camera.imuGyro ' The data may not be present but just copy it...
                 imuAccel = camera.imuaccel
                 imuTimeStamp = camera.imutimestamp
-                formPointCloud = camera.pointCloud.clone() ' the point cloud is never resized - OpenGL apps.
+                formPointCloud = camera.pointCloud ' the point cloud is never resized - OpenGL apps.
                 If usingIntelCamera = False Then formPointCloud *= 0.001 ' units are millimeters for Kinect
                 If lowResolution Then
                     formColor = camera.color.Resize(fastSize)
@@ -900,12 +900,12 @@ Public Class OpenCVB
                     formRedLeft = camera.redLeft.Resize(fastSize)
                     formRedRight = camera.redRight.Resize(fastSize)
                 Else
-                    formColor = camera.color.clone()
-                    formDepthRGB = camera.depthRGB.clone()
-                    formDepth = camera.depth.clone()
-                    formDisparity = camera.disparity.clone()
-                    formRedLeft = camera.redLeft.clone()
-                    formRedRight = camera.redRight.clone()
+                    formColor = camera.color
+                    formDepthRGB = camera.depthRGB
+                    formDepth = camera.depth
+                    formDisparity = camera.disparity
+                    formRedLeft = camera.redLeft
+                    formRedRight = camera.redRight
                 End If
                 cameraDataUpdated = True
             End SyncLock
