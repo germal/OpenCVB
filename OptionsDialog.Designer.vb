@@ -33,7 +33,6 @@ Partial Class OptionsDialog
         Me.AvoidDNNCrashes = New System.Windows.Forms.CheckBox()
         Me.ShowConsoleLog = New System.Windows.Forms.CheckBox()
         Me.ShowLabels = New System.Windows.Forms.CheckBox()
-        Me.MinimizeMemoryFootprint = New System.Windows.Forms.CheckBox()
         Me.Filters = New System.Windows.Forms.GroupBox()
         Me.DisparityToDepth = New System.Windows.Forms.CheckBox()
         Me.HoleFillingFilter = New System.Windows.Forms.CheckBox()
@@ -133,7 +132,7 @@ Partial Class OptionsDialog
         Me.lowResolution.AutoSize = True
         Me.lowResolution.Location = New System.Drawing.Point(16, 40)
         Me.lowResolution.Name = "lowResolution"
-        Me.lowResolution.Size = New System.Drawing.Size(482, 24)
+        Me.lowResolution.Size = New System.Drawing.Size(471, 24)
         Me.lowResolution.TabIndex = 0
         Me.lowResolution.TabStop = True
         Me.lowResolution.Text = "Run algorithm after resizing image to 640x360 (lowResolution)"
@@ -144,7 +143,6 @@ Partial Class OptionsDialog
         Me.GroupBox2.Controls.Add(Me.AvoidDNNCrashes)
         Me.GroupBox2.Controls.Add(Me.ShowConsoleLog)
         Me.GroupBox2.Controls.Add(Me.ShowLabels)
-        Me.GroupBox2.Controls.Add(Me.MinimizeMemoryFootprint)
         Me.GroupBox2.Location = New System.Drawing.Point(21, 312)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(936, 192)
@@ -155,7 +153,7 @@ Partial Class OptionsDialog
         'AvoidDNNCrashes
         '
         Me.AvoidDNNCrashes.AutoSize = True
-        Me.AvoidDNNCrashes.Location = New System.Drawing.Point(15, 136)
+        Me.AvoidDNNCrashes.Location = New System.Drawing.Point(15, 100)
         Me.AvoidDNNCrashes.Name = "AvoidDNNCrashes"
         Me.AvoidDNNCrashes.Size = New System.Drawing.Size(449, 24)
         Me.AvoidDNNCrashes.TabIndex = 3
@@ -165,7 +163,7 @@ Partial Class OptionsDialog
         'ShowConsoleLog
         '
         Me.ShowConsoleLog.AutoSize = True
-        Me.ShowConsoleLog.Location = New System.Drawing.Point(16, 106)
+        Me.ShowConsoleLog.Location = New System.Drawing.Point(16, 70)
         Me.ShowConsoleLog.Name = "ShowConsoleLog"
         Me.ShowConsoleLog.Size = New System.Drawing.Size(630, 24)
         Me.ShowConsoleLog.TabIndex = 2
@@ -176,22 +174,12 @@ Partial Class OptionsDialog
         'ShowLabels
         '
         Me.ShowLabels.AutoSize = True
-        Me.ShowLabels.Location = New System.Drawing.Point(16, 76)
+        Me.ShowLabels.Location = New System.Drawing.Point(16, 40)
         Me.ShowLabels.Name = "ShowLabels"
         Me.ShowLabels.Size = New System.Drawing.Size(175, 24)
         Me.ShowLabels.TabIndex = 1
         Me.ShowLabels.Text = "Show Image Labels"
         Me.ShowLabels.UseVisualStyleBackColor = True
-        '
-        'MinimizeMemoryFootprint
-        '
-        Me.MinimizeMemoryFootprint.AutoSize = True
-        Me.MinimizeMemoryFootprint.Location = New System.Drawing.Point(16, 46)
-        Me.MinimizeMemoryFootprint.Name = "MinimizeMemoryFootprint"
-        Me.MinimizeMemoryFootprint.Size = New System.Drawing.Size(224, 24)
-        Me.MinimizeMemoryFootprint.TabIndex = 0
-        Me.MinimizeMemoryFootprint.Text = "Minimize Memory Footprint"
-        Me.MinimizeMemoryFootprint.UseVisualStyleBackColor = True
         '
         'Filters
         '
@@ -426,7 +414,6 @@ Partial Class OptionsDialog
     Friend WithEvents lowResolution As RadioButton
     Friend WithEvents GroupBox2 As GroupBox
     Friend WithEvents ShowLabels As CheckBox
-    Friend WithEvents MinimizeMemoryFootprint As CheckBox
     Friend WithEvents Filters As GroupBox
     Friend WithEvents DisparityToDepth As CheckBox
     Friend WithEvents HoleFillingFilter As CheckBox

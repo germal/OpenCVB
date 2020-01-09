@@ -39,7 +39,6 @@ Public Class OpenCVB
     Dim imuTimeStamp As Double
     Dim LastX As Int32
     Dim LastY As Int32
-    Dim MinimizeMemoryFootprint As Boolean
     Dim mouseClickFlag As Boolean
     Dim mouseClickPoint As New cv.Point
     Dim mouseDownPoint As New cv.Point
@@ -701,7 +700,6 @@ Public Class OpenCVB
         cameraIntel.DisparityToDepth = GetSetting("OpenCVB", "DisparityToDepth", "DisparityToDepth", True)
 
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
-        parms.minimizeMemoryFootprint = optionsForm.MinimizeMemoryFootprint.Checked
         parms.lowResolution = optionsForm.lowResolution.Checked
         parms.UsingIntelCamera = optionsForm.IntelCamera.Checked
         parms.activeAlgorithm = AvailableAlgorithms.Text
@@ -770,8 +768,6 @@ Public Class OpenCVB
                 Application.DoEvents()
             End While
         End If
-
-        MinimizeMemoryFootprint = optionsForm.MinimizeMemoryFootprint.Checked
 
         parms.IMUpresent = camera.IMUpresent
         parms.intrinsics = camera.Intrinsics_VB
@@ -952,7 +948,7 @@ Public Class OpenCVB
 
             If Me.IsDisposed Then Exit While
             cameraFrameCount += 1
-            If MinimizeMemoryFootprint Then GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
+            GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
         cameraFrameCount = 0
     End Sub

@@ -4,7 +4,6 @@ Public Class OptionsDialog
         SaveSetting("OpenCVB", "FastAccurate", "FastAccurate", lowResolution.Checked)
         SaveSetting("OpenCVB", "IntelCamera", "IntelCamera", IntelCamera.Checked)
 
-        SaveSetting("OpenCVB", "MinimizeMemoryFootprint", "MinimizeMemoryFootprint", MinimizeMemoryFootprint.Checked)
         SaveSetting("OpenCVB", "ShowLabels", "ShowLabels", ShowLabels.Checked)
 
         SaveSetting("OpenCVB", "DecimationFilter", "DecimationFilter", DecimationFilter.Checked)
@@ -39,7 +38,6 @@ Public Class OptionsDialog
             Kinect4Azure.Checked = True
         End If
 
-        MinimizeMemoryFootprint.Checked = GetSetting("OpenCVB", "MinimizeMemoryFootprint", "MinimizeMemoryFootprint", False)
         ShowLabels.Checked = GetSetting("OpenCVB", "ShowLabels", "ShowLabels", False)
 
         DecimationFilter.Checked = GetSetting("OpenCVB", "DecimationFilter", "DecimationFilter", False)
