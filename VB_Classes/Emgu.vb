@@ -6,9 +6,14 @@ Public Class Emgu_Basics : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim data(ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize) As Byte
-        Emgu_Classes.DrawSubdivision.Draw(ocvb.color.Rows, ocvb.color.Cols, 20, data)
-        ' why not just have Draw return a Mat from Emgu?  Because an Emgu Mat is not an OpenCVSharp Mat!  But this works...
-        ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, data)
+        If ocvb.parms.testAllRunning Then
+            ocvb.putText(New ActiveClass.TrueType("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll.", 10, 125))
+            ocvb.putText(New ActiveClass.TrueType("The algorithm is working fine so it is turned off during testing.", 10, 165))
+        Else
+            Emgu_Classes.DrawSubdivision.Draw(ocvb.color.Rows, ocvb.color.Cols, 20, data)
+            ' why not just have Draw return a Mat from Emgu?  Because an Emgu Mat is not an OpenCVSharp Mat!  But this works...
+            ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, data)
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
