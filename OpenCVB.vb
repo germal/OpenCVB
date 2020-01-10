@@ -606,7 +606,6 @@ Public Class OpenCVB
         textDesc = ""
         saveLayout()
     End Sub
-
     Private Sub SnapShotButton_Click(sender As Object, e As EventArgs) Handles SnapShotButton.Click
         Dim img As New Bitmap(Me.Width, Me.Height)
         Me.DrawToBitmap(img, New Rectangle(0, 0, Me.Width, Me.Height))
@@ -638,7 +637,8 @@ Public Class OpenCVB
                 End SyncLock
             End If
         Next
-        cv.Cv2.ImShow("resultMat", resultMat)
+        img = cv.Extensions.BitmapConverter.ToBitmap(resultMat)
+        Clipboard.SetImage(img)
     End Sub
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e)

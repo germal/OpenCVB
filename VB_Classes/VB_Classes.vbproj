@@ -349,8 +349,8 @@
     <Content Include="Python\kalman_TinyEKF.py" />
     <Content Include="Python\Camshift_PS.py" />
     <Content Include="Python\Edges_Canny_PS.py" />
-    <Content Include="Python\lk_homography_PS.py" />
-    <Content Include="Python\lk_track_PS.py" />
+    <Content Include="Python\KLT_homography_PS.py" />
+    <Content Include="Python\KLT_track_PS.py" />
     <Content Include="Python\logpolar.py" />
     <Content Include="Python\SVM_Digits_PS.py" />
     <Content Include="Python\Facedetect_PS.py" />
