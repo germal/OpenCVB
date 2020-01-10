@@ -499,17 +499,16 @@ Public Class OpenCVB
         mouseClickPoint = mousePoint
     End Sub
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
-        Dim res() As String = GetType(OpenCVB).Assembly.GetManifestResourceNames()
         Static saveTestAllState As Boolean
         If stopAlgorithmThread Then
             If saveTestAllState Then testAllButton_Click(sender, e)
             RunAlgorithmTask()
-            PausePlayButton.Image = New System.Drawing.Bitmap(GetType(OpenCVB).Assembly.GetManifestResourceStream(res(3)))
+            PausePlayButton.Image = Image.FromFile("../../Data/PauseButtonRun.png")
         Else
             saveTestAllState = TestAllTimer.Enabled
             If saveTestAllState Then testAllButton_Click(sender, e)
             stopAlgorithmThread = True
-            PausePlayButton.Image = New System.Drawing.Bitmap(GetType(OpenCVB).Assembly.GetManifestResourceStream(res(4)))
+            PausePlayButton.Image = Image.FromFile("../../Data/PauseButton.png")
         End If
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
@@ -594,18 +593,6 @@ Public Class OpenCVB
         picLabels(0) = "Input " + details
         picLabels(1) = "Depth " + details
     End Sub
-
-    Private Sub SnapShotButton_Click(sender As Object, e As EventArgs) Handles SnapShotButton.Click
-        Dim img As New Bitmap(Me.Width, Me.Height)
-        Me.DrawToBitmap(img, New Rectangle(0, 0, Me.Width, Me.Height))
-
-        Dim result1 As cv.Mat
-        SyncLock camPic
-            result1 = formResult1.Clone()
-        End SyncLock
-        Dim m = cv.Extensions.BitmapConverter.ToMat(img)
-        cv.Cv2.ImShow("result1", result1)
-    End Sub
     Public Sub updateCamera()
         If optionsForm.IntelCamera.Checked Then camera = cameraIntel Else camera = cameraKinect
         cameraName = camera.devicename
@@ -618,6 +605,40 @@ Public Class OpenCVB
         If threadStop(cameraFrameCount) = False Then cameraTaskHandle.Abort()
         textDesc = ""
         saveLayout()
+    End Sub
+
+    Private Sub SnapShotButton_Click(sender As Object, e As EventArgs) Handles SnapShotButton.Click
+        Dim img As New Bitmap(Me.Width, Me.Height)
+        Me.DrawToBitmap(img, New Rectangle(0, 0, Me.Width, Me.Height))
+
+        Dim snapForm = New SnapshotRequest
+        snapForm.SnapshotRequest_Load(sender, e)
+        snapForm.PictureBox1.Image = img
+        snapForm.AllImages.Checked = True
+        If snapForm.ShowDialog() <> DialogResult.OK Then Exit Sub
+
+        Dim resultMat As New cv.Mat
+        For i = 0 To 4
+            Dim radioButton = Choose(i + 1, snapForm.AllImages, snapForm.ColorImage, snapForm.DepthRGB, snapForm.Result1, snapForm.Result2)
+            If radioButton.checked Then
+                SyncLock camPic
+                    Select Case i
+                        Case 0 ' all images
+                            resultMat = cv.Extensions.BitmapConverter.ToMat(img)
+                        Case 1 ' color image
+                            resultMat = formColor.Clone()
+                        Case 2 ' depth RGB
+                            resultMat = formDepthRGB.Clone()
+                        Case 3 ' result1
+                            resultMat = formResult1.Clone()
+                        Case 4 ' result2
+                            resultMat = formResult2.Clone()
+                    End Select
+                    Exit For
+                End SyncLock
+            End If
+        Next
+        cv.Cv2.ImShow("resultMat", resultMat)
     End Sub
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
@@ -707,8 +728,7 @@ Public Class OpenCVB
         If parms.lowResolution Then parms.imageToTrueTypeLoc *= parms.speedFactor
 
         AlgorithmDesc.Text = ""
-        Dim res() As String = GetType(OpenCVB).Assembly.GetManifestResourceNames()
-        PausePlayButton.Image = New System.Drawing.Bitmap(GetType(OpenCVB).Assembly.GetManifestResourceStream(res(3)))
+        PausePlayButton.Image = Image.FromFile("../../Data/PauseButton.png")
 
         stopAlgorithmThread = False
 

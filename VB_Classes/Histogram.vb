@@ -550,11 +550,7 @@ Public Class Histogram_Depth : Implements IDisposable
     Public inrange As Depth_InRangeTrim
     Public sliders As New OptionsSliders
     Public plotHist As Plot_Histogram
-    Dim holes As Depth_Holes
     Public Sub New(ocvb As AlgorithmData)
-        holes = New Depth_Holes(ocvb)
-        holes.externalUse = True
-
         plotHist = New Plot_Histogram(ocvb)
         plotHist.externalUse = True
 
@@ -565,9 +561,6 @@ Public Class Histogram_Depth : Implements IDisposable
         ocvb.desc = "Show depth data as a histogram."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        holes.Run(ocvb)
-        Dim mask As New cv.Mat
-        cv.Cv2.BitwiseNot(holes.holeMask, mask)
         inrange.Run(ocvb)
         plotHist.minRange = inrange.sliders.TrackBar1.Value
         plotHist.maxRange = inrange.sliders.TrackBar2.Value
@@ -575,7 +568,7 @@ Public Class Histogram_Depth : Implements IDisposable
         Dim histSize() = {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
 
-        cv.Cv2.CalcHist(New cv.Mat() {ocvb.depth}, New Integer() {0}, mask, plotHist.hist, 1, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {ocvb.depth}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
         plotHist.dst = ocvb.result2
         plotHist.Run(ocvb)
