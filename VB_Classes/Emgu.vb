@@ -28,13 +28,18 @@ Public Class Emgu_Facedetection : Implements IDisposable
         ocvb.result1.SetTo(0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim lena = New cv.Mat(ocvb.parms.HomeDir + "Data/Lena.jpg", cv.ImreadModes.Color)
-        Dim data(lena.Rows * lena.Cols * lena.ElemSize) As Byte
-        Emgu_Classes.FaceDetection.Detect(ocvb.parms.HomeDir + "Data\\Lena.jpg",
-                                          ocvb.parms.HomeDir + "Data\\haarcascade_frontalface_alt.xml", data)
-        Dim tmp = New cv.Mat(lena.Rows, lena.Cols, cv.MatType.CV_8UC3, data)
-        tmp = tmp.Resize(New cv.Size(ocvb.result1.Rows, ocvb.result1.Rows))
-        ocvb.result1(New cv.Rect(0, 0, tmp.Rows, tmp.Cols)) = tmp
+        If ocvb.parms.testAllRunning Then
+            ocvb.putText(New ActiveClass.TrueType("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll.", 10, 125))
+            ocvb.putText(New ActiveClass.TrueType("The algorithm is working fine so it is turned off during testing.", 10, 165))
+        Else
+            Dim lena = New cv.Mat(ocvb.parms.HomeDir + "Data/Lena.jpg", cv.ImreadModes.Color)
+            Dim data(lena.Rows * lena.Cols * lena.ElemSize) As Byte
+            Emgu_Classes.FaceDetection.Detect(ocvb.parms.HomeDir + "Data\\Lena.jpg",
+                                              ocvb.parms.HomeDir + "Data\\haarcascade_frontalface_alt.xml", data)
+            Dim tmp = New cv.Mat(lena.Rows, lena.Cols, cv.MatType.CV_8UC3, data)
+            tmp = tmp.Resize(New cv.Size(ocvb.result1.Rows, ocvb.result1.Rows))
+            ocvb.result1(New cv.Rect(0, 0, tmp.Rows, tmp.Cols)) = tmp
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub

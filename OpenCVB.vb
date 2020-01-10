@@ -501,14 +501,14 @@ Public Class OpenCVB
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
         Static saveTestAllState As Boolean
         If stopAlgorithmThread Then
-            If saveTestAllState Then testAllButton_Click(sender, e)
-            RunAlgorithmTask()
-            PausePlayButton.Image = Image.FromFile("../../Data/PauseButtonRun.png")
+            stopAlgorithmThread = False
+            If saveTestAllState Then testAllButton_Click(sender, e) Else RunAlgorithmTask()
+            PausePlayButton.Image = Image.FromFile("../../Data/PauseButton.png")
         Else
             saveTestAllState = TestAllTimer.Enabled
-            If saveTestAllState Then testAllButton_Click(sender, e)
+            If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
             stopAlgorithmThread = True
-            PausePlayButton.Image = Image.FromFile("../../Data/PauseButton.png")
+            PausePlayButton.Image = Image.FromFile("../../Data/PauseButtonRun.png")
         End If
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
@@ -521,6 +521,14 @@ Public Class OpenCVB
             TestAllTimer.Enabled = False
             TestAllButton.Text = "Test All"
             TestAllButton.Image = Image.FromFile("../../Data/testall.png")
+        End If
+    End Sub
+    Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
+        If stopAlgorithmThread = True Then Exit Sub ' they have paused.
+        If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
+            AvailableAlgorithms.SelectedIndex += 1
+        Else
+            AvailableAlgorithms.SelectedIndex = 0
         End If
     End Sub
     Private Sub opencvkeyword_dropdown(sender As Object, e As EventArgs) Handles OpenCVkeyword.DropDown
@@ -539,14 +547,6 @@ Public Class OpenCVB
     Private Sub algorithms_dropdownclosed(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDownClosed
         ' if the algorithm didn't change, then resume current algorithm.
         If saveAlgorithmIndex = AvailableAlgorithms.SelectedIndex Then RunAlgorithmTask()
-    End Sub
-    Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-        If stopAlgorithmThread = True Then Exit Sub ' they have paused.
-        If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
-            AvailableAlgorithms.SelectedIndex += 1
-        Else
-            AvailableAlgorithms.SelectedIndex = 0
-        End If
     End Sub
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
         OptionsBringToFront = True
