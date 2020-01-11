@@ -1,31 +1,24 @@
 from __future__ import print_function
 import sys
 import cv2 as cv
-
+import numpy as np
+# https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_template_matching/py_template_matching.html
 ## [global_variables]
 use_mask = False
 img = None
 templ = None
 mask = None
-image_window = "Source Image"
-result_window = "Result window"
-
-match_method = 0
+result_window = 'Source Image (left) and intermediate data (right)'
+match_method = 4
 max_Trackbar = 5
 ## [global_variables]
 
 def main(argv):
-
-    if (len(sys.argv) < 3):
-        print('Not enough parameters')
-        print('Usage:\nmatch_template_demo.py <image_name> <template_name> [<mask_name>]')
-        return -1
-
     ## [load_image]
     global img
     global templ
-    img = cv.imread(sys.argv[1], cv.IMREAD_COLOR)
-    templ = cv.imread(sys.argv[2], cv.IMREAD_COLOR)
+    img = cv.imread("../../Data/Messi5.jpg", cv.IMREAD_COLOR)
+    templ = cv.imread("../../Data/Messi1.jpg", cv.IMREAD_COLOR)
 
     if (len(sys.argv) > 3):
         global use_mask
@@ -39,13 +32,12 @@ def main(argv):
     ## [load_image]
 
     ## [create_windows]
-    cv.namedWindow( image_window, cv.WINDOW_AUTOSIZE )
     cv.namedWindow( result_window, cv.WINDOW_AUTOSIZE )
     ## [create_windows]
 
     ## [create_trackbar]
     trackbar_label = 'Method: \n 0: SQDIFF \n 1: SQDIFF NORMED \n 2: TM CCORR \n 3: TM CCORR NORMED \n 4: TM COEFF \n 5: TM COEFF NORMED'
-    cv.createTrackbar( trackbar_label, image_window, match_method, max_Trackbar, MatchingMethod )
+    cv.createTrackbar( trackbar_label, result_window, match_method, max_Trackbar, MatchingMethod )
     ## [create_trackbar]
 
     MatchingMethod(match_method)
@@ -88,9 +80,12 @@ def MatchingMethod(param):
     ## [imshow]
     cv.rectangle(img_display, matchLoc, (matchLoc[0] + templ.shape[0], matchLoc[1] + templ.shape[1]), (0,0,0), 2, 8, 0 )
     cv.rectangle(result, matchLoc, (matchLoc[0] + templ.shape[0], matchLoc[1] + templ.shape[1]), (0,0,0), 2, 8, 0 )
-    cv.imshow(image_window, img_display)
-    cv.imshow(result_window, result)
-    ## [imshow]
+    result = np.uint8(result * 255)
+    result = cv.resize(result, (img_display.shape[1], img_display.shape[0]))
+    result = cv.cvtColor(result, cv.COLOR_GRAY2BGR)
+    both = np.empty((img.shape[0], img.shape[1]*2, 3), np.uint8)
+    both = cv.hconcat([img_display, result])
+    cv.imshow(result_window, both)
     pass
 
 if __name__ == "__main__":

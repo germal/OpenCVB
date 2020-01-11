@@ -1,40 +1,92 @@
-#!/usr/bin/env python
-
-'''
-This example shows the functionalities of lines extraction finished by LSDDetector class.
-
-USAGE: lsd_lines_extraction.py [<path_to_input_image>]
-'''
-
+from __future__ import print_function
 import sys
 import cv2 as cv
+import numpy as np
+# https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_template_matching/py_template_matching.html
+## [global_variables]
+use_mask = False
+img = None
+templ = None
+mask = None
+result_window = 'Source Image (left) and intermediate data (right)'
+match_method = 4
+max_Trackbar = 5
+## [global_variables]
 
-if __name__ == '__main__':
-    print(__doc__)
+def main(argv):
+    ## [load_image]
+    global img
+    global templ
+    img = cv.imread("../../Data/Messi5.jpg", cv.IMREAD_COLOR)
+    templ = cv.imread("../../Data/Messi1.jpg", cv.IMREAD_COLOR)
 
-    if len(sys.argv) > 1:
-        fname = sys.argv[1]
-    else :
-        fname = '../../data/corridor.jpg'
+    if (len(sys.argv) > 3):
+        global use_mask
+        use_mask = True
+        global mask
+        mask = cv.imread( sys.argv[3], cv.IMREAD_COLOR )
 
-    img = cv.imread(fname)
+    if ((img is None) or (templ is None) or (use_mask and (mask is None))):
+        print('Can\'t read one of the images')
+        return -1
+    ## [load_image]
 
-    if img is None:
-        print('Failed to load image file:', fname)
-        sys.exit(1)
+    ## [create_windows]
+    cv.namedWindow( result_window, cv.WINDOW_AUTOSIZE )
+    ## [create_windows]
 
-    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    ## [create_trackbar]
+    trackbar_label = 'Method: \n 0: SQDIFF \n 1: SQDIFF NORMED \n 2: TM CCORR \n 3: TM CCORR NORMED \n 4: TM COEFF \n 5: TM COEFF NORMED'
+    cv.createTrackbar( trackbar_label, result_window, match_method, max_Trackbar, MatchingMethod )
+    ## [create_trackbar]
 
-    lsd = cv.line_descriptor_LSDDetector.createLSDDetector()
+    MatchingMethod(match_method)
 
-    lines = lsd.detect(gray, 2, 1)
-    for kl in lines:
-        if kl.octave == 0:
-            # cv.line only accepts integer coordinate
-            pt1 = (int(kl.startPointX), int(kl.startPointY))
-            pt2 = (int(kl.endPointX), int(kl.endPointY))
-            cv.line(img, pt1, pt2, [255, 0, 0], 2)
-
-    cv.imshow('output', img)
+    ## [wait_key]
     cv.waitKey(0)
-    cv.destroyAllWindows()
+    return 0
+    ## [wait_key]
+
+def MatchingMethod(param):
+
+    global match_method
+    match_method = param
+
+    ## [copy_source]
+    img_display = img.copy()
+    ## [copy_source]
+    ## [match_template]
+    method_accepts_mask = (cv.TM_SQDIFF == match_method or match_method == cv.TM_CCORR_NORMED)
+    if (use_mask and method_accepts_mask):
+        result = cv.matchTemplate(img, templ, match_method, None, mask)
+    else:
+        result = cv.matchTemplate(img, templ, match_method)
+    ## [match_template]
+
+    ## [normalize]
+    cv.normalize( result, result, 0, 1, cv.NORM_MINMAX, -1 )
+    ## [normalize]
+    ## [best_match]
+    _minVal, _maxVal, minLoc, maxLoc = cv.minMaxLoc(result, None)
+    ## [best_match]
+
+    ## [match_loc]
+    if (match_method == cv.TM_SQDIFF or match_method == cv.TM_SQDIFF_NORMED):
+        matchLoc = minLoc
+    else:
+        matchLoc = maxLoc
+    ## [match_loc]
+
+    ## [imshow]
+    cv.rectangle(img_display, matchLoc, (matchLoc[0] + templ.shape[0], matchLoc[1] + templ.shape[1]), (0,0,0), 2, 8, 0 )
+    cv.rectangle(result, matchLoc, (matchLoc[0] + templ.shape[0], matchLoc[1] + templ.shape[1]), (0,0,0), 2, 8, 0 )
+    result = np.uint8(result * 255)
+    result = cv.resize(result, (img_display.shape[1], img_display.shape[0]))
+    result = cv.cvtColor(result, cv.COLOR_GRAY2BGR)
+    both = np.empty((img.shape[0], img.shape[1]*2, 3), np.uint8)
+    both = cv.hconcat([img_display, result])
+    cv.imshow(result_window, both)
+    pass
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
