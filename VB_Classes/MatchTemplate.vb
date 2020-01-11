@@ -162,20 +162,54 @@ End Class
 
 Public Class MatchTemplate_BestTemplate : Implements IDisposable
     Dim grid As Thread_Grid
+    Dim entropies(0) As Entropy_Basics
+    Dim match As MatchTemplate_Basics
     Public Sub New(ocvb As AlgorithmData)
         grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
         grid.externalUse = True
 
+        match = New MatchTemplate_Basics(ocvb)
+
+        ocvb.parms.ShowOptions = False ' we won't need the options...
+        ocvb.label1 = "MatchTemplate probabilities"
+        ocvb.label2 = "Tracking red circle.  White rectangle is original."
         ocvb.desc = "Find the best object to track in the image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        grid.Run(ocvb)
-        Parallel.For(0, grid.roiList.Count - 1,
-         Sub(i)
+        Static bestContrast As cv.Rect
+        If ocvb.frameCount Mod 100 = 0 Then
+            grid.Run(ocvb)
+            If entropies.Length <> grid.roiList.Count Then
+                ReDim entropies(grid.roiList.Count - 1)
+                For i = 0 To entropies.Length - 1
+                    entropies(i) = New Entropy_Basics(ocvb)
+                    entropies(i).externalUse = True
+                Next
+            End If
 
-         End Sub)
+            Parallel.For(0, grid.roiList.Count - 1,
+             Sub(i)
+                 entropies(i).src = ocvb.color(grid.roiList(i))
+                 entropies(i).Run(ocvb)
+             End Sub)
+
+            Dim maxEntropy As Single
+            Dim maxIndex As Int32
+            For i = 0 To entropies.Count - 1
+                If entropies(i).entropy > maxEntropy Then
+                    maxEntropy = entropies(i).entropy
+                    maxIndex = i
+                End If
+            Next
+
+            ocvb.result2 = ocvb.color.Clone()
+            bestContrast = grid.roiList(maxIndex)
+            ocvb.drawRect = bestContrast
+        End If
+
+        match.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         grid.Dispose()

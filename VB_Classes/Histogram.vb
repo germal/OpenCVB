@@ -113,9 +113,10 @@ Public Class Histogram_Basics : Implements IDisposable
 
         Dim maxVal As Double
         For i = 0 To src.Channels - 1
-            cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {i}, New cv.Mat(), histRGB(i), 1, dimensions, ranges)
-            histRGB(i).MinMaxLoc(0, maxVal)
-            histRGB(i) = histRGB(i).Normalize(0, dst.Rows, cv.NormTypes.MinMax)
+            Dim hist As New cv.Mat
+            cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {i}, New cv.Mat(), hist, 1, dimensions, ranges)
+            hist.MinMaxLoc(0, maxVal)
+            histRGB(i) = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
             If externalUse = False Then
                 Dim points = New List(Of cv.Point)
                 Dim listOfPoints = New List(Of List(Of cv.Point))
