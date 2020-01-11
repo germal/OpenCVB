@@ -68,7 +68,7 @@ Public Class BGSubtract_Basics_MT : Implements IDisposable
         grid = New Thread_Grid(ocvb)
 
         sliders.setupTrackBar1(ocvb, "Correlation Threshold", 0, 1000, 980)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label2 = "Only Motion Added"
         ocvb.desc = "Detect Motion in the color image"
@@ -113,13 +113,13 @@ Public Class BGSubtract_Depth_MT : Implements IDisposable
         bgsub.Run(ocvb)
 
         If ocvb.frameCount = 0 Then ocvb.depthRGB.CopyTo(ocvb.result2)
-        Dim gray = ocvb.result1.CvtColor(cv.ColorConversionCodes.bgr2gray)
+        Dim gray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim mask = gray.Threshold(1, 255, cv.ThresholdTypes.Binary)
         Dim shadowMask As New cv.Mat
         cv.Cv2.BitwiseAnd(shadow.holeMask, mask, shadowMask)
         mask.SetTo(0, shadow.holeMask)
         ocvb.depthRGB.CopyTo(ocvb.result2, mask)
-        mask = mask.CvtColor(cv.ColorConversionCodes.gray2bgr)
+        mask = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.AddWeighted(ocvb.result1, 0.75, mask, 0.25, 0, ocvb.result1)
         ocvb.result2.SetTo(0, shadowMask)
     End Sub
@@ -139,7 +139,7 @@ Public Class BGSubtract_MOG : Implements IDisposable
     Dim MOG As cv.BackgroundSubtractorMOG
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "MOG Learn Rate", 0, 1000, 10)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         MOG = cv.BackgroundSubtractorMOG.Create()
         ocvb.desc = "Subtract background using a mixture of Gaussians"
@@ -169,7 +169,7 @@ Public Class BGSubtract_MOG2 : Implements IDisposable
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "MOG Learn Rate", 0, 1000, 10)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
         ocvb.desc = "Subtract background using a mixture of Gaussians"
@@ -196,7 +196,7 @@ Public Class BGSubtract_GMG_KNN : Implements IDisposable
     Dim knn As cv.BackgroundSubtractorKNN
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Learn Rate", 1, 1000, 1)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         gmg = cv.BackgroundSubtractorGMG.Create()
         knn = cv.BackgroundSubtractorKNN.Create()
@@ -234,7 +234,7 @@ Public Class BGSubtract_MOG_RGBDepth : Implements IDisposable
     Dim MOGRGB As cv.BackgroundSubtractorMOG
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "MOG Learn Rate x1000", 0, 1000, 10)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         MOGDepth = cv.BackgroundSubtractorMOG.Create()
         MOGRGB = cv.BackgroundSubtractorMOG.Create()
@@ -273,7 +273,7 @@ Public Class BGSubtract_MOG_Retina : Implements IDisposable
         retina.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Uncertainty threshold", 1, 255, 100)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
         ocvb.label1 = "MOG results of depth motion"

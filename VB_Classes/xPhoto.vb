@@ -127,5 +127,6 @@ Public Class xPhoto_OilPaint_CPP : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         xPhoto_OilPaint_Close(xPhoto_OilPaint)
+        radio.Dispose()
     End Sub
 End Class

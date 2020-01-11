@@ -106,3 +106,78 @@ Public Class MatchTemplate_RowCorrelation : Implements IDisposable
         flow.Dispose()
     End Sub
 End Class
+
+
+
+
+
+Public Class MatchTemplate_Basics : Implements IDisposable
+    Dim radio As New OptionsRadioButtons
+    Public Sub New(ocvb As AlgorithmData)
+        radio.Setup(ocvb, 6)
+        For i = 0 To radio.check.Count - 1
+            radio.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
+        Next
+        radio.check(5).Checked = True
+        radio.Show()
+
+        ocvb.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
+
+        ocvb.label1 = "MatchTemplate probabilities"
+        ocvb.label2 = "White is input, Red is highest probability"
+        ocvb.desc = "Find the requested template in an image"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static saveTemplate As cv.Mat
+        Static saveRect As cv.Rect
+        If ocvb.drawRect <> New cv.Rect Then
+            saveRect = ocvb.drawRect
+            saveTemplate = ocvb.color(ocvb.drawRect).Clone()
+            ocvb.drawRectClear = True
+        End If
+        Dim matchMethod As cv.TemplateMatchModes
+        For i = 0 To radio.check.Count - 1
+            If radio.check(i).Checked Then
+                matchMethod = Choose(i + 1, cv.TemplateMatchModes.SqDiff, cv.TemplateMatchModes.SqDiffNormed, cv.TemplateMatchModes.CCorr,
+                                          cv.TemplateMatchModes.CCorrNormed, cv.TemplateMatchModes.CCoeff, cv.TemplateMatchModes.CCoeffNormed)
+                Exit For
+            End If
+        Next
+        cv.Cv2.MatchTemplate(ocvb.color, saveTemplate, ocvb.result1, matchMethod)
+        ocvb.result2 = ocvb.color
+        saveTemplate.CopyTo(ocvb.result2(saveRect))
+        ocvb.result2.Rectangle(saveRect, cv.Scalar.White, 1)
+        Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
+        ocvb.result1.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
+        ocvb.result2.Circle(maxLoc.X + saveRect.Width / 2, maxLoc.Y + saveRect.Height / 2, 20, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        radio.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class MatchTemplate_BestTemplate : Implements IDisposable
+    Dim grid As Thread_Grid
+    Public Sub New(ocvb As AlgorithmData)
+        grid = New Thread_Grid(ocvb)
+        grid.sliders.TrackBar1.Value = 32
+        grid.sliders.TrackBar2.Value = 32
+        grid.externalUse = True
+
+        ocvb.desc = "Find the best object to track in the image"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        grid.Run(ocvb)
+        Parallel.For(0, grid.roiList.Count - 1,
+         Sub(i)
+
+         End Sub)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        grid.Dispose()
+    End Sub
+End Class

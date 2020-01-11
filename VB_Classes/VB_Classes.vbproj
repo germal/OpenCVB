@@ -125,6 +125,7 @@
     <Compile Include="Concat.vb" />
     <Compile Include="EMax.vb" />
     <Compile Include="Emgu.vb" />
+    <Compile Include="Entropy.vb" />
     <Compile Include="FeatureLess.vb" />
     <Compile Include="FREAK.vb" />
     <Compile Include="Gabor.vb" />
@@ -353,6 +354,7 @@
     <Content Include="Python\KLT_track_PS.py" />
     <Content Include="Python\logpolar.py" />
     <Content Include="Python\MatchTemplate.py" />
+    <Content Include="Python\mosse_PS.py" />
     <Content Include="Python\SVM_Digits_PS.py" />
     <Content Include="Python\Facedetect_PS.py" />
     <Content Include="Python\Laplacian_PyramidFilter_PS.py" />

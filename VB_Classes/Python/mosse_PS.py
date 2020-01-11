@@ -6,15 +6,12 @@ MOSSE tracking sample
 This sample implements correlation-based tracking approach, described in [1].
 
 Usage:
-  mosse.py [--pause] [<video source>]
-
-  --pause  -  Start with playback paused at the first video frame.
-              Useful for tracking target selection.
+  mosse.py 
 
   Draw rectangles around objects with a mouse to track them.
 
 Keys:
-  SPACE    - pause video
+  SPACE    - pause input
   c        - clear targets
 
 [1] David S. Bolme et al. "Visual Object Tracking using Adaptive Correlation Filters"
@@ -32,7 +29,6 @@ if PY3:
 import numpy as np
 import cv2 as cv
 from common import draw_str, RectSelector
-import video
 
 def rnd_warp(a):
     h, w = a.shape[:2]
@@ -145,54 +141,41 @@ class MOSSE:
         self.H[...,1] *= -1
 
 class App:
-    def __init__(self, video_src, paused = False):
-        self.cap = video.create_capture(video_src)
-        _, self.frame = self.cap.read()
-        cv.imshow('frame', self.frame)
-        self.rect_sel = RectSelector('frame', self.onrect)
+    def Open(self):
+        self.paused = False
+        cv.namedWindow(title_window)
+        self.rect_sel = RectSelector(title_window, self.onrect)
         self.trackers = []
-        self.paused = paused
+        from PyStream import PyStreamRun
+        PyStreamRun(self.OpenCVCode, 'Mosse_PS.py')
 
     def onrect(self, rect):
         frame_gray = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
         tracker = MOSSE(frame_gray, rect)
         self.trackers.append(tracker)
 
-    def run(self):
-        while True:
-            if not self.paused:
-                ret, self.frame = self.cap.read()
-                if not ret:
-                    break
-                frame_gray = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
-                for tracker in self.trackers:
-                    tracker.update(frame_gray)
-
-            vis = self.frame.copy()
+    def OpenCVCode(self, vis, depth_colormap):
+        self.frame = vis.copy()
+        if not self.paused:
+            frame_gray = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
             for tracker in self.trackers:
-                tracker.draw_state(vis)
-            if len(self.trackers) > 0:
-                cv.imshow('tracker state', self.trackers[-1].state_vis)
-            self.rect_sel.draw(vis)
+                tracker.update(frame_gray)
 
-            cv.imshow('frame', vis)
-            ch = cv.waitKey(10)
-            if ch == 27:
-                break
-            if ch == ord(' '):
-                self.paused = not self.paused
-            if ch == ord('c'):
-                self.trackers = []
+        for tracker in self.trackers:
+            tracker.draw_state(vis)
+        if len(self.trackers) > 0:
+            cv.imshow('tracker state', self.trackers[-1].state_vis)
+        self.rect_sel.draw(vis)
 
+        cv.imshow(title_window, vis)
+        ch = cv.waitKey(10)
+        if ch == ord(' '):
+            self.paused = not self.paused
+        if ch == ord('c'):
+            self.trackers = []
 
 if __name__ == '__main__':
     print (__doc__)
-    import sys, getopt
-    opts, args = getopt.getopt(sys.argv[1:], '', ['pause'])
-    opts = dict(opts)
-    try:
-        video_src = args[0]
-    except:
-        video_src = '0'
-
-    App(video_src, paused = '--pause' in opts).run()
+    import sys
+    title_window = "Mosse_PS.py - Draw rectangles around any objects to be tracked!"
+    App().Open()

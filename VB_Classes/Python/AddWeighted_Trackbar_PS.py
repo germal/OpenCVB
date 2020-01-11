@@ -4,18 +4,14 @@ alpha_slider_max = 100
 title_window = 'AddWeighted_Trackbar_PS.py - Linear Blend'
 saveAlpha = 50
     
-## [on_trackbar]
 def on_trackbar(val):
     global saveAlpha # force the callback to reference the global variable.
     saveAlpha = val 
-## [on_trackbar]
 
 cv.namedWindow(title_window)
-## [create_trackbar]
 trackbar_name = 'Alpha'
 cv.createTrackbar(trackbar_name, title_window , saveAlpha, alpha_slider_max, on_trackbar)
 on_trackbar(saveAlpha)
-## [create_trackbar]
 
 def OpenCVCode(imgRGB, depth_colormap):
     alpha = saveAlpha / alpha_slider_max

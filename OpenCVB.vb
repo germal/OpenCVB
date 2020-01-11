@@ -646,28 +646,30 @@ Public Class OpenCVB
         stopAlgorithmThread = True
         Dim saveCurrentCamera = optionsForm.IntelCamera.Checked
 
-        optionsForm.ShowDialog()
+        Dim OKcancel = optionsForm.ShowDialog()
 
-        If saveCurrentCamera <> optionsForm.IntelCamera.Checked Then
-            stopCameraThread = True
-            If threadStop(cameraFrameCount) = False Then cameraTaskHandle.Abort()
-            cameraTaskHandle = Nothing
+        If OKcancel = DialogResult.OK Then
+            If saveCurrentCamera <> optionsForm.IntelCamera.Checked Then
+                stopCameraThread = True
+                If threadStop(cameraFrameCount) = False Then cameraTaskHandle.Abort()
+                cameraTaskHandle = Nothing
+            End If
+            TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
+
+            If optionsForm.SnapToGrid.Checked Then
+                For i = 0 To 3
+                    camPic(i).Size = New Size(regWidth / 2, regHeight / 2)
+                Next
+                camPic(1).Left = camPic(0).Left + camPic(0).Width
+                camPic(2).Top = camPic(0).Top + camPic(0).Height
+                camPic(3).Left = camPic(2).Left + camPic(2).Width
+                camPic(3).Top = camPic(0).Top + camPic(0).Height
+
+                Me.Width = camPic(0).Width * 2 + 40
+                Me.Height = camPic(0).Height * 2 + 90
+            End If
+            saveLayout()
         End If
-        TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
-
-        If optionsForm.SnapToGrid.Checked Then
-            For i = 0 To 3
-                camPic(i).Size = New Size(regWidth / 2, regHeight / 2)
-            Next
-            camPic(1).Left = camPic(0).Left + camPic(0).Width
-            camPic(2).Top = camPic(0).Top + camPic(0).Height
-            camPic(3).Left = camPic(2).Left + camPic(2).Width
-            camPic(3).Top = camPic(0).Top + camPic(0).Height
-
-            Me.Width = camPic(0).Width * 2 + 40
-            Me.Height = camPic(0).Height * 2 + 90
-        End If
-        saveLayout()
         RunAlgorithmTask()
     End Sub
     Private Function threadStop(ByRef frame As Int32) As Boolean

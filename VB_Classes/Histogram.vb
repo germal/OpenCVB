@@ -73,6 +73,7 @@ End Module
 ' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
 Public Class Histogram_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
+    Public histRGB(2) As cv.Mat
     Public src As New cv.Mat
     Public dst As New cv.Mat
     Public bins As Int32 = 50
@@ -91,6 +92,10 @@ Public Class Histogram_Basics : Implements IDisposable
         For i = 0 To 255
             indices.Set(Of Single)(i, 0, CSng(i))
         Next
+
+        For i = 0 To 2
+            histRGB(i) = New cv.Mat
+        Next
         ocvb.desc = "Plot histograms for up to 3 channels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -108,23 +113,25 @@ Public Class Histogram_Basics : Implements IDisposable
 
         Dim maxVal As Double
         For i = 0 To src.Channels - 1
-            Dim hist = New cv.Mat
-            cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {i}, New cv.Mat(), hist, 1, dimensions, ranges)
-            hist.MinMaxLoc(0, maxVal)
-            hist = hist.Normalize(0, dst.Rows, cv.NormTypes.MinMax)
-            Dim points = New List(Of cv.Point)
-            Dim listOfPoints = New List(Of List(Of cv.Point))
-            For j = 0 To bins - 1
-                points.Add(New cv.Point(CInt(j * pixelWidth), dst.Rows - hist.At(Of Single)(j, 0)))
-            Next
-            listOfPoints.Add(points)
-            dst.Polylines(listOfPoints, False, plotColors(i), thickness, cv.LineTypes.AntiAlias)
+            cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {i}, New cv.Mat(), histRGB(i), 1, dimensions, ranges)
+            histRGB(i).MinMaxLoc(0, maxVal)
+            histRGB(i) = histRGB(i).Normalize(0, dst.Rows, cv.NormTypes.MinMax)
+            If externalUse = False Then
+                Dim points = New List(Of cv.Point)
+                Dim listOfPoints = New List(Of List(Of cv.Point))
+                For j = 0 To bins - 1
+                    points.Add(New cv.Point(CInt(j * pixelWidth), dst.Rows - histRGB(i).At(Of Single)(j, 0)))
+                Next
+                listOfPoints.Add(points)
+                dst.Polylines(listOfPoints, False, plotColors(i), thickness, cv.LineTypes.AntiAlias)
+            End If
         Next
 
-        maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
-
-        AddPlotScale(dst, maxVal, sliders.TrackBar3.Value / 10)
-        ocvb.label1 = "Histogram for Color image above - " + CStr(bins) + " bins"
+        If externalUse = False Then
+            maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
+            AddPlotScale(dst, maxVal, sliders.TrackBar3.Value / 10)
+            ocvb.label1 = "Histogram for Color image above - " + CStr(bins) + " bins"
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
