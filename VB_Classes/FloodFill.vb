@@ -236,7 +236,7 @@ Public Class FloodFill_Basics : Implements IDisposable
     End Class
     Public Sub New(ocvb As AlgorithmData)
         check.Setup(ocvb, 1)
-        check.Box(0).Text = "Show the first 16 largest objects in view (in order of size)"
+        check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
         If ocvb.parms.ShowOptions Then check.Show()
 
         sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 5000, 2500)

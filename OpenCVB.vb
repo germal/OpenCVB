@@ -24,7 +24,6 @@ Public Class OpenCVB
     Dim cameraTaskHandle As Thread
     Dim camPic(displayFrames - 1) As PictureBox
     Dim CodeLineCount As Int32
-    Dim saveAlgorithmIndex As Int32
     Dim DrawingRectangle As Boolean
     Dim drawRect As New cv.Rect(0, 0, 0, 0)
     Dim externalInvocation As Boolean
@@ -532,21 +531,10 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub opencvkeyword_dropdown(sender As Object, e As EventArgs) Handles OpenCVkeyword.DropDown
-        saveAlgorithmIndex = OpenCVkeyword.SelectedIndex
-    End Sub
-    Private Sub opencvkeyword_dropdownclosed(sender As Object, e As EventArgs) Handles OpenCVkeyword.DropDownClosed
-        ' if the algorithm didn't change, then resume current algorithm.
-        If saveAlgorithmIndex = OpenCVkeyword.SelectedIndex Then
-            stopAlgorithmThread = True
-            RunAlgorithmTask()
-        End If
+        stopAlgorithmThread = True
     End Sub
     Private Sub algorithms_dropdown(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDown
-        saveAlgorithmIndex = AvailableAlgorithms.SelectedIndex
-    End Sub
-    Private Sub algorithms_dropdownclosed(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDownClosed
-        ' if the algorithm didn't change, then resume current algorithm.
-        If saveAlgorithmIndex = AvailableAlgorithms.SelectedIndex Then RunAlgorithmTask()
+        stopAlgorithmThread = True
     End Sub
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
         OptionsBringToFront = True
