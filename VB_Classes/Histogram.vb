@@ -189,7 +189,6 @@ Public Class Histogram_EqualizeColor : Implements IDisposable
 
         ocvb.desc = "Create an equalized histogram of the color image.  Histogram differences are very subtle but image is noticeably enhanced."
         ocvb.label1 = "Image Enhanced with Equalized Histogram"
-        ocvb.label2 = "Before (top) and After Green Histograms"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim rgb(2) As cv.Mat
@@ -200,12 +199,8 @@ Public Class Histogram_EqualizeColor : Implements IDisposable
             rgbEq(i) = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
             cv.Cv2.EqualizeHist(rgb(i), rgbEq(i))
         Next
-        cv.Cv2.Merge(rgbEq, ocvb.result1)
 
         If externalUse = False Then
-            Dim test As New cv.Mat
-            cv.Cv2.Subtract(rgb(0), rgbEq(0), test)
-
             kalman.gray = rgb(0).Clone() ' just show the green plane
             kalman.dst = mats.mat(0)
             kalman.plotHist.backColor = cv.Scalar.Green
@@ -216,6 +211,9 @@ Public Class Histogram_EqualizeColor : Implements IDisposable
             kalman.Run(ocvb)
 
             mats.Run(ocvb)
+            ocvb.label2 = "Before (top) and After Green Histograms"
+
+            cv.Cv2.Merge(rgbEq, ocvb.result1)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

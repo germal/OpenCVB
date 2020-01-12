@@ -73,15 +73,6 @@ Public Class Stabilizer_Basics : Implements IDisposable
         ocvb.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
         ocvb.label1 = "Stabilized Image"
     End Sub
-    Private Sub kalmanFilter()
-        Dim f1err As New cv.Mat
-        cv.Cv2.Add(errScale, qScale, f1err)
-        For i = 0 To errScale.Rows - 1
-            Dim gainScale = f1err.At(Of Double)(i, 0) / (f1err.At(Of Double)(i, 0) + rScale.At(Of Double)(i, 0))
-            sScale.Set(Of Double)(i, 0, sScale.At(Of Double)(i, 0) + gainScale * (sumScale.At(Of Double)(i, 0) - sScale.At(Of Double)(i, 0)))
-            errScale.Set(Of Double)(i, 0, (1 - gainScale) * f1err.At(Of Double)(i, 0))
-        Next
-    End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim vert_Border = borderCrop * ocvb.color.Rows / ocvb.color.Cols
         If ocvb.frameCount = 0 Then
@@ -135,8 +126,6 @@ Public Class Stabilizer_Basics : Implements IDisposable
 
             Dim delta As New cv.Mat(5, 1, cv.MatType.CV_64F, New Double() {ds_x, ds_y, da, dx, dy})
             cv.Cv2.Add(sumScale, delta, sumScale)
-
-            If ocvb.frameCount > 1 Then kalmanFilter() ' updates sScale
 
             Dim diff As New cv.Mat
             cv.Cv2.Subtract(sScale, sumScale, diff)
