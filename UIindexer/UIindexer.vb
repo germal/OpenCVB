@@ -33,15 +33,15 @@ Module IndexMain
         End While
 
         ' read the list of OpenCV API's we will be looking for
-        Dim api = New System.IO.StreamReader(directoryInfo.FullName + "\..\Data\OpenCVapi.txt")
-        While api.EndOfStream = False
-            line = api.ReadLine()
+        Dim srAPI = New System.IO.StreamReader(directoryInfo.FullName + "\..\Data\OpenCVapi.txt")
+        While srAPI.EndOfStream = False
+            line = srAPI.ReadLine()
             If line <> "" Then
                 apiList.Add(line + "(") ' it needs the parenthesis to make sure it is a function.
                 apiListLCase.Add(LCase(line) + "(") ' it needs the parenthesis to make sure it is a function.
             End If
         End While
-        api.Close()
+        srAPI.Close()
 
         Dim apiOCVB = New System.IO.StreamReader(directoryInfo.FullName + "\..\Data\AlgorithmList.txt")
         line = apiOCVB.ReadLine() ' toss the codeline count...

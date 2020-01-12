@@ -15,4 +15,4 @@ def OpenCVCode(imgRGB, depth_colormap):
 if __name__ == '__main__':
     mser = cv.MSER_create()
     from PyStream import PyStreamRun
-    PyStreamRun(OpenCVCode, 'MotionTemplate_PS.py')
+    PyStreamRun(OpenCVCode, 'mser_PS.py')

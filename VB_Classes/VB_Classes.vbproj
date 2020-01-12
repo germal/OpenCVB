@@ -354,6 +354,8 @@
     <Content Include="Python\KLT_track_PS.py" />
     <Content Include="Python\logpolar.py" />
     <Content Include="Python\MatchTemplate.py" />
+    <Content Include="Python\MotionTemplate_PS.py" />
+    <Content Include="Python\MSER_PS.py" />
     <Content Include="Python\Tracker_PS.py" />
     <Content Include="Python\SVM_Digits_PS.py" />
     <Content Include="Python\Facedetect_PS.py" />

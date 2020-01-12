@@ -9,6 +9,8 @@ Public Class MSER_Basics : Implements IDisposable
     Public zone() As cv.Rect = Nothing
     Public region()() As cv.Point = Nothing
     Public check As New OptionsCheckbox
+    Dim saveParms() As Int32
+    Dim mser As cv.MSER
     Public Sub New(ocvb As AlgorithmData)
         sliders2.setupTrackBar1(ocvb, "MSER Edge Blursize", 1, 20, 5)
         If ocvb.parms.ShowOptions Then sliders2.Show()
@@ -25,11 +27,14 @@ Public Class MSER_Basics : Implements IDisposable
         sliders.setupTrackBar4(ocvb, "MSER Max Variation", 1, 100, 25)
         If ocvb.parms.ShowOptions Then sliders.show()
 
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, 2)
         check.Box(0).Text = "Pass2Only"
+        check.Box(1).Text = "Use Grayscale, not color input (default)"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.show()
+        check.Box(1).Checked = True
+        If ocvb.parms.ShowOptions Then check.Show()
 
+        ReDim saveParms(10) ' 4 sliders + 4 sliders + 1 slider + 2 checkboxes
         ocvb.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -46,27 +51,36 @@ Public Class MSER_Basics : Implements IDisposable
         Dim edgeBlurSize = sliders2.TrackBar1.Value
         If edgeBlurSize Mod 2 = 0 Then edgeBlurSize += 1 ' must be odd.
 
-        Dim mser = cv.MSER.Create(delta, minArea, maxArea, maxVariation, minDiversity, maxEvolution, areaThreshold, minMargin, edgeBlurSize)
+        Dim changedParms As Boolean
+        For i = 0 To saveParms.Length - 1
+            Dim nextVal = Choose(i + 1, sliders.TrackBar1.Value, sliders.TrackBar2.Value, sliders.TrackBar3.Value, sliders.TrackBar4.Value,
+                                      sliders1.TrackBar1.Value, sliders1.TrackBar2.Value, sliders1.TrackBar3.Value, sliders1.TrackBar4.Value,
+                                      sliders2.TrackBar1.Value, check.Box(0).Checked)
+            If nextVal <> saveParms(i) Then changedParms = True
+            saveParms(i) = nextVal
+        Next
 
-        Dim keyImg As List(Of cv.KeyPoint) = Nothing
-        mser.Pass2Only = check.Box(0).Checked
+        If changedParms Then
+            mser = cv.MSER.Create(delta, minArea, maxArea, maxVariation, minDiversity, maxEvolution, areaThreshold, minMargin, edgeBlurSize)
+            mser.Pass2Only = check.Box(0).Checked
+        End If
+
         If externalUse = False Then src = ocvb.color.Clone()
         src = src.Blur(New cv.Size(edgeBlurSize, edgeBlurSize))
+        If check.Box(1).Checked Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mser.DetectRegions(src, region, zone)
 
         If externalUse = False Then
             Dim pixels As Int32
-            Dim regionCount As Int32
             ocvb.result1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
             For i = 0 To region.Length - 1
-                regionCount += 1
                 Dim nextRegion = region(i)
+                pixels += nextRegion.Length
                 For Each pt In nextRegion
                     ocvb.result1.Set(Of cv.Vec3b)(pt.Y, pt.X, ocvb.depthRGB.At(Of cv.Vec3b)(pt.Y, pt.X))
-                    pixels += 1
                 Next
             Next
-            ocvb.label1 = CStr(regionCount) + " Regions had " + CStr(pixels) + " pixels"
+            ocvb.label1 = CStr(region.Length) + " Regions " + Format(pixels / region.Length, "#0.0") + " pixels/region (avg)"
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -174,8 +188,6 @@ End Class
 
 
 ' https://github.com/shimat/opencvsharp/wiki/MSER
-' Results are surprisingly different from those in the example above.  
-' Code Is identical And so Is the input image - resize does not affect results (use an imshow to test it.)
 Public Class MSER_CPPStyle : Implements IDisposable
     Dim gray As cv.Mat
     Dim image As cv.Mat
@@ -208,5 +220,45 @@ Public Class MSER_CPPStyle : Implements IDisposable
         ocvb.result2 = mat.Resize(ocvb.result2.Size())
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class
+
+
+
+
+
+' https://github.com/opencv/opencv/blob/master/samples/python/mser.py
+Public Class MSER_Contours : Implements IDisposable
+    Dim mser As MSER_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        mser = New MSER_Basics(ocvb)
+        mser.externalUse = True
+        mser.sliders.TrackBar2.Value = 4000
+        ocvb.desc = "Use MSER but show the contours of each region."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        mser.src = ocvb.color.Clone()
+        mser.Run(ocvb)
+
+        Dim pixels As Int32
+        ocvb.result1 = ocvb.color
+        Dim hull() As cv.Point
+        For i = 0 To mser.region.Length - 1
+            Dim nextRegion = mser.region(i)
+            pixels += nextRegion.Length
+            hull = cv.Cv2.ConvexHull(nextRegion, True)
+            Dim listOfPoints = New List(Of List(Of cv.Point))
+            Dim points = New List(Of cv.Point)
+            For j = 0 To hull.Count - 1
+                points.Add(hull(j))
+            Next
+            listOfPoints.Add(points)
+            ocvb.result1.DrawContours(listOfPoints, 0, cv.Scalar.Yellow, 1)
+        Next
+
+        ocvb.label1 = CStr(mser.region.Length) + " Regions " + Format(pixels / mser.region.Length, "#0.0") + " pixels/region (avg)"
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        mser.Dispose()
     End Sub
 End Class

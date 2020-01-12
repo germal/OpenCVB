@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import numpy as np
 import cv2 as cv
+import sys
+title_window = "MotionTemplate_PS.py"
 
 MHI_DURATION = 0.5
 DEFAULT_THRESHOLD = 32
@@ -11,55 +13,34 @@ MIN_TIME_DELTA = 0.05
 def nothing(dummy):
     pass
 
-def draw_motion_comp(vis, (x, y, w, h), angle, color):
-    cv.rectangle(vis, (x, y), (x+w, y+h), (0, 255, 0))
-    r = min(w/2, h/2)
-    cx, cy = x+w/2, y+h/2
+def draw_motion_comp(vis, rect, angle, color):
+    cv.rectangle(vis, (rect[0], rect[1]), (rect[0]+rect[2], rect[1]+rect[3]), (0, 255, 0))
+    r = min(rect[2]/2, rect[3]/2)
+    cx, cy = rect[0]+rect[2]/2, rect[1]+rect[3]/2
     angle = angle*np.pi/180
-    cv.circle(vis, (cx, cy), r, color, 3)
-    cv.line(vis, (cx, cy), (int(cx+np.cos(angle)*r), int(cy+np.sin(angle)*r)), color, 3)
+    cv.circle(vis, (int(cx), int(cy)), int(r), color, 3)
+    cv.line(vis, (int(cx), int(cy)), (int(cx+np.cos(angle)*r), int(cy+np.sin(angle)*r)), color, 3)
 
-if __name__ == '__main__':
-    import sys
-    try:
-        video_src = sys.argv[1]
-    except:
-        video_src = 0
-
-    cv.namedWindow('motempl')
-    visuals = ['input', 'frame_diff', 'motion_hist', 'grad_orient']
-    cv.createTrackbar('visual', 'motempl', 2, len(visuals)-1, nothing)
-    cv.createTrackbar('threshold', 'motempl', DEFAULT_THRESHOLD, 255, nothing)
-
-    cam = cv.VideoCapture(video_src)
-    if not cam.isOpened():
-        print("could not open video_src " + str(video_src) + " !\n")
-        sys.exit(1)
-    ret, frame = cam.read()
-    if ret == False:
-        print("could not read from " + str(video_src) + " !\n")
-        sys.exit(1)
-    h, w = frame.shape[:2]
-    prev_frame = frame.copy()
+def OpenCVCode(imgRGB, depth_colormap):
+    global frameCount, prev_imgRGB
+    h, w = imgRGB.shape[:2]
     motion_history = np.zeros((h, w), np.float32)
     hsv = np.zeros((h, w, 3), np.uint8)
     hsv[:,:,1] = 255
-    while True:
-        ret, frame = cam.read()
-        if ret == False:
-            break
-        frame_diff = cv.absdiff(frame, prev_frame)
+     
+    if frameCount > 0:
+        frame_diff = cv.absdiff(imgRGB, prev_imgRGB)
         gray_diff = cv.cvtColor(frame_diff, cv.COLOR_BGR2GRAY)
-        thrs = cv.getTrackbarPos('threshold', 'motempl')
+        thrs = cv.getTrackbarPos('threshold', title_window)
         ret, motion_mask = cv.threshold(gray_diff, thrs, 1, cv.THRESH_BINARY)
         timestamp = cv.getTickCount() / cv.getTickFrequency()
         cv.motempl.updateMotionHistory(motion_mask, motion_history, timestamp, MHI_DURATION)
         mg_mask, mg_orient = cv.motempl.calcMotionGradient( motion_history, MAX_TIME_DELTA, MIN_TIME_DELTA, apertureSize=5 )
         seg_mask, seg_bounds = cv.motempl.segmentMotion(motion_history, timestamp, MAX_TIME_DELTA)
 
-        visual_name = visuals[cv.getTrackbarPos('visual', 'motempl')]
+        visual_name = visuals[cv.getTrackbarPos('visual', title_window)]
         if visual_name == 'input':
-            vis = frame.copy()
+            vis = imgRGB.copy()
         elif visual_name == 'frame_diff':
             vis = frame_diff.copy()
         elif visual_name == 'motion_hist':
@@ -86,9 +67,15 @@ if __name__ == '__main__':
             draw_motion_comp(vis, rect, angle, color)
 
         cv.putText(vis, visual_name, (20, 20), cv.FONT_HERSHEY_PLAIN, 1.0, (200,0,0))
-        cv.imshow('motempl', vis)
+        cv.imshow(title_window, vis)
 
-        prev_frame = frame.copy()
-        if 0xFF & cv.waitKey(5) == 27:
-            break
-    cv.destroyAllWindows()
+    prev_imgRGB = imgRGB.copy()
+    frameCount += 1
+
+frameCount = 0
+cv.namedWindow(title_window)
+visuals = ['input', 'frame_diff', 'motion_hist', 'grad_orient']
+cv.createTrackbar('visual', title_window, 2, len(visuals)-1, nothing)
+cv.createTrackbar('threshold', title_window, DEFAULT_THRESHOLD, 255, nothing)
+from PyStream import PyStreamRun
+PyStreamRun(OpenCVCode, 'MotionTemplate_PS.py')

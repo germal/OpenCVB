@@ -530,12 +530,6 @@ Public Class OpenCVB
             AvailableAlgorithms.SelectedIndex = 0
         End If
     End Sub
-    Private Sub opencvkeyword_dropdown(sender As Object, e As EventArgs) Handles OpenCVkeyword.DropDown
-        stopAlgorithmThread = True
-    End Sub
-    Private Sub algorithms_dropdown(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDown
-        stopAlgorithmThread = True
-    End Sub
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
         OptionsBringToFront = True
     End Sub

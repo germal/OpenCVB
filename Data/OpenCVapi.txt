@@ -48,6 +48,8 @@ buildOpticalFlowPyramid
 calcBackProject
 calcCovarMatrix
 calcHist
+calcGlobalOrientation
+calcMotionGradient
 calcOpticalFlowFarneback
 calcOpticalFlowPyrLK
 calibrateCamera
@@ -439,6 +441,7 @@ sampsonDistance
 scaleAdd
 Scharr
 seamlessClone
+segmentMotion
 selectROI
 selectROIs
 sepFilter2D
@@ -509,6 +512,7 @@ UMat_queue
 undistort
 undistortPoints
 undistortPointsIter
+updateMotionHistory
 useOpenVX
 useOptimized
 validateDisparity
