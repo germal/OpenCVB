@@ -167,6 +167,7 @@ Public Class MSER_TestSynthetic : Implements IDisposable
         mser.sliders.TrackBar3.Value = 5000
         mser.sliders.TrackBar4.Value = 2
         mser.sliders1.TrackBar1.Value = 0
+        mser.check.Box(1).Checked = False ' the grayscale result is quite unimpressive.
 
         synth = New MSER_Synthetic(ocvb)
         ocvb.desc = "Test MSER with the synthetic image."
@@ -175,7 +176,7 @@ Public Class MSER_TestSynthetic : Implements IDisposable
         synth.Run(ocvb)
         ocvb.result2 = ocvb.result1.Clone()
 
-        testSynthetic(ocvb, ocvb.result1, False, 10)
+        'testSynthetic(ocvb, ocvb.result1, False, 10)
         testSynthetic(ocvb, ocvb.result2, True, 100)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
