@@ -6,6 +6,12 @@ Module OpticalFlowModule_Exports
                                 polyN As Single, polySigma As Single, OpticalFlowFlags As cv.OpticalFlowFlags) As cv.Mat
         Dim flow As New cv.Mat
         If pyrScale >= 1 Then pyrScale = 0.99
+
+        ' When running "Test All", the OpenGL require full resolution which switches to low resolution (if active) after completion.
+        ' The first frame after switching will mean oldgray is full resolution and gray is low resolution.  This avoids the problem.
+        ' if another algorithm lexically follows the OpenGL algorithms, this may change (or be deleted!)
+        If oldGray.Size() <> gray.Size() Then oldGray = gray.Clone()
+
         cv.Cv2.CalcOpticalFlowFarneback(oldGray, gray, flow, pyrScale, levels, winSize, iterations, polyN, polySigma, OpticalFlowFlags)
         Dim flowVec(1) As cv.Mat
         cv.Cv2.Split(flow, flowVec)

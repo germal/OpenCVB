@@ -681,15 +681,13 @@ Public Class OpenCVB
         cameraIntel.DisparityToDepth = GetSetting("OpenCVB", "DisparityToDepth", "DisparityToDepth", True)
 
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
-        SyncLock camPic ' no window when lowresolution and fastsize aren't in sync...
-            lowResolution = optionsForm.lowResolution.Checked
-            usingIntelCamera = optionsForm.IntelCamera.Checked
+        lowResolution = optionsForm.lowResolution.Checked
+        usingIntelCamera = optionsForm.IntelCamera.Checked
 
-            parms.activeAlgorithm = AvailableAlgorithms.Text
-            ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
-            If parms.activeAlgorithm.Contains("OpenGL") Or parms.activeAlgorithm.Contains("OpenCVGL") Then lowResolution = False
-            fastSize = If(lowResolution, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
-        End SyncLock
+        parms.activeAlgorithm = AvailableAlgorithms.Text
+        ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
+        If parms.activeAlgorithm.Contains("OpenGL") Or parms.activeAlgorithm.Contains("OpenCVGL") Then lowResolution = False
+        fastSize = If(lowResolution, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
 
         parms.lowResolution = lowResolution
         parms.UsingIntelCamera = usingIntelCamera
