@@ -1,26 +1,6 @@
-#!/usr/bin/env python
-
-'''
-example to show optical flow
-
-USAGE: opt_flow.py [<video_source>]
-
-Keys:
- 1 - toggle HSV flow visualization
- 2 - toggle glitch
-
-Keys:
-    ESC    - exit
-'''
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
-
-import video
-
+import sys
 
 def draw_flow(img, flow, step=16):
     h, w = img.shape[:2]
@@ -56,25 +36,17 @@ def warp_flow(img, flow):
     res = cv.remap(img, flow, None, cv.INTER_LINEAR)
     return res
 
-def main():
-    import sys
-    try:
-        fn = sys.argv[1]
-    except IndexError:
-        fn = 0
-
-    cam = video.create_capture(fn)
-    ret, prev = cam.read()
-    prevgray = cv.cvtColor(prev, cv.COLOR_BGR2GRAY)
-    show_hsv = False
-    show_glitch = False
-    cur_glitch = prev.copy()
-
-    while True:
-        ret, img = cam.read()
-        gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-        flow = cv.calcOpticalFlowFarneback(prevgray, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
-        prevgray = gray
+def OpenCVCode(imgRGB, depth_colormap):
+    global frameCount, prev_imgRGB, prev, show_hsv, show_glitch, cur_glitch
+    gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
+    if frameCount == 0:
+        show_hsv = True
+        show_glitch = True
+        prev = imgRGB.copy()
+        cur_glitch = imgRGB.copy()
+    else:
+        flow = cv.calcOpticalFlowFarneback(prev_imgRGB, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+        prev_imgRGB = gray
 
         cv.imshow('flow', draw_flow(gray, flow))
         if show_hsv:
@@ -84,21 +56,19 @@ def main():
             cv.imshow('glitch', cur_glitch)
 
         ch = cv.waitKey(5)
-        if ch == 27:
-            break
         if ch == ord('1'):
             show_hsv = not show_hsv
-            print('HSV flow visualization is', ['off', 'on'][show_hsv])
         if ch == ord('2'):
             show_glitch = not show_glitch
             if show_glitch:
-                cur_glitch = img.copy()
+                cur_glitch = imgRGB.copy()
             print('glitch is', ['off', 'on'][show_glitch])
-
-    print('Done')
-
+    prev_imgRGB = gray.copy()
+    frameCount += 1
 
 if __name__ == '__main__':
-    print(__doc__)
-    main()
-    cv.destroyAllWindows()
+    frameCount = 0
+
+    from PyStream import PyStreamRun
+    PyStreamRun(OpenCVCode, 'OpticalFlow2_PS.py')
+    

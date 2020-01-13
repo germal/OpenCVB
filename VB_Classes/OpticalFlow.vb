@@ -7,8 +7,8 @@ Module OpticalFlowModule_Exports
         Dim flow As New cv.Mat
         If pyrScale >= 1 Then pyrScale = 0.99
 
-        ' When running "Test All", the OpenGL require full resolution which switches to low resolution (if active) after completion.
-        ' The first frame after switching will mean oldgray is full resolution and gray is low resolution.  This avoids the problem.
+        ' When running "Test All", the OpenGL code requires full resolution which switches to low resolution (if active) after completion.
+        ' The first frame after switching will mean oldgray is full resolution and gray is low resolution.  This "If" avoids the problem.
         ' if another algorithm lexically follows the OpenGL algorithms, this may change (or be deleted!)
         If oldGray.Size() <> gray.Size() Then oldGray = gray.Clone()
 
