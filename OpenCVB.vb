@@ -681,15 +681,18 @@ Public Class OpenCVB
         cameraIntel.DisparityToDepth = GetSetting("OpenCVB", "DisparityToDepth", "DisparityToDepth", True)
 
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
-        lowResolution = optionsForm.lowResolution.Checked
-        parms.lowResolution = lowResolution
-        parms.UsingIntelCamera = optionsForm.IntelCamera.Checked
-        parms.activeAlgorithm = AvailableAlgorithms.Text
+        SyncLock camPic ' no window when lowresolution and fastsize aren't in sync...
+            lowResolution = optionsForm.lowResolution.Checked
+            usingIntelCamera = optionsForm.IntelCamera.Checked
 
-        ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
-        If parms.activeAlgorithm.Contains("OpenGL") Or parms.activeAlgorithm.Contains("OpenCVGL") Then
-            If parms.lowResolution Then parms.lowResolution = False
-        End If
+            parms.activeAlgorithm = AvailableAlgorithms.Text
+            ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
+            If parms.activeAlgorithm.Contains("OpenGL") Or parms.activeAlgorithm.Contains("OpenCVGL") Then lowResolution = False
+            fastSize = If(lowResolution, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
+        End SyncLock
+
+        parms.lowResolution = lowResolution
+        parms.UsingIntelCamera = usingIntelCamera
 
         parms.PythonExe = optionsForm.PythonExeName.Text
         parms.vtkDirectory = vtkDirectory
@@ -716,7 +719,6 @@ Public Class OpenCVB
 
         stopAlgorithmThread = False
 
-        fastSize = If(optionsForm.lowResolution.Checked, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
         formResult1 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
         formResult2 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
         formResultsUpdated = True ' one time update to zero out the results when starting a new camera or algorithm.
