@@ -14,7 +14,7 @@ Public Class Rodrigues_Basics : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.UsingIntelCamera Then
             ocvb.result2.SetTo(0)
-            ocvb.putText(New ActiveClass.TrueType("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140, RESULT1s))
+            ocvb.putText(New ActiveClass.TrueType("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140, RESULT1))
             Exit Sub
         End If
 
