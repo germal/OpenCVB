@@ -94,33 +94,33 @@ Public Class ActiveClass : Implements IDisposable
         Public Property FOV As Single()
     End Structure
     Public Structure algorithmParameters
-        Dim lowResolution As Boolean
-        Dim minimizeMemoryFootprint As Boolean
-        Dim useRecordedData As Boolean
-        Dim UsingIntelCamera As Boolean
-        Dim IMUpresent As Boolean
-        Dim testAllRunning As Boolean
-        Dim ShowOptions As Boolean
-        Dim ShowConsoleLog As Boolean
+        Dim activeAlgorithm As String
         Dim AvoidDNNCrashes As Boolean
         Dim externalInvocation As Boolean
-        Dim PythonExe As String
-        Dim activeAlgorithm As String
-        Dim vtkDirectory As String
-        Dim HomeDir As String
-        Dim OpenCVfullPath As String
-        Dim OpenCV_Version_ID As String
-        Dim speedFactor As Int32
-        Dim width As Int32
+        Dim extrinsics As Extrinsics_VB
         Dim height As Int32
+        Dim HomeDir As String
+        Dim imageToTrueTypeLoc As Single
+        Dim imuAccel As cv.Point3f
+        Dim imuGyro As cv.Point3f
+        Dim IMUpresent As Boolean
+        Dim imuTimeStamp As Double
+        Dim intrinsics As Intrinsics_VB
+        Dim lowResolution As Boolean
         Dim mainFormHeight As Int32
         Dim mainFormLoc As Point
-        Dim imageToTrueTypeLoc As Single
-        Dim intrinsics As Intrinsics_VB
-        Dim extrinsics As Extrinsics_VB
-        Dim imuGyro As cv.Point3f
-        Dim imuAccel As cv.Point3f
-        Dim imuTimeStamp As Double
+        Dim minimizeMemoryFootprint As Boolean
+        Dim OpenCV_Version_ID As String
+        Dim OpenCVfullPath As String
+        Dim PythonExe As String
+        Dim ShowConsoleLog As Boolean
+        Dim ShowOptions As Boolean
+        Dim speedFactor As Int32
+        Dim testAllRunning As Boolean
+        Dim useRecordedData As Boolean
+        Dim UsingIntelCamera As Boolean
+        Dim vtkDirectory As String
+        Dim width As Int32
     End Structure
     Public Sub New(parms As algorithmParameters)
         UpdateHostLocation(parms.mainFormLoc.X, parms.mainFormLoc.Y, parms.mainFormHeight)

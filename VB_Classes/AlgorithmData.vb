@@ -2,42 +2,42 @@
 Imports System.Runtime.InteropServices
 
 Public Class AlgorithmData
+    Public bestOpenCVFont = cv.HersheyFonts.HersheyComplex
+    Public bestOpenCVFontSize = 1.5
     Public color As cv.Mat
+    Public colorScalar(255) As cv.Scalar
     Public depth As cv.Mat
-    Public disparity As cv.Mat
     Public depthRGB As cv.Mat
-    Public pointCloud As cv.Mat
-    Public redLeft As cv.Mat
-    Public redRight As cv.Mat
-    Public name As String
     Public desc As String
-    Public optionsTop As Int32
-    Public optionsLeft As Int32
-    Public result1 As New cv.Mat
-    Public result2 As New cv.Mat
+    Public disparity As cv.Mat
     Public drawRect As cv.Rect ' filled in if the user draws on any of the images.
     Public drawRectClear As Boolean ' used to remove the drawing rectangle when it has been used to initialize a camshift or mean shift.
-    Public mousePoint As cv.Point ' trace any mouse movements using this.
+    Public fontName As String
+    Public fontSize As Int32
+    Public frameCount As Int32 = 0
+    Public label1 As String
+    Public label2 As String
     Public mouseClickFlag As Boolean
     Public mouseClickPoint As cv.Point
     Public mousePicTag As Int32 ' which image was the mouse in?
-    Public rng = New cv.RNG()
+    Public mousePoint As cv.Point ' trace any mouse movements using this.
     Public ms_rng As System.Random
-    Public rColors(255) As cv.Vec3b
-    Public colorScalar(255) As cv.Scalar
-    Public label1 As String
-    Public label2 As String
-    Public frameCount As Int32 = 0
-    Public PythonFileName As String
-    Public PythonExe As String
-    Public TTtextData(3) As List(Of ActiveClass.TrueType)
-    Public fontName As String
-    Public fontSize As Int32
-    Public bestOpenCVFont = cv.HersheyFonts.HersheyComplex
-    Public bestOpenCVFontSize = 1.5
-    Public openGLWidth = 1500
+    Public name As String
     Public openGLHeight = 1200
+    Public openGLWidth = 1500
+    Public optionsLeft As Int32
+    Public optionsTop As Int32
     Public parms As ActiveClass.algorithmParameters
+    Public pointCloud As cv.Mat
+    Public PythonExe As String
+    Public PythonFileName As String
+    Public rColors(255) As cv.Vec3b
+    Public redLeft As cv.Mat
+    Public redRight As cv.Mat
+    Public result1 As New cv.Mat
+    Public result2 As New cv.Mat
+    Public rng = New cv.RNG()
+    Public TTtextData(3) As List(Of ActiveClass.TrueType)
     Public Sub New(parms As ActiveClass.algorithmParameters)
         optionsTop = parms.mainFormLoc.Y + parms.mainFormHeight
         optionsLeft = parms.mainFormLoc.X
