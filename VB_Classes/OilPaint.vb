@@ -13,25 +13,35 @@ Public Class OilPaint_Pointilism : Implements IDisposable
             Application.DoEvents() ' because the rest of initialization takes so long, let the show take effect.
         End If
 
-        ' only need to create the mask to order the brush strokes once.
-        randomMask = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32SC2)
-        Dim nPt As New cv.Point
-        For y = 0 To randomMask.Height - 1
-            For x = 0 To randomMask.Width - 1
-                nPt.X = (ocvb.rng.uniform(-1, 1) + x) Mod (randomMask.Width - 1)
-                nPt.Y = (ocvb.rng.uniform(-1, 1) + y) Mod (randomMask.Height - 1)
-                If nPt.X < 0 Then nPt.X = 0
-                If nPt.Y < 0 Then nPt.Y = 0
-                randomMask.Set(Of cv.Point)(y, x, nPt)
-            Next
-        Next
+        Dim w = ocvb.color.Width / 8
+        Dim h = ocvb.color.Height / 8
+        ocvb.drawRect = New cv.Rect(w * 3, h * 3, w * 2, h * 2)
 
-        Dim myRNG As New cv.RNG
-        cv.Cv2.RandShuffle(randomMask, 1.0, myRNG) ' the RNG is not optional.
         ocvb.desc = "Alter the image to effect the pointilism style - Painterly effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.bgr2gray)
+        ocvb.result1 = ocvb.color.Clone()
+        Dim src = ocvb.result1(ocvb.drawRect)
+        Static saveDrawRect As New cv.Rect
+        If saveDrawRect <> ocvb.drawRect Then
+            saveDrawRect = ocvb.drawRect
+            ' only need to create the mask to order the brush strokes once.
+            randomMask = New cv.Mat(src.Size(), cv.MatType.CV_32SC2)
+            Dim nPt As New cv.Point
+            For y = 0 To randomMask.Height - 1
+                For x = 0 To randomMask.Width - 1
+                    nPt.X = (ocvb.rng.uniform(-1, 1) + x) Mod (randomMask.Width - 1)
+                    nPt.Y = (ocvb.rng.uniform(-1, 1) + y) Mod (randomMask.Height - 1)
+                    If nPt.X < 0 Then nPt.X = 0
+                    If nPt.Y < 0 Then nPt.Y = 0
+                    randomMask.Set(Of cv.Point)(y, x, nPt)
+                Next
+            Next
+            Dim myRNG As New cv.RNG
+            cv.Cv2.RandShuffle(randomMask, 1.0, myRNG) ' the RNG is not optional.
+        End If
+        Dim rand = randomMask.Resize(src.Size())
+        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim fieldx As New cv.Mat, fieldy As New cv.Mat
         cv.Cv2.Scharr(gray, fieldx, cv.MatType.CV_32FC1, 1, 0, 1 / 15.36)
@@ -42,13 +52,12 @@ Public Class OilPaint_Pointilism : Implements IDisposable
         cv.Cv2.GaussianBlur(fieldy, fieldy, New cv.Size(smoothingRadius, smoothingRadius), 0, 0)
 
         Dim strokeSize = sliders.TrackBar1.Value
-        ocvb.result1.SetTo(0)
-        For y = 0 To ocvb.color.Height - 1
-            For x = 0 To ocvb.color.Width - 1
-                Dim nPt = randomMask.At(Of cv.Point)(y, x)
-                Dim fx = fieldx.At(Of Single)(nPt.Y, nPt.X)
-                Dim fy = fieldy.At(Of Single)(nPt.Y, nPt.X)
-                Dim nextColor = ocvb.result2.At(Of cv.Vec3b)(nPt.Y, nPt.X)
+        src.SetTo(0)
+        For y = 0 To src.Height - 1
+            For x = 0 To src.Width - 1
+                Dim nPt = rand.At(Of cv.Point)(y, x)
+                Dim fx = fieldx(ocvb.drawRect).At(Of Single)(nPt.Y, nPt.X)
+                Dim fy = fieldy(ocvb.drawRect).At(Of Single)(nPt.Y, nPt.X)
                 Dim nPoint = New cv.Point2f(nPt.X, nPt.Y)
                 Dim gradient_magnitude = Math.Sqrt(fx * fx + fy * fy)
                 Dim slen = Math.Round(strokeSize + strokeSize * Math.Sqrt(gradient_magnitude))
@@ -56,7 +65,8 @@ Public Class OilPaint_Pointilism : Implements IDisposable
                 Dim direction = Math.Atan2(fx, fy)
                 Dim angle = direction * 180.0 / Math.PI + 90
 
-                ocvb.result1.Circle(nPoint, slen / 4, ocvb.color.At(Of cv.Vec3b)(nPt.Y, nPt.X), -1, cv.LineTypes.AntiAlias)
+                Dim nextColor = ocvb.color(ocvb.drawRect).At(Of cv.Vec3b)(nPt.Y, nPt.X)
+                ocvb.result1(ocvb.drawRect).Circle(nPoint, slen / 4, nextColor, -1, cv.LineTypes.AntiAlias)
             Next
         Next
     End Sub
@@ -64,6 +74,7 @@ Public Class OilPaint_Pointilism : Implements IDisposable
         sliders.Dispose()
     End Sub
 End Class
+
 
 
 

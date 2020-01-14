@@ -23,8 +23,8 @@ End Module
 Public Class OpenCVGL_Image_CPP : Implements IDisposable
     Dim cloud As Depth_XYZ_OpenMP_CPP
     Dim imu As IMU_Basics
-    Dim rgbData() As Byte
-    Dim pointCloudData() As Byte
+    Dim rgbData(0) As Byte
+    Dim pointCloudData(0) As Byte
     Public sliders As New OptionsSliders
     Public sliders1 As New OptionsSliders
     Public sliders2 As New OptionsSliders
@@ -35,16 +35,14 @@ Public Class OpenCVGL_Image_CPP : Implements IDisposable
         imu = New IMU_Basics(ocvb)
         imu.externalUse = True
 
-        If ocvb.parms.testAllRunning Then Exit Sub
-
-        setOpenGLsliders(ocvb, sliders, sliders1, sliders2, sliders3)
-        sliders2.TrackBar3.Value = -10 ' eye.z
-        sliders.TrackBar1.Value = 30 ' FOV
-        sliders.TrackBar2.Value = 0 ' Yaw
-        sliders.TrackBar3.Value = 0 ' pitch
-        sliders.TrackBar4.Value = 0 ' roll
-
-        ReDim rgbData(ocvb.color.Total * ocvb.color.ElemSize - 1)
+        If ocvb.parms.testAllRunning = False Then
+            setOpenGLsliders(ocvb, sliders, sliders1, sliders2, sliders3)
+            sliders2.TrackBar3.Value = -10 ' eye.z
+            sliders.TrackBar1.Value = 30 ' FOV
+            sliders.TrackBar2.Value = 0 ' Yaw
+            sliders.TrackBar3.Value = 0 ' pitch
+            sliders.TrackBar4.Value = 0 ' roll
+        End If
 
         OpenCVGL_Image_Open(ocvb.color.Width, ocvb.color.Height)
         ocvb.desc = "Use the OpenCV implementation of OpenGL to render a 3D image with depth."
@@ -56,9 +54,6 @@ Public Class OpenCVGL_Image_CPP : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType("Skipping it during a 'Test All' just so all the other tests can be exercised.", 10, 100, RESULT1))
             Exit Sub
         End If
-        Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
-        If ocvb.frameCount = 0 Then ReDim pointCloudData(pcSize - 1)
-
         imu.Run(ocvb)
         Dim FOV = sliders.TrackBar1.Value
         Dim yaw = sliders.TrackBar2.Value
@@ -73,6 +68,9 @@ Public Class OpenCVGL_Image_CPP : Implements IDisposable
         OpenCVGL_Image_Control(ocvb.parms.intrinsics.ppx, ocvb.parms.intrinsics.ppy, ocvb.parms.intrinsics.fx, ocvb.parms.intrinsics.fy,
                                FOV, zNear, zFar, eye, yaw, roll, pitch, pointSize, zTrans, ocvb.color.Width, ocvb.color.Height)
 
+        Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
+        If rgbData.Length <> ocvb.color.Total * ocvb.color.ElemSize Then ReDim rgbData(ocvb.color.Total * ocvb.color.ElemSize - 1)
+        If pointCloudData.Length <> pcSize Then ReDim pointCloudData(pcSize - 1)
         Marshal.Copy(ocvb.color.Data, rgbData, 0, rgbData.Length)
         Marshal.Copy(ocvb.pointCloud.Data, pointCloudData, 0, pcSize)
         Dim handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned)

@@ -259,6 +259,7 @@
     <Compile Include="Stitch.vb" />
     <Compile Include="TextureFlow.vb" />
     <Compile Include="Trace.vb" />
+    <Compile Include="Tracker.vb" />
     <Compile Include="VB_Classes.vb" />
     <Compile Include="OptionsCheckbox.Designer.vb">
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>
@@ -356,6 +357,7 @@
     <Content Include="Python\MatchTemplate.py" />
     <Content Include="Python\MotionTemplate_PS.py" />
     <Content Include="Python\MSER_PS.py" />
+    <Content Include="Python\MultiTracker_PS.py" />
     <Content Include="Python\OpticalFlow2_PS.py" />
     <Content Include="Python\Tracker_PS.py" />
     <Content Include="Python\SVM_Digits_PS.py" />

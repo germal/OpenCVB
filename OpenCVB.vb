@@ -501,7 +501,7 @@ Public Class OpenCVB
         Static saveTestAllState As Boolean
         If stopAlgorithmThread Then
             stopAlgorithmThread = False
-            If saveTestAllState Then testAllButton_Click(sender, e) Else RunAlgorithmTask()
+            If saveTestAllState Then testAllButton_Click(sender, e) Else StartAlgorithmTask()
             PausePlayButton.Image = Image.FromFile("../../Data/PauseButton.png")
         Else
             saveTestAllState = TestAllTimer.Enabled
@@ -539,7 +539,7 @@ Public Class OpenCVB
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If AvailableAlgorithms.Enabled Then
             SaveSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Text)
-            RunAlgorithmTask()
+            StartAlgorithmTask()
         End If
     End Sub
     Private Sub ActivateTimer_Tick(sender As Object, e As EventArgs) Handles ActivateTimer.Tick
@@ -652,7 +652,7 @@ Public Class OpenCVB
             End If
             saveLayout()
         End If
-        RunAlgorithmTask()
+        StartAlgorithmTask()
     End Sub
     Private Function threadStop(ByRef frame As Int32) As Boolean
         If frame <> 0 Then
@@ -663,12 +663,12 @@ Public Class OpenCVB
                 Application.DoEvents() ' to allow the algorithm task to gracefully end and dispose OpenCVB.
                 Thread.Sleep(100)
                 sleepCount += 1
-                If sleepCount > 10 Then Return False
+                If sleepCount > 100 Then Return False
             End While
         End If
         Return True
     End Function
-    Private Sub RunAlgorithmTask()
+    Private Sub StartAlgorithmTask()
         stopAlgorithmThread = True
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
 
@@ -762,7 +762,7 @@ Public Class OpenCVB
         fpsTimer.Enabled = True
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
-        drawRect = New cv.Rect(0, 0, 0, 0)
+        drawRect = New cv.Rect
         Dim saveLowResSetting As Boolean = parms.lowResolution
         Dim OpenCVB = New VB_Classes.ActiveClass(parms)
         textDesc = OpenCVB.ocvb.desc
@@ -857,7 +857,7 @@ Public Class OpenCVB
                         Next
                     End SyncLock
                 End If
-                If OptionsBringToFront And TestAllTimer.Enabled = False And frameCount > 100 Then
+                If OptionsBringToFront And TestAllTimer.Enabled = False Then
                     Try
                         For Each frm In Application.OpenForms
                             If frm.name.startswith("Option") Then frm.topmost = True
