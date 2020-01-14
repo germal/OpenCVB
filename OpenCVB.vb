@@ -12,6 +12,7 @@ Public Class OpenCVB
     Const displayFrames As Int32 = 4
     Dim activeAlgorithm As String
     Dim AlgorithmCount As Int32
+    Dim AlgorithmTestCount As Int32
     Dim algorithmTaskHandle As Thread
     Dim border As Int32 = 6
     Dim BothFirstAndLastReady As Boolean
@@ -762,6 +763,10 @@ Public Class OpenCVB
         fpsTimer.Enabled = True
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
+        If parms.testAllRunning Then
+            AlgorithmTestCount += 1
+            Console.WriteLine(vbTab + "Starting " + parms.activeAlgorithm + " " + CStr(AlgorithmTestCount) + " algorithms tested.")
+        End If
         drawRect = New cv.Rect
         Dim saveLowResSetting As Boolean = parms.lowResolution
         Dim OpenCVB = New VB_Classes.ActiveClass(parms)
@@ -878,6 +883,9 @@ Public Class OpenCVB
         End While
         OpenCVB.Dispose()
         frameCount = 0
+        If parms.testAllRunning Then
+            Console.WriteLine(vbTab + "Ending " + parms.activeAlgorithm)
+        End If
     End Sub
     Private Sub CameraTask()
         While 1
