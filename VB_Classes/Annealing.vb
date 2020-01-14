@@ -54,8 +54,6 @@ Public Class Annealing_Basics_CPP : Implements IDisposable
                 cityPositions(i).Y = radius * Math.Sin(theta) + center.Y
                 cityOrder(i) = (i + 1) Mod numberOfCities
             Next
-        Else
-            ' citypositions has been set externally.
         End If
         For i = 0 To cityOrder.Length - 1
             cityOrder(i) = (i + 1) Mod numberOfCities

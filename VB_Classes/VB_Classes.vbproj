@@ -251,6 +251,7 @@
     <Compile Include="RecursiveBilateralFilter.vb" />
     <Compile Include="Resize.vb" />
     <Compile Include="Retina.vb" />
+    <Compile Include="Rodrigues.vb" />
     <Compile Include="Salience.vb" />
     <Compile Include="SemiGlobalMatching.vb" />
     <Compile Include="Sift.vb" />

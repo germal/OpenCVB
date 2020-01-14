@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Tracker_Basics : Implements IDisposable
-    Dim tracker As cv.Tracking.MultiTracker
-    Dim check As New OptionsCheckbox
+    Public check As New OptionsCheckbox
+    Public tracker As cv.Tracking.MultiTracker
     Public bbox As cv.Rect2d
     Public boxObject() As cv.Rect2d
     Public externalUse As Boolean
@@ -10,7 +10,6 @@ Public Class Tracker_Basics : Implements IDisposable
         check.Box(0).Text = "Stop tracking selected object"
         check.Show()
         ocvb.desc = "Track an object using cv.Tracking API"
-        ocvb.putText(New ActiveClass.TrueType("Draw a rectangle around object to be tracked in color image above left.", 10, 140, RESULT2))
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(0).Checked Then
@@ -35,6 +34,7 @@ Public Class Tracker_Basics : Implements IDisposable
                 Dim p1 = New cv.Point(boxObject(0).X, boxObject(0).Y)
                 Dim p2 = New cv.Point(boxObject(0).X + bbox.Width, boxObject(0).Y + bbox.Height)
                 ocvb.result1.Rectangle(p1, p2, cv.Scalar.Blue, 2)
+                ocvb.putText(New ActiveClass.TrueType("Draw a rectangle around object to be tracked in color image above left.", 10, 140, RESULT2))
             End If
         End If
     End Sub
@@ -49,20 +49,34 @@ End Class
 
 
 Public Class Tracker_MultiObject : Implements IDisposable
-    Dim multi As List(Of Tracker_Basics)
+    Dim trackers As New List(Of Tracker_Basics)
     Public Sub New(ocvb As AlgorithmData)
-        ocvb.desc = "Track multiple objects "
+        ocvb.desc = "Track any number of objects simultaneously"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.drawRect.Width <> 0 Then
-
-            'tracker = cv.Tracking.MultiTracker.Create()
-            'Dim r = ocvb.drawRect
-            'bbox = New cv.Rect2d(r.X, r.Y, r.Width, r.Height) ' silly that this isn't the same as rect.
-            'ocvb.drawRectClear = True
-            'tracker.Add(cv.Tracking.TrackerMIL.Create(), ocvb.color, bbox)
+            Dim tr = New Tracker_Basics(ocvb)
+            tr.externalUse = True
+            tr.Run(ocvb)
+            ocvb.drawRect = New cv.Rect
+            trackers.Add(tr)
         End If
+        ocvb.result1 = ocvb.color.Clone()
+        For Each tr In trackers
+            Dim closeIt As Boolean
+            If tr.check.Box(0).Checked Then closeIt = True
+            tr.Run(ocvb)
+            If closeIt Then tr.check.Dispose()
+            If tr.tracker IsNot Nothing Then
+                Dim p1 = New cv.Point(tr.boxObject(0).X, tr.boxObject(0).Y)
+                Dim p2 = New cv.Point(tr.boxObject(0).X + tr.bbox.Width, tr.boxObject(0).Y + tr.bbox.Height)
+                ocvb.result1.Rectangle(p1, p2, cv.Scalar.Blue, 2)
+            End If
+        Next
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+        For Each tr In trackers
+            tr.Dispose()
+        Next
     End Sub
 End Class

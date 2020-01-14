@@ -6,6 +6,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
+#include "opencv2/calib3d.hpp"
 #include <string>
 #include "time.h"
 #include <iomanip> 
@@ -38,13 +39,15 @@ public:
 	int pointCloudBuffSize = 0;
 	k4a_image_t colorImage = NULL;
 	Depth_Colorizer* dcptr = NULL;
+	k4a_device_configuration_t config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
+	char outMsg[10000];
+
 private:
 	k4a_capture_t capture = NULL;
 	const int32_t TIMEOUT_IN_MS = 1000;
 	size_t infraredSize = 0;
 	k4a_image_t point_cloud = NULL;
 	int colorRows = 0, colorCols = 0, colorBuffSize = 0;
-	k4a_device_configuration_t config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
 public:
 	~KinectCamera()
 	{
@@ -145,6 +148,8 @@ public:
 	}
 };
 
+KinectCamera* kcPtr;
+
 extern "C" __declspec(dllexport)
 int KinectDeviceCount(KinectCamera *kc)
 {
@@ -156,6 +161,7 @@ int *KinectOpen()
 {
 	KinectCamera *kc = new KinectCamera();
 	if (kc->deviceCount == 0) return 0;
+	kcPtr = kc;
 	return (int *)kc;
 }
 
@@ -207,4 +213,69 @@ void KinectClose(KinectCamera *kc)
 	if (kc == 0) return;
 	k4a_device_close(kc->device);
 	delete kc;
+}
+
+extern "C" __declspec(dllexport)
+char* KinectRodrigues()
+{
+	k4a_calibration_t calibration;
+	if (K4A_RESULT_SUCCEEDED != k4a_device_get_calibration(kcPtr->device, kcPtr->config.depth_mode, kcPtr->config.color_resolution, &calibration))
+	{
+		printf("Failed to get calibration\n");
+		return 0;
+	}
+
+	vector<k4a_float3_t> points_3d = { { { 0.f, 0.f, 1000.f } },          // color camera center
+									   { { -1000.f, -1000.f, 1000.f } },  // color camera top left
+									   { { 1000.f, -1000.f, 1000.f } },   // color camera top right
+									   { { 1000.f, 1000.f, 1000.f } },    // color camera bottom right
+									   { { -1000.f, 1000.f, 1000.f } } }; // color camera bottom left
+
+	// k4a project function
+	vector<k4a_float2_t> k4a_points_2d(points_3d.size());
+	for (size_t i = 0; i < points_3d.size(); i++)
+	{
+		int valid = 0;
+		k4a_calibration_3d_to_2d(&calibration,
+			&points_3d[i],
+			K4A_CALIBRATION_TYPE_COLOR,
+			K4A_CALIBRATION_TYPE_DEPTH,
+			&k4a_points_2d[i],
+			&valid);
+	}
+
+	// converting the calibration data to OpenCV format
+	// extrinsic transformation from color to depth camera
+	Mat se3 = Mat(3, 3, CV_32FC1, calibration.extrinsics[K4A_CALIBRATION_TYPE_COLOR][K4A_CALIBRATION_TYPE_DEPTH].rotation);
+	Mat r_vec = Mat(3, 1, CV_32FC1);
+	Rodrigues(se3, r_vec);
+	Mat t_vec = Mat(3, 1, CV_32F, calibration.extrinsics[K4A_CALIBRATION_TYPE_COLOR][K4A_CALIBRATION_TYPE_DEPTH].translation);
+
+	// intrinsic parameters of the depth camera
+	k4a_calibration_intrinsic_parameters_t* intrinsics = &calibration.depth_camera_calibration.intrinsics.parameters;
+	vector<float> _camera_matrix = {
+		intrinsics->param.fx, 0.f, intrinsics->param.cx, 0.f, intrinsics->param.fy, intrinsics->param.cy, 0.f, 0.f, 1.f
+	};
+	Mat camera_matrix = Mat(3, 3, CV_32F, &_camera_matrix[0]);
+	vector<float> _dist_coeffs = { intrinsics->param.k1, intrinsics->param.k2, intrinsics->param.p1,
+								   intrinsics->param.p2, intrinsics->param.k3, intrinsics->param.k4,
+								   intrinsics->param.k5, intrinsics->param.k6 };
+	Mat dist_coeffs = Mat(8, 1, CV_32F, &_dist_coeffs[0]);
+
+	// OpenCV project function
+	vector<Point2f> cv_points_2d(points_3d.size());
+	projectPoints(*reinterpret_cast<vector<Point3f>*>(&points_3d),
+		r_vec,
+		t_vec,
+		camera_matrix,
+		dist_coeffs,
+		cv_points_2d);
+
+	for (size_t i = 0; i < points_3d.size(); i++)
+	{
+		sprintf_s(kcPtr->outMsg, "3d point:\t\t\t(%.5f, %.5f, %.5f)\n OpenCV projectPoints:\t\t(%.5f, %.5f)\n k4a_calibration_3d_to_2d:\t(%.5f, %.5f)\n\n",
+			points_3d[i].v[0], points_3d[i].v[1], points_3d[i].v[2], cv_points_2d[i].x, cv_points_2d[i].y, k4a_points_2d[i].v[0], k4a_points_2d[i].v[1]);
+	}
+
+	return kcPtr->outMsg;
 }
