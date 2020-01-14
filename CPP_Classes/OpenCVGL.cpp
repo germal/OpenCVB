@@ -103,16 +103,13 @@ void OpenCVGL_Image_Control(float _ppx, float _ppy, float _fx, float _fy, float 
 extern "C" __declspec(dllexport)
 void OpenCVGL_Image_Run(int *rgbPtr, int *pointCloud, int rows, int cols)
 {
-	printf("rows = %d cols = %d \n", rows, cols);
 	Mat rgb, depth;
 	rgb = Mat(rows, cols, CV_8UC3, rgbPtr);
 	Mat vertex = Mat(rows, cols, CV_32FC3, pointCloud);
-	printf("vertex length = %zd \n", vertex.total());
 
 	renderData->arr.setVertexArray(vertex);
 	renderData->arr.setTexCoordArray(texCoords); 
 	renderData->tex.copyFrom(rgb);
-	printf("1 vertex length = %zd \n", vertex.total());
 
 	glClearColor(1, 1, 1, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -131,7 +128,6 @@ void OpenCVGL_Image_Run(int *rgbPtr, int *pointCloud, int rows, int cols)
 	glEnable(GL_TEXTURE_2D);
 
 	renderData->tex.bind();
-	printf("2 vertex length = %zd \n", vertex.total());
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -139,7 +135,6 @@ void OpenCVGL_Image_Run(int *rgbPtr, int *pointCloud, int rows, int cols)
 	glDisable(GL_CULL_FACE);
 
 	setOpenGlDrawCallback(winname, draw, renderData);
-	printf("3 vertex length = %zd \n", vertex.total());
 
 	updateWindow(winname);
 }
