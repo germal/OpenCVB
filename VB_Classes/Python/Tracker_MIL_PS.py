@@ -12,13 +12,8 @@ init_once = False
 def OpenCVCode(image, depth_colormap):
     global init_once
     if not init_once:
-        bbox1 = cv.selectROI(title_window, image) # just selecting one object for now.  Others are possible.
-        #bbox2 = cv.selectROI(title_window, image)
-        #bbox3 = cv.selectROI(title_window, image)
-
+        bbox1 = (100, 100, 100, 100) # cv.selectROI(title_window, image) # just selecting one object for now.  Others are possible.
         ok = tracker.add(cv.TrackerMIL_create(), image, bbox1)
-        #ok = tracker.add(cv.TrackerMIL_create(), image, bbox2)
-        #ok = tracker.add(cv.TrackerMIL_create(), image, bbox3)
         init_once = True
 
     ok, boxes = tracker.update(image)

@@ -358,9 +358,9 @@
     <Content Include="Python\MatchTemplate.py" />
     <Content Include="Python\MotionTemplate_PS.py" />
     <Content Include="Python\MSER_PS.py" />
-    <Content Include="Python\MultiTracker_PS.py" />
+    <Content Include="Python\Tracker_MIL_PS.py" />
     <Content Include="Python\OpticalFlow2_PS.py" />
-    <Content Include="Python\Tracker_PS.py" />
+    <Content Include="Python\Tracker_MOSSE_PS.py" />
     <Content Include="Python\SVM_Digits_PS.py" />
     <Content Include="Python\Facedetect_PS.py" />
     <Content Include="Python\Laplacian_PyramidFilter_PS.py" />

@@ -30,19 +30,18 @@ Public Class OpenCVGL_Image_CPP : Implements IDisposable
     Public sliders2 As New OptionsSliders
     Public sliders3 As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        If ocvb.parms.UsingIntelCamera Then cloud = New Depth_XYZ_OpenMP_CPP(ocvb)
-
         imu = New IMU_Basics(ocvb)
         imu.externalUse = True
 
-        If ocvb.parms.testAllRunning = False Then
-            setOpenGLsliders(ocvb, sliders, sliders1, sliders2, sliders3)
-            sliders2.TrackBar3.Value = -10 ' eye.z
-            sliders.TrackBar1.Value = 30 ' FOV
-            sliders.TrackBar2.Value = 0 ' Yaw
-            sliders.TrackBar3.Value = 0 ' pitch
-            sliders.TrackBar4.Value = 0 ' roll
-        End If
+        If ocvb.parms.testAllRunning Then Exit Sub
+        If ocvb.parms.UsingIntelCamera Then cloud = New Depth_XYZ_OpenMP_CPP(ocvb)
+
+        setOpenGLsliders(ocvb, sliders, sliders1, sliders2, sliders3)
+        sliders2.TrackBar3.Value = -10 ' eye.z
+        sliders.TrackBar1.Value = 30 ' FOV
+        sliders.TrackBar2.Value = 0 ' Yaw
+        sliders.TrackBar3.Value = 0 ' pitch
+        sliders.TrackBar4.Value = 0 ' roll
 
         OpenCVGL_Image_Open(ocvb.color.Width, ocvb.color.Height)
         ocvb.desc = "Use the OpenCV implementation of OpenGL to render a 3D image with depth."
