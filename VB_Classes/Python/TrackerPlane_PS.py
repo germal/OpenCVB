@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 Multitarget planar tracking
 ==================
@@ -12,7 +10,7 @@ video: http://www.youtube.com/watch?v=pzVbhxx6aog
 
 Usage
 -----
-plane_tracker.py [<video source>]
+PlaneTracker_PS.py 
 
 Keys:
    SPACE  -  pause video
@@ -21,25 +19,16 @@ Keys:
 Select a textured planar object to track by drawing a box with a mouse.
 '''
 
-# Python 2/3 compatibility
-from __future__ import print_function
 import sys
-PY3 = sys.version_info[0] == 3
-
-if PY3:
-    xrange = range
-
 import numpy as np
 import cv2 as cv
+title_window = "PlaneDetector_PS.py"
 
 # built-in modules
 from collections import namedtuple
 
 # local modules
-import video
 import common
-from video import presets
-
 
 FLANN_INDEX_KDTREE = 1
 FLANN_INDEX_LSH    = 6
@@ -104,7 +93,7 @@ class PlaneTracker:
         matches = [m[0] for m in matches if len(m) == 2 and m[0].distance < m[1].distance * 0.75]
         if len(matches) < MIN_MATCH_COUNT:
             return []
-        matches_by_id = [[] for _ in xrange(len(self.targets))]
+        matches_by_id = [[] for _ in range(len(self.targets))]
         for m in matches:
             matches_by_id[m.imgIdx].append(m)
         tracked = []
@@ -139,51 +128,38 @@ class PlaneTracker:
 
 
 class App:
-    def __init__(self, src):
-        self.cap = video.create_capture(src, presets['book'])
+    def Open(self):
         self.frame = None
         self.paused = False
         self.tracker = PlaneTracker()
 
-        cv.namedWindow('plane')
-        self.rect_sel = common.RectSelector('plane', self.on_rect)
+        cv.namedWindow(title_window)
+        self.rect_sel = common.RectSelector(title_window, self.on_rect)
+        from PyStream import PyStreamRun
+        PyStreamRun(self.OpenCVCode, 'PlaneTracker_PS.py')
 
     def on_rect(self, rect):
         self.tracker.add_target(self.frame, rect)
 
-    def run(self):
-        while True:
-            playing = not self.paused and not self.rect_sel.dragging
-            if playing or self.frame is None:
-                ret, frame = self.cap.read()
-                if not ret:
-                    break
-                self.frame = frame.copy()
+    def OpenCVCode(self, imgRGB, depth_colormap):
+        playing = not self.paused and not self.rect_sel.dragging
+        self.frame = imgRGB.copy()
 
-            vis = self.frame.copy()
-            if playing:
-                tracked = self.tracker.track(self.frame)
-                for tr in tracked:
-                    cv.polylines(vis, [np.int32(tr.quad)], True, (255, 255, 255), 2)
-                    for (x, y) in np.int32(tr.p1):
-                        cv.circle(vis, (x, y), 2, (255, 255, 255))
+        vis = self.frame.copy()
+        if playing:
+            tracked = self.tracker.track(self.frame)
+            for tr in tracked:
+                cv.polylines(vis, [np.int32(tr.quad)], True, (255, 255, 255), 2)
+                for (x, y) in np.int32(tr.p1):
+                    cv.circle(vis, (x, y), 2, (255, 255, 255))
 
-            self.rect_sel.draw(vis)
-            cv.imshow('plane', vis)
-            ch = cv.waitKey(1)
-            if ch == ord(' '):
-                self.paused = not self.paused
-            if ch == ord('c'):
-                self.tracker.clear()
-            if ch == 27:
-                break
+        self.rect_sel.draw(vis)
+        cv.imshow(title_window, vis)
+        ch = cv.waitKey(1)
+        if ch == ord(' '):
+            self.paused = not self.paused
+        if ch == ord('c'):
+            self.tracker.clear()
 
 if __name__ == '__main__':
-    print(__doc__)
-
-    import sys
-    try:
-        video_src = sys.argv[1]
-    except:
-        video_src = 0
-    App(video_src).run()
+    App().Open()
