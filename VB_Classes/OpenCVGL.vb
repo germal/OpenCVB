@@ -21,7 +21,6 @@ End Module
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class OpenCVGL_Image_CPP : Implements IDisposable
-    Dim cloud As Depth_XYZ_OpenMP_CPP
     Dim imu As IMU_Basics
     Dim rgbData(0) As Byte
     Dim pointCloudData(0) As Byte
@@ -32,9 +31,6 @@ Public Class OpenCVGL_Image_CPP : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         imu = New IMU_Basics(ocvb)
         imu.externalUse = True
-
-        If ocvb.parms.testAllRunning Then Exit Sub
-        If ocvb.parms.UsingIntelCamera Then cloud = New Depth_XYZ_OpenMP_CPP(ocvb)
 
         setOpenGLsliders(ocvb, sliders, sliders1, sliders2, sliders3)
         sliders2.TrackBar3.Value = -10 ' eye.z
@@ -47,12 +43,6 @@ Public Class OpenCVGL_Image_CPP : Implements IDisposable
         ocvb.desc = "Use the OpenCV implementation of OpenGL to render a 3D image with depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.testAllRunning Then
-            ' It runs fine but after several runs, it will fail with an external exception.  Only happens on 'Test All' runs.  Runs fine otherwise.
-            ocvb.putText(New ActiveClass.TrueType("OpenCVGL only fails when running 'Test All'.  Can't get it to fail otherwise.", 10, 60, RESULT1))
-            ocvb.putText(New ActiveClass.TrueType("Skipping it during a 'Test All' just so all the other tests can be exercised.", 10, 100, RESULT1))
-            Exit Sub
-        End If
         imu.Run(ocvb)
         Dim FOV = sliders.TrackBar1.Value
         Dim yaw = sliders.TrackBar2.Value
