@@ -258,6 +258,7 @@
     <Compile Include="Annealing.vb" />
     <Compile Include="Solve.vb" />
     <Compile Include="Stitch.vb" />
+    <Compile Include="SuperPixels.vb" />
     <Compile Include="TextureFlow.vb" />
     <Compile Include="Trace.vb" />
     <Compile Include="Tracker.vb" />
@@ -358,6 +359,11 @@
     <Content Include="Python\MatchTemplate.py" />
     <Content Include="Python\MotionTemplate_PS.py" />
     <Content Include="Python\MSER_PS.py" />
+    <Content Include="Python\ICP_SyntheticExample.py" />
+    <Content Include="Python\ICP_Models.py" />
+    <Content Include="Python\reg_shift.py" />
+    <Content Include="Python\Superpixels_PS.py" />
+    <Content Include="Python\TrackerPlane_AugmentedReality_PS.py" />
     <Content Include="Python\TrackerPlane_PS.py" />
     <Content Include="Python\Tracker_MIL_PS.py" />
     <Content Include="Python\OpticalFlow2_PS.py" />

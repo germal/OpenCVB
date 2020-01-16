@@ -81,7 +81,6 @@ Public Class EMax_Basics : Implements IDisposable
             ocvb.result2.SetTo(0)
         End If
 
-
         ' draw the clustered samples
         For i = 0 To samples.Rows - 1
             Dim pt = New cv.Point(Math.Round(samples.At(Of Single)(i, 0)), Math.Round(samples.At(Of Single)(i, 1)))

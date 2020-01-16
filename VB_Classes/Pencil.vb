@@ -7,7 +7,7 @@ Public Class Pencil_Basics : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "Pencil Sigma_r", 1, 100, 7)
         sliders.setupTrackBar3(ocvb, "Pencil Shade Factor", 1, 200, 40)
         If ocvb.parms.ShowOptions Then sliders.show()
-        ocvb.desc = "Convert image to a pencil sketch - Painterly effect"
+        ocvb.desc = "Convert image to a pencil sketch - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim sigma_s = sliders.TrackBar1.Value

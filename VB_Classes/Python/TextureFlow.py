@@ -15,7 +15,7 @@ from __future__ import print_function
 
 import numpy as np
 import cv2 as cv
-desc = "painterly effect"
+desc = "Painterly Effect"
 title_window = 'TextureFlow.py'
 
 def main():

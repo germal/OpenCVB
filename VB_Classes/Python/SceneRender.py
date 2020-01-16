@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 from numpy import pi, sin, cos
 
@@ -110,11 +104,6 @@ if __name__ == '__main__':
     render = TestSceneRender(backGr, noise = 0.5)
 
     while True:
-
         img = render.getNextFrame()
         cv.imshow('img', img)
-
         ch = cv.waitKey(3)
-        if ch == 27:
-            break
-    cv.destroyAllWindows()

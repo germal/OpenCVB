@@ -101,7 +101,7 @@ Public Class Palette_ColorMap : Implements IDisposable
         Next
         radio.check(4).Checked = True
         If ocvb.parms.ShowOptions Then radio.Show()
-        ocvb.desc = "Apply the different color maps in OpenCV - painterly effect"
+        ocvb.desc = "Apply the different color maps in OpenCV - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim colormap = cv.ColormapTypes.Autumn
@@ -147,7 +147,7 @@ Public Class Palette_Map : Implements IDisposable
         sliders = New OptionsSliders
         sliders.setupTrackBar1(ocvb, "inRange offset", 1, 100, 10)
         If ocvb.parms.ShowOptions Then sliders.show()
-        ocvb.desc = "Map colors to different palette - painterly effect."
+        ocvb.desc = "Map colors to different palette - Painterly Effect."
         ocvb.label1 = "Reduced Colors"
     End Sub
     Private Class CompareVec3b : Implements IComparer(Of cv.Vec3b)
@@ -274,7 +274,7 @@ Public Class Palette_Random : Implements IDisposable
         check.Box(0).Text = "Generate a new pair of random colors"
         check.Box(0).Checked = True
         If ocvb.parms.ShowOptions Then check.Show()
-        ocvb.desc = "Create a random colormap and apply it - painterly effect"
+        ocvb.desc = "Create a random colormap and apply it - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(0).Checked Then

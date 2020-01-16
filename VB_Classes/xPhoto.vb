@@ -86,7 +86,7 @@ Public Class xPhoto_OilPaint_CPP : Implements IDisposable
 
         Application.DoEvents() ' because the rest of initialization takes so long, let the show() above take effect.
         xPhoto_OilPaint = xPhoto_OilPaint_Open()
-        ocvb.desc = "Use the xPhoto Oil Painting transform - Painterly effect"
+        ocvb.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src As New cv.Mat

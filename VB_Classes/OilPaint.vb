@@ -17,7 +17,7 @@ Public Class OilPaint_Pointilism : Implements IDisposable
         Dim h = ocvb.color.Height / 8
         ocvb.drawRect = New cv.Rect(w * 3, h * 3, w * 2, h * 2)
 
-        ocvb.desc = "Alter the image to effect the pointilism style - Painterly effect"
+        ocvb.desc = "Alter the image to effect the pointilism style - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1 = ocvb.color.Clone()
@@ -86,7 +86,7 @@ Public Class OilPaint_ColorProbability : Implements IDisposable
         km = New kMeans_RGBFast(ocvb)
         km.sliders.TrackBar1.Value = 12 ' we would like a dozen colors or so in the color image.
         ReDim color_probability(km.sliders.TrackBar1.Value - 1)
-        ocvb.desc = "Determine color probabilities on the output of kMeans - Painterly effect"
+        ocvb.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         km.Run(ocvb)
@@ -123,7 +123,7 @@ Public Class OilPaint_Manual : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Filter Size", 3, 15, 3)
         sliders.setupTrackBar2(ocvb, "Intensity", 5, 150, 25)
         If ocvb.parms.ShowOptions Then sliders.show()
-        ocvb.desc = "Alter an image so it appears more like an oil painting - Painterly effect.  Select a region of interest."
+        ocvb.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
         Dim w = ocvb.color.Width / 8
         Dim h = ocvb.color.Height / 8
         ocvb.drawRect = New cv.Rect(w * 3, h * 3, w * 2, h * 2)
@@ -185,7 +185,7 @@ Public Class OilPaint_Manual_CS : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 10, 4)
         sliders.setupTrackBar2(ocvb, "Intensity", 0, 250, 20)
         If ocvb.parms.ShowOptions Then sliders.show()
-        ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly effect.  Select a region of interest to paint."
+        ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
         ocvb.label2 = "Selected area only"
 
         Dim w = ocvb.color.Width / 16
@@ -224,7 +224,7 @@ Public Class OilPaint_Cartoon : Implements IDisposable
         ocvb.drawRect = New cv.Rect(ocvb.color.Width / 4 + w, ocvb.color.Height / 4 + h, w * 2, h * 2)
 
         oil.sliders.setupTrackBar3(ocvb, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
-        ocvb.desc = "Alter an image so it appears more like a cartoon - Painterly effect"
+        ocvb.desc = "Alter an image so it appears more like a cartoon - Painterly Effect"
         ocvb.label1 = "OilPaint_Cartoon"
         ocvb.label2 = "Laplacian Edges"
     End Sub

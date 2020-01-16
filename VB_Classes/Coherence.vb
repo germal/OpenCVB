@@ -5,7 +5,7 @@ Public Class Coherence_Basics : Implements IDisposable
     Public src As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
-        ocvb.desc = "Find lines that are artistically coherent in the image - Painterly effect."
+        ocvb.desc = "Find lines that are artistically coherent in the image - Painterly Effect."
         sliders.setupTrackBar1(ocvb, "Coherence Sigma", 1, 15, 9)
         sliders.setupTrackBar2(ocvb, "Coherence Blend", 1, 10, 10)
         sliders.setupTrackBar3(ocvb, "Coherence str_sigma", 1, 15, 15)

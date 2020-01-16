@@ -343,11 +343,13 @@ Laplacian
 line
 linearPolar
 LineSegmentDetector
+loadPLYSimple
 log
 logPolar
 LUT
 magnitude
 Mahalanobis
+match
 matchShapes
 matchTemplate
 matMulDeriv
@@ -407,6 +409,8 @@ pointPolygonTest
 polarToCart
 polylines
 pow
+ppf_match_3d_ICP
+ppf_match_3d_PPF3DDetector
 preCornerDetect
 projectPoints
 PSNR
@@ -425,6 +429,7 @@ rectangle
 rectify3Collinear
 redirectError
 reduce
+registerModelToScene
 remap
 repeat
 reprojectImageTo3D
@@ -503,6 +508,7 @@ TonemapDrago
 TonemapMantiuk
 TonemapReinhard
 trace
+trainModel
 transform
 transpose
 triangulatePoints

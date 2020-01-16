@@ -10,7 +10,7 @@ Public Class CartoonifyImage_Basics : Implements IDisposable
         If ocvb.parms.ShowOptions Then sliders.show()
         ocvb.label1 = "Mask for Cartoon"
         ocvb.label2 = "Cartoonify Result"
-        ocvb.desc = "Create a cartoon from a color image - Painterly effect"
+        ocvb.desc = "Create a cartoon from a color image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim medianBlur = sliders.TrackBar1.Value

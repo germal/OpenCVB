@@ -26,7 +26,7 @@ Public Class Gabor_Basics : Implements IDisposable
         sliders.setupTrackBar4(ocvb, "Gabor lambda", 0, 100, 10)
         If ocvb.parms.ShowOptions Then sliders.show()
 
-        ocvb.desc = "Explore Gabor kernel - painterly effect"
+        ocvb.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then
@@ -89,7 +89,7 @@ Public Class Gabor_Basics_MT : Implements IDisposable
             gabor(i).sliders.TrackBar3.Value = i * 180 / gabor.Length
             gabor(i).externalUse = True
         Next
-        ocvb.desc = "Apply multiple Gabor filters sweeping through different values of theta - painterly effect."
+        ocvb.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result2 = New cv.Mat(ocvb.result2.Size(), cv.MatType.CV_32FC1, 0)

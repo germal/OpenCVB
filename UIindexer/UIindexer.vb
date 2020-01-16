@@ -71,7 +71,7 @@ Module IndexMain
                 line = Trim(nextFile.ReadLine())
                 Dim lcaseLine = LCase(line)
                 If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
-                If lcaseLine.Contains("painterly effect") Then Painterly.Add(classname, classname)
+                If lcaseLine.Contains("Painterly Effect") Then Painterly.Add(classname, classname)
                 Dim split As String() = Regex.Split(line, "\W+")
                 If LCase(line).StartsWith("public class") And InStr(line, "Implements IDisposable") Then
                     classname = split(2) ' public class <classname>

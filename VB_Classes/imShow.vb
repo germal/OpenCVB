@@ -7,6 +7,6 @@ Public Class imShow_Basics : Implements IDisposable
         cv.Cv2.ImShow("color", ocvb.color)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        cv.Cv2.DestroyAllWindows()
+        cv.Cv2.DestroyAllWindows() ' not really needed
     End Sub
 End Class

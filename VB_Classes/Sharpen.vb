@@ -36,7 +36,7 @@ Public Class Sharpen_DetailEnhance : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "DetailEnhance Sigma_s", 0, 200, 60)
         sliders.setupTrackBar2(ocvb, "DetailEnhance Sigma_r", 1, 100, 7)
         If ocvb.parms.ShowOptions Then sliders.show()
-        ocvb.desc = "Enhance detail on an image - Painterly effect"
+        ocvb.desc = "Enhance detail on an image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim sigma_s = sliders.TrackBar1.Value
@@ -58,7 +58,7 @@ Public Class Sharpen_Stylize : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Stylize Sigma_s", 0, 200, 60)
         sliders.setupTrackBar2(ocvb, "Stylize Sigma_r", 1, 100, 7)
         If ocvb.parms.ShowOptions Then sliders.show()
-        ocvb.desc = "Stylize an image - Painterly effect"
+        ocvb.desc = "Stylize an image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim sigma_s = sliders.TrackBar1.Value

@@ -9,7 +9,7 @@ Public Class LUT_Gray : Implements IDisposable
         sliders.setupTrackBar3(ocvb, "LUT xxx through yyy", 1, 255, 160)
         sliders.setupTrackBar4(ocvb, "LUT xxx through 255", 1, 255, 210)
         If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - painterly effect."
+        ocvb.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         sliders.LabelSlider1.Text = "LUT zero through " + CStr(sliders.TrackBar1.Value)
@@ -41,7 +41,7 @@ Public Class LUT_Color : Implements IDisposable
     Public src As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
-        ocvb.desc = "Build and use a custom color palette - painterly effect"
+        ocvb.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then

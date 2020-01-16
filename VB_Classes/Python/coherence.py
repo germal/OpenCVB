@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 Coherence-enhancing filtering example
 =====================================
@@ -8,24 +6,16 @@ inspired by
   Joachim Weickert "Coherence-Enhancing Shock Filters"
   http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
 import sys
-PY3 = sys.version_info[0] == 3
 title_window = 'Coherence.py'
-
-if PY3:
-    xrange = range
-
 import numpy as np
 import cv2 as cv
-desc = "Painterly effect" #include this in the 'Painterly effect' group.
+desc = "Painterly Effect" #include this to put this example in the 'Painterly Effect' group.
 
 def coherence_filter(img, sigma = 11, str_sigma = 11, blend = 0.5, iter_n = 4):
     h, w = img.shape[:2]
 
-    for i in xrange(iter_n):
+    for i in range(iter_n):
         print(i)
 
         gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -50,15 +40,7 @@ def coherence_filter(img, sigma = 11, str_sigma = 11, blend = 0.5, iter_n = 4):
 
 def main():
     import sys
-    try:
-        fn = sys.argv[1]
-    except:
-        fn = '../../Data/baboon.jpg'
-
-    src = cv.imread(cv.samples.findFile(fn))
-
-    def nothing(*argv):
-        pass
+    src = cv.imread('../../Data/baboon.jpg')
 
     def update():
         sigma = cv.getTrackbarPos('sigma', 'control')*2+1
@@ -68,10 +50,13 @@ def main():
         dst = coherence_filter(src, sigma=sigma, str_sigma = str_sigma, blend = blend)
         cv.imshow('dst', dst)
 
+    def controlUpdate(val): # placeholder for all the trackbars.
+        pass
+
     cv.namedWindow('control', 0)
-    cv.createTrackbar('sigma', 'control', 9, 15, nothing)
-    cv.createTrackbar('blend', 'control', 7, 10, nothing)
-    cv.createTrackbar('str_sigma', 'control', 9, 15, nothing)
+    cv.createTrackbar('sigma', 'control', 9, 15, controlUpdate)
+    cv.createTrackbar('blend', 'control', 7, 10, controlUpdate)
+    cv.createTrackbar('str_sigma', 'control', 9, 15, controlUpdate)
 
     print('Press SPACE to update the image\n')
 
@@ -81,11 +66,6 @@ def main():
         ch = cv.waitKey()
         if ch == ord(' '):
             update()
-        if ch == 27:
-            break
-
-    print('Done')
-
 
 if __name__ == '__main__':
     print(__doc__)
