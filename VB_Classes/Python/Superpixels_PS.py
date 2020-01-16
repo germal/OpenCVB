@@ -2,21 +2,21 @@ import numpy as np
 import cv2 as cv
 import common
 import sys
-title_window = "Superpixels_PS.py"
+title_window = "SuperPixel_PS.py"
 
 def OpenCVCode(imgRGB, depth_colormap):
     global seeds, display_mode, num_superpixels, prior, num_levels, num_histogram_bins, frameCount, color_img
     converted_img = cv.cvtColor(imgRGB, cv.COLOR_BGR2HSV)
     height,width,channels = converted_img.shape
-    num_superpixels_new = cv.getTrackbarPos('Number of Superpixels', title_window)
+    num_SuperPixel_new = cv.getTrackbarPos('Number of Superpixels', title_window)
     num_iterations = cv.getTrackbarPos('Iterations', title_window)
 
     if frameCount == 0:
         color_img = np.zeros((height,width,3), np.uint8)
         color_img[:] = (0, 0, 255)
 
-    if not seeds or num_superpixels_new != num_superpixels:
-        num_superpixels = num_superpixels_new
+    if not seeds or num_SuperPixel_new != num_superpixels:
+        num_superpixels = num_SuperPixel_new
         seeds = cv.ximgproc.createSuperpixelSEEDS(width, height, channels,
                 num_superpixels, num_levels, prior, num_histogram_bins)
 
@@ -63,4 +63,4 @@ if __name__ == '__main__':
     num_levels = 4
     num_histogram_bins = 5
     from PyStream import PyStreamRun
-    PyStreamRun(OpenCVCode, 'Superpixels_PS.py')
+    PyStreamRun(OpenCVCode, 'SuperPixel_PS.py')

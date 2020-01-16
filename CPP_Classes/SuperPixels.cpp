@@ -27,7 +27,7 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-SuperPixels *SuperPixels_Open(int _width, int _height, int _channels, int _num_superpixels, int _num_levels, int _prior) 
+SuperPixels *SuperPixel_Open(int _width, int _height, int _channels, int _num_superpixels, int _num_levels, int _prior) 
 {
     SuperPixels *spPtr = new SuperPixels();
 	spPtr->width = _width;
@@ -41,13 +41,13 @@ SuperPixels *SuperPixels_Open(int _width, int _height, int _channels, int _num_s
 }
 
 extern "C" __declspec(dllexport)
-void SuperPixels_Close(SuperPixels *spPtr)
+void SuperPixel_Close(SuperPixels *spPtr)
 {
     delete spPtr;
 }
 
 extern "C" __declspec(dllexport)
-int *SuperPixels_Run(SuperPixels *spPtr, int *srcPtr)
+int *SuperPixel_Run(SuperPixels *spPtr, int *srcPtr)
 {
 	spPtr->src = Mat(spPtr->height, spPtr->width, (spPtr->channels == 3) ? CV_8UC3 : CV_8UC1, srcPtr);
 	spPtr->Run();

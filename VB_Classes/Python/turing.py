@@ -1,30 +1,19 @@
-#!/usr/bin/env python
-
 '''
 Multiscale Turing Patterns generator
 ====================================
 
 Inspired by http://www.jonathanmccabe.com/Cyclic_Symmetric_Multi-Scale_Turing_Patterns.pdf
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
 import sys
-PY3 = sys.version_info[0] == 3
-
-if PY3:
-    xrange = range
-
 import numpy as np
 import cv2 as cv
 from common import draw_str
 import getopt, sys
 from itertools import count
+title_window = "Turing.py"
 
 help_message = '''
 USAGE: turing.py [-o <output.avi>]
-
-Press ESC to stop.
 '''
 
 def main():
@@ -40,42 +29,38 @@ def main():
         out = cv.VideoWriter(args['-o'], cv.VideoWriter_fourcc(*'DIB '), 30.0, (w, h), False)
         print('writing %s ...' % fn)
 
-    a = np.zeros((h, w), np.float32)
-    cv.randu(a, np.array([0]), np.array([1]))
+    turing = np.zeros((h, w), np.float32)
+    cv.randu(turing, np.array([0]), np.array([1]))
 
     def process_scale(a_lods, lod):
         d = a_lods[lod] - cv.pyrUp(a_lods[lod+1])
-        for _i in xrange(lod):
+        for _i in range(lod):
             d = cv.pyrUp(d)
         v = cv.GaussianBlur(d*d, (3, 3), 0)
         return np.sign(d), v
 
     scale_num = 6
     for frame_i in count():
-        a_lods = [a]
-        for i in xrange(scale_num):
+        a_lods = [turing]
+        for i in range(scale_num):
             a_lods.append(cv.pyrDown(a_lods[-1]))
         ms, vs = [], []
-        for i in xrange(1, scale_num):
+        for i in range(1, scale_num):
             m, v = process_scale(a_lods, i)
             ms.append(m)
             vs.append(v)
         mi = np.argmin(vs, 0)
-        a += np.choose(mi, ms) * 0.025
-        a = (a-a.min()) / a.ptp()
+        turing += np.choose(mi, ms) * 0.025
+        turing = (turing-turing.min()) / turing.ptp()
 
         if out:
-            out.write(a)
-        vis = a.copy()
+            out.write(turing)
+        vis = turing.copy()
         draw_str(vis, (20, 20), 'frame %d' % frame_i)
-        cv.imshow('a', vis)
+        cv.imshow(title_window, vis)
         if cv.waitKey(5) == 27:
             break
-
-    print('Done')
-
 
 if __name__ == '__main__':
     print(__doc__)
     main()
-    cv.destroyAllWindows()
