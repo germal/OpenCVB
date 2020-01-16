@@ -35,15 +35,15 @@ Public Class SuperPixels_Basics_CPP : Implements IDisposable
         Static numSuperPixels As Int32
         Static numIterations As Int32
         Static prior As Int32
+        If externalUse = False Then src = ocvb.color
         If numSuperPixels <> sliders.TrackBar1.Value Or numIterations <> sliders.TrackBar2.Value Or prior <> sliders.TrackBar3.Value Then
             numSuperPixels = sliders.TrackBar1.Value
             numIterations = sliders.TrackBar2.Value
             prior = sliders.TrackBar3.Value
             If spPtr <> 0 Then SuperPixels_Close(spPtr)
-            spPtr = SuperPixels_Open(ocvb.color.Width, ocvb.color.Height, ocvb.color.Channels, numSuperPixels, numIterations, prior)
+            spPtr = SuperPixels_Open(src.Width, src.Height, src.Channels, numSuperPixels, numIterations, prior)
         End If
 
-        If externalUse = False Then src = ocvb.color
         Dim srcData(src.Total * src.ElemSize) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
