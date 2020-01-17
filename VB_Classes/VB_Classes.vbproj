@@ -357,6 +357,7 @@
     <Content Include="Python\Edges_Canny_PS.py" />
     <Content Include="Python\KLT_homography_PS.py" />
     <Content Include="Python\KLT_track_PS.py" />
+    <Content Include="Python\LaplaceEquations.py" />
     <Content Include="Python\logpolar.py" />
     <Content Include="Python\MatchTemplate.py" />
     <Content Include="Python\MotionTemplate_PS.py" />
