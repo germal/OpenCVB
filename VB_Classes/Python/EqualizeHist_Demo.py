@@ -4,7 +4,6 @@ import argparse
 import numpy as np
 title_window = 'EqualizedHist_Demo.py'
 
-## [Load image]
 parser = argparse.ArgumentParser(description='Code for Histogram Equalization tutorial.')
 parser.add_argument('--input', help='Path to input image.', default='../../Data/lena.jpg')
 args = parser.parse_args()
@@ -13,19 +12,13 @@ src = cv.imread(cv.samples.findFile(args.input))
 if src is None:
     print('Could not open or find the image:', args.input)
     exit(0)
-## [Load image]
 
-## [Convert to grayscale]
 src = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
-## [Convert to grayscale]
 
-## [Apply Histogram Equalization]
 dst = cv.equalizeHist(src)
-## [Apply Histogram Equalization]
 
-images = np.vstack((src, dst))
-cv.imshow("Original (Top) and Equalized Image (bottom)", images)
+both = np.empty((src.shape[0], src.shape[1]*2, 1), src.dtype)
+both = cv.hconcat([src, dst])
+cv.imshow("Original (left) and Equalized Image (right)", both)
 
-## [Wait until user exits the program]
 cv.waitKey()
-## [Wait until user exits the program]
