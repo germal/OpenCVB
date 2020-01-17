@@ -44,6 +44,12 @@ for more and better features than convolutions, features that are measured and
 essential. Depth, infrared, gravity, and camera motion are the kind of objective
 features that can enhance almost any color image algorithm.
 
+And what if all cameras had depth? And an IMU. Those assumptions are being made
+now in OpenCVB – which explains why only a few cameras (Intel and Kinect) are
+currently supported. More cameras with depth are expected to arrive and
+integration with OpenCVB is likely to follow. OpenCVB is an opportunity to
+exploit these new features.
+
 The algorithms are notably short, almost always less than a page of code,
 labelled reasonably well, easily searched and grouped and combined, and often
 provide links to alternate versions online. Many downloadable algorithms are
@@ -95,6 +101,24 @@ You will need to download and install the following before starting:
     Select “Windows Installer” to get proprietary Kinect4Azure support.
 
 -   Build and run OpenCVB.sln
+
+    -   URGENT FIX (Jan. 17, 2020):
+
+        -   In Visual Studio menus with OpenCVB.sln, use “Tools/Nuget Package
+            Manager/Manage Nuget Packages for Solution”
+
+        -   Under the list of “Installed” Nuget packages, select “OpenCVSharp4”
+
+        -   In check boxes, select “CS_Classes”, “OpenCVB”, and “VB_Classes”
+
+        -   In the “Version” pulldown, select “4.1.1.20191110” (OpenCVSharp from
+            11/10/2019)
+
+        -   Click “Install” This will install an older version of OpenCVSharp
+            that works with OpenCVB.
+
+    -   This change will go away as soon as the latest version of OpenCVSharp is
+        working properly with OpenCVB. Fix is prepared but mysteries remain.
 
 **Installation – Windows 10 Only**
 
