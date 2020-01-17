@@ -446,6 +446,7 @@ Public Class Kalman_Depth : Implements IDisposable
 
         Static saveGrayCols = gray.Cols
         If ocvb.frameCount = 0 Or saveGrayCols <> gray.Cols Then
+            saveGrayCols = gray.Cols
             ReDim kalman(gray.Cols - 1)
             For i = 0 To gray.Cols - 1
                 kalman(i) = New Kalman_kDimension(ocvb)
