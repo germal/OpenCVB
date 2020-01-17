@@ -107,7 +107,11 @@ namespace CS_Classes
                                     img2.CopyTo(right);
 
                                     byte[] maskBytes = new byte[mask.Rows * mask.Cols];
+#if opencvsharpOld 
                                     mask.GetArray(0, 0, maskBytes);
+#else
+                                    mask.GetArray(out maskBytes);
+#endif
 
                                     Cv2.DrawMatches(img1, keypoints1, img2, keypoints2, goodMatchesList, img3, Scalar.All(-1), Scalar.All(-1), maskBytes, DrawMatchesFlags.NotDrawSinglePoints);
 
@@ -141,7 +145,11 @@ namespace CS_Classes
             {
                 Cv2.PerspectiveTransform(src, dst, transformationMatrix);
                 Point2f[] dstArray = new Point2f[dst.Rows * dst.Cols];
+#if opencvsharpOld 
                 dst.GetArray(0, 0, dstArray);
+#else
+                dst.GetArray(out dstArray);
+#endif
                 Point2d[] result = Array.ConvertAll(dstArray, Point2fToPoint2d);
                 return result;
             }

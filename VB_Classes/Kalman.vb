@@ -40,10 +40,13 @@ Public Class Kalman_Basics : Implements IDisposable
         If ocvb.frameCount = 0 Or restartRequested Then
             restartRequested = False
             kf = New cv.KalmanFilter(6, 3, 0)
+#If opencvsharpOld Then
             kf.TransitionMatrix.SetArray(0, 0, New Single() {1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1})
             kf.StatePre.SetArray(0, 0, New Single() {0, 0, 0, 0})
-            Dim statePre(3) As Single ' all zeros by default
-            kf.StatePre.SetArray(0, 0, statePre)
+#Else
+            kf.TransitionMatrix = New cv.Mat(16, 1, cv.MatType.CV_32F, New Single() {1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1})
+            kf.StatePre = New cv.Mat(4, 1, cv.MatType.CV_32F, New Single() {0, 0, 0, 0})
+#End If
 
             cv.Cv2.SetIdentity(kf.MeasurementMatrix)
             cv.Cv2.SetIdentity(kf.ProcessNoiseCov, ProcessNoiseCov)
@@ -170,9 +173,15 @@ Public Class Kalman_kDimension : Implements IDisposable
             kalman = New cv.KalmanFilter(kDimension * 2, kDimension, 0)
             measurement = New cv.Mat(kDimension, 1, cv.MatType.CV_32F, 0)
             inputReal = New cv.Mat(kDimension, 1, cv.MatType.CV_32F, 0)
+
+#If opencvsharpOld Then
             kalman.TransitionMatrix.SetArray(0, 0, New Single() {transitionMatrix(0), transitionMatrix(1), transitionMatrix(2), transitionMatrix(3)})
             Dim statePre(kDimension) As Single ' all zeros by default
             kalman.StatePre.SetArray(0, 0, statePre)
+#Else
+            kalman.TransitionMatrix = New cv.Mat(4, 1, cv.MatType.CV_32F, transitionMatrix)
+            kalman.StatePre = New cv.Mat(4, 1, cv.MatType.CV_32F, New Single() {0, 0, 0, 0})
+#End If
 
             cv.Cv2.SetIdentity(kalman.MeasurementMatrix)
             cv.Cv2.SetIdentity(kalman.ProcessNoiseCov, ProcessNoiseCov)
@@ -240,7 +249,11 @@ Public Class Kalman_RotatingPoint : Implements IDisposable
         ocvb.label1 = "Estimate Yellow < Real Red (if working)"
 
         cv.Cv2.Randn(kState, New cv.Scalar(0), cv.Scalar.All(0.1))
+#If opencvsharpOld Then
         kf.TransitionMatrix.SetArray(0, 0, New Single() {1, 1, 0, 1}.ToArray)
+#Else
+        kf.TransitionMatrix = New cv.Mat(4, 1, cv.MatType.CV_32F, New Single() {1, 1, 0, 1})
+#End If
 
         cv.Cv2.SetIdentity(kf.MeasurementMatrix)
         cv.Cv2.SetIdentity(kf.ProcessNoiseCov, cv.Scalar.All(0.00001))
@@ -370,8 +383,13 @@ Public Class Kalman_Point2f : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount = 0 Or restartRequested Then
             restartRequested = False
+#If opencvsharpOld Then
             kf.TransitionMatrix.SetArray(0, 0, New Single() {1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1})
             kf.StatePre.SetArray(0, 0, New Single() {0, 0, 0, 0})
+#Else
+            kf.TransitionMatrix = New cv.Mat(16, 1, cv.MatType.CV_32F, New Single() {1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1})
+            kf.StatePre = New cv.Mat(4, 1, cv.MatType.CV_32F, New Single() {0, 0, 0, 0})
+#End If
 
             cv.Cv2.SetIdentity(kf.MeasurementMatrix)
             cv.Cv2.SetIdentity(kf.ProcessNoiseCov, ProcessNoiseCov)
@@ -484,7 +502,11 @@ Public Class Kalman_Single : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         ocvb.label1 = "Estimate a single value (no default output)"
 
+#If opencvsharpOld Then
         kf.TransitionMatrix.SetArray(0, 0, New Single() {1, 1, 0, 1}.ToArray)
+#Else
+        kf.TransitionMatrix = New cv.Mat(4, 1, cv.MatType.CV_32F, New Single() {1, 1, 0, 1})
+#End If
 
         cv.Cv2.SetIdentity(kf.MeasurementMatrix)
         cv.Cv2.SetIdentity(kf.ProcessNoiseCov, cv.Scalar.All(0.00001))

@@ -77,11 +77,18 @@ Public Class Mat_Transpose : Implements IDisposable
         ocvb.label2 = "Color Image Transposed Twice"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim transpose = ocvb.color.T()
-        Dim newSize = New cv.Size(ocvb.color.Cols, ocvb.color.Rows)
-        ocvb.result1 = transpose.Resize(newSize)
-        transpose = ocvb.result1.T()
-        ocvb.result2 = transpose.Resize(newSize)
+        Dim trColor = ocvb.color.T()
+#If opencvsharpOld Then
+        ocvb.result1 = trColor.Resize(New cv.Size(ocvb.color.Cols, ocvb.color.Rows))
+#Else
+        ocvb.result1 = trColor.ToMat.Resize(New cv.Size(ocvb.color.Cols, ocvb.color.Rows))
+#End If
+        Dim trBack = ocvb.result1.T()
+#If opencvsharpOld Then
+        ocvb.result2 = trBack.Resize(New cv.Size(ocvb.color.Cols, ocvb.color.Rows))
+#Else
+        ocvb.result2 = trBack.ToMat.Resize(ocvb.color.Size())
+#End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub

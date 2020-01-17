@@ -13,8 +13,10 @@ Public Class Brightness_Clahe : Implements IDisposable ' Contrast Limited Adapti
         cv.Cv2.CvtColor(ocvb.color, imgGray, cv.ColorConversionCodes.BGR2GRAY)
 
         Dim claheObj = cv.Cv2.CreateCLAHE()
-        claheObj.SetTilesGridSize(New cv.Size(sliders.TrackBar1.Value, sliders.TrackBar2.Value))
-        claheObj.SetClipLimit(sliders.TrackBar1.Value)
+        ' claheObj.SetTilesGridSize(New cv.Size(sliders.TrackBar1.Value, sliders.TrackBar2.Value))
+        ' claheObj.SetClipLimit(sliders.TrackBar1.Value)
+        claheObj.TilesGridSize() = New cv.Size(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
+        claheObj.ClipLimit = sliders.TrackBar1.Value
         claheObj.Apply(imgGray, imgClahe)
 
         ocvb.label1 = "GrayScale"

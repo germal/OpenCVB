@@ -28,8 +28,8 @@ Public Class OpenCVB
     Dim DrawingRectangle As Boolean
     Dim drawRect As New cv.Rect(0, 0, 0, 0)
     Dim externalInvocation As Boolean
-    Dim formColor As cv.Mat, formDepthRGB As cv.Mat, formResult1 As cv.Mat, formResult2 As cv.Mat
-    Dim formDepth As cv.Mat, formPointCloud As cv.Mat, formDisparity As cv.Mat, formRedLeft As cv.Mat, formRedRight As cv.Mat
+    Dim formColor As New cv.Mat, formDepthRGB As New cv.Mat, formResult1 As New cv.Mat, formResult2 As New cv.Mat
+    Dim formDepth As New cv.Mat, formPointCloud As New cv.Mat, formDisparity As New cv.Mat, formRedLeft As New cv.Mat, formRedRight As New cv.Mat
     Dim formResultsUpdated As Boolean
     Dim frameCount As Int32
     Dim GrabRectangleData As Boolean
@@ -153,6 +153,7 @@ Public Class OpenCVB
         Try
             SyncLock camPic ' avoid updating the image while copying into it in the algorithm and camera tasks
                 If formColor IsNot Nothing Then
+                    cameraDataUpdated = False
                     If formColor.Width <> camPic(0).Width Or formColor.Height <> camPic(0).Height Or
                        formDepthRGB.Width <> camPic(1).Width Or formDepthRGB.Height <> camPic(1).Height Then
 
@@ -900,7 +901,7 @@ Public Class OpenCVB
             End If
             camera.GetNextFrame()
 
-            If camera.color Is Nothing Then Continue While ' at startup it may not be ready...
+            If camera.color Is Nothing Then Continue While
             SyncLock camPic
                 imuGyro = camera.imuGyro ' The data may not be present but just copy it...
                 imuAccel = camera.imuaccel

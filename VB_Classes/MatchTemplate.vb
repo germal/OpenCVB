@@ -85,8 +85,10 @@ Public Class MatchTemplate_RowCorrelation : Implements IDisposable
         Dim line2 = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
 
         ocvb.result1.SetTo(0)
-        ocvb.result1.Row(line1) = ocvb.color.Row(line1)
-        ocvb.result1.Row(line2) = ocvb.color.Row(line2)
+        Dim nextLine = ocvb.result1.Row(line1)
+        nextLine = ocvb.color.Row(line1)
+        nextLine = ocvb.result1.Row(line2)
+        nextLine = ocvb.color.Row(line2)
 
         mathCor.sample1 = ocvb.color.Row(line1).Clone()
         mathCor.sample2 = ocvb.color.Row(line2 + 1).Clone()
