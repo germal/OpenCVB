@@ -551,12 +551,13 @@ Public Class Histogram_Depth : Implements IDisposable
     Public inrange As Depth_InRangeTrim
     Public sliders As New OptionsSliders
     Public plotHist As Plot_Histogram
+    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         plotHist = New Plot_Histogram(ocvb)
         plotHist.externalUse = True
 
         inrange = New Depth_InRangeTrim(ocvb)
-        sliders.setupTrackBar1(ocvb, "Histogram Depth Bins", 1, ocvb.color.Width, 10) ' max is the number of columns we have.
+        sliders.setupTrackBar1(ocvb, "Histogram Depth Bins", 1, ocvb.color.Width * 2, 10) ' max is the number of columns * 2 
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Show depth data as a histogram."
@@ -571,8 +572,10 @@ Public Class Histogram_Depth : Implements IDisposable
 
         cv.Cv2.CalcHist(New cv.Mat() {ocvb.depth}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
-        plotHist.dst = ocvb.result2
-        plotHist.Run(ocvb)
+        If externalUse = False Then
+            plotHist.dst = ocvb.result2
+            plotHist.Run(ocvb)
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()

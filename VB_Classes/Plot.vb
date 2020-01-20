@@ -211,3 +211,42 @@ Public Class Plot_Basics : Implements IDisposable
         hist.Dispose()
     End Sub
 End Class
+
+
+
+
+
+Public Class Plot_Depth : Implements IDisposable
+    Dim plot As Plot_Basics_CPP
+    Dim hist As Histogram_Depth
+    Public Sub New(ocvb As AlgorithmData)
+        hist = New Histogram_Depth(ocvb)
+        hist.externalUse = True
+        hist.sliders.TrackBar1.Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!
+        hist.sliders.TrackBar1.Value = 200 ' a lot more bins in a plot than a bar chart.
+        hist.inrange.sliders.TrackBar2.Value = 5000 ' up to x meters.
+
+        plot = New Plot_Basics_CPP(ocvb)
+        plot.externalUse = True
+
+        ocvb.desc = "Show depth in a plot format with variable bins."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        hist.Run(ocvb)
+        plot.dst = ocvb.result1
+        ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
+        ReDim plot.srcY(hist.plotHist.hist.Rows - 1)
+        Dim inRangeMin = hist.inrange.sliders.TrackBar1.Value
+        Dim inRangeMax = hist.inrange.sliders.TrackBar2.Value
+        For i = 0 To plot.srcX.Length - 1
+            plot.srcX(i) = inRangeMin + i * (inRangeMax - inRangeMin) / plot.srcX.Length
+            plot.srcY(i) = hist.plotHist.hist.At(Of Single)(i, 0)
+        Next
+        plot.Run(ocvb)
+        ocvb.label1 = "histogram with " + ocvb.label1
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        plot.Dispose()
+        hist.Dispose()
+    End Sub
+End Class
