@@ -286,6 +286,7 @@ Public Class Palette_Random : Implements IDisposable
             resized.Run(ocvb)
         End If
         Palette_ApplyCustom(ocvb, ocvb.color, resized.dst)
+        ocvb.label2 = "Palette source colors"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         gradient.Dispose()
