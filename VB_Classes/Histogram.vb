@@ -73,8 +73,8 @@ End Module
 ' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
 Public Class Histogram_Basics : Implements IDisposable
     Public sliders As New OptionsSliders
-    Public histRGBraw() As cv.Mat
-    Public histRGBnormalized() As cv.Mat
+    Public histRGBraw(2) As cv.Mat
+    Public histRGBnormalized(2) As cv.Mat
     Public src As New cv.Mat
     Public bins As Int32 = 50
     Public minRange As Int32 = 0
@@ -90,13 +90,6 @@ Public Class Histogram_Basics : Implements IDisposable
         ocvb.desc = "Plot histograms for up to 3 channels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If histRGBnormalized Is Nothing Then
-            ReDim histRGBraw(src.Channels - 1)
-            ReDim histRGBnormalized(src.Channels - 1)
-            For i = 0 To src.Channels - 1
-                histRGBnormalized(i) = New cv.Mat
-            Next
-        End If
         Dim thickness = sliders.TrackBar2.Value
         Dim bins = sliders.TrackBar1.Value
         Dim dimensions() = New Integer() {bins}
@@ -110,9 +103,9 @@ Public Class Histogram_Basics : Implements IDisposable
         For i = 0 To src.Channels - 1
             Dim hist As New cv.Mat
             cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {i}, New cv.Mat(), hist, 1, dimensions, ranges)
-            hist.MinMaxLoc(0, maxVal)
             histRGBraw(i) = hist.Clone()
             histRGBnormalized(i) = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
+            histRGBnormalized(i).MinMaxLoc(0, maxVal)
             Dim points = New List(Of cv.Point)
             Dim listOfPoints = New List(Of List(Of cv.Point))
             For j = 0 To bins - 1

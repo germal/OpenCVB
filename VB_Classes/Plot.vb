@@ -203,6 +203,7 @@ Public Class Plot_Basics : Implements IDisposable
                 plot.srcY(i) = hist.histRGBraw(0).At(Of Single)(i, 0)
             Next
             plot.Run(ocvb)
+            ocvb.label1 = "histogram with " + ocvb.label1
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
