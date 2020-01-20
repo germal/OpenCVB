@@ -396,7 +396,7 @@
     <Content Include="Python\Polyline_Browse.py" />
     <Content Include="Python\Histogram_BackProject_Demo1.py" />
     <Content Include="Python\Histogram_BackProject_Demo2.py" />
-    <Content Include="Python\Histogram_Plot.py" />
+    <Content Include="Python\Histogram_Bars.py" />
     <Content Include="Python\Calibrate.py" />
     <Content Include="Python\Calibrate_ShowExtrinsics.py" />
     <Content Include="Python\Edges_CannyDetector.py" />

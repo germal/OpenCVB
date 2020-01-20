@@ -175,8 +175,7 @@ Public Class MatchTemplate_BestTemplate : Implements IDisposable
         match = New MatchTemplate_Basics(ocvb)
 
         ocvb.parms.ShowOptions = False ' we won't need the options...
-        ocvb.label1 = "MatchTemplate probabilities"
-        ocvb.label2 = "Tracking red circle.  White rectangle is original."
+        ocvb.label2 = "White is highest entropy (input). Red is best match."
         ocvb.desc = "Find the best object to track in the image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -212,6 +211,7 @@ Public Class MatchTemplate_BestTemplate : Implements IDisposable
         End If
 
         match.Run(ocvb)
+        ocvb.label1 = "MatchTemplate probabilities"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         grid.Dispose()

@@ -1,5 +1,61 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
+Public Class BGSubtract_Basics_CPP : Implements IDisposable
+    Dim radio As New OptionsRadioButtons
+    Dim bgfs As IntPtr
+    Dim currMethod As Int32 = -1
+    Public src As New cv.Mat
+    Public externalUse As Boolean
+    Public Sub New(ocvb As AlgorithmData)
+        radio.Setup(ocvb, 7)
+        radio.check(0).Text = "GMG"
+        radio.check(1).Text = "CNT - Counting"
+        radio.check(2).Text = "KNN"
+        radio.check(3).Text = "MOG"
+        radio.check(4).Text = "MOG2"
+        radio.check(5).Text = "GSOC"
+        radio.check(6).Text = "LSBP"
+        radio.check(4).Checked = True ' mog2 appears to be the best...
+        If ocvb.parms.ShowOptions Then radio.Show()
+        ocvb.desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        For i = 0 To radio.check.Count - 1
+            If radio.check(i).Checked Then
+                If currMethod = i Then
+                    Exit For
+                Else
+                    If ocvb.frameCount > 0 Then BGSubtract_BGFG_Close(bgfs)
+                    currMethod = i
+                    ocvb.label1 = "Method = " + radio.check(i).Text
+                    bgfs = BGSubtract_BGFG_Open(currMethod)
+                End If
+            End If
+        Next
+        If externalUse = False Then src = ocvb.color
+        Dim srcData(src.Total * src.ElemSize) As Byte
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
+        Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
+        Dim imagePtr = BGSubtract_BGFG_Run(bgfs, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        handleSrc.Free()
+
+        If imagePtr <> 0 Then
+            Dim dstData(src.Total - 1) As Byte
+            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
+            ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        radio.Dispose()
+        BGSubtract_BGFG_Close(bgfs)
+    End Sub
+End Class
+
+
+
+
+
 Public Class BGSubtract_MotionDetect_MT : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim radio As New OptionsRadioButtons
@@ -330,62 +386,6 @@ Module BGSubtract_BGFG_CPP_Module
     Public Function BGSubtract_BGFG_Run(bgfs As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, channels As Int32) As IntPtr
     End Function
 End Module
-
-
-
-
-' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
-Public Class BGSubtract_Basics_CPP : Implements IDisposable
-    Dim radio As New OptionsRadioButtons
-    Dim bgfs As IntPtr
-    Dim currMethod As Int32 = -1
-    Public src As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        radio.Setup(ocvb, 7)
-        radio.check(0).Text = "GMG"
-        radio.check(1).Text = "CNT - Counting"
-        radio.check(2).Text = "KNN"
-        radio.check(3).Text = "MOG"
-        radio.check(4).Text = "MOG2"
-        radio.check(5).Text = "GSOC"
-        radio.check(6).Text = "LSBP"
-        radio.check(4).Checked = True ' mog2 appears to be the best...
-        If ocvb.parms.ShowOptions Then radio.Show()
-        ocvb.desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
-                If currMethod = i Then
-                    Exit For
-                Else
-                    If ocvb.frameCount > 0 Then BGSubtract_BGFG_Close(bgfs)
-                    currMethod = i
-                    ocvb.label1 = "Method = " + radio.check(i).Text
-                    bgfs = BGSubtract_BGFG_Open(currMethod)
-                End If
-            End If
-        Next
-        If externalUse = False Then src = ocvb.color
-        Dim srcData(src.Total * src.ElemSize) As Byte
-        Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
-        Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
-        Dim imagePtr = BGSubtract_BGFG_Run(bgfs, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
-        handleSrc.Free()
-
-        If imagePtr <> 0 Then
-            Dim dstData(src.Total - 1) As Byte
-            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
-        End If
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        radio.Dispose()
-        BGSubtract_BGFG_Close(bgfs)
-    End Sub
-End Class
-
 
 
 

@@ -30,8 +30,8 @@ Public Class Entropy_Basics : Implements IDisposable
         hist.Run(ocvb)
         entropy = 0
         Dim entropyChannels As String = ""
-        For i = 0 To 2
-            Dim nextEntropy = channelEntropy(src.Total, hist.histRGB(i))
+        For i = 0 To src.Channels - 1
+            Dim nextEntropy = channelEntropy(src.Total, hist.histRGBnormalized(i))
             entropyChannels += "Entropy for " + Choose(i + 1, "Red", "Green", "Blue") + " " + Format(nextEntropy, "0.00") + ", "
             entropy += nextEntropy
         Next

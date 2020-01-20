@@ -78,7 +78,10 @@ Public Class IMU_Stabilizer : Implements IDisposable
 
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Turn on/off Kalman filtering of IMU data."
-        If ocvb.parms.ShowOptions Then check.show()
+        If ocvb.parms.ShowOptions Then check.Show()
+
+        kalman.plot.sliders.Hide()
+        kalman.kPlot.sliders.Hide()
 
         ocvb.desc = "Stabilize the image with the IMU data."
         ocvb.label1 = "IMU Stabilize (Move Camera + Select Kalman)"
@@ -98,9 +101,6 @@ Public Class IMU_Stabilizer : Implements IDisposable
             Dim da = ocvb.parms.imuGyro.Z
             Dim sx = 1 ' assume no scaling is taking place.
             Dim sy = 1 ' assume no scaling is taking place.
-
-            Dim Text = "dx = " + Format(dx, "#0.00") + vbNewLine + " dy = " + Format(dy, "#0.00") + vbNewLine + " da = " + Format(da, "#0.00")
-            ocvb.putText(New ActiveClass.TrueType(Text, 10, 100, RESULT1))
 
             If ocvb.frameCount > 1 And check.Box(0).Checked Then
                 kalman.inputReal = New cv.Point3f(dx, dy, da)
@@ -122,11 +122,17 @@ Public Class IMU_Stabilizer : Implements IDisposable
             smoothedFrame = smoothedFrame(New cv.Range(borderCrop, smoothedFrame.Rows - borderCrop), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
             ocvb.result1 = smoothedFrame.Resize(ocvb.color.Size())
             cv.Cv2.Subtract(ocvb.color, ocvb.result1, ocvb.result2)
+
+            ocvb.result1(New cv.Rect(10, 95, 50, 50)).SetTo(0)
+            Dim Text = "dx = " + Format(dx, "#0.00") + vbNewLine + "dy = " + Format(dy, "#0.00") + vbNewLine + "da = " + Format(da, "#0.00")
+            ocvb.putText(New ActiveClass.TrueType(Text, 10, 100, RESULT1))
         Else
             ocvb.putText(New ActiveClass.TrueType("No IMU present on this RealSense device", 20, 100))
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         kalman.Dispose()
+        check.Dispose()
     End Sub
 End Class
+

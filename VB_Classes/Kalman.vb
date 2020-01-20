@@ -15,8 +15,8 @@ Public Class Kalman_Basics : Implements IDisposable
 
     Public kf As cv.KalmanFilter
     Public measurement As New cv.Mat(3, 1, cv.MatType.CV_32F, 0)
-    Dim plot As Plot_OverTime
-    Dim kPlot As Plot_OverTime
+    Public plot As Plot_OverTime
+    Public kPlot As Plot_OverTime
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "ProcessNoiseCov x10000", 1, 1000, 100)
         sliders.setupTrackBar2(ocvb, "MeasurementNoiseCov", 1, 100, 10)

@@ -11,7 +11,7 @@ Public Class Plot_OverTime : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Pixel Height", 1, 40, 20)
         sliders.setupTrackBar2(ocvb, "Pixel Width", 1, 40, 5)
-        sliders.setupTrackBar3(ocvb, "Scale Font Size x10", 1, 20, 10)
+        sliders.setupTrackBar3(ocvb, "Plot (time) Font Size x10", 1, 20, 10)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Plot an input variable over time"
     End Sub
@@ -54,7 +54,7 @@ Public Class Plot_Histogram : Implements IDisposable
     Public backColor As cv.Scalar = cv.Scalar.Red
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "Plot Scale Font Size x10", 1, 20, 10)
+        sliders.setupTrackBar1(ocvb, "Histogram Font Size x10", 1, 20, 10)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
@@ -101,7 +101,7 @@ End Class
 
 Module Plot_OpenCV_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Plot_OpenCVBasics(plota As IntPtr, plotb As IntPtr, rows As Int32, cols As Int32)
+    Public Sub Plot_OpenCVBasics(inX As IntPtr, inY As IntPtr, inLen As Int32, dstptr As IntPtr, rows As Int32, cols As Int32)
     End Sub
 
     Public Sub AddPlotScale(dst As cv.Mat, maxVal As Double, fontsize As Double)
@@ -122,25 +122,46 @@ End Module
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
-Public Class Plot_OpenCVBasics_CPP : Implements IDisposable
+Public Class Plot_Basics_CPP : Implements IDisposable
+    Public srcX(49) As Double
+    Public srcY(49) As Double
+    Public externalUse As Boolean
+    Public dst As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
-        ocvb.label1 = "Default Visualization of Plot2D"
-        ocvb.label2 = "Custom Visualization of Plot2D"
         ocvb.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim plotAData(ocvb.color.Total * ocvb.color.ElemSize - 1) As Byte
-        Dim handleA = GCHandle.Alloc(plotAData, GCHandleType.Pinned)
+        Dim maxX As Double = Double.MinValue
+        Dim minX As Double = Double.MaxValue
+        Dim maxY As Double = Double.MinValue
+        Dim minY As Double = Double.MaxValue
+        Dim plotData(ocvb.color.Total * ocvb.color.ElemSize - 1) As Byte
+        Dim handlePlot = GCHandle.Alloc(plotData, GCHandleType.Pinned)
 
-        Dim PlotBData(ocvb.color.Total * ocvb.color.ElemSize - 1) As Byte
-        Dim handleB = GCHandle.Alloc(PlotBData, GCHandleType.Pinned)
+        If externalUse = False Then
+            For i = 0 To srcX.Length - 1
+                srcX(i) = i
+                srcY(i) = i * i * i
+            Next
+            dst = ocvb.result1
+        End If
+        For i = 0 To srcX.Length - 1
+            If srcX(i) > maxX Then maxX = CInt(srcX(i))
+            If srcX(i) < minX Then minX = CInt(srcX(i))
+            If srcY(i) > maxY Then maxY = CInt(srcY(i))
+            If srcY(i) < minY Then minY = CInt(srcY(i))
+        Next
 
-        Plot_OpenCVBasics(handleA.AddrOfPinnedObject, handleB.AddrOfPinnedObject, ocvb.color.Rows, ocvb.color.Cols)
+        Dim handleX = GCHandle.Alloc(srcX, GCHandleType.Pinned)
+        Dim handleY = GCHandle.Alloc(srcY, GCHandleType.Pinned)
 
-        Marshal.Copy(plotAData, 0, ocvb.result1.Data, plotAData.Length)
-        Marshal.Copy(PlotBData, 0, ocvb.result2.Data, PlotBData.Length)
-        handleA.Free()
-        handleB.Free()
+        Plot_OpenCVBasics(handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, srcX.Length - 1, handlePlot.AddrOfPinnedObject, ocvb.color.Rows, ocvb.color.Cols)
+
+        Marshal.Copy(plotData, 0, dst.Data, plotData.Length)
+        handlePlot.Free()
+        handleX.Free()
+        handleY.Free()
+        ocvb.label1 = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + vbTab + " y-axis: " + CStr(minY) + " to " + CStr(maxY)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
@@ -150,57 +171,42 @@ End Class
 
 
 Public Class Plot_Basics : Implements IDisposable
-    Public sliders As New OptionsSliders
+    Dim plot As Plot_Basics_CPP
+    Dim hist As Histogram_Basics
     Public plotCount As Int32 = 3
     Public externalUse As Boolean
-    Public src As cv.Mat
-    Public dst As cv.Mat
-    Public maxVal As Int32 = 250
-    Public plotColor As New cv.Scalar
-    Dim columnIndex As Int32
     Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "Pixel Height", 1, 40, 2)
-        sliders.setupTrackBar2(ocvb, "Scale Font Size x10", 1, 20, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        hist = New Histogram_Basics(ocvb)
+        hist.externalUse = True
+
+        plot = New Plot_Basics_CPP(ocvb)
+        plot.externalUse = True
+
+        ocvb.label1 = "Plot of grayscale histogram"
+        ocvb.label2 = "Same Data but using OpenCV C++ plot"
         ocvb.desc = "Plot data provided in src Mat"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
-            plotColor = cv.Scalar.Red
-            dst = ocvb.result1
-            src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            ocvb.label1 = "Plot of grayscale image values"
+        If externalUse Then
+            hist.sliders.TrackBar1.Hide()
+            hist.sliders.TrackBar2.Hide()
+            hist.sliders.TrackBar3.Hide()
+        Else
+            hist.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            hist.plotColors(0) = cv.Scalar.White
+            hist.Run(ocvb)
+            plot.dst = ocvb.result2
+            ReDim plot.srcX(hist.histRGBraw(0).Rows - 1)
+            ReDim plot.srcY(hist.histRGBraw(0).Rows - 1)
+            For i = 0 To plot.srcX.Length - 1
+                plot.srcX(i) = i
+                plot.srcY(i) = hist.histRGBraw(0).At(Of Single)(i, 0)
+            Next
+            plot.Run(ocvb)
         End If
-        If src.Channels <> 1 Then
-            ocvb.putText(New ActiveClass.TrueType("Only single channel data can be input to Plot_Basics", 10, 125))
-            Exit Sub
-        End If
-        If src.Cols <> 1 Then src = src.Reshape(1, src.Width * src.Height)
-        Dim src32f As New cv.Mat
-        src.ConvertTo(src32f, cv.MatType.CV_32F)
-
-        Dim minVal As Single, maxVal As Single
-        src32f.MinMaxLoc(minVal, maxVal)
-        maxVal = Math.Round(maxVal / 5, 0) * 5 + 5
-
-        Dim pixelHeight = CInt((sliders.TrackBar1.Value + 1) / 2)
-        Dim pixelWidth = dst.Cols / src32f.Rows
-        If pixelWidth < 1 Then pixelWidth = 1
-        dst.SetTo(0)
-        Dim lastX As Int32
-        For i = 0 To src32f.Rows - 1
-            Dim nextVal = src32f.At(Of Single)(i, 0)
-            Dim x = CInt((i / src32f.Rows) * dst.Cols)
-            If lastX <> x Then
-                Dim y = dst.Rows - CInt(dst.Rows * nextVal / (maxVal - minVal))
-                dst.Rectangle(New cv.Rect(x, y - pixelHeight, pixelWidth * 2, pixelHeight * 2), plotColor, -1)
-            End If
-            lastX = x
-        Next
-
-        AddPlotScale(dst, maxVal, sliders.TrackBar2.Value / 10)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+        plot.Dispose()
+        hist.Dispose()
     End Sub
 End Class

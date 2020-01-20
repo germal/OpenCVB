@@ -1,131 +1,149 @@
-# kalman_mousetracker.py - OpenCV mouse-tracking demo using TinyEKF
-# Adapted from
-#   http://www.morethantechnical.com/2011/06/17/simple-kalman-filter-for-tracking-using-opencv-2-2-w-code/
-# Copyright (C) 2016 Simon D. Levy
-# MIT License
-import ctypes
-def Mbox(title, text, style):
-    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
+from OpenGL.GL import *
+from OpenGL.GLU import *
+import pygame
+from pygame.locals import *
+from SharedMemory import SharedMemory as blackboard
+#import serial
 
-# This delay will affect the Kalman update rate
-DELAY_MSEC = 1
+#ser = serial.Serial('/dev/tty.usbserial', 38400, timeout=1)
 
-# Arbitrary display params
-WINDOW_NAME = 'Kalman Mousetracker [ESC to quit]'
-WINDOW_SIZE = 500
+ax = ay = az = 0.0
+yaw_mode = True
 
-import cv2 as cv
-import numpy as np
-import sys
-from TinyEKF import EKF
-title_window = 'Kalman_TinyEKF.py'
+bkb = blackboard() #Init class BlackBoard
 
-class TrackerEKF(EKF):
-    # An EKF for mouse tracking
-    def __init__(self):
-        # Two state values (mouse coordinates), two measurement values (mouse coordinates)
-        EKF.__init__(self, 2, 2)
+def resize(width, height):
+    if height==0:
+        height=1
+    glViewport(0, 0, width, height)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluPerspective(45, 1.0*width/height, 0.1, 100.0)
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
 
-    def f(self, x):
-        # State-transition function is identity
-        return np.copy(x), np.eye(2)
+def init():
+    glShadeModel(GL_SMOOTH)
+    glClearColor(0.0, 0.0, 0.0, 0.0)
+    glClearDepth(1.0)
+    glEnable(GL_DEPTH_TEST)
+    glDepthFunc(GL_LEQUAL)
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
 
-    def h(self, x):
-        # Observation function is identity
-        return x, np.eye(2)
+def drawText(position, textString):     
+    font = pygame.font.SysFont ("Courier", 18, True)
+    textSurface = font.render(textString, True, (255,255,255,255), (0,0,0,255))     
+    textData = pygame.image.tostring(textSurface, "RGBA", True)     
+    glRasterPos3d(*position)     
+    glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
 
-class MouseInfo(object):
-    # A class to store X,Y points
-    def __init__(self):
-        self.x, self.y = -1, -1
+def draw():
+    global rquad
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
+    
+    glLoadIdentity()
+    glTranslatef(0,0.0,-7.0)
 
-    def __str__(self):
-        return '%4d %4d' % (self.x, self.y)
+    osd_text = "pitch: " + str("{0:.2f}".format(ay)) + ", roll: " + str("{0:.2f}".format(ax))
 
-def mouseCallback(event, x, y, flags, mouse_info):
-    # Callback to update a MouseInfo object with new X,Y coordinates
-    mouse_info.x = x
-    mouse_info.y = y
+    if yaw_mode:
+        osd_line = osd_text + ", yaw: " + str("{0:.2f}".format(az))
+    else:
+        osd_line = osd_text
 
+    drawText((-2,-2, 2), osd_line)
 
-def drawCross(img, center, r, g, b):
-    #Draws a cross a the specified X,Y coordinates with color RGB
-    d = 5
-    t = 2
-    color = (r, g, b)
-    ctrx = center[0]
-    ctry = center[1]
-    cv.line(img, (ctrx - d, ctry - d), (ctrx + d, ctry + d), color, t, cv.LINE_AA)
-    cv.line(img, (ctrx + d, ctry - d), (ctrx - d, ctry + d), color, t, cv.LINE_AA)
+    # the way I'm holding the IMU board, X and Y axis are switched 
+    # with respect to the OpenGL coordinate system
+    if yaw_mode:                             # experimental
+        glRotatef(az, 0.0, 1.0, 0.0)  # Yaw,   rotate around y-axis
+    else:
+        glRotatef(0.0, 0.0, 1.0, 0.0)
+    glRotatef(ay ,1.0,0.0,0.0)        # Pitch, rotate around x-axis
+    glRotatef(-1*ax ,0.0,0.0,1.0)     # Roll,  rotate around z-axis
 
+    glBegin(GL_QUADS)	
+    glColor3f(0.0,1.0,0.0)
+    glVertex3f( 1.0, 0.2,-1.0)
+    glVertex3f(-1.0, 0.2,-1.0)		
+    glVertex3f(-1.0, 0.2, 1.0)		
+    glVertex3f( 1.0, 0.2, 1.0)		
 
-def drawLines(img, points, r, g, b):
-    cv.polylines(img, [np.int32(points)], isClosed=False, color=(r, g, b))
+    glColor3f(1.0,0.5,0.0)	
+    glVertex3f( 1.0,-0.2, 1.0)
+    glVertex3f(-1.0,-0.2, 1.0)		
+    glVertex3f(-1.0,-0.2,-1.0)		
+    glVertex3f( 1.0,-0.2,-1.0)		
 
+    glColor3f(1.0,0.0,0.0)		
+    glVertex3f( 1.0, 0.2, 1.0)
+    glVertex3f(-1.0, 0.2, 1.0)		
+    glVertex3f(-1.0,-0.2, 1.0)		
+    glVertex3f( 1.0,-0.2, 1.0)		
 
-def newImage():
-    return np.zeros((WINDOW_SIZE,WINDOW_SIZE,3), np.uint8) 
+    glColor3f(1.0,1.0,0.0)	
+    glVertex3f( 1.0,-0.2,-1.0)
+    glVertex3f(-1.0,-0.2,-1.0)
+    glVertex3f(-1.0, 0.2,-1.0)		
+    glVertex3f( 1.0, 0.2,-1.0)		
 
+    glColor3f(0.0,0.0,1.0)	
+    glVertex3f(-1.0, 0.2, 1.0)
+    glVertex3f(-1.0, 0.2,-1.0)		
+    glVertex3f(-1.0,-0.2,-1.0)		
+    glVertex3f(-1.0,-0.2, 1.0)		
 
-try:
-    if __name__ == '__main__':
-        # Create a new image in a named window
-        img = newImage()
-        cv.namedWindow(WINDOW_NAME)
+    glColor3f(1.0,0.0,1.0)	
+    glVertex3f( 1.0, 0.2,-1.0)
+    glVertex3f( 1.0, 0.2, 1.0)
+    glVertex3f( 1.0,-0.2, 1.0)		
+    glVertex3f( 1.0,-0.2,-1.0)		
+    glEnd()	
+         
+def read_data():
+    global ax, ay, az
+    ax = ay = az = 0.0
+    line_done = 0
 
-        # Create an X,Y mouse info object and set the window's mouse callback to modify it
-        mouse_info = MouseInfo()
-        cv.setMouseCallback(WINDOW_NAME, mouseCallback, mouse_info)
+    # request data by sending a dot
+#    ser.write(".")
+    #while not line_done:
+#    line = ser.readline() 
+    angles = [bkb.read_float("IMU_EULER_X")*180/3.1415,
+              bkb.read_float("IMU_EULER_Y")*180/3.1415, 
+              bkb.read_float("IMU_EULER_Z")*180/3.1415]  #line.split(", ")
+    if len(angles) == 3:    
+        ax = float(angles[0])
+        ay = float(angles[1])
+        az = float(angles[2])
+        line_done = 1 
 
-        # Loop until mouse inside window
-        while True:
+def main():
+    global yaw_mode
 
-            if mouse_info.x > 0 and mouse_info.y > 0:
-                break
+    video_flags = OPENGL|DOUBLEBUF
+    
+    pygame.init()
+    screen = pygame.display.set_mode((640,480), video_flags)
+    pygame.display.set_caption("Press Esc to quit, z toggles yaw mode")
+    resize((640,480))
+    init()
+    frames = 0
+    ticks = pygame.time.get_ticks()
+    while 1:
+        event = pygame.event.poll()
+        if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+            break       
+        if event.type == KEYDOWN and event.key == K_z:
+            yaw_mode = not yaw_mode
+#            ser.write("z")
+        read_data()
+        draw()
+      
+        pygame.display.flip()
+        frames = frames+1
 
-            cv.imshow(WINDOW_NAME, img)
-            if cv.waitKey(1) == 27:
-                exit(0)
+    #print("fps:  %d" % ((frames*1000)/(pygame.time.get_ticks()-ticks)))
+#    ser.close()
 
-        # These will get the trajectories for mouse location and Kalman estiamte
-        measured_points = []
-        kalman_points = []
-
-        # Create a new Kalman filter for mouse tracking
-        kalfilt = TrackerEKF()
-
-        # Loop till user hits escape
-        count = 0
-        while True:
-            # Serve up a fresh image
-            img = newImage()
-            if count % 1000 == 0: 
-                print(count)
-                measured_points = []
-                kalman_points = []
-            count += 1
-
-            # Grab current mouse position and add it to the trajectory
-            measured = (mouse_info.x, mouse_info.y)
-            measured_points.append(measured)
-
-            # Update the Kalman filter with the mouse point, getting the estimate.
-            estimate = kalfilt.step((mouse_info.x, mouse_info.y))
-
-            # Add the estimate to the trajectory
-            estimated = [int (c) for c in estimate]
-            kalman_points.append(estimated)
-
-            # Display the trajectories and current points
-            drawLines(img, kalman_points,   0,   255, 0)
-            drawCross(img, estimated,       255, 255, 255)
-            drawLines(img, measured_points, 255, 255, 0)
-            drawCross(img, measured, 0,   0,   255)
-
-            # Delay for specified interval, quitting on ESC
-            cv.imshow(WINDOW_NAME, img)
-            if cv.waitKey(DELAY_MSEC) & 0xFF == 27:
-                break
-except Exception as exception:
-    print(exception)
-    Mbox('OpenCVB.py', 'Failure - see print output', 1)    
+if __name__ == '__main__': main()
