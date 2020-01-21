@@ -22,9 +22,9 @@ Public Class MatchTemplate_Correlation : Implements IDisposable
         radio.check(4).Text = "SqDiff"
         radio.check(5).Text = "SqDiffNormed"
         radio.check(1).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
+        radio.Show()
         sliders.setupTrackBar1(ocvb, "Sample Size", 2, 10000, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
         ocvb.label2 = "Log of correlation results"
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
@@ -121,7 +121,7 @@ Public Class MatchTemplate_Basics : Implements IDisposable
             radio.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
         Next
         radio.check(5).Checked = True
-        radio.Show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         ocvb.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
 
@@ -175,6 +175,7 @@ Public Class MatchTemplate_BestTemplate : Implements IDisposable
         match = New MatchTemplate_Basics(ocvb)
 
         ocvb.parms.ShowOptions = False ' we won't need the options...
+
         ocvb.label2 = "White is highest entropy (input). Red is best match."
         ocvb.desc = "Find the best object to track in the image"
     End Sub

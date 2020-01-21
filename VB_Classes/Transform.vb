@@ -3,7 +3,7 @@ Public Class Transform_Resize : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Resize Percent", 50, 1000, 50)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Resize an image based on the slider value."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -34,7 +34,7 @@ Public Class Transform_Rotate : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Angle", 0, 180, 30)
         sliders.setupTrackBar2(ocvb, "Scale Factor", 1, 100, 50)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -58,7 +58,7 @@ Public Class Transform_Sort : Implements IDisposable
         radio.check(1).Text = "Descending"
         radio.check(2).Text = "EveryColumn"
         radio.check(3).Text = "EveryRow"
-        If ocvb.parms.ShowOptions Then radio.show()
+        radio.show()
         ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -84,7 +84,7 @@ Public Class Transform_SortReshape : Implements IDisposable
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
-        If ocvb.parms.ShowOptions Then radio.show()
+        radio.show()
         ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

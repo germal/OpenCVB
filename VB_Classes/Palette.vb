@@ -8,7 +8,7 @@ Public Class Palette_Color : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "blue", 0, 255, ocvb.rng.uniform(0, 255))
         sliders.setupTrackBar2(ocvb, "green", 0, 255, ocvb.rng.uniform(0, 255))
         sliders.setupTrackBar3(ocvb, "red", 0, 255, ocvb.rng.uniform(0, 255))
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Define a color using sliders."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -100,7 +100,7 @@ Public Class Palette_ColorMap : Implements IDisposable
             radio.check(i).Text = mapNames(i)
         Next
         radio.check(4).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
+        radio.Show()
         ocvb.desc = "Apply the different color maps in OpenCV - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -146,7 +146,7 @@ Public Class Palette_Map : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders = New OptionsSliders
         sliders.setupTrackBar1(ocvb, "inRange offset", 1, 100, 10)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Map colors to different palette - Painterly Effect."
         ocvb.label1 = "Reduced Colors"
     End Sub
@@ -273,7 +273,7 @@ Public Class Palette_Random : Implements IDisposable
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Generate a new pair of random colors"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
+        check.Show()
         ocvb.desc = "Create a random colormap and apply it - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

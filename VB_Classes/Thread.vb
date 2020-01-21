@@ -28,7 +28,7 @@ Public Class Thread_Grid : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "ThreadGrid Width", 5, ocvb.color.Width, 32)
         sliders.setupTrackBar2(ocvb, "ThreadGrid Height", 5, ocvb.color.Height, 32)
         sliders.setupTrackBar3(ocvb, "ThreadGrid Border", 0, 20, 0)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)
         gridMask = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)

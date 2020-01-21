@@ -5,7 +5,7 @@ Public Class Grayscale_Basics : Implements IDisposable
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Use OpenCV to create grayscale image"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.show()
+        check.show()
 
         ocvb.desc = "Manually create a grayscale image.  The only reason for this example is to show how slow it can be to do the work manually in VB.Net"
         ocvb.label1 = "Grayscale_Basics"

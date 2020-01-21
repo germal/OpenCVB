@@ -5,7 +5,7 @@ Public Class PCA_Basics : Implements IDisposable
     Public useDepthInput As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Retained Variance", 1, 100, 95)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Reconstruct a video stream as a composite of X images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

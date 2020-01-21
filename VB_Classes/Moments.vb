@@ -10,7 +10,7 @@ Public Class Moments_CentroidKalman : Implements IDisposable
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Turn Kalman filtering on"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.show()
+        check.show()
 
         ocvb.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
         ocvb.label1 = "Red dot = Kalman smoothed centroid"

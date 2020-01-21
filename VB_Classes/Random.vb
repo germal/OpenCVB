@@ -8,7 +8,7 @@ Public Class Random_Points : Implements IDisposable
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Random Pixel Count", 1, 500, 20)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         ReDim Points(sliders.TrackBar1.Value - 1)
         ReDim Points2f(sliders.TrackBar1.Value - 1)
@@ -121,7 +121,7 @@ Public Class Random_NormalDist : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "Random_NormalDist Green Mean", 0, 255, 127)
         sliders.setupTrackBar3(ocvb, "Random_NormalDist Red Mean", 0, 255, 180)
         sliders.setupTrackBar4(ocvb, "Random_NormalDist Stdev", 0, 255, 50)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Create a normal distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

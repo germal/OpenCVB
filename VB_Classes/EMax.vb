@@ -18,14 +18,14 @@ Public Class EMax_Basics : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "EMax Number of Samples", 1, 200, 100)
         sliders.setupTrackBar2(ocvb, "EMax Prediction Step Size", 1, 20, 5)
         sliders.setupTrackBar3(ocvb, "EMax Sigma (spread)", 1, 100, 30)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         radio.Setup(ocvb, 3)
         radio.check(0).Text = "EMax matrix type Spherical"
         radio.check(1).Text = "EMax matrix type Diagonal"
         radio.check(2).Text = "EMax matrix type Generic"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.show()
+        radio.show()
 
         ocvb.desc = "OpenCV expectation maximization example."
     End Sub

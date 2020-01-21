@@ -8,7 +8,7 @@ Public Class LUT_Gray : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "LUT xxx through yyy", 1, 255, 110)
         sliders.setupTrackBar3(ocvb, "LUT xxx through yyy", 1, 255, 160)
         sliders.setupTrackBar4(ocvb, "LUT xxx through 255", 1, 255, 210)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
         ocvb.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

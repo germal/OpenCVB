@@ -8,10 +8,8 @@ Public Class OilPaint_Pointilism : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Stroke Scale", 1, 5, 3)
         sliders.setupTrackBar2(ocvb, "Smoothing Radius", 0, 100, 32)
-        If ocvb.parms.ShowOptions Then
-            sliders.Show()
-            Application.DoEvents() ' because the rest of initialization takes so long, let the show take effect.
-        End If
+        sliders.Show()
+        Application.DoEvents() ' because the rest of initialization takes so long, let the show take effect.
 
         Dim w = ocvb.color.Width / 8
         Dim h = ocvb.color.Height / 8
@@ -122,7 +120,7 @@ Public Class OilPaint_Manual : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Filter Size", 3, 15, 3)
         sliders.setupTrackBar2(ocvb, "Intensity", 5, 150, 25)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
         Dim w = ocvb.color.Width / 8
         Dim h = ocvb.color.Height / 8
@@ -184,7 +182,7 @@ Public Class OilPaint_Manual_CS : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 10, 4)
         sliders.setupTrackBar2(ocvb, "Intensity", 0, 250, 20)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
         ocvb.label2 = "Selected area only"
 

@@ -73,13 +73,13 @@ Public Class Blob_Detector_CS : Implements IDisposable
         check.Box(2).Text = "FilterByConvexity"
         check.Box(3).Text = "FilterByInertia"
         check.Box(4).Text = "FilterByColor"
-        If ocvb.parms.ShowOptions Then check.show()
+        check.Show()
         check.Box(4).Checked = True ' filter by color...
 
         sliders.setupTrackBar1(ocvb, "min Threshold", 0, 255, 100)
         sliders.setupTrackBar2(ocvb, "max Threshold", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, "Threshold Step", 1, 50, 5)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.Show()
 
         ocvb.label1 = "Blob_Detector_CS Input"
     End Sub
@@ -274,7 +274,7 @@ Public Class Blob_Basics : Implements IDisposable
         rects = blobs.flood.fBasics.maskRects
         masks = blobs.flood.fBasics.masks
 
-        Dim saveRectCount As Int32 = -1
+        Static saveRectCount As Int32 = -1
         If saveRectCount <> rects.Count Then
             saveRectCount = rects.Count
             ReDim kalman(saveRectCount - 1)
@@ -283,6 +283,9 @@ Public Class Blob_Basics : Implements IDisposable
                 kalman(i).externalUse = True
             Next
         End If
+        For i = 0 To kalman.Count - 1
+            kalman(i).Run(ocvb)
+        Next
 
         If externalUse = False Then
             Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(0).Value ' this is the largest contiguous blob

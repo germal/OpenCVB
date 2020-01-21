@@ -10,7 +10,7 @@ Public Class Features_GoodFeatures : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Number of Points", 10, 1000, 200)
         sliders.setupTrackBar2(ocvb, "Quality Level", 1, 100, 1)
         sliders.setupTrackBar3(ocvb, "Distance", 1, 100, 30)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         ocvb.desc = "Find good features to track in an RGB image."
     End Sub

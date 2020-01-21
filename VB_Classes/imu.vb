@@ -9,7 +9,7 @@ Public Class IMU_Basics : Implements IDisposable
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         flow = New Font_FlowText(ocvb)
         flow.externalUse = True
@@ -78,7 +78,7 @@ Public Class IMU_Stabilizer : Implements IDisposable
 
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Turn on/off Kalman filtering of IMU data."
-        If ocvb.parms.ShowOptions Then check.Show()
+        check.Show()
 
         kalman.plot.sliders.Hide()
         kalman.kPlot.sliders.Hide()

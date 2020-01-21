@@ -5,7 +5,7 @@ Public Class Math_Subtract : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Red", 0, 255, 255)
         sliders.setupTrackBar2(ocvb, "Green", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, "Blue", 0, 255, 255)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
         ocvb.desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -32,7 +32,7 @@ Public Class Math_Median_CDF : Implements IDisposable
     Public rangeMax As Integer = 255
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Histogram Bins", 4, 1000, 100)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Compute the src image median"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

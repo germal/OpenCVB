@@ -13,7 +13,7 @@ Public Class Resize_Options : Implements IDisposable
         radio.check(3).Text = "Resize with Linear flag"
         radio.check(4).Text = "Resize with Nearest flag (identical to Area?)"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.show()
+        radio.show()
         ocvb.desc = "Resize with different options and compare them"
         ocvb.label2 = "Difference from Cubic Resize (Best)"
     End Sub
@@ -59,7 +59,7 @@ Public Class Resize_Percentage : Implements IDisposable
         resizeOptions.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Resize Percentage (%)", 1, 100, 3)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
 
         ocvb.desc = "Resize by a percentage of the image."
     End Sub

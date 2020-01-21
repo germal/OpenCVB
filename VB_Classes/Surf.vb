@@ -12,10 +12,10 @@ Public Class Surf_Basics_CS : Implements IDisposable
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.show()
+        radio.show()
 
         sliders.setupTrackBar1(ocvb, "Hessian threshold", 1, 5000, 2000)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right infrared images."
         ocvb.label1 = "BF Matcher output"

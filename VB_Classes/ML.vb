@@ -98,7 +98,7 @@ Public Class ML_FillDepthRGB : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "ML Min Learn Count", 2, 100, 5)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         shadow = New Depth_Holes(ocvb)
         ocvb.label2 = "ML filled shadow"
         ocvb.desc = "Same as ML_FillDepth above but display grayscale depth to confirm correctness of model."
@@ -132,7 +132,7 @@ Public Class ML_DepthFromColor_MT : Implements IDisposable
         dilate.sliders.TrackBar2.Value = 2
 
         sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 500, 5000, 1000)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 16
@@ -214,7 +214,7 @@ Public Class ML_DepthFromColor : Implements IDisposable
         shadow = New Depth_Holes(ocvb)
 
         sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 1000, 5000, 1500)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         resized = New Resize_Percentage(ocvb)
         resized.externalUse = True
@@ -306,7 +306,7 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
         shadow = New Depth_Holes(ocvb)
 
         sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 1000, 5000, 1500)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         resized = New Resize_Percentage(ocvb)
         resized.externalUse = True
@@ -414,7 +414,7 @@ Public Class ML_EdgeDepth : Implements IDisposable
         dilate.sliders.TrackBar2.Value = 5
 
         sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 500, 5000, 1000)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 16

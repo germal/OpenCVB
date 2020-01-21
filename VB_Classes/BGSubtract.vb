@@ -17,7 +17,7 @@ Public Class BGSubtract_Basics_CPP : Implements IDisposable
         radio.check(5).Text = "GSOC"
         radio.check(6).Text = "LSBP"
         radio.check(4).Checked = True ' mog2 appears to be the best...
-        If ocvb.parms.ShowOptions Then radio.Show()
+        radio.Show()
         ocvb.desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -61,14 +61,14 @@ Public Class BGSubtract_MotionDetect_MT : Implements IDisposable
     Dim radio As New OptionsRadioButtons
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Correlation Threshold", 0, 1000, 980)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
         radio.Setup(ocvb, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = CStr(2 ^ i) + " threads"
         Next
         radio.check(0).Text = "1 thread"
         radio.check(5).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
+        radio.Show()
         ocvb.label2 = "Only Motion Added"
         ocvb.desc = "Detect Motion for use with background subtraction"
     End Sub
@@ -124,7 +124,7 @@ Public Class BGSubtract_Basics_MT : Implements IDisposable
         grid = New Thread_Grid(ocvb)
 
         sliders.setupTrackBar1(ocvb, "Correlation Threshold", 0, 1000, 980)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
 
         ocvb.label2 = "Only Motion Added"
         ocvb.desc = "Detect Motion in the color image"
@@ -195,7 +195,7 @@ Public Class BGSubtract_MOG : Implements IDisposable
     Dim MOG As cv.BackgroundSubtractorMOG
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "MOG Learn Rate", 0, 1000, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
 
         MOG = cv.BackgroundSubtractorMOG.Create()
         ocvb.desc = "Subtract background using a mixture of Gaussians"
@@ -225,7 +225,7 @@ Public Class BGSubtract_MOG2 : Implements IDisposable
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "MOG Learn Rate", 0, 1000, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
 
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
         ocvb.desc = "Subtract background using a mixture of Gaussians"
@@ -252,7 +252,7 @@ Public Class BGSubtract_GMG_KNN : Implements IDisposable
     Dim knn As cv.BackgroundSubtractorKNN
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Learn Rate", 1, 1000, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
 
         gmg = cv.BackgroundSubtractorGMG.Create()
         knn = cv.BackgroundSubtractorKNN.Create()
@@ -290,7 +290,7 @@ Public Class BGSubtract_MOG_RGBDepth : Implements IDisposable
     Dim MOGRGB As cv.BackgroundSubtractorMOG
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "MOG Learn Rate x1000", 0, 1000, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
 
         MOGDepth = cv.BackgroundSubtractorMOG.Create()
         MOGRGB = cv.BackgroundSubtractorMOG.Create()
@@ -329,7 +329,7 @@ Public Class BGSubtract_MOG_Retina : Implements IDisposable
         retina.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Uncertainty threshold", 1, 255, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
 
         ocvb.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
         ocvb.label1 = "MOG results of depth motion"
@@ -444,7 +444,7 @@ Public Class BGSubtract_Synthetic_CPP : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "Synthetic Magnitude", 1, 40, 20)
         sliders.setupTrackBar3(ocvb, "Synthetic Wavespeed x100", 1, 400, 20)
         sliders.setupTrackBar4(ocvb, "Synthetic ObjectSpeed", 1, 20, 15)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
         ocvb.label1 = ""
         ocvb.label2 = "Synthetic background/foreground image."
         ocvb.desc = "Generate a synthetic input to background subtraction method."

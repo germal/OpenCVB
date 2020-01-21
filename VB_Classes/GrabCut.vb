@@ -8,7 +8,7 @@ Public Class GrabCut_Basics : Implements IDisposable
 
         sliders.setupTrackBar1(ocvb, "Erode iterations", 1, 20, 3)
         sliders.setupTrackBar2(ocvb, "Erode kernel size", 1, 21, 3)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         ocvb.desc = "Use grabcut to isolate what is in the foreground and background.  "
     End Sub

@@ -24,7 +24,7 @@ Public Class Salience_Basics_CPP : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders = New OptionsSliders
         sliders.setupTrackBar1(ocvb, "Salience numScales", 1, 6, 1)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         ReDim grayData(ocvb.color.Total - 1)
         rows = ocvb.color.Rows
@@ -73,7 +73,7 @@ Public Class Salience_Basics_MT : Implements IDisposable
         sliders = New OptionsSliders
         sliders.setupTrackBar1(ocvb, "Salience numScales", 1, 6, 1)
         sliders.setupTrackBar2(ocvb, "Salience Number of Threads", 1, 100, 36)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         ReDim grayData(ocvb.color.Total - 1)
         ocvb.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."

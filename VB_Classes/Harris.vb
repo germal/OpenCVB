@@ -36,7 +36,7 @@ Public Class Harris_Features_CPP : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "Harris Neighborhood", 1, 41, 21)
         sliders.setupTrackBar3(ocvb, "Harris aperture", 1, 33, 21)
         sliders.setupTrackBar4(ocvb, "Harris Parameter", 1, 100, 1)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         ocvb.desc = "Use Harris feature detectors to identify interesting points."
 
@@ -84,7 +84,7 @@ Public Class Harris_Detector_CPP : Implements IDisposable
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Harris qualityLevel", 1, 100, 2)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         ocvb.desc = "Use Harris detector to identify interesting points."
 

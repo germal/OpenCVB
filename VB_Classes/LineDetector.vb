@@ -178,17 +178,17 @@ Public Class lineDetector_FLD : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders2.setupTrackBar1(ocvb, "FLD - canny Threshold1", 1, 100, 50)
         sliders2.setupTrackBar2(ocvb, "FLD - canny Threshold2", 1, 100, 50)
-        If ocvb.parms.ShowOptions Then sliders2.Show()
+        sliders2.Show()
 
         sliders.setupTrackBar1(ocvb, "FLD - Min Length", 1, 200, 30)
         sliders.setupTrackBar2(ocvb, "FLD - max distance", 1, 100, 14)
         sliders.setupTrackBar3(ocvb, "FLD - Canny Aperture", 3, 7, 7)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         check.Setup(ocvb, 1)
         check.Box(0).Text = "FLD - incremental merge"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.show()
+        check.show()
         ocvb.desc = "Basics for a Fast Line Detector"
 
         Dim size = ocvb.color.Rows * ocvb.color.Cols
@@ -281,12 +281,12 @@ Public Class LineDetector_3D_LongestLine : Implements IDisposable
         lines = New lineDetector_FLD(ocvb)
 
         sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 1)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         check.Setup(ocvb, 1)
         check.Box(0).Text = "RGB determines line length (when depth is present for >50% of points)"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.show()
+        check.show()
 
         ocvb.desc = "Identify planes using the lines present in the rgb image."
         ocvb.label2 = ""
@@ -324,12 +324,12 @@ Public Class LineDetector_3D_FLD_MT : Implements IDisposable
         lines = New lineDetector_FLD(ocvb)
 
         sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 1)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         check.Setup(ocvb, 1)
         check.Box(0).Text = "RGB determines line length (when depth is present for >50% of points)"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.show()
+        check.show()
 
         ocvb.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
         ocvb.label2 = ""
@@ -366,12 +366,12 @@ Public Class LineDetector_3D_LSD_MT : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         lines = New LineDetector_LSD(ocvb)
         sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 1)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         check.Setup(ocvb, 1)
         check.Box(0).Text = "RGB determines line length (when depth is present for >50% of points)"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.show()
+        check.show()
 
         ocvb.desc = "Measure 3D line segments using a multi-threaded Line Stream Detector"
         ocvb.label2 = ""
@@ -420,13 +420,13 @@ Public Class LineDetector_3D_FitLineZ : Implements IDisposable
 
         sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 3)
         sliders.setupTrackBar2(ocvb, "Point count threshold", 5, 500, 50)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         check.Setup(ocvb, 2)
         check.Box(0).Text = "Fitline using x and z (unchecked it will use y and z)"
         check.Box(1).Text = "display output only once a second (to be readable)"
         check.Box(1).Checked = True
-        If ocvb.parms.ShowOptions Then check.show()
+        check.show()
 
         radio.Setup(ocvb, 4)
         radio.check(0).Text = "Use Fast LineDetector"
@@ -434,7 +434,7 @@ Public Class LineDetector_3D_FitLineZ : Implements IDisposable
         radio.check(2).Text = "Debug FLD longest line"
         radio.check(3).Text = "Debug LSD longest line"
         radio.check(2).Checked = True
-        If ocvb.parms.ShowOptions Then radio.show()
+        radio.show()
 
         ocvb.desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
         ocvb.label2 = ""
@@ -544,7 +544,7 @@ Public Class LineDetector_Basics : Implements IDisposable
     Dim ld As cv.XImgProc.FastLineDetector
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "LineDetector thickness of line", 1, 20, 2)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         ocvb.label1 = "Manually drawn with thickness"

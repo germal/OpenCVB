@@ -21,7 +21,7 @@ Public Class Kalman_Basics : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "ProcessNoiseCov x10000", 1, 1000, 100)
         sliders.setupTrackBar2(ocvb, "MeasurementNoiseCov", 1, 100, 10)
         sliders.setupTrackBar3(ocvb, "ErrorCovPost x100", 1, 100, 10)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.Show()
 
         plot = New Plot_OverTime(ocvb)
         plot.externalUse = True
@@ -98,7 +98,7 @@ Public Class Kalman_kDimension_Options : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "ProcessNoiseCov x10000", 1, 1000, 100)
         sliders.setupTrackBar2(ocvb, "MeasurementNoiseCov", 1, 100, 10)
         sliders.setupTrackBar3(ocvb, "ErrorCovPost x100", 1, 100, 10)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.Show()
 
         radio.Setup(ocvb, 7)
         radio.check(0).Text = "1,0,1,0 transition matrix"
@@ -109,7 +109,7 @@ Public Class Kalman_kDimension_Options : Implements IDisposable
         radio.check(5).Text = "0,0,0,1 transition matrix"
         radio.check(6).Text = "0,1,1,0 transition matrix"
         radio.check(4).Checked = True
-        If ocvb.parms.ShowOptions Then radio.show()
+        radio.Show()
 
         ocvb.label1 = "Kalman_kDimension (no output by default)"
         ocvb.desc = "Use this kalman filter to predict the set of values."
@@ -375,7 +375,7 @@ Public Class Kalman_Point2f : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "ProcessNoiseCov x10000", 1, 1000, 100)
         sliders.setupTrackBar2(ocvb, "MeasurementNoiseCov", 1, 100, 10)
         sliders.setupTrackBar3(ocvb, "ErrorCovPost x100", 1, 100, 10)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.Show()
 
         ocvb.label1 = "Kalman_Basics (no output by default)"
         ocvb.desc = "Use this kalman filter to predict the next value."
@@ -519,7 +519,7 @@ Public Class Kalman_GeneralPurpose : Implements IDisposable
         src(3) = autoRand.Next(5, ocvb.color.Height - src(1))
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False And src Is Nothing Then setValues(ocvb)
+        If src Is Nothing Then setValues(ocvb)
         Static saveDimension As Int32 = -1
         If saveDimension <> src.Length Then
             saveDimension = src.Length

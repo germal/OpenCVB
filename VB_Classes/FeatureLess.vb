@@ -12,7 +12,7 @@ Public Class Featureless_Basics_MT : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar3(ocvb, "FeatureLess threshold", 1, 100, 3)
         sliders.setupTrackBar4(ocvb, "FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         edges = New Edges_Canny(ocvb)
         edges.externalUse = True
@@ -90,7 +90,7 @@ Public Class FeatureLess_Prediction : Implements IDisposable
     Dim fLess As Featureless_Basics_MT
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "FeatureLess Resize Percent", 1, 100, 1)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         fLess = New Featureless_Basics_MT(ocvb)
 

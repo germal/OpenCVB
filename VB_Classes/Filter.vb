@@ -30,7 +30,7 @@ Public Class Filter_NormalizedKernel : Implements IDisposable
         radio.check(1).Checked = True
         radio.check(2).Text = "L2"
         radio.check(3).Text = "MinMax"
-        If ocvb.parms.ShowOptions Then radio.show()
+        radio.show()
         ocvb.desc = "Create a normalized kernel and use it."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -86,11 +86,11 @@ Public Class Filter_SepFilter2D : Implements IDisposable
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
+        check.Show()
 
         sliders.setupTrackBar1(ocvb, "Kernel X size", 1, 21, 5)
         sliders.setupTrackBar2(ocvb, "Kernel Y size", 1, 21, 11)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
 
         ocvb.label1 = "Gaussian Blur result"
         ocvb.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"

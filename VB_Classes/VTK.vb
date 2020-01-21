@@ -129,7 +129,7 @@ Public Class VTK_Histogram3D : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Random Number Stdev", 0, 255, 10)
         sliders.setupTrackBar2(ocvb, "Hist 3D bins", 1, 100, 32)
         sliders.setupTrackBar3(ocvb, "Hist 3D bin Threshold X1000000", 10, 100, 20)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         mats = New Mat_4to1(ocvb)
         mats.externalUse = True

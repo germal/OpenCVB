@@ -95,14 +95,14 @@ Public Class Fitline_RawInput : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Random point count", 0, 500, 100)
         sliders.setupTrackBar2(ocvb, "Line Point Count", 0, 500, 20)
         sliders.setupTrackBar3(ocvb, "Line Noise", 1, 100, 10)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         check.Setup(ocvb, 2)
         check.Box(0).Text = "Highlight Line Data"
         check.Box(1).Text = "Recompute with new random data"
         check.Box(0).Checked = True
         check.Box(1).Checked = True
-        If ocvb.parms.ShowOptions Then check.show()
+        check.show()
 
         ocvb.desc = "Generate a noisy line in a field of random data."
         Randomize()

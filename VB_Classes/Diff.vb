@@ -4,7 +4,7 @@ Public Class Diff_Basics : Implements IDisposable
     Dim lastFrame As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Diff - Color Threshold", 1, 255, 50)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
         ocvb.label1 = "Stable Gray Color"
         ocvb.label2 = "Unstable Gray Color"
         ocvb.desc = "Capture an image and compare it to previous frame using absDiff and threshold"

@@ -3,7 +3,7 @@ Public Class InfraRed_Basics : Implements IDisposable
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 100)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Show the infrared images from the Intel RealSense Camera"
         ocvb.label1 = "Infrared Left Image"
         If ocvb.parms.UsingIntelCamera Then

@@ -10,7 +10,7 @@ Public Class BlockMatching_Basics : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Blockmatch scale", 1, 200, 100)
         sliders.setupTrackBar2(ocvb, "Blockmatch max disparity", 1, 8, 1)
         sliders.setupTrackBar3(ocvb, "Blockmatch block size", 5, 255, 15)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Use OpenCV's block matching on the Realsense infrared views."
         ocvb.label1 = "Disparity image (not depth)"
         ocvb.label2 = "Right Infrared Image"

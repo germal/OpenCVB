@@ -16,12 +16,12 @@ Public Class KLT_Basics : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
         sliders.setupTrackBar3(ocvb, "KLT - minDistance", 1, 100, 7)
         sliders.setupTrackBar4(ocvb, "KLT - BlockSize", 1, 100, 7)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         check.Setup(ocvb, 2)
         check.Box(0).Text = "KLT - Night Mode"
         check.Box(1).Text = "KLT - delete all Points"
-        If ocvb.parms.ShowOptions Then check.show()
+        check.show()
 
         ocvb.desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub

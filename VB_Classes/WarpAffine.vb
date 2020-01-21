@@ -99,7 +99,7 @@ Public Class WarpAffine_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Angle", 0, 360, 10)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Use WarpAffine to transform input images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -125,7 +125,7 @@ Public Class WarpAffine_Perspective : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Warped Width", 0, ocvb.color.Cols, ocvb.color.Cols - 50)
         sliders.setupTrackBar2(ocvb, "Warped Height", 0, ocvb.color.Rows, ocvb.color.Rows - 50)
         sliders.setupTrackBar3(ocvb, "Warped Angle", 0, 360, 0)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Use WarpPerspective to transform input images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -86,7 +86,7 @@ Public Class DNN_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "dnn Scale Factor", 1, 10000, 78)
         sliders.setupTrackBar2(ocvb, "dnn MeanVal", 1, 255, 127)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
 
         dnnWidth = ocvb.color.Height ' height is always smaller than width...
         dnnHeight = ocvb.color.Height

@@ -13,26 +13,26 @@ Public Class MSER_Basics : Implements IDisposable
     Dim mser As cv.MSER
     Public Sub New(ocvb As AlgorithmData)
         sliders2.setupTrackBar1(ocvb, "MSER Edge Blursize", 1, 20, 5)
-        If ocvb.parms.ShowOptions Then sliders2.Show()
+        sliders2.Show()
 
         sliders1.setupTrackBar1(ocvb, "Min Diversity", 0, 100, 20)
         sliders1.setupTrackBar2(ocvb, "MSER Max Evolution", 1, 1000, 200)
         sliders1.setupTrackBar3(ocvb, "MSER Area Threshold", 1, 101, 101)
         sliders1.setupTrackBar4(ocvb, "MSER Min Margin", 1, 100, 3)
-        If ocvb.parms.ShowOptions Then sliders1.Show()
+        sliders1.Show()
 
         sliders.setupTrackBar1(ocvb, "MSER Delta", 1, 100, 5)
         sliders.setupTrackBar2(ocvb, "MSER Min Area", 1, 10000, 60)
         sliders.setupTrackBar3(ocvb, "MSER Max Area", 1000, 100000, 100000)
         sliders.setupTrackBar4(ocvb, "MSER Max Variation", 1, 100, 25)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
 
         check.Setup(ocvb, 2)
         check.Box(0).Text = "Pass2Only"
         check.Box(1).Text = "Use Grayscale, not color input (default)"
         check.Box(0).Checked = True
         check.Box(1).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
+        check.Show()
 
         ReDim saveParms(10) ' 4 sliders + 4 sliders + 1 slider + 2 checkboxes
         ocvb.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."

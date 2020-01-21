@@ -4,7 +4,7 @@ Public Class Brightness_Clahe : Implements IDisposable ' Contrast Limited Adapti
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Clip Limit", 1, 100, 10)
         sliders.setupTrackBar2(ocvb, "Grid Size", 1, 100, 8)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -36,7 +36,7 @@ Public Class Brightness_Contrast : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Brightness", 1, 100, 50)
         sliders.setupTrackBar2(ocvb, "Contrast", 1, 100, 50)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Show image with vary contrast and brightness."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -78,7 +78,7 @@ Public Class Brightness_AlphaBeta : Implements IDisposable
         ocvb.desc = "Use alpha and beta with ConvertScaleAbs."
         sliders.setupTrackBar1(ocvb, "Brightness Alpha (contrast)", 0, 500, 300)
         sliders.setupTrackBar2(ocvb, "Brightness Beta (brightness)", -100, 100, 0)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1 = ocvb.color.ConvertScaleAbs(sliders.TrackBar1.Value / 500, sliders.TrackBar2.Value)
@@ -97,7 +97,7 @@ Public Class Brightness_Gamma : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         ocvb.desc = "Use gamma with ConvertScaleAbs."
         sliders.setupTrackBar1(ocvb, "Brightness Gamma correction", 0, 200, 100)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static lastGamma As Int32 = -1

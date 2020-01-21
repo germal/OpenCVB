@@ -18,9 +18,9 @@ Public Class CamShift_Basics : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "CamShift vMax", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, "CamShift Smin", 0, 255, 60)
         sliders.setupTrackBar4(ocvb, "CamShift Histogram bins", 16, 255, 32)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
 
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
         ocvb.label1 = "Draw anywhere to create histogram and start camshift"
         ocvb.label2 = "Histogram of targeted region (hue only)"
         ocvb.desc = "CamShift Demo - draw on the images to define the object to track."
@@ -183,7 +183,7 @@ Public Class Camshift_Object : Implements IDisposable
         camshift = New CamShift_Basics(ocvb)
 
         sliders.setupTrackBar1(ocvb, "How often should camshift be reinitialized", 1, 500, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
         ocvb.desc = "Use the blob depth cluster as input to initialize a camshift algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -215,7 +215,7 @@ Public Class Camshift_TopObjects : Implements IDisposable
 
         blob = New Blob_DepthClusters(ocvb)
         sliders.setupTrackBar1(ocvb, "How often should camshift be reinitialized", 1, 500, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
         For i = 0 To cams.Length - 1
             cams(i) = New CamShift_Basics(ocvb)
         Next

@@ -4,7 +4,7 @@ Public Class MeanSubtraction_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Scaling Factor = mean/scaling factor X100", 1, 500, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.Show()
         ocvb.desc = "Subtract the mean from the image with a scaling factor"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

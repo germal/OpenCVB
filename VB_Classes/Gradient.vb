@@ -64,7 +64,7 @@ Public Class Gradient_Flatland : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         grade = New Gradient_Basics(ocvb)
         sliders.setupTrackBar1(ocvb, "Reduction Factor", 1, 64, 16)
-        If ocvb.parms.ShowOptions Then sliders.show()
+        sliders.show()
         ocvb.desc = "Reduced grayscale shows isobars in depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
