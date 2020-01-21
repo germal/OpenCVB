@@ -223,39 +223,63 @@ End Class
 
 
 
-'Public Class Blob_Dimensions : Implements IDisposable
-'    Public flood As FloodFill_RelativeRange
-'    Dim blobs As Blob_DepthClusters
-'    Public Sub New(ocvb As AlgorithmData)
-'        blobs = New Blob_DepthClusters(ocvb)
-'        blobs.externalUse = True
-
-'        ocvb.desc = "Get the blobs and measure their size."
-'    End Sub
-'    Public Sub Run(ocvb As AlgorithmData)
-'        Dim blobList = blobs.histBlobs.valleys.rangeBoundaries
-'        blobs.Run(ocvb)
-'    End Sub
-'    Public Sub Dispose() Implements IDisposable.Dispose
-'        blobs.Dispose()
-'        flood.Dispose()
-'    End Sub
-'End Class
-
-
-
-Public Class Blob_LargestBlob : Implements IDisposable
-    Dim blobs As Blob_DepthClusters
+Public Class Blob_Rectangles : Implements IDisposable
+    Dim blobs As Blob_Basics
+    Dim kalman() As Kalman_kDimension
     Public Sub New(ocvb As AlgorithmData)
-        blobs = New Blob_DepthClusters(ocvb)
-        ocvb.desc = "Isolate just the largest blob"
+        blobs = New Blob_Basics(ocvb)
+        ocvb.desc = "Get the blobs and their masks and outline them with a rectangle."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blobs.Run(ocvb)
-        Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(0).Value ' this is the largest contiguous blob
-        ocvb.color.CopyTo(ocvb.result1, blobs.flood.fBasics.masks(maskIndex))
-        Dim rect = blobs.flood.fBasics.maskRects(maskIndex)
-        ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
+        ocvb.result1 = ocvb.color
+        Static blobCount As Int32
+        If blobCount <> blobs.rects.Count Then
+            blobCount = blobs.rects.Count
+            ReDim kalman(blobs.rects.Count - 1)
+            For i = 0 To blobCount - 1
+                kalman(i) = New Kalman_kDimension(ocvb)
+                kalman(i).kDimension = 4 ' there are 4 values in a cv.Rect to Kalmanize...
+            Next
+        End If
+        For i = 0 To blobs.rects.Count - 1
+            Dim rect = blobs.rects(i)
+            ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
+        Next
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        blobs.Dispose()
+        For i = 0 To kalman.Length - 1
+            kalman(i).Dispose()
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class Blob_Basics : Implements IDisposable
+    Dim blobs As Blob_DepthClusters
+    Public rects As List(Of cv.Rect)
+    Public masks As List(Of cv.Mat)
+    Public externalUse As Boolean
+    Public Sub New(ocvb As AlgorithmData)
+        blobs = New Blob_DepthClusters(ocvb)
+        ocvb.desc = "Gather all the blob data and display the largest."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        blobs.Run(ocvb)
+        rects = blobs.flood.fBasics.maskRects
+        masks = blobs.flood.fBasics.masks
+
+        If externalUse = False Then
+            Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(0).Value ' this is the largest contiguous blob
+            ocvb.color.CopyTo(ocvb.result1, masks(maskIndex))
+            Dim rect = rects(maskIndex)
+            ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
+            ocvb.label1 = ocvb.label1 + " - show largest blob"
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         blobs.Dispose()

@@ -53,10 +53,11 @@ Module UI_GeneratorMain
                     line = Trim(nextFile.ReadLine())
                     If Len(Trim(line)) > 0 Then CodeLineCount += 1
                     If LCase(line).StartsWith("public class") Then
-                        Dim split As String() = Regex.Split(line, "\W+")
-                        className = split(2) ' public class <classname>
+                        If InStr(LCase(line), ": implements idisposable") Then
+                            Dim split As String() = Regex.Split(line, "\W+")
+                            className = split(2) ' public class <classname>
+                        End If
                     End If
-
                     If LCase(line).StartsWith("public sub new(ocvb as algorithmdata)") Then functionNames.Add(className)
                 End While
             End If

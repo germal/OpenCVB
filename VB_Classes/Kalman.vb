@@ -414,57 +414,64 @@ Public Class Kalman_Point2f : Implements IDisposable
 End Class
 
 
+
+
+
+
 Public Class Kalman_Image : Implements IDisposable
-    Dim kalman() As Kalman_kDimension
+    Dim kRect As Kalman_Rectangle
     Public Sub New(ocvb As AlgorithmData)
-        ocvb.desc = "Use Kalman to stabilize pixel values.  Shows limitations of how much data can be pushed through a Kalman Filter."
+        kRect = New Kalman_Rectangle(ocvb)
+        kRect.externalUse = True
+        ocvb.desc = "Use Kalman filter on a portion of the color image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.drawRect = New cv.Rect(0, 0, 0, 0) Then ocvb.drawRect = New cv.Rect(0, 200, ocvb.color.Width, 50)
-        ocvb.result1 = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim gray = ocvb.result1(ocvb.drawRect)
-
-        Static saveGrayCols = gray.Cols
-        If ocvb.frameCount = 0 Or saveGrayCols <> gray.Cols Then
-            ReDim kalman(gray.Cols - 1)
-            For i = 0 To gray.Cols - 1
-                kalman(i) = New Kalman_kDimension(ocvb)
-                kalman(i).kDimension = gray.Height
-            Next
-            ocvb.label1 = "Draw on the image - keep it small!"
-        End If
-
-        If ocvb.frameCount > 0 Then
-            Parallel.For(0, gray.Cols - 1,
-            Sub(i)
-                If kalman(i).inputReal.Cols = 0 Then kalman(i).Run(ocvb) ' initialize on the first invocation...
-                gray.Col(i).ConvertTo(kalman(i).inputReal, cv.MatType.CV_32F)
-                kalman(i).Run(ocvb)
-                kalman(i).statePoint.ConvertTo(ocvb.result1.Col(i), cv.MatType.CV_8U)
-            End Sub)
-        End If
+        kRect.src = ocvb.color
+        kRect.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        For i = 0 To kalman.Count - 1
-            kalman(i).Dispose()
-        Next
+        kRect.Dispose()
     End Sub
 End Class
 
 
+
+
 Public Class Kalman_Depth : Implements IDisposable
-    Dim kalman() As Kalman_kDimension
+    Dim kRect As Kalman_Rectangle
     Public Sub New(ocvb As AlgorithmData)
-        ocvb.desc = "Use Kalman to stabilize Depth values.  Shows limitations of how much data can be pushed through a Kalman Filter."
+        kRect = New Kalman_Rectangle(ocvb)
+        kRect.externalUse = True
+        ocvb.desc = "Use Kalman filter on a portion of the depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.drawRect = New cv.Rect(0, 0, 0, 0) Then ocvb.drawRect = New cv.Rect(0, 200, ocvb.depthRGB.Width, 50)
-        ocvb.result1 = ocvb.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        kRect.src = ocvb.depthRGB
+        kRect.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        kRect.Dispose()
+    End Sub
+End Class
+
+
+
+
+Public Class Kalman_Rectangle : Implements IDisposable
+    Dim kalman() As Kalman_kDimension
+    Public src As cv.Mat
+    Public externalUse As Boolean
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.desc = "Use Kalman to stabilize image value.  Shows limitations of how much data can be pushed through a Kalman Filter."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.drawRect = New cv.Rect Then ocvb.drawRect = New cv.Rect(0, 200, ocvb.depthRGB.Width, 50)
+        If externalUse = False Then src = ocvb.depthRGB
+        ocvb.result1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray = ocvb.result1(ocvb.drawRect)
 
-        Static saveGrayCols = gray.Cols
-        If ocvb.frameCount = 0 Or saveGrayCols <> gray.Cols Then
-            saveGrayCols = gray.Cols
+        Static saveDimension As Int32 = -1
+        If saveDimension <> gray.Cols Then
+            saveDimension = gray.Cols
             ReDim kalman(gray.Cols - 1)
             For i = 0 To gray.Cols - 1
                 kalman(i) = New Kalman_kDimension(ocvb)
@@ -473,15 +480,13 @@ Public Class Kalman_Depth : Implements IDisposable
             ocvb.label1 = "Draw on the image - keep it small!"
         End If
 
-        If ocvb.frameCount > 0 Then
-            Parallel.For(0, gray.Cols - 1,
+        Parallel.For(0, gray.Cols - 1,
             Sub(i)
-                If kalman(i).inputReal.Cols = 0 Then kalman(i).Run(ocvb) ' initialize on the first invocation...
+                If kalman(i).inputReal.Rows = 0 Then kalman(i).Run(ocvb) ' initialize on the first invocation...
                 gray.Col(i).ConvertTo(kalman(i).inputReal, cv.MatType.CV_32F)
                 kalman(i).Run(ocvb)
                 kalman(i).statePoint.ConvertTo(gray.Col(i), cv.MatType.CV_8U)
             End Sub)
-        End If
         ocvb.result1(ocvb.drawRect) = gray
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

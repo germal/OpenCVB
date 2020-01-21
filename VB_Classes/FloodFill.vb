@@ -228,7 +228,7 @@ Public Class FloodFill_Basics : Implements IDisposable
     Public initialMask As New cv.Mat
     Public thumbNails As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
-    Private Class CompareMaskSize : Implements IComparer(Of Int32)
+    Public Class CompareMaskSize : Implements IComparer(Of Int32)
         Public Function Compare(ByVal a As Int32, ByVal b As Int32) As Integer Implements IComparer(Of Int32).Compare
             If a <= b Then Return 1
             Return -1
