@@ -5,7 +5,7 @@ Public Class FAST_Basics : Implements IDisposable
     Public keypoints() As cv.KeyPoint
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Threshold", 0, 200, 15)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
         ocvb.label1 = "FAST_Basics nonMax = true"
     End Sub
@@ -38,7 +38,7 @@ Public Class FAST_Centroid : Implements IDisposable
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Turn Kalman filtering on"
         check.Box(0).Checked = True
-        check.show()
+        If ocvb.parms.ShowOptions Then check.Show()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         fast.Run(ocvb)

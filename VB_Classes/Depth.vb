@@ -101,7 +101,7 @@ Public Class Depth_ManualTrim : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Min Depth", 200, 1000, 200)
         sliders.setupTrackBar2(ocvb, "Max Depth", 200, 10000, 1400)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Manually show depth with varying min and max depths."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -220,7 +220,7 @@ Public Class Depth_InRangeTrim : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "InRange Min Depth", 200, 1000, 200)
         sliders.setupTrackBar2(ocvb, "InRange Max Depth", 200, 10000, 1400)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Show depth with OpenCV using varying min and max depths."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -325,7 +325,7 @@ Public Class Depth_Flatland : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Region Count", 1, 250, 10)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label2 = "Grayscale version"
         ocvb.desc = "Attempt to stabilize the depth image."
@@ -402,7 +402,7 @@ Public Class Depth_HolesRect : Implements IDisposable
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "shadowRect Min Size", 1, 20000, 2000)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         shadow = New Depth_Holes(ocvb)
         shadow.externalUse = True
@@ -501,7 +501,7 @@ Public Class Depth_ToInfrared : Implements IDisposable
 
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Save Current Yellow Rectangle"
-        check.show()
+        If ocvb.parms.ShowOptions Then check.Show()
 
         Dim top As Int32, left As Int32, bot As Int32, right As Int32
         If ocvb.parms.UsingIntelCamera Then
@@ -519,7 +519,7 @@ Public Class Depth_ToInfrared : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "Color Image Left in RedLeft", 0, ocvb.color.Width / 2, left * ocvb.color.Width)
         sliders.setupTrackBar3(ocvb, "Color Image Bot in RedLeft", ocvb.color.Height / 2, ocvb.color.Height, bot * ocvb.color.Height)
         sliders.setupTrackBar4(ocvb, "Color Image Right in RedLeft", ocvb.color.Width / 2, ocvb.color.Width, right * ocvb.color.Width)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         If ocvb.parms.UsingIntelCamera Then
             ocvb.label1 = "Color + Infrared Left (overlay)"
             ocvb.label2 = "Aligned RedLeft and color"
@@ -563,7 +563,7 @@ Public Class Depth_FlatData : Implements IDisposable
         shadow = New Depth_Holes(ocvb)
 
         sliders.setupTrackBar1(ocvb, "FlatData Region Count", 1, 250, 200)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label1 = "Reduced resolution DepthRGB"
         ocvb.label2 = "Contours of the Depth Shadow"
@@ -600,7 +600,7 @@ Public Class Depth_FlatBackground : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         shadow = New Depth_Holes(ocvb)
         sliders.setupTrackBar1(ocvb, "FlatBackground Max Depth", 200, 10000, 2000)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Simplify the depth image with a flat background"
     End Sub
@@ -706,7 +706,7 @@ Public Class Depth_MeanStdev_MT : Implements IDisposable
 
         sliders.setupTrackBar1(ocvb, "MeanStdev Max Depth Range", 1, 20000, 3500)
         sliders.setupTrackBar2(ocvb, "MeanStdev Frame Series", 1, 100, 5)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Collect a time series of depth and measure where the stdev is unstable.  Plan is to avoid depth where unstable."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -840,7 +840,7 @@ Public Class Depth_Uncertainty : Implements IDisposable
         retina.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Uncertainty threshold", 1, 255, 100)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Use the bio-inspired retina algorithm to determine depth uncertainty."
     End Sub
@@ -863,7 +863,7 @@ Public Class Depth_ColorMap : Implements IDisposable
     Dim Palette As Palette_ColorMap
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Depth ColorMap Alpha X100", 1, 100, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         Palette = New Palette_ColorMap(ocvb)
         Palette.externalUse = True
@@ -891,7 +891,7 @@ Public Class Depth_Stable : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Diff - Number of Frames", 1, 20, 10)
         sliders.setupTrackBar2(ocvb, "Diff - Depth Range in Millimeters", 1, 200, 100)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Collect X frames, compute stable depth and color pixels using thresholds"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

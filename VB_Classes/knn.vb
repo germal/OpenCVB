@@ -7,7 +7,7 @@ Public Class knn_Basics : Implements IDisposable
         random = New Random_Points(ocvb)
         sliders.setupTrackBar1(ocvb, "knn Query Points", 1, 10000, 10)
         sliders.setupTrackBar2(ocvb, "knn Known Points", 1, 10, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
         ocvb.label2 = "Search Input"
     End Sub
@@ -74,7 +74,7 @@ Public Class knn_Cluster2D : Implements IDisposable
         knn.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "knn - number of cities", 10, 1000, 100)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label1 = ""
         ocvb.label2 = ""
@@ -173,7 +173,7 @@ Public Class knn_Point2d : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "knn Query Points", 1, 50, 10)
         sliders.setupTrackBar2(ocvb, "knn k nearest points", 1, 5, 1)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Use KNN to connect 2D points."
         ocvb.label1 = "Yellow=Queries, Blue=Best Responses"
@@ -244,7 +244,7 @@ Public Class knn_Point3d : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "knn Query Points", 1, 500, 10)
         sliders.setupTrackBar2(ocvb, "knn k nearest points", 0, 500, 1)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
         ocvb.label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"

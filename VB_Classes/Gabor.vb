@@ -75,13 +75,13 @@ Public Class Gabor_Basics_MT : Implements IDisposable
 
         sliders1.setupTrackBar1(ocvb, "Gabor gamma X10", 0, 10, 5)
         sliders1.setupTrackBar2(ocvb, "Gabor Phase offset X100", 0, 100, 0)
-        sliders1.Show()
+        If ocvb.parms.ShowOptions Then sliders1.Show()
 
         sliders.setupTrackBar1(ocvb, "Gabor Kernel Size", 0, 50, 15)
         sliders.setupTrackBar2(ocvb, "Gabor Sigma", 0, 100, 4)
         sliders.setupTrackBar3(ocvb, "Gabor Theta (degrees)", 0, 180, 90)
         sliders.setupTrackBar4(ocvb, "Gabor lambda", 0, 100, 10)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.parms.ShowOptions = False ' no  options for the Gabor_Basics algorithm needed - just need them for the parent thread.
         For i = 0 To gabor.Length - 1

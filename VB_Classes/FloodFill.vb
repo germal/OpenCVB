@@ -11,7 +11,7 @@ Public Class FloodFill_Basics_MT : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 500, 50)
         sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar3(ocvb, "FloodFill HiDiff", 1, 255, 5)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Use floodfill to build image segments with a grayscale image."
     End Sub
@@ -197,7 +197,7 @@ Public Class FloodFill_RelativeRange : Implements IDisposable
         check.Box(1).Text = "Use 4 nearest pixels (Link4) - when off, it means use 8 nearest pixels (Link8)"
         check.Box(1).Checked = True ' link4 produces better results.
         check.Box(2).Text = "Use 'Mask Only'"
-        check.Show()
+        If ocvb.parms.ShowOptions Then check.Show()
         ocvb.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -237,13 +237,13 @@ Public Class FloodFill_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
-        check.Show()
+        If ocvb.parms.ShowOptions Then check.Show()
 
         sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar3(ocvb, "FloodFill HiDiff", 1, 255, 5)
         sliders.setupTrackBar4(ocvb, "Step Size", 1, ocvb.color.Width / 2, 20)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."

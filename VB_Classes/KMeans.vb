@@ -37,7 +37,7 @@ Public Class kMeans_Basics : Implements IDisposable
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 4)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Cluster the rgb image using kMeans."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -76,7 +76,7 @@ Public Class kMeans_RGBFast : Implements IDisposable
     Public clusterCount = 6
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 4)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Cluster a small rgb image using kMeans.  Specify clusterCount value."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -119,7 +119,7 @@ Public Class kMeans_RGB_Plus_XYDepth : Implements IDisposable
     Private sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 4)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         km = New kMeans_Basics(ocvb)
         ocvb.label1 = "kmeans - RGB, XY, and Depth Raw"
         ocvb.desc = "Cluster with kMeans RGB, x, y, and depth."
@@ -178,7 +178,7 @@ Public Class kMeans_RGB1_MT : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 4)
         sliders.setupTrackBar2(ocvb, "Thread Count", 1, 32, 4)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.label1 = "kmeans - raw labels"
         ocvb.label2 = "kmeans - clusterColors"
         ocvb.desc = "Cluster the segmented rgb image using kMeans with multiple threads.  Select the desired number of clusters/threads."
@@ -265,14 +265,14 @@ Public Class kMeans_RGB2_MT : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 10)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         radio.Setup(ocvb, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = CStr(2 ^ i) + " threads"
         Next
         radio.check(0).Text = "1 thread"
         radio.check(5).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
         ocvb.label1 = "kmeans - raw labels"
         ocvb.desc = "Cluster the segmented rgb image using kMeans with multiple threads.  Select the desired number of clusters/threads."
     End Sub
@@ -341,14 +341,14 @@ Public Class kMeans_RGB3_MT : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 14)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         radio.Setup(ocvb, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = CStr(2 ^ i) + " threads"
         Next
         radio.check(0).Text = "1 thread"
         radio.check(5).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
         ocvb.label1 = "kmeans - raw labels"
         ocvb.label2 = "Synchronized colors from raw labels"
         ocvb.desc = "Cluster the segmented rgb image using kMeans with multiple threads.  Select the desired number of clusters/threads."
@@ -441,7 +441,7 @@ Public Class kMeans_ReducedRGB : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Reduction factor", 2, 64, 64)
         sliders.setupTrackBar2(ocvb, "kmeans k", 2, 64, 4)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.label2 = "Reduced color image."
         ocvb.desc = "Reduce each pixel by the reduction factor and then run kmeans."
     End Sub
@@ -476,7 +476,7 @@ Public Class kMeans_XYDepth : Implements IDisposable
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 4)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         Dim w = ocvb.color.Width / 4
         Dim h = ocvb.color.Height / 4
         ocvb.drawRect = New cv.Rect(w, h, w * 2, h * 2)
@@ -549,7 +549,7 @@ Public Class kMeans_LAB : Implements IDisposable
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 4)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.label1 = "kMeans_LAB - draw to select region"
         Dim w = ocvb.color.Width / 4
         Dim h = ocvb.color.Height / 4
@@ -589,7 +589,7 @@ Public Class kMeans_RGB4_MT : Implements IDisposable
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 10)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 64
@@ -678,7 +678,7 @@ Public Class kMeans_Color : Implements IDisposable
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -712,7 +712,7 @@ Public Class kMeans_Color_MT : Implements IDisposable
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 2)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 32
@@ -762,7 +762,7 @@ Public Class kMeans_ColorDepth : Implements IDisposable
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -805,7 +805,7 @@ Public Class kMeans_ColorDepth_MT : Implements IDisposable
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 32

@@ -24,12 +24,12 @@ Public Class Retina_Basics_CPP : Implements IDisposable
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Retina Sample Factor", 1, 10, 2)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         check.Setup(ocvb, 2)
         check.Box(0).Text = "Use log sampling"
         check.Box(1).Text = "Open resulting xml file"
-        check.show()
+        If ocvb.parms.ShowOptions Then check.Show()
         ocvb.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
         ocvb.label1 = "Retina Parvo"
         ocvb.label2 = "Retina Magno"

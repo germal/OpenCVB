@@ -18,7 +18,7 @@ Public Class Draw_rectangles : Implements IDisposable
     Public drawRotatedRectangles As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Rectangle Count", 1, 255, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Draw the requested number of rotated rectangles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -56,7 +56,7 @@ Public Class Draw_Noise : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Noise Count", 1, 1000, 100)
         sliders.setupTrackBar2(ocvb, "Noise Width", 1, 10, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Add Noise to the color image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -103,7 +103,7 @@ Public Class Draw_Ellipses : Implements IDisposable
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Ellipse Count", 1, 255, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Draw the requested number of ellipses."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -130,7 +130,7 @@ Public Class Draw_Circles : Implements IDisposable
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Circle Count", 1, 255, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Draw the requested number of circles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -156,7 +156,7 @@ Public Class Draw_Line : Implements IDisposable
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Line Count", 1, 255, 1)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Draw the requested number of Lines."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -183,7 +183,7 @@ Public Class Draw_Polygon : Implements IDisposable
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Poly Count", 1, 255, 1)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Draw Polygon figures"
         ocvb.label2 = "Convex Hull for the same polygon"
 
@@ -191,7 +191,7 @@ Public Class Draw_Polygon : Implements IDisposable
         radio.check(0).Text = "Polygon Outline"
         radio.check(1).Text = "Polygon Filled"
         radio.check(0).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim h = ocvb.color.Height / 8

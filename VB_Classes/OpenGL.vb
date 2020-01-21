@@ -133,17 +133,17 @@ Module OpenGL_Sliders_Module
         sliders1.setupTrackBar2(ocvb, "OpenGL zFar", -50, 200, 20)
         sliders1.setupTrackBar3(ocvb, "OpenGL Point Size", 1, 20, 2)
         sliders1.setupTrackBar4(ocvb, "zTrans", -1000, 1000, 50)
-        sliders1.Show()
+        If ocvb.parms.ShowOptions Then sliders1.Show()
 
         sliders2.setupTrackBar1(ocvb, "OpenGL Eye X", -180, 180, 0)
         sliders2.setupTrackBar2(ocvb, "OpenGL Eye Y", -180, 180, 0)
         sliders2.setupTrackBar3(ocvb, "OpenGL Eye Z", -180, 180, -40)
-        sliders2.Show()
+        If ocvb.parms.ShowOptions Then sliders2.Show()
 
         sliders3.setupTrackBar1(ocvb, "OpenGL Scale X", 1, 100, 10)
         sliders3.setupTrackBar2(ocvb, "OpenGL Scale Y", 1, 100, 10)
         sliders3.setupTrackBar3(ocvb, "OpenGL Scale Z", 1, 100, 1)
-        sliders3.Show()
+        If ocvb.parms.ShowOptions Then sliders3.Show()
 
         ' this is last so it shows up on top of all the others.
         sliders.setupTrackBar1(ocvb, "OpenGL FOV", 1, 180, 150)
@@ -151,7 +151,7 @@ Module OpenGL_Sliders_Module
         sliders.setupTrackBar2(ocvb, "OpenGL yaw (degrees)", -180, 180, -3)
         sliders.setupTrackBar3(ocvb, "OpenGL pitch (degrees)", -180, 180, 3)
         sliders.setupTrackBar4(ocvb, "OpenGL roll (degrees)", -180, 180, 0)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
     End Sub
 End Module
 
@@ -269,7 +269,7 @@ Public Class OpenGL_3Ddata : Implements IDisposable
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ogl = New OpenGL_Options(ocvb)
         ogl.OpenGL.OpenGLTitle = "OpenGL_3Ddata"

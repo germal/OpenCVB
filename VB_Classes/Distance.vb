@@ -10,10 +10,10 @@ Public Class Distance_Basics : Implements IDisposable
         radio.check(1).Text = "L1"
         radio.check(2).Text = "L2"
         radio.check(2).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         sliders.setupTrackBar1(ocvb, "kernel size", 1, 5, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         foreground = New kMeans_Depth_FG_BG(ocvb)
         ocvb.desc = "Distance algorithm basics."

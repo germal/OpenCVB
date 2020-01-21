@@ -128,7 +128,7 @@ Public Class DFT_ButterworthFilter : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "DFT B Filter - Radius", 1, ocvb.color.Height, ocvb.color.Height)
         sliders.setupTrackBar2(ocvb, "DFT B Filter - Order", 1, ocvb.color.Height, 2)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         dft = New DFT_Basics(ocvb)
         ocvb.desc = "Use the Butterworth filter on a DFT image - color image input."
         ocvb.label1 = "Image with Butterworth Low Pass Filter Applied"

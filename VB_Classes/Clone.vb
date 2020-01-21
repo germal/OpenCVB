@@ -46,7 +46,7 @@ Public Class Clone_ColorChange : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Color Change - Red", 5, 25, 15)
         sliders.setupTrackBar2(ocvb, "Color Change - Green", 5, 25, 5)
         sliders.setupTrackBar3(ocvb, "Color Change - Blue", 5, 25, 5)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 0
@@ -71,7 +71,7 @@ Public Class Clone_IlluminationChange : Implements IDisposable
 
         sliders.setupTrackBar1(ocvb, "Alpha", 0, 20, 2)
         sliders.setupTrackBar2(ocvb, "Beta", 0, 20, 2)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 1
@@ -97,7 +97,7 @@ Public Class Clone_TextureFlattening : Implements IDisposable
 
         sliders.setupTrackBar1(ocvb, "Low Threshold", 0, 100, 10)
         sliders.setupTrackBar2(ocvb, "High Threshold", 0, 100, 50)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 2
@@ -131,7 +131,7 @@ Public Class Clone_Eagle : Implements IDisposable
         radio.check(1).Text = "Seamless - MonochromeTransfer Clone"
         radio.check(2).Text = "Seamless - Normal Clone"
         radio.check(2).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         sourceImage = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/CloneSource.png")
         srcROI = New cv.Rect(0, 40, sourceImage.Width, sourceImage.Height)
@@ -184,7 +184,7 @@ Public Class Clone_Seamless : Implements IDisposable
         radio.check(1).Text = "Seamless Mono Clone"
         radio.check(2).Text = "Seamless Mixed Clone"
         radio.check(0).Checked = True
-        radio.Show()
+        If ocvb.parms.ShowOptions Then radio.Show()
         ocvb.label1 = "Mask for Clone"
         ocvb.label2 = "Results for SeamlessClone"
         ocvb.desc = "Use the seamlessclone API to merge color and depth..."

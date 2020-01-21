@@ -7,7 +7,7 @@ Public Class BRISK_Basics : Implements IDisposable
     Public src As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "BRISK Radius Threshold", 1, 100, 50)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Detect features with BRISK"
         Brisk = cv.BRISK.Create()
     End Sub

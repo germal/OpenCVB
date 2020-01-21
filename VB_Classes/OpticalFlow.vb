@@ -81,7 +81,7 @@ Public Class OpticalFlow_DenseOptions : Implements IDisposable
         radio.check(3).Text = "PyrAReady"
         radio.check(4).Text = "PyrBReady"
         radio.check(0).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         sliders2.setupTrackBar1(ocvb, "Optical Flow PolyN", 1, 15, 5)
         sliders2.setupTrackBar2(ocvb, "Optical Flow Scaling Output", 1, 100, 50)
@@ -91,7 +91,7 @@ Public Class OpticalFlow_DenseOptions : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "Optical Flow Levels", 1, 10, 1)
         sliders.setupTrackBar3(ocvb, "Optical Flow winSize", 1, 9, 1)
         sliders.setupTrackBar4(ocvb, "Optical Flow Iterations", 1, 10, 1)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Use dense optical flow algorithm options"
     End Sub
@@ -169,7 +169,7 @@ Public Class OpticalFlow_DenseBasics_MT : Implements IDisposable
         flow.sliders.TrackBar1.Value = 75
 
         sliders.setupTrackBar1(ocvb, "Correlation Threshold", 0, 1000, 1000)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "MultiThread dense optical flow algorithm  "
     End Sub
@@ -234,7 +234,7 @@ Public Class OpticalFlow_Sparse : Implements IDisposable
 
         sliders.setupTrackBar1(ocvb, "OpticalFlow window", 1, 20, 3)
         sliders.setupTrackBar2(ocvb, "OpticalFlow Max Pixels Distance", 1, 100, 30)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         radio.Setup(ocvb, 6)
         radio.check(0).Text = "FarnebackGaussian"
@@ -245,7 +245,7 @@ Public Class OpticalFlow_Sparse : Implements IDisposable
         radio.check(5).Text = "UseInitialFlow"
         radio.check(5).Enabled = False
         radio.check(0).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         ocvb.desc = "Show the optical flow of a sparse matrix."
         ocvb.label1 = ""

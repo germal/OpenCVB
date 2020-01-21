@@ -21,7 +21,7 @@ Public Class RecursiveBilateralFilter_CPP : Implements IDisposable
     Dim rbf As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "RBF Recursion count", 1, 20, 2)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ReDim srcData(ocvb.color.Total * ocvb.color.ElemSize - 1)
 

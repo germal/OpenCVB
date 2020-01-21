@@ -71,7 +71,7 @@ Public Class MeanShift_PyrFilter : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "MeanShift Spatial Radius", 1, 100, 10)
         sliders.setupTrackBar2(ocvb, "MeanShift color Radius", 1, 100, 15)
         sliders.setupTrackBar3(ocvb, "MeanShift Max Pyramid level", 1, 8, 3)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -105,7 +105,7 @@ Public Class Meanshift_TopObjects : Implements IDisposable
 
         blob = New Blob_DepthClusters(ocvb)
         sliders.setupTrackBar1(ocvb, "How often should camshift be reinitialized", 1, 500, 100)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         For i = 0 To cams.Length - 1
             cams(i) = New MeanShift_Basics(ocvb)
             cams(i).rectangleEdgeWidth = 8

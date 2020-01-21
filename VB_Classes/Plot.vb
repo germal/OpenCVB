@@ -12,7 +12,7 @@ Public Class Plot_OverTime : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Pixel Height", 1, 40, 20)
         sliders.setupTrackBar2(ocvb, "Pixel Width", 1, 40, 5)
         sliders.setupTrackBar3(ocvb, "Plot (time) Font Size x10", 1, 20, 10)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Plot an input variable over time"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -55,7 +55,7 @@ Public Class Plot_Histogram : Implements IDisposable
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Histogram Font Size x10", 1, 20, 10)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub

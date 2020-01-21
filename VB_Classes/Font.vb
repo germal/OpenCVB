@@ -31,7 +31,7 @@ End Class
 Public Class Font_TrueType : Implements IDisposable
     Dim font As New OptionsFont
     Public Sub New(ocvb As AlgorithmData)
-        font.Show()
+        If ocvb.parms.ShowOptions Then font.Show()
         ocvb.desc = "Display different TrueType fonts"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

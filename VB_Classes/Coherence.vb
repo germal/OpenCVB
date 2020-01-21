@@ -10,7 +10,7 @@ Public Class Coherence_Basics : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "Coherence Blend", 1, 10, 10)
         sliders.setupTrackBar3(ocvb, "Coherence str_sigma", 1, 15, 15)
         sliders.setupTrackBar4(ocvb, "Coherence eigen kernel", 1, 31, 1)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.label1 = "Coherence - draw rectangle to apply"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

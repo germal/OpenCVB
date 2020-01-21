@@ -7,7 +7,7 @@ Public Class Video_Basics : Implements IDisposable
     Dim currVideo As String
     Public image As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
-        videoOptions.Show()
+        If ocvb.parms.ShowOptions Then videoOptions.Show()
         If srcVideo = "" Then srcVideo = ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4" ' default video...
         currVideo = srcVideo
         videoOptions.NewVideo(ocvb, srcVideo)

@@ -8,7 +8,7 @@ Public Class DilateErode_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "DilateErode Kernel Size", 1, 32, 5)
         sliders.setupTrackBar2(ocvb, "Minus (Erode) to Plus (Dilate)", -32, 32, 1)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Dilate and Erode the RGB and Depth image."
 
         radio.Setup(ocvb, 3)
@@ -16,7 +16,7 @@ Public Class DilateErode_Basics : Implements IDisposable
         radio.check(1).Text = "Ellipse"
         radio.check(2).Text = "Rect"
         radio.check(0).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim iterations = sliders.TrackBar2.Value
@@ -91,10 +91,10 @@ Public Class DilateErode_OpenClose : Implements IDisposable
         radio.check(1).Text = "Ellipse"
         radio.check(2).Text = "Rect"
         radio.check(2).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         sliders.setupTrackBar1(ocvb, "Dilate Open/Close Iterations", -10, 10, 10)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

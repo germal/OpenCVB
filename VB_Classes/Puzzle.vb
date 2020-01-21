@@ -108,7 +108,7 @@ Public Class Puzzle_PieceCorrelation : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Restart Annealing"
-        check.show()
+        If ocvb.parms.ShowOptions Then check.Show()
 
         For i = 0 To puzzle.Count - 1
             puzzle(i) = New Puzzle_Basics(ocvb)

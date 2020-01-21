@@ -4,7 +4,7 @@ Public Class Blur_Gaussian : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -23,7 +23,7 @@ Public Class Blur_Gaussian_CS : Implements IDisposable
     Dim CS_BlurGaussian As New CS_BlurGaussian
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -41,7 +41,7 @@ Public Class Blur_Median_CS : Implements IDisposable
     Dim CS_BlurMedian As New CS_BlurMedian
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -58,7 +58,7 @@ Public Class Blur_Homogeneous : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Smooth each pixel with a kernel of 1's of different sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -78,7 +78,7 @@ Public Class Blur_Median : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -99,7 +99,7 @@ Public Class Blur_Bilateral : Implements IDisposable
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

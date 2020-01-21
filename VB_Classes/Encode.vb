@@ -4,7 +4,7 @@ Public Class Encode_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
         sliders.setupTrackBar2(ocvb, "Encode Output Scaling", 1, 100, 7)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Error Level Analysis - to verify a jpg image has not been modified."
         ocvb.label1 = "absDiff with original"
@@ -38,7 +38,7 @@ Public Class Encode_Options : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
         sliders.setupTrackBar2(ocvb, "Encode Output Scaling", 1, 100, 85)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         radio.Setup(ocvb, 6)
         radio.check(0).Text = "JpegChromaQuality"
@@ -48,7 +48,7 @@ Public Class Encode_Options : Implements IDisposable
         radio.check(4).Text = "JpegQuality"
         radio.check(5).Text = "WebPQuality"
         radio.check(4).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         ocvb.desc = "Encode options that affect quality."
         ocvb.label1 = "absDiff with original image"

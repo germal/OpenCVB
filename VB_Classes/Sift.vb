@@ -12,10 +12,10 @@ Public Class Sift_Basics_CS : Implements IDisposable
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         sliders.setupTrackBar1(ocvb, "Points to Match", 1, 1000, 200)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right infrared images."
     End Sub
@@ -52,10 +52,10 @@ Public Class Sift_Basics_CS_MT : Implements IDisposable
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         sliders.setupTrackBar1(ocvb, "Points to Match", 1, 1000, 100)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right infrared images."
     End Sub

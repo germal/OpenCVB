@@ -8,7 +8,7 @@ Public Class SVM_Options : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "SampleCount", 10, 1000, 500)
         sliders.setupTrackBar2(ocvb, "Granularity", 1, 50, 5)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         radio.Setup(ocvb, 4)
         radio.check(0).Text = "kernel Type = Linear"
@@ -16,7 +16,7 @@ Public Class SVM_Options : Implements IDisposable
         radio.check(2).Text = "kernel Type = RBF"
         radio.check(2).Checked = True
         radio.check(3).Text = "kernel Type = Sigmoid"
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         radio1.Setup(ocvb, 5)
         radio1.check(0).Text = "SVM Type = CSvc"
@@ -25,7 +25,7 @@ Public Class SVM_Options : Implements IDisposable
         radio1.check(2).Text = "SVM Type = NuSvc"
         radio1.check(3).Text = "SVM Type = NuSvr"
         radio1.check(4).Text = "SVM Type = OneClass"
-        radio1.Show()
+        If ocvb.parms.ShowOptions Then radio1.Show()
 
         ocvb.desc = "SVM has many options - enough to make a class for it."
     End Sub

@@ -17,7 +17,7 @@ Public Class CComp_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "CComp Threshold", 0, 255, 10)
         sliders.setupTrackBar2(ocvb, "CComp Min Area", 0, 10000, 500)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Draw bounding boxes around RGB binarized connected Components"
         ocvb.label1 = "CComp binary"
@@ -199,7 +199,7 @@ Public Class CComp_InRange_MT : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "InRange # of ranges", 2, 255, 15)
         sliders.setupTrackBar2(ocvb, "InRange Max Depth", 150, 10000, 3000)
         sliders.setupTrackBar3(ocvb, "InRange min Blob Size (in pixels)", 1, 2000, 500)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Connected components in specific ranges"
         ocvb.label2 = "Blob rectangles - largest to smallest"
@@ -257,7 +257,7 @@ Public Class CComp_InRange : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "InRange # of ranges", 1, 20, 15)
         sliders.setupTrackBar2(ocvb, "InRange min Blob Size (in pixels)", 1, 2000, 500)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Connect components in specific ranges"
         ocvb.label2 = "Blob rectangles - smallest to largest"

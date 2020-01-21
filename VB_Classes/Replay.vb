@@ -73,7 +73,7 @@ Public Class Replay_Record : Implements IDisposable
     Dim depthRGBBytes() As Byte
     Dim cloudBytes() As Byte
     Public Sub New(ocvb As AlgorithmData)
-        recording.Show()
+        If ocvb.parms.ShowOptions Then recording.Show()
         ocvb.desc = "Create a recording of camera data that contains color, depth, depthRGB, pointCloud, and IMU data in an .bob file."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -147,7 +147,7 @@ Public Class Replay_Play : Implements IDisposable
     Dim fs As FileStream
     Public Sub New(ocvb As AlgorithmData)
         playback.startButton.Text = "Start Playback"
-        playback.Show()
+        If ocvb.parms.ShowOptions Then playback.Show()
         playback.Button2_Click(New Object, New EventArgs) ' autoplay the recorded data (if it exists.)
 
         ocvb.desc = "Playback a file recorded by OpenCVB"

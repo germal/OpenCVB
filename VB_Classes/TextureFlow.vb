@@ -7,7 +7,7 @@ Public Class TextureFlow_Basics : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Texture Flow Delta", 2, 100, 12)
         sliders.setupTrackBar2(ocvb, "Texture Eigen BlockSize", 1, 100, 20)
         sliders.setupTrackBar3(ocvb, "Texture Eigen Ksize", 1, 15, 1)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub

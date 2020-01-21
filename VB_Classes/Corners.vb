@@ -7,7 +7,7 @@ Public Class Corners_Harris : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar2(ocvb, "Corner aperture size", 1, 21, 3)
         sliders.setupTrackBar3(ocvb, "Corner quality level", 1, 100, 50)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Find corners using Eigen values and vectors"
         ocvb.label2 = "Corner Eigen values"
     End Sub
@@ -67,7 +67,7 @@ Public Class Corners_SubPix : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         good = New Features_GoodFeatures(ocvb)
         sliders.setupTrackBar1(ocvb, "SubPix kernel Size", 1, 20, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Use PreCornerDetect to find features in the image."
         ocvb.label1 = "Output of GoodFeatures"
@@ -103,7 +103,7 @@ Public Class Corners_PreCornerDetect : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         median = New Math_Median_CDF(ocvb)
         sliders.setupTrackBar1(ocvb, "kernel Size", 1, 20, 19)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Use PreCornerDetect to find features in the image."
     End Sub
@@ -147,7 +147,7 @@ Public Class Corners_ShiTomasi_CPP : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar2(ocvb, "Corner aperture size", 1, 21, 3)
         sliders.setupTrackBar3(ocvb, "Corner quality level", 1, 100, 50)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Find corners using Eigen values and vectors"
         ocvb.label2 = "Corner Eigen values"
     End Sub

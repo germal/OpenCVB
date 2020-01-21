@@ -73,7 +73,7 @@ Public Class xPhoto_OilPaint_CPP : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "xPhoto Dynamic Ratio", 1, 127, 7)
         sliders.setupTrackBar2(ocvb, "xPhoto Block Size", 1, 100, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         radio.Setup(ocvb, 5)
         radio.check(0).Text = "BGR2GRAY"
@@ -82,7 +82,7 @@ Public Class xPhoto_OilPaint_CPP : Implements IDisposable
         radio.check(3).Text = "BGR2XYZ"
         radio.check(4).Text = "BGR2Lab"
         radio.check(0).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         Application.DoEvents() ' because the rest of initialization takes so long, let the show() above take effect.
         xPhoto_OilPaint = xPhoto_OilPaint_Open()

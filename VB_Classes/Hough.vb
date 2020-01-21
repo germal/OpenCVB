@@ -80,7 +80,7 @@ Public Class Hough_Lines : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar3(ocvb, "threshold", 1, 100, 50)
         sliders.setupTrackBar4(ocvb, "Lines to Plot", 1, 1000, 50)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Use Houghlines to find lines in the image."
     End Sub
 
@@ -124,7 +124,7 @@ Public Class Hough_Lines_MT : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar3(ocvb, "threshold", 1, 100, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         edges = New Edges_Canny(ocvb)
         edges.externalUse = True

@@ -21,7 +21,7 @@ Public Class Kalman_Basics : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "ProcessNoiseCov x10000", 1, 1000, 100)
         sliders.setupTrackBar2(ocvb, "MeasurementNoiseCov", 1, 100, 10)
         sliders.setupTrackBar3(ocvb, "ErrorCovPost x100", 1, 100, 10)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         plot = New Plot_OverTime(ocvb)
         plot.externalUse = True
@@ -98,7 +98,7 @@ Public Class Kalman_kDimension_Options : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "ProcessNoiseCov x10000", 1, 1000, 100)
         sliders.setupTrackBar2(ocvb, "MeasurementNoiseCov", 1, 100, 10)
         sliders.setupTrackBar3(ocvb, "ErrorCovPost x100", 1, 100, 10)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         radio.Setup(ocvb, 7)
         radio.check(0).Text = "1,0,1,0 transition matrix"
@@ -109,7 +109,7 @@ Public Class Kalman_kDimension_Options : Implements IDisposable
         radio.check(5).Text = "0,0,0,1 transition matrix"
         radio.check(6).Text = "0,1,1,0 transition matrix"
         radio.check(4).Checked = True
-        radio.Show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         ocvb.label1 = "Kalman_kDimension (no output by default)"
         ocvb.desc = "Use this kalman filter to predict the set of values."
@@ -375,7 +375,7 @@ Public Class Kalman_Point2f : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "ProcessNoiseCov x10000", 1, 1000, 100)
         sliders.setupTrackBar2(ocvb, "MeasurementNoiseCov", 1, 100, 10)
         sliders.setupTrackBar3(ocvb, "ErrorCovPost x100", 1, 100, 10)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label1 = "Kalman_Basics (no output by default)"
         ocvb.desc = "Use this kalman filter to predict the next value."

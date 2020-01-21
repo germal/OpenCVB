@@ -7,7 +7,7 @@ Public Class CartoonifyImage_Basics : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "Cartoon Median Blur kernel 2", 1, 21, 3)
         sliders.setupTrackBar3(ocvb, "Cartoon threshold", 1, 255, 80)
         sliders.setupTrackBar4(ocvb, "Cartoon Laplacian kernel", 1, 21, 5)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.label1 = "Mask for Cartoon"
         ocvb.label2 = "Cartoonify Result"
         ocvb.desc = "Create a cartoon from a color image - Painterly Effect"

@@ -13,7 +13,7 @@ Public Class Contours_Basics : Implements IDisposable
         radio1.check(3).Text = "List"
         radio1.check(4).Text = "Tree"
         radio1.check(4).Checked = True
-        radio1.Show()
+        If ocvb.parms.ShowOptions Then radio1.Show()
 
         radio2.Setup(ocvb, 4)
         radio2.Text = "ContourApproximation Mode"
@@ -22,7 +22,7 @@ Public Class Contours_Basics : Implements IDisposable
         radio2.check(2).Text = "ApproxTC89KCOS"
         radio2.check(3).Text = "ApproxTC89L1"
         radio2.check(1).Checked = True
-        radio2.Show()
+        If ocvb.parms.ShowOptions Then radio2.Show()
 
         rotatedRect = New Draw_rotatedRectangles(ocvb)
         rotatedRect.rect.sliders.TrackBar1.Value = 5

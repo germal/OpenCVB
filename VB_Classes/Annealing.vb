@@ -161,7 +161,7 @@ Public Class Annealing_CPP_MT : Implements IDisposable
 
         sliders.setupTrackBar1(ocvb, "Anneal Number of Cities", 5, 500, 25)
         sliders.setupTrackBar2(ocvb, "Success = top X threads agree on energy level.", 2, anneal.Count, anneal.Count)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         check.Setup(ocvb, 3)
         check.Box(0).Text = "Restart TravelingSalesman"
@@ -169,7 +169,7 @@ Public Class Annealing_CPP_MT : Implements IDisposable
         check.Box(1).Checked = True
         check.Box(2).Text = "Circular pattern of cities (allows you to visually check if successful.)"
         check.Box(2).Checked = True
-        check.Show()
+        If ocvb.parms.ShowOptions Then check.Show()
 
         flow = New Font_FlowText(ocvb)
         flow.externalUse = True
@@ -268,7 +268,7 @@ Public Class Annealing_Options : Implements IDisposable
         check.Box(0).Text = "Restart TravelingSalesman"
         check.Box(1).Text = "Circular pattern of cities (allows you to visually check if successful.)"
         check.Box(1).Checked = True
-        check.Show()
+        If ocvb.parms.ShowOptions Then check.Show()
 
         flow = New Font_FlowText(ocvb)
         flow.externalUse = True

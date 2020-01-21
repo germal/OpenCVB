@@ -22,9 +22,9 @@ Public Class MatchTemplate_Correlation : Implements IDisposable
         radio.check(4).Text = "SqDiff"
         radio.check(5).Text = "SqDiffNormed"
         radio.check(1).Checked = True
-        radio.Show()
+        If ocvb.parms.ShowOptions Then radio.Show()
         sliders.setupTrackBar1(ocvb, "Sample Size", 2, 10000, 100)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.label2 = "Log of correlation results"
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub

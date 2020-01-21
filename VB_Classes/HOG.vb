@@ -8,7 +8,7 @@ Public Class HOG_Basics : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Threshold", 0, 100, 0)
         sliders.setupTrackBar2(ocvb, "Stride", 1, 100, 1)
         sliders.setupTrackBar3(ocvb, "Scale", 0, 2000, 300)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Find people with Histogram of Gradients (HOG) 2D feature"
         staticImage = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
         ocvb.result2 = staticImage.Resize(ocvb.result2.Size)

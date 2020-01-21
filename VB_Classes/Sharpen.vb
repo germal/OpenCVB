@@ -5,7 +5,7 @@ Public Class Sharpen_UnsharpMask : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "sigma", 1, 2000, 100)
         sliders.setupTrackBar2(ocvb, "threshold", 0, 255, 5)
         sliders.setupTrackBar3(ocvb, "Shift Amount", 0, 5000, 1000)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Sharpen an image"
         ocvb.label2 = "Unsharp mask (difference from Blur)"
     End Sub
@@ -35,7 +35,7 @@ Public Class Sharpen_DetailEnhance : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "DetailEnhance Sigma_s", 0, 200, 60)
         sliders.setupTrackBar2(ocvb, "DetailEnhance Sigma_r", 1, 100, 7)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Enhance detail on an image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -57,7 +57,7 @@ Public Class Sharpen_Stylize : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Stylize Sigma_s", 0, 200, 60)
         sliders.setupTrackBar2(ocvb, "Stylize Sigma_r", 1, 100, 7)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Stylize an image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

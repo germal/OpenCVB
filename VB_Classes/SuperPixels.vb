@@ -29,7 +29,7 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Number of SuperPixels", 1, 1000, 400)
         sliders.setupTrackBar2(ocvb, "Iterations", 1, 10, 4)
         sliders.setupTrackBar3(ocvb, "Prior", 1, 10, 2)
-        If ocvb.parms.testAllRunning = False Then sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label2 = "Mask of SuperPixels"
         ocvb.desc = "Sub-divide the image into super pixels."
@@ -117,7 +117,7 @@ Public Class SuperPixel_Basics_MT : Implements IDisposable
         grid.sliders.Hide()
 
         sliders.setupTrackBar1(ocvb, "Number of SuperPixels", 1, 1000, 100)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.parms.testAllRunning = True ' turn off sliders in superpixels_basics_cpp
         ocvb.desc = "Use multi-threading to get superpixels"

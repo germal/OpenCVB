@@ -9,7 +9,7 @@ Public Class Tracker_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Stop tracking selected object"
-        check.Show()
+        If ocvb.parms.ShowOptions Then check.Show()
         ocvb.desc = "Track an object using cv.Tracking API"
         ocvb.putText(New ActiveClass.TrueType("Draw a rectangle around object to be tracked in color image above left.", 10, 140, RESULT2))
     End Sub
@@ -121,7 +121,7 @@ Public Class Tracker_Methods : Implements IDisposable
         radio.check(6).Text = "TrackerMOSSE"
         radio.check(7).Text = "TrackerTLD"
         radio.check(5).Checked = True ' TrackerMIL is the default
-        radio.Show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         ocvb.putText(New ActiveClass.TrueType("Select a method then", 10, 110, RESULT2))
         ocvb.desc = "Experiment with the different types of tracking methods - apparently not much difference..."

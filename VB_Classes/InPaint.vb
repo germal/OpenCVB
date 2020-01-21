@@ -7,13 +7,13 @@ Public Class InPaint_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Thickness", 1, 25, 2)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         radio.Setup(ocvb, 2)
         radio.check(0).Text = "TELEA"
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         ocvb.desc = "Create a flaw in an image and then use inPaint to mask it."
         ocvb.label2 = "Repaired Image"
@@ -50,7 +50,7 @@ Public Class InPaint_Noise : Implements IDisposable
         radio.check(0).Text = "TELEA"
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         ocvb.desc = "Create noise in an image and then use inPaint to remove it."
         ocvb.label2 = "Repaired Image"

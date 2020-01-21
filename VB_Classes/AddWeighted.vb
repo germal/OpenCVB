@@ -1,10 +1,9 @@
 ﻿Imports cv = OpenCvSharp
-
 Public Class AddWeighted_DepthRGB : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Weight", 0, 100, 50)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Add depth and rgb with specified weights."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

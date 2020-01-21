@@ -73,13 +73,13 @@ Public Class Blob_Detector_CS : Implements IDisposable
         check.Box(2).Text = "FilterByConvexity"
         check.Box(3).Text = "FilterByInertia"
         check.Box(4).Text = "FilterByColor"
-        check.Show()
+        If ocvb.parms.ShowOptions Then check.Show()
         check.Box(4).Checked = True ' filter by color...
 
         sliders.setupTrackBar1(ocvb, "min Threshold", 0, 255, 100)
         sliders.setupTrackBar2(ocvb, "max Threshold", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, "Threshold Step", 1, 50, 5)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label1 = "Blob_Detector_CS Input"
     End Sub

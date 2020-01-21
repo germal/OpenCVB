@@ -7,7 +7,7 @@ Public Class MotionBlur_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Motion Blur Length", 1, 101, 51)
         sliders.setupTrackBar2(ocvb, "Motion Blur Angle", -90, 90, 0)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Use Filter2D to create a motion blur"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -127,7 +127,7 @@ Public Class MotionBlur_Deblur : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Redo motion blurred image"
-        check.show()
+        If ocvb.parms.ShowOptions Then check.Show()
 
         mblur = New MotionBlur_Basics(ocvb)
         ResetBlurredImage(ocvb)
@@ -136,7 +136,7 @@ Public Class MotionBlur_Deblur : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "Deblur Angle of Restore Vector", mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum, 0)
         sliders.setupTrackBar3(ocvb, "Deblur Signal to Noise Ratio", 1, 1000, 700)
         sliders.setupTrackBar4(ocvb, "Deblur Gamma", 1, 100, 5)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Deblur a motion blurred image"
         ocvb.label1 = "Blurred Image Input"

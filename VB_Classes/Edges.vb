@@ -11,7 +11,7 @@ Public Class Edges_Canny : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Canny threshold1", 1, 255, 50)
         sliders.setupTrackBar2(ocvb, "Canny threshold2", 1, 255, 50)
         sliders.setupTrackBar3(ocvb, "Canny Aperture", 3, 7, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Show canny edge detection with varying thresholds"
         ocvb.label1 = "Canny using L1 Norm"
@@ -93,7 +93,7 @@ Public Class Edges_Laplacian : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Gaussian Kernel", 1, 32, 7)
         sliders.setupTrackBar2(ocvb, "Laplacian Kernel", 1, 32, 5)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -153,11 +153,11 @@ Public Class Edges_Preserving : Implements IDisposable
         radio.check(0).Text = "Edge RecurseFilter"
         radio.check(1).Text = "Edge NormconvFilter"
         radio.check(0).Checked = True
-        radio.show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         sliders.setupTrackBar1(ocvb, "Edge Sigma_s", 0, 200, 10)
         sliders.setupTrackBar2(ocvb, "Edge Sigma_r", 1, 100, 40)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "OpenCV's edge preserving filter."
     End Sub
@@ -204,7 +204,7 @@ Public Class Edges_RandomForest_CPP : Implements IDisposable
     Dim EdgesPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Edges RF Threshold", 1, 255, 35)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Detect edges using structured forests - Opencv Contrib"
         ocvb.label1 = "Detected Edges"
@@ -255,7 +255,7 @@ Public Class Edges_Sobel : Implements IDisposable
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Sobel kernel Size", 1, 32, 3)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -320,7 +320,7 @@ Public Class Edges_ResizeAdd : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Border Vertical in Pixels", 1, 20, 5)
         sliders.setupTrackBar2(ocvb, "Border Horizontal in Pixels", 1, 20, 5)
         sliders.setupTrackBar3(ocvb, "Threshold for Pixel Difference", 1, 50, 16)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Find edges using a resize, subtract, and threshold."
         ocvb.label1 = ""
@@ -347,7 +347,7 @@ Public Class Edges_DCTfrequency : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 32)
         sliders.setupTrackBar2(ocvb, "Threshold after Removal", 1, 255, 20)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Find edges by removing all the highest frequencies."
     End Sub
@@ -385,7 +385,7 @@ Public Class Edges_InfraredDots : Implements IDisposable
         sobel.sliders.TrackBar1.Value = 5
 
         sliders.setupTrackBar1(ocvb, "Threshold for sobel edges", 1, 255, 30)
-        sliders.show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Find all the dots in the image - indicating they are within the desired range of the camera."
     End Sub
@@ -428,7 +428,7 @@ Public Class Edges_Deriche_CPP : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Deriche Alpha", 1, 400, 100)
         sliders.setupTrackBar2(ocvb, "Deriche Omega", 1, 1000, 100)
-        sliders.Show()
+        If ocvb.parms.ShowOptions Then sliders.Show()
         Edges_Deriche = Edges_Deriche_Open()
         ocvb.desc = "Edge detection using the Deriche X and Y gradients"
     End Sub
