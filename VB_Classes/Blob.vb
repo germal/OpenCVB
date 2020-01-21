@@ -156,29 +156,20 @@ End Class
 
 
 
-Public Class Blob_LargestInDepth : Implements IDisposable
+Public Class Blob_LargestDepthCluster : Implements IDisposable
     Dim blobs As Blob_DepthClusters
     Public Sub New(ocvb As AlgorithmData)
         blobs = New Blob_DepthClusters(ocvb)
 
-        ocvb.desc = "Display only the largest blob."
+        ocvb.desc = "Display only the largest depth cluster (might not be contiguous.)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blobs.Run(ocvb)
-        Dim blobList = blobs.histBlobs.valleys.sortedBoundaries
+        Dim blobList = blobs.histBlobs.valleys.rangeBoundaries
 
-        Dim maxSize As Int32
-        Dim maxIndex As Int32
-        Dim sizes = blobs.histBlobs.valleys.sortedSizes
-        For i = 0 To sizes.Count - 1
-            If maxSize < sizes(i) Then
-                maxSize = sizes(i)
-                maxIndex = i
-            End If
-        Next
-
+        Dim maxSize = blobs.histBlobs.valleys.sortedSizes.ElementAt(0)
         ocvb.result1.SetTo(0)
-        Dim startEndDepth = blobs.histBlobs.valleys.sortedBoundaries.ElementAt(maxIndex)
+        Dim startEndDepth = blobs.histBlobs.valleys.rangeBoundaries.ElementAt(0)
         Dim tmp16 As New cv.Mat, mask As New cv.Mat
         cv.Cv2.InRange(ocvb.depth, startEndDepth.X, startEndDepth.Y, tmp16)
         cv.Cv2.ConvertScaleAbs(tmp16, mask)
@@ -197,6 +188,7 @@ End Class
 Public Class Blob_DepthClusters : Implements IDisposable
     Public histBlobs As Histogram_DepthClusters
     Public flood As FloodFill_RelativeRange
+    Public externalUse As Boolean
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData)
         shadow = New Depth_Holes(ocvb)
@@ -213,14 +205,11 @@ Public Class Blob_DepthClusters : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
-
         histBlobs.Run(ocvb)
-
         flood.fBasics.srcGray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim clusters = ocvb.result2.Clone()
         flood.fBasics.initialMask = shadow.holeMask
         flood.Run(ocvb)
-        ocvb.label1 = CStr(histBlobs.valleys.sortedBoundaries.Count) + " Depth Clusters"
+        ocvb.label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         histBlobs.Dispose()
@@ -228,3 +217,48 @@ Public Class Blob_DepthClusters : Implements IDisposable
         shadow.Dispose()
     End Sub
 End Class
+
+
+
+
+
+
+'Public Class Blob_Dimensions : Implements IDisposable
+'    Public flood As FloodFill_RelativeRange
+'    Dim blobs As Blob_DepthClusters
+'    Public Sub New(ocvb As AlgorithmData)
+'        blobs = New Blob_DepthClusters(ocvb)
+'        blobs.externalUse = True
+
+'        ocvb.desc = "Get the blobs and measure their size."
+'    End Sub
+'    Public Sub Run(ocvb As AlgorithmData)
+'        Dim blobList = blobs.histBlobs.valleys.rangeBoundaries
+'        blobs.Run(ocvb)
+'    End Sub
+'    Public Sub Dispose() Implements IDisposable.Dispose
+'        blobs.Dispose()
+'        flood.Dispose()
+'    End Sub
+'End Class
+
+
+
+Public Class Blob_LargestBlob : Implements IDisposable
+    Dim blobs As Blob_DepthClusters
+    Public Sub New(ocvb As AlgorithmData)
+        blobs = New Blob_DepthClusters(ocvb)
+        ocvb.desc = "Isolate just the largest blob"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        blobs.Run(ocvb)
+        Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(0).Value ' this is the largest contiguous blob
+        ocvb.color.CopyTo(ocvb.result1, blobs.flood.fBasics.masks(maskIndex))
+        Dim rect = blobs.flood.fBasics.maskRects(maskIndex)
+        ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        blobs.Dispose()
+    End Sub
+End Class
+

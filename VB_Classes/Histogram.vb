@@ -591,7 +591,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
     Dim mykf As Kalman_kDimension_Options
     Dim hist As Histogram_Depth
     Dim check As New OptionsCheckbox
-    Public sortedBoundaries As New List(Of cv.Point)
+    Public rangeBoundaries As New List(Of cv.Point)
     Public sortedSizes As New List(Of Int32)
     Private Class CompareCounts : Implements IComparer(Of Single)
         Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
@@ -664,18 +664,18 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         startEndDepth = New cv.Point(startDepth, hist.inrange.sliders.TrackBar2.Value)
         depthBoundaries.Add(pointCount, startEndDepth) ' capped at the max depth we are observing
 
-        sortedBoundaries.Clear()
+        rangeBoundaries.Clear()
         sortedSizes.Clear()
         For i = depthBoundaries.Count - 1 To 0 Step -1
-            sortedBoundaries.Add(depthBoundaries.ElementAt(i).Value)
+            rangeBoundaries.Add(depthBoundaries.ElementAt(i).Value)
             sortedSizes.Add(depthBoundaries.ElementAt(i).Key)
         Next
 
         Dim plotColors(hist.plotHist.hist.Rows - 1) As cv.Scalar
         For i = 0 To hist.plotHist.hist.Rows - 1
             Dim depth = i * depthIncr + 1
-            For j = 0 To sortedBoundaries.Count - 1
-                Dim startEnd = sortedBoundaries.ElementAt(j)
+            For j = 0 To rangeBoundaries.Count - 1
+                Dim startEnd = rangeBoundaries.ElementAt(j)
                 If depth >= startEnd.X And depth < startEnd.Y Then
                     plotColors(i) = ocvb.colorScalar(j Mod 255)
                     Exit For
@@ -698,7 +698,6 @@ Public Class Histogram_DepthClusters : Implements IDisposable
     Public valleys As Histogram_DepthValleys
     Public Sub New(ocvb As AlgorithmData)
         valleys = New Histogram_DepthValleys(ocvb)
-
         ocvb.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -707,14 +706,14 @@ Public Class Histogram_DepthClusters : Implements IDisposable
         ocvb.result2.SetTo(0)
         Dim mask As New cv.Mat
         Dim tmp16 As New cv.Mat
-        For i = 0 To valleys.sortedBoundaries.Count - 1
-            Dim startEndDepth = valleys.sortedBoundaries.ElementAt(i)
+        For i = 0 To valleys.rangeBoundaries.Count - 1
+            Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
             cv.Cv2.InRange(ocvb.depth, startEndDepth.X, startEndDepth.Y, tmp16)
             cv.Cv2.ConvertScaleAbs(tmp16, mask)
             ocvb.result2.SetTo(ocvb.colorScalar(i), mask)
         Next
-        ocvb.label1 = "Histogram of " + CStr(valleys.sortedBoundaries.Count) + " Depth Clusters"
-        ocvb.label2 = "Backprojection of " + CStr(valleys.sortedBoundaries.Count) + " histogram clusters"
+        ocvb.label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
+        ocvb.label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         valleys.Dispose()

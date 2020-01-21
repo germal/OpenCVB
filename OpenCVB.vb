@@ -864,6 +864,7 @@ Public Class OpenCVB
                     End SyncLock
                 End If
                 If OptionsBringToFront And TestAllTimer.Enabled = False Then
+                    OptionsBringToFront = False
                     Try
                         For Each frm In Application.OpenForms
                             If frm.name.startswith("Option") Then frm.topmost = True
@@ -874,14 +875,25 @@ Public Class OpenCVB
                     Catch ex As Exception ' ignoring exceptions here.  It is a transition to another class and form was activated...
                         Console.WriteLine("Error in OptionsBringToFront: " + ex.Message)
                     End Try
-                    OptionsBringToFront = False
                 End If
                 If Me.IsDisposed Then Exit While
             Catch ex As Exception
+                Console.WriteLine("Error in AlgorithmTask: " + ex.Message)
                 Exit While
             End Try
             frameCount += 1
         End While
+
+        ' remove all options forms.  They can only be made topmost (see OptionsBringToFront above) when created on the same thread.
+        ' This deletes the options forms for the current thread so they will be created again with the next thread.
+        Dim frmlist As New List(Of Form)
+        For Each frm In Application.OpenForms
+            If frm.name.startswith("Option") Then frmlist.Add(frm)
+        Next
+        For Each frm In frmlist
+            frm.Close()
+        Next
+
         OpenCVB.Dispose()
         frameCount = 0
         If parms.testAllRunning Then
