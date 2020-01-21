@@ -225,7 +225,7 @@ Public Class FloodFill_Basics : Implements IDisposable
     Public maskSizes As New SortedList(Of Int32, Int32)(New CompareMaskSize)
     Public maskRects As New List(Of cv.Rect)
 
-    Public initialMask As New cv.Mat
+    Public initialMask As cv.Mat
     Public thumbNails As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Class CompareMaskSize : Implements IComparer(Of Int32)
@@ -255,6 +255,7 @@ Public Class FloodFill_Basics : Implements IDisposable
         Dim stepSize = sliders.TrackBar4.Value
 
         If externalUse = False Then
+            sliders.TrackBar1.Value = 250 ' shows all the isolated regions in the grayscale image.
             srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             initialMask = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8U, 0)
         End If
@@ -270,7 +271,7 @@ Public Class FloodFill_Basics : Implements IDisposable
 
         maskPlus.SetTo(0)
         maskPlus(maskRect).SetTo(255, initialMask)
-        Dim lastMask = initialMask.Clone()
+        Dim othersMask = initialMask.Clone()
 
         thumbNails = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
         Dim allSize = New cv.Size(thumbNails.Width / 4, thumbNails.Height / 4) ' show the first 16 masks
@@ -283,16 +284,14 @@ Public Class FloodFill_Basics : Implements IDisposable
                     If masks.Count = 0 Then
                         masks.Add(maskPlus(maskRect).Clone())
                     Else
-                        masks.Add(maskPlus(maskRect).Clone() - lastMask) ' difference from all previous masks is what we want here.
+                        masks.Add(maskPlus(maskRect).Clone() - othersMask) ' difference from all previous masks is what we want here.
                     End If
                     masks(masks.Count - 1).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
                     maskSizes.Add(masks(masks.Count - 1).CountNonZero(), masks.Count - 1)
                     maskRects.Add(rect)
-                    lastMask = maskPlus(maskRect).Clone()
-                Else
-                    ' or in the unwanted object into the last mask.
-                    cv.Cv2.BitwiseOr(lastMask, maskPlus(maskRect), lastMask)
                 End If
+                ' or in the any unwanted object or previously identified object into the last mask.
+                cv.Cv2.BitwiseOr(othersMask, maskPlus(maskRect), othersMask)
             Next
         Next
 
