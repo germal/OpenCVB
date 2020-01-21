@@ -890,9 +890,12 @@ Public Class OpenCVB
         For Each frm In Application.OpenForms
             If frm.name.startswith("Option") Then frmlist.Add(frm)
         Next
-        For Each frm In frmlist
-            frm.Close()
-        Next
+        Try
+            For Each frm In frmlist
+                frm.Close()
+            Next
+        Catch ex As Exception
+        End Try
 
         OpenCVB.Dispose()
         frameCount = 0
