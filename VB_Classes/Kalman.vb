@@ -419,9 +419,9 @@ End Class
 
 
 Public Class Kalman_Image : Implements IDisposable
-    Dim kRect As Kalman_Rectangle
+    Dim kRect As Kalman_Mat
     Public Sub New(ocvb As AlgorithmData)
-        kRect = New Kalman_Rectangle(ocvb)
+        kRect = New Kalman_Mat(ocvb)
         kRect.externalUse = True
         ocvb.desc = "Use Kalman filter on a portion of the color image."
     End Sub
@@ -438,9 +438,9 @@ End Class
 
 
 Public Class Kalman_Depth : Implements IDisposable
-    Dim kRect As Kalman_Rectangle
+    Dim kRect As Kalman_Mat
     Public Sub New(ocvb As AlgorithmData)
-        kRect = New Kalman_Rectangle(ocvb)
+        kRect = New Kalman_Mat(ocvb)
         kRect.externalUse = True
         ocvb.desc = "Use Kalman filter on a portion of the depth image."
     End Sub
@@ -456,7 +456,7 @@ End Class
 
 
 
-Public Class Kalman_Rectangle : Implements IDisposable
+Public Class Kalman_Mat : Implements IDisposable
     Dim kalman() As Kalman_kDimension
     Public src As cv.Mat
     Public externalUse As Boolean
@@ -496,6 +496,66 @@ Public Class Kalman_Rectangle : Implements IDisposable
         Next
     End Sub
 End Class
+
+
+
+
+Public Class Kalman_GeneralPurpose : Implements IDisposable
+    Dim kalman As Kalman_kDimension
+    Public src() As Single
+    Public dst() As Single
+    Public externalUse As Boolean
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.label1 = "Move the rectangle smoothly from one location to another"
+        ocvb.desc = "Use Kalman to stabilize a set of value (such as a cv.rect.)"
+    End Sub
+    Private Sub setValues(ocvb As AlgorithmData)
+        Static autoRand As New Random()
+        ReDim src(3)
+
+        src(0) = autoRand.Next(50, ocvb.color.Width - 50)
+        src(1) = autoRand.Next(50, ocvb.color.Height - 50)
+        src(2) = autoRand.Next(5, ocvb.color.Width - src(0))
+        src(3) = autoRand.Next(5, ocvb.color.Height - src(1))
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If externalUse = False And src Is Nothing Then setValues(ocvb)
+        Static saveDimension As Int32 = -1
+        If saveDimension <> src.Length Then
+            saveDimension = src.Length
+            kalman = New Kalman_kDimension(ocvb)
+            kalman.kDimension = src.Length
+        End If
+
+        If kalman.inputReal.Rows = 0 Then kalman.Run(ocvb) ' initialize
+        For i = 0 To src.Length - 1
+            kalman.inputReal.Set(Of Single)(i, 0, src(i))
+        Next
+        kalman.Run(ocvb)
+
+        If dst Is Nothing Then ReDim dst(src.Count - 1)
+        For i = 0 To src.Length - 1
+            dst(i) = kalman.statePoint.At(Of Single)(i, 0)
+        Next
+
+        If externalUse = False Then
+            ocvb.result1 = ocvb.color
+            Static rect As New cv.Rect(CInt(dst(0)), CInt(dst(1)), CInt(dst(2)), CInt(dst(3)))
+            If rect.X = CInt(dst(0)) And rect.Y = CInt(dst(1)) And rect.Width = CInt(dst(2)) And rect.Height = CInt(dst(3)) Then
+                setValues(ocvb)
+            Else
+                rect = New cv.Rect(CInt(dst(0)), CInt(dst(1)), CInt(dst(2)), CInt(dst(3)))
+            End If
+            ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
+        End If
+        ocvb.label1 = "Rectangle moves smoothly from random locations"
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        kalman.Dispose()
+    End Sub
+End Class
+
+
 
 
 Public Class Kalman_Single : Implements IDisposable

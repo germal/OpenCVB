@@ -264,6 +264,7 @@ Public Class Blob_Basics : Implements IDisposable
     Public rects As List(Of cv.Rect)
     Public masks As List(Of cv.Mat)
     Public externalUse As Boolean
+    Public kalman() As Kalman_GeneralPurpose
     Public Sub New(ocvb As AlgorithmData)
         blobs = New Blob_DepthClusters(ocvb)
         ocvb.desc = "Gather all the blob data and display the largest."
@@ -272,6 +273,16 @@ Public Class Blob_Basics : Implements IDisposable
         blobs.Run(ocvb)
         rects = blobs.flood.fBasics.maskRects
         masks = blobs.flood.fBasics.masks
+
+        Dim saveRectCount As Int32 = -1
+        If saveRectCount <> rects.Count Then
+            saveRectCount = rects.Count
+            ReDim kalman(saveRectCount - 1)
+            For i = 0 To saveRectCount - 1
+                kalman(i) = New Kalman_GeneralPurpose(ocvb)
+                kalman(i).externalUse = True
+            Next
+        End If
 
         If externalUse = False Then
             Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(0).Value ' this is the largest contiguous blob
@@ -283,6 +294,9 @@ Public Class Blob_Basics : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         blobs.Dispose()
+        For i = 0 To kalman.Count - 1
+            kalman(i).Dispose()
+        Next
     End Sub
 End Class
 
