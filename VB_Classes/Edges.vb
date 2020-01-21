@@ -215,7 +215,7 @@ Public Class Edges_RandomForest_CPP : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.testAllRunning Then
             ocvb.putText(New ActiveClass.TrueType("When 'Test All' is running, the database load can take longer than the test time", 10, 100, RESULT2))
-            ocvb.putText(New ActiveClass.TrueType("This is the only test that is not run during a 'Test All' run.", 10, 140, RESULT2))
+            ocvb.putText(New ActiveClass.TrueType("This test is not run during a 'Test All' run but runs fine otherwise.", 10, 140, RESULT2))
             Exit Sub
         End If
         If ocvb.frameCount < 10 Then

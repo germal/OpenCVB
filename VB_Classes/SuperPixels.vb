@@ -119,7 +119,7 @@ Public Class SuperPixel_Basics_MT : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Number of SuperPixels", 1, 1000, 100)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        ocvb.parms.testAllRunning = True ' turn off sliders in superpixels_basics_cpp
+        ocvb.parms.ShowOptions = True ' turn off sliders in superpixels_basics_cpp
         ocvb.desc = "Use multi-threading to get superpixels"
         ocvb.label1 = "Not Working!  C++ code not reentrant?"
         ocvb.label2 = "Note symmetry in the 4 quadrants.  Not working."
