@@ -147,7 +147,7 @@ Public Class Replay_Play : Implements IDisposable
     Dim fs As FileStream
     Public Sub New(ocvb As AlgorithmData)
         playback.startButton.Text = "Start Playback"
-        playback.Show()
+        playback.Show() ' showing this options form is not optional (ha!)  The fileinfo is needed in Run so always initialize it.
         playback.Button2_Click(New Object, New EventArgs) ' autoplay the recorded data (if it exists.)
 
         ocvb.desc = "Playback a file recorded by OpenCVB"

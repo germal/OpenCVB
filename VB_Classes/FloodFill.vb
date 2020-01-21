@@ -270,32 +270,27 @@ Public Class FloodFill_Basics : Implements IDisposable
         maskRects.Clear()
 
         maskPlus.SetTo(0)
-        maskPlus(maskRect).SetTo(255, initialMask)
         Dim othersMask = initialMask.Clone()
 
         thumbNails = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
         Dim allSize = New cv.Size(thumbNails.Width / 4, thumbNails.Height / 4) ' show the first 16 masks
-        Dim allRect = New cv.Rect(0, 0, allSize.Width, allSize.Height)
 
         For y = 0 To srcGray.Height - 1 Step stepSize
             For x = 0 To srcGray.Width - 1 Step stepSize
                 Dim count = cv.Cv2.FloodFill(srcGray, maskPlus, New cv.Point(x, y), cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
                 If count > minFloodSize Then
-                    If masks.Count = 0 Then
-                        masks.Add(maskPlus(maskRect).Clone())
-                    Else
-                        masks.Add(maskPlus(maskRect).Clone() - othersMask) ' difference from all previous masks is what we want here.
-                    End If
+                    masks.Add(maskPlus(maskRect).Clone().SetTo(0, othersMask))
                     masks(masks.Count - 1).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
                     maskSizes.Add(masks(masks.Count - 1).CountNonZero(), masks.Count - 1)
                     maskRects.Add(rect)
                 End If
-                ' or in the any unwanted object or previously identified object into the last mask.
+                ' Mask off any object that is too small or previously identified
                 cv.Cv2.BitwiseOr(othersMask, maskPlus(maskRect), othersMask)
             Next
         Next
 
         Dim thumbCount As Int32
+        Dim allRect = New cv.Rect(0, 0, allSize.Width, allSize.Height)
         For i = 0 To masks.Count - 1
             Dim maskIndex = maskSizes.ElementAt(i).Value
             Dim nextColor = ocvb.colorScalar(i Mod 255)

@@ -551,7 +551,7 @@ Public Class Kalman_GeneralPurpose : Implements IDisposable
         ocvb.label1 = "Rectangle moves smoothly from random locations"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        kalman.Dispose()
+        If kalman IsNot Nothing Then kalman.Dispose()
     End Sub
 End Class
 
