@@ -402,7 +402,7 @@ the time means that the OpenCVB startup will take longer – approximately 5
 seconds vs. 3 seconds on a higher-end system. The default is to leave the
 “Enable Native Code Debugging” property off so OpenCVB will load faster. Of
 course, if there is a problem in the C++ code that is best handled with a debug
-session, turn the “Enable Native Code Debugging” property on in the OpenCVB
+session, turn on the “Enable Native Code Debugging” property in the OpenCVB
 VB.Net application.
 
 **Record and Playback**

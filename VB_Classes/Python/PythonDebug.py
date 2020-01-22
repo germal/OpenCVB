@@ -1,149 +1,66 @@
-from OpenGL.GL import *
-from OpenGL.GLU import *
-import pygame
-from pygame.locals import *
-from SharedMemory import SharedMemory as blackboard
-#import serial
+import numpy as np
+import cv2 as cv
+import common
+import sys
+title_window = "SuperPixel_PS.py"
 
-#ser = serial.Serial('/dev/tty.usbserial', 38400, timeout=1)
+def OpenCVCode(imgRGB, depth_colormap):
+    global seeds, display_mode, num_superpixels, prior, num_levels, num_histogram_bins, frameCount, color_img
+    converted_img = cv.cvtColor(imgRGB, cv.COLOR_BGR2HSV)
+    height,width,channels = converted_img.shape
+    num_SuperPixel_new = cv.getTrackbarPos('Number of Superpixels', title_window)
+    num_iterations = cv.getTrackbarPos('Iterations', title_window)
 
-ax = ay = az = 0.0
-yaw_mode = True
+    if frameCount == 0:
+        color_img = np.zeros((height,width,3), np.uint8)
+        color_img[:] = (0, 0, 255)
 
-bkb = blackboard() #Init class BlackBoard
+    if not seeds or num_SuperPixel_new != num_superpixels:
+        num_superpixels = num_SuperPixel_new
+        seeds = cv.ximgproc.createSuperpixelSEEDS(width, height, channels,
+                num_superpixels, num_levels, prior, num_histogram_bins)
 
-def resize(width, height):
-    if height==0:
-        height=1
-    glViewport(0, 0, width, height)
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluPerspective(45, 1.0*width/height, 0.1, 100.0)
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
+    seeds.iterate(converted_img, num_iterations)
 
-def init():
-    glShadeModel(GL_SMOOTH)
-    glClearColor(0.0, 0.0, 0.0, 0.0)
-    glClearDepth(1.0)
-    glEnable(GL_DEPTH_TEST)
-    glDepthFunc(GL_LEQUAL)
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
+    # retrieve the segmentation result
+    labels = seeds.getLabels()
 
-def drawText(position, textString):     
-    font = pygame.font.SysFont ("Courier", 18, True)
-    textSurface = font.render(textString, True, (255,255,255,255), (0,0,0,255))     
-    textData = pygame.image.tostring(textSurface, "RGBA", True)     
-    glRasterPos3d(*position)     
-    glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
+    # labels output: use the last x bits to determine the color
+    num_label_bits = 2
+    labels &= (1<<num_label_bits)-1
+    labels *= 1<<(16-num_label_bits)
 
-def draw():
-    global rquad
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
-    
-    glLoadIdentity()
-    glTranslatef(0,0.0,-7.0)
+    mask = seeds.getLabelContourMask(False)
 
-    osd_text = "pitch: " + str("{0:.2f}".format(ay)) + ", roll: " + str("{0:.2f}".format(ax))
+    # stitch foreground & background together
+    mask_inv = cv.bitwise_not(mask)
+    result_bg = cv.bitwise_and(imgRGB, imgRGB, mask=mask_inv)
+    result_fg = cv.bitwise_and(color_img, color_img, mask=mask)
+    result = cv.add(result_bg, result_fg)
 
-    if yaw_mode:
-        osd_line = osd_text + ", yaw: " + str("{0:.2f}".format(az))
+    if display_mode == 0:
+        cv.imshow(title_window, result)
+    elif display_mode == 1:
+        cv.imshow(title_window, mask)
     else:
-        osd_line = osd_text
+        cv.imshow(title_window, labels)
 
-    drawText((-2,-2, 2), osd_line)
+    ch = cv.waitKey(1)
+    if ch & 0xff == ord(' '):
+        display_mode = (display_mode + 1) % 3
+    frameCount += 1
 
-    # the way I'm holding the IMU board, X and Y axis are switched 
-    # with respect to the OpenGL coordinate system
-    if yaw_mode:                             # experimental
-        glRotatef(az, 0.0, 1.0, 0.0)  # Yaw,   rotate around y-axis
-    else:
-        glRotatef(0.0, 0.0, 1.0, 0.0)
-    glRotatef(ay ,1.0,0.0,0.0)        # Pitch, rotate around x-axis
-    glRotatef(-1*ax ,0.0,0.0,1.0)     # Roll,  rotate around z-axis
+if __name__ == '__main__':
+    cv.namedWindow(title_window)
+    cv.createTrackbar('Number of Superpixels', title_window, 400, 1000, common.nothing)
+    cv.createTrackbar('Iterations', title_window, 4, 12, common.nothing)
 
-    glBegin(GL_QUADS)	
-    glColor3f(0.0,1.0,0.0)
-    glVertex3f( 1.0, 0.2,-1.0)
-    glVertex3f(-1.0, 0.2,-1.0)		
-    glVertex3f(-1.0, 0.2, 1.0)		
-    glVertex3f( 1.0, 0.2, 1.0)		
-
-    glColor3f(1.0,0.5,0.0)	
-    glVertex3f( 1.0,-0.2, 1.0)
-    glVertex3f(-1.0,-0.2, 1.0)		
-    glVertex3f(-1.0,-0.2,-1.0)		
-    glVertex3f( 1.0,-0.2,-1.0)		
-
-    glColor3f(1.0,0.0,0.0)		
-    glVertex3f( 1.0, 0.2, 1.0)
-    glVertex3f(-1.0, 0.2, 1.0)		
-    glVertex3f(-1.0,-0.2, 1.0)		
-    glVertex3f( 1.0,-0.2, 1.0)		
-
-    glColor3f(1.0,1.0,0.0)	
-    glVertex3f( 1.0,-0.2,-1.0)
-    glVertex3f(-1.0,-0.2,-1.0)
-    glVertex3f(-1.0, 0.2,-1.0)		
-    glVertex3f( 1.0, 0.2,-1.0)		
-
-    glColor3f(0.0,0.0,1.0)	
-    glVertex3f(-1.0, 0.2, 1.0)
-    glVertex3f(-1.0, 0.2,-1.0)		
-    glVertex3f(-1.0,-0.2,-1.0)		
-    glVertex3f(-1.0,-0.2, 1.0)		
-
-    glColor3f(1.0,0.0,1.0)	
-    glVertex3f( 1.0, 0.2,-1.0)
-    glVertex3f( 1.0, 0.2, 1.0)
-    glVertex3f( 1.0,-0.2, 1.0)		
-    glVertex3f( 1.0,-0.2,-1.0)		
-    glEnd()	
-         
-def read_data():
-    global ax, ay, az
-    ax = ay = az = 0.0
-    line_done = 0
-
-    # request data by sending a dot
-#    ser.write(".")
-    #while not line_done:
-#    line = ser.readline() 
-    angles = [bkb.read_float("IMU_EULER_X")*180/3.1415,
-              bkb.read_float("IMU_EULER_Y")*180/3.1415, 
-              bkb.read_float("IMU_EULER_Z")*180/3.1415]  #line.split(", ")
-    if len(angles) == 3:    
-        ax = float(angles[0])
-        ay = float(angles[1])
-        az = float(angles[2])
-        line_done = 1 
-
-def main():
-    global yaw_mode
-
-    video_flags = OPENGL|DOUBLEBUF
-    
-    pygame.init()
-    screen = pygame.display.set_mode((640,480), video_flags)
-    pygame.display.set_caption("Press Esc to quit, z toggles yaw mode")
-    resize((640,480))
-    init()
-    frames = 0
-    ticks = pygame.time.get_ticks()
-    while 1:
-        event = pygame.event.poll()
-        if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-            break       
-        if event.type == KEYDOWN and event.key == K_z:
-            yaw_mode = not yaw_mode
-#            ser.write("z")
-        read_data()
-        draw()
-      
-        pygame.display.flip()
-        frames = frames+1
-
-    #print("fps:  %d" % ((frames*1000)/(pygame.time.get_ticks()-ticks)))
-#    ser.close()
-
-if __name__ == '__main__': main()
+    frameCount = 0
+    seeds = None
+    display_mode = 0
+    num_superpixels = 400
+    prior = 2
+    num_levels = 4
+    num_histogram_bins = 5
+    from PyStream import PyStreamRun
+    PyStreamRun(OpenCVCode, 'SuperPixel_PS.py')

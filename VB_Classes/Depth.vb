@@ -890,7 +890,7 @@ Public Class Depth_Stable : Implements IDisposable
     Public stableZeroDepth As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Diff - Number of Frames", 1, 20, 10)
-        sliders.setupTrackBar2(ocvb, "Diff - Depth Range in Millimeters", 1, 200, 100)
+        sliders.setupTrackBar2(ocvb, "Diff - Depth in meters", 1, 8, 3)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Collect X frames, compute stable depth and color pixels using thresholds"
     End Sub

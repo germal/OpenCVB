@@ -13,7 +13,7 @@ class SuperPixels
 {
 private:
 public:
-	Mat src, dst;
+	Mat src, labels, dst;
 	Ptr<cv::ximgproc::SuperpixelSEEDS> seeds;
 	int width, height, num_superpixels = 400, num_levels = 4, prior = 2;
 	SuperPixels(){}
@@ -23,6 +23,7 @@ public:
 		//cvtColor(src, hsv, cv::ColorConversionCodes::COLOR_BGR2HSV);
 		seeds->iterate(src);
 		seeds->getLabelContourMask(dst, false);
+		seeds->getLabels(labels);
     }
 };
 
@@ -36,17 +37,24 @@ SuperPixels *SuperPixel_Open(int _width, int _height, int _num_superpixels, int 
 	spPtr->num_levels = _num_levels;
 	spPtr->prior = _prior;
 	spPtr->seeds = cv::ximgproc::createSuperpixelSEEDS(_width, _height, 3, _num_superpixels, _num_levels, _prior);
+	spPtr->labels = Mat(spPtr->height, spPtr->width, CV_32S);
 	return spPtr;
 }
 
 extern "C" __declspec(dllexport)
-void SuperPixel_Close(SuperPixels *spPtr)
+void SuperPixel_Close(SuperPixels * spPtr)
 {
-    delete spPtr;
+	delete spPtr;
 }
 
 extern "C" __declspec(dllexport)
-int *SuperPixel_Run(SuperPixels *spPtr, int *srcPtr)
+int *SuperPixel_GetLabels(SuperPixels * spPtr)
+{
+	return (int *) spPtr->labels.data;
+}
+
+extern "C" __declspec(dllexport)
+int *SuperPixel_Run(SuperPixels *spPtr, int* srcPtr)
 {
 	spPtr->src = Mat(spPtr->height, spPtr->width, CV_8UC3, srcPtr);
 	spPtr->Run();

@@ -2,18 +2,18 @@ import numpy as np
 import cv2 as cv
 import common
 import sys
-title_window = "SuperPixel_PS.py"
+title_window = "SuperPixel_PS.py - use spacebar to switch views."
 
 def OpenCVCode(imgRGB, depth_colormap):
-    global seeds, display_mode, num_superpixels, prior, num_levels, num_histogram_bins, frameCount, color_img
+    global seeds, display_mode, num_superpixels, prior, num_levels, num_histogram_bins, frameCount, scalarRed
     converted_img = cv.cvtColor(imgRGB, cv.COLOR_BGR2HSV)
     height,width,channels = converted_img.shape
     num_SuperPixel_new = cv.getTrackbarPos('Number of Superpixels', title_window)
     num_iterations = cv.getTrackbarPos('Iterations', title_window)
 
     if frameCount == 0:
-        color_img = np.zeros((height,width,3), np.uint8)
-        color_img[:] = (0, 0, 255)
+        scalarRed = np.zeros((height,width,3), np.uint8)
+        scalarRed[:] = (0, 0, 255)
 
     if not seeds or num_SuperPixel_new != num_superpixels:
         num_superpixels = num_SuperPixel_new
@@ -35,7 +35,7 @@ def OpenCVCode(imgRGB, depth_colormap):
     # stitch foreground & background together
     mask_inv = cv.bitwise_not(mask)
     result_bg = cv.bitwise_and(imgRGB, imgRGB, mask=mask_inv)
-    result_fg = cv.bitwise_and(color_img, color_img, mask=mask)
+    result_fg = cv.bitwise_and(scalarRed, scalarRed, mask=mask)
     result = cv.add(result_bg, result_fg)
 
     if display_mode == 0:
@@ -47,7 +47,7 @@ def OpenCVCode(imgRGB, depth_colormap):
 
     ch = cv.waitKey(1)
     if ch & 0xff == ord(' '):
-        display_mode = (display_mode + 1) % 2
+        display_mode = (display_mode + 1) % 2 # set this to 3 to get the labels working but it won't display...
     frameCount += 1
 
 if __name__ == '__main__':
@@ -63,4 +63,4 @@ if __name__ == '__main__':
     num_levels = 4
     num_histogram_bins = 5
     from PyStream import PyStreamRun
-    PyStreamRun(OpenCVCode, 'SuperPixel_PS.py')
+    PyStreamRun(OpenCVCode, 'SuperPixels_PS.py')

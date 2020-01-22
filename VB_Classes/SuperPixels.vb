@@ -9,6 +9,9 @@ Module SuperPixel_CPP_Module
     Public Sub SuperPixel_Close(spPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function SuperPixel_GetLabels(spPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function SuperPixel_Run(spPtr As IntPtr, rgbPtr As IntPtr) As IntPtr
     End Function
 End Module
@@ -31,7 +34,7 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
         sliders.setupTrackBar3(ocvb, "Prior", 1, 10, 2)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        ocvb.label2 = "Mask of SuperPixels"
+        ocvb.label2 = "Superpixel labels"
         ocvb.desc = "Sub-divide the image into super pixels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -41,7 +44,6 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
         If externalUse = False Then
             src = ocvb.color.Clone()
             dst1 = ocvb.result1
-            dst2 = ocvb.result2
         End If
         If numSuperPixels <> sliders.TrackBar1.Value Or numIterations <> sliders.TrackBar2.Value Or prior <> sliders.TrackBar3.Value Then
             numSuperPixels = sliders.TrackBar1.Value
@@ -58,16 +60,21 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
         handleSrc.Free()
 
         If imagePtr <> 0 Then
+            Dim labelData(src.Total * 4) As Byte ' labels are 32-bit integers.
+            Dim labelPtr = SuperPixel_GetLabels(spPtr)
+            Marshal.Copy(labelPtr, labelData, 0, labelData.Length)
+
             Dim dstData(src.Total - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
+
             If externalUse Then
                 dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
                 dst1 = src
                 dst1.SetTo(cv.Scalar.White, dst2)
             Else
-                ocvb.result2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
+                Dim tmp = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
                 ocvb.result1 = src
-                ocvb.result1.SetTo(cv.Scalar.White, dst2)
+                ocvb.result1.SetTo(cv.Scalar.White, tmp)
             End If
         End If
     End Sub
