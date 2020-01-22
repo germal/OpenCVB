@@ -30,7 +30,10 @@ End Class
 
 
 Public Class Transform_Rotate : Implements IDisposable
-    Dim sliders As New OptionsSliders
+    Public sliders As New OptionsSliders
+    Public src As cv.Mat
+    Public dst As cv.Mat
+    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Angle", 0, 180, 30)
         sliders.setupTrackBar2(ocvb, "Scale Factor", 1, 100, 50)
@@ -38,9 +41,13 @@ Public Class Transform_Rotate : Implements IDisposable
         ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim imageCenter = New cv.Point2f(ocvb.color.Width / 2, ocvb.color.Height / 2)
+        If externalUse = False Then
+            src = ocvb.color
+            dst = ocvb.result2
+        End If
+        Dim imageCenter = New cv.Point2f(src.Width / 2, src.Height / 2)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.TrackBar1.Value, sliders.TrackBar2.Value / 100)
-        cv.Cv2.WarpAffine(ocvb.color, ocvb.result1, rotationMat, New cv.Size())
+        cv.Cv2.WarpAffine(src, dst, rotationMat, New cv.Size())
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()

@@ -28,13 +28,12 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
     Public dst2 As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
-
         sliders.setupTrackBar1(ocvb, "Number of SuperPixels", 1, 1000, 400)
         sliders.setupTrackBar2(ocvb, "Iterations", 0, 10, 4)
         sliders.setupTrackBar3(ocvb, "Prior", 1, 10, 2)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        ocvb.label2 = "Superpixel labels"
+        ocvb.label2 = "Superpixel label data (0-255)"
         ocvb.desc = "Sub-divide the image into super pixels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -60,9 +59,6 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
         handleSrc.Free()
 
         If imagePtr <> 0 Then
-            Dim labelData(src.Total * 4) As Byte ' labels are 32-bit integers.
-            Dim labelPtr = SuperPixel_GetLabels(spPtr)
-            Marshal.Copy(labelPtr, labelData, 0, labelData.Length)
 
             Dim dstData(src.Total - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
@@ -77,6 +73,12 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
                 ocvb.result1.SetTo(cv.Scalar.White, tmp)
             End If
         End If
+
+        Dim labelData(src.Total * 4) As Byte ' labels are 32-bit integers.
+        Dim labelPtr = SuperPixel_GetLabels(spPtr)
+        Marshal.Copy(labelPtr, labelData, 0, labelData.Length)
+        Dim labels = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32S, labelData)
+        labels.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         SuperPixel_Close(spPtr)
