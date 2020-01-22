@@ -152,7 +152,7 @@ Public Class OpenCVB
         Dim g As Graphics = e.Graphics
         Try
             SyncLock camPic ' avoid updating the image while copying into it in the algorithm and camera tasks
-                If formColor IsNot Nothing Then
+                If formColor IsNot Nothing And formColor.Width > 0 And formColor.Height > 0 Then
                     cameraDataUpdated = False
                     If formColor.Width <> camPic(0).Width Or formColor.Height <> camPic(0).Height Or
                        formDepthRGB.Width <> camPic(1).Width Or formDepthRGB.Height <> camPic(1).Height Then
@@ -326,6 +326,7 @@ Public Class OpenCVB
         sr.Close()
 
         OpenCVkeyword.Text = GetSetting("OpenCVB", "OpenCVkeyword", "OpenCVkeyword", "<All>")
+        If OpenCVkeyword.Text = "" Then OpenCVkeyword.Text = "<All>"
         SaveSetting("OpenCVB", "OpenCVkeyword", "OpenCVkeyword", OpenCVkeyword.Text)
     End Sub
     Private Sub OpenCVkeyword_SelectedIndexChanged(sender As Object, e As EventArgs) Handles OpenCVkeyword.SelectedIndexChanged
@@ -660,7 +661,7 @@ Public Class OpenCVB
         If frame <> 0 Then
             Dim sleepCount As Int32
             ' some algorithms can take a long time to finish a single iteration.  
-            ' Each algorithm must run dispose() - to kill options forms and external Python or OpenGL taskes.  Have to wait until exit...
+            ' Each algorithm must run dispose() - to kill options forms and external Python or OpenGL taskes.  Wait until exit...
             While frame
                 Application.DoEvents() ' to allow the algorithm task to gracefully end and dispose OpenCVB.
                 Thread.Sleep(100)

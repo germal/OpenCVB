@@ -542,13 +542,14 @@ End Class
 Public Class LineDetector_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim ld As cv.XImgProc.FastLineDetector
+    Public dst As New cv.Mat
+    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "LineDetector thickness of line", 1, 20, 2)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         ocvb.label1 = "Manually drawn with thickness"
-        ocvb.label2 = "Drawn with DrawSegment (thickness=1)"
         ocvb.desc = "Use ximgproc to find all the lines present."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -557,15 +558,20 @@ Public Class LineDetector_Basics : Implements IDisposable
         ocvb.color.CopyTo(ocvb.result1)
         ocvb.color.CopyTo(ocvb.result2)
         Dim thickness = sliders.TrackBar1.Value
+
+        If externalUse = False Then dst = ocvb.result1
         For Each v In vectors
-            If v(0) >= 0 And v(0) <= ocvb.result1.Cols And v(1) >= 0 And v(1) <= ocvb.result1.Rows And
-               v(2) >= 0 And v(2) <= ocvb.result1.Cols And v(3) >= 0 And v(3) <= ocvb.result1.Rows Then
+            If v(0) >= 0 And v(0) <= dst.Cols And v(1) >= 0 And v(1) <= dst.Rows And
+               v(2) >= 0 And v(2) <= dst.Cols And v(3) >= 0 And v(3) <= dst.Rows Then
                 Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
                 Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                ocvb.result1.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
+                dst.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
             End If
         Next
-        ld.DrawSegments(ocvb.result2, vectors, False)
+        If externalUse = False Then
+            ocvb.label2 = "Drawn with DrawSegment (thickness=1)"
+            ld.DrawSegments(ocvb.result2, vectors, False)
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()

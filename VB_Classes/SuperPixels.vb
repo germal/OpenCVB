@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 
 Module SuperPixel_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SuperPixel_Open(width As Int32, height As Int32, channels As Int32, num_superpixels As Int32, num_levels As Int32, prior As Int32) As IntPtr
+    Public Function SuperPixel_Open(width As Int32, height As Int32, num_superpixels As Int32, num_levels As Int32, prior As Int32) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub SuperPixel_Close(spPtr As IntPtr)
@@ -27,7 +27,7 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
 
         sliders.setupTrackBar1(ocvb, "Number of SuperPixels", 1, 1000, 400)
-        sliders.setupTrackBar2(ocvb, "Iterations", 1, 10, 4)
+        sliders.setupTrackBar2(ocvb, "Iterations", 0, 10, 4)
         sliders.setupTrackBar3(ocvb, "Prior", 1, 10, 2)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -39,7 +39,7 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
         Static numIterations As Int32
         Static prior As Int32
         If externalUse = False Then
-            src = ocvb.color
+            src = ocvb.color.Clone()
             dst1 = ocvb.result1
             dst2 = ocvb.result2
         End If
@@ -48,7 +48,7 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
             numIterations = sliders.TrackBar2.Value
             prior = sliders.TrackBar3.Value
             If spPtr <> 0 Then SuperPixel_Close(spPtr)
-            spPtr = SuperPixel_Open(src.Width, src.Height, src.Channels, numSuperPixels, numIterations, prior)
+            spPtr = SuperPixel_Open(src.Width, src.Height, numSuperPixels, numIterations, prior)
         End If
 
         Dim srcData(src.Total * src.ElemSize) As Byte
@@ -95,6 +95,72 @@ Public Class SuperPixel_Depth : Implements IDisposable
         pixels.Run(ocvb)
         ocvb.result1 = pixels.dst1
         ocvb.result2 = pixels.dst2
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        pixels.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class SuperPixel_WithCanny : Implements IDisposable
+    Dim pixels As SuperPixel_Basics_CPP
+    Dim edges As Edges_Canny
+    Public Sub New(ocvb As AlgorithmData)
+        edges = New Edges_Canny(ocvb)
+        edges.externalUse = True
+
+        pixels = New SuperPixel_Basics_CPP(ocvb)
+        pixels.externalUse = True
+
+        ocvb.desc = "Create SuperPixels using DepthRGB image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        edges.Run(ocvb)
+        pixels.src = ocvb.color.Clone()
+        pixels.src.SetTo(cv.Scalar.White, edges.dst)
+        pixels.Run(ocvb)
+        ocvb.result1 = pixels.dst1
+        ocvb.result2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        ocvb.result2.SetTo(cv.Scalar.Red, edges.dst)
+        ocvb.label2 = "Edges provided by Canny in red"
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        pixels.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class SuperPixel_WithLineDetector : Implements IDisposable
+    Dim pixels As SuperPixel_Basics_CPP
+    Dim lines As LineDetector_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        lines = New LineDetector_Basics(ocvb)
+        lines.externalUse = True
+
+        pixels = New SuperPixel_Basics_CPP(ocvb)
+        pixels.externalUse = True
+
+        ocvb.desc = "Create SuperPixels using DepthRGB image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        lines.dst = ocvb.result1
+        lines.Run(ocvb)
+        pixels.src = ocvb.result1.Clone()
+        ocvb.result2 = ocvb.result1.Clone()
+        ocvb.label2 = "Input to superpixel basics."
+        pixels.Run(ocvb)
+        ocvb.result1 = pixels.dst1
+        ' ocvb.result2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        ' ocvb.result2.SetTo(cv.Scalar.Red, lines.dst)
+        ' ocvb.label2 = "Edges provided by Canny in red"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         pixels.Dispose()
