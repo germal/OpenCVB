@@ -251,16 +251,18 @@ Public Class Palette_Display : Implements IDisposable
         palette.Run(ocvb)
         Dim cMapDir As New DirectoryInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps")
         Dim colorMap As Int32
+        Dim mapName As String = ""
         For i = 0 To palette.radio.check.Count - 1
             If palette.radio.check(i).Checked Then
-                colormap = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cool, cv.ColormapTypes.Hot,
+                colorMap = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cool, cv.ColormapTypes.Hot,
                                          cv.ColormapTypes.Hsv, cv.ColormapTypes.Jet, cv.ColormapTypes.Ocean, cv.ColormapTypes.Pink,
                                          cv.ColormapTypes.Rainbow, cv.ColormapTypes.Spring, cv.ColormapTypes.Summer, cv.ColormapTypes.Winter, 12, 13, 14, 15, 16, 17, 18, 19, 20)
-                ocvb.label1 = mapNames(i)
-                ocvb.label2 = mapNames(i)
+                mapName = mapNames(i)
+                ocvb.label1 = "ColorMap = " + mapName
+                ocvb.label2 = mapName + " ColorMap illustrated"
             End If
         Next
-        Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + ocvb.label1 + ".jpg")
+        Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + mapName + ".jpg")
         If mapFile.Exists Then
             Dim cmap = cv.Cv2.ImRead(mapFile.FullName)
             ocvb.result2 = cmap.Resize(ocvb.color.Size())
@@ -395,7 +397,7 @@ Public Class Palette_ColorMap : Implements IDisposable
                                          cv.ColormapTypes.Hsv, cv.ColormapTypes.Jet, cv.ColormapTypes.Ocean, cv.ColormapTypes.Pink,
                                          cv.ColormapTypes.Rainbow, cv.ColormapTypes.Spring, cv.ColormapTypes.Summer, cv.ColormapTypes.Winter,
                                          12, 13, 14, 15, 16, 17, 18, 19, 20) ' missing some colorMapType definitions but they are there...
-                ocvb.label1 = mapNames(i)
+                ocvb.label1 = "ColorMap = " + mapNames(i)
                 ' special case the random color map!
                 If colormap = 19 Then
                     Static saveTransitionCount = gradMap.sliders.TrackBar1.Value

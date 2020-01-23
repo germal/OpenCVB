@@ -290,6 +290,7 @@
     <Compile Include="Sharpen.vb" />
     <Compile Include="Video.vb" />
     <Compile Include="Stabilizer.vb" />
+    <Compile Include="Voxels.vb" />
     <Compile Include="VTK.vb" />
     <Compile Include="XFeatures.vb" />
     <Compile Include="Surf.vb" />

@@ -26,10 +26,12 @@ End Class
 Public Class Math_Median_CDF : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public src As cv.Mat
+    Dim dst As cv.mat
     Public medianVal As Double
     Public hist As New cv.Mat()
     Public rangeMin As Integer = 0
     Public rangeMax As Integer = 255
+    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Histogram Bins", 4, 1000, 100)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -40,12 +42,10 @@ Public Class Math_Median_CDF : Implements IDisposable
         Dim dimensions() = New Integer() {bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(rangeMin, rangeMax)}
 
-        If src Is Nothing Then
-            ocvb.result1 = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Else
-            ocvb.result1 = src.Clone()
+        If externalUse = False Then
+            src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
-        cv.Cv2.CalcHist(New cv.Mat() {ocvb.result1}, New Integer() {0}, New cv.Mat(), hist, 1, dimensions, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat(), hist, 1, dimensions, ranges)
 
         Dim cdf As New cv.Mat
         hist.CopyTo(cdf)
@@ -53,7 +53,7 @@ Public Class Math_Median_CDF : Implements IDisposable
         For i = 1 To bins - 1
             cdfIndexer(i) = cdfIndexer(i - 1) + cdfIndexer(i)
         Next
-        cdf /= ocvb.result1.Total
+        cdf /= src.Total
 
         cdfIndexer = cdf.GetGenericIndexer(Of Single) ' need to reset the indexer because the mat will move with the divide above.
         For i = 0 To bins - 1
@@ -63,9 +63,9 @@ Public Class Math_Median_CDF : Implements IDisposable
             End If
         Next
 
-        If src Is Nothing Then
+        If externalUse = false Then
             Dim mask = New cv.Mat
-            mask = ocvb.result1.GreaterThan(medianVal)
+            mask = src.GreaterThan(medianVal)
             ocvb.result1.SetTo(0)
             ocvb.color.CopyTo(ocvb.result1, mask)
             ocvb.label1 = "Grayscale pixels > " + Format(medianVal, "#0.0")
