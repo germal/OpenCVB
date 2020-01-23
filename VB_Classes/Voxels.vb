@@ -1,38 +1,69 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Voxels_Basics : Implements IDisposable
+Public Class Voxels_Basics_MT : Implements IDisposable
+    Public trim As Depth_InRangeTrim
+    Dim sliders As New OptionsSliders
     Public grid As Thread_Grid
-    Public voxels() As Math_Median_CDF
+    Public voxels() As Double
     Public Sub New(ocvb As AlgorithmData)
+        trim = New Depth_InRangeTrim(ocvb)
+        trim.externalUse = True
+        trim.sliders.TrackBar2.Value = 5000
+
+        sliders.setupTrackBar1(ocvb, "Histogram Bins", 2, 200, 100)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = 32
-        grid.sliders.TrackBar2.Value = 32
+        grid.sliders.TrackBar1.Value = 16
+        grid.sliders.TrackBar2.Value = 16
         grid.externalUse = True
 
         ocvb.desc = "Use multi-threading to get center-weighted depth values as voxels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        trim.Run(ocvb)
+        Dim minDepth = trim.sliders.TrackBar1.Value
+        Dim maxDepth = trim.sliders.TrackBar2.Value
+
         grid.Run(ocvb)
 
         Static saveVoxelCount As Int32 = -1
         If saveVoxelCount <> grid.roiList.Count Then
             saveVoxelCount = grid.roiList.Count
             ReDim voxels(saveVoxelCount - 1)
-            ocvb.parms.ShowOptions = False ' too many sliders otherwise.
-            For i = 0 To saveVoxelCount - 1
-                voxels(i) = New Math_Median_CDF(ocvb)
-                voxels(i).rangeMax = 5000 ' 5 meters
-                voxels(i).rangeMin = 50
-                voxels(i).externalUse = True
-            Next
         End If
-        Parallel.For(0, grid.roiList.Count,
+
+        Dim bins = sliders.TrackBar1.Value
+        Dim gridCount = grid.roiList.Count
+        Parallel.For(0, gridCount,
         Sub(i)
             Dim roi = grid.roiList(i)
-            voxels(i).src = ocvb.depth(roi)
-            voxels(i).Run(ocvb)
+            If ocvb.depth(roi).CountNonZero() Then
+                voxels(i) = computeMedian(ocvb.depth(roi), trim.Mask(roi), bins, minDepth, maxDepth)
+            End If
+        End Sub)
+        ocvb.result1 = ocvb.depthRGB.Clone()
+        ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+        Dim voxelMat = New cv.Mat(voxels.Length - 1, 1, cv.MatType.CV_64F, voxels)
+        voxelMat = voxelMat.Normalize(255, 0, cv.NormTypes.MinMax)
+
+        Dim nearColor = cv.Scalar.Yellow
+        Dim farColor = cv.Scalar.Blue
+        ocvb.result2.SetTo(0)
+        Parallel.For(0, gridCount,
+        Sub(i)
+            Dim roi = grid.roiList(i)
+            Dim v = voxelMat.At(Of Double)(i)
+            If v > 0 And v < 256 Then
+                Dim color = New cv.Scalar(((256 - v) * nearColor(0) + v * farColor(0)) >> 8,
+                                          ((256 - v) * nearColor(1) + v * farColor(1)) >> 8,
+                                          ((256 - v) * nearColor(2) + v * farColor(2)) >> 8)
+                ocvb.result2(roi).SetTo(color, trim.Mask(roi))
+            End If
         End Sub)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         grid.Dispose()
+        sliders.Dispose()
+        trim.Dispose()
     End Sub
 End Class

@@ -212,36 +212,6 @@ Public Class Depth_WorldXYZ_MT : Implements IDisposable
 End Class
 
 
-Public Class Depth_InRangeTrim : Implements IDisposable
-    Public Mask As New cv.Mat
-    Public zeroMask As New cv.Mat
-    Public externalUse As Boolean
-    Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "InRange Min Depth", 200, 1000, 200)
-        sliders.setupTrackBar2(ocvb, "InRange Max Depth", 200, 10000, 1400)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Show depth with OpenCV using varying min and max depths."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If sliders.TrackBar1.Value >= sliders.TrackBar2.Value Then sliders.TrackBar2.Value = sliders.TrackBar1.Value + 1
-        Dim minDepth = cv.Scalar.All(sliders.TrackBar1.Value)
-        Dim maxDepth = cv.Scalar.All(sliders.TrackBar2.Value)
-        Dim tmp16 As New cv.Mat
-        cv.Cv2.InRange(ocvb.depth, minDepth, maxDepth, tmp16)
-        cv.Cv2.ConvertScaleAbs(tmp16, Mask)
-        cv.Cv2.BitwiseNot(Mask, zeroMask)
-
-        If externalUse = False Then
-            ocvb.result1.SetTo(0)
-            ocvb.depthRGB.CopyTo(ocvb.result1, Mask)
-        End If
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
-End Class
-
 
 
 Public Class Depth_Median : Implements IDisposable
@@ -941,16 +911,73 @@ End Class
 
 
 
-Public Class Depth_Average : Implements IDisposable
-    Dim depth As Depth_Stable
+
+Public Class Depth_InRangeTrim : Implements IDisposable
+    Public Mask As New cv.Mat
+    Public zeroMask As New cv.Mat
+    Public externalUse As Boolean
+    Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        depth = New Depth_Stable(ocvb)
-        depth.sliders.TrackBar1.Value = 1 ' just compare to previous frame
-        ocvb.desc = "Smooth the depth values by averaging"
+        sliders.setupTrackBar1(ocvb, "InRange Min Depth", 200, 1000, 200)
+        sliders.setupTrackBar2(ocvb, "InRange Max Depth", 200, 10000, 1400)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+        ocvb.desc = "Show depth with OpenCV using varying min and max depths."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If sliders.TrackBar1.Value >= sliders.TrackBar2.Value Then sliders.TrackBar2.Value = sliders.TrackBar1.Value + 1
+        Dim minDepth = cv.Scalar.All(sliders.TrackBar1.Value)
+        Dim maxDepth = cv.Scalar.All(sliders.TrackBar2.Value)
+        Dim tmp16 As New cv.Mat
+        cv.Cv2.InRange(ocvb.depth, minDepth, maxDepth, tmp16)
+        cv.Cv2.ConvertScaleAbs(tmp16, Mask)
+        cv.Cv2.BitwiseNot(Mask, zeroMask)
 
+        If externalUse = False Then
+            ocvb.result1.SetTo(0)
+            ocvb.depthRGB.CopyTo(ocvb.result1, Mask)
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
     End Sub
 End Class
+
+
+
+Public Class Depth_Palette : Implements IDisposable
+    Public trim As Depth_InRangeTrim
+    Dim customColorMap As New cv.Mat
+    Dim depth As New cv.Mat
+    Public Sub New(ocvb As AlgorithmData)
+        trim = New Depth_InRangeTrim(ocvb)
+        trim.externalUse = True
+        trim.sliders.TrackBar2.Value = 5000
+
+        customColorMap = colorTransition(cv.Scalar.Blue, cv.Scalar.Yellow, 256)
+        ocvb.desc = "Use a palette to display depth from the raw depth data.  Will it be faster Depth_Colorizer?  (Of course)"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        trim.Run(ocvb)
+        Dim minDepth = trim.sliders.TrackBar1.Value
+        Dim maxDepth = trim.sliders.TrackBar2.Value
+
+        ' this and the following will smooth the palette usage (otherwise it is slightly jerky as the normalize adjusts to the max/min.)
+        ocvb.depth.Set(Of UShort)(0, 0, minDepth)
+        ocvb.depth.Set(Of UShort)(0, 1, maxDepth)
+        trim.Mask.Set(Of Byte)(0, 0, 255)
+        trim.Mask.Set(Of Byte)(0, 1, 255)
+
+        Dim depthNorm16 = ocvb.depth.Normalize(255, 0, cv.NormTypes.MinMax, -1, trim.Mask)
+        depthNorm16.ConvertTo(depth, cv.MatType.CV_8U)
+        depth = depth.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        ocvb.result1 = Palette_ApplyCustom(depth, customColorMap)
+        ocvb.result1.SetTo(0, trim.zeroMask)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        Trim.Dispose()
+    End Sub
+End Class
+
+
+
+

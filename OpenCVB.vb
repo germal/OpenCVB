@@ -743,7 +743,6 @@ Public Class OpenCVB
 
             cameraFrameCount = 0
             cameraTaskHandle = New Thread(AddressOf CameraTask)
-            cameraTaskHandle.Priority = ThreadPriority.AboveNormal
             cameraTaskHandle.Name = "CameraTask"
             cameraTaskHandle.Start()
             ' wait for the first frame to appear.
@@ -757,7 +756,6 @@ Public Class OpenCVB
         parms.extrinsics = camera.Extrinsics_VB
 
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
-        algorithmTaskHandle.Priority = ThreadPriority.Lowest
         algorithmTaskHandle.Name = "AlgorithmTask"
         algorithmTaskHandle.Start(parms)
 

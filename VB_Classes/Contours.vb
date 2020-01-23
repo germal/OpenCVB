@@ -113,15 +113,15 @@ End Class
 
 
 Public Class Contours_Depth : Implements IDisposable
-    Public foreground As Depth_InRangeTrim
+    Public trim As Depth_InRangeTrim
     Public Sub New(ocvb As AlgorithmData)
-        foreground = New Depth_InRangeTrim(ocvb)
+        trim = New Depth_InRangeTrim(ocvb)
         ocvb.desc = "Find and draw the contour of the depth foreground."
         ocvb.label1 = "DepthContour input"
         ocvb.label2 = "DepthContour output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        foreground.Run(ocvb)
+        trim.Run(ocvb)
         Dim img = ocvb.result1.CvtColor(cv.ColorConversionCodes.bgr2gray)
         img = img.Threshold(1, 255, cv.ThresholdTypes.Binary)
 
@@ -144,7 +144,7 @@ Public Class Contours_Depth : Implements IDisposable
         Next
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        foreground.Dispose()
+        trim.Dispose()
     End Sub
 End Class
 

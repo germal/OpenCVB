@@ -58,32 +58,49 @@ Public Class Palette_LinearPolar : Implements IDisposable
 End Class
 
 
+
+
 Module Palette_Custom_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst As IntPtr, rows As Int32, cols As Int32)
     End Sub
     Public mapNames() As String = {"Autumn", "Bone", "Cool", "Hot", "Hsv", "Jet", "Ocean", "Pink", "Rainbow", "Spring", "Summer", "Winter", "Parula", "Magma", "Inferno", "Viridis", "Cividis", "Twilight", "Twilight_Shifted", "Random", "None"}
-    Public Sub Palette_ApplyCustom(ocvb As AlgorithmData, src As cv.Mat, randomColorMap As cv.Mat)
+    Public Function Palette_ApplyCustom(src As cv.Mat, customColorMap As cv.Mat) As cv.Mat
         ' the VB.Net interface to OpenCV doesn't support adding a random lookup table to ApplyColorMap API.  It is available in C++ though.
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
 
-        Dim mapData(randomColorMap.Total * randomColorMap.ElemSize - 1) As Byte
+        Dim mapData(customColorMap.Total * customColorMap.ElemSize - 1) As Byte
         Dim handleMap = GCHandle.Alloc(mapData, GCHandleType.Pinned)
-        Marshal.Copy(randomColorMap.Data, mapData, 0, mapData.Length)
+        Marshal.Copy(customColorMap.Data, mapData, 0, mapData.Length)
 
         Dim dstData(src.Total * src.ElemSize - 1) As Byte
         Dim handleDst = GCHandle.Alloc(dstData, GCHandleType.Pinned)
 
         Palette_Custom(handleSrc.AddrOfPinnedObject, handleMap.AddrOfPinnedObject, handleDst.AddrOfPinnedObject, src.Rows, src.Cols)
 
-        Marshal.Copy(dstData, 0, ocvb.result1.Data, dstData.Length)
+        Dim dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        Marshal.Copy(dstData, 0, dst.Data, dstData.Length)
         handleSrc.Free()
         handleMap.Free()
         handleDst.Free()
-    End Sub
-
+        Return dst
+    End Function
+    Public Function colorTransition(color1 As cv.Scalar, color2 As cv.Scalar, width As Int32) As cv.Mat
+        Dim f As Double = 1.0
+        Dim gradientColors As New cv.Mat(1, width, cv.MatType.CV_64FC3)
+        For i = 0 To width - 1
+            gradientColors.Set(Of cv.Scalar)(0, i, New cv.Scalar(f * color2(0) + (1 - f) * color1(0), f * color2(1) + (1 - f) * color1(1),
+                                                                 f * color2(2) + (1 - f) * color1(2)))
+            f -= 1 / width
+        Next
+        Dim result = New cv.Mat(1, width, cv.MatType.CV_8UC3)
+        For i = 0 To width - 1
+            result.Col(i).SetTo(gradientColors.At(Of cv.Scalar)(0, i))
+        Next
+        Return result
+    End Function
 End Module
 
 
@@ -196,7 +213,7 @@ Public Class Palette_Random : Implements IDisposable
             resized.resizePercent = 256 / ocvb.color.Total ' we want only 256 colors
             resized.Run(ocvb)
         End If
-        Palette_ApplyCustom(ocvb, ocvb.color, resized.dst)
+        ocvb.result1 = Palette_ApplyCustom(ocvb.color, resized.dst)
         ocvb.label2 = "Palette source colors"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -324,42 +341,35 @@ Public Class Palette_BuildGradientColorMap : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Number of color transitions", 1, 30, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
+
+        ocvb.label2 = "Generated colormap"
         ocvb.desc = "Build a random colormap that smoothly transitions colors."
     End Sub
-    Private Function colorSmoothly(color1 As cv.Scalar, color2 As cv.Scalar, width As Int32) As cv.Mat
-        Dim f As Double = 1.0
-        Dim gradientColors As New cv.Mat(1, width, cv.MatType.CV_64FC3)
-        For i = 0 To width - 1
-            gradientColors.Set(Of cv.Scalar)(0, i, New cv.Scalar(f * color2(0) + (1 - f) * color1(0), f * color2(1) + (1 - f) * color1(1),
-                                                                 f * color2(2) + (1 - f) * color1(2)))
-            f -= 1 / width
-        Next
-        Dim result = New cv.Mat(1, width, cv.MatType.CV_8UC3)
-        For i = 0 To width - 1
-            result.Col(i).SetTo(gradientColors.At(Of cv.Scalar)(0, i))
-        Next
-        Return result
-    End Function
     Public Sub Run(ocvb As AlgorithmData)
-        Dim color1 = New cv.Scalar(ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255))
-        Dim color2 = New cv.Scalar(ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255))
-        Dim gradCount = sliders.TrackBar1.Value
-        Dim gradMat As New cv.Mat
-        For i = 0 To gradCount - 1
-            gradMat = colorSmoothly(color1, color2, ocvb.color.Width)
-            color2 = color1
-            color1 = New cv.Scalar(ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255))
-            If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
-        Next
-        If externalUse Then
-            gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
-        Else
-            gradientColorMap = gradientColorMap.Resize(New cv.Size(ocvb.color.Width, 1))
-
-            For i = 0 To ocvb.result2.Height - 1
-                ocvb.result2.Row(i) = gradientColorMap
+        If externalUse = False And ocvb.frameCount Mod 100 = 0 Or externalUse Then
+            Static autoRand As New Random()
+            ocvb.rng = New cv.RNG(autoRand.Next(0, 1000))
+            Dim color1 = New cv.Scalar(ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255))
+            Dim color2 = New cv.Scalar(ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255))
+            Dim gradCount = sliders.TrackBar1.Value
+            Dim gradMat As New cv.Mat
+            For i = 0 To gradCount - 1
+                gradMat = colorTransition(color1, color2, ocvb.color.Width)
+                color2 = color1
+                color1 = New cv.Scalar(ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255))
+                If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
             Next
+            If externalUse Then
+                gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
+            Else
+                gradientColorMap = gradientColorMap.Resize(New cv.Size(ocvb.color.Width, 1))
+
+                For i = 0 To ocvb.result2.Height - 1
+                    ocvb.result2.Row(i) = gradientColorMap
+                Next
+            End If
         End If
+        If externalUse = False Then ocvb.result1 = Palette_ApplyCustom(ocvb.color, gradientColorMap)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
@@ -406,7 +416,7 @@ Public Class Palette_ColorMap : Implements IDisposable
                         buildNewRandomMap = True
                         gradMap.Run(ocvb)
                     End If
-                    Palette_ApplyCustom(ocvb, src, gradMap.gradientColorMap)
+                    ocvb.result1 = Palette_ApplyCustom(src, gradMap.gradientColorMap)
                     Exit For
                 End If
                 buildNewRandomMap = False ' if they select something other than random, then next random request will rebuild the map.

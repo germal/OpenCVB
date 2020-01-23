@@ -20,32 +20,14 @@ End Class
 
 
 
+Module Math_Functions
+    Public Function computeMedian(src As cv.Mat, mask As cv.Mat, bins As Int32, rangeMin As Single, rangeMax As Single) As Double
 
-
-
-Public Class Math_Median_CDF : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public src As cv.Mat
-    Dim dst As cv.mat
-    Public medianVal As Double
-    Public hist As New cv.Mat()
-    Public rangeMin As Integer = 0
-    Public rangeMax As Integer = 255
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "Histogram Bins", 4, 1000, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Compute the src image median"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Dim bins As Int32 = sliders.TrackBar1.Value
         Dim dimensions() = New Integer() {bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(rangeMin, rangeMax)}
 
-        If externalUse = False Then
-            src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        End If
-        cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat(), hist, 1, dimensions, ranges)
+        Dim hist As New cv.Mat()
+        cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, mask, hist, 1, dimensions, ranges)
 
         Dim cdf As New cv.Mat
         hist.CopyTo(cdf)
@@ -56,14 +38,43 @@ Public Class Math_Median_CDF : Implements IDisposable
         cdf /= src.Total
 
         cdfIndexer = cdf.GetGenericIndexer(Of Single) ' need to reset the indexer because the mat will move with the divide above.
+        Dim median As Double
         For i = 0 To bins - 1
             If cdfIndexer(i) > 0.5 Then
-                medianVal = i * (rangeMax - rangeMin) / bins
+                median = i * (rangeMax - rangeMin) / bins
                 Exit For
             End If
         Next
+        Return median
+    End Function
+End Module
 
-        If externalUse = false Then
+
+
+Public Class Math_Median_CDF : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Public src As cv.Mat
+    Dim dst As cv.mat
+    Public medianVal As Double
+    Public rangeMin As Integer = 0
+    Public rangeMax As Integer = 255
+    Public externalUse As Boolean
+    Public bins As Int32 = 10
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "Histogram Bins", 4, 1000, 100)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        ocvb.desc = "Compute the src image median"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If externalUse = False Then
+            bins = sliders.TrackBar1.Value
+            src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        End If
+
+        medianVal = computeMedian(src, New cv.Mat, bins, rangeMin, rangeMax)
+
+        If externalUse = False Then
             Dim mask = New cv.Mat
             mask = src.GreaterThan(medianVal)
             ocvb.result1.SetTo(0)
@@ -77,7 +88,7 @@ Public Class Math_Median_CDF : Implements IDisposable
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+        If sliders IsNot Nothing Then sliders.Dispose()
     End Sub
 End Class
 

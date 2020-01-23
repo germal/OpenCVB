@@ -3,9 +3,9 @@
 Public Class Threshold_LaplacianFilter : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim edges As Filter_Laplacian
-    Dim foreground As Depth_InRangeTrim
+    Dim trim As Depth_InRangeTrim
     Public Sub New(ocvb As AlgorithmData)
-        foreground = New Depth_InRangeTrim(ocvb)
+        trim = New Depth_InRangeTrim(ocvb)
         edges = New Filter_Laplacian(ocvb)
         sliders.setupTrackBar1(ocvb, "dist Threshold", 1, 100, 40)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -15,7 +15,7 @@ Public Class Threshold_LaplacianFilter : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         edges.Run(ocvb)
-        foreground.Run(ocvb)
+        trim.Run(ocvb)
 
         Dim gray = ocvb.result1.CvtColor(cv.ColorConversionCodes.bgr2gray)
         Dim mask = ocvb.result1.CvtColor(cv.ColorConversionCodes.bgr2gray).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
@@ -34,6 +34,6 @@ Public Class Threshold_LaplacianFilter : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
         edges.Dispose()
-        foreground.Dispose()
+        trim.Dispose()
     End Sub
 End Class

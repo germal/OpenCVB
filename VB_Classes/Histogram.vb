@@ -274,7 +274,7 @@ End Class
 Public Class Histogram_2D_XZ_YZ : Implements IDisposable
     Dim xyDepth As Mat_ImageXYZ_MT
     Dim mats As Mat_4to1
-    Dim inrange As Depth_InRangeTrim
+    Dim trim As Depth_InRangeTrim
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         xyDepth = New Mat_ImageXYZ_MT(ocvb)
@@ -282,8 +282,8 @@ Public Class Histogram_2D_XZ_YZ : Implements IDisposable
         mats = New Mat_4to1(ocvb)
         mats.externalUse = True
 
-        inrange = New Depth_InRangeTrim(ocvb)
-        inrange.sliders.TrackBar2.Value = 1500 ' up to x meters away 
+        trim = New Depth_InRangeTrim(ocvb)
+        trim.sliders.TrackBar2.Value = 1500 ' up to x meters away 
 
         sliders.setupTrackBar1(ocvb, "Histogram X bins", 1, ocvb.color.Width / 2, 30)
         sliders.setupTrackBar2(ocvb, "Histogram Z bins", 1, 200, 100)
@@ -297,9 +297,9 @@ Public Class Histogram_2D_XZ_YZ : Implements IDisposable
         Dim xbins = sliders.TrackBar1.Value
         Dim zbins = sliders.TrackBar2.Value
         Dim histSize() = {xbins, zbins}
-        inrange.Run(ocvb)
-        Dim minRange = inrange.sliders.TrackBar1.Value
-        Dim maxRange = inrange.sliders.TrackBar2.Value
+        trim.Run(ocvb)
+        Dim minRange = trim.sliders.TrackBar1.Value
+        Dim maxRange = trim.sliders.TrackBar2.Value
 
         Dim histogram As New cv.Mat
 
@@ -316,7 +316,7 @@ Public Class Histogram_2D_XZ_YZ : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
-        inrange.Dispose()
+        trim.Dispose()
         xyDepth.Dispose()
         mats.Dispose()
     End Sub
