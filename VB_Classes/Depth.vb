@@ -132,7 +132,6 @@ Public Class Depth_Projections : Implements IDisposable
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
-
         foreground = New Depth_ManualTrim(ocvb)
         foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
         foreground.sliders.TrackBar2.Value = 1200 ' fixed distance to keep the images stable.
@@ -961,13 +960,8 @@ Public Class Depth_Palette : Implements IDisposable
         Dim minDepth = trim.sliders.TrackBar1.Value
         Dim maxDepth = trim.sliders.TrackBar2.Value
 
-        ' this and the following will smooth the palette usage (otherwise it is slightly jerky as the normalize adjusts to the max/min.)
-        ocvb.depth.Set(Of UShort)(0, 0, minDepth)
-        ocvb.depth.Set(Of UShort)(0, 1, maxDepth)
-        trim.Mask.Set(Of Byte)(0, 0, 255)
-        trim.Mask.Set(Of Byte)(0, 1, 255)
-
-        Dim depthNorm16 = ocvb.depth.Normalize(255, 0, cv.NormTypes.MinMax, -1, trim.Mask)
+        Dim depthNorm16 = ocvb.depth
+        depthNorm16 *= 255 / (maxDepth - minDepth) ' do the normalize manually to use the min and max Depth (more stable
         depthNorm16.ConvertTo(depth, cv.MatType.CV_8U)
         depth = depth.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result1 = Palette_ApplyCustom(depth, customColorMap)

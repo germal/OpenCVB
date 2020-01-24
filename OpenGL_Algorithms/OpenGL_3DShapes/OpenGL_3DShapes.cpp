@@ -1,5 +1,3 @@
-// License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2015 Intel Corporation. All Rights Reserved.
 #include "../OpenGL_Basics/OpenGLcommon.h"
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>

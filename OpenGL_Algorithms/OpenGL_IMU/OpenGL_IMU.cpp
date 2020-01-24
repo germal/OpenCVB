@@ -1,5 +1,3 @@
-// License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2015 Intel Corporation. All Rights Reserved.
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "..\OpenGL_Basics\OpenGLcommon.h"

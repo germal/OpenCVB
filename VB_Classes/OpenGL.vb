@@ -344,3 +344,29 @@ Public Class OpenGL_Draw3D : Implements IDisposable
         circle.Dispose()
     End Sub
 End Class
+
+
+
+
+
+Public Class OpenGL_Voxels : Implements IDisposable
+    Public voxels As Voxels_Basics_MT
+    Public ogl As OpenGL_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        voxels = New Voxels_Basics_MT(ocvb)
+
+        ogl = New OpenGL_Basics(ocvb)
+        ogl.OpenGLTitle = "OpenGL_Voxels"
+        ocvb.desc = "Show the voxel representation in OpenGL"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        voxels.Run(ocvb)
+
+        ogl.rgbInput = ocvb.color
+        ogl.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        voxels.Dispose()
+        ogl.Dispose()
+    End Sub
+End Class

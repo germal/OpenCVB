@@ -13,15 +13,14 @@ Public Class Stitch_Basics : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mats As New List(Of cv.Mat)
-        Dim autoRand As New Random()
         Dim imageCount = sliders.TrackBar1.Value
         Dim width = sliders.TrackBar2.Value
         Dim height = sliders.TrackBar3.Value
         If externalUse = False Then src = ocvb.color.Clone()
         ocvb.result1 = src.Clone()
         For i = 0 To imageCount - 1
-            Dim x1 = CInt(autoRand.NextDouble() * (src.Width - width))
-            Dim x2 = CInt(autoRand.NextDouble() * (src.Height - height))
+            Dim x1 = CInt(ocvb.rng.uniform(0, src.Width - width))
+            Dim x2 = CInt(ocvb.rng.uniform(0, src.Height - height))
             Dim rect = New cv.Rect(x1, x2, width, height)
             ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
             mats.Add(src(rect).Clone())

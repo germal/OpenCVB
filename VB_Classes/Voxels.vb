@@ -17,7 +17,8 @@ Public Class Voxels_Basics_MT : Implements IDisposable
         grid.sliders.TrackBar2.Value = 16
         grid.externalUse = True
 
-        ocvb.desc = "Use multi-threading to get center-weighted depth values as voxels."
+        ocvb.label2 = "Voxels labeled with their median distance"
+        ocvb.desc = "Use multi-threading to get median depth values as voxels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
@@ -43,8 +44,9 @@ Public Class Voxels_Basics_MT : Implements IDisposable
         End Sub)
         ocvb.result1 = ocvb.depthRGB.Clone()
         ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+
         Dim voxelMat = New cv.Mat(voxels.Length - 1, 1, cv.MatType.CV_64F, voxels)
-        voxelMat = voxelMat.Normalize(255, 0, cv.NormTypes.MinMax)
+        voxelMat *= 255 / (maxDepth - minDepth) ' do the normalize manually to use the min and max Depth (more stable image)
 
         Dim nearColor = cv.Scalar.Yellow
         Dim farColor = cv.Scalar.Blue

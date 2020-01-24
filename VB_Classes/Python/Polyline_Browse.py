@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 browse.py
 =========
@@ -11,21 +9,11 @@ Usage
 browse.py [image filename]
 
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
 import sys
-PY3 = sys.version_info[0] == 3
-
-if PY3:
-    xrange = range
-
 import numpy as np
 import cv2 as cv
-title_window = 'Polyline_Browse.py'
-
-# built-in modules
 import sys
+title_window = 'Polyline_Browse.py'
 
 def main():
     if len(sys.argv) > 1:
@@ -45,7 +33,7 @@ def main():
 
 
     small = img
-    for i in xrange(3):
+    for i in range(3):
         small = cv.pyrDown(small)
 
     def onmouse(event, x, y, flags, param):
@@ -59,7 +47,6 @@ def main():
     cv.setMouseCallback('preview', onmouse)
     cv.waitKey()
     print('Done')
-
 
 if __name__ == '__main__':
     print(__doc__)

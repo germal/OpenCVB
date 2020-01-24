@@ -347,8 +347,6 @@ Public Class Palette_BuildGradientColorMap : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False And ocvb.frameCount Mod 100 = 0 Or externalUse Then
-            Static autoRand As New Random()
-            ocvb.rng = New cv.RNG(autoRand.Next(0, 1000))
             Dim color1 = New cv.Scalar(ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255))
             Dim color2 = New cv.Scalar(ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255))
             Dim gradCount = sliders.TrackBar1.Value

@@ -35,7 +35,10 @@ Module Math_Functions
         For i = 1 To bins - 1
             cdfIndexer(i) = cdfIndexer(i - 1) + cdfIndexer(i)
         Next
-        cdf /= src.Total
+
+        Dim totalPixels = mask.CountNonZero()
+        If totalPixels = 0 Then totalPixels = src.Total
+        cdf /= totalPixels
 
         cdfIndexer = cdf.GetGenericIndexer(Of Single) ' need to reset the indexer because the mat will move with the divide above.
         Dim median As Double

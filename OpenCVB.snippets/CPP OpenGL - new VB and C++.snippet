@@ -28,9 +28,7 @@ End Class
 
 '//// Create a new project with this as the main module.  Simplest way: copy the OpenGL_Callbacks project to another directory.
 '//// Rename the directory and project and add it to the OpenCVB solution.  Don't forget to update VB_Classes dependencies.
-'//// If VB_Classes depends on your new project, it will recompile with every restart.
-'//// License Apache 2.0.See LICENSE file in root directory.
-'//// Copyright(c) 2015-2017 Intel Corporation. All Rights Reserved.
+'//// When VB_Classes depends on your new project, your new OpenGL will recompile (if changed) with every restart of OpenCVB.
 '//
 '//#include "example.hpp"          // Include short list of convenience functions for rendering
 '//#define NOGLFW
@@ -117,6 +115,7 @@ End Class
 '//	CloseHandle(pipe);
 '//	return EXIT_SUCCESS;
 '//}
+
 ]]>
             </Code>
         </Snippet>
