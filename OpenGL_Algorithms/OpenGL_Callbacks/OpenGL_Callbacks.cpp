@@ -8,7 +8,7 @@
 int main(int argc, char* argv[])
 {
 	GLuint gl_handle = 0;
-	windowTitle << "OpenGL_Voxels";
+	windowTitle << "OpenGL_Callbacks";
 	initializeNamedPipeAndMemMap(argc, argv);
 
 	window app(windowWidth, windowHeight, windowTitle.str().c_str());

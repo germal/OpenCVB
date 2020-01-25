@@ -8,17 +8,19 @@
 int main(int argc, char* argv[])
 {
 	GLuint gl_handle = 0;
-	windowTitle << "OpenGL_Callbacks";
+	windowTitle << "OpenGL_Voxels";
 	initializeNamedPipeAndMemMap(argc, argv);
 
 	window app(windowWidth, windowHeight, windowTitle.str().c_str());
 	glfw_state MyState;
+	MyState.offset_x = 10.0f;
+	MyState.offset_y = 10.0f;
 	register_glfw_callbacks(app, MyState);
 	double pixels = imageWidth * imageHeight;
 
 	while (app)
 	{
-		readPipeAndMemMap();
+		readPipeAndMemMap(); 
 
 		tex.upload(rgbBuffer, imageWidth, imageHeight);
 
@@ -31,7 +33,7 @@ int main(int argc, char* argv[])
 
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
-		gluPerspective(60, imageWidth / imageHeight, 0.01f, 10.0f);
+		gluPerspective(120, imageWidth / imageHeight, 0.01f, 10.0f);
 
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
@@ -50,30 +52,16 @@ int main(int argc, char* argv[])
 		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, tex_border_color);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // GL_CLAMP_TO_EDGE
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // GL_CLAMP_TO_EDGE
-		glBegin(GL_POINTS);
 
-		float2 pt; int pcIndex = 0; float3* pcIntel = (float3*)pointCloudBuffer;
-		for (int y = 0; y < imageHeight; ++y)
-		{
-			for (int x = 0; x < imageWidth; ++x)
-			{
-				if (pcIntel[pcIndex].z > 0)
-				{
-					glVertex3fv((float*)&pcIntel[pcIndex]);
-					pt.x = (float)((x + 0.5f) / imageWidth);
-					pt.y = (float)((y + 0.5f) / imageHeight);
-					glTexCoord2fv((const GLfloat*)& pt);
-				}
-				pcIndex++;
-			}
-		}
+		DrawBox(0.05f, -0.05f, 0.05f, 0.05f, 0.05f, 0.05f);
+		DrawBox(0.1f, -0.05f, 0.05f, 0.05f, 0.05f, 0.05f);
+		DrawBox(0.15f, -0.05f, 0.05f, 0.05f, 0.05f, 0.05f);
 
-		glEnd();
 		glDisable(GL_TEXTURE_2D);
 
 		drawAxes(10, 0, 0, 1);
 		draw_floor(10);
-
+		
 		glPopMatrix();
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();

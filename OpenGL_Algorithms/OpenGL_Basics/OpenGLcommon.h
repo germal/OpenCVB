@@ -284,3 +284,57 @@ static int ackBuffers()
 	}
 	return 0;
 }
+
+static void DrawBox(float x, float y, float z, float w, float h, float d)
+{
+	glBegin(GL_POLYGON);
+	glColor3f(1.0, 0.0, 0.0);     glVertex3f(x, y -h, z - d);      // P1 is red
+	glColor3f(0.0, 1.0, 0.0);     glVertex3f(x, y, z - d);      // P2 is green
+	glColor3f(0.0, 0.0, 1.0);     glVertex3f(x - w, y, z - d);      // P3 is blue
+	glColor3f(1.0, 0.0, 1.0);     glVertex3f(x - w, y - h, z - d);      // P4 is purple
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor3f(1.0, 1.0, 1.0);
+	glVertex3f(x, y - h, z);
+	glVertex3f(x, y, z);
+	glVertex3f(x - w, y, z);
+	glVertex3f(x - w, y - h, z);
+	glEnd();
+
+	// Purple side - RIGHT
+	glBegin(GL_POLYGON);
+	glColor3f(1.0, 0.0, 1.0);
+	glVertex3f(x, y - h, z - d);
+	glVertex3f(x, y, z - d);
+	glVertex3f(x, y, z);
+	glVertex3f(x, y - h, z);
+	glEnd();
+
+	// Green side - LEFT
+	glBegin(GL_POLYGON);
+	glColor3f(0.0, 1.0, 0.0);
+	glVertex3f(x - w, y - h, z);
+	glVertex3f(x - w, y, z);
+	glVertex3f(x - w, y, z - d);
+	glVertex3f(x - w, y - h, z - d);
+	glEnd();
+
+	// Blue side - TOP
+	glBegin(GL_POLYGON);
+	glColor3f(0.0, 0.0, 1.0);
+	glVertex3f(x, y, z);
+	glVertex3f(x, y, z - d);
+	glVertex3f(x - w, y, z - d);
+	glVertex3f(x - w, y, z);
+	glEnd();
+
+	// Red side - BOTTOM
+	glBegin(GL_POLYGON);
+	glColor3f(1.0, 0.0, 0.0);
+	glVertex3f(x, y - h, z - d);
+	glVertex3f(x, y - h, z);
+	glVertex3f(x - w, y - h, z);
+	glVertex3f(x - w, y - h, z - d);
+	glEnd();
+}

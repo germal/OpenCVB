@@ -32,7 +32,7 @@ int main(int argc, char * argv[])
 
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
-		gluPerspective(FOV, (float)windowWidth / windowHeight, zNear + 0.01, zFar);
+		gluPerspective(FOV, (float)windowWidth / windowHeight, zNear + 0.01f, zFar);
 
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
