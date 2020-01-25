@@ -22,28 +22,20 @@ End Class
 
 Module Math_Functions
     Public Function computeMedian(src As cv.Mat, mask As cv.Mat, bins As Int32, rangeMin As Single, rangeMax As Single) As Double
-
         Dim dimensions() = New Integer() {bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(rangeMin, rangeMax)}
 
         Dim hist As New cv.Mat()
         cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, mask, hist, 1, dimensions, ranges)
-
-        Dim cdf As New cv.Mat
-        hist.CopyTo(cdf)
-        Dim cdfIndexer = cdf.GetGenericIndexer(Of Single)
-        For i = 1 To bins - 1
-            cdfIndexer(i) = cdfIndexer(i - 1) + cdfIndexer(i)
-        Next
-
         Dim totalPixels = mask.CountNonZero()
         If totalPixels = 0 Then totalPixels = src.Total
-        cdf /= totalPixels
+        Dim halfPixels = totalPixels / 2
 
-        cdfIndexer = cdf.GetGenericIndexer(Of Single) ' need to reset the indexer because the mat will move with the divide above.
         Dim median As Double
-        For i = 0 To bins - 1
-            If cdfIndexer(i) > 0.5 Then
+        Dim cdfVal As Double = hist.At(Of Single)(0)
+        For i = 1 To bins - 1
+            cdfVal += hist.At(Of Single)(i)
+            If cdfVal > halfPixels Then
                 median = i * (rangeMax - rangeMin) / bins
                 Exit For
             End If

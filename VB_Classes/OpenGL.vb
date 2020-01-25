@@ -354,6 +354,7 @@ Public Class OpenGL_Voxels : Implements IDisposable
     Public ogl As OpenGL_Basics
     Public Sub New(ocvb As AlgorithmData)
         voxels = New Voxels_Basics_MT(ocvb)
+        voxels.check.Box(0).Checked = False
 
         ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_Voxels"
