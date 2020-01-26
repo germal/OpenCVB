@@ -724,6 +724,8 @@ Public Class OpenCVB
         formResult2 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
         formResultsUpdated = True ' one time update to zero out the results when starting a new camera or algorithm.
 
+        Thread.CurrentThread.Priority = ThreadPriority.Lowest
+
         If cameraTaskHandle Is Nothing Then
             stopCameraThread = False
             updateCamera()
@@ -744,6 +746,7 @@ Public Class OpenCVB
             cameraFrameCount = 0
             cameraTaskHandle = New Thread(AddressOf CameraTask)
             cameraTaskHandle.Name = "CameraTask"
+            cameraTaskHandle.Priority = ThreadPriority.Highest
             cameraTaskHandle.Start()
             ' wait for the first frame to appear.
             While cameraFrameCount = 0
@@ -757,6 +760,7 @@ Public Class OpenCVB
 
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
         algorithmTaskHandle.Name = "AlgorithmTask"
+        algorithmTaskHandle.Priority = ThreadPriority.Lowest
         algorithmTaskHandle.Start(parms)
 
         ActivateTimer.Enabled = True
