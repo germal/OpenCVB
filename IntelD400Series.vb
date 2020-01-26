@@ -120,6 +120,7 @@ Public Class IntelD400Series : Implements IDisposable
         deviceCount = devices.Count
 
         If deviceCount = 0 Then Return
+
         device = devices(0)
         deviceName = device.Info.Item(rs.CameraInfo.Name)
         If deviceName.EndsWith("USB2") Then MsgBox("Is the RealSense camera attached to a USB2 socket?  Are you using the Intel-provided cable?  It needs to be USB3!")

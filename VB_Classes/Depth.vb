@@ -10,6 +10,16 @@ Module Depth_Colorizer_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Depth_Colorizer_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
     End Function
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Depth_Colorizer2_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Depth_Colorizer2_Close(Depth_ColorizerPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Depth_Colorizer2_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    End Function
 End Module
 
 
@@ -46,6 +56,47 @@ Public Class Depth_Colorizer_CPP : Implements IDisposable
         Depth_Colorizer_Close(Depth_Colorizer)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Depth_Colorizer2_CPP : Implements IDisposable
+    Public dst As New cv.Mat
+    Public src As New cv.Mat
+    Public externalUse As Boolean
+    Dim Depth_Colorizer As IntPtr
+    Public Sub New(ocvb As AlgorithmData)
+        Depth_Colorizer = Depth_Colorizer2_Open()
+        ocvb.desc = "Display 16 bit image using C++ instead of VB.Net"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If externalUse = False Then src = ocvb.depth Else dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+
+        Dim depthData(src.Total * src.ElemSize - 1) As Byte
+        Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
+        Marshal.Copy(src.Data, depthData, 0, depthData.Length)
+        Dim imagePtr = Depth_Colorizer2_Run(Depth_Colorizer, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
+        handleSrc.Free()
+
+        If imagePtr <> 0 Then
+            If dst.Rows = 0 Then dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+            Dim dstData(dst.Total * dst.ElemSize - 1) As Byte
+            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
+            If externalUse = False Then
+                ocvb.result1 = New cv.Mat(ocvb.result1.Rows, ocvb.result1.Cols, cv.MatType.CV_8UC3, dstData)
+            Else
+                dst = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
+            End If
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        Depth_Colorizer2_Close(Depth_Colorizer)
+    End Sub
+End Class
+
+
 
 
 ' this algorithm is only intended to show how the depth can be colorized.  It is very slow.  Use the C++ version of this code nearby.
@@ -88,6 +139,62 @@ Public Class Depth_Colorizer : Implements IDisposable
         ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, rgbdata)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_Colorizer_MT : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Dim grid As Thread_Grid
+    Public src As cv.Mat
+    Public externalUse As Boolean
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "Min Depth", 100, 1000, 100)
+        sliders.setupTrackBar2(ocvb, "Max Depth", 1001, 10000, 4000)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        grid = New Thread_Grid(ocvb)
+        grid.externalUse = True
+
+        ocvb.desc = "Colorize normally uses CDF to stabilize the colors.  Just using sliders here - stabilized but not optimal range."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        grid.Run(ocvb)
+
+        If externalUse = False Then src = ocvb.depth
+        Dim nearColor = New Single() {0, 1, 1}
+        Dim farColor = New Single() {1, 0, 0}
+
+        Dim minDepth = sliders.TrackBar1.Value
+        Dim maxDepth = sliders.TrackBar2.Value
+
+        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+         Sub(roi)
+             Dim depth = src(roi)
+             Dim stride = depth.Width * 3
+             Dim rgbdata(stride * depth.Height) As Byte
+             For y = 0 To depth.Rows - 1
+                 For x = 0 To depth.Cols - 1
+                     Dim pixel = depth.Get(Of UInt16)(y, x)
+                     If pixel > minDepth And pixel <= maxDepth Then
+                         Dim t = (pixel - minDepth) / (maxDepth - minDepth)
+                         rgbdata(x * 3 + 0 + y * stride) = ((1 - t) * nearColor(0) + t * farColor(0)) * 255
+                         rgbdata(x * 3 + 1 + y * stride) = ((1 - t) * nearColor(1) + t * farColor(1)) * 255
+                         rgbdata(x * 3 + 2 + y * stride) = ((1 - t) * nearColor(2) + t * farColor(2)) * 255
+                     End If
+                 Next
+             Next
+             ocvb.result1(roi) = New cv.Mat(depth.Rows, depth.Cols, cv.MatType.CV_8UC3, rgbdata)
+         End Sub)
+        ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        grid.Dispose()
+        sliders.Dispose()
     End Sub
 End Class
 

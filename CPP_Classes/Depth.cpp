@@ -73,23 +73,46 @@ int *Depth_XYZ_OpenMP_Run(DepthXYZ *DepthXYZPtr, int *depthPtr, int rows, int co
 #include "DepthColorizer.hpp"
 
 extern "C" __declspec(dllexport)
-Depth_Colorizer *Depth_Colorizer_Open()
+Depth_Colorizer * Depth_Colorizer_Open()
 {
-    Depth_Colorizer *Depth_ColorizerPtr = new Depth_Colorizer();
-    return Depth_ColorizerPtr;
+	Depth_Colorizer* Depth_ColorizerPtr = new Depth_Colorizer();
+	return Depth_ColorizerPtr;
 }
 
 extern "C" __declspec(dllexport)
-void Depth_Colorizer_Close(Depth_Colorizer *Depth_ColorizerPtr)
+void Depth_Colorizer_Close(Depth_Colorizer * Depth_ColorizerPtr)
 {
-    delete Depth_ColorizerPtr;
+	delete Depth_ColorizerPtr;
 }
 
 extern "C" __declspec(dllexport)
-int *Depth_Colorizer_Run(Depth_Colorizer *Depth_ColorizerPtr, int *depthPtr, int rows, int cols)
+int* Depth_Colorizer_Run(Depth_Colorizer * Depth_ColorizerPtr, int* depthPtr, int rows, int cols)
 {
-    Depth_ColorizerPtr->depth = Mat(rows, cols, CV_16U, depthPtr);
+	Depth_ColorizerPtr->depth = Mat(rows, cols, CV_16U, depthPtr);
 	Depth_ColorizerPtr->dst = Mat(rows, cols, CV_8UC3);
 	Depth_ColorizerPtr->Run();
-    return (int *) Depth_ColorizerPtr->dst.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
+	return (int*)Depth_ColorizerPtr->dst.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
+}
+
+
+extern "C" __declspec(dllexport)
+Depth_Colorizer2 * Depth_Colorizer2_Open()
+{
+	Depth_Colorizer2* Depth_ColorizerPtr = new Depth_Colorizer2();
+	return Depth_ColorizerPtr;
+}
+
+extern "C" __declspec(dllexport)
+void Depth_Colorizer2_Close(Depth_Colorizer2 * Depth_ColorizerPtr)
+{
+	delete Depth_ColorizerPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Depth_Colorizer2_Run(Depth_Colorizer2 * Depth_ColorizerPtr, int* depthPtr, int rows, int cols)
+{
+	Depth_ColorizerPtr->depth = Mat(rows, cols, CV_16U, depthPtr);
+	Depth_ColorizerPtr->dst = Mat(rows, cols, CV_8UC3);
+	Depth_ColorizerPtr->Run();
+	return (int*)Depth_ColorizerPtr->dst.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
 }
