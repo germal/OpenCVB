@@ -44,7 +44,7 @@ void render_scene(state app_state)
 	glRotated(app_state.pitch, -1, 0, 0);
 	glRotated(app_state.yaw,    0, 1, 0);
 	glRotated(app_state.roll,   0, 0, 1);
-	draw_floor(8);
+	draw_floor(8, 1, 0);
 }
 
 class camera_renderer

@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
-		gluLookAt(0, 0, -4, 0, 0, 10, 0, -1, 0);
+		gluLookAt(0, 0, -2, 0, 0, 10, 0, -1, 0);
 
 		glTranslatef(0, 0, +0.5f + MyState.offset_y * 0.05f);
 		glRotated(MyState.pitch, 1, 0, 0);
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 
 		Mat voxels(dataHeight, dataWidth, CV_64F, dataBuffer);
 
-		float x = 0, y = 0, z = 0;
+		float x = 0, y = -5, z = 0;
 		float dx = 0.3f, dy = dx, dz = dx;
 		Scalar nearColor(1.0f, 1.0f, 0.0f);
 		Scalar farColor (0.0f, 0.0f, 1.0f);
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 					glColor3f(float((1.0f - v) * nearColor(0) + v * farColor(0)),
 							  float((1.0f - v) * nearColor(1) + v * farColor(1)),
 							  float((1.0f - v) * nearColor(2) + v * farColor(2)));
-					z = float(v * 6.0f);
+					z = float(v * 20.0f);
 					glVertex3f(x + i * dx, -y - j * dy - dy, z - dz);
 					glVertex3f(x + i * dx, -y - j * dy, z - dz);      
 					glVertex3f(x + i * dx - dx, -y - j * dy, z - dz);      
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 		}
 
 		drawAxes(50, 0, 0, 5);
-		draw_floor(10);
+		draw_floor(20, 10, 0);
 		
 		glPopMatrix();
 		glMatrixMode(GL_PROJECTION);

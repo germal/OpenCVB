@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 		glDisable(GL_TEXTURE_2D);
 
 		drawAxes(10, 0, 0, 1);
-		draw_floor(10);
+		draw_floor(10, 1, 0);
 
 		glPopMatrix();
 		glMatrixMode(GL_PROJECTION);

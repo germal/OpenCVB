@@ -75,7 +75,7 @@ int main(int argc, char * argv[])
 
 		float zDistance = 10.0f;
 		drawAxes(100.0f, 0, 0, zDistance);
-		draw_floor(20);
+		draw_floor(20, 1, 0);
 
 		glPopMatrix();
 		glMatrixMode(GL_PROJECTION);

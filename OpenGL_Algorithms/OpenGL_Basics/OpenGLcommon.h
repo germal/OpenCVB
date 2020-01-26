@@ -270,7 +270,7 @@ static void drawAxes(float axislen, float x, float y, float z)
 	glEnd();
 }
 
-static void draw_floor(int tileCount)
+static void draw_floor(int tileCount, GLint y, GLint z)
 {
 	glLineWidth(1.0);
 	glBegin(GL_LINES);
@@ -279,10 +279,10 @@ static void draw_floor(int tileCount)
 	// Render "floor" grid
 	for (int i = 0; i <= tileCount; i++)
 	{
-		glVertex3i(i - tileHalf, 1, 0);
-		glVertex3i(i - tileHalf, 1, tileCount);
-		glVertex3i(-tileHalf, 1, i);
-		glVertex3i(tileHalf, 1, i);
+		glVertex3i(i - tileHalf, y, z);
+		glVertex3i(i - tileHalf, y, tileCount);
+		glVertex3i(-tileHalf, y, i);
+		glVertex3i(tileHalf, y, i);
 	}
 	glEnd();
 }
