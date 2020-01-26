@@ -4,7 +4,10 @@ Public Class Voxels_Basics_MT : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public grid As Thread_Grid
     Public voxels() As Double
+    Public voxelMat As cv.Mat
     Public check As New OptionsCheckbox
+    Public minDepth As Double
+    Public maxDepth As Double
     Public Sub New(ocvb As AlgorithmData)
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Display intermediate results"
@@ -28,8 +31,8 @@ Public Class Voxels_Basics_MT : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
-        Dim minDepth = trim.sliders.TrackBar1.Value
-        Dim maxDepth = trim.sliders.TrackBar2.Value
+        minDepth = trim.sliders.TrackBar1.Value
+        maxDepth = trim.sliders.TrackBar2.Value
 
         grid.Run(ocvb)
 
@@ -44,9 +47,13 @@ Public Class Voxels_Basics_MT : Implements IDisposable
         Parallel.For(0, gridCount,
         Sub(i)
             Dim roi = grid.roiList(i)
-            If ocvb.depth(roi).CountNonZero() Then voxels(i) = computeMedian(ocvb.depth(roi), trim.Mask(roi), bins, minDepth, maxDepth)
+            If ocvb.depth(roi).CountNonZero() Then
+                voxels(i) = computeMedian(ocvb.depth(roi), trim.Mask(roi), bins, minDepth, maxDepth)
+            Else
+                voxels(i) = 0
+            End If
         End Sub)
-        Dim voxelMat = New cv.Mat(voxels.Length - 1, 1, cv.MatType.CV_64F, voxels)
+        voxelMat = New cv.Mat(voxels.Length - 1, 1, cv.MatType.CV_64F, voxels)
         voxelMat *= 255 / (maxDepth - minDepth) ' do the normalize manually to use the min and max Depth (more stable image)
 
         If check.Box(0).Checked Then ' do they want to display results?

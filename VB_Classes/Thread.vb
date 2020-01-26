@@ -92,7 +92,8 @@ Public Class Thread_Grid : Implements IDisposable
             ocvb.color.CopyTo(ocvb.result1)
             ocvb.result1.SetTo(cv.Scalar.All(255), gridMask)
         End If
-        ocvb.label1 = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " " + CStr(roiList(0).Width) + "X" + CStr(roiList(0).Height) + " regions"
+        ocvb.label1 = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
+                      CStr(roiList(0).Width) + "X" + CStr(roiList(0).Height) + " regions"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()

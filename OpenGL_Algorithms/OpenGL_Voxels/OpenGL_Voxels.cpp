@@ -4,6 +4,10 @@
 #include "example.hpp"          // Include short list of convenience functions for rendering
 #define NOGLFW
 #include "../OpenGL_Basics/OpenGLcommon.h"
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
+using namespace cv;
 
 int main(int argc, char* argv[])
 {
@@ -13,18 +17,16 @@ int main(int argc, char* argv[])
 
 	window app(windowWidth, windowHeight, windowTitle.str().c_str());
 	glfw_state MyState;
-	MyState.offset_x = 10.0f;
-	MyState.offset_y = 10.0f;
+	MyState.offset_x = 0;
+	MyState.offset_y = -35.0f;
+	MyState.pitch = 5.0f;
+	MyState.yaw = 0;
 	register_glfw_callbacks(app, MyState);
 	double pixels = imageWidth * imageHeight;
 
 	while (app)
 	{
 		readPipeAndMemMap(); 
-
-		tex.upload(rgbBuffer, imageWidth, imageHeight);
-
-		// OpenGL commands that prep screen for the pointcloud
 		glLoadIdentity();
 		glPushAttrib(GL_ALL_ATTRIB_BITS);
 
@@ -33,33 +35,51 @@ int main(int argc, char* argv[])
 
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
-		gluPerspective(120, imageWidth / imageHeight, 0.01f, 10.0f);
+		gluPerspective(160, imageWidth / imageHeight, 0.01f, 30.0f);
 
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
-		gluLookAt(0, 0, 0, 0, 0, 1, 0, -1, 0);
+		gluLookAt(0, 0, -4, 0, 0, 10, 0, -1, 0);
 
 		glTranslatef(0, 0, +0.5f + MyState.offset_y * 0.05f);
 		glRotated(MyState.pitch, 1, 0, 0);
 		glRotated(MyState.yaw, 0, 1, 0);
 		glTranslatef(0, 0, -0.5f);
 
-		glPointSize((float)pointSize);
 		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, tex.get_gl_handle());
-		float tex_border_color[] = { 0.8f, 0.8f, 0.8f, 0.8f };
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, tex_border_color);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // GL_CLAMP_TO_EDGE
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // GL_CLAMP_TO_EDGE
+		glColor3f(1.0f, 0, 0);
 
-		DrawBox(0.05f, -0.05f, 0.05f, 0.05f, 0.05f, 0.05f);
-		DrawBox(0.1f, -0.05f, 0.05f, 0.05f, 0.05f, 0.05f);
-		DrawBox(0.15f, -0.05f, 0.05f, 0.05f, 0.05f, 0.05f);
+		Mat voxels(dataHeight, dataWidth, CV_64F, dataBuffer);
 
-		glDisable(GL_TEXTURE_2D);
+		float x = 0, y = 0, z = 0;
+		float dx = 0.3f, dy = dx, dz = dx;
+		Scalar nearColor(1.0f, 1.0f, 0.0f);
+		Scalar farColor (0.0f, 0.0f, 1.0f);
+		int half = int(dataWidth / 2);
+		int testCount = 0;
+		for (int i = -half; i < half; i++)
+		{
+			for (int j = 0; j < dataHeight; j++)
+			{
+				double v = voxels.at<double>(dataHeight - j - 1, i + half);
+				if (v > 0 && v < 1.0f)
+				{
+					glBegin(GL_POLYGON);
+					glColor3f(float((1.0f - v) * nearColor(0) + v * farColor(0)),
+							  float((1.0f - v) * nearColor(1) + v * farColor(1)),
+							  float((1.0f - v) * nearColor(2) + v * farColor(2)));
+					z = float(v * 6.0f);
+					glVertex3f(x + i * dx, -y - j * dy - dy, z - dz);
+					glVertex3f(x + i * dx, -y - j * dy, z - dz);      
+					glVertex3f(x + i * dx - dx, -y - j * dy, z - dz);      
+					glVertex3f(x + i * dx - dx, -y - j * dy - dy, z - dz);      
+					glEnd();
+					DrawBox(x + i * dx, -y - j * dy, z, dx, dy, dz);	
+				}
+			}
+		}
 
-		drawAxes(10, 0, 0, 1);
+		drawAxes(50, 0, 0, 5);
 		draw_floor(10);
 		
 		glPopMatrix();

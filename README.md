@@ -630,6 +630,15 @@ Sample programs.*
 *This synthetic problem demonstrates how to use the Python SciKit package to
 perform a gradient descent problem.*
 
+![](media/b5a3eacfa7c49fff74e9ec5733ee77a1.png)
+
+*A voxel-style view of the depth data in OpenGL is available – see top window.
+The bottom left shows the thread grid used to compute the median depth in each
+voxel while the bottom right shows the voxels colored with their median depth
+(using the typical colors for depth – yellow for close, blue for distant.) The
+options used in each of the contributing algorithms are present below the main
+OpenCVB window.*
+
 **Future Work**
 
 The plan is to continue adding more algorithms. There are numerous published

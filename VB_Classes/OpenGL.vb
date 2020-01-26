@@ -363,7 +363,8 @@ Public Class OpenGL_Voxels : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         voxels.Run(ocvb)
 
-        ogl.rgbInput = ocvb.color
+        ogl.dataInput = New cv.Mat(voxels.grid.tilesPerCol, voxels.grid.tilesPerRow, cv.MatType.CV_64F, voxels.voxels)
+        ogl.dataInput *= 1 / (voxels.maxDepth - voxels.minDepth)
         ogl.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

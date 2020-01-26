@@ -97,7 +97,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)../../librealsense/realsense2;$(ProjectDir)../../librealsense/src;$(ProjectDir)../../librealsense/examples;$(ProjectDir)../../librealsense/include;$(ProjectDir)../../librealsense/third-party/glfw/include;C:\_src\OpenCVB\librealsense\build;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4098</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4098;4267</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -152,8 +152,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)../../librealsense/realsense2;$(ProjectDir)../../librealsense/src;$(ProjectDir)../../librealsense/examples;$(ProjectDir)../../librealsense/include;$(ProjectDir)../../librealsense/third-party/glfw/include;C:\_src\OpenCVB\librealsense\build;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>
-      </DisableSpecificWarnings>
+      <DisableSpecificWarnings>4098;4267</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>

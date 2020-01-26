@@ -141,23 +141,6 @@ static float3 Eye;
 static float3 scaleXYZ;
 static float zTrans;
 
-static void draw_floor(int tileCount)
-{
-	glLineWidth(1.0);
-	glBegin(GL_LINES);
-	glColor4f(0.4f, 0.4f, 0.4f, 1.f);
-	int tileHalf = (int) (tileCount / 2);
-	// Render "floor" grid
-	for (int i = 0; i <= tileCount; i++)
-	{
-		glVertex3i(i - tileHalf, 1, 0);
-		glVertex3i(i - tileHalf, 1, tileCount);
-		glVertex3i(-tileHalf, 1, i);
-		glVertex3i(tileHalf, 1, i);
-	}
-	glEnd();
-}
-
 static int initializeNamedPipeAndMemMap(int argc, char * argv[])
 {
 	if (argc != 6)
@@ -264,15 +247,7 @@ static void readPipeAndMemMap()
 		ReadFile(pipe, pointCloudBuffer, (int)pcBufferSize, &dwRead, NULL);
 	}
 }
-static void drawAxes(float axislen, float x, float y, float z)
-{
-	glLineWidth(5.0);
-	glBegin(GL_LINES);
-	glColor3f(1, 0, 0); glVertex3f(x, y, z); glVertex3f(axislen, 0, 0);
-	glColor3f(0, 1, 0); glVertex3f(x, y, z); glVertex3f(0, -axislen, 0);
-	glColor3f(0, 0, 1); glVertex3f(x, y, z); glVertex3f(0, 0, -axislen);
-	glEnd();
-}
+
 static int ackBuffers()
 {
 	DWORD dwWrite = 0;
@@ -285,56 +260,71 @@ static int ackBuffers()
 	return 0;
 }
 
-static void DrawBox(float x, float y, float z, float w, float h, float d)
+static void drawAxes(float axislen, float x, float y, float z)
+{
+	glLineWidth(5.0);
+	glBegin(GL_LINES);
+	glColor3f(1, 0, 0); glVertex3f(x, y, z); glVertex3f(axislen, y, z);
+	glColor3f(0, 1, 0); glVertex3f(x, y, z); glVertex3f(x, -axislen, z);
+	glColor3f(0, 0, 1); glVertex3f(x, y, z); glVertex3f(x, y, -axislen);
+	glEnd();
+}
+
+static void draw_floor(int tileCount)
+{
+	glLineWidth(1.0);
+	glBegin(GL_LINES);
+	glColor4f(0.4f, 0.4f, 0.4f, 1.f);
+	int tileHalf = (int)(tileCount / 2);
+	// Render "floor" grid
+	for (int i = 0; i <= tileCount; i++)
+	{
+		glVertex3i(i - tileHalf, 1, 0);
+		glVertex3i(i - tileHalf, 1, tileCount);
+		glVertex3i(-tileHalf, 1, i);
+		glVertex3i(tileHalf, 1, i);
+	}
+	glEnd();
+}
+
+static void DrawBox(float x, float y, float z, float dx, float dy, float dz)
 {
 	glBegin(GL_POLYGON);
-	glColor3f(1.0, 0.0, 0.0);     glVertex3f(x, y -h, z - d);      // P1 is red
-	glColor3f(0.0, 1.0, 0.0);     glVertex3f(x, y, z - d);      // P2 is green
-	glColor3f(0.0, 0.0, 1.0);     glVertex3f(x - w, y, z - d);      // P3 is blue
-	glColor3f(1.0, 0.0, 1.0);     glVertex3f(x - w, y - h, z - d);      // P4 is purple
-	glEnd();
-
-	glBegin(GL_POLYGON);
-	glColor3f(1.0, 1.0, 1.0);
-	glVertex3f(x, y - h, z);
+	glVertex3f(x, y - dy, z);
 	glVertex3f(x, y, z);
-	glVertex3f(x - w, y, z);
-	glVertex3f(x - w, y - h, z);
+	glVertex3f(x - dx, y, z);
+	glVertex3f(x - dx, y - dy, z);
 	glEnd();
 
 	// Purple side - RIGHT
 	glBegin(GL_POLYGON);
-	glColor3f(1.0, 0.0, 1.0);
-	glVertex3f(x, y - h, z - d);
-	glVertex3f(x, y, z - d);
+	glVertex3f(x, y - dy, z - dz);
+	glVertex3f(x, y, z - dz);
 	glVertex3f(x, y, z);
-	glVertex3f(x, y - h, z);
+	glVertex3f(x, y - dy, z);
 	glEnd();
 
 	// Green side - LEFT
 	glBegin(GL_POLYGON);
-	glColor3f(0.0, 1.0, 0.0);
-	glVertex3f(x - w, y - h, z);
-	glVertex3f(x - w, y, z);
-	glVertex3f(x - w, y, z - d);
-	glVertex3f(x - w, y - h, z - d);
+	glVertex3f(x - dx, y - dy, z);
+	glVertex3f(x - dx, y, z);
+	glVertex3f(x - dx, y, z - dz);
+	glVertex3f(x - dx, y - dy, z - dz);
 	glEnd();
 
 	// Blue side - TOP
 	glBegin(GL_POLYGON);
-	glColor3f(0.0, 0.0, 1.0);
 	glVertex3f(x, y, z);
-	glVertex3f(x, y, z - d);
-	glVertex3f(x - w, y, z - d);
-	glVertex3f(x - w, y, z);
+	glVertex3f(x, y, z - dz);
+	glVertex3f(x - dx, y, z - dz);
+	glVertex3f(x - dx, y, z);
 	glEnd();
 
 	// Red side - BOTTOM
 	glBegin(GL_POLYGON);
-	glColor3f(1.0, 0.0, 0.0);
-	glVertex3f(x, y - h, z - d);
-	glVertex3f(x, y - h, z);
-	glVertex3f(x - w, y - h, z);
-	glVertex3f(x - w, y - h, z - d);
+	glVertex3f(x, y - dy, z - dz);
+	glVertex3f(x, y - dy, z);
+	glVertex3f(x - dx, y - dy, z);
+	glVertex3f(x - dx, y - dy, z - dz);
 	glEnd();
 }
