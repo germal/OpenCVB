@@ -958,7 +958,7 @@ Public Class Depth_Colorizer_2_CPP : Implements IDisposable
         inrange.sliders.TrackBar2.Value = 4000 ' a better default
         inrange.externalUse = True
 
-        ocvb.desc = "Display 16 bit image using C++ instead of VB.Net"
+        ocvb.desc = "Display 16-bit depth data with inrange trim.  Higher contrast than others - yellow to blue always present."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         inrange.Run(ocvb)

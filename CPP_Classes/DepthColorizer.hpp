@@ -66,7 +66,7 @@ public:
 		float nearColor[3] = { 0, 1.0f, 1.0f };
 		float farColor[3] = { 1.0f, 0, 0 };
 		// Produce a cumulative histogram of depth values
-		float hRange[] = { 1, float(histSize - 1) }; // ranges are exclusive at the top of the range
+		float hRange[] = { 1, float(histSize) }; // ranges are exclusive at the top of the range
 		const float* range[] = { hRange };
 		int hbins[] = { histSize };
 		Mat hist;
