@@ -15,6 +15,7 @@
 .vs/*
 */obj/*
 *.exe
+*.enc
 *.iobj
 *.ipdb
 *.user

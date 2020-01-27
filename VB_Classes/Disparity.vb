@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Disparity_Basics : Implements IDisposable
-    Dim disp16 As Depth_Colorizer_CPP
+    Dim disp16 As Depth_Colorizer_1_CPP
     Public Sub New(ocvb As AlgorithmData)
-        disp16 = New Depth_Colorizer_CPP(ocvb)
+        disp16 = New Depth_Colorizer_1_CPP(ocvb)
         disp16.externalUse = True
 
         ocvb.desc = "Show disparity from RealSense camera"

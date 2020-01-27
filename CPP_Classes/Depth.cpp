@@ -70,6 +70,11 @@ int *Depth_XYZ_OpenMP_Run(DepthXYZ *DepthXYZPtr, int *depthPtr, int rows, int co
 
 
 
+
+
+
+
+
 #include "DepthColorizer.hpp"
 
 extern "C" __declspec(dllexport)
@@ -95,6 +100,11 @@ int* Depth_Colorizer_Run(Depth_Colorizer * Depth_ColorizerPtr, int* depthPtr, in
 }
 
 
+
+
+
+
+
 extern "C" __declspec(dllexport)
 Depth_Colorizer2 * Depth_Colorizer2_Open()
 {
@@ -109,8 +119,9 @@ void Depth_Colorizer2_Close(Depth_Colorizer2 * Depth_ColorizerPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* Depth_Colorizer2_Run(Depth_Colorizer2 * Depth_ColorizerPtr, int* depthPtr, int rows, int cols)
+int* Depth_Colorizer2_Run(Depth_Colorizer2 * Depth_ColorizerPtr, int* depthPtr, int rows, int cols, int _histSize)
 {
+	Depth_ColorizerPtr->histSize = _histSize;
 	Depth_ColorizerPtr->depth = Mat(rows, cols, CV_16U, depthPtr);
 	Depth_ColorizerPtr->dst = Mat(rows, cols, CV_8UC3);
 	Depth_ColorizerPtr->Run();

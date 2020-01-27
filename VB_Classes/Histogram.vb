@@ -274,7 +274,7 @@ End Class
 Public Class Histogram_2D_XZ_YZ : Implements IDisposable
     Dim xyDepth As Mat_ImageXYZ_MT
     Dim mats As Mat_4to1
-    Dim trim As Depth_InRangeTrim
+    Dim trim As Depth_InRange
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         xyDepth = New Mat_ImageXYZ_MT(ocvb)
@@ -282,7 +282,7 @@ Public Class Histogram_2D_XZ_YZ : Implements IDisposable
         mats = New Mat_4to1(ocvb)
         mats.externalUse = True
 
-        trim = New Depth_InRangeTrim(ocvb)
+        trim = New Depth_InRange(ocvb)
         trim.sliders.TrackBar2.Value = 1500 ' up to x meters away 
 
         sliders.setupTrackBar1(ocvb, "Histogram X bins", 1, ocvb.color.Width / 2, 30)
@@ -548,7 +548,7 @@ End Class
 
 
 Public Class Histogram_Depth : Implements IDisposable
-    Public inrange As Depth_InRangeTrim
+    Public inrange As Depth_InRange
     Public sliders As New OptionsSliders
     Public plotHist As Plot_Histogram
     Public externalUse As Boolean
@@ -556,7 +556,7 @@ Public Class Histogram_Depth : Implements IDisposable
         plotHist = New Plot_Histogram(ocvb)
         plotHist.externalUse = True
 
-        inrange = New Depth_InRangeTrim(ocvb)
+        inrange = New Depth_InRange(ocvb)
         sliders.setupTrackBar1(ocvb, "Histogram Depth Bins", 1, ocvb.color.Width * 2, 10) ' max is the number of columns * 2 
         If ocvb.parms.ShowOptions Then sliders.Show()
 

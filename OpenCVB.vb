@@ -19,8 +19,9 @@ Public Class OpenCVB
     Dim cameraFrameCount As Int32
     Dim camera As Object
     Dim cameraDataUpdated As Boolean
-    Dim cameraIntel As Object
+    Dim cameraD400Series As Object
     Dim cameraKinect As Object
+    Dim cameraT265 As Object
     Dim cameraName As String
     Dim cameraTaskHandle As Thread
     Dim camPic(displayFrames - 1) As PictureBox
@@ -135,9 +136,14 @@ Public Class OpenCVB
         optionsForm.Dialog1_Load(sender, e)
 
         cameraKinect = New Kinect(30, regWidth, regHeight)
-        cameraIntel = New IntelD400Series(30, regWidth, regHeight)
+        cameraD400Series = New IntelD400Series(30, regWidth, regHeight)
 
-        If cameraKinect.deviceCount = 0 And cameraIntel.deviceCount = 0 Then
+        cameraT265 = New IntelT265
+        If cameraT265.DetectDevice("T265") Then ' See if we have a T265 camera.
+
+        End If
+
+        If cameraKinect.deviceCount = 0 And cameraD400Series.deviceCount = 0 Then
             MsgBox("OpenCVB supports either a Kinect for Azure 3D camera or an Intel D400Series 3D camera.  Neither is present.")
             End
         End If
@@ -579,7 +585,7 @@ Public Class OpenCVB
         picLabels(1) = "Depth " + details
     End Sub
     Public Sub updateCamera()
-        If optionsForm.IntelCamera.Checked Then camera = cameraIntel Else camera = cameraKinect
+        If optionsForm.IntelCamera.Checked Then camera = cameraD400Series Else camera = cameraKinect
         cameraName = camera.devicename
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
@@ -675,13 +681,13 @@ Public Class OpenCVB
         stopAlgorithmThread = True
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
 
-        cameraIntel.DecimationFilter = GetSetting("OpenCVB", "DecimationFilter", "DecimationFilter", False)
-        cameraIntel.ThresholdFilter = GetSetting("OpenCVB", "ThresholdFilter", "ThresholdFilter", False)
-        cameraIntel.DepthToDisparity = GetSetting("OpenCVB", "DepthToDisparity", "DepthToDisparity", True)
-        cameraIntel.SpatialFilter = GetSetting("OpenCVB", "SpatialFilter", "SpatialFilter", True)
-        cameraIntel.TemporalFilter = GetSetting("OpenCVB", "TemporalFilter", "TemporalFilter", False)
-        cameraIntel.HoleFillingFilter = GetSetting("OpenCVB", "HoleFillingFilter", "HoleFillingFilter", True)
-        cameraIntel.DisparityToDepth = GetSetting("OpenCVB", "DisparityToDepth", "DisparityToDepth", True)
+        cameraD400Series.DecimationFilter = GetSetting("OpenCVB", "DecimationFilter", "DecimationFilter", False)
+        cameraD400Series.ThresholdFilter = GetSetting("OpenCVB", "ThresholdFilter", "ThresholdFilter", False)
+        cameraD400Series.DepthToDisparity = GetSetting("OpenCVB", "DepthToDisparity", "DepthToDisparity", True)
+        cameraD400Series.SpatialFilter = GetSetting("OpenCVB", "SpatialFilter", "SpatialFilter", True)
+        cameraD400Series.TemporalFilter = GetSetting("OpenCVB", "TemporalFilter", "TemporalFilter", False)
+        cameraD400Series.HoleFillingFilter = GetSetting("OpenCVB", "HoleFillingFilter", "HoleFillingFilter", True)
+        cameraD400Series.DisparityToDepth = GetSetting("OpenCVB", "DisparityToDepth", "DisparityToDepth", True)
 
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
         lowResolution = optionsForm.lowResolution.Checked
@@ -730,7 +736,7 @@ Public Class OpenCVB
             stopCameraThread = False
             updateCamera()
 
-            If cameraIntel.deviceCount = 0 Then
+            If cameraD400Series.deviceCount = 0 Then
                 optionsForm.Kinect4Azure.Checked = True
                 optionsForm.IntelCamera.Enabled = False
                 SaveSetting("OpenCVB", "IntelCamera", "IntelCamera", False)

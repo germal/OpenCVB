@@ -1,10 +1,10 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Object_Basics : Implements IDisposable
-    Dim trim As Depth_InRangeTrim
+    Dim trim As Depth_InRange
     Dim ccomp As CComp_EdgeMask
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
-        trim = New Depth_InRangeTrim(ocvb)
+        trim = New Depth_InRange(ocvb)
         trim.externalUse = True
 
         ccomp = New CComp_EdgeMask(ocvb)

@@ -113,9 +113,9 @@ End Class
 
 
 Public Class Contours_Depth : Implements IDisposable
-    Public trim As Depth_InRangeTrim
+    Public trim As Depth_InRange
     Public Sub New(ocvb As AlgorithmData)
-        trim = New Depth_InRangeTrim(ocvb)
+        trim = New Depth_InRange(ocvb)
         ocvb.desc = "Find and draw the contour of the depth foreground."
         ocvb.label1 = "DepthContour input"
         ocvb.label2 = "DepthContour output"
@@ -151,9 +151,9 @@ End Class
 
 
 Public Class Contours_RGB : Implements IDisposable
-    Dim foreground As Depth_InRangeTrim
+    Dim foreground As Depth_InRange
     Public Sub New(ocvb As AlgorithmData)
-        foreground = New Depth_InRangeTrim(ocvb)
+        foreground = New Depth_InRange(ocvb)
         ocvb.desc = "Find and draw the contour of the largest foreground RGB contour."
         ocvb.label2 = "Background"
     End Sub

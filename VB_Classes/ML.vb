@@ -119,12 +119,12 @@ End Class
 
 
 Public Class ML_DepthFromColor_MT : Implements IDisposable
-    Dim disp16 As Depth_Colorizer_CPP
+    Dim disp16 As Depth_Colorizer_1_CPP
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        disp16 = New Depth_Colorizer_CPP(ocvb)
+        disp16 = New Depth_Colorizer_1_CPP(ocvb)
         disp16.externalUse = True
 
         dilate = New DilateErode_Basics(ocvb)
@@ -199,13 +199,13 @@ End Class
 
 
 Public Class ML_DepthFromColor : Implements IDisposable
-    Dim disp16 As Depth_Colorizer_CPP
+    Dim disp16 As Depth_Colorizer_1_CPP
     Dim mats As Mat_4to1
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        disp16 = New Depth_Colorizer_CPP(ocvb)
+        disp16 = New Depth_Colorizer_1_CPP(ocvb)
         disp16.externalUse = True
 
         mats = New Mat_4to1(ocvb)
@@ -295,9 +295,9 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
     Dim sliders As New OptionsSliders
-    Dim disp16 As Depth_Colorizer_CPP
+    Dim disp16 As Depth_Colorizer_1_CPP
     Public Sub New(ocvb As AlgorithmData)
-        disp16 = New Depth_Colorizer_CPP(ocvb)
+        disp16 = New Depth_Colorizer_1_CPP(ocvb)
         disp16.externalUse = True
 
         mats = New Mat_4to1(ocvb)
@@ -401,12 +401,12 @@ End Class
 
 
 Public Class ML_EdgeDepth : Implements IDisposable
-    Dim disp16 As Depth_Colorizer_CPP
+    Dim disp16 As Depth_Colorizer_1_CPP
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        disp16 = New Depth_Colorizer_CPP(ocvb)
+        disp16 = New Depth_Colorizer_1_CPP(ocvb)
         disp16.externalUse = True
 
         dilate = New DilateErode_Basics(ocvb)

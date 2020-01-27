@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Voxels_Basics_MT : Implements IDisposable
-    Public trim As Depth_InRangeTrim
+    Public trim As Depth_InRange
     Dim sliders As New OptionsSliders
     Public grid As Thread_Grid
     Public voxels() As Double
@@ -14,7 +14,7 @@ Public Class Voxels_Basics_MT : Implements IDisposable
         check.Box(0).Checked = False
         If ocvb.parms.ShowOptions Then check.Show()
 
-        trim = New Depth_InRangeTrim(ocvb)
+        trim = New Depth_InRange(ocvb)
         trim.externalUse = True
         trim.sliders.TrackBar2.Value = 5000
 
