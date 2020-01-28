@@ -141,14 +141,24 @@ Public Class OpenCVB
         cameraT265 = New IntelT265(30, regWidth, regHeight)
         optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = cameraT265.deviceCount
 
+        updateCamera()
+
         ' if a camera is missing, try to find another.
-        If cameraD400Series.deviceCount = 0 Then optionsForm.cameraIndex = OptionsDialog.Kinect4AzureCam
-        If cameraKinect.deviceCount = 0 Then optionsForm.cameraIndex = OptionsDialog.D400Cam
-        If cameraT265.deviceCount = 0 Then optionsForm.cameraIndex = OptionsDialog.D400Cam
+        If camera.deviceCount = 0 And cameraD400Series.deviceCount > 0 Then
+            optionsForm.cameraIndex = OptionsDialog.D400Cam
+            updateCamera()
+        End If
+        If camera.deviceCount = 0 And cameraKinect.deviceCount > 0 Then
+            optionsForm.cameraIndex = OptionsDialog.Kinect4AzureCam
+            updateCamera()
+        End If
+        If camera.deviceCount = 0 And cameraT265.deviceCount > 0 Then
+            optionsForm.cameraIndex = OptionsDialog.T265Camera
+            updateCamera()
+        End If
 
         optionsForm.cameraRadioButton(optionsForm.cameraIndex).Checked = True ' make sure any switch is reflected in the UI.
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
-        updateCamera()
 
         If camera.deviceCount = 0 Then
             MsgBox("OpenCVB supports Kinect for Azure 3D camera, Intel D400Series 3D camera, or Intel T265.  Nothing found!")
