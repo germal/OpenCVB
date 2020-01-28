@@ -204,9 +204,6 @@
     <EmbeddedResource Include="Data/PauseButton.png" />
     <EmbeddedResource Include="Data/PauseButtonRun.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="realsense2.dll" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
     <PreBuildEvent>

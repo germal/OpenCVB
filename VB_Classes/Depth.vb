@@ -378,25 +378,25 @@ Public Class Depth_ToInfrared : Implements IDisposable
         If ocvb.parms.ShowOptions Then check.Show()
 
         Dim top As Int32, left As Int32, bot As Int32, right As Int32
-        If ocvb.parms.UsingIntelCamera Then
+        If ocvb.parms.cameraIndex = D400Cam Then
             top = GetSetting("OpenCVB", "DepthToInfraredTop", "DepthToInfraredTop", 1 / 8)
-            left = GetSetting("OpenCVB", "DepthToInfraredLeft", "DepthToInfraredLeft", 1 / 8)
+            left = GetSetting("OpenCVB", "DepthToInfraleftView", "DepthToInfraleftView", 1 / 8)
             bot = GetSetting("OpenCVB", "DepthToInfraredBot", "DepthToInfraredBot", 7 / 8)
-            right = GetSetting("OpenCVB", "DepthToInfraredRight", "DepthToInfraredRight", 7 / 8)
+            right = GetSetting("OpenCVB", "DepthToInfrarightView", "DepthToInfrarightView", 7 / 8)
         Else
             top = 0
             left = 0
             bot = 1
             right = 1
         End If
-        sliders.setupTrackBar1(ocvb, "Color Image Top in RedLeft", 0, ocvb.color.Height / 2, top * ocvb.color.Height)
-        sliders.setupTrackBar2(ocvb, "Color Image Left in RedLeft", 0, ocvb.color.Width / 2, left * ocvb.color.Width)
-        sliders.setupTrackBar3(ocvb, "Color Image Bot in RedLeft", ocvb.color.Height / 2, ocvb.color.Height, bot * ocvb.color.Height)
-        sliders.setupTrackBar4(ocvb, "Color Image Right in RedLeft", ocvb.color.Width / 2, ocvb.color.Width, right * ocvb.color.Width)
+        sliders.setupTrackBar1(ocvb, "Color Image Top in leftView", 0, ocvb.color.Height / 2, top * ocvb.color.Height)
+        sliders.setupTrackBar2(ocvb, "Color Image Left in leftView", 0, ocvb.color.Width / 2, left * ocvb.color.Width)
+        sliders.setupTrackBar3(ocvb, "Color Image Bot in leftView", ocvb.color.Height / 2, ocvb.color.Height, bot * ocvb.color.Height)
+        sliders.setupTrackBar4(ocvb, "Color Image Right in leftView", ocvb.color.Width / 2, ocvb.color.Width, right * ocvb.color.Width)
         If ocvb.parms.ShowOptions Then sliders.Show()
-        If ocvb.parms.UsingIntelCamera Then
+        If ocvb.parms.cameraIndex = D400Cam Then
             ocvb.label1 = "Color + Infrared Left (overlay)"
-            ocvb.label2 = "Aligned RedLeft and color"
+            ocvb.label2 = "Aligned leftView and color"
         Else
             ocvb.label1 = "Aligning infrared with color is not useful on Kinect"
             ocvb.label2 = ""
@@ -416,9 +416,9 @@ Public Class Depth_ToInfrared : Implements IDisposable
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
             SaveSetting("OpenCVB", "DepthToInfraredTop", "DepthToInfraredTop", sliders.TrackBar1.Value / ocvb.color.Height)
-            SaveSetting("OpenCVB", "DepthToInfraredLeft", "DepthToInfraredLeft", sliders.TrackBar2.Value / ocvb.color.Width)
+            SaveSetting("OpenCVB", "DepthToInfraleftView", "DepthToInfraleftView", sliders.TrackBar2.Value / ocvb.color.Width)
             SaveSetting("OpenCVB", "DepthToInfraredBot", "DepthToInfraredBot", sliders.TrackBar3.Value / ocvb.color.Height)
-            SaveSetting("OpenCVB", "DepthToInfraredRight", "DepthToInfraredRight", sliders.TrackBar4.Value / ocvb.color.Width)
+            SaveSetting("OpenCVB", "DepthToInfrarightView", "DepthToInfrarightView", sliders.TrackBar4.Value / ocvb.color.Width)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

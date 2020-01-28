@@ -12,7 +12,7 @@ Public Class Rodrigues_Basics : Implements IDisposable
         ocvb.desc = "Compute Rodrigues calibration for Kinect camera (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.UsingIntelCamera Then
+        If ocvb.parms.cameraIndex = D400Cam Then
             ocvb.result2.SetTo(0)
             ocvb.putText(New ActiveClass.TrueType("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140, RESULT1))
             Exit Sub

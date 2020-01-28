@@ -31,17 +31,17 @@ End Module
 '    End Sub
 '    Public Sub Run(ocvb As AlgorithmData)
 '        If ocvb.frameCount < 10 Then Exit Sub
-'        Marshal.Copy(ocvb.redLeft.Data, leftData, 0, leftData.Length)
-'        Marshal.Copy(ocvb.redRight.Data, rightData, 0, rightData.Length)
+'        Marshal.Copy(ocvb.leftView.Data, leftData, 0, leftData.Length)
+'        Marshal.Copy(ocvb.rightView.Data, rightData, 0, rightData.Length)
 '        Dim handleLeft = GCHandle.Alloc(leftData, GCHandleType.Pinned)
 '        Dim handleRight = GCHandle.Alloc(rightData, GCHandleType.Pinned)
 '        Dim imagePtr = SemiGlobalMatching_Run(SemiGlobalMatching, handleLeft.AddrOfPinnedObject(), handleRight.AddrOfPinnedObject(),
-'                                              ocvb.redLeft.Rows, ocvb.redLeft.Cols, 3)
+'                                              ocvb.leftView.Rows, ocvb.leftView.Cols, 3)
 '        handleLeft.Free() ' free the pinned memory...
 '        handleRight.Free() ' free the pinned memory...
 '        Dim dstData(ocvb.color.Total - 1) As Byte
 '        Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-'        Dim dst = New cv.Mat(ocvb.redLeft.Rows, ocvb.redLeft.Cols, cv.MatType.CV_8U, dstData)
+'        Dim dst = New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols, cv.MatType.CV_8U, dstData)
 '        ocvb.result1 = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 '    End Sub
 '    Public Sub Dispose() Implements IDisposable.Dispose

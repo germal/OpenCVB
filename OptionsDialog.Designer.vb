@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class OptionsDialog
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,12 +20,13 @@ Partial Class OptionsDialog
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.GroupBox5 = New System.Windows.Forms.GroupBox()
+        Me.CameraGroup = New System.Windows.Forms.GroupBox()
+        Me.IntelT265 = New System.Windows.Forms.RadioButton()
         Me.SnapToGrid = New System.Windows.Forms.CheckBox()
         Me.Kinect4Azure = New System.Windows.Forms.RadioButton()
-        Me.IntelCamera = New System.Windows.Forms.RadioButton()
+        Me.IntelD400 = New System.Windows.Forms.RadioButton()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.AccurateProcessing = New System.Windows.Forms.RadioButton()
         Me.lowResolution = New System.Windows.Forms.RadioButton()
@@ -52,7 +53,7 @@ Partial Class OptionsDialog
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.OKButton = New System.Windows.Forms.Button()
         Me.Cancel_Button = New System.Windows.Forms.Button()
-        Me.GroupBox5.SuspendLayout()
+        Me.CameraGroup.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.Filters.SuspendLayout()
@@ -61,22 +62,34 @@ Partial Class OptionsDialog
         Me.GroupBox6.SuspendLayout()
         Me.SuspendLayout()
         '
-        'GroupBox5
+        'CameraGroup
         '
-        Me.GroupBox5.Controls.Add(Me.SnapToGrid)
-        Me.GroupBox5.Controls.Add(Me.Kinect4Azure)
-        Me.GroupBox5.Controls.Add(Me.IntelCamera)
-        Me.GroupBox5.Location = New System.Drawing.Point(21, 12)
-        Me.GroupBox5.Name = "GroupBox5"
-        Me.GroupBox5.Size = New System.Drawing.Size(692, 160)
-        Me.GroupBox5.TabIndex = 3
-        Me.GroupBox5.TabStop = False
-        Me.GroupBox5.Text = "Camera"
+        Me.CameraGroup.Controls.Add(Me.IntelT265)
+        Me.CameraGroup.Controls.Add(Me.SnapToGrid)
+        Me.CameraGroup.Controls.Add(Me.Kinect4Azure)
+        Me.CameraGroup.Controls.Add(Me.IntelD400)
+        Me.CameraGroup.Location = New System.Drawing.Point(21, 12)
+        Me.CameraGroup.Name = "CameraGroup"
+        Me.CameraGroup.Size = New System.Drawing.Size(692, 180)
+        Me.CameraGroup.TabIndex = 3
+        Me.CameraGroup.TabStop = False
+        Me.CameraGroup.Text = "Camera"
+        '
+        'IntelT265
+        '
+        Me.IntelT265.AutoSize = True
+        Me.IntelT265.Location = New System.Drawing.Point(16, 103)
+        Me.IntelT265.Name = "IntelT265"
+        Me.IntelT265.Size = New System.Drawing.Size(195, 24)
+        Me.IntelT265.TabIndex = 3
+        Me.IntelT265.TabStop = True
+        Me.IntelT265.Text = "Use Intel T265 camera"
+        Me.IntelT265.UseVisualStyleBackColor = True
         '
         'SnapToGrid
         '
         Me.SnapToGrid.AutoSize = True
-        Me.SnapToGrid.Location = New System.Drawing.Point(84, 114)
+        Me.SnapToGrid.Location = New System.Drawing.Point(84, 146)
         Me.SnapToGrid.Name = "SnapToGrid"
         Me.SnapToGrid.Size = New System.Drawing.Size(354, 24)
         Me.SnapToGrid.TabIndex = 2
@@ -94,22 +107,22 @@ Partial Class OptionsDialog
         Me.Kinect4Azure.Text = "Use Microsoft Kinect for Azure Camera"
         Me.Kinect4Azure.UseVisualStyleBackColor = True
         '
-        'IntelCamera
+        'IntelD400
         '
-        Me.IntelCamera.AutoSize = True
-        Me.IntelCamera.Location = New System.Drawing.Point(16, 40)
-        Me.IntelCamera.Name = "IntelCamera"
-        Me.IntelCamera.Size = New System.Drawing.Size(271, 24)
-        Me.IntelCamera.TabIndex = 0
-        Me.IntelCamera.TabStop = True
-        Me.IntelCamera.Text = "Use Intel D400Series 3D Camera"
-        Me.IntelCamera.UseVisualStyleBackColor = True
+        Me.IntelD400.AutoSize = True
+        Me.IntelD400.Location = New System.Drawing.Point(16, 40)
+        Me.IntelD400.Name = "IntelD400"
+        Me.IntelD400.Size = New System.Drawing.Size(271, 24)
+        Me.IntelD400.TabIndex = 0
+        Me.IntelD400.TabStop = True
+        Me.IntelD400.Text = "Use Intel D400Series 3D Camera"
+        Me.IntelD400.UseVisualStyleBackColor = True
         '
         'GroupBox1
         '
         Me.GroupBox1.Controls.Add(Me.AccurateProcessing)
         Me.GroupBox1.Controls.Add(Me.lowResolution)
-        Me.GroupBox1.Location = New System.Drawing.Point(21, 178)
+        Me.GroupBox1.Location = New System.Drawing.Point(21, 216)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(936, 128)
         Me.GroupBox1.TabIndex = 4
@@ -143,7 +156,7 @@ Partial Class OptionsDialog
         Me.GroupBox2.Controls.Add(Me.AvoidDNNCrashes)
         Me.GroupBox2.Controls.Add(Me.ShowConsoleLog)
         Me.GroupBox2.Controls.Add(Me.ShowLabels)
-        Me.GroupBox2.Location = New System.Drawing.Point(21, 312)
+        Me.GroupBox2.Location = New System.Drawing.Point(21, 350)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(936, 192)
         Me.GroupBox2.TabIndex = 5
@@ -190,7 +203,7 @@ Partial Class OptionsDialog
         Me.Filters.Controls.Add(Me.DepthToDisparity)
         Me.Filters.Controls.Add(Me.ThresholdFilter)
         Me.Filters.Controls.Add(Me.DecimationFilter)
-        Me.Filters.Location = New System.Drawing.Point(21, 510)
+        Me.Filters.Location = New System.Drawing.Point(21, 548)
         Me.Filters.Name = "Filters"
         Me.Filters.Size = New System.Drawing.Size(936, 274)
         Me.Filters.TabIndex = 7
@@ -274,7 +287,7 @@ Partial Class OptionsDialog
         Me.GroupBox4.Controls.Add(Me.ShowOptions)
         Me.GroupBox4.Controls.Add(Me.TestAllDuration)
         Me.GroupBox4.Controls.Add(Me.Label1)
-        Me.GroupBox4.Location = New System.Drawing.Point(24, 797)
+        Me.GroupBox4.Location = New System.Drawing.Point(24, 835)
         Me.GroupBox4.Name = "GroupBox4"
         Me.GroupBox4.Size = New System.Drawing.Size(941, 139)
         Me.GroupBox4.TabIndex = 8
@@ -316,7 +329,7 @@ Partial Class OptionsDialog
         Me.GroupBox6.Controls.Add(Me.PythonExeName)
         Me.GroupBox6.Controls.Add(Me.SelectPythonFile)
         Me.GroupBox6.Controls.Add(Me.Label2)
-        Me.GroupBox6.Location = New System.Drawing.Point(21, 942)
+        Me.GroupBox6.Location = New System.Drawing.Point(21, 980)
         Me.GroupBox6.Name = "GroupBox6"
         Me.GroupBox6.Size = New System.Drawing.Size(941, 116)
         Me.GroupBox6.TabIndex = 9
@@ -382,15 +395,15 @@ Partial Class OptionsDialog
         Me.Controls.Add(Me.Filters)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
-        Me.Controls.Add(Me.GroupBox5)
+        Me.Controls.Add(Me.CameraGroup)
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MinimizeBox = False
         Me.Name = "OptionsDialog"
         Me.ShowInTaskbar = False
         Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show
         Me.Text = "OpenCVB Global Settings"
-        Me.GroupBox5.ResumeLayout(False)
-        Me.GroupBox5.PerformLayout()
+        Me.CameraGroup.ResumeLayout(False)
+        Me.CameraGroup.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
@@ -405,10 +418,10 @@ Partial Class OptionsDialog
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents GroupBox5 As GroupBox
+    Friend WithEvents CameraGroup As GroupBox
     Friend WithEvents SnapToGrid As CheckBox
     Friend WithEvents Kinect4Azure As RadioButton
-    Friend WithEvents IntelCamera As RadioButton
+    Friend WithEvents IntelD400 As RadioButton
     Friend WithEvents GroupBox1 As GroupBox
     Friend WithEvents AccurateProcessing As RadioButton
     Friend WithEvents lowResolution As RadioButton
@@ -435,4 +448,5 @@ Partial Class OptionsDialog
     Friend WithEvents AvoidDNNCrashes As CheckBox
     Friend WithEvents OKButton As Button
     Friend WithEvents Cancel_Button As Button
+    Friend WithEvents IntelT265 As RadioButton
 End Class

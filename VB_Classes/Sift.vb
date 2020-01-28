@@ -20,9 +20,9 @@ Public Class Sift_Basics_CS : Implements IDisposable
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right infrared images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim dst As New cv.Mat(ocvb.redLeft.Rows, ocvb.redLeft.Cols * 2, cv.MatType.CV_8UC3)
+        Dim dst As New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols * 2, cv.MatType.CV_8UC3)
 
-        CS_SiftBasics.Run(ocvb.redLeft, ocvb.redRight, dst, radio.check(0).Checked, sliders.TrackBar1.Value)
+        CS_SiftBasics.Run(ocvb.leftView, ocvb.rightView, dst, radio.check(0).Checked, sliders.TrackBar1.Value)
 
         dst(New cv.Rect(0, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result1)
         dst(New cv.Rect(ocvb.result1.Width, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result2)
@@ -62,13 +62,13 @@ Public Class Sift_Basics_CS_MT : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
 
-        Dim dst As New cv.Mat(ocvb.redLeft.Rows, ocvb.redLeft.Cols * 2, cv.MatType.CV_8UC3)
+        Dim dst As New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols * 2, cv.MatType.CV_8UC3)
 
         Dim numFeatures = sliders.TrackBar1.Value
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
-            Dim left = ocvb.redLeft(roi).Clone()  ' sift wants the inputs to be continuous and roi-modified Mats are not continuous.
-            Dim right = ocvb.redRight(roi).Clone()
+            Dim left = ocvb.leftView(roi).Clone()  ' sift wants the inputs to be continuous and roi-modified Mats are not continuous.
+            Dim right = ocvb.rightView(roi).Clone()
             Dim dstROI = New cv.Rect(roi.X, roi.Y, roi.Width * 2, roi.Height)
             Dim dstTmp = dst(dstROI).Clone()
             CS_SiftBasics.Run(left, right, dstTmp, radio.check(0).Checked, numFeatures)

@@ -19,8 +19,8 @@ Public Class BlockMatching_Basics : Implements IDisposable
         Dim scale = sliders.TrackBar1.Value / 100
         If sliders.TrackBar1.Value <> 100 Then
             Dim method = If(scale < 1.0, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic)
-            ocvb.redLeft = ocvb.redLeft.Resize(New cv.Size(ocvb.redLeft.Width * scale, ocvb.redLeft.Height * scale), 0, 0, method)
-            ocvb.redRight = ocvb.redRight.Resize(New cv.Size(ocvb.redRight.Width * scale, ocvb.redRight.Height * scale), 0, 0, method)
+            ocvb.leftView = ocvb.leftView.Resize(New cv.Size(ocvb.leftView.Width * scale, ocvb.leftView.Height * scale), 0, 0, method)
+            ocvb.rightView = ocvb.rightView.Resize(New cv.Size(ocvb.rightView.Width * scale, ocvb.rightView.Height * scale), 0, 0, method)
         End If
 
         Dim numDisparity = sliders.TrackBar2.Value * 16 ' must be a multiple of 16
@@ -41,11 +41,11 @@ Public Class BlockMatching_Basics : Implements IDisposable
         blockMatch.Disp12MaxDiff = 1
 
         Dim disparity As New cv.Mat
-        blockMatch.compute(ocvb.redLeft, ocvb.redRight, disparity)
+        blockMatch.compute(ocvb.leftView, ocvb.rightView, disparity)
         disp16.src = disparity
         disp16.Run(ocvb)
         ocvb.result1 = disp16.dst
-        ocvb.result2 = ocvb.redRight
+        ocvb.result2 = ocvb.rightView
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()

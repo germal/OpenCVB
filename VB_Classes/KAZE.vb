@@ -89,11 +89,11 @@ Public Class KAZE_LeftAligned_CS : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim CS_KazeLeft As New CS_Classes.Kaze_Basics
-        CS_KazeLeft.GetKeypoints(ocvb.redLeft)
+        CS_KazeLeft.GetKeypoints(ocvb.leftView)
         Dim CS_KazeRight As New CS_Classes.Kaze_Basics
-        CS_KazeRight.GetKeypoints(ocvb.redRight)
+        CS_KazeRight.GetKeypoints(ocvb.rightView)
 
-        ocvb.result1 = ocvb.redLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        ocvb.result1 = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For i = 0 To CS_KazeLeft.kazeKeyPoints.Count - 1
             ocvb.result1.Circle(CS_KazeLeft.kazeKeyPoints.ElementAt(i).Pt, 1, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next

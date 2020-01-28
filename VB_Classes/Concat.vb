@@ -32,8 +32,8 @@ Public Class Concat_4way : Implements IDisposable
         If externalUse = False Then
             img(0) = ocvb.color
             img(1) = ocvb.depthRGB
-            img(2) = ocvb.redLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            img(3) = ocvb.redRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            img(2) = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            img(3) = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
         Dim tmp1 As New cv.Mat, tmp2 As New cv.Mat, tmp3 As New cv.Mat
         cv.Cv2.HConcat(img(0), img(1), tmp1)

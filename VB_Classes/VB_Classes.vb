@@ -12,6 +12,11 @@ Module VB_Classes
     Public Const FRAME_DEPTH = 1
     Public Const RESULT1 = 2
     Public Const RESULT2 = 3
+
+    Public Const D400Cam As Int32 = 0 ' Must be defined in OptionsDialog the same way!
+    Public Const Kinect4AzureCam As Int32 = 1 ' Must be defined in OptionsDialog the same way!
+    Public Const T265Camera As Int32 = 2 ' Must be defined in OptionsDialog the same way!
+
     Public term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public recordedData As Replay_Play
     Public Sub MakeSureImage8uC3(ByRef src As cv.Mat)
@@ -96,6 +101,7 @@ Public Class ActiveClass : Implements IDisposable
     Public Structure algorithmParameters
         Dim activeAlgorithm As String
         Dim AvoidDNNCrashes As Boolean
+        Dim cameraIndex As Int32
         Dim externalInvocation As Boolean
         Dim extrinsics As Extrinsics_VB
         Dim height As Int32
@@ -118,7 +124,6 @@ Public Class ActiveClass : Implements IDisposable
         Dim speedFactor As Int32
         Dim testAllRunning As Boolean
         Dim useRecordedData As Boolean
-        Dim UsingIntelCamera As Boolean
         Dim vtkDirectory As String
         Dim width As Int32
     End Structure

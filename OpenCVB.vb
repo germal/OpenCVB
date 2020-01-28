@@ -22,7 +22,7 @@ Public Class OpenCVB
     Dim cameraD400Series As Object
     Dim cameraKinect As Object
     Dim cameraT265 As Object
-    Dim cameraName As String
+    Public cameraName As String
     Dim cameraTaskHandle As Thread
     Dim camPic(displayFrames - 1) As PictureBox
     Dim CodeLineCount As Int32
@@ -30,7 +30,7 @@ Public Class OpenCVB
     Dim drawRect As New cv.Rect(0, 0, 0, 0)
     Dim externalInvocation As Boolean
     Dim formColor As New cv.Mat, formDepthRGB As New cv.Mat, formResult1 As New cv.Mat, formResult2 As New cv.Mat
-    Dim formDepth As New cv.Mat, formPointCloud As New cv.Mat, formDisparity As New cv.Mat, formRedLeft As New cv.Mat, formRedRight As New cv.Mat
+    Dim formDepth As New cv.Mat, formPointCloud As New cv.Mat, formDisparity As New cv.Mat, formleftView As New cv.Mat, formrightView As New cv.Mat
     Dim formResultsUpdated As Boolean
     Dim frameCount As Int32
     Dim GrabRectangleData As Boolean
@@ -62,7 +62,6 @@ Public Class OpenCVB
     Dim stopCameraThread As Boolean
     Dim textDesc As String = ""
     Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.ActiveClass.TrueType)
-    Dim usingIntelCamera As Boolean
     Dim vtkDirectory As String = ""
 
     <System.Runtime.InteropServices.DllImport("user32.dll")>
@@ -137,11 +136,7 @@ Public Class OpenCVB
 
         cameraKinect = New Kinect(30, regWidth, regHeight)
         cameraD400Series = New IntelD400Series(30, regWidth, regHeight)
-
-        cameraT265 = New IntelT265
-        If cameraT265.DetectDevice("T265") Then ' See if we have a T265 camera.
-
-        End If
+        cameraT265 = New IntelT265(30, regWidth, regHeight)
 
         If cameraKinect.deviceCount = 0 And cameraD400Series.deviceCount = 0 Then
             MsgBox("OpenCVB supports either a Kinect for Azure 3D camera or an Intel D400Series 3D camera.  Neither is present.")
@@ -585,7 +580,14 @@ Public Class OpenCVB
         picLabels(1) = "Depth " + details
     End Sub
     Public Sub updateCamera()
-        If optionsForm.IntelCamera.Checked Then camera = cameraD400Series Else camera = cameraKinect
+        Select Case optionsForm.cameraIndex
+            Case OptionsDialog.D400Cam
+                camera = cameraD400Series
+            Case OptionsDialog.Kinect4AzureCam
+                camera = cameraKinect
+            Case OptionsDialog.T265Camera
+                camera = cameraT265
+        End Select
         cameraName = camera.devicename
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
@@ -635,12 +637,12 @@ Public Class OpenCVB
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
         TestAllTimer.Enabled = False
         stopAlgorithmThread = True
-        Dim saveCurrentCamera = optionsForm.IntelCamera.Checked
+        Dim saveCurrentCamera = optionsForm.cameraIndex
 
         Dim OKcancel = optionsForm.ShowDialog()
 
         If OKcancel = DialogResult.OK Then
-            If saveCurrentCamera <> optionsForm.IntelCamera.Checked Then
+            If saveCurrentCamera <> optionsForm.cameraIndex Then
                 stopCameraThread = True
                 If threadStop(cameraFrameCount) = False Then cameraTaskHandle.Abort()
                 cameraTaskHandle = Nothing
@@ -678,6 +680,7 @@ Public Class OpenCVB
         Return True
     End Function
     Private Sub StartAlgorithmTask()
+        If camera Is Nothing Then updateCamera()
         stopAlgorithmThread = True
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
 
@@ -691,7 +694,6 @@ Public Class OpenCVB
 
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
         lowResolution = optionsForm.lowResolution.Checked
-        usingIntelCamera = optionsForm.IntelCamera.Checked
 
         parms.activeAlgorithm = AvailableAlgorithms.Text
         ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
@@ -699,7 +701,7 @@ Public Class OpenCVB
         fastSize = If(lowResolution, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
 
         parms.lowResolution = lowResolution
-        parms.UsingIntelCamera = usingIntelCamera
+        parms.cameraIndex = optionsForm.cameraIndex ' index of active camera
 
         parms.PythonExe = optionsForm.PythonExeName.Text
         parms.vtkDirectory = vtkDirectory
@@ -736,24 +738,13 @@ Public Class OpenCVB
             stopCameraThread = False
             updateCamera()
 
-            If cameraD400Series.deviceCount = 0 Then
-                optionsForm.Kinect4Azure.Checked = True
-                optionsForm.IntelCamera.Enabled = False
-                SaveSetting("OpenCVB", "IntelCamera", "IntelCamera", False)
-                updateCamera()
-            End If
-            If cameraKinect.devicecount = 0 Then
-                optionsForm.IntelCamera.Checked = True
-                optionsForm.Kinect4Azure.Enabled = False
-                SaveSetting("OpenCVB", "IntelCamera", "IntelCamera", True)
-                updateCamera()
-            End If
+            If camera.deviceCount = 0 Then SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", OptionsDialog.cameraIndex)
 
             cameraFrameCount = 0
             cameraTaskHandle = New Thread(AddressOf CameraTask)
             cameraTaskHandle.Name = "CameraTask"
             cameraTaskHandle.Priority = ThreadPriority.Highest
-            cameraTaskHandle.Start()
+            cameraTaskHandle.Start(camera.pcMultiplier)
             ' wait for the first frame to appear.
             While cameraFrameCount = 0
                 Application.DoEvents()
@@ -823,8 +814,8 @@ Public Class OpenCVB
                 OpenCVB.ocvb.depthRGB = formDepthRGB
                 OpenCVB.ocvb.depth = formDepth
                 OpenCVB.ocvb.disparity = formDisparity
-                OpenCVB.ocvb.redLeft = formRedLeft
-                OpenCVB.ocvb.redRight = formRedRight
+                OpenCVB.ocvb.leftView = formleftView
+                OpenCVB.ocvb.rightView = formrightView
                 OpenCVB.ocvb.parms.imuGyro = imuGyro
                 OpenCVB.ocvb.parms.imuAccel = imuAccel
                 OpenCVB.ocvb.parms.imuTimeStamp = imuTimeStamp
@@ -912,16 +903,16 @@ Public Class OpenCVB
             Console.WriteLine(vbTab + "Ending " + parms.activeAlgorithm)
         End If
     End Sub
-    Private Sub CameraTask()
+    Private Sub CameraTask(PCmultiplier As Single)
         While 1
             Application.DoEvents()
             If stopCameraThread Then Exit While
             If Me.Visible And Me.IsDisposed = False Then
                 Me.Invoke(
-                    Sub()
-                        Me.Refresh()
-                    End Sub
-                )
+                        Sub()
+                            Me.Refresh()
+                        End Sub
+                    )
             End If
             camera.GetNextFrame()
 
@@ -931,21 +922,21 @@ Public Class OpenCVB
                 imuAccel = camera.imuaccel
                 imuTimeStamp = camera.imutimestamp
                 formPointCloud = camera.pointCloud ' the point cloud is never resized - OpenGL apps.
-                If usingIntelCamera = False Then formPointCloud *= 0.001 ' units are millimeters for Kinect
+                If PCmultiplier <> 1 Then formPointCloud *= 0.001 ' units are millimeters for Kinect
                 If lowResolution Then
                     formColor = camera.color.Resize(fastSize)
                     formDepthRGB = camera.depthRGB.Resize(fastSize)
                     formDepth = camera.depth.Resize(fastSize)
                     formDisparity = camera.disparity.Resize(fastSize)
-                    formRedLeft = camera.redLeft.Resize(fastSize)
-                    formRedRight = camera.redRight.Resize(fastSize)
+                    formleftView = camera.leftView.Resize(fastSize)
+                    formrightView = camera.rightView.Resize(fastSize)
                 Else
                     formColor = camera.color
                     formDepthRGB = camera.depthRGB
                     formDepth = camera.depth
                     formDisparity = camera.disparity
-                    formRedLeft = camera.redLeft
-                    formRedRight = camera.redRight
+                    formleftView = camera.leftView
+                    formrightView = camera.rightView
                 End If
                 cameraDataUpdated = True
             End SyncLock

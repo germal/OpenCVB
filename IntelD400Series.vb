@@ -2,59 +2,53 @@
 Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Imports System.Threading
 Public Class IntelD400Series : Implements IDisposable
-    Dim ctx As New rs.Context
+    Dim align As rs.Align
+    Dim blocks As List(Of rs.ProcessingBlock)
     Dim cfg As New rs.Config
-    Dim devices As rs.DeviceList
+    Dim colorBytes() As Byte
+    Dim colorizer As New rs.Colorizer
+    Dim ctx As New rs.Context
+    Dim depth2Disparity As New rs.DisparityTransform
+    Dim depthBytes() As Byte
+    Dim depthRGBBytes() As Byte
     Dim device As rs.Device
+    Dim devices As rs.DeviceList
+    Dim disparityBytes() As Byte
+    Dim h As Int32
     Dim pipeline As New rs.Pipeline
     Dim pipeline_profile As rs.PipelineProfile
-    Dim colorizer As New rs.Colorizer
-    Dim depth2Disparity As New rs.DisparityTransform
-    Dim align As rs.Align
+    Dim leftViewBytes() As Byte
+    Dim rightViewBytes() As Byte
     Dim sensor As rs.Sensor
-    Dim blocks As List(Of rs.ProcessingBlock)
-    Public intrinsics_VB As VB_Classes.ActiveClass.Intrinsics_VB
-    Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
-    Public modelInverse As Boolean
-    Public IMUpresent As Boolean
-
+    Dim vertices() As Byte
     Dim w As Int32
-    Dim h As Int32
-
-    Public failedImageCount As Int32
-
-    Public deviceCount As Int32
-    Public deviceName As String
-
     Public color As cv.Mat
+    Public DecimationFilter As Boolean
     Public depth As cv.Mat
     Public depthRGB As cv.Mat
-    Public disparity As cv.Mat
-    Public redLeft As cv.Mat
-    Public redRight As cv.Mat
-
-    Dim colorBytes() As Byte
-    Dim depthBytes() As Byte
-    Dim disparityBytes() As Byte
-    Dim depthRGBBytes() As Byte
-    Dim redLeftBytes() As Byte
-    Dim redRightBytes() As Byte
-    Public imuGyro As cv.Point3f
-    Public imuAccel As cv.Point3f
-    Public imuTimeStamp As Double
-    Public DecimationFilter As Boolean
-    Public ThresholdFilter As Boolean
     Public DepthToDisparity As Boolean
+    Public deviceCount As Int32
+    Public deviceName As String
+    Public disparity As cv.Mat
+    Public DisparityToDepth As Boolean
+    Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
+    Public failedImageCount As Int32
+    Public HoleFillingFilter As Boolean
+    Public imuAccel As cv.Point3f
+    Public imuGyro As cv.Point3f
+    Public IMUpresent As Boolean
+    Public imuTimeStamp As Double
+    Public intrinsics_VB As VB_Classes.ActiveClass.Intrinsics_VB
+    Public modelInverse As Boolean
+    Public pc As New rs.PointCloud
+    Public pcMultiplier As Single = 1
+    Public pointCloud As cv.Mat
+    Public leftView As cv.Mat
+    Public rightView As cv.Mat
     Public SpatialFilter As Boolean
     Public TemporalFilter As Boolean
-    Public HoleFillingFilter As Boolean
-    Public DisparityToDepth As Boolean
-    Public pc As New rs.PointCloud
-
-    Dim vertices() As Byte
-    Public pointCloud As cv.Mat
+    Public ThresholdFilter As Boolean
 
     Dim block As New rs.CustomProcessingBlock(
         Sub(f, src)
@@ -78,12 +72,12 @@ Public Class IntelD400Series : Implements IDisposable
                     Dim colorFrame = frames.ColorFrame
                     Dim disparityFrame = depth2Disparity.Process(depthFrame)
                     Dim depthRGBframe = colorizer.Process(depthFrame)
-                    Dim redRight As rs.Frame = Nothing
-                    Dim redLeft = frames.InfraredFrame
+                    Dim rightView As rs.Frame = Nothing
+                    Dim leftView = frames.InfraredFrame
                     For Each frame In frames
                         If frame.Profile.Stream = rs.Stream.Infrared Then
                             If frame.Profile.Index = 2 Then
-                                redRight = frame
+                                rightView = frame
                                 Exit For
                             End If
                         End If
@@ -96,8 +90,8 @@ Public Class IntelD400Series : Implements IDisposable
                     Marshal.Copy(disparityFrame.Data, disparityBytes, 0, disparityBytes.Length)
                     Marshal.Copy(depthRGBframe.Data, depthRGBBytes, 0, depthRGBBytes.Length)
                     Marshal.Copy(depthFrame.Data, depthBytes, 0, depthBytes.Length)
-                    Marshal.Copy(redLeft.Data, redLeftBytes, 0, redLeftBytes.Length)
-                    Marshal.Copy(redRight.Data, redRightBytes, 0, redRightBytes.Length)
+                    Marshal.Copy(leftView.Data, leftViewBytes, 0, leftViewBytes.Length)
+                    Marshal.Copy(rightView.Data, rightViewBytes, 0, rightViewBytes.Length)
 
                     ' get motion data and timestamp from the gyro and accelerometer
                     If IMUpresent Then
@@ -121,7 +115,13 @@ Public Class IntelD400Series : Implements IDisposable
 
         If deviceCount = 0 Then Return
 
-        device = devices(0)
+        device = devices(0) ' Assume device 0 if multiple devices but if 435i is present, use that.
+        For i = 0 To deviceCount - 1
+            If devices(i).Info.Item(rs.CameraInfo.Name).Contains("435I") Then
+                device = devices(i)
+                Exit For
+            End If
+        Next
         deviceName = device.Info.Item(rs.CameraInfo.Name)
         If deviceName.EndsWith("USB2") Then MsgBox("Is the RealSense camera attached to a USB2 socket?  Are you using the Intel-provided cable?  It needs to be USB3!")
 
@@ -170,8 +170,8 @@ Public Class IntelD400Series : Implements IDisposable
             ReDim depthRGBBytes(w * h * 3 - 1)
             ReDim depthBytes(w * h * System.Runtime.InteropServices.Marshal.SizeOf(GetType(UShort)) - 1)
             ReDim disparityBytes(w * h * 4 - 1)
-            ReDim redLeftBytes(w * h - 1)
-            ReDim redRightBytes(w * h - 1)
+            ReDim leftViewBytes(w * h - 1)
+            ReDim rightViewBytes(w * h - 1)
             ReDim vertices(w * h * System.Runtime.InteropServices.Marshal.SizeOf(GetType(Single)) * 3 - 1) ' 3 floats per pixel.  
         End If
     End Sub
@@ -183,8 +183,8 @@ Public Class IntelD400Series : Implements IDisposable
         depthRGB = New cv.Mat(h, w, cv.MatType.CV_8UC3, depthRGBBytes)
         depth = New cv.Mat(h, w, cv.MatType.CV_16U, depthBytes)
         disparity = New cv.Mat(h, w, cv.MatType.CV_32F, disparityBytes)
-        redLeft = New cv.Mat(h, w, cv.MatType.CV_8U, redLeftBytes)
-        redRight = New cv.Mat(h, w, cv.MatType.CV_8U, redRightBytes)
+        leftView = New cv.Mat(h, w, cv.MatType.CV_8U, leftViewBytes)
+        rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rightViewBytes)
         pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
     End Sub
     Private disposedValue As Boolean ' To detect redundant calls

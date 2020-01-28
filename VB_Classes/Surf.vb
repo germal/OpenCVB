@@ -21,9 +21,9 @@ Public Class Surf_Basics_CS : Implements IDisposable
         ocvb.label1 = "BF Matcher output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim dst As New cv.Mat(ocvb.redLeft.Rows, ocvb.redLeft.Cols * 2, cv.MatType.CV_8UC3)
+        Dim dst As New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols * 2, cv.MatType.CV_8UC3)
 
-        CS_SurfBasics.Run(ocvb.redLeft, ocvb.redRight, dst, sliders.TrackBar1.Value, radio.check(0).Checked)
+        CS_SurfBasics.Run(ocvb.leftView, ocvb.rightView, dst, sliders.TrackBar1.Value, radio.check(0).Checked)
 
         dst(New cv.Rect(0, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result1)
         dst(New cv.Rect(ocvb.result1.Width, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result2)

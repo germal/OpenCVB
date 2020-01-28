@@ -57,38 +57,34 @@ Public Class Kinect : Implements IDisposable
         Dim metric_radius As Single ' Metric radius */
     End Structure
 
-    Public imuPresent As Boolean = True ' kinect cameras always have an IMU.
+    Dim kc As IntPtr
+    Public color As cv.Mat
+    Public colorBytes() As Byte
+    Public colorIntrinsics As rs.Intrinsics
+    Public depth As cv.Mat
+    Public depthBytes() As Byte
+    Public depthIntrinsics As rs.Intrinsics
+    Public depthRGB As cv.Mat
+    Public depthRGBBytes() As Byte
+    Public deviceCount As Int32
+    Public deviceName As String = "Kinect for Azure"
+    Public disparity As cv.Mat
+    Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
+    Public failedImageCount As Int32
+    Public h As Int32
     Public imuAccel As cv.Point3f
     Public imuGyro As cv.Point3f
+    Public imuPresent As Boolean = True ' kinect cameras always have an IMU.
     Public imuTimeStamp As Double
-
-    Dim kc As IntPtr
-    Public depthIntrinsics As rs.Intrinsics
-    Public colorIntrinsics As rs.Intrinsics
-    Public modelInverse As Boolean
-
-    Public w As Int32
-    Public h As Int32
-
-    Public failedImageCount As Int32
-
-    Public deviceName As String = "Kinect for Azure"
-    Public deviceCount As Int32
-    Public serialNumber As String
     Public intrinsics_VB As VB_Classes.ActiveClass.Intrinsics_VB
-    Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
-
-    Public color As cv.Mat
-    Public depth As cv.Mat
-    Public depthRGB As cv.Mat
+    Public modelInverse As Boolean
     Public pointCloud As New cv.Mat
-    Public disparity As cv.Mat
-    Public redLeft As cv.Mat
-    Public redRight As cv.Mat
+    Public pcMultiplier As Single = 0.001
+    Public leftView As cv.Mat
+    Public rightView As cv.Mat
+    Public serialNumber As String
+    Public w As Int32
 
-    Public colorBytes() As Byte
-    Public depthBytes() As Byte
-    Public depthRGBBytes() As Byte
     Public Sub New(fps As Int32, width As Int32, height As Int32)
         kc = KinectOpen()
         If kc <> 0 Then
@@ -98,7 +94,7 @@ Public Class Kinect : Implements IDisposable
             w = width
             h = height
             disparity = New cv.Mat
-            redLeft = New cv.Mat
+            leftView = New cv.Mat
 
             Dim ptr = KinectExtrinsics(kc)
             Dim rotationTranslation(12) As Single
@@ -179,8 +175,8 @@ Public Class Kinect : Implements IDisposable
 
         Dim tmp As New cv.Mat
         cv.Cv2.Normalize(depth, tmp, 0, 255, cv.NormTypes.MinMax)
-        tmp.ConvertTo(redLeft, cv.MatType.CV_8U)
-        redRight = redLeft
+        tmp.ConvertTo(leftView, cv.MatType.CV_8U)
+        rightView = leftView
         depth.ConvertTo(disparity, cv.MatType.CV_32F)
 
         Dim pc = New cv.Mat(h, w, cv.MatType.CV_16SC3, KinectPointCloud(kc))

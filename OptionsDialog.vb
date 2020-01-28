@@ -1,8 +1,14 @@
 ﻿Imports System.IO
 Public Class OptionsDialog
+    Public cameraIndex As Int32 ' an index into the cameraRadioButton array.
+    Public Const D400Cam As Int32 = 0 ' Must be defined in VB_Classes the same way!
+    Public Const Kinect4AzureCam As Int32 = 1 ' Must be defined in VB_Classes the same way!
+    Public Const T265Camera As Int32 = 2 ' Must be defined in VB_Classes the same way!
+
+    Dim cameraRadioButton(2) As RadioButton
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
         SaveSetting("OpenCVB", "FastAccurate", "FastAccurate", lowResolution.Checked)
-        SaveSetting("OpenCVB", "IntelCamera", "IntelCamera", IntelCamera.Checked)
+        SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", cameraIndex)
 
         SaveSetting("OpenCVB", "ShowLabels", "ShowLabels", ShowLabels.Checked)
 
@@ -24,7 +30,26 @@ Public Class OptionsDialog
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
+    Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
+        cameraIndex = sender.tag
+    End Sub
     Public Sub Dialog1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        For i = 0 To 2
+            cameraRadioButton(i) = New RadioButton
+            CameraGroup.Controls.Add(cameraRadioButton(i))
+            cameraRadioButton(i).Visible = True
+            cameraRadioButton(i).AutoSize = True
+            cameraRadioButton(i).BringToFront()
+            cameraRadioButton(i).Tag = i ' this will manage the public type for the camera - see VB_Classes.vb.
+            AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
+        Next
+        cameraRadioButton(0).Location = IntelD400.Location
+        cameraRadioButton(0).Text = IntelD400.Text
+        cameraRadioButton(1).Location = Kinect4Azure.Location
+        cameraRadioButton(1).Text = Kinect4Azure.Text
+        cameraRadioButton(2).Location = IntelT265.Location
+        cameraRadioButton(2).Text = IntelT265.Text
+
         Me.Height = GetSetting("OpenCVB", "OptionsHeight", "OptionsHeight", Me.Height)
         If GetSetting("OpenCVB", "FastAccurate", "FastAccurate", True) Then
             lowResolution.Checked = True
@@ -32,11 +57,8 @@ Public Class OptionsDialog
             AccurateProcessing.Checked = True
         End If
 
-        If GetSetting("OpenCVB", "IntelCamera", "IntelCamera", True) Then
-            IntelCamera.Checked = True
-        Else
-            Kinect4Azure.Checked = True
-        End If
+        cameraIndex = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", D400Cam)
+        cameraRadioButton(cameraIndex).Checked = True
 
         ShowLabels.Checked = GetSetting("OpenCVB", "ShowLabels", "ShowLabels", False)
 

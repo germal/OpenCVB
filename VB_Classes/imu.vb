@@ -29,7 +29,7 @@ Public Class IMU_Basics : Implements IDisposable
             Else
                 gyroAngle = ocvb.parms.imuGyro
                 Dim dt_gyro = (ocvb.parms.imuTimeStamp - lastTimeStamp) / 1000
-                If ocvb.parms.UsingIntelCamera = False Then dt_gyro /= 1000 ' different units in the timestamp?
+                If ocvb.parms.cameraIndex <> D400Cam Then dt_gyro /= 1000 ' different units in the timestamp?
                 lastTimeStamp = ocvb.parms.imuTimeStamp
                 gyroAngle = gyroAngle * dt_gyro
                 theta += New cv.Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X)
@@ -37,7 +37,7 @@ Public Class IMU_Basics : Implements IDisposable
 
             ' NOTE: Initialize the angle around the y-axis to zero.
             Dim accelAngle = New cv.Point3f(Math.Atan2(ocvb.parms.imuAccel.X, Math.Sqrt(ocvb.parms.imuAccel.Y * ocvb.parms.imuAccel.Y + ocvb.parms.imuAccel.Z * ocvb.parms.imuAccel.Z)), 0,
-                                            Math.Atan2(ocvb.parms.imuAccel.Y, ocvb.parms.imuAccel.Z))
+                                                Math.Atan2(ocvb.parms.imuAccel.Y, ocvb.parms.imuAccel.Z))
             If ocvb.frameCount = 0 Then
                 theta = accelAngle
             Else
@@ -49,8 +49,8 @@ Public Class IMU_Basics : Implements IDisposable
             End If
             If externalUse = False Then
                 flow.msgs.Add("ts = " + CStr(ocvb.parms.imuTimeStamp) + vbTab + "Gravity(x = " + Format(ocvb.parms.imuAccel.X, "#0.000") + " y = " + Format(ocvb.parms.imuAccel.Y, "#0.000") +
-                              " z = " + Format(ocvb.parms.imuAccel.Z, "#0.000") + ")" + vbTab + "Motion (pitch = " + Format(ocvb.parms.imuGyro.X, "#0.000") + vbTab +
-                              " Yaw = " + Format(ocvb.parms.imuGyro.Y, "#0.000") + vbTab + " Roll = " + Format(ocvb.parms.imuGyro.Z, "#0.000") + ")")
+                                  " z = " + Format(ocvb.parms.imuAccel.Z, "#0.000") + ")" + vbTab + "Motion (pitch = " + Format(ocvb.parms.imuGyro.X, "#0.000") + vbTab +
+                                  " Yaw = " + Format(ocvb.parms.imuGyro.Y, "#0.000") + vbTab + " Roll = " + Format(ocvb.parms.imuGyro.Z, "#0.000") + ")")
             End If
             ocvb.label1 = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
         Else

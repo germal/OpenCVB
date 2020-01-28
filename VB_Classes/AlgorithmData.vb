@@ -32,13 +32,15 @@ Public Class AlgorithmData
     Public PythonExe As String
     Public PythonFileName As String
     Public rColors(255) As cv.Vec3b
-    Public redLeft As cv.Mat
-    Public redRight As cv.Mat
+    Public leftView As cv.Mat
+    Public rightView As cv.Mat
     Public result1 As New cv.Mat
     Public result2 As New cv.Mat
     Public rng = New cv.RNG()
     Public TTtextData(3) As List(Of ActiveClass.TrueType)
+
     Dim autoRand As New Random()
+
     Public Sub New(parms As ActiveClass.algorithmParameters)
         optionsTop = parms.mainFormLoc.Y + parms.mainFormHeight
         optionsLeft = parms.mainFormLoc.X
