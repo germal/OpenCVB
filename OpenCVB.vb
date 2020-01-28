@@ -139,7 +139,7 @@ Public Class OpenCVB
         cameraKinect = New Kinect(30, regWidth, regHeight)
         optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.deviceCount
         cameraT265 = New IntelT265(30, regWidth, regHeight)
-        optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraT265.deviceCount
+        optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = cameraT265.deviceCount
 
         ' if a camera is missing, try to find another.
         If cameraD400Series.deviceCount = 0 Then optionsForm.cameraIndex = OptionsDialog.Kinect4AzureCam

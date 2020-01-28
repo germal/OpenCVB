@@ -120,8 +120,9 @@ Public Class IntelT265 : Implements IDisposable
             Name = CType(info("Caption"), String) ' Get the name of the device.'
             If InStr(Name, deviceName, CompareMethod.Text) > 0 Then deviceCount += 1
         Next
-#If 0 Then
+
         If deviceCount = 0 Then Return
+#If 0 Then
 
         If deviceName.EndsWith("USB2") Then MsgBox("Is the RealSense camera attached to a USB2 socket?  Are you using the Intel-provided cable?  It needs to be USB3!")
 
