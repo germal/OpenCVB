@@ -135,22 +135,16 @@ Public Class OpenCVB
         optionsForm.Dialog1_Load(sender, e)
 
         cameraD400Series = New IntelD400Series(30, regWidth, regHeight)
+        optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.deviceCount
         cameraKinect = New Kinect(30, regWidth, regHeight)
+        optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.deviceCount
         cameraT265 = New IntelT265(30, regWidth, regHeight)
+        optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraT265.deviceCount
 
         ' if a camera is missing, try to find another.
-        If cameraD400Series.deviceCount = 0 Then
-            optionsForm.cameraRadioButton(optionsForm.cameraIndex).Enabled = False
-            optionsForm.cameraIndex = OptionsDialog.Kinect4AzureCam
-        End If
-        If cameraKinect.deviceCount = 0 Then
-            optionsForm.cameraRadioButton(optionsForm.cameraIndex).Enabled = False
-            optionsForm.cameraIndex = OptionsDialog.D400Cam
-        End If
-        If cameraT265.deviceCount = 0 Then
-            optionsForm.cameraRadioButton(optionsForm.cameraIndex).Enabled = False
-            optionsForm.cameraIndex = OptionsDialog.D400Cam
-        End If
+        If cameraD400Series.deviceCount = 0 Then optionsForm.cameraIndex = OptionsDialog.Kinect4AzureCam
+        If cameraKinect.deviceCount = 0 Then optionsForm.cameraIndex = OptionsDialog.D400Cam
+        If cameraT265.deviceCount = 0 Then optionsForm.cameraIndex = OptionsDialog.D400Cam
 
         optionsForm.cameraRadioButton(optionsForm.cameraIndex).Checked = True ' make sure any switch is reflected in the UI.
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)

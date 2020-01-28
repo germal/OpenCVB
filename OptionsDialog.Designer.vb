@@ -23,10 +23,7 @@ Partial Class OptionsDialog
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.CameraGroup = New System.Windows.Forms.GroupBox()
-        Me.IntelT265 = New System.Windows.Forms.RadioButton()
         Me.SnapToGrid = New System.Windows.Forms.CheckBox()
-        Me.Kinect4Azure = New System.Windows.Forms.RadioButton()
-        Me.IntelD400 = New System.Windows.Forms.RadioButton()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.AccurateProcessing = New System.Windows.Forms.RadioButton()
         Me.lowResolution = New System.Windows.Forms.RadioButton()
@@ -64,10 +61,7 @@ Partial Class OptionsDialog
         '
         'CameraGroup
         '
-        Me.CameraGroup.Controls.Add(Me.IntelT265)
         Me.CameraGroup.Controls.Add(Me.SnapToGrid)
-        Me.CameraGroup.Controls.Add(Me.Kinect4Azure)
-        Me.CameraGroup.Controls.Add(Me.IntelD400)
         Me.CameraGroup.Location = New System.Drawing.Point(21, 12)
         Me.CameraGroup.Name = "CameraGroup"
         Me.CameraGroup.Size = New System.Drawing.Size(692, 180)
@@ -75,48 +69,15 @@ Partial Class OptionsDialog
         Me.CameraGroup.TabStop = False
         Me.CameraGroup.Text = "Camera"
         '
-        'IntelT265
-        '
-        Me.IntelT265.AutoSize = True
-        Me.IntelT265.Location = New System.Drawing.Point(16, 103)
-        Me.IntelT265.Name = "IntelT265"
-        Me.IntelT265.Size = New System.Drawing.Size(195, 24)
-        Me.IntelT265.TabIndex = 3
-        Me.IntelT265.TabStop = True
-        Me.IntelT265.Text = "Use Intel T265 camera"
-        Me.IntelT265.UseVisualStyleBackColor = True
-        '
         'SnapToGrid
         '
         Me.SnapToGrid.AutoSize = True
-        Me.SnapToGrid.Location = New System.Drawing.Point(84, 146)
+        Me.SnapToGrid.Location = New System.Drawing.Point(84, 128)
         Me.SnapToGrid.Name = "SnapToGrid"
         Me.SnapToGrid.Size = New System.Drawing.Size(354, 24)
         Me.SnapToGrid.TabIndex = 2
         Me.SnapToGrid.Text = "Snap to Grid (Resizes to 360x640 for display)"
         Me.SnapToGrid.UseVisualStyleBackColor = True
-        '
-        'Kinect4Azure
-        '
-        Me.Kinect4Azure.AutoSize = True
-        Me.Kinect4Azure.Location = New System.Drawing.Point(16, 70)
-        Me.Kinect4Azure.Name = "Kinect4Azure"
-        Me.Kinect4Azure.Size = New System.Drawing.Size(309, 24)
-        Me.Kinect4Azure.TabIndex = 1
-        Me.Kinect4Azure.TabStop = True
-        Me.Kinect4Azure.Text = "Use Microsoft Kinect for Azure Camera"
-        Me.Kinect4Azure.UseVisualStyleBackColor = True
-        '
-        'IntelD400
-        '
-        Me.IntelD400.AutoSize = True
-        Me.IntelD400.Location = New System.Drawing.Point(16, 40)
-        Me.IntelD400.Name = "IntelD400"
-        Me.IntelD400.Size = New System.Drawing.Size(271, 24)
-        Me.IntelD400.TabIndex = 0
-        Me.IntelD400.TabStop = True
-        Me.IntelD400.Text = "Use Intel D400Series 3D Camera"
-        Me.IntelD400.UseVisualStyleBackColor = True
         '
         'GroupBox1
         '
@@ -420,8 +381,6 @@ Partial Class OptionsDialog
     End Sub
     Friend WithEvents CameraGroup As GroupBox
     Friend WithEvents SnapToGrid As CheckBox
-    Friend WithEvents Kinect4Azure As RadioButton
-    Friend WithEvents IntelD400 As RadioButton
     Friend WithEvents GroupBox1 As GroupBox
     Friend WithEvents AccurateProcessing As RadioButton
     Friend WithEvents lowResolution As RadioButton
@@ -448,5 +407,4 @@ Partial Class OptionsDialog
     Friend WithEvents AvoidDNNCrashes As CheckBox
     Friend WithEvents OKButton As Button
     Friend WithEvents Cancel_Button As Button
-    Friend WithEvents IntelT265 As RadioButton
 End Class

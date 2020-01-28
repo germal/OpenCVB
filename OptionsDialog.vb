@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Public Class OptionsDialog
     Public cameraIndex As Int32 ' an index into the cameraRadioButton array.
+    Public cameraDeviceCount(2) As Int32
     Public Const D400Cam As Int32 = 0 ' Must be defined in VB_Classes the same way!
     Public Const Kinect4AzureCam As Int32 = 1 ' Must be defined in VB_Classes the same way!
     Public Const T265Camera As Int32 = 2 ' Must be defined in VB_Classes the same way!
@@ -38,15 +39,16 @@ Public Class OptionsDialog
             cameraRadioButton(i).Visible = True
             cameraRadioButton(i).AutoSize = True
             cameraRadioButton(i).BringToFront()
+            If cameraDeviceCount(i) = 0 Then cameraRadioButton(i).Enabled = False
             cameraRadioButton(i).Tag = i ' this will manage the public type for the camera - see VB_Classes.vb.
             AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
         Next
-        cameraRadioButton(0).Location = IntelD400.Location
-        cameraRadioButton(0).Text = IntelD400.Text
-        cameraRadioButton(1).Location = Kinect4Azure.Location
-        cameraRadioButton(1).Text = Kinect4Azure.Text
-        cameraRadioButton(2).Location = IntelT265.Location
-        cameraRadioButton(2).Text = IntelT265.Text
+        cameraRadioButton(0).Location = New Point(16, 20)
+        cameraRadioButton(0).Text = "Use Intel D400 Series 3D camera"
+        cameraRadioButton(1).Location = New Point(16, 40)
+        cameraRadioButton(1).Text = "Use Microsoft Kinect for Azure Camera"
+        cameraRadioButton(2).Location = New Point(16, 60)
+        cameraRadioButton(2).Text = "Use Intel T265 camera"
 
         If GetSetting("OpenCVB", "FastAccurate", "FastAccurate", True) Then
             lowResolution.Checked = True
