@@ -134,12 +134,30 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.Dialog1_Load(sender, e)
 
-        cameraKinect = New Kinect(30, regWidth, regHeight)
         cameraD400Series = New IntelD400Series(30, regWidth, regHeight)
+        cameraKinect = New Kinect(30, regWidth, regHeight)
         cameraT265 = New IntelT265(30, regWidth, regHeight)
 
-        If cameraKinect.deviceCount = 0 And cameraD400Series.deviceCount = 0 Then
-            MsgBox("OpenCVB supports either a Kinect for Azure 3D camera or an Intel D400Series 3D camera.  Neither is present.")
+        ' if a camera is missing, try to find another.
+        If cameraD400Series.deviceCount = 0 Then
+            optionsForm.cameraRadioButton(optionsForm.cameraIndex).Enabled = False
+            optionsForm.cameraIndex = OptionsDialog.Kinect4AzureCam
+        End If
+        If cameraKinect.deviceCount = 0 Then
+            optionsForm.cameraRadioButton(optionsForm.cameraIndex).Enabled = False
+            optionsForm.cameraIndex = OptionsDialog.D400Cam
+        End If
+        If cameraT265.deviceCount = 0 Then
+            optionsForm.cameraRadioButton(optionsForm.cameraIndex).Enabled = False
+            optionsForm.cameraIndex = OptionsDialog.D400Cam
+        End If
+
+        optionsForm.cameraRadioButton(optionsForm.cameraIndex).Checked = True ' make sure any switch is reflected in the UI.
+        SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
+        updateCamera()
+
+        If camera.deviceCount = 0 Then
+            MsgBox("OpenCVB supports Kinect for Azure 3D camera, Intel D400Series 3D camera, or Intel T265.  Nothing found!")
             End
         End If
 
@@ -680,7 +698,6 @@ Public Class OpenCVB
         Return True
     End Function
     Private Sub StartAlgorithmTask()
-        If camera Is Nothing Then updateCamera()
         stopAlgorithmThread = True
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
 

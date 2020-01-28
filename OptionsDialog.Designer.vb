@@ -387,7 +387,7 @@ Partial Class OptionsDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1049, 1127)
+        Me.ClientSize = New System.Drawing.Size(1049, 1225)
         Me.Controls.Add(Me.Cancel_Button)
         Me.Controls.Add(Me.OKButton)
         Me.Controls.Add(Me.GroupBox6)

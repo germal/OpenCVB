@@ -4,8 +4,7 @@ Public Class OptionsDialog
     Public Const D400Cam As Int32 = 0 ' Must be defined in VB_Classes the same way!
     Public Const Kinect4AzureCam As Int32 = 1 ' Must be defined in VB_Classes the same way!
     Public Const T265Camera As Int32 = 2 ' Must be defined in VB_Classes the same way!
-
-    Dim cameraRadioButton(2) As RadioButton
+    Public cameraRadioButton(2) As RadioButton
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
         SaveSetting("OpenCVB", "FastAccurate", "FastAccurate", lowResolution.Checked)
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", cameraIndex)
@@ -26,7 +25,6 @@ Public Class OptionsDialog
         SaveSetting("OpenCVB", "ShowOptions", "ShowOptions", ShowOptions.Checked)
         SaveSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", ShowConsoleLog.Checked)
         SaveSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", AvoidDNNCrashes.Checked)
-        SaveSetting("OpenCVB", "OptionsHeight", "OptionsHeight", Me.Height)
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
@@ -50,7 +48,6 @@ Public Class OptionsDialog
         cameraRadioButton(2).Location = IntelT265.Location
         cameraRadioButton(2).Text = IntelT265.Text
 
-        Me.Height = GetSetting("OpenCVB", "OptionsHeight", "OptionsHeight", Me.Height)
         If GetSetting("OpenCVB", "FastAccurate", "FastAccurate", True) Then
             lowResolution.Checked = True
         Else
