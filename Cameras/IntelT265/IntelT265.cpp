@@ -1,4 +1,3 @@
-#include <winsock2.h>
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
@@ -16,266 +15,79 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <k4a/k4a.h>
-#include <k4a/k4a.hpp>
-#include <k4apixel.h>
 #include "../../CPP_Classes/DepthColorizer.hpp"
+#include <librealsense2/rs.hpp>
 
 using namespace std;
 using namespace cv;
-using namespace k4aviewer;
 
-class KinectCamera
+class t265Camera
 {
 public:
-	char *serial_number = NULL;
-	uint32_t deviceCount = 0;
-	k4a_imu_sample_t imu_sample;
-	k4a_device_t device = NULL;
-	k4a_calibration_t calibration;
-	k4a_transformation_t transformation;
-	k4a_image_t depthInColor;
-	k4a_image_t point_cloud_image;
-	int pointCloudBuffSize = 0;
-	k4a_image_t colorImage = NULL;
-	Depth_Colorizer* dcptr = NULL;
-	k4a_device_configuration_t config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
-	char outMsg[10000];
-
+	int frame_counter = 0;
 private:
-	k4a_capture_t capture = NULL;
-	const int32_t TIMEOUT_IN_MS = 1000;
-	size_t infraredSize = 0;
-	k4a_image_t point_cloud = NULL;
-	int colorRows = 0, colorCols = 0, colorBuffSize = 0;
+	rs2::pipeline pipe;
+	rs2::config cfg;
+	std::mutex data_mutex;
 public:
-	~KinectCamera()
+	~t265Camera(){}
+	t265Camera()
 	{
-	}
-	KinectCamera()
-	{
-		deviceCount = k4a_device_get_installed_count();
-		if (deviceCount > 0)
-		{
-			device = NULL;
-			if (K4A_RESULT_SUCCEEDED != k4a_device_open(K4A_DEVICE_DEFAULT, &device)) { deviceCount = 0; return; }
+		cfg.enable_stream(RS2_STREAM_POSE, RS2_FORMAT_6DOF);
+		cfg.enable_stream(RS2_STREAM_FISHEYE, 1, RS2_FORMAT_Y8);
+		cfg.enable_stream(RS2_STREAM_FISHEYE, 2, RS2_FORMAT_Y8);
 
-			KinectSerialNumber();
-
-			config.color_format = K4A_IMAGE_FORMAT_COLOR_BGRA32;
-			config.color_resolution = K4A_COLOR_RESOLUTION_720P;
-			config.depth_mode = K4A_DEPTH_MODE_WFOV_2X2BINNED;
-			config.camera_fps = K4A_FRAMES_PER_SECOND_30;
-
-			k4a_device_get_calibration(device, config.depth_mode, config.color_resolution, &calibration);
-
-			colorRows = calibration.color_camera_calibration.resolution_height;
-			colorCols = calibration.color_camera_calibration.resolution_width;
-			colorBuffSize = colorRows * colorCols;
-			pointCloudBuffSize = colorBuffSize * 3 * (int) sizeof(int16_t);
-
-			k4a_image_create(K4A_IMAGE_FORMAT_DEPTH16, colorCols, colorRows, colorCols * (int)sizeof(int16_t), &depthInColor);
-			k4a_image_create(K4A_IMAGE_FORMAT_CUSTOM, colorCols, colorRows, colorCols * 3 * (int)sizeof(int16_t), &point_cloud_image); // int16_t - not a mistake.
-			k4a_image_create(K4A_IMAGE_FORMAT_COLOR_BGRA32, colorCols, colorRows, colorCols * 4 * (int)sizeof(uint8_t), &colorImage);
-
-			k4a_device_start_cameras(device, &config);
-
-			transformation = k4a_transformation_create(&calibration);
-
-			k4a_device_start_imu(device);
-			dcptr = new Depth_Colorizer();
-		}
+		pipe.start(cfg);
 	}
 
-	void KinectSerialNumber()
+	int *waitForFrame()
 	{
-		size_t length = 0;
-		if (K4A_BUFFER_RESULT_TOO_SMALL != k4a_device_get_serialnum(device, NULL, &length))
-		{
-			printf("%d: Failed to get serial number length\n", 0);
-			k4a_device_close(device);
-		}
+		auto frameset = pipe.wait_for_frames();
+		// Get a frame from the pose stream
+		auto f = frameset.first_or_default(RS2_STREAM_POSE);
+		// Cast the frame to pose_frame and get its data
+		auto pose_data = f.as<rs2::pose_frame>().get_pose_data();
 
-		serial_number = (char *)malloc(length);
-		k4a_device_get_serialnum(device, serial_number, &length);
-	}
-
-	int *waitForFrame(void *color, void * depthRGB)
-	{
-		bool waiting = true;
-		while (waiting)
-		{
-			switch (k4a_device_get_capture(device, &capture, TIMEOUT_IN_MS))
-			{
-			case K4A_WAIT_RESULT_SUCCEEDED:
-				waiting = false;
-				break;
-			case K4A_WAIT_RESULT_TIMEOUT:
-				return 0;
-			case K4A_WAIT_RESULT_FAILED:
-				return 0;
-			}
-		}
-
-		if (colorImage) k4a_image_release(colorImage);  // we want to keep the colorimage around between calls.
-		colorImage = k4a_capture_get_color_image(capture);
-		if (colorImage)
-		{
-			uint8_t* tmpColor = k4a_image_get_buffer(colorImage);
-			if (tmpColor == NULL) return 0; // just have to use the last buffers.  Nothing new...
-			Mat bgr = Mat(colorCols, colorRows, CV_8UC3, color);
-			Mat bgra = Mat(colorCols, colorRows, CV_8UC4, tmpColor);
-			cvtColor(bgra, bgr, COLOR_BGRA2BGR);
-		}
-
-		k4a_image_t depthImage = k4a_capture_get_depth_image(capture);
-		if (depthImage != NULL and depthImage->_rsvd != 0)
-		{
-			k4a_transformation_depth_image_to_color_camera(transformation, depthImage, depthInColor);
-			uint16_t *depthBuffer = (uint16_t *) k4a_image_get_buffer(depthInColor); 
-			dcptr->depth = Mat(colorRows, colorCols, CV_16U, depthBuffer);
-			dcptr->dst = Mat(colorRows, colorCols, CV_8UC3, depthRGB);
-			dcptr->Run();
-		}
-
-		k4a_transformation_depth_image_to_point_cloud(transformation, depthInColor, K4A_CALIBRATION_TYPE_COLOR, point_cloud_image);
-		k4a_device_get_imu_sample(device, &imu_sample, 2000);
-
-		if (depthImage) k4a_image_release(depthImage);
-
-		k4a_capture_release(capture);
-		return (int *)&imu_sample;
+		auto fs = frameset.as<rs2::frameset>();
+		auto colorImage = fs.get_color_frame();
+		frame_counter++;
+		return (int *) colorImage.get_data();
 	}
 };
 
-KinectCamera* kcPtr;
-
 extern "C" __declspec(dllexport)
-int KinectDeviceCount(KinectCamera *kc)
+int *t265Open()
 {
-	return kc->deviceCount;
-}
-
-extern "C" __declspec(dllexport)
-int *KinectOpen()
-{
-	KinectCamera *kc = new KinectCamera();
-	if (kc->deviceCount == 0) return 0;
-	kcPtr = kc;
+	t265Camera *kc = new t265Camera();
 	return (int *)kc;
 }
 
+//extern "C" __declspec(dllexport)
+//int *t265Extrinsics(t265Camera *kc)
+//{
+//	return (int *)&kc->calibration.extrinsics[K4A_CALIBRATION_TYPE_DEPTH][K4A_CALIBRATION_TYPE_COLOR];
+//}
+
+//extern "C" __declspec(dllexport)
+//int *t265Intrinsics(t265Camera *kc)
+//{
+//	return (int *)&kc->calibration.color_camera_calibration.intrinsics.parameters;
+//}
+
+//extern "C" __declspec(dllexport)
+//int* t265PointCloud(t265Camera* kc)
+//{
+//	return (int *) k4a_image_get_buffer(kc->point_cloud_image);
+//}
+
 extern "C" __declspec(dllexport)
-int *KinectDeviceName(KinectCamera *kc)
+int* t265WaitFrame(t265Camera* kc, void* color, void* depthRGB)
 {
-	return (int *)kc->serial_number;
+	return kc->waitForFrame();
 }
 
 extern "C" __declspec(dllexport)
-int *KinectExtrinsics(KinectCamera *kc)
+void t265Close(t265Camera *kc)
 {
-	return (int *)&kc->calibration.extrinsics[K4A_CALIBRATION_TYPE_DEPTH][K4A_CALIBRATION_TYPE_COLOR];
-}
-
-extern "C" __declspec(dllexport)
-int *KinectIntrinsics(KinectCamera *kc)
-{
-	return (int *)&kc->calibration.color_camera_calibration.intrinsics.parameters;
-}
-
-extern "C" __declspec(dllexport)
-int* KinectPointCloud(KinectCamera* kc)
-{
-	return (int *) k4a_image_get_buffer(kc->point_cloud_image);
-}
-extern "C" __declspec(dllexport)
-int* KinectDepthInColor(KinectCamera* kc)
-{
-	return (int*)k4a_image_get_buffer(kc->depthInColor);
-}
-extern "C" __declspec(dllexport)
-int* KinectWaitFrame(KinectCamera* kc, void* color, void* depthRGB)
-{
-	return kc->waitForFrame(color, depthRGB);
-}
-
-extern "C" __declspec(dllexport)
-void KinectClose(KinectCamera *kc)
-{
-	if (kc->point_cloud_image) k4a_image_release(kc->point_cloud_image);
-	if (kc->depthInColor) k4a_image_release(kc->depthInColor);
-	if (kc->colorImage) k4a_image_release(kc->colorImage);
-
-	k4a_device_stop_imu(kc->device);
-	k4a_device_stop_cameras(kc->device);
-	k4a_transformation_destroy(kc->transformation);
-	free(kc->serial_number);
-	if (kc == 0) return;
-	k4a_device_close(kc->device);
 	delete kc;
-}
-
-extern "C" __declspec(dllexport)
-char* KinectRodrigues()
-{
-	k4a_calibration_t calibration;
-	if (K4A_RESULT_SUCCEEDED != k4a_device_get_calibration(kcPtr->device, kcPtr->config.depth_mode, kcPtr->config.color_resolution, &calibration))
-	{
-		printf("Failed to get calibration\n");
-		return 0;
-	}
-
-	vector<k4a_float3_t> points_3d = { { { 0.f, 0.f, 1000.f } },          // color camera center
-									   { { -1000.f, -1000.f, 1000.f } },  // color camera top left
-									   { { 1000.f, -1000.f, 1000.f } },   // color camera top right
-									   { { 1000.f, 1000.f, 1000.f } },    // color camera bottom right
-									   { { -1000.f, 1000.f, 1000.f } } }; // color camera bottom left
-
-	// k4a project function
-	vector<k4a_float2_t> k4a_points_2d(points_3d.size());
-	for (size_t i = 0; i < points_3d.size(); i++)
-	{
-		int valid = 0;
-		k4a_calibration_3d_to_2d(&calibration,
-			&points_3d[i],
-			K4A_CALIBRATION_TYPE_COLOR,
-			K4A_CALIBRATION_TYPE_DEPTH,
-			&k4a_points_2d[i],
-			&valid);
-	}
-
-	// converting the calibration data to OpenCV format
-	// extrinsic transformation from color to depth camera
-	Mat se3 = Mat(3, 3, CV_32FC1, calibration.extrinsics[K4A_CALIBRATION_TYPE_COLOR][K4A_CALIBRATION_TYPE_DEPTH].rotation);
-	Mat r_vec = Mat(3, 1, CV_32FC1);
-	Rodrigues(se3, r_vec);
-	Mat t_vec = Mat(3, 1, CV_32F, calibration.extrinsics[K4A_CALIBRATION_TYPE_COLOR][K4A_CALIBRATION_TYPE_DEPTH].translation);
-
-	// intrinsic parameters of the depth camera
-	k4a_calibration_intrinsic_parameters_t* intrinsics = &calibration.depth_camera_calibration.intrinsics.parameters;
-	vector<float> _camera_matrix = {
-		intrinsics->param.fx, 0.f, intrinsics->param.cx, 0.f, intrinsics->param.fy, intrinsics->param.cy, 0.f, 0.f, 1.f
-	};
-	Mat camera_matrix = Mat(3, 3, CV_32F, &_camera_matrix[0]);
-	vector<float> _dist_coeffs = { intrinsics->param.k1, intrinsics->param.k2, intrinsics->param.p1,
-								   intrinsics->param.p2, intrinsics->param.k3, intrinsics->param.k4,
-								   intrinsics->param.k5, intrinsics->param.k6 };
-	Mat dist_coeffs = Mat(8, 1, CV_32F, &_dist_coeffs[0]);
-
-	// OpenCV project function
-	vector<Point2f> cv_points_2d(points_3d.size());
-	projectPoints(*reinterpret_cast<vector<Point3f>*>(&points_3d),
-		r_vec,
-		t_vec,
-		camera_matrix,
-		dist_coeffs,
-		cv_points_2d);
-
-	for (size_t i = 0; i < points_3d.size(); i++)
-	{
-		sprintf_s(kcPtr->outMsg, "3d point:\t\t\t(%.5f, %.5f, %.5f)\n OpenCV projectPoints:\t\t(%.5f, %.5f)\n k4a_calibration_3d_to_2d:\t(%.5f, %.5f)\n\n",
-			points_3d[i].v[0], points_3d[i].v[1], points_3d[i].v[2], cv_points_2d[i].x, cv_points_2d[i].y, k4a_points_2d[i].v[0], k4a_points_2d[i].v[1]);
-	}
-
-	return kcPtr->outMsg;
 }

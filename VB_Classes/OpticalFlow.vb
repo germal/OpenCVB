@@ -85,7 +85,7 @@ Public Class OpticalFlow_DenseOptions : Implements IDisposable
 
         sliders2.setupTrackBar1(ocvb, "Optical Flow PolyN", 1, 15, 5)
         sliders2.setupTrackBar2(ocvb, "Optical Flow Scaling Output", 1, 100, 50)
-        sliders2.Show()
+        If ocvb.parms.ShowOptions Then sliders2.Show()
 
         sliders.setupTrackBar1(ocvb, "Optical Flow pyrScale", 1, 100, 40)
         sliders.setupTrackBar2(ocvb, "Optical Flow Levels", 1, 10, 1)

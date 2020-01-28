@@ -109,7 +109,10 @@ Public Class IntelT265 : Implements IDisposable
         End Sub
     )
     Public Sub New(fps As Int32, width As Int32, height As Int32)
-        deviceName = "T265"
+        ctx = New rs.Context
+        devices = ctx.QueryDevices()
+
+        deviceName = "T265" ' The T265 camera is not supported by the ctx.querydevices.
         ' See if the desired device shows up in the device manager.'
         Dim info As Management.ManagementObject
         Dim search As System.Management.ManagementObjectSearcher
@@ -118,24 +121,28 @@ Public Class IntelT265 : Implements IDisposable
         For Each info In search.Get()
             ' Go through each device detected.'
             Name = CType(info("Caption"), String) ' Get the name of the device.'
-            If InStr(Name, deviceName, CompareMethod.Text) > 0 Then deviceCount += 1
+            If InStr(Name, deviceName, CompareMethod.Text) > 0 Then
+                deviceName = Name
+                deviceCount += 1
+            End If
         Next
 
         If deviceCount = 0 Then Return
+
+        'cfg.EnableStream(rs.Stream.Pose, rs.Format.SixDOF)
+        ''cfg.EnableStream(rs.Stream.Fisheye, 1, rs.Format.Y8)
+        ''cfg.EnableStream(rs.Stream.Fisheye, 2, rs.Format.Y8)
+
+        'Dim callback As rs.FrameCallback = (
+        'Sub(frame)
+        '    Dim fpose = frame.As(Of rs.PoseFrame)()
+        '    Dim fs = frame.As(Of rs.FrameSet)()
+
+        '    Console.WriteLine("testing")
+        'End Sub)
+
+        'pipeline_profile = pipeline.Start(cfg) ', callback)
 #If 0 Then
-
-        If deviceName.EndsWith("USB2") Then MsgBox("Is the RealSense camera attached to a USB2 socket?  Are you using the Intel-provided cable?  It needs to be USB3!")
-
-        cfg.EnableStream(rs.Stream.Color, width, height, rs.Format.Bgr8, fps)
-        cfg.EnableStream(rs.Stream.Depth, width, height, rs.Format.Z16, fps)
-        cfg.EnableStream(rs.Stream.Infrared, 1, width, height, rs.Format.Y8, fps) ' left
-        cfg.EnableStream(rs.Stream.Infrared, 2, width, height, rs.Format.Y8, fps) ' right
-
-        If deviceName = "Intel RealSense D435I" Then
-            cfg.EnableStream(rs.Stream.Gyro)
-            cfg.EnableStream(rs.Stream.Accel)
-            IMUpresent = True
-        End If
 
         pipeline = New rs.Pipeline(ctx)
         pipeline_profile = pipeline.Start(cfg)
@@ -178,33 +185,15 @@ Public Class IntelT265 : Implements IDisposable
 #End If
     End Sub
     Public Sub GetNextFrame()
-        Dim frameSet = pipeline.WaitForFrames(1000)
-        block.Process(frameSet)
+        Dim frames = pipeline.WaitForFrames(1000)
+        Dim f = frames.FirstOrDefault(rs.Stream.Pose)
+        Dim pose_data = f.As(Of rs.PoseFrame).PoseData()
 
-        color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorBytes)
-        depthRGB = New cv.Mat(h, w, cv.MatType.CV_8UC3, depthRGBBytes)
-        depth = New cv.Mat(h, w, cv.MatType.CV_16U, depthBytes)
-        disparity = New cv.Mat(h, w, cv.MatType.CV_32F, disparityBytes)
-        leftView = New cv.Mat(h, w, cv.MatType.CV_8U, leftViewBytes)
-        rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rightViewBytes)
-        pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
     End Sub
-    Private disposedValue As Boolean ' To detect redundant calls
-
-    ' IDisposable
     Protected Overridable Sub Dispose(disposing As Boolean)
         pipeline.Stop()
         cfg.DisableAllStreams()
-        ctx.Dispose()
-        cfg.Dispose()
-        pipeline.Dispose()
-        colorizer.Dispose()
-        depth2Disparity.Dispose()
-        block.Dispose()
-        align.Dispose()
-        disposedValue = True
     End Sub
-
     Public Sub Dispose() Implements IDisposable.Dispose
         Dispose(True)
     End Sub
