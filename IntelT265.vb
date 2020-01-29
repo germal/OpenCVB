@@ -2,6 +2,24 @@
 Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
+
+Module T265_Interface
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265Open() As IntPtr
+    End Function
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265WaitFrame(kc As IntPtr, color As IntPtr, depthRGB As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265Extrinsics(kc As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265Intrinsics(kc As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub T265Close(kc As IntPtr)
+    End Sub
+End Module
 Public Class IntelT265 : Implements IDisposable
     Dim align As rs.Align
     Dim blocks As List(Of rs.ProcessingBlock)
@@ -49,6 +67,7 @@ Public Class IntelT265 : Implements IDisposable
     Public SpatialFilter As Boolean
     Public TemporalFilter As Boolean
     Public ThresholdFilter As Boolean
+    Dim tcPtr As IntPtr
     Dim block As New rs.CustomProcessingBlock(
         Sub(f, src)
             Using varRelease = New rs.FramesReleaser
@@ -109,86 +128,20 @@ Public Class IntelT265 : Implements IDisposable
         End Sub
     )
     Public Sub New(fps As Int32, width As Int32, height As Int32)
-        ctx = New rs.Context
-        devices = ctx.QueryDevices()
-
-        deviceName = "T265" ' The T265 camera is not supported by the ctx.querydevices.
-        ' See if the desired device shows up in the device manager.'
-        Dim info As Management.ManagementObject
-        Dim search As System.Management.ManagementObjectSearcher
-        Dim Name As String
-        search = New System.Management.ManagementObjectSearcher("SELECT * From Win32_PnPEntity")
-        For Each info In search.Get()
-            ' Go through each device detected.'
-            Name = CType(info("Caption"), String) ' Get the name of the device.'
-            If InStr(Name, deviceName, CompareMethod.Text) > 0 Then
-                deviceName = Name
-                deviceCount += 1
-            End If
-        Next
-
+        If OpenCVB.deviceSearch("T265") Then deviceCount = 1
         If deviceCount = 0 Then Return
 
-        'cfg.EnableStream(rs.Stream.Pose, rs.Format.SixDOF)
-        ''cfg.EnableStream(rs.Stream.Fisheye, 1, rs.Format.Y8)
-        ''cfg.EnableStream(rs.Stream.Fisheye, 2, rs.Format.Y8)
+        cfg.EnableStream(rs.Stream.Pose, rs.Format.SixDOF)
+        cfg.EnableStream(rs.Stream.Fisheye, 1, rs.Format.Y8)
+        cfg.EnableStream(rs.Stream.Fisheye, 2, rs.Format.Y8)
 
-        'Dim callback As rs.FrameCallback = (
-        'Sub(frame)
-        '    Dim fpose = frame.As(Of rs.PoseFrame)()
-        '    Dim fs = frame.As(Of rs.FrameSet)()
-
-        '    Console.WriteLine("testing")
-        'End Sub)
-
-        'pipeline_profile = pipeline.Start(cfg) ', callback)
-#If 0 Then
-
-        pipeline = New rs.Pipeline(ctx)
         pipeline_profile = pipeline.Start(cfg)
-        align = New rs.Align(rs.Stream.Color)
-        sensor = pipeline_profile.Device.Sensors.First() ' This may change!  But just take the first for now.  It is the only one with 7 filters
-        blocks = sensor.ProcessingBlocks.ToList()
-
-        If deviceName <> "Intel RealSense D435" And deviceName <> "Intel RealSense D415" And deviceName <> "Intel RealSense D435I" Then
-            MsgBox("We only support the D435, D415, or D435I cameras. " + vbCrLf + "Is this a new device?  It is called: " + deviceName)
-            deviceCount = 0
-        Else
-            Dim dIntrinsics = pipeline_profile.GetStream(rs.Stream.Depth).As(Of rs.VideoStreamProfile).GetIntrinsics
-            Dim cIntrinsics = pipeline_profile.GetStream(rs.Stream.Color).As(Of rs.VideoStreamProfile).GetIntrinsics
-            w = dIntrinsics.width
-            h = dIntrinsics.height
-            intrinsics_VB.width = dIntrinsics.width
-            intrinsics_VB.height = dIntrinsics.height
-            intrinsics_VB.ppx = dIntrinsics.ppx
-            intrinsics_VB.ppy = dIntrinsics.ppy
-            intrinsics_VB.fx = dIntrinsics.fx
-            intrinsics_VB.fy = dIntrinsics.fy
-            intrinsics_VB.FOV = dIntrinsics.FOV
-            intrinsics_VB.coeffs = dIntrinsics.coeffs
-            Dim extrinsics As rs.Extrinsics = Nothing
-            For Each stream In pipeline_profile.Streams
-                extrinsics = stream.GetExtrinsicsTo(pipeline_profile.GetStream(rs.Stream.Infrared))
-                If extrinsics.rotation(0) <> 1 Then Exit For
-            Next
-            Extrinsics_VB.rotation = extrinsics.rotation
-            Extrinsics_VB.translation = extrinsics.translation
-
-            ReDim colorBytes(w * h * 3 - 1)
-            ReDim depthRGBBytes(w * h * 3 - 1)
-            ReDim depthBytes(w * h * System.Runtime.InteropServices.Marshal.SizeOf(GetType(UShort)) - 1)
-            ReDim disparityBytes(w * h * 4 - 1)
-            ReDim leftViewBytes(w * h - 1)
-            ReDim rightViewBytes(w * h - 1)
-            ReDim vertices(w * h * System.Runtime.InteropServices.Marshal.SizeOf(GetType(Single)) * 3 - 1) ' 3 floats per pixel.  
-        End If
-#End If
     End Sub
     Public Sub GetNextFrame()
         Dim frames = pipeline.WaitForFrames(1000)
         Dim f = frames.FirstOrDefault(rs.Stream.Pose)
         Dim pose_data = f.As(Of rs.PoseFrame).PoseData()
-
+        'Dim fs = f.As(Of rs.FrameSet)()
     End Sub
     Protected Overridable Sub Dispose(disposing As Boolean)
         pipeline.Stop()

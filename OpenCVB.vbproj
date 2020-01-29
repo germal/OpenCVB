@@ -82,8 +82,8 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Intel.RealSense">
-      <HintPath>librealsense\build\Release\Intel.RealSense.dll</HintPath>
+    <Reference Include="Intel.RealSensed">
+      <HintPath>librealsense\Build\Debug\Intel.RealSensed.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
       <HintPath>packages\OpenCvSharp4.4.1.1.20191110\lib\net461\OpenCvSharp.dll</HintPath>

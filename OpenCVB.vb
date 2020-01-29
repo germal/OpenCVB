@@ -122,7 +122,8 @@ Public Class OpenCVB
         ' the depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
         ' Post an issue if this Is Not a valid assumption
-        Dim kinectDLL As New FileInfo("C:/Program Files/Azure Kinect SDK v1.3.0/tools/depthengine_2_0.dll")
+        'Dim kinectDLL As New FileInfo("C:/Program Files/Azure Kinect SDK v1.3.0/tools/depthengine_2_0.dll")
+        Dim kinectDLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.3.0\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
         If kinectDLL.Exists = False Then
             MsgBox("The Microsoft installer for the Kinect camera proprietary portion was not installed in the right place (or it has changed.)" + vbCrLf +
                 "It was expected to be in " + kinectDLL.FullName + vbCrLf + "Update the code and restart.")
@@ -259,6 +260,21 @@ Public Class OpenCVB
         Next
         saveLayout()
     End Sub
+    Public Function deviceSearch(deviceName As String) As Boolean
+        ' See if the desired device shows up in the device manager.'
+        Dim info As Management.ManagementObject
+        Dim search As System.Management.ManagementObjectSearcher
+        Dim Name As String
+        search = New System.Management.ManagementObjectSearcher("SELECT * From Win32_PnPEntity")
+        For Each info In search.Get()
+            Name = CType(info("Caption"), String) ' Get the name of the device.'
+            If InStr(Name, deviceName, CompareMethod.Text) > 0 Then
+                deviceName = Name
+                Return True
+            End If
+        Next
+        Return False
+    End Function
     Private Sub setupCamPics()
         Me.Left = GetSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
         Me.Top = GetSetting("OpenCVB", "OpenCVBTop", "OpenCVBTop", Me.Top)

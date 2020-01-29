@@ -95,15 +95,6 @@ def callback(frame):
         frame_data["timestamp_ms"] = ts
         frame_mutex.release()
 
-from realsense_device_manager import DeviceManager
-
-rs_config = rs.config()
-ctx = rs.context()
-#device_manager = DeviceManager(ctx, rs_config)
-#device_manager.enable_all_devices()
-
-devices = ctx.query_devices()
-deviceCount = devices
 # Declare RealSense pipeline, encapsulating the actual device and sensors
 pipe = rs.pipeline()
 
