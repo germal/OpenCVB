@@ -122,7 +122,6 @@ Public Class OpenCVB
         ' the depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
         ' Post an issue if this Is Not a valid assumption
-        'Dim kinectDLL As New FileInfo("C:/Program Files/Azure Kinect SDK v1.3.0/tools/depthengine_2_0.dll")
         Dim kinectDLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.3.0\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
         If kinectDLL.Exists = False Then
             MsgBox("The Microsoft installer for the Kinect camera proprietary portion was not installed in the right place (or it has changed.)" + vbCrLf +
@@ -133,14 +132,22 @@ Public Class OpenCVB
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
 
         optionsForm = New OptionsDialog
-        optionsForm.Dialog1_Load(sender, e)
+        optionsForm.OptionsDialog_Load(sender, e)
 
-        cameraD400Series = New IntelD400Series(30, regWidth, regHeight)
-        optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.deviceCount
+        cameraD400Series = New IntelD400Series()
+        cameraD400Series.deviceCount = USBenumeration("Depth Camera 435")
+        cameraD400Series.deviceCount += USBenumeration("Depth Camera 415")
+        If cameraD400Series.deviceCount > 0 Then cameraD400Series.initialize(30, regWidth, regHeight)
+
         cameraKinect = New Kinect(30, regWidth, regHeight)
-        optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.deviceCount
-        cameraT265 = New IntelT265(30, regWidth, regHeight)
-        optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = cameraT265.deviceCount
+
+        cameraT265 = New IntelT265()
+        cameraT265.deviceCount = USBenumeration("T265")
+        If cameraT265.deviceCount > 0 Then cameraT265.initialize(30, regWidth, regHeight)
+
+        optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.devicecount
+        optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.devicecount
+        optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = cameraT265.devicecount
 
         updateCamera()
 
@@ -260,7 +267,8 @@ Public Class OpenCVB
         Next
         saveLayout()
     End Sub
-    Public Function deviceSearch(deviceName As String) As Boolean
+    Public Function USBenumeration(searchName As String) As Int32
+        Dim deviceCount As Int32
         ' See if the desired device shows up in the device manager.'
         Dim info As Management.ManagementObject
         Dim search As System.Management.ManagementObjectSearcher
@@ -268,12 +276,9 @@ Public Class OpenCVB
         search = New System.Management.ManagementObjectSearcher("SELECT * From Win32_PnPEntity")
         For Each info In search.Get()
             Name = CType(info("Caption"), String) ' Get the name of the device.'
-            If InStr(Name, deviceName, CompareMethod.Text) > 0 Then
-                deviceName = Name
-                Return True
-            End If
+            If InStr(Name, searchName, CompareMethod.Text) > 0 Then deviceCount += 1
         Next
-        Return False
+        Return deviceCount
     End Function
     Private Sub setupCamPics()
         Me.Left = GetSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
@@ -676,11 +681,6 @@ Public Class OpenCVB
         TestAllTimer.Enabled = False
         stopAlgorithmThread = True
         Dim saveCurrentCamera = optionsForm.cameraIndex
-        ' the T265 will crash if not stopped during the showdialog.  Not sure why.
-        If saveCurrentCamera = OptionsDialog.T265Camera Then
-            stopCameraThread = True
-            saveCurrentCamera = -1
-        End If
 
         Dim OKcancel = optionsForm.ShowDialog()
 

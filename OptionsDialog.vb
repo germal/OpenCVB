@@ -1,11 +1,11 @@
 ﻿Imports System.IO
 Public Class OptionsDialog
     Public cameraIndex As Int32 ' an index into the cameraRadioButton array.
-    Public cameraDeviceCount(2) As Int32
     Public Const D400Cam As Int32 = 0 ' Must be defined in VB_Classes the same way!
     Public Const Kinect4AzureCam As Int32 = 1 ' Must be defined in VB_Classes the same way!
     Public Const T265Camera As Int32 = 2 ' Must be defined in VB_Classes the same way!
-    Public cameraRadioButton(2) As RadioButton
+    Public cameraDeviceCount(T265Camera) As Int32
+    Public cameraRadioButton(T265Camera) As RadioButton
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
         SaveSetting("OpenCVB", "FastAccurate", "FastAccurate", lowResolution.Checked)
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", cameraIndex)
@@ -32,7 +32,7 @@ Public Class OptionsDialog
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
         cameraIndex = sender.tag
     End Sub
-    Public Sub Dialog1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Public Sub OptionsDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         For i = 0 To 2
             cameraRadioButton(i) = New RadioButton
             CameraGroup.Controls.Add(cameraRadioButton(i))
@@ -102,7 +102,7 @@ Public Class OptionsDialog
         End If
     End Sub
     Private Sub Cancel_Button_Click(sender As Object, e As EventArgs) Handles Cancel_Button.Click
-        Dialog1_Load(sender, e) ' restore the settings to what they were on entry...
+        OptionsDialog_Load(sender, e) ' restore the settings to what they were on entry...
         Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.Hide()
     End Sub

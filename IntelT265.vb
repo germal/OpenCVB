@@ -36,11 +36,11 @@ Public Class IntelT265 : Implements IDisposable
     Public pointCloud As cv.Mat
     Public leftView As cv.Mat
     Public rightView As cv.Mat
-    Public Sub New(fps As Int32, width As Int32, height As Int32)
+    Public Sub New()
+    End Sub
+    Public Sub initialize(fps As Int32, width As Int32, height As Int32)
         w = width
         h = height
-        If OpenCVB.deviceSearch("T265") Then deviceCount = 1
-        If deviceCount = 0 Then Return
 
         cfg.EnableStream(rs.Stream.Pose, rs.Format.SixDOF)
         cfg.EnableStream(rs.Stream.Fisheye, 1, rs.Format.Y8)

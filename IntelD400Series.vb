@@ -109,13 +109,10 @@ Public Class IntelD400Series : Implements IDisposable
             End Using
         End Sub
     )
-    Public Sub New(fps As Int32, width As Int32, height As Int32)
-        Console.WriteLine(ctx.Version())
-
-        If OpenCVB.deviceSearch("Depth Camera 435") Then deviceCount = 1
-        If OpenCVB.deviceSearch("Depth Camera 415") Then deviceCount += 1
-
-        If deviceCount = 0 Then Return
+    Public Sub New()
+        Console.WriteLine("The current librealsense version is " + ctx.Version())
+    End Sub
+    Public Sub initialize(fps As Int32, width As Int32, height As Int32)
         devices = ctx.QueryDevices()
         device = devices(0) ' Assume device 0 if multiple devices but if 435i is present, prefer that.
         For i = 0 To devices.Count - 1
