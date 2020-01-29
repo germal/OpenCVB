@@ -52,29 +52,34 @@ Public Class IntelT265 : Implements IDisposable
         Dim frames = pipeline.WaitForFrames(1000)
         Dim f = frames.FirstOrDefault(rs.Stream.Pose)
         Dim pose_data = f.As(Of rs.PoseFrame).PoseData()
-        Static framecount As Int32
-        color = New cv.Mat(h, w, cv.MatType.CV_8UC3, framecount)
-        depthRGB = New cv.Mat(h, w, cv.MatType.CV_8UC3, framecount)
-        depth = New cv.Mat(h, w, cv.MatType.CV_16U, framecount)
-        disparity = New cv.Mat(h, w, cv.MatType.CV_32F, 0)
-        leftView = New cv.Mat(h, w, cv.MatType.CV_8U, framecount)
-        rightView = New cv.Mat(h, w, cv.MatType.CV_8U, framecount)
-        pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, framecount)
-        framecount += 1
-        If framecount = 256 Then framecount = 0
-
         Dim images = frames.As(Of rs.FrameSet)()
-        Dim fishEyeLeft = images.FishEyeFrame
-        Dim leftBytes(fishEyeLeft.Height * fishEyeLeft.Width) As Byte
-        Marshal.Copy(fishEyeLeft.Data, leftBytes, 0, leftBytes.Length)
+        Dim fishEye = images.FishEyeFrame
+        Dim leftBytes(fishEye.Height * fishEye.Width) As Byte
+        Marshal.Copy(fishEye.Data, leftBytes, 0, leftBytes.Length)
+        Dim rightBytes(fishEye.Height * fishEye.Width) As Byte
+        For Each frame In images
+            If frame.Profile.Stream = rs.Stream.Fisheye Then
+                If frame.Profile.Index = 2 Then
+                    Marshal.Copy(frame.Data, rightBytes, 0, rightBytes.Length)
+                    Exit For
+                End If
+            End If
+        Next
 
-        Dim left = New cv.Mat(fishEyeLeft.Height, fishEyeLeft.Width, cv.MatType.CV_8U, leftBytes)
+        color = New cv.Mat(h, w, cv.MatType.CV_8UC3, fishEye.Number Mod 255)
+        depthRGB = New cv.Mat(h, w, cv.MatType.CV_8UC3, fishEye.Number Mod 255)
+        depth = New cv.Mat(h, w, cv.MatType.CV_16U, fishEye.Number Mod 255)
+        disparity = New cv.Mat(h, w, cv.MatType.CV_32F, 0)
+        leftView = New cv.Mat(h, w, cv.MatType.CV_8U, fishEye.Number Mod 255)
+        rightView = New cv.Mat(h, w, cv.MatType.CV_8U, fishEye.Number Mod 255)
+        pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, fishEye.Number Mod 255)
+
+
+        Dim left = New cv.Mat(fishEye.Height, fishEye.Width, cv.MatType.CV_8U, leftBytes)
         cv.Cv2.ImShow("left", left)
 
-        'If images Then
-        '    Static test As Int32
-        '    test += 1
-        'End If
+        Dim right = New cv.Mat(fishEye.Height, fishEye.Width, cv.MatType.CV_8U, rightBytes)
+        cv.Cv2.ImShow("right", right)
     End Sub
     Protected Overridable Sub Dispose(disposing As Boolean)
         pipeline.Stop()
