@@ -676,6 +676,11 @@ Public Class OpenCVB
         TestAllTimer.Enabled = False
         stopAlgorithmThread = True
         Dim saveCurrentCamera = optionsForm.cameraIndex
+        ' the T265 will crash if not stopped during the showdialog.  Not sure why.
+        If saveCurrentCamera = OptionsDialog.T265Camera Then
+            stopCameraThread = True
+            saveCurrentCamera = -1
+        End If
 
         Dim OKcancel = optionsForm.ShowDialog()
 
@@ -941,15 +946,13 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub CameraTask(PCmultiplier As Single)
-        While 1
+        While stopCameraThread = False
             Application.DoEvents()
-            If stopCameraThread Then Exit While
             If Me.Visible And Me.IsDisposed = False Then
-                Me.Invoke(
-                        Sub()
-                            Me.Refresh()
-                        End Sub
-                    )
+                Me.Invoke(Sub()
+                              Me.Refresh()
+                          End Sub
+                )
             End If
             camera.GetNextFrame()
 
@@ -978,11 +981,12 @@ Public Class OpenCVB
                 cameraDataUpdated = True
             End SyncLock
 
-            If Me.IsDisposed Then Exit While
+            ' If Me.IsDisposed Then Exit While
             cameraFrameCount += 1
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
         cameraFrameCount = 0
+        camera.dispose()
     End Sub
 End Class
 
