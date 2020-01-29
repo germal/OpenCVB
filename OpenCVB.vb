@@ -136,14 +136,18 @@ Public Class OpenCVB
 
         cameraD400Series = New IntelD400Series()
         cameraD400Series.deviceCount = USBenumeration("Depth Camera 435")
-        cameraD400Series.deviceCount += USBenumeration("Depth Camera 415")
+        cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 415 Depth")
         If cameraD400Series.deviceCount > 0 Then cameraD400Series.initialize(30, regWidth, regHeight)
 
         cameraKinect = New Kinect(30, regWidth, regHeight)
 
+
         cameraT265 = New IntelT265()
-        cameraT265.deviceCount = USBenumeration("T265")
-        If cameraT265.deviceCount > 0 Then cameraT265.initialize(30, regWidth, regHeight)
+        ' we can't have a 415 and a T265 on the same system.  At least at this point - 1/29/2020
+        If cameraD400Series.deviceName <> "Intel RealSense D415" Then
+            cameraT265.deviceCount = USBenumeration("T265")
+            If cameraT265.deviceCount > 0 Then cameraT265.initialize(30, regWidth, regHeight)
+        End If
 
         optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.devicecount
