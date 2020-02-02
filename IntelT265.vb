@@ -245,7 +245,6 @@ Public Class IntelT265
         Dim tmpDepthRGB = New cv.Mat
         disp_vis = disp_vis.ConvertScaleAbs(1)
         cv.Cv2.ApplyColorMap(disp_vis, tmpDepthRGB, cv.ColormapTypes.Jet)
-        cv.Cv2.ImShow("mask", mask)
         Dim depthRect = New cv.Rect(CInt(stereo_cx / 2), 0, tmpDepthRGB.Width, tmpDepthRGB.Height)
         tmpDepthRGB.CopyTo(depthRGB(depthRect), mask)
 
