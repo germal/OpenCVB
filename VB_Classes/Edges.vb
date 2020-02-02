@@ -281,18 +281,18 @@ End Class
 
 
 
-Public Class Edges_Infrared : Implements IDisposable
-    Dim red As InfraRed_Basics
+Public Class Edges_LeftView : Implements IDisposable
+    Dim red As LeftRightView_Basics
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData)
-        red = New InfraRed_Basics(ocvb)
+        red = New LeftRightView_Basics(ocvb)
         sobel = New Edges_Sobel(ocvb)
         sobel.externalUse = True
         sobel.sliders.TrackBar1.Value = 5
 
-        ocvb.desc = "Find the edges in the infrared images."
-        ocvb.label1 = "Edges in Left Infrared Image"
-        ocvb.label2 = "Edges in Right Infrared Image"
+        ocvb.desc = "Find the edges in the LeftViewimages."
+        ocvb.label1 = "Edges in Left LeftViewImage"
+        ocvb.label2 = "Edges in Right LeftViewImage"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         red.Run(ocvb)
@@ -376,10 +376,10 @@ End Class
 
 Public Class Edges_InfraredDots : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Dim red As InfraRed_Basics
+    Dim red As LeftRightView_Basics
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData)
-        red = New InfraRed_Basics(ocvb)
+        red = New LeftRightView_Basics(ocvb)
         sobel = New Edges_Sobel(ocvb)
         sobel.externalUse = True
         sobel.sliders.TrackBar1.Value = 5

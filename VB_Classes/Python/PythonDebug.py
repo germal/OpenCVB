@@ -95,15 +95,6 @@ def callback(frame):
         frame_data["timestamp_ms"] = ts
         frame_mutex.release()
 
-from realsense_device_manager import DeviceManager
-
-rs_config = rs.config()
-ctx = rs.context()
-#device_manager = DeviceManager(ctx, rs_config)
-#device_manager.enable_all_devices()
-
-devices = ctx.query_devices()
-deviceCount = devices
 # Declare RealSense pipeline, encapsulating the actual device and sensors
 pipe = rs.pipeline()
 
@@ -129,8 +120,8 @@ try:
     stereo = cv2.StereoSGBM_create(minDisparity = min_disp,
                                    numDisparities = num_disp,
                                    blockSize = 16,
-                                   P1 = 8*3*window_size**2,
-                                   P2 = 32*3*window_size**2,
+                                   P1 = 8*3*window_size*window_size,
+                                   P2 = 32*3*window_size*window_size,
                                    disp12MaxDiff = 1,
                                    uniquenessRatio = 10,
                                    speckleWindowSize = 100,
@@ -212,7 +203,7 @@ try:
     (rm1, rm2) = cv2.fisheye.initUndistortRectifyMap(K_right, D_right, R_right, P_right, stereo_size, m1type)
     undistort_rectify = {"left"  : (lm1, lm2),
                          "right" : (rm1, rm2)}
-
+   
     mode = "stack"
     while True:
         # Check if the camera has acquired any frames
@@ -237,20 +228,35 @@ try:
                                           map1 = undistort_rectify["right"][0],
                                           map2 = undistort_rectify["right"][1],
                                           interpolation = cv2.INTER_LINEAR)}
-
             # compute the disparity on the center of the frames and convert it to a pixel disparity (divide by DISP_SCALE=16)
-            disparity = stereo.compute(center_undistorted["left"], center_undistorted["right"]).astype(np.float32) / 16.0
+            disparity = stereo.compute(center_undistorted["left"], center_undistorted["right"]) #.astype(np.float32) / 16
+
+            mean = cv2.mean(disparity)
+            print('disparitymean {:.1f}'.format(mean[0]))
 
             # re-crop just the valid part of the disparity
             disparity = disparity[:,max_disp:]
 
             # convert disparity to 0-255 and color it
-            disp_vis = 255*(disparity - min_disp)/ num_disp
+            #disp_vis = 255*(disparity - min_disp)/ num_disp
+            disp_vis = disparity
+            disp_vis *= 255 / num_disp
+
+            #minval, maxval, minloc, maxloc = cv2.minMaxLoc(disp_vis)
+            #print('disp_vis {:.1f} {:.1f}'.format(minval, maxval))
+
+            cv2.imshow("disp_vis", disp_vis)
             disp_color = cv2.applyColorMap(cv2.convertScaleAbs(disp_vis,1), cv2.COLORMAP_JET)
+           
+            #minval, maxval, minloc, maxloc = cv2.minMaxLoc(disp_vis)
+            #print('disp_vis {:.1f} {:.1f}'.format(minval, maxval))
+
             color_image = cv2.cvtColor(center_undistorted["left"][:,max_disp:], cv2.COLOR_GRAY2RGB)
 
             if mode == "stack":
                 cv2.imshow(WINDOW_TITLE, np.hstack((color_image, disp_color)))
+                cv2.imshow("color_image", color_image)
+                cv2.imshow("disp_color", disp_color)
             if mode == "overlay":
                 ind = disparity >= min_disp
                 color_image[ind, 0] = disp_color[ind, 0]

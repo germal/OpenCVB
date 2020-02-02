@@ -62,12 +62,12 @@ End Class
 
 
 Public Class KAZE_Match_CS : Implements IDisposable
-    Dim red As InfraRed_Basics
-    Dim CS_Kaze As New CS_Classes.KAZE_Sample
+    Dim red As LeftRightView_Basics
+    Dim CS_Kaze As New CS_Classes.Kaze_Sample
     Public Sub New(ocvb As AlgorithmData)
-        red = New InfraRed_Basics(ocvb)
+        red = New LeftRightView_Basics(ocvb)
         red.sliders.TrackBar1.Value = 45
-        ocvb.desc = "Match keypoints in the left and right infrared images."
+        ocvb.desc = "Match keypoints in the left and right images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         red.Run(ocvb)
@@ -85,7 +85,7 @@ End Class
 
 Public Class KAZE_LeftAligned_CS : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
-        ocvb.desc = "Match keypoints in the aligned left and unaligned right infrared images but display it as movement."
+        ocvb.desc = "Match keypoints in the aligned left and unaligned right images but display it as movement."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim CS_KazeLeft As New CS_Classes.Kaze_Basics

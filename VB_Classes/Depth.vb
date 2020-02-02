@@ -366,12 +366,12 @@ End Class
 
 
 
-Public Class Depth_ToInfrared : Implements IDisposable
-    Dim red As InfraRed_Basics
+Public Class Depth_ToLeftView : Implements IDisposable
+    Dim red As LeftRightView_Basics
     Dim sliders As New OptionsSliders
     Dim check As New OptionsCheckbox
     Public Sub New(ocvb As AlgorithmData)
-        red = New InfraRed_Basics(ocvb)
+        red = New LeftRightView_Basics(ocvb)
 
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Save Current Yellow Rectangle"
@@ -379,9 +379,9 @@ Public Class Depth_ToInfrared : Implements IDisposable
 
         Dim top As Int32, left As Int32, bot As Int32, right As Int32
         If ocvb.parms.cameraIndex = D400Cam Then
-            top = GetSetting("OpenCVB", "DepthToInfraredTop", "DepthToInfraredTop", 1 / 8)
+            top = GetSetting("OpenCVB", "DepthToLeftViewTop", "DepthToLeftViewTop", 1 / 8)
             left = GetSetting("OpenCVB", "DepthToInfraleftView", "DepthToInfraleftView", 1 / 8)
-            bot = GetSetting("OpenCVB", "DepthToInfraredBot", "DepthToInfraredBot", 7 / 8)
+            bot = GetSetting("OpenCVB", "DepthToLeftViewBot", "DepthToLeftViewBot", 7 / 8)
             right = GetSetting("OpenCVB", "DepthToInfrarightView", "DepthToInfrarightView", 7 / 8)
         Else
             top = 0
@@ -395,13 +395,13 @@ Public Class Depth_ToInfrared : Implements IDisposable
         sliders.setupTrackBar4(ocvb, "Color Image Right in leftView", ocvb.color.Width / 2, ocvb.color.Width, right * ocvb.color.Width)
         If ocvb.parms.ShowOptions Then sliders.Show()
         If ocvb.parms.cameraIndex = D400Cam Then
-            ocvb.label1 = "Color + Infrared Left (overlay)"
+            ocvb.label1 = "Color + LeftView (overlay)"
             ocvb.label2 = "Aligned leftView and color"
         Else
-            ocvb.label1 = "Aligning infrared with color is not useful on Kinect"
+            ocvb.label1 = "Aligning LeftView with color is not useful on Kinect"
             ocvb.label2 = ""
         End If
-        ocvb.desc = "Map the depth image into the infrared images"
+        ocvb.desc = "Map the depth image into the LeftView images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         red.Run(ocvb)
@@ -415,9 +415,9 @@ Public Class Depth_ToInfrared : Implements IDisposable
         ocvb.result1 = ocvb.color + ocvb.result1
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
-            SaveSetting("OpenCVB", "DepthToInfraredTop", "DepthToInfraredTop", sliders.TrackBar1.Value / ocvb.color.Height)
+            SaveSetting("OpenCVB", "DepthToLeftViewTop", "DepthToLeftViewTop", sliders.TrackBar1.Value / ocvb.color.Height)
             SaveSetting("OpenCVB", "DepthToInfraleftView", "DepthToInfraleftView", sliders.TrackBar2.Value / ocvb.color.Width)
-            SaveSetting("OpenCVB", "DepthToInfraredBot", "DepthToInfraredBot", sliders.TrackBar3.Value / ocvb.color.Height)
+            SaveSetting("OpenCVB", "DepthToLeftViewBot", "DepthToLeftViewBot", sliders.TrackBar3.Value / ocvb.color.Height)
             SaveSetting("OpenCVB", "DepthToInfrarightView", "DepthToInfrarightView", sliders.TrackBar4.Value / ocvb.color.Width)
         End If
     End Sub

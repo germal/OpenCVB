@@ -11,7 +11,7 @@ Public Class Disparity_Basics : Implements IDisposable
         Else
             ocvb.label1 = "Kinect Camera Disparity is also the Depth"
         End If
-        ocvb.label2 = "Left Infrared Image"
+        ocvb.label2 = "Left View"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim disparity16u As New cv.Mat

@@ -11,7 +11,7 @@ requirements:
 -   Visual Studio 2019 Community Edition (Free version of Visual Studio)
 
 -   Either a Microsoft Kinect for Azure camera or an Intel RealSense camera –
-    D415, D435, D435i.
+    D415, D435, D435i or T265
 
 The Microsoft Kinect for Azure camera has an IMU (Inertial Measurement Unit) and
 has better depth accuracy but requires more power and is not as portable as the
@@ -262,24 +262,26 @@ provide the most portable version of any algorithm.
 
 **Camera Interface**
 
-All the camera code is isolated in the “camera” class instances IntelD4xx.vb or
-Kinect.vb. There are no references to camera interfaces anywhere else in the
-code. Isolating the camera support from the algorithms strips the code to just
-the essential OpenCV API’s needed.
+All the camera code is isolated in the “camera” class instances IntelD4xx.vb,
+Kinect.vb or IntelT265.vb. There are no references to camera interfaces anywhere
+else in the code. Isolating the camera support from the algorithms strips the
+code to just the essential OpenCV API’s needed.
 
-However, the Intel RealSense team does not support this VB.Net interface (they
-did not provide an interface written in VB.Net.) Please post any issue if
-problems are encountered with the latest RealSense drivers. The version used in
-this release is librealsense2 version 2.23.0 dated June 2019 or later. The
-librealsense2 library is updated roughly every other week.
+The Intel RealSense team does not support this VB.Net interface (they did not
+provide an interface written in VB.Net.) Please post any issue if problems are
+encountered with the latest RealSense drivers. The version used in this release
+is librealsense2 version 2.32.1. The librealsense2 library is updated roughly
+every other week.
 
 Similarly, the Kinect for Azure camera support is isolated to the Kinect.vb
 class and a supporting KinectCamera DLL that provides all the interface code to
 the Kinect for Azure libraries. Since there is likely to be little interest in
-debugging the KinectCamera DLL, it is compiled with optimizations enabled even
-in the Debug configuration. Optimizations enable a higher framerate than when
-running the Debug configuration of the Kinect camera DLL. As a result, the
-VB.Net code in Debug mode often runs as fast as the Release configuration.
+debugging the KinectCamera DLL, the Build Configuration is the Release version
+even in the Debug configuration. If it is necessary to debug the camera
+interface, set any Build Configuration components to the Debug version.
+Optimizations enable a higher framerate than when running the Debug
+configuration of the Kinect camera DLL. As a result, the VB.Net code in Debug
+mode often runs as fast as the Release configuration.
 
 **OpenGL Interface**
 
@@ -639,6 +641,16 @@ voxel while the bottom right shows the voxels colored with their median depth
 options used in each of the contributing algorithms are present below the main
 OpenCVB window.*
 
+![](media/4e524b1046ae6ba349f76388e2c86faa.png)
+
+*Support for Intel’s T265 is rudimentary – it is not meant to capture depth and
+the camera is grayscale. The upper left image is the undistorted and remapped
+Left View. The upper right color section shows depth (computed on the host)
+while the rest of the image is the Left View. The bottom views are the left and
+right raw camera views (stretched to accommodate the frame size.) While none of
+the algorithms fail when running the T265, not all of them produce anything
+useful as depth is not provided by the camera.*
+
 **Future Work**
 
 The plan is to continue adding more algorithms. There are numerous published
@@ -674,4 +686,4 @@ software.
 
 Fremont, California
 
-Fall 2019
+Winter 2020

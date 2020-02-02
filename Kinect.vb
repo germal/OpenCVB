@@ -31,7 +31,7 @@ Module Kinect_Interface
     Public Sub KinectClose(kc As IntPtr)
     End Sub
 End Module
-Public Class Kinect : Implements IDisposable
+Public Class Kinect
     Structure imuData
         Dim temperature As Single
         Dim imuAccel As cv.Point3f
@@ -84,8 +84,10 @@ Public Class Kinect : Implements IDisposable
     Public rightView As cv.Mat
     Public serialNumber As String
     Public w As Int32
-
-    Public Sub New(fps As Int32, width As Int32, height As Int32)
+    Public pipelineClosed As Boolean
+    Public Sub New()
+    End Sub
+    Public Sub initialize(fps As Int32, width As Int32, height As Int32)
         kc = KinectOpen()
         If kc <> 0 Then
             deviceCount = KinectDeviceCount(kc)
@@ -95,6 +97,7 @@ Public Class Kinect : Implements IDisposable
             h = height
             disparity = New cv.Mat
             leftView = New cv.Mat
+            pipelineClosed = False
 
             Dim ptr = KinectExtrinsics(kc)
             Dim rotationTranslation(12) As Single
@@ -182,36 +185,7 @@ Public Class Kinect : Implements IDisposable
         Dim pc = New cv.Mat(h, w, cv.MatType.CV_16SC3, KinectPointCloud(kc))
         pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3) ' This is less efficient than using 16-bit pixels but consistent with Intel cameras (and more widely accepted as normal.)
     End Sub
-#Region "IDisposable Support"
-    Private disposedValue As Boolean ' To detect redundant calls
-
-    ' IDisposable
-    Protected Overridable Sub Dispose(disposing As Boolean)
-        KinectClose(kc)
-        If Not disposedValue Then
-            If disposing Then
-                ' TODO: dispose managed state (managed objects).
-            End If
-
-            ' TODO: free unmanaged resources (unmanaged objects) and override Finalize() below.
-            ' TODO: set large fields to null.
-        End If
-        disposedValue = True
+    Public Sub closePipe()
+        pipelineClosed = True
     End Sub
-
-    ' TODO: override Finalize() only if Dispose(disposing As Boolean) above has code to free unmanaged resources.
-    'Protected Overrides Sub Finalize()
-    '    ' Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.
-    '    Dispose(False)
-    '    MyBase.Finalize()
-    'End Sub
-
-    ' This code added by Visual Basic to correctly implement the disposable pattern.
-    Public Sub Dispose() Implements IDisposable.Dispose
-        ' Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.
-        Dispose(True)
-        ' TODO: uncomment the following line if Finalize() is overridden above.
-        ' GC.SuppressFinalize(Me)
-    End Sub
-#End Region
 End Class

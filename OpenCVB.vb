@@ -29,6 +29,7 @@ Public Class OpenCVB
     Dim DrawingRectangle As Boolean
     Dim drawRect As New cv.Rect(0, 0, 0, 0)
     Dim externalInvocation As Boolean
+    Dim fps As Int32 = 30
     Dim formColor As New cv.Mat, formDepthRGB As New cv.Mat, formResult1 As New cv.Mat, formResult2 As New cv.Mat
     Dim formDepth As New cv.Mat, formPointCloud As New cv.Mat, formDisparity As New cv.Mat, formleftView As New cv.Mat, formrightView As New cv.Mat
     Dim formResultsUpdated As Boolean
@@ -134,20 +135,18 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
+        cameraT265 = New IntelT265()
+        cameraT265.deviceCount = USBenumeration("T265")
+        If cameraT265.deviceCount > 0 Then cameraT265.initialize(fps, regWidth, regHeight)
+
         cameraD400Series = New IntelD400Series()
         cameraD400Series.deviceCount = USBenumeration("Depth Camera 435")
         cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 415 Depth")
         cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 435 With RGB Module Depth")
-        If cameraD400Series.deviceCount > 0 Then cameraD400Series.initialize(30, regWidth, regHeight)
+        If cameraD400Series.deviceCount > 0 Then cameraD400Series.initialize(fps, regWidth, regHeight)
 
-        cameraKinect = New Kinect(30, regWidth, regHeight)
-
-        cameraT265 = New IntelT265()
-        ' we can't have a 415 and a T265 on the same system.  At least at this point - 1/29/2020
-        If cameraD400Series.deviceName <> "Intel RealSense D415" And cameraD400Series.deviceName <> "Intel RealSense D435" Then
-            cameraT265.deviceCount = USBenumeration("T265")
-            If cameraT265.deviceCount > 0 Then cameraT265.initialize(30, regWidth, regHeight)
-        End If
+        cameraKinect = New Kinect()
+        cameraKinect.initialize(fps, regWidth, regHeight)
 
         optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.devicecount
@@ -280,7 +279,6 @@ Public Class OpenCVB
         search = New System.Management.ManagementObjectSearcher("SELECT * From Win32_PnPEntity")
         For Each info In search.Get()
             Name = CType(info("Caption"), String) ' Get the name of the device.'
-            If InStr(Name, "Intel") Then Console.WriteLine(Name)
             If InStr(Name, searchName, CompareMethod.Text) > 0 Then deviceCount += 1
         Next
         Return deviceCount
@@ -637,6 +635,7 @@ Public Class OpenCVB
                 camera = cameraT265
         End Select
         cameraName = camera.devicename
+        camera.pipelineClosed = False
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopAlgorithmThread = True
@@ -691,9 +690,11 @@ Public Class OpenCVB
 
         If OKcancel = DialogResult.OK Then
             If saveCurrentCamera <> optionsForm.cameraIndex Then
+                camera.closePipe()
                 stopCameraThread = True
                 If threadStop(cameraFrameCount) = False Then cameraTaskHandle.Abort()
                 cameraTaskHandle = Nothing
+                updateCamera()
             End If
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
 
@@ -783,7 +784,6 @@ Public Class OpenCVB
 
         If cameraTaskHandle Is Nothing Then
             stopCameraThread = False
-            updateCamera()
 
             If camera.deviceCount = 0 Then SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", OptionsDialog.cameraIndex)
 
@@ -991,7 +991,6 @@ Public Class OpenCVB
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
         cameraFrameCount = 0
-        camera.dispose()
     End Sub
 End Class
 

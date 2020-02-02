@@ -2,7 +2,7 @@
 Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class IntelD400Series : Implements IDisposable
+Public Class IntelD400Series
     Dim align As rs.Align
     Dim blocks As List(Of rs.ProcessingBlock)
     Dim cfg As New rs.Config
@@ -49,6 +49,7 @@ Public Class IntelD400Series : Implements IDisposable
     Public SpatialFilter As Boolean
     Public TemporalFilter As Boolean
     Public ThresholdFilter As Boolean
+    Public pipelineClosed As Boolean
 
     Dim block As New rs.CustomProcessingBlock(
         Sub(f, src)
@@ -113,16 +114,10 @@ Public Class IntelD400Series : Implements IDisposable
         Console.WriteLine("The current librealsense version is " + ctx.Version())
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
+        pipelineClosed = False
         devices = ctx.QueryDevices()
-        device = devices(0) ' Assume device 0 if multiple devices but if 435i is present, prefer that.
-        For i = 0 To devices.Count - 1
-            If devices(i).Info.Item(rs.CameraInfo.Name).Contains("435I") Then
-                device = devices(i)
-                Exit For
-            End If
-        Next
+        device = devices(0)
         deviceName = device.Info.Item(rs.CameraInfo.Name)
-        If deviceName.EndsWith("USB2") Then MsgBox("Is the RealSense camera attached to a USB2 socket?  Are you using the Intel-provided cable?  It needs to be USB3!")
 
         cfg.EnableStream(rs.Stream.Color, width, height, rs.Format.Bgr8, fps)
         cfg.EnableStream(rs.Stream.Depth, width, height, rs.Format.Z16, fps)
@@ -167,14 +162,15 @@ Public Class IntelD400Series : Implements IDisposable
 
             ReDim colorBytes(w * h * 3 - 1)
             ReDim depthRGBBytes(w * h * 3 - 1)
-            ReDim depthBytes(w * h * System.Runtime.InteropServices.Marshal.SizeOf(GetType(UShort)) - 1)
+            ReDim depthBytes(w * h * 2 - 1)
             ReDim disparityBytes(w * h * 4 - 1)
             ReDim leftViewBytes(w * h - 1)
             ReDim rightViewBytes(w * h - 1)
-            ReDim vertices(w * h * System.Runtime.InteropServices.Marshal.SizeOf(GetType(Single)) * 3 - 1) ' 3 floats per pixel.  
+            ReDim vertices(w * h * 4 * 3 - 1) ' 3 floats or 12 bytes per pixel.  
         End If
     End Sub
     Public Sub GetNextFrame()
+        If pipelineClosed Then Exit Sub
         Dim frameSet = pipeline.WaitForFrames(1000)
         block.Process(frameSet)
 
@@ -186,23 +182,7 @@ Public Class IntelD400Series : Implements IDisposable
         rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rightViewBytes)
         pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
     End Sub
-    Private disposedValue As Boolean ' To detect redundant calls
-
-    ' IDisposable
-    Protected Overridable Sub Dispose(disposing As Boolean)
-        pipeline.Stop()
-        cfg.DisableAllStreams()
-        ctx.Dispose()
-        cfg.Dispose()
-        pipeline.Dispose()
-        colorizer.Dispose()
-        depth2Disparity.Dispose()
-        block.Dispose()
-        align.Dispose()
-        disposedValue = True
-    End Sub
-
-    Public Sub Dispose() Implements IDisposable.Dispose
-        Dispose(True)
+    Public Sub closePipe()
+        pipelineClosed = True
     End Sub
 End Class

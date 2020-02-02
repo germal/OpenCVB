@@ -17,7 +17,7 @@ Public Class Sift_Basics_CS : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Points to Match", 1, 1000, 200)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        ocvb.desc = "Compare 2 images to get a homography.  We will use left and right infrared images."
+        ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim dst As New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols * 2, cv.MatType.CV_8UC3)
@@ -57,7 +57,7 @@ Public Class Sift_Basics_CS_MT : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Points to Match", 1, 1000, 100)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        ocvb.desc = "Compare 2 images to get a homography.  We will use left and right infrared images."
+        ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)

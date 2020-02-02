@@ -1,17 +1,23 @@
 ﻿Imports cv = OpenCvSharp
-Public Class InfraRed_Basics : Implements IDisposable
+Public Class LeftRightView_Basics : Implements IDisposable
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 100)
         If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Show the infrared images from the Intel RealSense Camera"
-        ocvb.label1 = "Infrared Left Image"
-        If ocvb.parms.cameraIndex = D400Cam Then
-            ocvb.label2 = "Infrared Right Image"
-        Else
-            ocvb.label2 = "There is only one infrared image on Kinect cameras"
-            sliders.TrackBar1.Value = 0
-        End If
+        ocvb.desc = "Show the left and right views from the 3D Camera"
+        Select Case ocvb.parms.cameraIndex
+            Case D400Cam
+                ocvb.label1 = "Infrared Left Image"
+                ocvb.label2 = "Infrared Right Image"
+            Case Kinect4AzureCam
+                ocvb.label1 = "Infrared Image"
+                ocvb.label2 = "There is only one infrared image with Kinect"
+                sliders.TrackBar1.Value = 0
+            Case T265Camera
+                ocvb.label1 = "Raw Left View Image (resized)"
+                ocvb.label2 = "Raw Right Right Image (resized)"
+                sliders.TrackBar1.Value = 50
+        End Select
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.leftView += sliders.TrackBar1.Value
@@ -26,7 +32,7 @@ End Class
 
 
 
-Public Class InfraRed_Features : Implements IDisposable
+Public Class LeftRightView_Features : Implements IDisposable
     Dim features As Features_GoodFeatures
     Public Sub New(ocvb As AlgorithmData)
         features = New Features_GoodFeatures(ocvb)
@@ -52,7 +58,7 @@ End Class
 
 
 
-Public Class InfraRed_Palettized : Implements IDisposable
+Public Class LeftRightView_Palettized : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         ocvb.desc = "Add color to the 8-bit infrared images."
         ocvb.label1 = "Infrared Left Image"
@@ -72,7 +78,7 @@ End Class
 
 
 
-Public Class InfraRed_BRISK : Implements IDisposable
+Public Class LeftRightView_BRISK : Implements IDisposable
     Dim brisk As BRISK_Basics
     Public Sub New(ocvb As AlgorithmData)
         ocvb.desc = "Add color to the 8-bit infrared images."

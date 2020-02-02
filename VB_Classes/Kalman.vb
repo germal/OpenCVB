@@ -348,9 +348,11 @@ Public Class Kalman_RGBGrid_MT : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         grid.Dispose()
-        For i = 0 To kalman.Count - 1
-            kalman(i).Dispose()
-        Next
+        If kalman IsNot Nothing Then
+            For i = 0 To kalman.Count - 1
+                If kalman(i) IsNot Nothing Then kalman(i).Dispose()
+            Next
+        End If
     End Sub
 End Class
 
