@@ -14,8 +14,8 @@ Public Class LeftRightView_Basics : Implements IDisposable
                 ocvb.label2 = "There is only one infrared image with Kinect"
                 sliders.TrackBar1.Value = 0
             Case T265Camera
-                ocvb.label1 = "Raw Left View Image (resized)"
-                ocvb.label2 = "Raw Right Right Image (resized)"
+                ocvb.label1 = "Raw Left View Image"
+                ocvb.label2 = "Raw Right Right Image"
                 sliders.TrackBar1.Value = 50
         End Select
     End Sub
@@ -29,6 +29,53 @@ Public Class LeftRightView_Basics : Implements IDisposable
         sliders.Dispose()
     End Sub
 End Class
+
+
+
+
+
+
+Public Class LeftRightView_CompareRaw : Implements IDisposable
+    Public sliders As New OptionsSliders
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 100)
+        sliders.setupTrackBar2(ocvb, "Slice Starting Y", 0, 300, 100)
+        sliders.setupTrackBar3(ocvb, "Slice Height", 0, 300, 50)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+        Select Case ocvb.parms.cameraIndex
+            Case D400Cam
+                ocvb.label1 = "Infrared Left Image"
+                ocvb.label2 = "Infrared Right Image"
+            Case Kinect4AzureCam
+                ocvb.label1 = "Infrared Image"
+                ocvb.label2 = "There is only one infrared image with Kinect"
+                sliders.TrackBar1.Value = 0
+            Case T265Camera
+                ocvb.label1 = "Raw Left View Image"
+                ocvb.label2 = "Raw Right Right Image"
+                sliders.TrackBar1.Value = 50
+        End Select
+        ocvb.desc = "Show slices of the left and right view next to each other for visual comparison"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        ocvb.leftView += sliders.TrackBar1.Value
+        ocvb.rightView += sliders.TrackBar1.Value
+
+        ocvb.result1 = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_8UC1, 0)
+        ocvb.result2 = ocvb.leftView
+
+        ocvb.result1.SetTo(0)
+        Dim sliceY = sliders.TrackBar2.Value
+        Dim slideHeight = sliders.TrackBar3.Value
+        ocvb.leftView(New cv.Rect(0, sliceY, ocvb.leftView.Width, slideHeight)).CopyTo(ocvb.result1(New cv.Rect(0, 100, ocvb.leftView.Width, slideHeight)))
+        ocvb.rightView(New cv.Rect(0, sliceY, ocvb.leftView.Width, slideHeight)).CopyTo(ocvb.result1(New cv.Rect(0, 100 + slideHeight, ocvb.leftView.Width, slideHeight)))
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
+    End Sub
+End Class
+
+
 
 
 

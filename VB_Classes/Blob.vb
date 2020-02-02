@@ -220,9 +220,11 @@ Public Class Blob_Rectangles : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         blobs.Dispose()
-        For i = 0 To kalman.Length - 1
-            kalman(i).Dispose()
-        Next
+        If kalman IsNot Nothing Then
+            For i = 0 To kalman.Length - 1
+                kalman(i).Dispose()
+            Next
+        End If
     End Sub
 End Class
 

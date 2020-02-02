@@ -76,6 +76,10 @@ Public Class IntelT265
     Dim maxDisp As Int32
     Dim validRect As cv.Rect
     Dim tPtr As IntPtr
+    Dim rawWidth As Int32
+    Dim rawHeight As Int32
+    Dim rawSrc As cv.Rect
+    Dim rawDst As cv.Rect
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
@@ -115,6 +119,9 @@ Public Class IntelT265
 
         Extrinsics_VB.rotation = extrinsics.rotation
         Extrinsics_VB.translation = extrinsics.translation
+
+        rawWidth = intrinsicsLeft.width
+        rawHeight = intrinsicsLeft.height
 
         kLeft = {intrinsicsLeft.fx, 0, intrinsicsLeft.ppx, 0, intrinsicsLeft.fy, intrinsicsLeft.ppy, 0, 0, 1}
         dLeft = {intrinsicsLeft.coeffs(0), intrinsicsLeft.coeffs(1), intrinsicsLeft.coeffs(2), intrinsicsLeft.coeffs(3)}
@@ -178,12 +185,14 @@ Public Class IntelT265
         pMat = New cv.Mat(3, 4, cv.MatType.CV_64F, pRight)
         cv.Cv2.FishEye.InitUndistortRectifyMap(kMat, dMat, rMat, pMat, stereo_size, cv.MatType.CV_32FC1, rm1, rm2)
         cv.Cv2.FishEye.InitUndistortRectifyMap(kMat, dMat, rMat, pMat, New cv.Size(w, h), cv.MatType.CV_32FC1, rightViewMap1, rightViewMap2)
-        leftView = New cv.Mat(h, w, cv.MatType.CV_8UC3, 0)
-        rightView = New cv.Mat(h, w, cv.MatType.CV_8UC3, 0)
+        leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, 0)
+        rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, 0)
+        rawSrc = New cv.Rect((rawWidth - rawWidth * h / rawHeight) / 2, 0, rawWidth * h / rawHeight, h)
+        rawDst = New cv.Rect(0, 0, rawWidth * h / rawHeight, h)
     End Sub
     Public Sub GetNextFrame()
-        Static leftBytes(intrinsics_VB.height * intrinsics_VB.width) As Byte
-        Static rightBytes(intrinsics_VB.height * intrinsics_VB.width) As Byte
+        Static leftBytes(rawHeight * rawWidth - 1) As Byte
+        Static rightBytes(leftBytes.Length - 1) As Byte
 
         If pipelineClosed Then Exit Sub
         Dim frames = pipeline.WaitForFrames(1000)
@@ -204,10 +213,9 @@ Public Class IntelT265
         Dim leftMat = New cv.Mat(fishEye.Height, fishEye.Width, cv.MatType.CV_8U, leftBytes)
         color = leftMat.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear)
         color = color.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        leftView = leftMat.Resize(New cv.Size(w, h))
         Dim rightMat = New cv.Mat(fishEye.Height, fishEye.Width, cv.MatType.CV_8U, rightBytes)
-        rightView = rightMat.Resize(New cv.Size(w, h))
         depthRGB = color.Clone()
+
         Dim remapLeft = leftMat.Remap(lm1, lm2, cv.InterpolationFlags.Linear)
         Dim remapRight = rightMat.Remap(rm1, rm2, cv.InterpolationFlags.Linear)
 
@@ -248,6 +256,10 @@ Public Class IntelT265
         Dim depthRect = New cv.Rect(CInt(stereo_cx / 2), 0, tmpDepthRGB.Width, tmpDepthRGB.Height)
         tmpDepthRGB.CopyTo(depthRGB(depthRect), mask)
 
+        Dim tmp = New cv.Mat(h, w, cv.MatType.CV_8UC1)
+        leftMat(rawSrc).CopyTo(leftView(rawDst))
+        rightMat(rawSrc).CopyTo(rightView(rawDst))
+        rightView(rawDst) = tmp(rawDst).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         depth = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
         pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, 0)
     End Sub
