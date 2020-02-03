@@ -57,6 +57,7 @@ int main(int argc, char* argv[])
 		Scalar farColor (0.0f, 0.0f, 1.0f);
 		int half = int(dataWidth / 2);
 		int testCount = 0;
+		glLineWidth(3.0f);
 		for (int i = -half; i < half; i++)
 		{
 			for (int j = 0; j < dataHeight; j++)
@@ -74,7 +75,8 @@ int main(int argc, char* argv[])
 					glVertex3f(x + i * dx - dx, -y - j * dy, z - dz);      
 					glVertex3f(x + i * dx - dx, -y - j * dy - dy, z - dz);      
 					glEnd();
-					DrawBox(x + i * dx, -y - j * dy, z, dx, dy, dz);	
+					DrawBox(x + i * dx, -y - j * dy, z, dx, dy, dz);
+					DrawWireFrame(x + i * dx, -y - j * dy, z, dx, dy, dz);
 				}
 			}
 		}

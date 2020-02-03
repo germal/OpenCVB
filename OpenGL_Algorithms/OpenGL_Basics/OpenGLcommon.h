@@ -287,6 +287,38 @@ static void draw_floor(int tileCount, GLint y, GLint z)
 	glEnd();
 }
 
+static void DrawWireFrame(float x, float y, float z, float dx, float dy, float dz)
+{
+	glColor3f(0, 0, 0);
+	glBegin(GL_LINES);
+
+	glVertex3f(x, y, z);
+	glVertex3f(x - dx, y, z);
+	glVertex3f(x - dx, y - dy, z);
+	glVertex3f(x, y - dy, z);
+
+	glVertex3f(x, y - dy, z - dz);
+	glVertex3f(x, y, z - dz);
+	glVertex3f(x, y, z);
+	glVertex3f(x, y - dy, z);
+
+	glVertex3f(x - dx, y - dy, z);
+	glVertex3f(x - dx, y, z);
+	glVertex3f(x - dx, y, z - dz);
+	glVertex3f(x - dx, y - dy, z - dz);
+
+	glVertex3f(x, y, z);
+	glVertex3f(x, y, z - dz);
+	glVertex3f(x - dx, y, z - dz);
+	glVertex3f(x - dx, y, z);
+
+	glVertex3f(x, y - dy, z - dz);
+	glVertex3f(x, y - dy, z);
+	glVertex3f(x - dx, y - dy, z);
+	glVertex3f(x - dx, y - dy, z - dz);
+
+	glEnd();
+}
 static void DrawBox(float x, float y, float z, float dx, float dy, float dz)
 {
 	glBegin(GL_POLYGON);

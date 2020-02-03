@@ -5,7 +5,7 @@ title_window = 'OpenGL_Cube.py'
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-verticies = (
+vertices = (
     (1, -1, -1),
     (1, 1, -1),
     (-1, 1, -1),
@@ -35,7 +35,7 @@ def Cube():
     glBegin(GL_LINES)
     for edge in edges:
         for vertex in edge:
-            glVertex3fv(verticies[vertex])
+            glVertex3fv(vertices[vertex])
     glEnd()
 
 
