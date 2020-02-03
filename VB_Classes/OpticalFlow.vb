@@ -87,7 +87,7 @@ Public Class OpticalFlow_DenseOptions : Implements IDisposable
         sliders2.setupTrackBar2(ocvb, "Optical Flow Scaling Output", 1, 100, 50)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
-        sliders.setupTrackBar1(ocvb, "Optical Flow pyrScale", 1, 100, 40)
+        sliders.setupTrackBar1(ocvb, "Optical Flow pyrScale", 1, 100, 4)
         sliders.setupTrackBar2(ocvb, "Optical Flow Levels", 1, 10, 1)
         sliders.setupTrackBar3(ocvb, "Optical Flow winSize", 1, 9, 1)
         sliders.setupTrackBar4(ocvb, "Optical Flow Iterations", 1, 10, 1)
@@ -139,6 +139,7 @@ Public Class OpticalFlow_DenseBasics : Implements IDisposable
             flow.Run(ocvb)
 
             Dim hsv = opticalFlow_Dense(oldGray, gray, flow.pyrScale, flow.levels, flow.winSize, flow.iterations, flow.polyN, flow.polySigma, flow.OpticalFlowFlags)
+
             ocvb.result1 = hsv.CvtColor(cv.ColorConversionCodes.HSV2RGB)
             ocvb.result1 = ocvb.result1.ConvertScaleAbs(flow.outputScaling)
             ocvb.result2 = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
