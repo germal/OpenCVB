@@ -39,7 +39,7 @@ Public Class IntelT265
     Public depthRGB As New cv.Mat
     Public disparity As New cv.Mat
     Public deviceCount As Int32
-    Public deviceName As String
+    Public deviceName As String = "Intel T265"
     Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
     Public failedImageCount As Int32
     Public imuAccel As cv.Point3f
@@ -80,6 +80,22 @@ Public Class IntelT265
     Dim rawHeight As Int32
     Dim rawSrc As cv.Rect
     Dim rawDst As cv.Rect
+    Dim intrinsicsLeft As rs.Intrinsics
+    Dim intrinsicsRight As rs.Intrinsics
+    Dim leftStream As rs.VideoStreamProfile
+    Dim rightStream As rs.VideoStreamProfile
+    Private Sub getIntrinsics(leftStream As rs.VideoStreamProfile, rightStream As rs.VideoStreamProfile)
+        intrinsicsLeft = leftStream.GetIntrinsics()
+        intrinsicsRight = rightStream.GetIntrinsics()
+        intrinsics_VB.width = intrinsicsLeft.width
+        intrinsics_VB.height = intrinsicsLeft.height
+        intrinsics_VB.ppx = intrinsicsLeft.ppx
+        intrinsics_VB.ppy = intrinsicsLeft.ppy
+        intrinsics_VB.fx = intrinsicsLeft.fx
+        intrinsics_VB.fy = intrinsicsLeft.fy
+        intrinsics_VB.FOV = intrinsicsLeft.FOV
+        intrinsics_VB.coeffs = intrinsicsLeft.coeffs
+    End Sub
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
@@ -99,26 +115,14 @@ Public Class IntelT265
         stereo = cv.StereoSGBM.Create(minDisp, numDisp, 16, 8 * 3 * windowSize * windowSize,
                                       32 * 3 * windowSize * windowSize, 1, 0, 10, 100)
 
-
-        Dim leftStream As rs.VideoStreamProfile = pipeline_profile.GetStream(Of rs.VideoStreamProfile)(rs.Stream.Fisheye, 1)
-        Dim rightStream As rs.VideoStreamProfile = pipeline_profile.GetStream(Of rs.VideoStreamProfile)(rs.Stream.Fisheye, 2)
-        Dim intrinsicsLeft = leftStream.GetIntrinsics()
-        Dim intrinsicsRight = rightStream.GetIntrinsics()
+        leftStream = pipeline_profile.GetStream(Of rs.VideoStreamProfile)(rs.Stream.Fisheye, 1)
+        rightStream = pipeline_profile.GetStream(Of rs.VideoStreamProfile)(rs.Stream.Fisheye, 2)
 
         ' Get the relative extrinsics between the left And right camera
         Dim extrinsics = leftStream.GetExtrinsicsTo(rightStream)
-
-        intrinsics_VB.width = intrinsicsLeft.width
-        intrinsics_VB.height = intrinsicsLeft.height
-        intrinsics_VB.ppx = intrinsicsLeft.ppx
-        intrinsics_VB.ppy = intrinsicsLeft.ppy
-        intrinsics_VB.fx = intrinsicsLeft.fx
-        intrinsics_VB.fy = intrinsicsLeft.fy
-        intrinsics_VB.FOV = intrinsicsLeft.FOV
-        intrinsics_VB.coeffs = intrinsicsLeft.coeffs
-
         Extrinsics_VB.rotation = extrinsics.rotation
         Extrinsics_VB.translation = extrinsics.translation
+        getIntrinsics(leftStream, rightStream)
 
         rawWidth = intrinsicsLeft.width
         rawHeight = intrinsicsLeft.height
@@ -189,6 +193,9 @@ Public Class IntelT265
         rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, 0)
         rawSrc = New cv.Rect((rawWidth - rawWidth * h / rawHeight) / 2, 0, rawWidth * h / rawHeight, h)
         rawDst = New cv.Rect(0, 0, rawWidth * h / rawHeight, h)
+        ReDim vertices(w * h * 4 * 3 - 1) ' 3 floats or 12 bytes per pixel.  
+
+        IMUpresent = False ' for now.  Need to keep feeding the gyro data to the algorithm... soon...
     End Sub
     Public Sub GetNextFrame()
         Static leftBytes(rawHeight * rawWidth - 1) As Byte
@@ -209,6 +216,8 @@ Public Class IntelT265
                 End If
             End If
         Next
+
+        getIntrinsics(leftStream, rightStream)
 
         Dim leftMat = New cv.Mat(fishEye.Height, fishEye.Width, cv.MatType.CV_8U, leftBytes)
         color = leftMat.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear)
@@ -261,7 +270,7 @@ Public Class IntelT265
         rightMat(rawSrc).CopyTo(rightView(rawDst))
         rightView(rawDst) = tmp(rawDst).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         depth = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
-        pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, 0)
+        pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
     End Sub
     Public Sub closePipe()
         pipelineClosed = True

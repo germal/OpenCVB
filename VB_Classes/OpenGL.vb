@@ -235,7 +235,6 @@ Public Class OpenGL_IMU : Implements IDisposable
         ocvb.desc = "Show how to use IMU coordinates in OpenGL"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ogl.OpenGL.rgbInput = ocvb.color ' we need to send something to keep the pipe flowing and getting the ack back.
         ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
         If ocvb.parms.IMUpresent Then
             ogl.Run(ocvb) ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
