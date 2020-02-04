@@ -129,6 +129,7 @@
     <Compile Include="Emgu.vb" />
     <Compile Include="Entropy.vb" />
     <Compile Include="FeatureLess.vb" />
+    <Compile Include="FishEye.vb" />
     <Compile Include="FREAK.vb" />
     <Compile Include="Gabor.vb" />
     <Compile Include="Grayscale.vb" />

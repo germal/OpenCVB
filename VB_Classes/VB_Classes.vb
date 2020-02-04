@@ -126,6 +126,17 @@ Public Class ActiveClass : Implements IDisposable
         Dim useRecordedData As Boolean
         Dim vtkDirectory As String
         Dim width As Int32
+
+        Dim kMatleft As cv.Mat
+        Dim dMatleft As cv.Mat
+        Dim rMatleft As cv.Mat
+        Dim pMatleft As cv.Mat
+
+        Dim kMatRight As cv.Mat
+        Dim dMatRight As cv.Mat
+        Dim rMatRight As cv.Mat
+        Dim pMatRight As cv.Mat
+
     End Structure
     Public Sub New(parms As algorithmParameters)
         UpdateHostLocation(parms.mainFormLoc.X, parms.mainFormLoc.Y, parms.mainFormHeight)

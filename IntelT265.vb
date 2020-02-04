@@ -17,11 +17,11 @@ End Module
 
 Structure T265IMUdata
     Public translation As cv.Point3f
-    Public accelation As cv.Point3f
+    Public acceleration As cv.Point3f
     Public velocity As cv.Point3f
     Public rotation As cv.Point3f
     Public angularVelocity As cv.Point3f
-    Public angularAccelaration As cv.Point3f
+    Public angularAcceleration As cv.Point3f
     Public trackerConfidence As Int32
     Public mapperConfidence As Int32
 End Structure
@@ -40,6 +40,17 @@ Public Class IntelT265
     Dim rRight(8) As Double
     Dim pLeft(8) As Double
     Dim pRight(8) As Double
+
+    Public kMatleft As cv.Mat
+    Public dMatleft As cv.Mat
+    Public rMatleft As cv.Mat
+    Public pMatleft As cv.Mat
+
+    Public kMatRight As cv.Mat
+    Public dMatRight As cv.Mat
+    Public rMatRight As cv.Mat
+    Public pMatRight As cv.Mat
+
     Dim pipeline As New rs.Pipeline
     Dim pipeline_profile As rs.PipelineProfile
     Dim stereo As cv.StereoSGBM
@@ -134,6 +145,7 @@ Public Class IntelT265
         Dim extrinsics = leftStream.GetExtrinsicsTo(rightStream)
         Extrinsics_VB.rotation = extrinsics.rotation
         Extrinsics_VB.translation = extrinsics.translation
+
         getIntrinsics(leftStream, rightStream)
 
         rawWidth = intrinsicsLeft.width
@@ -188,19 +200,19 @@ Public Class IntelT265
         '          0, 0, 0, stereo_focal_px,
         '          0, 0, -1 / extrinsics.translation(0), 0}
 
-        Dim kMat As New cv.Mat(3, 3, cv.MatType.CV_64F, kLeft)
-        Dim dMat As New cv.Mat(1, 4, cv.MatType.CV_64F, dLeft)
-        Dim rMat As New cv.Mat(3, 3, cv.MatType.CV_64F, rLeft)
-        Dim pMat As New cv.Mat(3, 4, cv.MatType.CV_64F, pLeft)
-        cv.Cv2.FishEye.InitUndistortRectifyMap(kMat, dMat, rMat, pMat, stereo_size, cv.MatType.CV_32FC1, lm1, lm2)
-        cv.Cv2.FishEye.InitUndistortRectifyMap(kMat, dMat, rMat, pMat, New cv.Size(w, h), cv.MatType.CV_32FC1, leftViewMap1, leftViewMap2)
+        kMatleft = New cv.Mat(3, 3, cv.MatType.CV_64F, kLeft)
+        dMatleft = New cv.Mat(1, 4, cv.MatType.CV_64F, dLeft)
+        rMatleft = New cv.Mat(3, 3, cv.MatType.CV_64F, rLeft)
+        pMatleft = New cv.Mat(3, 4, cv.MatType.CV_64F, pLeft)
+        cv.Cv2.FishEye.InitUndistortRectifyMap(kMatleft, dMatleft, rMatleft, pMatleft, stereo_size, cv.MatType.CV_32FC1, lm1, lm2)
+        cv.Cv2.FishEye.InitUndistortRectifyMap(kMatleft, dMatleft, rMatleft, pMatleft, New cv.Size(w, h), cv.MatType.CV_32FC1, leftViewMap1, leftViewMap2)
 
-        kMat = New cv.Mat(3, 3, cv.MatType.CV_64F, kRight)
-        dMat = New cv.Mat(1, 4, cv.MatType.CV_64F, dRight)
-        rMat = New cv.Mat(3, 3, cv.MatType.CV_64F, rRight)
-        pMat = New cv.Mat(3, 4, cv.MatType.CV_64F, pRight)
-        cv.Cv2.FishEye.InitUndistortRectifyMap(kMat, dMat, rMat, pMat, stereo_size, cv.MatType.CV_32FC1, rm1, rm2)
-        cv.Cv2.FishEye.InitUndistortRectifyMap(kMat, dMat, rMat, pMat, New cv.Size(w, h), cv.MatType.CV_32FC1, rightViewMap1, rightViewMap2)
+        kMatRight = New cv.Mat(3, 3, cv.MatType.CV_64F, kRight)
+        dMatRight = New cv.Mat(1, 4, cv.MatType.CV_64F, dRight)
+        rMatRight = New cv.Mat(3, 3, cv.MatType.CV_64F, rRight)
+        pMatRight = New cv.Mat(3, 4, cv.MatType.CV_64F, pRight)
+        cv.Cv2.FishEye.InitUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, stereo_size, cv.MatType.CV_32FC1, rm1, rm2)
+        cv.Cv2.FishEye.InitUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, New cv.Size(w, h), cv.MatType.CV_32FC1, rightViewMap1, rightViewMap2)
         leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, 0)
         rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, 0)
         rawSrc = New cv.Rect((rawWidth - rawWidth * h / rawHeight) / 2, 0, rawWidth * h / rawHeight, h)
@@ -221,7 +233,26 @@ Public Class IntelT265
         If pipelineClosed Then Exit Sub
         Dim frames = pipeline.WaitForFrames(1000)
         Dim f = frames.FirstOrDefault(rs.Stream.Pose)
-        Dim pose_data = f.As(Of rs.PoseFrame).PoseData()
+
+
+        'Dim poseData = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Pose)
+        'Dim imuStruct = Marshal.PtrToStructure(Of T265IMUdata)(poseData.Data)
+        'Console.WriteLine("len = " + CStr(Marshal.SizeOf(imuStruct)))
+        'imuGyro = imuStruct.translation
+        'imuGyro.Y *= -1
+        'imuGyro.Z *= -1
+        'imuAccel = imuStruct.acceleration
+        'imuTimeStamp = poseData.Timestamp
+        'Console.WriteLine("translation xyz " + CStr(imuStruct.translation.X) + vbTab + CStr(imuStruct.translation.Y) + vbTab + CStr(imuStruct.translation.Z))
+        'Console.WriteLine("acceleration xyz " + CStr(imuStruct.acceleration.X) + vbTab + CStr(imuStruct.acceleration.Y) + vbTab + CStr(imuStruct.acceleration.Z))
+        'Console.WriteLine("velocity xyz " + CStr(imuStruct.velocity.X) + vbTab + CStr(imuStruct.velocity.Y) + vbTab + CStr(imuStruct.velocity.Z))
+        'Console.WriteLine("rotation xyz " + CStr(imuStruct.rotation.X) + vbTab + CStr(imuStruct.rotation.Y) + vbTab + CStr(imuStruct.rotation.Z))
+        'Console.WriteLine("angularVelocity xyz " + CStr(imuStruct.angularVelocity.X) + vbTab + CStr(imuStruct.angularVelocity.Y) + vbTab + CStr(imuStruct.angularVelocity.Z))
+        'Console.WriteLine("angularAcceleration xyz " + CStr(imuStruct.angularAcceleration.X) + vbTab + CStr(imuStruct.angularAcceleration.Y) + vbTab + CStr(imuStruct.angularAcceleration.Z))
+        'Console.WriteLine("trackerConfidence " + CStr(imuStruct.trackerConfidence))
+        'Console.WriteLine("mapperConfidence " + CStr(imuStruct.mapperConfidence))
+
+
         Dim images = frames.As(Of rs.FrameSet)()
         Dim fishEye = images.FishEyeFrame()
         Marshal.Copy(fishEye.Data, leftBytes, 0, leftBytes.Length)
@@ -233,8 +264,6 @@ Public Class IntelT265
                 End If
             End If
         Next
-
-        getIntrinsics(leftStream, rightStream)
 
         Dim leftMat = New cv.Mat(fishEye.Height, fishEye.Width, cv.MatType.CV_8U, leftBytes)
         color = leftMat.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear)
@@ -288,14 +317,6 @@ Public Class IntelT265
         rightView(rawDst) = tmp(rawDst).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         depth = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
         pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
-
-        Dim poseData = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Pose)
-        Dim imuStruct = Marshal.PtrToStructure(Of T265IMUdata)(poseData.Data)
-        imuGyro = imuStruct.translation
-        imuGyro.Y *= -1
-        imuGyro.Z *= -1
-        imuAccel = imuStruct.angularAccelaration
-        imuTimeStamp = poseData.Timestamp
     End Sub
     Public Sub closePipe()
         pipelineClosed = True

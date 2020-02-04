@@ -762,6 +762,17 @@ Public Class OpenCVB
         parms.PythonExe = optionsForm.PythonExeName.Text
         parms.vtkDirectory = vtkDirectory
         parms.HomeDir = HomeDir.FullName
+        If optionsForm.cameraIndex = OptionsDialog.T265Camera Then
+            parms.kMatLeft = camera.kMatLeft
+            parms.dMatleft = camera.dMatleft
+            parms.rMatleft = camera.rMatleft
+            parms.pMatleft = camera.pMatleft
+
+            parms.kMatright = camera.kMatright
+            parms.dMatright = camera.dMatright
+            parms.rMatright = camera.rMatright
+            parms.pMatright = camera.pMatright
+        End If
         parms.OpenCVfullPath = OpenCVfullPath
         parms.mainFormLoc = Me.Location
         parms.mainFormHeight = Me.Height
