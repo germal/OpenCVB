@@ -15,7 +15,18 @@ Module SGBM_Module
     End Function
 End Module
 
+Structure T265IMUdata
+    Public translation As cv.Point3f
+    Public accelation As cv.Point3f
+    Public velocity As cv.Point3f
+    Public rotation As cv.Point3f
+    Public angularVelocity As cv.Point3f
+    Public angularAccelaration As cv.Point3f
+    Public trackerConfidence As Int32
+    Public mapperConfidence As Int32
+End Structure
 Public Class IntelT265
+#Region "IntelT265Data"
     Dim cfg As New rs.Config
     Dim colorBytes() As Byte
     Dim device As rs.Device
@@ -84,6 +95,7 @@ Public Class IntelT265
     Dim intrinsicsRight As rs.Intrinsics
     Dim leftStream As rs.VideoStreamProfile
     Dim rightStream As rs.VideoStreamProfile
+#End Region
     Private Sub getIntrinsics(leftStream As rs.VideoStreamProfile, rightStream As rs.VideoStreamProfile)
         intrinsicsLeft = leftStream.GetIntrinsics()
         intrinsicsRight = rightStream.GetIntrinsics()
@@ -195,9 +207,14 @@ Public Class IntelT265
         rawDst = New cv.Rect(0, 0, rawWidth * h / rawHeight, h)
         ReDim vertices(w * h * 4 * 3 - 1) ' 3 floats or 12 bytes per pixel.  
 
-        IMUpresent = False ' for now.  Need to keep feeding the gyro data to the algorithm... soon...
+        IMUpresent = True
     End Sub
     Public Sub GetNextFrame()
+#If DEBUG Then
+        Static msgDelivered As Boolean
+        If msgDelivered = False Then MsgBox("The T265 camera support is quite slow in Debug mode." + vbCrLf + "Use Release mode to get reasonable responsiveness.")
+        msgDelivered = True
+#End If
         Static leftBytes(rawHeight * rawWidth - 1) As Byte
         Static rightBytes(leftBytes.Length - 1) As Byte
 
@@ -271,6 +288,14 @@ Public Class IntelT265
         rightView(rawDst) = tmp(rawDst).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         depth = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
         pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
+
+        Dim poseData = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Pose)
+        Dim imuStruct = Marshal.PtrToStructure(Of T265IMUdata)(poseData.Data)
+        imuGyro = imuStruct.translation
+        imuGyro.Y *= -1
+        imuGyro.Z *= -1
+        imuAccel = imuStruct.angularAccelaration
+        imuTimeStamp = poseData.Timestamp
     End Sub
     Public Sub closePipe()
         pipelineClosed = True

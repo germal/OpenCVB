@@ -326,34 +326,22 @@ static void DrawBox(float x, float y, float z, float dx, float dy, float dz)
 	glVertex3f(x, y, z);
 	glVertex3f(x - dx, y, z);
 	glVertex3f(x - dx, y - dy, z);
-	glEnd();
 
-	// Purple side - RIGHT
-	glBegin(GL_POLYGON);
 	glVertex3f(x, y - dy, z - dz);
 	glVertex3f(x, y, z - dz);
 	glVertex3f(x, y, z);
 	glVertex3f(x, y - dy, z);
-	glEnd();
 
-	// Green side - LEFT
-	glBegin(GL_POLYGON);
 	glVertex3f(x - dx, y - dy, z);
 	glVertex3f(x - dx, y, z);
 	glVertex3f(x - dx, y, z - dz);
 	glVertex3f(x - dx, y - dy, z - dz);
-	glEnd();
 
-	// Blue side - TOP
-	glBegin(GL_POLYGON);
 	glVertex3f(x, y, z);
 	glVertex3f(x, y, z - dz);
 	glVertex3f(x - dx, y, z - dz);
 	glVertex3f(x - dx, y, z);
-	glEnd();
 
-	// Red side - BOTTOM
-	glBegin(GL_POLYGON);
 	glVertex3f(x, y - dy, z - dz);
 	glVertex3f(x, y - dy, z);
 	glVertex3f(x - dx, y - dy, z);
