@@ -49,7 +49,7 @@ Public Class CComp_Basics : Implements IDisposable
 
         cc.RenderBlobs(ocvb.result1)
         dstGray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim grayDepth = ocvb.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim grayDepth = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result1.CopyTo(ocvb.result2)
         For Each blob In cc.Blobs
             If blob.Area < sliders.TrackBar2.Value Then Continue For ' skip it if too small...
@@ -128,7 +128,7 @@ Public Class CComp_ColorDepth : Implements IDisposable
 
         For Each blob In cc.Blobs.Skip(1)
             Dim roi = blob.Rect
-            Dim avg = ocvb.depthRGB(roi).Mean(binary(roi))
+            Dim avg = ocvb.RGBDepth(roi).Mean(binary(roi))
             ocvb.result1(roi).SetTo(avg, binary(roi))
         Next
 
@@ -166,7 +166,7 @@ Public Class CComp_Image : Implements IDisposable
         blobList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
 
         For i = 0 To blobList.Count - 1
-            Dim avg = ocvb.depthRGB(blobList(i)).Mean(binary(blobList(i)))
+            Dim avg = ocvb.RGBDepth(blobList(i)).Mean(binary(blobList(i)))
             ocvb.result1(blobList(i)).SetTo(avg, binary(blobList(i)))
         Next
 
@@ -180,7 +180,7 @@ Public Class CComp_Image : Implements IDisposable
         blobList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
 
         For i = 0 To blobList.Count - 1
-            Dim avg = ocvb.depthRGB(blobList(i)).Mean(binary(blobList(i)))
+            Dim avg = ocvb.RGBDepth(blobList(i)).Mean(binary(blobList(i)))
             ocvb.result1(blobList(i)).SetTo(avg, binary(blobList(i)))
         Next
     End Sub
@@ -234,7 +234,7 @@ Public Class CComp_InRange_MT : Implements IDisposable
                 Dim depth = ocvb.depth(roiList(j))
                 Dim meanDepth = depth.Mean(mask(roiList(j)))
                 If meanDepth.Item(0) < maxDepth Then
-                    Dim avg = ocvb.depthRGB(roiList(j)).Mean(mask(roiList(j)))
+                    Dim avg = ocvb.RGBDepth(roiList(j)).Mean(mask(roiList(j)))
                     ocvb.result1(roiList(j)).SetTo(avg, bin)
                     ocvb.result2(roiList(j)).SetTo(avg)
                 End If
@@ -287,7 +287,7 @@ Public Class CComp_InRange : Implements IDisposable
         roiList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
         'For i = roiList.Count - 1 To 0 Step -1
         For i = 0 To roiList.Count - 1
-            Dim avg = ocvb.depthRGB(roiList(i)).Mean(mask(roiList(i)))
+            Dim avg = ocvb.RGBDepth(roiList(i)).Mean(mask(roiList(i)))
             ocvb.result2(roiList(i)).SetTo(avg)
         Next
 

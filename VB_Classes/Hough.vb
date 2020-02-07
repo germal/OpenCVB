@@ -153,7 +153,7 @@ Public Class Hough_Lines_MT : Implements IDisposable
         Sub(roi)
             Dim segments() = cv.Cv2.HoughLines(edges.dst(roi), rhoIn, thetaIn, threshold)
             If segments.Count = 0 Then
-                ocvb.result2(roi) = ocvb.depthRGB(roi)
+                ocvb.result2(roi) = ocvb.RGBDepth(roi)
                 Exit Sub
             End If
             ocvb.result2(roi).SetTo(0)

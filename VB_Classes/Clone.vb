@@ -208,7 +208,7 @@ Public Class Clone_Seamless : Implements IDisposable
             End If
         Next
         ocvb.result2 = ocvb.color.Clone()
-        cv.Cv2.SeamlessClone(ocvb.depthRGB, ocvb.color, ocvb.result1, center, ocvb.result2, style)
+        cv.Cv2.SeamlessClone(ocvb.RGBDepth, ocvb.color, ocvb.result1, center, ocvb.result2, style)
         ocvb.result2.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

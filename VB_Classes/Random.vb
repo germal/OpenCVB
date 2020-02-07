@@ -42,7 +42,7 @@ Public Class Random_Shuffle : Implements IDisposable
         ocvb.desc = "Use randomShuffle to reorder an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.depthRGB.CopyTo(ocvb.result1)
+        ocvb.RGBDepth.CopyTo(ocvb.result1)
         Dim myRNG As New cv.RNG
         cv.Cv2.RandShuffle(ocvb.result1, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
         ocvb.label1 = "Random_shuffle - wave at camera"

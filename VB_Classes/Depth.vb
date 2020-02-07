@@ -21,7 +21,7 @@ Public Class Depth_ManualTrim : Implements IDisposable
         cv.Cv2.BitwiseAnd(Mask, maskMin, Mask)
 
         ocvb.result1.SetTo(0)
-        ocvb.depthRGB.CopyTo(ocvb.result1, Mask)
+        ocvb.RGBDepth.CopyTo(ocvb.result1, Mask)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
@@ -134,12 +134,12 @@ Public Class Depth_Median : Implements IDisposable
         Dim mask As cv.Mat
         mask = median.src.LessThan(median.medianVal)
         ocvb.result1.SetTo(0)
-        ocvb.depthRGB.CopyTo(ocvb.result1, mask)
+        ocvb.RGBDepth.CopyTo(ocvb.result1, mask)
         ocvb.label1 = "Median Depth < " + Format(median.medianVal, "#0.0")
 
         cv.Cv2.BitwiseNot(mask, mask)
         ocvb.result2.SetTo(0)
-        ocvb.depthRGB.CopyTo(ocvb.result2, mask)
+        ocvb.RGBDepth.CopyTo(ocvb.result2, mask)
         ocvb.label2 = "Median Depth > " + Format(median.medianVal, "#0.0")
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -206,7 +206,7 @@ Public Class Depth_Flatland : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim reductionFactor = sliders.TrackBar1.Maximum - sliders.TrackBar1.Value
-        ocvb.result1 = ocvb.depthRGB / reductionFactor
+        ocvb.result1 = ocvb.RGBDepth / reductionFactor
         ocvb.result1 *= reductionFactor
         ocvb.result2 = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -228,8 +228,8 @@ Public Class Depth_FirstLastDistance : Implements IDisposable
         Dim minVal As Double, maxVal As Double
         Dim minPt As cv.Point, maxPt As cv.Point
         cv.Cv2.MinMaxLoc(ocvb.depth, minVal, maxVal, minPt, maxPt, mask)
-        ocvb.depthRGB.CopyTo(ocvb.result1)
-        ocvb.depthRGB.CopyTo(ocvb.result2)
+        ocvb.RGBDepth.CopyTo(ocvb.result1)
+        ocvb.RGBDepth.CopyTo(ocvb.result2)
         ocvb.label1 = "Min Depth " + CStr(minVal) + " mm"
         ocvb.result1.Circle(minPt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         ocvb.label2 = "Max Depth " + CStr(maxVal) + " mm"
@@ -491,7 +491,7 @@ Public Class Depth_FlatBackground : Implements IDisposable
         ocvb.depth.SetTo(0, zeroMask)
 
         ocvb.result1.SetTo(0)
-        ocvb.depthRGB.CopyTo(ocvb.result1, mask)
+        ocvb.RGBDepth.CopyTo(ocvb.result1, mask)
         zeroMask.SetTo(255, shadow.holeMask)
         ocvb.color.CopyTo(ocvb.result1, zeroMask)
         ocvb.depth.SetTo(maxDepth, zeroMask) ' set the depth to the maxdepth for any background
@@ -719,7 +719,7 @@ Public Class Depth_Uncertainty : Implements IDisposable
         ocvb.desc = "Use the bio-inspired retina algorithm to determine depth uncertainty."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        retina.src = ocvb.depthRGB
+        retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
         ocvb.result2 = ocvb.result2.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
@@ -840,7 +840,7 @@ Public Class Depth_Palette : Implements IDisposable
         ocvb.result1.SetTo(0, trim.zeroMask)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        Trim.Dispose()
+        trim.Dispose()
     End Sub
 End Class
 
@@ -932,7 +932,7 @@ Public Class Depth_InRange : Implements IDisposable
 
         If externalUse = False Then
             ocvb.result1.SetTo(0)
-            ocvb.depthRGB.CopyTo(ocvb.result1, Mask)
+            ocvb.RGBDepth.CopyTo(ocvb.result1, Mask)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

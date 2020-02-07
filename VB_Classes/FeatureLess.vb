@@ -70,7 +70,7 @@ Public Class Featureless_Basics_MT : Implements IDisposable
         For i = 1 To regionCount - 1
             Dim label = mask.InRange(i, i)
             objects.Add(label.Clone())
-            Dim mean = ocvb.depthRGB.Mean(label)
+            Dim mean = ocvb.RGBDepth.Mean(label)
             ocvb.result2.SetTo(mean, label)
         Next
         ocvb.label2 = "FeatureLess Regions = " + CStr(regionCount)

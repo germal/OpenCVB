@@ -77,7 +77,7 @@ Public Class MSER_Basics : Implements IDisposable
                 Dim nextRegion = region(i)
                 pixels += nextRegion.Length
                 For Each pt In nextRegion
-                    ocvb.result1.Set(Of cv.Vec3b)(pt.Y, pt.X, ocvb.depthRGB.At(Of cv.Vec3b)(pt.Y, pt.X))
+                    ocvb.result1.Set(Of cv.Vec3b)(pt.Y, pt.X, ocvb.RGBDepth.At(Of cv.Vec3b)(pt.Y, pt.X))
                 Next
             Next
             ocvb.label1 = CStr(region.Length) + " Regions " + Format(pixels / region.Length, "#0.0") + " pixels/region (avg)"

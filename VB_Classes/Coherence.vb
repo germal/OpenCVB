@@ -86,7 +86,7 @@ Public Class Coherence_Depth : Implements IDisposable
         ocvb.desc = "Find coherent lines in the depth image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        coherent.src = ocvb.depthRGB
+        coherent.src = ocvb.RGBDepth
         coherent.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

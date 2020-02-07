@@ -65,7 +65,7 @@ Public Class Fitline_3DBasics_MT : Implements IDisposable
             Next
             If points.Count = 0 Then
                 ' save the average color for this roi
-                Dim mean = ocvb.depthRGB(roi).Mean()
+                Dim mean = ocvb.RGBDepth(roi).Mean()
                 mean(0) = 255 - mean(0)
                 ocvb.result2.Rectangle(roi, mean, -1, cv.LineTypes.AntiAlias)
                 Exit Sub

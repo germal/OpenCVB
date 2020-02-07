@@ -111,7 +111,7 @@ Public Class Plane_Detect : Implements IDisposable
         grid.Run(ocvb)
 
         ocvb.result2.SetTo(0)
-        ocvb.depthRGB.CopyTo(ocvb.result1)
+        ocvb.RGBDepth.CopyTo(ocvb.result1)
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
@@ -187,7 +187,7 @@ Public Class Plane_DetectDebug : Implements IDisposable
         grid.Run(ocvb)
 
         ocvb.result2.SetTo(0)
-        ocvb.depthRGB.CopyTo(ocvb.result1)
+        ocvb.RGBDepth.CopyTo(ocvb.result1)
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)

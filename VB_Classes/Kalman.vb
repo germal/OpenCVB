@@ -447,7 +447,7 @@ Public Class Kalman_Depth : Implements IDisposable
         ocvb.desc = "Use Kalman filter on a portion of the depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        kRect.src = ocvb.depthRGB
+        kRect.src = ocvb.RGBDepth
         kRect.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -466,8 +466,8 @@ Public Class Kalman_Mat : Implements IDisposable
         ocvb.desc = "Use Kalman to stabilize image value.  Shows limitations of how much data can be pushed through a Kalman Filter."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.drawRect = New cv.Rect Then ocvb.drawRect = New cv.Rect(0, 200, ocvb.depthRGB.Width, 50)
-        If externalUse = False Then src = ocvb.depthRGB
+        If ocvb.drawRect = New cv.Rect Then ocvb.drawRect = New cv.Rect(0, 200, ocvb.RGBDepth.Width, 50)
+        If externalUse = False Then src = ocvb.RGBDepth
         ocvb.result1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray = ocvb.result1(ocvb.drawRect)
 

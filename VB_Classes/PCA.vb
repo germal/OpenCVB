@@ -13,7 +13,7 @@ Public Class PCA_Basics : Implements IDisposable
         Static images32f(images.Length) As cv.Mat
         Dim index = ocvb.frameCount Mod images.Length
         If useDepthInput Then
-            images(index) = ocvb.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            images(index) = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
             images(index) = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If

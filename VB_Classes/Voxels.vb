@@ -57,7 +57,7 @@ Public Class Voxels_Basics_MT : Implements IDisposable
         voxelMat *= 255 / (maxDepth - minDepth) ' do the normalize manually to use the min and max Depth (more stable image)
 
         If check.Box(0).Checked Then ' do they want to display results?
-            ocvb.result1 = ocvb.depthRGB.Clone()
+            ocvb.result1 = ocvb.RGBDepth.Clone()
             ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
             Dim nearColor = cv.Scalar.Yellow
             Dim farColor = cv.Scalar.Blue

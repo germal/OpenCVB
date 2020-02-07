@@ -6,7 +6,7 @@ Public Class Mat_Repeat : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim small = ocvb.color.Resize(New cv.Size(ocvb.color.Cols / 10, ocvb.color.Rows / 10))
         ocvb.result1 = small.Repeat(10, 10)
-        small = ocvb.depthRGB.Resize(New cv.Size(ocvb.color.Cols / 10, ocvb.color.Rows / 10))
+        small = ocvb.RGBDepth.Resize(New cv.Size(ocvb.color.Cols / 10, ocvb.color.Rows / 10))
         ocvb.result2 = small.Repeat(10, 10)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -147,7 +147,7 @@ Public Class Mat_4to1 : Implements IDisposable
         Static roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
         If externalUse = False Then
             mat1 = ocvb.color
-            mat2 = ocvb.depthRGB
+            mat2 = ocvb.RGBDepth
             mat3 = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             mat4 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             mat = {mat1, mat2, mat3, mat4}
@@ -188,7 +188,7 @@ Public Class Mat_2to1 : Implements IDisposable
         Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         If externalUse = False Then
             mat1 = ocvb.color
-            mat2 = ocvb.depthRGB
+            mat2 = ocvb.RGBDepth
             mat = {mat1, mat2}
         End If
         For i = 0 To 1

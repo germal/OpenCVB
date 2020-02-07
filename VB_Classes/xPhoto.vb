@@ -34,7 +34,7 @@ Public Class xPhoto_Bm3dDenoiseDepthImage : Implements IDisposable
         ocvb.label2 = "Difference from Input"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(gray, gray)
         CvXPhoto.Bm3dDenoising(gray, ocvb.result1)
         cv.Cv2.Subtract(ocvb.result1, gray, ocvb.result2)

@@ -65,7 +65,7 @@ Public Class Blur_Homogeneous : Implements IDisposable
         Dim kernelSize As Int32 = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         ocvb.result1 = ocvb.color.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
-        ocvb.result2 = ocvb.depthRGB.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
+        ocvb.result2 = ocvb.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()

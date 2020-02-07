@@ -49,7 +49,7 @@ Public Class DCT_DepthRGB : Implements IDisposable
         ocvb.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
         gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)

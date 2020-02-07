@@ -41,7 +41,7 @@ Public Class Gradient_Depth : Implements IDisposable
         ocvb.label2 = "Phase Output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        sobel.src = ocvb.depthRGB.Clone()
+        sobel.src = ocvb.RGBDepth.Clone()
         sobel.Run(ocvb)
         Dim angle = New cv.Mat
         Dim x32f As New cv.Mat
@@ -69,7 +69,7 @@ Public Class Gradient_Flatland : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim reductionFactor = sliders.TrackBar1.Maximum - sliders.TrackBar1.Value
-        ocvb.result1 = ocvb.depthRGB.Clone()
+        ocvb.result1 = ocvb.RGBDepth.Clone()
         ocvb.result1 /= reductionFactor
         ocvb.result1 *= reductionFactor
         grade.Run(ocvb)

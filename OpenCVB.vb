@@ -877,7 +877,7 @@ Public Class OpenCVB
                 cameraDataUpdated = False
                 OpenCVB.ocvb.pointCloud = formPointCloud
                 OpenCVB.ocvb.color = formColor
-                OpenCVB.ocvb.depthRGB = formDepthRGB
+                OpenCVB.ocvb.RGBDepth = formDepthRGB
                 OpenCVB.ocvb.depth = formDepth
                 OpenCVB.ocvb.disparity = formDisparity
                 OpenCVB.ocvb.leftView = formleftView

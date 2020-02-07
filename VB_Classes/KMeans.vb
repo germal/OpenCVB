@@ -57,7 +57,7 @@ Public Class kMeans_Basics : Implements IDisposable
 
         For i = 0 To clusterCount - 1
             Dim mask = labels.InRange(i, i)
-            Dim mean = ocvb.depthRGB.Mean(mask)
+            Dim mean = ocvb.RGBDepth.Mean(mask)
             ocvb.result1.SetTo(mean, mask)
         Next
     End Sub
@@ -499,7 +499,7 @@ Public Class kMeans_XYDepth : Implements IDisposable
         For i = 0 To columnVector.Rows - 1
             columnVector.Set(Of cv.Vec3f)(i, 0, colors.Get(Of cv.Vec3f)(labels.Get(Of Int32)(i)))
         Next
-        ocvb.depthRGB.CopyTo(ocvb.result1)
+        ocvb.RGBDepth.CopyTo(ocvb.result1)
         columnVector.Reshape(3, ocvb.result1(roi).Height).ConvertTo(ocvb.result1(roi), cv.MatType.CV_8U)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -694,7 +694,7 @@ Public Class kMeans_Color : Implements IDisposable
 
         For i = 0 To clusterCount - 1
             Dim mask = labels.InRange(i, i)
-            Dim mean = ocvb.depthRGB.Mean(mask)
+            Dim mean = ocvb.RGBDepth.Mean(mask)
             ocvb.result1.SetTo(mean, mask)
         Next
     End Sub
@@ -743,7 +743,7 @@ Public Class kMeans_Color_MT : Implements IDisposable
             For i = 0 To clusterCount - 1
                 Dim mask = labels.InRange(i, i)
                 mask.SetTo(0, zeroDepth) ' don't include the zeros in the mean depth computation.
-                Dim mean = ocvb.depthRGB(roi).Mean(mask)
+                Dim mean = ocvb.RGBDepth(roi).Mean(mask)
                 ocvb.result1(roi).SetTo(mean, mask)
             Next
         End Sub)
@@ -787,7 +787,7 @@ Public Class kMeans_ColorDepth : Implements IDisposable
 
         For i = 0 To clusterCount - 1
             Dim mask = labels.InRange(i, i)
-            Dim mean = ocvb.depthRGB.Mean(mask)
+            Dim mean = ocvb.RGBDepth.Mean(mask)
             ocvb.result1.SetTo(mean, mask)
         Next
     End Sub
@@ -840,7 +840,7 @@ Public Class kMeans_ColorDepth_MT : Implements IDisposable
 
            For i = 0 To clusterCount - 1
                Dim mask = labels.InRange(i, i)
-               Dim mean = ocvb.depthRGB(roi).Mean(mask)
+               Dim mean = ocvb.RGBDepth(roi).Mean(mask)
                ocvb.result1(roi).SetTo(mean, mask)
            Next
        End Sub)

@@ -7,9 +7,9 @@ Public Class Concat_Basics : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim tmp As New cv.Mat
-        cv.Cv2.HConcat(ocvb.color, ocvb.depthRGB, tmp)
+        cv.Cv2.HConcat(ocvb.color, ocvb.RGBDepth, tmp)
         ocvb.result1 = tmp.Resize(ocvb.color.Size())
-        cv.Cv2.VConcat(ocvb.color, ocvb.depthRGB, tmp)
+        cv.Cv2.VConcat(ocvb.color, ocvb.RGBDepth, tmp)
         ocvb.result2 = tmp.Resize(ocvb.color.Size())
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -31,7 +31,7 @@ Public Class Concat_4way : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then
             img(0) = ocvb.color
-            img(1) = ocvb.depthRGB
+            img(1) = ocvb.RGBDepth
             img(2) = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(ocvb.color.Size())
             img(3) = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(ocvb.color.Size())
         End If

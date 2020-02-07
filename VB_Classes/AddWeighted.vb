@@ -8,7 +8,7 @@ Public Class AddWeighted_DepthRGB : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim alpha = sliders.TrackBar1.Value / sliders.TrackBar1.Maximum
-        cv.Cv2.AddWeighted(ocvb.color, alpha, ocvb.depthRGB, 1.0 - alpha, 0, ocvb.result1)
+        cv.Cv2.AddWeighted(ocvb.color, alpha, ocvb.RGBDepth, 1.0 - alpha, 0, ocvb.result1)
         ocvb.label1 = "depth " + Format(1 - sliders.TrackBar1.Value / 100, "#0%") + " RGB " + Format(sliders.TrackBar1.Value / 100, "#0%")
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

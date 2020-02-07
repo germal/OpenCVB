@@ -75,9 +75,9 @@ Public Class ML_FillDepthRGB_MT : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
         grid.Run(ocvb)
-        ocvb.depthRGB.CopyTo(ocvb.result1)
+        ocvb.RGBDepth.CopyTo(ocvb.result1)
         ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
-        Dim grayDepth = ocvb.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim grayDepth = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim minLearnCount = 5
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
@@ -106,8 +106,8 @@ Public Class ML_FillDepthRGB : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
         Dim minLearnCount = sliders.TrackBar1.Value
-        ocvb.depthRGB.CopyTo(ocvb.result1)
-        Dim grayDepth = ocvb.depthRGB.CvtColor(cv.ColorConversionCodes.bgr2gray)
+        ocvb.RGBDepth.CopyTo(ocvb.result1)
+        Dim grayDepth = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         detectAndFillShadow(shadow.holeMask, shadow.borderMask, grayDepth, ocvb.color, minLearnCount)
         ocvb.result2 = grayDepth.CvtColor(cv.ColorConversionCodes.gray2bgr)
     End Sub

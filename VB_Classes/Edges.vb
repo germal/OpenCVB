@@ -110,7 +110,7 @@ Public Class Edges_Laplacian : Implements IDisposable
         cv.Cv2.ConvertScaleAbs(dst, abs_dst)
         cv.Cv2.CvtColor(abs_dst, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
 
-        cv.Cv2.GaussianBlur(ocvb.depthRGB, ocvb.result2, New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
+        cv.Cv2.GaussianBlur(ocvb.RGBDepth, ocvb.result2, New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
         cv.Cv2.CvtColor(ocvb.result2, gray, cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.Laplacian(gray, dst, cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
         cv.Cv2.ConvertScaleAbs(dst, abs_dst)
@@ -170,9 +170,9 @@ Public Class Edges_Preserving : Implements IDisposable
             cv.Cv2.EdgePreservingFilter(ocvb.color, ocvb.result1, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
         End If
         If radio.check(0).Checked Then
-            cv.Cv2.EdgePreservingFilter(ocvb.depthRGB, ocvb.result2, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
+            cv.Cv2.EdgePreservingFilter(ocvb.RGBDepth, ocvb.result2, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
         Else
-            cv.Cv2.EdgePreservingFilter(ocvb.depthRGB, ocvb.result2, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
+            cv.Cv2.EdgePreservingFilter(ocvb.RGBDepth, ocvb.result2, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -352,7 +352,7 @@ Public Class Edges_DCTfrequency : Implements IDisposable
         ocvb.desc = "Find edges by removing all the highest frequencies."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
         gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)

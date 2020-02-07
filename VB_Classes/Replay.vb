@@ -34,9 +34,9 @@ Module recordPlaybackCommon
         binWrite.Write(ocvb.depth.Height)
         binWrite.Write(ocvb.depth.ElemSize)
 
-        binWrite.Write(ocvb.depthRGB.Width)
-        binWrite.Write(ocvb.depthRGB.Height)
-        binWrite.Write(ocvb.depthRGB.ElemSize)
+        binWrite.Write(ocvb.RGBDepth.Width)
+        binWrite.Write(ocvb.RGBDepth.Height)
+        binWrite.Write(ocvb.RGBDepth.ElemSize)
 
         binWrite.Write(ocvb.pointCloud.Width)
         binWrite.Write(ocvb.pointCloud.Height)
@@ -82,7 +82,7 @@ Public Class Replay_Record : Implements IDisposable
             If recordingActive = False Then
                 bytesPerColor = ocvb.color.Total * ocvb.color.ElemSize
                 bytesPerDepth = ocvb.depth.Total * ocvb.depth.ElemSize
-                bytesPerDepthRGB = ocvb.depthRGB.Total * ocvb.depthRGB.ElemSize
+                bytesPerDepthRGB = ocvb.RGBDepth.Total * ocvb.RGBDepth.ElemSize
                 ' start recording...
                 ReDim colorBytes(bytesPerColor - 1)
                 ReDim depthBytes(bytesPerDepth - 1)
@@ -102,7 +102,7 @@ Public Class Replay_Record : Implements IDisposable
                 binWrite.Write(depthBytes)
                 bytesTotal += depthBytes.Length
 
-                Marshal.Copy(ocvb.depthRGB.Data, depthRGBBytes, 0, depthRGBBytes.Length)
+                Marshal.Copy(ocvb.RGBDepth.Data, depthRGBBytes, 0, depthRGBBytes.Length)
                 binWrite.Write(depthRGBBytes)
                 bytesTotal += depthRGBBytes.Length
 
@@ -168,7 +168,7 @@ Public Class Replay_Play : Implements IDisposable
 
                 depthRGBBytes = binRead.ReadBytes(bytesPerDepthRGB)
                 tmpMat = New cv.Mat(fh.depthRGBHeight, fh.depthRGBWidth, cv.MatType.CV_8UC3, depthRGBBytes)
-                ocvb.depthRGB = tmpMat.Resize(ocvb.depthRGB.Size())
+                ocvb.RGBDepth = tmpMat.Resize(ocvb.RGBDepth.Size())
                 bytesTotal += depthRGBBytes.Length
 
                 cloudBytes = binRead.ReadBytes(bytesPerCloud)
@@ -183,7 +183,7 @@ Public Class Replay_Play : Implements IDisposable
                 End If
                 playback.BytesMovedTrackbar.Value = bytesTotal / 1000000
                 ocvb.result1 = ocvb.color.Clone()
-                ocvb.result2 = ocvb.depthRGB.Clone()
+                ocvb.result2 = ocvb.RGBDepth.Clone()
             Else
                 If playback.fileinfo.Exists = False Then
                     ocvb.putText(New ActiveClass.TrueType("File not found: " + playback.fileinfo.FullName, 10, 125))

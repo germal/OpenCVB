@@ -192,7 +192,7 @@ Public Class DFT_ButterworthDepth : Implements IDisposable
         ocvb.label2 = "Same filter with radius / 2"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        bfilter.dft.gray = ocvb.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        bfilter.dft.gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bfilter.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

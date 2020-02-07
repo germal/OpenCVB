@@ -94,7 +94,7 @@ Public Class Retina_Depth : Implements IDisposable
         ocvb.label2 = "Current depth motion result"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        retina.src = ocvb.depthRGB
+        retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
         Static lastMotion As New cv.Mat
         If lastMotion.Width = 0 Then lastMotion = ocvb.result2

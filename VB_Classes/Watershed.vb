@@ -9,13 +9,13 @@ Public Class Watershed_Basics : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src = ocvb.color
-        If useDepthImage = True Then src = ocvb.depthRGB
+        If useDepthImage = True Then src = ocvb.RGBDepth
         If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
             cv.Cv2.Rectangle(ocvb.result2, ocvb.drawRect, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
             ocvb.drawRect = New cv.Rect(0, 0, 0, 0)
         End If
 
-        Dim gray = ocvb.result2.CvtColor(cv.ColorConversionCodes.bgr2gray)
+        Dim gray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If gray.CountNonZero() Then
             Dim markerMask As New cv.Mat
             markerMask = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -65,11 +65,11 @@ Public Class Watershed_DepthAuto : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         ocvb.result2.SetTo(0)
         watershed = New Watershed_Basics(ocvb)
-        watershed.UseDepthImage = True
+        watershed.useDepthImage = True
         ocvb.desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.result1 = ocvb.depthRGB / 64
+        ocvb.result1 = ocvb.RGBDepth / 64
         ocvb.result1 *= 64
 
         ' erode the blobs at distinct depths to keep them separate

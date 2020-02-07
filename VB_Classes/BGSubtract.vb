@@ -168,13 +168,13 @@ Public Class BGSubtract_Depth_MT : Implements IDisposable
         shadow.Run(ocvb) ' get where depth is zero
         bgsub.Run(ocvb)
 
-        If ocvb.frameCount = 0 Then ocvb.depthRGB.CopyTo(ocvb.result2)
+        If ocvb.frameCount = 0 Then ocvb.RGBDepth.CopyTo(ocvb.result2)
         Dim gray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim mask = gray.Threshold(1, 255, cv.ThresholdTypes.Binary)
         Dim shadowMask As New cv.Mat
         cv.Cv2.BitwiseAnd(shadow.holeMask, mask, shadowMask)
         mask.SetTo(0, shadow.holeMask)
-        ocvb.depthRGB.CopyTo(ocvb.result2, mask)
+        ocvb.RGBDepth.CopyTo(ocvb.result2, mask)
         mask = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.AddWeighted(ocvb.result1, 0.75, mask, 0.25, 0, ocvb.result1)
         ocvb.result2.SetTo(0, shadowMask)
@@ -299,7 +299,7 @@ Public Class BGSubtract_MOG_RGBDepth : Implements IDisposable
         ocvb.desc = "Subtract background from depth data using a mixture of Gaussians"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        gray = ocvb.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOGDepth.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
         ocvb.result1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -336,7 +336,7 @@ Public Class BGSubtract_MOG_Retina : Implements IDisposable
         ocvb.label2 = "Difference from retina depth motion."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        retina.src = ocvb.depthRGB
+        retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
         input.src = ocvb.result2
         input.Run(ocvb)

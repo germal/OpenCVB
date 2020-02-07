@@ -29,12 +29,12 @@ Public Class DilateErode_Basics : Implements IDisposable
         If externalUse = False Then
             If iterations >= 0 Then
                 ocvb.result1 = ocvb.color.Dilate(element, Nothing, iterations)
-                ocvb.result2 = ocvb.depthRGB.Dilate(element, Nothing, iterations)
+                ocvb.result2 = ocvb.RGBDepth.Dilate(element, Nothing, iterations)
                 ocvb.label1 = "Dilate RGB " + CStr(iterations) + " times"
                 ocvb.label2 = "Dilate Depth " + CStr(iterations) + " times"
             Else
                 ocvb.result1 = ocvb.color.Erode(element, Nothing, -iterations)
-                ocvb.result2 = ocvb.depthRGB.Erode(element, Nothing, -iterations)
+                ocvb.result2 = ocvb.RGBDepth.Erode(element, Nothing, -iterations)
                 ocvb.label1 = "Erode RGB " + CStr(-iterations) + " times"
                 ocvb.label2 = "Erode Depth " + CStr(-iterations) + " times"
             End If
@@ -72,7 +72,7 @@ Public Class DilateErode_DepthSeed : Implements IDisposable
         validImg.SetTo(0, ocvb.depth.GreaterThan(3000)) ' max distance
         cv.Cv2.BitwiseAnd(seeds, validImg, seeds)
         ocvb.result1.SetTo(0)
-        ocvb.depthRGB.CopyTo(ocvb.result1, seeds)
+        ocvb.RGBDepth.CopyTo(ocvb.result1, seeds)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
@@ -109,10 +109,10 @@ Public Class DilateErode_OpenClose : Implements IDisposable
         Next
         Dim element = cv.Cv2.GetStructuringElement(elementShape, New cv.Size(an * 2 + 1, an * 2 + 1), New cv.Point(an, an))
         If n < 0 Then
-            cv.Cv2.MorphologyEx(ocvb.depthRGB, ocvb.result2, cv.MorphTypes.Open, element)
+            cv.Cv2.MorphologyEx(ocvb.RGBDepth, ocvb.result2, cv.MorphTypes.Open, element)
             cv.Cv2.MorphologyEx(ocvb.color, ocvb.result1, cv.MorphTypes.Open, element)
         Else
-            cv.Cv2.MorphologyEx(ocvb.depthRGB, ocvb.result2, cv.MorphTypes.Close, element)
+            cv.Cv2.MorphologyEx(ocvb.RGBDepth, ocvb.result2, cv.MorphTypes.Close, element)
             cv.Cv2.MorphologyEx(ocvb.color, ocvb.result1, cv.MorphTypes.Close, element)
         End If
     End Sub

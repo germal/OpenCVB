@@ -46,7 +46,7 @@ Public Class TextureFlow_Depth : Implements IDisposable
         ocvb.desc = "Display texture flow in the depth data"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        texture.src = ocvb.depthRGB
+        texture.src = ocvb.RGBDepth
         texture.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
