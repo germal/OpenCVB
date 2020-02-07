@@ -32,6 +32,7 @@ Public Class Sift_Basics_CS : Implements IDisposable
             CS_SiftBasics.Run(fisheye.leftView, fisheye.rightView, dst, radio.check(0).Checked, sliders.TrackBar1.Value)
         Else
             CS_SiftBasics.Run(ocvb.leftView, ocvb.rightView, dst, radio.check(0).Checked, sliders.TrackBar1.Value)
+            If ocvb.parms.lowResolution Then dst = dst.Resize(New cv.Size(ocvb.result1.Width * 2, ocvb.result1.Height))
         End If
 
         dst(New cv.Rect(0, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result1)

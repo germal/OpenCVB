@@ -898,8 +898,13 @@ Public Class Depth_Colorizer_1_CPP : Implements IDisposable
             Dim dstData(dst.Total * dst.ElemSize - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             If externalUse = False Then
-                ocvb.result1 = New cv.Mat(ocvb.result1.Rows, ocvb.result1.Cols, cv.MatType.CV_8UC3, dstData)
-            Else
+                If ocvb.parms.lowResolution Then
+                    Dim tmp = New cv.Mat(ocvb.depth16.Rows, ocvb.depth16.Cols, cv.MatType.CV_8UC3, dstData)
+                    ocvb.result1 = tmp.Resize(ocvb.result1.Size())
+                Else
+                    ocvb.result1 = New cv.Mat(ocvb.result1.Rows, ocvb.result1.Cols, cv.MatType.CV_8UC3, dstData)
+                End If
+
                 dst = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
             End If
         End If

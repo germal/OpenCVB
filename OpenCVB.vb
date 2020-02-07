@@ -985,19 +985,19 @@ Public Class OpenCVB
                 imuGyro = camera.imuGyro ' The data may not be present but just copy it...
                 imuAccel = camera.imuaccel
                 imuTimeStamp = camera.imutimestamp
-                formPointCloud = camera.pointCloud ' the point cloud is never resized - OpenGL apps.
                 If PCmultiplier <> 1 Then formPointCloud *= 0.001 ' units are millimeters for Kinect
                 If lowResolution Then
                     formColor = camera.color.Resize(fastSize)
                     formRGBDepth = camera.RGBDepth.Resize(fastSize)
-                    formDepth16 = camera.depth16.Resize(fastSize)
                     formDisparity = camera.disparity.Resize(fastSize)
                 Else
                     formColor = camera.color
                     formRGBDepth = camera.RGBDepth
-                    formDepth16 = camera.depth16
                     formDisparity = camera.disparity
                 End If
+                ' these cannot be resized without damage
+                formPointCloud = camera.pointCloud
+                formDepth16 = camera.depth16
                 formleftView = camera.leftView
                 formrightView = camera.rightView
                 cameraDataUpdated = True
