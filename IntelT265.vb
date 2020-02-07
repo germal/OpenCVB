@@ -58,7 +58,7 @@ Public Class IntelT265
     Dim w As Int32
     Public color As cv.Mat
     Public depth As cv.Mat
-    Public depthRGB As New cv.Mat
+    Public RGBDepth As New cv.Mat
     Public disparity As New cv.Mat
     Public deviceCount As Int32
     Public deviceName As String = "Intel T265"
@@ -276,7 +276,7 @@ Public Class IntelT265
         color = leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(New cv.Size(w, h))
         color = color.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         rightView = New cv.Mat(fishEye.Height, fishEye.Width, cv.MatType.CV_8U, rightBytes)
-        depthRGB = color.Clone()
+        RGBDepth = color.Clone()
 
         Dim remapLeft = leftView.Remap(lm1, lm2, cv.InterpolationFlags.Linear)
         Dim remapRight = rightView.Remap(rm1, rm2, cv.InterpolationFlags.Linear)
@@ -312,11 +312,11 @@ Public Class IntelT265
         disp_vis *= CDbl(255 / numDisp)
 
         ' convert disparity To 0-255 And color it
-        Dim tmpDepthRGB = New cv.Mat
+        Dim tmpRGBDepth = New cv.Mat
         disp_vis = disp_vis.ConvertScaleAbs(1)
-        cv.Cv2.ApplyColorMap(disp_vis, tmpDepthRGB, cv.ColormapTypes.Jet)
-        Dim depthRect = New cv.Rect(stereo_cx, 0, tmpDepthRGB.Width, tmpDepthRGB.Height)
-        tmpDepthRGB.CopyTo(depthRGB(depthRect), mask)
+        cv.Cv2.ApplyColorMap(disp_vis, tmpRGBDepth, cv.ColormapTypes.Jet)
+        Dim depthRect = New cv.Rect(stereo_cx, 0, tmpRGBDepth.Width, tmpRGBDepth.Height)
+        tmpRGBDepth.CopyTo(RGBDepth(depthRect), mask)
 
         depth = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
         pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)

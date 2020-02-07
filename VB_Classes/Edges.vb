@@ -360,7 +360,7 @@ Public Class Edges_DCTfrequency : Implements IDisposable
 
         Dim roi As New cv.Rect(0, 0, sliders.TrackBar1.Value, src32f.Height)
         If roi.Width > 0 Then frequencies(roi).SetTo(0)
-        ocvb.label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed from depthRGB"
+        ocvb.label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed from RGBDepth"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
         src32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC1, 255)

@@ -40,7 +40,7 @@ End Class
 
 
 
-Public Class DCT_DepthRGB : Implements IDisposable
+Public Class DCT_RGBDepth : Implements IDisposable
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 1)

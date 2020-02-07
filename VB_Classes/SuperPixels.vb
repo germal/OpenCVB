@@ -97,7 +97,7 @@ Public Class SuperPixel_Depth : Implements IDisposable
         pixels = New SuperPixel_Basics_CPP(ocvb)
         pixels.externalUse = True
 
-        ocvb.desc = "Create SuperPixels using DepthRGB image."
+        ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         pixels.src = ocvb.RGBDepth
@@ -125,7 +125,7 @@ Public Class SuperPixel_WithCanny : Implements IDisposable
         pixels = New SuperPixel_Basics_CPP(ocvb)
         pixels.externalUse = True
 
-        ocvb.desc = "Create SuperPixels using DepthRGB image."
+        ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         edges.Run(ocvb)
@@ -157,7 +157,7 @@ Public Class SuperPixel_WithLineDetector : Implements IDisposable
         pixels = New SuperPixel_Basics_CPP(ocvb)
         pixels.externalUse = True
 
-        ocvb.desc = "Create SuperPixels using DepthRGB image."
+        ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         lines.dst = ocvb.result1

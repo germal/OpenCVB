@@ -4,7 +4,7 @@ Imports System.Runtime.InteropServices
 Module recordPlaybackCommon
     Public bytesPerColor As Int64
     Public bytesPerDepth As Int64
-    Public bytesPerDepthRGB As Int64
+    Public bytesPerRGBDepth As Int64
     Public bytesPerCloud As Int64
     Public Structure fileHeader
         Public pcBufferSize As Int32 ' indicates that a point cloud is in the data stream.
@@ -17,9 +17,9 @@ Module recordPlaybackCommon
         Public depthHeight As Int32
         Public depthElemsize As Int32
 
-        Public depthRGBWidth As Int32
-        Public depthRGBHeight As Int32
-        Public depthRGBElemsize As Int32
+        Public RGBDepthWidth As Int32
+        Public RGBDepthHeight As Int32
+        Public RGBDepthElemsize As Int32
 
         Public cloudWidth As Int32
         Public cloudHeight As Int32
@@ -51,9 +51,9 @@ Module recordPlaybackCommon
         header.depthHeight = binRead.ReadInt32()
         header.depthElemsize = binRead.ReadInt32()
 
-        header.depthRGBWidth = binRead.ReadInt32()
-        header.depthRGBHeight = binRead.ReadInt32()
-        header.depthRGBElemsize = binRead.ReadInt32()
+        header.RGBDepthWidth = binRead.ReadInt32()
+        header.RGBDepthHeight = binRead.ReadInt32()
+        header.RGBDepthElemsize = binRead.ReadInt32()
 
         header.cloudWidth = binRead.ReadInt32()
         header.cloudHeight = binRead.ReadInt32()
@@ -70,11 +70,11 @@ Public Class Replay_Record : Implements IDisposable
     Dim recordingActive As Boolean
     Dim colorBytes() As Byte
     Dim depthBytes() As Byte
-    Dim depthRGBBytes() As Byte
+    Dim RGBDepthBytes() As Byte
     Dim cloudBytes() As Byte
     Public Sub New(ocvb As AlgorithmData)
         If ocvb.parms.ShowOptions Then recording.Show()
-        ocvb.desc = "Create a recording of camera data that contains color, depth, depthRGB, pointCloud, and IMU data in an .bob file."
+        ocvb.desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static bytesTotal As Int64
@@ -82,11 +82,11 @@ Public Class Replay_Record : Implements IDisposable
             If recordingActive = False Then
                 bytesPerColor = ocvb.color.Total * ocvb.color.ElemSize
                 bytesPerDepth = ocvb.depth.Total * ocvb.depth.ElemSize
-                bytesPerDepthRGB = ocvb.RGBDepth.Total * ocvb.RGBDepth.ElemSize
+                bytesPerRGBDepth = ocvb.RGBDepth.Total * ocvb.RGBDepth.ElemSize
                 ' start recording...
                 ReDim colorBytes(bytesPerColor - 1)
                 ReDim depthBytes(bytesPerDepth - 1)
-                ReDim depthRGBBytes(bytesPerDepthRGB - 1)
+                ReDim RGBDepthBytes(bytesPerRGBDepth - 1)
                 Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
                 ReDim cloudBytes(pcSize - 1)
 
@@ -102,9 +102,9 @@ Public Class Replay_Record : Implements IDisposable
                 binWrite.Write(depthBytes)
                 bytesTotal += depthBytes.Length
 
-                Marshal.Copy(ocvb.RGBDepth.Data, depthRGBBytes, 0, depthRGBBytes.Length)
-                binWrite.Write(depthRGBBytes)
-                bytesTotal += depthRGBBytes.Length
+                Marshal.Copy(ocvb.RGBDepth.Data, RGBDepthBytes, 0, RGBDepthBytes.Length)
+                binWrite.Write(RGBDepthBytes)
+                bytesTotal += RGBDepthBytes.Length
 
                 Marshal.Copy(ocvb.pointCloud.Data, cloudBytes, 0, cloudBytes.Length)
                 binWrite.Write(cloudBytes)
@@ -141,7 +141,7 @@ Public Class Replay_Play : Implements IDisposable
     Dim playbackActive As Boolean
     Dim colorBytes() As Byte
     Dim depthBytes() As Byte
-    Dim depthRGBBytes() As Byte
+    Dim RGBDepthBytes() As Byte
     Dim cloudBytes() As Byte
     Dim fh As New fileHeader
     Dim fs As FileStream
@@ -166,10 +166,10 @@ Public Class Replay_Play : Implements IDisposable
                 ocvb.depth = tmpMat.Resize(ocvb.depth.Size())
                 bytesTotal += depthBytes.Length
 
-                depthRGBBytes = binRead.ReadBytes(bytesPerDepthRGB)
-                tmpMat = New cv.Mat(fh.depthRGBHeight, fh.depthRGBWidth, cv.MatType.CV_8UC3, depthRGBBytes)
+                RGBDepthBytes = binRead.ReadBytes(bytesPerRGBDepth)
+                tmpMat = New cv.Mat(fh.RGBDepthHeight, fh.RGBDepthWidth, cv.MatType.CV_8UC3, RGBDepthBytes)
                 ocvb.RGBDepth = tmpMat.Resize(ocvb.RGBDepth.Size())
-                bytesTotal += depthRGBBytes.Length
+                bytesTotal += RGBDepthBytes.Length
 
                 cloudBytes = binRead.ReadBytes(bytesPerCloud)
                 ocvb.pointCloud = New cv.Mat(fh.cloudHeight, fh.cloudWidth, cv.MatType.CV_32FC3, cloudBytes)  ' we cannot resize the point cloud.
@@ -198,12 +198,12 @@ Public Class Replay_Play : Implements IDisposable
 
                 bytesPerColor = fh.colorWidth * fh.colorHeight * fh.colorElemsize
                 bytesPerDepth = fh.depthWidth * fh.depthHeight * fh.depthElemsize
-                bytesPerDepthRGB = fh.depthRGBWidth * fh.depthRGBHeight * fh.depthRGBElemsize
+                bytesPerRGBDepth = fh.RGBDepthWidth * fh.RGBDepthHeight * fh.RGBDepthElemsize
                 bytesPerCloud = fh.cloudWidth * fh.cloudHeight * fh.cloudElemsize
 
                 ReDim colorBytes(bytesPerColor - 1)
                 ReDim depthBytes(bytesPerDepth - 1)
-                ReDim depthRGBBytes(bytesPerDepthRGB - 1)
+                ReDim RGBDepthBytes(bytesPerRGBDepth - 1)
                 ReDim cloudBytes(bytesPerCloud - 1)
             End If
         Else

@@ -59,7 +59,7 @@ Module ML__Exports
 End Module
 
 
-Public Class ML_FillDepthRGB_MT : Implements IDisposable
+Public Class ML_FillRGBDepth_MT : Implements IDisposable
     Dim shadow As Depth_Holes
     Dim grid As Thread_Grid
 
@@ -93,7 +93,7 @@ Public Class ML_FillDepthRGB_MT : Implements IDisposable
 End Class
 
 
-Public Class ML_FillDepthRGB : Implements IDisposable
+Public Class ML_FillRGBDepth : Implements IDisposable
     Dim shadow As Depth_Holes
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)

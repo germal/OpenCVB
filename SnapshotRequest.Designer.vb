@@ -26,7 +26,7 @@ Partial Class SnapshotRequest
         Me.OK_Button = New System.Windows.Forms.Button()
         Me.Cancel_Button = New System.Windows.Forms.Button()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
-        Me.DepthRGB = New System.Windows.Forms.RadioButton()
+        Me.RGBDepth = New System.Windows.Forms.RadioButton()
         Me.ColorImage = New System.Windows.Forms.RadioButton()
         Me.Result1 = New System.Windows.Forms.RadioButton()
         Me.Result2 = New System.Windows.Forms.RadioButton()
@@ -82,16 +82,16 @@ Partial Class SnapshotRequest
         Me.PictureBox1.TabIndex = 1
         Me.PictureBox1.TabStop = False
         '
-        'DepthRGB
+        'RGBDepth
         '
-        Me.DepthRGB.AutoSize = True
-        Me.DepthRGB.Location = New System.Drawing.Point(416, 93)
-        Me.DepthRGB.Name = "DepthRGB"
-        Me.DepthRGB.Size = New System.Drawing.Size(167, 24)
-        Me.DepthRGB.TabIndex = 7
-        Me.DepthRGB.TabStop = True
-        Me.DepthRGB.Text = "Depth RGB Image"
-        Me.DepthRGB.UseVisualStyleBackColor = True
+        Me.RGBDepth.AutoSize = True
+        Me.RGBDepth.Location = New System.Drawing.Point(416, 93)
+        Me.RGBDepth.Name = "RGBDepth"
+        Me.RGBDepth.Size = New System.Drawing.Size(167, 24)
+        Me.RGBDepth.TabIndex = 7
+        Me.RGBDepth.TabStop = True
+        Me.RGBDepth.Text = "Depth RGB Image"
+        Me.RGBDepth.UseVisualStyleBackColor = True
         '
         'ColorImage
         '
@@ -158,7 +158,7 @@ Partial Class SnapshotRequest
         Me.Controls.Add(Me.Result1)
         Me.Controls.Add(Me.Result2)
         Me.Controls.Add(Me.ColorImage)
-        Me.Controls.Add(Me.DepthRGB)
+        Me.Controls.Add(Me.RGBDepth)
         Me.Controls.Add(Me.PictureBox1)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
@@ -179,7 +179,7 @@ Partial Class SnapshotRequest
     Friend WithEvents OK_Button As System.Windows.Forms.Button
     Friend WithEvents Cancel_Button As System.Windows.Forms.Button
     Friend WithEvents PictureBox1 As PictureBox
-    Friend WithEvents DepthRGB As RadioButton
+    Friend WithEvents RGBDepth As RadioButton
     Friend WithEvents ColorImage As RadioButton
     Friend WithEvents Result1 As RadioButton
     Friend WithEvents Result2 As RadioButton

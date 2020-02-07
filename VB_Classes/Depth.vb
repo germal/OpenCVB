@@ -439,7 +439,7 @@ Public Class Depth_FlatData : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "FlatData Region Count", 1, 250, 200)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        ocvb.label1 = "Reduced resolution DepthRGB"
+        ocvb.label1 = "Reduced resolution RGBDepth"
         ocvb.label2 = "Contours of the Depth Shadow"
         ocvb.desc = "Attempt to stabilize the depth image."
     End Sub

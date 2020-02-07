@@ -187,7 +187,7 @@ Public Class DFT_ButterworthDepth : Implements IDisposable
         bfilter = New DFT_ButterworthFilter(ocvb)
         bfilter.dft.externalUse = True
 
-        ocvb.desc = "Use the Butterworth filter on a DFT image - depthRGB as input."
+        ocvb.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
         ocvb.label1 = "Image with Butterworth Low Pass Filter Applied"
         ocvb.label2 = "Same filter with radius / 2"
     End Sub

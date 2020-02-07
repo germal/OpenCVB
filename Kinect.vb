@@ -13,7 +13,7 @@ Module Kinect_Interface
     Public Function KinectDeviceName(kc As IntPtr) As IntPtr
     End Function
     <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function KinectWaitFrame(kc As IntPtr, color As IntPtr, depthRGB As IntPtr) As IntPtr
+    Public Function KinectWaitFrame(kc As IntPtr, color As IntPtr, RGBDepth As IntPtr) As IntPtr
     End Function
     <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectExtrinsics(kc As IntPtr) As IntPtr
@@ -64,8 +64,8 @@ Public Class Kinect
     Public depth As cv.Mat
     Public depthBytes() As Byte
     Public depthIntrinsics As rs.Intrinsics
-    Public depthRGB As cv.Mat
-    Public depthRGBBytes() As Byte
+    Public RGBDepth As cv.Mat
+    Public RGBDepthBytes() As Byte
     Public deviceCount As Int32
     Public deviceName As String = "Kinect for Azure"
     Public disparity As cv.Mat
@@ -129,7 +129,7 @@ Public Class Kinect
             intrinsics_VB.coeffs(5) = intrinsicsOutput.k6
 
             ReDim colorBytes(w * h * 3 - 1)
-            ReDim depthRGBBytes(w * h * 3 - 1)
+            ReDim RGBDepthBytes(w * h * 3 - 1)
             ReDim depthBytes(w * h * System.Runtime.InteropServices.Marshal.SizeOf(GetType(UShort)) - 1)
         End If
     End Sub
@@ -138,9 +138,9 @@ Public Class Kinect
         Dim imuFrame As IntPtr
         If kc = 0 Then Return
         Dim handleColor = GCHandle.Alloc(colorBytes, GCHandleType.Pinned)
-        Dim handleDepthRGB = GCHandle.Alloc(depthRGBBytes, GCHandleType.Pinned)
+        Dim handleRGBDepth = GCHandle.Alloc(RGBDepthBytes, GCHandleType.Pinned)
         Try
-            imuFrame = KinectWaitFrame(kc, handleColor.AddrOfPinnedObject(), handleDepthRGB.AddrOfPinnedObject())
+            imuFrame = KinectWaitFrame(kc, handleColor.AddrOfPinnedObject(), handleRGBDepth.AddrOfPinnedObject())
         Catch ex As Exception
             failedImageCount += 10 ' force a restart of the camera if this happens
             Exit Sub
@@ -169,11 +169,11 @@ Public Class Kinect
         End If
 
         handleColor.Free()
-        handleDepthRGB.Free()
+        handleRGBDepth.Free()
 
         color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorBytes)
 
-        depthRGB = New cv.Mat(h, w, cv.MatType.CV_8UC3, depthRGBBytes)
+        RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
         depth = New cv.Mat(h, w, cv.MatType.CV_16U, KinectDepthInColor(kc)) ' using the depth buffer right where kinect placed it.  C++ buffer
 
         Dim tmp As New cv.Mat

@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class AddWeighted_DepthRGB : Implements IDisposable
+Public Class AddWeighted_RGBDepth : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Weight", 0, 100, 50)

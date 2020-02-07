@@ -11,7 +11,7 @@ Public Class IntelD400Series
     Dim ctx As New rs.Context
     Dim depth2Disparity As New rs.DisparityTransform
     Dim depthBytes() As Byte
-    Dim depthRGBBytes() As Byte
+    Dim RGBDepthBytes() As Byte
     Dim device As rs.Device
     Dim devices As rs.DeviceList
     Dim disparityBytes() As Byte
@@ -26,7 +26,7 @@ Public Class IntelD400Series
     Public color As cv.Mat
     Public DecimationFilter As Boolean
     Public depth As cv.Mat
-    Public depthRGB As cv.Mat
+    Public RGBDepth As cv.Mat
     Public DepthToDisparity As Boolean
     Public deviceCount As Int32
     Public deviceName As String
@@ -72,7 +72,7 @@ Public Class IntelD400Series
                     Dim depthFrame = frames.DepthFrame
                     Dim colorFrame = frames.ColorFrame
                     Dim disparityFrame = depth2Disparity.Process(depthFrame)
-                    Dim depthRGBframe = colorizer.Process(depthFrame)
+                    Dim RGBDepthframe = colorizer.Process(depthFrame)
                     Dim rightView As rs.Frame = Nothing
                     Dim leftView = frames.InfraredFrame
                     For Each frame In frames
@@ -89,7 +89,7 @@ Public Class IntelD400Series
 
                     Marshal.Copy(colorFrame.Data, colorBytes, 0, colorBytes.Length)
                     Marshal.Copy(disparityFrame.Data, disparityBytes, 0, disparityBytes.Length)
-                    Marshal.Copy(depthRGBframe.Data, depthRGBBytes, 0, depthRGBBytes.Length)
+                    Marshal.Copy(RGBDepthframe.Data, RGBDepthBytes, 0, RGBDepthBytes.Length)
                     Marshal.Copy(depthFrame.Data, depthBytes, 0, depthBytes.Length)
                     Marshal.Copy(leftView.Data, leftViewBytes, 0, leftViewBytes.Length)
                     Marshal.Copy(rightView.Data, rightViewBytes, 0, rightViewBytes.Length)
@@ -161,7 +161,7 @@ Public Class IntelD400Series
             Extrinsics_VB.translation = extrinsics.translation
 
             ReDim colorBytes(w * h * 3 - 1)
-            ReDim depthRGBBytes(w * h * 3 - 1)
+            ReDim RGBDepthBytes(w * h * 3 - 1)
             ReDim depthBytes(w * h * 2 - 1)
             ReDim disparityBytes(w * h * 4 - 1)
             ReDim leftViewBytes(w * h - 1)
@@ -175,7 +175,7 @@ Public Class IntelD400Series
         block.Process(frameSet)
 
         color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorBytes)
-        depthRGB = New cv.Mat(h, w, cv.MatType.CV_8UC3, depthRGBBytes)
+        RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
         depth = New cv.Mat(h, w, cv.MatType.CV_16U, depthBytes)
         disparity = New cv.Mat(h, w, cv.MatType.CV_32F, disparityBytes)
         leftView = New cv.Mat(h, w, cv.MatType.CV_8U, leftViewBytes)

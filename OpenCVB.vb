@@ -30,7 +30,7 @@ Public Class OpenCVB
     Dim drawRect As New cv.Rect(0, 0, 0, 0)
     Dim externalInvocation As Boolean
     Dim fps As Int32 = 30
-    Dim formColor As New cv.Mat, formDepthRGB As New cv.Mat, formResult1 As New cv.Mat, formResult2 As New cv.Mat
+    Dim formColor As New cv.Mat, formRGBDepth As New cv.Mat, formResult1 As New cv.Mat, formResult2 As New cv.Mat
     Dim formDepth As New cv.Mat, formPointCloud As New cv.Mat, formDisparity As New cv.Mat, formleftView As New cv.Mat, formrightView As New cv.Mat
     Dim formResultsUpdated As Boolean
     Dim frameCount As Int32
@@ -197,17 +197,17 @@ Public Class OpenCVB
                 If formColor IsNot Nothing And formColor.Width > 0 And formColor.Height > 0 Then
                     cameraDataUpdated = False
                     If formColor.Width <> camPic(0).Width Or formColor.Height <> camPic(0).Height Or
-                       formDepthRGB.Width <> camPic(1).Width Or formDepthRGB.Height <> camPic(1).Height Then
+                       formRGBDepth.Width <> camPic(1).Width Or formRGBDepth.Height <> camPic(1).Height Then
 
                         Dim color = formColor
-                        Dim depthRGB = formDepthRGB
+                        Dim RGBDepth = formRGBDepth
                         color = color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
-                        depthRGB = depthRGB.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
+                        RGBDepth = RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
                         cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
-                        cvext.BitmapConverter.ToBitmap(depthRGB, camPic(1).Image)
+                        cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
                     Else
                         cvext.BitmapConverter.ToBitmap(formColor, camPic(0).Image)
-                        cvext.BitmapConverter.ToBitmap(formDepthRGB, camPic(1).Image)
+                        cvext.BitmapConverter.ToBitmap(formRGBDepth, camPic(1).Image)
                     End If
 
                     If formResultsUpdated Then
@@ -465,7 +465,7 @@ Public Class OpenCVB
                 DrawingRectangle = False
 
                 Dim pic = DirectCast(sender, PictureBox)
-                Dim src = Choose(pic.Tag + 1, formColor, formDepthRGB, formResult1, formResult2)
+                Dim src = Choose(pic.Tag + 1, formColor, formRGBDepth, formResult1, formResult2)
 
                 Dim srcROI = New cv.Mat
                 srcROI = src(drawRect).clone()
@@ -666,7 +666,7 @@ Public Class OpenCVB
 
         Dim resultMat As New cv.Mat
         For i = 0 To 4
-            Dim radioButton = Choose(i + 1, snapForm.AllImages, snapForm.ColorImage, snapForm.DepthRGB, snapForm.Result1, snapForm.Result2)
+            Dim radioButton = Choose(i + 1, snapForm.AllImages, snapForm.ColorImage, snapForm.RGBDepth, snapForm.Result1, snapForm.Result2)
             If radioButton.checked Then
                 SyncLock camPic
                     Select Case i
@@ -675,7 +675,7 @@ Public Class OpenCVB
                         Case 1 ' color image
                             resultMat = formColor.Clone()
                         Case 2 ' depth RGB
-                            resultMat = formDepthRGB.Clone()
+                            resultMat = formRGBDepth.Clone()
                         Case 3 ' result1
                             resultMat = formResult1.Clone()
                         Case 4 ' result2
@@ -763,15 +763,15 @@ Public Class OpenCVB
         parms.vtkDirectory = vtkDirectory
         parms.HomeDir = HomeDir.FullName
         If optionsForm.cameraIndex = OptionsDialog.T265Camera Then
-            parms.kMatLeft = camera.kMatLeft
+            parms.kMatleft = camera.kMatLeft
             parms.dMatleft = camera.dMatleft
             parms.rMatleft = camera.rMatleft
             parms.pMatleft = camera.pMatleft
 
-            parms.kMatright = camera.kMatright
-            parms.dMatright = camera.dMatright
-            parms.rMatright = camera.rMatright
-            parms.pMatright = camera.pMatright
+            parms.kMatRight = camera.kMatright
+            parms.dMatRight = camera.dMatright
+            parms.rMatRight = camera.rMatright
+            parms.pMatRight = camera.pMatright
         End If
         parms.OpenCVfullPath = OpenCVfullPath
         parms.mainFormLoc = Me.Location
@@ -877,7 +877,7 @@ Public Class OpenCVB
                 cameraDataUpdated = False
                 OpenCVB.ocvb.pointCloud = formPointCloud
                 OpenCVB.ocvb.color = formColor
-                OpenCVB.ocvb.RGBDepth = formDepthRGB
+                OpenCVB.ocvb.RGBDepth = formRGBDepth
                 OpenCVB.ocvb.depth = formDepth
                 OpenCVB.ocvb.disparity = formDisparity
                 OpenCVB.ocvb.leftView = formleftView
@@ -989,12 +989,12 @@ Public Class OpenCVB
                 If PCmultiplier <> 1 Then formPointCloud *= 0.001 ' units are millimeters for Kinect
                 If lowResolution Then
                     formColor = camera.color.Resize(fastSize)
-                    formDepthRGB = camera.depthRGB.Resize(fastSize)
+                    formRGBDepth = camera.RGBDepth.Resize(fastSize)
                     formDepth = camera.depth.Resize(fastSize)
                     formDisparity = camera.disparity.Resize(fastSize)
                 Else
                     formColor = camera.color
-                    formDepthRGB = camera.depthRGB
+                    formRGBDepth = camera.RGBDepth
                     formDepth = camera.depth
                     formDisparity = camera.disparity
                 End If
