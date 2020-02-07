@@ -710,6 +710,7 @@ Public Class Histogram_DepthClusters : Implements IDisposable
             Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
             cv.Cv2.InRange(ocvb.depth16, startEndDepth.X, startEndDepth.Y, tmp16)
             cv.Cv2.ConvertScaleAbs(tmp16, mask)
+            If ocvb.parms.lowResolution Then mask = mask.Resize(ocvb.color.Size())
             ocvb.result2.SetTo(ocvb.colorScalar(i), mask)
         Next
         ocvb.label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
