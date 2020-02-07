@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Disparity_Basics : Implements IDisposable
-    Dim disp16 As Depth_Colorizer_1_CPP
+    Dim colorizer As Depth_Colorizer_1_CPP
     Public Sub New(ocvb As AlgorithmData)
-        disp16 = New Depth_Colorizer_1_CPP(ocvb)
-        disp16.externalUse = True
+        colorizer = New Depth_Colorizer_1_CPP(ocvb)
+        colorizer.externalUse = True
 
         ocvb.desc = "Show disparity from RealSense camera"
         If ocvb.parms.cameraIndex = D400Cam Then
@@ -16,12 +16,12 @@ Public Class Disparity_Basics : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim disparity16u As New cv.Mat
         ocvb.disparity.ConvertTo(disparity16u, cv.MatType.CV_16U)
-        disp16.src = disparity16u
-        disp16.Run(ocvb)
-        ocvb.result1 = disp16.dst
-        ocvb.result2 = ocvb.leftView
+        colorizer.src = disparity16u
+        colorizer.Run(ocvb)
+        ocvb.result1 = colorizer.dst
+        ocvb.result2 = ocvb.leftView.Resize(ocvb.color.Size())
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        disp16.Dispose()
+        colorizer.Dispose()
     End Sub
 End Class

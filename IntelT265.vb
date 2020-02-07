@@ -26,7 +26,7 @@ Structure T265IMUdata
     Public mapperConfidence As Int32
 End Structure
 Public Class IntelT265
-#Region "IntelT265Data"
+#Region "T265Data"
     Dim cfg As New rs.Config
     Dim colorBytes() As Byte
     Dim device As rs.Device
@@ -100,8 +100,6 @@ Public Class IntelT265
     Dim tPtr As IntPtr
     Dim rawWidth As Int32
     Dim rawHeight As Int32
-    Dim rawSrc As cv.Rect
-    Dim rawDst As cv.Rect
     Dim intrinsicsLeft As rs.Intrinsics
     Dim intrinsicsRight As rs.Intrinsics
     Dim leftStream As rs.VideoStreamProfile
@@ -204,19 +202,21 @@ Public Class IntelT265
         dMatleft = New cv.Mat(1, 4, cv.MatType.CV_64F, dLeft)
         rMatleft = New cv.Mat(3, 3, cv.MatType.CV_64F, rLeft)
         pMatleft = New cv.Mat(3, 4, cv.MatType.CV_64F, pLeft)
-        cv.Cv2.FishEye.InitUndistortRectifyMap(kMatleft, dMatleft, rMatleft, pMatleft, stereo_size, cv.MatType.CV_32FC1, lm1, lm2)
-        cv.Cv2.FishEye.InitUndistortRectifyMap(kMatleft, dMatleft, rMatleft, pMatleft, New cv.Size(w, h), cv.MatType.CV_32FC1, leftViewMap1, leftViewMap2)
+        cv.Cv2.FishEye.InitUndistortRectifyMap(kMatleft, dMatleft, rMatleft, pMatleft, stereo_size,
+                                               cv.MatType.CV_32FC1, lm1, lm2)
+        cv.Cv2.FishEye.InitUndistortRectifyMap(kMatleft, dMatleft, rMatleft, pMatleft, New cv.Size(rawWidth, rawHeight),
+                                               cv.MatType.CV_32FC1, leftViewMap1, leftViewMap2)
 
         kMatRight = New cv.Mat(3, 3, cv.MatType.CV_64F, kRight)
         dMatRight = New cv.Mat(1, 4, cv.MatType.CV_64F, dRight)
         rMatRight = New cv.Mat(3, 3, cv.MatType.CV_64F, rRight)
         pMatRight = New cv.Mat(3, 4, cv.MatType.CV_64F, pRight)
-        cv.Cv2.FishEye.InitUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, stereo_size, cv.MatType.CV_32FC1, rm1, rm2)
-        cv.Cv2.FishEye.InitUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, New cv.Size(w, h), cv.MatType.CV_32FC1, rightViewMap1, rightViewMap2)
+        cv.Cv2.FishEye.InitUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, stereo_size,
+                                               cv.MatType.CV_32FC1, rm1, rm2)
+        cv.Cv2.FishEye.InitUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, New cv.Size(rawWidth, rawHeight),
+                                               cv.MatType.CV_32FC1, rightViewMap1, rightViewMap2)
         leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, 0)
         rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, 0)
-        rawSrc = New cv.Rect((rawWidth - rawWidth * h / rawHeight) / 2, 0, rawWidth * h / rawHeight, h)
-        rawDst = New cv.Rect(0, 0, rawWidth * h / rawHeight, h)
         ReDim vertices(w * h * 4 * 3 - 1) ' 3 floats or 12 bytes per pixel.  
 
         IMUpresent = True
@@ -224,7 +224,14 @@ Public Class IntelT265
     Public Sub GetNextFrame()
 #If DEBUG Then
         Static msgDelivered As Boolean
-        If msgDelivered = False Then MsgBox("The T265 camera support is quite slow in Debug mode." + vbCrLf + "Use Release mode to get reasonable responsiveness.")
+        If msgDelivered = False Then
+            Dim msgDeliverCount = GetSetting("OpenCVB", "msgDeliverCount", "msgDeliverCount", 0)
+            If msgDeliverCount < 2 Then
+                MsgBox("The T265 camera support is quite slow in Debug mode." + vbCrLf + "Use Release mode to get reasonable responsiveness.")
+                msgDeliverCount += 1
+                SaveSetting("OpenCVB", "msgDeliverCount", "msgDeliverCount", msgDeliverCount)
+            End If
+        End If
         msgDelivered = True
 #End If
         Static leftBytes(rawHeight * rawWidth - 1) As Byte
@@ -265,14 +272,14 @@ Public Class IntelT265
             End If
         Next
 
-        Dim leftMat = New cv.Mat(fishEye.Height, fishEye.Width, cv.MatType.CV_8U, leftBytes)
-        color = leftMat.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear)
+        leftView = New cv.Mat(fishEye.Height, fishEye.Width, cv.MatType.CV_8U, leftBytes)
+        color = leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(New cv.Size(w, h))
         color = color.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        Dim rightMat = New cv.Mat(fishEye.Height, fishEye.Width, cv.MatType.CV_8U, rightBytes)
+        rightView = New cv.Mat(fishEye.Height, fishEye.Width, cv.MatType.CV_8U, rightBytes)
         depthRGB = color.Clone()
 
-        Dim remapLeft = leftMat.Remap(lm1, lm2, cv.InterpolationFlags.Linear)
-        Dim remapRight = rightMat.Remap(rm1, rm2, cv.InterpolationFlags.Linear)
+        Dim remapLeft = leftView.Remap(lm1, lm2, cv.InterpolationFlags.Linear)
+        Dim remapRight = rightView.Remap(rm1, rm2, cv.InterpolationFlags.Linear)
 
         '#Const USE_FAILING_COMPUTE_API = 1
 #If USE_FAILING_COMPUTE_API Then
@@ -308,13 +315,9 @@ Public Class IntelT265
         Dim tmpDepthRGB = New cv.Mat
         disp_vis = disp_vis.ConvertScaleAbs(1)
         cv.Cv2.ApplyColorMap(disp_vis, tmpDepthRGB, cv.ColormapTypes.Jet)
-        Dim depthRect = New cv.Rect(CInt(stereo_cx / 2), 0, tmpDepthRGB.Width, tmpDepthRGB.Height)
+        Dim depthRect = New cv.Rect(stereo_cx, 0, tmpDepthRGB.Width, tmpDepthRGB.Height)
         tmpDepthRGB.CopyTo(depthRGB(depthRect), mask)
 
-        Dim tmp = New cv.Mat(h, w, cv.MatType.CV_8UC1)
-        leftMat(rawSrc).CopyTo(leftView(rawDst))
-        rightMat(rawSrc).CopyTo(rightView(rawDst))
-        rightView(rawDst) = tmp(rawDst).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         depth = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
         pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
     End Sub

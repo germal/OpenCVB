@@ -992,16 +992,14 @@ Public Class OpenCVB
                     formDepthRGB = camera.depthRGB.Resize(fastSize)
                     formDepth = camera.depth.Resize(fastSize)
                     formDisparity = camera.disparity.Resize(fastSize)
-                    formleftView = camera.leftView.Resize(fastSize)
-                    formrightView = camera.rightView.Resize(fastSize)
                 Else
                     formColor = camera.color
                     formDepthRGB = camera.depthRGB
                     formDepth = camera.depth
                     formDisparity = camera.disparity
-                    formleftView = camera.leftView
-                    formrightView = camera.rightView
                 End If
+                formleftView = camera.leftView
+                formrightView = camera.rightView
                 cameraDataUpdated = True
             End SyncLock
 

@@ -31,46 +31,53 @@ Partial Class OptionsRecordPlayback
         '
         'Filename
         '
-        Me.Filename.Location = New System.Drawing.Point(44, 35)
+        Me.Filename.Location = New System.Drawing.Point(29, 23)
+        Me.Filename.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.Filename.Name = "Filename"
-        Me.Filename.Size = New System.Drawing.Size(710, 26)
+        Me.Filename.Size = New System.Drawing.Size(475, 20)
         Me.Filename.TabIndex = 1
         '
         'startButton
         '
-        Me.startButton.Location = New System.Drawing.Point(44, 159)
+        Me.startButton.Location = New System.Drawing.Point(29, 103)
+        Me.startButton.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.startButton.Name = "startButton"
-        Me.startButton.Size = New System.Drawing.Size(153, 39)
+        Me.startButton.Size = New System.Drawing.Size(102, 25)
         Me.startButton.TabIndex = 3
         Me.startButton.Text = "Start Recording"
         Me.startButton.UseVisualStyleBackColor = True
         '
         'BytesMovedTrackbar
         '
-        Me.BytesMovedTrackbar.Location = New System.Drawing.Point(31, 84)
+        Me.BytesMovedTrackbar.Location = New System.Drawing.Point(21, 55)
+        Me.BytesMovedTrackbar.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.BytesMovedTrackbar.Maximum = 20000
         Me.BytesMovedTrackbar.Name = "BytesMovedTrackbar"
-        Me.BytesMovedTrackbar.Size = New System.Drawing.Size(733, 69)
+        Me.BytesMovedTrackbar.Size = New System.Drawing.Size(489, 45)
         Me.BytesMovedTrackbar.TabIndex = 4
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(770, 74)
+        Me.Label1.Location = New System.Drawing.Point(513, 48)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(115, 20)
+        Me.Label1.Size = New System.Drawing.Size(78, 13)
         Me.Label1.TabIndex = 5
         Me.Label1.Text = "20 Gbytes Max"
         '
         'OptionsRecordPlayback
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(936, 229)
+        Me.ClientSize = New System.Drawing.Size(624, 149)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.BytesMovedTrackbar)
         Me.Controls.Add(Me.startButton)
         Me.Controls.Add(Me.Filename)
+        Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
         Me.Name = "OptionsRecordPlayback"
         Me.Text = "OptionsRecordPlayback"
         CType(Me.BytesMovedTrackbar, System.ComponentModel.ISupportInitialize).EndInit()

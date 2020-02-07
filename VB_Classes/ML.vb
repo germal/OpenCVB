@@ -119,13 +119,13 @@ End Class
 
 
 Public Class ML_DepthFromColor_MT : Implements IDisposable
-    Dim disp16 As Depth_Colorizer_1_CPP
+    Dim colorizer As Depth_Colorizer_1_CPP
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        disp16 = New Depth_Colorizer_1_CPP(ocvb)
-        disp16.externalUse = True
+        colorizer = New Depth_Colorizer_1_CPP(ocvb)
+        colorizer.externalUse = True
 
         dilate = New DilateErode_Basics(ocvb)
         dilate.externalUse = True
@@ -184,29 +184,29 @@ Public Class ML_DepthFromColor_MT : Implements IDisposable
         ocvb.label2 = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
         Dim depth16u As New cv.Mat
         predictedDepth.ConvertTo(depth16u, cv.MatType.CV_16U)
-        disp16.src = depth16u
-        disp16.Run(ocvb)
-        ocvb.result1 = disp16.dst
+        colorizer.src = depth16u
+        colorizer.Run(ocvb)
+        ocvb.result1 = colorizer.dst
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
         dilate.Dispose()
         grid.Dispose()
-        disp16.Dispose()
+        colorizer.Dispose()
     End Sub
 End Class
 
 
 
 Public Class ML_DepthFromColor : Implements IDisposable
-    Dim disp16 As Depth_Colorizer_1_CPP
+    Dim colorizer As Depth_Colorizer_1_CPP
     Dim mats As Mat_4to1
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        disp16 = New Depth_Colorizer_1_CPP(ocvb)
-        disp16.externalUse = True
+        colorizer = New Depth_Colorizer_1_CPP(ocvb)
+        colorizer.externalUse = True
 
         mats = New Mat_4to1(ocvb)
         mats.externalUse = True
@@ -247,9 +247,9 @@ Public Class ML_DepthFromColor : Implements IDisposable
         depth32f.SetTo(sliders.TrackBar1.Value, mask)
         depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
 
-        disp16.src = depth16
-        disp16.Run(ocvb)
-        mats.mat(3) = disp16.dst.Clone()
+        colorizer.src = depth16
+        colorizer.Run(ocvb)
+        mats.mat(3) = colorizer.dst.Clone()
 
         mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
@@ -271,9 +271,9 @@ Public Class ML_DepthFromColor : Implements IDisposable
 
         predictedDepth.ConvertTo(depth16, cv.MatType.CV_16U)
 
-        disp16.src = depth16
-        disp16.Run(ocvb)
-        ocvb.result1 = disp16.dst.Clone()
+        colorizer.src = depth16
+        colorizer.Run(ocvb)
+        ocvb.result1 = colorizer.dst.Clone()
 
         mats.Run(ocvb)
         ocvb.label1 = "Predicted Depth"
@@ -284,7 +284,7 @@ Public Class ML_DepthFromColor : Implements IDisposable
         shadow.Dispose()
         mats.Dispose()
         resized.Dispose()
-        disp16.Dispose()
+        colorizer.Dispose()
     End Sub
 End Class
 
@@ -295,10 +295,10 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
     Dim sliders As New OptionsSliders
-    Dim disp16 As Depth_Colorizer_1_CPP
+    Dim colorizer As Depth_Colorizer_1_CPP
     Public Sub New(ocvb As AlgorithmData)
-        disp16 = New Depth_Colorizer_1_CPP(ocvb)
-        disp16.externalUse = True
+        colorizer = New Depth_Colorizer_1_CPP(ocvb)
+        colorizer.externalUse = True
 
         mats = New Mat_4to1(ocvb)
         mats.externalUse = True
@@ -341,9 +341,9 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
         depth32f.SetTo(sliders.TrackBar1.Value, mask)
         depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
 
-        disp16.src = depth16
-        disp16.Run(ocvb)
-        mats.mat(3) = disp16.dst.Clone()
+        colorizer.src = depth16
+        colorizer.Run(ocvb)
+        mats.mat(3) = colorizer.dst.Clone()
 
         mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
@@ -381,9 +381,9 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
 
         predictedDepth.ConvertTo(depth16, cv.MatType.CV_16U)
 
-        disp16.src = depth16
-        disp16.Run(ocvb)
-        ocvb.result1 = disp16.dst.Clone()
+        colorizer.src = depth16
+        colorizer.Run(ocvb)
+        ocvb.result1 = colorizer.dst.Clone()
 
         mats.Run(ocvb)
         ocvb.label2 = "shadow, empty, Depth Mask < " + CStr(sliders.TrackBar1.Value) + ", Learn Input"
@@ -393,7 +393,7 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
         shadow.Dispose()
         mats.Dispose()
         resized.Dispose()
-        disp16.Dispose()
+        colorizer.Dispose()
     End Sub
 End Class
 
@@ -401,13 +401,13 @@ End Class
 
 
 Public Class ML_EdgeDepth : Implements IDisposable
-    Dim disp16 As Depth_Colorizer_1_CPP
+    Dim colorizer As Depth_Colorizer_1_CPP
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        disp16 = New Depth_Colorizer_1_CPP(ocvb)
-        disp16.externalUse = True
+        colorizer = New Depth_Colorizer_1_CPP(ocvb)
+        colorizer.externalUse = True
 
         dilate = New DilateErode_Basics(ocvb)
         dilate.externalUse = True
@@ -466,14 +466,14 @@ Public Class ML_EdgeDepth : Implements IDisposable
         ocvb.label2 = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
         Dim depth16u As New cv.Mat
         predictedDepth.ConvertTo(depth16u, cv.MatType.CV_16U)
-        disp16.src = depth16u
-        disp16.Run(ocvb)
-        ocvb.result2 = disp16.dst
+        colorizer.src = depth16u
+        colorizer.Run(ocvb)
+        ocvb.result2 = colorizer.dst
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
         dilate.Dispose()
         grid.Dispose()
-        disp16.Dispose()
+        colorizer.Dispose()
     End Sub
 End Class

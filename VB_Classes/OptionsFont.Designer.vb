@@ -29,9 +29,10 @@ Partial Class OptionsFont
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(37, 27)
+        Me.Button1.Location = New System.Drawing.Point(25, 18)
+        Me.Button1.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(115, 39)
+        Me.Button1.Size = New System.Drawing.Size(77, 25)
         Me.Button1.TabIndex = 3
         Me.Button1.Text = "Change"
         Me.Button1.UseVisualStyleBackColor = True
@@ -39,19 +40,23 @@ Partial Class OptionsFont
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(184, 36)
+        Me.Label1.Location = New System.Drawing.Point(123, 23)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(88, 20)
+        Me.Label1.Size = New System.Drawing.Size(59, 13)
         Me.Label1.TabIndex = 4
         Me.Label1.Text = "Font Name"
         '
         'OptionsFont
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(692, 196)
+        Me.ClientSize = New System.Drawing.Size(461, 127)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.Button1)
+        Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
         Me.Name = "OptionsFont"
         Me.Text = "Current Font Settings"
         Me.ResumeLayout(False)
