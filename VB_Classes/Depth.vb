@@ -942,6 +942,7 @@ Public Class Depth_InRange : Implements IDisposable
 
         If externalUse = False Then
             ocvb.result1.SetTo(0)
+            If ocvb.RGBDepth.Width <> Mask.Width Then Mask = Mask.Resize(ocvb.RGBDepth.Size())
             ocvb.RGBDepth.CopyTo(ocvb.result1, Mask)
         End If
     End Sub
