@@ -253,6 +253,7 @@ Public Class Depth_Holes : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mask = ocvb.depth16.Threshold(1, 20000, cv.ThresholdTypes.BinaryInv)
+        If ocvb.parms.lowResolution Then mask = mask.Resize(ocvb.color.Size)
         holeMask = New cv.Mat
         mask.ConvertTo(holeMask, cv.MatType.CV_8UC1)
         If externalUse = False Then ocvb.result1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
