@@ -64,7 +64,7 @@ Public Class LeftRightView_CompareUndistorted : Implements IDisposable
 
         sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 0)
         sliders.setupTrackBar2(ocvb, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar3(ocvb, "Slice Height", 0, 300, 50)
+        sliders.setupTrackBar3(ocvb, "Slice Height", 1, 300, 50)
         If ocvb.parms.ShowOptions Then sliders.Show()
         Select Case ocvb.parms.cameraIndex
             Case D400Cam
@@ -99,8 +99,13 @@ Public Class LeftRightView_CompareUndistorted : Implements IDisposable
         ocvb.result1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1, 0)
         ocvb.result2 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1, 0)
 
-        leftInput(New cv.Rect(0, sliceY, leftInput.Width, slideHeight)).CopyTo(ocvb.result1(New cv.Rect(0, 100, leftInput.Width, slideHeight)))
-        rightInput(New cv.Rect(0, sliceY, leftInput.Width, slideHeight)).CopyTo(ocvb.result1(New cv.Rect(0, 100 + slideHeight, leftInput.Width, slideHeight)))
+        If ocvb.parms.lowResolution Then
+            leftInput = leftInput.Resize(ocvb.color.Size())
+            rightInput = rightInput.Resize(ocvb.color.Size())
+        End If
+        Dim rSrc = New cv.Rect(0, sliceY, leftInput.Width, slideHeight)
+        leftInput(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100, leftInput.Width, slideHeight)))
+        rightInput(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100 + slideHeight, leftInput.Width, slideHeight)))
 
         ocvb.result2 = leftInput
         ocvb.result1 += sliders.TrackBar1.Value
@@ -121,7 +126,7 @@ Public Class LeftRightView_CompareRaw : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 100)
         sliders.setupTrackBar2(ocvb, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar3(ocvb, "Slice Height", 0, 300, 50)
+        sliders.setupTrackBar3(ocvb, "Slice Height", 1, 120, 50)
         If ocvb.parms.ShowOptions Then sliders.Show()
         Select Case ocvb.parms.cameraIndex
             Case D400Cam
@@ -148,8 +153,20 @@ Public Class LeftRightView_CompareRaw : Implements IDisposable
         ocvb.result1.SetTo(0)
         Dim sliceY = sliders.TrackBar2.Value
         Dim slideHeight = sliders.TrackBar3.Value
-        ocvb.leftView(New cv.Rect(0, sliceY, ocvb.leftView.Width, slideHeight)).CopyTo(ocvb.result1(New cv.Rect(0, 100, ocvb.leftView.Width, slideHeight)))
-        ocvb.rightView(New cv.Rect(0, sliceY, ocvb.leftView.Width, slideHeight)).CopyTo(ocvb.result1(New cv.Rect(0, 100 + slideHeight, ocvb.leftView.Width, slideHeight)))
+        Dim slideWidth = ocvb.leftView.Width
+        If ocvb.parms.lowResolution Then slideWidth /= 2
+        ocvb.leftView(New cv.Rect(0, sliceY, slideWidth, slideHeight)).CopyTo(ocvb.result1(New cv.Rect(0, 100, slideWidth, slideHeight)))
+        ocvb.rightView(New cv.Rect(0, sliceY, slideWidth, slideHeight)).CopyTo(ocvb.result1(New cv.Rect(0, 100 + slideHeight, slideWidth, slideHeight)))
+        Dim rSrc = New cv.Rect(0, sliceY, ocvb.leftView.Width, slideHeight)
+        If ocvb.parms.lowResolution Then
+            Dim rDst1 = New cv.Rect(0, 100, ocvb.result1.Width, slideHeight)
+            Dim rDst2 = New cv.Rect(0, 100 + slideHeight, ocvb.result1.Width, slideHeight)
+            ocvb.result1(rDst1) = ocvb.leftView(rSrc).Resize(New cv.Size(ocvb.result1.Width, slideHeight))
+            ocvb.result1(rDst2) = ocvb.rightView(rSrc).Resize(New cv.Size(ocvb.result1.Width, slideHeight))
+        Else
+            ocvb.leftView(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100, ocvb.leftView.Width, slideHeight)))
+            ocvb.rightView(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100 + slideHeight, ocvb.leftView.Width, slideHeight)))
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
