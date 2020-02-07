@@ -61,7 +61,7 @@ Public Class Kinect
     Public color As cv.Mat
     Public colorBytes() As Byte
     Public colorIntrinsics As rs.Intrinsics
-    Public depth As cv.Mat
+    Public depth16 As cv.Mat
     Public depthBytes() As Byte
     Public depthIntrinsics As rs.Intrinsics
     Public RGBDepth As cv.Mat
@@ -174,13 +174,13 @@ Public Class Kinect
         color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorBytes)
 
         RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
-        depth = New cv.Mat(h, w, cv.MatType.CV_16U, KinectDepthInColor(kc)) ' using the depth buffer right where kinect placed it.  C++ buffer
+        depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, KinectDepthInColor(kc)) ' using the depth buffer right where kinect placed it.  C++ buffer
 
         Dim tmp As New cv.Mat
-        cv.Cv2.Normalize(depth, tmp, 0, 255, cv.NormTypes.MinMax)
+        cv.Cv2.Normalize(depth16, tmp, 0, 255, cv.NormTypes.MinMax)
         tmp.ConvertTo(leftView, cv.MatType.CV_8U)
         rightView = leftView
-        depth.ConvertTo(disparity, cv.MatType.CV_32F)
+        depth16.ConvertTo(disparity, cv.MatType.CV_32F)
 
         Dim pc = New cv.Mat(h, w, cv.MatType.CV_16SC3, KinectPointCloud(kc))
         pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3) ' This is less efficient than using 16-bit pixels but consistent with Intel cameras (and more widely accepted as normal.)

@@ -235,7 +235,7 @@ Public Class Mat_ImageXYZ_MT : Implements IDisposable
               xyzPlanes(2)(roi).SetTo(0)
               For y = roi.Y To roi.Y + roi.Height - 1
                   For x = roi.X To roi.X + roi.Width - 1
-                      z = ocvb.depth.At(Of UInt16)(y, x)
+                      z = ocvb.depth16.At(Of UInt16)(y, x)
                       If z > 0 Then xyzPlanes(2).Set(Of Single)(y, x, z)
                   Next
               Next

@@ -12,11 +12,11 @@ Public Class Depth_ManualTrim : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim minDepth = sliders.TrackBar1.Value
         Dim maxDepth = sliders.TrackBar2.Value
-        Mask = ocvb.depth.Threshold(maxDepth, 255, cv.ThresholdTypes.BinaryInv)
+        Mask = ocvb.depth16.Threshold(maxDepth, 255, cv.ThresholdTypes.BinaryInv)
         Mask.ConvertTo(Mask, cv.MatType.CV_8U)
 
         Dim maskMin As New cv.Mat
-        maskMin = ocvb.depth.Threshold(minDepth, 255, cv.ThresholdTypes.Binary)
+        maskMin = ocvb.depth16.Threshold(minDepth, 255, cv.ThresholdTypes.Binary)
         maskMin.ConvertTo(maskMin, cv.MatType.CV_8U)
         cv.Cv2.BitwiseAnd(Mask, maskMin, Mask)
 
@@ -63,7 +63,7 @@ Public Class Depth_Projections : Implements IDisposable
                  For x = roi.X To roi.X + roi.Width - 1
                      Dim m = foreground.Mask.At(Of Byte)(y, x)
                      If m > 0 Then
-                         Dim depth = ocvb.depth.Get(Of UShort)(y, x)
+                         Dim depth = ocvb.depth16.Get(Of UShort)(y, x)
                          If depth > 0 Then
                              Dim dy = Math.Round(h * (depth - desiredMin) / range)
                              If dy < h And dy > 0 Then ocvb.result1.Set(Of cv.Vec3b)(h - dy, x, ocvb.color.At(Of cv.Vec3b)(y, x))
@@ -101,7 +101,7 @@ Public Class Depth_WorldXYZ_MT : Implements IDisposable
             Dim xy As New cv.Point3f
             For xy.Y = roi.Y To roi.Y + roi.Height - 1
                 For xy.X = roi.X To roi.X + roi.Width - 1
-                    xy.Z = ocvb.depth.At(Of UInt16)(xy.Y, xy.X)
+                    xy.Z = ocvb.depth16.At(Of UInt16)(xy.Y, xy.X)
                     If xy.Z <> 0 Then
                         Dim w = getWorldCoordinatesD(ocvb, xy)
                         xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, w)
@@ -128,7 +128,7 @@ Public Class Depth_Median : Implements IDisposable
         ocvb.desc = "Divide the depth image ahead and behind the median."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.depth.ConvertTo(median.src, cv.MatType.CV_32F)
+        ocvb.depth16.ConvertTo(median.src, cv.MatType.CV_32F)
         median.Run(ocvb)
 
         Dim mask As cv.Mat
@@ -161,7 +161,7 @@ Public Class Depth_LocalMinMax_MT : Implements IDisposable
         ocvb.color.CopyTo(ocvb.result1)
         ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
 
-        Dim mask = ocvb.depth.Threshold(1, 5000, cv.ThresholdTypes.Binary)
+        Dim mask = ocvb.depth16.Threshold(1, 5000, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8UC1)
 
         Dim ptList = New List(Of cv.Point)
@@ -171,7 +171,7 @@ Public Class Depth_LocalMinMax_MT : Implements IDisposable
         Sub(roi)
             Dim minVal As Double, maxVal As Double
             Dim minPt As cv.Point, maxPt As cv.Point
-            cv.Cv2.MinMaxLoc(ocvb.depth(roi), minVal, maxVal, minPt, maxPt, mask(roi))
+            cv.Cv2.MinMaxLoc(ocvb.depth16(roi), minVal, maxVal, minPt, maxPt, mask(roi))
 
             ' if min and max are equal, this segment is all the same value (likely 0)
             If minPt <> maxPt Then
@@ -223,11 +223,11 @@ Public Class Depth_FirstLastDistance : Implements IDisposable
         ocvb.desc = "Monitor the first and last depth distances"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim mask = ocvb.depth.Threshold(1, 20000, cv.ThresholdTypes.Binary)
+        Dim mask = ocvb.depth16.Threshold(1, 20000, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8UC1)
         Dim minVal As Double, maxVal As Double
         Dim minPt As cv.Point, maxPt As cv.Point
-        cv.Cv2.MinMaxLoc(ocvb.depth, minVal, maxVal, minPt, maxPt, mask)
+        cv.Cv2.MinMaxLoc(ocvb.depth16, minVal, maxVal, minPt, maxPt, mask)
         ocvb.RGBDepth.CopyTo(ocvb.result1)
         ocvb.RGBDepth.CopyTo(ocvb.result2)
         ocvb.label1 = "Min Depth " + CStr(minVal) + " mm"
@@ -252,7 +252,7 @@ Public Class Depth_Holes : Implements IDisposable
         ocvb.desc = "Identify holes in the depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim mask = ocvb.depth.Threshold(1, 20000, cv.ThresholdTypes.BinaryInv)
+        Dim mask = ocvb.depth16.Threshold(1, 20000, cv.ThresholdTypes.BinaryInv)
         holeMask = New cv.Mat
         mask.ConvertTo(holeMask, cv.MatType.CV_8UC1)
         If externalUse = False Then ocvb.result1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -394,31 +394,36 @@ Public Class Depth_ToLeftView : Implements IDisposable
         sliders.setupTrackBar3(ocvb, "Color Image Bot in leftView", ocvb.color.Height / 2, ocvb.color.Height, bot * ocvb.color.Height)
         sliders.setupTrackBar4(ocvb, "Color Image Right in leftView", ocvb.color.Width / 2, ocvb.color.Width, right * ocvb.color.Width)
         If ocvb.parms.ShowOptions Then sliders.Show()
-        If ocvb.parms.cameraIndex = D400Cam Then
-            ocvb.label1 = "Color + LeftView (overlay)"
-            ocvb.label2 = "Aligned leftView and color"
-        Else
-            ocvb.label1 = "Aligning LeftView with color is not useful on Kinect"
-            ocvb.label2 = ""
-        End If
+        Select Case ocvb.parms.cameraIndex
+            Case D400Cam
+                ocvb.label1 = "Color + LeftView (overlay)"
+                ocvb.label2 = "Aligned leftView and color"
+            Case Kinect4AzureCam
+                ocvb.label1 = "Aligning LeftView with color is not useful on Kinect"
+                ocvb.label2 = ""
+            Case T265Camera
+                ocvb.label1 = "Aligning LeftView with color is not useful on T265"
+                ocvb.label2 = ""
+        End Select
         ocvb.desc = "Map the depth image into the LeftView images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        red.Run(ocvb)
-        ocvb.result2 = ocvb.result1
-        Dim rHeight = sliders.TrackBar3.Value - sliders.TrackBar1.Value
-        Dim rWidth = sliders.TrackBar4.Value - sliders.TrackBar2.Value
-        Dim rect = New cv.Rect(sliders.TrackBar2.Value, sliders.TrackBar1.Value, rWidth, rHeight)
-        ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.result2.Rectangle(rect, cv.Scalar.Yellow, 1)
-        ocvb.result1 = ocvb.result2(rect).Resize(ocvb.result1.Size())
-        ocvb.result1 = ocvb.color + ocvb.result1
-        If check.Box(0).Checked Then
-            check.Box(0).Checked = False
-            SaveSetting("OpenCVB", "DepthToLeftViewTop", "DepthToLeftViewTop", sliders.TrackBar1.Value / ocvb.color.Height)
-            SaveSetting("OpenCVB", "DepthToInfraleftView", "DepthToInfraleftView", sliders.TrackBar2.Value / ocvb.color.Width)
-            SaveSetting("OpenCVB", "DepthToLeftViewBot", "DepthToLeftViewBot", sliders.TrackBar3.Value / ocvb.color.Height)
-            SaveSetting("OpenCVB", "DepthToInfrarightView", "DepthToInfrarightView", sliders.TrackBar4.Value / ocvb.color.Width)
+        If ocvb.parms.cameraIndex = D400Cam Then
+            red.Run(ocvb)
+            ocvb.result2 = ocvb.result1
+            Dim rHeight = sliders.TrackBar3.Value - sliders.TrackBar1.Value
+            Dim rWidth = sliders.TrackBar4.Value - sliders.TrackBar2.Value
+            Dim rect = New cv.Rect(sliders.TrackBar2.Value, sliders.TrackBar1.Value, rWidth, rHeight)
+            ocvb.result2.Rectangle(rect, cv.Scalar.Yellow, 1)
+            ocvb.result1 = ocvb.result2(rect).Resize(ocvb.result1.Size())
+            ocvb.result1 = ocvb.color + ocvb.result1
+            If check.Box(0).Checked Then
+                check.Box(0).Checked = False
+                SaveSetting("OpenCVB", "DepthToLeftViewTop", "DepthToLeftViewTop", sliders.TrackBar1.Value / ocvb.color.Height)
+                SaveSetting("OpenCVB", "DepthToInfraleftView", "DepthToInfraleftView", sliders.TrackBar2.Value / ocvb.color.Width)
+                SaveSetting("OpenCVB", "DepthToLeftViewBot", "DepthToLeftViewBot", sliders.TrackBar3.Value / ocvb.color.Height)
+                SaveSetting("OpenCVB", "DepthToInfrarightView", "DepthToInfrarightView", sliders.TrackBar4.Value / ocvb.color.Width)
+            End If
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -451,7 +456,7 @@ Public Class Depth_FlatData : Implements IDisposable
         Dim gray8u As New cv.Mat
 
         cv.Cv2.BitwiseNot(shadow.holeMask, mask)
-        gray = ocvb.depth.Normalize(0, 255, cv.NormTypes.MinMax, -1, mask)
+        gray = ocvb.depth16.Normalize(0, 255, cv.NormTypes.MinMax, -1, mask)
         gray.ConvertTo(gray8u, cv.MatType.CV_8U)
 
         Dim reductionFactor = sliders.TrackBar1.Maximum - sliders.TrackBar1.Value
@@ -483,18 +488,18 @@ Public Class Depth_FlatBackground : Implements IDisposable
         Dim mask As New cv.Mat
         Dim maxDepth = cv.Scalar.All(sliders.TrackBar1.Value)
         Dim tmp16 As New cv.Mat
-        cv.Cv2.InRange(ocvb.depth, 0, maxDepth, tmp16)
+        cv.Cv2.InRange(ocvb.depth16, 0, maxDepth, tmp16)
         cv.Cv2.ConvertScaleAbs(tmp16, mask)
 
         Dim zeroMask As New cv.Mat
         cv.Cv2.BitwiseNot(mask, zeroMask)
-        ocvb.depth.SetTo(0, zeroMask)
+        ocvb.depth16.SetTo(0, zeroMask)
 
         ocvb.result1.SetTo(0)
         ocvb.RGBDepth.CopyTo(ocvb.result1, mask)
         zeroMask.SetTo(255, shadow.holeMask)
         ocvb.color.CopyTo(ocvb.result1, zeroMask)
-        ocvb.depth.SetTo(maxDepth, zeroMask) ' set the depth to the maxdepth for any background
+        ocvb.depth16.SetTo(maxDepth, zeroMask) ' set the depth to the maxdepth for any background
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
@@ -514,7 +519,7 @@ Public Class Depth_WorldXYZ : Implements IDisposable
         Dim xy As New cv.Point3f
         For xy.Y = 0 To xyzFrame.Height - 1
             For xy.X = 0 To xyzFrame.Width - 1
-                xy.Z = ocvb.depth.At(Of UInt16)(xy.Y, xy.X)
+                xy.Z = ocvb.depth16.At(Of UInt16)(xy.Y, xy.X)
                 If xy.Z <> 0 Then
                     Dim w = getWorldCoordinatesD(ocvb, xy)
                     xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, w)
@@ -551,16 +556,16 @@ Public Class Depth_XYZ_OpenMP_CPP : Implements IDisposable
         ' can't do this in the constructor because intrinsics were not initialized yet (because zinput was not initialized until algorithm thread starts.
         If ocvb.frameCount = 0 Then DepthXYZ = Depth_XYZ_OpenMP_Open(ocvb.parms.intrinsics.ppx, ocvb.parms.intrinsics.ppy, ocvb.parms.intrinsics.fx, ocvb.parms.intrinsics.fy)
 
-        Dim depthData(ocvb.depth.Total * ocvb.depth.ElemSize - 1) As Byte
+        Dim depthData(ocvb.depth16.Total * ocvb.depth16.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned) ' pin it for the duration...
-        Marshal.Copy(ocvb.depth.Data, depthData, 0, depthData.Length)
-        Dim imagePtr = Depth_XYZ_OpenMP_Run(DepthXYZ, handleSrc.AddrOfPinnedObject(), ocvb.depth.Rows, ocvb.depth.Cols)
+        Marshal.Copy(ocvb.depth16.Data, depthData, 0, depthData.Length)
+        Dim imagePtr = Depth_XYZ_OpenMP_Run(DepthXYZ, handleSrc.AddrOfPinnedObject(), ocvb.depth16.Rows, ocvb.depth16.Cols)
         handleSrc.Free()
 
         If imagePtr <> 0 Then
-            Dim dstData(ocvb.depth.Total * 3 * 4 - 1) As Byte
+            Dim dstData(ocvb.depth16.Total * 3 * 4 - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            pointCloud = New cv.Mat(ocvb.depth.Rows, ocvb.depth.Cols, cv.MatType.CV_32FC3, dstData)
+            pointCloud = New cv.Mat(ocvb.depth16.Rows, ocvb.depth16.Cols, cv.MatType.CV_32FC3, dstData)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -598,14 +603,14 @@ Public Class Depth_MeanStdev_MT : Implements IDisposable
         End If
 
         Dim mask As New cv.Mat, tmp16 As New cv.Mat
-        cv.Cv2.InRange(ocvb.depth, 1, maxDepth, tmp16)
+        cv.Cv2.InRange(ocvb.depth16, 1, maxDepth, tmp16)
         cv.Cv2.ConvertScaleAbs(tmp16, mask)
         Dim outOfRangeMask As New cv.Mat
         cv.Cv2.BitwiseNot(mask, outOfRangeMask)
 
         Dim minVal As Double, maxVal As Double
         Dim minPt As cv.Point, maxPt As cv.Point
-        cv.Cv2.MinMaxLoc(ocvb.depth, minVal, maxVal, minPt, maxPt, mask)
+        cv.Cv2.MinMaxLoc(ocvb.depth16, minVal, maxVal, minPt, maxPt, mask)
 
         Dim meanIndex = ocvb.frameCount Mod meanCount
         Dim meanValues As New cv.Mat(grid.roiList.Count - 1, 1, cv.MatType.CV_32F)
@@ -614,7 +619,7 @@ Public Class Depth_MeanStdev_MT : Implements IDisposable
         Sub(i)
             Dim roi = grid.roiList(i)
             Dim mean As Single = 0, stdev As Single = 0
-            cv.Cv2.MeanStdDev(ocvb.depth(roi), mean, stdev, mask(roi))
+            cv.Cv2.MeanStdDev(ocvb.depth16(roi), mean, stdev, mask(roi))
             meanSeries.Set(Of Single)(i, meanIndex, mean)
             If ocvb.frameCount >= meanCount - 1 Then
                 cv.Cv2.MeanStdDev(meanSeries.Row(i), mean, stdev)
@@ -685,7 +690,7 @@ Public Class Depth_MeanStdevPlot : Implements IDisposable
         Dim mean As Single = 0, stdev As Single = 0
         Dim mask As New cv.Mat
         cv.Cv2.BitwiseNot(shadow.holeMask, mask)
-        cv.Cv2.MeanStdDev(ocvb.depth, mean, stdev, mask)
+        cv.Cv2.MeanStdDev(ocvb.depth16, mean, stdev, mask)
 
         If mean > plot1.maxVal Then plot1.maxVal = mean + 1000 - (mean + 1000) Mod 1000
         If stdev > plot2.maxVal Then plot2.maxVal = stdev + 1000 - (stdev + 1000) Mod 1000
@@ -745,7 +750,7 @@ Public Class Depth_ColorMap : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim alpha = sliders.TrackBar1.Value / 100
-        cv.Cv2.ConvertScaleAbs(ocvb.depth, Palette.src, alpha)
+        cv.Cv2.ConvertScaleAbs(ocvb.depth16, Palette.src, alpha)
         Palette.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -784,7 +789,7 @@ Public Class Depth_Stable : Implements IDisposable
         End If
 
         If countDown = 0 Then
-            stableDepth = New cv.Mat(ocvb.depth.Size(), cv.MatType.CV_16U, 0)
+            stableDepth = New cv.Mat(ocvb.depth16.Size(), cv.MatType.CV_16U, 0)
             Dim minMat = stableDepth.Clone().SetTo(20000)
             For i = 0 To lastFrameCount - 1
                 cv.Cv2.Max(lastDepth(i), stableDepth, stableDepth)
@@ -801,7 +806,7 @@ Public Class Depth_Stable : Implements IDisposable
         Else
             countDown -= 1
         End If
-        lastDepth(frameIndex) = ocvb.depth
+        lastDepth(frameIndex) = ocvb.depth16
         frameIndex += 1
         If frameIndex >= lastDepth.Count Then frameIndex = 0
         ocvb.label1 = "Stable depth over " + CStr(lastFrameCount) + " frames"
@@ -832,7 +837,7 @@ Public Class Depth_Palette : Implements IDisposable
         Dim minDepth = trim.sliders.TrackBar1.Value
         Dim maxDepth = trim.sliders.TrackBar2.Value
 
-        Dim depthNorm16 = ocvb.depth
+        Dim depthNorm16 = ocvb.depth16
         depthNorm16 *= 255 / (maxDepth - minDepth) ' do the normalize manually to use the min and max Depth (more stable
         depthNorm16.ConvertTo(depth, cv.MatType.CV_8U)
         depth = depth.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -880,7 +885,7 @@ Public Class Depth_Colorizer_1_CPP : Implements IDisposable
         ocvb.desc = "Display 16 bit image using C++ instead of VB.Net"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then src = ocvb.depth Else dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        If externalUse = False Then src = ocvb.depth16 Else dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
 
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
@@ -925,9 +930,9 @@ Public Class Depth_InRange : Implements IDisposable
         If sliders.TrackBar1.Value >= sliders.TrackBar2.Value Then sliders.TrackBar2.Value = sliders.TrackBar1.Value + 1
         Dim minDepth = cv.Scalar.All(sliders.TrackBar1.Value)
         Dim maxDepth = cv.Scalar.All(sliders.TrackBar2.Value)
-        cv.Cv2.InRange(ocvb.depth, minDepth, maxDepth, Mask)
+        cv.Cv2.InRange(ocvb.depth16, minDepth, maxDepth, Mask)
         cv.Cv2.BitwiseNot(Mask, zeroMask)
-        dst = ocvb.depth.Clone()
+        dst = ocvb.depth16.Clone()
         dst.SetTo(0, zeroMask)
 
         If externalUse = False Then
@@ -1000,7 +1005,7 @@ Public Class Depth_ColorizerVB : Implements IDisposable
         ocvb.desc = "Colorize depth manually."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim src = ocvb.depth
+        Dim src = ocvb.depth16
         Dim nearColor = New Byte() {0, 255, 255}
         Dim farColor = New Byte() {255, 0, 0}
 
@@ -1059,7 +1064,7 @@ Public Class Depth_ColorizerVB_MT : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
 
-        If externalUse = False Then src = ocvb.depth
+        If externalUse = False Then src = ocvb.depth16
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
 
@@ -1128,7 +1133,7 @@ Public Class Depth_Colorizer_MT : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
 
-        If externalUse = False Then src = ocvb.depth
+        If externalUse = False Then src = ocvb.depth16
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
 

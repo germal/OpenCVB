@@ -107,7 +107,7 @@ Public Class Plane_Detect : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim depth32f As New cv.Mat
-        ocvb.depth.ConvertTo(depth32f, cv.MatType.CV_32F)
+        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
         grid.Run(ocvb)
 
         ocvb.result2.SetTo(0)
@@ -183,7 +183,7 @@ Public Class Plane_DetectDebug : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim depth32f As New cv.Mat
-        ocvb.depth.ConvertTo(depth32f, cv.MatType.CV_32F)
+        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
         grid.Run(ocvb)
 
         ocvb.result2.SetTo(0)

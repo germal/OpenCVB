@@ -570,7 +570,7 @@ Public Class Histogram_Depth : Implements IDisposable
         Dim histSize() = {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
 
-        cv.Cv2.CalcHist(New cv.Mat() {ocvb.depth}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {ocvb.depth16}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
         If externalUse = False Then
             plotHist.dst = ocvb.result2
@@ -708,7 +708,7 @@ Public Class Histogram_DepthClusters : Implements IDisposable
         Dim tmp16 As New cv.Mat
         For i = 0 To valleys.rangeBoundaries.Count - 1
             Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
-            cv.Cv2.InRange(ocvb.depth, startEndDepth.X, startEndDepth.Y, tmp16)
+            cv.Cv2.InRange(ocvb.depth16, startEndDepth.X, startEndDepth.Y, tmp16)
             cv.Cv2.ConvertScaleAbs(tmp16, mask)
             ocvb.result2.SetTo(ocvb.colorScalar(i), mask)
         Next

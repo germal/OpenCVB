@@ -147,7 +147,7 @@ Public Class ML_DepthFromColor_MT : Implements IDisposable
         grid.Run(ocvb)
 
         Dim depth32f As New cv.Mat
-        ocvb.depth.ConvertTo(depth32f, cv.MatType.CV_32F)
+        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
 
         Dim mask = depth32f.Threshold(sliders.TrackBar1.Value, sliders.TrackBar1.Value, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
@@ -236,7 +236,7 @@ Public Class ML_DepthFromColor : Implements IDisposable
         resized.dst.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim shadowSmall = mats.mat(0).Resize(color32f.Size()).Clone()
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
-        Dim depth16 = ocvb.depth.Resize(color32f.Size())
+        Dim depth16 = ocvb.depth16.Resize(color32f.Size())
         depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
 
         Dim mask = depth32f.Threshold(sliders.TrackBar1.Value, sliders.TrackBar1.Value, cv.ThresholdTypes.Binary)
@@ -267,7 +267,7 @@ Public Class ML_DepthFromColor : Implements IDisposable
         Dim input = color32f.Reshape(1, color32f.Total) ' test the entire original image.
         Dim output As New cv.Mat
         rtree.Predict(input, output)
-        Dim predictedDepth = output.Reshape(1, ocvb.depth.Height)
+        Dim predictedDepth = output.Reshape(1, ocvb.depth16.Height)
 
         predictedDepth.ConvertTo(depth16, cv.MatType.CV_16U)
 
@@ -329,7 +329,7 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
         resized.dst.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim shadowSmall = shadow.holeMask.Resize(color32f.Size()).Clone()
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
-        Dim depth16 = ocvb.depth.Resize(color32f.Size())
+        Dim depth16 = ocvb.depth16.Resize(color32f.Size())
         depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
 
         Dim mask = depth32f.Threshold(sliders.TrackBar1.Value, sliders.TrackBar1.Value, cv.ThresholdTypes.BinaryInv)
@@ -377,7 +377,7 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
 
         Dim output As New cv.Mat
         rtree.Predict(input, output)
-        Dim predictedDepth = output.Reshape(1, ocvb.depth.Height)
+        Dim predictedDepth = output.Reshape(1, ocvb.depth16.Height)
 
         predictedDepth.ConvertTo(depth16, cv.MatType.CV_16U)
 
@@ -429,7 +429,7 @@ Public Class ML_EdgeDepth : Implements IDisposable
         grid.Run(ocvb)
 
         Dim depth32f As New cv.Mat
-        ocvb.depth.ConvertTo(depth32f, cv.MatType.CV_32F)
+        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
 
         Dim mask = depth32f.Threshold(sliders.TrackBar1.Value, sliders.TrackBar1.Value, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)

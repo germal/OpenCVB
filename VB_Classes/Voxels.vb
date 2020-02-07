@@ -47,8 +47,8 @@ Public Class Voxels_Basics_MT : Implements IDisposable
         Parallel.For(0, gridCount,
         Sub(i)
             Dim roi = grid.roiList(i)
-            If ocvb.depth(roi).CountNonZero() Then
-                voxels(i) = computeMedian(ocvb.depth(roi), trim.Mask(roi), bins, minDepth, maxDepth)
+            If ocvb.depth16(roi).CountNonZero() Then
+                voxels(i) = computeMedian(ocvb.depth16(roi), trim.Mask(roi), bins, minDepth, maxDepth)
             Else
                 voxels(i) = 0
             End If

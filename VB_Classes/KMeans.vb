@@ -131,7 +131,7 @@ Public Class kMeans_RGB_Plus_XYDepth : Implements IDisposable
         Dim xyDepth32f As New cv.Mat(rgb32f.Size(), cv.MatType.CV_32FC3)
         For y = 0 To xyDepth32f.Rows - 1
             For x = 0 To xyDepth32f.Cols - 1
-                Dim nextVal = New cv.Vec3f(x, y, CSng(ocvb.depth.At(Of UShort)(y, x)))
+                Dim nextVal = New cv.Vec3f(x, y, CSng(ocvb.depth16.At(Of UShort)(y, x)))
                 xyDepth32f.Set(Of cv.Vec3f)(y, x, nextVal)
             Next
         Next
@@ -484,10 +484,10 @@ Public Class kMeans_XYDepth : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim roi = ocvb.drawRect
-        Dim xyDepth32f As New cv.Mat(ocvb.depth(roi).Size(), cv.MatType.CV_32FC3)
+        Dim xyDepth32f As New cv.Mat(ocvb.depth16(roi).Size(), cv.MatType.CV_32FC3)
         For y = 0 To xyDepth32f.Rows - 1
             For x = 0 To xyDepth32f.Cols - 1
-                Dim nextVal = New cv.Vec3f(x, y, ocvb.depth(roi).At(Of UShort)(y, x))
+                Dim nextVal = New cv.Vec3f(x, y, ocvb.depth16(roi).At(Of UShort)(y, x))
                 xyDepth32f.Set(Of cv.Vec3f)(y, x, nextVal)
             Next
         Next
@@ -516,12 +516,12 @@ Public Class kMeans_Depth_FG_BG : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim columnVector As New cv.Mat
-        columnVector = ocvb.depth.Reshape(1, ocvb.depth.Rows * ocvb.depth.Cols)
+        columnVector = ocvb.depth16.Reshape(1, ocvb.depth16.Rows * ocvb.depth16.Cols)
         columnVector.ConvertTo(columnVector, cv.MatType.CV_32FC1,)
         Dim labels = New cv.Mat()
         Dim depthCenters As New cv.Mat
         cv.Cv2.Kmeans(columnVector, 2, labels, term, 3, cv.KMeansFlags.PpCenters, depthCenters)
-        labels = labels.Reshape(1, ocvb.depth.Rows)
+        labels = labels.Reshape(1, ocvb.depth16.Rows)
 
         Dim foregroundLabel = 0
         If depthCenters.At(Of Single)(0, 0) > depthCenters.At(Of Single)(1, 0) Then
@@ -532,7 +532,7 @@ Public Class kMeans_Depth_FG_BG : Implements IDisposable
         If depthCenters.At(Of Single)(0, 0) > 20000 Or depthCenters.At(Of Single)(1, 0) > 20000 Then Exit Sub
 
         Dim mask = labels.InRange(foregroundLabel, foregroundLabel)
-        Dim shadow = ocvb.depth.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        Dim shadow = ocvb.depth16.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
         Dim shadowMask As New cv.Mat
         shadow.ConvertTo(shadowMask, cv.MatType.CV_8U)
         mask.SetTo(0, shadowMask)
@@ -726,7 +726,7 @@ Public Class kMeans_Color_MT : Implements IDisposable
         Dim clusterCount = sliders.TrackBar1.Value
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
-            Dim zeroDepth = ocvb.depth(roi).Clone()
+            Dim zeroDepth = ocvb.depth16(roi).Clone()
             zeroDepth.ConvertTo(zeroDepth, cv.MatType.CV_8U)
             zeroDepth = zeroDepth.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
 
@@ -772,7 +772,7 @@ Public Class kMeans_ColorDepth : Implements IDisposable
         cv.Cv2.Split(rgb32f, srcPlanes)
         ReDim Preserve srcPlanes(3)
         srcPlanes(3) = New cv.Mat
-        ocvb.depth.ConvertTo(srcPlanes(3), cv.MatType.CV_32F)
+        ocvb.depth16.ConvertTo(srcPlanes(3), cv.MatType.CV_32F)
 
         Dim rgbDepth As New cv.Mat
         cv.Cv2.Merge(srcPlanes, rgbDepth)
@@ -826,7 +826,7 @@ Public Class kMeans_ColorDepth_MT : Implements IDisposable
            cv.Cv2.Split(rgb32f, srcPlanes)
            ReDim Preserve srcPlanes(3)
            srcPlanes(3) = New cv.Mat
-           ocvb.depth(roi).ConvertTo(srcPlanes(3), cv.MatType.CV_32F)
+           ocvb.depth16(roi).ConvertTo(srcPlanes(3), cv.MatType.CV_32F)
 
            Dim rgbDepth As New cv.Mat
            cv.Cv2.Merge(srcPlanes, rgbDepth)

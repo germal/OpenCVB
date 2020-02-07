@@ -31,7 +31,7 @@ Public Class OpenCVB
     Dim externalInvocation As Boolean
     Dim fps As Int32 = 30
     Dim formColor As New cv.Mat, formRGBDepth As New cv.Mat, formResult1 As New cv.Mat, formResult2 As New cv.Mat
-    Dim formDepth As New cv.Mat, formPointCloud As New cv.Mat, formDisparity As New cv.Mat, formleftView As New cv.Mat, formrightView As New cv.Mat
+    Dim formDepth16 As New cv.Mat, formPointCloud As New cv.Mat, formDisparity As New cv.Mat, formleftView As New cv.Mat, formrightView As New cv.Mat
     Dim formResultsUpdated As Boolean
     Dim frameCount As Int32
     Dim GrabRectangleData As Boolean
@@ -878,7 +878,7 @@ Public Class OpenCVB
                 OpenCVB.ocvb.pointCloud = formPointCloud
                 OpenCVB.ocvb.color = formColor
                 OpenCVB.ocvb.RGBDepth = formRGBDepth
-                OpenCVB.ocvb.depth = formDepth
+                OpenCVB.ocvb.depth16 = formDepth16
                 OpenCVB.ocvb.disparity = formDisparity
                 OpenCVB.ocvb.leftView = formleftView
                 OpenCVB.ocvb.rightView = formrightView
@@ -990,12 +990,12 @@ Public Class OpenCVB
                 If lowResolution Then
                     formColor = camera.color.Resize(fastSize)
                     formRGBDepth = camera.RGBDepth.Resize(fastSize)
-                    formDepth = camera.depth.Resize(fastSize)
+                    formDepth16 = camera.depth16.Resize(fastSize)
                     formDisparity = camera.disparity.Resize(fastSize)
                 Else
                     formColor = camera.color
                     formRGBDepth = camera.RGBDepth
-                    formDepth = camera.depth
+                    formDepth16 = camera.depth16
                     formDisparity = camera.disparity
                 End If
                 formleftView = camera.leftView

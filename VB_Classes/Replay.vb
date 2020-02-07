@@ -30,9 +30,9 @@ Module recordPlaybackCommon
         binWrite.Write(ocvb.color.Height)
         binWrite.Write(ocvb.color.ElemSize)
 
-        binWrite.Write(ocvb.depth.Width)
-        binWrite.Write(ocvb.depth.Height)
-        binWrite.Write(ocvb.depth.ElemSize)
+        binWrite.Write(ocvb.depth16.Width)
+        binWrite.Write(ocvb.depth16.Height)
+        binWrite.Write(ocvb.depth16.ElemSize)
 
         binWrite.Write(ocvb.RGBDepth.Width)
         binWrite.Write(ocvb.RGBDepth.Height)
@@ -81,7 +81,7 @@ Public Class Replay_Record : Implements IDisposable
         If recording.startRecordPlayback Then
             If recordingActive = False Then
                 bytesPerColor = ocvb.color.Total * ocvb.color.ElemSize
-                bytesPerDepth = ocvb.depth.Total * ocvb.depth.ElemSize
+                bytesPerDepth = ocvb.depth16.Total * ocvb.depth16.ElemSize
                 bytesPerRGBDepth = ocvb.RGBDepth.Total * ocvb.RGBDepth.ElemSize
                 ' start recording...
                 ReDim colorBytes(bytesPerColor - 1)
@@ -98,7 +98,7 @@ Public Class Replay_Record : Implements IDisposable
                 binWrite.Write(colorBytes)
                 bytesTotal += colorBytes.Length
 
-                Marshal.Copy(ocvb.depth.Data, depthBytes, 0, depthBytes.Length)
+                Marshal.Copy(ocvb.depth16.Data, depthBytes, 0, depthBytes.Length)
                 binWrite.Write(depthBytes)
                 bytesTotal += depthBytes.Length
 
@@ -163,7 +163,7 @@ Public Class Replay_Play : Implements IDisposable
 
                 depthBytes = binRead.ReadBytes(bytesPerDepth)
                 tmpMat = New cv.Mat(fh.depthHeight, fh.depthWidth, cv.MatType.CV_16U, depthBytes)
-                ocvb.depth = tmpMat.Resize(ocvb.depth.Size())
+                ocvb.depth16 = tmpMat.Resize(ocvb.depth16.Size())
                 bytesTotal += depthBytes.Length
 
                 RGBDepthBytes = binRead.ReadBytes(bytesPerRGBDepth)

@@ -103,7 +103,7 @@ Public Class Math_DepthMeanStdev : Implements IDisposable
             Dim mean As Single = 0, stdev As Single = 0
             cv.Cv2.MeanStdDev(minMax.stableDepth, mean, stdev, ocvb.result1)
             ocvb.label1 = "stablized depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
-            cv.Cv2.MeanStdDev(ocvb.depth, mean, stdev, ocvb.result1)
+            cv.Cv2.MeanStdDev(ocvb.depth16, mean, stdev, ocvb.result1)
             ocvb.label2 = "raw depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
         End If
     End Sub

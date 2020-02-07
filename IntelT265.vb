@@ -57,7 +57,7 @@ Public Class IntelT265
     Dim vertices() As Byte
     Dim w As Int32
     Public color As cv.Mat
-    Public depth As cv.Mat
+    Public depth16 As cv.Mat
     Public RGBDepth As New cv.Mat
     Public disparity As New cv.Mat
     Public deviceCount As Int32
@@ -318,7 +318,7 @@ Public Class IntelT265
         Dim depthRect = New cv.Rect(stereo_cx, 0, tmpRGBDepth.Width, tmpRGBDepth.Height)
         tmpRGBDepth.CopyTo(RGBDepth(depthRect), mask)
 
-        depth = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
+        depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
         pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
     End Sub
     Public Sub closePipe()

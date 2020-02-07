@@ -25,7 +25,7 @@ Public Class IntelD400Series
     Dim w As Int32
     Public color As cv.Mat
     Public DecimationFilter As Boolean
-    Public depth As cv.Mat
+    Public depth16 As cv.Mat
     Public RGBDepth As cv.Mat
     Public DepthToDisparity As Boolean
     Public deviceCount As Int32
@@ -176,7 +176,7 @@ Public Class IntelD400Series
 
         color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorBytes)
         RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
-        depth = New cv.Mat(h, w, cv.MatType.CV_16U, depthBytes)
+        depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, depthBytes)
         disparity = New cv.Mat(h, w, cv.MatType.CV_32F, disparityBytes)
         leftView = New cv.Mat(h, w, cv.MatType.CV_8U, leftViewBytes)
         rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rightViewBytes)

@@ -104,14 +104,14 @@ Public Class FeatureLess_Prediction : Implements IDisposable
         Dim percent = Math.Sqrt(sliders.TrackBar1.Value / 100)
         Dim newSize = New cv.Size(ocvb.color.Width * percent, ocvb.color.Height * percent)
 
-        Dim rgb = ocvb.color.Clone(), depth = ocvb.depth, mask = fLess.mask
+        Dim rgb = ocvb.color.Clone(), depth16 = ocvb.depth16, mask = fLess.mask
 
         rgb = rgb.Resize(newSize)
-        depth = depth.Resize(newSize)
-        Dim saveDepth = depth.Clone()
+        depth16 = depth16.Resize(newSize)
+        Dim saveDepth = depth16.Clone()
 
         ' manually resize the mask to make sure there is no dithering...
-        mask = New cv.Mat(depth.Size(), cv.MatType.CV_8U, 0)
+        mask = New cv.Mat(depth16.Size(), cv.MatType.CV_8U, 0)
         Dim labelSmall As New cv.Mat(mask.Size(), cv.MatType.CV_32S, 0)
         Dim xFactor = CInt(fLess.mask.Width / newSize.Width)
         Dim yFactor = CInt(fLess.mask.Height / newSize.Height)
@@ -125,11 +125,11 @@ Public Class FeatureLess_Prediction : Implements IDisposable
         Next
 
         rgb.SetTo(0, mask)
-        depth.SetTo(0, mask)
+        depth16.SetTo(0, mask)
 
         Dim rgb32f As New cv.Mat, depth32f As New cv.Mat, response As New cv.Mat
         rgb.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
-        depth.ConvertTo(depth32f, cv.MatType.CV_32F)
+        depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
         labelSmall.ConvertTo(response, cv.MatType.CV_32S)
 
         Dim saveRGB = rgb32f.Clone()

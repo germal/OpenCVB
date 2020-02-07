@@ -49,7 +49,7 @@ Public Class Fitline_3DBasics_MT : Implements IDisposable
 
         Parallel.ForEach(Of cv.Rect)(hlines.grid.roiList,
         Sub(roi)
-            Dim depth = ocvb.depth(roi).Clone()
+            Dim depth = ocvb.depth16(roi).Clone()
             Dim fMask = mask(roi).Clone()
             Dim points As New List(Of cv.Point3f)
             Dim rows = ocvb.color.Rows, cols = ocvb.color.Cols
