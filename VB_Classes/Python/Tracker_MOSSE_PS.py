@@ -18,14 +18,7 @@ Keys:
     http://www.cs.colostate.edu/~draper/papers/bolme_cvpr10.pdf
 '''
 
-# Python 2/3 compatibility
-from __future__ import print_function
 import sys
-PY3 = sys.version_info[0] == 3
-
-if PY3:
-    xrange = range
-
 import numpy as np
 import cv2 as cv
 from common import draw_str, RectSelector
@@ -69,7 +62,7 @@ class MOSSE:
         self.G = cv.dft(g, flags=cv.DFT_COMPLEX_OUTPUT)
         self.H1 = np.zeros_like(self.G)
         self.H2 = np.zeros_like(self.G)
-        for _i in xrange(128):
+        for _i in range(128):
             a = self.preprocess(rnd_warp(img))
             A = cv.dft(a, flags=cv.DFT_COMPLEX_OUTPUT)
             self.H1 += cv.mulSpectrums(self.G, A, 0, conjB=True)
@@ -147,7 +140,7 @@ class App:
         self.rect_sel = RectSelector(title_window, self.onrect)
         self.trackers = []
         from PyStream import PyStreamRun
-        PyStreamRun(self.OpenCVCode, 'Mosse_PS.py')
+        PyStreamRun(self.OpenCVCode, 'Tracker_Mosse_PS.py')
 
     def onrect(self, rect):
         frame_gray = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)

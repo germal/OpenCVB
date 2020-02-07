@@ -1,272 +1,174 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-## License: Apache 2.0. See LICENSE file in root directory.
-## Copyright(c) 2019 Intel Corporation. All Rights Reserved.
-# Python 2/3 compatibility
-from __future__ import print_function
+#!/usr/bin/env python
 
-"""
-This example shows how to use T265 intrinsics and extrinsics in OpenCV to
-asynchronously compute depth maps from T265 fisheye images on the host.
-T265 is not a depth camera and the quality of passive-only depth options will
-always be limited compared to (e.g.) the D4XX series cameras. However, T265 does
-have two global shutter cameras in a stereo configuration, and in this example
-we show how to set up OpenCV to undistort the images and compute stereo depth
-from them.
-Getting started with python3, OpenCV and T265 on Ubuntu 16.04:
-First, set up the virtual enviroment:
-$ apt-get install python3-venv  # install python3 built in venv support
-$ python3 -m venv py3librs      # create a virtual environment in pylibrs
-$ source py3librs/bin/activate  # activate the venv, do this from every terminal
-$ pip install opencv-python     # install opencv 4.1 in the venv
-$ pip install pyrealsense2      # install librealsense python bindings
-Then, for every new terminal:
-$ source py3librs/bin/activate  # Activate the virtual environment
-$ python3 t265_stereo.py        # Run the example
-"""
+'''
+MOSSE tracking sample
 
-# First import the library
-import pyrealsense2 as rs
+This sample implements correlation-based tracking approach, described in [1].
 
-# Import OpenCV and numpy
-import cv2
+Usage:
+  Tracker_PS.py 
+
+  Draw rectangles around objects with a mouse to track them.
+
+Keys:
+  SPACE    - pause input
+  c        - clear targets
+
+[1] David S. Bolme et al. "Visual Object Tracking using Adaptive Correlation Filters"
+    http://www.cs.colostate.edu/~draper/papers/bolme_cvpr10.pdf
+'''
+
+import sys
 import numpy as np
-from math import tan, pi
+import cv2 as cv
+from common import draw_str, RectSelector
 
-"""
-In this section, we will set up the functions that will translate the camera
-intrinsics and extrinsics from librealsense into parameters that can be used
-with OpenCV.
-The T265 uses very wide angle lenses, so the distortion is modeled using a four
-parameter distortion model known as Kanalla-Brandt. OpenCV supports this
-distortion model in their "fisheye" module, more details can be found here:
-https://docs.opencv.org/3.4/db/d58/group__calib3d__fisheye.html
-"""
+def rnd_warp(a):
+    h, w = a.shape[:2]
+    T = np.zeros((2, 3))
+    coef = 0.2
+    ang = (np.random.rand()-0.5)*coef
+    c, s = np.cos(ang), np.sin(ang)
+    T[:2, :2] = [[c,-s], [s, c]]
+    T[:2, :2] += (np.random.rand(2, 2) - 0.5)*coef
+    c = (w/2, h/2)
+    T[:,2] = c - np.dot(T[:2, :2], c)
+    return cv.warpAffine(a, T, (w, h), borderMode = cv.BORDER_REFLECT)
 
-"""
-Returns R, T transform from src to dst
-"""
-def get_extrinsics(src, dst):
-    extrinsics = src.get_extrinsics_to(dst)
-    R = np.reshape(extrinsics.rotation, [3,3]).T
-    T = np.array(extrinsics.translation)
-    return (R, T)
+def divSpec(A, B):
+    Ar, Ai = A[...,0], A[...,1]
+    Br, Bi = B[...,0], B[...,1]
+    C = (Ar+1j*Ai)/(Br+1j*Bi)
+    C = np.dstack([np.real(C), np.imag(C)]).copy()
+    return C
 
-"""
-Returns a camera matrix K from librealsense intrinsics
-"""
-def camera_matrix(intrinsics):
-    return np.array([[intrinsics.fx,             0, intrinsics.ppx],
-                     [            0, intrinsics.fy, intrinsics.ppy],
-                     [            0,             0,              1]])
+eps = 1e-5
 
-"""
-Returns the fisheye distortion from librealsense intrinsics
-"""
-def fisheye_distortion(intrinsics):
-    return np.array(intrinsics.coeffs[:4])
+class MOSSE:
+    def __init__(self, frame, rect):
+        x1, y1, x2, y2 = rect
+        w, h = map(cv.getOptimalDFTSize, [x2-x1, y2-y1])
+        x1, y1 = (x1+x2-w)//2, (y1+y2-h)//2
+        self.pos = x, y = x1+0.5*(w-1), y1+0.5*(h-1)
+        self.size = w, h
+        img = cv.getRectSubPix(frame, (w, h), (x, y))
 
-# Set up a mutex to share data between threads 
-from threading import Lock
-frame_mutex = Lock()
-frame_data = {"left"  : None,
-              "right" : None,
-              "timestamp_ms" : None
-              }
+        self.win = cv.createHanningWindow((w, h), cv.CV_32F)
+        g = np.zeros((h, w), np.float32)
+        g[h//2, w//2] = 1
+        g = cv.GaussianBlur(g, (-1, -1), 2.0)
+        g /= g.max()
 
-"""
-This callback is called on a separate thread, so we must use a mutex
-to ensure that data is synchronized properly. We should also be
-careful not to do much work on this thread to avoid data backing up in the
-callback queue.
-"""
-def callback(frame):
-    global frame_data
-    if frame.is_frameset():
-        frameset = frame.as_frameset()
-        f1 = frameset.get_fisheye_frame(1).as_video_frame()
-        f2 = frameset.get_fisheye_frame(2).as_video_frame()
-        left_data = np.asanyarray(f1.get_data())
-        right_data = np.asanyarray(f2.get_data())
-        ts = frameset.get_timestamp()
-        frame_mutex.acquire()
-        frame_data["left"] = left_data
-        frame_data["right"] = right_data
-        frame_data["timestamp_ms"] = ts
-        frame_mutex.release()
+        self.G = cv.dft(g, flags=cv.DFT_COMPLEX_OUTPUT)
+        self.H1 = np.zeros_like(self.G)
+        self.H2 = np.zeros_like(self.G)
+        for _i in range(128):
+            a = self.preprocess(rnd_warp(img))
+            A = cv.dft(a, flags=cv.DFT_COMPLEX_OUTPUT)
+            self.H1 += cv.mulSpectrums(self.G, A, 0, conjB=True)
+            self.H2 += cv.mulSpectrums(     A, A, 0, conjB=True)
+        self.update_kernel()
+        self.update(frame)
 
-# Declare RealSense pipeline, encapsulating the actual device and sensors
-pipe = rs.pipeline()
+    def update(self, frame, rate = 0.125):
+        (x, y), (w, h) = self.pos, self.size
+        self.last_img = img = cv.getRectSubPix(frame, (w, h), (x, y))
+        img = self.preprocess(img)
+        self.last_resp, (dx, dy), self.psr = self.correlate(img)
+        self.good = self.psr > 8.0
+        if not self.good:
+            return
 
-# Build config object and stream everything
-cfg = rs.config()
+        self.pos = x+dx, y+dy
+        self.last_img = img = cv.getRectSubPix(frame, (w, h), self.pos)
+        img = self.preprocess(img)
 
-# Start streaming with our callback
-pipe.start(cfg, callback)
+        A = cv.dft(img, flags=cv.DFT_COMPLEX_OUTPUT)
+        H1 = cv.mulSpectrums(self.G, A, 0, conjB=True)
+        H2 = cv.mulSpectrums(     A, A, 0, conjB=True)
+        self.H1 = self.H1 * (1.0-rate) + H1 * rate
+        self.H2 = self.H2 * (1.0-rate) + H2 * rate
+        self.update_kernel()
 
-try:
-    # Set up an OpenCV window to visualize the results
-    WINDOW_TITLE = 'Realsense'
-    cv2.namedWindow(WINDOW_TITLE, cv2.WINDOW_NORMAL)
+    @property
+    def state_vis(self):
+        f = cv.idft(self.H, flags=cv.DFT_SCALE | cv.DFT_REAL_OUTPUT )
+        h, w = f.shape
+        f = np.roll(f, -h//2, 0)
+        f = np.roll(f, -w//2, 1)
+        kernel = np.uint8( (f-f.min()) / f.ptp()*255 )
+        resp = self.last_resp
+        resp = np.uint8(np.clip(resp/resp.max(), 0, 1)*255)
+        vis = np.hstack([self.last_img, kernel, resp])
+        return vis
 
-    # Configure the OpenCV stereo algorithm. See
-    # https://docs.opencv.org/3.4/d2/d85/classcv_1_1StereoSGBM.html for a
-    # description of the parameters
-    window_size = 5
-    min_disp = 0
-    # must be divisible by 16
-    num_disp = 112 - min_disp
-    max_disp = min_disp + num_disp
-    stereo = cv2.StereoSGBM_create(minDisparity = min_disp,
-                                   numDisparities = num_disp,
-                                   blockSize = 16,
-                                   P1 = 8*3*window_size*window_size,
-                                   P2 = 32*3*window_size*window_size,
-                                   disp12MaxDiff = 1,
-                                   uniquenessRatio = 10,
-                                   speckleWindowSize = 100,
-                                   speckleRange = 32)
+    def draw_state(self, vis):
+        (x, y), (w, h) = self.pos, self.size
+        x1, y1, x2, y2 = int(x-0.5*w), int(y-0.5*h), int(x+0.5*w), int(y+0.5*h)
+        cv.rectangle(vis, (x1, y1), (x2, y2), (0, 0, 255))
+        if self.good:
+            cv.circle(vis, (int(x), int(y)), 2, (0, 0, 255), -1)
+        else:
+            cv.line(vis, (x1, y1), (x2, y2), (0, 0, 255))
+            cv.line(vis, (x2, y1), (x1, y2), (0, 0, 255))
+        draw_str(vis, (x1, y2+16), 'PSR: %.2f' % self.psr)
 
-    # Retreive the stream and intrinsic properties for both cameras
-    profiles = pipe.get_active_profile()
-    streams = {"left"  : profiles.get_stream(rs.stream.fisheye, 1).as_video_stream_profile(),
-               "right" : profiles.get_stream(rs.stream.fisheye, 2).as_video_stream_profile()}
-    intrinsics = {"left"  : streams["left"].get_intrinsics(),
-                  "right" : streams["right"].get_intrinsics()}
+    def preprocess(self, img):
+        img = np.log(np.float32(img)+1.0)
+        img = (img-img.mean()) / (img.std()+eps)
+        return img*self.win
 
-    # Print information about both cameras
-    print("Left camera:",  intrinsics["left"])
-    print("Right camera:", intrinsics["right"])
+    def correlate(self, img):
+        C = cv.mulSpectrums(cv.dft(img, flags=cv.DFT_COMPLEX_OUTPUT), self.H, 0, conjB=True)
+        resp = cv.idft(C, flags=cv.DFT_SCALE | cv.DFT_REAL_OUTPUT)
+        h, w = resp.shape
+        _, mval, _, (mx, my) = cv.minMaxLoc(resp)
+        side_resp = resp.copy()
+        cv.rectangle(side_resp, (mx-5, my-5), (mx+5, my+5), 0, -1)
+        smean, sstd = side_resp.mean(), side_resp.std()
+        psr = (mval-smean) / (sstd+eps)
+        return resp, (mx-w//2, my-h//2), psr
 
-    # Translate the intrinsics from librealsense into OpenCV
-    K_left  = camera_matrix(intrinsics["left"])
-    D_left  = fisheye_distortion(intrinsics["left"])
-    K_right = camera_matrix(intrinsics["right"])
-    D_right = fisheye_distortion(intrinsics["right"])
-    (width, height) = (intrinsics["left"].width, intrinsics["left"].height)
+    def update_kernel(self):
+        self.H = divSpec(self.H1, self.H2)
+        self.H[...,1] *= -1
 
-    # Get the relative extrinsics between the left and right camera
-    (R, T) = get_extrinsics(streams["left"], streams["right"])
+class App:
+    def Open(self):
+        self.paused = False
+        cv.namedWindow(title_window)
+        self.rect_sel = RectSelector(title_window, self.onrect)
+        self.trackers = []
+        from PyStream import PyStreamRun
+        PyStreamRun(self.OpenCVCode, 'Tracker_Mosse_PS.py')
 
-    # We need to determine what focal length our undistorted images should have
-    # in order to set up the camera matrices for initUndistortRectifyMap.  We
-    # could use stereoRectify, but here we show how to derive these projection
-    # matrices from the calibration and a desired height and field of view
+    def onrect(self, rect):
+        frame_gray = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
+        tracker = MOSSE(frame_gray, rect)
+        self.trackers.append(tracker)
 
-    # We calculate the undistorted focal length:
-    #
-    #         h
-    # -----------------
-    #  \      |      /
-    #    \    | f  /
-    #     \   |   /
-    #      \ fov /
-    #        \|/
-    stereo_fov_rad = 90 * (pi/180)  # 90 degree desired fov
-    stereo_height_px = 300          # 300x300 pixel stereo output
-    stereo_focal_px = stereo_height_px/2 / tan(stereo_fov_rad/2)
+    def OpenCVCode(self, vis, depth_colormap):
+        self.frame = vis.copy()
+        if not self.paused:
+            frame_gray = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
+            for tracker in self.trackers:
+                tracker.update(frame_gray)
 
-    # We set the left rotation to identity and the right rotation
-    # the rotation between the cameras
-    R_left = np.eye(3)
-    R_right = R
+        for tracker in self.trackers:
+            tracker.draw_state(vis)
+        if len(self.trackers) > 0:
+            cv.imshow('tracker state', self.trackers[-1].state_vis)
+        self.rect_sel.draw(vis)
 
-    # The stereo algorithm needs max_disp extra pixels in order to produce valid
-    # disparity on the desired output region. This changes the width, but the
-    # center of projection should be on the center of the cropped image
-    stereo_width_px = stereo_height_px + max_disp
-    stereo_size = (stereo_width_px, stereo_height_px)
-    stereo_cx = (stereo_height_px - 1)/2 + max_disp
-    stereo_cy = (stereo_height_px - 1)/2
+        cv.imshow(title_window, vis)
+        ch = cv.waitKey(10)
+        if ch == ord(' '):
+            self.paused = not self.paused
+        if ch == ord('c'):
+            self.trackers = []
 
-    # Construct the left and right projection matrices, the only difference is
-    # that the right projection matrix should have a shift along the x axis of
-    # baseline*focal_length
-    P_left = np.array([[stereo_focal_px, 0, stereo_cx, 0],
-                       [0, stereo_focal_px, stereo_cy, 0],
-                       [0,               0,         1, 0]])
-    P_right = P_left.copy()
-    P_right[0][3] = T[0]*stereo_focal_px
-
-    # Construct Q for use with cv2.reprojectImageTo3D. Subtract max_disp from x
-    # since we will crop the disparity later
-    Q = np.array([[1, 0,       0, -(stereo_cx - max_disp)],
-                  [0, 1,       0, -stereo_cy],
-                  [0, 0,       0, stereo_focal_px],
-                  [0, 0, -1/T[0], 0]])
-
-    # Create an undistortion map for the left and right camera which applies the
-    # rectification and undoes the camera distortion. This only has to be done
-    # once
-    m1type = cv2.CV_32FC1
-    (lm1, lm2) = cv2.fisheye.initUndistortRectifyMap(K_left, D_left, R_left, P_left, stereo_size, m1type)
-    (rm1, rm2) = cv2.fisheye.initUndistortRectifyMap(K_right, D_right, R_right, P_right, stereo_size, m1type)
-    undistort_rectify = {"left"  : (lm1, lm2),
-                         "right" : (rm1, rm2)}
-   
-    mode = "stack"
-    while True:
-        # Check if the camera has acquired any frames
-        frame_mutex.acquire()
-        valid = frame_data["timestamp_ms"] is not None
-        frame_mutex.release()
-
-        # If frames are ready to process
-        if valid:
-            # Hold the mutex only long enough to copy the stereo frames
-            frame_mutex.acquire()
-            frame_copy = {"left"  : frame_data["left"].copy(),
-                          "right" : frame_data["right"].copy()}
-            frame_mutex.release()
-
-            # Undistort and crop the center of the frames
-            center_undistorted = {"left" : cv2.remap(src = frame_copy["left"],
-                                          map1 = undistort_rectify["left"][0],
-                                          map2 = undistort_rectify["left"][1],
-                                          interpolation = cv2.INTER_LINEAR),
-                                  "right" : cv2.remap(src = frame_copy["right"],
-                                          map1 = undistort_rectify["right"][0],
-                                          map2 = undistort_rectify["right"][1],
-                                          interpolation = cv2.INTER_LINEAR)}
-            # compute the disparity on the center of the frames and convert it to a pixel disparity (divide by DISP_SCALE=16)
-            disparity = stereo.compute(center_undistorted["left"], center_undistorted["right"]) #.astype(np.float32) / 16
-
-            mean = cv2.mean(disparity)
-            print('disparitymean {:.1f}'.format(mean[0]))
-
-            # re-crop just the valid part of the disparity
-            disparity = disparity[:,max_disp:]
-
-            # convert disparity to 0-255 and color it
-            #disp_vis = 255*(disparity - min_disp)/ num_disp
-            disp_vis = disparity
-            disp_vis *= 255 / num_disp
-
-            #minval, maxval, minloc, maxloc = cv2.minMaxLoc(disp_vis)
-            #print('disp_vis {:.1f} {:.1f}'.format(minval, maxval))
-
-            cv2.imshow("disp_vis", disp_vis)
-            disp_color = cv2.applyColorMap(cv2.convertScaleAbs(disp_vis,1), cv2.COLORMAP_JET)
-           
-            #minval, maxval, minloc, maxloc = cv2.minMaxLoc(disp_vis)
-            #print('disp_vis {:.1f} {:.1f}'.format(minval, maxval))
-
-            color_image = cv2.cvtColor(center_undistorted["left"][:,max_disp:], cv2.COLOR_GRAY2RGB)
-
-            if mode == "stack":
-                cv2.imshow(WINDOW_TITLE, np.hstack((color_image, disp_color)))
-                cv2.imshow("color_image", color_image)
-                cv2.imshow("disp_color", disp_color)
-            if mode == "overlay":
-                ind = disparity >= min_disp
-                color_image[ind, 0] = disp_color[ind, 0]
-                color_image[ind, 1] = disp_color[ind, 1]
-                color_image[ind, 2] = disp_color[ind, 2]
-                cv2.imshow(WINDOW_TITLE, color_image)
-        key = cv2.waitKey(1)
-        if key == ord('s'): mode = "stack"
-        if key == ord('o'): mode = "overlay"
-        if key == ord('q') or cv2.getWindowProperty(WINDOW_TITLE, cv2.WND_PROP_VISIBLE) < 1:
-            break
-finally:
-    pipe.stop()
+if __name__ == '__main__':
+    print (__doc__)
+    import sys
+    title_window = "Tracker_PS.py - Draw rectangles around multiple objects to be tracked!"
+    App().Open()

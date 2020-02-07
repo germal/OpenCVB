@@ -31,15 +31,19 @@ Public Class PyStream_Basics : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If pythonReady Then
+            Dim depth16 = ocvb.depth16
+            If ocvb.parms.lowResolution Then depth16 = depth16.Resize(ocvb.color.Size)
+
             For i = 0 To memMap.memMapValues.Length - 1
-                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.color.Total * ocvb.color.ElemSize, ocvb.depth16.Total * ocvb.depth16.ElemSize, ocvb.color.Rows, ocvb.color.Cols)
+                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.color.Total * ocvb.color.ElemSize,
+                                                depth16.Total * depth16.ElemSize, ocvb.color.Rows, ocvb.color.Cols)
             Next
             memMap.Run(ocvb)
 
             If rgbBuffer.Length <> ocvb.color.Total * ocvb.color.ElemSize Then ReDim rgbBuffer(ocvb.color.Total * ocvb.color.ElemSize - 1)
-            If depthBuffer.Length <> ocvb.depth16.Total * ocvb.depth16.ElemSize Then ReDim depthBuffer(ocvb.depth16.Total * ocvb.depth16.ElemSize - 1)
+            If depthBuffer.Length <> depth16.Total * depth16.ElemSize Then ReDim depthBuffer(depth16.Total * depth16.ElemSize - 1)
             Marshal.Copy(ocvb.color.Data, rgbBuffer, 0, ocvb.color.Total * ocvb.color.ElemSize)
-            Marshal.Copy(ocvb.depth16.Data, depthBuffer, 0, ocvb.depth16.Total * ocvb.depth16.ElemSize - 1)
+            Marshal.Copy(depth16.Data, depthBuffer, 0, depthBuffer.Length - 1)
             If pipeImages.IsConnected Then
                 On Error Resume Next
                 pipeImages.Write(rgbBuffer, 0, rgbBuffer.Length)
