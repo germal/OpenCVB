@@ -799,8 +799,10 @@ Public Class Depth_Stable : Implements IDisposable
             Dim rangeDepth As New cv.Mat
             cv.Cv2.Subtract(stableDepth, minMat, rangeDepth)
             Dim stableDepthMask = rangeDepth.Threshold(sliders.TrackBar2.Value, 255, cv.ThresholdTypes.BinaryInv)
+            If ocvb.parms.lowResolution Then stableDepthMask = stableDepthMask.Resize(ocvb.color.Size())
             stableDepthMask.ConvertTo(ocvb.result1, cv.MatType.CV_8U)
             stableZeroDepth = minMat.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+            If ocvb.parms.lowResolution Then stableZeroDepth = stableZeroDepth.Resize(ocvb.color.Size())
             stableZeroDepth.ConvertTo(stableZeroDepth, cv.MatType.CV_8U)
             ocvb.result2 = ocvb.result1.Clone()
             ocvb.result2.SetTo(0, stableZeroDepth)
