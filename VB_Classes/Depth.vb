@@ -21,6 +21,7 @@ Public Class Depth_ManualTrim : Implements IDisposable
         cv.Cv2.BitwiseAnd(Mask, maskMin, Mask)
 
         ocvb.result1.SetTo(0)
+        If ocvb.parms.lowResolution Then Mask = Mask.Resize(ocvb.color.Size())
         ocvb.RGBDepth.CopyTo(ocvb.result1, Mask)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
