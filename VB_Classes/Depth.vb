@@ -696,6 +696,7 @@ Public Class Depth_MeanStdevPlot : Implements IDisposable
         Dim mean As Single = 0, stdev As Single = 0
         Dim mask As New cv.Mat
         cv.Cv2.BitwiseNot(shadow.holeMask, mask)
+        If ocvb.parms.lowResolution Then mask = mask.Resize(ocvb.depth16.Size())
         cv.Cv2.MeanStdDev(ocvb.depth16, mean, stdev, mask)
 
         If mean > plot1.maxVal Then plot1.maxVal = mean + 1000 - (mean + 1000) Mod 1000
