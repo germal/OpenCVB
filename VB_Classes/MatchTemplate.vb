@@ -132,7 +132,7 @@ Public Class MatchTemplate_Basics : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Static saveTemplate As cv.Mat
         Static saveRect As cv.Rect
-        If ocvb.drawRect <> New cv.Rect Then
+        If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
             saveRect = ocvb.drawRect
             saveTemplate = ocvb.color(ocvb.drawRect).Clone()
             ocvb.drawRectClear = True
