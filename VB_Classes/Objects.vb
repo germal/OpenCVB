@@ -14,6 +14,10 @@ Public Class Object_Basics : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
+        If ocvb.parms.lowResolution Then
+            trim.Mask = trim.Mask.Resize(ocvb.color.Size)
+            trim.zeroMask = trim.zeroMask.Resize(ocvb.color.Size())
+        End If
         If externalUse = False Then
             ocvb.result1 = trim.Mask
             ocvb.result2 = trim.zeroMask
@@ -22,7 +26,6 @@ Public Class Object_Basics : Implements IDisposable
         ocvb.color.CopyTo(ccomp.srcGray, trim.Mask)
         ccomp.srcGray = ccomp.srcGray.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ccomp.Run(ocvb)
-
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         trim.Dispose()

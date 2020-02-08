@@ -100,7 +100,6 @@ Public Class CComp_EdgeMask : Implements IDisposable
         Else
             ccomp.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
-        cv.Cv2.ImShow("result1", ocvb.result1)
         ccomp.srcGray.SetTo(0, ocvb.result1)
         ccomp.Run(ocvb)
         ocvb.label1 = "Edges_CannyAndShadow (input to ccomp)"
