@@ -457,6 +457,7 @@ Public Class Depth_FlatData : Implements IDisposable
         Dim gray8u As New cv.Mat
 
         cv.Cv2.BitwiseNot(shadow.holeMask, mask)
+        If ocvb.parms.lowResolution Then mask = mask.Resize(ocvb.depth16.Size())
         gray = ocvb.depth16.Normalize(0, 255, cv.NormTypes.MinMax, -1, mask)
         gray.ConvertTo(gray8u, cv.MatType.CV_8U)
 
