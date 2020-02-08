@@ -184,6 +184,7 @@ Public Class DCT_Surfaces_debug : Implements IDisposable
         Dim mask = ocvb.result1.Clone() ' result1 contains the DCT mask of featureless surfaces.
         Dim notMask As New cv.Mat
         cv.Cv2.BitwiseNot(mask, notMask)
+        If ocvb.parms.lowResolution Then notMask = notMask.Resize(ocvb.depth16.Size())
         ocvb.depth16.SetTo(0, notMask) ' remove non-featureless surface depth data.
 
         ' find the most featureless roi
@@ -216,11 +217,13 @@ Public Class DCT_Surfaces_debug : Implements IDisposable
                     Next
                 Next
                 Dim plane = computePlaneEquation(worldPoints)
-                flow.msgs.Add("a=" + Format(plane.Item0, "#0.00") + " b=" + Format(plane.Item1, "#0.00") + " c=" + Format(Math.Abs(plane.Item2), "#0.00") +
+                If Single.IsNaN(plane.Item0) = False Then
+                    flow.msgs.Add("a=" + Format(plane.Item0, "#0.00") + " b=" + Format(plane.Item1, "#0.00") + " c=" + Format(Math.Abs(plane.Item2), "#0.00") +
                               vbTab + "depth=" + Format(-plane.Item3 / 1000, "#0.00") + "m" + vbTab + "roi.x = " + Format(roi.X, "000") + vbTab + " roi.y = " +
                               Format(roi.Y, "000") + vbTab + "MinDepth = " + Format(minDepth / 1000, "#0.00") + "m" + vbTab + " MaxDepth = " + Format(maxDepth / 1000, "#0.00") + "m")
+                End If
             End If
-        End If
+            End If
         flow.Run(ocvb)
         ocvb.label1 = "Largest flat surface segment stats"
     End Sub

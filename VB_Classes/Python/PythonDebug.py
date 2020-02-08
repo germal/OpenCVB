@@ -1,174 +1,61 @@
 #!/usr/bin/env python
 
 '''
-MOSSE tracking sample
-
-This sample implements correlation-based tracking approach, described in [1].
+This program illustrates the use of findContours and drawContours.
+The original image is put up along with the image of drawn contours.
 
 Usage:
-  Tracker_PS.py 
-
-  Draw rectangles around objects with a mouse to track them.
-
-Keys:
-  SPACE    - pause input
-  c        - clear targets
-
-[1] David S. Bolme et al. "Visual Object Tracking using Adaptive Correlation Filters"
-    http://www.cs.colostate.edu/~draper/papers/bolme_cvpr10.pdf
+    contours.py
+A trackbar is put up which controls the contour level from -3 to 3
 '''
 
 import sys
+title_window = 'Contours.py'
 import numpy as np
 import cv2 as cv
-from common import draw_str, RectSelector
 
-def rnd_warp(a):
-    h, w = a.shape[:2]
-    T = np.zeros((2, 3))
-    coef = 0.2
-    ang = (np.random.rand()-0.5)*coef
-    c, s = np.cos(ang), np.sin(ang)
-    T[:2, :2] = [[c,-s], [s, c]]
-    T[:2, :2] += (np.random.rand(2, 2) - 0.5)*coef
-    c = (w/2, h/2)
-    T[:,2] = c - np.dot(T[:2, :2], c)
-    return cv.warpAffine(a, T, (w, h), borderMode = cv.BORDER_REFLECT)
+def make_image():
+    img = np.zeros((500, 500), np.uint8)
+    black, white = 0, 255
+    for i in range(6):
+        dx = int((i%2)*250 - 30)
+        dy = int((i/2.)*150)
 
-def divSpec(A, B):
-    Ar, Ai = A[...,0], A[...,1]
-    Br, Bi = B[...,0], B[...,1]
-    C = (Ar+1j*Ai)/(Br+1j*Bi)
-    C = np.dstack([np.real(C), np.imag(C)]).copy()
-    return C
-
-eps = 1e-5
-
-class MOSSE:
-    def __init__(self, frame, rect):
-        x1, y1, x2, y2 = rect
-        w, h = map(cv.getOptimalDFTSize, [x2-x1, y2-y1])
-        x1, y1 = (x1+x2-w)//2, (y1+y2-h)//2
-        self.pos = x, y = x1+0.5*(w-1), y1+0.5*(h-1)
-        self.size = w, h
-        img = cv.getRectSubPix(frame, (w, h), (x, y))
-
-        self.win = cv.createHanningWindow((w, h), cv.CV_32F)
-        g = np.zeros((h, w), np.float32)
-        g[h//2, w//2] = 1
-        g = cv.GaussianBlur(g, (-1, -1), 2.0)
-        g /= g.max()
-
-        self.G = cv.dft(g, flags=cv.DFT_COMPLEX_OUTPUT)
-        self.H1 = np.zeros_like(self.G)
-        self.H2 = np.zeros_like(self.G)
-        for _i in range(128):
-            a = self.preprocess(rnd_warp(img))
-            A = cv.dft(a, flags=cv.DFT_COMPLEX_OUTPUT)
-            self.H1 += cv.mulSpectrums(self.G, A, 0, conjB=True)
-            self.H2 += cv.mulSpectrums(     A, A, 0, conjB=True)
-        self.update_kernel()
-        self.update(frame)
-
-    def update(self, frame, rate = 0.125):
-        (x, y), (w, h) = self.pos, self.size
-        self.last_img = img = cv.getRectSubPix(frame, (w, h), (x, y))
-        img = self.preprocess(img)
-        self.last_resp, (dx, dy), self.psr = self.correlate(img)
-        self.good = self.psr > 8.0
-        if not self.good:
-            return
-
-        self.pos = x+dx, y+dy
-        self.last_img = img = cv.getRectSubPix(frame, (w, h), self.pos)
-        img = self.preprocess(img)
-
-        A = cv.dft(img, flags=cv.DFT_COMPLEX_OUTPUT)
-        H1 = cv.mulSpectrums(self.G, A, 0, conjB=True)
-        H2 = cv.mulSpectrums(     A, A, 0, conjB=True)
-        self.H1 = self.H1 * (1.0-rate) + H1 * rate
-        self.H2 = self.H2 * (1.0-rate) + H2 * rate
-        self.update_kernel()
-
-    @property
-    def state_vis(self):
-        f = cv.idft(self.H, flags=cv.DFT_SCALE | cv.DFT_REAL_OUTPUT )
-        h, w = f.shape
-        f = np.roll(f, -h//2, 0)
-        f = np.roll(f, -w//2, 1)
-        kernel = np.uint8( (f-f.min()) / f.ptp()*255 )
-        resp = self.last_resp
-        resp = np.uint8(np.clip(resp/resp.max(), 0, 1)*255)
-        vis = np.hstack([self.last_img, kernel, resp])
-        return vis
-
-    def draw_state(self, vis):
-        (x, y), (w, h) = self.pos, self.size
-        x1, y1, x2, y2 = int(x-0.5*w), int(y-0.5*h), int(x+0.5*w), int(y+0.5*h)
-        cv.rectangle(vis, (x1, y1), (x2, y2), (0, 0, 255))
-        if self.good:
-            cv.circle(vis, (int(x), int(y)), 2, (0, 0, 255), -1)
-        else:
-            cv.line(vis, (x1, y1), (x2, y2), (0, 0, 255))
-            cv.line(vis, (x2, y1), (x1, y2), (0, 0, 255))
-        draw_str(vis, (x1, y2+16), 'PSR: %.2f' % self.psr)
-
-    def preprocess(self, img):
-        img = np.log(np.float32(img)+1.0)
-        img = (img-img.mean()) / (img.std()+eps)
-        return img*self.win
-
-    def correlate(self, img):
-        C = cv.mulSpectrums(cv.dft(img, flags=cv.DFT_COMPLEX_OUTPUT), self.H, 0, conjB=True)
-        resp = cv.idft(C, flags=cv.DFT_SCALE | cv.DFT_REAL_OUTPUT)
-        h, w = resp.shape
-        _, mval, _, (mx, my) = cv.minMaxLoc(resp)
-        side_resp = resp.copy()
-        cv.rectangle(side_resp, (mx-5, my-5), (mx+5, my+5), 0, -1)
-        smean, sstd = side_resp.mean(), side_resp.std()
-        psr = (mval-smean) / (sstd+eps)
-        return resp, (mx-w//2, my-h//2), psr
-
-    def update_kernel(self):
-        self.H = divSpec(self.H1, self.H2)
-        self.H[...,1] *= -1
-
-class App:
-    def Open(self):
-        self.paused = False
-        cv.namedWindow(title_window)
-        self.rect_sel = RectSelector(title_window, self.onrect)
-        self.trackers = []
-        from PyStream import PyStreamRun
-        PyStreamRun(self.OpenCVCode, 'Tracker_Mosse_PS.py')
-
-    def onrect(self, rect):
-        frame_gray = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
-        tracker = MOSSE(frame_gray, rect)
-        self.trackers.append(tracker)
-
-    def OpenCVCode(self, vis, depth_colormap):
-        self.frame = vis.copy()
-        if not self.paused:
-            frame_gray = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
-            for tracker in self.trackers:
-                tracker.update(frame_gray)
-
-        for tracker in self.trackers:
-            tracker.draw_state(vis)
-        if len(self.trackers) > 0:
-            cv.imshow('tracker state', self.trackers[-1].state_vis)
-        self.rect_sel.draw(vis)
-
-        cv.imshow(title_window, vis)
-        ch = cv.waitKey(10)
-        if ch == ord(' '):
-            self.paused = not self.paused
-        if ch == ord('c'):
-            self.trackers = []
+        if i == 0:
+            for j in range(11):
+                angle = (j+5)*np.pi/21
+                c, s = np.cos(angle), np.sin(angle)
+                x1, y1 = np.int32([dx+100+j*10-80*c, dy+100-90*s])
+                x2, y2 = np.int32([dx+100+j*10-30*c, dy+100-30*s])
+                cv.line(img, (x1, y1), (x2, y2), white)
+ 
+        cv.ellipse( img, (dx+150, dy+100), (100,70), 0, 0, 360, white, -1 )
+        cv.ellipse( img, (dx+115, dy+70), (30,20), 0, 0, 360, black, -1 )
+        cv.ellipse( img, (dx+185, dy+70), (30,20), 0, 0, 360, black, -1 )
+        cv.ellipse( img, (dx+115, dy+70), (15,15), 0, 0, 360, white, -1 )
+        cv.ellipse( img, (dx+185, dy+70), (15,15), 0, 0, 360, white, -1 )
+        cv.ellipse( img, (dx+115, dy+70), (5,5), 0, 0, 360, black, -1 )
+        cv.ellipse( img, (dx+185, dy+70), (5,5), 0, 0, 360, black, -1 )
+        cv.ellipse( img, (dx+150, dy+100), (10,5), 0, 0, 360, black, -1 )
+        cv.ellipse( img, (dx+150, dy+150), (40,10), 0, 0, 360, black, -1 )
+        cv.ellipse( img, (dx+27, dy+100), (20,35), 0, 0, 360, white, -1 )
+        cv.ellipse( img, (dx+273, dy+100), (20,35), 0, 0, 360, white, -1 )
+    return img
 
 if __name__ == '__main__':
-    print (__doc__)
-    import sys
-    title_window = "Tracker_PS.py - Draw rectangles around multiple objects to be tracked!"
-    App().Open()
+    print(__doc__)
+    img = make_image()
+    h, w = img.shape[:2]
+    vis = np.zeros((h, w, 3), np.uint8)
+    contours0, hierarchy = cv.findContours( img.copy(), cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    contours = [cv.approxPolyDP(cnt, 3, True) for cnt in contours0]
+
+    both = np.empty((vis.shape[0], vis.shape[1]*2, vis.shape[2]), vis.dtype)
+    img = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
+    for i in range(10):
+        levels = i - 3
+        cv.drawContours( vis, contours, (-1, 2)[levels <= 0], (128,255,255), 3, cv.LINE_AA, hierarchy, abs(levels) )
+        both = cv.hconcat([vis, img])
+        cv.imshow(title_window, both)
+        cv.waitKey(1000)
+    cv.waitKey()

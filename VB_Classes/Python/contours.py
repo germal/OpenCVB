@@ -9,27 +9,20 @@ Usage:
 A trackbar is put up which controls the contour level from -3 to 3
 '''
 
-# Python 2/3 compatibility
-from __future__ import print_function
 import sys
-PY3 = sys.version_info[0] == 3
 title_window = 'Contours.py'
-
-if PY3:
-    xrange = range
-
 import numpy as np
 import cv2 as cv
 
 def make_image():
     img = np.zeros((500, 500), np.uint8)
     black, white = 0, 255
-    for i in xrange(6):
+    for i in range(6):
         dx = int((i%2)*250 - 30)
         dy = int((i/2.)*150)
 
         if i == 0:
-            for j in xrange(11):
+            for j in range(11):
                 angle = (j+5)*np.pi/21
                 c, s = np.cos(angle), np.sin(angle)
                 x1, y1 = np.int32([dx+100+j*10-80*c, dy+100-90*s])
@@ -49,27 +42,19 @@ def make_image():
         cv.ellipse( img, (dx+273, dy+100), (20,35), 0, 0, 360, white, -1 )
     return img
 
-def main():
+if __name__ == '__main__':
+    print(__doc__)
     img = make_image()
     h, w = img.shape[:2]
-
+    vis = np.zeros((h, w, 3), np.uint8)
     contours0, hierarchy = cv.findContours( img.copy(), cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
     contours = [cv.approxPolyDP(cnt, 3, True) for cnt in contours0]
 
-    def update(levels):
-        vis = np.zeros((h, w, 3), np.uint8)
-        levels = levels - 3
-        cv.drawContours( vis, contours, (-1, 2)[levels <= 0], (128,255,255),
-            3, cv.LINE_AA, hierarchy, abs(levels) )
-        cv.imshow('contours', vis)
-    update(3)
-    cv.createTrackbar( "levels+3", "contours", 3, 7, update )
-    cv.imshow('image', img)
+    both = np.empty((vis.shape[0], vis.shape[1]*2, vis.shape[2]), vis.dtype)
+    img = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
+    for i in range(10):
+        cv.drawContours( vis, contours, (-1, 2)[(i - 3) <= 0], (128,255,255), 3, cv.LINE_AA, hierarchy, abs(i) )
+        both = cv.hconcat([vis, img])
+        cv.imshow(title_window, both)
+        cv.waitKey(1000)
     cv.waitKey()
-    print('Done')
-
-
-if __name__ == '__main__':
-    print(__doc__)
-    main()
-    cv.destroyAllWindows()
