@@ -14,9 +14,7 @@ Public Class Disparity_Basics : Implements IDisposable
         ocvb.label2 = "Left View"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim disparity16u As New cv.Mat
-        ocvb.disparity.ConvertTo(disparity16u, cv.MatType.CV_16U)
-        colorizer.src = disparity16u
+        ocvb.disparity.ConvertTo(colorizer.src, cv.MatType.CV_16U)
         colorizer.Run(ocvb)
         ocvb.result1 = colorizer.dst
         ocvb.result2 = ocvb.leftView.Resize(ocvb.color.Size())

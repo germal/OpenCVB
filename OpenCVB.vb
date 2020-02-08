@@ -989,17 +989,16 @@ Public Class OpenCVB
                 If lowResolution Then
                     formColor = camera.color.Resize(fastSize)
                     formRGBDepth = camera.RGBDepth.Resize(fastSize)
-                    formDisparity = camera.disparity.Resize(fastSize)
                 Else
                     formColor = camera.color
                     formRGBDepth = camera.RGBDepth
-                    formDisparity = camera.disparity
                 End If
                 ' these cannot be resized without damage
                 formPointCloud = camera.pointCloud
                 formDepth16 = camera.depth16
                 formleftView = camera.leftView
                 formrightView = camera.rightView
+                formDisparity = camera.disparity
                 cameraDataUpdated = True
             End SyncLock
 

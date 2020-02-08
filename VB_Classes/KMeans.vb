@@ -524,9 +524,7 @@ Public Class kMeans_Depth_FG_BG : Implements IDisposable
         labels = labels.Reshape(1, ocvb.depth16.Rows)
 
         Dim foregroundLabel = 0
-        If depthCenters.At(Of Single)(0, 0) > depthCenters.At(Of Single)(1, 0) Then
-            foregroundLabel = 1
-        End If
+        If depthCenters.At(Of Single)(0, 0) > depthCenters.At(Of Single)(1, 0) Then foregroundLabel = 1
 
         ' if one of the centers is way out there, leave the mask alone.  KMeans clustered an unreasonably small cluster.
         If depthCenters.At(Of Single)(0, 0) > 20000 Or depthCenters.At(Of Single)(1, 0) > 20000 Then Exit Sub
@@ -536,6 +534,7 @@ Public Class kMeans_Depth_FG_BG : Implements IDisposable
         Dim shadowMask As New cv.Mat
         shadow.ConvertTo(shadowMask, cv.MatType.CV_8U)
         mask.SetTo(0, shadowMask)
+        If ocvb.parms.lowResolution Then mask = mask.Resize(ocvb.color.Size())
         ocvb.result1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
