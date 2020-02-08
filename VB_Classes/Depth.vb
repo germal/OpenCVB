@@ -498,9 +498,12 @@ Public Class Depth_FlatBackground : Implements IDisposable
         ocvb.depth16.SetTo(0, zeroMask)
 
         ocvb.result1.SetTo(0)
+        If ocvb.parms.lowResolution Then mask = mask.Resize(ocvb.color.Size())
         ocvb.RGBDepth.CopyTo(ocvb.result1, mask)
+        If ocvb.parms.lowResolution Then zeroMask = zeroMask.Resize(ocvb.color.Size())
         zeroMask.SetTo(255, shadow.holeMask)
         ocvb.color.CopyTo(ocvb.result1, zeroMask)
+        If ocvb.parms.lowResolution Then zeroMask = zeroMask.Resize(ocvb.depth16.Size())
         ocvb.depth16.SetTo(maxDepth, zeroMask) ' set the depth to the maxdepth for any background
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
