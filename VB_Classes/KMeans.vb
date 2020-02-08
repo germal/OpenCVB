@@ -772,6 +772,7 @@ Public Class kMeans_ColorDepth : Implements IDisposable
         ReDim Preserve srcPlanes(3)
         srcPlanes(3) = New cv.Mat
         ocvb.depth16.ConvertTo(srcPlanes(3), cv.MatType.CV_32F)
+        If ocvb.parms.lowResolution Then srcPlanes(3) = srcPlanes(3).Resize(ocvb.color.Size())
 
         Dim rgbDepth As New cv.Mat
         cv.Cv2.Merge(srcPlanes, rgbDepth)
