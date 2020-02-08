@@ -72,6 +72,7 @@ Public Class DilateErode_DepthSeed : Implements IDisposable
         validImg.SetTo(0, ocvb.depth16.GreaterThan(3000)) ' max distance
         cv.Cv2.BitwiseAnd(seeds, validImg, seeds)
         ocvb.result1.SetTo(0)
+        If ocvb.parms.lowResolution Then seeds = seeds.Resize(ocvb.color.Size())
         ocvb.RGBDepth.CopyTo(ocvb.result1, seeds)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
