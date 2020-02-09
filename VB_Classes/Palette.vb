@@ -362,8 +362,10 @@ Public Class Palette_BuildGradientColorMap : Implements IDisposable
             Else
                 gradientColorMap = gradientColorMap.Resize(New cv.Size(ocvb.color.Width, 1))
 
+                Dim r As New cv.Rect(0, 0, ocvb.color.Width, 1)
                 For i = 0 To ocvb.result2.Height - 1
-                    ocvb.result2.Row(i) = gradientColorMap
+                    r.Y = i
+                    ocvb.result2(r) = gradientColorMap
                 Next
             End If
         End If

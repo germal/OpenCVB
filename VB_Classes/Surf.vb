@@ -39,8 +39,14 @@ Public Class Surf_Basics_CS : Implements IDisposable
 
         CS_SurfBasics.Run(leftView, rightview, dst, sliders.TrackBar1.Value, radio.check(0).Checked)
 
-        dst(New cv.Rect(0, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result1)
-        dst(New cv.Rect(ocvb.result1.Width, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result2)
+        If ocvb.parms.lowResolution Then
+            dst = dst.Resize(New cv.Size(ocvb.color.Width * 2, ocvb.color.Height))
+            dst(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(ocvb.result1)
+            dst(New cv.Rect(ocvb.color.Width, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(ocvb.result2)
+        Else
+            dst(New cv.Rect(0, 0, ocvb.leftView.Width, ocvb.leftView.Height)).CopyTo(ocvb.result1)
+            dst(New cv.Rect(ocvb.result1.Width, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result2)
+        End If
 
         ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
