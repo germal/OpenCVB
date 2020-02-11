@@ -30,7 +30,7 @@ Public Class OpenCVB
     Dim drawRect As New cv.Rect(0, 0, 0, 0)
     Dim externalInvocation As Boolean
     Dim fps As Int32 = 30
-    Dim formColor As New cv.Mat, formRGBDepth As New cv.Mat, formResult1 As New cv.Mat, formResult2 As New cv.Mat
+    Dim formColor As cv.Mat = Nothing, formRGBDepth As New cv.Mat, formResult1 As New cv.Mat, formResult2 As New cv.Mat
     Dim formDepth16 As New cv.Mat, formPointCloud As New cv.Mat, formDisparity As New cv.Mat, formleftView As New cv.Mat, formrightView As New cv.Mat
     Dim formResultsUpdated As Boolean
     Dim frameCount As Int32

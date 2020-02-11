@@ -370,7 +370,6 @@
     <Content Include="Python\RotateImage.py" />
     <Content Include="Python\selectivesearchsegmentation_demo.py" />
     <Content Include="Python\Superpixels_PS.py" />
-    <Content Include="Python\T265Example.py" />
     <Content Include="Python\threshold_inRange_PS.py" />
     <Content Include="Python\TrackerPlane_AugmentedReality_PS.py" />
     <Content Include="Python\TrackerPlane_PS.py" />

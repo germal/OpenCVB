@@ -24,6 +24,8 @@ Public Class FishEye_Basics : Implements IDisposable
             leftView = ocvb.leftView.Remap(leftviewMap1, leftviewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
             rightView = ocvb.rightView.Remap(rightViewMap1, rightViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
         Else
+            ocvb.label1 = "Left View (no fisheye lens present)"
+            ocvb.label2 = "Right View (no fisheye lens present)"
             leftView = ocvb.leftView
             rightView = ocvb.rightView
         End If
