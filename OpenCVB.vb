@@ -86,14 +86,6 @@ Public Class OpenCVB
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         HomeDir = New DirectoryInfo(CurDir() + "\..\..\") ' running in OpenCVB/bin/Debug mostly...
-#If DEBUG Then
-        ' check that the release versions are built.
-        Dim testDLL As New FileInfo(HomeDir.FullName + "\bin\Release\Camera_Kinect4Azure.dll")
-        If testDLL.Exists = False Then
-            MsgBox("Be sure to rebuild both the Debug and Release versions." + vbCrLf + "The Kinect DLL is set to Release in Debug Build Configuration.")
-            End
-        End If
-#End If
         Dim args() = Environment.GetCommandLineArgs()
         ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
         If args.Length > 1 Then
