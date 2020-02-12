@@ -4,6 +4,34 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 
 Module SGBM_Module
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265Open() As IntPtr
+    End Function
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265DeviceCount(kc As IntPtr) As Int32
+    End Function
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265DeviceName(kc As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265WaitFrame(kc As IntPtr, color As IntPtr, RGBDepth As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265Extrinsics(kc As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265Intrinsics(kc As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265PointCloud(kc As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265DepthInColor(kc As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub T265Close(kc As IntPtr)
+    End Sub
+
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function t265sgm_Open() As IntPtr
     End Function
@@ -120,6 +148,7 @@ Public Class IntelT265
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
+
         pipelineClosed = False
         w = width
         h = height

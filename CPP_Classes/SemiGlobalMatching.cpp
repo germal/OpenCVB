@@ -87,10 +87,6 @@ int *SemiGlobalMatching_Run(SemiGlobalMatching *SemiGlobalMatchingPtr, int *left
 
 
 
-
-
-
-
 class t265sgm
 {
 private:
@@ -124,7 +120,7 @@ void t265sgm_Close(t265sgm * tPtr)
 	delete tPtr;
 }
 extern "C" __declspec(dllexport)
-int* t265sgm_Run(t265sgm *tPtr, int* leftPtr, int* rightPtr, int rows, int cols, int maxDisp)
+int* t265sgm_Run(t265sgm * tPtr, int* leftPtr, int* rightPtr, int rows, int cols, int maxDisp)
 {
 	Mat leftimg = Mat(rows, cols, CV_8UC1, leftPtr);
 	Mat rightimg = Mat(rows, cols, CV_8UC1, rightPtr);
