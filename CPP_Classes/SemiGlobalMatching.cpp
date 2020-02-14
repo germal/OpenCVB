@@ -58,6 +58,10 @@ public:
 	}
 };
 
+
+
+
+
 extern "C" __declspec(dllexport)
 SemiGlobalMatching *SemiGlobalMatching_Open(int rows, int cols)
 {
@@ -83,47 +87,3 @@ int *SemiGlobalMatching_Run(SemiGlobalMatching *SemiGlobalMatchingPtr, int *left
 	return (int *) SemiGlobalMatchingPtr->disparityMapstage2.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
 }
 
-
-
-
-
-class t265sgm
-{
-private:
-public:
-	Mat disparity;
-	Ptr<StereoSGBM> stereo;
-	t265sgm()
-	{
-		stereo = cv::StereoSGBM::create(0, 112, 16, 8 * 3 * 25, 32 * 3 * 25, 1, 0, 10, 100, 32);
-	}
-	void Run(Mat leftimg, Mat rightimg, int maxDisp)
-	{
-		Mat disp16s;
-		stereo->compute(leftimg, rightimg, disp16s);
-		Rect validRect = Rect(maxDisp, 0, disp16s.cols - maxDisp, disp16s.rows);
-		disp16s = disp16s(validRect);
-		disp16s.convertTo(disparity, CV_32F, 1.0f / 16.0f);
-	}
-};
-
-extern "C" __declspec(dllexport)
-t265sgm * t265sgm_Open()
-{
-	t265sgm* tPtr = new t265sgm();
-	return tPtr;
-}
-
-extern "C" __declspec(dllexport)
-void t265sgm_Close(t265sgm * tPtr)
-{
-	delete tPtr;
-}
-extern "C" __declspec(dllexport)
-int* t265sgm_Run(t265sgm * tPtr, int* leftPtr, int* rightPtr, int rows, int cols, int maxDisp)
-{
-	Mat leftimg = Mat(rows, cols, CV_8UC1, leftPtr);
-	Mat rightimg = Mat(rows, cols, CV_8UC1, rightPtr);
-	tPtr->Run(leftimg, rightimg, maxDisp);
-	return (int*)tPtr->disparity.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
-}

@@ -85,12 +85,14 @@ Public Class OpenCVB
     End Structure
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        HomeDir = New DirectoryInfo(CurDir() + "\..\..\") ' running in OpenCVB/bin/Debug mostly...
+        HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
+
 #If DEBUG Then
-        ' The Debug version is configured with the release version of each of the camera drivers.  This enables the dll's to be found.
+        ' Camera DLL's are built in Release mode even when configured for Debug (for performance while debugging).  
         Dim releaseDir = HomeDir.FullName + "\bin\Release\"
-        updatePath(releaseDir, "Release Version of camera drivers.")
+        updatePath(releaseDir, "Release Version of camera DLL's.")
 #End If
+
         Dim args() = Environment.GetCommandLineArgs()
         ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
         If args.Length > 1 Then
@@ -140,7 +142,7 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
-        cameraT265 = New IntelT265()
+        cameraT265 = New IntelT265()  ' alternative Intel265_CPP - a C++ version
         cameraT265.deviceCount = USBenumeration("T265")
         If cameraT265.deviceCount > 0 Then cameraT265.initialize(fps, regWidth, regHeight)
 
@@ -982,7 +984,6 @@ Public Class OpenCVB
                 imuGyro = camera.imuGyro ' The data may not be present but just copy it...
                 imuAccel = camera.imuaccel
                 imuTimeStamp = camera.imutimestamp
-                If PCmultiplier <> 1 Then formPointCloud *= 0.001 ' units are millimeters for Kinect
                 If lowResolution Then
                     formColor = camera.color.Resize(fastSize)
                     formRGBDepth = camera.RGBDepth.Resize(fastSize)
@@ -996,6 +997,7 @@ Public Class OpenCVB
                 formleftView = camera.leftView
                 formrightView = camera.rightView
                 formDisparity = camera.disparity
+                If PCmultiplier <> 1 Then formPointCloud *= 0.001 ' units are millimeters for Kinect
                 cameraDataUpdated = True
             End SyncLock
 

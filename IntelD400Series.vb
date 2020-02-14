@@ -49,7 +49,7 @@ Public Class IntelD400Series
     Public SpatialFilter As Boolean
     Public TemporalFilter As Boolean
     Public ThresholdFilter As Boolean
-    Public pipelineClosed As Boolean
+    Public pipelineClosed As Boolean = False
 
     Dim block As New rs.CustomProcessingBlock(
         Sub(f, src)
@@ -73,12 +73,12 @@ Public Class IntelD400Series
                     Dim colorFrame = frames.ColorFrame
                     Dim disparityFrame = depth2Disparity.Process(depthFrame)
                     Dim RGBDepthframe = colorizer.Process(depthFrame)
-                    Dim rightView As rs.Frame = Nothing
-                    Dim leftView = frames.InfraredFrame
+                    Dim rawRight As rs.Frame = Nothing
+                    Dim rawLeft = frames.InfraredFrame
                     For Each frame In frames
                         If frame.Profile.Stream = rs.Stream.Infrared Then
                             If frame.Profile.Index = 2 Then
-                                rightView = frame
+                                rawRight = frame
                                 Exit For
                             End If
                         End If
@@ -86,13 +86,12 @@ Public Class IntelD400Series
 
                     Dim points = pc.Process(depthFrame).As(Of rs.Points)
                     Marshal.Copy(points.Data, vertices, 0, vertices.Length)
-
                     Marshal.Copy(colorFrame.Data, colorBytes, 0, colorBytes.Length)
                     Marshal.Copy(disparityFrame.Data, disparityBytes, 0, disparityBytes.Length)
                     Marshal.Copy(RGBDepthframe.Data, RGBDepthBytes, 0, RGBDepthBytes.Length)
                     Marshal.Copy(depthFrame.Data, depthBytes, 0, depthBytes.Length)
-                    Marshal.Copy(leftView.Data, leftViewBytes, 0, leftViewBytes.Length)
-                    Marshal.Copy(rightView.Data, rightViewBytes, 0, rightViewBytes.Length)
+                    Marshal.Copy(rawLeft.Data, leftViewBytes, 0, leftViewBytes.Length)
+                    Marshal.Copy(rawRight.Data, rightViewBytes, 0, rightViewBytes.Length)
 
                     ' get motion data and timestamp from the gyro and accelerometer
                     If IMUpresent Then
@@ -114,7 +113,6 @@ Public Class IntelD400Series
         Console.WriteLine("The current librealsense version is " + ctx.Version())
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
-        pipelineClosed = False
         devices = ctx.QueryDevices()
         device = devices(0)
         deviceName = device.Info.Item(rs.CameraInfo.Name)

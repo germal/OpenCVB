@@ -2,48 +2,7 @@
 Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-
-Module SGBM_Module
-    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265Open() As IntPtr
-    End Function
-    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265DeviceCount(kc As IntPtr) As Int32
-    End Function
-    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265DeviceName(kc As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265WaitFrame(kc As IntPtr, color As IntPtr, RGBDepth As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265Extrinsics(kc As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265Intrinsics(kc As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265PointCloud(kc As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265DepthInColor(kc As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub T265Close(kc As IntPtr)
-    End Sub
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function t265sgm_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub t265sgm_Close(bgfs As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function t265sgm_Run(tPtr As IntPtr, leftimg As IntPtr, rightimg As IntPtr, rows As Int32, cols As Int32, maxDisp As Int32) As IntPtr
-    End Function
-End Module
-
-Structure T265IMUdata
+Structure T265IMUdataOld
     Public translation As cv.Point3f
     Public acceleration As cv.Point3f
     Public velocity As cv.Point3f
@@ -56,40 +15,51 @@ End Structure
 Public Class IntelT265
 #Region "T265Data"
     Dim cfg As New rs.Config
-    Dim colorBytes() As Byte
-    Dim device As rs.Device
-    Dim devices As rs.DeviceList
-    Dim h As Int32
-    Dim kLeft(8) As Double
-    Dim kRight(8) As Double
     Dim dLeft(3) As Double
     Dim dRight(3) As Double
-    Dim rLeft(8) As Double
-    Dim rRight(8) As Double
-    Dim pLeft(8) As Double
-    Dim pRight(8) As Double
-
-    Public kMatleft As cv.Mat
-    Public dMatleft As cv.Mat
-    Public rMatleft As cv.Mat
-    Public pMatleft As cv.Mat
-
-    Public kMatRight As cv.Mat
-    Public dMatRight As cv.Mat
-    Public rMatRight As cv.Mat
-    Public pMatRight As cv.Mat
-
+    Dim h As Int32
+    Dim intrinsicsLeft As rs.Intrinsics
+    Dim intrinsicsRight As rs.Intrinsics
+    Dim kLeft(8) As Double
+    Dim kRight(8) As Double
+    Dim leftStream As rs.VideoStreamProfile
+    Dim leftViewMap1 As New cv.Mat
+    Dim leftViewMap2 As New cv.Mat
+    Dim lm1 As New cv.Mat
+    Dim lm2 As New cv.Mat
+    Dim maxDisp As Int32
+    Dim minDisp = 0
+    Dim numDisp As Int32
     Dim pipeline As New rs.Pipeline
     Dim pipeline_profile As rs.PipelineProfile
+    Dim pLeft(11) As Double
+    Dim pRight(11) As Double
+    Dim rawHeight As Int32
+    Dim rawWidth As Int32
+    Dim rightStream As rs.VideoStreamProfile
+    Dim rightViewMap1 As New cv.Mat
+    Dim rightViewMap2 As New cv.Mat
+    Dim rLeft(8) As Double
+    Dim rm1 As New cv.Mat
+    Dim rm2 As New cv.Mat
+    Dim rRight(8) As Double
     Dim stereo As cv.StereoSGBM
+    Dim stereo_cx As Double
+    Dim stereo_cy As Double
+    Dim stereo_focal_px As Double
+    Dim stereo_fov_rad As Double
+    Dim stereo_height_px As Double
+    Dim stereo_size As cv.Size
+    Dim stereo_width_px As Double
+    Dim tPtr As IntPtr
+    Dim validRect As cv.Rect
     Dim vertices() As Byte
     Dim w As Int32
     Public color As cv.Mat
     Public depth16 As cv.Mat
-    Public RGBDepth As New cv.Mat
-    Public disparity As New cv.Mat
     Public deviceCount As Int32
     Public deviceName As String = "Intel T265"
+    Public disparity As New cv.Mat
     Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
     Public failedImageCount As Int32
     Public imuAccel As cv.Point3f
@@ -97,41 +67,23 @@ Public Class IntelT265
     Public IMUpresent As Boolean
     Public imuTimeStamp As Double
     Public intrinsics_VB As VB_Classes.ActiveClass.Intrinsics_VB
+    Public leftView As cv.Mat
     Public modelInverse As Boolean
     Public pc As New rs.PointCloud
     Public pcMultiplier As Single = 1
+    Public pipelineClosed As Boolean = False
     Public pointCloud As cv.Mat
-    Public leftView As cv.Mat
+    Public RGBDepth As New cv.Mat
     Public rightView As cv.Mat
-    Public pipelineClosed As Boolean
-    Dim stereo_fov_rad As Double
-    Dim stereo_height_px As Double
-    Dim stereo_focal_px As Double
-    Dim stereo_width_px As Double
-    Dim stereo_size As cv.Size
-    Dim stereo_cx As Double
-    Dim stereo_cy As Double
-    Dim Qarray(15) As Double
-    Dim lm1 As New cv.Mat
-    Dim lm2 As New cv.Mat
-    Dim rm1 As New cv.Mat
-    Dim rm2 As New cv.Mat
-    Dim leftViewMap1 As New cv.Mat
-    Dim leftViewMap2 As New cv.Mat
-    Dim rightViewMap1 As New cv.Mat
-    Dim rightViewMap2 As New cv.Mat
-    Dim minDisp = 0
-    Dim windowSize = 5
-    Dim numDisp As Int32
-    Dim maxDisp As Int32
-    Dim validRect As cv.Rect
-    Dim tPtr As IntPtr
-    Dim rawWidth As Int32
-    Dim rawHeight As Int32
-    Dim intrinsicsLeft As rs.Intrinsics
-    Dim intrinsicsRight As rs.Intrinsics
-    Dim leftStream As rs.VideoStreamProfile
-    Dim rightStream As rs.VideoStreamProfile
+
+    Public dMatleft As cv.Mat
+    Public dMatRight As cv.Mat
+    Public kMatleft As cv.Mat
+    Public kMatRight As cv.Mat
+    Public pMatleft As cv.Mat
+    Public pMatRight As cv.Mat
+    Public rMatleft As cv.Mat
+    Public rMatRight As cv.Mat
 #End Region
     Private Sub getIntrinsics(leftStream As rs.VideoStreamProfile, rightStream As rs.VideoStreamProfile)
         intrinsicsLeft = leftStream.GetIntrinsics()
@@ -148,8 +100,6 @@ Public Class IntelT265
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
-
-        pipelineClosed = False
         w = width
         h = height
 
@@ -161,9 +111,8 @@ Public Class IntelT265
 
         numDisp = 112 - minDisp
         maxDisp = minDisp + numDisp
-        tPtr = t265sgm_Open()
-        stereo = cv.StereoSGBM.Create(minDisp, numDisp, 16, 8 * 3 * windowSize * windowSize,
-                                      32 * 3 * windowSize * windowSize, 1, 0, 10, 100)
+        Dim windowSize = 5
+        stereo = cv.StereoSGBM.Create(minDisp, numDisp, 16, 8 * 3 * windowSize * windowSize, 32 * 3 * windowSize * windowSize, 1, 0, 10, 100, 32)
 
         leftStream = pipeline_profile.GetStream(Of rs.VideoStreamProfile)(rs.Stream.Fisheye, 1)
         rightStream = pipeline_profile.GetStream(Of rs.VideoStreamProfile)(rs.Stream.Fisheye, 2)
@@ -251,18 +200,6 @@ Public Class IntelT265
         IMUpresent = True
     End Sub
     Public Sub GetNextFrame()
-#If DEBUG Then
-        Static msgDelivered As Boolean
-        If msgDelivered = False Then
-            Dim msgDeliverCount = GetSetting("OpenCVB", "msgDeliverCount", "msgDeliverCount", 0)
-            If msgDeliverCount < 2 Then
-                MsgBox("The T265 camera support is quite slow in Debug mode." + vbCrLf + "Use Release mode to get reasonable responsiveness.")
-                msgDeliverCount += 1
-                SaveSetting("OpenCVB", "msgDeliverCount", "msgDeliverCount", msgDeliverCount)
-            End If
-        End If
-        msgDelivered = True
-#End If
         Static leftBytes(rawHeight * rawWidth - 1) As Byte
         Static rightBytes(leftBytes.Length - 1) As Byte
 
@@ -270,8 +207,7 @@ Public Class IntelT265
         Dim frames = pipeline.WaitForFrames(1000)
         Dim f = frames.FirstOrDefault(rs.Stream.Pose)
 
-
-        'Dim poseData = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Pose)
+        Dim poseData = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Pose)
         'Dim imuStruct = Marshal.PtrToStructure(Of T265IMUdata)(poseData.Data)
         'Console.WriteLine("len = " + CStr(Marshal.SizeOf(imuStruct)))
         'imuGyro = imuStruct.translation
@@ -287,7 +223,6 @@ Public Class IntelT265
         'Console.WriteLine("angularAcceleration xyz " + CStr(imuStruct.angularAcceleration.X) + vbTab + CStr(imuStruct.angularAcceleration.Y) + vbTab + CStr(imuStruct.angularAcceleration.Z))
         'Console.WriteLine("trackerConfidence " + CStr(imuStruct.trackerConfidence))
         'Console.WriteLine("mapperConfidence " + CStr(imuStruct.mapperConfidence))
-
 
         Dim images = frames.As(Of rs.FrameSet)()
         Dim fishEye = images.FishEyeFrame()
@@ -310,32 +245,13 @@ Public Class IntelT265
         Dim remapLeft = leftView.Remap(lm1, lm2, cv.InterpolationFlags.Linear)
         Dim remapRight = rightView.Remap(rm1, rm2, cv.InterpolationFlags.Linear)
 
-        '#Const USE_FAILING_COMPUTE_API = 1
-#If USE_FAILING_COMPUTE_API Then
         stereo.Compute(remapLeft, remapRight, disparity) ' Works but doesn't produce the correct results.  C++ version produces correct results.
         ' re-crop just the valid part of the disparity
         validRect = New cv.Rect(maxDisp, 0, disparity.Cols - maxDisp, disparity.Rows)
         disparity.ConvertTo(disparity, cv.MatType.CV_32F, CDbl(1 / 16))
         Dim disp_vis = disparity.Clone()
         disp_vis = disp_vis(validRect)
-#Else
-        Dim leftData(remapLeft.Total * remapLeft.ElemSize - 1) As Byte
-        Marshal.Copy(remapLeft.Data, leftData, 0, leftData.Length - 1)
-        Dim handleLeft = GCHandle.Alloc(leftData, GCHandleType.Pinned)
 
-        Dim rightData(remapRight.Total * remapRight.ElemSize - 1) As Byte
-        Marshal.Copy(remapRight.Data, rightData, 0, rightData.Length - 1)
-        Dim handleRight = GCHandle.Alloc(rightData, GCHandleType.Pinned)
-
-        Dim dispPtr = t265sgm_Run(tPtr, handleLeft.AddrOfPinnedObject(), handleRight.AddrOfPinnedObject(), stereo_size.Height, stereo_size.Width, maxDisp)
-        handleLeft.Free()
-        handleRight.Free()
-
-        Static dstData((remapLeft.Cols - maxDisp) * remapLeft.Rows * 4 - 1) As Byte ' 32-bit float array coming back from C++
-        Marshal.Copy(dispPtr, dstData, 0, dstData.Length)
-        disparity = New cv.Mat(remapLeft.Cols - maxDisp, remapLeft.Rows, cv.MatType.CV_32F, dstData)
-        Dim disp_vis = disparity.Clone()
-#End If
         Dim mask = disp_vis.Threshold(1, 255, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
         disp_vis *= CDbl(255 / numDisp)

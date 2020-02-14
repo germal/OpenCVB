@@ -27,9 +27,6 @@ Module Kinect_Interface
     <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDepthInColor(kc As IntPtr) As IntPtr
     End Function
-    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub KinectClose(kc As IntPtr)
-    End Sub
 End Module
 Public Class Kinect
     Structure imuData
@@ -84,7 +81,7 @@ Public Class Kinect
     Public rightView As cv.Mat
     Public serialNumber As String
     Public w As Int32
-    Public pipelineClosed As Boolean
+    Public pipelineClosed As Boolean = False
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
@@ -97,7 +94,6 @@ Public Class Kinect
             h = height
             disparity = New cv.Mat
             leftView = New cv.Mat
-            pipelineClosed = False
 
             Dim ptr = KinectExtrinsics(kc)
             Dim rotationTranslation(12) As Single
