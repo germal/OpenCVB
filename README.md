@@ -614,7 +614,7 @@ Sample programs.*
 *This synthetic problem demonstrates how to use the Python SciKit package to
 perform a gradient descent problem.*
 
-![](media/b5a3eacfa7c49fff74e9ec5733ee77a1.png)
+![](media/2bb85cf64b4b39f190ba31e5059be427.png)
 
 *A voxel-style view of the depth data in OpenGL is available – see top window.
 The bottom left shows the thread grid used to compute the median depth in each
@@ -623,7 +623,7 @@ voxel while the bottom right shows the voxels colored with their median depth
 options used in each of the contributing algorithms are present below the main
 OpenCVB window.*
 
-![](media/4e524b1046ae6ba349f76388e2c86faa.png)
+![](media/83446a818084895c88dd13d1b30b9e2a.png)
 
 *Support for Intel’s T265 is rudimentary – it is not meant to capture depth and
 the camera is grayscale. The upper left image is the undistorted and remapped
