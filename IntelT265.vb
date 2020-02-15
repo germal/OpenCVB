@@ -84,6 +84,7 @@ Public Class IntelT265
     Public pMatRight As cv.Mat
     Public rMatleft As cv.Mat
     Public rMatRight As cv.Mat
+    Dim QArray(15) As Double
 #End Region
     Private Sub getIntrinsics(leftStream As rs.VideoStreamProfile, rightStream As rs.VideoStreamProfile)
         intrinsicsLeft = leftStream.GetIntrinsics()
@@ -136,7 +137,8 @@ Public Class IntelT265
         ' We need To determine what focal length our undistorted images should have
         ' In order To Set up the camera matrices For initUndistortRectifyMap.  We
         ' could use stereoRectify, but here we show how To derive these projection
-        ' matrices from the calibration And a desired height And field Of view      ' We calculate the undistorted focal length:
+        ' matrices from the calibration And a desired height And field Of view      
+        ' We calculate the undistorted focal length:
         '
         '         h
         ' -----------------
@@ -171,10 +173,10 @@ Public Class IntelT265
 
         ' Construct Q For use With cv2.reprojectImageTo3D. Subtract maxDisp from x
         ' since we will crop the disparity later
-        'Qarray = {1, 0, 0, -(stereo_cx - maxDisp),
-        '          0, 1, 0, -stereo_cy,
-        '          0, 0, 0, stereo_focal_px,
-        '          0, 0, -1 / extrinsics.translation(0), 0}
+        Qarray = {1, 0, 0, -(stereo_cx - maxDisp),
+                  0, 1, 0, -stereo_cy,
+                  0, 0, 0, stereo_focal_px,
+                  0, 0, -1 / extrinsics.translation(0), 0}
 
         kMatleft = New cv.Mat(3, 3, cv.MatType.CV_64F, kLeft)
         dMatleft = New cv.Mat(1, 4, cv.MatType.CV_64F, dLeft)
@@ -248,8 +250,9 @@ Public Class IntelT265
         stereo.Compute(remapLeft, remapRight, disparity) ' Works but doesn't produce the correct results.  C++ version produces correct results.
         ' re-crop just the valid part of the disparity
         validRect = New cv.Rect(maxDisp, 0, disparity.Cols - maxDisp, disparity.Rows)
-        disparity.ConvertTo(disparity, cv.MatType.CV_32F, CDbl(1 / 16))
-        Dim disp_vis = disparity.Clone()
+        Dim disp_vis As New cv.Mat, tmpdisp As New cv.Mat
+        disparity.ConvertTo(disp_vis, cv.MatType.CV_32F, CDbl(1 / 16))
+        disparity.ConvertTo(tmpdisp, cv.MatType.CV_32F, CDbl(1 / 16))
         disp_vis = disp_vis(validRect)
 
         Dim mask = disp_vis.Threshold(1, 255, cv.ThresholdTypes.Binary)
@@ -263,7 +266,17 @@ Public Class IntelT265
         Dim depthRect = New cv.Rect(stereo_cx, 0, tmpRGBDepth.Width, tmpRGBDepth.Height)
         tmpRGBDepth.CopyTo(RGBDepth(depthRect), mask)
 
+        'Dim maxVal As Double, minVal As Double
+        'tmpdisp.MinMaxIdx(minVal, maxVal)
+
         depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
+        'For y = depthRect.Y To depthRect.Y + depthRect.Height - 1
+        '    For x = depthRect.X To depthRect.Width - 1
+        '        Dim nextVal = disparity.At(Of UShort)(y - validRect.Y, x - validRect.X) + 1
+        '        If nextVal > 0 And nextVal < 65000 Then depth16.Set(Of UShort)(y, x, 1000 - nextVal)
+        '    Next
+        'Next
+        disparity(validRect).ConvertTo(depth16(depthRect), cv.MatType.CV_16UC1)
         pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
     End Sub
     Public Sub closePipe()
