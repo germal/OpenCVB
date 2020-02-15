@@ -808,6 +808,7 @@ Public Class OpenCVB
 
         parms.IMUpresent = camera.IMUpresent
         parms.intrinsicsLeft = camera.intrinsicsLeft_VB
+        parms.intrinsicsRight = camera.intrinsicsRight_VB
         parms.extrinsics = camera.Extrinsics_VB
 
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)

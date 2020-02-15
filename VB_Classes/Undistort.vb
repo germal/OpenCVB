@@ -1,17 +1,17 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module undistort_Mats
-    Public Sub getMats(ocvb As AlgorithmData, ByRef kMatLeft As cv.Mat, ByRef dMatLeft As cv.Mat, ByRef rMatLeft As cv.Mat, ByRef pMatLeft As cv.Mat,
-                       maxDisp As Int32, stereo_height_px As Int32)
+    Public Sub undistortSetup(ocvb As AlgorithmData, ByRef kMatLeft As cv.Mat, ByRef dMatLeft As cv.Mat, ByRef rMatLeft As cv.Mat, ByRef pMatLeft As cv.Mat,
+                       maxDisp As Int32, stereo_height_px As Int32, intrinsics As ActiveClass.intrinsics_VB)
         Dim kLeft(8) As Double
         Dim rLeft(8) As Double
         Dim dLeft(4) As Double
         Dim pLeft(11) As Double
 
-        kLeft = {ocvb.parms.intrinsicsLeft.fx, 0, ocvb.parms.intrinsicsLeft.ppx, 0,
-                 ocvb.parms.intrinsicsLeft.fy, ocvb.parms.intrinsicsLeft.ppy, 0, 0, 1}
-        dLeft = {ocvb.parms.intrinsicsLeft.coeffs(0), ocvb.parms.intrinsicsLeft.coeffs(1),
-                 ocvb.parms.intrinsicsLeft.coeffs(2), ocvb.parms.intrinsicsLeft.coeffs(3)}
+        kLeft = {intrinsics.fx, 0, intrinsics.ppx, 0,
+                 intrinsics.fy, intrinsics.ppy, 0, 0, 1}
+        dLeft = {intrinsics.coeffs(0), intrinsics.coeffs(1),
+                 intrinsics.coeffs(2), intrinsics.coeffs(3)}
 
         ' We need To determine what focal length our undistorted images should have
         ' In order To Set up the camera matrices For initUndistortRectifyMap.  We
@@ -82,6 +82,7 @@ Public Class Undistort_Basics : Implements IDisposable
         check.Box(0).Checked = True
         If ocvb.parms.ShowOptions Then check.Show()
 
+        ocvb.label1 = "Left Image with sliders applied"
         ocvb.desc = "Use sliders to control the undistort OpenCV API"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -97,7 +98,7 @@ Public Class Undistort_Basics : Implements IDisposable
 
             maxDisp = sliders.TrackBar4.Value
             Dim stereo_height_px = sliders.TrackBar3.Value
-            getMats(ocvb, kMatLeft, dMatLeft, rMatLeft, pMatLeft, maxDisp, stereo_height_px)
+            undistortSetup(ocvb, kMatLeft, dMatLeft, rMatLeft, pMatLeft, maxDisp, stereo_height_px, ocvb.parms.intrinsicsLeft)
         End If
         If saveK <> sliders.TrackBar1.Value Then
             saveK = sliders.TrackBar1.Value
@@ -123,6 +124,11 @@ Public Class Undistort_Basics : Implements IDisposable
         cv.Cv2.FishEye.InitUndistortRectifyMap(kMat, dMat, rMatLeft, pMatLeft, New cv.Size(rawWidth, rawHeight),
                                                cv.MatType.CV_32FC1, leftViewMap1, leftViewMap2)
         ocvb.result1 = ocvb.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
+
+        If ocvb.parms.cameraIndex = D400Cam Then
+            ocvb.putText(New ActiveClass.TrueType("The current driver for the Intel D400 series doesn't have the intrinsic coefficients!  All zero for now.",
+                                                  10, 125, RESULT2))
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()

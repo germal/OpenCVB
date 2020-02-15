@@ -151,6 +151,7 @@ Public Class IntelD400Series
             intrinsicsLeft_VB.fy = dintrinsicsLeft.fy
             intrinsicsLeft_VB.FOV = dintrinsicsLeft.FOV
             intrinsicsLeft_VB.coeffs = dintrinsicsLeft.coeffs
+            intrinsicsRight_VB = intrinsicsLeft_VB ' How to get the right lens intrinsics?
             Dim extrinsics As rs.Extrinsics = Nothing
             For Each stream In pipeline_profile.Streams
                 extrinsics = stream.GetExtrinsicsTo(pipeline_profile.GetStream(rs.Stream.Infrared))

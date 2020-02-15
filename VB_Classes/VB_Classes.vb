@@ -60,7 +60,8 @@ Public Class ActiveClass : Implements IDisposable
         Public picTag As Int32
         Public x As Int32
         Public y As Int32
-        Public Sub New(_text As String, _x As Int32, _y As Int32, Optional _fontName As String = defaultFont, Optional _fontSize As Double = defaultFontSize, Optional _picTag As Int32 = _RESULT1)
+        Public Sub New(_text As String, _x As Int32, _y As Int32, Optional _fontName As String = defaultFont,
+                       Optional _fontSize As Double = defaultFontSize, Optional _picTag As Int32 = _RESULT1)
             text = _text
             x = _x
             y = _y
@@ -112,6 +113,7 @@ Public Class ActiveClass : Implements IDisposable
         Dim IMUpresent As Boolean
         Dim imuTimeStamp As Double
         Dim intrinsicsLeft As intrinsics_VB
+        Dim intrinsicsRight As intrinsics_VB
         Dim lowResolution As Boolean
         Dim mainFormHeight As Int32
         Dim mainFormLoc As Point

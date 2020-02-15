@@ -74,6 +74,7 @@ Public Class Kinect
     Public imuPresent As Boolean = True ' kinect cameras always have an IMU.
     Public imuTimeStamp As Double
     Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
+    Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public modelInverse As Boolean
     Public pointCloud As New cv.Mat
     Public pcMultiplier As Single = 0.001
@@ -123,6 +124,8 @@ Public Class Kinect
             intrinsicsLeft_VB.coeffs(3) = intrinsicsLeftOutput.k4
             intrinsicsLeft_VB.coeffs(4) = intrinsicsLeftOutput.k5
             intrinsicsLeft_VB.coeffs(5) = intrinsicsLeftOutput.k6
+
+            intrinsicsRight_VB = intrinsicsLeft_VB ' there is no right lens - just copy for compatibility.
 
             ReDim colorBytes(w * h * 3 - 1)
             ReDim RGBDepthBytes(w * h * 3 - 1)

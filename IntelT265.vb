@@ -18,8 +18,6 @@ Public Class IntelT265
     Dim dLeft(3) As Double
     Dim dRight(3) As Double
     Dim h As Int32
-    Dim intrinsicsLeft As rs.Intrinsics
-    Dim intrinsicsRight As rs.Intrinsics
     Dim kLeft(8) As Double
     Dim kRight(8) As Double
     Dim leftStream As rs.VideoStreamProfile
@@ -67,6 +65,7 @@ Public Class IntelT265
     Public IMUpresent As Boolean
     Public imuTimeStamp As Double
     Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
+    Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public leftView As cv.Mat
     Public modelInverse As Boolean
     Public pc As New rs.PointCloud
@@ -86,17 +85,15 @@ Public Class IntelT265
     Public rMatRight As cv.Mat
     Dim QArray(15) As Double
 #End Region
-    Private Sub getIntrinsics(leftStream As rs.VideoStreamProfile, rightStream As rs.VideoStreamProfile)
-        intrinsicsLeft = leftStream.GetIntrinsics()
-        intrinsicsRight = rightStream.GetIntrinsics()
-        intrinsicsLeft_VB.width = intrinsicsLeft.width
-        intrinsicsLeft_VB.height = intrinsicsLeft.height
-        intrinsicsLeft_VB.ppx = intrinsicsLeft.ppx
-        intrinsicsLeft_VB.ppy = intrinsicsLeft.ppy
-        intrinsicsLeft_VB.fx = intrinsicsLeft.fx
-        intrinsicsLeft_VB.fy = intrinsicsLeft.fy
-        intrinsicsLeft_VB.FOV = intrinsicsLeft.FOV
-        intrinsicsLeft_VB.coeffs = intrinsicsLeft.coeffs
+    Private Sub getIntrinsics(ByRef vb_intrin As VB_Classes.ActiveClass.intrinsics_VB, intrinsics As rs.Intrinsics)
+        vb_intrin.width = intrinsics.width
+        vb_intrin.height = intrinsics.height
+        vb_intrin.ppx = intrinsics.ppx
+        vb_intrin.ppy = intrinsics.ppy
+        vb_intrin.fx = intrinsics.fx
+        vb_intrin.fy = intrinsics.fy
+        vb_intrin.FOV = intrinsics.FOV
+        vb_intrin.coeffs = intrinsics.coeffs
     End Sub
     Public Sub New()
     End Sub
@@ -123,16 +120,17 @@ Public Class IntelT265
         Extrinsics_VB.rotation = extrinsics.rotation
         Extrinsics_VB.translation = extrinsics.translation
 
-        getIntrinsics(leftStream, rightStream)
+        Dim intrinsics = leftStream.GetIntrinsics()
+        getIntrinsics(intrinsicsLeft_VB, intrinsics)
+        rawWidth = intrinsics.width
+        rawHeight = intrinsics.height
+        kLeft = {intrinsics.fx, 0, intrinsics.ppx, 0, intrinsics.fy, intrinsics.ppy, 0, 0, 1}
+        dLeft = {intrinsics.coeffs(0), intrinsics.coeffs(1), intrinsics.coeffs(2), intrinsics.coeffs(3)}
 
-        rawWidth = intrinsicsLeft.width
-        rawHeight = intrinsicsLeft.height
-
-        kLeft = {intrinsicsLeft.fx, 0, intrinsicsLeft.ppx, 0, intrinsicsLeft.fy, intrinsicsLeft.ppy, 0, 0, 1}
-        dLeft = {intrinsicsLeft.coeffs(0), intrinsicsLeft.coeffs(1), intrinsicsLeft.coeffs(2), intrinsicsLeft.coeffs(3)}
-
-        kRight = {intrinsicsRight.fx, 0, intrinsicsRight.ppx, 0, intrinsicsRight.fy, intrinsicsRight.ppy, 0, 0, 1}
-        dRight = {intrinsicsRight.coeffs(0), intrinsicsRight.coeffs(1), intrinsicsRight.coeffs(2), intrinsicsRight.coeffs(3)}
+        intrinsics = rightStream.GetIntrinsics()
+        getIntrinsics(intrinsicsRight_VB, intrinsics)
+        kRight = {intrinsics.fx, 0, intrinsics.ppx, 0, intrinsics.fy, intrinsics.ppy, 0, 0, 1}
+        dRight = {intrinsics.coeffs(0), intrinsics.coeffs(1), intrinsics.coeffs(2), intrinsics.coeffs(3)}
 
         ' We need To determine what focal length our undistorted images should have
         ' In order To Set up the camera matrices For initUndistortRectifyMap.  We
