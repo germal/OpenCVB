@@ -88,7 +88,7 @@ Public Class ActiveClass : Implements IDisposable
         Public rotation As Single()
         Public translation As Single()
     End Structure
-    Public Structure Intrinsics_VB
+    Public Structure intrinsics_VB
         Public width As Integer
         Public height As Integer
         Public ppx As Single
@@ -111,7 +111,7 @@ Public Class ActiveClass : Implements IDisposable
         Dim imuGyro As cv.Point3f
         Dim IMUpresent As Boolean
         Dim imuTimeStamp As Double
-        Dim intrinsics As Intrinsics_VB
+        Dim intrinsicsLeft As intrinsics_VB
         Dim lowResolution As Boolean
         Dim mainFormHeight As Int32
         Dim mainFormLoc As Point
@@ -126,16 +126,6 @@ Public Class ActiveClass : Implements IDisposable
         Dim useRecordedData As Boolean
         Dim vtkDirectory As String
         Dim width As Int32
-
-        Dim kMatleft As cv.Mat
-        Dim dMatleft As cv.Mat
-        Dim rMatleft As cv.Mat
-        Dim pMatleft As cv.Mat
-
-        Dim kMatRight As cv.Mat
-        Dim dMatRight As cv.Mat
-        Dim rMatRight As cv.Mat
-        Dim pMatRight As cv.Mat
 
     End Structure
     Public Sub New(parms As algorithmParameters)

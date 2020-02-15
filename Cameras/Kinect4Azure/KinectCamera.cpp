@@ -178,7 +178,7 @@ int *KinectExtrinsics(KinectCamera *kc)
 }
 
 extern "C" __declspec(dllexport)
-int *KinectIntrinsics(KinectCamera *kc)
+int *KinectintrinsicsLeft(KinectCamera *kc)
 {
 	return (int *)&kc->calibration.color_camera_calibration.intrinsics.parameters;
 }

@@ -633,6 +633,14 @@ right raw camera views (stretched to accommodate the frame size.) While none of
 the algorithms fail when running the T265, not all of them produce anything
 useful as depth is not provided by the camera.*
 
+![](media/64c52c2be85cafd12a707e52aa3a8cbc.png)
+
+*OpenCV’s InitUndistortRectifyMat and Remap API’s can be used to manipulate the
+image arbitrarily. Here one of the sliders in the interface has introduced
+barrel distortion in the lower left image. This is a useful exercise to get an
+more intuitive understanding of the parameters needed to rectify and undistort
+an image.*
+
 **Future Work**
 
 The plan is to continue adding more algorithms. There are numerous published

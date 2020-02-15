@@ -39,10 +39,10 @@ Public Class OpenGL_Basics : Implements IDisposable
             timeConversionUnits = 1000 * 1000
             imuAlphaFactor = 0.99
         End If
-        ' setup the memory mapped area and initialize the intrinsics needed to convert imageXYZ to worldXYZ and for command/control of the interface.
+        ' setup the memory mapped area and initialize the intrinsicsLeft needed to convert imageXYZ to worldXYZ and for command/control of the interface.
         For i = 0 To memMapValues.Length - 1
             ' only change this if you are changing the data in the OpenGL C++ code at the same time...
-            memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.parms.intrinsics.fx, ocvb.parms.intrinsics.fy, ocvb.parms.intrinsics.ppx, ocvb.parms.intrinsics.ppy,
+            memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy, ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy,
                                             rgbInput.Width, rgbInput.Height, rgbInput.ElemSize * rgbInput.Total,
                                             dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
                                             ocvb.parms.imuGyro.X, ocvb.parms.imuGyro.Y, ocvb.parms.imuGyro.Z,

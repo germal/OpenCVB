@@ -30,10 +30,10 @@ Module T265_Module
     Public Function T265LeftRaw(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265IntrinsicsLeft(tp As IntPtr) As IntPtr
+    Public Function T265intrinsicsLeft(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265IntrinsicsRight(tp As IntPtr) As IntPtr
+    Public Function T265intrinsicsLeftRight(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265Extrinsics(tp As IntPtr) As IntPtr
@@ -84,7 +84,7 @@ Public Class IntelT265_CPP_Version
     Public imuGyro As cv.Point3f
     Public IMUpresent As Boolean = True
     Public imuTimeStamp As Double
-    Public intrinsics_VB As VB_Classes.ActiveClass.Intrinsics_VB
+    Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public leftView As cv.Mat
     Public modelInverse As Boolean
     Public pc As New rs.PointCloud
@@ -104,15 +104,15 @@ Public Class IntelT265_CPP_Version
     Public rMatRight As cv.Mat
 
 #End Region
-    Private Sub setIntrinsics(intrinsicsLeft As rs.Intrinsics)
-        intrinsics_VB.width = intrinsicsLeft.width
-        intrinsics_VB.height = intrinsicsLeft.height
-        intrinsics_VB.ppx = intrinsicsLeft.ppx
-        intrinsics_VB.ppy = intrinsicsLeft.ppy
-        intrinsics_VB.fx = intrinsicsLeft.fx
-        intrinsics_VB.fy = intrinsicsLeft.fy
-        intrinsics_VB.FOV = intrinsicsLeft.FOV
-        intrinsics_VB.coeffs = intrinsicsLeft.coeffs
+    Private Sub setintrinsicsLeft(intrinsicsLeft As rs.Intrinsics)
+        intrinsicsLeft_VB.width = intrinsicsLeft.width
+        intrinsicsLeft_VB.height = intrinsicsLeft.height
+        intrinsicsLeft_VB.ppx = intrinsicsLeft.ppx
+        intrinsicsLeft_VB.ppy = intrinsicsLeft.ppy
+        intrinsicsLeft_VB.fx = intrinsicsLeft.fx
+        intrinsicsLeft_VB.fy = intrinsicsLeft.fy
+        intrinsicsLeft_VB.FOV = intrinsicsLeft.FOV
+        intrinsicsLeft_VB.coeffs = intrinsicsLeft.coeffs
     End Sub
     Public Sub New()
     End Sub
@@ -126,9 +126,9 @@ Public Class IntelT265_CPP_Version
         depth16Width = T265Depth16Width(tp)
         depth16Height = T265Depth16Height(tp)
 
-        Dim intrin = T265IntrinsicsLeft(tp)
+        Dim intrin = T265intrinsicsLeft(tp)
         intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
-        setIntrinsics(intrinsicsLeft)
+        setintrinsicsLeft(intrinsicsLeft)
 
         Dim extrin = T265Extrinsics(tp)
         extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin)

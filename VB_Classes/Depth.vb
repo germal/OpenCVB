@@ -560,7 +560,7 @@ Public Class Depth_XYZ_OpenMP_CPP : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ' can't do this in the constructor because intrinsics were not initialized yet (because zinput was not initialized until algorithm thread starts.
-        If ocvb.frameCount = 0 Then DepthXYZ = Depth_XYZ_OpenMP_Open(ocvb.parms.intrinsics.ppx, ocvb.parms.intrinsics.ppy, ocvb.parms.intrinsics.fx, ocvb.parms.intrinsics.fy)
+        If ocvb.frameCount = 0 Then DepthXYZ = Depth_XYZ_OpenMP_Open(ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy)
 
         Dim depthData(ocvb.depth16.Total * ocvb.depth16.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned) ' pin it for the duration...

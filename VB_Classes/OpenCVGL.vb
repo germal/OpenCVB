@@ -63,7 +63,7 @@ Public Class OpenCVGL_Image_CPP : Implements IDisposable
         Dim eye As New cv.Vec3f(sliders2.TrackBar1.Value, sliders2.TrackBar2.Value, sliders2.TrackBar3.Value)
         Dim zTrans = sliders1.TrackBar4.Value / 100
 
-        OpenCVGL_Image_Control(ocvb.parms.intrinsics.ppx, ocvb.parms.intrinsics.ppy, ocvb.parms.intrinsics.fx, ocvb.parms.intrinsics.fy,
+        OpenCVGL_Image_Control(ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy,
                                FOV, zNear, zFar, eye, yaw, roll, pitch, pointSize, zTrans, ocvb.color.Width, ocvb.color.Height)
 
         Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize

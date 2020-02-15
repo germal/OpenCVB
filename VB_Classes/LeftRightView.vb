@@ -127,6 +127,7 @@ End Class
 
 
 Public Class LeftRightView_CompareRaw : Implements IDisposable
+    Dim lrView As LeftRightView_Basics
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 100)
@@ -146,35 +147,30 @@ Public Class LeftRightView_CompareRaw : Implements IDisposable
                 ocvb.label2 = "Raw Right Right Image"
                 sliders.TrackBar1.Value = 50
         End Select
+        lrView = New LeftRightView_Basics(ocvb)
+        lrView.sliders.Hide()
         ocvb.desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+
         ocvb.leftView += sliders.TrackBar1.Value
         ocvb.rightView += sliders.TrackBar1.Value
 
-        ocvb.result1 = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_8UC1, 0)
-        ocvb.result2 = ocvb.leftView
-
+        lrView.Run(ocvb)
+        Dim leftView = ocvb.result1.Clone() ' we will be using result1 for output now.
         ocvb.result1.SetTo(0)
+
         Dim sliceY = sliders.TrackBar2.Value
         Dim slideHeight = sliders.TrackBar3.Value
-        Dim slideWidth = ocvb.leftView.Width
-        If ocvb.parms.lowResolution Then slideWidth /= 2
-        ocvb.leftView(New cv.Rect(0, sliceY, slideWidth, slideHeight)).CopyTo(ocvb.result1(New cv.Rect(0, 100, slideWidth, slideHeight)))
-        ocvb.rightView(New cv.Rect(0, sliceY, slideWidth, slideHeight)).CopyTo(ocvb.result1(New cv.Rect(0, 100 + slideHeight, slideWidth, slideHeight)))
-        Dim rSrc = New cv.Rect(0, sliceY, ocvb.leftView.Width, slideHeight)
-        If ocvb.parms.lowResolution Then
-            Dim rDst1 = New cv.Rect(0, 100, ocvb.result1.Width, slideHeight)
-            Dim rDst2 = New cv.Rect(0, 100 + slideHeight, ocvb.result1.Width, slideHeight)
-            ocvb.result1(rDst1) = ocvb.leftView(rSrc).Resize(New cv.Size(ocvb.result1.Width, slideHeight))
-            ocvb.result1(rDst2) = ocvb.rightView(rSrc).Resize(New cv.Size(ocvb.result1.Width, slideHeight))
-        Else
-            ocvb.leftView(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100, ocvb.leftView.Width, slideHeight)))
-            ocvb.rightView(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100 + slideHeight, ocvb.leftView.Width, slideHeight)))
-        End If
+        leftView(New cv.Rect(0, sliceY, leftView.Width, slideHeight)).CopyTo(ocvb.result1(New cv.Rect(0, 100, leftView.Width, slideHeight)))
+        ocvb.result2(New cv.Rect(0, sliceY, leftView.Width, slideHeight)).CopyTo(ocvb.result1(New cv.Rect(0, 100 + slideHeight, leftView.Width, slideHeight)))
+        Dim rSrc = New cv.Rect(0, sliceY, leftView.Width, slideHeight)
+        leftView(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100, leftView.Width, slideHeight)))
+        ocvb.result2(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100 + slideHeight, leftView.Width, slideHeight)))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
+        lrView.Dispose()
     End Sub
 End Class
 
@@ -183,25 +179,39 @@ End Class
 
 
 Public Class LeftRightView_Features : Implements IDisposable
+    Dim lrView As LeftRightView_Basics
     Dim features As Features_GoodFeatures
     Public Sub New(ocvb As AlgorithmData)
         features = New Features_GoodFeatures(ocvb)
         features.externalUse = True
 
+        lrView = New LeftRightView_Basics(ocvb)
+
         ocvb.desc = "Find GoodFeatures in the left and right depalettized infrared images"
-        ocvb.label1 = "Infrared Left Image"
-        ocvb.label2 = "Infrared Right Image"
+        ocvb.label1 = "Left Image"
+        ocvb.label2 = "Right Image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        features.gray = ocvb.rightView
-        features.Run(ocvb)
-        ocvb.result1.CopyTo(ocvb.result2) ' save the right image
+        lrView.Run(ocvb)
+        Dim leftView = ocvb.result1.Clone()
+        Dim rightView = ocvb.result2.Clone()
 
-        features.gray = ocvb.leftView
+        features.gray = rightView.Clone()
         features.Run(ocvb)
+        rightView.CopyTo(ocvb.result2) ' save the right image
+        For i = 0 To features.goodFeatures.Count - 1
+            cv.Cv2.Circle(ocvb.result2, features.goodFeatures(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        Next
+
+        features.gray = leftView
+        features.Run(ocvb)
+        For i = 0 To features.goodFeatures.Count - 1
+            cv.Cv2.Circle(ocvb.result1, features.goodFeatures(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        Next
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         features.Dispose()
+        lrView.Dispose()
     End Sub
 End Class
 
@@ -209,19 +219,24 @@ End Class
 
 
 Public Class LeftRightView_Palettized : Implements IDisposable
+    Dim lrView As LeftRightView_Basics
     Public Sub New(ocvb As AlgorithmData)
+        lrView = New LeftRightView_Basics(ocvb)
         ocvb.desc = "Add color to the 8-bit infrared images."
-        ocvb.label1 = "Infrared Left Image"
-        ocvb.label2 = "Infrared Right Image"
+        ocvb.label1 = "Left Image"
+        ocvb.label2 = "Right Image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.result1 = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lrView.Run(ocvb)
+
+        ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.ApplyColorMap(ocvb.result1, ocvb.result1, cv.ColormapTypes.Rainbow)
 
-        ocvb.result2 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.ApplyColorMap(ocvb.result2, ocvb.result2, cv.ColormapTypes.Rainbow)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+        lrView.Dispose()
     End Sub
 End Class
 
@@ -229,6 +244,7 @@ End Class
 
 
 Public Class LeftRightView_BRISK : Implements IDisposable
+    Dim lrView As LeftRightView_Basics
     Dim brisk As BRISK_Basics
     Public Sub New(ocvb As AlgorithmData)
         ocvb.desc = "Add color to the 8-bit infrared images."
@@ -238,26 +254,28 @@ Public Class LeftRightView_BRISK : Implements IDisposable
         brisk = New BRISK_Basics(ocvb)
         brisk.externalUse = True
         brisk.sliders.TrackBar1.Value = 20
+
+        lrView = New LeftRightView_Basics(ocvb)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        brisk.src = ocvb.rightView.Clone()
-        ocvb.result2 = ocvb.rightView.Clone()
+        lrView.Run(ocvb)
+        brisk.src = ocvb.result2.Clone()
         brisk.Run(ocvb)
 
         For Each pt In brisk.features
-            ocvb.result2.Circle(pt, 2, cv.Scalar.Green, -1, cv.LineTypes.AntiAlias)
+            ocvb.result2.Circle(pt, 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
-        brisk.src = ocvb.leftView.Clone()
-        ocvb.result1 = ocvb.leftView.Clone()
+        brisk.src = ocvb.result1.Clone()
         brisk.Run(ocvb)
 
         For Each pt In brisk.features
-            ocvb.result1.Circle(pt, 2, cv.Scalar.Green, -1, cv.LineTypes.AntiAlias)
+            ocvb.result1.Circle(pt, 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         brisk.Dispose()
+        lrView.Dispose()
     End Sub
 End Class
 

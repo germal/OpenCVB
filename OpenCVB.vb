@@ -761,17 +761,7 @@ Public Class OpenCVB
         parms.PythonExe = optionsForm.PythonExeName.Text
         parms.vtkDirectory = vtkDirectory
         parms.HomeDir = HomeDir.FullName
-        If optionsForm.cameraIndex = OptionsDialog.T265Camera Then
-            parms.kMatleft = camera.kMatLeft
-            parms.dMatleft = camera.dMatleft
-            parms.rMatleft = camera.rMatleft
-            parms.pMatleft = camera.pMatleft
 
-            parms.kMatRight = camera.kMatright
-            parms.dMatRight = camera.dMatright
-            parms.rMatRight = camera.rMatright
-            parms.pMatRight = camera.pMatright
-        End If
         parms.OpenCVfullPath = OpenCVfullPath
         parms.mainFormLoc = Me.Location
         parms.mainFormHeight = Me.Height
@@ -817,7 +807,7 @@ Public Class OpenCVB
         End If
 
         parms.IMUpresent = camera.IMUpresent
-        parms.intrinsics = camera.Intrinsics_VB
+        parms.intrinsicsLeft = camera.intrinsicsLeft_VB
         parms.extrinsics = camera.Extrinsics_VB
 
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)

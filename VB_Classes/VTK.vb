@@ -37,7 +37,7 @@ Public Class VTK_Basics : Implements IDisposable
         ocvb.desc = "Create VTK window and update it with images"
     End Sub
     Private Sub memMapUpdate(ocvb As AlgorithmData)
-        ' setup the memory mapped area and initialize the intrinsics needed to convert imageXYZ to worldXYZ and for command/control of the interface.
+        ' setup the memory mapped area and initialize the intrinsicsLeft needed to convert imageXYZ to worldXYZ and for command/control of the interface.
         For i = 0 To memMapSysData.Length - 1
             ' only change this if you are changing the data in the VTK C++ code at the same time...
             memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.color.Width, ocvb.color.Height, dataInput.Total * dataInput.ElemSize,

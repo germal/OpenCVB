@@ -39,7 +39,8 @@ Public Class IntelD400Series
     Public imuGyro As cv.Point3f
     Public IMUpresent As Boolean
     Public imuTimeStamp As Double
-    Public intrinsics_VB As VB_Classes.ActiveClass.Intrinsics_VB
+    Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
+    Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public modelInverse As Boolean
     Public pc As New rs.PointCloud
     Public pcMultiplier As Single = 1
@@ -138,18 +139,18 @@ Public Class IntelD400Series
             MsgBox("We only support the D435, D415, or D435I cameras. " + vbCrLf + "Is this a new device?  It is called: " + deviceName)
             deviceCount = 0
         Else
-            Dim dIntrinsics = pipeline_profile.GetStream(rs.Stream.Depth).As(Of rs.VideoStreamProfile).GetIntrinsics
-            Dim cIntrinsics = pipeline_profile.GetStream(rs.Stream.Color).As(Of rs.VideoStreamProfile).GetIntrinsics
-            w = dIntrinsics.width
-            h = dIntrinsics.height
-            intrinsics_VB.width = dIntrinsics.width
-            intrinsics_VB.height = dIntrinsics.height
-            intrinsics_VB.ppx = dIntrinsics.ppx
-            intrinsics_VB.ppy = dIntrinsics.ppy
-            intrinsics_VB.fx = dIntrinsics.fx
-            intrinsics_VB.fy = dIntrinsics.fy
-            intrinsics_VB.FOV = dIntrinsics.FOV
-            intrinsics_VB.coeffs = dIntrinsics.coeffs
+            Dim dintrinsicsLeft = pipeline_profile.GetStream(rs.Stream.Depth).As(Of rs.VideoStreamProfile).GetIntrinsics
+            Dim cintrinsicsLeft = pipeline_profile.GetStream(rs.Stream.Color).As(Of rs.VideoStreamProfile).GetIntrinsics
+            w = dintrinsicsLeft.width
+            h = dintrinsicsLeft.height
+            intrinsicsLeft_VB.width = dintrinsicsLeft.width
+            intrinsicsLeft_VB.height = dintrinsicsLeft.height
+            intrinsicsLeft_VB.ppx = dintrinsicsLeft.ppx
+            intrinsicsLeft_VB.ppy = dintrinsicsLeft.ppy
+            intrinsicsLeft_VB.fx = dintrinsicsLeft.fx
+            intrinsicsLeft_VB.fy = dintrinsicsLeft.fy
+            intrinsicsLeft_VB.FOV = dintrinsicsLeft.FOV
+            intrinsicsLeft_VB.coeffs = dintrinsicsLeft.coeffs
             Dim extrinsics As rs.Extrinsics = Nothing
             For Each stream In pipeline_profile.Streams
                 extrinsics = stream.GetExtrinsicsTo(pipeline_profile.GetStream(rs.Stream.Infrared))

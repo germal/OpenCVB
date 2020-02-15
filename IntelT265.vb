@@ -66,7 +66,7 @@ Public Class IntelT265
     Public imuGyro As cv.Point3f
     Public IMUpresent As Boolean
     Public imuTimeStamp As Double
-    Public intrinsics_VB As VB_Classes.ActiveClass.Intrinsics_VB
+    Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public leftView As cv.Mat
     Public modelInverse As Boolean
     Public pc As New rs.PointCloud
@@ -89,14 +89,14 @@ Public Class IntelT265
     Private Sub getIntrinsics(leftStream As rs.VideoStreamProfile, rightStream As rs.VideoStreamProfile)
         intrinsicsLeft = leftStream.GetIntrinsics()
         intrinsicsRight = rightStream.GetIntrinsics()
-        intrinsics_VB.width = intrinsicsLeft.width
-        intrinsics_VB.height = intrinsicsLeft.height
-        intrinsics_VB.ppx = intrinsicsLeft.ppx
-        intrinsics_VB.ppy = intrinsicsLeft.ppy
-        intrinsics_VB.fx = intrinsicsLeft.fx
-        intrinsics_VB.fy = intrinsicsLeft.fy
-        intrinsics_VB.FOV = intrinsicsLeft.FOV
-        intrinsics_VB.coeffs = intrinsicsLeft.coeffs
+        intrinsicsLeft_VB.width = intrinsicsLeft.width
+        intrinsicsLeft_VB.height = intrinsicsLeft.height
+        intrinsicsLeft_VB.ppx = intrinsicsLeft.ppx
+        intrinsicsLeft_VB.ppy = intrinsicsLeft.ppy
+        intrinsicsLeft_VB.fx = intrinsicsLeft.fx
+        intrinsicsLeft_VB.fy = intrinsicsLeft.fy
+        intrinsicsLeft_VB.FOV = intrinsicsLeft.FOV
+        intrinsicsLeft_VB.coeffs = intrinsicsLeft.coeffs
     End Sub
     Public Sub New()
     End Sub

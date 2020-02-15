@@ -25,7 +25,7 @@ Public Class Features_GoodFeatures : Implements IDisposable
         goodFeatures.Clear()
         For i = 0 To features.Length - 1
             goodFeatures.Add(features.ElementAt(i))
-            If externalUse = False Then cv.Cv2.Circle(ocvb.result1, features(i), 3, New cv.Scalar(0, 0, 255), -1, cv.LineTypes.AntiAlias)
+            If externalUse = False Then cv.Cv2.Circle(ocvb.result1, features(i), 3, cv.Scalar.white, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
