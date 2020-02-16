@@ -126,8 +126,10 @@ Public Class Undistort_Basics : Implements IDisposable
         ocvb.result1 = ocvb.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
 
         If ocvb.parms.cameraIndex = D400Cam Then
-            ocvb.putText(New ActiveClass.TrueType("The current driver for the Intel D400 series doesn't have the intrinsic coefficients!  All zero for now.",
-                                                  10, 125, RESULT2))
+            ocvb.result2.SetTo(0)
+            ocvb.putText(New ActiveClass.TrueType("The current driver for the Intel D400 series doesn't have the intrinsic coefficients!  All zero for now.", 10, 125, RESULT2))
+        Else
+            ocvb.result2 = ocvb.color.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
