@@ -178,6 +178,7 @@ Public Class Plot_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         hist = New Histogram_Basics(ocvb)
         hist.externalUse = True
+        hist.plotRequested = True
 
         plot = New Plot_Basics_CPP(ocvb)
         plot.externalUse = True
@@ -188,9 +189,7 @@ Public Class Plot_Basics : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse Then
-            hist.sliders.TrackBar1.Hide()
-            hist.sliders.TrackBar2.Hide()
-            hist.sliders.TrackBar3.Hide()
+            If hist.sliders.Visible Then hist.sliders.Hide()
         Else
             hist.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             hist.plotColors(0) = cv.Scalar.White

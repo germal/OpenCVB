@@ -80,6 +80,7 @@ Public Class Histogram_Basics : Implements IDisposable
     Public minRange As Int32 = 0
     Public maxRange As Int32 = 255
     Public externalUse As Boolean
+    Public plotRequested As Boolean
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Histogram Bins", 2, 256, 256)
@@ -90,12 +91,8 @@ Public Class Histogram_Basics : Implements IDisposable
         ocvb.desc = "Plot histograms for up to 3 channels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
-            src = ocvb.color
-            bins = sliders.TrackBar1.Value
-        Else
-            If sliders.Visible Then sliders.Hide()
-        End If
+        If externalUse = False Then src = ocvb.color
+        bins = sliders.TrackBar1.Value
 
         Dim thickness = sliders.TrackBar2.Value
         Dim dimensions() = New Integer() {bins}
@@ -111,7 +108,7 @@ Public Class Histogram_Basics : Implements IDisposable
             histRaw(i) = hist.Clone()
             histRaw(i).MinMaxLoc(0, maxVal)
             histNormalized(i) = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
-            If externalUse = False Then
+            If externalUse = False Or plotRequested Then
                 Dim points = New List(Of cv.Point)
                 Dim listOfPoints = New List(Of List(Of cv.Point))
                 For j = 0 To bins - 1
@@ -122,7 +119,7 @@ Public Class Histogram_Basics : Implements IDisposable
             End If
         Next
 
-        If externalUse = False Then
+        If externalUse = False Or plotRequested Then
             maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
             AddPlotScale(ocvb.result1, maxVal, sliders.TrackBar3.Value / 10)
             ocvb.label1 = "Histogram for Color image above - " + CStr(bins) + " bins"
