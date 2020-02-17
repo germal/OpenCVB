@@ -1,4 +1,5 @@
 ﻿Imports cv = OpenCvSharp
+Imports System.Runtime.InteropServices
 Public Class Brightness_Clahe : Implements IDisposable ' Contrast Limited Adaptive Histogram Equalization (CLAHE)
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
@@ -114,3 +115,122 @@ Public Class Brightness_Gamma : Implements IDisposable
     End Sub
 End Class
 
+
+
+
+Module Brightness_Module
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function WhiteBalance_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub WhiteBalance_Close(wPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function WhiteBalance_Run(wPtr As IntPtr, rgb As IntPtr, rows As Int32, cols As Int32, thresholdVal As Single) As IntPtr
+    End Function
+End Module
+
+
+
+
+
+' https://blog.csdn.net/just_sort/article/details/85982871
+Public Class Brightness_WhiteBalance_CPP : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Dim wPtr As IntPtr
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "White balance threshold X100", 1, 100, 10)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        wPtr = WhiteBalance_Open()
+        ocvb.label1 = "Image with auto white balance"
+        ocvb.label2 = "White pixels were altered from the original"
+        ocvb.desc = "Automate getting the right white balance"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim rgbData(ocvb.color.Total * ocvb.color.ElemSize - 1) As Byte
+        Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
+        Marshal.Copy(ocvb.color.Data, rgbData, 0, rgbData.Length)
+
+        Dim thresholdVal As Single = sliders.TrackBar1.Value / 100
+        Dim rgbPtr = WhiteBalance_Run(wPtr, handleSrc.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols, thresholdVal)
+        handleSrc.Free()
+
+        ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, rgbPtr) ' no need to copy.  rgbPtr points to C++ data, not managed.
+        Dim diff = ocvb.result1 - ocvb.color
+        diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ocvb.result2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        WhiteBalance_Close(wPtr)
+        sliders.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+' https://blog.csdn.net/just_sort/article/details/85982871
+Public Class Brightness_WhiteBalance : Implements IDisposable
+    Dim hist As Histogram_Basics
+    Dim sliders As New OptionsSliders
+    Dim wPtr As IntPtr
+    Public Sub New(ocvb As AlgorithmData)
+        hist = New Histogram_Basics(ocvb)
+        hist.bins = 256 * 3
+        hist.maxRange = hist.bins
+        hist.externalUse = True
+
+        sliders.setupTrackBar1(ocvb, "White balance threshold X100", 1, 100, 10)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        ocvb.label1 = "Image with auto white balance"
+        ocvb.label2 = "White pixels were altered from the original"
+        ocvb.desc = "Automate getting the right white balance - faster than the C++ version"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim rgb32f As New cv.Mat
+        ocvb.color.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
+        Dim maxInput = New cv.Mat(rgb32f.Rows, rgb32f.Cols * 3, cv.MatType.CV_32F, rgb32f.Data)
+        Dim maxVal As Double, minVal As Double
+        maxInput.MinMaxLoc(minVal, maxVal)
+
+        Dim planes() = rgb32f.Split()
+        Dim sum32f = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32F)
+        sum32f = planes(0) + planes(1) + planes(2)
+        hist.src = sum32f
+        hist.Run(ocvb)
+
+        Dim thresholdVal = sliders.TrackBar1.Value / 100
+        Dim sum As Single
+        Dim threshold As Int32
+        For i = hist.histRaw(0).Rows - 1 To 0 Step -1
+            sum += hist.histRaw(0).At(Of Single)(i, 0)
+            If sum > hist.src.Rows * hist.src.Cols * thresholdVal Then
+                threshold = i
+                Exit For
+            End If
+        Next
+
+        Dim mask = sum32f.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(1)
+
+        Dim mean = rgb32f.Mean(mask)
+        For i = 0 To rgb32f.Channels - 1
+            planes(i) *= maxVal / mean.Item(i)
+            planes(i) = planes(i).Threshold(255, 255, cv.ThresholdTypes.Trunc)
+        Next
+
+        cv.Cv2.Merge(planes, rgb32f)
+        rgb32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC3)
+
+        Dim diff = ocvb.result1 - ocvb.color
+        diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ocvb.result2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        WhiteBalance_Close(wPtr)
+        sliders.Dispose()
+        hist.Dispose()
+    End Sub
+End Class

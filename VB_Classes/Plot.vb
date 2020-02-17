@@ -196,11 +196,11 @@ Public Class Plot_Basics : Implements IDisposable
             hist.plotColors(0) = cv.Scalar.White
             hist.Run(ocvb)
             plot.dst = ocvb.result2
-            ReDim plot.srcX(hist.histRGBraw(0).Rows - 1)
-            ReDim plot.srcY(hist.histRGBraw(0).Rows - 1)
+            ReDim plot.srcX(hist.histRaw(0).Rows - 1)
+            ReDim plot.srcY(hist.histRaw(0).Rows - 1)
             For i = 0 To plot.srcX.Length - 1
                 plot.srcX(i) = i
-                plot.srcY(i) = hist.histRGBraw(0).At(Of Single)(i, 0)
+                plot.srcY(i) = hist.histRaw(0).At(Of Single)(i, 0)
             Next
             plot.Run(ocvb)
             ocvb.label1 = "histogram with " + ocvb.label1

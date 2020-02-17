@@ -110,5 +110,8 @@
     <ClCompile Include="SuperPixels.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WhiteBalance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

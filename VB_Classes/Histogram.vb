@@ -73,8 +73,8 @@ End Module
 ' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
 Public Class Histogram_Basics : Implements IDisposable
     Public sliders As New OptionsSliders
-    Public histRGBraw(2) As cv.Mat
-    Public histRGBnormalized(2) As cv.Mat
+    Public histRaw(2) As cv.Mat
+    Public histNormalized(2) As cv.Mat
     Public src As New cv.Mat
     Public bins As Int32 = 50
     Public minRange As Int32 = 0
@@ -90,11 +90,16 @@ Public Class Histogram_Basics : Implements IDisposable
         ocvb.desc = "Plot histograms for up to 3 channels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If externalUse = False Then
+            src = ocvb.color
+            bins = sliders.TrackBar1.Value
+        Else
+            If sliders.Visible Then sliders.Hide()
+        End If
+
         Dim thickness = sliders.TrackBar2.Value
-        Dim bins = sliders.TrackBar1.Value
         Dim dimensions() = New Integer() {bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-        If externalUse = False Then src = ocvb.color
 
         ocvb.result1.SetTo(0)
         Dim lineWidth = ocvb.result1.Cols / bins
@@ -103,16 +108,18 @@ Public Class Histogram_Basics : Implements IDisposable
         For i = 0 To src.Channels - 1
             Dim hist As New cv.Mat
             cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {i}, New cv.Mat(), hist, 1, dimensions, ranges)
-            histRGBraw(i) = hist.Clone()
-            histRGBnormalized(i) = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
-            histRGBnormalized(i).MinMaxLoc(0, maxVal)
-            Dim points = New List(Of cv.Point)
-            Dim listOfPoints = New List(Of List(Of cv.Point))
-            For j = 0 To bins - 1
-                points.Add(New cv.Point(CInt(j * lineWidth), ocvb.result1.Rows - histRGBnormalized(i).At(Of Single)(j, 0)))
-            Next
-            listOfPoints.Add(points)
-            ocvb.result1.Polylines(listOfPoints, False, plotColors(i), thickness, cv.LineTypes.AntiAlias)
+            histRaw(i) = hist.Clone()
+            histRaw(i).MinMaxLoc(0, maxVal)
+            histNormalized(i) = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
+            If externalUse = False Then
+                Dim points = New List(Of cv.Point)
+                Dim listOfPoints = New List(Of List(Of cv.Point))
+                For j = 0 To bins - 1
+                    points.Add(New cv.Point(CInt(j * lineWidth), ocvb.result1.Rows - ocvb.result1.Rows * histRaw(i).At(Of Single)(j, 0) / maxVal))
+                Next
+                listOfPoints.Add(points)
+                ocvb.result1.Polylines(listOfPoints, False, plotColors(i), thickness, cv.LineTypes.AntiAlias)
+            End If
         Next
 
         If externalUse = False Then

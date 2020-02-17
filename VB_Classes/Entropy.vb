@@ -31,7 +31,7 @@ Public Class Entropy_Basics : Implements IDisposable
         entropy = 0
         Dim entropyChannels As String = ""
         For i = 0 To src.Channels - 1
-            Dim nextEntropy = channelEntropy(src.Total, hist.histRGBnormalized(i))
+            Dim nextEntropy = channelEntropy(src.Total, hist.histNormalized(i))
             entropyChannels += "Entropy for " + Choose(i + 1, "Red", "Green", "Blue") + " " + Format(nextEntropy, "0.00") + ", "
             entropy += nextEntropy
         Next
