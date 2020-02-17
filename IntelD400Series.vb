@@ -51,7 +51,7 @@ Public Class IntelD400Series
     Public TemporalFilter As Boolean
     Public ThresholdFilter As Boolean
     Public pipelineClosed As Boolean = False
-
+    Public transformationMatrix(15) As Single
     Dim block As New rs.CustomProcessingBlock(
         Sub(f, src)
             Using varRelease = New rs.FramesReleaser

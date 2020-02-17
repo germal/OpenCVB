@@ -265,6 +265,7 @@
     <Compile Include="TextureFlow.vb" />
     <Compile Include="Trace.vb" />
     <Compile Include="Tracker.vb" />
+    <Compile Include="TransformationMatrix.vb" />
     <Compile Include="Undistort.vb" />
     <Compile Include="VB_Classes.vb" />
     <Compile Include="OptionsCheckbox.Designer.vb">

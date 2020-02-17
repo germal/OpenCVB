@@ -1,0 +1,41 @@
+﻿Imports cv = OpenCvSharp
+Public Class TransformationMatrix_Basics : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Dim topLocations As New List(Of cv.Point3d)
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "TMatrix Top View multiplier", 1, 1000, 500)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+        ocvb.label1 = "View from above the T265 camera"
+        ocvb.label2 = "View from side of the T265 camera"
+        ocvb.desc = "Show how to use the T265's transformation matrix"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        ocvb.result1.SetTo(0)
+        ocvb.result2.SetTo(0)
+        If ocvb.parms.cameraIndex = T265Camera And ocvb.parms.transformationMatrix IsNot Nothing Then
+            Dim t = ocvb.parms.transformationMatrix
+            Dim mul = sliders.TrackBar1.Value
+            topLocations.Add(New cv.Point3d(-t(12) * mul + ocvb.result1.Width / 2,
+                                            -t(13) * mul + ocvb.result1.Height / 2,
+                                             t(14) * mul + ocvb.result1.Height / 2))
+
+            For i = 0 To topLocations.Count - 1
+                Dim pt = topLocations.ElementAt(i)
+                If pt.X > 0 And pt.X < ocvb.result1.Width And pt.Z > 0 And pt.Z < ocvb.color.Height Then
+                    ocvb.result1.Circle(New cv.Point(pt.X, pt.Z), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                End If
+
+                If pt.Z > 0 And pt.Z < ocvb.result1.Width And pt.Y > 0 And pt.Y < ocvb.color.Height Then
+                    ocvb.result2.Circle(New cv.Point(pt.Z, pt.Y), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                End If
+            Next
+
+            If topLocations.Count > 200 Then topLocations.RemoveAt(0) ' just show the last x points
+        Else
+            ocvb.putText(New ActiveClass.TrueType("Only the T265 camera has support for the transformation matrix.", 10, 125))
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
+    End Sub
+End Class

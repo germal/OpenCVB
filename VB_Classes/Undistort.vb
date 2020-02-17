@@ -99,6 +99,12 @@ Public Class Undistort_Basics : Implements IDisposable
             maxDisp = sliders.TrackBar4.Value
             Dim stereo_height_px = sliders.TrackBar3.Value
             undistortSetup(ocvb, kMatLeft, dMatLeft, rMatLeft, pMatLeft, maxDisp, stereo_height_px, ocvb.parms.intrinsicsLeft)
+
+            ' the intrinsic coeff's on the Intel D400 series are always zero.  Here we just make up some numbers so we can show the impact.
+            If ocvb.parms.cameraIndex = D400Cam Then
+                Dim d() As Double = {0.5, -2, 1.5, 0.5}
+                dMatLeft = New cv.Mat(1, 4, cv.MatType.CV_64F, d)
+            End If
         End If
         If saveK <> sliders.TrackBar1.Value Then
             saveK = sliders.TrackBar1.Value
@@ -124,13 +130,7 @@ Public Class Undistort_Basics : Implements IDisposable
         cv.Cv2.FishEye.InitUndistortRectifyMap(kMat, dMat, rMatLeft, pMatLeft, New cv.Size(rawWidth, rawHeight),
                                                cv.MatType.CV_32FC1, leftViewMap1, leftViewMap2)
         ocvb.result1 = ocvb.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
-
-        If ocvb.parms.cameraIndex = D400Cam Then
-            ocvb.result2.SetTo(0)
-            ocvb.putText(New ActiveClass.TrueType("The current driver for the Intel D400 series doesn't have the intrinsic coefficients!  All zero for now.", 10, 125, RESULT2))
-        Else
-            ocvb.result2 = ocvb.color.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
-        End If
+        ocvb.result2 = ocvb.color.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()

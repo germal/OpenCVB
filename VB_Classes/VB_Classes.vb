@@ -125,6 +125,7 @@ Public Class ActiveClass : Implements IDisposable
         Dim ShowOptions As Boolean
         Dim speedFactor As Int32
         Dim testAllRunning As Boolean
+        Dim transformationMatrix() As Single
         Dim useRecordedData As Boolean
         Dim vtkDirectory As String
         Dim width As Int32

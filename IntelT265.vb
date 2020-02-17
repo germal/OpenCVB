@@ -2,16 +2,6 @@
 Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Structure T265IMUdataOld
-    Public translation As cv.Point3f
-    Public acceleration As cv.Point3f
-    Public velocity As cv.Point3f
-    Public rotation As cv.Point3f
-    Public angularVelocity As cv.Point3f
-    Public angularAcceleration As cv.Point3f
-    Public trackerConfidence As Int32
-    Public mapperConfidence As Int32
-End Structure
 Public Class IntelT265
 #Region "T265Data"
     Dim cfg As New rs.Config
@@ -84,6 +74,8 @@ Public Class IntelT265
     Public rMatleft As cv.Mat
     Public rMatRight As cv.Mat
     Dim QArray(15) As Double
+
+    Public transformationMatrix() As Single
 #End Region
     Private Sub getIntrinsics(ByRef vb_intrin As VB_Classes.ActiveClass.intrinsics_VB, intrinsics As rs.Intrinsics)
         vb_intrin.width = intrinsics.width
@@ -171,7 +163,7 @@ Public Class IntelT265
 
         ' Construct Q For use With cv2.reprojectImageTo3D. Subtract maxDisp from x
         ' since we will crop the disparity later
-        Qarray = {1, 0, 0, -(stereo_cx - maxDisp),
+        QArray = {1, 0, 0, -(stereo_cx - maxDisp),
                   0, 1, 0, -stereo_cy,
                   0, 0, 0, stereo_focal_px,
                   0, 0, -1 / extrinsics.translation(0), 0}
@@ -199,6 +191,16 @@ Public Class IntelT265
 
         IMUpresent = True
     End Sub
+    Structure T265IMUdata
+        Public translation As cv.Point3f
+        Public velocity As cv.Point3f
+        Public acceleration As cv.Point3f
+        Public rotation As System.Numerics.Quaternion
+        Public angularVelocity As cv.Point3f
+        Public angularAcceleration As cv.Point3f
+        Public trackerConfidence As Int32
+        Public mapperConfidence As Int32
+    End Structure
     Public Sub GetNextFrame()
         Static leftBytes(rawHeight * rawWidth - 1) As Byte
         Static rightBytes(leftBytes.Length - 1) As Byte
@@ -208,21 +210,15 @@ Public Class IntelT265
         Dim f = frames.FirstOrDefault(rs.Stream.Pose)
 
         Dim poseData = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Pose)
-        'Dim imuStruct = Marshal.PtrToStructure(Of T265IMUdata)(poseData.Data)
-        'Console.WriteLine("len = " + CStr(Marshal.SizeOf(imuStruct)))
-        'imuGyro = imuStruct.translation
-        'imuGyro.Y *= -1
-        'imuGyro.Z *= -1
-        'imuAccel = imuStruct.acceleration
-        'imuTimeStamp = poseData.Timestamp
-        'Console.WriteLine("translation xyz " + CStr(imuStruct.translation.X) + vbTab + CStr(imuStruct.translation.Y) + vbTab + CStr(imuStruct.translation.Z))
-        'Console.WriteLine("acceleration xyz " + CStr(imuStruct.acceleration.X) + vbTab + CStr(imuStruct.acceleration.Y) + vbTab + CStr(imuStruct.acceleration.Z))
-        'Console.WriteLine("velocity xyz " + CStr(imuStruct.velocity.X) + vbTab + CStr(imuStruct.velocity.Y) + vbTab + CStr(imuStruct.velocity.Z))
-        'Console.WriteLine("rotation xyz " + CStr(imuStruct.rotation.X) + vbTab + CStr(imuStruct.rotation.Y) + vbTab + CStr(imuStruct.rotation.Z))
-        'Console.WriteLine("angularVelocity xyz " + CStr(imuStruct.angularVelocity.X) + vbTab + CStr(imuStruct.angularVelocity.Y) + vbTab + CStr(imuStruct.angularVelocity.Z))
-        'Console.WriteLine("angularAcceleration xyz " + CStr(imuStruct.angularAcceleration.X) + vbTab + CStr(imuStruct.angularAcceleration.Y) + vbTab + CStr(imuStruct.angularAcceleration.Z))
-        'Console.WriteLine("trackerConfidence " + CStr(imuStruct.trackerConfidence))
-        'Console.WriteLine("mapperConfidence " + CStr(imuStruct.mapperConfidence))
+        Dim pose = Marshal.PtrToStructure(Of T265IMUdata)(poseData.Data)
+        Dim q As System.Numerics.Quaternion = pose.rotation
+        Dim t = pose.translation
+        '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
+        Dim mat() As Single = {-(1 - 2 * q.Y * q.Y - 2 * q.Z * q.Z), -(2 * q.X * q.Y + 2 * q.Z * q.W), -(2 * q.X * q.Z - 2 * q.Y * q.W), 0.0,
+                               2 * q.X * q.Y - 2 * q.Z * q.W, 1 - 2 * q.X * q.X - 2 * q.Z * q.Z, 2 * q.Y * q.Z + 2 * q.X * q.W, 0.0,
+                               -(2 * q.X * q.Z + 2 * q.Y * q.W), -(2 * q.Y * q.Z - 2 * q.X * q.W), -(1 - 2 * q.X * q.X - 2 * q.Y * q.Y), 0.0,
+                               t.X, t.Y, t.Z, 1.0}
+        transformationMatrix = mat
 
         Dim images = frames.As(Of rs.FrameSet)()
         Dim fishEye = images.FishEyeFrame()

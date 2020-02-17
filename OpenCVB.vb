@@ -31,6 +31,7 @@ Public Class OpenCVB
     Dim externalInvocation As Boolean
     Dim fps As Int32 = 30
     Dim formColor As cv.Mat = Nothing, formRGBDepth As New cv.Mat, formResult1 As New cv.Mat, formResult2 As New cv.Mat
+    Dim tMatrix() As Single ' the transformation matrix.
     Dim formDepth16 As New cv.Mat, formPointCloud As New cv.Mat, formDisparity As New cv.Mat, formleftView As New cv.Mat, formrightView As New cv.Mat
     Dim formResultsUpdated As Boolean
     Dim frameCount As Int32
@@ -764,6 +765,7 @@ Public Class OpenCVB
 
         parms.OpenCVfullPath = OpenCVfullPath
         parms.mainFormLoc = Me.Location
+        parms.transformationMatrix = camera.transformationmatrix
         parms.mainFormHeight = Me.Height
         parms.OpenCV_Version_ID = Environment.GetEnvironmentVariable("OpenCV_Version")
         parms.imageToTrueTypeLoc = 1 / resizeForDisplay
@@ -875,6 +877,7 @@ Public Class OpenCVB
                 OpenCVB.ocvb.parms.imuGyro = imuGyro
                 OpenCVB.ocvb.parms.imuAccel = imuAccel
                 OpenCVB.ocvb.parms.imuTimeStamp = imuTimeStamp
+                OpenCVB.ocvb.parms.transformationMatrix = tMatrix
             End SyncLock
             OpenCVB.UpdateHostLocation(Me.Left, Me.Top, Me.Height)
 
@@ -988,6 +991,7 @@ Public Class OpenCVB
                 formleftView = camera.leftView
                 formrightView = camera.rightView
                 formDisparity = camera.disparity
+                tMatrix = camera.transformationMatrix
                 If PCmultiplier <> 1 Then formPointCloud *= 0.001 ' units are millimeters for Kinect
                 cameraDataUpdated = True
             End SyncLock
