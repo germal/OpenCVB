@@ -187,7 +187,7 @@ Public Class Brightness_WhiteBalance : Implements IDisposable
 
         ocvb.label1 = "Image with auto white balance"
         ocvb.label2 = "White pixels were altered from the original"
-        ocvb.desc = "Automate getting the right white balance - faster than the C++ version"
+        ocvb.desc = "Automate getting the right white balance - faster than the C++ version (in debug mode)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim rgb32f As New cv.Mat

@@ -6,6 +6,7 @@ Public Class Random_Points : Implements IDisposable
     Public Points() As cv.Point
     Public Points2f() As cv.Point2f
     Public externalUse As Boolean
+    Public rangeRect As cv.Rect
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Random Pixel Count", 1, 500, 20)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -13,6 +14,7 @@ Public Class Random_Points : Implements IDisposable
         ReDim Points(sliders.TrackBar1.Value - 1)
         ReDim Points2f(sliders.TrackBar1.Value - 1)
 
+        rangeRect = New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)
         ocvb.desc = "Create a random mask with a specificied number of pixels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -22,8 +24,8 @@ Public Class Random_Points : Implements IDisposable
         End If
         If externalUse = False Then ocvb.result1.SetTo(0)
         For i = 0 To Points.Length - 1
-            Dim x = ocvb.rng.uniform(0, ocvb.color.Cols)
-            Dim y = ocvb.rng.uniform(0, ocvb.color.Rows)
+            Dim x = ocvb.rng.uniform(rangeRect.X, rangeRect.X + rangeRect.Width)
+            Dim y = ocvb.rng.uniform(rangeRect.Y, rangeRect.Y + rangeRect.Height)
             Points(i) = New cv.Point2f(x, y)
             Points2f(i) = New cv.Point2f(x, y)
             If externalUse = False Then cv.Cv2.Circle(ocvb.result1, Points(i), 3, cv.Scalar.Gray, -1, cv.LineTypes.AntiAlias, 0)

@@ -259,6 +259,7 @@
     <Compile Include="SemiGlobalMatching.vb" />
     <Compile Include="Sift.vb" />
     <Compile Include="Annealing.vb" />
+    <Compile Include="Smoothing.vb" />
     <Compile Include="Solve.vb" />
     <Compile Include="Stitch.vb" />
     <Compile Include="SuperPixels.vb" />

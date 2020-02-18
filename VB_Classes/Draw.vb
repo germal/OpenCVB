@@ -196,9 +196,9 @@ Public Class Draw_Polygon : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim h = ocvb.color.Height / 8
         Dim w = ocvb.color.Width / 8
-        Dim polyColor = New cv.Scalar(ocvb.ms_rng.next(0, 255), ocvb.ms_rng.next(0, 255), ocvb.ms_rng.next(0, 255))
+        Dim polyColor = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
         If ocvb.frameCount Mod updateFrequency = 0 Then
-            ocvb.result1.SetTo(cv.scalar.white)
+            ocvb.result1.SetTo(cv.Scalar.White)
             For i = 0 To sliders.TrackBar1.Value - 1
                 With ocvb.rng
                     Dim points = New List(Of cv.Point)

@@ -51,14 +51,17 @@ Module UI_GeneratorMain
                 Dim nextFile As New System.IO.StreamReader(fileName)
                 While nextFile.Peek() <> -1
                     line = Trim(nextFile.ReadLine())
-                    If Len(Trim(line)) > 0 Then CodeLineCount += 1
-                    If LCase(line).StartsWith("public class") Then
-                        If InStr(LCase(line), ": implements idisposable") Then
-                            Dim split As String() = Regex.Split(line, "\W+")
-                            className = split(2) ' public class <classname>
+                    line = Replace(line, vbTab, "")
+                    If line IsNot Nothing Then
+                        If Len(line) > 0 Then CodeLineCount += 1
+                        If LCase(line).StartsWith("public class") Then
+                            If InStr(LCase(line), ": implements idisposable") Then
+                                Dim split As String() = Regex.Split(line, "\W+")
+                                className = split(2) ' public class <classname>
+                            End If
                         End If
+                        If LCase(line).StartsWith("public sub new(ocvb as algorithmdata)") Then functionNames.Add(className)
                     End If
-                    If LCase(line).StartsWith("public sub new(ocvb as algorithmdata)") Then functionNames.Add(className)
                 End While
             End If
         Next
