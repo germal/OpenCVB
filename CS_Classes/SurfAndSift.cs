@@ -12,12 +12,13 @@ namespace CS_Classes
 {
     public class CS_SurfBasics
     {
+        public bool drawPoints = true;
+        public KeyPoint[] keypoints1, keypoints2;
         public void New(){}
         public void Run(Mat gray1, Mat gray2, Mat dst, int hessianThreshold, bool useBFMatcher)
         {
             var surf = SURF.Create(hessianThreshold, 4, 2, true);
 
-            KeyPoint[] keypoints1, keypoints2;
             var descriptors1 = new Mat();
             var descriptors2 = new Mat();
             surf.DetectAndCompute(gray1, null, out keypoints1, descriptors1);
@@ -29,7 +30,7 @@ namespace CS_Classes
                 {
                     var bfMatcher = new BFMatcher(NormTypes.L2, false);
                     DMatch[] bfMatches = bfMatcher.Match(descriptors1, descriptors2);
-                    Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, bfMatches, dst);
+                    if (drawPoints) Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, bfMatches, dst);
                 }
             }
             else
@@ -38,7 +39,7 @@ namespace CS_Classes
                 if (descriptors1.Width > 0 && descriptors2.Width > 0)
                 {
                     DMatch[] flannMatches = flannMatcher.Match(descriptors1, descriptors2);
-                    Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, flannMatches, dst);
+                    if (drawPoints) Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, flannMatches, dst);
                 }
             }
         }
