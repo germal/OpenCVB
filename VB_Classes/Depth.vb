@@ -418,6 +418,7 @@ Public Class Depth_ToLeftView : Implements IDisposable
             Dim rect = New cv.Rect(sliders.TrackBar2.Value, sliders.TrackBar1.Value, rWidth, rHeight)
             ocvb.result2.Rectangle(rect, cv.Scalar.Yellow, 1)
             ocvb.result1 = ocvb.result2(rect).Resize(ocvb.result1.Size())
+            If ocvb.result1.Channels = 1 Then ocvb.result1 = ocvb.result1.CvtColor(OpenCvSharp.ColorConversionCodes.GRAY2BGR)
             ocvb.result1 = ocvb.color + ocvb.result1
             If check.Box(0).Checked Then
                 check.Box(0).Checked = False
