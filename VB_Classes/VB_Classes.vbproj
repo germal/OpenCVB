@@ -478,9 +478,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PreBuildEvent>
-$(ProjectDir)\..\UI_Generator\bin\UI_Generator.exe
-$(ProjectDir)\..\UIindexer\bin\UIindexer.exe
+    <PreBuildEvent>$(ProjectDir)\..\bin\Debug\UI_Generator.exe
+$(ProjectDir)\..\bin\Debug\UIindexer.exe
+
 </PreBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
