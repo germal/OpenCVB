@@ -39,7 +39,8 @@ Public Class IntelD400Series
     Public imuGyro As cv.Point3f
     Public IMUpresent As Boolean
     Public imuTimeStamp As Double
-    Public intrinsics_VB As VB_Classes.ActiveClass.Intrinsics_VB
+    Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
+    Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public modelInverse As Boolean
     Public pc As New rs.PointCloud
     Public pcMultiplier As Single = 1
@@ -49,8 +50,8 @@ Public Class IntelD400Series
     Public SpatialFilter As Boolean
     Public TemporalFilter As Boolean
     Public ThresholdFilter As Boolean
-    Public pipelineClosed As Boolean
-
+    Public pipelineClosed As Boolean = False
+    Public transformationMatrix(15) As Single
     Dim block As New rs.CustomProcessingBlock(
         Sub(f, src)
             Using varRelease = New rs.FramesReleaser
@@ -73,12 +74,12 @@ Public Class IntelD400Series
                     Dim colorFrame = frames.ColorFrame
                     Dim disparityFrame = depth2Disparity.Process(depthFrame)
                     Dim RGBDepthframe = colorizer.Process(depthFrame)
-                    Dim rightView As rs.Frame = Nothing
-                    Dim leftView = frames.InfraredFrame
+                    Dim rawRight As rs.Frame = Nothing
+                    Dim rawLeft = frames.InfraredFrame
                     For Each frame In frames
                         If frame.Profile.Stream = rs.Stream.Infrared Then
                             If frame.Profile.Index = 2 Then
-                                rightView = frame
+                                rawRight = frame
                                 Exit For
                             End If
                         End If
@@ -86,13 +87,12 @@ Public Class IntelD400Series
 
                     Dim points = pc.Process(depthFrame).As(Of rs.Points)
                     Marshal.Copy(points.Data, vertices, 0, vertices.Length)
-
                     Marshal.Copy(colorFrame.Data, colorBytes, 0, colorBytes.Length)
                     Marshal.Copy(disparityFrame.Data, disparityBytes, 0, disparityBytes.Length)
                     Marshal.Copy(RGBDepthframe.Data, RGBDepthBytes, 0, RGBDepthBytes.Length)
                     Marshal.Copy(depthFrame.Data, depthBytes, 0, depthBytes.Length)
-                    Marshal.Copy(leftView.Data, leftViewBytes, 0, leftViewBytes.Length)
-                    Marshal.Copy(rightView.Data, rightViewBytes, 0, rightViewBytes.Length)
+                    Marshal.Copy(rawLeft.Data, leftViewBytes, 0, leftViewBytes.Length)
+                    Marshal.Copy(rawRight.Data, rightViewBytes, 0, rightViewBytes.Length)
 
                     ' get motion data and timestamp from the gyro and accelerometer
                     If IMUpresent Then
@@ -114,7 +114,6 @@ Public Class IntelD400Series
         Console.WriteLine("The current librealsense version is " + ctx.Version())
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
-        pipelineClosed = False
         devices = ctx.QueryDevices()
         device = devices(0)
         deviceName = device.Info.Item(rs.CameraInfo.Name)
@@ -140,18 +139,19 @@ Public Class IntelD400Series
             MsgBox("We only support the D435, D415, or D435I cameras. " + vbCrLf + "Is this a new device?  It is called: " + deviceName)
             deviceCount = 0
         Else
-            Dim dIntrinsics = pipeline_profile.GetStream(rs.Stream.Depth).As(Of rs.VideoStreamProfile).GetIntrinsics
-            Dim cIntrinsics = pipeline_profile.GetStream(rs.Stream.Color).As(Of rs.VideoStreamProfile).GetIntrinsics
-            w = dIntrinsics.width
-            h = dIntrinsics.height
-            intrinsics_VB.width = dIntrinsics.width
-            intrinsics_VB.height = dIntrinsics.height
-            intrinsics_VB.ppx = dIntrinsics.ppx
-            intrinsics_VB.ppy = dIntrinsics.ppy
-            intrinsics_VB.fx = dIntrinsics.fx
-            intrinsics_VB.fy = dIntrinsics.fy
-            intrinsics_VB.FOV = dIntrinsics.FOV
-            intrinsics_VB.coeffs = dIntrinsics.coeffs
+            Dim dintrinsicsLeft = pipeline_profile.GetStream(rs.Stream.Depth).As(Of rs.VideoStreamProfile).GetIntrinsics
+            Dim cintrinsicsLeft = pipeline_profile.GetStream(rs.Stream.Color).As(Of rs.VideoStreamProfile).GetIntrinsics
+            w = dintrinsicsLeft.width
+            h = dintrinsicsLeft.height
+            intrinsicsLeft_VB.width = dintrinsicsLeft.width
+            intrinsicsLeft_VB.height = dintrinsicsLeft.height
+            intrinsicsLeft_VB.ppx = dintrinsicsLeft.ppx
+            intrinsicsLeft_VB.ppy = dintrinsicsLeft.ppy
+            intrinsicsLeft_VB.fx = dintrinsicsLeft.fx
+            intrinsicsLeft_VB.fy = dintrinsicsLeft.fy
+            intrinsicsLeft_VB.FOV = dintrinsicsLeft.FOV
+            intrinsicsLeft_VB.coeffs = dintrinsicsLeft.coeffs
+            intrinsicsRight_VB = intrinsicsLeft_VB ' How to get the right lens intrinsics?
             Dim extrinsics As rs.Extrinsics = Nothing
             For Each stream In pipeline_profile.Streams
                 extrinsics = stream.GetExtrinsicsTo(pipeline_profile.GetStream(rs.Stream.Infrared))

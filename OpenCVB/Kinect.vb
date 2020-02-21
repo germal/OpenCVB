@@ -19,7 +19,7 @@ Module Kinect_Interface
     Public Function KinectExtrinsics(kc As IntPtr) As IntPtr
     End Function
     <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function KinectIntrinsics(kc As IntPtr) As IntPtr
+    Public Function KinectintrinsicsLeft(kc As IntPtr) As IntPtr
     End Function
     <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectPointCloud(kc As IntPtr) As IntPtr
@@ -27,9 +27,6 @@ Module Kinect_Interface
     <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDepthInColor(kc As IntPtr) As IntPtr
     End Function
-    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub KinectClose(kc As IntPtr)
-    End Sub
 End Module
 Public Class Kinect
     Structure imuData
@@ -39,7 +36,7 @@ Public Class Kinect
         Dim imuGyro As cv.Point3f
         Dim gyroTimeStamp As Long
     End Structure
-    Structure intrinsicsData
+    Structure intrinsicsLeftData
         Dim cx As Single            ' Principal point In image, x */
         Dim cy As Single            ' Principal point In image, y */
         Dim fx As Single            ' Focal length x */
@@ -60,10 +57,10 @@ Public Class Kinect
     Dim kc As IntPtr
     Public color As cv.Mat
     Public colorBytes() As Byte
-    Public colorIntrinsics As rs.Intrinsics
+    Public colorintrinsicsLeft As rs.intrinsics
     Public depth16 As cv.Mat
     Public depthBytes() As Byte
-    Public depthIntrinsics As rs.Intrinsics
+    Public depthintrinsicsLeft As rs.intrinsics
     Public RGBDepth As cv.Mat
     Public RGBDepthBytes() As Byte
     Public deviceCount As Int32
@@ -76,7 +73,8 @@ Public Class Kinect
     Public imuGyro As cv.Point3f
     Public imuPresent As Boolean = True ' kinect cameras always have an IMU.
     Public imuTimeStamp As Double
-    Public intrinsics_VB As VB_Classes.ActiveClass.Intrinsics_VB
+    Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
+    Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public modelInverse As Boolean
     Public pointCloud As New cv.Mat
     Public pcMultiplier As Single = 0.001
@@ -84,7 +82,8 @@ Public Class Kinect
     Public rightView As cv.Mat
     Public serialNumber As String
     Public w As Int32
-    Public pipelineClosed As Boolean
+    Public pipelineClosed As Boolean = False
+    Public transformationMatrix(15) As Single
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
@@ -97,7 +96,6 @@ Public Class Kinect
             h = height
             disparity = New cv.Mat
             leftView = New cv.Mat
-            pipelineClosed = False
 
             Dim ptr = KinectExtrinsics(kc)
             Dim rotationTranslation(12) As Single
@@ -111,22 +109,24 @@ Public Class Kinect
                 Extrinsics_VB.translation(i) = rotationTranslation(i + Extrinsics_VB.rotation.Length - 1)
             Next
 
-            ptr = KinectIntrinsics(kc)
-            Dim intrinsicsOutput = Marshal.PtrToStructure(Of intrinsicsData)(ptr)
-            intrinsics_VB.ppx = intrinsicsOutput.cx
-            intrinsics_VB.ppy = intrinsicsOutput.cy
-            intrinsics_VB.fx = intrinsicsOutput.fx
-            intrinsics_VB.fy = intrinsicsOutput.fy
-            ReDim intrinsics_VB.FOV(2)
-            intrinsics_VB.FOV(0) = intrinsicsOutput.fy
-            intrinsics_VB.FOV(1) = intrinsicsOutput.fy
-            ReDim intrinsics_VB.coeffs(5)
-            intrinsics_VB.coeffs(0) = intrinsicsOutput.k1
-            intrinsics_VB.coeffs(1) = intrinsicsOutput.k2
-            intrinsics_VB.coeffs(2) = intrinsicsOutput.k3
-            intrinsics_VB.coeffs(3) = intrinsicsOutput.k4
-            intrinsics_VB.coeffs(4) = intrinsicsOutput.k5
-            intrinsics_VB.coeffs(5) = intrinsicsOutput.k6
+            ptr = KinectintrinsicsLeft(kc)
+            Dim intrinsicsLeftOutput = Marshal.PtrToStructure(Of intrinsicsLeftData)(ptr)
+            intrinsicsLeft_VB.ppx = intrinsicsLeftOutput.cx
+            intrinsicsLeft_VB.ppy = intrinsicsLeftOutput.cy
+            intrinsicsLeft_VB.fx = intrinsicsLeftOutput.fx
+            intrinsicsLeft_VB.fy = intrinsicsLeftOutput.fy
+            ReDim intrinsicsLeft_VB.FOV(2)
+            intrinsicsLeft_VB.FOV(0) = intrinsicsLeftOutput.fy
+            intrinsicsLeft_VB.FOV(1) = intrinsicsLeftOutput.fy
+            ReDim intrinsicsLeft_VB.coeffs(5)
+            intrinsicsLeft_VB.coeffs(0) = intrinsicsLeftOutput.k1
+            intrinsicsLeft_VB.coeffs(1) = intrinsicsLeftOutput.k2
+            intrinsicsLeft_VB.coeffs(2) = intrinsicsLeftOutput.k3
+            intrinsicsLeft_VB.coeffs(3) = intrinsicsLeftOutput.k4
+            intrinsicsLeft_VB.coeffs(4) = intrinsicsLeftOutput.k5
+            intrinsicsLeft_VB.coeffs(5) = intrinsicsLeftOutput.k6
+
+            intrinsicsRight_VB = intrinsicsLeft_VB ' there is no right lens - just copy for compatibility.
 
             ReDim colorBytes(w * h * 3 - 1)
             ReDim RGBDepthBytes(w * h * 3 - 1)

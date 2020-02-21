@@ -2,125 +2,94 @@
 Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-
-Module SGBM_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function t265sgm_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub t265sgm_Close(bgfs As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function t265sgm_Run(tPtr As IntPtr, leftimg As IntPtr, rightimg As IntPtr, rows As Int32, cols As Int32, maxDisp As Int32) As IntPtr
-    End Function
-End Module
-
-Structure T265IMUdata
-    Public translation As cv.Point3f
-    Public acceleration As cv.Point3f
-    Public velocity As cv.Point3f
-    Public rotation As cv.Point3f
-    Public angularVelocity As cv.Point3f
-    Public angularAcceleration As cv.Point3f
-    Public trackerConfidence As Int32
-    Public mapperConfidence As Int32
-End Structure
 Public Class IntelT265
 #Region "T265Data"
     Dim cfg As New rs.Config
-    Dim colorBytes() As Byte
-    Dim device As rs.Device
-    Dim devices As rs.DeviceList
+    Dim dLeft(3) As Double
+    Dim dRight(3) As Double
     Dim h As Int32
     Dim kLeft(8) As Double
     Dim kRight(8) As Double
-    Dim dLeft(3) As Double
-    Dim dRight(3) As Double
-    Dim rLeft(8) As Double
-    Dim rRight(8) As Double
-    Dim pLeft(8) As Double
-    Dim pRight(8) As Double
-
-    Public kMatleft As cv.Mat
-    Public dMatleft As cv.Mat
-    Public rMatleft As cv.Mat
-    Public pMatleft As cv.Mat
-
-    Public kMatRight As cv.Mat
-    Public dMatRight As cv.Mat
-    Public rMatRight As cv.Mat
-    Public pMatRight As cv.Mat
-
+    Dim leftStream As rs.VideoStreamProfile
+    Dim leftViewMap1 As New cv.Mat
+    Dim leftViewMap2 As New cv.Mat
+    Dim lm1 As New cv.Mat
+    Dim lm2 As New cv.Mat
+    Dim maxDisp As Int32
+    Dim minDisp = 0
+    Dim numDisp As Int32
     Dim pipeline As New rs.Pipeline
     Dim pipeline_profile As rs.PipelineProfile
+    Dim pLeft(11) As Double
+    Dim pRight(11) As Double
+    Dim rawHeight As Int32
+    Dim rawWidth As Int32
+    Dim rightStream As rs.VideoStreamProfile
+    Dim rightViewMap1 As New cv.Mat
+    Dim rightViewMap2 As New cv.Mat
+    Dim rLeft(8) As Double
+    Dim rm1 As New cv.Mat
+    Dim rm2 As New cv.Mat
+    Dim rRight(8) As Double
     Dim stereo As cv.StereoSGBM
+    Dim stereo_cx As Double
+    Dim stereo_cy As Double
+    Dim stereo_focal_px As Double
+    Dim stereo_fov_rad As Double
+    Dim stereo_height_px As Double
+    Dim stereo_size As cv.Size
+    Dim stereo_width_px As Double
+    Dim tPtr As IntPtr
+    Dim validRect As cv.Rect
     Dim vertices() As Byte
     Dim w As Int32
     Public color As cv.Mat
     Public depth16 As cv.Mat
-    Public RGBDepth As New cv.Mat
-    Public disparity As New cv.Mat
     Public deviceCount As Int32
     Public deviceName As String = "Intel T265"
+    Public disparity As New cv.Mat
     Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
     Public failedImageCount As Int32
     Public imuAccel As cv.Point3f
     Public imuGyro As cv.Point3f
     Public IMUpresent As Boolean
     Public imuTimeStamp As Double
-    Public intrinsics_VB As VB_Classes.ActiveClass.Intrinsics_VB
+    Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
+    Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
+    Public leftView As cv.Mat
     Public modelInverse As Boolean
     Public pc As New rs.PointCloud
     Public pcMultiplier As Single = 1
+    Public pipelineClosed As Boolean = False
     Public pointCloud As cv.Mat
-    Public leftView As cv.Mat
+    Public RGBDepth As New cv.Mat
     Public rightView As cv.Mat
-    Public pipelineClosed As Boolean
-    Dim stereo_fov_rad As Double
-    Dim stereo_height_px As Double
-    Dim stereo_focal_px As Double
-    Dim stereo_width_px As Double
-    Dim stereo_size As cv.Size
-    Dim stereo_cx As Double
-    Dim stereo_cy As Double
-    Dim Qarray(15) As Double
-    Dim lm1 As New cv.Mat
-    Dim lm2 As New cv.Mat
-    Dim rm1 As New cv.Mat
-    Dim rm2 As New cv.Mat
-    Dim leftViewMap1 As New cv.Mat
-    Dim leftViewMap2 As New cv.Mat
-    Dim rightViewMap1 As New cv.Mat
-    Dim rightViewMap2 As New cv.Mat
-    Dim minDisp = 0
-    Dim windowSize = 5
-    Dim numDisp As Int32
-    Dim maxDisp As Int32
-    Dim validRect As cv.Rect
-    Dim tPtr As IntPtr
-    Dim rawWidth As Int32
-    Dim rawHeight As Int32
-    Dim intrinsicsLeft As rs.Intrinsics
-    Dim intrinsicsRight As rs.Intrinsics
-    Dim leftStream As rs.VideoStreamProfile
-    Dim rightStream As rs.VideoStreamProfile
+
+    Public dMatleft As cv.Mat
+    Public dMatRight As cv.Mat
+    Public kMatleft As cv.Mat
+    Public kMatRight As cv.Mat
+    Public pMatleft As cv.Mat
+    Public pMatRight As cv.Mat
+    Public rMatleft As cv.Mat
+    Public rMatRight As cv.Mat
+    Dim QArray(15) As Double
+
+    Public transformationMatrix() As Single
 #End Region
-    Private Sub getIntrinsics(leftStream As rs.VideoStreamProfile, rightStream As rs.VideoStreamProfile)
-        intrinsicsLeft = leftStream.GetIntrinsics()
-        intrinsicsRight = rightStream.GetIntrinsics()
-        intrinsics_VB.width = intrinsicsLeft.width
-        intrinsics_VB.height = intrinsicsLeft.height
-        intrinsics_VB.ppx = intrinsicsLeft.ppx
-        intrinsics_VB.ppy = intrinsicsLeft.ppy
-        intrinsics_VB.fx = intrinsicsLeft.fx
-        intrinsics_VB.fy = intrinsicsLeft.fy
-        intrinsics_VB.FOV = intrinsicsLeft.FOV
-        intrinsics_VB.coeffs = intrinsicsLeft.coeffs
+    Private Sub getIntrinsics(ByRef vb_intrin As VB_Classes.ActiveClass.intrinsics_VB, intrinsics As rs.Intrinsics)
+        vb_intrin.width = intrinsics.width
+        vb_intrin.height = intrinsics.height
+        vb_intrin.ppx = intrinsics.ppx
+        vb_intrin.ppy = intrinsics.ppy
+        vb_intrin.fx = intrinsics.fx
+        vb_intrin.fy = intrinsics.fy
+        vb_intrin.FOV = intrinsics.FOV
+        vb_intrin.coeffs = intrinsics.coeffs
     End Sub
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
-        pipelineClosed = False
         w = width
         h = height
 
@@ -132,9 +101,8 @@ Public Class IntelT265
 
         numDisp = 112 - minDisp
         maxDisp = minDisp + numDisp
-        tPtr = t265sgm_Open()
-        stereo = cv.StereoSGBM.Create(minDisp, numDisp, 16, 8 * 3 * windowSize * windowSize,
-                                      32 * 3 * windowSize * windowSize, 1, 0, 10, 100)
+        Dim windowSize = 5
+        stereo = cv.StereoSGBM.Create(minDisp, numDisp, 16, 8 * 3 * windowSize * windowSize, 32 * 3 * windowSize * windowSize, 1, 0, 10, 100, 32)
 
         leftStream = pipeline_profile.GetStream(Of rs.VideoStreamProfile)(rs.Stream.Fisheye, 1)
         rightStream = pipeline_profile.GetStream(Of rs.VideoStreamProfile)(rs.Stream.Fisheye, 2)
@@ -144,21 +112,23 @@ Public Class IntelT265
         Extrinsics_VB.rotation = extrinsics.rotation
         Extrinsics_VB.translation = extrinsics.translation
 
-        getIntrinsics(leftStream, rightStream)
+        Dim intrinsics = leftStream.GetIntrinsics()
+        getIntrinsics(intrinsicsLeft_VB, intrinsics)
+        rawWidth = intrinsics.width
+        rawHeight = intrinsics.height
+        kLeft = {intrinsics.fx, 0, intrinsics.ppx, 0, intrinsics.fy, intrinsics.ppy, 0, 0, 1}
+        dLeft = {intrinsics.coeffs(0), intrinsics.coeffs(1), intrinsics.coeffs(2), intrinsics.coeffs(3)}
 
-        rawWidth = intrinsicsLeft.width
-        rawHeight = intrinsicsLeft.height
-
-        kLeft = {intrinsicsLeft.fx, 0, intrinsicsLeft.ppx, 0, intrinsicsLeft.fy, intrinsicsLeft.ppy, 0, 0, 1}
-        dLeft = {intrinsicsLeft.coeffs(0), intrinsicsLeft.coeffs(1), intrinsicsLeft.coeffs(2), intrinsicsLeft.coeffs(3)}
-
-        kRight = {intrinsicsRight.fx, 0, intrinsicsRight.ppx, 0, intrinsicsRight.fy, intrinsicsRight.ppy, 0, 0, 1}
-        dRight = {intrinsicsRight.coeffs(0), intrinsicsRight.coeffs(1), intrinsicsRight.coeffs(2), intrinsicsRight.coeffs(3)}
+        intrinsics = rightStream.GetIntrinsics()
+        getIntrinsics(intrinsicsRight_VB, intrinsics)
+        kRight = {intrinsics.fx, 0, intrinsics.ppx, 0, intrinsics.fy, intrinsics.ppy, 0, 0, 1}
+        dRight = {intrinsics.coeffs(0), intrinsics.coeffs(1), intrinsics.coeffs(2), intrinsics.coeffs(3)}
 
         ' We need To determine what focal length our undistorted images should have
         ' In order To Set up the camera matrices For initUndistortRectifyMap.  We
         ' could use stereoRectify, but here we show how To derive these projection
-        ' matrices from the calibration And a desired height And field Of view      ' We calculate the undistorted focal length:
+        ' matrices from the calibration And a desired height And field Of view      
+        ' We calculate the undistorted focal length:
         '
         '         h
         ' -----------------
@@ -193,10 +163,10 @@ Public Class IntelT265
 
         ' Construct Q For use With cv2.reprojectImageTo3D. Subtract maxDisp from x
         ' since we will crop the disparity later
-        'Qarray = {1, 0, 0, -(stereo_cx - maxDisp),
-        '          0, 1, 0, -stereo_cy,
-        '          0, 0, 0, stereo_focal_px,
-        '          0, 0, -1 / extrinsics.translation(0), 0}
+        QArray = {1, 0, 0, -(stereo_cx - maxDisp),
+                  0, 1, 0, -stereo_cy,
+                  0, 0, 0, stereo_focal_px,
+                  0, 0, -1 / extrinsics.translation(0), 0}
 
         kMatleft = New cv.Mat(3, 3, cv.MatType.CV_64F, kLeft)
         dMatleft = New cv.Mat(1, 4, cv.MatType.CV_64F, dLeft)
@@ -221,19 +191,17 @@ Public Class IntelT265
 
         IMUpresent = True
     End Sub
+    Structure T265IMUdata
+        Public translation As cv.Point3f
+        Public velocity As cv.Point3f
+        Public acceleration As cv.Point3f
+        Public rotation As System.Numerics.Quaternion
+        Public angularVelocity As cv.Point3f
+        Public angularAcceleration As cv.Point3f
+        Public trackerConfidence As Int32
+        Public mapperConfidence As Int32
+    End Structure
     Public Sub GetNextFrame()
-#If DEBUG Then
-        Static msgDelivered As Boolean
-        If msgDelivered = False Then
-            Dim msgDeliverCount = GetSetting("OpenCVB", "msgDeliverCount", "msgDeliverCount", 0)
-            If msgDeliverCount < 2 Then
-                MsgBox("The T265 camera support is quite slow in Debug mode." + vbCrLf + "Use Release mode to get reasonable responsiveness.")
-                msgDeliverCount += 1
-                SaveSetting("OpenCVB", "msgDeliverCount", "msgDeliverCount", msgDeliverCount)
-            End If
-        End If
-        msgDelivered = True
-#End If
         Static leftBytes(rawHeight * rawWidth - 1) As Byte
         Static rightBytes(leftBytes.Length - 1) As Byte
 
@@ -241,24 +209,16 @@ Public Class IntelT265
         Dim frames = pipeline.WaitForFrames(1000)
         Dim f = frames.FirstOrDefault(rs.Stream.Pose)
 
-
-        'Dim poseData = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Pose)
-        'Dim imuStruct = Marshal.PtrToStructure(Of T265IMUdata)(poseData.Data)
-        'Console.WriteLine("len = " + CStr(Marshal.SizeOf(imuStruct)))
-        'imuGyro = imuStruct.translation
-        'imuGyro.Y *= -1
-        'imuGyro.Z *= -1
-        'imuAccel = imuStruct.acceleration
-        'imuTimeStamp = poseData.Timestamp
-        'Console.WriteLine("translation xyz " + CStr(imuStruct.translation.X) + vbTab + CStr(imuStruct.translation.Y) + vbTab + CStr(imuStruct.translation.Z))
-        'Console.WriteLine("acceleration xyz " + CStr(imuStruct.acceleration.X) + vbTab + CStr(imuStruct.acceleration.Y) + vbTab + CStr(imuStruct.acceleration.Z))
-        'Console.WriteLine("velocity xyz " + CStr(imuStruct.velocity.X) + vbTab + CStr(imuStruct.velocity.Y) + vbTab + CStr(imuStruct.velocity.Z))
-        'Console.WriteLine("rotation xyz " + CStr(imuStruct.rotation.X) + vbTab + CStr(imuStruct.rotation.Y) + vbTab + CStr(imuStruct.rotation.Z))
-        'Console.WriteLine("angularVelocity xyz " + CStr(imuStruct.angularVelocity.X) + vbTab + CStr(imuStruct.angularVelocity.Y) + vbTab + CStr(imuStruct.angularVelocity.Z))
-        'Console.WriteLine("angularAcceleration xyz " + CStr(imuStruct.angularAcceleration.X) + vbTab + CStr(imuStruct.angularAcceleration.Y) + vbTab + CStr(imuStruct.angularAcceleration.Z))
-        'Console.WriteLine("trackerConfidence " + CStr(imuStruct.trackerConfidence))
-        'Console.WriteLine("mapperConfidence " + CStr(imuStruct.mapperConfidence))
-
+        Dim poseData = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Pose)
+        Dim pose = Marshal.PtrToStructure(Of T265IMUdata)(poseData.Data)
+        Dim q As System.Numerics.Quaternion = pose.rotation
+        Dim t = pose.translation
+        '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
+        Dim mat() As Single = {-(1 - 2 * q.Y * q.Y - 2 * q.Z * q.Z), -(2 * q.X * q.Y + 2 * q.Z * q.W), -(2 * q.X * q.Z - 2 * q.Y * q.W), 0.0,
+                               2 * q.X * q.Y - 2 * q.Z * q.W, 1 - 2 * q.X * q.X - 2 * q.Z * q.Z, 2 * q.Y * q.Z + 2 * q.X * q.W, 0.0,
+                               -(2 * q.X * q.Z + 2 * q.Y * q.W), -(2 * q.Y * q.Z - 2 * q.X * q.W), -(1 - 2 * q.X * q.X - 2 * q.Y * q.Y), 0.0,
+                               t.X, t.Y, t.Z, 1.0}
+        transformationMatrix = mat
 
         Dim images = frames.As(Of rs.FrameSet)()
         Dim fishEye = images.FishEyeFrame()
@@ -281,32 +241,14 @@ Public Class IntelT265
         Dim remapLeft = leftView.Remap(lm1, lm2, cv.InterpolationFlags.Linear)
         Dim remapRight = rightView.Remap(rm1, rm2, cv.InterpolationFlags.Linear)
 
-        '#Const USE_FAILING_COMPUTE_API = 1
-#If USE_FAILING_COMPUTE_API Then
         stereo.Compute(remapLeft, remapRight, disparity) ' Works but doesn't produce the correct results.  C++ version produces correct results.
         ' re-crop just the valid part of the disparity
         validRect = New cv.Rect(maxDisp, 0, disparity.Cols - maxDisp, disparity.Rows)
-        disparity.ConvertTo(disparity, cv.MatType.CV_32F, CDbl(1 / 16))
-        Dim disp_vis = disparity.Clone()
+        Dim disp_vis As New cv.Mat, tmpdisp As New cv.Mat
+        disparity.ConvertTo(disp_vis, cv.MatType.CV_32F, CDbl(1 / 16))
+        disparity.ConvertTo(tmpdisp, cv.MatType.CV_32F, CDbl(1 / 16))
         disp_vis = disp_vis(validRect)
-#Else
-        Dim leftData(remapLeft.Total * remapLeft.ElemSize - 1) As Byte
-        Marshal.Copy(remapLeft.Data, leftData, 0, leftData.Length - 1)
-        Dim handleLeft = GCHandle.Alloc(leftData, GCHandleType.Pinned)
 
-        Dim rightData(remapRight.Total * remapRight.ElemSize - 1) As Byte
-        Marshal.Copy(remapRight.Data, rightData, 0, rightData.Length - 1)
-        Dim handleRight = GCHandle.Alloc(rightData, GCHandleType.Pinned)
-
-        Dim dispPtr = t265sgm_Run(tPtr, handleLeft.AddrOfPinnedObject(), handleRight.AddrOfPinnedObject(), stereo_size.Height, stereo_size.Width, maxDisp)
-        handleLeft.Free()
-        handleRight.Free()
-
-        Static dstData((remapLeft.Cols - maxDisp) * remapLeft.Rows * 4 - 1) As Byte ' 32-bit float array coming back from C++
-        Marshal.Copy(dispPtr, dstData, 0, dstData.Length)
-        disparity = New cv.Mat(remapLeft.Cols - maxDisp, remapLeft.Rows, cv.MatType.CV_32F, dstData)
-        Dim disp_vis = disparity.Clone()
-#End If
         Dim mask = disp_vis.Threshold(1, 255, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
         disp_vis *= CDbl(255 / numDisp)
@@ -318,7 +260,17 @@ Public Class IntelT265
         Dim depthRect = New cv.Rect(stereo_cx, 0, tmpRGBDepth.Width, tmpRGBDepth.Height)
         tmpRGBDepth.CopyTo(RGBDepth(depthRect), mask)
 
+        'Dim maxVal As Double, minVal As Double
+        'tmpdisp.MinMaxIdx(minVal, maxVal)
+
         depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
+        'For y = depthRect.Y To depthRect.Y + depthRect.Height - 1
+        '    For x = depthRect.X To depthRect.Width - 1
+        '        Dim nextVal = disparity.At(Of UShort)(y - validRect.Y, x - validRect.X) + 1
+        '        If nextVal > 0 And nextVal < 65000 Then depth16.Set(Of UShort)(y, x, 1000 - nextVal)
+        '    Next
+        'Next
+        disparity(validRect).ConvertTo(depth16(depthRect), cv.MatType.CV_16UC1)
         pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
     End Sub
     Public Sub closePipe()

@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="packages\OpenCvSharp4.runtime.win.4.1.1.20191110\build\net\OpenCvSharp4.runtime.win.props" Condition="Exists('packages\OpenCvSharp4.runtime.win.4.1.1.20191110\build\net\OpenCvSharp4.runtime.win.props')" />
+  <Import Project="..\packages\OpenCvSharp4.runtime.win.4.2.0.20200208\build\net\OpenCvSharp4.runtime.win.props" Condition="Exists('..\packages\OpenCvSharp4.runtime.win.4.2.0.20200208\build\net\OpenCvSharp4.runtime.win.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1D41512C-0C74-4E61-858C-00E36FECD58F}</ProjectGuid>
+    <ProjectGuid>{0A8F9C2E-8EDF-4487-AFEB-0ECA797816B4}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <StartupObject>OpenCVB.My.MyApplication</StartupObject>
     <RootNamespace>OpenCVB</RootNamespace>
@@ -60,7 +60,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\bin\Debug\</OutputPath>
     <DocumentationFile>OpenCVB.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <DebugType>full</DebugType>
@@ -72,7 +72,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\bin\Release\</OutputPath>
     <DocumentationFile>OpenCVB.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
@@ -81,12 +81,24 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Intel.RealSense">
       <HintPath>..\librealsense\Build\Release\Intel.RealSense.dll</HintPath>
     </Reference>
-    <Reference Include="Intel.RealSensed">
-      <HintPath>..\librealsense\Build\Debug\Intel.RealSensed.dll</HintPath>
+    <Reference Include="OpenCvSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp4.4.2.0.20200208\lib\net461\OpenCvSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="OpenCvSharp.Blob, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp4.4.2.0.20200208\lib\net461\OpenCvSharp.Blob.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="OpenCvSharp.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp4.4.2.0.20200208\lib\net461\OpenCvSharp.Extensions.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -173,6 +185,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -186,7 +199,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="VB_Classes\VB_Classes.vbproj">
+    <ProjectReference Include="..\VB_Classes\VB_Classes.vbproj">
       <Project>{735a2264-8a36-4d0a-ade0-2bfad6734401}</Project>
       <Name>VB_Classes</Name>
     </ProjectReference>
@@ -204,6 +217,6 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('packages\OpenCvSharp4.runtime.win.4.1.1.20191110\build\net\OpenCvSharp4.runtime.win.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\OpenCvSharp4.runtime.win.4.1.1.20191110\build\net\OpenCvSharp4.runtime.win.props'))" />
+    <Error Condition="!Exists('..\packages\OpenCvSharp4.runtime.win.4.2.0.20200208\build\net\OpenCvSharp4.runtime.win.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenCvSharp4.runtime.win.4.2.0.20200208\build\net\OpenCvSharp4.runtime.win.props'))" />
   </Target>
 </Project>

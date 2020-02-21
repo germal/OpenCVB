@@ -210,9 +210,6 @@ End Class
 
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-' The real value of this exercise is to show how poorly the Surf algorithm is matching points.
-' The points must match in y or the camera is poorly calibrated.  Loosen the restriction and it still is poor.
-' Only occasionally is it finding points that really match along the (approximate) y-axis.
 Public Class Surf_DrawMatchManual_CS : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim surf As Surf_Basics_CS
@@ -231,14 +228,20 @@ Public Class Surf_DrawMatchManual_CS : Implements IDisposable
         ocvb.result2 = surf.srcRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim keys1 = surf.CS_SurfBasics.keypoints1
         Dim keys2 = surf.CS_SurfBasics.keypoints2
+        For i = 0 To keys1.Count - 1
+            ocvb.result1.Circle(keys1(i).Pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        Next
+        For i = 0 To keys2.Count - 1
+            ocvb.result2.Circle(keys2(i).Pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        Next
         Dim matchCount As Integer
         For i = 0 To keys1.Count - 1
             Dim pt = keys1(i).Pt
             For j = 0 To keys2.Count - 1
-                If Math.Abs(keys2(i).Pt.Y - pt.Y) < sliders.TrackBar1.Value Then
+                If Math.Abs(keys2(j).Pt.Y - pt.Y) < sliders.TrackBar1.Value Then
                     ocvb.result1.Circle(pt, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-                    ocvb.result2.Circle(keys2(i).Pt, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-                    keys2(i).Pt.Y = -1 ' so we don't match it again.
+                    ocvb.result2.Circle(keys2(j).Pt, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                    keys2(j).Pt.Y = -1 ' so we don't match it again.
                     matchCount += 1
                 End If
             Next

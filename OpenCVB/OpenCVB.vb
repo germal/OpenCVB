@@ -31,6 +31,7 @@ Public Class OpenCVB
     Dim externalInvocation As Boolean
     Dim fps As Int32 = 30
     Dim formColor As cv.Mat = Nothing, formRGBDepth As New cv.Mat, formResult1 As New cv.Mat, formResult2 As New cv.Mat
+    Dim tMatrix() As Single ' the transformation matrix.
     Dim formDepth16 As New cv.Mat, formPointCloud As New cv.Mat, formDisparity As New cv.Mat, formleftView As New cv.Mat, formrightView As New cv.Mat
     Dim formResultsUpdated As Boolean
     Dim frameCount As Int32
@@ -85,19 +86,14 @@ Public Class OpenCVB
     End Structure
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        HomeDir = New DirectoryInfo(CurDir() + "\..\..\") ' running in OpenCVB/bin/Debug mostly...
+        HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
+
 #If DEBUG Then
-        ' check that the release versions are built.
-        Dim releaseDLL As New FileInfo(HomeDir.FullName + "\bin\Release\Camera_Kinect4Azure.dll")
-        If releaseDLL.Exists = False Then
-            MsgBox("Be sure to rebuild both the Debug and Release versions." + vbCrLf +
-                   "The Kinect DLL is set to Release in Debug Build Configuration for better performance.")
-            End
-        Else
-            Dim debugDll = New FileInfo(HomeDir.FullName + "\bin\Debug\Camera_Kinect4Azure.dll")
-            If debugDll.exists = False Then FileCopy(releaseDLL.FullName, debugDll.fullname)
-        End If
+        ' Camera DLL's are built in Release mode even when configured for Debug (for performance while debugging).  
+        Dim releaseDir = HomeDir.FullName + "\bin\Release\"
+        updatePath(releaseDir, "Release Version of camera DLL's.")
 #End If
+
         Dim args() = Environment.GetCommandLineArgs()
         ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
         If args.Length > 1 Then
@@ -147,7 +143,7 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
-        cameraT265 = New IntelT265()
+        cameraT265 = New IntelT265()  ' alternative Intel265_CPP - a C++ version
         cameraT265.deviceCount = USBenumeration("T265")
         If cameraT265.deviceCount > 0 Then cameraT265.initialize(fps, regWidth, regHeight)
 
@@ -564,24 +560,24 @@ Public Class OpenCVB
         If stopAlgorithmThread Then
             stopAlgorithmThread = False
             If saveTestAllState Then testAllButton_Click(sender, e) Else StartAlgorithmTask()
-            PausePlayButton.Image = Image.FromFile("../../Data/PauseButton.png")
+            PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
         Else
             saveTestAllState = TestAllTimer.Enabled
             If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
             stopAlgorithmThread = True
-            PausePlayButton.Image = Image.FromFile("../../Data/PauseButtonRun.png")
+            PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButtonRun.png")
         End If
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
         If TestAllButton.Text = "Test All" Then
             TestAllButton.Text = "Stop Test"
-            TestAllButton.Image = Image.FromFile("../../Data/StopTest.png")
+            TestAllButton.Image = Image.FromFile("../../OpenCVB/Data/StopTest.png")
             TestAllTimer_Tick(sender, e)
             TestAllTimer.Enabled = True
         Else
             TestAllTimer.Enabled = False
             TestAllButton.Text = "Test All"
-            TestAllButton.Image = Image.FromFile("../../Data/testall.png")
+            TestAllButton.Image = Image.FromFile("../../OpenCVB/Data/testall.png")
         End If
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
@@ -766,19 +762,10 @@ Public Class OpenCVB
         parms.PythonExe = optionsForm.PythonExeName.Text
         parms.vtkDirectory = vtkDirectory
         parms.HomeDir = HomeDir.FullName
-        If optionsForm.cameraIndex = OptionsDialog.T265Camera Then
-            parms.kMatleft = camera.kMatLeft
-            parms.dMatleft = camera.dMatleft
-            parms.rMatleft = camera.rMatleft
-            parms.pMatleft = camera.pMatleft
 
-            parms.kMatRight = camera.kMatright
-            parms.dMatRight = camera.dMatright
-            parms.rMatRight = camera.rMatright
-            parms.pMatRight = camera.pMatright
-        End If
         parms.OpenCVfullPath = OpenCVfullPath
         parms.mainFormLoc = Me.Location
+        parms.transformationMatrix = camera.transformationmatrix
         parms.mainFormHeight = Me.Height
         parms.OpenCV_Version_ID = Environment.GetEnvironmentVariable("OpenCV_Version")
         parms.imageToTrueTypeLoc = 1 / resizeForDisplay
@@ -795,7 +782,7 @@ Public Class OpenCVB
         If parms.lowResolution Then parms.imageToTrueTypeLoc *= parms.speedFactor
 
         AlgorithmDesc.Text = ""
-        PausePlayButton.Image = Image.FromFile("../../Data/PauseButton.png")
+        PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
 
         stopAlgorithmThread = False
 
@@ -822,7 +809,8 @@ Public Class OpenCVB
         End If
 
         parms.IMUpresent = camera.IMUpresent
-        parms.intrinsics = camera.Intrinsics_VB
+        parms.intrinsicsLeft = camera.intrinsicsLeft_VB
+        parms.intrinsicsRight = camera.intrinsicsRight_VB
         parms.extrinsics = camera.Extrinsics_VB
 
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
@@ -889,6 +877,7 @@ Public Class OpenCVB
                 OpenCVB.ocvb.parms.imuGyro = imuGyro
                 OpenCVB.ocvb.parms.imuAccel = imuAccel
                 OpenCVB.ocvb.parms.imuTimeStamp = imuTimeStamp
+                OpenCVB.ocvb.parms.transformationMatrix = tMatrix
             End SyncLock
             OpenCVB.UpdateHostLocation(Me.Left, Me.Top, Me.Height)
 
@@ -989,7 +978,6 @@ Public Class OpenCVB
                 imuGyro = camera.imuGyro ' The data may not be present but just copy it...
                 imuAccel = camera.imuaccel
                 imuTimeStamp = camera.imutimestamp
-                If PCmultiplier <> 1 Then formPointCloud *= 0.001 ' units are millimeters for Kinect
                 If lowResolution Then
                     formColor = camera.color.Resize(fastSize)
                     formRGBDepth = camera.RGBDepth.Resize(fastSize)
@@ -1003,6 +991,8 @@ Public Class OpenCVB
                 formleftView = camera.leftView
                 formrightView = camera.rightView
                 formDisparity = camera.disparity
+                tMatrix = camera.transformationMatrix
+                If PCmultiplier <> 1 Then formPointCloud *= 0.001 ' units are millimeters for Kinect
                 cameraDataUpdated = True
             End SyncLock
 
