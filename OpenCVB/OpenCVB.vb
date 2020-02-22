@@ -86,14 +86,6 @@ Public Class OpenCVB
     End Structure
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
-
-#If DEBUG Then
-        ' Camera DLL's are built in Release mode even when configured for Debug (for performance while debugging).  
-        Dim releaseDir = HomeDir.FullName + "\bin\Release\"
-        updatePath(releaseDir, "Release Version of camera DLL's.")
-#End If
-
         Dim args() = Environment.GetCommandLineArgs()
         ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
         If args.Length > 1 Then
@@ -110,34 +102,30 @@ Public Class OpenCVB
             externalInvocation = True ' we don't need to start python because it started OpenCVB.
         End If
 
+        HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
+
+#If DEBUG Then
+        ' Camera DLL's are built in Release mode even when configured for Debug (for performance while debugging).  
+        ' It is not likely they will need debugging and it runs faster in Debug mode.
+        Dim releaseDir = HomeDir.FullName + "\bin\Release\"
+        updatePath(releaseDir, "Release Version of camera DLL's.")
+        Dim IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Debug\"
+        updatePath(IntelPERC_Lib_Dir, "Realsense camera support.")
+        Dim Kinect_Dir = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\"
+        updatePath(Kinect_Dir, "Kinect camera support.")
+#End If
+        Dim librealsenseRelease = HomeDir.FullName + "librealsense\build\Release\"
+        updatePath(librealsenseRelease, "Realsense camera support.")
+
+        Dim KinectRelease = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\"
+        updatePath(KinectRelease, "Kinect camera support.")
+
         OpenCVfullPath = HomeDir.FullName + "OpenCV\Build\bin\Debug\"
         updatePath(OpenCVfullPath, "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
         OpenCVfullPath = HomeDir.FullName + "OpenCV\Build\bin\Release\"
         updatePath(OpenCVfullPath, "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
-        Dim IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Debug\"
-        updatePath(IntelPERC_Lib_Dir, "Realsense camera support.")
-
-        IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Release\"
-        updatePath(IntelPERC_Lib_Dir, "Realsense camera support.")
-
-        Dim Kinect_Dir = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\"
-        updatePath(Kinect_Dir, "Kinect camera support.")
-
-        Kinect_Dir = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\"
-        updatePath(Kinect_Dir, "Kinect camera support.")
-
-        ' the depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
-        ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
-        ' Post an issue if this Is Not a valid assumption
-        Dim kinectDLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.3.0\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
-        If kinectDLL.Exists = False Then
-            MsgBox("The Microsoft installer for the Kinect camera proprietary portion was not installed in the right place (or it has changed.)" + vbCrLf +
-                "It was expected to be in " + kinectDLL.FullName + vbCrLf + "Update the code and restart.")
-        End If
-        updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
-        Debug.WriteLine("system path = " + Environment.GetEnvironmentVariable("Path"))
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
 
         optionsForm = New OptionsDialog
@@ -154,7 +142,20 @@ Public Class OpenCVB
         If cameraD400Series.deviceCount > 0 Then cameraD400Series.initialize(fps, regWidth, regHeight)
 
         cameraKinect = New Kinect()
-        cameraKinect.initialize(fps, regWidth, regHeight)
+        cameraKinect.deviceCount = USBenumeration("Azure Kinect 4K Camera")
+        If cameraKinect.deviceCount > 0 Then
+            ' the Kinect depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
+            ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
+            ' Post an issue if this Is Not a valid assumption
+            Dim kinectDLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.3.0\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
+            If kinectDLL.Exists = False Then
+                MsgBox("The Microsoft installer for the Kinect camera proprietary portion was not installed in the right place (or it has changed.)" + vbCrLf +
+                "It was expected to be in " + kinectDLL.FullName + vbCrLf + "Update the code and restart.")
+            Else
+                updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
+                cameraKinect.initialize(fps, regWidth, regHeight)
+            End If
+        End If
 
         optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.devicecount
@@ -180,7 +181,7 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
 
         If camera.deviceCount = 0 Then
-            MsgBox("OpenCVB supports Kinect for Azure 3D camera, Intel D400Series 3D camera, or Intel T265.  Nothing found!")
+            MsgBox("OpenCVB supports Kinect for Azure 3D camera, Intel D400Series 3D cameras, or Intel T265.  Nothing found!")
             End
         End If
 
