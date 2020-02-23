@@ -166,6 +166,7 @@
     <Compile Include="SnapshotRequest.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="StereoLabsZed2.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="OptionsDialog.resx">

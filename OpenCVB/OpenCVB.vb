@@ -21,6 +21,7 @@ Public Class OpenCVB
     Dim cameraDataUpdated As Boolean
     Dim cameraD400Series As Object
     Dim cameraKinect As Object
+    Dim cameraZed2 As Object
     Dim cameraT265 As Object
     Public cameraName As String
     Dim cameraTaskHandle As Thread
@@ -157,9 +158,24 @@ Public Class OpenCVB
             End If
         End If
 
+        cameraZed2 = New StereoLabsZed2()
+        cameraZed2.deviceCount = USBenumeration("ZED 2")
+        If cameraZed2.deviceCount > 0 Then
+            Dim Zed2DLL As New FileInfo(HomeDir.FullName + "bin/debug/Camera_StereoLabsZed2.dll")
+            If Zed2DLL.Exists = False Then Zed2DLL = New FileInfo(HomeDir.FullName + "bin/Release/Camera_StereoLabsZed2.dll")
+            If Zed2DLL.Exists = False Then
+                MsgBox("StereoLabsZed2.DLL is not built.  Add it to the OpenCVB Project." + vbCrLf +
+                       "It is available under the Cameras Directory." + vbCrLf +
+                       "You will have to install the StereoLabs SDK and CUDA to build the StereoLabsZed2.dll.")
+            Else
+                cameraZed2.initialize(fps, regWidth, regHeight)
+            End If
+        End If
+
         optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = cameraT265.devicecount
+        optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = cameraZed2.devicecount
 
         updateCamera()
 
@@ -174,6 +190,10 @@ Public Class OpenCVB
         End If
         If camera.deviceCount = 0 And cameraT265.deviceCount > 0 Then
             optionsForm.cameraIndex = OptionsDialog.T265Camera
+            updateCamera()
+        End If
+        If camera.deviceCount = 0 And cameraZed2.deviceCount > 0 Then
+            optionsForm.cameraIndex = OptionsDialog.StereoLabsZED2
             updateCamera()
         End If
 
@@ -288,6 +308,7 @@ Public Class OpenCVB
         search = New System.Management.ManagementObjectSearcher("SELECT * From Win32_PnPEntity")
         For Each info In search.Get()
             Name = CType(info("Caption"), String) ' Get the name of the device.'
+            'If InStr(Name, "Xeon", CompareMethod.Text) = False And InStr(Name, "Intel", CompareMethod.Text) = False Then Console.WriteLine(Name)
             If InStr(Name, searchName, CompareMethod.Text) > 0 Then deviceCount += 1
         Next
         Return deviceCount
@@ -635,14 +656,7 @@ Public Class OpenCVB
         picLabels(1) = "Depth " + details
     End Sub
     Public Sub updateCamera()
-        Select Case optionsForm.cameraIndex
-            Case OptionsDialog.D400Cam
-                camera = cameraD400Series
-            Case OptionsDialog.Kinect4AzureCam
-                camera = cameraKinect
-            Case OptionsDialog.T265Camera
-                camera = cameraT265
-        End Select
+        camera = Choose(optionsForm.cameraIndex + 1, cameraD400Series, cameraKinect, cameraT265, cameraZed2)
         cameraName = camera.devicename
         camera.pipelineClosed = False
     End Sub

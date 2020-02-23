@@ -1,5 +1,4 @@
 ﻿Imports System.Windows.Controls
-Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Module Kinect_Interface
@@ -13,7 +12,7 @@ Module Kinect_Interface
     Public Function KinectDeviceName(kc As IntPtr) As IntPtr
     End Function
     <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function KinectWaitFrame(kc As IntPtr, color As IntPtr, RGBDepth As IntPtr) As IntPtr
+    Public Function KinectWaitFrame(kc As IntPtr, RGBDepth As IntPtr) As IntPtr
     End Function
     <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectExtrinsics(kc As IntPtr) As IntPtr
@@ -23,6 +22,12 @@ Module Kinect_Interface
     End Function
     <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectPointCloud(kc As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function KinectRGBA(kc As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function KinectDepth16(kc As IntPtr) As IntPtr
     End Function
     <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDepthInColor(kc As IntPtr) As IntPtr
@@ -56,11 +61,7 @@ Public Class Kinect
 
     Dim kc As IntPtr
     Public color As cv.Mat
-    Public colorBytes() As Byte
-    Public colorintrinsicsLeft As rs.intrinsics
     Public depth16 As cv.Mat
-    Public depthBytes() As Byte
-    Public depthintrinsicsLeft As rs.intrinsics
     Public RGBDepth As cv.Mat
     Public RGBDepthBytes() As Byte
     Public deviceCount As Int32
@@ -116,8 +117,8 @@ Public Class Kinect
             intrinsicsLeft_VB.fx = intrinsicsLeftOutput.fx
             intrinsicsLeft_VB.fy = intrinsicsLeftOutput.fy
             ReDim intrinsicsLeft_VB.FOV(2)
-            intrinsicsLeft_VB.FOV(0) = intrinsicsLeftOutput.fy
-            intrinsicsLeft_VB.FOV(1) = intrinsicsLeftOutput.fy
+            'intrinsicsLeft_VB.FOV(0) = intrinsicsLeftOutput.fx ' no FOV from Kinect?  
+            'intrinsicsLeft_VB.FOV(1) = intrinsicsLeftOutput.fy
             ReDim intrinsicsLeft_VB.coeffs(5)
             intrinsicsLeft_VB.coeffs(0) = intrinsicsLeftOutput.k1
             intrinsicsLeft_VB.coeffs(1) = intrinsicsLeftOutput.k2
@@ -128,19 +129,16 @@ Public Class Kinect
 
             intrinsicsRight_VB = intrinsicsLeft_VB ' there is no right lens - just copy for compatibility.
 
-            ReDim colorBytes(w * h * 3 - 1)
             ReDim RGBDepthBytes(w * h * 3 - 1)
-            ReDim depthBytes(w * h * System.Runtime.InteropServices.Marshal.SizeOf(GetType(UShort)) - 1)
         End If
     End Sub
 
     Public Sub GetNextFrame()
         Dim imuFrame As IntPtr
         If kc = 0 Then Return
-        Dim handleColor = GCHandle.Alloc(colorBytes, GCHandleType.Pinned)
         Dim handleRGBDepth = GCHandle.Alloc(RGBDepthBytes, GCHandleType.Pinned)
         Try
-            imuFrame = KinectWaitFrame(kc, handleColor.AddrOfPinnedObject(), handleRGBDepth.AddrOfPinnedObject())
+            imuFrame = KinectWaitFrame(kc, handleRGBDepth.AddrOfPinnedObject())
         Catch ex As Exception
             failedImageCount += 10 ' force a restart of the camera if this happens
             Exit Sub
@@ -168,13 +166,13 @@ Public Class Kinect
             imuTimeStamp = imuOutput.accelTimeStamp
         End If
 
-        handleColor.Free()
         handleRGBDepth.Free()
 
-        color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorBytes)
+        Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, KinectRGBA(kc))
+        color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
         RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
-        depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, KinectDepthInColor(kc)) ' using the depth buffer right where kinect placed it.  C++ buffer
+        depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, KinectDepth16(kc))
 
         Dim tmp As New cv.Mat
         cv.Cv2.Normalize(depth16, tmp, 0, 255, cv.NormTypes.MinMax)

@@ -34,13 +34,15 @@ public:
 	k4a_device_t device = NULL;
 	k4a_calibration_t calibration;
 	k4a_transformation_t transformation;
-	k4a_image_t depthInColor;
+	uint16_t* depthBuffer;
+	uint8_t* colorBuffer;
 	k4a_image_t point_cloud_image;
 	int pointCloudBuffSize = 0;
 	k4a_image_t colorImage = NULL;
 	Depth_Colorizer* dcptr = NULL;
 	k4a_device_configuration_t config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
 	char outMsg[10000];
+	Mat color;
 
 private:
 	k4a_capture_t capture = NULL;
@@ -48,6 +50,7 @@ private:
 	size_t infraredSize = 0;
 	k4a_image_t point_cloud = NULL;
 	int colorRows = 0, colorCols = 0, colorBuffSize = 0;
+	k4a_image_t depthInColor;
 public:
 	~KinectCamera()
 	{
@@ -100,7 +103,7 @@ public:
 		k4a_device_get_serialnum(device, serial_number, &length);
 	}
 
-	int *waitForFrame(void *color, void * RGBDepth)
+	int *waitForFrame(void* RGBDepth)
 	{
 		bool waiting = true;
 		while (waiting)
@@ -121,18 +124,15 @@ public:
 		colorImage = k4a_capture_get_color_image(capture);
 		if (colorImage)
 		{
-			uint8_t* tmpColor = k4a_image_get_buffer(colorImage);
-			if (tmpColor == NULL) return 0; // just have to use the last buffers.  Nothing new...
-			Mat bgr = Mat(colorCols, colorRows, CV_8UC3, color);
-			Mat bgra = Mat(colorCols, colorRows, CV_8UC4, tmpColor);
-			cvtColor(bgra, bgr, COLOR_BGRA2BGR);
+			colorBuffer = k4a_image_get_buffer(colorImage);
+			if (colorBuffer == NULL) return 0; // just have to use the last buffers.  Nothing new...
 		}
 
 		k4a_image_t depthImage = k4a_capture_get_depth_image(capture);
 		if (depthImage != NULL and depthImage->_rsvd != 0)
 		{
 			k4a_transformation_depth_image_to_color_camera(transformation, depthImage, depthInColor);
-			uint16_t *depthBuffer = (uint16_t *) k4a_image_get_buffer(depthInColor); 
+			depthBuffer = (uint16_t *) k4a_image_get_buffer(depthInColor);
 			dcptr->depth = Mat(colorRows, colorCols, CV_16U, depthBuffer);
 			dcptr->dst = Mat(colorRows, colorCols, CV_8UC3, RGBDepth);
 			dcptr->Run();
@@ -180,30 +180,37 @@ int *KinectExtrinsics(KinectCamera *kc)
 extern "C" __declspec(dllexport)
 int *KinectintrinsicsLeft(KinectCamera *kc)
 {
-	return (int *)&kc->calibration.color_camera_calibration.intrinsics.parameters;
+	return (int *)&kc->calibration.color_camera_calibration.intrinsics.parameters.v;
 }
 
 extern "C" __declspec(dllexport)
-int* KinectPointCloud(KinectCamera* kc)
+int* KinectPointCloud(KinectCamera * kc)
 {
-	return (int *) k4a_image_get_buffer(kc->point_cloud_image);
+	return (int*)k4a_image_get_buffer(kc->point_cloud_image);
 }
+
 extern "C" __declspec(dllexport)
-int* KinectDepthInColor(KinectCamera* kc)
+int* KinectRGBA(KinectCamera * kc)
 {
-	return (int*)k4a_image_get_buffer(kc->depthInColor);
+	return (int*)kc->colorBuffer;
 }
+
 extern "C" __declspec(dllexport)
-int* KinectWaitFrame(KinectCamera* kc, void* color, void* RGBDepth)
+int* KinectDepth16(KinectCamera* kc)
 {
-	return kc->waitForFrame(color, RGBDepth);
+	return (int*)kc->depthBuffer;
+}
+
+extern "C" __declspec(dllexport)
+int* KinectWaitFrame(KinectCamera* kc, void* RGBDepth)
+{
+	return kc->waitForFrame(RGBDepth);
 }
 
 extern "C" __declspec(dllexport)
 void KinectClose(KinectCamera *kc)
 {
 	if (kc->point_cloud_image) k4a_image_release(kc->point_cloud_image);
-	if (kc->depthInColor) k4a_image_release(kc->depthInColor);
 	if (kc->colorImage) k4a_image_release(kc->colorImage);
 
 	k4a_device_stop_imu(kc->device);

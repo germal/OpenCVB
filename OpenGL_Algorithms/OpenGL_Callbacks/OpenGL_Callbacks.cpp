@@ -4,6 +4,9 @@
 #include "example.hpp"          // Include short list of convenience functions for rendering
 #define NOGLFW
 #include "../OpenGL_Basics/OpenGLcommon.h"
+#include <iostream>
+#include <cmath>
+#include <cfloat>
 
 int main(int argc, char* argv[])
 {

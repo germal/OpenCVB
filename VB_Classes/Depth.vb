@@ -397,7 +397,7 @@ Public Class Depth_ToLeftView : Implements IDisposable
         sliders.setupTrackBar4(ocvb, "Color Image Right in leftView", ocvb.color.Width / 2, ocvb.color.Width, right * ocvb.color.Width)
         If ocvb.parms.ShowOptions Then sliders.Show()
         Select Case ocvb.parms.cameraIndex
-            Case D400Cam
+            Case D400Cam, StereoLabsZED2
                 ocvb.label1 = "Color + LeftView (overlay)"
                 ocvb.label2 = "Aligned leftView and color"
             Case Kinect4AzureCam
@@ -410,7 +410,7 @@ Public Class Depth_ToLeftView : Implements IDisposable
         ocvb.desc = "Map the depth image into the LeftView images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.cameraIndex = D400Cam Then
+        If ocvb.parms.cameraIndex = D400Cam Or ocvb.parms.cameraIndex = StereoLabsZED2 Then
             red.Run(ocvb)
             ocvb.result2 = ocvb.result1
             Dim rHeight = sliders.TrackBar3.Value - sliders.TrackBar1.Value

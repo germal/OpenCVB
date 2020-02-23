@@ -6,9 +6,9 @@ Public Class LeftRightView_Basics : Implements IDisposable
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Show the left and right views from the 3D Camera"
         Select Case ocvb.parms.cameraIndex
-            Case D400Cam
-                ocvb.label1 = "Infrared Left Image"
-                ocvb.label2 = "Infrared Right Image"
+            Case D400Cam, StereoLabsZED2
+                ocvb.label1 = "Left Image"
+                ocvb.label2 = "Right Image"
             Case Kinect4AzureCam
                 ocvb.label1 = "Infrared Image"
                 ocvb.label2 = "There is only one infrared image with Kinect"
@@ -21,9 +21,6 @@ Public Class LeftRightView_Basics : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Select Case ocvb.parms.cameraIndex
-            Case D400Cam, Kinect4AzureCam
-                ocvb.result1 = ocvb.leftView
-                ocvb.result2 = ocvb.rightView
             Case T265Camera
                 ocvb.result1 = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_8UC1, 0)
                 ocvb.result2 = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_8UC1, 0)
@@ -45,6 +42,9 @@ Public Class LeftRightView_Basics : Implements IDisposable
                 ocvb.rightView(rawSrc).CopyTo(tmp)
                 If ocvb.parms.lowResolution Then tmp = tmp.Resize(New cv.Size(rawDst.Width, tmp.Height / 2))
                 ocvb.result2(rawDst) = tmp
+            Case Else
+                ocvb.result1 = ocvb.leftView
+                ocvb.result2 = ocvb.rightView
         End Select
 
         ocvb.result1 += sliders.TrackBar1.Value
@@ -72,9 +72,9 @@ Public Class LeftRightView_CompareUndistorted : Implements IDisposable
         sliders.setupTrackBar3(ocvb, "Slice Height", 1, 300, 50)
         If ocvb.parms.ShowOptions Then sliders.Show()
         Select Case ocvb.parms.cameraIndex
-            Case D400Cam
-                ocvb.label1 = "Infrared Left Image"
-                ocvb.label2 = "Infrared Right Image"
+            Case D400Cam, StereoLabsZED2
+                ocvb.label1 = "Left Image"
+                ocvb.label2 = "Right Image"
             Case Kinect4AzureCam
                 ocvb.label1 = "Infrared Image"
                 ocvb.label2 = "There is only one infrared image with Kinect"
@@ -135,9 +135,9 @@ Public Class LeftRightView_CompareRaw : Implements IDisposable
         sliders.setupTrackBar3(ocvb, "Slice Height", 1, 120, 50)
         If ocvb.parms.ShowOptions Then sliders.Show()
         Select Case ocvb.parms.cameraIndex
-            Case D400Cam
-                ocvb.label1 = "Infrared Left Image"
-                ocvb.label2 = "Infrared Right Image"
+            Case D400Cam, StereoLabsZED2
+                ocvb.label1 = "Left Image"
+                ocvb.label2 = "Right Image"
             Case Kinect4AzureCam
                 ocvb.label1 = "Infrared Image"
                 ocvb.label2 = "There is only one infrared image with Kinect"
