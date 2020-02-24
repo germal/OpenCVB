@@ -152,6 +152,7 @@ Public Class OpenCVB
             If kinectDLL.Exists = False Then
                 MsgBox("The Microsoft installer for the Kinect camera proprietary portion was not installed in the right place (or it has changed.)" + vbCrLf +
                 "It was expected to be in " + kinectDLL.FullName + vbCrLf + "Update the code and restart.")
+                cameraKinect.deviceCount = 0 ' we can't use this device
             Else
                 updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
                 cameraKinect.initialize(fps, regWidth, regHeight)
@@ -164,9 +165,10 @@ Public Class OpenCVB
             Dim Zed2DLL As New FileInfo(HomeDir.FullName + "bin/debug/Camera_StereoLabsZed2.dll")
             If Zed2DLL.Exists = False Then Zed2DLL = New FileInfo(HomeDir.FullName + "bin/Release/Camera_StereoLabsZed2.dll")
             If Zed2DLL.Exists = False Then
-                MsgBox("StereoLabsZed2.DLL is not built.  Add it to the OpenCVB Project." + vbCrLf +
-                       "It is available under the Cameras Directory." + vbCrLf +
+                MsgBox("StereoLabsZed2.DLL is not built.  Add the project to the OpenCVB solution." + vbCrLf +
+                       "The StereoLabsZed2 project is in the Cameras Directory." + vbCrLf +
                        "You will have to install the StereoLabs SDK and CUDA to build the StereoLabsZed2.dll.")
+                cameraKinect.deviceCount = 0 ' we can't use this device
             Else
                 cameraZed2.initialize(fps, regWidth, regHeight)
             End If
@@ -179,7 +181,7 @@ Public Class OpenCVB
 
         updateCamera()
 
-        ' if a camera is missing, try to find another.
+        ' if the activee camera is missing, try to find another.
         If camera.deviceCount = 0 And cameraD400Series.deviceCount > 0 Then
             optionsForm.cameraIndex = OptionsDialog.D400Cam
             updateCamera()
