@@ -20,24 +20,16 @@ class StereoLabsZed2
 {
 public:
 	int serialNumber = 0;
-	cv::Mat disparity;
 	CameraParameters intrinsicsLeft;
 	CameraParameters intrinsicsRight;
 	CalibrationParameters extrinsics;
-	float *pointCloud;
-	sl::Mat leftView;
-	sl::Mat rightView;
-	sl::Mat RGBADepth;
-	sl::Mat depth32F;
-	sl::Mat color;
 
 private:
 	sl::Camera zed;
 	sl::InitParameters init_params;
 	int width, height;
-	bool IMUpresent = true;
-
-
+	float imuData;
+	long long pixelCount;
 public:
 	~StereoLabsZed2()
 	{
@@ -47,6 +39,7 @@ public:
 	{
 		width = w;
 		height = h;
+		pixelCount = (long long)width * height;
 
 		ERROR_CODE err = zed.open();
 		if (err != ERROR_CODE::SUCCESS) {
@@ -64,25 +57,33 @@ public:
 		
 		init_params.camera_resolution = sl::RESOLUTION::HD720;
 		init_params.camera_fps = fps;
-		pointCloud = new float[(long long)width * height * 3];
-		// pointCloudXYZRGB = sl::Mat(camera_info.camera_resolution, MAT_TYPE::F32_C4, MEM::CPU);
 	}
 
-	int *waitForFrame()
+	int *waitForFrame(void* rgba, void* depthRGBA, void* _depth32f, void* left, void* right, void* pointCloud)
 	{
+		// allocate and free the mat structures to try and avoid the flicker problem as GPU memory garbage collects.
+		sl::Mat color, RGBADepth, depth32F, leftView, rightView, pcMat;
+
 		zed.grab();
 		zed.retrieveImage(color, VIEW::LEFT, MEM::CPU);
-		zed.retrieveImage(leftView, VIEW::LEFT_GRAY, MEM::CPU);
-		zed.retrieveImage(rightView, VIEW::RIGHT_GRAY, MEM::CPU);
+		memcpy(rgba, (void*)color.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount * 4);
+
 		zed.retrieveImage(RGBADepth, VIEW::DEPTH, MEM::CPU);
+		memcpy(depthRGBA, (void*)RGBADepth.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount * 4);
+
 		zed.retrieveMeasure(depth32F, MEASURE::DEPTH, MEM::CPU);
+		memcpy(_depth32f, (void*)depth32F.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount * 4);
 
-		sl::Mat pointCloudXYZRGB;
-		zed.retrieveMeasure(pointCloudXYZRGB, MEASURE::XYZARGB, MEM::CPU);
-		float* pc = (float*)pointCloudXYZRGB.getPtr<sl::uchar1>(sl::MEM::CPU);
+		zed.retrieveImage(leftView, VIEW::LEFT_GRAY, MEM::CPU);
+		memcpy(left, (void*)leftView.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount);
 
-		float* pcXYZ = pointCloud;
-		for (int i = 0; i < (long long)width * height * 4; i+= 4)
+		zed.retrieveImage(rightView, VIEW::RIGHT_GRAY, MEM::CPU);
+		memcpy(right, (void*)rightView.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount);
+
+		zed.retrieveMeasure(pcMat, MEASURE::XYZARGB, MEM::CPU);
+		float* pc = (float*)pcMat.getPtr<sl::uchar1>(sl::MEM::CPU);
+		float* pcXYZ = (float *)pointCloud;
+		for (int i = 0; i < pixelCount * 4; i+= 4)
 		{
 			pcXYZ[0] = pc[i];
 			pcXYZ[1] = pc[i + 1];
@@ -90,7 +91,9 @@ public:
 			pcXYZ += 3;
 		}
 
-		return (int*)color.getPtr<sl::uchar1>(sl::MEM::CPU);
+		// explicitly free the mat structures - trying to fix the flicker problem with GPU memory.
+		color.free(); RGBADepth.free(); depth32F.free(); leftView.free(); rightView.free(); pcMat.free();
+		return (int*)&imuData;
 	}
 };
 
@@ -126,44 +129,14 @@ int* Zed2Extrinsics(StereoLabsZed2*Zed2)
 }
 
 extern "C" __declspec(dllexport)
-int* Zed2PointCloud(StereoLabsZed2 * Zed2)
-{
-	return (int*)Zed2->pointCloud;
-}
-
-extern "C" __declspec(dllexport)
 int Zed2SerialNumber(StereoLabsZed2 * Zed2)
 {
 	return Zed2->serialNumber;
 }
 
 extern "C" __declspec(dllexport)
-int* Zed2LeftView(StereoLabsZed2*Zed2)
+int* Zed2WaitFrame(StereoLabsZed2* Zed2, void* rgba, void* depthRGBA, void* depth32f, void* left, void* right, void *pointCloud )
 {
-	return (int*)Zed2->leftView.getPtr<sl::uchar1>(sl::MEM::CPU);
-}
-
-extern "C" __declspec(dllexport)
-int* Zed2RightView(StereoLabsZed2 *Zed2)
-{
-	return (int*)Zed2->rightView.getPtr<sl::uchar1>(sl::MEM::CPU);
-}
-
-extern "C" __declspec(dllexport)
-int* Zed2Depth32f(StereoLabsZed2 *Zed2)
-{
-	return (int*)Zed2->depth32F.getPtr<sl::uchar1>(sl::MEM::CPU);
-}
-
-extern "C" __declspec(dllexport)
-int* Zed2RGBADepth(StereoLabsZed2 * Zed2)
-{
-	return (int*)Zed2->RGBADepth.getPtr<sl::uchar1>(sl::MEM::CPU);
-}
-
-extern "C" __declspec(dllexport)
-int* Zed2WaitFrame(StereoLabsZed2* Zed2)
-{
-	return Zed2->waitForFrame();
+	return Zed2->waitForFrame(rgba, depthRGBA, depth32f, left, right, pointCloud);
 }
 

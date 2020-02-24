@@ -2,7 +2,7 @@
 Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class IntelD400Series
+Public Class CameraD400Series
     Dim align As rs.Align
     Dim blocks As List(Of rs.ProcessingBlock)
     Dim cfg As New rs.Config

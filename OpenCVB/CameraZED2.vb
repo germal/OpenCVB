@@ -9,7 +9,8 @@ Module Zed2_Interface
     Public Function Zed2SerialNumber(kc As IntPtr) As Int32
     End Function
     <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2WaitFrame(kc As IntPtr) As IntPtr
+    Public Function Zed2WaitFrame(kc As IntPtr, rgba As IntPtr, depthRGBA As IntPtr, depth32f As IntPtr, left As IntPtr,
+                                  right As IntPtr, pointCloud As IntPtr) As IntPtr
     End Function
     <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2Extrinsics(kc As IntPtr) As IntPtr
@@ -20,23 +21,8 @@ Module Zed2_Interface
     <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2intrinsicsRight(kc As IntPtr) As IntPtr
     End Function
-    <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2PointCloud(kc As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2LeftView(kc As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2RightView(kc As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2RGBADepth(kc As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2Depth32f(kc As IntPtr) As IntPtr
-    End Function
 End Module
-Public Class StereoLabsZed2
+Public Class CameraZED2
     Structure imuData
         Dim temperature As Single
         Dim imuAccel As cv.Point3f
@@ -45,10 +31,10 @@ Public Class StereoLabsZed2
         Dim gyroTimeStamp As Long
     End Structure
     Structure intrinsicsLeftData
-        Dim fx As Single            ' Focal length x */
-        Dim fy As Single            ' Focal length y */
-        Dim cx As Single            ' Principal point In image, x */
-        Dim cy As Single            ' Principal point In image, y */
+        Dim fx As Single ' Focal length x */
+        Dim fy As Single ' Focal length y */
+        Dim cx As Single ' Principal point In image, x */
+        Dim cy As Single ' Principal point In image, y */
         Dim k1 As Double ' Distortion factor :  [ k1, k2, p1, p2, k3 ]. Radial (k1,k2,k3) And Tangential (p1,p2) distortion
         Dim k2 As Double
         Dim p1 As Double
@@ -65,6 +51,12 @@ Public Class StereoLabsZed2
     Public color As New cv.Mat
     Public depth16 As New cv.Mat
     Public RGBDepth As New cv.Mat
+    Dim colorBytes() As Byte
+    Dim depthRGBABytes() As Byte
+    Dim depth32FBytes() As Byte
+    Dim leftBytes() As Byte
+    Dim rightBytes() As Byte
+    Dim pointCloudBytes() As Byte
     Public deviceCount As Int32
     Public deviceName As String = "StereoLabs ZED 2"
     Public disparity As cv.Mat
@@ -146,13 +138,27 @@ Public Class StereoLabsZed2
             intrinsicsRight_VB.coeffs(4) = intrinsics.k3
             intrinsicsRight_VB.width = intrinsics.width
             intrinsicsRight_VB.height = intrinsics.height
+
+            ReDim colorBytes(w * h * 4) ' rgba format coming back from driver
+            ReDim depthRGBABytes(w * h * 4)
+            ReDim depth32Fbytes(w * h * 4)
+            ReDim leftBytes(w * h)
+            ReDim rightBytes(w * h)
+            ReDim pointCloudBytes(w * h * 12) ' xyz + rgba
         End If
     End Sub
 
     Public Sub GetNextFrame()
-        Dim imuFrame As IntPtr
         If Zed2 = 0 Then Return
-        Dim colorPtr = Zed2WaitFrame(Zed2)
+        Dim handlecolorBytes = GCHandle.Alloc(colorBytes, GCHandleType.Pinned)
+        Dim handleDepthRGBABytes = GCHandle.Alloc(depthRGBABytes, GCHandleType.Pinned)
+        Dim handledepth32Fbytes = GCHandle.Alloc(depth32FBytes, GCHandleType.Pinned)
+        Dim handleleftBytes = GCHandle.Alloc(leftBytes, GCHandleType.Pinned)
+        Dim handlerightBytes = GCHandle.Alloc(rightBytes, GCHandleType.Pinned)
+        Dim handlePCBytes = GCHandle.Alloc(pointCloudBytes, GCHandleType.Pinned)
+        Dim imuFrame = Zed2WaitFrame(Zed2, handlecolorBytes.AddrOfPinnedObject(), handleDepthRGBABytes.AddrOfPinnedObject(),
+                                           handledepth32Fbytes.AddrOfPinnedObject(), handleleftBytes.AddrOfPinnedObject(),
+                                           handlerightBytes.AddrOfPinnedObject(), handlePCBytes.AddrOfPinnedObject())
         'If imuFrame = 0 Then
         '    Console.WriteLine("Zed2WaitFrame has returned without any image.")
         '    failedImageCount += 1
@@ -176,20 +182,27 @@ Public Class StereoLabsZed2
         'imuTimeStamp = imuOutput.accelTimeStamp
         'End If
 
-        Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorPtr)
+        handlecolorBytes.Free()
+        handleDepthRGBABytes.Free()
+        handledepth32Fbytes.Free()
+        handleleftBytes.Free()
+        handlerightBytes.Free()
+        handlePCBytes.Free()
+
+        Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBytes)
         color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-        Dim RGBADepth = New cv.Mat(h, w, cv.MatType.CV_8UC4, Zed2RGBADepth(Zed2))
+        Dim RGBADepth = New cv.Mat(h, w, cv.MatType.CV_8UC4, depthRGBABytes)
         RGBDepth = RGBADepth.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-        Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, Zed2Depth32f(Zed2))
+        Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depth32FBytes)
         depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
 
         disparity = depth16.Clone()
 
-        leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2LeftView(Zed2))
-        rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2RightView(Zed2))
-        pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, Zed2PointCloud(Zed2))
+        leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftBytes)
+        rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightBytes)
+        pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes)
     End Sub
     Public Sub closePipe()
         pipelineClosed = True

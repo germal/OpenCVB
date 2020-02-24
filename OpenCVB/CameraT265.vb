@@ -2,7 +2,7 @@
 Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class IntelT265
+Public Class CameraT265
 #Region "T265Data"
     Dim cfg As New rs.Config
     Dim dLeft(3) As Double

@@ -771,59 +771,31 @@ End Class
 
 
 Public Class Depth_Stable : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Dim lastDepth() As cv.Mat
-    Public stableDepth As cv.Mat
-    Public stableZeroDepth As cv.Mat
+    Dim mog As BGSubtract_Basics_CPP
     Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "Diff - Number of Frames", 1, 20, 10)
-        sliders.setupTrackBar2(ocvb, "Diff - Depth in meters", 1, 8, 3)
-        If ocvb.parms.ShowOptions Then sliders.Show()
+        mog = New BGSubtract_Basics_CPP(ocvb)
+        mog.radio.check(4).Checked = True
+        mog.externalUse = True
+
+        ocvb.label2 = "Stable (non-zero) Depth"
         ocvb.desc = "Collect X frames, compute stable depth and color pixels using thresholds"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static frameIndex As Int32
-        Static countDown As Int32
-        Static lastFrameCount As Int32
-        If lastFrameCount <> sliders.TrackBar1.Value Then
-            stableDepth = Nothing
-            lastFrameCount = sliders.TrackBar1.Value
-            countDown = lastFrameCount
-            frameIndex = 0
-            ReDim lastDepth(lastFrameCount - 1)
-            For i = 0 To lastDepth.Count - 1
-                lastDepth(i) = New cv.Mat
-            Next
-        End If
-
-        If countDown = 0 Then
-            stableDepth = New cv.Mat(ocvb.depth16.Size(), cv.MatType.CV_16U, 0)
-            Dim minMat = stableDepth.Clone().SetTo(20000)
-            For i = 0 To lastFrameCount - 1
-                cv.Cv2.Max(lastDepth(i), stableDepth, stableDepth)
-                cv.Cv2.Min(lastDepth(i), minMat, minMat)
-            Next
-            Dim rangeDepth As New cv.Mat
-            cv.Cv2.Subtract(stableDepth, minMat, rangeDepth)
-            Dim stableDepthMask = rangeDepth.Threshold(sliders.TrackBar2.Value, 255, cv.ThresholdTypes.BinaryInv)
-            If ocvb.parms.lowResolution Then stableDepthMask = stableDepthMask.Resize(ocvb.color.Size())
-            stableDepthMask.ConvertTo(ocvb.result1, cv.MatType.CV_8U)
-            stableZeroDepth = minMat.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-            If ocvb.parms.lowResolution Then stableZeroDepth = stableZeroDepth.Resize(ocvb.color.Size())
-            stableZeroDepth.ConvertTo(stableZeroDepth, cv.MatType.CV_8U)
-            ocvb.result2 = ocvb.result1.Clone()
-            ocvb.result2.SetTo(0, stableZeroDepth)
-        Else
-            countDown -= 1
-        End If
-        lastDepth(frameIndex) = ocvb.depth16
-        frameIndex += 1
-        If frameIndex >= lastDepth.Count Then frameIndex = 0
-        ocvb.label1 = "Stable depth over " + CStr(lastFrameCount) + " frames"
-        ocvb.label2 = "Stable non-zero depth over " + CStr(lastFrameCount) + " frames"
+        mog.src = ocvb.RGBDepth
+        mog.Run(ocvb)
+        cv.Cv2.BitwiseNot(ocvb.result1, ocvb.result2)
+        ocvb.label1 = "Stable (non-zero) Depth" + " using " + mog.radio.check(mog.currMethod).Text + " method"
+        Dim zeroDepth = ocvb.depth16.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        zeroDepth = zeroDepth.ConvertScaleAbs(1)
+        Dim mask = ocvb.result1.Clone()
+        ocvb.result1 = ocvb.color.Clone()
+        ocvb.result1.SetTo(0, mask)
+        If ocvb.color.Size <> zeroDepth.Size Then zeroDepth = zeroDepth.Resize(ocvb.color.Size) ' depth is always at full resolution.
+        ocvb.result1.SetTo(0, zeroDepth)
+        ocvb.result2.SetTo(0, zeroDepth)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+        mog.Dispose()
     End Sub
 End Class
 

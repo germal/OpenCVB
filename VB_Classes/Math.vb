@@ -99,15 +99,12 @@ Public Class Math_DepthMeanStdev : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         minMax.Run(ocvb)
-        If minMax.stableDepth IsNot Nothing Then
-            Dim mean As Single = 0, stdev As Single = 0
-            Dim mask As New cv.Mat
-            mask = ocvb.result1.Resize(minMax.stableDepth.Size())
-            cv.Cv2.MeanStdDev(minMax.stableDepth, mean, stdev, mask)
-            ocvb.label1 = "stablized depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
-            cv.Cv2.MeanStdDev(ocvb.depth16, mean, stdev, mask)
-            ocvb.label2 = "raw depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
-        End If
+        Dim mean As Single = 0, stdev As Single = 0
+        Dim mask = ocvb.result2 ' the mask for stable depth.
+        cv.Cv2.MeanStdDev(ocvb.depth16, mean, stdev, mask)
+        ocvb.label2 = "stablized depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
+        cv.Cv2.MeanStdDev(ocvb.depth16, mean, stdev, mask)
+        ocvb.label1 = "raw depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         minMax.Dispose()

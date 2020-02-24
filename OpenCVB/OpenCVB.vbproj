@@ -130,14 +130,14 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IntelT265.vb" />
+    <Compile Include="CameraT265.vb" />
     <Compile Include="OptionsDialog.Designer.vb">
       <DependentUpon>OptionsDialog.vb</DependentUpon>
     </Compile>
     <Compile Include="OptionsDialog.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Kinect.vb" />
+    <Compile Include="CameraKinect.vb" />
     <Compile Include="OpenCVB.designer.vb">
       <DependentUpon>OpenCVB.vb</DependentUpon>
     </Compile>
@@ -159,14 +159,14 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="IntelD400Series.vb" />
+    <Compile Include="CameraD400Series.vb" />
     <Compile Include="SnapshotRequest.Designer.vb">
       <DependentUpon>SnapshotRequest.vb</DependentUpon>
     </Compile>
     <Compile Include="SnapshotRequest.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="StereoLabsZed2.vb" />
+    <Compile Include="CameraZED2.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="OptionsDialog.resx">

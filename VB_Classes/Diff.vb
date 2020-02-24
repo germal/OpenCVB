@@ -34,8 +34,10 @@ Public Class Diff_UnstableDepthAndColor : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         diff = New Diff_Basics(ocvb)
         diff.sliders.TrackBar1.Value = 20 ' this is color threshold - low means detecting more motion.
-        depth = New Depth_Stable(ocvb)
-        depth.sliders.TrackBar1.Value = 1 ' just look at previous frame
+
+        'depth = New Depth_Stable(ocvb)
+        'depth.sliders.TrackBar1.Value = 1 ' just look at previous frame
+
         ocvb.desc = "Build a mask for any pixels that have either unstable depth or color"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

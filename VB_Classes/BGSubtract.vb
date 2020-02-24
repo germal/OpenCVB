@@ -2,9 +2,9 @@
 Imports System.Runtime.InteropServices
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
 Public Class BGSubtract_Basics_CPP : Implements IDisposable
-    Dim radio As New OptionsRadioButtons
+    Public radio As New OptionsRadioButtons
     Dim bgfs As IntPtr
-    Dim currMethod As Int32 = -1
+    Public currMethod As Int32 = -1
     Public src As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)

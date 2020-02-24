@@ -33,7 +33,7 @@ Module Kinect_Interface
     Public Function KinectDepthInColor(kc As IntPtr) As IntPtr
     End Function
 End Module
-Public Class Kinect
+Public Class CameraKinect
     Structure imuData
         Dim temperature As Single
         Dim imuAccel As cv.Point3f
@@ -168,20 +168,23 @@ Public Class Kinect
 
         handleRGBDepth.Free()
 
-        Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, KinectRGBA(kc))
-        color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+        Dim colorBuffer = KinectRGBA(kc)
+        If colorBuffer <> 0 Then
+            Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBuffer)
+            color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-        RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
-        depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, KinectDepth16(kc))
+            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
+            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, KinectDepth16(kc))
 
-        Dim tmp As New cv.Mat
-        cv.Cv2.Normalize(depth16, tmp, 0, 255, cv.NormTypes.MinMax)
-        tmp.ConvertTo(leftView, cv.MatType.CV_8U)
-        rightView = leftView
-        depth16.ConvertTo(disparity, cv.MatType.CV_32F)
+            Dim tmp As New cv.Mat
+            cv.Cv2.Normalize(depth16, tmp, 0, 255, cv.NormTypes.MinMax)
+            tmp.ConvertTo(leftView, cv.MatType.CV_8U)
+            rightView = leftView
+            depth16.ConvertTo(disparity, cv.MatType.CV_32F)
 
-        Dim pc = New cv.Mat(h, w, cv.MatType.CV_16SC3, KinectPointCloud(kc))
-        pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3) ' This is less efficient than using 16-bit pixels but consistent with Intel cameras (and more widely accepted as normal.)
+            Dim pc = New cv.Mat(h, w, cv.MatType.CV_16SC3, KinectPointCloud(kc))
+            pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3) ' This is less efficient than using 16-bit pixels but consistent with Intel cameras (and more widely accepted as normal.)
+        End If
     End Sub
     Public Sub closePipe()
         pipelineClosed = True
