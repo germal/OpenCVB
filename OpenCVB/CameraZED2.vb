@@ -24,11 +24,22 @@ Module Zed2_Interface
 End Module
 Public Class CameraZED2
     Structure imuData
-        Dim temperature As Single
-        Dim imuAccel As cv.Point3f
-        Dim accelTimeStamp As Long
-        Dim imuGyro As cv.Point3f
-        Dim gyroTimeStamp As Long
+        Dim r00 As Single
+        Dim r01 As Single
+        Dim r02 As Single
+        Dim tx As Single
+        Dim r10 As Single
+        Dim r11 As Single
+        Dim r12 As Single
+        Dim ty As Single
+        Dim r20 As Single
+        Dim r21 As Single
+        Dim r22 As Single
+        Dim tz As Single
+        Dim m30 As Single
+        Dim m31 As Single
+        Dim m32 As Single
+        Dim m33 As Single
     End Structure
     Structure intrinsicsLeftData
         Dim fx As Single ' Focal length x */
@@ -159,6 +170,10 @@ Public Class CameraZED2
         Dim imuFrame = Zed2WaitFrame(Zed2, handlecolorBytes.AddrOfPinnedObject(), handleDepthRGBABytes.AddrOfPinnedObject(),
                                            handledepth32Fbytes.AddrOfPinnedObject(), handleleftBytes.AddrOfPinnedObject(),
                                            handlerightBytes.AddrOfPinnedObject(), handlePCBytes.AddrOfPinnedObject())
+
+        Dim imuRawData(15) As Single
+        Marshal.Copy(imuFrame, imuRawData, 0, imuRawData.Length)
+
         'If imuFrame = 0 Then
         '    Console.WriteLine("Zed2WaitFrame has returned without any image.")
         '    failedImageCount += 1

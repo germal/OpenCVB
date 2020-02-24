@@ -23,13 +23,14 @@ public:
 	CameraParameters intrinsicsLeft;
 	CameraParameters intrinsicsRight;
 	CalibrationParameters extrinsics;
-
 private:
 	sl::Camera zed;
 	sl::InitParameters init_params;
 	int width, height;
 	float imuData;
 	long long pixelCount;
+	Pose camera_path;
+	POSITIONAL_TRACKING_STATE tracking_state;
 public:
 	~StereoLabsZed2()
 	{
@@ -41,10 +42,14 @@ public:
 		height = h;
 		pixelCount = (long long)width * height;
 
-		ERROR_CODE err = zed.open();
-		if (err != ERROR_CODE::SUCCESS) {
-			std::cout << "Error " << err << ", exit program.\n";
-		}
+		init_params.sensors_required = true;
+		init_params.depth_mode = DEPTH_MODE::ULTRA;
+		init_params.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP; // OpenGL's coordinate system is right_handed
+
+		init_params.camera_resolution = sl::RESOLUTION::HD720;
+		init_params.camera_fps = fps;
+
+		zed.open(init_params);
 
 		auto camera_info = zed.getCameraInformation();
 		serialNumber = camera_info.serial_number;
@@ -52,11 +57,9 @@ public:
 		intrinsicsLeft = camera_info.calibration_parameters.left_cam;
 		intrinsicsRight = camera_info.calibration_parameters.right_cam;
 
-		init_params.depth_mode = DEPTH_MODE::ULTRA;
-		init_params.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP; // OpenGL's coordinate system is right_handed
-		
-		init_params.camera_resolution = sl::RESOLUTION::HD720;
-		init_params.camera_fps = fps;
+		PositionalTrackingParameters positional_tracking_param;
+		positional_tracking_param.enable_area_memory = true;
+		zed.enablePositionalTracking(positional_tracking_param);
 	}
 
 	int *waitForFrame(void* rgba, void* depthRGBA, void* _depth32f, void* left, void* right, void* pointCloud)
@@ -93,7 +96,8 @@ public:
 
 		// explicitly free the mat structures - trying to fix the flicker problem with GPU memory.
 		color.free(); RGBADepth.free(); depth32F.free(); leftView.free(); rightView.free(); pcMat.free();
-		return (int*)&imuData;
+		tracking_state = zed.getPosition(camera_path, REFERENCE_FRAME::WORLD);
+		return (int*)&camera_path.pose_data;
 	}
 };
 

@@ -35,8 +35,7 @@ Public Class Diff_UnstableDepthAndColor : Implements IDisposable
         diff = New Diff_Basics(ocvb)
         diff.sliders.TrackBar1.Value = 20 ' this is color threshold - low means detecting more motion.
 
-        'depth = New Depth_Stable(ocvb)
-        'depth.sliders.TrackBar1.Value = 1 ' just look at previous frame
+        depth = New Depth_Stable(ocvb)
 
         ocvb.desc = "Build a mask for any pixels that have either unstable depth or color"
     End Sub
@@ -44,12 +43,17 @@ Public Class Diff_UnstableDepthAndColor : Implements IDisposable
         diff.Run(ocvb)
         Dim unstableColor = ocvb.result2.Clone()
         depth.Run(ocvb)
-        If ocvb.result1.Channels = 1 Then
+        If ocvb.result2.Channels = 1 Then
             Dim unstableDepth As New cv.Mat
-            cv.Cv2.BitwiseNot(ocvb.result1, unstableDepth)
-            cv.Cv2.BitwiseOr(unstableColor, unstableDepth, ocvb.result1)
-            ocvb.label1 = "Unstable depth or color"
-            ocvb.label2 = "Unknown depth"
+            Dim mask As New cv.Mat
+            cv.Cv2.BitwiseNot(ocvb.result2, unstableDepth)
+            If unstableColor.Channels = 3 Then unstableColor = unstableColor.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            cv.Cv2.BitwiseOr(unstableColor, unstableDepth, mask)
+            ocvb.result1 = ocvb.color.Clone()
+            ocvb.result1.SetTo(0, mask)
+            ocvb.label1 = "Stable depth and color"
+            ocvb.label2 = "Stable (non-zero) Depth"
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
