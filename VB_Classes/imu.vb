@@ -48,9 +48,9 @@ Public Class IMU_Basics : Implements IDisposable
                 theta.Z = theta.Z * alpha + accelAngle.Z * (1 - alpha)
             End If
             If externalUse = False Then
-                flow.msgs.Add("ts = " + CStr(ocvb.parms.imuTimeStamp) + vbTab + "Gravity(x = " + Format(ocvb.parms.imuAccel.X, "#0.000") + " y = " + Format(ocvb.parms.imuAccel.Y, "#0.000") +
-                                  " z = " + Format(ocvb.parms.imuAccel.Z, "#0.000") + ")" + vbTab + "Motion (pitch = " + Format(ocvb.parms.imuGyro.X, "#0.000") + vbTab +
-                                  " Yaw = " + Format(ocvb.parms.imuGyro.Y, "#0.000") + vbTab + " Roll = " + Format(ocvb.parms.imuGyro.Z, "#0.000") + ")")
+                flow.msgs.Add("Gravity (m/sec^2) x = " + Format(ocvb.parms.imuAccel.X, "#0.000") + " y = " + Format(ocvb.parms.imuAccel.Y, "#0.000") +
+                                  " z = " + Format(ocvb.parms.imuAccel.Z, "#0.000") + vbTab + "Motion (rads/sec) pitch = " + Format(ocvb.parms.imuGyro.X, "#0.000") + vbTab +
+                                  " Yaw = " + Format(ocvb.parms.imuGyro.Y, "#0.000") + vbTab + " Roll = " + Format(ocvb.parms.imuGyro.Z, "#0.000"))
             End If
             ocvb.label1 = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
         Else

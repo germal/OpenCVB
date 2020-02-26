@@ -51,7 +51,7 @@ Public Class CameraD400Series
     Public TemporalFilter As Boolean
     Public ThresholdFilter As Boolean
     Public pipelineClosed As Boolean = False
-    Public transformationMatrix(15) As Single
+    Public transformationMatrix() As Single
     Public Sub New()
         Console.WriteLine("The current librealsense version is " + ctx.Version())
     End Sub

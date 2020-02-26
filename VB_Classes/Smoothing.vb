@@ -51,7 +51,7 @@ Public Class Smoothing_Exterior : Implements IDisposable
 		ocvb.desc = "Smoothing the line connecting a series of points."
 	End Sub
 	Public Sub Run(ocvb As AlgorithmData)
-		If ocvb.frameCount Mod 100 Then Exit Sub
+		If ocvb.frameCount Mod 30 Then Exit Sub
 
 		hull.Run(ocvb)
 		Dim nextHull = hull.hull
@@ -129,7 +129,7 @@ Public Class Smoothing_Interior : Implements IDisposable
 		ocvb.desc = "Smoothing the line connecting a series of points staying inside the outline."
 	End Sub
 	Public Sub Run(ocvb As AlgorithmData)
-		If ocvb.frameCount Mod 100 Then Exit Sub
+		If ocvb.frameCount Mod 30 Then Exit Sub
 
 		hull.Run(ocvb)
 		Dim nextHull = hull.hull

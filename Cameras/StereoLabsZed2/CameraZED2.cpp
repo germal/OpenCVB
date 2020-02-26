@@ -23,13 +23,18 @@ public:
 	CameraParameters intrinsicsLeft;
 	CameraParameters intrinsicsRight;
 	CalibrationParameters extrinsics;
+	float rotation[9];
+	float translation[3];
+	float acceleration[3];
+	SensorsData sensordata;
+	Orientation orientation;
 private:
+	Pose camera_path;
 	sl::Camera zed;
 	sl::InitParameters init_params;
 	int width, height;
 	float imuData;
 	long long pixelCount;
-	Pose camera_path;
 	POSITIONAL_TRACKING_STATE tracking_state;
 public:
 	~StereoLabsZed2()
@@ -97,6 +102,12 @@ public:
 		// explicitly free the mat structures - trying to fix the flicker problem with GPU memory.
 		color.free(); RGBADepth.free(); depth32F.free(); leftView.free(); rightView.free(); pcMat.free();
 		tracking_state = zed.getPosition(camera_path, REFERENCE_FRAME::WORLD);
+
+		memcpy((void*)&rotation, (void*)&camera_path.getRotationMatrix(), sizeof(float) * 9);
+		memcpy((void*)&translation, (void*)&camera_path.getTranslation(), sizeof(float) * 3);
+
+		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
+
 		return (int*)&camera_path.pose_data;
 	}
 };
@@ -130,6 +141,37 @@ extern "C" __declspec(dllexport)
 int* Zed2Extrinsics(StereoLabsZed2*Zed2)
 {
 	return (int *) &Zed2->extrinsics;
+}
+
+extern "C" __declspec(dllexport)
+int* Zed2Acceleration(StereoLabsZed2 * Zed2)
+{
+	return (int*)&Zed2->sensordata.imu.linear_acceleration;
+}
+
+extern "C" __declspec(dllexport)
+int* Zed2Translation(StereoLabsZed2 * Zed2)
+{
+	return (int*)&Zed2->translation;
+}
+
+extern "C" __declspec(dllexport)
+int* Zed2RotationMatrix(StereoLabsZed2 * Zed2)
+{
+	return (int*)&Zed2->rotation;
+}
+
+extern "C" __declspec(dllexport)
+int* Zed2AngularVelocity(StereoLabsZed2 * Zed2)
+{
+	return (int*)&Zed2->sensordata.imu.angular_velocity;
+}
+
+extern "C" __declspec(dllexport)
+int* Zed2Orientation(StereoLabsZed2 * Zed2)
+{
+	Zed2->orientation = Zed2->sensordata.imu.pose.getOrientation();
+	return (int*)&Zed2->orientation;
 }
 
 extern "C" __declspec(dllexport)

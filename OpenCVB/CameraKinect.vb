@@ -84,7 +84,7 @@ Public Class CameraKinect
     Public serialNumber As String
     Public w As Int32
     Public pipelineClosed As Boolean = False
-    Public transformationMatrix(15) As Single
+    Public transformationMatrix() As Single
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)

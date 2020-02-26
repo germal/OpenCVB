@@ -21,9 +21,24 @@ Module Zed2_Interface
     <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2intrinsicsRight(kc As IntPtr) As IntPtr
     End Function
+    <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2Translation(kc As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2RotationMatrix(kc As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2Acceleration(kc As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2AngularVelocity(kc As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2Orientation(kc As IntPtr) As IntPtr
+    End Function
 End Module
 Public Class CameraZED2
-    Structure imuData
+    Structure imuDataStruct
         Dim r00 As Single
         Dim r01 As Single
         Dim r02 As Single
@@ -87,7 +102,7 @@ Public Class CameraZED2
     Public serialNumber As String
     Public w As Int32
     Public pipelineClosed As Boolean = False
-    Public transformationMatrix(15) As Single
+    Public transformationMatrix() As Single
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
@@ -170,32 +185,53 @@ Public Class CameraZED2
         Dim imuFrame = Zed2WaitFrame(Zed2, handlecolorBytes.AddrOfPinnedObject(), handleDepthRGBABytes.AddrOfPinnedObject(),
                                            handledepth32Fbytes.AddrOfPinnedObject(), handleleftBytes.AddrOfPinnedObject(),
                                            handlerightBytes.AddrOfPinnedObject(), handlePCBytes.AddrOfPinnedObject())
+        Dim acc = Zed2Acceleration(Zed2)
+        imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(acc)
+
+        Dim ang = Zed2AngularVelocity(Zed2)
+        Dim angularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
+
+        Dim quat = Zed2Orientation(Zed2)
+        Dim q = Marshal.PtrToStructure(Of System.Numerics.Quaternion)(quat)
+        Console.WriteLine("q.x = " + CStr(q.X) + "  q.y = " + CStr(q.Y) + "  q.z = " + CStr(q.Z) + "  q.w = " + CStr(q.W))
+
+        ' there must be a bug in the structure for acceleration and velocity.  This is an attempt to make something work.
+        ' Eliminate this code when the results above make sense.
+        imuAccel.Z = imuAccel.X
+        imuAccel.Y = angularVelocity.Z
+        imuAccel.X = angularVelocity.Y
+
+        ' roll pitch and yaw - but the values are currently incorrect.  Zed must fix this...
+        ' all 3 numbers should be near zero for a stationary camera.
+        imuGyro.X = angularVelocity.X
+        imuGyro.Y = angularVelocity.Y
+        imuGyro.Z = angularVelocity.Z
 
         Dim imuRawData(15) As Single
         Marshal.Copy(imuFrame, imuRawData, 0, imuRawData.Length)
+        Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
+        Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
+        Dim mat() As Single = {-rt.r00, rt.r01, -rt.r02, 0.0,
+                               -rt.r10, rt.r11, rt.r12, 0.0,
+                               -rt.r20, rt.r21, -rt.r22, 0.0,
+                               t.X, t.Y, t.Z, 1.0}
+        transformationMatrix = mat
 
-        'If imuFrame = 0 Then
-        '    Console.WriteLine("Zed2WaitFrame has returned without any image.")
-        '    failedImageCount += 1
-        '    Exit Sub ' just process the existing images again?  
-        'Else
-        'Dim imuOutput = Marshal.PtrToStructure(Of imuData)(imuFrame)
-        'imuGyro = imuOutput.imuGyro
-        'imuAccel = imuOutput.imuAccel
+        ' testing to see if we could have computed this independently...
+        Dim tr = Zed2Translation(Zed2)
+        Dim translation(2) As Single
+        Marshal.Copy(tr, translation, 0, translation.Length)
 
-        ' make the imu data consistent with the Intel IMU...
-        'Dim tmpVal = imuAccel.Z
-        'imuAccel.Z = imuAccel.X
-        'imuAccel.X = imuAccel.Y
-        'imuAccel.Y = tmpVal
+        Dim rot = Zed2RotationMatrix(Zed2)
+        Dim rotation(8) As Single
+        Marshal.Copy(rot, rotation, 0, rotation.Length)
 
-        'tmpVal = imuGyro.Z
-        'imuGyro.Z = -imuGyro.X
-        'imuGyro.X = imuGyro.Y
-        'imuGyro.Y = tmpVal
+        '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
+        Dim testmat() As Single = {-(1 - 2 * q.Y * q.Y - 2 * q.Z * q.Z), -(2 * q.X * q.Y + 2 * q.Z * q.W), -(2 * q.X * q.Z - 2 * q.Y * q.W), 0.0,
+                               2 * q.X * q.Y - 2 * q.Z * q.W, 1 - 2 * q.X * q.X - 2 * q.Z * q.Z, 2 * q.Y * q.Z + 2 * q.X * q.W, 0.0,
+                               -(2 * q.X * q.Z + 2 * q.Y * q.W), -(2 * q.Y * q.Z - 2 * q.X * q.W), -(1 - 2 * q.X * q.X - 2 * q.Y * q.Y), 0.0,
+                               t.X, t.Y, t.Z, 1.0}
 
-        'imuTimeStamp = imuOutput.accelTimeStamp
-        'End If
 
         handlecolorBytes.Free()
         handleDepthRGBABytes.Free()

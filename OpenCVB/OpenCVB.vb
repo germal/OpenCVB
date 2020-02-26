@@ -425,6 +425,7 @@ Public Class OpenCVB
             AvailableAlgorithms.Items.Clear()
             While sr.EndOfStream = False
                 infoLine = sr.ReadLine
+                infoLine = UCase(Mid(infoLine, 1, 1)) + Mid(infoLine, 2)
                 AvailableAlgorithms.Items.Add(infoLine)
             End While
             sr.Close()
@@ -824,10 +825,6 @@ Public Class OpenCVB
             cameraTaskHandle.Name = "CameraTask"
             cameraTaskHandle.Priority = ThreadPriority.Highest
             cameraTaskHandle.Start(camera.pcMultiplier)
-            ' wait for the first frame to appear.
-            While cameraFrameCount = 0
-                Application.DoEvents()
-            End While
         End If
 
         parms.IMUpresent = camera.IMUpresent

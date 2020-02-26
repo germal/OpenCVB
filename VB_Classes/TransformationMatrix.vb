@@ -5,14 +5,16 @@ Public Class TransformationMatrix_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "TMatrix Top View multiplier", 1, 1000, 500)
         If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.label1 = "View from above the T265 camera"
-        ocvb.label2 = "View from side of the T265 camera"
-        ocvb.desc = "Show how to use the T265's transformation matrix"
+        If ocvb.parms.cameraIndex = StereoLabsZED2 Then sliders.TrackBar1.Value = 1 ' need a smaller multiplier...
+
+        ocvb.label1 = "View from above the camera"
+        ocvb.label2 = "View from side of the camera"
+        ocvb.desc = "Show the contents of the transformation matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1.SetTo(0)
         ocvb.result2.SetTo(0)
-        If ocvb.parms.cameraIndex = T265Camera And ocvb.parms.transformationMatrix IsNot Nothing Then
+        If ocvb.parms.transformationMatrix IsNot Nothing Then
             Dim t = ocvb.parms.transformationMatrix
             Dim mul = sliders.TrackBar1.Value
             topLocations.Add(New cv.Point3d(-t(12) * mul + ocvb.result1.Width / 2,
@@ -30,9 +32,9 @@ Public Class TransformationMatrix_Basics : Implements IDisposable
                 End If
             Next
 
-            If topLocations.Count > 200 Then topLocations.RemoveAt(0) ' just show the last x points
+            If topLocations.Count > 20 Then topLocations.RemoveAt(0) ' just show the last x points
         Else
-            ocvb.putText(New ActiveClass.TrueType("Only the T265 camera has support for the transformation matrix.", 10, 125))
+            ocvb.putText(New ActiveClass.TrueType("The transformation matrix for the current camera has not been set", 10, 125))
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

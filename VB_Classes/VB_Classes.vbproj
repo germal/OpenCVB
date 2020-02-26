@@ -357,24 +357,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Python\grabcut.py" />
-    <Content Include="Python\kalman_TinyEKF.py" />
+    <Content Include="Python\Grabcut.py" />
+    <Content Include="Python\Kalman_TinyEKF.py" />
     <Content Include="Python\Camshift_PS.py" />
     <Content Include="Python\Edges_Canny_PS.py" />
     <Content Include="Python\KLT_homography_PS.py" />
     <Content Include="Python\KLT_track_PS.py" />
     <Content Include="Python\LaplaceEquations.py" />
-    <Content Include="Python\logpolar.py" />
+    <Content Include="Python\Logpolar.py" />
     <Content Include="Python\MatchTemplate.py" />
     <Content Include="Python\MotionTemplate_PS.py" />
     <Content Include="Python\MSER_PS.py" />
     <Content Include="Python\ICP_SyntheticExample.py" />
     <Content Include="Python\ICP_Models.py" />
-    <Content Include="Python\reg_shift.py" />
+    <Content Include="Python\Reg_shift.py" />
     <Content Include="Python\RotateImage.py" />
     <Content Include="Python\selectivesearchsegmentation_demo.py" />
     <Content Include="Python\Superpixels_PS.py" />
-    <Content Include="Python\threshold_inRange_PS.py" />
+    <Content Include="Python\Threshold_inRange_PS.py" />
     <Content Include="Python\TrackerPlane_AugmentedReality_PS.py" />
     <Content Include="Python\TrackerPlane_PS.py" />
     <Content Include="Python\Tracker_MIL_PS.py" />
@@ -394,7 +394,7 @@
     <Content Include="Python\Depth_RGB_PS.py" />
     <Content Include="Python\Python_SurfaceBlitOld.py" />
     <Content Include="Python\Sobel_AnisotropicSegmentation.py" />
-    <Content Include="Python\turing.py" />
+    <Content Include="Python\Turing.py" />
     <Content Include="Python\WarpAffine_SIFT.py" />
     <Content Include="Python\BareBones.py" />
     <Content Include="Python\Brightness_Contrast_Example1.py" />
