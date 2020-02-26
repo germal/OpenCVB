@@ -412,6 +412,7 @@ Public Class Depth_ToLeftView : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = D400Cam Or ocvb.parms.cameraIndex = StereoLabsZED2 Then
             red.Run(ocvb)
+            If ocvb.result1.Size <> ocvb.color.Size Then ocvb.result1 = ocvb.result1.Resize(ocvb.color.Size())
             ocvb.result2 = ocvb.result1
             Dim rHeight = sliders.TrackBar3.Value - sliders.TrackBar1.Value
             Dim rWidth = sliders.TrackBar4.Value - sliders.TrackBar2.Value
