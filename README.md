@@ -10,32 +10,42 @@ requirements:
 
 -   Visual Studio 2019 Community Edition (Free version of Visual Studio)
 
--   Either a Microsoft Kinect for Azure camera or an Intel RealSense camera –
-    D415, D435, D435i or T265
+-   Any of the following RGBZ cameras:
+
+    -   Microsoft Kinect for Azure
+
+    -   Intel RealSense camera – D415, D435, D435i or T265
+
+    -   StereoLabs ZED2
 
 The Microsoft Kinect for Azure camera has an IMU (Inertial Measurement Unit) and
 has better depth accuracy but requires more power and is not as portable as the
-Intel D4xx cameras. The D435i camera has an IMU as well.
+Intel D4xx cameras.
 
 **The Objective**
 
-There are many computer vision examples on the web but too often something is
-missing. And when the build is finally working, a filename or option is not
-known. OpenCVB collects many of these algorithms into a single application and
-guarantees that each will build and run. In addition, the process of adding
-variants and experimenting with the example is simplified.
+This software is targeting cameras that produce depth as well as color. Depth
+should prompt a complete review of existing computer vision algorithms, i.e. how
+could depth improve the results? To enable revisiting many existing algorithms,
+this software provides a single application that can run almost 600 algorithms.
 
-If this approach is to be useful, all the common languages for computer vision
-projects - C++, C\#, Python, and VB.Net – need support. Secondly, it is
-important to get access to multiple libraries - OpenCV, OpenCVSharp, OpenGL, and
-OpenMP. And lastly, it is important to use all the possible image
-representations - 3D, bitmaps, plots, bar charts, spreadsheets, or text.
+There are many computer vision examples on the web but too often something is
+missing. And when the build is finally working, a file or option needs to be
+specified and is not provided. OpenCVB collects many of these algorithms into a
+single application and guarantees that each will build and run. In addition, the
+process of adding variants and experimenting with the example is simplified.
+
+If this approach is to be useful, the languages for computer vision projects -
+C++, C\#, Python, and VB.Net – need support. Secondly, it is important to get
+access to multiple libraries - OpenCV, OpenCVSharp, OpenGL, and OpenMP. And
+lastly, it is important to use all the possible image representations - 3D,
+bitmaps, plots, bar charts, spreadsheets, or text.
 
 Making these languages and libraries available while using the same
 infrastructure shaped a standardized class for computer vision examples.
-Implementing hundreds of examples with the same reusable class has confirmed the
-approach is useful. The result is a starting point to share and explore computer
-vision experiments.
+Implementing hundreds of examples with the same reusable class structure has
+confirmed the approach is useful. The result is a starting point to add depth
+and explore further computer vision experiments.
 
 There are other objectives. Convolutions combined with neural nets (CNN’s) are a
 successful approach to computer vision. CNN’s detect differences within a set of
@@ -44,21 +54,21 @@ for more and better features than convolutions, features that are measured and
 essential. Depth, infrared, gravity, and camera motion are the kind of objective
 features that can enhance almost any color image algorithm.
 
-And what if all cameras had depth? And an IMU. Those assumptions are being made
-now in OpenCVB – which explains why only a few cameras (Intel and Kinect) are
-currently supported. More cameras with depth are expected to arrive and
-integration with OpenCVB is likely to follow. OpenCVB is an opportunity to
-exploit these new features.
+And what if all cameras had depth? And an IMU. Making this assumption explains
+why only a few cameras from Intel, Microsoft, and others are currently
+supported. More cameras with depth are expected to arrive and integration with
+OpenCVB is likely to follow. OpenCVB is an opportunity to exploit the new
+features of these cameras.
 
 The algorithms are notably short, almost always less than a page of code,
-labelled reasonably well, easily searched and grouped and combined, and often
-provide links to alternate versions online. Many downloadable algorithms are
-encumbered by environmental considerations that can obscure the meaning or
-context of an algorithm. All the algorithms here are isolated from environmental
-specifics like a user interface or targeted usage and even camera device. All
-the algorithms work with both the Kinect for Azure 3D camera and the Intel D4xx
-cameras. This package attempts to isolate algorithm functionality and thereby
-enable adaptation and combination for multiple eventual uses.
+labelled reasonably well, easily searched and grouped and combined, while often
+providing links to online versions for other platforms. Many downloadable
+algorithms are encumbered by environmental considerations that can obscure the
+meaning or context of an algorithm. All the algorithms here are isolated from
+environmental specifics like a user interface or targeted usage and even camera
+device. All the algorithms work with the supported list of cameras. This package
+attempts to isolate algorithm functionality and thereby enable adaptation and
+combination for multiple eventual uses of the algorithm in any platform.
 
 **Pre-Install Notes**
 
@@ -123,7 +133,7 @@ The third step is where all the work is.
 
 The “PrepareTree.bat” script will download OpenCV, librealsense, and
 Kinect4Azure from their respective GitHub locations and install them in the
-OpenCVB tree. In addition, the script will run the CMake command that sets up
+OpenCVB tree. In addition, the script will run the CMake commands that setup
 OpenCV, librealsense, and Kinect4Azure. The script will then open Visual Studio
 for each solution file. Build the Debug and Release versions of each with the
 “Build/Batch Build” Visual Studio menu entry. The download and CMake steps take
@@ -152,21 +162,26 @@ installation of the Kinect4Azure camera:
 
 The last step is to open the OpenCVB.sln file and build OpenCVB.
 
+-   If you are using the StereoLabs ZED 2 camera (released Q1 2020), install the
+    StereoLabs SDK from <https://www.stereolabs.com/>
+
 **Trouble-Shooting New Install**
 
 Some typical problems with new installations:
 
 -   Link problems: check the “OpenCV_Version” environmental variable for OpenCV
-    version. Make sure that OpenCV Debug and Release versions were built
-    successfully.
+    version. It may need to reflect a newer version of OpenCV. For OpenCV 4.2,
+    the environmental variable is OpenCV_Version = 420. Make sure that OpenCV
+    Debug and Release versions were built successfully.
 
--   Camera Failure: check the Kinect4Azure/Intel D4xx installation, test camera
-    independently. Did the Kinect4Azure support get upgraded recently? Post if
-    some configuration problems prevent the camera from working in OpenCVB.
+-   Camera Failure: check the camera installation by testing camera with
+    examples provided by the vendor. Did the Kinect4Azure support get upgraded
+    recently? Post if some configuration problems prevent the camera from
+    working in OpenCVB.
 
--   Python Scripts Fail: check OpenCVB Options Python setting – click the
-    Settings icon. Make sure it points to the currently installed version in
-    Visual Studio. Test Python scripts independently using \<OpenCVB Home
+-   Python Scripts Fail: check OpenCVB Options Python setting (in the Settings
+    icon.) Make sure it points to the Python version that was installed. Test
+    Python scripts independently using \<OpenCVB Home
     Directory\>/VB_Classes/Python/PythonDebug.sln. Also review the list of
     required packages in the Python section below.
 
@@ -176,7 +191,8 @@ OpenCVB is a WinForms application and most of the algorithms are written using
 Microsoft's managed code but C++ examples are provided as well (with appropriate
 VB.Net wrappers.) Python examples don’t require a VB.Net wrapper unless you want
 to pass RGB, depth, or point cloud images to your Python script. There are
-several VB.Net examples that demonstrate how to move images to Python.
+several VB.Net examples that demonstrate how to move images to Python (see
+AddWeighted_Trackbar_PS.py as an example that is only a few lines of code.)
 
 For C++, C\#, and VB.Net writing a new experiment requires a new class be added
 anywhere in the “VB_Classes” project. OpenCVB will automatically detect the new
@@ -236,7 +252,7 @@ Python. Most of the algorithms avoid pixel-by-pixel details – VB.Net can be
 detailed but it will be slower than C++. Usually, OpenCV is doing most of the
 real work in optimized C++ through the OpenCVSharp interface. Most algorithms
 run reasonably fast even in Debug mode because the release version of
-OpenCVSharp is active even when in the solution is in Debug mode.
+OpenCVSharp is active even when the solution is in Debug mode.
 
 Critics will point out that a Windows 10 app using VB.Net is not easily portable
 but the entire OpenCVB application does not need to be ported to other
@@ -250,26 +266,21 @@ easily ported to a variety of non-Windows platforms.
 
 **Camera Interface**
 
-All the camera code is isolated in the “camera” class instances IntelD4xx.vb,
-Kinect.vb or IntelT265.vb. There are no references to camera interfaces anywhere
-else in the code. Isolating the camera support from the algorithms strips the
-code to just the essential OpenCV API’s needed.
+All the camera code is isolated in the “camera” class instances
+cameraD400Series.vb, cameraKinect.vb, cameraZed2.vb or cameraT265.vb. There are
+no references to camera interfaces anywhere else in the code. Isolating the
+camera support from the algorithms strips the code to just the essential OpenCV
+API’s needed.
 
-The Intel RealSense team does not support this VB.Net interface (they did not
-provide an interface written in VB.Net.) Please post any issue if problems are
-encountered with the latest RealSense drivers. The version used in this release
-is librealsense2 version 2.32.1. The librealsense2 library is updated roughly
-every other week.
-
-Similarly, the Kinect for Azure camera support is isolated to the Kinect.vb
-class and a supporting KinectCamera DLL that provides all the interface code to
-the Kinect for Azure libraries. Since there is likely to be little interest in
-debugging the KinectCamera DLL, the Build Configuration is the Release version
-even in the Debug configuration. If it is necessary to debug the camera
-interface, set any Build Configuration components to the Debug version.
-Optimizations enable a higher framerate than when running the Debug
-configuration of the Kinect camera DLL. As a result, the VB.Net code in Debug
-mode often runs as fast as the Release configuration.
+For example, the Kinect for Azure camera support is isolated to the
+cameraKinect.vb class and a supporting KinectCamera DLL that provides all the
+interface code to the Kinect for Azure libraries. Since there is likely to be
+little interest in debugging the KinectCamera DLL, the Release version is used
+in the Debug configuration. If it is necessary to debug the camera interface,
+set any Build Configuration components to the Debug version. Optimizations
+enable a higher framerate than when running the Debug configuration of the
+Kinect camera DLL. As a result, the VB.Net code in Debug mode often runs as fast
+as the Release configuration.
 
 **OpenGL Interface**
 
