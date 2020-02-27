@@ -37,8 +37,7 @@ Public Class CameraD400Series
     Public HoleFillingFilter As Boolean
     Public imuAccel As cv.Point3f
     Public imuGyro As cv.Point3f
-    Public IMUpresent As Boolean
-    Public imuTimeStamp As Double
+    Public IMU_Present As Boolean
     Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public modelInverse As Boolean
@@ -52,6 +51,10 @@ Public Class CameraD400Series
     Public ThresholdFilter As Boolean
     Public pipelineClosed As Boolean = False
     Public transformationMatrix() As Single
+    Public IMU_Barometer As Single
+    Public IMU_Magnetometer As cv.Point3f
+    Public IMU_Temperature As Single
+    Public IMU_TimeStamp As Double
     Public Sub New()
         Console.WriteLine("The current librealsense version is " + ctx.Version())
     End Sub
@@ -68,7 +71,7 @@ Public Class CameraD400Series
         If deviceName = "Intel RealSense D435I" Then
             cfg.EnableStream(rs.Stream.Gyro)
             cfg.EnableStream(rs.Stream.Accel)
-            IMUpresent = True
+            IMU_Present = True
         End If
 
         pipeline = New rs.Pipeline(ctx)
@@ -154,10 +157,11 @@ Public Class CameraD400Series
                     Marshal.Copy(rawRight.Data, rightViewBytes, 0, rightViewBytes.Length)
 
                     ' get motion data and timestamp from the gyro and accelerometer
-                    If IMUpresent Then
+                    If IMU_Present Then
                         Dim gyroFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Gyro, rs.Format.MotionXyz32f)
                         imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame.Data)
-                        imuTimeStamp = gyroFrame.Timestamp
+
+                        IMU_TimeStamp = gyroFrame.Timestamp
 
                         Dim accelFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Accel, rs.Format.MotionXyz32f)
                         imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame.Data)
@@ -173,6 +177,15 @@ Public Class CameraD400Series
         If pipelineClosed Then Exit Sub
         Dim frameSet = pipeline.WaitForFrames(1000)
         block.Process(frameSet)
+
+        Static startTime = IMU_TimeStamp
+        Dim tmp = IMU_TimeStamp - startTime
+        If tmp < 0 Then
+            startTime = IMU_TimeStamp
+            IMU_TimeStamp = IMU_TimeStamp
+        Else
+            IMU_TimeStamp = tmp
+        End If
 
         color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorBytes)
         RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)

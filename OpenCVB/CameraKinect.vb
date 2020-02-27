@@ -72,8 +72,7 @@ Public Class CameraKinect
     Public h As Int32
     Public imuAccel As cv.Point3f
     Public imuGyro As cv.Point3f
-    Public imuPresent As Boolean = True ' kinect cameras always have an IMU.
-    Public imuTimeStamp As Double
+    Public IMU_Present As Boolean = True ' kinect cameras always have an IMU.
     Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public modelInverse As Boolean
@@ -85,6 +84,10 @@ Public Class CameraKinect
     Public w As Int32
     Public pipelineClosed As Boolean = False
     Public transformationMatrix() As Single
+    Public IMU_Barometer As Single
+    Public IMU_Magnetometer As cv.Point3f
+    Public IMU_Temperature As Single
+    Public IMU_TimeStamp As Double
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
@@ -163,7 +166,7 @@ Public Class CameraKinect
             imuGyro.X = imuGyro.Y
             imuGyro.Y = tmpVal
 
-            imuTimeStamp = imuOutput.accelTimeStamp
+            IMU_TimeStamp = imuOutput.accelTimeStamp
         End If
 
         handleRGBDepth.Free()

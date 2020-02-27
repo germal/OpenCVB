@@ -1,265 +1,149 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-## License: Apache 2.0. See LICENSE file in root directory.
-## Copyright(c) 2019 Intel Corporation. All Rights Reserved.
-# Python 2/3 compatibility
-from __future__ import print_function
+########################################################################
+#
+# Copyright (c) 2020, STEREOLABS.
+#
+# All rights reserved.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+########################################################################
 
-"""
-This example shows how to use T265 intrinsics and extrinsics in OpenCV to
-asynchronously compute depth maps from T265 fisheye images on the host.
-
-T265 is not a depth camera and the quality of passive-only depth options will
-always be limited compared to (e.g.) the D4XX series cameras. However, T265 does
-have two global shutter cameras in a stereo configuration, and in this example
-we show how to set up OpenCV to undistort the images and compute stereo depth
-from them.
-
-Getting started with python3, OpenCV and T265 on Ubuntu 16.04:
-
-First, set up the virtual enviroment:
-
-$ apt-get install python3-venv  # install python3 built in venv support
-$ python3 -m venv py3librs      # create a virtual environment in pylibrs
-$ source py3librs/bin/activate  # activate the venv, do this from every terminal
-$ pip install opencv-python     # install opencv 4.1 in the venv
-$ pip install pyrealsense2      # install librealsense python bindings
-
-Then, for every new terminal:
-
-$ source py3librs/bin/activate  # Activate the virtual environment
-$ python3 t265_stereo.py        # Run the example
-"""
-
-# First import the library
-import pyrealsense2 as rs
-
-# Import OpenCV and numpy
+import pyzed.sl as sl
 import cv2
 import numpy as np
-from math import tan, pi
 
-"""
-In this section, we will set up the functions that will translate the camera
-intrinsics and extrinsics from librealsense into parameters that can be used
-with OpenCV.
+def main():
+    # Create a Camera object
+    zed = sl.Camera()
 
-The T265 uses very wide angle lenses, so the distortion is modeled using a four
-parameter distortion model known as Kanalla-Brandt. OpenCV supports this
-distortion model in their "fisheye" module, more details can be found here:
+    # Create a InitParameters object and set configuration parameters
+    init_params = sl.InitParameters()
+    init_params.camera_resolution = sl.RESOLUTION.HD720  # Use HD720 video mode
+    init_params.coordinate_system = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP
+    init_params.coordinate_units = sl.UNIT.METER
 
-https://docs.opencv.org/3.4/db/d58/group__calib3d__fisheye.html
-"""
+    # Open the camera
+    err = zed.open(init_params)
+    if err != sl.ERROR_CODE.SUCCESS :
+        print(repr(err))
+        zed.close()
+        exit(1)
 
-"""
-Returns R, T transform from src to dst
-"""
-def get_extrinsics(src, dst):
-    extrinsics = src.get_extrinsics_to(dst)
-    R = np.reshape(extrinsics.rotation, [3,3]).T
-    T = np.array(extrinsics.translation)
-    return (R, T)
+    cam_model = zed.get_camera_information().camera_model
+    if cam_model == sl.MODEL.ZED :
+        print("This tutorial only supports ZED-M and ZED2 camera models")
+        exit(1)
 
-"""
-Returns a camera matrix K from librealsense intrinsics
-"""
-def camera_matrix(intrinsics):
-    return np.array([[intrinsics.fx,             0, intrinsics.ppx],
-                     [            0, intrinsics.fy, intrinsics.ppy],
-                     [            0,             0,              1]])
-
-"""
-Returns the fisheye distortion from librealsense intrinsics
-"""
-def fisheye_distortion(intrinsics):
-    return np.array(intrinsics.coeffs[:4])
-
-# Set up a mutex to share data between threads 
-from threading import Lock
-frame_mutex = Lock()
-frame_data = {"left"  : None,
-              "right" : None,
-              "timestamp_ms" : None
-              }
-
-"""
-This callback is called on a separate thread, so we must use a mutex
-to ensure that data is synchronized properly. We should also be
-careful not to do much work on this thread to avoid data backing up in the
-callback queue.
-"""
-def callback(frame):
-    global frame_data
-    if frame.is_frameset():
-        frameset = frame.as_frameset()
-        f1 = frameset.get_fisheye_frame(1).as_video_frame()
-        f2 = frameset.get_fisheye_frame(2).as_video_frame()
-        left_data = np.asanyarray(f1.get_data())
-        right_data = np.asanyarray(f2.get_data())
-        ts = frameset.get_timestamp()
-        frame_mutex.acquire()
-        frame_data["left"] = left_data
-        frame_data["right"] = right_data
-        frame_data["timestamp_ms"] = ts
-        frame_mutex.release()
-
-# Declare RealSense pipeline, encapsulating the actual device and sensors
-pipe = rs.pipeline()
-
-# Build config object and stream everything
-cfg = rs.config()
-
-# Start streaming with our callback
-pipe.start(cfg, callback)
-
-try:
-    # Set up an OpenCV window to visualize the results
-    WINDOW_TITLE = 'Realsense'
-    cv2.namedWindow(WINDOW_TITLE, cv2.WINDOW_NORMAL)
-
-    # Configure the OpenCV stereo algorithm. See
-    # https://docs.opencv.org/3.4/d2/d85/classcv_1_1StereoSGBM.html for a
-    # description of the parameters
-    window_size = 5
-    min_disp = 0
-    # must be divisible by 16
-    num_disp = 112 - min_disp
-    max_disp = min_disp + num_disp
-    stereo = cv2.StereoSGBM_create(minDisparity = min_disp,
-                                   numDisparities = num_disp,
-                                   blockSize = 16,
-                                   P1 = 8*3*window_size**2,
-                                   P2 = 32*3*window_size**2,
-                                   disp12MaxDiff = 1,
-                                   uniquenessRatio = 10,
-                                   speckleWindowSize = 100,
-                                   speckleRange = 32)
-
-    # Retreive the stream and intrinsic properties for both cameras
-    profiles = pipe.get_active_profile()
-    streams = {"left"  : profiles.get_stream(rs.stream.fisheye, 1).as_video_stream_profile(),
-               "right" : profiles.get_stream(rs.stream.fisheye, 2).as_video_stream_profile()}
-    intrinsics = {"left"  : streams["left"].get_intrinsics(),
-                  "right" : streams["right"].get_intrinsics()}
-
-    # Print information about both cameras
-    print("Left camera:",  intrinsics["left"])
-    print("Right camera:", intrinsics["right"])
-
-    # Translate the intrinsics from librealsense into OpenCV
-    K_left  = camera_matrix(intrinsics["left"])
-    D_left  = fisheye_distortion(intrinsics["left"])
-    K_right = camera_matrix(intrinsics["right"])
-    D_right = fisheye_distortion(intrinsics["right"])
-    (width, height) = (intrinsics["left"].width, intrinsics["left"].height)
-
-    # Get the relative extrinsics between the left and right camera
-    (R, T) = get_extrinsics(streams["left"], streams["right"])
-
-    # We need to determine what focal length our undistorted images should have
-    # in order to set up the camera matrices for initUndistortRectifyMap.  We
-    # could use stereoRectify, but here we show how to derive these projection
-    # matrices from the calibration and a desired height and field of view
-
-    # We calculate the undistorted focal length:
-    #
-    #         h
-    # -----------------
-    #  \      |      /
-    #    \    | f  /
-    #     \   |   /
-    #      \ fov /
-    #        \|/
-    stereo_fov_rad = 90 * (pi/180)  # 90 degree desired fov
-    stereo_height_px = 300          # 300x300 pixel stereo output
-    stereo_focal_px = stereo_height_px/2 / tan(stereo_fov_rad/2)
-
-    # We set the left rotation to identity and the right rotation
-    # the rotation between the cameras
-    R_left = np.eye(3)
-    R_right = R
-
-    # The stereo algorithm needs max_disp extra pixels in order to produce valid
-    # disparity on the desired output region. This changes the width, but the
-    # center of projection should be on the center of the cropped image
-    stereo_width_px = stereo_height_px + max_disp
-    stereo_size = (stereo_width_px, stereo_height_px)
-    stereo_cx = (stereo_height_px - 1)/2 + max_disp
-    stereo_cy = (stereo_height_px - 1)/2
-
-    # Construct the left and right projection matrices, the only difference is
-    # that the right projection matrix should have a shift along the x axis of
-    # baseline*focal_length
-    P_left = np.array([[stereo_focal_px, 0, stereo_cx, 0],
-                       [0, stereo_focal_px, stereo_cy, 0],
-                       [0,               0,         1, 0]])
-    P_right = P_left.copy()
-    P_right[0][3] = T[0]*stereo_focal_px
-
-    # Construct Q for use with cv2.reprojectImageTo3D. Subtract max_disp from x
-    # since we will crop the disparity later
-    Q = np.array([[1, 0,       0, -(stereo_cx - max_disp)],
-                  [0, 1,       0, -stereo_cy],
-                  [0, 0,       0, stereo_focal_px],
-                  [0, 0, -1/T[0], 0]])
-
-    # Create an undistortion map for the left and right camera which applies the
-    # rectification and undoes the camera distortion. This only has to be done
-    # once
-    m1type = cv2.CV_32FC1
-    (lm1, lm2) = cv2.fisheye.initUndistortRectifyMap(K_left, D_left, R_left, P_left, stereo_size, m1type)
-    (rm1, rm2) = cv2.fisheye.initUndistortRectifyMap(K_right, D_right, R_right, P_right, stereo_size, m1type)
-    undistort_rectify = {"left"  : (lm1, lm2),
-                         "right" : (rm1, rm2)}
-
-    mode = "stack"
-    while True:
-        # Check if the camera has acquired any frames
-        frame_mutex.acquire()
-        valid = frame_data["timestamp_ms"] is not None
-        frame_mutex.release()
-
-        # If frames are ready to process
-        if valid:
-            # Hold the mutex only long enough to copy the stereo frames
-            frame_mutex.acquire()
-            frame_copy = {"left"  : frame_data["left"].copy(),
-                          "right" : frame_data["right"].copy()}
-            frame_mutex.release()
-
-            # Undistort and crop the center of the frames
-            center_undistorted = {"left" : cv2.remap(src = frame_copy["left"],
-                                          map1 = undistort_rectify["left"][0],
-                                          map2 = undistort_rectify["left"][1],
-                                          interpolation = cv2.INTER_LINEAR),
-                                  "right" : cv2.remap(src = frame_copy["right"],
-                                          map1 = undistort_rectify["right"][0],
-                                          map2 = undistort_rectify["right"][1],
-                                          interpolation = cv2.INTER_LINEAR)}
-
-            # compute the disparity on the center of the frames and convert it to a pixel disparity (divide by DISP_SCALE=16)
-            disparity = stereo.compute(center_undistorted["left"], center_undistorted["right"]).astype(np.float32) / 16.0
-
-            # re-crop just the valid part of the disparity
-            disparity = disparity[:,max_disp:]
-
-            # convert disparity to 0-255 and color it
-            disp_vis = 255*(disparity - min_disp)/ num_disp
-            disp_color = cv2.applyColorMap(cv2.convertScaleAbs(disp_vis,1), cv2.COLORMAP_JET)
-            color_image = cv2.cvtColor(center_undistorted["left"][:,max_disp:], cv2.COLOR_GRAY2RGB)
-
-            if mode == "stack":
-                cv2.imshow(WINDOW_TITLE, np.hstack((color_image, disp_color)))
-            if mode == "overlay":
-                ind = disparity >= min_disp
-                color_image[ind, 0] = disp_color[ind, 0]
-                color_image[ind, 1] = disp_color[ind, 1]
-                color_image[ind, 2] = disp_color[ind, 2]
-                cv2.imshow(WINDOW_TITLE, color_image)
-        key = cv2.waitKey(1)
-        if key == ord('s'): mode = "stack"
-        if key == ord('o'): mode = "overlay"
-        if key == ord('q') or cv2.getWindowProperty(WINDOW_TITLE, cv2.WND_PROP_VISIBLE) < 1:
+    # Get Sensor Data for 2 seconds (800 samples)
+    i = 0
+    data = sl.SensorsData()
+    first_ts = sl.Timestamp()
+    prev_imu_ts = sl.Timestamp()
+    prev_baro_ts = sl.Timestamp()
+    prev_mag_ts = sl.Timestamp()
+    while i < 80000 :
+        # Get Sensor Data not synced with image frames
+        if zed.get_sensors_data(data, sl.TIME_REFERENCE.CURRENT) != sl.ERROR_CODE.SUCCESS :
+            print("Error retrieving Sensor Data")
             break
-finally:
-    pipe.stop()
+
+        imu_ts = data.get_imu_data().timestamp
+
+        if i == 0 :
+            first_ts = imu_ts
+
+        # Check if Sensors Data are updated
+        if prev_imu_ts.data_ns == imu_ts.data_ns :
+            continue
+
+        prev_imu_ts = imu_ts
+
+        print("*** Sample #"+str(i))
+
+        seconds = data.get_imu_data().timestamp.get_seconds() - first_ts.get_seconds()
+        print(" * Relative timestamp: "+str(seconds)+" sec")
+
+        # Filtered orientation quaternion
+        zed_imu = data.get_imu_data()
+
+        #Display the IMU acceleratoin
+        acceleration = [0,0,0]
+        zed_imu.get_linear_acceleration(acceleration)
+        ax = round(acceleration[0], 3)
+        ay = round(acceleration[1], 3)
+        az = round(acceleration[2], 3)
+        print("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
+
+        #Display the IMU angular velocity
+        a_velocity = [0,0,0]
+        zed_imu.get_angular_velocity(a_velocity)
+        vx = round(a_velocity[0], 3)
+        vy = round(a_velocity[1], 3)
+        vz = round(a_velocity[2], 3)
+        print("IMU Angular Velocity: Vx: {0}, Vy: {1}, Vz {2}\n".format(vx, vy, vz))
+
+        # Display the IMU orientation quaternion
+        zed_imu_pose = sl.Transform()
+        ox = round(zed_imu.get_pose(zed_imu_pose).get_orientation().get()[0], 3)
+        oy = round(zed_imu.get_pose(zed_imu_pose).get_orientation().get()[1], 3)
+        oz = round(zed_imu.get_pose(zed_imu_pose).get_orientation().get()[2], 3)
+        ow = round(zed_imu.get_pose(zed_imu_pose).get_orientation().get()[3], 3)
+        print("IMU Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
+
+        if cam_model == sl.MODEL.ZED2 :
+
+            # IMU temperature
+            location = sl.SENSOR_LOCATION.IMU
+            temp = data.get_temperature_data().get(location)
+            if temp != -1:
+               print(" *  IMU temperature: "+str(temp)+"C")
+
+            # Check if Magnetometer Data are updated
+            mag_ts = data.get_magnetometer_data().timestamp
+            if (prev_mag_ts.data_ns != mag_ts.data_ns) :
+                prev_mag_ts = mag_ts
+                mx = round(data.get_magnetometer_data().get_magnetic_field_calibrated()[0])
+                my = round(data.get_magnetometer_data().get_magnetic_field_calibrated()[1])
+                mz = round(data.get_magnetometer_data().get_magnetic_field_calibrated()[2])
+                print(" * Magnetic Fields [uT]: x: {0}, y: {1}, z: {2}".format(mx, my, mz))
+
+            baro_ts = data.get_barometer_data().timestamp
+            if (prev_baro_ts.data_ns != baro_ts.data_ns) :
+                prev_baro_ts = baro_ts
+
+                # Atmospheric pressure
+                print(" * Atmospheric pressure [hPa]: "+str(data.get_barometer_data().pressure))
+
+                # Barometer temperature
+                location = sl.SENSOR_LOCATION.BAROMETER
+                baro_temp = data.get_temperature_data().get(location)
+                if baro_temp != -1:
+                    print(" * Barometer temperature: "+str(temp)+"C")
+
+                # Camera temperatures
+                location_left = sl.SENSOR_LOCATION.ONBOARD_LEFT
+                location_right = sl.SENSOR_LOCATION.ONBOARD_RIGHT
+
+                left_temp = data.get_temperature_data().get(location_left)
+                right_temp = data.get_temperature_data().get(location_right)
+                print(" * Camera left temperature: "+str(left_temp))
+                print(" * Camera right temperature: "+str(right_temp))
+
+        i = i+1
+
+    zed.close()
+    return 0
+
+if __name__ == "__main__":
+    main()
+

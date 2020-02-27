@@ -15,22 +15,18 @@ Public Class IMU_Basics : Implements IDisposable
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
-        flow = New Font_FlowText(ocvb)
-        flow.externalUse = True
-        flow.result1or2 = RESULT1
-
         ocvb.desc = "Read and display the IMU coordinates"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.IMUpresent Then
+        If ocvb.parms.IMU_Present Then
             Dim alpha As Double = sliders.TrackBar1.Value / 1000
             If ocvb.frameCount = 0 Then
-                lastTimeStamp = ocvb.parms.imuTimeStamp
+                lastTimeStamp = ocvb.parms.IMU_TimeStamp
             Else
                 gyroAngle = ocvb.parms.imuGyro
-                Dim dt_gyro = (ocvb.parms.imuTimeStamp - lastTimeStamp) / 1000
+                Dim dt_gyro = (ocvb.parms.IMU_TimeStamp - lastTimeStamp) / 1000
                 If ocvb.parms.cameraIndex <> D400Cam Then dt_gyro /= 1000 ' different units in the timestamp?
-                lastTimeStamp = ocvb.parms.imuTimeStamp
+                lastTimeStamp = ocvb.parms.IMU_TimeStamp
                 gyroAngle = gyroAngle * dt_gyro
                 theta += New cv.Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X)
             End If
@@ -48,7 +44,7 @@ Public Class IMU_Basics : Implements IDisposable
                 theta.Z = theta.Z * alpha + accelAngle.Z * (1 - alpha)
             End If
             If externalUse = False Then
-                flow.msgs.Add("Gravity (m/sec^2) x = " + Format(ocvb.parms.imuAccel.X, "#0.000") + " y = " + Format(ocvb.parms.imuAccel.Y, "#0.000") +
+                flow.msgs.Add("ts = " + CStr(ocvb.parms.IMU_TimeStamp) + "Gravity (m/sec^2) x = " + Format(ocvb.parms.imuAccel.X, "#0.000") + " y = " + Format(ocvb.parms.imuAccel.Y, "#0.000") +
                                   " z = " + Format(ocvb.parms.imuAccel.Z, "#0.000") + vbTab + "Motion (rads/sec) pitch = " + Format(ocvb.parms.imuGyro.X, "#0.000") + vbTab +
                                   " Yaw = " + Format(ocvb.parms.imuGyro.Y, "#0.000") + vbTab + " Roll = " + Format(ocvb.parms.imuGyro.Z, "#0.000"))
             End If
@@ -88,7 +84,7 @@ Public Class IMU_Stabilizer : Implements IDisposable
         ocvb.label2 = "Difference from Color Image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.IMUpresent Then
+        If ocvb.parms.IMU_Present Then
             Static savedKalmanCheck = check.Box(0).Checked
             If savedKalmanCheck <> check.Box(0).Checked Then
                 kalman.restartRequested = True
@@ -136,3 +132,87 @@ Public Class IMU_Stabilizer : Implements IDisposable
     End Sub
 End Class
 
+
+
+
+
+
+Public Class IMU_Magnetometer : Implements IDisposable
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.desc = "Get the IMU_Magnetometer values from the IMU (if available)"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.IMU_Magnetometer = New cv.Point3f Then
+            ocvb.putText(New ActiveClass.TrueType("The IMU for this camera does not have IMU_Magnetometer readings.", 10, 125))
+        Else
+            ocvb.putText(New ActiveClass.TrueType("Uncalibrated IMU Magnetometer reading:  x = " + CStr(ocvb.parms.IMU_Magnetometer.X), 10, 60))
+            ocvb.putText(New ActiveClass.TrueType("Uncalibrated IMU Magnetometer reading:  y = " + CStr(ocvb.parms.IMU_Magnetometer.Y), 10, 80))
+            ocvb.putText(New ActiveClass.TrueType("Uncalibrated IMU Magnetometer reading:  z = " + CStr(ocvb.parms.IMU_Magnetometer.Z), 10, 100))
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class
+
+
+
+
+Public Class IMU_Barometer : Implements IDisposable
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.desc = "Get the barometric pressure from the IMU (if available)"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.IMU_Barometer = 0 Then
+            ocvb.putText(New ActiveClass.TrueType("The IMU for this camera does not have barometric pressure.", 10, 125))
+        Else
+            ocvb.putText(New ActiveClass.TrueType("Barometric pressure is " + CStr(ocvb.parms.IMU_Barometer) + " hectopascal.", 10, 60))
+            ocvb.putText(New ActiveClass.TrueType("Barometric pressure is " + Format(ocvb.parms.IMU_Barometer * 0.02953, "#0.00") + " inches of mercury.", 10, 90))
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class
+
+
+
+
+Public Class IMU_Temperature : Implements IDisposable
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.desc = "Get the temperature of the IMU (if available)"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.IMU_Present Then
+            ocvb.putText(New ActiveClass.TrueType("IMU Temperature is " + Format(ocvb.parms.IMU_Temperature, "#0.00") + " degrees Celsius.", 10, 60))
+            ocvb.putText(New ActiveClass.TrueType("IMU Temperature is " + Format(ocvb.parms.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.", 10, 80))
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class IMU_TimeStamp : Implements IDisposable
+    Dim flow As Font_FlowText
+    Public Sub New(ocvb As AlgorithmData)
+        flow = New Font_FlowText(ocvb)
+        flow.externalUse = True
+        flow.result1or2 = RESULT1
+
+        ocvb.desc = "Get the timestamp from the IMU"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.IMU_Present Then
+            flow.msgs.Add("Timestamp = " + Format(ocvb.parms.IMU_TimeStamp / 1000, "##0.0000000000000") + " seconds")
+            flow.Run(ocvb)
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        flow.Dispose()
+    End Sub
+End Class

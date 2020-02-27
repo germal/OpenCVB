@@ -52,8 +52,7 @@ Public Class CameraT265
     Public failedImageCount As Int32
     Public imuAccel As cv.Point3f
     Public imuGyro As cv.Point3f
-    Public IMUpresent As Boolean
-    Public imuTimeStamp As Double
+    Public IMU_Present As Boolean
     Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public leftView As cv.Mat
@@ -73,6 +72,10 @@ Public Class CameraT265
     Public pMatRight As cv.Mat
     Public rMatleft As cv.Mat
     Public rMatRight As cv.Mat
+    Public IMU_Barometer As Single
+    Public IMU_Magnetometer As cv.Point3f
+    Public IMU_Temperature As Single
+    Public IMU_TimeStamp As Double
     Dim QArray(15) As Double
 
     Public transformationMatrix() As Single
@@ -189,7 +192,7 @@ Public Class CameraT265
         rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, 0)
         ReDim vertices(w * h * 4 * 3 - 1) ' 3 floats or 12 bytes per pixel.  
 
-        IMUpresent = True
+        IMU_Present = True
     End Sub
     Structure T265IMUdata
         Public translation As cv.Point3f

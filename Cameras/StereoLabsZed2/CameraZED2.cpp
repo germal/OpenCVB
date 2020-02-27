@@ -28,14 +28,14 @@ public:
 	float acceleration[3];
 	SensorsData sensordata;
 	Orientation orientation;
+	float imuTemperature;
+	Pose zed_pose;
 private:
-	Pose camera_path;
 	sl::Camera zed;
 	sl::InitParameters init_params;
 	int width, height;
 	float imuData;
 	long long pixelCount;
-	POSITIONAL_TRACKING_STATE tracking_state;
 public:
 	~StereoLabsZed2()
 	{
@@ -101,88 +101,84 @@ public:
 
 		// explicitly free the mat structures - trying to fix the flicker problem with GPU memory.
 		color.free(); RGBADepth.free(); depth32F.free(); leftView.free(); rightView.free(); pcMat.free();
-		tracking_state = zed.getPosition(camera_path, REFERENCE_FRAME::WORLD);
+		
+		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
 
-		memcpy((void*)&rotation, (void*)&camera_path.getRotationMatrix(), sizeof(float) * 9);
-		memcpy((void*)&translation, (void*)&camera_path.getTranslation(), sizeof(float) * 3);
+		memcpy((void*)&rotation, (void*)&zed_pose.getRotationMatrix(), sizeof(float) * 9);
+		memcpy((void*)&translation, (void*)&zed_pose.getTranslation(), sizeof(float) * 3);
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
 
-		return (int*)&camera_path.pose_data;
+		return (int*)&zed_pose.pose_data;
 	}
 };
 
-extern "C" __declspec(dllexport)
-int* Zed2Open(int w, int h, int fps)
+extern "C" __declspec(dllexport) int* Zed2Open(int w, int h, int fps)
 {
 	StereoLabsZed2* Zed2 = new StereoLabsZed2(w, h, fps);
 	return (int*)Zed2;
 }
-
-extern "C" __declspec(dllexport)
-void Zed2Close(StereoLabsZed2 * Zed2)
+extern "C" __declspec(dllexport) void Zed2Close(StereoLabsZed2 * Zed2)
 {
 	delete Zed2;
 }
-
-extern "C" __declspec(dllexport)
-int* Zed2intrinsicsLeft(StereoLabsZed2* Zed2)
+extern "C" __declspec(dllexport) int* Zed2intrinsicsLeft(StereoLabsZed2* Zed2)
 {
 	return (int*)&Zed2->intrinsicsLeft;
 }
-
-extern "C" __declspec(dllexport)
-int* Zed2intrinsicsRight(StereoLabsZed2* Zed2)
+extern "C" __declspec(dllexport) int* Zed2intrinsicsRight(StereoLabsZed2* Zed2)
 {
 	return (int*)&Zed2->intrinsicsRight;
 }
-
-extern "C" __declspec(dllexport)
-int* Zed2Extrinsics(StereoLabsZed2*Zed2)
+extern "C" __declspec(dllexport) int* Zed2Extrinsics(StereoLabsZed2*Zed2)
 {
 	return (int *) &Zed2->extrinsics;
 }
-
-extern "C" __declspec(dllexport)
-int* Zed2Acceleration(StereoLabsZed2 * Zed2)
+extern "C" __declspec(dllexport) int* Zed2Acceleration(StereoLabsZed2 * Zed2)
 {
 	return (int*)&Zed2->sensordata.imu.linear_acceleration;
 }
-
-extern "C" __declspec(dllexport)
-int* Zed2Translation(StereoLabsZed2 * Zed2)
+extern "C" __declspec(dllexport) int* Zed2Translation(StereoLabsZed2 * Zed2)
 {
 	return (int*)&Zed2->translation;
 }
-
-extern "C" __declspec(dllexport)
-int* Zed2RotationMatrix(StereoLabsZed2 * Zed2)
+extern "C" __declspec(dllexport) int* Zed2RotationMatrix(StereoLabsZed2 * Zed2)
 {
 	return (int*)&Zed2->rotation;
 }
-
-extern "C" __declspec(dllexport)
-int* Zed2AngularVelocity(StereoLabsZed2 * Zed2)
+extern "C" __declspec(dllexport) int* Zed2AngularVelocity(StereoLabsZed2 * Zed2)
 {
 	return (int*)&Zed2->sensordata.imu.angular_velocity;
 }
-
-extern "C" __declspec(dllexport)
-int* Zed2Orientation(StereoLabsZed2 * Zed2)
+extern "C" __declspec(dllexport) float Zed2IMU_Barometer(StereoLabsZed2 * Zed2)
+{
+	return Zed2->sensordata.barometer.pressure;
+}
+extern "C" __declspec(dllexport) int* Zed2Orientation(StereoLabsZed2 * Zed2)
 {
 	Zed2->orientation = Zed2->sensordata.imu.pose.getOrientation();
 	return (int*)&Zed2->orientation;
 }
-
-extern "C" __declspec(dllexport)
-int Zed2SerialNumber(StereoLabsZed2 * Zed2)
+extern "C" __declspec(dllexport) int Zed2SerialNumber(StereoLabsZed2 * Zed2)
 {
 	return Zed2->serialNumber;
 }
-
-extern "C" __declspec(dllexport)
-int* Zed2WaitFrame(StereoLabsZed2* Zed2, void* rgba, void* depthRGBA, void* depth32f, void* left, void* right, void *pointCloud )
+extern "C" __declspec(dllexport) int* Zed2WaitFrame(StereoLabsZed2* Zed2, void* rgba, void* depthRGBA, void* depth32f, void* left, void* right, void *pointCloud )
 {
 	return Zed2->waitForFrame(rgba, depthRGBA, depth32f, left, right, pointCloud);
+}
+extern "C" __declspec(dllexport) int* Zed2IMU_Magnetometer(StereoLabsZed2 * Zed2)
+{
+	return (int*)&Zed2->sensordata.magnetometer.magnetic_field_uncalibrated; // calibrated values look incorrect.
+}
+extern "C" __declspec(dllexport) double Zed2IMU_TimeStamp(StereoLabsZed2 * Zed2)
+{
+	return static_cast<double>(Zed2->zed_pose.timestamp.getMilliseconds()); // this does not have the accuracy of the imu timestamp...
+	//return static_cast<double>(Zed2->sensordata.imu.timestamp.getSeconds()); // This did not appear to be valid!
+}
+extern "C" __declspec(dllexport)float Zed2IMU_Temperature(StereoLabsZed2 * Zed2)
+{
+	Zed2->sensordata.temperature.get(sl::SensorsData::TemperatureData::SENSOR_LOCATION::IMU, Zed2->imuTemperature);
+	return Zed2->imuTemperature;
 }
 

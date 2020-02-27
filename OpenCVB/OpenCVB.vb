@@ -40,7 +40,10 @@ Public Class OpenCVB
     Dim HomeDir As DirectoryInfo
     Dim imuGyro As cv.Point3f
     Dim imuAccel As cv.Point3f
-    Dim imuTimeStamp As Double
+    Dim IMU_TimeStamp As Double
+    Dim IMU_Barometer As Single
+    Dim IMU_Magnetometer As cv.Point3f
+    Dim IMU_Temperature As Single
     Dim LastX As Int32
     Dim LastY As Int32
     Dim lowResolution As Boolean
@@ -827,7 +830,7 @@ Public Class OpenCVB
             cameraTaskHandle.Start(camera.pcMultiplier)
         End If
 
-        parms.IMUpresent = camera.IMUpresent
+        parms.IMU_Present = camera.IMU_Present
         parms.intrinsicsLeft = camera.intrinsicsLeft_VB
         parms.intrinsicsRight = camera.intrinsicsRight_VB
         parms.extrinsics = camera.Extrinsics_VB
@@ -895,8 +898,11 @@ Public Class OpenCVB
                 OpenCVB.ocvb.rightView = formrightView
                 OpenCVB.ocvb.parms.imuGyro = imuGyro
                 OpenCVB.ocvb.parms.imuAccel = imuAccel
-                OpenCVB.ocvb.parms.imuTimeStamp = imuTimeStamp
                 OpenCVB.ocvb.parms.transformationMatrix = tMatrix
+                OpenCVB.ocvb.parms.IMU_TimeStamp = IMU_TimeStamp
+                OpenCVB.ocvb.parms.IMU_Barometer = IMU_Barometer
+                OpenCVB.ocvb.parms.IMU_Magnetometer = IMU_Magnetometer
+                OpenCVB.ocvb.parms.IMU_Temperature = IMU_Temperature
             End SyncLock
             OpenCVB.UpdateHostLocation(Me.Left, Me.Top, Me.Height)
 
@@ -996,7 +1002,10 @@ Public Class OpenCVB
             SyncLock camPic
                 imuGyro = camera.imuGyro ' The data may not be present but just copy it...
                 imuAccel = camera.imuaccel
-                imuTimeStamp = camera.imutimestamp
+                IMU_Barometer = camera.IMU_Barometer
+                IMU_Magnetometer = camera.IMU_Magnetometer
+                IMU_Temperature = camera.IMU_Temperature
+                IMU_TimeStamp = camera.IMU_TimeStamp
                 If lowResolution Then
                     formColor = camera.color.Resize(fastSize)
                     formRGBDepth = camera.RGBDepth.Resize(fastSize)

@@ -34,7 +34,19 @@ Module Zed2_Interface
     Public Function Zed2AngularVelocity(kc As IntPtr) As IntPtr
     End Function
     <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2IMU_Temperature(kc As IntPtr) As Single
+    End Function
+    <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2IMU_TimeStamp(kc As IntPtr) As UInt64
+    End Function
+    <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2IMU_Barometer(kc As IntPtr) As Single
+    End Function
+    <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2Orientation(kc As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Camera_StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2IMU_Magnetometer(kc As IntPtr) As IntPtr
     End Function
 End Module
 Public Class CameraZED2
@@ -90,8 +102,7 @@ Public Class CameraZED2
     Public h As Int32
     Public imuAccel As cv.Point3f
     Public imuGyro As cv.Point3f
-    Public imuPresent As Boolean = True ' Zed2 cameras always have an IMU.
-    Public imuTimeStamp As Double
+    Public IMU_Present As Boolean = True ' Zed2 cameras always have an IMU.
     Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public modelInverse As Boolean
@@ -103,6 +114,10 @@ Public Class CameraZED2
     Public w As Int32
     Public pipelineClosed As Boolean = False
     Public transformationMatrix() As Single
+    Public IMU_Barometer As Single
+    Public IMU_Magnetometer As cv.Point3f
+    Public IMU_Temperature As Single
+    Public IMU_TimeStamp As Double
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
@@ -167,7 +182,7 @@ Public Class CameraZED2
 
             ReDim colorBytes(w * h * 4) ' rgba format coming back from driver
             ReDim depthRGBABytes(w * h * 4)
-            ReDim depth32Fbytes(w * h * 4)
+            ReDim depth32FBytes(w * h * 4)
             ReDim leftBytes(w * h)
             ReDim rightBytes(w * h)
             ReDim pointCloudBytes(w * h * 12) ' xyz + rgba
@@ -191,10 +206,6 @@ Public Class CameraZED2
         Dim ang = Zed2AngularVelocity(Zed2)
         Dim angularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
 
-        Dim quat = Zed2Orientation(Zed2)
-        Dim q = Marshal.PtrToStructure(Of System.Numerics.Quaternion)(quat)
-        Console.WriteLine("q.x = " + CStr(q.X) + "  q.y = " + CStr(q.Y) + "  q.z = " + CStr(q.Z) + "  q.w = " + CStr(q.W))
-
         ' there must be a bug in the structure for acceleration and velocity.  This is an attempt to make something work.
         ' Eliminate this code when the results above make sense.
         imuAccel.Z = imuAccel.X
@@ -207,8 +218,6 @@ Public Class CameraZED2
         imuGyro.Y = angularVelocity.Y
         imuGyro.Z = angularVelocity.Z
 
-        Dim imuRawData(15) As Single
-        Marshal.Copy(imuFrame, imuRawData, 0, imuRawData.Length)
         Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
         Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
         Dim mat() As Single = {-rt.r00, rt.r01, -rt.r02, 0.0,
@@ -226,19 +235,26 @@ Public Class CameraZED2
         Dim rotation(8) As Single
         Marshal.Copy(rot, rotation, 0, rotation.Length)
 
-        '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
-        Dim testmat() As Single = {-(1 - 2 * q.Y * q.Y - 2 * q.Z * q.Z), -(2 * q.X * q.Y + 2 * q.Z * q.W), -(2 * q.X * q.Z - 2 * q.Y * q.W), 0.0,
-                               2 * q.X * q.Y - 2 * q.Z * q.W, 1 - 2 * q.X * q.X - 2 * q.Z * q.Z, 2 * q.Y * q.Z + 2 * q.X * q.W, 0.0,
-                               -(2 * q.X * q.Z + 2 * q.Y * q.W), -(2 * q.Y * q.Z - 2 * q.X * q.W), -(1 - 2 * q.X * q.X - 2 * q.Y * q.Y), 0.0,
-                               t.X, t.Y, t.Z, 1.0}
-
-
         handlecolorBytes.Free()
         handleDepthRGBABytes.Free()
         handledepth32Fbytes.Free()
         handleleftBytes.Free()
         handlerightBytes.Free()
         handlePCBytes.Free()
+
+        IMU_Barometer = Zed2IMU_Barometer(Zed2)
+        Dim mag = Zed2IMU_Magnetometer(Zed2)
+        IMU_Magnetometer = Marshal.PtrToStructure(Of cv.Point3f)(mag)
+
+        IMU_Temperature = Zed2IMU_Temperature(Zed2)
+
+        Static startTime = Zed2IMU_TimeStamp(Zed2)
+        Dim tmp = Zed2IMU_TimeStamp(Zed2)
+        IMU_TimeStamp = tmp - startTime
+        If IMU_TimeStamp < 0 Then
+            startTime = tmp
+            IMU_TimeStamp = tmp
+        End If
 
         Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBytes)
         color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)

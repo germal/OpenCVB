@@ -111,8 +111,11 @@ Public Class ActiveClass : Implements IDisposable
         Dim imageToTrueTypeLoc As Single
         Dim imuAccel As cv.Point3f
         Dim imuGyro As cv.Point3f
-        Dim IMUpresent As Boolean
-        Dim imuTimeStamp As Double
+        Dim IMU_Barometer As Single
+        Dim IMU_Magnetometer As cv.Point3f
+        Dim IMU_Present As Boolean
+        Dim IMU_Temperature As Single
+        Dim IMU_TimeStamp As Double
         Dim intrinsicsLeft As intrinsics_VB
         Dim intrinsicsRight As intrinsics_VB
         Dim lowResolution As Boolean

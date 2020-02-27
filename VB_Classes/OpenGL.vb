@@ -46,7 +46,7 @@ Public Class OpenGL_Basics : Implements IDisposable
                                             rgbInput.Width, rgbInput.Height, rgbInput.ElemSize * rgbInput.Total,
                                             dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
                                             ocvb.parms.imuGyro.X, ocvb.parms.imuGyro.Y, ocvb.parms.imuGyro.Z,
-                                            ocvb.parms.imuAccel.X, ocvb.parms.imuAccel.Y, ocvb.parms.imuAccel.Z, ocvb.parms.imuTimeStamp, If(ocvb.parms.IMUpresent, 1, 0),
+                                            ocvb.parms.imuAccel.X, ocvb.parms.imuAccel.Y, ocvb.parms.imuAccel.Z, ocvb.parms.IMU_TimeStamp, If(ocvb.parms.IMU_Present, 1, 0),
                                             eye.Item0 / 100, eye.Item1 / 100, eye.Item2 / 100, zTrans, scaleXYZ.Item0 / 10, scaleXYZ.Item1 / 10, scaleXYZ.Item2 / 10,
                                             timeConversionUnits, imuAlphaFactor)
         Next
@@ -236,7 +236,7 @@ Public Class OpenGL_IMU : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
-        If ocvb.parms.IMUpresent Then
+        If ocvb.parms.IMU_Present Then
             ogl.Run(ocvb) ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
         Else
             ocvb.putText(New ActiveClass.TrueType("No IMU present on this RealSense device", 20, 100))

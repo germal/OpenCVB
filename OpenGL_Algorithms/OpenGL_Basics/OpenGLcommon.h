@@ -133,7 +133,7 @@ static float3 gyro_data;
 static float3 accel_data;
 static double timestamp;
 static float timeConversionUnits = 1000.0f;
-static int IMUpresent = false;
+static int IMU_Present = false;
 /* alpha indicates the part that gyro and accelerometer take in computation of theta; higher alpha gives more weight to gyro, but too high
 values cause drift; lower alpha gives more weight to accelerometer, which is more sensitive to disturbances */
 static float imuAlphaFactor = 0.98f; // Intel IMU mixes the accel and gyro values to get direction while it does not work on Kinect
@@ -225,7 +225,7 @@ static void readPipeAndMemMap()
 	accel_data.z = (float)sharedMem[23];
 
 	timestamp = sharedMem[24];
-	IMUpresent = (int)sharedMem[25];
+	IMU_Present = (int)sharedMem[25];
 
 	Eye.x = (float)sharedMem[26];
 	Eye.y = (float)sharedMem[27];
