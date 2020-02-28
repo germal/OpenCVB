@@ -225,37 +225,39 @@ Public Class OpenCVB
         Dim g As Graphics = e.Graphics
         Try
             SyncLock camPic ' avoid updating the image while copying into it in the algorithm and camera tasks
-                If formColor IsNot Nothing And formColor.Width > 0 And formColor.Height > 0 Then
-                    cameraDataUpdated = False
-                    If formColor.Width <> camPic(0).Width Or formColor.Height <> camPic(0).Height Or
-                       formRGBDepth.Width <> camPic(1).Width Or formRGBDepth.Height <> camPic(1).Height Then
+                If formColor IsNot Nothing Then
+                    If formColor.Width > 0 And formColor.Height > 0 Then
+                        cameraDataUpdated = False
+                        If formColor.Width <> camPic(0).Width Or formColor.Height <> camPic(0).Height Or
+                           formRGBDepth.Width <> camPic(1).Width Or formRGBDepth.Height <> camPic(1).Height Then
 
-                        Dim color = formColor
-                        Dim RGBDepth = formRGBDepth
-                        color = color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
-                        RGBDepth = RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
-                        cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
-                        cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
-                    Else
-                        cvext.BitmapConverter.ToBitmap(formColor, camPic(0).Image)
-                        cvext.BitmapConverter.ToBitmap(formRGBDepth, camPic(1).Image)
-                    End If
-
-                    If formResultsUpdated Then
-                        If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Or
-                            formResult2.Width <> camPic(3).Width Or formResult2.Height <> camPic(3).Height Then
-
-                            Dim result1 = formResult1
-                            Dim result2 = formResult2
-                            result1 = result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
-                            result2 = result2.Resize(New cv.Size(camPic(3).Size.Width, camPic(3).Size.Height))
-                            cvext.BitmapConverter.ToBitmap(result1, camPic(2).Image)
-                            cvext.BitmapConverter.ToBitmap(result2, camPic(3).Image)
+                            Dim color = formColor
+                            Dim RGBDepth = formRGBDepth
+                            color = color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
+                            RGBDepth = RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
+                            cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
+                            cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
                         Else
-                            cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
-                            cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
+                            cvext.BitmapConverter.ToBitmap(formColor, camPic(0).Image)
+                            cvext.BitmapConverter.ToBitmap(formRGBDepth, camPic(1).Image)
                         End If
-                        formResultsUpdated = False
+
+                        If formResultsUpdated Then
+                            If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Or
+                                formResult2.Width <> camPic(3).Width Or formResult2.Height <> camPic(3).Height Then
+
+                                Dim result1 = formResult1
+                                Dim result2 = formResult2
+                                result1 = result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
+                                result2 = result2.Resize(New cv.Size(camPic(3).Size.Width, camPic(3).Size.Height))
+                                cvext.BitmapConverter.ToBitmap(result1, camPic(2).Image)
+                                cvext.BitmapConverter.ToBitmap(result2, camPic(3).Image)
+                            Else
+                                cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
+                                cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
+                            End If
+                            formResultsUpdated = False
+                        End If
                     End If
                 End If
                 Dim pic = DirectCast(sender, PictureBox)
