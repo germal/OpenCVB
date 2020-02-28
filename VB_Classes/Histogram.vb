@@ -121,7 +121,7 @@ Public Class Histogram_Basics : Implements IDisposable
 
         If externalUse = False Or plotRequested Then
             maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
-            AddPlotScale(ocvb.result1, maxVal, sliders.TrackBar3.Value / 10)
+            AddPlotScale(ocvb.result1, 0, maxVal, sliders.TrackBar3.Value / 10)
             ocvb.label1 = "Histogram for Color image above - " + CStr(bins) + " bins"
         End If
     End Sub

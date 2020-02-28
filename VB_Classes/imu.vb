@@ -44,9 +44,10 @@ Public Class IMU_Basics : Implements IDisposable
                 theta.Z = theta.Z * alpha + accelAngle.Z * (1 - alpha)
             End If
             If externalUse = False Then
-                flow.msgs.Add("ts = " + CStr(ocvb.parms.IMU_TimeStamp) + "Gravity (m/sec^2) x = " + Format(ocvb.parms.imuAccel.X, "#0.000") + " y = " + Format(ocvb.parms.imuAccel.Y, "#0.000") +
-                                  " z = " + Format(ocvb.parms.imuAccel.Z, "#0.000") + vbTab + "Motion (rads/sec) pitch = " + Format(ocvb.parms.imuGyro.X, "#0.000") + vbTab +
-                                  " Yaw = " + Format(ocvb.parms.imuGyro.Y, "#0.000") + vbTab + " Roll = " + Format(ocvb.parms.imuGyro.Z, "#0.000"))
+                flow.msgs.Add("ts = " + CStr(ocvb.parms.IMU_TimeStamp) + " Gravity (m/sec^2) x = " + Format(ocvb.parms.imuAccel.X, "#0.000") +
+                              " y = " + Format(ocvb.parms.imuAccel.Y, "#0.000") + " z = " + Format(ocvb.parms.imuAccel.Z, "#0.000") + vbTab +
+                              " Motion (rads/sec) pitch = " + Format(ocvb.parms.imuGyro.X, "#0.000") + vbTab +
+                              " Yaw = " + Format(ocvb.parms.imuGyro.Y, "#0.000") + vbTab + " Roll = " + Format(ocvb.parms.imuGyro.Z, "#0.000"))
             End If
             ocvb.label1 = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
         Else
@@ -138,19 +139,33 @@ End Class
 
 
 Public Class IMU_Magnetometer : Implements IDisposable
+    Public plot As Plot_OverTime
     Public Sub New(ocvb As AlgorithmData)
+        plot = New Plot_OverTime(ocvb)
+        plot.externalUse = True
+        plot.dst = ocvb.result2
+        plot.maxVal = 10
+        plot.minVal = -10
+        plot.sliders.TrackBar1.Value = 2
+        plot.sliders.TrackBar2.Value = 2
+
         ocvb.desc = "Get the IMU_Magnetometer values from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.IMU_Magnetometer = New cv.Point3f Then
-            ocvb.putText(New ActiveClass.TrueType("The IMU for this camera does not have IMU_Magnetometer readings.", 10, 125))
+            ocvb.putText(New ActiveClass.TrueType("The IMU for this camera does not have Magnetometer readings.", 10, 125))
         Else
             ocvb.putText(New ActiveClass.TrueType("Uncalibrated IMU Magnetometer reading:  x = " + CStr(ocvb.parms.IMU_Magnetometer.X), 10, 60))
             ocvb.putText(New ActiveClass.TrueType("Uncalibrated IMU Magnetometer reading:  y = " + CStr(ocvb.parms.IMU_Magnetometer.Y), 10, 80))
             ocvb.putText(New ActiveClass.TrueType("Uncalibrated IMU Magnetometer reading:  z = " + CStr(ocvb.parms.IMU_Magnetometer.Z), 10, 100))
+            plot.plotData = New cv.Scalar(ocvb.parms.IMU_Magnetometer.X, ocvb.parms.IMU_Magnetometer.Y, ocvb.parms.IMU_Magnetometer.Z)
+            plot.Run(ocvb)
+            ocvb.label2 = "x (blue) = " + Format(plot.plotData.Item(0), "#0.00") + " y (green) = " + Format(plot.plotData.Item(1), "#0.00") +
+                          " z (red) = " + Format(plot.plotData.Item(2), "#0.00")
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+        plot.Dispose()
     End Sub
 End Class
 
@@ -194,9 +209,6 @@ End Class
 
 
 
-
-
-
 Public Class IMU_TimeStamp : Implements IDisposable
     Dim flow As Font_FlowText
     Public Sub New(ocvb As AlgorithmData)
@@ -214,5 +226,66 @@ Public Class IMU_TimeStamp : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         flow.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class IMU_Time : Implements IDisposable
+    Public plot As Plot_OverTime
+    Public deltaTime As Double
+    Public externalUse As Boolean
+    Dim minVal = 0
+    Dim maxVal = 50
+    Dim myStopWatch As New System.Diagnostics.Stopwatch
+    Dim lastXdelta As New List(Of Single)
+    Public Sub New(ocvb As AlgorithmData)
+        plot = New Plot_OverTime(ocvb)
+        plot.externalUse = True
+        plot.dst = ocvb.result2
+        plot.maxVal = maxVal
+        plot.minVal = minVal
+        plot.sliders.TrackBar1.Value = 2
+        plot.sliders.TrackBar2.Value = 2
+
+        myStopWatch.Start()
+        ocvb.desc = "Measure and plot the time difference from the IMU timestamp to the current time."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static columnCount As Integer
+        Dim ms = myStopWatch.ElapsedMilliseconds
+        Static lastIMUtime = ocvb.parms.IMU_TimeStamp
+        Dim imuTime = ocvb.parms.IMU_TimeStamp - lastIMUtime
+        deltaTime = Math.Max(0, ms - imuTime)
+        If externalUse = False Then
+            ocvb.putText(New ActiveClass.TrueType("timestamp (ms) = " + Format(imuTime, "#0.000000") + " Now = " + Format(ms, "#0.000000"), 10, 60))
+            ocvb.putText(New ActiveClass.TrueType("Delta ms = " + Format(deltaTime, "#0.000000"), 10, 80))
+            plot.plotData = New cv.Scalar(minVal - 100, minVal - 100, deltaTime) ' push the first 2 values off the plot...
+            plot.Run(ocvb)
+            lastXdelta.Add(deltaTime)
+            If lastXdelta.Count >= ocvb.color.Width Then lastXdelta.Remove(0)
+            columnCount += plot.sliders.TrackBar2.Value ' bump the column index by the width of the current column
+
+            ' whenever it is about to start at the left edge, make sure the range is still good.
+            If columnCount Mod ocvb.color.Width = 0 And ocvb.frameCount > 0 Then
+                ocvb.result2.SetTo(0)
+                minVal = Double.MaxValue
+                maxVal = Double.MinValue
+                For i = 0 To lastXdelta.Count - 1
+                    If lastXdelta.Item(i) < minVal Then minVal = lastXdelta.Item(i)
+                    If lastXdelta.Item(i) > maxVal Then maxVal = lastXdelta.Item(i)
+                Next
+                maxVal = CInt(maxVal + 1)
+                minVal = CInt(minVal - 1)
+                plot.maxVal = maxVal
+                plot.minVal = minVal
+            End If
+            ocvb.label2 = "Plot of Delta ms between " + CStr(minVal) + " and " + CStr(maxVal) + " ms"
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        plot.Dispose()
     End Sub
 End Class

@@ -11,7 +11,7 @@ Public Class Tracker_Basics : Implements IDisposable
         check.Box(0).Text = "Stop tracking selected object"
         If ocvb.parms.ShowOptions Then check.Show()
         ocvb.desc = "Track an object using cv.Tracking API"
-        ocvb.putText(New ActiveClass.TrueType("Draw a rectangle around object to be tracked in color image above left.", 10, 140, RESULT2))
+        ocvb.putText(New ActiveClass.TrueType("Draw a rectangle around object to be tracked.", 10, 140, RESULT2))
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(0).Checked Then
@@ -123,7 +123,6 @@ Public Class Tracker_Methods : Implements IDisposable
         radio.check(5).Checked = True ' TrackerMIL is the default
         If ocvb.parms.ShowOptions Then radio.Show()
 
-        ocvb.putText(New ActiveClass.TrueType("Select a method then", 10, 110, RESULT2))
         ocvb.desc = "Experiment with the different types of tracking methods - apparently not much difference..."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -146,5 +145,27 @@ Public Class Tracker_Methods : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
         radio.Dispose()
         tracker.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Module Quaternion_Module
+
+End Module
+
+
+
+' https://github.com/IntelRealSense/librealsense/tree/master/examples/ar-basic
+Public Class Tracker_3DLocation : Implements IDisposable
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.desc = "Track a location in 3D geometry and mark it will XYZ axes."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
 End Class

@@ -6,6 +6,7 @@ Public Class Plot_OverTime : Implements IDisposable
     Public plotCount As Int32 = 3
     Public externalUse As Boolean
     Public dst As cv.Mat
+    Public minVal As Int32 = 0
     Public maxVal As Int32 = 250
     Dim columnIndex As Int32
     Public Sub New(ocvb As AlgorithmData)
@@ -27,15 +28,18 @@ Public Class Plot_OverTime : Implements IDisposable
         End If
         dst.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(0)
         If externalUse = False Then plotData = ocvb.color.Mean()
+
         For i = 0 To plotCount - 1
             Dim color = Choose(i Mod 3 + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
-            Dim y = 1 - plotData.Item(i) / (maxVal - pixelHeight * 2)
-            y *= ocvb.color.Height - pixelHeight
-            dst.Rectangle(New cv.Rect(columnIndex - pixelWidth, y - pixelHeight, pixelWidth * 2, pixelHeight * 2), color, -1)
+            If plotData.Item(i) >= minVal And plotData.Item(i) <= maxVal Then
+                Dim y = 1 - (plotData.Item(i) - minVal) / (maxVal - minVal)
+                y *= ocvb.color.Height - 1
+                dst.Rectangle(New cv.Rect(columnIndex - pixelWidth, y - pixelHeight, pixelWidth * 2, pixelHeight * 2), color, -1)
+            End If
         Next
         columnIndex += pixelWidth
         If externalUse = False Then ocvb.label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
-        AddPlotScale(dst, maxVal, sliders.TrackBar3.Value / 10)
+        AddPlotScale(dst, minVal, maxVal, sliders.TrackBar3.Value / 10)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
@@ -87,7 +91,7 @@ Public Class Plot_Histogram : Implements IDisposable
                 If hist.Rows <= 255 Then color = cv.Scalar.All((i Mod 255) * incr)
                 cv.Cv2.Rectangle(dst, New cv.Rect(i * barWidth, dst.Height - h, barWidth, h), color, -1)
             Next
-            AddPlotScale(dst, maxVal, sliders.TrackBar1.Value / 10)
+            AddPlotScale(dst, 0, maxVal, sliders.TrackBar1.Value / 10)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -104,10 +108,10 @@ Module Plot_OpenCV_Module
     Public Sub Plot_OpenCVBasics(inX As IntPtr, inY As IntPtr, inLen As Int32, dstptr As IntPtr, rows As Int32, cols As Int32)
     End Sub
 
-    Public Sub AddPlotScale(dst As cv.Mat, maxVal As Double, fontsize As Double)
+    Public Sub AddPlotScale(dst As cv.Mat, minVal As Double, maxVal As Double, fontsize As Double)
         ' draw a scale along the side
         Dim spacer = CInt(dst.Height / 5)
-        Dim spaceVal = CInt(maxVal / 5)
+        Dim spaceVal = CInt((maxVal - minVal) / 5)
         For i = 0 To 4
             Dim pt1 = New cv.Point(0, spacer * i)
             Dim pt2 = New cv.Point(10, spacer * i)

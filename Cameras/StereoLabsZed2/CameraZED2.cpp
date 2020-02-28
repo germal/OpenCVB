@@ -108,7 +108,7 @@ public:
 		memcpy((void*)&translation, (void*)&zed_pose.getTranslation(), sizeof(float) * 3);
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
-
+		
 		return (int*)&zed_pose.pose_data;
 	}
 };

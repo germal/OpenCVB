@@ -2,6 +2,7 @@
 Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
+Imports System.Numerics
 Public Class CameraT265
 #Region "T265Data"
     Dim cfg As New rs.Config
@@ -194,11 +195,11 @@ Public Class CameraT265
 
         IMU_Present = True
     End Sub
-    Structure T265IMUdata
+    Structure PoseData
         Public translation As cv.Point3f
         Public velocity As cv.Point3f
         Public acceleration As cv.Point3f
-        Public rotation As System.Numerics.Quaternion
+        Public rotation As Quaternion
         Public angularVelocity As cv.Point3f
         Public angularAcceleration As cv.Point3f
         Public trackerConfidence As Int32
@@ -213,8 +214,8 @@ Public Class CameraT265
         Dim f = frames.FirstOrDefault(rs.Stream.Pose)
 
         Dim poseData = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Pose)
-        Dim pose = Marshal.PtrToStructure(Of T265IMUdata)(poseData.Data)
-        Dim q As System.Numerics.Quaternion = pose.rotation
+        Dim pose = Marshal.PtrToStructure(Of PoseData)(poseData.Data)
+        Dim q As Quaternion = pose.rotation
         Dim t = pose.translation
         '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
         Dim mat() As Single = {-(1 - 2 * q.Y * q.Y - 2 * q.Z * q.Z), -(2 * q.X * q.Y + 2 * q.Z * q.W), -(2 * q.X * q.Z - 2 * q.Y * q.W), 0.0,
@@ -222,6 +223,10 @@ Public Class CameraT265
                                -(2 * q.X * q.Z + 2 * q.Y * q.W), -(2 * q.Y * q.Z - 2 * q.X * q.W), -(1 - 2 * q.X * q.X - 2 * q.Y * q.Y), 0.0,
                                t.X, t.Y, t.Z, 1.0}
         transformationMatrix = mat
+
+        IMU_TimeStamp = poseData.Timestamp
+        imuAccel = pose.acceleration
+        imuGyro = pose.angularVelocity
 
         Dim images = frames.As(Of rs.FrameSet)()
         Dim fishEye = images.FishEyeFrame()
