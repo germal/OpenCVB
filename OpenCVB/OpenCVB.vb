@@ -999,6 +999,7 @@ Public Class OpenCVB
             camera.GetNextFrame()
 
             If camera.color Is Nothing Then Continue While
+            If cameraDataUpdated = True Then Continue While ' the last frames have not been used yet.
             SyncLock camPic
                 imuGyro = camera.imuGyro ' The data may not be present but just copy it...
                 imuAccel = camera.imuaccel

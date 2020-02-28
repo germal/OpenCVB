@@ -166,7 +166,7 @@ Public Class CameraKinect
             imuGyro.X = imuGyro.Y
             imuGyro.Y = tmpVal
 
-            IMU_TimeStamp = imuOutput.accelTimeStamp
+            IMU_TimeStamp = imuOutput.accelTimeStamp / 1000
         End If
 
         handleRGBDepth.Free()

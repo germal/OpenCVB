@@ -238,7 +238,7 @@ Public Class IMU_Time : Implements IDisposable
     Public deltaTime As Double
     Public externalUse As Boolean
     Dim minVal = 0
-    Dim maxVal = 50
+    Dim maxVal = 100
     Dim myStopWatch As New System.Diagnostics.Stopwatch
     Dim lastXdelta As New List(Of Single)
     Public Sub New(ocvb As AlgorithmData)
