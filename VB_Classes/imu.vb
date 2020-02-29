@@ -44,10 +44,10 @@ Public Class IMU_Basics : Implements IDisposable
                 theta.Z = theta.Z * alpha + accelAngle.Z * (1 - alpha)
             End If
             If externalUse = False Then
-                flow.msgs.Add("ts = " + CStr(ocvb.parms.IMU_TimeStamp) + " Gravity (m/sec^2) x = " + Format(ocvb.parms.imuAccel.X, "#0.000") +
-                              " y = " + Format(ocvb.parms.imuAccel.Y, "#0.000") + " z = " + Format(ocvb.parms.imuAccel.Z, "#0.000") + vbTab +
-                              " Motion (rads/sec) pitch = " + Format(ocvb.parms.imuGyro.X, "#0.000") + vbTab +
-                              " Yaw = " + Format(ocvb.parms.imuGyro.Y, "#0.000") + vbTab + " Roll = " + Format(ocvb.parms.imuGyro.Z, "#0.000"))
+                flow.msgs.Add("ts = " + Format(ocvb.parms.IMU_TimeStamp, "#0.00") + " Gravity (m/sec^2) x = " + Format(ocvb.parms.imuAccel.X, "#0.00") +
+                              " y = " + Format(ocvb.parms.imuAccel.Y, "#0.00") + " z = " + Format(ocvb.parms.imuAccel.Z, "#0.00") + vbTab +
+                              " Motion (rads/sec) pitch = " + Format(ocvb.parms.imuGyro.X, "#0.00") +
+                              " Yaw = " + Format(ocvb.parms.imuGyro.Y, "#0.00") + " Roll = " + Format(ocvb.parms.imuGyro.Z, "#0.00"))
             End If
             ocvb.label1 = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
         Else
@@ -234,42 +234,70 @@ End Class
 
 
 Public Class IMU_Time : Implements IDisposable
+    Dim check As New OptionsCheckbox
+    Dim k1 As Kalman_Single
+    Dim k2 As Kalman_Single
     Public plot As Plot_OverTime
-    Public deltaTime As Double
+    Public positiveDelta As Double
+    Public smoothedDelta As Double
     Public externalUse As Boolean
-    Dim minVal = 0
-    Dim maxVal = 100
-    Dim myStopWatch As New System.Diagnostics.Stopwatch
+    Dim minVal = -20
+    Dim maxVal = 20
     Dim lastXdelta As New List(Of Single)
     Public Sub New(ocvb As AlgorithmData)
+        check.Setup(ocvb, 1)
+        check.Box(0).Text = "Resync the IMU and CPU clocks"
+        If ocvb.parms.ShowOptions Then check.Show()
+
+        k1 = New Kalman_Single(ocvb)
+        k2 = New Kalman_Single(ocvb)
+
         plot = New Plot_OverTime(ocvb)
         plot.externalUse = True
         plot.dst = ocvb.result2
         plot.maxVal = maxVal
         plot.minVal = minVal
-        plot.sliders.TrackBar1.Value = 2
-        plot.sliders.TrackBar2.Value = 2
+        plot.sliders.TrackBar1.Value = 4
+        plot.sliders.TrackBar2.Value = 4
 
-        myStopWatch.Start()
-        ocvb.desc = "Measure and plot the time difference from the IMU timestamp to the current time."
+        ocvb.desc = "Measure and plot the time difference from the IMU timestamp to the current time (2 different clocks)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static columnCount As Integer
-        Dim ms = myStopWatch.ElapsedMilliseconds
-        Static lastIMUtime = ocvb.parms.IMU_TimeStamp
-        Dim imuTime = ocvb.parms.IMU_TimeStamp - lastIMUtime
-        deltaTime = Math.Max(0, ms - imuTime)
-        If externalUse = False Then
-            ocvb.putText(New ActiveClass.TrueType("timestamp (ms) = " + Format(imuTime, "#0.000000") + " Now = " + Format(ms, "#0.000000"), 10, 60))
-            ocvb.putText(New ActiveClass.TrueType("Delta ms = " + Format(deltaTime, "#0.000000"), 10, 80))
-            plot.plotData = New cv.Scalar(minVal - 100, minVal - 100, deltaTime) ' push the first 2 values off the plot...
-            plot.Run(ocvb)
-            lastXdelta.Add(deltaTime)
-            If lastXdelta.Count >= ocvb.color.Width Then lastXdelta.Remove(0)
-            columnCount += plot.sliders.TrackBar2.Value ' bump the column index by the width of the current column
+        Static syncCount As Integer
+        Static myframeCount As Integer
+        Static syncCPU As Double
+        Static offChartValue As Integer
+        Static myStopWatch As New System.Diagnostics.Stopwatch
+        If ocvb.frameCount = 0 Then myStopWatch.Start()
+        Dim ms = myStopWatch.ElapsedMilliseconds - syncCPU
 
-            ' whenever it is about to start at the left edge, make sure the range is still good.
-            If columnCount Mod ocvb.color.Width = 0 And ocvb.frameCount > 0 Then
+        Static lastIMUtime = ocvb.parms.IMU_TimeStamp
+        Dim imuDelta = ocvb.parms.IMU_TimeStamp - lastIMUtime
+
+        Static timeOffset As Double ' when the IMU clock is ahead of the cpu clock, use the average offset to bump the cpu clock
+        If imuDelta > ms Then
+            timeOffset = imuDelta - ms
+            k1.inputReal = timeOffset
+            k1.Run(ocvb)
+            timeOffset = k1.stateResult
+        End If
+
+        positiveDelta = Math.Max(0, ms + timeOffset - imuDelta) ' it is essential that this value be positive
+        Dim rawDelta = ms + timeOffset - imuDelta
+        k2.inputReal = positiveDelta
+        k2.Run(ocvb)
+        smoothedDelta = k2.stateResult
+        If smoothedDelta < 1 Then smoothedDelta = 1
+        If externalUse = False Then
+            plot.plotData = New cv.Scalar(smoothedDelta, positiveDelta, rawDelta)
+            plot.Run(ocvb)
+            lastXdelta.Add(rawDelta)
+            If lastXdelta.Count >= ocvb.color.Width Then lastXdelta.Remove(0)
+
+            If rawDelta < minVal Or rawDelta > maxVal Then offChartValue += 1
+
+            ' if enough points are off the charted area, then redo the scale.
+            If offChartValue > 50 Then
                 ocvb.result2.SetTo(0)
                 minVal = Double.MaxValue
                 maxVal = Double.MinValue
@@ -281,11 +309,51 @@ Public Class IMU_Time : Implements IDisposable
                 minVal = CInt(minVal - 1)
                 plot.maxVal = maxVal
                 plot.minVal = minVal
+                lastXdelta.Clear()
+                offChartValue = 0
+                plot.columnIndex = 0 ' restart at the left side of the chart
             End If
-            ocvb.label2 = "Plot of Delta ms between " + CStr(minVal) + " and " + CStr(maxVal) + " ms"
+
+            ocvb.putText(New ActiveClass.TrueType(" IMU timestamp (ms) = " + Format(imuDelta, "#0.0"), 10, 60))
+            ocvb.putText(New ActiveClass.TrueType("CPU timestamp (ms) = " + Format(ms, "#0.0"), 10, 80))
+            If rawDelta < 0 Then
+                ocvb.putText(New ActiveClass.TrueType("Delta ms = " + Format(rawDelta, "00.00") + " Raw data plotted in Red", 10, 100))
+            Else
+                ocvb.putText(New ActiveClass.TrueType("Delta ms = " + Format(rawDelta, "000.00") + " Raw data plotted in Red", 10, 100))
+            End If
+            ocvb.putText(New ActiveClass.TrueType("Delta ms = " + Format(smoothedDelta, "000.00") + " forced positive values are smoothed with Kalman filter and plotted in Blue", 10, 120))
+            ocvb.putText(New ActiveClass.TrueType("timeOffset ms = " + Format(timeOffset, "000.00") +
+                                                  " When CPU and IMU clock difference is negative, the time offset is smoothed with Kalman filter", 10, 140))
+            ocvb.putText(New ActiveClass.TrueType("positiveDelta ms = " + Format(positiveDelta, "000.00") + " forced positive Delta ms plotted in Green", 10, 160))
+            ocvb.putText(New ActiveClass.TrueType("Off chart count = " + CStr(offChartValue), 10, 180))
+            ocvb.putText(New ActiveClass.TrueType("myFrameCount = " + CStr(myframeCount), 10, 200))
+            syncCount -= 1
+            If smoothedDelta > 10 Or myframeCount >= 1000 Or check.Box(0).Checked Or syncCount > 0 Then
+                ocvb.putText(New ActiveClass.TrueType("Syncing the IMU and CPU Times", 10, 220))
+            End If
+
+            ocvb.label1 = "Delta ms: Raw values between " + CStr(minVal) + " and " + CStr(maxVal)
+            ocvb.label2 = "Delta ms: Red (raw) Blue (smoothed) "
+        End If
+
+        ' Clocks drift.  Here we sync up the IMU and CPU clocks by restarting the algorithm.  
+        ' We could reset the Kalman object but the effect of the Kalman filter becomes quite apparent as the values shift to normal.
+        myframeCount += 1
+        If smoothedDelta > 10 Or myframeCount >= 1000 Or check.Box(0).Checked Then
+            myframeCount = 0
+            check.Box(0).Checked = False
+            syncCPU += ms
+            lastIMUtime = ocvb.parms.IMU_TimeStamp
+            smoothedDelta = 0
+            timeOffset = 0
+            positiveDelta = 0
+            offChartValue = 1000 ' force the update to the scale.
+            syncCount = 30 ' show it for the next 30 frames.
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         plot.Dispose()
+        k1.Dispose()
+        k2.Dispose()
     End Sub
 End Class

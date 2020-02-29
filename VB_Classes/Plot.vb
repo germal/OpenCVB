@@ -8,7 +8,7 @@ Public Class Plot_OverTime : Implements IDisposable
     Public dst As cv.Mat
     Public minVal As Int32 = 0
     Public maxVal As Int32 = 250
-    Dim columnIndex As Int32
+    Public columnIndex As Int32
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Pixel Height", 1, 40, 20)
         sliders.setupTrackBar2(ocvb, "Pixel Width", 1, 40, 5)
@@ -20,8 +20,8 @@ Public Class Plot_OverTime : Implements IDisposable
         If ocvb.frameCount = 0 Then
             If externalUse = False Then dst = ocvb.result1
         End If
-        Dim pixelHeight = CInt((sliders.TrackBar1.Value + 1) / 2)
-        Dim pixelWidth = CInt((sliders.TrackBar2.Value + 1) / 2)
+        Dim pixelHeight = CInt(sliders.TrackBar1.Value)
+        Dim pixelWidth = CInt(sliders.TrackBar2.Value)
         If columnIndex + pixelWidth >= ocvb.color.Width Then
             dst.ColRange(columnIndex, ocvb.color.Width).SetTo(0)
             columnIndex = 0
@@ -34,7 +34,12 @@ Public Class Plot_OverTime : Implements IDisposable
             If plotData.Item(i) >= minVal And plotData.Item(i) <= maxVal Then
                 Dim y = 1 - (plotData.Item(i) - minVal) / (maxVal - minVal)
                 y *= ocvb.color.Height - 1
-                dst.Rectangle(New cv.Rect(columnIndex - pixelWidth, y - pixelHeight, pixelWidth * 2, pixelHeight * 2), color, -1)
+                If i = 1 Then
+                    ' plot the green values as circles
+                    dst.Circle(New cv.Point(columnIndex - pixelWidth, y - pixelHeight), pixelWidth, color, -1, cv.LineTypes.AntiAlias)
+                Else
+                    dst.Rectangle(New cv.Rect(columnIndex - pixelWidth, y - pixelHeight, pixelWidth * 2, pixelHeight * 2), color, -1)
+                End If
             End If
         Next
         columnIndex += pixelWidth
@@ -112,6 +117,7 @@ Module Plot_OpenCV_Module
         ' draw a scale along the side
         Dim spacer = CInt(dst.Height / 5)
         Dim spaceVal = CInt((maxVal - minVal) / 5)
+        If spaceVal < 1 Then spaceVal = 1
         For i = 0 To 4
             Dim pt1 = New cv.Point(0, spacer * i)
             Dim pt2 = New cv.Point(10, spacer * i)

@@ -332,8 +332,16 @@ int* T265RGBDepth(t265Camera * tp)
 }
 
 extern "C" __declspec(dllexport)
-int* T265WaitFrame(t265Camera* kc, void* color, void* depthRGB)
+int* T265WaitFrame(t265Camera * kc, void* color, void* depthRGB)
 {
 	return kc->waitForFrame();
+}
+
+extern "C" __declspec(dllexport)
+float T265GetEpochTime(double pose_time_ms)
+{
+	auto now = std::chrono::system_clock::now().time_since_epoch();
+	double now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+	return static_cast<float>(std::max(0., (now_ms - pose_time_ms) / 1000.));
 }
 

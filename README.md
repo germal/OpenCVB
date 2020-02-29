@@ -37,8 +37,8 @@ process of adding variants and experimenting with the example is simplified.
 
 If this approach is to be useful, the languages for computer vision projects -
 C++, C\#, Python, and VB.Net – need support. Secondly, it is important to get
-access to multiple libraries - OpenCV, OpenCVSharp, OpenGL, and OpenMP. And
-lastly, it is important to use all the possible image representations - 3D,
+access to multiple libraries - OpenCV, OpenCVSharp, OpenGL, Emgu, and OpenMP.
+And lastly, it is important to use all the possible image representations - 3D,
 bitmaps, plots, bar charts, spreadsheets, or text.
 
 Making these languages and libraries available while using the same
@@ -54,7 +54,7 @@ for more and better features than convolutions, features that are measured and
 essential. Depth, infrared, gravity, and camera motion are the kind of objective
 features that can enhance almost any color image algorithm.
 
-And what if all cameras had depth? And an IMU. Making this assumption explains
+And what if all cameras had depth and an IMU? Making this assumption explains
 why only a few cameras from Intel, Microsoft, and others are currently
 supported. More cameras with depth are expected to arrive and integration with
 OpenCVB is likely to follow. OpenCVB is an opportunity to exploit the new
@@ -114,7 +114,7 @@ You will need to download and install the following before starting:
 
 -   Build and run OpenCVB.sln
 
-**Installation – Windows 10 Only**
+**Full Installation Discussion**
 
 The first step is to download OpenCVB from GitHub:
 

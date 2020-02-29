@@ -3,6 +3,12 @@ Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Imports System.Numerics
+Module T265_Module
+    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265GetEpochTime(timeStamp As Double) As Single
+    End Function
+End Module
+
 Public Class CameraT265
 #Region "T265Data"
     Dim cfg As New rs.Config
@@ -77,6 +83,7 @@ Public Class CameraT265
     Public IMU_Magnetometer As cv.Point3f
     Public IMU_Temperature As Single
     Public IMU_TimeStamp As Double
+    Public captureTimeStamp As Double
     Dim QArray(15) As Double
 
     Public transformationMatrix() As Single
@@ -98,6 +105,8 @@ Public Class CameraT265
         h = height
 
         cfg.EnableStream(rs.Stream.Pose, rs.Format.SixDOF)
+        cfg.EnableStream(rs.Stream.Gyro)
+        cfg.EnableStream(rs.Stream.Accel)
         cfg.EnableStream(rs.Stream.Fisheye, 1, rs.Format.Y8)
         cfg.EnableStream(rs.Stream.Fisheye, 2, rs.Format.Y8)
 
@@ -214,7 +223,10 @@ Public Class CameraT265
         Dim f = frames.FirstOrDefault(rs.Stream.Pose)
 
         Dim poseData = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Pose)
+        IMU_TimeStamp = poseData.Timestamp
+        Dim deltams = T265GetEpochTime(IMU_TimeStamp)
         Dim pose = Marshal.PtrToStructure(Of PoseData)(poseData.Data)
+        ' Console.WriteLine("deltams = " + CStr(deltams) + " pose data " + CStr(pose.rotation.X))
         Dim q As Quaternion = pose.rotation
         Dim t = pose.translation
         '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
@@ -224,9 +236,11 @@ Public Class CameraT265
                                t.X, t.Y, t.Z, 1.0}
         transformationMatrix = mat
 
-        IMU_TimeStamp = poseData.Timestamp
-        imuAccel = pose.acceleration
-        imuGyro = pose.angularVelocity
+        Dim gyroFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Gyro, rs.Format.MotionXyz32f)
+        imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame.Data)
+
+        Dim accelFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Accel, rs.Format.MotionXyz32f)
+        imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame.Data)
 
         Dim images = frames.As(Of rs.FrameSet)()
         Dim fishEye = images.FishEyeFrame()
