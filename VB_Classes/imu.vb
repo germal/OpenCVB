@@ -326,10 +326,10 @@ Public Class IMU_Time : Implements IDisposable
                                                   " When CPU and IMU clock difference is negative, the time offset is smoothed with Kalman filter", 10, 140))
             ocvb.putText(New ActiveClass.TrueType("positiveDelta ms = " + Format(positiveDelta, "000.00") + " forced positive Delta ms plotted in Green", 10, 160))
             ocvb.putText(New ActiveClass.TrueType("Off chart count = " + CStr(offChartValue), 10, 180))
-            ocvb.putText(New ActiveClass.TrueType("myFrameCount = " + CStr(myframeCount), 10, 200))
+            ocvb.putText(New ActiveClass.TrueType("myFrameCount = " + CStr(myframeCount) + " - Use this to reset after x frames", 10, 200))
             syncCount -= 1
             If smoothedDelta > 10 Or myframeCount >= 1000 Or check.Box(0).Checked Or syncCount > 0 Then
-                ocvb.putText(New ActiveClass.TrueType("Syncing the IMU and CPU Times", 10, 220))
+                ocvb.putText(New ActiveClass.TrueType("Syncing the IMU and CPU Clocks", 10, 220))
             End If
 
             ocvb.label1 = "Delta ms: Raw values between " + CStr(minVal) + " and " + CStr(maxVal)
