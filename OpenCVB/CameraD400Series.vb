@@ -114,69 +114,64 @@ Public Class CameraD400Series
             ReDim vertices(w * h * 4 * 3 - 1) ' 3 floats or 12 bytes per pixel.  
         End If
     End Sub
-    Dim block As New rs.CustomProcessingBlock(
-        Sub(f, src)
-            Using varRelease = New rs.FramesReleaser
-                Try
-                    For Each p In blocks
-                        If p.Info.Item(0) = "Decimation Filter" And DecimationFilter Then f = p.Process(f)
-                        If p.Info.Item(0) = "Threshold Filter" And ThresholdFilter Then f = p.Process(f)
-                        If p.Info.Item(0) = "Depth to Disparity" Then f = p.Process(f) ' always have depth to disparity
-                        If p.Info.Item(0) = "Spatial Filter" And SpatialFilter Then f = p.Process(f)
-                        If p.Info.Item(0) = "Temporal Filter" And TemporalFilter Then f = p.Process(f)
-                        If p.Info.Item(0) = "Hole Filling Filter" And HoleFillingFilter Then f = p.Process(f)
-                        If p.Info.Item(0) = "Disparity to Depth" Then f = p.Process(f) ' always have disparity to depth
-                    Next
-
-                    f = align.Process(f)
-                    f = colorizer.Process(f)
-
-                    Dim frames = f.As(Of rs.FrameSet)()
-                    Dim depthFrame = frames.DepthFrame
-                    Dim colorFrame = frames.ColorFrame
-                    Dim disparityFrame = depth2Disparity.Process(depthFrame)
-                    Dim RGBDepthframe = colorizer.Process(depthFrame)
-                    Dim rawRight As rs.Frame = Nothing
-                    Dim rawLeft = frames.InfraredFrame
-                    For Each frame In frames
-                        If frame.Profile.Stream = rs.Stream.Infrared Then
-                            If frame.Profile.Index = 2 Then
-                                rawRight = frame
-                                Exit For
-                            End If
-                        End If
-                    Next
-
-                    Dim points = pc.Process(depthFrame).As(Of rs.Points)
-                    Marshal.Copy(points.Data, vertices, 0, vertices.Length)
-                    Marshal.Copy(colorFrame.Data, colorBytes, 0, colorBytes.Length)
-                    Marshal.Copy(disparityFrame.Data, disparityBytes, 0, disparityBytes.Length)
-                    Marshal.Copy(RGBDepthframe.Data, RGBDepthBytes, 0, RGBDepthBytes.Length)
-                    Marshal.Copy(depthFrame.Data, depthBytes, 0, depthBytes.Length)
-                    Marshal.Copy(rawLeft.Data, leftViewBytes, 0, leftViewBytes.Length)
-                    Marshal.Copy(rawRight.Data, rightViewBytes, 0, rightViewBytes.Length)
-
-                    ' get motion data and timestamp from the gyro and accelerometer
-                    If IMU_Present Then
-                        Dim gyroFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Gyro, rs.Format.MotionXyz32f)
-                        imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame.Data)
-
-                        IMU_TimeStamp = gyroFrame.Timestamp
-
-                        Dim accelFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Accel, rs.Format.MotionXyz32f)
-                        imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame.Data)
-                    End If
-                Catch ex As Exception
-                    Console.WriteLine("Error in CustomProcessingBlock: " + ex.Message)
-                    failedImageCount += 1
-                End Try
-            End Using
-        End Sub
-    )
     Public Sub GetNextFrame()
         If pipelineClosed Then Exit Sub
-        Dim frameSet = pipeline.WaitForFrames(1000)
-        block.Process(frameSet)
+        Dim frameset = pipeline.WaitForFrames(1000)
+        Try
+            Dim frames = frameset.As(Of rs.FrameSet)()
+            ' get motion data and timestamp from the gyro and accelerometer
+            If IMU_Present Then
+                Dim gyroFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Gyro, rs.Format.MotionXyz32f)
+                imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame.Data)
+
+                IMU_TimeStamp = gyroFrame.Timestamp
+
+                Dim accelFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Accel, rs.Format.MotionXyz32f)
+                imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame.Data)
+            End If
+
+            Dim f As rs.Frame
+            For Each p In blocks
+                If p.Info.Item(0) = "Decimation Filter" And DecimationFilter Then f = p.Process(frameset)
+                If p.Info.Item(0) = "Threshold Filter" And ThresholdFilter Then f = p.Process(frameset)
+                If p.Info.Item(0) = "Depth to Disparity" Then f = p.Process(frameset) ' always have depth to disparity
+                If p.Info.Item(0) = "Spatial Filter" And SpatialFilter Then f = p.Process(frameset)
+                If p.Info.Item(0) = "Temporal Filter" And TemporalFilter Then f = p.Process(frameset)
+                If p.Info.Item(0) = "Hole Filling Filter" And HoleFillingFilter Then f = p.Process(frameset)
+                If p.Info.Item(0) = "Disparity to Depth" Then f = p.Process(frameset) ' always have disparity to depth
+            Next
+
+            f = align.Process(frameset)
+            f = colorizer.Process(frameset)
+
+            Dim depthFrame = frames.DepthFrame
+            Dim colorFrame = frames.ColorFrame
+            Dim disparityFrame = depth2Disparity.Process(depthFrame)
+            Dim RGBDepthframe = colorizer.Process(depthFrame)
+            Dim rawRight As rs.Frame = Nothing
+            Dim rawLeft = frames.InfraredFrame
+            For Each frame In frames
+                If frame.Profile.Stream = rs.Stream.Infrared Then
+                    If frame.Profile.Index = 2 Then
+                        rawRight = frame
+                        Exit For
+                    End If
+                End If
+            Next
+
+            Dim points = pc.Process(depthFrame).As(Of rs.Points)
+            Marshal.Copy(points.Data, vertices, 0, vertices.Length)
+            Marshal.Copy(colorFrame.Data, colorBytes, 0, colorBytes.Length)
+            Marshal.Copy(disparityFrame.Data, disparityBytes, 0, disparityBytes.Length)
+            Marshal.Copy(RGBDepthframe.Data, RGBDepthBytes, 0, RGBDepthBytes.Length)
+            Marshal.Copy(depthFrame.Data, depthBytes, 0, depthBytes.Length)
+            Marshal.Copy(rawLeft.Data, leftViewBytes, 0, leftViewBytes.Length)
+            Marshal.Copy(rawRight.Data, rightViewBytes, 0, rightViewBytes.Length)
+
+        Catch ex As Exception
+            Console.WriteLine("Error in CustomProcessingBlock: " + ex.Message)
+            failedImageCount += 1
+        End Try
 
         Static startTime = IMU_TimeStamp
         Dim tmp = IMU_TimeStamp - startTime

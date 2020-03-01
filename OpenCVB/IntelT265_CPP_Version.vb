@@ -3,7 +3,7 @@ Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 
-Module T265_Module
+Module T265_Module_CPP
     <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265Open(w As Int32, h As Int32) As IntPtr
     End Function
