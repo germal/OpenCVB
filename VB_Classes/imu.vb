@@ -259,6 +259,8 @@ Public Class IMU_Time : Implements IDisposable
         plot.minVal = minVal
         plot.sliders.TrackBar1.Value = 4
         plot.sliders.TrackBar2.Value = 4
+        plot.backColor = cv.Scalar.Aquamarine
+        plot.plotCount = 3
 
         ocvb.desc = "Measure and plot the time difference from the IMU timestamp to the current time (2 different clocks)."
     End Sub
@@ -289,7 +291,7 @@ Public Class IMU_Time : Implements IDisposable
         smoothedDelta = k2.stateResult
         If smoothedDelta < 1 Then smoothedDelta = 1
         If externalUse = False Then
-            plot.plotData = New cv.Scalar(smoothedDelta, positiveDelta, rawDelta)
+            plot.plotData = New cv.Scalar(smoothedDelta, 0, rawDelta, 0)
             plot.Run(ocvb)
             lastXdelta.Add(rawDelta)
             If lastXdelta.Count >= ocvb.color.Width Then lastXdelta.Remove(0)
@@ -333,7 +335,7 @@ Public Class IMU_Time : Implements IDisposable
             End If
 
             ocvb.label1 = "Delta ms: Raw values between " + CStr(minVal) + " and " + CStr(maxVal)
-            ocvb.label2 = "Delta ms: Red (raw) Blue (smoothed) "
+            ocvb.label2 = "Delta ms: Red (raw) Blue (smoothed) Green is zero"
         End If
 
         ' Clocks drift.  Here we sync up the IMU and CPU clocks by restarting the algorithm.  

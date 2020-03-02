@@ -3,7 +3,9 @@ Imports System.Runtime.InteropServices
 Public Class Plot_OverTime : Implements IDisposable
     Public sliders As New OptionsSliders
     Public plotData As cv.Scalar
-    Public plotCount As Int32 = 3
+    Public plotCount As Int32 = 4
+    Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.White}
+    Public backColor = cv.Scalar.Black
     Public externalUse As Boolean
     Public dst As cv.Mat
     Public minVal As Int32 = 0
@@ -23,23 +25,31 @@ Public Class Plot_OverTime : Implements IDisposable
         Dim pixelHeight = CInt(sliders.TrackBar1.Value)
         Dim pixelWidth = CInt(sliders.TrackBar2.Value)
         If columnIndex + pixelWidth >= ocvb.color.Width Then
-            dst.ColRange(columnIndex, ocvb.color.Width).SetTo(0)
+            dst.ColRange(columnIndex, ocvb.color.Width).SetTo(backColor)
             columnIndex = 0
         End If
-        dst.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(0)
+        dst.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
         If externalUse = False Then plotData = ocvb.color.Mean()
 
+        Dim rectSize = New cv.Size2f(pixelWidth, pixelHeight)
+        Dim ellipseSize = New cv.Size(pixelWidth * 2, pixelHeight)
         For i = 0 To plotCount - 1
-            Dim color = Choose(i Mod 3 + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
             If plotData.Item(i) >= minVal And plotData.Item(i) <= maxVal Then
                 Dim y = 1 - (plotData.Item(i) - minVal) / (maxVal - minVal)
                 y *= ocvb.color.Height - 1
-                If i = 1 Then
-                    ' plot the green values as circles
-                    dst.Circle(New cv.Point(columnIndex - pixelWidth, y - pixelHeight), pixelWidth, color, -1, cv.LineTypes.AntiAlias)
-                Else
-                    dst.Rectangle(New cv.Rect(columnIndex - pixelWidth, y - pixelHeight, pixelWidth * 2, pixelHeight * 2), color, -1)
-                End If
+                Dim c As New cv.Point(columnIndex - pixelWidth, y - pixelHeight)
+                Dim rect = New cv.Rect(c.X, c.Y, pixelWidth * 2, pixelHeight * 2)
+                Select Case i
+                    Case 0
+                        dst.Circle(c, pixelWidth, plotColors(i), -1, cv.LineTypes.AntiAlias)
+                    Case 1
+                        dst.Rectangle(rect, plotColors(i), -1)
+                    Case 2
+                        dst.Ellipse(c, ellipseSize, 0, 0, 360, plotColors(i), -1)
+                    Case 3
+                        Dim rotatedRect = New cv.RotatedRect(c, rectSize, 45)
+                        drawRotatedRectangle(rotatedRect, ocvb.result2, plotColors(i))
+                End Select
             End If
         Next
         columnIndex += pixelWidth
