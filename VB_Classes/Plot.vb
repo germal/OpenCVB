@@ -63,6 +63,8 @@ End Class
 
 
 
+
+
 Public Class Plot_Histogram : Implements IDisposable
     Public sliders As New OptionsSliders
     Public hist As New cv.Mat

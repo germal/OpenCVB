@@ -113,5 +113,8 @@
     <ClCompile Include="WhiteBalance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Dither.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

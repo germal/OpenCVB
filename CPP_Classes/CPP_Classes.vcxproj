@@ -31,6 +31,7 @@
     <ClCompile Include="BGSubtract.cpp" />
     <ClCompile Include="Corners.cpp" />
     <ClCompile Include="Depth.cpp" />
+    <ClCompile Include="Dither.cpp" />
     <ClCompile Include="Edges.cpp" />
     <ClCompile Include="EMax.cpp" />
     <ClCompile Include="FitEllipse.cpp" />
