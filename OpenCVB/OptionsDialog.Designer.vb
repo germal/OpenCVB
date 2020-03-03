@@ -64,7 +64,7 @@ Partial Class OptionsDialog
         Me.CameraGroup.Controls.Add(Me.SnapToGrid)
         Me.CameraGroup.Location = New System.Drawing.Point(21, 12)
         Me.CameraGroup.Name = "CameraGroup"
-        Me.CameraGroup.Size = New System.Drawing.Size(692, 231)
+        Me.CameraGroup.Size = New System.Drawing.Size(692, 261)
         Me.CameraGroup.TabIndex = 3
         Me.CameraGroup.TabStop = False
         Me.CameraGroup.Text = "Camera"
@@ -72,7 +72,7 @@ Partial Class OptionsDialog
         'SnapToGrid
         '
         Me.SnapToGrid.AutoSize = True
-        Me.SnapToGrid.Location = New System.Drawing.Point(91, 181)
+        Me.SnapToGrid.Location = New System.Drawing.Point(91, 218)
         Me.SnapToGrid.Name = "SnapToGrid"
         Me.SnapToGrid.Size = New System.Drawing.Size(354, 24)
         Me.SnapToGrid.TabIndex = 2
@@ -83,7 +83,7 @@ Partial Class OptionsDialog
         '
         Me.GroupBox1.Controls.Add(Me.AccurateProcessing)
         Me.GroupBox1.Controls.Add(Me.lowResolution)
-        Me.GroupBox1.Location = New System.Drawing.Point(21, 264)
+        Me.GroupBox1.Location = New System.Drawing.Point(21, 279)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(936, 128)
         Me.GroupBox1.TabIndex = 4
@@ -117,7 +117,7 @@ Partial Class OptionsDialog
         Me.GroupBox2.Controls.Add(Me.AvoidDNNCrashes)
         Me.GroupBox2.Controls.Add(Me.ShowConsoleLog)
         Me.GroupBox2.Controls.Add(Me.ShowLabels)
-        Me.GroupBox2.Location = New System.Drawing.Point(21, 398)
+        Me.GroupBox2.Location = New System.Drawing.Point(21, 413)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(936, 192)
         Me.GroupBox2.TabIndex = 5
@@ -164,7 +164,7 @@ Partial Class OptionsDialog
         Me.Filters.Controls.Add(Me.DepthToDisparity)
         Me.Filters.Controls.Add(Me.ThresholdFilter)
         Me.Filters.Controls.Add(Me.DecimationFilter)
-        Me.Filters.Location = New System.Drawing.Point(21, 596)
+        Me.Filters.Location = New System.Drawing.Point(21, 611)
         Me.Filters.Name = "Filters"
         Me.Filters.Size = New System.Drawing.Size(936, 274)
         Me.Filters.TabIndex = 7
@@ -248,7 +248,7 @@ Partial Class OptionsDialog
         Me.GroupBox4.Controls.Add(Me.ShowOptions)
         Me.GroupBox4.Controls.Add(Me.TestAllDuration)
         Me.GroupBox4.Controls.Add(Me.Label1)
-        Me.GroupBox4.Location = New System.Drawing.Point(24, 883)
+        Me.GroupBox4.Location = New System.Drawing.Point(24, 898)
         Me.GroupBox4.Name = "GroupBox4"
         Me.GroupBox4.Size = New System.Drawing.Size(941, 139)
         Me.GroupBox4.TabIndex = 8
@@ -290,7 +290,7 @@ Partial Class OptionsDialog
         Me.GroupBox6.Controls.Add(Me.PythonExeName)
         Me.GroupBox6.Controls.Add(Me.SelectPythonFile)
         Me.GroupBox6.Controls.Add(Me.Label2)
-        Me.GroupBox6.Location = New System.Drawing.Point(21, 1028)
+        Me.GroupBox6.Location = New System.Drawing.Point(21, 1043)
         Me.GroupBox6.Name = "GroupBox6"
         Me.GroupBox6.Size = New System.Drawing.Size(941, 116)
         Me.GroupBox6.TabIndex = 9

@@ -223,7 +223,8 @@ Public Class CameraT265
         Dim f = frames.FirstOrDefault(rs.Stream.Pose)
 
         Dim poseData = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Pose)
-        IMU_TimeStamp = poseData.Timestamp
+        Static startingTime = poseData.Timestamp
+        IMU_TimeStamp = poseData.Timestamp - startingTime
         Dim pose = Marshal.PtrToStructure(Of PoseData)(poseData.Data)
         Dim q As Quaternion = pose.rotation
         Dim t = pose.translation

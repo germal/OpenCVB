@@ -2,34 +2,34 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Module Kinect_Interface
-    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectOpen() As IntPtr
     End Function
-    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDeviceCount(kc As IntPtr) As Int32
     End Function
-    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDeviceName(kc As IntPtr) As IntPtr
     End Function
-    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectWaitFrame(kc As IntPtr, RGBDepth As IntPtr) As IntPtr
     End Function
-    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectExtrinsics(kc As IntPtr) As IntPtr
     End Function
-    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectintrinsicsLeft(kc As IntPtr) As IntPtr
     End Function
-    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectPointCloud(kc As IntPtr) As IntPtr
     End Function
-    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectRGBA(kc As IntPtr) As IntPtr
     End Function
-    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDepth16(kc As IntPtr) As IntPtr
     End Function
-    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDepthInColor(kc As IntPtr) As IntPtr
     End Function
 End Module

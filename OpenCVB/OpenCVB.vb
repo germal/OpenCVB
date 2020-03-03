@@ -21,6 +21,7 @@ Public Class OpenCVB
     Dim cameraDataUpdated As Boolean
     Dim cameraD400Series As Object
     Dim cameraKinect As Object
+    Dim cameraMyntD As Object
     Dim cameraZed2 As Object
     Dim cameraT265 As Object
     Public cameraName As String
@@ -167,24 +168,53 @@ Public Class OpenCVB
         cameraZed2 = New CameraZED2()
         cameraZed2.deviceCount = USBenumeration("ZED 2")
         If cameraZed2.deviceCount > 0 Then
-            Dim Zed2DLL As New FileInfo(HomeDir.FullName + "bin/debug/Camera_StereoLabsZed2.dll")
-            If Zed2DLL.Exists = False Then Zed2DLL = New FileInfo(HomeDir.FullName + "bin/Release/Camera_StereoLabsZed2.dll")
+            Dim Zed2DLL As New FileInfo(HomeDir.FullName + "bin/debug/StereoLabsZed2.dll")
+            If Zed2DLL.Exists = False Then Zed2DLL = New FileInfo(HomeDir.FullName + "bin/Release/StereoLabsZed2.dll")
             If Zed2DLL.Exists = False Then
-                MsgBox("A StereoLabls ZED 2 camera is present but StereoLabsZed2.DLL is not built." + vbCrLf +
+                MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
+                       "StereoLabsZed2.DLL has not been built yet." + vbCrLf + vbCrLf +
                        "Add the StereoLabsZed2 project to the OpenCVB solution." + vbCrLf +
                        "The StereoLabsZed2 project is in the Cameras Directory." + vbCrLf +
-                       "Be sure to update Project/Project Dependencies for OpenCVB." + vbCrLf +
-                       "Go to stereolabs.com to download the Version 3 SDK." + vbCrLf +
-                       "It will install the SDK and CUDA needed to build the StereoLabsZed2.dll.")
-                cameraKinect.deviceCount = 0 ' we can't use this device
+                       "Update the Project Dependencies for OpenCVB to include it." + vbCrLf +
+                       "If you have not already done so, go to stereolabs.com" + vbCrLf +
+                       "and download and install the Version 3 SDK so that the " + vbCrLf +
+                       "OpenCVB's StereoLabsZed2.dll project will build." + vbCrLf + vbCrLf +
+                       "For extra performance, use Build Configuration to" + vbCrLf +
+                       "to always use StereolabsZed2.dll in Release mode." + vbCrLf +
+                       "Delete any Debug version to see performance boost.")
+                cameraZed2.deviceCount = 0 ' we can't use this device
             Else
                 cameraZed2.initialize(fps, regWidth, regHeight)
+            End If
+        End If
+
+        cameraMyntD = New CameraMyntD()
+        cameraMyntD.deviceCount = USBenumeration("MYNT-EYE-D1000")
+        If cameraMyntD.deviceCount > 0 Then
+            Dim MyntDLL As New FileInfo(HomeDir.FullName + "bin/debug/MyntD1000.dll")
+            If MyntDLL.Exists = False Then MyntDLL = New FileInfo(HomeDir.FullName + "bin/Release/MyntD1000.dll")
+            If MyntDLL.Exists = False Then
+                MsgBox("A MyntD 1000 camera is present but OpenCVB's" + vbCrLf +
+                       "MyntD1000.DLL has not been built yet." + vbCrLf + vbCrLf +
+                       "Add the MyntD1000 project to the OpenCVB solution." + vbCrLf +
+                       "The MyntD1000 project is in the Cameras Directory." + vbCrLf +
+                       "Update the Project Dependencies for OpenCVB to include it." + vbCrLf +
+                       "If you have not already done so, go to MYNT Eye Website" + vbCrLf +
+                       "(see Readme.md) and install the latest SDK so that the " + vbCrLf +
+                       "OpenCVB's MyntD1000.dll project will build." + vbCrLf + vbCrLf +
+                       "For extra performance, use Build Configuration to" + vbCrLf +
+                       "to always use MyntD1000.dll in Release mode." + vbCrLf +
+                       "Delete any Debug version to see performance boost.")
+                cameraMyntD.deviceCount = 0 ' we can't use this device
+            Else
+                cameraMyntD.initialize(fps, regWidth, regHeight)
             End If
         End If
 
         optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = cameraT265.devicecount
+        optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = cameraZed2.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = cameraZed2.devicecount
 
         updateCamera()
@@ -211,7 +241,7 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
 
         If camera.deviceCount = 0 Then
-            MsgBox("OpenCVB supports Kinect for Azure 3D camera, Intel D400Series 3D cameras, or Intel T265.  Nothing found!")
+            MsgBox("OpenCVB supports Kinect for Azure 3D camera, Intel D400Series 3D cameras, Or Intel T265.  Nothing found!")
             End
         End If
 

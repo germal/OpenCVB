@@ -1,12 +1,13 @@
 ﻿Imports System.IO
 Public Class OptionsDialog
     Public cameraIndex As Int32 ' an index into the cameraRadioButton array.
-    Public Const D400Cam As Int32 = 0 ' Must be defined in VB_Classes the same way!
-    Public Const Kinect4AzureCam As Int32 = 1 ' Must be defined in VB_Classes the same way!
-    Public Const T265Camera As Int32 = 2 ' Must be defined in VB_Classes the same way!
-    Public Const StereoLabsZED2 As Int32 = 3 ' Must be defined in VB_Classes the same way!
-    Public cameraDeviceCount(StereoLabsZED2) As Int32
-    Public cameraRadioButton(StereoLabsZED2) As RadioButton
+    Public Const D400Cam As Int32 = 0 ' Must be defined in VB_Classes.vb the same way!
+    Public Const Kinect4AzureCam As Int32 = 1 ' Must be defined in VB_Classes.vb the same way!
+    Public Const T265Camera As Int32 = 2 ' Must be defined in VB_Classes.vb the same way!
+    Public Const StereoLabsZED2 As Int32 = 3 ' Must be defined in VB_Classes.vb the same way!
+    Public Const MyntD1000 As Int32 = 4 ' Must be defined in VB_Classes.vb the same way!
+    Public cameraDeviceCount(MyntD1000) As Int32
+    Public cameraRadioButton(MyntD1000) As RadioButton
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
         SaveSetting("OpenCVB", "FastAccurate", "FastAccurate", lowResolution.Checked)
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", cameraIndex)
@@ -34,7 +35,7 @@ Public Class OptionsDialog
         cameraIndex = sender.tag
     End Sub
     Public Sub OptionsDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        For i = 0 To 3
+        For i = 0 To cameraRadioButton.Count - 1
             cameraRadioButton(i) = New RadioButton
             CameraGroup.Controls.Add(cameraRadioButton(i))
             cameraRadioButton(i).Visible = True
@@ -44,7 +45,7 @@ Public Class OptionsDialog
             cameraRadioButton(i).Tag = i ' this will manage the public type for the camera - see VB_Classes.vb.
             cameraRadioButton(i).Location = New Point(16, (i + 1) * 20)
             cameraRadioButton(i).Text = Choose(i + 1, "Intel D400 Series 3D camera", "Microsoft Kinect for Azure Camera",
-                                               "Intel T265 camera", "StereoLabs ZED 2 camera")
+                                               "Intel T265 camera", "StereoLabs ZED 2 camera", "Mynt Eye D 1000 camera")
             AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
         Next
 

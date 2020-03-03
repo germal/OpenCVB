@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module Rodrigues_Basics_Exports
-    <DllImport(("Camera_Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectRodrigues() As IntPtr
     End Function
 End Module

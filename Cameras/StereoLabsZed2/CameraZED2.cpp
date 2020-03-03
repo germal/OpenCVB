@@ -29,6 +29,7 @@ public:
 	SensorsData sensordata;
 	Orientation orientation;
 	float imuTemperature;
+	double imuTimeStamp;
 	Pose zed_pose;
 private:
 	sl::Camera zed;
@@ -108,10 +109,10 @@ public:
 		memcpy((void*)&translation, (void*)&zed_pose.getTranslation(), sizeof(float) * 3);
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
-		
+		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
 		return (int*)&zed_pose.pose_data;
 	}
-};
+}; 
 
 extern "C" __declspec(dllexport) int* Zed2Open(int w, int h, int fps)
 {
@@ -173,8 +174,8 @@ extern "C" __declspec(dllexport) int* Zed2IMU_Magnetometer(StereoLabsZed2 * Zed2
 }
 extern "C" __declspec(dllexport) double Zed2IMU_TimeStamp(StereoLabsZed2 * Zed2)
 {
-	return static_cast<double>(Zed2->zed_pose.timestamp.getMilliseconds()); // this does not have the accuracy of the imu timestamp...
-	//return static_cast<double>(Zed2->sensordata.imu.timestamp.getSeconds()); // This did not appear to be valid!
+	// printf("ts (uint64) =%ju (0x%jx)\n", Zed2->zed_pose.timestamp.getMilliseconds(), Zed2->zed_pose.timestamp.getMilliseconds());
+	return Zed2->imuTimeStamp;
 }
 extern "C" __declspec(dllexport)float Zed2IMU_Temperature(StereoLabsZed2 * Zed2)
 {
