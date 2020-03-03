@@ -47,6 +47,11 @@ Public Class OpenCVB
     Dim IMU_Temperature As Single
     Dim IMU_Rotation As System.Numerics.Quaternion
     Dim IMU_Translation As cv.Point3f
+    Dim IMU_Acceleration As cv.Point3f
+    Dim IMU_Velocity As cv.Point3f
+    Dim IMU_AngularAcceleration As cv.Point3f
+    Dim IMU_AngularVelocity As cv.Point3f
+
     Dim LastX As Int32
     Dim LastY As Int32
     Dim lowResolution As Boolean
@@ -947,6 +952,10 @@ Public Class OpenCVB
                 OpenCVB.ocvb.parms.IMU_Temperature = IMU_Temperature
                 OpenCVB.ocvb.parms.IMU_Rotation = IMU_Rotation
                 OpenCVB.ocvb.parms.IMU_Translation = IMU_Translation
+                OpenCVB.ocvb.parms.IMU_Acceleration = IMU_Acceleration
+                OpenCVB.ocvb.parms.IMU_Velocity = IMU_Velocity
+                OpenCVB.ocvb.parms.IMU_AngularAcceleration = IMU_AngularAcceleration
+                OpenCVB.ocvb.parms.IMU_AngularVelocity = IMU_AngularVelocity
             End SyncLock
             OpenCVB.UpdateHostLocation(Me.Left, Me.Top, Me.Height)
 
@@ -1053,6 +1062,10 @@ Public Class OpenCVB
                 IMU_TimeStamp = camera.IMU_TimeStamp
                 IMU_Rotation = camera.IMU_Rotation
                 IMU_Translation = camera.IMU_Translation
+                IMU_Acceleration = camera.IMU_Acceleration
+                IMU_Velocity = camera.IMU_Velocity
+                IMU_AngularAcceleration = camera.IMU_AngularAcceleration
+                IMU_AngularVelocity = camera.IMU_AngularVelocity
                 If lowResolution Then
                     formColor = camera.color.Resize(fastSize)
                     formRGBDepth = camera.RGBDepth.Resize(fastSize)

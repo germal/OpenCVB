@@ -59,9 +59,17 @@ Public Class CameraT265
     Public failedImageCount As Int32
     Public imuAccel As cv.Point3f
     Public imuGyro As cv.Point3f
+    Public IMU_Barometer As Single
+    Public IMU_Magnetometer As cv.Point3f
+    Public IMU_Temperature As Single
+    Public IMU_TimeStamp As Double
     Public IMU_Present As Boolean
     Public IMU_Rotation As Quaternion
     Public IMU_Translation As cv.Point3f
+    Public IMU_Acceleration As cv.Point3f
+    Public IMU_Velocity As cv.Point3f
+    Public IMU_AngularAcceleration As cv.Point3f
+    Public IMU_AngularVelocity As cv.Point3f
     Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public leftView As cv.Mat
@@ -81,10 +89,6 @@ Public Class CameraT265
     Public pMatRight As cv.Mat
     Public rMatleft As cv.Mat
     Public rMatRight As cv.Mat
-    Public IMU_Barometer As Single
-    Public IMU_Magnetometer As cv.Point3f
-    Public IMU_Temperature As Single
-    Public IMU_TimeStamp As Double
     Public captureTimeStamp As Double
     Dim QArray(15) As Double
 
@@ -231,6 +235,10 @@ Public Class CameraT265
         IMU_Rotation = pose.rotation
         Dim q = IMU_Rotation
         IMU_Translation = pose.translation
+        IMU_Acceleration = pose.acceleration
+        IMU_Velocity = pose.velocity
+        IMU_AngularAcceleration = pose.angularAcceleration
+        IMU_AngularVelocity = pose.angularVelocity
         Dim t = IMU_Translation
         '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
         Dim mat() As Single = {-(1 - 2 * q.Y * q.Y - 2 * q.Z * q.Z), -(2 * q.X * q.Y + 2 * q.Z * q.W), -(2 * q.X * q.Z - 2 * q.Y * q.W), 0.0,

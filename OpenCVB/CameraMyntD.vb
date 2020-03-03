@@ -120,6 +120,10 @@ Public Class CameraMyntD
     Public IMU_TimeStamp As Double
     Public IMU_Rotation As System.Numerics.Quaternion
     Public IMU_Translation As cv.Point3f
+    Public IMU_Acceleration As cv.Point3f
+    Public IMU_Velocity As cv.Point3f
+    Public IMU_AngularAcceleration As cv.Point3f
+    Public IMU_AngularVelocity As cv.Point3f
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)

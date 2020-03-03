@@ -233,13 +233,13 @@ End Class
 
 
 
-Public Class IMU_Time : Implements IDisposable
+Public Class IMU_Latency : Implements IDisposable
     Public check As New OptionsCheckbox
     Dim k1 As Kalman_Single
     Dim k2 As Kalman_Single
     Public plot As Plot_OverTime
     Public positiveDelta As Double
-    Public smoothedDelta As Double
+    Public smoothedLatency As Double
     Public IMUinterval As Double
     Public CPUinterval As Double
     Public externalUse As Boolean
@@ -291,10 +291,10 @@ Public Class IMU_Time : Implements IDisposable
         Dim rawDelta = ms + timeOffset - IMUinterval
         k2.inputReal = positiveDelta
         k2.Run(ocvb)
-        smoothedDelta = k2.stateResult
-        If smoothedDelta < 1 Then smoothedDelta = 1
+        smoothedLatency = k2.stateResult
+        If smoothedLatency < 1 Then smoothedLatency = 1
         If externalUse = False Then
-            plot.plotData = New cv.Scalar(smoothedDelta, 0, rawDelta, 0)
+            plot.plotData = New cv.Scalar(smoothedLatency, 0, rawDelta, 0)
             plot.Run(ocvb)
             Static lastXdelta As New List(Of Single)
             lastXdelta.Add(rawDelta)
@@ -323,20 +323,26 @@ Public Class IMU_Time : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType(" IMU timestamp (ms) = " + Format(IMUinterval, "#0.0"), 10, 60))
             ocvb.putText(New ActiveClass.TrueType("CPU timestamp (ms) = " + Format(ms, "#0.0"), 10, 80))
             If rawDelta < 0 Then
-                ocvb.putText(New ActiveClass.TrueType("Delta ms = " + Format(rawDelta, "00.00") + " Raw data plotted in Red", 10, 100))
+                ocvb.putText(New ActiveClass.TrueType("Raw latency (ms) = " + Format(rawDelta, "00.00") + " Raw data plotted in Red", 10, 100))
             Else
-                ocvb.putText(New ActiveClass.TrueType("Delta ms = " + Format(rawDelta, "000.00") + " Raw data plotted in Red", 10, 100))
+                ocvb.putText(New ActiveClass.TrueType("Raw latency (ms) = " + Format(rawDelta, "000.00") + " Raw data plotted in Red", 10, 100))
             End If
-            ocvb.putText(New ActiveClass.TrueType("Delta ms = " + Format(smoothedDelta, "000.00") + " forced positive values are smoothed with Kalman filter and plotted in Blue", 10, 120))
+            ocvb.putText(New ActiveClass.TrueType("smoothed Latency (ms) = " + Format(smoothedLatency, "000.00") + " forced positive values are smoothed with Kalman filter and plotted in Blue", 10, 120))
             ocvb.putText(New ActiveClass.TrueType("timeOffset ms = " + Format(timeOffset, "000.00") +
                                                   " When the raw value is negative, the smoothed value is offset with this value.", 10, 140))
             ocvb.putText(New ActiveClass.TrueType("positiveDelta ms = " + Format(positiveDelta, "000.00") + " forced positive Delta ms", 10, 160))
             ocvb.putText(New ActiveClass.TrueType("Off chart count = " + CStr(offChartValue), 10, 180))
             ocvb.putText(New ActiveClass.TrueType("myFrameCount = " + CStr(myframeCount) + " - Use this to reset after " + CStr(resetCounter) + " frames", 10, 200))
             syncCount -= 1
-            If smoothedDelta > 10 Or myframeCount >= 1000 Or check.Box(0).Checked Or syncCount > 0 Then
+            If smoothedLatency > 10 Or myframeCount >= 1000 Or check.Box(0).Checked Or syncCount > 0 Then
                 ocvb.putText(New ActiveClass.TrueType("Syncing the IMU and CPU Clocks", 10, 220))
             End If
+            Static imuLast = IMUinterval
+            Static cpuLast = CPUinterval
+            ocvb.putText(New ActiveClass.TrueType("IMU frame time (ms) " + Format(IMUinterval - imuLast, "0."), 10, 240))
+            ocvb.putText(New ActiveClass.TrueType("CPU frame time (ms) " + Format(CPUinterval - cpuLast, "0."), 10, 260))
+            imuLast = IMUinterval
+            cpuLast = CPUinterval
 
             ocvb.label1 = "Delta ms: Raw values between " + CStr(minVal) + " and " + CStr(maxVal)
             ocvb.label2 = "Delta ms: Red (raw) Blue (smoothed) Green is zero"
@@ -345,12 +351,12 @@ Public Class IMU_Time : Implements IDisposable
         ' Clocks drift.  Here we sync up the IMU and CPU clocks by restarting the algorithm.  
         ' We could reset the Kalman object but the effect of the Kalman filter becomes quite apparent as the values shift to normal.
         myframeCount += 1
-        If smoothedDelta > 10 Or myframeCount >= resetCounter Or check.Box(0).Checked Then
+        If smoothedLatency > 10 Or myframeCount >= resetCounter Or check.Box(0).Checked Then
             myframeCount = 0
             check.Box(0).Checked = False
             syncShift += ms
             lastIMUtime = ocvb.parms.IMU_TimeStamp
-            smoothedDelta = 0
+            smoothedLatency = 5 ' it is generally about 5 ms
             timeOffset = 0
             positiveDelta = 0
             offChartValue = 1000 ' force the update to the scale.
