@@ -55,6 +55,8 @@ Public Class CameraD400Series
     Public IMU_Magnetometer As cv.Point3f
     Public IMU_Temperature As Single
     Public IMU_TimeStamp As Double
+    Public IMU_Rotation As System.Numerics.Quaternion
+    Public IMU_Translation As cv.Point3f
     Public Sub New()
         Console.WriteLine("The current librealsense version is " + ctx.Version())
     End Sub

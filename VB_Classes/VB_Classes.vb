@@ -117,6 +117,8 @@ Public Class ActiveClass : Implements IDisposable
         Dim IMU_Present As Boolean
         Dim IMU_Temperature As Single
         Dim IMU_TimeStamp As Double
+        Dim IMU_Rotation As System.Numerics.Quaternion
+        Dim IMU_Translation As cv.Point3f
         Dim intrinsicsLeft As intrinsics_VB
         Dim intrinsicsRight As intrinsics_VB
         Dim lowResolution As Boolean

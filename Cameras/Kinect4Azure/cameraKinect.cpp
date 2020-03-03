@@ -243,26 +243,20 @@ char* KinectRodrigues()
 	for (size_t i = 0; i < points_3d.size(); i++)
 	{
 		int valid = 0;
-		k4a_calibration_3d_to_2d(&calibration,
-			&points_3d[i],
-			K4A_CALIBRATION_TYPE_COLOR,
-			K4A_CALIBRATION_TYPE_DEPTH,
-			&k4a_points_2d[i],
-			&valid);
+		k4a_calibration_3d_to_2d(&calibration, &points_3d[i], K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_DEPTH, &k4a_points_2d[i], &valid);
 	}
 
 	// converting the calibration data to OpenCV format
 	// extrinsic transformation from color to depth camera
 	Mat se3 = Mat(3, 3, CV_32FC1, calibration.extrinsics[K4A_CALIBRATION_TYPE_COLOR][K4A_CALIBRATION_TYPE_DEPTH].rotation);
 	Mat r_vec = Mat(3, 1, CV_32FC1);
-	Rodrigues(se3, r_vec);
+	cv::Rodrigues(se3, r_vec);
 	Mat t_vec = Mat(3, 1, CV_32F, calibration.extrinsics[K4A_CALIBRATION_TYPE_COLOR][K4A_CALIBRATION_TYPE_DEPTH].translation);
 
 	// intrinsic parameters of the depth camera
 	k4a_calibration_intrinsic_parameters_t* intrinsics = &calibration.depth_camera_calibration.intrinsics.parameters;
-	vector<float> _camera_matrix = {
-		intrinsics->param.fx, 0.f, intrinsics->param.cx, 0.f, intrinsics->param.fy, intrinsics->param.cy, 0.f, 0.f, 1.f
-	};
+	vector<float> _camera_matrix = { intrinsics->param.fx, 0.f, intrinsics->param.cx, 0.f, intrinsics->param.fy, intrinsics->param.cy, 
+									 0.f, 0.f, 1.f };
 	Mat camera_matrix = Mat(3, 3, CV_32F, &_camera_matrix[0]);
 	vector<float> _dist_coeffs = { intrinsics->param.k1, intrinsics->param.k2, intrinsics->param.p1,
 								   intrinsics->param.p2, intrinsics->param.k3, intrinsics->param.k4,
@@ -271,12 +265,7 @@ char* KinectRodrigues()
 
 	// OpenCV project function
 	vector<Point2f> cv_points_2d(points_3d.size());
-	projectPoints(*reinterpret_cast<vector<Point3f>*>(&points_3d),
-		r_vec,
-		t_vec,
-		camera_matrix,
-		dist_coeffs,
-		cv_points_2d);
+	cv::projectPoints(*reinterpret_cast<vector<Point3f>*>(&points_3d), r_vec, t_vec, camera_matrix, dist_coeffs, cv_points_2d);
 
 	for (size_t i = 0; i < points_3d.size(); i++)
 	{

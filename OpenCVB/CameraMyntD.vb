@@ -118,10 +118,13 @@ Public Class CameraMyntD
     Public IMU_Magnetometer As cv.Point3f
     Public IMU_Temperature As Single
     Public IMU_TimeStamp As Double
+    Public IMU_Rotation As System.Numerics.Quaternion
+    Public IMU_Translation As cv.Point3f
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
         MyntD = MyntDOpen(width, height, 60)
+        Exit Sub
         If MyntD <> 0 Then
             Dim serialNumber = MyntDSerialNumber(MyntD)
             Console.WriteLine("MYNT EYE D 1000 serial number = " + CStr(serialNumber))

@@ -234,16 +234,17 @@ End Class
 
 
 Public Class IMU_Time : Implements IDisposable
-    Dim check As New OptionsCheckbox
+    Public check As New OptionsCheckbox
     Dim k1 As Kalman_Single
     Dim k2 As Kalman_Single
     Public plot As Plot_OverTime
     Public positiveDelta As Double
     Public smoothedDelta As Double
+    Public IMUinterval As Double
+    Public CPUinterval As Double
     Public externalUse As Boolean
     Dim minVal = -20
     Dim maxVal = 20
-    Dim lastXdelta As New List(Of Single)
     Public Sub New(ocvb As AlgorithmData)
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Resync the IMU and CPU clocks"
@@ -267,26 +268,27 @@ Public Class IMU_Time : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Static syncCount As Integer
         Static myframeCount As Integer
-        Static syncCPU As Double
+        Static syncShift As Double
         Static offChartValue As Integer
         Static myStopWatch As New System.Diagnostics.Stopwatch
         Dim resetCounter = 1000
         If ocvb.frameCount = 0 Then myStopWatch.Start()
-        Dim ms = myStopWatch.ElapsedMilliseconds - syncCPU
+        CPUinterval = myStopWatch.ElapsedMilliseconds
+        Dim ms = CPUinterval - syncShift
 
         Static lastIMUtime = ocvb.parms.IMU_TimeStamp
-        Dim imuDelta = ocvb.parms.IMU_TimeStamp - lastIMUtime
+        IMUinterval = ocvb.parms.IMU_TimeStamp - lastIMUtime
 
         Static timeOffset As Double ' when the IMU clock is ahead of the cpu clock, use the average offset to bump the cpu clock
-        If imuDelta > ms Then
-            timeOffset = imuDelta - ms
+        If IMUinterval > ms Then
+            timeOffset = IMUinterval - ms
             k1.inputReal = timeOffset
             k1.Run(ocvb)
             timeOffset = k1.stateResult
         End If
 
-        positiveDelta = Math.Max(0, ms + timeOffset - imuDelta) ' it is essential that this value be positive
-        Dim rawDelta = ms + timeOffset - imuDelta
+        positiveDelta = Math.Max(0, ms + timeOffset - IMUinterval) ' it is essential that this value be positive
+        Dim rawDelta = ms + timeOffset - IMUinterval
         k2.inputReal = positiveDelta
         k2.Run(ocvb)
         smoothedDelta = k2.stateResult
@@ -294,6 +296,7 @@ Public Class IMU_Time : Implements IDisposable
         If externalUse = False Then
             plot.plotData = New cv.Scalar(smoothedDelta, 0, rawDelta, 0)
             plot.Run(ocvb)
+            Static lastXdelta As New List(Of Single)
             lastXdelta.Add(rawDelta)
             If lastXdelta.Count >= ocvb.color.Width Then lastXdelta.Remove(0)
 
@@ -317,7 +320,7 @@ Public Class IMU_Time : Implements IDisposable
                 plot.columnIndex = 0 ' restart at the left side of the chart
             End If
 
-            ocvb.putText(New ActiveClass.TrueType(" IMU timestamp (ms) = " + Format(imuDelta, "#0.0"), 10, 60))
+            ocvb.putText(New ActiveClass.TrueType(" IMU timestamp (ms) = " + Format(IMUinterval, "#0.0"), 10, 60))
             ocvb.putText(New ActiveClass.TrueType("CPU timestamp (ms) = " + Format(ms, "#0.0"), 10, 80))
             If rawDelta < 0 Then
                 ocvb.putText(New ActiveClass.TrueType("Delta ms = " + Format(rawDelta, "00.00") + " Raw data plotted in Red", 10, 100))
@@ -327,7 +330,7 @@ Public Class IMU_Time : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType("Delta ms = " + Format(smoothedDelta, "000.00") + " forced positive values are smoothed with Kalman filter and plotted in Blue", 10, 120))
             ocvb.putText(New ActiveClass.TrueType("timeOffset ms = " + Format(timeOffset, "000.00") +
                                                   " When the raw value is negative, the smoothed value is offset with this value.", 10, 140))
-            ocvb.putText(New ActiveClass.TrueType("positiveDelta ms = " + Format(positiveDelta, "000.00") + " forced positive Delta ms plotted in Green", 10, 160))
+            ocvb.putText(New ActiveClass.TrueType("positiveDelta ms = " + Format(positiveDelta, "000.00") + " forced positive Delta ms", 10, 160))
             ocvb.putText(New ActiveClass.TrueType("Off chart count = " + CStr(offChartValue), 10, 180))
             ocvb.putText(New ActiveClass.TrueType("myFrameCount = " + CStr(myframeCount) + " - Use this to reset after " + CStr(resetCounter) + " frames", 10, 200))
             syncCount -= 1
@@ -345,7 +348,7 @@ Public Class IMU_Time : Implements IDisposable
         If smoothedDelta > 10 Or myframeCount >= resetCounter Or check.Box(0).Checked Then
             myframeCount = 0
             check.Box(0).Checked = False
-            syncCPU += ms
+            syncShift += ms
             lastIMUtime = ocvb.parms.IMU_TimeStamp
             smoothedDelta = 0
             timeOffset = 0

@@ -60,6 +60,8 @@ Public Class CameraT265
     Public imuAccel As cv.Point3f
     Public imuGyro As cv.Point3f
     Public IMU_Present As Boolean
+    Public IMU_Rotation As Quaternion
+    Public IMU_Translation As cv.Point3f
     Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public leftView As cv.Mat
@@ -226,8 +228,10 @@ Public Class CameraT265
         Static startingTime = poseData.Timestamp
         IMU_TimeStamp = poseData.Timestamp - startingTime
         Dim pose = Marshal.PtrToStructure(Of PoseData)(poseData.Data)
-        Dim q As Quaternion = pose.rotation
-        Dim t = pose.translation
+        IMU_Rotation = pose.rotation
+        Dim q = IMU_Rotation
+        IMU_Translation = pose.translation
+        Dim t = IMU_Translation
         '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
         Dim mat() As Single = {-(1 - 2 * q.Y * q.Y - 2 * q.Z * q.Z), -(2 * q.X * q.Y + 2 * q.Z * q.W), -(2 * q.X * q.Z - 2 * q.Y * q.W), 0.0,
                                2 * q.X * q.Y - 2 * q.Z * q.W, 1 - 2 * q.X * q.X - 2 * q.Z * q.Z, 2 * q.Y * q.Z + 2 * q.X * q.W, 0.0,
@@ -284,84 +288,6 @@ Public Class CameraT265
         disparity(validRect).ConvertTo(depth16(depthRect), cv.MatType.CV_16UC1)
         pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
     End Sub
-    'Private Sub callback(frame As rs.Frame)
-    '    If pipelineClosed Then Exit Sub
-    '    Static leftBytes(rawHeight * rawWidth - 1) As Byte
-    '    Static rightBytes(leftBytes.Length - 1) As Byte
-    '    Static poseFrameCount As Integer
-    '    Static imageFrameCount As Integer
-    '    Static gyroFrameCount As Integer
-    '    Static AccelFrameCount As Integer
-    '    Static myStopWatch As New System.Diagnostics.Stopwatch
-    '    Static lastMs As Double
-    '    Static initialized As Boolean
-
-    '    If initialized = False Then
-    '        initialized = True
-    '        myStopWatch.Start()
-    '    End If
-
-    '    Dim ms = myStopWatch.ElapsedMilliseconds
-    '    Dim f = frame.As(Of rs.Frame)
-
-    '    Select Case f.Profile.Stream
-    '        Case rs.Stream.Pose
-    '            poseFrameCount += 1
-    '            Dim poseFrame = f.As(Of rs.PoseFrame)
-    '            Dim poseData = poseFrame(rs.Stream.Pose)
-    '            If poseData Then
-    '                Dim pose = Marshal.PtrToStructure(Of PoseData)(poseData)
-    '                IMU_TimeStamp = poseFrame.Timestamp
-    '                Dim q As Quaternion = pose.rotation
-    '                Dim t = pose.translation
-    '                '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
-    '                Dim mat() As Single = {-(1 - 2 * q.Y * q.Y - 2 * q.Z * q.Z), -(2 * q.X * q.Y + 2 * q.Z * q.W), -(2 * q.X * q.Z - 2 * q.Y * q.W), 0.0,
-    '                                       2 * q.X * q.Y - 2 * q.Z * q.W, 1 - 2 * q.X * q.X - 2 * q.Z * q.Z, 2 * q.Y * q.Z + 2 * q.X * q.W, 0.0,
-    '                                       -(2 * q.X * q.Z + 2 * q.Y * q.W), -(2 * q.Y * q.Z - 2 * q.X * q.W), -(1 - 2 * q.X * q.X - 2 * q.Y * q.Y), 0.0,
-    '                                       t.X, t.Y, t.Z, 1.0}
-    '                transformationMatrix = mat
-    '            End If
-    '        Case rs.Stream.Gyro
-    '            gyroFrameCount += 1
-    '            'imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(f(rs.Stream.Gyro))
-
-    '        Case rs.Stream.Accel
-    '            AccelFrameCount += 1
-    '            ' imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(f(rs.Stream.Accel))
-
-    '        Case rs.Stream.Fisheye
-    '            imageFrameCount += 1
-
-    '            Console.WriteLine("index = " + CStr(f.Profile.Index))
-    '            Marshal.Copy(f.Data, leftBytes, 0, leftBytes.Length)
-    '            'For Each frame In images
-    '            '    If frame.Profile.Stream = rs.Stream.Fisheye Then
-    '            '        If frame.Profile.Index = 2 Then
-    '            '            Marshal.Copy(frame.Data, rightBytes, 0, rightBytes.Length)
-    '            '            Exit For
-    '            '        End If
-    '            '    End If
-    '            'Next
-    '            color = leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(New cv.Size(w, h))
-    '            color = color.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-    '            RGBDepth = color.Clone()
-    '    End Select
-
-    '    If ms - lastMs > 1000 Then
-    '        Console.WriteLine("p = " + CStr(poseFrameCount) + " gyro = " + CStr(gyroFrameCount) + " accel = " + CStr(AccelFrameCount) + " image = " + CStr(imageFrameCount))
-    '        poseFrameCount = 0
-    '        gyroFrameCount = 0
-    '        AccelFrameCount = 0
-    '        imageFrameCount = 0
-    '        lastMs = ms
-    '    End If
-
-    '    Dim frames = frame.As(Of rs.Frame)
-    '    leftView = New cv.Mat(720, 1280, cv.MatType.CV_8U, leftbytes)
-    '    rightView = New cv.Mat(720, 1280, cv.MatType.CV_8U, 0)
-
-    '    depth16 = New cv.Mat(720, 1280, cv.MatType.CV_16U, 0)
-    'End Sub
     Public Sub closePipe()
         pipelineClosed = True
     End Sub

@@ -50,6 +50,7 @@ Partial Class OptionsDialog
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.OKButton = New System.Windows.Forms.Button()
         Me.Cancel_Button = New System.Windows.Forms.Button()
+        Me.EnableAltCams = New System.Windows.Forms.CheckBox()
         Me.CameraGroup.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -61,10 +62,11 @@ Partial Class OptionsDialog
         '
         'CameraGroup
         '
+        Me.CameraGroup.Controls.Add(Me.EnableAltCams)
         Me.CameraGroup.Controls.Add(Me.SnapToGrid)
         Me.CameraGroup.Location = New System.Drawing.Point(21, 12)
         Me.CameraGroup.Name = "CameraGroup"
-        Me.CameraGroup.Size = New System.Drawing.Size(692, 261)
+        Me.CameraGroup.Size = New System.Drawing.Size(771, 261)
         Me.CameraGroup.TabIndex = 3
         Me.CameraGroup.TabStop = False
         Me.CameraGroup.Text = "Camera"
@@ -72,7 +74,7 @@ Partial Class OptionsDialog
         'SnapToGrid
         '
         Me.SnapToGrid.AutoSize = True
-        Me.SnapToGrid.Location = New System.Drawing.Point(91, 218)
+        Me.SnapToGrid.Location = New System.Drawing.Point(63, 190)
         Me.SnapToGrid.Name = "SnapToGrid"
         Me.SnapToGrid.Size = New System.Drawing.Size(354, 24)
         Me.SnapToGrid.TabIndex = 2
@@ -328,7 +330,7 @@ Partial Class OptionsDialog
         '
         'OKButton
         '
-        Me.OKButton.Location = New System.Drawing.Point(798, 33)
+        Me.OKButton.Location = New System.Drawing.Point(850, 33)
         Me.OKButton.Name = "OKButton"
         Me.OKButton.Size = New System.Drawing.Size(142, 42)
         Me.OKButton.TabIndex = 10
@@ -337,12 +339,23 @@ Partial Class OptionsDialog
         '
         'Cancel_Button
         '
-        Me.Cancel_Button.Location = New System.Drawing.Point(798, 83)
+        Me.Cancel_Button.Location = New System.Drawing.Point(850, 83)
         Me.Cancel_Button.Name = "Cancel_Button"
         Me.Cancel_Button.Size = New System.Drawing.Size(142, 42)
         Me.Cancel_Button.TabIndex = 11
         Me.Cancel_Button.Text = "Cancel"
         Me.Cancel_Button.UseVisualStyleBackColor = True
+        '
+        'EnableAltCams
+        '
+        Me.EnableAltCams.AutoSize = True
+        Me.EnableAltCams.Location = New System.Drawing.Point(63, 220)
+        Me.EnableAltCams.Name = "EnableAltCams"
+        Me.EnableAltCams.Size = New System.Drawing.Size(660, 24)
+        Me.EnableAltCams.TabIndex = 3
+        Me.EnableAltCams.Text = "Check for Zed 2 and MYNT D cameras (unchecked smaller memory footprint, faster lo" &
+    "ad)"
+        Me.EnableAltCams.UseVisualStyleBackColor = True
         '
         'OptionsDialog
         '
@@ -407,4 +420,5 @@ Partial Class OptionsDialog
     Friend WithEvents AvoidDNNCrashes As CheckBox
     Friend WithEvents OKButton As Button
     Friend WithEvents Cancel_Button As Button
+    Friend WithEvents EnableAltCams As CheckBox
 End Class
