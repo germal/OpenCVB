@@ -124,6 +124,8 @@ Public Class CameraMyntD
     Public IMU_Velocity As cv.Point3f
     Public IMU_AngularAcceleration As cv.Point3f
     Public IMU_AngularVelocity As cv.Point3f
+    Public IMU_FrameTime As Double
+    Public imageFrameCount As Integer
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
@@ -269,6 +271,7 @@ Public Class CameraMyntD
         leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftBytes)
         rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightBytes)
         pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes)
+        imageFrameCount += 1
     End Sub
     Public Sub closePipe()
         pipelineClosed = True

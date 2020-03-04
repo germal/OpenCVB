@@ -123,6 +123,7 @@ Public Class ActiveClass : Implements IDisposable
         Dim IMU_Velocity As cv.Point3f
         Dim IMU_AngularAcceleration As cv.Point3f
         Dim IMU_AngularVelocity As cv.Point3f
+        Dim IMU_FrameTime As Double
         Dim intrinsicsLeft As intrinsics_VB
         Dim intrinsicsRight As intrinsics_VB
         Dim lowResolution As Boolean

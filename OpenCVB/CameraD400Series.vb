@@ -61,6 +61,8 @@ Public Class CameraD400Series
     Public IMU_Velocity As cv.Point3f
     Public IMU_AngularAcceleration As cv.Point3f
     Public IMU_AngularVelocity As cv.Point3f
+    Public IMU_FrameTime As Double
+    Public imageFrameCount As Integer
     Public Sub New()
         Console.WriteLine("The current librealsense version is " + ctx.Version())
     End Sub
@@ -195,6 +197,7 @@ Public Class CameraD400Series
         leftView = New cv.Mat(h, w, cv.MatType.CV_8U, leftViewBytes)
         rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rightViewBytes)
         pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
+        imageFrameCount += 1
     End Sub
     Public Sub closePipe()
         pipelineClosed = True

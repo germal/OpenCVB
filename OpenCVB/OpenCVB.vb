@@ -9,6 +9,7 @@ Imports System.Text.RegularExpressions
 Imports System.Environment
 Public Class OpenCVB
 #Region "Globals"
+    Public t265CallbackActive As Boolean
     Const displayFrames As Int32 = 4
     Dim activeAlgorithm As String
     Dim AlgorithmCount As Int32
@@ -26,7 +27,7 @@ Public Class OpenCVB
     Dim cameraT265 As Object
     Public cameraName As String
     Dim cameraTaskHandle As Thread
-    Dim camPic(displayFrames - 1) As PictureBox
+    Public camPic(displayFrames - 1) As PictureBox
     Dim CodeLineCount As Int32
     Dim DrawingRectangle As Boolean
     Dim drawRect As New cv.Rect(0, 0, 0, 0)
@@ -51,6 +52,7 @@ Public Class OpenCVB
     Dim IMU_Velocity As cv.Point3f
     Dim IMU_AngularAcceleration As cv.Point3f
     Dim IMU_AngularVelocity As cv.Point3f
+    Dim IMU_FrameTime As Double
 
     Dim LastX As Int32
     Dim LastY As Int32
@@ -956,6 +958,7 @@ Public Class OpenCVB
                 OpenCVB.ocvb.parms.IMU_Velocity = IMU_Velocity
                 OpenCVB.ocvb.parms.IMU_AngularAcceleration = IMU_AngularAcceleration
                 OpenCVB.ocvb.parms.IMU_AngularVelocity = IMU_AngularVelocity
+                OpenCVB.ocvb.parms.IMU_FrameTime = IMU_FrameTime
             End SyncLock
             OpenCVB.UpdateHostLocation(Me.Left, Me.Top, Me.Height)
 
@@ -1053,6 +1056,11 @@ Public Class OpenCVB
 
             If camera.color Is Nothing Then Continue While
             If cameraDataUpdated = True Then Continue While ' the last frames have not been used yet.
+
+            Static lastFrame = camera.imageFrameCount
+            If lastFrame = camera.imageframecount Then Continue While ' some cameras are callback that may not have images at this point.  T265
+            lastFrame = camera.imageframecount
+
             SyncLock camPic
                 imuGyro = camera.imuGyro ' The data may not be present but just copy it...
                 imuAccel = camera.imuaccel
@@ -1064,6 +1072,7 @@ Public Class OpenCVB
                 IMU_Translation = camera.IMU_Translation
                 IMU_Acceleration = camera.IMU_Acceleration
                 IMU_Velocity = camera.IMU_Velocity
+                IMU_FrameTime = camera.IMU_FrameTime
                 IMU_AngularAcceleration = camera.IMU_AngularAcceleration
                 IMU_AngularVelocity = camera.IMU_AngularVelocity
                 If lowResolution Then
@@ -1084,7 +1093,6 @@ Public Class OpenCVB
                 cameraDataUpdated = True
             End SyncLock
 
-            ' If Me.IsDisposed Then Exit While
             cameraFrameCount += 1
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While

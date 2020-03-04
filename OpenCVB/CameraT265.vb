@@ -3,6 +3,7 @@ Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Imports System.Numerics
+Imports System.Threading
 Module T265_Module
     <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265GetEpochTime(timeStamp As Double) As Single
@@ -70,6 +71,7 @@ Public Class CameraT265
     Public IMU_Velocity As cv.Point3f
     Public IMU_AngularAcceleration As cv.Point3f
     Public IMU_AngularVelocity As cv.Point3f
+    Public IMU_FrameTime As Double
     Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public leftView As cv.Mat
@@ -93,6 +95,7 @@ Public Class CameraT265
     Dim QArray(15) As Double
 
     Public transformationMatrix() As Single
+    Public imageFrameCount As Integer
 #End Region
     Private Sub getIntrinsics(ByRef vb_intrin As VB_Classes.ActiveClass.intrinsics_VB, intrinsics As rs.Intrinsics)
         vb_intrin.width = intrinsics.width
@@ -116,7 +119,11 @@ Public Class CameraT265
         cfg.EnableStream(rs.Stream.Fisheye, 1, rs.Format.Y8)
         cfg.EnableStream(rs.Stream.Fisheye, 2, rs.Format.Y8)
 
-        pipeline_profile = pipeline.Start(cfg) ', AddressOf callback)
+        If OpenCVB.t265CallbackActive Then
+            pipeline_profile = pipeline.Start(cfg, AddressOf callback)
+        Else
+            pipeline_profile = pipeline.Start(cfg)
+        End If
 
         numDisp = 112 - minDisp
         maxDisp = minDisp + numDisp
@@ -221,80 +228,121 @@ Public Class CameraT265
         Public mapperConfidence As Int32
     End Structure
     Public Sub GetNextFrame()
-        Static leftBytes(rawHeight * rawWidth - 1) As Byte
-        Static rightBytes(leftBytes.Length - 1) As Byte
+        If OpenCVB.t265CallbackActive Then
+            Thread.Sleep(1)
+        Else
+            Dim frameset = pipeline.WaitForFrames(1000)
+            For i = 0 To 3
+                Dim stream = Choose(i + 1, rs.Stream.Pose, rs.Stream.Gyro, rs.Stream.Accel, rs.Stream.Fisheye)
+                Dim f = frameset.FirstOrDefault(stream)
+                getFrames(f, frameset)
+            Next
+        End If
+    End Sub
+    Private Sub getFrames(frame As rs.Frame, frameset As rs.FrameSet)
+        Static poseFrameCount As Integer
+        Static gyroFrameCount As Integer
+        Static imageCounter As Integer
+        Static AccelFrameCount As Integer
+        Static lastFrameTime = IMU_TimeStamp
+        Static totalMS As Double
 
-        If pipelineClosed Then Exit Sub
-        Dim frames = pipeline.WaitForFrames(1000)
-        Dim f = frames.FirstOrDefault(rs.Stream.Pose)
-
-        Dim poseData = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Pose)
-        Static startingTime = poseData.Timestamp
-        IMU_TimeStamp = poseData.Timestamp - startingTime
-        Dim pose = Marshal.PtrToStructure(Of PoseData)(poseData.Data)
-        IMU_Rotation = pose.rotation
-        Dim q = IMU_Rotation
-        IMU_Translation = pose.translation
-        IMU_Acceleration = pose.acceleration
-        IMU_Velocity = pose.velocity
-        IMU_AngularAcceleration = pose.angularAcceleration
-        IMU_AngularVelocity = pose.angularVelocity
-        Dim t = IMU_Translation
-        '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
-        Dim mat() As Single = {-(1 - 2 * q.Y * q.Y - 2 * q.Z * q.Z), -(2 * q.X * q.Y + 2 * q.Z * q.W), -(2 * q.X * q.Z - 2 * q.Y * q.W), 0.0,
+        Select Case frame.Profile.Stream
+            Case rs.Stream.Pose
+                poseFrameCount += 1
+                Dim poseFrame = frame.As(Of rs.PoseFrame)
+                Dim poseData = poseFrame.PoseData
+                IMU_TimeStamp = poseFrame.Timestamp
+                IMU_FrameTime = IMU_TimeStamp - lastFrameTime
+                lastFrameTime = IMU_TimeStamp
+                totalMS += IMU_FrameTime
+                Dim pose = Marshal.PtrToStructure(Of PoseData)(poseFrame.Data)
+                IMU_Rotation = pose.rotation
+                Dim q = IMU_Rotation
+                IMU_Translation = pose.translation
+                IMU_Acceleration = pose.acceleration
+                IMU_Velocity = pose.velocity
+                IMU_AngularAcceleration = pose.angularAcceleration
+                IMU_AngularVelocity = pose.angularVelocity
+                Dim t = IMU_Translation
+                '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
+                Dim mat() As Single = {-(1 - 2 * q.Y * q.Y - 2 * q.Z * q.Z), -(2 * q.X * q.Y + 2 * q.Z * q.W), -(2 * q.X * q.Z - 2 * q.Y * q.W), 0.0,
                                2 * q.X * q.Y - 2 * q.Z * q.W, 1 - 2 * q.X * q.X - 2 * q.Z * q.Z, 2 * q.Y * q.Z + 2 * q.X * q.W, 0.0,
                                -(2 * q.X * q.Z + 2 * q.Y * q.W), -(2 * q.Y * q.Z - 2 * q.X * q.W), -(1 - 2 * q.X * q.X - 2 * q.Y * q.Y), 0.0,
                                t.X, t.Y, t.Z, 1.0}
-        transformationMatrix = mat
+                transformationMatrix = mat
+            Case rs.Stream.Gyro
+                gyroFrameCount += 1
+                imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
 
-        Dim gyroFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Gyro, rs.Format.MotionXyz32f)
-        imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame.Data)
+            Case rs.Stream.Accel
+                AccelFrameCount += 1
+                imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
 
-        Dim accelFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Accel, rs.Format.MotionXyz32f)
-        imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame.Data)
+            Case rs.Stream.Fisheye
+                imageFrameCount += 1
+                imageCounter += 1
+                If frameset Is Nothing Then frameset = frame.As(Of rs.FrameSet)
+                Dim firstFrame = frameset.FirstOrDefault(rs.Stream.Fisheye)
+                Static leftBytes(rawHeight * rawWidth - 1) As Byte
+                Static rightBytes(rawHeight * rawWidth - 1) As Byte
+                Marshal.Copy(firstFrame.Data, leftBytes, 0, leftBytes.Length)
+                For Each fr In frameset
+                    If fr.Profile.Stream = rs.Stream.Fisheye Then
+                        If fr.Profile.Index = 2 Then
+                            Marshal.Copy(fr.Data, rightBytes, 0, rightBytes.Length)
+                            Exit For
+                        End If
+                    End If
+                Next
+                SyncLock OpenCVB.camPic
+                    leftView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, leftBytes)
+                    rightView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, rightBytes)
+                    Dim tmpColor = leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(New cv.Size(w, h))
+                    color = tmpColor.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        Dim images = frames.As(Of rs.FrameSet)()
-        Dim fishEye = images.FishEyeFrame()
-        Marshal.Copy(fishEye.Data, leftBytes, 0, leftBytes.Length)
-        For Each frame In images
-            If frame.Profile.Stream = rs.Stream.Fisheye Then
-                If frame.Profile.Index = 2 Then
-                    Marshal.Copy(frame.Data, rightBytes, 0, rightBytes.Length)
-                    Exit For
-                End If
-            End If
-        Next
+                    Dim remapLeft = leftView.Remap(lm1, lm2, cv.InterpolationFlags.Linear)
+                    Dim remapRight = rightView.Remap(rm1, rm2, cv.InterpolationFlags.Linear)
 
-        leftView = New cv.Mat(fishEye.Height, fishEye.Width, cv.MatType.CV_8U, leftBytes)
-        color = leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(New cv.Size(w, h))
-        color = color.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        rightView = New cv.Mat(fishEye.Height, fishEye.Width, cv.MatType.CV_8U, rightBytes)
-        RGBDepth = color.Clone()
+                    stereo.Compute(remapLeft, remapRight, disparity)
 
-        Dim remapLeft = leftView.Remap(lm1, lm2, cv.InterpolationFlags.Linear)
-        Dim remapRight = rightView.Remap(rm1, rm2, cv.InterpolationFlags.Linear)
+                    ' re-crop just the valid part of the disparity
+                    validRect = New cv.Rect(maxDisp, 0, disparity.Cols - maxDisp, disparity.Rows)
+                    Dim disp_vis As New cv.Mat, tmpdisp As New cv.Mat
+                    disparity.ConvertTo(disp_vis, cv.MatType.CV_32F, CDbl(1 / 16))
+                    disparity.ConvertTo(tmpdisp, cv.MatType.CV_32F, CDbl(1 / 16))
+                    disp_vis = disp_vis(validRect)
 
-        stereo.Compute(remapLeft, remapRight, disparity) ' Works but doesn't produce the correct results.  C++ version produces correct results.
-        ' re-crop just the valid part of the disparity
-        validRect = New cv.Rect(maxDisp, 0, disparity.Cols - maxDisp, disparity.Rows)
-        Dim disp_vis As New cv.Mat, tmpdisp As New cv.Mat
-        disparity.ConvertTo(disp_vis, cv.MatType.CV_32F, CDbl(1 / 16))
-        disparity.ConvertTo(tmpdisp, cv.MatType.CV_32F, CDbl(1 / 16))
-        disp_vis = disp_vis(validRect)
+                    Dim mask = disp_vis.Threshold(1, 255, cv.ThresholdTypes.Binary)
+                    mask.ConvertTo(mask, cv.MatType.CV_8U)
+                    disp_vis *= CDbl(255 / numDisp)
 
-        Dim mask = disp_vis.Threshold(1, 255, cv.ThresholdTypes.Binary)
-        mask.ConvertTo(mask, cv.MatType.CV_8U)
-        disp_vis *= CDbl(255 / numDisp)
+                    ' convert disparity To 0-255 And color it
+                    Dim tmpRGBDepth = New cv.Mat
+                    disp_vis = disp_vis.ConvertScaleAbs(1)
+                    cv.Cv2.ApplyColorMap(disp_vis, tmpRGBDepth, cv.ColormapTypes.Jet)
+                    Dim depthRect = New cv.Rect(stereo_cx, 0, tmpRGBDepth.Width, tmpRGBDepth.Height)
+                    RGBDepth = color.Clone()
+                    tmpRGBDepth.CopyTo(RGBDepth(depthRect), mask)
+                    depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
+                    disparity(validRect).ConvertTo(depth16(depthRect), cv.MatType.CV_16UC1)
+                    pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
+                End SyncLock
+        End Select
 
-        ' convert disparity To 0-255 And color it
-        Dim tmpRGBDepth = New cv.Mat
-        disp_vis = disp_vis.ConvertScaleAbs(1)
-        cv.Cv2.ApplyColorMap(disp_vis, tmpRGBDepth, cv.ColormapTypes.Jet)
-        Dim depthRect = New cv.Rect(stereo_cx, 0, tmpRGBDepth.Width, tmpRGBDepth.Height)
-        tmpRGBDepth.CopyTo(RGBDepth(depthRect), mask)
-        depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
-        disparity(validRect).ConvertTo(depth16(depthRect), cv.MatType.CV_16UC1)
-        pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
+        If totalMS > 1000 Then
+            Console.WriteLine("pose = " + CStr(poseFrameCount) + " gyro = " + CStr(gyroFrameCount) + " accel = " + CStr(AccelFrameCount) +
+                              " image = " + CStr(imageCounter))
+            poseFrameCount = 0
+            gyroFrameCount = 0
+            AccelFrameCount = 0
+            imageCounter = 0
+            totalMS = 0
+        End If
+    End Sub
+    Private Sub callback(frame As rs.Frame)
+        If pipelineClosed Then Exit Sub
+        getFrames(frame, Nothing)
     End Sub
     Public Sub closePipe()
         pipelineClosed = True

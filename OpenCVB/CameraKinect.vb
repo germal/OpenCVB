@@ -94,6 +94,8 @@ Public Class CameraKinect
     Public IMU_Velocity As cv.Point3f
     Public IMU_AngularAcceleration As cv.Point3f
     Public IMU_AngularVelocity As cv.Point3f
+    Public IMU_FrameTime As Double
+    Public imageFrameCount As Integer
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
@@ -193,6 +195,7 @@ Public Class CameraKinect
 
             Dim pc = New cv.Mat(h, w, cv.MatType.CV_16SC3, KinectPointCloud(kc))
             pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3) ' This is less efficient than using 16-bit pixels but consistent with Intel cameras (and more widely accepted as normal.)
+            imageFrameCount += 1
         End If
     End Sub
     Public Sub closePipe()

@@ -337,11 +337,9 @@ Public Class IMU_Latency : Implements IDisposable
             If smoothedLatency > 10 Or myframeCount >= 1000 Or check.Box(0).Checked Or syncCount > 0 Then
                 ocvb.putText(New ActiveClass.TrueType("Syncing the IMU and CPU Clocks", 10, 220))
             End If
-            Static imuLast = IMUinterval
             Static cpuLast = CPUinterval
-            ocvb.putText(New ActiveClass.TrueType("IMU frame time (ms) " + Format(IMUinterval - imuLast, "0."), 10, 240))
+            ocvb.putText(New ActiveClass.TrueType("IMU frame time (ms) " + Format(ocvb.parms.IMU_FrameTime, "0.00"), 10, 240))
             ocvb.putText(New ActiveClass.TrueType("CPU frame time (ms) " + Format(CPUinterval - cpuLast, "0."), 10, 260))
-            imuLast = IMUinterval
             cpuLast = CPUinterval
 
             ocvb.label1 = "Delta ms: Raw values between " + CStr(minVal) + " and " + CStr(maxVal)
@@ -351,7 +349,7 @@ Public Class IMU_Latency : Implements IDisposable
         ' Clocks drift.  Here we sync up the IMU and CPU clocks by restarting the algorithm.  
         ' We could reset the Kalman object but the effect of the Kalman filter becomes quite apparent as the values shift to normal.
         myframeCount += 1
-        If smoothedLatency > 10 Or myframeCount >= resetCounter Or check.Box(0).Checked Then
+        If myframeCount >= resetCounter Or check.Box(0).Checked Then
             myframeCount = 0
             check.Box(0).Checked = False
             syncShift += ms
