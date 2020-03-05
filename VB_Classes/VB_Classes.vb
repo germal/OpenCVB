@@ -164,12 +164,13 @@ Public Class ActiveClass : Implements IDisposable
     Public Sub RunAlgorithm()
         Try
             If ocvb.parms.useRecordedData Then recordedData.Run(ocvb)
-            ActiveAlgorithm.Run(ocvb)
-            ocvb.frameCount += 1
+            If ocvb.color IsNot Nothing And ocvb.RGBDepth IsNot Nothing Then
+                ActiveAlgorithm.Run(ocvb)
+                ocvb.frameCount += 1
 
-            MakeSureImage8uC3(ocvb.result1)
-            MakeSureImage8uC3(ocvb.result2)
-
+                MakeSureImage8uC3(ocvb.result1)
+                MakeSureImage8uC3(ocvb.result2)
+            End If
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try

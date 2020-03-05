@@ -110,6 +110,7 @@ public:
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
 		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
+		
 		return (int*)&zed_pose.pose_data;
 	}
 }; 

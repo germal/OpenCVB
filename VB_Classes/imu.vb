@@ -337,9 +337,11 @@ Public Class IMU_Latency : Implements IDisposable
             If smoothedLatency > 10 Or myframeCount >= 1000 Or check.Box(0).Checked Or syncCount > 0 Then
                 ocvb.putText(New ActiveClass.TrueType("Syncing the IMU and CPU Clocks", 10, 220))
             End If
+            Static imuLast = IMUinterval
             Static cpuLast = CPUinterval
-            ocvb.putText(New ActiveClass.TrueType("IMU frame time (ms) " + Format(ocvb.parms.IMU_FrameTime, "0.00"), 10, 240))
+            ocvb.putText(New ActiveClass.TrueType("IMU frame time (ms) " + Format(IMUinterval - imuLast, "0."), 10, 240))
             ocvb.putText(New ActiveClass.TrueType("CPU frame time (ms) " + Format(CPUinterval - cpuLast, "0."), 10, 260))
+            imuLast = IMUinterval
             cpuLast = CPUinterval
 
             ocvb.label1 = "Delta ms: Raw values between " + CStr(minVal) + " and " + CStr(maxVal)
@@ -349,7 +351,7 @@ Public Class IMU_Latency : Implements IDisposable
         ' Clocks drift.  Here we sync up the IMU and CPU clocks by restarting the algorithm.  
         ' We could reset the Kalman object but the effect of the Kalman filter becomes quite apparent as the values shift to normal.
         myframeCount += 1
-        If myframeCount >= resetCounter Or check.Box(0).Checked Then
+        If smoothedLatency > 10 Or myframeCount >= resetCounter Or check.Box(0).Checked Then
             myframeCount = 0
             check.Box(0).Checked = False
             syncShift += ms
@@ -365,5 +367,42 @@ Public Class IMU_Latency : Implements IDisposable
         plot.Dispose()
         k1.Dispose()
         k2.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class IMU_PlotIMUFrameTime : Implements IDisposable
+    Public plot As Plot_OverTime
+    Public CPUInterval As Double
+    Public Sub New(ocvb As AlgorithmData)
+        plot = New Plot_OverTime(ocvb)
+        plot.externalUse = True
+        plot.dst = ocvb.result2
+        plot.maxVal = 50
+        plot.minVal = 20
+        plot.sliders.TrackBar1.Value = 4
+        plot.sliders.TrackBar2.Value = 4
+        plot.backColor = cv.Scalar.Aquamarine
+        plot.plotCount = 3
+
+        ocvb.desc = "Plot both the IMU Frame time and the CPU frame time."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static myStopWatch As New System.Diagnostics.Stopwatch
+        If ocvb.frameCount = 0 Then myStopWatch.Start()
+        CPUinterval = myStopWatch.ElapsedMilliseconds
+        Dim ms = CPUInterval
+        Static cpuLast = CPUInterval
+        plot.plotData = New cv.Scalar(ocvb.parms.IMU_FrameTime, 0, CPUInterval - cpuLast, 0)
+        plot.Run(ocvb)
+        ocvb.putText(New ActiveClass.TrueType("IMU frame time (ms) " + Format(ocvb.parms.IMU_FrameTime, "0.00"), 10, 240))
+        ocvb.putText(New ActiveClass.TrueType("CPU frame time (ms) " + Format(CPUInterval - cpuLast, "0."), 10, 260))
+        cpuLast = CPUInterval
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        plot.Dispose()
     End Sub
 End Class

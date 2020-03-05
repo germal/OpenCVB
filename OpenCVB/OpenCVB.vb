@@ -9,7 +9,6 @@ Imports System.Text.RegularExpressions
 Imports System.Environment
 Public Class OpenCVB
 #Region "Globals"
-    Public t265CallbackActive As Boolean
     Const displayFrames As Int32 = 4
     Dim activeAlgorithm As String
     Dim AlgorithmCount As Int32
@@ -17,15 +16,12 @@ Public Class OpenCVB
     Dim algorithmTaskHandle As Thread
     Dim border As Int32 = 6
     Dim BothFirstAndLastReady As Boolean
-    Dim cameraFrameCount As Int32
     Dim camera As Object
-    Dim cameraDataUpdated As Boolean
     Dim cameraD400Series As Object
     Dim cameraKinect As Object
     Dim cameraMyntD As Object
     Dim cameraZed2 As Object
     Dim cameraT265 As Object
-    Public cameraName As String
     Dim cameraTaskHandle As Thread
     Public camPic(displayFrames - 1) As PictureBox
     Dim CodeLineCount As Int32
@@ -33,26 +29,10 @@ Public Class OpenCVB
     Dim drawRect As New cv.Rect(0, 0, 0, 0)
     Dim externalInvocation As Boolean
     Dim fps As Int32 = 30
-    Dim formColor As cv.Mat = Nothing, formRGBDepth As New cv.Mat, formResult1 As New cv.Mat, formResult2 As New cv.Mat
-    Dim tMatrix() As Single ' the transformation matrix.
-    Dim formDepth16 As New cv.Mat, formPointCloud As New cv.Mat, formDisparity As New cv.Mat, formleftView As New cv.Mat, formrightView As New cv.Mat
-    Dim formResultsUpdated As Boolean
+    Dim formResult1 As New cv.Mat, formResult2 As New cv.Mat
     Dim frameCount As Int32
     Dim GrabRectangleData As Boolean
     Dim HomeDir As DirectoryInfo
-    Dim imuGyro As cv.Point3f
-    Dim imuAccel As cv.Point3f
-    Dim IMU_TimeStamp As Double
-    Dim IMU_Barometer As Single
-    Dim IMU_Magnetometer As cv.Point3f
-    Dim IMU_Temperature As Single
-    Dim IMU_Rotation As System.Numerics.Quaternion
-    Dim IMU_Translation As cv.Point3f
-    Dim IMU_Acceleration As cv.Point3f
-    Dim IMU_Velocity As cv.Point3f
-    Dim IMU_AngularAcceleration As cv.Point3f
-    Dim IMU_AngularVelocity As cv.Point3f
-    Dim IMU_FrameTime As Double
 
     Dim LastX As Int32
     Dim LastY As Int32
@@ -79,25 +59,6 @@ Public Class OpenCVB
     Dim textDesc As String = ""
     Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.ActiveClass.TrueType)
     Dim vtkDirectory As String = ""
-
-    <System.Runtime.InteropServices.DllImport("user32.dll")>
-    Public Shared Function GetCursorPos(ByRef point As System.Drawing.Point) As Boolean
-    End Function
-
-    <DllImport("user32.dll")>
-    Private Shared Function GetForegroundWindow() As IntPtr
-    End Function
-
-    <DllImport("user32.dll")>
-    Private Shared Function GetWindowRect(hWnd As IntPtr, ByRef rect As Rect) As IntPtr
-    End Function
-    <StructLayout(LayoutKind.Sequential)>
-    Private Structure Rect
-        Public Left As Integer
-        Public Top As Integer
-        Public Right As Integer
-        Public Bottom As Integer
-    End Structure
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim args() = Environment.GetCommandLineArgs()
@@ -145,7 +106,7 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
-        cameraT265 = New CameraT265()  ' alternative Intel265_CPP - a C++ version
+        cameraT265 = New CameraT265()
         cameraT265.deviceCount = USBenumeration("T265")
         If cameraT265.deviceCount > 0 Then cameraT265.initialize(fps, regWidth, regHeight)
 
@@ -274,37 +235,33 @@ Public Class OpenCVB
         Dim g As Graphics = e.Graphics
         Try
             SyncLock camPic ' avoid updating the image while copying into it in the algorithm and camera tasks
-                If formColor IsNot Nothing Then
-                    cameraDataUpdated = False
-                    If formColor.Width <> camPic(0).Width Or formColor.Height <> camPic(0).Height Or
-                               formRGBDepth.Width <> camPic(1).Width Or formRGBDepth.Height <> camPic(1).Height Then
+                If camera.color IsNot Nothing Then
+                    If camera.color.Width <> camPic(0).Width Or camera.Color.Height <> camPic(0).Height Or
+                               camera.RGBDepth.Width <> camPic(1).Width Or camera.RGBDepth.Height <> camPic(1).Height Then
 
-                        Dim color = formColor
-                        Dim RGBDepth = formRGBDepth
+                        Dim color = camera.color
+                        Dim RGBDepth = camera.RGBDepth
                         color = color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
                         RGBDepth = RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
                         cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
                         cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
                     Else
-                        cvext.BitmapConverter.ToBitmap(formColor, camPic(0).Image)
-                        cvext.BitmapConverter.ToBitmap(formRGBDepth, camPic(1).Image)
+                        cvext.BitmapConverter.ToBitmap(camera.Color, camPic(0).Image)
+                        cvext.BitmapConverter.ToBitmap(camera.RGBDepth, camPic(1).Image)
                     End If
 
-                    If formResultsUpdated Then
-                        If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Or
-                                    formResult2.Width <> camPic(3).Width Or formResult2.Height <> camPic(3).Height Then
+                    If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Or
+                                formResult2.Width <> camPic(3).Width Or formResult2.Height <> camPic(3).Height Then
 
-                            Dim result1 = formResult1
-                            Dim result2 = formResult2
-                            result1 = result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
-                            result2 = result2.Resize(New cv.Size(camPic(3).Size.Width, camPic(3).Size.Height))
-                            cvext.BitmapConverter.ToBitmap(result1, camPic(2).Image)
-                            cvext.BitmapConverter.ToBitmap(result2, camPic(3).Image)
-                        Else
-                            cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
-                            cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
-                        End If
-                        formResultsUpdated = False
+                        Dim result1 = formResult1
+                        Dim result2 = formResult2
+                        result1 = result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
+                        result2 = result2.Resize(New cv.Size(camPic(3).Size.Width, camPic(3).Size.Height))
+                        cvext.BitmapConverter.ToBitmap(result1, camPic(2).Image)
+                        cvext.BitmapConverter.ToBitmap(result2, camPic(3).Image)
+                    Else
+                        cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
+                        cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
                     End If
                 End If
                 Dim pic = DirectCast(sender, PictureBox)
@@ -547,7 +504,7 @@ Public Class OpenCVB
                 DrawingRectangle = False
 
                 Dim pic = DirectCast(sender, PictureBox)
-                Dim src = Choose(pic.Tag + 1, formColor, formRGBDepth, formResult1, formResult2)
+                Dim src = Choose(pic.Tag + 1, camera.Color, camera.RGBDepth, formResult1, formResult2)
 
                 Dim srcROI = New cv.Mat
                 srcROI = src(drawRect).clone()
@@ -619,8 +576,8 @@ Public Class OpenCVB
                 drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
                 drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
                 drawRect.Height = Math.Abs(mouseDownPoint.Y - mouseMovePoint.Y)
-                If drawRect.X + drawRect.Width > formColor.Width Then drawRect.Width = formColor.Width - drawRect.X
-                If drawRect.Y + drawRect.Height > formColor.Height Then drawRect.Height = formColor.Height - drawRect.Y
+                If drawRect.X + drawRect.Width > camera.Color.Width Then drawRect.Width = camera.Color.Width - drawRect.X
+                If drawRect.Y + drawRect.Height > camera.Color.Height Then drawRect.Height = camera.Color.Height - drawRect.Y
                 BothFirstAndLastReady = True
             End If
             mousePicTag = pic.Tag
@@ -695,12 +652,12 @@ Public Class OpenCVB
         Dim fps As Single = countFrames / (fpsTimer.Interval / 1000)
 
         Static lastCameraFrame As Int32
-        If lastCameraFrame > cameraFrameCount Then lastCameraFrame = 0
-        Dim camFrames = cameraFrameCount - lastCameraFrame
-        lastCameraFrame = cameraFrameCount
+        If lastCameraFrame > camera.frameCount Then lastCameraFrame = 0
+        Dim camFrames = camera.frameCount - lastCameraFrame
+        lastCameraFrame = camera.frameCount
         Dim cameraFPS As Single = camFrames / (fpsTimer.Interval / 1000)
 
-        Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " + cameraName +
+        Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " + camera.deviceName +
                   " FPS = " + Format(cameraFPS, "#0.0") + ", Algorithm FPS = " + Format(fps, "#0.0")
         If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
     End Sub
@@ -716,16 +673,16 @@ Public Class OpenCVB
         picLabels(1) = "Depth " + details
     End Sub
     Public Sub updateCamera()
-        camera = Choose(optionsForm.cameraIndex + 1, cameraD400Series, cameraKinect, cameraT265, cameraZed2)
-        cameraName = camera.devicename
+        camera = Choose(optionsForm.cameraIndex + 1, cameraD400Series, cameraKinect, cameraT265, cameraZed2, cameraMyntD)
         camera.pipelineClosed = False
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopAlgorithmThread = True
         stopCameraThread = True
         Application.DoEvents()
+        camera.closePipe()
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
-        If threadStop(cameraFrameCount) = False Then cameraTaskHandle.Abort()
+        If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
         textDesc = ""
         saveLayout()
     End Sub
@@ -748,9 +705,9 @@ Public Class OpenCVB
                         Case 0 ' all images
                             resultMat = cv.Extensions.BitmapConverter.ToMat(img)
                         Case 1 ' color image
-                            resultMat = formColor.Clone()
+                            resultMat = camera.Color.Clone()
                         Case 2 ' depth RGB
-                            resultMat = formRGBDepth.Clone()
+                            resultMat = camera.RGBDepth.Clone()
                         Case 3 ' result1
                             resultMat = formResult1.Clone()
                         Case 4 ' result2
@@ -775,7 +732,8 @@ Public Class OpenCVB
             If saveCurrentCamera <> optionsForm.cameraIndex Then
                 camera.closePipe()
                 stopCameraThread = True
-                If threadStop(cameraFrameCount) = False Then cameraTaskHandle.Abort()
+                cameraTaskHandle.Abort()
+                cameraTaskHandle.Abort()
                 cameraTaskHandle = Nothing
                 updateCamera()
             End If
@@ -806,7 +764,7 @@ Public Class OpenCVB
                 Application.DoEvents() ' to allow the algorithm task to gracefully end and dispose OpenCVB.
                 Thread.Sleep(100)
                 sleepCount += 1
-                If sleepCount > 100 Then Return False
+                If sleepCount > 10 Then Return False
             End While
         End If
         Return True
@@ -863,7 +821,6 @@ Public Class OpenCVB
 
         formResult1 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
         formResult2 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
-        formResultsUpdated = True ' one time update to zero out the results when starting a new camera or algorithm.
 
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
 
@@ -872,11 +829,11 @@ Public Class OpenCVB
 
             If camera.deviceCount = 0 Then SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", OptionsDialog.cameraIndex)
 
-            cameraFrameCount = 0
+            camera.frameCount = 0
             cameraTaskHandle = New Thread(AddressOf CameraTask)
             cameraTaskHandle.Name = "CameraTask"
             cameraTaskHandle.Priority = ThreadPriority.Highest
-            cameraTaskHandle.Start(camera.pcMultiplier)
+            cameraTaskHandle.Start()
         End If
 
         parms.IMU_Present = camera.IMU_Present
@@ -892,6 +849,11 @@ Public Class OpenCVB
         ActivateTimer.Enabled = True
         fpsTimer.Enabled = True
     End Sub
+
+    Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
+        Me.Refresh()
+    End Sub
+
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
         If parms.testAllRunning Then
             AlgorithmTestCount += 1
@@ -931,34 +893,39 @@ Public Class OpenCVB
             While 1
                 If stopAlgorithmThread Then Exit While ' really exit the while loop below...
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
-                If cameraDataUpdated Then Exit While
+                If camera.newImagesAvailable Then Exit While
             End While
             If stopAlgorithmThread Then Exit While
 
             ' bring the data into the algorithm task.
             SyncLock camPic
-                cameraDataUpdated = False
-                OpenCVB.ocvb.pointCloud = formPointCloud
-                OpenCVB.ocvb.color = formColor
-                OpenCVB.ocvb.RGBDepth = formRGBDepth
-                OpenCVB.ocvb.depth16 = formDepth16
-                OpenCVB.ocvb.disparity = formDisparity
-                OpenCVB.ocvb.leftView = formleftView
-                OpenCVB.ocvb.rightView = formrightView
-                OpenCVB.ocvb.parms.imuGyro = imuGyro
-                OpenCVB.ocvb.parms.imuAccel = imuAccel
-                OpenCVB.ocvb.parms.transformationMatrix = tMatrix
-                OpenCVB.ocvb.parms.IMU_TimeStamp = IMU_TimeStamp
-                OpenCVB.ocvb.parms.IMU_Barometer = IMU_Barometer
-                OpenCVB.ocvb.parms.IMU_Magnetometer = IMU_Magnetometer
-                OpenCVB.ocvb.parms.IMU_Temperature = IMU_Temperature
-                OpenCVB.ocvb.parms.IMU_Rotation = IMU_Rotation
-                OpenCVB.ocvb.parms.IMU_Translation = IMU_Translation
-                OpenCVB.ocvb.parms.IMU_Acceleration = IMU_Acceleration
-                OpenCVB.ocvb.parms.IMU_Velocity = IMU_Velocity
-                OpenCVB.ocvb.parms.IMU_AngularAcceleration = IMU_AngularAcceleration
-                OpenCVB.ocvb.parms.IMU_AngularVelocity = IMU_AngularVelocity
-                OpenCVB.ocvb.parms.IMU_FrameTime = IMU_FrameTime
+                camera.newImagesAvailable = False
+                If lowResolution Then
+                    OpenCVB.ocvb.color = camera.color.Resize(fastSize)
+                    OpenCVB.ocvb.RGBDepth = camera.RGBDepth.Resize(fastSize)
+                Else
+                    OpenCVB.ocvb.color = camera.color
+                    OpenCVB.ocvb.RGBDepth = camera.RGBDepth
+                End If
+                OpenCVB.ocvb.pointCloud = camera.PointCloud
+                OpenCVB.ocvb.depth16 = camera.Depth16
+                OpenCVB.ocvb.disparity = camera.Disparity
+                OpenCVB.ocvb.leftView = camera.leftView
+                OpenCVB.ocvb.rightView = camera.rightView
+                OpenCVB.ocvb.parms.imuGyro = camera.imuGyro
+                OpenCVB.ocvb.parms.imuAccel = camera.imuAccel
+                OpenCVB.ocvb.parms.transformationMatrix = camera.transformationMatrix
+                OpenCVB.ocvb.parms.IMU_TimeStamp = camera.IMU_TimeStamp
+                OpenCVB.ocvb.parms.IMU_Barometer = camera.IMU_Barometer
+                OpenCVB.ocvb.parms.IMU_Magnetometer = camera.IMU_Magnetometer
+                OpenCVB.ocvb.parms.IMU_Temperature = camera.IMU_Temperature
+                OpenCVB.ocvb.parms.IMU_Rotation = camera.IMU_Rotation
+                OpenCVB.ocvb.parms.IMU_Translation = camera.IMU_Translation
+                OpenCVB.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
+                OpenCVB.ocvb.parms.IMU_Velocity = camera.IMU_Velocity
+                OpenCVB.ocvb.parms.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
+                OpenCVB.ocvb.parms.IMU_AngularVelocity = camera.IMU_AngularVelocity
+                OpenCVB.ocvb.parms.IMU_FrameTime = camera.IMU_FrameTime
             End SyncLock
             OpenCVB.UpdateHostLocation(Me.Left, Me.Top, Me.Height)
 
@@ -991,7 +958,6 @@ Public Class OpenCVB
                     SyncLock camPic
                         formResult1 = OpenCVB.ocvb.result1.Clone()
                         formResult2 = OpenCVB.ocvb.result2.Clone()
-                        formResultsUpdated = True
                         For i = VB_Classes.ActiveClass._RESULT1 To VB_Classes.ActiveClass._RESULT2
                             If OpenCVB.ocvb.TTtextData(i).Count Then
                                 TTtextData(i).Clear()
@@ -1043,60 +1009,17 @@ Public Class OpenCVB
             Console.WriteLine(vbTab + "Ending " + parms.activeAlgorithm)
         End If
     End Sub
-    Private Sub CameraTask(PCmultiplier As Single)
+    Private Sub CameraTask()
         While stopCameraThread = False
-            Application.DoEvents()
-            If Me.Visible And Me.IsDisposed = False Then
-                Me.Invoke(Sub()
-                              Me.Refresh()
-                          End Sub
-                )
-            End If
             camera.GetNextFrame()
+            ' some cameras may be configured for callbacks that may not have images yet.
+            Static lastFrame = camera.frameCount
+            If lastFrame = camera.framecount Then Continue While
+            lastFrame = camera.framecount
 
-            If camera.color Is Nothing Then Continue While
-            If cameraDataUpdated = True Then Continue While ' the last frames have not been used yet.
-
-            Static lastFrame = camera.imageFrameCount
-            If lastFrame = camera.imageframecount Then Continue While ' some cameras are callback that may not have images at this point.  T265
-            lastFrame = camera.imageframecount
-
-            SyncLock camPic
-                imuGyro = camera.imuGyro ' The data may not be present but just copy it...
-                imuAccel = camera.imuaccel
-                IMU_Barometer = camera.IMU_Barometer
-                IMU_Magnetometer = camera.IMU_Magnetometer
-                IMU_Temperature = camera.IMU_Temperature
-                IMU_TimeStamp = camera.IMU_TimeStamp
-                IMU_Rotation = camera.IMU_Rotation
-                IMU_Translation = camera.IMU_Translation
-                IMU_Acceleration = camera.IMU_Acceleration
-                IMU_Velocity = camera.IMU_Velocity
-                IMU_FrameTime = camera.IMU_FrameTime
-                IMU_AngularAcceleration = camera.IMU_AngularAcceleration
-                IMU_AngularVelocity = camera.IMU_AngularVelocity
-                If lowResolution Then
-                    formColor = camera.color.Resize(fastSize)
-                    formRGBDepth = camera.RGBDepth.Resize(fastSize)
-                Else
-                    formColor = camera.color
-                    formRGBDepth = camera.RGBDepth
-                End If
-                ' these cannot be resized without damage
-                formPointCloud = camera.pointCloud
-                formDepth16 = camera.depth16
-                formleftView = camera.leftView
-                formrightView = camera.rightView
-                formDisparity = camera.disparity
-                tMatrix = camera.transformationMatrix
-                If PCmultiplier <> 1 Then formPointCloud *= 0.001 ' units are millimeters for Kinect
-                cameraDataUpdated = True
-            End SyncLock
-
-            cameraFrameCount += 1
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
-        cameraFrameCount = 0
+        camera.frameCount = 0
     End Sub
 End Class
 

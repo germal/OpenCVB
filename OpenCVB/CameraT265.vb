@@ -11,11 +11,11 @@ Module T265_Module
 End Module
 
 Public Class CameraT265
+    Inherits Camera
 #Region "T265Data"
     Dim cfg As New rs.Config
     Dim dLeft(3) As Double
     Dim dRight(3) As Double
-    Dim h As Int32
     Dim kLeft(8) As Double
     Dim kRight(8) As Double
     Dim leftStream As rs.VideoStreamProfile
@@ -39,7 +39,6 @@ Public Class CameraT265
     Dim rm1 As New cv.Mat
     Dim rm2 As New cv.Mat
     Dim rRight(8) As Double
-    Dim stereo As cv.StereoSGBM
     Dim stereo_cx As Double
     Dim stereo_cy As Double
     Dim stereo_focal_px As Double
@@ -48,40 +47,7 @@ Public Class CameraT265
     Dim stereo_size As cv.Size
     Dim stereo_width_px As Double
     Dim tPtr As IntPtr
-    Dim validRect As cv.Rect
-    Dim vertices() As Byte
-    Dim w As Int32
-    Public color As cv.Mat
-    Public depth16 As cv.Mat
-    Public deviceCount As Int32
-    Public deviceName As String = "Intel T265"
-    Public disparity As New cv.Mat
-    Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
-    Public failedImageCount As Int32
-    Public imuAccel As cv.Point3f
-    Public imuGyro As cv.Point3f
-    Public IMU_Barometer As Single
-    Public IMU_Magnetometer As cv.Point3f
-    Public IMU_Temperature As Single
-    Public IMU_TimeStamp As Double
-    Public IMU_Present As Boolean
-    Public IMU_Rotation As Quaternion
-    Public IMU_Translation As cv.Point3f
-    Public IMU_Acceleration As cv.Point3f
-    Public IMU_Velocity As cv.Point3f
-    Public IMU_AngularAcceleration As cv.Point3f
-    Public IMU_AngularVelocity As cv.Point3f
-    Public IMU_FrameTime As Double
-    Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
-    Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
-    Public leftView As cv.Mat
-    Public modelInverse As Boolean
     Public pc As New rs.PointCloud
-    Public pcMultiplier As Single = 1
-    Public pipelineClosed As Boolean = False
-    Public pointCloud As cv.Mat
-    Public RGBDepth As New cv.Mat
-    Public rightView As cv.Mat
 
     Public dMatleft As cv.Mat
     Public dMatRight As cv.Mat
@@ -93,9 +59,6 @@ Public Class CameraT265
     Public rMatRight As cv.Mat
     Public captureTimeStamp As Double
     Dim QArray(15) As Double
-
-    Public transformationMatrix() As Single
-    Public imageFrameCount As Integer
 #End Region
     Private Sub getIntrinsics(ByRef vb_intrin As VB_Classes.ActiveClass.intrinsics_VB, intrinsics As rs.Intrinsics)
         vb_intrin.width = intrinsics.width
@@ -107,9 +70,8 @@ Public Class CameraT265
         vb_intrin.FOV = intrinsics.FOV
         vb_intrin.coeffs = intrinsics.coeffs
     End Sub
-    Public Sub New()
-    End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
+        deviceName = "Intel T265"
         w = width
         h = height
 
@@ -119,16 +81,10 @@ Public Class CameraT265
         cfg.EnableStream(rs.Stream.Fisheye, 1, rs.Format.Y8)
         cfg.EnableStream(rs.Stream.Fisheye, 2, rs.Format.Y8)
 
-        If OpenCVB.t265CallbackActive Then
-            pipeline_profile = pipeline.Start(cfg, AddressOf callback)
-        Else
-            pipeline_profile = pipeline.Start(cfg)
-        End If
+        pipeline_profile = pipeline.Start(cfg)
 
         numDisp = 112 - minDisp
         maxDisp = minDisp + numDisp
-        Dim windowSize = 5
-        stereo = cv.StereoSGBM.Create(minDisp, numDisp, 16, 8 * 3 * windowSize * windowSize, 32 * 3 * windowSize * windowSize, 1, 0, 10, 100, 32)
 
         leftStream = pipeline_profile.GetStream(Of rs.VideoStreamProfile)(rs.Stream.Fisheye, 1)
         rightStream = pipeline_profile.GetStream(Of rs.VideoStreamProfile)(rs.Stream.Fisheye, 2)
@@ -228,86 +184,83 @@ Public Class CameraT265
         Public mapperConfidence As Int32
     End Structure
     Public Sub GetNextFrame()
-        If OpenCVB.t265CallbackActive Then
-            Thread.Sleep(1)
-        Else
-            Dim frameset = pipeline.WaitForFrames(1000)
-            For i = 0 To 3
-                Dim stream = Choose(i + 1, rs.Stream.Pose, rs.Stream.Gyro, rs.Stream.Accel, rs.Stream.Fisheye)
-                Dim f = frameset.FirstOrDefault(stream)
-                getFrames(f, frameset)
-            Next
-        End If
+        If pipelineClosed Then Exit Sub
+        Dim frameset = pipeline.WaitForFrames(1000)
+        For i = 0 To 3
+            Dim stream = Choose(i + 1, rs.Stream.Pose, rs.Stream.Gyro, rs.Stream.Accel, rs.Stream.Fisheye)
+            Dim f = frameset.FirstOrDefault(stream)
+            getFrames(f, frameset)
+        Next
     End Sub
     Private Sub getFrames(frame As rs.Frame, frameset As rs.FrameSet)
-        Static poseFrameCount As Integer
-        Static gyroFrameCount As Integer
         Static imageCounter As Integer
-        Static AccelFrameCount As Integer
-        Static lastFrameTime = IMU_TimeStamp
         Static totalMS As Double
 
         Select Case frame.Profile.Stream
             Case rs.Stream.Pose
-                poseFrameCount += 1
                 Dim poseFrame = frame.As(Of rs.PoseFrame)
                 Dim poseData = poseFrame.PoseData
-                IMU_TimeStamp = poseFrame.Timestamp
-                IMU_FrameTime = IMU_TimeStamp - lastFrameTime
-                lastFrameTime = IMU_TimeStamp
-                totalMS += IMU_FrameTime
-                Dim pose = Marshal.PtrToStructure(Of PoseData)(poseFrame.Data)
-                IMU_Rotation = pose.rotation
-                Dim q = IMU_Rotation
-                IMU_Translation = pose.translation
-                IMU_Acceleration = pose.acceleration
-                IMU_Velocity = pose.velocity
-                IMU_AngularAcceleration = pose.angularAcceleration
-                IMU_AngularVelocity = pose.angularVelocity
-                Dim t = IMU_Translation
-                '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
-                Dim mat() As Single = {-(1 - 2 * q.Y * q.Y - 2 * q.Z * q.Z), -(2 * q.X * q.Y + 2 * q.Z * q.W), -(2 * q.X * q.Z - 2 * q.Y * q.W), 0.0,
-                               2 * q.X * q.Y - 2 * q.Z * q.W, 1 - 2 * q.X * q.X - 2 * q.Z * q.Z, 2 * q.Y * q.Z + 2 * q.X * q.W, 0.0,
-                               -(2 * q.X * q.Z + 2 * q.Y * q.W), -(2 * q.Y * q.Z - 2 * q.X * q.W), -(1 - 2 * q.X * q.X - 2 * q.Y * q.Y), 0.0,
-                               t.X, t.Y, t.Z, 1.0}
-                transformationMatrix = mat
+                SyncLock OpenCVB.camPic ' only really need the synclock when in callback mode but it doesn't hurt to waitforframe mode.
+                    IMU_TimeStamp = poseFrame.Timestamp
+                    Static lastFrameTime = IMU_TimeStamp
+                    IMU_FrameTime = IMU_TimeStamp - lastFrameTime
+                    lastFrameTime = IMU_TimeStamp
+                    totalMS += IMU_FrameTime
+                    Dim pose = Marshal.PtrToStructure(Of PoseData)(poseFrame.Data)
+                    IMU_Rotation = pose.rotation
+                    Dim q = IMU_Rotation
+                    IMU_Translation = pose.translation
+                    IMU_Acceleration = pose.acceleration
+                    IMU_Velocity = pose.velocity
+                    IMU_AngularAcceleration = pose.angularAcceleration
+                    IMU_AngularVelocity = pose.angularVelocity
+                    Dim t = IMU_Translation
+                    '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
+                    Dim mat() As Single = {
+                        -(1 - 2 * q.Y * q.Y - 2 * q.Z * q.Z), -(2 * q.X * q.Y + 2 * q.Z * q.W), -(2 * q.X * q.Z - 2 * q.Y * q.W), 0.0,
+                        2 * q.X * q.Y - 2 * q.Z * q.W, 1 - 2 * q.X * q.X - 2 * q.Z * q.Z, 2 * q.Y * q.Z + 2 * q.X * q.W, 0.0,
+                        -(2 * q.X * q.Z + 2 * q.Y * q.W), -(2 * q.Y * q.Z - 2 * q.X * q.W), -(1 - 2 * q.X * q.X - 2 * q.Y * q.Y), 0.0,
+                        t.X, t.Y, t.Z, 1.0}
+                    transformationMatrix = mat
+                End SyncLock
             Case rs.Stream.Gyro
-                gyroFrameCount += 1
                 imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
 
             Case rs.Stream.Accel
-                AccelFrameCount += 1
                 imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
 
             Case rs.Stream.Fisheye
-                imageFrameCount += 1
+                frameCount += 1
                 imageCounter += 1
                 If frameset Is Nothing Then frameset = frame.As(Of rs.FrameSet)
                 Dim firstFrame = frameset.FirstOrDefault(rs.Stream.Fisheye)
-                Static leftBytes(rawHeight * rawWidth - 1) As Byte
-                Static rightBytes(rawHeight * rawWidth - 1) As Byte
-                Marshal.Copy(firstFrame.Data, leftBytes, 0, leftBytes.Length)
+                Static leftViewBytes(rawHeight * rawWidth - 1) As Byte
+                Static rightViewBytes(rawHeight * rawWidth - 1) As Byte
+                Marshal.Copy(firstFrame.Data, leftViewBytes, 0, leftViewBytes.Length)
                 For Each fr In frameset
                     If fr.Profile.Stream = rs.Stream.Fisheye Then
                         If fr.Profile.Index = 2 Then
-                            Marshal.Copy(fr.Data, rightBytes, 0, rightBytes.Length)
+                            Marshal.Copy(fr.Data, rightViewBytes, 0, rightViewBytes.Length)
                             Exit For
                         End If
                     End If
                 Next
-                SyncLock OpenCVB.camPic
-                    leftView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, leftBytes)
-                    rightView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, rightBytes)
+                SyncLock OpenCVB.camPic ' only really need the synclock when in callback mode but it doesn't hurt to waitforframe mode.
+                    leftView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, leftViewBytes)
+                    rightView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, rightViewBytes)
                     Dim tmpColor = leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(New cv.Size(w, h))
                     color = tmpColor.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
                     Dim remapLeft = leftView.Remap(lm1, lm2, cv.InterpolationFlags.Linear)
                     Dim remapRight = rightView.Remap(rm1, rm2, cv.InterpolationFlags.Linear)
 
+                    disparity = New cv.Mat(remapLeft.Size(), cv.MatType.CV_16SC1)
+                    Dim windowSize = 5
+                    Dim stereo = cv.StereoSGBM.Create(minDisp, numDisp, 16, 8 * 3 * windowSize * windowSize, 32 * 3 * windowSize * windowSize, 1, 0, 10, 100, 32)
                     stereo.Compute(remapLeft, remapRight, disparity)
 
                     ' re-crop just the valid part of the disparity
-                    validRect = New cv.Rect(maxDisp, 0, disparity.Cols - maxDisp, disparity.Rows)
+                    Dim validRect = New cv.Rect(maxDisp, 0, disparity.Cols - maxDisp, disparity.Rows)
                     Dim disp_vis As New cv.Mat, tmpdisp As New cv.Mat
                     disparity.ConvertTo(disp_vis, cv.MatType.CV_32F, CDbl(1 / 16))
                     disparity.ConvertTo(tmpdisp, cv.MatType.CV_32F, CDbl(1 / 16))
@@ -327,24 +280,14 @@ Public Class CameraT265
                     depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
                     disparity(validRect).ConvertTo(depth16(depthRect), cv.MatType.CV_16UC1)
                     pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
+                    newImagesAvailable += 1
                 End SyncLock
         End Select
 
         If totalMS > 1000 Then
-            Console.WriteLine("pose = " + CStr(poseFrameCount) + " gyro = " + CStr(gyroFrameCount) + " accel = " + CStr(AccelFrameCount) +
-                              " image = " + CStr(imageCounter))
-            poseFrameCount = 0
-            gyroFrameCount = 0
-            AccelFrameCount = 0
+            Console.WriteLine("image = " + CStr(imageCounter) + " internal camera FPS.")
             imageCounter = 0
             totalMS = 0
         End If
-    End Sub
-    Private Sub callback(frame As rs.Frame)
-        If pipelineClosed Then Exit Sub
-        getFrames(frame, Nothing)
-    End Sub
-    Public Sub closePipe()
-        pipelineClosed = True
     End Sub
 End Class

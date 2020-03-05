@@ -130,6 +130,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera.vb" />
     <Compile Include="CameraMyntD.vb" />
     <Compile Include="CameraT265.vb" />
     <Compile Include="OptionsDialog.Designer.vb">
@@ -175,6 +176,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="OpenCVB.resx">
       <DependentUpon>OpenCVB.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

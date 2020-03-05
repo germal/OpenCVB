@@ -6,69 +6,52 @@ Module Zed2_Interface
     Public Function Zed2Open(width As Int32, height As Int32, fps As Int32) As IntPtr
     End Function
     <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2SerialNumber(kc As IntPtr) As Int32
+    Public Function Zed2SerialNumber(cPtr As IntPtr) As Int32
     End Function
     <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2WaitFrame(kc As IntPtr, rgba As IntPtr, depthRGBA As IntPtr, depth32f As IntPtr, left As IntPtr,
+    Public Function Zed2WaitFrame(cPtr As IntPtr, rgba As IntPtr, depthRGBA As IntPtr, depth32f As IntPtr, left As IntPtr,
                                   right As IntPtr, pointCloud As IntPtr) As IntPtr
     End Function
     <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2Extrinsics(kc As IntPtr) As IntPtr
+    Public Function Zed2Extrinsics(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2intrinsicsLeft(kc As IntPtr) As IntPtr
+    Public Function Zed2intrinsicsLeft(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2intrinsicsRight(kc As IntPtr) As IntPtr
+    Public Function Zed2intrinsicsRight(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2Translation(kc As IntPtr) As IntPtr
+    Public Function Zed2Translation(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2RotationMatrix(kc As IntPtr) As IntPtr
+    Public Function Zed2RotationMatrix(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2Acceleration(kc As IntPtr) As IntPtr
+    Public Function Zed2Acceleration(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2AngularVelocity(kc As IntPtr) As IntPtr
+    Public Function Zed2AngularVelocity(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2IMU_Temperature(kc As IntPtr) As Single
+    Public Function Zed2IMU_Temperature(cPtr As IntPtr) As Single
     End Function
     <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2IMU_TimeStamp(kc As IntPtr) As Double
+    Public Function Zed2IMU_TimeStamp(cPtr As IntPtr) As Double
     End Function
     <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2IMU_Barometer(kc As IntPtr) As Single
+    Public Function Zed2IMU_Barometer(cPtr As IntPtr) As Single
     End Function
     <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2Orientation(kc As IntPtr) As IntPtr
+    Public Function Zed2Orientation(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2IMU_Magnetometer(kc As IntPtr) As IntPtr
+    Public Function Zed2IMU_Magnetometer(cPtr As IntPtr) As IntPtr
     End Function
 End Module
 Public Class CameraZED2
-    Structure imuDataStruct
-        Dim r00 As Single
-        Dim r01 As Single
-        Dim r02 As Single
-        Dim tx As Single
-        Dim r10 As Single
-        Dim r11 As Single
-        Dim r12 As Single
-        Dim ty As Single
-        Dim r20 As Single
-        Dim r21 As Single
-        Dim r22 As Single
-        Dim tz As Single
-        Dim m30 As Single
-        Dim m31 As Single
-        Dim m32 As Single
-        Dim m33 As Single
-    End Structure
-    Structure intrinsicsLeftData
+    Inherits Camera
+    Structure intrinsicsLeftZed
         Dim fx As Single ' Focal length x */
         Dim fy As Single ' Focal length y */
         Dim cx As Single ' Principal point In image, x */
@@ -85,60 +68,19 @@ Public Class CameraZED2
         Dim height As Int64
     End Structure
 
-    Dim Zed2 As IntPtr
-    Public color As New cv.Mat
-    Public depth16 As New cv.Mat
-    Public RGBDepth As New cv.Mat
-    Dim colorBytes() As Byte
-    Dim depthRGBABytes() As Byte
-    Dim depth32FBytes() As Byte
-    Dim leftBytes() As Byte
-    Dim rightBytes() As Byte
-    Dim pointCloudBytes() As Byte
-    Public deviceCount As Int32
-    Public deviceName As String = "StereoLabs ZED 2"
-    Public disparity As cv.Mat
-    Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
-    Public h As Int32
-    Public imuAccel As cv.Point3f
-    Public imuGyro As cv.Point3f
-    Public IMU_Present As Boolean = True ' Zed2 cameras always have an IMU.
-    Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
-    Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
-    Public modelInverse As Boolean
-    Public pointCloud As New cv.Mat
-    Public pcMultiplier As Single = 0.001
-    Public leftView As cv.Mat
-    Public rightView As cv.Mat
-    Public serialNumber As String
-    Public w As Int32
-    Public pipelineClosed As Boolean = False
-    Public transformationMatrix() As Single
-    Public IMU_Barometer As Single
-    Public IMU_Magnetometer As cv.Point3f
-    Public IMU_Temperature As Single
-    Public IMU_TimeStamp As Double
-    Public IMU_Rotation As System.Numerics.Quaternion
-    Public IMU_Translation As cv.Point3f
-    Public IMU_Acceleration As cv.Point3f
-    Public IMU_Velocity As cv.Point3f
-    Public IMU_AngularAcceleration As cv.Point3f
-    Public IMU_AngularVelocity As cv.Point3f
-    Public IMU_FrameTime As Double
-    Public imageFrameCount As Integer
-    Public Sub New()
-    End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
-        Zed2 = Zed2Open(width, height, 60)
-        If Zed2 <> 0 Then
-            Dim serialNumber = Zed2SerialNumber(Zed2)
+        cPtr = Zed2Open(width, height, 60)
+        deviceName = "StereoLabs ZED 2"
+        pcMultiplier = 0.001
+        If cPtr <> 0 Then
+            Dim serialNumber = Zed2SerialNumber(cPtr)
             Console.WriteLine("ZED 2 serial number = " + CStr(serialNumber))
             w = width
             h = height
             disparity = New cv.Mat
             leftView = New cv.Mat
 
-            Dim ptr = Zed2Extrinsics(Zed2)
+            Dim ptr = Zed2Extrinsics(cPtr)
             Dim rotationTranslation(12) As Single
             Marshal.Copy(ptr, rotationTranslation, 0, rotationTranslation.Length)
             ReDim Extrinsics_VB.rotation(8)
@@ -150,8 +92,8 @@ Public Class CameraZED2
                 Extrinsics_VB.translation(i) = rotationTranslation(i + Extrinsics_VB.rotation.Length - 1)
             Next
 
-            ptr = Zed2intrinsicsLeft(Zed2)
-            Dim intrinsics = Marshal.PtrToStructure(Of intrinsicsLeftData)(ptr)
+            ptr = Zed2intrinsicsLeft(cPtr)
+            Dim intrinsics = Marshal.PtrToStructure(Of intrinsicsLeftZed)(ptr)
             intrinsicsLeft_VB.ppx = intrinsics.cx
             intrinsicsLeft_VB.ppy = intrinsics.cy
             intrinsicsLeft_VB.fx = intrinsics.fx
@@ -169,8 +111,8 @@ Public Class CameraZED2
             intrinsicsLeft_VB.width = intrinsics.width
             intrinsicsLeft_VB.height = intrinsics.height
 
-            ptr = Zed2intrinsicsRight(Zed2)
-            intrinsics = Marshal.PtrToStructure(Of intrinsicsLeftData)(ptr)
+            ptr = Zed2intrinsicsRight(cPtr)
+            intrinsics = Marshal.PtrToStructure(Of intrinsicsLeftZed)(ptr)
             intrinsicsRight_VB.ppx = intrinsics.cx
             intrinsicsRight_VB.ppy = intrinsics.cy
             intrinsicsRight_VB.fx = intrinsics.fx
@@ -189,93 +131,103 @@ Public Class CameraZED2
             intrinsicsRight_VB.height = intrinsics.height
 
             ReDim colorBytes(w * h * 4) ' rgba format coming back from driver
-            ReDim depthRGBABytes(w * h * 4)
+            ReDim RGBADepthBytes(w * h * 4)
             ReDim depth32FBytes(w * h * 4)
-            ReDim leftBytes(w * h)
-            ReDim rightBytes(w * h)
+            ReDim leftViewBytes(w * h)
+            ReDim rightViewBytes(w * h)
             ReDim pointCloudBytes(w * h * 12) ' xyz + rgba
         End If
     End Sub
 
     Public Sub GetNextFrame()
-        If Zed2 = 0 Then Return
+        Static totalMS As Double
+        Static imageCounter As Integer
+        If cPtr = 0 Then Return
         Dim handlecolorBytes = GCHandle.Alloc(colorBytes, GCHandleType.Pinned)
-        Dim handleDepthRGBABytes = GCHandle.Alloc(depthRGBABytes, GCHandleType.Pinned)
+        Dim handleRGBADepthBytes = GCHandle.Alloc(RGBADepthBytes, GCHandleType.Pinned)
         Dim handledepth32Fbytes = GCHandle.Alloc(depth32FBytes, GCHandleType.Pinned)
-        Dim handleleftBytes = GCHandle.Alloc(leftBytes, GCHandleType.Pinned)
-        Dim handlerightBytes = GCHandle.Alloc(rightBytes, GCHandleType.Pinned)
+        Dim handleLeftViewBytes = GCHandle.Alloc(leftViewBytes, GCHandleType.Pinned)
+        Dim handleRightViewBytes = GCHandle.Alloc(rightViewBytes, GCHandleType.Pinned)
         Dim handlePCBytes = GCHandle.Alloc(pointCloudBytes, GCHandleType.Pinned)
-        Dim imuFrame = Zed2WaitFrame(Zed2, handlecolorBytes.AddrOfPinnedObject(), handleDepthRGBABytes.AddrOfPinnedObject(),
-                                           handledepth32Fbytes.AddrOfPinnedObject(), handleleftBytes.AddrOfPinnedObject(),
-                                           handlerightBytes.AddrOfPinnedObject(), handlePCBytes.AddrOfPinnedObject())
-        Dim acc = Zed2Acceleration(Zed2)
-        imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(acc)
+        Dim imuFrame = Zed2WaitFrame(cPtr, handlecolorBytes.AddrOfPinnedObject(), handleRGBADepthBytes.AddrOfPinnedObject(),
+                                           handledepth32Fbytes.AddrOfPinnedObject(), handleLeftViewBytes.AddrOfPinnedObject(),
+                                           handleRightViewBytes.AddrOfPinnedObject(), handlePCBytes.AddrOfPinnedObject())
 
-        Dim ang = Zed2AngularVelocity(Zed2)
-        Dim angularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
+        handlecolorBytes.Free()
+        handleRGBADepthBytes.Free()
+        handledepth32Fbytes.Free()
+        handleLeftViewBytes.Free()
+        handleRightViewBytes.Free()
+        handlePCBytes.Free()
 
-        ' there must be a bug in the structure for acceleration and velocity.  This is an attempt to make something work.
-        ' Eliminate this code when the results above make sense.
-        imuAccel.Z = imuAccel.X
-        imuAccel.Y = angularVelocity.Z
-        imuAccel.X = angularVelocity.Y
+        SyncLock OpenCVB.camPic
+            Dim acc = Zed2Acceleration(cPtr)
+            imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(acc)
 
-        ' roll pitch and yaw - but the values are currently incorrect.  Zed must fix this...
-        ' all 3 numbers should be near zero for a stationary camera.
-        imuGyro.X = angularVelocity.X
-        imuGyro.Y = angularVelocity.Y
-        imuGyro.Z = angularVelocity.Z
+            Dim ang = Zed2AngularVelocity(cPtr)
+            Dim angularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
 
-        Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
-        Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
-        Dim mat() As Single = {-rt.r00, rt.r01, -rt.r02, 0.0,
+            imuAccel.Z = imuAccel.X
+            imuAccel.Y = angularVelocity.Z
+            imuAccel.X = angularVelocity.Y
+
+            ' roll pitch and yaw - but the values are currently incorrect.  Zed must fix this...
+            ' all 3 numbers should be near zero for a stationary camera.
+            imuGyro.X = angularVelocity.X
+            imuGyro.Y = angularVelocity.Y
+            imuGyro.Z = angularVelocity.Z
+
+            Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
+            Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
+            Dim mat() As Single = {-rt.r00, rt.r01, -rt.r02, 0.0,
                                -rt.r10, rt.r11, rt.r12, 0.0,
                                -rt.r20, rt.r21, -rt.r22, 0.0,
                                t.X, t.Y, t.Z, 1.0}
-        transformationMatrix = mat
+            transformationMatrix = mat
 
-        ' testing to see if we could have computed this independently...
-        Dim tr = Zed2Translation(Zed2)
-        Dim translation(2) As Single
-        Marshal.Copy(tr, translation, 0, translation.Length)
+            ' testing to see if we could have computed this independently...
+            Dim tr = Zed2Translation(cPtr)
+            Dim translation(2) As Single
+            Marshal.Copy(tr, translation, 0, translation.Length)
 
-        Dim rot = Zed2RotationMatrix(Zed2)
-        Dim rotation(8) As Single
-        Marshal.Copy(rot, rotation, 0, rotation.Length)
+            Dim rot = Zed2RotationMatrix(cPtr)
+            Dim rotation(8) As Single
+            Marshal.Copy(rot, rotation, 0, rotation.Length)
 
-        handlecolorBytes.Free()
-        handleDepthRGBABytes.Free()
-        handledepth32Fbytes.Free()
-        handleleftBytes.Free()
-        handlerightBytes.Free()
-        handlePCBytes.Free()
+            IMU_Barometer = Zed2IMU_Barometer(cPtr)
+            Dim mag = Zed2IMU_Magnetometer(cPtr)
+            IMU_Magnetometer = Marshal.PtrToStructure(Of cv.Point3f)(mag)
 
-        IMU_Barometer = Zed2IMU_Barometer(Zed2)
-        Dim mag = Zed2IMU_Magnetometer(Zed2)
-        IMU_Magnetometer = Marshal.PtrToStructure(Of cv.Point3f)(mag)
+            IMU_Temperature = Zed2IMU_Temperature(cPtr)
 
-        IMU_Temperature = Zed2IMU_Temperature(Zed2)
+            IMU_TimeStamp = Zed2IMU_TimeStamp(cPtr)
+            Static lastFrameTime = IMU_TimeStamp
+            IMU_FrameTime = IMU_TimeStamp - lastFrameTime
+            lastFrameTime = IMU_TimeStamp
+            totalMS += IMU_FrameTime
 
-        Static startTime = Zed2IMU_TimeStamp(Zed2)
-        IMU_TimeStamp = Zed2IMU_TimeStamp(Zed2) - startTime
+            Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBytes)
+            color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-        Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBytes)
-        color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+            Dim RGBADepth = New cv.Mat(h, w, cv.MatType.CV_8UC4, RGBADepthBytes)
+            RGBDepth = RGBADepth.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-        Dim RGBADepth = New cv.Mat(h, w, cv.MatType.CV_8UC4, depthRGBABytes)
-        RGBDepth = RGBADepth.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+            Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depth32FBytes)
+            depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
 
-        Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depth32FBytes)
-        depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
+            disparity = depth16.Clone()
 
-        disparity = depth16.Clone()
-
-        leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftBytes)
-        rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightBytes)
-        pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes)
-        imageFrameCount += 1
-    End Sub
-    Public Sub closePipe()
-        pipelineClosed = True
+            leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftViewBytes)
+            rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightViewBytes)
+            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes) * pcMultiplier ' change to meters...
+            newImagesAvailable = True
+            frameCount += 1
+            imageCounter += 1
+        End SyncLock
+        If totalMS > 1000 Then
+            Console.WriteLine("image = " + CStr(imageCounter) + " internal camera FPS")
+            imageCounter = 0
+            totalMS = 0
+        End If
     End Sub
 End Class

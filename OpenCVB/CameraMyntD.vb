@@ -6,68 +6,51 @@ Module MyntD_Interface
     Public Function MyntDOpen(width As Int32, height As Int32, fps As Int32) As IntPtr
     End Function
     <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDSerialNumber(kc As IntPtr) As Int32
+    Public Function MyntDSerialNumber(cPtr As IntPtr) As Int32
     End Function
     <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDWaitFrame(kc As IntPtr, rgba As IntPtr, depthRGBA As IntPtr, depth32f As IntPtr, left As IntPtr,
+    Public Function MyntDWaitFrame(cPtr As IntPtr, rgba As IntPtr, depthRGBA As IntPtr, depth32f As IntPtr, left As IntPtr,
                                   right As IntPtr, pointCloud As IntPtr) As IntPtr
     End Function
     <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDExtrinsics(kc As IntPtr) As IntPtr
+    Public Function MyntDExtrinsics(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDintrinsicsLeft(kc As IntPtr) As IntPtr
+    Public Function MyntDintrinsicsLeft(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDintrinsicsRight(kc As IntPtr) As IntPtr
+    Public Function MyntDintrinsicsRight(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDTranslation(kc As IntPtr) As IntPtr
+    Public Function MyntDTranslation(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDRotationMatrix(kc As IntPtr) As IntPtr
+    Public Function MyntDRotationMatrix(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDAcceleration(kc As IntPtr) As IntPtr
+    Public Function MyntDAcceleration(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDAngularVelocity(kc As IntPtr) As IntPtr
+    Public Function MyntDAngularVelocity(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDIMU_Temperature(kc As IntPtr) As Single
+    Public Function MyntDIMU_Temperature(cPtr As IntPtr) As Single
     End Function
     <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDIMU_TimeStamp(kc As IntPtr) As Double
+    Public Function MyntDIMU_TimeStamp(cPtr As IntPtr) As Double
     End Function
     <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDIMU_Barometer(kc As IntPtr) As Single
+    Public Function MyntDIMU_Barometer(cPtr As IntPtr) As Single
     End Function
     <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDOrientation(kc As IntPtr) As IntPtr
+    Public Function MyntDOrientation(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDIMU_Magnetometer(kc As IntPtr) As IntPtr
+    Public Function MyntDIMU_Magnetometer(cPtr As IntPtr) As IntPtr
     End Function
 End Module
 Public Class CameraMyntD
-    Structure imuDataStruct
-        Dim r00 As Single
-        Dim r01 As Single
-        Dim r02 As Single
-        Dim tx As Single
-        Dim r10 As Single
-        Dim r11 As Single
-        Dim r12 As Single
-        Dim ty As Single
-        Dim r20 As Single
-        Dim r21 As Single
-        Dim r22 As Single
-        Dim tz As Single
-        Dim m30 As Single
-        Dim m31 As Single
-        Dim m32 As Single
-        Dim m33 As Single
-    End Structure
+    Inherits Camera
     Structure intrinsicsLeftData
         Dim fx As Single ' Focal length x */
         Dim fy As Single ' Focal length y */
@@ -85,61 +68,20 @@ Public Class CameraMyntD
         Dim height As Int64
     End Structure
 
-    Dim MyntD As IntPtr
-    Public color As New cv.Mat
-    Public depth16 As New cv.Mat
-    Public RGBDepth As New cv.Mat
-    Dim colorBytes() As Byte
-    Dim depthRGBABytes() As Byte
-    Dim depth32FBytes() As Byte
-    Dim leftBytes() As Byte
-    Dim rightBytes() As Byte
-    Dim pointCloudBytes() As Byte
-    Public deviceCount As Int32
-    Public deviceName As String = "StereoLabs ZED 2"
-    Public disparity As cv.Mat
-    Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
-    Public h As Int32
-    Public imuAccel As cv.Point3f
-    Public imuGyro As cv.Point3f
-    Public IMU_Present As Boolean = True ' MyntD cameras always have an IMU.
-    Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
-    Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
-    Public modelInverse As Boolean
-    Public pointCloud As New cv.Mat
-    Public pcMultiplier As Single = 0.001
-    Public leftView As cv.Mat
-    Public rightView As cv.Mat
-    Public serialNumber As String
-    Public w As Int32
-    Public pipelineClosed As Boolean = False
-    Public transformationMatrix() As Single
-    Public IMU_Barometer As Single
-    Public IMU_Magnetometer As cv.Point3f
-    Public IMU_Temperature As Single
-    Public IMU_TimeStamp As Double
-    Public IMU_Rotation As System.Numerics.Quaternion
-    Public IMU_Translation As cv.Point3f
-    Public IMU_Acceleration As cv.Point3f
-    Public IMU_Velocity As cv.Point3f
-    Public IMU_AngularAcceleration As cv.Point3f
-    Public IMU_AngularVelocity As cv.Point3f
-    Public IMU_FrameTime As Double
-    Public imageFrameCount As Integer
-    Public Sub New()
-    End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
-        MyntD = MyntDOpen(width, height, 60)
+        cPtr = MyntDOpen(width, height, 60)
+        MyBase.pcMultiplier = 0.001
+        MyBase.deviceName = "MYNT EYE D 1000"
         Exit Sub
-        If MyntD <> 0 Then
-            Dim serialNumber = MyntDSerialNumber(MyntD)
+        If cPtr <> 0 Then
+            Dim serialNumber = MyntDSerialNumber(cPtr)
             Console.WriteLine("MYNT EYE D 1000 serial number = " + CStr(serialNumber))
             w = width
             h = height
             disparity = New cv.Mat
             leftView = New cv.Mat
 
-            Dim ptr = MyntDExtrinsics(MyntD)
+            Dim ptr = MyntDExtrinsics(cPtr)
             Dim rotationTranslation(12) As Single
             Marshal.Copy(ptr, rotationTranslation, 0, rotationTranslation.Length)
             ReDim Extrinsics_VB.rotation(8)
@@ -151,7 +93,7 @@ Public Class CameraMyntD
                 Extrinsics_VB.translation(i) = rotationTranslation(i + Extrinsics_VB.rotation.Length - 1)
             Next
 
-            ptr = MyntDintrinsicsLeft(MyntD)
+            ptr = MyntDintrinsicsLeft(cPtr)
             Dim intrinsics = Marshal.PtrToStructure(Of intrinsicsLeftData)(ptr)
             intrinsicsLeft_VB.ppx = intrinsics.cx
             intrinsicsLeft_VB.ppy = intrinsics.cy
@@ -170,7 +112,7 @@ Public Class CameraMyntD
             intrinsicsLeft_VB.width = intrinsics.width
             intrinsicsLeft_VB.height = intrinsics.height
 
-            ptr = MyntDintrinsicsRight(MyntD)
+            ptr = MyntDintrinsicsRight(cPtr)
             intrinsics = Marshal.PtrToStructure(Of intrinsicsLeftData)(ptr)
             intrinsicsRight_VB.ppx = intrinsics.cx
             intrinsicsRight_VB.ppy = intrinsics.cy
@@ -190,29 +132,29 @@ Public Class CameraMyntD
             intrinsicsRight_VB.height = intrinsics.height
 
             ReDim colorBytes(w * h * 4) ' rgba format coming back from driver
-            ReDim depthRGBABytes(w * h * 4)
+            ReDim RGBADepthBytes(w * h * 4)
             ReDim depth32FBytes(w * h * 4)
-            ReDim leftBytes(w * h)
-            ReDim rightBytes(w * h)
+            ReDim leftViewBytes(w * h)
+            ReDim rightViewBytes(w * h)
             ReDim pointCloudBytes(w * h * 12) ' xyz + rgba
         End If
     End Sub
 
     Public Sub GetNextFrame()
-        If MyntD = 0 Then Return
+        If cPtr = 0 Then Return
         Dim handlecolorBytes = GCHandle.Alloc(colorBytes, GCHandleType.Pinned)
-        Dim handleDepthRGBABytes = GCHandle.Alloc(depthRGBABytes, GCHandleType.Pinned)
+        Dim handleRGBADepthBytes = GCHandle.Alloc(RGBADepthBytes, GCHandleType.Pinned)
         Dim handledepth32Fbytes = GCHandle.Alloc(depth32FBytes, GCHandleType.Pinned)
-        Dim handleleftBytes = GCHandle.Alloc(leftBytes, GCHandleType.Pinned)
-        Dim handlerightBytes = GCHandle.Alloc(rightBytes, GCHandleType.Pinned)
+        Dim handleLeftViewBytes = GCHandle.Alloc(leftViewBytes, GCHandleType.Pinned)
+        Dim handleRightViewBytes = GCHandle.Alloc(rightViewBytes, GCHandleType.Pinned)
         Dim handlePCBytes = GCHandle.Alloc(pointCloudBytes, GCHandleType.Pinned)
-        Dim imuFrame = MyntDWaitFrame(MyntD, handlecolorBytes.AddrOfPinnedObject(), handleDepthRGBABytes.AddrOfPinnedObject(),
-                                           handledepth32Fbytes.AddrOfPinnedObject(), handleleftBytes.AddrOfPinnedObject(),
-                                           handlerightBytes.AddrOfPinnedObject(), handlePCBytes.AddrOfPinnedObject())
-        Dim acc = MyntDAcceleration(MyntD)
+        Dim imuFrame = MyntDWaitFrame(cPtr, handlecolorBytes.AddrOfPinnedObject(), handleRGBADepthBytes.AddrOfPinnedObject(),
+                                           handledepth32Fbytes.AddrOfPinnedObject(), handleLeftViewBytes.AddrOfPinnedObject(),
+                                           handleRightViewBytes.AddrOfPinnedObject(), handlePCBytes.AddrOfPinnedObject())
+        Dim acc = MyntDAcceleration(cPtr)
         imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(acc)
 
-        Dim ang = MyntDAngularVelocity(MyntD)
+        Dim ang = MyntDAngularVelocity(cPtr)
         Dim angularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
 
         imuAccel.Z = imuAccel.X
@@ -233,47 +175,47 @@ Public Class CameraMyntD
         transformationMatrix = mat
 
         ' testing to see if we could have computed this independently...
-        Dim tr = MyntDTranslation(MyntD)
+        Dim tr = MyntDTranslation(cPtr)
         Dim translation(2) As Single
         Marshal.Copy(tr, translation, 0, translation.Length)
 
-        Dim rot = MyntDRotationMatrix(MyntD)
+        Dim rot = MyntDRotationMatrix(cPtr)
         Dim rotation(8) As Single
         Marshal.Copy(rot, rotation, 0, rotation.Length)
 
         handlecolorBytes.Free()
-        handleDepthRGBABytes.Free()
+        handleRGBADepthBytes.Free()
         handledepth32Fbytes.Free()
-        handleleftBytes.Free()
-        handlerightBytes.Free()
+        handleLeftViewBytes.Free()
+        handleRightViewBytes.Free()
         handlePCBytes.Free()
 
-        IMU_Barometer = MyntDIMU_Barometer(MyntD)
-        Dim mag = MyntDIMU_Magnetometer(MyntD)
+        IMU_Barometer = MyntDIMU_Barometer(cPtr)
+        Dim mag = MyntDIMU_Magnetometer(cPtr)
         IMU_Magnetometer = Marshal.PtrToStructure(Of cv.Point3f)(mag)
 
-        IMU_Temperature = MyntDIMU_Temperature(MyntD)
+        IMU_Temperature = MyntDIMU_Temperature(cPtr)
 
-        Static startTime = MyntDIMU_TimeStamp(MyntD)
-        IMU_TimeStamp = MyntDIMU_TimeStamp(MyntD) - startTime
+        Static startTime = MyntDIMU_TimeStamp(cPtr)
+        IMU_TimeStamp = MyntDIMU_TimeStamp(cPtr) - startTime
 
-        Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBytes)
-        color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+        SyncLock OpenCVB.camPic
+            Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBytes)
+            Color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-        Dim RGBADepth = New cv.Mat(h, w, cv.MatType.CV_8UC4, depthRGBABytes)
-        RGBDepth = RGBADepth.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+            Dim RGBADepth = New cv.Mat(h, w, cv.MatType.CV_8UC4, RGBADepthBytes)
+            RGBDepth = RGBADepth.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-        Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depth32FBytes)
-        depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
+            Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depth32FBytes)
+            depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
 
-        disparity = depth16.Clone()
+            disparity = depth16.Clone()
 
-        leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftBytes)
-        rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightBytes)
-        pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes)
-        imageFrameCount += 1
-    End Sub
-    Public Sub closePipe()
-        pipelineClosed = True
+            leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftViewBytes)
+            rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightViewBytes)
+            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes) * pcMultiplier ' change to meters...
+            newImagesAvailable = True
+            frameCount += 1
+        End SyncLock
     End Sub
 End Class

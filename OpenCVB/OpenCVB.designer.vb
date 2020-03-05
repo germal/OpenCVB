@@ -37,6 +37,7 @@ Partial Class OpenCVB
         Me.OpenCVkeyword = New System.Windows.Forms.ComboBox()
         Me.RestartCameraTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.RefreshTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -136,6 +137,11 @@ Partial Class OpenCVB
         '
         Me.RestartCameraTimer.Interval = 1000
         '
+        'RefreshTimer
+        '
+        Me.RefreshTimer.Enabled = True
+        Me.RefreshTimer.Interval = 30
+        '
         'OpenCVB
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -167,4 +173,5 @@ Partial Class OpenCVB
     Friend WithEvents OpenCVkeyword As ComboBox
     Friend WithEvents RestartCameraTimer As Timer
     Friend WithEvents ToolTip1 As ToolTip
+    Friend WithEvents RefreshTimer As Timer
 End Class
