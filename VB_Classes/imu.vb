@@ -388,6 +388,7 @@ Public Class IMU_PlotIMUFrameTime : Implements IDisposable
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 3
 
+        ocvb.label2 = "Left scale is in milliseconds"
         ocvb.desc = "Plot both the IMU Frame time and the CPU frame time."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -59,6 +59,10 @@ Public Class OpenCVB
     Dim textDesc As String = ""
     Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.ActiveClass.TrueType)
     Dim vtkDirectory As String = ""
+    Dim myStopWatch As New System.Diagnostics.Stopwatch
+    Dim lastRefreshTime As Double
+    Const MIN_REFRESH_TIME As Integer = 32 ' if a refresh is requested more that x milliseconds then execute it.  Otherwise pass...
+    Dim skipRefreshCount As Integer
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim args() = Environment.GetCommandLineArgs()
@@ -230,8 +234,10 @@ Public Class OpenCVB
 
         TestAllTimer.Interval = optionsForm.TestAllDuration.Text * 1000
         FindPython()
+        myStopWatch.Start()
     End Sub
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
+        lastRefreshTime = myStopWatch.ElapsedMilliseconds
         Dim g As Graphics = e.Graphics
         Try
             SyncLock camPic ' avoid updating the image while copying into it in the algorithm and camera tasks
@@ -660,6 +666,9 @@ Public Class OpenCVB
         Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " + camera.deviceName +
                   " FPS = " + Format(cameraFPS, "#0.0") + ", Algorithm FPS = " + Format(fps, "#0.0")
         If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
+
+        Console.WriteLine(CStr(skipRefreshCount) + " skips per second")
+        skipRefreshCount = 0
     End Sub
     Private Sub saveLayout()
         SaveSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
@@ -851,6 +860,11 @@ Public Class OpenCVB
     End Sub
 
     Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
+        Dim currTime = myStopWatch.ElapsedMilliseconds
+        If currTime - lastRefreshTime < MIN_REFRESH_TIME Then
+            skipRefreshCount += 1
+            Exit Sub
+        End If
         Me.Refresh()
     End Sub
 
@@ -1011,6 +1025,15 @@ Public Class OpenCVB
     End Sub
     Private Sub CameraTask()
         While stopCameraThread = False
+            ' do we need this anymore?
+            'Dim currTime = myStopWatch.ElapsedMilliseconds
+            'If currTime - lastRefreshTime > MIN_REFRESH_TIME Then
+            '    Me.Invoke(Sub()
+            '                  Me.Refresh()
+            '              End Sub
+            '        )
+            'End If
+
             camera.GetNextFrame()
             ' some cameras may be configured for callbacks that may not have images yet.
             Static lastFrame = camera.frameCount
