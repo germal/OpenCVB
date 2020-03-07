@@ -3,7 +3,7 @@ Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Imports System.Threading
-Public Class CameraD400Series
+Public Class CameraD400
     Inherits Camera
 
     Dim align As rs.Align
@@ -86,8 +86,6 @@ Public Class CameraD400Series
     End Sub
     Public Sub GetNextFrame()
         If pipelineClosed Then Exit Sub
-        Static totalMS As Double
-        Static imageCounter As Integer
         Dim frames = pipeline.WaitForFrames(1000)
         Try
             Dim procf As rs.Frame
@@ -136,15 +134,12 @@ Public Class CameraD400Series
                     imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame.Data)
 
                     IMU_TimeStamp = gyroFrame.Timestamp
+                    Static imuStartTime = IMU_TimeStamp
+                    IMU_TimeStamp -= imuStartTime
 
                     Dim accelFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Accel, rs.Format.MotionXyz32f)
                     imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame.Data)
                 End If
-
-                Static lastFrameTime = IMU_TimeStamp
-                IMU_FrameTime = IMU_TimeStamp - lastFrameTime
-                lastFrameTime = IMU_TimeStamp
-                totalMS += IMU_FrameTime
 
                 color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorBytes)
                 RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
@@ -153,19 +148,12 @@ Public Class CameraD400Series
                 leftView = New cv.Mat(h, w, cv.MatType.CV_8U, leftViewBytes)
                 rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rightViewBytes)
                 pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
-                frameCount += 1
-                newImagesAvailable = True
-                imageCounter += 1
             End SyncLock
 
         Catch ex As Exception
             Console.WriteLine("Error in CustomProcessingBlock: " + ex.Message)
             failedImageCount += 1
         End Try
-        If totalMS > 1000 Then
-            Console.WriteLine("image = " + CStr(imageCounter) + " internal camera FPS")
-            imageCounter = 0
-            totalMS = 0
-        End If
+        MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
 End Class

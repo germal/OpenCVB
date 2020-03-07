@@ -24,20 +24,17 @@ class t265sgm
 {
 private:
 public:
-	Mat disparity;
+	Mat disp16s;
 	Ptr<StereoSGBM> stereo;
 	t265sgm(int minDisp, int windowSize, int numDisp)
 	{
 		//stereo = cv::StereoSGBM::create(0, 112, 16, 8 * 3 * 25, 32 * 3 * 25, 1, 0, 10, 100, 32);
 		stereo = cv::StereoSGBM::create(minDisp, numDisp, 16, 8 * 3 * windowSize * windowSize, 32 * 3 * windowSize * windowSize, 1, 0, 10, 100, 32);
 	}
-	void Run(Mat leftimg, Mat rightimg, int maxDisp)
+	Mat Run(Mat leftimg, Mat rightimg, int maxDisp)
 	{
-		Mat disp16s;
 		stereo->compute(leftimg, rightimg, disp16s);
-		Rect validRect = Rect(maxDisp, 0, disp16s.cols - maxDisp, disp16s.rows);
-		disp16s = disp16s(validRect);
-		disp16s.convertTo(disparity, CV_32F, 1.0f / 16.0f);
+		return disp16s;
 	}
 };
 
@@ -65,6 +62,8 @@ public:
 	rs2_extrinsics extrinsics;
 	int stereo_width_px;
 	int stereo_height_px;
+	rs2_pose pose_data;
+	double IMU_TimeStamp;
 
 private:
 	int width, height;
@@ -95,7 +94,6 @@ private:
 	double stereo_cx;
 	double stereo_cy;
 	cv::Size stereo_size;
-	bool IMUpresent = true;
 	rs2::frame leftImage;
 	rs2::frame rightImage;
 
@@ -121,6 +119,8 @@ public:
 		height = h;
 
 		cfg.enable_stream(RS2_STREAM_POSE, RS2_FORMAT_6DOF);
+		cfg.enable_stream(RS2_STREAM_GYRO);
+		cfg.enable_stream(RS2_STREAM_ACCEL);
 		cfg.enable_stream(RS2_STREAM_FISHEYE, 1, RS2_FORMAT_Y8);
 		cfg.enable_stream(RS2_STREAM_FISHEYE, 2, RS2_FORMAT_Y8);
 
@@ -208,10 +208,11 @@ public:
 	int *waitForFrame()
 	{
 		auto frameset = pipeline.wait_for_frames(1000);
-		// Get a frame from the pose stream
+		
 		auto f = frameset.first_or_default(RS2_STREAM_POSE);
 		// Cast the frame to pose_frame and get its data
-		auto pose_data = f.as<rs2::pose_frame>().get_pose_data();
+		pose_data = f.as<rs2::pose_frame>().get_pose_data();
+		IMU_TimeStamp = f.get_timestamp();
 
 		auto fs = frameset.as<rs2::frameset>();
 		leftImage = fs.get_fisheye_frame(1);
@@ -229,11 +230,9 @@ public:
 		cv::remap(leftViewRaw, remapLeft, lm1, lm2, INTER_LINEAR);
 		cv::remap(rightViewRaw, remapRight, rm1, rm2, INTER_LINEAR);
 
-
 		Mat disp16s;
 		//stereoPtr->compute(remapLeft, remapRight, disp16s);
-		sgm->Run(remapLeft, remapRight, maxDisp);
-		disp16s = sgm->disparity;
+		disp16s = sgm->Run(remapLeft, remapRight, maxDisp);
 
 		Rect validRect = Rect(maxDisp, 0, disp16s.cols - maxDisp, disp16s.rows);
 		disp16s = disp16s(validRect);
@@ -332,16 +331,28 @@ int* T265RGBDepth(t265Camera * tp)
 }
 
 extern "C" __declspec(dllexport)
+int* T265PoseData(t265Camera * tp)
+{
+	return (int*)&tp->pose_data;
+}
+
+extern "C" __declspec(dllexport)
+double T265TimeStamp(t265Camera * tp)
+{
+	return tp->IMU_TimeStamp;
+}
+
+extern "C" __declspec(dllexport)
 int* T265WaitFrame(t265Camera * kc, void* color, void* depthRGB)
 {
 	return kc->waitForFrame();
 }
 
 extern "C" __declspec(dllexport)
-float T265GetEpochTime(double pose_time_ms)
+float T265timeStampLatency(double timeStampMS)
 {
 	auto now = std::chrono::system_clock::now().time_since_epoch();
-	double now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
-	return static_cast<float>(std::max(0., (now_ms - pose_time_ms) / 1000.));
-}
+	double now_ms = static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(now).count());
 
+	return static_cast<float>(std::max(0., (now_ms - timeStampMS)));
+}

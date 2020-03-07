@@ -274,6 +274,7 @@ Public Class IMU_Latency : Implements IDisposable
         Dim resetCounter = 1000
         If ocvb.frameCount = 0 Then myStopWatch.Start()
         CPUinterval = myStopWatch.ElapsedMilliseconds
+
         Dim ms = CPUinterval - syncShift
 
         Static lastIMUtime = ocvb.parms.IMU_TimeStamp
@@ -287,15 +288,20 @@ Public Class IMU_Latency : Implements IDisposable
             timeOffset = k1.stateResult
         End If
 
-        positiveDelta = Math.Max(0, ms + timeOffset - IMUinterval) ' it is essential that this value be positive
-        Dim rawDelta = ms + timeOffset - IMUinterval
-        k2.inputReal = positiveDelta
+        'positiveDelta = Math.Abs(ms + timeOffset - IMUinterval) ' it is essential that this value be positive
+
+        Dim rawDelta = Math.Abs(ms + timeOffset - IMUinterval) '  ms + timeOffset - IMUinterval
+        ' if the interface to the camera provided a value, use that one...
+        If ocvb.parms.IMU_LatencyMS <> 0 Then rawDelta = ocvb.parms.IMU_LatencyMS
+
+        k2.inputReal = rawDelta ' positiveDelta
         k2.Run(ocvb)
         smoothedLatency = k2.stateResult
         If smoothedLatency < 1 Then smoothedLatency = 1
         If externalUse = False Then
             plot.plotData = New cv.Scalar(smoothedLatency, 0, rawDelta, 0)
             plot.Run(ocvb)
+
             Static lastXdelta As New List(Of Single)
             lastXdelta.Add(rawDelta)
             If lastXdelta.Count >= ocvb.color.Width Then lastXdelta.Remove(0)
@@ -330,16 +336,16 @@ Public Class IMU_Latency : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType("smoothed Latency (ms) = " + Format(smoothedLatency, "000.00") + " forced positive values are smoothed with Kalman filter and plotted in Blue", 10, 120))
             ocvb.putText(New ActiveClass.TrueType("timeOffset ms = " + Format(timeOffset, "000.00") +
                                                   " When the raw value is negative, the smoothed value is offset with this value.", 10, 140))
-            ocvb.putText(New ActiveClass.TrueType("positiveDelta ms = " + Format(positiveDelta, "000.00") + " forced positive Delta ms", 10, 160))
+            'ocvb.putText(New ActiveClass.TrueType("positiveDelta ms = " + Format(positiveDelta, "000.00") + " forced positive Delta ms", 10, 160))
             ocvb.putText(New ActiveClass.TrueType("Off chart count = " + CStr(offChartValue), 10, 180))
-            ocvb.putText(New ActiveClass.TrueType("myFrameCount = " + CStr(myframeCount) + " - Use this to reset after " + CStr(resetCounter) + " frames", 10, 200))
+            ocvb.putText(New ActiveClass.TrueType("myFrameCount = " + CStr(myframeCount) + " - Use this to reset the plot scaling after " + CStr(resetCounter) + " frames", 10, 200))
             syncCount -= 1
-            If smoothedLatency > 10 Or myframeCount >= 1000 Or check.Box(0).Checked Or syncCount > 0 Then
+            If myframeCount >= 1000 Or check.Box(0).Checked Or syncCount > 0 Then
                 ocvb.putText(New ActiveClass.TrueType("Syncing the IMU and CPU Clocks", 10, 220))
             End If
             Static imuLast = IMUinterval
             Static cpuLast = CPUinterval
-            ocvb.putText(New ActiveClass.TrueType("IMU frame time (ms) " + Format(IMUinterval - imuLast, "0."), 10, 240))
+            ocvb.putText(New ActiveClass.TrueType("IMU frame time (ms) " + Format(ocvb.parms.IMU_FrameTime, "0."), 10, 240))
             ocvb.putText(New ActiveClass.TrueType("CPU frame time (ms) " + Format(CPUinterval - cpuLast, "0."), 10, 260))
             imuLast = IMUinterval
             cpuLast = CPUinterval
@@ -351,16 +357,16 @@ Public Class IMU_Latency : Implements IDisposable
         ' Clocks drift.  Here we sync up the IMU and CPU clocks by restarting the algorithm.  
         ' We could reset the Kalman object but the effect of the Kalman filter becomes quite apparent as the values shift to normal.
         myframeCount += 1
-        If smoothedLatency > 10 Or myframeCount >= resetCounter Or check.Box(0).Checked Then
+        If myframeCount >= resetCounter Or check.Box(0).Checked Then
             myframeCount = 0
             check.Box(0).Checked = False
-            syncShift += ms
+            syncShift += ms ' clock drift
             lastIMUtime = ocvb.parms.IMU_TimeStamp
-            smoothedLatency = 5 ' it is generally about 5 ms
+            smoothedLatency = 0
             timeOffset = 0
             positiveDelta = 0
             offChartValue = 1000 ' force the update to the scale.
-            syncCount = 30 ' show it for the next 30 frames.
+            syncCount = 30 ' show sync message for the next 30 frames.
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -377,6 +383,9 @@ End Class
 Public Class IMU_PlotIMUFrameTime : Implements IDisposable
     Public plot As Plot_OverTime
     Public CPUInterval As Double
+    Public clockDrift As Double
+    Dim kIMU As Kalman_Single
+    Dim kCPU As Kalman_Single
     Public Sub New(ocvb As AlgorithmData)
         plot = New Plot_OverTime(ocvb)
         plot.externalUse = True
@@ -388,22 +397,32 @@ Public Class IMU_PlotIMUFrameTime : Implements IDisposable
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 3
 
+        kIMU = New Kalman_Single(ocvb)
+        kCPU = New Kalman_Single(ocvb)
+
         ocvb.label2 = "Left scale is in milliseconds"
         ocvb.desc = "Plot both the IMU Frame time and the CPU frame time."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static myStopWatch As New System.Diagnostics.Stopwatch
-        If ocvb.frameCount = 0 Then myStopWatch.Start()
-        CPUinterval = myStopWatch.ElapsedMilliseconds
-        Dim ms = CPUInterval
-        Static cpuLast = CPUInterval
-        plot.plotData = New cv.Scalar(ocvb.parms.IMU_FrameTime, 0, CPUInterval - cpuLast, 0)
+        kIMU.inputReal = ocvb.parms.IMU_FrameTime
+        kIMU.Run(ocvb)
+        kCPU.inputReal = ocvb.parms.CPU_FrameTime
+        kCPU.Run(ocvb)
+
+        plot.plotData = New cv.Scalar(ocvb.parms.IMU_FrameTime, 0, ocvb.parms.CPU_FrameTime, 0)
         plot.Run(ocvb)
-        ocvb.putText(New ActiveClass.TrueType("IMU frame time (ms) " + Format(ocvb.parms.IMU_FrameTime, "0.00"), 10, 240))
-        ocvb.putText(New ActiveClass.TrueType("CPU frame time (ms) " + Format(CPUInterval - cpuLast, "0."), 10, 260))
-        cpuLast = CPUInterval
+        ocvb.putText(New ActiveClass.TrueType("IMU frame time (ms, in Blue) " + Format(ocvb.parms.IMU_FrameTime, "0.00") +
+                                              " smoothed = " + Format(kIMU.stateResult, "0.00"), 10, 60))
+        ocvb.putText(New ActiveClass.TrueType("CPU frame time (ms, in Red) " + Format(ocvb.parms.CPU_FrameTime, "0.00") +
+                                              " smoothed = " + Format(kCPU.stateResult, "0.00"), 10, 80))
+        ocvb.putText(New ActiveClass.TrueType("IMU_TimeStamp (ms) " + Format(ocvb.parms.IMU_TimeStamp, "0.00"), 10, 100))
+        ocvb.putText(New ActiveClass.TrueType("CPU_TimeSTamp (ms) " + Format(ocvb.parms.CPU_TimeStamp, "0.00"), 10, 120))
+        ocvb.putText(New ActiveClass.TrueType("Clock Separation (ms) " + Format(ocvb.parms.IMU_TimeStamp - ocvb.parms.CPU_TimeStamp, "0.00"), 10, 140))
+        clockDrift = ocvb.parms.CPU_TimeStamp - ocvb.parms.IMU_TimeStamp
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         plot.Dispose()
+        kIMU.Dispose()
+        kCPU.Dispose()
     End Sub
 End Class

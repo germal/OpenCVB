@@ -2,35 +2,38 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Module Kinect_Interface
-    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectOpen() As IntPtr
     End Function
-    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDeviceCount(cPtr As IntPtr) As Int32
     End Function
-    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDeviceName(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectWaitFrame(cPtr As IntPtr, RGBDepth As IntPtr) As IntPtr
     End Function
-    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectExtrinsics(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectintrinsicsLeft(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectPointCloud(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectRGBA(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDepth16(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Kinect4Azure.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDepthInColor(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function KinectIMULatencyMS(cPtr As IntPtr) As Double
     End Function
 End Module
 Public Class CameraKinect
@@ -110,8 +113,6 @@ Public Class CameraKinect
     End Sub
 
     Public Sub GetNextFrame()
-        Static totalMS As Double
-        Static imageCounter As Integer
         Dim imuFrame As IntPtr
         If cPtr = 0 Then Return
         Dim handleRGBDepth = GCHandle.Alloc(RGBDepthBytes, GCHandleType.Pinned)
@@ -142,10 +143,7 @@ Public Class CameraKinect
             imuGyro.Y = tmpVal
 
             IMU_TimeStamp = imuOutput.accelTimeStamp / 1000
-            Static lastFrameTime = IMU_TimeStamp
-            IMU_FrameTime = IMU_TimeStamp - lastFrameTime
-            lastFrameTime = IMU_TimeStamp
-            totalMS += IMU_FrameTime
+            IMU_LatencyMS = KinectIMULatencyMS(cPtr)
         End If
 
         handleRGBDepth.Free()
@@ -168,15 +166,8 @@ Public Class CameraKinect
                 Dim pc = New cv.Mat(h, w, cv.MatType.CV_16SC3, KinectPointCloud(cPtr))
                 pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3) ' This is less efficient than using 16-bit pixels but consistent with Intel cameras (and more widely accepted as normal.)
                 pointCloud *= pcMultiplier ' change to meters...
-                frameCount += 1
-                newImagesAvailable = True
             End SyncLock
-            imageCounter += 1
         End If
-        If totalMS > 1000 Then
-            Console.WriteLine("image = " + CStr(imageCounter) + " internal camera FPS.")
-            imageCounter = 0
-            totalMS = 0
-        End If
+        MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
 End Class

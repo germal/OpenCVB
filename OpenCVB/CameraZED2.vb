@@ -2,50 +2,50 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Module Zed2_Interface
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2Open(width As Int32, height As Int32, fps As Int32) As IntPtr
     End Function
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2SerialNumber(cPtr As IntPtr) As Int32
     End Function
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2WaitFrame(cPtr As IntPtr, rgba As IntPtr, depthRGBA As IntPtr, depth32f As IntPtr, left As IntPtr,
                                   right As IntPtr, pointCloud As IntPtr) As IntPtr
     End Function
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2Extrinsics(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2intrinsicsLeft(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2intrinsicsRight(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2Translation(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2RotationMatrix(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2Acceleration(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2AngularVelocity(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2IMU_Temperature(cPtr As IntPtr) As Single
     End Function
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2IMU_TimeStamp(cPtr As IntPtr) As Double
     End Function
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2IMU_Barometer(cPtr As IntPtr) As Single
     End Function
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2Orientation(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("StereoLabsZed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2IMU_Magnetometer(cPtr As IntPtr) As IntPtr
     End Function
 End Module
@@ -140,8 +140,6 @@ Public Class CameraZED2
     End Sub
 
     Public Sub GetNextFrame()
-        Static totalMS As Double
-        Static imageCounter As Integer
         If cPtr = 0 Then Return
         Dim handlecolorBytes = GCHandle.Alloc(colorBytes, GCHandleType.Pinned)
         Dim handleRGBADepthBytes = GCHandle.Alloc(RGBADepthBytes, GCHandleType.Pinned)
@@ -201,10 +199,8 @@ Public Class CameraZED2
             IMU_Temperature = Zed2IMU_Temperature(cPtr)
 
             IMU_TimeStamp = Zed2IMU_TimeStamp(cPtr)
-            Static lastFrameTime = IMU_TimeStamp
-            IMU_FrameTime = IMU_TimeStamp - lastFrameTime
-            lastFrameTime = IMU_TimeStamp
-            totalMS += IMU_FrameTime
+            Static imuStartTime = IMU_TimeStamp
+            IMU_TimeStamp -= imuStartTime
 
             Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBytes)
             color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
@@ -220,14 +216,7 @@ Public Class CameraZED2
             leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftViewBytes)
             rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightViewBytes)
             pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes) * pcMultiplier ' change to meters...
-            newImagesAvailable = True
-            frameCount += 1
-            imageCounter += 1
         End SyncLock
-        If totalMS > 1000 Then
-            Console.WriteLine("image = " + CStr(imageCounter) + " internal camera FPS")
-            imageCounter = 0
-            totalMS = 0
-        End If
+        MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
 End Class

@@ -5,7 +5,6 @@ Public Class BlockMatching_Basics : Implements IDisposable
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         colorizer = New Depth_Colorizer_1_CPP(ocvb)
-        colorizer.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Blockmatch scale", 1, 200, 100)
         sliders.setupTrackBar2(ocvb, "Blockmatch max disparity", 1, 8, 1)
@@ -44,7 +43,7 @@ Public Class BlockMatching_Basics : Implements IDisposable
         blockMatch.compute(ocvb.leftView, ocvb.rightView, disparity)
         colorizer.src = disparity
         colorizer.Run(ocvb)
-        ocvb.result1 = colorizer.dst.Resize(ocvb.color.Size())
+        ocvb.result1 = ocvb.result1.Resize(ocvb.color.Size())
         ocvb.result2 = ocvb.rightView.Resize(ocvb.color.Size())
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

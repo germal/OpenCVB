@@ -2,50 +2,50 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Module MyntD_Interface
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDOpen(width As Int32, height As Int32, fps As Int32) As IntPtr
     End Function
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDSerialNumber(cPtr As IntPtr) As Int32
     End Function
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDWaitFrame(cPtr As IntPtr, rgba As IntPtr, depthRGBA As IntPtr, depth32f As IntPtr, left As IntPtr,
                                   right As IntPtr, pointCloud As IntPtr) As IntPtr
     End Function
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDExtrinsics(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDintrinsicsLeft(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDintrinsicsRight(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDTranslation(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDRotationMatrix(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDAcceleration(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDAngularVelocity(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDIMU_Temperature(cPtr As IntPtr) As Single
     End Function
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDIMU_TimeStamp(cPtr As IntPtr) As Double
     End Function
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDIMU_Barometer(cPtr As IntPtr) As Single
     End Function
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDOrientation(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("MyntD1000.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDIMU_Magnetometer(cPtr As IntPtr) As IntPtr
     End Function
 End Module
@@ -214,8 +214,7 @@ Public Class CameraMyntD
             leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftViewBytes)
             rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightViewBytes)
             pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes) * pcMultiplier ' change to meters...
-            newImagesAvailable = True
-            frameCount += 1
         End SyncLock
+        MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
 End Class

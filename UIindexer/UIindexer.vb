@@ -6,6 +6,7 @@ Module IndexMain
     Dim CSnames As New SortedList(Of String, String)
     Dim OpenGLnames As New SortedList(Of String, String)
     Dim PYnames As New SortedList(Of String, String)
+    Dim nonPYnames As New SortedList(Of String, String)
     Dim PYStreamNames As New SortedList(Of String, String)
     Dim Painterly As New SortedList(Of String, String)
     Private Function trimQuotes(line As String)
@@ -53,6 +54,7 @@ Module IndexMain
                 If line.EndsWith("_MT.py") Then MTnames.Add(line, line)
             Else
                 If line <> "" Then
+                    nonPYnames.Add(line, line)
                     apiList.Add(line)
                     apiListLCase.Add(LCase(line))
                 End If
@@ -143,6 +145,12 @@ Module IndexMain
         sw.Write("<Multi-Threaded Algorithms>")
         For i = 0 To MTnames.Count - 1
             sw.Write("," + MTnames.ElementAt(i).Key)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<non-Python>")
+        For i = 0 To nonPYnames.Count - 1
+            sw.Write("," + nonPYnames.ElementAt(i).Key)
         Next
         sw.WriteLine()
 

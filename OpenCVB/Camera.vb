@@ -1,4 +1,5 @@
 ﻿Imports cv = OpenCvSharp
+Imports System.Numerics
 Public Class Camera
     Public pipelineClosed As Boolean = False
     Public transformationMatrix() As Single
@@ -13,6 +14,8 @@ Public Class Camera
     Public IMU_AngularAcceleration As cv.Point3f
     Public IMU_AngularVelocity As cv.Point3f
     Public IMU_FrameTime As Double
+    Public CPU_TimeStamp As Double
+    Public CPU_FrameTime As Double
     Public frameCount As Integer
     Public pcMultiplier As Single = 1
     Public pointCloud As cv.Mat
@@ -44,9 +47,10 @@ Public Class Camera
     Public pointCloudBytes() As Byte
     Public serialNumber As String
     Public failedImageCount As Int32
-    Public cPtr As IntPtr
     Public modelInverse As Boolean
     Public newImagesAvailable As Boolean
+    Public IMU_LatencyMS As Double
+    Public cPtr As IntPtr
     Public Structure imuDataStruct
         Dim r00 As Single
         Dim r01 As Single
@@ -65,10 +69,46 @@ Public Class Camera
         Dim m32 As Single
         Dim m33 As Single
     End Structure
+    Structure PoseData
+        Public translation As cv.Point3f
+        Public velocity As cv.Point3f
+        Public acceleration As cv.Point3f
+        Public rotation As Quaternion
+        Public angularVelocity As cv.Point3f
+        Public angularAcceleration As cv.Point3f
+        Public trackerConfidence As Int32
+        Public mapperConfidence As Int32
+    End Structure
     Public Sub New()
         pointCloud = New cv.Mat()
         disparity = New cv.Mat()
         depth16 = New cv.Mat()
+    End Sub
+    Public Sub GetNextFrameCounts(frameTime As Double)
+        Static imageCounter As Integer
+        Static totalMS = frameTime
+        If totalMS > 1000 Then
+            'Console.WriteLine("image = " + CStr(imageCounter) + " internal camera FPS")
+            imageCounter = 0
+            totalMS = 0
+        End If
+        imageCounter += 1
+        totalMS += frameTime
+
+        Static lastFrameTime = IMU_TimeStamp
+        Static imuStartTime = IMU_TimeStamp
+        IMU_FrameTime = IMU_TimeStamp - lastFrameTime - imuStartTime
+        lastFrameTime = IMU_TimeStamp - imuStartTime
+
+        Static myStopWatch As New System.Diagnostics.Stopwatch
+        If frameCount = 0 Then myStopWatch.Start()
+        CPU_TimeStamp = myStopWatch.ElapsedMilliseconds
+        Static lastCPUTime = CPU_TimeStamp
+        CPU_FrameTime = CPU_TimeStamp - lastCPUTime
+        lastCPUTime = CPU_TimeStamp
+
+        frameCount += 1
+        newImagesAvailable = True
     End Sub
     Public Sub closePipe()
         pipelineClosed = True

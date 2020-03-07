@@ -203,7 +203,7 @@ Public Class Blob_Rectangles : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blobs.Run(ocvb)
-        ocvb.result1 = ocvb.color
+        ocvb.result1 = ocvb.color.Clone()
         Static blobCount As Int32
         If blobCount <> blobs.rects.Count Then
             blobCount = blobs.rects.Count

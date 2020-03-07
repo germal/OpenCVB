@@ -1,3 +1,5 @@
+#include "../CameraDefines.hpp"
+#ifdef MYNTD_1000
 #include <iostream>
 #include <iomanip>
 #include <cstring>
@@ -188,4 +190,4 @@ extern "C" __declspec(dllexport) int* MyntDWaitFrame(CameraMyntD* MyntD, void* r
 //	MyntD->sensordata.temperature.get(sl::SensorsData::TemperatureData::SENSOR_LOCATION::IMU, MyntD->imuTemperature);
 //	return MyntD->imuTemperature;
 //}
-
+#endif

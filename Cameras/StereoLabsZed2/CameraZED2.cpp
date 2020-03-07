@@ -1,3 +1,6 @@
+#include "../CameraDefines.hpp"
+#ifdef STEREOLAB_INSTALLED
+
 #include <iostream>
 #include <iomanip>
 #include <cstring>
@@ -184,3 +187,4 @@ extern "C" __declspec(dllexport)float Zed2IMU_Temperature(StereoLabsZed2 * Zed2)
 	return Zed2->imuTemperature;
 }
 
+#endif

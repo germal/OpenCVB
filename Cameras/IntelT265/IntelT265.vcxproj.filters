@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cameraT265.cpp">
+    <ClCompile Include="cameraT265Native.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

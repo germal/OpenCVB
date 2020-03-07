@@ -2,11 +2,9 @@
 Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Imports System.Numerics
-Imports System.Threading
 Module T265_Module
-    <DllImport(("Camera_IntelT265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265GetEpochTime(timeStamp As Double) As Single
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265timeStampLatency(timeStamp As Double) As Single
     End Function
 End Module
 
@@ -72,6 +70,7 @@ Public Class CameraT265
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
         deviceName = "Intel T265"
+        IMU_Present = True
         w = width
         h = height
 
@@ -170,19 +169,7 @@ Public Class CameraT265
         leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, 0)
         rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, 0)
         ReDim vertices(w * h * 4 * 3 - 1) ' 3 floats or 12 bytes per pixel.  
-
-        IMU_Present = True
     End Sub
-    Structure PoseData
-        Public translation As cv.Point3f
-        Public velocity As cv.Point3f
-        Public acceleration As cv.Point3f
-        Public rotation As Quaternion
-        Public angularVelocity As cv.Point3f
-        Public angularAcceleration As cv.Point3f
-        Public trackerConfidence As Int32
-        Public mapperConfidence As Int32
-    End Structure
     Public Sub GetNextFrame()
         If pipelineClosed Then Exit Sub
         Dim frameset = pipeline.WaitForFrames(1000)
@@ -214,6 +201,7 @@ Public Class CameraT265
                     IMU_Velocity = pose.velocity
                     IMU_AngularAcceleration = pose.angularAcceleration
                     IMU_AngularVelocity = pose.angularVelocity
+                    IMU_LatencyMS = T265timeStampLatency(IMU_TimeStamp)
                     Dim t = IMU_Translation
                     '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
                     Dim mat() As Single = {
@@ -285,7 +273,7 @@ Public Class CameraT265
         End Select
 
         If totalMS > 1000 Then
-            Console.WriteLine("image = " + CStr(imageCounter) + " internal camera FPS.")
+            'Console.WriteLine("image = " + CStr(imageCounter) + " internal camera FPS.")
             imageCounter = 0
             totalMS = 0
         End If

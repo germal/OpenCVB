@@ -59,10 +59,6 @@ Public Class OpenCVB
     Dim textDesc As String = ""
     Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.ActiveClass.TrueType)
     Dim vtkDirectory As String = ""
-    Dim myStopWatch As New System.Diagnostics.Stopwatch
-    Dim lastRefreshTime As Double
-    Const MIN_REFRESH_TIME As Integer = 32 ' if a refresh is requested more that x milliseconds then execute it.  Otherwise pass...
-    Dim skipRefreshCount As Integer
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim args() = Environment.GetCommandLineArgs()
@@ -84,10 +80,35 @@ Public Class OpenCVB
         HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
 
 #If DEBUG Then
-        ' Camera DLL's are built in Release mode even when configured for Debug (for performance while debugging).  
-        ' It is not likely they will need debugging and it runs faster in Debug mode.
+        ' Camera DLL's are built in Release mode even when configured for Debug (for performance while debugging algorithms).  
+        ' It is not likely they will need debugging and the camera interface runs a lot faster in Debug mode.
         Dim releaseDir = HomeDir.FullName + "\bin\Release\"
         updatePath(releaseDir, "Release Version of camera DLL's.")
+
+        ' check to make sure there are no camera dll's in the Debug directory by mistake!
+        For i = 0 To 3
+            Dim dllName = Choose(i + 1, "Cam_Kinect4.dll", "Cam_MyntD.dll", "Cam_T265.dll", "Cam_Zed2.dll")
+            Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
+            If dllFile.Exists Then
+                MsgBox(dllFile.Name + "was built in the Debug directory." + vbCrLf + "Camera dll's are built in Release" + vbCrLf +
+                       "for performance.  If you need to debug the camera" + vbCrLf + "interface, edit this message.")
+                End
+            End If
+        Next
+
+        Dim myntSDKready As Boolean
+        Dim zed2SDKready As Boolean
+        ' now check if the Mynt D camera or StereoLabs Zed2 camera are installed with the SDK.  (If tiny, then not installed.)
+        Dim releaseDLL = New FileInfo(HomeDir.FullName + "\bin\Release\Cam_MyntD.dll")
+        Dim debugDLL = New FileInfo(HomeDir.FullName + "\bin\Debug\Cam_MyntD.dll")
+        If releaseDLL.Exists Then If releaseDLL.Length > 13000 Then myntSDKready = True
+        If debugDLL.Exists Then If debugDLL.Length > 13000 Then myntSDKready = True
+
+        releaseDLL = New FileInfo(HomeDir.FullName + "\bin\Release\Cam_Zed2.dll")
+        debugDLL = New FileInfo(HomeDir.FullName + "\bin\Debug\Cam_Zed2.dll")
+        If releaseDLL.Exists Then If releaseDLL.Length > 13000 Then zed2SDKready = True
+        If debugDLL.Exists Then If debugDLL.Length > 13000 Then zed2SDKready = True
+
         Dim IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Debug\"
         updatePath(IntelPERC_Lib_Dir, "Realsense camera support.")
         Dim Kinect_Dir = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\"
@@ -110,11 +131,11 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
-        cameraT265 = New CameraT265()
+        cameraT265 = New CameraT265Native() ' CameraT265() ' 
         cameraT265.deviceCount = USBenumeration("T265")
         If cameraT265.deviceCount > 0 Then cameraT265.initialize(fps, regWidth, regHeight)
 
-        cameraD400Series = New CameraD400Series()
+        cameraD400Series = New CameraD400()
         cameraD400Series.deviceCount = USBenumeration("Depth Camera 435")
         cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 415 Depth")
         cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 435 With RGB Module Depth")
@@ -139,51 +160,34 @@ Public Class OpenCVB
             End If
         End If
 
-        If optionsForm.EnableAltCams.Checked Then
-            cameraZed2 = New CameraZED2()
-            cameraZed2.deviceCount = USBenumeration("ZED 2")
-            If cameraZed2.deviceCount > 0 Then
-                Dim Zed2DLL As New FileInfo(HomeDir.FullName + "bin/debug/StereoLabsZed2.dll")
-                If Zed2DLL.Exists = False Then Zed2DLL = New FileInfo(HomeDir.FullName + "bin/Release/StereoLabsZed2.dll")
-                If Zed2DLL.Exists = False Then
-                    MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
-                           "StereoLabsZed2.DLL has not been built yet." + vbCrLf + vbCrLf +
-                           "Add the StereoLabsZed2 project to the OpenCVB solution." + vbCrLf +
-                           "The StereoLabsZed2 project is in the Cameras Directory." + vbCrLf +
-                           "Update the Project Dependencies for OpenCVB to include it." + vbCrLf +
-                           "If you have not already done so, go to stereolabs.com" + vbCrLf +
-                           "and download and install the Version 3 SDK so that the " + vbCrLf +
-                           "OpenCVB's StereoLabsZed2.dll project will build." + vbCrLf + vbCrLf +
-                           "For extra performance, use Build Configuration to" + vbCrLf +
-                           "to always use StereolabsZed2.dll in Release mode." + vbCrLf +
-                           "Delete any Debug version to see performance boost.")
-                    cameraZed2.deviceCount = 0 ' we can't use this device
-                Else
-                    cameraZed2.initialize(fps, regWidth, regHeight)
-                End If
+        cameraZed2 = New CameraZED2()
+        cameraZed2.deviceCount = USBenumeration("ZED 2")
+        If cameraZed2.deviceCount > 0 Then
+            If zed2SDKready = False Then
+                MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
+                       "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
+                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
+                       "and rebuild OpenCVB with the MYNT SDK." + vbCrLf + vbCrLf +
+                       "Also, add environmental variable " + vbCrLf +
+                       "MYNTEYE_DEPTHLIB_OUTPUT" + vbCrLf +
+                       "to point to '<MYNT_SDK_DIR>/_output'.")
+                cameraZed2.deviceCount = 0 ' we can't use this device
+            Else
+                cameraZed2.initialize(fps, regWidth, regHeight)
             End If
+        End If
 
-            cameraMyntD = New CameraMyntD()
-            cameraMyntD.deviceCount = USBenumeration("MYNT-EYE-D1000")
-            If cameraMyntD.deviceCount > 1 Then
-                Dim MyntDLL As New FileInfo(HomeDir.FullName + "bin/debug/MyntD1000.dll")
-                If MyntDLL.Exists = False Then MyntDLL = New FileInfo(HomeDir.FullName + "bin/Release/MyntD1000.dll")
-                If MyntDLL.Exists = False Then
-                    MsgBox("A MyntD 1000 camera is present but OpenCVB's" + vbCrLf +
-                           "MyntD1000.DLL has not been built yet." + vbCrLf + vbCrLf +
-                           "Add the MyntD1000 project to the OpenCVB solution." + vbCrLf +
-                           "The MyntD1000 project is in the Cameras Directory." + vbCrLf +
-                           "Update the Project Dependencies for OpenCVB to include it." + vbCrLf +
-                           "If you have not already done so, go to MYNT Eye Website" + vbCrLf +
-                           "(see Readme.md) and install the latest SDK so that the " + vbCrLf +
-                           "OpenCVB's MyntD1000.dll project will build." + vbCrLf + vbCrLf +
-                           "For extra performance, use Build Configuration to" + vbCrLf +
-                           "to always use MyntD1000.dll in Release mode." + vbCrLf +
-                           "Delete any Debug version to see performance boost.")
-                    cameraMyntD.deviceCount = 0 ' we can't use this device
-                Else
-                    cameraMyntD.initialize(fps, regWidth, regHeight)
-                End If
+        cameraMyntD = New CameraMyntD()
+        cameraMyntD.deviceCount = USBenumeration("MYNT-EYE-D1000")
+        If cameraMyntD.deviceCount > 0 Then
+            If myntSDKready = False Then
+                MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
+                       "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
+                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
+                       "and rebuild OpenCVB with the StereoLabs SDK.")
+                cameraMyntD.deviceCount = 0 ' we can't use this device
+            Else
+                cameraMyntD.initialize(fps, regWidth, regHeight)
             End If
         End If
 
@@ -234,47 +238,28 @@ Public Class OpenCVB
 
         TestAllTimer.Interval = optionsForm.TestAllDuration.Text * 1000
         FindPython()
-        myStopWatch.Start()
     End Sub
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
-        lastRefreshTime = myStopWatch.ElapsedMilliseconds
         Dim g As Graphics = e.Graphics
         Try
-            SyncLock camPic ' avoid updating the image while copying into it in the algorithm and camera tasks
-                If camera.color IsNot Nothing Then
-                    If camera.color.Width <> camPic(0).Width Or camera.Color.Height <> camPic(0).Height Or
-                               camera.RGBDepth.Width <> camPic(1).Width Or camera.RGBDepth.Height <> camPic(1).Height Then
-
-                        Dim color = camera.color
-                        Dim RGBDepth = camera.RGBDepth
-                        color = color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
-                        RGBDepth = RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
-                        cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
-                        cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
-                    Else
-                        cvext.BitmapConverter.ToBitmap(camera.Color, camPic(0).Image)
-                        cvext.BitmapConverter.ToBitmap(camera.RGBDepth, camPic(1).Image)
-                    End If
-
-                    If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Or
+            Dim pic = DirectCast(sender, PictureBox)
+            g.ScaleTransform(1, 1)
+            g.DrawImage(pic.Image, 0, 0)
+            g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
+            SyncLock formResult1
+                If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Or
                                 formResult2.Width <> camPic(3).Width Or formResult2.Height <> camPic(3).Height Then
 
-                        Dim result1 = formResult1
-                        Dim result2 = formResult2
-                        result1 = result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
-                        result2 = result2.Resize(New cv.Size(camPic(3).Size.Width, camPic(3).Size.Height))
-                        cvext.BitmapConverter.ToBitmap(result1, camPic(2).Image)
-                        cvext.BitmapConverter.ToBitmap(result2, camPic(3).Image)
-                    Else
-                        cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
-                        cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
-                    End If
+                    Dim result1 = formResult1
+                    Dim result2 = formResult2
+                    result1 = result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
+                    result2 = result2.Resize(New cv.Size(camPic(3).Size.Width, camPic(3).Size.Height))
+                    cvext.BitmapConverter.ToBitmap(result1, camPic(2).Image)
+                    cvext.BitmapConverter.ToBitmap(result2, camPic(3).Image)
+                Else
+                    cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
+                    cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
                 End If
-                Dim pic = DirectCast(sender, PictureBox)
-                g.ScaleTransform(1, 1)
-                g.DrawImage(pic.Image, 0, 0)
-                g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
-
                 If optionsForm.ShowLabels.Checked Then
                     ' with the low resolution display, we need to use the entire width of the image to display the RGB and Depth text area.
                     Dim textRect As New Rectangle(0, 0, pic.Width / 2, If(resizeForDisplay = 4, 12, 20))
@@ -295,6 +280,23 @@ Public Class OpenCVB
                     maxline -= 1
                     If maxline <= 0 Then Exit For
                 Next
+            End SyncLock
+            SyncLock camPic ' avoid updating the image while copying into it in the algorithm and camera tasks
+                If camera.color IsNot Nothing Then
+                    If camera.color.Width <> camPic(0).Width Or camera.Color.Height <> camPic(0).Height Or
+                               camera.RGBDepth.Width <> camPic(1).Width Or camera.RGBDepth.Height <> camPic(1).Height Then
+
+                        Dim color = camera.color
+                        Dim RGBDepth = camera.RGBDepth
+                        color = color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
+                        RGBDepth = RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
+                        cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
+                        cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
+                    Else
+                        cvext.BitmapConverter.ToBitmap(camera.Color, camPic(0).Image)
+                        cvext.BitmapConverter.ToBitmap(camera.RGBDepth, camPic(1).Image)
+                    End If
+                End If
             End SyncLock
         Catch ex As Exception
             Console.WriteLine("Paint exception occurred: " + ex.Message)
@@ -666,9 +668,6 @@ Public Class OpenCVB
         Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " + camera.deviceName +
                   " FPS = " + Format(cameraFPS, "#0.0") + ", Algorithm FPS = " + Format(fps, "#0.0")
         If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
-
-        Console.WriteLine(CStr(skipRefreshCount) + " skips per second")
-        skipRefreshCount = 0
     End Sub
     Private Sub saveLayout()
         SaveSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
@@ -858,16 +857,9 @@ Public Class OpenCVB
         ActivateTimer.Enabled = True
         fpsTimer.Enabled = True
     End Sub
-
     Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
-        Dim currTime = myStopWatch.ElapsedMilliseconds
-        If currTime - lastRefreshTime < MIN_REFRESH_TIME Then
-            skipRefreshCount += 1
-            Exit Sub
-        End If
         Me.Refresh()
     End Sub
-
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
         If parms.testAllRunning Then
             AlgorithmTestCount += 1
@@ -939,7 +931,10 @@ Public Class OpenCVB
                 OpenCVB.ocvb.parms.IMU_Velocity = camera.IMU_Velocity
                 OpenCVB.ocvb.parms.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
                 OpenCVB.ocvb.parms.IMU_AngularVelocity = camera.IMU_AngularVelocity
+                OpenCVB.ocvb.parms.IMU_LatencyMS = camera.IMU_LatencyMS
                 OpenCVB.ocvb.parms.IMU_FrameTime = camera.IMU_FrameTime
+                OpenCVB.ocvb.parms.CPU_TimeStamp = camera.CPU_TimeStamp
+                OpenCVB.ocvb.parms.CPU_FrameTime = camera.CPU_FrameTime
             End SyncLock
             OpenCVB.UpdateHostLocation(Me.Left, Me.Top, Me.Height)
 
@@ -969,7 +964,7 @@ Public Class OpenCVB
                 picLabels(3) = OpenCVB.ocvb.label2
                 If RefreshAvailable Then
                     ' share the results of the algorithm task.
-                    SyncLock camPic
+                    SyncLock formResult1
                         formResult1 = OpenCVB.ocvb.result1.Clone()
                         formResult2 = OpenCVB.ocvb.result2.Clone()
                         For i = VB_Classes.ActiveClass._RESULT1 To VB_Classes.ActiveClass._RESULT2
@@ -1025,21 +1020,7 @@ Public Class OpenCVB
     End Sub
     Private Sub CameraTask()
         While stopCameraThread = False
-            ' do we need this anymore?
-            'Dim currTime = myStopWatch.ElapsedMilliseconds
-            'If currTime - lastRefreshTime > MIN_REFRESH_TIME Then
-            '    Me.Invoke(Sub()
-            '                  Me.Refresh()
-            '              End Sub
-            '        )
-            'End If
-
             camera.GetNextFrame()
-            ' some cameras may be configured for callbacks that may not have images yet.
-            Static lastFrame = camera.frameCount
-            If lastFrame = camera.framecount Then Continue While
-            lastFrame = camera.framecount
-
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
         camera.frameCount = 0
