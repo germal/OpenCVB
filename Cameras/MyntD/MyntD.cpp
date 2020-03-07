@@ -1,5 +1,11 @@
 #include "../CameraDefines.hpp"
 #ifdef MYNTD_1000
+#ifdef DEBUG
+#pragma comment(lib, "opencv_world343d.lib")
+#else
+#pragma comment(lib, "opencv_world343.lib")
+#endif
+#pragma comment(lib, "mynteye_depth.lib") 
 #include <iostream>
 #include <iomanip>
 #include <cstring>
