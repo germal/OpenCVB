@@ -96,12 +96,17 @@ Public Class OpenCVB
             End If
         Next
 
+        Dim IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Debug\"
+        updatePath(IntelPERC_Lib_Dir, "Realsense camera support.")
+        Dim Kinect_Dir = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\"
+        updatePath(Kinect_Dir, "Kinect camera support.")
+#End If
         Dim myntSDKready As Boolean
         Dim zed2SDKready As Boolean
         ' now check if the Mynt D camera or StereoLabs Zed2 camera are installed with the SDK.  (If tiny, then not installed.)
         Dim releaseDLL = New FileInfo(HomeDir.FullName + "\bin\Release\Cam_MyntD.dll")
         Dim debugDLL = New FileInfo(HomeDir.FullName + "\bin\Debug\Cam_MyntD.dll")
-        If releaseDLL.Exists Then If releaseDLL.Length > 13000 Then myntSDKready = True
+        If releaseDLL.Exists Then If releaseDLL.Length > 11000 Then myntSDKready = True
         If debugDLL.Exists Then If debugDLL.Length > 13000 Then myntSDKready = True
 
         releaseDLL = New FileInfo(HomeDir.FullName + "\bin\Release\Cam_Zed2.dll")
@@ -109,11 +114,6 @@ Public Class OpenCVB
         If releaseDLL.Exists Then If releaseDLL.Length > 13000 Then zed2SDKready = True
         If debugDLL.Exists Then If debugDLL.Length > 13000 Then zed2SDKready = True
 
-        Dim IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Debug\"
-        updatePath(IntelPERC_Lib_Dir, "Realsense camera support.")
-        Dim Kinect_Dir = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\"
-        updatePath(Kinect_Dir, "Kinect camera support.")
-#End If
         Dim librealsenseRelease = HomeDir.FullName + "librealsense\build\Release\"
         updatePath(librealsenseRelease, "Realsense camera support.")
 
@@ -164,13 +164,10 @@ Public Class OpenCVB
         cameraZed2.deviceCount = USBenumeration("ZED 2")
         If cameraZed2.deviceCount > 0 Then
             If zed2SDKready = False Then
-                MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
-                       "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
+                MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
+                       "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
                        "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-                       "and rebuild OpenCVB with the MYNT SDK." + vbCrLf + vbCrLf +
-                       "Also, add environmental variable " + vbCrLf +
-                       "MYNTEYE_DEPTHLIB_OUTPUT" + vbCrLf +
-                       "to point to '<MYNT_SDK_DIR>/_output'.")
+                       "and rebuild OpenCVB with the StereoLabs SDK.")
                 cameraZed2.deviceCount = 0 ' we can't use this device
             Else
                 cameraZed2.initialize(fps, regWidth, regHeight)
@@ -181,10 +178,13 @@ Public Class OpenCVB
         cameraMyntD.deviceCount = USBenumeration("MYNT-EYE-D1000")
         If cameraMyntD.deviceCount > 0 Then
             If myntSDKready = False Then
-                MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
-                       "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
+                MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
+                       "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
                        "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-                       "and rebuild OpenCVB with the StereoLabs SDK.")
+                       "and rebuild OpenCVB with the MYNT SDK." + vbCrLf + vbCrLf +
+                       "Also, add environmental variable " + vbCrLf +
+                       "MYNTEYE_DEPTHLIB_OUTPUT" + vbCrLf +
+                       "to point to '<MYNT_SDK_DIR>/_output'.")
                 cameraMyntD.deviceCount = 0 ' we can't use this device
             Else
                 cameraMyntD.initialize(fps, regWidth, regHeight)
