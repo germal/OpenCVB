@@ -288,13 +288,11 @@ Public Class IMU_Latency : Implements IDisposable
             timeOffset = k1.stateResult
         End If
 
-        'positiveDelta = Math.Abs(ms + timeOffset - IMUinterval) ' it is essential that this value be positive
-
         Dim rawDelta = Math.Abs(ms + timeOffset - IMUinterval) '  ms + timeOffset - IMUinterval
         ' if the interface to the camera provided a value, use that one...
         If ocvb.parms.IMU_LatencyMS <> 0 Then rawDelta = ocvb.parms.IMU_LatencyMS
 
-        k2.inputReal = rawDelta ' positiveDelta
+        k2.inputReal = rawDelta
         k2.Run(ocvb)
         smoothedLatency = k2.stateResult
         If smoothedLatency < 1 Then smoothedLatency = 1
@@ -336,7 +334,6 @@ Public Class IMU_Latency : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType("smoothed Latency (ms) = " + Format(smoothedLatency, "000.00") + " forced positive values are smoothed with Kalman filter and plotted in Blue", 10, 120))
             ocvb.putText(New ActiveClass.TrueType("timeOffset ms = " + Format(timeOffset, "000.00") +
                                                   " When the raw value is negative, the smoothed value is offset with this value.", 10, 140))
-            'ocvb.putText(New ActiveClass.TrueType("positiveDelta ms = " + Format(positiveDelta, "000.00") + " forced positive Delta ms", 10, 160))
             ocvb.putText(New ActiveClass.TrueType("Off chart count = " + CStr(offChartValue), 10, 180))
             ocvb.putText(New ActiveClass.TrueType("myFrameCount = " + CStr(myframeCount) + " - Use this to reset the plot scaling after " + CStr(resetCounter) + " frames", 10, 200))
             syncCount -= 1
@@ -364,7 +361,6 @@ Public Class IMU_Latency : Implements IDisposable
             lastIMUtime = ocvb.parms.IMU_TimeStamp
             smoothedLatency = 0
             timeOffset = 0
-            positiveDelta = 0
             offChartValue = 1000 ' force the update to the scale.
             syncCount = 30 ' show sync message for the next 30 frames.
         End If
@@ -390,8 +386,8 @@ Public Class IMU_PlotIMUFrameTime : Implements IDisposable
         plot = New Plot_OverTime(ocvb)
         plot.externalUse = True
         plot.dst = ocvb.result2
-        plot.maxVal = 50
-        plot.minVal = 20
+        plot.maxVal = 35
+        plot.minVal = 25
         plot.sliders.TrackBar1.Value = 4
         plot.sliders.TrackBar2.Value = 4
         plot.backColor = cv.Scalar.Aquamarine
@@ -404,10 +400,38 @@ Public Class IMU_PlotIMUFrameTime : Implements IDisposable
         ocvb.desc = "Plot both the IMU Frame time and the CPU frame time."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        Static offChartValue As Integer
+
         kIMU.inputReal = ocvb.parms.IMU_FrameTime
         kIMU.Run(ocvb)
         kCPU.inputReal = ocvb.parms.CPU_FrameTime
         kCPU.Run(ocvb)
+
+        If ocvb.parms.IMU_FrameTime < plot.minVal Or ocvb.parms.IMU_FrameTime > plot.maxVal Then offChartValue += 1
+        If ocvb.parms.CPU_FrameTime < plot.minVal Or ocvb.parms.CPU_FrameTime > plot.maxVal Then offChartValue += 1
+        Static lastXdelta As New List(Of Single)
+        lastXdelta.Add(ocvb.parms.IMU_FrameTime)
+        If lastXdelta.Count >= ocvb.color.Width Then lastXdelta.Remove(0)
+        lastXdelta.Add(ocvb.parms.CPU_FrameTime)
+        If lastXdelta.Count >= ocvb.color.Width Then lastXdelta.Remove(0)
+
+        ' if enough points are off the charted area, then redo the scale.
+        If offChartValue > 50 Then
+            ocvb.result2.SetTo(0)
+            Dim minVal = Double.MaxValue
+            Dim maxVal = Double.MinValue
+            For i = 0 To lastXdelta.Count - 1
+                If lastXdelta.Item(i) < minVal Then minVal = lastXdelta.Item(i)
+                If lastXdelta.Item(i) > maxVal Then maxVal = lastXdelta.Item(i)
+            Next
+            maxVal = CInt(maxVal + 1)
+            minVal = CInt(minVal - 1)
+            plot.maxVal = maxVal
+            plot.minVal = minVal
+            lastXdelta.Clear()
+            offChartValue = 0
+            plot.columnIndex = 0 ' restart at the left side of the chart
+        End If
 
         plot.plotData = New cv.Scalar(ocvb.parms.IMU_FrameTime, 0, ocvb.parms.CPU_FrameTime, 0)
         plot.Run(ocvb)

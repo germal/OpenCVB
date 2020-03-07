@@ -103,16 +103,17 @@ Public Class OpenCVB
 #End If
         Dim myntSDKready As Boolean
         Dim zed2SDKready As Boolean
-        ' now check if the Mynt D camera or StereoLabs Zed2 camera are installed with the SDK.  (If tiny, then not installed.)
-        Dim releaseDLL = New FileInfo(HomeDir.FullName + "\bin\Release\Cam_MyntD.dll")
-        Dim debugDLL = New FileInfo(HomeDir.FullName + "\bin\Debug\Cam_MyntD.dll")
-        If releaseDLL.Exists Then If releaseDLL.Length > 11000 Then myntSDKready = True
-        If debugDLL.Exists Then If debugDLL.Length > 13000 Then myntSDKready = True
-
-        releaseDLL = New FileInfo(HomeDir.FullName + "\bin\Release\Cam_Zed2.dll")
-        debugDLL = New FileInfo(HomeDir.FullName + "\bin\Debug\Cam_Zed2.dll")
-        If releaseDLL.Exists Then If releaseDLL.Length > 13000 Then zed2SDKready = True
-        If debugDLL.Exists Then If debugDLL.Length > 13000 Then zed2SDKready = True
+        Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
+        Dim sr = New StreamReader(defines.FullName)
+        While sr.EndOfStream = False
+            Dim infoLine = sr.ReadLine
+            If infoLine.StartsWith("//") = False Then
+                Dim Split = Regex.Split(infoLine, "\W+")
+                If Split(2) = "MYNTD_1000" Then myntSDKready = True
+                If Split(2) = "STEREOLAB_INSTALLED" Then zed2SDKready = True
+            End If
+        End While
+        sr.Close()
 
         Dim librealsenseRelease = HomeDir.FullName + "librealsense\build\Release\"
         updatePath(librealsenseRelease, "Realsense camera support.")
