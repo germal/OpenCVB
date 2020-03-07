@@ -1,5 +1,8 @@
 #include "../CameraDefines.hpp"
 #ifdef STEREOLAB_INSTALLED
+#pragma comment(lib, "sl_zed64.lib")
+#pragma comment(lib, "cuda.lib") 
+#pragma comment(lib, "cudart.lib") 
 
 #include <iostream>
 #include <iomanip>
@@ -12,9 +15,9 @@
 #include <algorithm>
 #include <opencv2/core.hpp>
 #include <opencv2/calib3d.hpp>
-#include "opencv2/imgproc.hpp"
-#include "opencv2/imgcodecs.hpp"
-#include "opencv2/highgui.hpp"
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
 #include <sl/Camera.hpp>
 using namespace sl;
 using namespace std;
@@ -188,3 +191,5 @@ extern "C" __declspec(dllexport)float Zed2IMU_Temperature(StereoLabsZed2 * Zed2)
 }
 
 #endif
+
+

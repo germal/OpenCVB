@@ -1026,5 +1026,3 @@ Public Class OpenCVB
         camera.frameCount = 0
     End Sub
 End Class
-
-

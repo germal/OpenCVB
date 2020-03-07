@@ -1,6 +1,6 @@
 #include "../CameraDefines.hpp"
 #ifdef MYNTD_1000
-#ifdef DEBUG
+#ifdef _DEBUG
 #pragma comment(lib, "opencv_world343d.lib")
 #else
 #pragma comment(lib, "opencv_world343.lib")
