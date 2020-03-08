@@ -386,10 +386,6 @@ Public Class IMU_PlotIMUFrameTime : Implements IDisposable
         ' avoid startup oddities...
         If ocvb.frameCount > 10 Then
             If minHostLatency > hostLatency Then minHostLatency = hostLatency
-            If hostLatency > frameTime Then
-                droppedFrames += Math.Floor(hostLatency / frameTime)
-                hostLatency = hostLatency Mod frameTime
-            End If
             If maxHostLatency < hostLatency Then maxHostLatency = hostLatency
 
             If minCPUFrameTime > ocvb.parms.CPU_FrameTime Then minCPUFrameTime = ocvb.parms.CPU_FrameTime
@@ -418,6 +414,12 @@ Public Class IMU_PlotIMUFrameTime : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType("host Latency (ms) min = " + Format(minHostLatency, "00") + " max = " +
                                                Format(maxHostLatency, "00") + " average " + Format(sampledAvgHostLatency, "00") +
                                                " current = " + Format(sampledHostLatency, "00"), 10, 100))
+
+            If hostLatency > frameTime Then
+                droppedFrames += Math.Floor(hostLatency / frameTime)
+                hostLatency = hostLatency Mod frameTime
+            End If
+
             If ocvb.frameCount Mod 1000 = 0 Then
                 minHostLatency = Double.MaxValue
                 maxHostLatency = Double.MinValue
