@@ -42,7 +42,6 @@ Public Class Quaterion_IMUPrediction : Implements IDisposable
     Dim imu As IMU_Latency
     Public Sub New(ocvb As AlgorithmData)
         imu = New IMU_Latency(ocvb)
-        imu.check.Hide()
         imu.plot.sliders.Hide()
         imu.externalUse = True
 

@@ -1,6 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Plot_OverTime : Implements IDisposable
+    Public check As New OptionsCheckbox
     Public sliders As New OptionsSliders
     Public plotData As cv.Scalar
     Public plotCount As Int32 = 4
@@ -11,7 +12,12 @@ Public Class Plot_OverTime : Implements IDisposable
     Public minVal As Int32 = 0
     Public maxVal As Int32 = 250
     Public columnIndex As Int32
+    Public offChartValue As Integer
     Public Sub New(ocvb As AlgorithmData)
+        check.Setup(ocvb, 1)
+        check.Box(0).Text = "Reset the plot scale"
+        If ocvb.parms.ShowOptions Then check.Show()
+
         sliders.setupTrackBar1(ocvb, "Pixel Height", 1, 40, 20)
         sliders.setupTrackBar2(ocvb, "Pixel Width", 1, 40, 5)
         sliders.setupTrackBar3(ocvb, "Plot (time) Font Size x10", 1, 20, 10)
@@ -30,6 +36,30 @@ Public Class Plot_OverTime : Implements IDisposable
         End If
         dst.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
         If externalUse = False Then plotData = ocvb.color.Mean()
+
+        Static lastXdelta As New List(Of Single)
+        For i = 0 To plotCount - 1
+            If plotData.Item(i) < minVal Or plotData.Item(i) > maxVal Then offChartValue += 1
+            lastXdelta.Add(plotData.Item(i))
+            If lastXdelta.Count >= 100 Then lastXdelta.Remove(0)
+        Next
+
+        ' if enough points are off the charted area or if manually requested, then redo the scale.
+        If offChartValue > 50 Or check.Box(0).Checked Then
+            dst.SetTo(0)
+            check.Box(0).Checked = False
+            minVal = Int32.MaxValue
+            maxVal = Int32.MinValue
+            For i = 0 To lastXdelta.Count - 1
+                If lastXdelta.Item(i) < minVal Then minVal = lastXdelta.Item(i)
+                If lastXdelta.Item(i) > maxVal Then maxVal = lastXdelta.Item(i)
+            Next
+            maxVal = CInt(maxVal + 1)
+            minVal = CInt(minVal - 1)
+            lastXdelta.Clear()
+            offChartValue = 0
+            columnIndex = 0 ' restart at the left side of the chart
+        End If
 
         Dim rectSize = New cv.Size2f(pixelWidth, pixelHeight)
         Dim ellipseSize = New cv.Size(pixelWidth * 2, pixelHeight)
@@ -58,6 +88,7 @@ Public Class Plot_OverTime : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
+        check.Dispose()
     End Sub
 End Class
 
