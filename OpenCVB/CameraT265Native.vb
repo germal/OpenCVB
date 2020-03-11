@@ -48,7 +48,7 @@ Module T265_Module_CPP
     Public Function T265PoseData(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265TimeStamp(tp As IntPtr) As Double
+    Public Function T265IMUTimeStamp(tp As IntPtr) As Double
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265Depth16(tp As IntPtr) As IntPtr
@@ -133,7 +133,7 @@ Public Class CameraT265Native
         Dim posePtr = T265PoseData(cPtr)
         SyncLock OpenCVB.camPic ' only really need the synclock when in callback mode but it doesn't hurt to waitforframe mode.
             Dim pose = Marshal.PtrToStructure(Of PoseData)(posePtr)
-            IMU_TimeStamp = T265TimeStamp(cPtr)
+            IMU_TimeStamp = T265IMUTimeStamp(cPtr)
             Static imuStartTime = IMU_TimeStamp
             IMU_TimeStamp -= imuStartTime
 
@@ -144,7 +144,6 @@ Public Class CameraT265Native
             IMU_Velocity = pose.velocity
             IMU_AngularAcceleration = pose.angularAcceleration
             IMU_AngularVelocity = pose.angularVelocity
-            IMU_LatencyMS = T265timeStampLatency(IMU_TimeStamp)
             Dim t = IMU_Translation
             '  Set the matrix as column-major for convenient work with OpenGL and rotate by 180 degress (by negating 1st and 3rd columns)
             Dim mat() As Single = {

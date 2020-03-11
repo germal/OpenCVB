@@ -932,7 +932,6 @@ Public Class OpenCVB
                 OpenCVB.ocvb.parms.IMU_Velocity = camera.IMU_Velocity
                 OpenCVB.ocvb.parms.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
                 OpenCVB.ocvb.parms.IMU_AngularVelocity = camera.IMU_AngularVelocity
-                OpenCVB.ocvb.parms.IMU_LatencyMS = camera.IMU_LatencyMS
                 OpenCVB.ocvb.parms.IMU_FrameTime = camera.IMU_FrameTime
                 OpenCVB.ocvb.parms.CPU_TimeStamp = camera.CPU_TimeStamp
                 OpenCVB.ocvb.parms.CPU_FrameTime = camera.CPU_FrameTime

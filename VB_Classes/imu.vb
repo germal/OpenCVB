@@ -144,8 +144,8 @@ Public Class IMU_Magnetometer : Implements IDisposable
         plot = New Plot_OverTime(ocvb)
         plot.externalUse = True
         plot.dst = ocvb.result2
-        plot.maxVal = 10
-        plot.minVal = -10
+        plot.maxScale = 10
+        plot.minScale = -10
         plot.sliders.TrackBar1.Value = 2
         plot.sliders.TrackBar2.Value = 2
 
@@ -208,252 +208,83 @@ End Class
 
 
 
-
-Public Class IMU_TimeStamp : Implements IDisposable
-    Dim flow As Font_FlowText
-    Public Sub New(ocvb As AlgorithmData)
-        flow = New Font_FlowText(ocvb)
-        flow.externalUse = True
-        flow.result1or2 = RESULT1
-
-        ocvb.desc = "Get the timestamp from the IMU"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.IMU_Present Then
-            flow.msgs.Add("Timestamp = " + Format(ocvb.parms.IMU_TimeStamp / 1000, "##0.0000000") + " seconds")
-            flow.Run(ocvb)
-        End If
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        flow.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-Public Class IMU_Latency : Implements IDisposable
-    Dim k1 As Kalman_Single
-    Dim k2 As Kalman_Single
-    Public plot As Plot_OverTime
-    Public positiveDelta As Double
-    Public smoothedLatency As Double
-    Public IMUinterval As Double
-    Public CPUinterval As Double
-    Public externalUse As Boolean
-    Dim minVal = -20
-    Dim maxVal = 20
-    Public Sub New(ocvb As AlgorithmData)
-        k1 = New Kalman_Single(ocvb)
-        k2 = New Kalman_Single(ocvb)
-
-        plot = New Plot_OverTime(ocvb)
-        plot.externalUse = True
-        plot.dst = ocvb.result2
-        plot.maxVal = maxVal
-        plot.minVal = minVal
-        plot.sliders.TrackBar1.Value = 4
-        plot.sliders.TrackBar2.Value = 4
-        plot.backColor = cv.Scalar.Aquamarine
-        plot.plotCount = 3
-
-        ocvb.desc = "Measure and plot the time difference from the IMU timestamp to the current time (2 different clocks)."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Static syncCount As Integer
-        Static myframeCount As Integer
-        Static syncShift As Double
-        Static myStopWatch As New System.Diagnostics.Stopwatch
-        Dim resetCounter = 1000
-        If ocvb.frameCount = 0 Then myStopWatch.Start()
-        CPUinterval = myStopWatch.ElapsedMilliseconds
-
-        Dim ms = CPUinterval - syncShift
-
-        Static lastIMUtime = ocvb.parms.IMU_TimeStamp
-        IMUinterval = ocvb.parms.IMU_TimeStamp - lastIMUtime
-
-        Static timeOffset As Double ' when the IMU clock is ahead of the cpu clock, use the average offset to bump the cpu clock
-        If IMUinterval > ms Then
-            timeOffset = IMUinterval - ms
-            k1.inputReal = timeOffset
-            k1.Run(ocvb)
-            timeOffset = k1.stateResult
-        End If
-
-        Dim rawDelta = Math.Abs(ms + timeOffset - IMUinterval) '  ms + timeOffset - IMUinterval
-        ' if the interface to the camera provided a value, use that one...
-        If ocvb.parms.IMU_LatencyMS <> 0 Then rawDelta = ocvb.parms.IMU_LatencyMS
-
-        k2.inputReal = rawDelta
-        k2.Run(ocvb)
-        smoothedLatency = k2.stateResult
-        If smoothedLatency < 1 Then smoothedLatency = 1
-        If externalUse = False Then
-            plot.plotData = New cv.Scalar(smoothedLatency, 0, rawDelta, 0)
-            plot.Run(ocvb)
-
-            ocvb.putText(New ActiveClass.TrueType(" IMU timestamp (ms) = " + Format(IMUinterval, "#0.0"), 10, 60))
-            ocvb.putText(New ActiveClass.TrueType("CPU timestamp (ms) = " + Format(ms, "#0.0"), 10, 80))
-            If rawDelta < 0 Then
-                ocvb.putText(New ActiveClass.TrueType("Raw latency (ms) = " + Format(rawDelta, "00.00") + " Raw data plotted in Red", 10, 100))
-            Else
-                ocvb.putText(New ActiveClass.TrueType("Raw latency (ms) = " + Format(rawDelta, "000.00") + " Raw data plotted in Red", 10, 100))
-            End If
-            ocvb.putText(New ActiveClass.TrueType("smoothed Latency (ms) = " + Format(smoothedLatency, "000.00") + " forced positive values are smoothed with Kalman filter and plotted in Blue", 10, 120))
-            ocvb.putText(New ActiveClass.TrueType("timeOffset ms = " + Format(timeOffset, "000.00") +
-                                                  " When the raw value is negative, the smoothed value is offset with this value.", 10, 140))
-            ocvb.putText(New ActiveClass.TrueType("Off chart count = " + CStr(plot.offChartValue), 10, 180))
-            ocvb.putText(New ActiveClass.TrueType("myFrameCount = " + CStr(myframeCount) + " - Use this to reset the plot scaling after " + CStr(resetCounter) + " frames", 10, 200))
-            syncCount -= 1
-            If myframeCount >= 1000 Or syncCount > 0 Then
-                ocvb.putText(New ActiveClass.TrueType("Syncing the IMU and CPU Clocks", 10, 220))
-            End If
-            Static imuLast = IMUinterval
-            Static cpuLast = CPUinterval
-            ocvb.putText(New ActiveClass.TrueType("IMU frame time (ms) " + Format(ocvb.parms.IMU_FrameTime, "0."), 10, 240))
-            ocvb.putText(New ActiveClass.TrueType("CPU frame time (ms) " + Format(CPUinterval - cpuLast, "0."), 10, 260))
-            imuLast = IMUinterval
-            cpuLast = CPUinterval
-
-            ocvb.label1 = "Delta ms: Raw values between " + CStr(minVal) + " and " + CStr(maxVal)
-            ocvb.label2 = "Delta ms: Red (raw) Blue (smoothed) Green is zero"
-        End If
-
-        ' Clocks drift.  Here we sync up the IMU and CPU clocks by restarting the algorithm.  
-        ' We could reset the Kalman object but the effect of the Kalman filter becomes quite apparent as the values shift to normal.
-        myframeCount += 1
-        If myframeCount >= resetCounter Then
-            myframeCount = 0
-            syncShift += ms ' clock drift
-            lastIMUtime = ocvb.parms.IMU_TimeStamp
-            smoothedLatency = 0
-            timeOffset = 0
-            syncCount = 30 ' show sync message for the next 30 frames.
-        End If
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        plot.Dispose()
-        k1.Dispose()
-        k2.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-Public Class IMU_PlotIMUFrameTime : Implements IDisposable
+Public Class IMU_FrameTimes : Implements IDisposable
+    Dim sliders As New OptionsSliders
     Public plot As Plot_OverTime
     Public CPUInterval As Double
-    Public clockDrift As Double
-    Dim kIMU As Kalman_Single
-    Dim kSeparation As Kalman_Single
+    Public externalUse As Boolean
+    Public IMUtoCaptureEstimate As Double
     Public Sub New(ocvb As AlgorithmData)
         plot = New Plot_OverTime(ocvb)
         plot.externalUse = True
         plot.dst = ocvb.result2
-        plot.maxVal = 50
-        plot.minVal = 10
+        plot.maxScale = 50
+        plot.minScale = 0
         plot.sliders.TrackBar1.Value = 4
         plot.sliders.TrackBar2.Value = 4
         plot.backColor = cv.Scalar.Aquamarine
-        plot.plotCount = 3
+        plot.plotCount = 4
 
-        kIMU = New Kalman_Single(ocvb)
-        kSeparation = New Kalman_Single(ocvb)
+        sliders.setupTrackBar1(ocvb, "Assumed min IMU to Capture time (ms)", 1, 10, 2)
+        If ocvb.parms.ShowOptions Then sliders.Show()
 
-        ocvb.label2 = "Red is CPU, Blue IMU, Green AvgCPULatency (ms)"
-        ocvb.desc = "Plot both the IMU Frame time and the CPU frame time."
+        ocvb.label2 = "IMU FT (blue) CPU FT (green) latency est. (red)"
+        ocvb.desc = "Plot both the IMU and CPU Frame time with a smoothed IMU frame time and likely IMU to Capture delay."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Const frameTime As Double = 33.333
-        Static hostLatency As Double
-        Static droppedFrames As Integer
-        Static minHostLatency As Double = Double.MaxValue
-        Static maxHostLatency As Double = Double.MinValue
-        Static avgHostLatency As Double
-        Static minCPUFrameTime As Double = Double.MaxValue
-        Static maxCPUFrameTime As Double = Double.MinValue
-        Static minIMUFrameTime As Double = Double.MaxValue
-        Static maxIMUFrameTime As Double = Double.MinValue
-        hostLatency += Math.Max(0, ocvb.parms.CPU_FrameTime - frameTime)
+        Static IMUcenter As Integer = ocvb.parms.IMU_FrameTime
+        Static histogramIMU(100) As Integer
+        ' there can be some errant times at startup.
+        If ocvb.parms.IMU_FrameTime > 100 Or ocvb.parms.CPU_FrameTime > 100 Then Exit Sub ' skip the crazy values.
+        If ocvb.parms.IMU_FrameTime = 0 Then Exit Sub ' if the IMU frametime was 0, then no new IMU data was generated
 
-        kIMU.inputReal = ocvb.parms.IMU_FrameTime
-        kIMU.Run(ocvb)
+        Dim imuFrameTime = CInt(ocvb.parms.IMU_FrameTime)
+        If IMUcenter <> 0 Then imuFrameTime = imuFrameTime Mod IMUcenter
+        IMUtoCaptureEstimate = IMUcenter - imuFrameTime + sliders.TrackBar1.Value
+        If IMUtoCaptureEstimate > IMUcenter Then IMUtoCaptureEstimate -= IMUcenter
+        If IMUtoCaptureEstimate < 0 Then IMUtoCaptureEstimate = sliders.TrackBar1.Value
 
-        ' avoid startup oddities...
-        If ocvb.frameCount > 10 Then
-            If minHostLatency > hostLatency Then minHostLatency = hostLatency
-            If maxHostLatency < hostLatency Then maxHostLatency = hostLatency
+        Static sampledIMUFrameTime = ocvb.parms.IMU_FrameTime
+        If ocvb.frameCount Mod 10 = 0 Then sampledIMUFrameTime = ocvb.parms.IMU_FrameTime
 
-            If minCPUFrameTime > ocvb.parms.CPU_FrameTime Then minCPUFrameTime = ocvb.parms.CPU_FrameTime
-            If maxCPUFrameTime < ocvb.parms.CPU_FrameTime Then maxCPUFrameTime = ocvb.parms.CPU_FrameTime
+        If externalUse = False Then
+            Dim maxval = Integer.MinValue
+            For i = 0 To histogramIMU.Count - 1
+                If maxval < histogramIMU(i) Then
+                    maxval = histogramIMU(i)
+                    IMUcenter = i
+                End If
+            Next
 
-            If minIMUFrameTime > ocvb.parms.IMU_FrameTime Then minIMUFrameTime = ocvb.parms.IMU_FrameTime
-            If maxIMUFrameTime < ocvb.parms.IMU_FrameTime Then maxIMUFrameTime = ocvb.parms.IMU_FrameTime
+            ocvb.putText(New ActiveClass.TrueType("IMU_TimeStamp (ms) " + Format(ocvb.parms.IMU_TimeStamp, "00"), 10, 40))
+            ocvb.putText(New ActiveClass.TrueType("CPU TimeStamp (ms) " + Format(ocvb.parms.CPU_TimeStamp, "00"), 10, 60))
+            ocvb.putText(New ActiveClass.TrueType("IMU Frametime (ms, sampled) " + Format(sampledIMUFrameTime, "000.00") +
+                                                          " imuCenter = " + Format(IMUcenter, "00") +
+                                                          " latest = " + Format(ocvb.parms.IMU_FrameTime, "00.00"), 10, 80))
+            ocvb.putText(New ActiveClass.TrueType("IMUtoCapture (ms, sampled, in red) " + Format(IMUtoCaptureEstimate, "00"), 10, 100))
 
-            Static sampledCPUtime = ocvb.parms.CPU_FrameTime
-            If ocvb.frameCount Mod 10 = 0 Then sampledCPUtime = ocvb.parms.CPU_FrameTime
-            ocvb.putText(New ActiveClass.TrueType("CPU_FrameTime (ms, in Red) min = " + Format(minCPUFrameTime, "00") + " max = " +
-                                                   Format(maxCPUFrameTime, "00") + " current = " + Format(sampledCPUtime, "00"), 10, 60))
+            plot.plotData = New cv.Scalar(ocvb.parms.IMU_FrameTime, ocvb.parms.CPU_FrameTime, IMUtoCaptureEstimate, IMUcenter)
+            plot.Run(ocvb)
 
-            Static sampledIMUtime = ocvb.parms.IMU_FrameTime
-            If ocvb.frameCount Mod 10 = 0 Then sampledCPUtime = ocvb.parms.IMU_FrameTime
-            ocvb.putText(New ActiveClass.TrueType("IMU_FrameTime (ms, in Blue) min = " + Format(minIMUFrameTime, "00") + " max = " +
-                                                   Format(maxIMUFrameTime, "00") + " current = " + Format(sampledIMUtime, "00"), 10, 80))
+            If plot.maxScale - plot.minScale > histogramIMU.Count Then ReDim histogramIMU(plot.maxScale - plot.minScale)
 
-            avgHostLatency = (hostLatency + avgHostLatency) / 2
-            Static sampledHostLatency = hostLatency
-            Static sampledAvgHostLatency = avgHostLatency
-            If ocvb.frameCount Mod 10 = 0 Then
-                sampledHostLatency = hostLatency
-                sampledAvgHostLatency = avgHostLatency
-            End If
-            ocvb.putText(New ActiveClass.TrueType("host Latency (ms) min = " + Format(minHostLatency, "00") + " max = " +
-                                               Format(maxHostLatency, "00") + " average " + Format(sampledAvgHostLatency, "00") +
-                                               " current = " + Format(sampledHostLatency, "00"), 10, 100))
+            histogramIMU(CInt(ocvb.parms.IMU_FrameTime)) += 1
 
-            If hostLatency > frameTime Then
-                droppedFrames += Math.Floor(hostLatency / frameTime)
-                hostLatency = hostLatency Mod frameTime
-            End If
-
-            If ocvb.frameCount Mod 1000 = 0 Then
-                minHostLatency = Double.MaxValue
-                maxHostLatency = Double.MinValue
-                minCPUFrameTime = Double.MaxValue
-                maxCPUFrameTime = Double.MinValue
-                minIMUFrameTime = Double.MaxValue
-                maxIMUFrameTime = Double.MinValue
+            Const plotLastX = 25
+            If plot.lastXdelta.Count > plotLastX Then
+                Dim y = 200
+                For i = 0 To plot.plotCount - 1
+                    Dim outStr = "Last " + CStr(plotLastX) + Choose(i + 1, " IMU FrameTime", " CPU Frame Time", " IMUtoCapture ms", " IMU Center time") + vbTab
+                    For j = plot.lastXdelta.Count - plotLastX - 1 To plot.lastXdelta.Count - 1
+                        outStr += Format(plot.lastXdelta.Item(j).Item(i), "00") + ", "
+                    Next
+                    ocvb.putText(New ActiveClass.TrueType(outStr, 10, y))
+                    y += 20
+                Next
             End If
         End If
-
-        ' <IMU capture> < IMU to Image capture delay> <host interrupt delay> <camera task to algorithm task delay>
-        ' <host interrupt delay> ~ avgHostLatency  (definitely >= minCPUFrameTime)
-        ' IMU is captured at 200 FPS, Images captured at 30 FPS.
-        ' Theoretically, average <IMU to Image capture delay> ~= 2 ms (definitely less than 4 ms which is 200 FPS)
-        ' In actuality, IMU is not getting 200 FPS and <IMU to Image capture delay> 
-        ' <camera task to algorithm task delay> can be ignored because the times are captured in the camera interface, right after WaitForFrame
-        plot.plotData = New cv.Scalar(ocvb.parms.IMU_FrameTime, avgHostLatency, ocvb.parms.CPU_FrameTime, 0)
-        plot.Run(ocvb)
-
-        ocvb.putText(New ActiveClass.TrueType("IMU_TimeStamp (ms) " + Format(ocvb.parms.IMU_TimeStamp, "00"), 10, 160))
-        ocvb.putText(New ActiveClass.TrueType("CPU_TimeStamp (ms) " + Format(ocvb.parms.CPU_TimeStamp, "00"), 10, 180))
-
-        ocvb.putText(New ActiveClass.TrueType("Dropped Frames " + CStr(droppedFrames) + " out of " + CStr(ocvb.frameCount), 10, 200))
-
-        kSeparation.inputReal = ocvb.parms.IMU_TimeStamp - ocvb.parms.CPU_TimeStamp
-        kSeparation.Run(ocvb)
-
-        ocvb.putText(New ActiveClass.TrueType("Clock Separation (ms) " + Format(ocvb.parms.IMU_TimeStamp - ocvb.parms.CPU_TimeStamp, "0.00") +
-                                              " smoothed = " + Format(kSeparation.stateResult, "00"), 10, 220))
-        clockDrift = ocvb.parms.CPU_TimeStamp - ocvb.parms.IMU_TimeStamp
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         plot.Dispose()
-        kIMU.Dispose()
-        kSeparation.Dispose()
     End Sub
 End Class

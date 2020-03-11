@@ -126,7 +126,6 @@ Public Class ActiveClass : Implements IDisposable
         Dim IMU_FrameTime As Double
         Dim CPU_TimeStamp As Double
         Dim CPU_FrameTime As Double
-        Dim IMU_LatencyMS As Double
         Dim intrinsicsLeft As intrinsics_VB
         Dim intrinsicsRight As intrinsics_VB
         Dim lowResolution As Boolean

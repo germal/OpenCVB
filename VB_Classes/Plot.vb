@@ -9,13 +9,15 @@ Public Class Plot_OverTime : Implements IDisposable
     Public backColor = cv.Scalar.Black
     Public externalUse As Boolean
     Public dst As cv.Mat
-    Public minVal As Int32 = 0
-    Public maxVal As Int32 = 250
+    Public minScale As Int32
+    Public maxScale As Int32
     Public columnIndex As Int32
-    Public offChartValue As Integer
+    Public offChartCount As Integer
+    Public lastXdelta As New List(Of cv.Scalar)
     Public Sub New(ocvb As AlgorithmData)
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Reset the plot scale"
+        check.Box(0).Checked = True
         If ocvb.parms.ShowOptions Then check.Show()
 
         sliders.setupTrackBar1(ocvb, "Pixel Height", 1, 40, 20)
@@ -25,6 +27,9 @@ Public Class Plot_OverTime : Implements IDisposable
         ocvb.desc = "Plot an input variable over time"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+
+        Const plotSeriesCount = 100
+        lastXdelta.Add(plotData)
         If ocvb.frameCount = 0 Then
             If externalUse = False Then dst = ocvb.result1
         End If
@@ -37,54 +42,57 @@ Public Class Plot_OverTime : Implements IDisposable
         dst.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
         If externalUse = False Then plotData = ocvb.color.Mean()
 
-        Static lastXdelta As New List(Of Single)
-        For i = 0 To plotCount - 1
-            If plotData.Item(i) < minVal Or plotData.Item(i) > maxVal Then offChartValue += 1
-            lastXdelta.Add(plotData.Item(i))
-            If lastXdelta.Count >= 100 Then lastXdelta.Remove(0)
-        Next
-
         ' if enough points are off the charted area or if manually requested, then redo the scale.
-        If offChartValue > 50 Or check.Box(0).Checked Then
+        If (offChartCount > CInt(ocvb.color.Width / sliders.TrackBar2.Value) Or check.Box(0).Checked) And lastXdelta.Count >= plotSeriesCount Then
             dst.SetTo(0)
             check.Box(0).Checked = False
-            minVal = Int32.MaxValue
-            maxVal = Int32.MinValue
+            maxScale = Int32.MinValue
+            minScale = Int32.MaxValue
             For i = 0 To lastXdelta.Count - 1
-                If lastXdelta.Item(i) < minVal Then minVal = lastXdelta.Item(i)
-                If lastXdelta.Item(i) > maxVal Then maxVal = lastXdelta.Item(i)
+                Dim nextVal = lastXdelta.Item(i)
+                For j = 0 To plotCount - 1
+                    If nextVal.Item(j) < minScale Then minScale = nextVal.Item(j)
+                    If nextVal.Item(j) > maxScale Then maxScale = nextVal.Item(j)
+                Next
             Next
-            maxVal = CInt(maxVal + 1)
-            minVal = CInt(minVal - 1)
+            If minScale < 5 And minScale > 0 Then minScale = 0 ' nice location...
             lastXdelta.Clear()
-            offChartValue = 0
+            offChartCount = 0
             columnIndex = 0 ' restart at the left side of the chart
         End If
 
+        If lastXdelta.Count >= plotSeriesCount Then lastXdelta.RemoveAt(0)
+
         Dim rectSize = New cv.Size2f(pixelWidth, pixelHeight)
         Dim ellipseSize = New cv.Size(pixelWidth * 2, pixelHeight)
+        If plotData.Item(3) < 10 Then plotCount = plotCount
         For i = 0 To plotCount - 1
-            If plotData.Item(i) >= minVal And plotData.Item(i) <= maxVal Then
-                Dim y = 1 - (plotData.Item(i) - minVal) / (maxVal - minVal)
-                y *= ocvb.color.Height - 1
-                Dim c As New cv.Point(columnIndex - pixelWidth, y - pixelHeight)
-                Dim rect = New cv.Rect(c.X, c.Y, pixelWidth * 2, pixelHeight * 2)
-                Select Case i
-                    Case 0
-                        dst.Circle(c, pixelWidth, plotColors(i), -1, cv.LineTypes.AntiAlias)
-                    Case 1
-                        dst.Rectangle(rect, plotColors(i), -1)
-                    Case 2
-                        dst.Ellipse(c, ellipseSize, 0, 0, 360, plotColors(i), -1)
-                    Case 3
-                        Dim rotatedRect = New cv.RotatedRect(c, rectSize, 45)
-                        drawRotatedRectangle(rotatedRect, ocvb.result2, plotColors(i))
-                End Select
+            If plotData.Item(i) < minScale And plotData.Item(i) > maxScale Then
+                offChartCount += 1
+                Exit For
             End If
         Next
+        For i = 0 To plotCount - 1
+            Dim y = 1 - (plotData.Item(i) - minScale) / (maxScale - minScale)
+            y *= ocvb.color.Height - 1
+            Dim c As New cv.Point(columnIndex - pixelWidth, y - pixelHeight)
+            Dim rect = New cv.Rect(c.X, c.Y, pixelWidth * 2, pixelHeight * 2)
+            Select Case i
+                Case 0
+                    dst.Circle(c, pixelWidth, plotColors(i), -1, cv.LineTypes.AntiAlias)
+                Case 1
+                    dst.Rectangle(rect, plotColors(i), -1)
+                Case 2
+                    dst.Ellipse(c, ellipseSize, 0, 0, 360, plotColors(i), -1)
+                Case 3
+                    Dim rotatedRect = New cv.RotatedRect(c, rectSize, 45)
+                    drawRotatedRectangle(rotatedRect, ocvb.result2, plotColors(i))
+            End Select
+        Next
         columnIndex += pixelWidth
+        dst.Col(columnIndex).SetTo(0)
         If externalUse = False Then ocvb.label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
-        AddPlotScale(dst, minVal, maxVal, sliders.TrackBar3.Value / 10)
+        AddPlotScale(dst, minScale, maxScale, sliders.TrackBar3.Value / 10)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()

@@ -39,9 +39,9 @@ End Class
 
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/pose-predict
 Public Class Quaterion_IMUPrediction : Implements IDisposable
-    Dim imu As IMU_Latency
+    Dim imu As IMU_FrameTimes
     Public Sub New(ocvb As AlgorithmData)
-        imu = New IMU_Latency(ocvb)
+        imu = New IMU_FrameTimes(ocvb)
         imu.plot.sliders.Hide()
         imu.externalUse = True
 
@@ -59,7 +59,7 @@ Public Class Quaterion_IMUPrediction : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         imu.Run(ocvb)
 
-        Dim dt = imu.smoothedLatency ' this is the time from IMU measurement to the time the CPU got the pose data.
+        Dim dt = 4 'imu.smoothedLatency ' this is the time from IMU measurement to the time the CPU got the pose data.
 
         Dim t = ocvb.parms.IMU_Translation
         Dim predictedTranslation = New cv.Point3f(dt * (dt / 2 * ocvb.parms.IMU_Acceleration.X + ocvb.parms.IMU_Velocity.X) + t.X,

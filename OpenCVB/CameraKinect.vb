@@ -32,9 +32,6 @@ Module Kinect_Interface
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDepthInColor(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function KinectIMULatencyMS(cPtr As IntPtr) As Double
-    End Function
 End Module
 Public Class CameraKinect
     Inherits Camera
@@ -143,7 +140,6 @@ Public Class CameraKinect
             imuGyro.Y = tmpVal
 
             IMU_TimeStamp = imuOutput.accelTimeStamp / 1000
-            IMU_LatencyMS = KinectIMULatencyMS(cPtr)
         End If
 
         handleRGBDepth.Free()

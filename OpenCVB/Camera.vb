@@ -49,7 +49,6 @@ Public Class Camera
     Public failedImageCount As Int32
     Public modelInverse As Boolean
     Public newImagesAvailable As Boolean
-    Public IMU_LatencyMS As Double
     Public cPtr As IntPtr
     Public Structure imuDataStruct
         Dim r00 As Single

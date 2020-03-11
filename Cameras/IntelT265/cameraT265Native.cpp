@@ -208,10 +208,7 @@ public:
 	int *waitForFrame()
 	{
 		auto frameset = pipeline.wait_for_frames(1000);
-		
 		auto f = frameset.first_or_default(RS2_STREAM_POSE);
-		// Cast the frame to pose_frame and get its data
-		pose_data = f.as<rs2::pose_frame>().get_pose_data();
 		IMU_TimeStamp = f.get_timestamp();
 
 		auto fs = frameset.as<rs2::frameset>();
@@ -253,6 +250,8 @@ public:
 		tmpRGBDepth.copyTo(RGBDepth(depthRect), mask);
 		depth16 = disparity.clone();
 
+		// Cast the frame to pose_frame and get its data
+		pose_data = f.as<rs2::pose_frame>().get_pose_data();
 		return (int *) color.data;
 	}
 };
@@ -337,7 +336,7 @@ int* T265PoseData(t265Camera * tp)
 }
 
 extern "C" __declspec(dllexport)
-double T265TimeStamp(t265Camera * tp)
+double T265IMUTimeStamp(t265Camera * tp)
 {
 	return tp->IMU_TimeStamp;
 }

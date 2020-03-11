@@ -43,7 +43,6 @@ public:
 	k4a_device_configuration_t config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
 	char outMsg[10000];
 	Mat color;
-	float imu_latencyMS;
 
 private:
 	k4a_capture_t capture = NULL;
@@ -150,17 +149,6 @@ public:
 		double now_ms = static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(now).count());
 		static double hostStartTime = now_ms;
 		double timeStamp = static_cast<double>(imu_sample.acc_timestamp_usec) / 1000;
-		static double imuStartTime = timeStamp;
-		imu_latencyMS = static_cast<float>(std::abs(now_ms - (timeStamp - imuStartTime  + hostStartTime)));
-		//printf("imu_latencyMS = %f timeStamp - imuStartTime = %f now_ms - hostStartTime = %f\n", 
-		//	imu_latencyMS, timeStamp - imuStartTime, now_ms - hostStartTime);
-
-		// if the latency climbs over 10, the clocks are diverging.  Just sync them up again.
-		if (imu_latencyMS > 10)
-		{
-			hostStartTime = now_ms;
-			imuStartTime = timeStamp;
-		}
 		
 		return (int *)&imu_sample;
 	}
@@ -217,12 +205,6 @@ extern "C" __declspec(dllexport)
 int* KinectDepth16(KinectCamera * kc)
 {
 	return (int*)kc->depthBuffer;
-}
-
-extern "C" __declspec(dllexport) 
-double KinectIMULatencyMS(KinectCamera * kc)
-{
-	return kc->imu_latencyMS;
 }
 
 extern "C" __declspec(dllexport)

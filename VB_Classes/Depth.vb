@@ -681,13 +681,13 @@ Public Class Depth_MeanStdevPlot : Implements IDisposable
         plot1 = New Plot_OverTime(ocvb)
         plot1.externalUse = True
         plot1.dst = ocvb.result1
-        plot1.maxVal = 2000
+        plot1.maxScale = 2000
         plot1.plotCount = 1
 
         plot2 = New Plot_OverTime(ocvb)
         plot2.externalUse = True
         plot2.dst = ocvb.result2
-        plot2.maxVal = 1000
+        plot2.maxScale = 1000
         plot2.plotCount = 1
 
         ocvb.desc = "Plot the mean and stdev of the depth image"
@@ -701,8 +701,8 @@ Public Class Depth_MeanStdevPlot : Implements IDisposable
         If ocvb.parms.lowResolution Then mask = mask.Resize(ocvb.depth16.Size())
         cv.Cv2.MeanStdDev(ocvb.depth16, mean, stdev, mask)
 
-        If mean > plot1.maxVal Then plot1.maxVal = mean + 1000 - (mean + 1000) Mod 1000
-        If stdev > plot2.maxVal Then plot2.maxVal = stdev + 1000 - (stdev + 1000) Mod 1000
+        If mean > plot1.maxScale Then plot1.maxScale = mean + 1000 - (mean + 1000) Mod 1000
+        If stdev > plot2.maxScale Then plot2.maxScale = stdev + 1000 - (stdev + 1000) Mod 1000
 
         plot1.plotData = New cv.Scalar(mean, 0, 0)
         plot1.Run(ocvb)
