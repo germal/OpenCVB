@@ -235,7 +235,7 @@ Public Class IMU_FrameTimes : Implements IDisposable
         Static IMUcenter As Integer = ocvb.parms.IMU_FrameTime
         Static histogramIMU(100) As Integer
         ' there can be some errant times at startup.
-        If ocvb.parms.IMU_FrameTime > 100 Then Exit Sub ' skip the crazy values.
+        If ocvb.parms.IMU_FrameTime > 100 Or ocvb.parms.IMU_FrameTime < 0 Then Exit Sub ' skip the crazy values.
         If ocvb.parms.IMU_FrameTime = 0 Then
             Static allZeroCount As Integer
             allZeroCount += 1
