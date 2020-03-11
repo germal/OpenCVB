@@ -226,6 +226,7 @@ Public Class IMU_FrameTimes : Implements IDisposable
         plot.plotCount = 4
 
         sliders.setupTrackBar1(ocvb, "Assumed min IMU to Capture time (ms)", 1, 10, 2)
+        sliders.setupTrackBar2(ocvb, "Number of Plot Values to show", 5, 30, 25)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label2 = "IMU FT (blue) CPU FT (green) latency est. (red)"
@@ -278,7 +279,7 @@ Public Class IMU_FrameTimes : Implements IDisposable
 
             histogramIMU(CInt(ocvb.parms.IMU_FrameTime)) += 1
 
-            Const plotLastX = 25
+            Dim plotLastX = sliders.TrackBar2.Value
             If plot.lastXdelta.Count > plotLastX Then
                 Dim y = 200
                 For i = 0 To plot.plotCount - 1

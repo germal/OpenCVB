@@ -456,6 +456,19 @@ algorithm to segment an entire image, creating blobs that can be measured and
 tracked. The black segment has no depth. The number of blobs can be controlled
 with a lower limit on the size of the blob.*
 
+![](media/1df99676bf4ca2ef5c9351c3259c35ac.png)
+
+*The IMU timestamp provides clues to the relationship between the IMU capture
+and the image capture (the devices are on different clocks.) The image capture
+triggers an interrupt but how long ago did the IMU capture the pose data or
+Gyro/Acceleration? The plot in the lower right shows the actual frame durations
+for the IMU and images and estimates the delay from the IMU capture to the image
+capture. The blue dots are the actual IMU capture frame times, the green is the
+host image capture frame time, and the red is the estimated delay from the IMU
+capture to the image capture. The white row shows the IMU frame time with the
+highest occurrence and is used as a boundary between lost IMU captures (above)
+and correctly sequenced IMU captures (at or below).*
+
 ![](media/3df8502dfd9e7ac7e50e5645cf8fe4ad.png)
 
 *Here the MeanShift algorithm is used to track the 4 largest blobs in the image.
