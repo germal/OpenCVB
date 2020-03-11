@@ -229,14 +229,22 @@ Public Class IMU_FrameTimes : Implements IDisposable
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label2 = "IMU FT (blue) CPU FT (green) latency est. (red)"
-        ocvb.desc = "Plot both the IMU and CPU Frame time with a smoothed IMU frame time and likely IMU to Capture delay."
+        ocvb.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static IMUcenter As Integer = ocvb.parms.IMU_FrameTime
         Static histogramIMU(100) As Integer
         ' there can be some errant times at startup.
-        If ocvb.parms.IMU_FrameTime > 100 Or ocvb.parms.CPU_FrameTime > 100 Then Exit Sub ' skip the crazy values.
-        If ocvb.parms.IMU_FrameTime = 0 Then Exit Sub ' if the IMU frametime was 0, then no new IMU data was generated
+        If ocvb.parms.IMU_FrameTime > 100 Then Exit Sub ' skip the crazy values.
+        If ocvb.parms.IMU_FrameTime = 0 Then
+            Static allZeroCount As Integer
+            allZeroCount += 1
+            If allZeroCount > 20 Then
+                ocvb.putText(New ActiveClass.TrueType("Is IMU present?  No IMU FrameTimes", 10, 40))
+                allZeroCount = Integer.MinValue ' don't show message again.
+            End If
+            Exit Sub ' if the IMU frametime was 0, then no new IMU data was generated (or it is unsupported!)
+        End If
 
         Dim imuFrameTime = CInt(ocvb.parms.IMU_FrameTime)
         If IMUcenter <> 0 Then imuFrameTime = imuFrameTime Mod IMUcenter
