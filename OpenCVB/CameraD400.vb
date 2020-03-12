@@ -94,21 +94,21 @@ Public Class CameraD400
             procf = align.Process(frames)
 
             frames = procf.As(Of rs.FrameSet)()
-            Dim depthFrame = frames.DepthFrame()
-            Dim colorFrame = frames.ColorFrame
-            Dim disparityFrame = depth2Disparity.Process(depthFrame)
-            Dim rawRight As rs.Frame = Nothing
-            Dim rawLeft = frames.InfraredFrame
-            For Each frame In frames
-                If frame.Profile.Stream = rs.Stream.Infrared Then
-                    If frame.Profile.Index = 2 Then
-                        rawRight = frame
-                        Exit For
-                    End If
-                End If
-            Next
-
             SyncLock OpenCVB.camPic
+                Dim depthFrame = frames.DepthFrame()
+                Dim colorFrame = frames.ColorFrame
+                Dim disparityFrame = depth2Disparity.Process(depthFrame)
+                Dim rawRight As rs.Frame = Nothing
+                Dim rawLeft = frames.InfraredFrame
+                For Each frame In frames
+                    If frame.Profile.Stream = rs.Stream.Infrared Then
+                        If frame.Profile.Index = 2 Then
+                            rawRight = frame
+                            Exit For
+                        End If
+                    End If
+                Next
+
                 ' get motion data and timestamp from the gyro and accelerometer
                 If IMU_Present Then
                     Dim gyroFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Gyro, rs.Format.MotionXyz32f)
