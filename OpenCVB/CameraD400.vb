@@ -27,7 +27,8 @@ Public Class CameraD400
     Public ThresholdFilter As Boolean
 
     Public pc As New rs.PointCloud
-    Dim depthFrame As rs.DepthFrame
+    Dim depthFrame As rs.Frame
+    Dim RGBdepthFrame As rs.Frame
     Dim colorFrame As rs.Frame
     Dim disparityFrame As rs.Frame
     Dim rawRight As rs.Frame
@@ -100,20 +101,21 @@ Public Class CameraD400
             procf = align.Process(frames)
 
             frames = procf.As(Of rs.FrameSet)()
-            SyncLock OpenCVB.camPic
-                depthFrame = frames.DepthFrame()
-                colorFrame = frames.ColorFrame
-                disparityFrame = depth2Disparity.Process(depthFrame)
-                rawLeft = frames.InfraredFrame
-                For Each frame In frames
-                    If frame.Profile.Stream = rs.Stream.Infrared Then
-                        If frame.Profile.Index = 2 Then
-                            rawRight = frame
-                            Exit For
-                        End If
+            depthFrame = frames.DepthFrame()
+            RGBdepthFrame = colorizer.Process(depthFrame)
+            colorFrame = frames.ColorFrame
+            disparityFrame = depth2Disparity.Process(depthFrame)
+            rawLeft = frames.InfraredFrame
+            For Each frame In frames
+                If frame.Profile.Stream = rs.Stream.Infrared Then
+                    If frame.Profile.Index = 2 Then
+                        rawRight = frame
+                        Exit For
                     End If
-                Next
+                End If
+            Next
 
+            SyncLock OpenCVB.camPic
                 ' get motion data and timestamp from the gyro and accelerometer
                 If IMU_Present Then
                     Dim gyroFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Gyro, rs.Format.MotionXyz32f)
@@ -128,7 +130,7 @@ Public Class CameraD400
                 End If
 
                 color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorFrame.Data)
-                RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorizer.Process(depthFrame).Data)
+                RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBdepthFrame.Data)
                 depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, depthFrame.Data)
                 disparity = New cv.Mat(h, w, cv.MatType.CV_32F, disparityFrame.Data)
                 leftView = New cv.Mat(h, w, cv.MatType.CV_8U, rawLeft.Data)
