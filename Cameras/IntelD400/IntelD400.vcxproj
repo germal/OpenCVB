@@ -20,11 +20,11 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{E0C3C127-F9DB-452E-9D46-E0261511CFB1}</ProjectGuid>
+    <ProjectGuid>{7E39A14A-E4A3-48EC-B771-CCE2BC0C5398}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>KinectCamera</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Cam_T265</ProjectName>
+    <ProjectName>Cam_D400</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -163,7 +163,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="cameraT265.cpp" />
+    <ClCompile Include="cameraD400.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CameraDefines.hpp" />

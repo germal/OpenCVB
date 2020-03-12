@@ -887,9 +887,9 @@ Public Class Depth_Colorizer_1_CPP : Implements IDisposable
                 Else
                     ocvb.result1 = New cv.Mat(ocvb.result1.Rows, ocvb.result1.Cols, cv.MatType.CV_8UC3, dstData)
                 End If
-
-                dst = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
             End If
+
+            dst = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

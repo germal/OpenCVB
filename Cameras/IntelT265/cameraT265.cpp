@@ -101,17 +101,6 @@ private:
 
 public:
 	~t265Camera(){}
-	rs2::device get_device(const std::string& serial_number = "") {
-		rs2::context ctx;
-		while (true) {
-			for (auto&& dev : ctx.query_devices()) {
-				if (((serial_number.empty() && std::strstr(dev.get_info(RS2_CAMERA_INFO_NAME), "T265")) ||
-					std::strcmp(dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER), serial_number.c_str()) == 0))
-					return dev;
-			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		}
-	}
 
 	t265Camera(int w, int h)
 	{
@@ -259,8 +248,8 @@ public:
 extern "C" __declspec(dllexport)
 int *T265Open(int w, int h)
 {
-	t265Camera *kc = new t265Camera(w, h);
-	return (int *)kc;
+	t265Camera *tp = new t265Camera(w, h);
+	return (int *)tp;
 }
 
 extern "C" __declspec(dllexport)
@@ -342,9 +331,9 @@ double T265IMUTimeStamp(t265Camera * tp)
 }
 
 extern "C" __declspec(dllexport)
-int* T265WaitFrame(t265Camera * kc, void* color, void* depthRGB)
+int* T265WaitFrame(t265Camera * tp)
 {
-	return kc->waitForFrame();
+	return tp->waitForFrame();
 }
 
 extern "C" __declspec(dllexport)

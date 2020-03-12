@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Numerics
+Imports rs = Intel.RealSense
 Public Class Camera
     Public pipelineClosed As Boolean = False
     Public transformationMatrix() As Single
@@ -35,6 +36,7 @@ Public Class Camera
     Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public leftView As cv.Mat
     Public rightView As cv.Mat
+
     Public colorBytes() As Byte
     Public vertices() As Byte
     Public RGBADepthBytes() As Byte
@@ -45,6 +47,7 @@ Public Class Camera
     Public disparityBytes() As Byte
     Public depth32FBytes() As Byte
     Public pointCloudBytes() As Byte
+
     Public serialNumber As String
     Public failedImageCount As Int32
     Public modelInverse As Boolean
@@ -78,6 +81,16 @@ Public Class Camera
         Public trackerConfidence As Int32
         Public mapperConfidence As Int32
     End Structure
+    Public Sub setintrinsicsLeft(intrinsicsLeft As rs.Intrinsics)
+        intrinsicsLeft_VB.width = intrinsicsLeft.width
+        intrinsicsLeft_VB.height = intrinsicsLeft.height
+        intrinsicsLeft_VB.ppx = intrinsicsLeft.ppx
+        intrinsicsLeft_VB.ppy = intrinsicsLeft.ppy
+        intrinsicsLeft_VB.fx = intrinsicsLeft.fx
+        intrinsicsLeft_VB.fy = intrinsicsLeft.fy
+        intrinsicsLeft_VB.FOV = intrinsicsLeft.FOV
+        intrinsicsLeft_VB.coeffs = intrinsicsLeft.coeffs
+    End Sub
     Public Sub New()
         pointCloud = New cv.Mat()
         disparity = New cv.Mat()

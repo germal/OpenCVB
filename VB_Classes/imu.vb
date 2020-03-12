@@ -208,7 +208,7 @@ End Class
 
 
 
-Public Class IMU_FrameTimes : Implements IDisposable
+Public Class IMU_FrameTime : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public plot As Plot_OverTime
     Public CPUInterval As Double
@@ -218,26 +218,28 @@ Public Class IMU_FrameTimes : Implements IDisposable
         plot = New Plot_OverTime(ocvb)
         plot.externalUse = True
         plot.dst = ocvb.result2
-        plot.maxScale = 50
+        plot.maxScale = 150
         plot.minScale = 0
         plot.sliders.TrackBar1.Value = 4
         plot.sliders.TrackBar2.Value = 4
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.setupTrackBar1(ocvb, "Assumed min IMU to Capture time (ms)", 1, 10, 2)
-        sliders.setupTrackBar2(ocvb, "Number of Plot Values to show", 5, 30, 25)
+        sliders.setupTrackBar1(ocvb, "Minimum IMU to Capture time (ms)", 1, 10, 2)
+        sliders.setupTrackBar2(ocvb, "Number of Plot Values", 5, 30, 25)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        ocvb.label2 = "IMU FT (blue) CPU FT (green) latency est. (red)"
+        ocvb.label2 = "IMU FT (blue) CPU FT (green) Latency est. (red)"
         ocvb.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static IMUcenter As Integer = ocvb.parms.IMU_FrameTime
-        Static histogramIMU(100) As Integer
+        Static IMUanchor As Integer = ocvb.parms.IMU_FrameTime
+        Static histogramIMU(plot.maxScale) As Integer
         ' there can be some errant times at startup.
-        If ocvb.parms.IMU_FrameTime > 100 Or ocvb.parms.IMU_FrameTime < 0 Then Exit Sub ' skip the crazy values.
-        If ocvb.parms.IMU_FrameTime = 0 Then
+        If ocvb.parms.IMU_FrameTime > plot.maxScale Or ocvb.parms.IMU_FrameTime < 0 Then Exit Sub ' skip the crazy values.
+        Static imuTotalTime As Double
+        imuTotalTime += ocvb.parms.IMU_FrameTime
+        If imuTotalTime = 0 Then
             Static allZeroCount As Integer
             allZeroCount += 1
             If allZeroCount > 20 Then
@@ -247,37 +249,37 @@ Public Class IMU_FrameTimes : Implements IDisposable
             Exit Sub ' if the IMU frametime was 0, then no new IMU data was generated (or it is unsupported!)
         End If
 
+        Dim maxval = Integer.MinValue
+        For i = 0 To histogramIMU.Count - 1
+            If maxval < histogramIMU(i) Then
+                maxval = histogramIMU(i)
+                IMUanchor = i
+            End If
+        Next
+
         Dim imuFrameTime = CInt(ocvb.parms.IMU_FrameTime)
-        If IMUcenter <> 0 Then imuFrameTime = imuFrameTime Mod IMUcenter
-        IMUtoCaptureEstimate = IMUcenter - imuFrameTime + sliders.TrackBar1.Value
-        If IMUtoCaptureEstimate > IMUcenter Then IMUtoCaptureEstimate -= IMUcenter
+        If IMUanchor <> 0 Then imuFrameTime = imuFrameTime Mod IMUanchor
+        IMUtoCaptureEstimate = IMUanchor - imuFrameTime + sliders.TrackBar1.Value
+        If IMUtoCaptureEstimate > IMUanchor Then IMUtoCaptureEstimate -= IMUanchor
         If IMUtoCaptureEstimate < 0 Then IMUtoCaptureEstimate = sliders.TrackBar1.Value
 
         Static sampledIMUFrameTime = ocvb.parms.IMU_FrameTime
         If ocvb.frameCount Mod 10 = 0 Then sampledIMUFrameTime = ocvb.parms.IMU_FrameTime
 
-        If externalUse = False Then
-            Dim maxval = Integer.MinValue
-            For i = 0 To histogramIMU.Count - 1
-                If maxval < histogramIMU(i) Then
-                    maxval = histogramIMU(i)
-                    IMUcenter = i
-                End If
-            Next
+        histogramIMU(CInt(ocvb.parms.IMU_FrameTime)) += 1
 
+        If externalUse = False Then
             ocvb.putText(New ActiveClass.TrueType("IMU_TimeStamp (ms) " + Format(ocvb.parms.IMU_TimeStamp, "00"), 10, 40))
             ocvb.putText(New ActiveClass.TrueType("CPU TimeStamp (ms) " + Format(ocvb.parms.CPU_TimeStamp, "00"), 10, 60))
             ocvb.putText(New ActiveClass.TrueType("IMU Frametime (ms, sampled) " + Format(sampledIMUFrameTime, "000.00") +
-                                                          " imuCenter = " + Format(IMUcenter, "00") +
+                                                          " IMUanchor = " + Format(IMUanchor, "00") +
                                                           " latest = " + Format(ocvb.parms.IMU_FrameTime, "00.00"), 10, 80))
             ocvb.putText(New ActiveClass.TrueType("IMUtoCapture (ms, sampled, in red) " + Format(IMUtoCaptureEstimate, "00"), 10, 100))
 
-            plot.plotData = New cv.Scalar(ocvb.parms.IMU_FrameTime, ocvb.parms.CPU_FrameTime, IMUtoCaptureEstimate, IMUcenter)
+            plot.plotData = New cv.Scalar(ocvb.parms.IMU_FrameTime, ocvb.parms.CPU_FrameTime, IMUtoCaptureEstimate, IMUanchor)
             plot.Run(ocvb)
 
             If plot.maxScale - plot.minScale > histogramIMU.Count Then ReDim histogramIMU(plot.maxScale - plot.minScale)
-
-            histogramIMU(CInt(ocvb.parms.IMU_FrameTime)) += 1
 
             Dim plotLastX = sliders.TrackBar2.Value
             If plot.lastXdelta.Count > plotLastX Then
@@ -295,5 +297,169 @@ Public Class IMU_FrameTimes : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         plot.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class IMU_HostFrameTimes : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Public plot As Plot_OverTime
+    Public CPUInterval As Double
+    Public externalUse As Boolean
+    Public HostInterruptDelayEstimate As Double
+    Public Sub New(ocvb As AlgorithmData)
+        plot = New Plot_OverTime(ocvb)
+        plot.externalUse = True
+        plot.dst = ocvb.result2
+        plot.maxScale = 150
+        plot.minScale = 0
+        plot.sliders.TrackBar1.Value = 4
+        plot.sliders.TrackBar2.Value = 4
+        plot.backColor = cv.Scalar.Aquamarine
+        plot.plotCount = 4
+
+        sliders.setupTrackBar1(ocvb, "Minimum Host interrupt delay (ms)", 1, 10, 4)
+        sliders.setupTrackBar2(ocvb, "Number of Plot Values", 5, 30, 25)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        ocvb.label2 = "IMU FT (blue) CPU FT (green) Latency est. (red)"
+        ocvb.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static CPUanchor As Integer = ocvb.parms.CPU_FrameTime
+        Static hist(plot.maxScale) As Integer
+        ' there can be some errant times at startup.
+        If ocvb.parms.CPU_FrameTime > plot.maxScale Or ocvb.parms.CPU_FrameTime < 0 Then Exit Sub ' skip the crazy values.
+
+        Dim maxval = Integer.MinValue
+        For i = 0 To hist.Count - 1
+            If maxval < hist(i) Then
+                maxval = hist(i)
+                CPUanchor = i
+            End If
+        Next
+
+        Dim cpuFrameTime = CInt(ocvb.parms.CPU_FrameTime)
+        If CPUanchor <> 0 Then cpuFrameTime = cpuFrameTime Mod CPUanchor
+        HostInterruptDelayEstimate = CPUanchor - cpuFrameTime + sliders.TrackBar1.Value
+        If HostInterruptDelayEstimate > CPUanchor Then HostInterruptDelayEstimate -= CPUanchor
+        If HostInterruptDelayEstimate < 0 Then HostInterruptDelayEstimate = sliders.TrackBar1.Value
+
+        Static sampledCPUFrameTime = ocvb.parms.CPU_FrameTime
+        If ocvb.frameCount Mod 10 = 0 Then sampledCPUFrameTime = ocvb.parms.CPU_FrameTime
+
+        hist(CInt(ocvb.parms.CPU_FrameTime)) += 1
+
+        If externalUse = False Then
+            ocvb.putText(New ActiveClass.TrueType("IMU_TimeStamp (ms) " + Format(ocvb.parms.IMU_TimeStamp, "00"), 10, 40))
+            ocvb.putText(New ActiveClass.TrueType("CPU TimeStamp (ms) " + Format(ocvb.parms.CPU_TimeStamp, "00"), 10, 60))
+            ocvb.putText(New ActiveClass.TrueType("CPU Frametime (ms, sampled) " + Format(sampledCPUFrameTime, "000.00") +
+                                                          " CPUanchor = " + Format(CPUanchor, "00") +
+                                                          " latest = " + Format(ocvb.parms.CPU_FrameTime, "00.00"), 10, 80))
+            ocvb.putText(New ActiveClass.TrueType("Host Interrupt Delay (ms, sampled, in red) " + Format(HostInterruptDelayEstimate, "00"), 10, 100))
+
+            plot.plotData = New cv.Scalar(ocvb.parms.IMU_FrameTime, ocvb.parms.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
+            plot.Run(ocvb)
+
+            If plot.maxScale - plot.minScale > hist.Count Then ReDim hist(plot.maxScale - plot.minScale)
+
+            Dim plotLastX = sliders.TrackBar2.Value
+            If plot.lastXdelta.Count > plotLastX Then
+                Dim y = 200
+                For i = 0 To plot.plotCount - 1
+                    Dim outStr = "Last " + CStr(plotLastX) + Choose(i + 1, " IMU FrameTime", " CPU Frametime", " Host Delay ms", " CPUanchor FT") + vbTab
+                    For j = plot.lastXdelta.Count - plotLastX - 1 To plot.lastXdelta.Count - 1
+                        outStr += Format(plot.lastXdelta.Item(j).Item(i), "00") + ", "
+                    Next
+                    ocvb.putText(New ActiveClass.TrueType(outStr, 10, y))
+                    y += 20
+                Next
+            End If
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        plot.Dispose()
+    End Sub
+End Class
+
+
+
+
+Public Class IMU_TotalDelay : Implements IDisposable
+    Dim host As IMU_HostFrameTimes
+    Dim imu As IMU_FrameTime
+    Dim plot As Plot_OverTime
+    Dim k1 As Kalman_Single
+    Dim externalUse As Boolean
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.parms.ShowOptions = False
+
+        host = New IMU_HostFrameTimes(ocvb)
+        host.externalUse = True
+        imu = New IMU_FrameTime(ocvb)
+        imu.externalUse = True
+        k1 = New Kalman_Single(ocvb)
+
+        ocvb.parms.ShowOptions = True ' just show plot options...
+
+        plot = New Plot_OverTime(ocvb)
+        plot.externalUse = True
+        plot.dst = ocvb.result2
+        plot.maxScale = 50
+        plot.minScale = 0
+        plot.sliders.TrackBar1.Value = 4
+        plot.sliders.TrackBar2.Value = 4
+        plot.backColor = cv.Scalar.Aquamarine
+        plot.plotCount = 4
+
+        ocvb.label2 = "IMU (blue) host (green) Total delay est. (red)"
+        ocvb.desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        host.Run(ocvb)
+        imu.Run(ocvb)
+        Dim totaldelay = host.HostInterruptDelayEstimate + imu.IMUtoCaptureEstimate
+
+        k1.inputReal = totaldelay
+        k1.Run(ocvb)
+
+        Static sampledCPUDelay = host.HostInterruptDelayEstimate
+        Static sampledIMUDelay = imu.IMUtoCaptureEstimate
+        Static sampledTotalDelay = totaldelay
+        Static sampledSmooth = k1.stateResult
+        If ocvb.frameCount Mod 10 = 0 Then
+            sampledCPUDelay = host.HostInterruptDelayEstimate
+            sampledIMUDelay = imu.IMUtoCaptureEstimate
+            sampledTotalDelay = totaldelay
+            sampledSmooth = k1.stateResult
+        End If
+
+        ocvb.putText(New ActiveClass.TrueType("Estimated host delay (ms, sampled) " + Format(sampledCPUDelay, "00"), 10, 40))
+        ocvb.putText(New ActiveClass.TrueType("Estimated IMU delay (ms, sampled) " + Format(sampledIMUDelay, "00"), 10, 60))
+        ocvb.putText(New ActiveClass.TrueType("Estimated Total delay (ms, sampled) " + Format(sampledTotalDelay, "00"), 10, 80))
+        ocvb.putText(New ActiveClass.TrueType("Estimated Total delay Smoothed (ms, sampled, in White) " + Format(sampledSmooth, "00"), 10, 100))
+
+        plot.plotData = New cv.Scalar(imu.IMUtoCaptureEstimate, host.HostInterruptDelayEstimate, totaldelay, k1.stateResult)
+        plot.Run(ocvb)
+
+        Dim plotLastX = 25
+        If plot.lastXdelta.Count > plotLastX Then
+            Dim y = 200
+            For i = 0 To plot.plotCount - 1
+                Dim outStr = "Last " + CStr(plotLastX) + Choose(i + 1, " IMU Delay ", " Host Delay", " Total Delay ms", " Smoothed Total") + vbTab
+                For j = plot.lastXdelta.Count - plotLastX - 1 To plot.lastXdelta.Count - 1
+                    outStr += Format(plot.lastXdelta.Item(j).Item(i), "00") + ", "
+                Next
+                ocvb.putText(New ActiveClass.TrueType(outStr, 10, y))
+                y += 20
+            Next
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        host.Dispose()
+        imu.Dispose()
     End Sub
 End Class

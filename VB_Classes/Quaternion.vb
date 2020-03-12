@@ -39,9 +39,9 @@ End Class
 
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/pose-predict
 Public Class Quaterion_IMUPrediction : Implements IDisposable
-    Dim imu As IMU_FrameTimes
+    Dim imu As IMU_FrameTime
     Public Sub New(ocvb As AlgorithmData)
-        imu = New IMU_FrameTimes(ocvb)
+        imu = New IMU_FrameTime(ocvb)
         imu.plot.sliders.Hide()
         imu.externalUse = True
 

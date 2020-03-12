@@ -70,7 +70,6 @@ End Module
 End Structure
 Public Class CameraT265Native
     Inherits Camera
-#Region "T265Data"
     Dim pipeline As New rs.Pipeline ' even though this is not used, removing it makes the interface fail.  The constructor is needed.
 
     Dim intrinsicsLeft As rs.Intrinsics
@@ -80,21 +79,8 @@ Public Class CameraT265Native
     Dim depth16Width As Int32
 
     Public extrinsics As rs.Extrinsics
-    Public IMUpresent As Boolean = True
-    Public imuTimeStamp As Double
     Public pc As New rs.PointCloud
 
-#End Region
-    Private Sub setintrinsicsLeft(intrinsicsLeft As rs.Intrinsics)
-        intrinsicsLeft_VB.width = intrinsicsLeft.width
-        intrinsicsLeft_VB.height = intrinsicsLeft.height
-        intrinsicsLeft_VB.ppx = intrinsicsLeft.ppx
-        intrinsicsLeft_VB.ppy = intrinsicsLeft.ppy
-        intrinsicsLeft_VB.fx = intrinsicsLeft.fx
-        intrinsicsLeft_VB.fy = intrinsicsLeft.fy
-        intrinsicsLeft_VB.FOV = intrinsicsLeft.FOV
-        intrinsicsLeft_VB.coeffs = intrinsicsLeft.coeffs
-    End Sub
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
@@ -124,7 +110,7 @@ Public Class CameraT265Native
         Static leftBytes(rawHeight * rawWidth - 1) As Byte
         Static rightBytes(leftBytes.Length - 1) As Byte
         Static depth16Bytes(depth16Width * depth16Height * 2 - 1) As Byte
-        Static rgbdBytes(colorBytes.Length - 1) As Byte
+        Static rgbdBytes(colorBytes.Length - 1) As Byte ' most of the image is grayscale but the 300x300 part is RGB so the whole has to be...
 
         If pipelineClosed Then Exit Sub
 

@@ -14,6 +14,7 @@ Public Class Plot_OverTime : Implements IDisposable
     Public columnIndex As Int32
     Public offChartCount As Integer
     Public lastXdelta As New List(Of cv.Scalar)
+    Dim myStopWatch As Stopwatch
     Public Sub New(ocvb As AlgorithmData)
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Reset the plot scale"
@@ -25,9 +26,10 @@ Public Class Plot_OverTime : Implements IDisposable
         sliders.setupTrackBar3(ocvb, "Plot (time) Font Size x10", 1, 20, 10)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Plot an input variable over time"
+        MyStopWatch = Stopwatch.StartNew()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-
+        Static rangeReset As Boolean = False
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
         If ocvb.frameCount = 0 Then
@@ -36,6 +38,11 @@ Public Class Plot_OverTime : Implements IDisposable
         Dim pixelHeight = CInt(sliders.TrackBar1.Value)
         Dim pixelWidth = CInt(sliders.TrackBar2.Value)
         If columnIndex + pixelWidth >= ocvb.color.Width Then
+            ' after the first screenful of data, reset the scale to appropriate values.
+            If rangeReset = False Then
+                rangeReset = True
+                offChartCount = Integer.MaxValue
+            End If
             dst.ColRange(columnIndex, ocvb.color.Width).SetTo(backColor)
             columnIndex = 0
         End If
@@ -64,7 +71,7 @@ Public Class Plot_OverTime : Implements IDisposable
         If lastXdelta.Count >= plotSeriesCount Then lastXdelta.RemoveAt(0)
 
         Dim rectSize = New cv.Size2f(pixelWidth, pixelHeight)
-        Dim ellipseSize = New cv.Size(pixelWidth * 2, pixelHeight)
+        Dim ellipseSize = New cv.Size(pixelWidth, pixelHeight * 2)
         If plotData.Item(3) < 10 Then plotCount = plotCount
         For i = 0 To plotCount - 1
             If plotData.Item(i) < minScale And plotData.Item(i) > maxScale Then
@@ -89,6 +96,14 @@ Public Class Plot_OverTime : Implements IDisposable
                     drawRotatedRectangle(rotatedRect, ocvb.result2, plotColors(i))
             End Select
         Next
+
+        Static lastSeconds As Double
+        Dim nextWatchVal = myStopWatch.ElapsedMilliseconds
+        If nextWatchVal - lastSeconds > 1000 Then
+            lastSeconds = nextWatchVal
+            dst.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst.Height), cv.Scalar.White, 1)
+        End If
+
         columnIndex += pixelWidth
         dst.Col(columnIndex).SetTo(0)
         If externalUse = False Then ocvb.label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
@@ -171,11 +186,11 @@ Module Plot_OpenCV_Module
         If spaceVal < 1 Then spaceVal = 1
         For i = 0 To 4
             Dim pt1 = New cv.Point(0, spacer * i)
-            Dim pt2 = New cv.Point(10, spacer * i)
-            dst.Line(pt1, pt2, cv.Scalar.White, 3)
+            Dim pt2 = New cv.Point(dst.Width, spacer * i)
+            dst.Line(pt1, pt2, cv.Scalar.White, 1)
             If i = 0 Then pt2.Y += 10
-            cv.Cv2.PutText(dst, Format(maxVal - spaceVal * i, "###,###,##0"), New cv.Point(pt2.X + 5, pt2.Y + 8),
-                           cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 2)
+            cv.Cv2.PutText(dst, Format(maxVal - spaceVal * i, "###,###,##0"), New cv.Point(pt1.X + 5, pt1.Y - 4),
+                           cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.Black, 2)
         Next
     End Sub
 End Module

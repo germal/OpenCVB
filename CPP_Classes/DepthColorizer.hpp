@@ -11,8 +11,8 @@ public:
 	Depth_Colorizer() {}
 	void Run()
 	{
-		unsigned char nearColor[3] = { 0, 255, 255 };
-		unsigned char farColor[3] = { 255, 0, 0 };
+		unsigned char nearColor[3] = { 255, 0, 0 };
+		unsigned char farColor[3] = { 0, 255, 255 } ;
 		// Produce a cumulative histogram of depth values
 		int histogram[256 * 256] = { 1 };
 		unsigned short* depthImage = (unsigned short*)depth.data;

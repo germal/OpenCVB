@@ -136,7 +136,12 @@ Public Class OpenCVB
         cameraT265.deviceCount = USBenumeration("T265")
         If cameraT265.deviceCount > 0 Then cameraT265.initialize(fps, regWidth, regHeight)
 
+#If 1 Then
         cameraD400Series = New CameraD400()
+#Else
+        cameraD400Series = New CameraD400Native()
+#End If
+
         cameraD400Series.deviceCount = USBenumeration("Depth Camera 435")
         cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 415 Depth")
         cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 435 With RGB Module Depth")
@@ -273,7 +278,8 @@ Public Class OpenCVB
                 ' draw any TrueType font data on the image 
                 Dim white = System.Drawing.Color.White
                 Dim maxline = 21
-                For Each tt In TTtextData(pic.Tag)
+                For i = 0 To TTtextData(pic.Tag).Count - 1 ' using enumeration here would occasionally generate a mistaken warning.
+                    Dim tt = TTtextData(pic.Tag)(i)
                     g.DrawString(tt.text, New Font(tt.fontName, tt.fontSize), New SolidBrush(white), tt.x, tt.y)
                     If tt.x >= camPic(pic.Tag).Width Or tt.y >= camPic(pic.Tag).Height Then
                         Console.WriteLine("TrueType text off image!  " + tt.text + " is being written to " + CStr(tt.x) + " and " + CStr(tt.y))
@@ -334,7 +340,10 @@ Public Class OpenCVB
         For Each info In search.Get()
             Name = CType(info("Caption"), String) ' Get the name of the device.'
             'If InStr(Name, "Xeon", CompareMethod.Text) = False And InStr(Name, "Intel", CompareMethod.Text) = False Then Console.WriteLine(Name)
-            If InStr(Name, searchName, CompareMethod.Text) > 0 Then deviceCount += 1
+            If InStr(Name, searchName, CompareMethod.Text) > 0 Then
+                deviceCount += 1
+                Exit For
+            End If
         Next
         Return deviceCount
     End Function
@@ -782,6 +791,7 @@ Public Class OpenCVB
         stopAlgorithmThread = True
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
 
+#If 1 Then
         cameraD400Series.DecimationFilter = GetSetting("OpenCVB", "DecimationFilter", "DecimationFilter", False)
         cameraD400Series.ThresholdFilter = GetSetting("OpenCVB", "ThresholdFilter", "ThresholdFilter", False)
         cameraD400Series.DepthToDisparity = GetSetting("OpenCVB", "DepthToDisparity", "DepthToDisparity", True)
@@ -789,7 +799,7 @@ Public Class OpenCVB
         cameraD400Series.TemporalFilter = GetSetting("OpenCVB", "TemporalFilter", "TemporalFilter", False)
         cameraD400Series.HoleFillingFilter = GetSetting("OpenCVB", "HoleFillingFilter", "HoleFillingFilter", True)
         cameraD400Series.DisparityToDepth = GetSetting("OpenCVB", "DisparityToDepth", "DisparityToDepth", True)
-
+#End If
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
         lowResolution = optionsForm.lowResolution.Checked
 

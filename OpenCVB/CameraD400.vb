@@ -54,8 +54,7 @@ Public Class CameraD400
             MsgBox("This driver only supports the D435, D415, or D435I cameras. " + vbCrLf + "Is this a new Intel camera?  It is called: " + deviceName)
             deviceCount = 0
         Else
-            Dim dintrinsicsLeft = pipeline_profile.GetStream(rs.Stream.Depth).As(Of rs.VideoStreamProfile).GetIntrinsics
-            Dim cintrinsicsLeft = pipeline_profile.GetStream(rs.Stream.Color).As(Of rs.VideoStreamProfile).GetIntrinsics
+            Dim dintrinsicsLeft = pipeline_profile.GetStream(rs.Stream.Color).As(Of rs.VideoStreamProfile).GetIntrinsics
             MyBase.w = dintrinsicsLeft.width
             MyBase.h = dintrinsicsLeft.height
             intrinsicsLeft_VB.width = dintrinsicsLeft.width
@@ -74,14 +73,6 @@ Public Class CameraD400
             Next
             Extrinsics_VB.rotation = extrinsics.rotation
             Extrinsics_VB.translation = extrinsics.translation
-
-            ReDim colorBytes(w * h * 3 - 1)
-            ReDim RGBDepthBytes(w * h * 3 - 1)
-            ReDim depthBytes(w * h * 2 - 1)
-            ReDim disparityBytes(w * h * 4 - 1)
-            ReDim leftViewBytes(w * h - 1)
-            ReDim rightViewBytes(w * h - 1)
-            ReDim vertices(w * h * 4 * 3 - 1) ' 3 floats or 12 bytes per pixel.  
         End If
     End Sub
     Public Sub GetNextFrame()
@@ -106,7 +97,6 @@ Public Class CameraD400
             Dim depthFrame = frames.DepthFrame()
             Dim colorFrame = frames.ColorFrame
             Dim disparityFrame = depth2Disparity.Process(depthFrame)
-            Dim RGBDepthframe = colorizer.Process(depthFrame)
             Dim rawRight As rs.Frame = Nothing
             Dim rawLeft = frames.InfraredFrame
             For Each frame In frames
@@ -117,15 +107,6 @@ Public Class CameraD400
                     End If
                 End If
             Next
-
-            Marshal.Copy(colorFrame.Data, colorBytes, 0, colorBytes.Length)
-            Marshal.Copy(RGBDepthframe.Data, RGBDepthBytes, 0, RGBDepthBytes.Length)
-            Dim points = pc.Process(depthFrame).As(Of rs.Points)
-            Marshal.Copy(points.Data, vertices, 0, vertices.Length)
-            Marshal.Copy(disparityFrame.Data, disparityBytes, 0, disparityBytes.Length)
-            Marshal.Copy(depthFrame.Data, depthBytes, 0, depthBytes.Length)
-            Marshal.Copy(rawLeft.Data, leftViewBytes, 0, leftViewBytes.Length)
-            Marshal.Copy(rawRight.Data, rightViewBytes, 0, rightViewBytes.Length)
 
             SyncLock OpenCVB.camPic
                 ' get motion data and timestamp from the gyro and accelerometer
@@ -141,13 +122,14 @@ Public Class CameraD400
                     imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame.Data)
                 End If
 
-                color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorBytes)
-                RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
-                depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, depthBytes)
-                disparity = New cv.Mat(h, w, cv.MatType.CV_32F, disparityBytes)
-                leftView = New cv.Mat(h, w, cv.MatType.CV_8U, leftViewBytes)
-                rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rightViewBytes)
-                pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
+                color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorFrame.Data)
+                RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorizer.Process(depthFrame).Data)
+                depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, depthFrame.Data)
+                disparity = New cv.Mat(h, w, cv.MatType.CV_32F, disparityFrame.Data)
+                leftView = New cv.Mat(h, w, cv.MatType.CV_8U, rawLeft.Data)
+                rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rawRight.Data)
+                Dim points = pc.Process(depthFrame).As(Of rs.Points)
+                pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, points.Data)
             End SyncLock
 
         Catch ex As Exception

@@ -20,7 +20,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cameraT265.cpp">
+    <ClCompile Include="cameraD400.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
