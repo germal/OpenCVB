@@ -27,6 +27,12 @@ Public Class CameraD400
     Public ThresholdFilter As Boolean
 
     Public pc As New rs.PointCloud
+    Dim depthFrame As rs.DepthFrame
+    Dim colorFrame As rs.Frame
+    Dim disparityFrame As rs.Frame
+    Dim rawRight As rs.Frame
+    Dim rawLeft As rs.Frame
+
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
         devices = ctx.QueryDevices()
         device = devices(0)
@@ -95,11 +101,10 @@ Public Class CameraD400
 
             frames = procf.As(Of rs.FrameSet)()
             SyncLock OpenCVB.camPic
-                Dim depthFrame = frames.DepthFrame()
-                Dim colorFrame = frames.ColorFrame
-                Dim disparityFrame = depth2Disparity.Process(depthFrame)
-                Dim rawRight As rs.Frame = Nothing
-                Dim rawLeft = frames.InfraredFrame
+                depthFrame = frames.DepthFrame()
+                colorFrame = frames.ColorFrame
+                disparityFrame = depth2Disparity.Process(depthFrame)
+                rawLeft = frames.InfraredFrame
                 For Each frame In frames
                     If frame.Profile.Stream = rs.Stream.Infrared Then
                         If frame.Profile.Index = 2 Then
