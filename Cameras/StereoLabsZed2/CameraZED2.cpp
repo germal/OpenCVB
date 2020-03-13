@@ -76,7 +76,6 @@ public:
 
 	int *waitForFrame(void* rgba, void* depthRGBA, void* _depth32f, void* left, void* right, void* pointCloud)
 	{
-		// allocate and free the mat structures to try and avoid the flicker problem as GPU memory garbage collects.
 		sl::Mat color, RGBADepth, depth32F, leftView, rightView, pcMat;
 
 		zed.grab();

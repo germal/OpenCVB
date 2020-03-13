@@ -131,6 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.vb" />
+    <Compile Include="CameraD400Native.vb" />
     <Compile Include="CameraMyntD.vb" />
     <Compile Include="CameraT265Native.vb" />
     <Compile Include="OptionsDialog.Designer.vb">

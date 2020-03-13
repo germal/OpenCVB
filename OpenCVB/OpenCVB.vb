@@ -136,7 +136,7 @@ Public Class OpenCVB
         cameraT265.deviceCount = USBenumeration("T265")
         If cameraT265.deviceCount > 0 Then cameraT265.initialize(fps, regWidth, regHeight)
 
-#If 1 Then
+#If 0 Then
         cameraD400Series = New CameraD400()
 #Else
         cameraD400Series = New CameraD400Native()
@@ -791,7 +791,7 @@ Public Class OpenCVB
         stopAlgorithmThread = True
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
 
-#If 1 Then
+#If 0 Then
         cameraD400Series.DecimationFilter = GetSetting("OpenCVB", "DecimationFilter", "DecimationFilter", False)
         cameraD400Series.ThresholdFilter = GetSetting("OpenCVB", "ThresholdFilter", "ThresholdFilter", False)
         cameraD400Series.DepthToDisparity = GetSetting("OpenCVB", "DepthToDisparity", "DepthToDisparity", True)

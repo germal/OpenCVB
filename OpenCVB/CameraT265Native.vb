@@ -104,14 +104,14 @@ Public Class CameraT265Native
         extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin)
         Extrinsics_VB.rotation = extrinsics.rotation
         Extrinsics_VB.translation = extrinsics.translation
+
+        ReDim colorBytes(w * h * 3 - 1)
+        ReDim leftViewBytes(rawHeight * rawWidth - 1)
+        ReDim rightViewBytes(leftViewBytes.Length - 1)
+        ReDim depthBytes(depth16Width * depth16Height * 2 - 1)
+        ReDim RGBDepthBytes(colorBytes.Length - 1)  ' most of the image is grayscale but the 300x300 part is RGB so the whole has to be...
     End Sub
     Public Sub GetNextFrame()
-        Static colorBytes(w * h * 3 - 1) As Byte
-        Static leftBytes(rawHeight * rawWidth - 1) As Byte
-        Static rightBytes(leftBytes.Length - 1) As Byte
-        Static depth16Bytes(depth16Width * depth16Height * 2 - 1) As Byte
-        Static rgbdBytes(colorBytes.Length - 1) As Byte ' most of the image is grayscale but the 300x300 part is RGB so the whole has to be...
-
         If pipelineClosed Then Exit Sub
 
         Dim colorPtr = T265WaitFrame(cPtr)
@@ -145,21 +145,21 @@ Public Class CameraT265Native
         color = leftView
 
         Dim rightPtr = T265RightRaw(cPtr)
-        Marshal.Copy(rightPtr, rightBytes, 0, rightBytes.Length - 1)
-        rightView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, rightBytes)
+        Marshal.Copy(rightPtr, rightViewBytes, 0, rightViewBytes.Length - 1)
+        rightView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, rightViewBytes)
 
         Dim leftPtr = T265LeftRaw(cPtr)
-        Marshal.Copy(leftPtr, leftBytes, 0, leftBytes.Length - 1)
-        leftView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, leftBytes)
+        Marshal.Copy(leftPtr, leftViewBytes, 0, leftViewBytes.Length - 1)
+        leftView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, leftViewBytes)
 
         Dim rgbdPtr = T265RGBDepth(cPtr)
-        Marshal.Copy(rgbdPtr, rgbdBytes, 0, rgbdBytes.Length - 1)
-        RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, rgbdBytes)
+        Marshal.Copy(rgbdPtr, RGBDepthBytes, 0, RGBDepthBytes.Length - 1)
+        RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
 
         Dim depthPtr = T265Depth16(cPtr)
-        Marshal.Copy(depthPtr, depth16Bytes, 0, depth16Bytes.Length - 1)
-        depth16 = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_16U, depth16Bytes)
-        disparity = depth16
+        Marshal.Copy(depthPtr, depthBytes, 0, depthBytes.Length - 1)
+        depth16 = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_16U, depthBytes)
+        disparity = New cv.Mat(h, w, cv.MatType.CV_32F)
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
 End Class

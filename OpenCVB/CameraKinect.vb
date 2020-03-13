@@ -160,7 +160,8 @@ Public Class CameraKinect
                 depth16.ConvertTo(disparity, cv.MatType.CV_32F)
 
                 Dim pc = New cv.Mat(h, w, cv.MatType.CV_16SC3, KinectPointCloud(cPtr))
-                pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3) ' This is less efficient than using 16-bit pixels but consistent with Intel cameras (and more widely accepted as normal.)
+                ' This is less efficient than using 16-bit pixels but consistent with Intel cameras (and more widely accepted.)
+                pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3)
                 pointCloud *= pcMultiplier ' change to meters...
             End SyncLock
         End If

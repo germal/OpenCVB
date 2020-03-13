@@ -39,9 +39,9 @@ Public Class Camera
 
     Public colorBytes() As Byte
     Public vertices() As Byte
-    Public RGBADepthBytes() As Byte
     Public depthBytes() As Byte
     Public RGBDepthBytes() As Byte
+    Public RGBADepthBytes() As Byte
     Public leftViewBytes() As Byte
     Public rightViewBytes() As Byte
     Public disparityBytes() As Byte

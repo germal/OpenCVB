@@ -97,7 +97,6 @@ Public Class CameraD400Native
     Public Sub New()
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
-#If 0 Then
         deviceName = "Intel D400"
         IMU_Present = True
         w = width
@@ -114,72 +113,8 @@ Public Class CameraD400Native
         extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin)
         Extrinsics_VB.rotation = extrinsics.rotation
         Extrinsics_VB.translation = extrinsics.translation
-#Else
-        Devices = ctx.QueryDevices()
-        device = Devices(0)
-        deviceName = device.Info.Item(rs.CameraInfo.Name)
-        Console.WriteLine("The current librealsense version is " + ctx.Version())
-
-        cfg.EnableStream(rs.Stream.Color, width, height, rs.Format.Bgr8, fps)
-        cfg.EnableStream(rs.Stream.Depth, width, height, rs.Format.Z16, fps)
-        cfg.EnableStream(rs.Stream.Infrared, 1, width, height, rs.Format.Y8, fps) ' left
-        cfg.EnableStream(rs.Stream.Infrared, 2, width, height, rs.Format.Y8, fps) ' right
-
-        If deviceName = "Intel RealSense D435I" Then
-            cfg.EnableStream(rs.Stream.Gyro)
-            cfg.EnableStream(rs.Stream.Accel)
-            IMU_Present = True
-        End If
-
-        pipeline_profile = pipeline.Start(cfg)
-
-        align = New rs.Align(rs.Stream.Color)
-        sensor = pipeline_profile.Device.Sensors.First() ' This may change!  But just take the first for now.  It is the only one with 7 filters
-        blocks = sensor.ProcessingBlocks.ToList()
-
-        If deviceName <> "Intel RealSense D435" And deviceName <> "Intel RealSense D415" And deviceName <> "Intel RealSense D435I" Then
-            MsgBox("This driver only supports the D435, D415, or D435I cameras. " + vbCrLf + "Is this a new Intel camera?  It is called: " + deviceName)
-            deviceCount = 0
-        Else
-            Dim dintrinsicsLeft = pipeline_profile.GetStream(rs.Stream.Color).As(Of rs.VideoStreamProfile).GetIntrinsics
-            MyBase.w = dintrinsicsLeft.width
-            MyBase.h = dintrinsicsLeft.height
-            intrinsicsLeft_VB.width = dintrinsicsLeft.width
-            intrinsicsLeft_VB.height = dintrinsicsLeft.height
-            intrinsicsLeft_VB.ppx = dintrinsicsLeft.ppx
-            intrinsicsLeft_VB.ppy = dintrinsicsLeft.ppy
-            intrinsicsLeft_VB.fx = dintrinsicsLeft.fx
-            intrinsicsLeft_VB.fy = dintrinsicsLeft.fy
-            intrinsicsLeft_VB.FOV = dintrinsicsLeft.FOV
-            intrinsicsLeft_VB.coeffs = dintrinsicsLeft.coeffs
-            intrinsicsRight_VB = intrinsicsLeft_VB ' How to get the right lens intrinsics?
-            Dim extrinsics As rs.Extrinsics = Nothing
-            For Each stream In pipeline_profile.Streams
-                extrinsics = stream.GetExtrinsicsTo(pipeline_profile.GetStream(rs.Stream.Infrared))
-                If extrinsics.rotation(0) <> 1 Then Exit For
-            Next
-            Extrinsics_VB.rotation = extrinsics.rotation
-            Extrinsics_VB.translation = extrinsics.translation
-
-            ReDim colorBytes(w * h * 3 - 1)
-            ReDim RGBDepthBytes(w * h * 3 - 1)
-            ReDim depthBytes(w * h * 2 - 1)
-            ReDim disparityBytes(w * h * 4 - 1)
-            ReDim leftViewBytes(w * h - 1)
-            ReDim rightViewBytes(w * h - 1)
-            ReDim vertices(w * h * 4 * 3 - 1) ' 3 floats or 12 bytes per pixel.  
-        End If
-#End If
     End Sub
     Public Sub GetNextFrame()
-        ReDim colorBytes(w * h * 3 - 1)
-        ReDim depthBytes(w * h * 2 - 1)
-        ReDim disparityBytes(w * h * 2 - 1)
-        ReDim RGBDepthBytes(colorBytes.Length - 1)
-        ReDim leftViewBytes(w * h - 1)
-        ReDim rightViewBytes(w * h - 1)
-        ReDim vertices(w * h * 3 * 3 - 1)
-
         If pipelineClosed Then Exit Sub
 
         Dim colorPtr = D400WaitForFrame(cPtr)
@@ -188,15 +123,15 @@ Public Class CameraD400Native
             IMU_TimeStamp = D400IMUTimeStamp(cPtr)
             Static imuStartTime = IMU_TimeStamp
             IMU_TimeStamp -= imuStartTime
-        End SyncLock
 
-        color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorBytes)
-        RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
-        depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, depthBytes)
-        disparity = New cv.Mat(h, w, cv.MatType.CV_16U, disparityBytes)
-        leftView = New cv.Mat(h, w, cv.MatType.CV_8U, leftViewBytes)
-        rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rightViewBytes)
-        pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, vertices)
+            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorPtr)
+            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, 0)
+            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, D400Depth16(cPtr))
+            disparity = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
+            leftView = New cv.Mat(h, w, cv.MatType.CV_8U, D400LeftRaw(cPtr))
+            rightView = New cv.Mat(h, w, cv.MatType.CV_8U, D400RightRaw(cPtr))
+            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, 0) ' D400PointCloud(cPtr))
+        End SyncLock
 
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
