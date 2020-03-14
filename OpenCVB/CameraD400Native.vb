@@ -85,6 +85,7 @@ Public Class CameraD400Native
         Dim intrin = D400intrinsicsLeft(cPtr)
         intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
         intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)
+        intrinsicsRight_VB = intrinsicsLeft_VB ' need to get the Right lens intrinsics?
 
         Dim extrin = D400Extrinsics(cPtr)
         extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin)
