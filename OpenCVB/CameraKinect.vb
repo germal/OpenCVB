@@ -105,6 +105,7 @@ Public Class CameraKinect
             intrinsicsRight_VB = intrinsicsLeft_VB ' there is no right lens - just copy for compatibility.
 
             ReDim RGBDepthBytes(w * h * 3 - 1)
+            pointCloud = New cv.Mat()
         End If
     End Sub
 
