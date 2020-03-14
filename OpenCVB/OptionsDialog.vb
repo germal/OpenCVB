@@ -16,12 +16,9 @@ Public Class OptionsDialog
 
         SaveSetting("OpenCVB", "DecimationFilter", "DecimationFilter", DecimationFilter.Checked)
         SaveSetting("OpenCVB", "ThresholdFilter", "ThresholdFilter", ThresholdFilter.Checked)
-        SaveSetting("OpenCVB", "DepthToDisparity", "DepthToDisparity", DepthToDisparity.Checked)
         SaveSetting("OpenCVB", "SpatialFilter", "SpatialFilter", SpatialFilter.Checked)
         SaveSetting("OpenCVB", "TemporalFilter", "TemporalFilter", TemporalFilter.Checked)
         SaveSetting("OpenCVB", "HoleFillingFilter", "HoleFillingFilter", HoleFillingFilter.Checked)
-        SaveSetting("OpenCVB", "DisparityToDepth", "DisparityToDepth", DisparityToDepth.Checked)
-        SaveSetting("OpenCVB", "EnableAltCams", "EnableAltCams", EnableAltCams.Checked)
 
         SaveSetting("OpenCVB", "TestAllDuration", "TestAllDuration", TestAllDuration.Value)
         SaveSetting("OpenCVB", "SnapToGrid", "SnapToGrid", SnapToGrid.Checked)
@@ -63,12 +60,9 @@ Public Class OptionsDialog
 
         DecimationFilter.Checked = GetSetting("OpenCVB", "DecimationFilter", "DecimationFilter", False)
         ThresholdFilter.Checked = GetSetting("OpenCVB", "ThresholdFilter", "ThresholdFilter", False)
-        DepthToDisparity.Checked = GetSetting("OpenCVB", "DepthToDisparity", "DepthToDisparity", True)
         SpatialFilter.Checked = GetSetting("OpenCVB", "SpatialFilter", "SpatialFilter", True)
         TemporalFilter.Checked = GetSetting("OpenCVB", "TemporalFilter", "TemporalFilter", False)
         HoleFillingFilter.Checked = GetSetting("OpenCVB", "HoleFillingFilter", "HoleFillingFilter", True)
-        DisparityToDepth.Checked = GetSetting("OpenCVB", "DisparityToDepth", "DisparityToDepth", True)
-        EnableAltCams.Checked = GetSetting("OpenCVB", "EnableAltCams", "EnableAltCams", False)
 
         TestAllDuration.Value = GetSetting("OpenCVB", "TestAllDuration", "TestAllDuration", 10)
         SnapToGrid.Checked = GetSetting("OpenCVB", "SnapToGrid", "SnapToGrid", True)

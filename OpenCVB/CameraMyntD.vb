@@ -78,7 +78,6 @@ Public Class CameraMyntD
             Console.WriteLine("MYNT EYE D 1000 serial number = " + CStr(serialNumber))
             w = width
             h = height
-            disparity = New cv.Mat
             leftView = New cv.Mat
 
             Dim ptr = MyntDExtrinsics(cPtr)
@@ -208,8 +207,6 @@ Public Class CameraMyntD
 
             Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depth32FBytes)
             depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
-
-            disparity = depth16.Clone()
 
             leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftViewBytes)
             rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightViewBytes)

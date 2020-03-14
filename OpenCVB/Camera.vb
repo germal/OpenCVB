@@ -27,7 +27,6 @@ Public Class Camera
     Public RGBDepth As cv.Mat
     Public deviceCount As Int32
     Public deviceName As String
-    Public disparity As cv.Mat
     Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
     Public imuAccel As cv.Point3f
     Public imuGyro As cv.Point3f
@@ -92,17 +91,13 @@ Public Class Camera
         intrinsicsLeft_VB.coeffs = intrinsicsLeft.coeffs
     End Sub
     Public Sub New()
-        pointCloud = New cv.Mat()
-        disparity = New cv.Mat()
-        depth16 = New cv.Mat()
     End Sub
     Public Sub GetNextFrameCounts(frameTime As Double)
         Static imageCounter As Integer
         Static totalMS = frameTime
         If totalMS > 1000 Then
-            'Console.WriteLine("image = " + CStr(imageCounter) + " internal camera FPS")
             imageCounter = 0
-            totalMS = 0
+            totalMS = totalMS - 1000
         End If
         imageCounter += 1
         totalMS += frameTime

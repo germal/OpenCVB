@@ -158,7 +158,6 @@
     <Compile Include="DFT.vb" />
     <Compile Include="Diff.vb" />
     <Compile Include="DilateErode.vb" />
-    <Compile Include="Disparity.vb" />
     <Compile Include="Distance.vb" />
     <Compile Include="DNN.vb" />
     <Compile Include="Draw.vb" />

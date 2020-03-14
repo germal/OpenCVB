@@ -32,11 +32,9 @@ Partial Class OptionsDialog
         Me.ShowConsoleLog = New System.Windows.Forms.CheckBox()
         Me.ShowLabels = New System.Windows.Forms.CheckBox()
         Me.Filters = New System.Windows.Forms.GroupBox()
-        Me.DisparityToDepth = New System.Windows.Forms.CheckBox()
         Me.HoleFillingFilter = New System.Windows.Forms.CheckBox()
         Me.TemporalFilter = New System.Windows.Forms.CheckBox()
         Me.SpatialFilter = New System.Windows.Forms.CheckBox()
-        Me.DepthToDisparity = New System.Windows.Forms.CheckBox()
         Me.ThresholdFilter = New System.Windows.Forms.CheckBox()
         Me.DecimationFilter = New System.Windows.Forms.CheckBox()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
@@ -50,7 +48,6 @@ Partial Class OptionsDialog
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.OKButton = New System.Windows.Forms.Button()
         Me.Cancel_Button = New System.Windows.Forms.Button()
-        Me.EnableAltCams = New System.Windows.Forms.CheckBox()
         Me.CameraGroup.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -62,11 +59,10 @@ Partial Class OptionsDialog
         '
         'CameraGroup
         '
-        Me.CameraGroup.Controls.Add(Me.EnableAltCams)
         Me.CameraGroup.Controls.Add(Me.SnapToGrid)
         Me.CameraGroup.Location = New System.Drawing.Point(21, 12)
         Me.CameraGroup.Name = "CameraGroup"
-        Me.CameraGroup.Size = New System.Drawing.Size(771, 261)
+        Me.CameraGroup.Size = New System.Drawing.Size(771, 227)
         Me.CameraGroup.TabIndex = 3
         Me.CameraGroup.TabStop = False
         Me.CameraGroup.Text = "Camera"
@@ -85,7 +81,7 @@ Partial Class OptionsDialog
         '
         Me.GroupBox1.Controls.Add(Me.AccurateProcessing)
         Me.GroupBox1.Controls.Add(Me.lowResolution)
-        Me.GroupBox1.Location = New System.Drawing.Point(21, 279)
+        Me.GroupBox1.Location = New System.Drawing.Point(21, 240)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(936, 128)
         Me.GroupBox1.TabIndex = 4
@@ -119,7 +115,7 @@ Partial Class OptionsDialog
         Me.GroupBox2.Controls.Add(Me.AvoidDNNCrashes)
         Me.GroupBox2.Controls.Add(Me.ShowConsoleLog)
         Me.GroupBox2.Controls.Add(Me.ShowLabels)
-        Me.GroupBox2.Location = New System.Drawing.Point(21, 413)
+        Me.GroupBox2.Location = New System.Drawing.Point(21, 372)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(936, 192)
         Me.GroupBox2.TabIndex = 5
@@ -159,35 +155,22 @@ Partial Class OptionsDialog
         '
         'Filters
         '
-        Me.Filters.Controls.Add(Me.DisparityToDepth)
         Me.Filters.Controls.Add(Me.HoleFillingFilter)
         Me.Filters.Controls.Add(Me.TemporalFilter)
         Me.Filters.Controls.Add(Me.SpatialFilter)
-        Me.Filters.Controls.Add(Me.DepthToDisparity)
         Me.Filters.Controls.Add(Me.ThresholdFilter)
         Me.Filters.Controls.Add(Me.DecimationFilter)
-        Me.Filters.Location = New System.Drawing.Point(21, 611)
+        Me.Filters.Location = New System.Drawing.Point(21, 566)
         Me.Filters.Name = "Filters"
-        Me.Filters.Size = New System.Drawing.Size(936, 274)
+        Me.Filters.Size = New System.Drawing.Size(936, 207)
         Me.Filters.TabIndex = 7
         Me.Filters.TabStop = False
         Me.Filters.Text = "RealSense Camera Filters (Running in the DSP chip)"
         '
-        'DisparityToDepth
-        '
-        Me.DisparityToDepth.AutoSize = True
-        Me.DisparityToDepth.Enabled = False
-        Me.DisparityToDepth.Location = New System.Drawing.Point(16, 226)
-        Me.DisparityToDepth.Name = "DisparityToDepth"
-        Me.DisparityToDepth.Size = New System.Drawing.Size(162, 24)
-        Me.DisparityToDepth.TabIndex = 6
-        Me.DisparityToDepth.Text = "Disparity to Depth"
-        Me.DisparityToDepth.UseVisualStyleBackColor = True
-        '
         'HoleFillingFilter
         '
         Me.HoleFillingFilter.AutoSize = True
-        Me.HoleFillingFilter.Location = New System.Drawing.Point(16, 196)
+        Me.HoleFillingFilter.Location = New System.Drawing.Point(16, 165)
         Me.HoleFillingFilter.Name = "HoleFillingFilter"
         Me.HoleFillingFilter.Size = New System.Drawing.Size(151, 24)
         Me.HoleFillingFilter.TabIndex = 5
@@ -197,7 +180,7 @@ Partial Class OptionsDialog
         'TemporalFilter
         '
         Me.TemporalFilter.AutoSize = True
-        Me.TemporalFilter.Location = New System.Drawing.Point(16, 166)
+        Me.TemporalFilter.Location = New System.Drawing.Point(16, 136)
         Me.TemporalFilter.Name = "TemporalFilter"
         Me.TemporalFilter.Size = New System.Drawing.Size(140, 24)
         Me.TemporalFilter.TabIndex = 4
@@ -207,23 +190,12 @@ Partial Class OptionsDialog
         'SpatialFilter
         '
         Me.SpatialFilter.AutoSize = True
-        Me.SpatialFilter.Location = New System.Drawing.Point(16, 136)
+        Me.SpatialFilter.Location = New System.Drawing.Point(16, 106)
         Me.SpatialFilter.Name = "SpatialFilter"
         Me.SpatialFilter.Size = New System.Drawing.Size(123, 24)
         Me.SpatialFilter.TabIndex = 3
         Me.SpatialFilter.Text = "Spatial Filter"
         Me.SpatialFilter.UseVisualStyleBackColor = True
-        '
-        'DepthToDisparity
-        '
-        Me.DepthToDisparity.AutoSize = True
-        Me.DepthToDisparity.Enabled = False
-        Me.DepthToDisparity.Location = New System.Drawing.Point(16, 106)
-        Me.DepthToDisparity.Name = "DepthToDisparity"
-        Me.DepthToDisparity.Size = New System.Drawing.Size(162, 24)
-        Me.DepthToDisparity.TabIndex = 2
-        Me.DepthToDisparity.Text = "Depth to Disparity"
-        Me.DepthToDisparity.UseVisualStyleBackColor = True
         '
         'ThresholdFilter
         '
@@ -250,9 +222,9 @@ Partial Class OptionsDialog
         Me.GroupBox4.Controls.Add(Me.ShowOptions)
         Me.GroupBox4.Controls.Add(Me.TestAllDuration)
         Me.GroupBox4.Controls.Add(Me.Label1)
-        Me.GroupBox4.Location = New System.Drawing.Point(24, 898)
+        Me.GroupBox4.Location = New System.Drawing.Point(22, 774)
         Me.GroupBox4.Name = "GroupBox4"
-        Me.GroupBox4.Size = New System.Drawing.Size(941, 139)
+        Me.GroupBox4.Size = New System.Drawing.Size(935, 139)
         Me.GroupBox4.TabIndex = 8
         Me.GroupBox4.TabStop = False
         Me.GroupBox4.Text = "Test All Options"
@@ -292,9 +264,9 @@ Partial Class OptionsDialog
         Me.GroupBox6.Controls.Add(Me.PythonExeName)
         Me.GroupBox6.Controls.Add(Me.SelectPythonFile)
         Me.GroupBox6.Controls.Add(Me.Label2)
-        Me.GroupBox6.Location = New System.Drawing.Point(21, 1043)
+        Me.GroupBox6.Location = New System.Drawing.Point(21, 914)
         Me.GroupBox6.Name = "GroupBox6"
-        Me.GroupBox6.Size = New System.Drawing.Size(941, 116)
+        Me.GroupBox6.Size = New System.Drawing.Size(936, 116)
         Me.GroupBox6.TabIndex = 9
         Me.GroupBox6.TabStop = False
         Me.GroupBox6.Text = "Python "
@@ -346,22 +318,11 @@ Partial Class OptionsDialog
         Me.Cancel_Button.Text = "Cancel"
         Me.Cancel_Button.UseVisualStyleBackColor = True
         '
-        'EnableAltCams
-        '
-        Me.EnableAltCams.AutoSize = True
-        Me.EnableAltCams.Location = New System.Drawing.Point(63, 220)
-        Me.EnableAltCams.Name = "EnableAltCams"
-        Me.EnableAltCams.Size = New System.Drawing.Size(660, 24)
-        Me.EnableAltCams.TabIndex = 3
-        Me.EnableAltCams.Text = "Check for Zed 2 and MYNT D cameras (unchecked smaller memory footprint, faster lo" &
-    "ad)"
-        Me.EnableAltCams.UseVisualStyleBackColor = True
-        '
         'OptionsDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1049, 1225)
+        Me.ClientSize = New System.Drawing.Size(1049, 1052)
         Me.Controls.Add(Me.Cancel_Button)
         Me.Controls.Add(Me.OKButton)
         Me.Controls.Add(Me.GroupBox6)
@@ -400,11 +361,9 @@ Partial Class OptionsDialog
     Friend WithEvents GroupBox2 As GroupBox
     Friend WithEvents ShowLabels As CheckBox
     Friend WithEvents Filters As GroupBox
-    Friend WithEvents DisparityToDepth As CheckBox
     Friend WithEvents HoleFillingFilter As CheckBox
     Friend WithEvents TemporalFilter As CheckBox
     Friend WithEvents SpatialFilter As CheckBox
-    Friend WithEvents DepthToDisparity As CheckBox
     Friend WithEvents ThresholdFilter As CheckBox
     Friend WithEvents DecimationFilter As CheckBox
     Friend WithEvents GroupBox4 As GroupBox
@@ -420,5 +379,4 @@ Partial Class OptionsDialog
     Friend WithEvents AvoidDNNCrashes As CheckBox
     Friend WithEvents OKButton As Button
     Friend WithEvents Cancel_Button As Button
-    Friend WithEvents EnableAltCams As CheckBox
 End Class

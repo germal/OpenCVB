@@ -9,7 +9,6 @@ Public Class AlgorithmData
     Public depth16 As cv.Mat
     Public RGBDepth As cv.Mat
     Public desc As String
-    Public disparity As cv.Mat
     Public drawRect As cv.Rect ' filled in if the user draws on any of the images.
     Public drawRectClear As Boolean ' used to remove the drawing rectangle when it has been used to initialize a camshift or mean shift.
     Public fontName As String

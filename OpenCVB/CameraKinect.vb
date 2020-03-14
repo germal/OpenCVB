@@ -71,7 +71,6 @@ Public Class CameraKinect
             serialNumber = Marshal.PtrToStringAnsi(strPtr)
             w = width
             h = height
-            disparity = New cv.Mat
             leftView = New cv.Mat
 
             Dim ptr = KinectExtrinsics(cPtr)
@@ -157,7 +156,6 @@ Public Class CameraKinect
                 cv.Cv2.Normalize(depth16, tmp, 0, 255, cv.NormTypes.MinMax)
                 tmp.ConvertTo(leftView, cv.MatType.CV_8U)
                 rightView = leftView
-                depth16.ConvertTo(disparity, cv.MatType.CV_32F)
 
                 Dim pc = New cv.Mat(h, w, cv.MatType.CV_16SC3, KinectPointCloud(cPtr))
                 ' This is less efficient than using 16-bit pixels but consistent with Intel cameras (and more widely accepted.)

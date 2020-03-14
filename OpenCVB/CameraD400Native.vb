@@ -9,32 +9,22 @@ Module D400_Module_CPP
     Public Function D400Open(w As Int32, h As Int32, IMUPresent As Boolean) As IntPtr
     End Function
     <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function D400RawWidth(tp As IntPtr) As Int32
-    End Function
-    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function D400RawHeight(tp As IntPtr) As Int32
-    End Function
-    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function D400Depth16Width(tp As IntPtr) As Int32
-    End Function
-    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function D400Depth16Height(tp As IntPtr) As Int32
-    End Function
-
-    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function D400WaitForFrame(tp As IntPtr) As IntPtr
-    End Function
+    Public Sub D400WaitForFrame(tp As IntPtr)
+    End Sub
     <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function D400RightRaw(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400Color(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function D400LeftRaw(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function D400intrinsicsLeft(tp As IntPtr) As IntPtr
+    Public Function D400Disparity(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function D400intrinsicsLeftRight(tp As IntPtr) As IntPtr
+    Public Function D400intrinsicsLeft(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function D400Extrinsics(tp As IntPtr) As IntPtr
@@ -46,16 +36,16 @@ Module D400_Module_CPP
     Public Function D400RGBDepth(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function D400PoseData(tp As IntPtr) As IntPtr
+    Public Function D400Gyro(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function D400IMUTimeStamp(tp As IntPtr) As Double
     End Function
     <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function D400Depth16(tp As IntPtr) As IntPtr
+    Public Function D400Accel(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function D400timeStampLatency(timeStamp As Double) As Single
+    Public Function D400Depth16(tp As IntPtr) As IntPtr
     End Function
 End Module
 
@@ -72,20 +62,7 @@ End Structure
 Public Class CameraD400Native
     Inherits Camera
 
-    Dim align As rs.Align
-    Dim blocks As List(Of rs.ProcessingBlock)
-    Dim cfg As New rs.Config
-    Dim colorizer As New rs.Colorizer
-    Dim ctx As New rs.Context
-    Dim depth2Disparity As New rs.DisparityTransform
-    Dim device As rs.Device
-    Dim devices As rs.DeviceList
-    Dim pipeline As New rs.Pipeline
-    Dim pipeline_profile As rs.PipelineProfile
-    Dim sensor As rs.Sensor
     Public DecimationFilter As Boolean
-    Public DepthToDisparity As Boolean
-    Public DisparityToDepth As Boolean
     Public HoleFillingFilter As Boolean
     Public SpatialFilter As Boolean
     Public TemporalFilter As Boolean
@@ -117,20 +94,25 @@ Public Class CameraD400Native
     Public Sub GetNextFrame()
         If pipelineClosed Then Exit Sub
 
-        Dim colorPtr = D400WaitForFrame(cPtr)
+        D400WaitForFrame(cPtr)
 
         SyncLock OpenCVB.camPic ' only really need the synclock when in callback mode but it doesn't hurt to waitforframe mode.
-            IMU_TimeStamp = D400IMUTimeStamp(cPtr)
-            Static imuStartTime = IMU_TimeStamp
-            IMU_TimeStamp -= imuStartTime
+            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, D400Color(cPtr)).Clone() ' must be first!  Prepares the procframes...
 
-            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorPtr)
-            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, 0)
-            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, D400Depth16(cPtr))
-            disparity = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
-            leftView = New cv.Mat(h, w, cv.MatType.CV_8U, D400LeftRaw(cPtr))
-            rightView = New cv.Mat(h, w, cv.MatType.CV_8U, D400RightRaw(cPtr))
-            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, 0) ' D400PointCloud(cPtr))
+            Dim accelFrame = D400Accel(cPtr)
+            imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
+
+            Dim gyroFrame = D400Gyro(cPtr)
+            imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
+
+            Static imuStartTime = D400IMUTimeStamp(cPtr)
+            IMU_TimeStamp = D400IMUTimeStamp(cPtr) - imuStartTime
+
+            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, D400RGBDepth(cPtr)).Clone()
+            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, D400Depth16(cPtr)).Clone()
+            leftView = New cv.Mat(h, w, cv.MatType.CV_8U, D400LeftRaw(cPtr)).Clone()
+            rightView = New cv.Mat(h, w, cv.MatType.CV_8U, D400RightRaw(cPtr)).Clone()
+            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, D400PointCloud(cPtr))
         End SyncLock
 
         MyBase.GetNextFrameCounts(IMU_FrameTime)

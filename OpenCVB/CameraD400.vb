@@ -19,8 +19,6 @@ Public Class CameraD400
     Dim sensor As rs.Sensor
 
     Public DecimationFilter As Boolean
-    Public DepthToDisparity As Boolean
-    Public DisparityToDepth As Boolean
     Public HoleFillingFilter As Boolean
     Public SpatialFilter As Boolean
     Public TemporalFilter As Boolean
@@ -54,6 +52,8 @@ Public Class CameraD400
         pipeline_profile = pipeline.Start(cfg)
 
         align = New rs.Align(rs.Stream.Color)
+        Dim deviceA = pipeline_profile.Device
+        Dim sensors = deviceA.Sensors
         sensor = pipeline_profile.Device.Sensors.First() ' This may change!  But just take the first for now.  It is the only one with 7 filters
         blocks = sensor.ProcessingBlocks.ToList()
 
@@ -90,11 +90,9 @@ Public Class CameraD400
             For Each p In blocks
                 If p.Info.Item(0) = "Decimation Filter" And DecimationFilter Then procf = p.Process(frames)
                 If p.Info.Item(0) = "Threshold Filter" And ThresholdFilter Then procf = p.Process(frames)
-                If p.Info.Item(0) = "Depth to Disparity" Then procf = p.Process(frames) ' always have depth to disparity
                 If p.Info.Item(0) = "Spatial Filter" And SpatialFilter Then procf = p.Process(frames)
                 If p.Info.Item(0) = "Temporal Filter" And TemporalFilter Then procf = p.Process(frames)
                 If p.Info.Item(0) = "Hole Filling Filter" And HoleFillingFilter Then procf = p.Process(frames)
-                If p.Info.Item(0) = "Disparity to Depth" Then procf = p.Process(frames) ' always have disparity to depth
             Next
 
             procf = colorizer.Process(frames)
@@ -132,7 +130,6 @@ Public Class CameraD400
                 color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorFrame.Data)
                 RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBdepthFrame.Data)
                 depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, depthFrame.Data)
-                disparity = New cv.Mat(h, w, cv.MatType.CV_32F, disparityFrame.Data)
                 leftView = New cv.Mat(h, w, cv.MatType.CV_8U, rawLeft.Data)
                 rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rawRight.Data)
                 Dim points = pc.Process(depthFrame).As(Of rs.Points)

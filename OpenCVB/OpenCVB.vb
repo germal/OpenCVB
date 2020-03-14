@@ -86,15 +86,15 @@ Public Class OpenCVB
         updatePath(releaseDir, "Release Version of camera DLL's.")
 
         ' check to make sure there are no camera dll's in the Debug directory by mistake!
-        For i = 0 To 3
-            Dim dllName = Choose(i + 1, "Cam_Kinect4.dll", "Cam_MyntD.dll", "Cam_T265.dll", "Cam_Zed2.dll")
-            Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
-            If dllFile.Exists Then
-                MsgBox(dllFile.Name + "was built in the Debug directory." + vbCrLf + "Camera dll's are built in Release" + vbCrLf +
-                       "for performance.  If you need to debug the camera" + vbCrLf + "interface, edit this message.")
-                End
-            End If
-        Next
+        'For i = 0 To 3
+        '    Dim dllName = Choose(i + 1, "Cam_Kinect4.dll", "Cam_MyntD.dll", "Cam_T265.dll", "Cam_Zed2.dll", "Cam_D400.dll")
+        '    Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
+        '    If dllFile.Exists Then
+        '        MsgBox(dllFile.Name + "was built in the Debug directory." + vbCrLf + "Camera dll's are built in Release" + vbCrLf +
+        '               "for performance.  If you need to debug the camera" + vbCrLf + "interface, edit this message.")
+        '        End
+        '    End If
+        'Next
 
         Dim IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Debug\"
         updatePath(IntelPERC_Lib_Dir, "Realsense camera support.")
@@ -132,16 +132,11 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
-        cameraT265 = New CameraT265Native() ' CameraT265() ' 
+        cameraT265 = New CameraT265Native()
         cameraT265.deviceCount = USBenumeration("T265")
         If cameraT265.deviceCount > 0 Then cameraT265.initialize(fps, regWidth, regHeight)
 
-#If 0 Then
-        cameraD400Series = New CameraD400()
-#Else
-        cameraD400Series = New CameraD400Native()
-#End If
-
+        cameraD400Series = New CameraD400Native() ' the pure VB version is in  CameraD400() but it is too slow... use CameraD400Native()
         cameraD400Series.deviceCount = USBenumeration("Depth Camera 435")
         cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 415 Depth")
         cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 435 With RGB Module Depth")
@@ -200,10 +195,8 @@ Public Class OpenCVB
         optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = cameraT265.devicecount
-        If optionsForm.EnableAltCams.Checked Then
-            optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = cameraZed2.devicecount
-            optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) = cameraMyntD.devicecount
-        End If
+        optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = cameraZed2.devicecount
+        optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) = cameraMyntD.devicecount
 
         updateCamera()
 
@@ -220,15 +213,13 @@ Public Class OpenCVB
             optionsForm.cameraIndex = OptionsDialog.T265Camera
             updateCamera()
         End If
-        If optionsForm.EnableAltCams.Checked Then
-            If camera.deviceCount = 0 And cameraZed2.deviceCount > 0 Then
-                optionsForm.cameraIndex = OptionsDialog.StereoLabsZED2
-                updateCamera()
-            End If
-            If camera.deviceCount = 0 And cameraMyntD.deviceCount > 0 Then
-                optionsForm.cameraIndex = OptionsDialog.MyntD1000
-                updateCamera()
-            End If
+        If camera.deviceCount = 0 And cameraZed2.deviceCount > 0 Then
+            optionsForm.cameraIndex = OptionsDialog.StereoLabsZED2
+            updateCamera()
+        End If
+        If camera.deviceCount = 0 And cameraMyntD.deviceCount > 0 Then
+            optionsForm.cameraIndex = OptionsDialog.MyntD1000
+            updateCamera()
         End If
 
         optionsForm.cameraRadioButton(optionsForm.cameraIndex).Checked = True ' make sure any switch is reflected in the UI.
@@ -791,15 +782,12 @@ Public Class OpenCVB
         stopAlgorithmThread = True
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
 
-#If 0 Then
         cameraD400Series.DecimationFilter = GetSetting("OpenCVB", "DecimationFilter", "DecimationFilter", False)
         cameraD400Series.ThresholdFilter = GetSetting("OpenCVB", "ThresholdFilter", "ThresholdFilter", False)
-        cameraD400Series.DepthToDisparity = GetSetting("OpenCVB", "DepthToDisparity", "DepthToDisparity", True)
         cameraD400Series.SpatialFilter = GetSetting("OpenCVB", "SpatialFilter", "SpatialFilter", True)
         cameraD400Series.TemporalFilter = GetSetting("OpenCVB", "TemporalFilter", "TemporalFilter", False)
         cameraD400Series.HoleFillingFilter = GetSetting("OpenCVB", "HoleFillingFilter", "HoleFillingFilter", True)
-        cameraD400Series.DisparityToDepth = GetSetting("OpenCVB", "DisparityToDepth", "DisparityToDepth", True)
-#End If
+
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
         lowResolution = optionsForm.lowResolution.Checked
 
@@ -926,7 +914,6 @@ Public Class OpenCVB
                 End If
                 OpenCVB.ocvb.pointCloud = camera.PointCloud
                 OpenCVB.ocvb.depth16 = camera.Depth16
-                OpenCVB.ocvb.disparity = camera.Disparity
                 OpenCVB.ocvb.leftView = camera.leftView
                 OpenCVB.ocvb.rightView = camera.rightView
                 OpenCVB.ocvb.parms.imuGyro = camera.imuGyro

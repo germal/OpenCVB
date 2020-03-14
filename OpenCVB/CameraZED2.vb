@@ -77,7 +77,6 @@ Public Class CameraZED2
             Console.WriteLine("ZED 2 serial number = " + CStr(serialNumber))
             w = width
             h = height
-            disparity = New cv.Mat
             leftView = New cv.Mat
 
             Dim ptr = Zed2Extrinsics(cPtr)
@@ -210,8 +209,6 @@ Public Class CameraZED2
 
             Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depth32FBytes)
             depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
-
-            disparity = depth16.Clone()
 
             leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftViewBytes)
             rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightViewBytes)

@@ -415,6 +415,7 @@ Public Class IMU_TotalDelay : Implements IDisposable
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
+        ocvb.label1 = "Timing data - total (white) right image"
         ocvb.label2 = "IMU (blue) host (green) Total delay est. (red)"
         ocvb.desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
     End Sub
