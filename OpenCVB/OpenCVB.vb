@@ -660,8 +660,9 @@ Public Class OpenCVB
         lastCameraFrame = camera.frameCount
         Dim cameraFPS As Single = camFrames / (fpsTimer.Interval / 1000)
 
-        Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " + camera.deviceName +
-                  " FPS = " + Format(cameraFPS, "#0.0") + ", Algorithm FPS = " + Format(fps, "#0.0")
+        Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " +
+                  optionsForm.cameraRadioButton(optionsForm.cameraIndex).Text + " FPS = " + Format(cameraFPS, "#0.0") +
+                  ", Algorithm FPS = " + Format(fps, "#0.0")
         If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
     End Sub
     Private Sub saveLayout()
@@ -1044,6 +1045,7 @@ Public Class OpenCVB
             If originalCameraIndex <> cameraIndex Then
                 optionsForm.cameraIndex = cameraIndex
                 RestartCamera()
+                SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", cameraIndex)
             End If
         End If
 
