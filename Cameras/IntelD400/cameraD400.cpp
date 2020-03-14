@@ -104,20 +104,25 @@ int* D400Extrinsics(D400Camera* tp)
 extern "C" __declspec(dllexport)
 double D400IMUTimeStamp(D400Camera* tp)
 {
-	auto gyroframe = tp->procframes.first_or_default(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
-	return gyroframe.get_timestamp();
+	auto gyro = tp->procframes.first_or_default(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+	if (gyro == 0) return 0;
+	return gyro.get_timestamp();
 }
 
 extern "C" __declspec(dllexport)
 int* D400Gyro(D400Camera * tp)
 {
-	return (int*)tp->procframes.first_or_default(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F).get_data();
+	auto gyro = tp->procframes.first_or_default(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+	if (gyro == 0) return 0;
+	return (int*)gyro.get_data();
 }
 
 extern "C" __declspec(dllexport)
 int * D400Accel(D400Camera * tp)
 {
-	return (int *) tp->procframes.first_or_default(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F).get_data();
+	auto accel = tp->procframes.first_or_default(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+	if (accel == 0) return 0;
+	return (int *)accel.get_data();
 }
 
 extern "C" __declspec(dllexport)

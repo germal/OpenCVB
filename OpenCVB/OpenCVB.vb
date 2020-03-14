@@ -165,11 +165,14 @@ Public Class OpenCVB
         cameraZed2.deviceCount = USBenumeration("ZED 2")
         If cameraZed2.deviceCount > 0 Then
             If zed2SDKready = False Then
-                MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
+                If GetSetting("OpenCVB", "zed2SDKready", "zed2SDKready", True) Then
+                    MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
                        "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
                        "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
                        "and rebuild OpenCVB with the StereoLabs SDK.")
-                cameraZed2.deviceCount = 0 ' we can't use this device
+                    cameraZed2.deviceCount = 0 ' we can't use this device
+                    SaveSetting("OpenCVB", "zed2SDKready", "zed2SDKready", False) ' just show this message one time...
+                End If
             Else
                 cameraZed2.initialize(fps, regWidth, regHeight)
             End If
@@ -179,14 +182,17 @@ Public Class OpenCVB
         cameraMyntD.deviceCount = USBenumeration("MYNT-EYE-D1000")
         If cameraMyntD.deviceCount > 0 Then
             If myntSDKready = False Then
-                MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
+                If GetSetting("OpenCVB", "myntSDKready", "myntSDKready", True) Then
+                    MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
                        "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
                        "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
                        "and rebuild OpenCVB with the MYNT SDK." + vbCrLf + vbCrLf +
                        "Also, add environmental variable " + vbCrLf +
                        "MYNTEYE_DEPTHLIB_OUTPUT" + vbCrLf +
                        "to point to '<MYNT_SDK_DIR>/_output'.")
-                cameraMyntD.deviceCount = 0 ' we can't use this device
+                    cameraMyntD.deviceCount = 0 ' we can't use this device
+                    SaveSetting("OpenCVB", "myntSDKready", "myntSDKready", False)
+                End If
             Else
                 cameraMyntD.initialize(fps, regWidth, regHeight)
             End If
@@ -794,6 +800,7 @@ Public Class OpenCVB
 
         parms.lowResolution = lowResolution
         parms.cameraIndex = optionsForm.cameraIndex ' index of active camera
+        parms.cameraName = camera.deviceName
 
         parms.PythonExe = optionsForm.PythonExeName.Text
         parms.vtkDirectory = vtkDirectory

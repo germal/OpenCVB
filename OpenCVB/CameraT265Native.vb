@@ -72,14 +72,12 @@ End Module
 End Structure
 Public Class CameraT265Native
     Inherits Camera
-    Dim pipeline As New rs.Pipeline ' even though this is not used, removing it makes the interface fail.  The constructor is needed.
-
-    Dim intrinsicsLeft As rs.Intrinsics
     Dim rawHeight As Int32
     Dim rawWidth As Int32
     Dim depth16Height As Int32
     Dim depth16Width As Int32
 
+    Dim intrinsicsLeft As rs.Intrinsics
     Public extrinsics As rs.Extrinsics
     Public pc As New rs.PointCloud
 
@@ -112,6 +110,7 @@ Public Class CameraT265Native
         ReDim rightViewBytes(leftViewBytes.Length - 1)
         ReDim depthBytes(depth16Width * depth16Height * 2 - 1)
         ReDim RGBDepthBytes(colorBytes.Length - 1)  ' most of the image is grayscale but the 300x300 part is RGB so the whole has to be...
+        pointCloud = New cv.Mat()
     End Sub
     Public Sub GetNextFrame()
         If pipelineClosed Then Exit Sub

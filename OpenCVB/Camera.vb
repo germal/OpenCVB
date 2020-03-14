@@ -89,6 +89,8 @@ Public Class Camera
         intrinsicsLeft_VB.fy = intrinsicsLeft.fy
         intrinsicsLeft_VB.FOV = intrinsicsLeft.FOV
         intrinsicsLeft_VB.coeffs = intrinsicsLeft.coeffs
+        If intrinsicsLeft_VB.FOV Is Nothing Then ReDim intrinsicsLeft_VB.FOV(2)
+        If intrinsicsLeft_VB.coeffs Is Nothing Then ReDim intrinsicsLeft_VB.coeffs(5)
     End Sub
     Public Sub New()
     End Sub

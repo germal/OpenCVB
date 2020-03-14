@@ -75,7 +75,7 @@ Public Class CameraD400Native
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
         deviceName = "Intel D400"
-        IMU_Present = True
+        IMU_Present = False
         w = width
         h = height
         If OpenCVB.USBenumeration("RealSense(TM) 435 With RGB Module Depth") > 0 Then IMU_Present = True
@@ -100,10 +100,10 @@ Public Class CameraD400Native
             color = New cv.Mat(h, w, cv.MatType.CV_8UC3, D400Color(cPtr)).Clone() ' must be first!  Prepares the procframes...
 
             Dim accelFrame = D400Accel(cPtr)
-            imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
+            If accelFrame <> 0 Then imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
 
             Dim gyroFrame = D400Gyro(cPtr)
-            imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
+            If gyroFrame <> 0 Then imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
 
             Static imuStartTime = D400IMUTimeStamp(cPtr)
             IMU_TimeStamp = D400IMUTimeStamp(cPtr) - imuStartTime

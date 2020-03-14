@@ -105,6 +105,7 @@ Public Class ActiveClass : Implements IDisposable
         Dim activeAlgorithm As String
         Dim AvoidDNNCrashes As Boolean
         Dim cameraIndex As Int32
+        Dim cameraName As String
         Dim externalInvocation As Boolean
         Dim extrinsics As Extrinsics_VB
         Dim height As Int32
