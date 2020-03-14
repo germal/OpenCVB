@@ -176,21 +176,21 @@ Public Class OpenCVB
         End If
 
         cameraMyntD = New CameraMyntD()
-        'cameraMyntD.deviceCount = USBenumeration("MYNT-EYE-D1000")
-        'If cameraMyntD.deviceCount > 0 Then
-        '    If myntSDKready = False Then
-        '        MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
-        '               "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
-        '               "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-        '               "and rebuild OpenCVB with the MYNT SDK." + vbCrLf + vbCrLf +
-        '               "Also, add environmental variable " + vbCrLf +
-        '               "MYNTEYE_DEPTHLIB_OUTPUT" + vbCrLf +
-        '               "to point to '<MYNT_SDK_DIR>/_output'.")
-        '        cameraMyntD.deviceCount = 0 ' we can't use this device
-        '    Else
-        '        cameraMyntD.initialize(fps, regWidth, regHeight)
-        '    End If
-        'End If
+        cameraMyntD.deviceCount = USBenumeration("MYNT-EYE-D1000")
+        If cameraMyntD.deviceCount > 0 Then
+            If myntSDKready = False Then
+                MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
+                       "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
+                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
+                       "and rebuild OpenCVB with the MYNT SDK." + vbCrLf + vbCrLf +
+                       "Also, add environmental variable " + vbCrLf +
+                       "MYNTEYE_DEPTHLIB_OUTPUT" + vbCrLf +
+                       "to point to '<MYNT_SDK_DIR>/_output'.")
+                cameraMyntD.deviceCount = 0 ' we can't use this device
+            Else
+                cameraMyntD.initialize(fps, regWidth, regHeight)
+            End If
+        End If
 
         optionsForm.cameraTotalCount = cameraD400Series.devicecount + cameraKinect.devicecount + cameraT265.devicecount + cameraZed2.devicecount + cameraMyntD.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.devicecount
@@ -1021,7 +1021,7 @@ Public Class OpenCVB
         If stopAlgorithmThread = True Then Exit Sub ' they have paused.
 
         ' if lowresolution is active and all the algorithms are covered, then switch to high res or vice versa...
-        If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 Then
+        If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
             optionsForm.lowResolution.Checked = Not optionsForm.lowResolution.Checked
             saveLayout()
         End If
