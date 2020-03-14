@@ -135,6 +135,7 @@ Public Class CameraZED2
             ReDim leftViewBytes(w * h)
             ReDim rightViewBytes(w * h)
             ReDim pointCloudBytes(w * h * 12) ' xyz + rgba
+            depth16 = New cv.Mat
         End If
     End Sub
 

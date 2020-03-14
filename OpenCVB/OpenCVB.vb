@@ -86,15 +86,15 @@ Public Class OpenCVB
         updatePath(releaseDir, "Release Version of camera DLL's.")
 
         ' check to make sure there are no camera dll's in the Debug directory by mistake!
-        'For i = 0 To 3
-        '    Dim dllName = Choose(i + 1, "Cam_Kinect4.dll", "Cam_MyntD.dll", "Cam_T265.dll", "Cam_Zed2.dll", "Cam_D400.dll")
-        '    Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
-        '    If dllFile.Exists Then
-        '        MsgBox(dllFile.Name + "was built in the Debug directory." + vbCrLf + "Camera dll's are built in Release" + vbCrLf +
-        '               "for performance.  If you need to debug the camera" + vbCrLf + "interface, edit this message.")
-        '        End
-        '    End If
-        'Next
+        For i = 0 To 3
+            Dim dllName = Choose(i + 1, "Cam_Kinect4.dll", "Cam_MyntD.dll", "Cam_T265.dll", "Cam_Zed2.dll", "Cam_D400.dll")
+            Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
+            If dllFile.Exists Then
+                MsgBox(dllFile.Name + "was built in the Debug directory." + vbCrLf + "Camera dll's are built in Release" + vbCrLf +
+                       "for performance.  If you need to debug the camera" + vbCrLf + "interface, edit this message.")
+                End
+            End If
+        Next
 
         Dim IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Debug\"
         updatePath(IntelPERC_Lib_Dir, "Realsense camera support.")
@@ -176,22 +176,23 @@ Public Class OpenCVB
         End If
 
         cameraMyntD = New CameraMyntD()
-        cameraMyntD.deviceCount = USBenumeration("MYNT-EYE-D1000")
-        If cameraMyntD.deviceCount > 0 Then
-            If myntSDKready = False Then
-                MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
-                       "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
-                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-                       "and rebuild OpenCVB with the MYNT SDK." + vbCrLf + vbCrLf +
-                       "Also, add environmental variable " + vbCrLf +
-                       "MYNTEYE_DEPTHLIB_OUTPUT" + vbCrLf +
-                       "to point to '<MYNT_SDK_DIR>/_output'.")
-                cameraMyntD.deviceCount = 0 ' we can't use this device
-            Else
-                cameraMyntD.initialize(fps, regWidth, regHeight)
-            End If
-        End If
+        'cameraMyntD.deviceCount = USBenumeration("MYNT-EYE-D1000")
+        'If cameraMyntD.deviceCount > 0 Then
+        '    If myntSDKready = False Then
+        '        MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
+        '               "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
+        '               "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
+        '               "and rebuild OpenCVB with the MYNT SDK." + vbCrLf + vbCrLf +
+        '               "Also, add environmental variable " + vbCrLf +
+        '               "MYNTEYE_DEPTHLIB_OUTPUT" + vbCrLf +
+        '               "to point to '<MYNT_SDK_DIR>/_output'.")
+        '        cameraMyntD.deviceCount = 0 ' we can't use this device
+        '    Else
+        '        cameraMyntD.initialize(fps, regWidth, regHeight)
+        '    End If
+        'End If
 
+        optionsForm.cameraTotalCount = cameraD400Series.devicecount + cameraKinect.devicecount + cameraT265.devicecount + cameraZed2.devicecount + cameraMyntD.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = cameraT265.devicecount
@@ -628,14 +629,7 @@ Public Class OpenCVB
             TestAllButton.Image = Image.FromFile("../../OpenCVB/Data/testall.png")
         End If
     End Sub
-    Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-        If stopAlgorithmThread = True Then Exit Sub ' they have paused.
-        If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
-            AvailableAlgorithms.SelectedIndex += 1
-        Else
-            AvailableAlgorithms.SelectedIndex = 0
-        End If
-    End Sub
+
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
         OptionsBringToFront = True
     End Sub
@@ -729,6 +723,14 @@ Public Class OpenCVB
         img = cv.Extensions.BitmapConverter.ToBitmap(resultMat)
         Clipboard.SetImage(img)
     End Sub
+    Private Sub RestartCamera()
+        camera.closePipe()
+        stopCameraThread = True
+        cameraTaskHandle.Abort()
+        cameraTaskHandle.Abort()
+        cameraTaskHandle = Nothing
+        updateCamera()
+    End Sub
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
         TestAllTimer.Enabled = False
@@ -738,14 +740,7 @@ Public Class OpenCVB
         Dim OKcancel = optionsForm.ShowDialog()
 
         If OKcancel = DialogResult.OK Then
-            If saveCurrentCamera <> optionsForm.cameraIndex Then
-                camera.closePipe()
-                stopCameraThread = True
-                cameraTaskHandle.Abort()
-                cameraTaskHandle.Abort()
-                cameraTaskHandle = Nothing
-                updateCamera()
-            End If
+            If saveCurrentCamera <> optionsForm.cameraIndex Then RestartCamera()
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
 
             If optionsForm.SnapToGrid.Checked Then
@@ -1021,5 +1016,41 @@ Public Class OpenCVB
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
         camera.frameCount = 0
+    End Sub
+    Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
+        If stopAlgorithmThread = True Then Exit Sub ' they have paused.
+
+        ' if lowresolution is active and all the algorithms are covered, then switch to high res or vice versa...
+        If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 Then
+            optionsForm.lowResolution.Checked = Not optionsForm.lowResolution.Checked
+            saveLayout()
+        End If
+
+        ' after sweeping through low and high resolution, sweep through the cameras as well...
+        If AlgorithmTestCount Mod (AvailableAlgorithms.Items.Count * 2) = 0 And AlgorithmTestCount > 0 Then
+            Static cameraIndex = optionsForm.cameraIndex
+            Dim originalCameraIndex = optionsForm.cameraIndex
+            cameraIndex += 1
+            If cameraIndex >= optionsForm.cameraTotalCount Then cameraIndex = 0
+            For i = 0 To optionsForm.cameraTotalCount - 1
+                If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
+                    optionsForm.cameraRadioButton(cameraIndex).Checked = True
+                    Exit For
+                Else
+                    cameraIndex += 1
+                    If cameraIndex >= optionsForm.cameraTotalCount Then cameraIndex = 0
+                End If
+            Next
+            If originalCameraIndex <> cameraIndex Then
+                optionsForm.cameraIndex = cameraIndex
+                RestartCamera()
+            End If
+        End If
+
+        If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
+            AvailableAlgorithms.SelectedIndex += 1
+        Else
+            AvailableAlgorithms.SelectedIndex = 0
+        End If
     End Sub
 End Class

@@ -8,6 +8,7 @@ Public Class OptionsDialog
     Public Const MyntD1000 As Int32 = 4 ' Must be defined in VB_Classes.vb the same way!
     Public cameraDeviceCount(MyntD1000) As Int32
     Public cameraRadioButton(MyntD1000) As RadioButton
+    Public cameraTotalCount As Integer
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
         SaveSetting("OpenCVB", "FastAccurate", "FastAccurate", lowResolution.Checked)
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", cameraIndex)
