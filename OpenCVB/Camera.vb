@@ -80,18 +80,18 @@ Public Class Camera
         Public trackerConfidence As Int32
         Public mapperConfidence As Int32
     End Structure
-    Public Sub setintrinsicsLeft(intrinsicsLeft As rs.Intrinsics)
-        intrinsicsLeft_VB.width = intrinsicsLeft.width
-        intrinsicsLeft_VB.height = intrinsicsLeft.height
-        intrinsicsLeft_VB.ppx = intrinsicsLeft.ppx
-        intrinsicsLeft_VB.ppy = intrinsicsLeft.ppy
-        intrinsicsLeft_VB.fx = intrinsicsLeft.fx
-        intrinsicsLeft_VB.fy = intrinsicsLeft.fy
-        intrinsicsLeft_VB.FOV = intrinsicsLeft.FOV
-        intrinsicsLeft_VB.coeffs = intrinsicsLeft.coeffs
-        If intrinsicsLeft_VB.FOV Is Nothing Then ReDim intrinsicsLeft_VB.FOV(2)
-        If intrinsicsLeft_VB.coeffs Is Nothing Then ReDim intrinsicsLeft_VB.coeffs(5)
-    End Sub
+    Public Function setintrinsics(intrinsicsHW As rs.Intrinsics) As VB_Classes.ActiveClass.intrinsics_VB
+        Dim intrinsics As New VB_Classes.ActiveClass.intrinsics_VB
+        intrinsics.width = intrinsicsHW.width
+        intrinsics.height = intrinsicsHW.height
+        intrinsics.ppx = intrinsicsHW.ppx
+        intrinsics.ppy = intrinsicsHW.ppy
+        intrinsics.fx = intrinsicsHW.fx
+        intrinsics.fy = intrinsicsHW.fy
+        intrinsics.FOV = intrinsicsHW.FOV
+        intrinsics.coeffs = intrinsicsHW.coeffs
+        Return intrinsics
+    End Function
     Public Sub New()
     End Sub
     Public Sub GetNextFrameCounts(frameTime As Double)

@@ -32,7 +32,7 @@ Module T265_Module_CPP
     Public Function T265intrinsicsLeft(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265intrinsicsLeftRight(tp As IntPtr) As IntPtr
+    Public Function T265intrinsicsRight(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265Extrinsics(tp As IntPtr) As IntPtr
@@ -77,7 +77,6 @@ Public Class CameraT265Native
     Dim depth16Height As Int32
     Dim depth16Width As Int32
 
-    Dim intrinsicsLeft As rs.Intrinsics
     Public extrinsics As rs.Extrinsics
     Public pc As New rs.PointCloud
 
@@ -97,8 +96,12 @@ Public Class CameraT265Native
         depth16Height = T265Depth16Height(cPtr)
 
         Dim intrin = T265intrinsicsLeft(cPtr)
-        intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
-        setintrinsicsLeft(intrinsicsLeft)
+        Dim intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
+        intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)
+
+        intrin = T265intrinsicsRight(cPtr)
+        Dim intrinsicsRight = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
+        intrinsicsRight_VB = setintrinsics(intrinsicsRight)
 
         Dim extrin = T265Extrinsics(cPtr)
         extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin)

@@ -84,7 +84,7 @@ Public Class CameraD400Native
 
         Dim intrin = D400intrinsicsLeft(cPtr)
         intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
-        setintrinsicsLeft(intrinsicsLeft)
+        intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)
 
         Dim extrin = D400Extrinsics(cPtr)
         extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin)

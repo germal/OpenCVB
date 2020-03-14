@@ -48,7 +48,7 @@ public:
 	Mat color, RGBDepth, depth16, leftViewRaw, rightViewRaw;
 	float *vertices;
 	int rawWidth, rawHeight;
-	rs2_intrinsics intrinsicsLeft, intrinsicsLeftRight;
+	rs2_intrinsics intrinsicsLeft, intrinsicsRight;
 	rs2_extrinsics extrinsics;
 	int stereo_width_px, stereo_height_px;
 	rs2_pose pose_data;
@@ -100,7 +100,7 @@ public:
 		extrinsics = leftStream.get_extrinsics_to(rightStream);
 
 		intrinsicsLeft = leftStream.as<rs2::video_stream_profile>().get_intrinsics();
-		intrinsicsLeftRight = rightStream.as<rs2::video_stream_profile>().get_intrinsics();
+		intrinsicsRight = rightStream.as<rs2::video_stream_profile>().get_intrinsics();
 
 		rawWidth = intrinsicsLeft.width;
 		rawHeight = intrinsicsLeft.height;
@@ -108,8 +108,8 @@ public:
 		double kLeft[9] = { intrinsicsLeft.fx, 0, intrinsicsLeft.ppx, 0, intrinsicsLeft.fy, intrinsicsLeft.ppy, 0, 0, 1 };
 		double dLeft[4] = { intrinsicsLeft.coeffs[0], intrinsicsLeft.coeffs[1], intrinsicsLeft.coeffs[2], intrinsicsLeft.coeffs[3] };
 
-		double kRight[9] = { intrinsicsLeftRight.fx, 0, intrinsicsLeftRight.ppx, 0, intrinsicsLeftRight.fy, intrinsicsLeftRight.ppy, 0, 0, 1 };
-		double dRight[4] = { intrinsicsLeftRight.coeffs[0], intrinsicsLeftRight.coeffs[1], intrinsicsLeftRight.coeffs[2], intrinsicsLeftRight.coeffs[3] };
+		double kRight[9] = { intrinsicsRight.fx, 0, intrinsicsRight.ppx, 0, intrinsicsRight.fy, intrinsicsRight.ppy, 0, 0, 1 };
+		double dRight[4] = { intrinsicsRight.coeffs[0], intrinsicsRight.coeffs[1], intrinsicsRight.coeffs[2], intrinsicsRight.coeffs[3] };
 
 		// We need To determine what focal length our undistorted images should have
 		// In order To Set up the camera matrices For initUndistortRectifyMap.  We
@@ -229,6 +229,12 @@ extern "C" __declspec(dllexport)
 int* T265intrinsicsLeft(t265Camera * tp)
 {
 	return (int*)&tp->intrinsicsLeft;
+}
+
+extern "C" __declspec(dllexport)
+int* T265intrinsicsRight(t265Camera * tp)
+{
+	return (int*)&tp->intrinsicsRight;
 }
 
 extern "C" __declspec(dllexport)
