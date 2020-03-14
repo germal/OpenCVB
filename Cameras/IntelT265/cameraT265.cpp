@@ -44,24 +44,13 @@ public:
 class t265Camera
 {
 public:
-	Mat leftViewMap1;
-	Mat leftViewMap2;
-	Mat rightViewMap1;
-	Mat rightViewMap2;
-	Mat color;
-	Mat RGBDepth;
-	Mat disparity;
-	Mat depth16;
-	Mat leftViewRaw;
-	Mat rightViewRaw;
+	Mat leftViewMap1, leftViewMap2, rightViewMap1, rightViewMap2;
+	Mat color, RGBDepth, depth16, leftViewRaw, rightViewRaw;
 	float *vertices;
-	int rawWidth;
-	int rawHeight;
-	rs2_intrinsics intrinsicsLeft;
-	rs2_intrinsics intrinsicsLeftRight;
+	int rawWidth, rawHeight;
+	rs2_intrinsics intrinsicsLeft, intrinsicsLeftRight;
 	rs2_extrinsics extrinsics;
-	int stereo_width_px;
-	int stereo_height_px;
+	int stereo_width_px, stereo_height_px;
 	rs2_pose pose_data;
 	double IMU_TimeStamp;
 
@@ -77,26 +66,10 @@ private:
 	int windowSize = 5;
 	Ptr<StereoSGBM> stereoPtr;
 
-	Mat kMatleft;
-	Mat dMatleft;
-	Mat rMatleft;
-	Mat pMatleft;
-
 	Mat lm1, lm2, rm1, rm2;
-
-	Mat kMatRight;
-	Mat dMatRight;
-	Mat rMatRight;
-	Mat pMatRight;
-
-	double stereo_fov_rad;
-	double stereo_focal_px;
-	double stereo_cx;
-	double stereo_cy;
+	
+	double stereo_fov_rad, stereo_focal_px, stereo_cx, stereo_cy;
 	cv::Size stereo_size;
-	rs2::frame leftImage;
-	rs2::frame rightImage;
-
 	t265sgm* sgm;
 
 public:
@@ -175,17 +148,17 @@ public:
 		double pRight[12] = { stereo_focal_px, 0, stereo_cx, 0, 0, stereo_focal_px, stereo_cy, 0, 0, 0, 1, 0 };
 		pRight[3] = extrinsics.translation[0] * stereo_focal_px;
 
-		kMatleft = Mat(3, 3, CV_64F, kLeft);
-		dMatleft = Mat(1, 4, CV_64F, dLeft);
-		rMatleft = Mat(3, 3, CV_64F, rLeft);
-		pMatleft = Mat(3, 4, CV_64F, pLeft);
+		Mat kMatleft = Mat(3, 3, CV_64F, kLeft);
+		Mat dMatleft = Mat(1, 4, CV_64F, dLeft);
+		Mat rMatleft = Mat(3, 3, CV_64F, rLeft);
+		Mat pMatleft = Mat(3, 4, CV_64F, pLeft);
 		cv::fisheye::initUndistortRectifyMap(kMatleft, dMatleft, rMatleft, pMatleft, stereo_size, CV_32FC1, lm1, lm2);
 		cv::fisheye::initUndistortRectifyMap(kMatleft, dMatleft, rMatleft, pMatleft, Size(rawWidth, rawHeight), CV_32FC1, leftViewMap1, leftViewMap2);
 
-		kMatRight = Mat(3, 3, CV_64F, kRight);
-		dMatRight = Mat(1, 4, CV_64F, dRight);
-		rMatRight = Mat(3, 3, CV_64F, rRight);
-		pMatRight = Mat(3, 4, CV_64F, pRight);
+		Mat kMatRight = Mat(3, 3, CV_64F, kRight);
+		Mat dMatRight = Mat(1, 4, CV_64F, dRight);
+		Mat rMatRight = Mat(3, 3, CV_64F, rRight);
+		Mat pMatRight = Mat(3, 4, CV_64F, pRight);
 
 		cv::fisheye::initUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, stereo_size, CV_32FC1, rm1, rm2);
 		cv::fisheye::initUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, Size(rawWidth, rawHeight), CV_32FC1, rightViewMap1, rightViewMap2);
@@ -194,18 +167,18 @@ public:
 		vertices = new float[vSize](); // 3 floats or 12 bytes per pixel.  
 	}
 
-	int *waitForFrame()
+	void waitForFrame()
 	{
 		auto frameset = pipeline.wait_for_frames(1000);
 		auto f = frameset.first_or_default(RS2_STREAM_POSE);
 		IMU_TimeStamp = f.get_timestamp();
 
 		auto fs = frameset.as<rs2::frameset>();
-		leftImage = fs.get_fisheye_frame(1);
-		rightImage = fs.get_fisheye_frame(2);
+		rs2::frame leftImage = fs.get_fisheye_frame(1);
+		rs2::frame rightImage = fs.get_fisheye_frame(2);
 
-		leftViewRaw = Mat(rawHeight, rawWidth, CV_8U, (void *)leftImage.get_data());
-		rightViewRaw = Mat(rawHeight, rawWidth, CV_8U, (void*)rightImage.get_data());
+		leftViewRaw = Mat(rawHeight, rawWidth, CV_8U, (void *)leftImage.get_data()).clone();
+		rightViewRaw = Mat(rawHeight, rawWidth, CV_8U, (void*)rightImage.get_data()).clone();
 
 		remap(leftViewRaw, color, leftViewMap1, leftViewMap2, INTER_LINEAR);
 		resize(color, color, Size(width, height));
@@ -222,6 +195,7 @@ public:
 
 		Rect validRect = Rect(maxDisp, 0, disp16s.cols - maxDisp, disp16s.rows);
 		disp16s = disp16s(validRect);
+		Mat disparity;
 		disp16s.convertTo(disparity, CV_32F, 1.0f / 16.0f);
 
 		Mat disp_vis = disparity.clone();
@@ -241,7 +215,6 @@ public:
 
 		// Cast the frame to pose_frame and get its data
 		pose_data = f.as<rs2::pose_frame>().get_pose_data();
-		return (int *) color.data;
 	}
 };
 
@@ -288,6 +261,10 @@ int* T265Extrinsics(t265Camera* tp)
 	return (int *) &tp->extrinsics;
 }
 
+
+
+
+
 extern "C" __declspec(dllexport)
 int* T265PointCloud(t265Camera * tp)
 {
@@ -319,6 +296,12 @@ int* T265RGBDepth(t265Camera * tp)
 }
 
 extern "C" __declspec(dllexport)
+int* T265Color(t265Camera * tp)
+{
+	return (int*)tp->color.data;
+}
+
+extern "C" __declspec(dllexport)
 int* T265PoseData(t265Camera * tp)
 {
 	return (int*)&tp->pose_data;
@@ -331,7 +314,7 @@ double T265IMUTimeStamp(t265Camera * tp)
 }
 
 extern "C" __declspec(dllexport)
-int* T265WaitFrame(t265Camera * tp)
+void T265WaitFrame(t265Camera * tp)
 {
-	return tp->waitForFrame();
+	tp->waitForFrame();
 }

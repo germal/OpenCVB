@@ -19,10 +19,9 @@ Module T265_Module_CPP
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265Depth16Height(tp As IntPtr) As Int32
     End Function
-
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265WaitFrame(tp As IntPtr) As IntPtr
-    End Function
+    Public Sub T265WaitFrame(tp As IntPtr)
+    End Sub
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265RightRaw(tp As IntPtr) As IntPtr
     End Function
@@ -52,6 +51,9 @@ Module T265_Module_CPP
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265Depth16(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265Color(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265timeStampLatency(timeStamp As Double) As Single
@@ -114,10 +116,10 @@ Public Class CameraT265Native
     Public Sub GetNextFrame()
         If pipelineClosed Then Exit Sub
 
-        Dim colorPtr = T265WaitFrame(cPtr)
+        T265WaitFrame(cPtr)
 
-        Dim posePtr = T265PoseData(cPtr)
         SyncLock OpenCVB.camPic ' only really need the synclock when in callback mode but it doesn't hurt to waitforframe mode.
+            Dim posePtr = T265PoseData(cPtr)
             Dim pose = Marshal.PtrToStructure(Of PoseData)(posePtr)
             IMU_TimeStamp = T265IMUTimeStamp(cPtr)
             Static imuStartTime = IMU_TimeStamp
@@ -138,27 +140,28 @@ Public Class CameraT265Native
                         -(2 * q.X * q.Z + 2 * q.Y * q.W), -(2 * q.Y * q.Z - 2 * q.X * q.W), -(1 - 2 * q.X * q.X - 2 * q.Y * q.Y), 0.0,
                         t.X, t.Y, t.Z, 1.0}
             transformationMatrix = mat
+
+            Dim colorPtr = T265Color(cPtr)
+            Marshal.Copy(colorPtr, colorBytes, 0, colorBytes.Length - 1)
+            leftView = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorBytes)
+            color = leftView
+
+            Dim rightPtr = T265RightRaw(cPtr)
+            Marshal.Copy(rightPtr, rightViewBytes, 0, rightViewBytes.Length - 1)
+            rightView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, rightViewBytes)
+
+            Dim leftPtr = T265LeftRaw(cPtr)
+            Marshal.Copy(leftPtr, leftViewBytes, 0, leftViewBytes.Length - 1)
+            leftView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, leftViewBytes)
+
+            Dim rgbdPtr = T265RGBDepth(cPtr)
+            Marshal.Copy(rgbdPtr, RGBDepthBytes, 0, RGBDepthBytes.Length - 1)
+            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
+
+            Dim depthPtr = T265Depth16(cPtr)
+            Marshal.Copy(depthPtr, depthBytes, 0, depthBytes.Length - 1)
+            depth16 = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_16U, depthBytes)
+            MyBase.GetNextFrameCounts(IMU_FrameTime)
         End SyncLock
-
-        Marshal.Copy(colorPtr, colorBytes, 0, colorBytes.Length - 1)
-        leftView = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorBytes)
-        color = leftView
-
-        Dim rightPtr = T265RightRaw(cPtr)
-        Marshal.Copy(rightPtr, rightViewBytes, 0, rightViewBytes.Length - 1)
-        rightView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, rightViewBytes)
-
-        Dim leftPtr = T265LeftRaw(cPtr)
-        Marshal.Copy(leftPtr, leftViewBytes, 0, leftViewBytes.Length - 1)
-        leftView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, leftViewBytes)
-
-        Dim rgbdPtr = T265RGBDepth(cPtr)
-        Marshal.Copy(rgbdPtr, RGBDepthBytes, 0, RGBDepthBytes.Length - 1)
-        RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
-
-        Dim depthPtr = T265Depth16(cPtr)
-        Marshal.Copy(depthPtr, depthBytes, 0, depthBytes.Length - 1)
-        depth16 = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_16U, depthBytes)
-        MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
 End Class
