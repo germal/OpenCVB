@@ -337,7 +337,6 @@ Public Class OpenCVB
         search = New System.Management.ManagementObjectSearcher("SELECT * From Win32_PnPEntity")
         For Each info In search.Get()
             Name = CType(info("Caption"), String) ' Get the name of the device.'
-            'If InStr(Name, "Xeon", CompareMethod.Text) = False And InStr(Name, "Intel", CompareMethod.Text) = False Then Console.WriteLine(Name)
             If InStr(Name, searchName, CompareMethod.Text) > 0 Then
                 deviceCount += 1
                 Exit For

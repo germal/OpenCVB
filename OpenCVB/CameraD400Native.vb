@@ -78,7 +78,7 @@ Public Class CameraD400Native
         IMU_Present = False
         w = width
         h = height
-        If OpenCVB.USBenumeration("RealSense(TM) 435 With RGB Module Depth") > 0 Then IMU_Present = True
+        If OpenCVB.USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth") > 0 Then IMU_Present = True
 
         cPtr = D400Open(width, height, IMU_Present)
 

@@ -88,7 +88,7 @@ Module UI_GeneratorMain
         For i = 0 To cleanNames.Count - 1 Step stepSize
             sw.WriteLine("Select Case ucase(name)")
             For j = i To i + stepSize - 1
-                If j < cleanNames.Count - 1 Then
+                If j < cleanNames.Count Then
                     Dim nextName = cleanNames.Item(j)
                     sw.WriteLine(vbTab + "case """ + UCase(nextName) + """")
                     sw.WriteLine(vbTab + vbTab + "ocvb.name = """ + nextName + """")
