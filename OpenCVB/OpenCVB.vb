@@ -265,19 +265,6 @@ Public Class OpenCVB
                         cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
                         cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
                     End If
-
-                    ' draw any TrueType font data on the image 
-                    Dim white = System.Drawing.Color.White
-                    Dim maxline = 21
-                    For i = 0 To TTtextData(pic.Tag).Count - 1 ' using enumeration here would occasionally generate a mistaken warning.
-                        Dim tt = TTtextData(pic.Tag)(i)
-                        g.DrawString(tt.text, New Font(tt.fontName, tt.fontSize), New SolidBrush(white), tt.x, tt.y)
-                        If tt.x >= camPic(pic.Tag).Width Or tt.y >= camPic(pic.Tag).Height Then
-                            Console.WriteLine("TrueType text off image!  " + tt.text + " is being written to " + CStr(tt.x) + " and " + CStr(tt.y))
-                        End If
-                        maxline -= 1
-                        If maxline <= 0 Then Exit For
-                    Next
                 End SyncLock
             End If
             If cameraRefresh Then
@@ -299,14 +286,28 @@ Public Class OpenCVB
                     End If
                 End SyncLock
             End If
-            If optionsForm.ShowLabels.Checked Then
-                ' with the low resolution display, we need to use the entire width of the image to display the RGB and Depth text area.
-                Dim textRect As New Rectangle(0, 0, pic.Width / 2, If(resizeForDisplay = 4, 12, 20))
-                If Len(picLabels(pic.Tag)) Then g.FillRectangle(myBrush, textRect)
-                Dim black = System.Drawing.Color.Black
-                Dim fontSize = If(resizeForDisplay = 4, 6, 10)
-                g.DrawString(picLabels(pic.Tag), New Font("Microsoft Sans Serif", fontSize), New SolidBrush(black), 0, 0)
-            End If
+            SyncLock camPic
+                ' draw any TrueType font data on the image 
+                Dim white = System.Drawing.Color.White
+                Dim maxline = 21
+                For i = 0 To TTtextData(pic.Tag).Count - 1 ' using enumeration here would occasionally generate a mistaken warning.
+                    Dim tt = TTtextData(pic.Tag)(i)
+                    g.DrawString(tt.text, New Font(tt.fontName, tt.fontSize), New SolidBrush(white), tt.x, tt.y)
+                    If tt.x >= camPic(pic.Tag).Width Or tt.y >= camPic(pic.Tag).Height Then
+                        Console.WriteLine("TrueType text off image!  " + tt.text + " is being written to " + CStr(tt.x) + " and " + CStr(tt.y))
+                    End If
+                    maxline -= 1
+                    If maxline <= 0 Then Exit For
+                Next
+                If optionsForm.ShowLabels.Checked Then
+                    ' with the low resolution display, we need to use the entire width of the image to display the RGB and Depth text area.
+                    Dim textRect As New Rectangle(0, 0, pic.Width / 2, If(resizeForDisplay = 4, 12, 20))
+                    If Len(picLabels(pic.Tag)) Then g.FillRectangle(myBrush, textRect)
+                    Dim black = System.Drawing.Color.Black
+                    Dim fontSize = If(resizeForDisplay = 4, 6, 10)
+                    g.DrawString(picLabels(pic.Tag), New Font("Microsoft Sans Serif", fontSize), New SolidBrush(black), 0, 0)
+                End If
+            End SyncLock
         Catch ex As Exception
             Console.WriteLine("Paint exception occurred: " + ex.Message)
         End Try
