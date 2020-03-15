@@ -669,6 +669,7 @@ Public Class OpenCVB
                   optionsForm.cameraRadioButton(optionsForm.cameraIndex).Text + " FPS = " + Format(cameraFPS, "#0.0") +
                   ", Algorithm FPS = " + Format(fps, "#0.0")
         If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
+        Me.Refresh()
     End Sub
     Private Sub saveLayout()
         SaveSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
@@ -680,10 +681,6 @@ Public Class OpenCVB
         If optionsForm.lowResolution.Checked Then details += "On" Else details += "Off"
         picLabels(0) = "Input " + details
         picLabels(1) = "Depth " + details
-    End Sub
-    Public Sub updateCamera()
-        camera = Choose(optionsForm.cameraIndex + 1, cameraD400Series, cameraKinect, cameraT265, cameraZed2, cameraMyntD)
-        camera.pipelineClosed = False
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopAlgorithmThread = True
@@ -729,6 +726,10 @@ Public Class OpenCVB
         img = cv.Extensions.BitmapConverter.ToBitmap(resultMat)
         Clipboard.SetImage(img)
     End Sub
+    Public Sub updateCamera()
+        camera = Choose(optionsForm.cameraIndex + 1, cameraD400Series, cameraKinect, cameraT265, cameraZed2, cameraMyntD)
+        camera.pipelineClosed = False
+    End Sub
     Private Sub CameraTask()
         While stopCameraThread = False
             camera.GetNextFrame()
@@ -736,48 +737,11 @@ Public Class OpenCVB
         End While
         camera.frameCount = 0
     End Sub
-    Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-        If stopAlgorithmThread = True Then Exit Sub ' they have paused.
-
-        ' if lowresolution is active and all the algorithms are covered, then switch to high res or vice versa...
-        If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
-            optionsForm.lowResolution.Checked = Not optionsForm.lowResolution.Checked
-            saveLayout()
-        End If
-
-        ' after sweeping through low and high resolution, sweep through the cameras as well...
-        If AlgorithmTestCount Mod (AvailableAlgorithms.Items.Count * 2) = 0 And AlgorithmTestCount > 0 Then
-            Static cameraIndex = optionsForm.cameraIndex
-            Dim originalCameraIndex = optionsForm.cameraIndex
-            cameraIndex += 1
-            If cameraIndex >= optionsForm.cameraTotalCount Then cameraIndex = 0
-            For i = 0 To optionsForm.cameraTotalCount - 1
-                If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
-                    optionsForm.cameraRadioButton(cameraIndex).Checked = True
-                    Exit For
-                Else
-                    cameraIndex += 1
-                    If cameraIndex >= optionsForm.cameraTotalCount Then cameraIndex = 0
-                End If
-            Next
-            If originalCameraIndex <> cameraIndex Then
-                optionsForm.cameraIndex = cameraIndex
-                RestartCamera()
-                SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", cameraIndex)
-            End If
-        End If
-
-        If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
-            AvailableAlgorithms.SelectedIndex += 1
-        Else
-            AvailableAlgorithms.SelectedIndex = 0
-        End If
-    End Sub
     Private Sub RestartCamera()
         camera.closePipe()
         stopCameraThread = True
-        cameraTaskHandle.Abort()
-        cameraTaskHandle.Abort()
+        If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
+        If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
         cameraTaskHandle = Nothing
         updateCamera()
     End Sub
@@ -903,7 +867,9 @@ Public Class OpenCVB
         fpsTimer.Enabled = True
     End Sub
     Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
-        Me.Refresh()
+        For i = 0 To camPic.Count - 1
+            camPic(i).Refresh()
+        Next
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
         If parms.testAllRunning Then
@@ -1059,6 +1025,43 @@ Public Class OpenCVB
         frameCount = 0
         If parms.testAllRunning Then
             Console.WriteLine(vbTab + "Ending " + parms.activeAlgorithm)
+        End If
+    End Sub
+    Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
+        If stopAlgorithmThread = True Then Exit Sub ' they have paused.
+
+        ' if lowresolution is active and all the algorithms are covered, then switch to high res or vice versa...
+        If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
+            optionsForm.lowResolution.Checked = Not optionsForm.lowResolution.Checked
+            saveLayout()
+        End If
+
+        ' after sweeping through low and high resolution, sweep through the cameras as well...
+        If AlgorithmTestCount Mod (AvailableAlgorithms.Items.Count * 2) = 0 Then 'And AlgorithmTestCount > 0 
+            Static cameraIndex = optionsForm.cameraIndex
+            Dim currentCameraIndex = optionsForm.cameraIndex
+            cameraIndex += 1
+            If cameraIndex >= optionsForm.cameraTotalCount Then cameraIndex = 0
+            For i = 0 To optionsForm.cameraTotalCount - 1
+                If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
+                    optionsForm.cameraRadioButton(cameraIndex).Checked = True
+                    Exit For
+                Else
+                    cameraIndex += 1
+                    If cameraIndex >= optionsForm.cameraTotalCount Then cameraIndex = 0
+                End If
+            Next
+            If currentCameraIndex <> cameraIndex Then
+                optionsForm.cameraIndex = cameraIndex
+                RestartCamera()
+                SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", cameraIndex)
+            End If
+        End If
+
+        If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
+            AvailableAlgorithms.SelectedIndex += 1
+        Else
+            AvailableAlgorithms.SelectedIndex = 0
         End If
     End Sub
 End Class

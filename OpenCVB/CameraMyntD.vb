@@ -141,6 +141,7 @@ Public Class CameraMyntD
 
     Public Sub GetNextFrame()
         If cPtr = 0 Then Return
+        Exit Sub
         Dim handlecolorBytes = GCHandle.Alloc(colorBytes, GCHandleType.Pinned)
         Dim handleRGBADepthBytes = GCHandle.Alloc(RGBADepthBytes, GCHandleType.Pinned)
         Dim handledepth32Fbytes = GCHandle.Alloc(depth32FBytes, GCHandleType.Pinned)

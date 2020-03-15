@@ -109,7 +109,6 @@ Module UI_GeneratorMain
         sw.WriteLine("End Class")
         sw.Close()
 
-
         Dim textInfo As New FileInfo(directoryInfo.FullName + "/../Data/AlgorithmList.txt")
         sw = New StreamWriter(textInfo.FullName)
         sw.WriteLine("CodeLineCount = " + CStr(CodeLineCount))
