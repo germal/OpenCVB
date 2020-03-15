@@ -140,7 +140,7 @@ Partial Class OpenCVB
         'RefreshTimer
         '
         Me.RefreshTimer.Enabled = True
-        Me.RefreshTimer.Interval = 30
+        Me.RefreshTimer.Interval = 95
         '
         'OpenCVB
         '

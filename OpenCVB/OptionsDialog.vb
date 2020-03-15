@@ -27,6 +27,7 @@ Public Class OptionsDialog
         SaveSetting("OpenCVB", "ShowOptions", "ShowOptions", ShowOptions.Checked)
         SaveSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", ShowConsoleLog.Checked)
         SaveSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", AvoidDNNCrashes.Checked)
+        SaveSetting("OpenCVB", "RefreshRate", "RefreshRate", RefreshRate.Value)
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
@@ -70,6 +71,7 @@ Public Class OptionsDialog
         ShowOptions.Checked = GetSetting("OpenCVB", "ShowOptions", "ShowOptions", False)
         ShowConsoleLog.Checked = GetSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", False)
         AvoidDNNCrashes.Checked = GetSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", False)
+        RefreshRate.Value = GetSetting("OpenCVB", "RefreshRate", "RefreshRate", 15)
 
         Dim selectionName = GetSetting("OpenCVB", "PythonExe", "PythonExe", "")
         Dim selectionInfo As FileInfo = Nothing

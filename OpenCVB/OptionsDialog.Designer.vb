@@ -48,6 +48,8 @@ Partial Class OptionsDialog
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.OKButton = New System.Windows.Forms.Button()
         Me.Cancel_Button = New System.Windows.Forms.Button()
+        Me.RefreshRate = New System.Windows.Forms.NumericUpDown()
+        Me.Label3 = New System.Windows.Forms.Label()
         Me.CameraGroup.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -55,6 +57,7 @@ Partial Class OptionsDialog
         Me.GroupBox4.SuspendLayout()
         CType(Me.TestAllDuration, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox6.SuspendLayout()
+        CType(Me.RefreshRate, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'CameraGroup
@@ -112,6 +115,8 @@ Partial Class OptionsDialog
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.Label3)
+        Me.GroupBox2.Controls.Add(Me.RefreshRate)
         Me.GroupBox2.Controls.Add(Me.AvoidDNNCrashes)
         Me.GroupBox2.Controls.Add(Me.ShowConsoleLog)
         Me.GroupBox2.Controls.Add(Me.ShowLabels)
@@ -125,7 +130,7 @@ Partial Class OptionsDialog
         'AvoidDNNCrashes
         '
         Me.AvoidDNNCrashes.AutoSize = True
-        Me.AvoidDNNCrashes.Location = New System.Drawing.Point(15, 100)
+        Me.AvoidDNNCrashes.Location = New System.Drawing.Point(16, 100)
         Me.AvoidDNNCrashes.Name = "AvoidDNNCrashes"
         Me.AvoidDNNCrashes.Size = New System.Drawing.Size(449, 24)
         Me.AvoidDNNCrashes.TabIndex = 3
@@ -318,6 +323,26 @@ Partial Class OptionsDialog
         Me.Cancel_Button.Text = "Cancel"
         Me.Cancel_Button.UseVisualStyleBackColor = True
         '
+        'RefreshRate
+        '
+        Me.RefreshRate.Increment = New Decimal(New Integer() {5, 0, 0, 0})
+        Me.RefreshRate.Location = New System.Drawing.Point(16, 147)
+        Me.RefreshRate.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
+        Me.RefreshRate.Name = "RefreshRate"
+        Me.RefreshRate.ReadOnly = True
+        Me.RefreshRate.Size = New System.Drawing.Size(89, 26)
+        Me.RefreshRate.TabIndex = 4
+        Me.RefreshRate.Value = New Decimal(New Integer() {15, 0, 0, 0})
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(112, 153)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(289, 20)
+        Me.Label3.TabIndex = 5
+        Me.Label3.Text = "Number of screen refreshes per second"
+        '
         'OptionsDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -350,6 +375,7 @@ Partial Class OptionsDialog
         CType(Me.TestAllDuration, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox6.ResumeLayout(False)
         Me.GroupBox6.PerformLayout()
+        CType(Me.RefreshRate, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -379,4 +405,6 @@ Partial Class OptionsDialog
     Friend WithEvents AvoidDNNCrashes As CheckBox
     Friend WithEvents OKButton As Button
     Friend WithEvents Cancel_Button As Button
+    Friend WithEvents Label3 As Label
+    Friend WithEvents RefreshRate As NumericUpDown
 End Class

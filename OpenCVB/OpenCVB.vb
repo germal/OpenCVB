@@ -24,6 +24,8 @@ Public Class OpenCVB
     Dim cameraT265 As Object
     Dim cameraTaskHandle As Thread
     Public camPic(displayFrames - 1) As PictureBox
+    Dim cameraRefresh As Boolean
+    Dim algorithmRefresh As Boolean
     Dim CodeLineCount As Int32
     Dim DrawingRectangle As Boolean
     Dim drawRect As New cv.Rect(0, 0, 0, 0)
@@ -250,59 +252,62 @@ Public Class OpenCVB
             g.ScaleTransform(1, 1)
             g.DrawImage(pic.Image, 0, 0)
             g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
-            SyncLock formResult1
-                If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Or
-                                formResult2.Width <> camPic(3).Width Or formResult2.Height <> camPic(3).Height Then
-
-                    Dim result1 = formResult1
-                    Dim result2 = formResult2
-                    result1 = result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
-                    result2 = result2.Resize(New cv.Size(camPic(3).Size.Width, camPic(3).Size.Height))
-                    cvext.BitmapConverter.ToBitmap(result1, camPic(2).Image)
-                    cvext.BitmapConverter.ToBitmap(result2, camPic(3).Image)
-                Else
-                    cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
-                    cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
-                End If
-                If optionsForm.ShowLabels.Checked Then
-                    ' with the low resolution display, we need to use the entire width of the image to display the RGB and Depth text area.
-                    Dim textRect As New Rectangle(0, 0, pic.Width / 2, If(resizeForDisplay = 4, 12, 20))
-                    If Len(picLabels(pic.Tag)) Then g.FillRectangle(myBrush, textRect)
-                    Dim black = System.Drawing.Color.Black
-                    Dim fontSize = If(resizeForDisplay = 4, 6, 10)
-                    g.DrawString(picLabels(pic.Tag), New Font("Microsoft Sans Serif", fontSize), New SolidBrush(black), 0, 0)
-                End If
-
-                ' draw any TrueType font data on the image 
-                Dim white = System.Drawing.Color.White
-                Dim maxline = 21
-                For i = 0 To TTtextData(pic.Tag).Count - 1 ' using enumeration here would occasionally generate a mistaken warning.
-                    Dim tt = TTtextData(pic.Tag)(i)
-                    g.DrawString(tt.text, New Font(tt.fontName, tt.fontSize), New SolidBrush(white), tt.x, tt.y)
-                    If tt.x >= camPic(pic.Tag).Width Or tt.y >= camPic(pic.Tag).Height Then
-                        Console.WriteLine("TrueType text off image!  " + tt.text + " is being written to " + CStr(tt.x) + " and " + CStr(tt.y))
-                    End If
-                    maxline -= 1
-                    If maxline <= 0 Then Exit For
-                Next
-            End SyncLock
-            SyncLock camPic ' avoid updating the image while copying into it in the algorithm and camera tasks
-                If camera.color IsNot Nothing Then
-                    If camera.color.Width <> camPic(0).Width Or camera.Color.Height <> camPic(0).Height Or
-                               camera.RGBDepth.Width <> camPic(1).Width Or camera.RGBDepth.Height <> camPic(1).Height Then
-
-                        Dim color = camera.color
-                        Dim RGBDepth = camera.RGBDepth
-                        color = color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
-                        RGBDepth = RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
-                        cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
-                        cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
+            If algorithmRefresh Then
+                algorithmRefresh = False
+                SyncLock formResult1
+                    If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Then
+                        Dim result1 = formResult1
+                        Dim result2 = formResult2
+                        result1 = result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
+                        result2 = result2.Resize(New cv.Size(camPic(3).Size.Width, camPic(3).Size.Height))
+                        cvext.BitmapConverter.ToBitmap(result1, camPic(2).Image)
+                        cvext.BitmapConverter.ToBitmap(result2, camPic(3).Image)
                     Else
-                        cvext.BitmapConverter.ToBitmap(camera.Color, camPic(0).Image)
-                        cvext.BitmapConverter.ToBitmap(camera.RGBDepth, camPic(1).Image)
+                        cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
+                        cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
                     End If
-                End If
-            End SyncLock
+
+                    ' draw any TrueType font data on the image 
+                    Dim white = System.Drawing.Color.White
+                    Dim maxline = 21
+                    For i = 0 To TTtextData(pic.Tag).Count - 1 ' using enumeration here would occasionally generate a mistaken warning.
+                        Dim tt = TTtextData(pic.Tag)(i)
+                        g.DrawString(tt.text, New Font(tt.fontName, tt.fontSize), New SolidBrush(white), tt.x, tt.y)
+                        If tt.x >= camPic(pic.Tag).Width Or tt.y >= camPic(pic.Tag).Height Then
+                            Console.WriteLine("TrueType text off image!  " + tt.text + " is being written to " + CStr(tt.x) + " and " + CStr(tt.y))
+                        End If
+                        maxline -= 1
+                        If maxline <= 0 Then Exit For
+                    Next
+                End SyncLock
+            End If
+            If cameraRefresh Then
+                cameraRefresh = False
+                SyncLock camPic ' avoid updating the image while copying into it in the algorithm and camera tasks
+                    If camera.color IsNot Nothing Then
+                        If camera.color.Width <> camPic(0).Width Or camera.Color.Height <> camPic(0).Height Then
+
+                            Dim color = camera.color
+                            Dim RGBDepth = camera.RGBDepth
+                            color = color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
+                            RGBDepth = RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
+                            cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
+                            cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
+                        Else
+                            cvext.BitmapConverter.ToBitmap(camera.Color, camPic(0).Image)
+                            cvext.BitmapConverter.ToBitmap(camera.RGBDepth, camPic(1).Image)
+                        End If
+                    End If
+                End SyncLock
+            End If
+            If optionsForm.ShowLabels.Checked Then
+                ' with the low resolution display, we need to use the entire width of the image to display the RGB and Depth text area.
+                Dim textRect As New Rectangle(0, 0, pic.Width / 2, If(resizeForDisplay = 4, 12, 20))
+                If Len(picLabels(pic.Tag)) Then g.FillRectangle(myBrush, textRect)
+                Dim black = System.Drawing.Color.Black
+                Dim fontSize = If(resizeForDisplay = 4, 6, 10)
+                g.DrawString(picLabels(pic.Tag), New Font("Microsoft Sans Serif", fontSize), New SolidBrush(black), 0, 0)
+            End If
         Catch ex As Exception
             Console.WriteLine("Paint exception occurred: " + ex.Message)
         End Try
@@ -652,6 +657,9 @@ Public Class OpenCVB
         If TestAllButton.Text <> "Stop Test" Then Me.Activate()
         RefreshAvailable = True
     End Sub
+    Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
+        Me.Refresh()
+    End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastFrame As Int32
         If lastFrame > frameCount Then lastFrame = 0
@@ -666,10 +674,9 @@ Public Class OpenCVB
         Dim cameraFPS As Single = camFrames / (fpsTimer.Interval / 1000)
 
         Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " +
-                  optionsForm.cameraRadioButton(optionsForm.cameraIndex).Text + " FPS = " + Format(cameraFPS, "#0.0") +
-                  ", Algorithm FPS = " + Format(fps, "#0.0")
+                  optionsForm.cameraRadioButton(optionsForm.cameraIndex).Text + "/Algorithm FPS " + Format(cameraFPS, "#0.0") +
+                  "/" + Format(fps, "#0.0")
         If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
-        Me.Refresh()
     End Sub
     Private Sub saveLayout()
         SaveSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
@@ -733,6 +740,7 @@ Public Class OpenCVB
     Private Sub CameraTask()
         While stopCameraThread = False
             camera.GetNextFrame()
+            cameraRefresh = True
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
         camera.frameCount = 0
@@ -756,6 +764,7 @@ Public Class OpenCVB
         If OKcancel = DialogResult.OK Then
             If saveCurrentCamera <> optionsForm.cameraIndex Then RestartCamera()
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
+            RefreshTimer.Interval = CInt(1000 / optionsForm.RefreshRate.Value)
 
             If optionsForm.SnapToGrid.Checked Then
                 For i = 0 To 3
@@ -866,11 +875,6 @@ Public Class OpenCVB
         ActivateTimer.Enabled = True
         fpsTimer.Enabled = True
     End Sub
-    Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
-        For i = 0 To camPic.Count - 1
-            camPic(i).Refresh()
-        Next
-    End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
         If parms.testAllRunning Then
             AlgorithmTestCount += 1
@@ -974,6 +978,7 @@ Public Class OpenCVB
                 If RefreshAvailable Then
                     ' share the results of the algorithm task.
                     SyncLock formResult1
+                        algorithmRefresh = True
                         formResult1 = OpenCVB.ocvb.result1.Clone()
                         formResult2 = OpenCVB.ocvb.result2.Clone()
                         For i = VB_Classes.ActiveClass._RESULT1 To VB_Classes.ActiveClass._RESULT2
