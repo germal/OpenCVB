@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 Watershed segmentation
 =========
@@ -20,14 +18,14 @@ Keys
   ESC   - exit
 
 '''
-
-
-# Python 2/3 compatibility
-from __future__ import print_function
+import sys
+import os
 
 import numpy as np
 import cv2 as cv
+
 from common import Sketcher
+
 title_window = 'Watershed.py'
 
 class App:

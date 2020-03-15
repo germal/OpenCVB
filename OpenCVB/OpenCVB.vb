@@ -199,7 +199,6 @@ Public Class OpenCVB
             End If
         End If
 
-        optionsForm.cameraTotalCount = cameraD400Series.devicecount + cameraKinect.devicecount + cameraT265.devicecount + cameraZed2.devicecount + cameraMyntD.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.devicecount
         optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = cameraT265.devicecount
@@ -747,9 +746,6 @@ Public Class OpenCVB
         stopCameraThread = True
         If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
         If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
-        cameraTaskHandle.Abort()
-        cameraTaskHandle.Abort()
-        cameraTaskHandle.Abort()
         cameraTaskHandle = Nothing
         updateCamera()
     End Sub
@@ -783,22 +779,24 @@ Public Class OpenCVB
         StartAlgorithmTask()
     End Sub
     Private Function threadStop(ByRef frame As Int32) As Boolean
-        If frame <> 0 Then
-            Dim sleepCount As Int32
-            ' some algorithms can take a long time to finish a single iteration.  
-            ' Each algorithm must run dispose() - to kill options forms and external Python or OpenGL taskes.  Wait until exit...
-            While frame
-                Application.DoEvents() ' to allow the algorithm task to gracefully end and dispose OpenCVB.
-                Thread.Sleep(100)
-                sleepCount += 1
-                If sleepCount > 10 Then Return False
-            End While
-        End If
+        Dim sleepCount As Int32
+        ' some algorithms can take a long time to finish a single iteration.  
+        ' Each algorithm must run dispose() - to kill options forms and external Python or OpenGL taskes.  Wait until exit...
+        While frame
+            Application.DoEvents() ' to allow the algorithm task to gracefully end and dispose OpenCVB.
+            Thread.Sleep(100)
+            sleepCount += 1
+            If sleepCount > 10 Then Return False
+        End While
         Return True
     End Function
     Private Sub StartAlgorithmTask()
         stopAlgorithmThread = True
+        ' there may be a long-running algorithmtask that doesn't see that the algorithm has been stopped.
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
+        If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
+        If algorithmTaskHandle IsNot Nothing Then algorithmTaskHandle.Abort()
+        If algorithmTaskHandle IsNot Nothing Then algorithmTaskHandle.Abort()
 
         cameraD400Series.DecimationFilter = GetSetting("OpenCVB", "DecimationFilter", "DecimationFilter", False)
         cameraD400Series.ThresholdFilter = GetSetting("OpenCVB", "ThresholdFilter", "ThresholdFilter", False)
@@ -880,6 +878,7 @@ Public Class OpenCVB
             AlgorithmTestCount += 1
             Console.WriteLine(vbTab + "Starting " + parms.activeAlgorithm + " " + CStr(AlgorithmTestCount) + " algorithms tested.")
         End If
+        Dim saveAlgorithmTestCount = AlgorithmTestCount ' use this to confirm that this task is to terminate.
         drawRect = New cv.Rect
         Dim saveLowResSetting As Boolean = parms.lowResolution
         Dim OpenCVB = New VB_Classes.ActiveClass(parms)
@@ -917,6 +916,7 @@ Public Class OpenCVB
                 If camera.newImagesAvailable Then Exit While
             End While
             If stopAlgorithmThread Then Exit While
+            If saveAlgorithmTestCount <> AlgorithmTestCount Then Exit While ' a failsafe provision.  This task needs to exit.
 
             ' bring the data into the algorithm task.
             SyncLock camPic
@@ -1042,7 +1042,7 @@ Public Class OpenCVB
         End If
 
         ' after sweeping through low and high resolution, sweep through the cameras as well...
-        If AlgorithmTestCount Mod (AvailableAlgorithms.Items.Count * 2) = 0 Then 'And AlgorithmTestCount > 0 
+        If AlgorithmTestCount Mod (AvailableAlgorithms.Items.Count * 2) = 0 And AlgorithmTestCount > 0 Then
             Static cameraIndex = optionsForm.cameraIndex
             Dim currentCameraIndex = optionsForm.cameraIndex
             cameraIndex += 1

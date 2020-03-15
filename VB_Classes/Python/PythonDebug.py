@@ -18,12 +18,14 @@ Keys
   ESC   - exit
 
 '''
+import sys
+import os
+
 import numpy as np
 import cv2 as cv
-import os
-import sys
 
 from common import Sketcher
+
 title_window = 'Watershed.py'
 
 class App:
