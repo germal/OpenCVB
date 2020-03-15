@@ -153,6 +153,10 @@ Public Class ActiveClass : Implements IDisposable
         ocvb.PythonExe = parms.PythonExe
         ocvb.parms = parms
         ActiveAlgorithm = algoList.createAlgorithm(parms.activeAlgorithm, ocvb)
+        If ActiveAlgorithm Is Nothing Then
+            MsgBox("The algorithm: " + parms.activeAlgorithm + " was not found in the algorithmList.vb code." + vbCrLf +
+                   "Review the code to determine why.")
+        End If
         If ActiveAlgorithm Is Nothing And parms.activeAlgorithm.EndsWith(".py") Then
             parms.activeAlgorithm = parms.activeAlgorithm.Substring(0, Len(parms.activeAlgorithm) - 3)
             ActiveAlgorithm = algoList.createAlgorithm(parms.activeAlgorithm, ocvb)

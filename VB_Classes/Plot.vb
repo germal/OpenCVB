@@ -21,8 +21,8 @@ Public Class Plot_OverTime : Implements IDisposable
         check.Box(0).Checked = True
         If ocvb.parms.ShowOptions Then check.Show()
 
-        sliders.setupTrackBar1(ocvb, "Pixel Height", 1, 40, 20)
-        sliders.setupTrackBar2(ocvb, "Pixel Width", 1, 40, 5)
+        sliders.setupTrackBar1(ocvb, "Pixel Height", 1, 40, 4)
+        sliders.setupTrackBar2(ocvb, "Pixel Width", 1, 40, 4)
         sliders.setupTrackBar3(ocvb, "Plot (time) Font Size x10", 1, 20, 10)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Plot an input variable over time"
@@ -50,7 +50,7 @@ Public Class Plot_OverTime : Implements IDisposable
         If externalUse = False Then plotData = ocvb.color.Mean()
 
         ' if enough points are off the charted area or if manually requested, then redo the scale.
-        If (offChartCount > CInt(ocvb.color.Width / sliders.TrackBar2.Value) Or check.Box(0).Checked) And lastXdelta.Count >= plotSeriesCount Then
+        If (offChartCount > 50 Or check.Box(0).Checked) And lastXdelta.Count >= plotSeriesCount Then
             dst.SetTo(0)
             check.Box(0).Checked = False
             maxScale = Int32.MinValue
@@ -58,8 +58,8 @@ Public Class Plot_OverTime : Implements IDisposable
             For i = 0 To lastXdelta.Count - 1
                 Dim nextVal = lastXdelta.Item(i)
                 For j = 0 To plotCount - 1
-                    If nextVal.Item(j) < minScale Then minScale = nextVal.Item(j)
-                    If nextVal.Item(j) > maxScale Then maxScale = nextVal.Item(j)
+                    If Math.Floor(nextVal.Item(j)) < minScale Then minScale = Math.Floor(nextVal.Item(j))
+                    If Math.Floor(nextVal.Item(j)) > maxScale Then maxScale = Math.Ceiling(nextVal.Item(j))
                 Next
             Next
             If minScale < 5 And minScale > 0 Then minScale = 0 ' nice location...
@@ -69,16 +69,15 @@ Public Class Plot_OverTime : Implements IDisposable
         End If
 
         If lastXdelta.Count >= plotSeriesCount Then lastXdelta.RemoveAt(0)
-
-        Dim rectSize = New cv.Size2f(pixelWidth, pixelHeight)
-        Dim ellipseSize = New cv.Size(pixelWidth, pixelHeight * 2)
-        If plotData.Item(3) < 10 Then plotCount = plotCount
         For i = 0 To plotCount - 1
-            If plotData.Item(i) < minScale And plotData.Item(i) > maxScale Then
+            If Math.Floor(plotData.Item(i)) < minScale Or Math.Ceiling(plotData.Item(i)) > maxScale Then
                 offChartCount += 1
                 Exit For
             End If
         Next
+
+        Dim rectSize = New cv.Size2f(pixelWidth, pixelHeight)
+        Dim ellipseSize = New cv.Size(pixelWidth, pixelHeight * 2)
         For i = 0 To plotCount - 1
             Dim y = 1 - (plotData.Item(i) - minScale) / (maxScale - minScale)
             y *= ocvb.color.Height - 1

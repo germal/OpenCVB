@@ -25,15 +25,22 @@ Public Class Kalman_Basics : Implements IDisposable
 
         plot = New Plot_OverTime(ocvb)
         plot.externalUse = True
-        plot.dst = ocvb.result2
-        plot.sliders.TrackBar2.Value = 20
+        plot.dst = ocvb.result1
+        plot.maxScale = 200
+        plot.minScale = 50
+        plot.backColor = cv.Scalar.Aquamarine
+        plot.plotCount = 3
 
         kPlot = New Plot_OverTime(ocvb)
         kPlot.externalUse = True
-        kPlot.dst = ocvb.result1
-        kPlot.sliders.TrackBar2.Value = 20
+        kPlot.dst = ocvb.result2
+        kPlot.backColor = cv.Scalar.Aquamarine
+        kPlot.maxScale = 200
+        kPlot.minScale = 50
+        kPlot.plotCount = 3
 
-        ocvb.label1 = "Kalman_Basics"
+        ocvb.label1 = "Kalman input: mean values for RGB"
+        ocvb.label2 = "Kalman output: smoothed mean values for RGB"
         ocvb.desc = "Use this kalman filter to predict the next value."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -47,7 +54,6 @@ Public Class Kalman_Basics : Implements IDisposable
             kf.TransitionMatrix = New cv.Mat(16, 1, cv.MatType.CV_32F, New Single() {1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1})
             kf.StatePre = New cv.Mat(4, 1, cv.MatType.CV_32F, New Single() {0, 0, 0, 0})
 #End If
-
             cv.Cv2.SetIdentity(kf.MeasurementMatrix)
             cv.Cv2.SetIdentity(kf.ProcessNoiseCov, ProcessNoiseCov)
             cv.Cv2.SetIdentity(kf.MeasurementNoiseCov, MeasurementNoiseCov)
@@ -56,7 +62,6 @@ Public Class Kalman_Basics : Implements IDisposable
 
         If externalUse = False Then
             plot.plotData = ocvb.color.Mean()
-            ocvb.label2 = "Input: x = " + Format(plot.plotData.Item(0), "#0.00") + " y = " + Format(plot.plotData.Item(1), "#0.00") + " z = " + Format(plot.plotData.Item(2), "#0.00")
             plot.Run(ocvb)
             inputReal.X = plot.plotData.Item(0)
             inputReal.Y = plot.plotData.Item(1)
@@ -73,9 +78,10 @@ Public Class Kalman_Basics : Implements IDisposable
         Dim estimated = kf.Correct(measurement)
         statePoint = New cv.Point3f(estimated.At(Of Single)(0), estimated.At(Of Single)(1), estimated.At(Of Single)(2))
         If externalUse = False Then
+            kPlot.maxScale = plot.maxScale ' keep the scale the same for the side-by-side plots.
+            kPlot.minScale = plot.minScale
             kPlot.plotData = New cv.Scalar(statePoint.X, statePoint.Y, statePoint.Z)
             kPlot.Run(ocvb)
-            ocvb.label1 = "Kalman output: x = " + Format(statePoint.X, "#0.00") + " y = " + Format(statePoint.Y, "#0.00") + " z = " + Format(statePoint.Z, "#0.00")
         End If
         lastStatePoint = statePoint
     End Sub

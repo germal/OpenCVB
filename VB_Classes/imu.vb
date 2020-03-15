@@ -146,8 +146,6 @@ Public Class IMU_Magnetometer : Implements IDisposable
         plot.dst = ocvb.result2
         plot.maxScale = 10
         plot.minScale = -10
-        plot.sliders.TrackBar1.Value = 2
-        plot.sliders.TrackBar2.Value = 2
 
         ocvb.desc = "Get the IMU_Magnetometer values from the IMU (if available)"
     End Sub
@@ -220,8 +218,6 @@ Public Class IMU_FrameTime : Implements IDisposable
         plot.dst = ocvb.result2
         plot.maxScale = 150
         plot.minScale = 0
-        plot.sliders.TrackBar1.Value = 4
-        plot.sliders.TrackBar2.Value = 4
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
@@ -316,8 +312,6 @@ Public Class IMU_HostFrameTimes : Implements IDisposable
         plot.dst = ocvb.result2
         plot.maxScale = 150
         plot.minScale = 0
-        plot.sliders.TrackBar1.Value = 4
-        plot.sliders.TrackBar2.Value = 4
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
@@ -410,8 +404,6 @@ Public Class IMU_TotalDelay : Implements IDisposable
         plot.dst = ocvb.result2
         plot.maxScale = 50
         plot.minScale = 0
-        plot.sliders.TrackBar1.Value = 4
-        plot.sliders.TrackBar2.Value = 4
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
