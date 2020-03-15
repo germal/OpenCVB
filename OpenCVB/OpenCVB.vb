@@ -94,7 +94,6 @@ Public Class OpenCVB
             If dllFile.Exists Then
                 MsgBox(dllFile.Name + "was built in the Debug directory." + vbCrLf + "Camera dll's are built in Release" + vbCrLf +
                        "for performance.  If you need to debug the camera" + vbCrLf + "interface, edit this message.")
-                End
             End If
         Next
 
@@ -342,10 +341,7 @@ Public Class OpenCVB
         search = New System.Management.ManagementObjectSearcher("SELECT * From Win32_PnPEntity")
         For Each info In search.Get()
             Name = CType(info("Caption"), String) ' Get the name of the device.'
-            If InStr(Name, searchName, CompareMethod.Text) > 0 Then
-                deviceCount += 1
-                Exit For
-            End If
+            If InStr(Name, searchName, CompareMethod.Text) > 0 Then deviceCount += 1
         Next
         Return deviceCount
     End Function
@@ -750,6 +746,9 @@ Public Class OpenCVB
         stopCameraThread = True
         If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
         If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
+        cameraTaskHandle.Abort()
+        cameraTaskHandle.Abort()
+        cameraTaskHandle.Abort()
         cameraTaskHandle = Nothing
         updateCamera()
     End Sub

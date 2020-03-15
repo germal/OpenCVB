@@ -180,9 +180,10 @@ public:
 		leftViewRaw = Mat(rawHeight, rawWidth, CV_8U, (void *)leftImage.get_data()).clone();
 		rightViewRaw = Mat(rawHeight, rawWidth, CV_8U, (void*)rightImage.get_data()).clone();
 
-		remap(leftViewRaw, color, leftViewMap1, leftViewMap2, INTER_LINEAR);
-		resize(color, color, Size(width, height));
-		cvtColor(color, color, COLOR_GRAY2BGR);
+		Mat tmpColor;
+		remap(leftViewRaw, tmpColor, leftViewMap1, leftViewMap2, INTER_LINEAR);
+		resize(tmpColor, tmpColor, Size(width, height));
+		cvtColor(tmpColor, color, COLOR_GRAY2BGR);
 		RGBDepth = color.clone();
 
 		Mat remapLeft, remapRight;
