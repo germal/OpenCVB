@@ -26,17 +26,11 @@ Public Class Kalman_Basics : Implements IDisposable
         plot = New Plot_OverTime(ocvb)
         plot.externalUse = True
         plot.dst = ocvb.result1
-        plot.maxScale = 200
-        plot.minScale = 50
-        plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 3
 
         kPlot = New Plot_OverTime(ocvb)
         kPlot.externalUse = True
         kPlot.dst = ocvb.result2
-        kPlot.backColor = cv.Scalar.Aquamarine
-        kPlot.maxScale = 200
-        kPlot.minScale = 50
         kPlot.plotCount = 3
 
         ocvb.label1 = "Kalman input: mean values for RGB"
@@ -82,6 +76,11 @@ Public Class Kalman_Basics : Implements IDisposable
             kPlot.minScale = plot.minScale
             kPlot.plotData = New cv.Scalar(statePoint.X, statePoint.Y, statePoint.Z)
             kPlot.Run(ocvb)
+        End If
+        ' if either one has triggered a reset for the scale, do them both...
+        If kPlot.offChartCount = 0 Or plot.offChartCount = 0 Then
+            kPlot.offChartCount = kPlot.plotTriggerRescale + 1
+            plot.offChartCount = plot.plotTriggerRescale + 1
         End If
         lastStatePoint = statePoint
     End Sub

@@ -58,8 +58,8 @@ class Depth_Colorizer2
 {
 private:
 public:
-	Mat depth, dst;
-	int histSize;
+	Mat depth16, dst;
+	int histSize = 255;
 	Depth_Colorizer2() {} 
 	void Run()
 	{
@@ -70,9 +70,9 @@ public:
 		const float* range[] = { hRange };
 		int hbins[] = { histSize };
 		Mat hist;
-		if (countNonZero(depth) > 0)
+		if (countNonZero(depth16) > 0)
 		{
-			calcHist(&depth, 1, 0, Mat(), hist, 1, hbins, range, true, false);
+			calcHist(&depth16, 1, 0, Mat(), hist, 1, hbins, range, true, false);
 		}
 		else {
 			dst.setTo(0);
@@ -91,7 +91,7 @@ public:
 
 			// Produce RGB image by using the histogram to interpolate between two colors
 			auto rgb = (unsigned char*)dst.data;
-			unsigned short* depthImage = (unsigned short*)depth.data;
+			unsigned short* depthImage = (unsigned short*)depth16.data;
 			for (int i = 0; i < dst.cols * dst.rows; i++)
 			{
 				if (uint16_t d = depthImage[i]) // For valid depth values (depth > 0)
@@ -107,7 +107,7 @@ public:
 						*rgb++ = 0; *rgb++ = 0; *rgb++ = 0;
 					}
 				}
-				else // Use black pixels for invalid values (depth == 0)
+				else // Use black pixels for invalid values (depth16 == 0)
 				{
 					*rgb++ = 0; *rgb++ = 0; *rgb++ = 0;
 				}

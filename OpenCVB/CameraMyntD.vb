@@ -9,7 +9,7 @@ Module MyntD_Interface
     Public Function MyntDSerialNumber(cPtr As IntPtr) As Int32
     End Function
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDWaitFrame(cPtr As IntPtr, rgba As IntPtr, depthRGBA As IntPtr, depth32f As IntPtr, left As IntPtr,
+    Public Function MyntDWaitFrame(cPtr As IntPtr, rgba As IntPtr, depthRGB As IntPtr, depth16 As IntPtr, left As IntPtr,
                                   right As IntPtr, pointCloud As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -131,8 +131,8 @@ Public Class CameraMyntD
             intrinsicsRight_VB.height = intrinsics.height
 
             ReDim colorBytes(w * h * 4) ' rgba format coming back from driver
-            ReDim RGBADepthBytes(w * h * 4)
-            ReDim depth32FBytes(w * h * 4)
+            ReDim RGBDepthBytes(w * h * 3)
+            ReDim depthBytes(w * h * 2)
             ReDim leftViewBytes(w * h)
             ReDim rightViewBytes(w * h)
             ReDim pointCloudBytes(w * h * 12) ' xyz + rgba
@@ -143,13 +143,13 @@ Public Class CameraMyntD
         If cPtr = 0 Then Return
         Exit Sub
         Dim handlecolorBytes = GCHandle.Alloc(colorBytes, GCHandleType.Pinned)
-        Dim handleRGBADepthBytes = GCHandle.Alloc(RGBADepthBytes, GCHandleType.Pinned)
-        Dim handledepth32Fbytes = GCHandle.Alloc(depth32FBytes, GCHandleType.Pinned)
+        Dim handleRGBDepthBytes = GCHandle.Alloc(RGBDepthBytes, GCHandleType.Pinned)
+        Dim handledepthBytes = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)
         Dim handleLeftViewBytes = GCHandle.Alloc(leftViewBytes, GCHandleType.Pinned)
         Dim handleRightViewBytes = GCHandle.Alloc(rightViewBytes, GCHandleType.Pinned)
         Dim handlePCBytes = GCHandle.Alloc(pointCloudBytes, GCHandleType.Pinned)
-        Dim imuFrame = MyntDWaitFrame(cPtr, handlecolorBytes.AddrOfPinnedObject(), handleRGBADepthBytes.AddrOfPinnedObject(),
-                                           handledepth32Fbytes.AddrOfPinnedObject(), handleLeftViewBytes.AddrOfPinnedObject(),
+        Dim imuFrame = MyntDWaitFrame(cPtr, handlecolorBytes.AddrOfPinnedObject(), handleRGBDepthBytes.AddrOfPinnedObject(),
+                                           handledepthBytes.AddrOfPinnedObject(), handleLeftViewBytes.AddrOfPinnedObject(),
                                            handleRightViewBytes.AddrOfPinnedObject(), handlePCBytes.AddrOfPinnedObject())
         Dim acc = MyntDAcceleration(cPtr)
         imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(acc)
@@ -184,8 +184,8 @@ Public Class CameraMyntD
         Marshal.Copy(rot, rotation, 0, rotation.Length)
 
         handlecolorBytes.Free()
-        handleRGBADepthBytes.Free()
-        handledepth32Fbytes.Free()
+        handleRGBDepthBytes.Free()
+        handledepthBytes.Free()
         handleLeftViewBytes.Free()
         handleRightViewBytes.Free()
         handlePCBytes.Free()
@@ -203,10 +203,10 @@ Public Class CameraMyntD
             Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBytes)
             Color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-            Dim RGBADepth = New cv.Mat(h, w, cv.MatType.CV_8UC4, RGBADepthBytes)
+            Dim RGBADepth = New cv.Mat(h, w, cv.MatType.CV_8UC4, RGBDepthBytes)
             RGBDepth = RGBADepth.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-            Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depth32FBytes)
+            Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depthBytes)
             depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
 
             leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftViewBytes)

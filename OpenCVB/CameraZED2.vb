@@ -9,7 +9,7 @@ Module Zed2_Interface
     Public Function Zed2SerialNumber(cPtr As IntPtr) As Int32
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2WaitFrame(cPtr As IntPtr, rgba As IntPtr, depthRGBA As IntPtr, depth32f As IntPtr, left As IntPtr,
+    Public Function Zed2WaitFrame(cPtr As IntPtr, rgba As IntPtr, RGBDepthPtr As IntPtr, depth16 As IntPtr, left As IntPtr,
                                   right As IntPtr, pointCloud As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -130,8 +130,8 @@ Public Class CameraZED2
             intrinsicsRight_VB.height = intrinsics.height
 
             ReDim colorBytes(w * h * 4) ' rgba format coming back from driver
-            ReDim RGBADepthBytes(w * h * 4)
-            ReDim depth32FBytes(w * h * 4)
+            ReDim RGBDepthBytes(w * h * 3)
+            ReDim depthBytes(w * h * 2)
             ReDim leftViewBytes(w * h)
             ReDim rightViewBytes(w * h)
             ReDim pointCloudBytes(w * h * 12) ' xyz + rgba
@@ -142,18 +142,18 @@ Public Class CameraZED2
     Public Sub GetNextFrame()
         If cPtr = 0 Then Return
         Dim handlecolorBytes = GCHandle.Alloc(colorBytes, GCHandleType.Pinned)
-        Dim handleRGBADepthBytes = GCHandle.Alloc(RGBADepthBytes, GCHandleType.Pinned)
-        Dim handledepth32Fbytes = GCHandle.Alloc(depth32FBytes, GCHandleType.Pinned)
+        Dim handleRGBDepthBytes = GCHandle.Alloc(RGBDepthBytes, GCHandleType.Pinned)
+        Dim handledepthBytes = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)
         Dim handleLeftViewBytes = GCHandle.Alloc(leftViewBytes, GCHandleType.Pinned)
         Dim handleRightViewBytes = GCHandle.Alloc(rightViewBytes, GCHandleType.Pinned)
         Dim handlePCBytes = GCHandle.Alloc(pointCloudBytes, GCHandleType.Pinned)
-        Dim imuFrame = Zed2WaitFrame(cPtr, handlecolorBytes.AddrOfPinnedObject(), handleRGBADepthBytes.AddrOfPinnedObject(),
-                                           handledepth32Fbytes.AddrOfPinnedObject(), handleLeftViewBytes.AddrOfPinnedObject(),
+        Dim imuFrame = Zed2WaitFrame(cPtr, handlecolorBytes.AddrOfPinnedObject(), handleRGBDepthBytes.AddrOfPinnedObject(),
+                                           handledepthBytes.AddrOfPinnedObject(), handleLeftViewBytes.AddrOfPinnedObject(),
                                            handleRightViewBytes.AddrOfPinnedObject(), handlePCBytes.AddrOfPinnedObject())
 
         handlecolorBytes.Free()
-        handleRGBADepthBytes.Free()
-        handledepth32Fbytes.Free()
+        handleRGBDepthBytes.Free()
+        handledepthBytes.Free()
         handleLeftViewBytes.Free()
         handleRightViewBytes.Free()
         handlePCBytes.Free()
@@ -205,10 +205,9 @@ Public Class CameraZED2
             Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBytes)
             color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-            Dim RGBADepth = New cv.Mat(h, w, cv.MatType.CV_8UC4, RGBADepthBytes)
-            RGBDepth = RGBADepth.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
 
-            Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depth32FBytes)
+            Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depthBytes)
             depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
 
             leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftViewBytes)

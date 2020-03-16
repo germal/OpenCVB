@@ -4,13 +4,14 @@ Public Class Plot_OverTime : Implements IDisposable
     Public check As New OptionsCheckbox
     Public sliders As New OptionsSliders
     Public plotData As cv.Scalar
-    Public plotCount As Int32 = 4
+    Public plotCount As Int32 = 3
     Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.White}
-    Public backColor = cv.Scalar.Black
+    Public backColor = cv.Scalar.Aquamarine
     Public externalUse As Boolean
     Public dst As cv.Mat
-    Public minScale As Int32
-    Public maxScale As Int32
+    Public minScale As Int32 = 50
+    Public maxScale As Int32 = 200
+    Public plotTriggerRescale = 50
     Public columnIndex As Int32
     Public offChartCount As Integer
     Public lastXdelta As New List(Of cv.Scalar)
@@ -41,7 +42,7 @@ Public Class Plot_OverTime : Implements IDisposable
             ' after the first screenful of data, reset the scale to appropriate values.
             If rangeReset = False Then
                 rangeReset = True
-                offChartCount = Integer.MaxValue
+                offChartCount = plotTriggerRescale + 1
             End If
             dst.ColRange(columnIndex, ocvb.color.Width).SetTo(backColor)
             columnIndex = 0
@@ -49,8 +50,15 @@ Public Class Plot_OverTime : Implements IDisposable
         dst.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
         If externalUse = False Then plotData = ocvb.color.Mean()
 
+        For i = 0 To plotCount - 1
+            If Math.Floor(plotData.Item(i)) < minScale Or Math.Ceiling(plotData.Item(i)) > maxScale Then
+                offChartCount += 1
+                Exit For
+            End If
+        Next
+
         ' if enough points are off the charted area or if manually requested, then redo the scale.
-        If (offChartCount > 50 Or check.Box(0).Checked) And lastXdelta.Count >= plotSeriesCount Then
+        If (offChartCount > plotTriggerRescale Or check.Box(0).Checked) And lastXdelta.Count >= plotSeriesCount Then
             dst.SetTo(0)
             check.Box(0).Checked = False
             maxScale = Int32.MinValue
@@ -67,14 +75,7 @@ Public Class Plot_OverTime : Implements IDisposable
             offChartCount = 0
             columnIndex = 0 ' restart at the left side of the chart
         End If
-
         If lastXdelta.Count >= plotSeriesCount Then lastXdelta.RemoveAt(0)
-        For i = 0 To plotCount - 1
-            If Math.Floor(plotData.Item(i)) < minScale Or Math.Ceiling(plotData.Item(i)) > maxScale Then
-                offChartCount += 1
-                Exit For
-            End If
-        Next
 
         Dim rectSize = New cv.Size2f(pixelWidth, pixelHeight)
         Dim ellipseSize = New cv.Size(pixelWidth, pixelHeight * 2)

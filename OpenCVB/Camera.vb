@@ -40,11 +40,9 @@ Public Class Camera
     Public vertices() As Byte
     Public depthBytes() As Byte
     Public RGBDepthBytes() As Byte
-    Public RGBADepthBytes() As Byte
     Public leftViewBytes() As Byte
     Public rightViewBytes() As Byte
     Public disparityBytes() As Byte
-    Public depth32FBytes() As Byte
     Public pointCloudBytes() As Byte
 
     Public serialNumber As String
