@@ -133,13 +133,6 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
-        cameraT265 = New CameraT265Native()
-        cameraT265.deviceCount = USBenumeration("T265")
-        If cameraT265.deviceCount > 0 Then
-            cameraT265.initialize(fps, regWidth, regHeight)
-            optionsForm.cameraTotalCount += 1
-        End If
-
         cameraD400Series = New CameraD400Native() ' the pure VB version is in  CameraD400() but it is too slow... use CameraD400Native()
         cameraD400Series.deviceCount = USBenumeration("Depth Camera 435")
         cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 415 Depth")
@@ -206,6 +199,15 @@ Public Class OpenCVB
                 cameraMyntD.initialize(fps, regWidth, regHeight)
                 optionsForm.cameraTotalCount += 1
             End If
+        End If
+
+
+        ' check for the T265 last as it seems to take longer to be recognized by the USB controller.  If first, it was not found on my machine!
+        cameraT265 = New CameraT265Native()
+        cameraT265.deviceCount = USBenumeration("T265")
+        If cameraT265.deviceCount > 0 Then
+            cameraT265.initialize(fps, regWidth, regHeight)
+            optionsForm.cameraTotalCount += 1
         End If
 
         optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.devicecount
@@ -350,6 +352,21 @@ Public Class OpenCVB
         search = New System.Management.ManagementObjectSearcher("SELECT * From Win32_PnPEntity")
         For Each info In search.Get()
             Name = CType(info("Caption"), String) ' Get the name of the device.'
+            ' toss the uninteresting names so we can find the cameras.
+            If Name Is Nothing Then Continue For
+            If InStr(Name, "Xeon") = False And InStr(Name, "Chipset") = False And InStr(Name, "Generic") = False And InStr(Name, "Bluetooth") = False And
+                    InStr(Name, "Monitor") = False And InStr(Name, "Mouse") = False And InStr(Name, "NVIDIA") = False And InStr(Name, "HID-compliant") = False And
+                    InStr(Name, " CPU ") = False And InStr(Name, "PCI Express") = False And Name.StartsWith("USB ") = False And
+                    Name.StartsWith("Microsoft") = False And Name.StartsWith("Motherboard") = False And InStr(Name, "SATA") = False And
+                    InStr(Name, "Volume") = False And Name.StartsWith("WAN") = False And InStr(Name, "ACPI") = False And
+                    Name.StartsWith("HID") = False And InStr(Name, "OneNote") = False And Name.StartsWith("Samsung") = False And
+                    Name.StartsWith("System ") = False And Name.StartsWith("HP") = False And InStr(Name, "Wireless") = False And
+                    Name.StartsWith("SanDisk") = False And InStr(Name, "Wi-Fi") = False And Name.StartsWith("Media ") = False And
+                    Name.StartsWith("High precision") = False And Name.StartsWith("High Definition ") = False And
+                    InStr(Name, "Remote") = False And InStr(Name, "Numeric") = False And InStr(Name, "UMBus ") = False And
+                    Name.StartsWith("Plug and Play") = False And InStr(Name, "Print") = False Then
+                Console.WriteLine(Name) ' looking for new cameras 
+            End If
             If InStr(Name, searchName, CompareMethod.Text) > 0 Then deviceCount += 1
         Next
         Return deviceCount

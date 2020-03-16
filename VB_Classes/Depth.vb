@@ -136,11 +136,18 @@ Public Class Depth_Median : Implements IDisposable
         mask = median.src.LessThan(median.medianVal)
         ocvb.result1.SetTo(0)
         ocvb.RGBDepth.CopyTo(ocvb.result1, mask)
+
+        Dim zeroMask = ocvb.depth16.Equals(0)
+        cv.Cv2.ConvertScaleAbs(zeroMask, zeroMask.ToMat)
+        If ocvb.parms.lowResolution Then zeroMask = zeroMask.ToMat.Resize(ocvb.result1.Size())
+        ocvb.result1.SetTo(0, zeroMask)
+
         ocvb.label1 = "Median Depth < " + Format(median.medianVal, "#0.0")
 
         cv.Cv2.BitwiseNot(mask, mask)
         ocvb.result2.SetTo(0)
         ocvb.RGBDepth.CopyTo(ocvb.result2, mask)
+        ocvb.result2.SetTo(0, zeroMask)
         ocvb.label2 = "Median Depth > " + Format(median.medianVal, "#0.0")
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

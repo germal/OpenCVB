@@ -14,12 +14,6 @@ Module T265_Module_CPP
     Public Function T265RawHeight(tp As IntPtr) As Int32
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265Depth16Width(tp As IntPtr) As Int32
-    End Function
-    <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265Depth16Height(tp As IntPtr) As Int32
-    End Function
-    <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub T265WaitFrame(tp As IntPtr)
     End Sub
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -58,6 +52,9 @@ Module T265_Module_CPP
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265timeStampLatency(timeStamp As Double) As Single
     End Function
+    <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub T265InitializeSGM(tp As IntPtr)
+    End Sub
 End Module
 
     Structure T265IMUdata
@@ -74,11 +71,11 @@ Public Class CameraT265Native
     Inherits Camera
     Dim rawHeight As Int32
     Dim rawWidth As Int32
-    Dim depth16Height As Int32
-    Dim depth16Width As Int32
 
     Public extrinsics As rs.Extrinsics
     Public pc As New rs.PointCloud
+    Dim rawSrcRect As cv.Rect
+    Dim rawDstRect As cv.Rect
 
     Public Sub New()
     End Sub
@@ -91,9 +88,6 @@ Public Class CameraT265Native
         cPtr = T265Open(width, height)
         rawWidth = T265RawWidth(cPtr)
         rawHeight = T265RawHeight(cPtr)
-
-        depth16Width = T265Depth16Width(cPtr)
-        depth16Height = T265Depth16Height(cPtr)
 
         Dim intrin = T265intrinsicsLeft(cPtr)
         Dim intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
@@ -108,16 +102,18 @@ Public Class CameraT265Native
         Extrinsics_VB.rotation = extrinsics.rotation
         Extrinsics_VB.translation = extrinsics.translation
 
-        ReDim colorBytes(w * h * 3 - 1)
-        ReDim leftViewBytes(rawHeight * rawWidth - 1)
-        ReDim rightViewBytes(leftViewBytes.Length - 1)
-        ReDim depthBytes(depth16Width * depth16Height * 2 - 1)
-        ReDim RGBDepthBytes(colorBytes.Length - 1)  ' most of the image is grayscale but the 300x300 part is RGB so the whole has to be...
+        rightView = New cv.Mat(h, w, cv.MatType.CV_8U, 0)
+        leftView = New cv.Mat(h, w, cv.MatType.CV_8U, 0)
+
+        rawSrcRect = New cv.Rect((rawWidth - rawWidth * h / rawHeight) / 2, 0, rawWidth * h / rawHeight, h)
+        rawDstRect = New cv.Rect(0, 0, rawSrcRect.Width, rawSrcRect.Height)
+
         pointCloud = New cv.Mat()
     End Sub
     Public Sub GetNextFrame()
         If pipelineClosed Or cPtr = 0 Then Exit Sub
 
+        If frameCount = 0 Then T265InitializeSGM(cPtr)
         T265WaitFrame(cPtr)
 
         SyncLock OpenCVB.camPic ' only really need the synclock when in callback mode but it doesn't hurt to waitforframe mode.
@@ -143,26 +139,19 @@ Public Class CameraT265Native
                         t.X, t.Y, t.Z, 1.0}
             transformationMatrix = mat
 
-            Dim colorPtr = T265Color(cPtr)
-            Marshal.Copy(colorPtr, colorBytes, 0, colorBytes.Length - 1)
-            leftView = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorBytes)
+            leftView = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265Color(cPtr)).Clone()
             color = leftView
 
-            Dim rightPtr = T265RightRaw(cPtr)
-            Marshal.Copy(rightPtr, rightViewBytes, 0, rightViewBytes.Length - 1)
-            rightView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, rightViewBytes)
+            rightView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265RightRaw(cPtr))
+            leftView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265LeftRaw(cPtr))
 
-            Dim leftPtr = T265LeftRaw(cPtr)
-            Marshal.Copy(leftPtr, leftViewBytes, 0, leftViewBytes.Length - 1)
-            leftView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, leftViewBytes)
+            rightView(rawDstRect) = rightView(rawSrcRect)
+            leftView(rawDstRect) = leftView(rawSrcRect)
 
-            Dim rgbdPtr = T265RGBDepth(cPtr)
-            Marshal.Copy(rgbdPtr, RGBDepthBytes, 0, RGBDepthBytes.Length - 1)
-            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
+            ' Console.WriteLine("rgb depth = " + Hex(T265RGBDepth(cPtr).ToInt64))
+            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265RGBDepth(cPtr)).Clone()
+            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, T265Depth16(cPtr)).Clone()
 
-            Dim depthPtr = T265Depth16(cPtr)
-            Marshal.Copy(depthPtr, depthBytes, 0, depthBytes.Length - 1)
-            depth16 = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_16U, depthBytes)
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End SyncLock
     End Sub

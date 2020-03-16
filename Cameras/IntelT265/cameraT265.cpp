@@ -28,7 +28,6 @@ public:
 	Ptr<StereoSGBM> stereo;
 	t265sgm(int minDisp, int windowSize, int numDisp)
 	{
-		//stereo = cv::StereoSGBM::create(0, 112, 16, 8 * 3 * 25, 32 * 3 * 25, 1, 0, 10, 100, 32);
 		stereo = cv::StereoSGBM::create(minDisp, numDisp, 16, 8 * 3 * windowSize * windowSize, 32 * 3 * windowSize * windowSize, 1, 0, 10, 100, 32);
 	}
 	Mat Run(Mat leftimg, Mat rightimg, int maxDisp)
@@ -64,7 +63,6 @@ private:
 	int minDisp = 0;
 	int maxDisp;
 	int windowSize = 5;
-	Ptr<StereoSGBM> stereoPtr;
 
 	Mat lm1, lm2, rm1, rm2;
 	
@@ -75,6 +73,10 @@ private:
 public:
 	~t265Camera(){}
 
+	void initializeSGM()
+	{
+		sgm = new t265sgm(minDisp, windowSize, numDisp);
+	}
 	t265Camera(int w, int h)
 	{
 		width = w;
@@ -90,10 +92,7 @@ public:
 
 		numDisp = 112 - minDisp;
 		maxDisp = minDisp + numDisp;
-
-		//stereoPtr = cv::StereoSGBM::create(minDisp, numDisp, 16, 8 * 3 * windowSize * windowSize, 32 * 3 * windowSize * windowSize, 1, 0, 10, 100);
-		sgm = new t265sgm(minDisp, windowSize, numDisp);
-
+		
 		auto leftStream = pipeline_profile.get_stream(RS2_STREAM_FISHEYE, 1).as<rs2::video_stream_profile>();
 		auto rightStream = pipeline_profile.get_stream(RS2_STREAM_FISHEYE, 2).as<rs2::video_stream_profile>();
 
@@ -163,8 +162,13 @@ public:
 		cv::fisheye::initUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, stereo_size, CV_32FC1, rm1, rm2);
 		cv::fisheye::initUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, Size(rawWidth, rawHeight), CV_32FC1, rightViewMap1, rightViewMap2);
 
+		// we are only calculating depth on a small region.  Depth is unknown everywhere else...
+		depth16 = Mat(height, width, CV_16U);
+		depth16.setTo(0);
+
 		int vSize = int(w * h * 4 * 3);
 		vertices = new float[vSize](); // 3 floats or 12 bytes per pixel.  
+		initializeSGM();
 	}
 
 	void waitForFrame()
@@ -173,33 +177,30 @@ public:
 		auto f = frameset.first_or_default(RS2_STREAM_POSE);
 		IMU_TimeStamp = f.get_timestamp();
 
+		Mat disp16s, tmpColor, remapLeft, remapRight, disparity;
+
 		auto fs = frameset.as<rs2::frameset>();
 		rs2::frame leftImage = fs.get_fisheye_frame(1);
-		rs2::frame rightImage = fs.get_fisheye_frame(2);
-
-		leftViewRaw = Mat(rawHeight, rawWidth, CV_8U, (void *)leftImage.get_data()).clone();
-		rightViewRaw = Mat(rawHeight, rawWidth, CV_8U, (void*)rightImage.get_data()).clone();
-
-		Mat tmpColor;
+		leftViewRaw = Mat(rawHeight, rawWidth, CV_8U, (void*)leftImage.get_data());
 		remap(leftViewRaw, tmpColor, leftViewMap1, leftViewMap2, INTER_LINEAR);
 		resize(tmpColor, tmpColor, Size(width, height));
 		cvtColor(tmpColor, color, COLOR_GRAY2BGR);
 		RGBDepth = color.clone();
-
-		Mat remapLeft, remapRight;
 		cv::remap(leftViewRaw, remapLeft, lm1, lm2, INTER_LINEAR);
-		cv::remap(rightViewRaw, remapRight, rm1, rm2, INTER_LINEAR);
 
-		Mat disp16s;
-		//stereoPtr->compute(remapLeft, remapRight, disp16s);
+		rs2::frame rightImage = fs.get_fisheye_frame(2);
+		rightViewRaw = Mat(rawHeight, rawWidth, CV_8U, (void*)rightImage.get_data());
+		cv::remap(rightViewRaw, remapRight, rm1, rm2, INTER_LINEAR);
 		disp16s = sgm->Run(remapLeft, remapRight, maxDisp);
 
 		Rect validRect = Rect(maxDisp, 0, disp16s.cols - maxDisp, disp16s.rows);
 		disp16s = disp16s(validRect);
-		Mat disparity;
 		disp16s.convertTo(disparity, CV_32F, 1.0f / 16.0f);
 
 		Mat disp_vis = disparity.clone();
+		cv::Rect depthRect = Rect(int(stereo_cx), 0, disparity.cols, disparity.rows);
+		disp16s.convertTo(depth16(depthRect), CV_16U);
+		depth16 *= 16;
 
 		Mat mask;
 		threshold(disp_vis, mask, 1, 255, THRESH_BINARY);
@@ -210,9 +211,7 @@ public:
 		Mat tmpRGBDepth;
 		cv::convertScaleAbs(disp_vis, disp_vis, 1);
 		cv::applyColorMap(disp_vis, tmpRGBDepth, cv::COLORMAP_JET);
-		cv::Rect depthRect = Rect(int(stereo_cx), 0, tmpRGBDepth.cols, tmpRGBDepth.rows);
 		tmpRGBDepth.copyTo(RGBDepth(depthRect), mask);
-		depth16 = disparity.clone();
 
 		// Cast the frame to pose_frame and get its data
 		pose_data = f.as<rs2::pose_frame>().get_pose_data();
@@ -251,18 +250,6 @@ int T265RawHeight(t265Camera * tp)
 }
 
 extern "C" __declspec(dllexport)
-int T265Depth16Width(t265Camera * tp)
-{
-	return tp->stereo_height_px; // it is a square 300x300
-}
-
-extern "C" __declspec(dllexport)
-int T265Depth16Height(t265Camera * tp)
-{
-	return tp->stereo_height_px;
-}
-
-extern "C" __declspec(dllexport)
 int* T265Extrinsics(t265Camera* tp)
 {
 	return (int *) &tp->extrinsics;
@@ -279,7 +266,7 @@ int* T265PointCloud(t265Camera * tp)
 }
 
 extern "C" __declspec(dllexport)
-int* T265LeftRaw(t265Camera* tp)
+int* T265LeftRaw(t265Camera* tp)	
 {
 	return (int *) tp->leftViewRaw.data;
 }
@@ -318,6 +305,12 @@ extern "C" __declspec(dllexport)
 double T265IMUTimeStamp(t265Camera * tp)
 {
 	return tp->IMU_TimeStamp;
+}
+
+extern "C" __declspec(dllexport)
+void T265InitializeSGM(t265Camera * tp)
+{
+	tp->initializeSGM();
 }
 
 extern "C" __declspec(dllexport)

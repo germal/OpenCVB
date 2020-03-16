@@ -11,6 +11,7 @@ Public Class Thread_Grid : Implements IDisposable
     Public tilesPerRow As Int32
     Public tilesPerCol As Int32
     Dim incompleteRegions As Int32
+    Public src As New cv.Mat
     Private Sub drawGrid(rList As List(Of cv.Rect))
         For Each roi In rList
             Dim p1 = New cv.Point(roi.X + roi.Width, roi.Y)
@@ -25,13 +26,14 @@ Public Class Thread_Grid : Implements IDisposable
         Next
     End Sub
     Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "ThreadGrid Width", 5, ocvb.color.Width, 32)
-        sliders.setupTrackBar2(ocvb, "ThreadGrid Height", 5, ocvb.color.Height, 32)
+        src = ocvb.color
+        sliders.setupTrackBar1(ocvb, "ThreadGrid Width", 5, src.Width, 32)
+        sliders.setupTrackBar2(ocvb, "ThreadGrid Height", 5, src.Height, 32)
         sliders.setupTrackBar3(ocvb, "ThreadGrid Border", 0, 20, 0)
         If ocvb.parms.ShowOptions Then sliders.Show()
         roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)
-        gridMask = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
+        gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
         ocvb.desc = "Create a grid for use with parallel.ForEach."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -46,11 +48,11 @@ Public Class Thread_Grid : Implements IDisposable
 
             gridMask.SetTo(0)
             incompleteRegions = 0
-            For y = 0 To ocvb.color.Height - 1 Step sliders.TrackBar2.Value
-                For x = 0 To ocvb.color.Width - 1 Step sliders.TrackBar1.Value
+            For y = 0 To src.Height - 1 Step sliders.TrackBar2.Value
+                For x = 0 To src.Width - 1 Step sliders.TrackBar1.Value
                     Dim roi = New cv.Rect(x, y, sliders.TrackBar1.Value, sliders.TrackBar2.Value)
-                    If x + roi.Width > ocvb.color.Width Then roi.Width = ocvb.color.Width - x
-                    If y + roi.Height >= ocvb.color.Height Then roi.Height = ocvb.color.Height - y
+                    If x + roi.Width > src.Width Then roi.Width = src.Width - x
+                    If y + roi.Height >= src.Height Then roi.Height = src.Height - y
                     If roi.Width > 0 And roi.Height > 0 Then
                         If y = 0 Then tilesPerRow += 1
                         If x = 0 Then tilesPerCol += 1
@@ -72,11 +74,11 @@ Public Class Thread_Grid : Implements IDisposable
                     broi.Height += broi.Y
                     broi.Y = 0
                 End If
-                If broi.Width + broi.X > ocvb.color.Width Then
-                    broi.Width = ocvb.color.Width - broi.X
+                If broi.Width + broi.X > src.Width Then
+                    broi.Width = src.Width - broi.X
                 End If
-                If broi.Height + broi.Y > ocvb.color.Height Then
-                    broi.Height = ocvb.color.Height - broi.Y
+                If broi.Height + broi.Y > src.Height Then
+                    broi.Height = src.Height - broi.Y
                 End If
                 borderList.Add(broi)
             Next
@@ -89,7 +91,7 @@ Public Class Thread_Grid : Implements IDisposable
         End If
 
         If externalUse = False Then
-            ocvb.color.CopyTo(ocvb.result1)
+            src.CopyTo(ocvb.result1)
             ocvb.result1.SetTo(cv.Scalar.All(255), gridMask)
         End If
         ocvb.label1 = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +

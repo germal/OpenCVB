@@ -31,7 +31,7 @@ Public Class LeftRightView_Basics : Implements IDisposable
                 Dim rawHeight = ocvb.leftView.Height
                 Dim rawSrc = New cv.Rect((rawWidth - rawWidth * h / rawHeight) / 2, 0, rawWidth * h / rawHeight, h)
                 Dim rawDst = New cv.Rect(0, 0, rawSrc.Width, rawSrc.Height)
-                If ocvb.parms.lowResolution Then rawDst = New cv.Rect(0, 0, rawSrc.Width / 2 + 1, rawSrc.Height / 2)
+                If ocvb.parms.lowResolution Then rawDst = New cv.Rect(0, 0, CInt(rawSrc.Width / 2), rawSrc.Height / 2)
 
                 Dim tmp As New cv.Mat(New cv.Size(rawSrc.Width, rawSrc.Height), cv.MatType.CV_8UC1)
                 ocvb.leftView(rawSrc).CopyTo(tmp)
