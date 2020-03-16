@@ -139,14 +139,13 @@ Public Class CameraT265Native
                         t.X, t.Y, t.Z, 1.0}
             transformationMatrix = mat
 
-            leftView = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265Color(cPtr)).Clone()
-            color = leftView
+            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265Color(cPtr)).Clone()
 
-            rightView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265RightRaw(cPtr))
-            leftView = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265LeftRaw(cPtr))
+            Dim right = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265RightRaw(cPtr)).Clone()
+            Dim left = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265LeftRaw(cPtr)).Clone()
 
-            rightView(rawDstRect) = rightView(rawSrcRect)
-            leftView(rawDstRect) = leftView(rawSrcRect)
+            rightView(rawDstRect) = right(rawSrcRect)
+            leftView(rawDstRect) = left(rawSrcRect)
 
             ' Console.WriteLine("rgb depth = " + Hex(T265RGBDepth(cPtr).ToInt64))
             RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265RGBDepth(cPtr)).Clone()

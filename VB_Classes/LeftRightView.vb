@@ -20,32 +20,8 @@ Public Class LeftRightView_Basics : Implements IDisposable
         End Select
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Select Case ocvb.parms.cameraIndex
-            Case T265Camera
-                ocvb.result1 = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_8UC1, 0)
-                ocvb.result2 = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_8UC1, 0)
-                Dim h = ocvb.parms.height
-                If ocvb.parms.lowResolution Then h = ocvb.parms.height * 2
-
-                Dim rawWidth = ocvb.leftView.Width
-                Dim rawHeight = ocvb.leftView.Height
-                Dim rawSrc = New cv.Rect((rawWidth - rawWidth * h / rawHeight) / 2, 0, rawWidth * h / rawHeight, h)
-                Dim rawDst = New cv.Rect(0, 0, rawSrc.Width, rawSrc.Height)
-                If ocvb.parms.lowResolution Then rawDst = New cv.Rect(0, 0, CInt(rawSrc.Width / 2), rawSrc.Height / 2)
-
-                Dim tmp As New cv.Mat(New cv.Size(rawSrc.Width, rawSrc.Height), cv.MatType.CV_8UC1)
-                ocvb.leftView(rawSrc).CopyTo(tmp)
-                If ocvb.parms.lowResolution Then tmp = tmp.Resize(New cv.Size(rawDst.Width, tmp.Height / 2))
-                ocvb.result1(rawDst) = tmp
-
-                tmp = New cv.Mat(New cv.Size(rawSrc.Width, rawSrc.Height), cv.MatType.CV_8UC1)
-                ocvb.rightView(rawSrc).CopyTo(tmp)
-                If ocvb.parms.lowResolution Then tmp = tmp.Resize(New cv.Size(rawDst.Width, tmp.Height / 2))
-                ocvb.result2(rawDst) = tmp
-            Case Else
-                ocvb.result1 = ocvb.leftView
-                ocvb.result2 = ocvb.rightView
-        End Select
+        ocvb.result1 = ocvb.leftView
+        ocvb.result2 = ocvb.rightView
 
         ocvb.result1 += sliders.TrackBar1.Value
         ocvb.result2 += sliders.TrackBar1.Value
