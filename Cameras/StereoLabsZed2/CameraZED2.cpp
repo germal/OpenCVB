@@ -66,7 +66,8 @@ public:
 		init_params.camera_resolution = sl::RESOLUTION::HD720;
 		init_params.camera_fps = fps;
 
-		zed.open(init_params);
+		auto rc = zed.open(init_params);
+		printf("rc = %d\n", rc);
 
 		auto camera_info = zed.getCameraInformation();
 		serialNumber = camera_info.serial_number;
@@ -80,7 +81,7 @@ public:
 		cPtr = new Depth_Colorizer();
 	}
 
-	void waitForFrameBad()
+	void waitForFrame()
 	{
 		zed.grab();
 	}
@@ -103,15 +104,14 @@ public:
 		cPtr->Run();
 
 		zed.retrieveImage(leftView, VIEW::LEFT_GRAY, MEM::CPU);
-		leftViewMat = cv::Mat(height, width, CV_8U, (void*)leftView.getPtr<sl::uchar1>(sl::MEM::CPU));
+		leftViewMat = cv::Mat(height, width, CV_8U, (void*)leftView.getPtr<sl::uchar1>(sl::MEM::CPU)).clone();
 
 		zed.retrieveImage(rightView, VIEW::RIGHT_GRAY, MEM::CPU);
-		rightViewMat = cv::Mat(height, width, CV_8U, (void*)rightView.getPtr<sl::uchar1>(sl::MEM::CPU));
+		rightViewMat = cv::Mat(height, width, CV_8U, (void*)rightView.getPtr<sl::uchar1>(sl::MEM::CPU)).clone();
 
 		zed.retrieveMeasure(pcMat, MEASURE::XYZARGB, MEM::CPU);
-		pointCloudMat = cv::Mat(height, width, CV_32FC3, (void*)pcMat.getPtr<sl::uchar1>(sl::MEM::CPU));
-
-		color.free(); depth32f.free(); leftView.free(); rightView.free(); pcMat.free();
+		cv::Mat pc = cv::Mat(height, width, CV_32FC4, (void*)pcMat.getPtr<sl::uchar1>(sl::MEM::CPU));
+		pc.convertTo(pointCloudMat, CV_32FC3, 0.001);
 
 		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
 
@@ -121,7 +121,7 @@ public:
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
 		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
 	}
-	int* waitForFrame(void* rgba, void* depthRGBA, void* _depth32f, void* left, void* right, void* pointCloud)
+	int* waitForFrameOld(void* rgba, void* depthRGBA, void* _depth32f, void* left, void* right, void* pointCloud)
 	{
 		sl::Mat color, RGBADepth, depth32F, leftView, rightView, pcMat;
 
@@ -146,9 +146,9 @@ public:
 		float* pcXYZ = (float*)pointCloud;
 		for (int i = 0; i < pixelCount * 4; i += 4)
 		{
-			pcXYZ[0] = pc[i] * 0.001;
-			pcXYZ[1] = pc[i + 1] * 0.001;
-			pcXYZ[2] = pc[i + 2] * 0.001;
+			pcXYZ[0] = pc[i] * 0.001f;
+			pcXYZ[1] = pc[i + 1] * 0.001f;
+			pcXYZ[2] = pc[i + 2] * 0.001f;
 			pcXYZ += 3;
 		}
 
@@ -176,7 +176,6 @@ extern "C" __declspec(dllexport) void Zed2Close(StereoLabsZed2 * Zed2)
 {
 	delete Zed2;
 }
-
 extern "C" __declspec(dllexport) int* Zed2intrinsicsLeft(StereoLabsZed2* Zed2)
 {
 	return (int*)&Zed2->intrinsicsLeft;
@@ -218,13 +217,13 @@ extern "C" __declspec(dllexport) int Zed2SerialNumber(StereoLabsZed2 * Zed2)
 {
 	return Zed2->serialNumber;
 }
-extern "C" __declspec(dllexport) void Zed2WaitFrameBad(StereoLabsZed2 * Zed2)
+extern "C" __declspec(dllexport) void Zed2WaitFrame(StereoLabsZed2 * Zed2)
 {
-	Zed2->waitForFrameBad();
+	Zed2->waitForFrame();
 }
-extern "C" __declspec(dllexport) int* Zed2WaitFrame(StereoLabsZed2 * Zed2, void* rgba, void* depthRGBA, void* depth32f, void* left, void* right, void* pointCloud)
+extern "C" __declspec(dllexport) int* Zed2WaitFrameOld(StereoLabsZed2 * Zed2, void* rgba, void* depthRGBA, void* depth32f, void* left, void* right, void* pointCloud)
 {
-	return Zed2->waitForFrame(rgba, depthRGBA, depth32f, left, right, pointCloud);
+	return Zed2->waitForFrameOld(rgba, depthRGBA, depth32f, left, right, pointCloud);
 }
 extern "C" __declspec(dllexport) int* Zed2IMU_Magnetometer(StereoLabsZed2 * Zed2)
 {

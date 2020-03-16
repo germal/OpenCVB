@@ -135,13 +135,19 @@ Public Class OpenCVB
 
         cameraT265 = New CameraT265Native()
         cameraT265.deviceCount = USBenumeration("T265")
-        If cameraT265.deviceCount > 0 Then cameraT265.initialize(fps, regWidth, regHeight)
+        If cameraT265.deviceCount > 0 Then
+            cameraT265.initialize(fps, regWidth, regHeight)
+            optionsForm.cameraTotalCount += 1
+        End If
 
         cameraD400Series = New CameraD400Native() ' the pure VB version is in  CameraD400() but it is too slow... use CameraD400Native()
         cameraD400Series.deviceCount = USBenumeration("Depth Camera 435")
         cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 415 Depth")
         cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 435 With RGB Module Depth")
-        If cameraD400Series.deviceCount > 0 Then cameraD400Series.initialize(fps, regWidth, regHeight)
+        If cameraD400Series.deviceCount > 0 Then
+            cameraD400Series.initialize(fps, regWidth, regHeight)
+            optionsForm.cameraTotalCount += 1
+        End If
 
         cameraKinect = New CameraKinect()
         cameraKinect.deviceCount = USBenumeration("Azure Kinect 4K Camera")
@@ -159,6 +165,7 @@ Public Class OpenCVB
             Else
                 updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
                 cameraKinect.initialize(fps, regWidth, regHeight)
+                optionsForm.cameraTotalCount += 1
             End If
         End If
 
@@ -176,6 +183,7 @@ Public Class OpenCVB
                 End If
             Else
                 cameraZed2.initialize(fps, regWidth, regHeight)
+                optionsForm.cameraTotalCount += 1
             End If
         End If
 
@@ -196,6 +204,7 @@ Public Class OpenCVB
                 End If
             Else
                 cameraMyntD.initialize(fps, regWidth, regHeight)
+                optionsForm.cameraTotalCount += 1
             End If
         End If
 

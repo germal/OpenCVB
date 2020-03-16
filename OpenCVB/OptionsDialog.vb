@@ -42,7 +42,6 @@ Public Class OptionsDialog
             cameraRadioButton(i).AutoSize = True
             cameraRadioButton(i).BringToFront()
             If cameraDeviceCount(i) = 0 Then cameraRadioButton(i).Enabled = False
-            If cameraRadioButton(i).Enabled Then cameraTotalCount += 1
             cameraRadioButton(i).Tag = i ' this will manage the public type for the camera - see VB_Classes.vb.
             cameraRadioButton(i).Location = New Point(16, (i + 1) * 20)
             cameraRadioButton(i).Text = Choose(i + 1, "Intel D400 Series 3D camera", "Microsoft Kinect for Azure Camera",
