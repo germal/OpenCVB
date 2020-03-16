@@ -111,7 +111,7 @@ Public Class CameraKinect
 
     Public Sub GetNextFrame()
         Dim imuFrame As IntPtr
-        If cPtr = 0 Then Return
+        If pipelineClosed Or cPtr = 0 Then Exit Sub
         Dim handleRGBDepth = GCHandle.Alloc(RGBDepthBytes, GCHandleType.Pinned)
         Try
             imuFrame = KinectWaitFrame(cPtr, handleRGBDepth.AddrOfPinnedObject())

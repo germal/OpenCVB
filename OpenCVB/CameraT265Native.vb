@@ -116,7 +116,7 @@ Public Class CameraT265Native
         pointCloud = New cv.Mat()
     End Sub
     Public Sub GetNextFrame()
-        If pipelineClosed Then Exit Sub
+        If pipelineClosed Or cPtr = 0 Then Exit Sub
 
         T265WaitFrame(cPtr)
 

@@ -8,10 +8,16 @@ Module Zed2_Interface
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2SerialNumber(cPtr As IntPtr) As Int32
     End Function
+
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2WaitFrame(cPtr As IntPtr, rgba As IntPtr, RGBDepthPtr As IntPtr, depth16 As IntPtr, left As IntPtr,
+    Public Sub Zed2WaitFramebad(cPtr As IntPtr)
+    End Sub
+
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2WaitFrame(cPtr As IntPtr, rgba As IntPtr, depthRGBA As IntPtr, depth32f As IntPtr, left As IntPtr,
                                   right As IntPtr, pointCloud As IntPtr) As IntPtr
     End Function
+
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2Extrinsics(cPtr As IntPtr) As IntPtr
     End Function
@@ -48,9 +54,43 @@ Module Zed2_Interface
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2IMU_Magnetometer(cPtr As IntPtr) As IntPtr
     End Function
+
+
+
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Zed2GetData(cPtr As IntPtr)
+    End Sub
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2PoseData(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2Color(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2RGBDepth(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2Depth(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2PointCloud(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2GetPoseData(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2RightView(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2LeftView(cPtr As IntPtr) As IntPtr
+    End Function
 End Module
 Public Class CameraZED2
     Inherits Camera
+
+    Dim RGBADepthBytes() As Byte
+    Dim depth32FBytes() As Byte
+
     Structure intrinsicsLeftZed
         Dim fx As Single ' Focal length x */
         Dim fy As Single ' Focal length y */
@@ -78,6 +118,7 @@ Public Class CameraZED2
             w = width
             h = height
             leftView = New cv.Mat
+            depth16 = New cv.Mat
 
             Dim ptr = Zed2Extrinsics(cPtr)
             Dim rotationTranslation(12) As Single
@@ -130,30 +171,91 @@ Public Class CameraZED2
             intrinsicsRight_VB.height = intrinsics.height
 
             ReDim colorBytes(w * h * 4) ' rgba format coming back from driver
-            ReDim RGBDepthBytes(w * h * 3)
-            ReDim depthBytes(w * h * 2)
+            ReDim RGBADepthBytes(w * h * 4)
+            ReDim depth32FBytes(w * h * 4)
             ReDim leftViewBytes(w * h)
             ReDim rightViewBytes(w * h)
-            ReDim pointCloudBytes(w * h * 12) ' xyz + rgba
-            depth16 = New cv.Mat
+            ReDim pointCloudBytes(w * h * 12) ' xyz
         End If
     End Sub
 
+    Public Sub GetNextFrameBad()
+        If pipelineClosed Or cPtr = 0 Then Exit Sub
+        'Zed2WaitFrameBad(cPtr)
+
+
+        SyncLock OpenCVB.camPic
+            Zed2GetData(cPtr)
+
+            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, Zed2Color(cPtr)).Clone()
+            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, Zed2RGBDepth(cPtr)).Clone()
+            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, Zed2Depth(cPtr)).Clone()
+            leftView = color.CvtColor(cv.ColorConversionCodes.BGR2GRAY) '  New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2LeftView(cPtr)).Clone()
+            rightView = leftView.Clone()
+            '            rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2RightView(cPtr)).Clone()
+            ' pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone()  ' change to meters...
+
+            Dim imuFrame = Zed2GetPoseData(cPtr)
+            Dim acc = Zed2Acceleration(cPtr)
+            imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(acc)
+
+            Dim ang = Zed2AngularVelocity(cPtr)
+            Dim angularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
+
+            imuAccel.Z = imuAccel.X
+            imuAccel.Y = angularVelocity.Z
+            imuAccel.X = angularVelocity.Y
+
+            ' roll pitch and yaw - but the values are currently incorrect.  Zed must fix this...
+            ' all 3 numbers should be near zero for a stationary camera.
+            imuGyro.X = angularVelocity.X
+            imuGyro.Y = angularVelocity.Y
+            imuGyro.Z = angularVelocity.Z
+
+            Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
+            Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
+            Dim mat() As Single = {-rt.r00, rt.r01, -rt.r02, 0.0,
+                                   -rt.r10, rt.r11, rt.r12, 0.0,
+                                   -rt.r20, rt.r21, -rt.r22, 0.0,
+                                    t.X, t.Y, t.Z, 1.0}
+            transformationMatrix = mat
+
+            ' testing to see if we could have computed this independently...
+            Dim tr = Zed2Translation(cPtr)
+            Dim translation(2) As Single
+            Marshal.Copy(tr, translation, 0, translation.Length)
+
+            Dim rot = Zed2RotationMatrix(cPtr)
+            Dim rotation(8) As Single
+            Marshal.Copy(rot, rotation, 0, rotation.Length)
+
+            IMU_Barometer = Zed2IMU_Barometer(cPtr)
+            Dim mag = Zed2IMU_Magnetometer(cPtr)
+            IMU_Magnetometer = Marshal.PtrToStructure(Of cv.Point3f)(mag)
+
+            IMU_Temperature = Zed2IMU_Temperature(cPtr)
+
+            IMU_TimeStamp = Zed2IMU_TimeStamp(cPtr)
+            Static imuStartTime = IMU_TimeStamp
+            IMU_TimeStamp -= imuStartTime
+        End SyncLock
+        MyBase.GetNextFrameCounts(IMU_FrameTime)
+    End Sub
     Public Sub GetNextFrame()
         If cPtr = 0 Then Return
         Dim handlecolorBytes = GCHandle.Alloc(colorBytes, GCHandleType.Pinned)
-        Dim handleRGBDepthBytes = GCHandle.Alloc(RGBDepthBytes, GCHandleType.Pinned)
-        Dim handledepthBytes = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)
+        Dim handleRGBADepthBytes = GCHandle.Alloc(RGBADepthBytes, GCHandleType.Pinned)
+        Dim handledepth32Fbytes = GCHandle.Alloc(depth32FBytes, GCHandleType.Pinned)
         Dim handleLeftViewBytes = GCHandle.Alloc(leftViewBytes, GCHandleType.Pinned)
         Dim handleRightViewBytes = GCHandle.Alloc(rightViewBytes, GCHandleType.Pinned)
         Dim handlePCBytes = GCHandle.Alloc(pointCloudBytes, GCHandleType.Pinned)
-        Dim imuFrame = Zed2WaitFrame(cPtr, handlecolorBytes.AddrOfPinnedObject(), handleRGBDepthBytes.AddrOfPinnedObject(),
-                                           handledepthBytes.AddrOfPinnedObject(), handleLeftViewBytes.AddrOfPinnedObject(),
+        Dim imuFrame = Zed2WaitFrame(cPtr, handlecolorBytes.AddrOfPinnedObject(), handleRGBADepthBytes.AddrOfPinnedObject(),
+                                           handledepth32Fbytes.AddrOfPinnedObject(), handleLeftViewBytes.AddrOfPinnedObject(),
                                            handleRightViewBytes.AddrOfPinnedObject(), handlePCBytes.AddrOfPinnedObject())
 
         handlecolorBytes.Free()
-        handleRGBDepthBytes.Free()
-        handledepthBytes.Free()
+        handleRGBADepthBytes.Free()
+        handledepth32Fbytes.Free()
         handleLeftViewBytes.Free()
         handleRightViewBytes.Free()
         handlePCBytes.Free()
@@ -205,15 +307,17 @@ Public Class CameraZED2
             Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBytes)
             color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
+            Dim RGBADepth = New cv.Mat(h, w, cv.MatType.CV_8UC4, RGBADepthBytes)
+            RGBDepth = RGBADepth.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-            Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depthBytes)
+            Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depth32FBytes)
             depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
 
             leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftViewBytes)
             rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightViewBytes)
-            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes) * pcMultiplier ' change to meters...
+            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes) ' change to meters...
+            MyBase.GetNextFrameCounts(IMU_FrameTime)
         End SyncLock
-        MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
+
 End Class

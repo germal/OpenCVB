@@ -93,7 +93,7 @@ Public Class CameraD400Native
         Extrinsics_VB.translation = extrinsics.translation
     End Sub
     Public Sub GetNextFrame()
-        If pipelineClosed Then Exit Sub
+        If pipelineClosed Or cPtr = 0 Then Exit Sub
 
         D400WaitForFrame(cPtr)
 

@@ -140,7 +140,7 @@ Public Class CameraMyntD
     End Sub
 
     Public Sub GetNextFrame()
-        If cPtr = 0 Then Return
+        If pipelineClosed Or cPtr = 0 Then Exit Sub
         Exit Sub
         Dim handlecolorBytes = GCHandle.Alloc(colorBytes, GCHandleType.Pinned)
         Dim handleRGBDepthBytes = GCHandle.Alloc(RGBDepthBytes, GCHandleType.Pinned)

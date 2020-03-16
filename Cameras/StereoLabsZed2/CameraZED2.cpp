@@ -40,13 +40,14 @@ public:
 	float imuTemperature = 0;
 	double imuTimeStamp = 0;
 	Pose zed_pose;
-private:
 	sl::Camera zed;
+	cv::Mat colorMat, leftViewMat, rightViewMat, pointCloudMat;
+	Depth_Colorizer* cPtr;
+private:
 	sl::InitParameters init_params;
 	int width, height;
 	float imuData = 0;
 	long long pixelCount;
-	Depth_Colorizer2* cPtr;
 public:
 	~StereoLabsZed2()
 	{
@@ -76,29 +77,63 @@ public:
 		PositionalTrackingParameters positional_tracking_param;
 		positional_tracking_param.enable_area_memory = true;
 		zed.enablePositionalTracking(positional_tracking_param);
-		cPtr = new Depth_Colorizer2();
+		cPtr = new Depth_Colorizer();
 	}
 
-	int *waitForFrame(void* rgba, void* RGBDepthPtr, void* _depth16, void* left, void* right, void* pointCloud)
+	void waitForFrameBad()
 	{
-		sl::Mat color, RGBADepth, depth32f, leftView, rightView, pcMat;
 		zed.grab();
-		zed.retrieveImage(color, VIEW::LEFT, MEM::CPU);
+	}
 
-		memcpy(rgba, (void*)color.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount * 4);
+	void GetData()
+	{
+		sl::Mat color, depth32f, leftView, rightView, pcMat;
+		
+		zed.retrieveImage(color, VIEW::LEFT, MEM::CPU);
+		cv::Mat tmp = cv::Mat(height, width, CV_8UC4, (void*)color.getPtr<sl::uchar1>(sl::MEM::CPU));
+		cv::cvtColor(tmp, colorMat, cv::ColorConversionCodes::COLOR_BGRA2BGR);
 
 		zed.retrieveMeasure(depth32f, MEASURE::DEPTH, MEM::CPU);
 		cv::Mat depth = cv::Mat(height, width, CV_32FC1, (void*)depth32f.getPtr<sl::uchar1>(sl::MEM::CPU));
-		cv::threshold(depth, depth, 10000, 10000, cv::ThresholdTypes::THRESH_BINARY);
-		cv::imshow("depth", depth);
-		cv::waitKey(10);
+		cv::threshold(depth, depth, 20000, 20000, cv::ThresholdTypes::THRESH_TRUNC);
 
 		depth.convertTo(cPtr->depth16, CV_16U);
+
 		cPtr->dst = cv::Mat(height, width, CV_8UC3);
 		cPtr->Run();
-		memcpy(RGBDepthPtr, cPtr->dst.data, pixelCount * 3);
 
-		memcpy(_depth16, cPtr->depth16.data, pixelCount * 2);
+		zed.retrieveImage(leftView, VIEW::LEFT_GRAY, MEM::CPU);
+		leftViewMat = cv::Mat(height, width, CV_8U, (void*)leftView.getPtr<sl::uchar1>(sl::MEM::CPU));
+
+		zed.retrieveImage(rightView, VIEW::RIGHT_GRAY, MEM::CPU);
+		rightViewMat = cv::Mat(height, width, CV_8U, (void*)rightView.getPtr<sl::uchar1>(sl::MEM::CPU));
+
+		zed.retrieveMeasure(pcMat, MEASURE::XYZARGB, MEM::CPU);
+		pointCloudMat = cv::Mat(height, width, CV_32FC3, (void*)pcMat.getPtr<sl::uchar1>(sl::MEM::CPU));
+
+		color.free(); depth32f.free(); leftView.free(); rightView.free(); pcMat.free();
+
+		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
+
+		memcpy((void*)&rotation, (void*)&zed_pose.getRotationMatrix(), sizeof(float) * 9);
+		memcpy((void*)&translation, (void*)&zed_pose.getTranslation(), sizeof(float) * 3);
+
+		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
+		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
+	}
+	int* waitForFrame(void* rgba, void* depthRGBA, void* _depth32f, void* left, void* right, void* pointCloud)
+	{
+		sl::Mat color, RGBADepth, depth32F, leftView, rightView, pcMat;
+
+		zed.grab();
+		zed.retrieveImage(color, VIEW::LEFT, MEM::CPU);
+		memcpy(rgba, (void*)color.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount * 4);
+
+		zed.retrieveImage(RGBADepth, VIEW::DEPTH, MEM::CPU);
+		memcpy(depthRGBA, (void*)RGBADepth.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount * 4);
+
+		zed.retrieveMeasure(depth32F, MEASURE::DEPTH, MEM::CPU);
+		memcpy(_depth32f, (void*)depth32F.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount * 4);
 
 		zed.retrieveImage(leftView, VIEW::LEFT_GRAY, MEM::CPU);
 		memcpy(left, (void*)leftView.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount);
@@ -108,18 +143,18 @@ public:
 
 		zed.retrieveMeasure(pcMat, MEASURE::XYZARGB, MEM::CPU);
 		float* pc = (float*)pcMat.getPtr<sl::uchar1>(sl::MEM::CPU);
-		float* pcXYZ = (float *)pointCloud;
-		for (int i = 0; i < pixelCount * 4; i+= 4)
+		float* pcXYZ = (float*)pointCloud;
+		for (int i = 0; i < pixelCount * 4; i += 4)
 		{
-			pcXYZ[0] = pc[i];
-			pcXYZ[1] = pc[i + 1];
-			pcXYZ[2] = pc[i + 2];
+			pcXYZ[0] = pc[i] * 0.001;
+			pcXYZ[1] = pc[i + 1] * 0.001;
+			pcXYZ[2] = pc[i + 2] * 0.001;
 			pcXYZ += 3;
 		}
 
 		// explicitly free the mat structures - trying to fix the flicker problem with GPU memory.
-		color.free(); RGBADepth.free(); depth32f.free(); leftView.free(); rightView.free(); pcMat.free();
-		
+		color.free(); RGBADepth.free(); depth32F.free(); leftView.free(); rightView.free(); pcMat.free();
+
 		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
 
 		memcpy((void*)&rotation, (void*)&zed_pose.getRotationMatrix(), sizeof(float) * 9);
@@ -127,10 +162,10 @@ public:
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
 		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
-		
+
 		return (int*)&zed_pose.pose_data;
 	}
-}; 
+};
 
 extern "C" __declspec(dllexport) int* Zed2Open(int w, int h, int fps)
 {
@@ -141,6 +176,7 @@ extern "C" __declspec(dllexport) void Zed2Close(StereoLabsZed2 * Zed2)
 {
 	delete Zed2;
 }
+
 extern "C" __declspec(dllexport) int* Zed2intrinsicsLeft(StereoLabsZed2* Zed2)
 {
 	return (int*)&Zed2->intrinsicsLeft;
@@ -182,9 +218,13 @@ extern "C" __declspec(dllexport) int Zed2SerialNumber(StereoLabsZed2 * Zed2)
 {
 	return Zed2->serialNumber;
 }
-extern "C" __declspec(dllexport) int* Zed2WaitFrame(StereoLabsZed2* Zed2, void* rgba, void* RGBDepthPtr, void* depth16, void* left, void* right, void *pointCloud )
+extern "C" __declspec(dllexport) void Zed2WaitFrameBad(StereoLabsZed2 * Zed2)
 {
-	return Zed2->waitForFrame(rgba, RGBDepthPtr, depth16, left, right, pointCloud);
+	Zed2->waitForFrameBad();
+}
+extern "C" __declspec(dllexport) int* Zed2WaitFrame(StereoLabsZed2 * Zed2, void* rgba, void* depthRGBA, void* depth32f, void* left, void* right, void* pointCloud)
+{
+	return Zed2->waitForFrame(rgba, depthRGBA, depth32f, left, right, pointCloud);
 }
 extern "C" __declspec(dllexport) int* Zed2IMU_Magnetometer(StereoLabsZed2 * Zed2)
 {
@@ -199,6 +239,54 @@ extern "C" __declspec(dllexport)float Zed2IMU_Temperature(StereoLabsZed2 * Zed2)
 {
 	Zed2->sensordata.temperature.get(sl::SensorsData::TemperatureData::SENSOR_LOCATION::IMU, Zed2->imuTemperature);
 	return Zed2->imuTemperature;
+}
+extern "C" __declspec(dllexport) int* Zed2GetPoseData(StereoLabsZed2 * Zed2)
+{
+	return (int*)&Zed2->zed_pose.pose_data;
+}
+
+
+
+
+extern "C" __declspec(dllexport) void Zed2GetData(StereoLabsZed2 * Zed2)
+{
+	Zed2->GetData();
+}
+
+extern "C" __declspec(dllexport)
+int* Zed2Color(StereoLabsZed2 * Zed2)
+{
+	return (int*)Zed2->colorMat.data;
+}
+
+extern "C" __declspec(dllexport)
+int* Zed2RGBDepth(StereoLabsZed2 * Zed2)
+{
+	return (int*)Zed2->cPtr->dst.data;
+}
+
+extern "C" __declspec(dllexport)
+int* Zed2Depth(StereoLabsZed2 * Zed2)
+{
+	return (int*)Zed2->cPtr->depth16.data;
+}
+
+extern "C" __declspec(dllexport)
+int* Zed2PointCloud(StereoLabsZed2 * Zed2)
+{
+	return (int*)Zed2->pointCloudMat.data;
+}
+
+extern "C" __declspec(dllexport)
+int* Zed2LeftView(StereoLabsZed2 * Zed2)
+{
+	return (int*)Zed2->leftViewMat.data;
+}
+
+extern "C" __declspec(dllexport)
+int* Zed2RightView(StereoLabsZed2 * Zed2)
+{
+	return (int*)Zed2->rightViewMat.data;
 }
 
 #endif

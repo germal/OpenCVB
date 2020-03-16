@@ -83,7 +83,7 @@ Public Class CameraD400
         End If
     End Sub
     Public Sub GetNextFrame()
-        If pipelineClosed Then Exit Sub
+        If pipelineClosed Or cPtr = 0 Then Exit Sub
         Dim frames = pipeline.WaitForFrames(1000)
         Try
             Dim procf As rs.Frame

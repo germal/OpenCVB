@@ -133,7 +133,7 @@ public:
 		{
 			k4a_transformation_depth_image_to_color_camera(transformation, depthImage, depthInColor);
 			depthBuffer = (uint16_t *) k4a_image_get_buffer(depthInColor);
-			dcptr->depth = Mat(colorRows, colorCols, CV_16U, depthBuffer);
+			dcptr->depth16 = Mat(colorRows, colorCols, CV_16U, depthBuffer);
 			dcptr->dst = Mat(colorRows, colorCols, CV_8UC3, RGBDepth);
 			dcptr->Run();
 		}

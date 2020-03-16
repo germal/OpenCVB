@@ -93,7 +93,7 @@ void Depth_Colorizer_Close(Depth_Colorizer * Depth_ColorizerPtr)
 extern "C" __declspec(dllexport)
 int* Depth_Colorizer_Run(Depth_Colorizer * Depth_ColorizerPtr, int* depthPtr, int rows, int cols)
 {
-	Depth_ColorizerPtr->depth = Mat(rows, cols, CV_16U, depthPtr);
+	Depth_ColorizerPtr->depth16 = Mat(rows, cols, CV_16U, depthPtr);
 	Depth_ColorizerPtr->dst = Mat(rows, cols, CV_8UC3);
 	Depth_ColorizerPtr->Run();
 	return (int*)Depth_ColorizerPtr->dst.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
