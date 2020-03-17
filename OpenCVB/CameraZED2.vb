@@ -14,11 +14,6 @@ Module Zed2_Interface
     End Sub
 
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2WaitFrameOld(cPtr As IntPtr, rgba As IntPtr, depthRGBA As IntPtr, depth32f As IntPtr, left As IntPtr,
-                                  right As IntPtr, pointCloud As IntPtr) As IntPtr
-    End Function
-
-    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2Extrinsics(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -87,9 +82,6 @@ Module Zed2_Interface
 End Module
 Public Class CameraZED2
     Inherits Camera
-
-    Dim RGBADepthBytes() As Byte
-    Dim depth32FBytes() As Byte
 
     Structure intrinsicsLeftZed
         Dim fx As Single ' Focal length x */
@@ -169,13 +161,6 @@ Public Class CameraZED2
             intrinsicsRight_VB.coeffs(4) = intrinsics.k3
             intrinsicsRight_VB.width = intrinsics.width
             intrinsicsRight_VB.height = intrinsics.height
-
-            ReDim colorBytes(w * h * 4) ' rgba format coming back from driver
-            ReDim RGBADepthBytes(w * h * 4)
-            ReDim depth32FBytes(w * h * 4)
-            ReDim leftViewBytes(w * h)
-            ReDim rightViewBytes(w * h)
-            ReDim pointCloudBytes(w * h * 12) ' xyz
         End If
     End Sub
 
@@ -191,7 +176,7 @@ Public Class CameraZED2
             depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, Zed2Depth(cPtr)).Clone()
             leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2LeftView(cPtr)).Clone()
             rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2RightView(cPtr)).Clone()
-            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone()  ' change to meters...
+            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone()
 
             Dim imuFrame = Zed2GetPoseData(cPtr)
             Dim acc = Zed2Acceleration(cPtr)
@@ -239,83 +224,4 @@ Public Class CameraZED2
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End SyncLock
     End Sub
-    Public Sub GetNextFrameOld()
-        If cPtr = 0 Then Return
-        Dim handlecolorBytes = GCHandle.Alloc(colorBytes, GCHandleType.Pinned)
-        Dim handleRGBADepthBytes = GCHandle.Alloc(RGBADepthBytes, GCHandleType.Pinned)
-        Dim handledepth32Fbytes = GCHandle.Alloc(depth32FBytes, GCHandleType.Pinned)
-        Dim handleLeftViewBytes = GCHandle.Alloc(leftViewBytes, GCHandleType.Pinned)
-        Dim handleRightViewBytes = GCHandle.Alloc(rightViewBytes, GCHandleType.Pinned)
-        Dim handlePCBytes = GCHandle.Alloc(pointCloudBytes, GCHandleType.Pinned)
-        Dim imuFrame = Zed2WaitFrameOld(cPtr, handlecolorBytes.AddrOfPinnedObject(), handleRGBADepthBytes.AddrOfPinnedObject(),
-                                           handledepth32Fbytes.AddrOfPinnedObject(), handleLeftViewBytes.AddrOfPinnedObject(),
-                                           handleRightViewBytes.AddrOfPinnedObject(), handlePCBytes.AddrOfPinnedObject())
-
-        handlecolorBytes.Free()
-        handleRGBADepthBytes.Free()
-        handledepth32Fbytes.Free()
-        handleLeftViewBytes.Free()
-        handleRightViewBytes.Free()
-        handlePCBytes.Free()
-
-        SyncLock OpenCVB.camPic
-            Dim acc = Zed2Acceleration(cPtr)
-            imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(acc)
-
-            Dim ang = Zed2AngularVelocity(cPtr)
-            Dim angularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
-
-            imuAccel.Z = imuAccel.X
-            imuAccel.Y = angularVelocity.Z
-            imuAccel.X = angularVelocity.Y
-
-            ' roll pitch and yaw - but the values are currently incorrect.  Zed must fix this...
-            ' all 3 numbers should be near zero for a stationary camera.
-            imuGyro.X = angularVelocity.X
-            imuGyro.Y = angularVelocity.Y
-            imuGyro.Z = angularVelocity.Z
-
-            Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
-            Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
-            Dim mat() As Single = {-rt.r00, rt.r01, -rt.r02, 0.0,
-                               -rt.r10, rt.r11, rt.r12, 0.0,
-                               -rt.r20, rt.r21, -rt.r22, 0.0,
-                               t.X, t.Y, t.Z, 1.0}
-            transformationMatrix = mat
-
-            ' testing to see if we could have computed this independently...
-            Dim tr = Zed2Translation(cPtr)
-            Dim translation(2) As Single
-            Marshal.Copy(tr, translation, 0, translation.Length)
-
-            Dim rot = Zed2RotationMatrix(cPtr)
-            Dim rotation(8) As Single
-            Marshal.Copy(rot, rotation, 0, rotation.Length)
-
-            IMU_Barometer = Zed2IMU_Barometer(cPtr)
-            Dim mag = Zed2IMU_Magnetometer(cPtr)
-            IMU_Magnetometer = Marshal.PtrToStructure(Of cv.Point3f)(mag)
-
-            IMU_Temperature = Zed2IMU_Temperature(cPtr)
-
-            IMU_TimeStamp = Zed2IMU_TimeStamp(cPtr)
-            Static imuStartTime = IMU_TimeStamp
-            IMU_TimeStamp -= imuStartTime
-
-            Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBytes)
-            color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
-
-            Dim RGBADepth = New cv.Mat(h, w, cv.MatType.CV_8UC4, RGBADepthBytes)
-            RGBDepth = RGBADepth.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
-
-            Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depth32FBytes)
-            depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
-
-            leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftViewBytes)
-            rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightViewBytes)
-            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes) ' change to meters...
-            MyBase.GetNextFrameCounts(IMU_FrameTime)
-        End SyncLock
-    End Sub
-
 End Class

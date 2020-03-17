@@ -89,7 +89,7 @@ public:
 	void GetData()
 	{
 		sl::Mat color, depth32f, leftView, rightView, pcMat;
-		
+
 		zed.retrieveImage(color, VIEW::LEFT, MEM::CPU);
 		cv::Mat tmp = cv::Mat(height, width, CV_8UC4, (void*)color.getPtr<sl::uchar1>(sl::MEM::CPU));
 		cv::cvtColor(tmp, colorMat, cv::ColorConversionCodes::COLOR_BGRA2BGR);
@@ -120,50 +120,6 @@ public:
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
 		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
-	}
-	int* waitForFrameOld(void* rgba, void* depthRGBA, void* _depth32f, void* left, void* right, void* pointCloud)
-	{
-		sl::Mat color, RGBADepth, depth32F, leftView, rightView, pcMat;
-
-		zed.grab();
-		zed.retrieveImage(color, VIEW::LEFT, MEM::CPU);
-		memcpy(rgba, (void*)color.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount * 4);
-
-		zed.retrieveImage(RGBADepth, VIEW::DEPTH, MEM::CPU);
-		memcpy(depthRGBA, (void*)RGBADepth.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount * 4);
-
-		zed.retrieveMeasure(depth32F, MEASURE::DEPTH, MEM::CPU);
-		memcpy(_depth32f, (void*)depth32F.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount * 4);
-
-		zed.retrieveImage(leftView, VIEW::LEFT_GRAY, MEM::CPU);
-		memcpy(left, (void*)leftView.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount);
-
-		zed.retrieveImage(rightView, VIEW::RIGHT_GRAY, MEM::CPU);
-		memcpy(right, (void*)rightView.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount);
-
-		zed.retrieveMeasure(pcMat, MEASURE::XYZARGB, MEM::CPU);
-		float* pc = (float*)pcMat.getPtr<sl::uchar1>(sl::MEM::CPU);
-		float* pcXYZ = (float*)pointCloud;
-		for (int i = 0; i < pixelCount * 4; i += 4)
-		{
-			pcXYZ[0] = pc[i] * 0.001f;
-			pcXYZ[1] = pc[i + 1] * 0.001f;
-			pcXYZ[2] = pc[i + 2] * 0.001f;
-			pcXYZ += 3;
-		}
-
-		// explicitly free the mat structures - trying to fix the flicker problem with GPU memory.
-		color.free(); RGBADepth.free(); depth32F.free(); leftView.free(); rightView.free(); pcMat.free();
-
-		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
-
-		memcpy((void*)&rotation, (void*)&zed_pose.getRotationMatrix(), sizeof(float) * 9);
-		memcpy((void*)&translation, (void*)&zed_pose.getTranslation(), sizeof(float) * 3);
-
-		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
-		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
-
-		return (int*)&zed_pose.pose_data;
 	}
 };
 
@@ -220,10 +176,6 @@ extern "C" __declspec(dllexport) int Zed2SerialNumber(StereoLabsZed2 * Zed2)
 extern "C" __declspec(dllexport) void Zed2WaitFrame(StereoLabsZed2 * Zed2)
 {
 	Zed2->waitForFrame();
-}
-extern "C" __declspec(dllexport) int* Zed2WaitFrameOld(StereoLabsZed2 * Zed2, void* rgba, void* depthRGBA, void* depth32f, void* left, void* right, void* pointCloud)
-{
-	return Zed2->waitForFrameOld(rgba, depthRGBA, depth32f, left, right, pointCloud);
 }
 extern "C" __declspec(dllexport) int* Zed2IMU_Magnetometer(StereoLabsZed2 * Zed2)
 {

@@ -114,8 +114,7 @@ Public Class CameraD400Native
             leftView = New cv.Mat(h, w, cv.MatType.CV_8U, D400LeftRaw(cPtr)).Clone()
             rightView = New cv.Mat(h, w, cv.MatType.CV_8U, D400RightRaw(cPtr)).Clone()
             pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, D400PointCloud(cPtr))
+            MyBase.GetNextFrameCounts(IMU_FrameTime)
         End SyncLock
-
-        MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
 End Class

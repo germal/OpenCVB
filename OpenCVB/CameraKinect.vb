@@ -162,8 +162,8 @@ Public Class CameraKinect
                 ' This is less efficient than using 16-bit pixels but consistent with Intel cameras (and more widely accepted.)
                 pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3)
                 pointCloud *= pcMultiplier ' change to meters...
+                MyBase.GetNextFrameCounts(IMU_FrameTime)
             End SyncLock
         End If
-        MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
 End Class

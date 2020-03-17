@@ -134,12 +134,12 @@ Public Class CameraD400
                 rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rawRight.Data)
                 Dim points = pc.Process(depthFrame).As(Of rs.Points)
                 pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, points.Data)
+                MyBase.GetNextFrameCounts(IMU_FrameTime)
             End SyncLock
 
         Catch ex As Exception
             Console.WriteLine("Error in CustomProcessingBlock: " + ex.Message)
             failedImageCount += 1
         End Try
-        MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
 End Class
