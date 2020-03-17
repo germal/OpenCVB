@@ -49,15 +49,9 @@ Module T265_Module_CPP
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265Color(tp As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265timeStampLatency(timeStamp As Double) As Single
-    End Function
-    <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub T265InitializeSGM(tp As IntPtr)
-    End Sub
 End Module
 
-    Structure T265IMUdata
+Structure T265IMUdata
     Public translation As cv.Point3f
     Public acceleration As cv.Point3f
     Public velocity As cv.Point3f
@@ -113,7 +107,6 @@ Public Class CameraT265Native
     Public Sub GetNextFrame()
         If pipelineClosed Or cPtr = 0 Then Exit Sub
 
-        If frameCount = 0 Then T265InitializeSGM(cPtr)
         T265WaitFrame(cPtr)
 
         SyncLock OpenCVB.camPic ' only really need the synclock when in callback mode but it doesn't hurt to waitforframe mode.

@@ -772,6 +772,8 @@ Public Class OpenCVB
         stopCameraThread = True
         If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
         If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
+        cameraTaskHandle.Abort()
+        cameraTaskHandle.Abort()
         cameraTaskHandle = Nothing
         updateCamera()
     End Sub

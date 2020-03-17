@@ -52,11 +52,11 @@ public:
 	int stereo_width_px, stereo_height_px;
 	rs2_pose pose_data;
 	double IMU_TimeStamp;
+	rs2::pipeline pipeline;
 
 private:
 	int width, height;
 	rs2::config cfg;
-	rs2::pipeline pipeline;
 	std::mutex data_mutex;
 	rs2::pipeline_profile pipeline_profile;
 	int numDisp;
@@ -73,10 +73,6 @@ private:
 public:
 	~t265Camera(){}
 
-	void initializeSGM()
-	{
-		sgm = new t265sgm(minDisp, windowSize, numDisp);
-	}
 	t265Camera(int w, int h)
 	{
 		width = w;
@@ -168,7 +164,7 @@ public:
 
 		int vSize = int(w * h * 4 * 3);
 		vertices = new float[vSize](); // 3 floats or 12 bytes per pixel.  
-		initializeSGM();
+		sgm = new t265sgm(minDisp, windowSize, numDisp);
 	}
 
 	void waitForFrame()
@@ -250,11 +246,10 @@ int T265RawHeight(t265Camera * tp)
 }
 
 extern "C" __declspec(dllexport)
-int* T265Extrinsics(t265Camera* tp)
+int* T265Extrinsics(t265Camera * tp)
 {
-	return (int *) &tp->extrinsics;
+	return (int*)&tp->extrinsics;
 }
-
 
 
 
@@ -305,12 +300,6 @@ extern "C" __declspec(dllexport)
 double T265IMUTimeStamp(t265Camera * tp)
 {
 	return tp->IMU_TimeStamp;
-}
-
-extern "C" __declspec(dllexport)
-void T265InitializeSGM(t265Camera * tp)
-{
-	tp->initializeSGM();
 }
 
 extern "C" __declspec(dllexport)
