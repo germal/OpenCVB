@@ -45,7 +45,6 @@ class t265Camera
 public:
 	Mat leftViewMap1, leftViewMap2, rightViewMap1, rightViewMap2;
 	Mat color, RGBDepth, depth16, leftViewRaw, rightViewRaw;
-	float *vertices;
 	int rawWidth, rawHeight;
 	rs2_intrinsics intrinsicsLeft, intrinsicsRight;
 	rs2_extrinsics extrinsics;
@@ -162,8 +161,6 @@ public:
 		depth16 = Mat(height, width, CV_16U);
 		depth16.setTo(0);
 
-		int vSize = int(w * h * 4 * 3);
-		vertices = new float[vSize](); // 3 floats or 12 bytes per pixel.  
 		sgm = new t265sgm(minDisp, windowSize, numDisp);
 	}
 
@@ -253,12 +250,6 @@ int* T265Extrinsics(t265Camera * tp)
 
 
 
-
-extern "C" __declspec(dllexport)
-int* T265PointCloud(t265Camera * tp)
-{
-	return (int*)&tp->vertices;
-}
 
 extern "C" __declspec(dllexport)
 int* T265LeftRaw(t265Camera* tp)	

@@ -233,6 +233,7 @@ Public Class Replay_OpenGL : Implements IDisposable
         ocvb.desc = "Replay a recorded session with OpenGL"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        ' the T265 has no pointcloud
         replay.Run(ocvb)
         ogl.Run(ocvb)
     End Sub

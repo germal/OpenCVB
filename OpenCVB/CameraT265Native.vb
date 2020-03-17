@@ -143,7 +143,7 @@ Public Class CameraT265Native
             ' Console.WriteLine("rgb depth = " + Hex(T265RGBDepth(cPtr).ToInt64))
             RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265RGBDepth(cPtr)).Clone()
             depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, T265Depth16(cPtr)).Clone()
-
+            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, 0) ' no point cloud for T265 - just provide it for compatibility.
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End SyncLock
     End Sub

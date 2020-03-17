@@ -53,7 +53,6 @@ Public Class OpenGL_Basics : Implements IDisposable
     End Sub
     Private Sub startOpenGLWindow(ocvb As AlgorithmData)
         Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
-        If pcSize = 0 Then Exit Sub
         ' first setup the named pipe that will be used to feed data to the OpenGL window
         pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
         PipeTaskIndex += 1
@@ -76,13 +75,8 @@ Public Class OpenGL_Basics : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount = 0 Then startOpenGLWindow(ocvb)
         Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
-        If pcSize = 0 Then
-            ocvb.putText(New ActiveClass.TrueType("There is no point cloud for this camera - " + ocvb.parms.cameraName, 20, 100))
-            Exit Sub
-        End If
-
         Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
-        If ocvb.frameCount > 0 Then
+        If ocvb.frameCount > 0 And pipe IsNot Nothing Then
             Dim bytesRead = pipe.Read(readPipe, 0, 4)
             If bytesRead = 0 Then
                 ocvb.putText(New ActiveClass.TrueType("The OpenGL process appears to have stopped.", 20, 100))
