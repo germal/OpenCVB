@@ -511,7 +511,7 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
         Static splitIndex As Int32 = -1
         If externalUse = False Then
             Dim split() = cv.Cv2.Split(ocvb.color)
-            If ocvb.frameCount Mod 100 = 0 Then
+            If ocvb.frameCount Mod 500 = 0 Then
                 splitIndex += 1
                 If splitIndex > 2 Then splitIndex = 0
             End If
@@ -532,7 +532,7 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
         If check.Box(0).Checked Then
             mykf.kf.inputReal = histogram.Clone()
             mykf.Run(ocvb)
-            If ocvb.frameCount > 0 Then histogram = mykf.kf.statePoint
+            If ocvb.frameCount > 0 Then histogram = mykf.kf.stateResult
         End If
 
         plotHist.hist = histogram
@@ -642,7 +642,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         If check.Box(0).Checked Then
             mykf.kf.inputReal = hist.plotHist.hist.Clone()
             mykf.Run(ocvb)
-            If ocvb.frameCount > 0 Then hist.plotHist.hist = mykf.kf.statePoint
+            If ocvb.frameCount > 0 Then hist.plotHist.hist = mykf.kf.stateResult
         End If
 
         Dim depthIncr = CInt(hist.inrange.sliders.TrackBar2.Value / hist.sliders.TrackBar1.Value) ' each bar represents this number of millimeters
@@ -650,13 +650,13 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         Dim startDepth = 1
         Dim startEndDepth As cv.Point
         Dim depthBoundaries As New SortedList(Of Single, cv.Point)(New CompareCounts)
-        For i = 0 To mykf.kf.statePoint.Rows - 1
-            Dim prev2 = If(i > 2, mykf.kf.statePoint.At(Of Single)(i - 2, 0), 0)
-            Dim prev = If(i > 1, mykf.kf.statePoint.At(Of Single)(i - 1, 0), 0)
-            Dim curr = mykf.kf.statePoint.At(Of Single)(i, 0)
-            Dim post = If(i < mykf.kf.statePoint.Rows - 1, mykf.kf.statePoint.At(Of Single)(i + 1, 0), 0)
-            Dim post2 = If(i < mykf.kf.statePoint.Rows - 2, mykf.kf.statePoint.At(Of Single)(i + 2, 0), 0)
-            pointCount += mykf.kf.statePoint.At(Of Single)(i, 0)
+        For i = 0 To mykf.kf.stateResult.Rows - 1
+            Dim prev2 = If(i > 2, mykf.kf.stateResult.At(Of Single)(i - 2, 0), 0)
+            Dim prev = If(i > 1, mykf.kf.stateResult.At(Of Single)(i - 1, 0), 0)
+            Dim curr = mykf.kf.stateResult.At(Of Single)(i, 0)
+            Dim post = If(i < mykf.kf.stateResult.Rows - 1, mykf.kf.stateResult.At(Of Single)(i + 1, 0), 0)
+            Dim post2 = If(i < mykf.kf.stateResult.Rows - 2, mykf.kf.stateResult.At(Of Single)(i + 2, 0), 0)
+            pointCount += mykf.kf.stateResult.At(Of Single)(i, 0)
             If curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr Then
                 startEndDepth = New cv.Point(startDepth, i * depthIncr)
                 depthBoundaries.Add(pointCount, startEndDepth)

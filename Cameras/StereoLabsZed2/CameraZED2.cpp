@@ -41,7 +41,7 @@ public:
 	double imuTimeStamp = 0;
 	Pose zed_pose;
 	sl::Camera zed;
-	cv::Mat colorMat, leftViewMat, rightViewMat, pointCloudMat;
+	cv::Mat color, leftView, rightView, pointCloud;
 	Depth_Colorizer* cPtr;
 private:
 	sl::InitParameters init_params;
@@ -62,22 +62,25 @@ public:
 		init_params.sensors_required = true;
 		init_params.depth_mode = DEPTH_MODE::ULTRA;
 		init_params.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP; // OpenGL's coordinate system is right_handed
+		init_params.coordinate_units = UNIT::METER;
 
 		init_params.camera_resolution = sl::RESOLUTION::HD720;
-		init_params.camera_fps = fps;
+		init_params.camera_fps = 60;
 
-		auto rc = zed.open(init_params);
-		printf("rc = %d\n", rc);
+		zed.open(init_params);
 
 		auto camera_info = zed.getCameraInformation();
 		serialNumber = camera_info.serial_number;
+		printf("serial number = %d", serialNumber);
 		extrinsics = camera_info.calibration_parameters_raw;
 		intrinsicsLeft = camera_info.calibration_parameters.left_cam;
 		intrinsicsRight = camera_info.calibration_parameters.right_cam;
 
 		PositionalTrackingParameters positional_tracking_param;
 		positional_tracking_param.enable_area_memory = true;
-		zed.enablePositionalTracking(positional_tracking_param);
+		auto returned_state = zed.enablePositionalTracking(positional_tracking_param);
+
+		pointCloud = cv::Mat(height, width, CV_32FC3);
 		cPtr = new Depth_Colorizer();
 	}
 
@@ -88,14 +91,14 @@ public:
 
 	void GetData()
 	{
-		sl::Mat color, depth32f, leftView, rightView, pcMat;
+		sl::Mat colorSL, depthSL32f, leftViewSL, rightViewSL, pcMatSL;
 
-		zed.retrieveImage(color, VIEW::LEFT, MEM::CPU);
-		cv::Mat tmp = cv::Mat(height, width, CV_8UC4, (void*)color.getPtr<sl::uchar1>(sl::MEM::CPU));
-		cv::cvtColor(tmp, colorMat, cv::ColorConversionCodes::COLOR_BGRA2BGR);
+		zed.retrieveImage(colorSL, VIEW::LEFT, MEM::CPU);
+		cv::Mat tmp = cv::Mat(height, width, CV_8UC4, (void*)colorSL.getPtr<sl::uchar1>(sl::MEM::CPU));
+		cv::cvtColor(tmp, color, cv::ColorConversionCodes::COLOR_BGRA2BGR);
 
-		zed.retrieveMeasure(depth32f, MEASURE::DEPTH, MEM::CPU);
-		cv::Mat depth = cv::Mat(height, width, CV_32FC1, (void*)depth32f.getPtr<sl::uchar1>(sl::MEM::CPU));
+		zed.retrieveMeasure(depthSL32f, MEASURE::DEPTH, MEM::CPU);
+		cv::Mat depth = cv::Mat(height, width, CV_32FC1, (void*)depthSL32f.getPtr<sl::uchar1>(sl::MEM::CPU));
 		cv::threshold(depth, depth, 20000, 20000, cv::ThresholdTypes::THRESH_TRUNC);
 
 		depth.convertTo(cPtr->depth16, CV_16U);
@@ -103,19 +106,25 @@ public:
 		cPtr->dst = cv::Mat(height, width, CV_8UC3);
 		cPtr->Run();
 
-		zed.retrieveImage(leftView, VIEW::LEFT_GRAY, MEM::CPU);
-		leftViewMat = cv::Mat(height, width, CV_8U, (void*)leftView.getPtr<sl::uchar1>(sl::MEM::CPU)).clone();
+		zed.retrieveImage(leftViewSL, VIEW::LEFT_GRAY, MEM::CPU);
+		leftView = cv::Mat(height, width, CV_8U, (void*)leftViewSL.getPtr<sl::uchar1>(sl::MEM::CPU)).clone();
 
-		zed.retrieveImage(rightView, VIEW::RIGHT_GRAY, MEM::CPU);
-		rightViewMat = cv::Mat(height, width, CV_8U, (void*)rightView.getPtr<sl::uchar1>(sl::MEM::CPU)).clone();
+		zed.retrieveImage(rightViewSL, VIEW::RIGHT_GRAY, MEM::CPU);
+		rightView = cv::Mat(height, width, CV_8U, (void*)rightViewSL.getPtr<sl::uchar1>(sl::MEM::CPU)).clone();
 
-		zed.retrieveMeasure(pcMat, MEASURE::XYZARGB, MEM::CPU);
-		cv::Mat pc = cv::Mat(height, width, CV_32FC4, (void*)pcMat.getPtr<sl::uchar1>(sl::MEM::CPU));
-		pc.convertTo(pointCloudMat, CV_32FC3, 0.001);
+		zed.retrieveMeasure(pcMatSL, MEASURE::XYZ, MEM::CPU); // XYZ has an extra byte!
+		float* pc = (float*)pcMatSL.getPtr<sl::uchar1>(sl::MEM::CPU);
+		float* pcXYZ = (float*)pointCloud.data;
+		for (int i = 0; i < pixelCount * 4; i += 4)
+		{
+			pcXYZ[0] = pc[i];
+			pcXYZ[1] = -pc[i + 1];
+			pcXYZ[2] = -pc[i + 2];
+			pcXYZ += 3;
+		}
 
 		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
-
-		memcpy((void*)&rotation, (void*)&zed_pose.getRotationMatrix(), sizeof(float) * 9);
+		memcpy((void*)&rotation, (void*)&zed_pose.getEulerAngles(), sizeof(float) * 9);
 		memcpy((void*)&translation, (void*)&zed_pose.getTranslation(), sizeof(float) * 3);
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
@@ -203,11 +212,10 @@ extern "C" __declspec(dllexport) void Zed2GetData(StereoLabsZed2 * Zed2)
 {
 	Zed2->GetData();
 }
-
 extern "C" __declspec(dllexport)
 int* Zed2Color(StereoLabsZed2 * Zed2)
 {
-	return (int*)Zed2->colorMat.data;
+	return (int*)Zed2->color.data;
 }
 
 extern "C" __declspec(dllexport)
@@ -225,19 +233,19 @@ int* Zed2Depth(StereoLabsZed2 * Zed2)
 extern "C" __declspec(dllexport)
 int* Zed2PointCloud(StereoLabsZed2 * Zed2)
 {
-	return (int*)Zed2->pointCloudMat.data;
+	return (int*)Zed2->pointCloud.data;
 }
 
 extern "C" __declspec(dllexport)
 int* Zed2LeftView(StereoLabsZed2 * Zed2)
 {
-	return (int*)Zed2->leftViewMat.data;
+	return (int*)Zed2->leftView.data;
 }
 
 extern "C" __declspec(dllexport)
 int* Zed2RightView(StereoLabsZed2 * Zed2)
 {
-	return (int*)Zed2->rightViewMat.data;
+	return (int*)Zed2->rightView.data;
 }
 
 #endif

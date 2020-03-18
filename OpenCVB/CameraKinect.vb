@@ -65,6 +65,7 @@ Public Class CameraKinect
         cPtr = KinectOpen()
         deviceName = "Kinect for Azure"
         pcMultiplier = 0.001
+        IMU_Present = True
         If cPtr <> 0 Then
             deviceCount = KinectDeviceCount(cPtr)
             Dim strPtr = KinectDeviceName(cPtr) ' The width and height of the image are set in the constructor.
@@ -145,7 +146,7 @@ Public Class CameraKinect
         handleRGBDepth.Free()
 
         Dim colorBuffer = KinectRGBA(cPtr)
-        If colorBuffer <> 0 Then
+        If colorBuffer <> 0 Then ' it can be zero on startup...
             Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBuffer)
             SyncLock OpenCVB.camPic
                 color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
@@ -159,7 +160,7 @@ Public Class CameraKinect
                 rightView = leftView
 
                 Dim pc = New cv.Mat(h, w, cv.MatType.CV_16SC3, KinectPointCloud(cPtr))
-                ' This is less efficient than using 16-bit pixels but consistent with Intel cameras (and more widely accepted.)
+                ' This is less efficient than using 16-bit pixels but consistent with the other cameras
                 pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3)
                 pointCloud *= pcMultiplier ' change to meters...
                 MyBase.GetNextFrameCounts(IMU_FrameTime)

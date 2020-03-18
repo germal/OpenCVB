@@ -51,7 +51,7 @@ Public Class IMU_Basics : Implements IDisposable
             End If
             ocvb.label1 = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
         Else
-            If ocvb.frameCount = 0 Then flow.msgs.Add("No IMU present on this RealSense device")
+            If ocvb.frameCount = 0 Then flow.msgs.Add("No IMU present on this device")
         End If
         flow.Run(ocvb)
     End Sub
@@ -404,7 +404,6 @@ Public Class IMU_TotalDelay : Implements IDisposable
         plot.dst = ocvb.result2
         plot.maxScale = 50
         plot.minScale = 0
-        plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
         ocvb.label1 = "Timing data - total (white) right image"

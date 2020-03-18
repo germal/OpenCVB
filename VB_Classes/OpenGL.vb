@@ -225,12 +225,13 @@ End Class
 Public Class OpenGL_IMU : Implements IDisposable
     Public ogl As OpenGL_Options
     Public Sub New(ocvb As AlgorithmData)
+        ocvb.parms.ShowOptions = False
         ogl = New OpenGL_Options(ocvb)
         ogl.OpenGL.OpenGLTitle = "OpenGL_IMU"
         ogl.sliders.TrackBar2.Value = 0 ' pitch
         ogl.sliders.TrackBar3.Value = 0 ' yaw
         ogl.sliders.TrackBar4.Value = 0 ' roll
-        ocvb.pointCloud = New cv.Mat ' we are not using the point in this example.
+        ocvb.pointCloud = New cv.Mat ' we are not using the point cloud in this example.
         ocvb.desc = "Show how to use IMU coordinates in OpenGL"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

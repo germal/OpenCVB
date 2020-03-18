@@ -281,18 +281,10 @@ Public Class OpenCVB
                 cameraRefresh = False
                 SyncLock camPic ' avoid updating the image while copying into it in the algorithm and camera tasks
                     If camera.color IsNot Nothing Then
-                        If camera.color.Width <> camPic(0).Width Or camera.Color.Height <> camPic(0).Height Then
-
-                            Dim color = camera.color
-                            Dim RGBDepth = camera.RGBDepth
-                            color = color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
-                            RGBDepth = RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
-                            cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
-                            cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
-                        Else
-                            cvext.BitmapConverter.ToBitmap(camera.Color, camPic(0).Image)
-                            cvext.BitmapConverter.ToBitmap(camera.RGBDepth, camPic(1).Image)
-                        End If
+                        Dim RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
+                        Dim Color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
+                        cvext.BitmapConverter.ToBitmap(Color, camPic(0).Image)
+                        cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
                     End If
                 End SyncLock
             End If
@@ -344,6 +336,7 @@ Public Class OpenCVB
         saveLayout()
     End Sub
     Public Function USBenumeration(searchName As String) As Int32
+        Static firstCall = True
         Dim deviceCount As Int32
         ' See if the desired device shows up in the device manager.'
         Dim info As Management.ManagementObject
@@ -354,7 +347,9 @@ Public Class OpenCVB
             Name = CType(info("Caption"), String) ' Get the name of the device.'
             ' toss the uninteresting names so we can find the cameras.
             If Name Is Nothing Then Continue For
-            If InStr(Name, "Xeon") = False And InStr(Name, "Chipset") = False And InStr(Name, "Generic") = False And InStr(Name, "Bluetooth") = False And
+
+            If firstCall Then
+                If InStr(Name, "Xeon") = False And InStr(Name, "Chipset") = False And InStr(Name, "Generic") = False And InStr(Name, "Bluetooth") = False And
                     InStr(Name, "Monitor") = False And InStr(Name, "Mouse") = False And InStr(Name, "NVIDIA") = False And InStr(Name, "HID-compliant") = False And
                     InStr(Name, " CPU ") = False And InStr(Name, "PCI Express") = False And Name.StartsWith("USB ") = False And
                     Name.StartsWith("Microsoft") = False And Name.StartsWith("Motherboard") = False And InStr(Name, "SATA") = False And
@@ -365,10 +360,12 @@ Public Class OpenCVB
                     Name.StartsWith("High precision") = False And Name.StartsWith("High Definition ") = False And
                     InStr(Name, "Remote") = False And InStr(Name, "Numeric") = False And InStr(Name, "UMBus ") = False And
                     Name.StartsWith("Plug and Play") = False And InStr(Name, "Print") = False Then
-                Console.WriteLine(Name) ' looking for new cameras 
+                    Console.WriteLine(Name) ' looking for new cameras 
+                End If
             End If
             If InStr(Name, searchName, CompareMethod.Text) > 0 Then deviceCount += 1
         Next
+        firstCall = False
         Return deviceCount
     End Function
     Private Sub setupCamPics()

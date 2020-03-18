@@ -23,7 +23,7 @@ Public Class Moments_CentroidKalman : Implements IDisposable
             If check.Box(0).Checked Then
                 kalman.inputReal = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
                 kalman.Run(ocvb)
-                ocvb.result1.Circle(New cv.Point(kalman.statePoint.X, kalman.statePoint.Y), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                ocvb.result1.Circle(New cv.Point(kalman.stateResult.X, kalman.stateResult.Y), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
             Else
                 ocvb.result1.Circle(New cv.Point(CInt(m.M10 / m.M00), CInt(m.M01 / m.M00)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
             End If

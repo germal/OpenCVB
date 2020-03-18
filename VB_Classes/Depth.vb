@@ -157,51 +157,6 @@ End Class
 
 
 
-Public Class Depth_LocalMinMax_MT : Implements IDisposable
-    Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData)
-        grid = New Thread_Grid(ocvb)
-        grid.externalUse = True
-        ocvb.desc = "Find minimum depth in each segment."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        grid.Run(ocvb)
-        ocvb.color.CopyTo(ocvb.result1)
-        ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
-
-        Dim mask = ocvb.depth16.Threshold(1, 5000, cv.ThresholdTypes.Binary)
-        mask.ConvertTo(mask, cv.MatType.CV_8UC1)
-
-        Dim ptList = New List(Of cv.Point)
-        ptList.Capacity = grid.roiList.Count * 2
-
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
-        Sub(roi)
-            Dim minVal As Double, maxVal As Double
-            Dim minPt As cv.Point, maxPt As cv.Point
-            cv.Cv2.MinMaxLoc(ocvb.depth16(roi), minVal, maxVal, minPt, maxPt, mask(roi))
-
-            ' if min and max are equal, this segment is all the same value (likely 0)
-            If minPt <> maxPt Then
-                cv.Cv2.Circle(ocvb.result1(roi), minPt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-                ptList.Add(New cv.Point(minPt.X + roi.X, minPt.Y + roi.Y))
-                cv.Cv2.Circle(ocvb.result1(roi), maxPt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-                ptList.Add(New cv.Point(maxPt.X + roi.X, maxPt.Y + roi.Y))
-            End If
-        End Sub)
-
-        Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
-        For i = 0 To ptList.Count - 1
-            subdiv.Insert(ptList(i))
-        Next
-        paint_voronoi(ocvb, ocvb.result2, subdiv)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        grid.Dispose()
-    End Sub
-End Class
-
-
 
 Public Class Depth_Flatland : Implements IDisposable
     Dim sliders As New OptionsSliders
@@ -1159,5 +1114,117 @@ Public Class Depth_Colorizer_MT : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
         grid.Dispose()
         sliders.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class Depth_LocalMinMax_MT : Implements IDisposable
+    Public grid As Thread_Grid
+    Public ptListX() As Single
+    Public ptListY() As Single
+    Public externalUse As Boolean
+    Public Sub New(ocvb As AlgorithmData)
+        grid = New Thread_Grid(ocvb)
+        grid.externalUse = True
+
+        ocvb.label1 = "Red is min distance, Blue is max distance"
+        ocvb.desc = "Find min and max depth in each segment."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        grid.Run(ocvb)
+
+        Dim mask = ocvb.depth16.Threshold(1, 5000, cv.ThresholdTypes.Binary)
+        mask.ConvertTo(mask, cv.MatType.CV_8UC1)
+
+        ocvb.color.CopyTo(ocvb.result1)
+        'ocvb.result1.SetTo(0, mask)
+        ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+
+        ReDim ptListX(grid.roiList.Count - 1)
+        ReDim ptListY(grid.roiList.Count - 1)
+        Parallel.For(0, grid.roiList.Count,
+        Sub(i)
+            Dim roi = grid.roiList(i)
+            Dim minVal As Double, maxVal As Double
+            Dim minPt As cv.Point, maxPt As cv.Point
+            cv.Cv2.MinMaxLoc(ocvb.depth16(roi), minVal, maxVal, minPt, maxPt, mask(roi))
+            If minPt.X < 0 Or minPt.Y < 0 Then minPt = New cv.Point2f(0, 0)
+            ptListX(i) = minPt.X + roi.X
+            ptListY(i) = minPt.Y + roi.Y
+
+            cv.Cv2.Circle(ocvb.result1(roi), minPt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            'cv.Cv2.Circle(ocvb.result1(roi), maxPt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            'ptList(i * 2 + 1) = New cv.Point2f(maxPt.X + roi.X, maxPt.Y + roi.Y)
+        End Sub)
+
+
+        If externalUse = False Then
+            Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
+            For i = 0 To ptListX.Count - 1
+                If ptListX(i) <> 0 And ptListY(i) <> 0 Then subdiv.Insert(New cv.Point2f(ptListX(i), ptListY(i)))
+            Next
+            paint_voronoi(ocvb, ocvb.result2, subdiv)
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        grid.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class Depth_LocalMinMax_Kalman_MT : Implements IDisposable
+    Dim minmax As Depth_LocalMinMax_MT
+    Dim kalmanX As Kalman_GeneralPurpose
+    Dim kalmanY As Kalman_GeneralPurpose
+    Public Sub New(ocvb As AlgorithmData)
+        minmax = New Depth_LocalMinMax_MT(ocvb)
+        minmax.externalUse = True
+        minmax.grid.sliders.TrackBar1.Value = 32
+        minmax.grid.sliders.TrackBar2.Value = 32
+        ocvb.parms.ShowOptions = False
+
+        ocvb.desc = "Find minimum depth in each segment."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static gridWidth As Int32
+        Static gridHeight As Int32
+        minmax.Run(ocvb)
+
+        If gridWidth <> minmax.grid.sliders.TrackBar1.Value Or gridHeight <> minmax.grid.sliders.TrackBar2.Value Then
+            If kalmanX IsNot Nothing Then kalmanX.Dispose()
+            If kalmanY IsNot Nothing Then kalmanY.Dispose()
+            gridWidth = minmax.grid.sliders.TrackBar1.Value
+            gridHeight = minmax.grid.sliders.TrackBar2.Value
+            kalmanX = New Kalman_GeneralPurpose(ocvb)
+            kalmanX.externalUse = True
+            kalmanY = New Kalman_GeneralPurpose(ocvb)
+            kalmanY.externalUse = True
+        End If
+
+        kalmanX.src = minmax.ptListX
+        kalmanX.Run(ocvb)
+        kalmanY.src = minmax.ptListY
+        kalmanY.Run(ocvb)
+
+        Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
+        For i = 0 To kalmanX.dst.Length - 1
+            If kalmanX.dst(i) >= ocvb.color.Width Then kalmanX.dst(i) = ocvb.color.Width - 1
+            If kalmanX.dst(i) < 0 Then kalmanX.dst(i) = 0
+            If kalmanY.dst(i) >= ocvb.color.Height Then kalmanY.dst(i) = ocvb.color.Height - 1
+            If kalmanY.dst(i) < 0 Then kalmanY.dst(i) = 0
+            subdiv.Insert(New cv.Point2f(kalmanX.dst(i), kalmanY.dst(i)))
+        Next
+        paint_voronoi(ocvb, ocvb.result2, subdiv)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        kalmanX.Dispose()
+        kalmanY.Dispose()
+        minmax.Dispose()
     End Sub
 End Class

@@ -103,7 +103,7 @@ Public Class CameraZED2
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
         cPtr = Zed2Open(width, height, 60)
         deviceName = "StereoLabs ZED 2"
-        pcMultiplier = 0.001
+        IMU_Present = True
         If cPtr <> 0 Then
             Dim serialNumber = Zed2SerialNumber(cPtr)
             Console.WriteLine("ZED 2 serial number = " + CStr(serialNumber))
@@ -183,17 +183,7 @@ Public Class CameraZED2
             imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(acc)
 
             Dim ang = Zed2AngularVelocity(cPtr)
-            Dim angularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
-
-            imuAccel.Z = imuAccel.X
-            imuAccel.Y = angularVelocity.Z
-            imuAccel.X = angularVelocity.Y
-
-            ' roll pitch and yaw - but the values are currently incorrect.  Zed must fix this...
-            ' all 3 numbers should be near zero for a stationary camera.
-            imuGyro.X = angularVelocity.X
-            imuGyro.Y = angularVelocity.Y
-            imuGyro.Z = angularVelocity.Z
+            imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(ang)
 
             Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
             Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
