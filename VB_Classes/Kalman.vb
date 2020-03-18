@@ -92,62 +92,6 @@ Public Class Kalman_Basics : Implements IDisposable
 End Class
 
 
-Public Class Kalman_kDimension_Options : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public radio As New OptionsRadioButtons
-    Public kf As Kalman_kDimension
-    Public Sub New(ocvb As AlgorithmData)
-        kf = New Kalman_kDimension(ocvb)
-        kf.externalUse = True
-
-        sliders.setupTrackBar1(ocvb, "ProcessNoiseCov x10000", 1, 1000, 100)
-        sliders.setupTrackBar2(ocvb, "MeasurementNoiseCov", 1, 100, 10)
-        sliders.setupTrackBar3(ocvb, "ErrorCovPost x100", 1, 100, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
-        radio.Setup(ocvb, 7)
-        radio.check(0).Text = "1,0,1,0 transition matrix"
-        radio.check(1).Text = "1,1,1,0 transition matrix"
-        radio.check(2).Text = "1,0,1,1 transition matrix"
-        radio.check(3).Text = "0,0,1,0 transition matrix"
-        radio.check(4).Text = "0,0,0,0 transition matrix" ' this produces better results...  Experiment with histogram_kalmansmoothed to verify
-        radio.check(5).Text = "0,0,0,1 transition matrix"
-        radio.check(6).Text = "0,1,1,0 transition matrix"
-        radio.check(4).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
-        ocvb.label1 = "Kalman_kDimension (no output by default)"
-        ocvb.desc = "Use this kalman filter to predict the set of values."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        kf.ProcessNoiseCov = cv.Scalar.All(sliders.TrackBar1.Value / 10000)
-        kf.MeasurementNoiseCov = cv.Scalar.All(sliders.TrackBar2.Value)
-        kf.ErrorCovPost = cv.Scalar.All(sliders.TrackBar3.Value / 100)
-
-        Static saveTransitionMatrixIndex As Int32
-        If radio.check(saveTransitionMatrixIndex).Checked = False Then
-            Dim tMatrixStr As String = ""
-            For i = 0 To radio.check.Length - 1
-                If radio.check(i).Checked Then
-                    tMatrixStr = radio.check(i).Text
-                    saveTransitionMatrixIndex = i
-                    Exit For
-                End If
-            Next
-            tMatrixStr = tMatrixStr.Substring(0, InStr(tMatrixStr, " ") - 1)
-            Dim tm = tMatrixStr.Split(",")
-            kf.transitionMatrix = New Single() {tm(0), tm(1), tm(2), tm(3)}
-            kf.restartRequested = True
-        End If
-
-        kf.Run(ocvb)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        radio.Dispose()
-    End Sub
-End Class
-
 
 
 
@@ -614,5 +558,67 @@ Public Class Kalman_kDimension : Implements IDisposable
         stateResult = kf.Correct(measurement).RowRange(0, kDimension).Clone()
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Kalman_kDimension_Options : Implements IDisposable
+    Public sliders As New OptionsSliders
+    Public radio As New OptionsRadioButtons
+    Public kf As Kalman_kDimension
+    Public Sub New(ocvb As AlgorithmData)
+        kf = New Kalman_kDimension(ocvb)
+        kf.externalUse = True
+
+        sliders.setupTrackBar1(ocvb, "ProcessNoiseCov x10000", 1, 1000, 100)
+        sliders.setupTrackBar2(ocvb, "MeasurementNoiseCov", 1, 100, 10)
+        sliders.setupTrackBar3(ocvb, "ErrorCovPost x100", 1, 100, 10)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        radio.Setup(ocvb, 7)
+        radio.check(0).Text = "1,0,1,0 transition matrix"
+        radio.check(1).Text = "1,1,1,0 transition matrix"
+        radio.check(2).Text = "1,0,1,1 transition matrix"
+        radio.check(3).Text = "0,0,1,0 transition matrix"
+        radio.check(4).Text = "0,0,0,0 transition matrix" ' this produces better results...  Experiment with histogram_kalmansmoothed to verify
+        radio.check(5).Text = "0,0,0,1 transition matrix"
+        radio.check(6).Text = "0,1,1,0 transition matrix"
+        radio.check(4).Checked = True
+        If ocvb.parms.ShowOptions Then radio.Show()
+
+        ocvb.label1 = "Kalman_kDimension (no output by default)"
+        ocvb.desc = "Use this kalman filter to predict the set of values."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        kf.ProcessNoiseCov = cv.Scalar.All(sliders.TrackBar1.Value / 10000)
+        kf.MeasurementNoiseCov = cv.Scalar.All(sliders.TrackBar2.Value)
+        kf.ErrorCovPost = cv.Scalar.All(sliders.TrackBar3.Value / 100)
+
+        Static saveTransitionMatrixIndex As Int32
+        If radio.check(saveTransitionMatrixIndex).Checked = False Then
+            Dim tMatrixStr As String = ""
+            For i = 0 To radio.check.Length - 1
+                If radio.check(i).Checked Then
+                    tMatrixStr = radio.check(i).Text
+                    saveTransitionMatrixIndex = i
+                    Exit For
+                End If
+            Next
+            tMatrixStr = tMatrixStr.Substring(0, InStr(tMatrixStr, " ") - 1)
+            Dim tm = tMatrixStr.Split(",")
+            kf.transitionMatrix = New Single() {tm(0), tm(1), tm(2), tm(3)}
+            kf.restartRequested = True
+        End If
+
+        kf.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
+        radio.Dispose()
     End Sub
 End Class

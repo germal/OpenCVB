@@ -196,26 +196,47 @@ End Class
 
 Public Class Blob_Rectangles : Implements IDisposable
     Dim blobs As Blob_LargestBlob
-    Dim kalman() As Kalman_kDimension
+    Dim kalman() As Kalman_GeneralPurpose
+    Private Class CompareRect : Implements IComparer(Of cv.Rect)
+        Public Function Compare(ByVal a As cv.Rect, ByVal b As cv.Rect) As Integer Implements IComparer(Of cv.Rect).Compare
+            Dim aSize = a.Width * a.Height
+            Dim bSize = b.Width * b.Height
+            If aSize > bSize Then Return -1
+            Return 1
+        End Function
+    End Class
     Public Sub New(ocvb As AlgorithmData)
+        ocvb.parms.ShowOptions = False
         blobs = New Blob_LargestBlob(ocvb)
         ocvb.desc = "Get the blobs and their masks and outline them with a rectangle."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blobs.Run(ocvb)
         ocvb.result1 = ocvb.color.Clone()
+
+        ' sort the blobs by size before delivery to kalman
+        Dim sortedBlobs As New SortedList(Of cv.Rect, Integer)(New CompareRect)
+        For i = 0 To blobs.rects.Count - 1
+            sortedBlobs.Add(blobs.rects(i), i)
+        Next
         Static blobCount As Int32
-        If blobCount <> blobs.rects.Count Then
-            blobCount = blobs.rects.Count
-            ReDim kalman(blobs.rects.Count - 1)
-            For i = 0 To blobCount - 1
-                kalman(i) = New Kalman_kDimension(ocvb)
-                kalman(i).kDimension = 4 ' there are 4 values in a cv.Rect to Kalmanize...
+        Dim blobsToShow = Math.Min(3, blobs.rects.Count - 1)
+        If blobCount <> blobsToShow Then
+            blobCount = blobsToShow
+            ReDim kalman(blobsToShow - 1)
+            For i = 0 To blobsToShow - 1
+                kalman(i) = New Kalman_GeneralPurpose(ocvb)
+                kalman(i).externalUse = True
             Next
         End If
-        For i = 0 To blobs.rects.Count - 1
-            Dim rect = blobs.rects(i)
-            ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
+
+        ocvb.label1 = "Showing top " + CStr(blobsToShow) + " of the " + CStr(blobs.rects.Count) + " blobs found "
+        For i = 0 To blobsToShow - 1
+            Dim rect = sortedBlobs.ElementAt(i).Key
+            kalman(i).src = {rect.X, rect.Y, rect.Width, rect.Height}
+            kalman(i).Run(ocvb)
+            rect = New cv.Rect(kalman(i).dst(0), kalman(i).dst(1), kalman(i).dst(2), kalman(i).dst(3))
+            ocvb.result1.Rectangle(rect, ocvb.colorScalar(i), 2)
         Next
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
