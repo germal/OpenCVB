@@ -11,7 +11,7 @@ Public Class Resize_Options : Implements IDisposable
         radio.check(1).Text = "Resize with Cubic flag (Should have no changed pixels)"
         radio.check(2).Text = "Resize with Lanczos4 flag"
         radio.check(3).Text = "Resize with Linear flag"
-        radio.check(4).Text = "Resize with Nearest flag (identical to Area?)"
+        radio.check(4).Text = "Resize with Nearest flag"
         radio.check(0).Checked = True
         If ocvb.parms.ShowOptions Then radio.Show()
         ocvb.desc = "Resize with different options and compare them"
@@ -53,7 +53,6 @@ Public Class Resize_Percentage : Implements IDisposable
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public resizeOptions As Resize_Options
-    Public resizePercent As Double
     Public Sub New(ocvb As AlgorithmData)
         resizeOptions = New Resize_Options(ocvb)
         resizeOptions.externalUse = True
@@ -64,12 +63,11 @@ Public Class Resize_Percentage : Implements IDisposable
         ocvb.desc = "Resize by a percentage of the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim percent = sliders.TrackBar1.Value / 100
-        If externalUse = False Then src = ocvb.color Else percent = resizePercent
-        If resizePercent > 1 Then percent /= 100
+        Dim percent As Double = CDbl(sliders.TrackBar1.Value / 100)
+        If externalUse = False Then src = ocvb.color
         percent = Math.Sqrt(percent)
-        resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * percent), src.Height * percent)
-        resizeOptions.src = src.Clone()
+        resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * percent), Math.Ceiling(src.Height * percent))
+        resizeOptions.src = src
         resizeOptions.Run(ocvb)
 
         If externalUse = False Then

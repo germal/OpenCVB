@@ -395,7 +395,7 @@
     <Content Include="Python\GradientDescent.py" />
     <Content Include="Python\KAZE_match.py" />
     <Content Include="Python\Depth_RGB_PS.py" />
-    <Content Include="Python\Python_SurfaceBlitOld.py" />
+    <Content Include="Python\Python_SurfaceBlit.py" />
     <Content Include="Python\Sobel_AnisotropicSegmentation.py" />
     <Content Include="Python\Turing.py" />
     <Content Include="Python\WarpAffine_SIFT.py" />

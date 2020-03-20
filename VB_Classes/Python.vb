@@ -7,8 +7,8 @@ Module Python_Module
     Public Function checkPythonPackage(ocvb As AlgorithmData, packageName As String) As Boolean
         ' make sure that opencv-python and numpy are installed on this system.
         If ocvb.PythonExe = "" Then
-            ocvb.putText(New ActiveClass.TrueType("Python is not present and needs to be installed.", 10, 60, RESULT1))
-            ocvb.putText(New ActiveClass.TrueType("Visit Python.org and download the latest version.", 10, 120, RESULT1))
+            ocvb.putText(New ActiveClass.TrueType("Python is not present and needs to be installed." + vbCrLf +
+                                                  "Visit Python.org and download the latest version.", 10, 60, RESULT1))
             Return False
         End If
         Dim pythonFileInfo = New FileInfo(ocvb.PythonExe)
@@ -17,9 +17,9 @@ Module Python_Module
         Dim packageFiles = packageFolder.GetDirectories(packageName, IO.SearchOption.TopDirectoryOnly)
 
         If packageFiles.Count = 0 Then
-            ocvb.putText(New ActiveClass.TrueType("Python is present but the packages needed by this Python script are not present.", 10, 60, RESULT1))
-            ocvb.putText(New ActiveClass.TrueType("Go to the Visual Studio menu 'Tools/Python/Python Environments'", 10, 90, RESULT1))
-            ocvb.putText(New ActiveClass.TrueType("Select 'Packages' in the combo box and search for packages required by this script.", 10, 120, RESULT1))
+            ocvb.putText(New ActiveClass.TrueType("Python is present but the packages needed by this Python script are not present." + vbCrLf +
+                                                  "Go to the Visual Studio menu 'Tools/Python/Python Environments'" + vbCrLf +
+                                                  "Select 'Packages' in the combo box and search for packages required by this script.", 10, 60, RESULT1))
             MsgBox("It looks like the " + packageName + " package is missing." + vbCrLf +
                    "Be sure to install Python packages: opencv-python, NumPy, PyOpenGL, pygame, psutil.")
             Return False
@@ -89,7 +89,7 @@ Public Class Python_Run : Implements IDisposable
         For i = 0 To proc.Count - 1
             proc(i).Kill()
         Next i
-        pipe.Dispose()
+        If pipe IsNot Nothing Then pipe.Dispose()
     End Sub
 End Class
 
@@ -147,7 +147,7 @@ End Class
 
 
 
-Public Class Python_SurfaceBlitOld : Implements IDisposable
+Public Class Python_SurfaceBlit : Implements IDisposable
     Dim memMap As Python_MemMap
     Dim pipeName As String
     Dim pipe As NamedPipeServerStream
@@ -166,7 +166,7 @@ Public Class Python_SurfaceBlitOld : Implements IDisposable
 
         ' this Python script assumes that fast processing is off - the pointcloud is being used and cannot be resized.
         ' ocvb.parms.lowResolution = False
-        ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_SurfaceBlitOld.py"
+        ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
         memMap = New Python_MemMap(ocvb)
 
         If ocvb.parms.externalInvocation Then
@@ -194,7 +194,8 @@ Public Class Python_SurfaceBlitOld : Implements IDisposable
                 pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
                 If pipe.IsConnected Then pipe.Write(pointCloudBuffer, 0, pcSize)
             End If
-            ocvb.putText(New ActiveClass.TrueType("Blit works fine when run inline but fails with Python callback.", 10, 60, RESULT1))
+            ocvb.putText(New ActiveClass.TrueType("Blit works fine when run inline but fails with Python callback." + vbCrLf +
+                                                  "See 'Python_SurfaceBlit_PS.py' for the surfaceBlit failure", 10, 60, RESULT1))
         Else
             ocvb.putText(New ActiveClass.TrueType("Python is not available", 10, 60, RESULT1))
         End If

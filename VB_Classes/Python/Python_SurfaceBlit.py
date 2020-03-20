@@ -9,7 +9,7 @@ import array
 import argparse
 import cv2 as cv
 import numpy as np
-title_window = 'Python_SurfaceBlitOld.py'
+title_window = 'Python_SurfaceBlit.py'
 import ctypes
 import os, time, sys
 from time import sleep
@@ -28,7 +28,7 @@ if MemMapLength == 0:
     args.pipeName = 'OpenCVBImages0' # we always start with 0 and since it is only invoked once, 0 is all it will ever be.
     ocvb = os.getcwd() + '\\..\\..\\bin\Debug\OpenCVB.exe'
     if os.path.exists(ocvb):
-        pid = os.spawnv(os.P_NOWAIT, ocvb, 'Python_SurfaceBlitOld')
+        pid = os.spawnv(os.P_NOWAIT, ocvb, 'Python_SurfaceBlit')
 
 pipeName = '\\\\.\\pipe\\' + args.pipeName
 while True:
@@ -44,7 +44,7 @@ except Exception as exception:
     print(exception)
     Mbox('Python_SurfaceBlit 1', 'Failure 1 - see print output', 1)    
 
-pygame.display.set_caption("OpenCVB - Python_SurfaceBlitOld.py")
+pygame.display.set_caption("OpenCVB - Python_SurfaceBlit.py")
 initialized = False
 
 try:

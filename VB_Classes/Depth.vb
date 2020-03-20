@@ -1228,3 +1228,85 @@ Public Class Depth_LocalMinMax_Kalman_MT : Implements IDisposable
         minmax.Dispose()
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Depth_Decreasing : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Public externaluse As Boolean
+    Public Increasing As Boolean
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "Threshold in millimeters", 0, 1000, 8)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        ocvb.desc = "Identify where depth is decreasing - coming toward the camera."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim depth32f As New cv.Mat
+        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        Static lastDepth As cv.Mat = depth32f.Clone()
+
+        Dim thresholdCentimeters = sliders.TrackBar1.Value
+        Dim diff As New cv.Mat
+        If Increasing Then
+            cv.Cv2.Subtract(depth32f, lastDepth, diff)
+        Else
+            cv.Cv2.Subtract(lastDepth, depth32f, diff)
+        End If
+        diff = diff.Threshold(thresholdCentimeters, 0, cv.ThresholdTypes.Tozero)
+        diff = diff.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        ocvb.result1 = diff.ConvertScaleAbs()
+        lastDepth = depth32f
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_Increasing : Implements IDisposable
+    Dim depth As Depth_Decreasing
+    Public Sub New(ocvb As AlgorithmData)
+        depth = New Depth_Decreasing(ocvb)
+        depth.externaluse = True
+        depth.Increasing = True
+        ocvb.desc = "Identify where depth is increasing - retreating from the camera."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        depth.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        depth.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Depth_Punch : Implements IDisposable
+    Dim depth As Depth_Decreasing
+    Public Sub New(ocvb As AlgorithmData)
+        depth = New Depth_Decreasing(ocvb)
+        depth.externaluse = True
+        ocvb.desc = "Identify the largest blob in the depth decreasing output"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        depth.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        depth.Dispose()
+    End Sub
+End Class

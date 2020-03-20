@@ -485,7 +485,7 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
     Public sliders As New OptionsSliders
     Public check As New OptionsCheckbox
     Public histogram As New cv.Mat
-    Public mykf As Kalman_kDimension_Options
+    Public kalman As Kalman_GeneralPurpose
     Public plotHist As Plot_Histogram
     Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New(ocvb As AlgorithmData)
@@ -493,11 +493,11 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
         plotHist = New Plot_Histogram(ocvb)
         plotHist.externalUse = True
 
-        mykf = New Kalman_kDimension_Options(ocvb)
+        kalman = New Kalman_GeneralPurpose(ocvb)
+        kalman.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Histogram Bins", 1, 255, 50)
         If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
 
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Use Kalman to calm graph"
@@ -506,6 +506,7 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
 
         ocvb.label1 = "Gray scale input to histogram"
         ocvb.label2 = "Histogram - x=bins/y=count"
+        ocvb.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static splitIndex As Int32 = -1
@@ -522,7 +523,6 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
         Dim histSize() = {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
 
-        mykf.kf.kDimension = plotHist.bins
         Dim dimensions() = New Integer() {plotHist.bins}
         cv.Cv2.CalcHist(New cv.Mat() {gray}, New Integer() {0}, mask, histogram, 1, dimensions, ranges)
 
@@ -530,9 +530,14 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
         ocvb.label2 = "Plot Histogram bins = " + CStr(plotHist.bins)
 
         If check.Box(0).Checked Then
-            mykf.kf.inputReal = histogram.Clone()
-            mykf.Run(ocvb)
-            If ocvb.frameCount > 0 Then histogram = mykf.kf.stateResult
+            ReDim kalman.src(plotHist.bins - 1)
+            For i = 0 To plotHist.bins - 1
+                kalman.src(i) = histogram.At(Of Single)(i, 0)
+            Next
+            kalman.Run(ocvb)
+            For i = 0 To plotHist.bins - 1
+                histogram.Set(Of Single)(i, 0, kalman.dst(i))
+            Next
         End If
 
         plotHist.hist = histogram
@@ -543,7 +548,7 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
         check.Dispose()
-        mykf.Dispose()
+        kalman.Dispose()
         plotHist.Dispose()
     End Sub
 End Class
@@ -592,7 +597,7 @@ End Class
 
 
 Public Class Histogram_DepthValleys : Implements IDisposable
-    Dim mykf As Kalman_kDimension_Options
+    Dim kalman As Kalman_GeneralPurpose
     Dim hist As Histogram_Depth
     Dim check As New OptionsCheckbox
     Public rangeBoundaries As New List(Of cv.Point)
@@ -625,24 +630,27 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         hist.inrange.sliders.TrackBar2.Value = 5000 ' depth to 5 meters.
         hist.sliders.TrackBar1.Value = 40 ' number of bins.
 
-        mykf = New Kalman_kDimension_Options(ocvb)
+        kalman = New Kalman_GeneralPurpose(ocvb)
+        kalman.externalUse = True
 
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Use Kalman Filter to smooth histogram plot."
         check.Box(0).Checked = True
         If ocvb.parms.ShowOptions Then check.Show()
 
-        ocvb.label1 = "Histogram clustered by valleys"
         ocvb.desc = "Identify valleys in the Depth histogram."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        If check.Box(0).Checked Then mykf.kf.kDimension = hist.plotHist.bins
-
         If check.Box(0).Checked Then
-            mykf.kf.inputReal = hist.plotHist.hist.Clone()
-            mykf.Run(ocvb)
-            If ocvb.frameCount > 0 Then hist.plotHist.hist = mykf.kf.stateResult
+            ReDim kalman.src(hist.plotHist.hist.Rows - 1)
+            For i = 0 To hist.plotHist.hist.Rows - 1
+                kalman.src(i) = hist.plotHist.hist.At(Of Single)(i, 0)
+            Next
+            kalman.Run(ocvb)
+            For i = 0 To hist.plotHist.hist.Rows - 1
+                hist.plotHist.hist.Set(Of Single)(i, 0, kalman.dst(i))
+            Next
         End If
 
         Dim depthIncr = CInt(hist.inrange.sliders.TrackBar2.Value / hist.sliders.TrackBar1.Value) ' each bar represents this number of millimeters
@@ -650,13 +658,13 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         Dim startDepth = 1
         Dim startEndDepth As cv.Point
         Dim depthBoundaries As New SortedList(Of Single, cv.Point)(New CompareCounts)
-        For i = 0 To mykf.kf.stateResult.Rows - 1
-            Dim prev2 = If(i > 2, mykf.kf.stateResult.At(Of Single)(i - 2, 0), 0)
-            Dim prev = If(i > 1, mykf.kf.stateResult.At(Of Single)(i - 1, 0), 0)
-            Dim curr = mykf.kf.stateResult.At(Of Single)(i, 0)
-            Dim post = If(i < mykf.kf.stateResult.Rows - 1, mykf.kf.stateResult.At(Of Single)(i + 1, 0), 0)
-            Dim post2 = If(i < mykf.kf.stateResult.Rows - 2, mykf.kf.stateResult.At(Of Single)(i + 2, 0), 0)
-            pointCount += mykf.kf.stateResult.At(Of Single)(i, 0)
+        For i = 0 To kalman.dst.Length - 1
+            Dim prev2 = If(i > 2, kalman.dst(i - 2), 0)
+            Dim prev = If(i > 1, kalman.dst(i - 1), 0)
+            Dim curr = kalman.dst(i)
+            Dim post = If(i < kalman.dst.Length - 1, kalman.dst(i + 1), 0)
+            Dim post2 = If(i < kalman.dst.Length - 2, kalman.dst(i + 2), 0)
+            pointCount += kalman.dst(i)
             If curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr Then
                 startEndDepth = New cv.Point(startDepth, i * depthIncr)
                 depthBoundaries.Add(pointCount, startEndDepth)
@@ -687,10 +695,12 @@ Public Class Histogram_DepthValleys : Implements IDisposable
             Next
         Next
         histogramBarsValleys(ocvb.result1, hist.plotHist.hist, plotColors)
+        ocvb.label1 = "Histogram clustered by valleys and smoothed"
+        ocvb.label2 = "Original (unsmoothed) histogram"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         hist.Dispose()
-        mykf.Dispose()
+        kalman.Dispose()
     End Sub
 End Class
 

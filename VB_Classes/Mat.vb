@@ -180,7 +180,7 @@ Public Class Mat_2to1 : Implements IDisposable
         mat1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
-        ocvb.desc = "Use one Mat for up to 2 images"
+        ocvb.desc = "Fill a Mat with 2 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static nSize = New cv.Size(ocvb.color.Width, ocvb.color.Height / 2)

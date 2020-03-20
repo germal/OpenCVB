@@ -189,7 +189,7 @@ Public Class Kalman_RotatingPoint : Implements IDisposable
 End Class
 
 
-Public Class Kalman_RGBGrid_MT : Implements IDisposable
+Public Class Kalman_RGBGrid_MT1 : Implements IDisposable
     Public grid As Thread_Grid
     Dim kalman() As Kalman_kDimension
     Public Sub New(ocvb As AlgorithmData)
@@ -198,7 +198,6 @@ Public Class Kalman_RGBGrid_MT : Implements IDisposable
         grid.sliders.TrackBar2.Value = 64
         grid.externalUse = True
 
-        ocvb.label2 = "This algorithm is unfinished..."
         ocvb.desc = "Use Kalman to stabilize pixel values."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -224,11 +223,11 @@ Public Class Kalman_RGBGrid_MT : Implements IDisposable
            Sub(i)
                Dim roi = grid.roiList(i)
                Dim grayDiff As New cv.Mat, gray32f As New cv.Mat
-               cv.Cv2.Subtract(gray(roi), lastGray(roi), grayDiff)
+               cv.Cv2.Absdiff(gray(roi), lastGray(roi), grayDiff)
                grayDiff.ConvertTo(gray32f, cv.MatType.CV_32F)
                Dim learnInput = gray32f.Clone()
                kalman(i).inputReal = learnInput.Reshape(1, roi.Width * roi.Height)
-               ' kalman(i).Run(ocvb)
+               kalman(i).Run(ocvb)
                If kalman(i).stateResult.Width > 0 Then
                    learnInput = kalman(i).stateResult.Clone()
                    gray32f = learnInput.Reshape(1, roi.Height)
@@ -238,6 +237,7 @@ Public Class Kalman_RGBGrid_MT : Implements IDisposable
            End Sub)
         End If
         lastGray = gray.Clone()
+        ocvb.result2 = ocvb.result1.Threshold(254, 255, cv.ThresholdTypes.Binary)
         ocvb.label1 = "Kalman stabilized grayscale image"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -314,202 +314,61 @@ End Class
 
 
 
-Public Class Kalman_Image : Implements IDisposable
-    Dim kRect As Kalman_Mat
+
+Public Class Kalman_GeneralPurpose_Options : Implements IDisposable
+    Public sliders As New OptionsSliders
+    Public radio As New OptionsRadioButtons
+    Public kf As Kalman_Single
     Public Sub New(ocvb As AlgorithmData)
-        kRect = New Kalman_Mat(ocvb)
-        kRect.externalUse = True
-        ocvb.desc = "Use Kalman filter on a portion of the color image."
+        kf = New Kalman_Single(ocvb) ' avoid using the externalUse because then it will run the mean calculation and smoothing...
+
+        sliders.setupTrackBar1(ocvb, "ProcessNoiseCov x10000", 1, 1000, 100)
+        sliders.setupTrackBar2(ocvb, "MeasurementNoiseCov x100", 1, 100, 10)
+        sliders.setupTrackBar3(ocvb, "ErrorCovPost", 1, 100, 1)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        radio.Setup(ocvb, 7)
+        radio.check(0).Text = "1,0,1,0 transition matrix"
+        radio.check(1).Text = "1,1,1,0 transition matrix"
+        radio.check(2).Text = "1,0,1,1 transition matrix"
+        radio.check(3).Text = "0,0,1,0 transition matrix"
+        radio.check(4).Text = "1,1,0,1 transition matrix"
+        radio.check(5).Text = "0,0,0,1 transition matrix"
+        radio.check(6).Text = "0,1,1,0 transition matrix"
+        radio.check(4).Checked = True
+        If ocvb.parms.ShowOptions Then radio.Show()
+
+        ocvb.desc = "Use this to experiment with the options for a kalman filter."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        kRect.src = ocvb.color
-        kRect.Run(ocvb)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        kRect.Dispose()
-    End Sub
-End Class
+        kf.ProcessNoiseCov = cv.Scalar.All(sliders.TrackBar1.Value / 10000)
+        kf.MeasurementNoiseCov = cv.Scalar.All(sliders.TrackBar2.Value / 100)
+        kf.ErrorCovPost = cv.Scalar.All(sliders.TrackBar3.Value)
 
-
-
-
-Public Class Kalman_Depth : Implements IDisposable
-    Dim kRect As Kalman_Mat
-    Public Sub New(ocvb As AlgorithmData)
-        kRect = New Kalman_Mat(ocvb)
-        kRect.externalUse = True
-        ocvb.desc = "Use Kalman filter on a portion of the depth image."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        kRect.src = ocvb.RGBDepth
-        kRect.Run(ocvb)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        kRect.Dispose()
-    End Sub
-End Class
-
-
-
-
-Public Class Kalman_Mat : Implements IDisposable
-    Dim kalman() As Kalman_kDimension
-    Public src As cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        ocvb.desc = "Use Kalman to stabilize image value.  Shows limitations of how much data can be pushed through a Kalman Filter."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.drawRect = New cv.Rect Then ocvb.drawRect = New cv.Rect(0, 200, ocvb.RGBDepth.Width, 50)
-        If externalUse = False Then src = ocvb.RGBDepth
-        ocvb.result1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim gray = ocvb.result1(ocvb.drawRect)
-
-        Static saveDimension As Int32 = -1
-        If saveDimension <> gray.Cols Then
-            saveDimension = gray.Cols
-            ReDim kalman(gray.Cols - 1)
-            For i = 0 To gray.Cols - 1
-                kalman(i) = New Kalman_kDimension(ocvb)
-                kalman(i).kDimension = gray.Height
+        Static saveTransitionMatrixIndex As Int32
+        If radio.check(saveTransitionMatrixIndex).Checked = False Then
+            Dim tMatrixStr As String = ""
+            For i = 0 To radio.check.Length - 1
+                If radio.check(i).Checked Then
+                    tMatrixStr = radio.check(i).Text
+                    saveTransitionMatrixIndex = i
+                    Exit For
+                End If
             Next
-            ocvb.label1 = "Draw on the image - keep it small!"
+            tMatrixStr = tMatrixStr.Substring(0, InStr(tMatrixStr, " ") - 1)
+            Dim tm = tMatrixStr.Split(",")
+            kf.transitionMatrix = New Single() {tm(0), tm(1), tm(2), tm(3)}
+            kf.newTransmissionMatrix = True
         End If
 
-        Parallel.For(0, gray.Cols - 1,
-            Sub(i)
-                If kalman(i).inputReal.Rows = 0 Then kalman(i).Run(ocvb) ' initialize on the first invocation...
-                gray.Col(i).ConvertTo(kalman(i).inputReal, cv.MatType.CV_32F)
-                kalman(i).Run(ocvb)
-                kalman(i).stateResult.ConvertTo(gray.Col(i), cv.MatType.CV_8U)
-            End Sub)
-        ocvb.result1(ocvb.drawRect) = gray
+        kf.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        If kalman Is Nothing Then Exit Sub
-        For i = 0 To kalman.Count - 1
-            kalman(i).Dispose()
-        Next
+        sliders.Dispose()
+        radio.Dispose()
+        kf.Dispose()
     End Sub
 End Class
-
-
-
-
-Public Class Kalman_GeneralPurpose : Implements IDisposable
-    Dim kalman() As Kalman_Single
-    Public src() As Single
-    Public dst() As Single
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        ocvb.label1 = "Rectangle moves smoothly from random locations"
-        ocvb.desc = "Use Kalman to stabilize a set of value (such as a cv.rect.)"
-    End Sub
-    Private Sub setValues(ocvb As AlgorithmData)
-        Static autoRand As New Random()
-        ReDim src(3)
-        src(0) = autoRand.Next(50, ocvb.color.Width - 50)
-        src(1) = autoRand.Next(50, ocvb.color.Height - 50)
-        src(2) = autoRand.Next(5, ocvb.color.Width - src(0))
-        src(3) = autoRand.Next(5, ocvb.color.Height - src(1))
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If src Is Nothing Then setValues(ocvb)
-        Static saveDimension As Int32 = -1
-        If saveDimension <> src.Length Then
-            saveDimension = src.Length
-            ReDim kalman(src.Length - 1)
-            For i = 0 To src.Length - 1
-                kalman(i) = New Kalman_Single(ocvb)
-                kalman(i).externalUse = True
-            Next
-        End If
-
-        For i = 0 To kalman.Length - 1
-            kalman(i).inputReal = src(i)
-            kalman(i).Run(ocvb)
-        Next
-
-        If dst Is Nothing Then ReDim dst(src.Count - 1)
-        For i = 0 To src.Length - 1
-            dst(i) = kalman(i).stateResult
-        Next
-
-        If externalUse = False Then
-            ocvb.result1 = ocvb.color
-            Static rect As New cv.Rect(CInt(dst(0)), CInt(dst(1)), CInt(dst(2)), CInt(dst(3)))
-            If rect.X = CInt(dst(0)) And rect.Y = CInt(dst(1)) And rect.Width = CInt(dst(2)) And rect.Height = CInt(dst(3)) Then
-                setValues(ocvb)
-            Else
-                rect = New cv.Rect(CInt(dst(0)), CInt(dst(1)), CInt(dst(2)), CInt(dst(3)))
-            End If
-            ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
-        End If
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        If kalman IsNot Nothing Then
-            For i = 0 To kalman.Length - 1
-                kalman(i).Dispose()
-            Next
-        End If
-    End Sub
-End Class
-
-
-
-
-Public Class Kalman_Single : Implements IDisposable
-    Dim plot As Plot_OverTime
-    Dim kf As New cv.KalmanFilter(2, 1, 0)
-    Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
-    Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, 0)
-    Public inputReal As Single
-    Public stateResult As Single
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        ' when running without options, there is no need for plot - it is an external use.
-        If ocvb.parms.ShowOptions = True Then
-            plot = New Plot_OverTime(ocvb)
-            plot.externalUse = True
-            plot.dst = ocvb.result2
-            plot.maxScale = 150
-            plot.minScale = 80
-            plot.plotCount = 2
-        End If
-
-#If opencvsharpOld Then
-        kf.TransitionMatrix.SetArray(0, 0, New Single() {1, 1, 0, 1}.ToArray)
-#Else
-        kf.TransitionMatrix = New cv.Mat(4, 1, cv.MatType.CV_32F, New Single() {1, 1, 0, 1})
-#End If
-        cv.Cv2.SetIdentity(kf.MeasurementMatrix)
-        cv.Cv2.SetIdentity(kf.ProcessNoiseCov, cv.Scalar.All(0.00001))
-        cv.Cv2.SetIdentity(kf.MeasurementNoiseCov, cv.Scalar.All(0.1))
-        cv.Cv2.SetIdentity(kf.ErrorCovPost, cv.Scalar.All(1))
-        ocvb.label1 = "Mean of the grayscale image is predicted"
-        ocvb.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
-            ocvb.result1 = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            inputReal = ocvb.result1.Mean().Item(0)
-        End If
-
-        Dim prediction = kf.Predict()
-        measurement.Set(Of Single)(0, 0, inputReal)
-        stateResult = kf.Correct(measurement).At(Of Single)(0, 0)
-        If externalUse = False Then
-            plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
-            plot.Run(ocvb)
-            ocvb.label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
-        End If
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        If plot IsNot Nothing Then plot.Dispose()
-    End Sub
-End Class
-
-
 
 
 
@@ -567,58 +426,411 @@ End Class
 
 
 
-Public Class Kalman_kDimension_Options : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public radio As New OptionsRadioButtons
-    Public kf As Kalman_kDimension
+
+Public Class Kalman_GeneralPurpose : Implements IDisposable
+    Dim kalman() As Kalman_Single
+    Public src() As Single
+    Public dst() As Single
+    Public externalUse As Boolean
+    Public ProcessNoiseCov As Single = 0.00001
+    Public MeasurementNoiseCov As Single = 0.1
+    Public ErrorCovPost As Single = 1
+
     Public Sub New(ocvb As AlgorithmData)
-        kf = New Kalman_kDimension(ocvb)
-        kf.externalUse = True
-
-        sliders.setupTrackBar1(ocvb, "ProcessNoiseCov x10000", 1, 1000, 100)
-        sliders.setupTrackBar2(ocvb, "MeasurementNoiseCov", 1, 100, 10)
-        sliders.setupTrackBar3(ocvb, "ErrorCovPost x100", 1, 100, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
-        radio.Setup(ocvb, 7)
-        radio.check(0).Text = "1,0,1,0 transition matrix"
-        radio.check(1).Text = "1,1,1,0 transition matrix"
-        radio.check(2).Text = "1,0,1,1 transition matrix"
-        radio.check(3).Text = "0,0,1,0 transition matrix"
-        radio.check(4).Text = "0,0,0,0 transition matrix" ' this produces better results...  Experiment with histogram_kalmansmoothed to verify
-        radio.check(5).Text = "0,0,0,1 transition matrix"
-        radio.check(6).Text = "0,1,1,0 transition matrix"
-        radio.check(4).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
-        ocvb.label1 = "Kalman_kDimension (no output by default)"
-        ocvb.desc = "Use this kalman filter to predict the set of values."
+        ocvb.label1 = "Rectangle moves smoothly from random locations"
+        ocvb.desc = "Use Kalman to stabilize a set of value (such as a cv.rect.)"
+    End Sub
+    Private Sub setValues(ocvb As AlgorithmData)
+        Static autoRand As New Random()
+        ReDim src(3)
+        src(0) = autoRand.Next(50, ocvb.color.Width - 50)
+        src(1) = autoRand.Next(50, ocvb.color.Height - 50)
+        src(2) = autoRand.Next(5, ocvb.color.Width - src(0))
+        src(3) = autoRand.Next(5, ocvb.color.Height - src(1))
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        kf.ProcessNoiseCov = cv.Scalar.All(sliders.TrackBar1.Value / 10000)
-        kf.MeasurementNoiseCov = cv.Scalar.All(sliders.TrackBar2.Value)
-        kf.ErrorCovPost = cv.Scalar.All(sliders.TrackBar3.Value / 100)
-
-        Static saveTransitionMatrixIndex As Int32
-        If radio.check(saveTransitionMatrixIndex).Checked = False Then
-            Dim tMatrixStr As String = ""
-            For i = 0 To radio.check.Length - 1
-                If radio.check(i).Checked Then
-                    tMatrixStr = radio.check(i).Text
-                    saveTransitionMatrixIndex = i
-                    Exit For
-                End If
-            Next
-            tMatrixStr = tMatrixStr.Substring(0, InStr(tMatrixStr, " ") - 1)
-            Dim tm = tMatrixStr.Split(",")
-            kf.transitionMatrix = New Single() {tm(0), tm(1), tm(2), tm(3)}
-            kf.restartRequested = True
+        Static saveProcessNoiseCov As Single
+        Static saveMeasurementNoiseCov As Single
+        Static saveErrorCovPost As Single
+        If ProcessNoiseCov <> saveProcessNoiseCov Then
+            saveProcessNoiseCov = ProcessNoiseCov
+            saveMeasurementNoiseCov = MeasurementNoiseCov
+            saveErrorCovPost = ErrorCovPost
         End If
 
-        kf.Run(ocvb)
+        If src Is Nothing Then setValues(ocvb)
+        Static saveDimension As Int32 = -1
+        If saveDimension <> src.Length Then
+            If kalman IsNot Nothing Then
+                If kalman.Count > 0 Then
+                    For i = 0 To kalman.Count - 1
+                        kalman(i).Dispose()
+                    Next
+                End If
+            End If
+            saveDimension = src.Length
+            ReDim kalman(src.Length - 1)
+            For i = 0 To src.Length - 1
+                kalman(i) = New Kalman_Single(ocvb)
+                kalman(i).externalUse = True
+                kalman(i).ProcessNoiseCov = 0.00001
+                kalman(i).MeasurementNoiseCov = 0.1
+                kalman(i).ErrorCovPost = 1
+            Next
+            ReDim dst(src.Count - 1)
+        End If
+
+        For i = 0 To kalman.Length - 1
+            kalman(i).inputReal = src(i)
+            kalman(i).Run(ocvb)
+        Next
+
+        For i = 0 To src.Length - 1
+            dst(i) = kalman(i).stateResult
+        Next
+
+        If externalUse = False Then
+            ocvb.result1 = ocvb.color
+            Static rect As New cv.Rect(CInt(dst(0)), CInt(dst(1)), CInt(dst(2)), CInt(dst(3)))
+            If rect.X = CInt(dst(0)) And rect.Y = CInt(dst(1)) And rect.Width = CInt(dst(2)) And rect.Height = CInt(dst(3)) Then
+                setValues(ocvb)
+            Else
+                rect = New cv.Rect(CInt(dst(0)), CInt(dst(1)), CInt(dst(2)), CInt(dst(3)))
+            End If
+            ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        radio.Dispose()
+        If kalman IsNot Nothing Then
+            For i = 0 To kalman.Count - 1
+                kalman(i).Dispose()
+            Next
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Kalman_CVMat : Implements IDisposable
+    Dim kalman() As Kalman_Single
+    Public src As cv.Mat
+    Public dst As cv.Mat
+    Public externalUse As Boolean
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.label1 = "Rectangle moves smoothly from random locations"
+        ocvb.desc = "Use Kalman to stabilize a set of values (such as a cv.rect.)"
+    End Sub
+    Private Sub setValues(ocvb As AlgorithmData)
+        Static autoRand As New Random()
+        Dim x = autoRand.Next(50, ocvb.color.Width - 50)
+        Dim y = autoRand.Next(50, ocvb.color.Height - 50)
+        Dim vals() As Single = {x, y, autoRand.Next(5, ocvb.color.Width - x), autoRand.Next(5, ocvb.color.Height - y)}
+        src = New cv.Mat(4, 1, cv.MatType.CV_32F, vals)
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If src Is Nothing Then setValues(ocvb)
+        Static saveDimension As Int32 = -1
+        If saveDimension <> src.Rows Then
+            If kalman IsNot Nothing Then
+                If kalman.Count > 0 Then
+                    For i = 0 To kalman.Count - 1
+                        kalman(i).Dispose()
+                    Next
+                End If
+            End If
+            saveDimension = src.Rows
+            ReDim kalman(src.Rows - 1)
+            For i = 0 To src.Rows - 1
+                kalman(i) = New Kalman_Single(ocvb)
+                kalman(i).externalUse = True
+            Next
+            dst = New cv.Mat(src.Rows, 1, cv.MatType.CV_32F, 0)
+        End If
+
+        For i = 0 To kalman.Length - 1
+            kalman(i).inputReal = src.At(Of Single)(i, 0)
+            kalman(i).Run(ocvb)
+        Next
+
+        For i = 0 To src.Rows - 1
+            dst.Set(Of Single)(i, 0, kalman(i).stateResult)
+        Next
+
+        If externalUse = False Then
+            Dim rx(src.Rows - 1) As Single
+            Dim testrect As New cv.Rect
+            For i = 0 To src.Rows - 1
+                rx(i) = dst.At(Of Single)(i, 0)
+            Next
+            ocvb.result1 = ocvb.color
+            Static rect As New cv.Rect(CInt(rx(0)), CInt(rx(1)), CInt(rx(2)), CInt(rx(3)))
+            If rect.X = CInt(rx(0)) And rect.Y = CInt(rx(1)) And rect.Width = CInt(rx(2)) And rect.Height = CInt(rx(3)) Then
+                setValues(ocvb)
+            Else
+                rect = New cv.Rect(CInt(rx(0)), CInt(rx(1)), CInt(rx(2)), CInt(rx(3)))
+            End If
+            ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        If kalman IsNot Nothing Then
+            For i = 0 To kalman.Count - 1
+                kalman(i).Dispose()
+            Next
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Kalman_Image : Implements IDisposable
+    Dim kalman As Kalman_CVMat
+    Public Sub New(ocvb As AlgorithmData)
+        kalman = New Kalman_CVMat(ocvb)
+        kalman.externalUse = True
+
+        ocvb.drawRect = New cv.Rect(100, 100, 100, 100) ' just do a portion of the image.
+        ocvb.desc = "Use Kalman filter on a portion of a color image (too slow to run on the whole image.)"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        ocvb.result1 = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray32f As New cv.Mat
+        ocvb.result1(ocvb.drawRect).ConvertTo(gray32f, cv.MatType.CV_32F)
+        kalman.src = gray32f.Reshape(1, gray32f.Width * gray32f.Height)
+        kalman.Run(ocvb)
+        Dim dst As New cv.Mat
+        kalman.dst.ConvertTo(dst, cv.MatType.CV_8U)
+        dst = dst.Reshape(1, ocvb.drawRect.Height)
+        ocvb.result1(ocvb.drawRect) = dst
+        ocvb.label1 = "Draw anywhere to apply Kalman to the image data"
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        kalman.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Kalman_ImageSmall : Implements IDisposable
+    Dim kalman As Kalman_CVMat
+    Dim resize As Resize_Percentage
+    Public Sub New(ocvb As AlgorithmData)
+        kalman = New Kalman_CVMat(ocvb)
+        kalman.externalUse = True
+
+        resize = New Resize_Percentage(ocvb)
+        resize.externalUse = True
+
+        ocvb.label1 = "The small image is processed by the Kalman filter"
+        ocvb.label2 = "The original grayscale image"
+        ocvb.desc = "Resize the image to allow the Kalman filter to process the whole image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        resize.src = gray
+        resize.Run(ocvb)
+
+        Dim saveOriginal = resize.dst.Clone()
+        Dim gray32f As New cv.Mat
+        resize.dst.ConvertTo(gray32f, cv.MatType.CV_32F)
+        kalman.src = gray32f.Reshape(1, gray32f.Width * gray32f.Height)
+        kalman.Run(ocvb)
+        Dim dst As New cv.Mat
+        kalman.dst.ConvertTo(dst, cv.MatType.CV_8U)
+        dst = dst.Reshape(1, gray32f.Height)
+        ocvb.result1 = dst.Resize(ocvb.result1.Size())
+        cv.Cv2.Subtract(dst, saveOriginal, dst)
+        dst = dst.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        ocvb.result2 = dst.Resize(ocvb.result1.Size())
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        kalman.Dispose()
+        resize.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class Kalman_DepthSmall : Implements IDisposable
+    Dim kalman As Kalman_CVMat
+    Dim resize As Resize_Percentage
+    Public Sub New(ocvb As AlgorithmData)
+        kalman = New Kalman_CVMat(ocvb)
+        kalman.externalUse = True
+
+        resize = New Resize_Percentage(ocvb)
+        resize.externalUse = True
+        resize.sliders.TrackBar1.Value = 1
+
+        ocvb.label2 = "Brighter means depth is decreasing."
+        ocvb.label1 = "Mask of non-zero depth after Kalman smoothing"
+        ocvb.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim depth32f As New cv.Mat
+        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        resize.src = depth32f
+        resize.Run(ocvb)
+
+        resize.dst.ConvertTo(depth32f, cv.MatType.CV_32F)
+        kalman.src = depth32f.Reshape(1, depth32f.Width * depth32f.Height)
+        Dim saveOriginal = kalman.src.Clone()
+        kalman.Run(ocvb)
+        Dim dst = kalman.dst.Reshape(1, depth32f.Height)
+        ocvb.result1 = dst.Resize(ocvb.result1.Size())
+        ocvb.result1 = ocvb.result1.ConvertScaleAbs()
+        cv.Cv2.Subtract(kalman.dst, saveOriginal, depth32f)
+        depth32f = depth32f.Threshold(0, 0, cv.ThresholdTypes.Tozero)
+        depth32f.ConvertTo(dst, cv.MatType.CV_8U)
+        dst = dst.Reshape(1, resize.dst.Height)
+        ocvb.result2 = dst.Resize(ocvb.result1.Size())
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        kalman.Dispose()
+        resize.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Kalman_Single : Implements IDisposable
+    Dim plot As Plot_OverTime
+    Dim kf As New cv.KalmanFilter(2, 1, 0)
+    Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
+    Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, 0)
+    Public inputReal As Single
+    Public stateResult As Single
+    Public externalUse As Boolean
+    Public ProcessNoiseCov As Single = 0.00001
+    Public MeasurementNoiseCov As Single = 0.1
+    Public ErrorCovPost As Single = 1
+    Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
+    Public newTransmissionMatrix As Boolean = True
+    Public Sub New(ocvb As AlgorithmData)
+        ' when running without options, there is no need for plot - it is an external use.
+        If ocvb.parms.ShowOptions = True Then
+            plot = New Plot_OverTime(ocvb)
+            plot.externalUse = True
+            plot.dst = ocvb.result2
+            plot.maxScale = 150
+            plot.minScale = 80
+            plot.plotCount = 2
+        End If
+
+#If opencvsharpOld Then
+        kf.TransitionMatrix.SetArray(0, 0, New Single() {1, 1, 0, 1}.ToArray)
+#Else
+        kf.TransitionMatrix = New cv.Mat(4, 1, cv.MatType.CV_32F, New Single() {1, 1, 0, 1})
+#End If
+        cv.Cv2.SetIdentity(kf.MeasurementMatrix)
+        cv.Cv2.SetIdentity(kf.ProcessNoiseCov, cv.Scalar.All(0.00001))
+        cv.Cv2.SetIdentity(kf.MeasurementNoiseCov, cv.Scalar.All(0.1))
+        cv.Cv2.SetIdentity(kf.ErrorCovPost, cv.Scalar.All(1))
+        ocvb.label1 = "Mean of the grayscale image is predicted"
+        ocvb.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If externalUse = False Then
+            ocvb.result1 = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            inputReal = ocvb.result1.Mean().Item(0)
+        End If
+
+        Dim prediction = kf.Predict()
+        measurement.Set(Of Single)(0, 0, inputReal)
+        stateResult = kf.Correct(measurement).At(Of Single)(0, 0)
+        If externalUse = False Then
+            plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
+            plot.Run(ocvb)
+            ocvb.label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        If plot IsNot Nothing Then plot.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Kalman_SingleNew : Implements IDisposable
+    Dim plot As Plot_OverTime
+    Public kf As New cv.KalmanFilter(2, 1, 0)
+    Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
+    Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, 0)
+    Public inputReal As Single
+    Public stateResult As Single
+    Public externalUse As Boolean
+    Public ProcessNoiseCov As Single = 0.00001
+    Public MeasurementNoiseCov As Single = 0.1
+    Public ErrorCovPost As Single = 1
+    Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
+    Public newTransmissionMatrix As Boolean = True
+    Public Sub New(ocvb As AlgorithmData)
+        cv.Cv2.SetIdentity(kf.MeasurementMatrix)
+        ocvb.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static saveProcessNoiseCov As Single
+        Static saveMeasurementNoiseCov As Single
+        Static saveErrorCovPost As Single
+        If ProcessNoiseCov <> saveProcessNoiseCov Or saveMeasurementNoiseCov = MeasurementNoiseCov Or saveErrorCovPost = ErrorCovPost Then
+            saveProcessNoiseCov = ProcessNoiseCov
+            saveMeasurementNoiseCov = MeasurementNoiseCov
+            saveErrorCovPost = ErrorCovPost
+            cv.Cv2.SetIdentity(kf.ProcessNoiseCov, cv.Scalar.All(ProcessNoiseCov))
+            cv.Cv2.SetIdentity(kf.MeasurementNoiseCov, cv.Scalar.All(MeasurementNoiseCov))
+            cv.Cv2.SetIdentity(kf.ErrorCovPost, cv.Scalar.All(ErrorCovPost))
+        End If
+        If newTransmissionMatrix Then
+            newTransmissionMatrix = False
+#If opencvsharpOld Then
+            kf.TransitionMatrix.SetArray(0, 0, transitionMatrix.ToArray)
+#Else
+            kf.TransitionMatrix = New cv.Mat(4, 1, cv.MatType.CV_32F,  transitionMatrix.ToArray)
+#End If
+        End If
+        If externalUse = False Then
+            If ocvb.frameCount = 0 Then
+                plot = New Plot_OverTime(ocvb)
+                plot.externalUse = True
+                plot.dst = ocvb.result2
+                plot.maxScale = 150
+                plot.minScale = 80
+                plot.plotCount = 2
+            End If
+
+            ocvb.label1 = "Mean of the grayscale image is predicted"
+            ocvb.result1 = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            inputReal = ocvb.result1.Mean().Item(0)
+        End If
+
+        Dim prediction = kf.Predict()
+        measurement.Set(Of Single)(0, 0, inputReal)
+        stateResult = kf.Correct(measurement).At(Of Single)(0, 0)
+        If externalUse = False Then
+            plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
+            plot.Run(ocvb)
+            ocvb.label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        If plot IsNot Nothing Then plot.Dispose()
     End Sub
 End Class

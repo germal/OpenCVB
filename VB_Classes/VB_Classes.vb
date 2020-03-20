@@ -152,6 +152,8 @@ Public Class ActiveClass : Implements IDisposable
         If LCase(parms.activeAlgorithm).EndsWith(".py") Then ocvb.PythonFileName = parms.activeAlgorithm
         ocvb.PythonExe = parms.PythonExe
         ocvb.parms = parms
+        slidersOffset = New cv.Point
+        radioOffset = New cv.Point
         ActiveAlgorithm = algoList.createAlgorithm(parms.activeAlgorithm, ocvb)
         If ActiveAlgorithm Is Nothing Then
             MsgBox("The algorithm: " + parms.activeAlgorithm + " was not found in the algorithmList.vb code." + vbCrLf +
@@ -161,8 +163,6 @@ Public Class ActiveClass : Implements IDisposable
             parms.activeAlgorithm = parms.activeAlgorithm.Substring(0, Len(parms.activeAlgorithm) - 3)
             ActiveAlgorithm = algoList.createAlgorithm(parms.activeAlgorithm, ocvb)
         End If
-        slidersOffset = New cv.Point
-        radioOffset = New cv.Point
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
     End Sub
     Public Sub UpdateHostLocation(left As Int32, top As Int32, height As Int32)

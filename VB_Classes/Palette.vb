@@ -210,7 +210,7 @@ Public Class Palette_Random : Implements IDisposable
             gradient.Run(ocvb)
             ' we want 256 colors from the gradient in result1
             resized.src = ocvb.result1
-            resized.resizePercent = 256 / ocvb.color.Total ' we want only 256 colors
+            resized.sliders.TrackBar1.Value = 256 / ocvb.color.Total ' we want only 256 colors
             resized.Run(ocvb)
         End If
         ocvb.result1 = Palette_ApplyCustom(ocvb.color, resized.dst)

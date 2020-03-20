@@ -184,6 +184,7 @@ Public Class CameraZED2
 
             Dim ang = Zed2AngularVelocity(cPtr)
             imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(ang)
+            imuGyro *= 0.0174533 ' Zed 2 gyro is in degreees/sec
 
             Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
             Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)

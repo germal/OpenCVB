@@ -218,7 +218,7 @@ Public Class ML_DepthFromColor : Implements IDisposable
 
         resized = New Resize_Percentage(ocvb)
         resized.externalUse = True
-        resized.resizePercent = 2 ' 2% of the image.
+        resized.sliders.TrackBar1.Value = 2 ' 2% of the image.
 
         ocvb.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
@@ -310,7 +310,7 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
 
         resized = New Resize_Percentage(ocvb)
         resized.externalUse = True
-        resized.resizePercent = 2
+        resized.sliders.TrackBar1.Value = 2
 
         ocvb.label1 = "Predicted Depth"
         ocvb.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."

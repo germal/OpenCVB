@@ -22,8 +22,8 @@ Public Class Plot_OverTime : Implements IDisposable
         check.Box(0).Checked = True
         If ocvb.parms.ShowOptions Then check.Show()
 
-        sliders.setupTrackBar1(ocvb, "Pixel Height", 1, 40, 4)
-        sliders.setupTrackBar2(ocvb, "Pixel Width", 1, 40, 4)
+        sliders.setupTrackBar1(ocvb, "Plot Pixel Height", 1, 40, 4)
+        sliders.setupTrackBar2(ocvb, "Plot Pixel Width", 1, 40, 4)
         sliders.setupTrackBar3(ocvb, "Plot (time) Font Size x10", 1, 20, 10)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Plot an input variable over time"
