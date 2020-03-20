@@ -293,7 +293,7 @@ Public Class Kalman_CVMat : Implements IDisposable
     Public dst As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
-        ocvb.label1 = "Rectangle moves smoothly from random locations"
+        ocvb.label1 = "Rectangle moves smoothly to random locations"
         ocvb.desc = "Use Kalman to stabilize a set of values (such as a cv.rect.)"
     End Sub
     Private Sub setValues(ocvb As AlgorithmData)

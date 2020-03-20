@@ -1003,14 +1003,14 @@ Public Class Depth_ColorizerVB_MT : Implements IDisposable
     Public src As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "Min Depth", 100, 1000, 100)
+        sliders.setupTrackBar1(ocvb, "Min Depth", 0, 1000, 0)
         sliders.setupTrackBar2(ocvb, "Max Depth", 1001, 10000, 4000)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         grid = New Thread_Grid(ocvb)
         grid.externalUse = True
 
-        ocvb.desc = "Colorize depth manually."
+        ocvb.desc = "Colorize depth manually with multi-threading."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
@@ -1035,25 +1035,28 @@ Public Class Depth_ColorizerVB_MT : Implements IDisposable
             histogram(i) += histogram(i - 1)
         Next
         Dim maxHist = histogram(histSize - 1)
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
-       Sub(roi)
-           Dim depth = src(roi)
-           Dim rgbdata(src.Total) As cv.Vec3b
-           Dim rgbIndex As Int32
-           For y = 0 To depth.Rows - 1
-               For x = 0 To depth.Cols - 1
-                   Dim pixel = depth.Get(Of UInt16)(y, x)
-                   If pixel > 0 And pixel < histSize Then
-                       Dim t = histogram(pixel) / maxHist
-                       rgbdata(rgbIndex) = New cv.Vec3b(((1 - t) * nearColor(0) + t * farColor(0)) * 255,
-                                                        ((1 - t) * nearColor(1) + t * farColor(1)) * 255,
-                                                        ((1 - t) * nearColor(2) + t * farColor(2)) * 255)
-                   End If
-                   rgbIndex += 1
+        If maxHist > 0 Then
+            Parallel.ForEach(Of cv.Rect)(grid.roiList,
+           Sub(roi)
+               Dim depth = src(roi)
+               Dim rgbdata(src.Total) As cv.Vec3b
+               Dim rgbIndex As Int32
+               For y = 0 To depth.Rows - 1
+                   For x = 0 To depth.Cols - 1
+                       Dim pixel = depth.Get(Of UInt16)(y, x)
+                       If pixel > 0 And pixel < histSize Then
+                           Dim t = histogram(pixel) / maxHist
+                           rgbdata(rgbIndex) = New cv.Vec3b(((1 - t) * nearColor(0) + t * farColor(0)) * 255,
+                                                            ((1 - t) * nearColor(1) + t * farColor(1)) * 255,
+                                                            ((1 - t) * nearColor(2) + t * farColor(2)) * 255)
+                       End If
+                       rgbIndex += 1
+                   Next
                Next
-           Next
-           ocvb.result1(roi) = New cv.Mat(depth.Rows, depth.Cols, cv.MatType.CV_8UC3, rgbdata)
-       End Sub)
+               ocvb.result1(roi) = New cv.Mat(depth.Rows, depth.Cols, cv.MatType.CV_8UC3, rgbdata)
+           End Sub)
+
+        End If
         ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
