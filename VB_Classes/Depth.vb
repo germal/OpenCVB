@@ -1180,8 +1180,8 @@ End Class
 
 Public Class Depth_LocalMinMax_Kalman_MT : Implements IDisposable
     Dim minmax As Depth_LocalMinMax_MT
-    Dim kalmanX As Kalman_GeneralPurpose
-    Dim kalmanY As Kalman_GeneralPurpose
+    Dim kalmanX As Kalman_Basics
+    Dim kalmanY As Kalman_Basics
     Public Sub New(ocvb As AlgorithmData)
         minmax = New Depth_LocalMinMax_MT(ocvb)
         minmax.externalUse = True
@@ -1201,9 +1201,9 @@ Public Class Depth_LocalMinMax_Kalman_MT : Implements IDisposable
             If kalmanY IsNot Nothing Then kalmanY.Dispose()
             gridWidth = minmax.grid.sliders.TrackBar1.Value
             gridHeight = minmax.grid.sliders.TrackBar2.Value
-            kalmanX = New Kalman_GeneralPurpose(ocvb)
+            kalmanX = New Kalman_Basics(ocvb)
             kalmanX.externalUse = True
-            kalmanY = New Kalman_GeneralPurpose(ocvb)
+            kalmanY = New Kalman_Basics(ocvb)
             kalmanY.externalUse = True
         End If
 

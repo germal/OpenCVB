@@ -75,10 +75,8 @@ Public Class IMU_Stabilizer : Implements IDisposable
 
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Turn on/off Kalman filtering of IMU data."
+        check.Box(0).Checked = True
         If ocvb.parms.ShowOptions Then check.Show()
-
-        kalman.plot.sliders.Hide()
-        kalman.kPlot.sliders.Hide()
 
         ocvb.desc = "Stabilize the image with the IMU data."
         ocvb.label1 = "IMU Stabilize (Move Camera + Select Kalman)"
@@ -86,11 +84,6 @@ Public Class IMU_Stabilizer : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.IMU_Present Then
-            Static savedKalmanCheck = check.Box(0).Checked
-            If savedKalmanCheck <> check.Box(0).Checked Then
-                kalman.restartRequested = True
-                savedKalmanCheck = check.Box(0).Checked
-            End If
             Dim borderCrop = 5
             Dim vert_Border = borderCrop * ocvb.color.Rows / ocvb.color.Cols
             Dim dx = ocvb.parms.imuGyro.X
@@ -99,12 +92,12 @@ Public Class IMU_Stabilizer : Implements IDisposable
             Dim sx = 1 ' assume no scaling is taking place.
             Dim sy = 1 ' assume no scaling is taking place.
 
-            If ocvb.frameCount > 1 And check.Box(0).Checked Then
-                kalman.inputReal = New cv.Point3f(dx, dy, da)
+            If check.Box(0).Checked Then
+                kalman.src = {dx, dy, da}
                 kalman.Run(ocvb)
-                dx = kalman.statePoint.X
-                dy = kalman.statePoint.Y
-                da = kalman.statePoint.Z
+                dx = kalman.dst(0)
+                dy = kalman.dst(1)
+                da = kalman.dst(2)
             End If
 
             Dim smoothedMat = New cv.Mat(2, 3, cv.MatType.CV_64F)

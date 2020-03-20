@@ -196,7 +196,7 @@ End Class
 
 Public Class Blob_Rectangles : Implements IDisposable
     Dim blobs As Blob_LargestBlob
-    Dim kalman() As Kalman_GeneralPurpose
+    Dim kalman() As Kalman_Basics
     Private Class CompareRect : Implements IComparer(Of cv.Rect)
         Public Function Compare(ByVal a As cv.Rect, ByVal b As cv.Rect) As Integer Implements IComparer(Of cv.Rect).Compare
             Dim aSize = a.Width * a.Height
@@ -225,7 +225,7 @@ Public Class Blob_Rectangles : Implements IDisposable
             blobCount = blobsToShow
             ReDim kalman(blobsToShow - 1)
             For i = 0 To blobsToShow - 1
-                kalman(i) = New Kalman_GeneralPurpose(ocvb)
+                kalman(i) = New Kalman_Basics(ocvb)
                 kalman(i).externalUse = True
             Next
         End If
@@ -259,10 +259,10 @@ Public Class Blob_LargestBlob : Implements IDisposable
     Public rects As List(Of cv.Rect)
     Public masks As List(Of cv.Mat)
     Public externalUse As Boolean
-    Public kalman As Kalman_GeneralPurpose
+    Public kalman As Kalman_Basics
     Public blobIndex As Int32
     Public Sub New(ocvb As AlgorithmData)
-        kalman = New Kalman_GeneralPurpose(ocvb)
+        kalman = New Kalman_Basics(ocvb)
         kalman.externalUse = True
 
         blobs = New Blob_DepthClusters(ocvb)

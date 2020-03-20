@@ -38,11 +38,11 @@ Public Class Font_TrueType : Implements IDisposable
         ' get the font on every iteration because it could have changed.  This should be done in any algorithm using OptionsFont.
         ocvb.fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         ocvb.fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
-        ocvb.putText(New ActiveClass.TrueType("TrueType Font Example (override default font) = Times New Roman with size 10", 10, 50, "Times New Roman", 10, RESULT1))
-        ocvb.putText(New ActiveClass.TrueType("Use 'Change' button in the font dialog below to set a global font: " + ocvb.fontName, 10, 100, ocvb.fontName, ocvb.fontSize, RESULT1))
-        ocvb.putText(New ActiveClass.TrueType("Global TrueType Font = " + ocvb.fontName + " with size " + CStr(ocvb.fontSize),
-                                                        10, 200, ocvb.fontName, ocvb.fontSize, RESULT1))
-        ocvb.putText(New ActiveClass.TrueType("Use 'ocvb.putText' with 'ocvb.fontName' and 'ocvb.fontSize' to exploit global font.", 10, 300, ocvb.fontName, ocvb.fontSize, RESULT1))
+        ocvb.putText(New ActiveClass.TrueType("TrueType Font Example (override default font) = Times New Roman with size 10" + vbCrLf +
+                                              "Use 'Change' button in the font dialog below to set a global font: " + ocvb.fontName + vbCrLf +
+                                              "Global TrueType Font = " + ocvb.fontName + " with size " + CStr(ocvb.fontSize) + vbCrLf +
+                                              "Use 'ocvb.putText' with 'ocvb.fontName' and 'ocvb.fontSize' to exploit global font.",
+                                              10, 50, "Times New Roman", 10, RESULT1))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         font.Dispose()

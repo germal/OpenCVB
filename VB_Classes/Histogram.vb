@@ -485,7 +485,7 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
     Public sliders As New OptionsSliders
     Public check As New OptionsCheckbox
     Public histogram As New cv.Mat
-    Public kalman As Kalman_GeneralPurpose
+    Public kalman As Kalman_Basics
     Public plotHist As Plot_Histogram
     Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New(ocvb As AlgorithmData)
@@ -493,7 +493,7 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
         plotHist = New Plot_Histogram(ocvb)
         plotHist.externalUse = True
 
-        kalman = New Kalman_GeneralPurpose(ocvb)
+        kalman = New Kalman_Basics(ocvb)
         kalman.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Histogram Bins", 1, 255, 50)
@@ -597,7 +597,7 @@ End Class
 
 
 Public Class Histogram_DepthValleys : Implements IDisposable
-    Dim kalman As Kalman_GeneralPurpose
+    Dim kalman As Kalman_Basics
     Dim hist As Histogram_Depth
     Dim check As New OptionsCheckbox
     Public rangeBoundaries As New List(Of cv.Point)
@@ -630,7 +630,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         hist.inrange.sliders.TrackBar2.Value = 5000 ' depth to 5 meters.
         hist.sliders.TrackBar1.Value = 40 ' number of bins.
 
-        kalman = New Kalman_GeneralPurpose(ocvb)
+        kalman = New Kalman_Basics(ocvb)
         kalman.externalUse = True
 
         check.Setup(ocvb, 1)

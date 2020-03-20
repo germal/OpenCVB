@@ -15,6 +15,7 @@ Public Class Plot_OverTime : Implements IDisposable
     Public columnIndex As Int32
     Public offChartCount As Integer
     Public lastXdelta As New List(Of cv.Scalar)
+    Public topBottomPad As Integer
     Dim myStopWatch As Stopwatch
     Public Sub New(ocvb As AlgorithmData)
         check.Setup(ocvb, 1)
@@ -27,10 +28,9 @@ Public Class Plot_OverTime : Implements IDisposable
         sliders.setupTrackBar3(ocvb, "Plot (time) Font Size x10", 1, 20, 10)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Plot an input variable over time"
-        MyStopWatch = Stopwatch.StartNew()
+        myStopWatch = Stopwatch.StartNew()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static rangeReset As Boolean = False
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
         If ocvb.frameCount = 0 Then
@@ -39,11 +39,6 @@ Public Class Plot_OverTime : Implements IDisposable
         Dim pixelHeight = CInt(sliders.TrackBar1.Value)
         Dim pixelWidth = CInt(sliders.TrackBar2.Value)
         If columnIndex + pixelWidth >= ocvb.color.Width Then
-            ' after the first screenful of data, reset the scale to appropriate values.
-            If rangeReset = False Then
-                rangeReset = True
-                offChartCount = plotTriggerRescale + 1
-            End If
             dst.ColRange(columnIndex, ocvb.color.Width).SetTo(backColor)
             columnIndex = 0
         End If
@@ -71,6 +66,8 @@ Public Class Plot_OverTime : Implements IDisposable
                 Next
             Next
             If minScale < 5 And minScale > 0 Then minScale = 0 ' nice location...
+            minScale -= topBottomPad
+            maxScale += topBottomPad
             lastXdelta.Clear()
             offChartCount = 0
             columnIndex = 0 ' restart at the left side of the chart
@@ -107,7 +104,7 @@ Public Class Plot_OverTime : Implements IDisposable
         columnIndex += pixelWidth
         dst.Col(columnIndex).SetTo(0)
         If externalUse = False Then ocvb.label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
-        AddPlotScale(dst, minScale, maxScale, sliders.TrackBar3.Value / 10)
+        AddPlotScale(dst, minScale - topBottomPad, maxScale + topBottomPad, sliders.TrackBar3.Value / 10)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()

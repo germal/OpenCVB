@@ -30,9 +30,12 @@ End Class
 Public Class FAST_Centroid : Implements IDisposable
     Dim check As New OptionsCheckbox
     Dim fast As FAST_Basics
-    Dim kalman As Kalman_Point2f
+    Dim kalman As Kalman_Basics
     Public Sub New(ocvb As AlgorithmData)
-        kalman = New Kalman_Point2f(ocvb)
+        kalman = New Kalman_Basics(ocvb)
+        ReDim kalman.src(1) ' 2 elements - cv.point
+        kalman.externalUse = True
+
         fast = New FAST_Basics(ocvb)
 
         check.Setup(ocvb, 1)
@@ -50,9 +53,10 @@ Public Class FAST_Centroid : Implements IDisposable
         Dim m = cv.Cv2.Moments(gray, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
             If check.Box(0).Checked Then
-                kalman.inputReal = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
+                kalman.src(0) = m.M10 / m.M00
+                kalman.src(1) = m.M01 / m.M00
                 kalman.Run(ocvb)
-                ocvb.result2.Circle(New cv.Point(kalman.stateResult.X, kalman.stateResult.Y), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                ocvb.result2.Circle(New cv.Point(kalman.dst(0), kalman.dst(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
             Else
                 ocvb.result2.Circle(New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
             End If
