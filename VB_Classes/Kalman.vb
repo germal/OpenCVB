@@ -722,16 +722,6 @@ Public Class Kalman_Single : Implements IDisposable
     Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
     Public newTransmissionMatrix As Boolean = True
     Public Sub New(ocvb As AlgorithmData)
-        ' when running without options, there is no need for plot - it is an external use.
-        If ocvb.parms.ShowOptions = True Then
-            plot = New Plot_OverTime(ocvb)
-            plot.externalUse = True
-            plot.dst = ocvb.result2
-            plot.maxScale = 150
-            plot.minScale = 80
-            plot.plotCount = 2
-        End If
-
 #If opencvsharpOld Then
         kf.TransitionMatrix.SetArray(0, 0, New Single() {1, 1, 0, 1}.ToArray)
 #Else
@@ -746,6 +736,15 @@ Public Class Kalman_Single : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then
+            If ocvb.frameCount = 0 Then
+                plot = New Plot_OverTime(ocvb)
+                plot.externalUse = True
+                plot.dst = ocvb.result2
+                plot.maxScale = 150
+                plot.minScale = 80
+                plot.plotCount = 2
+            End If
+
             ocvb.result1 = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             inputReal = ocvb.result1.Mean().Item(0)
         End If
