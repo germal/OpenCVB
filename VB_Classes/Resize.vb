@@ -5,7 +5,6 @@ Public Class Resize_Options : Implements IDisposable
     Public src As cv.Mat
     Public dst As New cv.Mat
     Public newSize As cv.Size
-    Public resizePercent As Double
     Public Sub New(ocvb As AlgorithmData)
         radio.Setup(ocvb, 5)
         radio.check(0).Text = "Resize with Area flag"
@@ -54,7 +53,6 @@ Public Class Resize_Percentage : Implements IDisposable
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public resizeOptions As Resize_Options
-    Public resizePercent As Double
     Public Sub New(ocvb As AlgorithmData)
         resizeOptions = New Resize_Options(ocvb)
         resizeOptions.externalUse = True
@@ -67,10 +65,9 @@ Public Class Resize_Percentage : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim percent As Double = CDbl(sliders.TrackBar1.Value / 100)
         If externalUse = False Then src = ocvb.color
-        resizePercent = sliders.TrackBar1.Value / 100
-        If resizePercent > 1 Then percent /= 100
-        percent = Math.Sqrt(percent)
-        resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * percent), Math.Ceiling(src.Height * percent))
+        dim resizePercent = sliders.TrackBar1.Value / 100
+        resizePercent = Math.Sqrt(resizePercent)
+        resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * resizePercent), Math.Ceiling(src.Height * resizePercent))
         resizeOptions.src = src
         resizeOptions.Run(ocvb)
 
