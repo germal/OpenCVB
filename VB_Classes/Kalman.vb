@@ -380,6 +380,7 @@ Public Class Kalman_ImageSmall : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         resize.src = gray
+        resize.resizePercent = resize.sliders.TrackBar1.Value / 100
         resize.Run(ocvb)
 
         Dim saveOriginal = resize.dst.Clone()
@@ -424,6 +425,7 @@ Public Class Kalman_DepthSmall : Implements IDisposable
         Dim depth32f As New cv.Mat
         ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
         resize.src = depth32f
+        resize.resizePercent = resize.sliders.TrackBar1.Value / 100
         resize.Run(ocvb)
 
         resize.dst.ConvertTo(depth32f, cv.MatType.CV_32F)
