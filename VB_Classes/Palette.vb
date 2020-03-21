@@ -186,47 +186,6 @@ End Class
 
 
 
-
-Public Class Palette_Random : Implements IDisposable
-    Dim gradient As Palette_Gradient
-    Dim resized As Resize_Percentage
-    Dim check As New OptionsCheckbox
-    Public Sub New(ocvb As AlgorithmData)
-        gradient = New Palette_Gradient(ocvb)
-        gradient.frameModulo = 1
-
-        resized = New Resize_Percentage(ocvb)
-        resized.externalUse = True
-
-        check.Setup(ocvb, 1)
-        check.Box(0).Text = "Generate a new pair of random colors"
-        check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
-        ocvb.label1 = "The gradient between 2 colors applied as palette"
-        ocvb.label2 = "Palette source colors"
-        ocvb.desc = "Create a random colormap and apply it - Painterly Effect"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If check.Box(0).Checked Then
-            check.Box(0).Checked = False
-            gradient.Run(ocvb)
-            ' we want 256 colors from the gradient in result1
-            resized.src = ocvb.result1
-            resized.Run(ocvb)
-        End If
-        ocvb.result1 = Palette_ApplyCustom(ocvb.color, resized.dst)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        gradient.Dispose()
-        resized.Dispose()
-        check.Dispose()
-    End Sub
-End Class
-
-
-
-
-
 Public Class Palette_DrawTest : Implements IDisposable
     Dim palette As Palette_ColorMap
     Dim draw As Draw_RngImage
@@ -250,7 +209,6 @@ Public Class Palette_DrawTest : Implements IDisposable
         draw.Dispose()
     End Sub
 End Class
-
 
 
 
@@ -295,7 +253,6 @@ End Class
 
 
 
-
 Public Class Palette_Gradient : Implements IDisposable
     Public frameModulo As Int32 = 30 ' every 30 frames try a different pair of random colors.
     Public color1 As cv.Scalar
@@ -334,6 +291,7 @@ End Class
 
 
 
+
 Public Class Palette_BuildGradientColorMap : Implements IDisposable
     Public sliders As New OptionsSliders
     Public gradientColorMap As New cv.Mat
@@ -343,10 +301,10 @@ Public Class Palette_BuildGradientColorMap : Implements IDisposable
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label2 = "Generated colormap"
-        ocvb.desc = "Build a random colormap that smoothly transitions colors."
+        ocvb.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False And ocvb.frameCount Mod 100 = 0 Or externalUse Then
+        If (externalUse = False And ocvb.frameCount Mod 100 = 0) Or externalUse Then
             Dim color1 = New cv.Scalar(ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255))
             Dim color2 = New cv.Scalar(ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255))
             Dim gradCount = sliders.TrackBar1.Value
@@ -357,12 +315,9 @@ Public Class Palette_BuildGradientColorMap : Implements IDisposable
                 color1 = New cv.Scalar(ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255), ocvb.rng.uniform(0, 255))
                 If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
             Next
-            If externalUse Then
-                gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
-            Else
-                gradientColorMap = gradientColorMap.Resize(New cv.Size(ocvb.color.Width, 1))
-
-                Dim r As New cv.Rect(0, 0, ocvb.color.Width, 1)
+            gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
+            If externalUse = False Then
+                Dim r As New cv.Rect(0, 0, 255, 1)
                 For i = 0 To ocvb.result2.Height - 1
                     r.Y = i
                     ocvb.result2(r) = gradientColorMap
@@ -408,6 +363,16 @@ Public Class Palette_ColorMap : Implements IDisposable
                                          cv.ColormapTypes.Rainbow, cv.ColormapTypes.Spring, cv.ColormapTypes.Summer, cv.ColormapTypes.Winter,
                                          12, 13, 14, 15, 16, 17, 18, 19, 20) ' missing some colorMapType definitions but they are there...
                 ocvb.label1 = "ColorMap = " + mapNames(i)
+
+                If externalUse = False Then
+                    Static cMapDir As New DirectoryInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps")
+                    Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + colormap + ".jpg")
+                    If mapFile.Exists Then
+                        Static cmap = cv.Cv2.ImRead(mapFile.FullName)
+                        ocvb.result2 = cmap.Resize(ocvb.color.Size())
+                    End If
+                End If
+
                 ' special case the random color map!
                 If colormap = 19 Then
                     Static saveTransitionCount = gradMap.sliders.TrackBar1.Value
@@ -432,5 +397,36 @@ Public Class Palette_ColorMap : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
         radio.Dispose()
         gradMap.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class Palette_DepthColorMap : Implements IDisposable
+    Public gradientColorMap As New cv.Mat
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.desc = "Build a colormap that best shows the depth."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim color1 = cv.Scalar.Yellow
+        Dim color2 = cv.Scalar.Red
+        Dim color3 = cv.Scalar.Blue
+        Dim gradMat As New cv.Mat
+        gradMat = colorTransition(color1, color2, ocvb.color.Width)
+        gradientColorMap = gradMat
+        gradMat = colorTransition(color3, color1, ocvb.color.Width)
+        cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
+        gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
+        ocvb.result1 = Palette_ApplyCustom(ocvb.color, gradientColorMap)
+
+        Dim r As New cv.Rect(100, 0, 255, 1)
+        For i = 0 To ocvb.result2.Height - 1
+            r.Y = i
+            ocvb.result2(r) = gradientColorMap
+        Next
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
 End Class

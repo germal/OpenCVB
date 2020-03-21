@@ -17,9 +17,9 @@ Public Class Aruco_Basics : Implements IDisposable
         Dim rejectedPoints()() As cv.Point2f = Nothing
         ' this fails!  Cannot cast a Mat to an InputArray!  Bug?
         ' cv.Aruco.CvAruco.DetectMarkers(src, dictionary, corners, ids, detectorParameters, rejectedPoints)
-        ocvb.putText(New ActiveClass.TrueType("This algorithm is currently failing in VB.Net (works in C#).", 10, 140, RESULT1))
-        ocvb.putText(New ActiveClass.TrueType("The DetectMarkers API works in C# but fails in VB.Net.", 10, 180, RESULT1))
-        ocvb.putText(New ActiveClass.TrueType("To see the correct output, use Aruco_CS.", 10, 220, RESULT1))
+        ocvb.putText(New ActiveClass.TrueType("This algorithm is currently failing in VB.Net (works in C#)." + vbCrLf +
+                                              "The DetectMarkers API works in C# but fails in VB.Net." + vbCrLf +
+                                              "To see the correct output, use Aruco_CS.", 10, 140, RESULT1))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub

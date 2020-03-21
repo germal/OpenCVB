@@ -214,13 +214,13 @@ Public Class Edges_RandomForest_CPP : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.testAllRunning Then
-            ocvb.putText(New ActiveClass.TrueType("When 'Test All' is running, the database load can take longer than the test time", 10, 100, RESULT2))
-            ocvb.putText(New ActiveClass.TrueType("This test is not run during a 'Test All' run but runs fine otherwise.", 10, 140, RESULT2))
+            ocvb.putText(New ActiveClass.TrueType("When 'Test All' is running, the database load can take longer than the test time" + vbCrLf +
+                                                  "This test is not run during a 'Test All' run but runs fine otherwise.", 10, 100, RESULT2))
             Exit Sub
         End If
         If ocvb.frameCount < 10 Then
-            ocvb.putText(New ActiveClass.TrueType("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100, RESULT2))
-            ocvb.putText(New ActiveClass.TrueType("If running 'Test All' and the duration of each test < load time, it will finish loading before continuing to the next algorithm.", 10, 140, RESULT2))
+            ocvb.putText(New ActiveClass.TrueType("On the first call only, it takes a few seconds to load the randomForest model." + vbCrLf +
+                                                  "If running 'Test All' and the duration of each test < load time, it will finish loading before continuing to the next algorithm.", 10, 100, RESULT2))
         End If
         If ocvb.frameCount = 5 Then
             Dim modelInfo = New FileInfo(ocvb.parms.HomeDir + "Data/model.yml.gz")

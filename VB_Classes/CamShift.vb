@@ -148,8 +148,8 @@ Public Class Camshift_Python : Implements IDisposable
                 pipeImages.Write(rgbBuffer, 0, rgbBuffer.Length)
             End If
         End If
-        ocvb.putText(New ActiveClass.TrueType("Draw a rectangle anywhere on the 'camshift' (Python) window nearby.", 10, 140, RESULT1))
-        ocvb.putText(New ActiveClass.TrueType("Mouse down will show highlighted areas that may be used for tracking.", 10, 180, RESULT1))
+        ocvb.putText(New ActiveClass.TrueType("Draw a rectangle anywhere on the 'camshift' (Python) window nearby." + vbCrLf +
+                                              "Mouse down will show highlighted areas that may be used for tracking.", 10, 140, RESULT1))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         memMap.Dispose()
