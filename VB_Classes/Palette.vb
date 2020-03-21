@@ -202,6 +202,8 @@ Public Class Palette_Random : Implements IDisposable
         check.Box(0).Text = "Generate a new pair of random colors"
         check.Box(0).Checked = True
         If ocvb.parms.ShowOptions Then check.Show()
+        ocvb.label1 = "The gradient between 2 colors applied as palette"
+        ocvb.label2 = "Palette source colors"
         ocvb.desc = "Create a random colormap and apply it - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -210,11 +212,10 @@ Public Class Palette_Random : Implements IDisposable
             gradient.Run(ocvb)
             ' we want 256 colors from the gradient in result1
             resized.src = ocvb.result1
-            resized.sliders.TrackBar1.Value = 256 / ocvb.color.Total ' we want only 256 colors
+            resized.resizePercent = 256 / ocvb.color.Total ' we want only 256 colors
             resized.Run(ocvb)
         End If
         ocvb.result1 = Palette_ApplyCustom(ocvb.color, resized.dst)
-        ocvb.label2 = "Palette source colors"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         gradient.Dispose()

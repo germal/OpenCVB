@@ -53,6 +53,7 @@ Public Class Resize_Percentage : Implements IDisposable
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public resizeOptions As Resize_Options
+    Public resizePercent As Double
     Public Sub New(ocvb As AlgorithmData)
         resizeOptions = New Resize_Options(ocvb)
         resizeOptions.externalUse = True
@@ -64,7 +65,8 @@ Public Class Resize_Percentage : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim percent As Double = CDbl(sliders.TrackBar1.Value / 100)
-        If externalUse = False Then src = ocvb.color
+        If externalUse = False Then src = ocvb.color Else percent = resizePercent
+        If resizePercent > 1 Then percent /= 100
         percent = Math.Sqrt(percent)
         resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * percent), Math.Ceiling(src.Height * percent))
         resizeOptions.src = src
