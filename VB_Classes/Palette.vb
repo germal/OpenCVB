@@ -366,7 +366,7 @@ Public Class Palette_ColorMap : Implements IDisposable
 
                 If externalUse = False Then
                     Static cMapDir As New DirectoryInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps")
-                    Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + colormap + ".jpg")
+                    Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + mapNames(i) + ".jpg")
                     If mapFile.Exists Then
                         Static cmap = cv.Cv2.ImRead(mapFile.FullName)
                         ocvb.result2 = cmap.Resize(ocvb.color.Size())
