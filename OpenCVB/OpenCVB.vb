@@ -359,7 +359,14 @@ Public Class OpenCVB
                     Name.StartsWith("SanDisk") = False And InStr(Name, "Wi-Fi") = False And Name.StartsWith("Media ") = False And
                     Name.StartsWith("High precision") = False And Name.StartsWith("High Definition ") = False And
                     InStr(Name, "Remote") = False And InStr(Name, "Numeric") = False And InStr(Name, "UMBus ") = False And
-                    Name.StartsWith("Plug and Play") = False And InStr(Name, "Print") = False Then
+                    Name.StartsWith("Plug and Play") = False And InStr(Name, "Print") = False And
+                    InStr(Name, "Microphone") = False And Name.StartsWith("Direct memory") = False And
+                    InStr(Name, "interrupt controller") = False And Name.StartsWith("NVVHCI") = False And
+                    Name.StartsWith("ASMedia") = False And Name <> "Fax" And Name.StartsWith("Speakers") = False And
+                    InStr(Name, "Host Controller") = False And InStr(Name, "Management Engine") = False And
+                    Name.StartsWith("NDIS") = False And Name.StartsWith("Logitech USB Input Device") = False And
+                    Name.StartsWith("Simple Device") = False And InStr(Name, "Ethernet") = False And
+                    InStr(Name, "Composite Bus Enumerator") = False And InStr(Name, "Turbo Boost") = False Then
                     Console.WriteLine(Name) ' looking for new cameras 
                 End If
             End If

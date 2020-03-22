@@ -28,8 +28,8 @@ Public Class Stitch_Basics : Implements IDisposable
 
         If ocvb.parms.testAllRunning Then
             ' It runs fine but after several runs, it will fail with an external exception.  Only happens on 'Test All' runs.  
-            ocvb.putText(New ActiveClass.TrueType("Stitch_Basics only fails when running 'Test All'.", 10, 60, RESULT2))
-            ocvb.putText(New ActiveClass.TrueType("Skipping it during a 'Test All' just so all the other tests can be exercised.", 10, 100, RESULT2))
+            ocvb.putText(New ActiveClass.TrueType("Stitch_Basics only fails when running 'Test All'." + vbCrLf +
+                                                  "Skipping it during a 'Test All' just so all the other tests can be exercised.", 10, 60, RESULT2))
             Exit Sub
         End If
 

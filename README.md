@@ -425,15 +425,13 @@ algorithms using VTK will work with or without VTK installed but if it is not
 present, the VTK algorithms will simply display a message explaining how to
 enable VTK with the following steps:
 
--   Build VTK with VTK.sln in “\<OpenCVB Home Directory\>/VTK/Build”
+-   Run “PrepareVTK.bat” in \<OpenCVB_Home\>
 
--   Run CMake on OpenCV and add WITH_VTK and VTK_Dir.
+-   Build VTK for both Debug and Release
 
--   Add the VTK_Apps/DataExample to the OpenCVB.sln project
+-   Build OpenCV for both Debug and Release
 
--   Update the Project Dependencies for VB_Classes to include any VTK projects
-
--   Rebuild OpenCVB and it will find VTK and OpenCV’s VIZ DLL
+-   Edit mainVTK.cpp (project VTKDataExample) and modify the first line
 
 **Sample Results**
 

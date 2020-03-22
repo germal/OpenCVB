@@ -64,12 +64,11 @@ Public Class AlgorithmData
         fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
     End Sub
     Public Sub vtkInstructions()
-        putText(New ActiveClass.TrueType("VTK support is disabled.  Here are the steps needed to enable VTK.", 10, 125))
-        putText(New ActiveClass.TrueType("Step 1) build VTK with <OpenCVB_Home_Directory>/VTK/Build/VTK.sln", 10, 145))
-        putText(New ActiveClass.TrueType("Step 2) Reconfigure OpenCV with CMake - With_VTK and VTK_Dir.", 10, 185))
-        putText(New ActiveClass.TrueType("Step 3) Add the VTK_Apps/DataExample to OpenCVB.sln'", 10, 205))
-        putText(New ActiveClass.TrueType("Step 4) Update the Project Dependencies for VB_Classes to include the VTK_Apps/DataExample project", 10, 225))
-        putText(New ActiveClass.TrueType("Step 5) Rebuild OpenCVB and it will find VTK and OpenCV's VIZ DLL", 10, 245))
+        putText(New ActiveClass.TrueType("VTK support is disabled. " + vbCrLf + "Enable VTK with the following steps:" + vbCrLf + vbCrLf +
+                                         "Step 1) Run 'PrepareVTK.bat' in <OpenCVB_Home>" + vbCrLf +
+                                         "Step 2) Build VTK for both Debug and Release" + vbCrLf +
+                                         "Step 3) Build OpenCV for both Debug and Release" + vbCrLf +
+                                         "Step 4) Edit mainVTK.cpp (project VTKDataExample) and modify the first line", 10, 125))
     End Sub
     Public Sub putText(tt As ActiveClass.TrueType)
         TTtextData(tt.picTag).Add(tt)

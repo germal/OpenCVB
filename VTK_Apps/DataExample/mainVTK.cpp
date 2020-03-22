@@ -1,10 +1,12 @@
+//#define WITH_VTK
+#include "VTK_Data.h"
+#ifdef WITH_VTK
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <iostream>
 
 using namespace std;
-#include "VTK_Data.h"
 
 #include <opencv2/viz.hpp>
 
@@ -73,9 +75,11 @@ public:
 		DrawHistogram3D();
 	}
 };
+#endif
 
 int main(int argc, char **argv)
 {
+#ifdef WITH_VTK
 	windowTitle << "OpenCVB VTK_Data Cloud"; // this will create the window title.
 	if (initializeNamedPipeAndMemMap(argc, argv) != 0) return -1;
 
@@ -95,5 +99,9 @@ int main(int argc, char **argv)
 		v->DrawHistogram3D();
 		if (ackBuffers()) break;
 	}
+#else
+	std::string msg = "VTK is not installed.  To enable VTK: Run 'PrepareVTK.bat' in < OpenCVB_Home>, Build VTK for both Debug and Release, Build OpenCV for both Debug and Release, then edit 'mainVTK.cpp' (project VTKDataExample), and modify the first line.";
+	MessageBoxA(0, msg.c_str(), "OpenCVB", MB_OK);
+#endif
 	return 0;
 }

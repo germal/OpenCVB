@@ -34,8 +34,8 @@ Public Class EMax_Basics : Implements IDisposable
         regionCount = grid.roiList.Count - 1
 
         If externalUse = False Then
-            ocvb.putText(New ActiveClass.TrueType("The EMax VB_Class fails as a result of a bug in OpenCVSharp.  See code for details.", 20, 100, RESULT2))
-            ocvb.putText(New ActiveClass.TrueType("The EMax_Basics_CPP works fine and they are functionally identical.", 20, 120, RESULT2))
+            ocvb.putText(New ActiveClass.TrueType("The EMax VB_Class fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
+                                                  "The EMax_Basics_CPP works fine and they are functionally identical.", 20, 100, RESULT2))
         End If
 
         samples = New cv.Mat(sliders.TrackBar1.Value, 2, cv.MatType.CV_32FC1, 0)

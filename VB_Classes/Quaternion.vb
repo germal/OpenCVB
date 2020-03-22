@@ -25,9 +25,9 @@ Public Class Quaterion_Basics : Implements IDisposable
                                 CSng(sliders2.TrackBar3.Value / 100), CSng(sliders2.TrackBar4.Value / 100))
 
         Dim quatmul = Quaternion.Multiply(q1, q2)
-        ocvb.putText(New ActiveClass.TrueType("q1 = " + q1.ToString(), 10, 60))
-        ocvb.putText(New ActiveClass.TrueType("q2 = " + q2.ToString(), 10, 80))
-        ocvb.putText(New ActiveClass.TrueType("Multiply q1 * q2" + quatmul.ToString(), 10, 100))
+        ocvb.putText(New ActiveClass.TrueType("q1 = " + q1.ToString() + vbCrLf +
+                                              "q2 = " + q2.ToString() + vbCrLf +
+                                              "Multiply q1 * q2" + quatmul.ToString(), 10, 60))
 
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -75,14 +75,14 @@ Public Class Quaterion_IMUPrediction : Implements IDisposable
 
         Dim diffq = Quaternion.Subtract(ocvb.parms.IMU_Rotation, predictedRotation)
 
-        ocvb.putText(New ActiveClass.TrueType("IMU_Acceleration = " + ocvb.parms.IMU_Acceleration.ToString(), 10, 40))
-        ocvb.putText(New ActiveClass.TrueType("IMU_Velocity = " + ocvb.parms.IMU_Velocity.ToString(), 10, 60))
-        ocvb.putText(New ActiveClass.TrueType("IMU_AngularAcceleration = " + ocvb.parms.IMU_AngularAcceleration.ToString(), 10, 80))
-        ocvb.putText(New ActiveClass.TrueType("IMU_AngularVelocity = " + ocvb.parms.IMU_AngularVelocity.ToString(), 10, 100))
-        ocvb.putText(New ActiveClass.TrueType("dt = " + dt.ToString(), 10, 120))
-        ocvb.putText(New ActiveClass.TrueType("Pose quaternion = " + ocvb.parms.IMU_Rotation.ToString(), 10, 140))
-        ocvb.putText(New ActiveClass.TrueType("Prediction Rotation = " + predictedRotation.ToString(), 10, 160))
-        ocvb.putText(New ActiveClass.TrueType("difference = " + diffq.ToString(), 10, 180))
+        ocvb.putText(New ActiveClass.TrueType("IMU_Acceleration = " + ocvb.parms.IMU_Acceleration.ToString() + vbCrLf +
+                                              "IMU_Velocity = " + ocvb.parms.IMU_Velocity.ToString() + vbCrLf +
+                                              "IMU_AngularAcceleration = " + ocvb.parms.IMU_AngularAcceleration.ToString() + vbCrLf +
+                                              "IMU_AngularVelocity = " + ocvb.parms.IMU_AngularVelocity.ToString() + vbCrLf +
+                                              "dt = " + dt.ToString() + vbCrLf +
+                                              "Pose quaternion = " + ocvb.parms.IMU_Rotation.ToString() + vbCrLf +
+                                              "Prediction Rotation = " + predictedRotation.ToString() + vbCrLf +
+                                              "difference = " + diffq.ToString(), 10, 40))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         imu.Dispose()

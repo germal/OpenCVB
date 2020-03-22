@@ -250,10 +250,10 @@ Public Class Fitline_EigenFit : Implements IDisposable
             ocvb.result2.Line(p1, p2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
         End If
 
-        ocvb.putText(New ActiveClass.TrueType("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(Len)), 10, 22, RESULT2))
-        ocvb.putText(New ActiveClass.TrueType("Confidence = " + Format(eigenVal.At(Of Single)(0, 0) / eigenVal.At(Of Single)(1, 0), "#0.0"), 10, 40, RESULT2))
-        ocvb.putText(New ActiveClass.TrueType("theta: atan2(" + Format(eigenVec.At(Of Single)(1, 0), "#0.0") + ", " + Format(eigenVec.At(Of Single)(0, 0), "#0.0") + ") = " +
-                                            Format(theta, "#0.0000"), 10, 60, RESULT2))
+        ocvb.putText(New ActiveClass.TrueType("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(Len)) + vbCrLf +
+                                              "Confidence = " + Format(eigenVal.At(Of Single)(0, 0) / eigenVal.At(Of Single)(1, 0), "#0.0") + vbCrLf +
+                                              "theta: atan2(" + Format(eigenVec.At(Of Single)(1, 0), "#0.0") + ", " + Format(eigenVec.At(Of Single)(0, 0), "#0.0") + ") = " +
+                                              Format(theta, "#0.0000"), 10, 22, RESULT2))
 
         p1 = New cv.Point(0, noisyLine.bb)
         p2 = New cv.Point(w, noisyLine.m * w + noisyLine.bb)

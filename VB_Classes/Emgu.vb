@@ -7,8 +7,8 @@ Public Class Emgu_Basics : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim data(ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize) As Byte
         If ocvb.parms.testAllRunning Then
-            ocvb.putText(New ActiveClass.TrueType("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll.", 10, 125))
-            ocvb.putText(New ActiveClass.TrueType("The algorithm is working fine so it is turned off during testing.", 10, 165))
+            ocvb.putText(New ActiveClass.TrueType("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll." + vbCrLf +
+                                                  "The algorithm is working fine so it is turned off during testing.", 10, 125))
         Else
             Emgu_Classes.DrawSubdivision.Draw(ocvb.color.Rows, ocvb.color.Cols, 20, data)
             ' why not just have Draw return a Mat from Emgu?  Because an Emgu Mat is not an OpenCVSharp Mat!  But this works...
@@ -29,8 +29,8 @@ Public Class Emgu_Facedetection : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.testAllRunning Then
-            ocvb.putText(New ActiveClass.TrueType("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll.", 10, 125))
-            ocvb.putText(New ActiveClass.TrueType("The algorithm is working fine so it is turned off during testing.", 10, 165))
+            ocvb.putText(New ActiveClass.TrueType("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll." + vbCrLf +
+                                                  "The algorithm is working fine so it is turned off during testing.", 10, 125))
         Else
             Dim lena = New cv.Mat(ocvb.parms.HomeDir + "Data/Lena.jpg", cv.ImreadModes.Color)
             Dim data(lena.Rows * lena.Cols * lena.ElemSize) As Byte

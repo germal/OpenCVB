@@ -10,6 +10,7 @@
 #include <chrono>
 #include <thread>
 #include <tchar.h>
+#include <string>
 static HANDLE pipe;
 static int MemMapBufferSize;
 static double *sharedMem; 

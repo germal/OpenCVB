@@ -216,11 +216,13 @@ Public Class WarpAffine_3Points : Implements IDisposable
         Next
 
         Dim ttStart = 40
-        ocvb.putText(New ActiveClass.TrueType("M defined as: ", 10, ttStart, RESULT2))
-        Dim nextLine = Format(M.At(Of Double)(0, 0), "#0.00") + vbTab + Format(M.At(Of Double)(0, 1), "#0.00") + vbTab + Format(M.At(Of Double)(0, 2), "#0.00")
-        ocvb.putText(New ActiveClass.TrueType(nextLine, 10, ttStart + 20, RESULT2))
-        nextLine = Format(M.At(Of Double)(1, 0), "#0.00") + vbTab + Format(M.At(Of Double)(1, 1), "#0.00") + vbTab + Format(M.At(Of Double)(1, 2), "#0.00")
-        ocvb.putText(New ActiveClass.TrueType(nextLine, 10, ttStart + 40, RESULT2))
+        ocvb.putText(New ActiveClass.TrueType("M defined as: " + vbCrLf +
+                                              Format(M.At(Of Double)(0, 0), "#0.00") + vbTab +
+                                              Format(M.At(Of Double)(0, 1), "#0.00") + vbTab +
+                                              Format(M.At(Of Double)(0, 2), "#0.00") + vbCrLf +
+                                              Format(M.At(Of Double)(1, 0), "#0.00") + vbTab +
+                                              Format(M.At(Of Double)(1, 1), "#0.00") + vbTab +
+                                              Format(M.At(Of Double)(1, 2), "#0.00"), 10, ttStart, RESULT2))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         triangle.Dispose()
@@ -273,14 +275,16 @@ Public Class WarpAffine_4Points : Implements IDisposable
 
         ocvb.result2.SetTo(0)
         Dim ttStart = 40
-        ocvb.putText(New ActiveClass.TrueType("M defined as: ", 10, ttStart, RESULT2))
-        Dim nextLine = Format(M.At(Of Double)(0, 0), "#0.00") + vbTab + Format(M.At(Of Double)(0, 1), "#0.00") + vbTab + Format(M.At(Of Double)(0, 2), "#0.00")
-        ocvb.putText(New ActiveClass.TrueType(nextLine, 10, ttStart + 20, RESULT2))
-        nextLine = Format(M.At(Of Double)(1, 0), "#0.00") + vbTab + Format(M.At(Of Double)(1, 1), "#0.00") + vbTab + Format(M.At(Of Double)(1, 2), "#0.00")
-        ocvb.putText(New ActiveClass.TrueType(nextLine, 10, ttStart + 40, RESULT2))
-        nextLine = Format(M.At(Of Double)(2, 0), "#0.00") + vbTab + Format(M.At(Of Double)(2, 1), "#0.00") + vbTab + Format(M.At(Of Double)(2, 2), "#0.00")
-        ocvb.putText(New ActiveClass.TrueType(nextLine, 10, ttStart + 60, RESULT2))
-
+        ocvb.putText(New ActiveClass.TrueType("M defined as: " + vbCrLf +
+                                              Format(M.At(Of Double)(0, 0), "#0.00") + vbTab +
+                                              Format(M.At(Of Double)(0, 1), "#0.00") + vbTab +
+                                              Format(M.At(Of Double)(0, 2), "#0.00") + vbCrLf +
+                                              Format(M.At(Of Double)(1, 0), "#0.00") + vbTab +
+                                              Format(M.At(Of Double)(1, 1), "#0.00") + vbTab +
+                                              Format(M.At(Of Double)(1, 2), "#0.00") + vbCrLf +
+                                              Format(M.At(Of Double)(2, 0), "#0.00") + vbTab +
+                                              Format(M.At(Of Double)(2, 1), "#0.00") + vbTab +
+                                              Format(M.At(Of Double)(2, 2), "#0.00") + vbCrLf, 10, ttStart, RESULT2))
         Dim center As New cv.Point2f(M.At(Of Double)(0, 2), M.At(Of Double)(1, 2))
         ocvb.result1.Circle(center, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         center = New cv.Point2f(50, ocvb.color.Height / 2)

@@ -48,8 +48,8 @@ Public Class OpenCVGL_Image_CPP : Implements IDisposable
         If ocvb.parms.testAllRunning Then
             ' It runs fine but after several cycles, it will fail with an external exception.  
             ' Only happens on 'Test All' runs.  Runs fine otherwise.
-            ocvb.putText(New ActiveClass.TrueType("OpenCVGL only fails when running 'Test All'.  Can't get it to fail otherwise.", 10, 60, RESULT1))
-            ocvb.putText(New ActiveClass.TrueType("Skipping it during a 'Test All' just so all the other tests can be exercised.", 10, 100, RESULT1))
+            ocvb.putText(New ActiveClass.TrueType("OpenCVGL only fails when running 'Test All'.  Can't get it to fail otherwise." + vbCrLf +
+                                                  "Skipping it during a 'Test All' just so all the other tests can be exercised.", 10, 60, RESULT1))
             Exit Sub
         End If
         imu.Run(ocvb)
