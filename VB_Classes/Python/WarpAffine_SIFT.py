@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 Affine invariant feature-based image matching sample.
 
@@ -18,10 +16,6 @@ USAGE
 
   Press left mouse button on a feature point to see its matching point.
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
 

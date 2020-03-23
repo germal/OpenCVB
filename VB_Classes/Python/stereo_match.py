@@ -1,14 +1,8 @@
-#!/usr/bin/env python
-
 '''
 Simple example of stereo image matching and point cloud generation.
 
 Resulting .ply file cam be easily viewed using MeshLab ( http://meshlab.sourceforge.net/ )
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
 title_window = 'Stereo_match.py'

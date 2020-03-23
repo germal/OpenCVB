@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 '''
 mouse_and_match.py [-i path | --input path: default ../data/]
 
@@ -10,10 +9,6 @@ Demonstrate using a mouse to interact with an image:
  SPACE for next image
  ESC to exit
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
 

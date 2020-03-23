@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 '''
 This example illustrates how to use cv.HoughCircles() function.
 
@@ -7,10 +5,6 @@ Usage:
     houghcircles.py [<image_name>]
     image argument defaults to board.jpg
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
 title_window = 'Hough_example4.py'

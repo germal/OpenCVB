@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 Texture flow direction estimation.
 
@@ -9,10 +7,6 @@ to estimate image texture flow direction.
 Usage:
     texture_flow.py [<image>]
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
 desc = "Painterly Effect"

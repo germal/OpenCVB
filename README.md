@@ -350,34 +350,16 @@ available on the system.
 
 **Python Packages (Optional but Cool!)**
 
-Python is not installed with the “opencv-python” or “NumPy” libraries which are
-required for many of the OpenCVB Python scripts. To update the current version
-of Python in Visual Studio, packages may be easily installed through the Visual
-Studio menus:
+The Python libraries “opencv-python” or “NumPy” are required for many of the
+OpenCVB Python scripts but are not installed by default. To update the current
+version of Python in Visual Studio, packages may be easily installed through the
+Visual Studio menus:
 
 -   “Tools/Python/Python Environments” – select “Packages” in the combo box then
     enter for “opencv-python” or “numpy” and select the package from the list.
 
-Here is the complete list of the expected Python packages used by the Python
-scripts provided by OpenCVB.
-
--   matplotlib
-
--   numpy
-
--   opencv-python
-
--   opencv-contrib-python
-
--   PyOpenGL
-
--   Pygame
-
--   Psutil
-
--   Scikit-learn
-
--   sklearn
+To check that all the necessary packages are installed, run the ‘BareBones.py’
+script.
 
 **Python Debugging**
 
@@ -386,11 +368,11 @@ Visual Studio’s Python debug environment is not available. When a Python scrip
 fails in OpenCVB, it may be debugged in the PythonDebug project. Here are the
 steps to debug Python:
 
--   Open VB_Classes\\Python\\PythonDebug.pyproj a Visual Studio Python project.
+-   Open VB_Classes\\Python\\PythonDebug.pyproj in Visual Studio.
 
 -   Copy the failing Python script into the PythonDebug.py file, and run it.
 
-The Python script will be running in the same environment as it were invoked
+The Python script will be running in the same environment as if it were invoked
 from OpenCVB except the Python debugger will be active.
 
 **Visual Studio Debugging**
@@ -399,7 +381,7 @@ The Visual Studio projects can be configured to simultaneously debug both
 managed and unmanaged code seamlessly. The property “Enable Native Code
 Debugging” for the managed projects controls whether C\# or VB.Net code will
 step into C++ code while debugging. However, leaving that property enabled all
-the time means that the OpenCVB startup will take longer – approximately 5
+the time means that the OpenCVB will take longer to start – approximately 5
 seconds vs. 3 seconds on a higher-end system. The default is to leave the
 “Enable Native Code Debugging” property off so OpenCVB will load faster. Of
 course, if there is a problem in the C++ code that is best handled with a debug

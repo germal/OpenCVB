@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 '''
 ===============================================================================
 Interactive Image Segmentation using GrabCut algorithm.
@@ -26,10 +25,6 @@ Key 'r' - To reset the setup
 Key 's' - To save the results
 ===============================================================================
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
 title_window = 'grabcut.py'

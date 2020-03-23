@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-
-from __future__ import print_function
 import os, sys, re, string, io
 
 # the list only for debugging. The real list, used in the real OpenCV build, is specified in CMakeLists.txt

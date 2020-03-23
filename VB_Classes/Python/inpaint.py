@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 Inpainting sample.
 
@@ -14,10 +12,6 @@ Keys:
   r     - reset the inpainting mask
   ESC   - exit
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
 title_window = 'Inpaint.py'

@@ -1,22 +1,13 @@
-#!/usr/bin/env python
-
 '''
 sample for disctrete fourier transform (dft)
 
 USAGE:
     dft.py <image_file>
 '''
-
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
 title_window = 'DFT_Example1.py'
-
 import sys
-
 
 def shift_dft(src, dst=None):
     '''

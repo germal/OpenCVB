@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 K-means clusterization sample.
 Usage:
@@ -9,15 +7,11 @@ Keyboard shortcuts:
    ESC   - exit
    space - generate new distribution
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
 title_window = 'kmeans.py'
 
-from gaussian_mix import make_gaussians
+from Gaussian_mix import make_gaussians
 
 def main():
     cluster_n = 5

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 SVM and KNearest digit recognition.
 
@@ -22,10 +20,6 @@ Following preprocessing is applied to the dataset:
 Usage:
    digits.py
 '''
-
-
-# Python 2/3 compatibility
-from __future__ import print_function
 title_window = 'Digits_SVM_KNearest_adjust.py'
 
 import numpy as np
@@ -38,8 +32,6 @@ from numpy.linalg import norm
 
 # local modules
 from common import clock, mosaic
-
-
 
 SZ = 20 # size of each digit is SZ x SZ
 CLASS_N = 10

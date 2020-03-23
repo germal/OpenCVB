@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 ''' This is a sample for histogram plotting for RGB images and grayscale images for better understanding of colour distribution
 
 Benefit : Learn how to draw histogram of images
@@ -14,10 +12,6 @@ Usage : python hist.py <image_file>
 
 Abid Rahman 3/14/12 debug Gary Bradski
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
 title_window = 'Hist.py'

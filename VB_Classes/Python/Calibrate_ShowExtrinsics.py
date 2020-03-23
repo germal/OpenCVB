@@ -1,9 +1,4 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
 title_window = 'Calibrate_ShowExtrinsics.py'

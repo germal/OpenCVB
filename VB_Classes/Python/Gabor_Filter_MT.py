@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # https://github.com/opencv/opencv/blob/master/samples/python/gabor_threads.py
 '''
 gabor_threads.py
@@ -14,15 +13,12 @@ gabor_threads.py [image filename]
 
 '''
 
-# Python 2/3 compatibility
-from __future__ import print_function
 title_window = 'Gabor_Filter_MT.py'
 
 import numpy as np
 import cv2 as cv
 
 from multiprocessing.pool import ThreadPool
- 
 
 def build_filters():
     filters = []

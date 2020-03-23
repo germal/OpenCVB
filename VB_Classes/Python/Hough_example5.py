@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 '''
 This example illustrates how to use Hough Transform to find lines
 
@@ -7,10 +5,6 @@ Usage:
     houghlines.py [<image_name>]
     image argument defaults to pic1.png
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import cv2 as cv
 import numpy as np
 

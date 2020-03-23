@@ -8,7 +8,7 @@ Module Python_Module
         ' make sure that opencv-python and numpy are installed on this system.
         If ocvb.PythonExe = "" Then
             ocvb.putText(New ActiveClass.TrueType("Python is not present and needs to be installed." + vbCrLf +
-                                                  "Visit Python.org and download the latest version.", 10, 60, RESULT1))
+                                                  "Get Python 3.7+ with Visual Studio's Install app.", 10, 60, RESULT1))
             Return False
         End If
         Dim pythonFileInfo = New FileInfo(ocvb.PythonExe)
@@ -18,11 +18,9 @@ Module Python_Module
 
         If packageFiles.Count = 0 Then
             ocvb.putText(New ActiveClass.TrueType("Python is present but the packages needed by this Python script are not present." + vbCrLf +
+                                                  "Use the Barebones.py script to show which imports are missing.'" + vbCrLf +
                                                   "Go to the Visual Studio menu 'Tools/Python/Python Environments'" + vbCrLf +
                                                   "Select 'Packages' in the combo box and search for packages required by this script.", 10, 60, RESULT1))
-            MsgBox("It looks like the " + packageName + " package is missing." + vbCrLf +
-                   "Be sure to install Python packages: opencv-python, NumPy, PyOpenGL, pygame, psutil.")
-            Return False
         End If
         Return True
     End Function

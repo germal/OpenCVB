@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 SVM and KNearest digit recognition.
 
@@ -23,10 +21,6 @@ Usage:
    digits.py
 '''
 
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
 
@@ -37,8 +31,6 @@ from numpy.linalg import norm
 
 # local modules
 from common import clock, mosaic
-
-
 
 SZ = 20 # size of each digit is SZ x SZ
 CLASS_N = 10

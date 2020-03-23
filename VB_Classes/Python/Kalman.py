@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
    Tracking of rotating point.
    Rotation speed is constant.
@@ -11,12 +10,7 @@
    Pressing any key (except ESC) will reset the tracking with a different speed.
    Pressing ESC will stop the program.
 """
-# Python 2/3 compatibility
 import sys
-PY3 = sys.version_info[0] == 3
-
-if PY3:
-    long = int
 
 import numpy as np
 import cv2 as cv
@@ -30,7 +24,7 @@ def main():
     img_width = 500
     kalman = cv.KalmanFilter(2, 1, 0)
 
-    code = long(-1)
+    code = int(-1)
 
     cv.namedWindow("Kalman")
 

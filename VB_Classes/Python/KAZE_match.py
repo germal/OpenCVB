@@ -1,5 +1,4 @@
 # https://github.com/opencv/opencv/blob/master/samples/python/tutorial_code/features2D/akaze_matching/AKAZE_match.py
-from __future__ import print_function
 import cv2 as cv
 import numpy as np
 import argparse

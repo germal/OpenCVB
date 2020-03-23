@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import cv2 as cv
 
 alpha = 0.5

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 Robust line fitting.
 ==================
@@ -21,12 +19,7 @@ SPACE - generate random points
 f     - change distance function
 ESC   - exit
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
 import sys
-PY3 = sys.version_info[0] == 3
-
 import numpy as np
 import cv2 as cv
 
@@ -36,7 +29,6 @@ import itertools as it
 # local modules
 from common import draw_str
 title_window = 'Fitline.py'
-
 
 w, h = 512, 256
 
@@ -50,10 +42,7 @@ def sample_line(p1, p2, n, noise=0.0):
 
 dist_func_names = it.cycle('DIST_L2 DIST_L1 DIST_L12 DIST_FAIR DIST_WELSCH DIST_HUBER'.split())
 
-if PY3:
-    cur_func_name = next(dist_func_names)
-else:
-    cur_func_name = dist_func_names.next()
+cur_func_name = next(dist_func_names)
 
 def update(_=None):
     noise = cv.getTrackbarPos('noise', 'fit line')
@@ -89,10 +78,7 @@ def main():
         update()
         ch = cv.waitKey(0)
         if ch == ord('f'):
-            if PY3:
-                cur_func_name = next(dist_func_names)
-            else:
-                cur_func_name = dist_func_names.next()
+            cur_func_name = next(dist_func_names)
         if ch == 27:
             break
 

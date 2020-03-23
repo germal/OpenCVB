@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 The sample demonstrates how to train Random Trees classifier
 (or Boosting classifier, or MLP, or Knearest, or Support Vector Machines) using the provided dataset.
@@ -24,10 +22,6 @@ USAGE:
 
   Models: RTrees, KNearest, Boost, SVM, MLP
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
 title_window = 'ML_letters.py'

@@ -1,15 +1,7 @@
 '''
 This module contains some common routines used by other samples.
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
 import sys
-PY3 = sys.version_info[0] == 3
-
-if PY3:
-    from functools import reduce
-
 import numpy as np
 import cv2 as cv
 
@@ -200,10 +192,7 @@ class RectSelector:
 def grouper(n, iterable, fillvalue=None):
     '''grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx'''
     args = [iter(iterable)] * n
-    if PY3:
-        output = it.zip_longest(fillvalue=fillvalue, *args)
-    else:
-        output = it.izip_longest(fillvalue=fillvalue, *args)
+    output = it.zip_longest(fillvalue=fillvalue, *args)
     return output
 
 def mosaic(w, imgs):

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 Morphology operations.
 
@@ -11,12 +9,7 @@ Keys:
   2   - change structure element shape
   ESC - exit
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
 import sys
-PY3 = sys.version_info[0] == 3
-
 import numpy as np
 import cv2 as cv
 title_window = 'Morphology.py'
@@ -42,12 +35,8 @@ def main():
     modes = cycle(['erode/dilate', 'open/close', 'blackhat/tophat', 'gradient'])
     str_modes = cycle(['ellipse', 'rect', 'cross'])
 
-    if PY3:
-        cur_mode = next(modes)
-        cur_str_mode = next(str_modes)
-    else:
-        cur_mode = modes.next()
-        cur_str_mode = str_modes.next()
+    cur_mode = next(modes)
+    cur_str_mode = next(str_modes)
 
     def update(dummy=None):
         sz = cv.getTrackbarPos('op/size', 'morphology')
@@ -81,15 +70,9 @@ def main():
         if ch == 27:
             break
         if ch == ord('1'):
-            if PY3:
-                cur_mode = next(modes)
-            else:
-                cur_mode = modes.next()
+            cur_mode = next(modes)
         if ch == ord('2'):
-            if PY3:
-                cur_str_mode = next(str_modes)
-            else:
-                cur_str_mode = str_modes.next()
+            cur_str_mode = next(str_modes)
         update()
 
     print('Done')

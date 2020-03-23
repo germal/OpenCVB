@@ -4,7 +4,6 @@ import array
 import argparse
 import ctypes
 import os, time, sys
-import psutil
 import cv2 as cv
 from time import sleep
 def Mbox(title, text, style):

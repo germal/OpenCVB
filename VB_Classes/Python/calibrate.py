@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 camera calibration for distorted images with chess board samples
 reads distorted images, calculates the calibration and write undistorted images
@@ -12,9 +10,6 @@ default values:
     --square_size: 1.0
     <image mask> defaults to ../data/left*.jpg
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
 
 import numpy as np
 import cv2 as cv

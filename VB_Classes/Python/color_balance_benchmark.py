@@ -1,12 +1,9 @@
-#!/usr/bin/env python
-from __future__ import print_function
 import os, sys, argparse, json
 import numpy as np
 import scipy.io
 import cv2 as cv
 import timeit
 from learn_color_balance import load_ground_truth
-
 
 def load_json(path):
     f = open(path, "r")

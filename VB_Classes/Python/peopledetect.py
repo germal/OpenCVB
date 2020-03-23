@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 example to detect upright people in images using HOG features
 
@@ -8,10 +6,6 @@ Usage:
 
 Press any key to continue, ESC to stop.
 '''
-
-# Python 2/3 compatibility
-from __future__ import print_function
-
 import numpy as np
 import cv2 as cv
 title_window = 'Peopledetect.py'
