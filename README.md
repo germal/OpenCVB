@@ -398,6 +398,20 @@ the option: “\<All using recorded data\>”. Selecting “Test All” with tha
 setting will run all the active algorithms with the recorded data. This is a
 useful regression test.
 
+**StereoLabs Zed 2 Support**
+
+The StereoLabs Zed 2 camera is supported but the support is turned off by
+default. To enable this support:
+
+-   Download the Windows 10 SDK from
+    <https://www.stereolabs.com/developers/release/>
+
+-   Edit the CameraDefines.hpp file to turn on the interface to the Zed 2
+    camera.
+
+The Zed 2 camera is always installed in the C:\\Program Files (x86)\\ZED SDK
+(regardless of the version) so no additional changes are required.
+
 **VTK Support**
 
 VTK (the Visualization ToolKit) is an excellent tool and OpenCVB supports its
