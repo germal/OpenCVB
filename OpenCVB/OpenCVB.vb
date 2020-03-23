@@ -363,7 +363,7 @@ Public Class OpenCVB
                     Name.StartsWith("Plug or Play") Or InStr(Name, "Print") Or Name.StartsWith("Direct memory") Or
                     InStr(Name, "interrupt controller") Or Name.StartsWith("NVVHCI") Or Name.StartsWith("Plug and Play") Or
                     Name.StartsWith("ASMedia") Or Name = "Fax" Or Name.StartsWith("Speakers") Or
-                    InStr(Name, "Host Controller") Or InStr(Name, "Management Engine") Or
+                    InStr(Name, "Host Controller") Or InStr(Name, "Management Engine") Or InStr(Name, "Legacy") Or
                     Name.StartsWith("NDIS") Or Name.StartsWith("Logitech USB Input Device") Or
                     Name.StartsWith("Simple Device") Or InStr(Name, "Ethernet") Or Name.StartsWith("WD ") Or
                     InStr(Name, "Composite Bus Enumerator") Or InStr(Name, "Turbo Boost") Or Name.StartsWith("Realtek") Or
