@@ -329,12 +329,12 @@ just the mouse interface, see the OpenGL_Callbacks algorithm.
 
 OpenCV has numerous examples of Python scripts and Python is often used for
 computer vision experiments. To add a new Python script for use with OpenCVB,
-just add a script in the Python directory of the VB_Classes project. It is
-convenient for edits to add any script to the VB_Classes project but, more
-importantly, any changes to a Python script will automatically show the new or
-renamed Python files in the user interface. Python scripts don’t require a
-VB.Net wrapper – just add them to the VB_Classes Project in the Python
-directory.
+add a script in the Python directory of the VB_Classes project. It is convenient
+for edits to add any script to the VB_Classes project but, more importantly, any
+changes to a Python script will automatically show the new or renamed Python
+files in the user interface. Python scripts don’t require a VB.Net wrapper –
+just add them to the VB_Classes Project in the Python directory – and the script
+will be present in the user interface.
 
 However, to send the RGB, depth, or point cloud image data from the camera to
 the Python script, a VB.Net wrapper is required. Examples are provided – see
@@ -344,16 +344,16 @@ algorithm Python_RGBDepth is the companion for the Python_RGBDepth.py script.
 
 Python scripts show up in the list of algorithms in the OpenCVB user interface
 and each Python script will be run when performing a “Test All” regression. To
-change which version of Python is used, open the “Options” for OptionCVB and in
-the “Python” section, there is a browse button to select any Python.exe
-available on the system.
+change which version of Python is used, open the “Options” dialog and in the
+“Python” section, there is a browse button to select any Python.exe available on
+the system.
 
-**Python Packages (Optional but Cool!)**
+**Python Packages**
 
 The Python libraries “opencv-python” or “NumPy” are required for many of the
-OpenCVB Python scripts but are not installed by default. To update the current
-version of Python in Visual Studio, packages may be easily installed through the
-Visual Studio menus:
+OpenCVB Python scripts but are not installed by default. To update missing
+packages in Visual Studio, use the “Tools/Python/Python Environments” in the
+Visual Studio menu:
 
 -   “Tools/Python/Python Environments” – select “Packages” in the combo box then
     enter for “opencv-python” or “numpy” and select the package from the list.
@@ -393,10 +393,10 @@ VB.Net application.
 The ability to record and playback is provided with OpenCVB – see Replay_Record
 and Replay_Play algorithms. RGB, Depth, point cloud, and IMU data are written to
 the recording file. Any algorithm that normally runs with the live camera input
-can be run with recorded data. Use the “Subset Combo Box” to select the option:
-“\<All using recorded data\>”. Selecting “Test All” with that setting will run
-all the active algorithms with the recorded data. This is a useful regression
-test.
+and IMU data can be run with recorded data. Use the “Subset Combo Box” to select
+the option: “\<All using recorded data\>”. Selecting “Test All” with that
+setting will run all the active algorithms with the recorded data. This is a
+useful regression test.
 
 **VTK Support**
 
@@ -424,17 +424,18 @@ bottom left and right or additional windows.
 
 ![](media/cd7e699a6192e4daf1d540a15e35005a.png)
 
-*Histogram valleys are used to create clusters in depth data. The bottom left is
+*Histogram Valleys are used to create clusters in depth data. The bottom left is
 the histogram showing the different clusters. The bottom right is the
 back-projection of the different clusters into the image using the same colors
 as the histogram.*
 
 ![](media/f3e144361b0ffeb85ff30f51af3eac3e.png)
 
-*Using the histogram to create clusters (see above example) allows a follow-on
-algorithm to segment an entire image, creating blobs that can be measured and
-tracked. The black segment has no depth. The number of blobs can be controlled
-with a lower limit on the size of the blob.*
+*Using the histogram to create clusters (see previous example ‘Histogram
+Valleys’) allows an algorithm to segment an entire image (see lower right
+image), creating blobs that can be measured and tracked. The black segment has
+no depth. The number of blobs can be controlled with a lower limit on the size
+of the blob.*
 
 ![](media/1df99676bf4ca2ef5c9351c3259c35ac.png)
 
@@ -442,12 +443,14 @@ with a lower limit on the size of the blob.*
 and the image capture (the devices are on different clocks.) The image capture
 triggers an interrupt but how long ago did the IMU capture the pose data or
 Gyro/Acceleration? The plot in the lower right shows the actual frame durations
-for the IMU and images and estimates the delay from the IMU capture to the image
-capture. The blue dots are the actual IMU capture frame times, the green is the
-host image capture frame time, and the red is the estimated delay from the IMU
-capture to the image capture. The white row shows the IMU frame time with the
-highest occurrence and is used as a boundary between lost IMU captures (above)
-and correctly sequenced IMU captures (at or below).*
+for the IMU and host interrupts following an image capture. The IMU and host
+interrupt frame times are used to estimate the delay from the IMU capture to the
+image capture. The blue dots are the actual IMU capture frame times, the green
+is the host image capture frame time, and the red is the estimated delay from
+the IMU capture to the image capture. The white row shows the IMU frame time
+with the highest occurrence and is used as a boundary between lost IMU captures
+(below the white line) and correctly sequenced IMU captures (at or above the
+white line).*
 
 ![](media/3df8502dfd9e7ac7e50e5645cf8fe4ad.png)
 

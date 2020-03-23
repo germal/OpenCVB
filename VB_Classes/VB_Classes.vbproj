@@ -400,7 +400,7 @@
     <Content Include="Python\Sobel_AnisotropicSegmentation.py" />
     <Content Include="Python\Turing.py" />
     <Content Include="Python\WarpAffine_SIFT.py" />
-    <Content Include="Python\BareBones.py" />
+    <Content Include="Python\PythonPackages.py" />
     <Content Include="Python\Brightness_Contrast_Example1.py" />
     <Content Include="Python\Draw_Basic.py" />
     <Content Include="Python\BGSubtract.py" />

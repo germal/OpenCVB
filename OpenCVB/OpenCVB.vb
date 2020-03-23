@@ -336,7 +336,7 @@ Public Class OpenCVB
         saveLayout()
     End Sub
     Public Function USBenumeration(searchName As String) As Int32
-        Static firstCall = True
+        Static firstCall = 0
         Dim deviceCount As Int32
         ' See if the desired device shows up in the device manager.'
         Dim info As Management.ManagementObject
@@ -348,31 +348,33 @@ Public Class OpenCVB
             ' toss the uninteresting names so we can find the cameras.
             If Name Is Nothing Then Continue For
 
-            If firstCall Then
-                If InStr(Name, "Xeon") = False And InStr(Name, "Chipset") = False And InStr(Name, "Generic") = False And InStr(Name, "Bluetooth") = False And
-                    InStr(Name, "Monitor") = False And InStr(Name, "Mouse") = False And InStr(Name, "NVIDIA") = False And InStr(Name, "HID-compliant") = False And
-                    InStr(Name, " CPU ") = False And InStr(Name, "PCI Express") = False And Name.StartsWith("USB ") = False And
-                    Name.StartsWith("Microsoft") = False And Name.StartsWith("Motherboard") = False And InStr(Name, "SATA") = False And
-                    InStr(Name, "Volume") = False And Name.StartsWith("WAN") = False And InStr(Name, "ACPI") = False And
-                    Name.StartsWith("HID") = False And InStr(Name, "OneNote") = False And Name.StartsWith("Samsung") = False And
-                    Name.StartsWith("System ") = False And Name.StartsWith("HP") = False And InStr(Name, "Wireless") = False And
-                    Name.StartsWith("SanDisk") = False And InStr(Name, "Wi-Fi") = False And Name.StartsWith("Media ") = False And
-                    Name.StartsWith("High precision") = False And Name.StartsWith("High Definition ") = False And
-                    InStr(Name, "Remote") = False And InStr(Name, "Numeric") = False And InStr(Name, "UMBus ") = False And
-                    Name.StartsWith("Plug and Play") = False And InStr(Name, "Print") = False And
-                    InStr(Name, "Microphone") = False And Name.StartsWith("Direct memory") = False And
-                    InStr(Name, "interrupt controller") = False And Name.StartsWith("NVVHCI") = False And
-                    Name.StartsWith("ASMedia") = False And Name <> "Fax" And Name.StartsWith("Speakers") = False And
-                    InStr(Name, "Host Controller") = False And InStr(Name, "Management Engine") = False And
-                    Name.StartsWith("NDIS") = False And Name.StartsWith("Logitech USB Input Device") = False And
-                    Name.StartsWith("Simple Device") = False And InStr(Name, "Ethernet") = False And
-                    InStr(Name, "Composite Bus Enumerator") = False And InStr(Name, "Turbo Boost") = False Then
+            If firstCall = 4 Then
+                ' why do this?  So enumeration can tell us about the cameras present in a short list.
+                If InStr(Name, "Xeon") Or InStr(Name, "Chipset") Or InStr(Name, "Generic") Or InStr(Name, "Bluetooth") Or
+                    InStr(Name, "Monitor") Or InStr(Name, "Mouse") Or InStr(Name, "NVIDIA") Or InStr(Name, "HID-compliant") Or
+                    InStr(Name, " CPU ") Or InStr(Name, "PCI Express") Or Name.StartsWith("USB ") Or
+                    Name.StartsWith("Microsoft") Or Name.StartsWith("Motherboard") Or InStr(Name, "SATA") Or
+                    InStr(Name, "Volume") Or Name.StartsWith("WAN") Or InStr(Name, "ACPI") Or
+                    Name.StartsWith("HID") Or InStr(Name, "OneNote") Or Name.StartsWith("Samsung") Or
+                    Name.StartsWith("System ") Or Name.StartsWith("HP") Or InStr(Name, "Wireless") Or
+                    Name.StartsWith("SanDisk") Or InStr(Name, "Wi-Fi") Or Name.StartsWith("Media ") Or
+                    Name.StartsWith("High precision") Or Name.StartsWith("High Definition ") Or
+                    InStr(Name, "Remote") Or InStr(Name, "Numeric") Or InStr(Name, "UMBus ") Or
+                    Name.StartsWith("Plug or Play") Or InStr(Name, "Print") Or Name.StartsWith("Direct memory") Or
+                    InStr(Name, "interrupt controller") Or Name.StartsWith("NVVHCI") Or Name.StartsWith("Plug and Play") Or
+                    Name.StartsWith("ASMedia") Or Name = "Fax" Or Name.StartsWith("Speakers") Or
+                    InStr(Name, "Host Controller") Or InStr(Name, "Management Engine") Or
+                    Name.StartsWith("NDIS") Or Name.StartsWith("Logitech USB Input Device") Or
+                    Name.StartsWith("Simple Device") Or InStr(Name, "Ethernet") Or Name.StartsWith("WD ") Or
+                    InStr(Name, "Composite Bus Enumerator") Or InStr(Name, "Turbo Boost") Or Name.StartsWith("RealTek") Or
+                    Name.StartsWith("PCI-to-PCI") Or Name.StartsWith("Network Controller") Or Name.StartsWith("ATAPI ") Then
+                Else
                     Console.WriteLine(Name) ' looking for new cameras 
                 End If
             End If
             If InStr(Name, searchName, CompareMethod.Text) > 0 Then deviceCount += 1
         Next
-        firstCall = False
+        firstCall += 1
         Return deviceCount
     End Function
     Private Sub setupCamPics()
