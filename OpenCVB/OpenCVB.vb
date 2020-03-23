@@ -366,7 +366,7 @@ Public Class OpenCVB
                     InStr(Name, "Host Controller") Or InStr(Name, "Management Engine") Or
                     Name.StartsWith("NDIS") Or Name.StartsWith("Logitech USB Input Device") Or
                     Name.StartsWith("Simple Device") Or InStr(Name, "Ethernet") Or Name.StartsWith("WD ") Or
-                    InStr(Name, "Composite Bus Enumerator") Or InStr(Name, "Turbo Boost") Or Name.StartsWith("RealTek") Or
+                    InStr(Name, "Composite Bus Enumerator") Or InStr(Name, "Turbo Boost") Or Name.StartsWith("Realtek") Or
                     Name.StartsWith("PCI-to-PCI") Or Name.StartsWith("Network Controller") Or Name.StartsWith("ATAPI ") Then
                 Else
                     Console.WriteLine(Name) ' looking for new cameras 
