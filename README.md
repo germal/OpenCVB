@@ -358,8 +358,8 @@ Visual Studio menu:
 -   “Tools/Python/Python Environments” – select “Packages” in the combo box then
     enter for “opencv-python” or “numpy” and select the package from the list.
 
-To check that all the necessary packages are installed, run the ‘BareBones.py’
-script.
+To check that all the necessary packages are installed, run the
+‘PythonPackages.py’ script.
 
 **Python Debugging**
 
