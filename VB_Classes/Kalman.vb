@@ -491,15 +491,15 @@ Public Class Kalman_Single : Implements IDisposable
             inputReal = ocvb.result1.Mean().Item(0)
         End If
 
-        Dim prediction = kf.Predict()
-        measurement.Set(Of Single)(0, 0, inputReal)
-        stateResult = kf.Correct(measurement).At(Of Single)(0, 0)
-        If externalUse = False Then
-            plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
-            plot.Run(ocvb)
-            ocvb.label1 = "Mean of the grayscale image is predicted"
-            ocvb.label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
-        End If
+        'Dim prediction = kf.Predict()
+        'measurement.Set(Of Single)(0, 0, inputReal)
+        'stateResult = kf.Correct(measurement).At(Of Single)(0, 0)
+        'If externalUse = False Then
+        '    plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
+        '    plot.Run(ocvb)
+        '    ocvb.label1 = "Mean of the grayscale image is predicted"
+        '    ocvb.label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
+        'End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         If plot IsNot Nothing Then plot.Dispose()

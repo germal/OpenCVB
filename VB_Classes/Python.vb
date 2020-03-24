@@ -18,7 +18,7 @@ Module Python_Module
 
         If packageFiles.Count = 0 Then
             ocvb.putText(New ActiveClass.TrueType("Python is present but the packages needed by this Python script are not present." + vbCrLf +
-                                                  "Use the Barebones.py script to show which imports are missing.'" + vbCrLf +
+                                                  "Use the PythonPackages.py script to show which imports are missing.'" + vbCrLf +
                                                   "Go to the Visual Studio menu 'Tools/Python/Python Environments'" + vbCrLf +
                                                   "Select 'Packages' in the combo box and search for packages required by this script.", 10, 60, RESULT1))
         End If
@@ -56,7 +56,7 @@ Public Class Python_Run : Implements IDisposable
     Dim pipe As PyStream_Basics = Nothing
     Dim tryCount As Int32
     Public Sub New(ocvb As AlgorithmData)
-        If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Barebones.py"
+        If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
         If pythonApp.Name.EndsWith("_PS.py") Then

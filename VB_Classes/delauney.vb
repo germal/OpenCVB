@@ -95,7 +95,7 @@ Public Class Delaunay_Basics : Implements IDisposable
             Dim fp = New cv.Point2f(ocvb.rng.uniform(0, rect.Width), ocvb.rng.uniform(0, rect.Height))
             locate_point(ocvb.result1, subdiv, fp, active_facet_color)
             subdiv.Insert(fp)
-            'draw_subdiv(ocvb.result1, subdiv, cv.scalar.white, ocvb.frameCount Mod 2)
+            draw_subdiv(ocvb.result1, subdiv, cv.Scalar.White, ocvb.frameCount Mod 2)
         Next
 
         paint_voronoi(ocvb, ocvb.result1, subdiv)

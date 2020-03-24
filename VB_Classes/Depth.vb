@@ -1138,13 +1138,17 @@ Public Class Depth_LocalMinMax_MT : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
+        Dim depth16 = ocvb.depth16
+        ' depth should not normally be resized but we do it here
+        If depth16.Width <> ocvb.color.Width Then depth16 = depth16.Resize(ocvb.color.Size())
 
-        Dim mask = ocvb.depth16.Threshold(1, 5000, cv.ThresholdTypes.Binary)
+        Dim mask = depth16.Threshold(1, 5000, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8UC1)
 
-        ocvb.color.CopyTo(ocvb.result1)
-        'ocvb.result1.SetTo(0, mask)
-        ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+        If externalUse = False Then
+            ocvb.color.CopyTo(ocvb.result1)
+            ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+        End If
 
         ReDim ptListX(grid.roiList.Count - 1)
         ReDim ptListY(grid.roiList.Count - 1)
@@ -1153,14 +1157,15 @@ Public Class Depth_LocalMinMax_MT : Implements IDisposable
             Dim roi = grid.roiList(i)
             Dim minVal As Double, maxVal As Double
             Dim minPt As cv.Point, maxPt As cv.Point
-            cv.Cv2.MinMaxLoc(ocvb.depth16(roi), minVal, maxVal, minPt, maxPt, mask(roi))
+            cv.Cv2.MinMaxLoc(depth16(roi), minVal, maxVal, minPt, maxPt, mask(roi))
             If minPt.X < 0 Or minPt.Y < 0 Then minPt = New cv.Point2f(0, 0)
             ptListX(i) = minPt.X + roi.X
             ptListY(i) = minPt.Y + roi.Y
 
-            cv.Cv2.Circle(ocvb.result1(roi), minPt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            'cv.Cv2.Circle(ocvb.result1(roi), maxPt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-            'ptList(i * 2 + 1) = New cv.Point2f(maxPt.X + roi.X, maxPt.Y + roi.Y)
+            If externalUse = False Then
+                cv.Cv2.Circle(ocvb.result1(roi), minPt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                cv.Cv2.Circle(ocvb.result1(roi), maxPt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            End If
         End Sub)
 
 
@@ -1215,6 +1220,9 @@ Public Class Depth_LocalMinMax_Kalman_MT : Implements IDisposable
         kalmanY.src = minmax.ptListY
         kalmanY.Run(ocvb)
 
+        ocvb.result1 = ocvb.color.Clone()
+        ocvb.result1.SetTo(cv.Scalar.White, minmax.grid.gridMask)
+
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
         For i = 0 To kalmanX.dst.Length - 1
             If kalmanX.dst(i) >= ocvb.color.Width Then kalmanX.dst(i) = ocvb.color.Width - 1
@@ -1222,6 +1230,9 @@ Public Class Depth_LocalMinMax_Kalman_MT : Implements IDisposable
             If kalmanY.dst(i) >= ocvb.color.Height Then kalmanY.dst(i) = ocvb.color.Height - 1
             If kalmanY.dst(i) < 0 Then kalmanY.dst(i) = 0
             subdiv.Insert(New cv.Point2f(kalmanX.dst(i), kalmanY.dst(i)))
+
+            ' just show the minimum (closest) point 
+            cv.Cv2.Circle(ocvb.result1, New cv.Point(kalmanX.dst(i), kalmanY.dst(i)), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
         paint_voronoi(ocvb, ocvb.result2, subdiv)
     End Sub

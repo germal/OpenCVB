@@ -78,6 +78,7 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
         Dim labelPtr = SuperPixel_GetLabels(spPtr)
         Marshal.Copy(labelPtr, labelData, 0, labelData.Length)
         Dim labels = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32S, labelData)
+        If numSuperPixels < 255 Then labels *= 255 / numSuperPixels
         labels.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

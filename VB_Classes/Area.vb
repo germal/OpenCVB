@@ -13,7 +13,6 @@ Public Class Area_MinTriangle_CPP : Implements IDisposable
     Public srcData() As Byte
     Public dstData() As Byte
     Public triangle As cv.Mat
-    Dim rng As New cv.RNG
     Private Sub setup(ocvb As AlgorithmData)
         numberOfPoints = sliders.TrackBar1.Value
         ReDim srcPoints(numberOfPoints)
@@ -34,8 +33,8 @@ Public Class Area_MinTriangle_CPP : Implements IDisposable
 
         ocvb.result1.SetTo(0)
         For i = 0 To srcPoints.Length - 1
-            srcPoints(i).X = rng.Uniform(ocvb.color.Width / 2 - squareWidth, ocvb.color.Width / 2 + squareWidth)
-            srcPoints(i).Y = rng.Uniform(ocvb.color.Height / 2 - squareWidth, ocvb.color.Height / 2 + squareWidth)
+            srcPoints(i).X = ocvb.ms_rng.Next(ocvb.color.Width / 2 - squareWidth, ocvb.color.Width / 2 + squareWidth)
+            srcPoints(i).Y = ocvb.ms_rng.Next(ocvb.color.Height / 2 - squareWidth, ocvb.color.Height / 2 + squareWidth)
             ocvb.result1.Circle(srcPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
@@ -67,7 +66,6 @@ Public Class Area_MinRect : Implements IDisposable
     Dim numberOfPoints As Int32
     Public srcPoints() As cv.Point2f
     Public minRect As cv.RotatedRect
-    Dim rng As New cv.RNG
     Private Sub setup(ocvb As AlgorithmData)
         numberOfPoints = sliders.TrackBar1.Value
         ReDim srcPoints(numberOfPoints)
@@ -86,8 +84,8 @@ Public Class Area_MinRect : Implements IDisposable
 
         ocvb.result1.SetTo(0)
         For i = 0 To srcPoints.Length - 1
-            srcPoints(i).X = rng.Uniform(ocvb.color.Width / 2 - squareWidth, ocvb.color.Width / 2 + squareWidth)
-            srcPoints(i).Y = rng.Uniform(ocvb.color.Height / 2 - squareWidth, ocvb.color.Height / 2 + squareWidth)
+            srcPoints(i).X = ocvb.ms_rng.Next(ocvb.color.Width / 2 - squareWidth, ocvb.color.Width / 2 + squareWidth)
+            srcPoints(i).Y = ocvb.ms_rng.Next(ocvb.color.Height / 2 - squareWidth, ocvb.color.Height / 2 + squareWidth)
             ocvb.result1.Circle(srcPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 

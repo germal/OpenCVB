@@ -197,39 +197,37 @@ Public Class Draw_Polygon : Implements IDisposable
         Dim h = ocvb.color.Height / 8
         Dim w = ocvb.color.Width / 8
         Dim polyColor = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
-        If ocvb.frameCount Mod updateFrequency = 0 Then
-            ocvb.result1.SetTo(cv.Scalar.White)
-            For i = 0 To sliders.TrackBar1.Value - 1
-                With ocvb.rng
-                    Dim points = New List(Of cv.Point)
-                    Dim listOfPoints = New List(Of List(Of cv.Point))
-                    For j = 0 To 10
-                        points.Add(New cv.Point(CInt(.uniform(w, w * 7)), CInt(.uniform(h, h * 7))))
-                    Next
-                    listOfPoints.Add(points)
-                    If radio.check(0).Checked Then
-                        cv.Cv2.Polylines(ocvb.result1, listOfPoints, True, polyColor, 2, cv.LineTypes.AntiAlias)
-                    Else
-                        ocvb.result1.FillPoly(listOfPoints, New cv.Scalar(0, 0, 255))
-                    End If
-
-                    Dim hull() As cv.Point
-                    hull = cv.Cv2.ConvexHull(points, True)
-                    listOfPoints = New List(Of List(Of cv.Point))
-                    points = New List(Of cv.Point)
-                    For j = 0 To hull.Count - 1
-                        points.Add(New cv.Point(hull(j).X, hull(j).Y))
-                    Next
-                    listOfPoints.Add(points)
-                    ocvb.result2.SetTo(cv.Scalar.White)
-                    If radio.check(0).Checked Then
-                        cv.Cv2.DrawContours(ocvb.result2, listOfPoints, 0, polyColor, 2)
-                    Else
-                        cv.Cv2.DrawContours(ocvb.result2, listOfPoints, 0, polyColor, -1)
-                    End If
-                End With
+        'If ocvb.frameCount Mod updateFrequency = 0 Then
+        ocvb.result1.SetTo(cv.Scalar.White)
+        For i = 0 To sliders.TrackBar1.Value - 1
+            Dim points = New List(Of cv.Point)
+            Dim listOfPoints = New List(Of List(Of cv.Point))
+            For j = 0 To 10
+                points.Add(New cv.Point(CInt(ocvb.ms_rng.Next(w, w * 7)), CInt(ocvb.ms_rng.Next(h, h * 7))))
             Next
-        End If
+            listOfPoints.Add(points)
+            If radio.check(0).Checked Then
+                cv.Cv2.Polylines(ocvb.result1, listOfPoints, True, polyColor, 2, cv.LineTypes.AntiAlias)
+            Else
+                ocvb.result1.FillPoly(listOfPoints, New cv.Scalar(0, 0, 255))
+            End If
+
+            Dim hull() As cv.Point
+            hull = cv.Cv2.ConvexHull(points, True)
+            listOfPoints = New List(Of List(Of cv.Point))
+            points = New List(Of cv.Point)
+            For j = 0 To hull.Count - 1
+                points.Add(New cv.Point(hull(j).X, hull(j).Y))
+            Next
+            listOfPoints.Add(points)
+            ocvb.result2.SetTo(cv.Scalar.White)
+            If radio.check(0).Checked Then
+                cv.Cv2.DrawContours(ocvb.result2, listOfPoints, 0, polyColor, 2)
+            Else
+                cv.Cv2.DrawContours(ocvb.result2, listOfPoints, 0, polyColor, -1)
+            End If
+        Next
+        'End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
