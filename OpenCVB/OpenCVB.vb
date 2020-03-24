@@ -309,6 +309,7 @@ Public Class OpenCVB
                     Dim fontSize = If(resizeForDisplay = 4, 6, 10)
                     g.DrawString(picLabels(pic.Tag), New Font("Microsoft Sans Serif", fontSize), New SolidBrush(black), 0, 0)
                 End If
+                AlgorithmDesc.Text = textDesc
             End SyncLock
         Catch ex As Exception
             Console.WriteLine("Paint exception occurred: " + ex.Message)
@@ -704,7 +705,6 @@ Public Class OpenCVB
         Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " +
                   optionsForm.cameraRadioButton(optionsForm.cameraIndex).Text + "/Algorithm FPS " + Format(cameraFPS, "#0.0") +
                   "/" + Format(fps, "#0.0")
-        If AlgorithmDesc.Text = "" Then AlgorithmDesc.Text = textDesc
     End Sub
     Private Sub saveLayout()
         SaveSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
@@ -872,7 +872,6 @@ Public Class OpenCVB
         parms.height = regHeight / parms.speedFactor
         If parms.lowResolution Then parms.imageToTrueTypeLoc *= parms.speedFactor
 
-        AlgorithmDesc.Text = ""
         PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
 
         stopAlgorithmThread = False
@@ -917,6 +916,9 @@ Public Class OpenCVB
         Dim saveLowResSetting As Boolean = parms.lowResolution
         Dim OpenCVB = New VB_Classes.ActiveClass(parms)
         textDesc = OpenCVB.ocvb.desc
+
+        Console.WriteLine("textDesc = " + textDesc) ' Debugging a label problem...
+
         ' some algorithms need to turn off the lowResolution (OpenGL apps run at full resolution.)  
         ' Here we check to see if the algorithm constructor changed lowResolution.
         If OpenCVB.ocvb.parms.lowResolution <> saveLowResSetting Then

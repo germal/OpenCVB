@@ -17,7 +17,7 @@ Public Class Polylines_IEnumerableExample : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim points = Enumerable.Range(0, sliders.TrackBar1.Value).Select(Of cv.Point)(
             Function(i)
-                Return New cv.Point(CInt(ocvb.rng.uniform(0, ocvb.color.Width)), CInt(ocvb.rng.uniform(0, ocvb.color.Height)))
+                Return New cv.Point(CInt(ocvb.ms_rng.next(0, ocvb.color.Width)), CInt(ocvb.ms_rng.next(0, ocvb.color.Height)))
             End Function).ToList
         Dim pts As New List(Of List(Of cv.Point))
         pts.Add(points)

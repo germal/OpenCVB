@@ -28,8 +28,8 @@ Public Class OilPaint_Pointilism : Implements IDisposable
             Dim nPt As New cv.Point
             For y = 0 To randomMask.Height - 1
                 For x = 0 To randomMask.Width - 1
-                    nPt.X = (ocvb.rng.uniform(-1, 1) + x) Mod (randomMask.Width - 1)
-                    nPt.Y = (ocvb.rng.uniform(-1, 1) + y) Mod (randomMask.Height - 1)
+                    nPt.X = (ocvb.ms_rng.next(-1, 1) + x) Mod (randomMask.Width - 1)
+                    nPt.Y = (ocvb.ms_rng.next(-1, 1) + y) Mod (randomMask.Height - 1)
                     If nPt.X < 0 Then nPt.X = 0
                     If nPt.Y < 0 Then nPt.Y = 0
                     randomMask.Set(Of cv.Point)(y, x, nPt)

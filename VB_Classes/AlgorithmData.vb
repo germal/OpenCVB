@@ -35,7 +35,6 @@ Public Class AlgorithmData
     Public rightView As cv.Mat
     Public result1 As New cv.Mat
     Public result2 As New cv.Mat
-    Public rng = New cv.RNG()
     Public TTtextData(3) As List(Of ActiveClass.TrueType)
 
     Dim autoRand As New Random()
@@ -51,10 +50,9 @@ Public Class AlgorithmData
         result2 = New cv.Mat(parms.height, parms.width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         label1 = ""
         label2 = ""
-        rng = New cv.RNG(autoRand.Next(0, 1000))
         ms_rng = New System.Random
         For i = 0 To rColors.Length - 1
-            rColors(i) = New cv.Vec3b(rng.uniform(100, 255), rng.uniform(100, 255), rng.uniform(100, 255))
+            rColors(i) = New cv.Vec3b(ms_rng.Next(100, 255), ms_rng.Next(100, 255), ms_rng.Next(100, 255))
             colorScalar(i) = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)
         Next
         For i = 0 To TTtextData.Count - 1

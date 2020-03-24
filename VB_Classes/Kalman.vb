@@ -82,28 +82,10 @@ End Class
 
 ' http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
 Public Class Kalman_Compare : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public inputReal As New cv.Point3f
-    Public lastStatePoint As New cv.Point3f
-    Public statePoint As New cv.Point3f
-    Public ProcessNoiseCov = cv.Scalar.All(1 / 10000)
-    Public MeasurementNoiseCov = cv.Scalar.All(10 / 100)
-    Public ErrorCovPost = cv.Scalar.All(1)
-    Public prediction As cv.Mat
-
-    Public externalUse As Boolean
-    Public restartRequested As Boolean
-
-    Public kf As cv.KalmanFilter
-    Public measurement As New cv.Mat(3, 1, cv.MatType.CV_32F, 0)
+    Dim kalman() As Kalman_Single
     Public plot As Plot_OverTime
     Public kPlot As Plot_OverTime
     Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "ProcessNoiseCov x10000", 1, 1000, 100)
-        sliders.setupTrackBar2(ocvb, "MeasurementNoiseCov", 1, 100, 10)
-        sliders.setupTrackBar3(ocvb, "ErrorCovPost x100", 1, 100, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
         plot = New Plot_OverTime(ocvb)
         plot.externalUse = True
         plot.dst = ocvb.result1
@@ -121,56 +103,41 @@ Public Class Kalman_Compare : Implements IDisposable
         ocvb.desc = "Use this kalman filter to predict the next value."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount = 0 Or restartRequested Then
-            restartRequested = False
-            kf = New cv.KalmanFilter(6, 3, 0)
-#If opencvsharpOld Then
-            kf.TransitionMatrix.SetArray(0, 0, New Single() {1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1})
-            kf.StatePre.SetArray(0, 0, New Single() {0, 0, 0, 0})
-#Else
-            kf.TransitionMatrix = New cv.Mat(16, 1, cv.MatType.CV_32F, New Single() {1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1})
-            kf.StatePre = New cv.Mat(4, 1, cv.MatType.CV_32F, New Single() {0, 0, 0, 0})
-#End If
-            cv.Cv2.SetIdentity(kf.MeasurementMatrix)
-            cv.Cv2.SetIdentity(kf.ProcessNoiseCov, ProcessNoiseCov)
-            cv.Cv2.SetIdentity(kf.MeasurementNoiseCov, MeasurementNoiseCov)
-            cv.Cv2.SetIdentity(kf.ErrorCovPost, ErrorCovPost)
-        End If
-
-        If externalUse = False Then
-            ' if either one has triggered a reset for the scale, do them both...
-            If kPlot.offChartCount >= kPlot.plotTriggerRescale Or plot.offChartCount >= plot.plotTriggerRescale Then
-                kPlot.offChartCount = kPlot.plotTriggerRescale + 1
-                plot.offChartCount = plot.plotTriggerRescale + 1
+        If ocvb.frameCount = 0 Then
+            If kalman IsNot Nothing Then
+                If kalman.Count > 0 Then
+                    For i = 0 To kalman.Count - 1
+                        kalman(i).Dispose()
+                    Next
+                End If
             End If
-
-            plot.plotData = ocvb.color.Mean()
-            plot.Run(ocvb)
-            inputReal.X = plot.plotData.Item(0)
-            inputReal.Y = plot.plotData.Item(1)
-            inputReal.Z = plot.plotData.Item(2)
-        End If
-        ProcessNoiseCov = cv.Scalar.All(sliders.TrackBar1.Value / 10000)
-        MeasurementNoiseCov = cv.Scalar.All(sliders.TrackBar2.Value)
-        ErrorCovPost = cv.Scalar.All(sliders.TrackBar3.Value / 100)
-
-        prediction = kf.Predict()
-        measurement.Set(Of Single)(0, 0, inputReal.X)
-        measurement.Set(Of Single)(0, 1, inputReal.Y)
-        measurement.Set(Of Single)(0, 2, inputReal.Z)
-        Dim estimated = kf.Correct(measurement)
-        statePoint = New cv.Point3f(estimated.At(Of Single)(0), estimated.At(Of Single)(1), estimated.At(Of Single)(2))
-        If externalUse = False Then
-            kPlot.maxScale = plot.maxScale ' keep the scale the same for the side-by-side plots.
-            kPlot.minScale = plot.minScale
-            kPlot.plotData = New cv.Scalar(statePoint.X, statePoint.Y, statePoint.Z)
-            kPlot.Run(ocvb)
+            ReDim kalman(3 - 1)
+            For i = 0 To kalman.Count - 1
+                kalman(i) = New Kalman_Single(ocvb)
+                kalman(i).externalUse = True
+            Next
         End If
 
-        lastStatePoint = statePoint
+        ' if either one has triggered a reset for the scale, do them both...
+        If kPlot.offChartCount >= kPlot.plotTriggerRescale Or plot.offChartCount >= plot.plotTriggerRescale Then
+            kPlot.offChartCount = kPlot.plotTriggerRescale + 1
+            plot.offChartCount = plot.plotTriggerRescale + 1
+        End If
+
+        plot.plotData = ocvb.color.Mean()
+        plot.Run(ocvb)
+
+        For i = 0 To kalman.Count - 1
+            kalman(i).inputReal = plot.plotData.Item(i)
+            kalman(i).Run(ocvb)
+        Next
+
+        kPlot.maxScale = plot.maxScale ' keep the scale the same for the side-by-side plots.
+        kPlot.minScale = plot.minScale
+        kPlot.plotData = New cv.Scalar(kalman(0).stateResult, kalman(1).stateResult, kalman(2).stateResult)
+        kPlot.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
         plot.Dispose()
         kPlot.Dispose()
     End Sub
@@ -199,11 +166,7 @@ Public Class Kalman_RotatingPoint : Implements IDisposable
         ocvb.label1 = "Estimate Yellow < Real Red (if working)"
 
         cv.Cv2.Randn(kState, New cv.Scalar(0), cv.Scalar.All(0.1))
-#If opencvsharpOld Then
-        kf.TransitionMatrix.SetArray(0, 0, New Single() {1, 1, 0, 1}.ToArray)
-#Else
-        kf.TransitionMatrix = New cv.Mat(4, 1, cv.MatType.CV_32F, New Single() {1, 1, 0, 1})
-#End If
+        kf.TransitionMatrix = New cv.Mat(2, 2, cv.MatType.CV_32F, New Single() {1, 1, 0, 1})
 
         cv.Cv2.SetIdentity(kf.MeasurementMatrix)
         cv.Cv2.SetIdentity(kf.ProcessNoiseCov, cv.Scalar.All(0.00001))
@@ -465,15 +428,13 @@ Public Class Kalman_Single : Implements IDisposable
     Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
     Public newTransmissionMatrix As Boolean = True
     Public Sub New(ocvb As AlgorithmData)
-#If opencvsharpOld Then
-        kf.TransitionMatrix.SetArray(0, 0, New Single() {1, 1, 0, 1}.ToArray)
-#Else
-        kf.TransitionMatrix = New cv.Mat(4, 1, cv.MatType.CV_32F, New Single() {1, 1, 0, 1})
-#End If
-        cv.Cv2.SetIdentity(kf.MeasurementMatrix)
-        cv.Cv2.SetIdentity(kf.ProcessNoiseCov, cv.Scalar.All(0.00001))
-        cv.Cv2.SetIdentity(kf.MeasurementNoiseCov, cv.Scalar.All(0.1))
-        cv.Cv2.SetIdentity(kf.ErrorCovPost, cv.Scalar.All(1))
+        Dim tMatrix() As Single = {1, 1, 0, 1}
+        kf.TransitionMatrix = New cv.Mat(2, 2, cv.MatType.CV_32F, tMatrix)
+        kf.MeasurementMatrix.SetIdentity(1)
+        kf.ProcessNoiseCov.SetIdentity(0.00001)
+        kf.MeasurementNoiseCov.SetIdentity(0.1)
+        kf.ErrorCovPost.SetIdentity(1)
+
         ocvb.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -491,15 +452,15 @@ Public Class Kalman_Single : Implements IDisposable
             inputReal = ocvb.result1.Mean().Item(0)
         End If
 
-        'Dim prediction = kf.Predict()
-        'measurement.Set(Of Single)(0, 0, inputReal)
-        'stateResult = kf.Correct(measurement).At(Of Single)(0, 0)
-        'If externalUse = False Then
-        '    plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
-        '    plot.Run(ocvb)
-        '    ocvb.label1 = "Mean of the grayscale image is predicted"
-        '    ocvb.label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
-        'End If
+        Dim prediction = kf.Predict()
+        measurement.Set(Of Single)(0, 0, inputReal)
+        stateResult = kf.Correct(measurement).At(Of Single)(0, 0)
+        If externalUse = False Then
+            plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
+            plot.Run(ocvb)
+            ocvb.label1 = "Mean of the grayscale image is predicted"
+            ocvb.label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         If plot IsNot Nothing Then plot.Dispose()

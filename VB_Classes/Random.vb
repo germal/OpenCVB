@@ -24,8 +24,8 @@ Public Class Random_Points : Implements IDisposable
         End If
         If externalUse = False Then ocvb.result1.SetTo(0)
         For i = 0 To Points.Length - 1
-            Dim x = ocvb.rng.uniform(rangeRect.X, rangeRect.X + rangeRect.Width)
-            Dim y = ocvb.rng.uniform(rangeRect.Y, rangeRect.Y + rangeRect.Height)
+            Dim x = ocvb.ms_rng.next(rangeRect.X, rangeRect.X + rangeRect.Width)
+            Dim y = ocvb.ms_rng.next(rangeRect.Y, rangeRect.Y + rangeRect.Height)
             Points(i) = New cv.Point2f(x, y)
             Points2f(i) = New cv.Point2f(x, y)
             If externalUse = False Then cv.Cv2.Circle(ocvb.result1, Points(i), 3, cv.Scalar.Gray, -1, cv.LineTypes.AntiAlias, 0)

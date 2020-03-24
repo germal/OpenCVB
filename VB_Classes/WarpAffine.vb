@@ -74,7 +74,7 @@ Public Class WarpAffine_Captcha : Implements IDisposable
         For i = 0 To captchaLength - 1
             Dim charImage = New cv.Mat(charHeight, charWidth, cv.MatType.CV_8UC3, cv.Scalar.White)
             Dim c = characters(rng.Next(0, characters.Length - 1))
-            cv.Cv2.PutText(charImage, c, New cv.Point(10, charHeight - 10), ocvb.rng.uniform(1, 6), ocvb.rng.uniform(3, 4), ocvb.rColors(i), ocvb.rng.uniform(1, 5),
+            cv.Cv2.PutText(charImage, c, New cv.Point(10, charHeight - 10), ocvb.ms_rng.next(1, 6), ocvb.ms_rng.next(3, 4), ocvb.rColors(i), ocvb.ms_rng.next(1, 5),
                            cv.LineTypes.AntiAlias)
             transform(charImage)
             rotate(charImage, charImage)

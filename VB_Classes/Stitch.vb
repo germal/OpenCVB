@@ -19,8 +19,8 @@ Public Class Stitch_Basics : Implements IDisposable
         If externalUse = False Then src = ocvb.color.Clone()
         ocvb.result1 = src.Clone()
         For i = 0 To imageCount - 1
-            Dim x1 = CInt(ocvb.rng.uniform(0, src.Width - width))
-            Dim x2 = CInt(ocvb.rng.uniform(0, src.Height - height))
+            Dim x1 = CInt(ocvb.ms_rng.next(0, src.Width - width))
+            Dim x2 = CInt(ocvb.ms_rng.next(0, src.Height - height))
             Dim rect = New cv.Rect(x1, x2, width, height)
             ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
             mats.Add(src(rect).Clone())

@@ -17,8 +17,8 @@ Public Class QRcode_Basics : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim input = ocvb.color.Clone()
-        Dim x = ocvb.rng.uniform(0, input.Width - Math.Max(qrInput1.Width, qrInput2.Width))
-        Dim y = ocvb.rng.uniform(0, input.Height - Math.Max(qrInput1.Height, qrInput2.Height))
+        Dim x = ocvb.ms_rng.next(0, input.Width - Math.Max(qrInput1.Width, qrInput2.Width))
+        Dim y = ocvb.ms_rng.next(0, input.Height - Math.Max(qrInput1.Height, qrInput2.Height))
         If CInt(ocvb.frameCount / 50) Mod 2 = 0 Then
             Dim roi = New cv.Rect(x, y, qrInput1.Width, qrInput1.Height)
             input(roi) = qrInput1

@@ -72,8 +72,8 @@ Public Class SVM_Basics : Implements IDisposable
         Dim points(svmOptions.sliders.TrackBar1.Value) As cv.Point2f
         Dim responses(points.Length - 1) As Int32
         For i = 0 To points.Length - 1
-            Dim x = ocvb.rng.uniform(0, ocvb.color.Height - 1)
-            Dim y = ocvb.rng.uniform(0, ocvb.color.Height - 1)
+            Dim x = ocvb.ms_rng.next(0, ocvb.color.Height - 1)
+            Dim y = ocvb.ms_rng.next(0, ocvb.color.Height - 1)
             points(i) = New cv.Point2f(x, y)
             responses(i) = If(y > f(x), 1, 2)
         Next
@@ -160,8 +160,8 @@ Public Class SVM_Basics_MT : Implements IDisposable
         Dim points(svmOptions.sliders.TrackBar1.Value) As cv.Point2f
         Dim responses(points.Length - 1) As Int32
         For i = 0 To points.Length - 1
-            Dim x = ocvb.rng.uniform(0, ocvb.color.Height - 1)
-            Dim y = ocvb.rng.uniform(0, ocvb.color.Height - 1)
+            Dim x = ocvb.ms_rng.next(0, ocvb.color.Height - 1)
+            Dim y = ocvb.ms_rng.next(0, ocvb.color.Height - 1)
             points(i) = New cv.Point2f(x, y)
             responses(i) = If(y > f(x), 1, 2)
         Next
@@ -246,9 +246,9 @@ Public Class SVM_Simple : Implements IDisposable
         Dim trainData As New cv.Mat(dataSize, 2, cv.MatType.CV_32F)
         Dim labels = New cv.Mat(dataSize, 1, cv.MatType.CV_32S)
         For i = 0 To dataSize
-            labels.Set(Of Int32)(i, 0, ocvb.rng.uniform(-1, 1))
-            trainData.Set(Of Single)(i, 0, CSng(ocvb.rng.uniform(0, ocvb.color.Width - 1)))
-            trainData.Set(Of Single)(i, 1, CSng(ocvb.rng.uniform(0, ocvb.color.Height - 1)))
+            labels.Set(Of Int32)(i, 0, ocvb.ms_rng.next(-1, 1))
+            trainData.Set(Of Single)(i, 0, CSng(ocvb.ms_rng.next(0, ocvb.color.Width - 1)))
+            trainData.Set(Of Single)(i, 1, CSng(ocvb.ms_rng.next(0, ocvb.color.Height - 1)))
         Next
         ' make sure that there always 2 classes present.
         labels.Set(Of Single)(0, 0, -1)

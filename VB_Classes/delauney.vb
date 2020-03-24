@@ -92,7 +92,7 @@ Public Class Delaunay_Basics : Implements IDisposable
         Dim subdiv As New cv.Subdiv2D(rect)
 
         For i = 0 To 100
-            Dim fp = New cv.Point2f(ocvb.rng.uniform(0, rect.Width), ocvb.rng.uniform(0, rect.Height))
+            Dim fp = New cv.Point2f(ocvb.ms_rng.Next(0, rect.Width), ocvb.ms_rng.Next(0, rect.Height))
             locate_point(ocvb.result1, subdiv, fp, active_facet_color)
             subdiv.Insert(fp)
             draw_subdiv(ocvb.result1, subdiv, cv.Scalar.White, ocvb.frameCount Mod 2)

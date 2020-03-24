@@ -23,7 +23,7 @@ Public Class knn_Basics : Implements IDisposable
 
         Dim queryPoints(sliders.TrackBar1.Value) As cv.Point2f
         For i = 0 To queryPoints.Length - 1
-            queryPoints(i) = New cv.Point2f(ocvb.rng.uniform(0, ocvb.result1.Cols), ocvb.rng.uniform(0, ocvb.result1.Rows))
+            queryPoints(i) = New cv.Point2f(ocvb.ms_rng.Next(0, ocvb.result1.Cols), ocvb.ms_rng.Next(0, ocvb.result1.Rows))
         Next
 
         Dim bluePoints = sliders.TrackBar2.Value
@@ -184,11 +184,11 @@ Public Class knn_Point2d : Implements IDisposable
             ReDim lastSet(sliders.TrackBar1.Value - 1)
             ReDim querySet(sliders.TrackBar1.Value - 1)
             For i = 0 To lastSet.Count - 1
-                lastSet(i) = New cv.Point2f(ocvb.rng.uniform(0, ocvb.result1.Cols), ocvb.rng.uniform(0, ocvb.result1.Rows))
+                lastSet(i) = New cv.Point2f(ocvb.ms_rng.Next(0, ocvb.result1.Cols), ocvb.ms_rng.Next(0, ocvb.result1.Rows))
             Next
 
             For i = 0 To querySet.Count - 1
-                querySet(i) = New cv.Point2f(ocvb.rng.uniform(0, ocvb.result1.Cols), ocvb.rng.uniform(0, ocvb.result1.Rows))
+                querySet(i) = New cv.Point2f(ocvb.ms_rng.Next(0, ocvb.result1.Cols), ocvb.ms_rng.Next(0, ocvb.result1.Rows))
             Next
             ocvb.result1.SetTo(0)
         End If
@@ -257,11 +257,11 @@ Public Class knn_Point3d : Implements IDisposable
             ReDim lastSet(sliders.TrackBar1.Value - 1)
             ReDim querySet(lastSet.Count - 1)
             For i = 0 To lastSet.Count - 1
-                lastSet(i) = New cv.Point3f(ocvb.rng.uniform(0, ocvb.result1.Cols), ocvb.rng.uniform(0, ocvb.result1.Rows), ocvb.rng.uniform(0, maxDepth))
+                lastSet(i) = New cv.Point3f(ocvb.ms_rng.Next(0, ocvb.result1.Cols), ocvb.ms_rng.Next(0, ocvb.result1.Rows), ocvb.ms_rng.Next(0, maxDepth))
             Next
 
             For i = 0 To querySet.Count - 1
-                querySet(i) = New cv.Point3f(ocvb.rng.uniform(0, ocvb.result1.Cols), ocvb.rng.uniform(0, ocvb.result1.Rows), ocvb.rng.uniform(0, maxDepth))
+                querySet(i) = New cv.Point3f(ocvb.ms_rng.Next(0, ocvb.result1.Cols), ocvb.ms_rng.Next(0, ocvb.result1.Rows), ocvb.ms_rng.Next(0, maxDepth))
             Next
 
             ocvb.result1.SetTo(0)

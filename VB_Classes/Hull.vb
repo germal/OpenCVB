@@ -42,7 +42,7 @@ Public Class Hull_Basics : Implements IDisposable
         Dim w = ocvb.color.Width - ocvb.color.Width / pad
         Dim h = ocvb.color.Height - ocvb.color.Height / pad
         For i = 0 To Count - 1
-            points(i) = New cv.Point2f(ocvb.rng.uniform(ocvb.color.Width / pad, w), ocvb.rng.uniform(ocvb.color.Height / pad, h))
+            points(i) = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Width / pad, w), ocvb.ms_rng.Next(ocvb.color.Height / pad, h))
         Next
         hull = cv.Cv2.ConvexHull(points, True)
 

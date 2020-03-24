@@ -566,7 +566,7 @@ Public Class Histogram_Depth : Implements IDisposable
         plotHist.externalUse = True
 
         inrange = New Depth_InRange(ocvb)
-        sliders.setupTrackBar1(ocvb, "Histogram Depth Bins", 1, ocvb.color.Width * 2, 10) ' max is the number of columns * 2 
+        sliders.setupTrackBar1(ocvb, "Histogram Depth Bins", 1, ocvb.color.Width * 2, 50) ' max is the number of columns * 2 
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Show depth data as a histogram."
