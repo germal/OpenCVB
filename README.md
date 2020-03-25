@@ -222,19 +222,18 @@ all the algorithms that use the OpenCV “Threshold” API.
 
 ![](media/4586d56c7a17e4e113da812370ffc437.png)
 
-*In the image above, the Algorithm Combo Box contains only those algorithms that
-use the OpenCV Threshold API – specified in the “Subset Combo Box”. The
-“CartoonifyImage_Basics” algorithm is just one of the algorithms using the
-OpenCV Threshold API.*
+*In the image above, the subset is “\<All\>” has been selected and the complete
+list of algorithms will appear in the combo box on the left. If the subset
+selected was “Threshold”, only those algorithms using the OpenCV threshold API
+would appear in the combo box on the left.*
 
 The ability to create subsets from the hundreds of algorithms makes it easier to
 study examples of an OpenCV API or OpenCVB algorithm usage. All the OpenCV API’s
-that are used and all the OpenCVB algorithms are listed in the “Subset Combo
-Box”. In addition to all the OpenCV API’s and OpenCVB algorithms, several
+that are used and all the OpenCVB algorithms are available in the list of
+subsets. In addition to all the OpenCV API’s and OpenCVB algorithms, several
 higher-level groupings are available. For instance, selecting “\<OpenGL\>” will
 select only the algorithms that use OpenGL. The “\<All\>” entry in the Subset
-Combo Box will restore the complete list of algorithms in the Algorithm Combo
-Box.
+Combo Box will restore the complete list of algorithms.
 
 **Why VB.Net?**
 
