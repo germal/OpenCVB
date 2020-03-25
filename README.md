@@ -220,11 +220,7 @@ algorithm names and all the OpenCV API’s referenced. For instance, selecting
 “Threshold” in the Subset Combo Box, will update the Algorithm Combo Box with
 all the algorithms that use the OpenCV “Threshold” API.
 
-List of algorithms in this subset
-
-Specify the subset of algorithms here
-
-![](media/ccdf2afd0fae5655ba4ac5fbba499d01.png)
+![](media/4586d56c7a17e4e113da812370ffc437.png)
 
 *In the image above, the Algorithm Combo Box contains only those algorithms that
 use the OpenCV Threshold API – specified in the “Subset Combo Box”. The
