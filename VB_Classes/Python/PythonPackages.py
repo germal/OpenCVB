@@ -52,4 +52,4 @@ if warningMsg:
     Mbox('Barebones', 'Needed packages are not present.  Review console log.', 1)
 else:
     Mbox('Barebones', 'Python is present and all the necessary packages appear to be installed.', 1)
-cv2.waitKey(10000)
+cv2.waitKey(3000)
