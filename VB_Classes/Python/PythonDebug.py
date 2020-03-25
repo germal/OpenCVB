@@ -2,49 +2,49 @@ import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
-title_window = 'BareBones.py'
+title_window = 'PythonPackages.py'
 
 print("Checking the packages used by the OpenCVB Python scripts.")
 warningMsg = False
 try:
     import numpy
-except ImportError:
-    print('You need to install numpy.')
+except ImportError as err:
+    print('You need to install numpy.', err)
     warningMsg = True
 
 try:
     import cv2
-except ImportError:
-    print('You need to install opencv-python and opencv-contrib-python.')
+except ImportError as err:
+    print('You need to install opencv-python and opencv-contrib-python.', err)
     warningMsg = True
 
 try:
     import sklearn
-except ImportError:
-    print('You need to install scikit-learn.')
+except ImportError as err:
+    print('You need to install scikit-learn.', err)
     warningMsg = True
 
 try:
     import matplotlib.pyplot as plt
-except ImportError:
-    print('You need to install matplotlib.')
+except ImportError as err:
+    print('You need to install matplotlib.', err)
     warningMsg = True
 
 try:
-    from OpenGL.GL import *
-except ImportError:
-    print('You need to install matplotlib.')
+    import OpenGL
+except ImportError as err:
+    print('You need to install PyOpenGL.', err)
     warningMsg = True
-
+    
 try:
-    import pygame
-except ImportError:
-    print('You need to install Pygame.')
+    import Pygame
+except ImportError as err:
+    print('You need to install Pygame.', err)
     warningMsg = True
 
 try:
     from cv2_rolling_ball import subtract_background_rolling_ball
-except ImportError:
+except ImportError as err:
     print('You need to install opencv-rolling-ball.')
     warningMsg = True
 

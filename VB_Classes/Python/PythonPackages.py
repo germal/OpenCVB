@@ -31,6 +31,12 @@ except ImportError as err:
     warningMsg = True
 
 try:
+    import OpenGL
+except ImportError as err:
+    print('You need to install PyOpenGL.', err)
+    warningMsg = True
+    
+try:
     import pygame
 except ImportError as err:
     print('You need to install Pygame.', err)
@@ -45,5 +51,5 @@ except ImportError as err:
 if warningMsg:
     Mbox('Barebones', 'Needed packages are not present.  Review console log.', 1)
 else:
-    Mbox('Barebones', 'Python is present and all the necessary packages appear to be present.', 1)
+    Mbox('Barebones', 'Python is present and all the necessary packages appear to be installed.', 1)
 cv2.waitKey(10000)
