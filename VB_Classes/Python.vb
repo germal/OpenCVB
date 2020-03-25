@@ -29,6 +29,11 @@ Module Python_Module
         If checkPythonPackage(ocvb, "numpy") = False Or checkPythonPackage(ocvb, "cv2") = False Then Return False
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
+        For Each p In Process.GetProcesses
+            If p.ProcessName.ToUpper.Contains("PYTHON") Then
+                Console.WriteLine(p.ProcessName)
+            End If
+        Next
         If pythonApp.Exists Then
             Dim p As New Process
             p.StartInfo.FileName = ocvb.PythonExe

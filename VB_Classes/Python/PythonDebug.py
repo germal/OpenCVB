@@ -37,7 +37,7 @@ except ImportError as err:
     warningMsg = True
     
 try:
-    import Pygame
+    import pygame
 except ImportError as err:
     print('You need to install Pygame.', err)
     warningMsg = True
@@ -52,4 +52,4 @@ if warningMsg:
     Mbox('Barebones', 'Needed packages are not present.  Review console log.', 1)
 else:
     Mbox('Barebones', 'Python is present and all the necessary packages appear to be present.', 1)
-cv2.waitKey(10000)
+cv2.waitKey(100000)
