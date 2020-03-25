@@ -41,6 +41,9 @@ Module T265_Module_CPP
     Public Function T265PoseData(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265Disparity(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265IMUTimeStamp(tp As IntPtr) As Double
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -142,6 +145,8 @@ Public Class CameraT265Native
 
             RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265RGBDepth(cPtr)).Clone()
             depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, T265Depth16(cPtr)).Clone()
+            Dim disparity32f = New cv.Mat(30, 30, cv.MatType.CV_32F, T265Disparity(cPtr)).Clone()
+
             pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, 0) ' no point cloud for T265 - just provide it for compatibility.
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End SyncLock
