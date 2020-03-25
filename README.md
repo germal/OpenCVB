@@ -344,10 +344,10 @@ algorithm Python_RGBDepth is the companion for the Depth_RGB_PS.py script (the
 images to the Python script. See Algorithm subset “\<PyStream\>”.)
 
 Python scripts show up in the list of algorithms in the OpenCVB user interface
-and each Python script will be run when performing a “Test All” regression. To
-change which version of Python is used, open the “Options” dialog and in the
-“Python” section, there is a browse button to select any Python.exe available on
-the system.
+and each Python script will be run when performing a regression tests. To change
+which version of Python is used, open the “Options” dialog and in the “Python”
+section, there is a browse button to select any Python.exe available on the
+system.
 
 **Python Packages**
 

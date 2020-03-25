@@ -62,7 +62,7 @@ End Class
 
 Module Palette_Custom_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst As IntPtr, rows As Int32, cols As Int32)
+    Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst As IntPtr, rows As Int32, cols As Int32, channels As Int32)
     End Sub
     Public mapNames() As String = {"Autumn", "Bone", "Cool", "Hot", "Hsv", "Jet", "Ocean", "Pink", "Rainbow", "Spring", "Summer", "Winter", "Parula", "Magma", "Inferno", "Viridis", "Cividis", "Twilight", "Twilight_Shifted", "Random", "None"}
     Public Function Palette_ApplyCustom(src As cv.Mat, customColorMap As cv.Mat) As cv.Mat
@@ -75,10 +75,11 @@ Module Palette_Custom_Module
         Dim handleMap = GCHandle.Alloc(mapData, GCHandleType.Pinned)
         Marshal.Copy(customColorMap.Data, mapData, 0, mapData.Length)
 
-        Dim dstData(src.Total * src.ElemSize - 1) As Byte
+        Dim dstData(src.Total * 3 - 1) As Byte ' it always comes back in color...
         Dim handleDst = GCHandle.Alloc(dstData, GCHandleType.Pinned)
 
-        Palette_Custom(handleSrc.AddrOfPinnedObject, handleMap.AddrOfPinnedObject, handleDst.AddrOfPinnedObject, src.Rows, src.Cols)
+        ' the custom colormap API is not implemented for custom color maps.  Only colormapTypes can be provided.
+        Palette_Custom(handleSrc.AddrOfPinnedObject, handleMap.AddrOfPinnedObject, handleDst.AddrOfPinnedObject, src.Rows, src.Cols, src.Channels)
 
         Dim dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         Marshal.Copy(dstData, 0, dst.Data, dstData.Length)
@@ -410,15 +411,17 @@ Public Class Palette_DepthColorMap : Implements IDisposable
         ocvb.desc = "Build a colormap that best shows the depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim color1 = cv.Scalar.Yellow
-        Dim color2 = cv.Scalar.Red
-        Dim color3 = cv.Scalar.Blue
-        Dim gradMat As New cv.Mat
-        gradMat = colorTransition(color1, color2, ocvb.color.Width)
-        gradientColorMap = gradMat
-        gradMat = colorTransition(color3, color1, ocvb.color.Width)
-        cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
-        gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
+        If ocvb.frameCount = 0 Then
+            Dim color1 = cv.Scalar.Yellow
+            Dim color2 = cv.Scalar.Red
+            Dim color3 = cv.Scalar.Blue
+            Dim gradMat As New cv.Mat
+            gradMat = colorTransition(color1, color2, ocvb.color.Width)
+            gradientColorMap = gradMat
+            gradMat = colorTransition(color3, color1, ocvb.color.Width)
+            cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
+            gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
+        End If
         ocvb.result1 = Palette_ApplyCustom(ocvb.color, gradientColorMap)
 
         Dim r As New cv.Rect(100, 0, 255, 1)
@@ -426,6 +429,28 @@ Public Class Palette_DepthColorMap : Implements IDisposable
             r.Y = i
             ocvb.result2(r) = gradientColorMap
         Next
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class
+
+
+
+
+
+Public Class Palette_DepthColorMapJet : Implements IDisposable
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.desc = "Modify the Jet colormap for use as a depth colormap.  NOTE: custom color maps need to use C++ ApplyColorMap."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static colormap As New cv.Mat()
+        If ocvb.frameCount = 0 Then
+            Dim mapFile = New FileInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps/colorscale_Jet.jpg")
+            colormap = cv.Cv2.ImRead(mapFile.FullName)
+        End If
+        Dim depth8u = ocvb.depth16.ConvertScaleAbs(0.03)
+        If depth8u.Width <> ocvb.color.Width Then depth8u = depth8u.Resize(ocvb.color.Size())
+        ocvb.result1 = Palette_ApplyCustom(255 - depth8u, colormap.Row(0)) ' the custom colormap API is not available in managed code.
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub

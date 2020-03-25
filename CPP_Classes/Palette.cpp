@@ -10,9 +10,14 @@ using namespace std;
 using namespace cv;
 
 extern "C" __declspec(dllexport)
-void Palette_Custom(int* imgPtr, int *colorMapPtr, int *dstPtr, int rows, int cols)
+void Palette_Custom(int* imgPtr, int *colorMapPtr, int *dstPtr, int rows, int cols, int channels)
 {
-	Mat img = Mat(rows, cols, CV_8UC3, imgPtr);
+	Mat img;
+	if (channels == 1) 
+		img = Mat(rows, cols, CV_8UC1, imgPtr);
+	else
+		img = Mat(rows, cols, CV_8UC3, imgPtr);
+
 	Mat colorMap = Mat(256, 1, CV_8UC3, colorMapPtr);
 	Mat dst = Mat(rows, cols, CV_8UC3, dstPtr);
 	applyColorMap(img, dst, colorMap);
