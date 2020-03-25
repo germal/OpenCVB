@@ -222,7 +222,7 @@ all the algorithms that use the OpenCV “Threshold” API.
 
 ![](media/4586d56c7a17e4e113da812370ffc437.png)
 
-*In the image above, the subset is “\<All\>” has been selected and the complete
+*In the image above, the subset “\<All\>” has been selected and the complete
 list of algorithms will appear in the combo box on the left. If the subset
 selected was “Threshold”, only those algorithms using the OpenCV threshold API
 would appear in the combo box on the left.*
@@ -241,10 +241,10 @@ VB.Net is not a language associated with computer vision algorithms. But the
 proliferation of examples in OpenCVB suggests this may be an oversight. Even the
 seasoned developer should recognize what is obvious to the beginner: VB.Net has
 the ability to provide clarity. VB.Net is a full-featured language just like C\#
-with lambda functions and multi-threading. VB.Net includes user interface tools
-that are flexible and complete (check boxes, radio buttons, sliders, TrueType
-fonts, and much more) - options missing from OpenCV's popular HighGUI library.
-(All existing HighGUI interfaces are still supported though.)
+with lambda functions and multi-threading and VB.Net includes user interface
+tools that are flexible and complete (check boxes, radio buttons, sliders,
+TrueType fonts, and much more) - options missing from OpenCV's popular HighGUI
+library. (All existing HighGUI interfaces are still supported though.)
 
 The main caution in using VB.Net is to treat it as a scripting language like
 Python. Most of the algorithms avoid pixel-by-pixel details – VB.Net can be
@@ -256,30 +256,30 @@ OpenCVSharp is active even when the solution is in Debug mode.
 Critics will point out that a Windows 10 app using VB.Net is not easily portable
 but the entire OpenCVB application does not need to be ported to other
 platforms. Only individual algorithms will need to be ported after they are
-debugged and polished and the algorithms consist almost entirely of OpenCV API’s
-which are already available everywhere. OpenCVB’s value lies in the ability to
-freely experiment and finish an OpenCV algorithm before even starting a port to
-a different platform. Confining development to OpenCVB’s C++ interface should
-provide the most portable version of any algorithm but VB.Net code is also
-easily ported to a variety of non-Windows platforms.
+debugged and polished and most algorithms consist almost entirely of OpenCV
+API’s which are already available everywhere. OpenCVB’s value lies in the
+ability to freely experiment and finish an OpenCV algorithm before even starting
+a port to a different platform. Confining development to OpenCVB’s C++ interface
+should provide the most portable version of any algorithm but VB.Net code is
+also easily ported to a variety of non-Windows platforms.
 
 **Camera Interface**
 
-All the camera code is isolated in the “camera” class instances
-cameraD400Series.vb, cameraKinect.vb, cameraZed2.vb or cameraT265.vb. There are
-no references to camera interfaces anywhere else in the code. Isolating the
-camera support from the algorithms strips the code to just the essential OpenCV
-API’s needed.
+All the camera code is isolated in the “camera” class – see cameraD400Series.vb,
+cameraKinect.vb, cameraMynt.vb, cameraZed2.vb or cameraT265.vb. There are no
+references to camera interfaces anywhere else in the code. Isolating the camera
+support from the algorithms strips the code to just the essential OpenCV API’s
+needed.
 
 For example, the Kinect for Azure camera support is isolated to the
-cameraKinect.vb class and a supporting KinectCamera DLL that provides all the
+cameraKinect.vb class and a supporting Kinect4Azure DLL that provides all the
 interface code to the Kinect for Azure libraries. Since there is likely to be
-little interest in debugging the KinectCamera DLL, the Release version is used
-in the Debug configuration. If it is necessary to debug the camera interface,
-set any Build Configuration components to the Debug version. Optimizations
-enable a higher framerate than when running the Debug configuration of the
-Kinect camera DLL. As a result, the VB.Net code in Debug mode often runs as fast
-as the Release configuration.
+little interest in debugging the Kinect4Azure DLL, the Release version is used
+even in the Debug configuration. If it is necessary to debug the camera
+interface, set any Build Configuration components to the Debug version.
+Optimizations enable a higher framerate than when running the Debug
+configuration of the Kinect camera DLL. As a result, the VB.Net code in Debug
+mode often runs as fast as the Release configuration.
 
 **OpenGL Interface**
 
@@ -289,10 +289,10 @@ accommodate running separately, a named-pipe moves the image data to the
 separate process and a memory-mapped file provides a control interface. The
 result is both robust and economical leaving the OpenGL C++ code independent of
 hardware specifics. The VB.Net code for the OpenGL interface is less than a page
-and does not require much memory or CPU usage. OpenGL C++ code is typically
-customized for specific applications in a format that should be familiar to
-OpenGL developers. There are several examples – displaying RGB and Depth, 3D
-histograms, 3D drawing, and IMU usage. A code snippet (See ‘Build New
+and does not require much memory or CPU usage. The OpenGL C++ code provided with
+OpenCVB is customized for specific applications in a format that should be
+familiar to OpenGL developers. There are several examples – displaying RGB and
+Depth, 3D histograms, 3D drawing, and IMU usage. A code snippet (See ‘Build New
 Experiments’ above) provides everything needed to add a new OpenGL algorithm
 that will consume RGB and a point cloud.
 
@@ -339,7 +339,9 @@ However, to send the RGB, depth, or point cloud image data from the camera to
 the Python script, a VB.Net wrapper is required. Examples are provided – see
 Python_SurfaceBlit or Python_RGBDepth. There is a simple naming convention for
 Python scripts with a VB.Net wrapper: use the same name for both, i.e. the
-algorithm Python_RGBDepth is the companion for the Python_RGBDepth.py script.
+algorithm Python_RGBDepth is the companion for the Depth_RGB_PS.py script (the
+\_PS suffix indicates it is a Python Streaming script sending the RGB and Depth
+images to the Python script. See Algorithm subset “\<PyStream\>”.)
 
 Python scripts show up in the list of algorithms in the OpenCVB user interface
 and each Python script will be run when performing a “Test All” regression. To
@@ -393,9 +395,9 @@ The ability to record and playback is provided with OpenCVB – see Replay_Recor
 and Replay_Play algorithms. RGB, Depth, point cloud, and IMU data are written to
 the recording file. Any algorithm that normally runs with the live camera input
 and IMU data can be run with recorded data. Use the “Subset Combo Box” to select
-the option: “\<All using recorded data\>”. Selecting “Test All” with that
-setting will run all the active algorithms with the recorded data. This is a
-useful regression test.
+the option: “\<All using recorded data\>”. Running the regression tests with
+that setting will run all the algorithms with recorded data instead of a live
+camera feed.
 
 **StereoLabs Zed 2 Support**
 
@@ -430,10 +432,10 @@ enable VTK with the following steps:
 
 **Sample Results**
 
-What follows is a preview of some algorithms’ output.
+The following images are a preview of some algorithms’ output.
 
-Top left image is the RGB and top right is depth. Algorithm results are in the
-bottom left and right or additional windows.
+The top left image is the RGB and top right is depth. Algorithm results are in
+the bottom left and right or additional windows.
 
 ![](media/cd7e699a6192e4daf1d540a15e35005a.png)
 
