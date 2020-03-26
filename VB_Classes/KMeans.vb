@@ -517,7 +517,7 @@ Public Class kMeans_Depth_FG_BG : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim columnVector As New cv.Mat
         columnVector = ocvb.depth16.Reshape(1, ocvb.depth16.Rows * ocvb.depth16.Cols)
-        columnVector.ConvertTo(columnVector, cv.MatType.CV_32FC1,)
+        columnVector.ConvertTo(columnVector, cv.MatType.CV_32FC1)
         Dim labels = New cv.Mat()
         Dim depthCenters As New cv.Mat
         cv.Cv2.Kmeans(columnVector, 2, labels, term, 3, cv.KMeansFlags.PpCenters, depthCenters)

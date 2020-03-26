@@ -2,6 +2,7 @@
 Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
+Imports System.IO
 
 Module T265_Module_CPP
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -32,12 +33,6 @@ Module T265_Module_CPP
     Public Function T265Extrinsics(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265PointCloud(tp As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265RGBDepth(tp As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265PoseData(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -45,9 +40,6 @@ Module T265_Module_CPP
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265IMUTimeStamp(tp As IntPtr) As Double
-    End Function
-    <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265Depth16(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265Color(tp As IntPtr) As IntPtr
@@ -143,21 +135,26 @@ Public Class CameraT265Native
             rightView(rawDstRect) = right(rawSrcRect)
             leftView(rawDstRect) = left(rawSrcRect)
 
-            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265RGBDepth(cPtr)).Clone()
-            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, T265Depth16(cPtr)).Clone()
-
             Dim disparity32f = New cv.Mat(300, 300, cv.MatType.CV_32F, T265Disparity(cPtr)).Clone()
-            Dim depth32f As New cv.Mat(disparity32f.Size(), cv.MatType.CV_32F)
-            depth32f.SetTo(12000)
+            disparity32f = disparity32f.Threshold(0, 0, cv.ThresholdTypes.Tozero)
+
+            Dim depth32f As New cv.Mat(disparity32f.Size(), cv.MatType.CV_32F, 12000)
             cv.Cv2.Divide(depth32f, disparity32f, depth32f)
-            depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
+            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U).Clone()
+            Dim rectDepth As New cv.Rect((disparity32f.Width - 1) / 2 + 112, 0, disparity32f.Width, disparity32f.Height)
+            depth32f.ConvertTo(depth16(rectDepth), cv.MatType.CV_16U)
+
+            Dim depth8u = New cv.Mat(color.Height, depth16.Width, cv.MatType.CV_8U)
+            depth8u(rectDepth) = 255 - depth16(rectDepth).ConvertScaleAbs(0.03)
+            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, 0)
+            cv.Cv2.ApplyColorMap(depth8u(rectDepth), RGBDepth(rectDepth), cv.ColormapTypes.Jet)
 
             If frameCount Mod 100 = 0 Then
                 Static minval As Double, maxval As Double
                 depth16.MinMaxLoc(minval, maxval)
                 Dim mean = depth16.Mean()
                 Console.WriteLine("depth16 mean = " + Format(mean.Item(0), "#0.0") + " max = " + Format(maxval, "#0.0"))
-                disparity32f = disparity32f.Threshold(0, 0, cv.ThresholdTypes.BinaryInv)
+                depth16 = depth16.Threshold(10000, 0, cv.ThresholdTypes.TozeroInv)
             End If
 
             pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, 0) ' no point cloud for T265 - just provide it for compatibility.

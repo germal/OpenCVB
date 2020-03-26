@@ -157,10 +157,6 @@ public:
 		cv::fisheye::initUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, stereo_size, CV_32FC1, rm1, rm2);
 		cv::fisheye::initUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, Size(rawWidth, rawHeight), CV_32FC1, rightViewMap1, rightViewMap2);
 
-		// we are only calculating depth on a small region.  Depth is unknown everywhere else...
-		depth16 = Mat(height, width, CV_16U);
-		depth16.setTo(0);
-
 		sgm = new t265sgm(minDisp, windowSize, numDisp);
 	}
 
@@ -189,23 +185,8 @@ public:
 		Rect validRect = Rect(maxDisp, 0, disp16s.cols - maxDisp, disp16s.rows);
 		disp16s = disp16s(validRect);
 		disp16s.convertTo(disparity, CV_32F, 1.0f / 16.0f);
-		//threshold(disparity, disparity, 0, 0, THRESH_BINARY_INV);
-
-		Mat disp_vis = disparity.clone();
-		cv::Rect depthRect = Rect(int(stereo_cx), 0, disparity.cols, disparity.rows);
-		disp16s.convertTo(depth16(depthRect), CV_16U);
-
-		Mat mask;
-		threshold(disp_vis, mask, 1, 255, THRESH_BINARY);
-		mask.convertTo(mask, CV_8U);
-		disp_vis *= 255.0 / numDisp;
-
-		// convert disparity To 0 - 255 And color it
-		Mat tmpRGBDepth;
-		cv::convertScaleAbs(disp_vis, disp_vis);
-		cv::applyColorMap(disp_vis, tmpRGBDepth, cv::COLORMAP_JET);
-		tmpRGBDepth.copyTo(RGBDepth(depthRect), mask);
-
+		threshold(disparity, disparity, 0, 0, cv::THRESH_TOZERO); // anything below zero is now zero...
+																  
 		// Cast the frame to pose_frame and get its data
 		pose_data = f.as<rs2::pose_frame>().get_pose_data();
 	}
@@ -261,18 +242,6 @@ extern "C" __declspec(dllexport)
 int* T265RightRaw(t265Camera * tp)
 {
 	return (int*)tp->rightViewRaw.data;
-}
-
-extern "C" __declspec(dllexport)
-int* T265Depth16(t265Camera * tp)
-{
-	return (int*)tp->depth16.data;
-}
-
-extern "C" __declspec(dllexport)
-int* T265RGBDepth(t265Camera * tp)
-{
-	return (int*)tp->RGBDepth.data;
 }
 
 extern "C" __declspec(dllexport)

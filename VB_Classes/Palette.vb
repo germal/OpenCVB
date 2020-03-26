@@ -214,45 +214,6 @@ End Class
 
 
 
-Public Class Palette_Display : Implements IDisposable
-    Dim palette As Palette_ColorMap
-    Public Sub New(ocvb As AlgorithmData)
-        palette = New Palette_ColorMap(ocvb)
-        palette.externalUse = True
-
-        ocvb.desc = "Display the requested palette and the results of its application."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        palette.src = ocvb.color.Clone()
-        palette.Run(ocvb)
-        Dim cMapDir As New DirectoryInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps")
-        Dim colorMap As Int32
-        Dim mapName As String = ""
-        For i = 0 To palette.radio.check.Count - 1
-            If palette.radio.check(i).Checked Then
-                colorMap = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cool, cv.ColormapTypes.Hot,
-                                         cv.ColormapTypes.Hsv, cv.ColormapTypes.Jet, cv.ColormapTypes.Ocean, cv.ColormapTypes.Pink,
-                                         cv.ColormapTypes.Rainbow, cv.ColormapTypes.Spring, cv.ColormapTypes.Summer, cv.ColormapTypes.Winter, 12, 13, 14, 15, 16, 17, 18, 19, 20)
-                mapName = mapNames(i)
-                ocvb.label1 = "ColorMap = " + mapName
-                ocvb.label2 = mapName + " ColorMap illustrated"
-            End If
-        Next
-        Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + mapName + ".jpg")
-        If mapFile.Exists Then
-            Dim cmap = cv.Cv2.ImRead(mapFile.FullName)
-            ocvb.result2 = cmap.Resize(ocvb.color.Size())
-        Else
-            If colorMap = 19 Then ocvb.result2 = palette.gradMap.gradientColorMap.Resize(ocvb.color.Size()) Else ocvb.result2.SetTo(0)
-        End If
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        palette.Dispose()
-    End Sub
-End Class
-
-
-
 
 Public Class Palette_Gradient : Implements IDisposable
     Public frameModulo As Int32 = 30 ' every 30 frames try a different pair of random colors.
@@ -408,7 +369,7 @@ End Class
 Public Class Palette_DepthColorMap : Implements IDisposable
     Public gradientColorMap As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
-        ocvb.desc = "Build a colormap that best shows the depth."
+        ocvb.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount = 0 Then
@@ -440,17 +401,12 @@ End Class
 
 Public Class Palette_DepthColorMapJet : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
-        ocvb.desc = "Modify the Jet colormap for use as a depth colormap.  NOTE: custom color maps need to use C++ ApplyColorMap."
+        ocvb.desc = "Use the Jet colormap to display depth. "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static colormap As New cv.Mat()
-        If ocvb.frameCount = 0 Then
-            Dim mapFile = New FileInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps/colorscale_Jet.jpg")
-            colormap = cv.Cv2.ImRead(mapFile.FullName)
-        End If
         Dim depth8u = ocvb.depth16.ConvertScaleAbs(0.03)
         If depth8u.Width <> ocvb.color.Width Then depth8u = depth8u.Resize(ocvb.color.Size())
-        ocvb.result1 = Palette_ApplyCustom(255 - depth8u, colormap.Row(0)) ' the custom colormap API is not available in managed code.
+        cv.Cv2.ApplyColorMap(255 - depth8u, ocvb.result1, cv.ColormapTypes.Jet)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
