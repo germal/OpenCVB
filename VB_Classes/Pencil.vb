@@ -19,3 +19,36 @@ Public Class Pencil_Basics : Implements IDisposable
         sliders.Dispose()
     End Sub
 End Class
+
+
+
+
+' https://cppsecrets.com/users/2582658986657266505064717765737646677977/Convert-photo-to-sketch-using-python.php?fbclid=IwAR3pOtiqxeOPiqouii7tmN9Q7yA5vG4dFdXGqA0XgZqcMB87w5a1PEMzGOw
+Public Class Pencil_Manual : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "Blur kernel size", 2, 100, 10)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+        ocvb.desc = "Break down the process of converting an image to a sketch - Painterly Effect"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim grayinv As New cv.Mat
+        cv.Cv2.BitwiseNot(gray, grayinv)
+        Dim ksize = sliders.TrackBar1.Value
+        If ksize Mod 2 = 0 Then ksize += 1
+        Dim blur = grayinv.Blur(New cv.Size(ksize, ksize), New cv.Point(ksize / 2, ksize / 2))
+        cv.Cv2.Divide(gray, 255 - blur, ocvb.result1, 256)
+
+        Static index As Integer
+        ocvb.label2 = "Intermediate result: " + Choose(index + 1, "gray", "grayinv", "blur")
+        ocvb.result2 = Choose(index + 1, gray, grayinv, blur)
+        If ocvb.frameCount Mod 30 = 0 Then
+            index += 1
+            If index >= 3 Then index = 0
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
+    End Sub
+End Class

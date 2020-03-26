@@ -145,7 +145,20 @@ Public Class CameraT265Native
 
             RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265RGBDepth(cPtr)).Clone()
             depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, T265Depth16(cPtr)).Clone()
-            Dim disparity32f = New cv.Mat(30, 30, cv.MatType.CV_32F, T265Disparity(cPtr)).Clone()
+
+            Dim disparity32f = New cv.Mat(300, 300, cv.MatType.CV_32F, T265Disparity(cPtr)).Clone()
+            Dim depth32f As New cv.Mat(disparity32f.Size(), cv.MatType.CV_32F)
+            depth32f.SetTo(12000)
+            cv.Cv2.Divide(depth32f, disparity32f, depth32f)
+            depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
+
+            If frameCount Mod 100 = 0 Then
+                Static minval As Double, maxval As Double
+                depth16.MinMaxLoc(minval, maxval)
+                Dim mean = depth16.Mean()
+                Console.WriteLine("depth16 mean = " + Format(mean.Item(0), "#0.0") + " max = " + Format(maxval, "#0.0"))
+                disparity32f = disparity32f.Threshold(0, 0, cv.ThresholdTypes.BinaryInv)
+            End If
 
             pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, 0) ' no point cloud for T265 - just provide it for compatibility.
             MyBase.GetNextFrameCounts(IMU_FrameTime)

@@ -29,11 +29,15 @@ Module Python_Module
         If checkPythonPackage(ocvb, "numpy") = False Or checkPythonPackage(ocvb, "cv2") = False Then Return False
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
-        For Each p In Process.GetProcesses
-            If p.ProcessName.ToUpper.Contains("PYTHON") Then
-                Console.WriteLine(p.ProcessName)
-            End If
-        Next
+        ' when running the regression tests, some python processes are not completing before the next starts.  Then they build up.  What a mess.  This prevents it
+        If ocvb.parms.testAllRunning Then
+            For Each p In Process.GetProcesses
+                If p.ProcessName.ToUpper.Contains("PYTHON") Then
+                    ' if it is not our process, we won't be able to kill it.
+                    p.Kill()
+                End If
+            Next
+        End If
         If pythonApp.Exists Then
             Dim p As New Process
             p.StartInfo.FileName = ocvb.PythonExe
@@ -95,6 +99,7 @@ Public Class Python_Run : Implements IDisposable
         If pipe IsNot Nothing Then pipe.Dispose()
     End Sub
 End Class
+
 
 
 

@@ -154,6 +154,13 @@ Public Class CameraKinect
                 RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
                 depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, KinectDepth16(cPtr))
 
+                If frameCount Mod 100 = 0 Then
+                    Static minval As Double, maxval As Double
+                    depth16.MinMaxLoc(minval, maxval)
+                    Dim mean = depth16.Mean()
+                    Console.WriteLine("mean = " + Format(mean.Item(0), "#0.0") + " max = " + Format(maxval, "#0.0"))
+                End If
+
                 Dim tmp As New cv.Mat
                 cv.Cv2.Normalize(depth16, tmp, 0, 255, cv.NormTypes.MinMax)
                 tmp.ConvertTo(leftView, cv.MatType.CV_8U)

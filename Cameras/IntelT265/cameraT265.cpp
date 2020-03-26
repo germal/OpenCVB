@@ -52,6 +52,7 @@ public:
 	rs2_pose pose_data;
 	double IMU_TimeStamp;
 	rs2::pipeline pipeline;
+	Mat disparity;
 
 private:
 	int width, height;
@@ -62,7 +63,6 @@ private:
 	int minDisp = 0;
 	int maxDisp;
 	int windowSize = 5;
-
 	Mat lm1, lm2, rm1, rm2;
 	
 	double stereo_fov_rad, stereo_focal_px, stereo_cx, stereo_cy;
@@ -170,7 +170,7 @@ public:
 		auto f = frameset.first_or_default(RS2_STREAM_POSE);
 		IMU_TimeStamp = f.get_timestamp();
 
-		Mat disp16s, tmpColor, remapLeft, remapRight, disparity;
+		Mat disp16s, tmpColor, remapLeft, remapRight;
 
 		auto fs = frameset.as<rs2::frameset>();
 		rs2::frame leftImage = fs.get_fisheye_frame(1);
@@ -189,11 +189,11 @@ public:
 		Rect validRect = Rect(maxDisp, 0, disp16s.cols - maxDisp, disp16s.rows);
 		disp16s = disp16s(validRect);
 		disp16s.convertTo(disparity, CV_32F, 1.0f / 16.0f);
+		//threshold(disparity, disparity, 0, 0, THRESH_BINARY_INV);
 
 		Mat disp_vis = disparity.clone();
 		cv::Rect depthRect = Rect(int(stereo_cx), 0, disparity.cols, disparity.rows);
 		disp16s.convertTo(depth16(depthRect), CV_16U);
-		depth16 *= 16;
 
 		Mat mask;
 		threshold(disp_vis, mask, 1, 255, THRESH_BINARY);
@@ -202,7 +202,7 @@ public:
 
 		// convert disparity To 0 - 255 And color it
 		Mat tmpRGBDepth;
-		cv::convertScaleAbs(disp_vis, disp_vis, 1);
+		cv::convertScaleAbs(disp_vis, disp_vis);
 		cv::applyColorMap(disp_vis, tmpRGBDepth, cv::COLORMAP_JET);
 		tmpRGBDepth.copyTo(RGBDepth(depthRect), mask);
 
@@ -285,6 +285,12 @@ extern "C" __declspec(dllexport)
 int* T265PoseData(t265Camera * tp)
 {
 	return (int*)&tp->pose_data;
+}
+
+extern "C" __declspec(dllexport)
+int* T265Disparity(t265Camera * tp)
+{
+	return (int*)tp->disparity.data;
 }
 
 extern "C" __declspec(dllexport)
