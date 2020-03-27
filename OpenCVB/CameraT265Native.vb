@@ -127,15 +127,15 @@ Public Class CameraT265Native
                         t.X, t.Y, t.Z, 1.0}
             transformationMatrix = mat
 
-            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265Color(cPtr))
+            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265Color(cPtr)).Clone()
 
-            Dim right = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265RightRaw(cPtr))
-            Dim left = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265LeftRaw(cPtr))
+            Dim right = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265RightRaw(cPtr)).Clone()
+            Dim left = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265LeftRaw(cPtr)).Clone()
 
             rightView(rawDstRect) = right(rawSrcRect)
             leftView(rawDstRect) = left(rawSrcRect)
 
-            Dim disparity32f = New cv.Mat(300, 300, cv.MatType.CV_32F, T265Disparity(cPtr))
+            Dim disparity32f = New cv.Mat(300, 300, cv.MatType.CV_32F, T265Disparity(cPtr)).Clone()
             disparity32f = disparity32f.Threshold(0, 0, cv.ThresholdTypes.Tozero)
 
             Dim depth32f As New cv.Mat(disparity32f.Size(), cv.MatType.CV_32F, 20000)
@@ -148,14 +148,6 @@ Public Class CameraT265Native
             depth8u(rectDepth) = 255 - depth16(rectDepth).ConvertScaleAbs(0.03)
             RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, 0)
             cv.Cv2.ApplyColorMap(depth8u(rectDepth), RGBDepth(rectDepth), cv.ColormapTypes.Jet)
-
-            If frameCount Mod 100 = 0 Then
-                Static minval As Double, maxval As Double
-                depth16.MinMaxLoc(minval, maxval)
-                Dim mean = depth16.Mean()
-                Console.WriteLine("depth16 mean = " + Format(mean.Item(0), "#0.0") + " max = " + Format(maxval, "#0.0"))
-                depth16 = depth16.Threshold(10000, 0, cv.ThresholdTypes.TozeroInv)
-            End If
 
             pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, 0) ' no point cloud for T265 - just provide it for compatibility.
             MyBase.GetNextFrameCounts(IMU_FrameTime)
