@@ -64,7 +64,6 @@ Public Class CameraKinect
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
         cPtr = KinectOpen()
         deviceName = "Kinect for Azure"
-        pcMultiplier = 0.001
         IMU_Present = True
         If cPtr <> 0 Then
             deviceCount = KinectDeviceCount(cPtr)
@@ -161,8 +160,7 @@ Public Class CameraKinect
 
                 Dim pc = New cv.Mat(h, w, cv.MatType.CV_16SC3, KinectPointCloud(cPtr))
                 ' This is less efficient than using 16-bit pixels but consistent with the other cameras
-                pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3)
-                pointCloud *= pcMultiplier ' change to meters...
+                pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3, 0.001) ' convert to meters...
                 MyBase.GetNextFrameCounts(IMU_FrameTime)
             End SyncLock
         End If

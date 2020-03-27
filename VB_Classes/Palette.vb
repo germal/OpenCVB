@@ -259,7 +259,7 @@ Public Class Palette_BuildGradientColorMap : Implements IDisposable
     Public gradientColorMap As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "Number of color transitions", 1, 30, 5)
+        sliders.setupTrackBar1(ocvb, "Number of color transitions (use with Random only)", 1, 30, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label2 = "Generated colormap"
@@ -278,13 +278,11 @@ Public Class Palette_BuildGradientColorMap : Implements IDisposable
                 If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
             Next
             gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
-            If externalUse = False Then
-                Dim r As New cv.Rect(0, 0, 255, 1)
-                For i = 0 To ocvb.result2.Height - 1
-                    r.Y = i
-                    ocvb.result2(r) = gradientColorMap
-                Next
-            End If
+            Dim r As New cv.Rect(0, 0, 255, 1)
+            For i = 0 To ocvb.result2.Height - 1
+                r.Y = i
+                ocvb.result2(r) = gradientColorMap
+            Next
         End If
         If externalUse = False Then ocvb.result1 = Palette_ApplyCustom(ocvb.color, gradientColorMap)
     End Sub
@@ -326,13 +324,11 @@ Public Class Palette_ColorMap : Implements IDisposable
                                          12, 13, 14, 15, 16, 17, 18, 19, 20) ' missing some colorMapType definitions but they are there...
                 ocvb.label1 = "ColorMap = " + mapNames(i)
 
-                If externalUse = False Then
-                    Static cMapDir As New DirectoryInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps")
-                    Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + mapNames(i) + ".jpg")
-                    If mapFile.Exists Then
-                        Static cmap = cv.Cv2.ImRead(mapFile.FullName)
-                        ocvb.result2 = cmap.Resize(ocvb.color.Size())
-                    End If
+                Static cMapDir As New DirectoryInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps")
+                Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + mapNames(i) + ".jpg")
+                If mapFile.Exists Then
+                    Static cmap = cv.Cv2.ImRead(mapFile.FullName)
+                    ocvb.result2 = cmap.Resize(ocvb.color.Size())
                 End If
 
                 ' special case the random color map!
@@ -349,6 +345,7 @@ Public Class Palette_ColorMap : Implements IDisposable
                 buildNewRandomMap = False ' if they select something other than random, then next random request will rebuild the map.
                 If colormap = 20 Then
                     ocvb.result1 = src.Clone()
+                    ocvb.result2.SetTo(0)
                     Exit For
                 End If
                 cv.Cv2.ApplyColorMap(src, ocvb.result1, colormap)
@@ -368,7 +365,11 @@ End Class
 
 Public Class Palette_DepthColorMap : Implements IDisposable
     Public gradientColorMap As New cv.Mat
+    Dim holes As Depth_Holes
     Public Sub New(ocvb As AlgorithmData)
+        holes = New Depth_Holes(ocvb)
+        holes.externalUse = True
+
         ocvb.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -383,7 +384,12 @@ Public Class Palette_DepthColorMap : Implements IDisposable
             cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
             gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
         End If
-        ocvb.result1 = Palette_ApplyCustom(ocvb.color, gradientColorMap)
+        Dim depth8u = ocvb.depth16.ConvertScaleAbs(0.1)
+        If depth8u.Width <> ocvb.color.Width Then depth8u = depth8u.Resize(ocvb.color.Size())
+        ocvb.result1 = Palette_ApplyCustom(depth8u, gradientColorMap)
+
+        holes.Run(ocvb)
+        ocvb.result1.SetTo(0, holes.holeMask)
 
         Dim r As New cv.Rect(100, 0, 255, 1)
         For i = 0 To ocvb.result2.Height - 1
@@ -392,6 +398,7 @@ Public Class Palette_DepthColorMap : Implements IDisposable
         Next
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+        holes.Dispose()
     End Sub
 End Class
 

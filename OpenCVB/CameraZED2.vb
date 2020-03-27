@@ -178,6 +178,13 @@ Public Class CameraZED2
             rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2RightView(cPtr)).Clone()
             pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone()
 
+            If frameCount Mod 100 = 0 Then
+                Static minval As Double, maxval As Double
+                depth16.MinMaxLoc(minval, maxval)
+                Dim mean = depth16.Mean()
+                Console.WriteLine("depth16 mean = " + Format(mean.Item(0), "#0.0") + " max = " + Format(maxval, "#0.0"))
+            End If
+
             Dim imuFrame = Zed2GetPoseData(cPtr)
             Dim acc = Zed2Acceleration(cPtr)
             imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(acc)

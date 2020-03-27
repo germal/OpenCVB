@@ -215,7 +215,7 @@ Public Class Depth_Holes : Implements IDisposable
         ocvb.desc = "Identify holes in the depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim mask = ocvb.depth16.Threshold(1, 20000, cv.ThresholdTypes.BinaryInv)
+        Dim mask = ocvb.depth16.Threshold(1, 0, cv.ThresholdTypes.TozeroInv)
         If ocvb.parms.lowResolution Then mask = mask.Resize(ocvb.color.Size)
         holeMask = New cv.Mat
         mask.ConvertTo(holeMask, cv.MatType.CV_8UC1)
@@ -708,30 +708,6 @@ End Class
 
 
 
-Public Class Depth_ColorMap : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim Palette As Palette_ColorMap
-    Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "Depth ColorMap Alpha X100", 1, 100, 3)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
-        Palette = New Palette_ColorMap(ocvb)
-        Palette.externalUse = True
-        ocvb.desc = "Display the depth as a color map"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Dim alpha = sliders.TrackBar1.Value / 100
-        cv.Cv2.ConvertScaleAbs(ocvb.depth16, Palette.src, alpha)
-        Palette.Run(ocvb)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        Palette.Dispose()
-    End Sub
-End Class
-
-
-
 
 Public Class Depth_Stable : Implements IDisposable
     Dim mog As BGSubtract_Basics_CPP
@@ -923,6 +899,7 @@ Public Class Depth_Colorizer_2_CPP : Implements IDisposable
         Dim histSize = maxDepth - minDepth
 
         If externalUse = False Then src = inrange.dst Else dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        If src.Width <> ocvb.color.Width Then src = src.Resize(ocvb.color.Size())
 
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
@@ -1016,6 +993,7 @@ Public Class Depth_ColorizerVB_MT : Implements IDisposable
         grid.Run(ocvb)
 
         If externalUse = False Then src = ocvb.depth16
+        If src.Width <> ocvb.color.Width Then src = src.Resize(ocvb.color.Size())
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
 
@@ -1088,6 +1066,7 @@ Public Class Depth_Colorizer_MT : Implements IDisposable
         grid.Run(ocvb)
 
         If externalUse = False Then src = ocvb.depth16
+        If src.Width <> ocvb.color.Width Then src = src.Resize(ocvb.color.Size())
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
 
@@ -1322,5 +1301,31 @@ Public Class Depth_Punch : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         depth.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class Depth_ColorMap : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Dim Palette As Palette_ColorMap
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "Depth ColorMap Alpha X100", 1, 100, 3)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        Palette = New Palette_ColorMap(ocvb)
+        Palette.externalUse = True
+        ocvb.desc = "Display the depth as a color map"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim alpha = sliders.TrackBar1.Value / 100
+        cv.Cv2.ConvertScaleAbs(ocvb.depth16, Palette.src, alpha)
+        Palette.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
+        Palette.Dispose()
     End Sub
 End Class

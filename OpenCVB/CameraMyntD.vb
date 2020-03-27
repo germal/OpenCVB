@@ -70,7 +70,6 @@ Public Class CameraMyntD
 
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
         cPtr = MyntDOpen(width, height, 60)
-        MyBase.pcMultiplier = 0.001
         MyBase.deviceName = "MYNT EYE D 1000"
         Exit Sub
         If cPtr <> 0 Then
@@ -211,7 +210,7 @@ Public Class CameraMyntD
 
             leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftViewBytes)
             rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightViewBytes)
-            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes) * pcMultiplier ' change to meters...
+            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes)
         End SyncLock
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub

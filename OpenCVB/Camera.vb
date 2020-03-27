@@ -18,7 +18,6 @@ Public Class Camera
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
     Public frameCount As Integer
-    Public pcMultiplier As Single = 1
     Public pointCloud As cv.Mat
     Public h As Int32
     Public w As Int32

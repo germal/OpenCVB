@@ -73,6 +73,10 @@ Public Class OpenGL_Basics : Implements IDisposable
         pipe.WaitForConnection()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.cameraIndex = T265Camera Then
+            ocvb.putText(New ActiveClass.TrueType("The T265 camera doesn't have a point cloud.", 10, 60, RESULT1))
+            Exit Sub
+        End If
         If ocvb.frameCount = 0 Then startOpenGLWindow(ocvb)
         Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
         Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
