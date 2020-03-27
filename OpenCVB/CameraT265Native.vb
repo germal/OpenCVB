@@ -127,20 +127,20 @@ Public Class CameraT265Native
                         t.X, t.Y, t.Z, 1.0}
             transformationMatrix = mat
 
-            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265Color(cPtr)).Clone()
+            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265Color(cPtr))
 
-            Dim right = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265RightRaw(cPtr)).Clone()
-            Dim left = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265LeftRaw(cPtr)).Clone()
+            Dim right = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265RightRaw(cPtr))
+            Dim left = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265LeftRaw(cPtr))
 
             rightView(rawDstRect) = right(rawSrcRect)
             leftView(rawDstRect) = left(rawSrcRect)
 
-            Dim disparity32f = New cv.Mat(300, 300, cv.MatType.CV_32F, T265Disparity(cPtr)).Clone()
+            Dim disparity32f = New cv.Mat(300, 300, cv.MatType.CV_32F, T265Disparity(cPtr))
             disparity32f = disparity32f.Threshold(0, 0, cv.ThresholdTypes.Tozero)
 
-            Dim depth32f As New cv.Mat(disparity32f.Size(), cv.MatType.CV_32F, 12000)
+            Dim depth32f As New cv.Mat(disparity32f.Size(), cv.MatType.CV_32F, 20000)
             cv.Cv2.Divide(depth32f, disparity32f, depth32f)
-            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U).Clone()
+            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U)
             Dim rectDepth As New cv.Rect((disparity32f.Width - 1) / 2 + 112, 0, disparity32f.Width, disparity32f.Height)
             depth32f.ConvertTo(depth16(rectDepth), cv.MatType.CV_16U)
 

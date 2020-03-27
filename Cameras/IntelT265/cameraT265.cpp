@@ -44,7 +44,7 @@ class t265Camera
 {
 public:
 	Mat leftViewMap1, leftViewMap2, rightViewMap1, rightViewMap2;
-	Mat color, RGBDepth, depth16, leftViewRaw, rightViewRaw;
+	Mat color, depth16, leftViewRaw, rightViewRaw;
 	int rawWidth, rawHeight;
 	rs2_intrinsics intrinsicsLeft, intrinsicsRight;
 	rs2_extrinsics extrinsics;
@@ -174,7 +174,6 @@ public:
 		remap(leftViewRaw, tmpColor, leftViewMap1, leftViewMap2, INTER_LINEAR);
 		resize(tmpColor, tmpColor, Size(width, height));
 		cvtColor(tmpColor, color, COLOR_GRAY2BGR);
-		RGBDepth = color.clone();
 		cv::remap(leftViewRaw, remapLeft, lm1, lm2, INTER_LINEAR);
 
 		rs2::frame rightImage = fs.get_fisheye_frame(2);
