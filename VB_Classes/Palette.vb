@@ -278,6 +278,7 @@ Public Class Palette_BuildGradientColorMap : Implements IDisposable
                 If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
             Next
             gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
+            ocvb.result2.SetTo(0)
             Dim r As New cv.Rect(0, 0, 255, 1)
             For i = 0 To ocvb.result2.Height - 1
                 r.Y = i
@@ -327,7 +328,7 @@ Public Class Palette_ColorMap : Implements IDisposable
                 Static cMapDir As New DirectoryInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps")
                 Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + mapNames(i) + ".jpg")
                 If mapFile.Exists Then
-                    Static cmap = cv.Cv2.ImRead(mapFile.FullName)
+                    Dim cmap = cv.Cv2.ImRead(mapFile.FullName)
                     ocvb.result2 = cmap.Resize(ocvb.color.Size())
                 End If
 
