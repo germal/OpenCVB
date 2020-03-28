@@ -110,6 +110,8 @@ Public Class WarpAffine_Basics : Implements IDisposable
         angle *= -1
         rotationMatrix = cv.Cv2.GetRotationMatrix2D(pt, angle, 1.0)
         cv.Cv2.WarpAffine(ocvb.result1, ocvb.result2, rotationMatrix, ocvb.color.Size(), cv.InterpolationFlags.Nearest)
+        ocvb.label1 = "Rotated with Warpaffine with angle: " + CStr(angle)
+        ocvb.label2 = "Rotated back with inverse Warpaffine angle: " + CStr(-angle)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()

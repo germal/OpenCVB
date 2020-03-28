@@ -259,7 +259,7 @@ Public Class Palette_BuildGradientColorMap : Implements IDisposable
     Public gradientColorMap As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "Number of color transitions (use with Random only)", 1, 30, 5)
+        sliders.setupTrackBar1(ocvb, "Number of color transitions (Used only with Random)", 1, 30, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label2 = "Generated colormap"

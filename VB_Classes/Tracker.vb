@@ -147,25 +147,3 @@ Public Class Tracker_Methods : Implements IDisposable
         tracker.Dispose()
     End Sub
 End Class
-
-
-
-
-
-Module Quaternion_Module
-
-End Module
-
-
-
-' https://github.com/IntelRealSense/librealsense/tree/master/examples/ar-basic
-Public Class Tracker_3DLocation : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
-        ocvb.desc = "Track a location in 3D geometry and mark it will XYZ axes."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-    End Sub
-End Class

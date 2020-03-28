@@ -9,6 +9,7 @@ Public Class Camera
     Public IMU_Temperature As Single
     Public IMU_TimeStamp As Double
     Public IMU_Rotation As System.Numerics.Quaternion
+    Public IMU_RotationMatrix(9 - 1) As Single
     Public IMU_Translation As cv.Point3f
     Public IMU_Acceleration As cv.Point3f
     Public IMU_Velocity As cv.Point3f
@@ -27,8 +28,6 @@ Public Class Camera
     Public deviceCount As Int32
     Public deviceName As String
     Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
-    Public imuAccel As cv.Point3f
-    Public imuGyro As cv.Point3f
     Public IMU_Present As Boolean
     Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB

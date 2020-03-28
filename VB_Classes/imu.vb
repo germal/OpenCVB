@@ -23,7 +23,7 @@ Public Class IMU_Basics : Implements IDisposable
             If ocvb.frameCount = 0 Then
                 lastTimeStamp = ocvb.parms.IMU_TimeStamp
             Else
-                gyroAngle = ocvb.parms.imuGyro
+                gyroAngle = ocvb.parms.IMU_AngularVelocity
                 Dim dt_gyro = (ocvb.parms.IMU_TimeStamp - lastTimeStamp) / 1000
                 If ocvb.parms.cameraIndex <> D400Cam Then dt_gyro /= 1000 ' different units in the timestamp?
                 lastTimeStamp = ocvb.parms.IMU_TimeStamp
@@ -32,8 +32,8 @@ Public Class IMU_Basics : Implements IDisposable
             End If
 
             ' NOTE: Initialize the angle around the y-axis to zero.
-            Dim accelAngle = New cv.Point3f(Math.Atan2(ocvb.parms.imuAccel.X, Math.Sqrt(ocvb.parms.imuAccel.Y * ocvb.parms.imuAccel.Y + ocvb.parms.imuAccel.Z * ocvb.parms.imuAccel.Z)), 0,
-                                                Math.Atan2(ocvb.parms.imuAccel.Y, ocvb.parms.imuAccel.Z))
+            Dim accelAngle = New cv.Point3f(Math.Atan2(ocvb.parms.IMU_Acceleration.X, Math.Sqrt(ocvb.parms.IMU_Acceleration.Y * ocvb.parms.IMU_Acceleration.Y + ocvb.parms.IMU_Acceleration.Z * ocvb.parms.IMU_Acceleration.Z)), 0,
+                                                Math.Atan2(ocvb.parms.IMU_Acceleration.Y, ocvb.parms.IMU_Acceleration.Z))
             If ocvb.frameCount = 0 Then
                 theta = accelAngle
             Else
@@ -44,10 +44,10 @@ Public Class IMU_Basics : Implements IDisposable
                 theta.Z = theta.Z * alpha + accelAngle.Z * (1 - alpha)
             End If
             If externalUse = False Then
-                flow.msgs.Add("ts = " + Format(ocvb.parms.IMU_TimeStamp, "#0.00") + " Gravity (m/sec^2) x = " + Format(ocvb.parms.imuAccel.X, "#0.00") +
-                              " y = " + Format(ocvb.parms.imuAccel.Y, "#0.00") + " z = " + Format(ocvb.parms.imuAccel.Z, "#0.00") + vbTab +
-                              " Motion (rads/sec) pitch = " + Format(ocvb.parms.imuGyro.X, "#0.00") +
-                              " Yaw = " + Format(ocvb.parms.imuGyro.Y, "#0.00") + " Roll = " + Format(ocvb.parms.imuGyro.Z, "#0.00"))
+                flow.msgs.Add("ts = " + Format(ocvb.parms.IMU_TimeStamp, "#0.00") + " Gravity (m/sec^2) x = " + Format(ocvb.parms.IMU_Acceleration.X, "#0.00") +
+                              " y = " + Format(ocvb.parms.IMU_Acceleration.Y, "#0.00") + " z = " + Format(ocvb.parms.IMU_Acceleration.Z, "#0.00") + vbTab +
+                              " Motion (rads/sec) pitch = " + Format(ocvb.parms.IMU_AngularVelocity.X, "#0.00") +
+                              " Yaw = " + Format(ocvb.parms.IMU_AngularVelocity.Y, "#0.00") + " Roll = " + Format(ocvb.parms.IMU_AngularVelocity.Z, "#0.00"))
             End If
             ocvb.label1 = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
         Else
@@ -86,9 +86,9 @@ Public Class IMU_Stabilizer : Implements IDisposable
         If ocvb.parms.IMU_Present Then
             Dim borderCrop = 5
             Dim vert_Border = borderCrop * ocvb.color.Rows / ocvb.color.Cols
-            Dim dx = ocvb.parms.imuGyro.X
-            Dim dy = ocvb.parms.imuGyro.Y
-            Dim da = ocvb.parms.imuGyro.Z
+            Dim dx = ocvb.parms.IMU_AngularVelocity.X
+            Dim dy = ocvb.parms.IMU_AngularVelocity.Y
+            Dim da = ocvb.parms.IMU_AngularVelocity.Z
             Dim sx = 1 ' assume no scaling is taking place.
             Dim sy = 1 ' assume no scaling is taking place.
 
@@ -248,9 +248,10 @@ Public Class IMU_FrameTime : Implements IDisposable
 
         Dim imuFrameTime = CInt(ocvb.parms.IMU_FrameTime)
         If IMUanchor <> 0 Then imuFrameTime = imuFrameTime Mod IMUanchor
-        IMUtoCaptureEstimate = IMUanchor - imuFrameTime + sliders.TrackBar1.Value
+        Dim minDelay = sliders.TrackBar1.Value
+        IMUtoCaptureEstimate = IMUanchor - imuFrameTime + minDelay
         If IMUtoCaptureEstimate > IMUanchor Then IMUtoCaptureEstimate -= IMUanchor
-        If IMUtoCaptureEstimate < 0 Then IMUtoCaptureEstimate = sliders.TrackBar1.Value
+        If IMUtoCaptureEstimate < minDelay Then IMUtoCaptureEstimate = minDelay
 
         Static sampledIMUFrameTime = ocvb.parms.IMU_FrameTime
         If ocvb.frameCount Mod 10 = 0 Then sampledIMUFrameTime = ocvb.parms.IMU_FrameTime
@@ -335,9 +336,10 @@ Public Class IMU_HostFrameTimes : Implements IDisposable
 
         Dim cpuFrameTime = CInt(ocvb.parms.CPU_FrameTime)
         If CPUanchor <> 0 Then cpuFrameTime = cpuFrameTime Mod CPUanchor
-        HostInterruptDelayEstimate = CPUanchor - cpuFrameTime + sliders.TrackBar1.Value
+        Dim minDelay = sliders.TrackBar1.Value
+        HostInterruptDelayEstimate = CPUanchor - cpuFrameTime + minDelay
         If HostInterruptDelayEstimate > CPUanchor Then HostInterruptDelayEstimate -= CPUanchor
-        If HostInterruptDelayEstimate < 0 Then HostInterruptDelayEstimate = sliders.TrackBar1.Value
+        If HostInterruptDelayEstimate < 0 Then HostInterruptDelayEstimate = minDelay
 
         Static sampledCPUFrameTime = ocvb.parms.CPU_FrameTime
         If ocvb.frameCount Mod 10 = 0 Then sampledCPUFrameTime = ocvb.parms.CPU_FrameTime

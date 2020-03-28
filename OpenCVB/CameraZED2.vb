@@ -178,20 +178,15 @@ Public Class CameraZED2
             rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2RightView(cPtr)).Clone()
             pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone()
 
-            If frameCount Mod 100 = 0 Then
-                Static minval As Double, maxval As Double
-                depth16.MinMaxLoc(minval, maxval)
-                Dim mean = depth16.Mean()
-                Console.WriteLine("depth16 mean = " + Format(mean.Item(0), "#0.0") + " max = " + Format(maxval, "#0.0"))
-            End If
-
             Dim imuFrame = Zed2GetPoseData(cPtr)
             Dim acc = Zed2Acceleration(cPtr)
-            imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(acc)
+            IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
+            IMU_Acceleration.Y *= -1 ' make it consistent with the other cameras.
 
             Dim ang = Zed2AngularVelocity(cPtr)
-            imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(ang)
-            imuGyro *= 0.0174533 ' Zed 2 gyro is in degreees/sec
+            IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
+            IMU_AngularVelocity *= 0.0174533 ' Zed 2 gyro is in degrees/sec
+            IMU_AngularVelocity.Z *= -1 ' make it consistent with the other cameras.
 
             Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
             Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
@@ -207,8 +202,7 @@ Public Class CameraZED2
             Marshal.Copy(tr, translation, 0, translation.Length)
 
             Dim rot = Zed2RotationMatrix(cPtr)
-            Dim rotation(8) As Single
-            Marshal.Copy(rot, rotation, 0, rotation.Length)
+            Marshal.Copy(rot, IMU_RotationMatrix, 0, IMU_RotationMatrix.Length)
 
             IMU_Barometer = Zed2IMU_Barometer(cPtr)
             Dim mag = Zed2IMU_Magnetometer(cPtr)

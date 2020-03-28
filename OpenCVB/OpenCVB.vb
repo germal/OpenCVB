@@ -839,6 +839,7 @@ Public Class OpenCVB
         cameraD400Series.HoleFillingFilter = GetSetting("OpenCVB", "HoleFillingFilter", "HoleFillingFilter", True)
 
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
+        ReDim parms.IMU_RotationMatrix(9 - 1)
         lowResolution = optionsForm.lowResolution.Checked
 
         parms.activeAlgorithm = AvailableAlgorithms.Text
@@ -968,14 +969,14 @@ Public Class OpenCVB
                 OpenCVB.ocvb.depth16 = camera.Depth16
                 OpenCVB.ocvb.leftView = camera.leftView
                 OpenCVB.ocvb.rightView = camera.rightView
-                OpenCVB.ocvb.parms.imuGyro = camera.imuGyro
-                OpenCVB.ocvb.parms.imuAccel = camera.imuAccel
+                OpenCVB.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
                 OpenCVB.ocvb.parms.transformationMatrix = camera.transformationMatrix
                 OpenCVB.ocvb.parms.IMU_TimeStamp = camera.IMU_TimeStamp
                 OpenCVB.ocvb.parms.IMU_Barometer = camera.IMU_Barometer
                 OpenCVB.ocvb.parms.IMU_Magnetometer = camera.IMU_Magnetometer
                 OpenCVB.ocvb.parms.IMU_Temperature = camera.IMU_Temperature
                 OpenCVB.ocvb.parms.IMU_Rotation = camera.IMU_Rotation
+                OpenCVB.ocvb.parms.IMU_RotationMatrix = camera.IMU_RotationMatrix
                 OpenCVB.ocvb.parms.IMU_Translation = camera.IMU_Translation
                 OpenCVB.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
                 OpenCVB.ocvb.parms.IMU_Velocity = camera.IMU_Velocity

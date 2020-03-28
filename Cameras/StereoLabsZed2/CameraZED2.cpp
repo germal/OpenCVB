@@ -99,7 +99,6 @@ public:
 
 		zed.retrieveMeasure(depthSL32f, MEASURE::DEPTH, MEM::CPU);
 		cv::Mat depth = cv::Mat(height, width, CV_32FC1, (void*)depthSL32f.getPtr<sl::uchar1>(sl::MEM::CPU)) * 1000;
-		//cv::threshold(depth, depth, 20000, 20000, cv::ThresholdTypes::THRESH_TRUNC);
 
 		depth.convertTo(cPtr->depth16, CV_16U);
 

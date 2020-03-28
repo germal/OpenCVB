@@ -111,14 +111,13 @@ Public Class ActiveClass : Implements IDisposable
         Dim height As Int32
         Dim HomeDir As String
         Dim imageToTrueTypeLoc As Single
-        Dim imuAccel As cv.Point3f
-        Dim imuGyro As cv.Point3f
         Dim IMU_Barometer As Single
         Dim IMU_Magnetometer As cv.Point3f
         Dim IMU_Present As Boolean
         Dim IMU_Temperature As Single
         Dim IMU_TimeStamp As Double
         Dim IMU_Rotation As System.Numerics.Quaternion
+        Dim IMU_RotationMatrix() As Single
         Dim IMU_Translation As cv.Point3f
         Dim IMU_Acceleration As cv.Point3f
         Dim IMU_Velocity As cv.Point3f

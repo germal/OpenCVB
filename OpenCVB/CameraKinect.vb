@@ -39,7 +39,7 @@ Public Class CameraKinect
         Dim temperature As Single
         Dim imuAccel As cv.Point3f
         Dim accelTimeStamp As Long
-        Dim imuGyro As cv.Point3f
+        Dim imu_Gyro As cv.Point3f
         Dim gyroTimeStamp As Long
     End Structure
 
@@ -125,19 +125,19 @@ Public Class CameraKinect
             Exit Sub ' just process the existing images again?  
         Else
             Dim imuOutput = Marshal.PtrToStructure(Of imuData)(imuFrame)
-            imuGyro = imuOutput.imuGyro
-            imuAccel = imuOutput.imuAccel
+            IMU_AngularVelocity = imuOutput.imu_Gyro
+            IMU_Acceleration = imuOutput.imuAccel
 
             ' make the imu data consistent with the Intel IMU...
-            Dim tmpVal = imuAccel.Z
-            imuAccel.Z = imuAccel.X
-            imuAccel.X = imuAccel.Y
-            imuAccel.Y = tmpVal
+            Dim tmpVal = IMU_Acceleration.Z
+            IMU_Acceleration.Z = IMU_Acceleration.X
+            IMU_Acceleration.X = -IMU_Acceleration.Y
+            IMU_Acceleration.Y = tmpVal
 
-            tmpVal = imuGyro.Z
-            imuGyro.Z = -imuGyro.X
-            imuGyro.X = imuGyro.Y
-            imuGyro.Y = tmpVal
+            tmpVal = IMU_AngularVelocity.Z
+            IMU_AngularVelocity.Z = -IMU_AngularVelocity.X
+            IMU_AngularVelocity.X = -IMU_AngularVelocity.Y
+            IMU_AngularVelocity.Y = tmpVal
 
             IMU_TimeStamp = imuOutput.accelTimeStamp / 1000
         End If

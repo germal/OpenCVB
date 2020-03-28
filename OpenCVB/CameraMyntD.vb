@@ -151,19 +151,19 @@ Public Class CameraMyntD
                                            handledepthBytes.AddrOfPinnedObject(), handleLeftViewBytes.AddrOfPinnedObject(),
                                            handleRightViewBytes.AddrOfPinnedObject(), handlePCBytes.AddrOfPinnedObject())
         Dim acc = MyntDAcceleration(cPtr)
-        imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(acc)
+        IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
 
         Dim ang = MyntDAngularVelocity(cPtr)
         Dim angularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
 
-        imuAccel.Z = imuAccel.X
-        imuAccel.Y = angularVelocity.Z
-        imuAccel.X = angularVelocity.Y
+        IMU_Acceleration.Z = IMU_Acceleration.X
+        IMU_Acceleration.Y = angularVelocity.Z
+        IMU_Acceleration.X = angularVelocity.Y
 
         ' all 3 numbers should be near zero for a stationary camera.
-        imuGyro.X = angularVelocity.X
-        imuGyro.Y = angularVelocity.Y
-        imuGyro.Z = angularVelocity.Z
+        IMU_AngularVelocity.X = angularVelocity.X
+        IMU_AngularVelocity.Y = angularVelocity.Y
+        IMU_AngularVelocity.Z = angularVelocity.Z
 
         Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
         Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)

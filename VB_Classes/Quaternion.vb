@@ -1,5 +1,17 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Numerics
+
+Module Quaternion_module
+    Public Function quaternion_exp(v As cv.Point3f) As Quaternion
+        v *= 0.5
+        Dim theta2 = v.X * v.X + v.Y * v.Y + v.Z * v.Z
+        Dim theta = Math.Sqrt(theta2)
+        Dim c = Math.Cos(theta)
+        Dim s = If(theta2 < Math.Sqrt(120 * Single.Epsilon), 1 - theta2 / 6, Math.Sin(theta) / theta2)
+        Return New Quaternion(s * v.X, s * v.Y, s * v.Z, c)
+    End Function
+End Module
+
 Public Class Quaterion_Basics : Implements IDisposable
     Dim sliders1 As New OptionsSliders
     Dim sliders2 As New OptionsSliders
@@ -39,27 +51,20 @@ End Class
 
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/pose-predict
 Public Class Quaterion_IMUPrediction : Implements IDisposable
-    Dim imu As IMU_FrameTime
+    Dim host As IMU_HostFrameTimes
     Public Sub New(ocvb As AlgorithmData)
-        imu = New IMU_FrameTime(ocvb)
-        imu.plot.sliders.Hide()
-        imu.externalUse = True
+        host = New IMU_HostFrameTimes(ocvb)
+        host.externalUse = True
 
         ocvb.label1 = "Quaternion_IMUPrediction"
-        ocvb.desc = "IMU arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
+        ocvb.label2 = ""
+        ocvb.desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
     End Sub
-    Private Function quaternion_exp(v As cv.Point3f) As Quaternion
-        v *= 0.5
-        Dim theta2 = v.X * v.X + v.Y * v.Y + v.Z * v.Z
-        Dim theta = Math.Sqrt(theta2)
-        Dim c = Math.Cos(theta)
-        Dim s = If(theta2 < Math.Sqrt(120 * Single.Epsilon), 1 - theta2 / 6, Math.Sin(theta) / theta2)
-        Return New Quaternion(s * v.X, s * v.Y, s * v.Z, c)
-    End Function
-    Public Sub Run(ocvb As AlgorithmData)
-        imu.Run(ocvb)
 
-        Dim dt = 4 'imu.smoothedLatency ' this is the time from IMU measurement to the time the CPU got the pose data.
+    Public Sub Run(ocvb As AlgorithmData)
+        host.Run(ocvb)
+
+        Dim dt = host.HostInterruptDelayEstimate
 
         Dim t = ocvb.parms.IMU_Translation
         Dim predictedTranslation = New cv.Point3f(dt * (dt / 2 * ocvb.parms.IMU_Acceleration.X + ocvb.parms.IMU_Velocity.X) + t.X,
@@ -75,16 +80,37 @@ Public Class Quaterion_IMUPrediction : Implements IDisposable
 
         Dim diffq = Quaternion.Subtract(ocvb.parms.IMU_Rotation, predictedRotation)
 
-        ocvb.putText(New ActiveClass.TrueType("IMU_Acceleration = " + ocvb.parms.IMU_Acceleration.ToString() + vbCrLf +
-                                              "IMU_Velocity = " + ocvb.parms.IMU_Velocity.ToString() + vbCrLf +
-                                              "IMU_AngularAcceleration = " + ocvb.parms.IMU_AngularAcceleration.ToString() + vbCrLf +
-                                              "IMU_AngularVelocity = " + ocvb.parms.IMU_AngularVelocity.ToString() + vbCrLf +
+        ocvb.putText(New ActiveClass.TrueType("IMU_Acceleration = " + vbTab +
+                                              Format(ocvb.parms.IMU_Acceleration.X, "#0.00") + ", " + vbTab +
+                                              Format(ocvb.parms.IMU_Acceleration.Y, "#0.00") + ", " + vbTab +
+                                              Format(ocvb.parms.IMU_Acceleration.Z, "#0.00") + ", " + vbTab + vbCrLf +
+                                              "IMU_Velocity = " + vbTab + vbTab +
+                                              Format(ocvb.parms.IMU_Velocity.X, "#0.00") + ", " + vbTab +
+                                              Format(ocvb.parms.IMU_Velocity.Y, "#0.00") + ", " + vbTab +
+                                              Format(ocvb.parms.IMU_Velocity.Z, "#0.00") + ", " + vbTab + vbCrLf +
+                                              "IMU_AngularAccel. = " + vbTab +
+                                              Format(ocvb.parms.IMU_AngularAcceleration.X, "#0.00") + ", " + vbTab +
+                                              Format(ocvb.parms.IMU_AngularAcceleration.Y, "#0.00") + ", " + vbTab +
+                                              Format(ocvb.parms.IMU_AngularAcceleration.Z, "#0.00") + ", " + vbTab + vbCrLf +
+                                              "IMU_AngularVelocity = " + vbTab +
+                                              Format(ocvb.parms.IMU_AngularVelocity.X, "#0.00") + ", " + vbTab +
+                                              Format(ocvb.parms.IMU_AngularVelocity.Y, "#0.00") + ", " + vbTab +
+                                              Format(ocvb.parms.IMU_AngularVelocity.Z, "#0.00") + ", " + vbTab + vbCrLf +
                                               "dt = " + dt.ToString() + vbCrLf +
-                                              "Pose quaternion = " + ocvb.parms.IMU_Rotation.ToString() + vbCrLf +
-                                              "Prediction Rotation = " + predictedRotation.ToString() + vbCrLf +
-                                              "difference = " + diffq.ToString(), 10, 40))
+                                              "Pose quaternion = " + vbTab +
+                                              Format(ocvb.parms.IMU_Rotation.X, "#0.00") + ", " + vbTab +
+                                              Format(ocvb.parms.IMU_Rotation.Y, "#0.00") + ", " + vbTab +
+                                              Format(ocvb.parms.IMU_Rotation.Z, "#0.00") + ", " + vbTab + vbCrLf +
+                                              "Prediction Rotation = " + vbTab +
+                                              Format(predictedRotation.X, "#0.00") + ", " + vbTab +
+                                              Format(predictedRotation.Y, "#0.00") + ", " + vbTab +
+                                              Format(predictedRotation.Z, "#0.00") + ", " + vbTab + vbCrLf +
+                                              "difference = " + vbTab + vbTab +
+                                              Format(diffq.X, "#0.00") + ", " + vbTab +
+                                              Format(diffq.Y, "#0.00") + ", " + vbTab +
+                                              Format(diffq.Z, "#0.00") + ", " + vbTab, 10, 40))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        imu.Dispose()
+        host.Dispose()
     End Sub
 End Class

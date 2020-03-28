@@ -45,8 +45,8 @@ Public Class OpenGL_Basics : Implements IDisposable
             memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy, ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy,
                                             rgbInput.Width, rgbInput.Height, rgbInput.ElemSize * rgbInput.Total,
                                             dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
-                                            ocvb.parms.imuGyro.X, ocvb.parms.imuGyro.Y, ocvb.parms.imuGyro.Z,
-                                            ocvb.parms.imuAccel.X, ocvb.parms.imuAccel.Y, ocvb.parms.imuAccel.Z, ocvb.parms.IMU_TimeStamp, If(ocvb.parms.IMU_Present, 1, 0),
+                                            ocvb.parms.IMU_AngularVelocity.X, ocvb.parms.IMU_AngularVelocity.Y, ocvb.parms.IMU_AngularVelocity.Z,
+                                            ocvb.parms.IMU_Acceleration.X, ocvb.parms.IMU_Acceleration.Y, ocvb.parms.IMU_Acceleration.Z, ocvb.parms.IMU_TimeStamp, If(ocvb.parms.IMU_Present, 1, 0),
                                             eye.Item0 / 100, eye.Item1 / 100, eye.Item2 / 100, zTrans, scaleXYZ.Item0 / 10, scaleXYZ.Item1 / 10, scaleXYZ.Item2 / 10,
                                             timeConversionUnits, imuAlphaFactor)
         Next
