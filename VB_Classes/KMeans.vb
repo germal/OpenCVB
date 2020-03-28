@@ -527,7 +527,7 @@ Public Class kMeans_Depth_FG_BG : Implements IDisposable
         If depthCenters.At(Of Single)(0, 0) > depthCenters.At(Of Single)(1, 0) Then foregroundLabel = 1
 
         ' if one of the centers is way out there, leave the mask alone.  KMeans clustered an unreasonably small cluster.
-        If depthCenters.At(Of Single)(0, 0) > 20000 Or depthCenters.At(Of Single)(1, 0) > 20000 Then Exit Sub
+        ' If depthCenters.At(Of Single)(0, 0) > 20000 Or depthCenters.At(Of Single)(1, 0) > 20000 Then Exit Sub
 
         Dim mask = labels.InRange(foregroundLabel, foregroundLabel)
         Dim shadow = ocvb.depth16.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)

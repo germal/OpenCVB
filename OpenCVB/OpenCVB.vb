@@ -977,6 +977,7 @@ Public Class OpenCVB
                 OpenCVB.ocvb.parms.IMU_Temperature = camera.IMU_Temperature
                 OpenCVB.ocvb.parms.IMU_Rotation = camera.IMU_Rotation
                 OpenCVB.ocvb.parms.IMU_RotationMatrix = camera.IMU_RotationMatrix
+                OpenCVB.ocvb.parms.IMU_RotationVector = camera.IMU_RotationVector
                 OpenCVB.ocvb.parms.IMU_Translation = camera.IMU_Translation
                 OpenCVB.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
                 OpenCVB.ocvb.parms.IMU_Velocity = camera.IMU_Velocity

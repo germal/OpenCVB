@@ -8,25 +8,11 @@ Module Zed2_Interface
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2SerialNumber(cPtr As IntPtr) As Int32
     End Function
-
-    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Zed2WaitFrame(cPtr As IntPtr)
-    End Sub
-
-    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2ExtrinsicsTransform(cPtr As IntPtr) As IntPtr
-    End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2intrinsicsLeft(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2intrinsicsRight(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2Translation(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2RotationMatrix(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2Acceleration(cPtr As IntPtr) As IntPtr
@@ -53,6 +39,9 @@ Module Zed2_Interface
 
 
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Zed2WaitForFrame(cPtr As IntPtr)
+    End Sub
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Zed2GetData(cPtr As IntPtr)
     End Sub
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -78,6 +67,21 @@ Module Zed2_Interface
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2LeftView(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2ExtrinsicsRotationMatrix(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2ExtrinsicsTranslation(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2Translation(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2RotationMatrix(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Zed2RotationVector(cPtr As IntPtr) As IntPtr
     End Function
 End Module
 Public Class CameraZED2
@@ -112,19 +116,13 @@ Public Class CameraZED2
             leftView = New cv.Mat
             depth16 = New cv.Mat
 
-            Dim ptr = Zed2ExtrinsicsTransform(cPtr)
-            Dim extrinsicsTransform(16 - 1) As Single
-            Marshal.Copy(ptr, extrinsicsTransform, 0, extrinsicsTransform.Length)
             ReDim Extrinsics_VB.rotation(9 - 1)
+            Dim ptr = Zed2ExtrinsicsRotationMatrix(cPtr)
+            Marshal.Copy(ptr, Extrinsics_VB.rotation, 0, Extrinsics_VB.rotation.Length)
+
             ReDim Extrinsics_VB.translation(3 - 1)
-            Extrinsics_VB.translation(0) = extrinsicsTransform(3)
-            Extrinsics_VB.translation(1) = extrinsicsTransform(7)
-            Extrinsics_VB.translation(2) = extrinsicsTransform(11)
-            For j = 0 To 2
-                Extrinsics_VB.rotation(j) = extrinsicsTransform(j)
-                Extrinsics_VB.rotation(j + 3) = extrinsicsTransform(4 + j)
-                Extrinsics_VB.rotation(j + 6) = extrinsicsTransform(8 + j)
-            Next
+            ptr = Zed2ExtrinsicsTranslation(cPtr)
+            Marshal.Copy(ptr, Extrinsics_VB.translation, 0, Extrinsics_VB.translation.Length)
 
             ptr = Zed2intrinsicsLeft(cPtr)
             Dim intrinsics = Marshal.PtrToStructure(Of intrinsicsLeftZed)(ptr)
@@ -168,7 +166,7 @@ Public Class CameraZED2
 
     Public Sub GetNextFrame()
         If pipelineClosed Or cPtr = 0 Then Exit Sub
-        Zed2WaitFrame(cPtr)
+        Zed2WaitForFrame(cPtr)
 
         SyncLock OpenCVB.camPic
             Zed2GetData(cPtr)
@@ -198,13 +196,14 @@ Public Class CameraZED2
                                     t.X, t.Y, t.Z, 1.0}
             transformationMatrix = mat
 
-            ' testing to see if we could have computed this independently...
-            Dim tr = Zed2Translation(cPtr)
-            Dim translation(2) As Single
-            Marshal.Copy(tr, translation, 0, translation.Length)
-
             Dim rot = Zed2RotationMatrix(cPtr)
             Marshal.Copy(rot, IMU_RotationMatrix, 0, IMU_RotationMatrix.Length)
+
+            Dim vec = Zed2RotationVector(cPtr)
+            IMU_RotationVector = Marshal.PtrToStructure(Of cv.Point3f)(vec)
+
+            Dim tran = Zed2Translation(cPtr)
+            IMU_Translation = Marshal.PtrToStructure(Of cv.Point3f)(tran)
 
             IMU_Barometer = Zed2IMU_Barometer(cPtr)
             Dim mag = Zed2IMU_Magnetometer(cPtr)

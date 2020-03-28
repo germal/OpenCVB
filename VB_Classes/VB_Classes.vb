@@ -118,6 +118,7 @@ Public Class ActiveClass : Implements IDisposable
         Dim IMU_TimeStamp As Double
         Dim IMU_Rotation As System.Numerics.Quaternion
         Dim IMU_RotationMatrix() As Single
+        Dim IMU_RotationVector As cv.Point3f
         Dim IMU_Translation As cv.Point3f
         Dim IMU_Acceleration As cv.Point3f
         Dim IMU_Velocity As cv.Point3f

@@ -111,7 +111,13 @@ Public Class CameraT265Native
             Static imuStartTime = IMU_TimeStamp
             IMU_TimeStamp -= imuStartTime
 
-            IMU_Rotation = pose.rotation
+            IMU_RotationVector = New cv.Point3f(pose.rotation.X, pose.rotation.Y, pose.rotation.Z)
+
+            ' the T265 doesn't provide the rotation matrix so we provide it with this Rodriques calculation
+            Dim src As New cv.Mat(3, 1, cv.MatType.CV_32F, IMU_RotationVector)
+            Dim dst As New cv.Mat(3, 3, src.Type, IMU_RotationMatrix)
+            cv.Cv2.Rodrigues(src, dst)
+
             Dim q = IMU_Rotation
             IMU_Translation = pose.translation
             IMU_Acceleration = pose.acceleration

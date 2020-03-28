@@ -33,6 +33,51 @@ End Class
 
 
 
+Public Class Rodrigues_ValidateVector : Implements IDisposable
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.cameraIndex <> StereoLabsZED2 And ocvb.parms.cameraIndex <> T265Camera Then
+            ocvb.result2.SetTo(0)
+            ocvb.putText(New ActiveClass.TrueType("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation", 10, 140, RESULT1))
+            Exit Sub
+        End If
+
+        Dim rot = ocvb.parms.IMU_RotationMatrix
+        Dim output As String = "IMU Rotation Matrix for Zed 2 camera" + vbCrLf
+        For i = 0 To 2
+            output += vbTab + Format(rot(i * 3), "#0.000000") + vbTab + Format(rot(i * 3 + 1), "#0.0000000") + vbTab + Format(rot(i * 3 + 2), "#0.0000000") + vbCrLf
+        Next
+        ocvb.putText(New ActiveClass.TrueType(output, 10, 90, RESULT1))
+
+        Dim src As New cv.Mat(3, 3, cv.MatType.CV_32F, ocvb.parms.IMU_RotationMatrix)
+        Dim dst As New cv.Mat(3, 1, src.Type)
+        cv.Cv2.Rodrigues(src, dst)
+
+        output = "Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
+        For i = 0 To 2
+            output += vbTab + Format(dst.At(Of Single)(i), "#0.000000000") + vbTab
+        Next
+        ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
+
+        output = "Rotation Vector from IMU: " + vbCrLf
+        output += vbTab + Format(ocvb.parms.IMU_RotationVector.X, "#0.000000000") + vbTab
+        output += vbTab + Format(ocvb.parms.IMU_RotationVector.Y, "#0.000000000") + vbTab
+        output += vbTab + Format(ocvb.parms.IMU_RotationVector.Z, "#0.000000000") + vbTab
+        ocvb.putText(New ActiveClass.TrueType(output, 10, 190, RESULT1))
+
+        If ocvb.parms.cameraIndex = T265Camera Then
+            ocvb.putText(New ActiveClass.TrueType("The T265 does not provide the Rotation Matrix but it is calculated from the Rotation Vector.", 10, 220, RESULT1))
+        End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class
+
+
+
+
 
 Public Class Rodrigues_RotationMatrix : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
@@ -40,23 +85,19 @@ Public Class Rodrigues_RotationMatrix : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim rot = ocvb.parms.IMU_RotationMatrix
-        rot(8) = 0
         Dim output As String = "IMU Rotation Matrix (rotate the camera to see if it is working)" + vbCrLf
         For i = 0 To 2
-            output += vbTab + Format(rot(i * 3), "#0.00") + vbTab + Format(rot(i * 3 + 1), "#0.00") + vbTab + Format(rot(i * 3 + 2), "#0.00") + vbCrLf
+            output += vbTab + Format(rot(i * 3), "#0.000000") + vbTab + Format(rot(i * 3 + 1), "#0.0000000") + vbTab + Format(rot(i * 3 + 2), "#0.0000000") + vbCrLf
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 90, RESULT1))
 
-        Dim src32f As New cv.Mat(3, 3, cv.MatType.CV_32F, ocvb.parms.IMU_RotationMatrix)
-        Dim src As New cv.Mat
-        src32f.ConvertTo(src, cv.MatType.CV_64F)
-        Dim Jacobian As New cv.Mat(9, 3, src.Type, 0)
+        Dim src As New cv.Mat(3, 3, cv.MatType.CV_32F, ocvb.parms.IMU_RotationMatrix)
         Dim dst As New cv.Mat(3, 1, src.Type, 3)
         cv.Cv2.Rodrigues(src, dst)
 
         output = "Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
-            output += vbTab + Format(dst.At(Of Double)(i), "#0.000000000") + vbTab
+            output += vbTab + Format(dst.At(Of Single)(i), "#0.000000000") + vbTab
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
     End Sub

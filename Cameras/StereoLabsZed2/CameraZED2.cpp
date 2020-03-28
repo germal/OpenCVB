@@ -31,10 +31,12 @@ public:
 	int serialNumber = 0;
 	CameraParameters intrinsicsLeft;
 	CameraParameters intrinsicsRight;
-	Transform extrinsicsTransform;
-	float rotation[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	float translation[3] = { 0, 0, 0 };
+	Translation extrinsicsTranslation;
+	Rotation extrinsicsRotationMatrix;
 	float acceleration[3] = { 0, 0, 0 };
+	sl::float3 IMU_RotationVector;
+	Rotation IMU_RotationMatrix;
+	Translation IMU_Translation;
 	SensorsData sensordata;
 	Orientation orientation;
 	float imuTemperature = 0;
@@ -72,7 +74,8 @@ public:
 		CameraInformation camera_info = zed.getCameraInformation();
 		serialNumber = camera_info.serial_number;
 		printf("serial number = %d", serialNumber);
-		extrinsicsTransform = camera_info.camera_configuration.calibration_parameters.stereo_transform;
+		extrinsicsTranslation = camera_info.camera_configuration.calibration_parameters.stereo_transform.getTranslation();
+		extrinsicsRotationMatrix = camera_info.camera_configuration.calibration_parameters.stereo_transform.getRotationMatrix();
 		intrinsicsLeft = camera_info.calibration_parameters.left_cam;
 		intrinsicsRight = camera_info.calibration_parameters.right_cam;
 
@@ -123,8 +126,9 @@ public:
 		}
 
 		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
-		memcpy((void*)&rotation, (void*)&zed_pose.getEulerAngles(), sizeof(float) * 9);
-		memcpy((void*)&translation, (void*)&zed_pose.getTranslation(), sizeof(float) * 3);
+		IMU_RotationMatrix = zed_pose.getRotationMatrix();
+		IMU_RotationVector = zed_pose.getRotationVector();
+		IMU_Translation = zed_pose.getTranslation();
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
 		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
@@ -148,21 +152,25 @@ extern "C" __declspec(dllexport) int* Zed2intrinsicsRight(StereoLabsZed2* Zed2)
 {
 	return (int*)&Zed2->intrinsicsRight;
 }
-extern "C" __declspec(dllexport) int* Zed2ExtrinsicsTransform(StereoLabsZed2*Zed2)
-{
-	return (int *) &Zed2->extrinsicsTransform;
-}
 extern "C" __declspec(dllexport) int* Zed2Acceleration(StereoLabsZed2 * Zed2)
 {
 	return (int*)&Zed2->sensordata.imu.linear_acceleration;
 }
 extern "C" __declspec(dllexport) int* Zed2Translation(StereoLabsZed2 * Zed2)
 {
-	return (int*)&Zed2->translation;
+	return (int*)&Zed2->IMU_Translation;
 }
 extern "C" __declspec(dllexport) int* Zed2RotationMatrix(StereoLabsZed2 * Zed2)
 {
-	return (int*)&Zed2->rotation;
+	return (int*)&Zed2->IMU_RotationMatrix;
+}
+extern "C" __declspec(dllexport) int* Zed2RotationVector(StereoLabsZed2 * Zed2)
+{
+	return (int*)&Zed2->IMU_RotationVector;
+}
+extern "C" __declspec(dllexport) int Zed2Confidence(StereoLabsZed2 * Zed2)
+{
+	return Zed2->zed_pose.pose_confidence;
 }
 extern "C" __declspec(dllexport) int* Zed2AngularVelocity(StereoLabsZed2 * Zed2)
 {
@@ -181,7 +189,7 @@ extern "C" __declspec(dllexport) int Zed2SerialNumber(StereoLabsZed2 * Zed2)
 {
 	return Zed2->serialNumber;
 }
-extern "C" __declspec(dllexport) void Zed2WaitFrame(StereoLabsZed2 * Zed2)
+extern "C" __declspec(dllexport) void Zed2WaitForFrame(StereoLabsZed2 * Zed2)
 {
 	Zed2->waitForFrame();
 }
@@ -202,6 +210,14 @@ extern "C" __declspec(dllexport)float Zed2IMU_Temperature(StereoLabsZed2 * Zed2)
 extern "C" __declspec(dllexport) int* Zed2GetPoseData(StereoLabsZed2 * Zed2)
 {
 	return (int*)&Zed2->zed_pose.pose_data;
+}
+extern "C" __declspec(dllexport) int* Zed2ExtrinsicsRotationMatrix(StereoLabsZed2 * Zed2)
+{
+	return (int*)&Zed2->extrinsicsRotationMatrix;
+}
+extern "C" __declspec(dllexport) int* Zed2ExtrinsicsTranslation(StereoLabsZed2 * Zed2)
+{
+	return (int*)&Zed2->extrinsicsTranslation;
 }
 
 
