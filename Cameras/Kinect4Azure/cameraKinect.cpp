@@ -261,7 +261,7 @@ char* KinectRodrigues()
 
 	// intrinsic parameters of the depth camera
 	k4a_calibration_intrinsic_parameters_t* intrinsics = &calibration.depth_camera_calibration.intrinsics.parameters;
-	vector<float> _camera_matrix = { intrinsics->param.fx, 0.f, intrinsics->param.cx, 0.f, intrinsics->param.fy, intrinsics->param.cy, 
+	vector<float> _camera_matrix = { intrinsics->param.fx, 0.f, intrinsics->param.cx, 0.f, intrinsics->param.fy, intrinsics->param.cy,
 									 0.f, 0.f, 1.f };
 	Mat camera_matrix = Mat(3, 3, CV_32F, &_camera_matrix[0]);
 	vector<float> _dist_coeffs = { intrinsics->param.k1, intrinsics->param.k2, intrinsics->param.p1,
@@ -269,7 +269,7 @@ char* KinectRodrigues()
 								   intrinsics->param.k5, intrinsics->param.k6 };
 	Mat dist_coeffs = Mat(8, 1, CV_32F, &_dist_coeffs[0]);
 
-	// OpenCV project function
+	// OpenCV projectPoints function
 	vector<Point2f> cv_points_2d(points_3d.size());
 	cv::projectPoints(*reinterpret_cast<vector<Point3f>*>(&points_3d), r_vec, t_vec, camera_matrix, dist_coeffs, cv_points_2d);
 
@@ -281,3 +281,14 @@ char* KinectRodrigues()
 
 	return kcPtr->outMsg;
 }
+
+extern "C" __declspec(dllexport)
+void KinectRodriguesOnly(float *extrinsics, float *vectorOut)
+{
+	Mat extIn = Mat(3, 3, CV_32FC1, extrinsics);
+	Mat extOut = Mat(3, 1, CV_32FC1, vectorOut);
+	cv::Rodrigues(extIn, extOut);
+}
+
+
+

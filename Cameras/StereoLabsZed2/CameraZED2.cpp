@@ -31,7 +31,7 @@ public:
 	int serialNumber = 0;
 	CameraParameters intrinsicsLeft;
 	CameraParameters intrinsicsRight;
-	CalibrationParameters extrinsics;
+	Transform extrinsicsTransform;
 	float rotation[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	float translation[3] = { 0, 0, 0 };
 	float acceleration[3] = { 0, 0, 0 };
@@ -69,10 +69,10 @@ public:
 
 		zed.open(init_params);
 
-		auto camera_info = zed.getCameraInformation();
+		CameraInformation camera_info = zed.getCameraInformation();
 		serialNumber = camera_info.serial_number;
 		printf("serial number = %d", serialNumber);
-		extrinsics = camera_info.calibration_parameters_raw;
+		extrinsicsTransform = camera_info.camera_configuration.calibration_parameters.stereo_transform;
 		intrinsicsLeft = camera_info.calibration_parameters.left_cam;
 		intrinsicsRight = camera_info.calibration_parameters.right_cam;
 
@@ -148,9 +148,9 @@ extern "C" __declspec(dllexport) int* Zed2intrinsicsRight(StereoLabsZed2* Zed2)
 {
 	return (int*)&Zed2->intrinsicsRight;
 }
-extern "C" __declspec(dllexport) int* Zed2Extrinsics(StereoLabsZed2*Zed2)
+extern "C" __declspec(dllexport) int* Zed2ExtrinsicsTransform(StereoLabsZed2*Zed2)
 {
-	return (int *) &Zed2->extrinsics;
+	return (int *) &Zed2->extrinsicsTransform;
 }
 extern "C" __declspec(dllexport) int* Zed2Acceleration(StereoLabsZed2 * Zed2)
 {

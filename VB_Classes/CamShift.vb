@@ -126,7 +126,7 @@ Public Class Camshift_Python : Implements IDisposable
         ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes\Python\Camshift_Python.py"
         memMap = New Python_MemMap(ocvb)
 
-        If ocvb.parms.externalInvocation Then
+        If ocvb.parms.externalPythonInvocation Then
             pythonReady = True ' python was already running and invoked OpenCVB.
         Else
             pythonReady = StartPython(ocvb, "--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)

@@ -29,7 +29,7 @@ Public Class OpenCVB
     Dim CodeLineCount As Int32
     Dim DrawingRectangle As Boolean
     Dim drawRect As New cv.Rect(0, 0, 0, 0)
-    Dim externalInvocation As Boolean
+    Dim externalPythonInvocation As Boolean
     Dim fps As Int32 = 30
     Dim formResult1 As New cv.Mat, formResult2 As New cv.Mat
     Dim frameCount As Int32
@@ -76,7 +76,7 @@ Public Class OpenCVB
                 algorithm = args(1)
             End If
             SaveSetting("OpenCVB", "<All>", "<All>", algorithm)
-            externalInvocation = True ' we don't need to start python because it started OpenCVB.
+            externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
         End If
 
         HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
@@ -863,7 +863,7 @@ Public Class OpenCVB
         parms.imageToTrueTypeLoc = 1 / resizeForDisplay
         parms.useRecordedData = OpenCVkeyword.Text = "<All using recorded data>"
         parms.testAllRunning = TestAllButton.Text = "Stop Test"
-        parms.externalInvocation = externalInvocation
+        parms.externalPythonInvocation = externalPythonInvocation
         If parms.testAllRunning Then parms.ShowOptions = optionsForm.ShowOptions.Checked Else parms.ShowOptions = True ' always show options when not running 'test all'
         parms.ShowConsoleLog = optionsForm.ShowConsoleLog.Checked
         parms.AvoidDNNCrashes = optionsForm.AvoidDNNCrashes.Checked

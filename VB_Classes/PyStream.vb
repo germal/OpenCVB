@@ -21,7 +21,7 @@ Public Class PyStream_Basics : Implements IDisposable
 
         memMap = New Python_MemMap(ocvb)
 
-        If ocvb.parms.externalInvocation Then
+        If ocvb.parms.externalPythonInvocation Then
             pythonReady = True ' python was already running and invoked OpenCVB.
         Else
             pythonReady = StartPython(ocvb, "--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)

@@ -126,7 +126,7 @@ Public Class Python_MemMap : Implements IDisposable
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
 
         If externalUse = False Then
-            If ocvb.parms.externalInvocation = False Then
+            If ocvb.parms.externalPythonInvocation = False Then
                 StartPython(ocvb, "--MemMapLength=" + CStr(memMapbufferSize))
             End If
             Dim pythonApp = New FileInfo(ocvb.PythonFileName)
@@ -177,7 +177,7 @@ Public Class Python_SurfaceBlit : Implements IDisposable
         ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
         memMap = New Python_MemMap(ocvb)
 
-        If ocvb.parms.externalInvocation Then
+        If ocvb.parms.externalPythonInvocation Then
             PythonReady = True ' python was already running and invoked OpenCVB.
         Else
             PythonReady = StartPython(ocvb, "--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)

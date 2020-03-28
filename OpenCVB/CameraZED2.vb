@@ -14,7 +14,7 @@ Module Zed2_Interface
     End Sub
 
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2Extrinsics(cPtr As IntPtr) As IntPtr
+    Public Function Zed2ExtrinsicsTransform(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2intrinsicsLeft(cPtr As IntPtr) As IntPtr
@@ -112,16 +112,18 @@ Public Class CameraZED2
             leftView = New cv.Mat
             depth16 = New cv.Mat
 
-            Dim ptr = Zed2Extrinsics(cPtr)
-            Dim rotationTranslation(12) As Single
-            Marshal.Copy(ptr, rotationTranslation, 0, rotationTranslation.Length)
-            ReDim Extrinsics_VB.rotation(8)
-            ReDim Extrinsics_VB.translation(2)
-            For i = 0 To Extrinsics_VB.rotation.Length - 1
-                Extrinsics_VB.rotation(i) = rotationTranslation(i)
-            Next
-            For i = 0 To Extrinsics_VB.translation.Length - 1
-                Extrinsics_VB.translation(i) = rotationTranslation(i + Extrinsics_VB.rotation.Length - 1)
+            Dim ptr = Zed2ExtrinsicsTransform(cPtr)
+            Dim extrinsicsTransform(16 - 1) As Single
+            Marshal.Copy(ptr, extrinsicsTransform, 0, extrinsicsTransform.Length)
+            ReDim Extrinsics_VB.rotation(9 - 1)
+            ReDim Extrinsics_VB.translation(3 - 1)
+            Extrinsics_VB.translation(0) = extrinsicsTransform(3)
+            Extrinsics_VB.translation(1) = extrinsicsTransform(7)
+            Extrinsics_VB.translation(2) = extrinsicsTransform(11)
+            For j = 0 To 2
+                Extrinsics_VB.rotation(j) = extrinsicsTransform(j)
+                Extrinsics_VB.rotation(j + 3) = extrinsicsTransform(4 + j)
+                Extrinsics_VB.rotation(j + 6) = extrinsicsTransform(8 + j)
             Next
 
             ptr = Zed2intrinsicsLeft(cPtr)
