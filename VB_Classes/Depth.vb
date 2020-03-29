@@ -202,35 +202,6 @@ End Class
 
 
 
-Public Class Depth_Holes : Implements IDisposable
-    Public holeMask As New cv.Mat
-    Public borderMask As New cv.Mat
-    Public externalUse = False
-    Dim element As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
-        ocvb.label2 = "Shadow borders"
-        element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
-        ocvb.desc = "Identify holes in the depth image."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        holeMask = ocvb.depth16Raw.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-        holeMask.ConvertTo(holeMask, cv.MatType.CV_8U)
-        If ocvb.parms.lowResolution Then holeMask = holeMask.Resize(ocvb.color.Size)
-        If externalUse = False Then ocvb.result1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        borderMask = New cv.Mat
-        borderMask = holeMask.Dilate(element, Nothing, 1)
-        borderMask.SetTo(0, holeMask)
-        If externalUse = False Then ocvb.result2 = borderMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        holeMask.Dispose()
-        borderMask.Dispose()
-        element.Dispose()
-    End Sub
-End Class
-
-
 
 Public Class Depth_HolesRect : Implements IDisposable
     Dim sliders As New OptionsSliders
@@ -1314,5 +1285,35 @@ Public Class Depth_ColorMap : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
         Palette.Dispose()
+    End Sub
+End Class
+
+
+
+Public Class Depth_Holes : Implements IDisposable
+    Public holeMask As New cv.Mat
+    Public borderMask As New cv.Mat
+    Public externalUse = False
+    Dim element As New cv.Mat
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.label2 = "Shadow borders"
+        element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
+        ocvb.desc = "Identify holes in the depth image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        holeMask = ocvb.depth16Raw.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        holeMask.ConvertTo(holeMask, cv.MatType.CV_8U)
+        If ocvb.parms.lowResolution Then holeMask = holeMask.Resize(ocvb.color.Size)
+        If externalUse = False Then ocvb.result1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        borderMask = New cv.Mat
+        borderMask = holeMask.Dilate(element, Nothing, 1)
+        borderMask.SetTo(0, holeMask)
+        If externalUse = False Then ocvb.result2 = borderMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        holeMask.Dispose()
+        borderMask.Dispose()
+        element.Dispose()
     End Sub
 End Class

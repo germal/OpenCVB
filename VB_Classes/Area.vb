@@ -136,3 +136,41 @@ Public Class Area_MinMotionRect : Implements IDisposable
         input.Dispose()
     End Sub
 End Class
+
+
+
+
+
+Public Class Area_FindNonZero : Implements IDisposable
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.label1 = "Non-zero original points"
+        ocvb.label2 = "Coordinates of non-zero points"
+        ocvb.desc = "Use FindNonZero API to get coordinates of non-zero points."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim gray = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U).SetTo(0)
+        Dim srcPoints(10 - 1) As cv.Point ' doesn't really matter how many there are.
+        For i = 0 To srcPoints.Length - 1
+            srcPoints(i).X = ocvb.ms_rng.Next(0, ocvb.color.Width)
+            srcPoints(i).Y = ocvb.ms_rng.Next(0, ocvb.color.Height)
+            gray.Set(Of Byte)(srcPoints(i).Y, srcPoints(i).X, 255)
+        Next
+
+        Dim nonzero = gray.FindNonZero()
+
+        ocvb.result1.SetTo(0)
+        ' mark the points so they are visible...
+        For i = 0 To srcPoints.Length - 1
+            ocvb.result1.Circle(srcPoints(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        Next
+
+        Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf
+        For i = 0 To srcPoints.Length - 1
+            Dim pt = nonzero.At(Of cv.Point)(0, i)
+            outstr += "X = " + vbTab + CStr(pt.X) + vbTab + " y = " + vbTab + CStr(pt.Y) + vbCrLf
+        Next
+        ocvb.putText(New ActiveClass.TrueType(outstr, 10, 50, RESULT2))
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class

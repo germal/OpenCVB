@@ -1,4 +1,35 @@
 ﻿Imports cv = OpenCvSharp
+Module GetRotationMatrix
+    Public Sub SetInterpolationRadioButtons(ocvb As AlgorithmData, radio As OptionsRadioButtons)
+        radio.Setup(ocvb, 7)
+        radio.check(0).Text = "WarpAffine with Area"
+        radio.check(1).Text = "WarpAffine with Cubic flag"
+        radio.check(2).Text = "WarpAffine with Lanczos4"
+        radio.check(3).Text = "WarpAffine with Linear"
+        radio.check(4).Text = "WarpAffine with Nearest"
+        radio.check(5).Text = "WarpAffine with WarpFillOutliers"
+        radio.check(6).Text = "WarpAffine with WarpInverseMap"
+        radio.check(3).Checked = True
+        If ocvb.parms.ShowOptions Then radio.Show()
+    End Sub
+    Public Function getInterpolationRadioButtons(radio As OptionsRadioButtons) As cv.InterpolationFlags
+        Dim warpFlag As cv.InterpolationFlags
+        For i = 0 To radio.check.Length - 1
+            If radio.check(i).Checked Then
+                warpFlag = Choose(i + 1, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic, cv.InterpolationFlags.Lanczos4, cv.InterpolationFlags.Linear,
+                                    cv.InterpolationFlags.Nearest, cv.InterpolationFlags.WarpFillOutliers, cv.InterpolationFlags.WarpInverseMap)
+                Exit For
+            End If
+        Next
+        Return warpFlag
+    End Function
+End Module
+
+
+
+
+
+
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class GetRotationMatrix2D_Basics : Implements IDisposable
     Public sliders As New OptionsSliders
@@ -11,28 +42,13 @@ Public Class GetRotationMatrix2D_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "GetRotationMatrix2D Angle", 0, 360, 24)
         If ocvb.parms.ShowOptions Then sliders.Show()
+        SetInterpolationRadioButtons(ocvb, radio)
 
-        radio.Setup(ocvb, 7)
-        radio.check(0).Text = "WarpAffine with Area"
-        radio.check(1).Text = "WarpAffine with Cubic flag"
-        radio.check(2).Text = "WarpAffine with Lanczos4"
-        radio.check(3).Text = "WarpAffine with Linear"
-        radio.check(4).Text = "WarpAffine with Nearest"
-        radio.check(5).Text = "WarpAffine with WarpFillOutliers"
-        radio.check(6).Text = "WarpAffine with WarpInverseMap"
-        radio.check(3).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
         ocvb.desc = "Rotate a rectangle of a specified angle"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then src = ocvb.color
-        For i = 0 To radio.check.Length - 1
-            If radio.check(i).Checked Then
-                warpFlag = Choose(i + 1, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic, cv.InterpolationFlags.Lanczos4, cv.InterpolationFlags.Linear,
-                                    cv.InterpolationFlags.Nearest, cv.InterpolationFlags.WarpFillOutliers, cv.InterpolationFlags.WarpInverseMap)
-                Exit For
-            End If
-        Next
+        warpFlag = getInterpolationRadioButtons(radio)
 
         Dim angle = sliders.TrackBar1.Value
         M = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), angle, 1)
