@@ -26,7 +26,7 @@ class App(object):
 
     def test1(self, src):
         #rect = cv.selectROI(src, False)
-        rect = ((10, 10), (200, 200))
+        rect = ((100, 100), (200, 200))
         result = self.crop_minAreaRect(src, rect)
         cv.imshow("src(result)", result)
         cv.imshow("src", src)
@@ -34,7 +34,6 @@ class App(object):
     def Open(self):
         src = cv.imread('../../Data/baboon.jpg')
         self.test1(src)
-        #self.get_transform(src)
-        cv.waitKey(10000)
+        cv.waitKey()
 
 App().Open()

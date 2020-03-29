@@ -17,6 +17,9 @@ Module IndexMain
         End While
         Return line
     End Function
+    Private Function isAlpha(ByVal letterChar As String) As Boolean
+        Return Regex.IsMatch(letterChar, "^[A-Za-z]{1}$")
+    End Function
     Sub Main()
         Dim apiList As New List(Of String)
         Dim apiListLCase As New List(Of String)
@@ -71,7 +74,7 @@ Module IndexMain
 
             While nextFile.Peek() <> -1
                 line = Trim(nextFile.ReadLine())
-                Dim lcaseLine = LCase(line)
+                Dim lcaseLine = " " + LCase(line)
                 If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
                 If lcaseLine.Contains("Painterly Effect") Then Painterly.Add(classname, classname)
                 Dim split As String() = Regex.Split(line, "\W+")
@@ -89,11 +92,14 @@ Module IndexMain
                 If classname <> "" Then
                     If line.Contains("New OpenGL") And classname.StartsWith("OpenGL") = False And classname.StartsWith("OpenCVGL") = False Then OpenGLnames.Add(classname, classname)
                     For i = 0 To apiList.Count - 1
-                        If InStr(line, apiList(i)) Or InStr(lcaseLine, apiListLCase(i)) Then
-                            If tokens(i) Is Nothing Then
-                                tokens(i) = classname
-                            Else
-                                If tokens(i).Contains(classname) = False Then tokens(i) += "," + classname
+                        Dim index = InStr(lcaseLine, apiListLCase(i))
+                        If index > 0 Then
+                            If isAlpha(lcaseLine.Substring(index - 2, 1)) = False Then
+                                If tokens(i) Is Nothing Then
+                                    tokens(i) = classname
+                                Else
+                                    If tokens(i).Contains(classname) = False Then tokens(i) += "," + classname
+                                End If
                             End If
                         End If
                     Next

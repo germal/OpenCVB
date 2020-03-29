@@ -132,6 +132,7 @@
     <Compile Include="FishEye.vb" />
     <Compile Include="FREAK.vb" />
     <Compile Include="Gabor.vb" />
+    <Compile Include="GetRotationMatrix2D.vb" />
     <Compile Include="Grayscale.vb" />
     <Compile Include="Harris.vb" />
     <Compile Include="Area.vb" />
@@ -357,6 +358,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Python\Coherence.py" />
+    <Content Include="Python\GetRotationMatrix2d.py" />
     <Content Include="Python\Grabcut.py" />
     <Content Include="Python\Kalman_TinyEKF.py" />
     <Content Include="Python\Camshift_PS.py" />
@@ -409,7 +412,6 @@
     <Content Include="Python\Calibrate_ShowExtrinsics.py" />
     <Content Include="Python\Edges_CannyDetector.py" />
     <Content Include="Python\Brightness_Contrast_Example2.py" />
-    <Content Include="Python\Coherence.py" />
     <Content Include="Python\Histogram_Compare_Demo.py" />
     <Content Include="Python\Contours.py" />
     <Content Include="Python\Copy_make_border.py" />

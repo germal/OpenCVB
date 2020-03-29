@@ -29,13 +29,13 @@ Public Class WarpAffine_Captcha : Implements IDisposable
         Next
     End Sub
 
-    Private Sub scale(input As cv.Mat, ByRef output As cv.Mat)
+    Private Sub scaleImg(input As cv.Mat, ByRef output As cv.Mat)
         Dim height = rng.Next(0, 19) * -1 + charHeight
         Dim width = rng.Next(0, 19) * -1 + charWidth
         Dim s = New cv.Size(width, height)
         output = input.Resize(s)
     End Sub
-    Private Sub rotate(input As cv.Mat, ByRef output As cv.Mat)
+    Private Sub rotateImg(input As cv.Mat, ByRef output As cv.Mat)
         Dim sign = CInt(rng.NextDouble())
         If sign = 0 Then sign = -1
         Dim angle = rng.Next(0, 29) * sign ' between -30 and 30
@@ -43,7 +43,7 @@ Public Class WarpAffine_Captcha : Implements IDisposable
         Dim rotationMatrix = cv.Cv2.GetRotationMatrix2D(center, angle, 1)
         cv.Cv2.WarpAffine(input, output, rotationMatrix, input.Size(), cv.InterpolationFlags.Linear, cv.BorderTypes.Constant, cv.Scalar.White)
     End Sub
-    Private Sub transform(ByRef charImage As cv.Mat)
+    Private Sub transformPerspective(ByRef charImage As cv.Mat)
         Dim src(3) As cv.Point2f
         src(0) = New cv.Point2f(0, 0)
         src(1) = New cv.Point2f(0, charHeight)
@@ -76,9 +76,9 @@ Public Class WarpAffine_Captcha : Implements IDisposable
             Dim c = characters(rng.Next(0, characters.Length - 1))
             cv.Cv2.PutText(charImage, c, New cv.Point(10, charHeight - 10), ocvb.ms_rng.next(1, 6), ocvb.ms_rng.next(3, 4), ocvb.rColors(i), ocvb.ms_rng.next(1, 5),
                            cv.LineTypes.AntiAlias)
-            transform(charImage)
-            rotate(charImage, charImage)
-            scale(charImage, charImage)
+            transformPerspective(charImage)
+            rotateImg(charImage, charImage)
+            scaleImg(charImage, charImage)
             charImage.CopyTo(outImage(New cv.Rect(charWidth * i, 0, charImage.Cols, charImage.Rows)))
         Next
 
