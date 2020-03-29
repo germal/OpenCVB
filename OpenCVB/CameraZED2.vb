@@ -113,8 +113,6 @@ Public Class CameraZED2
             Console.WriteLine("ZED 2 serial number = " + CStr(serialNumber))
             w = width
             h = height
-            leftView = New cv.Mat
-            depth16 = New cv.Mat
 
             ReDim Extrinsics_VB.rotation(9 - 1)
             Dim ptr = Zed2ExtrinsicsRotationMatrix(cPtr)

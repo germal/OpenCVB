@@ -279,10 +279,12 @@ Public Class OpenCVB
             End If
             If cameraRefresh Then
                 cameraRefresh = False
+                Dim RGBDepth As New cv.Mat
+                Dim color As New cv.Mat
                 SyncLock camPic ' avoid updating the image while copying into it in the algorithm and camera tasks
                     If camera.color IsNot Nothing Then
-                        Dim RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
-                        Dim Color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
+                        RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
+                        color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
                         cvext.BitmapConverter.ToBitmap(Color, camPic(0).Image)
                         cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
                     End If
@@ -961,12 +963,14 @@ Public Class OpenCVB
                 If lowResolution Then
                     OpenCVB.ocvb.color = camera.color.Resize(fastSize)
                     OpenCVB.ocvb.RGBDepth = camera.RGBDepth.Resize(fastSize)
+                    OpenCVB.ocvb.depth16 = camera.Depth16.resize(fastSize)
                 Else
                     OpenCVB.ocvb.color = camera.color
                     OpenCVB.ocvb.RGBDepth = camera.RGBDepth
+                    OpenCVB.ocvb.depth16 = camera.depth16
                 End If
+                OpenCVB.ocvb.depth16Raw = camera.depth16raw
                 OpenCVB.ocvb.pointCloud = camera.PointCloud
-                OpenCVB.ocvb.depth16 = camera.Depth16
                 OpenCVB.ocvb.leftView = camera.leftView
                 OpenCVB.ocvb.rightView = camera.rightView
                 OpenCVB.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration

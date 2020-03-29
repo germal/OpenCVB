@@ -7,6 +7,7 @@ Public Class AlgorithmData
     Public color As cv.Mat
     Public colorScalar(255) As cv.Scalar
     Public depth16 As cv.Mat
+    Public depth16Raw As cv.Mat
     Public RGBDepth As cv.Mat
     Public desc As String
     Public drawRect As cv.Rect ' filled in if the user draws on any of the images.

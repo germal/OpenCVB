@@ -25,6 +25,7 @@ Public Class Camera
     Public w As Int32
     Public color As cv.Mat
     Public depth16 As cv.Mat
+    Public depth16Raw As cv.Mat
     Public RGBDepth As cv.Mat
     Public deviceCount As Int32
     Public deviceName As String
@@ -113,6 +114,7 @@ Public Class Camera
         CPU_FrameTime = CPU_TimeStamp - lastCPUTime
         lastCPUTime = CPU_TimeStamp
 
+        depth16Raw = depth16
         frameCount += 1
         newImagesAvailable = True
     End Sub

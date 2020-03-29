@@ -534,7 +534,6 @@ Public Class kMeans_Depth_FG_BG : Implements IDisposable
         Dim shadowMask As New cv.Mat
         shadow.ConvertTo(shadowMask, cv.MatType.CV_8U)
         mask.SetTo(0, shadowMask)
-        If ocvb.parms.lowResolution Then mask = mask.Resize(ocvb.color.Size())
         ocvb.result1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -772,7 +771,6 @@ Public Class kMeans_ColorDepth : Implements IDisposable
         ReDim Preserve srcPlanes(3)
         srcPlanes(3) = New cv.Mat
         ocvb.depth16.ConvertTo(srcPlanes(3), cv.MatType.CV_32F)
-        If ocvb.parms.lowResolution Then srcPlanes(3) = srcPlanes(3).Resize(ocvb.color.Size())
 
         Dim rgbDepth As New cv.Mat
         cv.Cv2.Merge(srcPlanes, rgbDepth)

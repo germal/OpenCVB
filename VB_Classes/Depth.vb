@@ -21,7 +21,6 @@ Public Class Depth_ManualTrim : Implements IDisposable
         cv.Cv2.BitwiseAnd(Mask, maskMin, Mask)
 
         ocvb.result1.SetTo(0)
-        If ocvb.parms.lowResolution Then Mask = Mask.Resize(ocvb.color.Size())
         ocvb.RGBDepth.CopyTo(ocvb.result1, Mask)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -139,7 +138,6 @@ Public Class Depth_Median : Implements IDisposable
 
         Dim zeroMask = ocvb.depth16.Equals(0)
         cv.Cv2.ConvertScaleAbs(zeroMask, zeroMask.ToMat)
-        If ocvb.parms.lowResolution Then zeroMask = zeroMask.ToMat.Resize(ocvb.result1.Size())
         ocvb.result1.SetTo(0, zeroMask)
 
         ocvb.label1 = "Median Depth < " + Format(median.medianVal, "#0.0")
@@ -215,10 +213,9 @@ Public Class Depth_Holes : Implements IDisposable
         ocvb.desc = "Identify holes in the depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim mask = ocvb.depth16.Threshold(1, 0, cv.ThresholdTypes.TozeroInv)
-        If ocvb.parms.lowResolution Then mask = mask.Resize(ocvb.color.Size)
-        holeMask = New cv.Mat
-        mask.ConvertTo(holeMask, cv.MatType.CV_8UC1)
+        holeMask = ocvb.depth16Raw.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        holeMask.ConvertTo(holeMask, cv.MatType.CV_8U)
+        If ocvb.parms.lowResolution Then holeMask = holeMask.Resize(ocvb.color.Size)
         If externalUse = False Then ocvb.result1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         borderMask = New cv.Mat
@@ -422,7 +419,6 @@ Public Class Depth_FlatData : Implements IDisposable
         Dim gray8u As New cv.Mat
 
         cv.Cv2.BitwiseNot(shadow.holeMask, mask)
-        If ocvb.parms.lowResolution Then mask = mask.Resize(ocvb.depth16.Size())
         gray = ocvb.depth16.Normalize(0, 255, cv.NormTypes.MinMax, -1, mask)
         gray.ConvertTo(gray8u, cv.MatType.CV_8U)
 
@@ -463,12 +459,9 @@ Public Class Depth_FlatBackground : Implements IDisposable
         ocvb.depth16.SetTo(0, zeroMask)
 
         ocvb.result1.SetTo(0)
-        If ocvb.parms.lowResolution Then mask = mask.Resize(ocvb.color.Size())
         ocvb.RGBDepth.CopyTo(ocvb.result1, mask)
-        If ocvb.parms.lowResolution Then zeroMask = zeroMask.Resize(ocvb.color.Size())
         zeroMask.SetTo(255, shadow.holeMask)
         ocvb.color.CopyTo(ocvb.result1, zeroMask)
-        If ocvb.parms.lowResolution Then zeroMask = zeroMask.Resize(ocvb.depth16.Size())
         ocvb.depth16.SetTo(maxDepth, zeroMask) ' set the depth to the maxdepth for any background
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -660,7 +653,6 @@ Public Class Depth_MeanStdevPlot : Implements IDisposable
         Dim mean As Single = 0, stdev As Single = 0
         Dim mask As New cv.Mat
         cv.Cv2.BitwiseNot(shadow.holeMask, mask)
-        If ocvb.parms.lowResolution Then mask = mask.Resize(ocvb.depth16.Size())
         cv.Cv2.MeanStdDev(ocvb.depth16, mean, stdev, mask)
 
         If mean > plot1.maxScale Then plot1.maxScale = mean + 1000 - (mean + 1000) Mod 1000
@@ -819,12 +811,7 @@ Public Class Depth_Colorizer_1_CPP : Implements IDisposable
             Dim dstData(dst.Total * dst.ElemSize - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             If externalUse = False Then
-                If ocvb.parms.lowResolution Then
-                    Dim tmp = New cv.Mat(ocvb.depth16.Rows, ocvb.depth16.Cols, cv.MatType.CV_8UC3, dstData)
-                    ocvb.result1 = tmp.Resize(ocvb.result1.Size())
-                Else
-                    ocvb.result1 = New cv.Mat(ocvb.result1.Rows, ocvb.result1.Cols, cv.MatType.CV_8UC3, dstData)
-                End If
+                ocvb.result1 = New cv.Mat(ocvb.result1.Rows, ocvb.result1.Cols, cv.MatType.CV_8UC3, dstData)
             End If
 
             dst = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)

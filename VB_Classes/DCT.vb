@@ -184,7 +184,6 @@ Public Class DCT_Surfaces_debug : Implements IDisposable
         Dim mask = ocvb.result1.Clone() ' result1 contains the DCT mask of featureless surfaces.
         Dim notMask As New cv.Mat
         cv.Cv2.BitwiseNot(mask, notMask)
-        If ocvb.parms.lowResolution Then notMask = notMask.Resize(ocvb.depth16.Size())
         ocvb.depth16.SetTo(0, notMask) ' remove non-featureless surface depth data.
 
         ' find the most featureless roi
