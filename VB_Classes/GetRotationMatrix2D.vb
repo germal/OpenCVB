@@ -1,14 +1,14 @@
 ﻿Imports cv = OpenCvSharp
 Module GetRotationMatrix
-    Public Sub SetInterpolationRadioButtons(ocvb As AlgorithmData, radio As OptionsRadioButtons)
+    Public Sub SetInterpolationRadioButtons(ocvb As AlgorithmData, radio As OptionsRadioButtons, radioName As String)
         radio.Setup(ocvb, 7)
-        radio.check(0).Text = "WarpAffine with Area"
-        radio.check(1).Text = "WarpAffine with Cubic flag"
-        radio.check(2).Text = "WarpAffine with Lanczos4"
-        radio.check(3).Text = "WarpAffine with Linear"
-        radio.check(4).Text = "WarpAffine with Nearest"
-        radio.check(5).Text = "WarpAffine with WarpFillOutliers"
-        radio.check(6).Text = "WarpAffine with WarpInverseMap"
+        radio.check(0).Text = radioName + " with Area"
+        radio.check(1).Text = radioName + " with Cubic flag"
+        radio.check(2).Text = radioName + " with Lanczos4"
+        radio.check(3).Text = radioName + " with Linear"
+        radio.check(4).Text = radioName + " with Nearest"
+        radio.check(5).Text = radioName + " with WarpFillOutliers"
+        radio.check(6).Text = radioName + " with WarpInverseMap"
         radio.check(3).Checked = True
         If ocvb.parms.ShowOptions Then radio.Show()
     End Sub
@@ -42,7 +42,7 @@ Public Class GetRotationMatrix2D_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "GetRotationMatrix2D Angle", 0, 360, 24)
         If ocvb.parms.ShowOptions Then sliders.Show()
-        SetInterpolationRadioButtons(ocvb, radio)
+        SetInterpolationRadioButtons(ocvb, radio, "Rotation2D")
 
         ocvb.desc = "Rotate a rectangle of a specified angle"
     End Sub

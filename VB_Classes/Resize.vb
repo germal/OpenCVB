@@ -6,31 +6,22 @@ Public Class Resize_Options : Implements IDisposable
     Public dst As New cv.Mat
     Public newSize As cv.Size
     Public Sub New(ocvb As AlgorithmData)
-        radio.Setup(ocvb, 5)
-        radio.check(0).Text = "Resize with Area flag"
-        radio.check(1).Text = "Resize with Cubic flag (Should have no changed pixels)"
-        radio.check(2).Text = "Resize with Lanczos4 flag"
-        radio.check(3).Text = "Resize with Linear flag"
-        radio.check(4).Text = "Resize with Nearest flag"
-        radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
+        SetInterpolationRadioButtons(ocvb, radio, "Resize")
+        ' warp is not allowed in resize
+        radio.check(5).Enabled = False
+        radio.check(6).Enabled = False
+
         ocvb.desc = "Resize with different options and compare them"
         ocvb.label2 = "Difference from Cubic Resize (Best)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim resizeFlag As Int32
-        For i = 0 To radio.check.Length - 1
-            If radio.check(i).Checked Then
-                resizeFlag = Choose(i + 1, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic, cv.InterpolationFlags.Lanczos4, cv.InterpolationFlags.Linear,
-                                    cv.InterpolationFlags.Nearest)
-                If externalUse = False Then ocvb.label1 = radio.check(i).Text + " (draw anywhere)"
-                Exit For
-            End If
-        Next
+        Dim resizeFlag = getInterpolationRadioButtons(radio)
         If externalUse = False Then
             Dim roi = New cv.Rect(ocvb.color.Width / 4, ocvb.color.Height / 4, ocvb.color.Width / 2, ocvb.color.Height / 2)
             If ocvb.drawRect.Width <> 0 Then roi = ocvb.drawRect
+
             ocvb.result1 = ocvb.color(roi).Resize(ocvb.result1.Size(), 0, 0, resizeFlag)
+
             ocvb.result2 = ocvb.color(roi).Resize(ocvb.result1.Size(), 0, 0, cv.InterpolationFlags.Cubic)
             ocvb.result2 -= ocvb.result1
             ocvb.result2 = ocvb.result2.Threshold(0, 255, cv.ThresholdTypes.Binary)

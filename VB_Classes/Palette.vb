@@ -29,31 +29,30 @@ End Class
 
 
 Public Class Palette_LinearPolar : Implements IDisposable
+    Dim radio As New OptionsRadioButtons
+    Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         ocvb.desc = "Use LinearPolar to create gradient image"
+        SetInterpolationRadioButtons(ocvb, radio, "LinearPolar")
+
+        sliders.setupTrackBar1(ocvb, "LinearPolar radius", 0, ocvb.color.Cols, ocvb.color.Cols / 2)
+        If ocvb.parms.ShowOptions Then sliders.Show()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod 30 = 0 Then
-            For i = 0 To ocvb.result1.Rows - 1
-                Dim c = i * 255 / ocvb.result1.Rows
-                ocvb.result1.Row(i).SetTo(New cv.Scalar(c, c, c))
-            Next
-            Static choices As Int32
-            Dim iFlagName = Choose(choices Mod 7 + 1, "Area", "Cubic", "lanczos4", "Linear", "Nearest", "WarpFillOutliers", "WarpInverseMap")
-            Dim iFlag = Choose(choices Mod 7 + 1, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic, cv.InterpolationFlags.Lanczos4, cv.InterpolationFlags.Linear,
-                                                      cv.InterpolationFlags.Nearest, cv.InterpolationFlags.WarpFillOutliers, cv.InterpolationFlags.WarpInverseMap)
-            ocvb.label1 = "LinearPolar " + iFlagName
-            ocvb.label2 = "LinearPolar RGB image"
-
-            Static pt = New cv.Point2f(ocvb.ms_rng.next(0, ocvb.result1.Cols - 1), ocvb.ms_rng.next(0, ocvb.result1.Rows - 1))
-            Dim radius = ocvb.ms_rng.next(0, ocvb.result1.Cols)
-            ocvb.result2.SetTo(0)
-            cv.Cv2.LinearPolar(ocvb.result1, ocvb.result1, pt, radius, iFlag)
-            cv.Cv2.LinearPolar(ocvb.color, ocvb.result2, pt, radius, iFlag)
-            choices += 1
-        End If
+        For i = 0 To ocvb.result1.Rows - 1
+            Dim c = i * 255 / ocvb.result1.Rows
+            ocvb.result1.Row(i).SetTo(New cv.Scalar(c, c, c))
+        Next
+        Dim iFlag = getInterpolationRadioButtons(radio)
+        Static pt = New cv.Point2f(ocvb.ms_rng.Next(0, ocvb.result1.Cols - 1), ocvb.ms_rng.Next(0, ocvb.result1.Rows - 1))
+        Dim radius = sliders.TrackBar1.Value ' ocvb.ms_rng.next(0, ocvb.result1.Cols)
+        ocvb.result2.SetTo(0)
+        cv.Cv2.LinearPolar(ocvb.result1, ocvb.result1, pt, radius, iFlag)
+        cv.Cv2.LinearPolar(ocvb.color, ocvb.result2, pt, radius, iFlag)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+        radio.Dispose()
+        sliders.Dispose()
     End Sub
 End Class
 

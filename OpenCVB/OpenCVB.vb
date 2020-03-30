@@ -725,7 +725,9 @@ Public Class OpenCVB
         Application.DoEvents()
         camera.closePipe()
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
+        If algorithmTaskHandle IsNot Nothing Then algorithmTaskHandle.Abort()
         If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
+        If cameraTaskHandle IsNot Nothing Then cameraTaskHandle.Abort()
         textDesc = ""
         saveLayout()
     End Sub

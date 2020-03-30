@@ -102,7 +102,7 @@ Public Class WarpAffine_Basics : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Angle", 0, 360, 10)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        SetInterpolationRadioButtons(ocvb, radio)
+        SetInterpolationRadioButtons(ocvb, radio, "WarpAffine")
 
         ocvb.desc = "Use WarpAffine to transform input images."
     End Sub
