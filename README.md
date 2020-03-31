@@ -220,7 +220,7 @@ algorithm names and all the OpenCV API’s referenced. For instance, selecting
 “Threshold” in the Subset Combo Box, will update the Algorithm Combo Box with
 all the algorithms that use the OpenCV “Threshold” API.
 
-![](media/4586d56c7a17e4e113da812370ffc437.png)
+![](media/38bd5de162aff996693b6f96d7b1d58e.png)
 
 *In the image above, the subset “\<All\>” has been selected and the complete
 list of algorithms will appear in the combo box on the left. If the subset
@@ -234,6 +234,14 @@ subsets. In addition to all the OpenCV API’s and OpenCVB algorithms, several
 higher-level groupings are available. For instance, selecting “\<OpenGL\>” will
 select only the algorithms that use OpenGL. The “\<All\>” entry in the Subset
 Combo Box will restore the complete list of algorithms.
+
+**Testing All Experiments**
+
+Testing is integrated into OpenCVB. Clicking the icon below runs through a
+checklist of all the algorithms at all the resolutions with all the supported
+cameras available on the system.
+
+![](media/4551393d07ab7de64ae7f0422f672cb7.png)
 
 **Why VB.Net?**
 
