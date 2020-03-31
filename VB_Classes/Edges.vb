@@ -250,6 +250,7 @@ End Class
 Public Class Edges_Sobel : Implements IDisposable
     Public sliders As New OptionsSliders
     Public src As cv.Mat
+    Public dst As cv.Mat
     Public grayX As cv.Mat
     Public grayY As cv.Mat
     Public externalUse As Boolean
@@ -262,17 +263,15 @@ Public Class Edges_Sobel : Implements IDisposable
         Dim kernelSize As Int32 = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         Dim grad As New cv.Mat()
-        If externalUse = False Then
-            src = ocvb.color
-        End If
-        Dim gray As New cv.Mat
-        If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else gray = src.Clone()
-        grayX = gray.Sobel(cv.MatType.CV_16U, 1, 0, kernelSize)
+        If externalUse = False Then src = ocvb.color
+        dst = New cv.Mat(src.Rows, src.Cols, src.Type)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        grayX = src.Sobel(cv.MatType.CV_16U, 1, 0, kernelSize)
         Dim abs_grayX = grayX.ConvertScaleAbs()
-        grayY = gray.Sobel(cv.MatType.CV_16U, 0, 1, kernelSize)
+        grayY = src.Sobel(cv.MatType.CV_16U, 0, 1, kernelSize)
         Dim abs_grayY = grayY.ConvertScaleAbs()
-        cv.Cv2.AddWeighted(abs_grayX, 0.5, abs_grayY, 0.5, 0, grad)
-        ocvb.result1 = grad.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.AddWeighted(abs_grayX, 0.5, abs_grayY, 0.5, 0, dst)
+        If externalUse = False Then ocvb.result1 = dst
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()

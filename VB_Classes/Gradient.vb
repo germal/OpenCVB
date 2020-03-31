@@ -23,6 +23,7 @@ Public Class Gradient_Basics : Implements IDisposable
         cv.Cv2.Phase(x32f, y32f, angle)
         Dim gray = angle.Normalize(255, 0, cv.NormTypes.MinMax)
         gray.ConvertTo(ocvb.result2, cv.MatType.CV_8UC1)
+        ocvb.result1 = sobel.dst
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sobel.Dispose()
@@ -51,6 +52,7 @@ Public Class Gradient_Depth : Implements IDisposable
         cv.Cv2.Phase(x32f, y32f, angle)
         Dim gray = angle.Normalize(255, 0, cv.NormTypes.MinMax)
         gray.ConvertTo(ocvb.result2, cv.MatType.CV_8UC1)
+        ocvb.result1 = sobel.dst
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sobel.Dispose()

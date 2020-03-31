@@ -2,8 +2,11 @@
 Imports System.IO
 Imports System.Runtime.InteropServices
 Public Class WarpModel_Input : Implements IDisposable
-    Dim radio As New OptionsRadioButtons
+    Public check As New OptionsCheckbox
+    Public radio As New OptionsRadioButtons
     Public rgb(3 - 1) As cv.Mat
+    Public gradient(3 - 1) As cv.Mat
+    Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData)
         radio.Setup(ocvb, 6)
         radio.check(0).Text = "building.jpg"
@@ -15,20 +18,33 @@ Public Class WarpModel_Input : Implements IDisposable
         radio.check(0).Checked = True
         If ocvb.parms.ShowOptions Then radio.Show()
 
+        check.Setup(ocvb, 1)
+        check.Box(0).Text = "Use Gradient in WarpInput"
+        If ocvb.parms.ShowOptions Then check.Show()
+
+        sobel = New Edges_Sobel(ocvb)
+        sobel.externalUse = True
         ocvb.desc = "Import the misaligned input."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim img As New cv.Mat
         For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
-                Dim photo As New FileInfo(ocvb.parms.HomeDir + "Data\Prokudin\" + radio.check(i).Text)
+            Dim nextRadio = radio.check(i)
+            If nextRadio.Checked Then
+                Dim photo As New FileInfo(ocvb.parms.HomeDir + "Data\Prokudin\" + nextRadio.Text)
                 img = cv.Cv2.ImRead(photo.FullName, cv.ImreadModes.Grayscale)
                 ocvb.label1 = photo.Name + " - red image"
                 ocvb.label2 = photo.Name + " - Misaligned merge"
+                Exit For
             End If
         Next
         Dim r() = {New cv.Rect(0, 0, img.Width, img.Height / 3), New cv.Rect(0, img.Height / 3, img.Width, img.Height / 3), New cv.Rect(0, 2 * img.Height / 3, img.Width, img.Height / 3)}
         For i = 0 To r.Count - 1
+            If check.Box(0).Checked Then
+                sobel.src = img(r(i))
+                sobel.Run(ocvb)
+                gradient(i) = sobel.dst.Clone()
+            End If
             rgb(i) = img(r(i))
         Next
         Dim merged As New cv.Mat
@@ -38,6 +54,8 @@ Public Class WarpModel_Input : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         radio.Dispose()
+        sobel.Dispose()
+        check.Dispose()
     End Sub
 End Class
 
@@ -57,6 +75,10 @@ Module WarpModel_CPP_Module
 End Module
 
 
+
+
+
+' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Public input As WarpModel_Input
@@ -64,6 +86,8 @@ Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
     Public warpMatrix() As Double
     Public src1 As New cv.Mat
     Public src2 As New cv.Mat
+    Public rgb1 As New cv.Mat
+    Public rgb2 As New cv.Mat
     Public externalUse As Boolean
     Public warpMode As Integer
     Public aligned As New cv.Mat
@@ -83,19 +107,23 @@ Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
         ocvb.desc = "Use FindTransformECC to align 2 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then input.Run(ocvb)
+        If externalUse = False Then input.Run(ocvb) Else input.radio.Visible = False
 
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then warpMode = i
         Next
 
-        If externalUse = False Then src1 = input.rgb(0)
+        If externalUse = False Then
+            If input.check.Box(0).Checked Then src1 = input.gradient(0) Else src1 = input.rgb(0)
+        End If
         Dim src1Data(src1.Total * src1.ElemSize) As Byte
         Marshal.Copy(src1.Data, src1Data, 0, src1Data.Length - 1)
 
-        If externalUse = False Then src2 = input.rgb(1)
-        Dim src2Data(src1.Total * src1.ElemSize) As Byte
-        Marshal.Copy(src1.Data, src2Data, 0, src2Data.Length - 1)
+        If externalUse = False Then
+            If input.check.Box(0).Checked Then src2 = input.gradient(1) Else src2 = input.rgb(1)
+        End If
+        Dim src2Data(src2.Total * src2.ElemSize) As Byte
+        Marshal.Copy(src2.Data, src2Data, 0, src2Data.Length - 1)
 
         Dim handleSrc1 = GCHandle.Alloc(src1Data, GCHandleType.Pinned)
         Dim handleSrc2 = GCHandle.Alloc(src2Data, GCHandleType.Pinned)
@@ -112,12 +140,14 @@ Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
         End If
         Marshal.Copy(matPtr, warpMatrix, 0, warpMatrix.Length)
 
+        rgb1 = input.rgb(0)
+        rgb2 = input.rgb(1)
         If warpMode <> 3 Then
             Dim warpMat = New cv.Mat(2, 3, cv.MatType.CV_32F, warpMatrix)
-            cv.Cv2.WarpAffine(src2, aligned, warpMat, src1.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+            cv.Cv2.WarpAffine(rgb2, aligned, warpMat, rgb1.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         Else
             Dim warpMat = New cv.Mat(3, 3, cv.MatType.CV_32F, warpMatrix)
-            cv.Cv2.WarpPerspective(src2, aligned, warpMat, src1.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+            cv.Cv2.WarpPerspective(rgb2, aligned, warpMat, rgb1.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -133,19 +163,24 @@ End Class
 
 
 
-Public Class WarpModel_AlignInput : Implements IDisposable
+' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
+Public Class WarpModel_AlignImages : Implements IDisposable
     Dim ecc As WarpModel_FindTransformECC_CPP
     Public Sub New(ocvb As AlgorithmData)
         ecc = New WarpModel_FindTransformECC_CPP(ocvb)
 
-        ocvb.desc = "Align the RGB inputs from the Prokudin examples."
+        ocvb.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim aligned() = {New cv.Mat, New cv.Mat}
-
         For i = 0 To 1
-            ecc.src1 = Choose(i + 1, ecc.input.rgb(0), ecc.input.rgb(0))
-            ecc.src2 = Choose(i + 1, ecc.input.rgb(1), ecc.input.rgb(2))
+            If ecc.input.check.Box(0).Checked Then
+                ecc.src1 = Choose(i + 1, ecc.input.gradient(0), ecc.input.gradient(0))
+                ecc.src2 = Choose(i + 1, ecc.input.gradient(1), ecc.input.gradient(2))
+            Else
+                ecc.src1 = Choose(i + 1, ecc.input.rgb(0), ecc.input.rgb(0))
+                ecc.src2 = Choose(i + 1, ecc.input.rgb(1), ecc.input.rgb(2))
+            End If
             ecc.Run(ocvb)
             aligned(i) = ecc.aligned.Clone()
         Next
@@ -157,5 +192,6 @@ Public Class WarpModel_AlignInput : Implements IDisposable
         ocvb.label1 = "Aligned image"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+        ecc.Dispose()
     End Sub
 End Class
