@@ -239,9 +239,20 @@ Combo Box will restore the complete list of algorithms.
 
 Testing is integrated into OpenCVB. Clicking the icon below runs through a
 checklist of all the algorithms at all the resolutions with all the supported
-cameras available on the system.
+cameras available on the system. The duration of each test can be selected in
+the Options dialog.
 
 ![](media/4551393d07ab7de64ae7f0422f672cb7.png)
+
+When using a subset of the algorithms, the “Test All” button will test only the
+algorithms in the subset. This can be useful when changing an algorithm that is
+reused frequently. For instance, if the Edges_Sobel algorithm is changed, first
+select the subset of all algorithms using Edges_Sobel then select “Test All” to
+visually review each algorithm using the updated Edges_Sobel.
+
+One side benefit of the “Test All” feature is that is provides a way to visually
+review all the algorithms. When used in combination with the subset feature, it
+can make it easier to search for a desired effect.
 
 **Why VB.Net?**
 
