@@ -1,6 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Runtime.InteropServices
+' https://github.com/ycui11/-Colorizing-Prokudin-Gorskii-images-of-the-Russian-Empire
+' https://github.com/petraohlin/Colorizing-the-Prokudin-Gorskii-Collection
 Public Class WarpModel_Input : Implements IDisposable
     Public check As New OptionsCheckbox
     Public radio As New OptionsRadioButtons
@@ -8,14 +10,20 @@ Public Class WarpModel_Input : Implements IDisposable
     Public gradient(3 - 1) As cv.Mat
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData)
-        radio.Setup(ocvb, 6)
+        radio.Setup(ocvb, 12)
         radio.check(0).Text = "building.jpg"
         radio.check(1).Text = "church.jpg"
         radio.check(2).Text = "emir.jpg"
         radio.check(3).Text = "Painting.jpg"
         radio.check(4).Text = "railroad.jpg"
         radio.check(5).Text = "river.jpg"
-        radio.check(0).Checked = True
+        radio.check(6).Text = "Cliff.jpg"
+        radio.check(7).Text = "Column.jpg"
+        radio.check(8).Text = "General.jpg"
+        radio.check(9).Text = "Girls.jpg"
+        radio.check(10).Text = "Tablet.jpg"
+        radio.check(11).Text = "Valley.jpg"
+        radio.check(9).Checked = True
         If ocvb.parms.ShowOptions Then radio.Show()
 
         check.Setup(ocvb, 1)
@@ -83,7 +91,7 @@ Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Public input As WarpModel_Input
     Dim cPtr As IntPtr
-    Public warpMatrix() As Double
+    Public warpMatrix() As Single
     Public src1 As New cv.Mat
     Public src2 As New cv.Mat
     Public rgb1 As New cv.Mat
@@ -95,10 +103,10 @@ Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
         cPtr = WarpModel_Open()
 
         radio.Setup(ocvb, 4)
-        radio.check(0).Text = "Motion_Translation"
+        radio.check(0).Text = "Motion_Translation (fastest)"
         radio.check(1).Text = "Motion_Euclidean"
-        radio.check(2).Text = "Motion_Affine"
-        radio.check(3).Text = "Motion_Homography"
+        radio.check(2).Text = "Motion_Affine (very slow - Use CPP_Classes in Release Mode)"
+        radio.check(3).Text = "Motion_Homography (even slower - Use CPP_Classes in Release Mode)"
         radio.check(0).Checked = True
         If ocvb.parms.ShowOptions Then radio.Show()
 
@@ -107,24 +115,29 @@ Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
         ocvb.desc = "Use FindTransformECC to align 2 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then input.Run(ocvb) Else input.radio.Visible = False
+        If externalUse = False Then input.Run(ocvb)
 
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then warpMode = i
         Next
 
-        If externalUse = False Then
-            If input.check.Box(0).Checked Then src1 = input.gradient(0) Else src1 = input.rgb(0)
+        If input.check.Box(0).Checked Then
+            src1 = input.gradient(0)
+            src2 = input.gradient(1)
+        Else
+            src1 = input.rgb(0)
+            src2 = input.rgb(1)
         End If
+
+        If radio.check(2).Checked Or radio.check(3).Checked Then
+            src1 = src1.Resize(New cv.Size(src1.Width / 4, src1.Height / 4))
+            src2 = src2.Resize(New cv.Size(src2.Width / 4, src2.Height / 4))
+        End If
+
         Dim src1Data(src1.Total * src1.ElemSize) As Byte
-        Marshal.Copy(src1.Data, src1Data, 0, src1Data.Length - 1)
-
-        If externalUse = False Then
-            If input.check.Box(0).Checked Then src2 = input.gradient(1) Else src2 = input.rgb(1)
-        End If
         Dim src2Data(src2.Total * src2.ElemSize) As Byte
+        Marshal.Copy(src1.Data, src1Data, 0, src1Data.Length - 1)
         Marshal.Copy(src2.Data, src2Data, 0, src2Data.Length - 1)
-
         Dim handleSrc1 = GCHandle.Alloc(src1Data, GCHandleType.Pinned)
         Dim handleSrc2 = GCHandle.Alloc(src2Data, GCHandleType.Pinned)
 
@@ -149,6 +162,16 @@ Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
             Dim warpMat = New cv.Mat(3, 3, cv.MatType.CV_32F, warpMatrix)
             cv.Cv2.WarpPerspective(rgb2, aligned, warpMat, rgb1.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         End If
+        Dim outStr = "The warp matrix is:" + vbCrLf
+        For i = 0 To warpMatrix.Length - 1
+            If i Mod 3 = 0 Then outStr += vbCrLf
+            outStr += Format(warpMatrix(i), "#0.000") + vbTab
+        Next
+
+        If radio.check(2).Checked Or radio.check(3).Checked Then
+            outStr += vbCrLf + "NOTE: input resized for performance." + vbCrLf + "Results are probably distorted." + vbCrLf + "Gradients may give better results."
+        End If
+        ocvb.putText(New ActiveClass.TrueType(outStr, aligned.Width + 10, 220, RESULT1))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         WarpModel_Close(cPtr)
@@ -190,6 +213,9 @@ Public Class WarpModel_AlignImages : Implements IDisposable
         cv.Cv2.Merge(mergeInput, merged)
         ocvb.result1(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
         ocvb.label1 = "Aligned image"
+        ocvb.putText(New ActiveClass.TrueType("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
+                                              "Other than that, images look the same." + vbCrLf +
+                                              "Displacement increases with Sobel" + vbCrLf + "kernel size", merged.Width + 10, 100, RESULT1))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         ecc.Dispose()

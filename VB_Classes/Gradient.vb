@@ -82,5 +82,6 @@ Public Class Gradient_Flatland : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
+        grade.Dispose()
     End Sub
 End Class
