@@ -688,6 +688,15 @@ barrel distortion in the lower left image. This is a useful exercise to get an
 more intuitive understanding of the parameters needed to rectify and undistort
 an image.*
 
+![](media/282608bc4f343ce30c844cadc10763b5.png)
+
+*The 100 year-old photos of Prokudin-Gorskii were made with red, green, and blue
+filters. Combining the 3 images is a useful application of the OpenCV API for
+findTransformECC that can align the images. One of the transformation matrices
+is displayed as well. The option to use gradients for the alignment as well is
+available. There are 4 possible OpenCV parameters to define the extent of the
+search for alignment in the user interface as well.*
+
 **Future Work**
 
 The plan is to continue adding more algorithms. There are numerous published
