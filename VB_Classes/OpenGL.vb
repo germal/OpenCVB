@@ -28,8 +28,11 @@ Public Class OpenGL_Basics : Implements IDisposable
     Public scaleXYZ As New cv.Vec3f(10, 10, 1)
     Public zTrans As Single = 0.5
     Public OpenGLTitle As String = "OpenGL_Basics"
+    Public imu As IMU_AnglesToGravity
     Public Sub New(ocvb As AlgorithmData)
-        Dispose() ' make sure there wasn't an old OpenGLWindow sitting around...
+        imu = New IMU_AnglesToGravity(ocvb)
+
+        ' Dispose() ' make sure there wasn't an old OpenGLWindow sitting around...
         ocvb.desc = "Create an OpenGL window and update it with images"
     End Sub
     Private Sub memMapUpdate(ocvb As AlgorithmData)
@@ -46,9 +49,10 @@ Public Class OpenGL_Basics : Implements IDisposable
                                             rgbInput.Width, rgbInput.Height, rgbInput.ElemSize * rgbInput.Total,
                                             dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
                                             ocvb.parms.IMU_AngularVelocity.X, ocvb.parms.IMU_AngularVelocity.Y, ocvb.parms.IMU_AngularVelocity.Z,
-                                            ocvb.parms.IMU_Acceleration.X, ocvb.parms.IMU_Acceleration.Y, ocvb.parms.IMU_Acceleration.Z, ocvb.parms.IMU_TimeStamp, If(ocvb.parms.IMU_Present, 1, 0),
-                                            eye.Item0 / 100, eye.Item1 / 100, eye.Item2 / 100, zTrans, scaleXYZ.Item0 / 10, scaleXYZ.Item1 / 10, scaleXYZ.Item2 / 10,
-                                            timeConversionUnits, imuAlphaFactor)
+                                            ocvb.parms.IMU_Acceleration.X, ocvb.parms.IMU_Acceleration.Y, ocvb.parms.IMU_Acceleration.Z, ocvb.parms.IMU_TimeStamp,
+                                            If(ocvb.parms.IMU_Present, 1, 0), eye.Item0 / 100, eye.Item1 / 100, eye.Item2 / 100, zTrans,
+                                            scaleXYZ.Item0 / 10, scaleXYZ.Item1 / 10, scaleXYZ.Item2 / 10, timeConversionUnits, imuAlphaFactor,
+                                            imu.angleX, imu.angleY, imu.angleZ)
         Next
     End Sub
     Private Sub startOpenGLWindow(ocvb As AlgorithmData)
@@ -73,6 +77,8 @@ Public Class OpenGL_Basics : Implements IDisposable
         pipe.WaitForConnection()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        imu.Run(ocvb)
+
         If ocvb.parms.cameraIndex = T265Camera Then
             ocvb.putText(New ActiveClass.TrueType("The T265 camera doesn't have a point cloud.", 10, 60, RESULT1))
             Exit Sub
@@ -125,6 +131,7 @@ Public Class OpenGL_Basics : Implements IDisposable
             proc(i).CloseMainWindow()
         Next i
         If memMapPtr <> 0 Then Marshal.FreeHGlobal(memMapPtr)
+        imu.Dispose()
     End Sub
 End Class
 

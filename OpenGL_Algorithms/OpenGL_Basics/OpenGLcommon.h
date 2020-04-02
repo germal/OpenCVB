@@ -134,6 +134,8 @@ static float3 accel_data;
 static double timestamp;
 static float timeConversionUnits = 1000.0f;
 static int IMU_Present = false;
+float imuAngleX, imuAngleY, imuAngleZ;
+
 /* alpha indicates the part that gyro and accelerometer take in computation of theta; higher alpha gives more weight to gyro, but too high
 values cause drift; lower alpha gives more weight to accelerometer, which is more sensitive to disturbances */
 static float imuAlphaFactor = 0.98f; // Intel IMU mixes the accel and gyro values to get direction while it does not work on Kinect
@@ -238,6 +240,9 @@ static void readPipeAndMemMap()
 
 	timeConversionUnits = (float)sharedMem[33];
 	imuAlphaFactor = (float)sharedMem[34];
+	imuAngleX = (float)sharedMem[35];
+	imuAngleY = (float)sharedMem[36];
+	imuAngleZ = (float)sharedMem[37];
 
 	DWORD dwRead;
 	ReadFile(pipe, rgbBuffer, rgbBufferSize, &dwRead, NULL);
