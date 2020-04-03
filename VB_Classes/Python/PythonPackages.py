@@ -41,6 +41,12 @@ try:
 except ImportError as err:
     print('You need to install Pygame.', err)
     warningMsg = True
+	    
+try:
+    import imutils
+except ImportError as err:
+    print('You need to install imutils.', err)
+    warningMsg = True
 
 try:
     from cv2_rolling_ball import subtract_background_rolling_ball

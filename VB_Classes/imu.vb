@@ -506,9 +506,9 @@ Public Class IMU_AnglesToGravity : Implements IDisposable
         Dim gx = kalman.dst(0)
         Dim gy = kalman.dst(1)
         Dim gz = kalman.dst(2)
-        Dim angleX = -Math.Atan2(gx, Math.Sqrt(gy * gy + gz * gz))
-        Dim angleY = Math.Atan2(gy, Math.Sqrt(gx * gx + gz * gz))
-        Dim angleZ = -Math.Atan2(gz, Math.Sqrt(gx * gx + gy * gy))
+        angleX = -Math.Atan2(gx, Math.Sqrt(gy * gy + gz * gz))
+        angleY = Math.Atan2(gy, Math.Sqrt(gx * gx + gz * gz))
+        angleZ = -Math.Atan2(gz, Math.Sqrt(gx * gx + gy * gy))
         outStr = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(gx, "#0.0000") + vbCrLf
         outStr += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(gy, "#0.0000") + vbCrLf
         outStr += "IMU Acceleration in Z-direction = " + vbTab + vbTab + Format(gz, "#0.0000") + vbCrLf
@@ -516,7 +516,7 @@ Public Class IMU_AnglesToGravity : Implements IDisposable
         outStr += "Y-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleY * 57.2958, "#0.0000") + vbCrLf
         outStr += "Z-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleZ * 57.2958, "#0.0000") + vbCrLf
         ' if there is any significant acceleration other than gravity, it will be detected here.
-        If Math.Abs(Math.Sqrt(gx * gx + gy * gy + gz * gz) - 9.807) > 0.05 Then outStr += vbCrLf + "Camera is moving.  Results are not valid."
+        If Math.Abs(Math.Sqrt(gx * gx + gy * gy + gz * gz) - 9.807) > 0.05 Then outStr += vbCrLf + "Camera is moving.  Results may not be valid."
         ocvb.putText(New ActiveClass.TrueType(outStr, 10, 100))
 
         ' validate the result

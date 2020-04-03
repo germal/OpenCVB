@@ -11,12 +11,13 @@
 int main(int argc, char* argv[])
 {
 	GLuint gl_handle = 0;
-	windowTitle << "OpenGL_Callbacks";
+	windowTitle << "OpenGL_GravityTransform";
 	initializeNamedPipeAndMemMap(argc, argv);
 
 	window app(windowWidth, windowHeight, windowTitle.str().c_str());
 	glfw_state MyState;
 	register_glfw_callbacks(app, MyState);
+	MyState.offset_y = 100.0f;
 	double pixels = imageWidth * imageHeight;
 
 	while (app)
@@ -41,9 +42,10 @@ int main(int argc, char* argv[])
 		gluLookAt(0, 0, 0, 0, 0, 1, 0, -1, 0);
 
 		glTranslatef(0, 0, +1.5f + MyState.offset_y * 0.05f);
-		glRotated(MyState.pitch, 1, 0, 0);
-		glRotated(MyState.yaw, 0, 1, 0);
-		glTranslatef(0, 0, -0.5f);
+		glRotated(imuAngleY * 57.2958, 1, 0, 0);
+		glRotated(imuAngleX * 57.2958, 0, 1, 0);
+		glRotated(imuAngleZ * 57.2958, 1, 0, 0);
+		glTranslatef(0, 0, -0.1f);
 
 		glPointSize((float)pointSize);
 		glEnable(GL_DEPTH_TEST);
@@ -73,9 +75,6 @@ int main(int argc, char* argv[])
 
 		glEnd();
 		glDisable(GL_TEXTURE_2D);
-
-		drawAxes(10, 0, 0, 1);
-		draw_floor(10, 1, 0);
 
 		glPopMatrix();
 		glMatrixMode(GL_PROJECTION);

@@ -382,3 +382,28 @@ Public Class OpenGL_Voxels : Implements IDisposable
         ogl.Dispose()
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class OpenGL_GravityTransform : Implements IDisposable
+    Public ogl As OpenGL_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        ogl = New OpenGL_Basics(ocvb)
+        ogl.OpenGLTitle = "OpenGL_GravityTransform"
+        ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        ogl.rgbInput = ocvb.color
+        ogl.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        ogl.Dispose()
+    End Sub
+End Class
+
+
+

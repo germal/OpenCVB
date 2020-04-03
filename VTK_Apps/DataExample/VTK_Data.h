@@ -1,4 +1,3 @@
-#pragma once
 #define NOMINMAX
 #include <stdio.h>
 #include <chrono>
