@@ -1,4 +1,5 @@
 ﻿Imports cv = OpenCvSharp
+Imports 
 Public Class EigenLib_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         ocvb.label1 = "NewClass_Basics"

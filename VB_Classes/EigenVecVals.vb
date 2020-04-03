@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 ' https://bytefish.de/blog/eigenvalues_in_opencv/
-Public Class Eigen_Basics : Implements IDisposable
+Public Class EigenVecVals_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         ocvb.desc = "Solve system of equations using OpenCV's EigenVV"
         ocvb.label1 = "EigenVec (solution)"

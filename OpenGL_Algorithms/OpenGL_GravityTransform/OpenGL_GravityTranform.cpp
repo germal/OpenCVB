@@ -42,7 +42,6 @@ int main(int argc, char* argv[])
 		gluLookAt(0, 0, 0, 0, 0, 1, 0, -1, 0);
 
 		glTranslatef(0, 0, +1.5f + MyState.offset_y * 0.05f);
-		glRotated(imuAngleY * 57.2958, 1, 0, 0);
 		glRotated(imuAngleX * 57.2958, 0, 1, 0);
 		glRotated(imuAngleZ * 57.2958, 1, 0, 0);
 		glTranslatef(0, 0, -0.1f);

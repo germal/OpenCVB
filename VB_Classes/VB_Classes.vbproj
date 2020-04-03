@@ -125,6 +125,7 @@
     <Compile Include="Coherence.vb" />
     <Compile Include="Concat.vb" />
     <Compile Include="Dither.vb" />
+    <Compile Include="EigenLib.vb" />
     <Compile Include="EMax.vb" />
     <Compile Include="Emgu.vb" />
     <Compile Include="Entropy.vb" />
@@ -160,7 +161,7 @@
     <Compile Include="DNN.vb" />
     <Compile Include="Draw.vb" />
     <Compile Include="Edges.vb" />
-    <Compile Include="Eigen.vb" />
+    <Compile Include="EigenVecVals.vb" />
     <Compile Include="Encode.vb" />
     <Compile Include="Extrinsics.vb" />
     <Compile Include="Face.vb" />
