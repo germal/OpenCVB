@@ -472,9 +472,10 @@ End Class
 
 Public Class IMU_AnglesToGravity : Implements IDisposable
     Dim kalman As Kalman_Basics
-    Public angleX As Single ' these are all in radians.
-    Public angleY As Single
-    Public angleZ As Single
+    Public angleX As Single ' in radians.
+    Public angleY As Single ' in radians.
+    Public angleZ As Single ' in radians.
+    Public result As Integer = RESULT1 ' should be result1 or result2
     Public Sub New(ocvb As AlgorithmData)
         kalman = New Kalman_Basics(ocvb)
         kalman.externalUse = True
@@ -492,11 +493,12 @@ Public Class IMU_AnglesToGravity : Implements IDisposable
         kalman.Run(ocvb)
 
         Dim rawData As String = "Smoothed Angular Velocity and Acceleration:" + vbCrLf + vbCrLf
-        rawData += "ts = " + Format(ocvb.parms.IMU_TimeStamp, "#0.00") + vbCrLf + " Acceleration (m/sec^2)" + vbTab + "x = " + vbTab + Format(kalman.dst(0), "#0.00") + vbTab +
-                              " y = " + vbTab + Format(kalman.dst(1), "#0.00") + vbTab + " z = " + vbTab + Format(kalman.dst(2), "#0.00") + vbCrLf +
-                              " Motion (rads/sec)" + vbTab + "pitch = " + vbTab + Format(kalman.dst(3), "#0.00") + vbTab +
-                              " Yaw = " + vbTab + Format(kalman.dst(4), "#0.00") + vbTab + " Roll = " + vbTab + Format(kalman.dst(4), "#0.00")
-        ocvb.putText(New ActiveClass.TrueType(rawData, 10, 30))
+        rawData += "ts = " + Format(ocvb.parms.IMU_TimeStamp, "#0.00") + vbCrLf + " Acceleration (m/sec^2)" + vbTab + "x = " + vbTab +
+                             Format(kalman.dst(0), "#0.00") + vbTab + " y = " + vbTab + Format(kalman.dst(1), "#0.00") + vbTab +
+                             " z = " + vbTab + Format(kalman.dst(2), "#0.00") + vbCrLf + " Motion (rads/sec)" + vbTab + "pitch = " + vbTab +
+                             Format(kalman.dst(3), "#0.00") + vbTab + " Yaw = " + vbTab + Format(kalman.dst(4), "#0.00") + vbTab +
+                             " Roll = " + vbTab + Format(kalman.dst(4), "#0.00")
+        ocvb.putText(New ActiveClass.TrueType(rawData, 10, 30, result))
 
         ' to insure that the camera is not moving, yaw, pitch, and roll must be near zero...
         Dim yaw = kalman.dst(4)
@@ -517,7 +519,7 @@ Public Class IMU_AnglesToGravity : Implements IDisposable
         outStr += "Z-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleZ * 57.2958, "#0.0000") + vbCrLf
         ' if there is any significant acceleration other than gravity, it will be detected here.
         If Math.Abs(Math.Sqrt(gx * gx + gy * gy + gz * gz) - 9.807) > 0.05 Then outStr += vbCrLf + "Camera is moving.  Results may not be valid."
-        ocvb.putText(New ActiveClass.TrueType(outStr, 10, 100))
+        ocvb.putText(New ActiveClass.TrueType(outStr, 10, 100, result))
 
         ' validate the result
         Dim valstr = "sqrt (" + vbTab + Format(gx, "#0.0000") + "*" + Format(gx, "#0.0000") + vbTab +
@@ -526,7 +528,7 @@ Public Class IMU_AnglesToGravity : Implements IDisposable
                                 vbTab + Format(Math.Sqrt(gx * gx + gy * gy + gz * gz), "#0.0000") + vbCrLf +
                                 "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
 
-        ocvb.putText(New ActiveClass.TrueType(valstr, 10, 200))
+        ocvb.putText(New ActiveClass.TrueType(valstr, 10, 200, result))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         kalman.Dispose()

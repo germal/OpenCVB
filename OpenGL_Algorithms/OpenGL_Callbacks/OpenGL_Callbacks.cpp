@@ -82,6 +82,7 @@ int main(int argc, char* argv[])
 		glPopMatrix();
 		glPopAttrib();
 		
+		glfwSetWindowTitle(app, imageLabel);
 		if (ackBuffers()) break;
 	}
 

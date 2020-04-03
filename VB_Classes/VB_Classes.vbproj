@@ -300,6 +300,7 @@
     <Compile Include="Voxels.vb" />
     <Compile Include="VTK.vb" />
     <Compile Include="WarpModel.vb" />
+    <Compile Include="WarpPerspective.vb" />
     <Compile Include="XFeatures.vb" />
     <Compile Include="Surf.vb" />
     <Compile Include="SVM.vb" />

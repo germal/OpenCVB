@@ -28,6 +28,7 @@ Public Class OpenGL_Basics : Implements IDisposable
     Public scaleXYZ As New cv.Vec3f(10, 10, 1)
     Public zTrans As Single = 0.5
     Public OpenGLTitle As String = "OpenGL_Basics"
+    Public imageLabel As String
     Public imu As IMU_AnglesToGravity
     Public Sub New(ocvb As AlgorithmData)
         imu = New IMU_AnglesToGravity(ocvb)
@@ -52,7 +53,7 @@ Public Class OpenGL_Basics : Implements IDisposable
                                             ocvb.parms.IMU_Acceleration.X, ocvb.parms.IMU_Acceleration.Y, ocvb.parms.IMU_Acceleration.Z, ocvb.parms.IMU_TimeStamp,
                                             If(ocvb.parms.IMU_Present, 1, 0), eye.Item0 / 100, eye.Item1 / 100, eye.Item2 / 100, zTrans,
                                             scaleXYZ.Item0 / 10, scaleXYZ.Item1 / 10, scaleXYZ.Item2 / 10, timeConversionUnits, imuAlphaFactor,
-                                            imu.angleX, imu.angleY, imu.angleZ)
+                                            imageLabel.Length)
         Next
     End Sub
     Private Sub startOpenGLWindow(ocvb As AlgorithmData)
@@ -74,6 +75,7 @@ Public Class OpenGL_Basics : Implements IDisposable
         memMapFile = MemoryMappedFile.CreateOrOpen("OpenCVBControl", memMapbufferSize)
         memMapWriter = memMapFile.CreateViewAccessor(0, memMapbufferSize)
 
+        imageLabel = OpenGLTitle ' default title - can be overridden with each image.
         pipe.WaitForConnection()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -116,6 +118,8 @@ Public Class OpenGL_Basics : Implements IDisposable
             pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
             pipe.Write(dataBuffer, 0, dataBuffer.Length)
             pipe.Write(pointCloudBuffer, 0, pointCloudBuffer.Length)
+            Dim buff = System.Text.Encoding.UTF8.GetBytes(imageLabel)
+            pipe.Write(buff, 0, imageLabel.Length)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -388,20 +392,68 @@ End Class
 
 
 
-
+' https://open.gl/transformations
+' https://www.codeproject.com/Articles/1247960/Learning-Basic-Math-Used-In-3D-Graphics-Engines
 Public Class OpenGL_GravityTransform : Implements IDisposable
+    Dim imu As IMU_AnglesToGravity
     Public ogl As OpenGL_Basics
     Public Sub New(ocvb As AlgorithmData)
+        imu = New IMU_AnglesToGravity(ocvb)
         ogl = New OpenGL_Basics(ocvb)
-        ogl.OpenGLTitle = "OpenGL_GravityTransform"
+        ogl.OpenGLTitle = "OpenGL_Callbacks"
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        imu.Run(ocvb)
+        Static rotateFlag As Integer = -1
+        Dim split() = cv.Cv2.Split(ocvb.pointCloud)
+
+        Dim zCos = Math.Cos(imu.angleZ)
+        Dim zSin = Math.Sin(imu.angleZ)
+
+        Dim xCos = Math.Cos(imu.angleX)
+        Dim xSin = Math.Sin(imu.angleX)
+
+        Select Case rotateFlag Mod 4
+            Case 0 ' rotate around x-axis - AKA YZ plane rotation matrix
+                split(1) = zCos * split(1) - zSin * split(2)
+                split(2) = zSin * split(1) + zCos * split(2)
+                ogl.imageLabel = "Rotating around the x-axis"
+            Case 1 ' rotate around z-axis - AKA XY plane rotation
+                split(0) = xCos * split(0) - xSin * split(1)
+                split(1) = xSin * split(0) + xCos * split(1)
+                ogl.imageLabel = "Rotating around the z-axis"
+            Case 2 ' rotate around x-axis and z-axis
+                Dim xArray(,) As Single = {{1, 0, 0, 0}, {0, zCos, -zSin, 0}, {0, zSin, zCos, 0}, {0, 0, 0, 1}}
+                Dim xRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, xArray)
+
+                Dim zArray(,) As Single = {{xCos, -xSin, 0, 0}, {xSin, xCos, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}
+                Dim zRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, zArray)
+                Dim yRotate = (xRotate * zRotate).ToMat
+
+                Dim xz(4 * 4) As Single
+                For j = 0 To yRotate.Rows - 1
+                    For i = 0 To yRotate.Cols - 1
+                        xz(i * 4 + j) = yRotate.At(Of Single)(i, j)
+                    Next
+                Next
+
+                split(0) = xz(0) * split(0) + xz(1) * split(1) + xz(2) * split(2)
+                split(1) = xz(4) * split(0) + xz(5) * split(1) + xz(6) * split(2)
+                split(2) = xz(8) * split(0) + xz(9) * split(1) + xz(10) * split(2)
+                ogl.imageLabel = "Rotating around the x-axis and the z-axis"
+            Case 3
+                ogl.imageLabel = "No rotation "
+        End Select
+        cv.Cv2.Merge(split, ocvb.pointCloud)
+
         ogl.rgbInput = ocvb.color
         ogl.Run(ocvb)
+        If ocvb.frameCount Mod 150 = 0 Then rotateFlag += 1
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         ogl.Dispose()
+        imu.Dispose()
     End Sub
 End Class
 
