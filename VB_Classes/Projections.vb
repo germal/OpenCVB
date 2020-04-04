@@ -67,7 +67,7 @@ Public Class Projections_GravityTransform : Implements IDisposable
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
-        ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view from the data"
+        ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
@@ -99,23 +99,25 @@ Public Class Projections_GravityTransform : Implements IDisposable
         vertSplit(1) = xz(4) * split(0) + xz(5) * split(1) + xz(6) * split(2)
         vertSplit(2) = xz(8) * split(0) + xz(9) * split(1) + xz(10) * split(2)
 
-        Dim mask = vertSplit(0).Threshold(0.001, 255, cv.ThresholdTypes.Binary)
+        Dim mask = vertSplit(2).Threshold(0.001, 255, cv.ThresholdTypes.Binary)
         mask = mask.ConvertScaleAbs()
-        cv.Cv2.Normalize(vertSplit(0), vertSplit(0), 0, ocvb.color.Width, cv.NormTypes.MinMax, -1, mask)
+        'cv.Cv2.Normalize(vertSplit(0), vertSplit(0), 0, ocvb.color.Width, cv.NormTypes.MinMax, -1, mask)
         cv.Cv2.Normalize(vertSplit(2), vertSplit(2), 0, ocvb.color.Height, cv.NormTypes.MinMax, -1, mask)
 
         Dim minval As Double, maxval As Double
-        split(2).MinMaxLoc(minval, maxval)
+        Dim minLoc As cv.Point, maxLoc As cv.Point
+        split(2).MinMaxLoc(minval, maxval, minLoc, maxLoc, mask)
+        ocvb.result2 = mask
 
-        Dim black = New cv.Vec3b(0, 0, 0)
-        ocvb.result2.SetTo(cv.Scalar.White)
+        'Dim black = New cv.Vec3b(0, 0, 0)
+        'ocvb.result2.SetTo(cv.Scalar.White)
         'Parallel.ForEach(Of cv.Rect)(grid.roiList,
         ' Sub(roi)
         '     For y = roi.Y To roi.Y + roi.Height - 1
         '         For x = roi.X To roi.X + roi.Width - 1
-        '             Dim depth = split(1).At(Of Single)(y, x)
+        '             Dim depth = vertSplit(2).At(Of Single)(y, x)
         '             If depth > 0 Then
-        '                 ocvb.result2.Set(Of cv.Vec3b)(CInt(depth), CInt(split(0).At(Of Single)(y, x)), black)
+        '                 ocvb.result2.Set(Of cv.Vec3b)(x, CInt(depth), black)
         '             End If
         '         Next
         '     Next

@@ -402,7 +402,6 @@ Public Class OpenGL_GravityTransform : Implements IDisposable
         imu = New IMU_AnglesToGravity(ocvb)
         ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_Callbacks"
-        ogl.pcSrc = ocvb.pointCloud
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -422,12 +421,10 @@ Public Class OpenGL_GravityTransform : Implements IDisposable
                 vertSplit(1) = zCos * split(1) - zSin * split(2)
                 vertSplit(2) = zSin * split(1) + zCos * split(2)
                 ogl.imageLabel = "Rotating around the x-axis"
-                cv.Cv2.Merge(vertSplit, ogl.pcSrc)
             Case 1 ' rotate around z-axis - AKA XY plane rotation
                 vertSplit(0) = xCos * split(0) - xSin * split(1)
                 vertSplit(1) = xSin * split(0) + xCos * split(1)
                 ogl.imageLabel = "Rotating around the z-axis"
-                cv.Cv2.Merge(vertSplit, ogl.pcSrc)
             Case 2 ' rotate around x-axis and z-axis
                 Dim xArray(,) As Single = {{1, 0, 0, 0}, {0, zCos, -zSin, 0}, {0, zSin, zCos, 0}, {0, 0, 0, 1}}
                 Dim xRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, xArray)
@@ -447,11 +444,11 @@ Public Class OpenGL_GravityTransform : Implements IDisposable
                 vertSplit(1) = xz(4) * split(0) + xz(5) * split(1) + xz(6) * split(2)
                 vertSplit(2) = xz(8) * split(0) + xz(9) * split(1) + xz(10) * split(2)
                 ogl.imageLabel = "Rotating around the x-axis and the z-axis"
-                cv.Cv2.Merge(vertSplit, ogl.pcSrc)
             Case 3
                 ogl.imageLabel = "No rotation "
-                ogl.pcSrc = ocvb.pointCloud
         End Select
+        ogl.pcSrc = New cv.Mat
+        cv.Cv2.Merge(vertSplit, ogl.pcSrc)
 
         ogl.rgbInput = ocvb.color
         ogl.Run(ocvb)
