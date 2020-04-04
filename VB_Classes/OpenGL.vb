@@ -30,9 +30,9 @@ Public Class OpenGL_Basics : Implements IDisposable
     Public OpenGLTitle As String = "OpenGL_Basics"
     Public imageLabel As String
     Public imu As IMU_AnglesToGravity
+    Public pcSrc As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         imu = New IMU_AnglesToGravity(ocvb)
-
         ' Dispose() ' make sure there wasn't an old OpenGLWindow sitting around...
         ocvb.desc = "Create an OpenGL window and update it with images"
     End Sub
@@ -57,7 +57,7 @@ Public Class OpenGL_Basics : Implements IDisposable
         Next
     End Sub
     Private Sub startOpenGLWindow(ocvb As AlgorithmData)
-        Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
+        Dim pcSize = pcSrc.Total * pcSrc.ElemSize
         ' first setup the named pipe that will be used to feed data to the OpenGL window
         pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
         PipeTaskIndex += 1
@@ -79,6 +79,7 @@ Public Class OpenGL_Basics : Implements IDisposable
         pipe.WaitForConnection()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If pcSrc Is Nothing Then pcSrc = ocvb.pointCloud
         imu.Run(ocvb)
 
         If ocvb.parms.cameraIndex = T265Camera Then
@@ -86,7 +87,7 @@ Public Class OpenGL_Basics : Implements IDisposable
             Exit Sub
         End If
         If ocvb.frameCount = 0 Then startOpenGLWindow(ocvb)
-        Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
+        Dim pcSize = pcSrc.Total * pcSrc.ElemSize
         Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
         If ocvb.frameCount > 0 And pipe IsNot Nothing Then
             Dim bytesRead = pipe.Read(readPipe, 0, 4)
@@ -97,8 +98,8 @@ Public Class OpenGL_Basics : Implements IDisposable
 
         If rgbInput.Width = 0 Then rgbInput = ocvb.color
 
-        If pointCloudBuffer.Length <> ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize Then
-            ReDim pointCloudBuffer(ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize - 1)
+        If pointCloudBuffer.Length <> pcSrc.Total * pcSrc.ElemSize Then
+            ReDim pointCloudBuffer(pcSrc.Total * pcSrc.ElemSize - 1)
         End If
 
         Dim rgb = rgbInput.CvtColor(cv.ColorConversionCodes.BGR2RGB) ' OpenGL needs RGB, not BGR
@@ -111,7 +112,7 @@ Public Class OpenGL_Basics : Implements IDisposable
 
         If rgb.Width > 0 Then Marshal.Copy(rgb.Data, rgbBuffer, 0, rgbBuffer.Length)
         If dataInput.Width > 0 Then Marshal.Copy(dataInput.Data, dataBuffer, 0, dataBuffer.Length)
-        If ocvb.pointCloud.Width > 0 Then Marshal.Copy(ocvb.pointCloud.Data, pointCloudBuffer, 0, pcSize)
+        If pcSrc.Width > 0 Then Marshal.Copy(pcSrc.Data, pointCloudBuffer, 0, pcSize)
 
         If pipe.IsConnected Then
             On Error Resume Next
@@ -401,6 +402,7 @@ Public Class OpenGL_GravityTransform : Implements IDisposable
         imu = New IMU_AnglesToGravity(ocvb)
         ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_Callbacks"
+        ogl.pcSrc = New cv.Mat
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -445,7 +447,7 @@ Public Class OpenGL_GravityTransform : Implements IDisposable
             Case 3
                 ogl.imageLabel = "No rotation "
         End Select
-        cv.Cv2.Merge(split, ocvb.pointCloud)
+        cv.Cv2.Merge(split, ogl.pcSrc)
 
         ogl.rgbInput = ocvb.color
         ogl.Run(ocvb)
