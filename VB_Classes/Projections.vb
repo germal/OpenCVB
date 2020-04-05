@@ -92,6 +92,8 @@ Public Class Projections_GravityTransform : Implements IDisposable
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData)
         imu = New IMU_AnglesToGravity(ocvb)
+        imu.result = RESULT2
+
         grid = New Thread_Grid(ocvb)
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
@@ -137,7 +139,7 @@ Public Class Projections_GravityTransform : Implements IDisposable
         cv.Cv2.Normalize(vertSplit(0), vertSplit(0), 0, ocvb.color.Width, cv.NormTypes.MinMax, -1, mask)
 
         Dim black = New cv.Vec3b(0, 0, 0)
-        ocvb.result2.SetTo(cv.Scalar.White)
+        ocvb.result1.SetTo(cv.Scalar.White)
         Dim desiredMax = sliders.TrackBar1.Value
         Dim h = ocvb.color.Height
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
@@ -150,7 +152,7 @@ Public Class Projections_GravityTransform : Implements IDisposable
                          If depth < desiredMax Then
                              'Dim dx = Math.Round(vertSplit(0).At(Of Single)(y, x))
                              Dim dy = Math.Round(h * (desiredMax - depth) / desiredMax)
-                             ocvb.result2.Set(Of cv.Vec3b)(h - dy, x, black)
+                             ocvb.result1.Set(Of cv.Vec3b)(h - dy, x, black)
                          End If
                      End If
                  Next
