@@ -151,9 +151,9 @@ Public Class Projections_GravityTransform : Implements IDisposable
                      If m > 0 Then
                          Dim depth = vertSplit(2).At(Of Single)(y, x)
                          If depth < desiredMax Then
-                             'Dim dx = Math.Round(vertSplit(0).At(Of Single)(y, x))
+                             Dim dx = Math.Round(vertSplit(0).At(Of Single)(y, x))
                              Dim dy = Math.Round(h * (desiredMax - depth) / desiredMax)
-                             ocvb.result1.Set(Of cv.Vec3b)(h - dy, w - x, black)
+                             ocvb.result1.Set(Of cv.Vec3b)(h - dy, dx, black)
                          End If
                      End If
                  Next
