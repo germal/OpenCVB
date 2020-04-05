@@ -477,6 +477,7 @@ Public Class IMU_AnglesToGravity : Implements IDisposable
     Public angleY As Single ' in radians.
     Public angleZ As Single ' in radians.
     Public result As Integer = RESULT1 ' should be result1 or result2
+    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         kalman1 = New Kalman_Basics(ocvb)
         ReDim kalman1.src(3 - 1)
@@ -513,25 +514,27 @@ Public Class IMU_AnglesToGravity : Implements IDisposable
         angleY = kalman2.dst(1)
         angleZ = kalman2.dst(2)
 
-        Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf
-        outStr = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(gx, "#0.0000") + vbCrLf
-        outStr += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(gy, "#0.0000") + vbCrLf
-        outStr += "IMU Acceleration in Z-direction = " + vbTab + vbTab + Format(gz, "#0.0000") + vbCrLf
-        outStr += "X-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleX * 57.2958, "#0.0000") + vbCrLf
-        outStr += "Y-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleY * 57.2958, "#0.0000") + vbCrLf
-        outStr += "Z-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleZ * 57.2958, "#0.0000") + vbCrLf
-        ' if there is any significant acceleration other than gravity, it will be detected here.
-        If Math.Abs(Math.Sqrt(gx * gx + gy * gy + gz * gz) - 9.807) > 0.05 Then outStr += vbCrLf + "Camera is moving.  Results may not be valid."
-        ocvb.putText(New ActiveClass.TrueType(outStr, 10, 40, result))
+        If externaluse = False Then
+            Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf
+            outStr = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(gx, "#0.0000") + vbCrLf
+            outStr += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(gy, "#0.0000") + vbCrLf
+            outStr += "IMU Acceleration in Z-direction = " + vbTab + vbTab + Format(gz, "#0.0000") + vbCrLf
+            outStr += "X-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleX * 57.2958, "#0.0000") + vbCrLf
+            outStr += "Y-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleY * 57.2958, "#0.0000") + vbCrLf
+            outStr += "Z-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleZ * 57.2958, "#0.0000") + vbCrLf
+            ' if there is any significant acceleration other than gravity, it will be detected here.
+            If Math.Abs(Math.Sqrt(gx * gx + gy * gy + gz * gz) - 9.807) > 0.05 Then outStr += vbCrLf + "Camera is moving.  Results may not be valid."
+            ocvb.putText(New ActiveClass.TrueType(outStr, 10, 40, result))
 
-        ' validate the result
-        Dim valstr = "sqrt (" + vbTab + Format(gx, "#0.0000") + "*" + Format(gx, "#0.0000") + vbTab +
-                                vbTab + Format(gy, "#0.0000") + "*" + Format(gy, "#0.0000") + vbTab +
-                                vbTab + Format(gz, "#0.0000") + "*" + Format(gz, "#0.0000") + " ) = " + vbTab +
-                                vbTab + Format(Math.Sqrt(gx * gx + gy * gy + gz * gz), "#0.0000") + vbCrLf +
-                                "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
+            ' validate the result
+            Dim valstr = "sqrt (" + vbTab + Format(gx, "#0.0000") + "*" + Format(gx, "#0.0000") + vbTab +
+                                    vbTab + Format(gy, "#0.0000") + "*" + Format(gy, "#0.0000") + vbTab +
+                                    vbTab + Format(gz, "#0.0000") + "*" + Format(gz, "#0.0000") + " ) = " + vbTab +
+                                    vbTab + Format(Math.Sqrt(gx * gx + gy * gy + gz * gz), "#0.0000") + vbCrLf +
+                                    "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
 
-        ocvb.putText(New ActiveClass.TrueType(valstr, 10, 150, result))
+            ocvb.putText(New ActiveClass.TrueType(valstr, 10, 150, result))
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         kalman1.Dispose()

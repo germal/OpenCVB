@@ -93,13 +93,14 @@ Public Class Projections_GravityTransform : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         imu = New IMU_AnglesToGravity(ocvb)
         imu.result = RESULT2
+        imu.externalUse = True
 
         grid = New Thread_Grid(ocvb)
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
-        sliders.setupTrackBar1(ocvb, "Gravity Transform Max Depth (in meters)", 0, 10, 4)
+        sliders.setupTrackBar1(ocvb, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
@@ -131,34 +132,50 @@ Public Class Projections_GravityTransform : Implements IDisposable
         Next
 
         vertSplit(0) = xz(0) * split(0) + xz(1) * split(1) + xz(2) * split(2)
+        vertSplit(1) = xz(4) * split(0) + xz(5) * split(1) + xz(6) * split(2)
         vertSplit(2) = xz(8) * split(0) + xz(9) * split(1) + xz(10) * split(2)
 
         Dim mask = vertSplit(2).Threshold(0.001, 255, cv.ThresholdTypes.Binary)
         mask = mask.ConvertScaleAbs()
 
         cv.Cv2.Normalize(vertSplit(0), vertSplit(0), 0, ocvb.color.Width, cv.NormTypes.MinMax, -1, mask)
+        cv.Cv2.Normalize(vertSplit(1), vertSplit(1), 0, ocvb.color.Height, cv.NormTypes.MinMax, -1, mask)
+
+        'Dim minval As Double, maxval As Double
+        'Dim minloc As cv.Point, maxloc As cv.Point
+        'vertSplit(0).MinMaxLoc(minval, maxval, minloc, maxloc, mask)
+        'Console.WriteLine("minval = " + CStr(minval) + " max = " + CStr(maxval))
 
         Dim black = New cv.Vec3b(0, 0, 0)
         ocvb.result1.SetTo(cv.Scalar.White)
-        Dim desiredMax = sliders.TrackBar1.Value
+        ocvb.result2.SetTo(cv.Scalar.White)
+        Dim desiredMax = sliders.TrackBar1.Value / 1000
         Dim w = ocvb.color.Width
         Dim h = ocvb.color.Height
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
-         Sub(roi)
-             For y = roi.Y To roi.Y + roi.Height - 1
-                 For x = roi.X To roi.X + roi.Width - 1
-                     Dim m = mask.At(Of Byte)(y, x)
-                     If m > 0 Then
-                         Dim depth = vertSplit(2).At(Of Single)(y, x)
-                         If depth < desiredMax Then
-                             Dim dx = Math.Round(vertSplit(0).At(Of Single)(y, x))
-                             Dim dy = Math.Round(h * (desiredMax - depth) / desiredMax)
-                             ocvb.result1.Set(Of cv.Vec3b)(h - dy, dx, black)
-                         End If
-                     End If
-                 Next
-             Next
-         End Sub)
+        'Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        ' Sub(roi)
+        For i = 0 To grid.roiList.Count - 1
+            Dim roi = grid.roiList.ElementAt(i)
+            For y = roi.Y + roi.Height - 1 To roi.Y Step -1
+                For x = roi.X To roi.X + roi.Width - 1
+                    Dim m = mask.At(Of Byte)(h - y - 1, x)
+                    If m > 0 Then
+                        Dim depth = vertSplit(2).At(Of Single)(h - y - 1, x)
+                        If depth < desiredMax Then
+                            Dim dx = Math.Round(vertSplit(0).At(Of Single)(h - y - 1, x))
+                            Dim dy = Math.Round(h * (desiredMax - depth) / desiredMax)
+                            ocvb.result1.Set(Of cv.Vec3b)(h - dy, dx, black)
+                            dx = Math.Round(vertSplit(1).At(Of Single)(y, x))
+                            dy = Math.Round(w * (desiredMax - depth) / desiredMax)
+                            If dy < h And dy > 0 Then ocvb.result2.Set(Of cv.Vec3b)(h - dy, dx, black)
+                        End If
+                    End If
+                Next
+            Next
+        Next
+        'End Sub)
+        ocvb.label1 = "Looking straight up"
+        ocvb.label2 = "Side View"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         imu.Dispose()
