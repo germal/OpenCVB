@@ -138,12 +138,12 @@ Public Class Projections_GravityTransform : Implements IDisposable
         Dim mask = vertSplit(2).Threshold(0.001, 255, cv.ThresholdTypes.Binary)
         mask = mask.ConvertScaleAbs()
 
-        cv.Cv2.Normalize(vertSplit(0), vertSplit(0), 0, ocvb.color.Width, cv.NormTypes.MinMax, -1, mask)
+        'cv.Cv2.Normalize(vertSplit(0), vertSplit(0), 0, ocvb.color.Width, cv.NormTypes.MinMax, -1, mask)
         cv.Cv2.Normalize(vertSplit(1), vertSplit(1), 0, ocvb.color.Height, cv.NormTypes.MinMax, -1, mask)
 
-        'Dim minval As Double, maxval As Double
-        'Dim minloc As cv.Point, maxloc As cv.Point
-        'vertSplit(0).MinMaxLoc(minval, maxval, minloc, maxloc, mask)
+        Dim minval As Double, maxval As Double
+        Dim minloc As cv.Point, maxloc As cv.Point
+        vertSplit(0).MinMaxLoc(minval, maxval, minloc, maxloc, mask)
         'Console.WriteLine("minval = " + CStr(minval) + " max = " + CStr(maxval))
 
         Dim black = New cv.Vec3b(0, 0, 0)
@@ -152,6 +152,7 @@ Public Class Projections_GravityTransform : Implements IDisposable
         Dim desiredMax = sliders.TrackBar1.Value / 1000
         Dim w = ocvb.color.Width
         Dim h = ocvb.color.Height
+        Dim xFactor = w / (maxval - minval)
         'Parallel.ForEach(Of cv.Rect)(grid.roiList,
         ' Sub(roi)
         For i = 0 To grid.roiList.Count - 1
@@ -162,11 +163,11 @@ Public Class Projections_GravityTransform : Implements IDisposable
                     If m > 0 Then
                         Dim depth = vertSplit(2).At(Of Single)(h - y - 1, x)
                         If depth < desiredMax Then
-                            Dim dx = Math.Round(vertSplit(0).At(Of Single)(h - y - 1, x))
+                            Dim dx = xFactor * (vertSplit(0).At(Of Single)(h - y - 1, x) - minval)
                             Dim dy = Math.Round(h * (desiredMax - depth) / desiredMax)
                             ocvb.result1.Set(Of cv.Vec3b)(h - dy, dx, black)
-                            dx = Math.Round(vertSplit(1).At(Of Single)(y, x))
-                            dy = Math.Round(w * (desiredMax - depth) / desiredMax)
+                            dy = Math.Round(vertSplit(1).At(Of Single)(y, x))
+                            dx = Math.Round(w * (desiredMax - depth) / desiredMax)
                             If dy < h And dy > 0 Then ocvb.result2.Set(Of cv.Vec3b)(h - dy, dx, black)
                         End If
                     End If
