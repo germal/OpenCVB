@@ -141,6 +141,7 @@ Public Class Projections_GravityTransform : Implements IDisposable
         Dim black = New cv.Vec3b(0, 0, 0)
         ocvb.result1.SetTo(cv.Scalar.White)
         Dim desiredMax = sliders.TrackBar1.Value
+        Dim w = ocvb.color.Width
         Dim h = ocvb.color.Height
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
          Sub(roi)
@@ -152,7 +153,7 @@ Public Class Projections_GravityTransform : Implements IDisposable
                          If depth < desiredMax Then
                              'Dim dx = Math.Round(vertSplit(0).At(Of Single)(y, x))
                              Dim dy = Math.Round(h * (desiredMax - depth) / desiredMax)
-                             ocvb.result1.Set(Of cv.Vec3b)(h - dy, x, black)
+                             ocvb.result1.Set(Of cv.Vec3b)(h - dy, w - x, black)
                          End If
                      End If
                  Next
