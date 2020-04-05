@@ -292,3 +292,26 @@ void KinectRodriguesOnly(float *extrinsics, float *vectorOut)
 
 
 
+
+
+
+//
+//extern "C" __declspec(dllexport)
+//HMM * HMM_Open() {
+//	HMM* HMMPtr = new HMM();
+//	return HMMPtr;
+//}
+//
+//extern "C" __declspec(dllexport)
+//void HMM_Close(HMM * HMMPtr)
+//{
+//	delete HMMPtr;
+//}
+//
+//extern "C" __declspec(dllexport)
+//int* HMM_Run(HMM * HMMPtr, int* rgbPtr, int rows, int cols, int channels)
+//{
+//	HMMPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, rgbPtr);
+//	HMMPtr->Run();
+//	return (int*)HMMPtr->dst.data; // return this C++ allocated data to managed code
+//}

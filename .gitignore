@@ -34,6 +34,7 @@ Azure-Kinect-Sensor-SDK
 librealsense
 OpenCV
 VTK
+bin
 eigen-git-mirror
 CPP_Classes/Debug/*
 CPP_Classes/Release/*

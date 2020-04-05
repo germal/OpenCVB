@@ -1,5 +1,4 @@
-﻿Imports System.Windows.Controls
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Module Kinect_Interface
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
