@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Module Projections
     ' for performance we are putting this in an optimized C++ interface to the Kinect camera for convenience...
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SimpleProjectionRun(cPtr As IntPtr, depth As IntPtr, desiredMin As Integer, desiredMax As Integer, rows As Integer, cols As Integer) As IntPtr
+    Public Function SimpleProjectionRun(cPtr As IntPtr, depth As IntPtr, desiredMin As Single, desiredMax As Single, rows As Integer, cols As Integer) As IntPtr
     End Function
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function SimpleProjectionSide(cPtr As IntPtr) As IntPtr
@@ -44,11 +44,16 @@ Public Class Projections_SideAndDown : Implements IDisposable
 
         Dim h = ocvb.result1.Height
         Dim w = ocvb.result1.Width
-        Dim desiredMin = foreground.sliders.TrackBar1.Value
-        Dim desiredMax = foreground.sliders.TrackBar2.Value
-        Dim range = desiredMax - desiredMin
+        Dim desiredMin = CSng(foreground.sliders.TrackBar1.Value)
+        Dim desiredMax = CSng(foreground.sliders.TrackBar2.Value)
+        Dim range = CSng(desiredMax - desiredMin)
 
 #If 0 Then
+        ' this VB.Net version is much slower than the optimized C++ version below.
+        Dim depth32f As New cv.Mat
+        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        ocvb.result1.SetTo(cv.Scalar.White)
+        ocvb.result2.SetTo(cv.Scalar.White)
         Dim black = New cv.Vec3b(0, 0, 0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
          Sub(roi)
@@ -56,13 +61,11 @@ Public Class Projections_SideAndDown : Implements IDisposable
                  For x = roi.X To roi.X + roi.Width - 1
                      Dim m = foreground.Mask.At(Of Byte)(y, x)
                      If m > 0 Then
-                         Dim depth = ocvb.depth16.Get(Of UShort)(y, x)
-                         If depth > 0 Then
-                             Dim dy = Math.Round(h * (depth - desiredMin) / range)
-                             If dy < h And dy > 0 Then ocvb.result1.Set(Of cv.Vec3b)(h - dy, x, black)
-                             Dim dx = Math.Round(w * (depth - desiredMin) / range)
-                             If dx < w And dx > 0 Then ocvb.result2.Set(Of cv.Vec3b)(y, dx, black)
-                         End If
+                         Dim depth = depth32f.Get(Of Single)(y, x)
+                         Dim dy = h * (depth - desiredMin) / range
+                         If dy < h And dy > 0 Then ocvb.result1.Set(Of cv.Vec3b)(h - dy, x, black)
+                         Dim dx = w * (depth - desiredMin) / range
+                         If dx < w And dx > 0 Then ocvb.result2.Set(Of cv.Vec3b)(y, dx, black)
                      End If
                  Next
              Next
@@ -155,7 +158,6 @@ Public Class Projections_GravityTransform : Implements IDisposable
         Dim minval As Double, maxval As Double
         Dim minloc As cv.Point, maxloc As cv.Point
         vertSplit(0).MinMaxLoc(minval, maxval, minloc, maxloc, mask)
-        'Console.WriteLine("minval = " + CStr(minval) + " max = " + CStr(maxval))
 
         Dim black = New cv.Vec3b(0, 0, 0)
         ocvb.result1.SetTo(cv.Scalar.White)

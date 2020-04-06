@@ -3,6 +3,7 @@ Imports System.Runtime.InteropServices
 Public Class Depth_ManualTrim : Implements IDisposable
     Public Mask As New cv.Mat
     Public sliders As New OptionsSliders
+    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "Min Depth", 200, 1000, 200)
         sliders.setupTrackBar2(ocvb, "Max Depth", 200, 10000, 1400)
@@ -13,15 +14,20 @@ Public Class Depth_ManualTrim : Implements IDisposable
         Dim minDepth = sliders.TrackBar1.Value
         Dim maxDepth = sliders.TrackBar2.Value
         Mask = ocvb.depth16.Threshold(maxDepth, 255, cv.ThresholdTypes.BinaryInv)
-        Mask.ConvertTo(Mask, cv.MatType.CV_8U)
+        Mask = Mask.ConvertScaleAbs()
 
         Dim maskMin As New cv.Mat
         maskMin = ocvb.depth16.Threshold(minDepth, 255, cv.ThresholdTypes.Binary)
-        maskMin.ConvertTo(maskMin, cv.MatType.CV_8U)
+        maskMin = maskMin.ConvertScaleAbs()
         cv.Cv2.BitwiseAnd(Mask, maskMin, Mask)
 
-        ocvb.result1.SetTo(0)
-        ocvb.RGBDepth.CopyTo(ocvb.result1, Mask)
+        If externalUse = False Then
+            ocvb.result1.SetTo(0)
+            ocvb.RGBDepth.CopyTo(ocvb.result1, Mask)
+        End If
+        Dim notMask As New cv.Mat
+        cv.Cv2.BitwiseNot(Mask, notMask)
+        ocvb.depth16.SetTo(0, notMask)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()

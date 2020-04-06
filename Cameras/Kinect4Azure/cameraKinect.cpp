@@ -299,28 +299,29 @@ class SimpleProjection
 {
 private:
 public:
-    Mat depth16, mask, viewTop, viewSide;
-    SimpleProjection(){}
+    Mat depth32f, mask, viewTop, viewSide;
+    SimpleProjection(){} 
 
-    void Run(int desiredMin, int desiredMax, int w, int h) 
+	void Run(float desiredMin, float desiredMax, int w, int h)
 	{
-		int range = desiredMax - desiredMin;
+		float range = float(desiredMax - desiredMin);
+		float hRange = (float)h;
+		float wRange = (float)w;
 #pragma omp parallel for
-		for (int y = 0; y < depth16.rows; ++y)
+		for (int y = 0; y < depth32f.rows; ++y)
 		{
-			for (int x = 0; x < depth16.cols; ++x)
+			for (int x = 0; x < depth32f.cols; ++x)
 			{
 				uchar m = mask.at<uchar>(y, x);
-				viewTop.at<uchar>(y, x) = m;
-				viewSide.at<uchar>(y, x) = m;
-				//if (m > 0)
-				//{
-				//	UINT16 d = depth16.at<UINT16>(y, x);
-				//	UINT16 dy = h * (d - desiredMin) / range;
-				//	if ((h - dy) >= 0 && dy < h) viewTop.at<uchar>(h - dy, x) = 0;
-				//	int dx = w * (d - desiredMin) / range;
-				//	if (dx < w && dx >= 0) viewSide.at<uchar>(y, dx) = 0;
-				//}
+				if (m == 255)
+				{
+					viewSide.at<uchar>(y, x) = m;
+					float d = depth32f.at<float>(y, x);
+					float dy = hRange * (d - desiredMin) / range;
+					if ((hRange - dy) > 0 && dy < hRange) viewTop.at<uchar>((int)(hRange - dy), x) = 0;
+					float dx = wRange * (d - desiredMin) / range;
+					if (dx < wRange && dx > 0) viewSide.at<uchar>(y, (int)dx) = 0;
+				}
 			}
 		}
     }
@@ -345,11 +346,12 @@ int *SimpleProjectionSide(SimpleProjection * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int *SimpleProjectionRun(SimpleProjection *cPtr, int *depthPtr, int desiredMin, int desiredMax, int rows, int cols)
+int *SimpleProjectionRun(SimpleProjection *cPtr, int *depthPtr, float desiredMin, float desiredMax, int rows, int cols)
 {
-	cPtr->depth16 = Mat(rows, cols, CV_16U, depthPtr);
-	threshold(cPtr->depth16, cPtr->mask, 0, 255, ThresholdTypes::THRESH_BINARY);
+	Mat depth16 = Mat(rows, cols, CV_16U, depthPtr);
+	threshold(depth16, cPtr->mask, 0, 255, ThresholdTypes::THRESH_BINARY);
 	convertScaleAbs(cPtr->mask, cPtr->mask);
+	depth16.convertTo(cPtr->depth32f, CV_32F);
 	cPtr->viewTop = Mat(rows, cols, CV_8U).setTo(255);
 	cPtr->viewSide = Mat(rows, cols, CV_8U).setTo(255);
 	cPtr->Run(desiredMin, desiredMax, cols, rows);
