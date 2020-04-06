@@ -433,8 +433,8 @@ Public Class Edges_Deriche_CPP : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src = ocvb.color
-        Dim srcData(src.Total * src.ElemSize) As Byte
-        Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
+        Dim srcData(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim alpha = sliders.TrackBar1.Value / 100
         Dim omega = sliders.TrackBar2.Value / 1000

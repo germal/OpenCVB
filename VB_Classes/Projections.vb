@@ -3,7 +3,10 @@ Imports System.Runtime.InteropServices
 Module Projections
     ' for performance we are putting this in an optimized C++ interface to the Kinect camera for convenience...
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SimpleProjectionRun(cPtr As IntPtr, depth As IntPtr, mask As IntPtr, desiredMin As Integer, desiredMax As Integer, rows As Integer, cols As Integer) As IntPtr
+    Public Function SimpleProjectionRun(cPtr As IntPtr, depth As IntPtr, desiredMin As Integer, desiredMax As Integer, rows As Integer, cols As Integer) As IntPtr
+    End Function
+    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function SimpleProjectionSide(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function SimpleProjectionOpen() As IntPtr
@@ -19,6 +22,7 @@ Public Class Projections_SideAndDown : Implements IDisposable
     Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
+    Dim depthBytes() As Byte
     Public Sub New(ocvb As AlgorithmData)
         grid = New Thread_Grid(ocvb)
         grid.externalUse = True
@@ -32,14 +36,11 @@ Public Class Projections_SideAndDown : Implements IDisposable
         ocvb.label2 = "Side View"
         ocvb.desc = "Project the depth data onto a top view and side view."
 
-        ' cPtr = SimpleProjectionOpen()
+        cPtr = SimpleProjectionOpen()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
         foreground.Run(ocvb)
-
-        ocvb.result1.SetTo(cv.Scalar.White)
-        ocvb.result2.SetTo(cv.Scalar.White)
 
         Dim h = ocvb.result1.Height
         Dim w = ocvb.result1.Width
@@ -47,7 +48,7 @@ Public Class Projections_SideAndDown : Implements IDisposable
         Dim desiredMax = foreground.sliders.TrackBar2.Value
         Dim range = desiredMax - desiredMin
 
-#If 1 Then
+#If 0 Then
         Dim black = New cv.Vec3b(0, 0, 0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
          Sub(roi)
@@ -67,17 +68,27 @@ Public Class Projections_SideAndDown : Implements IDisposable
              Next
          End Sub)
 #Else
-        Dim depthBytes(ocvb.depth16.Total * ocvb.depth16.ElemSize - 1)
-        Dim handleRGBDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)
+        If depthBytes Is Nothing Then
+            ReDim depthBytes(ocvb.depth16.Total * ocvb.depth16.ElemSize - 1)
+        End If
 
+        Marshal.Copy(ocvb.depth16.Data, depthBytes, 0, depthBytes.Length)
+        Dim handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)
+
+        Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, desiredMin, desiredMax, ocvb.depth16.Height, ocvb.depth16.Width)
+
+        ocvb.result1 = New cv.Mat(ocvb.depth16.Rows, ocvb.depth16.Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        ocvb.result2 = New cv.Mat(ocvb.depth16.Rows, ocvb.depth16.Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        handleDepth.Free()
 #End If
-        ocvb.label1 = "Top View"
+        ocvb.label1 = "Top View (looking down)"
         ocvb.label2 = "Side View"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         foreground.Dispose()
         grid.Dispose()
-        ' SimpleProjectionClose(cPtr)
+        SimpleProjectionClose(cPtr)
     End Sub
 End Class
 
@@ -153,29 +164,29 @@ Public Class Projections_GravityTransform : Implements IDisposable
         Dim w = ocvb.color.Width
         Dim h = ocvb.color.Height
         Dim xFactor = w / (maxval - minval)
-        'Parallel.ForEach(Of cv.Rect)(grid.roiList,
-        ' Sub(roi)
-        For i = 0 To grid.roiList.Count - 1
-            Dim roi = grid.roiList.ElementAt(i)
-            For y = roi.Y + roi.Height - 1 To roi.Y Step -1
-                For x = roi.X To roi.X + roi.Width - 1
-                    Dim m = mask.At(Of Byte)(h - y - 1, x)
-                    If m > 0 Then
-                        Dim depth = vertSplit(2).At(Of Single)(h - y - 1, x)
-                        If depth < desiredMax Then
-                            Dim dx = xFactor * (vertSplit(0).At(Of Single)(h - y - 1, x) - minval)
-                            Dim dy = Math.Round(h * (desiredMax - depth) / desiredMax)
-                            ocvb.result1.Set(Of cv.Vec3b)(h - dy, dx, black)
-                            dy = Math.Round(vertSplit(1).At(Of Single)(y, x))
-                            dx = Math.Round(w * (desiredMax - depth) / desiredMax)
-                            If dy < h And dy > 0 Then ocvb.result2.Set(Of cv.Vec3b)(h - dy, dx, black)
-                        End If
-                    End If
-                Next
-            Next
-        Next
-        'End Sub)
-        ocvb.label1 = "Looking straight up"
+        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+         Sub(roi)
+             'For i = 0 To grid.roiList.Count - 1
+             '    Dim roi = grid.roiList.ElementAt(i)
+             For y = roi.Y + roi.Height - 1 To roi.Y Step -1
+                 For x = roi.X To roi.X + roi.Width - 1
+                     Dim m = mask.At(Of Byte)(h - y - 1, x)
+                     If m > 0 Then
+                         Dim depth = vertSplit(2).At(Of Single)(h - y - 1, x)
+                         If depth < desiredMax Then
+                             Dim dx = xFactor * (vertSplit(0).At(Of Single)(h - y - 1, x) - minval)
+                             Dim dy = Math.Round(h * (desiredMax - depth) / desiredMax)
+                             ocvb.result1.Set(Of cv.Vec3b)(h - dy, dx, black)
+                             dy = Math.Round(vertSplit(1).At(Of Single)(y, x))
+                             dx = Math.Round(w * (desiredMax - depth) / desiredMax)
+                             If dy < h And dy > 0 Then ocvb.result2.Set(Of cv.Vec3b)(h - dy, dx, black)
+                         End If
+                     End If
+                 Next
+             Next
+             'Next
+         End Sub)
+        ocvb.label1 = "View looking up from under floor"
         ocvb.label2 = "Side View"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

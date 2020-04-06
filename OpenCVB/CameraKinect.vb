@@ -73,10 +73,10 @@ Public Class CameraKinect
             leftView = New cv.Mat
 
             Dim ptr = KinectExtrinsics(cPtr)
-            Dim rotationTranslation(12) As Single
+            Dim rotationTranslation(12 - 1) As Single
             Marshal.Copy(ptr, rotationTranslation, 0, rotationTranslation.Length)
-            ReDim Extrinsics_VB.rotation(8)
-            ReDim Extrinsics_VB.translation(2)
+            ReDim Extrinsics_VB.rotation(9 - 1)
+            ReDim Extrinsics_VB.translation(3 - 1)
             For i = 0 To Extrinsics_VB.rotation.Length - 1
                 Extrinsics_VB.rotation(i) = rotationTranslation(i)
             Next

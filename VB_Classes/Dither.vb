@@ -114,11 +114,11 @@ Public Class Dither_Basics : Implements IDisposable
         Dim w = ocvb.result1.Width
         Dim h = ocvb.result1.Height
         Dim nColors = Choose(sliders.TrackBar1.Value, 1, 3, 7, 15, 31) ' indicate 3, 6, 9, 12, 15 bits per pixel.
-        Dim pixels(ocvb.result1.Total * ocvb.result1.ElemSize) As Byte
+        Dim pixels(ocvb.result1.Total * ocvb.result1.ElemSize - 1) As Byte
         Dim hpixels = GCHandle.Alloc(pixels, GCHandleType.Pinned)
         For i = 0 To 1
             Dim src = Choose(i + 1, ocvb.color, ocvb.RGBDepth)
-            Marshal.Copy(src.Data, pixels, 0, pixels.Length - 1)
+            Marshal.Copy(src.Data, pixels, 0, pixels.Length)
             Select Case radioIndex
                 Case 0
                     ditherBayer16(hpixels.AddrOfPinnedObject, w, h)

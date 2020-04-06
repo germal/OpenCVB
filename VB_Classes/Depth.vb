@@ -915,7 +915,7 @@ Public Class Depth_ColorizerVB_MT : Implements IDisposable
         cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat, hist, 1, dimensions, ranges)
 
         Dim histogram(histSize - 1) As Single
-        Marshal.Copy(hist.Data, histogram, 0, histogram.Length - 1)
+        Marshal.Copy(hist.Data, histogram, 0, histogram.Length)
         For i = 1 To histogram.Length - 1
             histogram(i) += histogram(i - 1)
         Next

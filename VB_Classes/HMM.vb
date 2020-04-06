@@ -26,8 +26,8 @@ Public Class HMM_Example_CPP : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src = ocvb.color
-        Dim srcData(src.Total * src.ElemSize) As Byte
-        Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
+        Dim srcData(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim imagePtr = HMM_Run(HMM, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()

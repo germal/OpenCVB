@@ -34,8 +34,8 @@ Public Class BGSubtract_Basics_CPP : Implements IDisposable
             End If
         Next
         If externalUse = False Then src = ocvb.color
-        Dim srcData(src.Total * src.ElemSize) As Byte
-        Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
+        Dim srcData(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim imagePtr = BGSubtract_BGFG_Run(bgfs, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
@@ -461,8 +461,8 @@ Public Class BGSubtract_Synthetic_CPP : Implements IDisposable
             objectSpeed = sliders.TrackBar4.Value
 
             Dim src = ocvb.color
-            Dim srcData(src.Total * src.ElemSize) As Byte
-            Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
+            Dim srcData(src.Total * src.ElemSize - 1) As Byte
+            Marshal.Copy(src.Data, srcData, 0, srcData.Length)
             Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
 
             synthPtr = BGSubtract_Synthetic_Open(handleSrc.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols,
