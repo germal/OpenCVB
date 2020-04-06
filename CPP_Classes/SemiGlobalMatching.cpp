@@ -49,8 +49,8 @@ public:
 	void Run()
 	{
 		//Initial Smoothing
-		//GaussianBlur(leftImage, leftImage, Size(BLUR_RADIUS, BLUR_RADIUS), 0, 0);
-		//GaussianBlur(rightImage, rightImage, Size(BLUR_RADIUS, BLUR_RADIUS), 0, 0);
+		GaussianBlur(leftImage, leftImage, Size(BLUR_RADIUS, BLUR_RADIUS), 0, 0);
+		GaussianBlur(rightImage, rightImage, Size(BLUR_RADIUS, BLUR_RADIUS), 0, 0);
 
 		calculateCostHamming(leftImage, rightImage, disparityRange, C, S);
 		aggregation(leftImage, rightImage, disparityRange, C, S, A);

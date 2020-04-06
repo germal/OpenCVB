@@ -43,6 +43,7 @@
     <ClCompile Include="OpenCVGL.cpp" />
     <ClCompile Include="Palette.cpp" />
     <ClCompile Include="Plot_OpenCV.cpp" />
+    <ClCompile Include="Projections.cpp" />
     <ClCompile Include="Random_PatternGenerator.cpp" />
     <ClCompile Include="recursiveBilateralFilter.cpp" />
     <ClCompile Include="Retina.cpp" />

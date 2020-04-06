@@ -62,14 +62,14 @@ End Module
 
 
 Public Class Python_Run : Implements IDisposable
-    Dim pipe As PyStream_Basics = Nothing
+    Dim pyStream As PyStream_Basics = Nothing
     Dim tryCount As Int32
     Public Sub New(ocvb As AlgorithmData)
         If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
         If pythonApp.Name.EndsWith("_PS.py") Then
-            pipe = New PyStream_Basics(ocvb)
+            pyStream = New PyStream_Basics(ocvb)
         Else
             StartPython(ocvb, "")
         End If
@@ -80,8 +80,8 @@ Public Class Python_Run : Implements IDisposable
         ocvb.result2.SetTo(0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If pipe IsNot Nothing Then
-            pipe.Run(ocvb)
+        If pyStream IsNot Nothing Then
+            pyStream.Run(ocvb)
         Else
             Dim proc = Process.GetProcessesByName("python")
             If proc.Count = 0 Then
@@ -96,7 +96,7 @@ Public Class Python_Run : Implements IDisposable
         For i = 0 To proc.Count - 1
             proc(i).Kill()
         Next i
-        If pipe IsNot Nothing Then pipe.Dispose()
+        If pyStream IsNot Nothing Then pyStream.Dispose()
     End Sub
 End Class
 

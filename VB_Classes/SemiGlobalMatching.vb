@@ -31,6 +31,10 @@ End Module
 '    End Sub
 '    Public Sub Run(ocvb As AlgorithmData)
 '        If ocvb.frameCount < 10 Then Exit Sub
+'        If ocvb.parms.cameraIndex = Kinect4AzureCam Then
+'            ocvb.putText(New ActiveClass.TrueType("The left and right views are identical with the Microsoft Kinect 4 Azure camera.", 10, 60, RESULT1))
+'            Exit Sub
+'        End If
 '        Marshal.Copy(ocvb.leftView.Data, leftData, 0, leftData.Length)
 '        Marshal.Copy(ocvb.rightView.Data, rightData, 0, rightData.Length)
 '        Dim handleLeft = GCHandle.Alloc(leftData, GCHandleType.Pinned)

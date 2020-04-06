@@ -49,6 +49,8 @@ Public Class CamShift_Basics : Implements IDisposable
             vMinLast = min
             vMaxLast = max
             sBinsLast = sbins
+            If ocvb.drawRect.X + ocvb.drawRect.Width > ocvb.color.Width Then ocvb.drawRect.Width = ocvb.color.Width - ocvb.drawRect.X - 1
+            If ocvb.drawRect.Y + ocvb.drawRect.Height > ocvb.color.Height Then ocvb.drawRect.Height = ocvb.color.Height - ocvb.drawRect.Y - 1
             cv.Cv2.CalcHist(New cv.Mat() {hue(ocvb.drawRect)}, {0, 0}, mask(ocvb.drawRect), roi_hist, 1, hsize, ranges)
             roi_hist = roi_hist.Normalize(0, 255, cv.NormTypes.MinMax)
             roi = ocvb.drawRect
@@ -110,93 +112,29 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
-Public Class Camshift_Python : Implements IDisposable
-    Dim memMap As Python_MemMap
-    Dim pipeName As String
-    Dim pipeImages As NamedPipeServerStream
-    Dim rgbBuffer(1) As Byte
-    Dim pythonReady As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
-        pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.Out)
-        PipeTaskIndex += 1
-
-        ' set the pythonfilename before initializing memMap (it indicates Python_MemMap is not running standalone.)
-        ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes\Python\Camshift_Python.py"
-        memMap = New Python_MemMap(ocvb)
-
-        If ocvb.parms.externalPythonInvocation Then
-            pythonReady = True ' python was already running and invoked OpenCVB.
-        Else
-            pythonReady = StartPython(ocvb, "--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
-        End If
-        If pythonReady Then pipeImages.WaitForConnection()
-        ocvb.desc = "Stream data to the Camshift_Python Python script"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If pythonReady Then
-            For i = 0 To memMap.memMapValues.Length - 1
-                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.color.Total * ocvb.color.ElemSize, ocvb.color.Rows, ocvb.color.Cols)
-            Next
-            memMap.Run(ocvb)
-
-            If rgbBuffer.Length <> ocvb.color.Total * ocvb.color.ElemSize Then ReDim rgbBuffer(ocvb.color.Total * ocvb.color.ElemSize - 1)
-            Marshal.Copy(ocvb.color.Data, rgbBuffer, 0, ocvb.color.Total * ocvb.color.ElemSize)
-            If pipeImages.IsConnected Then
-                On Error Resume Next
-                pipeImages.Write(rgbBuffer, 0, rgbBuffer.Length)
-            End If
-        End If
-        ocvb.putText(New ActiveClass.TrueType("Draw a rectangle anywhere on the 'camshift' (Python) window nearby." + vbCrLf +
-                                              "Mouse down will show highlighted areas that may be used for tracking.", 10, 140, RESULT1))
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        memMap.Dispose()
-        If pipeImages IsNot Nothing Then
-            If pipeImages.IsConnected Then
-                pipeImages.Flush()
-                pipeImages.WaitForPipeDrain()
-                pipeImages.Disconnect()
-            End If
-        End If
-        On Error Resume Next
-        Dim proc = Process.GetProcessesByName("python")
-        For i = 0 To proc.Count - 1
-            proc(i).Kill()
-        Next i
-    End Sub
-End Class
-
-
-
 
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class Camshift_Object : Implements IDisposable
     Dim blob As Blob_DepthClusters
     Dim camshift As CamShift_Basics
-    Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
         blob = New Blob_DepthClusters(ocvb)
 
         camshift = New CamShift_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "How often should camshift be reinitialized", 1, 500, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Use the blob depth cluster as input to initialize a camshift algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blob.Run(ocvb)
 
         Dim largestMask = blob.flood.fBasics.maskSizes.ElementAt(0).Value
-        If ocvb.frameCount Mod sliders.TrackBar1.Value = 0 Or camshift.trackBox.Size.Width = 0 Then ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
+        If camshift.trackBox.Size.Width = 0 Then ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
         camshift.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         blob.Dispose()
         camshift.Dispose()
-        sliders.Dispose()
     End Sub
 End Class
 
