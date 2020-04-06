@@ -63,7 +63,7 @@ Public Class OpenGL_Basics : Implements IDisposable
         PipeTaskIndex += 1
         pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut, 1)
 
-        memMapbufferSize = 8 * (memMapValues.Length - 1)
+        memMapbufferSize = 8 * memMapValues.Length - 1
 
         startInfo.FileName = OpenGLTitle + ".exe"
         startInfo.Arguments = CStr(ocvb.openGLWidth) + " " + CStr(ocvb.openGLHeight) + " " + CStr(memMapbufferSize) + " " + pipeName + " " +
@@ -97,21 +97,17 @@ Public Class OpenGL_Basics : Implements IDisposable
         End If
 
         If rgbInput.Width = 0 Then rgbInput = ocvb.color
-
-        If pointCloudBuffer.Length <> pcSrc.Total * pcSrc.ElemSize Then
-            ReDim pointCloudBuffer(pcSrc.Total * pcSrc.ElemSize - 1)
-        End If
-
         Dim rgb = rgbInput.CvtColor(cv.ColorConversionCodes.BGR2RGB) ' OpenGL needs RGB, not BGR
         If rgbBuffer.Length <> rgb.Total * rgb.ElemSize Then ReDim rgbBuffer(rgb.Total * rgb.ElemSize - 1)
         If dataBuffer.Length <> dataInput.Total * dataInput.ElemSize Then ReDim dataBuffer(dataInput.Total * dataInput.ElemSize - 1)
         memMapUpdate(ocvb)
 
-        Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length - 1)
+        Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
 
         If rgb.Width > 0 Then Marshal.Copy(rgb.Data, rgbBuffer, 0, rgbBuffer.Length)
         If dataInput.Width > 0 Then Marshal.Copy(dataInput.Data, dataBuffer, 0, dataBuffer.Length)
+        If pointCloudBuffer.Length <> pcSrc.Total * pcSrc.ElemSize Then ReDim pointCloudBuffer(pcSrc.Total * pcSrc.ElemSize - 1)
         If pcSrc.Width > 0 Then Marshal.Copy(pcSrc.Data, pointCloudBuffer, 0, pcSize)
 
         If pipe.IsConnected Then

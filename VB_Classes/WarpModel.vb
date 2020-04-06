@@ -134,8 +134,8 @@ Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
             src2 = src2.Resize(New cv.Size(src2.Width / 4, src2.Height / 4))
         End If
 
-        Dim src1Data(src1.Total * src1.ElemSize) As Byte
-        Dim src2Data(src2.Total * src2.ElemSize) As Byte
+        Dim src1Data(src1.Total * src1.ElemSize - 1) As Byte
+        Dim src2Data(src2.Total * src2.ElemSize - 1) As Byte
         Marshal.Copy(src1.Data, src1Data, 0, src1Data.Length - 1)
         Marshal.Copy(src2.Data, src2Data, 0, src2Data.Length - 1)
         Dim handleSrc1 = GCHandle.Alloc(src1Data, GCHandleType.Pinned)

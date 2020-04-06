@@ -130,6 +130,7 @@ Public Class Mat_4to1 : Implements IDisposable
     Public mat() As cv.Mat = {mat1, mat2, mat3, mat4}
     Public externalUse As Boolean
     Public noLines As Boolean ' if they want lines or not...
+    Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         ocvb.label1 = ""
         mat1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
@@ -137,6 +138,7 @@ Public Class Mat_4to1 : Implements IDisposable
         mat3 = mat1.Clone()
         mat4 = mat1.Clone()
         mat = {mat1, mat2, mat3, mat4}
+        dst = ocvb.result2
         ocvb.desc = "Use one Mat for up to 4 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -152,14 +154,14 @@ Public Class Mat_4to1 : Implements IDisposable
             mat4 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             mat = {mat1, mat2, mat3, mat4}
         End If
-        If mat(0).Channels <> ocvb.result2.Channels Then ocvb.result2 = New cv.Mat(ocvb.color.Size(), mat(0).Type, 0)
+        If mat(0).Channels <> dst.Channels Then dst = New cv.Mat(ocvb.color.Size(), mat(0).Type, 0)
         For i = 0 To 3
             Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
-            ocvb.result2(roi) = mat(i).Resize(nSize)
+            dst(roi) = mat(i).Resize(nSize)
         Next
         If noLines = False Then
-            ocvb.result2.Line(New cv.Point(0, ocvb.result2.Height / 2), New cv.Point(ocvb.result2.Width, ocvb.result2.Height / 2), cv.Scalar.White, 2)
-            ocvb.result2.Line(New cv.Point(ocvb.result2.Width / 2, 0), New cv.Point(ocvb.result2.Width / 2, ocvb.result2.Height), cv.Scalar.White, 2)
+            dst.Line(New cv.Point(0, dst.Height / 2), New cv.Point(dst.Width, dst.Height / 2), cv.Scalar.White, 2)
+            dst.Line(New cv.Point(dst.Width / 2, 0), New cv.Point(dst.Width / 2, dst.Height), cv.Scalar.White, 2)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -175,11 +177,14 @@ Public Class Mat_2to1 : Implements IDisposable
     Public mat() = {mat1, mat2}
     Public externalUse As Boolean
     Public noLines As Boolean ' if they want lines or not...
+    Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         ocvb.label1 = ""
         mat1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
+        dst = ocvb.result2
+
         ocvb.desc = "Fill a Mat with 2 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -193,10 +198,10 @@ Public Class Mat_2to1 : Implements IDisposable
         End If
         For i = 0 To 1
             Dim roi = Choose(i + 1, roiTop, roibot)
-            ocvb.result2(roi) = mat(i).Resize(nSize)
+            dst(roi) = mat(i).Resize(nSize)
         Next
         If noLines = False Then
-            ocvb.result2.Line(New cv.Point(0, ocvb.result2.Height / 2), New cv.Point(ocvb.result2.Width, ocvb.result2.Height / 2), cv.Scalar.White, 2)
+            dst.Line(New cv.Point(0, dst.Height / 2), New cv.Point(dst.Width, dst.Height / 2), cv.Scalar.White, 2)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

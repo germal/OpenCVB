@@ -52,7 +52,7 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
             spPtr = SuperPixel_Open(src.Width, src.Height, numSuperPixels, numIterations, prior)
         End If
 
-        Dim srcData(src.Total * src.ElemSize) As Byte
+        Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim imagePtr = SuperPixel_Run(spPtr, handleSrc.AddrOfPinnedObject())
@@ -74,7 +74,7 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
             End If
         End If
 
-        Dim labelData(src.Total * 4) As Byte ' labels are 32-bit integers.
+        Dim labelData(src.Total * 4 - 1) As Byte ' labels are 32-bit integers.
         Dim labelPtr = SuperPixel_GetLabels(spPtr)
         Marshal.Copy(labelPtr, labelData, 0, labelData.Length)
         Dim labels = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32S, labelData)

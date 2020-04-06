@@ -137,7 +137,7 @@ Public Class Puzzle_PieceCorrelation : Implements IDisposable
                      state = New cv.Vec3i(1, 0, puzzle(0).scrambled(0).Height - 1)
              End Select
              Dim hOrder = GCHandle.Alloc(puzzleOrder(i), GCHandleType.Pinned)
-             Dim rgbData(images(i).Total * images(i).ElemSize) As Byte
+             Dim rgbData(images(i).Total * images(i).ElemSize - 1) As Byte
              Marshal.Copy(images(i).Data, rgbData, 0, rgbData.Length)
              Dim hImage = GCHandle.Alloc(rgbData, GCHandleType.Pinned)
              Dim out As IntPtr = Puzzle_PieceCorrelation_Run(puzzleSolvers(i), hOrder.AddrOfPinnedObject, hImage.AddrOfPinnedObject, images(i).Rows, images(i).Cols, state)

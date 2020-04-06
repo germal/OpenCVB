@@ -24,8 +24,8 @@ End Module
 '    Dim rightData() As Byte
 '    Dim SemiGlobalMatching As IntPtr
 '    Public Sub New(ocvb As AlgorithmData)
-'        ReDim leftData(ocvb.color.Total)
-'        ReDim rightData(ocvb.color.Total)
+'        ReDim leftData(ocvb.color.Total - 1)
+'        ReDim rightData(ocvb.color.Total - 1)
 '        SemiGlobalMatching = SemiGlobalMatching_Open(ocvb.color.Rows, ocvb.color.Cols)
 '        ocvb.desc = "Find depth using the semi-global matching algorithm."
 '    End Sub

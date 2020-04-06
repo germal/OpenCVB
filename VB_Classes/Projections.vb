@@ -30,6 +30,7 @@ Public Class Projections_SideAndDown : Implements IDisposable
         grid.sliders.TrackBar2.Value = 32
 
         foreground = New Depth_ManualTrim(ocvb)
+        foreground.externalUse = True
         foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
         foreground.sliders.TrackBar2.Value = 4000 ' fixed distance to keep the images stable.
         ocvb.label1 = "Top View"
@@ -100,7 +101,7 @@ End Class
 
 
 
-Public Class Projections_GravityTransform : Implements IDisposable
+Public Class Projections_GravityTransformVB : Implements IDisposable
     Dim imu As IMU_AnglesToGravity
     Dim sliders As New OptionsSliders
     Dim grid As Thread_Grid
@@ -168,8 +169,6 @@ Public Class Projections_GravityTransform : Implements IDisposable
         Dim xFactor = w / (maxval - minval)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
          Sub(roi)
-             'For i = 0 To grid.roiList.Count - 1
-             '    Dim roi = grid.roiList.ElementAt(i)
              For y = roi.Y + roi.Height - 1 To roi.Y Step -1
                  For x = roi.X To roi.X + roi.Width - 1
                      Dim m = mask.At(Of Byte)(h - y - 1, x)
@@ -186,7 +185,6 @@ Public Class Projections_GravityTransform : Implements IDisposable
                      End If
                  Next
              Next
-             'Next
          End Sub)
         ocvb.label1 = "View looking up from under floor"
         ocvb.label2 = "Side View"

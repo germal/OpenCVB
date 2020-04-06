@@ -134,12 +134,8 @@ Public Class Python_MemMap : Implements IDisposable
         End If
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
-            For i = 0 To memMapValues.Length - 1
-                memMapValues(i) = Choose(i + 1, ocvb.frameCount)
-            Next
-        End If
-        Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length - 1)
+        If externalUse = False Then memMapValues(0) = ocvb.frameCount
+        Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

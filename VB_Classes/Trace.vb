@@ -25,7 +25,7 @@ Public Class Trace_OpenCV_CPP : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src = ocvb.color
-        Dim srcData(src.Total * src.ElemSize) As Byte
+        Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim imagePtr = Trace_OpenCV_Run(Trace_OpenCV, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)

@@ -217,8 +217,8 @@ Public Class Random_PatternGenerator_CPP : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src = ocvb.color
-        Dim srcData(src.Total * src.ElemSize) As Byte
-        Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
+        Dim srcData(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim imagePtr = Random_PatternGenerator_Run(Random_PatternGenerator, src.Rows, src.Cols, src.Channels)
 
         If imagePtr <> 0 Then

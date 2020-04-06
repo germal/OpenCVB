@@ -40,7 +40,7 @@ Public Class PyStream_Basics : Implements IDisposable
             If rgbBuffer.Length <> ocvb.color.Total * ocvb.color.ElemSize Then ReDim rgbBuffer(ocvb.color.Total * ocvb.color.ElemSize - 1)
             If depthBuffer.Length <> ocvb.depth16.Total * ocvb.depth16.ElemSize Then ReDim depthBuffer(ocvb.depth16.Total * ocvb.depth16.ElemSize - 1)
             Marshal.Copy(ocvb.color.Data, rgbBuffer, 0, ocvb.color.Total * ocvb.color.ElemSize)
-            Marshal.Copy(ocvb.depth16.Data, depthBuffer, 0, depthBuffer.Length - 1)
+            Marshal.Copy(ocvb.depth16.Data, depthBuffer, 0, depthBuffer.Length)
             If pipeImages.IsConnected Then
                 On Error Resume Next
                 pipeImages.Write(rgbBuffer, 0, rgbBuffer.Length)
