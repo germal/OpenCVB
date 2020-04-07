@@ -680,7 +680,7 @@ Public Class Depth_Palette : Implements IDisposable
         depthNorm16 *= 255 / (maxDepth - minDepth) ' do the normalize manually to use the min and max Depth (more stable
         depthNorm16.ConvertTo(depth, cv.MatType.CV_8U)
         depth = depth.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.result1 = Palette_ApplyCustom(depth, customColorMap)
+        ocvb.result1 = Palette_Custom_Apply(depth, customColorMap)
         ocvb.result1.SetTo(0, trim.zeroMask)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

@@ -1,5 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.IO
+Imports System.Text
 Module Projections
     ' for performance we are putting this in an optimized C++ interface to the Kinect camera for convenience...
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -16,13 +18,16 @@ Module Projections
     End Sub
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Projections_Gravity_Open() As IntPtr
+    Public Function Projections_Gravity_Open(filename As String) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Projections_Gravity_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Projections_Gravity_Run(cPtr As IntPtr, xPtr As IntPtr, yPtr As IntPtr, zPtr As IntPtr, desiredMax As Single, rows As Int32, cols As Int32) As IntPtr
+    Public Function Projections_Gravity_Side(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Projections_Gravity_Run(cPtr As IntPtr, xPtr As IntPtr, yPtr As IntPtr, zPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
     End Function
 End Module
 
@@ -212,7 +217,90 @@ End Class
 
 
 
-Public Class Projections_Gravity_CPP : Implements IDisposable
+'Public Class Projections_Gravity_CPP : Implements IDisposable
+'    Dim imu As IMU_AnglesToGravity
+'    Dim sliders As New OptionsSliders
+'    Dim cPtr As IntPtr
+'    Dim zBytes() As Byte
+'    Dim kalman1 As Kalman_Single
+'    Public Sub New(ocvb As AlgorithmData)
+'        kalman1 = New Kalman_Single(ocvb)
+'        kalman1.externalUse = True
+
+'        imu = New IMU_AnglesToGravity(ocvb)
+'        imu.result = RESULT2
+'        imu.externalUse = True
+
+'        sliders.setupTrackBar1(ocvb, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
+'        If ocvb.parms.ShowOptions Then sliders.Show()
+
+'        cPtr = Projections_Gravity_Open()
+'        ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
+'    End Sub
+'    Public Sub Run(ocvb As AlgorithmData)
+'        imu.Run(ocvb)
+'        Dim split() = cv.Cv2.Split(ocvb.pointCloud)
+'        Dim vertSplit = split
+
+'        Dim zCos = Math.Cos(imu.angleZ)
+'        Dim zSin = Math.Sin(imu.angleZ)
+
+'        Dim xCos = Math.Cos(imu.angleX)
+'        Dim xSin = Math.Sin(imu.angleX)
+
+'        Dim xArray(,) As Single = {{1, 0, 0, 0}, {0, zCos, -zSin, 0}, {0, zSin, zCos, 0}, {0, 0, 0, 1}}
+'        Dim xRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, xArray)
+
+'        Dim zArray(,) As Single = {{xCos, -xSin, 0, 0}, {xSin, xCos, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}
+'        Dim zRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, zArray)
+'        Dim yRotate = (xRotate * zRotate).ToMat
+
+'        Dim xz(4 * 4) As Single
+'        For j = 0 To yRotate.Rows - 1
+'            For i = 0 To yRotate.Cols - 1
+'                xz(i * 4 + j) = yRotate.At(Of Single)(i, j)
+'            Next
+'        Next
+
+'        vertSplit(0) = xz(0) * split(0) + xz(1) * split(1) + xz(2) * split(2)
+'        vertSplit(1) = xz(4) * split(0) + xz(5) * split(1) + xz(6) * split(2)
+'        vertSplit(2) = xz(8) * split(0) + xz(9) * split(1) + xz(10) * split(2)
+
+'        Dim desiredMaxZ = sliders.TrackBar1.Value / 1000
+'        Dim minX As Double, maxX As Double, minY As Double, maxY As Double
+'        cv.Cv2.MinMaxLoc(vertSplit(0), minX, maxX)
+'        cv.Cv2.MinMaxLoc(vertSplit(1), minY, maxY)
+'        Dim compressX As Single = desiredMaxZ / Math.Abs(maxX - minX)
+'        Dim compressY As Single = desiredMaxZ / Math.Abs(maxY - minY)
+'        kalman1.inputReal = compressX
+'        kalman1.Run(ocvb)
+
+'        If zBytes Is Nothing Then ReDim zBytes(vertSplit(2).Total * vertSplit(2).ElemSize - 1)
+'        Marshal.Copy(vertSplit(2).Data, zBytes, 0, zBytes.Length)
+'        Dim handleZ = GCHandle.Alloc(zBytes, GCHandleType.Pinned)
+
+'        Dim imagePtr = Projections_Gravity_Run(cPtr, handleZ.AddrOfPinnedObject, desiredMaxZ, kalman1.stateResult, compressY, vertSplit(2).Height, vertSplit(2).Width)
+
+'        ocvb.result1 = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+'        ocvb.result2 = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+'        handleZ.Free()
+
+'        ocvb.label1 = "Top View (looking down)"
+'        ocvb.label2 = "Side View"
+'    End Sub
+'    Public Sub Dispose() Implements IDisposable.Dispose
+'        imu.Dispose()
+'        sliders.Dispose()
+'        Projections_Gravity_Close(cPtr)
+'        kalman1.Dispose()
+'    End Sub
+'End Class
+
+
+
+
+Public Class Projections_Gravity_CPP1 : Implements IDisposable
     Dim imu As IMU_AnglesToGravity
     Dim sliders As New OptionsSliders
     Dim cPtr As IntPtr
@@ -227,7 +315,12 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        cPtr = Projections_Gravity_Open()
+        Dim fileInfo As New FileInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps/colorscale_jet.jpg")
+        If fileInfo.Exists = False Then
+            MsgBox("The colormaps have moved!  Projections_Gravity_CPP won't work." + vbCrLf + "Look for this file:" + fileInfo.FullName)
+        End If
+        cPtr = Projections_Gravity_Open(fileInfo.FullName)
+
         ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -259,6 +352,8 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
         vertSplit(1) = xz(4) * split(0) + xz(5) * split(1) + xz(6) * split(2)
         vertSplit(2) = xz(8) * split(0) + xz(9) * split(1) + xz(10) * split(2)
 
+        Dim maxZ = sliders.TrackBar1.Value / 1000
+
         If zBytes Is Nothing Then
             ReDim xBytes(vertSplit(0).Total * vertSplit(0).ElemSize - 1)
             ReDim yBytes(vertSplit(1).Total * vertSplit(1).ElemSize - 1)
@@ -271,11 +366,11 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
         Dim handleY = GCHandle.Alloc(yBytes, GCHandleType.Pinned)
         Dim handleZ = GCHandle.Alloc(zBytes, GCHandleType.Pinned)
 
-        Dim desiredMax = sliders.TrackBar1.Value / 1000
-        Dim imagePtr = Projections_Gravity_Run(cPtr, handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, handleZ.AddrOfPinnedObject, desiredMax, vertSplit(2).Height, vertSplit(2).Width)
+        Dim imagePtr = Projections_Gravity_Run(cPtr, handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, handleZ.AddrOfPinnedObject,
+                                               maxZ, vertSplit(2).Height, vertSplit(2).Width)
 
-        ocvb.result1 = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.result2 = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        ocvb.result1 = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
+        ocvb.result2 = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_8UC3, Projections_Gravity_Side(cPtr)).Clone()
 
         handleX.Free()
         handleY.Free()

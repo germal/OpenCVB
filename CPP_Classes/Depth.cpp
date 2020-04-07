@@ -5,6 +5,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
+#include "DepthColorizer.hpp"
 
 using namespace std;
 using namespace cv;
@@ -73,9 +74,6 @@ int *Depth_XYZ_OpenMP_Run(DepthXYZ *DepthXYZPtr, int *depthPtr, int rows, int co
 
 
 
-
-
-#include "DepthColorizer.hpp"
 
 extern "C" __declspec(dllexport)
 Depth_Colorizer * Depth_Colorizer_Open()
