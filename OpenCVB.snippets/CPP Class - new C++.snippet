@@ -15,10 +15,10 @@ Module Anyname_CPP_Module
     Public Function Anyname_Open() As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Anyname_Close(anynamePtr As IntPtr)
+    Public Sub Anyname_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Anyname_Run(anynamePtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, channels As Int32) As IntPtr
+    Public Function Anyname_Run(cPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, channels As Int32) As IntPtr
     End Function
 End Module
 
@@ -46,22 +46,22 @@ End Module
 
 '//extern "C" __declspec(dllexport)
 '//anyname *Anyname_Open() {
-'//    anyname *anynamePtr = new anyname();
-'//    return anynamePtr;
+'//    anyname *cPtr = new anyname();
+'//    return cPtr;
 '//}
 
 '//extern "C" __declspec(dllexport)
-'//void Anyname_Close(anyname *anynamePtr)
+'//void Anyname_Close(anyname *cPtr)
 '//{
-'//    delete anynamePtr;
+'//    delete cPtr;
 '//}
 
 '//extern "C" __declspec(dllexport)
-'//int *Anyname_Run(anyname *anynamePtr, int *rgbPtr, int rows, int cols, int channels)
+'//int *Anyname_Run(anyname *cPtr, int *rgbPtr, int rows, int cols, int channels)
 '//{
-'//		anynamePtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, rgbPtr);
-'//		anynamePtr->Run();
-'//		return (int *) anynamePtr->dst.data; // return this C++ allocated data to managed code
+'//		cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, rgbPtr);
+'//		cPtr->Run();
+'//		return (int *) cPtr->dst.data; // return this C++ allocated data to managed code
 '//}
 
 Public Class AnyName_CPP : Implements IDisposable

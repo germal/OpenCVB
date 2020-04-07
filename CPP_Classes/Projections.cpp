@@ -30,10 +30,9 @@ public:
 				uchar m = mask.at<uchar>(y, x);
 				if (m == 255)
 				{
-					viewSide.at<uchar>(y, x) = m;
 					float d = depth32f.at<float>(y, x);
 					float dy = hRange * (d - desiredMin) / range;
-					if ((hRange - dy) > 0 && dy < hRange && dy > 0) viewTop.at<uchar>((int)(hRange - dy), x) = 0;
+					if (dy > 0 && dy < hRange) viewTop.at<uchar>((int)(hRange - dy), x) = 0;
 					float dx = wRange * (d - desiredMin) / range;
 					if (dx < wRange && dx > 0) viewSide.at<uchar>(y, (int)dx) = 0;
 				}
@@ -70,5 +69,77 @@ int* SimpleProjectionRun(SimpleProjection * cPtr, int* depthPtr, float desiredMi
 	cPtr->viewTop = Mat(rows, cols, CV_8U).setTo(255);
 	cPtr->viewSide = Mat(rows, cols, CV_8U).setTo(255);
 	cPtr->Run(desiredMin, desiredMax, cols, rows);
+	return (int*)cPtr->viewTop.data;
+}
+
+
+
+
+
+class Projections_Gravity
+{
+private:
+public:
+	Mat depth32f, mask, viewTop, viewSide;
+	Projections_Gravity() {}
+
+	void Run(float desiredMax, int w, int h)
+	{
+		float hRange = (float)h;
+		float wRange = (float)w;
+#pragma omp parallel for
+		for (int y = 0; y < depth32f.rows; ++y)
+		{
+			for (int x = 0; x < depth32f.cols; ++x)
+			{
+				uchar m = mask.at<uchar>(y, x);
+				if (m == 255)
+				{
+					float d = depth32f.at<float>(y, x);
+					float dy = hRange * d / desiredMax;
+					if (dy > 0 && dy < hRange) viewTop.at<uchar>((int)(hRange - dy), x) = 0;
+					//float dx = wRange * d / desiredMax;
+					//if (dx < wRange && dx > 0) viewSide.at<uchar>(y, (int)dx) = 0;
+				}
+			}
+		}
+	}
+};
+
+extern "C" __declspec(dllexport)
+Projections_Gravity * Projections_Gravity_Open() {
+	Projections_Gravity* cPtr = new Projections_Gravity();
+	return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+void Projections_Gravity_Close(Projections_Gravity * cPtr)
+{
+	delete cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Projections_Gravity_Side(Projections_Gravity * cPtr)
+{
+	return (int*)cPtr->viewSide.data;
+}
+
+extern "C" __declspec(dllexport)
+int* Projections_Gravity_Run(Projections_Gravity * cPtr, int* xPtr, int* yPtr, int* zPtr, float desiredMax, int rows, int cols)
+{
+
+	cPtr->depth32f = Mat(rows, cols, CV_32F, zPtr);
+
+	Mat mask;
+	threshold(cPtr->depth32f, mask, 0, 255, ThresholdTypes::THRESH_BINARY);
+	convertScaleAbs(mask, mask);
+
+	threshold(cPtr->depth32f, cPtr->mask, desiredMax, 255, ThresholdTypes::THRESH_BINARY_INV);
+	convertScaleAbs(cPtr->mask, cPtr->mask);
+	bitwise_and(mask, cPtr->mask, cPtr->mask);
+
+	cPtr->viewTop = Mat(rows, cols, CV_8U).setTo(255);
+	cPtr->viewSide = Mat(rows, cols, CV_8U).setTo(255);
+	cPtr->Run(desiredMax, cols, rows);
 	return (int*)cPtr->viewTop.data;
 }
