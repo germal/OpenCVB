@@ -353,10 +353,10 @@ Public Class IMU_HostFrameTimes : Implements IDisposable
                                                   " CPUanchor = " + Format(CPUanchor, "00") +
                                                   " latest = " + Format(ocvb.parms.CPU_FrameTime, "00.00") + vbCrLf +
                                                   "Host Interrupt Delay (ms, sampled, in red) " + Format(HostInterruptDelayEstimate, "00") + vbCrLf + vbCrLf +
-                                                  "IMU Frame Time = Blue" + vbCrLf +
-                                                  "Host Frame Time = Green" + vbCrLf +
-                                                  "Host Total Delay (latency) = Red" + vbCrLf +
-                                                  "Host Anchor Frame Time = White (Host Frame Time that occurs most often", 10, 40))
+                                                  "Blue" + vbTab + "IMU Frame Time" + vbCrLf +
+                                                  "Green" + vbTab + "Host Frame Time" + vbCrLf +
+                                                  "Red" + vbTab + "Host Total Delay (latency)" + vbCrLf +
+                                                  "White" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often", 10, 40))
 
             plot.plotData = New cv.Scalar(ocvb.parms.IMU_FrameTime, ocvb.parms.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
             plot.Run(ocvb)
@@ -437,10 +437,10 @@ Public Class IMU_TotalDelay : Implements IDisposable
                                               "Estimated IMU delay (ms, sampled) " + Format(sampledIMUDelay, "00") + vbCrLf +
                                               "Estimated Total delay (ms, sampled) " + Format(sampledTotalDelay, "00") + vbCrLf +
                                               "Estimated Total delay Smoothed (ms, sampled, in White) " + Format(sampledSmooth, "00") + vbCrLf + vbCrLf +
-                                              "IMU Frame Time = Blue" + vbCrLf +
-                                              "Host Frame Time = Green" + vbCrLf +
-                                              "Host+IMU Total Delay (latency) = Red" + vbCrLf +
-                                              "Host+IMU Anchor Frame Time = White (Host Frame Time that occurs most often", 10, 40))
+                                              "Blue" + vbTab + "IMU Frame Time" + vbCrLf +
+                                              "Green" + vbTab + "Host Frame Time" + vbCrLf +
+                                              "Red" + vbTab + "Host+IMU Total Delay (latency)" + vbCrLf +
+                                              "White" + vbTab + "Host+IMU Anchor Frame Time (Host Frame Time that occurs most often)", 10, 40))
 
         plot.plotData = New cv.Scalar(imu.IMUtoCaptureEstimate, host.HostInterruptDelayEstimate, totaldelay, kalman.stateResult)
         plot.Run(ocvb)

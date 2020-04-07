@@ -79,13 +79,14 @@ Public Class OpenGL_Basics : Implements IDisposable
         pipe.WaitForConnection()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If pcSrc Is Nothing Then pcSrc = ocvb.pointCloud
-        imu.Run(ocvb)
-
         If ocvb.parms.cameraIndex = T265Camera Then
             ocvb.putText(New ActiveClass.TrueType("The T265 camera doesn't have a point cloud.", 10, 60, RESULT1))
             Exit Sub
         End If
+
+        If pcSrc Is Nothing Then pcSrc = ocvb.pointCloud
+        imu.Run(ocvb)
+
         If ocvb.frameCount = 0 Then startOpenGLWindow(ocvb)
         Dim pcSize = pcSrc.Total * pcSrc.ElemSize
         Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
@@ -401,6 +402,11 @@ Public Class OpenGL_GravityTransform : Implements IDisposable
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.cameraIndex = T265Camera Then
+            ocvb.putText(New ActiveClass.TrueType("The T265 camera doesn't have a point cloud.", 10, 60, RESULT1))
+            Exit Sub
+        End If
+
         imu.Run(ocvb)
         Static rotateFlag As Integer = -1
         Dim split() = cv.Cv2.Split(ocvb.pointCloud)
