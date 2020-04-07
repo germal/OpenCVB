@@ -518,12 +518,14 @@ Public Class IMU_AnglesToGravity : Implements IDisposable
             Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf
             outStr = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(gx, "#0.0000") + vbCrLf
             outStr += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(gy, "#0.0000") + vbCrLf
-            outStr += "IMU Acceleration in Z-direction = " + vbTab + vbTab + Format(gz, "#0.0000") + vbCrLf
+            outStr += "IMU Acceleration in Z-direction = " + vbTab + vbTab + Format(gz, "#0.0000") + vbCrLf + vbCrLf
             outStr += "X-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleX * 57.2958, "#0.0000") + vbCrLf
             outStr += "Y-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleY * 57.2958, "#0.0000") + vbCrLf
-            outStr += "Z-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleZ * 57.2958, "#0.0000") + vbCrLf
+            outStr += "Z-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleZ * 57.2958, "#0.0000") + vbCrLf + vbCrLf
             ' if there is any significant acceleration other than gravity, it will be detected here.
-            If Math.Abs(Math.Sqrt(gx * gx + gy * gy + gz * gz) - 9.807) > 0.05 Then outStr += vbCrLf + "Camera is moving.  Results may not be valid."
+            If Math.Abs(Math.Sqrt(gx * gx + gy * gy + gz * gz) - 9.807) > 0.05 Then
+                outStr += vbCrLf + "Camera appears to be moving because the gravity vector is not 9.8.  Results may not be valid." + vbCrLf
+            End If
             ocvb.putText(New ActiveClass.TrueType(outStr, 10, 40, result))
 
             ' validate the result
@@ -533,7 +535,7 @@ Public Class IMU_AnglesToGravity : Implements IDisposable
                                     vbTab + Format(Math.Sqrt(gx * gx + gy * gy + gz * gz), "#0.0000") + vbCrLf +
                                     "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
 
-            ocvb.putText(New ActiveClass.TrueType(valstr, 10, 150, result))
+            ocvb.putText(New ActiveClass.TrueType(valstr, 10, 200, result))
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

@@ -92,7 +92,7 @@ Public Class OpenCVB
             Dim dllName = Choose(i + 1, "Cam_Kinect4.dll", "Cam_MyntD.dll", "Cam_T265.dll", "Cam_Zed2.dll", "Cam_D400.dll")
             Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
             If dllFile.Exists Then
-                MsgBox(dllFile.Name + "was built in the Debug directory." + vbCrLf + "Camera dll's are built in Release" + vbCrLf +
+                MsgBox(dllFile.Name + " was built in the Debug directory." + vbCrLf + "Camera dll's are built in Release" + vbCrLf +
                        "for performance.  If you need to debug the camera" + vbCrLf + "interface, edit this message.")
             End If
         Next
@@ -283,9 +283,10 @@ Public Class OpenCVB
                 Dim color As New cv.Mat
                 SyncLock camPic ' avoid updating the image while copying into it in the algorithm and camera tasks
                     If camera.color IsNot Nothing Then
+                        If RGBDepth.Width = 0 Then RGBDepth = New cv.Mat
                         RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
                         color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
-                        cvext.BitmapConverter.ToBitmap(Color, camPic(0).Image)
+                        cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
                         cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
                     End If
                 End SyncLock
@@ -351,7 +352,7 @@ Public Class OpenCVB
             ' toss the uninteresting names so we can find the cameras.
             If Name Is Nothing Then Continue For
 
-            If firstCall = 4 Then
+            If firstCall = 0 Then
                 ' why do this?  So enumeration can tell us about the cameras present in a short list.
                 If InStr(Name, "Xeon") Or InStr(Name, "Chipset") Or InStr(Name, "Generic") Or InStr(Name, "Bluetooth") Or
                     InStr(Name, "Monitor") Or InStr(Name, "Mouse") Or InStr(Name, "NVIDIA") Or InStr(Name, "HID-compliant") Or
@@ -375,7 +376,10 @@ Public Class OpenCVB
                     Console.WriteLine(Name) ' looking for new cameras 
                 End If
             End If
-            If InStr(Name, searchName, CompareMethod.Text) > 0 Then deviceCount += 1
+            If InStr(Name, searchName, CompareMethod.Text) > 0 Then
+                If firstCall = 0 Then Console.WriteLine(Name)
+                deviceCount += 1
+            End If
         Next
         firstCall += 1
         Return deviceCount

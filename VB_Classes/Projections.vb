@@ -212,7 +212,7 @@ End Class
 
 
 
-Public Class Projections_Gravity_CPP1 : Implements IDisposable
+Public Class Projections_Gravity_CPP : Implements IDisposable
     Dim imu As IMU_AnglesToGravity
     Dim sliders As New OptionsSliders
     Dim cPtr As IntPtr

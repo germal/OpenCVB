@@ -87,7 +87,7 @@ public:
 	{
 		float hRange = (float)h;
 		float wRange = (float)w;
-#pragma omp parallel for
+//#pragma omp parallel for
 		for (int y = 0; y < depth32f.rows; ++y)
 		{
 			for (int x = 0; x < depth32f.cols; ++x)
@@ -96,8 +96,8 @@ public:
 				if (m == 255)
 				{
 					float d = depth32f.at<float>(y, x);
-					float dy = hRange * d / desiredMax;
-					if (dy > 0 && dy < hRange) viewTop.at<uchar>((int)(hRange - dy), x) = 0;
+					//float dy = hRange * d / desiredMax;
+					//if (dy > 0 && dy < hRange) viewTop.at<uchar>((int)(hRange - dy), x) = 0;
 					//float dx = wRange * d / desiredMax;
 					//if (dx < wRange && dx > 0) viewSide.at<uchar>(y, (int)dx) = 0;
 				}
@@ -127,7 +127,6 @@ int* Projections_Gravity_Side(Projections_Gravity * cPtr)
 extern "C" __declspec(dllexport)
 int* Projections_Gravity_Run(Projections_Gravity * cPtr, int* xPtr, int* yPtr, int* zPtr, float desiredMax, int rows, int cols)
 {
-
 	cPtr->depth32f = Mat(rows, cols, CV_32F, zPtr);
 
 	Mat mask;
