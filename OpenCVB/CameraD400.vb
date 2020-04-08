@@ -2,21 +2,65 @@
 Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Imports System.Threading
+
+#If 1 Then
+Module D400_Module_CPP
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400Open(w As Int32, h As Int32, IMUPresent As Boolean) As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub D400WaitForFrame(tp As IntPtr)
+    End Sub
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400RightRaw(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400Color(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400LeftRaw(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400Disparity(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400intrinsicsLeft(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400Extrinsics(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400PointCloud(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400RGBDepth(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400Gyro(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400IMUTimeStamp(tp As IntPtr) As Double
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400Accel(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400Depth16(tp As IntPtr) As IntPtr
+    End Function
+End Module
+
+Structure D400IMUdata
+    Public translation As cv.Point3f
+    Public acceleration As cv.Point3f
+    Public velocity As cv.Point3f
+    Public rotation As cv.Point3f
+    Public angularVelocity As cv.Point3f
+    Public angularAcceleration As cv.Point3f
+    Public trackerConfidence As Int32
+    Public mapperConfidence As Int32
+End Structure
 Public Class CameraD400
     Inherits Camera
-
-    Dim align As rs.Align
-    Dim blocks As List(Of rs.ProcessingBlock)
-    Dim cfg As New rs.Config
-    Dim colorizer As New rs.Colorizer
-    Dim ctx As New rs.Context
-    Dim depth2Disparity As New rs.DisparityTransform
-    Dim device As rs.Device
-    Dim devices As rs.DeviceList
-    Dim pipeline As New rs.Pipeline
-    Dim pipeline_profile As rs.PipelineProfile
-    Dim sensor As rs.Sensor
 
     Public DecimationFilter As Boolean
     Public HoleFillingFilter As Boolean
@@ -24,122 +68,187 @@ Public Class CameraD400
     Public TemporalFilter As Boolean
     Public ThresholdFilter As Boolean
 
+    Dim intrinsicsLeft As rs.Intrinsics
+    Public extrinsics As rs.Extrinsics
     Public pc As New rs.PointCloud
-    Dim depthFrame As rs.Frame
-    Dim RGBdepthFrame As rs.Frame
-    Dim colorFrame As rs.Frame
-    Dim disparityFrame As rs.Frame
-    Dim rawRight As rs.Frame
-    Dim rawLeft As rs.Frame
-
+    Public Sub New()
+    End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
-        devices = ctx.QueryDevices()
-        device = devices(0)
-        deviceName = device.Info.Item(rs.CameraInfo.Name)
-        Console.WriteLine("The current librealsense version is " + ctx.Version())
+        deviceName = "Intel D400"
+        IMU_Present = False
+        w = width
+        h = height
+        If OpenCVB.USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth") > 0 Then IMU_Present = True
 
-        cfg.EnableStream(rs.Stream.Color, width, height, rs.Format.Bgr8, fps)
-        cfg.EnableStream(rs.Stream.Depth, width, height, rs.Format.Z16, fps)
-        cfg.EnableStream(rs.Stream.Infrared, 1, width, height, rs.Format.Y8, fps) ' left
-        cfg.EnableStream(rs.Stream.Infrared, 2, width, height, rs.Format.Y8, fps) ' right
+        cPtr = D400Open(width, height, IMU_Present)
 
-        If deviceName = "Intel RealSense D435I" Then
-            cfg.EnableStream(rs.Stream.Gyro)
-            cfg.EnableStream(rs.Stream.Accel)
-            IMU_Present = True
-        End If
+        Dim intrin = D400intrinsicsLeft(cPtr)
+        intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
+        intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)
+        intrinsicsRight_VB = intrinsicsLeft_VB ' need to get the Right lens intrinsics?
 
-        pipeline_profile = pipeline.Start(cfg)
-
-        align = New rs.Align(rs.Stream.Color)
-        Dim deviceA = pipeline_profile.Device
-        Dim sensors = deviceA.Sensors
-        sensor = pipeline_profile.Device.Sensors.First() ' This may change!  But just take the first for now.  It is the only one with 7 filters
-        blocks = sensor.ProcessingBlocks.ToList()
-
-        If deviceName <> "Intel RealSense D435" And deviceName <> "Intel RealSense D415" And deviceName <> "Intel RealSense D435I" Then
-            MsgBox("This driver only supports the D435, D415, or D435I cameras. " + vbCrLf + "Is this a new Intel camera?  It is called: " + deviceName)
-            deviceCount = 0
-        Else
-            Dim dintrinsicsLeft = pipeline_profile.GetStream(rs.Stream.Color).As(Of rs.VideoStreamProfile).GetIntrinsics
-            MyBase.w = dintrinsicsLeft.width
-            MyBase.h = dintrinsicsLeft.height
-            intrinsicsLeft_VB.width = dintrinsicsLeft.width
-            intrinsicsLeft_VB.height = dintrinsicsLeft.height
-            intrinsicsLeft_VB.ppx = dintrinsicsLeft.ppx
-            intrinsicsLeft_VB.ppy = dintrinsicsLeft.ppy
-            intrinsicsLeft_VB.fx = dintrinsicsLeft.fx
-            intrinsicsLeft_VB.fy = dintrinsicsLeft.fy
-            intrinsicsLeft_VB.FOV = dintrinsicsLeft.FOV
-            intrinsicsLeft_VB.coeffs = dintrinsicsLeft.coeffs
-            intrinsicsRight_VB = intrinsicsLeft_VB ' How to get the right lens intrinsics?
-            Dim extrinsics As rs.Extrinsics = Nothing
-            For Each stream In pipeline_profile.Streams
-                extrinsics = stream.GetExtrinsicsTo(pipeline_profile.GetStream(rs.Stream.Infrared))
-                If extrinsics.rotation(0) <> 1 Then Exit For
-            Next
-            Extrinsics_VB.rotation = extrinsics.rotation
-            Extrinsics_VB.translation = extrinsics.translation
-        End If
+        Dim extrin = D400Extrinsics(cPtr)
+        extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin)
+        Extrinsics_VB.rotation = extrinsics.rotation
+        Extrinsics_VB.translation = extrinsics.translation
     End Sub
     Public Sub GetNextFrame()
         If pipelineClosed Or cPtr = 0 Then Exit Sub
-        Dim frames = pipeline.WaitForFrames(1000)
-        Try
-            Dim procf As rs.Frame
-            For Each p In blocks
-                If p.Info.Item(0) = "Decimation Filter" And DecimationFilter Then procf = p.Process(frames)
-                If p.Info.Item(0) = "Threshold Filter" And ThresholdFilter Then procf = p.Process(frames)
-                If p.Info.Item(0) = "Spatial Filter" And SpatialFilter Then procf = p.Process(frames)
-                If p.Info.Item(0) = "Temporal Filter" And TemporalFilter Then procf = p.Process(frames)
-                If p.Info.Item(0) = "Hole Filling Filter" And HoleFillingFilter Then procf = p.Process(frames)
-            Next
 
-            procf = colorizer.Process(frames)
-            procf = align.Process(frames)
+        D400WaitForFrame(cPtr)
 
-            frames = procf.As(Of rs.FrameSet)()
-            depthFrame = frames.DepthFrame()
-            RGBdepthFrame = colorizer.Process(depthFrame)
-            colorFrame = frames.ColorFrame
-            disparityFrame = depth2Disparity.Process(depthFrame)
-            rawLeft = frames.InfraredFrame
-            For Each frame In frames
-                If frame.Profile.Stream = rs.Stream.Infrared Then
-                    If frame.Profile.Index = 2 Then
-                        rawRight = frame
-                        Exit For
-                    End If
-                End If
-            Next
+        SyncLock OpenCVB.camPic ' only really need the synclock when in callback mode but it doesn't hurt to waitforframe mode.
+            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, D400Color(cPtr)).Clone() ' must be first!  Prepares the procframes...
 
-            SyncLock OpenCVB.camPic
-                ' get motion data and timestamp from the gyro and accelerometer
-                If IMU_Present Then
-                    Dim gyroFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Gyro, rs.Format.MotionXyz32f)
-                    imuGyro = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame.Data)
+            Dim accelFrame = D400Accel(cPtr)
+            If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
+            IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
 
-                    IMU_TimeStamp = gyroFrame.Timestamp
-                    Static imuStartTime = IMU_TimeStamp
-                    IMU_TimeStamp -= imuStartTime
+            Dim gyroFrame = D400Gyro(cPtr)
+            If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
 
-                    Dim accelFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Accel, rs.Format.MotionXyz32f)
-                    imuAccel = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame.Data)
-                End If
+            Static imuStartTime = D400IMUTimeStamp(cPtr)
+            IMU_TimeStamp = D400IMUTimeStamp(cPtr) - imuStartTime
 
-                color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorFrame.Data)
-                RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBdepthFrame.Data)
-                depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, depthFrame.Data)
-                leftView = New cv.Mat(h, w, cv.MatType.CV_8U, rawLeft.Data)
-                rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rawRight.Data)
-                Dim points = pc.Process(depthFrame).As(Of rs.Points)
-                pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, points.Data)
-                MyBase.GetNextFrameCounts(IMU_FrameTime)
-            End SyncLock
-
-        Catch ex As Exception
-            Console.WriteLine("Error in CustomProcessingBlock: " + ex.Message)
-            failedImageCount += 1
-        End Try
+            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, D400RGBDepth(cPtr)).Clone()
+            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, D400Depth16(cPtr)).Clone()
+            leftView = New cv.Mat(h, w, cv.MatType.CV_8U, D400LeftRaw(cPtr)).Clone()
+            rightView = New cv.Mat(h, w, cv.MatType.CV_8U, D400RightRaw(cPtr)).Clone()
+            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, D400PointCloud(cPtr))
+            MyBase.GetNextFrameCounts(IMU_FrameTime)
+        End SyncLock
     End Sub
 End Class
+#Else
+Module D400_Module_CPP
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub D400Open(w As Int32, h As Int32, IMUPresent As Boolean)
+    End Sub
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400WaitForFrame(color As IntPtr, rgbDepth As IntPtr, depth16 As IntPtr, leftView As IntPtr, rightView As IntPtr,
+                                     pointCloud As IntPtr, gyro As IntPtr, accel As IntPtr) As Double
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400RightRaw() As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400LeftRaw() As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400Intrinsics() As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400Extrinsics() As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400PointCloud() As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400Gyro() As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400IMUTimeStamp() As Double
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400Accel() As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400RGBDepth() As IntPtr
+    End Function
+    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function D400Color() As IntPtr
+    End Function
+End Module
+
+Structure D400IMUdata
+    Public translation As cv.Point3f
+    Public acceleration As cv.Point3f
+    Public velocity As cv.Point3f
+    Public rotation As cv.Point3f
+    Public angularVelocity As cv.Point3f
+    Public angularAcceleration As cv.Point3f
+    Public trackerConfidence As Int32
+    Public mapperConfidence As Int32
+End Structure
+Public Class CameraD400
+    Inherits Camera
+
+    Public DecimationFilter As Boolean
+    Public HoleFillingFilter As Boolean
+    Public SpatialFilter As Boolean
+    Public TemporalFilter As Boolean
+    Public ThresholdFilter As Boolean
+
+    Dim intrinsicsLeft As rs.Intrinsics
+    Public extrinsics As rs.Extrinsics
+    Dim depth16Bytes() As Byte
+    Public Sub New()
+    End Sub
+    Public Sub initialize(fps As Int32, width As Int32, height As Int32)
+        deviceName = "Intel D400"
+        IMU_Present = False
+        w = width
+        h = height
+        If OpenCVB.USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth") > 0 Then IMU_Present = True
+
+        D400Open(width, height, IMU_Present)
+
+        Dim intrin = D400Intrinsics()
+        intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
+        intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)
+        intrinsicsRight_VB = intrinsicsLeft_VB ' need to get the Right lens intrinsics?
+
+        Dim extrin = D400Extrinsics()
+        extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin)
+        Extrinsics_VB.rotation = extrinsics.rotation
+        Extrinsics_VB.translation = extrinsics.translation
+
+        ReDim colorBytes(width * height * 3)
+        ReDim RGBDepthBytes(width * height * 3)
+        ReDim depth16Bytes(width * height * 2)
+        ReDim leftViewBytes(width * height)
+        ReDim rightViewBytes(width * height)
+        ReDim pointCloudBytes(width * height * 12)
+        rightView = New cv.Mat(height, width, cv.MatType.CV_8U)
+    End Sub
+    Public Sub GetNextFrame()
+        If pipelineClosed Then Exit Sub
+
+        Dim handleColor = GCHandle.Alloc(colorBytes, GCHandleType.Pinned)
+        Dim handleRGBdepth = GCHandle.Alloc(RGBDepthBytes, GCHandleType.Pinned)
+        Dim handleDepth16 = GCHandle.Alloc(depth16Bytes, GCHandleType.Pinned)
+        Dim handleLeft = GCHandle.Alloc(leftViewBytes, GCHandleType.Pinned)
+        Dim handleRight = GCHandle.Alloc(rightViewBytes, GCHandleType.Pinned)
+        Dim handlePointCloud = GCHandle.Alloc(pointCloudBytes, GCHandleType.Pinned)
+        Dim handleGyro = GCHandle.Alloc(IMU_AngularVelocity, GCHandleType.Pinned)
+        Dim handleAccel = GCHandle.Alloc(IMU_Acceleration, GCHandleType.Pinned)
+        IMU_TimeStamp = D400WaitForFrame(handleColor.AddrOfPinnedObject, handleRGBdepth.AddrOfPinnedObject, handleDepth16.AddrOfPinnedObject,
+                                         handleLeft.AddrOfPinnedObject, handleRight.AddrOfPinnedObject, handlePointCloud.AddrOfPinnedObject,
+                                         handleGyro.AddrOfPinnedObject, handleColor.AddrOfPinnedObject)
+        handleColor.Free()
+        handleRGBdepth.Free()
+        handleDepth16.Free()
+        handleLeft.Free()
+        handleRight.Free()
+        handlePointCloud.Free()
+        handleGyro.Free()
+        handleAccel.Free()
+
+        SyncLock OpenCVB.camPic ' only really need the synclock when in callback mode but it doesn't hurt to waitforframe mode.
+            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorBytes)
+
+            IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
+
+            Static imuStartTime = IMU_TimeStamp
+            IMU_TimeStamp -= imuStartTime
+
+            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
+            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, depth16Bytes)
+            leftView = New cv.Mat(h, w, cv.MatType.CV_8U, leftViewBytes)
+            rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rightViewBytes)
+            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes)
+            MyBase.GetNextFrameCounts(IMU_FrameTime)
+        End SyncLock
+    End Sub
+End Class
+#End If

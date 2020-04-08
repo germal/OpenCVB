@@ -133,7 +133,7 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
-        cameraD400Series = New CameraD400Native() ' the pure VB version is in  CameraD400() but it is too slow... use CameraD400Native()
+        cameraD400Series = New CameraD400()  ' change this to CameraD400VB to see how slow the VB version is.
         cameraD400Series.deviceCount = USBenumeration("Depth Camera 435")
         cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 415 Depth")
         cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 435 With RGB Module Depth")
