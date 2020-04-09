@@ -714,43 +714,43 @@ Module Depth_Colorizer_CPP_Module
 
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_Colorizer32s_Open() As IntPtr
+    Public Function Depth_Colorizer32f_Open() As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Depth_Colorizer32s_Close(Depth_ColorizerPtr As IntPtr)
+    Public Sub Depth_Colorizer32f_Close(Depth_ColorizerPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_Colorizer32s_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    Public Function Depth_Colorizer32f_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
     End Function
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_Colorizer32s2_Open() As IntPtr
+    Public Function Depth_Colorizer32f2_Open() As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Depth_Colorizer32s2_Close(Depth_ColorizerPtr As IntPtr)
+    Public Sub Depth_Colorizer32f2_Close(Depth_ColorizerPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_Colorizer32s2_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, histSize As Int32) As IntPtr
+    Public Function Depth_Colorizer32f2_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, histSize As Int32) As IntPtr
     End Function
 End Module
 
 
-Public Class Depth_Colorizer32s_1_CPP : Implements IDisposable
+Public Class Depth_Colorizer32f_1_CPP : Implements IDisposable
     Public dst As New cv.Mat
     Public src As New cv.Mat
     Public externalUse As Boolean
     Dim dcPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData)
-        dcPtr = Depth_Colorizer32s_Open()
+        dcPtr = Depth_Colorizer32f_Open()
         ocvb.desc = "Display 16 bit image using C++ instead of VB.Net"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then src = ocvb.depth32fzz Else dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        If externalUse = False Then src = ocvb.depth32f Else dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
 
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, depthData, 0, depthData.Length)
-        Dim imagePtr = Depth_Colorizer32s_Run(dcPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
+        Dim imagePtr = Depth_Colorizer32f_Run(dcPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
 
         If imagePtr <> 0 Then
@@ -765,7 +765,7 @@ Public Class Depth_Colorizer32s_1_CPP : Implements IDisposable
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        Depth_Colorizer32s_Close(dcPtr)
+        Depth_Colorizer32f_Close(dcPtr)
     End Sub
 End Class
 

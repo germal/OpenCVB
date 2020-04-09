@@ -56,20 +56,20 @@ public:
 
 
 
-class Depth_Colorizer32s
+class Depth_Colorizer32f
 {
 private:
 public:
-	Mat depth32fzz, dst;
-	Depth_Colorizer32s() {  }
+	Mat depth32f, dst;
+	Depth_Colorizer32f() {  }
 	void Run()
 	{
 		unsigned char nearColor[3] = { 0, 255, 255 };
 		unsigned char farColor[3] = { 255, 0, 0 };
 		int histogram[256 * 256] = { 1 };
 		// Produce a cumulative histogram of depth values
-		float* depthImage = (float*)depth32fzz.data;
-		for (int i = 0; i < depth32fzz.cols * depth32fzz.rows; ++i)
+		float* depthImage = (float*)depth32f.data;
+		for (int i = 0; i < depth32f.cols * depth32f.rows; ++i)
 		{
 			if (auto d = (int)depthImage[i]) ++histogram[d];
 		}

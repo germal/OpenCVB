@@ -76,22 +76,22 @@ int *Depth_XYZ_OpenMP_Run(DepthXYZ *DepthXYZPtr, int *depthPtr, int rows, int co
 
 
 extern "C" __declspec(dllexport)
-Depth_Colorizer32s * Depth_Colorizer32s_Open()
+Depth_Colorizer32f * Depth_Colorizer32f_Open()
 {
-	Depth_Colorizer32s* Depth_ColorizerPtr = new Depth_Colorizer32s();
+	Depth_Colorizer32f* Depth_ColorizerPtr = new Depth_Colorizer32f();
 	return Depth_ColorizerPtr;
 }
 
 extern "C" __declspec(dllexport)
-void Depth_Colorizer32s_Close(Depth_Colorizer32s * Depth_ColorizerPtr)
+void Depth_Colorizer32f_Close(Depth_Colorizer32f * Depth_ColorizerPtr)
 {
 	delete Depth_ColorizerPtr;
 }
 
 extern "C" __declspec(dllexport)
-int* Depth_Colorizer32s_Run(Depth_Colorizer32s * Depth_ColorizerPtr, int* depthPtr, int rows, int cols)
+int* Depth_Colorizer32f_Run(Depth_Colorizer32f * Depth_ColorizerPtr, int* depthPtr, int rows, int cols)
 {
-	Depth_ColorizerPtr->depth32fzz = Mat(rows, cols, CV_32F, depthPtr);
+	Depth_ColorizerPtr->depth32f = Mat(rows, cols, CV_32F, depthPtr);
 	Depth_ColorizerPtr->dst = Mat(rows, cols, CV_8UC3);
 	Depth_ColorizerPtr->Run();
 	return (int*)Depth_ColorizerPtr->dst.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy

@@ -976,14 +976,14 @@ Public Class OpenCVB
                     OpenCVB.ocvb.color = camera.color.Resize(fastSize)
                     OpenCVB.ocvb.RGBDepth = camera.RGBDepth.Resize(fastSize)
                     OpenCVB.ocvb.depth16 = camera.Depth16.resize(fastSize)
-                    OpenCVB.ocvb.depth32fzz = camera.depth32fzz.resize(fastSize)
+                    OpenCVB.ocvb.depth32f = camera.depth32f.resize(fastSize)
                 Else
                     OpenCVB.ocvb.color = camera.color
                     OpenCVB.ocvb.RGBDepth = camera.RGBDepth
                     OpenCVB.ocvb.depth16 = camera.depth16
-                    OpenCVB.ocvb.depth32fzz = camera.depth32fzz
+                    OpenCVB.ocvb.depth32f = camera.depth32f
                 End If
-                OpenCVB.ocvb.depth32fzzRaw = OpenCVB.ocvb.depth32fzz
+                OpenCVB.ocvb.depth32fRaw = OpenCVB.ocvb.depth32f
                 OpenCVB.ocvb.depth16Raw = camera.depth16
                 OpenCVB.ocvb.pointCloud = camera.PointCloud
                 OpenCVB.ocvb.leftView = camera.leftView

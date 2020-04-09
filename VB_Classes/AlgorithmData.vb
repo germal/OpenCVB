@@ -6,8 +6,8 @@ Public Class AlgorithmData
     Public bestOpenCVFontSize = 1.5
     Public color As cv.Mat
     Public colorScalar(255) As cv.Scalar
-    Public depth32fzz As cv.Mat
-    Public depth32fzzRaw As cv.Mat
+    Public depth32f As cv.Mat
+    Public depth32fRaw As cv.Mat
     Public depth16 As cv.Mat
     Public depth16Raw As cv.Mat
     Public RGBDepth As cv.Mat
