@@ -24,6 +24,7 @@ Public Class Camera
     Public h As Int32
     Public w As Int32
     Public color As cv.Mat
+    Public depth32fzz = New cv.Mat
     Public depth16 As cv.Mat
     Public depth16Raw As cv.Mat
     Public RGBDepth As cv.Mat
@@ -113,7 +114,13 @@ Public Class Camera
         CPU_FrameTime = CPU_TimeStamp - lastCPUTime
         lastCPUTime = CPU_TimeStamp
 
-        depth16Raw = depth16
+        Dim split(3 - 1) As cv.Mat
+        cv.Cv2.Split(pointCloud, split)
+
+        SyncLock bufferLock
+            depth32fzz = (split(2) * 1000).ToMat ' z is aligned with RGB
+            depth16Raw = depth16
+        End SyncLock
         frameCount += 1
         newImagesAvailable = True
     End Sub

@@ -198,9 +198,9 @@ Public Class CameraMyntD
         Static startTime = MyntDIMU_TimeStamp(cPtr)
         IMU_TimeStamp = MyntDIMU_TimeStamp(cPtr) - startTime
 
-        SyncLock OpenCVB.camPic
+        SyncLock bufferLock
             Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBytes)
-            Color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+            color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
             Dim RGBADepth = New cv.Mat(h, w, cv.MatType.CV_8UC4, RGBDepthBytes)
             RGBDepth = RGBADepth.CvtColor(cv.ColorConversionCodes.BGRA2BGR)

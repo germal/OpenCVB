@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿
+Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Imports System.Runtime.InteropServices
 Imports System.IO
@@ -7,6 +8,9 @@ Imports System.Threading
 Imports System.Globalization
 Imports System.Text.RegularExpressions
 Imports System.Environment
+Module opencv_module
+    Public bufferLock As New PictureBox ' this is a global lock on the camera buffers.
+End Module
 Public Class OpenCVB
 #Region "Globals"
     Const displayFrames As Int32 = 4
@@ -281,7 +285,7 @@ Public Class OpenCVB
                 cameraRefresh = False
                 Dim RGBDepth As New cv.Mat
                 Dim color As New cv.Mat
-                SyncLock camPic ' avoid updating the image while copying into it in the algorithm and camera tasks
+                SyncLock bufferLock ' avoid updating the image while copying into it in the algorithm and camera tasks
                     If camera.color IsNot Nothing Then
                         If RGBDepth.Width = 0 Then RGBDepth = New cv.Mat
                         RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
@@ -291,7 +295,7 @@ Public Class OpenCVB
                     End If
                 End SyncLock
             End If
-            SyncLock camPic
+            SyncLock bufferLock
                 ' draw any TrueType font data on the image 
                 Dim white = System.Drawing.Color.White
                 Dim maxline = 21
@@ -749,7 +753,7 @@ Public Class OpenCVB
         For i = 0 To 4
             Dim radioButton = Choose(i + 1, snapForm.AllImages, snapForm.ColorImage, snapForm.RGBDepth, snapForm.Result1, snapForm.Result2)
             If radioButton.checked Then
-                SyncLock camPic
+                SyncLock bufferLock
                     Select Case i
                         Case 0 ' all images
                             resultMat = cv.Extensions.BitmapConverter.ToMat(img)
@@ -776,6 +780,7 @@ Public Class OpenCVB
     Private Sub CameraTask()
         While stopCameraThread = False
             camera.GetNextFrame()
+
             cameraRefresh = True
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
@@ -964,18 +969,22 @@ Public Class OpenCVB
             If saveAlgorithmTestCount <> AlgorithmTestCount Then Exit While ' a failsafe provision.  This task needs to exit.
 
             ' bring the data into the algorithm task.
-            SyncLock camPic
+            SyncLock bufferLock
                 camera.newImagesAvailable = False
+
                 If lowResolution Then
                     OpenCVB.ocvb.color = camera.color.Resize(fastSize)
                     OpenCVB.ocvb.RGBDepth = camera.RGBDepth.Resize(fastSize)
                     OpenCVB.ocvb.depth16 = camera.Depth16.resize(fastSize)
+                    OpenCVB.ocvb.depth32fzz = camera.depth32fzz.resize(fastSize)
                 Else
                     OpenCVB.ocvb.color = camera.color
                     OpenCVB.ocvb.RGBDepth = camera.RGBDepth
                     OpenCVB.ocvb.depth16 = camera.depth16
+                    OpenCVB.ocvb.depth32fzz = camera.depth32fzz
                 End If
-                OpenCVB.ocvb.depth16Raw = camera.depth16raw
+                OpenCVB.ocvb.depth32fzzRaw = OpenCVB.ocvb.depth32fzz
+                OpenCVB.ocvb.depth16Raw = camera.depth16
                 OpenCVB.ocvb.pointCloud = camera.PointCloud
                 OpenCVB.ocvb.leftView = camera.leftView
                 OpenCVB.ocvb.rightView = camera.rightView

@@ -113,7 +113,7 @@ Public Class CameraD400VB
                 End If
             Next
 
-            SyncLock OpenCVB.camPic
+            SyncLock bufferLock
                 ' get motion data and timestamp from the gyro and accelerometer
                 If IMU_Present Then
                     Dim gyroFrame = frames.FirstOrDefault(Of rs.Frame)(rs.Stream.Gyro, rs.Format.MotionXyz32f)

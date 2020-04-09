@@ -146,7 +146,7 @@ Public Class CameraKinect
         Dim colorBuffer = KinectRGBA(cPtr)
         If colorBuffer <> 0 Then ' it can be zero on startup...
             Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBuffer)
-            SyncLock OpenCVB.camPic
+            SyncLock bufferLock
                 color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
                 RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)

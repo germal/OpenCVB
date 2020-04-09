@@ -166,7 +166,7 @@ Public Class CameraZED2
         If pipelineClosed Or cPtr = 0 Then Exit Sub
         Zed2WaitForFrame(cPtr)
 
-        SyncLock OpenCVB.camPic
+        SyncLock bufferLock
             Zed2GetData(cPtr)
 
             color = New cv.Mat(h, w, cv.MatType.CV_8UC3, Zed2Color(cPtr)).Clone()

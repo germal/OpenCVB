@@ -28,7 +28,6 @@ Public Class Sift_Basics_CS : Implements IDisposable
 
         If ocvb.parms.cameraIndex = T265Camera Then
             fisheye.Run(ocvb)
-            cv.Cv2.ImShow("test", fisheye.leftView)
             CS_SiftBasics.Run(fisheye.leftView, fisheye.rightView, dst, radio.check(0).Checked, sliders.TrackBar1.Value)
         Else
             CS_SiftBasics.Run(ocvb.leftView, ocvb.rightView, dst, radio.check(0).Checked, sliders.TrackBar1.Value)

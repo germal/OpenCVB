@@ -284,7 +284,6 @@ Public Class CComp_InRange : Implements IDisposable
             Next
         Next
         roiList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
-        'For i = roiList.Count - 1 To 0 Step -1
         For i = 0 To roiList.Count - 1
             Dim avg = ocvb.RGBDepth(roiList(i)).Mean(mask(roiList(i)))
             ocvb.result2(roiList(i)).SetTo(avg)

@@ -104,7 +104,7 @@ Public Class CameraT265Native
 
         T265WaitFrame(cPtr)
 
-        SyncLock OpenCVB.camPic ' only really need the synclock when in callback mode but it doesn't hurt to waitforframe mode.
+        SyncLock bufferLock ' only really need the synclock when in callback mode but it doesn't hurt to waitforframe mode.
             Dim posePtr = T265PoseData(cPtr)
             Dim pose = Marshal.PtrToStructure(Of PoseData)(posePtr)
             IMU_TimeStamp = T265IMUTimeStamp(cPtr)
