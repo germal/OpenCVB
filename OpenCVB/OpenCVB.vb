@@ -1006,6 +1006,7 @@ Public Class OpenCVB
                 OpenCVB.ocvb.parms.CPU_TimeStamp = camera.CPU_TimeStamp
                 OpenCVB.ocvb.parms.CPU_FrameTime = camera.CPU_FrameTime
             End SyncLock
+
             OpenCVB.UpdateHostLocation(Me.Left, Me.Top, Me.Height)
 
             Try

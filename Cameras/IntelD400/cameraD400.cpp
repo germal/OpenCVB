@@ -29,6 +29,7 @@ public:
 	rs2::pipeline_profile profiles;
 	rs2::pipeline pipeline;
 	rs2::frameset frames;
+	rs2::frameset processedFrames;
 	rs2::colorizer colorizer;
 	rs2::align align = rs2::align(RS2_STREAM_COLOR);
 	rs2::pointcloud pc;
@@ -122,15 +123,15 @@ int * D400Accel(D400Camera * tp)
 extern "C" __declspec(dllexport)
 int* D400PointCloud(D400Camera * tp)
 {
-	return (int*)tp->pc.process(tp->frames.get_depth_frame()).as<rs2::points>().get_data();
+	return (int*)tp->pc.process(tp->processedFrames.get_depth_frame()).as<rs2::points>().get_data();
 }
 
 extern "C" __declspec(dllexport)
 int* D400Color(D400Camera * tp)
 {
-	rs2::frameset procFrames = tp->colorizer.process(tp->frames);
-    procFrames = tp->align.process(procFrames);
-	return (int*)procFrames.get_color_frame().get_data();
+	tp->processedFrames = tp->colorizer.process(tp->frames);
+	tp->processedFrames = tp->align.process(tp->processedFrames);
+	return (int*)tp->processedFrames.get_color_frame().get_data();
 }
 
 extern "C" __declspec(dllexport)
@@ -148,13 +149,13 @@ int* D400RightRaw(D400Camera * tp)
 extern "C" __declspec(dllexport)
 int* D400Depth16(D400Camera * tp)
 {
-	return (int*)tp->frames.get_depth_frame().get_data();
+	return (int*)tp->processedFrames.get_depth_frame().get_data();
 }
 
 extern "C" __declspec(dllexport)
 int* D400RGBDepth(D400Camera * tp)
 {
-	auto RGBDepth = tp->colorizer.process(tp->frames.get_depth_frame());
+	auto RGBDepth = tp->colorizer.process(tp->processedFrames.get_depth_frame());
 	return (int*)RGBDepth.get_data();
 }
 
