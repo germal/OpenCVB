@@ -151,14 +151,14 @@ End Class
 
 
 Public Class Contours_RGB : Implements IDisposable
-    Dim foreground As Depth_InRange
+    Dim trim As Depth_InRange
     Public Sub New(ocvb As AlgorithmData)
-        foreground = New Depth_InRange(ocvb)
+        trim = New Depth_InRange(ocvb)
         ocvb.desc = "Find and draw the contour of the largest foreground RGB contour."
         ocvb.label2 = "Background"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        foreground.Run(ocvb)
+        trim.Run(ocvb)
         Dim img = ocvb.color.CvtColor(cv.ColorConversionCodes.bgr2gray)
         Dim mask = ocvb.result1.CvtColor(cv.ColorConversionCodes.bgr2gray)
         mask = mask.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
@@ -193,6 +193,6 @@ Public Class Contours_RGB : Implements IDisposable
         ocvb.color.CopyTo(ocvb.result2, mask)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        foreground.Dispose()
+        trim.Dispose()
     End Sub
 End Class

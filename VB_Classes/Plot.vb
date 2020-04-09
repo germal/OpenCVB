@@ -296,7 +296,7 @@ Public Class Plot_Depth : Implements IDisposable
         hist.externalUse = True
         hist.sliders.TrackBar1.Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!
         hist.sliders.TrackBar1.Value = 200 ' a lot more bins in a plot than a bar chart.
-        hist.inrange.sliders.TrackBar2.Value = 5000 ' up to x meters.
+        hist.trim.sliders.TrackBar2.Value = 5000 ' up to x meters.
 
         plot = New Plot_Basics_CPP(ocvb)
         plot.externalUse = True
@@ -308,8 +308,8 @@ Public Class Plot_Depth : Implements IDisposable
         plot.dst = ocvb.result1
         ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
         ReDim plot.srcY(hist.plotHist.hist.Rows - 1)
-        Dim inRangeMin = hist.inrange.sliders.TrackBar1.Value
-        Dim inRangeMax = hist.inrange.sliders.TrackBar2.Value
+        Dim inRangeMin = hist.trim.sliders.TrackBar1.Value
+        Dim inRangeMax = hist.trim.sliders.TrackBar2.Value
         For i = 0 To plot.srcX.Length - 1
             plot.srcX(i) = inRangeMin + i * (inRangeMax - inRangeMin) / plot.srcX.Length
             plot.srcY(i) = hist.plotHist.hist.At(Of Single)(i, 0)

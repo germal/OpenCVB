@@ -44,7 +44,7 @@ public:
 	Pose zed_pose;
 	sl::Camera zed;
 	cv::Mat color, leftView, rightView, pointCloud;
-	Depth_Colorizer* cPtr;
+	Depth_ColorizerOLD* cPtr;
 private:
 	sl::InitParameters init_params;
 	int width, height;
@@ -84,7 +84,7 @@ public:
 		auto returned_state = zed.enablePositionalTracking(positional_tracking_param);
 
 		pointCloud = cv::Mat(height, width, CV_32FC3);
-		cPtr = new Depth_Colorizer();
+		cPtr = new Depth_ColorizerOLD();
 	}
 
 	void waitForFrame()
@@ -101,9 +101,9 @@ public:
 		cv::cvtColor(tmp, color, cv::ColorConversionCodes::COLOR_BGRA2BGR);
 
 		zed.retrieveMeasure(depthSL32f, MEASURE::DEPTH, MEM::CPU);
-		cv::Mat depth = cv::Mat(height, width, CV_32FC1, (void*)depthSL32f.getPtr<sl::uchar1>(sl::MEM::CPU)) * 1000;
+		cv::Mat depth32f = cv::Mat(height, width, CV_32FC1, (void*)depthSL32f.getPtr<sl::uchar1>(sl::MEM::CPU)) * 1000;
 
-		depth.convertTo(cPtr->depth16, CV_16U);
+		depth32f.convertTo(cPtr->depth16, CV_16U);
 
 		cPtr->dst = cv::Mat(height, width, CV_8UC3);
 		cPtr->Run();
@@ -117,11 +117,20 @@ public:
 		zed.retrieveMeasure(pcMatSL, MEASURE::XYZ, MEM::CPU); // XYZ has an extra byte!
 		float* pc = (float*)pcMatSL.getPtr<sl::uchar1>(sl::MEM::CPU);
 		float* pcXYZ = (float*)pointCloud.data;
+		// 4 bytes per pixel to 3 bytes per pixel
 		for (int i = 0; i < pixelCount * 4; i += 4)
 		{
-			pcXYZ[0] = pc[i];
-			pcXYZ[1] = -pc[i + 1];
-			pcXYZ[2] = -pc[i + 2];
+			if (isnan(pc[i]))
+			{
+				pcXYZ[0] = 0;
+				pcXYZ[1] = 0;
+				pcXYZ[2] = 0;
+			}
+			else {
+				pcXYZ[0] = pc[i];
+				pcXYZ[1] = -pc[i + 1];
+				pcXYZ[2] = -pc[i + 2];
+			}
 			pcXYZ += 3;
 		}
 

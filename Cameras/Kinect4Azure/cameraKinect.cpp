@@ -39,7 +39,7 @@ public:
 	k4a_image_t point_cloud_image;
 	int pointCloudBuffSize = 0;
 	k4a_image_t colorImage = NULL;
-	Depth_Colorizer* dcptr = NULL;
+	Depth_ColorizerOLD* dcptr = NULL;
 	k4a_device_configuration_t config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
 	char outMsg[10000];
 	Mat color;
@@ -86,7 +86,7 @@ public:
 			transformation = k4a_transformation_create(&calibration);
 
 			k4a_device_start_imu(device);
-			dcptr = new Depth_Colorizer();
+			dcptr = new Depth_ColorizerOLD();
 		}
 	}
 

@@ -212,7 +212,8 @@ Public Class CComp_InRange_MT : Implements IDisposable
         Dim maxDepth = sliders.TrackBar2.Value
         Dim minBlobSize = sliders.TrackBar3.Value
 
-        Dim mask = ocvb.depth16.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim depth32f = getDepth32f(ocvb)
+        Dim mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
 
         Dim totalBlobs As Int32
@@ -230,8 +231,8 @@ Public Class CComp_InRange_MT : Implements IDisposable
             roiList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
             For j = roiList.Count - 1 To 0 Step -1
                 Dim bin = binary(roiList(j)).Clone()
-                Dim depth16 = ocvb.depth16(roiList(j))
-                Dim meanDepth = depth16.Mean(mask(roiList(j)))
+                Dim depth = depth32f(roiList(j))
+                Dim meanDepth = depth.Mean(mask(roiList(j)))
                 If meanDepth.Item(0) < maxDepth Then
                     Dim avg = ocvb.RGBDepth(roiList(j)).Mean(mask(roiList(j)))
                     ocvb.result1(roiList(j)).SetTo(avg, bin)
@@ -269,7 +270,7 @@ Public Class CComp_InRange : Implements IDisposable
         Dim rangeCount As Int32 = sliders.TrackBar1.Value
         Dim minBlobSize = sliders.TrackBar2.Value
 
-        Dim mask = ocvb.depth16.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim mask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
         ocvb.result1 = mask.Clone()
 

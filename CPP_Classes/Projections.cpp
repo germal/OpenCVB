@@ -63,10 +63,9 @@ int* SimpleProjectionSide(SimpleProjection * cPtr)
 extern "C" __declspec(dllexport)
 int* SimpleProjectionRun(SimpleProjection * cPtr, int* depthPtr, float desiredMin, float desiredMax, int rows, int cols)
 {
-	Mat depth16 = Mat(rows, cols, CV_16U, depthPtr);
-	threshold(depth16, cPtr->mask, 0, 255, ThresholdTypes::THRESH_BINARY);
+	cPtr->depth32f = Mat(rows, cols, CV_32F, depthPtr);
+	threshold(cPtr->depth32f, cPtr->mask, 0, 255, ThresholdTypes::THRESH_BINARY);
 	convertScaleAbs(cPtr->mask, cPtr->mask);
-	depth16.convertTo(cPtr->depth32f, CV_32F);
 	cPtr->viewTop = Mat(rows, cols, CV_8U).setTo(255);
 	cPtr->viewSide = Mat(rows, cols, CV_8U).setTo(255);
 	cPtr->Run(desiredMin, desiredMax, cols, rows);
@@ -81,7 +80,7 @@ class Projections_Gravity
 private:
 public:
 	Mat xDistance, yDistance, zDistance, viewTop, viewSide, top16u, side16u;
-	Depth_Colorizer2* colorizePtr;
+	Depth_Colorizer2OLD* colorizePtr;
 	Projections_Gravity() {}
 
 	void Run(float maxZ, int w, int h)
@@ -132,7 +131,7 @@ public:
 extern "C" __declspec(dllexport)
 Projections_Gravity * Projections_Gravity_Open(LPSTR fileName) {
 	Projections_Gravity* cPtr = new Projections_Gravity();
-	cPtr->colorizePtr = new Depth_Colorizer2();
+	cPtr->colorizePtr = new Depth_Colorizer2OLD();
 	return cPtr;
 }
 

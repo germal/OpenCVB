@@ -557,7 +557,7 @@ End Class
 
 
 Public Class Histogram_Depth : Implements IDisposable
-    Public inrange As Depth_InRange
+    Public trim As Depth_InRange
     Public sliders As New OptionsSliders
     Public plotHist As Plot_Histogram
     Public externalUse As Boolean
@@ -565,16 +565,16 @@ Public Class Histogram_Depth : Implements IDisposable
         plotHist = New Plot_Histogram(ocvb)
         plotHist.externalUse = True
 
-        inrange = New Depth_InRange(ocvb)
+        trim = New Depth_InRange(ocvb)
         sliders.setupTrackBar1(ocvb, "Histogram Depth Bins", 1, ocvb.color.Width * 2, 50) ' max is the number of columns * 2 
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Show depth data as a histogram."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        inrange.Run(ocvb)
-        plotHist.minRange = inrange.sliders.TrackBar1.Value
-        plotHist.maxRange = inrange.sliders.TrackBar2.Value
+        trim.Run(ocvb)
+        plotHist.minRange = trim.sliders.TrackBar1.Value
+        plotHist.maxRange = trim.sliders.TrackBar2.Value
         plotHist.bins = sliders.TrackBar1.Value
         Dim histSize() = {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
@@ -588,7 +588,7 @@ Public Class Histogram_Depth : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
-        inrange.Dispose()
+        trim.Dispose()
         plotHist.Dispose()
     End Sub
 End Class
@@ -627,7 +627,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
     End Sub
     Public Sub New(ocvb As AlgorithmData)
         hist = New Histogram_Depth(ocvb)
-        hist.inrange.sliders.TrackBar2.Value = 5000 ' depth to 5 meters.
+        hist.trim.sliders.TrackBar2.Value = 5000 ' depth to 5 meters.
         hist.sliders.TrackBar1.Value = 40 ' number of bins.
 
         kalman = New Kalman_Basics(ocvb)
@@ -653,7 +653,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
             Next
         End If
 
-        Dim depthIncr = CInt(hist.inrange.sliders.TrackBar2.Value / hist.sliders.TrackBar1.Value) ' each bar represents this number of millimeters
+        Dim depthIncr = CInt(hist.trim.sliders.TrackBar2.Value / hist.sliders.TrackBar1.Value) ' each bar represents this number of millimeters
         Dim pointCount = hist.plotHist.hist.At(Of Single)(0, 0) + hist.plotHist.hist.At(Of Single)(1, 0)
         Dim startDepth = 1
         Dim startEndDepth As cv.Point
@@ -673,7 +673,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
             End If
         Next
 
-        startEndDepth = New cv.Point(startDepth, hist.inrange.sliders.TrackBar2.Value)
+        startEndDepth = New cv.Point(startDepth, hist.trim.sliders.TrackBar2.Value)
         depthBoundaries.Add(pointCount, startEndDepth) ' capped at the max depth we are observing
 
         rangeBoundaries.Clear()

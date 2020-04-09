@@ -33,7 +33,7 @@ End Module
 
 
 
-Public Class Projections_SideAndDown_CPP : Implements IDisposable
+Public Class Projections_NoGravity_CPP : Implements IDisposable
     Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
@@ -63,11 +63,65 @@ Public Class Projections_SideAndDown_CPP : Implements IDisposable
         Dim desiredMin = CSng(foreground.sliders.TrackBar1.Value)
         Dim desiredMax = CSng(foreground.sliders.TrackBar2.Value)
         Dim range = CSng(desiredMax - desiredMin)
+        Dim depth32f = getDepth32f(ocvb)
+        If depthBytes Is Nothing Then
+            ReDim depthBytes(depth32f.Total * depth32f.ElemSize - 1)
+        End If
 
-#If 0 Then
+        Marshal.Copy(depth32f.Data, depthBytes, 0, depthBytes.Length)
+        Dim handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)
+
+        Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, desiredMin, desiredMax, depth32f.Height, depth32f.Width)
+
+        ocvb.result1 = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        ocvb.result2 = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        handleDepth.Free()
+        ocvb.label1 = "Top View (looking down)"
+        ocvb.label2 = "Side View"
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        foreground.Dispose()
+        grid.Dispose()
+        SimpleProjectionClose(cPtr)
+    End Sub
+End Class
+
+
+
+Public Class Projections_NoGravity : Implements IDisposable
+    Dim foreground As Depth_ManualTrim
+    Dim grid As Thread_Grid
+    Dim cPtr As IntPtr
+    Dim depthBytes() As Byte
+    Public Sub New(ocvb As AlgorithmData)
+        grid = New Thread_Grid(ocvb)
+        grid.externalUse = True
+        grid.sliders.TrackBar1.Value = 64
+        grid.sliders.TrackBar2.Value = 32
+
+        foreground = New Depth_ManualTrim(ocvb)
+        foreground.externalUse = True
+        foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
+        foreground.sliders.TrackBar2.Value = 4000 ' fixed distance to keep the images stable.
+        ocvb.label1 = "Top View"
+        ocvb.label2 = "Side View"
+        ocvb.desc = "Project the depth data onto a top view and side view - using only VB code (too slow.)"
+
+        cPtr = SimpleProjectionOpen()
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        grid.Run(ocvb)
+        foreground.Run(ocvb)
+
+        Dim h = ocvb.result1.Height
+        Dim w = ocvb.result1.Width
+        Dim desiredMin = CSng(foreground.sliders.TrackBar1.Value)
+        Dim desiredMax = CSng(foreground.sliders.TrackBar2.Value)
+        Dim range = CSng(desiredMax - desiredMin)
+        Dim depth32f = getDepth32f(ocvb)
+
         ' this VB.Net version is much slower than the optimized C++ version below.
-        Dim depth32f As New cv.Mat
-        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
         ocvb.result1.SetTo(cv.Scalar.White)
         ocvb.result2.SetTo(cv.Scalar.White)
         Dim black = New cv.Vec3b(0, 0, 0)
@@ -78,29 +132,14 @@ Public Class Projections_SideAndDown_CPP : Implements IDisposable
                      Dim m = foreground.Mask.At(Of Byte)(y, x)
                      If m > 0 Then
                          Dim depth = depth32f.Get(Of Single)(y, x)
-                         Dim dy = h * (depth - desiredMin) / range
+                         Dim dy = CInt(h * (depth - desiredMin) / range)
                          If dy < h And dy > 0 Then ocvb.result1.Set(Of cv.Vec3b)(h - dy, x, black)
-                         Dim dx = w * (depth - desiredMin) / range
+                         Dim dx = CInt(w * (depth - desiredMin) / range)
                          If dx < w And dx > 0 Then ocvb.result2.Set(Of cv.Vec3b)(y, dx, black)
                      End If
                  Next
              Next
          End Sub)
-#Else
-        If depthBytes Is Nothing Then
-            ReDim depthBytes(ocvb.depth16.Total * ocvb.depth16.ElemSize - 1)
-        End If
-
-        Marshal.Copy(ocvb.depth16.Data, depthBytes, 0, depthBytes.Length)
-        Dim handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)
-
-        Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, desiredMin, desiredMax, ocvb.depth16.Height, ocvb.depth16.Width)
-
-        ocvb.result1 = New cv.Mat(ocvb.depth16.Rows, ocvb.depth16.Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.result2 = New cv.Mat(ocvb.depth16.Rows, ocvb.depth16.Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        handleDepth.Free()
-#End If
         ocvb.label1 = "Top View (looking down)"
         ocvb.label2 = "Side View"
     End Sub
@@ -110,6 +149,8 @@ Public Class Projections_SideAndDown_CPP : Implements IDisposable
         SimpleProjectionClose(cPtr)
     End Sub
 End Class
+
+
 
 
 
@@ -215,92 +256,7 @@ End Class
 
 
 
-
-
-'Public Class Projections_Gravity_CPP : Implements IDisposable
-'    Dim imu As IMU_AnglesToGravity
-'    Dim sliders As New OptionsSliders
-'    Dim cPtr As IntPtr
-'    Dim zBytes() As Byte
-'    Dim kalman1 As Kalman_Single
-'    Public Sub New(ocvb As AlgorithmData)
-'        kalman1 = New Kalman_Single(ocvb)
-'        kalman1.externalUse = True
-
-'        imu = New IMU_AnglesToGravity(ocvb)
-'        imu.result = RESULT2
-'        imu.externalUse = True
-
-'        sliders.setupTrackBar1(ocvb, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
-'        If ocvb.parms.ShowOptions Then sliders.Show()
-
-'        cPtr = Projections_Gravity_Open()
-'        ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
-'    End Sub
-'    Public Sub Run(ocvb As AlgorithmData)
-'        imu.Run(ocvb)
-'        Dim split() = cv.Cv2.Split(ocvb.pointCloud)
-'        Dim vertSplit = split
-
-'        Dim zCos = Math.Cos(imu.angleZ)
-'        Dim zSin = Math.Sin(imu.angleZ)
-
-'        Dim xCos = Math.Cos(imu.angleX)
-'        Dim xSin = Math.Sin(imu.angleX)
-
-'        Dim xArray(,) As Single = {{1, 0, 0, 0}, {0, zCos, -zSin, 0}, {0, zSin, zCos, 0}, {0, 0, 0, 1}}
-'        Dim xRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, xArray)
-
-'        Dim zArray(,) As Single = {{xCos, -xSin, 0, 0}, {xSin, xCos, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}
-'        Dim zRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, zArray)
-'        Dim yRotate = (xRotate * zRotate).ToMat
-
-'        Dim xz(4 * 4) As Single
-'        For j = 0 To yRotate.Rows - 1
-'            For i = 0 To yRotate.Cols - 1
-'                xz(i * 4 + j) = yRotate.At(Of Single)(i, j)
-'            Next
-'        Next
-
-'        vertSplit(0) = xz(0) * split(0) + xz(1) * split(1) + xz(2) * split(2)
-'        vertSplit(1) = xz(4) * split(0) + xz(5) * split(1) + xz(6) * split(2)
-'        vertSplit(2) = xz(8) * split(0) + xz(9) * split(1) + xz(10) * split(2)
-
-'        Dim desiredMaxZ = sliders.TrackBar1.Value / 1000
-'        Dim minX As Double, maxX As Double, minY As Double, maxY As Double
-'        cv.Cv2.MinMaxLoc(vertSplit(0), minX, maxX)
-'        cv.Cv2.MinMaxLoc(vertSplit(1), minY, maxY)
-'        Dim compressX As Single = desiredMaxZ / Math.Abs(maxX - minX)
-'        Dim compressY As Single = desiredMaxZ / Math.Abs(maxY - minY)
-'        kalman1.inputReal = compressX
-'        kalman1.Run(ocvb)
-
-'        If zBytes Is Nothing Then ReDim zBytes(vertSplit(2).Total * vertSplit(2).ElemSize - 1)
-'        Marshal.Copy(vertSplit(2).Data, zBytes, 0, zBytes.Length)
-'        Dim handleZ = GCHandle.Alloc(zBytes, GCHandleType.Pinned)
-
-'        Dim imagePtr = Projections_Gravity_Run(cPtr, handleZ.AddrOfPinnedObject, desiredMaxZ, kalman1.stateResult, compressY, vertSplit(2).Height, vertSplit(2).Width)
-
-'        ocvb.result1 = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-'        ocvb.result2 = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-'        handleZ.Free()
-
-'        ocvb.label1 = "Top View (looking down)"
-'        ocvb.label2 = "Side View"
-'    End Sub
-'    Public Sub Dispose() Implements IDisposable.Dispose
-'        imu.Dispose()
-'        sliders.Dispose()
-'        Projections_Gravity_Close(cPtr)
-'        kalman1.Dispose()
-'    End Sub
-'End Class
-
-
-
-
-Public Class Projections_Gravity_CPP1 : Implements IDisposable
+Public Class Projections_Gravity_CPP : Implements IDisposable
     Dim imu As IMU_AnglesToGravity
     Dim sliders As New OptionsSliders
     Dim cPtr As IntPtr

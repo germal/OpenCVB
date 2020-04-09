@@ -307,9 +307,9 @@ Public Class Blob_LargestDepthCluster : Implements IDisposable
         Dim maxSize = blobs.histBlobs.valleys.sortedSizes.ElementAt(0)
         ocvb.result1.SetTo(0)
         Dim startEndDepth = blobs.histBlobs.valleys.rangeBoundaries.ElementAt(0)
-        Dim tmp16 As New cv.Mat, mask As New cv.Mat
-        cv.Cv2.InRange(ocvb.depth16, startEndDepth.X, startEndDepth.Y, tmp16)
-        cv.Cv2.ConvertScaleAbs(tmp16, mask)
+        Dim tmp As New cv.Mat, mask As New cv.Mat
+        cv.Cv2.InRange(getDepth32f(ocvb), startEndDepth.X, startEndDepth.Y, tmp)
+        cv.Cv2.ConvertScaleAbs(tmp, mask)
         ocvb.color.CopyTo(ocvb.result1, mask)
         ocvb.label1 = "Largest Depth Blob: " + Format(maxSize, "#,000") + " pixels (" + Format(maxSize / ocvb.color.Total, "#0.0%") + ")"
     End Sub

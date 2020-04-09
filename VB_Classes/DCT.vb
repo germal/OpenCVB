@@ -184,7 +184,8 @@ Public Class DCT_Surfaces_debug : Implements IDisposable
         Dim mask = ocvb.result1.Clone() ' result1 contains the DCT mask of featureless surfaces.
         Dim notMask As New cv.Mat
         cv.Cv2.BitwiseNot(mask, notMask)
-        ocvb.depth16.SetTo(0, notMask) ' remove non-featureless surface depth data.
+        Dim depth32f = getDepth32f(ocvb)
+        depth32f.SetTo(0, notMask) ' remove non-featureless surface depth data.
 
         ' find the most featureless roi
         Dim maxIndex As Int32
@@ -206,7 +207,7 @@ Public Class DCT_Surfaces_debug : Implements IDisposable
                 Dim minDepth As Int32 = 100000, maxDepth As Int32
                 For j = 0 To roi.Height - 1
                     For i = 0 To roi.Width - 1
-                        Dim nextD = ocvb.depth16(roi).At(Of Short)(j, i)
+                        Dim nextD = depth32f(roi).At(Of Short)(j, i)
                         If nextD <> 0 Then
                             If minDepth > nextD Then minDepth = nextD
                             If maxDepth < nextD Then maxDepth = nextD

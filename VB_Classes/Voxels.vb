@@ -11,7 +11,7 @@ Public Class Voxels_Basics_MT : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Display intermediate results"
-        check.Box(0).Checked = False
+        check.Box(0).Checked = True
         If ocvb.parms.ShowOptions Then check.Show()
 
         trim = New Depth_InRange(ocvb)
@@ -44,11 +44,12 @@ Public Class Voxels_Basics_MT : Implements IDisposable
 
         Dim bins = sliders.TrackBar1.Value
         Dim gridCount = grid.roiList.Count
+        Dim depth32f = getDepth32f(ocvb)
         Parallel.For(0, gridCount,
         Sub(i)
             Dim roi = grid.roiList(i)
-            If ocvb.depth16(roi).CountNonZero() Then
-                voxels(i) = computeMedian(ocvb.depth16(roi), trim.Mask(roi), bins, minDepth, maxDepth)
+            If depth32f(roi).CountNonZero() Then
+                voxels(i) = computeMedian(depth32f(roi), trim.Mask(roi), bins, minDepth, maxDepth)
             Else
                 voxels(i) = 0
             End If
