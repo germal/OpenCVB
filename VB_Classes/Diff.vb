@@ -48,7 +48,7 @@ Public Class Diff_UnstableDepthAndColor : Implements IDisposable
             Dim mask As New cv.Mat
             cv.Cv2.BitwiseNot(ocvb.result2, unstableDepth)
             If unstableColor.Channels = 3 Then unstableColor = unstableColor.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If ocvb.result1.Channels = 3 Then ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             cv.Cv2.BitwiseOr(unstableColor, unstableDepth, mask)
             ocvb.result1 = ocvb.color.Clone()
             ocvb.result1.SetTo(0, mask)

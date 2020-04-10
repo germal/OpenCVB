@@ -59,17 +59,18 @@ Public Class DilateErode_DepthSeed : Implements IDisposable
         ocvb.desc = "Erode depth to build a depth mask for inrange data."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim mat16 As New cv.Mat
+        Dim mat As New cv.Mat
         Dim element5x5 = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
-        cv.Cv2.Erode(ocvb.depth16, mat16, element5x5)
-        mat16 = ocvb.depth16 - mat16
+        Dim depth32f = getDepth32f(ocvb)
+        cv.Cv2.Erode(depth32f, mat, element5x5)
+        mat = depth32f - mat
         Dim flatDepth As Single = 100
         Dim seeds As New cv.Mat
-        seeds = mat16.LessThan(flatDepth)
+        seeds = mat.LessThan(flatDepth)
 
         Dim validImg As New cv.Mat
-        validImg = ocvb.depth16.GreaterThan(0)
-        validImg.SetTo(0, ocvb.depth16.GreaterThan(3000)) ' max distance
+        validImg = depth32f.GreaterThan(0)
+        validImg.SetTo(0, depth32f.GreaterThan(3000)) ' max distance
         cv.Cv2.BitwiseAnd(seeds, validImg, seeds)
         ocvb.result1.SetTo(0)
         ocvb.RGBDepth.CopyTo(ocvb.result1, seeds)

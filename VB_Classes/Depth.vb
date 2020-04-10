@@ -885,14 +885,14 @@ Public Class Depth_ColorizerVB : Implements IDisposable
         ocvb.desc = "Colorize depth manually."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim src = ocvb.depth16
+        Dim src = getDepth32f(ocvb)
         Dim nearColor = New Byte() {0, 255, 255}
         Dim farColor = New Byte() {255, 0, 0}
 
         Dim histogram(256 * 256 - 1) As Int32
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
-                Dim pixel = src.Get(Of UInt16)(y, x)
+                Dim pixel = src.Get(Of Single)(y, x)
                 If pixel Then histogram(pixel) += 1
             Next
         Next
@@ -907,7 +907,7 @@ Public Class Depth_ColorizerVB : Implements IDisposable
         Dim rgbdata(stride * src.Height) As Byte
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
-                Dim pixel = src.Get(Of UInt16)(y, x)
+                Dim pixel = src.Get(Of Single)(y, x)
                 If pixel Then
                     Dim t = histogram(pixel)
                     rgbdata(x * 3 + 0 + y * stride) = ((256 - t) * nearColor(0) + t * farColor(0)) >> 8
@@ -1069,11 +1069,9 @@ Public Class Depth_LocalMinMax_MT : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
-        Dim depth16 = ocvb.depth16
-        ' depth should not normally be resized but we do it here
-        If depth16.Width <> ocvb.color.Width Then depth16 = depth16.Resize(ocvb.color.Size())
+        Dim depth32f = getDepth32f(ocvb)
 
-        Dim mask = depth16.Threshold(1, 5000, cv.ThresholdTypes.Binary)
+        Dim mask = depth32f.Threshold(1, 5000, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8UC1)
 
         If externalUse = False Then
@@ -1088,7 +1086,7 @@ Public Class Depth_LocalMinMax_MT : Implements IDisposable
             Dim roi = grid.roiList(i)
             Dim minVal As Double, maxVal As Double
             Dim minPt As cv.Point, maxPt As cv.Point
-            cv.Cv2.MinMaxLoc(depth16(roi), minVal, maxVal, minPt, maxPt, mask(roi))
+            cv.Cv2.MinMaxLoc(depth32f(roi), minVal, maxVal, minPt, maxPt, mask(roi))
             If minPt.X < 0 Or minPt.Y < 0 Then minPt = New cv.Point2f(0, 0)
             ptListX(i) = minPt.X + roi.X
             ptListY(i) = minPt.Y + roi.Y
@@ -1191,8 +1189,7 @@ Public Class Depth_Decreasing : Implements IDisposable
         ocvb.desc = "Identify where depth is decreasing - coming toward the camera."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim depth32f As New cv.Mat
-        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        Dim depth32f = getDepth32f(ocvb)
         Static lastDepth As cv.Mat = depth32f.Clone()
 
         Dim thresholdCentimeters = sliders.TrackBar1.Value
@@ -1273,7 +1270,7 @@ Public Class Depth_ColorMap : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim alpha = sliders.TrackBar1.Value / 100
-        cv.Cv2.ConvertScaleAbs(ocvb.depth16, Palette.src, alpha)
+        cv.Cv2.ConvertScaleAbs(getDepth32f(ocvb), Palette.src, alpha)
         Palette.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -1295,7 +1292,7 @@ Public Class Depth_Holes : Implements IDisposable
         ocvb.desc = "Identify holes in the depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        holeMask = ocvb.depth16Raw.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        holeMask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
         holeMask.ConvertTo(holeMask, cv.MatType.CV_8U)
         If ocvb.parms.lowResolution Then holeMask = holeMask.Resize(ocvb.color.Size)
         If externalUse = False Then ocvb.result1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
