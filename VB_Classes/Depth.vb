@@ -892,7 +892,7 @@ Public Class Depth_ColorizerVB : Implements IDisposable
         Dim histogram(256 * 256 - 1) As Int32
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
-                Dim pixel = src.Get(Of Single)(y, x)
+                Dim pixel = Math.Truncate(src.Get(Of Single)(y, x))
                 If pixel Then histogram(pixel) += 1
             Next
         Next
@@ -907,7 +907,7 @@ Public Class Depth_ColorizerVB : Implements IDisposable
         Dim rgbdata(stride * src.Height) As Byte
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
-                Dim pixel = src.Get(Of Single)(y, x)
+                Dim pixel = Math.Truncate(src.Get(Of Single)(y, x))
                 If pixel Then
                     Dim t = histogram(pixel)
                     rgbdata(x * 3 + 0 + y * stride) = ((256 - t) * nearColor(0) + t * farColor(0)) >> 8
@@ -972,7 +972,7 @@ Public Class Depth_ColorizerVB_MT : Implements IDisposable
                Dim rgbIndex As Int32
                For y = 0 To depth.Rows - 1
                    For x = 0 To depth.Cols - 1
-                       Dim pixel = depth.Get(Of Single)(y, x)
+                       Dim pixel = Math.Truncate(depth.Get(Of Single)(y, x))
                        If pixel > 0 And pixel < histSize Then
                            Dim t = histogram(pixel) / maxHist
                            rgbdata(rgbIndex) = New cv.Vec3b(((1 - t) * nearColor(0) + t * farColor(0)) * 255,
