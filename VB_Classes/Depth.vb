@@ -944,8 +944,7 @@ Public Class Depth_ColorizerVB_MT : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
 
-        If externalUse = False Then src = ocvb.depth16
-        If src.Width <> ocvb.color.Width Then src = src.Resize(ocvb.color.Size())
+        If externalUse = False Then src = getDepth32f(ocvb)
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
 
@@ -973,7 +972,7 @@ Public Class Depth_ColorizerVB_MT : Implements IDisposable
                Dim rgbIndex As Int32
                For y = 0 To depth.Rows - 1
                    For x = 0 To depth.Cols - 1
-                       Dim pixel = depth.Get(Of UInt16)(y, x)
+                       Dim pixel = depth.Get(Of Single)(y, x)
                        If pixel > 0 And pixel < histSize Then
                            Dim t = histogram(pixel) / maxHist
                            rgbdata(rgbIndex) = New cv.Vec3b(((1 - t) * nearColor(0) + t * farColor(0)) * 255,
@@ -1017,7 +1016,7 @@ Public Class Depth_Colorizer_MT : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
 
-        If externalUse = False Then src = ocvb.depth16
+        If externalUse = False Then src = getDepth32f(ocvb)
         If src.Width <> ocvb.color.Width Then src = src.Resize(ocvb.color.Size())
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
@@ -1032,7 +1031,7 @@ Public Class Depth_Colorizer_MT : Implements IDisposable
              Dim rgbdata(stride * depth.Height) As Byte
              For y = 0 To depth.Rows - 1
                  For x = 0 To depth.Cols - 1
-                     Dim pixel = depth.Get(Of UInt16)(y, x)
+                     Dim pixel = depth.Get(Of Single)(y, x)
                      If pixel > minDepth And pixel <= maxDepth Then
                          Dim t = (pixel - minDepth) / (maxDepth - minDepth)
                          rgbdata(x * 3 + 0 + y * stride) = ((1 - t) * nearColor(0) + t * farColor(0)) * 255

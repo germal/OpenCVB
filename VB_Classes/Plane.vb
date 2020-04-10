@@ -106,8 +106,7 @@ Public Class Plane_Detect : Implements IDisposable
         ocvb.label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim depth32f As New cv.Mat
-        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        Dim depth32f = getDepth32f(ocvb)
         grid.Run(ocvb)
 
         ocvb.result2.SetTo(0)
@@ -182,8 +181,7 @@ Public Class Plane_DetectDebug : Implements IDisposable
         ocvb.label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim depth32f As New cv.Mat
-        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        Dim depth32f = getDepth32f(ocvb)
         grid.Run(ocvb)
 
         ocvb.result2.SetTo(0)

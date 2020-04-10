@@ -17,7 +17,7 @@ Public Class VTK_Basics : Implements IDisposable
     Public memMapSysData(6) As Double ' allow space for 10 user data values
     Public memMapUserData(10) As Double ' allow space for 10 user data values
     Public memMapValues(49) As Double ' more than needed - room for growth
-    Public usingDepthAndRGB As Boolean = True ' if false, we are using plotData, not ocvb.depth16.
+    Public usingDepthAndRGB As Boolean = True ' if false, we are using plotData, not depth32f.
     Public pointSize As Int32 = 1
     Public rgbInput As New cv.Mat
     Public dataInput As New cv.Mat
@@ -83,7 +83,7 @@ Public Class VTK_Basics : Implements IDisposable
 
         If usingDepthAndRGB Then
             rgbInput = ocvb.color.Clone()
-            dataInput = New cv.Mat ' ocvb.depth16.Clone()
+            dataInput = getDepth32f(ocvb)
         End If
 
         If rgbBuffer.Length <= rgbInput.Total * rgbInput.ElemSize Then MsgBox("Stopping VTK.  rgbInput Buffer > buffer limit.")

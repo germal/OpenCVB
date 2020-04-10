@@ -384,7 +384,7 @@ Public Class Palette_DepthColorMap : Implements IDisposable
             cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
             gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
         End If
-        Dim depth8u = ocvb.depth16.ConvertScaleAbs(0.1)
+        Dim depth8u = getDepth32f(ocvb).ConvertScaleAbs(0.1)
         If depth8u.Width <> ocvb.color.Width Then depth8u = depth8u.Resize(ocvb.color.Size())
         ocvb.result1 = Palette_Custom_Apply(depth8u, gradientColorMap)
 
@@ -411,7 +411,7 @@ Public Class Palette_DepthColorMapJet : Implements IDisposable
         ocvb.desc = "Use the Jet colormap to display depth. "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim depth8u = ocvb.depth16.ConvertScaleAbs(0.03)
+        Dim depth8u = getDepth32f(ocvb).ConvertScaleAbs(0.03)
         If depth8u.Width <> ocvb.color.Width Then depth8u = depth8u.Resize(ocvb.color.Size())
         cv.Cv2.ApplyColorMap(255 - depth8u, ocvb.result1, cv.ColormapTypes.Jet)
     End Sub

@@ -566,7 +566,7 @@ Public Class Histogram_Depth : Implements IDisposable
         plotHist.externalUse = True
 
         trim = New Depth_InRange(ocvb)
-        sliders.setupTrackBar1(ocvb, "Histogram Depth Bins", 1, ocvb.color.Width * 2, 50) ' max is the number of columns * 2 
+        sliders.setupTrackBar1(ocvb, "Histogram Depth Bins", 2, ocvb.color.Width, 50) ' max is the number of columns * 2 
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Show depth data as a histogram."
@@ -579,7 +579,7 @@ Public Class Histogram_Depth : Implements IDisposable
         Dim histSize() = {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
 
-        cv.Cv2.CalcHist(New cv.Mat() {ocvb.depth16}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {getDepth32f(ocvb)}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
         If externalUse = False Then
             plotHist.dst = ocvb.result2
@@ -719,11 +719,11 @@ Public Class Histogram_DepthClusters : Implements IDisposable
 
         ocvb.result2.SetTo(0)
         Dim mask As New cv.Mat
-        Dim tmp16 As New cv.Mat
+        Dim tmp As New cv.Mat
         For i = 0 To valleys.rangeBoundaries.Count - 1
             Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
-            cv.Cv2.InRange(ocvb.depth16, startEndDepth.X, startEndDepth.Y, tmp16)
-            cv.Cv2.ConvertScaleAbs(tmp16, mask)
+            cv.Cv2.InRange(getDepth32f(ocvb), startEndDepth.X, startEndDepth.Y, tmp)
+            cv.Cv2.ConvertScaleAbs(tmp, mask)
             ocvb.result2.SetTo(ocvb.colorScalar(i), mask)
         Next
         ocvb.label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"

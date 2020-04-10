@@ -234,16 +234,10 @@ Public Class Mat_ImageXYZ_MT : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
+        Dim depth32f = getDepth32f(ocvb)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
           Sub(roi)
-              Dim z As Single
-              xyzPlanes(2)(roi).SetTo(0)
-              For y = roi.Y To roi.Y + roi.Height - 1
-                  For x = roi.X To roi.X + roi.Width - 1
-                      z = ocvb.depth16.At(Of UInt16)(y, x)
-                      If z > 0 Then xyzPlanes(2).Set(Of Single)(y, x, z)
-                  Next
-              Next
+              xyzPlanes(2)(roi) = depth32f(roi)
           End Sub)
 
         If externalUse = False Then cv.Cv2.Merge(xyzPlanes, xyDepth)

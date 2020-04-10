@@ -50,8 +50,8 @@ def PyStreamRun(OpenCVCode, scriptName):
                     rgb = pipeIn.read(int(rgbBufferSize))
                     depthData = pipeIn.read(int(depthBufferSize))
                     depthSize = rows, cols, 1
-                    depth = np.array(np.frombuffer(depthData, np.uint16).reshape(depthSize))
-                    depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth, alpha=0.03), cv.COLORMAP_JET)
+                    depth = np.array(np.frombuffer(depthData, np.float32).reshape(depthSize))
+                    depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth, alpha=0.03), cv.COLORMAP_HSV)
                     rgbSize = rows, cols, 3
                     imgRGB = np.array(np.frombuffer(rgb, np.uint8).reshape(rgbSize))
                     OpenCVCode(imgRGB, depth_colormap)

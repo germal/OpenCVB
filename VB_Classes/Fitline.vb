@@ -46,17 +46,18 @@ Public Class Fitline_3DBasics_MT : Implements IDisposable
         Dim mask = gray.Threshold(1, 255, cv.ThresholdTypes.Binary)
         ocvb.result2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.color.CopyTo(ocvb.result1)
+        Dim depth32f = getDepth32f(ocvb)
 
         Parallel.ForEach(Of cv.Rect)(hlines.grid.roiList,
         Sub(roi)
-            Dim depth = ocvb.depth16(roi).Clone()
+            Dim depth = depth32f(roi).Clone()
             Dim fMask = mask(roi).Clone()
             Dim points As New List(Of cv.Point3f)
             Dim rows = ocvb.color.Rows, cols = ocvb.color.Cols
             For y = 0 To roi.Height - 1
                 For x = 0 To roi.Width - 1
                     If fMask.At(Of Byte)(y, x) > 0 Then
-                        Dim d = depth.At(Of UShort)(y, x)
+                        Dim d = depth.At(Of Single)(y, x)
                         If d > 0 And d < 10000 Then
                             points.Add(New cv.Point3f(x / rows, y / cols, d / 10000))
                         End If

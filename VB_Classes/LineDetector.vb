@@ -296,8 +296,7 @@ Public Class LineDetector_3D_LongestLine : Implements IDisposable
         lines.Run(ocvb)
         ocvb.color.CopyTo(ocvb.result2)
 
-        Dim depth32f As New cv.Mat
-        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        Dim depth32f = getDepth32f(ocvb)
 
         If lines.sortedLines.Count > 0 Then
             ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
@@ -339,8 +338,7 @@ Public Class LineDetector_3D_FLD_MT : Implements IDisposable
         lines.Run(ocvb)
         ocvb.color.CopyTo(ocvb.result2)
 
-        Dim depth32f As New cv.Mat
-        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        Dim depth32f = getDepth32f(ocvb)
 
         ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
         Dim maskLineWidth As Int32 = sliders.TrackBar1.Value
@@ -387,8 +385,7 @@ Public Class LineDetector_3D_LSD_MT : Implements IDisposable
         lines.Run(ocvb)
         ocvb.color.CopyTo(ocvb.result2)
 
-        Dim depth32f As New cv.Mat
-        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        Dim depth32f = getDepth32f(ocvb)
 
         ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
         Dim maskLineWidth As Int32 = sliders.TrackBar1.Value
@@ -453,8 +450,7 @@ Public Class LineDetector_3D_FitLineZ : Implements IDisposable
         If useLSD Then linesLSD.Run(ocvb) Else linesFLD.Run(ocvb)
         ocvb.color.CopyTo(ocvb.result2)
 
-        Dim depth32f As New cv.Mat
-        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        Dim depth32f = getDepth32f(ocvb)
 
         Dim sortedlines As SortedList(Of cv.Vec6f, Integer)
         If useLSD Then sortedlines = linesLSD.sortedLines Else sortedlines = linesFLD.sortedLines

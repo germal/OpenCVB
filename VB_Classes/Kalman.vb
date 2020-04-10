@@ -377,15 +377,14 @@ Public Class Kalman_DepthSmall : Implements IDisposable
 
         resize = New Resize_Percentage(ocvb)
         resize.externalUse = True
-        resize.sliders.TrackBar1.Value = 1
+        resize.sliders.TrackBar1.Value = 4
 
         ocvb.label2 = "Brighter: depth is decreasing (object getting closer)"
         ocvb.label1 = "Mask of non-zero depth after Kalman smoothing"
         ocvb.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim depth32f As New cv.Mat
-        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        Dim depth32f = getDepth32f(ocvb)
         resize.src = depth32f
         resize.Run(ocvb)
 

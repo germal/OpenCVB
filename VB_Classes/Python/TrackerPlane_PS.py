@@ -162,4 +162,5 @@ class App:
             self.tracker.clear()
 
 if __name__ == '__main__':
+    print(__doc__)
     App().Open()
