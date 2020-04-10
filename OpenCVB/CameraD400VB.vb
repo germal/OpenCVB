@@ -129,7 +129,6 @@ Public Class CameraD400VB
 
                 color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorFrame.Data)
                 RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBdepthFrame.Data)
-                depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, depthFrame.Data)
                 leftView = New cv.Mat(h, w, cv.MatType.CV_8U, rawLeft.Data)
                 rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rawRight.Data)
                 Dim points = pc.Process(depthFrame).As(Of rs.Points)

@@ -150,7 +150,7 @@ Public Class CameraKinect
                 color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
                 RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
-                depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, KinectDepth16(cPtr))
+                Dim depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, KinectDepth16(cPtr))
 
                 Dim tmp As New cv.Mat
                 cv.Cv2.Normalize(depth16, tmp, 0, 255, cv.NormTypes.MinMax)

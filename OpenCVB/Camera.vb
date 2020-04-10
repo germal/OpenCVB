@@ -24,8 +24,6 @@ Public Class Camera
     Public h As Int32
     Public w As Int32
     Public color As cv.Mat
-    Public depth32f As cv.Mat
-    Public depth16 As cv.Mat
     Public RGBDepth As cv.Mat
     Public deviceCount As Int32
     Public deviceName As String

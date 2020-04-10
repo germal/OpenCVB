@@ -43,9 +43,6 @@ Module D400_Module_CPP
     <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function D400Accel(tp As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function D400Depth16(tp As IntPtr) As IntPtr
-    End Function
 End Module
 
 Structure D400IMUdata
@@ -110,7 +107,6 @@ Public Class CameraD400
             IMU_TimeStamp = D400IMUTimeStamp(cPtr) - imuStartTime
 
             RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, D400RGBDepth(cPtr)).Clone()
-            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, D400Depth16(cPtr)).Clone()
             leftView = New cv.Mat(h, w, cv.MatType.CV_8U, D400LeftRaw(cPtr)).Clone()
             rightView = New cv.Mat(h, w, cv.MatType.CV_8U, D400RightRaw(cPtr)).Clone()
             pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, D400PointCloud(cPtr))

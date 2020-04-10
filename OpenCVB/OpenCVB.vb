@@ -206,7 +206,7 @@ Public Class OpenCVB
 
 
         ' check for the T265 last as it seems to take longer to be recognized by the USB controller.  If first, it was not found on my machine!
-        cameraT265 = New CameraT265Native()
+        cameraT265 = New CameraT265()
         cameraT265.deviceCount = USBenumeration("T265")
         If cameraT265.deviceCount > 0 Then
             cameraT265.initialize(fps, regWidth, regHeight)
@@ -1011,11 +1011,9 @@ Public Class OpenCVB
                 If lowResolution Then
                     OpenCVB.ocvb.color = camera.color.Resize(fastSize)
                     OpenCVB.ocvb.RGBDepth = camera.RGBDepth.Resize(fastSize)
-                    If camera.Depth16 IsNot Nothing Then OpenCVB.ocvb.depth16 = camera.Depth16.resize(fastSize)
                 Else
                     OpenCVB.ocvb.color = camera.color
                     OpenCVB.ocvb.RGBDepth = camera.RGBDepth
-                    If camera.Depth16 IsNot Nothing Then OpenCVB.ocvb.depth16 = camera.depth16
                 End If
                 OpenCVB.ocvb.pointCloud = camera.PointCloud
                 OpenCVB.ocvb.leftView = camera.leftView

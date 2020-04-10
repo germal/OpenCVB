@@ -205,9 +205,6 @@ Public Class CameraMyntD
             Dim RGBADepth = New cv.Mat(h, w, cv.MatType.CV_8UC4, RGBDepthBytes)
             RGBDepth = RGBADepth.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-            Dim depth32f = New cv.Mat(h, w, cv.MatType.CV_32F, depthBytes)
-            depth32f.ConvertTo(depth16, cv.MatType.CV_16U)
-
             leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftViewBytes)
             rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightViewBytes)
             pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes)

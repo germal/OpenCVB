@@ -147,12 +147,6 @@ int* D400RightRaw(D400Camera * tp)
 }
 
 extern "C" __declspec(dllexport)
-int* D400Depth16(D400Camera * tp)
-{
-	return (int*)tp->processedFrames.get_depth_frame().get_data();
-}
-
-extern "C" __declspec(dllexport)
 int* D400RGBDepth(D400Camera * tp)
 {
 	auto RGBDepth = tp->colorizer.process(tp->processedFrames.get_depth_frame());
