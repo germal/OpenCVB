@@ -9,7 +9,6 @@ Public Class AlgorithmData
     Public depth32f As cv.Mat
     Public depth32fRaw As cv.Mat
     Public depth16 As cv.Mat
-    Public depth16Raw As cv.Mat
     Public RGBDepth As cv.Mat
     Public desc As String
     Public drawRect As cv.Rect ' filled in if the user draws on any of the images.

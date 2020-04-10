@@ -44,7 +44,7 @@ public:
 	Pose zed_pose;
 	sl::Camera zed;
 	cv::Mat color, leftView, rightView, pointCloud;
-	Depth_ColorizerOLD* cPtr;
+	Depth_ColorizerZed2* cPtr;
 private:
 	sl::InitParameters init_params;
 	int width, height;
@@ -84,7 +84,7 @@ public:
 		auto returned_state = zed.enablePositionalTracking(positional_tracking_param);
 
 		pointCloud = cv::Mat(height, width, CV_32FC3);
-		cPtr = new Depth_ColorizerOLD();
+		cPtr = new Depth_ColorizerZed2();
 	}
 
 	void waitForFrame()
@@ -101,10 +101,7 @@ public:
 		cv::cvtColor(tmp, color, cv::ColorConversionCodes::COLOR_BGRA2BGR);
 
 		zed.retrieveMeasure(depthSL32f, MEASURE::DEPTH, MEM::CPU);
-		cv::Mat depth32f = cv::Mat(height, width, CV_32FC1, (void*)depthSL32f.getPtr<sl::uchar1>(sl::MEM::CPU)) * 1000;
-
-		depth32f.convertTo(cPtr->depth16, CV_16U);
-
+		cPtr->depth32f = cv::Mat(height, width, CV_32FC1, (void*)depthSL32f.getPtr<sl::uchar1>(sl::MEM::CPU)) * 1000;
 		cPtr->dst = cv::Mat(height, width, CV_8UC3);
 		cPtr->Run();
 
@@ -246,12 +243,6 @@ extern "C" __declspec(dllexport)
 int* Zed2RGBDepth(StereoLabsZed2 * Zed2)
 {
 	return (int*)Zed2->cPtr->dst.data;
-}
-
-extern "C" __declspec(dllexport)
-int* Zed2Depth(StereoLabsZed2 * Zed2)
-{
-	return (int*)Zed2->cPtr->depth16.data;
 }
 
 extern "C" __declspec(dllexport)

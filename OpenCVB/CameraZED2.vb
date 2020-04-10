@@ -171,7 +171,6 @@ Public Class CameraZED2
 
             color = New cv.Mat(h, w, cv.MatType.CV_8UC3, Zed2Color(cPtr))
             RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, Zed2RGBDepth(cPtr))
-            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, Zed2Depth(cPtr))
             leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2LeftView(cPtr))
             rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2RightView(cPtr))
             pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, Zed2PointCloud(cPtr))

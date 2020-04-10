@@ -1017,7 +1017,6 @@ Public Class OpenCVB
                     OpenCVB.ocvb.RGBDepth = camera.RGBDepth
                     If camera.Depth16 IsNot Nothing Then OpenCVB.ocvb.depth16 = camera.depth16
                 End If
-                OpenCVB.ocvb.depth16Raw = camera.depth16
                 OpenCVB.ocvb.pointCloud = camera.PointCloud
                 OpenCVB.ocvb.leftView = camera.leftView
                 OpenCVB.ocvb.rightView = camera.rightView
