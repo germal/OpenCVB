@@ -201,16 +201,15 @@ public:
 		divide(tmp, disparity, dxyz->depth);  // this is a hack to dummy up an approximate depth32f and point cloud.
 
 		dxyz->Run();
-
-		dxyz->depthxyz.copyTo(pointCloud(rectDepth));
 		float* pc = (float*)dxyz->depthxyz.data;
 		for (int i = 0; i < tmp.rows * tmp.cols * 3; ++i)
 			if (isnan(pc[i]) || isinf(pc[i])) pc[i] = 0;
 
+		dxyz->depthxyz.copyTo(pointCloud(rectDepth));
 		Mat split[3];
 		cv::split(dxyz->depthxyz, split);
 
-		normalize(split[2], split[2], 1, 255, NORM_MINMAX); // normalize the depth to values between 0-255
+		normalize(split[2], split[2], 0, 255, NORM_MINMAX); // normalize the depth to values between 0-255
 		split[2] = 255 - split[2];
 		convertScaleAbs(split[2], depth8u(rectDepth), 1);
 

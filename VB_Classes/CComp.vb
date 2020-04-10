@@ -213,8 +213,7 @@ Public Class CComp_InRange_MT : Implements IDisposable
         Dim minBlobSize = sliders.TrackBar3.Value
 
         Dim depth32f = getDepth32f(ocvb)
-        Dim mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary)
-        mask.ConvertTo(mask, cv.MatType.CV_8U)
+        Dim mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
         Dim totalBlobs As Int32
         Parallel.For(0, rangeCount - 1,

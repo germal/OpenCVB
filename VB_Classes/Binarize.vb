@@ -39,8 +39,7 @@ Public Class Binarize_OTSU : Implements IDisposable
 
             Dim thresholdType = Choose(i + 1, cv.ThresholdTypes.Binary, cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu,
                                               cv.ThresholdTypes.Otsu, cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu)
-            Dim thresh = gray.Threshold(meanScalar(0), 255, thresholdType)
-            mats1.mat(i) = thresh.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            mats1.mat(i) = gray.Threshold(meanScalar(0), 255, thresholdType).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Next
 
         mats1.Run(ocvb)
