@@ -364,7 +364,22 @@ Public Class Depth_FlatBackground : Implements IDisposable
 End Class
 
 
-' Use the C++ version of this algorithm - this is way too slow...
+
+Module DepthXYZ_CPP_Module
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Depth_XYZ_OpenMP_Open(ppx As Single, ppy As Single, fx As Single, fy As Single) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Depth_XYZ_OpenMP_Close(DepthXYZPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Depth_XYZ_OpenMP_Run(DepthXYZPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    End Function
+End Module
+
+
+
+' Use the C++ version below of this algorithm - this is way too slow...
 Public Class Depth_WorldXYZ : Implements IDisposable
     Public xyzFrame As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
@@ -389,20 +404,8 @@ Public Class Depth_WorldXYZ : Implements IDisposable
 End Class
 
 
-Module DepthXYZ_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_XYZ_OpenMP_Open(ppx As Single, ppy As Single, fx As Single, fy As Single) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Depth_XYZ_OpenMP_Close(DepthXYZPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_XYZ_OpenMP_Run(DepthXYZPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
-    End Function
-End Module
 
-
-Public Class Depth_XYZ_OpenMP_CPP : Implements IDisposable
+Public Class Depth_WorldXYZ_CPP : Implements IDisposable
     Public pointCloud As cv.Mat
     Dim DepthXYZ As IntPtr
     Public Sub New(ocvb As AlgorithmData)

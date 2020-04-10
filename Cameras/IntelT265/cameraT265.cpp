@@ -13,6 +13,7 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
+#include "../../CPP_Classes/DepthColorizer.hpp"
 
 using namespace std;
 using namespace cv;
@@ -44,7 +45,7 @@ class t265Camera
 {
 public:
 	Mat leftViewMap1, leftViewMap2, rightViewMap1, rightViewMap2;
-	Mat color, depth16, leftViewRaw, rightViewRaw;
+	Mat color, depth16, leftViewRaw, rightViewRaw, depth8u, pointCloud;
 	int rawWidth, rawHeight;
 	rs2_intrinsics intrinsicsLeft, intrinsicsRight;
 	rs2_extrinsics extrinsics;
@@ -52,7 +53,7 @@ public:
 	rs2_pose pose_data;
 	double IMU_TimeStamp;
 	rs2::pipeline pipeline;
-	Mat disparity;
+	DepthXYZ* dxyz;
 
 private:
 	int width, height;
@@ -62,6 +63,7 @@ private:
 	int numDisp;
 	int minDisp = 0;
 	int maxDisp;
+	int dispOffset = 112;
 	int windowSize = 5;
 	Mat lm1, lm2, rm1, rm2;
 	
@@ -85,7 +87,7 @@ public:
 
 		pipeline_profile = pipeline.start(cfg);
 
-		numDisp = 112 - minDisp;
+		numDisp = dispOffset - minDisp;
 		maxDisp = minDisp + numDisp;
 		
 		auto leftStream = pipeline_profile.get_stream(RS2_STREAM_FISHEYE, 1).as<rs2::video_stream_profile>();
@@ -158,6 +160,12 @@ public:
 		cv::fisheye::initUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, Size(rawWidth, rawHeight), CV_32FC1, rightViewMap1, rightViewMap2);
 
 		sgm = new t265sgm(minDisp, windowSize, numDisp);
+
+		dxyz = new DepthXYZ(intrinsicsLeft.ppx, intrinsicsLeft.ppy, intrinsicsLeft.fx, intrinsicsLeft.fy);
+		depth8u = Mat(720, 1280, CV_8U);
+		pointCloud = Mat(depth8u.rows, depth8u.cols, CV_32FC3);
+		const Scalar& s = Scalar(0, 0, 0);
+		pointCloud.setTo(s);
 	}
 
 	void waitForFrame()
@@ -183,9 +191,29 @@ public:
 
 		Rect validRect = Rect(maxDisp, 0, disp16s.cols - maxDisp, disp16s.rows);
 		disp16s = disp16s(validRect);
+		Mat tmp = Mat(300, 300, CV_32F, 20000);
+		Mat disparity(tmp.cols, tmp.rows, CV_32F);
+		Rect rectDepth((tmp.cols - 1) / 2 + dispOffset, 0, tmp.cols, tmp.rows);
 		disp16s.convertTo(disparity, CV_32F, 1.0f / 16.0f);
 		threshold(disparity, disparity, 0, 0, cv::THRESH_TOZERO); // anything below zero is now zero...
-																  
+
+		dxyz->depth = Mat(tmp.rows, tmp.cols, CV_32F);
+		divide(tmp, disparity, dxyz->depth);  // this is a hack to dummy up an approximate depth32f and point cloud.
+
+		dxyz->Run();
+
+		dxyz->depthxyz.copyTo(pointCloud(rectDepth));
+		float* pc = (float*)dxyz->depthxyz.data;
+		for (int i = 0; i < tmp.rows * tmp.cols * 3; ++i)
+			if (isnan(pc[i]) || isinf(pc[i])) pc[i] = 0;
+
+		Mat split[3];
+		cv::split(dxyz->depthxyz, split);
+
+		normalize(split[2], split[2], 1, 255, NORM_MINMAX); // normalize the depth to values between 0-255
+		split[2] = 255 - split[2];
+		convertScaleAbs(split[2], depth8u(rectDepth), 1);
+
 		// Cast the frame to pose_frame and get its data
 		pose_data = f.as<rs2::pose_frame>().get_pose_data();
 	}
@@ -256,9 +284,15 @@ int* T265PoseData(t265Camera * tp)
 }
 
 extern "C" __declspec(dllexport)
-int* T265Disparity(t265Camera * tp)
+int* T265PointCloud(t265Camera * tp)
 {
-	return (int*)tp->disparity.data;
+	return (int*)tp->pointCloud.data;
+}
+
+extern "C" __declspec(dllexport)
+int* T265Depth8u(t265Camera * tp)
+{
+	return (int*)tp->depth8u.data;
 }
 
 extern "C" __declspec(dllexport)

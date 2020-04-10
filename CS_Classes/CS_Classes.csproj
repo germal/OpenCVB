@@ -97,6 +97,7 @@
     <Compile Include="Blur.cs" />
     <Compile Include="DNN.cs" />
     <Compile Include="Kaze.cs" />
+    <Compile Include="MatrixInverse.cs" />
     <Compile Include="OilPaint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SurfAndSift.cs" />

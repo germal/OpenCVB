@@ -293,3 +293,48 @@ public:
 		}
 	}
 };
+
+
+
+
+class DepthXYZ
+{
+private:
+public:
+	Mat depth, depthxyz;
+	float ppx, ppy, fx, fy;
+	DepthXYZ(float _ppx, float _ppy, float _fx, float _fy)
+	{
+		ppx = _ppx; ppy = _ppy; fx = _fx; fy = _fy;
+	}
+	void GetImageCoordinates()
+	{
+		depthxyz = Mat(depth.rows, depth.cols, CV_32FC3);
+#ifdef _DEBUG
+#pragma omp parallel for  // doubles performance in debug mode but is much worse in Release mode.
+#endif
+		for (int y = 0; y < depth.rows; y++)
+		{
+			for (int x = 0; x < depth.cols; x++)
+			{
+				float d = float(depth.at<float>(y, x)) * 0.001f;
+				depthxyz.at<Vec3f>(y, x) = Vec3f(float(x), float(y), d);
+			}
+		}
+	}
+	void Run()
+	{
+		depthxyz = Mat(depth.rows, depth.cols, CV_32FC3);
+#ifdef _DEBUG
+#pragma omp parallel for  // doubles performance in debug mode but is much worse in Release mode.
+#endif
+		for (int y = 0; y < depth.rows; y++)
+		{
+			for (int x = 0; x < depth.cols; x++)
+			{
+				float d = float(depth.at<float>(y, x)) * 0.001f;
+				if (d > 0) depthxyz.at< Vec3f >(y, x) = Vec3f(float((x - ppx) / fx), float((y - ppy) / fy), d);
+			}
+		}
+	}
+};
