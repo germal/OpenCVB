@@ -490,13 +490,10 @@ Public Class Depth_MeanStdev_MT : Implements IDisposable
 
         If ocvb.frameCount >= meanCount Then
             Dim minStdVal As Double, maxStdVal As Double
-            Dim meanMask As New cv.Mat, stdMask As New cv.Mat
 
-            cv.Cv2.Threshold(meanValues, meanMask, 1, maxDepth, cv.ThresholdTypes.Binary)
-            meanMask.ConvertTo(meanMask, cv.MatType.CV_8U)
+            Dim meanmask = meanValues.Threshold(1, maxDepth, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             cv.Cv2.MinMaxLoc(meanValues, minVal, maxVal, minPt, maxPt, meanMask)
-            cv.Cv2.Threshold(stdValues, stdMask, 0.001, maxDepth, cv.ThresholdTypes.Binary) ' volatile region is x cm stdev.
-            stdMask.ConvertTo(stdMask, cv.MatType.CV_8U)
+            Dim stdMask = stdValues.Threshold(0.001, maxDepth, cv.ThresholdTypes.Binary).ConvertScaleAbs() ' volatile region is x cm stdev.
             cv.Cv2.MinMaxLoc(stdValues, minStdVal, maxStdVal, minPt, maxPt, stdMask)
 
             Parallel.For(0, grid.roiList.Count - 1,
@@ -614,8 +611,7 @@ Public Class Depth_Stable : Implements IDisposable
 
         cv.Cv2.BitwiseNot(ocvb.result1, ocvb.result2)
         ocvb.label1 = "Unstable Depth" + " using " + mog.radio.check(mog.currMethod).Text + " method"
-        Dim zeroDepth = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-        zeroDepth = zeroDepth.ConvertScaleAbs(1)
+        Dim zeroDepth = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(1)
         ocvb.result2.SetTo(0, zeroDepth)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -765,12 +761,10 @@ Public Class Depth_ManualTrim : Implements IDisposable
         Dim minDepth = sliders.TrackBar1.Value
         Dim maxDepth = sliders.TrackBar2.Value
         dst = getDepth32f(ocvb)
-        Mask = dst.Threshold(maxDepth, 255, cv.ThresholdTypes.BinaryInv)
-        Mask = Mask.ConvertScaleAbs()
+        Mask = dst.Threshold(maxDepth, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
 
         Dim maskMin As New cv.Mat
-        maskMin = dst.Threshold(minDepth, 255, cv.ThresholdTypes.Binary)
-        maskMin = maskMin.ConvertScaleAbs()
+        maskMin = dst.Threshold(minDepth, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         cv.Cv2.BitwiseAnd(Mask, maskMin, Mask)
 
         If externalUse = False Then
@@ -1199,9 +1193,7 @@ Public Class Depth_Decreasing : Implements IDisposable
         Else
             cv.Cv2.Subtract(lastDepth, depth32f, diff)
         End If
-        diff = diff.Threshold(thresholdCentimeters, 0, cv.ThresholdTypes.Tozero)
-        diff = diff.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        ocvb.result1 = diff.ConvertScaleAbs()
+        ocvb.result1 = diff.Threshold(thresholdCentimeters, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         lastDepth = depth32f
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
