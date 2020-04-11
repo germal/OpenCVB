@@ -1284,9 +1284,7 @@ Public Class Depth_Holes : Implements IDisposable
         ocvb.desc = "Identify holes in the depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        holeMask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-        holeMask.ConvertTo(holeMask, cv.MatType.CV_8U)
-        If ocvb.parms.lowResolution Then holeMask = holeMask.Resize(ocvb.color.Size)
+        holeMask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         If externalUse = False Then ocvb.result1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         borderMask = New cv.Mat

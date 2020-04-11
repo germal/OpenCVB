@@ -90,7 +90,6 @@ Public Class DFT_Inverse : Implements IDisposable
         mats.externalUse = True
         ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
         ocvb.label1 = "Image after Inverse DFT"
-        ocvb.label2 = "Mask of difference (top) and normalized difference"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -103,13 +102,18 @@ Public Class DFT_Inverse : Implements IDisposable
 
         ocvb.result1 = inverseDFT(complexImage)
 
-        ocvb.result2 = gray - ocvb.result1
-        If ocvb.frameCount Mod 50 = 0 Then mats.mat(0).setto(0)
-        Dim tmp = ocvb.result2.Threshold(1, 255, cv.ThresholdTypes.Binary).Clone()
-        Dim test = cv.Cv2.CountNonZero(tmp)
-        If test > 100000 Then mats.mat(0) = tmp
-        mats.mat(1) = ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
+        Dim diff As New cv.Mat
+        cv.Cv2.Absdiff(gray, ocvb.result1, diff)
+        mats.mat(0) = diff.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        mats.mat(1) = (diff * 50).ToMat
         mats.Run(ocvb)
+        If mats.mat(0).countnonzero() > 0 Then
+            ocvb.result2 = mats.dst
+            ocvb.label2 = "Mask of difference (top) and relative diff (bot)"
+        Else
+            ocvb.label2 = "InverseDFT reproduced original"
+            ocvb.result2.SetTo(0)
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         mats.Dispose()

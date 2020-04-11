@@ -196,6 +196,7 @@ Public Class Mat_2to1 : Implements IDisposable
             mat2 = ocvb.RGBDepth
             mat = {mat1, mat2}
         End If
+        If dst.Type <> mat(0).Type Then dst = New cv.Mat(ocvb.color.Size(), mat(0).type)
         For i = 0 To 1
             Dim roi = Choose(i + 1, roiTop, roibot)
             dst(roi) = mat(i).Resize(nSize)
