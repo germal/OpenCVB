@@ -56,8 +56,7 @@ Public Class Coherence_Basics : Implements IDisposable
             Dim gvv As New cv.Mat
             gvv = tmpX + tmpXY + tmpY
 
-            Dim mask = gvv.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-            mask.ConvertTo(mask, cv.MatType.CV_8U)
+            Dim mask = gvv.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
 
             Dim erode = src.Erode(New cv.Mat)
             Dim dilate = src.Dilate(New cv.Mat)

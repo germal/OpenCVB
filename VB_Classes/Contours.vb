@@ -48,8 +48,7 @@ Public Class Contours_Basics : Implements IDisposable
 
         Dim img As New cv.Mat(ocvb.result1.Size(), cv.MatType.CV_8UC1)
         rotatedRect.Run(ocvb)
-        img = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        img = img.Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+        img = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
 
         Dim contours0 As cv.Point()()
         If retrievalMode = cv.RetrievalModes.FloodFill Then
@@ -85,15 +84,14 @@ Public Class Contours_FindandDraw : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         rotatedRect = New Draw_rotatedRectangles(ocvb)
         rotatedRect.rect.sliders.TrackBar1.Value = 5
-        ocvb.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
         ocvb.label1 = "FindandDraw input"
         ocvb.label2 = "FindandDraw output"
+        ocvb.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim img As New cv.Mat(ocvb.result1.Size(), cv.MatType.CV_8UC1)
         rotatedRect.Run(ocvb)
-        img = ocvb.result1.CvtColor(cv.ColorConversionCodes.bgr2gray)
-        img = img.Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+        img = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
 
         Dim contours0 = cv.Cv2.FindContoursAsArray(img, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim contours()() As cv.Point = Nothing
@@ -122,8 +120,7 @@ Public Class Contours_Depth : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
-        Dim img = ocvb.result1.CvtColor(cv.ColorConversionCodes.bgr2gray)
-        img = img.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim img = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         Dim contours0 = cv.Cv2.FindContoursAsArray(img, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim contours()() As cv.Point = Nothing
@@ -160,8 +157,7 @@ Public Class Contours_RGB : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
         Dim img = ocvb.color.CvtColor(cv.ColorConversionCodes.bgr2gray)
-        Dim mask = ocvb.result1.CvtColor(cv.ColorConversionCodes.bgr2gray)
-        mask = mask.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        Dim mask = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
         img.SetTo(0, mask)
 
         Dim contours0 = cv.Cv2.FindContoursAsArray(img, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)

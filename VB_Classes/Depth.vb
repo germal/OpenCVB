@@ -104,8 +104,7 @@ Public Class Depth_FirstLastDistance : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim depth32f = getDepth32f(ocvb)
-        Dim mask = depth32f.Threshold(1, 20000, cv.ThresholdTypes.Binary)
-        mask.ConvertTo(mask, cv.MatType.CV_8UC1)
+        Dim mask = depth32f.Threshold(1, 20000, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         Dim minVal As Double, maxVal As Double
         Dim minPt As cv.Point, maxPt As cv.Point
         cv.Cv2.MinMaxLoc(depth32f, minVal, maxVal, minPt, maxPt, mask)
@@ -172,8 +171,7 @@ Public Class Depth_Foreground : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
         ocvb.result1.CopyTo(ocvb.result2)
-        Dim gray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        gray = gray.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim gray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         ' find the largest blob and use that as the body.  Head is highest in the image.
         Dim blobSize As New List(Of Int32)

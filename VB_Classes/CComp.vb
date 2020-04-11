@@ -269,8 +269,7 @@ Public Class CComp_InRange : Implements IDisposable
         Dim rangeCount As Int32 = sliders.TrackBar1.Value
         Dim minBlobSize = sliders.TrackBar2.Value
 
-        Dim mask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        mask.ConvertTo(mask, cv.MatType.CV_8U)
+        Dim mask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         ocvb.result1 = mask.Clone()
 
         Dim roiList As New List(Of cv.Rect)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿//https://visualstudiomagazine.com/articles/2020/04/06/invert-matrix.aspx
+using System;
 namespace MatrixInverse
 {
   class MatrixInverse

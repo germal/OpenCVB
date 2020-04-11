@@ -119,9 +119,7 @@ Public Class Corners_PreCornerDetect : Implements IDisposable
         median.src = gray.Clone()
         median.Run(ocvb)
         ocvb.result1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        'gray = gray.Threshold(median.medianVal, 255, cv.ThresholdTypes.BinaryInv)
-        gray = gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv)
-        ocvb.result2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        ocvb.result2 = gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "median = " + CStr(median.medianVal)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

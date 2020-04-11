@@ -202,7 +202,7 @@ int* KinectRGBA(KinectCamera * kc)
 }
 
 extern "C" __declspec(dllexport)
-int* KinectDepth16(KinectCamera * kc)
+int* KinectLeftView(KinectCamera * kc)
 {
 	return (int*)kc->depthBuffer;
 }
