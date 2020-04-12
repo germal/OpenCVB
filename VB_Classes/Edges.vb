@@ -289,18 +289,19 @@ Public Class Edges_LeftView : Implements IDisposable
         sobel.sliders.TrackBar1.Value = 5
 
         ocvb.desc = "Find the edges in the LeftViewimages."
-        ocvb.label1 = "Edges in Left LeftViewImage"
-        ocvb.label2 = "Edges in Right LeftViewImage"
+        ocvb.label1 = "Edges in Left Image"
+        ocvb.label2 = "Edges in Right Image (except on Kinect)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         red.Run(ocvb)
         Dim leftView = ocvb.result1
         sobel.src = ocvb.result2
         sobel.Run(ocvb)
-        ocvb.result2 = ocvb.result1
+        ocvb.result2 = sobel.dst.Clone()
 
         sobel.src = leftView
         sobel.Run(ocvb)
+        ocvb.result1 = sobel.dst
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         red.Dispose()
