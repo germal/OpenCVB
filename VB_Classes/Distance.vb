@@ -20,8 +20,7 @@ Public Class Distance_Basics : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         foreground.Run(ocvb)
-        Dim fg = ocvb.result1.CvtColor(cv.ColorConversionCodes.bgr2gray)
-        fg = fg.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim fg = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.bgr2gray)
         Dim DistanceType = cv.DistanceTypes.L2

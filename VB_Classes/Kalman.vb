@@ -396,8 +396,7 @@ Public Class Kalman_DepthSmall : Implements IDisposable
         ocvb.result1 = dst.Resize(ocvb.result1.Size())
         ocvb.result1 = ocvb.result1.ConvertScaleAbs()
         cv.Cv2.Subtract(kalman.dst, saveOriginal, depth32f)
-        depth32f = depth32f.Threshold(0, 0, cv.ThresholdTypes.Tozero)
-        depth32f.ConvertTo(dst, cv.MatType.CV_8U)
+        dst = depth32f.Threshold(0, 0, cv.ThresholdTypes.Tozero).ConvertScaleAbs()
         dst = dst.Reshape(1, resize.dst.Height)
         ocvb.result2 = dst.Resize(ocvb.result1.Size())
     End Sub

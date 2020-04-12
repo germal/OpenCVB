@@ -152,8 +152,7 @@ Public Class EMax_Basics_CPP : Implements IDisposable
         handleSrc.Free() ' free the pinned memory...
         handleLabels.Free() ' free the pinned memory...
 
-        Dim mask = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        mask = mask.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim mask = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         ocvb.result1.CopyTo(ocvb.result2, mask)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

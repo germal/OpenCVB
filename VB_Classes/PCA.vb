@@ -89,8 +89,7 @@ Public Class PCA_DrawImage : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1 = image.Resize(ocvb.result1.Size())
-        Dim gray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        gray = gray.Threshold(50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
+        Dim gray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
         Dim hierarchy() As cv.HierarchyIndex = Nothing
         Dim contours As cv.Point()() = Nothing
         cv.Cv2.FindContours(gray, contours, hierarchy, cv.RetrievalModes.List, cv.ContourApproximationModes.ApproxNone)

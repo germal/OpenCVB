@@ -106,8 +106,7 @@ Public Class Filter_SepFilter2D : Implements IDisposable
         If check.Box(0).Checked Then
             Dim graySep = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim grayGauss = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            ocvb.result2 = graySep - grayGauss
-            ocvb.result2 = ocvb.result2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            ocvb.result2 = (graySep - grayGauss).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
             ocvb.label2 = "Gaussian - SepFilter2D " + CStr(ocvb.result2.CountNonZero()) + " pixels different."
         Else
             ocvb.label2 = "SepFilter2D Result"

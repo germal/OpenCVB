@@ -153,8 +153,7 @@ Public Class ML_DepthFromColor_MT : Implements IDisposable
 
         Dim predictedDepth As New cv.Mat(depth32f.Size(), cv.MatType.CV_32F, 0)
 
-        mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-        mask.ConvertTo(mask, cv.MatType.CV_8U)
+        mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         dilate.src = mask
         dilate.Run(ocvb)
         mask = ocvb.result1
@@ -244,8 +243,7 @@ Public Class ML_DepthFromColor : Implements IDisposable
         colorizer.Run(ocvb)
         mats.mat(3) = colorizer.dst.Clone()
 
-        mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary)
-        mask.ConvertTo(mask, cv.MatType.CV_8U)
+        mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         Dim maskCount = mask.CountNonZero()
         ocvb.result1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -334,8 +332,7 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
         colorizer.Run(ocvb)
         mats.mat(3) = colorizer.dst.Clone()
 
-        mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary)
-        mask.ConvertTo(mask, cv.MatType.CV_8U)
+        mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         Dim maskCount = mask.CountNonZero()
         ocvb.result1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -423,8 +420,7 @@ Public Class ML_EdgeDepth : Implements IDisposable
 
         Dim predictedDepth As New cv.Mat(depth32f.Size(), cv.MatType.CV_32F, 0)
 
-        mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-        mask.ConvertTo(mask, cv.MatType.CV_8U)
+        mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         dilate.src = mask
         dilate.Run(ocvb)
         ocvb.result1 = dilate.src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

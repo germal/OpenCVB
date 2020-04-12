@@ -533,9 +533,7 @@ Public Class kMeans_Depth_FG_BG : Implements IDisposable
         ' If depthCenters.At(Of Single)(0, 0) > 20000 Or depthCenters.At(Of Single)(1, 0) > 20000 Then Exit Sub
 
         Dim mask = labels.InRange(foregroundLabel, foregroundLabel)
-        Dim shadow = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-        Dim shadowMask As New cv.Mat
-        shadow.ConvertTo(shadowMask, cv.MatType.CV_8U)
+        Dim shadowMask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         mask.SetTo(0, shadowMask)
         ocvb.result1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub

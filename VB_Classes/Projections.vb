@@ -206,8 +206,7 @@ Public Class Projections_GravityVB : Implements IDisposable
         vertSplit(1) = xz(4) * split(0) + xz(5) * split(1) + xz(6) * split(2)
         vertSplit(2) = xz(8) * split(0) + xz(9) * split(1) + xz(10) * split(2)
 
-        Dim mask = vertSplit(2).Threshold(0.001, 255, cv.ThresholdTypes.Binary)
-        mask = mask.ConvertScaleAbs()
+        Dim mask = vertSplit(2).Threshold(0.001, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
         cv.Cv2.Normalize(vertSplit(1), vertSplit(1), 0, ocvb.color.Height, cv.NormTypes.MinMax, -1, mask)
 

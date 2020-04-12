@@ -10,8 +10,7 @@ Public Class Fitline_Basics : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         draw.Run(ocvb)
 
-        Dim gray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        gray = gray.Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+        Dim gray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
         Dim contours As cv.Point()()
         contours = cv.Cv2.FindContoursAsArray(gray, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 
@@ -42,16 +41,17 @@ Public Class Fitline_3DBasics_MT : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hlines.Run(ocvb)
-        Dim gray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim mask = gray.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim mask = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         ocvb.result2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.color.CopyTo(ocvb.result1)
         Dim depth32f = getDepth32f(ocvb)
 
+        Dim lines As New List(Of cv.Line3D)
+        Dim nullLine = New cv.Line3D(0, 0, 0, 0, 0, 0)
         Parallel.ForEach(Of cv.Rect)(hlines.grid.roiList,
         Sub(roi)
-            Dim depth = depth32f(roi).Clone()
-            Dim fMask = mask(roi).Clone()
+            Dim depth = depth32f(roi)
+            Dim fMask = mask(roi)
             Dim points As New List(Of cv.Point3f)
             Dim rows = ocvb.color.Rows, cols = ocvb.color.Cols
             For y = 0 To roi.Height - 1
@@ -64,19 +64,24 @@ Public Class Fitline_3DBasics_MT : Implements IDisposable
                     End If
                 Next
             Next
+            Dim line = nullLine
             If points.Count = 0 Then
                 ' save the average color for this roi
                 Dim mean = ocvb.RGBDepth(roi).Mean()
                 mean(0) = 255 - mean(0)
                 ocvb.result2.Rectangle(roi, mean, -1, cv.LineTypes.AntiAlias)
-                Exit Sub
+            Else
+                Dim fitArray = points.ToArray()
+                line = cv.Cv2.FitLine(fitArray, cv.DistanceTypes.L2, 0, 0, 0.01)
             End If
-            Dim fitArray = points.ToArray()
-            Dim line = cv.Cv2.FitLine(fitArray, cv.DistanceTypes.L2, 0, 0, 0.01)
-            If line IsNot Nothing Then
-                HoughShowLines3D(ocvb.result1(roi), line)
-            End If
+            SyncLock lines
+                lines.Add(line)
+            End SyncLock
         End Sub)
+        ' putting this in the parallel for above causes a memory leak - could not find it...
+        For i = 0 To hlines.grid.roiList.Count - 1
+            houghShowLines3D(ocvb.result1(hlines.grid.roiList(i)), lines.ElementAt(i))
+        Next
         ocvb.result1.SetTo(cv.Scalar.White, hlines.grid.gridMask)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

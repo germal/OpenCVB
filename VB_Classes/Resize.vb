@@ -22,9 +22,7 @@ Public Class Resize_Options : Implements IDisposable
 
             ocvb.result1 = ocvb.color(roi).Resize(ocvb.result1.Size(), 0, 0, resizeFlag)
 
-            ocvb.result2 = ocvb.color(roi).Resize(ocvb.result1.Size(), 0, 0, cv.InterpolationFlags.Cubic)
-            ocvb.result2 -= ocvb.result1
-            ocvb.result2 = ocvb.result2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            ocvb.result2 = (ocvb.color(roi).Resize(ocvb.result1.Size(), 0, 0, cv.InterpolationFlags.Cubic) - ocvb.result1).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
             ocvb.color.Rectangle(roi, cv.Scalar.White, 1)
         Else
             dst = src.Resize(newSize, 0, 0, resizeFlag)

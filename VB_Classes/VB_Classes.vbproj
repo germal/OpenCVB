@@ -126,7 +126,6 @@
     <Compile Include="Coherence.vb" />
     <Compile Include="Concat.vb" />
     <Compile Include="Dither.vb" />
-    <Compile Include="EigenLib.vb" />
     <Compile Include="EMax.vb" />
     <Compile Include="Emgu.vb" />
     <Compile Include="Entropy.vb" />

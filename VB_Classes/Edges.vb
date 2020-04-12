@@ -234,8 +234,7 @@ Public Class Edges_RandomForest_CPP : Implements IDisposable
 
             Dim dstData(ocvb.color.Total - 1) As Byte
             Marshal.Copy(gray8u, dstData, 0, dstData.Length)
-            ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, dstData)
-            ocvb.result1 = ocvb.result1.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
+            ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, dstData).Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
