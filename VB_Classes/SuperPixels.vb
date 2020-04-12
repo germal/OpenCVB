@@ -101,7 +101,7 @@ Public Class SuperPixel_Depth : Implements IDisposable
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        pixels.src = ocvb.RGBDepth
+        pixels.src = ocvb.RGBDepth.Clone()
         pixels.Run(ocvb)
         ocvb.result1 = pixels.dst1
         ocvb.result2 = pixels.dst2

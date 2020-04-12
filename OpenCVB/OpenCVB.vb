@@ -781,6 +781,14 @@ Public Class OpenCVB
             camera.GetNextFrame()
 
             cameraRefresh = True
+            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+            Dim totalBytesOfMemoryUsed = currentProcess.WorkingSet64
+            Static frames As Integer
+            If frames Mod 100 = 0 Then Console.WriteLine("memory used = " + Format(CInt(totalBytesOfMemoryUsed / 1000000), "###,##0") + "MB")
+            If totalBytesOfMemoryUsed / 1000000 > 2000 Then
+                Console.WriteLine("Memory leak!")
+            End If
+            frames += 1
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
         camera.frameCount = 0
