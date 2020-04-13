@@ -75,6 +75,9 @@ Public Class CameraD400
         w = width
         h = height
         If OpenCVB.USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth") > 0 Then IMU_Present = True
+        Dim ctx As New rs.Context
+        Dim Devices = ctx.QueryDevices()
+        Console.WriteLine("The current librealsense version is " + ctx.Version())
 
         cPtr = D400Open(width, height, IMU_Present)
 

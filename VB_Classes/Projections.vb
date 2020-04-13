@@ -17,6 +17,8 @@ Module Projections
     Public Sub SimpleProjectionClose(cPtr As IntPtr)
     End Sub
 
+
+
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Projections_Gravity_Open(filename As String) As IntPtr
     End Function
@@ -28,6 +30,22 @@ Module Projections
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Projections_Gravity_Run(cPtr As IntPtr, xPtr As IntPtr, yPtr As IntPtr, zPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
+    End Function
+
+
+
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Projections_GravityHist_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Projections_GravityHist_Close(cPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Projections_GravityHist_Side(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Projections_GravityHist_Run(cPtr As IntPtr, xPtr As IntPtr, yPtr As IntPtr, zPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
     End Function
 End Module
 
@@ -259,9 +277,11 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
     Dim imu As IMU_AnglesToGravity
     Dim sliders As New OptionsSliders
     Dim cPtr As IntPtr
+    Dim histPtr As IntPtr
     Dim xBytes() As Byte
     Dim yBytes() As Byte
     Dim zBytes() As Byte
+    Public histogramRun As Boolean
     Public Sub New(ocvb As AlgorithmData)
         imu = New IMU_AnglesToGravity(ocvb)
         imu.result = RESULT2
@@ -275,6 +295,7 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
             MsgBox("The colormaps have moved!  Projections_Gravity_CPP won't work." + vbCrLf + "Look for this file:" + fileInfo.FullName)
         End If
         cPtr = Projections_Gravity_Open(fileInfo.FullName)
+        histPtr = Projections_GravityHist_Open()
 
         ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
     End Sub
@@ -321,23 +342,59 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
         Dim handleY = GCHandle.Alloc(yBytes, GCHandleType.Pinned)
         Dim handleZ = GCHandle.Alloc(zBytes, GCHandleType.Pinned)
 
-        Dim imagePtr = Projections_Gravity_Run(cPtr, handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, handleZ.AddrOfPinnedObject,
+        Dim imagePtr As IntPtr
+        If histogramRun Then
+            imagePtr = Projections_GravityHist_Run(histPtr, handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, handleZ.AddrOfPinnedObject,
                                                maxZ, vertSplit(2).Height, vertSplit(2).Width)
 
-        ocvb.result1 = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
-        ocvb.result2 = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_8UC3, Projections_Gravity_Side(cPtr)).Clone()
+            Dim histTop = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_32F, imagePtr).Clone()
+            Dim histSide = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_32F, Projections_GravityHist_Side(histPtr)).Clone()
+
+            ocvb.result1 = histTop.Normalize(255).ConvertScaleAbs()
+            ocvb.result2 = histSide.Normalize(255).ConvertScaleAbs()
+
+            ocvb.label1 = "Top View - normalized"
+            ocvb.label2 = "Side View - normalized"
+        Else
+            imagePtr = Projections_Gravity_Run(cPtr, handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, handleZ.AddrOfPinnedObject,
+                                               maxZ, vertSplit(2).Height, vertSplit(2).Width)
+
+            ocvb.result1 = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
+            ocvb.result2 = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_8UC3, Projections_Gravity_Side(cPtr)).Clone()
+
+            ocvb.label1 = "Top View (looking down)"
+            ocvb.label2 = "Side View"
+        End If
 
         handleX.Free()
         handleY.Free()
         handleZ.Free()
-
-        ocvb.label1 = "Top View (looking down)"
-        ocvb.label2 = "Side View"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         imu.Dispose()
         sliders.Dispose()
         Projections_Gravity_Close(cPtr)
+        Projections_GravityHist_Close(histPtr)
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Projections_GravityHistogram : Implements IDisposable
+    Dim gravity As Projections_Gravity_CPP
+    Public Sub New(ocvb As AlgorithmData)
+        gravity = New Projections_Gravity_CPP(ocvb)
+        gravity.histogramRun = True
+
+        ocvb.desc = "Use the top/down projection to create a histogram of 3D points"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        gravity.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        gravity.Dispose()
+    End Sub
+End Class

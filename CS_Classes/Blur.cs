@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using cv = OpenCvSharp;
-using System.Drawing;
+﻿using cv = OpenCvSharp;
 namespace CS_Classes
 {
     public class CS_BlurGaussian

@@ -195,6 +195,7 @@
     <Compile Include="Mat.vb" />
     <Compile Include="MatchTemplate.vb" />
     <Compile Include="Math.vb" />
+    <Compile Include="MatrixInverse.vb" />
     <Compile Include="MeanShift.vb" />
     <Compile Include="MeanSubtraction.vb" />
     <Compile Include="ML.vb" />

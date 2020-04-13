@@ -43,7 +43,8 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-SimpleProjection * SimpleProjectionOpen() {
+SimpleProjection * SimpleProjectionOpen() 
+{
 	SimpleProjection* cPtr = new SimpleProjection();
 	return cPtr;
 }
@@ -81,7 +82,7 @@ private:
 public:
 	Mat xDistance, yDistance, zDistance, viewTop, viewSide, top16u, side16u;
 	Depth_Colorizer2OLD* colorizePtr;
-	Projections_Gravity() {}
+	Projections_Gravity() : colorizePtr{ NULL } {}
 
 	void Run(float maxZ, int w, int h)
 	{
@@ -101,7 +102,7 @@ public:
 					if (fx > -zHalf && fx < zHalf)
 					{
 						float dx = range * (zHalf + fx) / maxZ; // maintain a 1:1 aspect ratio
-						if (dx > 0 && dx < range) top16u.at<ushort>((int)(range - dpixel), (int) dx) = int(255 * d / maxZ);
+						if (dx > 0 && dx < range) top16u.at<ushort>((int)(range - dpixel), (int)dx) = int(255 * d / maxZ);
 					}
 
 					float fy = yDistance.at<float>(y, x);
@@ -129,7 +130,8 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-Projections_Gravity * Projections_Gravity_Open(LPSTR fileName) {
+Projections_Gravity * Projections_Gravity_Open(LPSTR fileName) 
+{
 	Projections_Gravity* cPtr = new Projections_Gravity();
 	cPtr->colorizePtr = new Depth_Colorizer2OLD();
 	return cPtr;
@@ -158,4 +160,84 @@ int* Projections_Gravity_Run(Projections_Gravity * cPtr, int* xPtr, int* yPtr, i
 	cPtr->side16u = Mat(rows, cols, CV_16U).setTo(0);
 	cPtr->Run(maxZ, cols, rows);
 	return (int*)cPtr->viewTop.data;
+}
+
+
+
+
+
+
+
+
+
+
+class Projections_GravityHistogram
+{
+private:
+public:
+	Mat xDistance, yDistance, zDistance, histTop, histSide;
+	Projections_GravityHistogram() {}
+
+	void Run(float maxZ, int w, int h)
+	{
+		float zHalf = maxZ / 2;
+		float range = (float)h;
+
+#pragma omp parallel for
+		for (int y = 0; y < zDistance.rows; ++y)
+		{
+			for (int x = 0; x < zDistance.cols; ++x)
+			{
+				float d = zDistance.at<float>(y, x);
+				if (d > 0 and d < maxZ)
+				{
+					float fx = xDistance.at<float>(y, x);
+					float dpixel = range * d / maxZ;
+					if (fx > -zHalf && fx < zHalf)
+					{
+						float dx = range * (zHalf + fx) / maxZ; // maintain a 1:1 aspect ratio
+						if (dx > 0 && dx < range) histTop.at<float>((int)(range - dpixel), (int)dx) += 1;
+					}
+
+					float fy = yDistance.at<float>(y, x);
+					if (fy > -zHalf && fy < zHalf)
+					{
+						float dy = range * (zHalf + fy) / maxZ; // maintain a 1:1 aspect ratio
+						if (dy < range && dy > 0) histSide.at<float>(int(dy), (int)dpixel) += 1;
+					}
+				}
+			}
+		}
+	}
+};
+
+extern "C" __declspec(dllexport)
+Projections_GravityHistogram* Projections_GravityHist_Open() 
+{
+	Projections_GravityHistogram* cPtr = new Projections_GravityHistogram();
+	return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+void Projections_GravityHist_Close(Projections_GravityHistogram * cPtr)
+{
+	delete cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Projections_GravityHist_Side(Projections_GravityHistogram * cPtr)
+{
+	return (int*)cPtr->histSide.data;
+}
+
+extern "C" __declspec(dllexport)
+int* Projections_GravityHist_Run(Projections_GravityHistogram * cPtr, int* xPtr, int* yPtr, int* zPtr, float maxZ, int rows, int cols)
+{
+	cPtr->xDistance = Mat(rows, cols, CV_32F, xPtr);
+	cPtr->yDistance = Mat(rows, cols, CV_32F, yPtr);
+	cPtr->zDistance = Mat(rows, cols, CV_32F, zPtr);
+	cPtr->histTop = Mat(rows, cols, CV_32F).setTo(0);
+	cPtr->histSide = Mat(rows, cols, CV_32F).setTo(0);
+	cPtr->Run(maxZ, cols, rows);
+	return (int*)cPtr->histTop.data;
 }
