@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <algorithm>
+#include "example.hpp"
 #include <opencv2/core.hpp>
 #include <opencv2/calib3d.hpp>
 #include "opencv2/imgproc.hpp"
@@ -38,9 +39,6 @@ public:
 	}
 };
 
-
-
-
 class t265Camera
 {
 public:
@@ -54,6 +52,8 @@ public:
 	double IMU_TimeStamp;
 	rs2::pipeline pipeline;
 	DepthXYZ* dxyz;
+	float3 *gyro_data;
+	float3 *accel_data;
 
 private:
 	int width, height;
@@ -173,6 +173,13 @@ public:
 		auto frameset = pipeline.wait_for_frames(1000);
 		auto f = frameset.first_or_default(RS2_STREAM_POSE);
 		IMU_TimeStamp = f.get_timestamp();
+		pose_data = f.as<rs2::pose_frame>().get_pose_data(); // Cast the frame to pose_frame and get its data
+
+		// Cast the frame that arrived to motion frame
+		auto accel = frameset.first_or_default(RS2_STREAM_ACCEL);
+		accel_data = (float3 *) accel.get_data();
+		auto gyro = frameset.first_or_default(RS2_STREAM_GYRO);
+		gyro_data = (float3*)gyro.get_data();
 
 		Mat disp16s, tmpColor, remapLeft, remapRight;
 
@@ -212,9 +219,6 @@ public:
 		normalize(split[2], split[2], 0, 255, NORM_MINMAX); // normalize the depth to values between 0-255
 		split[2] = 255 - split[2];
 		convertScaleAbs(split[2], depth8u(rectDepth), 1);
-
-		// Cast the frame to pose_frame and get its data
-		pose_data = f.as<rs2::pose_frame>().get_pose_data();
 	}
 };
 
@@ -280,6 +284,18 @@ extern "C" __declspec(dllexport)
 int* T265PoseData(t265Camera * tp)
 {
 	return (int*)&tp->pose_data;
+}
+
+extern "C" __declspec(dllexport)
+int* T265GyroData(t265Camera * tp)
+{
+	return (int*)tp->gyro_data;
+}
+
+extern "C" __declspec(dllexport)
+int* T265AccelData(t265Camera * tp)
+{
+	return (int*)tp->accel_data;
 }
 
 extern "C" __declspec(dllexport)

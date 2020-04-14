@@ -36,6 +36,12 @@ Module T265_Module_CPP
     Public Function T265PoseData(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265GyroData(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265AccelData(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265PointCloud(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -124,8 +130,8 @@ Public Class CameraT265
 
             Dim q = IMU_Rotation
             IMU_Translation = pose.translation
-            IMU_Acceleration = pose.acceleration
-            IMU_Velocity = pose.velocity
+            IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(T265AccelData(cPtr))
+            IMU_Velocity = Marshal.PtrToStructure(Of cv.Point3f)(T265GyroData(cPtr))
             IMU_AngularAcceleration = pose.angularAcceleration
             IMU_AngularVelocity = pose.angularVelocity
             Dim t = IMU_Translation

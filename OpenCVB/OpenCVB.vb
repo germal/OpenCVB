@@ -208,6 +208,7 @@ Public Class OpenCVB
         ' check for the T265 last as it seems to take longer to be recognized by the USB controller.  If first, it was not found on my machine!
         cameraT265 = New CameraT265()
         cameraT265.deviceCount = USBenumeration("T265")
+        If cameraT265.devicecount = 0 Then cameraT265.deviceCount = USBenumeration("Movidius MA2X5X")
         If cameraT265.deviceCount > 0 Then
             cameraT265.initialize(fps, regWidth, regHeight)
             optionsForm.cameraTotalCount += 1
