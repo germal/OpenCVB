@@ -244,6 +244,7 @@ findChessboardCorners
 findChessboardCornersSB
 findCirclesGrid
 findContours
+FindContoursAsArray
 findEssentialMat
 findFundamentalMat
 findHomography

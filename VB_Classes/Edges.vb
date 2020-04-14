@@ -23,20 +23,14 @@ Public Class Edges_Canny : Implements IDisposable
         Dim aperture = sliders.TrackBar3.Value
         If aperture Mod 2 = 0 Then aperture += 1
         If externalUse = False Then
-            Static useRegularSrc As Boolean = False
-            If src Is Nothing Or useRegularSrc Then
-                useRegularSrc = True
-                src = ocvb.color.Clone
-            End If
+            src = ocvb.color.Clone
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            dst = gray.Canny(threshold1, threshold2, aperture, False)
-            If useRegularSrc = True Then
-                ocvb.result1 = dst.Clone()
-                ocvb.result2 = gray.Canny(threshold1, threshold2, aperture, True)
-            End If
+            ocvb.result1 = gray.Canny(threshold1, threshold2, aperture, False)
+            ocvb.result2 = gray.Canny(threshold1, threshold2, aperture, True)
         Else
-            Dim gray = ocvb.color.Clone.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            dst = gray.Canny(threshold1, threshold2, aperture, False)
+            If src.Channels = 3 Then dst = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst = src.Canny(threshold1, threshold2, aperture, False)
+            cv.Cv2.ImShow("dst", dst)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -68,6 +62,7 @@ Public Class Edges_CannyAndShadow : Implements IDisposable
         ocvb.label2 = "Edges in color and depth no dilate"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        canny.src = ocvb.color.Clone()
         canny.Run(ocvb)
         shadow.Run(ocvb)
 

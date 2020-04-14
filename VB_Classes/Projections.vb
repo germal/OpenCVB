@@ -288,6 +288,7 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
         imu.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
+        sliders.setupTrackBar2(ocvb, "Threshold for histogram Count", 1, 100, 10)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         Dim fileInfo As New FileInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps/colorscale_jet.jpg")
@@ -347,11 +348,12 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
             imagePtr = Projections_GravityHist_Run(histPtr, handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, handleZ.AddrOfPinnedObject,
                                                maxZ, vertSplit(2).Height, vertSplit(2).Width)
 
-            Dim histTop = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_32F, imagePtr).Clone()
-            Dim histSide = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_32F, Projections_GravityHist_Side(histPtr)).Clone()
+            Dim histTop = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_32F, imagePtr)
+            Dim histSide = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_32F, Projections_GravityHist_Side(histPtr))
 
-            ocvb.result1 = histTop.Normalize(255).ConvertScaleAbs()
-            ocvb.result2 = histSide.Normalize(255).ConvertScaleAbs()
+            Dim threshold = sliders.TrackBar2.Value
+            ocvb.result1 = histTop.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+            ocvb.result2 = histSide.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
             ocvb.label1 = "Top View - normalized"
             ocvb.label2 = "Side View - normalized"
@@ -384,7 +386,7 @@ End Class
 
 
 Public Class Projections_GravityHistogram : Implements IDisposable
-    Dim gravity As Projections_Gravity_CPP
+    Public gravity As Projections_Gravity_CPP
     Public Sub New(ocvb As AlgorithmData)
         gravity = New Projections_Gravity_CPP(ocvb)
         gravity.histogramRun = True
@@ -393,6 +395,38 @@ Public Class Projections_GravityHistogram : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         gravity.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        gravity.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Projections_GravityFitline : Implements IDisposable
+    Dim hough As Hough_Lines
+    Dim gravity As Projections_GravityHistogram
+    Public Sub New(ocvb As AlgorithmData)
+        gravity = New Projections_GravityHistogram(ocvb)
+
+        hough = New Hough_Lines(ocvb)
+        hough.externalUse = True
+
+        ocvb.desc = "Use Fitline on the image of top and side thresholded projections"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        gravity.Run(ocvb)
+        Dim viewTop = ocvb.result1
+        Dim viewSide = ocvb.result2
+
+        hough.src = viewTop
+        hough.Run(ocvb)
+
+        ocvb.result1 = ocvb.color
+
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         gravity.Dispose()

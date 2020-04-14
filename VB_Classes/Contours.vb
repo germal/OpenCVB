@@ -1,9 +1,12 @@
 ﻿Imports cv = OpenCvSharp
 
 Public Class Contours_Basics : Implements IDisposable
-    Dim rotatedRect As Draw_rotatedRectangles
-    Dim radio1 As New OptionsRadioButtons
-    Dim radio2 As New OptionsRadioButtons
+    Public rotatedRect As Draw_rotatedRectangles
+    Public radio1 As New OptionsRadioButtons
+    Public radio2 As New OptionsRadioButtons
+    Public externalUse As Boolean
+    Public src As New cv.Mat
+    Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         radio1.Setup(ocvb, 5)
         radio1.Text = "Retrieval Mode Options"
@@ -46,20 +49,22 @@ Public Class Contours_Basics : Implements IDisposable
             End If
         Next
 
-        Dim img As New cv.Mat(ocvb.result1.Size(), cv.MatType.CV_8UC1)
-        rotatedRect.Run(ocvb)
-        img = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+        If externalUse = False Then
+            src = New cv.Mat(ocvb.result1.Size(), cv.MatType.CV_8UC1)
+            rotatedRect.Run(ocvb)
+            src = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+        End If
+
+        dst = New cv.Mat(ocvb.result2.Size(), cv.MatType.CV_8UC1, 0)
 
         Dim contours0 As cv.Point()()
         If retrievalMode = cv.RetrievalModes.FloodFill Then
             Dim img32sc1 As New cv.Mat
-            img.ConvertTo(img32sc1, cv.MatType.CV_32SC1)
+            src.ConvertTo(img32sc1, cv.MatType.CV_32SC1)
             contours0 = cv.Cv2.FindContoursAsArray(img32sc1, retrievalMode, ApproximationMode)
-            img32sc1.ConvertTo(img, cv.MatType.CV_8UC1)
-            ocvb.result2 = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            img32sc1.ConvertTo(dst, cv.MatType.CV_8UC1)
         Else
-            contours0 = cv.Cv2.FindContoursAsArray(img, retrievalMode, ApproximationMode)
-            ocvb.result2.SetTo(0)
+            contours0 = cv.Cv2.FindContoursAsArray(src, retrievalMode, ApproximationMode)
         End If
 
         Dim contours()() As cv.Point = Nothing
@@ -68,7 +73,7 @@ Public Class Contours_Basics : Implements IDisposable
             contours(j) = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
         Next
 
-        cv.Cv2.DrawContours(ocvb.result2, contours, 0, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
+        cv.Cv2.DrawContours(dst, contours, 0, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         rotatedRect.Dispose()

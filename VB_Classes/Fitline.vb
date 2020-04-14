@@ -1,28 +1,51 @@
 ﻿Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/js_contour_features_fitLine.html
 Public Class Fitline_Basics : Implements IDisposable
-    Dim draw As Draw_Line
+    Public draw As Draw_Line
+    Public sliders As New OptionsSliders
+    Public externalUse As Boolean
+    Public src As New cv.Mat
+    Public dst As New cv.Mat
+    Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
     Public Sub New(ocvb As AlgorithmData)
         draw = New Draw_Line(ocvb)
         draw.sliders.TrackBar1.Value = 2
-        ocvb.desc = "Show how Fitline API works.  When overlapping (single contour), the lines are not correctly found."
+
+        sliders.setupTrackBar1(ocvb, "Accuracy for the radius X100", 0, 100, 10)
+        sliders.setupTrackBar2(ocvb, "Accuracy for the angle X100", 0, 100, 10)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        ocvb.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        draw.Run(ocvb)
+        If externalUse = False Then
+            draw.Run(ocvb)
+            src = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+            ocvb.result2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst = ocvb.result2
+        Else
+            If draw.sliders.Visible Then draw.sliders.Visible = False
+            lines.Clear()
+        End If
 
-        Dim gray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
         Dim contours As cv.Point()()
-        contours = cv.Cv2.FindContoursAsArray(gray, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-
-        ocvb.result2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        contours = cv.Cv2.FindContoursAsArray(src, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        Dim radiusAccuracy = sliders.TrackBar1.Value / 100
+        Dim angleAccuracy = sliders.TrackBar2.Value / 100
         For i = 0 To contours.Length - 1
             Dim cnt = contours(i)
-            Dim line2d = cv.Cv2.FitLine(cnt, cv.DistanceTypes.L2, 0, 0, 0.01)
-            Dim lefty = Math.Round((-line2d.X1 * line2d.Vy / line2d.Vx) + line2d.Y1)
-            Dim righty = Math.Round(((ocvb.result2.Cols - line2d.X1) * line2d.Vy / line2d.Vx) + line2d.Y1)
-            Dim p1 = New cv.Point(ocvb.result2.Cols - 1, righty)
-            Dim p2 = New cv.Point(0, lefty)
-            ocvb.result2.Line(p1, p2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            Dim line2d = cv.Cv2.FitLine(cnt, cv.DistanceTypes.L2, 0, radiusAccuracy, angleAccuracy)
+            Dim slope = line2d.Vy / line2d.Vx
+            Dim leftY = Math.Round(-line2d.X1 * slope + line2d.Y1)
+            Dim rightY = Math.Round((ocvb.color.Cols - line2d.X1) * slope + line2d.Y1)
+            Dim p1 = New cv.Point(0, leftY)
+            Dim p2 = New cv.Point(ocvb.color.Cols - 1, rightY)
+            If externalUse Then
+                lines.Add(p1)
+                lines.Add(p2)
+            Else
+                dst.Line(p1, p2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            End If
         Next
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

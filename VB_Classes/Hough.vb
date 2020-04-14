@@ -73,8 +73,11 @@ Public Class Hough_Lines : Implements IDisposable
     Dim edges As Edges_Canny
     Dim sliders As New OptionsSliders
     Public segments() As cv.LineSegmentPolar
+    Public externalUse As Boolean
+    Public src As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         edges = New Edges_Canny(ocvb)
+        edges.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, "theta", 1, 1000, 1000 * Math.PI / 180)
@@ -85,26 +88,34 @@ Public Class Hough_Lines : Implements IDisposable
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
+        If externalUse = False Then src = ocvb.color
+        edges.src = src.Clone()
         edges.Run(ocvb)
-        Dim gray = ocvb.result1.Clone()
+
+        If externalUse = False Then
+            src = ocvb.result1.Clone()
+        Else
+            If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        End If
 
         Dim rhoIn = sliders.TrackBar1.Value
         Dim thetaIn = sliders.TrackBar2.Value / 1000
         Dim threshold = sliders.TrackBar3.Value
 
-        segments = cv.Cv2.HoughLines(gray, rhoIn, thetaIn, threshold)
+        segments = cv.Cv2.HoughLines(src, rhoIn, thetaIn, threshold)
         ocvb.label1 = "Found " + CStr(segments.Length) + " Lines"
 
-        ocvb.color.CopyTo(ocvb.result1)
-        ocvb.color.CopyTo(ocvb.result2)
-        houghShowLines(ocvb.result1, segments, sliders.TrackBar4.Value)
-
-        Dim probSegments = cv.Cv2.HoughLinesP(gray, rhoIn, thetaIn, threshold)
-        For i = 0 To Math.Min(probSegments.Length, sliders.TrackBar4.Value) - 1
-            Dim line = probSegments(i)
-            ocvb.result2.Line(line.P1, line.P2, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
-        Next
-        ocvb.label2 = "Probablistic lines = " + CStr(probSegments.Length)
+        If externalUse = False Then
+            ocvb.color.CopyTo(ocvb.result1)
+            ocvb.color.CopyTo(ocvb.result2)
+            houghShowLines(ocvb.result1, segments, sliders.TrackBar4.Value)
+            Dim probSegments = cv.Cv2.HoughLinesP(src, rhoIn, thetaIn, threshold)
+            For i = 0 To Math.Min(probSegments.Length, sliders.TrackBar4.Value) - 1
+                Dim line = probSegments(i)
+                ocvb.result2.Line(line.P1, line.P2, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
+            Next
+            ocvb.label2 = "Probablistic lines = " + CStr(probSegments.Length)
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         edges.Dispose()

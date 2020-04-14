@@ -168,9 +168,6 @@ int* Projections_Gravity_Run(Projections_Gravity * cPtr, int* xPtr, int* yPtr, i
 
 
 
-
-
-
 class Projections_GravityHistogram
 {
 private:
@@ -183,7 +180,7 @@ public:
 		float zHalf = maxZ / 2;
 		float range = (float)h;
 
-#pragma omp parallel for
+		//#pragma omp parallel for
 		for (int y = 0; y < zDistance.rows; ++y)
 		{
 			for (int x = 0; x < zDistance.cols; ++x)
@@ -212,7 +209,7 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-Projections_GravityHistogram* Projections_GravityHist_Open() 
+Projections_GravityHistogram * Projections_GravityHist_Open()
 {
 	Projections_GravityHistogram* cPtr = new Projections_GravityHistogram();
 	return cPtr;

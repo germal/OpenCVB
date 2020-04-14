@@ -129,6 +129,7 @@ Public Class SuperPixel_WithCanny : Implements IDisposable
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        edges.src = ocvb.color.Clone()
         edges.Run(ocvb)
         pixels.src = ocvb.color.Clone()
         pixels.src.SetTo(cv.Scalar.White, edges.dst)
