@@ -514,7 +514,7 @@ Public Class IMU_AnglesToGravity : Implements IDisposable
         angleY = kalman2.dst(1)
         angleZ = kalman2.dst(2)
 
-        If externaluse = False Then
+        If externalUse = False Then
             Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf
             outStr = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(gx, "#0.0000") + vbCrLf
             outStr += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(gy, "#0.0000") + vbCrLf

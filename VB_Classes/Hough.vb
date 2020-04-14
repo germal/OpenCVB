@@ -92,11 +92,8 @@ Public Class Hough_Lines : Implements IDisposable
         edges.src = src.Clone()
         edges.Run(ocvb)
 
-        If externalUse = False Then
-            src = ocvb.result1.Clone()
-        Else
-            If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        End If
+        If externalUse = False Then src = ocvb.result1.Clone()
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rhoIn = sliders.TrackBar1.Value
         Dim thetaIn = sliders.TrackBar2.Value / 1000

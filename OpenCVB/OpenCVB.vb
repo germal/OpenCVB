@@ -1,13 +1,13 @@
 ﻿
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
-Imports System.Runtime.InteropServices
 Imports System.IO
 Imports System.ComponentModel
 Imports System.Threading
 Imports System.Globalization
 Imports System.Text.RegularExpressions
 Imports System.Environment
+Imports VBTest
 Module opencv_module
     Public bufferLock As New PictureBox ' this is a global lock on the camera buffers.
 End Module
@@ -300,12 +300,14 @@ Public Class OpenCVB
                 Dim maxline = 21
                 For i = 0 To TTtextData(pic.Tag).Count - 1 ' using enumeration here would occasionally generate a mistaken warning.
                     Dim tt = TTtextData(pic.Tag)(i)
-                    g.DrawString(tt.text, New Font(tt.fontName, tt.fontSize), New SolidBrush(white), tt.x, tt.y)
-                    If tt.x >= camPic(pic.Tag).Width Or tt.y >= camPic(pic.Tag).Height Then
-                        Console.WriteLine("TrueType text off image!  " + tt.text + " is being written to " + CStr(tt.x) + " and " + CStr(tt.y))
+                    If tt IsNot Nothing Then
+                        g.DrawString(tt.text, New Font(tt.fontName, tt.fontSize), New SolidBrush(white), tt.x, tt.y)
+                        If tt.x >= camPic(pic.Tag).Width Or tt.y >= camPic(pic.Tag).Height Then
+                            Console.WriteLine("TrueType text off image!  " + tt.text + " is being written to " + CStr(tt.x) + " and " + CStr(tt.y))
+                        End If
+                        maxline -= 1
+                        If maxline <= 0 Then Exit For
                     End If
-                    maxline -= 1
-                    If maxline <= 0 Then Exit For
                 Next
                 If optionsForm.ShowLabels.Checked Then
                     ' with the low resolution display, we need to use the entire width of the image to display the RGB and Depth text area.
@@ -1000,6 +1002,7 @@ Public Class OpenCVB
         BothFirstAndLastReady = False
         OpenCVB.ocvb.fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         OpenCVB.ocvb.fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
+        OpenCVB.ocvb.parms.VBTestInterface = New VBTest.VBTest_Basics(OpenCVB.ocvb)
 
         frameCount = 0 ' restart the count... 
         While 1
@@ -1122,6 +1125,7 @@ Public Class OpenCVB
         Catch ex As Exception
         End Try
 
+        OpenCVB.ocvb.parms.VBTestInterface.Dispose()
         OpenCVB.Dispose()
         frameCount = 0
         If parms.testAllRunning Then

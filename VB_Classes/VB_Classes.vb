@@ -102,7 +102,7 @@ Public Class ActiveClass : Implements IDisposable
         Public FOV As Single()
     End Structure
     Public Structure algorithmParameters
-        Dim activeAlgorithm As String
+        Dim activeAlgorithm As Object
         Dim AvoidDNNCrashes As Boolean
         Dim cameraIndex As Int32
         Dim cameraName As String
@@ -110,6 +110,7 @@ Public Class ActiveClass : Implements IDisposable
         Dim extrinsics As Extrinsics_VB
         Dim height As Int32
         Dim HomeDir As String
+        Dim VBTestInterface As Object
         Dim imageToTrueTypeLoc As Single
         Dim IMU_Barometer As Single
         Dim IMU_Magnetometer As cv.Point3f

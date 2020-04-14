@@ -3,17 +3,14 @@ Imports System.Text.RegularExpressions
 Module UI_GeneratorMain
     Sub Main()
         Dim line As String
-        Dim ExecDir As New DirectoryInfo(My.Application.Info.DirectoryPath)
-        ChDir(ExecDir.FullName)
-
-        Dim directoryInfo As New DirectoryInfo(CurDir() + "/../../vb_classes")
+        Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../../vb_classes")
         Dim fileNames As New List(Of String)
-        Dim fileEntries As String() = Directory.GetFiles(directoryInfo.FullName)
+        Dim fileEntries As String() = Directory.GetFiles(VBcodeDir.FullName)
 
-        Dim pythonAppDir As New IO.DirectoryInfo(directoryInfo.FullName + "/Python/")
+        Dim pythonAppDir As New IO.DirectoryInfo(VBcodeDir.FullName + "/Python/")
 
-        ' we only want to list the python files that are included in the VB_Classes Project.
-        Dim projFile As New FileInfo(directoryInfo.FullName + "/VB_Classes.vbproj")
+        ' we only want to review the python files that are included in the VB_Classes Project.  Other Python files may be support modules or just experiments.
+        Dim projFile As New FileInfo(VBcodeDir.FullName + "/VB_Classes.vbproj")
         Dim readProj = New StreamReader(projFile.FullName)
         While readProj.EndOfStream = False
             line = readProj.ReadLine()
@@ -24,7 +21,7 @@ Module UI_GeneratorMain
                     Dim endName = InStr(line, """")
                     line = Mid(line, 1, endName - 1)
                     line = Mid(line, Len("Python/") + 1)
-                    fileNames.Add(directoryInfo.FullName + "\Python\" + line)
+                    fileNames.Add(VBcodeDir.FullName + "\Python\" + line)
                 End If
             End If
             If Trim(line).StartsWith("<Compile Include=") Then
@@ -33,11 +30,27 @@ Module UI_GeneratorMain
                     line = Mid(line, startname)
                     Dim endName = InStr(line, """")
                     line = Mid(line, 1, endName - 1)
-                    If line.Contains("AlgorithmList.vb") = False And line.Contains("My Project") = False Then fileNames.Add(directoryInfo.FullName + "/" + line)
+                    If line.Contains("AlgorithmList.vb") = False And line.Contains("My Project") = False Then fileNames.Add(VBcodeDir.FullName + "/" + line)
                 End If
-                End If
+            End If
         End While
         readProj.Close()
+
+        'projFile = New FileInfo(VBcodeDir.FullName + "/../VBTest/VBTest.vbproj")
+        'readProj = New StreamReader(projFile.FullName)
+        'While readProj.EndOfStream = False
+        '    line = readProj.ReadLine()
+        '    If Trim(line).StartsWith("<Compile Include=") Then
+        '        If InStr(line, ".vb""") Then
+        '            Dim startname = InStr(line, "=") + 2
+        '            line = Mid(line, startname)
+        '            Dim endName = InStr(line, """")
+        '            line = Mid(line, 1, endName - 1)
+        '            If line.Contains("AlgorithmList.vb") = False And line.Contains("My Project") = False Then fileNames.Add(VBcodeDir.FullName + "/../VBTest/" + line)
+        '        End If
+        '    End If
+        'End While
+        'readProj.Close()
 
         Dim className As String = ""
         Dim functionNames As New List(Of String)
@@ -109,7 +122,7 @@ Module UI_GeneratorMain
         sw.WriteLine("End Class")
         sw.Close()
 
-        Dim textInfo As New FileInfo(directoryInfo.FullName + "/../Data/AlgorithmList.txt")
+        Dim textInfo As New FileInfo(VBcodeDir.FullName + "/../Data/AlgorithmList.txt")
         sw = New StreamWriter(textInfo.FullName)
         sw.WriteLine("CodeLineCount = " + CStr(CodeLineCount))
         For i = 0 To cleanNames.Count - 1
@@ -117,7 +130,7 @@ Module UI_GeneratorMain
         Next
         sw.Close()
 
-        Dim FilesInfo As New FileInfo(directoryInfo.FullName + "/../Data/FileNames.txt")
+        Dim FilesInfo As New FileInfo(VBcodeDir.FullName + "/../Data/FileNames.txt")
         sw = New StreamWriter(FilesInfo.FullName)
         For i = 0 To fileNames.Count - 1
             sw.WriteLine(fileNames.Item(i))

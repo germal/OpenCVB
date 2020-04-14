@@ -99,9 +99,6 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="ZedGraph, Version=5.1.7.430, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZedGraph.5.1.7\lib\net35-Client\ZedGraph.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -273,6 +270,7 @@
     <Compile Include="Tracker.vb" />
     <Compile Include="TransformationMatrix.vb" />
     <Compile Include="Undistort.vb" />
+    <Compile Include="VBTestInterface.vb" />
     <Compile Include="VB_Classes.vb" />
     <Compile Include="OptionsCheckbox.Designer.vb">
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>
@@ -487,8 +485,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PreBuildEvent>$(ProjectDir)\..\bin\Debug\UI_Generator.exe
-$(ProjectDir)\..\bin\Debug\UIindexer.exe
+    <PreBuildEvent>$(ProjectDir)\..\bin\Release\UI_Generator.exe
+$(ProjectDir)\..\bin\Release\UIindexer.exe
 
 </PreBuildEvent>
   </PropertyGroup>
