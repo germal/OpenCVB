@@ -96,8 +96,8 @@ Public Class CameraD400
 
         D400WaitForFrame(cPtr)
 
-        SyncLock bufferLock ' only really need the synclock when in callback mode but it doesn't hurt to waitforframe mode.
-            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, D400Color(cPtr)).Clone() ' must be first!  Prepares the procframes...
+        SyncLock bufferLock
+            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, D400Color(cPtr)).Clone()
 
             Dim accelFrame = D400Accel(cPtr)
             If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
@@ -112,7 +112,7 @@ Public Class CameraD400
             RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, D400RGBDepth(cPtr)).Clone()
             leftView = New cv.Mat(h, w, cv.MatType.CV_8U, D400LeftRaw(cPtr)).Clone()
             rightView = New cv.Mat(h, w, cv.MatType.CV_8U, D400RightRaw(cPtr)).Clone()
-            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, D400PointCloud(cPtr))
+            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, D400PointCloud(cPtr)).Clone()
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End SyncLock
     End Sub

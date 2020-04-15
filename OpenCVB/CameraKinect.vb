@@ -149,7 +149,7 @@ Public Class CameraKinect
             SyncLock bufferLock
                 color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
 
-                RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes)
+                RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes).Clone()
                 ' if you normalize here instead of just a fixed multiply, the image will pulse with different brightness values.  Not pretty.
                 leftView = (New cv.Mat(h, w, cv.MatType.CV_16U, KinectLeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs() ' so depth data fits into 0-255 (approximately)
                 rightView = leftView

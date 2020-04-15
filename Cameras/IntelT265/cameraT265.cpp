@@ -259,9 +259,6 @@ int* T265Extrinsics(t265Camera * tp)
 	return (int*)&tp->extrinsics;
 }
 
-
-
-
 extern "C" __declspec(dllexport)
 int* T265LeftRaw(t265Camera* tp)	
 {
