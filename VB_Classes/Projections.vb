@@ -355,8 +355,8 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
             ocvb.result1 = histTop.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             ocvb.result2 = histSide.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
-            ocvb.label1 = "Top View - normalized"
-            ocvb.label2 = "Side View - normalized"
+            ocvb.label1 = "Top View after threshold"
+            ocvb.label2 = "Side View after threshold"
         Else
             imagePtr = Projections_Gravity_Run(cPtr, handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, handleZ.AddrOfPinnedObject,
                                                maxZ, vertSplit(2).Height, vertSplit(2).Width)
@@ -395,38 +395,6 @@ Public Class Projections_GravityHistogram : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         gravity.Run(ocvb)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        gravity.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Projections_GravityFitline : Implements IDisposable
-    Dim hough As Hough_Lines
-    Dim gravity As Projections_GravityHistogram
-    Public Sub New(ocvb As AlgorithmData)
-        gravity = New Projections_GravityHistogram(ocvb)
-
-        hough = New Hough_Lines(ocvb)
-        hough.externalUse = True
-
-        ocvb.desc = "Use Fitline on the image of top and side thresholded projections"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        gravity.Run(ocvb)
-        Dim viewTop = ocvb.result1
-        Dim viewSide = ocvb.result2
-
-        hough.src = viewTop
-        hough.Run(ocvb)
-
-        ocvb.result1 = ocvb.color
-
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         gravity.Dispose()

@@ -62,11 +62,12 @@ features of these cameras.
 
 The algorithms are notably short, almost always less than a page of code,
 labelled reasonably well, easily searched and grouped and combined, while often
-providing links to online versions for other platforms. Many downloadable
-algorithms are encumbered by environmental considerations that can obscure the
-meaning or context of an algorithm. All the algorithms here contain just the
-algorithm all will work with the supported cameras. Isolating the algorithm
-functionality enables easy adaptation to other environments or platforms.
+providing links to online documentation and versions for other platforms. Many
+downloadable algorithms are encumbered by environmental considerations that can
+obscure the meaning or context of an algorithm. All the algorithms here contain
+just the algorithm and will work with each of the supported cameras. Isolating
+the algorithm functionality enables easy adaptation to other environments or
+platforms.
 
 **Pre-Install Notes**
 
@@ -460,6 +461,16 @@ The following images are a preview of some algorithms’ output.
 
 The top left image is the RGB and top right is depth. Algorithm results are in
 the bottom left and right or additional windows.
+
+![](media/5b39040e639f9b1b09e5039e38b653eb.png)
+
+*OpenGL has an infinite number of ways to view 3D data but in common usage, only
+2 views have names – top down and side views. The “Projection_Gravity” algorithm
+provides a top down view on the bottom left and a side view on the bottom right.
+The images are colored in the same way as the RGB depth image in the upper right
+with yellow indicating proximity to the camera. The aspect ratio of both views
+is 1:1 to provide realistic dimensions and sharp edges. This projection is
+available only with cameras that include an IMU.*
 
 ![](media/cd7e699a6192e4daf1d540a15e35005a.png)
 
