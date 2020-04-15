@@ -114,7 +114,7 @@ Public Class CameraT265
 
         T265WaitFrame(cPtr)
 
-        SyncLock bufferLock ' only really need the synclock when in callback mode but it doesn't hurt to waitforframe mode.
+        SyncLock bufferLock
             Dim posePtr = T265PoseData(cPtr)
             Dim pose = Marshal.PtrToStructure(Of PoseData)(posePtr)
             IMU_TimeStamp = T265IMUTimeStamp(cPtr)
@@ -123,7 +123,6 @@ Public Class CameraT265
 
             IMU_RotationVector = New cv.Point3f(pose.rotation.X, pose.rotation.Y, pose.rotation.Z)
 
-            ' the T265 doesn't provide the rotation matrix so we provide it with this Rodriques calculation
             Dim src As New cv.Mat(3, 1, cv.MatType.CV_32F, IMU_RotationVector)
             Dim dst As New cv.Mat(3, 3, src.Type, IMU_RotationMatrix)
             cv.Cv2.Rodrigues(src, dst)
@@ -143,10 +142,10 @@ Public Class CameraT265
                         t.X, t.Y, t.Z, 1.0}
             transformationMatrix = mat
 
-            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265Color(cPtr))
+            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265Color(cPtr)).Clone()
 
-            Dim right = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265RightRaw(cPtr))
-            Dim left = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265LeftRaw(cPtr))
+            Dim right = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265RightRaw(cPtr)).Clone()
+            Dim left = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265LeftRaw(cPtr)).Clone()
 
             rightView(rawDstRect) = right(rawSrcRect)
             leftView(rawDstRect) = left(rawSrcRect)

@@ -7,13 +7,13 @@ Public Class Surf_Basics_CS : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Public sliders As New OptionsSliders
     Public CS_SurfBasics As New CS_SurfBasics
-    Dim fisheye As FishEye_Basics
+    Dim fisheye As FishEye_Rectified
     Public srcLeft As New cv.Mat
     Public srcRight As New cv.Mat
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
-        fisheye = New FishEye_Basics(ocvb)
+        fisheye = New FishEye_Rectified(ocvb)
         fisheye.externalUse = True
 
         radio.Setup(ocvb, 2)
@@ -39,17 +39,14 @@ Public Class Surf_Basics_CS : Implements IDisposable
                 srcRight = ocvb.rightView
             End If
         End If
-        dst = New cv.Mat(srcLeft.Rows, srcLeft.Cols * 2, cv.MatType.CV_8UC3)
-
         CS_SurfBasics.Run(srcLeft, srcRight, dst, sliders.TrackBar1.Value, radio.check(0).Checked)
 
-        ' resize is needed for the T265
-        If dst.Width <> ocvb.color.Width * 2 Then dst = dst.Resize(New cv.Size(ocvb.color.Width * 2, srcLeft.Height))
+        'If dst.Width <> ocvb.color.Width * 2 Then dst = dst.Resize(New cv.Size(ocvb.color.Width * 2, srcLeft.Height))
         If externalUse = False Then
             dst(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(ocvb.result1)
             dst(New cv.Rect(ocvb.color.Width, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(ocvb.result2)
             ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
-            ocvb.label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
+            If CS_SurfBasics.keypoints1 IsNot Nothing Then ocvb.label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -64,146 +61,38 @@ End Class
 
 
 
+' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Surf_Basics : Implements IDisposable
-    Dim grid As Thread_Grid
     Dim surf As Surf_Basics_CS
-    Dim fisheye As FishEye_Basics
+    Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData)
-        fisheye = New FishEye_Basics(ocvb)
+        fisheye = New FishEye_Rectified(ocvb)
         fisheye.externalUse = True
 
         surf = New Surf_Basics_CS(ocvb)
         surf.externalUse = True
 
-        grid = New Thread_Grid(ocvb)
-        grid.externalUse = True
-        grid.sliders.TrackBar1.Value = ocvb.color.Width
-
-        ' The Surf OpenCV code is not reentrant.  There is some interference between threads.  This reduces it!
-        ' To experiments with the problem, vary the height to be lower and observe that the bottom of the image is chaotically updated.
-        grid.sliders.TrackBar2.Value = 72
-        If ocvb.parms.cameraIndex = T265Camera Then grid.sliders.TrackBar2.Value = 144
-
         ocvb.desc = "Use left and right views to match points in horizontal slices."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        grid.sliders.TrackBar1.Value = ocvb.color.Width
-        grid.Run(ocvb)
-
         If ocvb.parms.cameraIndex = T265Camera Then fisheye.Run(ocvb)
 
-        Dim roilist = grid.roiList
-        For i = 0 To roilist.Count - 1
-            Dim roi = roilist(i)
-            If ocvb.parms.cameraIndex = T265Camera Then
-                surf.srcLeft = fisheye.leftView(roi).Clone()
-                surf.srcRight = fisheye.rightView(roi).Clone()
-            Else
-                ocvb.leftView(roi).CopyTo(surf.srcLeft)
-                ocvb.rightView(roi).CopyTo(surf.srcRight)
-            End If
-            surf.Run(ocvb)
-            surf.dst(New cv.Rect(0, 0, roi.Width, roi.Height)).CopyTo(ocvb.result1(roi))
-            surf.dst(New cv.Rect(roi.Width, 0, roi.Width, roi.Height)).CopyTo(ocvb.result2(roi))
-        Next
+        If ocvb.parms.cameraIndex = T265Camera Then
+            surf.srcLeft = fisheye.leftView
+            surf.srcRight = fisheye.rightView
+        Else
+            surf.srcLeft = ocvb.leftView
+            surf.srcRight = ocvb.rightView
+        End If
+        surf.Run(ocvb)
+        surf.dst(New cv.Rect(0, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(ocvb.result1)
+        surf.dst(New cv.Rect(surf.srcLeft.Width, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(ocvb.result2)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        grid.Dispose()
         surf.Dispose()
         fisheye.Dispose()
     End Sub
 End Class
-
-
-
-
-
-
-' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Surf_Basics_MT : Implements IDisposable
-    Dim radio As New OptionsRadioButtons
-    Dim grid As Thread_Grid
-    Dim surfs(0) As Surf_Basics_CS
-    Dim fisheye As FishEye_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        fisheye = New FishEye_Basics(ocvb)
-        fisheye.externalUse = True
-
-        grid = New Thread_Grid(ocvb)
-        grid.externalUse = True
-        grid.sliders.TrackBar1.Value = ocvb.color.Width
-
-        ' The Surf OpenCV code is not reentrant.  There is some interference between threads.  This reduces it!
-        ' To experiments with the problem, vary the height to be lower and observe that the bottom of the image is chaotically updated.
-        grid.sliders.TrackBar2.Value = 72
-        If ocvb.parms.cameraIndex = T265Camera Then grid.sliders.TrackBar2.Value = 144
-
-        radio.Setup(ocvb, 2)
-        radio.check(0).Text = "Use BF Matcher"
-        radio.check(1).Text = "Use Flann Matcher"
-        radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
-        ocvb.parms.ShowOptions = False ' this turns off all the options form for the algorithm
-
-        ocvb.desc = "A multi-threaded version of the Surf algorithm"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        grid.sliders.TrackBar1.Value = ocvb.color.Width
-        grid.Run(ocvb)
-
-        Dim threads = grid.roiList.Count ' the number of threads is the number of horizontal slices in the image.
-        If surfs.Count <> threads Then
-            For i = 0 To surfs.Count - 1
-                If surfs(i) IsNot Nothing Then surfs(i).Dispose()
-            Next
-            ReDim surfs(threads - 1)
-            For i = 0 To surfs.Count - 1
-                surfs(i) = New Surf_Basics_CS(ocvb)
-                surfs(i).externalUse = True
-                surfs(i).radio.check(0).Checked = If(radio.check(0).Checked, 1, 0)
-                surfs(i).radio.check(1).Checked = If(radio.check(1).Checked, 1, 0)
-            Next
-        End If
-
-        If ocvb.parms.cameraIndex = T265Camera Then fisheye.Run(ocvb)
-
-        Dim result1 = ocvb.result1.Clone()
-        Dim result2 = ocvb.result2.Clone()
-        Parallel.For(0, grid.roiList.Count - 1,
-        Sub(i)
-            Dim roi = grid.roiList(i)
-            If ocvb.parms.cameraIndex = T265Camera Then
-                surfs(i).srcLeft = fisheye.leftView(roi)
-                surfs(i).srcRight = fisheye.rightView(roi)
-            Else
-                surfs(i).srcLeft = ocvb.leftView(roi)
-                surfs(i).srcRight = ocvb.rightView(roi)
-            End If
-            surfs(i).Run(ocvb)
-            Dim leftRect = New cv.Rect(0, 0, roi.Width, roi.Height)
-            Dim rightRect = New cv.Rect(roi.Width, 0, roi.Width, roi.Height)
-            If roi.Height = grid.roiList(0).Height Then
-                result1(roi) = surfs(i).dst(leftRect)
-                result2(roi) = surfs(i).dst(rightRect)
-            End If
-        End Sub)
-
-        ocvb.result1 = result1.Clone()
-        ocvb.result2 = result2.Clone()
-        ocvb.label2 = If(radio.check(0).Checked, "Right VIew - BF Matcher output", "Right View - Flann Matcher output")
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        grid.Dispose()
-        For i = 0 To surfs.Count - 1
-            If surfs(i) IsNot Nothing Then surfs(i).Dispose()
-        Next
-        fisheye.Dispose()
-        radio.Dispose()
-    End Sub
-End Class
-
-
 
 
 
@@ -228,25 +117,28 @@ Public Class Surf_DrawMatchManual_CS : Implements IDisposable
         ocvb.result2 = surf.srcRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim keys1 = surf.CS_SurfBasics.keypoints1
         Dim keys2 = surf.CS_SurfBasics.keypoints2
+
         For i = 0 To keys1.Count - 1
             ocvb.result1.Circle(keys1(i).Pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
-        For i = 0 To keys2.Count - 1
-            ocvb.result2.Circle(keys2(i).Pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        Next
+
         Dim matchCount As Integer
         For i = 0 To keys1.Count - 1
             Dim pt = keys1(i).Pt
             For j = 0 To keys2.Count - 1
-                If Math.Abs(keys2(j).Pt.Y - pt.Y) < sliders.TrackBar1.Value Then
-                    ocvb.result1.Circle(pt, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                If Math.Abs(keys2(j).Pt.X - pt.X) < sliders.TrackBar1.Value And Math.Abs(keys2(j).Pt.Y - pt.Y) < sliders.TrackBar1.Value Then
                     ocvb.result2.Circle(keys2(j).Pt, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
                     keys2(j).Pt.Y = -1 ' so we don't match it again.
                     matchCount += 1
                 End If
             Next
         Next
-        ocvb.label2 = "Right View - " + CStr(matchCount) + " matches"
+        ' mark those that were not 
+        For i = 0 To keys2.Count - 1
+            Dim pt = keys2(i).Pt
+            If pt.Y <> -1 Then ocvb.result2.Circle(keys2(i).Pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        Next
+        ocvb.label2 = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         surf.Dispose()

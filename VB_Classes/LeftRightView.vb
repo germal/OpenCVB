@@ -38,9 +38,9 @@ End Class
 
 Public Class LeftRightView_CompareUndistorted : Implements IDisposable
     Public sliders As New OptionsSliders
-    Public fisheye As FishEye_Basics
+    Public fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData)
-        fisheye = New FishEye_Basics(ocvb)
+        fisheye = New FishEye_Rectified(ocvb)
         fisheye.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 0)

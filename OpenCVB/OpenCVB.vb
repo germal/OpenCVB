@@ -1003,8 +1003,9 @@ Public Class OpenCVB
         BothFirstAndLastReady = False
         OpenCVB.ocvb.fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         OpenCVB.ocvb.fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
-        OpenCVB.ocvb.parms.VBTestInterface = New VBTest.VBTest_Basics(OpenCVB.ocvb)
-
+        If parms.activeAlgorithm = "VBTest_Interface" Then
+            OpenCVB.ocvb.parms.VBTestInterface = New VBTest.VBTest_Basics(OpenCVB.ocvb)
+        End If
         frameCount = 0 ' restart the count... 
         While 1
             ' wait until we have the latest camera data.
@@ -1023,13 +1024,15 @@ Public Class OpenCVB
                 If lowResolution Then
                     OpenCVB.ocvb.color = camera.color.Resize(fastSize)
                     OpenCVB.ocvb.RGBDepth = camera.RGBDepth.Resize(fastSize)
+                    OpenCVB.ocvb.leftView = camera.leftView.Resize(fastSize)
+                    OpenCVB.ocvb.rightView = camera.rightView.Resize(fastSize)
                 Else
                     OpenCVB.ocvb.color = camera.color
                     OpenCVB.ocvb.RGBDepth = camera.RGBDepth
+                    OpenCVB.ocvb.leftView = camera.leftView
+                    OpenCVB.ocvb.rightView = camera.rightView
                 End If
                 OpenCVB.ocvb.pointCloud = camera.PointCloud
-                OpenCVB.ocvb.leftView = camera.leftView
-                OpenCVB.ocvb.rightView = camera.rightView
                 OpenCVB.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
                 OpenCVB.ocvb.parms.transformationMatrix = camera.transformationMatrix
                 OpenCVB.ocvb.parms.IMU_TimeStamp = camera.IMU_TimeStamp
@@ -1126,7 +1129,7 @@ Public Class OpenCVB
         Catch ex As Exception
         End Try
 
-        OpenCVB.ocvb.parms.VBTestInterface.Dispose()
+        If parms.activeAlgorithm = "VBTest_Interface" Then OpenCVB.ocvb.parms.VBTestInterface.Dispose()
         OpenCVB.Dispose()
         frameCount = 0
         If parms.testAllRunning Then

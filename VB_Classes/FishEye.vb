@@ -1,6 +1,6 @@
 ﻿
 Imports cv = OpenCvSharp
-Public Class FishEye_Basics : Implements IDisposable
+Public Class FishEye_Rectified : Implements IDisposable
     Public externalUse As Boolean
     Public leftView As cv.Mat
     Public rightView As cv.Mat
@@ -40,6 +40,28 @@ Public Class FishEye_Basics : Implements IDisposable
             ocvb.result1 = leftView
             ocvb.result2 = rightView
         End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+    End Sub
+End Class
+
+
+
+
+
+Public Class FishEye_Raw : Implements IDisposable
+    Public Sub New(ocvb As AlgorithmData)
+        ocvb.desc = "Display the Raw FishEye images for the T265 (only)"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.cameraIndex <> T265Camera Then
+            ocvb.putText(New ActiveClass.TrueType("Only the T265 camera is has FishEye images at this point.", 10, 100, RESULT1))
+            Exit Sub
+        End If
+        ocvb.label1 = "Left Fisheye Image"
+        ocvb.label2 = "Right Fisheye Image"
+        ocvb.result1 = ocvb.leftView
+        ocvb.result2 = ocvb.rightView
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub

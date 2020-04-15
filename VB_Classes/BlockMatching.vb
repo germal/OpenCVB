@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/stereo_match.cpp
-Public Class BlockMatching_Basics : Implements IDisposable
+Public Class BlockMatching_Basics1 : Implements IDisposable
     Dim colorizer As Depth_Colorizer_1_CPP
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
@@ -10,9 +10,9 @@ Public Class BlockMatching_Basics : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "Blockmatch max disparity", 1, 8, 1)
         sliders.setupTrackBar3(ocvb, "Blockmatch block size", 5, 255, 15)
         If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Use OpenCV's block matching on the Realsense left and right views."
-        ocvb.label1 = "Left image (not depth)"
-        ocvb.label2 = "Right Image"
+        ocvb.desc = "Use OpenCV's block matching on left and right views."
+        ocvb.label1 = "Block matching disparity colorized like depth"
+        ocvb.label2 = "Right Image (used with left image)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim scale = sliders.TrackBar1.Value / 100

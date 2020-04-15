@@ -15,9 +15,10 @@ namespace CS_Classes
         public bool drawPoints = true;
         public KeyPoint[] keypoints1, keypoints2;
         public void New(){}
-        public void Run(Mat gray1, Mat gray2, Mat dst, int hessianThreshold, bool useBFMatcher)
+        public void Run(Mat gray1, Mat gray2, out Mat dst, int hessianThreshold, bool useBFMatcher)
         {
             var surf = SURF.Create(hessianThreshold, 4, 2, true);
+            dst = new Mat(gray1.Rows, gray1.Cols * 2, MatType.CV_8UC3);
 
             var descriptors1 = new Mat();
             var descriptors2 = new Mat();

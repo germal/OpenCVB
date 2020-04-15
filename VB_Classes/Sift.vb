@@ -7,9 +7,9 @@ Public Class Sift_Basics_CS : Implements IDisposable
     Dim radio As New OptionsRadioButtons
     Dim sliders As New OptionsSliders
     Dim CS_SiftBasics As New CS_SiftBasics
-    Dim fisheye As FishEye_Basics
+    Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData)
-        fisheye = New FishEye_Basics(ocvb)
+        fisheye = New FishEye_Rectified(ocvb)
         fisheye.externalUse = True
 
         radio.Setup(ocvb, 2)
@@ -54,9 +54,9 @@ Public Class Sift_Basics_CS_MT : Implements IDisposable
     Dim radio As New OptionsRadioButtons
     Dim sliders As New OptionsSliders
     Dim CS_SiftBasics As New CS_SiftBasics
-    Dim fisheye As FishEye_Basics
+    Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData)
-        fisheye = New FishEye_Basics(ocvb)
+        fisheye = New FishEye_Rectified(ocvb)
         fisheye.externalUse = True
         grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = ocvb.color.Width - 1 ' we are just taking horizontal slices of the image.
