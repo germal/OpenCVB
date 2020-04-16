@@ -24,6 +24,7 @@ public:
 	uchar *left_color, *right_color, * image_depth, * image_RGBdepth;
 	int rows, cols;
 	Depth_Colorizer16 * cPtr;
+	StreamIntrinsics intrinsicsBoth;
 	//CameraParameters intrinsicsLeft;
 	//CameraParameters intrinsicsRight;
 	//CalibrationParameters extrinsics;
@@ -36,11 +37,7 @@ public:
 	//double imuTimeStamp;
 	//Pose zed_pose;
 private:
-	//sl::Camera zed;
-	//sl::InitParameters init_params;
-	//int width, height;
 	//float imuData;
-	//long long pixelCount;
 public:
 	~CameraMyntD()
 	{
@@ -53,8 +50,6 @@ public:
 			std::cerr << "Error: select failed" << std::endl;
 
 		util::print_stream_infos(cam, dev_info.index);
-
-		// std::cout << "Open device: " << dev_info.index << ", " << dev_info.name << std::endl << std::endl;
 
 		OpenParams params(dev_info.index);
 		params.stream_mode = StreamMode::STREAM_2560x720;
@@ -69,11 +64,11 @@ public:
 		std::cout << std::endl;
 		if (!cam.IsOpened()) 
 			std::cerr << "Error: Open camera failed" << std::endl;
-
+		 
 		cPtr = new Depth_Colorizer16();
 		rows = h;
 		cols = w;
-		auto stream_intrinsics = cam.GetStreamIntrinsics(params.stream_mode);
+		intrinsicsBoth = cam.GetStreamIntrinsics(params.stream_mode);
 		
 		//extrinsics = camera_info.calibration_parameters_raw;
 		//intrinsicsLeft = camera_info.calibration_parameters.left_cam;
@@ -131,10 +126,25 @@ extern "C" __declspec(dllexport) int* MyntDImageDepth(CameraMyntD * MyntD)
 {
 	return (int*)MyntD->image_depth;
 }
-//extern "C" __declspec(dllexport) int* MyntDintrinsicsLeft(CameraMyntD* MyntD)
-//{
-//	return (int*)&MyntD->intrinsicsLeft;
-//}
+extern "C" __declspec(dllexport) int* MyntDintrinsicsLeft(CameraMyntD * MyntD)
+{
+	return (int*)&MyntD->intrinsicsBoth.left.width;
+}
+extern "C" __declspec(dllexport) int* MyntDintrinsicsRight(CameraMyntD * MyntD)
+{
+	return (int*)&MyntD->intrinsicsBoth.right.width;
+}
+
+extern "C" __declspec(dllexport) int* MyntDProjectionMatrix(CameraMyntD * MyntD)
+{
+	return (int*)&MyntD->intrinsicsBoth.right.p[0];
+}
+
+extern "C" __declspec(dllexport) int* MyntDRotationMatrix(CameraMyntD * MyntD)
+{
+	return (int*)&MyntD->intrinsicsBoth.right.r[0];
+}
+
 //extern "C" __declspec(dllexport) int* MyntDintrinsicsRight(CameraMyntD* MyntD)
 //{
 //	return (int*)&MyntD->intrinsicsRight;

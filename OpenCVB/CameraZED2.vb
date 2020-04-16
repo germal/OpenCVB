@@ -128,11 +128,11 @@ Public Class CameraZED2
             intrinsicsLeft_VB.ppy = intrinsics.cy
             intrinsicsLeft_VB.fx = intrinsics.fx
             intrinsicsLeft_VB.fy = intrinsics.fy
-            ReDim intrinsicsLeft_VB.FOV(2)
+            ReDim intrinsicsLeft_VB.FOV(3 - 1)
             intrinsicsLeft_VB.FOV(0) = intrinsics.v_fov
             intrinsicsLeft_VB.FOV(1) = intrinsics.h_fov
             intrinsicsLeft_VB.FOV(2) = intrinsics.d_fov
-            ReDim intrinsicsLeft_VB.coeffs(5)
+            ReDim intrinsicsLeft_VB.coeffs(5 - 1)
             intrinsicsLeft_VB.coeffs(0) = intrinsics.k1
             intrinsicsLeft_VB.coeffs(1) = intrinsics.k2
             intrinsicsLeft_VB.coeffs(2) = intrinsics.p1
@@ -147,11 +147,11 @@ Public Class CameraZED2
             intrinsicsRight_VB.ppy = intrinsics.cy
             intrinsicsRight_VB.fx = intrinsics.fx
             intrinsicsRight_VB.fy = intrinsics.fy
-            ReDim intrinsicsRight_VB.FOV(2)
+            ReDim intrinsicsRight_VB.FOV(3 - 1)
             intrinsicsRight_VB.FOV(0) = intrinsics.v_fov
             intrinsicsRight_VB.FOV(1) = intrinsics.h_fov
             intrinsicsRight_VB.FOV(2) = intrinsics.d_fov
-            ReDim intrinsicsRight_VB.coeffs(5)
+            ReDim intrinsicsRight_VB.coeffs(5 - 1)
             intrinsicsRight_VB.coeffs(0) = intrinsics.k1
             intrinsicsRight_VB.coeffs(1) = intrinsics.k2
             intrinsicsRight_VB.coeffs(2) = intrinsics.p1

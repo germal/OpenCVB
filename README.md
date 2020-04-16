@@ -113,6 +113,9 @@ You will need to download and install the following before starting:
 
 -   Build and run OpenCVB.sln
 
+    -   Edit “Cameras/CameraDefines.hpp” to turn off support for Mynt Eye D1000
+        or StereoLabs Zed 2 if not present
+
 **Full Installation Description with Discussion**
 
 The first step is to download OpenCVB from GitHub:
@@ -159,15 +162,21 @@ installation of the Kinect4Azure camera:
     -   Click “Microsoft Installer” to download and install the proprietary
         Kinect code from Microsoft
 
-The last step is to open the OpenCVB.sln file and build OpenCVB.
-
-Post build steps (optional):
+The last step is to open the OpenCVB.sln file and build OpenCVB. The default is
+to include support for StereoLabs Zed 2 and the Mynt Eye D 1000 cameras. Those
+wishing to include support for these optional cameras, should follow the
+instruction below. Those not interested in these cameras should just follow the
+third bullet below to turn off support (the default is to include support for
+both cameras.)
 
 -   If you are using the StereoLabs ZED 2 camera (released Q1 2020), install the
     StereoLabs SDK from <https://www.stereolabs.com/>
 
--   Edit the “Cameras/CameraDefines.hpp” file to uncomment the necessary
-    \#define for StereoLabs Zed 2 support to build.
+-   If you intend to use the Mynt Eye D 1000 camera, download the SDK from
+    <https://github.com/slightech/MYNT-EYE-D-SDK>
+
+-   Edit “Cameras/CameraDefines.hpp” file to toggle on or off the \#define for
+    StereoLabs Zed 2 or Mynt Eye D 1000 support.
 
 **Trouble-Shooting New Install**
 

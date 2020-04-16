@@ -20,11 +20,6 @@ Module MyntD_Interface
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDImageRGBdepth(cPtr As IntPtr) As IntPtr
     End Function
-
-
-    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDExtrinsics(cPtr As IntPtr) As IntPtr
-    End Function
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDintrinsicsLeft(cPtr As IntPtr) As IntPtr
     End Function
@@ -32,11 +27,23 @@ Module MyntD_Interface
     Public Function MyntDintrinsicsRight(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDTranslation(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDRotationMatrix(cPtr As IntPtr) As IntPtr
     End Function
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function MyntDProjectionMatrix(cPtr As IntPtr) As IntPtr
+    End Function
+
+
+
+
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function MyntDExtrinsics(cPtr As IntPtr) As IntPtr
+    End Function
+
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function MyntDTranslation(cPtr As IntPtr) As IntPtr
+    End Function
+
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDAcceleration(cPtr As IntPtr) As IntPtr
     End Function
@@ -61,26 +68,28 @@ Module MyntD_Interface
 End Module
 Public Class CameraMyntD
     Inherits Camera
-    Structure intrinsicsLeftData
-        Dim fx As Single ' Focal length x */
-        Dim fy As Single ' Focal length y */
-        Dim cx As Single ' Principal point In image, x */
-        Dim cy As Single ' Principal point In image, y */
+    Structure MyntIntrinsics
+        Dim width As UShort
+        Dim height As UShort
+        Dim fx As Double ' Focal length x */
+        Dim fy As Double ' Focal length y */
+        Dim cx As Double ' Principal point In image, x */
+        Dim cy As Double ' Principal point In image, y */
         Dim k1 As Double ' Distortion factor :  [ k1, k2, p1, p2, k3 ]. Radial (k1,k2,k3) And Tangential (p1,p2) distortion
         Dim k2 As Double
         Dim p1 As Double
         Dim p2 As Double
         Dim k3 As Double
-        Dim v_fov As Single ' vertical field of view in degrees.
-        Dim h_fov As Single ' horizontal field of view in degrees.
-        Dim d_fov As Single ' diagonal field of view in degrees.
-        Dim width As Int64
-        Dim height As Int64
     End Structure
 
+    ' 3x4 projection matrix in the (rectified) coordinate systems 
+    '  left: fx' cx' fy' cy' 1
+    '  right: fx' cx' tx fy' cy' 1
+    Public projectionMatrix(12 - 1) As Double ' 
+    Public rotationMatrix(9 - 1) As Double ' 3x3 rectification transform (rotation matrix) for the left camera.
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
         cPtr = MyntDOpen(width, height, 30)
-        MyBase.deviceName = "MYNT EYE D 1000"
+        MyBase.deviceName = "MyntEyeD 1000"
         If cPtr <> 0 Then
             w = width
             h = height
@@ -97,43 +106,41 @@ Public Class CameraMyntD
             '    Extrinsics_VB.translation(i) = rotationTranslation(i + Extrinsics_VB.rotation.Length - 1)
             'Next
 
-            'ptr = MyntDintrinsicsLeft(cPtr)
-            'Dim intrinsics = Marshal.PtrToStructure(Of intrinsicsLeftData)(ptr)
-            'intrinsicsLeft_VB.ppx = intrinsics.cx
-            'intrinsicsLeft_VB.ppy = intrinsics.cy
-            'intrinsicsLeft_VB.fx = intrinsics.fx
-            'intrinsicsLeft_VB.fy = intrinsics.fy
-            'ReDim intrinsicsLeft_VB.FOV(2)
-            'intrinsicsLeft_VB.FOV(0) = intrinsics.v_fov
-            'intrinsicsLeft_VB.FOV(1) = intrinsics.h_fov
-            'intrinsicsLeft_VB.FOV(2) = intrinsics.d_fov
-            'ReDim intrinsicsLeft_VB.coeffs(5)
-            'intrinsicsLeft_VB.coeffs(0) = intrinsics.k1
-            'intrinsicsLeft_VB.coeffs(1) = intrinsics.k2
-            'intrinsicsLeft_VB.coeffs(2) = intrinsics.p1
-            'intrinsicsLeft_VB.coeffs(3) = intrinsics.p2
-            'intrinsicsLeft_VB.coeffs(4) = intrinsics.k3
-            'intrinsicsLeft_VB.width = intrinsics.width
-            'intrinsicsLeft_VB.height = intrinsics.height
+            Dim ptr = MyntDintrinsicsLeft(cPtr)
+            Dim intrinsics = Marshal.PtrToStructure(Of MyntIntrinsics)(ptr)
+            intrinsicsLeft_VB.ppx = intrinsics.cx
+            intrinsicsLeft_VB.ppy = intrinsics.cy
+            intrinsicsLeft_VB.fx = intrinsics.fx
+            intrinsicsLeft_VB.fy = intrinsics.fy
+            ReDim intrinsicsLeft_VB.coeffs(5)
+            intrinsicsLeft_VB.coeffs(0) = intrinsics.k1
+            intrinsicsLeft_VB.coeffs(1) = intrinsics.k2
+            intrinsicsLeft_VB.coeffs(2) = intrinsics.p1
+            intrinsicsLeft_VB.coeffs(3) = intrinsics.p2
+            intrinsicsLeft_VB.coeffs(4) = intrinsics.k3
+            intrinsicsLeft_VB.width = intrinsics.width
+            intrinsicsLeft_VB.height = intrinsics.height
 
-            'ptr = MyntDintrinsicsRight(cPtr)
-            'intrinsics = Marshal.PtrToStructure(Of intrinsicsLeftData)(ptr)
-            'intrinsicsRight_VB.ppx = intrinsics.cx
-            'intrinsicsRight_VB.ppy = intrinsics.cy
-            'intrinsicsRight_VB.fx = intrinsics.fx
-            'intrinsicsRight_VB.fy = intrinsics.fy
-            'ReDim intrinsicsRight_VB.FOV(2)
-            'intrinsicsRight_VB.FOV(0) = intrinsics.v_fov
-            'intrinsicsRight_VB.FOV(1) = intrinsics.h_fov
-            'intrinsicsRight_VB.FOV(2) = intrinsics.d_fov
-            'ReDim intrinsicsRight_VB.coeffs(5)
-            'intrinsicsRight_VB.coeffs(0) = intrinsics.k1
-            'intrinsicsRight_VB.coeffs(1) = intrinsics.k2
-            'intrinsicsRight_VB.coeffs(2) = intrinsics.p1
-            'intrinsicsRight_VB.coeffs(3) = intrinsics.p2
-            'intrinsicsRight_VB.coeffs(4) = intrinsics.k3
-            'intrinsicsRight_VB.width = intrinsics.width
-            'intrinsicsRight_VB.height = intrinsics.height
+            ptr = MyntDRotationMatrix(cPtr)
+            Marshal.Copy(ptr, rotationMatrix, 0, rotationMatrix.Length)
+
+            ptr = MyntDProjectionMatrix(cPtr)
+            Marshal.Copy(ptr, projectionMatrix, 0, projectionMatrix.Length)
+
+            ptr = MyntDintrinsicsRight(cPtr)
+            intrinsics = Marshal.PtrToStructure(Of MyntIntrinsics)(ptr)
+            intrinsicsRight_VB.ppx = intrinsics.cx
+            intrinsicsRight_VB.ppy = intrinsics.cy
+            intrinsicsRight_VB.fx = intrinsics.fx
+            intrinsicsRight_VB.fy = intrinsics.fy
+            ReDim intrinsicsRight_VB.coeffs(5)
+            intrinsicsRight_VB.coeffs(0) = intrinsics.k1
+            intrinsicsRight_VB.coeffs(1) = intrinsics.k2
+            intrinsicsRight_VB.coeffs(2) = intrinsics.p1
+            intrinsicsRight_VB.coeffs(3) = intrinsics.p2
+            intrinsicsRight_VB.coeffs(4) = intrinsics.k3
+            intrinsicsRight_VB.width = intrinsics.width
+            intrinsicsRight_VB.height = intrinsics.height
         End If
     End Sub
 
