@@ -1,5 +1,8 @@
 #include "../CameraDefines.hpp"
 #ifdef MYNTD_1000
+#pragma comment(lib, "mynteye_depth.lib")
+#pragma comment(lib, "opencv_world343.lib") 
+
 #include <iostream>
 
 #include <opencv2/highgui/highgui.hpp>
