@@ -84,27 +84,28 @@ Public Class OpenCVB
 
         HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
 
-#If DEBUG Then
-        ' Camera DLL's are built in Release mode even when configured for Debug (for performance while debugging algorithms).  
-        ' It is not likely they will need debugging and the camera interface runs a lot faster in Debug mode.
+        '' Camera DLL's are built in Release mode even when configured for Debug (for performance while debugging algorithms).  
+        '' It is not likely they will need debugging and the camera interface runs a lot faster in Debug mode.
         Dim releaseDir = HomeDir.FullName + "\bin\Release\"
         updatePath(releaseDir, "Release Version of camera DLL's.")
 
-        ' check to make sure there are no camera dll's in the Debug directory by mistake!
-        For i = 0 To 3
-            Dim dllName = Choose(i + 1, "Cam_Kinect4.dll", "Cam_MyntD.dll", "Cam_T265.dll", "Cam_Zed2.dll", "Cam_D400.dll")
-            Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
-            If dllFile.Exists Then
-                MsgBox(dllFile.Name + " was built in the Debug directory." + vbCrLf + "Camera dll's are built in Release" + vbCrLf +
-                       "for performance.  If you need to debug the camera" + vbCrLf + "interface, edit this message.")
-            End If
-        Next
+#If DEBUG Then
+        '' check to make sure there are no camera dll's in the Debug directory by mistake!
+        'For i = 0 To 3
+        '    Dim dllName = Choose(i + 1, "Cam_Kinect4.dll", "Cam_MyntD.dll", "Cam_T265.dll", "Cam_Zed2.dll", "Cam_D400.dll")
+        '    Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
+        '    If dllFile.Exists Then
+        '        MsgBox(dllFile.Name + " was built in the Debug directory." + vbCrLf + "Camera dll's are built in Release" + vbCrLf +
+        '               "for performance.  If you need to debug the camera" + vbCrLf + "interface, edit this message.")
+        '    End If
+        'Next
 
-        Dim IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Debug\"
-        updatePath(IntelPERC_Lib_Dir, "Realsense camera support.")
-        Dim Kinect_Dir = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\"
-        updatePath(Kinect_Dir, "Kinect camera support.")
+        'Dim IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Debug\"
+        'updatePath(IntelPERC_Lib_Dir, "Realsense camera support.")
+        'Dim Kinect_Dir = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\"
+        'updatePath(Kinect_Dir, "Kinect camera support.")
 #End If
+
         Dim myntSDKready As Boolean
         Dim zed2SDKready As Boolean
         Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")

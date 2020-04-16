@@ -177,13 +177,13 @@ public:
 	{
 		float nearColor[3] = { 0, 1.0f, 1.0f };
 		float farColor[3] = { 1.0f, 0, 0 };
-		// Produce a cumulative histogram of depth values
 		float hRange[] = { 1, float(histSize) }; // ranges are exclusive at the top of the range
 		const float* range[] = { hRange };
 		int hbins[] = { histSize };
 		Mat hist;
 		if (countNonZero(depth32f) > 0)
 		{
+			// use OpenCV's histogram rather than binning manually.
 			calcHist(&depth32f, 1, 0, Mat(), hist, 1, hbins, range, true, false);
 		}
 		else {
@@ -192,9 +192,10 @@ public:
 		}
 
 		float* histogram = (float*)hist.data;
+		// Produce a cumulative histogram of depth values
 		for (int i = 1; i < histSize; i++)
 		{
-			histogram[i] += histogram[i - 1];
+			histogram[i] += histogram[i - 1] + 1;
 		}
 
 		if (histogram[histSize - 1] > 0)

@@ -6,12 +6,22 @@ Module MyntD_Interface
     Public Function MyntDOpen(width As Int32, height As Int32, fps As Int32) As IntPtr
     End Function
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDSerialNumber(cPtr As IntPtr) As Int32
+    Public Function MyntDWaitFrame(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDWaitFrame(cPtr As IntPtr, rgba As IntPtr, depthRGB As IntPtr, depth16 As IntPtr, left As IntPtr,
-                                  right As IntPtr, pointCloud As IntPtr) As IntPtr
+    Public Function MyntDLeftImage(cPtr As IntPtr) As IntPtr
     End Function
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function MyntDRightImage(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function MyntDImageDepth(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function MyntDImageRGBdepth(cPtr As IntPtr) As IntPtr
+    End Function
+
+
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDExtrinsics(cPtr As IntPtr) As IntPtr
     End Function
@@ -69,145 +79,136 @@ Public Class CameraMyntD
     End Structure
 
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
-        cPtr = MyntDOpen(width, height, 60)
+        cPtr = MyntDOpen(width, height, 30)
         MyBase.deviceName = "MYNT EYE D 1000"
-        Exit Sub
         If cPtr <> 0 Then
-            Dim serialNumber = MyntDSerialNumber(cPtr)
-            Console.WriteLine("MYNT EYE D 1000 serial number = " + CStr(serialNumber))
             w = width
             h = height
-            leftView = New cv.Mat
 
-            Dim ptr = MyntDExtrinsics(cPtr)
-            Dim rotationTranslation(12) As Single
-            Marshal.Copy(ptr, rotationTranslation, 0, rotationTranslation.Length)
-            ReDim Extrinsics_VB.rotation(8)
-            ReDim Extrinsics_VB.translation(2)
-            For i = 0 To Extrinsics_VB.rotation.Length - 1
-                Extrinsics_VB.rotation(i) = rotationTranslation(i)
-            Next
-            For i = 0 To Extrinsics_VB.translation.Length - 1
-                Extrinsics_VB.translation(i) = rotationTranslation(i + Extrinsics_VB.rotation.Length - 1)
-            Next
+            'Dim ptr = MyntDExtrinsics(cPtr)
+            'Dim rotationTranslation(12) As Single
+            'Marshal.Copy(ptr, rotationTranslation, 0, rotationTranslation.Length)
+            'ReDim Extrinsics_VB.rotation(8)
+            'ReDim Extrinsics_VB.translation(2)
+            'For i = 0 To Extrinsics_VB.rotation.Length - 1
+            '    Extrinsics_VB.rotation(i) = rotationTranslation(i)
+            'Next
+            'For i = 0 To Extrinsics_VB.translation.Length - 1
+            '    Extrinsics_VB.translation(i) = rotationTranslation(i + Extrinsics_VB.rotation.Length - 1)
+            'Next
 
-            ptr = MyntDintrinsicsLeft(cPtr)
-            Dim intrinsics = Marshal.PtrToStructure(Of intrinsicsLeftData)(ptr)
-            intrinsicsLeft_VB.ppx = intrinsics.cx
-            intrinsicsLeft_VB.ppy = intrinsics.cy
-            intrinsicsLeft_VB.fx = intrinsics.fx
-            intrinsicsLeft_VB.fy = intrinsics.fy
-            ReDim intrinsicsLeft_VB.FOV(2)
-            intrinsicsLeft_VB.FOV(0) = intrinsics.v_fov
-            intrinsicsLeft_VB.FOV(1) = intrinsics.h_fov
-            intrinsicsLeft_VB.FOV(2) = intrinsics.d_fov
-            ReDim intrinsicsLeft_VB.coeffs(5)
-            intrinsicsLeft_VB.coeffs(0) = intrinsics.k1
-            intrinsicsLeft_VB.coeffs(1) = intrinsics.k2
-            intrinsicsLeft_VB.coeffs(2) = intrinsics.p1
-            intrinsicsLeft_VB.coeffs(3) = intrinsics.p2
-            intrinsicsLeft_VB.coeffs(4) = intrinsics.k3
-            intrinsicsLeft_VB.width = intrinsics.width
-            intrinsicsLeft_VB.height = intrinsics.height
+            'ptr = MyntDintrinsicsLeft(cPtr)
+            'Dim intrinsics = Marshal.PtrToStructure(Of intrinsicsLeftData)(ptr)
+            'intrinsicsLeft_VB.ppx = intrinsics.cx
+            'intrinsicsLeft_VB.ppy = intrinsics.cy
+            'intrinsicsLeft_VB.fx = intrinsics.fx
+            'intrinsicsLeft_VB.fy = intrinsics.fy
+            'ReDim intrinsicsLeft_VB.FOV(2)
+            'intrinsicsLeft_VB.FOV(0) = intrinsics.v_fov
+            'intrinsicsLeft_VB.FOV(1) = intrinsics.h_fov
+            'intrinsicsLeft_VB.FOV(2) = intrinsics.d_fov
+            'ReDim intrinsicsLeft_VB.coeffs(5)
+            'intrinsicsLeft_VB.coeffs(0) = intrinsics.k1
+            'intrinsicsLeft_VB.coeffs(1) = intrinsics.k2
+            'intrinsicsLeft_VB.coeffs(2) = intrinsics.p1
+            'intrinsicsLeft_VB.coeffs(3) = intrinsics.p2
+            'intrinsicsLeft_VB.coeffs(4) = intrinsics.k3
+            'intrinsicsLeft_VB.width = intrinsics.width
+            'intrinsicsLeft_VB.height = intrinsics.height
 
-            ptr = MyntDintrinsicsRight(cPtr)
-            intrinsics = Marshal.PtrToStructure(Of intrinsicsLeftData)(ptr)
-            intrinsicsRight_VB.ppx = intrinsics.cx
-            intrinsicsRight_VB.ppy = intrinsics.cy
-            intrinsicsRight_VB.fx = intrinsics.fx
-            intrinsicsRight_VB.fy = intrinsics.fy
-            ReDim intrinsicsRight_VB.FOV(2)
-            intrinsicsRight_VB.FOV(0) = intrinsics.v_fov
-            intrinsicsRight_VB.FOV(1) = intrinsics.h_fov
-            intrinsicsRight_VB.FOV(2) = intrinsics.d_fov
-            ReDim intrinsicsRight_VB.coeffs(5)
-            intrinsicsRight_VB.coeffs(0) = intrinsics.k1
-            intrinsicsRight_VB.coeffs(1) = intrinsics.k2
-            intrinsicsRight_VB.coeffs(2) = intrinsics.p1
-            intrinsicsRight_VB.coeffs(3) = intrinsics.p2
-            intrinsicsRight_VB.coeffs(4) = intrinsics.k3
-            intrinsicsRight_VB.width = intrinsics.width
-            intrinsicsRight_VB.height = intrinsics.height
-
-            ReDim colorBytes(w * h * 4) ' rgba format coming back from driver
-            ReDim RGBDepthBytes(w * h * 3)
-            ReDim depthBytes(w * h * 2)
-            ReDim leftViewBytes(w * h)
-            ReDim rightViewBytes(w * h)
-            ReDim pointCloudBytes(w * h * 12) ' xyz + rgba
+            'ptr = MyntDintrinsicsRight(cPtr)
+            'intrinsics = Marshal.PtrToStructure(Of intrinsicsLeftData)(ptr)
+            'intrinsicsRight_VB.ppx = intrinsics.cx
+            'intrinsicsRight_VB.ppy = intrinsics.cy
+            'intrinsicsRight_VB.fx = intrinsics.fx
+            'intrinsicsRight_VB.fy = intrinsics.fy
+            'ReDim intrinsicsRight_VB.FOV(2)
+            'intrinsicsRight_VB.FOV(0) = intrinsics.v_fov
+            'intrinsicsRight_VB.FOV(1) = intrinsics.h_fov
+            'intrinsicsRight_VB.FOV(2) = intrinsics.d_fov
+            'ReDim intrinsicsRight_VB.coeffs(5)
+            'intrinsicsRight_VB.coeffs(0) = intrinsics.k1
+            'intrinsicsRight_VB.coeffs(1) = intrinsics.k2
+            'intrinsicsRight_VB.coeffs(2) = intrinsics.p1
+            'intrinsicsRight_VB.coeffs(3) = intrinsics.p2
+            'intrinsicsRight_VB.coeffs(4) = intrinsics.k3
+            'intrinsicsRight_VB.width = intrinsics.width
+            'intrinsicsRight_VB.height = intrinsics.height
         End If
     End Sub
 
     Public Sub GetNextFrame()
         If pipelineClosed Or cPtr = 0 Then Exit Sub
-        Exit Sub
-        Dim handlecolorBytes = GCHandle.Alloc(colorBytes, GCHandleType.Pinned)
-        Dim handleRGBDepthBytes = GCHandle.Alloc(RGBDepthBytes, GCHandleType.Pinned)
-        Dim handledepthBytes = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)
-        Dim handleLeftViewBytes = GCHandle.Alloc(leftViewBytes, GCHandleType.Pinned)
-        Dim handleRightViewBytes = GCHandle.Alloc(rightViewBytes, GCHandleType.Pinned)
-        Dim handlePCBytes = GCHandle.Alloc(pointCloudBytes, GCHandleType.Pinned)
-        Dim imuFrame = MyntDWaitFrame(cPtr, handlecolorBytes.AddrOfPinnedObject(), handleRGBDepthBytes.AddrOfPinnedObject(),
-                                           handledepthBytes.AddrOfPinnedObject(), handleLeftViewBytes.AddrOfPinnedObject(),
-                                           handleRightViewBytes.AddrOfPinnedObject(), handlePCBytes.AddrOfPinnedObject())
-        Dim acc = MyntDAcceleration(cPtr)
-        IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
+        Dim imagePtr = MyntDWaitFrame(cPtr)
+        'Dim acc = MyntDAcceleration(cPtr)
+        'IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
 
-        Dim ang = MyntDAngularVelocity(cPtr)
-        Dim angularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
+        'Dim ang = MyntDAngularVelocity(cPtr)
+        'Dim angularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
 
-        IMU_Acceleration.Z = IMU_Acceleration.X
-        IMU_Acceleration.Y = angularVelocity.Z
-        IMU_Acceleration.X = angularVelocity.Y
+        'IMU_Acceleration.Z = IMU_Acceleration.X
+        'IMU_Acceleration.Y = angularVelocity.Z
+        'IMU_Acceleration.X = angularVelocity.Y
 
-        ' all 3 numbers should be near zero for a stationary camera.
-        IMU_AngularVelocity.X = angularVelocity.X
-        IMU_AngularVelocity.Y = angularVelocity.Y
-        IMU_AngularVelocity.Z = angularVelocity.Z
+        '' all 3 numbers should be near zero for a stationary camera.
+        'IMU_AngularVelocity.X = angularVelocity.X
+        'IMU_AngularVelocity.Y = angularVelocity.Y
+        'IMU_AngularVelocity.Z = angularVelocity.Z
 
-        Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
-        Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
-        Dim mat() As Single = {-rt.r00, rt.r01, -rt.r02, 0.0,
-                               -rt.r10, rt.r11, rt.r12, 0.0,
-                               -rt.r20, rt.r21, -rt.r22, 0.0,
-                               t.X, t.Y, t.Z, 1.0}
-        transformationMatrix = mat
+        'Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
+        'Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
+        'Dim mat() As Single = {-rt.r00, rt.r01, -rt.r02, 0.0,
+        '                       -rt.r10, rt.r11, rt.r12, 0.0,
+        '                       -rt.r20, rt.r21, -rt.r22, 0.0,
+        '                       t.X, t.Y, t.Z, 1.0}
+        'transformationMatrix = mat
 
-        ' testing to see if we could have computed this independently...
-        Dim tr = MyntDTranslation(cPtr)
-        Dim translation(2) As Single
-        Marshal.Copy(tr, translation, 0, translation.Length)
+        '' testing to see if we could have computed this independently...
+        'Dim tr = MyntDTranslation(cPtr)
+        'Dim translation(2) As Single
+        'Marshal.Copy(tr, translation, 0, translation.Length)
 
-        Dim rot = MyntDRotationMatrix(cPtr)
-        Dim rotation(8) As Single
-        Marshal.Copy(rot, rotation, 0, rotation.Length)
+        'Dim rot = MyntDRotationMatrix(cPtr)
+        'Dim rotation(8) As Single
+        'Marshal.Copy(rot, rotation, 0, rotation.Length)
 
-        handlecolorBytes.Free()
-        handleRGBDepthBytes.Free()
-        handledepthBytes.Free()
-        handleLeftViewBytes.Free()
-        handleRightViewBytes.Free()
-        handlePCBytes.Free()
+        'handlecolorBytes.Free()
+        'handleRGBDepthBytes.Free()
+        'handledepthBytes.Free()
+        'handleLeftViewBytes.Free()
+        'handleRightViewBytes.Free()
+        'handlePCBytes.Free()
 
-        IMU_Barometer = MyntDIMU_Barometer(cPtr)
-        Dim mag = MyntDIMU_Magnetometer(cPtr)
-        IMU_Magnetometer = Marshal.PtrToStructure(Of cv.Point3f)(mag)
+        'IMU_Barometer = MyntDIMU_Barometer(cPtr)
+        'Dim mag = MyntDIMU_Magnetometer(cPtr)
+        'IMU_Magnetometer = Marshal.PtrToStructure(Of cv.Point3f)(mag)
 
-        IMU_Temperature = MyntDIMU_Temperature(cPtr)
+        'IMU_Temperature = MyntDIMU_Temperature(cPtr)
 
-        Static startTime = MyntDIMU_TimeStamp(cPtr)
-        IMU_TimeStamp = MyntDIMU_TimeStamp(cPtr) - startTime
+        'Static startTime = MyntDIMU_TimeStamp(cPtr)
+        'IMU_TimeStamp = MyntDIMU_TimeStamp(cPtr) - startTime
 
+
+        Dim depthRGBPtr = MyntDImageRGBdepth(cPtr)
+        Dim depth16Ptr = MyntDImageDepth(cPtr)
+        Dim rightPtr = MyntDRightImage(cPtr)
         SyncLock bufferLock
-            Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBytes)
-            color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+            If imagePtr <> 0 Then color = New cv.Mat(h, w, cv.MatType.CV_8UC3, imagePtr).Clone()
+            leftView = color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If rightPtr <> 0 Then rightView = New cv.Mat(h, w, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If depthRGBPtr <> 0 Then RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, depthRGBPtr).Clone()
 
-            Dim RGBADepth = New cv.Mat(h, w, cv.MatType.CV_8UC4, RGBDepthBytes)
-            RGBDepth = RGBADepth.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+            If depth16Ptr <> 0 Then
+                Dim depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, depth16Ptr)
 
-            leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, leftViewBytes)
-            rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, rightViewBytes)
-            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pointCloudBytes)
+                Dim pcX = New cv.Mat(h, w, cv.MatType.CV_32F, 0)
+                Dim pcY = New cv.Mat(h, w, cv.MatType.CV_32F, 0)
+                Dim pcZ = New cv.Mat(h, w, cv.MatType.CV_32F)
+                depth16.ConvertTo(pcZ, cv.MatType.CV_32F)
+
+                Dim split() = {pcX, pcY, (pcZ * 0.001).ToMat()}
+                cv.Cv2.Merge(split, pointCloud)
+            End If
         End SyncLock
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub

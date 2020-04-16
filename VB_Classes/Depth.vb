@@ -713,7 +713,7 @@ Public Class Depth_Colorizer_1_CPP : Implements IDisposable
     Dim dcPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         dcPtr = Depth_Colorizer_Open()
-        ocvb.desc = "Display 16 bit image using C++ instead of VB.Net"
+        ocvb.desc = "Display Depth image using C++ instead of VB.Net"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
 
@@ -793,6 +793,8 @@ Public Class Depth_InRange : Implements IDisposable
     Public depth32f As New cv.Mat
     Public externalUse As Boolean
     Public sliders As New OptionsSliders
+    Public minDepth As Double
+    Public maxDepth As Double
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "InRange Min Depth", 200, 1000, 200)
         sliders.setupTrackBar2(ocvb, "InRange Max Depth", 200, 10000, 1400)
@@ -801,19 +803,15 @@ Public Class Depth_InRange : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If sliders.TrackBar1.Value >= sliders.TrackBar2.Value Then sliders.TrackBar2.Value = sliders.TrackBar1.Value + 1
-        Dim minDepth = cv.Scalar.All(sliders.TrackBar1.Value)
-        Dim maxDepth = cv.Scalar.All(sliders.TrackBar2.Value)
+        minDepth = cv.Scalar.All(sliders.TrackBar1.Value)
+        maxDepth = cv.Scalar.All(sliders.TrackBar2.Value)
         depth32f = getDepth32f(ocvb)
         cv.Cv2.InRange(depth32f, minDepth, maxDepth, Mask)
         cv.Cv2.BitwiseNot(Mask, zeroMask)
         dst = depth32f.Clone()
         dst.SetTo(0, zeroMask)
 
-        If externalUse = False Then
-            ocvb.result1.SetTo(0)
-            If ocvb.RGBDepth.Width <> Mask.Width Then Mask = Mask.Resize(ocvb.RGBDepth.Size())
-            ocvb.RGBDepth.CopyTo(ocvb.result1, Mask)
-        End If
+        If externalUse = False Then ocvb.result1 = dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
@@ -835,23 +833,19 @@ Public Class Depth_Colorizer_2_CPP : Implements IDisposable
         dcPtr = Depth_Colorizer2_Open()
 
         trim = New Depth_InRange(ocvb)
-        trim.sliders.TrackBar2.Value = 4000 ' a better default
         trim.externalUse = True
 
         ocvb.desc = "Display depth data with inrange trim.  Higher contrast than others - yellow to blue always present."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
-        Dim minDepth = trim.sliders.TrackBar1.Value
-        Dim maxDepth = trim.sliders.TrackBar2.Value
-        Dim histSize = maxDepth - minDepth
 
         If externalUse = False Then src = trim.dst Else dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-
+        ocvb.result2 = trim.Mask
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, depthData, 0, depthData.Length)
-        Dim imagePtr = Depth_Colorizer2_Run(dcPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, histSize)
+        Dim imagePtr = Depth_Colorizer2_Run(dcPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, trim.maxDepth)
         handleSrc.Free()
 
         If imagePtr <> 0 Then

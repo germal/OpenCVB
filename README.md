@@ -97,8 +97,8 @@ You will need to download and install the following before starting:
     -   One of the algorithms – PythonPackages.py – checks that all the required
         Python packages are present.
 
--   In the OpenCVB directory, run the “PrepareTree.bat” script to download and
-    run CMake for OpenCV, OpenCV_Contrib, librealsense, and Kinect4Azure.
+-   In the OpenCVB directory, run the “PrepareTree.bat” script. It will download
+    and run CMake for OpenCV, OpenCV_Contrib, librealsense, and Kinect4Azure.
 
     -   This will take a fair amount of time depending on the network speed.
 
@@ -134,10 +134,10 @@ Kinect4Azure from their respective GitHub locations and install them in the
 OpenCVB tree. In addition, the script will run the CMake commands that setup
 OpenCV, librealsense, and Kinect4Azure for OpenCVB’s use. The script will then
 open Visual Studio for each solution file. Build the Debug and Release versions
-of each with the “Build/Batch Build” Visual Studio menu entry. The download and
-CMake steps take about 20 minutes depending on the speed of the network
-connection. The Visual Studio builds should take about an hour depending on the
-speed of the machine.
+of each with the “Build/Batch Build” Visual Studio menu entry. The steps to
+download and run CMake take about 20 minutes depending on the speed of the
+network connection. The Visual Studio builds should take about an hour depending
+on the speed of the machine.
 
 After all the packages have been built, then there is one environmental variable
 that needs to be set and it will depend on which version of OpenCV was just
@@ -465,11 +465,11 @@ the bottom left and right or additional windows.
 ![](media/5b39040e639f9b1b09e5039e38b653eb.png)
 
 *OpenGL has an infinite number of ways to view 3D data but in common usage, only
-2 views have names – top down and side views. The “Projection_Gravity” algorithm
-provides a top down view on the bottom left and a side view on the bottom right.
-The images are colored in the same way as the RGB depth image in the upper right
-with yellow indicating proximity to the camera. The aspect ratio of both views
-is 1:1 to provide realistic dimensions and sharp edges. This projection is
+3 views have names – front, top down and side views. The “Projection_Gravity”
+algorithm provides a top down view (bottom left) and a side view (bottom right.)
+The images are colored in the same way as the RGB depth image (upper right) with
+yellow indicating proximity to the camera. The aspect ratio of both top and side
+views is 1:1 to provide realistic dimensions and sharp edges. This projection is
 available only with cameras that include an IMU.*
 
 ![](media/cd7e699a6192e4daf1d540a15e35005a.png)

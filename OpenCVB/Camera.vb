@@ -20,20 +20,21 @@ Public Class Camera
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
     Public frameCount As Integer
-    Public pointCloud As cv.Mat
-    Public h As Int32
+    Public pointCloud As New cv.Mat
     Public w As Int32
-    Public color As cv.Mat
-    Public RGBDepth As cv.Mat
+
+    Public color As New cv.Mat
+    Public RGBDepth As New cv.Mat
+    Public leftView As New cv.Mat
+    Public rightView As New cv.Mat
+    Public h As Int32
+
     Public deviceCount As Int32
     Public deviceName As String
     Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
     Public IMU_Present As Boolean
     Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
     Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
-    Public leftView As cv.Mat
-    Public rightView As cv.Mat
-
     Public colorBytes() As Byte
     Public vertices() As Byte
     Public depthBytes() As Byte

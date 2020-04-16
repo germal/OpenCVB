@@ -125,25 +125,18 @@ Public Class Contours_Depth : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
-        Dim img = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-
-        Dim contours0 = cv.Cv2.FindContoursAsArray(img, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-        Dim contours()() As cv.Point = Nothing
-        ReDim contours(contours0.Length - 1)
+        ocvb.result2.SetTo(0)
+        Dim contours0 = cv.Cv2.FindContoursAsArray(trim.Mask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim maxIndex As Int32
         Dim maxNodes As Int32
-        For j = 0 To contours0.Length - 1
-            contours(j) = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
-            If maxNodes < contours(j).Length Then
-                maxIndex = j
-                maxNodes = contours(j).Length
+        For i = 0 To contours0.Length - 1
+            Dim contours = cv.Cv2.ApproxPolyDP(contours0(i), 3, True)
+            If maxNodes < contours.Length Then
+                maxIndex = i
+                maxNodes = contours.Length
             End If
         Next
-
-        ocvb.result2.SetTo(New cv.Scalar(0))
-        For i = 0 To contours0.Length - 1
-            If contours(i).Length > 10 Then cv.Cv2.DrawContours(ocvb.result2, contours, i, New cv.Scalar(0, 255, 255), -1)
-        Next
+        cv.Cv2.DrawContours(ocvb.result2, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         trim.Dispose()
@@ -161,37 +154,34 @@ Public Class Contours_RGB : Implements IDisposable
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
-        Dim img = ocvb.color.CvtColor(cv.ColorConversionCodes.bgr2gray)
-        Dim mask = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-        img.SetTo(0, mask)
+        Dim img = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        img.SetTo(0, trim.zeroMask)
 
         Dim contours0 = cv.Cv2.FindContoursAsArray(img, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-        Dim contours()() As cv.Point = Nothing
-        ReDim contours(contours0.Length - 1)
         Dim maxIndex As Int32
         Dim maxNodes As Int32
-        For j = 0 To contours0.Length - 1
-            contours(j) = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
-            If maxNodes < contours(j).Length Then
-                maxIndex = j
-                maxNodes = contours(j).Length
+        For i = 0 To contours0.Length - 1
+            Dim contours = cv.Cv2.ApproxPolyDP(contours0(i), 3, True)
+            If maxNodes < contours.Length Then
+                maxIndex = i
+                maxNodes = contours.Length
             End If
         Next
 
-        If contours.Length = 0 Then Exit Sub
+        If contours0(maxIndex).Length = 0 Then Exit Sub
 
         ocvb.result1.SetTo(New cv.Scalar(0))
-        Dim hull() = cv.Cv2.ConvexHull(contours(maxIndex), True)
+        Dim hull() = cv.Cv2.ConvexHull(contours0(maxIndex), True)
         Dim listOfPoints = New List(Of List(Of cv.Point))
         Dim points = New List(Of cv.Point)
-        For j = 0 To hull.Count - 1
-            points.Add(New cv.Point(hull(j).X, hull(j).Y))
+        For i = 0 To hull.Count - 1
+            points.Add(New cv.Point(hull(i).X, hull(i).Y))
         Next
         listOfPoints.Add(points)
         cv.Cv2.DrawContours(ocvb.result1, listOfPoints, 0, New cv.Scalar(255, 0, 0), -1)
-        cv.Cv2.DrawContours(ocvb.result1, contours, maxIndex, New cv.Scalar(0, 255, 255), -1)
+        cv.Cv2.DrawContours(ocvb.result1, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
         ocvb.result2.SetTo(0)
-        ocvb.color.CopyTo(ocvb.result2, mask)
+        ocvb.color.CopyTo(ocvb.result2, trim.zeroMask)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         trim.Dispose()

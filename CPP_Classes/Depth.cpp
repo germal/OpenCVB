@@ -86,6 +86,5 @@ int* Depth_Colorizer2_Run(Depth_Colorizer2 * Depth_ColorizerPtr, int* depthPtr, 
 	Depth_ColorizerPtr->depth32f = Mat(rows, cols, CV_32F, depthPtr);
 	Depth_ColorizerPtr->dst = Mat(rows, cols, CV_8UC3);
 	Depth_ColorizerPtr->Run();
-	Depth_ColorizerPtr->dst *= 0.001; // convert from millimeters to meters.
 	return (int*)Depth_ColorizerPtr->dst.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
 }

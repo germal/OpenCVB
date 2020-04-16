@@ -30,7 +30,6 @@ Public Class Edges_Canny : Implements IDisposable
         Else
             If src.Channels = 3 Then dst = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst = src.Canny(threshold1, threshold2, aperture, False)
-            cv.Cv2.ImShow("dst", dst)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

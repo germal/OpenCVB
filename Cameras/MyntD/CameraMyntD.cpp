@@ -1,30 +1,16 @@
 #include "../CameraDefines.hpp"
 #ifdef MYNTD_1000
-#ifdef _DEBUG
-#pragma comment(lib, "opencv_world343d.lib")
-#else
-#pragma comment(lib, "opencv_world343.lib")
-#endif
-#pragma comment(lib, "mynteye_depth.lib") 
 #include <iostream>
-#include <iomanip>
-#include <cstring>
-#include <string>
-#include <thread>
-#include <mutex>
-#include <cstdlib>
-#include <cstdio>
-#include <algorithm>
-#include <opencv2/core.hpp>
-#include <opencv2/calib3d.hpp>
-#include "opencv2/imgproc.hpp"
-#include "opencv2/imgcodecs.hpp"
-#include "opencv2/highgui.hpp"
 
+#include <opencv2/highgui/highgui.hpp>
+
+#define WITH_OPENCV
 #include <mynteyed/camera.h>
-#include <mynteyed/utils.h>
+#include <mynteyed/utils.h> 
+#include "../../CPP_Classes/DepthColorizer.hpp"
 
 MYNTEYE_USE_NAMESPACE
+using namespace cv;
 using namespace std;
 
 class CameraMyntD
@@ -32,8 +18,9 @@ class CameraMyntD
 public:
 	Camera cam;
 	DeviceInfo dev_info;
-
-	//int serialNumber = 0;
+	uchar *left_color, *right_color, * image_depth, * image_RGBdepth;
+	int rows, cols;
+	Depth_Colorizer16 * cPtr;
 	//CameraParameters intrinsicsLeft;
 	//CameraParameters intrinsicsRight;
 	//CalibrationParameters extrinsics;
@@ -58,21 +45,33 @@ public:
 	}
 	CameraMyntD(int w, int h, int fps)
 	{
-		//width = w;
-		//height = h;
-		//pixelCount = (long long)width * height;
+		DeviceInfo dev_info;
+		if (!util::select(cam, &dev_info))
+			std::cerr << "Error: select failed" << std::endl;
 
-		//init_params.sensors_required = true;
-		//init_params.depth_mode = DEPTH_MODE::ULTRA;
-		//init_params.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP; // OpenGL's coordinate system is right_handed
+		util::print_stream_infos(cam, dev_info.index);
 
-		//init_params.camera_resolution = sl::RESOLUTION::HD720;
-		//init_params.camera_fps = fps;
+		// std::cout << "Open device: " << dev_info.index << ", " << dev_info.name << std::endl << std::endl;
 
-		//zed.open(init_params);
+		OpenParams params(dev_info.index);
+		params.stream_mode = StreamMode::STREAM_2560x720;
+		params.ir_intensity = 4;
+		params.color_mode = ColorMode::COLOR_RECTIFIED;
+		params.depth_mode = DepthMode::DEPTH_RAW;
+		params.color_stream_format = StreamFormat::STREAM_YUYV;
+		params.framerate = 30;
 
-		//auto camera_info = zed.getCameraInformation();
-		//serialNumber = camera_info.serial_number;
+		cam.Open(params);
+
+		std::cout << std::endl;
+		if (!cam.IsOpened()) 
+			std::cerr << "Error: Open camera failed" << std::endl;
+
+		cPtr = new Depth_Colorizer16();
+		rows = h;
+		cols = w;
+		auto stream_intrinsics = cam.GetStreamIntrinsics(params.stream_mode);
+		
 		//extrinsics = camera_info.calibration_parameters_raw;
 		//intrinsicsLeft = camera_info.calibration_parameters.left_cam;
 		//intrinsicsRight = camera_info.calibration_parameters.right_cam;
@@ -82,50 +81,25 @@ public:
 		//zed.enablePositionalTracking(positional_tracking_param);
 	}
 
-	int *waitForFrame(void* rgba, void* depthRGBA, void* _depth32f, void* left, void* right, void* pointCloud)
+	int *waitForFrame()
 	{
-		//// allocate and free the mat structures to try and avoid the flicker problem as GPU memory garbage collects.
-		//sl::Mat color, RGBADepth, depth32F, leftView, rightView, pcMat;
-
-		//zed.grab();
-		//zed.retrieveImage(color, VIEW::LEFT, MEM::CPU);
-		//memcpy(rgba, (void*)color.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount * 4);
-
-		//zed.retrieveImage(RGBADepth, VIEW::DEPTH, MEM::CPU);
-		//memcpy(depthRGBA, (void*)RGBADepth.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount * 4);
-
-		//zed.retrieveMeasure(depth32F, MEASURE::DEPTH, MEM::CPU);
-		//memcpy(_depth32f, (void*)depth32F.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount * 4);
-
-		//zed.retrieveImage(leftView, VIEW::LEFT_GRAY, MEM::CPU);
-		//memcpy(left, (void*)leftView.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount);
-
-		//zed.retrieveImage(rightView, VIEW::RIGHT_GRAY, MEM::CPU);
-		//memcpy(right, (void*)rightView.getPtr<sl::uchar1>(sl::MEM::CPU), pixelCount);
-
-		//zed.retrieveMeasure(pcMat, MEASURE::XYZARGB, MEM::CPU);
-		//float* pc = (float*)pcMat.getPtr<sl::uchar1>(sl::MEM::CPU);
-		//float* pcXYZ = (float *)pointCloud;
-		//for (int i = 0; i < pixelCount * 4; i+= 4)
-		//{
-		//	pcXYZ[0] = pc[i];
-		//	pcXYZ[1] = pc[i + 1];
-		//	pcXYZ[2] = pc[i + 2];
-		//	pcXYZ += 3;
-		//}
-
-		//// explicitly free the mat structures - trying to fix the flicker problem with GPU memory.
-		//color.free(); RGBADepth.free(); depth32F.free(); leftView.free(); rightView.free(); pcMat.free();
-		//
-		//zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
-
-		//memcpy((void*)&rotation, (void*)&zed_pose.getRotationMatrix(), sizeof(float) * 9);
-		//memcpy((void*)&translation, (void*)&zed_pose.getTranslation(), sizeof(float) * 3);
-
-		//zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
-		//imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
-		//return (int*)&zed_pose.pose_data;
-		return 0;
+		left_color = right_color = image_depth = 0;  // assume we don't get any images.
+		auto left = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
+		if (left.img) left_color = left.img->To(ImageFormat::COLOR_BGR)->ToMat().data;
+		
+		auto right = cam.GetStreamData(ImageType::IMAGE_RIGHT_COLOR);
+		if (right.img) right_color = right.img->To(ImageFormat::COLOR_BGR)->ToMat().data;
+		
+		auto depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
+		if (depth.img)
+		{
+			auto depth16 = depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
+			cPtr->depth16 = depth16;
+			cPtr->dst = cv::Mat(rows, cols, CV_8UC3);
+			cPtr->Run();
+			image_depth = depth.img->To(ImageFormat::DEPTH_RAW)->ToMat().data;
+		}
+		return (int *) left_color;
 	}
 }; 
 
@@ -137,6 +111,22 @@ extern "C" __declspec(dllexport) int* MyntDOpen(int w, int h, int fps)
 extern "C" __declspec(dllexport) void MyntDClose(CameraMyntD * MyntD)
 {
 	delete MyntD;
+}
+extern "C" __declspec(dllexport) int* MyntDLeftImage(CameraMyntD * MyntD)
+{
+	return (int*)MyntD->left_color;
+}
+extern "C" __declspec(dllexport) int* MyntDRightImage(CameraMyntD * MyntD)
+{
+	return (int*)MyntD->right_color;
+}
+extern "C" __declspec(dllexport) int* MyntDImageRGBdepth(CameraMyntD * MyntD)
+{
+	return (int*)MyntD->cPtr->dst.data;
+}
+extern "C" __declspec(dllexport) int* MyntDImageDepth(CameraMyntD * MyntD)
+{
+	return (int*)MyntD->image_depth;
 }
 //extern "C" __declspec(dllexport) int* MyntDintrinsicsLeft(CameraMyntD* MyntD)
 //{
@@ -179,9 +169,9 @@ extern "C" __declspec(dllexport) void MyntDClose(CameraMyntD * MyntD)
 //{
 //	return MyntD->serialNumber;
 //}
-extern "C" __declspec(dllexport) int* MyntDWaitFrame(CameraMyntD* MyntD, void* rgba, void* depthRGBA, void* depth32f, void* left, void* right, void *pointCloud )
+extern "C" __declspec(dllexport) int *MyntDWaitFrame(CameraMyntD* MyntD)
 {
-	return MyntD->waitForFrame(rgba, depthRGBA, depth32f, left, right, pointCloud);
+	return MyntD->waitForFrame();
 }
 //extern "C" __declspec(dllexport) int* MyntDIMU_Magnetometer(CameraMyntD * MyntD)
 //{
