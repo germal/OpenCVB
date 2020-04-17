@@ -1,8 +1,11 @@
 #include "../CameraDefines.hpp"
 #ifdef MYNTD_1000
 #pragma comment(lib, "mynteye_depth.lib")
+#ifdef _DEBUG
+#pragma comment(lib, "opencv_world343d.lib") 
+#else
 #pragma comment(lib, "opencv_world343.lib") 
-
+#endif
 #include <iostream>
 
 #include <opencv2/highgui/highgui.hpp>
@@ -55,8 +58,8 @@ public:
 		params.stream_mode = StreamMode::STREAM_2560x720;
 		params.ir_intensity = 4;
 		params.color_mode = ColorMode::COLOR_RECTIFIED;
-		params.depth_mode = DepthMode::DEPTH_RAW;
 		params.color_stream_format = StreamFormat::STREAM_YUYV;
+		params.depth_mode = DepthMode::DEPTH_RAW;
 		params.framerate = 30;
 
 		cam.Open(params);
