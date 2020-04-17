@@ -94,19 +94,19 @@ Public Class CameraMyntD
             w = width
             h = height
 
-            'Dim ptr = MyntDExtrinsics(cPtr)
-            'Dim rotationTranslation(12) As Single
-            'Marshal.Copy(ptr, rotationTranslation, 0, rotationTranslation.Length)
-            'ReDim Extrinsics_VB.rotation(8)
-            'ReDim Extrinsics_VB.translation(2)
-            'For i = 0 To Extrinsics_VB.rotation.Length - 1
-            '    Extrinsics_VB.rotation(i) = rotationTranslation(i)
-            'Next
-            'For i = 0 To Extrinsics_VB.translation.Length - 1
-            '    Extrinsics_VB.translation(i) = rotationTranslation(i + Extrinsics_VB.rotation.Length - 1)
-            'Next
+            Dim ptr = MyntDExtrinsics(cPtr)
+            Dim rotationTranslation(12) As Double ' Mynt is using doubles but the VB copy will be a single.
+            Marshal.Copy(ptr, rotationTranslation, 0, rotationTranslation.Length)
+            ReDim Extrinsics_VB.rotation(9 - 1)
+            ReDim Extrinsics_VB.translation(3 - 1)
+            For i = 0 To Extrinsics_VB.rotation.Length - 1
+                Extrinsics_VB.rotation(i) = rotationTranslation(i)
+            Next
+            For i = 0 To Extrinsics_VB.translation.Length - 1
+                Extrinsics_VB.translation(i) = rotationTranslation(i + Extrinsics_VB.rotation.Length)
+            Next
 
-            Dim ptr = MyntDintrinsicsLeft(cPtr)
+            ptr = MyntDintrinsicsLeft(cPtr)
             Dim intrinsics = Marshal.PtrToStructure(Of MyntIntrinsics)(ptr)
             intrinsicsLeft_VB.ppx = intrinsics.cx
             intrinsicsLeft_VB.ppy = intrinsics.cy

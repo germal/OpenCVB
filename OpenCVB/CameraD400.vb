@@ -65,7 +65,6 @@ Public Class CameraD400
     Public ThresholdFilter As Boolean
 
     Dim intrinsicsLeft As rs.Intrinsics
-    Public extrinsics As rs.Extrinsics
     Public pc As New rs.PointCloud
     Public Sub New()
     End Sub
@@ -87,7 +86,7 @@ Public Class CameraD400
         intrinsicsRight_VB = intrinsicsLeft_VB ' need to get the Right lens intrinsics?
 
         Dim extrin = D400Extrinsics(cPtr)
-        extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin)
+        Dim extrinsics As rs.Extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin) ' they are both float's
         Extrinsics_VB.rotation = extrinsics.rotation
         Extrinsics_VB.translation = extrinsics.translation
     End Sub

@@ -835,6 +835,7 @@ Public Class Depth_Colorizer_2_CPP : Implements IDisposable
         trim = New Depth_InRange(ocvb)
         trim.externalUse = True
 
+        ocvb.label2 = "Mask from Depth_InRange"
         ocvb.desc = "Display depth data with inrange trim.  Higher contrast than others - yellow to blue always present."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

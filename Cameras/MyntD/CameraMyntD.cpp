@@ -1,11 +1,7 @@
 #include "../CameraDefines.hpp"
 #ifdef MYNTD_1000
 #pragma comment(lib, "mynteye_depth.lib")
-#ifdef _DEBUG
-#pragma comment(lib, "opencv_world343d.lib") 
-#else
 #pragma comment(lib, "opencv_world343.lib") 
-#endif
 #include <iostream>
 
 #include <opencv2/highgui/highgui.hpp>
@@ -28,6 +24,7 @@ public:
 	int rows, cols;
 	Depth_Colorizer16 * cPtr;
 	StreamIntrinsics intrinsicsBoth;
+	StreamExtrinsics extrinsics;
 	//CameraParameters intrinsicsLeft;
 	//CameraParameters intrinsicsRight;
 	//CalibrationParameters extrinsics;
@@ -72,14 +69,8 @@ public:
 		rows = h;
 		cols = w;
 		intrinsicsBoth = cam.GetStreamIntrinsics(params.stream_mode);
-		
-		//extrinsics = camera_info.calibration_parameters_raw;
-		//intrinsicsLeft = camera_info.calibration_parameters.left_cam;
-		//intrinsicsRight = camera_info.calibration_parameters.right_cam;
-
-		//PositionalTrackingParameters positional_tracking_param;
-		//positional_tracking_param.enable_area_memory = true;
-		//zed.enablePositionalTracking(positional_tracking_param);
+		bool ex_ok;
+		extrinsics = cam.GetStreamExtrinsics(StreamMode::STREAM_2560x720, &ex_ok);
 	}
 
 	int *waitForFrame()
@@ -148,14 +139,11 @@ extern "C" __declspec(dllexport) int* MyntDRotationMatrix(CameraMyntD * MyntD)
 	return (int*)&MyntD->intrinsicsBoth.right.r[0];
 }
 
-//extern "C" __declspec(dllexport) int* MyntDintrinsicsRight(CameraMyntD* MyntD)
-//{
-//	return (int*)&MyntD->intrinsicsRight;
-//}
-//extern "C" __declspec(dllexport) int* MyntDExtrinsics(CameraMyntD*MyntD)
-//{
-//	return (int *) &MyntD->extrinsics;
-//}
+
+extern "C" __declspec(dllexport) int* MyntDExtrinsics(CameraMyntD*MyntD)
+{
+	return (int *) &MyntD->extrinsics;
+}
 //extern "C" __declspec(dllexport) int* MyntDAcceleration(CameraMyntD * MyntD)
 //{
 //	return (int*)&MyntD->sensordata.imu.linear_acceleration;

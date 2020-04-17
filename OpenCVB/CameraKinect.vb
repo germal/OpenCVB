@@ -1,5 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
+Imports rs = Intel.RealSense
 Module Kinect_Interface
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectOpen() As IntPtr
@@ -41,7 +42,6 @@ Public Class CameraKinect
         Dim imu_Gyro As cv.Point3f
         Dim gyroTimeStamp As Long
     End Structure
-
     Structure intrinsicsLeftData
         Dim cx As Single            ' Principal point In image, x */
         Dim cy As Single            ' Principal point In image, y */
@@ -73,16 +73,9 @@ Public Class CameraKinect
             leftView = New cv.Mat
 
             Dim ptr = KinectExtrinsics(cPtr)
-            Dim rotationTranslation(12 - 1) As Single
-            Marshal.Copy(ptr, rotationTranslation, 0, rotationTranslation.Length)
-            ReDim Extrinsics_VB.rotation(9 - 1)
-            ReDim Extrinsics_VB.translation(3 - 1)
-            For i = 0 To Extrinsics_VB.rotation.Length - 1
-                Extrinsics_VB.rotation(i) = rotationTranslation(i)
-            Next
-            For i = 0 To Extrinsics_VB.translation.Length - 1
-                Extrinsics_VB.translation(i) = rotationTranslation(i + Extrinsics_VB.rotation.Length - 1)
-            Next
+            Dim extrinsics As rs.Extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(ptr)
+            Extrinsics_VB.rotation = extrinsics.rotation
+            Extrinsics_VB.translation = extrinsics.translation
 
             ptr = KinectintrinsicsLeft(cPtr)
             Dim intrinsicsLeftOutput = Marshal.PtrToStructure(Of intrinsicsLeftData)(ptr)
@@ -90,10 +83,8 @@ Public Class CameraKinect
             intrinsicsLeft_VB.ppy = intrinsicsLeftOutput.cy
             intrinsicsLeft_VB.fx = intrinsicsLeftOutput.fx
             intrinsicsLeft_VB.fy = intrinsicsLeftOutput.fy
-            ReDim intrinsicsLeft_VB.FOV(2)
-            'intrinsicsLeft_VB.FOV(0) = intrinsicsLeftOutput.fx ' no FOV from Kinect?  
-            'intrinsicsLeft_VB.FOV(1) = intrinsicsLeftOutput.fy
-            ReDim intrinsicsLeft_VB.coeffs(5)
+            ReDim intrinsicsLeft_VB.FOV(3 - 1)
+            ReDim intrinsicsLeft_VB.coeffs(6 - 1)
             intrinsicsLeft_VB.coeffs(0) = intrinsicsLeftOutput.k1
             intrinsicsLeft_VB.coeffs(1) = intrinsicsLeftOutput.k2
             intrinsicsLeft_VB.coeffs(2) = intrinsicsLeftOutput.k3
