@@ -32,7 +32,12 @@ Module MyntD_Interface
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDProjectionMatrix(cPtr As IntPtr) As IntPtr
     End Function
-
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function MyntDPointCloud(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function MyntDRawDepth(cPtr As IntPtr) As IntPtr
+    End Function
 
 
 
@@ -197,26 +202,19 @@ Public Class CameraMyntD
 
 
         Dim depthRGBPtr = MyntDImageRGBdepth(cPtr)
-        Dim depth16Ptr = MyntDImageDepth(cPtr)
+        Dim depth16Ptr = MyntDRawDepth(cPtr)
         Dim rightPtr = MyntDRightImage(cPtr)
-        SyncLock bufferLock
-            If imagePtr <> 0 Then color = New cv.Mat(h, w, cv.MatType.CV_8UC3, imagePtr).Clone()
-            leftView = color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            If rightPtr <> 0 Then rightView = New cv.Mat(h, w, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            If depthRGBPtr <> 0 Then RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, depthRGBPtr).Clone()
-
-            If depth16Ptr <> 0 Then
-                Dim depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, depth16Ptr)
-
-                Dim pcX = New cv.Mat(h, w, cv.MatType.CV_32F, 0)
-                Dim pcY = New cv.Mat(h, w, cv.MatType.CV_32F, 0)
-                Dim pcZ = New cv.Mat(h, w, cv.MatType.CV_32F)
-                depth16.ConvertTo(pcZ, cv.MatType.CV_32F)
-
-                Dim split() = {pcX, pcY, (pcZ * 0.001).ToMat()}
-                cv.Cv2.Merge(split, pointCloud)
-            End If
-        End SyncLock
-        MyBase.GetNextFrameCounts(IMU_FrameTime)
+        Dim pcPtr = MyntDPointCloud(cPtr)
+        If imagePtr <> 0 And depthRGBPtr <> 0 And rightPtr <> 0 And depth16Ptr <> 0 And pcPtr <> 0 Then
+            SyncLock bufferLock
+                If imagePtr <> 0 Then color = New cv.Mat(h, w, cv.MatType.CV_8UC3, imagePtr).Clone()
+                leftView = color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                If rightPtr <> 0 Then rightView = New cv.Mat(h, w, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                If depthRGBPtr <> 0 Then RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, depthRGBPtr).Clone()
+                pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pcPtr).Clone()
+                depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, depth16Ptr).Clone()
+            End SyncLock
+            MyBase.GetNextFrameCounts(IMU_FrameTime)
+        End If
     End Sub
 End Class

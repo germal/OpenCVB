@@ -27,6 +27,7 @@ Public Class AlgorithmData
     Public optionsTop As Int32
     Public parms As ActiveClass.algorithmParameters
     Public pointCloud As cv.Mat
+    Public depth16 As cv.Mat
     Public PythonExe As String
     Public PythonFileName As String
     Public rColors(255) As cv.Vec3b

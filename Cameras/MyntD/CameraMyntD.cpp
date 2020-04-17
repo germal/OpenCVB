@@ -20,22 +20,17 @@ class CameraMyntD
 public:
 	Camera cam;
 	DeviceInfo dev_info;
-	uchar *left_color, *right_color, * image_depth, * image_RGBdepth;
+	uchar *left_color, *right_color;
+	cv::Mat pointCloud, depth16;
 	int rows, cols;
 	Depth_Colorizer16 * cPtr;
 	StreamIntrinsics intrinsicsBoth;
 	StreamExtrinsics extrinsics;
-	//CameraParameters intrinsicsLeft;
-	//CameraParameters intrinsicsRight;
-	//CalibrationParameters extrinsics;
-	//float rotation[9];
-	//float translation[3];
 	//float acceleration[3];
 	//SensorsData sensordata;
 	//Orientation orientation;
 	//float imuTemperature;
 	//double imuTimeStamp;
-	//Pose zed_pose;
 private:
 	//float imuData;
 public:
@@ -71,11 +66,12 @@ public:
 		intrinsicsBoth = cam.GetStreamIntrinsics(params.stream_mode);
 		bool ex_ok;
 		extrinsics = cam.GetStreamExtrinsics(StreamMode::STREAM_2560x720, &ex_ok);
+		pointCloud = cv::Mat(h, w, CV_32FC3);
 	}
 
 	int *waitForFrame()
 	{
-		left_color = right_color = image_depth = 0;  // assume we don't get any images.
+		left_color = right_color = 0;  // assume we don't get any images.
 		auto left = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
 		if (left.img) left_color = left.img->To(ImageFormat::COLOR_BGR)->ToMat().data;
 		
@@ -85,16 +81,40 @@ public:
 		auto depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
 		if (depth.img)
 		{
-			auto depth16 = depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
+			depth16 = depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
 			cPtr->depth16 = depth16;
 			cPtr->dst = cv::Mat(rows, cols, CV_8UC3);
 			cPtr->Run();
-			image_depth = depth.img->To(ImageFormat::DEPTH_RAW)->ToMat().data;
+
+			Point3f* p = (Point3f*)pointCloud.data;
+			int cols = pointCloud.cols;
+			int rows = pointCloud.rows;
+			float z;
+			auto intrin = intrinsicsBoth.left;	
+			Point3f zero(0, 0, 0);
+			for (int y = 0; y < rows; y++) {
+				for (int x = 0; x < cols; x++) {
+					std::uint16_t d = depth16.ptr<std::uint16_t>(y)[x];
+					if (d != 0)
+					{
+						z = static_cast<float>(d) * 0.001;
+						p[y * cols + x] = Point3f((x - intrin.cx) * z / intrin.fx, (y - intrin.cy) * z / intrin.fy, z);
+					}
+					else {
+						p[y * cols + x] = zero;
+					}
+				}
+			}
 		}
 		return (int *) left_color;
 	}
 }; 
 
+
+extern "C" __declspec(dllexport) int* MyntDWaitFrame(CameraMyntD * MyntD)
+{
+	return MyntD->waitForFrame();
+}
 extern "C" __declspec(dllexport) int* MyntDOpen(int w, int h, int fps)
 {
 	CameraMyntD* MyntD = new CameraMyntD(w, h, fps);
@@ -116,10 +136,6 @@ extern "C" __declspec(dllexport) int* MyntDImageRGBdepth(CameraMyntD * MyntD)
 {
 	return (int*)MyntD->cPtr->dst.data;
 }
-extern "C" __declspec(dllexport) int* MyntDImageDepth(CameraMyntD * MyntD)
-{
-	return (int*)MyntD->image_depth;
-}
 extern "C" __declspec(dllexport) int* MyntDintrinsicsLeft(CameraMyntD * MyntD)
 {
 	return (int*)&MyntD->intrinsicsBoth.left.width;
@@ -138,11 +154,17 @@ extern "C" __declspec(dllexport) int* MyntDRotationMatrix(CameraMyntD * MyntD)
 {
 	return (int*)&MyntD->intrinsicsBoth.right.r[0];
 }
-
-
-extern "C" __declspec(dllexport) int* MyntDExtrinsics(CameraMyntD*MyntD)
+extern "C" __declspec(dllexport) int* MyntDExtrinsics(CameraMyntD * MyntD)
 {
-	return (int *) &MyntD->extrinsics;
+	return (int*)&MyntD->extrinsics;
+}
+extern "C" __declspec(dllexport) int* MyntDPointCloud(CameraMyntD * MyntD)
+{
+	return (int*)MyntD->pointCloud.data;
+}
+extern "C" __declspec(dllexport) int* MyntDRawDepth(CameraMyntD * MyntD)
+{
+	return (int*)MyntD->depth16.data;
 }
 //extern "C" __declspec(dllexport) int* MyntDAcceleration(CameraMyntD * MyntD)
 //{
@@ -169,14 +191,7 @@ extern "C" __declspec(dllexport) int* MyntDExtrinsics(CameraMyntD*MyntD)
 //	MyntD->orientation = MyntD->sensordata.imu.pose.getOrientation();
 //	return (int*)&MyntD->orientation;
 //}
-//extern "C" __declspec(dllexport) int MyntDSerialNumber(CameraMyntD * MyntD)
-//{
-//	return MyntD->serialNumber;
-//}
-extern "C" __declspec(dllexport) int *MyntDWaitFrame(CameraMyntD* MyntD)
-{
-	return MyntD->waitForFrame();
-}
+
 //extern "C" __declspec(dllexport) int* MyntDIMU_Magnetometer(CameraMyntD * MyntD)
 //{
 //	return (int*)&MyntD->sensordata.magnetometer.magnetic_field_uncalibrated; // calibrated values look incorrect.

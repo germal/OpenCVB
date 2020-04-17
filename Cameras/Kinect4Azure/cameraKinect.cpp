@@ -196,6 +196,12 @@ int* KinectPointCloud(KinectCamera * kc)
 }
 
 extern "C" __declspec(dllexport)
+int* KinectRawDepth(KinectCamera * kc)
+{
+	return (int*)kc->dcptr->depth16.data;
+}
+
+extern "C" __declspec(dllexport)
 int* KinectRGBA(KinectCamera * kc)
 {
 	return (int*)kc->colorBuffer;

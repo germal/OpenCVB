@@ -1040,6 +1040,7 @@ Public Class OpenCVB
                     OpenCVB.ocvb.rightView = camera.rightView
                 End If
                 OpenCVB.ocvb.pointCloud = camera.PointCloud
+                OpenCVB.ocvb.depth16 = camera.depth16
                 OpenCVB.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
                 OpenCVB.ocvb.parms.transformationMatrix = camera.transformationMatrix
                 OpenCVB.ocvb.parms.IMU_TimeStamp = camera.IMU_TimeStamp

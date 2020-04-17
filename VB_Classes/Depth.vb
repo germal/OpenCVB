@@ -698,10 +698,10 @@ Module Depth_Colorizer_CPP_Module
     End Function
 
     Public Function getDepth32f(ocvb As AlgorithmData) As cv.Mat
-        Dim split(3 - 1) As cv.Mat
-        cv.Cv2.Split(ocvb.pointCloud, split)
-        If ocvb.parms.lowResolution Then Return (split(2) * 1000).ToMat.Resize(ocvb.color.Size())
-        Return (split(2) * 1000).ToMat ' z is aligned with RGB
+        Dim depth32f As New cv.Mat
+        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        If ocvb.parms.lowResolution Then Return depth32f.Resize(ocvb.color.Size())
+        Return depth32f
     End Function
 End Module
 

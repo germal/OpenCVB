@@ -32,6 +32,9 @@ Module Kinect_Interface
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDepthInColor(cPtr As IntPtr) As IntPtr
     End Function
+    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function KinectRawDepth(cPtr As IntPtr) As IntPtr
+    End Function
 End Module
 Public Class CameraKinect
     Inherits Camera
@@ -139,7 +142,7 @@ Public Class CameraKinect
             Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBuffer)
             SyncLock bufferLock
                 color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
-
+                depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, KinectRawDepth(cPtr)).Clone()
                 RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes).Clone()
                 ' if you normalize here instead of just a fixed multiply, the image will pulse with different brightness values.  Not pretty.
                 leftView = (New cv.Mat(h, w, cv.MatType.CV_16U, KinectLeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs() ' so depth data fits into 0-255 (approximately)

@@ -26,7 +26,7 @@ class t265sgm
 {
 private:
 public:
-	Mat disp16s;
+	Mat depth16s;
 	Ptr<StereoSGBM> stereo;
 	t265sgm(int minDisp, int windowSize, int numDisp)
 	{
@@ -34,8 +34,8 @@ public:
 	}
 	Mat Run(Mat leftimg, Mat rightimg, int maxDisp)
 	{
-		stereo->compute(leftimg, rightimg, disp16s);
-		return disp16s;
+		stereo->compute(leftimg, rightimg, depth16s);
+		return depth16s;
 	}
 };
 
@@ -43,7 +43,7 @@ class t265Camera
 {
 public:
 	Mat leftViewMap1, leftViewMap2, rightViewMap1, rightViewMap2;
-	Mat color, depth16, leftViewRaw, rightViewRaw, depth8u, pointCloud;
+	Mat color, depth16, leftViewRaw, rightViewRaw, depth8u, pointCloud, depth16s, depth16u;
 	int rawWidth, rawHeight;
 	rs2_intrinsics intrinsicsLeft, intrinsicsRight;
 	rs2_extrinsics extrinsics;
@@ -164,6 +164,7 @@ public:
 		dxyz = new DepthXYZ(intrinsicsLeft.ppx, intrinsicsLeft.ppy, intrinsicsLeft.fx, intrinsicsLeft.fy);
 		depth8u = Mat(720, 1280, CV_8U);
 		pointCloud = Mat(depth8u.rows, depth8u.cols, CV_32FC3);
+		depth16u = Mat(depth8u.rows, depth8u.cols, CV_16U);
 		const Scalar& s = Scalar(0, 0, 0);
 		pointCloud.setTo(s);
 	}
@@ -181,7 +182,7 @@ public:
 		auto gyro = frameset.first_or_default(RS2_STREAM_GYRO);
 		gyro_data = (float3*)gyro.get_data();
 
-		Mat disp16s, tmpColor, remapLeft, remapRight;
+		Mat tmpColor, remapLeft, remapRight;
 
 		auto fs = frameset.as<rs2::frameset>();
 		rs2::frame leftImage = fs.get_fisheye_frame(1);
@@ -194,14 +195,14 @@ public:
 		rs2::frame rightImage = fs.get_fisheye_frame(2);
 		rightViewRaw = Mat(rawHeight, rawWidth, CV_8U, (void*)rightImage.get_data());
 		cv::remap(rightViewRaw, remapRight, rm1, rm2, INTER_LINEAR);
-		disp16s = sgm->Run(remapLeft, remapRight, maxDisp);
+		depth16s = sgm->Run(remapLeft, remapRight, maxDisp);
 
-		Rect validRect = Rect(maxDisp, 0, disp16s.cols - maxDisp, disp16s.rows);
-		disp16s = disp16s(validRect);
+		Rect validRect = Rect(maxDisp, 0, depth16s.cols - maxDisp, depth16s.rows);
+		depth16s = depth16s(validRect);
 		Mat tmp = Mat(300, 300, CV_32F, 20000);
 		Mat disparity(tmp.cols, tmp.rows, CV_32F);
 		Rect rectDepth((tmp.cols - 1) / 2 + dispOffset, 0, tmp.cols, tmp.rows);
-		disp16s.convertTo(disparity, CV_32F, 1.0f / 16.0f);
+		depth16s.convertTo(disparity, CV_32F, 1.0f / 16.0f);
 		threshold(disparity, disparity, 0, 0, cv::THRESH_TOZERO); // anything below zero is now zero...
 
 		dxyz->depth = Mat(tmp.rows, tmp.cols, CV_32F);
@@ -305,6 +306,12 @@ extern "C" __declspec(dllexport)
 int* T265Depth8u(t265Camera * tp)
 {
 	return (int*)tp->depth8u.data;
+}
+
+extern "C" __declspec(dllexport)
+int* T265RawDepth(t265Camera * tp)
+{
+	return (int*)tp->depth16s.data;
 }
 
 extern "C" __declspec(dllexport)

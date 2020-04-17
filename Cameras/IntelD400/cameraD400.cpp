@@ -72,7 +72,7 @@ public:
 
 	void waitForFrame()
 	{
-		frames = pipeline.wait_for_frames(1000);
+		frames = pipeline.wait_for_frames(5000);
 	}
 };
 
@@ -151,6 +151,12 @@ int* D400RGBDepth(D400Camera * tp)
 {
 	auto RGBDepth = tp->colorizer.process(tp->processedFrames.get_depth_frame());
 	return (int*)RGBDepth.get_data();
+}
+
+extern "C" __declspec(dllexport)
+int* D400RawDepth(D400Camera * tp)
+{
+	return (int*)tp->frames.get_depth_frame().get_data();
 }
 
 extern "C" __declspec(dllexport)

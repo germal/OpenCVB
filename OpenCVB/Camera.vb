@@ -20,14 +20,16 @@ Public Class Camera
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
     Public frameCount As Integer
-    Public pointCloud As New cv.Mat
     Public w As Int32
+    Public h As Int32
 
     Public color As New cv.Mat
     Public RGBDepth As New cv.Mat
     Public leftView As New cv.Mat
     Public rightView As New cv.Mat
-    Public h As Int32
+    Public pointCloud As New cv.Mat
+    Public depth16 As New cv.Mat
+
 
     Public deviceCount As Int32
     Public deviceName As String
