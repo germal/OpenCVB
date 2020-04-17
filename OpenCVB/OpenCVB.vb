@@ -1022,6 +1022,8 @@ Public Class OpenCVB
             If stopAlgorithmThread Then Exit While
             If saveAlgorithmTestCount <> AlgorithmTestCount Then Exit While ' a failsafe provision.  This task needs to exit.
 
+            If camera.color.width = 0 Or camera.RGBDepth.width = 0 Or camera.leftView.width = 0 Or camera.rightView.width = 0 Then Continue While
+
             ' bring the data into the algorithm task.
             SyncLock bufferLock
                 camera.newImagesAvailable = False
