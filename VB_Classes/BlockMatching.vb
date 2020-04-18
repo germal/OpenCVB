@@ -1,10 +1,10 @@
 ﻿Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/stereo_match.cpp
-Public Class BlockMatching_Basics1 : Implements IDisposable
-    Dim colorizer As Depth_Colorizer_1_CPP
+Public Class BlockMatching_Basics : Implements IDisposable
+    Dim colorizer As Depth_Colorizer_CPP
     Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        colorizer = New Depth_Colorizer_1_CPP(ocvb)
+        colorizer = New Depth_Colorizer_CPP(ocvb)
 
         sliders.setupTrackBar1(ocvb, "Blockmatch scale", 1, 200, 100)
         sliders.setupTrackBar2(ocvb, "Blockmatch max disparity", 1, 8, 1)

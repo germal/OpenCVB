@@ -706,7 +706,7 @@ Module Depth_Colorizer_CPP_Module
 End Module
 
 
-Public Class Depth_Colorizer_1_CPP : Implements IDisposable
+Public Class Depth_Colorizer_CPP : Implements IDisposable
     Public dst As New cv.Mat
     Public src As New cv.Mat
     Public externalUse As Boolean
@@ -823,7 +823,7 @@ End Class
 
 
 
-Public Class Depth_Colorizer_2_CPP : Implements IDisposable
+Public Class Depth_ColorizerFastFade_CPP : Implements IDisposable
     Dim trim As Depth_InRange
     Public dst As New cv.Mat
     Public src As New cv.Mat

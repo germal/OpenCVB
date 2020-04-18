@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Resize_Options : Implements IDisposable
+Public Class Resize_Basics : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Public externalUse As Boolean
     Public src As cv.Mat
@@ -12,6 +12,7 @@ Public Class Resize_Options : Implements IDisposable
         radio.check(6).Enabled = False
 
         ocvb.desc = "Resize with different options and compare them"
+        ocvb.label1 = "Rectangle highlight above resized"
         ocvb.label2 = "Difference from Cubic Resize (Best)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -22,8 +23,9 @@ Public Class Resize_Options : Implements IDisposable
 
             ocvb.result1 = ocvb.color(roi).Resize(ocvb.result1.Size(), 0, 0, resizeFlag)
 
-            ocvb.result2 = (ocvb.color(roi).Resize(ocvb.result1.Size(), 0, 0, cv.InterpolationFlags.Cubic) - ocvb.result1).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            ocvb.color.Rectangle(roi, cv.Scalar.White, 1)
+            ocvb.result2 = (ocvb.color(roi).Resize(ocvb.result1.Size(), 0, 0, cv.InterpolationFlags.Cubic) -
+                            ocvb.result1).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            ocvb.color.Rectangle(roi, cv.Scalar.White, 2)
         Else
             dst = src.Resize(newSize, 0, 0, resizeFlag)
         End If
@@ -36,14 +38,58 @@ End Class
 
 
 
+
+Public Class Resize_BetterWith32Bit : Implements IDisposable
+    Public radio As New OptionsRadioButtons
+    Dim colorizer As Depth_Colorizer_CPP
+    Public Sub New(ocvb As AlgorithmData)
+        colorizer = New Depth_Colorizer_CPP(ocvb)
+        colorizer.externalUse = True
+        SetInterpolationRadioButtons(ocvb, radio, "Resize")
+        ' warp is not allowed in resize
+        radio.check(5).Enabled = False
+        radio.check(6).Enabled = False
+
+        ocvb.label1 = "Resized depth16 run thru colorizer"
+        ocvb.label2 = "Resized depth8UC3 after running thru colorizer"
+        ocvb.desc = "When you resize depth16 is important.  Use depth16 at high resolution and resize the 8UC3 result"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim resizeFlag = getInterpolationRadioButtons(radio)
+        Dim newSize = ocvb.color.Size()
+        If ocvb.parms.lowResolution = False Then newSize = New cv.Size(ocvb.color.Height / 2, ocvb.color.Width / 2)
+
+        Dim depth32f As New cv.Mat
+        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        colorizer.src = depth32f
+        colorizer.Run(ocvb)
+        ocvb.result2 = colorizer.dst.Resize(newSize, 0, resizeFlag)
+
+        Dim depth16 = ocvb.depth16.Resize(newSize, 0, resizeFlag)
+        depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        colorizer.src = depth32f
+        colorizer.Run(ocvb)
+        ocvb.result1 = colorizer.dst
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        radio.Dispose()
+        colorizer.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class Resize_Percentage : Implements IDisposable
     Public sliders As New OptionsSliders
     Public src As New cv.Mat
     Public dst As New cv.Mat
     Public externalUse As Boolean
-    Public resizeOptions As Resize_Options
+    Public resizeOptions As Resize_Basics
     Public Sub New(ocvb As AlgorithmData)
-        resizeOptions = New Resize_Options(ocvb)
+        resizeOptions = New Resize_Basics(ocvb)
         resizeOptions.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Resize Percentage (%)", 1, 100, 3)

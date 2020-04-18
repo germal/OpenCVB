@@ -15,6 +15,7 @@ public:
 		unsigned char nearColor[3] = { 0, 255, 255 };
 		unsigned char farColor[3] = { 255, 0, 0 };
 		int histogram[256 * 256] = { 1 };
+		dst = cv::Mat(depth16.size(), CV_8UC3);
 		// Produce a cumulative histogram of depth values
 		unsigned short* depthImage = (unsigned short*)depth16.data;
 		for (int i = 0; i < depth16.cols * depth16.rows; ++i)
@@ -68,6 +69,7 @@ public:
 		unsigned char nearColor[3] = { 0, 255, 255 };
 		unsigned char farColor[3] = { 255, 0, 0 };
 		int histogram[256 * 256] = { 1 };
+		dst = Mat(depth32f.size(), CV_32F);
 		// Produce a cumulative histogram of depth values
 		float* depthImage = (float*)depth32f.data;
 		for (int i = 0; i < depth32f.cols * depth32f.rows; ++i)

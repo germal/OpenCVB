@@ -30,10 +30,9 @@ Module recordPlaybackCommon
         binWrite.Write(ocvb.color.Height)
         binWrite.Write(ocvb.color.ElemSize)
 
-        Dim depth32f = getDepth32f(ocvb)
-        binWrite.Write(depth32f.Width)
-        binWrite.Write(depth32f.Height)
-        binWrite.Write(depth32f.ElemSize)
+        binWrite.Write(ocvb.depth16.Width)
+        binWrite.Write(ocvb.depth16.Height)
+        binWrite.Write(ocvb.depth16.ElemSize)
 
         binWrite.Write(ocvb.RGBDepth.Width)
         binWrite.Write(ocvb.RGBDepth.Height)
@@ -71,6 +70,7 @@ Public Class Replay_Record : Implements IDisposable
     Dim recordingActive As Boolean
     Dim colorBytes() As Byte
     Dim RGBDepthBytes() As Byte
+    Dim depth16Bytes() As Byte
     Dim cloudBytes() As Byte
     Public Sub New(ocvb As AlgorithmData)
         If ocvb.parms.ShowOptions Then recording.Show()
@@ -95,6 +95,10 @@ Public Class Replay_Record : Implements IDisposable
                 Marshal.Copy(ocvb.color.Data, colorBytes, 0, colorBytes.Length)
                 binWrite.Write(colorBytes)
                 bytesTotal += colorBytes.Length
+
+                Marshal.Copy(ocvb.depth16.Data, depth16Bytes, 0, depth16Bytes.Length)
+                binWrite.Write(depth16Bytes)
+                bytesTotal += depth16Bytes.Length
 
                 Marshal.Copy(ocvb.RGBDepth.Data, RGBDepthBytes, 0, RGBDepthBytes.Length)
                 binWrite.Write(RGBDepthBytes)
@@ -134,6 +138,7 @@ Public Class Replay_Play : Implements IDisposable
     Dim binRead As BinaryReader
     Dim playbackActive As Boolean
     Dim colorBytes() As Byte
+    Dim depth16Bytes() As Byte
     Dim RGBDepthBytes() As Byte
     Dim cloudBytes() As Byte
     Dim fh As New fileHeader
@@ -153,6 +158,10 @@ Public Class Replay_Play : Implements IDisposable
                 Dim tmpMat = New cv.Mat(fh.colorHeight, fh.colorWidth, cv.MatType.CV_8UC3, colorBytes)
                 ocvb.color = tmpMat.Resize(ocvb.color.Size())
                 bytesTotal += colorBytes.Length
+
+                depth16Bytes = binRead.ReadBytes(bytesPerDepth)
+                tmpMat = New cv.Mat(fh.depthHeight, fh.depthWidth, cv.MatType.CV_16U, depth16Bytes)
+                bytesTotal += depth16Bytes.Length
 
                 RGBDepthBytes = binRead.ReadBytes(bytesPerRGBDepth)
                 tmpMat = New cv.Mat(fh.RGBDepthHeight, fh.RGBDepthWidth, cv.MatType.CV_8UC3, RGBDepthBytes)
@@ -185,7 +194,8 @@ Public Class Replay_Play : Implements IDisposable
                 readHeader(fh, binRead)
 
                 bytesPerColor = fh.colorWidth * fh.colorHeight * fh.colorElemsize
-                bytesPerRGBDepth = fh.RGBDepthWidth * fh.RGBDepthHeight * fh.RGBDepthElemsize
+                bytesPerDepth = fh.cloudWidth * fh.cloudHeight * fh.depthElemsize
+                bytesPerRGBDepth = fh.depthWidth * fh.depthHeight * fh.depthElemsize
                 bytesPerCloud = fh.cloudWidth * fh.cloudHeight * fh.cloudElemsize
 
                 ReDim colorBytes(bytesPerColor - 1)

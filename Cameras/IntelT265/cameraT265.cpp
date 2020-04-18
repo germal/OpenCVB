@@ -42,8 +42,8 @@ public:
 class t265Camera
 {
 public:
-	Mat leftViewMap1, leftViewMap2, rightViewMap1, rightViewMap2;
-	Mat color, depth16, leftViewRaw, rightViewRaw, depth8u, pointCloud, depth16s, depth16u;
+	Mat leftViewMap1, leftViewMap2, rightViewMap1, rightViewMap2, disparity;
+	Mat color, depth16, leftViewRaw, rightViewRaw, depth32f, depth16s;
 	int rawWidth, rawHeight;
 	rs2_intrinsics intrinsicsLeft, intrinsicsRight;
 	rs2_extrinsics extrinsics;
@@ -51,9 +51,9 @@ public:
 	rs2_pose pose_data;
 	double IMU_TimeStamp;
 	rs2::pipeline pipeline;
-	DepthXYZ* dxyz;
 	float3 *gyro_data;
 	float3 *accel_data;
+	Depth_Colorizer* cPtr;
 
 private:
 	int width, height;
@@ -78,6 +78,7 @@ public:
 	{
 		width = w;
 		height = h;
+		cPtr = new Depth_Colorizer();
 
 		cfg.enable_stream(RS2_STREAM_POSE, RS2_FORMAT_6DOF);
 		cfg.enable_stream(RS2_STREAM_GYRO);
@@ -160,13 +161,6 @@ public:
 		cv::fisheye::initUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, Size(rawWidth, rawHeight), CV_32FC1, rightViewMap1, rightViewMap2);
 
 		sgm = new t265sgm(minDisp, windowSize, numDisp);
-
-		dxyz = new DepthXYZ(intrinsicsLeft.ppx, intrinsicsLeft.ppy, intrinsicsLeft.fx, intrinsicsLeft.fy);
-		depth8u = Mat(720, 1280, CV_8U);
-		pointCloud = Mat(depth8u.rows, depth8u.cols, CV_32FC3);
-		depth16u = Mat(depth8u.rows, depth8u.cols, CV_16U);
-		const Scalar& s = Scalar(0, 0, 0);
-		pointCloud.setTo(s);
 	}
 
 	void waitForFrame()
@@ -199,27 +193,20 @@ public:
 
 		Rect validRect = Rect(maxDisp, 0, depth16s.cols - maxDisp, depth16s.rows);
 		depth16s = depth16s(validRect);
-		Mat tmp = Mat(300, 300, CV_32F, 20000);
-		Mat disparity(tmp.cols, tmp.rows, CV_32F);
-		Rect rectDepth((tmp.cols - 1) / 2 + dispOffset, 0, tmp.cols, tmp.rows);
+		Mat tmp = Mat(stereo_height_px, stereo_height_px, CV_32F, 20000); // this is just an estimate of an actual disparity to depth conversion.
+		disparity = Mat(tmp.rows, tmp.cols, CV_32F);
 		depth16s.convertTo(disparity, CV_32F, 1.0f / 16.0f);
 		threshold(disparity, disparity, 0, 0, cv::THRESH_TOZERO); // anything below zero is now zero...
 
-		dxyz->depth = Mat(tmp.rows, tmp.cols, CV_32F);
-		divide(tmp, disparity, dxyz->depth);  // this is a hack to dummy up an approximate depth32f and point cloud.
+		depth32f = Mat(tmp.rows, tmp.cols, CV_32F);
+		divide(tmp, disparity, depth32f);  // this is a hack to dummy up an approximate depth32f and point cloud.
 
-		dxyz->Run();
-		float* pc = (float*)dxyz->depthxyz.data;
-		for (int i = 0; i < tmp.rows * tmp.cols * 3; ++i)
+		float* pc = (float*)depth32f.data;
+		for (int i = 0; i < tmp.rows * tmp.cols; ++i)
 			if (isnan(pc[i]) || isinf(pc[i])) pc[i] = 0;
 
-		dxyz->depthxyz.copyTo(pointCloud(rectDepth));
-		Mat split[3];
-		cv::split(dxyz->depthxyz, split);
-
-		normalize(split[2], split[2], 0, 255, NORM_MINMAX); // normalize the depth to values between 0-255
-		split[2] = 255 - split[2];
-		convertScaleAbs(split[2], depth8u(rectDepth), 1);
+		cPtr->depth32f = depth32f;
+		cPtr->Run(); // the rgb output is in cPtr->dst
 	}
 };
 
@@ -278,6 +265,13 @@ int* T265Color(t265Camera * tp)
 	return (int*)tp->color.data;
 }
 
+
+extern "C" __declspec(dllexport)
+int* T265RGBdepth(t265Camera * tp)
+{
+	return (int*)tp->cPtr->dst.data;
+}
+
 extern "C" __declspec(dllexport)
 int* T265PoseData(t265Camera * tp)
 {
@@ -297,21 +291,9 @@ int* T265AccelData(t265Camera * tp)
 }
 
 extern "C" __declspec(dllexport)
-int* T265PointCloud(t265Camera * tp)
+int* T265Depth32f(t265Camera * tp)
 {
-	return (int*)tp->pointCloud.data;
-}
-
-extern "C" __declspec(dllexport)
-int* T265Depth8u(t265Camera * tp)
-{
-	return (int*)tp->depth8u.data;
-}
-
-extern "C" __declspec(dllexport)
-int* T265RawDepth(t265Camera * tp)
-{
-	return (int*)tp->depth16s.data;
+	return (int*)tp->depth32f.data;
 }
 
 extern "C" __declspec(dllexport)

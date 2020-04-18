@@ -119,12 +119,12 @@ End Class
 
 
 Public Class ML_DepthFromColor_MT : Implements IDisposable
-    Dim colorizer As Depth_Colorizer_1_CPP
+    Dim colorizer As Depth_Colorizer_CPP
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        colorizer = New Depth_Colorizer_1_CPP(ocvb)
+        colorizer = New Depth_Colorizer_CPP(ocvb)
         colorizer.externalUse = True
 
         dilate = New DilateErode_Basics(ocvb)
@@ -194,13 +194,13 @@ End Class
 
 
 Public Class ML_DepthFromColor : Implements IDisposable
-    Dim colorizer As Depth_Colorizer_1_CPP
+    Dim colorizer As Depth_Colorizer_CPP
     Dim mats As Mat_4to1
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        colorizer = New Depth_Colorizer_1_CPP(ocvb)
+        colorizer = New Depth_Colorizer_CPP(ocvb)
         colorizer.externalUse = True
 
         mats = New Mat_4to1(ocvb)
@@ -285,9 +285,9 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
     Dim sliders As New OptionsSliders
-    Dim colorizer As Depth_Colorizer_1_CPP
+    Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData)
-        colorizer = New Depth_Colorizer_1_CPP(ocvb)
+        colorizer = New Depth_Colorizer_CPP(ocvb)
         colorizer.externalUse = True
 
         mats = New Mat_4to1(ocvb)
@@ -386,12 +386,12 @@ End Class
 
 
 Public Class ML_EdgeDepth : Implements IDisposable
-    Dim colorizer As Depth_Colorizer_1_CPP
+    Dim colorizer As Depth_Colorizer_CPP
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
     Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        colorizer = New Depth_Colorizer_1_CPP(ocvb)
+        colorizer = New Depth_Colorizer_CPP(ocvb)
         colorizer.externalUse = True
 
         dilate = New DilateErode_Basics(ocvb)

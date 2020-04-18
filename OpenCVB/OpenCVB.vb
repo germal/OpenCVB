@@ -97,7 +97,7 @@ Public Class OpenCVB
                 ' if the debug dll exists, then remove the Release version because Release is ahead of Debug in the path for this app.
                 Dim releaseDLL = New FileInfo(HomeDir.FullName + "\bin\Release\" + dllName)
                 If releaseDLL.Exists Then
-                    If dllFile.CreationTime.CompareTo(releaseDLL.CreationTime) Then releaseDLL.Delete() Else dllFile.Delete()
+                    If DateTime.Compare(dllFile.LastWriteTime, releaseDLL.LastWriteTime) > 0 Then releaseDLL.Delete() Else dllFile.Delete()
                 End If
             End If
         Next
@@ -269,7 +269,9 @@ Public Class OpenCVB
             Dim pic = DirectCast(sender, PictureBox)
             g.ScaleTransform(1, 1)
             g.DrawImage(pic.Image, 0, 0)
-            g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
+            If drawRect.Width > 0 And drawRect.Height > 0 Then
+                g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
+            End If
             If algorithmRefresh Then
                 algorithmRefresh = False
                 SyncLock formResult1
@@ -792,8 +794,8 @@ Public Class OpenCVB
             Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
             Dim totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / 1000000
             Static lastBytesUsed = totalBytesOfMemoryUsed
-            If frameCount Mod 100 = 0 And Math.Abs(lastBytesUsed - totalBytesOfMemoryUsed) > 5 Then
-                Console.WriteLine("memory used = " + Format(CInt(totalBytesOfMemoryUsed), "###,##0") + "MB")
+            If frameCount Mod 100 = 0 And Math.Abs(lastBytesUsed - totalBytesOfMemoryUsed) > 10 Then
+                Console.WriteLine("OpenCVB is using " + Format(CInt(totalBytesOfMemoryUsed), "###,##0") + "MB of memory")
                 lastBytesUsed = totalBytesOfMemoryUsed
             End If
             If totalBytesOfMemoryUsed > 2000 Then Console.WriteLine("Memory leak!")

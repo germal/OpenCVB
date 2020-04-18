@@ -42,16 +42,16 @@ Module T265_Module_CPP
     Public Function T265AccelData(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265PointCloud(tp As IntPtr) As IntPtr
-    End Function
-    <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265Depth8u(tp As IntPtr) As IntPtr
+    Public Function T265Depth32f(tp As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265IMUTimeStamp(tp As IntPtr) As Double
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265Color(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function T265RGBdepth(tp As IntPtr) As IntPtr
     End Function
 End Module
 
@@ -71,7 +71,6 @@ Public Class CameraT265
     Dim rawWidth As Int32
 
     Public extrinsics As rs.Extrinsics
-    Public pc As New rs.PointCloud
     Dim rawSrcRect As cv.Rect
     Dim rawDstRect As cv.Rect
 
@@ -106,8 +105,9 @@ Public Class CameraT265
         rawSrcRect = New cv.Rect((rawWidth - rawWidth * h / rawHeight) / 2, 0, rawWidth * h / rawHeight, h)
         rawDstRect = New cv.Rect(0, 0, rawSrcRect.Width, rawSrcRect.Height)
 
-        pointCloud = New cv.Mat()
         RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, 0)
+        depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
+        pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, 0) ' we build an empty point cloud for the T265
     End Sub
     Public Sub GetNextFrame()
         If pipelineClosed Or cPtr = 0 Then Exit Sub
@@ -150,11 +150,15 @@ Public Class CameraT265
             rightView(rawDstRect) = right(rawSrcRect)
             leftView(rawDstRect) = left(rawSrcRect)
 
-            Dim depth8u = New cv.Mat(color.Height, color.Width, cv.MatType.CV_8U, T265Depth8u(cPtr))
             Dim rect As New cv.Rect((300 - 1) / 2 + 112, 0, 300, 300)
-            cv.Cv2.ApplyColorMap(depth8u(rect), RGBDepth(rect), cv.ColormapTypes.Jet)
 
-            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, T265PointCloud(cPtr)) ' we build a fake point cloud for the T265
+            Dim disparity = New cv.Mat(rect.Height, rect.Width, cv.MatType.CV_32F, T265Depth32f(cPtr))
+            disparity.ConvertTo(depth16(rect), cv.MatType.CV_16U)
+
+            Dim test = T265RGBdepth(cPtr)
+            Dim depthRGBsmall As New cv.Mat(rect.Height, rect.Width, cv.MatType.CV_8UC3, T265RGBdepth(cPtr))
+            depthRGBsmall.CopyTo(RGBDepth(rect))
+
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End SyncLock
     End Sub

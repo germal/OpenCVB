@@ -83,7 +83,6 @@ public:
 		{
 			depth16 = depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
 			cPtr->depth16 = depth16;
-			cPtr->dst = cv::Mat(rows, cols, CV_8UC3);
 			cPtr->Run();
 
 			Point3f* p = (Point3f*)pointCloud.data;
