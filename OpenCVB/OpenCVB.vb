@@ -179,6 +179,7 @@ Public Class OpenCVB
         ' OpenCV needs to be in the path and the librealsense and kinect open source code needs to be in the path.
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
+        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
         ' the Kinect depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
@@ -194,11 +195,9 @@ Public Class OpenCVB
             updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
         End If
 
-        optionsForm.cameraTotalCount = optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) +
-                                       optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) +
-                                       optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) +
-                                       optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) +
-                                       optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000)
+        For i = 0 To OptionsDialog.MyntD1000
+            If optionsForm.cameraDeviceCount(i) > 0 Then optionsForm.cameraTotalCount += 1
+        Next
 
         cameraD400Series = New CameraD400
         cameraKinect = New CameraKinect
@@ -222,8 +221,8 @@ Public Class OpenCVB
         stopCameraThread = True
         If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
         If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
-        cameraTaskHandle.Abort()
-        cameraTaskHandle.Abort()
+        If cameraTaskHandle IsNot Nothing Then cameraTaskHandle.Abort()
+        If cameraTaskHandle IsNot Nothing Then cameraTaskHandle.Abort()
         cameraTaskHandle = Nothing
         updateCamera()
     End Sub
@@ -781,7 +780,7 @@ Public Class OpenCVB
         End If
 
         ' after sweeping through low and high resolution, sweep through the cameras as well...
-        If AlgorithmTestCount Mod (AvailableAlgorithms.Items.Count * 2) = 0 And AlgorithmTestCount > 0 Then
+        If (AlgorithmTestCount Mod (AvailableAlgorithms.Items.Count * 2) = 0 And AlgorithmTestCount > 0) Or AvailableAlgorithms.Items.Count = 1 Then
             Static cameraIndex = optionsForm.cameraIndex
             Dim currentCameraIndex = optionsForm.cameraIndex
             cameraIndex += 1
