@@ -74,6 +74,7 @@ CirclesGridFinderParameters
 CLAHE
 clipLine
 colorChange
+colorMap
 ColRange
 compare
 compareHist

@@ -22,7 +22,9 @@ Public Class intrinsicsLeft_Basics : Implements IDisposable
         Next
         ocvb.putText(New ActiveClass.TrueType(nextLine, 10, ttStart + 90))
 
-        nextLine = "FOV in x = " + CStr(ocvb.parms.intrinsicsLeft.FOV(0)) + vbTab + "FOV in y = " + CStr(ocvb.parms.intrinsicsLeft.FOV(1))
+        If ocvb.parms.intrinsicsLeft.FOV IsNot Nothing Then
+            nextLine = "FOV in x = " + CStr(ocvb.parms.intrinsicsLeft.FOV(0)) + vbTab + "FOV in y = " + CStr(ocvb.parms.intrinsicsLeft.FOV(1))
+        End If
         ocvb.putText(New ActiveClass.TrueType(nextLine, 10, ttStart + 120))
 
         ocvb.result2.SetTo(0)

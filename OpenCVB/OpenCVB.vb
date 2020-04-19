@@ -194,6 +194,7 @@ Public Class OpenCVB
         Else
             updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
         End If
+        OpenCVfullPath = HomeDir.FullName + "OpenCV\Build\bin\Release\"
 
         For i = 0 To OptionsDialog.MyntD1000
             If optionsForm.cameraDeviceCount(i) > 0 Then optionsForm.cameraTotalCount += 1
