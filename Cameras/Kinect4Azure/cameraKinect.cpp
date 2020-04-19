@@ -103,7 +103,7 @@ public:
 		k4a_device_get_serialnum(device, serial_number, &length);
 	}
 
-	int *waitForFrame(void* RGBDepth)
+	int *waitForFrame()
 	{
 		bool waiting = true;
 		while (waiting)
@@ -134,7 +134,6 @@ public:
 			k4a_transformation_depth_image_to_color_camera(transformation, depthImage, depthInColor);
 			depthBuffer = (uint16_t *) k4a_image_get_buffer(depthInColor);
 			dcptr->depth16 = Mat(colorRows, colorCols, CV_16U, depthBuffer);
-			dcptr->dst = Mat(colorRows, colorCols, CV_8UC3, RGBDepth);
 			dcptr->Run();
 		}
 
@@ -214,9 +213,15 @@ int* KinectLeftView(KinectCamera * kc)
 }
 
 extern "C" __declspec(dllexport)
-int* KinectWaitFrame(KinectCamera* kc, void* RGBDepth)
+int* KinectRGBdepth(KinectCamera * kc)
 {
-	return kc->waitForFrame(RGBDepth);
+	return (int*)kc->dcptr->dst.data;
+}
+
+extern "C" __declspec(dllexport)
+int* KinectWaitFrame(KinectCamera* kc)
+{
+	return kc->waitForFrame();
 }
 
 extern "C" __declspec(dllexport)

@@ -32,7 +32,7 @@ Public Class Camera
 
 
     Public deviceCount As Int32
-    Public deviceName As String
+    Public deviceName As String = ""
     Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
     Public IMU_Present As Boolean
     Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB

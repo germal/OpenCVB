@@ -10,10 +10,10 @@ Public Class Kalman_Basics : Implements IDisposable
     Public ErrorCovPost As Single = 1
 
     Public Sub New(ocvb As AlgorithmData)
-        ocvb.label1 = "Rectangle moves smoothly from random locations"
         ocvb.desc = "Use Kalman to stabilize a set of value (such as a cv.rect.)"
     End Sub
     Private Sub setValues(ocvb As AlgorithmData)
+        ocvb.label1 = "Rectangle moves smoothly from random locations"
         Static autoRand As New Random()
         ReDim src(3)
         src(0) = autoRand.Next(50, ocvb.color.Width - 50)

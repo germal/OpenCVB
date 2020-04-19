@@ -12,7 +12,7 @@ Module Kinect_Interface
     Public Function KinectDeviceName(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function KinectWaitFrame(cPtr As IntPtr, RGBDepth As IntPtr) As IntPtr
+    Public Function KinectWaitFrame(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectExtrinsics(cPtr As IntPtr) As IntPtr
@@ -22,6 +22,9 @@ Module Kinect_Interface
     End Function
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectPointCloud(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function KinectRGBdepth(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectRGBA(cPtr As IntPtr) As IntPtr
@@ -105,13 +108,7 @@ Public Class CameraKinect
     Public Sub GetNextFrame()
         Dim imuFrame As IntPtr
         If pipelineClosed Or cPtr = 0 Then Exit Sub
-        Dim handleRGBDepth = GCHandle.Alloc(RGBDepthBytes, GCHandleType.Pinned)
-        Try
-            imuFrame = KinectWaitFrame(cPtr, handleRGBDepth.AddrOfPinnedObject())
-        Catch ex As Exception
-            failedImageCount += 10 ' force a restart of the camera if this happens
-            Exit Sub
-        End Try
+        imuFrame = KinectWaitFrame(cPtr)
         If imuFrame = 0 Then
             Console.WriteLine("KinectWaitFrame has returned without any image.")
             failedImageCount += 1
@@ -135,15 +132,13 @@ Public Class CameraKinect
             IMU_TimeStamp = imuOutput.accelTimeStamp / 1000
         End If
 
-        handleRGBDepth.Free()
-
         Dim colorBuffer = KinectRGBA(cPtr)
         If colorBuffer <> 0 Then ' it can be zero on startup...
             Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBuffer)
             SyncLock bufferLock
                 color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
                 depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, KinectRawDepth(cPtr)).Clone()
-                RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBDepthBytes).Clone()
+                RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, KinectRGBdepth(cPtr)).Clone()
                 ' if you normalize here instead of just a fixed multiply, the image will pulse with different brightness values.  Not pretty.
                 leftView = (New cv.Mat(h, w, cv.MatType.CV_16U, KinectLeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs() ' so depth data fits into 0-255 (approximately)
                 rightView = leftView

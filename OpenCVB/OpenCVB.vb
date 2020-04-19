@@ -66,6 +66,7 @@ Public Class OpenCVB
     Dim vtkDirectory As String = ""
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
         Dim args() = Environment.GetCommandLineArgs()
         ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
         If args.Length > 1 Then
@@ -115,7 +116,7 @@ Public Class OpenCVB
         Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
         Dim sr = New StreamReader(defines.FullName)
         While sr.EndOfStream = False
-            Dim infoLine = sr.ReadLine
+            Dim infoLine = Trim(sr.ReadLine)
             If infoLine.StartsWith("//") = False Then
                 Dim Split = Regex.Split(infoLine, "\W+")
                 If Split(2) = "MYNTD_1000" Then myntSDKready = True
@@ -124,147 +125,114 @@ Public Class OpenCVB
         End While
         sr.Close()
 
-        Dim librealsenseRelease = HomeDir.FullName + "librealsense\build\Release\"
-        updatePath(librealsenseRelease, "Realsense camera support.")
-
-        Dim KinectRelease = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\"
-        updatePath(KinectRelease, "Kinect camera support.")
-
-        OpenCVfullPath = HomeDir.FullName + "OpenCV\Build\bin\Debug\"
-        updatePath(OpenCVfullPath, "OpenCV and OpenCV Contrib are needed for C++ classes.")
-
-        OpenCVfullPath = HomeDir.FullName + "OpenCV\Build\bin\Release\"
-        updatePath(OpenCVfullPath, "OpenCV and OpenCV Contrib are needed for C++ classes.")
-
-        CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
-
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
-        Dim d400Count = USBenumeration("Depth Camera 435")
-        Dim KinectCount = USBenumeration("Azure Kinect 4K Camera")
-        Dim zedCount = USBenumeration("ZED 2")
-        Dim MyntCount = USBenumeration("MYNT-EYE-D1000")
-        Dim t265Count = USBenumeration("T265")
+        optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = USBenumeration("Depth Camera 435")
+        optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) += USBenumeration("RealSense(TM) 415 Depth")
+        optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) += USBenumeration("RealSense(TM) 435 With RGB Module Depth")
+        If optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) > 1 Then optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = 1 ' support only 1 at a time.
+        optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
+        optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = USBenumeration("T265")
+        If optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = 0 Then optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = USBenumeration("Movidius MA2X5X")
 
-        d400Count += USBenumeration("RealSense(TM) 415 Depth")
-        d400Count += USBenumeration("RealSense(TM) 435 With RGB Module Depth")
-        If d400Count > 0 Then
-            cameraD400Series = New CameraD400()  ' change this to CameraD400VB to see how slow the VB version is.
-            cameraD400Series.initialize(fps, regWidth, regHeight)
-            optionsForm.cameraTotalCount += 1
-        End If
-
-#Const DEBUGGING_D400 = 0
-#If DEBUGGING_D400 = 0 Then
-        If KinectCount > 0 Then
-            cameraKinect = New CameraKinect()
-            ' the Kinect depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
-            ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
-            ' Post an issue if this Is Not a valid assumption
-            Dim kinectDLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.3.0\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
-            If kinectDLL.Exists = False Then
-                MsgBox("The Microsoft installer for the Kinect camera proprietary portion" + vbCrLf +
-                       "was not installed in the expected place. (Has it changed?)" + vbCrLf +
-                       "It was expected to be in " + kinectDLL.FullName + vbCrLf +
-                       "Update the code near this message and restart.")
-                cameraKinect.deviceCount = 0 ' we can't use this device
-            Else
-                updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
-                cameraKinect.initialize(fps, regWidth, regHeight)
-                optionsForm.cameraTotalCount += 1
-            End If
-        End If
-
-        If zedCount > 0 Then
-            If zed2SDKready = False Then
-                cameraZed2 = New CameraZED2()
-                If GetSetting("OpenCVB", "zed2SDKready", "zed2SDKready", True) Then
-                    MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
+        ' Some devices may be present but their opencvb camera interface needs to be present as well.
+        optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) = USBenumeration("MYNT-EYE-D1000")
+        If myntSDKready = False Then
+            optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) = 0 ' hardware is there but dll is not installed yet.
+            If GetSetting("OpenCVB", "zed2SDKready", "zed2SDKready", True) Then
+                MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
                        "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
                        "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
                        "and rebuild OpenCVB with the StereoLabs SDK.")
-                    cameraZed2.deviceCount = 0 ' we can't use this device
-                    SaveSetting("OpenCVB", "zed2SDKready", "zed2SDKready", False) ' just show this message one time...
-                End If
-            Else
-                cameraZed2.initialize(fps, regWidth, regHeight)
-                optionsForm.cameraTotalCount += 1
+                SaveSetting("OpenCVB", "zed2SDKready", "zed2SDKready", False) ' just show this message one time...
+            End If
+        End If
+        optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = USBenumeration("ZED 2")
+        If zed2SDKready = False Then
+            optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = 0 ' hardware is present but dll is not installed yet.
+            If GetSetting("OpenCVB", "myntSDKready", "myntSDKready", True) Then
+                MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
+                   "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
+                   "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
+                   "and rebuild OpenCVB with the MYNT SDK." + vbCrLf + vbCrLf +
+                   "Also, add environmental variable " + vbCrLf +
+                   "MYNTEYE_DEPTHLIB_OUTPUT" + vbCrLf +
+                   "to point to '<MYNT_SDK_DIR>/_output'.")
+                SaveSetting("OpenCVB", "myntSDKready", "myntSDKready", False)
             End If
         End If
 
-        If MyntCount > 0 Then
-            cameraMyntD = New CameraMyntD()
-            If myntSDKready = False Then
-                If GetSetting("OpenCVB", "myntSDKready", "myntSDKready", True) Then
-                    MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
-                       "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
-                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-                       "and rebuild OpenCVB with the MYNT SDK." + vbCrLf + vbCrLf +
-                       "Also, add environmental variable " + vbCrLf +
-                       "MYNTEYE_DEPTHLIB_OUTPUT" + vbCrLf +
-                       "to point to '<MYNT_SDK_DIR>/_output'.")
-                    cameraMyntD.deviceCount = 0 ' we can't use this device
-                    SaveSetting("OpenCVB", "myntSDKready", "myntSDKready", False)
-                End If
-            Else
-                cameraMyntD.initialize(fps, regWidth, regHeight)
-                optionsForm.cameraTotalCount += 1
+        ' if the default camera is not present, try to find another.
+        If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
+            If optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) Then optionsForm.cameraIndex = OptionsDialog.D400Cam
+            If optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) Then optionsForm.cameraIndex = OptionsDialog.Kinect4AzureCam
+            If optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) Then optionsForm.cameraIndex = OptionsDialog.T265Camera
+            If optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) Then optionsForm.cameraIndex = OptionsDialog.StereoLabsZED2
+            If optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) Then optionsForm.cameraIndex = OptionsDialog.MyntD1000
+            If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
+                MsgBox("There are no supported cameras present.  Connect a D400series, Kinect 4 Azure, T265, MyntEyeD 1000, or StereoLabs Zed2.")
+                End
             End If
         End If
 
-
-        If t265Count = 0 Then t265Count = USBenumeration("Movidius MA2X5X")
-        If t265Count > 0 Then
-            cameraT265 = New CameraT265()
-            cameraT265.initialize(fps, regWidth, regHeight)
-            optionsForm.cameraTotalCount += 1
+        ' OpenCV needs to be in the path and the librealsense and kinect open source code needs to be in the path.
+        updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
+        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
+        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+        ' the Kinect depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
+        ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
+        ' Post an issue if this Is Not a valid assumption
+        Dim kinectDLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.3.0\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
+        If kinectDLL.Exists = False Then
+            MsgBox("The Microsoft installer for the Kinect camera proprietary portion" + vbCrLf +
+                   "was not installed in the expected place. (Has it changed?)" + vbCrLf +
+                   "It was expected to be in " + kinectDLL.FullName + vbCrLf +
+                   "Update the code near this message and restart.")
+            optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = 0 ' we can't use this device
+        Else
+            updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
         End If
-#End If
 
-        If cameraD400Series IsNot Nothing Then optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.devicecount
-        If cameraKinect IsNot Nothing Then optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.devicecount
-        If cameraT265 IsNot Nothing Then optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = cameraT265.devicecount
-        If cameraZed2 IsNot Nothing Then optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = cameraZed2.devicecount
-        If cameraMyntD IsNot Nothing Then optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) = cameraMyntD.devicecount
+        optionsForm.cameraTotalCount = optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) +
+                                       optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) +
+                                       optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) +
+                                       optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) +
+                                       optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000)
+
+        cameraD400Series = New CameraD400
+        cameraKinect = New CameraKinect
+        cameraT265 = New CameraT265
+        cameraZed2 = New CameraZED2
+        cameraMyntD = New CameraMyntD
 
         updateCamera()
 
-        ' if the active camera is missing, try to find another.
-        If camera.deviceCount = 0 And d400Count Then
-            optionsForm.cameraIndex = OptionsDialog.D400Cam
-            updateCamera()
-        End If
-        If camera.deviceCount = 0 And KinectCount Then
-            optionsForm.cameraIndex = OptionsDialog.Kinect4AzureCam
-            updateCamera()
-        End If
-        If camera.deviceCount = 0 And t265Count Then
-            optionsForm.cameraIndex = OptionsDialog.T265Camera
-            updateCamera()
-        End If
-        If camera.deviceCount = 0 And zedCount Then
-            optionsForm.cameraIndex = OptionsDialog.StereoLabsZED2
-            updateCamera()
-        End If
-        If camera.deviceCount = 0 And MyntCount Then
-            optionsForm.cameraIndex = OptionsDialog.MyntD1000
-            updateCamera()
-        End If
-
         optionsForm.cameraRadioButton(optionsForm.cameraIndex).Checked = True ' make sure any switch is reflected in the UI.
-        SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
-
-        If camera.deviceCount = 0 Then
-            MsgBox("OpenCVB supports Kinect for Azure 3D camera, Intel D400Series 3D cameras, Or Intel T265.  Nothing found!")
-            End
-        End If
 
         setupCamPics()
         loadAlgorithmComboBoxes()
 
         TestAllTimer.Interval = optionsForm.TestAllDuration.Text * 1000
         FindPython()
+
+        End Sub
+    Private Sub RestartCamera()
+        camera.closePipe()
+        stopCameraThread = True
+        If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
+        If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
+        cameraTaskHandle.Abort()
+        cameraTaskHandle.Abort()
+        cameraTaskHandle = Nothing
+        updateCamera()
+    End Sub
+    Public Sub updateCamera()
+        camera = Choose(optionsForm.cameraIndex + 1, cameraD400Series, cameraKinect, cameraT265, cameraZed2, cameraMyntD) ' order is same as in optionsdialog enum
+        ' if it hasn't been initialized then do so now...
+        If camera.devicename = "" Then camera.initialize(fps, regWidth, regHeight)
+        camera.pipelineclosed = False
+        SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
         Dim g As Graphics = e.Graphics
@@ -785,10 +753,6 @@ Public Class OpenCVB
         img = cv.Extensions.BitmapConverter.ToBitmap(resultMat)
         Clipboard.SetImage(img)
     End Sub
-    Public Sub updateCamera()
-        camera = Choose(optionsForm.cameraIndex + 1, cameraD400Series, cameraKinect, cameraT265, cameraZed2, cameraMyntD)
-        camera.pipelineClosed = False
-    End Sub
     Private Sub CameraTask()
         While stopCameraThread = False
             camera.GetNextFrame()
@@ -806,16 +770,7 @@ Public Class OpenCVB
         End While
         camera.frameCount = 0
     End Sub
-    Private Sub RestartCamera()
-        camera.closePipe()
-        stopCameraThread = True
-        If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
-        If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
-        cameraTaskHandle.Abort()
-        cameraTaskHandle.Abort()
-        cameraTaskHandle = Nothing
-        updateCamera()
-    End Sub
+
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         If stopAlgorithmThread = True Then Exit Sub ' they have paused.
 
@@ -843,7 +798,6 @@ Public Class OpenCVB
             If currentCameraIndex <> cameraIndex Then
                 optionsForm.cameraIndex = cameraIndex
                 RestartCamera()
-                SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", cameraIndex)
             End If
         End If
 
@@ -902,12 +856,6 @@ Public Class OpenCVB
         If algorithmTaskHandle IsNot Nothing Then algorithmTaskHandle.Abort()
         If algorithmTaskHandle IsNot Nothing Then algorithmTaskHandle.Abort()
 
-        cameraD400Series.DecimationFilter = GetSetting("OpenCVB", "DecimationFilter", "DecimationFilter", False)
-        cameraD400Series.ThresholdFilter = GetSetting("OpenCVB", "ThresholdFilter", "ThresholdFilter", False)
-        cameraD400Series.SpatialFilter = GetSetting("OpenCVB", "SpatialFilter", "SpatialFilter", True)
-        cameraD400Series.TemporalFilter = GetSetting("OpenCVB", "TemporalFilter", "TemporalFilter", False)
-        cameraD400Series.HoleFillingFilter = GetSetting("OpenCVB", "HoleFillingFilter", "HoleFillingFilter", True)
-
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
         ReDim parms.IMU_RotationMatrix(9 - 1)
         lowResolution = optionsForm.lowResolution.Checked
@@ -954,10 +902,6 @@ Public Class OpenCVB
 
         If cameraTaskHandle Is Nothing Then
             stopCameraThread = False
-
-            If camera.deviceCount = 0 Then SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", OptionsDialog.cameraIndex)
-
-            camera.frameCount = 0
             cameraTaskHandle = New Thread(AddressOf CameraTask)
             cameraTaskHandle.Name = "CameraTask"
             cameraTaskHandle.Priority = ThreadPriority.Highest

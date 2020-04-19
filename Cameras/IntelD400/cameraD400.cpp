@@ -33,9 +33,11 @@ public:
 	rs2::colorizer colorizer;
 	rs2::align align = rs2::align(RS2_STREAM_COLOR);
 	rs2::pointcloud pc;
+	rs2::frame RGBDepth;
+	int width, height;
+	rs2::frame accel, gyro;
 
 private:
-	int width, height;
 
 	rs2::context ctx;
 
@@ -73,6 +75,8 @@ public:
 	void waitForFrame()
 	{
 		frames = pipeline.wait_for_frames(5000);
+		gyro = frames.first_or_default(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+		accel = frames.first_or_default(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
 	}
 };
 
@@ -99,25 +103,22 @@ int* D400Extrinsics(D400Camera* tp)
 extern "C" __declspec(dllexport)
 double D400IMUTimeStamp(D400Camera* tp)
 {
-	auto gyro = tp->frames.first_or_default(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
-	if (gyro == 0) return 0;
-	return gyro.get_timestamp();
+	if (tp->gyro == 0) return 0;
+	return tp->gyro.get_timestamp();
 }
 
 extern "C" __declspec(dllexport)
 int* D400Gyro(D400Camera * tp)
 {
-	auto gyro = tp->frames.first_or_default(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
-	if (gyro == 0) return 0;
-	return (int*)gyro.get_data();
+	if (tp->gyro == 0) return 0;
+	return (int*)tp->gyro.get_data();
 }
 
 extern "C" __declspec(dllexport)
 int * D400Accel(D400Camera * tp)
 {
-	auto accel = tp->frames.first_or_default(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
-	if (accel == 0) return 0;
-	return (int *)accel.get_data();
+	if (tp->accel == 0) return 0;
+	return (int *)tp->accel.get_data();
 }
 
 extern "C" __declspec(dllexport)
@@ -149,8 +150,8 @@ int* D400RightRaw(D400Camera * tp)
 extern "C" __declspec(dllexport)
 int* D400RGBDepth(D400Camera * tp)
 {
-	auto RGBDepth = tp->colorizer.process(tp->processedFrames.get_depth_frame());
-	return (int*)RGBDepth.get_data();
+	//tp->RGBDepth = tp->colorizer.process(tp->processedFrames.get_depth_frame()); 
+	return (int*)tp->colorizer.process(tp->processedFrames.get_depth_frame()).get_data();
 }
 
 extern "C" __declspec(dllexport)
