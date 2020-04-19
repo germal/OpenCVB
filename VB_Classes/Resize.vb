@@ -39,7 +39,7 @@ End Class
 
 
 
-Public Class Resize_BetterWith32Bit : Implements IDisposable
+Public Class Resize_After8uc3 : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData)

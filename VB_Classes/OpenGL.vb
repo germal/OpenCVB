@@ -30,7 +30,6 @@ Public Class OpenGL_Basics : Implements IDisposable
     Public OpenGLTitle As String = "OpenGL_Basics"
     Public imageLabel As String
     Public imu As IMU_AnglesToGravity
-    Public pcSrc As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         imu = New IMU_AnglesToGravity(ocvb)
         ' Dispose() ' make sure there wasn't an old OpenGLWindow sitting around...
@@ -56,7 +55,7 @@ Public Class OpenGL_Basics : Implements IDisposable
                                             imageLabel.Length)
         Next
     End Sub
-    Private Sub startOpenGLWindow(ocvb As AlgorithmData)
+    Private Sub startOpenGLWindow(ocvb As AlgorithmData, pcSrc As cv.Mat)
         Dim pcSize = pcSrc.Total * pcSrc.ElemSize
         ' first setup the named pipe that will be used to feed data to the OpenGL window
         pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
@@ -84,10 +83,10 @@ Public Class OpenGL_Basics : Implements IDisposable
             Exit Sub
         End If
 
-        If pcSrc Is Nothing Then pcSrc = ocvb.pointCloud
+        Dim pcSrc = ocvb.pointCloud
         imu.Run(ocvb)
 
-        If ocvb.frameCount = 0 Then startOpenGLWindow(ocvb)
+        If ocvb.frameCount = 0 Then startOpenGLWindow(ocvb, pcSrc)
         Dim pcSize = pcSrc.Total * pcSrc.ElemSize
         Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
         If ocvb.frameCount > 0 And pipe IsNot Nothing Then
@@ -449,8 +448,7 @@ Public Class OpenGL_GravityTransform : Implements IDisposable
             Case 3
                 ogl.imageLabel = "No rotation "
         End Select
-        ogl.pcSrc = New cv.Mat
-        cv.Cv2.Merge(vertSplit, ogl.pcSrc)
+        cv.Cv2.Merge(vertSplit, ocvb.pointCloud)
 
         ogl.rgbInput = ocvb.color
         ogl.Run(ocvb)

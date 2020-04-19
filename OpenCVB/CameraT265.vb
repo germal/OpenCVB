@@ -78,6 +78,7 @@ Public Class CameraT265
     End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
         deviceName = "Intel T265"
+        deviceCount = 1
         IMU_Present = True
         w = width
         h = height

@@ -96,6 +96,7 @@ Public Class CameraMyntD
         cPtr = MyntDOpen(width, height, 30)
         MyBase.deviceName = "MyntEyeD 1000"
         If cPtr <> 0 Then
+            deviceCount = 1
             w = width
             h = height
 
@@ -200,7 +201,7 @@ Public Class CameraMyntD
         'Static startTime = MyntDIMU_TimeStamp(cPtr)
         'IMU_TimeStamp = MyntDIMU_TimeStamp(cPtr) - startTime
 
-
+        IMU_Present = False
         Dim depthRGBPtr = MyntDImageRGBdepth(cPtr)
         Dim depth16Ptr = MyntDRawDepth(cPtr)
         Dim rightPtr = MyntDRightImage(cPtr)

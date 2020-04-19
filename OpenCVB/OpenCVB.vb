@@ -141,18 +141,24 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
-        cameraD400Series = New CameraD400()  ' change this to CameraD400VB to see how slow the VB version is.
-        cameraD400Series.deviceCount = USBenumeration("Depth Camera 435")
-        cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 415 Depth")
-        cameraD400Series.deviceCount += USBenumeration("RealSense(TM) 435 With RGB Module Depth")
-        If cameraD400Series.deviceCount > 0 Then
+        Dim d400Count = USBenumeration("Depth Camera 435")
+        Dim KinectCount = USBenumeration("Azure Kinect 4K Camera")
+        Dim zedCount = USBenumeration("ZED 2")
+        Dim MyntCount = USBenumeration("MYNT-EYE-D1000")
+        Dim t265Count = USBenumeration("T265")
+
+        d400Count += USBenumeration("RealSense(TM) 415 Depth")
+        d400Count += USBenumeration("RealSense(TM) 435 With RGB Module Depth")
+        If d400Count > 0 Then
+            cameraD400Series = New CameraD400()  ' change this to CameraD400VB to see how slow the VB version is.
             cameraD400Series.initialize(fps, regWidth, regHeight)
             optionsForm.cameraTotalCount += 1
         End If
 
-        cameraKinect = New CameraKinect()
-        cameraKinect.deviceCount = USBenumeration("Azure Kinect 4K Camera")
-        If cameraKinect.deviceCount > 0 Then
+#Const DEBUGGING_D400 = 0
+#If DEBUGGING_D400 = 0 Then
+        If KinectCount > 0 Then
+            cameraKinect = New CameraKinect()
             ' the Kinect depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
             ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
             ' Post an issue if this Is Not a valid assumption
@@ -170,10 +176,9 @@ Public Class OpenCVB
             End If
         End If
 
-        cameraZed2 = New CameraZED2()
-        cameraZed2.deviceCount = USBenumeration("ZED 2")
-        If cameraZed2.deviceCount > 0 Then
+        If zedCount > 0 Then
             If zed2SDKready = False Then
+                cameraZed2 = New CameraZED2()
                 If GetSetting("OpenCVB", "zed2SDKready", "zed2SDKready", True) Then
                     MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
                        "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
@@ -188,9 +193,8 @@ Public Class OpenCVB
             End If
         End If
 
-        cameraMyntD = New CameraMyntD()
-        cameraMyntD.deviceCount = USBenumeration("MYNT-EYE-D1000")
-        If cameraMyntD.deviceCount > 0 Then
+        If MyntCount > 0 Then
+            cameraMyntD = New CameraMyntD()
             If myntSDKready = False Then
                 If GetSetting("OpenCVB", "myntSDKready", "myntSDKready", True) Then
                     MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
@@ -210,41 +214,40 @@ Public Class OpenCVB
         End If
 
 
-        ' check for the T265 last as it seems to take longer to be recognized by the USB controller.  If first, it was not found on my machine!
-        cameraT265 = New CameraT265()
-        cameraT265.deviceCount = USBenumeration("T265")
-        If cameraT265.devicecount = 0 Then cameraT265.deviceCount = USBenumeration("Movidius MA2X5X")
-        If cameraT265.deviceCount > 0 Then
+        If t265Count = 0 Then t265Count = USBenumeration("Movidius MA2X5X")
+        If t265Count > 0 Then
+            cameraT265 = New CameraT265()
             cameraT265.initialize(fps, regWidth, regHeight)
             optionsForm.cameraTotalCount += 1
         End If
+#End If
 
-        optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.devicecount
-        optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.devicecount
-        optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = cameraT265.devicecount
-        optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = cameraZed2.devicecount
-        optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) = cameraMyntD.devicecount
+        If cameraD400Series IsNot Nothing Then optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = cameraD400Series.devicecount
+        If cameraKinect IsNot Nothing Then optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = cameraKinect.devicecount
+        If cameraT265 IsNot Nothing Then optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = cameraT265.devicecount
+        If cameraZed2 IsNot Nothing Then optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = cameraZed2.devicecount
+        If cameraMyntD IsNot Nothing Then optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) = cameraMyntD.devicecount
 
         updateCamera()
 
         ' if the active camera is missing, try to find another.
-        If camera.deviceCount = 0 And cameraD400Series.deviceCount > 0 Then
+        If camera.deviceCount = 0 And d400Count Then
             optionsForm.cameraIndex = OptionsDialog.D400Cam
             updateCamera()
         End If
-        If camera.deviceCount = 0 And cameraKinect.deviceCount > 0 Then
+        If camera.deviceCount = 0 And KinectCount Then
             optionsForm.cameraIndex = OptionsDialog.Kinect4AzureCam
             updateCamera()
         End If
-        If camera.deviceCount = 0 And cameraT265.deviceCount > 0 Then
+        If camera.deviceCount = 0 And t265Count Then
             optionsForm.cameraIndex = OptionsDialog.T265Camera
             updateCamera()
         End If
-        If camera.deviceCount = 0 And cameraZed2.deviceCount > 0 Then
+        If camera.deviceCount = 0 And zedCount Then
             optionsForm.cameraIndex = OptionsDialog.StereoLabsZED2
             updateCamera()
         End If
-        If camera.deviceCount = 0 And cameraMyntD.deviceCount > 0 Then
+        If camera.deviceCount = 0 And MyntCount Then
             optionsForm.cameraIndex = OptionsDialog.MyntD1000
             updateCamera()
         End If
