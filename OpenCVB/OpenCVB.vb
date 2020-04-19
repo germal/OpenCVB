@@ -140,17 +140,6 @@ Public Class OpenCVB
         optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) = USBenumeration("MYNT-EYE-D1000")
         If myntSDKready = False Then
             optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) = 0 ' hardware is there but dll is not installed yet.
-            If GetSetting("OpenCVB", "zed2SDKready", "zed2SDKready", True) Then
-                MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
-                       "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
-                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-                       "and rebuild OpenCVB with the StereoLabs SDK.")
-                SaveSetting("OpenCVB", "zed2SDKready", "zed2SDKready", False) ' just show this message one time...
-            End If
-        End If
-        optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = USBenumeration("ZED 2")
-        If zed2SDKready = False Then
-            optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = 0 ' hardware is present but dll is not installed yet.
             If GetSetting("OpenCVB", "myntSDKready", "myntSDKready", True) Then
                 MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
                    "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
@@ -160,6 +149,17 @@ Public Class OpenCVB
                    "MYNTEYE_DEPTHLIB_OUTPUT" + vbCrLf +
                    "to point to '<MYNT_SDK_DIR>/_output'.")
                 SaveSetting("OpenCVB", "myntSDKready", "myntSDKready", False)
+            End If
+        End If
+        optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = USBenumeration("ZED 2")
+        If zed2SDKready = False Then
+            optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = 0 ' hardware is present but dll is not installed yet.
+            If GetSetting("OpenCVB", "zed2SDKready", "zed2SDKready", True) Then
+                MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
+                       "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
+                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
+                       "and rebuild OpenCVB with the StereoLabs SDK.")
+                SaveSetting("OpenCVB", "zed2SDKready", "zed2SDKready", False) ' just show this message one time...
             End If
         End If
 
