@@ -138,7 +138,7 @@ Public Class OpenCVB
 
         ' Some devices may be present but their opencvb camera interface needs to be present as well.
         optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) = USBenumeration("MYNT-EYE-D1000")
-        If myntSDKready = False Then
+        If optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) > 0 And myntSDKready = False Then
             optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) = 0 ' hardware is there but dll is not installed yet.
             If GetSetting("OpenCVB", "myntSDKready", "myntSDKready", True) Then
                 MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
@@ -152,7 +152,7 @@ Public Class OpenCVB
             End If
         End If
         optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = USBenumeration("ZED 2")
-        If zed2SDKready = False Then
+        If optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) > 0 And zed2SDKready = False Then
             optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) = 0 ' hardware is present but dll is not installed yet.
             If GetSetting("OpenCVB", "zed2SDKready", "zed2SDKready", True) Then
                 MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
