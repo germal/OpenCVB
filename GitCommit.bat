@@ -1,1 +1,0 @@
-"c:\Program Files\Git\bin\git.exe" commit -m %1
