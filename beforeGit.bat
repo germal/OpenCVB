@@ -1,2 +1,3 @@
-@echo on
-xcopy /Y cameras\cameraDefinesNone.hpp cameras\cameraDefines.hpp
+cd cameras
+xcopy /Y cameraDefinesNone.hpp cameraDefines.hpp
+copy /b cameraDefines.hpp +,,

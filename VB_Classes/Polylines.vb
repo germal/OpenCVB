@@ -58,6 +58,7 @@ Public Class Polylines_Random : Implements IDisposable
 
             ocvb.result1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
             ocvb.result1.Polylines(pts, False, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
 
         Dim zoomFactor = 4

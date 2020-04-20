@@ -38,6 +38,9 @@ Module MyntD_Interface
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDRawDepth(cPtr As IntPtr) As IntPtr
     End Function
+    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub MyntDtaskIMU(cPtr As IntPtr)
+    End Sub
 
 
 
@@ -53,7 +56,7 @@ Module MyntD_Interface
     Public Function MyntDAcceleration(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDAngularVelocity(cPtr As IntPtr) As IntPtr
+    Public Function MyntDGyro(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDIMU_Temperature(cPtr As IntPtr) As Single
@@ -92,6 +95,10 @@ Public Class CameraMyntD
     '  right: fx' cx' tx fy' cy' 1
     Public projectionMatrix(12 - 1) As Double ' 
     Public rotationMatrix(9 - 1) As Double ' 3x3 rectification transform (rotation matrix) for the left camera.
+    Dim IMUtask As Task
+    Private Sub IMUdataCollection()
+        MyntDtaskIMU(cPtr)
+    End Sub
     Public Sub initialize(fps As Int32, width As Int32, height As Int32)
         cPtr = MyntDOpen(width, height, 30)
         MyBase.deviceName = "MyntEyeD 1000"
@@ -147,26 +154,22 @@ Public Class CameraMyntD
             intrinsicsRight_VB.coeffs(4) = intrinsics.k3
             intrinsicsRight_VB.width = intrinsics.width
             intrinsicsRight_VB.height = intrinsics.height
+
+            IMU_Present = True
+            IMUtask = New Task(Sub() IMUdataCollection())
+            IMUtask.Start()
         End If
     End Sub
 
     Public Sub GetNextFrame()
         If pipelineClosed Or cPtr = 0 Then Exit Sub
         Dim imagePtr = MyntDWaitFrame(cPtr)
-        'Dim acc = MyntDAcceleration(cPtr)
-        'IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
+        Dim acc = MyntDAcceleration(cPtr)
+        IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
 
-        'Dim ang = MyntDAngularVelocity(cPtr)
-        'Dim angularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
-
-        'IMU_Acceleration.Z = IMU_Acceleration.X
-        'IMU_Acceleration.Y = angularVelocity.Z
-        'IMU_Acceleration.X = angularVelocity.Y
-
-        '' all 3 numbers should be near zero for a stationary camera.
-        'IMU_AngularVelocity.X = angularVelocity.X
-        'IMU_AngularVelocity.Y = angularVelocity.Y
-        'IMU_AngularVelocity.Z = angularVelocity.Z
+        Dim ang = MyntDGyro(cPtr)
+        IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
+        IMU_AngularVelocity *= 0.0174533 ' MyntD gyro is in degrees/sec
 
         'Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
         'Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
@@ -201,7 +204,6 @@ Public Class CameraMyntD
         'Static startTime = MyntDIMU_TimeStamp(cPtr)
         'IMU_TimeStamp = MyntDIMU_TimeStamp(cPtr) - startTime
 
-        IMU_Present = False
         Dim depthRGBPtr = MyntDImageRGBdepth(cPtr)
         Dim depth16Ptr = MyntDRawDepth(cPtr)
         Dim rightPtr = MyntDRightImage(cPtr)

@@ -62,6 +62,7 @@ Public Class OpenCVB
     Dim stopAlgorithmThread As Boolean
     Dim stopCameraThread As Boolean
     Dim textDesc As String = ""
+    Dim totalBytesOfMemoryUsed As Integer
     Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.ActiveClass.TrueType)
     Dim vtkDirectory As String = ""
 #End Region
@@ -694,7 +695,7 @@ Public Class OpenCVB
 
         Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " +
                   optionsForm.cameraRadioButton(optionsForm.cameraIndex).Text + "/Algorithm FPS " + Format(cameraFPS, "#0.0") +
-                  "/" + Format(fps, "#0.0")
+                  "/" + Format(fps, "#0.0") + " WorkingSet = " + CStr(totalBytesOfMemoryUsed) + " Mb"
     End Sub
     Private Sub saveLayout()
         SaveSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
@@ -759,13 +760,9 @@ Public Class OpenCVB
 
             cameraRefresh = True
             Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
-            Dim totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / 1000000
-            Static lastBytesUsed = totalBytesOfMemoryUsed
-            If frameCount Mod 100 = 0 And Math.Abs(lastBytesUsed - totalBytesOfMemoryUsed) > 10 Then
-                Console.WriteLine("OpenCVB is using " + Format(CInt(totalBytesOfMemoryUsed), "###,##0") + "MB of memory")
-                lastBytesUsed = totalBytesOfMemoryUsed
-            End If
-            If totalBytesOfMemoryUsed > 2000 Then Console.WriteLine("Memory leak!")
+            totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
+            If totalBytesOfMemoryUsed > 2000 Then Console.WriteLine("OpenCVB appears to have a memory leak in the current algorithm" + vbCrLf +
+                                                                    "The memory footprint has grown above 2Gb which is way more than expected.")
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
         camera.frameCount = 0

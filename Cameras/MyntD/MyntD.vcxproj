@@ -95,7 +95,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(MYNTEYED_SDK_ROOT)\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2\include;$(MYNTEYED_SDK_ROOT)\3rdparty\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MYNTEYED_SDK_ROOT)\samples\src\;$(MYNTEYED_SDK_ROOT)\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2\include;$(MYNTEYED_SDK_ROOT)\3rdparty\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DisableSpecificWarnings>4267;4251;4244</DisableSpecificWarnings>
@@ -151,7 +151,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(MYNTEYED_SDK_ROOT)\3rdparty\opencv\build\include;$(MYNTEYED_SDK_ROOT)\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MYNTEYED_SDK_ROOT)\samples\src\;$(MYNTEYED_SDK_ROOT)\3rdparty\opencv\build\include;$(MYNTEYED_SDK_ROOT)\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DisableSpecificWarnings>4267;4251;4244</DisableSpecificWarnings>
     </ClCompile>

@@ -1,5 +1,6 @@
 #include "../CameraDefines.hpp"
 #ifdef MYNTD_1000
+#pragma warning(disable : 4996)
 #pragma comment(lib, "mynteye_depth.lib")
 #pragma comment(lib, "opencv_world343.lib") 
 #include <iostream>
@@ -8,7 +9,10 @@
 
 #define WITH_OPENCV
 #include <mynteyed/camera.h>
-#include <mynteyed/utils.h> 
+#include <mynteyed/utils.h>
+#include "util/cam_utils.h"
+#include "util/counter.h"
+
 #include "../../CPP_Classes/DepthColorizer.hpp"
 
 MYNTEYE_USE_NAMESPACE
@@ -26,11 +30,8 @@ public:
 	Depth_Colorizer16 * cPtr;
 	StreamIntrinsics intrinsicsBoth;
 	StreamExtrinsics extrinsics;
-	//float acceleration[3];
 	//SensorsData sensordata;
 	//Orientation orientation;
-	//float imuTemperature;
-	//double imuTimeStamp;
 private:
 	//float imuData;
 public:
@@ -56,10 +57,6 @@ public:
 
 		cam.Open(params);
 
-		std::cout << std::endl;
-		if (!cam.IsOpened()) 
-			std::cerr << "Error: Open camera failed" << std::endl;
-		 
 		cPtr = new Depth_Colorizer16();
 		rows = h;
 		cols = w;
@@ -67,6 +64,7 @@ public:
 		bool ex_ok;
 		extrinsics = cam.GetStreamExtrinsics(StreamMode::STREAM_2560x720, &ex_ok);
 		pointCloud = cv::Mat(h, w, CV_32FC3);
+
 	}
 
 	int *waitForFrame()
@@ -109,6 +107,38 @@ public:
 	}
 }; 
 
+float acceleration[3];
+float gyro[3];
+float imuTemperature;
+double imuTimeStamp;
+
+extern "C" __declspec(dllexport) void MyntDtaskIMU(CameraMyntD * MyntD)
+{
+	if (MyntD->cam.IsMotionDatasSupported()) MyntD->cam.EnableMotionDatas(0);
+	util::Counter counter;
+
+	// Set motion data callback
+	MyntD->cam.SetMotionCallback([&counter](const MotionData& data) {
+		if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
+			counter.IncrAccelCount();
+			acceleration[0] = data.imu->accel[0] * 9.807; 
+			acceleration[1] = data.imu->accel[1] * 9.807;
+			acceleration[2] = data.imu->accel[2] * 9.807;
+		}
+		else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
+			counter.IncrGyroCount();
+			gyro[0] = data.imu->gyro[0];
+			gyro[1] = data.imu->gyro[1];
+			gyro[2] = data.imu->gyro[2];
+		}
+	});
+
+	while (1)
+	{
+		MyntD->cam.WaitForStream();
+		counter.Update();
+	}
+}
 
 extern "C" __declspec(dllexport) int* MyntDWaitFrame(CameraMyntD * MyntD)
 {
@@ -165,10 +195,18 @@ extern "C" __declspec(dllexport) int* MyntDRawDepth(CameraMyntD * MyntD)
 {
 	return (int*)MyntD->depth16.data;
 }
-//extern "C" __declspec(dllexport) int* MyntDAcceleration(CameraMyntD * MyntD)
-//{
-//	return (int*)&MyntD->sensordata.imu.linear_acceleration;
-//}
+
+extern "C" __declspec(dllexport) int* MyntDAcceleration(CameraMyntD * MyntD)
+{
+	return (int*)&acceleration;
+}
+
+extern "C" __declspec(dllexport) int* MyntDGyro(CameraMyntD * MyntD)
+{
+	return (int*)&gyro;
+}
+
+
 //extern "C" __declspec(dllexport) int* MyntDTranslation(CameraMyntD * MyntD)
 //{
 //	return (int*)&MyntD->translation;
@@ -177,10 +215,7 @@ extern "C" __declspec(dllexport) int* MyntDRawDepth(CameraMyntD * MyntD)
 //{
 //	return (int*)&MyntD->rotation;
 //}
-//extern "C" __declspec(dllexport) int* MyntDAngularVelocity(CameraMyntD * MyntD)
-//{
-//	return (int*)&MyntD->sensordata.imu.angular_velocity;
-//}
+
 //extern "C" __declspec(dllexport) float MyntDIMU_Barometer(CameraMyntD * MyntD)
 //{
 //	return MyntD->sensordata.barometer.pressure;

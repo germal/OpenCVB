@@ -7,88 +7,91 @@ Module ML__Exports
             Return If(a(0) < b(0), -1, 1)
         End Function
     End Class
-    Public Sub detectAndFillShadow(holeMask As cv.Mat, borderMask As cv.Mat, grayDepth As cv.Mat, color As cv.Mat, minLearnCount As Int32)
+    Public Function detectAndFillShadow(holeMask As cv.Mat, borderMask As cv.Mat, depth32f As cv.Mat, color As cv.Mat, minLearnCount As Int32) As cv.Mat
         Dim learnData As New SortedList(Of cv.Vec3f, Single)(New CompareVec3f)
         Dim rng As New System.Random
         Dim holeCount = cv.Cv2.CountNonZero(holeMask)
         Dim borderCount = cv.Cv2.CountNonZero(borderMask)
         If holeCount > 0 And borderCount > minLearnCount Then
-            Dim depthMat As New cv.Mat, color32f As New cv.Mat
-            grayDepth.ConvertTo(depthMat, cv.MatType.CV_32F)
+            Dim color32f As New cv.Mat
             color.ConvertTo(color32f, cv.MatType.CV_32FC3)
+
+            Dim learnInputList As New List(Of cv.Vec3f)
+            Dim responseInputList As New List(Of Single)
 
             For y = 0 To holeMask.Rows - 1
                 For x = 0 To holeMask.Cols - 1
                     If borderMask.At(Of Byte)(y, x) Then
                         Dim vec = color32f.Get(Of cv.Vec3f)(y, x)
                         If learnData.ContainsKey(vec) = False Then
-                            learnData.Add(vec, depthMat.Get(Of Single)(y, x)) ' keep out duplicates.
+                            learnData.Add(vec, depth32f.Get(Of Single)(y, x)) ' keep out duplicates.
+                            learnInputList.Add(vec)
+                            responseInputList.Add(depth32f.Get(Of Single)(y, x))
                         End If
                     End If
                 Next
             Next
 
-            Dim learnInput As New cv.Mat(learnData.Count, 3, cv.MatType.CV_32F)
-            Dim depthResponse As New cv.Mat(learnData.Count, 1, cv.MatType.CV_32F)
-
-            Dim indexTrain = 0
-            For i = 0 To learnData.Count - 1
-                learnInput.Set(Of cv.Vec3f)(indexTrain, 0, learnData.ElementAt(i).Key)
-                depthResponse.Set(Of Single)(i, 0, learnData.ElementAt(i).Value)
-            Next
+            Dim learnInput As New cv.Mat(learnData.Count, 3, cv.MatType.CV_32F, learnInputList.ToArray())
+            Dim depthResponse As New cv.Mat(learnData.Count, 1, cv.MatType.CV_32F, responseInputList.ToArray())
 
             ' now learn what depths are associated with which colors.
-            Using rtree = cv.ML.RTrees.Create()
-                rtree.Train(learnInput, cv.ML.SampleTypes.RowSample, depthResponse)
+            Dim rtree = cv.ML.RTrees.Create()
+            rtree.Train(learnInput, cv.ML.SampleTypes.RowSample, depthResponse)
 
-                ' now predict what the depth is based just on the color (and proximity to the region)
-                Using predictMat As New cv.Mat(1, 3, cv.MatType.CV_32F)
-                    For y = 0 To holeMask.Rows - 1
-                        For x = 0 To holeMask.Cols - 1
-                            If holeMask.At(Of Byte)(y, x) Then
-                                predictMat.Set(Of cv.Vec3f)(0, 0, color32f.Get(Of cv.Vec3f)(y, x))
-                                depthMat.Set(Of Single)(y, x, rtree.Predict(predictMat))
-                            End If
-                        Next
+            ' now predict what the depth is based just on the color (and proximity to the region)
+            Using predictMat As New cv.Mat(1, 3, cv.MatType.CV_32F)
+                For y = 0 To holeMask.Rows - 1
+                    For x = 0 To holeMask.Cols - 1
+                        If holeMask.At(Of Byte)(y, x) Then
+                            predictMat.Set(Of cv.Vec3f)(0, 0, color32f.Get(Of cv.Vec3f)(y, x))
+                            depth32f.Set(Of Single)(y, x, rtree.Predict(predictMat))
+                        End If
                     Next
-                End Using
-                depthMat.ConvertTo(grayDepth, cv.MatType.CV_8UC1)
+                Next
             End Using
         End If
-    End Sub
+        Return depth32f
+    End Function
 End Module
 
 
 Public Class ML_FillRGBDepth_MT : Implements IDisposable
     Dim shadow As Depth_Holes
     Dim grid As Thread_Grid
-
+    Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData)
+        colorizer = New Depth_Colorizer_CPP(ocvb)
+        colorizer.externalUse = True
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = 160
-        grid.sliders.TrackBar2.Value = 120
+        grid.sliders.TrackBar1.Value = ocvb.color.Width / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
+        grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
         grid.externalUse = True ' we don't need any results.
         shadow = New Depth_Holes(ocvb)
-        ocvb.label2 = "ML filled shadow"
-        ocvb.desc = "Same as ML_FillDepth above but display grayscale depth to confirm correctness of model."
+        ocvb.label1 = "ML filled shadow"
+        ocvb.label2 = ""
+        ocvb.desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
         grid.Run(ocvb)
-        ocvb.RGBDepth.CopyTo(ocvb.result1)
-        ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
-        Dim grayDepth = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
+        Dim depth32f = getDepth32f(ocvb)
         Dim minLearnCount = 5
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
-            detectAndFillShadow(shadow.holeMask(roi), shadow.borderMask(roi), grayDepth(roi), ocvb.color(roi), minLearnCount)
+            depth32f(roi) = detectAndFillShadow(shadow.holeMask(roi), shadow.borderMask(roi), depth32f(roi), ocvb.color(roi), minLearnCount)
         End Sub)
-        ocvb.result2 = grayDepth.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        colorizer.src = depth32f
+        colorizer.Run(ocvb)
+        ocvb.result1 = colorizer.dst.Clone()
+        ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+        ocvb.result2.SetTo(0) ' it was confusing to see the shadow intermediate results
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         shadow.Dispose()
         grid.Dispose()
+        colorizer.Dispose()
     End Sub
 End Class
 
@@ -96,24 +99,30 @@ End Class
 Public Class ML_FillRGBDepth : Implements IDisposable
     Dim shadow As Depth_Holes
     Dim sliders As New OptionsSliders
+    Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData)
+        colorizer = New Depth_Colorizer_CPP(ocvb)
+        colorizer.externalUse = True
         sliders.setupTrackBar1(ocvb, "ML Min Learn Count", 2, 100, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
         shadow = New Depth_Holes(ocvb)
         ocvb.label2 = "ML filled shadow"
-        ocvb.desc = "Same as ML_FillDepth above but display grayscale depth to confirm correctness of model."
+        ocvb.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
         Dim minLearnCount = sliders.TrackBar1.Value
         ocvb.RGBDepth.CopyTo(ocvb.result1)
-        Dim grayDepth = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        detectAndFillShadow(shadow.holeMask, shadow.borderMask, grayDepth, ocvb.color, minLearnCount)
-        ocvb.result2 = grayDepth.CvtColor(cv.ColorConversionCodes.gray2bgr)
+        Dim depth32f = getDepth32f(ocvb)
+        depth32f = detectAndFillShadow(shadow.holeMask, shadow.borderMask, depth32f, ocvb.color, minLearnCount)
+        colorizer.src = depth32f
+        colorizer.Run(ocvb)
+        ocvb.result2 = colorizer.dst
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         shadow.Dispose()
         sliders.Dispose()
+        colorizer.Dispose()
     End Sub
 End Class
 
