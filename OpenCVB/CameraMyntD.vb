@@ -166,6 +166,7 @@ Public Class CameraMyntD
         Dim imagePtr = MyntDWaitFrame(cPtr)
         Dim acc = MyntDAcceleration(cPtr)
         IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
+        IMU_Acceleration.Y *= -1 ' make it consistent with the other cameras.
 
         Dim ang = MyntDGyro(cPtr)
         IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)

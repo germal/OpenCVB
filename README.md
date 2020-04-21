@@ -18,34 +18,36 @@ requirements:
 
     -   StereoLabs ZED2
 
+    -   Mynt Eye D 1000
+
 The Microsoft Kinect for Azure camera has an IMU (Inertial Measurement Unit) and
 has better depth accuracy but requires more power and is not as portable as the
 Intel D4xx cameras.
 
 **The Objective**
 
-This software is targeting cameras that produce depth as well as color. Depth
-should prompt a complete review of existing computer vision algorithms, i.e. how
-could depth improve the results? To enable revisiting many existing algorithms,
-this software provides a single application that can run almost 600 algorithms.
+This software is targeting cameras that produce depth as well as color. These
+newer cameras have prompted a review of existing vision algorithms to see how
+they can be improved if depth is known. To enable revisiting many existing
+algorithms, this software provides a single application that can run over 600
+OpenCV algorithms on any of the cameras listed above.
 
 There are many computer vision examples on the web but too often something is
-missing. And when the build is finally working, a file or option needs to be
-specified and is not provided. OpenCVB collects many of these algorithms into a
-single application and guarantees that each will build and run. In addition, the
+missing. OpenCVB is designed to collect these algorithms into a single
+application and guarantees that each will build and run. In addition, the
 process of adding variants and experimenting with the example is simplified.
 
-If this approach is to be useful, the languages for computer vision projects -
-C++, C\#, Python, and VB.Net – need support. Secondly, it is important to get
-access to multiple libraries - OpenCV, OpenCVSharp, OpenGL, Emgu, and OpenMP.
-And lastly, it is important to use all the possible image representations - 3D,
-bitmaps, plots, bar charts, spreadsheets, or text.
+The languages used are those often found in computer vision projects - C++, C\#,
+Python and even VB.Net. Secondly, it is important to get access to multiple
+libraries - OpenCV, OpenCVSharp, OpenGL, Emgu, and OpenMP. And lastly, it is
+important to use all the possible image representations - 3D, bitmaps, plots,
+bar charts, spreadsheets, or text.
 
 Making these languages and libraries available while using the same
 infrastructure shaped a standardized class for computer vision examples.
 Implementing hundreds of examples with the same reusable class structure has
 confirmed the approach is useful. The result is a starting point to add depth
-and explore further computer vision experiments.
+and explore computer vision.
 
 There are other objectives. Convolutions combined with neural nets (CNN’s) are a
 successful approach to computer vision. CNN’s detect differences within a set of
@@ -56,18 +58,20 @@ features that can enhance almost any color image algorithm.
 
 And what if all cameras had depth and an IMU? Making this assumption explains
 why only a few cameras from Intel, Microsoft, and others are currently
-supported. More cameras with depth are expected to arrive and integration with
-OpenCVB is likely to follow. OpenCVB is an opportunity to exploit the new
-features of these cameras.
+supported. The data from each camera – color, depth, point cloud, and IMU data -
+is presented to all the algorithms in the same standardized format. More cameras
+with depth are expected to arrive and integration with OpenCVB is likely to
+follow. OpenCVB is an opportunity to experiment with the features of these
+cameras and apply the same algorithm to all cameras.
 
 The algorithms are notably short, almost always less than a page of code,
 labelled reasonably well, easily searched and grouped and combined, while often
 providing links to online documentation and versions for other platforms. Many
 downloadable algorithms are encumbered by environmental considerations that can
 obscure the meaning or context of an algorithm. All the algorithms here contain
-just the algorithm and will work with each of the supported cameras. Isolating
-the algorithm functionality enables easy adaptation to other environments or
-platforms.
+just the algorithm without camera dependencies and will work with each of the
+supported cameras. Isolating the algorithm functionality enables easy adaptation
+to other environments or platforms.
 
 **Pre-Install Notes**
 
@@ -113,8 +117,8 @@ You will need to download and install the following before starting:
 
 -   Build and run OpenCVB.sln
 
-    -   Edit “Cameras/CameraDefines.hpp” to turn off support for Mynt Eye D1000
-        or StereoLabs Zed 2 if not present
+    -   Edit “Cameras/CameraDefines.hpp” to turn on support for Mynt Eye D1000
+        or StereoLabs Zed 2
 
 **Full Installation Description with Discussion**
 
@@ -162,20 +166,17 @@ installation of the Kinect4Azure camera:
     -   Click “Microsoft Installer” to download and install the proprietary
         Kinect code from Microsoft
 
-The last step is to open the OpenCVB.sln file and build OpenCVB. The default is
-to include support for StereoLabs Zed 2 and the Mynt Eye D 1000 cameras. Those
-wishing to include support for these optional cameras, should follow the
-instruction below. Those not interested in these cameras should just follow the
-third bullet below to turn off support (the default is to include support for
-both cameras.)
+The last step is to open the OpenCVB.sln file and build OpenCVB.
 
--   If you are using the StereoLabs ZED 2 camera (released Q1 2020), install the
-    StereoLabs SDK from <https://www.stereolabs.com/>
+Support for some optional cameras can be easily added:
 
--   If you intend to use the Mynt Eye D 1000 camera, download the SDK from
+-   For the StereoLabs ZED 2 camera (released Q1 2020), install the StereoLabs
+    SDK from <https://www.stereolabs.com/>
+
+-   For the Mynt Eye D 1000 camera, download the SDK from
     <https://github.com/slightech/MYNT-EYE-D-SDK>
 
--   Edit “Cameras/CameraDefines.hpp” file to toggle on or off the \#define for
+-   Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for
     StereoLabs Zed 2 or Mynt Eye D 1000 support.
 
 **Trouble-Shooting New Install**
@@ -187,10 +188,10 @@ Some typical problems with new installations:
     the environmental variable is OpenCV_Version = 430. Make sure that OpenCV
     Debug and Release versions were built successfully.
 
--   Camera Failure: check the camera installation by testing camera with
-    examples provided by the vendor. Did the Kinect4Azure support get upgraded
-    recently? Post if some configuration problems prevent the camera from
-    working in OpenCVB.
+-   Camera Failure: check the camera installation by testing with examples
+    provided by the vendor. Did the Kinect4Azure support get upgraded recently?
+    Post if some configuration problems prevent the camera from working in
+    OpenCVB.
 
 -   Python Scripts Fail: this is likely a missing package. Run the algorithm
     “PythonPackages.py” in OpenCVB to verify that all the necessary packages are
@@ -273,37 +274,37 @@ can make it easier to search for a desired effect.
 
 VB.Net is not a language associated with computer vision algorithms. But the
 proliferation of examples in OpenCVB suggests this may be an oversight. Even the
-seasoned developer should recognize what is obvious to the beginner: VB.Net has
-the ability to provide clarity. VB.Net is a full-featured language just like C\#
-with lambda functions and multi-threading and VB.Net includes user interface
-tools that are flexible and complete (check boxes, radio buttons, sliders,
-TrueType fonts, and much more) - options missing from OpenCV's popular HighGUI
-library. (All existing HighGUI interfaces are still supported though.)
+seasoned developer should recognize what is obvious to the beginner: VB.Net can
+keep the code simple to read and write. VB.Net is a full-featured language just
+like C\# with lambda functions and multi-threading and VB.Net includes user
+interface tools that are flexible and complete (check boxes, radio buttons,
+sliders, TrueType fonts, and much more) - options missing from OpenCV's popular
+HighGUI library. (All existing HighGUI interfaces are still supported though.)
 
 The main caution in using VB.Net is to treat it as a scripting language like
 Python. Most of the algorithms avoid pixel-by-pixel details – VB.Net can be
-detailed but it will be slower than optimized C++. Usually, OpenCV is doing most
-of the real work in optimized C++ through the OpenCVSharp interface. Most
+detailed but it will be slower than optimized C++. Usually, OpenCVB is doing
+most of the real work in optimized C++ through the OpenCVSharp interface. Most
 algorithms run reasonably fast even in Debug mode because the release version of
 OpenCVSharp is active even when the solution is in Debug mode.
 
 Critics will point out that a Windows 10 app using VB.Net is not easily portable
-but the entire OpenCVB application does not need to be ported to other
-platforms. Only individual algorithms will need to be ported after they are
-debugged and polished and most algorithms consist almost entirely of OpenCV
-API’s which are already available everywhere. OpenCVB’s value lies in the
-ability to freely experiment and finish an OpenCV algorithm before even starting
-a port to a different platform. Confining development to OpenCVB’s C++ interface
-should provide the most portable version of any algorithm but even VB.Net code
-is also easily ported to a variety of non-Windows platforms.
+to other platforms but the entire OpenCVB application does not need to be ported
+to other platforms. Only individual algorithms will need to be ported after they
+are debugged and polished and most algorithms consist almost entirely of OpenCV
+API’s which are available everywhere. OpenCVB’s value lies in the ability to
+experiment and finish an OpenCV algorithm before even starting a port to a
+different platform. Confining development to OpenCVB’s C++ interface should
+provide the most portable version of any algorithm but even VB.Net code is also
+easily ported to a variety of non-Windows platforms.
 
 **Camera Interface**
 
 All the camera code is isolated in the “camera” class – see cameraD400Series.vb,
-cameraKinect.vb, cameraMynt.vb (unfinished), cameraZed2.vb or cameraT265.vb.
-There are no references to camera interfaces anywhere else in the code.
-Isolating the camera support from the algorithms strips the code to just the
-essential OpenCV API’s needed.
+cameraKinect.vb, cameraMynt.vb, cameraZed2.vb or cameraT265.vb. There are no
+references to camera interfaces anywhere else in the code. Isolating the camera
+support from the algorithms strips the code to just the essential OpenCV API’s
+needed.
 
 For example, the Kinect for Azure camera support is isolated to the
 cameraKinect.vb class and a supporting Kinect4Azure DLL that provides all the
@@ -443,18 +444,32 @@ default. To enable this support:
 -   Edit the CameraDefines.hpp file to turn on the interface to the Zed 2
     camera.
 
-The Zed 2 camera support is always installed in the C:\\Program Files (x86)\\ZED
-SDK (regardless of the version) so no additional changes are required to the
+The Zed 2 camera support is always installed in C:\\Program Files (x86)\\ZED SDK
+(regardless of the version) so no additional changes are required to the
 supporting C++ project.
+
+**Mynt Eye D 1000 Support**
+
+The Mynt Eye D 1000 camera is supported but the support is turned off by
+default. To enable this support:
+
+-   Download the Windows 10 SDK from
+    <https://github.com/slightech/MYNT-EYE-D-SDK>
+
+-   Edit the CameraDefines.hpp file to turn on the interface to the Zed 2
+    camera.
+
+The Mynt D SDK creates a system environmental variable MYNTEYED_SDK_ROOT that
+allows the OpenCVB build to locate the Mynt D camera support.
 
 **VTK Support**
 
-VTK (the Visualization ToolKit) is an excellent tool and OpenCVB supports its
-use with OpenCV but it takes a non-trivial amount of time and effort to install
-and build it. The support is present in this version but is turned off. All the
-algorithms using VTK will work with or without VTK installed but if it is not
-present, the VTK algorithms will simply display a message explaining how to
-enable VTK with the following steps:
+VTK (the Visualization ToolKit) is supported through OpenCV but it takes a
+non-trivial amount of time and effort to install and build it. The support is
+present in this version but is turned off. All the algorithms using VTK will
+work with or without VTK installed but if it is not present, the VTK algorithms
+will simply display a message explaining how to enable VTK with the following
+steps:
 
 -   Run “PrepareVTK.bat” in \<OpenCVB_Home\>
 
@@ -738,7 +753,7 @@ algorithms are automatically cascaded for easy selection.
 The list of people who have made OpenCVB possible is long but starts with the
 OpenCV contributors – particularly, Gary Bradski, Victor Erukhimov, and Vadim
 Pisarevsky - and Intel’s decision to contribute the code to the open source
-community. Also, this code would not exist without OpenCVSharp managed code
+community. Also, this code would not exist without OpenCVSharp’s managed code
 interface to OpenCV provided by user “shimat”. There is a further Intel
 contribution to this software in the form of RealSense cameras – low-cost 3D
 cameras for the maker community as well as robotics developers and others.
@@ -757,4 +772,4 @@ software.
 
 Fremont, California
 
-Winter 2020
+Spring 2020
