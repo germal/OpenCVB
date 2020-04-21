@@ -54,7 +54,7 @@ Module Zed2_Interface
     Public Function Zed2RGBDepth(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2Depth(cPtr As IntPtr) As IntPtr
+    Public Function Zed2Depth16(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2PointCloud(cPtr As IntPtr) As IntPtr
@@ -172,6 +172,7 @@ Public Class CameraZED2
 
             color = New cv.Mat(h, w, cv.MatType.CV_8UC3, Zed2Color(cPtr))
             RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, Zed2RGBDepth(cPtr))
+            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, Zed2Depth16(cPtr))
             leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2LeftView(cPtr))
             rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2RightView(cPtr))
             pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, Zed2PointCloud(cPtr))

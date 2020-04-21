@@ -50,7 +50,7 @@ Public Class Resize_After8uc3 : Implements IDisposable
         radio.check(5).Enabled = False
         radio.check(6).Enabled = False
 
-        ocvb.label1 = "Resized depth16 run thru colorizer"
+        ocvb.label1 = "Resized depth16 before running thru colorizer"
         ocvb.label2 = "Resized depth8UC3 after running thru colorizer"
         ocvb.desc = "When you resize depth16 is important.  Use depth16 at high resolution and resize the 8UC3 result"
     End Sub
