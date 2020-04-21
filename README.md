@@ -488,13 +488,13 @@ the bottom left and right or additional windows.
 
 ![](media/5b39040e639f9b1b09e5039e38b653eb.png)
 
-*OpenGL has an infinite number of ways to view 3D data but in common usage, only
-3 views have names – front, top down and side views. The “Projection_Gravity”
+*OpenGL has an infinite number of ways to view a point cloud but top down and
+side views may add the most value when visualized. The “Projection_Gravity”
 algorithm provides a top down view (bottom left) and a side view (bottom right.)
 The images are colored in the same way as the RGB depth image (upper right) with
 yellow indicating proximity to the camera. The aspect ratio of both top and side
 views is 1:1 to provide realistic dimensions and sharp edges. This projection is
-available only with cameras that include an IMU.*
+available with cameras that include an IMU.*
 
 ![](media/cd7e699a6192e4daf1d540a15e35005a.png)
 
