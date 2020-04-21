@@ -1273,7 +1273,11 @@ Public Class Depth_Holes : Implements IDisposable
     Public borderMask As New cv.Mat
     Public externalUse = False
     Dim element As New cv.Mat
+    Public sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "Amount of dilation around depth holes", 1, 10, 1)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
         ocvb.label2 = "Shadow borders"
         element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
         ocvb.desc = "Identify holes in the depth image."
@@ -1283,13 +1287,17 @@ Public Class Depth_Holes : Implements IDisposable
         If externalUse = False Then ocvb.result1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         borderMask = New cv.Mat
-        borderMask = holeMask.Dilate(element, Nothing, 1)
+        borderMask = holeMask.Dilate(element, Nothing, sliders.TrackBar1.Value)
         borderMask.SetTo(0, holeMask)
-        If externalUse = False Then ocvb.result2 = borderMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If externalUse = False Then
+            ocvb.result2.SetTo(0)
+            ocvb.RGBDepth.CopyTo(ocvb.result2, borderMask)
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         holeMask.Dispose()
         borderMask.Dispose()
         element.Dispose()
+        sliders.Dispose()
     End Sub
 End Class

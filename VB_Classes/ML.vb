@@ -86,7 +86,6 @@ Public Class ML_FillRGBDepth_MT : Implements IDisposable
         colorizer.Run(ocvb)
         ocvb.result1 = colorizer.dst.Clone()
         ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
-        ocvb.result2.SetTo(0) ' it was confusing to see the shadow intermediate results
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         shadow.Dispose()
@@ -103,9 +102,13 @@ Public Class ML_FillRGBDepth : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         colorizer = New Depth_Colorizer_CPP(ocvb)
         colorizer.externalUse = True
+
         sliders.setupTrackBar1(ocvb, "ML Min Learn Count", 2, 100, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
+
         shadow = New Depth_Holes(ocvb)
+        shadow.sliders.TrackBar1.value = 3
+
         ocvb.label2 = "ML filled shadow"
         ocvb.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
     End Sub
