@@ -29,7 +29,7 @@ Module Projections
     Public Function Projections_Gravity_Side(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Projections_Gravity_Run(cPtr As IntPtr, xPtr As IntPtr, yPtr As IntPtr, zPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
+    Public Function Projections_Gravity_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
     End Function
 
 
@@ -45,7 +45,7 @@ Module Projections
     Public Function Projections_GravityHist_Side(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Projections_GravityHist_Run(cPtr As IntPtr, xPtr As IntPtr, yPtr As IntPtr, zPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
+    Public Function Projections_GravityHist_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
     End Function
 End Module
 
@@ -278,10 +278,9 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim cPtr As IntPtr
     Dim histPtr As IntPtr
-    Dim xBytes() As Byte
-    Dim yBytes() As Byte
-    Dim zBytes() As Byte
+    Dim xyzBytes() As Byte
     Public histogramRun As Boolean
+    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         imu = New IMU_AnglesToGravity(ocvb)
         imu.result = RESULT2
@@ -331,25 +330,19 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
 
         Dim maxZ = sliders.TrackBar1.Value / 1000
 
-        If zBytes Is Nothing Then
-            ReDim xBytes(vertSplit(0).Total * vertSplit(0).ElemSize - 1)
-            ReDim yBytes(vertSplit(1).Total * vertSplit(1).ElemSize - 1)
-            ReDim zBytes(vertSplit(2).Total * vertSplit(2).ElemSize - 1)
-        End If
-        Marshal.Copy(vertSplit(0).Data, xBytes, 0, xBytes.Length)
-        Marshal.Copy(vertSplit(1).Data, yBytes, 0, yBytes.Length)
-        Marshal.Copy(vertSplit(2).Data, zBytes, 0, zBytes.Length)
-        Dim handleX = GCHandle.Alloc(xBytes, GCHandleType.Pinned)
-        Dim handleY = GCHandle.Alloc(yBytes, GCHandleType.Pinned)
-        Dim handleZ = GCHandle.Alloc(zBytes, GCHandleType.Pinned)
+        Dim xyz As New cv.Mat
+        cv.Cv2.Merge(vertSplit, xyz)
+
+        If xyzBytes Is Nothing Then ReDim xyzBytes(xyz.Total * xyz.ElemSize - 1)
+        Marshal.Copy(xyz.Data, xyzBytes, 0, xyzBytes.Length)
+        Dim handleXYZ = GCHandle.Alloc(xyzBytes, GCHandleType.Pinned)
 
         Dim imagePtr As IntPtr
         If histogramRun Then
-            imagePtr = Projections_GravityHist_Run(histPtr, handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, handleZ.AddrOfPinnedObject,
-                                               maxZ, vertSplit(2).Height, vertSplit(2).Width)
+            imagePtr = Projections_GravityHist_Run(histPtr, handleXYZ.AddrOfPinnedObject, maxZ, xyz.Height, xyz.Width)
 
-            Dim histTop = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_32F, imagePtr)
-            Dim histSide = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_32F, Projections_GravityHist_Side(histPtr))
+            Dim histTop = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, imagePtr)
+            Dim histSide = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, Projections_GravityHist_Side(histPtr))
 
             Dim threshold = sliders.TrackBar2.Value
             ocvb.result1 = histTop.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -358,19 +351,25 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
             ocvb.label1 = "Top View after threshold"
             ocvb.label2 = "Side View after threshold"
         Else
-            imagePtr = Projections_Gravity_Run(cPtr, handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, handleZ.AddrOfPinnedObject,
-                                               maxZ, vertSplit(2).Height, vertSplit(2).Width)
+            imagePtr = Projections_Gravity_Run(cPtr, handleXYZ.AddrOfPinnedObject, maxZ, xyz.Height, xyz.Width)
 
-            ocvb.result1 = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
-            ocvb.result2 = New cv.Mat(vertSplit(2).Rows, vertSplit(2).Cols, cv.MatType.CV_8UC3, Projections_Gravity_Side(cPtr)).Clone()
+            ocvb.result1 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
+            ocvb.result2 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, Projections_Gravity_Side(cPtr)).Clone()
 
             ocvb.label1 = "Top View (looking down)"
             ocvb.label2 = "Side View"
         End If
 
-        handleX.Free()
-        handleY.Free()
-        handleZ.Free()
+        ocvb.label1 += " - Red Dot is camera"
+        ocvb.label2 += " - Red Dot is camera"
+        Dim shift = CInt((xyz.Width - xyz.Height) / 2)
+        If ocvb.result1.Channels = 1 Then ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If ocvb.result2.Channels = 1 Then ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        ocvb.result1.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
+        ocvb.result2.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
+        ocvb.result1.Circle(New cv.Point(shift + xyz.Height / 2 + 10, xyz.Height - 10), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        ocvb.result2.Circle(New cv.Point(shift, xyz.Height / 2), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        handleXYZ.Free()
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         imu.Dispose()
