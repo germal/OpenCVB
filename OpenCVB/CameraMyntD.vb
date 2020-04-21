@@ -47,11 +47,6 @@ Module MyntD_Interface
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDExtrinsics(cPtr As IntPtr) As IntPtr
     End Function
-
-    <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDTranslation(cPtr As IntPtr) As IntPtr
-    End Function
-
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDAcceleration(cPtr As IntPtr) As IntPtr
     End Function
@@ -172,38 +167,10 @@ Public Class CameraMyntD
         IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
         IMU_AngularVelocity *= 0.0174533 ' MyntD gyro is in degrees/sec
 
-        'Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
-        'Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
-        'Dim mat() As Single = {-rt.r00, rt.r01, -rt.r02, 0.0,
-        '                       -rt.r10, rt.r11, rt.r12, 0.0,
-        '                       -rt.r20, rt.r21, -rt.r22, 0.0,
-        '                       t.X, t.Y, t.Z, 1.0}
-        'transformationMatrix = mat
+        IMU_Temperature = MyntDIMU_Temperature(cPtr)
 
-        '' testing to see if we could have computed this independently...
-        'Dim tr = MyntDTranslation(cPtr)
-        'Dim translation(2) As Single
-        'Marshal.Copy(tr, translation, 0, translation.Length)
-
-        'Dim rot = MyntDRotationMatrix(cPtr)
-        'Dim rotation(8) As Single
-        'Marshal.Copy(rot, rotation, 0, rotation.Length)
-
-        'handlecolorBytes.Free()
-        'handleRGBDepthBytes.Free()
-        'handledepthBytes.Free()
-        'handleLeftViewBytes.Free()
-        'handleRightViewBytes.Free()
-        'handlePCBytes.Free()
-
-        'IMU_Barometer = MyntDIMU_Barometer(cPtr)
-        'Dim mag = MyntDIMU_Magnetometer(cPtr)
-        'IMU_Magnetometer = Marshal.PtrToStructure(Of cv.Point3f)(mag)
-
-        'IMU_Temperature = MyntDIMU_Temperature(cPtr)
-
-        'Static startTime = MyntDIMU_TimeStamp(cPtr)
-        'IMU_TimeStamp = MyntDIMU_TimeStamp(cPtr) - startTime
+        Static startTime = MyntDIMU_TimeStamp(cPtr)
+        IMU_TimeStamp = MyntDIMU_TimeStamp(cPtr) - startTime
 
         Dim depthRGBPtr = MyntDImageRGBdepth(cPtr)
         Dim depth16Ptr = MyntDRawDepth(cPtr)

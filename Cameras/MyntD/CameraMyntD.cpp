@@ -30,10 +30,7 @@ public:
 	Depth_Colorizer16 * cPtr;
 	StreamIntrinsics intrinsicsBoth;
 	StreamExtrinsics extrinsics;
-	//SensorsData sensordata;
-	//Orientation orientation;
 private:
-	//float imuData;
 public:
 	~CameraMyntD()
 	{
@@ -124,6 +121,8 @@ extern "C" __declspec(dllexport) void MyntDtaskIMU(CameraMyntD * MyntD)
 			acceleration[0] = data.imu->accel[0] * 9.807; 
 			acceleration[1] = data.imu->accel[1] * 9.807;
 			acceleration[2] = data.imu->accel[2] * 9.807;
+			imuTimeStamp = data.imu->timestamp;
+			imuTemperature = data.imu->temperature;
 		}
 		else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
 			counter.IncrGyroCount();
@@ -206,37 +205,12 @@ extern "C" __declspec(dllexport) int* MyntDGyro(CameraMyntD * MyntD)
 	return (int*)&gyro;
 }
 
-
-//extern "C" __declspec(dllexport) int* MyntDTranslation(CameraMyntD * MyntD)
-//{
-//	return (int*)&MyntD->translation;
-//}
-//extern "C" __declspec(dllexport) int* MyntDRotationMatrix(CameraMyntD * MyntD)
-//{
-//	return (int*)&MyntD->rotation;
-//}
-
-//extern "C" __declspec(dllexport) float MyntDIMU_Barometer(CameraMyntD * MyntD)
-//{
-//	return MyntD->sensordata.barometer.pressure;
-//}
-//extern "C" __declspec(dllexport) int* MyntDOrientation(CameraMyntD * MyntD)
-//{
-//	MyntD->orientation = MyntD->sensordata.imu.pose.getOrientation();
-//	return (int*)&MyntD->orientation;
-//}
-
-//extern "C" __declspec(dllexport) int* MyntDIMU_Magnetometer(CameraMyntD * MyntD)
-//{
-//	return (int*)&MyntD->sensordata.magnetometer.magnetic_field_uncalibrated; // calibrated values look incorrect.
-//}
-//extern "C" __declspec(dllexport) double MyntDIMU_TimeStamp(CameraMyntD * MyntD)
-//{
-//	return MyntD->imuTimeStamp;
-//}
-//extern "C" __declspec(dllexport)float MyntDIMU_Temperature(CameraMyntD * MyntD)
-//{
-//	MyntD->sensordata.temperature.get(sl::SensorsData::TemperatureData::SENSOR_LOCATION::IMU, MyntD->imuTemperature);
-//	return MyntD->imuTemperature;
-//}
+extern "C" __declspec(dllexport) double MyntDIMU_TimeStamp(CameraMyntD * MyntD)
+{
+	return imuTimeStamp;
+}
+extern "C" __declspec(dllexport)float MyntDIMU_Temperature(CameraMyntD * MyntD)
+{
+	return imuTemperature;
+}
 #endif
