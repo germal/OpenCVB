@@ -84,8 +84,13 @@ End Class
 
 
 Public Class KAZE_LeftAligned_CS : Implements IDisposable
+    Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData)
-        ocvb.desc = "Match keypoints in the aligned left and unaligned right images but display it as movement."
+        sliders.setupTrackBar1(ocvb, "Max number of points to match", 1, 300, 100)
+        sliders.setupTrackBar2(ocvb, "When matching, max possible distance", 1, 200, 100)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        ocvb.desc = "Match keypoints in the left and right images but display it as movement in the right image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim CS_KazeLeft As New CS_Classes.Kaze_Basics
@@ -93,32 +98,37 @@ Public Class KAZE_LeftAligned_CS : Implements IDisposable
         Dim CS_KazeRight As New CS_Classes.Kaze_Basics
         CS_KazeRight.GetKeypoints(ocvb.rightView)
 
-        ocvb.result1 = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.result2 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        ocvb.result1 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        ocvb.result2 = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        For i = 0 To Math.Min(20, Math.Min(CS_KazeRight.kazeKeyPoints.Count, CS_KazeLeft.kazeKeyPoints.Count))
+        Dim topDistance = sliders.TrackBar2.Value
+        Dim maxPoints = sliders.TrackBar1.Value
+        Dim maxCount = Math.Min(maxPoints, Math.Min(CS_KazeRight.kazeKeyPoints.Count, CS_KazeLeft.kazeKeyPoints.Count))
+        For i = 0 To maxCount - 1
             Dim pt1 = CS_KazeRight.kazeKeyPoints.ElementAt(i)
             Dim minIndex As Integer
             Dim minDistance As Single = Single.MaxValue
             For j = 0 To CS_KazeLeft.kazeKeyPoints.Count - 1
                 Dim pt2 = CS_KazeLeft.kazeKeyPoints.ElementAt(j)
-                If Math.Abs(pt2.Pt.Y - pt1.Pt.Y) < 2 Then
+                ' the right image point must be to the right of the left image point (pt1 X is < pt2 X) and at about the same Y
+                If Math.Abs(pt2.Pt.Y - pt1.Pt.Y) < 2 And pt1.Pt.X < pt2.Pt.X Then
                     Dim distance = Math.Sqrt((pt1.Pt.X - pt2.Pt.X) * (pt1.Pt.X - pt2.Pt.X) + (pt1.Pt.Y - pt2.Pt.Y) * (pt1.Pt.Y - pt2.Pt.Y))
-                    If minDistance > distance Then
+                    ' it is not enough to just be at the same height.  Can't be too far away!
+                    If minDistance > distance And distance < topDistance Then
                         minIndex = j
                         minDistance = distance
                     End If
                 End If
             Next
             If minDistance < Single.MaxValue Then
-                ocvb.result1.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
                 ocvb.result2.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-                ocvb.result1.Circle(CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-                ocvb.result1.Line(pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+                ocvb.result1.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+                ocvb.result2.Circle(CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                ocvb.result2.Line(pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
             End If
         Next
-        ocvb.label1 = "Left image has " + CStr(CS_KazeLeft.kazeKeyPoints.Count) + " key points"
-        ocvb.label2 = "Right image has " + CStr(CS_KazeRight.kazeKeyPoints.Count) + " key points"
+        ocvb.label1 = "Right image has " + CStr(CS_KazeRight.kazeKeyPoints.Count) + " key points"
+        ocvb.label2 = "Left image has " + CStr(CS_KazeLeft.kazeKeyPoints.Count) + " key points"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
