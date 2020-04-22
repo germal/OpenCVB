@@ -367,36 +367,6 @@ End Class
 
 
 
-Public Class Edges_InfraredDots : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim red As LeftRightView_Basics
-    Dim sobel As Edges_Sobel
-    Public Sub New(ocvb As AlgorithmData)
-        red = New LeftRightView_Basics(ocvb)
-        sobel = New Edges_Sobel(ocvb)
-        sobel.externalUse = True
-        sobel.sliders.TrackBar1.Value = 5
-
-        sliders.setupTrackBar1(ocvb, "Threshold for sobel edges", 1, 255, 30)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
-        ocvb.desc = "Find all the dots in the image - indicating they are within the desired range of the camera."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        red.Run(ocvb)
-        sobel.src = ocvb.result1
-        sobel.Run(ocvb)
-        ocvb.result2 = ocvb.result1.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        red.Dispose()
-        sobel.Dispose()
-        sliders.Dispose()
-    End Sub
-End Class
-
-
-
 
 
 Module Edges_Deriche_CPP_Module

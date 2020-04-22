@@ -196,23 +196,34 @@ End Class
 
 Public Class LeftRightView_Palettized : Implements IDisposable
     Dim lrView As LeftRightView_Basics
+    Dim palette As Palette_ColorMap
     Public Sub New(ocvb As AlgorithmData)
         lrView = New LeftRightView_Basics(ocvb)
+        palette = New Palette_ColorMap(ocvb)
+        palette.externalUse = True
+
         ocvb.desc = "Add color to the 8-bit infrared images."
         ocvb.label1 = "Left Image"
         ocvb.label2 = "Right Image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         lrView.Run(ocvb)
+        Dim left = ocvb.result1.Clone()
+        Dim right = ocvb.result2.Clone()
 
-        ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.ApplyColorMap(ocvb.result1, ocvb.result1, cv.ColormapTypes.Rainbow)
+        palette.src = ocvb.result1
+        palette.Run(ocvb)
+        left = ocvb.result1.Clone()
 
-        ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.ApplyColorMap(ocvb.result2, ocvb.result2, cv.ColormapTypes.Rainbow)
+        palette.src = right
+        palette.Run(ocvb)
+        ocvb.result2 = ocvb.result1
+
+        ocvb.result1 = left
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         lrView.Dispose()
+        palette.Dispose()
     End Sub
 End Class
 

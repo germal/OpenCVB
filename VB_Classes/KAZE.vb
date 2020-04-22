@@ -94,13 +94,33 @@ Public Class KAZE_LeftAligned_CS : Implements IDisposable
         CS_KazeRight.GetKeypoints(ocvb.rightView)
 
         ocvb.result1 = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        For i = 0 To CS_KazeLeft.kazeKeyPoints.Count - 1
-            ocvb.result1.Circle(CS_KazeLeft.kazeKeyPoints.ElementAt(i).Pt, 1, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        ocvb.result2 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        For i = 0 To Math.Min(20, Math.Min(CS_KazeRight.kazeKeyPoints.Count, CS_KazeLeft.kazeKeyPoints.Count))
+            Dim pt1 = CS_KazeRight.kazeKeyPoints.ElementAt(i)
+            Dim minIndex As Integer
+            Dim minDistance As Single = Single.MaxValue
+            For j = 0 To CS_KazeLeft.kazeKeyPoints.Count - 1
+                Dim pt2 = CS_KazeLeft.kazeKeyPoints.ElementAt(j)
+                If Math.Abs(pt2.Pt.Y - pt1.Pt.Y) < 2 Then
+                    Dim distance = Math.Sqrt((pt1.Pt.X - pt2.Pt.X) * (pt1.Pt.X - pt2.Pt.X) + (pt1.Pt.Y - pt2.Pt.Y) * (pt1.Pt.Y - pt2.Pt.Y))
+                    If minDistance > distance Then
+                        minIndex = j
+                        minDistance = distance
+                    End If
+                End If
+            Next
+            If minDistance < Single.MaxValue Then
+                ocvb.result1.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+                ocvb.result2.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+                ocvb.result1.Circle(CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                ocvb.result1.Line(pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+            End If
         Next
-        For i = 0 To CS_KazeRight.kazeKeyPoints.Count - 1
-            ocvb.result1.Circle(CS_KazeRight.kazeKeyPoints.ElementAt(i).Pt, 1, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-        Next
+        ocvb.label1 = "Left image has " + CStr(CS_KazeLeft.kazeKeyPoints.Count) + " key points"
+        ocvb.label2 = "Right image has " + CStr(CS_KazeRight.kazeKeyPoints.Count) + " key points"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
 End Class
+

@@ -80,7 +80,7 @@ class Projections_Gravity
 {
 private:
 public:
-	Mat xDistance, yDistance, zDistance, viewTop, viewSide, top16u, side16u;
+	Mat xyz, viewTop, viewSide, top16u, side16u;
 	Depth_Colorizer2OLD* colorizePtr;
 	Projections_Gravity() : colorizePtr{ NULL } {}
 
@@ -88,28 +88,29 @@ public:
 	{
 		float zHalf = maxZ / 2;
 		float range = (float)h;
-
+		int shift = int((viewTop.cols - viewTop.rows) / 2); // shift to the center of the image.
 #pragma omp parallel for
-		for (int y = 0; y < zDistance.rows; ++y)
+		for (int y = 0; y < xyz.rows; ++y)
 		{
-			for (int x = 0; x < zDistance.cols; ++x)
+			for (int x = 0; x < xyz.cols; ++x)
 			{
-				float d = zDistance.at<float>(y, x);
+				Point3f pt = xyz.at<Point3f>(y, x);
+				float d = pt.z;
 				if (d > 0 and d < maxZ)
 				{
-					float fx = xDistance.at<float>(y, x);
+					float fx = pt.x;
 					float dpixel = range * d / maxZ;
 					if (fx > -zHalf && fx < zHalf)
 					{
 						float dx = range * (zHalf + fx) / maxZ; // maintain a 1:1 aspect ratio
-						if (dx > 0 && dx < range) top16u.at<ushort>((int)(range - dpixel), (int)dx) = int(255 * d / maxZ);
+						if (dx > 0 && dx < range) top16u.at<ushort>((int)(range - dpixel), (int)dx + shift) = int(255 * d / maxZ);
 					}
 
-					float fy = yDistance.at<float>(y, x);
+					float fy = pt.y;
 					if (fy > -zHalf && fy < zHalf)
 					{
 						float dy = range * (zHalf + fy) / maxZ; // maintain a 1:1 aspect ratio
-						if (dy < range && dy > 0) side16u.at<ushort>(int(dy), (int)dpixel) = int(255 * d / maxZ);
+						if (dy < range && dy > 0) side16u.at<ushort>(int(dy), (int)dpixel + shift) = int(255 * d / maxZ);
 					}
 				}
 			}
@@ -151,11 +152,9 @@ int* Projections_Gravity_Side(Projections_Gravity * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* Projections_Gravity_Run(Projections_Gravity * cPtr, int* xPtr, int* yPtr, int* zPtr, float maxZ, int rows, int cols)
+int* Projections_Gravity_Run(Projections_Gravity * cPtr, int* xyzPtr, float maxZ, int rows, int cols)
 {
-	cPtr->xDistance = Mat(rows, cols, CV_32F, xPtr);
-	cPtr->yDistance = Mat(rows, cols, CV_32F, yPtr);
-	cPtr->zDistance = Mat(rows, cols, CV_32F, zPtr);
+	cPtr->xyz = Mat(rows, cols, CV_32FC3, xyzPtr);
 	cPtr->top16u = Mat(rows, cols, CV_16U).setTo(0);
 	cPtr->side16u = Mat(rows, cols, CV_16U).setTo(0);
 	cPtr->Run(maxZ, cols, rows);
@@ -172,35 +171,36 @@ class Projections_GravityHistogram
 {
 private:
 public:
-	Mat xDistance, yDistance, zDistance, histTop, histSide;
+	Mat xyz, histTop, histSide;
 	Projections_GravityHistogram() {}
 
 	void Run(float maxZ, int w, int h)
 	{
 		float zHalf = maxZ / 2;
 		float range = (float)h;
-
-		//#pragma omp parallel for
-		for (int y = 0; y < zDistance.rows; ++y)
+		int shift = int((histTop.cols - histTop.rows) / 2); // shift to the center of the image.
+//#pragma omp parallel for  // this is faster without OpenMP!  On my system 21 FPS single-threaded, 15 FPS multi-threaded.
+		for (int y = 0; y < xyz.rows; ++y)
 		{
-			for (int x = 0; x < zDistance.cols; ++x)
+			for (int x = 0; x < xyz.cols; ++x)
 			{
-				float d = zDistance.at<float>(y, x);
+				Point3f pt = xyz.at<Point3f>(y, x);
+				float d = pt.z;
 				if (d > 0 and d < maxZ)
 				{
-					float fx = xDistance.at<float>(y, x);
+					float fx = pt.x;
 					float dpixel = range * d / maxZ;
 					if (fx > -zHalf && fx < zHalf)
 					{
 						float dx = range * (zHalf + fx) / maxZ; // maintain a 1:1 aspect ratio
-						if (dx > 0 && dx < range) histTop.at<float>((int)(range - dpixel), (int)dx) += 1;
+						if (dx > 0 && dx < range) histTop.at<float>((int)(range - dpixel), (int)dx + shift) += 1;
 					}
 
-					float fy = yDistance.at<float>(y, x);
+					float fy = pt.y;
 					if (fy > -zHalf && fy < zHalf)
 					{
 						float dy = range * (zHalf + fy) / maxZ; // maintain a 1:1 aspect ratio
-						if (dy < range && dy > 0) histSide.at<float>(int(dy), (int)dpixel) += 1;
+						if (dy < range && dy > 0) histSide.at<float>(int(dy), (int)dpixel + shift) += 1;
 					}
 				}
 			}
@@ -228,11 +228,9 @@ int* Projections_GravityHist_Side(Projections_GravityHistogram * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* Projections_GravityHist_Run(Projections_GravityHistogram * cPtr, int* xPtr, int* yPtr, int* zPtr, float maxZ, int rows, int cols)
+int* Projections_GravityHist_Run(Projections_GravityHistogram * cPtr, int* xyzPtr, float maxZ, int rows, int cols)
 {
-	cPtr->xDistance = Mat(rows, cols, CV_32F, xPtr);
-	cPtr->yDistance = Mat(rows, cols, CV_32F, yPtr);
-	cPtr->zDistance = Mat(rows, cols, CV_32F, zPtr);
+	cPtr->xyz = Mat(rows, cols, CV_32FC3, xyzPtr);
 	cPtr->histTop = Mat(rows, cols, CV_32F).setTo(0);
 	cPtr->histSide = Mat(rows, cols, CV_32F).setTo(0);
 	cPtr->Run(maxZ, cols, rows);

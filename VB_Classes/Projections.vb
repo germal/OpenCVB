@@ -300,6 +300,7 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
         ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.cameraIndex = T265Camera Then ocvb.putText(New ActiveClass.TrueType("T265 camera has no pointcloud data", 10, 125))
         imu.Run(ocvb)
         Dim split() = cv.Cv2.Split(ocvb.pointCloud)
         Dim vertSplit = split
