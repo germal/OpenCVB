@@ -1,4 +1,4 @@
-rmdir Azure-Kinect-Sense-SDK /s
+if exist Azure-Kinect-Sense-SDK (rmdir Azure-Kinect-Sense-SDK /s)
 
 "c:\Program Files\Git\bin\git.exe" clone "https://github.com/microsoft/Azure-Kinect-Sensor-SDK"
 
