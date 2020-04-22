@@ -61,8 +61,8 @@ Public Class GameOfLife_Basics : Implements IDisposable
                     nextgrid.Set(Of Byte)(y, x, 0)
                 End If
                 If nextgrid.At(Of Byte)(y, x) Then
-                    Dim pt = New cv.Point(x, y)
-                    ocvb.result1.Circle(pt * factor, factor / 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                    Dim pt = New cv.Point(x, y) * factor
+                    ocvb.result1.Circle(pt, factor / 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
                 End If
             Next
         Next
