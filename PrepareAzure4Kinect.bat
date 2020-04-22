@@ -5,3 +5,4 @@ if exist Azure-Kinect-Sense-SDK (rmdir Azure-Kinect-Sense-SDK /s)
 "C:\Program Files\CMake\bin\Cmake.exe" -DCMAKE_CONFIGURATION_TYPES=Debug;Release -DOpenCV_DIR=OpenCV/Build -DCMAKE_BUILD_TYPE=Debug -S Azure-Kinect-Sensor-SDK -B Azure-Kinect-Sensor-SDK/Build
 
 start Azure-Kinect-Sensor-SDK/Build/k4a.sln
+exit
