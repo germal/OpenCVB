@@ -150,10 +150,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CS_Classes\CS_Classes.csproj">
-      <Project>{fefe40b6-eb52-45c7-bd10-27968e1d6b2d}</Project>
-      <Name>CS_Classes</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Emgu_Classes\Emgu_Classes.csproj">
       <Project>{63393192-2893-4b1d-8f64-2818864c3d09}</Project>
       <Name>Emgu_Classes</Name>
