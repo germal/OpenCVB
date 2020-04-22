@@ -8,14 +8,14 @@ Public Class Random_Points : Implements IDisposable
     Public externalUse As Boolean
     Public rangeRect As cv.Rect
     Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "Random Pixel Count", 1, 500, 20)
+        sliders.setupTrackBar1(ocvb, "Random Pixel Count", 1, ocvb.color.Width * ocvb.color.Height, 20)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
         ReDim Points(sliders.TrackBar1.Value - 1)
         ReDim Points2f(sliders.TrackBar1.Value - 1)
 
         rangeRect = New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)
-        ocvb.desc = "Create a random mask with a specificied number of pixels."
+        ocvb.desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If Points.Length <> sliders.TrackBar1.Value Then

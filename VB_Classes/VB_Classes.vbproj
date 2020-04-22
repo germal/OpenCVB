@@ -130,6 +130,7 @@
     <Compile Include="FishEye.vb" />
     <Compile Include="FREAK.vb" />
     <Compile Include="Gabor.vb" />
+    <Compile Include="GameOfLife.vb" />
     <Compile Include="GetRotationMatrix2D.vb" />
     <Compile Include="Grayscale.vb" />
     <Compile Include="Harris.vb" />
