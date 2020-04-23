@@ -1,6 +1,8 @@
 *.obj
 *.log
 *.db
+*.suo
+VB_Classes/Python/.vs/PythonDebug/v16/.suo
 *.opendb
 *.lock
 *.ide

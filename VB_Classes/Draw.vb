@@ -277,3 +277,82 @@ Public Class Draw_RngImage : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
 End Class
+
+
+
+
+
+Public Class Draw_SymmetricalShapes : Implements IDisposable
+    Dim sliders As New OptionsSliders
+    Dim check As New OptionsCheckbox
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "Number of points", 200, 1000, 500)
+        sliders.setupTrackBar2(ocvb, "Radius 1", 1, ocvb.color.Height / 2, ocvb.color.Height / 4)
+        sliders.setupTrackBar3(ocvb, "Radius 2", 1, ocvb.color.Height / 2, ocvb.color.Height / 8)
+        sliders.setupTrackBar4(ocvb, "nGenPer", 1, 500, 100)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        check.Setup(ocvb, 5)
+        check.Box(0).Text = "Symmetric Ripple"
+        check.Box(1).Text = "Only Regular Shapes"
+        check.Box(2).Text = "Filled Shapes"
+        check.Box(3).Text = "Reverse In/Out"
+        check.Box(4).Text = "Use demo mode"
+        check.Box(4).Checked = True
+        If ocvb.parms.ShowOptions Then check.Show()
+        ocvb.desc = "Generate shapes programmatically"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static rotateAngle As Single = 0
+        Static fillColor = cv.Scalar.Red
+        If check.Box(4).Checked Then
+            If ocvb.frameCount Mod 30 = 0 Then
+                If sliders.TrackBar1.Value < sliders.TrackBar1.Maximum - 17 Then sliders.TrackBar1.Value += 17 Else sliders.TrackBar1.Value = sliders.TrackBar1.Minimum
+                If sliders.TrackBar2.Value < sliders.TrackBar2.Maximum - 10 Then sliders.TrackBar2.Value += 10 Else sliders.TrackBar2.Value = 1
+                If sliders.TrackBar3.Value > 13 Then sliders.TrackBar3.Value -= 13 Else sliders.TrackBar3.Value = sliders.TrackBar3.Maximum
+                If sliders.TrackBar4.Value > 27 Then sliders.TrackBar4.Value -= 27 Else sliders.TrackBar4.Value = sliders.TrackBar4.Maximum 
+                fillColor = ocvb.colorScalar(ocvb.frameCount Mod 255)
+            End If
+            If ocvb.frameCount Mod 37 = 0 Then check.Box(0).Checked = Not check.Box(0).Checked
+            If ocvb.frameCount Mod 222 = 0 Then check.Box(1).Checked = Not check.Box(1).Checked
+            If ocvb.frameCount Mod 77 = 0 Then check.Box(2).Checked = Not check.Box(2).Checked
+            If ocvb.frameCount Mod 100 = 0 Then check.Box(3).Checked = Not check.Box(3).Checked
+            rotateAngle += 1
+
+        End If
+
+        ocvb.result1.SetTo(0)
+        Dim numPoints = sliders.TrackBar1.Value
+        Dim nGenPer = sliders.TrackBar4.Value
+        If check.Box(1).Checked Then numPoints = CInt(numPoints / nGenPer) * nGenPer ' harmonize
+        Dim radius1 = sliders.TrackBar2.Value
+        Dim radius2 = sliders.TrackBar3.Value
+        Dim dTheta = 2 * cv.Cv2.PI / numPoints
+        Dim symmetricRipple = check.Box(0).Checked
+        Dim reverseInOut = check.Box(3).Checked
+        Dim pt As New cv.Point
+        Dim center As New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
+        Dim points As New List(Of cv.Point)
+
+        For i = 0 To numPoints - 1
+            Dim theta = i * dTheta
+            Dim ripple = radius2 * Math.Cos(nGenPer * theta)
+            If symmetricRipple = False Then ripple = Math.Abs(ripple)
+            If reverseInOut Then ripple = -ripple
+            pt.X = Math.Truncate(center.X + (radius1 + ripple) * Math.Cos(theta + rotateAngle) + 0.5)
+            pt.Y = Math.Truncate(center.Y - (radius1 + ripple) * Math.Sin(theta + rotateAngle) + 0.5)
+            points.Add(pt)
+        Next
+
+        ocvb.result1.SetTo(0)
+        For i = 0 To numPoints - 1
+            ocvb.result1.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod numPoints), ocvb.colorScalar(i Mod ocvb.colorScalar.Count), 2, cv.LineTypes.AntiAlias)
+        Next
+
+        If check.Box(2).Checked Then ocvb.result1.FloodFill(center, fillColor)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
+        check.Dispose()
+    End Sub
+End Class

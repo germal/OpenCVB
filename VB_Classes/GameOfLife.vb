@@ -1,4 +1,5 @@
 ﻿Imports cv = OpenCvSharp
+' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
 Public Class GameOfLife_Basics : Implements IDisposable
     Dim random As Random_Points
     Dim grid As cv.Mat
@@ -67,21 +68,21 @@ Public Class GameOfLife_Basics : Implements IDisposable
             Next
         Next
 
-        Static saveEarlierGrid = grid.Clone().SetTo(1)
-
-        Dim tmp As New cv.Mat
-        cv.Cv2.Subtract(saveEarlierGrid, nextgrid, tmp)
-        saveEarlierGrid = grid.Clone()
         Static countDownText As String = ""
-        If tmp.CountNonZero() = 0 Then
-            Static countDown = 200
-            countDown -= 1
-            countDownText = " countdown = " + CStr(countDown)
-            If countDown = 0 Then
-                savePointCount = -1 ' let's start a new game.  Nothing is really moving....
-                countDown = 200
-            End If
-        End If
+        'Static saveEarlierGrid = grid.Clone().SetTo(1)
+
+        'Dim tmp As New cv.Mat
+        'cv.Cv2.Subtract(saveEarlierGrid, nextgrid, tmp)
+        'saveEarlierGrid = grid.Clone()
+        'If tmp.CountNonZero() = 0 Then
+        '    Static countDown = 200
+        '    countDown -= 1
+        '    countDownText = " countdown = " + CStr(countDown)
+        '    If countDown = 0 Then
+        '        savePointCount = -1 ' let's start a new game.  Nothing is really moving....
+        '        countDown = 200
+        '    End If
+        'End If
         grid = nextgrid.Clone()
         ocvb.label1 = "Generation = " + CStr(generation) + countDownText
     End Sub
