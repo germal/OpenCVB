@@ -122,7 +122,7 @@ Public Class Annealing_CPP_MT : Implements IDisposable
     Dim flow As Font_FlowText
     Private Class CompareEnergy : Implements IComparer(Of Single)
         Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
-            ' why have compare for just int32?  So we can get duplicates.  Nothing below returns a zero (equal)
+            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
             If a <= b Then Return -1
             Return 1
         End Function

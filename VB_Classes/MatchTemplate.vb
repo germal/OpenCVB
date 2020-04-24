@@ -2,7 +2,7 @@
 Public Class MatchTemplate_Basics : Implements IDisposable
     Public sliders As New OptionsSliders
     Dim flow As Font_FlowText
-    Dim radio As New OptionsRadioButtons
+    Public radio As New OptionsRadioButtons
     Public sample1 As cv.Mat
     Public sample2 As cv.Mat
     Public externalUse As Boolean

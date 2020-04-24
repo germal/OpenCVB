@@ -7,13 +7,7 @@ Public Class CComp_Basics : Implements IDisposable
     Public externalUse As Boolean
     Public srcGray As New cv.Mat
     Public dstGray As New cv.Mat
-    Private Class CompareArea : Implements IComparer(Of Int32)
-        Public Function Compare(ByVal a As Int32, ByVal b As Int32) As Integer Implements IComparer(Of Int32).Compare
-            ' why have compare for just int32?  So we can get duplicates.  Nothing below returns a zero (equal)
-            If a <= b Then Return 1
-            Return -1
-        End Function
-    End Class
+
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "CComp Threshold", 0, 255, 10)
         sliders.setupTrackBar2(ocvb, "CComp Min Area", 0, 10000, 500)
@@ -42,8 +36,6 @@ Public Class CComp_Basics : Implements IDisposable
         End If
         ocvb.result1 = binary.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
-
-
 
         Static lastImage As New cv.Mat
 
