@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class MatchTemplate_Correlation : Implements IDisposable
+Public Class MatchTemplate_Basics : Implements IDisposable
     Public sliders As New OptionsSliders
     Dim flow As Font_FlowText
     Dim radio As New OptionsRadioButtons
@@ -67,16 +67,16 @@ End Class
 
 
 Public Class MatchTemplate_RowCorrelation : Implements IDisposable
-    Dim mathCor As MatchTemplate_Correlation
+    Dim corr As MatchTemplate_Basics
     Dim flow As Font_FlowText
     Public Sub New(ocvb As AlgorithmData)
         flow = New Font_FlowText(ocvb)
         flow.externalUse = True
         flow.result1or2 = RESULT2
 
-        mathCor = New MatchTemplate_Correlation(ocvb)
-        mathCor.externalUse = True
-        mathCor.sliders.Visible = False
+        corr = New MatchTemplate_Basics(ocvb)
+        corr.externalUse = True
+        corr.sliders.Visible = False
 
         ocvb.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
     End Sub
@@ -90,11 +90,11 @@ Public Class MatchTemplate_RowCorrelation : Implements IDisposable
         nextLine = ocvb.result1.Row(line2)
         nextLine = ocvb.color.Row(line2)
 
-        mathCor.sample1 = ocvb.color.Row(line1).Clone()
-        mathCor.sample2 = ocvb.color.Row(line2 + 1).Clone()
-        mathCor.Run(ocvb)
-        Dim correlation = mathCor.correlationMat.At(Of Single)(0, 0)
-        flow.msgs.Add(mathCor.matchText + " between lines " + CStr(line1) + " and line " + CStr(line2) + " = " + Format(correlation, "#,##0.00"))
+        corr.sample1 = ocvb.color.Row(line1).Clone()
+        corr.sample2 = ocvb.color.Row(line2 + 1).Clone()
+        corr.Run(ocvb)
+        Dim correlation = corr.correlationMat.At(Of Single)(0, 0)
+        flow.msgs.Add(corr.matchText + " between lines " + CStr(line1) + " and line " + CStr(line2) + " = " + Format(correlation, "#,##0.00"))
         flow.Run(ocvb)
 
         Static minCorrelation = Single.PositiveInfinity
@@ -104,7 +104,7 @@ Public Class MatchTemplate_RowCorrelation : Implements IDisposable
         ocvb.label1 = "Min = " + Format(minCorrelation, "#,##0.00") + " max = " + Format(maxCorrelation, "#,##0.0000")
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        mathCor.Dispose()
+        corr.Dispose()
         flow.Dispose()
     End Sub
 End Class
@@ -113,7 +113,7 @@ End Class
 
 
 
-Public Class MatchTemplate_Basics : Implements IDisposable
+Public Class MatchTemplate_DrawRect : Implements IDisposable
     Dim radio As New OptionsRadioButtons
     Public Sub New(ocvb As AlgorithmData)
         radio.Setup(ocvb, 6)
@@ -125,14 +125,16 @@ Public Class MatchTemplate_Basics : Implements IDisposable
 
         ocvb.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
 
-        ocvb.label1 = "MatchTemplate probabilities"
-        ocvb.label2 = "White is input, Red is highest probability"
+        ocvb.label1 = "Probabilities (draw rectangle to test again)"
+        ocvb.label2 = "White is input, Red circle centers highest probability"
         ocvb.desc = "Find the requested template in an image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static saveTemplate As cv.Mat
         Static saveRect As cv.Rect
         If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
+            If ocvb.drawRect.X + ocvb.drawRect.Width >= ocvb.color.Width Then ocvb.drawRect.Width = ocvb.color.Width - ocvb.drawRect.X
+            If ocvb.drawRect.Y + ocvb.drawRect.Height >= ocvb.color.Height Then ocvb.drawRect.Height = ocvb.color.Height - ocvb.drawRect.Y
             saveRect = ocvb.drawRect
             saveTemplate = ocvb.color(ocvb.drawRect).Clone()
             ocvb.drawRectClear = True
@@ -147,7 +149,6 @@ Public Class MatchTemplate_Basics : Implements IDisposable
         Next
         cv.Cv2.MatchTemplate(ocvb.color, saveTemplate, ocvb.result1, matchMethod)
         ocvb.result2 = ocvb.color
-        saveTemplate.CopyTo(ocvb.result2(saveRect))
         ocvb.result2.Rectangle(saveRect, cv.Scalar.White, 1)
         Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
         ocvb.result1.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
@@ -162,26 +163,27 @@ End Class
 
 
 
-Public Class MatchTemplate_BestTemplate : Implements IDisposable
+Public Class MatchTemplate_BestTemplate_MT : Implements IDisposable
     Dim grid As Thread_Grid
     Dim entropies(0) As Entropy_Basics
-    Dim match As MatchTemplate_Basics
+    Dim match As MatchTemplate_DrawRect
     Public Sub New(ocvb As AlgorithmData)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = 32
-        grid.sliders.TrackBar2.Value = 32
+        grid.sliders.TrackBar1.Value = 128
+        grid.sliders.TrackBar2.Value = 128
         grid.externalUse = True
 
-        match = New MatchTemplate_Basics(ocvb)
+        match = New MatchTemplate_DrawRect(ocvb)
 
         ocvb.parms.ShowOptions = False ' we won't need the options...
 
+        ocvb.label1 = "Probabilities - drawing is not used."
         ocvb.label2 = "White is highest entropy (input). Red is best match."
         ocvb.desc = "Find the best object to track in the image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static bestContrast As cv.Rect
-        If ocvb.frameCount Mod 100 = 0 Then
+        If ocvb.frameCount Mod 30 = 0 Then
             grid.Run(ocvb)
             If entropies.Length <> grid.roiList.Count Then
                 ReDim entropies(grid.roiList.Count - 1)
@@ -212,7 +214,6 @@ Public Class MatchTemplate_BestTemplate : Implements IDisposable
         End If
 
         match.Run(ocvb)
-        ocvb.label1 = "MatchTemplate probabilities"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         grid.Dispose()

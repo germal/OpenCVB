@@ -118,13 +118,13 @@ End Class
 
 Public Class Math_RGBCorrelation : Implements IDisposable
     Dim flow As Font_FlowText
-    Dim corr As MatchTemplate_Correlation
+    Dim corr As MatchTemplate_Basics
     Public Sub New(ocvb As AlgorithmData)
         flow = New Font_FlowText(ocvb)
         flow.externalUse = True
         flow.result1or2 = RESULT2
 
-        corr = New MatchTemplate_Correlation(ocvb)
+        corr = New MatchTemplate_Basics(ocvb)
         corr.externalUse = True
         corr.reportFreq = 1
 
