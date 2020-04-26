@@ -88,7 +88,7 @@ End Class
 
 
 
-Public Class Puzzle_SolverBottomUp : Implements IDisposable
+Public Class Puzzle_SolverVertical : Implements IDisposable
     Dim corr As MatchTemplate_Basics
     Dim puzzle As Puzzle_Basics
     Public roilist() As cv.Rect
@@ -110,7 +110,7 @@ Public Class Puzzle_SolverBottomUp : Implements IDisposable
         ocvb.desc = "Put the puzzle back together using the correlation coefficients of the top and bottom of each ROI."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Const correlationThreshold = 0.75
+        Dim correlationThreshold = 0.75
         If externalUse = False Then
             If ocvb.frameCount < 10 Then Exit Sub ' no startup dark images.
             If check.Box(0).Checked Then
@@ -128,24 +128,24 @@ Public Class Puzzle_SolverBottomUp : Implements IDisposable
         For i = 0 To goodFits.Count - 1
             goodFits(i) = New List(Of fit)  ' loops are easier if we don't have to check for "nothing" entries
         Next
+
+        ' comput correlation of every bottom to every top
         For i = 0 To roilist.Count - 1
             Dim roi1 = roilist(i)
+            corr.sample1 = ocvb.result1(roi1).Row(roi1.Height - 1)
             For j = 0 To roilist.Count - 1
                 If i = j Then Continue For
                 Dim roi2 = roilist(j)
-                corr.sample1 = ocvb.result1(roi1).Row(roi1.Height - 1)
                 corr.sample2 = ocvb.result1(roi2).Row(0)
                 corr.Run(ocvb)
-                If corr.correlationMat.At(Of Single)(0, 0) > 0 Then
-                    goodFits(i).Add(New fit(corr.correlationMat.At(Of Single)(0, 0), i, j))
-                End If
+                goodFits(i).Add(New fit(corr.correlationMat.At(Of Single)(0, 0), i, j))
             Next
         Next
 
         Dim botList As New List(Of fit)
         Dim botTotal = CInt(ocvb.color.Width / roilist(0).Width)
-        Dim colTotal = CInt(ocvb.color.Height / roilist(0).Height)
         Dim cutoff = correlationThreshold ' threshold for fit
+        ' search for enough tiles to fill the bottom row by looking for those bottoms that don't have a good correlation to any top.
         While botList.Count < botTotal
             botList.Clear()
             For i = 0 To goodFits.Count - 1
@@ -166,16 +166,17 @@ Public Class Puzzle_SolverBottomUp : Implements IDisposable
                     botList.Add(bestFit)
                 End If
             Next
+            ' cutoff is increased until the bottom row is filled.  
+            ' If the cutoff produces more than bottom row, remove the one With the best correlation To other tiles.
             cutoff += 0.01
         End While
 
-        Dim nextX As Integer
-        Dim nextY As Integer
-        For i = 0 To botList.Count - 1
-            Dim roi = roilist(botList(i).index)
-            ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, ocvb.color.Height - roi.Height, roi.Width, roi.Height)))
-            nextX += roi.Width
-            If nextX >= ocvb.color.Width Then Exit For
+        Dim botI = 0
+        For nextx = 0 To ocvb.color.Width - roilist(0).Width Step roilist(0).Width
+            Dim roi = roilist(botList(botI).index)
+            ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, ocvb.color.Height - roi.Height, roi.Width, roi.Height)))
+            goodFits(botList(botI).index).Clear() ' don't try to fit this tile anywhere else.
+            botI += 1
         Next
 
         Dim botindex = 0
@@ -202,6 +203,7 @@ Public Class Puzzle_SolverBottomUp : Implements IDisposable
                 Dim roi = roilist(bestI)
                 goodFits(bestI).ElementAt(bestJ).correlation = 0
                 ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, nextY, roi.Width, roi.Height)))
+                goodFits(bestI).Clear()
                 rectIndex = bestI
                 'cv.Cv2.ImShow("result2", ocvb.result2)
                 'cv.Cv2.WaitKey()
@@ -209,7 +211,11 @@ Public Class Puzzle_SolverBottomUp : Implements IDisposable
             botindex += 1
         Next
         ocvb.label1 = "Current input to puzzle solver"
-        ocvb.label2 = "Current output of puzzle solver"
+        If externalUse = False Then
+            ocvb.label2 = "Vertically sorted - not horizontally"
+        Else
+            ocvb.label2 = "Current output of puzzle solver"
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         corr.Dispose()
@@ -219,7 +225,11 @@ Public Class Puzzle_SolverBottomUp : Implements IDisposable
 End Class
 
 
-Public Class Puzzle_SolverLeftRight : Implements IDisposable
+
+
+
+
+Public Class Puzzle_SolverHorizontal : Implements IDisposable
     Dim corr As MatchTemplate_Basics
     Dim puzzle As Puzzle_Basics
     Public roilist() As cv.Rect
@@ -238,10 +248,10 @@ Public Class Puzzle_SolverLeftRight : Implements IDisposable
         check.Box(0).Checked = True
         If ocvb.parms.ShowOptions Then check.Show()
 
-        ocvb.desc = "Put the puzzle back together using correlation coefficients of the sides of each ROI."
+        ocvb.desc = "Put the puzzle back together using the correlation coefficients of the top and bottom of each ROI."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Const correlationThreshold = 0.75
+        Dim correlationThreshold = 0.75
         If externalUse = False Then
             If ocvb.frameCount < 10 Then Exit Sub ' no startup dark images.
             If check.Box(0).Checked Then
@@ -259,60 +269,61 @@ Public Class Puzzle_SolverLeftRight : Implements IDisposable
         For i = 0 To goodFits.Count - 1
             goodFits(i) = New List(Of fit)  ' loops are easier if we don't have to check for "nothing" entries
         Next
+
+        ' comput correlation of every bottom to every top
         For i = 0 To roilist.Count - 1
             Dim roi1 = roilist(i)
+            corr.sample1 = ocvb.result1(roi1).Col(roi1.Width - 1)
             For j = 0 To roilist.Count - 1
                 If i = j Then Continue For
                 Dim roi2 = roilist(j)
-                corr.sample1 = ocvb.result1(roi1).Col(roi1.Width - 1)
                 corr.sample2 = ocvb.result1(roi2).Col(0)
                 corr.Run(ocvb)
-                If corr.correlationMat.At(Of Single)(0, 0) > 0 Then
-                    goodFits(i).Add(New fit(corr.correlationMat.At(Of Single)(0, 0), i, j))
-                End If
+                goodFits(i).Add(New fit(corr.correlationMat.At(Of Single)(0, 0), i, j))
             Next
         Next
 
-        Dim rightList As New List(Of fit)
-        Dim rightTotal = CInt(ocvb.color.Width / roilist(0).Width)
+        Dim hList As New List(Of fit)
         Dim colTotal = CInt(ocvb.color.Height / roilist(0).Height)
-        Dim cutoff = correlationThreshold ' threshold for fit
-        While rightList.Count < rightTotal
-            rightList.Clear()
+        Dim cutoff = 0.75 ' starting point for fit threshold 
+        ' search for enough tiles to fill the bottom row by looking for those bottoms that don't have a good correlation to any top.
+        While hList.Count < colTotal
+            hList.Clear()
             For i = 0 To goodFits.Count - 1
-                Dim right = -1
+                Dim side = -1
                 For j = 0 To goodFits(i).Count - 1
                     Dim nextFit = goodFits(i).ElementAt(j)
                     If nextFit.correlation > cutoff Then
-                        right = i
+                        side = i
                         Exit For
                     End If
                 Next
-                If right = -1 Then
+                If side = -1 Then
                     Dim bestFit As New fit(-1, 0, 0)
                     For j = 0 To goodFits(i).Count - 1
                         Dim nextFit = goodFits(i).ElementAt(j)
                         If bestFit.correlation < nextFit.correlation Then bestFit = nextFit
                     Next
-                    rightList.Add(bestFit)
+                    hList.Add(bestFit)
                 End If
             Next
+            ' cutoff is increased until the right column is filled.  
+            ' If the cutoff produces more than bottom row, remove the one With the best correlation To other tiles.
             cutoff += 0.01
         End While
 
-        Dim nextX As Integer
-        Dim nextY As Integer
-        For i = 0 To rightList.Count - 1
-            Dim roi = roilist(rightList(i).index)
-            ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, ocvb.color.Height - roi.Height, roi.Width, roi.Height)))
-            nextX += roi.Width
-            If nextX >= ocvb.color.Width Then Exit For
+        Dim sideI = 0
+        For nexty = 0 To ocvb.color.Height - roilist(0).Height Step roilist(0).Height
+            Dim roi = roilist(hList(sideI).index)
+            ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(ocvb.color.Width - roi.Width, nexty, roi.Width, roi.Height)))
+            goodFits(hList(sideI).index).Clear() ' don't try to fit this tile anywhere else.
+            sideI += 1
         Next
 
-        Dim rightindex = 0
+        sideI = 0
         Dim rectIndex = 0
         For nextY = 0 To ocvb.color.Height - roilist(0).Height Step roilist(0).Height
-            rectIndex = rightList(rightindex).index
+            rectIndex = hList(sideI).index
             For nextX = ocvb.color.Width - roilist(0).Width * 2 To 0 Step -roilist(0).Width
                 Dim bestCorr As Single = -1
                 Dim bestI As Integer = 0
@@ -333,14 +344,17 @@ Public Class Puzzle_SolverLeftRight : Implements IDisposable
                 Dim roi = roilist(bestI)
                 goodFits(bestI).ElementAt(bestJ).correlation = 0
                 ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, nextY, roi.Width, roi.Height)))
+                goodFits(bestI).Clear()
                 rectIndex = bestI
-                'cv.Cv2.ImShow("result2", ocvb.result2)
-                'cv.Cv2.WaitKey()
             Next
-            rightindex += 1
+            sideI += 1
         Next
         ocvb.label1 = "Current input to puzzle solver"
-        ocvb.label2 = "Current output of puzzle solver"
+        If externalUse = False Then
+            ocvb.label2 = "Horizontally sorted - not vertically"
+        Else
+            ocvb.label2 = "Current output of puzzle solver"
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         corr.Dispose()
@@ -350,9 +364,13 @@ Public Class Puzzle_SolverLeftRight : Implements IDisposable
 End Class
 
 
+
+
+
+
 Public Class Puzzle_Solver : Implements IDisposable
-    Dim sides As Puzzle_SolverSides
-    Dim topBot As Puzzle_SolverTopBottom
+    Dim sides As Puzzle_SolverHorizontal
+    Dim topBot As Puzzle_SolverVertical
     Dim puzzle As Puzzle_Basics
     Dim check As New OptionsCheckbox
     Public src As cv.Mat
@@ -364,29 +382,29 @@ Public Class Puzzle_Solver : Implements IDisposable
 
         puzzle = New Puzzle_Basics(ocvb)
 
-        sides = New Puzzle_SolverSides(ocvb)
-        topBot = New Puzzle_SolverTopBottom(ocvb)
+        sides = New Puzzle_SolverHorizontal(ocvb)
+        topBot = New Puzzle_SolverVertical(ocvb)
 
         ocvb.desc = "Put the puzzle back together."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static initialList() As cv.Rect
-        If ocvb.frameCount < 10 Then Exit Sub ' no startup dark images.
-        If check.Box(0).Checked Then
-            check.Box(0).Checked = False
-            puzzle.Run(ocvb)
-            initialList = puzzle.grid.roiList.ToArray
-        End If
-        If initialList.Count > 1 Then
-            topBot.roilist = initialList
-            topBot.Run(ocvb)
+        'Static initialList() As cv.Rect
+        'If ocvb.frameCount < 10 Then Exit Sub ' no startup dark images.
+        'If check.Box(0).Checked Then
+        '    check.Box(0).Checked = False
+        '    puzzle.Run(ocvb)
+        '    initialList = puzzle.grid.roiList.ToArray
+        'End If
+        'If initialList.Count > 1 Then
+        '    topBot.roilist = initialList
+        '    topBot.Run(ocvb)
 
-            If topBot.roilist.Count > 1 Then
-                sides.roilist = topBot.roilist
-                sides.Run(ocvb)
-            End If
-        End If
-        initialList = sides.roilist ' for the next iteration
+        '    If topBot.roilist.Count > 1 Then
+        '        sides.roilist = topBot.roilist
+        '        sides.Run(ocvb)
+        '    End If
+        'End If
+        'initialList = sides.roilist ' for the next iteration
 
         ocvb.label1 = "Current input to puzzle solver"
         ocvb.label2 = "Current output of puzzle solver"
