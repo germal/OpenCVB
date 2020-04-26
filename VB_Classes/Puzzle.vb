@@ -141,7 +141,7 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
 
         Dim botList As New List(Of fit)
         Dim botTotal = CInt(ocvb.color.Width / roilist(0).Width)
-        Dim cutoff = 0.75 ' starting point for the fit threshold 
+        Dim cutoff = 0.01 ' starting point for the fit threshold 
         ' search for enough tiles to fill the bottom row by looking for those bottoms that don't have a good correlation to any top.
         While botList.Count < botTotal
             botList.Clear()
@@ -176,35 +176,35 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
             botI += 1
         Next
 
-        Dim botindex = 0
-        Dim rectIndex = 0
-        For nextX = 0 To ocvb.color.Width - roilist(0).Width Step roilist(0).Width
-            rectIndex = botList(botindex).index
-            For nextY = ocvb.color.Height - roilist(0).Height * 2 To 0 Step -roilist(0).Height
-                Dim bestCorr As Single = -1
-                Dim bestI As Integer = 0
-                Dim bestJ As Integer = 0
-                For i = 0 To fitList.Count - 1
-                    If i = rectIndex Then Continue For
-                    For j = 0 To fitList(i).Count - 1
-                        Dim nextFit = fitList(i).ElementAt(j)
-                        If nextFit.neighbor = rectIndex Then
-                            If bestCorr < nextFit.correlation Then
-                                bestJ = j
-                                bestI = i
-                                bestCorr = nextFit.correlation
-                            End If
-                        End If
-                    Next
-                Next
-                Dim roi = roilist(bestI)
-                fitList(bestI).ElementAt(bestJ).correlation = 0
-                ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, nextY, roi.Width, roi.Height)))
-                fitList(bestI).Clear()
-                rectIndex = bestI
-            Next
-            botindex += 1
-        Next
+        'Dim botindex = 0
+        'Dim rectIndex = 0
+        'For nextX = 0 To ocvb.color.Width - roilist(0).Width Step roilist(0).Width
+        '    rectIndex = botList(botindex).index
+        '    For nextY = ocvb.color.Height - roilist(0).Height * 2 To 0 Step -roilist(0).Height
+        '        Dim bestCorr As Single = -1
+        '        Dim bestI As Integer = 0
+        '        Dim bestJ As Integer = 0
+        '        For i = 0 To fitList.Count - 1
+        '            If i = rectIndex Then Continue For
+        '            For j = 0 To fitList(i).Count - 1
+        '                Dim nextFit = fitList(i).ElementAt(j)
+        '                If nextFit.neighbor = rectIndex Then
+        '                    If bestCorr < nextFit.correlation Then
+        '                        bestJ = j
+        '                        bestI = i
+        '                        bestCorr = nextFit.correlation
+        '                    End If
+        '                End If
+        '            Next
+        '        Next
+        '        Dim roi = roilist(bestI)
+        '        fitList(bestI).ElementAt(bestJ).correlation = 0
+        '        ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, nextY, roi.Width, roi.Height)))
+        '        fitList(bestI).Clear()
+        '        rectIndex = bestI
+        '    Next
+        '    botindex += 1
+        'Next
         ocvb.label1 = "Current input to puzzle solver"
         If externalUse = False Then
             ocvb.label2 = "Vertically sorted - not horizontally"
