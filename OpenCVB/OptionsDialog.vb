@@ -34,14 +34,19 @@ Public Class OptionsDialog
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
         cameraIndex = sender.tag
     End Sub
+    Public Sub enableCameras()
+        For i = 0 To cameraRadioButton.Count - 1
+            If cameraDeviceCount(i) > 0 Then cameraRadioButton(i).Enabled = True
+        Next
+    End Sub
     Public Sub OptionsDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         For i = 0 To cameraRadioButton.Count - 1
             cameraRadioButton(i) = New RadioButton
             CameraGroup.Controls.Add(cameraRadioButton(i))
             cameraRadioButton(i).Visible = True
+            If cameraDeviceCount(i) = 0 Then cameraRadioButton(i).Enabled = False
             cameraRadioButton(i).AutoSize = True
             cameraRadioButton(i).BringToFront()
-            If cameraDeviceCount(i) = 0 Then cameraRadioButton(i).Enabled = False
             cameraRadioButton(i).Tag = i ' this will manage the public type for the camera - see VB_Classes.vb.
             cameraRadioButton(i).Location = New Point(16, (i + 1) * 20)
             cameraRadioButton(i).Text = Choose(i + 1, "Intel D400 Series 3D camera", "Microsoft Kinect for Azure Camera",

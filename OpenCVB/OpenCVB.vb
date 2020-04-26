@@ -210,6 +210,7 @@ Public Class OpenCVB
         updateCamera()
 
         optionsForm.cameraRadioButton(optionsForm.cameraIndex).Checked = True ' make sure any switch is reflected in the UI.
+        optionsForm.enableCameras()
 
         setupCamPics()
         loadAlgorithmComboBoxes()
@@ -779,20 +780,20 @@ Public Class OpenCVB
 
         ' after sweeping through low and high resolution, sweep through the cameras as well...
         If (AlgorithmTestCount Mod (AvailableAlgorithms.Items.Count * 2) = 0 And AlgorithmTestCount > 0) Or AvailableAlgorithms.Items.Count = 1 Then
-            Static cameraIndex = optionsForm.cameraIndex
-            Dim currentCameraIndex = optionsForm.cameraIndex
+            Dim cameraIndex = optionsForm.cameraIndex
+            Dim saveCameraIndex = optionsForm.cameraIndex
             cameraIndex += 1
-            If cameraIndex >= optionsForm.cameraTotalCount Then cameraIndex = 0
-            For i = 0 To optionsForm.cameraTotalCount - 1
+            If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
+            For i = 0 To optionsForm.cameraRadioButton.Count - 1
                 If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
                     optionsForm.cameraRadioButton(cameraIndex).Checked = True
                     Exit For
                 Else
                     cameraIndex += 1
-                    If cameraIndex >= optionsForm.cameraTotalCount Then cameraIndex = 0
+                    If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
                 End If
             Next
-            If currentCameraIndex <> cameraIndex Then
+            If saveCameraIndex <> cameraIndex Then
                 optionsForm.cameraIndex = cameraIndex
                 RestartCamera()
             End If
