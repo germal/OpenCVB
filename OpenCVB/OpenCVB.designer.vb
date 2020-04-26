@@ -151,6 +151,7 @@ Partial Class OpenCVB
         Me.Controls.Add(Me.AlgorithmDesc)
         Me.Controls.Add(Me.AvailableAlgorithms)
         Me.Controls.Add(Me.ToolStrip1)
+        Me.KeyPreview = True
         Me.Name = "OpenCVB"
         Me.Text = "OpenCVB"
         Me.ToolStrip1.ResumeLayout(False)

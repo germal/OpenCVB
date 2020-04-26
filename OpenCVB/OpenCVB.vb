@@ -38,6 +38,7 @@ Public Class OpenCVB
     Dim frameCount As Int32
     Dim GrabRectangleData As Boolean
     Dim HomeDir As DirectoryInfo
+    Dim keyboardInput As String
 
     Dim LastX As Int32
     Dim LastY As Int32
@@ -879,6 +880,7 @@ Public Class OpenCVB
         parms.imageToTrueTypeLoc = 1 / resizeForDisplay
         parms.useRecordedData = OpenCVkeyword.Text = "<All using recorded data>"
         parms.testAllRunning = TestAllButton.Text = "Stop Test"
+        parms.keyboardInput = keyboardInput
         parms.externalPythonInvocation = externalPythonInvocation
         If parms.testAllRunning Then parms.ShowOptions = optionsForm.ShowOptions.Checked Else parms.ShowOptions = True ' always show options when not running 'test all'
         parms.ShowConsoleLog = optionsForm.ShowConsoleLog.Checked
@@ -1005,6 +1007,7 @@ Public Class OpenCVB
                 OpenCVB.ocvb.parms.IMU_FrameTime = camera.IMU_FrameTime
                 OpenCVB.ocvb.parms.CPU_TimeStamp = camera.CPU_TimeStamp
                 OpenCVB.ocvb.parms.CPU_FrameTime = camera.CPU_FrameTime
+                OpenCVB.ocvb.parms.keyboardInput = keyboardInput
             End SyncLock
 
             OpenCVB.UpdateHostLocation(Me.Left, Me.Top, Me.Height)
@@ -1023,6 +1026,7 @@ Public Class OpenCVB
                 OpenCVB.ocvb.mouseClickPoint = mouseClickPoint
                 mouseClickFlag = False
 
+
                 OpenCVB.RunAlgorithm()
 
                 If OpenCVB.ocvb.drawRectClear Then
@@ -1036,6 +1040,7 @@ Public Class OpenCVB
                 If RefreshAvailable Then
                     ' share the results of the algorithm task.
                     SyncLock formResult1
+                        If OpenCVB.ocvb.parms.keyInputAccepted Then keyboardInput = ""
                         algorithmRefresh = True
                         formResult1 = OpenCVB.ocvb.result1.Clone()
                         formResult2 = OpenCVB.ocvb.result2.Clone()
@@ -1090,5 +1095,20 @@ Public Class OpenCVB
         If parms.testAllRunning Then
             Console.WriteLine(vbTab + "Ending " + parms.activeAlgorithm)
         End If
+    End Sub
+
+    Private Sub OpenCVB_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+        If e.KeyCode = Keys.Escape Then
+            keyboardInput = ""
+            Exit Sub
+        End If
+
+        SyncLock bufferLock
+            keyboardInput += (e.KeyData.ToString()).ToLower
+        End SyncLock
+        '  Console.WriteLine(keyboardInput + " " + e.KeyValue.ToString)
+    End Sub
+    Private Sub AvailableAlgorithms_KeyDown(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyDown
+        e.SuppressKeyPress = True
     End Sub
 End Class
