@@ -31,8 +31,6 @@ Public Class Puzzle_Basics : Implements IDisposable
         grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 5
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
-        grid.sliders.TrackBar1.Minimum = grid.sliders.TrackBar1.Value
-        grid.sliders.TrackBar2.Minimum = grid.sliders.TrackBar2.Value
         grid.Run(ocvb)
         ocvb.desc = "Create the puzzle pieces for a genetic matching algorithm."
     End Sub
@@ -110,7 +108,6 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
         ocvb.desc = "Put the puzzle back together using the correlation coefficients of the top and bottom of each ROI."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim correlationThreshold = 0.75
         If externalUse = False Then
             If ocvb.frameCount < 10 Then Exit Sub ' no startup dark images.
             If check.Box(0).Checked Then
@@ -124,12 +121,12 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
             puzzle.grid.sliders.Visible = False
         End If
 
-        Dim goodFits(roilist.Count - 1) As List(Of fit)
-        For i = 0 To goodFits.Count - 1
-            goodFits(i) = New List(Of fit)  ' loops are easier if we don't have to check for "nothing" entries
+        Dim fitList(roilist.Count - 1) As List(Of fit)
+        For i = 0 To fitList.Count - 1
+            fitList(i) = New List(Of fit)  ' loops are easier if we don't have to check for "nothing" entries
         Next
 
-        ' comput correlation of every bottom to every top
+        ' compute correlation of every bottom to every top
         For i = 0 To roilist.Count - 1
             Dim roi1 = roilist(i)
             corr.sample1 = ocvb.result1(roi1).Row(roi1.Height - 1)
@@ -138,20 +135,20 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
                 Dim roi2 = roilist(j)
                 corr.sample2 = ocvb.result1(roi2).Row(0)
                 corr.Run(ocvb)
-                goodFits(i).Add(New fit(corr.correlationMat.At(Of Single)(0, 0), i, j))
+                fitList(i).Add(New fit(corr.correlationMat.At(Of Single)(0, 0), i, j))
             Next
         Next
 
         Dim botList As New List(Of fit)
         Dim botTotal = CInt(ocvb.color.Width / roilist(0).Width)
-        Dim cutoff = correlationThreshold ' threshold for fit
+        Dim cutoff = 0.75 ' starting point for the fit threshold 
         ' search for enough tiles to fill the bottom row by looking for those bottoms that don't have a good correlation to any top.
         While botList.Count < botTotal
             botList.Clear()
-            For i = 0 To goodFits.Count - 1
+            For i = 0 To fitList.Count - 1
                 Dim bot = -1
-                For j = 0 To goodFits(i).Count - 1
-                    Dim nextFit = goodFits(i).ElementAt(j)
+                For j = 0 To fitList(i).Count - 1
+                    Dim nextFit = fitList(i).ElementAt(j)
                     If nextFit.correlation > cutoff Then
                         bot = i
                         Exit For
@@ -159,8 +156,8 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
                 Next
                 If bot = -1 Then
                     Dim bestFit As New fit(-1, 0, 0)
-                    For j = 0 To goodFits(i).Count - 1
-                        Dim nextFit = goodFits(i).ElementAt(j)
+                    For j = 0 To fitList(i).Count - 1
+                        Dim nextFit = fitList(i).ElementAt(j)
                         If bestFit.correlation < nextFit.correlation Then bestFit = nextFit
                     Next
                     botList.Add(bestFit)
@@ -175,7 +172,7 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
         For nextx = 0 To ocvb.color.Width - roilist(0).Width Step roilist(0).Width
             Dim roi = roilist(botList(botI).index)
             ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, ocvb.color.Height - roi.Height, roi.Width, roi.Height)))
-            goodFits(botList(botI).index).Clear() ' don't try to fit this tile anywhere else.
+            fitList(botList(botI).index).Clear() ' don't try to fit this tile anywhere else.
             botI += 1
         Next
 
@@ -187,10 +184,10 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
                 Dim bestCorr As Single = -1
                 Dim bestI As Integer = 0
                 Dim bestJ As Integer = 0
-                For i = 0 To goodFits.Count - 1
+                For i = 0 To fitList.Count - 1
                     If i = rectIndex Then Continue For
-                    For j = 0 To goodFits(i).Count - 1
-                        Dim nextFit = goodFits(i).ElementAt(j)
+                    For j = 0 To fitList(i).Count - 1
+                        Dim nextFit = fitList(i).ElementAt(j)
                         If nextFit.neighbor = rectIndex Then
                             If bestCorr < nextFit.correlation Then
                                 bestJ = j
@@ -201,12 +198,10 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
                     Next
                 Next
                 Dim roi = roilist(bestI)
-                goodFits(bestI).ElementAt(bestJ).correlation = 0
+                fitList(bestI).ElementAt(bestJ).correlation = 0
                 ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, nextY, roi.Width, roi.Height)))
-                goodFits(bestI).Clear()
+                fitList(bestI).Clear()
                 rectIndex = bestI
-                'cv.Cv2.ImShow("result2", ocvb.result2)
-                'cv.Cv2.WaitKey()
             Next
             botindex += 1
         Next
@@ -216,6 +211,7 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
         Else
             ocvb.label2 = "Current output of puzzle solver"
         End If
+
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         corr.Dispose()
@@ -251,7 +247,6 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
         ocvb.desc = "Put the puzzle back together using the correlation coefficients of the top and bottom of each ROI."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim correlationThreshold = 0.75
         If externalUse = False Then
             If ocvb.frameCount < 10 Then Exit Sub ' no startup dark images.
             If check.Box(0).Checked Then
@@ -265,12 +260,12 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
             puzzle.grid.sliders.Visible = False
         End If
 
-        Dim goodFits(roilist.Count - 1) As List(Of fit)
-        For i = 0 To goodFits.Count - 1
-            goodFits(i) = New List(Of fit)  ' loops are easier if we don't have to check for "nothing" entries
+        Dim fitList(roilist.Count - 1) As List(Of fit)
+        For i = 0 To fitList.Count - 1
+            fitList(i) = New List(Of fit)  ' loops are easier if we don't have to check for "nothing" entries
         Next
 
-        ' comput correlation of every bottom to every top
+        ' compute correlation of every right side to every left side
         For i = 0 To roilist.Count - 1
             Dim roi1 = roilist(i)
             corr.sample1 = ocvb.result1(roi1).Col(roi1.Width - 1)
@@ -279,20 +274,20 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
                 Dim roi2 = roilist(j)
                 corr.sample2 = ocvb.result1(roi2).Col(0)
                 corr.Run(ocvb)
-                goodFits(i).Add(New fit(corr.correlationMat.At(Of Single)(0, 0), i, j))
+                fitList(i).Add(New fit(corr.correlationMat.At(Of Single)(0, 0), i, j))
             Next
         Next
 
         Dim hList As New List(Of fit)
         Dim colTotal = CInt(ocvb.color.Height / roilist(0).Height)
         Dim cutoff = 0.75 ' starting point for fit threshold 
-        ' search for enough tiles to fill the bottom row by looking for those bottoms that don't have a good correlation to any top.
+        ' search for enough tiles to fill the right column by looking for those sides that don't have a good correlation to any other side.
         While hList.Count < colTotal
             hList.Clear()
-            For i = 0 To goodFits.Count - 1
+            For i = 0 To fitList.Count - 1
                 Dim side = -1
-                For j = 0 To goodFits(i).Count - 1
-                    Dim nextFit = goodFits(i).ElementAt(j)
+                For j = 0 To fitList(i).Count - 1
+                    Dim nextFit = fitList(i).ElementAt(j)
                     If nextFit.correlation > cutoff Then
                         side = i
                         Exit For
@@ -300,8 +295,8 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
                 Next
                 If side = -1 Then
                     Dim bestFit As New fit(-1, 0, 0)
-                    For j = 0 To goodFits(i).Count - 1
-                        Dim nextFit = goodFits(i).ElementAt(j)
+                    For j = 0 To fitList(i).Count - 1
+                        Dim nextFit = fitList(i).ElementAt(j)
                         If bestFit.correlation < nextFit.correlation Then bestFit = nextFit
                     Next
                     hList.Add(bestFit)
@@ -316,7 +311,7 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
         For nexty = 0 To ocvb.color.Height - roilist(0).Height Step roilist(0).Height
             Dim roi = roilist(hList(sideI).index)
             ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(ocvb.color.Width - roi.Width, nexty, roi.Width, roi.Height)))
-            goodFits(hList(sideI).index).Clear() ' don't try to fit this tile anywhere else.
+            fitList(hList(sideI).index).Clear() ' don't try to fit this tile anywhere else.
             sideI += 1
         Next
 
@@ -328,10 +323,10 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
                 Dim bestCorr As Single = -1
                 Dim bestI As Integer = 0
                 Dim bestJ As Integer = 0
-                For i = 0 To goodFits.Count - 1
+                For i = 0 To fitList.Count - 1
                     If i = rectIndex Then Continue For
-                    For j = 0 To goodFits(i).Count - 1
-                        Dim nextFit = goodFits(i).ElementAt(j)
+                    For j = 0 To fitList(i).Count - 1
+                        Dim nextFit = fitList(i).ElementAt(j)
                         If nextFit.neighbor = rectIndex Then
                             If bestCorr < nextFit.correlation Then
                                 bestJ = j
@@ -342,9 +337,9 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
                     Next
                 Next
                 Dim roi = roilist(bestI)
-                goodFits(bestI).ElementAt(bestJ).correlation = 0
+                fitList(bestI).ElementAt(bestJ).correlation = 0
                 ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, nextY, roi.Width, roi.Height)))
-                goodFits(bestI).Clear()
+                fitList(bestI).Clear()
                 rectIndex = bestI
             Next
             sideI += 1
