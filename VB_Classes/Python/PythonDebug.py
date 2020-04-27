@@ -1,23 +1,50 @@
+'''
+K-means clusterization sample.
+Usage:
+   kmeans.py
+
+Keyboard shortcuts:
+   ESC   - exit
+   space - generate new distribution
+'''
+
+import numpy as np
 import cv2 as cv
 
-alpha_slider_max = 100
-title_window = 'AddWeighted_Trackbar_PS.py - Linear Blend'
-saveAlpha = 50
-    
-def on_trackbar(val):
-    global saveAlpha # force the callback to reference the global variable.
-    saveAlpha = val 
+from gaussian_mix import make_gaussians
 
-cv.namedWindow(title_window)
-trackbar_name = 'Alpha'
-cv.createTrackbar(trackbar_name, title_window , saveAlpha, alpha_slider_max, on_trackbar)
-on_trackbar(saveAlpha)
+def main():
+    cluster_n = 5
+    img_size = 512
 
-def OpenCVCode(imgRGB, depth_colormap):
-    alpha = saveAlpha / alpha_slider_max
-    beta = ( 1.0 - alpha )
-    dst = cv.addWeighted(imgRGB, alpha, depth_colormap, beta, 0.0)
-    cv.imshow(title_window, dst)
+    # generating bright palette
+    colors = np.zeros((1, cluster_n, 3), np.uint8)
+    colors[0,:] = 255
+    colors[0,:,0] = np.arange(0, 180, 180.0/cluster_n)
+    colors = cv.cvtColor(colors, cv.COLOR_HSV2BGR)[0]
 
-from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'AddWeighted_Trackbar_PS.py')
+    while True:
+        print('sampling distributions...')
+        points, _ = make_gaussians(cluster_n, img_size)
+
+        term_crit = (cv.TERM_CRITERIA_EPS, 30, 0.1)
+        _ret, labels, _centers = cv.kmeans(points, cluster_n, None, term_crit, 10, 0)
+
+        img = np.zeros((img_size, img_size, 3), np.uint8)
+        for (x, y), label in zip(np.int32(points), labels.ravel()):
+            c = list(map(int, colors[label]))
+
+            cv.circle(img, (x, y), 1, c, -1)
+
+        cv.imshow('kmeans', img)
+        ch = cv.waitKey(0)
+        if ch == 27:
+            break
+
+    print('Done')
+
+
+if __name__ == '__main__':
+    print(__doc__)
+    main()
+    cv.destroyAllWindows()
