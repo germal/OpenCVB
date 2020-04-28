@@ -171,10 +171,13 @@ The last step is to open the OpenCVB.sln file and build OpenCVB.
 Support for some optional cameras can be easily added:
 
 -   For the StereoLabs ZED 2 camera (released Q1 2020), install the StereoLabs
-    SDK from <https://www.stereolabs.com/>
+    SDK from
 
--   For the Mynt Eye D 1000 camera, download the SDK from
-    <https://github.com/slightech/MYNT-EYE-D-SDK>
+    -   <https://www.stereolabs.com/>
+
+-   For the Mynt Eye D 1000 camera, download the SDK from:
+
+    -   <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
 
 -   Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for
     StereoLabs Zed 2 or Mynt Eye D 1000 support.
