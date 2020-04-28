@@ -5,6 +5,7 @@ Module Puzzle_Solvers
     Public Class fit
         Public correlation As Single
         Public absDiff As Single
+        Public metric As Single
         Public index As Int32
         Public neighbor As Int32
         Sub New(corr As Single, abs As cv.Scalar, i As Int32, n As Int32)
@@ -12,6 +13,7 @@ Module Puzzle_Solvers
             absDiff = abs
             index = i
             neighbor = n
+            metric = 0 
         End Sub
     End Class
     Public Class CompareCorrelations : Implements IComparer(Of Single)
@@ -61,7 +63,8 @@ Module Puzzle_Solvers
             Next
             For j = 0 To fitList(i).Count - 1
                 fitList(i).ElementAt(j).absDiff = (maxDiff - fitList(i).ElementAt(j).absDiff) / maxDiff
-                sortedFit.Add(fitList(i).ElementAt(j).absDiff, fitList(i).ElementAt(j))
+                fitList(i).ElementAt(j).metric = fitList(i).ElementAt(j).correlation + fitList(i).ElementAt(j).absDiff
+                sortedFit.Add(fitList(i).ElementAt(j).metric, fitList(i).ElementAt(j))
             Next
             fitList(i).Clear()
             For j = 0 To sortedFit.Count - 1
@@ -78,18 +81,47 @@ Module Puzzle_Solvers
             tooGood.Clear()
             For i = 0 To fitList.Count - 1
                 Dim nextFit = fitList(i).ElementAt(0)
-                If nextFit.absDiff > cutoff Then
-                    tooGood.Add(nextFit.absDiff, nextFit)
+                If nextFit.metric > cutoff Then
+                    tooGood.Add(nextFit.metric, nextFit)
                 Else
                     edgeList.Add(nextFit)
                 End If
             Next
-
             ' set the cutoff to the 
-            If edgeList.Count <> edgeTotal Then cutoff = tooGood.ElementAt(tooGood.Count - edgeTotal).Value.absDiff
+            If edgeList.Count <> edgeTotal Then cutoff = tooGood.ElementAt(tooGood.Count - edgeTotal).Value.metric
         End While
+
         corr.Dispose()
         Return edgeList
+    End Function
+    Public Sub removeTile(fitlist() As List(Of fit), index As Integer)
+        For i = 0 To fitlist.Count - 1
+            For j = 0 To fitlist(i).Count - 1
+                Dim nextFit = fitlist(i).ElementAt(j)
+                If nextFit.neighbor = index Then
+                    fitlist(i).RemoveAt(j)
+                    Exit For
+                End If
+            Next
+        Next
+    End Sub
+
+    Public Function bestTile(fitList() As List(Of fit), edgeIndex As Integer, edgeTotal As Integer) As Integer
+        ' the edgelist neighbors are incorrect (they are edges!)  So find the tile whose bottom/rightside has the best connection to the top/leftside of the edge tile.
+        Dim bestMetric = Single.MinValue
+        Dim bestFit As Integer
+        For i = 0 To fitList.Count - 1
+            For j = 0 To fitList(i).Count - 1
+                Dim fit = fitList(i).ElementAt(j)
+                If fit.neighbor = edgeIndex Then
+                    If bestMetric < fit.metric Then
+                        bestMetric = fit.metric
+                        bestFit = fit.index ' connect the edge with the best fit with any tile.
+                    End If
+                End If
+            Next
+        Next
+        Return bestFit
     End Function
 End Module
 
@@ -200,7 +232,6 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
         For nextx = 0 To ocvb.color.Width - roilist(0).Width Step roilist(0).Width
             Dim roi = roilist(edgelist(botI).index)
             ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, ocvb.color.Height - roi.Height, roi.Width, roi.Height)))
-            fitList(edgelist(botI).index).Clear() ' don't try to fit this tile anywhere else.
             botI += 1
         Next
 
@@ -209,27 +240,10 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
         For nextX = 0 To ocvb.color.Width - roilist(0).Width Step roilist(0).Width
             rectIndex = edgelist(botindex).index
             For nextY = ocvb.color.Height - roilist(0).Height * 2 To 0 Step -roilist(0).Height
-                Dim bestCorr As Single = -1
-                Dim bestI As Integer = 0
-                Dim bestJ As Integer = 0
-                For i = 0 To fitList.Count - 1
-                    If i = rectIndex Then Continue For
-                    For j = 0 To fitList(i).Count - 1
-                        Dim nextFit = fitList(i).ElementAt(j)
-                        If nextFit.neighbor = rectIndex Then
-                            If bestCorr < nextFit.correlation Then
-                                bestJ = j
-                                bestI = i
-                                bestCorr = nextFit.correlation
-                            End If
-                        End If
-                    Next
-                Next
-                Dim roi = roilist(bestI)
-                fitList(bestI).ElementAt(bestJ).correlation = 0
+                Dim bestIndex = bestTile(fitList, rectIndex, edgeTotal)
+                Dim roi = roilist(bestIndex)
                 ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, nextY, roi.Width, roi.Height)))
-                fitList(bestI).Clear()
-                rectIndex = bestI
+                rectIndex = bestIndex
             Next
             botindex += 1
         Next
@@ -289,7 +303,6 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
         For nexty = 0 To ocvb.color.Height - roilist(0).Height Step roilist(0).Height
             Dim roi = roilist(edgelist(sideI).index)
             ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(ocvb.color.Width - roi.Width, nexty, roi.Width, roi.Height)))
-            fitList(edgelist(sideI).index).Clear() ' don't try to fit this tile anywhere else.
             sideI += 1
         Next
 
@@ -298,27 +311,10 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
         For nextY = 0 To ocvb.color.Height - roilist(0).Height Step roilist(0).Height
             rectIndex = edgelist(sideI).index
             For nextX = ocvb.color.Width - roilist(0).Width * 2 To 0 Step -roilist(0).Width
-                Dim bestCorr As Single = -1
-                Dim bestI As Integer = 0
-                Dim bestJ As Integer = 0
-                For i = 0 To fitList.Count - 1
-                    If i = rectIndex Then Continue For
-                    For j = 0 To fitList(i).Count - 1
-                        Dim nextFit = fitList(i).ElementAt(j)
-                        If nextFit.neighbor = rectIndex Then
-                            If bestCorr < nextFit.correlation Then
-                                bestJ = j
-                                bestI = i
-                                bestCorr = nextFit.correlation
-                            End If
-                        End If
-                    Next
-                Next
-                Dim roi = roilist(bestI)
-                fitList(bestI).ElementAt(bestJ).correlation = 0
+                Dim bestIndex = bestTile(fitList, rectIndex, edgeTotal)
+                Dim roi = roilist(bestIndex)
                 ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, nextY, roi.Width, roi.Height)))
-                fitList(bestI).Clear()
-                rectIndex = bestI
+                rectIndex = bestIndex
             Next
             sideI += 1
         Next
