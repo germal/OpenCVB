@@ -3,17 +3,14 @@ Imports System.Threading
 
 Module Puzzle_Solvers
     Public Class fit
-        Public correlation As Single
         Public absDiff As Single
-        Public metric As Single
         Public index As Int32
-        Public neighbor As Int32
-        Sub New(corr As Single, abs As cv.Scalar, i As Int32, n As Int32)
-            correlation = corr
+        Public neighborBelowOrLeft As Integer
+        Public neighborAboveOrRight As Integer
+        Sub New(abs As cv.Scalar, i As Int32, n As Int32)
             absDiff = abs
             index = i
-            neighbor = n
-            metric = 0 
+            neighborBelowOrLeft = n
         End Sub
     End Class
     Public Class CompareCorrelations : Implements IComparer(Of Single)
@@ -27,8 +24,6 @@ Module Puzzle_Solvers
     Public Function fitCheck(ocvb As AlgorithmData, roilist() As cv.Rect, rowCheck As Boolean, fitList() As List(Of fit), edgeTotal As Integer) As List(Of fit)
         Dim saveOptions = ocvb.parms.ShowOptions
         ocvb.parms.ShowOptions = False
-        Dim corr = New MatchTemplate_Basics(ocvb)
-        corr.externalUse = True
         ocvb.parms.ShowOptions = saveOptions
 
         For i = 0 To fitList.Count - 1
@@ -39,18 +34,17 @@ Module Puzzle_Solvers
 
         ' compute absDiff of every bottom to every top
         Dim maxDiff = Single.MinValue
-        Dim tmp As New cv.Mat
+        Dim tmp As New cv.Mat, sample1 As cv.Mat, sample2 As cv.Mat
         For i = 0 To roilist.Count - 1
             Dim roi1 = roilist(i)
-            If rowCheck Then corr.sample1 = ocvb.result1(roi1).Row(roi1.Height - 1) Else corr.sample1 = ocvb.result1(roi1).Col(roi1.Width - 1)
+            If rowCheck Then sample1 = ocvb.result1(roi1).Row(roi1.Height - 1) Else sample1 = ocvb.result1(roi1).Col(roi1.Width - 1)
             sortedFit.Clear()
             For j = 0 To roilist.Count - 1
                 If i = j Then Continue For
                 Dim roi2 = roilist(j)
-                If rowCheck Then corr.sample2 = ocvb.result1(roi2).Row(0) Else corr.sample2 = ocvb.result1(roi2).Col(0)
-                corr.Run(ocvb)
+                If rowCheck Then sample2 = ocvb.result1(roi2).Row(0) Else sample2 = ocvb.result1(roi2).Col(0)
 
-                cv.Cv2.Absdiff(corr.sample1, corr.sample2, tmp)
+                cv.Cv2.Absdiff(sample1, sample2, tmp)
                 Dim absD = cv.Cv2.Sum(tmp)
                 Dim absDiff As Single = Single.MinValue
                 For k = 0 To 2
@@ -58,13 +52,12 @@ Module Puzzle_Solvers
                 Next
                 If maxDiff < absDiff Then maxDiff = absDiff
 
-                Dim nextFit = New fit(corr.correlationMat.At(Of Single)(0, 0), absDiff, i, j)
+                Dim nextFit = New fit(absDiff, i, j)
                 fitList(i).Add(nextFit)
             Next
             For j = 0 To fitList(i).Count - 1
                 fitList(i).ElementAt(j).absDiff = (maxDiff - fitList(i).ElementAt(j).absDiff) / maxDiff
-                fitList(i).ElementAt(j).metric = fitList(i).ElementAt(j).correlation + fitList(i).ElementAt(j).absDiff
-                sortedFit.Add(fitList(i).ElementAt(j).metric, fitList(i).ElementAt(j))
+                sortedFit.Add(fitList(i).ElementAt(j).absDiff, fitList(i).ElementAt(j))
             Next
             fitList(i).Clear()
             For j = 0 To sortedFit.Count - 1
@@ -81,14 +74,14 @@ Module Puzzle_Solvers
             tooGood.Clear()
             For i = 0 To fitList.Count - 1
                 Dim nextFit = fitList(i).ElementAt(0)
-                If nextFit.metric > cutoff Then
-                    tooGood.Add(nextFit.metric, nextFit)
+                If nextFit.absDiff > cutoff Then
+                    tooGood.Add(nextFit.absDiff, nextFit)
                 Else
                     edgeList.Add(nextFit)
                 End If
             Next
             ' set the cutoff to the 
-            If edgeList.Count <> edgeTotal Then cutoff = tooGood.ElementAt(tooGood.Count - edgeTotal).Value.metric
+            If edgeList.Count <> edgeTotal Then cutoff = tooGood.ElementAt(tooGood.Count - edgeTotal).Value.absDiff
         End While
 
         'For i = 0 To edgeList.Count - 1
@@ -100,14 +93,13 @@ Module Puzzle_Solvers
         '        edgeIndex = bestIndex
         '    Next
         'Next
-        corr.Dispose()
         Return edgeList
     End Function
     Public Sub removeTile(fitlist() As List(Of fit), index As Integer)
         For i = 0 To fitlist.Count - 1
             For j = 0 To fitlist(i).Count - 1
                 Dim nextFit = fitlist(i).ElementAt(j)
-                If nextFit.neighbor = index Then
+                If nextFit.neighborBelowOrLeft = index Then
                     fitlist(i).RemoveAt(j)
                     Exit For
                 End If
@@ -116,16 +108,16 @@ Module Puzzle_Solvers
     End Sub
 
     Public Function bestTile(fitList() As List(Of fit), edgeIndex As Integer, edgeTotal As Integer) As Integer
-        ' the edgelist neighbors are incorrect (they are edges!)  So find the tile whose bottom/rightside has the best connection to the top/leftside of the edge tile.
+        ' the edgelist neighborBelowOrLefts are incorrect (they are edges!)  So find the tile whose bottom/rightside has the best connection to the top/leftside of the edge tile.
         Dim bestMetric = Single.MinValue
         Dim bestFit As Integer
         Dim bestElement As Integer
         For i = 0 To fitList.Count - 1
             For j = 0 To fitList(i).Count - 1
                 Dim fit = fitList(i).ElementAt(j)
-                If fit.neighbor = edgeIndex Then
-                    If bestMetric < fit.metric Then
-                        bestMetric = fit.metric
+                If fit.neighborBelowOrLeft = edgeIndex Then
+                    If bestMetric < fit.absDiff Then
+                        bestMetric = fit.absDiff
                         bestElement = j
                         bestFit = fit.index ' connect the edge with the best fit with any tile.
                     End If
