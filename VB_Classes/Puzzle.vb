@@ -91,6 +91,15 @@ Module Puzzle_Solvers
             If edgeList.Count <> edgeTotal Then cutoff = tooGood.ElementAt(tooGood.Count - edgeTotal).Value.metric
         End While
 
+        'For i = 0 To edgeList.Count - 1
+        '    Dim edgeIndex = edgeList(i).index
+        '    For j = 0 To edgeTotal - 1
+        '        Dim roi = roilist(edgeIndex)
+        '        Dim bestIndex = bestTile(fitList, edgeIndex, edgeTotal)
+        '        fitList(bestIndex)
+        '        edgeIndex = bestIndex
+        '    Next
+        'Next
         corr.Dispose()
         Return edgeList
     End Function
@@ -110,17 +119,20 @@ Module Puzzle_Solvers
         ' the edgelist neighbors are incorrect (they are edges!)  So find the tile whose bottom/rightside has the best connection to the top/leftside of the edge tile.
         Dim bestMetric = Single.MinValue
         Dim bestFit As Integer
+        Dim bestElement As Integer
         For i = 0 To fitList.Count - 1
             For j = 0 To fitList(i).Count - 1
                 Dim fit = fitList(i).ElementAt(j)
                 If fit.neighbor = edgeIndex Then
                     If bestMetric < fit.metric Then
                         bestMetric = fit.metric
+                        bestElement = j
                         bestFit = fit.index ' connect the edge with the best fit with any tile.
                     End If
                 End If
             Next
         Next
+        fitList(bestFit).ElementAt(bestElement)
         Return bestFit
     End Function
 End Module
@@ -228,20 +240,15 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
         Dim edgeTotal = CInt(ocvb.color.Width / roilist(0).Width)
         Dim edgelist = fitCheck(ocvb, roilist, rowCheck:=True, fitList, edgeTotal)
 
-        Dim botI = 0
-        For nextx = 0 To ocvb.color.Width - roilist(0).Width Step roilist(0).Width
-            Dim roi = roilist(edgelist(botI).index)
-            ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, ocvb.color.Height - roi.Height, roi.Width, roi.Height)))
-            botI += 1
-        Next
-
         Dim botindex = 0
         Dim rectIndex = 0
         For nextX = 0 To ocvb.color.Width - roilist(0).Width Step roilist(0).Width
             rectIndex = edgelist(botindex).index
+            Dim roi = roilist(rectIndex)
+            ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, ocvb.color.Height - roi.Height, roi.Width, roi.Height)))
             For nextY = ocvb.color.Height - roilist(0).Height * 2 To 0 Step -roilist(0).Height
                 Dim bestIndex = bestTile(fitList, rectIndex, edgeTotal)
-                Dim roi = roilist(bestIndex)
+                roi = roilist(bestIndex)
                 ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, nextY, roi.Width, roi.Height)))
                 rectIndex = bestIndex
             Next
