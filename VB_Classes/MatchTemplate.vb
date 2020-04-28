@@ -48,7 +48,7 @@ Public Class MatchTemplate_Basics : Implements IDisposable
         Next
         cv.Cv2.MatchTemplate(sample1, sample2, correlationMat, matchOption)
         If ocvb.frameCount Mod reportFreq = 0 Then
-            Dim correlation = correlationMat.At(Of Single)(0, 0)
+            Dim correlation = correlationMat.Get(Of Single)(0, 0)
             ocvb.label1 = "Correlation = " + Format(correlation, "#,##0.000")
             If externalUse = False Then
                 ocvb.label1 = matchText + " for " + CStr(sample1.Rows) + " samples each = " + Format(correlation, "#,##0.00")
@@ -93,7 +93,7 @@ Public Class MatchTemplate_RowCorrelation : Implements IDisposable
         corr.sample1 = ocvb.color.Row(line1).Clone()
         corr.sample2 = ocvb.color.Row(line2 + 1).Clone()
         corr.Run(ocvb)
-        Dim correlation = corr.correlationMat.At(Of Single)(0, 0)
+        Dim correlation = corr.correlationMat.Get(Of Single)(0, 0)
         flow.msgs.Add(corr.matchText + " between lines " + CStr(line1) + " and line " + CStr(line2) + " = " + Format(correlation, "#,##0.00"))
         flow.Run(ocvb)
 

@@ -48,8 +48,8 @@ Public Class Area_MinTriangle_CPP : Implements IDisposable
         triangle = New cv.Mat(3, 1, cv.MatType.CV_32FC2, dstData)
 
         For i = 0 To 2
-            Dim p1 = triangle.At(Of cv.Point2f)(i)
-            Dim p2 = triangle.At(Of cv.Point2f)((i + 1) Mod 3)
+            Dim p1 = triangle.Get(of cv.Point2f)(i)
+            Dim p2 = triangle.Get(of cv.Point2f)((i + 1) Mod 3)
             ocvb.result1.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         Next
     End Sub
@@ -166,7 +166,7 @@ Public Class Area_FindNonZero : Implements IDisposable
 
         Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf
         For i = 0 To srcPoints.Length - 1
-            Dim pt = nonzero.At(Of cv.Point)(0, i)
+            Dim pt = nonzero.Get(of cv.Point)(0, i)
             outstr += "X = " + vbTab + CStr(pt.X) + vbTab + " y = " + vbTab + CStr(pt.Y) + vbCrLf
         Next
         ocvb.putText(New ActiveClass.TrueType(outstr, 10, 50, RESULT2))

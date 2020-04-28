@@ -11,7 +11,7 @@ Module histogram_Functions
         Dim sScale = CInt(Math.Ceiling(dst.Cols / bBins))
         For h = 0 To aBins - 1
             For s = 0 To bBins - 1
-                Dim binVal = histogram.At(Of Single)(h, s)
+                Dim binVal = histogram.Get(of Single)(h, s)
                 Dim intensity = Math.Round(binVal * 255 / maxVal)
                 Dim pt1 = New cv.Point(s * sScale, h * hScale)
                 Dim pt2 = New cv.Point((s + 1) * sScale - 1, (h + 1) * hScale - 1)
@@ -36,7 +36,7 @@ Module histogram_Functions
         img.SetTo(0)
         If maxVal = 0 Then Exit Sub
         For i = 0 To binCount - 2
-            Dim h = img.Height * (hist.At(Of Single)(i, 0)) / maxVal
+            Dim h = img.Height * (hist.Get(of Single)(i, 0)) / maxVal
             If h = 0 Then h = 5 ' show the color range in the plot
             cv.Cv2.Rectangle(img, New cv.Rect(i * binWidth + 1, img.Height - h, binWidth - 2, h), New cv.Scalar(CInt(180.0 * i / binCount), 255, 255), -1)
         Next
@@ -112,7 +112,7 @@ Public Class Histogram_Basics : Implements IDisposable
                 Dim points = New List(Of cv.Point)
                 Dim listOfPoints = New List(Of List(Of cv.Point))
                 For j = 0 To bins - 1
-                    points.Add(New cv.Point(CInt(j * lineWidth), ocvb.result1.Rows - ocvb.result1.Rows * histRaw(i).At(Of Single)(j, 0) / maxVal))
+                    points.Add(New cv.Point(CInt(j * lineWidth), ocvb.result1.Rows - ocvb.result1.Rows * histRaw(i).Get(of Single)(j, 0) / maxVal))
                 Next
                 listOfPoints.Add(points)
                 ocvb.result1.Polylines(listOfPoints, False, plotColors(i), thickness, cv.LineTypes.AntiAlias)
@@ -532,7 +532,7 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
         If check.Box(0).Checked Then
             ReDim kalman.src(plotHist.bins - 1)
             For i = 0 To plotHist.bins - 1
-                kalman.src(i) = histogram.At(Of Single)(i, 0)
+                kalman.src(i) = histogram.Get(of Single)(i, 0)
             Next
             kalman.Run(ocvb)
             For i = 0 To plotHist.bins - 1
@@ -617,7 +617,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         img.SetTo(0)
         If maxVal = 0 Then Exit Sub
         For i = 0 To binCount - 1
-            Dim nextHistCount = hist.At(Of Single)(i, 0)
+            Dim nextHistCount = hist.Get(of Single)(i, 0)
             Dim h = CInt(img.Height * nextHistCount / maxVal)
             If h = 0 Then h = 1 ' show the color range in the plot
             Dim barRect As cv.Rect
@@ -645,7 +645,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         If check.Box(0).Checked Then
             ReDim kalman.src(hist.plotHist.hist.Rows - 1)
             For i = 0 To hist.plotHist.hist.Rows - 1
-                kalman.src(i) = hist.plotHist.hist.At(Of Single)(i, 0)
+                kalman.src(i) = hist.plotHist.hist.Get(of Single)(i, 0)
             Next
             kalman.Run(ocvb)
             For i = 0 To hist.plotHist.hist.Rows - 1
@@ -654,7 +654,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         End If
 
         Dim depthIncr = CInt(hist.trim.sliders.TrackBar2.Value / hist.sliders.TrackBar1.Value) ' each bar represents this number of millimeters
-        Dim pointCount = hist.plotHist.hist.At(Of Single)(0, 0) + hist.plotHist.hist.At(Of Single)(1, 0)
+        Dim pointCount = hist.plotHist.hist.Get(of Single)(0, 0) + hist.plotHist.hist.Get(of Single)(1, 0)
         Dim startDepth = 1
         Dim startEndDepth As cv.Point
         Dim depthBoundaries As New SortedList(Of Single, cv.Point)(New CompareCounts)

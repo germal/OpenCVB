@@ -97,8 +97,8 @@ Public Class GetRotationMatrix2D_Box : Implements IDisposable
             cv.Cv2.Transform(srcPoints, dstpoints, rotation.Mflip)
         End If
         For i = 0 To dstpoints.Width - 1
-            Dim p1 = dstpoints.At(Of cv.Point2f)(0, i)
-            Dim p2 = dstpoints.At(Of cv.Point2f)(0, (i + 1) Mod 4)
+            Dim p1 = dstpoints.Get(of cv.Point2f)(0, i)
+            Dim p2 = dstpoints.Get(of cv.Point2f)(0, (i + 1) Mod 4)
             ocvb.result2.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         Next
     End Sub

@@ -178,17 +178,17 @@ Public Class Kalman_RotatingPoint : Implements IDisposable
         ocvb.desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim stateAngle = kState.At(Of Single)(0)
+        Dim stateAngle = kState.Get(of Single)(0)
 
         Dim prediction = kf.Predict()
-        Dim predictAngle = prediction.At(Of Single)(0)
+        Dim predictAngle = prediction.Get(of Single)(0)
         Dim predictPt = calcPoint(center, radius, predictAngle)
         statePt = calcPoint(center, radius, stateAngle)
 
-        cv.Cv2.Randn(measurement, New cv.Scalar(0), cv.Scalar.All(kf.MeasurementNoiseCov.At(Of Single)(0)))
+        cv.Cv2.Randn(measurement, New cv.Scalar(0), cv.Scalar.All(kf.MeasurementNoiseCov.Get(of Single)(0)))
 
         measurement += kf.MeasurementMatrix * kState
-        Dim measAngle = measurement.At(Of Single)(0)
+        Dim measAngle = measurement.Get(of Single)(0)
         Dim measPt = calcPoint(center, radius, measAngle)
 
         ocvb.result1.SetTo(0)
@@ -200,7 +200,7 @@ Public Class Kalman_RotatingPoint : Implements IDisposable
 
         If ocvb.ms_rng.Next(0, 4) <> 0 Then kf.Correct(measurement)
 
-        cv.Cv2.Randn(processNoise, cv.Scalar.Black, cv.Scalar.All(Math.Sqrt(kf.ProcessNoiseCov.At(Of Single)(0, 0))))
+        cv.Cv2.Randn(processNoise, cv.Scalar.Black, cv.Scalar.All(Math.Sqrt(kf.ProcessNoiseCov.Get(of Single)(0, 0))))
         kState = kf.TransitionMatrix * kState + processNoise
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -287,7 +287,7 @@ Public Class Kalman_CVMat : Implements IDisposable
         End If
 
         For i = 0 To kalman.Length - 1
-            kalman(i).inputReal = src.At(Of Single)(i, 0)
+            kalman(i).inputReal = src.Get(of Single)(i, 0)
             kalman(i).Run(ocvb)
         Next
 
@@ -299,7 +299,7 @@ Public Class Kalman_CVMat : Implements IDisposable
             Dim rx(src.Rows - 1) As Single
             Dim testrect As New cv.Rect
             For i = 0 To src.Rows - 1
-                rx(i) = dst.At(Of Single)(i, 0)
+                rx(i) = dst.Get(of Single)(i, 0)
             Next
             ocvb.result1 = ocvb.color
             Static rect As New cv.Rect(CInt(rx(0)), CInt(rx(1)), CInt(rx(2)), CInt(rx(3)))
@@ -452,7 +452,7 @@ Public Class Kalman_Single : Implements IDisposable
 
         Dim prediction = kf.Predict()
         measurement.Set(Of Single)(0, 0, inputReal)
-        stateResult = kf.Correct(measurement).At(Of Single)(0, 0)
+        stateResult = kf.Correct(measurement).Get(of Single)(0, 0)
         If externalUse = False Then
             plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
             plot.Run(ocvb)

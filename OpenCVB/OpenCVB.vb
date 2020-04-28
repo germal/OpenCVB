@@ -562,7 +562,7 @@ Public Class OpenCVB
                 For y = 0 To drawRect.Height - 1
                     sw.Write("Row " + Format(y, "000") + "," + vbTab)
                     For x = 0 To drawRect.Width - 1
-                        Dim pt = srcROI.At(Of cv.Vec3b)(y, x)
+                        Dim pt = srcROI.Get(of cv.Vec3b)(y, x)
                         sw.Write(CStr(pt.Item0) + "," + CStr(pt.Item1) + "," + CStr(pt.Item2) + ",")
                     Next
                     sw.WriteLine("")

@@ -21,7 +21,7 @@ Module ML__Exports
 
             For y = 0 To holeMask.Rows - 1
                 For x = 0 To holeMask.Cols - 1
-                    If borderMask.At(Of Byte)(y, x) Then
+                    If borderMask.Get(of Byte)(y, x) Then
                         Dim vec = color32f.Get(Of cv.Vec3f)(y, x)
                         If learnData.ContainsKey(vec) = False Then
                             learnData.Add(vec, depth32f.Get(Of Single)(y, x)) ' keep out duplicates.
@@ -43,7 +43,7 @@ Module ML__Exports
             Using predictMat As New cv.Mat(1, 3, cv.MatType.CV_32F)
                 For y = 0 To holeMask.Rows - 1
                     For x = 0 To holeMask.Cols - 1
-                        If holeMask.At(Of Byte)(y, x) Then
+                        If holeMask.Get(of Byte)(y, x) Then
                             predictMat.Set(Of cv.Vec3f)(0, 0, color32f.Get(Of cv.Vec3f)(y, x))
                             depth32f.Set(Of Single)(y, x, rtree.Predict(predictMat))
                         End If
@@ -354,7 +354,7 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
         Dim learnInput As New cv.Mat(c.Rows, 6, cv.MatType.CV_32F, 0)
         For y = 0 To c.Rows - 1
             For x = 0 To c.Cols - 1
-                Dim v6 = New cv.Vec6f(c.At(Of Single)(y, x), c.At(Of Single)(y, x + 1), c.At(Of Single)(y, x + 2), x, y, 0)
+                Dim v6 = New cv.Vec6f(c.Get(of Single)(y, x), c.Get(of Single)(y, x + 1), c.Get(of Single)(y, x + 2), x, y, 0)
                 learnInput.Set(Of cv.Vec6f)(y, x, v6)
             Next
         Next
@@ -368,7 +368,7 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
         Dim input As New cv.Mat(allC.Rows, 6, cv.MatType.CV_32F, 0)
         For y = 0 To allC.Rows - 1
             For x = 0 To allC.Cols - 1
-                Dim v6 = New cv.Vec6f(allC.At(Of Single)(y, x), allC.At(Of Single)(y, x + 1), allC.At(Of Single)(y, x + 2), x, y, 0)
+                Dim v6 = New cv.Vec6f(allC.Get(of Single)(y, x), allC.Get(of Single)(y, x + 1), allC.Get(of Single)(y, x + 2), x, y, 0)
                 input.Set(Of cv.Vec6f)(y, x, v6)
             Next
         Next

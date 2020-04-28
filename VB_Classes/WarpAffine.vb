@@ -159,20 +159,20 @@ Public Class WarpAffine_3Points : Implements IDisposable
         ' triangles(0) = tOriginal
         For j = 0 To 1
             For i = 0 To triangles(j).Rows - 1
-                Dim p1 = triangles(j).At(Of cv.Point2f)(i) + New cv.Point2f(j * ocvb.color.Width, 0)
-                Dim p2 = triangles(j).At(Of cv.Point2f)((i + 1) Mod 3) + New cv.Point2f(j * ocvb.color.Width, 0)
+                Dim p1 = triangles(j).Get(of cv.Point2f)(i) + New cv.Point2f(j * ocvb.color.Width, 0)
+                Dim p2 = triangles(j).Get(of cv.Point2f)((i + 1) Mod 3) + New cv.Point2f(j * ocvb.color.Width, 0)
                 Dim color = Choose(i + 1, cv.Scalar.Red, cv.Scalar.White, cv.Scalar.Yellow)
                 wideMat.Line(p1, p2, color, 4, cv.LineTypes.AntiAlias)
                 If j = 0 Then
-                    Dim p3 = triangles(j + 1).At(Of cv.Point2f)(i) + New cv.Point2f(ocvb.color.Width, 0)
+                    Dim p3 = triangles(j + 1).Get(of cv.Point2f)(i) + New cv.Point2f(ocvb.color.Width, 0)
                     wideMat.Line(p1, p3, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 End If
             Next
         Next
 
-        Dim corner = triangles(0).At(Of cv.Point2f)(0)
+        Dim corner = triangles(0).Get(of cv.Point2f)(0)
         wideMat.Circle(corner, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        corner = New cv.Point2f(M.At(Of Double)(0, 2) + ocvb.color.Width, M.At(Of Double)(1, 2))
+        corner = New cv.Point2f(M.Get(of Double)(0, 2) + ocvb.color.Width, M.Get(of Double)(1, 2))
         wideMat.Circle(corner, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
         ocvb.result1 = wideMat(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
@@ -188,12 +188,12 @@ Public Class WarpAffine_3Points : Implements IDisposable
 
         Dim ttStart = 40
         ocvb.putText(New ActiveClass.TrueType("M defined as: " + vbCrLf +
-                                              Format(M.At(Of Double)(0, 0), "#0.00") + vbTab +
-                                              Format(M.At(Of Double)(0, 1), "#0.00") + vbTab +
-                                              Format(M.At(Of Double)(0, 2), "#0.00") + vbCrLf +
-                                              Format(M.At(Of Double)(1, 0), "#0.00") + vbTab +
-                                              Format(M.At(Of Double)(1, 1), "#0.00") + vbTab +
-                                              Format(M.At(Of Double)(1, 2), "#0.00"), 10, ttStart, RESULT2))
+                                              Format(M.Get(of Double)(0, 0), "#0.00") + vbTab +
+                                              Format(M.Get(of Double)(0, 1), "#0.00") + vbTab +
+                                              Format(M.Get(of Double)(0, 2), "#0.00") + vbCrLf +
+                                              Format(M.Get(of Double)(1, 0), "#0.00") + vbTab +
+                                              Format(M.Get(of Double)(1, 1), "#0.00") + vbTab +
+                                              Format(M.Get(of Double)(1, 2), "#0.00"), 10, ttStart, RESULT2))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         triangle.Dispose()
@@ -247,16 +247,16 @@ Public Class WarpAffine_4Points : Implements IDisposable
         ocvb.result2.SetTo(0)
         Dim ttStart = 40
         ocvb.putText(New ActiveClass.TrueType("M defined as: " + vbCrLf +
-                                              Format(M.At(Of Double)(0, 0), "#0.00") + vbTab +
-                                              Format(M.At(Of Double)(0, 1), "#0.00") + vbTab +
-                                              Format(M.At(Of Double)(0, 2), "#0.00") + vbCrLf +
-                                              Format(M.At(Of Double)(1, 0), "#0.00") + vbTab +
-                                              Format(M.At(Of Double)(1, 1), "#0.00") + vbTab +
-                                              Format(M.At(Of Double)(1, 2), "#0.00") + vbCrLf +
-                                              Format(M.At(Of Double)(2, 0), "#0.00") + vbTab +
-                                              Format(M.At(Of Double)(2, 1), "#0.00") + vbTab +
-                                              Format(M.At(Of Double)(2, 2), "#0.00") + vbCrLf, 10, ttStart, RESULT2))
-        Dim center As New cv.Point2f(M.At(Of Double)(0, 2), M.At(Of Double)(1, 2))
+                                              Format(M.Get(of Double)(0, 0), "#0.00") + vbTab +
+                                              Format(M.Get(of Double)(0, 1), "#0.00") + vbTab +
+                                              Format(M.Get(of Double)(0, 2), "#0.00") + vbCrLf +
+                                              Format(M.Get(of Double)(1, 0), "#0.00") + vbTab +
+                                              Format(M.Get(of Double)(1, 1), "#0.00") + vbTab +
+                                              Format(M.Get(of Double)(1, 2), "#0.00") + vbCrLf +
+                                              Format(M.Get(of Double)(2, 0), "#0.00") + vbTab +
+                                              Format(M.Get(of Double)(2, 1), "#0.00") + vbTab +
+                                              Format(M.Get(of Double)(2, 2), "#0.00") + vbCrLf, 10, ttStart, RESULT2))
+        Dim center As New cv.Point2f(M.Get(of Double)(0, 2), M.Get(of Double)(1, 2))
         ocvb.result1.Circle(center, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         center = New cv.Point2f(50, ocvb.color.Height / 2)
         ocvb.result1.Circle(center, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)

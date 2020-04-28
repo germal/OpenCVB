@@ -20,7 +20,7 @@ Public Class CComp_Basics : Implements IDisposable
     Private Function findNonZeroPixel(src As cv.Mat, startPt As cv.Point) As cv.Point
         For y = src.Height / 4 To src.Height - 1
             For x = src.Width / 4 To src.Width - 1
-                If src.At(Of cv.Vec3b)(y, x) <> cv.Scalar.All(0) Then Return New cv.Point(x, y)
+                If src.Get(of cv.Vec3b)(y, x) <> cv.Scalar.All(0) Then Return New cv.Point(x, y)
             Next
         Next
     End Function

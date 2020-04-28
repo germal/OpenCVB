@@ -97,7 +97,7 @@ Module Palette_Custom_Module
         Next
         Dim result = New cv.Mat(1, width, cv.MatType.CV_8UC3)
         For i = 0 To width - 1
-            result.Col(i).SetTo(gradientColors.At(Of cv.Scalar)(0, i))
+            result.Col(i).SetTo(gradientColors.Get(of cv.Scalar)(0, i))
         Next
         Return result
     End Function
@@ -135,7 +135,7 @@ Public Class Palette_Map : Implements IDisposable
         Dim black As New cv.Vec3b(0, 0, 0)
         For y = 0 To ocvb.result1.Height - 1
             For x = 0 To ocvb.result1.Width - 1
-                Dim nextVec = ocvb.result1.At(Of cv.Vec3b)(y, x)
+                Dim nextVec = ocvb.result1.Get(of cv.Vec3b)(y, x)
                 If nextVec <> black Then
                     If palette.ContainsKey(nextVec) Then
                         palette(nextVec) = palette(nextVec) + 1
@@ -241,7 +241,7 @@ Public Class Palette_Gradient : Implements IDisposable
             Next
 
             For i = 0 To ocvb.result1.Rows - 1
-                ocvb.result1.Row(i).SetTo(gradientColors.At(Of cv.Scalar)(i))
+                ocvb.result1.Row(i).SetTo(gradientColors.Get(of cv.Scalar)(i))
             Next
         End If
     End Sub

@@ -283,7 +283,7 @@ Public Class SVM_Simple : Implements IDisposable
             ' show the training data
             For i = 0 To trainData.Rows
                 Dim pt = New cv.Point(CInt(trainData.Get(Of Single)(i, 0)), CInt(trainData.Get(Of Single)(i, 1)))
-                If labels.At(Of Int32)(i) >= 0 Then
+                If labels.Get(of Int32)(i) >= 0 Then
                     ocvb.result1.Circle(pt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
                 Else
                     ocvb.result1.Circle(pt, 5, cv.Scalar.Green, -1, cv.LineTypes.AntiAlias)
@@ -295,7 +295,7 @@ Public Class SVM_Simple : Implements IDisposable
             Dim thickness = 2
             If response.Rows > 1 Then
                 For i = 0 To response.Rows
-                    Dim v = response.At(Of cv.Vec2f)(i)
+                    Dim v = response.Get(of cv.Vec2f)(i)
                     ocvb.result2.Circle(New cv.Point(v(0), v(1)), 6, cv.Scalar.Blue, thickness, cv.LineTypes.AntiAlias)
                 Next
             End If

@@ -272,7 +272,7 @@ Public Class Plot_Basics : Implements IDisposable
             ReDim plot.srcY(hist.histRaw(0).Rows - 1)
             For i = 0 To plot.srcX.Length - 1
                 plot.srcX(i) = i
-                plot.srcY(i) = hist.histRaw(0).At(Of Single)(i, 0)
+                plot.srcY(i) = hist.histRaw(0).Get(of Single)(i, 0)
             Next
             plot.Run(ocvb)
             ocvb.label1 = "histogram with " + ocvb.label1
@@ -312,7 +312,7 @@ Public Class Plot_Depth : Implements IDisposable
         Dim inRangeMax = hist.trim.sliders.TrackBar2.Value
         For i = 0 To plot.srcX.Length - 1
             plot.srcX(i) = inRangeMin + i * (inRangeMax - inRangeMin) / plot.srcX.Length
-            plot.srcY(i) = hist.plotHist.hist.At(Of Single)(i, 0)
+            plot.srcY(i) = hist.plotHist.hist.Get(of Single)(i, 0)
         Next
         plot.Run(ocvb)
         ocvb.label1 = "histogram with " + ocvb.label1

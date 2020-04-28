@@ -77,7 +77,7 @@ Public Class Random_LUTMask : Implements IDisposable
                 Dim y = random.Points(i).Y
                 If x >= ocvb.drawRect.X And x < ocvb.drawRect.X + ocvb.drawRect.Width Then
                     If y >= ocvb.drawRect.Y And y < ocvb.drawRect.Y + ocvb.drawRect.Height Then
-                        lutMat.Set(lutIndex, 0, ocvb.result2.At(Of cv.Vec3b)(y, x))
+                        lutMat.Set(lutIndex, 0, ocvb.result2.Get(of cv.Vec3b)(y, x))
                         lutIndex += 1
                         If lutIndex >= lutMat.Rows Then Exit For
                     End If

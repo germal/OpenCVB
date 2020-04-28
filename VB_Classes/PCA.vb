@@ -107,12 +107,12 @@ Public Class PCA_DrawImage : Implements IDisposable
             Next
 
             Dim pca_analysis = New cv.PCA(data_pts, New cv.Mat, cv.PCA.Flags.DataAsRow)
-            Dim cntr = New cv.Point(CInt(pca_analysis.Mean.At(Of Double)(0, 0)), CInt(pca_analysis.Mean.At(Of Double)(0, 1)))
+            Dim cntr = New cv.Point(CInt(pca_analysis.Mean.Get(of Double)(0, 0)), CInt(pca_analysis.Mean.Get(of Double)(0, 1)))
             Dim eigen_vecs(2) As cv.Point2d
             Dim eigen_val(2) As Double
             For j = 0 To 1
-                eigen_vecs(j) = New cv.Point2d(pca_analysis.Eigenvectors.At(Of Double)(j, 0), pca_analysis.Eigenvectors.At(Of Double)(j, 1))
-                eigen_val(j) = pca_analysis.Eigenvalues.At(Of Double)(0, j)
+                eigen_vecs(j) = New cv.Point2d(pca_analysis.Eigenvectors.Get(of Double)(j, 0), pca_analysis.Eigenvectors.Get(of Double)(j, 1))
+                eigen_val(j) = pca_analysis.Eigenvalues.Get(of Double)(0, j)
             Next
 
             ocvb.result2.Circle(cntr, 3, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)

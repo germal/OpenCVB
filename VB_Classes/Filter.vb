@@ -47,7 +47,7 @@ Public Class Filter_NormalizedKernel : Implements IDisposable
 
         Dim sum As Double
         For i = 0 To kernel.Width - 1
-            sum += Math.Abs(kernel.At(Of Single)(0, i))
+            sum += Math.Abs(kernel.Get(of Single)(0, i))
         Next
         ocvb.label1 = "kernel sum = " + Format(sum, "#0.000")
 

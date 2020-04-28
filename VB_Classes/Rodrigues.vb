@@ -57,7 +57,7 @@ Public Class Rodrigues_ValidateVector : Implements IDisposable
 
         output = "Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
-            output += vbTab + Format(dst.At(Of Single)(i), "#0.000000000") + vbTab
+            output += vbTab + Format(dst.Get(of Single)(i), "#0.000000000") + vbTab
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
 
@@ -97,7 +97,7 @@ Public Class Rodrigues_RotationMatrix : Implements IDisposable
 
         output = "Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
-            output += vbTab + Format(dst.At(Of Single)(i), "#0.000000000") + vbTab
+            output += vbTab + Format(dst.Get(of Single)(i), "#0.000000000") + vbTab
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
     End Sub
@@ -132,7 +132,7 @@ Public Class Rodrigues_Extrinsics : Implements IDisposable
 
         output = "Extrinsic Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
-            output += vbTab + Format(dst.At(Of Double)(i), "#0.000000000") + vbTab
+            output += vbTab + Format(dst.Get(of Double)(i), "#0.000000000") + vbTab
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
     End Sub

@@ -439,7 +439,7 @@ Public Class OpenGL_GravityTransform : Implements IDisposable
                 Dim xz(4 * 4) As Single
                 For j = 0 To yRotate.Rows - 1
                     For i = 0 To yRotate.Cols - 1
-                        xz(i * 4 + j) = yRotate.At(Of Single)(i, j)
+                        xz(i * 4 + j) = yRotate.Get(of Single)(i, j)
                     Next
                 Next
 

@@ -46,9 +46,9 @@ Public Class FitEllipse_Basics_CPP : Implements IDisposable
             FitEllipse_AMS(srcHandle.AddrOfPinnedObject(), area.srcPoints.Count - 1, dstHandle.AddrOfPinnedObject)
 
             Dim output As New cv.Mat(5, 1, cv.MatType.CV_32F, area.dstData)
-            Dim angle = output.At(Of Single)(0)
-            Dim center As New cv.Point2f(output.At(Of Single)(1), output.At(Of Single)(2))
-            Dim size As New cv.Size2f(output.At(Of Single)(3), output.At(Of Single)(4))
+            Dim angle = output.Get(of Single)(0)
+            Dim center As New cv.Point2f(output.Get(of Single)(1), output.Get(of Single)(2))
+            Dim size As New cv.Size2f(output.Get(of Single)(3), output.Get(of Single)(4))
             box = New cv.RotatedRect(center, size, angle)
             ocvb.result2.Ellipse(box, cv.Scalar.Yellow, 6, cv.LineTypes.AntiAlias)
 
@@ -56,9 +56,9 @@ Public Class FitEllipse_Basics_CPP : Implements IDisposable
             dstHandle.Free()
             area.Dispose()
 
-            angle = output.At(Of Single)(0)
-            center = New cv.Point2f(output.At(Of Single)(1), output.At(Of Single)(2))
-            size = New cv.Size2f(output.At(Of Single)(3), output.At(Of Single)(4))
+            angle = output.Get(of Single)(0)
+            center = New cv.Point2f(output.Get(of Single)(1), output.Get(of Single)(2))
+            size = New cv.Size2f(output.Get(of Single)(3), output.Get(of Single)(4))
             box = New cv.RotatedRect(center, size, angle)
             ocvb.result2.Ellipse(box, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
         End If

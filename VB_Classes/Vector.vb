@@ -15,10 +15,10 @@ Public Class Vector_Magnitude : Implements IDisposable
         ' sqrt((x2 - x1)^2 + (y2 - y1)^2)
         Dim euclidean_distance As New cv.Mat
         cv.Cv2.Magnitude(diff_x, diff_y, euclidean_distance)
-        ocvb.putText(New ActiveClass.TrueType("euclidean_distance = " + CStr(euclidean_distance.At(Of Single)(0, 0)), 10, 60))
+        ocvb.putText(New ActiveClass.TrueType("euclidean_distance = " + CStr(euclidean_distance.Get(of Single)(0, 0)), 10, 60))
 
         Dim manhattan_distance = cv.Cv2.Abs(diff_x) + cv.Cv2.Abs(diff_y)
-        ocvb.putText(New ActiveClass.TrueType("manhattan_distance = " + CStr(manhattan_distance.ToMat.At(Of Single)(0, 0)), 10, 90))
+        ocvb.putText(New ActiveClass.TrueType("manhattan_distance = " + CStr(manhattan_distance.ToMat.Get(of Single)(0, 0)), 10, 90))
 
         ' Another way to compute L1 distance, with absdiff
         ' abs(x2 - x1) + abs(y2 - y1)
@@ -27,7 +27,7 @@ Public Class Vector_Magnitude : Implements IDisposable
         Dim other_manhattan_distance As New cv.Mat
         cv.Cv2.Absdiff(points1, points2, other_manhattan_distance)
         other_manhattan_distance = other_manhattan_distance.Col(0) + other_manhattan_distance.Col(1)
-        ocvb.putText(New ActiveClass.TrueType("other_manhattan_distance = " + CStr(other_manhattan_distance.At(Of Single)(0, 0)), 10, 120))
+        ocvb.putText(New ActiveClass.TrueType("other_manhattan_distance = " + CStr(other_manhattan_distance.Get(of Single)(0, 0)), 10, 120))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub

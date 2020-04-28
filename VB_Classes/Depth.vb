@@ -20,7 +20,7 @@ Public Class Depth_WorldXYZ_MT : Implements IDisposable
             Dim xy As New cv.Point3f
             For xy.Y = roi.Y To roi.Y + roi.Height - 1
                 For xy.X = roi.X To roi.X + roi.Width - 1
-                    xy.Z = depth32f.At(Of UInt16)(xy.Y, xy.X)
+                    xy.Z = depth32f.Get(of UInt16)(xy.Y, xy.X)
                     If xy.Z <> 0 Then
                         Dim w = getWorldCoordinatesD(ocvb, xy)
                         xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, w)
@@ -178,7 +178,7 @@ Public Class Depth_Foreground : Implements IDisposable
         Dim blobLocation As New List(Of cv.Point)
         For y = 0 To gray.Height - 1
             For x = 0 To gray.Width - 1
-                Dim nextByte = gray.At(Of Byte)(y, x)
+                Dim nextByte = gray.Get(of Byte)(y, x)
                 If nextByte <> 0 Then
                     Dim count = gray.FloodFill(New cv.Point(x, y), 0)
                     If count > 10 Then
@@ -321,7 +321,7 @@ Public Class Depth_WorldXYZ : Implements IDisposable
         Dim xy As New cv.Point3f
         For xy.Y = 0 To xyzFrame.Height - 1
             For xy.X = 0 To xyzFrame.Width - 1
-                xy.Z = depth32f.At(Of Single)(xy.Y, xy.X)
+                xy.Z = depth32f.Get(of Single)(xy.Y, xy.X)
                 If xy.Z <> 0 Then
                     Dim w = getWorldCoordinatesD(ocvb, xy)
                     xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, w)
@@ -432,10 +432,10 @@ Public Class Depth_MeanStdev_MT : Implements IDisposable
             Sub(i)
                 Dim roi = grid.roiList(i)
                 ' this marks all the regions where the depth is volatile.
-                ocvb.result2(roi).SetTo(255 * (stdValues.At(Of Single)(i, 0) - minStdVal) / (maxStdVal - minStdVal))
+                ocvb.result2(roi).SetTo(255 * (stdValues.Get(of Single)(i, 0) - minStdVal) / (maxStdVal - minStdVal))
                 ocvb.result2(roi).SetTo(0, outOfRangeMask(roi))
 
-                ocvb.result1(roi).SetTo(255 * (meanValues.At(Of Single)(i, 0) - minVal) / (maxVal - minVal))
+                ocvb.result1(roi).SetTo(255 * (meanValues.Get(of Single)(i, 0) - minVal) / (maxVal - minVal))
                 ocvb.result1(roi).SetTo(0, outOfRangeMask(roi))
             End Sub)
             cv.Cv2.BitwiseOr(ocvb.result2, grid.gridMask, ocvb.result2)

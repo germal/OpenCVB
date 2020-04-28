@@ -52,7 +52,7 @@ Public Class Featureless_Basics_MT : Implements IDisposable
         regionCount = 1
         For y = 0 To mask.Rows - 1
             For x = 0 To mask.Cols - 1
-                If mask.At(Of Byte)(y, x) = 255 Then
+                If mask.Get(of Byte)(y, x) = 255 Then
                     Dim pt As New cv.Point(x, y)
                     Dim floodCount = mask.FloodFill(pt, regionCount)
                     If floodCount < floodCountThreshold Then
@@ -116,9 +116,9 @@ Public Class FeatureLess_Prediction : Implements IDisposable
         Dim yFactor = CInt(fLess.mask.Height / newSize.Height)
         For y = 0 To mask.Height - 2
             For x = 0 To mask.Width - 2
-                If fLess.mask.At(Of Byte)(y * yFactor, x * xFactor) = 255 Then
+                If fLess.mask.Get(of Byte)(y * yFactor, x * xFactor) = 255 Then
                     mask.Set(Of Byte)(y, x, 255)
-                    labelSmall.Set(Of Byte)(y, x, labels.At(Of Byte)(y, x))
+                    labelSmall.Set(Of Byte)(y, x, labels.Get(of Byte)(y, x))
                 End If
             Next
         Next
@@ -186,7 +186,7 @@ Public Class Featureless_DCT_MT : Implements IDisposable
         Dim regionCount = 1
         For y = 0 To mask.Rows - 1
             For x = 0 To mask.Cols - 1
-                If mask.At(Of Byte)(y, x) = 255 Then
+                If mask.Get(of Byte)(y, x) = 255 Then
                     Dim pt As New cv.Point(x, y)
                     Dim floodCount = mask.FloodFill(pt, regionCount)
                     objectSize.Add(floodCount)

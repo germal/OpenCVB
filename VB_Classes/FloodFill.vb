@@ -27,7 +27,7 @@ Public Class FloodFill_Basics_MT : Implements IDisposable
         Sub(roi)
             For y = roi.Y To roi.Y + roi.Height - 1
                 For x = roi.X To roi.X + roi.Width - 1
-                    Dim nextByte = srcGray.At(Of Byte)(y, x)
+                    Dim nextByte = srcGray.Get(of Byte)(y, x)
                     If nextByte <> 255 And nextByte > 0 Then
                         Dim count = cv.Cv2.FloodFill(srcGray, New cv.Point(x, y), cv.Scalar.White, roi, loDiff, hiDiff, cv.FloodFillFlags.FixedRange)
                         If count > minFloodSize Then
@@ -72,7 +72,7 @@ Public Class FloodFill_Color_MT : Implements IDisposable
         Sub(roi)
             For y = roi.Y To roi.Y + roi.Height - 1
                 For x = roi.X To roi.X + roi.Width - 1
-                    Dim vec = src.At(Of cv.Vec3b)(y, x)
+                    Dim vec = src.Get(of cv.Vec3b)(y, x)
                     If vec <> vec255 And vec <> vec0 Then
                         Dim count = cv.Cv2.FloodFill(src, New cv.Point(x, y), cv.Scalar.White, roi, loDiff, hiDiff, cv.FloodFillFlags.FixedRange + cv.FloodFillFlags.Link4)
                         If count > minFloodSize Then

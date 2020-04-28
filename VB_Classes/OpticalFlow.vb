@@ -256,9 +256,9 @@ Public Class OpticalFlow_Sparse : Implements IDisposable
         Dim f1err As New cv.Mat
         cv.Cv2.Add(errScale, qScale, f1err)
         For i = 0 To errScale.Rows - 1
-            Dim gainScale = f1err.At(Of Double)(i, 0) / (f1err.At(Of Double)(i, 0) + rScale.At(Of Double)(i, 0))
-            sScale.Set(Of Double)(i, 0, sScale.At(Of Double)(i, 0) + gainScale * (sumScale.At(Of Double)(i, 0) - sScale.At(Of Double)(i, 0)))
-            errScale.Set(Of Double)(i, 0, (1 - gainScale) * f1err.At(Of Double)(i, 0))
+            Dim gainScale = f1err.Get(Of Double)(i, 0) / (f1err.Get(Of Double)(i, 0) + rScale.Get(Of Double)(i, 0))
+            sScale.Set(Of Double)(i, 0, sScale.Get(Of Double)(i, 0) + gainScale * (sumScale.Get(Of Double)(i, 0) - sScale.Get(Of Double)(i, 0)))
+            errScale.Set(Of Double)(i, 0, (1 - gainScale) * f1err.Get(Of Double)(i, 0))
         Next
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -296,9 +296,9 @@ Public Class OpticalFlow_Sparse : Implements IDisposable
             features = New List(Of cv.Point2f)
             Dim lastFeatures As New List(Of cv.Point2f)
             For i = 0 To status.Rows - 1
-                If status.At(Of Byte)(i, 0) Then
-                    Dim pt1 = features1.At(Of cv.Point2f)(i, 0)
-                    Dim pt2 = features2.At(Of cv.Point2f)(i, 0)
+                If status.Get(Of Byte)(i, 0) Then
+                    Dim pt1 = features1.Get(Of cv.Point2f)(i, 0)
+                    Dim pt2 = features2.Get(Of cv.Point2f)(i, 0)
                     Dim length = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y))
                     If length < 30 Then
                         features.Add(pt1)

@@ -53,9 +53,9 @@ Public Class OilPaint_Pointilism : Implements IDisposable
         src.SetTo(0)
         For y = 0 To src.Height - 1
             For x = 0 To src.Width - 1
-                Dim nPt = rand.At(Of cv.Point)(y, x)
-                Dim fx = fieldx(ocvb.drawRect).At(Of Single)(nPt.Y, nPt.X)
-                Dim fy = fieldy(ocvb.drawRect).At(Of Single)(nPt.Y, nPt.X)
+                Dim nPt = rand.Get(of cv.Point)(y, x)
+                Dim fx = fieldx(ocvb.drawRect).Get(of Single)(nPt.Y, nPt.X)
+                Dim fy = fieldy(ocvb.drawRect).Get(of Single)(nPt.Y, nPt.X)
                 Dim nPoint = New cv.Point2f(nPt.X, nPt.Y)
                 Dim gradient_magnitude = Math.Sqrt(fx * fx + fy * fy)
                 Dim slen = Math.Round(strokeSize + strokeSize * Math.Sqrt(gradient_magnitude))
@@ -63,7 +63,7 @@ Public Class OilPaint_Pointilism : Implements IDisposable
                 Dim direction = Math.Atan2(fx, fy)
                 Dim angle = direction * 180.0 / Math.PI + 90
 
-                Dim nextColor = ocvb.color(ocvb.drawRect).At(Of cv.Vec3b)(nPt.Y, nPt.X)
+                Dim nextColor = ocvb.color(ocvb.drawRect).Get(of cv.Vec3b)(nPt.Y, nPt.X)
                 ocvb.result1(ocvb.drawRect).Circle(nPoint, slen / 4, nextColor, -1, cv.LineTypes.AntiAlias)
             Next
         Next
@@ -239,7 +239,7 @@ Public Class OilPaint_Cartoon : Implements IDisposable
         Dim vec000 = New cv.Vec3b(0, 0, 0)
         For y = 0 To roi.Height - 1
             For x = 0 To roi.Width - 1
-                If edges(roi).At(Of Byte)(y, x) >= threshold Then
+                If edges(roi).Get(of Byte)(y, x) >= threshold Then
                     ocvb.result1(roi).Set(Of cv.Vec3b)(y, x, vec000)
                 End If
             Next

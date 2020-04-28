@@ -24,7 +24,7 @@ Public Class MultiDimensionScaling_Cities : Implements IDisposable
         For i = 0 To rows - 1
             For j = 0 To rows - 1
                 For k = 0 To rows - 1
-                    Dim v = src.At(Of Double)(i, k) - src.At(Of Double)(i, j) - src.At(Of Double)(j, k)
+                    Dim v = src.Get(of Double)(i, k) - src.Get(of Double)(i, j) - src.Get(of Double)(j, k)
                     If v > c1 Then c1 = v
                 Next
             Next

@@ -23,7 +23,7 @@ Public Class TextureFlow_Basics : Implements IDisposable
         Dim d2 = TFdelta / 2
         For y = d2 To ocvb.result1.Height - 1 Step d2
             For x = d2 To ocvb.result1.Width - 1 Step d2
-                Dim delta = New cv.Point2f(split(4).At(Of Single)(y, x), split(5).At(Of Single)(y, x)) * TFdelta
+                Dim delta = New cv.Point2f(split(4).Get(of Single)(y, x), split(5).Get(of Single)(y, x)) * TFdelta
                 Dim p1 = New cv.Point(x - delta.X, y - delta.Y)
                 Dim p2 = New cv.Point(x + delta.X, y + delta.Y)
                 ocvb.result1.Line(p1, p2, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)

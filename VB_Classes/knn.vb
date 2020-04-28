@@ -34,7 +34,7 @@ Public Class knn_Basics : Implements IDisposable
             query.Set(Of cv.Point2f)(0, 0, queryPoints(i))
             knn.FindNearest(query, bluePoints, results, neighbors)
             For j = 0 To bluePoints - 1
-                Dim index = CInt(neighbors.At(Of Single)(0, j))
+                Dim index = CInt(neighbors.Get(of Single)(0, j))
                 cv.Cv2.Circle(ocvb.result1, random.Points(index), 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
                 ocvb.result1.Line(random.Points(index), queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
             Next
@@ -105,7 +105,7 @@ Public Class knn_Cluster2D : Implements IDisposable
         Dim hitBlack As Int32
         For y = 0 To result.Rows - 1
             For x = 0 To result.Cols - 1
-                Dim blackTest = result.At(Of cv.Vec3b)(y, x)
+                Dim blackTest = result.Get(of cv.Vec3b)(y, x)
                 If blackTest = black Then
                     If rColors(closedRegions Mod rColors.Length) = black Then
                         hitBlack += 1
@@ -114,7 +114,7 @@ Public Class knn_Cluster2D : Implements IDisposable
                     Dim byteCount = cv.Cv2.FloodFill(result, New cv.Point(x, y), rColors(closedRegions Mod rColors.Length))
                     If byteCount > 10 Then closedRegions += 1 ' there are fake regions due to anti-alias like features that appear when drawing.
                 End If
-                Dim whiteTest = tmp.At(Of Byte)(y, x)
+                Dim whiteTest = tmp.Get(of Byte)(y, x)
                 If whiteTest = 255 Then
                     cv.Cv2.FloodFill(tmp, New cv.Point(x, y), black)
                     totalClusters += 1
@@ -213,7 +213,7 @@ Public Class knn_Point2d : Implements IDisposable
             query.Set(Of cv.Point2f)(0, 0, querySet(i))
             knn.FindNearest(query, findXnearest, results, neighbors)
             For j = 0 To findXnearest - 1
-                responseSet(i * findXnearest + j) = CInt(neighbors.At(Of Single)(0, j))
+                responseSet(i * findXnearest + j) = CInt(neighbors.Get(of Single)(0, j))
             Next
             If externalUse = False Then
                 For j = 0 To findXnearest - 1
@@ -289,7 +289,7 @@ Public Class knn_Point3d : Implements IDisposable
             query.Set(Of cv.Point3f)(0, 0, querySet(i))
             knn.FindNearest(query, findXnearest, results, neighbors)
             For j = 0 To findXnearest - 1
-                responseSet(i * findXnearest + j) = CInt(neighbors.At(Of Single)(0, j))
+                responseSet(i * findXnearest + j) = CInt(neighbors.Get(of Single)(0, j))
             Next
             If externalUse = False Then
                 For j = 0 To findXnearest - 1
@@ -374,7 +374,7 @@ Public Class knn_ClusterNoisyLine : Implements IDisposable
             Dim totalClusters As Int32
             For y = 0 To tmp.Rows - 1
                 For x = 0 To tmp.Cols - 1
-                    If tmp.At(Of Byte)(y, x) = 255 Then
+                    If tmp.Get(of Byte)(y, x) = 255 Then
                         Dim byteCount = cv.Cv2.FloodFill(tmp, New cv.Point(x, y), black)
                         totalClusters += 1
                     End If

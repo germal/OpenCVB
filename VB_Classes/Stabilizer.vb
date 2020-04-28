@@ -100,9 +100,9 @@ Public Class Stabilizer_Basics : Implements IDisposable
             features = New List(Of cv.Point2f)
             Dim lastFeatures As New List(Of cv.Point2f)
             For i = 0 To status.Rows - 1
-                If status.At(Of Byte)(i, 0) Then
-                    Dim pt1 = features1.At(Of cv.Point2f)(i, 0)
-                    Dim pt2 = features2.At(Of cv.Point2f)(i, 0)
+                If status.Get(of Byte)(i, 0) Then
+                    Dim pt1 = features1.Get(of cv.Point2f)(i, 0)
+                    Dim pt2 = features2.Get(of cv.Point2f)(i, 0)
                     Dim length = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y))
                     If length < 10 Then
                         features.Add(pt1)
@@ -112,11 +112,11 @@ Public Class Stabilizer_Basics : Implements IDisposable
             Next
             Dim affine = cv.Cv2.GetAffineTransform(features.ToArray, lastFeatures.ToArray)
 
-            Dim dx = affine.At(Of Double)(0, 2)
-            Dim dy = affine.At(Of Double)(1, 2)
-            Dim da = Math.Atan2(affine.At(Of Double)(1, 0), affine.At(Of Double)(0, 0))
-            Dim ds_x = affine.At(Of Double)(0, 0) / Math.Cos(da)
-            Dim ds_y = affine.At(Of Double)(1, 1) / Math.Cos(da)
+            Dim dx = affine.Get(of Double)(0, 2)
+            Dim dy = affine.Get(of Double)(1, 2)
+            Dim da = Math.Atan2(affine.Get(of Double)(1, 0), affine.Get(of Double)(0, 0))
+            Dim ds_x = affine.Get(of Double)(0, 0) / Math.Cos(da)
+            Dim ds_y = affine.Get(of Double)(1, 1) / Math.Cos(da)
             Dim saveDX = dx, saveDY = dy, saveDA = da
 
             Dim text = "Original dx = " + Format(dx, "#0.00") + vbNewLine + " dy = " + Format(dy, "#0.00") + vbNewLine + " da = " + Format(da, "#0.00")
@@ -130,9 +130,9 @@ Public Class Stabilizer_Basics : Implements IDisposable
             Dim diff As New cv.Mat
             cv.Cv2.Subtract(sScale, sumScale, diff)
 
-            da += diff.At(Of Double)(2, 0)
-            dx += diff.At(Of Double)(3, 0)
-            dy += diff.At(Of Double)(4, 0)
+            da += diff.Get(of Double)(2, 0)
+            dx += diff.Get(of Double)(3, 0)
+            dy += diff.Get(of Double)(4, 0)
             If Math.Abs(dx) > 50 Then dx = saveDX
             If Math.Abs(dy) > 50 Then dy = saveDY
             If Math.Abs(da) > 50 Then da = saveDA

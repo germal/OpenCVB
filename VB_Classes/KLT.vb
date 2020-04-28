@@ -51,9 +51,9 @@ Public Class KLT_Basics : Implements IDisposable
             cv.Cv2.CalcOpticalFlowPyrLK(prevGray, gray, inputMat, outputMat, status, err, winSize, 3, term, cv.OpticalFlowFlags.None)
 
             For i = 0 To outputMat.Rows - 1
-                Dim pt = outputMat.At(Of cv.Point2f)(i)
+                Dim pt = outputMat.Get(of cv.Point2f)(i)
                 If pt.X >= 0 And pt.X <= ocvb.color.Cols And pt.Y >= 0 And pt.Y <= ocvb.color.Rows Then
-                    If status.At(Of Byte)(i) Then
+                    If status.Get(of Byte)(i) Then
                         ocvb.result1.Circle(pt, 3, circleColor, -1, cv.LineTypes.AntiAlias)
                     End If
                 Else
@@ -63,8 +63,8 @@ Public Class KLT_Basics : Implements IDisposable
 
             Dim k As Int32
             For i = 0 To inputPoints.Length - 1
-                If status.At(Of Byte)(i) Then
-                    inputPoints(k) = outputMat.At(Of cv.Point2f)(i)
+                If status.Get(of Byte)(i) Then
+                    inputPoints(k) = outputMat.Get(of cv.Point2f)(i)
                     k += 1
                 End If
             Next
@@ -99,7 +99,7 @@ Public Class KLT_OpticalFlow : Implements IDisposable
         klt.Run(ocvb)
         If ocvb.frameCount > 0 And lastpoints IsNot Nothing And klt.inputPoints IsNot Nothing Then
             For i = 0 To klt.inputPoints.Length - 1
-                If klt.status.At(Of Byte)(i) And i < lastpoints.Length And i < klt.inputPoints.Length Then
+                If klt.status.Get(of Byte)(i) And i < lastpoints.Length And i < klt.inputPoints.Length Then
                     ocvb.result1.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
                     ocvb.result2.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
                 End If

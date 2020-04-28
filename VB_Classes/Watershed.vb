@@ -38,7 +38,7 @@ Public Class Watershed_Basics : Implements IDisposable
                 ocvb.result1.SetTo(0)
                 For y = 0 To ocvb.result1.Rows - 1
                     For x = 0 To ocvb.result1.Cols - 1
-                        Dim idx = markers.At(Of Int32)(y, x)
+                        Dim idx = markers.Get(of Int32)(y, x)
                         If idx = -1 Then
                             ocvb.result1.Set(Of cv.Vec3b)(y, x, New cv.Vec3b(255, 255, 255))
                         ElseIf idx <= 0 Or idx > componentCount Then

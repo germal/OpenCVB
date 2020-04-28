@@ -206,7 +206,7 @@ Public Class Brightness_WhiteBalance : Implements IDisposable
         Dim sum As Single
         Dim threshold As Int32
         For i = hist.histRaw(0).Rows - 1 To 0 Step -1
-            sum += hist.histRaw(0).At(Of Single)(i, 0)
+            sum += hist.histRaw(0).Get(of Single)(i, 0)
             If sum > hist.src.Rows * hist.src.Cols * thresholdVal Then
                 threshold = i
                 Exit For

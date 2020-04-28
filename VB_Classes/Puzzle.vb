@@ -3,14 +3,20 @@ Imports System.Threading
 
 Module Puzzle_Solvers
     Public Class fit
-        Public absDiff As Single
+        Public metricBelowOrLeft As Single
+        Public metricAboveOrRight As Single
         Public index As Int32
+        Public corr1 As Single
+        Public corr2 As Single
         Public neighborBelowOrLeft As Integer
         Public neighborAboveOrRight As Integer
-        Sub New(abs As cv.Scalar, i As Int32, n As Int32)
-            absDiff = abs
+        Sub New(abs() As Single, corrs() As Single, i As Int32, n As Int32)
+            metricBelowOrLeft = abs(0)
+            metricAboveOrRight = abs(1)
             index = i
             neighborBelowOrLeft = n
+            corr1 = corrs(0)
+            corr2 = corrs(1)
         End Sub
     End Class
     Public Class CompareCorrelations : Implements IComparer(Of Single)
@@ -32,34 +38,49 @@ Module Puzzle_Solvers
 
         Dim sortedFit As New SortedList(Of Single, fit)(New CompareCorrelations)
 
-        ' compute absDiff of every bottom to every top
-        Dim maxDiff = Single.MinValue
-        Dim tmp As New cv.Mat, sample1 As cv.Mat, sample2 As cv.Mat
+        ' compute absDiff of every top/bottom to every left/right side
+        Dim tmp As New cv.Mat
+        Dim sample(4 - 1) As cv.Mat
+        For i = 0 To sample.Count - 1
+            sample(i) = New cv.Mat
+        Next
+
+        Dim correlationMat As New cv.Mat
         For i = 0 To roilist.Count - 1
+            Dim maxDiff() = {Single.MinValue, Single.MinValue}
             Dim roi1 = roilist(i)
-            If rowCheck Then sample1 = ocvb.result1(roi1).Row(roi1.Height - 1) Else sample1 = ocvb.result1(roi1).Col(roi1.Width - 1)
+            If rowCheck Then sample(0) = ocvb.result1(roi1).Row(roi1.Height - 1) Else sample(0) = ocvb.result1(roi1).Col(roi1.Width - 1)
+            If rowCheck Then sample(2) = ocvb.result1(roi1).Row(0) Else sample(2) = ocvb.result1(roi1).Col(0)
             sortedFit.Clear()
+            Dim nextFitList As New List(Of fit)
             For j = 0 To roilist.Count - 1
                 If i = j Then Continue For
                 Dim roi2 = roilist(j)
-                If rowCheck Then sample2 = ocvb.result1(roi2).Row(0) Else sample2 = ocvb.result1(roi2).Col(0)
+                If rowCheck Then sample(1) = ocvb.result1(roi2).Row(0) Else sample(1) = ocvb.result1(roi2).Col(0)
+                If rowCheck Then sample(3) = ocvb.result1(roi2).Row(roi1.Height - 1) Else sample(3) = ocvb.result1(roi2).Col(roi1.Width - 1)
 
-                cv.Cv2.Absdiff(sample1, sample2, tmp)
-                Dim absD = cv.Cv2.Sum(tmp)
-                Dim absDiff As Single = Single.MinValue
-                For k = 0 To 2
-                    If absDiff < absD.Item(k) Then absDiff = absD.Item(k)
+                Dim absDiff() = {Single.MinValue, Single.MinValue}
+                Dim correlations(2 - 1) As Single
+                For k = 0 To 3 Step 2
+                    cv.Cv2.Absdiff(sample(k), sample(k + 1), tmp)
+                    Dim absD = cv.Cv2.Sum(tmp)
+                    For m = 0 To 2
+                        If absDiff(k / 2) < absD.Item(m) Then absDiff(k / 2) = absD.Item(m)
+                    Next
+                    If maxDiff(k / 2) < absDiff(k / 2) Then maxDiff(k / 2) = absDiff(k / 2)
+                    cv.Cv2.MatchTemplate(sample(k), sample(k + 1), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                    correlations(k / 2) = correlationMat.Get(Of Single)(0, 0)
                 Next
-                If maxDiff < absDiff Then maxDiff = absDiff
 
-                Dim nextFit = New fit(absDiff, i, j)
-                fitList(i).Add(nextFit)
+                nextFitList.Add(New fit(absDiff, correlations, i, j))
             Next
-            For j = 0 To fitList(i).Count - 1
-                fitList(i).ElementAt(j).absDiff = (maxDiff - fitList(i).ElementAt(j).absDiff) / maxDiff
-                sortedFit.Add(fitList(i).ElementAt(j).absDiff, fitList(i).ElementAt(j))
+            For j = 0 To nextFitList.Count - 1
+                'nextFitList.ElementAt(j).metricBelowOrLeft = nextFitList.ElementAt(j).corr1 + (maxDiff(0) - nextFitList.ElementAt(j).metricBelowOrLeft) / maxDiff(0)
+                'nextFitList.ElementAt(j).metricAboveOrRight = nextFitList.ElementAt(j).corr2 + (maxDiff(1) - nextFitList.ElementAt(j).metricAboveOrRight) / maxDiff(1)
+                nextFitList.ElementAt(j).metricBelowOrLeft = (maxDiff(0) - nextFitList.ElementAt(j).metricBelowOrLeft) / maxDiff(0)
+                nextFitList.ElementAt(j).metricAboveOrRight = (maxDiff(1) - nextFitList.ElementAt(j).metricAboveOrRight) / maxDiff(1)
+                sortedFit.Add(nextFitList.ElementAt(j).metricBelowOrLeft, nextFitList.ElementAt(j))
             Next
-            fitList(i).Clear()
             For j = 0 To sortedFit.Count - 1
                 fitList(i).Add(sortedFit.ElementAt(j).Value)
             Next
@@ -74,58 +95,28 @@ Module Puzzle_Solvers
             tooGood.Clear()
             For i = 0 To fitList.Count - 1
                 Dim nextFit = fitList(i).ElementAt(0)
-                If nextFit.absDiff > cutoff Then
-                    tooGood.Add(nextFit.absDiff, nextFit)
+                If nextFit.metricBelowOrLeft > cutoff Then
+                    tooGood.Add(nextFit.metricBelowOrLeft, nextFit)
                 Else
                     edgeList.Add(nextFit)
                 End If
             Next
             ' set the cutoff to the 
-            If edgeList.Count <> edgeTotal Then cutoff = tooGood.ElementAt(tooGood.Count - edgeTotal).Value.absDiff
+            If edgeList.Count <> edgeTotal Then cutoff = tooGood.ElementAt(tooGood.Count - edgeTotal).Value.metricBelowOrLeft
         End While
 
-        'For i = 0 To edgeList.Count - 1
-        '    Dim edgeIndex = edgeList(i).index
-        '    For j = 0 To edgeTotal - 1
-        '        Dim roi = roilist(edgeIndex)
-        '        Dim bestIndex = bestTile(fitList, edgeIndex, edgeTotal)
-        '        fitList(bestIndex)
-        '        edgeIndex = bestIndex
-        '    Next
-        'Next
-        Return edgeList
-    End Function
-    Public Sub removeTile(fitlist() As List(Of fit), index As Integer)
-        For i = 0 To fitlist.Count - 1
-            For j = 0 To fitlist(i).Count - 1
-                Dim nextFit = fitlist(i).ElementAt(j)
-                If nextFit.neighborBelowOrLeft = index Then
-                    fitlist(i).RemoveAt(j)
-                    Exit For
-                End If
-            Next
-        Next
-    End Sub
-
-    Public Function bestTile(fitList() As List(Of fit), edgeIndex As Integer, edgeTotal As Integer) As Integer
-        ' the edgelist neighborBelowOrLefts are incorrect (they are edges!)  So find the tile whose bottom/rightside has the best connection to the top/leftside of the edge tile.
-        Dim bestMetric = Single.MinValue
-        Dim bestFit As Integer
-        Dim bestElement As Integer
+        ' Once the edges are found, sort the fitlist by the AbsDiffAboveOrRight
         For i = 0 To fitList.Count - 1
+            sortedFit.Clear()
             For j = 0 To fitList(i).Count - 1
-                Dim fit = fitList(i).ElementAt(j)
-                If fit.neighborBelowOrLeft = edgeIndex Then
-                    If bestMetric < fit.absDiff Then
-                        bestMetric = fit.absDiff
-                        bestElement = j
-                        bestFit = fit.index ' connect the edge with the best fit with any tile.
-                    End If
-                End If
+                sortedFit.Add(fitList(i).ElementAt(j).metricAboveOrRight, fitList(i).ElementAt(j))
+            Next
+            fitList(i).Clear()
+            For j = 0 To sortedFit.Count - 1
+                fitList(i).Add(sortedFit.ElementAt(j).Value)
             Next
         Next
-        fitList(bestFit).ElementAt(bestElement)
-        Return bestFit
+        Return edgeList
     End Function
 End Module
 
@@ -182,7 +173,7 @@ Public Class Puzzle_Basics : Implements IDisposable
         ' display image with shuffled roi's
         ocvb.result1.SetTo(0)
         ' These 2 lines help with visual debugging.
-        ocvb.color.Line(New cv.Point(0, ocvb.color.Height - 90), New cv.Point(ocvb.color.Width, ocvb.color.Height - 90), cv.Scalar.Red, 4)
+        ocvb.color.Line(New cv.Point(0, ocvb.color.Height - 70), New cv.Point(ocvb.color.Width, ocvb.color.Height - 70), cv.Scalar.Red, 4)
         ocvb.color.Line(New cv.Point(ocvb.color.Width - 50, 0), New cv.Point(ocvb.color.Width - 50, ocvb.color.Height), cv.Scalar.Yellow, 4)
         For i = 0 To scrambled.Count - 1
             Dim roi = grid.roiList(i)
@@ -234,25 +225,36 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
 
         Dim botindex = 0
         Dim rectIndex = 0
+        Dim usedList As New List(Of Integer)
         For nextX = 0 To ocvb.color.Width - roilist(0).Width Step roilist(0).Width
             rectIndex = edgelist(botindex).index
             Dim roi = roilist(rectIndex)
             ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, ocvb.color.Height - roi.Height, roi.Width, roi.Height)))
+            usedList.Add(rectIndex)
             For nextY = ocvb.color.Height - roilist(0).Height * 2 To 0 Step -roilist(0).Height
-                Dim bestIndex = bestTile(fitList, rectIndex, edgeTotal)
+                Dim bestIndex = fitList(rectIndex).ElementAt(0).neighborBelowOrLeft
+                For i = 0 To fitList(rectIndex).Count - 1
+                    If usedList.Contains(fitList(rectIndex).ElementAt(i).neighborBelowOrLeft) = False Then
+                        bestIndex = fitList(rectIndex).ElementAt(i).neighborBelowOrLeft
+                        Exit For
+                    End If
+                Next
+                usedList.Add(bestIndex)
                 roi = roilist(bestIndex)
                 ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, nextY, roi.Width, roi.Height)))
                 rectIndex = bestIndex
             Next
             botindex += 1
         Next
+        usedList.Clear()
+        ReDim fitList(0)
+        edgelist.Clear()
         ocvb.label1 = "Current input to puzzle solver"
         If externalUse = False Then
             ocvb.label2 = "Vertically sorted - not horizontally"
         Else
             ocvb.label2 = "Current output of puzzle solver"
         End If
-
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         puzzle.Dispose()
@@ -298,26 +300,31 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
         Dim edgeTotal = CInt(ocvb.color.Height / roilist(0).Height)
         Dim edgelist = fitCheck(ocvb, roilist, rowCheck:=False, fitList, edgeTotal)
 
-        Dim sideI = 0
-        For nexty = 0 To ocvb.color.Height - roilist(0).Height Step roilist(0).Height
-            Dim roi = roilist(edgelist(sideI).index)
-            ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(ocvb.color.Width - roi.Width, nexty, roi.Width, roi.Height)))
-            sideI += 1
-        Next
-
-        sideI = 0
+        Dim sideIndex = 0
         Dim rectIndex = 0
+        Dim usedList As New List(Of Integer)
         For nextY = 0 To ocvb.color.Height - roilist(0).Height Step roilist(0).Height
-            rectIndex = edgelist(sideI).index
+            rectIndex = edgelist(sideIndex).index
+            Dim roi = roilist(rectIndex)
+            ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(ocvb.color.Width - roi.Width, nextY, roi.Width, roi.Height)))
+            usedList.Add(rectIndex)
             For nextX = ocvb.color.Width - roilist(0).Width * 2 To 0 Step -roilist(0).Width
-                Dim bestIndex = bestTile(fitList, rectIndex, edgeTotal)
-                Dim roi = roilist(bestIndex)
+                Dim bestIndex = fitList(rectIndex).ElementAt(0).neighborBelowOrLeft
+                For i = 0 To fitList(rectIndex).Count - 1
+                    If usedList.Contains(fitList(rectIndex).ElementAt(i).neighborBelowOrLeft) = False Then
+                        bestIndex = fitList(rectIndex).ElementAt(i).neighborBelowOrLeft
+                        Exit For
+                    End If
+                Next
+                usedList.Add(bestIndex)
+                roi = roilist(bestIndex)
                 ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextX, nextY, roi.Width, roi.Height)))
                 rectIndex = bestIndex
             Next
-            sideI += 1
+            sideIndex += 1
         Next
-        ocvb.label1 = "Current input to puzzle solver"
+
+            ocvb.label1 = "Current input to puzzle solver"
         If externalUse = False Then
             ocvb.label2 = "Horizontally sorted - not vertically"
         Else

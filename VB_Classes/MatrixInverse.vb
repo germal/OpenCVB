@@ -5,14 +5,14 @@ Module matrixInverse_Module
         Dim outstr As String = "Original Matrix " + vbCrLf
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
-                outstr += Format(src.At(Of Double)(y, x), "#0.0000") + vbTab
+                outstr += Format(src.Get(of Double)(y, x), "#0.0000") + vbTab
             Next
             outstr += vbCrLf
         Next
         outstr += vbCrLf + "Matrix Inverse" + vbCrLf
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
-                outstr += Format(dst.At(Of Double)(y, x), "#0.0000") + vbTab
+                outstr += Format(dst.Get(of Double)(y, x), "#0.0000") + vbTab
             Next
             outstr += vbCrLf
         Next

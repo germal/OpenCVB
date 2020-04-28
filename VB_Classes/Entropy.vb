@@ -19,7 +19,7 @@ Public Class Entropy_Basics : Implements IDisposable
     Private Function channelEntropy(total As Int32, hist As cv.Mat) As Single
         Dim entropy As Single
         For i = 0 To hist.Rows - 1
-            Dim hc = Math.Abs(hist.At(Of Single)(i))
+            Dim hc = Math.Abs(hist.Get(of Single)(i))
             If hc <> 0 Then entropy += -(hc / total) * Math.Log10(hc / total)
         Next
         Return entropy

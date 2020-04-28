@@ -65,7 +65,7 @@ Public Class Voxels_Basics_MT : Implements IDisposable
             Parallel.For(0, gridCount,
             Sub(i)
                 Dim roi = grid.roiList(i)
-                Dim v = voxelMat.At(Of Double)(i)
+                Dim v = voxelMat.Get(of Double)(i)
                 If v > 0 And v < 256 Then
                     Dim color = New cv.Scalar(((256 - v) * nearColor(0) + v * farColor(0)) >> 8,
                                               ((256 - v) * nearColor(1) + v * farColor(1)) >> 8,

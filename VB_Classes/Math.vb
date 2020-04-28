@@ -32,9 +32,9 @@ Module Math_Functions
         Dim halfPixels = totalPixels / 2
 
         Dim median As Double
-        Dim cdfVal As Double = hist.At(Of Single)(0)
+        Dim cdfVal As Double = hist.Get(of Single)(0)
         For i = 1 To bins - 1
-            cdfVal += hist.At(Of Single)(i)
+            cdfVal += hist.Get(of Single)(i)
             If cdfVal > halfPixels Then
                 median = i * (rangeMax - rangeMin) / bins
                 Exit For

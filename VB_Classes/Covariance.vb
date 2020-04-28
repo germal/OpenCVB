@@ -13,7 +13,7 @@ Public Class Covariance_Basics : Implements IDisposable
         cv.Cv2.CalcCovarMatrix(samples, covar, mean, cv.CovarFlags.Cols)
         Dim overallMean = mean.Mean()
         If ocvb.frameCount Mod 100 = 0 Then
-            ocvb.label1 = "covar(0) = " + Format(covar.At(Of Double)(0), "#0.0") + " mean = " + Format(overallMean(0), "#0.00")
+            ocvb.label1 = "covar(0) = " + Format(covar.Get(of Double)(0), "#0.0") + " mean = " + Format(overallMean(0), "#0.00")
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -35,7 +35,7 @@ Public Class Covariance_Test : Implements IDisposable
         Dim mean = New cv.Mat
         cv.Cv2.CalcCovarMatrix(samples, covar, mean, cv.CovarFlags.Cols)
         Dim overallMean = mean.Mean()
-        ocvb.label1 = "covar(0) = " + Format(covar.At(Of Double)(0), "#0.0") + " mean(overall) = " + Format(overallMean(0), "#0.00")
+        ocvb.label1 = "covar(0) = " + Format(covar.Get(of Double)(0), "#0.0") + " mean(overall) = " + Format(overallMean(0), "#0.00")
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub

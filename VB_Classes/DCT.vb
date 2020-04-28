@@ -127,7 +127,7 @@ Public Class DCT_FeatureLess_MT : Implements IDisposable
             Dim runLen As Int32 = 0
             Dim runStart As Int32 = 0
             For j = 1 To ocvb.result2.Cols - 1
-                If ocvb.result2.At(Of Byte)(i, j) = ocvb.result2.At(Of Byte)(i, j - 1) Then
+                If ocvb.result2.Get(of Byte)(i, j) = ocvb.result2.Get(of Byte)(i, j - 1) Then
                     runLen += 1
                 Else
                     If runLen > runLenMin Then
@@ -207,7 +207,7 @@ Public Class DCT_Surfaces_debug : Implements IDisposable
                 Dim minDepth As Int32 = 100000, maxDepth As Int32
                 For j = 0 To roi.Height - 1
                     For i = 0 To roi.Width - 1
-                        Dim nextD = depth32f(roi).At(Of Short)(j, i)
+                        Dim nextD = depth32f(roi).Get(of Short)(j, i)
                         If nextD <> 0 Then
                             If minDepth > nextD Then minDepth = nextD
                             If maxDepth < nextD Then maxDepth = nextD

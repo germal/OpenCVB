@@ -108,7 +108,7 @@ Public Class Harris_Detector_CPP : Implements IDisposable
             If externalUse = False Then ocvb.color.CopyTo(ocvb.result1)
             FeaturePoints.Clear()
             For i = 0 To ptMat.Rows - 1
-                FeaturePoints.Add(New cv.Point2f(ptMat.At(Of Int32)(i, 0), ptMat.At(Of Int32)(i, 1)))
+                FeaturePoints.Add(New cv.Point2f(ptMat.Get(of Int32)(i, 0), ptMat.Get(of Int32)(i, 1)))
                 If externalUse = False Then ocvb.result1.Circle(FeaturePoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             Next
         End If

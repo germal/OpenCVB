@@ -9,20 +9,20 @@ Public Class GameOfLife_Basics : Implements IDisposable
     Private Function CountNeighbors(cellX As Integer, cellY As Integer) As Integer
         Dim count As Integer
         If cellX > 0 And cellY > 0 Then
-            If grid.At(Of Byte)(cellY - 1, cellX - 1) Then count += 1
-            If grid.At(Of Byte)(cellY - 1, cellX) Then count += 1
-            If grid.At(Of Byte)(cellY, cellX - 1) Then count += 1
+            If grid.Get(of Byte)(cellY - 1, cellX - 1) Then count += 1
+            If grid.Get(of Byte)(cellY - 1, cellX) Then count += 1
+            If grid.Get(of Byte)(cellY, cellX - 1) Then count += 1
         End If
         If cellX < grid.Width And cellY < grid.Height Then
-            If grid.At(Of Byte)(cellY + 1, cellX + 1) Then count += 1
-            If grid.At(Of Byte)(cellY + 1, cellX) Then count += 1
-            If grid.At(Of Byte)(cellY, cellX + 1) Then count += 1
+            If grid.Get(of Byte)(cellY + 1, cellX + 1) Then count += 1
+            If grid.Get(of Byte)(cellY + 1, cellX) Then count += 1
+            If grid.Get(of Byte)(cellY, cellX + 1) Then count += 1
         End If
         If cellX > 0 And cellY < grid.Height Then
-            If grid.At(Of Byte)(cellY + 1, cellX - 1) Then count += 1
+            If grid.Get(of Byte)(cellY + 1, cellX - 1) Then count += 1
         End If
         If cellX < grid.Width And cellY > 0 Then
-            If grid.At(Of Byte)(cellY - 1, cellX + 1) Then count += 1
+            If grid.Get(of Byte)(cellY - 1, cellX + 1) Then count += 1
         End If
         Return count
     End Function
@@ -54,14 +54,14 @@ Public Class GameOfLife_Basics : Implements IDisposable
                 Dim neighbors = CountNeighbors(x, y)
                 If neighbors = 2 Or neighbors = 3 Then
                     If neighbors = 2 Then
-                        nextgrid.Set(Of Byte)(y, x, grid.At(Of Byte)(y, x))
+                        nextgrid.Set(Of Byte)(y, x, grid.Get(of Byte)(y, x))
                     Else
                         nextgrid.Set(Of Byte)(y, x, 1)
                     End If
                 Else
                     nextgrid.Set(Of Byte)(y, x, 0)
                 End If
-                If nextgrid.At(Of Byte)(y, x) Then
+                If nextgrid.Get(of Byte)(y, x) Then
                     Dim pt = New cv.Point(x, y) * factor
                     ocvb.result1.Circle(pt, factor / 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
                 End If

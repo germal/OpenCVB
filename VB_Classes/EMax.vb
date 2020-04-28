@@ -83,8 +83,8 @@ Public Class EMax_Basics : Implements IDisposable
 
         ' draw the clustered samples
         For i = 0 To samples.Rows - 1
-            Dim pt = New cv.Point(Math.Round(samples.At(Of Single)(i, 0)), Math.Round(samples.At(Of Single)(i, 1)))
-            ocvb.result1.Circle(pt, 4, ocvb.rColors(labels.At(Of Int32)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
+            Dim pt = New cv.Point(Math.Round(samples.Get(of Single)(i, 0)), Math.Round(samples.Get(of Single)(i, 1)))
+            ocvb.result1.Circle(pt, 4, ocvb.rColors(labels.Get(of Int32)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
         Next
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

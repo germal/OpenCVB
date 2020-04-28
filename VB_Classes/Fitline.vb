@@ -79,8 +79,8 @@ Public Class Fitline_3DBasics_MT : Implements IDisposable
             Dim rows = ocvb.color.Rows, cols = ocvb.color.Cols
             For y = 0 To roi.Height - 1
                 For x = 0 To roi.Width - 1
-                    If fMask.At(Of Byte)(y, x) > 0 Then
-                        Dim d = depth.At(Of Single)(y, x)
+                    If fMask.Get(of Byte)(y, x) > 0 Then
+                        Dim d = depth.Get(of Single)(y, x)
                         If d > 0 And d < 10000 Then
                             points.Add(New cv.Point3f(x / rows, y / cols, d / 10000))
                         End If
@@ -262,7 +262,7 @@ Public Class Fitline_EigenFit : Implements IDisposable
 
         Dim D = New cv.Mat(2, 2, cv.MatType.CV_32FC1, vec4f.ToArray)
         cv.Cv2.Eigen(D, eigenVal, eigenVec)
-        Dim theta = Math.Atan2(eigenVec.At(Of Single)(1, 0), eigenVec.At(Of Single)(0, 0))
+        Dim theta = Math.Atan2(eigenVec.Get(of Single)(1, 0), eigenVec.Get(of Single)(0, 0))
 
         Dim Len = Math.Sqrt(Math.Pow(maxX - minX, 2) + Math.Pow(maxY - minY, 2))
 
@@ -280,8 +280,8 @@ Public Class Fitline_EigenFit : Implements IDisposable
         End If
 
         ocvb.putText(New ActiveClass.TrueType("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(Len)) + vbCrLf +
-                                              "Confidence = " + Format(eigenVal.At(Of Single)(0, 0) / eigenVal.At(Of Single)(1, 0), "#0.0") + vbCrLf +
-                                              "theta: atan2(" + Format(eigenVec.At(Of Single)(1, 0), "#0.0") + ", " + Format(eigenVec.At(Of Single)(0, 0), "#0.0") + ") = " +
+                                              "Confidence = " + Format(eigenVal.Get(of Single)(0, 0) / eigenVal.Get(of Single)(1, 0), "#0.0") + vbCrLf +
+                                              "theta: atan2(" + Format(eigenVec.Get(of Single)(1, 0), "#0.0") + ", " + Format(eigenVec.Get(of Single)(0, 0), "#0.0") + ") = " +
                                               Format(theta, "#0.0000"), 10, 22, RESULT2))
 
         p1 = New cv.Point(0, noisyLine.bb)

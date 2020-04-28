@@ -15,7 +15,7 @@ Public Class Solve_ByMat : Implements IDisposable
         Dim x As New cv.Mat
         cv.Cv2.Solve(a, y, x, cv.DecompTypes.LU)
 
-        ocvb.putText(New ActiveClass.TrueType("Solution ByMat: X1 = " + CStr(x.At(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.At(Of Double)(0, 1)), 10, 125))
+        ocvb.putText(New ActiveClass.TrueType("Solution ByMat: X1 = " + CStr(x.Get(of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(of Double)(0, 1)), 10, 125))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub
@@ -38,7 +38,7 @@ Public Class Solve_ByArray : Implements IDisposable
         Dim x As New cv.Mat
         cv.Cv2.Solve(cv.InputArray.Create(av), cv.InputArray.Create(yv), x, cv.DecompTypes.LU)
 
-        ocvb.putText(New ActiveClass.TrueType("Solution ByArray: X1 = " + CStr(x.At(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.At(Of Double)(0, 1)), 10, 125))
+        ocvb.putText(New ActiveClass.TrueType("Solution ByArray: X1 = " + CStr(x.Get(of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(of Double)(0, 1)), 10, 125))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
     End Sub

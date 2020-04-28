@@ -18,7 +18,7 @@ Public Class Grayscale_Basics : Implements IDisposable
             ocvb.result1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U)
             For y = 0 To ocvb.color.Rows - 1
                 For x = 0 To ocvb.color.Cols - 1
-                    Dim cc = ocvb.color.At(Of cv.Vec3b)(y, x)
+                    Dim cc = ocvb.color.Get(of cv.Vec3b)(y, x)
                     ocvb.result1.Set(Of Byte)(y, x, CByte((cc.Item0 * 1140 + cc.Item1 * 5870 + cc.Item2 * 2989) / 10000))
                 Next
             Next

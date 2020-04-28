@@ -147,7 +147,7 @@ Public Class Projections_NoGravity : Implements IDisposable
          Sub(roi)
              For y = roi.Y To roi.Y + roi.Height - 1
                  For x = roi.X To roi.X + roi.Width - 1
-                     Dim m = foreground.Mask.At(Of Byte)(y, x)
+                     Dim m = foreground.Mask.Get(of Byte)(y, x)
                      If m > 0 Then
                          Dim depth = depth32f.Get(Of Single)(y, x)
                          Dim dy = CInt(h * (depth - desiredMin) / range)
@@ -216,7 +216,7 @@ Public Class Projections_GravityVB : Implements IDisposable
         Dim xz(4 * 4) As Single
         For j = 0 To yRotate.Rows - 1
             For i = 0 To yRotate.Cols - 1
-                xz(i * 4 + j) = yRotate.At(Of Single)(i, j)
+                xz(i * 4 + j) = yRotate.Get(of Single)(i, j)
             Next
         Next
 
@@ -243,14 +243,14 @@ Public Class Projections_GravityVB : Implements IDisposable
          Sub(roi)
              For y = roi.Y + roi.Height - 1 To roi.Y Step -1
                  For x = roi.X To roi.X + roi.Width - 1
-                     Dim m = mask.At(Of Byte)(h - y - 1, x)
+                     Dim m = mask.Get(of Byte)(h - y - 1, x)
                      If m > 0 Then
-                         Dim depth = vertSplit(2).At(Of Single)(h - y - 1, x)
+                         Dim depth = vertSplit(2).Get(of Single)(h - y - 1, x)
                          If depth < desiredMax Then
-                             Dim dx = xFactor * (vertSplit(0).At(Of Single)(h - y - 1, x) - minval)
+                             Dim dx = xFactor * (vertSplit(0).Get(of Single)(h - y - 1, x) - minval)
                              Dim dy = Math.Round(h * (desiredMax - depth) / desiredMax)
                              If dy < h And dy > 0 Then ocvb.result1.Set(Of cv.Vec3b)(CInt(h - dy), CInt(dx), black)
-                             dy = Math.Round(vertSplit(1).At(Of Single)(y, x))
+                             dy = Math.Round(vertSplit(1).Get(of Single)(y, x))
                              dx = Math.Round(w * (desiredMax - depth) / desiredMax)
                              If dy < h And dy > 0 Then ocvb.result2.Set(Of cv.Vec3b)(CInt(h - dy), CInt(dx), black)
                          End If
@@ -321,7 +321,7 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
         Dim xz(4 * 4) As Single
         For j = 0 To yRotate.Rows - 1
             For i = 0 To yRotate.Cols - 1
-                xz(i * 4 + j) = yRotate.At(Of Single)(i, j)
+                xz(i * 4 + j) = yRotate.Get(of Single)(i, j)
             Next
         Next
 

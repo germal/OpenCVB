@@ -30,8 +30,8 @@ Public Class Corners_Harris : Implements IDisposable
 
             For j = 0 To gray.Rows - 1
                 For i = 0 To gray.Cols - 1
-                    Dim lambda_1 = dst.At(Of cv.Vec6f)(j, i)(0)
-                    Dim lambda_2 = dst.At(Of cv.Vec6f)(j, i)(1)
+                    Dim lambda_1 = dst.Get(of cv.Vec6f)(j, i)(0)
+                    Dim lambda_2 = dst.Get(of cv.Vec6f)(j, i)(1)
                     mc.Set(Of Single)(j, i, lambda_1 * lambda_2 - 0.04 * Math.Pow(lambda_1 + lambda_2, 2))
                 Next
             Next
@@ -42,7 +42,7 @@ Public Class Corners_Harris : Implements IDisposable
         color.CopyTo(ocvb.result1)
         For j = 0 To gray.Rows - 1
             For i = 0 To gray.Cols - 1
-                If mc.At(Of Single)(j, i) > minval + (maxval - minval) * sliders.TrackBar3.Value / sliders.TrackBar3.Maximum Then
+                If mc.Get(of Single)(j, i) > minval + (maxval - minval) * sliders.TrackBar3.Value / sliders.TrackBar3.Maximum Then
                     ocvb.result1.Circle(New cv.Point(i, j), 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
                     ocvb.result1.Circle(New cv.Point(i, j), 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
                 End If
@@ -180,7 +180,7 @@ Public Class Corners_ShiTomasi_CPP : Implements IDisposable
         color.CopyTo(ocvb.result1)
         For j = 0 To crows - 1
             For i = 0 To ccols - 1
-                If dst.At(Of Single)(j, i) > minval + (maxval - minval) * sliders.TrackBar3.Value / sliders.TrackBar3.Maximum Then
+                If dst.Get(of Single)(j, i) > minval + (maxval - minval) * sliders.TrackBar3.Value / sliders.TrackBar3.Maximum Then
                     ocvb.result1.Circle(New cv.Point(i, j), 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
                     ocvb.result1.Circle(New cv.Point(i, j), 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
                 End If

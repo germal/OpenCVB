@@ -132,7 +132,7 @@ Public Class kMeans_RGB_Plus_XYDepth : Implements IDisposable
         Dim depth32f = getDepth32f(ocvb)
         For y = 0 To xyDepth32f.Rows - 1
             For x = 0 To xyDepth32f.Cols - 1
-                Dim nextVal = depth32f.At(Of Single)(y, x)
+                Dim nextVal = depth32f.Get(of Single)(y, x)
                 If nextVal Then xyDepth32f.Set(Of cv.Vec3f)(y, x, New cv.Vec3f(x, y, nextVal))
             Next
         Next
@@ -489,7 +489,7 @@ Public Class kMeans_XYDepth : Implements IDisposable
         Dim xyDepth32f As New cv.Mat(depth32f(roi).Size(), cv.MatType.CV_32FC3, 0)
         For y = 0 To xyDepth32f.Rows - 1
             For x = 0 To xyDepth32f.Cols - 1
-                Dim nextVal = depth32f(roi).At(Of Single)(y, x)
+                Dim nextVal = depth32f(roi).Get(of Single)(y, x)
                 If nextVal Then xyDepth32f.Set(Of cv.Vec3f)(y, x, New cv.Vec3f(x, y, nextVal))
             Next
         Next
@@ -527,10 +527,10 @@ Public Class kMeans_Depth_FG_BG : Implements IDisposable
         labels = labels.Reshape(1, depth32f.Rows)
 
         Dim foregroundLabel = 0
-        If depthCenters.At(Of Single)(0, 0) > depthCenters.At(Of Single)(1, 0) Then foregroundLabel = 1
+        If depthCenters.Get(of Single)(0, 0) > depthCenters.Get(of Single)(1, 0) Then foregroundLabel = 1
 
         ' if one of the centers is way out there, leave the mask alone.  KMeans clustered an unreasonably small cluster.
-        ' If depthCenters.At(Of Single)(0, 0) > 20000 Or depthCenters.At(Of Single)(1, 0) > 20000 Then Exit Sub
+        ' If depthCenters.Get(of Single)(0, 0) > 20000 Or depthCenters.Get(of Single)(1, 0) > 20000 Then Exit Sub
 
         Dim mask = labels.InRange(foregroundLabel, foregroundLabel)
         Dim shadowMask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()

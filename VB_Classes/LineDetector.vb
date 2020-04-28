@@ -33,9 +33,9 @@ Module fastLineDetector_Exports
         Dim skipPoints As Int32
         For y = 0 To roi.Height - 1
             For x = 0 To roi.Width - 1
-                If mask.At(Of Byte)(y, x) = 1 Then
+                If mask.Get(of Byte)(y, x) = 1 Then
                     totalPoints += 1
-                    Dim w = getWorldCoordinatesD6(ocvb, New cv.Point3f(x + roi.X, y + roi.Y, depth32f.At(Of Single)(y, x)))
+                    Dim w = getWorldCoordinatesD6(ocvb, New cv.Point3f(x + roi.X, y + roi.Y, depth32f.Get(of Single)(y, x)))
                     worldDepth.Add(w)
                 End If
             Next
@@ -483,8 +483,8 @@ Public Class LineDetector_3D_FitLineZ : Implements IDisposable
                 Dim points As New List(Of cv.Point2f)
                 For y = 0 To roi.Height - 1
                     For x = 0 To roi.Width - 1
-                        If _mask.At(Of Byte)(y, x) = i Then
-                            Dim w = getWorldCoordinatesD6(ocvb, New cv.Point3f(x + roi.X, y + roi.Y, depth32f.At(Of Single)(y, x)))
+                        If _mask.Get(of Byte)(y, x) = i Then
+                            Dim w = getWorldCoordinatesD6(ocvb, New cv.Point3f(x + roi.X, y + roi.Y, depth32f.Get(of Single)(y, x)))
                             points.Add(New cv.Point(If(useX, w.Item0, w.Item1), w.Item2))
                             worldDepth.Add(w)
                         End If
