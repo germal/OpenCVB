@@ -69,9 +69,9 @@ labelled reasonably well, easily searched and grouped and combined, while often
 providing links to online documentation and versions for other platforms. Many
 downloadable algorithms are encumbered by environmental considerations that can
 obscure the meaning or context of an algorithm. All the algorithms here contain
-just the algorithm without camera dependencies and will work with each of the
-supported cameras. Isolating the algorithm functionality enables easy adaptation
-to other environments or platforms.
+just the algorithm separate from any camera dependencies and will work with each
+of the supported cameras. Isolating just the algorithm functionality enables
+easy adaptation to other environments or platforms.
 
 **Pre-Install Notes**
 
@@ -103,6 +103,7 @@ You will need to download and install the following before starting:
 
 -   In the OpenCVB directory, run the “PrepareTree.bat” script. It will download
     and run CMake for OpenCV, OpenCV_Contrib, librealsense, and Kinect4Azure.
+    After building it will occupy about 18Gb of disk space – plan accordingly.
 
     -   This will take a fair amount of time depending on the network speed.
 
@@ -214,9 +215,9 @@ AddWeighted_Trackbar_PS.py as an example that is only a few lines of code.)
 
 For C++, C\#, and VB.Net writing a new experiment requires a new class be added
 anywhere in the “VB_Classes” project. OpenCVB will automatically detect the new
-class during the build and present it in the user interface. The code is
-self-aware in this regard – the UI_Generator project is invoked in a pre-compile
-step for the VB_Classes project.
+class and present it in the user interface. The code is self-aware in this
+regard – the UI_Generator project is invoked in a pre-compile step for the
+VB_Classes project.
 
 Code “snippets” are provided to accelerate development of new VB.Net, OpenGL,
 and C++ algorithms. To use any snippets, you must first install them in Visual
@@ -226,7 +227,7 @@ snippets with a right-click in the VB.Net code, select “Snippet/Insert Snippet
 and select “OpenCVB.snippets”. NOTE: even C++ algorithms can use snippets, but
 each C++ algorithm has a VB.Net entry that includes both the C++ and the VB.Net
 code in the snippet. The C++ portion is to be cut and pasted anywhere in the
-“CPP_Classes” Visual Studio project.
+“CPP_Classes” Visual Studio project included with OpenCVB.
 
 **Experimental Subsets**
 
@@ -240,10 +241,9 @@ all the algorithms that use the OpenCV “Threshold” API.
 
 ![](media/38bd5de162aff996693b6f96d7b1d58e.png)
 
-*In the image above, the subset “\<All\>” can be selected and the complete list
-of algorithms will appear in the combo box on the left. If the subset selected
-was “Threshold”, only those algorithms using the OpenCV threshold API will
-appear in the combo box on the left.*
+*In the image above, all the algorithms using the “Edges_Sobel” class are listed
+in the Algorithms Combo Box. The Select Subset combo box contains a subset
+“\<All\>” that will allow access to the complete list of algorithms.*
 
 The ability to create subsets from the hundreds of algorithms makes it easier to
 study examples of an OpenCV API or OpenCVB algorithm usage. All the OpenCV API’s
@@ -253,7 +253,7 @@ instance, selecting “\<OpenGL\>” will select only the algorithms that use
 OpenGL. The “\<All\>” entry in the Subset Combo Box will restore the complete
 list of algorithms.
 
-**Testing All Experiments**
+**Regression Testing All Experiments**
 
 Testing is integrated into OpenCVB. Clicking the icon below runs through a
 checklist of all the algorithms at all the resolutions with all the supported
@@ -295,7 +295,7 @@ Critics will point out that a Windows 10 app using VB.Net is not easily portable
 to other platforms but the entire OpenCVB application does not need to be ported
 to other platforms. Only individual algorithms will need to be ported after they
 are debugged and polished and most algorithms consist almost entirely of OpenCV
-API’s which are available everywhere. OpenCVB’s value lies in the ability to
+APIs which are available everywhere. OpenCVB’s value lies in the ability to
 experiment and finish an OpenCV algorithm before even starting a port to a
 different platform. Confining development to OpenCVB’s C++ interface should
 provide the most portable version of any algorithm but even VB.Net code is also
@@ -394,7 +394,8 @@ packages in Visual Studio, use the “Tools/Python/Python Environments” in the
 Visual Studio menu:
 
 -   “Tools/Python/Python Environments” – select “Packages” in the combo box then
-    enter for “opencv-python” or “numpy” and select the package from the list.
+    enter “opencv-python” or “numpy” or any Python import and then select the
+    package from the list.
 
 To check that all the necessary packages are installed, run the
 ‘PythonPackages.py’ algorithm from OpenCVB’s user interface.
@@ -411,7 +412,10 @@ steps to debug Python:
 -   Copy the failing Python script into the PythonDebug.py file, and run it.
 
 The Python script will be running in the same environment as if it were invoked
-from OpenCVB except the Python debugger will be active.
+from OpenCVB except the Python debugger will be active. For Python scripts
+requiring a stream of images or point clouds, OpenCVB is opened in a separate
+address space with the requested Python script. Images and point clouds will
+then be streamed to the failing Python script running in the debugger.
 
 **Visual Studio Debugging**
 
@@ -424,7 +428,7 @@ seconds vs. 3 seconds on a higher-end system. The default is to leave the
 “Enable Native Code Debugging” property off so OpenCVB will load faster. Of
 course, if there is a problem in the C++ code that is best handled with a debug
 session, turn on the “Enable Native Code Debugging” property in the OpenCVB
-VB.Net application.
+VB.Net project and invoke the algorithm requiring C++ debugging.
 
 **Record and Playback**
 
@@ -457,13 +461,14 @@ The Mynt Eye D 1000 camera is supported but the support is turned off by
 default. To enable this support:
 
 -   Download the Windows 10 SDK from
-    <https://github.com/slightech/MYNT-EYE-D-SDK>
+    <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
 
 -   Edit the CameraDefines.hpp file to turn on the interface to the Zed 2
     camera.
 
 The Mynt D SDK creates a system environmental variable MYNTEYED_SDK_ROOT that
-allows the OpenCVB build to locate the Mynt D camera support.
+allows the OpenCVB build to locate the Mynt D camera support no matter where it
+was installed.
 
 **VTK Support**
 
@@ -486,8 +491,9 @@ steps:
 
 The following images are a preview of some algorithms’ output.
 
-The top left image is the RGB and top right is depth. Algorithm results are in
-the bottom left and right or additional windows.
+In the OpenCVB user interface, the top left image is the RGB and top right is
+depth. Algorithm results are in the bottom left and right or additional OpenGL,
+Python, or HighGUI windows.
 
 ![](media/82e8b583dbbef2d7b590f319eda0dca7.png)
 
@@ -496,9 +502,9 @@ side views may add the most value when visualized. The “Projection_Gravity”
 algorithm provides a top down view (bottom left) and a side view (bottom right.)
 The images are colored in the same way as the RGB depth image (upper right) with
 yellow indicating proximity to the camera. The aspect ratio of both top and side
-views is 1:1 to provide realistic dimensions and sharp edges. The red dot in
-both the bottom images represents the location of the camera. These projections
-are available with cameras that include an IMU.*
+views is 1:1 to provide realistic dimensions and sharp, straight edges. The red
+dot in both the bottom images represents the location of the camera. These
+projections are available with cameras that include an IMU.*
 
 ![](media/cd7e699a6192e4daf1d540a15e35005a.png)
 
@@ -551,7 +557,7 @@ algorithm are shown with 2 different FAST options.*
 
 *This is a combination of 4 variations of binarization and their corresponding
 histograms. It demonstrates the use of the Mat_4to1 class to get 4 images in
-each of a result image.*
+each of the result images.*
 
 ![](media/3367c93aeb671c6cd3ed978040e9b3aa.png)
 
@@ -712,7 +718,7 @@ The bottom left shows the thread grid used to compute the median depth in each
 voxel while the bottom right shows the voxels colored with their median depth
 (using the typical colors for depth – yellow for close, blue for distant.) The
 options used in each of the contributing algorithms are present below the main
-OpenCVB window.*
+OpenCVB window (not shown.)*
 
 ![](media/83446a818084895c88dd13d1b30b9e2a.png)
 
@@ -720,7 +726,7 @@ OpenCVB window.*
 the camera is grayscale. The upper left image is the undistorted and remapped
 Left View. The upper right color section shows depth (computed on the host)
 while the rest of the image is the Left View. The bottom views are the left and
-right raw camera views (stretched to accommodate the frame size.) While none of
+right raw camera views (cropped to accommodate the frame size.) While none of
 the algorithms fail when running the T265, not all of them produce anything
 useful as depth is not provided by the camera.*
 

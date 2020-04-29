@@ -57,7 +57,7 @@ Module Puzzle_Solvers
                 If i = j Then Continue For
                 Dim roi2 = roilist(j)
                 If rowCheck Then sample(1) = ocvb.result1(roi2).Row(0) Else sample(1) = ocvb.result1(roi2).Col(0)
-                If rowCheck Then sample(3) = ocvb.result1(roi2).Row(roi1.Height - 1) Else sample(3) = ocvb.result1(roi2).Col(roi1.Width - 1)
+                If rowCheck Then sample(3) = ocvb.result1(roi2).Row(roi2.Height - 1) Else sample(3) = ocvb.result1(roi2).Col(roi2.Width - 1)
 
                 Dim absDiff() = {Single.MinValue, Single.MinValue}
                 Dim correlations(2 - 1) As Single
@@ -74,11 +74,13 @@ Module Puzzle_Solvers
 
                 nextFitList.Add(New fit(absDiff, correlations, i, j))
             Next
+            ' change it here to determine if correlation AND absdiff are better than each by itself.  AbsDiff should be better than correlation
+            ' Especially since the best absDiff of the 3 channels is used to find the best absdiff (the channels have different absDiff values.)
             For j = 0 To nextFitList.Count - 1
-                'nextFitList.ElementAt(j).metricBelowOrLeft = nextFitList.ElementAt(j).corr1 + (maxDiff(0) - nextFitList.ElementAt(j).metricBelowOrLeft) / maxDiff(0)
-                'nextFitList.ElementAt(j).metricAboveOrRight = nextFitList.ElementAt(j).corr2 + (maxDiff(1) - nextFitList.ElementAt(j).metricAboveOrRight) / maxDiff(1)
-                nextFitList.ElementAt(j).metricBelowOrLeft = (maxDiff(0) - nextFitList.ElementAt(j).metricBelowOrLeft) / maxDiff(0)
-                nextFitList.ElementAt(j).metricAboveOrRight = (maxDiff(1) - nextFitList.ElementAt(j).metricAboveOrRight) / maxDiff(1)
+                nextFitList.ElementAt(j).metricBelowOrLeft = nextFitList.ElementAt(j).corr1 + (maxDiff(0) - nextFitList.ElementAt(j).metricBelowOrLeft) / maxDiff(0)
+                nextFitList.ElementAt(j).metricAboveOrRight = nextFitList.ElementAt(j).corr2 + (maxDiff(1) - nextFitList.ElementAt(j).metricAboveOrRight) / maxDiff(1)
+                'nextFitList.ElementAt(j).metricBelowOrLeft = (maxDiff(0) - nextFitList.ElementAt(j).metricBelowOrLeft) / maxDiff(0)
+                'nextFitList.ElementAt(j).metricAboveOrRight = (maxDiff(1) - nextFitList.ElementAt(j).metricAboveOrRight) / maxDiff(1)
                 sortedFit.Add(nextFitList.ElementAt(j).metricBelowOrLeft, nextFitList.ElementAt(j))
             Next
             For j = 0 To sortedFit.Count - 1
@@ -132,9 +134,10 @@ Public Class Puzzle_Basics : Implements IDisposable
     Public restartRequested As Boolean
     Public Sub New(ocvb As AlgorithmData)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = ocvb.color.Width / 5
-        grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
+        grid.sliders.TrackBar1.Value = ocvb.color.Width / 10
+        grid.sliders.TrackBar2.Value = ocvb.color.Height / 8
         grid.Run(ocvb)
+        grid.sliders.Hide()
         ocvb.desc = "Create the puzzle pieces for a genetic matching algorithm."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -209,7 +212,6 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
         If externalUse = False Then
             If ocvb.frameCount < 10 Then Exit Sub ' no startup dark images.
             If check.Box(0).Checked Then
-                check.Box(0).Checked = False
                 puzzle.restartRequested = True
                 puzzle.Run(ocvb)
                 roilist = puzzle.grid.roiList.ToArray
@@ -246,15 +248,13 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
             Next
             botindex += 1
         Next
-        usedList.Clear()
-        ReDim fitList(0)
-        edgelist.Clear()
         ocvb.label1 = "Current input to puzzle solver"
         If externalUse = False Then
             ocvb.label2 = "Vertically sorted - not horizontally"
         Else
             ocvb.label2 = "Current output of puzzle solver"
         End If
+        check.Box(0).Checked = False
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         puzzle.Dispose()
@@ -286,7 +286,6 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
         If externalUse = False Then
             If ocvb.frameCount < 10 Then Exit Sub ' no startup dark images.
             If check.Box(0).Checked Then
-                check.Box(0).Checked = False
                 puzzle.restartRequested = True
                 puzzle.Run(ocvb)
                 roilist = puzzle.grid.roiList.ToArray
@@ -330,6 +329,7 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
         Else
             ocvb.label2 = "Current output of puzzle solver"
         End If
+        check.Box(0).Checked = False
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         puzzle.Dispose()
