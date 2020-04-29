@@ -377,8 +377,9 @@ Python scripts that would like a stream of images from the camera need to use
 the “PyStream.py” import. There are numerous examples of how to do this: see
 AddWeighted_Trackbar_PS.py or Camshift_PS.py. The “_PS” suffix is an OpenCVB
 convention that indicates it is a Python Streaming script that expects a stream
-of RGB and Depth images. To see the list of all the Python Streaming scripts,
-select the pre-defined subset group called “\<PyStream\>”.
+of RGB and Depth images. NOTE: The Python script name MUST END WITH \_PS for
+PyStream.py to work. To see the list of all the Python Streaming scripts, select
+the pre-defined subset group called “\<PyStream\>”.
 
 Python scripts show up in the list of algorithms in the OpenCVB user interface
 and each Python script will be run when performing the regression tests. To

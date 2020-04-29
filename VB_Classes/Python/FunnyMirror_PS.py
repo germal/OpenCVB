@@ -1,7 +1,8 @@
-import cv2 as cv
+﻿import cv2 as cv
 import numpy as np
 import math
 import sys
+# https://github.com/spmallick/learnopencv/blob/master/FunnyMirrors/FunnyMirrorsVideo.py
 from vcam import vcam,meshGen
 saveMode=0
 
@@ -56,7 +57,10 @@ def OpenCVCode(imgRGB, depth_colormap):
 	out1 = cv.resize(out1,(700,350))
 	cv.imshow(title_window,out1)
 
-cv.createTrackbar(title_window, title_window, saveMode, 7, on_trackbar)
+cv.namedWindow(title_window)
+trackbar_name = 'Distort'
+cv.createTrackbar(trackbar_name, title_window, saveMode, 7, on_trackbar)
 on_trackbar(saveMode)
+
 from PyStream import PyStreamRun
 PyStreamRun(OpenCVCode, 'FunnyMirror_PS.py')

@@ -3,20 +3,16 @@ Imports System.Threading
 
 Module Puzzle_Solvers
     Public Class fit
-        Public metricBelowOrLeft As Single
-        Public metricAboveOrRight As Single
+        Public absDiffBelowOrLeft As Single
+        Public absDiffAboveOrRight As Single
         Public index As Int32
-        Public corr1 As Single
-        Public corr2 As Single
         Public neighborBelowOrLeft As Integer
         Public neighborAboveOrRight As Integer
-        Sub New(abs() As Single, corrs() As Single, i As Int32, n As Int32)
-            metricBelowOrLeft = abs(0)
-            metricAboveOrRight = abs(1)
+        Sub New(abs() As Single, i As Int32, n As Int32)
+            absDiffBelowOrLeft = abs(0)
+            absDiffAboveOrRight = abs(1)
             index = i
             neighborBelowOrLeft = n
-            corr1 = corrs(0)
-            corr2 = corrs(1)
         End Sub
     End Class
     Public Class CompareCorrelations : Implements IComparer(Of Single)
@@ -27,14 +23,23 @@ Module Puzzle_Solvers
         End Function
     End Class
 
+    Private Function computeMetric(sample() As cv.Mat) As Single()
+        Dim tmp As New cv.Mat
+        Dim absDiff(2 - 1) As Single
+        For i = 0 To 3 Step 2
+            cv.Cv2.Absdiff(sample(i), sample(i + 1), tmp)
+            Dim absD = cv.Cv2.Sum(tmp)
+            For j = 0 To 2
+                If absDiff(i / 2) < absD.Item(j) Then absDiff(i / 2) = absD.Item(j)
+            Next
+        Next
+        Return absDiff
+    End Function
+
     Public Function fitCheck(ocvb As AlgorithmData, roilist() As cv.Rect, rowCheck As Boolean, fitList() As List(Of fit), edgeTotal As Integer) As List(Of fit)
         Dim saveOptions = ocvb.parms.ShowOptions
         ocvb.parms.ShowOptions = False
         ocvb.parms.ShowOptions = saveOptions
-
-        For i = 0 To fitList.Count - 1
-            fitList(i) = New List(Of fit) ' loops are easier if we don't have to check for "nothing" entries
-        Next
 
         Dim sortedFit As New SortedList(Of Single, fit)(New CompareCorrelations)
 
@@ -45,9 +50,9 @@ Module Puzzle_Solvers
             sample(i) = New cv.Mat
         Next
 
-        Dim correlationMat As New cv.Mat
         For i = 0 To roilist.Count - 1
-            Dim maxDiff() = {Single.MinValue, Single.MinValue}
+            Dim maxDiff() As Single
+            maxDiff = {Single.MinValue, Single.MinValue}
             Dim roi1 = roilist(i)
             If rowCheck Then sample(0) = ocvb.result1(roi1).Row(roi1.Height - 1) Else sample(0) = ocvb.result1(roi1).Col(roi1.Width - 1)
             If rowCheck Then sample(2) = ocvb.result1(roi1).Row(0) Else sample(2) = ocvb.result1(roi1).Col(0)
@@ -59,29 +64,15 @@ Module Puzzle_Solvers
                 If rowCheck Then sample(1) = ocvb.result1(roi2).Row(0) Else sample(1) = ocvb.result1(roi2).Col(0)
                 If rowCheck Then sample(3) = ocvb.result1(roi2).Row(roi2.Height - 1) Else sample(3) = ocvb.result1(roi2).Col(roi2.Width - 1)
 
-                Dim absDiff() = {Single.MinValue, Single.MinValue}
-                Dim correlations(2 - 1) As Single
-                For k = 0 To 3 Step 2
-                    cv.Cv2.Absdiff(sample(k), sample(k + 1), tmp)
-                    Dim absD = cv.Cv2.Sum(tmp)
-                    For m = 0 To 2
-                        If absDiff(k / 2) < absD.Item(m) Then absDiff(k / 2) = absD.Item(m)
-                    Next
-                    If maxDiff(k / 2) < absDiff(k / 2) Then maxDiff(k / 2) = absDiff(k / 2)
-                    cv.Cv2.MatchTemplate(sample(k), sample(k + 1), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-                    correlations(k / 2) = correlationMat.Get(Of Single)(0, 0)
-                Next
-
-                nextFitList.Add(New fit(absDiff, correlations, i, j))
+                Dim absDiff() = computeMetric(sample)
+                If maxDiff(0) < absDiff(0) Then maxDiff(0) = absDiff(0)
+                If maxDiff(1) < absDiff(1) Then maxDiff(1) = absDiff(1)
+                nextFitList.Add(New fit(absDiff, i, j))
             Next
-            ' change it here to determine if correlation AND absdiff are better than each by itself.  AbsDiff should be better than correlation
-            ' Especially since the best absDiff of the 3 channels is used to find the best absdiff (the channels have different absDiff values.)
             For j = 0 To nextFitList.Count - 1
-                nextFitList.ElementAt(j).metricBelowOrLeft = nextFitList.ElementAt(j).corr1 + (maxDiff(0) - nextFitList.ElementAt(j).metricBelowOrLeft) / maxDiff(0)
-                nextFitList.ElementAt(j).metricAboveOrRight = nextFitList.ElementAt(j).corr2 + (maxDiff(1) - nextFitList.ElementAt(j).metricAboveOrRight) / maxDiff(1)
-                'nextFitList.ElementAt(j).metricBelowOrLeft = (maxDiff(0) - nextFitList.ElementAt(j).metricBelowOrLeft) / maxDiff(0)
-                'nextFitList.ElementAt(j).metricAboveOrRight = (maxDiff(1) - nextFitList.ElementAt(j).metricAboveOrRight) / maxDiff(1)
-                sortedFit.Add(nextFitList.ElementAt(j).metricBelowOrLeft, nextFitList.ElementAt(j))
+                nextFitList.ElementAt(j).absDiffBelowOrLeft = (maxDiff(0) - nextFitList.ElementAt(j).absDiffBelowOrLeft) / maxDiff(0)
+                nextFitList.ElementAt(j).absDiffAboveOrRight = (maxDiff(1) - nextFitList.ElementAt(j).absDiffAboveOrRight) / maxDiff(1)
+                sortedFit.Add(nextFitList.ElementAt(j).absDiffBelowOrLeft, nextFitList.ElementAt(j))
             Next
             For j = 0 To sortedFit.Count - 1
                 fitList(i).Add(sortedFit.ElementAt(j).Value)
@@ -97,21 +88,21 @@ Module Puzzle_Solvers
             tooGood.Clear()
             For i = 0 To fitList.Count - 1
                 Dim nextFit = fitList(i).ElementAt(0)
-                If nextFit.metricBelowOrLeft > cutoff Then
-                    tooGood.Add(nextFit.metricBelowOrLeft, nextFit)
+                If nextFit.absDiffBelowOrLeft > cutoff Then
+                    tooGood.Add(nextFit.absDiffBelowOrLeft, nextFit)
                 Else
                     edgeList.Add(nextFit)
                 End If
             Next
             ' set the cutoff to the 
-            If edgeList.Count <> edgeTotal Then cutoff = tooGood.ElementAt(tooGood.Count - edgeTotal).Value.metricBelowOrLeft
+            If edgeList.Count <> edgeTotal Then cutoff = tooGood.ElementAt(tooGood.Count - edgeTotal).Value.absDiffBelowOrLeft
         End While
 
         ' Once the edges are found, sort the fitlist by the AbsDiffAboveOrRight
         For i = 0 To fitList.Count - 1
             sortedFit.Clear()
             For j = 0 To fitList(i).Count - 1
-                sortedFit.Add(fitList(i).ElementAt(j).metricAboveOrRight, fitList(i).ElementAt(j))
+                sortedFit.Add(fitList(i).ElementAt(j).absDiffAboveOrRight, fitList(i).ElementAt(j))
             Next
             fitList(i).Clear()
             For j = 0 To sortedFit.Count - 1
@@ -134,8 +125,8 @@ Public Class Puzzle_Basics : Implements IDisposable
     Public restartRequested As Boolean
     Public Sub New(ocvb As AlgorithmData)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = ocvb.color.Width / 10
-        grid.sliders.TrackBar2.Value = ocvb.color.Height / 8
+        grid.sliders.TrackBar1.Value = ocvb.color.Width / 5
+        grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
         grid.Run(ocvb)
         grid.sliders.Hide()
         ocvb.desc = "Create the puzzle pieces for a genetic matching algorithm."
@@ -221,7 +212,13 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
             puzzle.grid.sliders.Visible = False
         End If
 
-        Dim fitList(roilist.Count - 1) As List(Of fit)
+        Static fitList(roilist.Count - 1) As List(Of fit)
+        If fitList(0) Is Nothing Then
+            For i = 0 To fitList.Count - 1
+                fitList(i) = New List(Of fit) ' loops are easier if we don't have to check for "nothing" entries
+            Next
+        End If
+
         Dim edgeTotal = CInt(ocvb.color.Width / roilist(0).Width)
         Dim edgelist = fitCheck(ocvb, roilist, rowCheck:=True, fitList, edgeTotal)
 
@@ -248,6 +245,7 @@ Public Class Puzzle_SolverVertical : Implements IDisposable
             Next
             botindex += 1
         Next
+
         ocvb.label1 = "Current input to puzzle solver"
         If externalUse = False Then
             ocvb.label2 = "Vertically sorted - not horizontally"
@@ -280,7 +278,7 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
         check.Box(0).Checked = True
         If ocvb.parms.ShowOptions Then check.Show()
 
-        ocvb.desc = "Put the puzzle back together using the correlation coefficients of the top and bottom of each ROI."
+        ocvb.desc = "Put the puzzle back together using the correlation coefficients of the left and right sides of each ROI."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then
@@ -295,7 +293,13 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
             puzzle.grid.sliders.Visible = False
         End If
 
-        Dim fitList(roilist.Count - 1) As List(Of fit)
+        Static fitList(roilist.Count - 1) As List(Of fit)
+        If fitList(0) Is Nothing Then
+            For i = 0 To fitList.Count - 1
+                fitList(i) = New List(Of fit) ' loops are easier if we don't have to check for "nothing" entries
+            Next
+        End If
+
         Dim edgeTotal = CInt(ocvb.color.Height / roilist(0).Height)
         Dim edgelist = fitCheck(ocvb, roilist, rowCheck:=False, fitList, edgeTotal)
 
@@ -323,7 +327,7 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
             sideIndex += 1
         Next
 
-            ocvb.label1 = "Current input to puzzle solver"
+        ocvb.label1 = "Current input to puzzle solver"
         If externalUse = False Then
             ocvb.label2 = "Horizontally sorted - not vertically"
         Else

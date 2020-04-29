@@ -41,6 +41,12 @@ try:
 except ImportError as err:
     print('You need to install Pygame.', err)
     warningMsg = True
+	        
+try:
+    import vcam
+except ImportError as err:
+    print('You need to install vcam.', err)
+    warningMsg = True
 	    
 try:
     import imutils
