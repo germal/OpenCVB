@@ -34,6 +34,32 @@ Module Puzzle_Solvers
         Next
         Return absDiff
     End Function
+    Private Function fillFitList(ocvb As AlgorithmData, i As Integer, roilist() As cv.Rect, sample() As cv.Mat, rowCheck As Boolean) As SortedList(Of Single, fit)
+        Dim maxDiff() = {Single.MinValue, Single.MinValue}
+        Dim roi1 = roilist(i)
+        If rowCheck Then sample(0) = ocvb.result1(roi1).Row(roi1.Height - 1) Else sample(0) = ocvb.result1(roi1).Col(roi1.Width - 1)
+        If rowCheck Then sample(2) = ocvb.result1(roi1).Row(0) Else sample(2) = ocvb.result1(roi1).Col(0)
+        Dim nextFitList As New List(Of fit)
+        For j = 0 To roilist.Count - 1
+            If i = j Then Continue For
+            Dim roi2 = roilist(j)
+            If rowCheck Then sample(1) = ocvb.result1(roi2).Row(0) Else sample(1) = ocvb.result1(roi2).Col(0)
+            If rowCheck Then sample(3) = ocvb.result1(roi2).Row(roi2.Height - 1) Else sample(3) = ocvb.result1(roi2).Col(roi2.Width - 1)
+
+            Dim absDiff() = computeMetric(sample)
+            If maxDiff(0) < absDiff(0) Then maxDiff(0) = absDiff(0)
+            If maxDiff(1) < absDiff(1) Then maxDiff(1) = absDiff(1)
+
+            nextFitList.Add(New fit(absDiff, i, j))
+        Next
+        Dim sortedFit As New SortedList(Of Single, fit)(New CompareCorrelations)
+        For j = 0 To nextFitList.Count - 1
+            nextFitList.ElementAt(j).metricBelowOrLeft = (maxDiff(0) - nextFitList.ElementAt(j).metricBelowOrLeft) / maxDiff(0)
+            nextFitList.ElementAt(j).metricAboveOrRight = (maxDiff(1) - nextFitList.ElementAt(j).metricAboveOrRight) / maxDiff(1)
+            sortedFit.Add(nextFitList.ElementAt(j).metricBelowOrLeft, nextFitList.ElementAt(j))
+        Next
+        Return sortedFit
+    End Function
     Public Function fitCheck(ocvb As AlgorithmData, roilist() As cv.Rect, rowCheck As Boolean, fitList() As List(Of fit), edgeTotal As Integer) As List(Of Integer)
         If fitList(0) Is Nothing Then
             For i = 0 To fitList.Count - 1
@@ -45,8 +71,6 @@ Module Puzzle_Solvers
         ocvb.parms.ShowOptions = False
         ocvb.parms.ShowOptions = saveOptions
 
-        Dim sortedFit As New SortedList(Of Single, fit)(New CompareCorrelations)
-
         ' compute absDiff of every top/bottom to every left/right side
         Dim tmp As New cv.Mat
         Dim sample(4 - 1) As cv.Mat
@@ -54,30 +78,9 @@ Module Puzzle_Solvers
             sample(i) = New cv.Mat
         Next
 
+        Dim sortedFit As New SortedList(Of Single, fit)(New CompareCorrelations)
         For i = 0 To roilist.Count - 1
-            Dim maxDiff() = {Single.MinValue, Single.MinValue}
-            Dim roi1 = roilist(i)
-            If rowCheck Then sample(0) = ocvb.result1(roi1).Row(roi1.Height - 1) Else sample(0) = ocvb.result1(roi1).Col(roi1.Width - 1)
-            If rowCheck Then sample(2) = ocvb.result1(roi1).Row(0) Else sample(2) = ocvb.result1(roi1).Col(0)
-            sortedFit.Clear()
-            Dim nextFitList As New List(Of fit)
-            For j = 0 To roilist.Count - 1
-                If i = j Then Continue For
-                Dim roi2 = roilist(j)
-                If rowCheck Then sample(1) = ocvb.result1(roi2).Row(0) Else sample(1) = ocvb.result1(roi2).Col(0)
-                If rowCheck Then sample(3) = ocvb.result1(roi2).Row(roi2.Height - 1) Else sample(3) = ocvb.result1(roi2).Col(roi2.Width - 1)
-
-                Dim absDiff() = computeMetric(sample)
-                If maxDiff(0) < absDiff(0) Then maxDiff(0) = absDiff(0)
-                If maxDiff(1) < absDiff(1) Then maxDiff(1) = absDiff(1)
-
-                nextFitList.Add(New fit(absDiff, i, j))
-            Next
-            For j = 0 To nextFitList.Count - 1
-                nextFitList.ElementAt(j).metricBelowOrLeft = (maxDiff(0) - nextFitList.ElementAt(j).metricBelowOrLeft) / maxDiff(0)
-                nextFitList.ElementAt(j).metricAboveOrRight = (maxDiff(1) - nextFitList.ElementAt(j).metricAboveOrRight) / maxDiff(1)
-                sortedFit.Add(nextFitList.ElementAt(j).metricBelowOrLeft, nextFitList.ElementAt(j))
-            Next
+            sortedFit = fillFitList(ocvb, i, roilist, sample, rowCheck)
             fitList(i).Clear()
             For j = 0 To sortedFit.Count - 1
                 fitList(i).Add(sortedFit.ElementAt(j).Value)
@@ -99,18 +102,34 @@ Module Puzzle_Solvers
                     edgeList.Add(i)
                 End If
             Next
-            ' set the cutoff to the 
+            ' set the cutoff to give the right number of edge tiles.
             If edgeList.Count <> edgeTotal Then cutoff = tooGood.ElementAt(tooGood.Count - edgeTotal).Value.metricBelowOrLeft
         End While
 
-        rowCheck = Not rowCheck ' if we were looking at top and bottom, now we are looking at left and right sides.
-        For i = 0 To edgeList.Count - 1
-            Dim tile = edgeList(i)
-            For j = 0 To edgeList.Count - 1
+        Dim edgeROI(edgeTotal - 1) As cv.Rect
+        For i = 0 To edgeROI.Count - 1
+            edgeROI(i) = roilist(edgeList(i)) ' create a short list of roi's just for the edge tiles.
+        Next
 
+        rowCheck = Not rowCheck ' if we were looking at top and bottom, now we are looking at left and right sides.
+        Dim fitLeft(edgeTotal - 1) As SortedList(Of Single, fit)
+        Dim fitRight(edgeTotal - 1) As List(Of fit)
+        For i = 0 To edgeTotal - 1
+            fitLeft(i) = fillFitList(ocvb, i, edgeROI, sample, rowCheck)
+            sortedFit.Clear()
+            For j = 0 To fitLeft(i).Count - 1
+                sortedFit.Add(fitLeft(i).ElementAt(j).Value.metricAboveOrRight, fitLeft(i).ElementAt(j).Value)
+            Next
+
+            fitRight(i) = New List(Of fit)
+            For j = 0 To sortedFit.Count - 1
+                fitRight(i).Add(sortedFit.ElementAt(j).Value)
             Next
         Next
 
+        'sortedFit.Clear()
+        'For i = 0 To edgeTotal - 1
+        'Next
         ' Once the edges are found, sort the fitlist by the AbsDiffAboveOrRight
         For i = 0 To fitList.Count - 1
             sortedFit.Clear()
