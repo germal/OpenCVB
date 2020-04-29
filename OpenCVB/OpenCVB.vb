@@ -763,7 +763,7 @@ Public Class OpenCVB
             cameraRefresh = True
             Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
             totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
-            If totalBytesOfMemoryUsed > 2000 Then Console.WriteLine("OpenCVB appears to have a memory leak in the current algorithm" + vbCrLf +
+            If totalBytesOfMemoryUsed > 2000 Then MsgBox("OpenCVB appears to have a memory leak in the current algorithm" + vbCrLf +
                                                                     "The memory footprint has grown above 2Gb which is way more than expected.")
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
