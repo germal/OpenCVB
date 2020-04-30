@@ -6,19 +6,27 @@ Module Puzzle_Solvers
         Public index As Int32
         Public neighborBelowOrLeft As Integer
         Public neighborAboveOrRight As Integer
-        Public upMetric As Single
-        Public dnMetric As Single
-        Public ltMetric As Single
-        Public rtMetric As Single
+        Public metricUp As Single
+        Public metricDn As Single
+        Public metricLt As Single
+        Public metricRt As Single
+        Public bestMetricUp As Single
+        Public bestMetricDn As Single
+        Public bestMetricLt As Single
+        Public bestMetricRt As Single
         Public bestUp As Integer
         Public bestDn As Integer
         Public bestLt As Integer
         Public bestRt As Integer
-        Sub New(abs() As Single, i As Int32, n As Int32, rowcheck As Boolean)
-            If rowcheck Then dnMetric = abs(0) Else ltMetric = abs(0)
-            If rowcheck Then upMetric = abs(1) Else rtMetric = abs(1)
-            index = i
+        Public metricTotal As Single
+        Sub New(abs() As Single, _index As Int32, n As Int32)
+            metricUp = abs(0)
+            metricDn = abs(1)
+            metricLt = abs(2)
+            metricRt = abs(3)
+            index = _index
             neighborBelowOrLeft = n
+            neighborAboveOrRight = n
         End Sub
     End Class
     Public Class CompareCorrelations : Implements IComparer(Of Single)
@@ -30,78 +38,80 @@ Module Puzzle_Solvers
     End Class
     Private Function computeMetric(sample() As cv.Mat) As Single()
         Dim tmp As New cv.Mat
-        Dim absDiff(2 - 1) As Single
-        For i = 0 To 3 Step 2
+        Dim absDiff(4 - 1) As Single
+        For i = 0 To 8 - 1 Step 2
             cv.Cv2.Absdiff(sample(i), sample(i + 1), tmp)
             Dim absD = cv.Cv2.Sum(tmp)
-            For j = 0 To 2
+            For j = 0 To 3 - 1
                 If absDiff(i / 2) < absD.Item(j) Then absDiff(i / 2) = absD.Item(j)
             Next
         Next
         Return absDiff
     End Function
-    Private Function fillFitList(ocvb As AlgorithmData, i As Integer, roilist() As cv.Rect, sample() As cv.Mat, rowCheck As Boolean) As SortedList(Of Single, fit)
-        Dim maxDiff() = {Single.MinValue, Single.MinValue}
+    Private Function fillFitList(ocvb As AlgorithmData, i As Integer, roilist() As cv.Rect, sample() As cv.Mat) As SortedList(Of Single, fit)
+        Dim maxDiff() = {Single.MinValue, Single.MinValue, Single.MinValue, Single.MinValue}
         Dim roi1 = roilist(i)
-        If rowCheck Then
-            sample(0) = ocvb.result1(roi1).Row(roi1.Height - 1)
-            sample(2) = ocvb.result1(roi1).Row(0)
-        Else
-            sample(0) = ocvb.result1(roi1).Col(roi1.Width - 1)
-            sample(2) = ocvb.result1(roi1).Col(0)
-        End If
+        sample(0) = ocvb.result1(roi1).Row(0)
+        sample(2) = ocvb.result1(roi1).Row(roi1.Height - 1)
+        sample(4) = ocvb.result1(roi1).Col(0)
+        sample(6) = ocvb.result1(roi1).Col(roi1.Width - 1)
         Dim nextFitList As New List(Of fit)
         For j = 0 To roilist.Count - 1
             If i = j Then Continue For
             Dim roi2 = roilist(j)
-            If rowCheck Then
-                sample(1) = ocvb.result1(roi2).Row(0)
-                sample(3) = ocvb.result1(roi2).Row(roi2.Height - 1)
-            Else
-                sample(1) = ocvb.result1(roi2).Col(0)
-                sample(3) = ocvb.result1(roi2).Col(roi2.Width - 1)
-            End If
+            sample(1) = ocvb.result1(roi2).Row(roi1.Height - 1)
+            sample(3) = ocvb.result1(roi2).Row(0)
+            sample(5) = ocvb.result1(roi2).Col(roi2.Width - 1)
+            sample(7) = ocvb.result1(roi2).Col(0)
 
             Dim absDiff() = computeMetric(sample)
-            If maxDiff(0) < absDiff(0) Then maxDiff(0) = absDiff(0)
-            If maxDiff(1) < absDiff(1) Then maxDiff(1) = absDiff(1)
+            For k = 0 To maxDiff.Count - 1
+                If maxDiff(k) < absDiff(k) Then maxDiff(k) = absDiff(k)
+            Next
 
-            nextFitList.Add(New fit(absDiff, i, j, rowCheck))
+            nextFitList.Add(New fit(absDiff, i, j))
         Next
-        Dim sortedFit As New SortedList(Of Single, fit)(New CompareCorrelations)
-        If rowCheck Then
-            For j = 0 To nextFitList.Count - 1
-                nextFitList.ElementAt(j).dnMetric = (maxDiff(0) - nextFitList.ElementAt(j).dnMetric) / maxDiff(0)
-                nextFitList.ElementAt(j).upMetric = (maxDiff(1) - nextFitList.ElementAt(j).upMetric) / maxDiff(1)
-                sortedFit.Add(nextFitList.ElementAt(j).upMetric, nextFitList.ElementAt(j))
+
+        Dim sortedUp As New SortedList(Of Single, fit)(New CompareCorrelations)
+        Dim sortedDn As New SortedList(Of Single, fit)(New CompareCorrelations)
+        Dim sortedLt As New SortedList(Of Single, fit)(New CompareCorrelations)
+        Dim sortedRt As New SortedList(Of Single, fit)(New CompareCorrelations)
+        For j = 0 To nextFitList.Count - 1
+            nextFitList.ElementAt(j).metricUp = (maxDiff(0) - nextFitList.ElementAt(j).metricUp) / maxDiff(0)
+            nextFitList.ElementAt(j).metricDn = (maxDiff(1) - nextFitList.ElementAt(j).metricDn) / maxDiff(1)
+            nextFitList.ElementAt(j).metricLt = (maxDiff(2) - nextFitList.ElementAt(j).metricLt) / maxDiff(2)
+            nextFitList.ElementAt(j).metricRt = (maxDiff(3) - nextFitList.ElementAt(j).metricRt) / maxDiff(3)
+            sortedUp.Add(nextFitList.ElementAt(j).metricUp, nextFitList.ElementAt(j))
+            sortedDn.Add(nextFitList.ElementAt(j).metricDn, nextFitList.ElementAt(j))
+            sortedLt.Add(nextFitList.ElementAt(j).metricLt, nextFitList.ElementAt(j))
+            sortedRt.Add(nextFitList.ElementAt(j).metricRt, nextFitList.ElementAt(j))
+        Next
+        Dim bestUp = sortedUp.ElementAt(0).Value.neighborAboveOrRight
+        Dim bestDn = sortedDn.ElementAt(0).Value.neighborBelowOrLeft
+        Dim bestLt = sortedLt.ElementAt(0).Value.neighborAboveOrRight
+        Dim bestRt = sortedRt.ElementAt(0).Value.neighborBelowOrLeft
+        Dim bestMetricUp = sortedUp.ElementAt(0).Value.metricUp
+        Dim bestMetricDn = sortedDn.ElementAt(0).Value.metricDn
+        Dim bestMetricLt = sortedLt.ElementAt(0).Value.metricLt
+        Dim bestMetricRt = sortedRt.ElementAt(0).Value.metricRt
+        Dim sortedFit = sortedLt
+        For j = 0 To sortedFit.Count - 1
+            sortedFit.ElementAt(j).Value.metricTotal = bestMetricUp + bestMetricDn + bestMetricLt + bestMetricRt
+            Dim maxMetric = Single.MinValue
+            For k = 0 To 4 - 1
+                Dim nextVal = Choose(k + 1, sortedFit.ElementAt(j).Value.metricUp, sortedFit.ElementAt(j).Value.metricDn,
+                                             sortedFit.ElementAt(j).Value.metricLt, sortedFit.ElementAt(j).Value.metricRt)
+                If nextVal > maxMetric Then maxMetric = nextVal
             Next
-            Dim bestUp = sortedFit.ElementAt(0).Value.neighborAboveOrRight
-            sortedFit.Clear()
-            For j = 0 To nextFitList.Count - 1
-                nextFitList.ElementAt(j).bestUp = bestUp
-                sortedFit.Add(nextFitList.ElementAt(j).dnMetric, nextFitList.ElementAt(j))
-            Next
-            Dim bestDn = sortedFit.ElementAt(0).Value.neighborBelowOrLeft
-            For j = 0 To sortedFit.Count - 1
-                sortedFit.ElementAt(j).Value.bestDn = bestDn
-            Next
-        Else
-            For j = 0 To nextFitList.Count - 1
-                nextFitList.ElementAt(j).ltMetric = (maxDiff(0) - nextFitList.ElementAt(j).ltMetric) / maxDiff(0)
-                nextFitList.ElementAt(j).rtMetric = (maxDiff(1) - nextFitList.ElementAt(j).rtMetric) / maxDiff(1)
-                sortedFit.Add(nextFitList.ElementAt(j).rtMetric, nextFitList.ElementAt(j))
-            Next
-            Dim bestRt = sortedFit.ElementAt(0).Value.neighborAboveOrRight
-            sortedFit.Clear()
-            For j = 0 To nextFitList.Count - 1
-                nextFitList.ElementAt(j).bestRt = bestRt
-                sortedFit.Add(nextFitList.ElementAt(j).ltMetric, nextFitList.ElementAt(j))
-            Next
-            Dim bestLt = sortedFit.ElementAt(0).Value.neighborBelowOrLeft
-            For j = 0 To sortedFit.Count - 1
-                sortedFit.ElementAt(j).Value.bestLt = bestLt
-            Next
-        End If
+            sortedFit.ElementAt(j).Value.bestUp = bestUp
+            sortedFit.ElementAt(j).Value.bestDn = bestDn
+            sortedFit.ElementAt(j).Value.bestLt = bestLt
+            sortedFit.ElementAt(j).Value.bestRt = bestRt
+            sortedFit.ElementAt(j).Value.bestMetricUp = bestMetricUp
+            sortedFit.ElementAt(j).Value.bestMetricDn = bestMetricDn
+            sortedFit.ElementAt(j).Value.bestMetricLt = bestMetricLt
+            sortedFit.ElementAt(j).Value.bestMetricRt = bestMetricRt
+        Next
         Return sortedFit
     End Function
     Public Function fitCheck(ocvb As AlgorithmData, roilist() As cv.Rect, rowCheck As Boolean, fitList() As List(Of fit), edgeTotal As Integer) As List(Of Integer)
@@ -117,23 +127,40 @@ Module Puzzle_Solvers
 
         ' compute absDiff of every top/bottom to every left/right side
         Dim tmp As New cv.Mat
-        Dim sample(4 - 1) As cv.Mat
+        Dim sample(8 - 1) As cv.Mat
         For i = 0 To sample.Count - 1
             sample(i) = New cv.Mat
         Next
 
         Dim sortedFit As New SortedList(Of Single, fit)(New CompareCorrelations)
         For i = 0 To roilist.Count - 1
-            sortedFit = fillFitList(ocvb, i, roilist, sample, rowCheck)
+            sortedFit = fillFitList(ocvb, i, roilist, sample)
             fitList(i).Clear()
             For j = 0 To sortedFit.Count - 1
                 fitList(i).Add(sortedFit.ElementAt(j).Value)
             Next
         Next
 
+        Dim corners As New List(Of Integer)
+        Dim nonCorners As New SortedList(Of Single, fit)(New CompareCorrelations)
+        Dim cutoff = -1.0
+        ' This while loop only runs twice - the first time to find the cutoff that gets the necessary tiles 
+        While corners.Count < 4 ' there are only 4 corners.
+            corners.Clear()
+            nonCorners.Clear()
+            For i = 0 To fitList.Count - 1
+                Dim nextFit = fitList(i).ElementAt(0)
+                If nextFit.metricTotal > cutoff Then nonCorners.Add(nextFit.metricTotal, nextFit) Else corners.Add(i)
+            Next
+            ' set the cutoff to give the right number of edge tiles.
+            If corners.Count <> 4 Then
+                cutoff = nonCorners.ElementAt(nonCorners.Count - 4).Value.metricTotal
+            End If
+        End While
+
         Dim edgeList As New List(Of Integer)
         Dim tooGood As New SortedList(Of Single, fit)(New CompareCorrelations)
-        Dim cutoff = -1.0
+        cutoff = -1.0
         ' This while loop only runs twice - the first time to find the cutoff that gets the necessary tiles to fill the bottom row.
         While edgeList.Count < edgeTotal
             edgeList.Clear()
@@ -141,17 +168,17 @@ Module Puzzle_Solvers
             For i = 0 To fitList.Count - 1
                 Dim nextFit = fitList(i).ElementAt(0)
                 If rowCheck Then
-                    If nextFit.dnMetric > cutoff Then tooGood.Add(nextFit.dnMetric, nextFit) Else edgeList.Add(i)
+                    If nextFit.metricDn > cutoff Then tooGood.Add(nextFit.metricDn, nextFit) Else edgeList.Add(i)
                 Else
-                    If nextFit.ltMetric > cutoff Then tooGood.Add(nextFit.ltMetric, nextFit) Else edgeList.Add(i)
+                    If nextFit.metricLt > cutoff Then tooGood.Add(nextFit.metricLt, nextFit) Else edgeList.Add(i)
                 End If
             Next
             ' set the cutoff to give the right number of edge tiles.
             If edgeList.Count <> edgeTotal Then
                 If rowCheck Then
-                    cutoff = tooGood.ElementAt(tooGood.Count - edgeTotal).Value.dnMetric
+                    cutoff = tooGood.ElementAt(tooGood.Count - edgeTotal).Value.metricDn
                 Else
-                    cutoff = tooGood.ElementAt(tooGood.Count - edgeTotal).Value.ltMetric
+                    cutoff = tooGood.ElementAt(tooGood.Count - edgeTotal).Value.metricLt
                 End If
             End If
         End While
@@ -164,13 +191,13 @@ Module Puzzle_Solvers
         Dim indexLeftOfNeighbor(edgeTotal - 1) As SortedList(Of Single, fit)
         Dim indexRightOfNeighbor(edgeTotal - 1) As List(Of fit)
         For i = 0 To edgeTotal - 1
-            indexLeftOfNeighbor(i) = fillFitList(ocvb, i, edgeROI, sample, rowCheck)
+            indexLeftOfNeighbor(i) = fillFitList(ocvb, i, edgeROI, sample)
             sortedFit.Clear()
             For j = 0 To indexLeftOfNeighbor(i).Count - 1
                 If rowCheck Then
-                    sortedFit.Add(indexLeftOfNeighbor(i).ElementAt(j).Value.upMetric, indexLeftOfNeighbor(i).ElementAt(j).Value)
+                    sortedFit.Add(indexLeftOfNeighbor(i).ElementAt(j).Value.metricDn, indexLeftOfNeighbor(i).ElementAt(j).Value)
                 Else
-                    sortedFit.Add(indexLeftOfNeighbor(i).ElementAt(j).Value.rtMetric, indexLeftOfNeighbor(i).ElementAt(j).Value)
+                    sortedFit.Add(indexLeftOfNeighbor(i).ElementAt(j).Value.metricRt, indexLeftOfNeighbor(i).ElementAt(j).Value)
                 End If
             Next
 
@@ -185,13 +212,13 @@ Module Puzzle_Solvers
         ' find the leftmost tile - the one with the smallest probability of being to the right of any of the other tiles.
         For i = 0 To edgeTotal - 1
             If rowCheck Then
-                If minValue > indexRightOfNeighbor(i).ElementAt(0).upMetric Then
-                    minValue = indexRightOfNeighbor(i).ElementAt(0).upMetric
+                If minValue > indexRightOfNeighbor(i).ElementAt(0).metricDn Then
+                    minValue = indexRightOfNeighbor(i).ElementAt(0).metricDn
                     minIndex = i
                 End If
             Else
-                If minValue > indexRightOfNeighbor(i).ElementAt(0).rtMetric Then
-                    minValue = indexRightOfNeighbor(i).ElementAt(0).rtMetric
+                If minValue > indexRightOfNeighbor(i).ElementAt(0).metricRt Then
+                    minValue = indexRightOfNeighbor(i).ElementAt(0).metricRt
                     minIndex = i
                 End If
             End If
@@ -221,9 +248,9 @@ Module Puzzle_Solvers
             sortedFit.Clear()
             For j = 0 To fitList(i).Count - 1
                 If rowCheck Then
-                    sortedFit.Add(fitList(i).ElementAt(j).upMetric, fitList(i).ElementAt(j))
+                    sortedFit.Add(fitList(i).ElementAt(j).metricDn, fitList(i).ElementAt(j))
                 Else
-                    sortedFit.Add(fitList(i).ElementAt(j).rtMetric, fitList(i).ElementAt(j))
+                    sortedFit.Add(fitList(i).ElementAt(j).metricRt, fitList(i).ElementAt(j))
                 End If
             Next
             fitList(i).Clear()
@@ -247,7 +274,7 @@ Public Class Puzzle_Basics : Implements IDisposable
     Public restartRequested As Boolean
     Public Sub New(ocvb As AlgorithmData)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = ocvb.color.Width / 5
+        grid.sliders.TrackBar1.Value = ocvb.color.Width / 10
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
         grid.Run(ocvb)
         grid.sliders.Hide()
@@ -433,8 +460,6 @@ Public Class Puzzle_SolverHorizontal : Implements IDisposable
                     If usedList.Contains(fitList(rectIndex).ElementAt(i).neighborBelowOrLeft) = False Then
                         bestIndex = fitList(rectIndex).ElementAt(i).neighborBelowOrLeft
                         Exit For
-                    Else
-                        Debug.WriteLine("test")
                     End If
                 Next
                 usedList.Add(bestIndex)
