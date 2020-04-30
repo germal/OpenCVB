@@ -10,6 +10,10 @@ Module Puzzle_Solvers
         Public dnMetric As Single
         Public ltMetric As Single
         Public rtMetric As Single
+        Public bestUp As Integer
+        Public bestDn As Integer
+        Public bestLt As Integer
+        Public bestRt As Integer
         Sub New(abs() As Single, i As Int32, n As Int32, rowcheck As Boolean)
             If rowcheck Then dnMetric = abs(0) Else ltMetric = abs(0)
             If rowcheck Then upMetric = abs(1) Else rtMetric = abs(1)
@@ -69,13 +73,33 @@ Module Puzzle_Solvers
             For j = 0 To nextFitList.Count - 1
                 nextFitList.ElementAt(j).dnMetric = (maxDiff(0) - nextFitList.ElementAt(j).dnMetric) / maxDiff(0)
                 nextFitList.ElementAt(j).upMetric = (maxDiff(1) - nextFitList.ElementAt(j).upMetric) / maxDiff(1)
+                sortedFit.Add(nextFitList.ElementAt(j).upMetric, nextFitList.ElementAt(j))
+            Next
+            Dim bestUp = sortedFit.ElementAt(0).Value.neighborAboveOrRight
+            sortedFit.Clear()
+            For j = 0 To nextFitList.Count - 1
+                nextFitList.ElementAt(j).bestUp = bestUp
                 sortedFit.Add(nextFitList.ElementAt(j).dnMetric, nextFitList.ElementAt(j))
+            Next
+            Dim bestDn = sortedFit.ElementAt(0).Value.neighborBelowOrLeft
+            For j = 0 To sortedFit.Count - 1
+                sortedFit.ElementAt(j).Value.bestDn = bestDn
             Next
         Else
             For j = 0 To nextFitList.Count - 1
                 nextFitList.ElementAt(j).ltMetric = (maxDiff(0) - nextFitList.ElementAt(j).ltMetric) / maxDiff(0)
                 nextFitList.ElementAt(j).rtMetric = (maxDiff(1) - nextFitList.ElementAt(j).rtMetric) / maxDiff(1)
+                sortedFit.Add(nextFitList.ElementAt(j).rtMetric, nextFitList.ElementAt(j))
+            Next
+            Dim bestRt = sortedFit.ElementAt(0).Value.neighborAboveOrRight
+            sortedFit.Clear()
+            For j = 0 To nextFitList.Count - 1
+                nextFitList.ElementAt(j).bestRt = bestRt
                 sortedFit.Add(nextFitList.ElementAt(j).ltMetric, nextFitList.ElementAt(j))
+            Next
+            Dim bestLt = sortedFit.ElementAt(0).Value.neighborBelowOrLeft
+            For j = 0 To sortedFit.Count - 1
+                sortedFit.ElementAt(j).Value.bestLt = bestLt
             Next
         End If
         Return sortedFit

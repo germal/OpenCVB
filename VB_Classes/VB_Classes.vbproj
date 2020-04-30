@@ -367,7 +367,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Python\Coherence.py" />
-    <Content Include="Python\FunMirror_PS.py" />
+    <Content Include="Python\FunHouseMirror_PS.py" />
     <Content Include="Python\GetRotationMatrix2d.py" />
     <Content Include="Python\Grabcut.py" />
     <Content Include="Python\Kalman_TinyEKF.py" />
