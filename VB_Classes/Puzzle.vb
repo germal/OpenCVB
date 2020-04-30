@@ -112,24 +112,47 @@ Module Puzzle_Solvers
         Next
 
         rowCheck = Not rowCheck ' if we were looking at top and bottom, now we are looking at left and right sides.
-        Dim fitLeft(edgeTotal - 1) As SortedList(Of Single, fit)
-        Dim fitRight(edgeTotal - 1) As List(Of fit)
+        Dim indexLeftOfNeighbor(edgeTotal - 1) As SortedList(Of Single, fit)
+        Dim indexRightOfNeighbor(edgeTotal - 1) As List(Of fit)
         For i = 0 To edgeTotal - 1
-            fitLeft(i) = fillFitList(ocvb, i, edgeROI, sample, rowCheck)
+            indexLeftOfNeighbor(i) = fillFitList(ocvb, i, edgeROI, sample, rowCheck)
             sortedFit.Clear()
-            For j = 0 To fitLeft(i).Count - 1
-                sortedFit.Add(fitLeft(i).ElementAt(j).Value.metricAboveOrRight, fitLeft(i).ElementAt(j).Value)
+            For j = 0 To indexLeftOfNeighbor(i).Count - 1
+                sortedFit.Add(indexLeftOfNeighbor(i).ElementAt(j).Value.metricAboveOrRight, indexLeftOfNeighbor(i).ElementAt(j).Value)
             Next
 
-            fitRight(i) = New List(Of fit)
+            indexRightOfNeighbor(i) = New List(Of fit)
             For j = 0 To sortedFit.Count - 1
-                fitRight(i).Add(sortedFit.ElementAt(j).Value)
+                indexRightOfNeighbor(i).Add(sortedFit.ElementAt(j).Value)
             Next
         Next
 
-        'sortedFit.Clear()
-        'For i = 0 To edgeTotal - 1
-        'Next
+        Dim minValue = Single.MaxValue
+        Dim minIndex As Integer
+        ' find the leftmost tile - the one with the smallest probability of being to the right of any of the other tiles.
+        For i = 0 To edgeTotal - 1
+            If minValue > indexRightOfNeighbor(i).ElementAt(0).metricAboveOrRight Then
+                minValue = indexRightOfNeighbor(i).ElementAt(0).metricAboveOrRight
+                minIndex = i
+            End If
+        Next
+
+        edgeList.Clear()
+        edgeList.Add(minIndex)
+        For i = 1 To edgeTotal - 1
+            edgeList.Add(indexLeftOfNeighbor(edgeList.ElementAt(i - 1)).ElementAt(0).Value.neighborBelowOrLeft)
+        Next
+
+        ' we have the edge tiles but now must translate them into indexes for the original roilist.
+        For i = 0 To edgeTotal - 1
+            Dim roi = edgeROI(edgeList(i))
+            For j = 0 To roilist.Count - 1
+                If roilist(j) = roi Then
+                    edgeList(i) = j
+                    Exit For
+                End If
+            Next
+        Next
         ' Once the edges are found, sort the fitlist by the AbsDiffAboveOrRight
         For i = 0 To fitList.Count - 1
             sortedFit.Clear()
@@ -157,7 +180,7 @@ Public Class Puzzle_Basics : Implements IDisposable
     Public restartRequested As Boolean
     Public Sub New(ocvb As AlgorithmData)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = ocvb.color.Width / 5
+        grid.sliders.TrackBar1.Value = ocvb.color.Width / 10
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
         grid.Run(ocvb)
         grid.sliders.Hide()
