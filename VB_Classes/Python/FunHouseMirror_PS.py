@@ -3,6 +3,8 @@ import numpy as np
 import math
 import sys
 # https://github.com/spmallick/learnopencv/blob/master/FunnyMirrors/FunnyMirrorsVideo.py
+# https://www.learnopencv.com/funny-mirrors-using-opencv/?ck_subscriber_id=785741175
+
 from vcam import vcam,meshGen
 saveMode=0
 
