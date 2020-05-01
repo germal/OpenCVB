@@ -161,7 +161,7 @@ Module Puzzle_Solvers
         Return edge
     End Function
     Public Function getCornerType(ByRef fit As bestFit) As cornerType
-        Dim sortBest As New SortedList(Of Single, Single)
+        Dim sortBest As New SortedList(Of Single, Single)(New CompareSingle)
         For i = 0 To 4 - 1
             Dim nextVal = Choose(i + 1, fit.bestMetricUp, fit.bestMetricDn, fit.bestMetricLt, fit.bestMetricRt)
             Dim nextIndex = Choose(i + 1, 1, 2, 3, 4)
@@ -293,28 +293,34 @@ Public Class Puzzle_Solver : Implements IDisposable
     Dim puzzle As Puzzle_Basics
     Public roilist() As cv.Rect
     Public externalUse As Boolean
-    Dim check As New OptionsCheckbox
+    Dim radio As New OptionsRadioButtons
     Public Sub New(ocvb As AlgorithmData)
         puzzle = New Puzzle_Basics(ocvb)
 
-        check.Setup(ocvb, 1)
-        check.Box(0).Text = "Restart Puzzle"
-        check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
+        radio.Setup(ocvb, 3)
+        radio.check(0).Text = "Easy Puzzle - tiles = 256x180"
+        radio.check(1).Text = "Medium Puzzle - tiles = 128x90"
+        radio.check(2).Text = "Hard Puzzle - tiles = 64x45"
+        radio.check(0).Checked = True
+        If ocvb.parms.ShowOptions Then radio.Show()
 
-        ocvb.desc = "Put the puzzle back together using the correlation coefficients of the left and right side of each ROI."
+        ocvb.desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then
-            'If ocvb.frameCount < 10 Then Exit Sub ' no startup dark images.
-            'If check.Box(0).Checked Then
+            If radio.check(0).Checked Then
+                puzzle.grid.sliders.TrackBar1.Value = 256
+                puzzle.grid.sliders.TrackBar2.Value = 180
+            ElseIf radio.check(1).Checked Then
+                puzzle.grid.sliders.TrackBar1.Value = 128
+                puzzle.grid.sliders.TrackBar2.Value = 90
+            Else
+                puzzle.grid.sliders.TrackBar1.Value = 64
+                puzzle.grid.sliders.TrackBar2.Value = 45
+            End If
             puzzle.restartRequested = True
             puzzle.Run(ocvb)
             roilist = puzzle.grid.roiList.ToArray
-            'End If
-        Else
-            check.Visible = False
-            puzzle.grid.sliders.Visible = False
         End If
 
         Dim fitlist As New List(Of bestFit)
@@ -323,23 +329,17 @@ Public Class Puzzle_Solver : Implements IDisposable
         Dim bestCorner = cornerlist.ElementAt(0)
         Dim fit = bestCorner
         Dim roi = roilist(fit.index)
+        Dim startcorner = bestCorner.corner
         Select Case bestCorner.corner
-            Case cornerType.upperLeft
+            Case cornerType.upperLeft, cornerType.upperRight
                 For nexty = 0 To ocvb.result2.Height - 1 Step roi.Height
                     For nextx = 0 To ocvb.result2.Width - 1 Step roi.Width
                         ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
-                        fit = fitlist.ElementAt(fit.bestRt.ElementAt(0))
-                        roi = roilist(fit.index)
-                    Next
-                    fit = fitlist.ElementAt(bestCorner.bestDn.ElementAt(0))
-                    roi = roilist(fit.index)
-                    bestCorner = fit
-                Next
-            Case cornerType.upperRight
-                For nexty = 0 To ocvb.result2.Height - 1 Step roi.Height
-                    For nextx = ocvb.result2.Width - roi.Width To 0 Step -roi.Width
-                        ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
-                        fit = fitlist.ElementAt(fit.bestLt.ElementAt(0))
+                        If startcorner = cornerType.upperLeft Then
+                            fit = fitlist.ElementAt(fit.bestRt.ElementAt(0))
+                        Else
+                            fit = fitlist.ElementAt(fit.bestLt.ElementAt(0))
+                        End If
                         roi = roilist(fit.index)
                     Next
                     fit = fitlist.ElementAt(bestCorner.bestDn.ElementAt(0))
@@ -350,18 +350,11 @@ Public Class Puzzle_Solver : Implements IDisposable
                 For nexty = ocvb.result2.Height - roi.Height To 0 Step -roi.Height
                     For nextx = 0 To ocvb.result2.Width - 1 Step roi.Width
                         ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
-                        fit = fitlist.ElementAt(fit.bestRt.ElementAt(0))
-                        roi = roilist(fit.index)
-                    Next
-                    fit = fitlist.ElementAt(bestCorner.bestUp.ElementAt(0))
-                    roi = roilist(fit.index)
-                    bestCorner = fit
-                Next
-            Case cornerType.lowerRight
-                For nexty = ocvb.result2.Height - roi.Height To 0 Step -roi.Height
-                    For nextx = ocvb.result2.Width - roi.Width To 0 Step -roi.Width
-                        ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
-                        fit = fitlist.ElementAt(fit.bestLt.ElementAt(0))
+                        If startcorner = cornerType.lowerLeft Then
+                            fit = fitlist.ElementAt(fit.bestRt.ElementAt(0))
+                        Else
+                            fit = fitlist.ElementAt(fit.bestLt.ElementAt(0))
+                        End If
                         roi = roilist(fit.index)
                     Next
                     fit = fitlist.ElementAt(bestCorner.bestUp.ElementAt(0))
@@ -370,20 +363,13 @@ Public Class Puzzle_Solver : Implements IDisposable
                 Next
         End Select
 
-        If fit.bestMetricUp < fit.bestMetricDn Then
-            fit = fitlist.ElementAt(fit.bestDn.ElementAt(0))
-        Else
-            fit = fitlist.ElementAt(fit.bestUp.ElementAt(0))
-        End If
-
         ocvb.label1 = "Input to puzzle solver"
         ocvb.label2 = "Puzzle_Solver output (possible ambiguities)"
-        check.Box(0).Checked = False
-        Thread.Sleep(1000)
+        Thread.Sleep(200)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         puzzle.Dispose()
-        check.Dispose()
+        radio.Dispose()
     End Sub
 End Class
 
