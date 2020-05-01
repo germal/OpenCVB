@@ -232,7 +232,6 @@ Public Class Puzzle_Basics : Implements IDisposable
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 10
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 8
         grid.Run(ocvb)
-        grid.sliders.Hide()
         ocvb.desc = "Create the puzzle pieces for a genetic matching algorithm."
     End Sub
     Function Shuffle(Of T)(collection As IEnumerable(Of T)) As List(Of T)
@@ -287,17 +286,17 @@ Public Class Puzzle_Solver : Implements IDisposable
     Dim fitlist As New List(Of bestFit)
     Public Sub New(ocvb As AlgorithmData)
         puzzle = New Puzzle_Basics(ocvb)
+        puzzle.grid.sliders.Hide()
 
         radio.Setup(ocvb, 3)
         radio.check(0).Text = "Easy Puzzle - tiles = 256x180"
         radio.check(1).Text = "Medium Puzzle - tiles = 128x90"
-        radio.check(2).Text = "Hard Puzzle - tiles = 64x45"
+        radio.check(2).Text = "Hard Puzzle - tiles = 64x90"
         radio.check(0).Checked = True
         If ocvb.parms.ShowOptions Then radio.Show()
 
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Reshuffle pieces"
-        check.Box(0).Checked = True
         If ocvb.parms.ShowOptions Then check.Show()
 
         ocvb.desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."
@@ -318,22 +317,31 @@ Public Class Puzzle_Solver : Implements IDisposable
                 saveIndex = i
             End If
         Next
+        Static saveWidth As Integer
+        If ocvb.color.Width <> saveWidth Then
+            check.Box(0).Checked = True
+            saveWidth = ocvb.color.Width
+        End If
         If check.Box(0).Checked Or ocvb.parms.testAllRunning Then
+            Dim factor = 1
+            If ocvb.parms.lowResolution Then factor = 2
             If radio.check(0).Checked Then
-                puzzle.grid.sliders.TrackBar1.Value = 256
-                puzzle.grid.sliders.TrackBar2.Value = 180
+                puzzle.grid.sliders.TrackBar1.Value = 256 / factor
+                puzzle.grid.sliders.TrackBar2.Value = 180 / factor
             ElseIf radio.check(1).Checked Then
-                puzzle.grid.sliders.TrackBar1.Value = 128
-                puzzle.grid.sliders.TrackBar2.Value = 90
+                puzzle.grid.sliders.TrackBar1.Value = 128 / factor
+                puzzle.grid.sliders.TrackBar2.Value = 90 / factor
             Else
-                puzzle.grid.sliders.TrackBar1.Value = 64
-                puzzle.grid.sliders.TrackBar2.Value = 45
+                puzzle.grid.sliders.TrackBar1.Value = 64 / factor
+                puzzle.grid.sliders.TrackBar2.Value = 90 / factor
             End If
             puzzle.restartRequested = True
             puzzle.Run(ocvb)
             roilist = puzzle.grid.roiList.ToArray
         End If
+
         Dim cornerlist = fitCheck(ocvb, roilist, fitlist)
+
         Dim bestCorner = cornerlist.ElementAt(0)
         Dim fit = bestCorner
         Dim roi = roilist(fit.index)
