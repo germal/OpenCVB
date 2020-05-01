@@ -346,7 +346,7 @@ Public Class Puzzle_Solver : Implements IDisposable
                     roi = roilist(fit.index)
                     bestCorner = fit
                 Next
-            Case cornerType.lowerLeft
+            Case cornerType.lowerLeft, cornerType.lowerRight
                 For nexty = ocvb.result2.Height - roi.Height To 0 Step -roi.Height
                     For nextx = 0 To ocvb.result2.Width - 1 Step roi.Width
                         ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
