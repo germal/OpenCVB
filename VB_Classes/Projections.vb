@@ -275,7 +275,7 @@ End Class
 
 Public Class Projections_Gravity_CPP : Implements IDisposable
     Dim imu As IMU_AnglesToGravity
-    Dim sliders As New OptionsSliders
+    Public sliders As New OptionsSliders
     Dim cPtr As IntPtr
     Dim histPtr As IntPtr
     Dim xyzBytes() As Byte
@@ -289,6 +289,7 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
         sliders.setupTrackBar2(ocvb, "Threshold for histogram Count", 1, 100, 10)
         If ocvb.parms.ShowOptions Then sliders.Show()
+        sliders.GroupBox2.Visible = False ' default is not a histogramrun
 
         Dim fileInfo As New FileInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps/colorscale_jet.jpg")
         If fileInfo.Exists = False Then
@@ -321,7 +322,7 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
         Dim xz(4 * 4) As Single
         For j = 0 To yRotate.Rows - 1
             For i = 0 To yRotate.Cols - 1
-                xz(i * 4 + j) = yRotate.Get(of Single)(i, j)
+                xz(i * 4 + j) = yRotate.Get(Of Single)(i, j)
             Next
         Next
 
@@ -361,15 +362,17 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
             ocvb.label2 = "Side View"
         End If
 
-        ocvb.label1 += " - Red Dot is camera"
-        ocvb.label2 += " - Red Dot is camera"
         Dim shift = CInt((xyz.Width - xyz.Height) / 2)
         If ocvb.result1.Channels = 1 Then ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If ocvb.result2.Channels = 1 Then ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.result1.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
-        ocvb.result2.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
-        ocvb.result1.Circle(New cv.Point(shift + xyz.Height / 2 + 10, xyz.Height - 10), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        ocvb.result2.Circle(New cv.Point(shift, xyz.Height / 2), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        If externalUse = False Then
+            ocvb.label1 += " - Red Dot is camera"
+            ocvb.label2 += " - Red Dot is camera"
+            ocvb.result1.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
+            ocvb.result2.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
+            ocvb.result1.Circle(New cv.Point(shift + xyz.Height / 2 + 10, xyz.Height - 15), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            ocvb.result2.Circle(New cv.Point(shift + 10, xyz.Height / 2), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        End If
         handleXYZ.Free()
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -389,6 +392,7 @@ Public Class Projections_GravityHistogram : Implements IDisposable
     Public gravity As Projections_Gravity_CPP
     Public Sub New(ocvb As AlgorithmData)
         gravity = New Projections_Gravity_CPP(ocvb)
+        gravity.sliders.GroupBox2.Visible = True
         gravity.histogramRun = True
 
         ocvb.desc = "Use the top/down projection to create a histogram of 3D points"
@@ -398,5 +402,38 @@ Public Class Projections_GravityHistogram : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         gravity.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Projections_HistogramFloodfill : Implements IDisposable
+    Dim flood As FloodFill_Basics
+    Public gravity As Projections_Gravity_CPP
+    Public Sub New(ocvb As AlgorithmData)
+        gravity = New Projections_Gravity_CPP(ocvb)
+        gravity.sliders.GroupBox2.Visible = True
+        gravity.externalUse = True
+        gravity.histogramRun = True
+
+        flood = New FloodFill_Basics(ocvb)
+        flood.sliders.TrackBar1.Value = 100
+        flood.sliders.TrackBar4.Value = 1
+        flood.externalUse = True
+
+        ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        gravity.Run(ocvb)
+        flood.srcGray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        flood.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        gravity.Dispose()
+        flood.Dispose()
     End Sub
 End Class

@@ -168,8 +168,8 @@ Public Class Blob_DepthClusters : Implements IDisposable
         histBlobs = New Histogram_DepthClusters(ocvb)
 
         flood = New FloodFill_RelativeRange(ocvb)
-        flood.fBasics.sliders.TrackBar2.Value = 1 ' pixels are exact.
-        flood.fBasics.sliders.TrackBar3.Value = 1 ' pixels are exact.
+        flood.fBasics.flood.sliders.TrackBar2.Value = 1 ' pixels are exact.
+        flood.fBasics.flood.sliders.TrackBar3.Value = 1 ' pixels are exact.
         flood.fBasics.externalUse = True
 
         ocvb.desc = "Highlight the distinct histogram blobs found with depth clustering."
@@ -178,7 +178,7 @@ Public Class Blob_DepthClusters : Implements IDisposable
         shadow.Run(ocvb)
         histBlobs.Run(ocvb)
         flood.fBasics.srcGray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        flood.fBasics.initialMask = shadow.holeMask
+        flood.fBasics.flood.initialMask = shadow.holeMask
         flood.Run(ocvb)
         ocvb.label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
     End Sub
@@ -271,10 +271,10 @@ Public Class Blob_LargestBlob : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         blobs.Run(ocvb)
         ocvb.result2 = ocvb.result1.Clone()
-        rects = blobs.flood.fBasics.maskRects
-        masks = blobs.flood.fBasics.masks
+        rects = blobs.flood.fBasics.flood.maskRects
+        masks = blobs.flood.fBasics.flood.masks
 
-        Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(blobIndex).Value ' this is the largest contiguous blob
+        Dim maskIndex = blobs.flood.fBasics.flood.maskSizes.ElementAt(blobIndex).Value ' this is the largest contiguous blob
         ocvb.color.CopyTo(ocvb.result1, masks(maskIndex))
         kalman.src = {rects(maskIndex).X, rects(maskIndex).Y, rects(maskIndex).Width, rects(maskIndex).Height}
         kalman.Run(ocvb)

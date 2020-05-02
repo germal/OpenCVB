@@ -118,10 +118,10 @@ Public Class Meanshift_TopObjects : Implements IDisposable
         Dim updateFrequency = sliders.TrackBar1.Value
         Dim trackBoxes As New List(Of cv.Rect)
         For i = 0 To cams.Length - 1
-            If blob.flood.fBasics.maskSizes.Count > i Then
-                Dim camIndex = blob.flood.fBasics.maskSizes.ElementAt(i).Value
+            If blob.flood.fBasics.flood.maskSizes.Count > i Then
+                Dim camIndex = blob.flood.fBasics.flood.maskSizes.ElementAt(i).Value
                 If ocvb.frameCount Mod updateFrequency = 0 Or cams(i).trackbox.Size.Width = 0 Or ocvb.frameCount < 3 Then
-                    ocvb.drawRect = blob.flood.fBasics.maskRects(camIndex)
+                    ocvb.drawRect = blob.flood.fBasics.flood.maskRects(camIndex)
                 End If
 
                 cams(i).Run(ocvb)
