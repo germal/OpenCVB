@@ -23,11 +23,10 @@ Public Class Kalman_Basics : Implements IDisposable
     Private Sub setValues(ocvb As AlgorithmData)
         ocvb.label1 = "Rectangle moves smoothly from random locations"
         Static autoRand As New Random()
-        ReDim src(3)
-        src(0) = autoRand.Next(50, ocvb.color.Width - 50)
-        src(1) = autoRand.Next(50, ocvb.color.Height - 50)
-        src(2) = autoRand.Next(5, ocvb.color.Width - src(0))
-        src(3) = autoRand.Next(5, ocvb.color.Height - src(1))
+        ReDim src(4 - 1)
+        Dim w = ocvb.color.Width
+        Dim h = ocvb.color.Height
+        src = {autoRand.Next(50, w - 50), autoRand.Next(50, h - 50), autoRand.Next(5, w / 4), autoRand.Next(5, h / 4)}
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src Is Nothing Then setValues(ocvb)
