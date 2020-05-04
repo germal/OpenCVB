@@ -1,6 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 'http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
 Public Class Kalman_Basics : Implements IDisposable
+    Public check As New OptionsCheckbox
     Dim kalman() As Kalman_Single
     Public src() As Single
     Public dst() As Single
@@ -10,6 +11,12 @@ Public Class Kalman_Basics : Implements IDisposable
     Public ErrorCovPost As Single = 1
 
     Public Sub New(ocvb As AlgorithmData)
+        check.Setup(ocvb, 1)
+        check.Box(0).Text = "Turn Kalman filtering on in " + ocvb.callerName
+        check.Box(0).Checked = True
+        If ocvb.parms.ShowOptions Then check.Show()
+
+        ocvb.callerName = ocvb.name ' after usage above.
         ocvb.desc = "Use Kalman to stabilize a set of value (such as a cv.rect.)"
     End Sub
     Private Sub setValues(ocvb As AlgorithmData)
@@ -44,14 +51,18 @@ Public Class Kalman_Basics : Implements IDisposable
             ReDim dst(src.Count - 1)
         End If
 
-        For i = 0 To kalman.Length - 1
-            kalman(i).inputReal = src(i)
-            kalman(i).Run(ocvb)
-        Next
+        If check.Box(0).Checked Then
+            For i = 0 To kalman.Length - 1
+                kalman(i).inputReal = src(i)
+                kalman(i).Run(ocvb)
+            Next
 
-        For i = 0 To src.Length - 1
-            dst(i) = kalman(i).stateResult
-        Next
+            For i = 0 To src.Length - 1
+                dst(i) = kalman(i).stateResult
+            Next
+        Else
+            dst = src ' do nothing to the input.
+        End If
 
         If externalUse = False Then
             ocvb.result1 = ocvb.color.Clone()
@@ -71,6 +82,7 @@ Public Class Kalman_Basics : Implements IDisposable
                 kalman(i).Dispose()
             Next
         End If
+        check.Dispose()
     End Sub
 End Class
 

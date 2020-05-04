@@ -132,7 +132,9 @@ Public Class Plot_Histogram : Implements IDisposable
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
+        If externalUse Then
+            sliders.Visible = False ' probably don't want this except when running standalone.
+        Else
             Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim dimensions() = New Integer() {bins}
             Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}

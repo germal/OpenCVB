@@ -67,7 +67,8 @@ End Module
 Public Class AnyName_CPP : Implements IDisposable
     Dim anyname As IntPtr
     Public Sub New(ocvb As AlgorithmData)
-        anyname = Anyname_Open()
+        ocvb.callerName = "AnyName_CPP"
+		anyname = Anyname_Open()
         ocvb.desc = "description of class"
 	End Sub
     Public Sub Run(ocvb As AlgorithmData)

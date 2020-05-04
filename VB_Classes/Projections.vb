@@ -281,6 +281,10 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
     Dim xyzBytes() As Byte
     Public histogramRun As Boolean
     Public externalUse As Boolean
+    Public src As cv.Mat
+    Public dst1 As cv.Mat
+    Public dst2 As cv.Mat
+    Public maxZ As Single
     Public Sub New(ocvb As AlgorithmData)
         imu = New IMU_AnglesToGravity(ocvb)
         imu.result = RESULT2
@@ -303,7 +307,10 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = T265Camera Then ocvb.putText(New ActiveClass.TrueType("T265 camera has no pointcloud data", 10, 125))
         imu.Run(ocvb)
-        Dim split() = cv.Cv2.Split(ocvb.pointCloud)
+
+        ' normally it is not desirable to resize the point cloud but it can be here because we are building a histogram.
+        If externalUse = False Then src = ocvb.pointCloud.Resize(ocvb.color.Size())
+        Dim split() = cv.Cv2.Split(src)
         Dim vertSplit = split
 
         Dim zCos = Math.Cos(imu.angleZ)
@@ -330,7 +337,7 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
         vertSplit(1) = xz(4) * split(0) + xz(5) * split(1) + xz(6) * split(2)
         vertSplit(2) = xz(8) * split(0) + xz(9) * split(1) + xz(10) * split(2)
 
-        Dim maxZ = sliders.TrackBar1.Value / 1000
+        maxZ = sliders.TrackBar1.Value / 1000
 
         Dim xyz As New cv.Mat
         cv.Cv2.Merge(vertSplit, xyz)
@@ -347,25 +354,27 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
             Dim histSide = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, Projections_GravityHist_Side(histPtr))
 
             Dim threshold = sliders.TrackBar2.Value
-            ocvb.result1 = histTop.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-            ocvb.result2 = histSide.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+            dst1 = histTop.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+            dst2 = histSide.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
             ocvb.label1 = "Top View after threshold"
             ocvb.label2 = "Side View after threshold"
         Else
             imagePtr = Projections_Gravity_Run(cPtr, handleXYZ.AddrOfPinnedObject, maxZ, xyz.Height, xyz.Width)
 
-            ocvb.result1 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
-            ocvb.result2 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, Projections_Gravity_Side(cPtr)).Clone()
+            dst1 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
+            dst2 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, Projections_Gravity_Side(cPtr)).Clone()
 
             ocvb.label1 = "Top View (looking down)"
             ocvb.label2 = "Side View"
         End If
 
-        Dim shift = CInt((xyz.Width - xyz.Height) / 2)
-        If ocvb.result1.Channels = 1 Then ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        If ocvb.result2.Channels = 1 Then ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If externalUse = False Then
+            ocvb.result1 = dst1
+            ocvb.result2 = dst2
+            Dim shift = CInt((xyz.Width - xyz.Height) / 2)
+            If ocvb.result1.Channels = 1 Then ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            If ocvb.result2.Channels = 1 Then ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             ocvb.label1 += " - Red Dot is camera"
             ocvb.label2 += " - Red Dot is camera"
             ocvb.result1.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
@@ -412,7 +421,7 @@ End Class
 
 
 Public Class Projections_HistogramFloodfill : Implements IDisposable
-    Dim flood As FloodFill_Basics
+    Dim flood As FloodFill_Projection
     Public gravity As Projections_Gravity_CPP
     Public Sub New(ocvb As AlgorithmData)
         gravity = New Projections_Gravity_CPP(ocvb)
@@ -420,17 +429,23 @@ Public Class Projections_HistogramFloodfill : Implements IDisposable
         gravity.externalUse = True
         gravity.histogramRun = True
 
-        flood = New FloodFill_Basics(ocvb)
+        flood = New FloodFill_Projection(ocvb)
         flood.sliders.TrackBar1.Value = 100
         flood.sliders.TrackBar4.Value = 1
         flood.externalUse = True
 
-        ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings"
+        ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        gravity.src = ocvb.pointCloud.Resize(ocvb.color.Size()) ' normally not a good idea to resize pointcloud but legit here because of histogram.
         gravity.Run(ocvb)
-        flood.srcGray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        flood.srcGray = gravity.dst1
         flood.Run(ocvb)
+
+        ocvb.result2 = flood.dst.Resize(ocvb.color.Size())
+        For Each rect In flood.objectRects
+            ocvb.result2.Rectangle(rect, cv.Scalar.Red, 1)
+        Next
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         gravity.Dispose()

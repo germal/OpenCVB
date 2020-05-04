@@ -10,6 +10,7 @@
 Imports cv = OpenCvSharp
 Public Class newClass_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
+		ocvb.callerName = "newClass_Basics"
         ocvb.label1 = "NewClass_Basics"
         ocvb.label2 = ""
         ocvb.desc = "New class description"

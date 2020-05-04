@@ -68,15 +68,9 @@ End Class
 
 Public Class IMU_Stabilizer : Implements IDisposable
     Dim kalman As Kalman_Basics
-    Dim check As New OptionsCheckbox
     Public Sub New(ocvb As AlgorithmData)
         kalman = New Kalman_Basics(ocvb)
         kalman.externalUse = True
-
-        check.Setup(ocvb, 1)
-        check.Box(0).Text = "Turn on/off Kalman filtering of IMU data."
-        check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
 
         ocvb.desc = "Stabilize the image with the IMU data."
         ocvb.label1 = "IMU Stabilize (Move Camera + Select Kalman)"
@@ -92,13 +86,11 @@ Public Class IMU_Stabilizer : Implements IDisposable
             Dim sx = 1 ' assume no scaling is taking place.
             Dim sy = 1 ' assume no scaling is taking place.
 
-            If check.Box(0).Checked Then
-                kalman.src = {dx, dy, da}
-                kalman.Run(ocvb)
-                dx = kalman.dst(0)
-                dy = kalman.dst(1)
-                da = kalman.dst(2)
-            End If
+            kalman.src = {dx, dy, da}
+            kalman.Run(ocvb)
+            dx = kalman.dst(0)
+            dy = kalman.dst(1)
+            da = kalman.dst(2)
 
             Dim smoothedMat = New cv.Mat(2, 3, cv.MatType.CV_64F)
             smoothedMat.Set(Of Double)(0, 0, sx * Math.Cos(da))
@@ -122,7 +114,6 @@ Public Class IMU_Stabilizer : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         kalman.Dispose()
-        check.Dispose()
     End Sub
 End Class
 

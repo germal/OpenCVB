@@ -66,12 +66,14 @@ Public Class FloodFill_Basics : Implements IDisposable
             Next
         Next
 
-        ocvb.result2.SetTo(0)
-        For i = 0 To masks.Count - 1
-            Dim maskIndex = maskSizes.ElementAt(i).Value
-            Dim nextColor = ocvb.colorScalar(i Mod 255)
-            ocvb.result2.SetTo(nextColor, masks(maskIndex))
-        Next
+        If externalUse = False Then
+            ocvb.result2.SetTo(0)
+            For i = 0 To masks.Count - 1
+                Dim maskIndex = maskSizes.ElementAt(i).Value
+                Dim nextColor = ocvb.colorScalar(i Mod 255)
+                ocvb.result2.SetTo(nextColor, masks(maskIndex))
+            Next
+        End If
         ocvb.label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -219,7 +221,7 @@ Public Class FloodFill_WithDepth : Implements IDisposable
         shadow.Run(ocvb)
 
         range.fBasics.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        range.fBasics.flood.initialMask = shadow.holeMask
+        range.fBasics.initialMask = shadow.holeMask
         range.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -255,7 +257,7 @@ Public Class FloodFill_CComp : Implements IDisposable
         ccomp.Run(ocvb)
 
         range.fBasics.srcGray = ccomp.dstGray
-        range.fBasics.flood.initialMask = shadow.holeMask
+        range.fBasics.initialMask = shadow.holeMask
         range.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -270,10 +272,10 @@ End Class
 
 
 Public Class FloodFill_RelativeRange : Implements IDisposable
-    Public fBasics As FloodFill_Top16
+    Public fBasics As FloodFill_Basics
     Dim check As New OptionsCheckbox
     Public Sub New(ocvb As AlgorithmData)
-        fBasics = New FloodFill_Top16(ocvb)
+        fBasics = New FloodFill_Basics(ocvb)
         check.Setup(ocvb, 3)
         check.Box(0).Text = "Use Fixed range - when off, it means use relative range "
         check.Box(1).Text = "Use 4 nearest pixels (Link4) - when off, it means use 8 nearest pixels (Link8)"
@@ -343,10 +345,69 @@ Public Class FloodFill_Top16 : Implements IDisposable
                 thumbCount += 1
             End If
         Next
+        cv.Cv2.ImShow("flood result2", ocvb.result2)
         If check.Box(0).Checked Then ocvb.result2 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         check.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class FloodFill_Projection : Implements IDisposable
+    Public sliders As New OptionsSliders
+    Public srcGray As New cv.Mat
+    Public dst As cv.Mat
+    Public externalUse As Boolean
+    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+    Public objectRects As New List(Of cv.Rect)
+    Public Sub New(ocvb As AlgorithmData)
+        sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 5000, 2500)
+        sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
+        sliders.setupTrackBar3(ocvb, "FloodFill HiDiff", 1, 255, 5)
+        sliders.setupTrackBar4(ocvb, "Step Size", 1, ocvb.color.Width / 2, 20)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
+        ocvb.label1 = "Input image to floodfill"
+        ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim minFloodSize = sliders.TrackBar1.Value
+        Dim loDiff = cv.Scalar.All(sliders.TrackBar2.Value)
+        Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
+        Dim stepSize = sliders.TrackBar4.Value
+
+        If externalUse = False Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ocvb.result1 = srcGray.Clone()
+        Dim maskPlus = New cv.Mat(New cv.Size(srcGray.Width + 2, srcGray.Height + 2), cv.MatType.CV_8UC1)
+        Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
+
+        objectRects.Clear()
+        dst = New cv.Mat(srcGray.Size(), cv.MatType.CV_8UC3, 0)
+        cv.Cv2.BitwiseNot(srcGray, srcGray) ' floodfill where there are zeros.
+        For y = 0 To srcGray.Height - 1 Step stepSize
+            For x = 0 To srcGray.Width - 1 Step stepSize
+                If srcGray.Get(Of Byte)(y, x) = 0 Then
+                    Dim rect As New cv.Rect
+                    maskPlus.SetTo(0)
+                    Dim count = cv.Cv2.FloodFill(srcGray, maskPlus, New cv.Point(x, y), cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
+                    If count > minFloodSize Then
+                        Dim nextColor = ocvb.colorScalar(objectRects.Count Mod 255)
+                        objectRects.Add(rect)
+                        dst(rect).SetTo(nextColor, maskPlus(rect))
+                    End If
+                End If
+            Next
+        Next
+
+        If externalUse = False Then ocvb.result2 = dst
+        ocvb.label2 = CStr(objectRects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        sliders.Dispose()
     End Sub
 End Class

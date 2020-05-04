@@ -128,8 +128,8 @@ Public Class Camshift_Object : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         blob.Run(ocvb)
 
-        Dim largestMask = blob.flood.fBasics.flood.maskSizes.ElementAt(0).Value
-        If camshift.trackBox.Size.Width = 0 Then ocvb.drawRect = blob.flood.fBasics.flood.maskRects(largestMask)
+        Dim largestMask = blob.flood.fBasics.maskSizes.ElementAt(0).Value
+        If camshift.trackBox.Size.Width = 0 Then ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
         camshift.Run(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -165,10 +165,10 @@ Public Class Camshift_TopObjects : Implements IDisposable
         Dim updateFrequency = sliders.TrackBar1.Value
         Dim trackBoxes As New List(Of cv.RotatedRect)
         For i = 0 To cams.Length - 1
-            If blob.flood.fBasics.flood.maskSizes.Count > i Then
-                Dim camIndex = blob.flood.fBasics.flood.maskSizes.ElementAt(i).Value
+            If blob.flood.fBasics.maskSizes.Count > i Then
+                Dim camIndex = blob.flood.fBasics.maskSizes.ElementAt(i).Value
                 If ocvb.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
-                    ocvb.drawRect = blob.flood.fBasics.flood.maskRects(camIndex)
+                    ocvb.drawRect = blob.flood.fBasics.maskRects(camIndex)
                 End If
 
                 cams(i).Run(ocvb)

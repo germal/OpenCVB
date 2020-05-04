@@ -21,6 +21,7 @@ Public Class AlgorithmData
     Public mousePoint As cv.Point ' trace any mouse movements using this.
     Public ms_rng As System.Random
     Public name As String
+    Public callerName As String
     Public openGLHeight = 1200
     Public openGLWidth = 1500
     Public optionsLeft As Int32
@@ -36,9 +37,6 @@ Public Class AlgorithmData
     Public result1 As New cv.Mat
     Public result2 As New cv.Mat
     Public TTtextData(3) As List(Of ActiveClass.TrueType)
-
-    Dim autoRand As New Random()
-
     Public Sub New(parms As ActiveClass.algorithmParameters)
         optionsTop = parms.mainFormLoc.Y + parms.mainFormHeight
         optionsLeft = parms.mainFormLoc.X

@@ -147,7 +147,6 @@ Public Class ActiveClass : Implements IDisposable
         Dim useRecordedData As Boolean
         Dim vtkDirectory As String
         Dim width As Int32
-
     End Structure
     Public Sub New(parms As algorithmParameters)
         UpdateHostLocation(parms.mainFormLoc.X, parms.mainFormLoc.Y, parms.mainFormHeight)
@@ -157,14 +156,17 @@ Public Class ActiveClass : Implements IDisposable
         ocvb.parms = parms
         slidersOffset = New cv.Point
         radioOffset = New cv.Point
-        ActiveAlgorithm = algoList.createAlgorithm(parms.activeAlgorithm, ocvb)
+        ocvb.name = parms.activeAlgorithm
+        ocvb.label1 = parms.activeAlgorithm
+        ocvb.callerName = ocvb.name
+        ActiveAlgorithm = algoList.createAlgorithm(ocvb)
         If ActiveAlgorithm Is Nothing Then
             MsgBox("The algorithm: " + parms.activeAlgorithm + " was not found in the algorithmList.vb code." + vbCrLf +
                    "Review the code to determine why.")
         End If
         If ActiveAlgorithm Is Nothing And parms.activeAlgorithm.EndsWith(".py") Then
             parms.activeAlgorithm = parms.activeAlgorithm.Substring(0, Len(parms.activeAlgorithm) - 3)
-            ActiveAlgorithm = algoList.createAlgorithm(parms.activeAlgorithm, ocvb)
+            ActiveAlgorithm = algoList.createAlgorithm(ocvb)
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
     End Sub

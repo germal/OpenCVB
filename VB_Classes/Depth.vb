@@ -980,12 +980,14 @@ Public Class Depth_LocalMinMax_MT : Implements IDisposable
     Public grid As Thread_Grid
     Public ptListX() As Single
     Public ptListY() As Single
+    Public pointList() As cv.Point2f
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
+        ocvb.callerName = "Depth_LocalMinMax_MT"
         grid = New Thread_Grid(ocvb)
         grid.externalUse = True
 
-        ocvb.label1 = "Red is min distance, Blue is max distance"
+        ocvb.label1 = "Red is min distance"
         ocvb.desc = "Find min and max depth in each segment."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -1000,6 +1002,7 @@ Public Class Depth_LocalMinMax_MT : Implements IDisposable
             ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
         End If
 
+        ReDim pointList(grid.roiList.Count - 1)
         ReDim ptListX(grid.roiList.Count - 1)
         ReDim ptListY(grid.roiList.Count - 1)
         Parallel.For(0, grid.roiList.Count,
@@ -1011,6 +1014,7 @@ Public Class Depth_LocalMinMax_MT : Implements IDisposable
             If minPt.X < 0 Or minPt.Y < 0 Then minPt = New cv.Point2f(0, 0)
             ptListX(i) = minPt.X + roi.X
             ptListY(i) = minPt.Y + roi.Y
+            pointList(i) = New cv.Point(ptListX(i), ptListY(i))
 
             If externalUse = False Then
                 cv.Cv2.Circle(ocvb.result1(roi), minPt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
@@ -1038,8 +1042,7 @@ End Class
 
 Public Class Depth_LocalMinMax_Kalman_MT : Implements IDisposable
     Dim minmax As Depth_LocalMinMax_MT
-    Dim kalmanX As Kalman_Basics
-    Dim kalmanY As Kalman_Basics
+    Dim kalman As Kalman_Basics
     Public Sub New(ocvb As AlgorithmData)
         minmax = New Depth_LocalMinMax_MT(ocvb)
         minmax.externalUse = True
@@ -1050,45 +1053,41 @@ Public Class Depth_LocalMinMax_Kalman_MT : Implements IDisposable
         ocvb.desc = "Find minimum depth in each segment."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static gridWidth As Int32
-        Static gridHeight As Int32
+        Static saveCount As Integer
         minmax.Run(ocvb)
 
-        If gridWidth <> minmax.grid.sliders.TrackBar1.Value Or gridHeight <> minmax.grid.sliders.TrackBar2.Value Then
-            If kalmanX IsNot Nothing Then kalmanX.Dispose()
-            If kalmanY IsNot Nothing Then kalmanY.Dispose()
-            gridWidth = minmax.grid.sliders.TrackBar1.Value
-            gridHeight = minmax.grid.sliders.TrackBar2.Value
-            kalmanX = New Kalman_Basics(ocvb)
-            kalmanX.externalUse = True
-            kalmanY = New Kalman_Basics(ocvb)
-            kalmanY.externalUse = True
+        If minmax.grid.roiList.Count <> saveCount Then
+            If kalman IsNot Nothing Then kalman.Dispose()
+            kalman = New Kalman_Basics(ocvb)
+            ReDim kalman.src(minmax.grid.roiList.Count - 1)
+            saveCount = kalman.src.Count
+            kalman.externalUse = True
         End If
 
-        kalmanX.src = minmax.ptListX
-        kalmanX.Run(ocvb)
-        kalmanY.src = minmax.ptListY
-        kalmanY.Run(ocvb)
+        For i = 0 To kalman.src.Count - 1 Step 2
+            kalman.src(i) = minmax.pointList(i).X
+            kalman.src(i + 1) = minmax.pointList(i).Y
+        Next
+        kalman.Run(ocvb)
 
         ocvb.result1 = ocvb.color.Clone()
         ocvb.result1.SetTo(cv.Scalar.White, minmax.grid.gridMask)
 
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
-        For i = 0 To kalmanX.dst.Length - 1
-            If kalmanX.dst(i) >= ocvb.color.Width Then kalmanX.dst(i) = ocvb.color.Width - 1
-            If kalmanX.dst(i) < 0 Then kalmanX.dst(i) = 0
-            If kalmanY.dst(i) >= ocvb.color.Height Then kalmanY.dst(i) = ocvb.color.Height - 1
-            If kalmanY.dst(i) < 0 Then kalmanY.dst(i) = 0
-            subdiv.Insert(New cv.Point2f(kalmanX.dst(i), kalmanY.dst(i)))
+        For i = 0 To kalman.dst.Length - 1 Step 2
+            If kalman.dst(i) >= ocvb.color.Width Then kalman.dst(i) = ocvb.color.Width - 1
+            If kalman.dst(i) < 0 Then kalman.dst(i) = 0
+            If kalman.dst(i + 1) >= ocvb.color.Height Then kalman.dst(i + 1) = ocvb.color.Height - 1
+            If kalman.dst(i + 1) < 0 Then kalman.dst(i + 1) = 0
+            subdiv.Insert(New cv.Point2f(kalman.dst(i), kalman.dst(i + 1)))
 
             ' just show the minimum (closest) point 
-            cv.Cv2.Circle(ocvb.result1, New cv.Point(kalmanX.dst(i), kalmanY.dst(i)), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(ocvb.result1, New cv.Point(kalman.dst(i), kalman.dst(i + 1)), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
         paint_voronoi(ocvb, ocvb.result2, subdiv)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        kalmanX.Dispose()
-        kalmanY.Dispose()
+        kalman.Dispose()
         minmax.Dispose()
     End Sub
 End Class
@@ -1215,6 +1214,7 @@ Public Class Depth_Holes : Implements IDisposable
         ocvb.desc = "Identify holes in the depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If externalUse Then sliders.Visible = False ' probably don't need this option except when running standalone.
         holeMask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         If externalUse = False Then ocvb.result1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 

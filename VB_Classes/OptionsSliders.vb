@@ -16,7 +16,7 @@ Public Class OptionsSliders
         TrackBar1.Maximum = max
         TrackBar1.Value = value
         GroupBox1.Visible = True
-        Me.Text = ocvb.name + " Options"
+        If ocvb.callerName <> ocvb.name Then Me.Text = ocvb.callerName + " Options for " + ocvb.name Else Me.Text = ocvb.name + " Options"
     End Sub
     Public Sub setupTrackBar2(ocvb As AlgorithmData, label As String, min As Integer, max As Integer, value As Integer)
         LabelSlider2.Text = label
@@ -24,7 +24,6 @@ Public Class OptionsSliders
         TrackBar2.Maximum = max
         TrackBar2.Value = value
         GroupBox2.Visible = True
-        Me.Text = ocvb.name + " Options"
     End Sub
     Public Sub setupTrackBar3(ocvb As AlgorithmData, label As String, min As Integer, max As Integer, value As Integer)
         LabelSlider3.Text = label
@@ -32,7 +31,6 @@ Public Class OptionsSliders
         TrackBar3.Maximum = max
         TrackBar3.Value = value
         GroupBox3.Visible = True
-        Me.Text = ocvb.name + " Options"
     End Sub
     Public Sub setupTrackBar4(ocvb As AlgorithmData, label As String, min As Integer, max As Integer, value As Integer)
         LabelSlider4.Text = label
@@ -40,7 +38,6 @@ Public Class OptionsSliders
         TrackBar4.Maximum = max
         TrackBar4.Value = value
         GroupBox4.Visible = True
-        Me.Text = ocvb.name + " Options"
     End Sub
     Private Sub TrackBar1_ValueChanged(sender As Object, e As EventArgs) Handles TrackBar1.ValueChanged
         Label1.Text = CStr(TrackBar1.Value)

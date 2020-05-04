@@ -13,7 +13,8 @@ Imports System.Runtime.InteropServices
 Public Class OpenGL_MyOpenGLtest : Implements IDisposable
     Public ogl As OpenGL_Basics
     Public Sub New(ocvb As AlgorithmData)
-        ogl = New OpenGL_Basics(ocvb)
+		ocvb.callerName = "OpenGL_MyOpenGLtest"
+		ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_MyOpenGLtest"
         ocvb.desc = "Describe your algorithm"
     End Sub

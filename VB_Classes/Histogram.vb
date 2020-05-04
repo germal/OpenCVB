@@ -112,7 +112,7 @@ Public Class Histogram_Basics : Implements IDisposable
                 Dim points = New List(Of cv.Point)
                 Dim listOfPoints = New List(Of List(Of cv.Point))
                 For j = 0 To bins - 1
-                    points.Add(New cv.Point(CInt(j * lineWidth), ocvb.result1.Rows - ocvb.result1.Rows * histRaw(i).Get(of Single)(j, 0) / maxVal))
+                    points.Add(New cv.Point(CInt(j * lineWidth), ocvb.result1.Rows - ocvb.result1.Rows * histRaw(i).Get(Of Single)(j, 0) / maxVal))
                 Next
                 listOfPoints.Add(points)
                 ocvb.result1.Polylines(listOfPoints, False, plotColors(i), thickness, cv.LineTypes.AntiAlias)
@@ -337,7 +337,7 @@ Public Class Histogram_BackProjectionGrayScale : Implements IDisposable
         hist = New Histogram_KalmanSmoothed(ocvb)
         hist.externalUse = True
         hist.dst = ocvb.result2
-        hist.check.Box(0).Checked = False
+        hist.kalman.check.Box(0).Checked = False
 
         sliders.setupTrackBar1(ocvb, "Histogram Bins", 1, 255, 50)
         sliders.setupTrackBar2(ocvb, "Number of neighbors to include", 0, 10, 1)
@@ -437,8 +437,8 @@ Public Class Histogram_ColorsAndGray : Implements IDisposable
 
         histogram = New Histogram_KalmanSmoothed(ocvb)
         histogram.externalUse = True
-        histogram.check.Box(0).Checked = False
-        histogram.check.Box(0).Enabled = False ' if we use Kalman, all the plots are identical as the values converge on the gray level setting...
+        histogram.kalman.check.Box(0).Checked = False
+        histogram.kalman.check.Box(0).Enabled = False ' if we use Kalman, all the plots are identical as the values converge on the gray level setting...
         histogram.sliders.TrackBar1.Value = 40
 
         check.Setup(ocvb, 1)
@@ -483,7 +483,6 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
     Public externalUse As Boolean
 
     Public sliders As New OptionsSliders
-    Public check As New OptionsCheckbox
     Public histogram As New cv.Mat
     Public kalman As Kalman_Basics
     Public plotHist As Plot_Histogram
@@ -498,11 +497,6 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
 
         sliders.setupTrackBar1(ocvb, "Histogram Bins", 1, 255, 50)
         If ocvb.parms.ShowOptions Then sliders.Show()
-
-        check.Setup(ocvb, 1)
-        check.Box(0).Text = "Use Kalman to calm graph"
-        check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
 
         ocvb.label1 = "Gray scale input to histogram"
         ocvb.label2 = "Histogram - x=bins/y=count"
@@ -529,16 +523,14 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
         ocvb.result1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "Plot Histogram bins = " + CStr(plotHist.bins)
 
-        If check.Box(0).Checked Then
-            ReDim kalman.src(plotHist.bins - 1)
-            For i = 0 To plotHist.bins - 1
-                kalman.src(i) = histogram.Get(of Single)(i, 0)
-            Next
-            kalman.Run(ocvb)
-            For i = 0 To plotHist.bins - 1
-                histogram.Set(Of Single)(i, 0, kalman.dst(i))
-            Next
-        End If
+        ReDim kalman.src(plotHist.bins - 1)
+        For i = 0 To plotHist.bins - 1
+            kalman.src(i) = histogram.Get(Of Single)(i, 0)
+        Next
+        kalman.Run(ocvb)
+        For i = 0 To plotHist.bins - 1
+            histogram.Set(Of Single)(i, 0, kalman.dst(i))
+        Next
 
         plotHist.hist = histogram
         plotHist.dst = dst
@@ -547,7 +539,6 @@ Public Class Histogram_KalmanSmoothed : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
-        check.Dispose()
         kalman.Dispose()
         plotHist.Dispose()
     End Sub
@@ -599,7 +590,6 @@ End Class
 Public Class Histogram_DepthValleys : Implements IDisposable
     Dim kalman As Kalman_Basics
     Dim hist As Histogram_Depth
-    Dim check As New OptionsCheckbox
     Public rangeBoundaries As New List(Of cv.Point)
     Public sortedSizes As New List(Of Int32)
     Private Class CompareCounts : Implements IComparer(Of Single)
@@ -626,6 +616,7 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         Next
     End Sub
     Public Sub New(ocvb As AlgorithmData)
+        ocvb.callerName = "Histogram_DepthValleys"
         hist = New Histogram_Depth(ocvb)
         hist.trim.sliders.TrackBar2.Value = 5000 ' depth to 5 meters.
         hist.sliders.TrackBar1.Value = 40 ' number of bins.
@@ -633,25 +624,18 @@ Public Class Histogram_DepthValleys : Implements IDisposable
         kalman = New Kalman_Basics(ocvb)
         kalman.externalUse = True
 
-        check.Setup(ocvb, 1)
-        check.Box(0).Text = "Use Kalman Filter to smooth histogram plot."
-        check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
-
         ocvb.desc = "Identify valleys in the Depth histogram."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        If check.Box(0).Checked Then
-            ReDim kalman.src(hist.plotHist.hist.Rows - 1)
-            For i = 0 To hist.plotHist.hist.Rows - 1
-                kalman.src(i) = hist.plotHist.hist.Get(of Single)(i, 0)
-            Next
-            kalman.Run(ocvb)
-            For i = 0 To hist.plotHist.hist.Rows - 1
-                hist.plotHist.hist.Set(Of Single)(i, 0, kalman.dst(i))
-            Next
-        End If
+        ReDim kalman.src(hist.plotHist.hist.Rows - 1)
+        For i = 0 To hist.plotHist.hist.Rows - 1
+            kalman.src(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
+        Next
+        kalman.Run(ocvb)
+        For i = 0 To hist.plotHist.hist.Rows - 1
+            hist.plotHist.hist.Set(Of Single)(i, 0, kalman.dst(i))
+        Next
 
         Dim depthIncr = CInt(hist.trim.sliders.TrackBar2.Value / hist.sliders.TrackBar1.Value) ' each bar represents this number of millimeters
         Dim pointCount = hist.plotHist.hist.Get(of Single)(0, 0) + hist.plotHist.hist.Get(of Single)(1, 0)
@@ -710,6 +694,7 @@ End Class
 
 Public Class Histogram_DepthClusters : Implements IDisposable
     Public valleys As Histogram_DepthValleys
+    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         valleys = New Histogram_DepthValleys(ocvb)
         ocvb.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
@@ -724,7 +709,7 @@ Public Class Histogram_DepthClusters : Implements IDisposable
             Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
             cv.Cv2.InRange(getDepth32f(ocvb), startEndDepth.X, startEndDepth.Y, tmp)
             cv.Cv2.ConvertScaleAbs(tmp, mask)
-            ocvb.result2.SetTo(ocvb.colorScalar(i), mask)
+            If externalUse = False Then ocvb.result2.SetTo(ocvb.colorScalar(i), mask)
         Next
         ocvb.label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
         ocvb.label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"
