@@ -8,7 +8,7 @@ Public Class OptionsRadioButtons
     End Sub
     Public Sub Setup(ocvb As AlgorithmData, count As Int32)
         ReDim check(count - 1)
-        If ocvb.callerName <> ocvb.name Then Me.Text = ocvb.name + " Options for " + ocvb.callerName Else Me.Text = ocvb.name + " Options"
+        If ocvb.callerName <> ocvb.name Then Me.Text = ocvb.callerName + " Options for " + ocvb.name Else Me.Text = ocvb.name + " Options"
         For i = 0 To check.Count - 1
             check(i) = New RadioButton
             check(i).AutoSize = True

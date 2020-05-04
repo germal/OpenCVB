@@ -462,21 +462,16 @@ End Class
 
 
 Public Class IMU_AnglesToGravity : Implements IDisposable
-    Dim kalman1 As Kalman_Basics
-    Dim kalman2 As Kalman_Basics
+    Dim kalman As Kalman_Basics
     Public angleX As Single ' in radians.
     Public angleY As Single ' in radians.
     Public angleZ As Single ' in radians.
     Public result As Integer = RESULT1 ' should be result1 or result2
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
-        kalman1 = New Kalman_Basics(ocvb)
-        ReDim kalman1.src(3 - 1)
-        kalman1.externalUse = True
-
-        kalman2 = New Kalman_Basics(ocvb)
-        ReDim kalman2.src(3 - 1)
-        kalman2.externalUse = True
+        kalman = New Kalman_Basics(ocvb)
+        ReDim kalman.src(6 - 1)
+        kalman.externalUse = True
 
         ocvb.desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
@@ -485,25 +480,15 @@ Public Class IMU_AnglesToGravity : Implements IDisposable
         Dim gy = ocvb.parms.IMU_Acceleration.Y
         Dim gz = ocvb.parms.IMU_Acceleration.Z
 
-        kalman1.src(0) = gx
-        kalman1.src(1) = gy
-        kalman1.src(2) = gz
-        kalman1.Run(ocvb)
-        gx = kalman1.dst(0)
-        gy = kalman1.dst(1)
-        gz = kalman1.dst(2)
-
         angleX = -Math.Atan2(gx, Math.Sqrt(gy * gy + gz * gz))
         angleY = Math.Atan2(gy, Math.Sqrt(gx * gx + gz * gz))
         angleZ = -Math.Atan2(gz, Math.Sqrt(gx * gx + gy * gy))
 
-        kalman2.src(0) = angleX
-        kalman2.src(1) = angleY
-        kalman2.src(2) = angleZ
-        kalman2.Run(ocvb)
-        angleX = kalman2.dst(0)
-        angleY = kalman2.dst(1)
-        angleZ = kalman2.dst(2)
+        kalman.src = {gx, gy, gz, angleX, angleY, angleZ}
+        kalman.Run(ocvb)
+        gx = kalman.dst(0)
+        gy = kalman.dst(1)
+        gz = kalman.dst(2)
 
         If externalUse = False Then
             Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf
@@ -530,7 +515,6 @@ Public Class IMU_AnglesToGravity : Implements IDisposable
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        kalman1.Dispose()
-        kalman2.Dispose()
+        kalman.Dispose()
     End Sub
 End Class

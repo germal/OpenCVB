@@ -11,6 +11,7 @@ Public Class Kalman_Basics : Implements IDisposable
     Public ErrorCovPost As Single = 1
 
     Public Sub New(ocvb As AlgorithmData)
+        ocvb.callerName = "Kalman_Basics"
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Turn Kalman filtering on in " + ocvb.callerName
         check.Box(0).Checked = True
