@@ -273,6 +273,29 @@ End Class
 
 
 
+
+Public Class Projections_GravityHistogram : Implements IDisposable
+    Public gravity As Projections_Gravity_CPP
+    Public Sub New(ocvb As AlgorithmData)
+        gravity = New Projections_Gravity_CPP(ocvb)
+        gravity.sliders.GroupBox2.Visible = True
+        gravity.histogramRun = True
+
+        ocvb.desc = "Use the top/down projection to create a histogram of 3D points"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        gravity.Run(ocvb)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        gravity.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class Projections_Gravity_CPP : Implements IDisposable
     Dim imu As IMU_AnglesToGravity
     Public sliders As New OptionsSliders
@@ -397,33 +420,20 @@ End Class
 
 
 
-Public Class Projections_GravityHistogram : Implements IDisposable
-    Public gravity As Projections_Gravity_CPP
-    Public Sub New(ocvb As AlgorithmData)
-        gravity = New Projections_Gravity_CPP(ocvb)
-        gravity.sliders.GroupBox2.Visible = True
-        gravity.histogramRun = True
-
-        ocvb.desc = "Use the top/down projection to create a histogram of 3D points"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        gravity.Run(ocvb)
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        gravity.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Projections_HistogramFloodfill : Implements IDisposable
     Dim flood As FloodFill_Projection
+    Dim sliders As New OptionsSliders
+    Dim kalman As Kalman_Basics
     Public gravity As Projections_Gravity_CPP
+    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
+        kalman = New Kalman_Basics(ocvb)
+        ReDim kalman.src(10 * 2 - 1) ' max 10 objects. Only width and height will be smoothed.  X and Y need to be precise.
+        kalman.externalUse = True
+
+        sliders.setupTrackBar1(ocvb, "epsilon for GroupRectangles X100", 0, 200, 80)
+        If ocvb.parms.ShowOptions Then sliders.Show()
+
         gravity = New Projections_Gravity_CPP(ocvb)
         gravity.sliders.GroupBox2.Visible = True
         gravity.externalUse = True
@@ -442,13 +452,85 @@ Public Class Projections_HistogramFloodfill : Implements IDisposable
         flood.srcGray = gravity.dst1
         flood.Run(ocvb)
 
-        ocvb.result2 = flood.dst.Resize(ocvb.color.Size())
-        For Each rect In flood.objectRects
-            ocvb.result2.Rectangle(rect, cv.Scalar.Red, 1)
+        ' Combine rectangles that are overlaping or touching.
+        Dim combinedRects As New List(Of cv.Rect)
+        ' first duplicate all the current rectangles so all originals (by themselves) will be returned.
+        For i = 0 To flood.objectRects.Count - 1
+            combinedRects.Add(flood.objectRects(i))
+            combinedRects.Add(flood.objectRects(i))
         Next
+
+        Dim epsilon = sliders.TrackBar1.Value / 100
+        cv.Cv2.GroupRectangles(combinedRects, 1, epsilon)
+
+        For i = 0 To Math.Min(combinedRects.Count * 2, kalman.src.Count) - 1 Step 2
+            Dim rIndex = i / 2
+            kalman.src(i) = combinedRects(rIndex).Width
+            kalman.src(i + 1) = combinedRects(rIndex).Height
+        Next
+        kalman.Run(ocvb)
+        Dim rects As New List(Of cv.Rect)
+        For i = 0 To Math.Min(combinedRects.Count * 2, kalman.src.Count) - 1 Step 2
+            Dim rect = combinedRects(i / 2)
+            rects.Add(New cv.Rect(rect.X, rect.Y, kalman.dst(i), kalman.dst(i + 1)))
+        Next
+
+        ocvb.result2 = flood.dst.Resize(ocvb.color.Size())
+        If externalUse = False Then
+            Dim maxDepth = gravity.sliders.TrackBar1.Value
+            Dim mmPerPixel = maxDepth / ocvb.result1.Height
+            For Each rect In rects
+                ocvb.result2.Rectangle(rect, cv.Scalar.White, 1)
+                Dim distanceFromCamera = (ocvb.result1.Height - rect.Y - rect.Height) * mmPerPixel
+                Dim objectWidth = rect.Width * mmPerPixel
+                Dim text = "depth=" + Format(distanceFromCamera / 1000, "#0.0") + "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
+                cv.Cv2.PutText(ocvb.result2, text, New cv.Point(rect.X, rect.Y - 10), cv.HersheyFonts.HersheyComplexSmall, 0.6, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            Next
+            ocvb.label2 = CStr(flood.objectRects.Count) + " objects combined into " + CStr(rects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         gravity.Dispose()
         flood.Dispose()
+        kalman.Dispose()
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Projections_Wall : Implements IDisposable
+    Dim objects As Projections_HistogramFloodfill
+    Dim lines As lineDetector_FLD
+    Dim dilate As DilateErode_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        dilate = New DilateErode_Basics(ocvb)
+        dilate.externalUse = True
+
+        objects = New Projections_HistogramFloodfill(ocvb)
+        objects.externalUse = True
+
+        lines = New lineDetector_FLD(ocvb)
+        lines.externalUse = True
+
+        ocvb.callerName = "Projections_WallDetect"
+        ocvb.desc = "Use the top down view to detect walls with a line detector algorithm"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        objects.Run(ocvb)
+
+        dilate.src = ocvb.result2
+        dilate.Run(ocvb)
+
+        lines.src = dilate.dst
+        lines.Run(ocvb)
+        lines.dst.CopyTo(ocvb.result1)
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        objects.Dispose()
+        lines.Dispose()
+    End Sub
+End Class
+

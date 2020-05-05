@@ -4,6 +4,7 @@ Public Class DilateErode_Basics : Implements IDisposable
     Public sliders As New OptionsSliders
     Public radio As New OptionsRadioButtons
     Public src As New cv.Mat
+    Public dst As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "DilateErode Kernel Size", 1, 32, 5)
@@ -19,6 +20,13 @@ Public Class DilateErode_Basics : Implements IDisposable
         If ocvb.parms.ShowOptions Then radio.Show()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If externalUse = False Then
+            src = ocvb.color
+            dst = ocvb.result1
+        Else
+            If dst Is Nothing Then dst = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3)
+        End If
+
         Dim iterations = sliders.TrackBar2.Value
         Dim kernelsize = sliders.TrackBar1.Value
         If kernelsize Mod 2 = 0 Then kernelsize += 1
@@ -26,23 +34,22 @@ Public Class DilateErode_Basics : Implements IDisposable
         If radio.check(1).Checked Then morphShape = cv.MorphShapes.Ellipse
         If radio.check(2).Checked Then morphShape = cv.MorphShapes.Rect
         Dim element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(kernelsize, kernelsize))
+
+        If iterations >= 0 Then
+            src.Dilate(element, Nothing, iterations).CopyTo(dst)
+        Else
+            src.Erode(element, Nothing, -iterations).CopyTo(dst)
+        End If
+
         If externalUse = False Then
             If iterations >= 0 Then
-                ocvb.result1 = ocvb.color.Dilate(element, Nothing, iterations)
                 ocvb.result2 = ocvb.RGBDepth.Dilate(element, Nothing, iterations)
                 ocvb.label1 = "Dilate RGB " + CStr(iterations) + " times"
                 ocvb.label2 = "Dilate Depth " + CStr(iterations) + " times"
             Else
-                ocvb.result1 = ocvb.color.Erode(element, Nothing, -iterations)
                 ocvb.result2 = ocvb.RGBDepth.Erode(element, Nothing, -iterations)
                 ocvb.label1 = "Erode RGB " + CStr(-iterations) + " times"
                 ocvb.label2 = "Erode Depth " + CStr(-iterations) + " times"
-            End If
-        Else
-            If iterations >= 0 Then
-                ocvb.result1 = src.Dilate(element, Nothing, iterations)
-            Else
-                ocvb.result1 = src.Erode(element, Nothing, -iterations)
             End If
         End If
     End Sub

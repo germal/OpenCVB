@@ -365,6 +365,7 @@ Public Class FloodFill_Projection : Implements IDisposable
     Public externalUse As Boolean
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public objectRects As New List(Of cv.Rect)
+    Public minFloodSize As Integer
     Public Sub New(ocvb As AlgorithmData)
         sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
@@ -376,7 +377,7 @@ Public Class FloodFill_Projection : Implements IDisposable
         ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim minFloodSize = sliders.TrackBar1.Value
+        minFloodSize = sliders.TrackBar1.Value
         Dim loDiff = cv.Scalar.All(sliders.TrackBar2.Value)
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
         Dim stepSize = sliders.TrackBar4.Value
@@ -404,8 +405,10 @@ Public Class FloodFill_Projection : Implements IDisposable
             Next
         Next
 
-        If externalUse = False Then ocvb.result2 = dst
-        ocvb.label2 = CStr(objectRects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+        If externalUse = False Then
+            ocvb.result2 = dst
+            ocvb.label2 = CStr(objectRects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         sliders.Dispose()
