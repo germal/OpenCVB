@@ -428,7 +428,7 @@ Public Class Projections_HistogramFloodfill : Implements IDisposable
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData)
         kalman = New Kalman_Basics(ocvb)
-        ReDim kalman.src(10 * 2 - 1) ' max 10 objects. Only width and height will be smoothed.  X and Y need to be precise.
+        ReDim kalman.src(10 * 4 - 1) ' max 10 objects. 
         kalman.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "epsilon for GroupRectangles X100", 0, 200, 80)
@@ -463,20 +463,24 @@ Public Class Projections_HistogramFloodfill : Implements IDisposable
         Dim epsilon = sliders.TrackBar1.Value / 100
         cv.Cv2.GroupRectangles(combinedRects, 1, epsilon)
 
-        For i = 0 To Math.Min(combinedRects.Count * 2, kalman.src.Count) - 1 Step 2
+        For i = 0 To Math.Min(combinedRects.Count * 2, kalman.src.Count) - 1 Step 4
             Dim rIndex = i / 2
-            kalman.src(i) = combinedRects(rIndex).Width
-            kalman.src(i + 1) = combinedRects(rIndex).Height
+            kalman.src(i) = combinedRects(rIndex).X
+            kalman.src(i + 1) = combinedRects(rIndex).Y
+            kalman.src(i + 2) = combinedRects(rIndex).Width
+            kalman.src(i + 3) = combinedRects(rIndex).Height
         Next
         kalman.Run(ocvb)
         Dim rects As New List(Of cv.Rect)
-        For i = 0 To Math.Min(combinedRects.Count * 2, kalman.src.Count) - 1 Step 2
+        For i = 0 To Math.Min(combinedRects.Count * 2, kalman.src.Count) - 1 Step 4
             Dim rect = combinedRects(i / 2)
-            rects.Add(New cv.Rect(rect.X, rect.Y, kalman.dst(i), kalman.dst(i + 1)))
+            rects.Add(New cv.Rect(kalman.dst(i), kalman.dst(i + 1), kalman.dst(i + 2), kalman.dst(i + 3)))
         Next
 
         ocvb.result2 = flood.dst.Resize(ocvb.color.Size())
         If externalUse = False Then
+            Dim fontSize As Single = 1.0
+            If ocvb.parms.lowResolution Then fontSize = 0.6
             Dim maxDepth = gravity.sliders.TrackBar1.Value
             Dim mmPerPixel = maxDepth / ocvb.result1.Height
             For Each rect In rects
@@ -484,7 +488,9 @@ Public Class Projections_HistogramFloodfill : Implements IDisposable
                 Dim distanceFromCamera = (ocvb.result1.Height - rect.Y - rect.Height) * mmPerPixel
                 Dim objectWidth = rect.Width * mmPerPixel
                 Dim text = "depth=" + Format(distanceFromCamera / 1000, "#0.0") + "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
-                cv.Cv2.PutText(ocvb.result2, text, New cv.Point(rect.X, rect.Y - 10), cv.HersheyFonts.HersheyComplexSmall, 0.6, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+
+                Dim pt = New cv.Point(rect.X, rect.Y - 10)
+                cv.Cv2.PutText(ocvb.result2, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
             ocvb.label2 = CStr(flood.objectRects.Count) + " objects combined into " + CStr(rects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
         End If
@@ -527,6 +533,9 @@ Public Class Projections_Wall : Implements IDisposable
         lines.src = dilate.dst
         lines.Run(ocvb)
         lines.dst.CopyTo(ocvb.result1)
+
+        ocvb.label1 = "Top View with lines in red"
+        ocvb.label2 = "Top View output without lines"
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         objects.Dispose()
