@@ -8,7 +8,7 @@ Public Class imShow_Basics
     Public Sub Run(ocvb As AlgorithmData)
         cv.Cv2.ImShow("color", ocvb.color)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         cv.Cv2.DestroyAllWindows() ' not really needed
     End Sub
 End Class

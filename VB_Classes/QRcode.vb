@@ -39,6 +39,6 @@ Public Class QRcode_Basics
         Next
         If refersTo <> "" Then ocvb.label1 = refersTo
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

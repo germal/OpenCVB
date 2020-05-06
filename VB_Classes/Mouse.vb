@@ -19,7 +19,7 @@ Public Class Mouse_Basics
         If colorIndex >= ocvb.colorScalar.Count Then colorIndex = 0
         ocvb.putText(New ActiveClass.TrueType("Move the mouse through this image to show mouse tracking.", 10, 50))
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -42,7 +42,7 @@ Public Class Mouse_LeftClick
             ocvb.result2 = ocvb.color(ocvb.drawRect).Resize(ocvb.result2.Size())
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -64,6 +64,6 @@ Public Class Mouse_RightClick
             ocvb.result2 = ocvb.color(ocvb.drawRect).Resize(ocvb.result2.Size())
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

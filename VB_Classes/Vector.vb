@@ -31,6 +31,6 @@ Public Class Vector_Magnitude
         other_manhattan_distance = other_manhattan_distance.Col(0) + other_manhattan_distance.Col(1)
         ocvb.putText(New ActiveClass.TrueType("other_manhattan_distance = " + CStr(other_manhattan_distance.Get(of Single)(0, 0)), 10, 120))
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

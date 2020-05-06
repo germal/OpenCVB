@@ -39,7 +39,7 @@ Public Class Remap_Basics
             direction = direction Mod 4
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -72,7 +72,7 @@ Public Class Remap_Flip
             direction = direction Mod 4
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 

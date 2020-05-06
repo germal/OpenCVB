@@ -3,9 +3,9 @@ Public Class Math_Subtract
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Red", 0, 255, 255)
-        sliders.setupTrackBar2(ocvb, "Green", 0, 255, 255)
-        sliders.setupTrackBar3(ocvb, "Blue", 0, 255, 255)
+        sliders.setupTrackBar1(ocvb, callerName, "Red", 0, 255, 255)
+        sliders.setupTrackBar2(ocvb, callerName, "Green", 0, 255, 255)
+        sliders.setupTrackBar3(ocvb, callerName,"Blue", 0, 255, 255)
                 ocvb.desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -13,7 +13,7 @@ Public Class Math_Subtract
         tmp.SetTo(New cv.Scalar(sliders.TrackBar3.Value, sliders.TrackBar2.Value, sliders.TrackBar1.Value))
         cv.Cv2.Subtract(tmp, ocvb.color, ocvb.result1)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -56,7 +56,7 @@ Public Class Math_Median_CDF
     Public bins As Int32 = 10
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Histogram Bins", 4, 1000, 100)
+        sliders.setupTrackBar1(ocvb, callerName, "Histogram Bins", 4, 1000, 100)
         ocvb.desc = "Compute the src image median"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -80,7 +80,7 @@ Public Class Math_Median_CDF
             ocvb.label2 = "Grayscale pixels < " + Format(medianVal, "#0.0")
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -106,7 +106,7 @@ Public Class Math_DepthMeanStdev
         cv.Cv2.MeanStdDev(depth32f, mean, stdev)
         ocvb.label1 = "raw depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         minMax.Dispose()
     End Sub
 End Class
@@ -153,7 +153,7 @@ Public Class Math_RGBCorrelation
         ocvb.label1 = ""
         ocvb.label2 = "Log of " + corr.matchText
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         corr.Dispose()
         flow.Dispose()
     End Sub

@@ -51,7 +51,7 @@ End Module
 '        Dim dst = New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols, cv.MatType.CV_8U, dstData)
 '        ocvb.result1 = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 '    End Sub
-'    Public Sub VBdispose()
+'    Public Sub MyDispose()
 '        SemiGlobalMatching_Close(SemiGlobalMatching)
 '    End Sub
 'End Class

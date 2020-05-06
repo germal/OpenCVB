@@ -17,7 +17,7 @@ Public Class Emgu_Basics
             ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, data)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -45,7 +45,7 @@ Public Class Emgu_Facedetection
             ocvb.result1(New cv.Rect(0, 0, tmp.Rows, tmp.Cols)) = tmp
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 

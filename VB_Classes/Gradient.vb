@@ -27,7 +27,7 @@ Public Class Gradient_Basics
         gray.ConvertTo(ocvb.result2, cv.MatType.CV_8UC1)
         ocvb.result1 = sobel.dst
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         sobel.Dispose()
     End Sub
 End Class
@@ -58,7 +58,7 @@ Public Class Gradient_Depth
         gray.ConvertTo(ocvb.result2, cv.MatType.CV_8UC1)
         ocvb.result1 = sobel.dst
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         sobel.Dispose()
     End Sub
 End Class
@@ -74,7 +74,7 @@ Public Class Gradient_Flatland
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grade = New Gradient_Basics(ocvb, "Gradient_Flatland")
-        sliders.setupTrackBar1(ocvb, "Reduction Factor", 1, 64, 16)
+        sliders.setupTrackBar1(ocvb, callerName, "Reduction Factor", 1, 64, 16)
                 ocvb.desc = "Reduced grayscale shows isobars in depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -84,7 +84,7 @@ Public Class Gradient_Flatland
         ocvb.result1 *= reductionFactor
         grade.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 grade.Dispose()
     End Sub
 End Class

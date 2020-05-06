@@ -89,7 +89,7 @@ Public Class GameOfLife_Basics
         ocvb.label1 = "Population " + CStr(population) + " Generation = " + CStr(generation) + countdownText
         grid = nextgrid.Clone()
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         random.Dispose()
     End Sub
 End Class
@@ -121,7 +121,7 @@ Public Class GameOfLife_Population
         plot.plotData = New cv.Scalar(game.population, 0, 0)
         plot.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         plot.Dispose()
         game.Dispose()
     End Sub

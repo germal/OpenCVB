@@ -92,7 +92,7 @@ Public Class Python_Run
             End If
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         On Error Resume Next
         Dim proc = Process.GetProcessesByName("python")
         For i = 0 To proc.Count - 1
@@ -142,7 +142,7 @@ Public Class Python_MemMap
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         If memMapPtr <> 0 Then Marshal.FreeHGlobal(memMapPtr)
         Dim proc = Process.GetProcessesByName("python")
         For i = 0 To proc.Count - 1
@@ -210,7 +210,7 @@ Public Class Python_SurfaceBlit
             ocvb.putText(New ActiveClass.TrueType("Python is not available", 10, 60, RESULT1))
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         If PythonReady = False Then Exit Sub ' none of this was created if Python wasn't found
         memMap.Dispose()
         If pipe IsNot Nothing Then

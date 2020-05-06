@@ -62,7 +62,7 @@ Public Class Hough_Circles
             cv.Cv2.Circle(ocvb.result2, New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         circles.Dispose()
     End Sub
 End Class
@@ -82,10 +82,10 @@ Public Class Hough_Lines
         edges = New Edges_Canny(ocvb, "Hough_Lines")
         edges.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, "rho", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, "theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3(ocvb, "threshold", 1, 100, 50)
-        sliders.setupTrackBar4(ocvb, "Lines to Plot", 1, 1000, 50)
+        sliders.setupTrackBar1(ocvb, callerName, "rho", 1, 100, 1)
+        sliders.setupTrackBar2(ocvb, callerName, "theta", 1, 1000, 1000 * Math.PI / 180)
+        sliders.setupTrackBar3(ocvb, callerName,"threshold", 1, 100, 50)
+        sliders.setupTrackBar4(ocvb, callerName,  "Lines to Plot", 1, 1000, 50)
                 ocvb.desc = "Use Houghlines to find lines in the image."
     End Sub
 
@@ -116,7 +116,7 @@ Public Class Hough_Lines
             ocvb.label2 = "Probablistic lines = " + CStr(probSegments.Length)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         edges.Dispose()
             End Sub
 End Class
@@ -131,9 +131,9 @@ Public Class Hough_Lines_MT
     Public grid As Thread_Grid
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "rho", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, "theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3(ocvb, "threshold", 1, 100, 3)
+        sliders.setupTrackBar1(ocvb, callerName, "rho", 1, 100, 1)
+        sliders.setupTrackBar2(ocvb, callerName, "theta", 1, 1000, 1000 * Math.PI / 180)
+        sliders.setupTrackBar3(ocvb, callerName,"threshold", 1, 100, 3)
         
         edges = New Edges_Canny(ocvb, "Hough_Lines_MT")
         edges.externalUse = True
@@ -170,7 +170,7 @@ Public Class Hough_Lines_MT
         End Sub)
         ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         edges.Dispose()
         grid.Dispose()
             End Sub

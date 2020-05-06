@@ -10,8 +10,8 @@ Public Class CComp_Basics
 
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "CComp Threshold", 0, 255, 10)
-        sliders.setupTrackBar2(ocvb, "CComp Min Area", 0, 10000, 500)
+        sliders.setupTrackBar1(ocvb, callerName, "CComp Threshold", 0, 255, 10)
+        sliders.setupTrackBar2(ocvb, callerName, "CComp Min Area", 0, 10000, 500)
         
         ocvb.desc = "Draw bounding boxes around RGB binarized connected Components"
         ocvb.label1 = "CComp binary"
@@ -61,7 +61,7 @@ Public Class CComp_Basics
         Next
         lastImage = ocvb.result1.Clone()
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -98,7 +98,7 @@ Public Class CComp_EdgeMask
         ocvb.label1 = "Edges_CannyAndShadow (input to ccomp)"
         ocvb.label2 = "Blob Rectangles with centroids (white)"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         ccomp.Dispose()
         edges.Dispose()
     End Sub
@@ -130,7 +130,7 @@ Public Class CComp_ColorDepth
             ocvb.result1.Rectangle(blob.Rect, cv.Scalar.White, 2)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -180,7 +180,7 @@ Public Class CComp_Image
             ocvb.result1(blobList(i)).SetTo(avg, binary(blobList(i)))
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -193,9 +193,9 @@ Public Class CComp_InRange_MT
     Public srcGray As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "InRange # of ranges", 2, 255, 15)
-        sliders.setupTrackBar2(ocvb, "InRange Max Depth", 150, 10000, 3000)
-        sliders.setupTrackBar3(ocvb, "InRange min Blob Size (in pixels)", 1, 2000, 500)
+        sliders.setupTrackBar1(ocvb, callerName, "InRange # of ranges", 2, 255, 15)
+        sliders.setupTrackBar2(ocvb, callerName, "InRange Max Depth", 150, 10000, 3000)
+        sliders.setupTrackBar3(ocvb, callerName,"InRange min Blob Size (in pixels)", 1, 2000, 500)
         
         ocvb.desc = "Connected components in specific ranges"
         ocvb.label2 = "Blob rectangles - largest to smallest"
@@ -238,7 +238,7 @@ Public Class CComp_InRange_MT
         End Sub)
         ocvb.label1 = "# of blobs = " + CStr(totalBlobs) + " in " + CStr(rangeCount) + " regions"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -251,8 +251,8 @@ Public Class CComp_InRange
     Public srcGray As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "InRange # of ranges", 1, 20, 15)
-        sliders.setupTrackBar2(ocvb, "InRange min Blob Size (in pixels)", 1, 2000, 500)
+        sliders.setupTrackBar1(ocvb, callerName, "InRange # of ranges", 1, 20, 15)
+        sliders.setupTrackBar2(ocvb, callerName, "InRange min Blob Size (in pixels)", 1, 2000, 500)
         
         ocvb.desc = "Connect components in specific ranges"
         ocvb.label2 = "Blob rectangles - smallest to largest"
@@ -286,7 +286,7 @@ Public Class CComp_InRange
 
         ocvb.label1 = "# of blobs = " + CStr(roiList.Count) + " in " + CStr(rangeCount) + " regions"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -330,6 +330,6 @@ Public Class CComp_Shapes
         cv.Cv2.VConcat(matTop, matBot, mat)
         ocvb.result2 = mat.Resize(ocvb.result2.Size())
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

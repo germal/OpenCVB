@@ -28,7 +28,7 @@ Public Class Rodrigues_ValidateKinect
             ocvb.putText(New ActiveClass.TrueType(split(i), 10, 90 + i * 20, RESULT1))
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -75,7 +75,7 @@ Public Class Rodrigues_ValidateVector
             ocvb.putText(New ActiveClass.TrueType("The T265 does not provide the Rotation Matrix but it is calculated from the Rotation Vector.", 10, 220, RESULT1))
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -107,7 +107,7 @@ Public Class Rodrigues_RotationMatrix
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -144,6 +144,6 @@ Public Class Rodrigues_Extrinsics
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

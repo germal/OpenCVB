@@ -12,6 +12,6 @@ Public Class Bitwise_Not
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.BitwiseNot(gray, ocvb.result2)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

@@ -8,9 +8,9 @@ Public Class Features_GoodFeatures
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Number of Points", 10, 1000, 200)
-        sliders.setupTrackBar2(ocvb, "Quality Level", 1, 100, 1)
-        sliders.setupTrackBar3(ocvb, "Distance", 1, 100, 30)
+        sliders.setupTrackBar1(ocvb, callerName, "Number of Points", 10, 1000, 200)
+        sliders.setupTrackBar2(ocvb, callerName, "Quality Level", 1, 100, 1)
+        sliders.setupTrackBar3(ocvb, callerName,"Distance", 1, 100, 30)
         
         ocvb.desc = "Find good features to track in an RGB image."
     End Sub
@@ -28,6 +28,6 @@ Public Class Features_GoodFeatures
             If externalUse = False Then cv.Cv2.Circle(ocvb.result1, features(i), 3, cv.Scalar.white, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class

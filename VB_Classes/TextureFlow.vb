@@ -5,9 +5,9 @@ Public Class TextureFlow_Basics
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Texture Flow Delta", 2, 100, 12)
-        sliders.setupTrackBar2(ocvb, "Texture Eigen BlockSize", 1, 100, 20)
-        sliders.setupTrackBar3(ocvb, "Texture Eigen Ksize", 1, 15, 1)
+        sliders.setupTrackBar1(ocvb, callerName, "Texture Flow Delta", 2, 100, 12)
+        sliders.setupTrackBar2(ocvb, callerName, "Texture Eigen BlockSize", 1, 100, 20)
+        sliders.setupTrackBar3(ocvb, callerName,"Texture Eigen Ksize", 1, 15, 1)
         
         ocvb.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub
@@ -30,7 +30,7 @@ Public Class TextureFlow_Basics
             Next
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -50,7 +50,7 @@ Public Class TextureFlow_Depth
         texture.src = ocvb.RGBDepth
         texture.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         texture.Dispose()
     End Sub
 End Class

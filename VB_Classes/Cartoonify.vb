@@ -4,11 +4,11 @@ Public Class CartoonifyImage_Basics
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Cartoon Median Blur kernel", 1, 21, 7)
-        sliders.setupTrackBar2(ocvb, "Cartoon Median Blur kernel 2", 1, 21, 3)
-        sliders.setupTrackBar3(ocvb, "Cartoon threshold", 1, 255, 80)
-        sliders.setupTrackBar4(ocvb, "Cartoon Laplacian kernel", 1, 21, 5)
-                ocvb.label1 = "Mask for Cartoon"
+        sliders.setupTrackBar1(ocvb, callerName, "Cartoon Median Blur kernel", 1, 21, 7)
+        sliders.setupTrackBar2(ocvb, callerName, "Cartoon Median Blur kernel 2", 1, 21, 3)
+        sliders.setupTrackBar3(ocvb, callerName,"Cartoon threshold", 1, 255, 80)
+        sliders.setupTrackBar4(ocvb, callerName, "Cartoon Laplacian kernel", 1, 21, 5)
+        ocvb.label1 = "Mask for Cartoon"
         ocvb.label2 = "Cartoonify Result"
         ocvb.desc = "Create a cartoon from a color image - Painterly Effect"
     End Sub
@@ -28,6 +28,6 @@ Public Class CartoonifyImage_Basics
         ocvb.result2 = ocvb.result2.MedianBlur(medianBlur2)
         ocvb.color.CopyTo(ocvb.result2, mask)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class

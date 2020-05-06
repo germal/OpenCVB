@@ -187,7 +187,7 @@ Public Class ActiveClass
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         If ActiveAlgorithm IsNot Nothing Then ActiveAlgorithm.dispose()
         If recordedData IsNot Nothing Then recordedData.Dispose()
     End Sub

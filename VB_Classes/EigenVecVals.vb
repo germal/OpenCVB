@@ -48,6 +48,6 @@ Public Class EigenVecVals_Basics
             ocvb.putText(New ActiveClass.TrueType(nextLine, 10, 50 + i * 30, RESULT2))
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

@@ -20,10 +20,10 @@ Public Class FloodFill_Basics
     End Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 5000, 2500)
-        sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar3(ocvb, "FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar4(ocvb, "Step Size", 1, ocvb.color.Width / 2, 20)
+        sliders.setupTrackBar1(ocvb, callerName, "FloodFill Minimum Size", 1, 5000, 2500)
+        sliders.setupTrackBar2(ocvb, callerName, "FloodFill LoDiff", 1, 255, 5)
+        sliders.setupTrackBar3(ocvb, callerName,"FloodFill HiDiff", 1, 255, 5)
+        sliders.setupTrackBar4(ocvb, callerName,  "Step Size", 1, ocvb.color.Width / 2, 20)
         
         ocvb.label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."
@@ -76,7 +76,7 @@ Public Class FloodFill_Basics
         End If
         ocvb.label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -92,9 +92,9 @@ Public Class FloodFill_Top16_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "FloodFill_Top16_MT")
-        sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 500, 50)
-        sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar3(ocvb, "FloodFill HiDiff", 1, 255, 5)
+        sliders.setupTrackBar1(ocvb, callerName, "FloodFill Minimum Size", 1, 500, 50)
+        sliders.setupTrackBar2(ocvb, callerName, "FloodFill LoDiff", 1, 255, 5)
+        sliders.setupTrackBar3(ocvb, callerName,"FloodFill HiDiff", 1, 255, 5)
         
         ocvb.desc = "Use floodfill to build image segments with a grayscale image."
     End Sub
@@ -121,7 +121,7 @@ Public Class FloodFill_Top16_MT
             Next
         End Sub)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 grid.Dispose()
     End Sub
 End Class
@@ -167,7 +167,7 @@ Public Class FloodFill_Color_MT
             Next
         End Sub)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         grid.Dispose()
         flood.Dispose()
     End Sub
@@ -197,7 +197,7 @@ Public Class FloodFill_DCT
         flood.Run(ocvb)
         ocvb.result2.SetTo(0, mask)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         dct.Dispose()
         flood.Dispose()
     End Sub
@@ -228,7 +228,7 @@ Public Class FloodFill_WithDepth
         range.fBasics.initialMask = shadow.holeMask
         range.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         range.Dispose()
         shadow.Dispose()
     End Sub
@@ -266,7 +266,7 @@ Public Class FloodFill_CComp
         range.fBasics.initialMask = shadow.holeMask
         range.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         ccomp.Dispose()
         range.Dispose()
         shadow.Dispose()
@@ -283,7 +283,7 @@ Public Class FloodFill_RelativeRange
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         fBasics = New FloodFill_Basics(ocvb, "FloodFill_RelativeRange")
-        check.Setup(ocvb, 3)
+        check.Setup(ocvb, callerName,  3)
         check.Box(0).Text = "Use Fixed range - when off, it means use relative range "
         check.Box(1).Text = "Use 4 nearest pixels (Link4) - when off, it means use 8 nearest pixels (Link8)"
         check.Box(1).Checked = True ' link4 produces better results.
@@ -297,7 +297,7 @@ Public Class FloodFill_RelativeRange
         If check.Box(2).Checked Then fBasics.floodFlag += cv.FloodFillFlags.MaskOnly
         fBasics.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         check.Dispose()
         fBasics.Dispose()
     End Sub
@@ -316,7 +316,7 @@ Public Class FloodFill_Top16
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
         
         flood = New FloodFill_Basics(ocvb, "FloodFill_Top16")
@@ -354,7 +354,7 @@ Public Class FloodFill_Top16
         If check.Box(0).Checked Then ocvb.result2 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         check.Dispose()
     End Sub
 End Class
@@ -373,10 +373,10 @@ Public Class FloodFill_Projection
     Public minFloodSize As Integer
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 5000, 2500)
-        sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar3(ocvb, "FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar4(ocvb, "Step Size", 1, ocvb.color.Width / 2, 20)
+        sliders.setupTrackBar1(ocvb, callerName, "FloodFill Minimum Size", 1, 5000, 2500)
+        sliders.setupTrackBar2(ocvb, callerName, "FloodFill LoDiff", 1, 255, 5)
+        sliders.setupTrackBar3(ocvb, callerName,"FloodFill HiDiff", 1, 255, 5)
+        sliders.setupTrackBar4(ocvb, callerName,  "Step Size", 1, ocvb.color.Width / 2, 20)
         
         ocvb.label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are."
@@ -415,6 +415,6 @@ Public Class FloodFill_Projection
             ocvb.label2 = CStr(objectRects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class

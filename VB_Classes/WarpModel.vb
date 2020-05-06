@@ -10,7 +10,7 @@ Public Class WarpModel_Input
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, 12)
+        radio.Setup(ocvb, callerName,12)
         radio.check(0).Text = "building.jpg"
         radio.check(1).Text = "church.jpg"
         radio.check(2).Text = "emir.jpg"
@@ -25,7 +25,7 @@ Public Class WarpModel_Input
         radio.check(11).Text = "Valley.jpg"
         radio.check(9).Checked = True
         
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Use Gradient in WarpInput"
         
         sobel = New Edges_Sobel(ocvb, "WarpModel_Input")
@@ -58,7 +58,7 @@ Public Class WarpModel_Input
         ocvb.result1(r(0)) = rgb(0).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result2(r(0)) = merged
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         radio.Dispose()
         sobel.Dispose()
         check.Dispose()
@@ -101,7 +101,7 @@ Public Class WarpModel_FindTransformECC_CPP
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         cPtr = WarpModel_Open()
 
-        radio.Setup(ocvb, 4)
+        radio.Setup(ocvb, callerName,4)
         radio.check(0).Text = "Motion_Translation (fastest)"
         radio.check(1).Text = "Motion_Euclidean"
         radio.check(2).Text = "Motion_Affine (very slow - Use CPP_Classes in Release Mode)"
@@ -171,7 +171,7 @@ Public Class WarpModel_FindTransformECC_CPP
         End If
         ocvb.putText(New ActiveClass.TrueType(outStr, aligned.Width + 10, 220, RESULT1))
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         WarpModel_Close(cPtr)
         radio.Dispose()
         input.Dispose()
@@ -217,7 +217,7 @@ Public Class WarpModel_AlignImages
                                               "Other than that, images look the same." + vbCrLf +
                                               "Displacement increases with Sobel" + vbCrLf + "kernel size", merged.Width + 10, 100, RESULT1))
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         ecc.Dispose()
     End Sub
 End Class

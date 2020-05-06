@@ -21,7 +21,7 @@ Public Class RecursiveBilateralFilter_CPP
     Dim rbf As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "RBF Recursion count", 1, 20, 2)
+        sliders.setupTrackBar1(ocvb, callerName, "RBF Recursion count", 1, 20, 2)
         
         ReDim srcData(ocvb.color.Total * ocvb.color.ElemSize - 1)
 
@@ -38,7 +38,7 @@ Public Class RecursiveBilateralFilter_CPP
         Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
         ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, dstData)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         RecursiveBilateralFilter_Close(rbf)
             End Sub
 End Class

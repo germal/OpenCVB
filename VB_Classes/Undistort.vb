@@ -66,17 +66,17 @@ Public Class Undistort_Basics
     Dim stereo_cy As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "undistort intrinsics Left", 1, 200, 100)
+        sliders.setupTrackBar1(ocvb, callerName, "undistort intrinsics Left", 1, 200, 100)
 
         If ocvb.parms.cameraIndex = T265Camera Then
-            sliders.setupTrackBar2(ocvb, "undistort intrinsics coeff's", -100000, 100000, 100)
+            sliders.setupTrackBar2(ocvb, callerName, "undistort intrinsics coeff's", -100000, 100000, 100)
         Else
-            sliders.setupTrackBar2(ocvb, "undistort intrinsics coeff's", -1000, 1000, 100)
+            sliders.setupTrackBar2(ocvb, callerName, "undistort intrinsics coeff's", -1000, 1000, 100)
         End If
-        sliders.setupTrackBar3(ocvb, "undistort stereo height", 1, ocvb.color.Height, ocvb.color.Height)
-        sliders.setupTrackBar4(ocvb, "undistort Offset left/right", 1, 200, 112)
+        sliders.setupTrackBar3(ocvb, callerName,"undistort stereo height", 1, ocvb.color.Height, ocvb.color.Height)
+        sliders.setupTrackBar4(ocvb, callerName,  "undistort Offset left/right", 1, 200, 112)
         
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Restore Original matrices"
         check.Box(0).Checked = True
         
@@ -130,6 +130,6 @@ Public Class Undistort_Basics
         ocvb.result1 = ocvb.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
         ocvb.result2 = ocvb.color.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class

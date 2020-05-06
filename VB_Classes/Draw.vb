@@ -18,7 +18,7 @@ Public Class Draw_rectangles
     Public drawRotatedRectangles As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Rectangle Count", 1, 255, 3)
+        sliders.setupTrackBar1(ocvb, callerName, "Rectangle Count", 1, 255, 3)
                 ocvb.desc = "Draw the requested number of rotated rectangles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -41,7 +41,7 @@ Public Class Draw_rectangles
             Next
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -54,8 +54,8 @@ Public Class Draw_Noise
     Public noiseMask As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Noise Count", 1, 1000, 100)
-        sliders.setupTrackBar2(ocvb, "Noise Width", 1, 10, 3)
+        sliders.setupTrackBar1(ocvb, callerName, "Noise Count", 1, 1000, 100)
+        sliders.setupTrackBar2(ocvb, callerName, "Noise Width", 1, 10, 3)
                 ocvb.desc = "Add Noise to the color image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -73,7 +73,7 @@ Public Class Draw_Noise
             noiseMask.Circle(center, noiseWidth, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -91,7 +91,7 @@ Public Class Draw_rotatedRectangles
     Public Sub Run(ocvb As AlgorithmData)
         rect.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         rect.Dispose()
     End Sub
 End Class
@@ -103,7 +103,7 @@ Public Class Draw_Ellipses
         Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Ellipse Count", 1, 255, 3)
+        sliders.setupTrackBar1(ocvb, callerName, "Ellipse Count", 1, 255, 3)
                 ocvb.desc = "Draw the requested number of ellipses."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -118,7 +118,7 @@ Public Class Draw_Ellipses
             Next
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -129,7 +129,7 @@ Public Class Draw_Circles
         Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Circle Count", 1, 255, 3)
+        sliders.setupTrackBar1(ocvb, callerName, "Circle Count", 1, 255, 3)
                 ocvb.desc = "Draw the requested number of circles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -143,7 +143,7 @@ Public Class Draw_Circles
             Next
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -154,7 +154,7 @@ Public Class Draw_Line
         Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Line Count", 1, 255, 1)
+        sliders.setupTrackBar1(ocvb, callerName, "Line Count", 1, 255, 1)
                 ocvb.desc = "Draw the requested number of Lines."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -168,7 +168,7 @@ Public Class Draw_Line
             ocvb.result1.Line(nPoint1, nPoint2, nextColor, thickness, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -179,11 +179,11 @@ Public Class Draw_Polygon
         Public updateFrequency = 30
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Poly Count", 1, 255, 1)
+        sliders.setupTrackBar1(ocvb, callerName, "Poly Count", 1, 255, 1)
                 ocvb.desc = "Draw Polygon figures"
         ocvb.label2 = "Convex Hull for the same polygon"
 
-        radio.Setup(ocvb, 2) ' ask for 2 radio buttons
+        radio.Setup(ocvb, callerName,2) ' ask for 2 radio buttons
         radio.check(0).Text = "Polygon Outline"
         radio.check(1).Text = "Polygon Filled"
         radio.check(0).Checked = True
@@ -224,7 +224,7 @@ Public Class Draw_Polygon
         Next
         'End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 radio.Dispose()
     End Sub
 End Class
@@ -270,7 +270,7 @@ Public Class Draw_RngImage
             End Select
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -282,12 +282,12 @@ Public Class Draw_SymmetricalShapes
     Inherits VB_Class
             Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Number of points", 200, 1000, 500)
-        sliders.setupTrackBar2(ocvb, "Radius 1", 1, ocvb.color.Height / 2, ocvb.color.Height / 4)
-        sliders.setupTrackBar3(ocvb, "Radius 2", 1, ocvb.color.Height / 2, ocvb.color.Height / 8)
-        sliders.setupTrackBar4(ocvb, "nGenPer", 1, 500, 100)
+        sliders.setupTrackBar1(ocvb, callerName, "Number of points", 200, 1000, 500)
+        sliders.setupTrackBar2(ocvb, callerName, "Radius 1", 1, ocvb.color.Height / 2, ocvb.color.Height / 4)
+        sliders.setupTrackBar3(ocvb, callerName,"Radius 2", 1, ocvb.color.Height / 2, ocvb.color.Height / 8)
+        sliders.setupTrackBar4(ocvb, callerName,  "nGenPer", 1, 500, 100)
         
-        check.Setup(ocvb, 5)
+        check.Setup(ocvb, callerName,  5)
         check.Box(0).Text = "Symmetric Ripple"
         check.Box(1).Text = "Only Regular Shapes"
         check.Box(2).Text = "Filled Shapes"
@@ -345,7 +345,7 @@ Public Class Draw_SymmetricalShapes
 
         If check.Box(2).Checked Then ocvb.result1.FloodFill(center, fillColor)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 check.Dispose()
     End Sub
 End Class

@@ -779,8 +779,11 @@ Public Class OpenCVB
             saveLayout()
         End If
 
+        Static changeCameras As Integer
+        If AvailableAlgorithms.Items.Count = 1 Then changeCameras += 1
         ' after sweeping through low and high resolution, sweep through the cameras as well...
-        If (AlgorithmTestCount Mod (AvailableAlgorithms.Items.Count * 2) = 0 And AlgorithmTestCount > 0) Or AvailableAlgorithms.Items.Count = 1 Then
+        If (AlgorithmTestCount Mod (AvailableAlgorithms.Items.Count * 2) = 0 And AlgorithmTestCount > 0) Or changeCameras >= 2 Then
+            changeCameras = 0
             Dim cameraIndex = optionsForm.cameraIndex
             Dim saveCameraIndex = optionsForm.cameraIndex
             cameraIndex += 1
@@ -803,7 +806,11 @@ Public Class OpenCVB
         If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
             AvailableAlgorithms.SelectedIndex += 1
         Else
-            AvailableAlgorithms.SelectedIndex = 0
+            If AvailableAlgorithms.Items.Count = 1 Then ' selection index won't change if there is only one algorithm in the list.
+                StartAlgorithmTask()
+            Else
+                AvailableAlgorithms.SelectedIndex = 0
+            End If
         End If
     End Sub
 

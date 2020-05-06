@@ -3,8 +3,8 @@ Public Class Encode_Basics
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
-        sliders.setupTrackBar2(ocvb, "Encode Output Scaling", 1, 100, 7)
+        sliders.setupTrackBar1(ocvb, callerName, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
+        sliders.setupTrackBar2(ocvb, callerName, "Encode Output Scaling", 1, 100, 7)
         
         ocvb.desc = "Error Level Analysis - to verify a jpg image has not been modified."
         ocvb.label1 = "absDiff with original"
@@ -25,7 +25,7 @@ Public Class Encode_Basics
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
         ocvb.label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -35,10 +35,10 @@ Public Class Encode_Options
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
-        sliders.setupTrackBar2(ocvb, "Encode Output Scaling", 1, 100, 85)
+        sliders.setupTrackBar1(ocvb, callerName, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
+        sliders.setupTrackBar2(ocvb, callerName, "Encode Output Scaling", 1, 100, 85)
         
-        radio.Setup(ocvb, 6)
+        radio.Setup(ocvb, callerName,6)
         radio.check(0).Text = "JpegChromaQuality"
         radio.check(1).Text = "JpegLumaQuality"
         radio.check(2).Text = "JpegOptimize"
@@ -82,7 +82,7 @@ Public Class Encode_Options
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
         ocvb.label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 radio.Dispose()
     End Sub
 End Class

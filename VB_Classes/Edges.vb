@@ -9,9 +9,9 @@ Public Class Edges_Canny
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Canny threshold1", 1, 255, 50)
-        sliders.setupTrackBar2(ocvb, "Canny threshold2", 1, 255, 50)
-        sliders.setupTrackBar3(ocvb, "Canny Aperture", 3, 7, 3)
+        sliders.setupTrackBar1(ocvb, callerName, "Canny threshold1", 1, 255, 50)
+        sliders.setupTrackBar2(ocvb, callerName, "Canny threshold2", 1, 255, 50)
+        sliders.setupTrackBar3(ocvb, callerName,"Canny Aperture", 3, 7, 3)
         
         ocvb.desc = "Show canny edge detection with varying thresholds"
         ocvb.label1 = "Canny using L1 Norm"
@@ -32,7 +32,7 @@ Public Class Edges_Canny
             dst = src.Canny(threshold1, threshold2, aperture, False)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -74,7 +74,7 @@ Public Class Edges_CannyAndShadow
         dilate.Run(ocvb)
         ocvb.result1.SetTo(0, shadow.holeMask)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         canny.Dispose()
         shadow.Dispose()
         dilate.Dispose()
@@ -87,8 +87,8 @@ Public Class Edges_Laplacian
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Gaussian Kernel", 1, 32, 7)
-        sliders.setupTrackBar2(ocvb, "Laplacian Kernel", 1, 32, 5)
+        sliders.setupTrackBar1(ocvb, callerName, "Gaussian Kernel", 1, 32, 7)
+        sliders.setupTrackBar2(ocvb, callerName, "Laplacian Kernel", 1, 32, 5)
                 ocvb.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -112,7 +112,7 @@ Public Class Edges_Laplacian
         cv.Cv2.CvtColor(abs_dst, ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "Laplacian of Depth Image"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -134,7 +134,7 @@ Public Class Edges_Scharr
         xyField.ConvertTo(gray, cv.MatType.CV_8U, 0.5)
         ocvb.result1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -145,13 +145,13 @@ Public Class Edges_Preserving
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, 2)
+        radio.Setup(ocvb, callerName,2)
         radio.check(0).Text = "Edge RecurseFilter"
         radio.check(1).Text = "Edge NormconvFilter"
         radio.check(0).Checked = True
         
-        sliders.setupTrackBar1(ocvb, "Edge Sigma_s", 0, 200, 10)
-        sliders.setupTrackBar2(ocvb, "Edge Sigma_r", 1, 100, 40)
+        sliders.setupTrackBar1(ocvb, callerName, "Edge Sigma_s", 0, 200, 10)
+        sliders.setupTrackBar2(ocvb, callerName, "Edge Sigma_r", 1, 100, 40)
         
         ocvb.desc = "OpenCV's edge preserving filter."
     End Sub
@@ -169,7 +169,7 @@ Public Class Edges_Preserving
             cv.Cv2.EdgePreservingFilter(ocvb.RGBDepth, ocvb.result2, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         radio.Dispose()
             End Sub
 End Class
@@ -197,7 +197,7 @@ Public Class Edges_RandomForest_CPP
     Dim EdgesPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Edges RF Threshold", 1, 255, 35)
+        sliders.setupTrackBar1(ocvb, callerName, "Edges RF Threshold", 1, 255, 35)
         
         ocvb.desc = "Detect edges using structured forests - Opencv Contrib"
         ocvb.label1 = "Detected Edges"
@@ -230,7 +230,7 @@ Public Class Edges_RandomForest_CPP
             ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, dstData).Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         Edges_RandomForest_Close(EdgesPtr)
             End Sub
 End Class
@@ -247,7 +247,7 @@ Public Class Edges_Sobel
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Sobel kernel Size", 1, 32, 3)
+        sliders.setupTrackBar1(ocvb, callerName, "Sobel kernel Size", 1, 32, 3)
                 ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -264,7 +264,7 @@ Public Class Edges_Sobel
         cv.Cv2.AddWeighted(abs_grayX, 0.5, abs_grayY, 0.5, 0, dst)
         If externalUse = False Then ocvb.result1 = dst
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -296,7 +296,7 @@ Public Class Edges_LeftView
         sobel.Run(ocvb)
         ocvb.result1 = sobel.dst
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         red.Dispose()
         sobel.Dispose()
     End Sub
@@ -310,9 +310,9 @@ Public Class Edges_ResizeAdd
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Border Vertical in Pixels", 1, 20, 5)
-        sliders.setupTrackBar2(ocvb, "Border Horizontal in Pixels", 1, 20, 5)
-        sliders.setupTrackBar3(ocvb, "Threshold for Pixel Difference", 1, 50, 16)
+        sliders.setupTrackBar1(ocvb, callerName, "Border Vertical in Pixels", 1, 20, 5)
+        sliders.setupTrackBar2(ocvb, callerName, "Border Horizontal in Pixels", 1, 20, 5)
+        sliders.setupTrackBar3(ocvb, callerName,"Threshold for Pixel Difference", 1, 50, 16)
         
         ocvb.desc = "Find edges using a resize, subtract, and threshold."
         ocvb.label1 = ""
@@ -326,7 +326,7 @@ Public Class Edges_ResizeAdd
         ocvb.result1 = ocvb.result1.Threshold(sliders.TrackBar3.Value, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.Add(gray, ocvb.result1, ocvb.result2)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -337,8 +337,8 @@ Public Class Edges_DCTfrequency
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 32)
-        sliders.setupTrackBar2(ocvb, "Threshold after Removal", 1, 255, 20)
+        sliders.setupTrackBar1(ocvb, callerName, "Remove Frequencies < x", 0, 100, 32)
+        sliders.setupTrackBar2(ocvb, callerName, "Threshold after Removal", 1, 255, 20)
         
         ocvb.desc = "Find edges by removing all the highest frequencies."
     End Sub
@@ -357,7 +357,7 @@ Public Class Edges_DCTfrequency
         src32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC1, 255)
         ocvb.result2 = ocvb.result1.Threshold(sliders.TrackBar2.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -387,8 +387,8 @@ Public Class Edges_Deriche_CPP
         Dim Edges_Deriche As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Deriche Alpha", 1, 400, 100)
-        sliders.setupTrackBar2(ocvb, "Deriche Omega", 1, 1000, 100)
+        sliders.setupTrackBar1(ocvb, callerName, "Deriche Alpha", 1, 400, 100)
+        sliders.setupTrackBar2(ocvb, callerName, "Deriche Omega", 1, 1000, 100)
                 Edges_Deriche = Edges_Deriche_Open()
         ocvb.desc = "Edge detection using the Deriche X and Y gradients"
     End Sub
@@ -408,7 +408,7 @@ Public Class Edges_Deriche_CPP
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         Edges_Deriche_Close(Edges_Deriche)
     End Sub
 End Class

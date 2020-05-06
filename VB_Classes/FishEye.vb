@@ -43,7 +43,7 @@ Public Class FishEye_Rectified
             ocvb.result2 = rightView
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -67,6 +67,6 @@ Public Class FishEye_Raw
         ocvb.result1 = ocvb.leftView
         ocvb.result2 = ocvb.rightView
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

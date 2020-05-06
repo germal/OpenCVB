@@ -28,7 +28,7 @@ Public Class Face_Haar_LBP
         ocvb.result2 = ocvb.color.Clone()
         detectFace(ocvb.result2, lbpCascade)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -47,7 +47,7 @@ Public Class Face_Haar_Alt
         ocvb.result1 = ocvb.color.Clone()
         detectFace(ocvb.result1, haarCascade)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 

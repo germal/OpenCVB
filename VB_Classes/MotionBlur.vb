@@ -6,8 +6,8 @@ Public Class MotionBlur_Basics
     Public showDirection As Boolean = True
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Motion Blur Length", 1, 101, 51)
-        sliders.setupTrackBar2(ocvb, "Motion Blur Angle", -90, 90, 0)
+        sliders.setupTrackBar1(ocvb, callerName, "Motion Blur Length", 1, 101, 51)
+        sliders.setupTrackBar2(ocvb, callerName, "Motion Blur Angle", -90, 90, 0)
                 ocvb.desc = "Use Filter2D to create a motion blur"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -29,7 +29,7 @@ Public Class MotionBlur_Basics
         pt2 += New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
         If showDirection Then ocvb.result1.Line(pt1, pt2, cv.Scalar.Yellow, 5, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -124,16 +124,16 @@ Public Class MotionBlur_Deblur
     End Function
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Redo motion blurred image"
         
         mblur = New MotionBlur_Basics(ocvb, "MotionBlur_Deblur")
         ResetBlurredImage(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "Deblur Restore Vector", 1, mblur.sliders.TrackBar1.Maximum, 10)
-        sliders.setupTrackBar2(ocvb, "Deblur Angle of Restore Vector", mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum, 0)
-        sliders.setupTrackBar3(ocvb, "Deblur Signal to Noise Ratio", 1, 1000, 700)
-        sliders.setupTrackBar4(ocvb, "Deblur Gamma", 1, 100, 5)
+        sliders.setupTrackBar1(ocvb, callerName, "Deblur Restore Vector", 1, mblur.sliders.TrackBar1.Maximum, 10)
+        sliders.setupTrackBar2(ocvb, callerName, "Deblur Angle of Restore Vector", mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum, 0)
+        sliders.setupTrackBar3(ocvb, callerName,"Deblur Signal to Noise Ratio", 1, 1000, 700)
+        sliders.setupTrackBar4(ocvb, callerName,  "Deblur Gamma", 1, 100, 5)
         
         ocvb.desc = "Deblur a motion blurred image"
         ocvb.label1 = "Blurred Image Input"
@@ -168,7 +168,7 @@ Public Class MotionBlur_Deblur
         imgOut.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
         ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 check.Dispose()
         mblur.Dispose()
     End Sub

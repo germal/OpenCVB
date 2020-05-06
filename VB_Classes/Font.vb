@@ -23,7 +23,7 @@ Public Class Font_OpenCV
             cv.Cv2.PutText(ocvb.result2, hersheyName + " " + Format(size, "#0.0"), New cv.Point(10, 30 + i * 30), hersheyFontItalics, size, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -48,7 +48,7 @@ Public Class Font_TrueType
                                               "Use 'ocvb.putText' with 'ocvb.fontName' and 'ocvb.fontSize' to exploit global font.",
                                               10, 50, "Times New Roman", 10, RESULT1))
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         font.Dispose()
     End Sub
 End Class
@@ -91,6 +91,6 @@ Public Class Font_FlowText
         End If
         lastCount = msgs.Count
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

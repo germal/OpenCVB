@@ -23,9 +23,9 @@ Public Class Retina_Basics_CPP
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Retina Sample Factor", 1, 10, 2)
+        sliders.setupTrackBar1(ocvb, callerName, "Retina Sample Factor", 1, 10, 2)
         
-        check.Setup(ocvb, 2)
+        check.Setup(ocvb, callerName,  2)
         check.Box(0).Text = "Use log sampling"
         check.Box(1).Text = "Open resulting xml file"
                 ocvb.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
@@ -75,7 +75,7 @@ Public Class Retina_Basics_CPP
             ocvb.result2 = magno.Resize(src.Size())
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         Retina_Basics_Close(Retina)
         check.Dispose()
     End Sub
@@ -106,7 +106,7 @@ Public Class Retina_Depth
         cv.Cv2.BitwiseOr(lastMotion, ocvb.result2, ocvb.result1)
         lastMotion = ocvb.result2
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         retina.Dispose()
     End Sub
 End Class

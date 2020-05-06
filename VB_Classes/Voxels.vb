@@ -9,7 +9,7 @@ Public Class Voxels_Basics_MT
     Public maxDepth As Double
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Display intermediate results"
         check.Box(0).Checked = True
         
@@ -17,7 +17,7 @@ Public Class Voxels_Basics_MT
         trim.externalUse = True
         trim.sliders.TrackBar2.Value = 5000
 
-        sliders.setupTrackBar1(ocvb, "Histogram Bins", 2, 200, 100)
+        sliders.setupTrackBar1(ocvb, callerName, "Histogram Bins", 2, 200, 100)
         
         grid = New Thread_Grid(ocvb, "Voxels_Basics_MT")
         grid.sliders.TrackBar1.Value = 16
@@ -73,7 +73,7 @@ Public Class Voxels_Basics_MT
             End Sub)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         grid.Dispose()
                 trim.Dispose()
         check.Dispose()

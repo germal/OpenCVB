@@ -5,7 +5,7 @@ Public Class FAST_Basics
         Public keypoints() As cv.KeyPoint
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Threshold", 0, 200, 15)
+        sliders.setupTrackBar1(ocvb, callerName, "Threshold", 0, 200, 15)
                 ocvb.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
         ocvb.label1 = "FAST_Basics nonMax = true"
     End Sub
@@ -18,7 +18,7 @@ Public Class FAST_Basics
             ocvb.result1.Circle(kp.Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
         Next kp
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -54,7 +54,7 @@ Public Class FAST_Centroid
             ocvb.result2.Circle(New cv.Point(kalman.dst(0), kalman.dst(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         fast.Dispose()
         kalman.Dispose()
     End Sub

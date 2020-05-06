@@ -28,10 +28,10 @@ Public Class Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         src = ocvb.color
-        sliders.setupTrackBar1(ocvb, "ThreadGrid Width", 5, src.Width, 32)
-        sliders.setupTrackBar2(ocvb, "ThreadGrid Height", 5, src.Height, 32)
-        sliders.setupTrackBar3(ocvb, "ThreadGrid Border", 0, 20, 0)
-                roiList = New List(Of cv.Rect)
+        sliders.setupTrackBar1(ocvb, callerName, "ThreadGrid Width", 5, src.Width, 32)
+        sliders.setupTrackBar2(ocvb, callerName, "ThreadGrid Height", 5, src.Height, 32)
+        sliders.setupTrackBar3(ocvb, callerName, "ThreadGrid Border", 0, 20, 0)
+        roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)
         gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
         ocvb.desc = "Create a grid for use with parallel.ForEach."
@@ -97,7 +97,7 @@ Public Class Thread_Grid
                           CStr(roiList(0).Width) + "X" + CStr(roiList(0).Height) + " regions"
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 gridMask.Dispose()
     End Sub
 End Class

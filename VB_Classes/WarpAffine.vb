@@ -89,7 +89,7 @@ Public Class WarpAffine_Captcha
         Dim roi As New cv.Rect(0, ocvb.color.Height / 2 - charHeight / 2, ocvb.result1.Cols, charHeight)
         ocvb.result1(roi) = outImage.Resize(New cv.Size(ocvb.result1.Cols, charHeight))
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -101,9 +101,9 @@ Public Class WarpAffine_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Angle", 0, 360, 10)
+        sliders.setupTrackBar1(ocvb, callerName, "Angle", 0, 360, 10)
 
-        SetInterpolationRadioButtons(ocvb, radio, "WarpAffine")
+        SetInterpolationRadioButtons(ocvb, callerName, radio, "WarpAffine")
 
         ocvb.desc = "Use WarpAffine to transform input images."
     End Sub
@@ -120,7 +120,7 @@ Public Class WarpAffine_Basics
         ocvb.label1 = "Rotated with Warpaffine with angle: " + CStr(angle)
         ocvb.label2 = "Rotated back with inverse Warpaffine angle: " + CStr(-angle)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         radio.Dispose()
     End Sub
 End Class
@@ -197,7 +197,7 @@ Public Class WarpAffine_3Points
                                               Format(M.Get(Of Double)(1, 1), "#0.00") + vbTab +
                                               Format(M.Get(Of Double)(1, 2), "#0.00"), 10, ttStart, RESULT2))
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         triangle.Dispose()
     End Sub
 End Class
@@ -265,7 +265,7 @@ Public Class WarpAffine_4Points
         center = New cv.Point2f(50, ocvb.color.Height / 2)
         ocvb.result1.Circle(center, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         rect.Dispose()
     End Sub
 End Class

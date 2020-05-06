@@ -89,7 +89,7 @@ Public Class ML_FillRGBDepth_MT
         ocvb.result1 = colorizer.dst.Clone()
         ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         shadow.Dispose()
         grid.Dispose()
         colorizer.Dispose()
@@ -106,7 +106,7 @@ Public Class ML_FillRGBDepth
         colorizer = New Depth_Colorizer_CPP(ocvb, "ML_FillRGBDepth")
         colorizer.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, "ML Min Learn Count", 2, 100, 5)
+        sliders.setupTrackBar1(ocvb, callerName, "ML Min Learn Count", 2, 100, 5)
         
         shadow = New Depth_Holes(ocvb, "ML_FillRGBDepth")
         shadow.sliders.TrackBar1.Value = 3
@@ -124,7 +124,7 @@ Public Class ML_FillRGBDepth
         colorizer.Run(ocvb)
         ocvb.result2 = colorizer.dst
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         shadow.Dispose()
                 colorizer.Dispose()
     End Sub
@@ -145,7 +145,7 @@ Public Class ML_DepthFromColor_MT
         dilate.externalUse = True
         dilate.sliders.TrackBar2.Value = 2
 
-        sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 500, 5000, 1000)
+        sliders.setupTrackBar1(ocvb, callerName, "Prediction Max Depth", 500, 5000, 1000)
         
         grid = New Thread_Grid(ocvb, "ML_DepthFromColor_MT")
         grid.sliders.TrackBar1.Value = 16
@@ -196,7 +196,7 @@ Public Class ML_DepthFromColor_MT
         colorizer.Run(ocvb)
         ocvb.result1 = colorizer.dst
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 dilate.Dispose()
         grid.Dispose()
         colorizer.Dispose()
@@ -221,7 +221,7 @@ Public Class ML_DepthFromColor
 
         shadow = New Depth_Holes(ocvb, "ML_DepthFromColor")
 
-        sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 1000, 5000, 1500)
+        sliders.setupTrackBar1(ocvb, callerName, "Prediction Max Depth", 1000, 5000, 1500)
         
         resized = New Resize_Percentage(ocvb, "ML_DepthFromColor")
         resized.externalUse = True
@@ -281,7 +281,7 @@ Public Class ML_DepthFromColor
         ocvb.label1 = "Predicted Depth"
         ocvb.label2 = "shadow, empty, Depth Mask < " + CStr(sliders.TrackBar1.Value) + ", Learn Input"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 shadow.Dispose()
         mats.Dispose()
         resized.Dispose()
@@ -307,7 +307,7 @@ Public Class ML_DepthFromXYColor
 
         shadow = New Depth_Holes(ocvb, "ML_DepthFromXYColor")
 
-        sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 1000, 5000, 1500)
+        sliders.setupTrackBar1(ocvb, callerName, "Prediction Max Depth", 1000, 5000, 1500)
         
         resized = New Resize_Percentage(ocvb, "ML_DepthFromXYColor")
         resized.externalUse = True
@@ -384,7 +384,7 @@ Public Class ML_DepthFromXYColor
         ocvb.result2 = mats.dst
         ocvb.label2 = "shadow, empty, Depth Mask < " + CStr(sliders.TrackBar1.Value) + ", Learn Input"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 shadow.Dispose()
         mats.Dispose()
         resized.Dispose()
@@ -409,7 +409,7 @@ Public Class ML_EdgeDepth
         dilate.externalUse = True
         dilate.sliders.TrackBar2.Value = 5
 
-        sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 500, 5000, 1000)
+        sliders.setupTrackBar1(ocvb, callerName, "Prediction Max Depth", 500, 5000, 1000)
         
         grid = New Thread_Grid(ocvb, "ML_EdgeDepth")
         grid.sliders.TrackBar1.Value = 16
@@ -460,7 +460,7 @@ Public Class ML_EdgeDepth
         colorizer.Run(ocvb)
         ocvb.result2 = colorizer.dst
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 dilate.Dispose()
         grid.Dispose()
         colorizer.Dispose()

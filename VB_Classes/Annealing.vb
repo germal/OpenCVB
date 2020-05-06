@@ -106,7 +106,7 @@ Public Class Annealing_Basics_CPP
             closed = True
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         Annealing_Basics_Close(saPtr)
     End Sub
 End Class
@@ -161,10 +161,10 @@ Public Class Annealing_CPP_MT
         mats = New Mat_4to1(ocvb, "Annealing_CPP_MT")
         mats.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, "Anneal Number of Cities", 5, 500, 25)
-        sliders.setupTrackBar2(ocvb, "Success = top X threads agree on energy level.", 2, anneal.Count, anneal.Count)
+        sliders.setupTrackBar1(ocvb, callerName, "Anneal Number of Cities", 5, 500, 25)
+        sliders.setupTrackBar2(ocvb, callerName, "Success = top X threads agree on energy level.", 2, anneal.Count, anneal.Count)
 
-        check.Setup(ocvb, 3)
+        check.Setup(ocvb, callerName, 3)
         check.Box(0).Text = "Restart TravelingSalesman"
         check.Box(1).Text = "Copy Best Intermediate solutions (top half) to Bottom Half"
         check.Box(1).Checked = True
@@ -238,7 +238,7 @@ Public Class Annealing_CPP_MT
 
         If allClosed Then setup(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         random.Dispose()
         mats.Dispose()
         flow.Dispose()
@@ -264,7 +264,7 @@ Public Class Annealing_Options
         random.externalUse = True
         random.Run(ocvb) ' get the city positions (may or may not be used below.)
 
-        check.Setup(ocvb, 2)
+        check.Setup(ocvb, callerName, 2)
         check.Box(0).Text = "Restart TravelingSalesman"
         check.Box(1).Text = "Circular pattern of cities (allows you to visually check if successful.)"
         check.Box(1).Checked = True
@@ -315,7 +315,7 @@ Public Class Annealing_Options
         flow.msgs.Add(anneal.msg)
         flow.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         flow.Dispose()
         check.Dispose()
         anneal.Dispose()

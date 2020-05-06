@@ -6,8 +6,8 @@ Public Class Resize_Basics
     Public dst As New cv.Mat
     Public newSize As cv.Size
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        SetInterpolationRadioButtons(ocvb, radio, "Resize")
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        SetInterpolationRadioButtons(ocvb, callerName, radio, "Resize")
         ' warp is not allowed in resize
         radio.check(5).Enabled = False
         radio.check(6).Enabled = False
@@ -31,7 +31,7 @@ Public Class Resize_Basics
             dst = src.Resize(newSize, 0, 0, resizeFlag)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         radio.Dispose()
     End Sub
 End Class
@@ -47,7 +47,7 @@ Public Class Resize_After8uc3
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         colorizer = New Depth_Colorizer_CPP(ocvb, "Resize_After8uc3")
         colorizer.externalUse = True
-        SetInterpolationRadioButtons(ocvb, radio, "Resize")
+        SetInterpolationRadioButtons(ocvb, callerName, radio, "Resize")
         ' warp is not allowed in resize
         radio.check(5).Enabled = False
         radio.check(6).Enabled = False
@@ -73,7 +73,7 @@ Public Class Resize_After8uc3
         colorizer.Run(ocvb)
         ocvb.result1 = colorizer.dst
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         radio.Dispose()
         colorizer.Dispose()
     End Sub
@@ -95,7 +95,7 @@ Public Class Resize_Percentage
         resizeOptions = New Resize_Basics(ocvb, "Resize_Percentage")
         resizeOptions.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, "Resize Percentage (%)", 1, 100, 3)
+        sliders.setupTrackBar1(ocvb, callerName, "Resize Percentage (%)", 1, 100, 3)
         
         ocvb.desc = "Resize by a percentage of the image."
     End Sub
@@ -117,7 +117,7 @@ Public Class Resize_Percentage
             dst = resizeOptions.dst
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         resizeOptions.Dispose()
             End Sub
 End Class

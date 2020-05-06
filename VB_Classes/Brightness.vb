@@ -4,8 +4,8 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Clip Limit", 1, 100, 10)
-        sliders.setupTrackBar2(ocvb, "Grid Size", 1, 100, 8)
+        sliders.setupTrackBar1(ocvb, callerName, "Clip Limit", 1, 100, 10)
+        sliders.setupTrackBar2(ocvb, callerName, "Grid Size", 1, 100, 8)
         ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -25,7 +25,7 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
         cv.Cv2.CvtColor(imgGray, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.CvtColor(imgClahe, ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -35,8 +35,8 @@ Public Class Brightness_Contrast
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Brightness", 1, 100, 50)
-        sliders.setupTrackBar2(ocvb, "Contrast", 1, 100, 50)
+        sliders.setupTrackBar1(ocvb, callerName, "Brightness", 1, 100, 50)
+        sliders.setupTrackBar2(ocvb, callerName, "Contrast", 1, 100, 50)
         ocvb.desc = "Show image with vary contrast and brightness."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -44,7 +44,7 @@ Public Class Brightness_Contrast
         ocvb.label1 = "Brightness/Contrast"
         ocvb.label2 = ""
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -67,7 +67,7 @@ Public Class Brightness_hue
         cv.Cv2.CvtColor(hsv_planes(0), ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.CvtColor(hsv_planes(1), ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -78,13 +78,13 @@ Public Class Brightness_AlphaBeta
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use alpha and beta with ConvertScaleAbs."
-        sliders.setupTrackBar1(ocvb, "Brightness Alpha (contrast)", 0, 500, 300)
-        sliders.setupTrackBar2(ocvb, "Brightness Beta (brightness)", -100, 100, 0)
+        sliders.setupTrackBar1(ocvb, callerName, "Brightness Alpha (contrast)", 0, 500, 300)
+        sliders.setupTrackBar2(ocvb, callerName, "Brightness Beta (brightness)", -100, 100, 0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1 = ocvb.color.ConvertScaleAbs(sliders.TrackBar1.Value / 500, sliders.TrackBar2.Value)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -97,7 +97,7 @@ Public Class Brightness_Gamma
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use gamma with ConvertScaleAbs."
-        sliders.setupTrackBar1(ocvb, "Brightness Gamma correction", 0, 200, 100)
+        sliders.setupTrackBar1(ocvb, callerName, "Brightness Gamma correction", 0, 200, 100)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static lastGamma As Int32 = -1
@@ -109,7 +109,7 @@ Public Class Brightness_Gamma
         End If
         ocvb.result1 = ocvb.color.LUT(lookupTable)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -138,7 +138,7 @@ Public Class Brightness_WhiteBalance_CPP
     Dim wPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "White balance threshold X100", 1, 100, 10)
+        sliders.setupTrackBar1(ocvb, callerName, "White balance threshold X100", 1, 100, 10)
 
         wPtr = WhiteBalance_Open()
         ocvb.label1 = "Image with auto white balance"
@@ -159,7 +159,7 @@ Public Class Brightness_WhiteBalance_CPP
         diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         WhiteBalance_Close(wPtr)
     End Sub
 End Class
@@ -180,7 +180,7 @@ Public Class Brightness_WhiteBalance
         hist.maxRange = hist.bins
         hist.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, "White balance threshold X100", 1, 100, 10)
+        sliders.setupTrackBar1(ocvb, callerName, "White balance threshold X100", 1, 100, 10)
 
         ocvb.label1 = "Image with auto white balance"
         ocvb.label2 = "White pixels were altered from the original"
@@ -225,7 +225,7 @@ Public Class Brightness_WhiteBalance
         diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         WhiteBalance_Close(wPtr)
         hist.Dispose()
     End Sub

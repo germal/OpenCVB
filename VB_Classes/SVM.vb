@@ -5,17 +5,17 @@ Public Class SVM_Options
     Public SVMType = cv.ML.SVM.Types.CSvc
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "SampleCount", 10, 1000, 500)
-        sliders.setupTrackBar2(ocvb, "Granularity", 1, 50, 5)
+        sliders.setupTrackBar1(ocvb, callerName, "SampleCount", 10, 1000, 500)
+        sliders.setupTrackBar2(ocvb, callerName, "Granularity", 1, 50, 5)
 
-        radio.Setup(ocvb, 4)
+        radio.Setup(ocvb, callerName, 4)
         radio.check(0).Text = "kernel Type = Linear"
         radio.check(1).Text = "kernel Type = Poly"
         radio.check(2).Text = "kernel Type = RBF"
         radio.check(2).Checked = True
         radio.check(3).Text = "kernel Type = Sigmoid"
 
-        radio1.Setup(ocvb, 5)
+        radio1.Setup(ocvb, callerName, 5)
         radio1.check(0).Text = "SVM Type = CSvc"
         radio1.check(0).Checked = True
         radio1.check(1).Text = "SVM Type = EpsSvr"
@@ -121,7 +121,7 @@ Public Class SVM_Basics
             Next
         End Using
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         svmOptions.Dispose()
     End Sub
 End Class
@@ -219,7 +219,7 @@ Public Class SVM_Basics_MT
             ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
         End Using
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         svmOptions.Dispose()
         grid.Dispose()
     End Sub
@@ -299,7 +299,7 @@ Public Class SVM_Simple
             End If
         End Using
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         svmOptions.Dispose()
     End Sub
 End Class

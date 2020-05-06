@@ -21,8 +21,8 @@ Public Class Area_MinTriangle_CPP
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Area Number of Points", 1, 30, 5)
-        sliders.setupTrackBar2(ocvb, "Area size", 10, 300, 200)
+        sliders.setupTrackBar1(ocvb, callerName, "Area Number of Points", 1, 30, 5)
+        sliders.setupTrackBar2(ocvb, callerName, "Area size", 10, 300, 200)
                 setup(ocvb)
 
         ocvb.desc = "Find minimum containing triangle for a set of points."
@@ -53,7 +53,7 @@ Public Class Area_MinTriangle_CPP
             ocvb.result1.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -71,8 +71,8 @@ Public Class Area_MinRect
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Area Number of Points", 1, 200, 5)
-        sliders.setupTrackBar2(ocvb, "Area size", 10, 300, 200)
+        sliders.setupTrackBar1(ocvb, callerName, "Area Number of Points", 1, 200, 5)
+        sliders.setupTrackBar2(ocvb, callerName, "Area size", 10, 300, 200)
                 setup(ocvb)
 
         ocvb.desc = "Find minimum containing rectangle for a set of points."
@@ -91,7 +91,7 @@ Public Class Area_MinRect
         minRect = cv.Cv2.MinAreaRect(srcPoints)
         drawRotatedRectangle(minRect, ocvb.result1, cv.Scalar.Yellow)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -132,7 +132,7 @@ Public Class Area_MinMotionRect
         motionRectangles(gray, ocvb.result2, ocvb.rColors)
         ocvb.result2.SetTo(cv.Scalar.All(255), gray)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         input.Dispose()
     End Sub
 End Class
@@ -173,6 +173,6 @@ Public Class Area_FindNonZero
         Next
         ocvb.putText(New ActiveClass.TrueType(outstr, 10, 50, RESULT2))
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

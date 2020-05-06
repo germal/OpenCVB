@@ -44,7 +44,7 @@ Public Class Smoothing_Exterior
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.externalUse = True
 
-		sliders.setupTrackBar1(ocvb, "Smoothing iterations", 1, 20, 10)
+		sliders.setupTrackBar1(ocvb, callerName, "Smoothing iterations", 1, 20, 10)
 		
 		ocvb.label1 = "Original Points (white) Smoothed (yellow)"
 		ocvb.label2 = ""
@@ -62,7 +62,7 @@ Public Class Smoothing_Exterior
 		Dim smoothPoints = getSplineInterpolationCatmullRom(points, sliders.TrackBar1.Value)
 		If smoothPoints.Count > 0 Then drawPoly(ocvb.result1, smoothPoints.ToArray, cv.Scalar.Yellow)
 	End Sub
-	Public Sub VBdispose()
+	Public Sub MyDispose()
 		hull.Dispose()
 			End Sub
 End Class
@@ -120,8 +120,8 @@ Public Class Smoothing_Interior
 		hull.externalUse = True
 		hull.sliders.TrackBar1.Value = 16
 
-		sliders.setupTrackBar1(ocvb, "Smoothing iterations", 1, 20, 1)
-		sliders.setupTrackBar2(ocvb, "Smoothing tension X100", 1, 100, 50)
+		sliders.setupTrackBar1(ocvb, callerName, "Smoothing iterations", 1, 20, 1)
+		sliders.setupTrackBar2(ocvb, callerName, "Smoothing tension X100", 1, 100, 50)
 		
 		ocvb.label1 = "Original Points (white) Smoothed (yellow)"
 		ocvb.label2 = ""
@@ -143,7 +143,7 @@ Public Class Smoothing_Interior
 		Next
 		If smoothPoints.Count > 0 Then drawPoly(ocvb.result1, smoothPoints.ToArray, cv.Scalar.Yellow)
 	End Sub
-	Public Sub VBdispose()
+	Public Sub MyDispose()
 		hull.Dispose()
 			End Sub
 End Class

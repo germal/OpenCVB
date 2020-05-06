@@ -21,7 +21,7 @@ Public Class Stabilizer_BriskFeatures
         stabilizer.features = brisk.features ' supply the features to track with Optical Flow
         stabilizer.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         brisk.Dispose()
         stabilizer.Dispose()
     End Sub
@@ -50,7 +50,7 @@ Public Class Stabilizer_HarrisFeatures
         stabilizer.features = harris.FeaturePoints ' supply the features to track with Optical Flow
         stabilizer.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         harris.Dispose()
         stabilizer.Dispose()
     End Sub
@@ -164,7 +164,7 @@ Public Class Stabilizer_Basics
         End If
         lastFrame = gray.Clone()
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         good.Dispose()
     End Sub
 End Class
@@ -210,7 +210,7 @@ Public Class Stabilizer_Basics_CPP
         '    ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, dstData)
         'End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         Stabilizer_Basics_Close(sPtr)
     End Sub
 End Class
@@ -238,7 +238,7 @@ Public Class Stabilizer_SideBySide
         ocvb.result2 = ocvb.result1.Clone()
         basics.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         original.Dispose()
         basics.Dispose()
     End Sub

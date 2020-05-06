@@ -8,7 +8,7 @@ Public Class Tracker_Basics
     Public trackerIndex As Int32 = 5 ' trackerMIL by default...
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Stop tracking selected object"
                 ocvb.desc = "Track an object using cv.Tracking API"
         ocvb.putText(New ActiveClass.TrueType("Draw a rectangle around object to be tracked.", 10, 140, RESULT2))
@@ -56,7 +56,7 @@ Public Class Tracker_Basics
             End If
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         If tracker IsNot Nothing Then tracker.Dispose()
         check.Dispose()
     End Sub
@@ -94,7 +94,7 @@ Public Class Tracker_MultiObject
             End If
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         For Each tr In trackers
             tr.Dispose()
         Next
@@ -113,7 +113,7 @@ Public Class Tracker_Methods
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         tracker = New Tracker_Basics(ocvb, "Tracker_Methods")
 
-        radio.Setup(ocvb, 8)
+        radio.Setup(ocvb, callerName,8)
         radio.check(0).Text = "TrackerBoosting"
         radio.check(1).Text = "TrackerCSRT"
         radio.check(2).Text = "TrackerGOTURN - disabled (not working)"
@@ -144,7 +144,7 @@ Public Class Tracker_Methods
         End If
         saveMethod = tracker.trackerIndex
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         radio.Dispose()
         tracker.Dispose()
     End Sub

@@ -3,7 +3,7 @@ Public Class Transform_Resize
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Resize Percent", 50, 1000, 50)
+        sliders.setupTrackBar1(ocvb, callerName, "Resize Percent", 50, 1000, 50)
                 ocvb.desc = "Resize an image based on the slider value."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -21,7 +21,7 @@ Public Class Transform_Resize
             ocvb.result1(roi) = ocvb.color.Resize(New cv.Size(w, h), 0)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -35,8 +35,8 @@ Public Class Transform_Rotate
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Angle", 0, 180, 30)
-        sliders.setupTrackBar2(ocvb, "Scale Factor", 1, 100, 50)
+        sliders.setupTrackBar1(ocvb, callerName, "Angle", 0, 180, 30)
+        sliders.setupTrackBar2(ocvb, callerName, "Scale Factor", 1, 100, 50)
                 ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -48,7 +48,7 @@ Public Class Transform_Rotate
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.TrackBar1.Value, sliders.TrackBar2.Value / 100)
         cv.Cv2.WarpAffine(src, dst, rotationMat, New cv.Size())
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -58,7 +58,7 @@ Public Class Transform_Sort
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, 4)
+        radio.Setup(ocvb, callerName,4)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
@@ -75,7 +75,7 @@ Public Class Transform_Sort
         Dim sorted = gray.Sort(sortOption + cv.SortFlags.EveryColumn)
         ocvb.result1 = sorted.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         radio.Dispose()
     End Sub
 End Class
@@ -86,7 +86,7 @@ Public Class Transform_SortReshape
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, 2)
+        radio.Setup(ocvb, callerName,2)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
@@ -101,7 +101,7 @@ Public Class Transform_SortReshape
         sorted = sorted.Reshape(1, ocvb.color.Rows)
         ocvb.result1 = sorted.CvtColor(cv.ColorConversionCodes.gray2bgr)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         radio.Dispose()
     End Sub
 End Class

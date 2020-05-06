@@ -16,6 +16,6 @@ Public Class Bitmap_ToMat
         bitmap = cv.Extensions.BitmapConverter.ToBitmap(ocvb.color)
         ocvb.result2 = cv.Extensions.BitmapConverter.ToMat(bitmap)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

@@ -11,11 +11,11 @@ Public Class Kalman_Basics
     Public ErrorCovPost As Single = 1
 
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        check.Setup(ocvb, 1)
-        check.Box(0).Text = "Turn Kalman filtering on in " + ocvb.caller
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        check.Setup(ocvb, callerName, 1)
+        check.Box(0).Text = "Turn Kalman filtering on in " + callerName
         check.Box(0).Checked = True
-        
+
         ocvb.desc = "Use Kalman to stabilize a set of value (such as a cv.rect.)"
     End Sub
     Private Sub setValues(ocvb As AlgorithmData)
@@ -74,7 +74,7 @@ Public Class Kalman_Basics
             ocvb.result1.Rectangle(rect, cv.Scalar.Red, 1)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         If kalman IsNot Nothing Then
             For i = 0 To kalman.Count - 1
                 kalman(i).Dispose()
@@ -149,7 +149,7 @@ Public Class Kalman_Compare
         kPlot.plotData = New cv.Scalar(kalman(0).stateResult, kalman(1).stateResult, kalman(2).stateResult)
         kPlot.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         plot.Dispose()
         kPlot.Dispose()
     End Sub
@@ -217,7 +217,7 @@ Public Class Kalman_RotatingPoint
         cv.Cv2.Randn(processNoise, cv.Scalar.Black, cv.Scalar.All(Math.Sqrt(kf.ProcessNoiseCov.Get(Of Single)(0, 0))))
         kState = kf.TransitionMatrix * kState + processNoise
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -256,7 +256,7 @@ Public Class Kalman_MousePredict
         cv.Cv2.Line(ocvb.result1, ocvb.mousePoint * locMultiplier, lastRealMouse * locMultiplier, New cv.Scalar(0, 0, 255), 1, cv.LineTypes.AntiAlias)
         lastRealMouse = ocvb.mousePoint
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         kalman.Dispose()
     End Sub
 End Class
@@ -329,7 +329,7 @@ Public Class Kalman_CVMat
             ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         If kalman IsNot Nothing Then
             For i = 0 To kalman.Count - 1
                 kalman(i).Dispose()
@@ -378,7 +378,7 @@ Public Class Kalman_ImageSmall
         dst = dst.Threshold(1, 255, cv.ThresholdTypes.Binary)
         ocvb.result2 = dst.Resize(ocvb.result1.Size())
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         kalman.Dispose()
         resize.Dispose()
     End Sub
@@ -422,7 +422,7 @@ Public Class Kalman_DepthSmall
         dst = dst.Reshape(1, resize.dst.Height)
         ocvb.result2 = dst.Resize(ocvb.result1.Size())
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         kalman.Dispose()
         resize.Dispose()
     End Sub
@@ -484,7 +484,7 @@ Public Class Kalman_Single
             ocvb.label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         If plot IsNot Nothing Then plot.Dispose()
     End Sub
 End Class

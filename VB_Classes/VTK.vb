@@ -102,7 +102,7 @@ Public Class VTK_Basics
             If dataInput.Rows > 0 Then pipe.Write(dataBuffer, 0, dataInput.Total * dataInput.ElemSize)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         If pipe IsNot Nothing Then
             If pipe.IsConnected Then
                 pipe.Flush()
@@ -129,9 +129,9 @@ Public Class VTK_Histogram3D
     Dim random As Random_NormalDist
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Random Number Stdev", 0, 255, 10)
-        sliders.setupTrackBar2(ocvb, "Hist 3D bins", 1, 100, 32)
-        sliders.setupTrackBar3(ocvb, "Hist 3D bin Threshold X1000000", 10, 100, 20)
+        sliders.setupTrackBar1(ocvb, callerName, "Random Number Stdev", 0, 255, 10)
+        sliders.setupTrackBar2(ocvb, callerName, "Hist 3D bins", 1, 100, 32)
+        sliders.setupTrackBar3(ocvb, callerName,"Hist 3D bin Threshold X1000000", 10, 100, 20)
         
         mats = New Mat_4to1(ocvb, "VTK_Histogram3D")
         mats.externalUse = True
@@ -181,7 +181,7 @@ Public Class VTK_Histogram3D
         vtk.dataInput = New cv.Mat ' ocvb.depth
         vtk.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         vtk.Dispose()
         mats.Dispose()
         random.Dispose()

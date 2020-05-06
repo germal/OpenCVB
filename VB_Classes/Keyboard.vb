@@ -19,6 +19,6 @@ Public Class Keyboard_Basics
         End If
         ocvb.parms.keyInputAccepted = True
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

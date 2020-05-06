@@ -6,9 +6,9 @@ Public Class Stitch_Basics
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Number of random images", 10, 50, 10)
-        sliders.setupTrackBar2(ocvb, "Rectangle width", ocvb.color.Width / 4, ocvb.color.Width - 1, ocvb.color.Width / 2)
-        sliders.setupTrackBar3(ocvb, "Rectangle height", ocvb.color.Height / 4, ocvb.color.Height - 1, ocvb.color.Height / 2)
+        sliders.setupTrackBar1(ocvb, callerName, "Number of random images", 10, 50, 10)
+        sliders.setupTrackBar2(ocvb, callerName, "Rectangle width", ocvb.color.Width / 4, ocvb.color.Width - 1, ocvb.color.Width / 2)
+        sliders.setupTrackBar3(ocvb, callerName,"Rectangle height", ocvb.color.Height / 4, ocvb.color.Height - 1, ocvb.color.Height / 2)
                 ocvb.desc = "Stitch together random parts of a color image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -51,6 +51,6 @@ Public Class Stitch_Basics
             End If
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class

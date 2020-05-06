@@ -127,7 +127,7 @@ Public Class Replay_Record
             End If
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         If recordingActive Then binWrite.Close()
         recording.Dispose()
     End Sub
@@ -216,7 +216,7 @@ Public Class Replay_Play
             End If
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         If playbackActive Then binRead.Close()
         playback.Dispose()
     End Sub
@@ -241,7 +241,7 @@ Public Class Replay_OpenGL
         replay.Run(ocvb)
         ogl.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         ogl.Dispose()
         replay.Dispose()
     End Sub

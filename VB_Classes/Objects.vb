@@ -25,7 +25,7 @@ Public Class Object_Basics
         ccomp.srcGray = ccomp.srcGray.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ccomp.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         trim.Dispose()
         ccomp.Dispose()
     End Sub

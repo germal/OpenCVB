@@ -3,7 +3,7 @@ Public Class LeftRightView_Basics
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 100)
+        sliders.setupTrackBar1(ocvb, callerName, "brightness", 0, 255, 100)
                 ocvb.desc = "Show the left and right views from the 3D Camera"
         Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
@@ -26,7 +26,7 @@ Public Class LeftRightView_Basics
         ocvb.result1 += sliders.TrackBar1.Value
         ocvb.result2 += sliders.TrackBar1.Value
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -43,9 +43,9 @@ Public Class LeftRightView_CompareUndistorted
         fisheye = New FishEye_Rectified(ocvb, "LeftRightView_CompareUndistorted")
         fisheye.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 0)
-        sliders.setupTrackBar2(ocvb, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar3(ocvb, "Slice Height", 1, 300, 50)
+        sliders.setupTrackBar1(ocvb, callerName, "brightness", 0, 255, 0)
+        sliders.setupTrackBar2(ocvb, callerName, "Slice Starting Y", 0, 300, 100)
+        sliders.setupTrackBar3(ocvb, callerName,"Slice Height", 1, 300, 50)
                 Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
                 ocvb.label1 = "Left Image"
@@ -91,7 +91,7 @@ Public Class LeftRightView_CompareUndistorted
         ocvb.result1 += sliders.TrackBar1.Value
         ocvb.result2 += sliders.TrackBar1.Value
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 fisheye.Dispose()
     End Sub
 End Class
@@ -105,9 +105,9 @@ Public Class LeftRightView_CompareRaw
     Dim lrView As LeftRightView_Basics
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 100)
-        sliders.setupTrackBar2(ocvb, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar3(ocvb, "Slice Height", 1, 120, 50)
+        sliders.setupTrackBar1(ocvb, callerName, "brightness", 0, 255, 100)
+        sliders.setupTrackBar2(ocvb, callerName, "Slice Starting Y", 0, 300, 100)
+        sliders.setupTrackBar3(ocvb, callerName,"Slice Height", 1, 120, 50)
                 Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
                 ocvb.label1 = "Left Image"
@@ -142,7 +142,7 @@ Public Class LeftRightView_CompareRaw
         leftView(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100, leftView.Width, slideHeight)))
         ocvb.result2(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100 + slideHeight, leftView.Width, slideHeight)))
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 lrView.Dispose()
     End Sub
 End Class
@@ -184,7 +184,7 @@ Public Class LeftRightView_Features
             cv.Cv2.Circle(ocvb.result1, features.goodFeatures(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         features.Dispose()
         lrView.Dispose()
     End Sub
@@ -222,7 +222,7 @@ Public Class LeftRightView_Palettized
 
         ocvb.result1 = left
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         lrView.Dispose()
         palette.Dispose()
     End Sub
@@ -263,7 +263,7 @@ Public Class LeftRightView_BRISK
             ocvb.result1.Circle(pt, 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         brisk.Dispose()
         lrView.Dispose()
     End Sub

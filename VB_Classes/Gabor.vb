@@ -16,14 +16,14 @@ Public Class Gabor_Basics
     Public phaseOffset As Double
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders1.setupTrackBar1(ocvb, "Gabor gamma X10", 0, 10, 5)
-        sliders1.setupTrackBar2(ocvb, "Gabor Phase offset X100", 0, 100, 0)
+        sliders1.setupTrackBar1(ocvb, callerName, "Gabor gamma X10", 0, 10, 5)
+        sliders1.setupTrackBar2(ocvb, callerName, "Gabor Phase offset X100", 0, 100, 0)
         If ocvb.parms.ShowOptions Then sliders1.Show()
 
-        sliders.setupTrackBar1(ocvb, "Gabor Kernel Size", 0, 50, 15)
-        sliders.setupTrackBar2(ocvb, "Gabor Sigma", 0, 100, 5)
-        sliders.setupTrackBar3(ocvb, "Gabor Theta (degrees)", 0, 180, 90)
-        sliders.setupTrackBar4(ocvb, "Gabor lambda", 0, 100, 10)
+        sliders.setupTrackBar1(ocvb, callerName, "Gabor Kernel Size", 0, 50, 15)
+        sliders.setupTrackBar2(ocvb, callerName, "Gabor Sigma", 0, 100, 5)
+        sliders.setupTrackBar3(ocvb, callerName, "Gabor Theta (degrees)", 0, 180, 90)
+        sliders.setupTrackBar4(ocvb, callerName, "Gabor lambda", 0, 100, 10)
 
         ocvb.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
@@ -50,7 +50,7 @@ Public Class Gabor_Basics
             ocvb.result2 = gKernel.Resize(ocvb.color.Size(), 0, 0, cv.InterpolationFlags.Cubic)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         sliders1.Dispose()
     End Sub
 End Class
@@ -71,14 +71,14 @@ Public Class Gabor_Basics_MT
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
         grid.Run(ocvb)
 
-        sliders1.setupTrackBar1(ocvb, "Gabor gamma X10", 0, 10, 5)
-        sliders1.setupTrackBar2(ocvb, "Gabor Phase offset X100", 0, 100, 0)
+        sliders1.setupTrackBar1(ocvb, callerName, "Gabor gamma X10", 0, 10, 5)
+        sliders1.setupTrackBar2(ocvb, callerName, "Gabor Phase offset X100", 0, 100, 0)
         If ocvb.parms.ShowOptions Then sliders1.Show()
 
-        sliders.setupTrackBar1(ocvb, "Gabor Kernel Size", 0, 50, 15)
-        sliders.setupTrackBar2(ocvb, "Gabor Sigma", 0, 100, 4)
-        sliders.setupTrackBar3(ocvb, "Gabor Theta (degrees)", 0, 180, 90)
-        sliders.setupTrackBar4(ocvb, "Gabor lambda", 0, 100, 10)
+        sliders.setupTrackBar1(ocvb, callerName, "Gabor Kernel Size", 0, 50, 15)
+        sliders.setupTrackBar2(ocvb, callerName, "Gabor Sigma", 0, 100, 4)
+        sliders.setupTrackBar3(ocvb, callerName,"Gabor Theta (degrees)", 0, 180, 90)
+        sliders.setupTrackBar4(ocvb, callerName,  "Gabor lambda", 0, 100, 10)
 
         ocvb.parms.ShowOptions = False ' no  options for the Gabor_Basics algorithm needed - just need them for the parent thread.
         For i = 0 To gabor.Length - 1
@@ -116,7 +116,7 @@ Public Class Gabor_Basics_MT
         End Sub)
         ocvb.result1 = accum
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         sliders1.Dispose()
     End Sub
 End Class

@@ -33,10 +33,10 @@ Public Class Harris_Features_CPP
     Dim Harris_Features As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Harris Threshold", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, "Harris Neighborhood", 1, 41, 21)
-        sliders.setupTrackBar3(ocvb, "Harris aperture", 1, 33, 21)
-        sliders.setupTrackBar4(ocvb, "Harris Parameter", 1, 100, 1)
+        sliders.setupTrackBar1(ocvb, callerName, "Harris Threshold", 1, 100, 1)
+        sliders.setupTrackBar2(ocvb, callerName, "Harris Neighborhood", 1, 41, 21)
+        sliders.setupTrackBar3(ocvb, callerName,"Harris aperture", 1, 33, 21)
+        sliders.setupTrackBar4(ocvb, callerName,  "Harris Parameter", 1, 100, 1)
         
         ocvb.desc = "Use Harris feature detectors to identify interesting points."
 
@@ -65,7 +65,7 @@ Public Class Harris_Features_CPP
         ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.AddWeighted(ocvb.result1, 0.5, ocvb.color, 0.5, 0, ocvb.result2)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         Harris_Features_Close(Harris_Features)
             End Sub
 End Class
@@ -83,7 +83,7 @@ Public Class Harris_Detector_CPP
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Harris qualityLevel", 1, 100, 2)
+        sliders.setupTrackBar1(ocvb, callerName, "Harris qualityLevel", 1, 100, 2)
         
         ocvb.desc = "Use Harris detector to identify interesting points."
 
@@ -112,7 +112,7 @@ Public Class Harris_Detector_CPP
             Next
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         Harris_Detector_Close(Harris_Detector)
             End Sub
 End Class

@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Module GetRotationMatrix
-    Public Sub SetInterpolationRadioButtons(ocvb As AlgorithmData, radio As OptionsRadioButtons, radioName As String)
-        radio.Setup(ocvb, 7)
+    Public Sub SetInterpolationRadioButtons(ocvb As AlgorithmData, callerName As String, radio As OptionsRadioButtons, radioName As String)
+        radio.Setup(ocvb, callerName, 7)
         radio.check(0).Text = radioName + " with Area"
         radio.check(1).Text = radioName + " with Cubic flag"
         radio.check(2).Text = radioName + " with Lanczos4"
@@ -10,7 +10,7 @@ Module GetRotationMatrix
         radio.check(5).Text = radioName + " with WarpFillOutliers"
         radio.check(6).Text = radioName + " with WarpInverseMap"
         radio.check(3).Checked = True
-            End Sub
+    End Sub
     Public Function getInterpolationRadioButtons(radio As OptionsRadioButtons) As cv.InterpolationFlags
         Dim warpFlag As cv.InterpolationFlags
         For i = 0 To radio.check.Length - 1
@@ -38,9 +38,9 @@ Public Class GetRotationMatrix2D_Basics
     Public Mflip As cv.Mat
     Public warpFlag As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "GetRotationMatrix2D Angle", 0, 360, 24)
-                SetInterpolationRadioButtons(ocvb, radio, "Rotation2D")
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        sliders.setupTrackBar1(ocvb, callerName, "GetRotationMatrix2D Angle", 0, 360, 24)
+        SetInterpolationRadioButtons(ocvb, callerName, radio, "Rotation2D")
 
         ocvb.desc = "Rotate a rectangle of a specified angle"
     End Sub
@@ -53,7 +53,7 @@ Public Class GetRotationMatrix2D_Basics
         ocvb.result1 = src.WarpAffine(M, src.Size(), warpFlag)
         If warpFlag = cv.InterpolationFlags.WarpInverseMap Then Mflip = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), -angle, 1)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 radio.Dispose()
     End Sub
 End Class
@@ -101,7 +101,7 @@ Public Class GetRotationMatrix2D_Box
             ocvb.result2.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         rotation.Dispose()
     End Sub
 End Class

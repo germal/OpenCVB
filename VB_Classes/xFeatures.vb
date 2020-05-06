@@ -21,6 +21,6 @@ Public Class XFeatures2D_StarDetector
             Next kpt
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

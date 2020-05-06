@@ -39,7 +39,7 @@ Public Class Trace_OpenCV_CPP
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         Trace_OpenCV_Close(Trace_OpenCV)
     End Sub
 End Class

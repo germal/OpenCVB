@@ -31,7 +31,7 @@ Public Class OpenCVGL_Image_CPP
         imu.externalUse = True
 
         If ocvb.parms.testAllRunning = False Then
-            setOpenGLsliders(ocvb, sliders, sliders1, sliders2, sliders3)
+            setOpenGLsliders(ocvb, callerName, sliders, sliders1, sliders2, sliders3)
             sliders2.TrackBar3.Value = -10 ' eye.z
             sliders.TrackBar1.Value = 30 ' FOV
             sliders.TrackBar2.Value = 0 ' Yaw
@@ -79,7 +79,7 @@ Public Class OpenCVGL_Image_CPP
         handleRGB.Free()
         handlePointCloud.Free()
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         OpenCVGL_Image_Close()
         imu.Dispose()
     End Sub

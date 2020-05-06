@@ -16,11 +16,11 @@ Public Class EMax_Basics
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 2
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 2
 
-        sliders.setupTrackBar1(ocvb, "EMax Number of Samples", 1, 200, 100)
-        sliders.setupTrackBar2(ocvb, "EMax Prediction Step Size", 1, 20, 5)
-        sliders.setupTrackBar3(ocvb, "EMax Sigma (spread)", 1, 100, 30)
+        sliders.setupTrackBar1(ocvb, callerName, "EMax Number of Samples", 1, 200, 100)
+        sliders.setupTrackBar2(ocvb, callerName, "EMax Prediction Step Size", 1, 20, 5)
+        sliders.setupTrackBar3(ocvb, callerName,"EMax Sigma (spread)", 1, 100, 30)
         
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, callerName,3)
         radio.check(0).Text = "EMax matrix type Spherical"
         radio.check(1).Text = "EMax matrix type Diagonal"
         radio.check(2).Text = "EMax matrix type Generic"
@@ -86,7 +86,7 @@ Public Class EMax_Basics
             ocvb.result1.Circle(pt, 4, ocvb.rColors(labels.Get(Of Int32)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 radio.Dispose()
         grid.Dispose()
     End Sub
@@ -155,7 +155,7 @@ Public Class EMax_Basics_CPP
         Dim mask = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         ocvb.result1.CopyTo(ocvb.result2, mask)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         EMax_Basics_Close(EMax_Basics)
         emax.Dispose()
     End Sub

@@ -51,7 +51,7 @@ Public Class PyStream_Basics
             End If
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         memMap.Dispose()
         If pipeImages IsNot Nothing Then
             If pipeImages.IsConnected Then

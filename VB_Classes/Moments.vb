@@ -25,7 +25,7 @@ Public Class Moments_CentroidKalman
             ocvb.result1.Circle(New cv.Point(kalman.dst(0), kalman.dst(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         foreground.Dispose()
         kalman.Dispose()
     End Sub

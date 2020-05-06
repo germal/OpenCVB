@@ -7,9 +7,9 @@ Public Class BlockMatching_Basics
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         colorizer = New Depth_Colorizer_CPP(ocvb, "BlockMatching_Basics")
 
-        sliders.setupTrackBar1(ocvb, "Blockmatch scale", 1, 200, 100)
-        sliders.setupTrackBar2(ocvb, "Blockmatch max disparity", 1, 8, 1)
-        sliders.setupTrackBar3(ocvb, "Blockmatch block size", 5, 255, 15)
+        sliders.setupTrackBar1(ocvb, callerName, "Blockmatch scale", 1, 200, 100)
+        sliders.setupTrackBar2(ocvb, callerName, "Blockmatch max disparity", 1, 8, 1)
+        sliders.setupTrackBar3(ocvb, callerName,"Blockmatch block size", 5, 255, 15)
                 ocvb.desc = "Use OpenCV's block matching on left and right views."
         ocvb.label1 = "Block matching disparity colorized like depth"
         ocvb.label2 = "Right Image (used with left image)"
@@ -46,7 +46,7 @@ Public Class BlockMatching_Basics
         ocvb.result1 = ocvb.result1.Resize(ocvb.color.Size())
         ocvb.result2 = ocvb.rightView.Resize(ocvb.color.Size())
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 colorizer.Dispose()
     End Sub
 End Class

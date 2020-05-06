@@ -16,12 +16,12 @@ Public Class Surf_Basics_CS
         fisheye = New FishEye_Rectified(ocvb, "Surf_Basics_CS")
         fisheye.externalUse = True
 
-        radio.Setup(ocvb, 2)
+        radio.Setup(ocvb, callerName,2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
         
-        sliders.setupTrackBar1(ocvb, "Hessian threshold", 1, 5000, 2000)
+        sliders.setupTrackBar1(ocvb, callerName, "Hessian threshold", 1, 5000, 2000)
         
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
         ocvb.label1 = "BF Matcher output"
@@ -47,7 +47,7 @@ Public Class Surf_Basics_CS
             If CS_SurfBasics.keypoints1 IsNot Nothing Then ocvb.label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 radio.Dispose()
         fisheye.Dispose()
     End Sub
@@ -87,7 +87,7 @@ Public Class Surf_Basics
         surf.dst(New cv.Rect(0, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(ocvb.result1)
         surf.dst(New cv.Rect(surf.srcLeft.Width, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(ocvb.result2)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         surf.Dispose()
         fisheye.Dispose()
     End Sub
@@ -106,7 +106,7 @@ Public Class Surf_DrawMatchManual_CS
         surf = New Surf_Basics_CS(ocvb, "Surf_DrawMatchManual_CS")
         surf.CS_SurfBasics.drawPoints = False
 
-        sliders.setupTrackBar1(ocvb, "Surf Vertical Range to Search", 0, 50, 10)
+        sliders.setupTrackBar1(ocvb, callerName, "Surf Vertical Range to Search", 0, 50, 10)
         
         ocvb.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub
@@ -139,7 +139,7 @@ Public Class Surf_DrawMatchManual_CS
         Next
         ocvb.label2 = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         surf.Dispose()
     End Sub
 End Class

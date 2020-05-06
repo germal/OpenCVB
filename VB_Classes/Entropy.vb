@@ -42,7 +42,7 @@ Public Class Entropy_Basics
             flow.Run(ocvb)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         hist.Dispose()
         flow.Dispose()
     End Sub

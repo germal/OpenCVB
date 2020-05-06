@@ -86,6 +86,6 @@ Public Class MultiDimensionScaling_Cities
             ocvb.result1.PutText(cityName, textPos, cv.HersheyFonts.HersheySimplex, 0.5, cv.Scalar.White)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

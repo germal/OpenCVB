@@ -6,9 +6,9 @@ Public Class HOG_Basics
     Dim staticImageProcessed As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Threshold", 0, 100, 0)
-        sliders.setupTrackBar2(ocvb, "Stride", 1, 100, 1)
-        sliders.setupTrackBar3(ocvb, "Scale", 0, 2000, 300)
+        sliders.setupTrackBar1(ocvb, callerName, "Threshold", 0, 100, 0)
+        sliders.setupTrackBar2(ocvb, callerName, "Stride", 1, 100, 1)
+        sliders.setupTrackBar3(ocvb, callerName,"Scale", 0, 2000, 300)
                 ocvb.desc = "Find people with Histogram of Gradients (HOG) 2D feature"
         staticImage = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
         ocvb.result2 = staticImage.Resize(ocvb.result2.Size)
@@ -58,7 +58,7 @@ Public Class HOG_Basics
             End If
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 

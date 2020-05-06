@@ -9,9 +9,12 @@ Public Class VB_Class : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Public radio1 As New OptionsRadioButtons
     Public videoOptions As New OptionsVideoName
+    Dim classInheritor As Object
     Public Sub New()
+        classInheritor = Me
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+        classInheritor.MyDispose()  ' dispose of any managed and unmanaged classes.
         sliders.Dispose()
         sliders1.Dispose()
         sliders2.Dispose()

@@ -14,7 +14,7 @@ Public Class MatchTemplate_Basics
         flow.externalUse = True
         flow.result1or2 = RESULT2
 
-        radio.Setup(ocvb, 6)
+        radio.Setup(ocvb, callerName,6)
         radio.check(0).Text = "CCoeff"
         radio.check(1).Text = "CCoeffNormed"
         radio.check(2).Text = "CCorr"
@@ -22,7 +22,7 @@ Public Class MatchTemplate_Basics
         radio.check(4).Text = "SqDiff"
         radio.check(5).Text = "SqDiffNormed"
         radio.check(1).Checked = True
-                sliders.setupTrackBar1(ocvb, "Sample Size", 2, 10000, 100)
+                sliders.setupTrackBar1(ocvb, callerName, "Sample Size", 2, 10000, 100)
                 ocvb.label2 = "Log of correlation results"
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
@@ -55,7 +55,7 @@ Public Class MatchTemplate_Basics
             End If
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 radio.Dispose()
     End Sub
 End Class
@@ -102,7 +102,7 @@ Public Class MatchTemplate_RowCorrelation
         If correlation > maxCorrelation Then maxCorrelation = correlation
         ocvb.label1 = "Min = " + Format(minCorrelation, "#,##0.00") + " max = " + Format(maxCorrelation, "#,##0.0000")
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         corr.Dispose()
         flow.Dispose()
     End Sub
@@ -116,7 +116,7 @@ Public Class MatchTemplate_DrawRect
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, 6)
+        radio.Setup(ocvb, callerName,6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
         Next
@@ -153,7 +153,7 @@ Public Class MatchTemplate_DrawRect
         ocvb.result1.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
         ocvb.result2.Circle(maxLoc.X + saveRect.Width / 2, maxLoc.Y + saveRect.Height / 2, 20, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         radio.Dispose()
     End Sub
 End Class
@@ -216,7 +216,7 @@ Public Class MatchTemplate_BestTemplate_MT
 
         match.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         grid.Dispose()
     End Sub
 End Class

@@ -7,6 +7,6 @@ Public Class VBTest_Interface
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.parms.VBTestInterface.Run(ocvb) ' OpenCVB.vb has already run the constructor of the VBTest_Basics class.
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

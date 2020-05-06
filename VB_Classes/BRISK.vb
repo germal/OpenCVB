@@ -7,7 +7,7 @@ Public Class BRISK_Basics
     Public src As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "BRISK Radius Threshold", 1, 100, 50)
+        sliders.setupTrackBar1(ocvb, callerName, "BRISK Radius Threshold", 1, 100, 50)
                 ocvb.desc = "Detect features with BRISK"
         Brisk = cv.BRISK.Create()
     End Sub
@@ -31,6 +31,6 @@ Public Class BRISK_Basics
             cv.Cv2.AddWeighted(ocvb.color, 0.5, wt, 0.5, 0, ocvb.result1)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class

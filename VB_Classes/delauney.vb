@@ -102,7 +102,7 @@ Public Class Delaunay_Basics
 
         paint_voronoi(ocvb, ocvb.result1, subdiv)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -130,7 +130,7 @@ Public Class Delaunay_GoodFeatures
 
         paint_voronoi(ocvb, ocvb.result2, subdiv)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         features.Dispose()
     End Sub
 End Class
@@ -184,6 +184,6 @@ Public Class Delauney_Subdiv2D
             ocvb.result1.Line(p1, p2, cv.Scalar.Green, 1)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

@@ -34,7 +34,7 @@ Public Class MeanShift_Basics
             ocvb.result1 = ocvb.color
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -60,7 +60,7 @@ Public Class MeanShift_Depth
         If ocvb.drawRect = New cv.Rect(0, 0, 0, 0) Or restartRequested Then blob.Run(ocvb)
         ms.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         ms.Dispose()
         blob.Dispose()
     End Sub
@@ -73,9 +73,9 @@ Public Class MeanShift_PyrFilter
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "MeanShift Spatial Radius", 1, 100, 10)
-        sliders.setupTrackBar2(ocvb, "MeanShift color Radius", 1, 100, 15)
-        sliders.setupTrackBar3(ocvb, "MeanShift Max Pyramid level", 1, 8, 3)
+        sliders.setupTrackBar1(ocvb, callerName, "MeanShift Spatial Radius", 1, 100, 10)
+        sliders.setupTrackBar2(ocvb, callerName, "MeanShift color Radius", 1, 100, 15)
+        sliders.setupTrackBar3(ocvb, callerName,"MeanShift Max Pyramid level", 1, 8, 3)
                 ocvb.desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -84,7 +84,7 @@ Public Class MeanShift_PyrFilter
         Dim maxPyrLevel = sliders.TrackBar3.Value
         cv.Cv2.PyrMeanShiftFiltering(ocvb.color, ocvb.result1, spatialRadius, colorRadius, maxPyrLevel)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -108,7 +108,7 @@ Public Class Meanshift_TopObjects
         mats2.externalUse = True
 
         blob = New Blob_DepthClusters(ocvb, "Meanshift_TopObjects")
-        sliders.setupTrackBar1(ocvb, "How often should camshift be reinitialized", 1, 500, 100)
+        sliders.setupTrackBar1(ocvb, callerName, "How often should camshift be reinitialized", 1, 500, 100)
                 For i = 0 To cams.Length - 1
             cams(i) = New MeanShift_Basics(ocvb, "Meanshift_TopObjects")
             cams(i).rectangleEdgeWidth = 8
@@ -137,7 +137,7 @@ Public Class Meanshift_TopObjects
         ocvb.result1 = ocvb.result2.Clone()
         mats2.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         blob.Dispose()
         For i = 0 To cams.Length - 1
             cams(i).Dispose()

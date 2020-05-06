@@ -18,13 +18,13 @@ Public Class Plot_OverTime
     Dim myStopWatch As Stopwatch
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Reset the plot scale"
         check.Box(0).Checked = True
         
-        sliders.setupTrackBar1(ocvb, "Plot Pixel Height", 1, 40, 4)
-        sliders.setupTrackBar2(ocvb, "Plot Pixel Width", 1, 40, 4)
-        sliders.setupTrackBar3(ocvb, "Plot (time) Font Size x10", 1, 20, 10)
+        sliders.setupTrackBar1(ocvb, callerName, "Plot Pixel Height", 1, 40, 4)
+        sliders.setupTrackBar2(ocvb, callerName, "Plot Pixel Width", 1, 40, 4)
+        sliders.setupTrackBar3(ocvb, callerName,"Plot (time) Font Size x10", 1, 20, 10)
                 ocvb.desc = "Plot an input variable over time"
         myStopWatch = Stopwatch.StartNew()
     End Sub
@@ -104,7 +104,7 @@ Public Class Plot_OverTime
         If externalUse = False Then ocvb.label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
         AddPlotScale(dst, minScale - topBottomPad, maxScale + topBottomPad, sliders.TrackBar3.Value / 10)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 check.Dispose()
     End Sub
 End Class
@@ -124,7 +124,7 @@ Public Class Plot_Histogram
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Histogram Font Size x10", 1, 20, 10)
+        sliders.setupTrackBar1(ocvb, callerName, "Histogram Font Size x10", 1, 20, 10)
         
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
@@ -161,7 +161,7 @@ Public Class Plot_Histogram
             AddPlotScale(dst, 0, maxVal, sliders.TrackBar1.Value / 10)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -236,7 +236,7 @@ Public Class Plot_Basics_CPP
         handleY.Free()
         ocvb.label1 = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + vbTab + " y-axis: " + CStr(minY) + " to " + CStr(maxY)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -280,7 +280,7 @@ Public Class Plot_Basics
             ocvb.label1 = "histogram with " + ocvb.label1
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         plot.Dispose()
         hist.Dispose()
     End Sub
@@ -321,7 +321,7 @@ Public Class Plot_Depth
         plot.Run(ocvb)
         ocvb.label1 = "histogram with " + ocvb.label1
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         plot.Dispose()
         hist.Dispose()
     End Sub

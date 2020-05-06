@@ -50,7 +50,7 @@ Public Class Blob_Input
             ocvb.result2.SetTo(0)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         rectangles.Dispose()
         circles.Dispose()
         ellipses.Dispose()
@@ -69,7 +69,7 @@ Public Class Blob_Detector_CS
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         input = New Blob_Input(ocvb, "Blob_Detector_CS")
         input.updateFrequency = 1 ' it is pretty fast but sloppy...
-        check.Setup(ocvb, 5)
+        check.Setup(ocvb, callerName,  5)
         check.Box(0).Text = "FilterByArea"
         check.Box(1).Text = "FilterByCircularity"
         check.Box(2).Text = "FilterByConvexity"
@@ -77,9 +77,9 @@ Public Class Blob_Detector_CS
         check.Box(4).Text = "FilterByColor"
                 check.Box(4).Checked = True ' filter by color...
 
-        sliders.setupTrackBar1(ocvb, "min Threshold", 0, 255, 100)
-        sliders.setupTrackBar2(ocvb, "max Threshold", 0, 255, 255)
-        sliders.setupTrackBar3(ocvb, "Threshold Step", 1, 50, 5)
+        sliders.setupTrackBar1(ocvb, callerName, "min Threshold", 0, 255, 100)
+        sliders.setupTrackBar2(ocvb, callerName, "max Threshold", 0, 255, 255)
+        sliders.setupTrackBar3(ocvb, callerName,"Threshold Step", 1, 50, 5)
         
         ocvb.label1 = "Blob_Detector_CS Input"
     End Sub
@@ -106,7 +106,7 @@ Public Class Blob_Detector_CS
         ' The create method in SimpleBlobDetector is not available in VB.Net.  Not sure why.  To get around this, just use C# where create method works fine.
         blobDetector.Start(ocvb.result1, ocvb.result2, blobParams)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 input.Dispose()
         check.Dispose()
     End Sub
@@ -147,7 +147,7 @@ Public Class Blob_RenderBlobs
             Next
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         input.Dispose()
     End Sub
 End Class
@@ -185,7 +185,7 @@ Public Class Blob_DepthClusters
         flood.Run(ocvb)
         ocvb.label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         histBlobs.Dispose()
         flood.Dispose()
         shadow.Dispose()
@@ -244,7 +244,7 @@ Public Class Blob_Rectangles
             ocvb.result1.Rectangle(rect, ocvb.colorScalar(i Mod 255), 2)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         blobs.Dispose()
         If kalman IsNot Nothing Then
             For i = 0 To kalman.Length - 1
@@ -289,7 +289,7 @@ Public Class Blob_LargestBlob
         ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
         ocvb.label1 = "Show the largest blob of the " + CStr(rects.Count) + " blobs"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         blobs.Dispose()
         If kalman IsNot Nothing Then kalman.Dispose()
     End Sub
@@ -321,7 +321,7 @@ Public Class Blob_LargestDepthCluster
         ocvb.color.CopyTo(ocvb.result1, mask)
         ocvb.label1 = "Largest Depth Blob: " + Format(maxSize, "#,000") + " pixels (" + Format(maxSize / ocvb.color.Total, "#0.0%") + ")"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         blobs.Dispose()
     End Sub
 End Class

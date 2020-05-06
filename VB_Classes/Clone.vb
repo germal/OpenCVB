@@ -31,7 +31,7 @@ Public Class Clone_Normal
                 cv.Cv2.TextureFlattening(ocvb.color, mask, ocvb.result1, textureFlatteningValues(0), textureFlatteningValues(1))
         End Select
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -46,16 +46,16 @@ Public Class Clone_ColorChange
         clone = New Clone_Normal(ocvb, "Clone_ColorChange")
         ocvb.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
 
-        sliders.setupTrackBar1(ocvb, "Color Change - Red", 5, 25, 15)
-        sliders.setupTrackBar2(ocvb, "Color Change - Green", 5, 25, 5)
-        sliders.setupTrackBar3(ocvb, "Color Change - Blue", 5, 25, 5)
+        sliders.setupTrackBar1(ocvb, callerName, "Color Change - Red", 5, 25, 15)
+        sliders.setupTrackBar2(ocvb, callerName, "Color Change - Green", 5, 25, 5)
+        sliders.setupTrackBar3(ocvb, callerName,"Color Change - Blue", 5, 25, 5)
             End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(sliders.TrackBar1.Value / 10, sliders.TrackBar2.Value / 10, sliders.TrackBar1.Value / 10)
         clone.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         clone.Dispose()
             End Sub
 End Class
@@ -71,15 +71,15 @@ Public Class Clone_IlluminationChange
         clone = New Clone_Normal(ocvb, "Clone_IlluminationChange")
         ocvb.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
 
-        sliders.setupTrackBar1(ocvb, "Alpha", 0, 20, 2)
-        sliders.setupTrackBar2(ocvb, "Beta", 0, 20, 2)
+        sliders.setupTrackBar1(ocvb, callerName, "Alpha", 0, 20, 2)
+        sliders.setupTrackBar2(ocvb, callerName, "Beta", 0, 20, 2)
             End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(sliders.TrackBar1.Value / 10, sliders.TrackBar2.Value / 10)
         clone.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         clone.Dispose()
             End Sub
 End Class
@@ -96,15 +96,15 @@ Public Class Clone_TextureFlattening
         clone = New Clone_Normal(ocvb, "Clone_TextureFlattening")
         ocvb.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
 
-        sliders.setupTrackBar1(ocvb, "Low Threshold", 0, 100, 10)
-        sliders.setupTrackBar2(ocvb, "High Threshold", 0, 100, 50)
+        sliders.setupTrackBar1(ocvb, callerName, "Low Threshold", 0, 100, 10)
+        sliders.setupTrackBar2(ocvb, callerName, "High Threshold", 0, 100, 50)
             End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cv.Vec2f(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
         clone.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         clone.Dispose()
             End Sub
 End Class
@@ -126,7 +126,7 @@ Public Class Clone_Eagle
     Dim pt As cv.Point
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, callerName,3)
         radio.check(0).Text = "Seamless - Mixed Clone"
         radio.check(1).Text = "Seamless - MonochromeTransfer Clone"
         radio.check(2).Text = "Seamless - Normal Clone"
@@ -166,7 +166,7 @@ Public Class Clone_Eagle
         Next
         cv.Cv2.SeamlessClone(sourceImage, ocvb.result1, mask, pt, ocvb.result1, cloneFlag)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         radio.Dispose()
     End Sub
 End Class
@@ -179,7 +179,7 @@ Public Class Clone_Seamless
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, callerName,3)
         radio.check(0).Text = "Seamless Normal Clone"
         radio.check(1).Text = "Seamless Mono Clone"
         radio.check(2).Text = "Seamless Mixed Clone"
@@ -210,7 +210,7 @@ Public Class Clone_Seamless
         cv.Cv2.SeamlessClone(ocvb.RGBDepth, ocvb.color, ocvb.result1, center, ocvb.result2, style)
         ocvb.result2.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         radio.Dispose()
     End Sub
 End Class

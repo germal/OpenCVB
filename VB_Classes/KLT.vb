@@ -12,12 +12,12 @@ Public Class KLT_Basics
     Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "KLT - MaxCorners", 1, 200, 100)
-        sliders.setupTrackBar2(ocvb, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
-        sliders.setupTrackBar3(ocvb, "KLT - minDistance", 1, 100, 7)
-        sliders.setupTrackBar4(ocvb, "KLT - BlockSize", 1, 100, 7)
+        sliders.setupTrackBar1(ocvb, callerName, "KLT - MaxCorners", 1, 200, 100)
+        sliders.setupTrackBar2(ocvb, callerName, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
+        sliders.setupTrackBar3(ocvb, callerName,"KLT - minDistance", 1, 100, 7)
+        sliders.setupTrackBar4(ocvb, callerName,  "KLT - BlockSize", 1, 100, 7)
 
-        check.Setup(ocvb, 2)
+        check.Setup(ocvb, callerName,  2)
         check.Box(0).Text = "KLT - Night Mode"
         check.Box(1).Text = "KLT - delete all Points"
 
@@ -76,7 +76,7 @@ Public Class KLT_Basics
         prevGray = gray.Clone()
         ocvb.label1 = "KLT Basics - " + If(inputPoints Is Nothing, "0", CStr(inputPoints.Length)) + " points"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         check.Dispose()
     End Sub
 End Class
@@ -106,7 +106,7 @@ Public Class KLT_OpticalFlow
         End If
         lastpoints = klt.inputPoints
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         klt.Dispose()
     End Sub
 End Class

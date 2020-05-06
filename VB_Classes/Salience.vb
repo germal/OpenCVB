@@ -24,7 +24,7 @@ Public Class Salience_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders = New OptionsSliders
-        sliders.setupTrackBar1(ocvb, "Salience numScales", 1, 6, 1)
+        sliders.setupTrackBar1(ocvb, callerName, "Salience numScales", 1, 6, 1)
 
         ReDim grayData(ocvb.color.Total - 1)
         rows = ocvb.color.Rows
@@ -58,7 +58,7 @@ Public Class Salience_Basics_CPP
         ocvb.color.CopyTo(ocvb.result1)
         ocvb.result1(roi) = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         Salience_Close(salience)
     End Sub
 End Class
@@ -71,8 +71,8 @@ Public Class Salience_Basics_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders = New OptionsSliders
-        sliders.setupTrackBar1(ocvb, "Salience numScales", 1, 6, 1)
-        sliders.setupTrackBar2(ocvb, "Salience Number of Threads", 1, 100, 36)
+        sliders.setupTrackBar1(ocvb, callerName, "Salience numScales", 1, 6, 1)
+        sliders.setupTrackBar2(ocvb, callerName, "Salience Number of Threads", 1, 100, 36)
 
         ReDim grayData(ocvb.color.Total - 1)
         ocvb.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
@@ -103,6 +103,6 @@ Public Class Salience_Basics_MT
             End Sub)
         grayHandle.Free()
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

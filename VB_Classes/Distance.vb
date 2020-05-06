@@ -5,13 +5,13 @@ Public Class Distance_Basics
     Dim foreground As kMeans_Depth_FG_BG
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, callerName,3)
         radio.check(0).Text = "C"
         radio.check(1).Text = "L1"
         radio.check(2).Text = "L2"
         radio.check(2).Checked = True
         
-        sliders.setupTrackBar1(ocvb, "kernel size", 1, 5, 3)
+        sliders.setupTrackBar1(ocvb, callerName, "kernel size", 1, 5, 3)
         
         foreground = New kMeans_Depth_FG_BG(ocvb, "Distance_Basics")
         ocvb.desc = "Distance algorithm basics."
@@ -39,7 +39,7 @@ Public Class Distance_Basics
         dist32f.ConvertTo(gray, cv.MatType.CV_8UC1)
         ocvb.result2 = gray.CvtColor(cv.ColorConversionCodes.gray2bgr)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 foreground.Dispose()
         radio.Dispose()
     End Sub

@@ -58,7 +58,7 @@ Public Class Pixel_GetSet
 
         mat4.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         mat4.Dispose()
     End Sub
 End Class

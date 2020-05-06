@@ -18,7 +18,7 @@ Public Class Covariance_Basics
             ocvb.label1 = "covar(0) = " + Format(covar.Get(Of Double)(0), "#0.0") + " mean = " + Format(overallMean(0), "#0.00")
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         random.Dispose()
     End Sub
 End Class
@@ -41,6 +41,6 @@ Public Class Covariance_Test
         Dim overallMean = mean.Mean()
         ocvb.label1 = "covar(0) = " + Format(covar.Get(of Double)(0), "#0.0") + " mean(overall) = " + Format(overallMean(0), "#0.00")
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

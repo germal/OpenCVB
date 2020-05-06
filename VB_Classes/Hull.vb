@@ -29,7 +29,7 @@ Public Class Hull_Basics
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Hull random points", 1, 20, 10)
+        sliders.setupTrackBar1(ocvb, callerName, "Hull random points", 1, 20, 10)
         
         ocvb.desc = "Surround a set of random points with a convex hull"
         ocvb.label1 = "Convex Hull Output"
@@ -66,6 +66,6 @@ Public Class Hull_Basics
             Next
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class

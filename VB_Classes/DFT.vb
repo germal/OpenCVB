@@ -75,7 +75,7 @@ Public Class DFT_Basics
             ocvb.result1 = inverseDFT(complexImage)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         mats.Dispose()
     End Sub
 End Class
@@ -119,7 +119,7 @@ Public Class DFT_Inverse
             ocvb.result2.SetTo(0)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         mats.Dispose()
     End Sub
 End Class
@@ -135,8 +135,8 @@ Public Class DFT_ButterworthFilter
     Public dft As DFT_Basics
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "DFT B Filter - Radius", 1, ocvb.color.Height, ocvb.color.Height)
-        sliders.setupTrackBar2(ocvb, "DFT B Filter - Order", 1, ocvb.color.Height, 2)
+        sliders.setupTrackBar1(ocvb, callerName, "DFT B Filter - Radius", 1, ocvb.color.Height, ocvb.color.Height)
+        sliders.setupTrackBar2(ocvb, callerName, "DFT B Filter - Order", 1, ocvb.color.Height, 2)
                 dft = New DFT_Basics(ocvb, "DFT_ButterworthFilter")
         ocvb.desc = "Use the Butterworth filter on a DFT image - color image input."
         ocvb.label1 = "Image with Butterworth Low Pass Filter Applied"
@@ -176,7 +176,7 @@ Public Class DFT_ButterworthFilter
            If k = 0 Then ocvb.result1 = inverseDFT(complex) Else ocvb.result2 = inverseDFT(complex)
        End Sub)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 dft.Dispose()
     End Sub
 End Class
@@ -204,7 +204,7 @@ Public Class DFT_ButterworthDepth
         bfilter.dft.gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bfilter.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         bfilter.Dispose()
     End Sub
 End Class

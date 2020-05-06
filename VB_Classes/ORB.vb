@@ -8,7 +8,7 @@ Public Class ORB_Basics
     Dim orb As cv.ORB
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "ORB - desired point count", 10, 2000, 700)
+        sliders.setupTrackBar1(ocvb, callerName, "ORB - desired point count", 10, 2000, 700)
         
         ocvb.desc = "Find keypoints using ORB"
     End Sub
@@ -25,7 +25,7 @@ Public Class ORB_Basics
             ocvb.label1 = CStr(keypoints.Count) + " key points were identified"
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         orb.Dispose()
             End Sub
 End Class

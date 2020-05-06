@@ -41,7 +41,7 @@ Public Class FLANN_Test
             End Using
         End Using
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -54,7 +54,7 @@ Public Class FLANN_Basics
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         random = New Random_Points(ocvb, "FLANN_Basics")
 
-        sliders.setupTrackBar1(ocvb, "Query Count", 1, 10000, 10)
+        sliders.setupTrackBar1(ocvb, callerName, "Query Count", 1, 10000, 10)
         
         ocvb.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
         ocvb.label1 = "Yellow is query, Nearest points blue"
@@ -87,7 +87,7 @@ Public Class FLANN_Basics
             Next
         End Using
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 random.Dispose()
     End Sub
 End Class

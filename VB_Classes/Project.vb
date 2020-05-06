@@ -58,7 +58,7 @@ Public Class Project_NoGravity_CPP
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "Project_NoGravity_CPP")
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
@@ -100,7 +100,7 @@ Public Class Project_NoGravity_CPP
         ocvb.label1 = "Top View (looking down)"
         ocvb.label2 = "Side View"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         foreground.Dispose()
         grid.Dispose()
         SimpleProjectionClose(cPtr)
@@ -116,7 +116,7 @@ Public Class Project_NoGravity
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "Project_NoGravity")
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
@@ -148,24 +148,24 @@ Public Class Project_NoGravity
         ocvb.result2.SetTo(cv.Scalar.White)
         Dim black = New cv.Vec3b(0, 0, 0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
-         Sub(roi)
-             For y = roi.Y To roi.Y + roi.Height - 1
-                 For x = roi.X To roi.X + roi.Width - 1
-                     Dim m = foreground.Mask.Get(Of Byte)(y, x)
-                     If m > 0 Then
-                         Dim depth = depth32f.Get(Of Single)(y, x)
-                         Dim dy = CInt(h * (depth - desiredMin) / range)
-                         If dy < h And dy > 0 Then ocvb.result1.Set(Of cv.Vec3b)(h - dy, x, black)
-                         Dim dx = CInt(w * (depth - desiredMin) / range)
-                         If dx < w And dx > 0 Then ocvb.result2.Set(Of cv.Vec3b)(y, dx, black)
-                     End If
+             Sub(roi)
+                 For y = roi.Y To roi.Y + roi.Height - 1
+                     For x = roi.X To roi.X + roi.Width - 1
+                         Dim m = foreground.Mask.Get(Of Byte)(y, x)
+                         If m > 0 Then
+                             Dim depth = depth32f.Get(Of Single)(y, x)
+                             Dim dy = CInt(h * (depth - desiredMin) / range)
+                             If dy < h And dy > 0 Then ocvb.result1.Set(Of cv.Vec3b)(h - dy, x, black)
+                             Dim dx = CInt(w * (depth - desiredMin) / range)
+                             If dx < w And dx > 0 Then ocvb.result2.Set(Of cv.Vec3b)(y, dx, black)
+                         End If
+                     Next
                  Next
-             Next
-         End Sub)
+             End Sub)
         ocvb.label1 = "Top View (looking down)"
         ocvb.label2 = "Side View"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         foreground.Dispose()
         grid.Dispose()
         SimpleProjectionClose(cPtr)
@@ -182,9 +182,9 @@ End Class
 Public Class Project_GravityVB
     Inherits VB_Class
     Dim imu As IMU_GravityVec
-        Dim grid As Thread_Grid
+    Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         imu = New IMU_GravityVec(ocvb, "Project_GravityVB")
         imu.result = RESULT2
         imu.externalUse = True
@@ -194,8 +194,8 @@ Public Class Project_GravityVB
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
-        sliders.setupTrackBar1(ocvb, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
-        
+        sliders.setupTrackBar1(ocvb, callerName, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
+
         ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -244,30 +244,30 @@ Public Class Project_GravityVB
         Dim h = CSng(ocvb.color.Height)
         Dim xFactor = w / (maxval - minval)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
-         Sub(roi)
-             For y = roi.Y + roi.Height - 1 To roi.Y Step -1
-                 For x = roi.X To roi.X + roi.Width - 1
-                     Dim m = mask.Get(Of Byte)(h - y - 1, x)
-                     If m > 0 Then
-                         Dim depth = vertSplit(2).Get(Of Single)(h - y - 1, x)
-                         If depth < desiredMax Then
-                             Dim dx = xFactor * (vertSplit(0).Get(Of Single)(h - y - 1, x) - minval)
-                             Dim dy = Math.Round(h * (desiredMax - depth) / desiredMax)
-                             If dy < h And dy > 0 Then ocvb.result1.Set(Of cv.Vec3b)(CInt(h - dy), CInt(dx), black)
-                             dy = Math.Round(vertSplit(1).Get(Of Single)(y, x))
-                             dx = Math.Round(w * (desiredMax - depth) / desiredMax)
-                             If dy < h And dy > 0 Then ocvb.result2.Set(Of cv.Vec3b)(CInt(h - dy), CInt(dx), black)
+             Sub(roi)
+                 For y = roi.Y + roi.Height - 1 To roi.Y Step -1
+                     For x = roi.X To roi.X + roi.Width - 1
+                         Dim m = mask.Get(Of Byte)(h - y - 1, x)
+                         If m > 0 Then
+                             Dim depth = vertSplit(2).Get(Of Single)(h - y - 1, x)
+                             If depth < desiredMax Then
+                                 Dim dx = xFactor * (vertSplit(0).Get(Of Single)(h - y - 1, x) - minval)
+                                 Dim dy = Math.Round(h * (desiredMax - depth) / desiredMax)
+                                 If dy < h And dy > 0 Then ocvb.result1.Set(Of cv.Vec3b)(CInt(h - dy), CInt(dx), black)
+                                 dy = Math.Round(vertSplit(1).Get(Of Single)(y, x))
+                                 dx = Math.Round(w * (desiredMax - depth) / desiredMax)
+                                 If dy < h And dy > 0 Then ocvb.result2.Set(Of cv.Vec3b)(CInt(h - dy), CInt(dx), black)
+                             End If
                          End If
-                     End If
+                     Next
                  Next
-             Next
-         End Sub)
+             End Sub)
         ocvb.label1 = "View looking up from under floor"
         ocvb.label2 = "Side View"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         imu.Dispose()
-                grid.Dispose()
+        grid.Dispose()
     End Sub
 End Class
 
@@ -281,7 +281,7 @@ Public Class Project_GravityHistogram
     Inherits VB_Class
     Public gravity As Project_Gravity_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         gravity = New Project_Gravity_CPP(ocvb, "Project_GravityHistogram")
         gravity.sliders.GroupBox2.Visible = True
         gravity.histogramRun = True
@@ -291,7 +291,7 @@ Public Class Project_GravityHistogram
     Public Sub Run(ocvb As AlgorithmData)
         gravity.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         gravity.Dispose()
     End Sub
 End Class
@@ -304,7 +304,7 @@ End Class
 Public Class Project_Gravity_CPP
     Inherits VB_Class
     Dim imu As IMU_GravityVec
-        Dim cPtr As IntPtr
+    Dim cPtr As IntPtr
     Dim histPtr As IntPtr
     Dim xyzBytes() As Byte
     Public histogramRun As Boolean
@@ -314,14 +314,14 @@ Public Class Project_Gravity_CPP
     Public dst2 As cv.Mat
     Public maxZ As Single
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         imu = New IMU_GravityVec(ocvb, "Project_Gravity_CPP")
         imu.result = RESULT2
         imu.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
-        sliders.setupTrackBar2(ocvb, "Threshold for histogram Count", 1, 100, 10)
-                sliders.GroupBox2.Visible = False ' default is not a histogramrun
+        sliders.setupTrackBar1(ocvb, callerName, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
+        sliders.setupTrackBar2(ocvb, callerName, "Threshold for histogram Count", 1, 100, 10)
+        sliders.GroupBox2.Visible = False ' default is not a histogramrun
 
         Dim fileInfo As New FileInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps/colorscale_jet.jpg")
         If fileInfo.Exists = False Then
@@ -412,9 +412,9 @@ Public Class Project_Gravity_CPP
         End If
         handleXYZ.Free()
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         imu.Dispose()
-                Project_Gravity_Close(cPtr)
+        Project_Gravity_Close(cPtr)
         Project_GravityHist_Close(histPtr)
     End Sub
 End Class
@@ -427,17 +427,17 @@ End Class
 Public Class Project_Floodfill
     Inherits VB_Class
     Dim flood As FloodFill_Projection
-        Dim kalman As Kalman_Basics
+    Dim kalman As Kalman_Basics
     Public gravity As Project_Gravity_CPP
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         kalman = New Kalman_Basics(ocvb, "Project_Floodfill")
         ReDim kalman.src(10 * 4 - 1) ' max 10 objects. 
         kalman.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, "epsilon for GroupRectangles X100", 0, 200, 80)
-        
+        sliders.setupTrackBar1(ocvb, callerName, "epsilon for GroupRectangles X100", 0, 200, 80)
+
         gravity = New Project_Gravity_CPP(ocvb, "Project_Floodfill")
         gravity.sliders.GroupBox2.Visible = True
         gravity.externalUse = True
@@ -499,7 +499,7 @@ Public Class Project_Floodfill
             ocvb.label2 = CStr(flood.objectRects.Count) + " objects combined into " + CStr(rects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         gravity.Dispose()
         flood.Dispose()
         kalman.Dispose()
@@ -517,7 +517,7 @@ Public Class Project_Wall
     Dim lines As lineDetector_FLD
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
 
         dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
         dilate.externalUse = True
@@ -543,7 +543,7 @@ Public Class Project_Wall
         ocvb.label1 = "Top View with lines in red"
         ocvb.label2 = "Top View output without lines"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         objects.Dispose()
         lines.Dispose()
     End Sub

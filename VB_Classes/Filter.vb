@@ -18,7 +18,7 @@ Public Class Filter_Laplacian
         imgResult.ConvertTo(ocvb.result1, cv.MatType.CV_8UC3)
         imgLaplacian.ConvertTo(ocvb.result2, cv.MatType.CV_8UC3)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -27,7 +27,7 @@ Public Class Filter_NormalizedKernel
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, 4)
+        radio.Setup(ocvb, callerName,4)
         radio.check(0).Text = "INF"
         radio.check(1).Text = "L1"
         radio.check(1).Checked = True
@@ -56,7 +56,7 @@ Public Class Filter_NormalizedKernel
         Dim dst32f = ocvb.color.Filter2D(cv.MatType.CV_32FC1, kernel, anchor:=New cv.Point(0, 0))
         dst32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC3)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         radio.Dispose()
     End Sub
 End Class
@@ -75,7 +75,7 @@ Public Class Filter_Normalized2D
         ocvb.result1 = ocvb.color.Filter2D(-1, kernel)
         ocvb.label1 = "Normalized KernelSize = " + CStr(kernelSize)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -87,12 +87,12 @@ Public Class Filter_SepFilter2D
     Inherits VB_Class
             Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"
         check.Box(0).Checked = True
         
-        sliders.setupTrackBar1(ocvb, "Kernel X size", 1, 21, 5)
-        sliders.setupTrackBar2(ocvb, "Kernel Y size", 1, 21, 11)
+        sliders.setupTrackBar1(ocvb, callerName, "Kernel X size", 1, 21, 5)
+        sliders.setupTrackBar2(ocvb, callerName, "Kernel Y size", 1, 21, 11)
         
         ocvb.label1 = "Gaussian Blur result"
         ocvb.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
@@ -114,7 +114,7 @@ Public Class Filter_SepFilter2D
             ocvb.label2 = "SepFilter2D Result"
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         check.Dispose()
             End Sub
 End Class

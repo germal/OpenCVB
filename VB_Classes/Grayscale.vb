@@ -3,7 +3,7 @@ Public Class Grayscale_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Use OpenCV to create grayscale image"
         check.Box(0).Checked = True
 
@@ -24,7 +24,7 @@ Public Class Grayscale_Basics
             Next
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         check.Dispose()
     End Sub
 End Class

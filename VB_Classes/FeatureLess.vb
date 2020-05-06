@@ -9,10 +9,10 @@ Public Class Featureless_Basics_MT
     Public objectSize As New List(Of Int32)
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "FeatureLess rho", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3(ocvb, "FeatureLess threshold", 1, 100, 3)
-        sliders.setupTrackBar4(ocvb, "FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
+        sliders.setupTrackBar1(ocvb, callerName, "FeatureLess rho", 1, 100, 1)
+        sliders.setupTrackBar2(ocvb, callerName, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
+        sliders.setupTrackBar3(ocvb, callerName,"FeatureLess threshold", 1, 100, 3)
+        sliders.setupTrackBar4(ocvb, callerName,  "FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
         
         edges = New Edges_Canny(ocvb, "Featureless_Basics_MT")
         edges.externalUse = True
@@ -75,7 +75,7 @@ Public Class Featureless_Basics_MT
         Next
         ocvb.label2 = "FeatureLess Regions = " + CStr(regionCount)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         edges.Dispose()
         grid.Dispose()
             End Sub
@@ -89,7 +89,7 @@ Public Class FeatureLess_Prediction
         Dim fLess As Featureless_Basics_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "FeatureLess Resize Percent", 1, 100, 1)
+        sliders.setupTrackBar1(ocvb, callerName, "FeatureLess Resize Percent", 1, 100, 1)
         
         fLess = New Featureless_Basics_MT(ocvb, "FeatureLess_Prediction")
 
@@ -159,7 +159,7 @@ Public Class FeatureLess_Prediction
         predictedDepth.Normalize(0, 255, cv.NormTypes.MinMax)
         predictedDepth.ConvertTo(mask, cv.MatType.CV_8U)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         fLess.Dispose()
             End Sub
 End Class
@@ -208,7 +208,7 @@ Public Class Featureless_DCT_MT
         ocvb.label2 = "Largest FeatureLess Region (" + CStr(nonZ) + " " + Format(nonZ / label.Total, "#0.0%") + " pixels)"
         ocvb.result2.SetTo(cv.Scalar.White, label)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         dct.Dispose()
     End Sub
 End Class

@@ -37,7 +37,7 @@ Public Class DNN_Test
             ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -68,7 +68,7 @@ Public Class DNN_Caffe_CS
             ocvb.putText(New ActiveClass.TrueType(str, 10, 100))
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -89,8 +89,8 @@ Public Class DNN_Basics
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "dnn Scale Factor", 1, 10000, 78)
-        sliders.setupTrackBar2(ocvb, "dnn MeanVal", 1, 255, 127)
+        sliders.setupTrackBar1(ocvb, callerName, "dnn Scale Factor", 1, 10000, 78)
+        sliders.setupTrackBar2(ocvb, callerName, "dnn MeanVal", 1, 255, 127)
         
         dnnWidth = ocvb.color.Height ' height is always smaller than width...
         dnnHeight = ocvb.color.Height
@@ -152,7 +152,7 @@ Public Class DNN_Basics
             End If
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 If net IsNot Nothing Then net.Dispose()
     End Sub
 End Class

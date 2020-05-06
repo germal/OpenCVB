@@ -177,21 +177,21 @@ Public Class lineDetector_FLD
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, callerName,3)
         radio.check(0).Text = "Low resolution - Factor 4"
         radio.check(1).Text = "Low resolution - Factor 2"
         radio.check(2).Text = "Low resolution - Factor 1"
         radio.check(1).Checked = True
 
-        sliders2.setupTrackBar1(ocvb, "FLD - canny Threshold1", 1, 100, 50)
-        sliders2.setupTrackBar2(ocvb, "FLD - canny Threshold2", 1, 100, 50)
+        sliders2.setupTrackBar1(ocvb, callerName, "FLD - canny Threshold1", 1, 100, 50)
+        sliders2.setupTrackBar2(ocvb, callerName, "FLD - canny Threshold2", 1, 100, 50)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
-        sliders.setupTrackBar1(ocvb, "FLD - Min Length", 1, 200, 30)
-        sliders.setupTrackBar2(ocvb, "FLD - max distance", 1, 100, 14)
-        sliders.setupTrackBar3(ocvb, "FLD - Canny Aperture", 3, 7, 7)
+        sliders.setupTrackBar1(ocvb, callerName, "FLD - Min Length", 1, 200, 30)
+        sliders.setupTrackBar2(ocvb, callerName, "FLD - max distance", 1, 100, 14)
+        sliders.setupTrackBar3(ocvb, callerName,"FLD - Canny Aperture", 3, 7, 7)
 
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "FLD - incremental merge"
         check.Box(0).Checked = True
         ocvb.desc = "Basics for a Fast Line Detector"
@@ -234,7 +234,7 @@ Public Class lineDetector_FLD
         If lineCount > 0 Then sortedLines = drawSegments(dst, lineCount, factor, dst)
         If externalUse = False Then dst.CopyTo(ocvb.result1)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -276,7 +276,7 @@ Public Class LineDetector_LSD
         sortedLines.Clear()
         If lineCount > 0 Then sortedLines = drawSegments(ocvb.result1, lineCount, factor, ocvb.result1)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -290,7 +290,7 @@ Public Class LineDetector_3D_LongestLine
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         lines = New lineDetector_FLD(ocvb, "LineDetector_3D_LongestLine")
 
-        sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 1)
+        sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 1)
 
         ocvb.desc = "Identify planes using the lines present in the rgb image."
         ocvb.label2 = ""
@@ -309,7 +309,7 @@ Public Class LineDetector_3D_LongestLine
             find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         lines.Dispose()
     End Sub
 End Class
@@ -324,7 +324,7 @@ Public Class LineDetector_3D_FLD_MT
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         lines = New lineDetector_FLD(ocvb, "LineDetector_3D_FLD_MT")
 
-        sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 1)
+        sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 1)
 
         ocvb.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
         ocvb.label2 = ""
@@ -344,7 +344,7 @@ Public Class LineDetector_3D_FLD_MT
                 find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
             End Sub)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         lines.Dispose()
     End Sub
 End Class
@@ -357,7 +357,7 @@ Public Class LineDetector_3D_LSD_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         lines = New LineDetector_LSD(ocvb, "LineDetector_3D_LSD_MT")
-        sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 1)
+        sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 1)
 
         ocvb.desc = "Measure 3D line segments using a multi-threaded Line Stream Detector"
         ocvb.label2 = ""
@@ -383,7 +383,7 @@ Public Class LineDetector_3D_LSD_MT
                 find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
             End Sub)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         lines.Dispose()
     End Sub
 End Class
@@ -400,15 +400,15 @@ Public Class LineDetector_3D_FitLineZ
         linesFLD = New lineDetector_FLD(ocvb, "LineDetector_3D_FitLineZ")
         linesLSD = New LineDetector_LSD(ocvb, "LineDetector_3D_FitLineZ")
 
-        sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 3)
-        sliders.setupTrackBar2(ocvb, "Point count threshold", 5, 500, 50)
+        sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 3)
+        sliders.setupTrackBar2(ocvb, callerName, "Point count threshold", 5, 500, 50)
 
-        check.Setup(ocvb, 2)
+        check.Setup(ocvb, callerName,  2)
         check.Box(0).Text = "Fitline using x and z (unchecked it will use y and z)"
         check.Box(1).Text = "display output only once a second (to be readable)"
         check.Box(1).Checked = True
 
-        radio.Setup(ocvb, 4)
+        radio.Setup(ocvb, callerName,4)
         radio.check(0).Text = "Use Fast LineDetector"
         radio.check(1).Text = "Use Line Stream Detector"
         radio.check(2).Text = "Debug FLD longest line"
@@ -505,7 +505,7 @@ Public Class LineDetector_3D_FitLineZ
                 End Sub)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         linesFLD.Dispose()
         linesLSD.Dispose()
         check.Dispose()
@@ -523,7 +523,7 @@ Public Class LineDetector_Basics
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "LineDetector thickness of line", 1, 20, 2)
+        sliders.setupTrackBar1(ocvb, callerName, "LineDetector thickness of line", 1, 20, 2)
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         ocvb.label1 = "Manually drawn with thickness"
@@ -550,7 +550,7 @@ Public Class LineDetector_Basics
             ld.DrawSegments(ocvb.result2, vectors, False)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         ld.Dispose()
     End Sub
 End Class

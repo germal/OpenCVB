@@ -40,7 +40,7 @@ Public Class HMM_Example_CPP
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, IIf(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), dstData)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         HMM_Close(HMM)
     End Sub
 End Class

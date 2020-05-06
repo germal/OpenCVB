@@ -19,7 +19,7 @@ Public Class Solve_ByMat
 
         ocvb.putText(New ActiveClass.TrueType("Solution ByMat: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125))
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -44,6 +44,6 @@ Public Class Solve_ByArray
 
         ocvb.putText(New ActiveClass.TrueType("Solution ByArray: X1 = " + CStr(x.Get(of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(of Double)(0, 1)), 10, 125))
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

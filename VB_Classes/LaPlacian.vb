@@ -4,9 +4,9 @@ Public Class Laplacian_Basics
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Laplacian Kernel size", 1, 21, 3)
-        sliders.setupTrackBar2(ocvb, "Laplacian Scale", 0, 100, 100)
-        sliders.setupTrackBar3(ocvb, "Laplacian Delta", 0, 1000, 0)
+        sliders.setupTrackBar1(ocvb, callerName, "Laplacian Kernel size", 1, 21, 3)
+        sliders.setupTrackBar2(ocvb, callerName, "Laplacian Scale", 0, 100, 100)
+        sliders.setupTrackBar3(ocvb, callerName,"Laplacian Delta", 0, 1000, 0)
                 ocvb.desc = "Laplacian filter - the second derivative."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -22,7 +22,7 @@ Public Class Laplacian_Basics
         ocvb.result1 = dst.ConvertScaleAbs()
         ocvb.label1 = "Laplacian Filter k = " + CStr(kernelSize)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -32,11 +32,11 @@ Public Class Laplacian_Blur
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Laplacian Kernel size", 1, 21, 3)
-        sliders.setupTrackBar2(ocvb, "Laplacian Scale", 0, 100, 100)
-        sliders.setupTrackBar3(ocvb, "Laplacian Delta", 0, 1000, 0)
+        sliders.setupTrackBar1(ocvb, callerName, "Laplacian Kernel size", 1, 21, 3)
+        sliders.setupTrackBar2(ocvb, callerName, "Laplacian Scale", 0, 100, 100)
+        sliders.setupTrackBar3(ocvb, callerName,"Laplacian Delta", 0, 1000, 0)
         
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, callerName,3)
         radio.check(0).Text = "Add Gaussian Blur"
         radio.check(1).Text = "Add boxfilter Blur"
         radio.check(2).Text = "Add median Blur"
@@ -67,7 +67,7 @@ Public Class Laplacian_Blur
         ocvb.result1 = dst.ConvertScaleAbs()
         ocvb.label1 = "Laplacian+" + blurText + " k = " + CStr(kernelSize)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 radio.Dispose()
     End Sub
 End Class

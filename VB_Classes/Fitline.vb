@@ -12,8 +12,8 @@ Public Class Fitline_Basics
         draw = New Draw_Line(ocvb, "Fitline_Basics")
         draw.sliders.TrackBar1.Value = 2
 
-        sliders.setupTrackBar1(ocvb, "Accuracy for the radius X100", 0, 100, 10)
-        sliders.setupTrackBar2(ocvb, "Accuracy for the angle X100", 0, 100, 10)
+        sliders.setupTrackBar1(ocvb, callerName, "Accuracy for the radius X100", 0, 100, 10)
+        sliders.setupTrackBar2(ocvb, callerName, "Accuracy for the angle X100", 0, 100, 10)
         
         ocvb.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
@@ -48,7 +48,7 @@ Public Class Fitline_Basics
             End If
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         draw.Dispose()
     End Sub
 End Class
@@ -109,7 +109,7 @@ Public Class Fitline_3DBasics_MT
         Next
         ocvb.result1.SetTo(cv.Scalar.White, hlines.grid.gridMask)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         hlines.Dispose()
     End Sub
 End Class
@@ -123,11 +123,11 @@ Public Class Fitline_RawInput
     Public bb As Single
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Random point count", 0, 500, 100)
-        sliders.setupTrackBar2(ocvb, "Line Point Count", 0, 500, 20)
-        sliders.setupTrackBar3(ocvb, "Line Noise", 1, 100, 10)
+        sliders.setupTrackBar1(ocvb, callerName, "Random point count", 0, 500, 100)
+        sliders.setupTrackBar2(ocvb, callerName, "Line Point Count", 0, 500, 20)
+        sliders.setupTrackBar3(ocvb, callerName,"Line Noise", 1, 100, 10)
         
-        check.Setup(ocvb, 2)
+        check.Setup(ocvb, callerName,  2)
         check.Box(0).Text = "Highlight Line Data"
         check.Box(1).Text = "Recompute with new random data"
         check.Box(0).Checked = True
@@ -187,7 +187,7 @@ Public Class Fitline_RawInput
             Next
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 check.Dispose()
     End Sub
 End Class
@@ -289,7 +289,7 @@ Public Class Fitline_EigenFit
         p2 = New cv.Point(w, noisyLine.m * w + noisyLine.bb)
         ocvb.result2.Line(p1, p2, cv.Scalar.Blue, 3, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         noisyLine.Dispose()
     End Sub
 End Class

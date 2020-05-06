@@ -4,7 +4,7 @@ Public Class Diff_Basics
         Dim lastFrame As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Diff - Color Threshold", 1, 255, 50)
+        sliders.setupTrackBar1(ocvb, callerName, "Diff - Color Threshold", 1, 255, 50)
                 ocvb.label1 = "Stable Gray Color"
         ocvb.label2 = "Unstable Gray Color"
         ocvb.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
@@ -19,7 +19,7 @@ Public Class Diff_Basics
         End If
         lastFrame = gray.Clone()
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -57,7 +57,7 @@ Public Class Diff_UnstableDepthAndColor
             ocvb.label2 = "Stable (non-zero) Depth"
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         diff.Dispose()
         depth.Dispose()
     End Sub

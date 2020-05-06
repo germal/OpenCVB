@@ -66,6 +66,6 @@ Public Class FitEllipse_Basics_CPP
         End If
         ocvb.label1 = "Using MinTriangle to generate " + CStr(area.srcPoints.Count) + " points"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

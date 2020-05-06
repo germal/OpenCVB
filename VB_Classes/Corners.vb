@@ -5,9 +5,9 @@ Public Class Corners_Harris
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Corner block size", 1, 21, 3)
-        sliders.setupTrackBar2(ocvb, "Corner aperture size", 1, 21, 3)
-        sliders.setupTrackBar3(ocvb, "Corner quality level", 1, 100, 50)
+        sliders.setupTrackBar1(ocvb, callerName, "Corner block size", 1, 21, 3)
+        sliders.setupTrackBar2(ocvb, callerName, "Corner aperture size", 1, 21, 3)
+        sliders.setupTrackBar3(ocvb, callerName,"Corner quality level", 1, 100, 50)
                 ocvb.desc = "Find corners using Eigen values and vectors"
         ocvb.label2 = "Corner Eigen values"
     End Sub
@@ -53,7 +53,7 @@ Public Class Corners_Harris
         cv.Cv2.Normalize(mc, McNormal, 127, 255, cv.NormTypes.MinMax)
         McNormal.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -66,7 +66,7 @@ Public Class Corners_SubPix
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         good = New Features_GoodFeatures(ocvb, "Corners_SubPix")
-        sliders.setupTrackBar1(ocvb, "SubPix kernel Size", 1, 20, 3)
+        sliders.setupTrackBar1(ocvb, callerName, "SubPix kernel Size", 1, 20, 3)
         
         ocvb.desc = "Use PreCornerDetect to find features in the image."
         ocvb.label1 = "Output of GoodFeatures"
@@ -87,7 +87,7 @@ Public Class Corners_SubPix
             cv.Cv2.Circle(ocvb.result2, p, 3, New cv.Scalar(0, 0, 255), -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 good.Dispose()
     End Sub
 End Class
@@ -101,7 +101,7 @@ Public Class Corners_PreCornerDetect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         median = New Math_Median_CDF(ocvb, "Corners_PreCornerDetect")
-        sliders.setupTrackBar1(ocvb, "kernel Size", 1, 20, 19)
+        sliders.setupTrackBar1(ocvb, callerName, "kernel Size", 1, 20, 19)
         
         ocvb.desc = "Use PreCornerDetect to find features in the image."
     End Sub
@@ -120,7 +120,7 @@ Public Class Corners_PreCornerDetect
         ocvb.result2 = gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "median = " + CStr(median.medianVal)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 median.Dispose()
     End Sub
 End Class
@@ -140,9 +140,9 @@ Public Class Corners_ShiTomasi_CPP
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Corner block size", 1, 21, 3)
-        sliders.setupTrackBar2(ocvb, "Corner aperture size", 1, 21, 3)
-        sliders.setupTrackBar3(ocvb, "Corner quality level", 1, 100, 50)
+        sliders.setupTrackBar1(ocvb, callerName, "Corner block size", 1, 21, 3)
+        sliders.setupTrackBar2(ocvb, callerName, "Corner aperture size", 1, 21, 3)
+        sliders.setupTrackBar3(ocvb, callerName,"Corner quality level", 1, 100, 50)
                 ocvb.desc = "Find corners using Eigen values and vectors"
         ocvb.label2 = "Corner Eigen values"
     End Sub
@@ -188,6 +188,6 @@ Public Class Corners_ShiTomasi_CPP
         cv.Cv2.Normalize(dst, stNormal, 127, 255, cv.NormTypes.MinMax)
         stNormal.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class

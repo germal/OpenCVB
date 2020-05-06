@@ -12,12 +12,12 @@ Public Class Sift_Basics_CS
         fisheye = New FishEye_Rectified(ocvb, "Sift_Basics_CS")
         fisheye.externalUse = True
 
-        radio.Setup(ocvb, 2)
+        radio.Setup(ocvb, callerName,2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
         
-        sliders.setupTrackBar1(ocvb, "Points to Match", 1, 1000, 200)
+        sliders.setupTrackBar1(ocvb, callerName, "Points to Match", 1, 1000, 200)
         
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
@@ -37,7 +37,7 @@ Public Class Sift_Basics_CS
 
         ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 radio.Dispose()
         fisheye.Dispose()
     End Sub
@@ -59,12 +59,12 @@ Public Class Sift_Basics_CS_MT
         grid.sliders.TrackBar1.Value = ocvb.color.Width - 1 ' we are just taking horizontal slices of the image.
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 2
 
-        radio.Setup(ocvb, 2)
+        radio.Setup(ocvb, callerName,2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
         
-        sliders.setupTrackBar1(ocvb, "Points to Match", 1, 1000, 100)
+        sliders.setupTrackBar1(ocvb, callerName, "Points to Match", 1, 1000, 100)
         
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
@@ -99,7 +99,7 @@ Public Class Sift_Basics_CS_MT
 
         ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         grid.Dispose()
                 radio.Dispose()
         fisheye.Dispose()

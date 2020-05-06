@@ -8,7 +8,7 @@ Public Class Threshold_LaplacianFilter
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         trim = New Depth_InRange(ocvb, "Threshold_LaplacianFilter")
         edges = New Filter_Laplacian(ocvb, "Threshold_LaplacianFilter")
-        sliders.setupTrackBar1(ocvb, "dist Threshold", 1, 100, 40)
+        sliders.setupTrackBar1(ocvb, callerName, "dist Threshold", 1, 100, 40)
                 ocvb.label1 = "Foreground Input"
         ocvb.desc = "Threshold the output of a Laplacian derivative, mask with depth foreground."
     End Sub
@@ -27,7 +27,7 @@ Public Class Threshold_LaplacianFilter
         dist32f.ConvertTo(gray, cv.MatType.CV_8UC1, 255)
         ocvb.result1 = gray.CvtColor(cv.ColorConversionCodes.gray2bgr)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 edges.Dispose()
         trim.Dispose()
     End Sub

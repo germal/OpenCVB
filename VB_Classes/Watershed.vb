@@ -56,7 +56,7 @@ Public Class Watershed_Basics
             ocvb.result1 = ocvb.color
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -83,7 +83,7 @@ Public Class Watershed_DepthAuto
 
         watershed.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         watershed.Dispose()
     End Sub
 End Class
@@ -114,7 +114,7 @@ Public Class Watershed_RGBSimpleAuto
     Public Sub Run(ocvb As AlgorithmData)
         watershed.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         watershed.Dispose()
     End Sub
 End Class
@@ -144,7 +144,7 @@ Public Class Watershed_RGBDepthAuto
     Public Sub Run(ocvb As AlgorithmData)
         watershed.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         watershed.Dispose()
     End Sub
 End Class

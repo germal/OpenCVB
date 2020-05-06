@@ -17,7 +17,7 @@ Public Class KAZE_KeypointsKAZE_CS
             ocvb.result1.Circle(CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -40,7 +40,7 @@ Public Class KAZE_KeypointsAKAZE_CS
             ocvb.result1.Circle(CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -61,7 +61,7 @@ Public Class KAZE_Sample_CS
         Dim result = CS_Kaze.Run(box, box_in_scene)
         ocvb.result1 = result.Resize(ocvb.color.Size())
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -83,7 +83,7 @@ Public Class KAZE_Match_CS
         result(New cv.Rect(0, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result1)
         result(New cv.Rect(ocvb.result1.Width, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result2)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         red.Dispose()
     End Sub
 End Class
@@ -95,8 +95,8 @@ Public Class KAZE_LeftAligned_CS
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Max number of points to match", 1, 300, 100)
-        sliders.setupTrackBar2(ocvb, "When matching, max possible distance", 1, 200, 100)
+        sliders.setupTrackBar1(ocvb, callerName, "Max number of points to match", 1, 300, 100)
+        sliders.setupTrackBar2(ocvb, callerName, "When matching, max possible distance", 1, 200, 100)
         
         ocvb.desc = "Match keypoints in the left and right images but display it as movement in the right image."
     End Sub
@@ -138,7 +138,7 @@ Public Class KAZE_LeftAligned_CS
         ocvb.label1 = "Right image has " + CStr(CS_KazeRight.kazeKeyPoints.Count) + " key points"
         ocvb.label2 = "Left image has " + CStr(CS_KazeLeft.kazeKeyPoints.Count) + " key points"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 

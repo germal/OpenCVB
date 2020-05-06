@@ -8,7 +8,7 @@ Public Class Contours_Basics
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, 5)
+        radio.Setup(ocvb, callerName,5)
         radio.Text = "Retrieval Mode Options"
         radio.check(0).Text = "CComp"
         radio.check(1).Text = "External"
@@ -18,7 +18,7 @@ Public Class Contours_Basics
         radio.check(4).Checked = True
         If ocvb.parms.ShowOptions Then radio.Show()
 
-        radio1.Setup(ocvb, 4)
+        radio1.Setup(ocvb, callerName, 4)
         radio1.Text = "ContourApproximation Mode"
         radio1.check(0).Text = "ApproxNone"
         radio1.check(1).Text = "ApproxSimple"
@@ -75,7 +75,7 @@ Public Class Contours_Basics
 
         cv.Cv2.DrawContours(dst, contours, 0, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         rotatedRect.Dispose()
         radio.Dispose()
         radio1.Dispose()
@@ -110,7 +110,7 @@ Public Class Contours_FindandDraw
         ocvb.result2.SetTo(0)
         cv.Cv2.DrawContours(ocvb.result2, contours, 0, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         rotatedRect.Dispose()
     End Sub
 End Class
@@ -142,7 +142,7 @@ Public Class Contours_Depth
         Next
         cv.Cv2.DrawContours(ocvb.result2, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         trim.Dispose()
     End Sub
 End Class
@@ -189,7 +189,7 @@ Public Class Contours_RGB
         ocvb.result2.SetTo(0)
         ocvb.color.CopyTo(ocvb.result2, trim.zeroMask)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         trim.Dispose()
     End Sub
 End Class

@@ -21,7 +21,7 @@ Public Class xPhoto_Bm3dDenoise
         ocvb.label2 = "Diff from input - max change=" + CStr(maxVal)
         ocvb.result2 = ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -47,7 +47,7 @@ Public Class xPhoto_Bm3dDenoiseDepthImage
         ocvb.label2 = "Diff from input - max change=" + CStr(maxVal)
         ocvb.result2 = ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -75,10 +75,10 @@ Public Class xPhoto_OilPaint_CPP
         Dim xPhoto_OilPaint As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "xPhoto Dynamic Ratio", 1, 127, 7)
-        sliders.setupTrackBar2(ocvb, "xPhoto Block Size", 1, 100, 3)
+        sliders.setupTrackBar1(ocvb, callerName, "xPhoto Dynamic Ratio", 1, 127, 7)
+        sliders.setupTrackBar2(ocvb, callerName, "xPhoto Block Size", 1, 100, 3)
         
-        radio.Setup(ocvb, 5)
+        radio.Setup(ocvb, callerName,5)
         radio.check(0).Text = "BGR2GRAY"
         radio.check(1).Text = "BGR2HSV"
         radio.check(2).Text = "BGR2YUV  "
@@ -127,7 +127,7 @@ Public Class xPhoto_OilPaint_CPP
             End If
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         xPhoto_OilPaint_Close(xPhoto_OilPaint)
         radio.Dispose()
     End Sub

@@ -270,7 +270,7 @@ Public Class Puzzle_Basics
             If roi.Width = width And roi.Height = height And roi2.Width = width And roi2.Height = height Then ocvb.result1(roi2) = ocvb.color(roi)
         Next
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         grid.Dispose()
     End Sub
 End Class
@@ -290,13 +290,13 @@ Public Class Puzzle_Solver
         puzzle = New Puzzle_Basics(ocvb, "Puzzle_Solver")
         puzzle.grid.sliders.Hide()
 
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, callerName,3)
         radio.check(0).Text = "Easy Puzzle - tiles = 256x180"
         radio.check(1).Text = "Medium Puzzle - tiles = 128x90"
         radio.check(2).Text = "Hard Puzzle - tiles = 64x90"
         radio.check(0).Checked = True
         
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Reshuffle pieces"
         
         ocvb.desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."
@@ -399,7 +399,7 @@ Public Class Puzzle_Solver
         ocvb.label2 = "Puzzle_Solver output (ambiguities possible)"
         If radio.check(1).Checked Or radio.check(2).Checked Then Thread.Sleep(1000)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         puzzle.Dispose()
         radio.Dispose()
         check.Dispose()

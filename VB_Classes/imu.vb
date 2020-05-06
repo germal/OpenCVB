@@ -9,7 +9,7 @@ Public Class IMU_Basics
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
+        sliders.setupTrackBar1(ocvb, callerName, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
         
         flow = New Font_FlowText(ocvb, "IMU_Basics")
         flow.externalUse = True
@@ -55,7 +55,7 @@ Public Class IMU_Basics
         End If
         flow.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         flow.Dispose()
             End Sub
 End Class
@@ -113,7 +113,7 @@ Public Class IMU_Stabilizer
             ocvb.putText(New ActiveClass.TrueType("No IMU present on this RealSense device", 20, 100))
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         kalman.Dispose()
     End Sub
 End Class
@@ -149,7 +149,7 @@ Public Class IMU_Magnetometer
                           " z (red) = " + Format(plot.plotData.Item(2), "#0.00")
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         plot.Dispose()
     End Sub
 End Class
@@ -171,7 +171,7 @@ Public Class IMU_Barometer
                                                   "Barometric pressure is " + Format(ocvb.parms.IMU_Barometer * 0.02953, "#0.00") + " inches of mercury.", 10, 60))
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -190,7 +190,7 @@ Public Class IMU_Temperature
                                                   "IMU Temperature is " + Format(ocvb.parms.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.", 10, 60))
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -213,8 +213,8 @@ Public Class IMU_FrameTime
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.setupTrackBar1(ocvb, "Minimum IMU to Capture time (ms)", 1, 10, 2)
-        sliders.setupTrackBar2(ocvb, "Number of Plot Values", 5, 30, 25)
+        sliders.setupTrackBar1(ocvb, callerName, "Minimum IMU to Capture time (ms)", 1, 10, 2)
+        sliders.setupTrackBar2(ocvb, callerName, "Number of Plot Values", 5, 30, 25)
         
         ocvb.label2 = "IMU FT (blue) CPU FT (green) Latency est. (red)"
         ocvb.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
@@ -287,7 +287,7 @@ Public Class IMU_FrameTime
             End If
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         plot.Dispose()
     End Sub
 End Class
@@ -312,8 +312,8 @@ Public Class IMU_HostFrameTimes
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.setupTrackBar1(ocvb, "Minimum Host interrupt delay (ms)", 1, 10, 4)
-        sliders.setupTrackBar2(ocvb, "Number of Plot Values", 5, 30, 25)
+        sliders.setupTrackBar1(ocvb, callerName, "Minimum Host interrupt delay (ms)", 1, 10, 4)
+        sliders.setupTrackBar2(ocvb, callerName, "Number of Plot Values", 5, 30, 25)
         
         ocvb.label2 = "IMU FT (blue) CPU FT (green) Latency est. (red)"
         ocvb.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
@@ -375,7 +375,7 @@ Public Class IMU_HostFrameTimes
             End If
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         plot.Dispose()
     End Sub
 End Class
@@ -458,7 +458,7 @@ Public Class IMU_TotalDelay
             ocvb.putText(New ActiveClass.TrueType(allText, 10, 180))
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         host.Dispose()
         kalman.Dispose()
         imu.Dispose()
@@ -525,7 +525,7 @@ Public Class IMU_GravityVec
             ocvb.putText(New ActiveClass.TrueType(valstr, 10, 200, result))
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         kalman.Dispose()
     End Sub
 End Class

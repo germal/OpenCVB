@@ -15,10 +15,10 @@ Public Class CamShift_Basics
         plotHist = New Plot_Histogram(ocvb, "CamShift_Basics")
         plotHist.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, "CamShift vMin", 0, 255, 32)
-        sliders.setupTrackBar2(ocvb, "CamShift vMax", 0, 255, 255)
-        sliders.setupTrackBar3(ocvb, "CamShift Smin", 0, 255, 60)
-        sliders.setupTrackBar4(ocvb, "CamShift Histogram bins", 16, 255, 32)
+        sliders.setupTrackBar1(ocvb, callerName, "CamShift vMin", 0, 255, 32)
+        sliders.setupTrackBar2(ocvb, callerName, "CamShift vMax", 0, 255, 255)
+        sliders.setupTrackBar3(ocvb, callerName,"CamShift Smin", 0, 255, 60)
+        sliders.setupTrackBar4(ocvb, callerName,  "CamShift Histogram bins", 16, 255, 32)
         
                 ocvb.label1 = "Draw anywhere to create histogram and start camshift"
         ocvb.label2 = "Histogram of targeted region (hue only)"
@@ -68,7 +68,7 @@ Public Class CamShift_Basics
         ocvb.color.CopyTo(ocvb.result1, mask)
         If trackBox.Size.Width > 0 Then ocvb.result1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -103,7 +103,7 @@ Public Class CamShift_Foreground
         camshift.Run(ocvb)
         ocvb.label2 = "Mask of objects closer than " + Format(depthMax / 1000, "#0.0") + " meters"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         camshift.Dispose()
         blob.Dispose()
     End Sub
@@ -134,7 +134,7 @@ Public Class Camshift_Object
         If camshift.trackBox.Size.Width = 0 Then ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
         camshift.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         blob.Dispose()
         camshift.Dispose()
     End Sub
@@ -155,7 +155,7 @@ Public Class Camshift_TopObjects
         mats.externalUse = True
 
         blob = New Blob_DepthClusters(ocvb, "Camshift_TopObjects")
-        sliders.setupTrackBar1(ocvb, "How often should camshift be reinitialized", 1, 500, 100)
+        sliders.setupTrackBar1(ocvb, callerName, "How often should camshift be reinitialized", 1, 500, 100)
                 For i = 0 To cams.Length - 1
             cams(i) = New CamShift_Basics(ocvb, "Camshift_TopObjects")
         Next
@@ -183,7 +183,7 @@ Public Class Camshift_TopObjects
         Next
         mats.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         blob.Dispose()
         For i = 0 To cams.Length - 1
             cams(i).Dispose()

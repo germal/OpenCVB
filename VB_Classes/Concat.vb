@@ -14,7 +14,7 @@ Public Class Concat_Basics
         cv.Cv2.VConcat(ocvb.color, ocvb.RGBDepth, tmp)
         ocvb.result2 = tmp.Resize(ocvb.color.Size())
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -45,6 +45,6 @@ Public Class Concat_4way
         cv.Cv2.VConcat(tmp1, tmp2, tmp3)
         ocvb.result1 = tmp3.Resize(ocvb.color.Size())
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class

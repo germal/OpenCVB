@@ -48,7 +48,7 @@ Public Class Binarize_OTSU
         ocvb.result1 = ocvb.result2.Clone() ' mat_4to1 puts output in result2
         mats2.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         mats1.Dispose()
         mats2.Dispose()
         plotHist.Dispose()
@@ -63,10 +63,10 @@ Public Class Binarize_Niblack_Sauvola
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.Label1.Text = "Kernel Size"
-        sliders.setupTrackBar1(ocvb, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar2(ocvb, "Niblack k", -1000, 1000, -200)
-        sliders.setupTrackBar3(ocvb, "Sauvola k", -1000, 1000, 100)
-        sliders.setupTrackBar4(ocvb, "Sauvola r", 1, 100, 64)
+        sliders.setupTrackBar1(ocvb, callerName, "Kernel Size", 3, 500, 51)
+        sliders.setupTrackBar2(ocvb, callerName, "Niblack k", -1000, 1000, -200)
+        sliders.setupTrackBar3(ocvb, callerName,"Sauvola k", -1000, 1000, 100)
+        sliders.setupTrackBar4(ocvb, callerName,  "Sauvola r", 1, 100, 64)
         
         ocvb.desc = "Binarize an image using Niblack and Sauvola"
         ocvb.label1 = "Binarize Niblack"
@@ -83,7 +83,7 @@ Public Class Binarize_Niblack_Sauvola
         cv.Extensions.Binarizer.Sauvola(gray, grayBin, kernelSize, sliders.TrackBar3.Value / 1000, sliders.TrackBar4.Value)
         ocvb.result2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -95,9 +95,9 @@ Public Class Binarize_Niblack_Nick
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.Label1.Text = "Kernel Size"
-        sliders.setupTrackBar1(ocvb, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar2(ocvb, "Niblack k", -1000, 1000, -200)
-        sliders.setupTrackBar3(ocvb, "Nick k", -1000, 1000, 100)
+        sliders.setupTrackBar1(ocvb, callerName, "Kernel Size", 3, 500, 51)
+        sliders.setupTrackBar2(ocvb, callerName, "Niblack k", -1000, 1000, -200)
+        sliders.setupTrackBar3(ocvb, callerName,"Nick k", -1000, 1000, 100)
         
         ocvb.desc = "Binarize an image using Niblack and Nick"
         ocvb.label1 = "Binarize Niblack"
@@ -114,7 +114,7 @@ Public Class Binarize_Niblack_Nick
         cv.Extensions.Binarizer.Nick(gray, grayBin, kernelSize, sliders.TrackBar3.Value / 1000)
         ocvb.result2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -126,9 +126,9 @@ Public Class Binarize_Bernson
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.Label1.Text = "Kernel Size"
-        sliders.setupTrackBar1(ocvb, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar2(ocvb, "Contrast min", 0, 255, 50)
-        sliders.setupTrackBar3(ocvb, "bg Threshold", 0, 255, 100)
+        sliders.setupTrackBar1(ocvb, callerName, "Kernel Size", 3, 500, 51)
+        sliders.setupTrackBar2(ocvb, callerName, "Contrast min", 0, 255, 50)
+        sliders.setupTrackBar3(ocvb, callerName,"bg Threshold", 0, 255, 100)
         
         ocvb.label1 = "Binarize Bernson (Draw Enabled)"
 
@@ -148,7 +148,7 @@ Public Class Binarize_Bernson
         End If
         ocvb.result1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
             End Sub
 End Class
 
@@ -165,9 +165,9 @@ Public Class Binarize_Bernson_MT
         grid.sliders.TrackBar2.Value = 32
 
         sliders.Label1.Text = "Kernel Size"
-        sliders.setupTrackBar1(ocvb, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar2(ocvb, "Contrast min", 0, 255, 50)
-        sliders.setupTrackBar3(ocvb, "bg Threshold", 0, 255, 100)
+        sliders.setupTrackBar1(ocvb, callerName, "Kernel Size", 3, 500, 51)
+        sliders.setupTrackBar2(ocvb, callerName, "Contrast min", 0, 255, 50)
+        sliders.setupTrackBar3(ocvb, callerName,"bg Threshold", 0, 255, 100)
         
         ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
         ocvb.label1 = "Binarize Bernson"
@@ -188,7 +188,7 @@ Public Class Binarize_Bernson_MT
                 ocvb.result1(roi) = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             End Sub)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
                 grid.Dispose()
     End Sub
 End Class

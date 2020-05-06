@@ -122,7 +122,7 @@ Public Class OpenGL_Basics
             pipe.Write(buff, 0, imageLabel.Length)
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         If pipe IsNot Nothing Then
             If pipe.IsConnected Then
                 pipe.Flush()
@@ -142,29 +142,29 @@ End Class
 
 
 Module OpenGL_Sliders_Module
-    Public Sub setOpenGLsliders(ocvb As AlgorithmData, sliders As OptionsSliders, sliders1 As OptionsSliders, sliders2 As OptionsSliders, sliders3 As OptionsSliders)
-        sliders1.setupTrackBar1(ocvb, "OpenGL zNear", 0, 100, 0)
-        sliders1.setupTrackBar2(ocvb, "OpenGL zFar", -50, 200, 20)
-        sliders1.setupTrackBar3(ocvb, "OpenGL Point Size", 1, 20, 2)
-        sliders1.setupTrackBar4(ocvb, "zTrans", -1000, 1000, 50)
+    Public Sub setOpenGLsliders(ocvb As AlgorithmData, callerName As String, sliders As OptionsSliders, sliders1 As OptionsSliders, sliders2 As OptionsSliders, sliders3 As OptionsSliders)
+        sliders1.setupTrackBar1(ocvb, callerName, "OpenGL zNear", 0, 100, 0)
+        sliders1.setupTrackBar2(ocvb, callerName, "OpenGL zFar", -50, 200, 20)
+        sliders1.setupTrackBar3(ocvb, callerName, "OpenGL Point Size", 1, 20, 2)
+        sliders1.setupTrackBar4(ocvb, callerName, "zTrans", -1000, 1000, 50)
         If ocvb.parms.ShowOptions Then sliders1.Show()
 
-        sliders2.setupTrackBar1(ocvb, "OpenGL Eye X", -180, 180, 0)
-        sliders2.setupTrackBar2(ocvb, "OpenGL Eye Y", -180, 180, 0)
-        sliders2.setupTrackBar3(ocvb, "OpenGL Eye Z", -180, 180, -40)
+        sliders2.setupTrackBar1(ocvb, callerName, "OpenGL Eye X", -180, 180, 0)
+        sliders2.setupTrackBar2(ocvb, callerName, "OpenGL Eye Y", -180, 180, 0)
+        sliders2.setupTrackBar3(ocvb, callerName, "OpenGL Eye Z", -180, 180, -40)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
-        sliders3.setupTrackBar1(ocvb, "OpenGL Scale X", 1, 100, 10)
-        sliders3.setupTrackBar2(ocvb, "OpenGL Scale Y", 1, 100, 10)
-        sliders3.setupTrackBar3(ocvb, "OpenGL Scale Z", 1, 100, 1)
+        sliders3.setupTrackBar1(ocvb, callerName, "OpenGL Scale X", 1, 100, 10)
+        sliders3.setupTrackBar2(ocvb, callerName, "OpenGL Scale Y", 1, 100, 10)
+        sliders3.setupTrackBar3(ocvb, callerName, "OpenGL Scale Z", 1, 100, 1)
         If ocvb.parms.ShowOptions Then sliders3.Show()
 
         ' this is last so it shows up on top of all the others.
-        sliders.setupTrackBar1(ocvb, "OpenGL FOV", 1, 180, 150)
+        sliders.setupTrackBar1(ocvb, callerName, "OpenGL FOV", 1, 180, 150)
         If ocvb.parms.cameraIndex = D400Cam Then sliders.TrackBar1.Value = 135
-        sliders.setupTrackBar2(ocvb, "OpenGL yaw (degrees)", -180, 180, -3)
-        sliders.setupTrackBar3(ocvb, "OpenGL pitch (degrees)", -180, 180, 3)
-        sliders.setupTrackBar4(ocvb, "OpenGL roll (degrees)", -180, 180, 0)
+        sliders.setupTrackBar2(ocvb, callerName, "OpenGL yaw (degrees)", -180, 180, -3)
+        sliders.setupTrackBar3(ocvb, callerName, "OpenGL pitch (degrees)", -180, 180, 3)
+        sliders.setupTrackBar4(ocvb, callerName, "OpenGL roll (degrees)", -180, 180, 0)
     End Sub
 End Module
 
@@ -177,7 +177,7 @@ Public Class OpenGL_Options
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         OpenGL = New OpenGL_Basics(ocvb, "OpenGL_Options")
-        setOpenGLsliders(ocvb, sliders, sliders1, sliders2, sliders3)
+        setOpenGLsliders(ocvb, callerName, sliders, sliders1, sliders2, sliders3)
         ocvb.desc = "Adjust point size and FOV in OpenGL"
         ocvb.label1 = ""
     End Sub
@@ -202,7 +202,7 @@ Public Class OpenGL_Options
 
         OpenGL.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         OpenGL.Dispose()
     End Sub
 End Class
@@ -223,7 +223,7 @@ Public Class OpenGL_Callbacks
         ogl.rgbInput = ocvb.color
         ogl.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         ogl.Dispose()
     End Sub
 End Class
@@ -254,7 +254,7 @@ Public Class OpenGL_IMU
             ocvb.putText(New ActiveClass.TrueType("No IMU present on this RealSense device", 20, 100))
         End If
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         ogl.Dispose()
     End Sub
 End Class
@@ -280,7 +280,7 @@ Public Class OpenGL_3Ddata
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
+        sliders.setupTrackBar1(ocvb, callerName, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
 
         ogl = New OpenGL_Options(ocvb, "OpenGL_3Ddata")
         ogl.OpenGL.OpenGLTitle = "OpenGL_3Ddata"
@@ -316,7 +316,7 @@ Public Class OpenGL_3Ddata
         ogl.OpenGL.dataInput = histogram.Clone()
         ogl.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         ogl.Dispose()
     End Sub
 End Class
@@ -351,7 +351,7 @@ Public Class OpenGL_Draw3D
         ogl.OpenGL.rgbInput = New cv.Mat(1, ocvb.rColors.Length - 1, cv.MatType.CV_8UC3, ocvb.rColors.ToArray)
         ogl.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         ogl.Dispose()
         circle.Dispose()
     End Sub
@@ -381,7 +381,7 @@ Public Class OpenGL_Voxels
         ogl.dataInput *= 1 / (voxels.maxDepth - voxels.minDepth)
         ogl.Run(ocvb)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         voxels.Dispose()
         ogl.Dispose()
     End Sub
@@ -460,7 +460,7 @@ Public Class OpenGL_GravityTransform
         ogl.Run(ocvb)
         If ocvb.frameCount Mod 30 = 0 Then rotateFlag += 1
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         ogl.Dispose()
         imu.Dispose()
     End Sub

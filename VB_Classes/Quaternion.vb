@@ -16,17 +16,15 @@ Public Class Quaterion_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders1.setupTrackBar1(ocvb, "quaternion A.x X100", -100, 100, 0)
-        sliders1.setupTrackBar2(ocvb, "quaternion A.y X100", -100, 100, 0)
-        sliders1.setupTrackBar3(ocvb, "quaternion A.z X100", -100, 100, 0)
-        sliders1.setupTrackBar4(ocvb, "quaternion Theta X100", -100, 100, 100)
-        If ocvb.parms.ShowOptions Then sliders1.Show()
+        sliders1.setupTrackBar1(ocvb,  callerName, "quaternion A.x X100", -100, 100, 0)
+        sliders1.setupTrackBar2(ocvb, callerName, "quaternion A.y X100", -100, 100, 0)
+        sliders1.setupTrackBar3(ocvb, callerName,  "quaternion A.z X100", -100, 100, 0)
+        sliders1.setupTrackBar4(ocvb, callerName, "quaternion Theta X100", -100, 100, 100)
 
-        sliders2.setupTrackBar1(ocvb, "quaternion B.x X100", -100, 100, 0)
-        sliders2.setupTrackBar2(ocvb, "quaternion B.y X100", -100, 100, 0)
-        sliders2.setupTrackBar3(ocvb, "quaternion B.z X100", -100, 100, 0)
-        sliders2.setupTrackBar4(ocvb, "quaternion Theta X100", -100, 100, 100)
-        If ocvb.parms.ShowOptions Then sliders2.Show()
+        sliders2.setupTrackBar1(ocvb, callerName, "quaternion B.x X100", -100, 100, 0)
+        sliders2.setupTrackBar2(ocvb, callerName, "quaternion B.y X100", -100, 100, 0)
+        sliders2.setupTrackBar3(ocvb, callerName, "quaternion B.z X100", -100, 100, 0)
+        sliders2.setupTrackBar4(ocvb, callerName, "quaternion Theta X100", -100, 100, 100)
 
         ocvb.desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub
@@ -42,7 +40,7 @@ Public Class Quaterion_Basics
                                                   "Multiply q1 * q2" + quatmul.ToString(), 10, 60))
 
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -112,7 +110,7 @@ Public Class Quaterion_IMUPrediction
                                                   Format(diffq.Y, "#0.00") + ", " + vbTab +
                                                   Format(diffq.Z, "#0.00") + ", " + vbTab, 10, 40))
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         host.Dispose()
     End Sub
 End Class

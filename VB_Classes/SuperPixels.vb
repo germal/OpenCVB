@@ -29,9 +29,9 @@ Public Class SuperPixel_Basics_CPP
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders.setupTrackBar1(ocvb, "Number of SuperPixels", 1, 1000, 400)
-        sliders.setupTrackBar2(ocvb, "Iterations", 0, 10, 4)
-        sliders.setupTrackBar3(ocvb, "Prior", 1, 10, 2)
+        sliders.setupTrackBar1(ocvb, callerName, "Number of SuperPixels", 1, 1000, 400)
+        sliders.setupTrackBar2(ocvb, callerName, "Iterations", 0, 10, 4)
+        sliders.setupTrackBar3(ocvb, callerName,"Prior", 1, 10, 2)
         
         ocvb.label2 = "Superpixel label data (0-255)"
         ocvb.desc = "Sub-divide the image into super pixels."
@@ -81,7 +81,7 @@ Public Class SuperPixel_Basics_CPP
         If numSuperPixels < 255 Then labels *= 255 / numSuperPixels
         labels.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         SuperPixel_Close(spPtr)
             End Sub
 End Class
@@ -107,7 +107,7 @@ Public Class SuperPixel_Depth
         ocvb.result1 = pixels.dst1
         ocvb.result2 = pixels.dst2
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         pixels.Dispose()
     End Sub
 End Class
@@ -142,7 +142,7 @@ Public Class SuperPixel_WithCanny
         ocvb.result2.SetTo(cv.Scalar.Red, edges.dst)
         ocvb.label2 = "Edges provided by Canny in red"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         pixels.Dispose()
     End Sub
 End Class
@@ -178,7 +178,7 @@ Public Class SuperPixel_WithLineDetector
         ' ocvb.result2.SetTo(cv.Scalar.Red, lines.dst)
         ' ocvb.label2 = "Edges provided by Canny in red"
     End Sub
-    Public Sub VBdispose()
+    Public Sub MyDispose()
         pixels.Dispose()
     End Sub
 End Class
