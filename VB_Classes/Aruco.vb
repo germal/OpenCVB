@@ -20,8 +20,8 @@ Public Class Aruco_Basics
         ' this fails!  Cannot cast a Mat to an InputArray!  Bug?
         ' cv.Aruco.CvAruco.DetectMarkers(src, dictionary, corners, ids, detectorParameters, rejectedPoints)
         ocvb.putText(New ActiveClass.TrueType("This algorithm is currently failing in VB.Net (works in C#)." + vbCrLf +
-                                              "The DetectMarkers API works in C# but fails in VB.Net." + vbCrLf +
-                                              "To see the correct output, use Aruco_CS.", 10, 140, RESULT1))
+                                                  "The DetectMarkers API works in C# but fails in VB.Net." + vbCrLf +
+                                                  "To see the correct output, use Aruco_CS.", 10, 140, RESULT1))
     End Sub
 End Class
 
@@ -43,6 +43,6 @@ Public Class Aruco_CS
         ocvb.result1 = aruco.detectedMarkers.Resize(ocvb.result1.Size())
 
         ocvb.result2(New cv.Rect(0, 0, ocvb.result2.Height, ocvb.result2.Height)) =
-                    aruco.normalizedImage.Resize(New cv.Size(ocvb.result2.Height, ocvb.result2.Height))
+                        aruco.normalizedImage.Resize(New cv.Size(ocvb.result2.Height, ocvb.result2.Height))
     End Sub
 End Class

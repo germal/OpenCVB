@@ -59,10 +59,10 @@ Public Class AlgorithmData
     End Sub
     Public Sub vtkInstructions()
         putText(New ActiveClass.TrueType("VTK support is disabled. " + vbCrLf + "Enable VTK with the following steps:" + vbCrLf + vbCrLf +
-                                         "Step 1) Run 'PrepareVTK.bat' in <OpenCVB_Home>" + vbCrLf +
-                                         "Step 2) Build VTK for both Debug and Release" + vbCrLf +
-                                         "Step 3) Build OpenCV for both Debug and Release" + vbCrLf +
-                                         "Step 4) Edit mainVTK.cpp (project VTKDataExample) and modify the first line", 10, 125))
+                                             "Step 1) Run 'PrepareVTK.bat' in <OpenCVB_Home>" + vbCrLf +
+                                             "Step 2) Build VTK for both Debug and Release" + vbCrLf +
+                                             "Step 3) Build OpenCV for both Debug and Release" + vbCrLf +
+                                             "Step 4) Edit mainVTK.cpp (project VTKDataExample) and modify the first line", 10, 125))
     End Sub
     Public Sub putText(tt As ActiveClass.TrueType)
         TTtextData(tt.picTag).Add(tt)

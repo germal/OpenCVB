@@ -187,12 +187,12 @@ Public Class Annealing_CPP_MT
         check.Box(0).Checked = False
         Dim allClosed As Boolean = True
         Parallel.For(0, anneal.Length,
-        Sub(i)
-            If anneal(i).closed = False Then
-                anneal(i).Run(ocvb)
-                allClosed = False
-            End If
-        End Sub)
+            Sub(i)
+                If anneal(i).closed = False Then
+                    anneal(i).Run(ocvb)
+                    allClosed = False
+                End If
+            End Sub)
 
         ' find the best result and start all the others with it.
         Dim minEnergy As Single = Single.MaxValue
