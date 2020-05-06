@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module FitEllipse_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -19,14 +19,14 @@ Public Class FitEllipse_Basics_CPP
     Public dstData(5 * 4 - 1) As Byte ' enough space for a float describing angle, center, and width/height - this will be filled in on the C++ side.
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        area = New Area_MinTriangle_CPP(ocvb, "FitEllipse_Basics_CPP")
+        area = New Area_MinTriangle_CPP(ocvb, callerName)
 
         ocvb.desc = "Use FitEllipse to draw around a set of points"
         dstHandle = GCHandle.Alloc(dstData, GCHandleType.Pinned)
         ocvb.label2 = "Green FitEllipse, Yellow=AMS, Red=Direct"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        area.Run(ocvb)  ' get some random clusters of points 
+        area.Run(ocvb)  ' get some random clusters of points
         ocvb.result2.SetTo(0)
         If area.srcPoints.Count >= 5 Then
             Dim box = cv.Cv2.FitEllipse(area.srcPoints)
@@ -43,7 +43,7 @@ Public Class FitEllipse_Basics_CPP
             ' AMS method
             Dim input As New cv.Mat(area.srcPoints.Count, 1, cv.MatType.CV_32FC2, area.srcPoints)
             Marshal.Copy(input.Data, area.srcData, 0, area.srcData.Length)
-            Dim srcHandle = GCHandle.Alloc(area.srcData, GCHandleType.Pinned) 
+            Dim srcHandle = GCHandle.Alloc(area.srcData, GCHandleType.Pinned)
             Dim dstHandle = GCHandle.Alloc(area.dstData, GCHandleType.Pinned)
             FitEllipse_AMS(srcHandle.AddrOfPinnedObject(), area.srcPoints.Count - 1, dstHandle.AddrOfPinnedObject)
 

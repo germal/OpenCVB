@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Resize_Basics
     Inherits VB_Class
         Public externalUse As Boolean
@@ -45,7 +45,7 @@ Public Class Resize_After8uc3
         Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        colorizer = New Depth_Colorizer_CPP(ocvb, "Resize_After8uc3")
+        colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
         colorizer.externalUse = True
         SetInterpolationRadioButtons(ocvb, callerName, radio, "Resize")
         ' warp is not allowed in resize
@@ -92,11 +92,11 @@ Public Class Resize_Percentage
     Public resizeOptions As Resize_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        resizeOptions = New Resize_Basics(ocvb, "Resize_Percentage")
+        resizeOptions = New Resize_Basics(ocvb, callerName)
         resizeOptions.externalUse = True
 
         sliders.setupTrackBar1(ocvb, callerName, "Resize Percentage (%)", 1, 100, 3)
-        
+
         ocvb.desc = "Resize by a percentage of the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

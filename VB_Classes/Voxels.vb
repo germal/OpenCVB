@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Voxels_Basics_MT
     Inherits VB_Class
     Public trim As Depth_InRange
@@ -12,14 +12,14 @@ Public Class Voxels_Basics_MT
         check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Display intermediate results"
         check.Box(0).Checked = True
-        
-        trim = New Depth_InRange(ocvb, "Voxels_Basics_MT")
+
+        trim = New Depth_InRange(ocvb, callerName)
         trim.externalUse = True
         trim.sliders.TrackBar2.Value = 5000
 
         sliders.setupTrackBar1(ocvb, callerName, "Histogram Bins", 2, 200, 100)
-        
-        grid = New Thread_Grid(ocvb, "Voxels_Basics_MT")
+
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
         grid.externalUse = True

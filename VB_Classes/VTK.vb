@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
@@ -10,8 +10,8 @@ Public Class VTK_Basics
     Dim startInfo As New ProcessStartInfo
     Dim hglobal As IntPtr
     Dim pipe As NamedPipeServerStream
-    Dim rgbBuffer(2048 * 4096 - 1) As Byte ' set a very large buffer so we don't have to redim 
-    Dim dataBuffer(2048 * 4096 - 1) As Byte ' set a very large buffer so we don't have to redim 
+    Dim rgbBuffer(2048 * 4096 - 1) As Byte ' set a very large buffer so we don't have to redim
+    Dim dataBuffer(2048 * 4096 - 1) As Byte ' set a very large buffer so we don't have to redim
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim memMapbufferSize As Int32
     Dim memMapFile As MemoryMappedFile
@@ -132,16 +132,16 @@ Public Class VTK_Histogram3D
         sliders.setupTrackBar1(ocvb, callerName, "Random Number Stdev", 0, 255, 10)
         sliders.setupTrackBar2(ocvb, callerName, "Hist 3D bins", 1, 100, 32)
         sliders.setupTrackBar3(ocvb, callerName,"Hist 3D bin Threshold X1000000", 10, 100, 20)
-        
-        mats = New Mat_4to1(ocvb, "VTK_Histogram3D")
+
+        mats = New Mat_4to1(ocvb, callerName)
         mats.externalUse = True
 
         ocvb.label2 = "Input to VTK plot"
 
-        vtk = New VTK_Basics(ocvb, "VTK_Histogram3D")
+        vtk = New VTK_Basics(ocvb, callerName)
         vtk.usingDepthAndRGB = False
 
-        random = New Random_NormalDist(ocvb, "VTK_Histogram3D")
+        random = New Random_NormalDist(ocvb, callerName)
         random.externalUse = True
         ocvb.desc = "Create the test pattern and send it to VTK for 3D display."
     End Sub
@@ -156,11 +156,11 @@ Public Class VTK_Histogram3D
                 lastStdev <> sliders.TrackBar1.Value Then
             vtk.memMapUserData(2) = 1 ' trigger a recompute of the 3D histogram.
         Else
-            vtk.memMapUserData(2) = 0 ' no need to recompute 3D histogram.  
+            vtk.memMapUserData(2) = 0 ' no need to recompute 3D histogram.
         End If
 
-        vtk.memMapUserData(0) = sliders.TrackBar2.Value ' number of bins 
-        vtk.memMapUserData(1) = sliders.TrackBar3.Value / 1000000 ' threshold  
+        vtk.memMapUserData(0) = sliders.TrackBar2.Value ' number of bins
+        vtk.memMapUserData(1) = sliders.TrackBar3.Value / 1000000 ' threshold
 
         If lastStdev <> sliders.TrackBar1.Value Then
             For i = 0 To 3

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.IO
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_Basics
@@ -38,12 +38,12 @@ Public Class Video_CarCounting
     Dim mog As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        mog = New BGSubtract_MOG(ocvb, "Video_CarCounting")
+        mog = New BGSubtract_MOG(ocvb, callerName)
         mog.externalUse = True
 
-        video = New Video_Basics(ocvb, "Video_CarCounting")
+        video = New Video_Basics(ocvb, callerName)
 
-        flow = New Font_FlowText(ocvb, "Video_CarCounting")
+        flow = New Font_FlowText(ocvb, callerName)
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
@@ -103,15 +103,15 @@ Public Class Video_CarCComp
     Dim mog As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        mog = New BGSubtract_MOG(ocvb, "Video_CarCComp")
+        mog = New BGSubtract_MOG(ocvb, callerName)
         mog.externalUse = True
 
-        cc = New CComp_Basics(ocvb, "Video_CarCComp")
+        cc = New CComp_Basics(ocvb, callerName)
         cc.externalUse = True
 
-        video = New Video_Basics(ocvb, "Video_CarCComp")
+        video = New Video_Basics(ocvb, callerName)
 
-        flow = New Font_FlowText(ocvb, "Video_CarCComp")
+        flow = New Font_FlowText(ocvb, callerName)
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
@@ -147,11 +147,11 @@ Public Class Video_MinRect
     Public contours As cv.Point()()
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        video = New Video_Basics(ocvb, "Video_MinRect")
+        video = New Video_Basics(ocvb, callerName)
         video.srcVideo = ocvb.parms.HomeDir + "Data/CarsDrivingUnderBridge.mp4"
         video.Run(ocvb)
 
-        mog = New BGSubtract_MOG(ocvb, "Video_MinRect")
+        mog = New BGSubtract_MOG(ocvb, callerName)
         mog.externalUse = True
         ocvb.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
@@ -187,7 +187,7 @@ Public Class Video_MinCircle
     Dim input As Video_MinRect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        input = New Video_MinRect(ocvb, "Video_MinCircle")
+        input = New Video_MinRect(ocvb, callerName)
         input.externalUse = True
         ocvb.desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub

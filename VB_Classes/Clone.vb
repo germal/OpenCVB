@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
 Public Class Clone_Normal
     Inherits VB_Class
@@ -43,7 +43,7 @@ Public Class Clone_ColorChange
         Dim clone As Clone_Normal
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        clone = New Clone_Normal(ocvb, "Clone_ColorChange")
+        clone = New Clone_Normal(ocvb, callerName)
         ocvb.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
 
         sliders.setupTrackBar1(ocvb, callerName, "Color Change - Red", 5, 25, 15)
@@ -68,7 +68,7 @@ Public Class Clone_IlluminationChange
         Dim clone As Clone_Normal
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        clone = New Clone_Normal(ocvb, "Clone_IlluminationChange")
+        clone = New Clone_Normal(ocvb, callerName)
         ocvb.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
 
         sliders.setupTrackBar1(ocvb, callerName, "Alpha", 0, 20, 2)
@@ -93,7 +93,7 @@ Public Class Clone_TextureFlattening
         Dim clone As Clone_Normal
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        clone = New Clone_Normal(ocvb, "Clone_TextureFlattening")
+        clone = New Clone_Normal(ocvb, callerName)
         ocvb.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
 
         sliders.setupTrackBar1(ocvb, callerName, "Low Threshold", 0, 100, 10)
@@ -131,7 +131,7 @@ Public Class Clone_Eagle
         radio.check(1).Text = "Seamless - MonochromeTransfer Clone"
         radio.check(2).Text = "Seamless - Normal Clone"
         radio.check(2).Checked = True
-        
+
         sourceImage = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/CloneSource.png")
         srcROI = New cv.Rect(0, 40, sourceImage.Width, sourceImage.Height)
 

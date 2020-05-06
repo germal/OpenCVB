@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Watershed_Basics
     Inherits VB_Class
     Public useDepthImage As Boolean
@@ -68,7 +68,7 @@ Public Class Watershed_DepthAuto
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.result2.SetTo(0)
-        watershed = New Watershed_Basics(ocvb, "Watershed_DepthAuto")
+        watershed = New Watershed_Basics(ocvb, callerName)
         watershed.useDepthImage = True
         ocvb.desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
@@ -98,7 +98,7 @@ Public Class Watershed_RGBSimpleAuto
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.result2.SetTo(0)
 
-        watershed = New Watershed_Basics(ocvb, "Watershed_RGBSimpleAuto")
+        watershed = New Watershed_Basics(ocvb, callerName)
 
         Dim topLeft = New cv.Rect(0, 0, 100, 100)
         Dim topRight = New cv.Rect(ocvb.color.Width - 100, 0, 100, 100)
@@ -129,7 +129,7 @@ Public Class Watershed_RGBDepthAuto
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.result2.SetTo(0)
 
-        watershed = New Watershed_Basics(ocvb, "Watershed_RGBDepthAuto")
+        watershed = New Watershed_Basics(ocvb, callerName)
 
         Dim topLeft = New cv.Rect(0, 0, 100, 100)
         Dim topRight = New cv.Rect(ocvb.color.Width - 100, 0, 100, 100)

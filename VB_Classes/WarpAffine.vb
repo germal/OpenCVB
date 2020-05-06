@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' http://opencvexamples.blogspot.com/
 Public Class WarpAffine_Captcha
     Inherits VB_Class
@@ -135,7 +135,7 @@ Public Class WarpAffine_3Points
     Dim triangle As Area_MinTriangle_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        triangle = New Area_MinTriangle_CPP(ocvb, "WarpAffine_3Points")
+        triangle = New Area_MinTriangle_CPP(ocvb, callerName)
         triangle.sliders.TrackBar1.Value = 20
         triangle.sliders.TrackBar2.Value = 150
 
@@ -212,7 +212,7 @@ Public Class WarpAffine_4Points
     Dim rect As Area_MinRect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        rect = New Area_MinRect(ocvb, "WarpAffine_4Points")
+        rect = New Area_MinRect(ocvb, callerName)
 
         ocvb.desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
         ocvb.label1 = "Color image with perspective transform applied"

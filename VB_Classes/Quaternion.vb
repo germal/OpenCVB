@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Numerics
 
 Module Quaternion_module
@@ -53,7 +53,7 @@ Public Class Quaterion_IMUPrediction
     Dim host As IMU_HostFrameTimes
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        host = New IMU_HostFrameTimes(ocvb, "Quaterion_IMUPrediction")
+        host = New IMU_HostFrameTimes(ocvb, callerName)
         host.externalUse = True
 
         ocvb.label1 = "Quaternion_IMUPrediction"

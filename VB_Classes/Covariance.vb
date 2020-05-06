@@ -1,10 +1,10 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Covariance_Basics
     Inherits VB_Class
     Dim random As Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        random = New Random_Points(ocvb, "Covariance_Basics")
+        random = New Random_Points(ocvb, callerName)
         ocvb.desc = "Calculate the covariance of random depth data points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

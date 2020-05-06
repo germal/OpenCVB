@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/lkdemo.cpp
 Public Class KLT_Basics
     Inherits VB_Class
@@ -90,7 +90,7 @@ Public Class KLT_OpticalFlow
     Dim lastpoints() As cv.Point2f
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        klt = New KLT_Basics(ocvb, "KLT_OpticalFlow")
+        klt = New KLT_Basics(ocvb, callerName)
         klt.externalUse = True ' we will compress the points file below.
         ocvb.desc = "KLT optical flow"
     End Sub

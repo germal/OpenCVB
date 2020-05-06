@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports CS_Classes
 Public Class Blur_Gaussian
     Inherits VB_Class
@@ -117,13 +117,13 @@ Public Class Blur_PlusHistogram
     Dim myhist As Histogram_EqualizeGray
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        mat2to1 = New Mat_2to1(ocvb, "Blur_PlusHistogram")
+        mat2to1 = New Mat_2to1(ocvb, callerName)
         mat2to1.externalUse = True
 
-        blur = New Blur_Bilateral(ocvb, "Blur_PlusHistogram")
+        blur = New Blur_Bilateral(ocvb, callerName)
         blur.externalUse = True
 
-        myhist = New Histogram_EqualizeGray(ocvb, "Blur_PlusHistogram")
+        myhist = New Histogram_EqualizeGray(ocvb, callerName)
         myhist.externalUse = True
 
         ocvb.desc = "Compound algorithms Blur and Histogram"

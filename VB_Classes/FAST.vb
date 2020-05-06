@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
 Public Class FAST_Basics
     Inherits VB_Class
@@ -32,11 +32,11 @@ Public Class FAST_Centroid
     Dim kalman As Kalman_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        kalman = New Kalman_Basics(ocvb, "FAST_Centroid")
+        kalman = New Kalman_Basics(ocvb, callerName)
         ReDim kalman.src(1) ' 2 elements - cv.point
         kalman.externalUse = True
 
-        fast = New FAST_Basics(ocvb, "FAST_Centroid")
+        fast = New FAST_Basics(ocvb, callerName)
         ocvb.desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

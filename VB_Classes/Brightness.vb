@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization (CLAHE)
     Inherits VB_Class
@@ -175,7 +175,7 @@ Public Class Brightness_WhiteBalance
     Dim wPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        hist = New Histogram_Basics(ocvb, "Brightness_WhiteBalance")
+        hist = New Histogram_Basics(ocvb, callerName)
         hist.bins = 256 * 3
         hist.maxRange = hist.bins
         hist.externalUse = True

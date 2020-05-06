@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 
@@ -132,14 +132,14 @@ Public Class Annealing_CPP_MT
         random.sliders.TrackBar1.Value = sliders.TrackBar1.Value
         random.Run(ocvb) ' get the city positions (may or may not be used below.)
 
-        anneal(0) = New Annealing_Basics_CPP(ocvb, "Annealing_CPP_MT")
+        anneal(0) = New Annealing_Basics_CPP(ocvb, callerName)
         anneal(0).numberOfCities = sliders.TrackBar1.Value
         anneal(0).circularPattern = check.Box(2).Checked
         If check.Box(2).Checked = False Then anneal(0).cityPositions = random.Points2f.Clone()
         anneal(0).setup(ocvb)
         anneal(0).Open() ' this will initialize the C++ copy of the city positions.
         For i = 1 To anneal.Length - 1
-            anneal(i) = New Annealing_Basics_CPP(ocvb, "Annealing_CPP_MT")
+            anneal(i) = New Annealing_Basics_CPP(ocvb, callerName)
             anneal(i).externalUse = True
             anneal(i).numberOfCities = sliders.TrackBar1.Value
             anneal(i).setup(ocvb)
@@ -154,11 +154,11 @@ Public Class Annealing_CPP_MT
 
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        random = New Random_Points(ocvb, "Annealing_CPP_MT")
+        random = New Random_Points(ocvb, callerName)
         random.externalUse = True
         random.sliders.Visible = False
 
-        mats = New Mat_4to1(ocvb, "Annealing_CPP_MT")
+        mats = New Mat_4to1(ocvb, callerName)
         mats.externalUse = True
 
         sliders.setupTrackBar1(ocvb, callerName, "Anneal Number of Cities", 5, 500, 25)
@@ -171,7 +171,7 @@ Public Class Annealing_CPP_MT
         check.Box(2).Text = "Circular pattern of cities (allows you to visually check if successful.)"
         check.Box(2).Checked = True
 
-        flow = New Font_FlowText(ocvb, "Annealing_CPP_MT")
+        flow = New Font_FlowText(ocvb, callerName)
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
@@ -259,7 +259,7 @@ Public Class Annealing_Options
     Dim flow As Font_FlowText
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        random = New Random_Points(ocvb, "Annealing_Options")
+        random = New Random_Points(ocvb, callerName)
         random.sliders.TrackBar1.Value = 25 ' change the default number of cities here.
         random.externalUse = True
         random.Run(ocvb) ' get the city positions (may or may not be used below.)
@@ -269,14 +269,14 @@ Public Class Annealing_Options
         check.Box(1).Text = "Circular pattern of cities (allows you to visually check if successful.)"
         check.Box(1).Checked = True
 
-        flow = New Font_FlowText(ocvb, "Annealing_Options")
+        flow = New Font_FlowText(ocvb, callerName)
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
         ocvb.label1 = "Log of Annealing progress"
 
 
-        anneal = New Annealing_Basics_CPP(ocvb, "Annealing_Options")
+        anneal = New Annealing_Basics_CPP(ocvb, callerName)
         anneal.externalUse = True
         anneal.numberOfCities = random.sliders.TrackBar1.Value
         anneal.circularPattern = check.Box(1).Checked

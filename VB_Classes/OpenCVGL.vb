@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module OpenCVGL_Image_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -27,7 +27,7 @@ Public Class OpenCVGL_Image_CPP
     Dim pointCloudData(0) As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        imu = New IMU_Basics(ocvb, "OpenCVGL_Image_CPP")
+        imu = New IMU_Basics(ocvb, callerName)
         imu.externalUse = True
 
         If ocvb.parms.testAllRunning = False Then
@@ -44,7 +44,7 @@ Public Class OpenCVGL_Image_CPP
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.testAllRunning Then
-            ' It runs fine but after several cycles, it will fail with an external exception.  
+            ' It runs fine but after several cycles, it will fail with an external exception.
             ' Only happens on 'Test All' runs.  Runs fine otherwise.
             ocvb.putText(New ActiveClass.TrueType("OpenCVGL only fails when running 'Test All'.  Can't get it to fail otherwise." + vbCrLf +
                                                   "Skipping it during a 'Test All' just so all the other tests can be exercised.", 10, 60, RESULT1))

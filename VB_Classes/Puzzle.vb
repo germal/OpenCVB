@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Threading
 
 Module Puzzle_Solvers
@@ -225,12 +225,12 @@ End Module
 Public Class Puzzle_Basics
     Inherits VB_Class
     Public grid As Thread_Grid
-    Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size. 
-    Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size. 
+    Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
+    Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public restartRequested As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        grid = New Thread_Grid(ocvb, "Puzzle_Basics")
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 10
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 8
         grid.Run(ocvb)
@@ -287,7 +287,7 @@ Public Class Puzzle_Solver
     Dim fitlist As New List(Of bestFit)
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        puzzle = New Puzzle_Basics(ocvb, "Puzzle_Solver")
+        puzzle = New Puzzle_Basics(ocvb, callerName)
         puzzle.grid.sliders.Hide()
 
         radio.Setup(ocvb, callerName,3)
@@ -295,10 +295,10 @@ Public Class Puzzle_Solver
         radio.check(1).Text = "Medium Puzzle - tiles = 128x90"
         radio.check(2).Text = "Hard Puzzle - tiles = 64x90"
         radio.check(0).Checked = True
-        
+
         check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Reshuffle pieces"
-        
+
         ocvb.desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."
     End Sub
     Private Function checkUsedList(best As List(Of Integer)) As bestFit

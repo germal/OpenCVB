@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Threading
 Module ML__Exports
     Private Class CompareVec3f : Implements IComparer(Of cv.Vec3f)
@@ -63,13 +63,13 @@ Public Class ML_FillRGBDepth_MT
     Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        colorizer = New Depth_Colorizer_CPP(ocvb, "ML_FillRGBDepth_MT")
+        colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
         colorizer.externalUse = True
-        grid = New Thread_Grid(ocvb, "ML_FillRGBDepth_MT")
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
         grid.externalUse = True ' we don't need any results.
-        shadow = New Depth_Holes(ocvb, "ML_FillRGBDepth_MT")
+        shadow = New Depth_Holes(ocvb, callerName)
         ocvb.label1 = "ML filled shadow"
         ocvb.label2 = ""
         ocvb.desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
@@ -103,12 +103,12 @@ Public Class ML_FillRGBDepth
         Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        colorizer = New Depth_Colorizer_CPP(ocvb, "ML_FillRGBDepth")
+        colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
         colorizer.externalUse = True
 
         sliders.setupTrackBar1(ocvb, callerName, "ML Min Learn Count", 2, 100, 5)
-        
-        shadow = New Depth_Holes(ocvb, "ML_FillRGBDepth")
+
+        shadow = New Depth_Holes(ocvb, callerName)
         shadow.sliders.TrackBar1.Value = 3
 
         ocvb.label2 = "ML filled shadow"
@@ -138,16 +138,16 @@ Public Class ML_DepthFromColor_MT
     Dim dilate As DilateErode_Basics
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        colorizer = New Depth_Colorizer_CPP(ocvb, "ML_DepthFromColor_MT")
+        colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
         colorizer.externalUse = True
 
-        dilate = New DilateErode_Basics(ocvb, "ML_DepthFromColor_MT")
+        dilate = New DilateErode_Basics(ocvb, callerName)
         dilate.externalUse = True
         dilate.sliders.TrackBar2.Value = 2
 
         sliders.setupTrackBar1(ocvb, callerName, "Prediction Max Depth", 500, 5000, 1000)
-        
-        grid = New Thread_Grid(ocvb, "ML_DepthFromColor_MT")
+
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
         grid.externalUse = True
@@ -213,17 +213,17 @@ Public Class ML_DepthFromColor
     Dim resized As Resize_Percentage
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        colorizer = New Depth_Colorizer_CPP(ocvb, "ML_DepthFromColor")
+        colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
         colorizer.externalUse = True
 
-        mats = New Mat_4to1(ocvb, "ML_DepthFromColor")
+        mats = New Mat_4to1(ocvb, callerName)
         mats.externalUse = True
 
-        shadow = New Depth_Holes(ocvb, "ML_DepthFromColor")
+        shadow = New Depth_Holes(ocvb, callerName)
 
         sliders.setupTrackBar1(ocvb, callerName, "Prediction Max Depth", 1000, 5000, 1500)
-        
-        resized = New Resize_Percentage(ocvb, "ML_DepthFromColor")
+
+        resized = New Resize_Percentage(ocvb, callerName)
         resized.externalUse = True
         resized.sliders.TrackBar1.Value = 2 ' 2% of the image.
 
@@ -299,17 +299,17 @@ Public Class ML_DepthFromXYColor
         Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        colorizer = New Depth_Colorizer_CPP(ocvb, "ML_DepthFromXYColor")
+        colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
         colorizer.externalUse = True
 
-        mats = New Mat_4to1(ocvb, "ML_DepthFromXYColor")
+        mats = New Mat_4to1(ocvb, callerName)
         mats.externalUse = True
 
-        shadow = New Depth_Holes(ocvb, "ML_DepthFromXYColor")
+        shadow = New Depth_Holes(ocvb, callerName)
 
         sliders.setupTrackBar1(ocvb, callerName, "Prediction Max Depth", 1000, 5000, 1500)
-        
-        resized = New Resize_Percentage(ocvb, "ML_DepthFromXYColor")
+
+        resized = New Resize_Percentage(ocvb, callerName)
         resized.externalUse = True
         resized.sliders.TrackBar1.Value = 2
 
@@ -402,16 +402,16 @@ Public Class ML_EdgeDepth
     Dim dilate As DilateErode_Basics
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        colorizer = New Depth_Colorizer_CPP(ocvb, "ML_EdgeDepth")
+        colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
         colorizer.externalUse = True
 
-        dilate = New DilateErode_Basics(ocvb, "ML_EdgeDepth")
+        dilate = New DilateErode_Basics(ocvb, callerName)
         dilate.externalUse = True
         dilate.sliders.TrackBar2.Value = 5
 
         sliders.setupTrackBar1(ocvb, callerName, "Prediction Max Depth", 500, 5000, 1000)
-        
-        grid = New Thread_Grid(ocvb, "ML_EdgeDepth")
+
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
         grid.externalUse = True

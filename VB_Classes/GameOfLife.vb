@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
 Public Class GameOfLife_Basics
     Inherits VB_Class
@@ -32,7 +32,7 @@ Public Class GameOfLife_Basics
         grid = New cv.Mat(ocvb.color.Height / factor, ocvb.color.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
 
-        random = New Random_Points(ocvb, "GameOfLife_Basics")
+        random = New Random_Points(ocvb, callerName)
         random.externalUse = True
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
         random.sliders.TrackBar1.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
@@ -105,9 +105,9 @@ Public Class GameOfLife_Population
     Dim game As GameOfLife_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        game = New GameOfLife_Basics(ocvb, "GameOfLife_Population")
+        game = New GameOfLife_Basics(ocvb, callerName)
 
-        plot = New Plot_OverTime(ocvb, "GameOfLife_Population")
+        plot = New Plot_OverTime(ocvb, callerName)
         plot.externalUse = True
         plot.dst = ocvb.result2
         plot.maxScale = 2000

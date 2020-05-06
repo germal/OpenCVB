@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Stabilizer_BriskFeatures
     Inherits VB_Class
@@ -6,10 +6,10 @@ Public Class Stabilizer_BriskFeatures
     Dim stabilizer As Stabilizer_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        stabilizer = New Stabilizer_Basics(ocvb, "Stabilizer_BriskFeatures")
+        stabilizer = New Stabilizer_Basics(ocvb, callerName)
         stabilizer.externalUse = True
 
-        brisk = New BRISK_Basics(ocvb, "Stabilizer_BriskFeatures")
+        brisk = New BRISK_Basics(ocvb, callerName)
         brisk.externalUse = True
         brisk.sliders.TrackBar1.Value = 10
 
@@ -37,10 +37,10 @@ Public Class Stabilizer_HarrisFeatures
     Dim stabilizer As Stabilizer_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        stabilizer = New Stabilizer_Basics(ocvb, "Stabilizer_HarrisFeatures")
+        stabilizer = New Stabilizer_Basics(ocvb, callerName)
         stabilizer.externalUse = True
 
-        harris = New Harris_Detector_CPP(ocvb, "Stabilizer_HarrisFeatures")
+        harris = New Harris_Detector_CPP(ocvb, callerName)
         harris.externalUse = True
 
         ocvb.desc = "Stabilize the video stream using Harris detector features"
@@ -73,7 +73,7 @@ Public Class Stabilizer_Basics
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        good = New Features_GoodFeatures(ocvb, "Stabilizer_Basics")
+        good = New Features_GoodFeatures(ocvb, callerName)
         good.externalUse = True
 
         ocvb.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
@@ -227,8 +227,8 @@ Public Class Stabilizer_SideBySide
     Dim basics As Stabilizer_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        original = New Stabilizer_Basics_CPP(ocvb, "Stabilizer_SideBySide")
-        basics = New Stabilizer_Basics(ocvb, "Stabilizer_SideBySide")
+        original = New Stabilizer_Basics_CPP(ocvb, callerName)
+        basics = New Stabilizer_Basics(ocvb, callerName)
         ocvb.desc = "Run both the original and the VB.Net version of the video stabilizer.  Neither is working properly."
         ocvb.label1 = "Stabilizer_Basic (VB.Net)"
         ocvb.label2 = "Stabilizer_Basic_CPP (C++)"

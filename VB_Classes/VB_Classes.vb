@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Drawing
 
 Module VB_Classes
@@ -168,7 +168,7 @@ Public Class ActiveClass
             parms.activeAlgorithm = parms.activeAlgorithm.Substring(0, Len(parms.activeAlgorithm) - 3)
             ActiveAlgorithm = algoList.createAlgorithm(ocvb)
         End If
-        If parms.useRecordedData Then recordedData = New Replay_Play(ocvb, "VB_Classes.vb")
+        If parms.useRecordedData Then recordedData = New Replay_Play(ocvb, callerName)
     End Sub
     Public Sub UpdateHostLocation(left As Int32, top As Int32, height As Int32)
         appLocation = New cv.Rect(left, top, 0, height)

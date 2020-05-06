@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module OpticalFlowModule_Exports
     ' https://docs.opencv.org/3.4/db/d7f/tutorial_js_lucas_kanade.html
@@ -126,7 +126,7 @@ Public Class OpticalFlow_DenseBasics
     Dim flow As OpticalFlow_DenseOptions
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        flow = New OpticalFlow_DenseOptions(ocvb, "OpticalFlow_DenseBasics")
+        flow = New OpticalFlow_DenseOptions(ocvb, callerName)
         ocvb.desc = "Use dense optical flow algorithm  "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -160,13 +160,13 @@ Public Class OpticalFlow_DenseBasics_MT
     Dim flow As OpticalFlow_DenseOptions
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        grid = New Thread_Grid(ocvb, "OpticalFlow_DenseBasics_MT")
+        grid = New Thread_Grid(ocvb, callerName)
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
         grid.sliders.TrackBar3.Value = 0
 
-        flow = New OpticalFlow_DenseOptions(ocvb, "OpticalFlow_DenseBasics_MT")
+        flow = New OpticalFlow_DenseOptions(ocvb, callerName)
         flow.sliders.TrackBar1.Value = 75
 
         sliders.setupTrackBar1(ocvb, callerName, "Correlation Threshold", 0, 1000, 1000)
@@ -229,7 +229,7 @@ Public Class OpticalFlow_Sparse
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        good = New Features_GoodFeatures(ocvb, "OpticalFlow_Sparse")
+        good = New Features_GoodFeatures(ocvb, callerName)
         good.externalUse = True
 
         sliders.setupTrackBar1(ocvb, callerName, "OpticalFlow window", 1, 20, 3)

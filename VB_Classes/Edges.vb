@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
 'https://docs.opencv.org/3.1.0/da/d22/tutorial_py_canny.html
@@ -12,7 +12,7 @@ Public Class Edges_Canny
         sliders.setupTrackBar1(ocvb, callerName, "Canny threshold1", 1, 255, 50)
         sliders.setupTrackBar2(ocvb, callerName, "Canny threshold2", 1, 255, 50)
         sliders.setupTrackBar3(ocvb, callerName,"Canny Aperture", 3, 7, 3)
-        
+
         ocvb.desc = "Show canny edge detection with varying thresholds"
         ocvb.label1 = "Canny using L1 Norm"
         ocvb.label2 = "Canny using L2 Norm"
@@ -45,16 +45,16 @@ Public Class Edges_CannyAndShadow
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        dilate = New DilateErode_Basics(ocvb, "Edges_CannyAndShadow")
+        dilate = New DilateErode_Basics(ocvb, callerName)
         dilate.radio.check(2).Checked = True
         dilate.externalUse = True
 
-        canny = New Edges_Canny(ocvb, "Edges_CannyAndShadow")
+        canny = New Edges_Canny(ocvb, callerName)
         canny.sliders.TrackBar1.Value = 100
         canny.sliders.TrackBar2.Value = 100
         canny.externalUse = True
 
-        shadow = New Depth_Holes(ocvb, "Edges_CannyAndShadow")
+        shadow = New Depth_Holes(ocvb, callerName)
         shadow.externalUse = True
 
         ocvb.desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
@@ -149,10 +149,10 @@ Public Class Edges_Preserving
         radio.check(0).Text = "Edge RecurseFilter"
         radio.check(1).Text = "Edge NormconvFilter"
         radio.check(0).Checked = True
-        
+
         sliders.setupTrackBar1(ocvb, callerName, "Edge Sigma_s", 0, 200, 10)
         sliders.setupTrackBar2(ocvb, callerName, "Edge Sigma_r", 1, 100, 40)
-        
+
         ocvb.desc = "OpenCV's edge preserving filter."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -198,7 +198,7 @@ Public Class Edges_RandomForest_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Edges RF Threshold", 1, 255, 35)
-        
+
         ocvb.desc = "Detect edges using structured forests - Opencv Contrib"
         ocvb.label1 = "Detected Edges"
 
@@ -276,8 +276,8 @@ Public Class Edges_LeftView
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        red = New LeftRightView_Basics(ocvb, "Edges_LeftView")
-        sobel = New Edges_Sobel(ocvb, "Edges_LeftView")
+        red = New LeftRightView_Basics(ocvb, callerName)
+        sobel = New Edges_Sobel(ocvb, callerName)
         sobel.externalUse = True
         sobel.sliders.TrackBar1.Value = 5
 
@@ -313,7 +313,7 @@ Public Class Edges_ResizeAdd
         sliders.setupTrackBar1(ocvb, callerName, "Border Vertical in Pixels", 1, 20, 5)
         sliders.setupTrackBar2(ocvb, callerName, "Border Horizontal in Pixels", 1, 20, 5)
         sliders.setupTrackBar3(ocvb, callerName,"Threshold for Pixel Difference", 1, 50, 16)
-        
+
         ocvb.desc = "Find edges using a resize, subtract, and threshold."
         ocvb.label1 = ""
         ocvb.label2 = ""
@@ -339,7 +339,7 @@ Public Class Edges_DCTfrequency
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Remove Frequencies < x", 0, 100, 32)
         sliders.setupTrackBar2(ocvb, callerName, "Threshold after Removal", 1, 255, 20)
-        
+
         ocvb.desc = "Find edges by removing all the highest frequencies."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

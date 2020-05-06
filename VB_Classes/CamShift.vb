@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Runtime.InteropServices
 Imports System.IO.MemoryMappedFiles
@@ -12,14 +12,14 @@ Public Class CamShift_Basics
     Public trackBox As New cv.RotatedRect
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        plotHist = New Plot_Histogram(ocvb, "CamShift_Basics")
+        plotHist = New Plot_Histogram(ocvb, callerName)
         plotHist.externalUse = True
 
         sliders.setupTrackBar1(ocvb, callerName, "CamShift vMin", 0, 255, 32)
         sliders.setupTrackBar2(ocvb, callerName, "CamShift vMax", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, callerName,"CamShift Smin", 0, 255, 60)
         sliders.setupTrackBar4(ocvb, callerName,  "CamShift Histogram bins", 16, 255, 32)
-        
+
                 ocvb.label1 = "Draw anywhere to create histogram and start camshift"
         ocvb.label2 = "Histogram of targeted region (hue only)"
         ocvb.desc = "CamShift Demo - draw on the images to define the object to track."
@@ -82,8 +82,8 @@ Public Class CamShift_Foreground
     Dim blob As Depth_Foreground
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        camshift = New CamShift_Basics(ocvb, "CamShift_Foreground")
-        blob = New Depth_Foreground(ocvb, "CamShift_Foreground")
+        camshift = New CamShift_Basics(ocvb, callerName)
+        blob = New Depth_Foreground(ocvb, callerName)
         ocvb.label1 = "Automatically finding the head - top of nearest object"
         ocvb.desc = "Use depth to find the head and start the camshift demo. "
     End Sub
@@ -121,9 +121,9 @@ Public Class Camshift_Object
     Dim camshift As CamShift_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        blob = New Blob_DepthClusters(ocvb, "Camshift_Object")
+        blob = New Blob_DepthClusters(ocvb, callerName)
 
-        camshift = New CamShift_Basics(ocvb, "Camshift_Object")
+        camshift = New CamShift_Basics(ocvb, callerName)
 
         ocvb.desc = "Use the blob depth cluster as input to initialize a camshift algorithm"
     End Sub
@@ -151,13 +151,13 @@ Public Class Camshift_TopObjects
         Dim mats As Mat_4to1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        mats = New Mat_4to1(ocvb, "Camshift_TopObjects")
+        mats = New Mat_4to1(ocvb, callerName)
         mats.externalUse = True
 
-        blob = New Blob_DepthClusters(ocvb, "Camshift_TopObjects")
+        blob = New Blob_DepthClusters(ocvb, callerName)
         sliders.setupTrackBar1(ocvb, callerName, "How often should camshift be reinitialized", 1, 500, 100)
                 For i = 0 To cams.Length - 1
-            cams(i) = New CamShift_Basics(ocvb, "Camshift_TopObjects")
+            cams(i) = New CamShift_Basics(ocvb, callerName)
         Next
         ocvb.desc = "Track"
     End Sub

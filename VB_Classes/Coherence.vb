@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
 Public Class Coherence_Basics
     Inherits VB_Class
@@ -81,7 +81,7 @@ Public Class Coherence_Depth
     Dim coherent As Coherence_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        coherent = New Coherence_Basics(ocvb, "Coherence_Depth")
+        coherent = New Coherence_Basics(ocvb, callerName)
         coherent.externalUse = True
         ocvb.desc = "Find coherent lines in the depth image"
     End Sub

@@ -1,11 +1,11 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/stereo_match.cpp
 Public Class BlockMatching_Basics
     Inherits VB_Class
     Dim colorizer As Depth_Colorizer_CPP
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        colorizer = New Depth_Colorizer_CPP(ocvb, "BlockMatching_Basics")
+        colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
 
         sliders.setupTrackBar1(ocvb, callerName, "Blockmatch scale", 1, 200, 100)
         sliders.setupTrackBar2(ocvb, callerName, "Blockmatch max disparity", 1, 8, 1)

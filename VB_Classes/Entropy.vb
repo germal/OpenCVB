@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' http://areshopencv.blogspot.com/2011/12/computing-entropy-of-image.html
 Public Class Entropy_Basics
     Inherits VB_Class
@@ -9,11 +9,11 @@ Public Class Entropy_Basics
     Public entropy As Single
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        flow = New Font_FlowText(ocvb, "Entropy_Basics")
+        flow = New Font_FlowText(ocvb, callerName)
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
-        hist = New Histogram_Basics(ocvb, "Entropy_Basics")
+        hist = New Histogram_Basics(ocvb, callerName)
         hist.externalUse = True
 
         ocvb.desc = "Compute the entropy in an image - a measure of contrast(iness)"

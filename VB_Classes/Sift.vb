@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports CS_Classes
 
@@ -9,16 +9,16 @@ Public Class Sift_Basics_CS
     Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        fisheye = New FishEye_Rectified(ocvb, "Sift_Basics_CS")
+        fisheye = New FishEye_Rectified(ocvb, callerName)
         fisheye.externalUse = True
 
         radio.Setup(ocvb, callerName,2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
-        
+
         sliders.setupTrackBar1(ocvb, callerName, "Points to Match", 1, 1000, 200)
-        
+
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -53,9 +53,9 @@ Public Class Sift_Basics_CS_MT
     Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        fisheye = New FishEye_Rectified(ocvb, "Sift_Basics_CS_MT")
+        fisheye = New FishEye_Rectified(ocvb, callerName)
         fisheye.externalUse = True
-        grid = New Thread_Grid(ocvb, "Sift_Basics_CS_MT")
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = ocvb.color.Width - 1 ' we are just taking horizontal slices of the image.
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 2
 
@@ -63,9 +63,9 @@ Public Class Sift_Basics_CS_MT
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
-        
+
         sliders.setupTrackBar1(ocvb, callerName, "Points to Match", 1, 1000, 100)
-        
+
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

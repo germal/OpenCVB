@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
 Imports System.Text
@@ -59,12 +59,12 @@ Public Class Project_NoGravity_CPP
     Dim depthBytes() As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        grid = New Thread_Grid(ocvb, "Project_NoGravity_CPP")
+        grid = New Thread_Grid(ocvb, callerName)
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
-        foreground = New Depth_ManualTrim(ocvb, "Project_NoGravity_CPP")
+        foreground = New Depth_ManualTrim(ocvb, callerName)
         foreground.externalUse = True
         foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
         foreground.sliders.TrackBar2.Value = 4000 ' fixed distance to keep the images stable.
@@ -117,12 +117,12 @@ Public Class Project_NoGravity
     Dim depthBytes() As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        grid = New Thread_Grid(ocvb, "Project_NoGravity")
+        grid = New Thread_Grid(ocvb, callerName)
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
-        foreground = New Depth_ManualTrim(ocvb, "Project_NoGravity")
+        foreground = New Depth_ManualTrim(ocvb, callerName)
         foreground.externalUse = True
         foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
         foreground.sliders.TrackBar2.Value = 4000 ' fixed distance to keep the images stable.
@@ -185,11 +185,11 @@ Public Class Project_GravityVB
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        imu = New IMU_GravityVec(ocvb, "Project_GravityVB")
+        imu = New IMU_GravityVec(ocvb, callerName)
         imu.result = RESULT2
         imu.externalUse = True
 
-        grid = New Thread_Grid(ocvb, "Project_GravityVB")
+        grid = New Thread_Grid(ocvb, callerName)
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
@@ -282,7 +282,7 @@ Public Class Project_GravityHistogram
     Public gravity As Project_Gravity_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        gravity = New Project_Gravity_CPP(ocvb, "Project_GravityHistogram")
+        gravity = New Project_Gravity_CPP(ocvb, callerName)
         gravity.sliders.GroupBox2.Visible = True
         gravity.histogramRun = True
 
@@ -315,7 +315,7 @@ Public Class Project_Gravity_CPP
     Public maxZ As Single
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        imu = New IMU_GravityVec(ocvb, "Project_Gravity_CPP")
+        imu = New IMU_GravityVec(ocvb, callerName)
         imu.result = RESULT2
         imu.externalUse = True
 
@@ -432,18 +432,18 @@ Public Class Project_Floodfill
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        kalman = New Kalman_Basics(ocvb, "Project_Floodfill")
-        ReDim kalman.src(10 * 4 - 1) ' max 10 objects. 
+        kalman = New Kalman_Basics(ocvb, callerName)
+        ReDim kalman.src(10 * 4 - 1) ' max 10 objects.
         kalman.externalUse = True
 
         sliders.setupTrackBar1(ocvb, callerName, "epsilon for GroupRectangles X100", 0, 200, 80)
 
-        gravity = New Project_Gravity_CPP(ocvb, "Project_Floodfill")
+        gravity = New Project_Gravity_CPP(ocvb, callerName)
         gravity.sliders.GroupBox2.Visible = True
         gravity.externalUse = True
         gravity.histogramRun = True
 
-        flood = New FloodFill_Projection(ocvb, "Project_Floodfill")
+        flood = New FloodFill_Projection(ocvb, callerName)
         flood.sliders.TrackBar1.Value = 100
         flood.sliders.TrackBar4.Value = 1
         flood.externalUse = True

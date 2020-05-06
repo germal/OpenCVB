@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
 Module SuperPixel_CPP_Module
@@ -32,7 +32,7 @@ Public Class SuperPixel_Basics_CPP
         sliders.setupTrackBar1(ocvb, callerName, "Number of SuperPixels", 1, 1000, 400)
         sliders.setupTrackBar2(ocvb, callerName, "Iterations", 0, 10, 4)
         sliders.setupTrackBar3(ocvb, callerName,"Prior", 1, 10, 2)
-        
+
         ocvb.label2 = "Superpixel label data (0-255)"
         ocvb.desc = "Sub-divide the image into super pixels."
     End Sub
@@ -96,7 +96,7 @@ Public Class SuperPixel_Depth
     Dim pixels As SuperPixel_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        pixels = New SuperPixel_Basics_CPP(ocvb, "SuperPixel_Depth")
+        pixels = New SuperPixel_Basics_CPP(ocvb, callerName)
         pixels.externalUse = True
 
         ocvb.desc = "Create SuperPixels using RGBDepth image."
@@ -123,10 +123,10 @@ Public Class SuperPixel_WithCanny
     Dim edges As Edges_Canny
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        edges = New Edges_Canny(ocvb, "SuperPixel_WithCanny")
+        edges = New Edges_Canny(ocvb, callerName)
         edges.externalUse = True
 
-        pixels = New SuperPixel_Basics_CPP(ocvb, "SuperPixel_WithCanny")
+        pixels = New SuperPixel_Basics_CPP(ocvb, callerName)
         pixels.externalUse = True
 
         ocvb.desc = "Create SuperPixels using RGBDepth image."
@@ -158,10 +158,10 @@ Public Class SuperPixel_WithLineDetector
     Dim lines As LineDetector_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        lines = New LineDetector_Basics(ocvb, "SuperPixel_WithLineDetector")
+        lines = New LineDetector_Basics(ocvb, callerName)
         lines.externalUse = True
 
-        pixels = New SuperPixel_Basics_CPP(ocvb, "SuperPixel_WithLineDetector")
+        pixels = New SuperPixel_Basics_CPP(ocvb, callerName)
         pixels.externalUse = True
 
         ocvb.desc = "Create SuperPixels using RGBDepth image."

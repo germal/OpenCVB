@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 
 Module Delaunay_Exports
     Public Sub draw_line(img As cv.Mat, org As cv.Point, dst As cv.Point, active_color As cv.Scalar)
@@ -114,7 +114,7 @@ Public Class Delaunay_GoodFeatures
     Dim features As Features_GoodFeatures
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        features = New Features_GoodFeatures(ocvb, "Delaunay_GoodFeatures")
+        features = New Features_GoodFeatures(ocvb, callerName)
         ocvb.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

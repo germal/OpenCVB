@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
 
@@ -190,10 +190,10 @@ Public Class Palette_DrawTest
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        palette = New Palette_ColorMap(ocvb, "Palette_DrawTest")
+        palette = New Palette_ColorMap(ocvb, callerName)
         palette.externalUse = True
 
-        draw = New Draw_RngImage(ocvb, "Palette_DrawTest")
+        draw = New Draw_RngImage(ocvb, callerName)
         palette.src = ocvb.result1
 
         ocvb.desc = "Experiment with palette using a drawn image"
@@ -301,7 +301,7 @@ Public Class Palette_ColorMap
     Public gradMap As Palette_BuildGradientColorMap
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        gradMap = New Palette_BuildGradientColorMap(ocvb, "Palette_ColorMap")
+        gradMap = New Palette_BuildGradientColorMap(ocvb, callerName)
         gradMap.externalUse = True
 
         radio.Setup(ocvb, callerName,21)
@@ -368,7 +368,7 @@ Public Class Palette_DepthColorMap
     Dim holes As Depth_Holes
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        holes = New Depth_Holes(ocvb, "Palette_DepthColorMap")
+        holes = New Depth_Holes(ocvb, callerName)
         holes.externalUse = True
 
         ocvb.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."

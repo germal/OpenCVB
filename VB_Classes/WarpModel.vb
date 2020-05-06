@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Runtime.InteropServices
 ' https://github.com/ycui11/-Colorizing-Prokudin-Gorskii-images-of-the-Russian-Empire
@@ -24,11 +24,11 @@ Public Class WarpModel_Input
         radio.check(10).Text = "Tablet.jpg"
         radio.check(11).Text = "Valley.jpg"
         radio.check(9).Checked = True
-        
+
         check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Use Gradient in WarpInput"
-        
-        sobel = New Edges_Sobel(ocvb, "WarpModel_Input")
+
+        sobel = New Edges_Sobel(ocvb, callerName)
         sobel.externalUse = True
         ocvb.desc = "Import the misaligned input."
     End Sub
@@ -107,8 +107,8 @@ Public Class WarpModel_FindTransformECC_CPP
         radio.check(2).Text = "Motion_Affine (very slow - Use CPP_Classes in Release Mode)"
         radio.check(3).Text = "Motion_Homography (even slower - Use CPP_Classes in Release Mode)"
         radio.check(0).Checked = True
-        
-        input = New WarpModel_Input(ocvb, "WarpModel_FindTransformECC_CPP")
+
+        input = New WarpModel_Input(ocvb, callerName)
 
         ocvb.desc = "Use FindTransformECC to align 2 images"
     End Sub
@@ -190,7 +190,7 @@ Public Class WarpModel_AlignImages
     Dim ecc As WarpModel_FindTransformECC_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        ecc = New WarpModel_FindTransformECC_CPP(ocvb, "WarpModel_AlignImages")
+        ecc = New WarpModel_FindTransformECC_CPP(ocvb, callerName)
 
         ocvb.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub
@@ -208,7 +208,7 @@ Public Class WarpModel_AlignImages
             aligned(i) = ecc.aligned.Clone()
         Next
 
-        Dim mergeInput() = {ecc.input.rgb(0), aligned(1), aligned(0)} ' green and blue were aligned to the original red 
+        Dim mergeInput() = {ecc.input.rgb(0), aligned(1), aligned(0)} ' green and blue were aligned to the original red
         Dim merged As New cv.Mat
         cv.Cv2.Merge(mergeInput, merged)
         ocvb.result1(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged

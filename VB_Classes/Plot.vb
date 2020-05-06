@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Plot_OverTime
     Inherits VB_Class
@@ -21,7 +21,7 @@ Public Class Plot_OverTime
         check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Reset the plot scale"
         check.Box(0).Checked = True
-        
+
         sliders.setupTrackBar1(ocvb, callerName, "Plot Pixel Height", 1, 40, 4)
         sliders.setupTrackBar2(ocvb, callerName, "Plot Pixel Width", 1, 40, 4)
         sliders.setupTrackBar3(ocvb, callerName,"Plot (time) Font Size x10", 1, 20, 10)
@@ -125,7 +125,7 @@ Public Class Plot_Histogram
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Histogram Font Size x10", 1, 20, 10)
-        
+
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -251,11 +251,11 @@ Public Class Plot_Basics
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        hist = New Histogram_Basics(ocvb, "Plot_Basics")
+        hist = New Histogram_Basics(ocvb, callerName)
         hist.externalUse = True
         hist.plotRequested = True
 
-        plot = New Plot_Basics_CPP(ocvb, "Plot_Basics")
+        plot = New Plot_Basics_CPP(ocvb, callerName)
         plot.externalUse = True
 
         ocvb.label1 = "Plot of grayscale histogram"
@@ -296,13 +296,13 @@ Public Class Plot_Depth
     Dim hist As Histogram_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        hist = New Histogram_Depth(ocvb, "Plot_Depth")
+        hist = New Histogram_Depth(ocvb, callerName)
         hist.externalUse = True
         hist.sliders.TrackBar1.Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!
         hist.sliders.TrackBar1.Value = 200 ' a lot more bins in a plot than a bar chart.
         hist.trim.sliders.TrackBar2.Value = 5000 ' up to x meters.
 
-        plot = New Plot_Basics_CPP(ocvb, "Plot_Depth")
+        plot = New Plot_Basics_CPP(ocvb, callerName)
         plot.externalUse = True
 
         ocvb.desc = "Show depth in a plot format with variable bins."

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
 Public Class BGSubtract_Basics_CPP
@@ -119,7 +119,7 @@ Public Class BGSubtract_Basics_MT
     Public externalUse = False
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        grid = New Thread_Grid(ocvb, "BGSubtract_Basics_MT")
+        grid = New Thread_Grid(ocvb, callerName)
 
         sliders.setupTrackBar1(ocvb, callerName, "Correlation Threshold", 0, 1000, 980)
 
@@ -155,9 +155,9 @@ Public Class BGSubtract_Depth_MT
     Dim bgsub As BGSubtract_Basics_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        bgsub = New BGSubtract_Basics_MT(ocvb, "BGSubtract_Depth_MT")
+        bgsub = New BGSubtract_Basics_MT(ocvb, callerName)
         bgsub.externalUse = True
-        shadow = New Depth_Holes(ocvb, "BGSubtract_Depth_MT")
+        shadow = New Depth_Holes(ocvb, callerName)
         shadow.externalUse = True
         ocvb.desc = "Detect Motion in the depth image"
         ocvb.label2 = "Accumulated 3D image"
@@ -316,12 +316,12 @@ Public Class BGSubtract_MOG_Retina
     Dim retina As Retina_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        input = New BGSubtract_MOG(ocvb, "BGSubtract_MOG_Retina")
+        input = New BGSubtract_MOG(ocvb, callerName)
 
         input.externalUse = True
         input.sliders.TrackBar1.Value = 100
 
-        retina = New Retina_Basics_CPP(ocvb, "BGSubtract_MOG_Retina")
+        retina = New Retina_Basics_CPP(ocvb, callerName)
         retina.externalUse = True
 
         sliders.setupTrackBar1(ocvb, callerName, "Uncertainty threshold", 1, 255, 100)
@@ -351,7 +351,7 @@ Public Class BGSubtract_DepthOrColorMotion
     Dim motion As Diff_UnstableDepthAndColor
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        motion = New Diff_UnstableDepthAndColor(ocvb, "BGSubtract_DepthOrColorMotion")
+        motion = New Diff_UnstableDepthAndColor(ocvb, callerName)
         ocvb.desc = "Detect motion with both depth and color changes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -393,10 +393,10 @@ Public Class BGSubtract_Video
     Dim video As Video_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        bgfg = New BGSubtract_Basics_CPP(ocvb, "BGSubtract_Video")
+        bgfg = New BGSubtract_Basics_CPP(ocvb, callerName)
         bgfg.externalUse = True
 
-        video = New Video_Basics(ocvb, "BGSubtract_Video")
+        video = New Video_Basics(ocvb, callerName)
         video.srcVideo = ocvb.parms.HomeDir + "Data/vtest.avi"
         ocvb.desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
@@ -492,10 +492,10 @@ Public Class BGSubtract_Synthetic
     Dim synth As BGSubtract_Synthetic_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        bgfg = New BGSubtract_Basics_CPP(ocvb, "BGSubtract_Synthetic")
+        bgfg = New BGSubtract_Basics_CPP(ocvb, callerName)
         bgfg.externalUse = True
 
-        synth = New BGSubtract_Synthetic_CPP(ocvb, "BGSubtract_Synthetic")
+        synth = New BGSubtract_Synthetic_CPP(ocvb, callerName)
         ocvb.desc = "Demonstrate background subtraction algorithms with synthetic images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

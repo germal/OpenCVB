@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Module GetRotationMatrix
     Public Sub SetInterpolationRadioButtons(ocvb As AlgorithmData, callerName As String, radio As OptionsRadioButtons, radioName As String)
         radio.Setup(ocvb, callerName, 7)
@@ -68,7 +68,7 @@ Public Class GetRotationMatrix2D_Box
     Dim rotation As GetRotationMatrix2D_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        rotation = New GetRotationMatrix2D_Basics(ocvb, "GetRotationMatrix2D_Box")
+        rotation = New GetRotationMatrix2D_Basics(ocvb, callerName)
         ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
 
         ocvb.label1 = "Original Rectangle in the original perspective"

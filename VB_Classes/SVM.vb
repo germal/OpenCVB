@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class SVM_Options
     Inherits VB_Class
     Public kernelType = cv.ML.SVM.KernelTypes.Rbf
@@ -50,7 +50,7 @@ Public Class SVM_Basics
     Dim svmOptions As SVM_Options
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        svmOptions = New SVM_Options(ocvb, "SVM_Basics")
+        svmOptions = New SVM_Options(ocvb, callerName)
         ocvb.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
         ocvb.label1 = "SVM_Basics input data"
         ocvb.label2 = "Results - line is ground truth"
@@ -135,8 +135,8 @@ Public Class SVM_Basics_MT
     Dim svmOptions As SVM_Options
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        svmOptions = New SVM_Options(ocvb, "SVM_Basics_MT")
-        grid = New Thread_Grid(ocvb, "SVM_Basics_MT")
+        svmOptions = New SVM_Options(ocvb, callerName)
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 100
         grid.sliders.TrackBar2.Value = 16
         grid.externalUse = True ' we don't need any results.
@@ -232,8 +232,8 @@ Public Class SVM_Simple
     Dim svmOptions As SVM_Options
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        svmOptions = New SVM_Options(ocvb, "SVM_Simple")
-        svmOptions.sliders.TrackBar1.Value = 50 ' set the samplecount 
+        svmOptions = New SVM_Options(ocvb, callerName)
+        svmOptions.sliders.TrackBar1.Value = 50 ' set the samplecount
         svmOptions.radio.check(1).Checked = True
         ocvb.desc = "Use SVM to classify random points."
     End Sub

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Math_Subtract
     Inherits VB_Class
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
@@ -93,7 +93,7 @@ Public Class Math_DepthMeanStdev
     Dim minMax As Depth_Stable
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        minMax = New Depth_Stable(ocvb, "Math_DepthMeanStdev")
+        minMax = New Depth_Stable(ocvb, callerName)
         ocvb.desc = "This algorithm shows that just using the max depth at each pixel does not improve depth!  Mean and stdev don't change."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -121,11 +121,11 @@ Public Class Math_RGBCorrelation
     Dim corr As MatchTemplate_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        flow = New Font_FlowText(ocvb, "Math_RGBCorrelation")
+        flow = New Font_FlowText(ocvb, callerName)
         flow.externalUse = True
         flow.result1or2 = RESULT2
 
-        corr = New MatchTemplate_Basics(ocvb, "Math_RGBCorrelation")
+        corr = New MatchTemplate_Basics(ocvb, callerName)
         corr.externalUse = True
         corr.reportFreq = 1
 

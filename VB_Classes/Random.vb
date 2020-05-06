@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
 Public Class Random_Points
@@ -10,7 +10,7 @@ Public Class Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Random Pixel Count", 1, ocvb.color.Width * ocvb.color.Height, 20)
-        
+
         ReDim Points(sliders.TrackBar1.Value - 1)
         ReDim Points2f(sliders.TrackBar1.Value - 1)
 
@@ -62,8 +62,8 @@ Public Class Random_LUTMask
     Dim km As kMeans_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        km = New kMeans_Basics(ocvb, "Random_LUTMask")
-        random = New Random_Points(ocvb, "Random_LUTMask")
+        km = New kMeans_Basics(ocvb, callerName)
+        random = New Random_Points(ocvb, callerName)
         ocvb.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image.  Note how interpolation impacts results"
         ocvb.label2 = "kmeans run To Get colors"
     End Sub
@@ -147,12 +147,12 @@ Public Class Random_CheckUniformDist
     Dim rUniform As Random_UniformDist
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        histogram = New Histogram_KalmanSmoothed(ocvb, "Random_CheckUniformDist")
+        histogram = New Histogram_KalmanSmoothed(ocvb, callerName)
         histogram.externalUse = True
         histogram.sliders.TrackBar1.Value = 255
         histogram.gray = New cv.Mat
 
-        rUniform = New Random_UniformDist(ocvb, "Random_CheckUniformDist")
+        rUniform = New Random_UniformDist(ocvb, callerName)
         rUniform.externalUse = True
 
         ocvb.desc = "Display the histogram for a uniform distribution."
@@ -177,12 +177,12 @@ Public Class Random_CheckNormalDist
     Dim normalDist As Random_NormalDist
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        histogram = New Histogram_KalmanSmoothed(ocvb, "Random_CheckNormalDist")
+        histogram = New Histogram_KalmanSmoothed(ocvb, callerName)
         histogram.externalUse = True
         histogram.sliders.TrackBar1.Value = 255
         histogram.gray = New cv.Mat
         histogram.plotHist.minRange = 1
-        normalDist = New Random_NormalDist(ocvb, "Random_CheckNormalDist")
+        normalDist = New Random_NormalDist(ocvb, callerName)
         normalDist.externalUse = True
         ocvb.desc = "Display the histogram for a Normal distribution."
     End Sub

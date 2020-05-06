@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/pca.cpp
 Public Class PCA_Basics
     Inherits VB_Class
@@ -29,7 +29,7 @@ Public Class PCA_Basics
             Next
 
             Dim retainedVariance = sliders.TrackBar1.Value / 100
-            Dim pca = New cv.PCA(data, New cv.Mat, cv.PCA.Flags.DataAsRow, retainedVariance)  ' the pca inputarray cannot be static so we reallocate each time.  
+            Dim pca = New cv.PCA(data, New cv.Mat, cv.PCA.Flags.DataAsRow, retainedVariance)  ' the pca inputarray cannot be static so we reallocate each time.
 
             Dim point = pca.Project(data.Row(0))
             Dim reconstruction = pca.BackProject(point)
@@ -49,7 +49,7 @@ Public Class PCA_Depth
     Dim pca As PCA_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        pca = New PCA_Basics(ocvb, "PCA_Depth")
+        pca = New PCA_Basics(ocvb, callerName)
         pca.useDepthInput = True
         ocvb.desc = "Reconstruct a depth stream as a composite of X images."
     End Sub
@@ -71,7 +71,7 @@ Public Class PCA_DrawImage
     Dim image As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        pca = New PCA_Basics(ocvb, "PCA_DrawImage")
+        pca = New PCA_Basics(ocvb, callerName)
         image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/pca_test1.jpg")
         ocvb.desc = "Use PCA to find the principle direction of an object."
         ocvb.label1 = "Original image"

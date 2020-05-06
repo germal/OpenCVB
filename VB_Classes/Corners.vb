@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_Harris
@@ -65,9 +65,9 @@ Public Class Corners_SubPix
     Dim good As Features_GoodFeatures
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        good = New Features_GoodFeatures(ocvb, "Corners_SubPix")
+        good = New Features_GoodFeatures(ocvb, callerName)
         sliders.setupTrackBar1(ocvb, callerName, "SubPix kernel Size", 1, 20, 3)
-        
+
         ocvb.desc = "Use PreCornerDetect to find features in the image."
         ocvb.label1 = "Output of GoodFeatures"
         ocvb.label2 = "Refined good features"
@@ -100,9 +100,9 @@ Public Class Corners_PreCornerDetect
         Dim median As Math_Median_CDF
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        median = New Math_Median_CDF(ocvb, "Corners_PreCornerDetect")
+        median = New Math_Median_CDF(ocvb, callerName)
         sliders.setupTrackBar1(ocvb, callerName, "kernel Size", 1, 20, 19)
-        
+
         ocvb.desc = "Use PreCornerDetect to find features in the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

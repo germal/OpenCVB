@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Threading
 
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
@@ -12,7 +12,7 @@ Public Class CComp_Basics
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "CComp Threshold", 0, 255, 10)
         sliders.setupTrackBar2(ocvb, callerName, "CComp Min Area", 0, 10000, 500)
-        
+
         ocvb.desc = "Draw bounding boxes around RGB binarized connected Components"
         ocvb.label1 = "CComp binary"
         ocvb.label2 = "Blob Rectangles and centroids"
@@ -76,9 +76,9 @@ Public Class CComp_EdgeMask
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        edges = New Edges_CannyAndShadow(ocvb, "CComp_EdgeMask")
+        edges = New Edges_CannyAndShadow(ocvb, callerName)
 
-        ccomp = New CComp_Basics(ocvb, "CComp_EdgeMask")
+        ccomp = New CComp_Basics(ocvb, callerName)
         ccomp.externalUse = True
 
         ocvb.desc = "Isolate Color connected components after applying the Edge Mask"
@@ -196,7 +196,7 @@ Public Class CComp_InRange_MT
         sliders.setupTrackBar1(ocvb, callerName, "InRange # of ranges", 2, 255, 15)
         sliders.setupTrackBar2(ocvb, callerName, "InRange Max Depth", 150, 10000, 3000)
         sliders.setupTrackBar3(ocvb, callerName,"InRange min Blob Size (in pixels)", 1, 2000, 500)
-        
+
         ocvb.desc = "Connected components in specific ranges"
         ocvb.label2 = "Blob rectangles - largest to smallest"
     End Sub
@@ -253,7 +253,7 @@ Public Class CComp_InRange
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "InRange # of ranges", 1, 20, 15)
         sliders.setupTrackBar2(ocvb, callerName, "InRange min Blob Size (in pixels)", 1, 2000, 500)
-        
+
         ocvb.desc = "Connect components in specific ranges"
         ocvb.label2 = "Blob rectangles - smallest to largest"
     End Sub

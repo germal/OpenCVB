@@ -1,15 +1,15 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Moments_CentroidKalman
     Inherits VB_Class
     Dim foreground As kMeans_Depth_FG_BG
     Dim kalman As Kalman_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        kalman = New Kalman_Basics(ocvb, "Moments_CentroidKalman")
+        kalman = New Kalman_Basics(ocvb, callerName)
         ReDim kalman.src(2 - 1) ' 2 elements - cv.point
         kalman.externalUse = True
 
-        foreground = New kMeans_Depth_FG_BG(ocvb, "Moments_CentroidKalman")
+        foreground = New kMeans_Depth_FG_BG(ocvb, callerName)
 
         ocvb.label1 = "Red dot = Kalman smoothed centroid"
         ocvb.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Featureless_Basics_MT
     Inherits VB_Class
     Public edges As Edges_Canny
@@ -13,11 +13,11 @@ Public Class Featureless_Basics_MT
         sliders.setupTrackBar2(ocvb, callerName, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar3(ocvb, callerName,"FeatureLess threshold", 1, 100, 3)
         sliders.setupTrackBar4(ocvb, callerName,  "FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
-        
-        edges = New Edges_Canny(ocvb, "Featureless_Basics_MT")
+
+        edges = New Edges_Canny(ocvb, callerName)
         edges.externalUse = True
 
-        grid = New Thread_Grid(ocvb, "Featureless_Basics_MT")
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = If(ocvb.color.Width > 1000, 16, 8)
         grid.sliders.TrackBar2.Value = If(ocvb.color.Width > 1000, 16, 8)
 
@@ -90,8 +90,8 @@ Public Class FeatureLess_Prediction
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "FeatureLess Resize Percent", 1, 100, 1)
-        
-        fLess = New Featureless_Basics_MT(ocvb, "FeatureLess_Prediction")
+
+        fLess = New Featureless_Basics_MT(ocvb, callerName)
 
         ocvb.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image."
     End Sub
@@ -172,7 +172,7 @@ Public Class Featureless_DCT_MT
     Dim dct As DCT_FeatureLess_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        dct = New DCT_FeatureLess_MT(ocvb, "Featureless_DCT_MT")
+        dct = New DCT_FeatureLess_MT(ocvb, callerName)
 
         ocvb.desc = "Use DCT to find largest featureless region."
         ocvb.label2 = "Largest FeatureLess Region"

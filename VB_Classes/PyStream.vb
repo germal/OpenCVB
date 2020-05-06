@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
@@ -21,7 +21,7 @@ Public Class PyStream_Basics
             ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/AddWeighted_Trackbar_PS.py"
         End If
 
-        memMap = New Python_MemMap(ocvb, "PyStream_Basics")
+        memMap = New Python_MemMap(ocvb, callerName)
 
         If ocvb.parms.externalPythonInvocation Then
             pythonReady = True ' python was already running and invoked OpenCVB.

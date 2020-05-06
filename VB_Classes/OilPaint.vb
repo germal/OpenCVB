@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Windows.Forms
 
 ' Source: https://hackernoon.com/https-medium-com-matteoronchetti-pointillism-with-python-and-opencv-f4274e6bbb7b
@@ -82,7 +82,7 @@ Public Class OilPaint_ColorProbability
     Public km As kMeans_RGBFast
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        km = New kMeans_RGBFast(ocvb, "OilPaint_ColorProbability")
+        km = New kMeans_RGBFast(ocvb, callerName)
         km.sliders.TrackBar1.Value = 12 ' we would like a dozen colors or so in the color image.
         ReDim color_probability(km.sliders.TrackBar1.Value - 1)
         ocvb.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
@@ -215,9 +215,9 @@ Public Class OilPaint_Cartoon
     Dim laplacian As Edges_Laplacian
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        laplacian = New Edges_Laplacian(ocvb, "OilPaint_Cartoon")
+        laplacian = New Edges_Laplacian(ocvb, callerName)
 
-        oil = New OilPaint_Manual_CS(ocvb, "OilPaint_Cartoon")
+        oil = New OilPaint_Manual_CS(ocvb, callerName)
         Dim w = ocvb.color.Width / 16
         Dim h = ocvb.color.Height / 16
         ocvb.drawRect = New cv.Rect(ocvb.color.Width / 4 + w, ocvb.color.Height / 4 + h, w * 2, h * 2)

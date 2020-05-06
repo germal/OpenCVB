@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' http://answers.opencv.org/question/175486/meanshift-sample-code-in-c/
 Public Class MeanShift_Basics
     Inherits VB_Class
@@ -47,8 +47,8 @@ Public Class MeanShift_Depth
     Dim blob As Depth_Foreground
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        ms = New MeanShift_Basics(ocvb, "MeanShift_Depth")
-        blob = New Depth_Foreground(ocvb, "MeanShift_Depth")
+        ms = New MeanShift_Basics(ocvb, callerName)
+        blob = New Depth_Foreground(ocvb, callerName)
         ocvb.desc = "Use depth to start mean shift algorithm."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -101,16 +101,16 @@ Public Class Meanshift_TopObjects
     Dim mats2 As Mat_4to1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        mats1 = New Mat_4to1(ocvb, "Meanshift_TopObjects")
+        mats1 = New Mat_4to1(ocvb, callerName)
         mats1.externalUse = True
 
-        mats2 = New Mat_4to1(ocvb, "Meanshift_TopObjects")
+        mats2 = New Mat_4to1(ocvb, callerName)
         mats2.externalUse = True
 
-        blob = New Blob_DepthClusters(ocvb, "Meanshift_TopObjects")
+        blob = New Blob_DepthClusters(ocvb, callerName)
         sliders.setupTrackBar1(ocvb, callerName, "How often should camshift be reinitialized", 1, 500, 100)
                 For i = 0 To cams.Length - 1
-            cams(i) = New MeanShift_Basics(ocvb, "Meanshift_TopObjects")
+            cams(i) = New MeanShift_Basics(ocvb, callerName)
             cams(i).rectangleEdgeWidth = 8
         Next
         ocvb.desc = "Track"

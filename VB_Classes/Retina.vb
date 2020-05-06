@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
 
@@ -24,7 +24,7 @@ Public Class Retina_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Retina Sample Factor", 1, 10, 2)
-        
+
         check.Setup(ocvb, callerName,  2)
         check.Box(0).Text = "Use log sampling"
         check.Box(1).Text = "Open resulting xml file"
@@ -46,7 +46,7 @@ Public Class Retina_Basics_CPP
             End If
         End If
         Static useLogSampling As Int32 = check.Box(0).Checked
-        Static samplingFactor As Single = -1 ' force open 
+        Static samplingFactor As Single = -1 ' force open
         If externalUse = False Then src = ocvb.color
         If useLogSampling <> check.Box(0).Checked Or samplingFactor <> sliders.TrackBar1.Value Then
             If Retina <> 0 Then Retina_Basics_Close(Retina)
@@ -91,7 +91,7 @@ Public Class Retina_Depth
     Dim retina As Retina_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        retina = New Retina_Basics_CPP(ocvb, "Retina_Depth")
+        retina = New Retina_Basics_CPP(ocvb, callerName)
         retina.externalUse = True
 
         ocvb.desc = "Use the bio-inspired retina algorithm with the depth data."

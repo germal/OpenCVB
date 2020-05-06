@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports CS_Classes
 
@@ -13,16 +13,16 @@ Public Class Surf_Basics_CS
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        fisheye = New FishEye_Rectified(ocvb, "Surf_Basics_CS")
+        fisheye = New FishEye_Rectified(ocvb, callerName)
         fisheye.externalUse = True
 
         radio.Setup(ocvb, callerName,2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
-        
+
         sliders.setupTrackBar1(ocvb, callerName, "Hessian threshold", 1, 5000, 2000)
-        
+
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
         ocvb.label1 = "BF Matcher output"
     End Sub
@@ -65,10 +65,10 @@ Public Class Surf_Basics
     Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        fisheye = New FishEye_Rectified(ocvb, "Surf_Basics")
+        fisheye = New FishEye_Rectified(ocvb, callerName)
         fisheye.externalUse = True
 
-        surf = New Surf_Basics_CS(ocvb, "Surf_Basics")
+        surf = New Surf_Basics_CS(ocvb, callerName)
         surf.externalUse = True
 
         ocvb.desc = "Use left and right views to match points in horizontal slices."
@@ -103,11 +103,11 @@ Public Class Surf_DrawMatchManual_CS
         Dim surf As Surf_Basics_CS
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        surf = New Surf_Basics_CS(ocvb, "Surf_DrawMatchManual_CS")
+        surf = New Surf_Basics_CS(ocvb, callerName)
         surf.CS_SurfBasics.drawPoints = False
 
         sliders.setupTrackBar1(ocvb, callerName, "Surf Vertical Range to Search", 0, 50, 10)
-        
+
         ocvb.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -132,7 +132,7 @@ Public Class Surf_DrawMatchManual_CS
                 End If
             Next
         Next
-        ' mark those that were not 
+        ' mark those that were not
         For i = 0 To keys2.Count - 1
             Dim pt = keys2(i).Pt
             If pt.Y <> -1 Then ocvb.result2.Circle(keys2(i).Pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)

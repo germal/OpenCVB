@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/modules/flann/doc/flann_fast_approximate_nearest_neighbor_search.html#
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FlannSample.vb
 Public Class FLANN_Test
@@ -52,10 +52,10 @@ Public Class FLANN_Basics
         Dim random As Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        random = New Random_Points(ocvb, "FLANN_Basics")
+        random = New Random_Points(ocvb, callerName)
 
         sliders.setupTrackBar1(ocvb, callerName, "Query Count", 1, 10000, 10)
-        
+
         ocvb.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
         ocvb.label1 = "Yellow is query, Nearest points blue"
         ocvb.label2 = "FLANN Search Input"

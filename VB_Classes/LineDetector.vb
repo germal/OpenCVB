@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module fastLineDetector_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -288,7 +288,7 @@ Public Class LineDetector_3D_LongestLine
     Dim lines As lineDetector_FLD
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        lines = New lineDetector_FLD(ocvb, "LineDetector_3D_LongestLine")
+        lines = New lineDetector_FLD(ocvb, callerName)
 
         sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 1)
 
@@ -322,7 +322,7 @@ Public Class LineDetector_3D_FLD_MT
     Dim lines As lineDetector_FLD
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        lines = New lineDetector_FLD(ocvb, "LineDetector_3D_FLD_MT")
+        lines = New lineDetector_FLD(ocvb, callerName)
 
         sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 1)
 
@@ -356,7 +356,7 @@ Public Class LineDetector_3D_LSD_MT
     Dim lines As LineDetector_LSD
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        lines = New LineDetector_LSD(ocvb, "LineDetector_3D_LSD_MT")
+        lines = New LineDetector_LSD(ocvb, callerName)
         sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 1)
 
         ocvb.desc = "Measure 3D line segments using a multi-threaded Line Stream Detector"
@@ -397,8 +397,8 @@ Public Class LineDetector_3D_FitLineZ
     Dim linesLSD As LineDetector_LSD
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        linesFLD = New lineDetector_FLD(ocvb, "LineDetector_3D_FitLineZ")
-        linesLSD = New LineDetector_LSD(ocvb, "LineDetector_3D_FitLineZ")
+        linesFLD = New lineDetector_FLD(ocvb, callerName)
+        linesLSD = New LineDetector_LSD(ocvb, callerName)
 
         sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 3)
         sliders.setupTrackBar2(ocvb, callerName, "Point count threshold", 5, 500, 50)

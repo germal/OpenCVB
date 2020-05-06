@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Collections.Concurrent
 Public Class kMeans_Clusters
     Inherits VB_Class
@@ -6,10 +6,10 @@ Public Class kMeans_Clusters
     Dim km As kMeans_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        Mats = New Mat_4to1(ocvb, "kMeans_Clusters")
+        Mats = New Mat_4to1(ocvb, callerName)
         Mats.externalUse = True
 
-        km = New kMeans_Basics(ocvb, "kMeans_Clusters")
+        km = New kMeans_Basics(ocvb, callerName)
 
         ocvb.label1 = "kmeans - k=10"
         ocvb.label2 = "kmeans - k=2,4,6,8"
@@ -120,7 +120,7 @@ Public Class kMeans_RGB_Plus_XYDepth
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 4)
-        km = New kMeans_Basics(ocvb, "kMeans_RGB_Plus_XYDepth")
+        km = New kMeans_Basics(ocvb, callerName)
         ocvb.label1 = "kmeans - RGB, XY, and Depth Raw"
         ocvb.desc = "Cluster with kMeans RGB, x, y, and depth."
     End Sub
@@ -580,8 +580,8 @@ Public Class kMeans_RGB4_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 10)
-        
-        grid = New Thread_Grid(ocvb, "kMeans_RGB4_MT")
+
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 48
         grid.externalUse = True ' we don't need any results.
@@ -701,8 +701,8 @@ Public Class kMeans_Color_MT
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 2)
-        
-        grid = New Thread_Grid(ocvb, "kMeans_Color_MT")
+
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
         grid.externalUse = True ' we don't need any results.
@@ -791,8 +791,8 @@ Public Class kMeans_ColorDepth_MT
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 3)
-        
-        grid = New Thread_Grid(ocvb, "kMeans_ColorDepth_MT")
+
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
         grid.externalUse = True ' we don't need any results.

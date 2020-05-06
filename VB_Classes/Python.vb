@@ -1,4 +1,4 @@
-﻿Imports System.IO
+Imports System.IO
 Imports System.Runtime.InteropServices
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
@@ -71,7 +71,7 @@ Public Class Python_Run
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
         If pythonApp.Name.EndsWith("_PS.py") Then
-            pyStream = New PyStream_Basics(ocvb, "Python_Run")
+            pyStream = New PyStream_Basics(ocvb, callerName)
         Else
             StartPython(ocvb, "")
         End If
@@ -177,7 +177,7 @@ Public Class Python_SurfaceBlit
         ' this Python script assumes that fast processing is off - the pointcloud is being used and cannot be resized.
         ' ocvb.parms.lowResolution = False
         ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
-        memMap = New Python_MemMap(ocvb, "Python_SurfaceBlit")
+        memMap = New Python_MemMap(ocvb, callerName)
 
         If ocvb.parms.externalPythonInvocation Then
             PythonReady = True ' python was already running and invoked OpenCVB.

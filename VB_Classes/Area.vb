@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module MinTriangle_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -17,7 +17,7 @@ Public Class Area_MinTriangle_CPP
         numberOfPoints = sliders.TrackBar1.Value
         ReDim srcPoints(numberOfPoints)
         ReDim srcData(numberOfPoints * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' input is a list of points.
-        ReDim dstData(3 * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' minTriangle returns 3 points 
+        ReDim dstData(3 * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' minTriangle returns 3 points
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
@@ -102,7 +102,7 @@ Public Class Area_MinMotionRect
     Dim input As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        input = New BGSubtract_MOG(ocvb, "Area_MinMotionRect")
+        input = New BGSubtract_MOG(ocvb, callerName)
         input.sliders.TrackBar1.Value = 100 ' low threshold to maximize motion
         ocvb.desc = "Use minRectArea to encompass detected motion"
         ocvb.label1 = "MinRectArea of MOG motion"

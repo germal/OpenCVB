@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Mat_Repeat
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
@@ -22,7 +22,7 @@ Public Class Mat_PointToMat
     Dim mask As Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        mask = New Random_Points(ocvb, "Mat_PointToMat")
+        mask = New Random_Points(ocvb, callerName)
         ocvb.desc = "Convert pointf3 into a mat of points."
         ocvb.label1 = "Random_Points points (original)"
         ocvb.label2 = "Random_Points points after format change"
@@ -50,7 +50,7 @@ Public Class Mat_MatToPoint
     Dim mask As Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        mask = New Random_Points(ocvb, "Mat_MatToPoint")
+        mask = New Random_Points(ocvb, callerName)
         ocvb.desc = "Convert a mat into a vector of points."
         ocvb.label1 = "Reconstructed RGB Image"
     End Sub
@@ -234,7 +234,7 @@ Public Class Mat_ImageXYZ_MT
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        grid = New Thread_Grid(ocvb, "Mat_ImageXYZ_MT")
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
 

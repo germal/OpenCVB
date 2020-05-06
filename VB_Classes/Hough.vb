@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 
 Module Hough_Exports
     Public Sub houghShowLines(ByRef dst As cv.Mat, segments() As cv.LineSegmentPolar, desiredCount As Int32)
@@ -44,7 +44,7 @@ Public Class Hough_Circles
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        circles = New Draw_Circles(ocvb, "Hough_Circles")
+        circles = New Draw_Circles(ocvb, callerName)
         circles.sliders.TrackBar1.Value = 3
         ocvb.desc = "Find circles using HoughCircles."
         ocvb.label1 = "Input circles to Hough"
@@ -79,7 +79,7 @@ Public Class Hough_Lines
     Public src As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        edges = New Edges_Canny(ocvb, "Hough_Lines")
+        edges = New Edges_Canny(ocvb, callerName)
         edges.externalUse = True
 
         sliders.setupTrackBar1(ocvb, callerName, "rho", 1, 100, 1)
@@ -134,11 +134,11 @@ Public Class Hough_Lines_MT
         sliders.setupTrackBar1(ocvb, callerName, "rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, callerName, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar3(ocvb, callerName,"threshold", 1, 100, 3)
-        
-        edges = New Edges_Canny(ocvb, "Hough_Lines_MT")
+
+        edges = New Edges_Canny(ocvb, callerName)
         edges.externalUse = True
 
-        grid = New Thread_Grid(ocvb, "Hough_Lines_MT")
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
         grid.externalUse = True ' we don't need any results.

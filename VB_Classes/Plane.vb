@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Module Plane_Exports
     Public Sub testCrossProduct()
         Dim p1 = New cv.Point3f(1, 2, 3)
@@ -99,7 +99,7 @@ Public Class Plane_Detect
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        grid = New Thread_Grid(ocvb, "Plane_Detect")
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 64
         grid.externalUse = True ' we don't need any results.
@@ -176,7 +176,7 @@ Public Class Plane_DetectDebug
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        grid = New Thread_Grid(ocvb, "Plane_DetectDebug")
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
         grid.externalUse = True ' we don't need any results.

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Tracker_Basics
     Inherits VB_Class
     Public tracker As cv.Tracking.MultiTracker
@@ -75,7 +75,7 @@ Public Class Tracker_MultiObject
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.drawRect.Width <> 0 Then
-            Dim tr = New Tracker_Basics(ocvb, "Tracker_MultiObject")
+            Dim tr = New Tracker_Basics(ocvb, callerName)
             tr.externalUse = True
             tr.Run(ocvb)
             ocvb.drawRect = New cv.Rect
@@ -111,7 +111,7 @@ Public Class Tracker_Methods
     Dim tracker As Tracker_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        tracker = New Tracker_Basics(ocvb, "Tracker_Methods")
+        tracker = New Tracker_Basics(ocvb, callerName)
 
         radio.Setup(ocvb, callerName,8)
         radio.check(0).Text = "TrackerBoosting"
@@ -124,7 +124,7 @@ Public Class Tracker_Methods
         radio.check(6).Text = "TrackerMOSSE"
         radio.check(7).Text = "TrackerTLD"
         radio.check(5).Checked = True ' TrackerMIL is the default
-        
+
         ocvb.desc = "Experiment with the different types of tracking methods - apparently not much difference..."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

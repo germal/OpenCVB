@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class MatchTemplate_Basics
     Inherits VB_Class
         Dim flow As Font_FlowText
@@ -10,7 +10,7 @@ Public Class MatchTemplate_Basics
     Public reportFreq = 10 ' report the results every x number of iterations.
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        flow = New Font_FlowText(ocvb, "MatchTemplate_Basics")
+        flow = New Font_FlowText(ocvb, callerName)
         flow.externalUse = True
         flow.result1or2 = RESULT2
 
@@ -69,11 +69,11 @@ Public Class MatchTemplate_RowCorrelation
     Dim flow As Font_FlowText
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        flow = New Font_FlowText(ocvb, "MatchTemplate_RowCorrelation")
+        flow = New Font_FlowText(ocvb, callerName)
         flow.externalUse = True
         flow.result1or2 = RESULT2
 
-        corr = New MatchTemplate_Basics(ocvb, "MatchTemplate_RowCorrelation")
+        corr = New MatchTemplate_Basics(ocvb, callerName)
         corr.externalUse = True
         corr.sliders.Visible = False
 
@@ -121,7 +121,7 @@ Public Class MatchTemplate_DrawRect
             radio.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
         Next
         radio.check(5).Checked = True
-        
+
         ocvb.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
 
         ocvb.label1 = "Probabilities (draw rectangle to test again)"
@@ -169,12 +169,12 @@ Public Class MatchTemplate_BestTemplate_MT
     Dim match As MatchTemplate_DrawRect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        grid = New Thread_Grid(ocvb, "MatchTemplate_BestTemplate_MT")
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 128
         grid.sliders.TrackBar2.Value = 128
         grid.externalUse = True
 
-        match = New MatchTemplate_DrawRect(ocvb, "MatchTemplate_BestTemplate_MT")
+        match = New MatchTemplate_DrawRect(ocvb, callerName)
 
         ocvb.parms.ShowOptions = False ' we won't need the options...
 
@@ -189,7 +189,7 @@ Public Class MatchTemplate_BestTemplate_MT
             If entropies.Length <> grid.roiList.Count Then
                 ReDim entropies(grid.roiList.Count - 1)
                 For i = 0 To entropies.Length - 1
-                    entropies(i) = New Entropy_Basics(ocvb, "MatchTemplate_BestTemplate_MT")
+                    entropies(i) = New Entropy_Basics(ocvb, callerName)
                     entropies(i).externalUse = True
                 Next
             End If

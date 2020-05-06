@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 
 Module Draw_Exports
     Dim rng As System.Random
@@ -84,7 +84,7 @@ Public Class Draw_rotatedRectangles
     Public rect As Draw_rectangles
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        rect = New Draw_rectangles(ocvb, "Draw_rotatedRectangles")
+        rect = New Draw_rectangles(ocvb, callerName)
         rect.drawRotatedRectangles = True
         ocvb.desc = "Draw the requested number of rectangles."
     End Sub
@@ -286,7 +286,7 @@ Public Class Draw_SymmetricalShapes
         sliders.setupTrackBar2(ocvb, callerName, "Radius 1", 1, ocvb.color.Height / 2, ocvb.color.Height / 4)
         sliders.setupTrackBar3(ocvb, callerName,"Radius 2", 1, ocvb.color.Height / 2, ocvb.color.Height / 8)
         sliders.setupTrackBar4(ocvb, callerName,  "nGenPer", 1, 500, 100)
-        
+
         check.Setup(ocvb, callerName,  5)
         check.Box(0).Text = "Symmetric Ripple"
         check.Box(1).Text = "Only Regular Shapes"
@@ -304,7 +304,7 @@ Public Class Draw_SymmetricalShapes
                 If sliders.TrackBar1.Value < sliders.TrackBar1.Maximum - 17 Then sliders.TrackBar1.Value += 17 Else sliders.TrackBar1.Value = sliders.TrackBar1.Minimum
                 If sliders.TrackBar2.Value < sliders.TrackBar2.Maximum - 10 Then sliders.TrackBar2.Value += 10 Else sliders.TrackBar2.Value = 1
                 If sliders.TrackBar3.Value > 13 Then sliders.TrackBar3.Value -= 13 Else sliders.TrackBar3.Value = sliders.TrackBar3.Maximum
-                If sliders.TrackBar4.Value > 27 Then sliders.TrackBar4.Value -= 27 Else sliders.TrackBar4.Value = sliders.TrackBar4.Maximum 
+                If sliders.TrackBar4.Value > 27 Then sliders.TrackBar4.Value -= 27 Else sliders.TrackBar4.Value = sliders.TrackBar4.Maximum
                 fillColor = ocvb.colorScalar(ocvb.frameCount Mod 255)
             End If
             If ocvb.frameCount Mod 37 = 0 Then check.Box(0).Checked = Not check.Box(0).Checked

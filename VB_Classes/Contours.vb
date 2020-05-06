@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 
 Public Class Contours_Basics
     Inherits VB_Class
@@ -27,7 +27,7 @@ Public Class Contours_Basics
         radio1.check(1).Checked = True
         If ocvb.parms.ShowOptions Then radio1.Show()
 
-        rotatedRect = New Draw_rotatedRectangles(ocvb, "Contours_Basics")
+        rotatedRect = New Draw_rotatedRectangles(ocvb, callerName)
         rotatedRect.rect.sliders.TrackBar1.Value = 5
         ocvb.desc = "Demo options on FindContours."
         ocvb.label2 = "FindContours output"
@@ -89,7 +89,7 @@ Public Class Contours_FindandDraw
     Dim rotatedRect As Draw_rotatedRectangles
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        rotatedRect = New Draw_rotatedRectangles(ocvb, "Contours_FindandDraw")
+        rotatedRect = New Draw_rotatedRectangles(ocvb, callerName)
         rotatedRect.rect.sliders.TrackBar1.Value = 5
         ocvb.label1 = "FindandDraw input"
         ocvb.label2 = "FindandDraw output"
@@ -122,7 +122,7 @@ Public Class Contours_Depth
     Public trim As Depth_InRange
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        trim = New Depth_InRange(ocvb, "Contours_Depth")
+        trim = New Depth_InRange(ocvb, callerName)
         ocvb.desc = "Find and draw the contour of the depth foreground."
         ocvb.label1 = "DepthContour input"
         ocvb.label2 = "DepthContour output"
@@ -154,7 +154,7 @@ Public Class Contours_RGB
     Dim trim As Depth_InRange
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        trim = New Depth_InRange(ocvb, "Contours_RGB")
+        trim = New Depth_InRange(ocvb, callerName)
         ocvb.desc = "Find and draw the contour of the largest foreground RGB contour."
         ocvb.label2 = "Background"
     End Sub

@@ -1,4 +1,4 @@
-﻿
+
 Imports cv = OpenCvSharp
 'https://gist.github.com/kendricktan/93f0da88d0b25087d751ed2244cf770c
 'https://medium.com/@anuj_shah/through-the-eyes-of-gabor-filter-17d1fdb3ac97
@@ -66,7 +66,7 @@ Public Class Gabor_Basics_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label2 = "The 32 kernels used"
-        grid = New Thread_Grid(ocvb, "Gabor_Basics_MT")
+        grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
         grid.Run(ocvb)
@@ -82,7 +82,7 @@ Public Class Gabor_Basics_MT
 
         ocvb.parms.ShowOptions = False ' no  options for the Gabor_Basics algorithm needed - just need them for the parent thread.
         For i = 0 To gabor.Length - 1
-            gabor(i) = New Gabor_Basics(ocvb, "Gabor_Basics_MT")
+            gabor(i) = New Gabor_Basics(ocvb, callerName)
             gabor(i).sliders.TrackBar3.Value = i * 180 / gabor.Length
             gabor(i).externalUse = True
         Next

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Diff_Basics
     Inherits VB_Class
         Dim lastFrame As New cv.Mat
@@ -33,10 +33,10 @@ Public Class Diff_UnstableDepthAndColor
     Dim lastFrames() As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        diff = New Diff_Basics(ocvb, "Diff_UnstableDepthAndColor")
+        diff = New Diff_Basics(ocvb, callerName)
         diff.sliders.TrackBar1.Value = 20 ' this is color threshold - low means detecting more motion.
 
-        depth = New Depth_Stable(ocvb, "Diff_UnstableDepthAndColor")
+        depth = New Depth_Stable(ocvb, callerName)
 
         ocvb.desc = "Build a mask for any pixels that have either unstable depth or color"
     End Sub

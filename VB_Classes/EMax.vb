@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
@@ -11,7 +11,7 @@ Public Class EMax_Basics
     Public regionCount As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        grid = New Thread_Grid(ocvb, "EMax_Basics")
+        grid = New Thread_Grid(ocvb, callerName)
 
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 2
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 2
@@ -19,13 +19,13 @@ Public Class EMax_Basics
         sliders.setupTrackBar1(ocvb, callerName, "EMax Number of Samples", 1, 200, 100)
         sliders.setupTrackBar2(ocvb, callerName, "EMax Prediction Step Size", 1, 20, 5)
         sliders.setupTrackBar3(ocvb, callerName,"EMax Sigma (spread)", 1, 100, 30)
-        
+
         radio.Setup(ocvb, callerName,3)
         radio.check(0).Text = "EMax matrix type Spherical"
         radio.check(1).Text = "EMax matrix type Diagonal"
         radio.check(2).Text = "EMax matrix type Generic"
         radio.check(0).Checked = True
-        
+
         ocvb.desc = "OpenCV expectation maximization example."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -69,7 +69,7 @@ Public Class EMax_Basics
                 For j = 0 To ocvb.result1.Cols - 1
                     sample.Set(Of Double)(0, 0, CSng(j))
                     sample.Set(Of Double)(0, 1, CSng(i))
-                    ' remove the " 0 '" to see the error in Predict2.  
+                    ' remove the " 0 '" to see the error in Predict2.
                     Dim response = 0 ' Math.Round(em_model.Predict2(sample)(1))
                     Dim c = ocvb.rColors(response)
                     ocvb.result1.Circle(New cv.Point(j, i), 1, c, -1)
@@ -115,7 +115,7 @@ Public Class EMax_Basics_CPP
     Dim EMax_Basics As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        emax = New EMax_Basics(ocvb, "EMax_Basics_CPP")
+        emax = New EMax_Basics(ocvb, callerName)
         emax.externalUse = True
 
         EMax_Basics = EMax_Basics_Open()

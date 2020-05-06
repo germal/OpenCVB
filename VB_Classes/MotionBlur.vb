@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class MotionBlur_Basics
     Inherits VB_Class
         Public externalUse As Boolean = False
@@ -126,15 +126,15 @@ Public Class MotionBlur_Deblur
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Redo motion blurred image"
-        
-        mblur = New MotionBlur_Basics(ocvb, "MotionBlur_Deblur")
+
+        mblur = New MotionBlur_Basics(ocvb, callerName)
         ResetBlurredImage(ocvb)
 
         sliders.setupTrackBar1(ocvb, callerName, "Deblur Restore Vector", 1, mblur.sliders.TrackBar1.Maximum, 10)
         sliders.setupTrackBar2(ocvb, callerName, "Deblur Angle of Restore Vector", mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum, 0)
         sliders.setupTrackBar3(ocvb, callerName,"Deblur Signal to Noise Ratio", 1, 1000, 700)
         sliders.setupTrackBar4(ocvb, callerName,  "Deblur Gamma", 1, 100, 5)
-        
+
         ocvb.desc = "Deblur a motion blurred image"
         ocvb.label1 = "Blurred Image Input"
         ocvb.label2 = "Deblurred Image Output"

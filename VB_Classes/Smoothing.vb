@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Public Class Smoothing_Exterior
     Inherits VB_Class
@@ -40,7 +40,7 @@ Public Class Smoothing_Exterior
 	End Function
 	Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
 				If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-		hull = New Hull_Basics(ocvb, "Smoothing_Exterior")
+		hull = New Hull_Basics(ocvb, callerName)
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.externalUse = True
 
@@ -115,7 +115,7 @@ Public Class Smoothing_Interior
 
 	Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
 				If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-		hull = New Hull_Basics(ocvb, "Smoothing_Interior")
+		hull = New Hull_Basics(ocvb, callerName)
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.externalUse = True
 		hull.sliders.TrackBar1.Value = 16

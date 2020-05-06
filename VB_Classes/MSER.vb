@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Basics
     Inherits VB_Class
@@ -156,7 +156,7 @@ Public Class MSER_TestSynthetic
     End Function
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        mser = New MSER_Basics(ocvb, "MSER_TestSynthetic")
+        mser = New MSER_Basics(ocvb, callerName)
         mser.externalUse = True
         mser.sliders.TrackBar1.Value = 10
         mser.sliders.TrackBar2.Value = 100
@@ -165,7 +165,7 @@ Public Class MSER_TestSynthetic
         mser.sliders1.TrackBar1.Value = 0
         mser.check.Box(1).Checked = False ' the grayscale result is quite unimpressive.
 
-        synth = New MSER_Synthetic(ocvb, "MSER_TestSynthetic")
+        synth = New MSER_Synthetic(ocvb, callerName)
         ocvb.desc = "Test MSER with the synthetic image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -232,7 +232,7 @@ Public Class MSER_Contours
     Dim mser As MSER_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        mser = New MSER_Basics(ocvb, "MSER_Contours")
+        mser = New MSER_Basics(ocvb, callerName)
         mser.externalUse = True
         mser.sliders.TrackBar2.Value = 4000
         ocvb.desc = "Use MSER but show the contours of each region."

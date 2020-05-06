@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Collections.Generic
 
 Public Class KAZE_KeypointsKAZE_CS
@@ -73,7 +73,7 @@ Public Class KAZE_Match_CS
     Dim CS_Kaze As New CS_Classes.Kaze_Sample
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        red = New LeftRightView_Basics(ocvb, "KAZE_Match_CS")
+        red = New LeftRightView_Basics(ocvb, callerName)
         red.sliders.TrackBar1.Value = 45
         ocvb.desc = "Match keypoints in the left and right images."
     End Sub
@@ -97,7 +97,7 @@ Public Class KAZE_LeftAligned_CS
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Max number of points to match", 1, 300, 100)
         sliders.setupTrackBar2(ocvb, callerName, "When matching, max possible distance", 1, 200, 100)
-        
+
         ocvb.desc = "Match keypoints in the left and right images but display it as movement in the right image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Runtime.InteropServices
 Module recordPlaybackCommon
@@ -232,8 +232,8 @@ Public Class Replay_OpenGL
     Dim replay As Replay_Play
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        ogl = New OpenGL_Callbacks(ocvb, "Replay_OpenGL")
-        replay = New Replay_Play(ocvb, "Replay_OpenGL")
+        ogl = New OpenGL_Callbacks(ocvb, callerName)
+        replay = New Replay_Play(ocvb, callerName)
         ocvb.desc = "Replay a recorded session with OpenGL"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

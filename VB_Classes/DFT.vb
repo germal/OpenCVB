@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module dft_Module
     Public Function inverseDFT(complexImage As cv.Mat) As cv.Mat
@@ -27,7 +27,7 @@ Public Class DFT_Basics
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        mats = New Mat_4to1(ocvb, "DFT_Basics")
+        mats = New Mat_4to1(ocvb, callerName)
         mats.externalUse = True
         mats.noLines = True
 
@@ -90,7 +90,7 @@ Public Class DFT_Inverse
     Dim mats As Mat_2to1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        mats = New Mat_2to1(ocvb, "DFT_Inverse")
+        mats = New Mat_2to1(ocvb, callerName)
         mats.externalUse = True
         ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
         ocvb.label1 = "Image after Inverse DFT"
@@ -137,7 +137,7 @@ Public Class DFT_ButterworthFilter
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "DFT B Filter - Radius", 1, ocvb.color.Height, ocvb.color.Height)
         sliders.setupTrackBar2(ocvb, callerName, "DFT B Filter - Order", 1, ocvb.color.Height, 2)
-                dft = New DFT_Basics(ocvb, "DFT_ButterworthFilter")
+                dft = New DFT_Basics(ocvb, callerName)
         ocvb.desc = "Use the Butterworth filter on a DFT image - color image input."
         ocvb.label1 = "Image with Butterworth Low Pass Filter Applied"
         ocvb.label2 = "Same filter with radius / 2"
@@ -193,7 +193,7 @@ Public Class DFT_ButterworthDepth
     Dim bfilter As DFT_ButterworthFilter
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
                 If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        bfilter = New DFT_ButterworthFilter(ocvb, "DFT_ButterworthDepth")
+        bfilter = New DFT_ButterworthFilter(ocvb, callerName)
         bfilter.dft.externalUse = True
 
         ocvb.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
