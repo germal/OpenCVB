@@ -3,7 +3,7 @@
 Public Class MeanSubtraction_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Scaling Factor = mean/scaling factor X100", 1, 500, 100)
         ocvb.desc = "Subtract the mean from the image with a scaling factor"
     End Sub

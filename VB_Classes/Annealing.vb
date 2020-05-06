@@ -68,7 +68,7 @@ Public Class Annealing_Basics_CPP
         closed = False
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         setup(ocvb)
         ocvb.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
@@ -153,7 +153,7 @@ Public Class Annealing_CPP_MT
     End Sub
 
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         random = New Random_Points(ocvb, callerName)
         random.externalUse = True
         random.sliders.Visible = False
@@ -257,7 +257,7 @@ Public Class Annealing_Options
     Public anneal As Annealing_Basics_CPP
     Dim flow As Font_FlowText
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         random = New Random_Points(ocvb, callerName)
         random.sliders.TrackBar1.Value = 25 ' change the default number of cities here.
         random.externalUse = True

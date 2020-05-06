@@ -4,7 +4,7 @@
 Public Class WarpPerspective_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Warped Width", 0, ocvb.color.Cols, ocvb.color.Cols - 50)
         sliders.setupTrackBar2(ocvb, callerName, "Warped Height", 0, ocvb.color.Rows, ocvb.color.Rows - 50)
         sliders.setupTrackBar3(ocvb, callerName, "Warped Angle", 0, 360, 0)

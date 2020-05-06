@@ -3,7 +3,7 @@ Public Class Watershed_Basics
     Inherits VB_Class
     Public useDepthImage As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.label1 = "Draw with left-click to select region."
         ocvb.label2 = "Mask for watershed (selected regions)."
         ocvb.result2.SetTo(0)
@@ -64,7 +64,7 @@ Public Class Watershed_DepthAuto
     Inherits VB_Class
     Dim watershed As Watershed_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.result2.SetTo(0)
         watershed = New Watershed_Basics(ocvb, callerName)
         watershed.useDepthImage = True
@@ -93,7 +93,7 @@ Public Class Watershed_RGBSimpleAuto
     Inherits VB_Class
     Dim watershed As Watershed_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.result2.SetTo(0)
 
         watershed = New Watershed_Basics(ocvb, callerName)
@@ -124,7 +124,7 @@ Public Class Watershed_RGBDepthAuto
     Inherits VB_Class
     Dim watershed As Watershed_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.result2.SetTo(0)
 
         watershed = New Watershed_Basics(ocvb, callerName)

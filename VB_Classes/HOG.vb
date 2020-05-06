@@ -5,7 +5,7 @@ Public Class HOG_Basics
     Dim staticImage As cv.Mat
     Dim staticImageProcessed As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Threshold", 0, 100, 0)
         sliders.setupTrackBar2(ocvb, callerName, "Stride", 1, 100, 1)
         sliders.setupTrackBar3(ocvb, callerName, "Scale", 0, 2000, 300)

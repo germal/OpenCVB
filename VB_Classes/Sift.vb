@@ -8,7 +8,7 @@ Public Class Sift_Basics_CS
         Dim CS_SiftBasics As New CS_SiftBasics
     Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         fisheye = New FishEye_Rectified(ocvb, callerName)
         fisheye.externalUse = True
 
@@ -51,7 +51,7 @@ Public Class Sift_Basics_CS_MT
         Dim CS_SiftBasics As New CS_SiftBasics
     Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         fisheye = New FishEye_Rectified(ocvb, callerName)
         fisheye.externalUse = True
         grid = New Thread_Grid(ocvb, callerName)

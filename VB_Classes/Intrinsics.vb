@@ -2,7 +2,7 @@
 Public Class intrinsicsLeft_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Show the depth camera intrinsicsLeft."
         ocvb.label2 = "ppx/ppy location"
     End Sub

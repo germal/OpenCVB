@@ -2,7 +2,7 @@
 Public Class Transform_Resize
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Resize Percent", 50, 1000, 50)
         ocvb.desc = "Resize an image based on the slider value."
     End Sub
@@ -32,7 +32,7 @@ Public Class Transform_Rotate
     Public dst As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Angle", 0, 180, 30)
         sliders.setupTrackBar2(ocvb, callerName, "Scale Factor", 1, 100, 50)
         ocvb.desc = "Rotate and scale and image based on the slider values."
@@ -53,7 +53,7 @@ End Class
 Public Class Transform_Sort
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         radio.Setup(ocvb, callerName, 4)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
@@ -78,7 +78,7 @@ End Class
 Public Class Transform_SortReshape
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         radio.Setup(ocvb, callerName, 2)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True

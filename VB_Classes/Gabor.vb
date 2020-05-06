@@ -15,7 +15,7 @@ Public Class Gabor_Basics
     Public gamma As Double
     Public phaseOffset As Double
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders1.setupTrackBar1(ocvb, callerName, "Gabor gamma X10", 0, 10, 5)
         sliders1.setupTrackBar2(ocvb, callerName, "Gabor Phase offset X100", 0, 100, 0)
         If ocvb.parms.ShowOptions Then sliders1.Show()
@@ -61,7 +61,7 @@ Public Class Gabor_Basics_MT
     Dim grid As Thread_Grid
     Dim gabor(31) As Gabor_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.label2 = "The 32 kernels used"
         grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.

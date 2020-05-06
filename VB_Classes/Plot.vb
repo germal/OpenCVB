@@ -17,7 +17,7 @@ Public Class Plot_OverTime
     Public topBottomPad As Integer
     Dim myStopWatch As Stopwatch
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         check.Setup(ocvb, callerName, 1)
         check.Box(0).Text = "Reset the plot scale"
         check.Box(0).Checked = True
@@ -120,7 +120,7 @@ Public Class Plot_Histogram
     Public backColor As cv.Scalar = cv.Scalar.Red
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Histogram Font Size x10", 1, 20, 10)
 
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
@@ -195,7 +195,7 @@ Public Class Plot_Basics_CPP
     Public externalUse As Boolean
     Public dst As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -243,7 +243,7 @@ Public Class Plot_Basics
     Public plotCount As Int32 = 3
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         hist = New Histogram_Basics(ocvb, callerName)
         hist.externalUse = True
         hist.plotRequested = True
@@ -288,7 +288,7 @@ Public Class Plot_Depth
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         hist = New Histogram_Depth(ocvb, callerName)
         hist.externalUse = True
         hist.sliders.TrackBar1.Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!

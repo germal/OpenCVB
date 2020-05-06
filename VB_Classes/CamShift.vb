@@ -11,7 +11,7 @@ Public Class CamShift_Basics
     Public plotHist As Plot_Histogram
     Public trackBox As New cv.RotatedRect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         plotHist = New Plot_Histogram(ocvb, callerName)
         plotHist.externalUse = True
 
@@ -79,7 +79,7 @@ Public Class CamShift_Foreground
     Dim camshift As CamShift_Basics
     Dim blob As Depth_Foreground
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         camshift = New CamShift_Basics(ocvb, callerName)
         blob = New Depth_Foreground(ocvb, callerName)
         ocvb.label1 = "Automatically finding the head - top of nearest object"
@@ -118,7 +118,7 @@ Public Class Camshift_Object
     Dim blob As Blob_DepthClusters
     Dim camshift As CamShift_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         blob = New Blob_DepthClusters(ocvb, callerName)
 
         camshift = New CamShift_Basics(ocvb, callerName)
@@ -148,7 +148,7 @@ Public Class Camshift_TopObjects
     Dim cams(3) As CamShift_Basics
     Dim mats As Mat_4to1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         mats = New Mat_4to1(ocvb, callerName)
         mats.externalUse = True
 

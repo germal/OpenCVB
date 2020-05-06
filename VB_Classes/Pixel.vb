@@ -6,7 +6,7 @@ Public Class Pixel_GetSet
     Inherits VB_Class
     Dim mat4 As Mat_4to1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         mat4 = New Mat_4to1(ocvb, callerName)
         mat4.externalUse = True
 

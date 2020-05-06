@@ -62,7 +62,7 @@ Public Class ML_FillRGBDepth_MT
     Dim grid As Thread_Grid
     Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
         colorizer.externalUse = True
         grid = New Thread_Grid(ocvb, callerName)
@@ -102,7 +102,7 @@ Public Class ML_FillRGBDepth
     Dim shadow As Depth_Holes
         Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
         colorizer.externalUse = True
 
@@ -137,7 +137,7 @@ Public Class ML_DepthFromColor_MT
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
         colorizer.externalUse = True
 
@@ -212,7 +212,7 @@ Public Class ML_DepthFromColor
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
         colorizer.externalUse = True
 
@@ -298,7 +298,7 @@ Public Class ML_DepthFromXYColor
     Dim resized As Resize_Percentage
         Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
         colorizer.externalUse = True
 
@@ -401,7 +401,7 @@ Public Class ML_EdgeDepth
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
         colorizer.externalUse = True
 

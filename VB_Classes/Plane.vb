@@ -98,7 +98,7 @@ Public Class Plane_Detect
     Inherits VB_Class
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 64
@@ -175,7 +175,7 @@ Public Class Plane_DetectDebug
     Inherits VB_Class
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32

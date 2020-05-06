@@ -5,7 +5,7 @@ Public Class Object_Basics
     Dim ccomp As CComp_EdgeMask
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         trim = New Depth_InRange(ocvb, callerName)
         trim.externalUse = True
 

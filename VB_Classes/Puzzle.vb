@@ -229,7 +229,7 @@ Public Class Puzzle_Basics
     Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public restartRequested As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 10
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 8
@@ -286,7 +286,7 @@ Public Class Puzzle_Solver
         Dim usedList As New List(Of Integer)
     Dim fitlist As New List(Of bestFit)
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         puzzle = New Puzzle_Basics(ocvb, callerName)
         puzzle.grid.sliders.Hide()
 

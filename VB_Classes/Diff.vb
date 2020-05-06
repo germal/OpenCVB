@@ -3,7 +3,7 @@ Public Class Diff_Basics
     Inherits VB_Class
         Dim lastFrame As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Diff - Color Threshold", 1, 255, 50)
                 ocvb.label1 = "Stable Gray Color"
         ocvb.label2 = "Unstable Gray Color"
@@ -32,7 +32,7 @@ Public Class Diff_UnstableDepthAndColor
     Dim depth As Depth_Stable
     Dim lastFrames() As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         diff = New Diff_Basics(ocvb, callerName)
         diff.sliders.TrackBar1.Value = 20 ' this is color threshold - low means detecting more motion.
 

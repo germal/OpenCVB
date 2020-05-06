@@ -8,7 +8,7 @@ Public Class DNN_Test
     Inherits VB_Class
     Dim net As Net
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
     End Sub
@@ -47,7 +47,7 @@ Public Class DNN_Caffe_CS
     Inherits VB_Class
     Dim caffeCS As CS_Classes.DNN
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
 
@@ -75,7 +75,7 @@ End Class
 ' https://github.com/twMr7/rscvdnn
 Public Class DNN_Basics
     Inherits VB_Class
-        Dim net As Net
+    Dim net As Net
     Dim dnnPrepared As Boolean
     Dim crop As cv.Rect
     Dim dnnWidth As Int32, dnnHeight As Int32
@@ -84,7 +84,7 @@ Public Class DNN_Basics
     Dim classNames() = {"background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse",
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "dnn Scale Factor", 1, 10000, 78)
         sliders.setupTrackBar2(ocvb, callerName, "dnn MeanVal", 1, 255, 127)
         

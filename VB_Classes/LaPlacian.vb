@@ -3,7 +3,7 @@
 Public Class Laplacian_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Laplacian Kernel size", 1, 21, 3)
         sliders.setupTrackBar2(ocvb, callerName, "Laplacian Scale", 0, 100, 100)
         sliders.setupTrackBar3(ocvb, callerName, "Laplacian Delta", 0, 1000, 0)
@@ -29,7 +29,7 @@ End Class
 Public Class Laplacian_Blur
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Laplacian Kernel size", 1, 21, 3)
         sliders.setupTrackBar2(ocvb, callerName, "Laplacian Scale", 0, 100, 100)
         sliders.setupTrackBar3(ocvb, callerName, "Laplacian Delta", 0, 1000, 0)

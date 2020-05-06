@@ -2,7 +2,7 @@
 Public Class AddWeighted_RGBDepth
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Weight", 0, 100, 50)
         ocvb.desc = "Add depth and rgb with specified weights."
     End Sub

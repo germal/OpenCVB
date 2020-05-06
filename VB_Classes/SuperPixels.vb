@@ -28,7 +28,7 @@ Public Class SuperPixel_Basics_CPP
     Public dst2 As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Number of SuperPixels", 1, 1000, 400)
         sliders.setupTrackBar2(ocvb, callerName, "Iterations", 0, 10, 4)
         sliders.setupTrackBar3(ocvb, callerName,"Prior", 1, 10, 2)
@@ -95,7 +95,7 @@ Public Class SuperPixel_Depth
     Inherits VB_Class
     Dim pixels As SuperPixel_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         pixels = New SuperPixel_Basics_CPP(ocvb, callerName)
         pixels.externalUse = True
 
@@ -122,7 +122,7 @@ Public Class SuperPixel_WithCanny
     Dim pixels As SuperPixel_Basics_CPP
     Dim edges As Edges_Canny
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         edges = New Edges_Canny(ocvb, callerName)
         edges.externalUse = True
 
@@ -157,7 +157,7 @@ Public Class SuperPixel_WithLineDetector
     Dim pixels As SuperPixel_Basics_CPP
     Dim lines As LineDetector_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         lines = New LineDetector_Basics(ocvb, callerName)
         lines.externalUse = True
 

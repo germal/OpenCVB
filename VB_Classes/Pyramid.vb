@@ -3,7 +3,7 @@
 Public Class Pyramid_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Zoom in and out", -1, 1, 0)
         ocvb.desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub

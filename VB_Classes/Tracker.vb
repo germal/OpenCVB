@@ -7,10 +7,10 @@ Public Class Tracker_Basics
     Public externalUse As Boolean
     Public trackerIndex As Int32 = 5 ' trackerMIL by default...
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        check.Setup(ocvb, callerName,  1)
+        setCaller(caller)
+        check.Setup(ocvb, callerName, 1)
         check.Box(0).Text = "Stop tracking selected object"
-                ocvb.desc = "Track an object using cv.Tracking API"
+        ocvb.desc = "Track an object using cv.Tracking API"
         ocvb.putText(New ActiveClass.TrueType("Draw a rectangle around object to be tracked.", 10, 140, RESULT2))
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -58,7 +58,7 @@ Public Class Tracker_Basics
     End Sub
     Public Sub MyDispose()
         If tracker IsNot Nothing Then tracker.Dispose()
-            End Sub
+    End Sub
 End Class
 
 
@@ -69,7 +69,7 @@ Public Class Tracker_MultiObject
     Inherits VB_Class
     Dim trackers As New List(Of Tracker_Basics)
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Track any number of objects simultaneously"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -109,7 +109,7 @@ Public Class Tracker_Methods
     Inherits VB_Class
     Dim tracker As Tracker_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         tracker = New Tracker_Basics(ocvb, callerName)
 
         radio.Setup(ocvb, callerName,8)

@@ -4,11 +4,11 @@ Public Class knn_Basics
     Inherits VB_Class
         Dim random As Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         random = New Random_Points(ocvb, callerName)
         sliders.setupTrackBar1(ocvb, callerName, "knn Query Points", 1, 10000, 10)
         sliders.setupTrackBar2(ocvb, callerName, "knn Known Points", 1, 10, 3)
-                ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
+        ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
         ocvb.label2 = "Search Input"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -43,7 +43,7 @@ Public Class knn_Basics
         Next
     End Sub
     Public Sub MyDispose()
-                random.Dispose()
+        random.Dispose()
     End Sub
 End Class
 
@@ -54,7 +54,7 @@ End Class
 
 Public Class knn_Cluster2D
     Inherits VB_Class
-        Dim knn As knn_Point2d
+    Dim knn As knn_Point2d
     Public cityPositions() As cv.Point
     Public cityOrder() As Int32
     Public distances() As Int32
@@ -68,7 +68,7 @@ Public Class knn_Cluster2D
         Next
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         knn = New knn_Point2d(ocvb, callerName)
         knn.sliders.Visible = False
         knn.externalUse = True
@@ -152,7 +152,7 @@ Public Class knn_Cluster2D
         End If
     End Sub
     Public Sub MyDispose()
-                knn.Dispose()
+        knn.Dispose()
     End Sub
 End Class
 
@@ -169,7 +169,7 @@ Public Class knn_Point2d
     Public externalUse As Boolean
     Public findXnearest As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "knn Query Points", 1, 50, 10)
         sliders.setupTrackBar2(ocvb, callerName, "knn k nearest points", 1, 5, 1)
 
@@ -237,7 +237,7 @@ Public Class knn_Point3d
     Public externalUse As Boolean
     Public findXnearest As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "knn Query Points", 1, 500, 10)
         sliders.setupTrackBar2(ocvb, callerName, "knn k nearest points", 0, 500, 1)
 
@@ -316,7 +316,7 @@ Public Class knn_ClusterNoisyLine
     Dim numberofCities As Int32
     Public findXnearest As Int32 = 2
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         noisyLine = New Fitline_RawInput(ocvb, callerName)
         knn = New knn_Point2d(ocvb, callerName)
         knn.sliders.Visible = False

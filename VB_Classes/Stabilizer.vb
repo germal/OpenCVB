@@ -5,7 +5,7 @@ Public Class Stabilizer_BriskFeatures
     Dim brisk As BRISK_Basics
     Dim stabilizer As Stabilizer_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         stabilizer = New Stabilizer_Basics(ocvb, callerName)
         stabilizer.externalUse = True
 
@@ -36,7 +36,7 @@ Public Class Stabilizer_HarrisFeatures
     Dim harris As Harris_Detector_CPP
     Dim stabilizer As Stabilizer_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         stabilizer = New Stabilizer_Basics(ocvb, callerName)
         stabilizer.externalUse = True
 
@@ -72,7 +72,7 @@ Public Class Stabilizer_Basics
     Dim sumScale As cv.Mat, sScale As cv.Mat, features1 As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         good = New Features_GoodFeatures(ocvb, callerName)
         good.externalUse = True
 
@@ -192,7 +192,7 @@ Public Class Stabilizer_Basics_CPP
     Dim handleSrc As GCHandle
     Dim sPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ReDim srcData(ocvb.color.Total * ocvb.color.ElemSize - 1)
         sPtr = Stabilizer_Basics_Open()
         ocvb.desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work."
@@ -226,7 +226,7 @@ Public Class Stabilizer_SideBySide
     Dim original As Stabilizer_Basics_CPP
     Dim basics As Stabilizer_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         original = New Stabilizer_Basics_CPP(ocvb, callerName)
         basics = New Stabilizer_Basics(ocvb, callerName)
         ocvb.desc = "Run both the original and the VB.Net version of the video stabilizer.  Neither is working properly."

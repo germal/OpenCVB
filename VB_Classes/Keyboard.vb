@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Keyboard_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.label1 = "Type in text to add to image"
         ocvb.desc = "Test the keyboard interface available to all algorithms"
     End Sub

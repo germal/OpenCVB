@@ -4,7 +4,7 @@ Public Class Distance_Basics
     Inherits VB_Class
     Dim foreground As kMeans_Depth_FG_BG
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         radio.Setup(ocvb, callerName,3)
         radio.check(0).Text = "C"
         radio.check(1).Text = "L1"

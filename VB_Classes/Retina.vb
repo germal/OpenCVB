@@ -22,7 +22,7 @@ Public Class Retina_Basics_CPP
     Public src As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Retina Sample Factor", 1, 10, 2)
 
         check.Setup(ocvb, callerName,  2)
@@ -89,7 +89,7 @@ Public Class Retina_Depth
     Inherits VB_Class
     Dim retina As Retina_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         retina = New Retina_Basics_CPP(ocvb, callerName)
         retina.externalUse = True
 

@@ -39,7 +39,7 @@ Public Class Smoothing_Exterior
 		Return spline
 	End Function
 	Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-				If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+				setCaller(caller)
 		hull = New Hull_Basics(ocvb, callerName)
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.externalUse = True
@@ -114,7 +114,7 @@ Public Class Smoothing_Interior
 	End Function
 
 	Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-				If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+				setCaller(caller)
 		hull = New Hull_Basics(ocvb, callerName)
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.externalUse = True

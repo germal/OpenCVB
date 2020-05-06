@@ -8,7 +8,7 @@ Public Class IMU_Basics
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
 
         flow = New Font_FlowText(ocvb, callerName)
@@ -57,7 +57,7 @@ Public Class IMU_Basics
     End Sub
     Public Sub MyDispose()
         flow.Dispose()
-            End Sub
+    End Sub
 End Class
 
 
@@ -69,7 +69,7 @@ Public Class IMU_Stabilizer
     Inherits VB_Class
     Dim kalman As Kalman_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         kalman = New Kalman_Basics(ocvb, callerName)
         kalman.externalUse = True
 
@@ -127,7 +127,7 @@ Public Class IMU_Magnetometer
     Inherits VB_Class
     Public plot As Plot_OverTime
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         plot = New Plot_OverTime(ocvb, callerName)
         plot.externalUse = True
         plot.dst = ocvb.result2
@@ -160,7 +160,7 @@ End Class
 Public Class IMU_Barometer
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Get the barometric pressure from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -179,7 +179,7 @@ End Class
 Public Class IMU_Temperature
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Get the temperature of the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -195,12 +195,12 @@ End Class
 
 Public Class IMU_FrameTime
     Inherits VB_Class
-        Public plot As Plot_OverTime
+    Public plot As Plot_OverTime
     Public CPUInterval As Double
     Public externalUse As Boolean
     Public IMUtoCaptureEstimate As Double
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         plot = New Plot_OverTime(ocvb, callerName)
         plot.externalUse = True
         plot.dst = ocvb.result2
@@ -294,12 +294,12 @@ End Class
 
 Public Class IMU_HostFrameTimes
     Inherits VB_Class
-        Public plot As Plot_OverTime
+    Public plot As Plot_OverTime
     Public CPUInterval As Double
     Public externalUse As Boolean
     Public HostInterruptDelayEstimate As Double
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         plot = New Plot_OverTime(ocvb, callerName)
         plot.externalUse = True
         plot.dst = ocvb.result2
@@ -387,7 +387,7 @@ Public Class IMU_TotalDelay
     Dim kalman As Kalman_Single
     Dim externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.parms.ShowOptions = False
 
         host = New IMU_HostFrameTimes(ocvb, callerName)
@@ -475,7 +475,7 @@ Public Class IMU_GravityVec
     Public result As Integer = RESULT1 ' should be result1 or result2
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         kalman = New Kalman_Basics(ocvb, callerName)
         ReDim kalman.src(6 - 1)
         kalman.externalUse = True

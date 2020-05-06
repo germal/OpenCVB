@@ -4,7 +4,7 @@ Public Class TextureFlow_Basics
         Public src As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Texture Flow Delta", 2, 100, 12)
         sliders.setupTrackBar2(ocvb, callerName, "Texture Eigen BlockSize", 1, 100, 20)
         sliders.setupTrackBar3(ocvb, callerName,"Texture Eigen Ksize", 1, 15, 1)
@@ -41,7 +41,7 @@ Public Class TextureFlow_Depth
     Inherits VB_Class
     Dim texture As TextureFlow_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         texture = New TextureFlow_Basics(ocvb, callerName)
         texture.externalUse = True
         ocvb.desc = "Display texture flow in the depth data"

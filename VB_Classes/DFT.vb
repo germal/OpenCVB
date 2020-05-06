@@ -26,7 +26,7 @@ Public Class DFT_Basics
     Public cols As Int32
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         mats = New Mat_4to1(ocvb, callerName)
         mats.externalUse = True
         mats.noLines = True
@@ -89,7 +89,7 @@ Public Class DFT_Inverse
     Inherits VB_Class
     Dim mats As Mat_2to1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         mats = New Mat_2to1(ocvb, callerName)
         mats.externalUse = True
         ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
@@ -134,7 +134,7 @@ Public Class DFT_ButterworthFilter
     Inherits VB_Class
     Public dft As DFT_Basics
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "DFT B Filter - Radius", 1, ocvb.color.Height, ocvb.color.Height)
         sliders.setupTrackBar2(ocvb, callerName, "DFT B Filter - Order", 1, ocvb.color.Height, 2)
                 dft = New DFT_Basics(ocvb, callerName)
@@ -192,7 +192,7 @@ Public Class DFT_ButterworthDepth
     Inherits VB_Class
     Dim bfilter As DFT_ButterworthFilter
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         bfilter = New DFT_ButterworthFilter(ocvb, callerName)
         bfilter.dft.externalUse = True
 

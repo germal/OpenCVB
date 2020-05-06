@@ -5,7 +5,7 @@ Public Class MotionBlur_Basics
     Public kernel As cv.Mat
     Public showDirection As Boolean = True
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Motion Blur Length", 1, 101, 51)
         sliders.setupTrackBar2(ocvb, callerName, "Motion Blur Angle", -90, 90, 0)
         ocvb.desc = "Use Filter2D to create a motion blur"
@@ -37,7 +37,7 @@ End Class
 ' https://docs.opencv.org/trunk/d1/dfd/tutorial_motion_deblur_filter.html
 Public Class MotionBlur_Deblur
     Inherits VB_Class
-            Dim mblur As MotionBlur_Basics
+    Dim mblur As MotionBlur_Basics
     Private Sub ResetBlurredImage(ocvb As AlgorithmData)
         mblur.sliders.TrackBar1.Value = ocvb.ms_rng.Next(mblur.sliders.TrackBar1.Minimum, mblur.sliders.TrackBar1.Maximum)
         mblur.sliders.TrackBar2.Value = ocvb.ms_rng.Next(mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum)
@@ -121,7 +121,7 @@ Public Class MotionBlur_Deblur
         Return planes(0)
     End Function
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Redo motion blurred image"
 

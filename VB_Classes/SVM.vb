@@ -4,7 +4,7 @@ Public Class SVM_Options
     Public kernelType = cv.ML.SVM.KernelTypes.Rbf
     Public SVMType = cv.ML.SVM.Types.CSvc
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "SampleCount", 10, 1000, 500)
         sliders.setupTrackBar2(ocvb, callerName, "Granularity", 1, 50, 5)
 
@@ -49,7 +49,7 @@ Public Class SVM_Basics
     Inherits VB_Class
     Dim svmOptions As SVM_Options
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         svmOptions = New SVM_Options(ocvb, callerName)
         ocvb.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
         ocvb.label1 = "SVM_Basics input data"
@@ -134,7 +134,7 @@ Public Class SVM_Basics_MT
     Dim grid As Thread_Grid
     Dim svmOptions As SVM_Options
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         svmOptions = New SVM_Options(ocvb, callerName)
         grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 100
@@ -231,7 +231,7 @@ Public Class SVM_Simple
     Inherits VB_Class
     Dim svmOptions As SVM_Options
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         svmOptions = New SVM_Options(ocvb, callerName)
         svmOptions.sliders.TrackBar1.Value = 50 ' set the samplecount
         svmOptions.radio.check(1).Checked = True

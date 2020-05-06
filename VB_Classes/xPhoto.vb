@@ -6,7 +6,7 @@ Imports System.Windows.Forms
 Public Class xPhoto_Bm3dDenoise
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Denoise image with block matching and filtering."
         ocvb.label1 = "Bm3dDenoising"
         ocvb.label2 = "Difference from Input"
@@ -30,7 +30,7 @@ End Class
 Public Class xPhoto_Bm3dDenoiseDepthImage
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Denoise the depth image with block matching and filtering."
         ocvb.label1 = "Bm3dDenoising"
         ocvb.label2 = "Difference from Input"
@@ -68,9 +68,9 @@ End Module
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/xphoto/samples/oil.cpp
 Public Class xPhoto_OilPaint_CPP
     Inherits VB_Class
-        Dim xPhoto_OilPaint As IntPtr
+    Dim xPhoto_OilPaint As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "xPhoto Dynamic Ratio", 1, 127, 7)
         sliders.setupTrackBar2(ocvb, callerName, "xPhoto Block Size", 1, 100, 3)
         

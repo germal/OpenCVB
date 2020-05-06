@@ -7,7 +7,7 @@ Public Class ORB_Basics
     Public externalUse As Boolean
     Dim orb As cv.ORB
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "ORB - desired point count", 10, 2000, 700)
         
         ocvb.desc = "Find keypoints using ORB"

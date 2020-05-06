@@ -20,7 +20,7 @@ Public Class RecursiveBilateralFilter_CPP
         Dim srcData() As Byte
     Dim rbf As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "RBF Recursion count", 1, 20, 2)
         
         ReDim srcData(ocvb.color.Total * ocvb.color.ElemSize - 1)

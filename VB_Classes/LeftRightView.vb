@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Public Class LeftRightView_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "brightness", 0, 255, 100)
         ocvb.desc = "Show the left and right views from the 3D Camera"
         Select Case ocvb.parms.cameraIndex
@@ -35,16 +35,16 @@ End Class
 
 Public Class LeftRightView_CompareUndistorted
     Inherits VB_Class
-        Public fisheye As FishEye_Rectified
+    Public fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         fisheye = New FishEye_Rectified(ocvb, callerName)
         fisheye.externalUse = True
 
         sliders.setupTrackBar1(ocvb, callerName, "brightness", 0, 255, 0)
         sliders.setupTrackBar2(ocvb, callerName, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar3(ocvb, callerName,"Slice Height", 1, 300, 50)
-                Select Case ocvb.parms.cameraIndex
+        sliders.setupTrackBar3(ocvb, callerName, "Slice Height", 1, 300, 50)
+        Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
                 ocvb.label1 = "Left Image"
                 ocvb.label2 = "Right Image"
@@ -90,7 +90,7 @@ Public Class LeftRightView_CompareUndistorted
         ocvb.result2 += sliders.TrackBar1.Value
     End Sub
     Public Sub MyDispose()
-                fisheye.Dispose()
+        fisheye.Dispose()
     End Sub
 End Class
 
@@ -101,12 +101,12 @@ End Class
 Public Class LeftRightView_CompareRaw
     Inherits VB_Class
     Dim lrView As LeftRightView_Basics
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "brightness", 0, 255, 100)
         sliders.setupTrackBar2(ocvb, callerName, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar3(ocvb, callerName,"Slice Height", 1, 120, 50)
-                Select Case ocvb.parms.cameraIndex
+        sliders.setupTrackBar3(ocvb, callerName, "Slice Height", 1, 120, 50)
+        Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
                 ocvb.label1 = "Left Image"
                 ocvb.label2 = "Right Image"
@@ -141,7 +141,7 @@ Public Class LeftRightView_CompareRaw
         ocvb.result2(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100 + slideHeight, leftView.Width, slideHeight)))
     End Sub
     Public Sub MyDispose()
-                lrView.Dispose()
+        lrView.Dispose()
     End Sub
 End Class
 
@@ -154,7 +154,7 @@ Public Class LeftRightView_Features
     Dim lrView As LeftRightView_Basics
     Dim features As Features_GoodFeatures
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         features = New Features_GoodFeatures(ocvb, callerName)
         features.externalUse = True
 
@@ -196,7 +196,7 @@ Public Class LeftRightView_Palettized
     Dim lrView As LeftRightView_Basics
     Dim palette As Palette_ColorMap
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         lrView = New LeftRightView_Basics(ocvb, callerName)
         palette = New Palette_ColorMap(ocvb, callerName)
         palette.externalUse = True
@@ -234,7 +234,7 @@ Public Class LeftRightView_BRISK
     Dim lrView As LeftRightView_Basics
     Dim brisk As BRISK_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Add color to the 8-bit infrared images."
         ocvb.label1 = "Infrared Left Image"
         ocvb.label2 = "Infrared Right Image"

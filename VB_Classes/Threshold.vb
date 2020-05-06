@@ -5,7 +5,7 @@ Public Class Threshold_LaplacianFilter
         Dim edges As Filter_Laplacian
     Dim trim As Depth_InRange
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         trim = New Depth_InRange(ocvb, callerName)
         edges = New Filter_Laplacian(ocvb, callerName)
         sliders.setupTrackBar1(ocvb, callerName, "dist Threshold", 1, 100, 40)

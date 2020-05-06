@@ -2,7 +2,7 @@
 Public Class Bitwise_Not
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.label1 = "Color BitwiseNot"
         ocvb.label2 = "Gray BitwiseNot"
         ocvb.desc = "Gray and color bitwise_not"

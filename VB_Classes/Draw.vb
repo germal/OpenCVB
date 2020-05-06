@@ -17,7 +17,7 @@ Public Class Draw_rectangles
     Public updateFrequency = 30
     Public drawRotatedRectangles As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Rectangle Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of rotated rectangles."
     End Sub
@@ -51,7 +51,7 @@ Public Class Draw_Noise
     Public addRandomColor As Boolean
     Public noiseMask As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Noise Count", 1, 1000, 100)
         sliders.setupTrackBar2(ocvb, callerName, "Noise Width", 1, 10, 3)
         ocvb.desc = "Add Noise to the color image"
@@ -79,7 +79,7 @@ Public Class Draw_rotatedRectangles
     Inherits VB_Class
     Public rect As Draw_rectangles
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         rect = New Draw_rectangles(ocvb, callerName)
         rect.drawRotatedRectangles = True
         ocvb.desc = "Draw the requested number of rectangles."
@@ -98,7 +98,7 @@ Public Class Draw_Ellipses
     Inherits VB_Class
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Ellipse Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of ellipses."
     End Sub
@@ -122,7 +122,7 @@ Public Class Draw_Circles
     Inherits VB_Class
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Circle Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of circles."
     End Sub
@@ -145,7 +145,7 @@ Public Class Draw_Line
     Inherits VB_Class
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Line Count", 1, 255, 1)
         ocvb.desc = "Draw the requested number of Lines."
     End Sub
@@ -168,7 +168,7 @@ Public Class Draw_Polygon
     Inherits VB_Class
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Poly Count", 1, 255, 1)
         ocvb.desc = "Draw Polygon figures"
         ocvb.label2 = "Convex Hull for the same polygon"
@@ -224,7 +224,7 @@ End Class
 Public Class Draw_RngImage
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Use RNG to draw the same set of shapes every time"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -266,7 +266,7 @@ End Class
 Public Class Draw_SymmetricalShapes
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Number of points", 200, 1000, 500)
         sliders.setupTrackBar2(ocvb, callerName, "Radius 1", 1, ocvb.color.Height / 2, ocvb.color.Height / 4)
         sliders.setupTrackBar3(ocvb, callerName, "Radius 2", 1, ocvb.color.Height / 2, ocvb.color.Height / 8)

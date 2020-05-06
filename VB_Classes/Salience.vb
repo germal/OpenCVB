@@ -22,7 +22,7 @@ Public Class Salience_Basics_CPP
     Dim rows As Int32, cols As Int32, numScales As Int32
     Dim salience As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders = New OptionsSliders
         sliders.setupTrackBar1(ocvb, callerName, "Salience numScales", 1, 6, 1)
 
@@ -69,7 +69,7 @@ Public Class Salience_Basics_MT
     Inherits VB_Class
     Dim grayData() As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders = New OptionsSliders
         sliders.setupTrackBar1(ocvb, callerName, "Salience numScales", 1, 6, 1)
         sliders.setupTrackBar2(ocvb, callerName, "Salience Number of Threads", 1, 100, 36)

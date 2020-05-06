@@ -4,7 +4,7 @@ Imports System.Runtime.InteropServices
 Public Class Corners_Harris
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar2(ocvb, callerName, "Corner aperture size", 1, 21, 3)
         sliders.setupTrackBar3(ocvb, callerName, "Corner quality level", 1, 100, 50)
@@ -61,8 +61,8 @@ End Class
 Public Class Corners_SubPix
     Inherits VB_Class
     Dim good As Features_GoodFeatures
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        setCaller(caller)
         good = New Features_GoodFeatures(ocvb, callerName)
         sliders.setupTrackBar1(ocvb, callerName, "SubPix kernel Size", 1, 20, 3)
 
@@ -86,7 +86,7 @@ Public Class Corners_SubPix
         Next
     End Sub
     Public Sub MyDispose()
-                good.Dispose()
+        good.Dispose()
     End Sub
 End Class
 
@@ -95,9 +95,9 @@ End Class
 
 Public Class Corners_PreCornerDetect
     Inherits VB_Class
-        Dim median As Math_Median_CDF
+    Dim median As Math_Median_CDF
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         median = New Math_Median_CDF(ocvb, callerName)
         sliders.setupTrackBar1(ocvb, callerName, "kernel Size", 1, 20, 19)
 
@@ -119,7 +119,7 @@ Public Class Corners_PreCornerDetect
         ocvb.label2 = "median = " + CStr(median.medianVal)
     End Sub
     Public Sub MyDispose()
-                median.Dispose()
+        median.Dispose()
     End Sub
 End Class
 
@@ -137,7 +137,7 @@ End Module
 Public Class Corners_ShiTomasi_CPP
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar2(ocvb, callerName, "Corner aperture size", 1, 21, 3)
         sliders.setupTrackBar3(ocvb, callerName, "Corner quality level", 1, 100, 50)

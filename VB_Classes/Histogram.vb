@@ -83,7 +83,7 @@ Public Class Histogram_Basics
     Public plotRequested As Boolean
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Histogram Bins", 2, 256, 256)
         sliders.setupTrackBar2(ocvb, callerName, "Histogram line thickness", 1, 20, 3)
         sliders.setupTrackBar3(ocvb, callerName, "Histogram Font Size x10", 1, 20, 10)
@@ -132,19 +132,19 @@ End Class
 
 Public Class Histogram_NormalizeGray
     Inherits VB_Class
-            Public histogram As Histogram_KalmanSmoothed
+    Public histogram As Histogram_KalmanSmoothed
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Min Gray", 0, 255, 0)
         sliders.setupTrackBar2(ocvb, callerName, "Max Gray", 0, 255, 255)
 
         histogram = New Histogram_KalmanSmoothed(ocvb, callerName)
         histogram.externalUse = True
 
-        check.Setup(ocvb, callerName,  1)
+        check.Setup(ocvb, callerName, 1)
         check.Box(0).Text = "Normalize Before Histogram"
         check.Box(0).Checked = True
-                ocvb.desc = "Create a histogram of a normalized image"
+        ocvb.desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         histogram.gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -154,8 +154,8 @@ Public Class Histogram_NormalizeGray
         histogram.Run(ocvb)
     End Sub
     Public Sub MyDispose()
-                histogram.Dispose()
-            End Sub
+        histogram.Dispose()
+    End Sub
 End Class
 
 
@@ -168,7 +168,7 @@ Public Class Histogram_EqualizeColor
     Dim mats As Mat_2to1
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         kalman = New Histogram_KalmanSmoothed(ocvb, callerName)
         kalman.externalUse = True
         kalman.sliders.TrackBar1.Value = 40
@@ -219,7 +219,7 @@ Public Class Histogram_EqualizeGray
     Public histogram As Histogram_KalmanSmoothed
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         histogram = New Histogram_KalmanSmoothed(ocvb, callerName)
         ocvb.desc = "Create an equalized histogram of the grayscale image."
     End Sub
@@ -246,7 +246,7 @@ Public Class Histogram_2D_HueSaturation
     Public hsv As cv.Mat
 
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
         sliders.setupTrackBar2(ocvb, callerName, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
         ocvb.desc = "Create a histogram for hue and saturation."
@@ -274,8 +274,8 @@ Public Class Histogram_2D_XZ_YZ
     Dim xyDepth As Mat_ImageXYZ_MT
     Dim mats As Mat_4to1
     Dim trim As Depth_InRange
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        setCaller(caller)
         xyDepth = New Mat_ImageXYZ_MT(ocvb, callerName)
 
         mats = New Mat_4to1(ocvb, callerName)
@@ -313,7 +313,7 @@ Public Class Histogram_2D_XZ_YZ
         mats.Run(ocvb)
     End Sub
     Public Sub MyDispose()
-                trim.Dispose()
+        trim.Dispose()
         xyDepth.Dispose()
         mats.Dispose()
     End Sub
@@ -325,9 +325,9 @@ End Class
 
 Public Class Histogram_BackProjectionGrayScale
     Inherits VB_Class
-        Dim hist As Histogram_KalmanSmoothed
+    Dim hist As Histogram_KalmanSmoothed
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         hist = New Histogram_KalmanSmoothed(ocvb, callerName)
         hist.externalUse = True
         hist.dst = ocvb.result2
@@ -368,7 +368,7 @@ Public Class Histogram_BackProjectionGrayScale
     End Sub
     Public Sub MyDispose()
         hist.Dispose()
-            End Sub
+    End Sub
 End Class
 
 
@@ -376,9 +376,9 @@ End Class
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
 Public Class Histogram_BackProjection
     Inherits VB_Class
-        Dim hist As Histogram_2D_HueSaturation
+    Dim hist As Histogram_2D_HueSaturation
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Backprojection Mask Threshold", 0, 255, 10)
 
         hist = New Histogram_2D_HueSaturation(ocvb, callerName)
@@ -407,7 +407,7 @@ Public Class Histogram_BackProjection
     End Sub
     Public Sub MyDispose()
         hist.Dispose()
-            End Sub
+    End Sub
 End Class
 
 
@@ -415,10 +415,10 @@ End Class
 
 Public Class Histogram_ColorsAndGray
     Inherits VB_Class
-            Dim histogram As Histogram_KalmanSmoothed
+    Dim histogram As Histogram_KalmanSmoothed
     Dim mats As Mat_4to1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         mats = New Mat_4to1(ocvb, callerName)
         mats.externalUse = True
 
@@ -431,10 +431,10 @@ Public Class Histogram_ColorsAndGray
         histogram.kalman.check.Box(0).Enabled = False ' if we use Kalman, all the plots are identical as the values converge on the gray level setting...
         histogram.sliders.TrackBar1.Value = 40
 
-        check.Setup(ocvb, callerName,  1)
+        check.Setup(ocvb, callerName, 1)
         check.Box(0).Text = "Normalize Before Histogram"
         check.Box(0).Checked = True
-                ocvb.desc = "Create a histogram of a normalized image"
+        ocvb.desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim split = ocvb.color.Split()
@@ -455,8 +455,8 @@ Public Class Histogram_ColorsAndGray
         mats.Run(ocvb)
     End Sub
     Public Sub MyDispose()
-                histogram.Dispose()
-                mats.Dispose()
+        histogram.Dispose()
+        mats.Dispose()
     End Sub
 End Class
 
@@ -470,12 +470,12 @@ Public Class Histogram_KalmanSmoothed
     Public dst As New cv.Mat
     Public externalUse As Boolean
 
-        Public histogram As New cv.Mat
+    Public histogram As New cv.Mat
     Public kalman As Kalman_Basics
     Public plotHist As Plot_Histogram
     Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         dst = ocvb.result2
         plotHist = New Plot_Histogram(ocvb, callerName)
         plotHist.externalUse = True
@@ -525,7 +525,7 @@ Public Class Histogram_KalmanSmoothed
         plotHist.Run(ocvb)
     End Sub
     Public Sub MyDispose()
-                kalman.Dispose()
+        kalman.Dispose()
         plotHist.Dispose()
     End Sub
 End Class
@@ -536,10 +536,10 @@ End Class
 Public Class Histogram_Depth
     Inherits VB_Class
     Public trim As Depth_InRange
-        Public plotHist As Plot_Histogram
+    Public plotHist As Plot_Histogram
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         plotHist = New Plot_Histogram(ocvb, callerName)
         plotHist.externalUse = True
 
@@ -564,7 +564,7 @@ Public Class Histogram_Depth
         End If
     End Sub
     Public Sub MyDispose()
-                trim.Dispose()
+        trim.Dispose()
         plotHist.Dispose()
     End Sub
 End Class
@@ -602,7 +602,7 @@ Public Class Histogram_DepthValleys
         Next
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         hist = New Histogram_Depth(ocvb, callerName)
         hist.trim.sliders.TrackBar2.Value = 5000 ' depth to 5 meters.
         hist.sliders.TrackBar1.Value = 40 ' number of bins.
@@ -683,7 +683,7 @@ Public Class Histogram_DepthClusters
     Public valleys As Histogram_DepthValleys
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         valleys = New Histogram_DepthValleys(ocvb, callerName)
         ocvb.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
     End Sub

@@ -8,7 +8,7 @@ Public Class Voxels_Basics_MT
     Public minDepth As Double
     Public maxDepth As Double
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         check.Setup(ocvb, callerName,  1)
         check.Box(0).Text = "Display intermediate results"
         check.Box(0).Checked = True

@@ -7,7 +7,7 @@ Public Class WarpAffine_Captcha
     Const captchaLength = 8
     Dim rng As New System.Random
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Use OpenCV to build a captcha Turing test."
     End Sub
     Private Sub addNoise(image As cv.Mat)
@@ -98,7 +98,7 @@ End Class
 Public Class WarpAffine_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Angle", 0, 360, 10)
 
         SetInterpolationRadioButtons(ocvb, callerName, radio, "WarpAffine")
@@ -129,7 +129,7 @@ Public Class WarpAffine_3Points
     Inherits VB_Class
     Dim triangle As Area_MinTriangle_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         triangle = New Area_MinTriangle_CPP(ocvb, callerName)
         triangle.sliders.TrackBar1.Value = 20
         triangle.sliders.TrackBar2.Value = 150
@@ -206,7 +206,7 @@ Public Class WarpAffine_4Points
     Inherits VB_Class
     Dim rect As Area_MinRect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         rect = New Area_MinRect(ocvb, callerName)
 
         ocvb.desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."

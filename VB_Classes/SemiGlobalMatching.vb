@@ -26,7 +26,7 @@ End Module
 '    Dim SemiGlobalMatching As IntPtr
 '     Public Sub New(ocvb As AlgorithmData, byVal caller as string)
 ' dim callerName = caller 
-' If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+' setCaller(caller)
 '        ReDim leftData(ocvb.color.Total - 1)
 '        ReDim rightData(ocvb.color.Total - 1)
 '        SemiGlobalMatching = SemiGlobalMatching_Open(ocvb.color.Rows, ocvb.color.Cols)

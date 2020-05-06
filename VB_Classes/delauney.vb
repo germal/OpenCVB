@@ -83,7 +83,7 @@ End Module
 Public Class Delaunay_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -111,7 +111,7 @@ Public Class Delaunay_GoodFeatures
     Inherits VB_Class
     Dim features As Features_GoodFeatures
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         features = New Features_GoodFeatures(ocvb, callerName)
         ocvb.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
@@ -140,7 +140,7 @@ End Class
 Public Class Delauney_Subdiv2D
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.label2 = "Voronoi facets for the same subdiv2D"
         ocvb.desc = "Generate random points and divide the image around those points."
     End Sub

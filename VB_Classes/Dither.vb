@@ -83,7 +83,7 @@ End Module
 Public Class Dither_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Bits per color plane", 1, 5, 1)
 
         radio.Setup(ocvb, callerName, 24)

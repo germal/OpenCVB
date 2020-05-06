@@ -12,7 +12,7 @@ Public Class Surf_Basics_CS
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         fisheye = New FishEye_Rectified(ocvb, callerName)
         fisheye.externalUse = True
 
@@ -63,7 +63,7 @@ Public Class Surf_Basics
     Dim surf As Surf_Basics_CS
     Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         fisheye = New FishEye_Rectified(ocvb, callerName)
         fisheye.externalUse = True
 
@@ -101,7 +101,7 @@ Public Class Surf_DrawMatchManual_CS
     Inherits VB_Class
         Dim surf As Surf_Basics_CS
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         surf = New Surf_Basics_CS(ocvb, callerName)
         surf.CS_SurfBasics.drawPoints = False
 

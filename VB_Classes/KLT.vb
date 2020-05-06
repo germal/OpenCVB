@@ -11,7 +11,7 @@ Public Class KLT_Basics
     Public circleColor = cv.Scalar.Red
     Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "KLT - MaxCorners", 1, 200, 100)
         sliders.setupTrackBar2(ocvb, callerName, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
         sliders.setupTrackBar3(ocvb, callerName, "KLT - minDistance", 1, 100, 7)
@@ -86,7 +86,7 @@ Public Class KLT_OpticalFlow
     Dim klt As KLT_Basics
     Dim lastpoints() As cv.Point2f
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         klt = New KLT_Basics(ocvb, callerName)
         klt.externalUse = True ' we will compress the points file below.
         ocvb.desc = "KLT optical flow"

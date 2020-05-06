@@ -20,7 +20,7 @@ Public Class Area_MinTriangle_CPP
         ReDim dstData(3 * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' minTriangle returns 3 points
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Area Number of Points", 1, 30, 5)
         sliders.setupTrackBar2(ocvb, callerName, "Area size", 10, 300, 200)
         setup(ocvb)
@@ -68,7 +68,7 @@ Public Class Area_MinRect
         ReDim srcPoints(numberOfPoints)
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Area Number of Points", 1, 200, 5)
         sliders.setupTrackBar2(ocvb, callerName, "Area size", 10, 300, 200)
         setup(ocvb)
@@ -97,7 +97,7 @@ Public Class Area_MinMotionRect
     Inherits VB_Class
     Dim input As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         input = New BGSubtract_MOG(ocvb, callerName)
         input.sliders.TrackBar1.Value = 100 ' low threshold to maximize motion
         ocvb.desc = "Use minRectArea to encompass detected motion"
@@ -140,7 +140,7 @@ End Class
 Public Class Area_FindNonZero
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.label1 = "Non-zero original points"
         ocvb.label2 = "Coordinates of non-zero points"
         ocvb.desc = "Use FindNonZero API to get coordinates of non-zero points."

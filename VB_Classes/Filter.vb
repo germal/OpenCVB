@@ -3,7 +3,7 @@
 Public Class Filter_Laplacian
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Use a filter to approximate the Laplacian derivative."
         ocvb.label1 = "Sharpened image using Filter2D output"
         ocvb.label2 = "Output of Filter2D (approximated Laplacian)"
@@ -24,7 +24,7 @@ End Class
 Public Class Filter_NormalizedKernel
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         radio.Setup(ocvb, callerName, 4)
         radio.check(0).Text = "INF"
         radio.check(1).Text = "L1"
@@ -61,7 +61,7 @@ End Class
 Public Class Filter_Normalized2D
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Create and apply a normalized kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -79,7 +79,7 @@ End Class
 Public Class Filter_SepFilter2D
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         check.Setup(ocvb, callerName, 1)
         check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"
         check.Box(0).Checked = True

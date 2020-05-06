@@ -15,7 +15,7 @@ End Module
 Public Class Quaterion_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders1.setupTrackBar1(ocvb, callerName, "quaternion A.x X100", -100, 100, 0)
         sliders1.setupTrackBar2(ocvb, callerName, "quaternion A.y X100", -100, 100, 0)
         sliders1.setupTrackBar3(ocvb, callerName, "quaternion A.z X100", -100, 100, 0)
@@ -50,7 +50,7 @@ Public Class Quaterion_IMUPrediction
     Inherits VB_Class
     Dim host As IMU_HostFrameTimes
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         host = New IMU_HostFrameTimes(ocvb, callerName)
         host.externalUse = True
 

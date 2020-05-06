@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization (CLAHE)
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Clip Limit", 1, 100, 10)
         sliders.setupTrackBar2(ocvb, callerName, "Grid Size", 1, 100, 8)
         ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
@@ -32,7 +32,7 @@ End Class
 Public Class Brightness_Contrast
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Brightness", 1, 100, 50)
         sliders.setupTrackBar2(ocvb, callerName, "Contrast", 1, 100, 50)
         ocvb.desc = "Show image with vary contrast and brightness."
@@ -50,7 +50,7 @@ Public Class Brightness_hue
     Inherits VB_Class
     Public hsv_planes(2) As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Show hue (Result1) and Saturation (Result2)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -70,7 +70,7 @@ End Class
 Public Class Brightness_AlphaBeta
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Use alpha and beta with ConvertScaleAbs."
         sliders.setupTrackBar1(ocvb, callerName, "Brightness Alpha (contrast)", 0, 500, 300)
         sliders.setupTrackBar2(ocvb, callerName, "Brightness Beta (brightness)", -100, 100, 0)
@@ -87,7 +87,7 @@ Public Class Brightness_Gamma
     Inherits VB_Class
     Dim lookupTable(255) As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Use gamma with ConvertScaleAbs."
         sliders.setupTrackBar1(ocvb, callerName, "Brightness Gamma correction", 0, 200, 100)
     End Sub
@@ -127,7 +127,7 @@ Public Class Brightness_WhiteBalance_CPP
     Inherits VB_Class
     Dim wPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "White balance threshold X100", 1, 100, 10)
 
         wPtr = WhiteBalance_Open()
@@ -164,7 +164,7 @@ Public Class Brightness_WhiteBalance
     Dim hist As Histogram_Basics
     Dim wPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         hist = New Histogram_Basics(ocvb, callerName)
         hist.bins = 256 * 3
         hist.maxRange = hist.bins

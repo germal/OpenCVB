@@ -26,7 +26,7 @@ Public Class Thread_Grid
         Next
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         src = ocvb.color
         sliders.setupTrackBar1(ocvb, callerName, "ThreadGrid Width", 5, src.Width, 32)
         sliders.setupTrackBar2(ocvb, callerName, "ThreadGrid Height", 5, src.Height, 32)

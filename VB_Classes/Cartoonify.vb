@@ -3,7 +3,7 @@
 Public Class CartoonifyImage_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Cartoon Median Blur kernel", 1, 21, 7)
         sliders.setupTrackBar2(ocvb, callerName, "Cartoon Median Blur kernel 2", 1, 21, 3)
         sliders.setupTrackBar3(ocvb, callerName, "Cartoon threshold", 1, 255, 80)

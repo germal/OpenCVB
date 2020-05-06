@@ -3,7 +3,7 @@
 Public Class Pencil_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Pencil Sigma_s", 0, 200, 60)
         sliders.setupTrackBar2(ocvb, callerName, "Pencil Sigma_r", 1, 100, 7)
         sliders.setupTrackBar3(ocvb, callerName, "Pencil Shade Factor", 1, 200, 40)
@@ -24,7 +24,7 @@ End Class
 Public Class Pencil_Manual
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Blur kernel size", 2, 100, 10)
         ocvb.desc = "Break down the process of converting an image to a sketch - Painterly Effect"
     End Sub

@@ -5,7 +5,7 @@ Public Class FREAK_Basics
     Inherits VB_Class
     Dim orb As ORB_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         orb = New ORB_Basics(ocvb, callerName)
         orb.externalUse = True
         ocvb.desc = "Find keypoints using ORB and FREAK algorithm"

@@ -4,7 +4,7 @@ Public Class GrabCut_Basics
     Inherits VB_Class
     Dim contours As Contours_Depth
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         contours = New Contours_Depth(ocvb, callerName)
 
         sliders.setupTrackBar1(ocvb, callerName, "Erode iterations", 1, 20, 3)

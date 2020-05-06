@@ -8,7 +8,7 @@ Public Class Binarize_OTSU
     Dim mats2 As Mat_4to1
     Dim plotHist As Plot_Histogram
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         plotHist = New Plot_Histogram(ocvb, callerName)
         plotHist.externalUse = True
 
@@ -61,7 +61,7 @@ End Class
 Public Class Binarize_Niblack_Sauvola
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.Label1.Text = "Kernel Size"
         sliders.setupTrackBar1(ocvb, callerName, "Kernel Size", 3, 500, 51)
         sliders.setupTrackBar2(ocvb, callerName, "Niblack k", -1000, 1000, -200)
@@ -91,7 +91,7 @@ End Class
 Public Class Binarize_Niblack_Nick
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.Label1.Text = "Kernel Size"
         sliders.setupTrackBar1(ocvb, callerName, "Kernel Size", 3, 500, 51)
         sliders.setupTrackBar2(ocvb, callerName, "Niblack k", -1000, 1000, -200)
@@ -120,7 +120,7 @@ End Class
 Public Class Binarize_Bernson
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.Label1.Text = "Kernel Size"
         sliders.setupTrackBar1(ocvb, callerName, "Kernel Size", 3, 500, 51)
         sliders.setupTrackBar2(ocvb, callerName, "Contrast min", 0, 255, 50)
@@ -152,8 +152,8 @@ End Class
 Public Class Binarize_Bernson_MT
     Inherits VB_Class
     Dim grid As Thread_Grid
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        setCaller(caller)
         grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32

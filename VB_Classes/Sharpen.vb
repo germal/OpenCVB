@@ -2,7 +2,7 @@
 Public Class Sharpen_UnsharpMask
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "sigma", 1, 2000, 100)
         sliders.setupTrackBar2(ocvb, callerName, "threshold", 0, 255, 5)
         sliders.setupTrackBar3(ocvb, callerName, "Shift Amount", 0, 5000, 1000)
@@ -30,7 +30,7 @@ End Class
 Public Class Sharpen_DetailEnhance
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "DetailEnhance Sigma_s", 0, 200, 60)
         sliders.setupTrackBar2(ocvb, callerName, "DetailEnhance Sigma_r", 1, 100, 7)
         ocvb.desc = "Enhance detail on an image - Painterly Effect"
@@ -49,7 +49,7 @@ End Class
 Public Class Sharpen_Stylize
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Stylize Sigma_s", 0, 200, 60)
         sliders.setupTrackBar2(ocvb, callerName, "Stylize Sigma_r", 1, 100, 7)
         ocvb.desc = "Stylize an image - Painterly Effect"

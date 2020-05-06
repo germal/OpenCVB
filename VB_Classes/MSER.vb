@@ -9,7 +9,7 @@ Public Class MSER_Basics
     Dim saveParms() As Int32
     Dim mser As cv.MSER
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders2.setupTrackBar1(ocvb, callerName, "MSER Edge Blursize", 1, 20, 5)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
@@ -102,7 +102,7 @@ Public Class MSER_Synthetic
         Next
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -151,7 +151,7 @@ Public Class MSER_TestSynthetic
         Return CStr(regionCount) + " Regions had " + CStr(pixels) + " pixels"
     End Function
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         mser = New MSER_Basics(ocvb, callerName)
         mser.externalUse = True
         mser.sliders.TrackBar1.Value = 10
@@ -186,7 +186,7 @@ Public Class MSER_CPPStyle
     Dim gray As cv.Mat
     Dim image As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.label1 = "Contour regions from MSER"
         ocvb.label2 = "Box regions from MSER"
         ocvb.desc = "Maximally Stable Extremal Regions example - still image"
@@ -225,7 +225,7 @@ Public Class MSER_Contours
     Inherits VB_Class
     Dim mser As MSER_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         mser = New MSER_Basics(ocvb, callerName)
         mser.externalUse = True
         mser.sliders.TrackBar2.Value = 4000

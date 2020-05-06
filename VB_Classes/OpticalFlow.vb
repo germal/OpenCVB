@@ -73,7 +73,7 @@ Public Class OpticalFlow_DenseOptions
     Public OpticalFlowFlags As cv.OpticalFlowFlags
     Public outputScaling As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         radio.Setup(ocvb, callerName, 5)
         radio.check(0).Text = "FarnebackGaussian"
         radio.check(1).Text = "LkGetMinEigenvals"
@@ -123,7 +123,7 @@ Public Class OpticalFlow_DenseBasics
 
     Dim flow As OpticalFlow_DenseOptions
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         flow = New OpticalFlow_DenseOptions(ocvb, callerName)
         ocvb.desc = "Use dense optical flow algorithm  "
     End Sub
@@ -157,7 +157,7 @@ Public Class OpticalFlow_DenseBasics_MT
     Dim accum As New cv.Mat
     Dim flow As OpticalFlow_DenseOptions
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         grid = New Thread_Grid(ocvb, callerName)
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 32
@@ -226,7 +226,7 @@ Public Class OpticalFlow_Sparse
     Dim sumScale As cv.Mat, sScale As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         good = New Features_GoodFeatures(ocvb, callerName)
         good.externalUse = True
 

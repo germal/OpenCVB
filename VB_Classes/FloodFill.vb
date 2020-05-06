@@ -19,7 +19,7 @@ Public Class FloodFill_Basics
         End Function
     End Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar2(ocvb, callerName, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar3(ocvb, callerName, "FloodFill HiDiff", 1, 255, 5)
@@ -84,15 +84,15 @@ End Class
 
 Public Class FloodFill_Top16_MT
     Inherits VB_Class
-        Dim grid As Thread_Grid
+    Dim grid As Thread_Grid
     Public srcGray As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         grid = New Thread_Grid(ocvb, callerName)
         sliders.setupTrackBar1(ocvb, callerName, "FloodFill Minimum Size", 1, 500, 50)
         sliders.setupTrackBar2(ocvb, callerName, "FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar3(ocvb, callerName,"FloodFill HiDiff", 1, 255, 5)
+        sliders.setupTrackBar3(ocvb, callerName, "FloodFill HiDiff", 1, 255, 5)
 
         ocvb.desc = "Use floodfill to build image segments with a grayscale image."
     End Sub
@@ -120,7 +120,7 @@ Public Class FloodFill_Top16_MT
         End Sub)
     End Sub
     Public Sub MyDispose()
-                grid.Dispose()
+        grid.Dispose()
     End Sub
 End Class
 
@@ -134,7 +134,7 @@ Public Class FloodFill_Color_MT
     Public src As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         grid = New Thread_Grid(ocvb, callerName)
         flood = New FloodFill_Top16_MT(ocvb, callerName)
 
@@ -179,7 +179,7 @@ Public Class FloodFill_DCT
     Dim flood As FloodFill_Color_MT
     Dim dct As DCT_FeatureLess_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         flood = New FloodFill_Color_MT(ocvb, callerName)
         flood.externalUse = True
 
@@ -210,7 +210,7 @@ Public Class FloodFill_WithDepth
     Dim range As FloodFill_RelativeRange
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         shadow = New Depth_Holes(ocvb, callerName)
         shadow.externalUse = True
 
@@ -242,7 +242,7 @@ Public Class FloodFill_CComp
     Dim range As FloodFill_RelativeRange
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         shadow = New Depth_Holes(ocvb, callerName)
         shadow.externalUse = True
 
@@ -278,15 +278,15 @@ End Class
 Public Class FloodFill_RelativeRange
     Inherits VB_Class
     Public fBasics As FloodFill_Basics
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        setCaller(caller)
         fBasics = New FloodFill_Basics(ocvb, callerName)
-        check.Setup(ocvb, callerName,  3)
+        check.Setup(ocvb, callerName, 3)
         check.Box(0).Text = "Use Fixed range - when off, it means use relative range "
         check.Box(1).Text = "Use 4 nearest pixels (Link4) - when off, it means use 8 nearest pixels (Link8)"
         check.Box(1).Checked = True ' link4 produces better results.
         check.Box(2).Text = "Use 'Mask Only'"
-                ocvb.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
+        ocvb.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         fBasics.floodFlag = 0
@@ -296,7 +296,7 @@ Public Class FloodFill_RelativeRange
         fBasics.Run(ocvb)
     End Sub
     Public Sub MyDispose()
-                fBasics.Dispose()
+        fBasics.Dispose()
     End Sub
 End Class
 
@@ -312,7 +312,7 @@ Public Class FloodFill_Top16
     Public thumbNails As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         check.Setup(ocvb, callerName, 1)
         check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
 
@@ -366,7 +366,7 @@ Public Class FloodFill_Projection
     Public objectRects As New List(Of cv.Rect)
     Public minFloodSize As Integer
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar2(ocvb, callerName, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar3(ocvb, callerName, "FloodFill HiDiff", 1, 255, 5)

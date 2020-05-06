@@ -4,7 +4,7 @@ Imports System.Linq
 Public Class Polylines_IEnumerableExample
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         check.Setup(ocvb, callerName, 2)
         check.Box(0).Text = "Polyline closed if checked"
         check.Box(0).Checked = True
@@ -35,7 +35,7 @@ End Class
 Public Class Polylines_Random
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Create a random procedural image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -7,7 +7,7 @@ Public Class Video_Basics
     Dim currVideo As String
     Public image As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         If srcVideo = "" Then srcVideo = ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4" ' default video...
         currVideo = srcVideo
         videoOptions.NewVideo(ocvb, srcVideo)
@@ -35,7 +35,7 @@ Public Class Video_CarCounting
     Dim video As Video_Basics
     Dim mog As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         mog = New BGSubtract_MOG(ocvb, callerName)
         mog.externalUse = True
 
@@ -100,7 +100,7 @@ Public Class Video_CarCComp
     Dim video As Video_Basics
     Dim mog As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         mog = New BGSubtract_MOG(ocvb, callerName)
         mog.externalUse = True
 
@@ -144,7 +144,7 @@ Public Class Video_MinRect
     Public externalUse As Boolean
     Public contours As cv.Point()()
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         video = New Video_Basics(ocvb, callerName)
         video.srcVideo = ocvb.parms.HomeDir + "Data/CarsDrivingUnderBridge.mp4"
         video.Run(ocvb)
@@ -184,7 +184,7 @@ Public Class Video_MinCircle
     Inherits VB_Class
     Dim input As Video_MinRect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         input = New Video_MinRect(ocvb, callerName)
         input.externalUse = True
         ocvb.desc = "Find area of car outline - example of using MinEnclosingCircle"

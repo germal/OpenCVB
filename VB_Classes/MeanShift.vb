@@ -5,7 +5,7 @@ Public Class MeanShift_Basics
     Public rectangleEdgeWidth As Int32 = 2
     Public trackbox As New cv.Rect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.label1 = "Draw anywhere to start mean shift tracking."
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track"
     End Sub
@@ -44,7 +44,7 @@ Public Class MeanShift_Depth
     Dim ms As MeanShift_Basics
     Dim blob As Depth_Foreground
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ms = New MeanShift_Basics(ocvb, callerName)
         blob = New Depth_Foreground(ocvb, callerName)
         ocvb.desc = "Use depth to start mean shift algorithm."
@@ -70,7 +70,7 @@ End Class
 Public Class MeanShift_PyrFilter
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "MeanShift Spatial Radius", 1, 100, 10)
         sliders.setupTrackBar2(ocvb, callerName, "MeanShift color Radius", 1, 100, 15)
         sliders.setupTrackBar3(ocvb, callerName, "MeanShift Max Pyramid level", 1, 8, 3)
@@ -93,10 +93,10 @@ Public Class Meanshift_TopObjects
     Inherits VB_Class
     Dim blob As Blob_DepthClusters
     Dim cams(3) As MeanShift_Basics
-        Dim mats1 As Mat_4to1
+    Dim mats1 As Mat_4to1
     Dim mats2 As Mat_4to1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         mats1 = New Mat_4to1(ocvb, callerName)
         mats1.externalUse = True
 

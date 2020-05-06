@@ -9,7 +9,7 @@ Public Class WarpModel_Input
     Public gradient(3 - 1) As cv.Mat
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         radio.Setup(ocvb, callerName,12)
         radio.check(0).Text = "building.jpg"
         radio.check(1).Text = "church.jpg"
@@ -96,7 +96,7 @@ Public Class WarpModel_FindTransformECC_CPP
     Public warpMode As Integer
     Public aligned As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         cPtr = WarpModel_Open()
 
         radio.Setup(ocvb, callerName,4)
@@ -186,7 +186,7 @@ Public Class WarpModel_AlignImages
     Inherits VB_Class
     Dim ecc As WarpModel_FindTransformECC_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         ecc = New WarpModel_FindTransformECC_CPP(ocvb, callerName)
 
         ocvb.desc = "Align the RGB inputs raw images from the Prokudin examples."

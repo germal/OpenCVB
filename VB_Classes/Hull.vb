@@ -28,7 +28,7 @@ Public Class Hull_Basics
     Public hull() As cv.Point
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Hull random points", 1, 20, 10)
 
         ocvb.desc = "Surround a set of random points with a convex hull"

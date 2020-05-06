@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 Public Class LUT_Gray
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "LUT zero through xxx", 1, 255, 65)
         sliders.setupTrackBar2(ocvb, callerName, "LUT xxx through yyy", 1, 255, 110)
         sliders.setupTrackBar3(ocvb, callerName, "LUT xxx through yyy", 1, 255, 160)
@@ -39,7 +39,7 @@ Public Class LUT_Color
     Public src As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

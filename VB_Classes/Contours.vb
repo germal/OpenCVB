@@ -7,8 +7,8 @@ Public Class Contours_Basics
     Public src As New cv.Mat
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, callerName,5)
+        setCaller(caller)
+        radio.Setup(ocvb, callerName, 5)
         radio.Text = "Retrieval Mode Options"
         radio.check(0).Text = "CComp"
         radio.check(1).Text = "External"
@@ -86,7 +86,7 @@ Public Class Contours_FindandDraw
     Inherits VB_Class
     Dim rotatedRect As Draw_rotatedRectangles
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         rotatedRect = New Draw_rotatedRectangles(ocvb, callerName)
         rotatedRect.rect.sliders.TrackBar1.Value = 5
         ocvb.label1 = "FindandDraw input"
@@ -119,7 +119,7 @@ Public Class Contours_Depth
     Inherits VB_Class
     Public trim As Depth_InRange
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         trim = New Depth_InRange(ocvb, callerName)
         ocvb.desc = "Find and draw the contour of the depth foreground."
         ocvb.label1 = "DepthContour input"
@@ -151,7 +151,7 @@ Public Class Contours_RGB
     Inherits VB_Class
     Dim trim As Depth_InRange
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         trim = New Depth_InRange(ocvb, callerName)
         ocvb.desc = "Find and draw the contour of the largest foreground RGB contour."
         ocvb.label2 = "Background"

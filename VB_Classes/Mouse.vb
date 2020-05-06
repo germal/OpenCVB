@@ -2,7 +2,7 @@
 Public Class Mouse_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Test the mousePoint interface"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -26,7 +26,7 @@ End Class
 Public Class Mouse_LeftClick
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Demonstrate what the left-click enables"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -48,7 +48,7 @@ End Class
 Public Class Mouse_RightClick
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Demonstrate what the right-click enables"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

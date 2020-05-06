@@ -49,6 +49,9 @@ Public Class VB_Class : Implements IDisposable
     Public radio1 As New OptionsRadioButtons
     Public videoOptions As New OptionsVideoName
     Dim classInheritor As Object
+    Public Sub setCaller(caller As String)
+        If caller = "" Or caller.Contains(Me.GetType.Name) Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    End Sub
     Public Sub New()
         classInheritor = Me
     End Sub

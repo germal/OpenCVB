@@ -5,7 +5,7 @@ Public Class kMeans_Clusters
     Dim Mats As Mat_4to1
     Dim km As kMeans_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         Mats = New Mat_4to1(ocvb, callerName)
         Mats.externalUse = True
 
@@ -38,7 +38,7 @@ End Class
 Public Class kMeans_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 4)
         ocvb.desc = "Cluster the rgb image using kMeans."
     End Sub
@@ -74,7 +74,7 @@ Public Class kMeans_RGBFast
     Public resizeFactor = 2
     Public clusterCount = 6
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 4)
         ocvb.desc = "Cluster a small rgb image using kMeans.  Specify clusterCount value."
     End Sub
@@ -114,7 +114,7 @@ Public Class kMeans_RGB_Plus_XYDepth
     Dim km As kMeans_Basics
     Dim clusterColors() As cv.Vec6i
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 4)
         km = New kMeans_Basics(ocvb, callerName)
         ocvb.label1 = "kmeans - RGB, XY, and Depth Raw"
@@ -172,7 +172,7 @@ Public Class kMeans_RGB1_MT
     Inherits VB_Class
     Public clusterColors() As cv.Vec3b
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 4)
         sliders.setupTrackBar2(ocvb, callerName, "Thread Count", 1, 32, 4)
         ocvb.label1 = "kmeans - raw labels"
@@ -256,7 +256,7 @@ Public Class kMeans_RGB2_MT
     Inherits VB_Class
     Public clusterColors() As cv.Vec3b
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 10)
         radio.Setup(ocvb, callerName, 6)
         For i = 0 To radio.check.Count - 1
@@ -326,7 +326,7 @@ End Class
 Public Class kMeans_RGB3_MT
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 14)
         radio.Setup(ocvb, callerName, 6)
         For i = 0 To radio.check.Count - 1
@@ -420,7 +420,7 @@ End Class
 Public Class kMeans_ReducedRGB
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Reduction factor", 2, 64, 64)
         sliders.setupTrackBar2(ocvb, callerName, "kmeans k", 2, 64, 4)
         ocvb.label2 = "Reduced color image."
@@ -453,7 +453,7 @@ End Class
 Public Class kMeans_XYDepth
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 4)
         Dim w = ocvb.color.Width / 4
         Dim h = ocvb.color.Height / 4
@@ -489,7 +489,7 @@ End Class
 Public Class kMeans_Depth_FG_BG
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -521,7 +521,7 @@ End Class
 Public Class kMeans_LAB
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 4)
         ocvb.label1 = "kMeans_LAB - draw to select region"
         Dim w = ocvb.color.Width / 4
@@ -556,9 +556,9 @@ End Class
 
 Public Class kMeans_RGB4_MT
     Inherits VB_Class
-        Dim grid As Thread_Grid
+    Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 10)
 
         grid = New Thread_Grid(ocvb, callerName)
@@ -635,7 +635,7 @@ Public Class kMeans_RGB4_MT
         cv.Cv2.CvtColor(allLabels, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
     Public Sub MyDispose()
-                grid.Dispose()
+        grid.Dispose()
     End Sub
 End Class
 
@@ -646,7 +646,7 @@ End Class
 Public Class kMeans_Color
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 3)
         ocvb.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
@@ -676,8 +676,8 @@ End Class
 Public Class kMeans_Color_MT
     Inherits VB_Class
     Public grid As Thread_Grid
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 2)
 
         grid = New Thread_Grid(ocvb, callerName)
@@ -713,7 +713,7 @@ Public Class kMeans_Color_MT
         End Sub)
     End Sub
     Public Sub MyDispose()
-                grid.Dispose()
+        grid.Dispose()
     End Sub
 End Class
 
@@ -724,7 +724,7 @@ End Class
 Public Class kMeans_ColorDepth
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 3)
         ocvb.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub
@@ -764,8 +764,8 @@ End Class
 Public Class kMeans_ColorDepth_MT
     Inherits VB_Class
     Public grid As Thread_Grid
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "kMeans k", 2, 32, 3)
 
         grid = New Thread_Grid(ocvb, callerName)

@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 Public Class FLANN_Test
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
         ocvb.label1 = "FLANN Basics"
     End Sub
@@ -47,9 +47,9 @@ End Class
 
 Public Class FLANN_Basics
     Inherits VB_Class
-        Dim random As Random_Points
+    Dim random As Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         random = New Random_Points(ocvb, callerName)
 
         sliders.setupTrackBar1(ocvb, callerName, "Query Count", 1, 10000, 10)

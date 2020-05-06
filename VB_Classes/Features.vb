@@ -7,7 +7,7 @@ Public Class Features_GoodFeatures
     Public gray As cv.Mat = Nothing
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Number of Points", 10, 1000, 200)
         sliders.setupTrackBar2(ocvb, callerName, "Quality Level", 1, 100, 1)
         sliders.setupTrackBar3(ocvb, callerName, "Distance", 1, 100, 30)

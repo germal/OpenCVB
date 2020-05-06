@@ -4,7 +4,7 @@ Public Class FAST_Basics
     Inherits VB_Class
     Public keypoints() As cv.KeyPoint
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Threshold", 0, 200, 15)
         ocvb.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
         ocvb.label1 = "FAST_Basics nonMax = true"
@@ -29,7 +29,7 @@ Public Class FAST_Centroid
     Dim fast As FAST_Basics
     Dim kalman As Kalman_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         kalman = New Kalman_Basics(ocvb, callerName)
         ReDim kalman.src(1) ' 2 elements - cv.point
         kalman.externalUse = True

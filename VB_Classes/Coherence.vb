@@ -5,7 +5,7 @@ Public Class Coherence_Basics
     Public src As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Find lines that are artistically coherent in the image - Painterly Effect."
         sliders.setupTrackBar1(ocvb, callerName, "Coherence Sigma", 1, 15, 9)
         sliders.setupTrackBar2(ocvb, callerName, "Coherence Blend", 1, 10, 10)
@@ -78,7 +78,7 @@ Public Class Coherence_Depth
     Inherits VB_Class
     Dim coherent As Coherence_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         coherent = New Coherence_Basics(ocvb, callerName)
         coherent.externalUse = True
         ocvb.desc = "Find coherent lines in the depth image"

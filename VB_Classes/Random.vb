@@ -8,7 +8,7 @@ Public Class Random_Points
     Public externalUse As Boolean
     Public rangeRect As cv.Rect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Random Pixel Count", 1, ocvb.color.Width * ocvb.color.Height, 20)
 
         ReDim Points(sliders.TrackBar1.Value - 1)
@@ -39,7 +39,7 @@ End Class
 Public Class Random_Shuffle
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Use randomShuffle to reorder an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -57,7 +57,7 @@ Public Class Random_LUTMask
     Dim random As Random_Points
     Dim km As kMeans_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         km = New kMeans_Basics(ocvb, callerName)
         random = New Random_Points(ocvb, callerName)
         ocvb.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image.  Note how interpolation impacts results"
@@ -99,7 +99,7 @@ Public Class Random_UniformDist
     Public uDist As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         uDist = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
         ocvb.desc = "Create a uniform distribution."
     End Sub
@@ -118,7 +118,7 @@ Public Class Random_NormalDist
     Public nDistImage As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Random_NormalDist Blue Mean", 0, 255, 25)
         sliders.setupTrackBar2(ocvb, callerName, "Random_NormalDist Green Mean", 0, 255, 127)
         sliders.setupTrackBar3(ocvb, callerName, "Random_NormalDist Red Mean", 0, 255, 180)
@@ -138,7 +138,7 @@ Public Class Random_CheckUniformDist
     Dim histogram As Histogram_KalmanSmoothed
     Dim rUniform As Random_UniformDist
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         histogram = New Histogram_KalmanSmoothed(ocvb, callerName)
         histogram.externalUse = True
         histogram.sliders.TrackBar1.Value = 255
@@ -168,7 +168,7 @@ Public Class Random_CheckNormalDist
     Dim histogram As Histogram_KalmanSmoothed
     Dim normalDist As Random_NormalDist
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         histogram = New Histogram_KalmanSmoothed(ocvb, callerName)
         histogram.externalUse = True
         histogram.sliders.TrackBar1.Value = 255
@@ -213,7 +213,7 @@ Public Class Random_PatternGenerator_CPP
     Inherits VB_Class
     Dim Random_PatternGenerator As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         Random_PatternGenerator = Random_PatternGenerator_Open()
         ocvb.desc = "Generate random patterns for use with 'Random Pattern Calibration'"
     End Sub

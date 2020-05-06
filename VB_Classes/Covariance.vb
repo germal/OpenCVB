@@ -3,7 +3,7 @@ Public Class Covariance_Basics
     Inherits VB_Class
     Dim random As Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         random = New Random_Points(ocvb, callerName)
         ocvb.desc = "Calculate the covariance of random depth data points."
     End Sub
@@ -29,7 +29,7 @@ End Class
 Public Class Covariance_Test
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Calculate the covariance of random depth data points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

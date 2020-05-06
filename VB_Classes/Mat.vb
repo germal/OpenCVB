@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Public Class Mat_Repeat
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Use the repeat method to replicate data."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -19,7 +19,7 @@ Public Class Mat_PointToMat
     Inherits VB_Class
     Dim mask As Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         mask = New Random_Points(ocvb, callerName)
         ocvb.desc = "Convert pointf3 into a mat of points."
         ocvb.label1 = "Random_Points points (original)"
@@ -47,7 +47,7 @@ Public Class Mat_MatToPoint
     Inherits VB_Class
     Dim mask As Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         mask = New Random_Points(ocvb, callerName)
         ocvb.desc = "Convert a mat into a vector of points."
         ocvb.label1 = "Reconstructed RGB Image"
@@ -77,7 +77,7 @@ End Class
 Public Class Mat_Transpose
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Transpose a Mat and show results."
         ocvb.label1 = "Color Image Transposed"
         ocvb.label2 = "Color Image Transposed Twice"
@@ -104,7 +104,7 @@ End Class
 Public Class Mat_Tricks
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Show some Mat tricks."
         ocvb.label1 = "Image squeezed into square Mat"
         ocvb.label2 = "Mat transposed around the diagonal"
@@ -137,7 +137,7 @@ Public Class Mat_4to1
     Public noLines As Boolean ' if they want lines or not...
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.label1 = ""
         mat1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
@@ -184,7 +184,7 @@ Public Class Mat_2to1
     Public noLines As Boolean ' if they want lines or not...
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.label1 = ""
         mat1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
@@ -223,7 +223,7 @@ Public Class Mat_ImageXYZ_MT
     Public xyzPlanes() As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         grid = New Thread_Grid(ocvb, callerName)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
@@ -263,7 +263,7 @@ End Class
 Public Class Mat_RowColRange
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.label1 = "BitwiseNot of RowRange and ColRange"
         ocvb.desc = "Perform operation on a range of cols and/or Rows."
     End Sub
@@ -283,7 +283,7 @@ End Class
 Public Class Mat_Managed
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "There is a limited ability to use Mat data in Managed code directly."
         ocvb.label1 = "Color change is in the managed cv.vec3b array"
     End Sub

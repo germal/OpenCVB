@@ -5,7 +5,7 @@ Imports cv = OpenCvSharp
 Public Class InPaint_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Thickness", 1, 25, 2)
 
         radio.Setup(ocvb, callerName, 2)
@@ -38,7 +38,7 @@ Public Class InPaint_Noise
     Inherits VB_Class
     Dim noise As Draw_Noise
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         noise = New Draw_Noise(ocvb, callerName)
 
         radio.Setup(ocvb, callerName,2)

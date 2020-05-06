@@ -34,7 +34,7 @@ Public Class OpenGL_Basics
     Public pointCloudInput As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         imu = New IMU_GravityVec(ocvb, callerName)
         ' Dispose() ' make sure there wasn't an old OpenGLWindow sitting around...
         ocvb.desc = "Create an OpenGL window and update it with images"
@@ -175,7 +175,7 @@ Public Class OpenGL_Options
     Inherits VB_Class
     Public OpenGL As OpenGL_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         OpenGL = New OpenGL_Basics(ocvb, callerName)
         setOpenGLsliders(ocvb, callerName, sliders, sliders1, sliders2, sliders3)
         ocvb.desc = "Adjust point size and FOV in OpenGL"
@@ -214,7 +214,7 @@ Public Class OpenGL_Callbacks
     Inherits VB_Class
     Public ogl As OpenGL_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ogl = New OpenGL_Basics(ocvb, callerName)
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         ocvb.desc = "Show the point cloud of 3D data and use callbacks to modify view."
@@ -236,7 +236,7 @@ Public Class OpenGL_IMU
     Inherits VB_Class
     Public ogl As OpenGL_Options
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.parms.ShowOptions = False
         ogl = New OpenGL_Options(ocvb, callerName)
         ogl.OpenGL.OpenGLTitle = "OpenGL_IMU"
@@ -279,7 +279,7 @@ Public Class OpenGL_3Ddata
     Dim histInput() As Byte
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
 
         ogl = New OpenGL_Options(ocvb, callerName)
@@ -329,7 +329,7 @@ Public Class OpenGL_Draw3D
     Dim circle As Draw_Circles
     Public ogl As OpenGL_Options
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         circle = New Draw_Circles(ocvb, callerName)
         circle.sliders.TrackBar1.Value = 5
 
@@ -366,7 +366,7 @@ Public Class OpenGL_Voxels
     Public voxels As Voxels_Basics_MT
     Public ogl As OpenGL_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         voxels = New Voxels_Basics_MT(ocvb, callerName)
         voxels.check.Box(0).Checked = False
 
@@ -399,7 +399,7 @@ Public Class OpenGL_GravityTransform
     Dim imu As IMU_GravityVec
     Public ogl As OpenGL_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         imu = New IMU_GravityVec(ocvb, callerName)
         ogl = New OpenGL_Basics(ocvb, callerName)
         ogl.externalUse = True

@@ -31,7 +31,7 @@ Public Class VTK_Basics
     Public vtkTitle As String = "VTK_Data"
     Public vtkPresent As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         If ocvb.parms.vtkDirectory.Length > 0 Then vtkPresent = True
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
         If fileinfo.Exists = False Then vtkPresent = False
@@ -128,7 +128,7 @@ Public Class VTK_Histogram3D
     Dim mats As Mat_4to1
     Dim random As Random_NormalDist
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Random Number Stdev", 0, 255, 10)
         sliders.setupTrackBar2(ocvb, callerName, "Hist 3D bins", 1, 100, 32)
         sliders.setupTrackBar3(ocvb, callerName,"Hist 3D bin Threshold X1000000", 10, 100, 20)

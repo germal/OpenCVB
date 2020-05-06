@@ -58,7 +58,7 @@ Public Class Project_NoGravity_CPP
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         grid = New Thread_Grid(ocvb, callerName)
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
@@ -116,7 +116,7 @@ Public Class Project_NoGravity
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         grid = New Thread_Grid(ocvb, callerName)
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
@@ -184,7 +184,7 @@ Public Class Project_GravityVB
     Dim imu As IMU_GravityVec
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         imu = New IMU_GravityVec(ocvb, callerName)
         imu.result = RESULT2
         imu.externalUse = True
@@ -281,7 +281,7 @@ Public Class Project_GravityHistogram
     Inherits VB_Class
     Public gravity As Project_Gravity_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         gravity = New Project_Gravity_CPP(ocvb, callerName)
         gravity.sliders.GroupBox2.Visible = True
         gravity.histogramRun = True
@@ -314,7 +314,7 @@ Public Class Project_Gravity_CPP
     Public dst2 As cv.Mat
     Public maxZ As Single
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         imu = New IMU_GravityVec(ocvb, callerName)
         imu.result = RESULT2
         imu.externalUse = True
@@ -431,7 +431,7 @@ Public Class Project_Floodfill
     Public gravity As Project_Gravity_CPP
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         kalman = New Kalman_Basics(ocvb, callerName)
         ReDim kalman.src(10 * 4 - 1) ' max 10 objects.
         kalman.externalUse = True
@@ -517,7 +517,7 @@ Public Class Project_Wall
     Dim lines As lineDetector_FLD
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
 
         dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
         dilate.externalUse = True

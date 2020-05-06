@@ -6,7 +6,7 @@ Public Class OilPaint_Pointilism
     Inherits VB_Class
     Dim randomMask As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Stroke Scale", 1, 5, 3)
         sliders.setupTrackBar2(ocvb, callerName, "Smoothing Radius", 0, 100, 32)
         Application.DoEvents() ' because the rest of initialization takes so long, let the show take effect.
@@ -79,7 +79,7 @@ Public Class OilPaint_ColorProbability
     Public color_probability() As Single
     Public km As kMeans_RGBFast
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         km = New kMeans_RGBFast(ocvb, callerName)
         km.sliders.TrackBar1.Value = 12 ' we would like a dozen colors or so in the color image.
         ReDim color_probability(km.sliders.TrackBar1.Value - 1)
@@ -117,7 +117,7 @@ End Class
 Public Class OilPaint_Manual
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Filter Size", 3, 15, 3)
         sliders.setupTrackBar2(ocvb, callerName, "Intensity", 5, 150, 25)
         ocvb.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
@@ -176,7 +176,7 @@ Public Class OilPaint_Manual_CS
     Inherits VB_Class
     Dim oilPaint As New CS_Classes.OilPaintManual
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Kernel Size", 1, 10, 4)
         sliders.setupTrackBar2(ocvb, callerName, "Intensity", 0, 250, 20)
         ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
@@ -208,7 +208,7 @@ Public Class OilPaint_Cartoon
     Dim oil As OilPaint_Manual_CS
     Dim laplacian As Edges_Laplacian
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         laplacian = New Edges_Laplacian(ocvb, callerName)
 
         oil = New OilPaint_Manual_CS(ocvb, callerName)

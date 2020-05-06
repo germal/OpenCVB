@@ -7,7 +7,7 @@ Public Class Gradient_Basics
     Public externalUse As Boolean
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sobel = New Edges_Sobel(ocvb, callerName)
         sobel.externalUse = True
         ocvb.desc = "Use phase to compute gradient"
@@ -39,7 +39,7 @@ Public Class Gradient_Depth
     Inherits VB_Class
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sobel = New Edges_Sobel(ocvb, callerName)
         sobel.externalUse = True
         ocvb.desc = "Use phase to compute gradient on depth image"
@@ -72,7 +72,7 @@ Public Class Gradient_Flatland
     Inherits VB_Class
     Dim grade As Gradient_Basics
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         grade = New Gradient_Basics(ocvb, callerName)
         sliders.setupTrackBar1(ocvb, callerName, "Reduction Factor", 1, 64, 16)
                 ocvb.desc = "Reduced grayscale shows isobars in depth."

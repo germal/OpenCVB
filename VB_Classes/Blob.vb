@@ -8,7 +8,7 @@ Public Class Blob_Input
     Dim Mats As Mat_4to1
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         rectangles = New Draw_rotatedRectangles(ocvb, callerName)
         circles = New Draw_Circles(ocvb, callerName)
         ellipses = New Draw_Ellipses(ocvb, callerName)
@@ -64,22 +64,22 @@ End Class
 Public Class Blob_Detector_CS
     Inherits VB_Class
     Dim input As Blob_Input
-            Dim blobDetector As New CS_Classes.Blob_Basics
+    Dim blobDetector As New CS_Classes.Blob_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         input = New Blob_Input(ocvb, callerName)
         input.updateFrequency = 1 ' it is pretty fast but sloppy...
-        check.Setup(ocvb, callerName,  5)
+        check.Setup(ocvb, callerName, 5)
         check.Box(0).Text = "FilterByArea"
         check.Box(1).Text = "FilterByCircularity"
         check.Box(2).Text = "FilterByConvexity"
         check.Box(3).Text = "FilterByInertia"
         check.Box(4).Text = "FilterByColor"
-                check.Box(4).Checked = True ' filter by color...
+        check.Box(4).Checked = True ' filter by color...
 
         sliders.setupTrackBar1(ocvb, callerName, "min Threshold", 0, 255, 100)
         sliders.setupTrackBar2(ocvb, callerName, "max Threshold", 0, 255, 255)
-        sliders.setupTrackBar3(ocvb, callerName,"Threshold Step", 1, 50, 5)
+        sliders.setupTrackBar3(ocvb, callerName, "Threshold Step", 1, 50, 5)
 
         ocvb.label1 = "Blob_Detector_CS Input"
     End Sub
@@ -117,7 +117,7 @@ Public Class Blob_RenderBlobs
     Inherits VB_Class
     Dim input As Blob_Input
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         input = New Blob_Input(ocvb, callerName)
         input.updateFrequency = 1
 
@@ -163,7 +163,7 @@ Public Class Blob_DepthClusters
     Public externalUse As Boolean
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         shadow = New Depth_Holes(ocvb, callerName)
         shadow.externalUse = True
 
@@ -209,7 +209,7 @@ Public Class Blob_Rectangles
         End Function
     End Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.parms.ShowOptions = False
         blobs = New Blob_LargestBlob(ocvb, callerName)
         ocvb.desc = "Get the blobs and their masks and outline them with a rectangle."
@@ -267,7 +267,7 @@ Public Class Blob_LargestBlob
     Public kalman As Kalman_Basics
     Public blobIndex As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         kalman = New Kalman_Basics(ocvb, callerName)
         kalman.externalUse = True
 
@@ -302,7 +302,7 @@ Public Class Blob_LargestDepthCluster
     Inherits VB_Class
     Dim blobs As Blob_DepthClusters
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         blobs = New Blob_DepthClusters(ocvb, callerName)
 
         ocvb.desc = "Display only the largest depth cluster (might not be contiguous.)"

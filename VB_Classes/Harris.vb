@@ -32,7 +32,7 @@ Public Class Harris_Features_CPP
         Dim srcData() As Byte
     Dim Harris_Features As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Harris Threshold", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, callerName, "Harris Neighborhood", 1, 41, 21)
         sliders.setupTrackBar3(ocvb, callerName,"Harris aperture", 1, 33, 21)
@@ -82,7 +82,7 @@ Public Class Harris_Detector_CPP
     Public FeaturePoints As New List(Of cv.Point2f)
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Harris qualityLevel", 1, 100, 2)
         
         ocvb.desc = "Use Harris detector to identify interesting points."

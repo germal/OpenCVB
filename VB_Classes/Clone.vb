@@ -7,7 +7,7 @@ Public Class Clone_Normal
     Public textureFlatteningValues As cv.Vec2f
     Public cloneSpec As Int32 ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
         ocvb.label1 = "Clone result - draw anywhere to clone a region"
         ocvb.label2 = "Clone Region Mask"
@@ -38,16 +38,16 @@ End Class
 
 Public Class Clone_ColorChange
     Inherits VB_Class
-        Dim clone As Clone_Normal
+    Dim clone As Clone_Normal
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         clone = New Clone_Normal(ocvb, callerName)
         ocvb.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
 
         sliders.setupTrackBar1(ocvb, callerName, "Color Change - Red", 5, 25, 15)
         sliders.setupTrackBar2(ocvb, callerName, "Color Change - Green", 5, 25, 5)
-        sliders.setupTrackBar3(ocvb, callerName,"Color Change - Blue", 5, 25, 5)
-            End Sub
+        sliders.setupTrackBar3(ocvb, callerName, "Color Change - Blue", 5, 25, 5)
+    End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(sliders.TrackBar1.Value / 10, sliders.TrackBar2.Value / 10, sliders.TrackBar1.Value / 10)
@@ -55,7 +55,7 @@ Public Class Clone_ColorChange
     End Sub
     Public Sub MyDispose()
         clone.Dispose()
-            End Sub
+    End Sub
 End Class
 
 
@@ -63,15 +63,15 @@ End Class
 
 Public Class Clone_IlluminationChange
     Inherits VB_Class
-        Dim clone As Clone_Normal
+    Dim clone As Clone_Normal
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         clone = New Clone_Normal(ocvb, callerName)
         ocvb.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
 
         sliders.setupTrackBar1(ocvb, callerName, "Alpha", 0, 20, 2)
         sliders.setupTrackBar2(ocvb, callerName, "Beta", 0, 20, 2)
-            End Sub
+    End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(sliders.TrackBar1.Value / 10, sliders.TrackBar2.Value / 10)
@@ -79,7 +79,7 @@ Public Class Clone_IlluminationChange
     End Sub
     Public Sub MyDispose()
         clone.Dispose()
-            End Sub
+    End Sub
 End Class
 
 
@@ -88,15 +88,15 @@ End Class
 
 Public Class Clone_TextureFlattening
     Inherits VB_Class
-        Dim clone As Clone_Normal
+    Dim clone As Clone_Normal
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         clone = New Clone_Normal(ocvb, callerName)
         ocvb.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
 
         sliders.setupTrackBar1(ocvb, callerName, "Low Threshold", 0, 100, 10)
         sliders.setupTrackBar2(ocvb, callerName, "High Threshold", 0, 100, 50)
-            End Sub
+    End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cv.Vec2f(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
@@ -104,7 +104,7 @@ Public Class Clone_TextureFlattening
     End Sub
     Public Sub MyDispose()
         clone.Dispose()
-            End Sub
+    End Sub
 End Class
 
 
@@ -123,7 +123,7 @@ Public Class Clone_Eagle
     Dim maskROI As cv.Rect
     Dim pt As cv.Point
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         radio.Setup(ocvb, callerName, 3)
         radio.check(0).Text = "Seamless - Mixed Clone"
         radio.check(1).Text = "Seamless - MonochromeTransfer Clone"
@@ -173,7 +173,7 @@ End Class
 Public Class Clone_Seamless
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         radio.Setup(ocvb, callerName, 3)
         radio.check(0).Text = "Seamless Normal Clone"
         radio.check(1).Text = "Seamless Mono Clone"

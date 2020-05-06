@@ -5,7 +5,7 @@ Public Class KAZE_KeypointsKAZE_CS
     Inherits VB_Class
     Dim CS_Kaze As New CS_Classes.Kaze_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Find keypoints using KAZE algorithm."
         ocvb.label1 = "KAZE key points"
     End Sub
@@ -26,7 +26,7 @@ Public Class KAZE_KeypointsAKAZE_CS
     Inherits VB_Class
     Dim CS_AKaze As New CS_Classes.AKaze_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Find keypoints using AKAZE algorithm."
         ocvb.label1 = "AKAZE key points"
     End Sub
@@ -48,7 +48,7 @@ Public Class KAZE_Sample_CS
     Dim box_in_scene As New cv.Mat
     Dim CS_Kaze As New CS_Classes.Kaze_Sample
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         box = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/box.png", cv.ImreadModes.Color)
         box_in_scene = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/box_in_scene.png", cv.ImreadModes.Color)
         ocvb.desc = "Match keypoints in 2 photos."
@@ -66,7 +66,7 @@ Public Class KAZE_Match_CS
     Dim red As LeftRightView_Basics
     Dim CS_Kaze As New CS_Classes.Kaze_Sample
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         red = New LeftRightView_Basics(ocvb, callerName)
         red.sliders.TrackBar1.Value = 45
         ocvb.desc = "Match keypoints in the left and right images."
@@ -88,7 +88,7 @@ End Class
 Public Class KAZE_LeftAligned_CS
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Max number of points to match", 1, 300, 100)
         sliders.setupTrackBar2(ocvb, callerName, "When matching, max possible distance", 1, 200, 100)
 

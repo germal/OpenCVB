@@ -43,7 +43,7 @@ Public Class Hough_Circles
     Dim circles As Draw_Circles
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         circles = New Draw_Circles(ocvb, callerName)
         circles.sliders.TrackBar1.Value = 3
         ocvb.desc = "Find circles using HoughCircles."
@@ -78,7 +78,7 @@ Public Class Hough_Lines
     Public externalUse As Boolean
     Public src As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         edges = New Edges_Canny(ocvb, callerName)
         edges.externalUse = True
 
@@ -130,7 +130,7 @@ Public Class Hough_Lines_MT
     Dim edges As Edges_Canny
     Public grid As Thread_Grid
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, callerName, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar3(ocvb, callerName,"threshold", 1, 100, 3)

@@ -4,7 +4,7 @@ Public Class BlockMatching_Basics
     Inherits VB_Class
     Dim colorizer As Depth_Colorizer_CPP
         Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
 
         sliders.setupTrackBar1(ocvb, callerName, "Blockmatch scale", 1, 200, 100)

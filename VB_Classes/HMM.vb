@@ -21,7 +21,7 @@ Public Class HMM_Example_CPP
     Inherits VB_Class
     Dim HMM As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         HMM = HMM_Open()
         ocvb.label1 = "HMM - see Visual Studio Output for results"
         ocvb.desc = "Simple test of Hidden Markov Model - text output"

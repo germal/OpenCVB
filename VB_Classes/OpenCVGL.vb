@@ -26,7 +26,7 @@ Public Class OpenCVGL_Image_CPP
     Dim rgbData(0) As Byte
     Dim pointCloudData(0) As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         imu = New IMU_Basics(ocvb, callerName)
         imu.externalUse = True
 

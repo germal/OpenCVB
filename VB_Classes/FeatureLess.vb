@@ -8,7 +8,7 @@ Public Class Featureless_Basics_MT
     Public objects As New List(Of cv.Mat)
     Public objectSize As New List(Of Int32)
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "FeatureLess rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, callerName, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar3(ocvb, callerName,"FeatureLess threshold", 1, 100, 3)
@@ -88,7 +88,7 @@ Public Class FeatureLess_Prediction
     Inherits VB_Class
         Dim fLess As Featureless_Basics_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "FeatureLess Resize Percent", 1, 100, 1)
 
         fLess = New Featureless_Basics_MT(ocvb, callerName)
@@ -171,7 +171,7 @@ Public Class Featureless_DCT_MT
     Inherits VB_Class
     Dim dct As DCT_FeatureLess_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         dct = New DCT_FeatureLess_MT(ocvb, callerName)
 
         ocvb.desc = "Use DCT to find largest featureless region."

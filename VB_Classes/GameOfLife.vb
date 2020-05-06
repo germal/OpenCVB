@@ -28,7 +28,7 @@ Public Class GameOfLife_Basics
         Return CountNeighbors
     End Function
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         grid = New cv.Mat(ocvb.color.Height / factor, ocvb.color.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
 
@@ -104,7 +104,7 @@ Public Class GameOfLife_Population
     Dim plot As Plot_OverTime
     Dim game As GameOfLife_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         game = New GameOfLife_Basics(ocvb, callerName)
 
         plot = New Plot_OverTime(ocvb, callerName)

@@ -18,7 +18,7 @@ Public Class FitEllipse_Basics_CPP
     Public dstHandle As GCHandle
     Public dstData(5 * 4 - 1) As Byte ' enough space for a float describing angle, center, and width/height - this will be filled in on the C++ side.
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         area = New Area_MinTriangle_CPP(ocvb, callerName)
 
         ocvb.desc = "Use FitEllipse to draw around a set of points"

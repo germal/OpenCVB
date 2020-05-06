@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Public Class Math_Subtract
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Red", 0, 255, 255)
         sliders.setupTrackBar2(ocvb, callerName, "Green", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, callerName, "Blue", 0, 255, 255)
@@ -53,7 +53,7 @@ Public Class Math_Median_CDF
     Public externalUse As Boolean
     Public bins As Int32 = 10
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Histogram Bins", 4, 1000, 100)
         ocvb.desc = "Compute the src image median"
     End Sub
@@ -88,7 +88,7 @@ Public Class Math_DepthMeanStdev
     Inherits VB_Class
     Dim minMax As Depth_Stable
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         minMax = New Depth_Stable(ocvb, callerName)
         ocvb.desc = "This algorithm shows that just using the max depth at each pixel does not improve depth!  Mean and stdev don't change."
     End Sub
@@ -116,7 +116,7 @@ Public Class Math_RGBCorrelation
     Dim flow As Font_FlowText
     Dim corr As MatchTemplate_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         flow = New Font_FlowText(ocvb, callerName)
         flow.externalUse = True
         flow.result1or2 = RESULT2

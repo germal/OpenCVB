@@ -176,7 +176,7 @@ Public Class lineDetector_FLD
     Public src As cv.Mat
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         radio.Setup(ocvb, callerName, 3)
         radio.check(0).Text = "Low resolution - Factor 4"
         radio.check(1).Text = "Low resolution - Factor 2"
@@ -245,7 +245,7 @@ Public Class LineDetector_LSD
     Public sortedLines As SortedList(Of cv.Vec6f, Integer)
     Public factor As Int32 = 4
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         ocvb.desc = "Fast Line Detector from the OpenCV contrib code base."
         Dim size = ocvb.color.Rows * ocvb.color.Cols
         ReDim data(size - 1)
@@ -283,7 +283,7 @@ Public Class LineDetector_3D_LongestLine
     Inherits VB_Class
     Dim lines As lineDetector_FLD
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         lines = New lineDetector_FLD(ocvb, callerName)
 
         sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 1)
@@ -317,7 +317,7 @@ Public Class LineDetector_3D_FLD_MT
     Inherits VB_Class
     Dim lines As lineDetector_FLD
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         lines = New lineDetector_FLD(ocvb, callerName)
 
         sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 1)
@@ -351,7 +351,7 @@ Public Class LineDetector_3D_LSD_MT
     Inherits VB_Class
     Dim lines As LineDetector_LSD
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         lines = New LineDetector_LSD(ocvb, callerName)
         sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 1)
 
@@ -392,19 +392,19 @@ Public Class LineDetector_3D_FitLineZ
     Dim linesFLD As lineDetector_FLD
     Dim linesLSD As LineDetector_LSD
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         linesFLD = New lineDetector_FLD(ocvb, callerName)
         linesLSD = New LineDetector_LSD(ocvb, callerName)
 
         sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 3)
         sliders.setupTrackBar2(ocvb, callerName, "Point count threshold", 5, 500, 50)
 
-        check.Setup(ocvb, callerName,  2)
+        check.Setup(ocvb, callerName, 2)
         check.Box(0).Text = "Fitline using x and z (unchecked it will use y and z)"
         check.Box(1).Text = "display output only once a second (to be readable)"
         check.Box(1).Checked = True
 
-        radio.Setup(ocvb, callerName,4)
+        radio.Setup(ocvb, callerName, 4)
         radio.check(0).Text = "Use Fast LineDetector"
         radio.check(1).Text = "Use Line Stream Detector"
         radio.check(2).Text = "Debug FLD longest line"
@@ -504,7 +504,7 @@ Public Class LineDetector_3D_FitLineZ
     Public Sub MyDispose()
         linesFLD.Dispose()
         linesLSD.Dispose()
-                    End Sub
+    End Sub
 End Class
 
 
@@ -516,7 +516,7 @@ Public Class LineDetector_Basics
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "LineDetector thickness of line", 1, 20, 2)
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector

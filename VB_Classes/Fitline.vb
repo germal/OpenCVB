@@ -8,7 +8,7 @@ Public Class Fitline_Basics
     Public dst As New cv.Mat
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         draw = New Draw_Line(ocvb, callerName)
         draw.sliders.TrackBar1.Value = 2
 
@@ -59,7 +59,7 @@ Public Class Fitline_3DBasics_MT
     Inherits VB_Class
     Dim hlines As Hough_Lines_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         hlines = New Hough_Lines_MT(ocvb, callerName)
         ocvb.desc = "Use visual lines to find 3D lines."
         ocvb.label2 = "White is featureless RGB, blue depth shadow"
@@ -122,7 +122,7 @@ Public Class Fitline_RawInput
     Public m As Single
     Public bb As Single
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         sliders.setupTrackBar1(ocvb, callerName, "Random point count", 0, 500, 100)
         sliders.setupTrackBar2(ocvb, callerName, "Line Point Count", 0, 500, 20)
         sliders.setupTrackBar3(ocvb, callerName, "Line Noise", 1, 100, 10)
@@ -197,7 +197,7 @@ Public Class Fitline_EigenFit
     Inherits VB_Class
     Dim noisyLine As Fitline_RawInput
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        setCaller(caller)
         noisyLine = New Fitline_RawInput(ocvb, callerName)
         noisyLine.sliders.TrackBar1.Value = 30
         noisyLine.sliders.TrackBar2.Value = 400

@@ -10,7 +10,7 @@ Public Class EMax_Basics
     Public grid As Thread_Grid
     Public regionCount As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         grid = New Thread_Grid(ocvb, callerName)
 
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 2
@@ -113,7 +113,7 @@ Public Class EMax_Basics_CPP
     Dim emax As EMax_Basics
     Dim EMax_Basics As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+                setCaller(caller)
         emax = New EMax_Basics(ocvb, callerName)
         emax.externalUse = True
 
