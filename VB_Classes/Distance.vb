@@ -41,6 +41,5 @@ Public Class Distance_Basics
     End Sub
     Public Sub MyDispose()
                 foreground.Dispose()
-        radio.Dispose()
-    End Sub
+            End Sub
 End Class

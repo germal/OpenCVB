@@ -8,7 +8,7 @@ Public Class Palette_Color
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "blue", 0, 255, ocvb.ms_rng.Next(0, 255))
         sliders.setupTrackBar2(ocvb, callerName, "green", 0, 255, ocvb.ms_rng.Next(0, 255))
-        sliders.setupTrackBar3(ocvb, callerName,"red", 0, 255, ocvb.ms_rng.Next(0, 255))
+        sliders.setupTrackBar3(ocvb, callerName, "red", 0, 255, ocvb.ms_rng.Next(0, 255))
         ocvb.desc = "Define a color using sliders."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -19,8 +19,6 @@ Public Class Palette_Color
         ocvb.result2.SetTo(New cv.Scalar(255 - b, 255 - g, 255 - r))
         ocvb.label1 = "Color (RGB) = " + CStr(b) + " " + CStr(g) + " " + CStr(r)
         ocvb.label2 = "Color (255 - RGB) = " + CStr(255 - b) + " " + CStr(255 - g) + " " + CStr(255 - r)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -47,9 +45,6 @@ Public Class Palette_LinearPolar
         ocvb.result2.SetTo(0)
         cv.Cv2.LinearPolar(ocvb.result1, ocvb.result1, pt, radius, iFlag)
         cv.Cv2.LinearPolar(ocvb.color, ocvb.result2, pt, radius, iFlag)
-    End Sub
-    Public Sub MyDispose()
-        radio.Dispose()
     End Sub
 End Class
 
@@ -175,8 +170,6 @@ Public Class Palette_Map
             ocvb.label2 = "Most Common Color +- " + CStr(offset) + " count = " + CStr(maxCount)
         End If
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -245,8 +238,6 @@ Public Class Palette_Gradient
             Next
         End If
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -285,8 +276,6 @@ Public Class Palette_BuildGradientColorMap
             Next
         End If
         If externalUse = False Then ocvb.result1 = Palette_Custom_Apply(ocvb.color, gradientColorMap)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -353,8 +342,7 @@ Public Class Palette_ColorMap
         Next
     End Sub
     Public Sub MyDispose()
-        radio.Dispose()
-        gradMap.Dispose()
+                gradMap.Dispose()
     End Sub
 End Class
 
@@ -417,7 +405,5 @@ Public Class Palette_DepthColorMapJet
         Dim depth8u = getDepth32f(ocvb).ConvertScaleAbs(0.03)
         If depth8u.Width <> ocvb.color.Width Then depth8u = depth8u.Resize(ocvb.color.Size())
         cv.Cv2.ApplyColorMap(255 - depth8u, ocvb.result1, cv.ColormapTypes.Jet)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

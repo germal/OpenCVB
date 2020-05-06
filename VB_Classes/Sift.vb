@@ -38,8 +38,7 @@ Public Class Sift_Basics_CS
         ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
     Public Sub MyDispose()
-                radio.Dispose()
-        fisheye.Dispose()
+                        fisheye.Dispose()
     End Sub
 End Class
 
@@ -101,7 +100,6 @@ Public Class Sift_Basics_CS_MT
     End Sub
     Public Sub MyDispose()
         grid.Dispose()
-                radio.Dispose()
-        fisheye.Dispose()
+                        fisheye.Dispose()
     End Sub
 End Class

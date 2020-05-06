@@ -76,6 +76,5 @@ Public Class Voxels_Basics_MT
     Public Sub MyDispose()
         grid.Dispose()
                 trim.Dispose()
-        check.Dispose()
-    End Sub
+            End Sub
 End Class

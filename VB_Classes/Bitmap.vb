@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 Public Class Bitmap_ToMat
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = "Convert color bitmap to Mat"
         ocvb.label2 = "Convert Mat to bitmap and then back to Mat"
         ocvb.desc = "Convert a color and grayscale bitmap to a cv.Mat"
@@ -15,7 +15,5 @@ Public Class Bitmap_ToMat
 
         bitmap = cv.Extensions.BitmapConverter.ToBitmap(ocvb.color)
         ocvb.result2 = cv.Extensions.BitmapConverter.ToMat(bitmap)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

@@ -4,14 +4,14 @@ Imports System.IO
 'https://docs.opencv.org/3.1.0/da/d22/tutorial_py_canny.html
 Public Class Edges_Canny
     Inherits VB_Class
-        Public src As cv.Mat
+    Public src As cv.Mat
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Canny threshold1", 1, 255, 50)
         sliders.setupTrackBar2(ocvb, callerName, "Canny threshold2", 1, 255, 50)
-        sliders.setupTrackBar3(ocvb, callerName,"Canny Aperture", 3, 7, 3)
+        sliders.setupTrackBar3(ocvb, callerName, "Canny Aperture", 3, 7, 3)
 
         ocvb.desc = "Show canny edge detection with varying thresholds"
         ocvb.label1 = "Canny using L1 Norm"
@@ -32,8 +32,6 @@ Public Class Edges_Canny
             dst = src.Canny(threshold1, threshold2, aperture, False)
         End If
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -85,11 +83,11 @@ End Class
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Edges_Laplacian
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Gaussian Kernel", 1, 32, 7)
         sliders.setupTrackBar2(ocvb, callerName, "Laplacian Kernel", 1, 32, 5)
-                ocvb.desc = "Show Laplacian edge detection with varying kernel sizes"
+        ocvb.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gaussiankernelSize As Int32 = sliders.TrackBar1.Value
@@ -112,8 +110,6 @@ Public Class Edges_Laplacian
         cv.Cv2.CvtColor(abs_dst, ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "Laplacian of Depth Image"
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -122,7 +118,7 @@ End Class
 Public Class Edges_Scharr
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Scharr is more accurate with 3x3 kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -134,8 +130,6 @@ Public Class Edges_Scharr
         xyField.ConvertTo(gray, cv.MatType.CV_8U, 0.5)
         ocvb.result1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -143,9 +137,9 @@ End Class
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class Edges_Preserving
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, callerName,2)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        radio.Setup(ocvb, callerName, 2)
         radio.check(0).Text = "Edge RecurseFilter"
         radio.check(1).Text = "Edge NormconvFilter"
         radio.check(0).Checked = True
@@ -169,9 +163,6 @@ Public Class Edges_Preserving
             cv.Cv2.EdgePreservingFilter(ocvb.RGBDepth, ocvb.result2, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
         End If
     End Sub
-    Public Sub MyDispose()
-        radio.Dispose()
-            End Sub
 End Class
 
 
@@ -240,15 +231,15 @@ End Class
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edges_Sobel
     Inherits VB_Class
-        Public src As cv.Mat
+    Public src As cv.Mat
     Public dst As cv.Mat
     Public grayX As cv.Mat
     Public grayY As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Sobel kernel Size", 1, 32, 3)
-                ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
+        ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize As Int32 = sliders.TrackBar1.Value
@@ -264,8 +255,6 @@ Public Class Edges_Sobel
         cv.Cv2.AddWeighted(abs_grayX, 0.5, abs_grayY, 0.5, 0, dst)
         If externalUse = False Then ocvb.result1 = dst
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -306,13 +295,13 @@ End Class
 
 Public Class Edges_ResizeAdd
     Inherits VB_Class
-        Public gray As New cv.Mat
+    Public gray As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Border Vertical in Pixels", 1, 20, 5)
         sliders.setupTrackBar2(ocvb, callerName, "Border Horizontal in Pixels", 1, 20, 5)
-        sliders.setupTrackBar3(ocvb, callerName,"Threshold for Pixel Difference", 1, 50, 16)
+        sliders.setupTrackBar3(ocvb, callerName, "Threshold for Pixel Difference", 1, 50, 16)
 
         ocvb.desc = "Find edges using a resize, subtract, and threshold."
         ocvb.label1 = ""
@@ -326,8 +315,6 @@ Public Class Edges_ResizeAdd
         ocvb.result1 = ocvb.result1.Threshold(sliders.TrackBar3.Value, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.Add(gray, ocvb.result1, ocvb.result2)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -335,8 +322,8 @@ End Class
 
 Public Class Edges_DCTfrequency
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Remove Frequencies < x", 0, 100, 32)
         sliders.setupTrackBar2(ocvb, callerName, "Threshold after Removal", 1, 255, 20)
 
@@ -357,8 +344,6 @@ Public Class Edges_DCTfrequency
         src32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC1, 255)
         ocvb.result2 = ocvb.result1.Threshold(sliders.TrackBar2.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 

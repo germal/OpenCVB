@@ -1,11 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 Public Class TransformationMatrix_Basics
     Inherits VB_Class
-        Dim topLocations As New List(Of cv.Point3d)
+    Dim topLocations As New List(Of cv.Point3d)
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "TMatrix Top View multiplier", 1, 1000, 500)
-                If ocvb.parms.cameraIndex = StereoLabsZED2 Then sliders.TrackBar1.Value = 1 ' need a smaller multiplier...
+        If ocvb.parms.cameraIndex = StereoLabsZED2 Then sliders.TrackBar1.Value = 1 ' need a smaller multiplier...
 
         ocvb.label1 = "View from above the camera"
         ocvb.label2 = "View from side of the camera"
@@ -37,6 +37,4 @@ Public Class TransformationMatrix_Basics
             ocvb.putText(New ActiveClass.TrueType("The transformation matrix for the current camera has not been set", 10, 125))
         End If
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class

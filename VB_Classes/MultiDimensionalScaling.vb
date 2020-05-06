@@ -14,7 +14,7 @@ Public Class MultiDimensionScaling_Cities
         2182, 1737, 1021, 1891, 959, 2734, 2408, 678, 0, 2329,    ' Seattle         
         543, 597, 1494, 1220, 2300, 923, 205, 2442, 2329, 0}      ' Washington D.C. 
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = "Resulting solution using cv.Eigen"
         ocvb.desc = "Use OpenCV's Eigen function to solve a system of equations"
     End Sub
@@ -26,7 +26,7 @@ Public Class MultiDimensionScaling_Cities
         For i = 0 To rows - 1
             For j = 0 To rows - 1
                 For k = 0 To rows - 1
-                    Dim v = src.Get(of Double)(i, k) - src.Get(of Double)(i, j) - src.Get(of Double)(j, k)
+                    Dim v = src.Get(Of Double)(i, k) - src.Get(Of Double)(i, j) - src.Get(Of Double)(j, k)
                     If v > c1 Then c1 = v
                 Next
             Next
@@ -85,7 +85,5 @@ Public Class MultiDimensionScaling_Cities
                                          "Seattle", "Washington D.C.")
             ocvb.result1.PutText(cityName, textPos, cv.HersheyFonts.HersheySimplex, 0.5, cv.Scalar.White)
         Next
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

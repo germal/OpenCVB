@@ -18,7 +18,7 @@ Public Class FitEllipse_Basics_CPP
     Public dstHandle As GCHandle
     Public dstData(5 * 4 - 1) As Byte ' enough space for a float describing angle, center, and width/height - this will be filled in on the C++ side.
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         area = New Area_MinTriangle_CPP(ocvb, callerName)
 
         ocvb.desc = "Use FitEllipse to draw around a set of points"
@@ -48,9 +48,9 @@ Public Class FitEllipse_Basics_CPP
             FitEllipse_AMS(srcHandle.AddrOfPinnedObject(), area.srcPoints.Count - 1, dstHandle.AddrOfPinnedObject)
 
             Dim output As New cv.Mat(5, 1, cv.MatType.CV_32F, area.dstData)
-            Dim angle = output.Get(of Single)(0)
-            Dim center As New cv.Point2f(output.Get(of Single)(1), output.Get(of Single)(2))
-            Dim size As New cv.Size2f(output.Get(of Single)(3), output.Get(of Single)(4))
+            Dim angle = output.Get(Of Single)(0)
+            Dim center As New cv.Point2f(output.Get(Of Single)(1), output.Get(Of Single)(2))
+            Dim size As New cv.Size2f(output.Get(Of Single)(3), output.Get(Of Single)(4))
             box = New cv.RotatedRect(center, size, angle)
             ocvb.result2.Ellipse(box, cv.Scalar.Yellow, 6, cv.LineTypes.AntiAlias)
 
@@ -58,14 +58,12 @@ Public Class FitEllipse_Basics_CPP
             dstHandle.Free()
             area.Dispose()
 
-            angle = output.Get(of Single)(0)
-            center = New cv.Point2f(output.Get(of Single)(1), output.Get(of Single)(2))
-            size = New cv.Size2f(output.Get(of Single)(3), output.Get(of Single)(4))
+            angle = output.Get(Of Single)(0)
+            center = New cv.Point2f(output.Get(Of Single)(1), output.Get(Of Single)(2))
+            size = New cv.Size2f(output.Get(Of Single)(3), output.Get(Of Single)(4))
             box = New cv.RotatedRect(center, size, angle)
             ocvb.result2.Ellipse(box, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
         End If
         ocvb.label1 = "Using MinTriangle to generate " + CStr(area.srcPoints.Count) + " points"
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

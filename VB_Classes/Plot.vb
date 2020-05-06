@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Plot_OverTime
     Inherits VB_Class
-        Public plotData As cv.Scalar
+    Public plotData As cv.Scalar
     Public plotCount As Int32 = 3
     Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.White}
     Public backColor = cv.Scalar.Aquamarine
@@ -17,15 +17,15 @@ Public Class Plot_OverTime
     Public topBottomPad As Integer
     Dim myStopWatch As Stopwatch
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        check.Setup(ocvb, callerName,  1)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        check.Setup(ocvb, callerName, 1)
         check.Box(0).Text = "Reset the plot scale"
         check.Box(0).Checked = True
 
         sliders.setupTrackBar1(ocvb, callerName, "Plot Pixel Height", 1, 40, 4)
         sliders.setupTrackBar2(ocvb, callerName, "Plot Pixel Width", 1, 40, 4)
-        sliders.setupTrackBar3(ocvb, callerName,"Plot (time) Font Size x10", 1, 20, 10)
-                ocvb.desc = "Plot an input variable over time"
+        sliders.setupTrackBar3(ocvb, callerName, "Plot (time) Font Size x10", 1, 20, 10)
+        ocvb.desc = "Plot an input variable over time"
         myStopWatch = Stopwatch.StartNew()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -104,9 +104,6 @@ Public Class Plot_OverTime
         If externalUse = False Then ocvb.label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
         AddPlotScale(dst, minScale - topBottomPad, maxScale + topBottomPad, sliders.TrackBar3.Value / 10)
     End Sub
-    Public Sub MyDispose()
-                check.Dispose()
-    End Sub
 End Class
 
 
@@ -115,7 +112,7 @@ End Class
 
 Public Class Plot_Histogram
     Inherits VB_Class
-        Public hist As New cv.Mat
+    Public hist As New cv.Mat
     Public dst As New cv.Mat
     Public bins As Int32 = 50
     Public minRange As Int32 = 0
@@ -123,7 +120,7 @@ Public Class Plot_Histogram
     Public backColor As cv.Scalar = cv.Scalar.Red
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Histogram Font Size x10", 1, 20, 10)
 
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
@@ -161,8 +158,6 @@ Public Class Plot_Histogram
             AddPlotScale(dst, 0, maxVal, sliders.TrackBar1.Value / 10)
         End If
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -200,7 +195,7 @@ Public Class Plot_Basics_CPP
     Public externalUse As Boolean
     Public dst As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -235,8 +230,6 @@ Public Class Plot_Basics_CPP
         handleX.Free()
         handleY.Free()
         ocvb.label1 = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + vbTab + " y-axis: " + CStr(minY) + " to " + CStr(maxY)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 

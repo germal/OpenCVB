@@ -160,7 +160,7 @@ End Class
 Public Class IMU_Barometer
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Get the barometric pressure from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -171,8 +171,6 @@ Public Class IMU_Barometer
                                                   "Barometric pressure is " + Format(ocvb.parms.IMU_Barometer * 0.02953, "#0.00") + " inches of mercury.", 10, 60))
         End If
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -181,7 +179,7 @@ End Class
 Public Class IMU_Temperature
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Get the temperature of the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -189,8 +187,6 @@ Public Class IMU_Temperature
             ocvb.putText(New ActiveClass.TrueType("IMU Temperature is " + Format(ocvb.parms.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
                                                   "IMU Temperature is " + Format(ocvb.parms.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.", 10, 60))
         End If
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 

@@ -80,8 +80,7 @@ Public Class Kalman_Basics
                 kalman(i).Dispose()
             Next
         End If
-        check.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
@@ -176,7 +175,7 @@ Public Class Kalman_RotatingPoint
         cv.Cv2.Line(dst, New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = "Estimate Yellow < Real Red (if working)"
 
         cv.Cv2.Randn(kState, New cv.Scalar(0), cv.Scalar.All(0.1))
@@ -216,8 +215,6 @@ Public Class Kalman_RotatingPoint
 
         cv.Cv2.Randn(processNoise, cv.Scalar.Black, cv.Scalar.All(Math.Sqrt(kf.ProcessNoiseCov.Get(Of Single)(0, 0))))
         kState = kf.TransitionMatrix * kState + processNoise
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 

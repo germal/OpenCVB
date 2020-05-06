@@ -2,14 +2,14 @@
 ' https://github.com/shimat/opencvsharp/blob/master/test/OpenCvSharp.Tests/stitching/StitchingTest.cs
 Public Class Stitch_Basics
     Inherits VB_Class
-        Public src As New cv.Mat
+    Public src As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Number of random images", 10, 50, 10)
         sliders.setupTrackBar2(ocvb, callerName, "Rectangle width", ocvb.color.Width / 4, ocvb.color.Width - 1, ocvb.color.Width / 2)
-        sliders.setupTrackBar3(ocvb, callerName,"Rectangle height", ocvb.color.Height / 4, ocvb.color.Height - 1, ocvb.color.Height / 2)
-                ocvb.desc = "Stitch together random parts of a color image."
+        sliders.setupTrackBar3(ocvb, callerName, "Rectangle height", ocvb.color.Height / 4, ocvb.color.Height - 1, ocvb.color.Height / 2)
+        ocvb.desc = "Stitch together random parts of a color image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mats As New List(Of cv.Mat)
@@ -51,6 +51,4 @@ Public Class Stitch_Basics
             End If
         End If
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class

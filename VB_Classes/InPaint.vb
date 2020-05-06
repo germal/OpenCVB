@@ -4,11 +4,11 @@ Imports cv = OpenCvSharp
 ' https://docs.opencv.org/master/df/d3d/tutorial_py_inpainting.html#gsc.tab=0
 Public Class InPaint_Basics
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Thickness", 1, 25, 2)
 
-        radio.Setup(ocvb, callerName,2)
+        radio.Setup(ocvb, callerName, 2)
         radio.check(0).Text = "TELEA"
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True
@@ -30,9 +30,6 @@ Public Class InPaint_Basics
         mask.Line(p1, p2, cv.Scalar.All(255), thickness, cv.LineTypes.AntiAlias)
         cv.Cv2.Inpaint(ocvb.result1, mask, ocvb.result2, thickness, inPaintFlag)
     End Sub
-    Public Sub MyDispose()
-        radio.Dispose()
-            End Sub
 End Class
 
 
@@ -59,7 +56,6 @@ Public Class InPaint_Noise
         cv.Cv2.Inpaint(ocvb.result1, noise.noiseMask, ocvb.result2, noise.maxNoiseWidth, inPaintFlag)
     End Sub
     Public Sub MyDispose()
-        radio.Dispose()
         noise.Dispose()
     End Sub
 End Class

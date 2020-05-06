@@ -4,12 +4,12 @@ Imports System.Windows.Forms
 ' Source: https://hackernoon.com/https-medium-com-matteoronchetti-pointillism-with-python-and-opencv-f4274e6bbb7b
 Public Class OilPaint_Pointilism
     Inherits VB_Class
-        Dim randomMask As cv.Mat
+    Dim randomMask As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Stroke Scale", 1, 5, 3)
         sliders.setupTrackBar2(ocvb, callerName, "Smoothing Radius", 0, 100, 32)
-                Application.DoEvents() ' because the rest of initialization takes so long, let the show take effect.
+        Application.DoEvents() ' because the rest of initialization takes so long, let the show take effect.
 
         Dim w = ocvb.color.Width / 8
         Dim h = ocvb.color.Height / 8
@@ -68,8 +68,6 @@ Public Class OilPaint_Pointilism
             Next
         Next
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -118,11 +116,11 @@ End Class
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
 Public Class OilPaint_Manual
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Filter Size", 3, 15, 3)
         sliders.setupTrackBar2(ocvb, callerName, "Intensity", 5, 150, 25)
-                ocvb.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
+        ocvb.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
         Dim w = ocvb.color.Width / 8
         Dim h = ocvb.color.Height / 8
         ocvb.drawRect = New cv.Rect(w * 3, h * 3, w * 2, h * 2)
@@ -169,8 +167,6 @@ Public Class OilPaint_Manual
         Next
         result1.CopyTo(ocvb.result1(roi))
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -179,11 +175,11 @@ End Class
 Public Class OilPaint_Manual_CS
     Inherits VB_Class
     Dim oilPaint As New CS_Classes.OilPaintManual
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Kernel Size", 1, 10, 4)
         sliders.setupTrackBar2(ocvb, callerName, "Intensity", 0, 250, 20)
-                ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
+        ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
         ocvb.label2 = "Selected area only"
 
         Dim w = ocvb.color.Width / 16
@@ -201,8 +197,6 @@ Public Class OilPaint_Manual_CS
         Dim s = New cv.Size(roi.Width * factor, roi.Height * factor)
         cv.Cv2.Resize(ocvb.result1(roi), ocvb.result2(New cv.Rect(0, 0, s.Width, s.Height)), s)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 

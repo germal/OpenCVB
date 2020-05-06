@@ -1,14 +1,14 @@
 Imports cv = OpenCvSharp
 Public Class MotionBlur_Basics
     Inherits VB_Class
-        Public externalUse As Boolean = False
+    Public externalUse As Boolean = False
     Public kernel As cv.Mat
     Public showDirection As Boolean = True
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Motion Blur Length", 1, 101, 51)
         sliders.setupTrackBar2(ocvb, callerName, "Motion Blur Angle", -90, 90, 0)
-                ocvb.desc = "Use Filter2D to create a motion blur"
+        ocvb.desc = "Use Filter2D to create a motion blur"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then
@@ -29,8 +29,6 @@ Public Class MotionBlur_Basics
         pt2 += New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
         If showDirection Then ocvb.result1.Line(pt1, pt2, cv.Scalar.Yellow, 5, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -169,7 +167,6 @@ Public Class MotionBlur_Deblur
         ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
     Public Sub MyDispose()
-                check.Dispose()
-        mblur.Dispose()
+                        mblur.Dispose()
     End Sub
 End Class

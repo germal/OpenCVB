@@ -1,10 +1,10 @@
 Imports cv = OpenCvSharp
 Public Class LeftRightView_Basics
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "brightness", 0, 255, 100)
-                ocvb.desc = "Show the left and right views from the 3D Camera"
+        ocvb.desc = "Show the left and right views from the 3D Camera"
         Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
                 ocvb.label1 = "Left Image"
@@ -26,8 +26,6 @@ Public Class LeftRightView_Basics
         ocvb.result1 += sliders.TrackBar1.Value
         ocvb.result2 += sliders.TrackBar1.Value
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 

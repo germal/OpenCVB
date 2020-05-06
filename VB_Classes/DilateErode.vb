@@ -2,21 +2,21 @@
 
 Public Class DilateErode_Basics
     Inherits VB_Class
-            Public src As New cv.Mat
+    Public src As New cv.Mat
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Dilate/Erode Kernel Size", 1, 32, 5)
         sliders.setupTrackBar2(ocvb, callerName, "Erode (-) to Dilate (+)", -32, 32, 1)
-                ocvb.desc = "Dilate and Erode the RGB and Depth image."
+        ocvb.desc = "Dilate and Erode the RGB and Depth image."
 
-        radio.Setup(ocvb, callerName,3)
+        radio.Setup(ocvb, callerName, 3)
         radio.check(0).Text = "Dilate/Erode shape: Cross"
         radio.check(1).Text = "Dilate/Erode shape: Ellipse"
         radio.check(2).Text = "Dilate/Erode shape: Rect"
         radio.check(0).Checked = True
-            End Sub
+    End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then
             src = ocvb.color
@@ -51,9 +51,6 @@ Public Class DilateErode_Basics
             End If
         End If
     End Sub
-    Public Sub MyDispose()
-                radio.Dispose()
-    End Sub
 End Class
 
 
@@ -61,7 +58,7 @@ End Class
 Public Class DilateErode_DepthSeed
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Erode depth to build a depth mask for inrange data."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -81,8 +78,6 @@ Public Class DilateErode_DepthSeed
         ocvb.result1.SetTo(0)
         ocvb.RGBDepth.CopyTo(ocvb.result1, seeds)
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -91,16 +86,16 @@ End Class
 
 Public Class DilateErode_OpenClose
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, callerName,3)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        radio.Setup(ocvb, callerName, 3)
         radio.check(0).Text = "Open/Close shape: Cross"
         radio.check(1).Text = "Open/Close shape: Ellipse"
         radio.check(2).Text = "Open/Close shape: Rect"
         radio.check(2).Checked = True
-        
+
         sliders.setupTrackBar1(ocvb, callerName, "Dilate Open/Close Iterations", -10, 10, 10)
-                ocvb.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
+        ocvb.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim n = sliders.TrackBar1.Value
@@ -120,9 +115,6 @@ Public Class DilateErode_OpenClose
             cv.Cv2.MorphologyEx(ocvb.RGBDepth, ocvb.result2, cv.MorphTypes.Close, element)
             cv.Cv2.MorphologyEx(ocvb.color, ocvb.result1, cv.MorphTypes.Close, element)
         End If
-    End Sub
-    Public Sub MyDispose()
-                radio.Dispose()
     End Sub
 End Class
 

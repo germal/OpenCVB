@@ -13,7 +13,7 @@ Public Class MSER_Basics
         sliders2.setupTrackBar1(ocvb, callerName, "MSER Edge Blursize", 1, 20, 5)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
-        sliders1.setupTrackBar1(ocvb,  callerName, "Min Diversity", 0, 100, 20)
+        sliders1.setupTrackBar1(ocvb, callerName, "Min Diversity", 0, 100, 20)
         sliders1.setupTrackBar2(ocvb, callerName, "MSER Max Evolution", 1, 1000, 200)
         sliders1.setupTrackBar3(ocvb, callerName, "MSER Area Threshold", 1, 101, 101)
         sliders1.setupTrackBar4(ocvb, callerName, "MSER Min Margin", 1, 100, 3)
@@ -21,10 +21,10 @@ Public Class MSER_Basics
 
         sliders.setupTrackBar1(ocvb, callerName, "MSER Delta", 1, 100, 5)
         sliders.setupTrackBar2(ocvb, callerName, "MSER Min Area", 1, 10000, 60)
-        sliders.setupTrackBar3(ocvb, callerName,"MSER Max Area", 1000, 100000, 100000)
-        sliders.setupTrackBar4(ocvb, callerName,  "MSER Max Variation", 1, 100, 25)
+        sliders.setupTrackBar3(ocvb, callerName, "MSER Max Area", 1000, 100000, 100000)
+        sliders.setupTrackBar4(ocvb, callerName, "MSER Max Variation", 1, 100, 25)
 
-        check.Setup(ocvb, callerName,  2)
+        check.Setup(ocvb, callerName, 2)
         check.Box(0).Text = "Pass2Only"
         check.Box(1).Text = "Use Grayscale, not color input (default)"
         check.Box(0).Checked = True
@@ -79,8 +79,6 @@ Public Class MSER_Basics
             ocvb.label1 = CStr(region.Length) + " Regions " + Format(pixels / region.Length, "#0.0") + " pixels/region (avg)"
         End If
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -123,8 +121,6 @@ Public Class MSER_Synthetic
 
         img = img.Resize(New cv.Size(ocvb.color.Height, ocvb.color.Height))
         ocvb.result1(New cv.Rect(0, 0, ocvb.color.Height, ocvb.color.Height)) = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -217,8 +213,6 @@ Public Class MSER_CPPStyle
             mat.Rectangle(box, color, -1, cv.LineTypes.AntiAlias)
         Next
         ocvb.result2 = mat.Resize(ocvb.result2.Size())
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 

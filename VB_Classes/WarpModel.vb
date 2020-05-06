@@ -59,10 +59,8 @@ Public Class WarpModel_Input
         ocvb.result2(r(0)) = merged
     End Sub
     Public Sub MyDispose()
-        radio.Dispose()
-        sobel.Dispose()
-        check.Dispose()
-    End Sub
+                sobel.Dispose()
+            End Sub
 End Class
 
 
@@ -173,8 +171,7 @@ Public Class WarpModel_FindTransformECC_CPP
     End Sub
     Public Sub MyDispose()
         WarpModel_Close(cPtr)
-        radio.Dispose()
-        input.Dispose()
+                input.Dispose()
     End Sub
 End Class
 

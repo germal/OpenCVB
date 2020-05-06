@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 Public Class DCT_RGB
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Remove Frequencies < x", 0, 100, 1)
 
         ocvb.desc = "Apply OpenCV's Discrete Cosine Transform to an RGB image and use slider to remove the highest frequencies."
@@ -32,8 +32,6 @@ Public Class DCT_RGB
 
         cv.Cv2.Subtract(ocvb.color, ocvb.result1, ocvb.result2)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -41,10 +39,10 @@ End Class
 
 Public Class DCT_RGBDepth
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Remove Frequencies < x", 0, 100, 1)
-                ocvb.label2 = "Subtract DCT inverse from Grayscale depth"
+        ocvb.label2 = "Subtract DCT inverse from Grayscale depth"
         ocvb.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -63,16 +61,14 @@ Public Class DCT_RGBDepth
 
         cv.Cv2.Subtract(gray, ocvb.result1, ocvb.result2)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
 
 Public Class DCT_Grayscale
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Remove Frequencies < x", 0, 100, 1)
 
         ocvb.desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
@@ -94,8 +90,6 @@ Public Class DCT_Grayscale
 
         cv.Cv2.Subtract(gray, ocvb.result1, ocvb.result2)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -267,8 +261,8 @@ End Class
 
 Public Class DCT_Rows
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Remove Frequencies < x", 0, 100, 1)
         sliders.setupTrackBar2(ocvb, callerName, "Threshold after removal", 1, 255, 30)
 
@@ -289,6 +283,4 @@ Public Class DCT_Rows
         src32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC1, 255)
         ocvb.result2 = ocvb.result1.Threshold(sliders.TrackBar2.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class

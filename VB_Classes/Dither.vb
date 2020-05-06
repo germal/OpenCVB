@@ -82,11 +82,11 @@ End Module
 ' https://www.codeproject.com/Articles/5259216/Dither-Ordered-and-Floyd-Steinberg-Monochrome-Colo
 Public Class Dither_Basics
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Bits per color plane", 1, 5, 1)
-        
-        radio.Setup(ocvb, callerName,24)
+
+        radio.Setup(ocvb, callerName, 24)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = Choose(i + 1, "Bayer16", "Bayer8", "Bayer4", "Bayer3", "Bayer2", "BayerRgbNbpp", "BayerRgb3bpp", "BayerRgb6bpp",
                                      "BayerRgb9bpp", "BayerRgb12bpp", "BayerRgb15bpp", "BayerRgb18bpp", "FSRgbNbpp", "Floyd-Steinberg",
@@ -94,7 +94,7 @@ Public Class Dither_Basics
                                      "SierraLiteRgbNbpp", "SierraLite", "SierraRgbNbpp", "Sierra")
         Next
         radio.check(4).Checked = True ' this one was interesting...
-        
+
         ocvb.desc = "Explore all the varieties of dithering"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -174,8 +174,5 @@ Public Class Dither_Basics
             End If
         Next
         hpixels.Free()
-    End Sub
-    Public Sub MyDispose()
-        radio.Dispose()
     End Sub
 End Class

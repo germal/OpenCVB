@@ -69,8 +69,6 @@ Public Class Coherence_Basics
         ocvb.result1.Rectangle(srcRect, cv.Scalar.Yellow, 2)
         ocvb.drawRect = srcRect
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 

@@ -34,7 +34,7 @@ Public Class MatrixInverse_Basics_CS
     Public src As New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
     Public dst As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Manually invert a matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -48,8 +48,6 @@ Public Class MatrixInverse_Basics_CS
 
         Dim outstr = printMatrixResults(src, dst)
         ocvb.putText(New ActiveClass.TrueType(outstr + vbCrLf + "Intermediate results are optionally available in the console log.", 10, 60, RESULT1))
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -65,7 +63,7 @@ Public Class MatrixInverse_OpenCV
     Public src As New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
     Public dst As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use OpenCV to invert a matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -78,7 +76,5 @@ Public Class MatrixInverse_OpenCV
         cv.Cv2.Invert(src, dst, cv.DecompTypes.LU)
         Dim outstr = printMatrixResults(src, dst)
         ocvb.putText(New ActiveClass.TrueType(outstr, 10, 60, RESULT1))
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

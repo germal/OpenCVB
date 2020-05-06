@@ -7,7 +7,7 @@ Public Class WarpAffine_Captcha
     Const captchaLength = 8
     Dim rng As New System.Random
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use OpenCV to build a captcha Turing test."
     End Sub
     Private Sub addNoise(image As cv.Mat)
@@ -89,8 +89,6 @@ Public Class WarpAffine_Captcha
         Dim roi As New cv.Rect(0, ocvb.color.Height / 2 - charHeight / 2, ocvb.result1.Cols, charHeight)
         ocvb.result1(roi) = outImage.Resize(New cv.Size(ocvb.result1.Cols, charHeight))
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -119,9 +117,6 @@ Public Class WarpAffine_Basics
         cv.Cv2.WarpAffine(ocvb.result1, ocvb.result2, rotationMatrix, ocvb.color.Size(), warpFlag)
         ocvb.label1 = "Rotated with Warpaffine with angle: " + CStr(angle)
         ocvb.label2 = "Rotated back with inverse Warpaffine angle: " + CStr(-angle)
-    End Sub
-    Public Sub MyDispose()
-        radio.Dispose()
     End Sub
 End Class
 

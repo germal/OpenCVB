@@ -2,11 +2,11 @@ Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/pca.cpp
 Public Class PCA_Basics
     Inherits VB_Class
-        Public useDepthInput As Boolean
+    Public useDepthInput As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Retained Variance", 1, 100, 95)
-                ocvb.desc = "Reconstruct a video stream as a composite of X images."
+        ocvb.desc = "Reconstruct a video stream as a composite of X images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static images(7) As cv.Mat
@@ -37,8 +37,6 @@ Public Class PCA_Basics
             reconstruction.ConvertTo(reconstruction, cv.MatType.CV_8UC1)
             ocvb.result1 = reconstruction.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 

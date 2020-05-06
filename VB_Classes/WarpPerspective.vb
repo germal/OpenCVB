@@ -3,12 +3,12 @@
 ' http://opencvexamples.blogspot.com/
 Public Class WarpPerspective_Basics
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Warped Width", 0, ocvb.color.Cols, ocvb.color.Cols - 50)
         sliders.setupTrackBar2(ocvb, callerName, "Warped Height", 0, ocvb.color.Rows, ocvb.color.Rows - 50)
-        sliders.setupTrackBar3(ocvb, callerName,"Warped Angle", 0, 360, 0)
-                ocvb.desc = "Use WarpPerspective to transform input images."
+        sliders.setupTrackBar3(ocvb, callerName, "Warped Angle", 0, 360, 0)
+        ocvb.desc = "Use WarpPerspective to transform input images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src(3) As cv.Point2f
@@ -32,6 +32,4 @@ Public Class WarpPerspective_Basics
         Dim rotationMatrix = cv.Cv2.GetRotationMatrix2D(center, angle, 1.0)
         cv.Cv2.WarpAffine(ocvb.result1, ocvb.result2, rotationMatrix, ocvb.color.Size(), cv.InterpolationFlags.Nearest)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class

@@ -6,7 +6,7 @@ Public Class QRcode_Basics
     Dim qrInput1 As New cv.Mat
     Dim qrInput2 As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         Dim fileInfo = New FileInfo(ocvb.parms.HomeDir + "data/QRcode1.png")
         If fileInfo.Exists Then qrInput1 = cv.Cv2.ImRead(fileInfo.FullName)
         fileInfo = New FileInfo(ocvb.parms.HomeDir + "Data/QRCode2.png")
@@ -38,7 +38,5 @@ Public Class QRcode_Basics
             ocvb.result1.Line(box(i), box((i + 1) Mod 4), cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
         Next
         If refersTo <> "" Then ocvb.label1 = refersTo
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

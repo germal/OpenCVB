@@ -2,7 +2,7 @@
 Public Class intrinsicsLeft_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Show the depth camera intrinsicsLeft."
         ocvb.label2 = "ppx/ppy location"
     End Sub
@@ -39,7 +39,5 @@ Public Class intrinsicsLeft_Basics
 
         Dim ptLoc = New cv.Point(ocvb.color.Width / 2 + 4, ocvb.color.Height / 2 + 4)
         ocvb.result2.Line(ptLoc, New cv.Point(ttLocation.X / ocvb.parms.imageToTrueTypeLoc, ttLocation.Y / ocvb.parms.imageToTrueTypeLoc), cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

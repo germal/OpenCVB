@@ -7,7 +7,7 @@ Public Class Clone_Normal
     Public textureFlatteningValues As cv.Vec2f
     Public cloneSpec As Int32 ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
         ocvb.label1 = "Clone result - draw anywhere to clone a region"
         ocvb.label2 = "Clone Region Mask"
@@ -30,8 +30,6 @@ Public Class Clone_Normal
             Case 2
                 cv.Cv2.TextureFlattening(ocvb.color, mask, ocvb.result1, textureFlatteningValues(0), textureFlatteningValues(1))
         End Select
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -125,8 +123,8 @@ Public Class Clone_Eagle
     Dim maskROI As cv.Rect
     Dim pt As cv.Point
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, callerName,3)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        radio.Setup(ocvb, callerName, 3)
         radio.check(0).Text = "Seamless - Mixed Clone"
         radio.check(1).Text = "Seamless - MonochromeTransfer Clone"
         radio.check(2).Text = "Seamless - Normal Clone"
@@ -166,9 +164,6 @@ Public Class Clone_Eagle
         Next
         cv.Cv2.SeamlessClone(sourceImage, ocvb.result1, mask, pt, ocvb.result1, cloneFlag)
     End Sub
-    Public Sub MyDispose()
-        radio.Dispose()
-    End Sub
 End Class
 
 
@@ -178,13 +173,13 @@ End Class
 Public Class Clone_Seamless
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, callerName,3)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        radio.Setup(ocvb, callerName, 3)
         radio.check(0).Text = "Seamless Normal Clone"
         radio.check(1).Text = "Seamless Mono Clone"
         radio.check(2).Text = "Seamless Mixed Clone"
         radio.check(0).Checked = True
-                ocvb.label1 = "Mask for Clone"
+        ocvb.label1 = "Mask for Clone"
         ocvb.label2 = "Results for SeamlessClone"
         ocvb.desc = "Use the seamlessclone API to merge color and depth..."
     End Sub
@@ -209,8 +204,5 @@ Public Class Clone_Seamless
         ocvb.result2 = ocvb.color.Clone()
         cv.Cv2.SeamlessClone(ocvb.RGBDepth, ocvb.color, ocvb.result1, center, ocvb.result2, style)
         ocvb.result2.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-    End Sub
-    Public Sub MyDispose()
-        radio.Dispose()
     End Sub
 End Class

@@ -3,7 +3,7 @@ Public Class Watershed_Basics
     Inherits VB_Class
     Public useDepthImage As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = "Draw with left-click to select region."
         ocvb.label2 = "Mask for watershed (selected regions)."
         ocvb.result2.SetTo(0)
@@ -55,8 +55,6 @@ Public Class Watershed_Basics
         Else
             ocvb.result1 = ocvb.color
         End If
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 

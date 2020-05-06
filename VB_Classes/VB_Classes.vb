@@ -133,7 +133,7 @@ Public Class ActiveClass
             parms.activeAlgorithm = parms.activeAlgorithm.Substring(0, Len(parms.activeAlgorithm) - 3)
             ActiveAlgorithm = algoList.createAlgorithm(ocvb)
         End If
-        If parms.useRecordedData Then recordedData = New Replay_Play(ocvb, callerName)
+        If parms.useRecordedData Then recordedData = New Replay_Play(ocvb, "VB_Classes.vb")
     End Sub
     Public Sub UpdateHostLocation(left As Int32, top As Int32, height As Int32)
         appLocation = New cv.Rect(left, top, 0, height)
@@ -151,9 +151,5 @@ Public Class ActiveClass
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
-    End Sub
-    Public Sub MyDispose()
-        If ActiveAlgorithm IsNot Nothing Then ActiveAlgorithm.dispose()
-        If recordedData IsNot Nothing Then recordedData.Dispose()
     End Sub
 End Class

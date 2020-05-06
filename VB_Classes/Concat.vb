@@ -2,7 +2,7 @@
 Public Class Concat_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Concatenate 2 images - horizontally and vertically"
         ocvb.label1 = "Horizontal concatenation"
         ocvb.label2 = "Vertical concatenation"
@@ -14,8 +14,6 @@ Public Class Concat_Basics
         cv.Cv2.VConcat(ocvb.color, ocvb.RGBDepth, tmp)
         ocvb.result2 = tmp.Resize(ocvb.color.Size())
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -26,7 +24,7 @@ Public Class Concat_4way
     Public img(3) As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Concatenate 4 images - horizontally and vertically"
         For i = 0 To img.Length - 1
             img(i) = New cv.Mat
@@ -44,7 +42,5 @@ Public Class Concat_4way
         cv.Cv2.HConcat(img(2), img(3), tmp2)
         cv.Cv2.VConcat(tmp1, tmp2, tmp3)
         ocvb.result1 = tmp3.Resize(ocvb.color.Size())
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

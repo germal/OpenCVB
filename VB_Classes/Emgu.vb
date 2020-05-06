@@ -3,7 +3,7 @@
 Public Class Emgu_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Test a sample EMGU usage."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -17,8 +17,6 @@ Public Class Emgu_Basics
             ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, data)
         End If
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -27,7 +25,7 @@ End Class
 Public Class Emgu_Facedetection
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use the simplest possible face detector in Emgu examples."
         ocvb.result1.SetTo(0)
     End Sub
@@ -44,8 +42,6 @@ Public Class Emgu_Facedetection
             tmp = tmp.Resize(New cv.Size(ocvb.result1.Rows, ocvb.result1.Rows))
             ocvb.result1(New cv.Rect(0, 0, tmp.Rows, tmp.Cols)) = tmp
         End If
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 

@@ -6,7 +6,7 @@ Imports System.Windows.Forms
 Public Class xPhoto_Bm3dDenoise
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Denoise image with block matching and filtering."
         ocvb.label1 = "Bm3dDenoising"
         ocvb.label2 = "Difference from Input"
@@ -21,8 +21,6 @@ Public Class xPhoto_Bm3dDenoise
         ocvb.label2 = "Diff from input - max change=" + CStr(maxVal)
         ocvb.result2 = ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -32,7 +30,7 @@ End Class
 Public Class xPhoto_Bm3dDenoiseDepthImage
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Denoise the depth image with block matching and filtering."
         ocvb.label1 = "Bm3dDenoising"
         ocvb.label2 = "Difference from Input"
@@ -46,8 +44,6 @@ Public Class xPhoto_Bm3dDenoiseDepthImage
         ocvb.result2.MinMaxLoc(minVal, maxVal)
         ocvb.label2 = "Diff from input - max change=" + CStr(maxVal)
         ocvb.result2 = ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -129,6 +125,5 @@ Public Class xPhoto_OilPaint_CPP
     End Sub
     Public Sub MyDispose()
         xPhoto_OilPaint_Close(xPhoto_OilPaint)
-        radio.Dispose()
-    End Sub
+            End Sub
 End Class

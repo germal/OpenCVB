@@ -4,12 +4,12 @@ Imports System.Threading
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
 Public Class CComp_Basics
     Inherits VB_Class
-        Public externalUse As Boolean
+    Public externalUse As Boolean
     Public srcGray As New cv.Mat
     Public dstGray As New cv.Mat
 
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "CComp Threshold", 0, 255, 10)
         sliders.setupTrackBar2(ocvb, callerName, "CComp Min Area", 0, 10000, 500)
 
@@ -61,8 +61,6 @@ Public Class CComp_Basics
         Next
         lastImage = ocvb.result1.Clone()
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -109,7 +107,7 @@ End Class
 Public Class CComp_ColorDepth
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Color connected components based on their depth"
         ocvb.label1 = "Color by Mean Depth"
     End Sub
@@ -130,8 +128,6 @@ Public Class CComp_ColorDepth
             ocvb.result1.Rectangle(blob.Rect, cv.Scalar.White, 2)
         Next
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -142,7 +138,7 @@ Public Class CComp_Image
     Public externalUse As Boolean
     Public srcGray As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Connect components throughout the image"
         ocvb.label1 = "Color Components with Mean Depth"
     End Sub
@@ -180,8 +176,6 @@ Public Class CComp_Image
             ocvb.result1(blobList(i)).SetTo(avg, binary(blobList(i)))
         Next
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -189,13 +183,13 @@ End Class
 
 Public Class CComp_InRange_MT
     Inherits VB_Class
-        Public externalUse As Boolean
+    Public externalUse As Boolean
     Public srcGray As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "InRange # of ranges", 2, 255, 15)
         sliders.setupTrackBar2(ocvb, callerName, "InRange Max Depth", 150, 10000, 3000)
-        sliders.setupTrackBar3(ocvb, callerName,"InRange min Blob Size (in pixels)", 1, 2000, 500)
+        sliders.setupTrackBar3(ocvb, callerName, "InRange min Blob Size (in pixels)", 1, 2000, 500)
 
         ocvb.desc = "Connected components in specific ranges"
         ocvb.label2 = "Blob rectangles - largest to smallest"
@@ -238,8 +232,6 @@ Public Class CComp_InRange_MT
         End Sub)
         ocvb.label1 = "# of blobs = " + CStr(totalBlobs) + " in " + CStr(rangeCount) + " regions"
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -247,10 +239,10 @@ End Class
 
 Public Class CComp_InRange
     Inherits VB_Class
-        Public externalUse As Boolean
+    Public externalUse As Boolean
     Public srcGray As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "InRange # of ranges", 1, 20, 15)
         sliders.setupTrackBar2(ocvb, callerName, "InRange min Blob Size (in pixels)", 1, 2000, 500)
 
@@ -286,8 +278,6 @@ Public Class CComp_InRange
 
         ocvb.label1 = "# of blobs = " + CStr(roiList.Count) + " in " + CStr(rangeCount) + " regions"
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -299,7 +289,7 @@ Public Class CComp_Shapes
     Inherits VB_Class
     Dim shapes As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         shapes = New cv.Mat(ocvb.parms.HomeDir + "Data/Shapes.png", cv.ImreadModes.Color)
         ocvb.label1 = "Largest connected component"
         ocvb.label2 = "RectView, LabelView, Binary, grayscale"
@@ -329,7 +319,5 @@ Public Class CComp_Shapes
         matBot = matBot.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.VConcat(matTop, matBot, mat)
         ocvb.result2 = mat.Resize(ocvb.result2.Size())
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

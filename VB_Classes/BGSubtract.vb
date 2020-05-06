@@ -47,7 +47,6 @@ Public Class BGSubtract_Basics_CPP
         End If
     End Sub
     Public Sub MyDispose()
-        radio.Dispose()
         BGSubtract_BGFG_Close(bgfs)
     End Sub
 End Class
@@ -61,7 +60,7 @@ Public Class BGSubtract_MotionDetect_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Correlation Threshold", 0, 1000, 980)
-        radio.Setup(ocvb, callerName,6)
+        radio.Setup(ocvb, callerName, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = CStr(2 ^ i) + " threads"
         Next
@@ -103,9 +102,6 @@ Public Class BGSubtract_MotionDetect_MT
                 End Sub)
         Next
         Task.WaitAll(taskArray)
-    End Sub
-    Public Sub MyDispose()
-        radio.Dispose()
     End Sub
 End Class
 

@@ -177,7 +177,7 @@ Public Class lineDetector_FLD
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, callerName,3)
+        radio.Setup(ocvb, callerName, 3)
         radio.check(0).Text = "Low resolution - Factor 4"
         radio.check(1).Text = "Low resolution - Factor 2"
         radio.check(2).Text = "Low resolution - Factor 1"
@@ -189,9 +189,9 @@ Public Class lineDetector_FLD
 
         sliders.setupTrackBar1(ocvb, callerName, "FLD - Min Length", 1, 200, 30)
         sliders.setupTrackBar2(ocvb, callerName, "FLD - max distance", 1, 100, 14)
-        sliders.setupTrackBar3(ocvb, callerName,"FLD - Canny Aperture", 3, 7, 7)
+        sliders.setupTrackBar3(ocvb, callerName, "FLD - Canny Aperture", 3, 7, 7)
 
-        check.Setup(ocvb, callerName,  1)
+        check.Setup(ocvb, callerName, 1)
         check.Box(0).Text = "FLD - incremental merge"
         check.Box(0).Checked = True
         ocvb.desc = "Basics for a Fast Line Detector"
@@ -234,8 +234,6 @@ Public Class lineDetector_FLD
         If lineCount > 0 Then sortedLines = drawSegments(dst, lineCount, factor, dst)
         If externalUse = False Then dst.CopyTo(ocvb.result1)
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -275,8 +273,6 @@ Public Class LineDetector_LSD
         ocvb.color.CopyTo(ocvb.result1)
         sortedLines.Clear()
         If lineCount > 0 Then sortedLines = drawSegments(ocvb.result1, lineCount, factor, ocvb.result1)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -508,9 +504,7 @@ Public Class LineDetector_3D_FitLineZ
     Public Sub MyDispose()
         linesFLD.Dispose()
         linesLSD.Dispose()
-        check.Dispose()
-        radio.Dispose()
-    End Sub
+                    End Sub
 End Class
 
 

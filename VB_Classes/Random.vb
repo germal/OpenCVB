@@ -3,12 +3,12 @@ Imports System.Runtime.InteropServices
 
 Public Class Random_Points
     Inherits VB_Class
-        Public Points() As cv.Point
+    Public Points() As cv.Point
     Public Points2f() As cv.Point2f
     Public externalUse As Boolean
     Public rangeRect As cv.Rect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Random Pixel Count", 1, ocvb.color.Width * ocvb.color.Height, 20)
 
         ReDim Points(sliders.TrackBar1.Value - 1)
@@ -31,8 +31,6 @@ Public Class Random_Points
             If externalUse = False Then cv.Cv2.Circle(ocvb.result1, Points(i), 3, cv.Scalar.Gray, -1, cv.LineTypes.AntiAlias, 0)
         Next
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -41,7 +39,7 @@ End Class
 Public Class Random_Shuffle
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use randomShuffle to reorder an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -49,8 +47,6 @@ Public Class Random_Shuffle
         Dim myRNG As New cv.RNG
         cv.Cv2.RandShuffle(ocvb.result1, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
         ocvb.label1 = "Random_shuffle - wave at camera"
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -103,7 +99,7 @@ Public Class Random_UniformDist
     Public uDist As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         uDist = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
         ocvb.desc = "Create a uniform distribution."
     End Sub
@@ -113,30 +109,26 @@ Public Class Random_UniformDist
             ocvb.result1 = uDist.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
 
 Public Class Random_NormalDist
     Inherits VB_Class
-        Public nDistImage As cv.Mat
+    Public nDistImage As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Random_NormalDist Blue Mean", 0, 255, 25)
         sliders.setupTrackBar2(ocvb, callerName, "Random_NormalDist Green Mean", 0, 255, 127)
-        sliders.setupTrackBar3(ocvb, callerName,"Random_NormalDist Red Mean", 0, 255, 180)
-        sliders.setupTrackBar4(ocvb, callerName,  "Random_NormalDist Stdev", 0, 255, 50)
-                ocvb.desc = "Create a normal distribution."
+        sliders.setupTrackBar3(ocvb, callerName, "Random_NormalDist Red Mean", 0, 255, 180)
+        sliders.setupTrackBar4(ocvb, callerName, "Random_NormalDist Stdev", 0, 255, 50)
+        ocvb.desc = "Create a normal distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         cv.Cv2.Randn(ocvb.result1, New cv.Scalar(sliders.TrackBar1.Value, sliders.TrackBar2.Value, sliders.TrackBar3.Value), cv.Scalar.All(sliders.TrackBar4.Value))
         If externalUse Then nDistImage = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 

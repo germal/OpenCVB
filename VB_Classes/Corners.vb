@@ -3,12 +3,12 @@ Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_Harris
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar2(ocvb, callerName, "Corner aperture size", 1, 21, 3)
-        sliders.setupTrackBar3(ocvb, callerName,"Corner quality level", 1, 100, 50)
-                ocvb.desc = "Find corners using Eigen values and vectors"
+        sliders.setupTrackBar3(ocvb, callerName, "Corner quality level", 1, 100, 50)
+        ocvb.desc = "Find corners using Eigen values and vectors"
         ocvb.label2 = "Corner Eigen values"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -53,8 +53,6 @@ Public Class Corners_Harris
         cv.Cv2.Normalize(mc, McNormal, 127, 255, cv.NormTypes.MinMax)
         McNormal.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -138,12 +136,12 @@ End Module
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_ShiTomasi_CPP
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar2(ocvb, callerName, "Corner aperture size", 1, 21, 3)
-        sliders.setupTrackBar3(ocvb, callerName,"Corner quality level", 1, 100, 50)
-                ocvb.desc = "Find corners using Eigen values and vectors"
+        sliders.setupTrackBar3(ocvb, callerName, "Corner quality level", 1, 100, 50)
+        ocvb.desc = "Find corners using Eigen values and vectors"
         ocvb.label2 = "Corner Eigen values"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -177,7 +175,7 @@ Public Class Corners_ShiTomasi_CPP
         color.CopyTo(ocvb.result1)
         For j = 0 To crows - 1
             For i = 0 To ccols - 1
-                If dst.Get(of Single)(j, i) > minval + (maxval - minval) * sliders.TrackBar3.Value / sliders.TrackBar3.Maximum Then
+                If dst.Get(Of Single)(j, i) > minval + (maxval - minval) * sliders.TrackBar3.Value / sliders.TrackBar3.Maximum Then
                     ocvb.result1.Circle(New cv.Point(i, j), 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
                     ocvb.result1.Circle(New cv.Point(i, j), 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
                 End If
@@ -188,6 +186,4 @@ Public Class Corners_ShiTomasi_CPP
         cv.Cv2.Normalize(dst, stNormal, 127, 255, cv.NormTypes.MinMax)
         stNormal.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class

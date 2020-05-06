@@ -2,7 +2,7 @@
 Public Class Font_OpenCV
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Display different font options available in OpenCV"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -22,8 +22,6 @@ Public Class Font_OpenCV
             Dim hersheyFontItalics = hersheyFont + cv.HersheyFonts.Italic
             cv.Cv2.PutText(ocvb.result2, hersheyName + " " + Format(size, "#0.0"), New cv.Point(10, 30 + i * 30), hersheyFontItalics, size, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -62,7 +60,7 @@ Public Class Font_FlowText
     Public externalUse As Boolean
     Public result1or2 As Int32 = RESULT1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -90,7 +88,5 @@ Public Class Font_FlowText
             Next
         End If
         lastCount = msgs.Count
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

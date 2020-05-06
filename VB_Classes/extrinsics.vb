@@ -2,7 +2,7 @@
 Public Class Extrinsics_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Show the depth camera extrinsics."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -20,7 +20,5 @@ Public Class Extrinsics_Basics
         nextLine = Format(ocvb.parms.extrinsics.rotation(6), fmt) + vbTab + Format(ocvb.parms.extrinsics.rotation(7), fmt) + vbTab +
                        Format(ocvb.parms.extrinsics.rotation(8), fmt) + vbTab + vbTab + vbTab + Format(ocvb.parms.extrinsics.translation(2), fmt)
         ocvb.putText(New ActiveClass.TrueType(nextLine, 10, ttStart + 60, RESULT1))
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

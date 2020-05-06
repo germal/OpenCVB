@@ -81,8 +81,8 @@ End Class
 
 Public Class Depth_Flatland
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Region Count", 1, 250, 10)
 
         ocvb.label2 = "Grayscale version"
@@ -95,8 +95,6 @@ Public Class Depth_Flatland
         ocvb.result2 = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -104,7 +102,7 @@ End Class
 Public Class Depth_FirstLastDistance
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Monitor the first and last depth distances"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -119,8 +117,6 @@ Public Class Depth_FirstLastDistance
         ocvb.result1.Circle(minPt, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         ocvb.label2 = "Max Depth " + CStr(maxVal) + " mm"
         ocvb.result2.Circle(maxPt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -318,7 +314,7 @@ Public Class Depth_WorldXYZ
     Inherits VB_Class
     Public xyzFrame As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         xyzFrame = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32FC3)
         ocvb.desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
     End Sub
@@ -334,8 +330,6 @@ Public Class Depth_WorldXYZ
                 End If
             Next
         Next
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -694,13 +688,13 @@ End Class
 Public Class Depth_ManualTrim
     Inherits VB_Class
     Public Mask As New cv.Mat
-        Public externalUse As Boolean
+    Public externalUse As Boolean
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Min Depth", 200, 1000, 200)
         sliders.setupTrackBar2(ocvb, callerName, "Max Depth", 200, 10000, 1400)
-                ocvb.desc = "Manually show depth with varying min and max depths."
+        ocvb.desc = "Manually show depth with varying min and max depths."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If sliders.TrackBar1.Value >= sliders.TrackBar2.Value Then sliders.TrackBar2.Value = sliders.TrackBar1.Value + 1
@@ -722,8 +716,6 @@ Public Class Depth_ManualTrim
             dst.SetTo(0, notMask)
         End If
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -738,13 +730,13 @@ Public Class Depth_InRange
     Public dst As New cv.Mat
     Public depth32f As New cv.Mat
     Public externalUse As Boolean
-        Public minDepth As Double
+    Public minDepth As Double
     Public maxDepth As Double
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "InRange Min Depth", 200, 1000, 200)
         sliders.setupTrackBar2(ocvb, callerName, "InRange Max Depth", 200, 10000, 1400)
-                ocvb.desc = "Show depth with OpenCV using varying min and max depths."
+        ocvb.desc = "Show depth with OpenCV using varying min and max depths."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If sliders.TrackBar1.Value >= sliders.TrackBar2.Value Then sliders.TrackBar2.Value = sliders.TrackBar1.Value + 1
@@ -758,8 +750,6 @@ Public Class Depth_InRange
 
         If externalUse = False Then ocvb.result1 = dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -819,7 +809,7 @@ End Class
 Public Class Depth_ColorizerVB
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Colorize depth manually."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -855,8 +845,6 @@ Public Class Depth_ColorizerVB
             Next
         Next
         ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, rgbdata)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -1117,10 +1105,10 @@ End Class
 
 Public Class Depth_Decreasing
     Inherits VB_Class
-        Public externaluse As Boolean
+    Public externaluse As Boolean
     Public Increasing As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Threshold in millimeters", 0, 1000, 8)
 
         ocvb.desc = "Identify where depth is decreasing - coming toward the camera."
@@ -1139,8 +1127,6 @@ Public Class Depth_Decreasing
         ocvb.result1 = diff.Threshold(thresholdCentimeters, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         lastDepth = depth32f
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 

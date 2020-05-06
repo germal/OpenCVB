@@ -48,8 +48,7 @@ Public Class Surf_Basics_CS
         End If
     End Sub
     Public Sub MyDispose()
-                radio.Dispose()
-        fisheye.Dispose()
+                        fisheye.Dispose()
     End Sub
 End Class
 

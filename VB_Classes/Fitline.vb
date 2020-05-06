@@ -122,12 +122,12 @@ Public Class Fitline_RawInput
     Public m As Single
     Public bb As Single
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Random point count", 0, 500, 100)
         sliders.setupTrackBar2(ocvb, callerName, "Line Point Count", 0, 500, 20)
-        sliders.setupTrackBar3(ocvb, callerName,"Line Noise", 1, 100, 10)
+        sliders.setupTrackBar3(ocvb, callerName, "Line Noise", 1, 100, 10)
 
-        check.Setup(ocvb, callerName,  2)
+        check.Setup(ocvb, callerName, 2)
         check.Box(0).Text = "Highlight Line Data"
         check.Box(1).Text = "Recompute with new random data"
         check.Box(0).Checked = True
@@ -186,9 +186,6 @@ Public Class Fitline_RawInput
                 ocvb.result1.Circle(pt, dotSize, highLight, -1, cv.LineTypes.AntiAlias)
             Next
         End If
-    End Sub
-    Public Sub MyDispose()
-                check.Dispose()
     End Sub
 End Class
 

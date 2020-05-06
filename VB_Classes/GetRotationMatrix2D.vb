@@ -32,7 +32,7 @@ End Module
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class GetRotationMatrix2D_Basics
     Inherits VB_Class
-            Public src As New cv.Mat
+    Public src As New cv.Mat
     Public externalUse As Boolean
     Public M As cv.Mat
     Public Mflip As cv.Mat
@@ -52,9 +52,6 @@ Public Class GetRotationMatrix2D_Basics
         M = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), angle, 1)
         ocvb.result1 = src.WarpAffine(M, src.Size(), warpFlag)
         If warpFlag = cv.InterpolationFlags.WarpInverseMap Then Mflip = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), -angle, 1)
-    End Sub
-    Public Sub MyDispose()
-                radio.Dispose()
     End Sub
 End Class
 

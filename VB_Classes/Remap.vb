@@ -2,7 +2,7 @@
 Public Class Remap_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use remap to reflect an image in 4 directions."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -39,8 +39,6 @@ Public Class Remap_Basics
             direction = direction Mod 4
         End If
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -50,7 +48,7 @@ Public Class Remap_Flip
     Inherits VB_Class
     Public direction = 0
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use flip to remap an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -71,8 +69,6 @@ Public Class Remap_Flip
             direction += 1
             direction = direction Mod 4
         End If
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 

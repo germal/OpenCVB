@@ -6,7 +6,7 @@ Public Class FishEye_Rectified
     Public leftView As cv.Mat
     Public rightView As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use OpenCV's FishEye API to undistort a fisheye lens input"
         ocvb.label1 = "Left View"
         ocvb.label2 = "Right View"
@@ -43,8 +43,6 @@ Public Class FishEye_Rectified
             ocvb.result2 = rightView
         End If
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -54,7 +52,7 @@ End Class
 Public Class FishEye_Raw
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Display the Raw FishEye images for the T265 (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -66,7 +64,5 @@ Public Class FishEye_Raw
         ocvb.label2 = "Right Fisheye Image"
         ocvb.result1 = ocvb.leftView
         ocvb.result2 = ocvb.rightView
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

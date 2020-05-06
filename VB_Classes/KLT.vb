@@ -14,10 +14,10 @@ Public Class KLT_Basics
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "KLT - MaxCorners", 1, 200, 100)
         sliders.setupTrackBar2(ocvb, callerName, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
-        sliders.setupTrackBar3(ocvb, callerName,"KLT - minDistance", 1, 100, 7)
-        sliders.setupTrackBar4(ocvb, callerName,  "KLT - BlockSize", 1, 100, 7)
+        sliders.setupTrackBar3(ocvb, callerName, "KLT - minDistance", 1, 100, 7)
+        sliders.setupTrackBar4(ocvb, callerName, "KLT - BlockSize", 1, 100, 7)
 
-        check.Setup(ocvb, callerName,  2)
+        check.Setup(ocvb, callerName, 2)
         check.Box(0).Text = "KLT - Night Mode"
         check.Box(1).Text = "KLT - delete all Points"
 
@@ -75,9 +75,6 @@ Public Class KLT_Basics
         End If
         prevGray = gray.Clone()
         ocvb.label1 = "KLT Basics - " + If(inputPoints Is Nothing, "0", CStr(inputPoints.Length)) + " points"
-    End Sub
-    Public Sub MyDispose()
-        check.Dispose()
     End Sub
 End Class
 

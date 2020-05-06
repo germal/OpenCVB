@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Resize_Basics
     Inherits VB_Class
-        Public externalUse As Boolean
+    Public externalUse As Boolean
     Public src As cv.Mat
     Public dst As New cv.Mat
     Public newSize As cv.Size
@@ -30,9 +30,6 @@ Public Class Resize_Basics
         Else
             dst = src.Resize(newSize, 0, 0, resizeFlag)
         End If
-    End Sub
-    Public Sub MyDispose()
-        radio.Dispose()
     End Sub
 End Class
 
@@ -74,8 +71,7 @@ Public Class Resize_After8uc3
         ocvb.result1 = colorizer.dst
     End Sub
     Public Sub MyDispose()
-        radio.Dispose()
-        colorizer.Dispose()
+                colorizer.Dispose()
     End Sub
 End Class
 

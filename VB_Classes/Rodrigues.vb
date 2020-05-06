@@ -28,8 +28,6 @@ Public Class Rodrigues_ValidateKinect
             ocvb.putText(New ActiveClass.TrueType(split(i), 10, 90 + i * 20, RESULT1))
         Next
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -38,7 +36,7 @@ End Class
 Public Class Rodrigues_ValidateVector
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -75,8 +73,6 @@ Public Class Rodrigues_ValidateVector
             ocvb.putText(New ActiveClass.TrueType("The T265 does not provide the Rotation Matrix but it is calculated from the Rotation Vector.", 10, 220, RESULT1))
         End If
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -86,7 +82,7 @@ End Class
 Public Class Rodrigues_RotationMatrix
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Display the contents of the IMU Rotation Matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -107,8 +103,6 @@ Public Class Rodrigues_RotationMatrix
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -120,7 +114,7 @@ End Class
 Public Class Rodrigues_Extrinsics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -140,10 +134,8 @@ Public Class Rodrigues_Extrinsics
 
         output = "Extrinsic Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
-            output += vbTab + Format(dst.Get(of Double)(i), "#0.000000000") + vbTab
+            output += vbTab + Format(dst.Get(Of Double)(i), "#0.000000000") + vbTab
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

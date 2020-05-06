@@ -103,6 +103,4 @@ Public Class Salience_Basics_MT
             End Sub)
         grayHandle.Free()
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class

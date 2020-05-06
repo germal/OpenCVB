@@ -23,8 +23,6 @@ Public Class Video_Basics
         image = videoOptions.nextImage
         If image.Empty() = False Then ocvb.result1 = image.Resize(ocvb.color.Size())
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 

@@ -163,13 +163,13 @@ End Class
 
 Public Class knn_Point2d
     Inherits VB_Class
-        Public querySet() As cv.Point2f
+    Public querySet() As cv.Point2f
     Public responseSet() As Int32
     Public lastSet() As cv.Point2f ' default usage: find and connect points in 2D for this number of points.
     Public externalUse As Boolean
     Public findXnearest As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "knn Query Points", 1, 50, 10)
         sliders.setupTrackBar2(ocvb, callerName, "knn k nearest points", 1, 5, 1)
 
@@ -221,8 +221,6 @@ Public Class knn_Point2d
             End If
         Next
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -233,13 +231,13 @@ End Class
 
 Public Class knn_Point3d
     Inherits VB_Class
-        Public querySet() As cv.Point3f
+    Public querySet() As cv.Point3f
     Public responseSet() As Int32
     Public lastSet() As cv.Point3f ' default usage: find and connect points in 2D for this number of points.
     Public externalUse As Boolean
     Public findXnearest As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "knn Query Points", 1, 500, 10)
         sliders.setupTrackBar2(ocvb, callerName, "knn k nearest points", 0, 500, 1)
 
@@ -303,8 +301,6 @@ Public Class knn_Point3d
             End If
         Next
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 

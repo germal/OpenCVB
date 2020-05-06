@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Text.RegularExpressions
 Public Class FloodFill_Basics
     Inherits VB_Class
-        Public srcGray As New cv.Mat
+    Public srcGray As New cv.Mat
     Public externalUse As Boolean
 
     Public masks As New List(Of cv.Mat)
@@ -19,11 +19,11 @@ Public Class FloodFill_Basics
         End Function
     End Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar2(ocvb, callerName, "FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar3(ocvb, callerName,"FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar4(ocvb, callerName,  "Step Size", 1, ocvb.color.Width / 2, 20)
+        sliders.setupTrackBar3(ocvb, callerName, "FloodFill HiDiff", 1, 255, 5)
+        sliders.setupTrackBar4(ocvb, callerName, "Step Size", 1, ocvb.color.Width / 2, 20)
 
         ocvb.label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."
@@ -76,8 +76,6 @@ Public Class FloodFill_Basics
         End If
         ocvb.label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -298,8 +296,7 @@ Public Class FloodFill_RelativeRange
         fBasics.Run(ocvb)
     End Sub
     Public Sub MyDispose()
-        check.Dispose()
-        fBasics.Dispose()
+                fBasics.Dispose()
     End Sub
 End Class
 
@@ -309,14 +306,14 @@ End Class
 Public Class FloodFill_Top16
     Inherits VB_Class
     Public flood As FloodFill_Basics
-        Public srcGray As New cv.Mat
+    Public srcGray As New cv.Mat
     Public externalUse As Boolean
 
     Public thumbNails As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        check.Setup(ocvb, callerName,  1)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        check.Setup(ocvb, callerName, 1)
         check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
 
         flood = New FloodFill_Basics(ocvb, callerName)
@@ -354,9 +351,6 @@ Public Class FloodFill_Top16
         If check.Box(0).Checked Then ocvb.result2 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
     End Sub
-    Public Sub MyDispose()
-        check.Dispose()
-    End Sub
 End Class
 
 
@@ -365,18 +359,18 @@ End Class
 
 Public Class FloodFill_Projection
     Inherits VB_Class
-        Public srcGray As New cv.Mat
+    Public srcGray As New cv.Mat
     Public dst As cv.Mat
     Public externalUse As Boolean
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public objectRects As New List(Of cv.Rect)
     Public minFloodSize As Integer
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar2(ocvb, callerName, "FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar3(ocvb, callerName,"FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar4(ocvb, callerName,  "Step Size", 1, ocvb.color.Width / 2, 20)
+        sliders.setupTrackBar3(ocvb, callerName, "FloodFill HiDiff", 1, 255, 5)
+        sliders.setupTrackBar4(ocvb, callerName, "Step Size", 1, ocvb.color.Width / 2, 20)
 
         ocvb.label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are."
@@ -415,6 +409,4 @@ Public Class FloodFill_Projection
             ocvb.label2 = CStr(objectRects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
         End If
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class

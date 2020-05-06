@@ -58,8 +58,7 @@ Public Class Tracker_Basics
     End Sub
     Public Sub MyDispose()
         If tracker IsNot Nothing Then tracker.Dispose()
-        check.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
@@ -70,12 +69,12 @@ Public Class Tracker_MultiObject
     Inherits VB_Class
     Dim trackers As New List(Of Tracker_Basics)
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Track any number of objects simultaneously"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.drawRect.Width <> 0 Then
-            Dim tr = New Tracker_Basics(ocvb, callerName)
+            Dim tr = New Tracker_Basics(ocvb, "Tracker_MultiObject")
             tr.externalUse = True
             tr.Run(ocvb)
             ocvb.drawRect = New cv.Rect
@@ -145,7 +144,6 @@ Public Class Tracker_Methods
         saveMethod = tracker.trackerIndex
     End Sub
     Public Sub MyDispose()
-        radio.Dispose()
-        tracker.Dispose()
+                tracker.Dispose()
     End Sub
 End Class

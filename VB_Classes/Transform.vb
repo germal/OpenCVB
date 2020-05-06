@@ -1,10 +1,10 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Transform_Resize
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Resize Percent", 50, 1000, 50)
-                ocvb.desc = "Resize an image based on the slider value."
+        ocvb.desc = "Resize an image based on the slider value."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim resizeFactor = sliders.TrackBar1.Value / 100
@@ -21,8 +21,6 @@ Public Class Transform_Resize
             ocvb.result1(roi) = ocvb.color.Resize(New cv.Size(w, h), 0)
         End If
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -30,14 +28,14 @@ End Class
 
 Public Class Transform_Rotate
     Inherits VB_Class
-        Public src As cv.Mat
+    Public src As cv.Mat
     Public dst As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Angle", 0, 180, 30)
         sliders.setupTrackBar2(ocvb, callerName, "Scale Factor", 1, 100, 50)
-                ocvb.desc = "Rotate and scale and image based on the slider values."
+        ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then
@@ -48,8 +46,6 @@ Public Class Transform_Rotate
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.TrackBar1.Value, sliders.TrackBar2.Value / 100)
         cv.Cv2.WarpAffine(src, dst, rotationMat, New cv.Size())
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -57,14 +53,14 @@ End Class
 Public Class Transform_Sort
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, callerName,4)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        radio.Setup(ocvb, callerName, 4)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
         radio.check(2).Text = "EveryColumn"
         radio.check(3).Text = "EveryRow"
-                ocvb.desc = "Sort the pixels of a grayscale image."
+        ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -75,9 +71,6 @@ Public Class Transform_Sort
         Dim sorted = gray.Sort(sortOption + cv.SortFlags.EveryColumn)
         ocvb.result1 = sorted.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub MyDispose()
-        radio.Dispose()
-    End Sub
 End Class
 
 
@@ -85,12 +78,12 @@ End Class
 Public Class Transform_SortReshape
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, callerName,2)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        radio.Setup(ocvb, callerName, 2)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
-                ocvb.desc = "Sort the pixels of a grayscale image."
+        ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.bgr2gray)
@@ -100,8 +93,5 @@ Public Class Transform_SortReshape
         Dim sorted = gray.Sort(sortOption + cv.SortFlags.EveryColumn)
         sorted = sorted.Reshape(1, ocvb.color.Rows)
         ocvb.result1 = sorted.CvtColor(cv.ColorConversionCodes.gray2bgr)
-    End Sub
-    Public Sub MyDispose()
-        radio.Dispose()
     End Sub
 End Class

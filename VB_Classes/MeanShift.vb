@@ -5,7 +5,7 @@ Public Class MeanShift_Basics
     Public rectangleEdgeWidth As Int32 = 2
     Public trackbox As New cv.Rect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = "Draw anywhere to start mean shift tracking."
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track"
     End Sub
@@ -33,8 +33,6 @@ Public Class MeanShift_Basics
         Else
             ocvb.result1 = ocvb.color
         End If
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -71,12 +69,12 @@ End Class
 'http://study.marearts.com/2014/12/opencv-meanshiftfiltering-example.html
 Public Class MeanShift_PyrFilter
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "MeanShift Spatial Radius", 1, 100, 10)
         sliders.setupTrackBar2(ocvb, callerName, "MeanShift color Radius", 1, 100, 15)
-        sliders.setupTrackBar3(ocvb, callerName,"MeanShift Max Pyramid level", 1, 8, 3)
-                ocvb.desc = "Use PyrMeanShiftFiltering to segment an image."
+        sliders.setupTrackBar3(ocvb, callerName, "MeanShift Max Pyramid level", 1, 8, 3)
+        ocvb.desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim spatialRadius = sliders.TrackBar1.Value
@@ -84,8 +82,6 @@ Public Class MeanShift_PyrFilter
         Dim maxPyrLevel = sliders.TrackBar3.Value
         cv.Cv2.PyrMeanShiftFiltering(ocvb.color, ocvb.result1, spatialRadius, colorRadius, maxPyrLevel)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 

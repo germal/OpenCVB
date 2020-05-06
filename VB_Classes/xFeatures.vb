@@ -3,7 +3,7 @@
 Public Class XFeatures2D_StarDetector
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Basics of the StarDetector - a 2D feature detector.  FAILS IN COMPUTE.  Uncomment to investigate further."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -20,7 +20,5 @@ Public Class XFeatures2D_StarDetector
                 cv.Cv2.Line(ocvb.result1, New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Scalar(0, 255, 0), 1, cv.LineTypes.Link8, 0)
             Next kpt
         End If
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

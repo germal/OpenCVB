@@ -77,8 +77,7 @@ Public Class Retina_Basics_CPP
     End Sub
     Public Sub MyDispose()
         Retina_Basics_Close(Retina)
-        check.Dispose()
-    End Sub
+            End Sub
 End Class
 
 

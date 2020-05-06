@@ -73,7 +73,7 @@ End Module
 ' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
 Public Class Histogram_Basics
     Inherits VB_Class
-        Public histRaw(2) As cv.Mat
+    Public histRaw(2) As cv.Mat
     Public histNormalized(2) As cv.Mat
     Public src As New cv.Mat
     Public bins As Int32 = 50
@@ -83,10 +83,10 @@ Public Class Histogram_Basics
     Public plotRequested As Boolean
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Histogram Bins", 2, 256, 256)
         sliders.setupTrackBar2(ocvb, callerName, "Histogram line thickness", 1, 20, 3)
-        sliders.setupTrackBar3(ocvb, callerName,"Histogram Font Size x10", 1, 20, 10)
+        sliders.setupTrackBar3(ocvb, callerName, "Histogram Font Size x10", 1, 20, 10)
 
         ocvb.desc = "Plot histograms for up to 3 channels."
     End Sub
@@ -125,8 +125,6 @@ Public Class Histogram_Basics
             ocvb.label1 = "Histogram for Color image above - " + CStr(bins) + " bins"
         End If
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -157,8 +155,7 @@ Public Class Histogram_NormalizeGray
     End Sub
     Public Sub MyDispose()
                 histogram.Dispose()
-        check.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
@@ -248,11 +245,11 @@ Public Class Histogram_2D_HueSaturation
     Public src As New cv.Mat
     Public hsv As cv.Mat
 
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
         sliders.setupTrackBar2(ocvb, callerName, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
-                ocvb.desc = "Create a histogram for hue and saturation."
+        ocvb.desc = "Create a histogram for hue and saturation."
         dst = ocvb.result1
         src = ocvb.color
     End Sub
@@ -267,8 +264,6 @@ Public Class Histogram_2D_HueSaturation
 
         histogram2DPlot(histogram, dst, hbins, sbins)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -461,8 +456,7 @@ Public Class Histogram_ColorsAndGray
     End Sub
     Public Sub MyDispose()
                 histogram.Dispose()
-        check.Dispose()
-        mats.Dispose()
+                mats.Dispose()
     End Sub
 End Class
 

@@ -3,13 +3,13 @@
 Imports cv = OpenCvSharp
 Public Class LUT_Gray
     Inherits VB_Class
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "LUT zero through xxx", 1, 255, 65)
         sliders.setupTrackBar2(ocvb, callerName, "LUT xxx through yyy", 1, 255, 110)
-        sliders.setupTrackBar3(ocvb, callerName,"LUT xxx through yyy", 1, 255, 160)
-        sliders.setupTrackBar4(ocvb, callerName,  "LUT xxx through 255", 1, 255, 210)
-                ocvb.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
+        sliders.setupTrackBar3(ocvb, callerName, "LUT xxx through yyy", 1, 255, 160)
+        sliders.setupTrackBar4(ocvb, callerName, "LUT xxx through 255", 1, 255, 210)
+        ocvb.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         sliders.LabelSlider1.Text = "LUT zero through " + CStr(sliders.TrackBar1.Value)
@@ -27,8 +27,6 @@ Public Class LUT_Gray
         Next
         ocvb.result1 = gray.LUT(myLut)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -41,7 +39,7 @@ Public Class LUT_Color
     Public src As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -54,7 +52,5 @@ Public Class LUT_Color
         Dim colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, paletteMap)
         ocvb.result1 = src.LUT(colorMat)
         ocvb.result2 = colorMat.Resize(src.Size())
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

@@ -2,11 +2,11 @@ Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
 Public Class FAST_Basics
     Inherits VB_Class
-        Public keypoints() As cv.KeyPoint
+    Public keypoints() As cv.KeyPoint
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, callerName, "Threshold", 0, 200, 15)
-                ocvb.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
+        ocvb.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
         ocvb.label1 = "FAST_Basics nonMax = true"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -18,8 +18,6 @@ Public Class FAST_Basics
             ocvb.result1.Circle(kp.Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
         Next kp
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 

@@ -83,7 +83,7 @@ End Module
 Public Class Delaunay_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -101,8 +101,6 @@ Public Class Delaunay_Basics
         Next
 
         paint_voronoi(ocvb, ocvb.result1, subdiv)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -142,7 +140,7 @@ End Class
 Public Class Delauney_Subdiv2D
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label2 = "Voronoi facets for the same subdiv2D"
         ocvb.desc = "Generate random points and divide the image around those points."
     End Sub
@@ -183,7 +181,5 @@ Public Class Delauney_Subdiv2D
             Dim p2 = New cv.Point(edge.Item2, edge.Item3)
             ocvb.result1.Line(p1, p2, cv.Scalar.Green, 1)
         Next
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

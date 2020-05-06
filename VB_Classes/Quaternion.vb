@@ -16,9 +16,9 @@ Public Class Quaterion_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        sliders1.setupTrackBar1(ocvb,  callerName, "quaternion A.x X100", -100, 100, 0)
+        sliders1.setupTrackBar1(ocvb, callerName, "quaternion A.x X100", -100, 100, 0)
         sliders1.setupTrackBar2(ocvb, callerName, "quaternion A.y X100", -100, 100, 0)
-        sliders1.setupTrackBar3(ocvb, callerName,  "quaternion A.z X100", -100, 100, 0)
+        sliders1.setupTrackBar3(ocvb, callerName, "quaternion A.z X100", -100, 100, 0)
         sliders1.setupTrackBar4(ocvb, callerName, "quaternion Theta X100", -100, 100, 100)
 
         sliders2.setupTrackBar1(ocvb, callerName, "quaternion B.x X100", -100, 100, 0)
@@ -39,8 +39,6 @@ Public Class Quaterion_Basics
                                                   "q2 = " + q2.ToString() + vbCrLf +
                                                   "Multiply q1 * q2" + quatmul.ToString(), 10, 60))
 
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 

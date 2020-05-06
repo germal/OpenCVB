@@ -107,8 +107,7 @@ Public Class Blob_Detector_CS
         blobDetector.Start(ocvb.result1, ocvb.result2, blobParams)
     End Sub
     Public Sub MyDispose()
-                input.Dispose()
-        check.Dispose()
+        input.Dispose()
     End Sub
 End Class
 

@@ -10,17 +10,17 @@ Public Class CamShift_Basics
     Inherits VB_Class
     Public plotHist As Plot_Histogram
     Public trackBox As New cv.RotatedRect
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         plotHist = New Plot_Histogram(ocvb, callerName)
         plotHist.externalUse = True
 
         sliders.setupTrackBar1(ocvb, callerName, "CamShift vMin", 0, 255, 32)
         sliders.setupTrackBar2(ocvb, callerName, "CamShift vMax", 0, 255, 255)
-        sliders.setupTrackBar3(ocvb, callerName,"CamShift Smin", 0, 255, 60)
-        sliders.setupTrackBar4(ocvb, callerName,  "CamShift Histogram bins", 16, 255, 32)
+        sliders.setupTrackBar3(ocvb, callerName, "CamShift Smin", 0, 255, 60)
+        sliders.setupTrackBar4(ocvb, callerName, "CamShift Histogram bins", 16, 255, 32)
 
-                ocvb.label1 = "Draw anywhere to create histogram and start camshift"
+        ocvb.label1 = "Draw anywhere to create histogram and start camshift"
         ocvb.label2 = "Histogram of targeted region (hue only)"
         ocvb.desc = "CamShift Demo - draw on the images to define the object to track."
     End Sub
@@ -68,8 +68,6 @@ Public Class CamShift_Basics
         ocvb.color.CopyTo(ocvb.result1, mask)
         If trackBox.Size.Width > 0 Then ocvb.result1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -81,7 +79,7 @@ Public Class CamShift_Foreground
     Dim camshift As CamShift_Basics
     Dim blob As Depth_Foreground
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         camshift = New CamShift_Basics(ocvb, callerName)
         blob = New Depth_Foreground(ocvb, callerName)
         ocvb.label1 = "Automatically finding the head - top of nearest object"
@@ -120,7 +118,7 @@ Public Class Camshift_Object
     Dim blob As Blob_DepthClusters
     Dim camshift As CamShift_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         blob = New Blob_DepthClusters(ocvb, callerName)
 
         camshift = New CamShift_Basics(ocvb, callerName)
@@ -148,15 +146,15 @@ Public Class Camshift_TopObjects
     Inherits VB_Class
     Dim blob As Blob_DepthClusters
     Dim cams(3) As CamShift_Basics
-        Dim mats As Mat_4to1
+    Dim mats As Mat_4to1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         mats = New Mat_4to1(ocvb, callerName)
         mats.externalUse = True
 
         blob = New Blob_DepthClusters(ocvb, callerName)
         sliders.setupTrackBar1(ocvb, callerName, "How often should camshift be reinitialized", 1, 500, 100)
-                For i = 0 To cams.Length - 1
+        For i = 0 To cams.Length - 1
             cams(i) = New CamShift_Basics(ocvb, callerName)
         Next
         ocvb.desc = "Track"
@@ -188,6 +186,6 @@ Public Class Camshift_TopObjects
         For i = 0 To cams.Length - 1
             cams(i).Dispose()
         Next
-                mats.Dispose()
+        mats.Dispose()
     End Sub
 End Class

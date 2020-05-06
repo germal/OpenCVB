@@ -3,7 +3,7 @@
 Public Class EigenVecVals_Basics
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Solve system of equations using OpenCV's EigenVV"
         ocvb.label1 = "EigenVec (solution)"
         ocvb.label2 = "Relationship between Eigen Vec and Vals"
@@ -47,7 +47,5 @@ Public Class EigenVecVals_Basics
             nextLine += " = " + vbTab + "0.0"
             ocvb.putText(New ActiveClass.TrueType(nextLine, 10, 50 + i * 30, RESULT2))
         Next
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

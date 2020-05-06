@@ -29,7 +29,7 @@ End Class
 Public Class Covariance_Test
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Calculate the covariance of random depth data points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -39,8 +39,6 @@ Public Class Covariance_Test
         Dim mean = New cv.Mat
         cv.Cv2.CalcCovarMatrix(samples, covar, mean, cv.CovarFlags.Cols)
         Dim overallMean = mean.Mean()
-        ocvb.label1 = "covar(0) = " + Format(covar.Get(of Double)(0), "#0.0") + " mean(overall) = " + Format(overallMean(0), "#0.00")
-    End Sub
-    Public Sub MyDispose()
+        ocvb.label1 = "covar(0) = " + Format(covar.Get(Of Double)(0), "#0.0") + " mean(overall) = " + Format(overallMean(0), "#0.00")
     End Sub
 End Class

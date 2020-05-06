@@ -401,8 +401,6 @@ Public Class Puzzle_Solver
     End Sub
     Public Sub MyDispose()
         puzzle.Dispose()
-        radio.Dispose()
-        check.Dispose()
-    End Sub
+                    End Sub
 End Class
 

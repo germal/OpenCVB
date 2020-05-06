@@ -23,8 +23,6 @@ Public Class Aruco_Basics
                                               "The DetectMarkers API works in C# but fails in VB.Net." + vbCrLf +
                                               "To see the correct output, use Aruco_CS.", 10, 140, RESULT1))
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -46,7 +44,5 @@ Public Class Aruco_CS
 
         ocvb.result2(New cv.Rect(0, 0, ocvb.result2.Height, ocvb.result2.Height)) =
                     aruco.normalizedImage.Resize(New cv.Size(ocvb.result2.Height, ocvb.result2.Height))
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class

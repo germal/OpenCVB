@@ -47,6 +47,6 @@ Public Class BlockMatching_Basics
         ocvb.result2 = ocvb.rightView.Resize(ocvb.color.Size())
     End Sub
     Public Sub MyDispose()
-                colorizer.Dispose()
+        colorizer.Dispose()
     End Sub
 End Class

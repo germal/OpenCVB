@@ -77,8 +77,6 @@ Public Class Contours_Basics
     End Sub
     Public Sub MyDispose()
         rotatedRect.Dispose()
-        radio.Dispose()
-        radio1.Dispose()
     End Sub
 End Class
 

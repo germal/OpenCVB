@@ -59,8 +59,6 @@ Public Class VB_Class : Implements IDisposable
         sliders1.Dispose()
         sliders2.Dispose()
         sliders3.Dispose()
-        check.Dispose()
-        radio.Dispose()
         radio1.Dispose()
         videoOptions.Dispose()
     End Sub

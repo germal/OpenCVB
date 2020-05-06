@@ -242,7 +242,6 @@ Public Class Annealing_CPP_MT
         random.Dispose()
         mats.Dispose()
         flow.Dispose()
-        check.Dispose()
         For i = 0 To anneal.Length - 1
             If anneal(i).closed = False Then anneal(i).Dispose()
         Next
@@ -317,7 +316,6 @@ Public Class Annealing_Options
     End Sub
     Public Sub MyDispose()
         flow.Dispose()
-        check.Dispose()
         anneal.Dispose()
         random.Dispose()
     End Sub

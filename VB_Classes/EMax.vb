@@ -87,8 +87,7 @@ Public Class EMax_Basics
         Next
     End Sub
     Public Sub MyDispose()
-                radio.Dispose()
-        grid.Dispose()
+                        grid.Dispose()
     End Sub
 End Class
 

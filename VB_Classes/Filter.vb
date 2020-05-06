@@ -3,7 +3,7 @@
 Public Class Filter_Laplacian
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use a filter to approximate the Laplacian derivative."
         ocvb.label1 = "Sharpened image using Filter2D output"
         ocvb.label2 = "Output of Filter2D (approximated Laplacian)"
@@ -18,22 +18,20 @@ Public Class Filter_Laplacian
         imgResult.ConvertTo(ocvb.result1, cv.MatType.CV_8UC3)
         imgLaplacian.ConvertTo(ocvb.result2, cv.MatType.CV_8UC3)
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
 Public Class Filter_NormalizedKernel
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, callerName,4)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        radio.Setup(ocvb, callerName, 4)
         radio.check(0).Text = "INF"
         radio.check(1).Text = "L1"
         radio.check(1).Checked = True
         radio.check(2).Text = "L2"
         radio.check(3).Text = "MinMax"
-                ocvb.desc = "Create a normalized kernel and use it."
+        ocvb.desc = "Create a normalized kernel and use it."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernel = New cv.Mat(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
@@ -56,9 +54,6 @@ Public Class Filter_NormalizedKernel
         Dim dst32f = ocvb.color.Filter2D(cv.MatType.CV_32FC1, kernel, anchor:=New cv.Point(0, 0))
         dst32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC3)
     End Sub
-    Public Sub MyDispose()
-        radio.Dispose()
-    End Sub
 End Class
 
 
@@ -66,7 +61,7 @@ End Class
 Public Class Filter_Normalized2D
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Create and apply a normalized kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -74,8 +69,6 @@ Public Class Filter_Normalized2D
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
         ocvb.result1 = ocvb.color.Filter2D(-1, kernel)
         ocvb.label1 = "Normalized KernelSize = " + CStr(kernelSize)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -85,15 +78,15 @@ End Class
 'https://www.cc.gatech.edu/classes/AY2015/cs4475_summer/documents/smoothing_separable.py
 Public Class Filter_SepFilter2D
     Inherits VB_Class
-            Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        check.Setup(ocvb, callerName,  1)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        check.Setup(ocvb, callerName, 1)
         check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"
         check.Box(0).Checked = True
-        
+
         sliders.setupTrackBar1(ocvb, callerName, "Kernel X size", 1, 21, 5)
         sliders.setupTrackBar2(ocvb, callerName, "Kernel Y size", 1, 21, 11)
-        
+
         ocvb.label1 = "Gaussian Blur result"
         ocvb.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
     End Sub
@@ -114,7 +107,4 @@ Public Class Filter_SepFilter2D
             ocvb.label2 = "SepFilter2D Result"
         End If
     End Sub
-    Public Sub MyDispose()
-        check.Dispose()
-            End Sub
 End Class

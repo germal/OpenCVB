@@ -8,7 +8,7 @@ Public Class DNN_Test
     Inherits VB_Class
     Dim net As Net
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
     End Sub
@@ -37,8 +37,6 @@ Public Class DNN_Test
             ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
         End If
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -49,7 +47,7 @@ Public Class DNN_Caffe_CS
     Inherits VB_Class
     Dim caffeCS As CS_Classes.DNN
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
 
@@ -67,8 +65,6 @@ Public Class DNN_Caffe_CS
         Else
             ocvb.putText(New ActiveClass.TrueType(str, 10, 100))
         End If
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 

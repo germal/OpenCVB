@@ -1,20 +1,20 @@
 Imports cv = OpenCvSharp
 Public Class MatchTemplate_Basics
     Inherits VB_Class
-        Dim flow As Font_FlowText
-        Public sample1 As cv.Mat
+    Dim flow As Font_FlowText
+    Public sample1 As cv.Mat
     Public sample2 As cv.Mat
     Public externalUse As Boolean
     Public matchText As String = ""
     Public correlationMat As New cv.Mat
     Public reportFreq = 10 ' report the results every x number of iterations.
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         flow = New Font_FlowText(ocvb, callerName)
         flow.externalUse = True
         flow.result1or2 = RESULT2
 
-        radio.Setup(ocvb, callerName,6)
+        radio.Setup(ocvb, callerName, 6)
         radio.check(0).Text = "CCoeff"
         radio.check(1).Text = "CCoeffNormed"
         radio.check(2).Text = "CCorr"
@@ -22,8 +22,8 @@ Public Class MatchTemplate_Basics
         radio.check(4).Text = "SqDiff"
         radio.check(5).Text = "SqDiffNormed"
         radio.check(1).Checked = True
-                sliders.setupTrackBar1(ocvb, callerName, "Sample Size", 2, 10000, 100)
-                ocvb.label2 = "Log of correlation results"
+        sliders.setupTrackBar1(ocvb, callerName, "Sample Size", 2, 10000, 100)
+        ocvb.label2 = "Log of correlation results"
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -54,9 +54,6 @@ Public Class MatchTemplate_Basics
                 flow.Run(ocvb)
             End If
         End If
-    End Sub
-    Public Sub MyDispose()
-                radio.Dispose()
     End Sub
 End Class
 
@@ -115,8 +112,8 @@ End Class
 Public Class MatchTemplate_DrawRect
     Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, callerName,6)
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
+        radio.Setup(ocvb, callerName, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
         Next
@@ -152,9 +149,6 @@ Public Class MatchTemplate_DrawRect
         Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
         ocvb.result1.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
         ocvb.result2.Circle(maxLoc.X + saveRect.Width / 2, maxLoc.Y + saveRect.Height / 2, 20, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
-    End Sub
-    Public Sub MyDispose()
-        radio.Dispose()
     End Sub
 End Class
 

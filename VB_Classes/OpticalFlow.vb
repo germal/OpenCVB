@@ -74,7 +74,7 @@ Public Class OpticalFlow_DenseOptions
     Public outputScaling As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
-        radio.Setup(ocvb, callerName,5)
+        radio.Setup(ocvb, callerName, 5)
         radio.check(0).Text = "FarnebackGaussian"
         radio.check(1).Text = "LkGetMinEigenvals"
         radio.check(2).Text = "None"
@@ -88,8 +88,8 @@ Public Class OpticalFlow_DenseOptions
 
         sliders.setupTrackBar1(ocvb, callerName, "Optical Flow pyrScale", 1, 100, 4)
         sliders.setupTrackBar2(ocvb, callerName, "Optical Flow Levels", 1, 10, 1)
-        sliders.setupTrackBar3(ocvb, callerName,"Optical Flow winSize", 1, 9, 1)
-        sliders.setupTrackBar4(ocvb, callerName,  "Optical Flow Iterations", 1, 10, 1)
+        sliders.setupTrackBar3(ocvb, callerName, "Optical Flow winSize", 1, 9, 1)
+        sliders.setupTrackBar4(ocvb, callerName, "Optical Flow Iterations", 1, 10, 1)
 
         ocvb.desc = "Use dense optical flow algorithm options"
     End Sub
@@ -112,8 +112,6 @@ Public Class OpticalFlow_DenseOptions
             End If
         Next
         outputScaling = sliders2.TrackBar2.Value
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -315,6 +313,5 @@ Public Class OpticalFlow_Sparse
     End Sub
     Public Sub MyDispose()
         good.Dispose()
-        radio.Dispose()
-    End Sub
+            End Sub
 End Class

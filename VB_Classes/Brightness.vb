@@ -25,8 +25,6 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
         cv.Cv2.CvtColor(imgGray, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.CvtColor(imgClahe, ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -43,8 +41,6 @@ Public Class Brightness_Contrast
         ocvb.color.ConvertTo(ocvb.result1, -1, sliders.TrackBar2.Value / 50, sliders.TrackBar1.Value)
         ocvb.label1 = "Brightness/Contrast"
         ocvb.label2 = ""
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -67,8 +63,6 @@ Public Class Brightness_hue
         cv.Cv2.CvtColor(hsv_planes(0), ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.CvtColor(hsv_planes(1), ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub MyDispose()
-    End Sub
 End Class
 
 
@@ -83,8 +77,6 @@ Public Class Brightness_AlphaBeta
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1 = ocvb.color.ConvertScaleAbs(sliders.TrackBar1.Value / 500, sliders.TrackBar2.Value)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
@@ -108,8 +100,6 @@ Public Class Brightness_Gamma
             Next
         End If
         ocvb.result1 = ocvb.color.LUT(lookupTable)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class
 
