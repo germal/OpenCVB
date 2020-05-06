@@ -2,7 +2,9 @@
 Public Class Diff_Basics : Implements IDisposable
     Public sliders As New OptionsSliders
     Dim lastFrame As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Diff - Color Threshold", 1, 255, 50)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.label1 = "Stable Gray Color"
@@ -31,11 +33,13 @@ Public Class Diff_UnstableDepthAndColor : Implements IDisposable
     Dim diff As Diff_Basics
     Dim depth As Depth_Stable
     Dim lastFrames() As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
-        diff = New Diff_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        diff = New Diff_Basics(ocvb, "Diff_UnstableDepthAndColor")
         diff.sliders.TrackBar1.Value = 20 ' this is color threshold - low means detecting more motion.
 
-        depth = New Depth_Stable(ocvb)
+        depth = New Depth_Stable(ocvb, "Diff_UnstableDepthAndColor")
 
         ocvb.desc = "Build a mask for any pixels that have either unstable depth or color"
     End Sub

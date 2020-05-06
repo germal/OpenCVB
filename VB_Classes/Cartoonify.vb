@@ -2,7 +2,9 @@
 ' https://github.com/davemk99/Cartoonify-Image/blob/master/main.cpp
 Public Class CartoonifyImage_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Cartoon Median Blur kernel", 1, 21, 7)
         sliders.setupTrackBar2(ocvb, "Cartoon Median Blur kernel 2", 1, 21, 3)
         sliders.setupTrackBar3(ocvb, "Cartoon threshold", 1, 255, 80)

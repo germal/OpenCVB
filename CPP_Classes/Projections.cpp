@@ -76,13 +76,13 @@ int* SimpleProjectionRun(SimpleProjection * cPtr, int* depthPtr, float desiredMi
 
 
 
-class Projections_Gravity
+class Project_Gravity
 {
 private:
 public:
 	Mat xyz, viewTop, viewSide, top16u, side16u;
 	Depth_Colorizer2OLD* colorizePtr;
-	Projections_Gravity() : colorizePtr{ NULL } {}
+	Project_Gravity() : colorizePtr{ NULL } {}
 
 	void Run(float maxZ, int w, int h)
 	{
@@ -131,28 +131,28 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-Projections_Gravity * Projections_Gravity_Open(LPSTR fileName) 
+Project_Gravity * Project_Gravity_Open(LPSTR fileName) 
 {
-	Projections_Gravity* cPtr = new Projections_Gravity();
+	Project_Gravity* cPtr = new Project_Gravity();
 	cPtr->colorizePtr = new Depth_Colorizer2OLD();
 	return cPtr;
 }
 
 extern "C" __declspec(dllexport)
-void Projections_Gravity_Close(Projections_Gravity * cPtr)
+void Project_Gravity_Close(Project_Gravity * cPtr)
 {
 	delete cPtr->colorizePtr;
 	delete cPtr;
 }
 
 extern "C" __declspec(dllexport)
-int* Projections_Gravity_Side(Projections_Gravity * cPtr)
+int* Project_Gravity_Side(Project_Gravity * cPtr)
 {
 	return (int*)cPtr->viewSide.data;
 }
 
 extern "C" __declspec(dllexport)
-int* Projections_Gravity_Run(Projections_Gravity * cPtr, int* xyzPtr, float maxZ, int rows, int cols)
+int* Project_Gravity_Run(Project_Gravity * cPtr, int* xyzPtr, float maxZ, int rows, int cols)
 {
 	cPtr->xyz = Mat(rows, cols, CV_32FC3, xyzPtr);
 	cPtr->top16u = Mat(rows, cols, CV_16U).setTo(0);
@@ -167,12 +167,12 @@ int* Projections_Gravity_Run(Projections_Gravity * cPtr, int* xyzPtr, float maxZ
 
 
 
-class Projections_GravityHistogram
+class Project_GravityHistogram
 {
 private:
 public:
 	Mat xyz, histTop, histSide;
-	Projections_GravityHistogram() {}
+	Project_GravityHistogram() {}
 
 	void Run(float maxZ, int w, int h)
 	{
@@ -209,26 +209,26 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-Projections_GravityHistogram * Projections_GravityHist_Open()
+Project_GravityHistogram * Project_GravityHist_Open()
 {
-	Projections_GravityHistogram* cPtr = new Projections_GravityHistogram();
+	Project_GravityHistogram* cPtr = new Project_GravityHistogram();
 	return cPtr;
 }
 
 extern "C" __declspec(dllexport)
-void Projections_GravityHist_Close(Projections_GravityHistogram * cPtr)
+void Project_GravityHist_Close(Project_GravityHistogram * cPtr)
 {
 	delete cPtr;
 }
 
 extern "C" __declspec(dllexport)
-int* Projections_GravityHist_Side(Projections_GravityHistogram * cPtr)
+int* Project_GravityHist_Side(Project_GravityHistogram * cPtr)
 {
 	return (int*)cPtr->histSide.data;
 }
 
 extern "C" __declspec(dllexport)
-int* Projections_GravityHist_Run(Projections_GravityHistogram * cPtr, int* xyzPtr, float maxZ, int rows, int cols)
+int* Project_GravityHist_Run(Project_GravityHistogram * cPtr, int* xyzPtr, float maxZ, int rows, int cols)
 {
 	cPtr->xyz = Mat(rows, cols, CV_32FC3, xyzPtr);
 	cPtr->histTop = Mat(rows, cols, CV_32F).setTo(0);

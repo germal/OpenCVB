@@ -81,7 +81,9 @@ End Module
 
 
 Public Class Delaunay_Basics : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -109,8 +111,10 @@ End Class
 
 Public Class Delaunay_GoodFeatures : Implements IDisposable
     Dim features As Features_GoodFeatures
-    Public Sub New(ocvb As AlgorithmData)
-        features = New Features_GoodFeatures(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        features = New Features_GoodFeatures(ocvb, "Delaunay_GoodFeatures")
         ocvb.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -136,7 +140,9 @@ End Class
 
 ' https://github.com/shimat/opencvsharp/wiki/Subdiv2D
 Public Class Delauney_Subdiv2D : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.label2 = "Voronoi facets for the same subdiv2D"
         ocvb.desc = "Generate random points and divide the image around those points."
     End Sub

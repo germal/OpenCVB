@@ -3,7 +3,9 @@ Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_Harris : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar2(ocvb, "Corner aperture size", 1, 21, 3)
         sliders.setupTrackBar3(ocvb, "Corner quality level", 1, 100, 50)
@@ -30,8 +32,8 @@ Public Class Corners_Harris : Implements IDisposable
 
             For j = 0 To gray.Rows - 1
                 For i = 0 To gray.Cols - 1
-                    Dim lambda_1 = dst.Get(of cv.Vec6f)(j, i)(0)
-                    Dim lambda_2 = dst.Get(of cv.Vec6f)(j, i)(1)
+                    Dim lambda_1 = dst.Get(Of cv.Vec6f)(j, i)(0)
+                    Dim lambda_2 = dst.Get(Of cv.Vec6f)(j, i)(1)
                     mc.Set(Of Single)(j, i, lambda_1 * lambda_2 - 0.04 * Math.Pow(lambda_1 + lambda_2, 2))
                 Next
             Next
@@ -42,7 +44,7 @@ Public Class Corners_Harris : Implements IDisposable
         color.CopyTo(ocvb.result1)
         For j = 0 To gray.Rows - 1
             For i = 0 To gray.Cols - 1
-                If mc.Get(of Single)(j, i) > minval + (maxval - minval) * sliders.TrackBar3.Value / sliders.TrackBar3.Maximum Then
+                If mc.Get(Of Single)(j, i) > minval + (maxval - minval) * sliders.TrackBar3.Value / sliders.TrackBar3.Maximum Then
                     ocvb.result1.Circle(New cv.Point(i, j), 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
                     ocvb.result1.Circle(New cv.Point(i, j), 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
                 End If
@@ -64,8 +66,10 @@ End Class
 Public Class Corners_SubPix : Implements IDisposable
     Dim good As Features_GoodFeatures
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
-        good = New Features_GoodFeatures(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        good = New Features_GoodFeatures(ocvb, "Corners_SubPix")
         sliders.setupTrackBar1(ocvb, "SubPix kernel Size", 1, 20, 3)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -100,8 +104,10 @@ End Class
 Public Class Corners_PreCornerDetect : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim median As Math_Median_CDF
-    Public Sub New(ocvb As AlgorithmData)
-        median = New Math_Median_CDF(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        median = New Math_Median_CDF(ocvb, "Corners_PreCornerDetect")
         sliders.setupTrackBar1(ocvb, "kernel Size", 1, 20, 19)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -141,7 +147,9 @@ End Module
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_ShiTomasi_CPP : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar2(ocvb, "Corner aperture size", 1, 21, 3)
         sliders.setupTrackBar3(ocvb, "Corner quality level", 1, 100, 50)

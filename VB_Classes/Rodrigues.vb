@@ -8,7 +8,9 @@ End Module
 
 
 Public Class Rodrigues_ValidateKinect : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Validate the Rodrigues calibration for Kinect camera (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -34,7 +36,9 @@ End Class
 
 
 Public Class Rodrigues_ValidateVector : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -57,7 +61,7 @@ Public Class Rodrigues_ValidateVector : Implements IDisposable
 
         output = "Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
-            output += vbTab + Format(dst.Get(of Single)(i), "#0.000000000") + vbTab
+            output += vbTab + Format(dst.Get(Of Single)(i), "#0.000000000") + vbTab
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
 
@@ -80,7 +84,9 @@ End Class
 
 
 Public Class Rodrigues_RotationMatrix : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Display the contents of the IMU Rotation Matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -97,7 +103,7 @@ Public Class Rodrigues_RotationMatrix : Implements IDisposable
 
         output = "Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
-            output += vbTab + Format(dst.Get(of Single)(i), "#0.000000000") + vbTab
+            output += vbTab + Format(dst.Get(Of Single)(i), "#0.000000000") + vbTab
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
     End Sub
@@ -112,7 +118,9 @@ End Class
 
 
 Public Class Rodrigues_Extrinsics : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

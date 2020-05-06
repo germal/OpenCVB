@@ -31,7 +31,9 @@ Public Class Harris_Features_CPP : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim srcData() As Byte
     Dim Harris_Features As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Harris Threshold", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, "Harris Neighborhood", 1, 41, 21)
         sliders.setupTrackBar3(ocvb, "Harris aperture", 1, 33, 21)
@@ -53,7 +55,7 @@ Public Class Harris_Features_CPP : Implements IDisposable
         Dim aperture = sliders.TrackBar3.Value
         If aperture Mod 2 = 0 Then aperture += 1
         Dim HarrisParm = sliders.TrackBar4.Value / 100
-        Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned) 
+        Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim imagePtr = Harris_Features_Run(Harris_Features, handleSrc.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols, threshold,
                                            neighborhood, aperture, HarrisParm)
 
@@ -82,7 +84,9 @@ Public Class Harris_Detector_CPP : Implements IDisposable
     Dim Harris_Detector As IntPtr
     Public FeaturePoints As New List(Of cv.Point2f)
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Harris qualityLevel", 1, 100, 2)
         If ocvb.parms.ShowOptions Then sliders.Show()
 

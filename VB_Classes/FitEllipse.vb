@@ -16,11 +16,13 @@ Public Class FitEllipse_Basics_CPP : Implements IDisposable
     Dim area As Area_MinTriangle_CPP
     Public dstHandle As GCHandle
     Public dstData(5 * 4 - 1) As Byte ' enough space for a float describing angle, center, and width/height - this will be filled in on the C++ side.
-    Public Sub New(ocvb As AlgorithmData)
-        area = New Area_MinTriangle_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        area = New Area_MinTriangle_CPP(ocvb, "FitEllipse_Basics_CPP")
 
         ocvb.desc = "Use FitEllipse to draw around a set of points"
-        dstHandle = GCHandle.Alloc(dstData, GCHandleType.Pinned) 
+        dstHandle = GCHandle.Alloc(dstData, GCHandleType.Pinned)
         ocvb.label2 = "Green FitEllipse, Yellow=AMS, Red=Direct"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

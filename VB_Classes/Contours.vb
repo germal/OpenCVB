@@ -7,7 +7,9 @@ Public Class Contours_Basics : Implements IDisposable
     Public externalUse As Boolean
     Public src As New cv.Mat
     Public dst As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         radio1.Setup(ocvb, 5)
         radio1.Text = "Retrieval Mode Options"
         radio1.check(0).Text = "CComp"
@@ -27,7 +29,7 @@ Public Class Contours_Basics : Implements IDisposable
         radio2.check(1).Checked = True
         If ocvb.parms.ShowOptions Then radio2.Show()
 
-        rotatedRect = New Draw_rotatedRectangles(ocvb)
+        rotatedRect = New Draw_rotatedRectangles(ocvb, "Contours_Basics")
         rotatedRect.rect.sliders.TrackBar1.Value = 5
         ocvb.desc = "Demo options on FindContours."
         ocvb.label2 = "FindContours output"
@@ -86,8 +88,10 @@ End Class
 
 Public Class Contours_FindandDraw : Implements IDisposable
     Dim rotatedRect As Draw_rotatedRectangles
-    Public Sub New(ocvb As AlgorithmData)
-        rotatedRect = New Draw_rotatedRectangles(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        rotatedRect = New Draw_rotatedRectangles(ocvb, "Contours_FindandDraw")
         rotatedRect.rect.sliders.TrackBar1.Value = 5
         ocvb.label1 = "FindandDraw input"
         ocvb.label2 = "FindandDraw output"
@@ -117,8 +121,10 @@ End Class
 
 Public Class Contours_Depth : Implements IDisposable
     Public trim As Depth_InRange
-    Public Sub New(ocvb As AlgorithmData)
-        trim = New Depth_InRange(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        trim = New Depth_InRange(ocvb, "Contours_Depth")
         ocvb.desc = "Find and draw the contour of the depth foreground."
         ocvb.label1 = "DepthContour input"
         ocvb.label2 = "DepthContour output"
@@ -147,8 +153,10 @@ End Class
 
 Public Class Contours_RGB : Implements IDisposable
     Dim trim As Depth_InRange
-    Public Sub New(ocvb As AlgorithmData)
-        trim = New Depth_InRange(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        trim = New Depth_InRange(ocvb, "Contours_RGB")
         ocvb.desc = "Find and draw the contour of the largest foreground RGB contour."
         ocvb.label2 = "Background"
     End Sub

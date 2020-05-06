@@ -13,7 +13,7 @@ Module fastLineDetector_Exports
     Public Function lineDetector_Lines() As IntPtr
     End Function
 
-    Public Sub find3DLineSegment(ocvb As AlgorithmData, _mask As cv.Mat, _depth32f As cv.Mat, aa As cv.Vec6f, maskLineWidth As Int32, UseRGBlength As Boolean)
+    Public Sub find3DLineSegment(ocvb As AlgorithmData, _mask As cv.Mat, _depth32f As cv.Mat, aa As cv.Vec6f, maskLineWidth As Int32)
         Dim pt1 = New cv.Point(aa(0), aa(1))
         Dim pt2 = New cv.Point(aa(2), aa(3))
         Dim centerPoint = New cv.Point((aa(0) + aa(2)) / 2, (aa(1) + aa(3)) / 2)
@@ -33,9 +33,9 @@ Module fastLineDetector_Exports
         Dim skipPoints As Int32
         For y = 0 To roi.Height - 1
             For x = 0 To roi.Width - 1
-                If mask.Get(of Byte)(y, x) = 1 Then
+                If mask.Get(Of Byte)(y, x) = 1 Then
                     totalPoints += 1
-                    Dim w = getWorldCoordinatesD6(ocvb, New cv.Point3f(x + roi.X, y + roi.Y, depth32f.Get(of Single)(y, x)))
+                    Dim w = getWorldCoordinatesD6(ocvb, New cv.Point3f(x + roi.X, y + roi.Y, depth32f.Get(Of Single)(y, x)))
                     worldDepth.Add(w)
                 End If
             Next
@@ -47,7 +47,7 @@ Module fastLineDetector_Exports
 
             ' if the sample is large enough (at least 20% of possible points), then project the line for the full length of the RGB line.
             ' Note: when using RGB to determine a projected length, the line is defined by pixel coordinate for y. (z_depth = m * y_pixel + bb)
-            If UseRGBlength And skipPoints / totalPoints < 0.5 Then
+            If skipPoints / totalPoints < 0.5 Then
                 If endPoints(0).Item2 = endPoints(1).Item2 Then endPoints(0).Item2 += 1 ' prevent NaN
                 Dim m = (endPoints(0).Item4 - endPoints(1).Item4) / (endPoints(0).Item2 - endPoints(1).Item2)
                 Dim bb = endPoints(0).Item2 - m * endPoints(0).Item4
@@ -63,11 +63,11 @@ Module fastLineDetector_Exports
                 Dim b = endPoints(0)
                 Dim d = endPoints(1)
                 Dim lenBD = Math.Sqrt((b.Item0 - d.Item0) * (b.Item0 - d.Item0) + (b.Item1 - d.Item1) * (b.Item1 - d.Item1) + (b.Item2 - d.Item2) * (b.Item2 - d.Item2))
-                cv.Cv2.PutText(ocvb.result2, Format(lenBD / 1000, "#0.00") + "m", centerPoint, cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                cv.Cv2.PutText(ocvb.result2, Format(lenBD / 1000, "0.00") + "m", centerPoint, cv.HersheyFonts.HersheyTriplex, 0.4, cv.Scalar.White, 1,
+                               cv.LineTypes.AntiAlias)
                 If endPoints(0).Item2 = endPoints(1).Item2 Then endPoints(0).Item2 += 1 ' prevent NaN
-                cv.Cv2.PutText(ocvb.result2, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "#0.00") + "y/z",
-                               New cv.Point(centerPoint.X, centerPoint.Y + 10), cv.HersheyFonts.HersheyTriplex, 0.3, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-
+                    cv.Cv2.PutText(ocvb.result2, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "0.00") + "y/z",
+                               New cv.Point(centerPoint.X, centerPoint.Y + 10), cv.HersheyFonts.HersheyTriplex, 0.4, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 ' show the final endpoints in xy projection.
                 ocvb.result2.Circle(New cv.Point(b.Item3, b.Item4), 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
                 ocvb.result2.Circle(New cv.Point(d.Item3, d.Item4), 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
@@ -178,7 +178,9 @@ Public Class lineDetector_FLD : Implements IDisposable
     Public externalUse As Boolean
     Public src As cv.Mat
     Public dst As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         radio.Setup(ocvb, 3)
         radio.check(0).Text = "Low resolution - Factor 4"
         radio.check(1).Text = "Low resolution - Factor 2"
@@ -229,7 +231,6 @@ Public Class lineDetector_FLD : Implements IDisposable
         Dim grayInput = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(New cv.Size(cols, rows))
 
         Dim data(grayInput.Total - 1) As Byte
-        cv.Cv2.ImShow("gray", grayInput)
 
         Marshal.Copy(grayInput.Data, data, 0, data.Length)
         Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
@@ -254,7 +255,9 @@ Public Class LineDetector_LSD : Implements IDisposable
     Dim data() As Byte
     Public sortedLines As SortedList(Of cv.Vec6f, Integer)
     Public factor As Int32 = 4
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Fast Line Detector from the OpenCV contrib code base."
         Dim size = ocvb.color.Rows * ocvb.color.Cols
         ReDim data(size - 1)
@@ -292,18 +295,14 @@ End Class
 
 Public Class LineDetector_3D_LongestLine : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Dim check As New OptionsCheckbox
     Dim lines As lineDetector_FLD
-    Public Sub New(ocvb As AlgorithmData)
-        lines = New lineDetector_FLD(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        lines = New lineDetector_FLD(ocvb, "LineDetector_3D_LongestLine")
 
         sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 1)
         If ocvb.parms.ShowOptions Then sliders.Show()
-
-        check.Setup(ocvb, 1)
-        check.Box(0).Text = "RGB determines line length (when depth is present for >50% of points)"
-        check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
 
         ocvb.desc = "Identify planes using the lines present in the rgb image."
         ocvb.label2 = ""
@@ -319,13 +318,12 @@ Public Class LineDetector_3D_LongestLine : Implements IDisposable
             ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
             Dim maskLineWidth As Int32 = sliders.TrackBar1.Value
             Dim mask = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, 0)
-            find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth, check.Box(0).Checked)
+            find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth)
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         lines.Dispose()
         sliders.Dispose()
-        check.Dispose()
     End Sub
 End Class
 
@@ -334,18 +332,14 @@ End Class
 
 Public Class LineDetector_3D_FLD_MT : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Dim check As New OptionsCheckbox
     Dim lines As lineDetector_FLD
-    Public Sub New(ocvb As AlgorithmData)
-        lines = New lineDetector_FLD(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        lines = New lineDetector_FLD(ocvb, "LineDetector_3D_FLD_MT")
 
         sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 1)
         If ocvb.parms.ShowOptions Then sliders.Show()
-
-        check.Setup(ocvb, 1)
-        check.Box(0).Text = "RGB determines line length (when depth is present for >50% of points)"
-        check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
 
         ocvb.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
         ocvb.label2 = ""
@@ -362,13 +356,12 @@ Public Class LineDetector_3D_FLD_MT : Implements IDisposable
         Dim mask = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, 0)
         Parallel.For(0, lines.sortedLines.Count - 1,
         Sub(i)
-            find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth, check.Box(0).Checked)
+            find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
         End Sub)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         lines.Dispose()
         sliders.Dispose()
-        check.Dispose()
     End Sub
 End Class
 
@@ -376,17 +369,13 @@ End Class
 
 Public Class LineDetector_3D_LSD_MT : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Dim check As New OptionsCheckbox
     Dim lines As LineDetector_LSD
-    Public Sub New(ocvb As AlgorithmData)
-        lines = New LineDetector_LSD(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        lines = New LineDetector_LSD(ocvb, "LineDetector_3D_LSD_MT")
         sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 1)
         If ocvb.parms.ShowOptions Then sliders.Show()
-
-        check.Setup(ocvb, 1)
-        check.Box(0).Text = "RGB determines line length (when depth is present for >50% of points)"
-        check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
 
         ocvb.desc = "Measure 3D line segments using a multi-threaded Line Stream Detector"
         ocvb.label2 = ""
@@ -409,13 +398,12 @@ Public Class LineDetector_3D_LSD_MT : Implements IDisposable
         Dim mask = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, 0)
         Parallel.For(0, lines.sortedLines.Count - 1,
         Sub(i)
-            find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth, check.Box(0).Checked)
+            find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
         End Sub)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         lines.Dispose()
         sliders.Dispose()
-        check.Dispose()
     End Sub
 End Class
 
@@ -428,9 +416,11 @@ Public Class LineDetector_3D_FitLineZ : Implements IDisposable
     Dim check As New OptionsCheckbox
     Dim linesFLD As lineDetector_FLD
     Dim linesLSD As LineDetector_LSD
-    Public Sub New(ocvb As AlgorithmData)
-        linesFLD = New lineDetector_FLD(ocvb)
-        linesLSD = New LineDetector_LSD(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        linesFLD = New lineDetector_FLD(ocvb, "LineDetector_3D_FitLineZ")
+        linesLSD = New LineDetector_LSD(ocvb, "LineDetector_3D_FitLineZ")
 
         sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 3)
         sliders.setupTrackBar2(ocvb, "Point count threshold", 5, 500, 50)
@@ -500,8 +490,8 @@ Public Class LineDetector_3D_FitLineZ : Implements IDisposable
                 Dim points As New List(Of cv.Point2f)
                 For y = 0 To roi.Height - 1
                     For x = 0 To roi.Width - 1
-                        If _mask.Get(of Byte)(y, x) = i Then
-                            Dim w = getWorldCoordinatesD6(ocvb, New cv.Point3f(x + roi.X, y + roi.Y, depth32f.Get(of Single)(y, x)))
+                        If _mask.Get(Of Byte)(y, x) = i Then
+                            Dim w = getWorldCoordinatesD6(ocvb, New cv.Point3f(x + roi.X, y + roi.Y, depth32f.Get(Of Single)(y, x)))
                             points.Add(New cv.Point(If(useX, w.Item0, w.Item1), w.Item2))
                             worldDepth.Add(w)
                         End If
@@ -557,7 +547,9 @@ Public Class LineDetector_Basics : Implements IDisposable
     Dim ld As cv.XImgProc.FastLineDetector
     Public dst As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "LineDetector thickness of line", 1, 20, 2)
         If ocvb.parms.ShowOptions Then sliders.Show()
 

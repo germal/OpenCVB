@@ -3,8 +3,10 @@
 Public Class GrabCut_Basics : Implements IDisposable
     Dim contours As Contours_Depth
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
-        contours = New Contours_Depth(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        contours = New Contours_Depth(ocvb, "GrabCut_Basics")
 
         sliders.setupTrackBar1(ocvb, "Erode iterations", 1, 20, 3)
         sliders.setupTrackBar2(ocvb, "Erode kernel size", 1, 21, 3)

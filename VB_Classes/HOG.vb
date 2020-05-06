@@ -4,7 +4,9 @@ Public Class HOG_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim staticImage As cv.Mat
     Dim staticImageProcessed As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Threshold", 0, 100, 0)
         sliders.setupTrackBar2(ocvb, "Stride", 1, 100, 1)
         sliders.setupTrackBar3(ocvb, "Scale", 0, 2000, 300)

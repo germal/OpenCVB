@@ -29,7 +29,9 @@ Public Class VTK_Basics : Implements IDisposable
     Public zFar As Single = 10.0
     Public vtkTitle As String = "VTK_Data"
     Public vtkPresent As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         If ocvb.parms.vtkDirectory.Length > 0 Then vtkPresent = True
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
         If fileinfo.Exists = False Then vtkPresent = False
@@ -125,21 +127,23 @@ Public Class VTK_Histogram3D : Implements IDisposable
     Dim mats As Mat_4to1
     Dim random As Random_NormalDist
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Random Number Stdev", 0, 255, 10)
         sliders.setupTrackBar2(ocvb, "Hist 3D bins", 1, 100, 32)
         sliders.setupTrackBar3(ocvb, "Hist 3D bin Threshold X1000000", 10, 100, 20)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        mats = New Mat_4to1(ocvb)
+        mats = New Mat_4to1(ocvb, "VTK_Histogram3D")
         mats.externalUse = True
 
         ocvb.label2 = "Input to VTK plot"
 
-        vtk = New VTK_Basics(ocvb)
+        vtk = New VTK_Basics(ocvb, "VTK_Histogram3D")
         vtk.usingDepthAndRGB = False
 
-        random = New Random_NormalDist(ocvb)
+        random = New Random_NormalDist(ocvb, "VTK_Histogram3D")
         random.externalUse = True
         ocvb.desc = "Create the test pattern and send it to VTK for 3D display."
     End Sub

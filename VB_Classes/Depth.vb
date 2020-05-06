@@ -3,8 +3,10 @@ Imports System.Runtime.InteropServices
 Public Class Depth_WorldXYZ_MT : Implements IDisposable
     Dim grid As Thread_Grid
     Public xyzFrame As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        grid = New Thread_Grid(ocvb, "Depth_WorldXYZ_MT")
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
         xyzFrame = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32FC3)
@@ -20,7 +22,7 @@ Public Class Depth_WorldXYZ_MT : Implements IDisposable
             Dim xy As New cv.Point3f
             For xy.Y = roi.Y To roi.Y + roi.Height - 1
                 For xy.X = roi.X To roi.X + roi.Width - 1
-                    xy.Z = depth32f.Get(of UInt16)(xy.Y, xy.X)
+                    xy.Z = depth32f.Get(Of UInt16)(xy.Y, xy.X)
                     If xy.Z <> 0 Then
                         Dim w = getWorldCoordinatesD(ocvb, xy)
                         xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, w)
@@ -39,8 +41,10 @@ End Class
 
 Public Class Depth_Median : Implements IDisposable
     Dim median As Math_Median_CDF
-    Public Sub New(ocvb As AlgorithmData)
-        median = New Math_Median_CDF(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        median = New Math_Median_CDF(ocvb, "Depth_Median")
         median.src = New cv.Mat
         median.rangeMax = 10000
         median.rangeMin = 1 ' ignore depth of zero as it is not known.
@@ -77,7 +81,9 @@ End Class
 
 Public Class Depth_Flatland : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Region Count", 1, 250, 10)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -99,7 +105,9 @@ End Class
 
 
 Public Class Depth_FirstLastDistance : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Monitor the first and last depth distances"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -125,11 +133,13 @@ End Class
 Public Class Depth_HolesRect : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim shadow As Depth_Holes
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "shadowRect Min Size", 1, 20000, 2000)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        shadow = New Depth_Holes(ocvb)
+        shadow = New Depth_Holes(ocvb, "Depth_HolesRect")
         shadow.externalUse = True
 
         ocvb.desc = "Identify the minimum rectangles of contours of the depth shadow"
@@ -164,8 +174,10 @@ End Class
 
 Public Class Depth_Foreground : Implements IDisposable
     Public trim As Depth_InRange
-    Public Sub New(ocvb As AlgorithmData)
-        trim = New Depth_InRange(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        trim = New Depth_InRange(ocvb, "Depth_Foreground")
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Use depth to find the top of the head and then meanshift to the face."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -178,7 +190,7 @@ Public Class Depth_Foreground : Implements IDisposable
         Dim blobLocation As New List(Of cv.Point)
         For y = 0 To gray.Height - 1
             For x = 0 To gray.Width - 1
-                Dim nextByte = gray.Get(of Byte)(y, x)
+                Dim nextByte = gray.Get(Of Byte)(y, x)
                 If nextByte <> 0 Then
                     Dim count = gray.FloodFill(New cv.Point(x, y), 0)
                     If count > 10 Then
@@ -222,8 +234,10 @@ End Class
 Public Class Depth_FlatData : Implements IDisposable
     Dim shadow As Depth_Holes
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
-        shadow = New Depth_Holes(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        shadow = New Depth_Holes(ocvb, "Depth_FlatData")
 
         sliders.setupTrackBar1(ocvb, "FlatData Region Count", 1, 250, 200)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -261,8 +275,10 @@ Public Class Depth_FlatBackground : Implements IDisposable
     Dim shadow As Depth_Holes
     Dim sliders As New OptionsSliders
     Public dst As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
-        shadow = New Depth_Holes(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        shadow = New Depth_Holes(ocvb, "Depth_FlatBackground")
         sliders.setupTrackBar1(ocvb, "FlatBackground Max Depth", 200, 10000, 2000)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -312,7 +328,9 @@ End Module
 ' Use the C++ version below of this algorithm - this is way too slow...
 Public Class Depth_WorldXYZ : Implements IDisposable
     Public xyzFrame As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         xyzFrame = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32FC3)
         ocvb.desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
     End Sub
@@ -321,7 +339,7 @@ Public Class Depth_WorldXYZ : Implements IDisposable
         Dim xy As New cv.Point3f
         For xy.Y = 0 To xyzFrame.Height - 1
             For xy.X = 0 To xyzFrame.Width - 1
-                xy.Z = depth32f.Get(of Single)(xy.Y, xy.X)
+                xy.Z = depth32f.Get(Of Single)(xy.Y, xy.X)
                 If xy.Z <> 0 Then
                     Dim w = getWorldCoordinatesD(ocvb, xy)
                     xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, w)
@@ -338,7 +356,9 @@ End Class
 Public Class Depth_WorldXYZ_CPP : Implements IDisposable
     Public pointCloud As cv.Mat
     Dim DepthXYZ As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.label1 = "xyzFrame is built"
         ocvb.desc = "Get the X, Y, Depth in the image coordinates (not the 3D image coordinates.)"
     End Sub
@@ -369,8 +389,10 @@ Public Class Depth_MeanStdev_MT : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim grid As Thread_Grid
     Dim meanSeries As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        grid = New Thread_Grid(ocvb, "Depth_MeanStdev_MT")
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 64
 
@@ -424,7 +446,7 @@ Public Class Depth_MeanStdev_MT : Implements IDisposable
             Dim minStdVal As Double, maxStdVal As Double
 
             Dim meanmask = meanValues.Threshold(1, maxDepth, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-            cv.Cv2.MinMaxLoc(meanValues, minVal, maxVal, minPt, maxPt, meanMask)
+            cv.Cv2.MinMaxLoc(meanValues, minVal, maxVal, minPt, maxPt, meanmask)
             Dim stdMask = stdValues.Threshold(0.001, maxDepth, cv.ThresholdTypes.Binary).ConvertScaleAbs() ' volatile region is x cm stdev.
             cv.Cv2.MinMaxLoc(stdValues, minStdVal, maxStdVal, minPt, maxPt, stdMask)
 
@@ -432,10 +454,10 @@ Public Class Depth_MeanStdev_MT : Implements IDisposable
             Sub(i)
                 Dim roi = grid.roiList(i)
                 ' this marks all the regions where the depth is volatile.
-                ocvb.result2(roi).SetTo(255 * (stdValues.Get(of Single)(i, 0) - minStdVal) / (maxStdVal - minStdVal))
+                ocvb.result2(roi).SetTo(255 * (stdValues.Get(Of Single)(i, 0) - minStdVal) / (maxStdVal - minStdVal))
                 ocvb.result2(roi).SetTo(0, outOfRangeMask(roi))
 
-                ocvb.result1(roi).SetTo(255 * (meanValues.Get(of Single)(i, 0) - minVal) / (maxVal - minVal))
+                ocvb.result1(roi).SetTo(255 * (meanValues.Get(Of Single)(i, 0) - minVal) / (maxVal - minVal))
                 ocvb.result1(roi).SetTo(0, outOfRangeMask(roi))
             End Sub)
             cv.Cv2.BitwiseOr(ocvb.result2, grid.gridMask, ocvb.result2)
@@ -455,17 +477,19 @@ Public Class Depth_MeanStdevPlot : Implements IDisposable
     Dim shadow As Depth_Holes
     Dim plot1 As Plot_OverTime
     Dim plot2 As Plot_OverTime
-    Public Sub New(ocvb As AlgorithmData)
-        shadow = New Depth_Holes(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        shadow = New Depth_Holes(ocvb, "Depth_MeanStdevPlot")
         shadow.externalUse = True
 
-        plot1 = New Plot_OverTime(ocvb)
+        plot1 = New Plot_OverTime(ocvb, "Depth_MeanStdevPlot")
         plot1.externalUse = True
         plot1.dst = ocvb.result1
         plot1.maxScale = 2000
         plot1.plotCount = 1
 
-        plot2 = New Plot_OverTime(ocvb)
+        plot2 = New Plot_OverTime(ocvb, "Depth_MeanStdevPlot")
         plot2.externalUse = True
         plot2.dst = ocvb.result2
         plot2.maxScale = 1000
@@ -503,8 +527,10 @@ End Class
 Public Class Depth_Uncertainty : Implements IDisposable
     Dim retina As Retina_Basics_CPP
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
-        retina = New Retina_Basics_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        retina = New Retina_Basics_CPP(ocvb, "Depth_Uncertainty")
         retina.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Uncertainty threshold", 1, 255, 100)
@@ -529,8 +555,10 @@ End Class
 
 Public Class Depth_Stable : Implements IDisposable
     Dim mog As BGSubtract_Basics_CPP
-    Public Sub New(ocvb As AlgorithmData)
-        mog = New BGSubtract_Basics_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        mog = New BGSubtract_Basics_CPP(ocvb, "Depth_Stable")
         mog.radio.check(1).Checked = True
         mog.externalUse = True
 
@@ -558,8 +586,10 @@ Public Class Depth_Palette : Implements IDisposable
     Public trim As Depth_InRange
     Dim customColorMap As New cv.Mat
     Dim depth As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
-        trim = New Depth_InRange(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        trim = New Depth_InRange(ocvb, "Depth_Palette")
         trim.externalUse = True
         trim.sliders.TrackBar2.Value = 5000
 
@@ -643,7 +673,9 @@ Public Class Depth_Colorizer_CPP : Implements IDisposable
     Public src As New cv.Mat
     Public externalUse As Boolean
     Dim dcPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         dcPtr = Depth_Colorizer_Open()
         ocvb.desc = "Display Depth image using C++ instead of VB.Net"
     End Sub
@@ -682,7 +714,9 @@ Public Class Depth_ManualTrim : Implements IDisposable
     Public sliders As New OptionsSliders
     Public externalUse As Boolean
     Public dst As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Min Depth", 200, 1000, 200)
         sliders.setupTrackBar2(ocvb, "Max Depth", 200, 10000, 1400)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -727,7 +761,9 @@ Public Class Depth_InRange : Implements IDisposable
     Public sliders As New OptionsSliders
     Public minDepth As Double
     Public maxDepth As Double
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "InRange Min Depth", 200, 1000, 200)
         sliders.setupTrackBar2(ocvb, "InRange Max Depth", 200, 10000, 1400)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -761,10 +797,12 @@ Public Class Depth_ColorizerFastFade_CPP : Implements IDisposable
     Public src As New cv.Mat
     Public externalUse As Boolean
     Dim dcPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         dcPtr = Depth_Colorizer2_Open()
 
-        trim = New Depth_InRange(ocvb)
+        trim = New Depth_InRange(ocvb, "Depth_ColorizerFastFade_CPP")
         trim.externalUse = True
 
         ocvb.label2 = "Mask from Depth_InRange"
@@ -803,7 +841,9 @@ End Class
 
 ' this algorithm is only intended to show how the depth can be colorized.  It is very slow.  Use the C++ version of this code nearby.
 Public Class Depth_ColorizerVB : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Colorize depth manually."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -853,12 +893,14 @@ Public Class Depth_ColorizerVB_MT : Implements IDisposable
     Dim grid As Thread_Grid
     Public src As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Min Depth", 0, 1000, 0)
         sliders.setupTrackBar2(ocvb, "Max Depth", 1001, 10000, 4000)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid(ocvb, "Depth_ColorizerVB_MT")
         grid.externalUse = True
 
         ocvb.desc = "Colorize depth manually with multi-threading."
@@ -925,12 +967,14 @@ Public Class Depth_Colorizer_MT : Implements IDisposable
     Dim grid As Thread_Grid
     Public src As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Min Depth", 100, 1000, 100)
         sliders.setupTrackBar2(ocvb, "Max Depth", 1001, 10000, 4000)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid(ocvb, "Depth_Colorizer_MT")
         grid.externalUse = True
 
         ocvb.desc = "Colorize normally uses CDF to stabilize the colors.  Just using sliders here - stabilized but not optimal range."
@@ -982,9 +1026,10 @@ Public Class Depth_LocalMinMax_MT : Implements IDisposable
     Public ptListY() As Single
     Public pointList() As cv.Point2f
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        ocvb.callerName = "Depth_LocalMinMax_MT"
-        grid = New Thread_Grid(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        grid = New Thread_Grid(ocvb, "Depth_LocalMinMax_MT")
         grid.externalUse = True
 
         ocvb.label1 = "Red is min distance"
@@ -1043,8 +1088,10 @@ End Class
 Public Class Depth_LocalMinMax_Kalman_MT : Implements IDisposable
     Dim minmax As Depth_LocalMinMax_MT
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        minmax = New Depth_LocalMinMax_MT(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        minmax = New Depth_LocalMinMax_MT(ocvb, "Depth_LocalMinMax_Kalman_MT")
         minmax.externalUse = True
         minmax.grid.sliders.TrackBar1.Value = 32
         minmax.grid.sliders.TrackBar2.Value = 32
@@ -1058,7 +1105,7 @@ Public Class Depth_LocalMinMax_Kalman_MT : Implements IDisposable
 
         If minmax.grid.roiList.Count <> saveCount Then
             If kalman IsNot Nothing Then kalman.Dispose()
-            kalman = New Kalman_Basics(ocvb)
+            kalman = New Kalman_Basics(ocvb, "Depth_LocalMinMax_Kalman_MT")
             ReDim kalman.src(minmax.grid.roiList.Count - 1)
             saveCount = kalman.src.Count
             kalman.externalUse = True
@@ -1102,7 +1149,9 @@ Public Class Depth_Decreasing : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public externaluse As Boolean
     Public Increasing As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Threshold in millimeters", 0, 1000, 8)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -1135,8 +1184,10 @@ End Class
 
 Public Class Depth_Increasing : Implements IDisposable
     Dim depth As Depth_Decreasing
-    Public Sub New(ocvb As AlgorithmData)
-        depth = New Depth_Decreasing(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        depth = New Depth_Decreasing(ocvb, "Depth_Increasing")
         depth.externaluse = True
         depth.Increasing = True
         ocvb.desc = "Identify where depth is increasing - retreating from the camera."
@@ -1158,8 +1209,10 @@ End Class
 
 Public Class Depth_Punch : Implements IDisposable
     Dim depth As Depth_Decreasing
-    Public Sub New(ocvb As AlgorithmData)
-        depth = New Depth_Decreasing(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        depth = New Depth_Decreasing(ocvb, "Depth_Punch")
         depth.externaluse = True
         ocvb.desc = "Identify the largest blob in the depth decreasing output"
     End Sub
@@ -1178,11 +1231,13 @@ End Class
 Public Class Depth_ColorMap : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim Palette As Palette_ColorMap
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Depth ColorMap Alpha X100", 1, 100, 3)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        Palette = New Palette_ColorMap(ocvb)
+        Palette = New Palette_ColorMap(ocvb, "Depth_ColorMap")
         Palette.externalUse = True
         ocvb.desc = "Display the depth as a color map"
     End Sub
@@ -1205,7 +1260,9 @@ Public Class Depth_Holes : Implements IDisposable
     Public externalUse = False
     Dim element As New cv.Mat
     Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Amount of dilation around depth holes", 1, 10, 1)
         If ocvb.parms.ShowOptions Then sliders.Show()
 

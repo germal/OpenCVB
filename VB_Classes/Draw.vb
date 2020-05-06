@@ -16,20 +16,22 @@ Public Class Draw_rectangles : Implements IDisposable
     Public sliders As New OptionsSliders
     Public updateFrequency = 30
     Public drawRotatedRectangles As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Rectangle Count", 1, 255, 3)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Draw the requested number of rotated rectangles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency = 0 Then
-            ocvb.result1.SetTo(cv.scalar.white)
+            ocvb.result1.SetTo(cv.Scalar.White)
             For i = 0 To sliders.TrackBar1.Value - 1
-                Dim nPoint = New cv.Point2f(ocvb.ms_rng.next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
-                Dim width = ocvb.ms_rng.next(0, ocvb.color.Cols - nPoint.X - 1)
-                Dim height = ocvb.ms_rng.next(0, ocvb.color.Rows - nPoint.Y - 1)
-                Dim eSize = New cv.Size2f(CSng(ocvb.ms_rng.next(0, ocvb.color.Cols - nPoint.X - 1)), CSng(ocvb.ms_rng.next(0, ocvb.color.Rows - nPoint.Y - 1)))
-                Dim angle = 180.0F * CSng(ocvb.ms_rng.next(0, 1000) / 1000.0F)
+                Dim nPoint = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
+                Dim width = ocvb.ms_rng.Next(0, ocvb.color.Cols - nPoint.X - 1)
+                Dim height = ocvb.ms_rng.Next(0, ocvb.color.Rows - nPoint.Y - 1)
+                Dim eSize = New cv.Size2f(CSng(ocvb.ms_rng.Next(0, ocvb.color.Cols - nPoint.X - 1)), CSng(ocvb.ms_rng.Next(0, ocvb.color.Rows - nPoint.Y - 1)))
+                Dim angle = 180.0F * CSng(ocvb.ms_rng.Next(0, 1000) / 1000.0F)
                 Dim rotatedRect = New cv.RotatedRect(nPoint, eSize, angle)
 
                 Dim nextColor = New cv.Scalar(ocvb.rColors(i).Item0, ocvb.rColors(i).Item1, ocvb.rColors(i).Item2)
@@ -53,7 +55,9 @@ Public Class Draw_Noise : Implements IDisposable
     Public maxNoiseWidth As Int32 = 3
     Public addRandomColor As Boolean
     Public noiseMask As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Noise Count", 1, 1000, 100)
         sliders.setupTrackBar2(ocvb, "Noise Width", 1, 10, 3)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -64,12 +68,12 @@ Public Class Draw_Noise : Implements IDisposable
         ocvb.color.CopyTo(ocvb.result1)
         noiseMask = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1).SetTo(0)
         For n = 0 To sliders.TrackBar1.Value
-            Dim i = ocvb.ms_rng.next(0, ocvb.color.Cols - 1)
-            Dim j = ocvb.ms_rng.next(0, ocvb.color.Rows - 1)
+            Dim i = ocvb.ms_rng.Next(0, ocvb.color.Cols - 1)
+            Dim j = ocvb.ms_rng.Next(0, ocvb.color.Rows - 1)
             Dim center = New cv.Point2f(i, j)
-            Dim c = New cv.Scalar(ocvb.ms_rng.next(0, 255), ocvb.ms_rng.next(0, 255), ocvb.ms_rng.next(0, 255))
+            Dim c = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
             If addRandomColor = False Then c = cv.Scalar.Black
-            Dim noiseWidth = ocvb.ms_rng.next(1, maxNoiseWidth)
+            Dim noiseWidth = ocvb.ms_rng.Next(1, maxNoiseWidth)
             ocvb.result1.Circle(center, noiseWidth, c, -1, cv.LineTypes.AntiAlias)
             noiseMask.Circle(center, noiseWidth, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
@@ -83,8 +87,10 @@ End Class
 
 Public Class Draw_rotatedRectangles : Implements IDisposable
     Public rect As Draw_rectangles
-    Public Sub New(ocvb As AlgorithmData)
-        rect = New Draw_rectangles(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        rect = New Draw_rectangles(ocvb, "Draw_rotatedRectangles")
         rect.drawRotatedRectangles = True
         ocvb.desc = "Draw the requested number of rectangles."
     End Sub
@@ -101,7 +107,9 @@ End Class
 Public Class Draw_Ellipses : Implements IDisposable
     Public sliders As New OptionsSliders
     Public updateFrequency = 30
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Ellipse Count", 1, 255, 3)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Draw the requested number of ellipses."
@@ -110,9 +118,9 @@ Public Class Draw_Ellipses : Implements IDisposable
         If ocvb.frameCount Mod updateFrequency = 0 Then
             ocvb.result1.SetTo(cv.Scalar.White)
             For i = 0 To sliders.TrackBar1.Value - 1
-                Dim nPoint = New cv.Point2f(ocvb.ms_rng.next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
-                Dim eSize = New cv.Size2f(CSng(ocvb.ms_rng.next(0, ocvb.color.Cols - nPoint.X - 1)), CSng(ocvb.ms_rng.next(0, ocvb.color.Rows - nPoint.Y - 1)))
-                Dim angle = 180.0F * CSng(ocvb.ms_rng.next(0, 1000) / 1000.0F)
+                Dim nPoint = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
+                Dim eSize = New cv.Size2f(CSng(ocvb.ms_rng.Next(0, ocvb.color.Cols - nPoint.X - 1)), CSng(ocvb.ms_rng.Next(0, ocvb.color.Rows - nPoint.Y - 1)))
+                Dim angle = 180.0F * CSng(ocvb.ms_rng.Next(0, 1000) / 1000.0F)
                 Dim nextColor = New cv.Scalar(ocvb.rColors(i).Item0, ocvb.rColors(i).Item1, ocvb.rColors(i).Item2)
                 ocvb.result1.Ellipse(New cv.RotatedRect(nPoint, eSize, angle), nextColor, -1,)
             Next
@@ -128,7 +136,9 @@ End Class
 Public Class Draw_Circles : Implements IDisposable
     Public sliders As New OptionsSliders
     Public updateFrequency = 30
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Circle Count", 1, 255, 3)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Draw the requested number of circles."
@@ -137,8 +147,8 @@ Public Class Draw_Circles : Implements IDisposable
         If ocvb.frameCount Mod updateFrequency = 0 Then
             ocvb.result1.SetTo(cv.Scalar.White)
             For i = 0 To sliders.TrackBar1.Value - 1
-                Dim nPoint = New cv.Point2f(ocvb.ms_rng.next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
-                Dim radius = ocvb.ms_rng.next(10, 10 + ocvb.ms_rng.next(ocvb.color.Cols / 4))
+                Dim nPoint = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
+                Dim radius = ocvb.ms_rng.Next(10, 10 + ocvb.ms_rng.Next(ocvb.color.Cols / 4))
                 Dim nextColor = New cv.Scalar(ocvb.rColors(i).Item0, ocvb.rColors(i).Item1, ocvb.rColors(i).Item2)
                 ocvb.result1.Circle(nPoint, radius, nextColor, -1,)
             Next
@@ -154,7 +164,9 @@ End Class
 Public Class Draw_Line : Implements IDisposable
     Public sliders As New OptionsSliders
     Public updateFrequency = 30
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Line Count", 1, 255, 1)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Draw the requested number of Lines."
@@ -163,9 +175,9 @@ Public Class Draw_Line : Implements IDisposable
         If ocvb.frameCount Mod updateFrequency Then Exit Sub
         ocvb.result1.SetTo(cv.Scalar.White)
         For i = 0 To sliders.TrackBar1.Value - 1
-            Dim nPoint1 = New cv.Point2f(ocvb.ms_rng.next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
-            Dim nPoint2 = New cv.Point2f(ocvb.ms_rng.next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
-            Dim thickness = ocvb.ms_rng.next(1, 10)
+            Dim nPoint1 = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
+            Dim nPoint2 = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
+            Dim thickness = ocvb.ms_rng.Next(1, 10)
             Dim nextColor = New cv.Scalar(ocvb.rColors(i).Item0, ocvb.rColors(i).Item1, ocvb.rColors(i).Item2)
             ocvb.result1.Line(nPoint1, nPoint2, nextColor, thickness, cv.LineTypes.AntiAlias)
         Next
@@ -181,7 +193,9 @@ Public Class Draw_Polygon : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Public updateFrequency = 30
     Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Poly Count", 1, 255, 1)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Draw Polygon figures"
@@ -241,7 +255,9 @@ End Class
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 Public Class Draw_RngImage : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Use RNG to draw the same set of shapes every time"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -285,7 +301,9 @@ End Class
 Public Class Draw_SymmetricalShapes : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim check As New OptionsCheckbox
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Number of points", 200, 1000, 500)
         sliders.setupTrackBar2(ocvb, "Radius 1", 1, ocvb.color.Height / 2, ocvb.color.Height / 4)
         sliders.setupTrackBar3(ocvb, "Radius 2", 1, ocvb.color.Height / 2, ocvb.color.Height / 8)

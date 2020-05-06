@@ -5,7 +5,9 @@ Public Class SVM_Options : Implements IDisposable
     Public radio1 As New OptionsRadioButtons
     Public kernelType = cv.ML.SVM.KernelTypes.Rbf
     Public SVMType = cv.ML.SVM.Types.CSvc
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "SampleCount", 10, 1000, 500)
         sliders.setupTrackBar2(ocvb, "Granularity", 1, 50, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -55,8 +57,10 @@ End Class
 
 Public Class SVM_Basics : Implements IDisposable
     Dim svmOptions As SVM_Options
-    Public Sub New(ocvb As AlgorithmData)
-        svmOptions = New SVM_Options(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        svmOptions = New SVM_Options(ocvb, "SVM_Basics")
         ocvb.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
         ocvb.label1 = "SVM_Basics input data"
         ocvb.label2 = "Results - line is ground truth"
@@ -72,8 +76,8 @@ Public Class SVM_Basics : Implements IDisposable
         Dim points(svmOptions.sliders.TrackBar1.Value) As cv.Point2f
         Dim responses(points.Length - 1) As Int32
         For i = 0 To points.Length - 1
-            Dim x = ocvb.ms_rng.next(0, ocvb.color.Height - 1)
-            Dim y = ocvb.ms_rng.next(0, ocvb.color.Height - 1)
+            Dim x = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
+            Dim y = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
             points(i) = New cv.Point2f(x, y)
             responses(i) = If(y > f(x), 1, 2)
         Next
@@ -138,9 +142,11 @@ End Class
 Public Class SVM_Basics_MT : Implements IDisposable
     Dim grid As Thread_Grid
     Dim svmOptions As SVM_Options
-    Public Sub New(ocvb As AlgorithmData)
-        svmOptions = New SVM_Options(ocvb)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        svmOptions = New SVM_Options(ocvb, "SVM_Basics_MT")
+        grid = New Thread_Grid(ocvb, "SVM_Basics_MT")
         grid.sliders.TrackBar1.Value = 100
         grid.sliders.TrackBar2.Value = 16
         grid.externalUse = True ' we don't need any results.
@@ -160,8 +166,8 @@ Public Class SVM_Basics_MT : Implements IDisposable
         Dim points(svmOptions.sliders.TrackBar1.Value) As cv.Point2f
         Dim responses(points.Length - 1) As Int32
         For i = 0 To points.Length - 1
-            Dim x = ocvb.ms_rng.next(0, ocvb.color.Height - 1)
-            Dim y = ocvb.ms_rng.next(0, ocvb.color.Height - 1)
+            Dim x = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
+            Dim y = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
             points(i) = New cv.Point2f(x, y)
             responses(i) = If(y > f(x), 1, 2)
         Next
@@ -233,8 +239,10 @@ End Class
 
 Public Class SVM_Simple : Implements IDisposable
     Dim svmOptions As SVM_Options
-    Public Sub New(ocvb As AlgorithmData)
-        svmOptions = New SVM_Options(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        svmOptions = New SVM_Options(ocvb, "SVM_Simple")
         svmOptions.sliders.TrackBar1.Value = 50 ' set the samplecount 
         svmOptions.radio.check(1).Checked = True
         ocvb.desc = "Use SVM to classify random points."

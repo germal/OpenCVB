@@ -2,12 +2,14 @@
 Public Class Moments_CentroidKalman : Implements IDisposable
     Dim foreground As kMeans_Depth_FG_BG
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        kalman = New Kalman_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        kalman = New Kalman_Basics(ocvb, "Moments_CentroidKalman")
         ReDim kalman.src(2 - 1) ' 2 elements - cv.point
         kalman.externalUse = True
 
-        foreground = New kMeans_Depth_FG_BG(ocvb)
+        foreground = New kMeans_Depth_FG_BG(ocvb, "Moments_CentroidKalman")
 
         ocvb.label1 = "Red dot = Kalman smoothed centroid"
         ocvb.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."

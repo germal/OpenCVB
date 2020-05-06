@@ -6,12 +6,14 @@ Public Class Entropy_Basics : Implements IDisposable
     Public src As cv.Mat
     Public externalUse As Boolean
     Public entropy As Single
-    Public Sub New(ocvb As AlgorithmData)
-        flow = New Font_FlowText(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        flow = New Font_FlowText(ocvb, "Entropy_Basics")
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
-        hist = New Histogram_Basics(ocvb)
+        hist = New Histogram_Basics(ocvb, "Entropy_Basics")
         hist.externalUse = True
 
         ocvb.desc = "Compute the entropy in an image - a measure of contrast(iness)"

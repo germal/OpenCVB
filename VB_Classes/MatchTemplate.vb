@@ -9,8 +9,10 @@ Public Class MatchTemplate_Basics : Implements IDisposable
     Public matchText As String = ""
     Public correlationMat As New cv.Mat
     Public reportFreq = 10 ' report the results every x number of iterations.
-    Public Sub New(ocvb As AlgorithmData)
-        flow = New Font_FlowText(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        flow = New Font_FlowText(ocvb, "MatchTemplate_Basics")
         flow.externalUse = True
         flow.result1or2 = RESULT2
 
@@ -69,12 +71,14 @@ End Class
 Public Class MatchTemplate_RowCorrelation : Implements IDisposable
     Dim corr As MatchTemplate_Basics
     Dim flow As Font_FlowText
-    Public Sub New(ocvb As AlgorithmData)
-        flow = New Font_FlowText(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        flow = New Font_FlowText(ocvb, "MatchTemplate_RowCorrelation")
         flow.externalUse = True
         flow.result1or2 = RESULT2
 
-        corr = New MatchTemplate_Basics(ocvb)
+        corr = New MatchTemplate_Basics(ocvb, "MatchTemplate_RowCorrelation")
         corr.externalUse = True
         corr.sliders.Visible = False
 
@@ -115,7 +119,9 @@ End Class
 
 Public Class MatchTemplate_DrawRect : Implements IDisposable
     Dim radio As New OptionsRadioButtons
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         radio.Setup(ocvb, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
@@ -167,13 +173,15 @@ Public Class MatchTemplate_BestTemplate_MT : Implements IDisposable
     Dim grid As Thread_Grid
     Dim entropies(0) As Entropy_Basics
     Dim match As MatchTemplate_DrawRect
-    Public Sub New(ocvb As AlgorithmData)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        grid = New Thread_Grid(ocvb, "MatchTemplate_BestTemplate_MT")
         grid.sliders.TrackBar1.Value = 128
         grid.sliders.TrackBar2.Value = 128
         grid.externalUse = True
 
-        match = New MatchTemplate_DrawRect(ocvb)
+        match = New MatchTemplate_DrawRect(ocvb, "MatchTemplate_BestTemplate_MT")
 
         ocvb.parms.ShowOptions = False ' we won't need the options...
 
@@ -188,7 +196,7 @@ Public Class MatchTemplate_BestTemplate_MT : Implements IDisposable
             If entropies.Length <> grid.roiList.Count Then
                 ReDim entropies(grid.roiList.Count - 1)
                 For i = 0 To entropies.Length - 1
-                    entropies(i) = New Entropy_Basics(ocvb)
+                    entropies(i) = New Entropy_Basics(ocvb, "MatchTemplate_BestTemplate_MT")
                     entropies(i).externalUse = True
                 Next
             End If

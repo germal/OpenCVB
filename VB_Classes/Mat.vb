@@ -1,6 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Mat_Repeat : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Use the repeat method to replicate data."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -17,8 +19,10 @@ End Class
 
 Public Class Mat_PointToMat : Implements IDisposable
     Dim mask As Random_Points
-    Public Sub New(ocvb As AlgorithmData)
-        mask = New Random_Points(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        mask = New Random_Points(ocvb, "Mat_PointToMat")
         ocvb.desc = "Convert pointf3 into a mat of points."
         ocvb.label1 = "Random_Points points (original)"
         ocvb.label2 = "Random_Points points after format change"
@@ -43,8 +47,10 @@ End Class
 
 Public Class Mat_MatToPoint : Implements IDisposable
     Dim mask As Random_Points
-    Public Sub New(ocvb As AlgorithmData)
-        mask = New Random_Points(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        mask = New Random_Points(ocvb, "Mat_MatToPoint")
         ocvb.desc = "Convert a mat into a vector of points."
         ocvb.label1 = "Reconstructed RGB Image"
     End Sub
@@ -71,7 +77,9 @@ End Class
 
 
 Public Class Mat_Transpose : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Transpose a Mat and show results."
         ocvb.label1 = "Color Image Transposed"
         ocvb.label2 = "Color Image Transposed Twice"
@@ -98,7 +106,9 @@ End Class
 
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/Mat/-/php-mat-class-examples.html#0x95f170f4714e3258c220a78eacceeee99591440b9885a2997bbbc6b3aebdcf1c-19,,37,
 Public Class Mat_Tricks : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Show some Mat tricks."
         ocvb.label1 = "Image squeezed into square Mat"
         ocvb.label2 = "Mat transposed around the diagonal"
@@ -131,7 +141,9 @@ Public Class Mat_4to1 : Implements IDisposable
     Public externalUse As Boolean
     Public noLines As Boolean ' if they want lines or not...
     Public dst As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.label1 = ""
         mat1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
@@ -178,7 +190,9 @@ Public Class Mat_2to1 : Implements IDisposable
     Public externalUse As Boolean
     Public noLines As Boolean ' if they want lines or not...
     Public dst As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.label1 = ""
         mat1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
@@ -217,8 +231,10 @@ Public Class Mat_ImageXYZ_MT : Implements IDisposable
     Public xyDepth As cv.Mat
     Public xyzPlanes() As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        grid = New Thread_Grid(ocvb, "Mat_ImageXYZ_MT")
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
 
@@ -255,7 +271,9 @@ End Class
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/MatExpr/-/php-matexpr-class-examples.html
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/MatOperations.cs
 Public Class Mat_RowColRange : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.label1 = "BitwiseNot of RowRange and ColRange"
         ocvb.desc = "Perform operation on a range of cols and/or Rows."
     End Sub
@@ -275,7 +293,9 @@ End Class
 
 
 Public Class Mat_Managed : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "There is a limited ability to use Mat data in Managed code directly."
         ocvb.label1 = "Color change is in the managed cv.vec3b array"
     End Sub

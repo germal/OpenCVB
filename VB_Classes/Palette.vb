@@ -4,10 +4,12 @@ Imports System.IO
 
 Public Class Palette_Color : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "blue", 0, 255, ocvb.ms_rng.next(0, 255))
-        sliders.setupTrackBar2(ocvb, "green", 0, 255, ocvb.ms_rng.next(0, 255))
-        sliders.setupTrackBar3(ocvb, "red", 0, 255, ocvb.ms_rng.next(0, 255))
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        sliders.setupTrackBar1(ocvb, "blue", 0, 255, ocvb.ms_rng.Next(0, 255))
+        sliders.setupTrackBar2(ocvb, "green", 0, 255, ocvb.ms_rng.Next(0, 255))
+        sliders.setupTrackBar3(ocvb, "red", 0, 255, ocvb.ms_rng.Next(0, 255))
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Define a color using sliders."
     End Sub
@@ -31,7 +33,9 @@ End Class
 Public Class Palette_LinearPolar : Implements IDisposable
     Dim radio As New OptionsRadioButtons
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Use LinearPolar to create gradient image"
         SetInterpolationRadioButtons(ocvb, radio, "LinearPolar")
 
@@ -97,7 +101,7 @@ Module Palette_Custom_Module
         Next
         Dim result = New cv.Mat(1, width, cv.MatType.CV_8UC3)
         For i = 0 To width - 1
-            result.Col(i).SetTo(gradientColors.Get(of cv.Scalar)(0, i))
+            result.Col(i).SetTo(gradientColors.Get(Of cv.Scalar)(0, i))
         Next
         Return result
     End Function
@@ -109,7 +113,9 @@ End Module
 
 Public Class Palette_Map : Implements IDisposable
     Dim sliders As OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders = New OptionsSliders
         sliders.setupTrackBar1(ocvb, "inRange offset", 1, 100, 10)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -135,7 +141,7 @@ Public Class Palette_Map : Implements IDisposable
         Dim black As New cv.Vec3b(0, 0, 0)
         For y = 0 To ocvb.result1.Height - 1
             For x = 0 To ocvb.result1.Width - 1
-                Dim nextVec = ocvb.result1.Get(of cv.Vec3b)(y, x)
+                Dim nextVec = ocvb.result1.Get(Of cv.Vec3b)(y, x)
                 If nextVec <> black Then
                     If palette.ContainsKey(nextVec) Then
                         palette(nextVec) = palette(nextVec) + 1
@@ -191,11 +197,13 @@ Public Class Palette_DrawTest : Implements IDisposable
     Dim draw As Draw_RngImage
     Public src As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        palette = New Palette_ColorMap(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        palette = New Palette_ColorMap(ocvb, "Palette_DrawTest")
         palette.externalUse = True
 
-        draw = New Draw_RngImage(ocvb)
+        draw = New Draw_RngImage(ocvb, "Palette_DrawTest")
         palette.src = ocvb.result1
 
         ocvb.desc = "Experiment with palette using a drawn image"
@@ -219,7 +227,9 @@ Public Class Palette_Gradient : Implements IDisposable
     Public color1 As cv.Scalar
     Public color2 As cv.Scalar
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.label2 = "From and To colors"
         ocvb.desc = "Create gradient image"
     End Sub
@@ -241,7 +251,7 @@ Public Class Palette_Gradient : Implements IDisposable
             Next
 
             For i = 0 To ocvb.result1.Rows - 1
-                ocvb.result1.Row(i).SetTo(gradientColors.Get(of cv.Scalar)(i))
+                ocvb.result1.Row(i).SetTo(gradientColors.Get(Of cv.Scalar)(i))
             Next
         End If
     End Sub
@@ -257,7 +267,9 @@ Public Class Palette_BuildGradientColorMap : Implements IDisposable
     Public sliders As New OptionsSliders
     Public gradientColorMap As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Number of color transitions (Used only with Random)", 1, 30, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -300,8 +312,10 @@ Public Class Palette_ColorMap : Implements IDisposable
     Public externalUse As Boolean
     Public radio As New OptionsRadioButtons
     Public gradMap As Palette_BuildGradientColorMap
-    Public Sub New(ocvb As AlgorithmData)
-        gradMap = New Palette_BuildGradientColorMap(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        gradMap = New Palette_BuildGradientColorMap(ocvb, "Palette_ColorMap")
         gradMap.externalUse = True
 
         radio.Setup(ocvb, 21)
@@ -366,8 +380,10 @@ End Class
 Public Class Palette_DepthColorMap : Implements IDisposable
     Public gradientColorMap As New cv.Mat
     Dim holes As Depth_Holes
-    Public Sub New(ocvb As AlgorithmData)
-        holes = New Depth_Holes(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        holes = New Depth_Holes(ocvb, "Palette_DepthColorMap")
         holes.externalUse = True
 
         ocvb.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
@@ -407,7 +423,9 @@ End Class
 
 
 Public Class Palette_DepthColorMapJet : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Use the Jet colormap to display depth. "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

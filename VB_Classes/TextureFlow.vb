@@ -3,7 +3,9 @@ Public Class TextureFlow_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public src As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Texture Flow Delta", 2, 100, 12)
         sliders.setupTrackBar2(ocvb, "Texture Eigen BlockSize", 1, 100, 20)
         sliders.setupTrackBar3(ocvb, "Texture Eigen Ksize", 1, 15, 1)
@@ -23,7 +25,7 @@ Public Class TextureFlow_Basics : Implements IDisposable
         Dim d2 = TFdelta / 2
         For y = d2 To ocvb.result1.Height - 1 Step d2
             For x = d2 To ocvb.result1.Width - 1 Step d2
-                Dim delta = New cv.Point2f(split(4).Get(of Single)(y, x), split(5).Get(of Single)(y, x)) * TFdelta
+                Dim delta = New cv.Point2f(split(4).Get(Of Single)(y, x), split(5).Get(Of Single)(y, x)) * TFdelta
                 Dim p1 = New cv.Point(x - delta.X, y - delta.Y)
                 Dim p2 = New cv.Point(x + delta.X, y + delta.Y)
                 ocvb.result1.Line(p1, p2, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
@@ -40,8 +42,10 @@ End Class
 
 Public Class TextureFlow_Depth : Implements IDisposable
     Dim texture As TextureFlow_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        texture = New TextureFlow_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        texture = New TextureFlow_Basics(ocvb, "TextureFlow_Depth")
         texture.externalUse = True
         ocvb.desc = "Display texture flow in the depth data"
     End Sub

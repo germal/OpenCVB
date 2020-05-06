@@ -1,7 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Math_Subtract : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Red", 0, 255, 255)
         sliders.setupTrackBar2(ocvb, "Green", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, "Blue", 0, 255, 255)
@@ -32,9 +34,9 @@ Module Math_Functions
         Dim halfPixels = totalPixels / 2
 
         Dim median As Double
-        Dim cdfVal As Double = hist.Get(of Single)(0)
+        Dim cdfVal As Double = hist.Get(Of Single)(0)
         For i = 1 To bins - 1
-            cdfVal += hist.Get(of Single)(i)
+            cdfVal += hist.Get(Of Single)(i)
             If cdfVal > halfPixels Then
                 median = i * (rangeMax - rangeMin) / bins
                 Exit For
@@ -49,13 +51,15 @@ End Module
 Public Class Math_Median_CDF : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public src As cv.Mat
-    Dim dst As cv.mat
+    Dim dst As cv.Mat
     Public medianVal As Double
     Public rangeMin As Integer = 0
     Public rangeMax As Integer = 255
     Public externalUse As Boolean
     Public bins As Int32 = 10
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Histogram Bins", 4, 1000, 100)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -93,8 +97,10 @@ End Class
 
 Public Class Math_DepthMeanStdev : Implements IDisposable
     Dim minMax As Depth_Stable
-    Public Sub New(ocvb As AlgorithmData)
-        minMax = New Depth_Stable(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        minMax = New Depth_Stable(ocvb, "Math_DepthMeanStdev")
         ocvb.desc = "This algorithm shows that just using the max depth at each pixel does not improve depth!  Mean and stdev don't change."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -119,12 +125,14 @@ End Class
 Public Class Math_RGBCorrelation : Implements IDisposable
     Dim flow As Font_FlowText
     Dim corr As MatchTemplate_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        flow = New Font_FlowText(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        flow = New Font_FlowText(ocvb, "Math_RGBCorrelation")
         flow.externalUse = True
         flow.result1or2 = RESULT2
 
-        corr = New MatchTemplate_Basics(ocvb)
+        corr = New MatchTemplate_Basics(ocvb, "Math_RGBCorrelation")
         corr.externalUse = True
         corr.reportFreq = 1
 

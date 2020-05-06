@@ -3,7 +3,9 @@
 Public Class FAST_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public keypoints() As cv.KeyPoint
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Threshold", 0, 200, 15)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
@@ -30,12 +32,14 @@ End Class
 Public Class FAST_Centroid : Implements IDisposable
     Dim fast As FAST_Basics
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        kalman = New Kalman_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        kalman = New Kalman_Basics(ocvb, "FAST_Centroid")
         ReDim kalman.src(1) ' 2 elements - cv.point
         kalman.externalUse = True
 
-        fast = New FAST_Basics(ocvb)
+        fast = New FAST_Basics(ocvb, "FAST_Centroid")
         ocvb.desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

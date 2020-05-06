@@ -60,14 +60,16 @@ Public Class ML_FillRGBDepth_MT : Implements IDisposable
     Dim shadow As Depth_Holes
     Dim grid As Thread_Grid
     Dim colorizer As Depth_Colorizer_CPP
-    Public Sub New(ocvb As AlgorithmData)
-        colorizer = New Depth_Colorizer_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        colorizer = New Depth_Colorizer_CPP(ocvb, "ML_FillRGBDepth_MT")
         colorizer.externalUse = True
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid(ocvb, "ML_FillRGBDepth_MT")
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
         grid.externalUse = True ' we don't need any results.
-        shadow = New Depth_Holes(ocvb)
+        shadow = New Depth_Holes(ocvb, "ML_FillRGBDepth_MT")
         ocvb.label1 = "ML filled shadow"
         ocvb.label2 = ""
         ocvb.desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
@@ -99,15 +101,17 @@ Public Class ML_FillRGBDepth : Implements IDisposable
     Dim shadow As Depth_Holes
     Dim sliders As New OptionsSliders
     Dim colorizer As Depth_Colorizer_CPP
-    Public Sub New(ocvb As AlgorithmData)
-        colorizer = New Depth_Colorizer_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        colorizer = New Depth_Colorizer_CPP(ocvb, "ML_FillRGBDepth")
         colorizer.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "ML Min Learn Count", 2, 100, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        shadow = New Depth_Holes(ocvb)
-        shadow.sliders.TrackBar1.value = 3
+        shadow = New Depth_Holes(ocvb, "ML_FillRGBDepth")
+        shadow.sliders.TrackBar1.Value = 3
 
         ocvb.label2 = "ML filled shadow"
         ocvb.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
@@ -135,18 +139,20 @@ Public Class ML_DepthFromColor_MT : Implements IDisposable
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
-        colorizer = New Depth_Colorizer_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        colorizer = New Depth_Colorizer_CPP(ocvb, "ML_DepthFromColor_MT")
         colorizer.externalUse = True
 
-        dilate = New DilateErode_Basics(ocvb)
+        dilate = New DilateErode_Basics(ocvb, "ML_DepthFromColor_MT")
         dilate.externalUse = True
         dilate.sliders.TrackBar2.Value = 2
 
         sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 500, 5000, 1000)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid(ocvb, "ML_DepthFromColor_MT")
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
         grid.externalUse = True
@@ -211,19 +217,21 @@ Public Class ML_DepthFromColor : Implements IDisposable
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
-        colorizer = New Depth_Colorizer_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        colorizer = New Depth_Colorizer_CPP(ocvb, "ML_DepthFromColor")
         colorizer.externalUse = True
 
-        mats = New Mat_4to1(ocvb)
+        mats = New Mat_4to1(ocvb, "ML_DepthFromColor")
         mats.externalUse = True
 
-        shadow = New Depth_Holes(ocvb)
+        shadow = New Depth_Holes(ocvb, "ML_DepthFromColor")
 
         sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 1000, 5000, 1500)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        resized = New Resize_Percentage(ocvb)
+        resized = New Resize_Percentage(ocvb, "ML_DepthFromColor")
         resized.externalUse = True
         resized.sliders.TrackBar1.Value = 2 ' 2% of the image.
 
@@ -298,19 +306,21 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
     Dim resized As Resize_Percentage
     Dim sliders As New OptionsSliders
     Dim colorizer As Depth_Colorizer_CPP
-    Public Sub New(ocvb As AlgorithmData)
-        colorizer = New Depth_Colorizer_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        colorizer = New Depth_Colorizer_CPP(ocvb, "ML_DepthFromXYColor")
         colorizer.externalUse = True
 
-        mats = New Mat_4to1(ocvb)
+        mats = New Mat_4to1(ocvb, "ML_DepthFromXYColor")
         mats.externalUse = True
 
-        shadow = New Depth_Holes(ocvb)
+        shadow = New Depth_Holes(ocvb, "ML_DepthFromXYColor")
 
         sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 1000, 5000, 1500)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        resized = New Resize_Percentage(ocvb)
+        resized = New Resize_Percentage(ocvb, "ML_DepthFromXYColor")
         resized.externalUse = True
         resized.sliders.TrackBar1.Value = 2
 
@@ -354,7 +364,7 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
         Dim learnInput As New cv.Mat(c.Rows, 6, cv.MatType.CV_32F, 0)
         For y = 0 To c.Rows - 1
             For x = 0 To c.Cols - 1
-                Dim v6 = New cv.Vec6f(c.Get(of Single)(y, x), c.Get(of Single)(y, x + 1), c.Get(of Single)(y, x + 2), x, y, 0)
+                Dim v6 = New cv.Vec6f(c.Get(Of Single)(y, x), c.Get(Of Single)(y, x + 1), c.Get(Of Single)(y, x + 2), x, y, 0)
                 learnInput.Set(Of cv.Vec6f)(y, x, v6)
             Next
         Next
@@ -368,7 +378,7 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
         Dim input As New cv.Mat(allC.Rows, 6, cv.MatType.CV_32F, 0)
         For y = 0 To allC.Rows - 1
             For x = 0 To allC.Cols - 1
-                Dim v6 = New cv.Vec6f(allC.Get(of Single)(y, x), allC.Get(of Single)(y, x + 1), allC.Get(of Single)(y, x + 2), x, y, 0)
+                Dim v6 = New cv.Vec6f(allC.Get(Of Single)(y, x), allC.Get(Of Single)(y, x + 1), allC.Get(Of Single)(y, x + 2), x, y, 0)
                 input.Set(Of cv.Vec6f)(y, x, v6)
             Next
         Next
@@ -402,18 +412,20 @@ Public Class ML_EdgeDepth : Implements IDisposable
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
-        colorizer = New Depth_Colorizer_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        colorizer = New Depth_Colorizer_CPP(ocvb, "ML_EdgeDepth")
         colorizer.externalUse = True
 
-        dilate = New DilateErode_Basics(ocvb)
+        dilate = New DilateErode_Basics(ocvb, "ML_EdgeDepth")
         dilate.externalUse = True
         dilate.sliders.TrackBar2.Value = 5
 
         sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 500, 5000, 1000)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid(ocvb, "ML_EdgeDepth")
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
         grid.externalUse = True

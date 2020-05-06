@@ -1,7 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Transform_Resize : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Resize Percent", 50, 1000, 50)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Resize an image based on the slider value."
@@ -34,7 +36,9 @@ Public Class Transform_Rotate : Implements IDisposable
     Public src As cv.Mat
     Public dst As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Angle", 0, 180, 30)
         sliders.setupTrackBar2(ocvb, "Scale Factor", 1, 100, 50)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -58,7 +62,9 @@ End Class
 
 Public Class Transform_Sort : Implements IDisposable
     Dim radio As New OptionsRadioButtons
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         radio.Setup(ocvb, 4)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
@@ -69,13 +75,13 @@ Public Class Transform_Sort : Implements IDisposable
         ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.bgr2gray)
+        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim sortOption = cv.SortFlags.Ascending
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
         If radio.check(2).Checked Then sortOption = cv.SortFlags.EveryColumn
         If radio.check(3).Checked Then sortOption = cv.SortFlags.EveryRow
         Dim sorted = gray.Sort(sortOption + cv.SortFlags.EveryColumn)
-        ocvb.result1 = sorted.CvtColor(cv.ColorConversionCodes.gray2bgr)
+        ocvb.result1 = sorted.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         radio.Dispose()
@@ -86,7 +92,9 @@ End Class
 
 Public Class Transform_SortReshape : Implements IDisposable
     Dim radio As New OptionsRadioButtons
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         radio.Setup(ocvb, 2)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True

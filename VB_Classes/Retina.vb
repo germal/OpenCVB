@@ -22,7 +22,9 @@ Public Class Retina_Basics_CPP : Implements IDisposable
     Dim startInfo As New ProcessStartInfo
     Public src As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Retina Sample Factor", 1, 10, 2)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -83,10 +85,17 @@ Public Class Retina_Basics_CPP : Implements IDisposable
     End Sub
 End Class
 
+
+
+
+
+
 Public Class Retina_Depth : Implements IDisposable
     Dim retina As Retina_Basics_CPP
-    Public Sub New(ocvb As AlgorithmData)
-        retina = New Retina_Basics_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        retina = New Retina_Basics_CPP(ocvb, "Retina_Depth")
         retina.externalUse = True
 
         ocvb.desc = "Use the bio-inspired retina algorithm with the depth data."

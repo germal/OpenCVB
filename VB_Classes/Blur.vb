@@ -2,7 +2,9 @@
 Imports CS_Classes
 Public Class Blur_Gaussian : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
@@ -21,7 +23,9 @@ End Class
 Public Class Blur_Gaussian_CS : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim CS_BlurGaussian As New CS_BlurGaussian
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
@@ -39,7 +43,9 @@ End Class
 Public Class Blur_Median_CS : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim CS_BlurMedian As New CS_BlurMedian
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
@@ -56,7 +62,9 @@ End Class
 
 Public Class Blur_Homogeneous : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Smooth each pixel with a kernel of 1's of different sizes."
@@ -76,7 +84,9 @@ End Class
 
 Public Class Blur_Median : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
@@ -97,7 +107,9 @@ Public Class Blur_Bilateral : Implements IDisposable
     Public sliders As New OptionsSliders
     Public src As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
@@ -120,14 +132,16 @@ Public Class Blur_PlusHistogram : Implements IDisposable
     Dim mat2to1 As Mat_2to1
     Dim blur As Blur_Bilateral
     Dim myhist As Histogram_EqualizeGray
-    Public Sub New(ocvb As AlgorithmData)
-        mat2to1 = New Mat_2to1(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        mat2to1 = New Mat_2to1(ocvb, "Blur_PlusHistogram")
         mat2to1.externalUse = True
 
-        blur = New Blur_Bilateral(ocvb)
+        blur = New Blur_Bilateral(ocvb, "Blur_PlusHistogram")
         blur.externalUse = True
 
-        myhist = New Histogram_EqualizeGray(ocvb)
+        myhist = New Histogram_EqualizeGray(ocvb, "Blur_PlusHistogram")
         myhist.externalUse = True
 
         ocvb.desc = "Compound algorithms Blur and Histogram"

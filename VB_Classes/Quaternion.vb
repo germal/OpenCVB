@@ -15,7 +15,9 @@ End Module
 Public Class Quaterion_Basics : Implements IDisposable
     Dim sliders1 As New OptionsSliders
     Dim sliders2 As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders1.setupTrackBar1(ocvb, "quaternion A.x X100", -100, 100, 0)
         sliders1.setupTrackBar2(ocvb, "quaternion A.y X100", -100, 100, 0)
         sliders1.setupTrackBar3(ocvb, "quaternion A.z X100", -100, 100, 0)
@@ -52,8 +54,10 @@ End Class
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/pose-predict
 Public Class Quaterion_IMUPrediction : Implements IDisposable
     Dim host As IMU_HostFrameTimes
-    Public Sub New(ocvb As AlgorithmData)
-        host = New IMU_HostFrameTimes(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        host = New IMU_HostFrameTimes(ocvb, "Quaterion_IMUPrediction")
         host.externalUse = True
 
         ocvb.label1 = "Quaternion_IMUPrediction"

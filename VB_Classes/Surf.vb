@@ -12,8 +12,10 @@ Public Class Surf_Basics_CS : Implements IDisposable
     Public srcRight As New cv.Mat
     Public dst As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        fisheye = New FishEye_Rectified(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        fisheye = New FishEye_Rectified(ocvb, "Surf_Basics_CS")
         fisheye.externalUse = True
 
         radio.Setup(ocvb, 2)
@@ -65,11 +67,13 @@ End Class
 Public Class Surf_Basics : Implements IDisposable
     Dim surf As Surf_Basics_CS
     Dim fisheye As FishEye_Rectified
-    Public Sub New(ocvb As AlgorithmData)
-        fisheye = New FishEye_Rectified(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        fisheye = New FishEye_Rectified(ocvb, "Surf_Basics")
         fisheye.externalUse = True
 
-        surf = New Surf_Basics_CS(ocvb)
+        surf = New Surf_Basics_CS(ocvb, "Surf_Basics")
         surf.externalUse = True
 
         ocvb.desc = "Use left and right views to match points in horizontal slices."
@@ -102,8 +106,10 @@ End Class
 Public Class Surf_DrawMatchManual_CS : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim surf As Surf_Basics_CS
-    Public Sub New(ocvb As AlgorithmData)
-        surf = New Surf_Basics_CS(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        surf = New Surf_Basics_CS(ocvb, "Surf_DrawMatchManual_CS")
         surf.CS_SurfBasics.drawPoints = False
 
         sliders.setupTrackBar1(ocvb, "Surf Vertical Range to Search", 0, 50, 10)

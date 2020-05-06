@@ -1,6 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Font_OpenCV : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Display different font options available in OpenCV"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -30,7 +32,9 @@ End Class
 
 Public Class Font_TrueType : Implements IDisposable
     Dim font As New OptionsFont
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         If ocvb.parms.ShowOptions Then font.Show()
         ocvb.desc = "Display different TrueType fonts"
     End Sub
@@ -56,7 +60,9 @@ Public Class Font_FlowText : Implements IDisposable
     Public msgs As New List(Of String)
     Public externalUse As Boolean
     Public result1or2 As Int32 = RESULT1
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

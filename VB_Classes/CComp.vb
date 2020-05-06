@@ -8,7 +8,9 @@ Public Class CComp_Basics : Implements IDisposable
     Public srcGray As New cv.Mat
     Public dstGray As New cv.Mat
 
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "CComp Threshold", 0, 255, 10)
         sliders.setupTrackBar2(ocvb, "CComp Min Area", 0, 10000, 500)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -20,7 +22,7 @@ Public Class CComp_Basics : Implements IDisposable
     Private Function findNonZeroPixel(src As cv.Mat, startPt As cv.Point) As cv.Point
         For y = src.Height / 4 To src.Height - 1
             For x = src.Width / 4 To src.Width - 1
-                If src.Get(of cv.Vec3b)(y, x) <> cv.Scalar.All(0) Then Return New cv.Point(x, y)
+                If src.Get(Of cv.Vec3b)(y, x) <> cv.Scalar.All(0) Then Return New cv.Point(x, y)
             Next
         Next
     End Function
@@ -74,10 +76,12 @@ Public Class CComp_EdgeMask : Implements IDisposable
     Dim edges As Edges_CannyAndShadow
     Public srcGray As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        edges = New Edges_CannyAndShadow(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        edges = New Edges_CannyAndShadow(ocvb, "CComp_EdgeMask")
 
-        ccomp = New CComp_Basics(ocvb)
+        ccomp = New CComp_Basics(ocvb, "CComp_EdgeMask")
         ccomp.externalUse = True
 
         ocvb.desc = "Isolate Color connected components after applying the Edge Mask"
@@ -106,7 +110,9 @@ End Class
 
 
 Public Class CComp_ColorDepth : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Color connected components based on their depth"
         ocvb.label1 = "Color by Mean Depth"
     End Sub
@@ -137,7 +143,9 @@ End Class
 Public Class CComp_Image : Implements IDisposable
     Public externalUse As Boolean
     Public srcGray As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Connect components throughout the image"
         ocvb.label1 = "Color Components with Mean Depth"
     End Sub
@@ -186,7 +194,9 @@ Public Class CComp_InRange_MT : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public externalUse As Boolean
     Public srcGray As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "InRange # of ranges", 2, 255, 15)
         sliders.setupTrackBar2(ocvb, "InRange Max Depth", 150, 10000, 3000)
         sliders.setupTrackBar3(ocvb, "InRange min Blob Size (in pixels)", 1, 2000, 500)
@@ -245,7 +255,9 @@ Public Class CComp_InRange : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public externalUse As Boolean
     Public srcGray As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "InRange # of ranges", 1, 20, 15)
         sliders.setupTrackBar2(ocvb, "InRange min Blob Size (in pixels)", 1, 2000, 500)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -294,7 +306,9 @@ End Class
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.ConnectedComponents.RenderBlobs(OpenCvSharp.Mat)/
 Public Class CComp_Shapes : Implements IDisposable
     Dim shapes As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         shapes = New cv.Mat(ocvb.parms.HomeDir + "Data/Shapes.png", cv.ImreadModes.Color)
         ocvb.label1 = "Largest connected component"
         ocvb.label2 = "RectView, LabelView, Binary, grayscale"

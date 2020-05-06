@@ -4,7 +4,9 @@ Imports System.Linq
 Public Class Polylines_IEnumerableExample : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim check As New OptionsCheckbox
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         check.Setup(ocvb, 2)
         check.Box(0).Text = "Polyline closed if checked"
         check.Box(0).Checked = True
@@ -17,7 +19,7 @@ Public Class Polylines_IEnumerableExample : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim points = Enumerable.Range(0, sliders.TrackBar1.Value).Select(Of cv.Point)(
             Function(i)
-                Return New cv.Point(CInt(ocvb.ms_rng.next(0, ocvb.color.Width)), CInt(ocvb.ms_rng.next(0, ocvb.color.Height)))
+                Return New cv.Point(CInt(ocvb.ms_rng.Next(0, ocvb.color.Width)), CInt(ocvb.ms_rng.Next(0, ocvb.color.Height)))
             End Function).ToList
         Dim pts As New List(Of List(Of cv.Point))
         pts.Add(points)
@@ -39,7 +41,9 @@ End Class
 ' VB.Net implementation of the browse example in OpenCV. 
 ' https://github.com/opencv/opencv/blob/master/samples/python/browse.py
 Public Class Polylines_Random : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Create a random procedural image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

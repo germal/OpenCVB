@@ -3,11 +3,13 @@ Public Class Object_Basics : Implements IDisposable
     Dim trim As Depth_InRange
     Dim ccomp As CComp_EdgeMask
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        trim = New Depth_InRange(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        trim = New Depth_InRange(ocvb, "Object_Basics")
         trim.externalUse = True
 
-        ccomp = New CComp_EdgeMask(ocvb)
+        ccomp = New CComp_EdgeMask(ocvb, "Object_Basics")
         ccomp.externalUse = True
 
         ocvb.desc = "Identify objects in the foreground."

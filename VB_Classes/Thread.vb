@@ -25,7 +25,9 @@ Public Class Thread_Grid : Implements IDisposable
             End If
         Next
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         src = ocvb.color
         sliders.setupTrackBar1(ocvb, "ThreadGrid Width", 5, src.Width, 32)
         sliders.setupTrackBar2(ocvb, "ThreadGrid Height", 5, src.Height, 32)

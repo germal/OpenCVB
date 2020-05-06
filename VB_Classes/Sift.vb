@@ -8,8 +8,10 @@ Public Class Sift_Basics_CS : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim CS_SiftBasics As New CS_SiftBasics
     Dim fisheye As FishEye_Rectified
-    Public Sub New(ocvb As AlgorithmData)
-        fisheye = New FishEye_Rectified(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        fisheye = New FishEye_Rectified(ocvb, "Sift_Basics_CS")
         fisheye.externalUse = True
 
         radio.Setup(ocvb, 2)
@@ -55,10 +57,12 @@ Public Class Sift_Basics_CS_MT : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim CS_SiftBasics As New CS_SiftBasics
     Dim fisheye As FishEye_Rectified
-    Public Sub New(ocvb As AlgorithmData)
-        fisheye = New FishEye_Rectified(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        fisheye = New FishEye_Rectified(ocvb, "Sift_Basics_CS_MT")
         fisheye.externalUse = True
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid(ocvb, "Sift_Basics_CS_MT")
         grid.sliders.TrackBar1.Value = ocvb.color.Width - 1 ' we are just taking horizontal slices of the image.
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 2
 

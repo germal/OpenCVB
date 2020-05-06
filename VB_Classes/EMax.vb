@@ -10,8 +10,11 @@ Public Class EMax_Basics : Implements IDisposable
     Public externalUse As Boolean
     Public grid As Thread_Grid
     Public regionCount As Int32
-    Public Sub New(ocvb As AlgorithmData)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        grid = New Thread_Grid(ocvb, "EMax_Basics")
+
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 2
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 2
 
@@ -83,8 +86,8 @@ Public Class EMax_Basics : Implements IDisposable
 
         ' draw the clustered samples
         For i = 0 To samples.Rows - 1
-            Dim pt = New cv.Point(Math.Round(samples.Get(of Single)(i, 0)), Math.Round(samples.Get(of Single)(i, 1)))
-            ocvb.result1.Circle(pt, 4, ocvb.rColors(labels.Get(of Int32)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
+            Dim pt = New cv.Point(Math.Round(samples.Get(Of Single)(i, 0)), Math.Round(samples.Get(Of Single)(i, 1)))
+            ocvb.result1.Circle(pt, 4, ocvb.rColors(labels.Get(Of Int32)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
         Next
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -114,8 +117,10 @@ End Module
 Public Class EMax_Basics_CPP : Implements IDisposable
     Dim emax As EMax_Basics
     Dim EMax_Basics As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
-        emax = New EMax_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        emax = New EMax_Basics(ocvb, "EMax_Basics_CPP")
         emax.externalUse = True
 
         EMax_Basics = EMax_Basics_Open()

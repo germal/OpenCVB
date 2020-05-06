@@ -4,7 +4,9 @@ Public Class MotionBlur_Basics : Implements IDisposable
     Public externalUse As Boolean = False
     Public kernel As cv.Mat
     Public showDirection As Boolean = True
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Motion Blur Length", 1, 101, 51)
         sliders.setupTrackBar2(ocvb, "Motion Blur Angle", -90, 90, 0)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -18,7 +20,7 @@ Public Class MotionBlur_Basics : Implements IDisposable
                 sliders.TrackBar2.Value = sliders.TrackBar2.Minimum
             End If
         End If
-            Dim kernelSize = sliders.TrackBar1.Value
+        Dim kernelSize = sliders.TrackBar1.Value
         kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F, 0)
         Dim theta = sliders.TrackBar2.Value / (180 / Math.PI)
         Dim pt1 = New cv.Point(0, (kernelSize - 1) / 2)
@@ -124,12 +126,14 @@ Public Class MotionBlur_Deblur : Implements IDisposable
         planes = complexIH.Split()
         Return planes(0)
     End Function
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Redo motion blurred image"
         If ocvb.parms.ShowOptions Then check.Show()
 
-        mblur = New MotionBlur_Basics(ocvb)
+        mblur = New MotionBlur_Basics(ocvb, "MotionBlur_Deblur")
         ResetBlurredImage(ocvb)
 
         sliders.setupTrackBar1(ocvb, "Deblur Restore Vector", 1, mblur.sliders.TrackBar1.Maximum, 10)

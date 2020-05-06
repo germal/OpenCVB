@@ -2,7 +2,9 @@
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Laplacian_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Laplacian Kernel size", 1, 21, 3)
         sliders.setupTrackBar2(ocvb, "Laplacian Scale", 0, 100, 100)
         sliders.setupTrackBar3(ocvb, "Laplacian Delta", 0, 1000, 0)
@@ -17,7 +19,7 @@ Public Class Laplacian_Basics : Implements IDisposable
         Dim ddepth = cv.MatType.CV_16S
 
         Dim src = ocvb.color.GaussianBlur(New cv.Size(kernelSize, kernelSize), 0, 0)
-        Dim srcGray = src.CvtColor(cv.ColorConversionCodes.bgr2gray)
+        Dim srcGray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim dst = srcGray.Laplacian(ddepth, kernelSize, scale, delta)
         ocvb.result1 = dst.ConvertScaleAbs()
         ocvb.label1 = "Laplacian Filter k = " + CStr(kernelSize)
@@ -32,7 +34,9 @@ End Class
 Public Class Laplacian_Blur : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim radio As New OptionsRadioButtons
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Laplacian Kernel size", 1, 21, 3)
         sliders.setupTrackBar2(ocvb, "Laplacian Scale", 0, 100, 100)
         sliders.setupTrackBar3(ocvb, "Laplacian Delta", 0, 1000, 0)

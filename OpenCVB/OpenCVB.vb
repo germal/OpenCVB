@@ -958,7 +958,7 @@ Public Class OpenCVB
         OpenCVB.ocvb.fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         OpenCVB.ocvb.fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
         If parms.activeAlgorithm = "VBTest_Interface" Then
-            OpenCVB.ocvb.parms.VBTestInterface = New VBTest.VBTest_Basics(OpenCVB.ocvb)
+            OpenCVB.ocvb.parms.VBTestInterface = New VBTest.VBTest_Basics(OpenCVB.ocvb, "OpenCVB")
         End If
         frameCount = 0 ' restart the count... 
         While 1

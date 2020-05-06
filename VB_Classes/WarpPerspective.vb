@@ -3,7 +3,9 @@
 ' http://opencvexamples.blogspot.com/
 Public Class WarpPerspective_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Warped Width", 0, ocvb.color.Cols, ocvb.color.Cols - 50)
         sliders.setupTrackBar2(ocvb, "Warped Height", 0, ocvb.color.Rows, ocvb.color.Rows - 50)
         sliders.setupTrackBar3(ocvb, "Warped Angle", 0, 360, 0)

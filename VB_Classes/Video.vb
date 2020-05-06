@@ -6,7 +6,9 @@ Public Class Video_Basics : Implements IDisposable
     Public srcVideo As String
     Dim currVideo As String
     Public image As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         If ocvb.parms.ShowOptions Then videoOptions.Show()
         If srcVideo = "" Then srcVideo = ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4" ' default video...
         currVideo = srcVideo
@@ -36,13 +38,15 @@ Public Class Video_CarCounting : Implements IDisposable
     Dim flow As Font_FlowText
     Dim video As Video_Basics
     Dim mog As BGSubtract_MOG
-    Public Sub New(ocvb As AlgorithmData)
-        mog = New BGSubtract_MOG(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        mog = New BGSubtract_MOG(ocvb, "Video_CarCounting")
         mog.externalUse = True
 
-        video = New Video_Basics(ocvb)
+        video = New Video_Basics(ocvb, "Video_CarCounting")
 
-        flow = New Font_FlowText(ocvb)
+        flow = New Font_FlowText(ocvb, "Video_CarCounting")
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
@@ -99,16 +103,18 @@ Public Class Video_CarCComp : Implements IDisposable
     Dim flow As Font_FlowText
     Dim video As Video_Basics
     Dim mog As BGSubtract_MOG
-    Public Sub New(ocvb As AlgorithmData)
-        mog = New BGSubtract_MOG(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        mog = New BGSubtract_MOG(ocvb, "Video_CarCComp")
         mog.externalUse = True
 
-        cc = New CComp_Basics(ocvb)
+        cc = New CComp_Basics(ocvb, "Video_CarCComp")
         cc.externalUse = True
 
-        video = New Video_Basics(ocvb)
+        video = New Video_Basics(ocvb, "Video_CarCComp")
 
-        flow = New Font_FlowText(ocvb)
+        flow = New Font_FlowText(ocvb, "Video_CarCComp")
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
@@ -141,12 +147,14 @@ Public Class Video_MinRect : Implements IDisposable
     Public mog As BGSubtract_MOG
     Public externalUse As Boolean
     Public contours As cv.Point()()
-    Public Sub New(ocvb As AlgorithmData)
-        video = New Video_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        video = New Video_Basics(ocvb, "Video_MinRect")
         video.srcVideo = ocvb.parms.HomeDir + "Data/CarsDrivingUnderBridge.mp4"
         video.Run(ocvb)
 
-        mog = New BGSubtract_MOG(ocvb)
+        mog = New BGSubtract_MOG(ocvb, "Video_MinRect")
         mog.externalUse = True
         ocvb.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
@@ -179,8 +187,10 @@ End Class
 
 Public Class Video_MinCircle : Implements IDisposable
     Dim input As Video_MinRect
-    Public Sub New(ocvb As AlgorithmData)
-        input = New Video_MinRect(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        input = New Video_MinRect(ocvb, "Video_MinCircle")
         input.externalUse = True
         ocvb.desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub

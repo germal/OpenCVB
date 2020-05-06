@@ -4,7 +4,9 @@ Public Class QRcode_Basics : Implements IDisposable
     Dim qrDecoder As New cv.QRCodeDetector
     Dim qrInput1 As New cv.Mat
     Dim qrInput2 As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         Dim fileInfo = New FileInfo(ocvb.parms.HomeDir + "data/QRcode1.png")
         If fileInfo.Exists Then qrInput1 = cv.Cv2.ImRead(fileInfo.FullName)
         fileInfo = New FileInfo(ocvb.parms.HomeDir + "Data/QRCode2.png")

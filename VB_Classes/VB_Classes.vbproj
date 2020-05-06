@@ -116,7 +116,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
-    <Compile Include="Affine3D.vb" />
     <Compile Include="AlgorithmData.vb" />
     <Compile Include="..\UI_Generator\AlgorithmList.vb" />
     <Compile Include="Aruco.vb" />

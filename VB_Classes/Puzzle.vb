@@ -227,8 +227,10 @@ Public Class Puzzle_Basics : Implements IDisposable
     Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size. 
     Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size. 
     Public restartRequested As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        grid = New Thread_Grid(ocvb, "Puzzle_Basics")
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 10
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 8
         grid.Run(ocvb)
@@ -284,8 +286,10 @@ Public Class Puzzle_Solver : Implements IDisposable
     Dim check As New OptionsCheckbox
     Dim usedList As New List(Of Integer)
     Dim fitlist As New List(Of bestFit)
-    Public Sub New(ocvb As AlgorithmData)
-        puzzle = New Puzzle_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        puzzle = New Puzzle_Basics(ocvb, "Puzzle_Solver")
         puzzle.grid.sliders.Hide()
 
         radio.Setup(ocvb, 3)

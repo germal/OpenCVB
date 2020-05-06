@@ -2,7 +2,9 @@
 'https://www.pyimagesearch.com/2017/11/06/deep-learning-opencvs-blobfromimage-works/
 Public Class MeanSubtraction_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Scaling Factor = mean/scaling factor X100", 1, 500, 100)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Subtract the mean from the image with a scaling factor"

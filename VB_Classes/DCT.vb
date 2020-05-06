@@ -1,7 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class DCT_RGB : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 1)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -42,7 +44,9 @@ End Class
 
 Public Class DCT_RGBDepth : Implements IDisposable
     Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 1)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.label2 = "Subtract DCT inverse from Grayscale depth"
@@ -73,7 +77,9 @@ End Class
 
 Public Class DCT_Grayscale : Implements IDisposable
     Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 1)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -107,11 +113,13 @@ End Class
 Public Class DCT_FeatureLess_MT : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public dct As DCT_Grayscale
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Run Length Minimum", 1, 100, 15)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        dct = New DCT_Grayscale(ocvb)
+        dct = New DCT_Grayscale(ocvb, "DCT_FeatureLess_MT")
         dct.sliders.TrackBar1.Value = 1
         ocvb.desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
         ocvb.label2 = "FeatureLess RGB regions"
@@ -127,7 +135,7 @@ Public Class DCT_FeatureLess_MT : Implements IDisposable
             Dim runLen As Int32 = 0
             Dim runStart As Int32 = 0
             For j = 1 To ocvb.result2.Cols - 1
-                If ocvb.result2.Get(of Byte)(i, j) = ocvb.result2.Get(of Byte)(i, j - 1) Then
+                If ocvb.result2.Get(Of Byte)(i, j) = ocvb.result2.Get(Of Byte)(i, j - 1) Then
                     runLen += 1
                 Else
                     If runLen > runLenMin Then
@@ -158,28 +166,30 @@ Public Class DCT_Surfaces_debug : Implements IDisposable
     Dim grid As Thread_Grid
     Dim dct As DCT_FeatureLess_MT
     Dim flow As Font_FlowText
-    Public Sub New(ocvb As AlgorithmData)
-        flow = New Font_FlowText(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        flow = New Font_FlowText(ocvb, "DCT_Surfaces_debug")
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid(ocvb, "DCT_Surfaces_debug")
         grid.sliders.TrackBar1.Value = 100
         grid.sliders.TrackBar2.Value = 150
-        dct = New DCT_FeatureLess_MT(ocvb)
+        dct = New DCT_FeatureLess_MT(ocvb, "DCT_Surfaces_debug")
         dct.dct.sliders.TrackBar1.Value = 1
-        Mats = New Mat_4to1(ocvb)
+        Mats = New Mat_4to1(ocvb, "DCT_Surfaces_debug")
         Mats.externalUse = True
 
         ocvb.desc = "Find plane equation for a featureless surface - debugging one region for now."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
-        mats.mat(0) = ocvb.result1.Clone()
+        Mats.mat(0) = ocvb.result1.Clone()
 
         dct.Run(ocvb)
-        mats.mat(1) = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Clone()
-        mats.mat(2) = ocvb.result2.Clone()
+        Mats.mat(1) = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Clone()
+        Mats.mat(2) = ocvb.result2.Clone()
 
         Dim mask = ocvb.result1.Clone() ' result1 contains the DCT mask of featureless surfaces.
         Dim notMask As New cv.Mat
@@ -195,8 +205,8 @@ Public Class DCT_Surfaces_debug : Implements IDisposable
             If roiCounts(i) > roiCounts(maxIndex) Then maxIndex = i
         Next
 
-        mats.mat(3) = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
-        ocvb.color(grid.roiList(maxIndex)).CopyTo(mats.mat(3)(grid.roiList(maxIndex)), mask(grid.roiList(maxIndex)))
+        Mats.mat(3) = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
+        ocvb.color(grid.roiList(maxIndex)).CopyTo(Mats.mat(3)(grid.roiList(maxIndex)), mask(grid.roiList(maxIndex)))
         Mats.Run(ocvb)
 
         Dim world As New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32FC3, 0)
@@ -207,7 +217,7 @@ Public Class DCT_Surfaces_debug : Implements IDisposable
                 Dim minDepth As Int32 = 100000, maxDepth As Int32
                 For j = 0 To roi.Height - 1
                     For i = 0 To roi.Width - 1
-                        Dim nextD = depth32f(roi).Get(of Short)(j, i)
+                        Dim nextD = depth32f(roi).Get(Of Short)(j, i)
                         If nextD <> 0 Then
                             If minDepth > nextD Then minDepth = nextD
                             If maxDepth < nextD Then maxDepth = nextD
@@ -223,7 +233,7 @@ Public Class DCT_Surfaces_debug : Implements IDisposable
                               Format(roi.Y, "000") + vbTab + "MinDepth = " + Format(minDepth / 1000, "#0.00") + "m" + vbTab + " MaxDepth = " + Format(maxDepth / 1000, "#0.00") + "m")
                 End If
             End If
-            End If
+        End If
         flow.Run(ocvb)
         ocvb.label1 = "Largest flat surface segment stats"
     End Sub
@@ -241,9 +251,11 @@ End Class
 Public Class DCT_CCompenents : Implements IDisposable
     Dim dct As DCT_FeatureLess_MT
     Dim cc As CComp_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        dct = New DCT_FeatureLess_MT(ocvb)
-        cc = New CComp_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        dct = New DCT_FeatureLess_MT(ocvb, "DCT_CCompenents")
+        cc = New CComp_Basics(ocvb, "DCT_CCompenents")
         cc.externalUse = True
 
         ocvb.desc = "Find surfaces that lack any texture with DCT (less highest frequency) and use connected components to isolate those surfaces."
@@ -267,7 +279,9 @@ End Class
 
 Public Class DCT_Rows : Implements IDisposable
     Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 1)
         sliders.setupTrackBar2(ocvb, "Threshold after removal", 1, 255, 30)
         If ocvb.parms.ShowOptions Then sliders.Show()

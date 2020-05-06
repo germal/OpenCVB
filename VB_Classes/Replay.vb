@@ -72,7 +72,9 @@ Public Class Replay_Record : Implements IDisposable
     Dim RGBDepthBytes() As Byte
     Dim depth16Bytes() As Byte
     Dim cloudBytes() As Byte
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         If ocvb.parms.ShowOptions Then recording.Show()
         ocvb.desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
@@ -145,7 +147,9 @@ Public Class Replay_Play : Implements IDisposable
     Dim cloudBytes() As Byte
     Dim fh As New fileHeader
     Dim fs As FileStream
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         playback.startButton.Text = "Start Playback"
         playback.Show() ' showing this options form is not optional (ha!)  The fileinfo is needed in Run so always initialize it.
         playback.Button2_Click(New Object, New EventArgs) ' autoplay the recorded data (if it exists.)
@@ -225,9 +229,11 @@ End Class
 Public Class Replay_OpenGL : Implements IDisposable
     Dim ogl As OpenGL_Callbacks
     Dim replay As Replay_Play
-    Public Sub New(ocvb As AlgorithmData)
-        ogl = New OpenGL_Callbacks(ocvb)
-        replay = New Replay_Play(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        ogl = New OpenGL_Callbacks(ocvb, "Replay_OpenGL")
+        replay = New Replay_Play(ocvb, "Replay_OpenGL")
         ocvb.desc = "Replay a recorded session with OpenGL"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

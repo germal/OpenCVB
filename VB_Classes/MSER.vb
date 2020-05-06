@@ -11,7 +11,9 @@ Public Class MSER_Basics : Implements IDisposable
     Public check As New OptionsCheckbox
     Dim saveParms() As Int32
     Dim mser As cv.MSER
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders2.setupTrackBar1(ocvb, "MSER Edge Blursize", 1, 20, 5)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
@@ -77,7 +79,7 @@ Public Class MSER_Basics : Implements IDisposable
                 Dim nextRegion = region(i)
                 pixels += nextRegion.Length
                 For Each pt In nextRegion
-                    ocvb.result1.Set(Of cv.Vec3b)(pt.Y, pt.X, ocvb.RGBDepth.Get(of cv.Vec3b)(pt.Y, pt.X))
+                    ocvb.result1.Set(Of cv.Vec3b)(pt.Y, pt.X, ocvb.RGBDepth.Get(Of cv.Vec3b)(pt.Y, pt.X))
                 Next
             Next
             ocvb.label1 = CStr(region.Length) + " Regions " + Format(pixels / region.Length, "#0.0") + " pixels/region (avg)"
@@ -110,7 +112,9 @@ Public Class MSER_Synthetic : Implements IDisposable
             img.FloodFill(p0, color(i))
         Next
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -159,8 +163,10 @@ Public Class MSER_TestSynthetic : Implements IDisposable
         Next
         Return CStr(regionCount) + " Regions had " + CStr(pixels) + " pixels"
     End Function
-    Public Sub New(ocvb As AlgorithmData)
-        mser = New MSER_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        mser = New MSER_Basics(ocvb, "MSER_TestSynthetic")
         mser.externalUse = True
         mser.sliders.TrackBar1.Value = 10
         mser.sliders.TrackBar2.Value = 100
@@ -169,7 +175,7 @@ Public Class MSER_TestSynthetic : Implements IDisposable
         mser.sliders1.TrackBar1.Value = 0
         mser.check.Box(1).Checked = False ' the grayscale result is quite unimpressive.
 
-        synth = New MSER_Synthetic(ocvb)
+        synth = New MSER_Synthetic(ocvb, "MSER_TestSynthetic")
         ocvb.desc = "Test MSER with the synthetic image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -192,7 +198,9 @@ End Class
 Public Class MSER_CPPStyle : Implements IDisposable
     Dim gray As cv.Mat
     Dim image As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.label1 = "Contour regions from MSER"
         ocvb.label2 = "Box regions from MSER"
         ocvb.desc = "Maximally Stable Extremal Regions example - still image"
@@ -231,8 +239,10 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/python/mser.py
 Public Class MSER_Contours : Implements IDisposable
     Dim mser As MSER_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        mser = New MSER_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        mser = New MSER_Basics(ocvb, "MSER_Contours")
         mser.externalUse = True
         mser.sliders.TrackBar2.Value = 4000
         ocvb.desc = "Use MSER but show the contours of each region."

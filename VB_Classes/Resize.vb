@@ -5,7 +5,9 @@ Public Class Resize_Basics : Implements IDisposable
     Public src As cv.Mat
     Public dst As New cv.Mat
     Public newSize As cv.Size
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         SetInterpolationRadioButtons(ocvb, radio, "Resize")
         ' warp is not allowed in resize
         radio.check(5).Enabled = False
@@ -42,8 +44,10 @@ End Class
 Public Class Resize_After8uc3 : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Dim colorizer As Depth_Colorizer_CPP
-    Public Sub New(ocvb As AlgorithmData)
-        colorizer = New Depth_Colorizer_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        colorizer = New Depth_Colorizer_CPP(ocvb, "Resize_After8uc3")
         colorizer.externalUse = True
         SetInterpolationRadioButtons(ocvb, radio, "Resize")
         ' warp is not allowed in resize
@@ -88,8 +92,10 @@ Public Class Resize_Percentage : Implements IDisposable
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public resizeOptions As Resize_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        resizeOptions = New Resize_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        resizeOptions = New Resize_Basics(ocvb, "Resize_Percentage")
         resizeOptions.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Resize Percentage (%)", 1, 100, 3)

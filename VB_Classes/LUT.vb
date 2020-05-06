@@ -3,7 +3,9 @@
 Imports cv = OpenCvSharp
 Public Class LUT_Gray : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "LUT zero through xxx", 1, 255, 65)
         sliders.setupTrackBar2(ocvb, "LUT xxx through yyy", 1, 255, 110)
         sliders.setupTrackBar3(ocvb, "LUT xxx through yyy", 1, 255, 160)
@@ -40,7 +42,9 @@ Public Class LUT_Color : Implements IDisposable
     Public paletteMap(256) As cv.Vec3b
     Public src As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

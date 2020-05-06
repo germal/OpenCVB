@@ -6,16 +6,18 @@ Public Class DilateErode_Basics : Implements IDisposable
     Public src As New cv.Mat
     Public dst As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        sliders.setupTrackBar1(ocvb, "DilateErode Kernel Size", 1, 32, 5)
-        sliders.setupTrackBar2(ocvb, "Minus (Erode) to Plus (Dilate)", -32, 32, 1)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        sliders.setupTrackBar1(ocvb, "Dilate/Erode Kernel Size", 1, 32, 5)
+        sliders.setupTrackBar2(ocvb, "Erode (-) to Dilate (+)", -32, 32, 1)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Dilate and Erode the RGB and Depth image."
 
         radio.Setup(ocvb, 3)
-        radio.check(0).Text = "Cross"
-        radio.check(1).Text = "Ellipse"
-        radio.check(2).Text = "Rect"
+        radio.check(0).Text = "Dilate/Erode shape: Cross"
+        radio.check(1).Text = "Dilate/Erode shape: Ellipse"
+        radio.check(2).Text = "Dilate/Erode shape: Rect"
         radio.check(0).Checked = True
         If ocvb.parms.ShowOptions Then radio.Show()
     End Sub
@@ -62,7 +64,9 @@ End Class
 
 
 Public Class DilateErode_DepthSeed : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Erode depth to build a depth mask for inrange data."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -93,11 +97,13 @@ End Class
 Public Class DilateErode_OpenClose : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim radio As New OptionsRadioButtons
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         radio.Setup(ocvb, 3)
-        radio.check(0).Text = "Cross"
-        radio.check(1).Text = "Ellipse"
-        radio.check(2).Text = "Rect"
+        radio.check(0).Text = "Open/Close shape: Cross"
+        radio.check(1).Text = "Open/Close shape: Ellipse"
+        radio.check(2).Text = "Open/Close shape: Rect"
         radio.check(2).Checked = True
         If ocvb.parms.ShowOptions Then radio.Show()
 

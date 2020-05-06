@@ -28,8 +28,10 @@ Public Class OpenCVGL_Image_CPP : Implements IDisposable
     Public sliders1 As New OptionsSliders
     Public sliders2 As New OptionsSliders
     Public sliders3 As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
-        imu = New IMU_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        imu = New IMU_Basics(ocvb, "OpenCVGL_Image_CPP")
         imu.externalUse = True
 
         If ocvb.parms.testAllRunning = False Then

@@ -4,7 +4,9 @@ Public Class Coherence_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public src As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Find lines that are artistically coherent in the image - Painterly Effect."
         sliders.setupTrackBar1(ocvb, "Coherence Sigma", 1, 15, 9)
         sliders.setupTrackBar2(ocvb, "Coherence Blend", 1, 10, 10)
@@ -79,8 +81,10 @@ End Class
 
 Public Class Coherence_Depth : Implements IDisposable
     Dim coherent As Coherence_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        coherent = New Coherence_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        coherent = New Coherence_Basics(ocvb, "Coherence_Depth")
         coherent.externalUse = True
         ocvb.desc = "Find coherent lines in the depth image"
     End Sub

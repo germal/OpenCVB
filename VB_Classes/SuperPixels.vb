@@ -27,7 +27,9 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
     Public dst1 As cv.Mat
     Public dst2 As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Number of SuperPixels", 1, 1000, 400)
         sliders.setupTrackBar2(ocvb, "Iterations", 0, 10, 4)
         sliders.setupTrackBar3(ocvb, "Prior", 1, 10, 2)
@@ -94,8 +96,10 @@ End Class
 
 Public Class SuperPixel_Depth : Implements IDisposable
     Dim pixels As SuperPixel_Basics_CPP
-    Public Sub New(ocvb As AlgorithmData)
-        pixels = New SuperPixel_Basics_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        pixels = New SuperPixel_Basics_CPP(ocvb, "SuperPixel_Depth")
         pixels.externalUse = True
 
         ocvb.desc = "Create SuperPixels using RGBDepth image."
@@ -119,11 +123,13 @@ End Class
 Public Class SuperPixel_WithCanny : Implements IDisposable
     Dim pixels As SuperPixel_Basics_CPP
     Dim edges As Edges_Canny
-    Public Sub New(ocvb As AlgorithmData)
-        edges = New Edges_Canny(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        edges = New Edges_Canny(ocvb, "SuperPixel_WithCanny")
         edges.externalUse = True
 
-        pixels = New SuperPixel_Basics_CPP(ocvb)
+        pixels = New SuperPixel_Basics_CPP(ocvb, "SuperPixel_WithCanny")
         pixels.externalUse = True
 
         ocvb.desc = "Create SuperPixels using RGBDepth image."
@@ -152,11 +158,13 @@ End Class
 Public Class SuperPixel_WithLineDetector : Implements IDisposable
     Dim pixels As SuperPixel_Basics_CPP
     Dim lines As LineDetector_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        lines = New LineDetector_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        lines = New LineDetector_Basics(ocvb, "SuperPixel_WithLineDetector")
         lines.externalUse = True
 
-        pixels = New SuperPixel_Basics_CPP(ocvb)
+        pixels = New SuperPixel_Basics_CPP(ocvb, "SuperPixel_WithLineDetector")
         pixels.externalUse = True
 
         ocvb.desc = "Create SuperPixels using RGBDepth image."

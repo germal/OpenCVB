@@ -1,7 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Filter_Laplacian : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Use a filter to approximate the Laplacian derivative."
         ocvb.label1 = "Sharpened image using Filter2D output"
         ocvb.label2 = "Output of Filter2D (approximated Laplacian)"
@@ -23,7 +25,9 @@ End Class
 
 Public Class Filter_NormalizedKernel : Implements IDisposable
     Dim radio As New OptionsRadioButtons
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         radio.Setup(ocvb, 4)
         radio.check(0).Text = "INF"
         radio.check(1).Text = "L1"
@@ -47,7 +51,7 @@ Public Class Filter_NormalizedKernel : Implements IDisposable
 
         Dim sum As Double
         For i = 0 To kernel.Width - 1
-            sum += Math.Abs(kernel.Get(of Single)(0, i))
+            sum += Math.Abs(kernel.Get(Of Single)(0, i))
         Next
         ocvb.label1 = "kernel sum = " + Format(sum, "#0.000")
 
@@ -62,7 +66,9 @@ End Class
 
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/filter_2d/filter_2d.html
 Public Class Filter_Normalized2D : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Create and apply a normalized kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -82,7 +88,9 @@ End Class
 Public Class Filter_SepFilter2D : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim check As New OptionsCheckbox
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"
         check.Box(0).Checked = True

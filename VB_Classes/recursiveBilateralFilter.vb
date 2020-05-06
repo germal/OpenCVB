@@ -19,7 +19,9 @@ Public Class RecursiveBilateralFilter_CPP : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim srcData() As Byte
     Dim rbf As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "RBF Recursion count", 1, 20, 2)
         If ocvb.parms.ShowOptions Then sliders.Show()
 

@@ -7,7 +7,9 @@ Public Class Random_Points : Implements IDisposable
     Public Points2f() As cv.Point2f
     Public externalUse As Boolean
     Public rangeRect As cv.Rect
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Random Pixel Count", 1, ocvb.color.Width * ocvb.color.Height, 20)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -24,8 +26,8 @@ Public Class Random_Points : Implements IDisposable
         End If
         If externalUse = False Then ocvb.result1.SetTo(0)
         For i = 0 To Points.Length - 1
-            Dim x = ocvb.ms_rng.next(rangeRect.X, rangeRect.X + rangeRect.Width)
-            Dim y = ocvb.ms_rng.next(rangeRect.Y, rangeRect.Y + rangeRect.Height)
+            Dim x = ocvb.ms_rng.Next(rangeRect.X, rangeRect.X + rangeRect.Width)
+            Dim y = ocvb.ms_rng.Next(rangeRect.Y, rangeRect.Y + rangeRect.Height)
             Points(i) = New cv.Point2f(x, y)
             Points2f(i) = New cv.Point2f(x, y)
             If externalUse = False Then cv.Cv2.Circle(ocvb.result1, Points(i), 3, cv.Scalar.Gray, -1, cv.LineTypes.AntiAlias, 0)
@@ -40,7 +42,9 @@ End Class
 
 
 Public Class Random_Shuffle : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Use randomShuffle to reorder an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -58,9 +62,11 @@ End Class
 Public Class Random_LUTMask : Implements IDisposable
     Dim random As Random_Points
     Dim km As kMeans_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        km = New kMeans_Basics(ocvb)
-        random = New Random_Points(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        km = New kMeans_Basics(ocvb, "Random_LUTMask")
+        random = New Random_Points(ocvb, "Random_LUTMask")
         ocvb.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image.  Note how interpolation impacts results"
         ocvb.label2 = "kmeans run To Get colors"
     End Sub
@@ -77,7 +83,7 @@ Public Class Random_LUTMask : Implements IDisposable
                 Dim y = random.Points(i).Y
                 If x >= ocvb.drawRect.X And x < ocvb.drawRect.X + ocvb.drawRect.Width Then
                     If y >= ocvb.drawRect.Y And y < ocvb.drawRect.Y + ocvb.drawRect.Height Then
-                        lutMat.Set(lutIndex, 0, ocvb.result2.Get(of cv.Vec3b)(y, x))
+                        lutMat.Set(lutIndex, 0, ocvb.result2.Get(Of cv.Vec3b)(y, x))
                         lutIndex += 1
                         If lutIndex >= lutMat.Rows Then Exit For
                     End If
@@ -98,7 +104,9 @@ End Class
 Public Class Random_UniformDist : Implements IDisposable
     Public uDist As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         uDist = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
         ocvb.desc = "Create a uniform distribution."
     End Sub
@@ -118,7 +126,9 @@ Public Class Random_NormalDist : Implements IDisposable
     Public sliders As New OptionsSliders
     Public nDistImage As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Random_NormalDist Blue Mean", 0, 255, 25)
         sliders.setupTrackBar2(ocvb, "Random_NormalDist Green Mean", 0, 255, 127)
         sliders.setupTrackBar3(ocvb, "Random_NormalDist Red Mean", 0, 255, 180)
@@ -140,20 +150,22 @@ End Class
 Public Class Random_CheckUniformDist : Implements IDisposable
     Dim histogram As Histogram_KalmanSmoothed
     Dim rUniform As Random_UniformDist
-    Public Sub New(ocvb As AlgorithmData)
-        histogram = New Histogram_KalmanSmoothed(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        histogram = New Histogram_KalmanSmoothed(ocvb, "Random_CheckUniformDist")
         histogram.externalUse = True
         histogram.sliders.TrackBar1.Value = 255
         histogram.gray = New cv.Mat
 
-        rUniform = New Random_UniformDist(ocvb)
+        rUniform = New Random_UniformDist(ocvb, "Random_CheckUniformDist")
         rUniform.externalUse = True
 
         ocvb.desc = "Display the histogram for a uniform distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         rUniform.Run(ocvb)
-        ocvb.result1 = rUniform.uDist.CvtColor(cv.ColorConversionCodes.gray2bgr)
+        ocvb.result1 = rUniform.uDist.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         rUniform.uDist.CopyTo(histogram.gray)
         histogram.Run(ocvb)
     End Sub
@@ -168,19 +180,21 @@ End Class
 Public Class Random_CheckNormalDist : Implements IDisposable
     Dim histogram As Histogram_KalmanSmoothed
     Dim normalDist As Random_NormalDist
-    Public Sub New(ocvb As AlgorithmData)
-        histogram = New Histogram_KalmanSmoothed(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        histogram = New Histogram_KalmanSmoothed(ocvb, "Random_CheckNormalDist")
         histogram.externalUse = True
         histogram.sliders.TrackBar1.Value = 255
         histogram.gray = New cv.Mat
         histogram.plotHist.minRange = 1
-        normalDist = New Random_NormalDist(ocvb)
+        normalDist = New Random_NormalDist(ocvb, "Random_CheckNormalDist")
         normalDist.externalUse = True
         ocvb.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         normalDist.Run(ocvb)
-        ocvb.result1 = normalDist.nDistImage.CvtColor(cv.ColorConversionCodes.gray2bgr)
+        ocvb.result1 = normalDist.nDistImage.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         normalDist.nDistImage.CopyTo(histogram.gray)
         histogram.Run(ocvb)
     End Sub
@@ -211,7 +225,9 @@ End Module
 
 Public Class Random_PatternGenerator_CPP : Implements IDisposable
     Dim Random_PatternGenerator As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         Random_PatternGenerator = Random_PatternGenerator_Open()
         ocvb.desc = "Generate random patterns for use with 'Random Pattern Calibration'"
     End Sub

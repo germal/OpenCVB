@@ -158,7 +158,6 @@ Public Class ActiveClass : Implements IDisposable
         radioOffset = New cv.Point
         ocvb.name = parms.activeAlgorithm
         ocvb.label1 = parms.activeAlgorithm
-        ocvb.callerName = ocvb.name
         ActiveAlgorithm = algoList.createAlgorithm(ocvb)
         If ActiveAlgorithm Is Nothing Then
             MsgBox("The algorithm: " + parms.activeAlgorithm + " was not found in the algorithmList.vb code." + vbCrLf +
@@ -168,7 +167,7 @@ Public Class ActiveClass : Implements IDisposable
             parms.activeAlgorithm = parms.activeAlgorithm.Substring(0, Len(parms.activeAlgorithm) - 3)
             ActiveAlgorithm = algoList.createAlgorithm(ocvb)
         End If
-        If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
+        If parms.useRecordedData Then recordedData = New Replay_Play(ocvb, "VB_Classes.vb")
     End Sub
     Public Sub UpdateHostLocation(left As Int32, top As Int32, height As Int32)
         appLocation = New cv.Rect(left, top, 0, height)

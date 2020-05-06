@@ -7,11 +7,13 @@ Public Class IMU_Basics : Implements IDisposable
     Public theta As cv.Point3f ' this is the description - x, y, and z - of the axes centered in the camera.
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        flow = New Font_FlowText(ocvb)
+        flow = New Font_FlowText(ocvb, "IMU_Basics")
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
@@ -68,8 +70,10 @@ End Class
 
 Public Class IMU_Stabilizer : Implements IDisposable
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        kalman = New Kalman_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        kalman = New Kalman_Basics(ocvb, "IMU_Stabilizer")
         kalman.externalUse = True
 
         ocvb.desc = "Stabilize the image with the IMU data."
@@ -124,8 +128,10 @@ End Class
 
 Public Class IMU_Magnetometer : Implements IDisposable
     Public plot As Plot_OverTime
-    Public Sub New(ocvb As AlgorithmData)
-        plot = New Plot_OverTime(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        plot = New Plot_OverTime(ocvb, "IMU_Magnetometer")
         plot.externalUse = True
         plot.dst = ocvb.result2
         plot.maxScale = 10
@@ -155,7 +161,9 @@ End Class
 
 
 Public Class IMU_Barometer : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Get the barometric pressure from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -174,7 +182,9 @@ End Class
 
 
 Public Class IMU_Temperature : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Get the temperature of the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -196,8 +206,10 @@ Public Class IMU_FrameTime : Implements IDisposable
     Public CPUInterval As Double
     Public externalUse As Boolean
     Public IMUtoCaptureEstimate As Double
-    Public Sub New(ocvb As AlgorithmData)
-        plot = New Plot_OverTime(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        plot = New Plot_OverTime(ocvb, "IMU_FrameTime")
         plot.externalUse = True
         plot.dst = ocvb.result2
         plot.maxScale = 150
@@ -295,8 +307,10 @@ Public Class IMU_HostFrameTimes : Implements IDisposable
     Public CPUInterval As Double
     Public externalUse As Boolean
     Public HostInterruptDelayEstimate As Double
-    Public Sub New(ocvb As AlgorithmData)
-        plot = New Plot_OverTime(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        plot = New Plot_OverTime(ocvb, "IMU_HostFrameTimes")
         plot.externalUse = True
         plot.dst = ocvb.result2
         plot.maxScale = 150
@@ -382,19 +396,21 @@ Public Class IMU_TotalDelay : Implements IDisposable
     Dim plot As Plot_OverTime
     Dim kalman As Kalman_Single
     Dim externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.parms.ShowOptions = False
 
-        host = New IMU_HostFrameTimes(ocvb)
+        host = New IMU_HostFrameTimes(ocvb, "IMU_TotalDelay")
         host.externalUse = True
-        imu = New IMU_FrameTime(ocvb)
+        imu = New IMU_FrameTime(ocvb, "IMU_TotalDelay")
         imu.externalUse = True
-        kalman = New Kalman_Single(ocvb)
+        kalman = New Kalman_Single(ocvb, "IMU_TotalDelay")
         kalman.externalUse = True
 
         ocvb.parms.ShowOptions = True ' just show plot options...
 
-        plot = New Plot_OverTime(ocvb)
+        plot = New Plot_OverTime(ocvb, "IMU_TotalDelay")
         plot.externalUse = True
         plot.dst = ocvb.result2
         plot.maxScale = 50
@@ -461,15 +477,17 @@ End Class
 
 
 
-Public Class IMU_AnglesToGravity : Implements IDisposable
+Public Class IMU_GravityVec : Implements IDisposable
     Dim kalman As Kalman_Basics
     Public angleX As Single ' in radians.
     Public angleY As Single ' in radians.
     Public angleZ As Single ' in radians.
     Public result As Integer = RESULT1 ' should be result1 or result2
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        kalman = New Kalman_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        kalman = New Kalman_Basics(ocvb, "IMU_GravityVec")
         ReDim kalman.src(6 - 1)
         kalman.externalUse = True
 

@@ -38,8 +38,10 @@ Public Class Smoothing_Exterior : Implements IDisposable
 		spline.Add(spoints(spoints.Count - 2))
 		Return spline
 	End Function
-	Public Sub New(ocvb As AlgorithmData)
-		hull = New Hull_Basics(ocvb)
+	Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+		Dim callerName = caller
+		If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+		hull = New Hull_Basics(ocvb, "Smoothing_Exterior")
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.externalUse = True
 
@@ -114,8 +116,10 @@ Public Class Smoothing_Interior : Implements IDisposable
 		Return nl
 	End Function
 
-	Public Sub New(ocvb As AlgorithmData)
-		hull = New Hull_Basics(ocvb)
+	Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+		Dim callerName = caller
+		If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+		hull = New Hull_Basics(ocvb, "Smoothing_Interior")
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.externalUse = True
 		hull.sliders.TrackBar1.Value = 16

@@ -7,7 +7,9 @@ Public Class Edges_Canny : Implements IDisposable
     Public src As cv.Mat
     Public dst As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Canny threshold1", 1, 255, 50)
         sliders.setupTrackBar2(ocvb, "Canny threshold2", 1, 255, 50)
         sliders.setupTrackBar3(ocvb, "Canny Aperture", 3, 7, 3)
@@ -43,17 +45,19 @@ Public Class Edges_CannyAndShadow : Implements IDisposable
     Dim shadow As Depth_Holes
     Dim canny As Edges_Canny
     Dim dilate As DilateErode_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        dilate = New DilateErode_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        dilate = New DilateErode_Basics(ocvb, "Edges_CannyAndShadow")
         dilate.radio.check(2).Checked = True
         dilate.externalUse = True
 
-        canny = New Edges_Canny(ocvb)
+        canny = New Edges_Canny(ocvb, "Edges_CannyAndShadow")
         canny.sliders.TrackBar1.Value = 100
         canny.sliders.TrackBar2.Value = 100
         canny.externalUse = True
 
-        shadow = New Depth_Holes(ocvb)
+        shadow = New Depth_Holes(ocvb, "Edges_CannyAndShadow")
         shadow.externalUse = True
 
         ocvb.desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
@@ -84,7 +88,9 @@ End Class
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Edges_Laplacian : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Gaussian Kernel", 1, 32, 7)
         sliders.setupTrackBar2(ocvb, "Laplacian Kernel", 1, 32, 5)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -120,7 +126,9 @@ End Class
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edges_Scharr : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Scharr is more accurate with 3x3 kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -142,7 +150,9 @@ End Class
 Public Class Edges_Preserving : Implements IDisposable
     Dim radio As New OptionsRadioButtons
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         radio.Setup(ocvb, 2)
         radio.check(0).Text = "Edge RecurseFilter"
         radio.check(1).Text = "Edge NormconvFilter"
@@ -196,7 +206,9 @@ Public Class Edges_RandomForest_CPP : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim rgbData() As Byte
     Dim EdgesPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Edges RF Threshold", 1, 255, 35)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -247,7 +259,9 @@ Public Class Edges_Sobel : Implements IDisposable
     Public grayX As cv.Mat
     Public grayY As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Sobel kernel Size", 1, 32, 3)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
@@ -276,9 +290,11 @@ End Class
 Public Class Edges_LeftView : Implements IDisposable
     Dim red As LeftRightView_Basics
     Dim sobel As Edges_Sobel
-    Public Sub New(ocvb As AlgorithmData)
-        red = New LeftRightView_Basics(ocvb)
-        sobel = New Edges_Sobel(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        red = New LeftRightView_Basics(ocvb, "Edges_LeftView")
+        sobel = New Edges_Sobel(ocvb, "Edges_LeftView")
         sobel.externalUse = True
         sobel.sliders.TrackBar1.Value = 5
 
@@ -309,7 +325,9 @@ Public Class Edges_ResizeAdd : Implements IDisposable
     Public sliders As New OptionsSliders
     Public gray As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Border Vertical in Pixels", 1, 20, 5)
         sliders.setupTrackBar2(ocvb, "Border Horizontal in Pixels", 1, 20, 5)
         sliders.setupTrackBar3(ocvb, "Threshold for Pixel Difference", 1, 50, 16)
@@ -337,7 +355,9 @@ End Class
 
 Public Class Edges_DCTfrequency : Implements IDisposable
     Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 32)
         sliders.setupTrackBar2(ocvb, "Threshold after Removal", 1, 255, 20)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -388,7 +408,9 @@ End Module
 Public Class Edges_Deriche_CPP : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim Edges_Deriche As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Deriche Alpha", 1, 400, 100)
         sliders.setupTrackBar2(ocvb, "Deriche Omega", 1, 1000, 100)
         If ocvb.parms.ShowOptions Then sliders.Show()

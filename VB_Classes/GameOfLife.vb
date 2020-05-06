@@ -26,11 +26,13 @@ Public Class GameOfLife_Basics : Implements IDisposable
         End If
         Return CountNeighbors
     End Function
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         grid = New cv.Mat(ocvb.color.Height / factor, ocvb.color.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
 
-        random = New Random_Points(ocvb)
+        random = New Random_Points(ocvb, "GameOfLife_Basics")
         random.externalUse = True
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
         random.sliders.TrackBar1.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
@@ -100,10 +102,12 @@ End Class
 Public Class GameOfLife_Population : Implements IDisposable
     Dim plot As Plot_OverTime
     Dim game As GameOfLife_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        game = New GameOfLife_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        game = New GameOfLife_Basics(ocvb, "GameOfLife_Population")
 
-        plot = New Plot_OverTime(ocvb)
+        plot = New Plot_OverTime(ocvb, "GameOfLife_Population")
         plot.externalUse = True
         plot.dst = ocvb.result2
         plot.maxScale = 2000

@@ -19,7 +19,9 @@ Public Class Area_MinTriangle_CPP : Implements IDisposable
         ReDim srcData(numberOfPoints * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' input is a list of points.
         ReDim dstData(3 * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' minTriangle returns 3 points 
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Area Number of Points", 1, 30, 5)
         sliders.setupTrackBar2(ocvb, "Area size", 10, 300, 200)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -48,8 +50,8 @@ Public Class Area_MinTriangle_CPP : Implements IDisposable
         triangle = New cv.Mat(3, 1, cv.MatType.CV_32FC2, dstData)
 
         For i = 0 To 2
-            Dim p1 = triangle.Get(of cv.Point2f)(i)
-            Dim p2 = triangle.Get(of cv.Point2f)((i + 1) Mod 3)
+            Dim p1 = triangle.Get(Of cv.Point2f)(i)
+            Dim p2 = triangle.Get(Of cv.Point2f)((i + 1) Mod 3)
             ocvb.result1.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         Next
     End Sub
@@ -70,7 +72,9 @@ Public Class Area_MinRect : Implements IDisposable
         numberOfPoints = sliders.TrackBar1.Value
         ReDim srcPoints(numberOfPoints)
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Area Number of Points", 1, 200, 5)
         sliders.setupTrackBar2(ocvb, "Area size", 10, 300, 200)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -101,8 +105,10 @@ End Class
 
 Public Class Area_MinMotionRect : Implements IDisposable
     Dim input As BGSubtract_MOG
-    Public Sub New(ocvb As AlgorithmData)
-        input = New BGSubtract_MOG(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        input = New BGSubtract_MOG(ocvb, "Area_MinMotionRect")
         input.sliders.TrackBar1.Value = 100 ' low threshold to maximize motion
         ocvb.desc = "Use minRectArea to encompass detected motion"
         ocvb.label1 = "MinRectArea of MOG motion"
@@ -142,7 +148,9 @@ End Class
 
 
 Public Class Area_FindNonZero : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.label1 = "Non-zero original points"
         ocvb.label2 = "Coordinates of non-zero points"
         ocvb.desc = "Use FindNonZero API to get coordinates of non-zero points."

@@ -5,7 +5,9 @@ Public Class Clone_Normal : Implements IDisposable
     Public illuminationChangeValues As cv.Vec2f
     Public textureFlatteningValues As cv.Vec2f
     Public cloneSpec As Int32 ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
         ocvb.label1 = "Clone result - draw anywhere to clone a region"
         ocvb.label2 = "Clone Region Mask"
@@ -39,8 +41,10 @@ End Class
 Public Class Clone_ColorChange : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim clone As Clone_Normal
-    Public Sub New(ocvb As AlgorithmData)
-        clone = New Clone_Normal(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        clone = New Clone_Normal(ocvb, "Clone_ColorChange")
         ocvb.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
 
         sliders.setupTrackBar1(ocvb, "Color Change - Red", 5, 25, 15)
@@ -65,8 +69,10 @@ End Class
 Public Class Clone_IlluminationChange : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim clone As Clone_Normal
-    Public Sub New(ocvb As AlgorithmData)
-        clone = New Clone_Normal(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        clone = New Clone_Normal(ocvb, "Clone_IlluminationChange")
         ocvb.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
 
         sliders.setupTrackBar1(ocvb, "Alpha", 0, 20, 2)
@@ -91,8 +97,10 @@ End Class
 Public Class Clone_TextureFlattening : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim clone As Clone_Normal
-    Public Sub New(ocvb As AlgorithmData)
-        clone = New Clone_Normal(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        clone = New Clone_Normal(ocvb, "Clone_TextureFlattening")
         ocvb.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
 
         sliders.setupTrackBar1(ocvb, "Low Threshold", 0, 100, 10)
@@ -125,7 +133,9 @@ Public Class Clone_Eagle : Implements IDisposable
     Dim srcROI As cv.Rect
     Dim maskROI As cv.Rect
     Dim pt As cv.Point
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         radio.Setup(ocvb, 3)
         radio.check(0).Text = "Seamless - Mixed Clone"
         radio.check(1).Text = "Seamless - MonochromeTransfer Clone"
@@ -178,7 +188,9 @@ End Class
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Cv2.SeamlessClone(OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.Point,%20OpenCvSharp.OutputArray,%20OpenCvSharp.SeamlessCloneMethods)/
 Public Class Clone_Seamless : Implements IDisposable
     Dim radio As New OptionsRadioButtons
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         radio.Setup(ocvb, 3)
         radio.check(0).Text = "Seamless Normal Clone"
         radio.check(1).Text = "Seamless Mono Clone"

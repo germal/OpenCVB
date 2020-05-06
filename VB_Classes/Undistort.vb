@@ -65,7 +65,9 @@ Public Class Undistort_Basics : Implements IDisposable
     Dim maxDisp As Int32
     Dim stereo_cx As Int32
     Dim stereo_cy As Int32
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "undistort intrinsics Left", 1, 200, 100)
 
         If ocvb.parms.cameraIndex = T265Camera Then

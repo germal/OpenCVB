@@ -11,7 +11,9 @@ Public Class KLT_Basics : Implements IDisposable
     Public outputMat As New cv.Mat
     Public circleColor = cv.Scalar.Red
     Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "KLT - MaxCorners", 1, 200, 100)
         sliders.setupTrackBar2(ocvb, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
         sliders.setupTrackBar3(ocvb, "KLT - minDistance", 1, 100, 7)
@@ -51,9 +53,9 @@ Public Class KLT_Basics : Implements IDisposable
             cv.Cv2.CalcOpticalFlowPyrLK(prevGray, gray, inputMat, outputMat, status, err, winSize, 3, term, cv.OpticalFlowFlags.None)
 
             For i = 0 To outputMat.Rows - 1
-                Dim pt = outputMat.Get(of cv.Point2f)(i)
+                Dim pt = outputMat.Get(Of cv.Point2f)(i)
                 If pt.X >= 0 And pt.X <= ocvb.color.Cols And pt.Y >= 0 And pt.Y <= ocvb.color.Rows Then
-                    If status.Get(of Byte)(i) Then
+                    If status.Get(Of Byte)(i) Then
                         ocvb.result1.Circle(pt, 3, circleColor, -1, cv.LineTypes.AntiAlias)
                     End If
                 Else
@@ -63,8 +65,8 @@ Public Class KLT_Basics : Implements IDisposable
 
             Dim k As Int32
             For i = 0 To inputPoints.Length - 1
-                If status.Get(of Byte)(i) Then
-                    inputPoints(k) = outputMat.Get(of cv.Point2f)(i)
+                If status.Get(Of Byte)(i) Then
+                    inputPoints(k) = outputMat.Get(Of cv.Point2f)(i)
                     k += 1
                 End If
             Next
@@ -90,8 +92,10 @@ End Class
 Public Class KLT_OpticalFlow : Implements IDisposable
     Dim klt As KLT_Basics
     Dim lastpoints() As cv.Point2f
-    Public Sub New(ocvb As AlgorithmData)
-        klt = New KLT_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        klt = New KLT_Basics(ocvb, "KLT_OpticalFlow")
         klt.externalUse = True ' we will compress the points file below.
         ocvb.desc = "KLT optical flow"
     End Sub

@@ -9,7 +9,9 @@ Public Class WarpModel_Input : Implements IDisposable
     Public rgb(3 - 1) As cv.Mat
     Public gradient(3 - 1) As cv.Mat
     Dim sobel As Edges_Sobel
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         radio.Setup(ocvb, 12)
         radio.check(0).Text = "building.jpg"
         radio.check(1).Text = "church.jpg"
@@ -30,7 +32,7 @@ Public Class WarpModel_Input : Implements IDisposable
         check.Box(0).Text = "Use Gradient in WarpInput"
         If ocvb.parms.ShowOptions Then check.Show()
 
-        sobel = New Edges_Sobel(ocvb)
+        sobel = New Edges_Sobel(ocvb, "WarpModel_Input")
         sobel.externalUse = True
         ocvb.desc = "Import the misaligned input."
     End Sub
@@ -99,7 +101,9 @@ Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
     Public externalUse As Boolean
     Public warpMode As Integer
     Public aligned As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         cPtr = WarpModel_Open()
 
         radio.Setup(ocvb, 4)
@@ -110,7 +114,7 @@ Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
         radio.check(0).Checked = True
         If ocvb.parms.ShowOptions Then radio.Show()
 
-        input = New WarpModel_Input(ocvb)
+        input = New WarpModel_Input(ocvb, "WarpModel_FindTransformECC_CPP")
 
         ocvb.desc = "Use FindTransformECC to align 2 images"
     End Sub
@@ -189,8 +193,10 @@ End Class
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_AlignImages : Implements IDisposable
     Dim ecc As WarpModel_FindTransformECC_CPP
-    Public Sub New(ocvb As AlgorithmData)
-        ecc = New WarpModel_FindTransformECC_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        ecc = New WarpModel_FindTransformECC_CPP(ocvb, "WarpModel_AlignImages")
 
         ocvb.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub

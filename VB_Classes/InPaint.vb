@@ -5,7 +5,9 @@
 Public Class InPaint_Basics : Implements IDisposable
     Dim radio As New OptionsRadioButtons
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Thickness", 1, 25, 2)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -43,8 +45,10 @@ End Class
 Public Class InPaint_Noise : Implements IDisposable
     Dim noise As Draw_Noise
     Dim radio As New OptionsRadioButtons
-    Public Sub New(ocvb As AlgorithmData)
-        noise = New Draw_Noise(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        noise = New Draw_Noise(ocvb, "InPaint_Noise")
 
         radio.Setup(ocvb, 2)
         radio.check(0).Text = "TELEA"

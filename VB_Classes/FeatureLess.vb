@@ -7,17 +7,19 @@ Public Class Featureless_Basics_MT : Implements IDisposable
     Public mask As New cv.Mat
     Public objects As New List(Of cv.Mat)
     Public objectSize As New List(Of Int32)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "FeatureLess rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar3(ocvb, "FeatureLess threshold", 1, 100, 3)
         sliders.setupTrackBar4(ocvb, "FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        edges = New Edges_Canny(ocvb)
+        edges = New Edges_Canny(ocvb, "Featureless_Basics_MT")
         edges.externalUse = True
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid(ocvb, "Featureless_Basics_MT")
         grid.sliders.TrackBar1.Value = If(ocvb.color.Width > 1000, 16, 8)
         grid.sliders.TrackBar2.Value = If(ocvb.color.Width > 1000, 16, 8)
 
@@ -52,7 +54,7 @@ Public Class Featureless_Basics_MT : Implements IDisposable
         regionCount = 1
         For y = 0 To mask.Rows - 1
             For x = 0 To mask.Cols - 1
-                If mask.Get(of Byte)(y, x) = 255 Then
+                If mask.Get(Of Byte)(y, x) = 255 Then
                     Dim pt As New cv.Point(x, y)
                     Dim floodCount = mask.FloodFill(pt, regionCount)
                     If floodCount < floodCountThreshold Then
@@ -88,11 +90,13 @@ End Class
 Public Class FeatureLess_Prediction : Implements IDisposable
     Public sliders As New OptionsSliders
     Dim fLess As Featureless_Basics_MT
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "FeatureLess Resize Percent", 1, 100, 1)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        fLess = New Featureless_Basics_MT(ocvb)
+        fLess = New Featureless_Basics_MT(ocvb, "FeatureLess_Prediction")
 
         ocvb.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image."
     End Sub
@@ -116,9 +120,9 @@ Public Class FeatureLess_Prediction : Implements IDisposable
         Dim yFactor = CInt(fLess.mask.Height / newSize.Height)
         For y = 0 To mask.Height - 2
             For x = 0 To mask.Width - 2
-                If fLess.mask.Get(of Byte)(y * yFactor, x * xFactor) = 255 Then
+                If fLess.mask.Get(Of Byte)(y * yFactor, x * xFactor) = 255 Then
                     mask.Set(Of Byte)(y, x, 255)
-                    labelSmall.Set(Of Byte)(y, x, labels.Get(of Byte)(y, x))
+                    labelSmall.Set(Of Byte)(y, x, labels.Get(Of Byte)(y, x))
                 End If
             Next
         Next
@@ -171,8 +175,10 @@ End Class
 
 Public Class Featureless_DCT_MT : Implements IDisposable
     Dim dct As DCT_FeatureLess_MT
-    Public Sub New(ocvb As AlgorithmData)
-        dct = New DCT_FeatureLess_MT(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        dct = New DCT_FeatureLess_MT(ocvb, "Featureless_DCT_MT")
 
         ocvb.desc = "Use DCT to find largest featureless region."
         ocvb.label2 = "Largest FeatureLess Region"

@@ -39,7 +39,9 @@ Public Class GetRotationMatrix2D_Basics : Implements IDisposable
     Public M As cv.Mat
     Public Mflip As cv.Mat
     Public warpFlag As Int32
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "GetRotationMatrix2D Angle", 0, 360, 24)
         If ocvb.parms.ShowOptions Then sliders.Show()
         SetInterpolationRadioButtons(ocvb, radio, "Rotation2D")
@@ -68,8 +70,10 @@ End Class
 
 Public Class GetRotationMatrix2D_Box : Implements IDisposable
     Dim rotation As GetRotationMatrix2D_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        rotation = New GetRotationMatrix2D_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        rotation = New GetRotationMatrix2D_Basics(ocvb, "GetRotationMatrix2D_Box")
         ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
 
         ocvb.label1 = "Original Rectangle in the original perspective"

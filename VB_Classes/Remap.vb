@@ -1,6 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Remap_Basics : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Use remap to reflect an image in 4 directions."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -46,7 +48,9 @@ End Class
 
 Public Class Remap_Flip : Implements IDisposable
     Public direction = 0
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Use flip to remap an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

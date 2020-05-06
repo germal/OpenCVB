@@ -4,7 +4,9 @@ Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
 
 Public Class xPhoto_Bm3dDenoise : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Denoise image with block matching and filtering."
         ocvb.label1 = "Bm3dDenoising"
         ocvb.label2 = "Difference from Input"
@@ -28,7 +30,9 @@ End Class
 
 
 Public Class xPhoto_Bm3dDenoiseDepthImage : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Denoise the depth image with block matching and filtering."
         ocvb.label1 = "Bm3dDenoising"
         ocvb.label2 = "Difference from Input"
@@ -70,7 +74,9 @@ Public Class xPhoto_OilPaint_CPP : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim radio As New OptionsRadioButtons
     Dim xPhoto_OilPaint As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "xPhoto Dynamic Ratio", 1, 127, 7)
         sliders.setupTrackBar2(ocvb, "xPhoto Block Size", 1, 100, 3)
         If ocvb.parms.ShowOptions Then sliders.Show()

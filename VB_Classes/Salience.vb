@@ -21,7 +21,9 @@ Public Class Salience_Basics_CPP : Implements IDisposable
     Dim grayData() As Byte
     Dim rows As Int32, cols As Int32, numScales As Int32
     Dim salience As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders = New OptionsSliders
         sliders.setupTrackBar1(ocvb, "Salience numScales", 1, 6, 1)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -69,7 +71,9 @@ End Class
 Public Class Salience_Basics_MT : Implements IDisposable
     Dim sliders As OptionsSliders
     Dim grayData() As Byte
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders = New OptionsSliders
         sliders.setupTrackBar1(ocvb, "Salience numScales", 1, 6, 1)
         sliders.setupTrackBar2(ocvb, "Salience Number of Threads", 1, 100, 36)

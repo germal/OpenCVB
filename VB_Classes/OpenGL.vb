@@ -29,11 +29,13 @@ Public Class OpenGL_Basics : Implements IDisposable
     Public zTrans As Single = 0.5
     Public OpenGLTitle As String = "OpenGL_Basics"
     Public imageLabel As String
-    Public imu As IMU_AnglesToGravity
+    Public imu As IMU_GravityVec
     Public pointCloudInput As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        imu = New IMU_AnglesToGravity(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        imu = New IMU_GravityVec(ocvb, "OpenGL_Basics")
         ' Dispose() ' make sure there wasn't an old OpenGLWindow sitting around...
         ocvb.desc = "Create an OpenGL window and update it with images"
     End Sub
@@ -176,8 +178,10 @@ Public Class OpenGL_Options : Implements IDisposable
     Public sliders2 As New OptionsSliders
     Public sliders3 As New OptionsSliders
     Public OpenGL As OpenGL_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        OpenGL = New OpenGL_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        OpenGL = New OpenGL_Basics(ocvb, "OpenGL_Options")
         setOpenGLsliders(ocvb, sliders, sliders1, sliders2, sliders3)
         ocvb.desc = "Adjust point size and FOV in OpenGL"
         ocvb.label1 = ""
@@ -217,8 +221,10 @@ End Class
 
 Public Class OpenGL_Callbacks : Implements IDisposable
     Public ogl As OpenGL_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        ogl = New OpenGL_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        ogl = New OpenGL_Basics(ocvb, "OpenGL_Callbacks")
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         ocvb.desc = "Show the point cloud of 3D data and use callbacks to modify view."
     End Sub
@@ -237,9 +243,11 @@ End Class
 'https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
 Public Class OpenGL_IMU : Implements IDisposable
     Public ogl As OpenGL_Options
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.parms.ShowOptions = False
-        ogl = New OpenGL_Options(ocvb)
+        ogl = New OpenGL_Options(ocvb, "OpenGL_IMU")
         ogl.OpenGL.OpenGLTitle = "OpenGL_IMU"
         ogl.sliders.TrackBar2.Value = 0 ' pitch
         ogl.sliders.TrackBar3.Value = 0 ' yaw
@@ -279,18 +287,20 @@ Public Class OpenGL_3Ddata : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim histInput() As Byte
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        ogl = New OpenGL_Options(ocvb)
+        ogl = New OpenGL_Options(ocvb, "OpenGL_3Ddata")
         ogl.OpenGL.OpenGLTitle = "OpenGL_3Ddata"
         ogl.sliders.TrackBar2.Value = -10
         ogl.sliders1.TrackBar3.Value = 5
         ogl.sliders.TrackBar3.Value = 10
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud when displaying data.
 
-        colors = New Palette_Gradient(ocvb)
+        colors = New Palette_Gradient(ocvb, "OpenGL_3Ddata")
         colors.externalUse = True
         colors.color1 = cv.Scalar.Yellow
         colors.color2 = cv.Scalar.Blue
@@ -329,11 +339,13 @@ End Class
 Public Class OpenGL_Draw3D : Implements IDisposable
     Dim circle As Draw_Circles
     Public ogl As OpenGL_Options
-    Public Sub New(ocvb As AlgorithmData)
-        circle = New Draw_Circles(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        circle = New Draw_Circles(ocvb, "OpenGL_Draw3D")
         circle.sliders.TrackBar1.Value = 5
 
-        ogl = New OpenGL_Options(ocvb)
+        ogl = New OpenGL_Options(ocvb, "OpenGL_Draw3D")
         ogl.OpenGL.OpenGLTitle = "OpenGL_3DShapes"
         ogl.sliders.TrackBar1.Value = 80
         ogl.sliders2.TrackBar1.Value = -140
@@ -364,11 +376,13 @@ End Class
 Public Class OpenGL_Voxels : Implements IDisposable
     Public voxels As Voxels_Basics_MT
     Public ogl As OpenGL_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        voxels = New Voxels_Basics_MT(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        voxels = New Voxels_Basics_MT(ocvb, "OpenGL_Voxels")
         voxels.check.Box(0).Checked = False
 
-        ogl = New OpenGL_Basics(ocvb)
+        ogl = New OpenGL_Basics(ocvb, "OpenGL_Voxels")
         ogl.OpenGLTitle = "OpenGL_Voxels"
         ocvb.desc = "Show the voxel representation in OpenGL"
     End Sub
@@ -393,11 +407,13 @@ End Class
 ' https://open.gl/transformations
 ' https://www.codeproject.com/Articles/1247960/Learning-Basic-Math-Used-In-3D-Graphics-Engines
 Public Class OpenGL_GravityTransform : Implements IDisposable
-    Dim imu As IMU_AnglesToGravity
+    Dim imu As IMU_GravityVec
     Public ogl As OpenGL_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        imu = New IMU_AnglesToGravity(ocvb)
-        ogl = New OpenGL_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        imu = New IMU_GravityVec(ocvb, "OpenGL_GravityTransform")
+        ogl = New OpenGL_Basics(ocvb, "OpenGL_GravityTransform")
         ogl.externalUse = True
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"

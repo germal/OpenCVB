@@ -6,13 +6,15 @@ Public Class Binarize_OTSU : Implements IDisposable
     Dim mats1 As Mat_4to1
     Dim mats2 As Mat_4to1
     Dim plotHist As Plot_Histogram
-    Public Sub New(ocvb As AlgorithmData)
-        plotHist = New Plot_Histogram(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        plotHist = New Plot_Histogram(ocvb, "Binarize_OTSU")
         plotHist.externalUse = True
 
-        mats1 = New Mat_4to1(ocvb)
+        mats1 = New Mat_4to1(ocvb, "Binarize_OTSU")
         mats1.externalUse = True
-        mats2 = New Mat_4to1(ocvb)
+        mats2 = New Mat_4to1(ocvb, "Binarize_OTSU")
         mats2.externalUse = True
 
         ocvb.desc = "Binarize an image using Threshold with OTSU."
@@ -58,7 +60,9 @@ End Class
 
 Public Class Binarize_Niblack_Sauvola : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.Label1.Text = "Kernel Size"
         sliders.setupTrackBar1(ocvb, "Kernel Size", 3, 500, 51)
         sliders.setupTrackBar2(ocvb, "Niblack k", -1000, 1000, -200)
@@ -91,7 +95,9 @@ End Class
 
 Public Class Binarize_Niblack_Nick : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.Label1.Text = "Kernel Size"
         sliders.setupTrackBar1(ocvb, "Kernel Size", 3, 500, 51)
         sliders.setupTrackBar2(ocvb, "Niblack k", -1000, 1000, -200)
@@ -123,7 +129,9 @@ End Class
 
 Public Class Binarize_Bernson : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.Label1.Text = "Kernel Size"
         sliders.setupTrackBar1(ocvb, "Kernel Size", 3, 500, 51)
         sliders.setupTrackBar2(ocvb, "Contrast min", 0, 255, 50)
@@ -159,8 +167,10 @@ End Class
 Public Class Binarize_Bernson_MT : Implements IDisposable
     Dim grid As Thread_Grid
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        grid = New Thread_Grid(ocvb, "Binarize_Bernson_MT")
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
 

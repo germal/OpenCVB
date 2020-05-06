@@ -5,7 +5,9 @@ Imports System.Windows.Forms
 Public Class OilPaint_Pointilism : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim randomMask As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Stroke Scale", 1, 5, 3)
         sliders.setupTrackBar2(ocvb, "Smoothing Radius", 0, 100, 32)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -28,8 +30,8 @@ Public Class OilPaint_Pointilism : Implements IDisposable
             Dim nPt As New cv.Point
             For y = 0 To randomMask.Height - 1
                 For x = 0 To randomMask.Width - 1
-                    nPt.X = (ocvb.ms_rng.next(-1, 1) + x) Mod (randomMask.Width - 1)
-                    nPt.Y = (ocvb.ms_rng.next(-1, 1) + y) Mod (randomMask.Height - 1)
+                    nPt.X = (ocvb.ms_rng.Next(-1, 1) + x) Mod (randomMask.Width - 1)
+                    nPt.Y = (ocvb.ms_rng.Next(-1, 1) + y) Mod (randomMask.Height - 1)
                     If nPt.X < 0 Then nPt.X = 0
                     If nPt.Y < 0 Then nPt.Y = 0
                     randomMask.Set(Of cv.Point)(y, x, nPt)
@@ -53,9 +55,9 @@ Public Class OilPaint_Pointilism : Implements IDisposable
         src.SetTo(0)
         For y = 0 To src.Height - 1
             For x = 0 To src.Width - 1
-                Dim nPt = rand.Get(of cv.Point)(y, x)
-                Dim fx = fieldx(ocvb.drawRect).Get(of Single)(nPt.Y, nPt.X)
-                Dim fy = fieldy(ocvb.drawRect).Get(of Single)(nPt.Y, nPt.X)
+                Dim nPt = rand.Get(Of cv.Point)(y, x)
+                Dim fx = fieldx(ocvb.drawRect).Get(Of Single)(nPt.Y, nPt.X)
+                Dim fy = fieldy(ocvb.drawRect).Get(Of Single)(nPt.Y, nPt.X)
                 Dim nPoint = New cv.Point2f(nPt.X, nPt.Y)
                 Dim gradient_magnitude = Math.Sqrt(fx * fx + fy * fy)
                 Dim slen = Math.Round(strokeSize + strokeSize * Math.Sqrt(gradient_magnitude))
@@ -63,7 +65,7 @@ Public Class OilPaint_Pointilism : Implements IDisposable
                 Dim direction = Math.Atan2(fx, fy)
                 Dim angle = direction * 180.0 / Math.PI + 90
 
-                Dim nextColor = ocvb.color(ocvb.drawRect).Get(of cv.Vec3b)(nPt.Y, nPt.X)
+                Dim nextColor = ocvb.color(ocvb.drawRect).Get(Of cv.Vec3b)(nPt.Y, nPt.X)
                 ocvb.result1(ocvb.drawRect).Circle(nPoint, slen / 4, nextColor, -1, cv.LineTypes.AntiAlias)
             Next
         Next
@@ -80,8 +82,10 @@ End Class
 Public Class OilPaint_ColorProbability : Implements IDisposable
     Public color_probability() As Single
     Public km As kMeans_RGBFast
-    Public Sub New(ocvb As AlgorithmData)
-        km = New kMeans_RGBFast(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        km = New kMeans_RGBFast(ocvb, "OilPaint_ColorProbability")
         km.sliders.TrackBar1.Value = 12 ' we would like a dozen colors or so in the color image.
         ReDim color_probability(km.sliders.TrackBar1.Value - 1)
         ocvb.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
@@ -117,7 +121,9 @@ End Class
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
 Public Class OilPaint_Manual : Implements IDisposable
     Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Filter Size", 3, 15, 3)
         sliders.setupTrackBar2(ocvb, "Intensity", 5, 150, 25)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -179,7 +185,9 @@ End Class
 Public Class OilPaint_Manual_CS : Implements IDisposable
     Dim oilPaint As New CS_Classes.OilPaintManual
     Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 10, 4)
         sliders.setupTrackBar2(ocvb, "Intensity", 0, 250, 20)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -213,10 +221,12 @@ End Class
 Public Class OilPaint_Cartoon : Implements IDisposable
     Dim oil As OilPaint_Manual_CS
     Dim laplacian As Edges_Laplacian
-    Public Sub New(ocvb As AlgorithmData)
-        laplacian = New Edges_Laplacian(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        laplacian = New Edges_Laplacian(ocvb, "OilPaint_Cartoon")
 
-        oil = New OilPaint_Manual_CS(ocvb)
+        oil = New OilPaint_Manual_CS(ocvb, "OilPaint_Cartoon")
         Dim w = ocvb.color.Width / 16
         Dim h = ocvb.color.Height / 16
         ocvb.drawRect = New cv.Rect(ocvb.color.Width / 4 + w, ocvb.color.Height / 4 + h, w * 2, h * 2)

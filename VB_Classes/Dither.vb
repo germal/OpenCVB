@@ -83,7 +83,9 @@ End Module
 Public Class Dither_Basics : Implements IDisposable
     Dim radio As New OptionsRadioButtons
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Bits per color plane", 1, 5, 1)
         If ocvb.parms.ShowOptions Then sliders.Show()
 

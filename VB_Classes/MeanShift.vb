@@ -3,7 +3,9 @@
 Public Class MeanShift_Basics : Implements IDisposable
     Public rectangleEdgeWidth As Int32 = 2
     Public trackbox As New cv.Rect
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.label1 = "Draw anywhere to start mean shift tracking."
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track"
     End Sub
@@ -42,9 +44,11 @@ End Class
 Public Class MeanShift_Depth : Implements IDisposable
     Dim ms As MeanShift_Basics
     Dim blob As Depth_Foreground
-    Public Sub New(ocvb As AlgorithmData)
-        ms = New MeanShift_Basics(ocvb)
-        blob = New Depth_Foreground(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        ms = New MeanShift_Basics(ocvb, "MeanShift_Depth")
+        blob = New Depth_Foreground(ocvb, "MeanShift_Depth")
         ocvb.desc = "Use depth to start mean shift algorithm."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -67,7 +71,9 @@ End Class
 'http://study.marearts.com/2014/12/opencv-meanshiftfiltering-example.html
 Public Class MeanShift_PyrFilter : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "MeanShift Spatial Radius", 1, 100, 10)
         sliders.setupTrackBar2(ocvb, "MeanShift color Radius", 1, 100, 15)
         sliders.setupTrackBar3(ocvb, "MeanShift Max Pyramid level", 1, 8, 3)
@@ -96,18 +102,20 @@ Public Class Meanshift_TopObjects : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim mats1 As Mat_4to1
     Dim mats2 As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData)
-        mats1 = New Mat_4to1(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        mats1 = New Mat_4to1(ocvb, "Meanshift_TopObjects")
         mats1.externalUse = True
 
-        mats2 = New Mat_4to1(ocvb)
+        mats2 = New Mat_4to1(ocvb, "Meanshift_TopObjects")
         mats2.externalUse = True
 
-        blob = New Blob_DepthClusters(ocvb)
+        blob = New Blob_DepthClusters(ocvb, "Meanshift_TopObjects")
         sliders.setupTrackBar1(ocvb, "How often should camshift be reinitialized", 1, 500, 100)
         If ocvb.parms.ShowOptions Then sliders.Show()
         For i = 0 To cams.Length - 1
-            cams(i) = New MeanShift_Basics(ocvb)
+            cams(i) = New MeanShift_Basics(ocvb, "Meanshift_TopObjects")
             cams(i).rectangleEdgeWidth = 8
         Next
         ocvb.desc = "Track"

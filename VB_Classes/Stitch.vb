@@ -4,7 +4,9 @@ Public Class Stitch_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public src As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Number of random images", 10, 50, 10)
         sliders.setupTrackBar2(ocvb, "Rectangle width", ocvb.color.Width / 4, ocvb.color.Width - 1, ocvb.color.Width / 2)
         sliders.setupTrackBar3(ocvb, "Rectangle height", ocvb.color.Height / 4, ocvb.color.Height - 1, ocvb.color.Height / 2)

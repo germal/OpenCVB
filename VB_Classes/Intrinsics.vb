@@ -1,6 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class intrinsicsLeft_Basics : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Show the depth camera intrinsicsLeft."
         ocvb.label2 = "ppx/ppy location"
     End Sub

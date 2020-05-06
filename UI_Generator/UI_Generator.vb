@@ -57,7 +57,7 @@ Module UI_GeneratorMain
                                 className = split(2) ' public class <classname>
                             End If
                         End If
-                        If LCase(line).StartsWith("public sub new(ocvb as algorithmdata)") Then functionNames.Add(className)
+                        If LCase(line).StartsWith("public sub new(ocvb as algorithmdata") Then functionNames.Add(className)
                     End If
                 End While
             End If
@@ -90,9 +90,9 @@ Module UI_GeneratorMain
                     sw.WriteLine(vbTab + "case """ + UCase(nextName) + """")
                     If nextName.EndsWith(".py") Then
                         sw.WriteLine(vbTab + vbTab + "ocvb.PythonFileName = """ + pythonAppDir.FullName + nextName + """")
-                        sw.WriteLine(vbTab + vbTab + "return new Python_Run(ocvb)")
+                        sw.WriteLine(vbTab + vbTab + "return new Python_Run(ocvb, """ + nextName + """)")
                     Else
-                        sw.WriteLine(vbTab + vbTab + "return new " + nextName + "(ocvb)")
+                        sw.WriteLine(vbTab + vbTab + "return new " + nextName + "(ocvb, """ + nextName + """)")
                     End If
                 End If
             Next

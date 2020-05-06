@@ -1,7 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Encode_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
         sliders.setupTrackBar2(ocvb, "Encode Output Scaling", 1, 100, 7)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -35,7 +37,9 @@ End Class
 Public Class Encode_Options : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim radio As New OptionsRadioButtons
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
         sliders.setupTrackBar2(ocvb, "Encode Output Scaling", 1, 100, 85)
         If ocvb.parms.ShowOptions Then sliders.Show()

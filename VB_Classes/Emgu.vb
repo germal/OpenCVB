@@ -1,7 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 
 Public Class Emgu_Basics : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Test a sample EMGU usage."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -23,7 +25,9 @@ End Class
 
 
 Public Class Emgu_Facedetection : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Use the simplest possible face detector in Emgu examples."
         ocvb.result1.SetTo(0)
     End Sub

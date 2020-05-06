@@ -1,8 +1,10 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Covariance_Basics : Implements IDisposable
     Dim random As Random_Points
-    Public Sub New(ocvb As AlgorithmData)
-        random = New Random_Points(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        random = New Random_Points(ocvb, "Covariance_Basics")
         ocvb.desc = "Calculate the covariance of random depth data points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -13,7 +15,7 @@ Public Class Covariance_Basics : Implements IDisposable
         cv.Cv2.CalcCovarMatrix(samples, covar, mean, cv.CovarFlags.Cols)
         Dim overallMean = mean.Mean()
         If ocvb.frameCount Mod 100 = 0 Then
-            ocvb.label1 = "covar(0) = " + Format(covar.Get(of Double)(0), "#0.0") + " mean = " + Format(overallMean(0), "#0.00")
+            ocvb.label1 = "covar(0) = " + Format(covar.Get(Of Double)(0), "#0.0") + " mean = " + Format(overallMean(0), "#0.00")
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
@@ -25,7 +27,9 @@ End Class
 
 ' http://answers.opencv.org/question/31228/how-to-use-function-calccovarmatrix/
 Public Class Covariance_Test : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Calculate the covariance of random depth data points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

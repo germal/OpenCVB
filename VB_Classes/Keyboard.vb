@@ -1,7 +1,9 @@
 ﻿
 Imports cv = OpenCvSharp
 Public Class Keyboard_Basics : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.label1 = "Type in text to add to image"
         ocvb.desc = "Test the keyboard interface available to all algorithms"
     End Sub

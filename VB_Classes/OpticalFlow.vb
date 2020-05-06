@@ -73,7 +73,9 @@ Public Class OpticalFlow_DenseOptions : Implements IDisposable
     Public polySigma As Single
     Public OpticalFlowFlags As cv.OpticalFlowFlags
     Public outputScaling As Int32
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         radio.Setup(ocvb, 5)
         radio.check(0).Text = "FarnebackGaussian"
         radio.check(1).Text = "LkGetMinEigenvals"
@@ -127,8 +129,10 @@ End Class
 
 Public Class OpticalFlow_DenseBasics : Implements IDisposable
     Dim flow As OpticalFlow_DenseOptions
-    Public Sub New(ocvb As AlgorithmData)
-        flow = New OpticalFlow_DenseOptions(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        flow = New OpticalFlow_DenseOptions(ocvb, "OpticalFlow_DenseBasics")
         ocvb.desc = "Use dense optical flow algorithm  "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -159,14 +163,16 @@ Public Class OpticalFlow_DenseBasics_MT : Implements IDisposable
     Public grid As Thread_Grid
     Dim accum As New cv.Mat
     Dim flow As OpticalFlow_DenseOptions
-    Public Sub New(ocvb As AlgorithmData)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        grid = New Thread_Grid(ocvb, "OpticalFlow_DenseBasics_MT")
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
         grid.sliders.TrackBar3.Value = 0
 
-        flow = New OpticalFlow_DenseOptions(ocvb)
+        flow = New OpticalFlow_DenseOptions(ocvb, "OpticalFlow_DenseBasics_MT")
         flow.sliders.TrackBar1.Value = 75
 
         sliders.setupTrackBar1(ocvb, "Correlation Threshold", 0, 1000, 1000)
@@ -229,8 +235,10 @@ Public Class OpticalFlow_Sparse : Implements IDisposable
     Dim lastFrame As cv.Mat
     Dim sumScale As cv.Mat, sScale As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
-        good = New Features_GoodFeatures(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        good = New Features_GoodFeatures(ocvb, "OpticalFlow_Sparse")
         good.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "OpticalFlow window", 1, 20, 3)

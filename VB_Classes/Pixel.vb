@@ -4,8 +4,10 @@ Imports System.Runtime.InteropServices
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/PixelAccess.cs
 Public Class Pixel_GetSet : Implements IDisposable
     Dim mat4 As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData)
-        mat4 = New Mat_4to1(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        mat4 = New Mat_4to1(ocvb, "Pixel_GetSet")
         mat4.externalUse = True
 
         ocvb.label1 = "Log of times for each method"

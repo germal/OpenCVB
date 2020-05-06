@@ -4,7 +4,9 @@ Public Class FishEye_Rectified : Implements IDisposable
     Public externalUse As Boolean
     Public leftView As cv.Mat
     Public rightView As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Use OpenCV's FishEye API to undistort a fisheye lens input"
         ocvb.label1 = "Left View"
         ocvb.label2 = "Right View"
@@ -50,7 +52,9 @@ End Class
 
 
 Public Class FishEye_Raw : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Display the Raw FishEye images for the T265 (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

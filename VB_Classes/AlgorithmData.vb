@@ -21,7 +21,7 @@ Public Class AlgorithmData
     Public mousePoint As cv.Point ' trace any mouse movements using this.
     Public ms_rng As System.Random
     Public name As String
-    Public callerName As String
+    Public caller As String
     Public openGLHeight = 1200
     Public openGLWidth = 1500
     Public optionsLeft As Int32

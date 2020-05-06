@@ -2,7 +2,9 @@
 Imports System.Runtime.InteropServices
 Public Class Brightness_Clahe : Implements IDisposable ' Contrast Limited Adaptive Histogram Equalization (CLAHE)
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Clip Limit", 1, 100, 10)
         sliders.setupTrackBar2(ocvb, "Grid Size", 1, 100, 8)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -34,7 +36,9 @@ End Class
 
 Public Class Brightness_Contrast : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Brightness", 1, 100, 50)
         sliders.setupTrackBar2(ocvb, "Contrast", 1, 100, 50)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -54,7 +58,9 @@ End Class
 
 Public Class Brightness_hue : Implements IDisposable
     Public hsv_planes(2) As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Show hue (Result1) and Saturation (Result2)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -75,7 +81,9 @@ End Class
 
 Public Class Brightness_AlphaBeta : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Use alpha and beta with ConvertScaleAbs."
         sliders.setupTrackBar1(ocvb, "Brightness Alpha (contrast)", 0, 500, 300)
         sliders.setupTrackBar2(ocvb, "Brightness Beta (brightness)", -100, 100, 0)
@@ -95,7 +103,9 @@ End Class
 Public Class Brightness_Gamma : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim lookupTable(255) As Byte
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Use gamma with ConvertScaleAbs."
         sliders.setupTrackBar1(ocvb, "Brightness Gamma correction", 0, 200, 100)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -138,7 +148,9 @@ End Module
 Public Class Brightness_WhiteBalance_CPP : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim wPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "White balance threshold X100", 1, 100, 10)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -176,8 +188,10 @@ Public Class Brightness_WhiteBalance : Implements IDisposable
     Dim hist As Histogram_Basics
     Dim sliders As New OptionsSliders
     Dim wPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
-        hist = New Histogram_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        hist = New Histogram_Basics(ocvb, "Brightness_WhiteBalance")
         hist.bins = 256 * 3
         hist.maxRange = hist.bins
         hist.externalUse = True

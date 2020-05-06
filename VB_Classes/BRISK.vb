@@ -5,7 +5,9 @@ Public Class BRISK_Basics : Implements IDisposable
     Public features As New List(Of cv.Point2f)
     Public externalUse As Boolean
     Public src As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "BRISK Radius Threshold", 1, 100, 50)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Detect features with BRISK"

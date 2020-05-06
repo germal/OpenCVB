@@ -66,7 +66,9 @@ Public Class Annealing_Basics_CPP : Implements IDisposable
         hCityPosition.Free()
         closed = False
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         setup(ocvb)
         ocvb.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
@@ -131,14 +133,14 @@ Public Class Annealing_CPP_MT : Implements IDisposable
         random.sliders.TrackBar1.Value = sliders.TrackBar1.Value
         random.Run(ocvb) ' get the city positions (may or may not be used below.)
 
-        anneal(0) = New Annealing_Basics_CPP(ocvb)
+        anneal(0) = New Annealing_Basics_CPP(ocvb, "Annealing_CPP_MT")
         anneal(0).numberOfCities = sliders.TrackBar1.Value
         anneal(0).circularPattern = check.Box(2).Checked
         If check.Box(2).Checked = False Then anneal(0).cityPositions = random.Points2f.Clone()
         anneal(0).setup(ocvb)
         anneal(0).Open() ' this will initialize the C++ copy of the city positions.
         For i = 1 To anneal.Length - 1
-            anneal(i) = New Annealing_Basics_CPP(ocvb)
+            anneal(i) = New Annealing_Basics_CPP(ocvb, "Annealing_CPP_MT")
             anneal(i).externalUse = True
             anneal(i).numberOfCities = sliders.TrackBar1.Value
             anneal(i).setup(ocvb)
@@ -151,12 +153,14 @@ Public Class Annealing_CPP_MT : Implements IDisposable
         startTime = Now
     End Sub
 
-    Public Sub New(ocvb As AlgorithmData)
-        random = New Random_Points(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        random = New Random_Points(ocvb, "Annealing_CPP_MT")
         random.externalUse = True
         random.sliders.Visible = False
 
-        mats = New Mat_4to1(ocvb)
+        mats = New Mat_4to1(ocvb, "Annealing_CPP_MT")
         mats.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Anneal Number of Cities", 5, 500, 25)
@@ -171,7 +175,7 @@ Public Class Annealing_CPP_MT : Implements IDisposable
         check.Box(2).Checked = True
         If ocvb.parms.ShowOptions Then check.Show()
 
-        flow = New Font_FlowText(ocvb)
+        flow = New Font_FlowText(ocvb, "Annealing_CPP_MT")
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
@@ -258,8 +262,10 @@ Public Class Annealing_Options : Implements IDisposable
     Public anneal As Annealing_Basics_CPP
     Public check As New OptionsCheckbox
     Dim flow As Font_FlowText
-    Public Sub New(ocvb As AlgorithmData)
-        random = New Random_Points(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        random = New Random_Points(ocvb, "Annealing_Options")
         random.sliders.TrackBar1.Value = 25 ' change the default number of cities here.
         random.externalUse = True
         random.Run(ocvb) ' get the city positions (may or may not be used below.)
@@ -270,14 +276,14 @@ Public Class Annealing_Options : Implements IDisposable
         check.Box(1).Checked = True
         If ocvb.parms.ShowOptions Then check.Show()
 
-        flow = New Font_FlowText(ocvb)
+        flow = New Font_FlowText(ocvb, "Annealing_Options")
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
         ocvb.label1 = "Log of Annealing progress"
 
 
-        anneal = New Annealing_Basics_CPP(ocvb)
+        anneal = New Annealing_Basics_CPP(ocvb, "Annealing_Options")
         anneal.externalUse = True
         anneal.numberOfCities = random.sliders.TrackBar1.Value
         anneal.circularPattern = check.Box(1).Checked

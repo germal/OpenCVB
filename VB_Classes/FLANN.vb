@@ -2,7 +2,9 @@
 ' https://docs.opencv.org/2.4/modules/flann/doc/flann_fast_approximate_nearest_neighbor_search.html#
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FlannSample.vb
 Public Class FLANN_Test : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
         ocvb.label1 = "FLANN Basics"
     End Sub
@@ -48,8 +50,10 @@ End Class
 Public Class FLANN_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim random As Random_Points
-    Public Sub New(ocvb As AlgorithmData)
-        random = New Random_Points(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        random = New Random_Points(ocvb, "FLANN_Basics")
 
         sliders.setupTrackBar1(ocvb, "Query Count", 1, 10000, 10)
         If ocvb.parms.ShowOptions Then sliders.Show()

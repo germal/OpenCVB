@@ -1,7 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Sharpen_UnsharpMask : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "sigma", 1, 2000, 100)
         sliders.setupTrackBar2(ocvb, "threshold", 0, 255, 5)
         sliders.setupTrackBar3(ocvb, "Shift Amount", 0, 5000, 1000)
@@ -32,7 +34,9 @@ End Class
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class Sharpen_DetailEnhance : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "DetailEnhance Sigma_s", 0, 200, 60)
         sliders.setupTrackBar2(ocvb, "DetailEnhance Sigma_r", 1, 100, 7)
         If ocvb.parms.ShowOptions Then sliders.Show()
@@ -54,7 +58,9 @@ End Class
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class Sharpen_Stylize : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Stylize Sigma_s", 0, 200, 60)
         sliders.setupTrackBar2(ocvb, "Stylize Sigma_r", 1, 100, 7)
         If ocvb.parms.ShowOptions Then sliders.Show()

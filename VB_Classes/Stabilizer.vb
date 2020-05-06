@@ -3,11 +3,13 @@ Imports System.Runtime.InteropServices
 Public Class Stabilizer_BriskFeatures : Implements IDisposable
     Dim brisk As BRISK_Basics
     Dim stabilizer As Stabilizer_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        stabilizer = New Stabilizer_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        stabilizer = New Stabilizer_Basics(ocvb, "Stabilizer_BriskFeatures")
         stabilizer.externalUse = True
 
-        brisk = New BRISK_Basics(ocvb)
+        brisk = New BRISK_Basics(ocvb, "Stabilizer_BriskFeatures")
         brisk.externalUse = True
         brisk.sliders.TrackBar1.Value = 10
 
@@ -32,11 +34,13 @@ End Class
 Public Class Stabilizer_HarrisFeatures : Implements IDisposable
     Dim harris As Harris_Detector_CPP
     Dim stabilizer As Stabilizer_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        stabilizer = New Stabilizer_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        stabilizer = New Stabilizer_Basics(ocvb, "Stabilizer_HarrisFeatures")
         stabilizer.externalUse = True
 
-        harris = New Harris_Detector_CPP(ocvb)
+        harris = New Harris_Detector_CPP(ocvb, "Stabilizer_HarrisFeatures")
         harris.externalUse = True
 
         ocvb.desc = "Stabilize the video stream using Harris detector features"
@@ -66,8 +70,10 @@ Public Class Stabilizer_Basics : Implements IDisposable
     Public borderCrop = 30
     Dim sumScale As cv.Mat, sScale As cv.Mat, features1 As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
-        good = New Features_GoodFeatures(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        good = New Features_GoodFeatures(ocvb, "Stabilizer_Basics")
         good.externalUse = True
 
         ocvb.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
@@ -100,9 +106,9 @@ Public Class Stabilizer_Basics : Implements IDisposable
             features = New List(Of cv.Point2f)
             Dim lastFeatures As New List(Of cv.Point2f)
             For i = 0 To status.Rows - 1
-                If status.Get(of Byte)(i, 0) Then
-                    Dim pt1 = features1.Get(of cv.Point2f)(i, 0)
-                    Dim pt2 = features2.Get(of cv.Point2f)(i, 0)
+                If status.Get(Of Byte)(i, 0) Then
+                    Dim pt1 = features1.Get(Of cv.Point2f)(i, 0)
+                    Dim pt2 = features2.Get(Of cv.Point2f)(i, 0)
                     Dim length = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y))
                     If length < 10 Then
                         features.Add(pt1)
@@ -112,11 +118,11 @@ Public Class Stabilizer_Basics : Implements IDisposable
             Next
             Dim affine = cv.Cv2.GetAffineTransform(features.ToArray, lastFeatures.ToArray)
 
-            Dim dx = affine.Get(of Double)(0, 2)
-            Dim dy = affine.Get(of Double)(1, 2)
-            Dim da = Math.Atan2(affine.Get(of Double)(1, 0), affine.Get(of Double)(0, 0))
-            Dim ds_x = affine.Get(of Double)(0, 0) / Math.Cos(da)
-            Dim ds_y = affine.Get(of Double)(1, 1) / Math.Cos(da)
+            Dim dx = affine.Get(Of Double)(0, 2)
+            Dim dy = affine.Get(Of Double)(1, 2)
+            Dim da = Math.Atan2(affine.Get(Of Double)(1, 0), affine.Get(Of Double)(0, 0))
+            Dim ds_x = affine.Get(Of Double)(0, 0) / Math.Cos(da)
+            Dim ds_y = affine.Get(Of Double)(1, 1) / Math.Cos(da)
             Dim saveDX = dx, saveDY = dy, saveDA = da
 
             Dim text = "Original dx = " + Format(dx, "#0.00") + vbNewLine + " dy = " + Format(dy, "#0.00") + vbNewLine + " da = " + Format(da, "#0.00")
@@ -130,9 +136,9 @@ Public Class Stabilizer_Basics : Implements IDisposable
             Dim diff As New cv.Mat
             cv.Cv2.Subtract(sScale, sumScale, diff)
 
-            da += diff.Get(of Double)(2, 0)
-            dx += diff.Get(of Double)(3, 0)
-            dy += diff.Get(of Double)(4, 0)
+            da += diff.Get(Of Double)(2, 0)
+            dx += diff.Get(Of Double)(3, 0)
+            dy += diff.Get(Of Double)(4, 0)
             If Math.Abs(dx) > 50 Then dx = saveDX
             If Math.Abs(dy) > 50 Then dy = saveDY
             If Math.Abs(da) > 50 Then da = saveDA
@@ -184,7 +190,9 @@ Public Class Stabilizer_Basics_CPP : Implements IDisposable
     Dim srcData() As Byte
     Dim handleSrc As GCHandle
     Dim sPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ReDim srcData(ocvb.color.Total * ocvb.color.ElemSize - 1)
         sPtr = Stabilizer_Basics_Open()
         ocvb.desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work."
@@ -216,9 +224,11 @@ End Class
 Public Class Stabilizer_SideBySide : Implements IDisposable
     Dim original As Stabilizer_Basics_CPP
     Dim basics As Stabilizer_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        original = New Stabilizer_Basics_CPP(ocvb)
-        basics = New Stabilizer_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        original = New Stabilizer_Basics_CPP(ocvb, "Stabilizer_SideBySide")
+        basics = New Stabilizer_Basics(ocvb, "Stabilizer_SideBySide")
         ocvb.desc = "Run both the original and the VB.Net version of the video stabilizer.  Neither is working properly."
         ocvb.label1 = "Stabilizer_Basic (VB.Net)"
         ocvb.label2 = "Stabilizer_Basic_CPP (C++)"

@@ -10,8 +10,10 @@ Public Class CamShift_Basics : Implements IDisposable
     Public plotHist As Plot_Histogram
     Public trackBox As New cv.RotatedRect
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
-        plotHist = New Plot_Histogram(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        plotHist = New Plot_Histogram(ocvb, "CamShift_Basics")
         plotHist.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "CamShift vMin", 0, 255, 32)
@@ -81,9 +83,11 @@ End Class
 Public Class CamShift_Foreground : Implements IDisposable
     Dim camshift As CamShift_Basics
     Dim blob As Depth_Foreground
-    Public Sub New(ocvb As AlgorithmData)
-        camshift = New CamShift_Basics(ocvb)
-        blob = New Depth_Foreground(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        camshift = New CamShift_Basics(ocvb, "CamShift_Foreground")
+        blob = New Depth_Foreground(ocvb, "CamShift_Foreground")
         ocvb.label1 = "Automatically finding the head - top of nearest object"
         ocvb.desc = "Use depth to find the head and start the camshift demo. "
     End Sub
@@ -118,10 +122,12 @@ End Class
 Public Class Camshift_Object : Implements IDisposable
     Dim blob As Blob_DepthClusters
     Dim camshift As CamShift_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        blob = New Blob_DepthClusters(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        blob = New Blob_DepthClusters(ocvb, "Camshift_Object")
 
-        camshift = New CamShift_Basics(ocvb)
+        camshift = New CamShift_Basics(ocvb, "Camshift_Object")
 
         ocvb.desc = "Use the blob depth cluster as input to initialize a camshift algorithm"
     End Sub
@@ -147,15 +153,17 @@ Public Class Camshift_TopObjects : Implements IDisposable
     Dim cams(3) As CamShift_Basics
     Dim sliders As New OptionsSliders
     Dim mats As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData)
-        mats = New Mat_4to1(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        mats = New Mat_4to1(ocvb, "Camshift_TopObjects")
         mats.externalUse = True
 
-        blob = New Blob_DepthClusters(ocvb)
+        blob = New Blob_DepthClusters(ocvb, "Camshift_TopObjects")
         sliders.setupTrackBar1(ocvb, "How often should camshift be reinitialized", 1, 500, 100)
         If ocvb.parms.ShowOptions Then sliders.Show()
         For i = 0 To cams.Length - 1
-            cams(i) = New CamShift_Basics(ocvb)
+            cams(i) = New CamShift_Basics(ocvb, "Camshift_TopObjects")
         Next
         ocvb.desc = "Track"
     End Sub

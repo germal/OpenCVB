@@ -64,12 +64,14 @@ End Module
 Public Class Python_Run : Implements IDisposable
     Dim pyStream As PyStream_Basics = Nothing
     Dim tryCount As Int32
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
         If pythonApp.Name.EndsWith("_PS.py") Then
-            pyStream = New PyStream_Basics(ocvb)
+            pyStream = New PyStream_Basics(ocvb, "Python_Run")
         Else
             StartPython(ocvb, "")
         End If
@@ -111,7 +113,9 @@ Public Class Python_MemMap : Implements IDisposable
     Public memMapValues(49) As Double ' more than we need - buffer for growth
     Public memMapbufferSize As Int32
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         If ocvb.PythonFileName Is Nothing Then
             ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_MemMap.py"
         Else
@@ -158,7 +162,9 @@ Public Class Python_SurfaceBlit : Implements IDisposable
     Dim rgbBuffer(1) As Byte
     Dim pointCloudBuffer(1) As Byte
     Dim PythonReady As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ' this Python script requires pygame to be present...
         If checkPythonPackage(ocvb, "pygame") = False Then
             PythonReady = False
@@ -171,7 +177,7 @@ Public Class Python_SurfaceBlit : Implements IDisposable
         ' this Python script assumes that fast processing is off - the pointcloud is being used and cannot be resized.
         ' ocvb.parms.lowResolution = False
         ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
-        memMap = New Python_MemMap(ocvb)
+        memMap = New Python_MemMap(ocvb, "Python_SurfaceBlit")
 
         If ocvb.parms.externalPythonInvocation Then
             PythonReady = True ' python was already running and invoked OpenCVB.

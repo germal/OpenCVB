@@ -3,7 +3,9 @@
 Public Class PCA_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
     Public useDepthInput As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Retained Variance", 1, 100, 95)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Reconstruct a video stream as a composite of X images."
@@ -47,8 +49,10 @@ End Class
 
 Public Class PCA_Depth : Implements IDisposable
     Dim pca As PCA_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        pca = New PCA_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        pca = New PCA_Basics(ocvb, "PCA_Depth")
         pca.useDepthInput = True
         ocvb.desc = "Reconstruct a depth stream as a composite of X images."
     End Sub
@@ -67,8 +71,10 @@ End Class
 Public Class PCA_DrawImage : Implements IDisposable
     Dim pca As PCA_Basics
     Dim image As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
-        pca = New PCA_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        pca = New PCA_Basics(ocvb, "PCA_DrawImage")
         image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/pca_test1.jpg")
         ocvb.desc = "Use PCA to find the principle direction of an object."
         ocvb.label1 = "Original image"

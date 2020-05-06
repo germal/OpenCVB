@@ -4,9 +4,11 @@ Public Class Threshold_LaplacianFilter : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim edges As Filter_Laplacian
     Dim trim As Depth_InRange
-    Public Sub New(ocvb As AlgorithmData)
-        trim = New Depth_InRange(ocvb)
-        edges = New Filter_Laplacian(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        trim = New Depth_InRange(ocvb, "Threshold_LaplacianFilter")
+        edges = New Filter_Laplacian(ocvb, "Threshold_LaplacianFilter")
         sliders.setupTrackBar1(ocvb, "dist Threshold", 1, 100, 40)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.label1 = "Foreground Input"

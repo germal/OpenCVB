@@ -1,7 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LeftRightView_Basics : Implements IDisposable
     Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 100)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Show the left and right views from the 3D Camera"
@@ -39,8 +41,10 @@ End Class
 Public Class LeftRightView_CompareUndistorted : Implements IDisposable
     Public sliders As New OptionsSliders
     Public fisheye As FishEye_Rectified
-    Public Sub New(ocvb As AlgorithmData)
-        fisheye = New FishEye_Rectified(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        fisheye = New FishEye_Rectified(ocvb, "LeftRightView_CompareUndistorted")
         fisheye.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 0)
@@ -105,7 +109,9 @@ End Class
 Public Class LeftRightView_CompareRaw : Implements IDisposable
     Dim lrView As LeftRightView_Basics
     Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 100)
         sliders.setupTrackBar2(ocvb, "Slice Starting Y", 0, 300, 100)
         sliders.setupTrackBar3(ocvb, "Slice Height", 1, 120, 50)
@@ -123,7 +129,7 @@ Public Class LeftRightView_CompareRaw : Implements IDisposable
                 ocvb.label2 = "Raw Right Right Image"
                 sliders.TrackBar1.Value = 50
         End Select
-        lrView = New LeftRightView_Basics(ocvb)
+        lrView = New LeftRightView_Basics(ocvb, "LeftRightView_CompareRaw")
         lrView.sliders.Hide()
         ocvb.desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
@@ -157,11 +163,13 @@ End Class
 Public Class LeftRightView_Features : Implements IDisposable
     Dim lrView As LeftRightView_Basics
     Dim features As Features_GoodFeatures
-    Public Sub New(ocvb As AlgorithmData)
-        features = New Features_GoodFeatures(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        features = New Features_GoodFeatures(ocvb, "LeftRightView_Features")
         features.externalUse = True
 
-        lrView = New LeftRightView_Basics(ocvb)
+        lrView = New LeftRightView_Basics(ocvb, "LeftRightView_Features")
 
         ocvb.desc = "Find GoodFeatures in the left and right depalettized infrared images"
         ocvb.label1 = "Left Image"
@@ -197,9 +205,11 @@ End Class
 Public Class LeftRightView_Palettized : Implements IDisposable
     Dim lrView As LeftRightView_Basics
     Dim palette As Palette_ColorMap
-    Public Sub New(ocvb As AlgorithmData)
-        lrView = New LeftRightView_Basics(ocvb)
-        palette = New Palette_ColorMap(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        lrView = New LeftRightView_Basics(ocvb, "LeftRightView_Palettized")
+        palette = New Palette_ColorMap(ocvb, "LeftRightView_Palettized")
         palette.externalUse = True
 
         ocvb.desc = "Add color to the 8-bit infrared images."
@@ -233,16 +243,18 @@ End Class
 Public Class LeftRightView_BRISK : Implements IDisposable
     Dim lrView As LeftRightView_Basics
     Dim brisk As BRISK_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Add color to the 8-bit infrared images."
         ocvb.label1 = "Infrared Left Image"
         ocvb.label2 = "Infrared Right Image"
 
-        brisk = New BRISK_Basics(ocvb)
+        brisk = New BRISK_Basics(ocvb, "LeftRightView_BRISK")
         brisk.externalUse = True
         brisk.sliders.TrackBar1.Value = 20
 
-        lrView = New LeftRightView_Basics(ocvb)
+        lrView = New LeftRightView_Basics(ocvb, "LeftRightView_BRISK")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         lrView.Run(ocvb)

@@ -19,7 +19,9 @@ End Module
 ' https://github.com/opencv/opencv/wiki/Profiling-OpenCV-Applications
 Public Class Trace_OpenCV_CPP : Implements IDisposable
     Dim Trace_OpenCV As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         Trace_OpenCV = Trace_OpenCV_Open()
         ocvb.desc = "Use OpenCV's Trace facility - applicable to C++ code - and requires Intel's VTune (see link in code.)"
     End Sub

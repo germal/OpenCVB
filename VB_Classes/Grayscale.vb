@@ -1,7 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Grayscale_Basics : Implements IDisposable
     Dim check As New OptionsCheckbox
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Use OpenCV to create grayscale image"
         check.Box(0).Checked = True

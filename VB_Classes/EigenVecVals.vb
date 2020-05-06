@@ -1,7 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 ' https://bytefish.de/blog/eigenvalues_in_opencv/
 Public Class EigenVecVals_Basics : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Solve system of equations using OpenCV's EigenVV"
         ocvb.label1 = "EigenVec (solution)"
         ocvb.label2 = "Relationship between Eigen Vec and Vals"

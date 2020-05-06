@@ -2,7 +2,9 @@
 ' https://docs.opencv.org/3.3.1/d6/d73/Pyramids_8cpp-example.html
 Public Class Pyramid_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Zoom in and out", -1, 1, 0)
         If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Use pyrup and pyrdown to zoom in and out of an image."

@@ -6,7 +6,9 @@ Public Class Features_GoodFeatures : Implements IDisposable
     Public goodFeatures As New List(Of cv.Point2f)
     Public gray As cv.Mat = Nothing
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Number of Points", 10, 1000, 200)
         sliders.setupTrackBar2(ocvb, "Quality Level", 1, 100, 1)
         sliders.setupTrackBar3(ocvb, "Distance", 1, 100, 30)

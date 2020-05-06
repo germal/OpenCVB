@@ -3,8 +3,10 @@
 Public Class BlockMatching_Basics : Implements IDisposable
     Dim colorizer As Depth_Colorizer_CPP
     Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
-        colorizer = New Depth_Colorizer_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        colorizer = New Depth_Colorizer_CPP(ocvb, "BlockMatching_Basics")
 
         sliders.setupTrackBar1(ocvb, "Blockmatch scale", 1, 200, 100)
         sliders.setupTrackBar2(ocvb, "Blockmatch max disparity", 1, 8, 1)

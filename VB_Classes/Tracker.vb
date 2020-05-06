@@ -6,7 +6,9 @@ Public Class Tracker_Basics : Implements IDisposable
     Public boxObject() As cv.Rect2d
     Public externalUse As Boolean
     Public trackerIndex As Int32 = 5 ' trackerMIL by default...
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Stop tracking selected object"
         If ocvb.parms.ShowOptions Then check.Show()
@@ -68,12 +70,14 @@ End Class
 
 Public Class Tracker_MultiObject : Implements IDisposable
     Dim trackers As New List(Of Tracker_Basics)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Track any number of objects simultaneously"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.drawRect.Width <> 0 Then
-            Dim tr = New Tracker_Basics(ocvb)
+            Dim tr = New Tracker_Basics(ocvb, "Tracker_MultiObject")
             tr.externalUse = True
             tr.Run(ocvb)
             ocvb.drawRect = New cv.Rect
@@ -107,8 +111,10 @@ End Class
 Public Class Tracker_Methods : Implements IDisposable
     Dim tracker As Tracker_Basics
     Dim radio As New OptionsRadioButtons
-    Public Sub New(ocvb As AlgorithmData)
-        tracker = New Tracker_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        tracker = New Tracker_Basics(ocvb, "Tracker_Methods")
 
         radio.Setup(ocvb, 8)
         radio.check(0).Text = "TrackerBoosting"

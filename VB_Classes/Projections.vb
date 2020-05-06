@@ -20,49 +20,51 @@ Module Projections
 
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Projections_Gravity_Open(filename As String) As IntPtr
+    Public Function Project_Gravity_Open(filename As String) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Projections_Gravity_Close(cPtr As IntPtr)
+    Public Sub Project_Gravity_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Projections_Gravity_Side(cPtr As IntPtr) As IntPtr
+    Public Function Project_Gravity_Side(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Projections_Gravity_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
+    Public Function Project_Gravity_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
     End Function
 
 
 
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Projections_GravityHist_Open() As IntPtr
+    Public Function Project_GravityHist_Open() As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Projections_GravityHist_Close(cPtr As IntPtr)
+    Public Sub Project_GravityHist_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Projections_GravityHist_Side(cPtr As IntPtr) As IntPtr
+    Public Function Project_GravityHist_Side(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Projections_GravityHist_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
+    Public Function Project_GravityHist_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
     End Function
 End Module
 
 
 
-Public Class Projections_NoGravity_CPP : Implements IDisposable
+Public Class Project_NoGravity_CPP : Implements IDisposable
     Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
-    Public Sub New(ocvb As AlgorithmData)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        grid = New Thread_Grid(ocvb, "Project_NoGravity_CPP")
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
-        foreground = New Depth_ManualTrim(ocvb)
+        foreground = New Depth_ManualTrim(ocvb, "Project_NoGravity_CPP")
         foreground.externalUse = True
         foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
         foreground.sliders.TrackBar2.Value = 4000 ' fixed distance to keep the images stable.
@@ -107,18 +109,20 @@ End Class
 
 
 
-Public Class Projections_NoGravity : Implements IDisposable
+Public Class Project_NoGravity : Implements IDisposable
     Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
-    Public Sub New(ocvb As AlgorithmData)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        grid = New Thread_Grid(ocvb, "Project_NoGravity")
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
-        foreground = New Depth_ManualTrim(ocvb)
+        foreground = New Depth_ManualTrim(ocvb, "Project_NoGravity")
         foreground.externalUse = True
         foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
         foreground.sliders.TrackBar2.Value = 4000 ' fixed distance to keep the images stable.
@@ -147,7 +151,7 @@ Public Class Projections_NoGravity : Implements IDisposable
          Sub(roi)
              For y = roi.Y To roi.Y + roi.Height - 1
                  For x = roi.X To roi.X + roi.Width - 1
-                     Dim m = foreground.Mask.Get(of Byte)(y, x)
+                     Dim m = foreground.Mask.Get(Of Byte)(y, x)
                      If m > 0 Then
                          Dim depth = depth32f.Get(Of Single)(y, x)
                          Dim dy = CInt(h * (depth - desiredMin) / range)
@@ -175,16 +179,18 @@ End Class
 
 
 
-Public Class Projections_GravityVB : Implements IDisposable
-    Dim imu As IMU_AnglesToGravity
+Public Class Project_GravityVB : Implements IDisposable
+    Dim imu As IMU_GravityVec
     Dim sliders As New OptionsSliders
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData)
-        imu = New IMU_AnglesToGravity(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        imu = New IMU_GravityVec(ocvb, "Project_GravityVB")
         imu.result = RESULT2
         imu.externalUse = True
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid(ocvb, "Project_GravityVB")
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
@@ -216,7 +222,7 @@ Public Class Projections_GravityVB : Implements IDisposable
         Dim xz(4 * 4) As Single
         For j = 0 To yRotate.Rows - 1
             For i = 0 To yRotate.Cols - 1
-                xz(i * 4 + j) = yRotate.Get(of Single)(i, j)
+                xz(i * 4 + j) = yRotate.Get(Of Single)(i, j)
             Next
         Next
 
@@ -243,14 +249,14 @@ Public Class Projections_GravityVB : Implements IDisposable
          Sub(roi)
              For y = roi.Y + roi.Height - 1 To roi.Y Step -1
                  For x = roi.X To roi.X + roi.Width - 1
-                     Dim m = mask.Get(of Byte)(h - y - 1, x)
+                     Dim m = mask.Get(Of Byte)(h - y - 1, x)
                      If m > 0 Then
-                         Dim depth = vertSplit(2).Get(of Single)(h - y - 1, x)
+                         Dim depth = vertSplit(2).Get(Of Single)(h - y - 1, x)
                          If depth < desiredMax Then
-                             Dim dx = xFactor * (vertSplit(0).Get(of Single)(h - y - 1, x) - minval)
+                             Dim dx = xFactor * (vertSplit(0).Get(Of Single)(h - y - 1, x) - minval)
                              Dim dy = Math.Round(h * (desiredMax - depth) / desiredMax)
                              If dy < h And dy > 0 Then ocvb.result1.Set(Of cv.Vec3b)(CInt(h - dy), CInt(dx), black)
-                             dy = Math.Round(vertSplit(1).Get(of Single)(y, x))
+                             dy = Math.Round(vertSplit(1).Get(Of Single)(y, x))
                              dx = Math.Round(w * (desiredMax - depth) / desiredMax)
                              If dy < h And dy > 0 Then ocvb.result2.Set(Of cv.Vec3b)(CInt(h - dy), CInt(dx), black)
                          End If
@@ -274,10 +280,12 @@ End Class
 
 
 
-Public Class Projections_GravityHistogram : Implements IDisposable
-    Public gravity As Projections_Gravity_CPP
-    Public Sub New(ocvb As AlgorithmData)
-        gravity = New Projections_Gravity_CPP(ocvb)
+Public Class Project_GravityHistogram : Implements IDisposable
+    Public gravity As Project_Gravity_CPP
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        gravity = New Project_Gravity_CPP(ocvb, "Project_GravityHistogram")
         gravity.sliders.GroupBox2.Visible = True
         gravity.histogramRun = True
 
@@ -296,8 +304,8 @@ End Class
 
 
 
-Public Class Projections_Gravity_CPP : Implements IDisposable
-    Dim imu As IMU_AnglesToGravity
+Public Class Project_Gravity_CPP : Implements IDisposable
+    Dim imu As IMU_GravityVec
     Public sliders As New OptionsSliders
     Dim cPtr As IntPtr
     Dim histPtr As IntPtr
@@ -308,8 +316,10 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
     Public dst1 As cv.Mat
     Public dst2 As cv.Mat
     Public maxZ As Single
-    Public Sub New(ocvb As AlgorithmData)
-        imu = New IMU_AnglesToGravity(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        imu = New IMU_GravityVec(ocvb, "Project_Gravity_CPP")
         imu.result = RESULT2
         imu.externalUse = True
 
@@ -320,10 +330,10 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
 
         Dim fileInfo As New FileInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps/colorscale_jet.jpg")
         If fileInfo.Exists = False Then
-            MsgBox("The colormaps have moved!  Projections_Gravity_CPP won't work." + vbCrLf + "Look for this file:" + fileInfo.FullName)
+            MsgBox("The colormaps have moved!  Project_Gravity_CPP won't work." + vbCrLf + "Look for this file:" + fileInfo.FullName)
         End If
-        cPtr = Projections_Gravity_Open(fileInfo.FullName)
-        histPtr = Projections_GravityHist_Open()
+        cPtr = Project_Gravity_Open(fileInfo.FullName)
+        histPtr = Project_GravityHist_Open()
 
         ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
     End Sub
@@ -371,10 +381,10 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
 
         Dim imagePtr As IntPtr
         If histogramRun Then
-            imagePtr = Projections_GravityHist_Run(histPtr, handleXYZ.AddrOfPinnedObject, maxZ, xyz.Height, xyz.Width)
+            imagePtr = Project_GravityHist_Run(histPtr, handleXYZ.AddrOfPinnedObject, maxZ, xyz.Height, xyz.Width)
 
             Dim histTop = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, imagePtr)
-            Dim histSide = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, Projections_GravityHist_Side(histPtr))
+            Dim histSide = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, Project_GravityHist_Side(histPtr))
 
             Dim threshold = sliders.TrackBar2.Value
             dst1 = histTop.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -383,10 +393,10 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
             ocvb.label1 = "Top View after threshold"
             ocvb.label2 = "Side View after threshold"
         Else
-            imagePtr = Projections_Gravity_Run(cPtr, handleXYZ.AddrOfPinnedObject, maxZ, xyz.Height, xyz.Width)
+            imagePtr = Project_Gravity_Run(cPtr, handleXYZ.AddrOfPinnedObject, maxZ, xyz.Height, xyz.Width)
 
             dst1 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
-            dst2 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, Projections_Gravity_Side(cPtr)).Clone()
+            dst2 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, Project_Gravity_Side(cPtr)).Clone()
 
             ocvb.label1 = "Top View (looking down)"
             ocvb.label2 = "Side View"
@@ -410,8 +420,8 @@ Public Class Projections_Gravity_CPP : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
         imu.Dispose()
         sliders.Dispose()
-        Projections_Gravity_Close(cPtr)
-        Projections_GravityHist_Close(histPtr)
+        Project_Gravity_Close(cPtr)
+        Project_GravityHist_Close(histPtr)
     End Sub
 End Class
 
@@ -420,26 +430,28 @@ End Class
 
 
 
-Public Class Projections_HistogramFloodfill : Implements IDisposable
+Public Class Project_Floodfill : Implements IDisposable
     Dim flood As FloodFill_Projection
     Dim sliders As New OptionsSliders
     Dim kalman As Kalman_Basics
-    Public gravity As Projections_Gravity_CPP
+    Public gravity As Project_Gravity_CPP
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        kalman = New Kalman_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        kalman = New Kalman_Basics(ocvb, "Project_Floodfill")
         ReDim kalman.src(10 * 4 - 1) ' max 10 objects. 
         kalman.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "epsilon for GroupRectangles X100", 0, 200, 80)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        gravity = New Projections_Gravity_CPP(ocvb)
+        gravity = New Project_Gravity_CPP(ocvb, "Project_Floodfill")
         gravity.sliders.GroupBox2.Visible = True
         gravity.externalUse = True
         gravity.histogramRun = True
 
-        flood = New FloodFill_Projection(ocvb)
+        flood = New FloodFill_Projection(ocvb, "Project_Floodfill")
         flood.sliders.TrackBar1.Value = 100
         flood.sliders.TrackBar4.Value = 1
         flood.externalUse = True
@@ -507,21 +519,23 @@ End Class
 
 
 
-Public Class Projections_Wall : Implements IDisposable
-    Dim objects As Projections_HistogramFloodfill
+Public Class Project_Wall : Implements IDisposable
+    Dim objects As Project_Floodfill
     Dim lines As lineDetector_FLD
     Dim dilate As DilateErode_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        dilate = New DilateErode_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+
+        dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
         dilate.externalUse = True
 
-        objects = New Projections_HistogramFloodfill(ocvb)
+        objects = New Project_Floodfill(ocvb, Me.GetType().Name)
         objects.externalUse = True
 
-        lines = New lineDetector_FLD(ocvb)
+        lines = New lineDetector_FLD(ocvb, Me.GetType().Name)
         lines.externalUse = True
 
-        ocvb.callerName = "Projections_WallDetect"
         ocvb.desc = "Use the top down view to detect walls with a line detector algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -24,8 +24,10 @@ Public Class DFT_Basics : Implements IDisposable
     Public rows As Int32
     Public cols As Int32
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        mats = New Mat_4to1(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        mats = New Mat_4to1(ocvb, "DFT_Basics")
         mats.externalUse = True
         mats.noLines = True
 
@@ -85,8 +87,10 @@ End Class
 ' http://opencvexamples.blogspot.com/
 Public Class DFT_Inverse : Implements IDisposable
     Dim mats As Mat_2to1
-    Public Sub New(ocvb As AlgorithmData)
-        mats = New Mat_2to1(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        mats = New Mat_2to1(ocvb, "DFT_Inverse")
         mats.externalUse = True
         ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
         ocvb.label1 = "Image after Inverse DFT"
@@ -129,11 +133,13 @@ End Class
 Public Class DFT_ButterworthFilter : Implements IDisposable
     Public dft As DFT_Basics
     Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "DFT B Filter - Radius", 1, ocvb.color.Height, ocvb.color.Height)
         sliders.setupTrackBar2(ocvb, "DFT B Filter - Order", 1, ocvb.color.Height, 2)
         If ocvb.parms.ShowOptions Then sliders.Show()
-        dft = New DFT_Basics(ocvb)
+        dft = New DFT_Basics(ocvb, "DFT_ButterworthFilter")
         ocvb.desc = "Use the Butterworth filter on a DFT image - color image input."
         ocvb.label1 = "Image with Butterworth Low Pass Filter Applied"
         ocvb.label2 = "Same filter with radius / 2"
@@ -187,8 +193,10 @@ End Class
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
 Public Class DFT_ButterworthDepth : Implements IDisposable
     Dim bfilter As DFT_ButterworthFilter
-    Public Sub New(ocvb As AlgorithmData)
-        bfilter = New DFT_ButterworthFilter(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        bfilter = New DFT_ButterworthFilter(ocvb, "DFT_ButterworthDepth")
         bfilter.dft.externalUse = True
 
         ocvb.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."

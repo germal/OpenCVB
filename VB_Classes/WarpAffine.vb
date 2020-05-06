@@ -5,7 +5,9 @@ Public Class WarpAffine_Captcha : Implements IDisposable
     Const charWidth = 80
     Const captchaLength = 8
     Dim rng As New System.Random
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Use OpenCV to build a captcha Turing test."
     End Sub
     Private Sub addNoise(image As cv.Mat)
@@ -74,7 +76,7 @@ Public Class WarpAffine_Captcha : Implements IDisposable
         For i = 0 To captchaLength - 1
             Dim charImage = New cv.Mat(charHeight, charWidth, cv.MatType.CV_8UC3, cv.Scalar.White)
             Dim c = characters(rng.Next(0, characters.Length - 1))
-            cv.Cv2.PutText(charImage, c, New cv.Point(10, charHeight - 10), ocvb.ms_rng.next(1, 6), ocvb.ms_rng.next(3, 4), ocvb.rColors(i), ocvb.ms_rng.next(1, 5),
+            cv.Cv2.PutText(charImage, c, New cv.Point(10, charHeight - 10), ocvb.ms_rng.Next(1, 6), ocvb.ms_rng.Next(3, 4), ocvb.rColors(i), ocvb.ms_rng.Next(1, 5),
                            cv.LineTypes.AntiAlias)
             transformPerspective(charImage)
             rotateImg(charImage, charImage)
@@ -98,7 +100,9 @@ End Class
 Public Class WarpAffine_Basics : Implements IDisposable
     Dim sliders As New OptionsSliders
     Dim radio As New OptionsRadioButtons
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Angle", 0, 360, 10)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
@@ -132,8 +136,10 @@ End Class
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
 Public Class WarpAffine_3Points : Implements IDisposable
     Dim triangle As Area_MinTriangle_CPP
-    Public Sub New(ocvb As AlgorithmData)
-        triangle = New Area_MinTriangle_CPP(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        triangle = New Area_MinTriangle_CPP(ocvb, "WarpAffine_3Points")
         triangle.sliders.TrackBar1.Value = 20
         triangle.sliders.TrackBar2.Value = 150
 
@@ -159,20 +165,20 @@ Public Class WarpAffine_3Points : Implements IDisposable
         ' triangles(0) = tOriginal
         For j = 0 To 1
             For i = 0 To triangles(j).Rows - 1
-                Dim p1 = triangles(j).Get(of cv.Point2f)(i) + New cv.Point2f(j * ocvb.color.Width, 0)
-                Dim p2 = triangles(j).Get(of cv.Point2f)((i + 1) Mod 3) + New cv.Point2f(j * ocvb.color.Width, 0)
+                Dim p1 = triangles(j).Get(Of cv.Point2f)(i) + New cv.Point2f(j * ocvb.color.Width, 0)
+                Dim p2 = triangles(j).Get(Of cv.Point2f)((i + 1) Mod 3) + New cv.Point2f(j * ocvb.color.Width, 0)
                 Dim color = Choose(i + 1, cv.Scalar.Red, cv.Scalar.White, cv.Scalar.Yellow)
                 wideMat.Line(p1, p2, color, 4, cv.LineTypes.AntiAlias)
                 If j = 0 Then
-                    Dim p3 = triangles(j + 1).Get(of cv.Point2f)(i) + New cv.Point2f(ocvb.color.Width, 0)
+                    Dim p3 = triangles(j + 1).Get(Of cv.Point2f)(i) + New cv.Point2f(ocvb.color.Width, 0)
                     wideMat.Line(p1, p3, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 End If
             Next
         Next
 
-        Dim corner = triangles(0).Get(of cv.Point2f)(0)
+        Dim corner = triangles(0).Get(Of cv.Point2f)(0)
         wideMat.Circle(corner, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        corner = New cv.Point2f(M.Get(of Double)(0, 2) + ocvb.color.Width, M.Get(of Double)(1, 2))
+        corner = New cv.Point2f(M.Get(Of Double)(0, 2) + ocvb.color.Width, M.Get(Of Double)(1, 2))
         wideMat.Circle(corner, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
         ocvb.result1 = wideMat(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
@@ -188,12 +194,12 @@ Public Class WarpAffine_3Points : Implements IDisposable
 
         Dim ttStart = 40
         ocvb.putText(New ActiveClass.TrueType("M defined as: " + vbCrLf +
-                                              Format(M.Get(of Double)(0, 0), "#0.00") + vbTab +
-                                              Format(M.Get(of Double)(0, 1), "#0.00") + vbTab +
-                                              Format(M.Get(of Double)(0, 2), "#0.00") + vbCrLf +
-                                              Format(M.Get(of Double)(1, 0), "#0.00") + vbTab +
-                                              Format(M.Get(of Double)(1, 1), "#0.00") + vbTab +
-                                              Format(M.Get(of Double)(1, 2), "#0.00"), 10, ttStart, RESULT2))
+                                              Format(M.Get(Of Double)(0, 0), "#0.00") + vbTab +
+                                              Format(M.Get(Of Double)(0, 1), "#0.00") + vbTab +
+                                              Format(M.Get(Of Double)(0, 2), "#0.00") + vbCrLf +
+                                              Format(M.Get(Of Double)(1, 0), "#0.00") + vbTab +
+                                              Format(M.Get(Of Double)(1, 1), "#0.00") + vbTab +
+                                              Format(M.Get(Of Double)(1, 2), "#0.00"), 10, ttStart, RESULT2))
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         triangle.Dispose()
@@ -207,8 +213,10 @@ End Class
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
 Public Class WarpAffine_4Points : Implements IDisposable
     Dim rect As Area_MinRect
-    Public Sub New(ocvb As AlgorithmData)
-        rect = New Area_MinRect(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        rect = New Area_MinRect(ocvb, "WarpAffine_4Points")
 
         ocvb.desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
         ocvb.label1 = "Color image with perspective transform applied"

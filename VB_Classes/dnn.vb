@@ -6,7 +6,9 @@ Imports System.IO
 
 Public Class DNN_Test : Implements IDisposable
     Dim net As Net
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
     End Sub
@@ -45,7 +47,9 @@ End Class
 
 Public Class DNN_Caffe_CS : Implements IDisposable
     Dim caffeCS As CS_Classes.DNN
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
 
@@ -83,7 +87,9 @@ Public Class DNN_Basics : Implements IDisposable
     Public rect As cv.Rect
     Dim classNames() = {"background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse",
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "dnn Scale Factor", 1, 10000, 78)
         sliders.setupTrackBar2(ocvb, "dnn MeanVal", 1, 255, 127)
         If ocvb.parms.ShowOptions Then sliders.Show()

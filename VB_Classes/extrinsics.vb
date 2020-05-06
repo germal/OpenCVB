@@ -1,6 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Extrinsics_Basics : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.desc = "Show the depth camera extrinsics."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

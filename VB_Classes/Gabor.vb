@@ -15,7 +15,9 @@ Public Class Gabor_Basics : Implements IDisposable
     Public lambda As Double
     Public gamma As Double
     Public phaseOffset As Double
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders1.setupTrackBar1(ocvb, "Gabor gamma X10", 0, 10, 5)
         sliders1.setupTrackBar2(ocvb, "Gabor Phase offset X100", 0, 100, 0)
         If ocvb.parms.ShowOptions Then sliders1.Show()
@@ -66,9 +68,11 @@ Public Class Gabor_Basics_MT : Implements IDisposable
     Public sliders1 As New OptionsSliders
     Dim grid As Thread_Grid
     Dim gabor(31) As Gabor_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         ocvb.label2 = "The 32 kernels used"
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid(ocvb, "Gabor_Basics_MT")
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
         grid.Run(ocvb)
@@ -85,7 +89,7 @@ Public Class Gabor_Basics_MT : Implements IDisposable
 
         ocvb.parms.ShowOptions = False ' no  options for the Gabor_Basics algorithm needed - just need them for the parent thread.
         For i = 0 To gabor.Length - 1
-            gabor(i) = New Gabor_Basics(ocvb)
+            gabor(i) = New Gabor_Basics(ocvb, "Gabor_Basics_MT")
             gabor(i).sliders.TrackBar3.Value = i * 180 / gabor.Length
             gabor(i).externalUse = True
         Next

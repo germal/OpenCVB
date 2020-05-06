@@ -19,7 +19,9 @@ End Module
 'https://github.com/omidsakhi/cv-hmm
 Public Class HMM_Example_CPP : Implements IDisposable
     Dim HMM As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         HMM = HMM_Open()
         ocvb.label1 = "HMM - see Visual Studio Output for results"
         ocvb.desc = "Simple test of Hidden Markov Model - text output"

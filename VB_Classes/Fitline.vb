@@ -7,8 +7,10 @@ Public Class Fitline_Basics : Implements IDisposable
     Public src As New cv.Mat
     Public dst As New cv.Mat
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
-    Public Sub New(ocvb As AlgorithmData)
-        draw = New Draw_Line(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        draw = New Draw_Line(ocvb, "Fitline_Basics")
         draw.sliders.TrackBar1.Value = 2
 
         sliders.setupTrackBar1(ocvb, "Accuracy for the radius X100", 0, 100, 10)
@@ -57,8 +59,10 @@ End Class
 
 Public Class Fitline_3DBasics_MT : Implements IDisposable
     Dim hlines As Hough_Lines_MT
-    Public Sub New(ocvb As AlgorithmData)
-        hlines = New Hough_Lines_MT(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        hlines = New Hough_Lines_MT(ocvb, "Fitline_3DBasics_MT")
         ocvb.desc = "Use visual lines to find 3D lines."
         ocvb.label2 = "White is featureless RGB, blue depth shadow"
     End Sub
@@ -79,8 +83,8 @@ Public Class Fitline_3DBasics_MT : Implements IDisposable
             Dim rows = ocvb.color.Rows, cols = ocvb.color.Cols
             For y = 0 To roi.Height - 1
                 For x = 0 To roi.Width - 1
-                    If fMask.Get(of Byte)(y, x) > 0 Then
-                        Dim d = depth.Get(of Single)(y, x)
+                    If fMask.Get(Of Byte)(y, x) > 0 Then
+                        Dim d = depth.Get(Of Single)(y, x)
                         If d > 0 And d < 10000 Then
                             points.Add(New cv.Point3f(x / rows, y / cols, d / 10000))
                         End If
@@ -120,7 +124,9 @@ Public Class Fitline_RawInput : Implements IDisposable
     Public points As List(Of cv.Point2f)
     Public m As Single
     Public bb As Single
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Random point count", 0, 500, 100)
         sliders.setupTrackBar2(ocvb, "Line Point Count", 0, 500, 20)
         sliders.setupTrackBar3(ocvb, "Line Noise", 1, 100, 10)
@@ -199,8 +205,10 @@ End Class
 ' http://www.cs.cmu.edu/~youngwoo/doc/lineFittingTest.cpp
 Public Class Fitline_EigenFit : Implements IDisposable
     Dim noisyLine As Fitline_RawInput
-    Public Sub New(ocvb As AlgorithmData)
-        noisyLine = New Fitline_RawInput(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        noisyLine = New Fitline_RawInput(ocvb, "Fitline_EigenFit")
         noisyLine.sliders.TrackBar1.Value = 30
         noisyLine.sliders.TrackBar2.Value = 400
         ocvb.label1 = "Raw input (use sliders below to explore)"

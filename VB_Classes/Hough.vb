@@ -41,8 +41,10 @@ End Module
 Public Class Hough_Circles : Implements IDisposable
     Dim circles As Draw_Circles
     Public updateFrequency = 30
-    Public Sub New(ocvb As AlgorithmData)
-        circles = New Draw_Circles(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        circles = New Draw_Circles(ocvb, "Hough_Circles")
         circles.sliders.TrackBar1.Value = 3
         ocvb.desc = "Find circles using HoughCircles."
         ocvb.label1 = "Input circles to Hough"
@@ -52,9 +54,9 @@ Public Class Hough_Circles : Implements IDisposable
         circles.Run(ocvb)
         Static Dim method As Int32 = 3
         Dim gray = New cv.Mat
-        cv.Cv2.CvtColor(ocvb.result1, gray, cv.ColorConversionCodes.bgr2gray)
+        cv.Cv2.CvtColor(ocvb.result1, gray, cv.ColorConversionCodes.BGR2GRAY)
         Dim cFound = cv.Cv2.HoughCircles(gray, method, 1, ocvb.result1.Rows / 4, 100, 10, 1, 200)
-        cv.Cv2.CvtColor(gray, ocvb.result2, cv.ColorConversionCodes.gray2bgr)
+        cv.Cv2.CvtColor(gray, ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
         Dim foundColor = New cv.Scalar(0, 0, 255)
         For i = 0 To cFound.Length - 1
             cv.Cv2.Circle(ocvb.result2, New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, cv.LineTypes.AntiAlias)
@@ -75,8 +77,10 @@ Public Class Hough_Lines : Implements IDisposable
     Public segments() As cv.LineSegmentPolar
     Public externalUse As Boolean
     Public src As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
-        edges = New Edges_Canny(ocvb)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        edges = New Edges_Canny(ocvb, "Hough_Lines")
         edges.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "rho", 1, 100, 1)
@@ -128,16 +132,18 @@ Public Class Hough_Lines_MT : Implements IDisposable
     Dim edges As Edges_Canny
     Public grid As Thread_Grid
     Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        Dim callerName = caller
+        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar3(ocvb, "threshold", 1, 100, 3)
         If ocvb.parms.ShowOptions Then sliders.Show()
 
-        edges = New Edges_Canny(ocvb)
+        edges = New Edges_Canny(ocvb, "Hough_Lines_MT")
         edges.externalUse = True
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid(ocvb, "Hough_Lines_MT")
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
         grid.externalUse = True ' we don't need any results.
