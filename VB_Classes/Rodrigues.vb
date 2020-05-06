@@ -7,10 +7,10 @@ Module Rodrigues_Basics_Exports
 End Module
 
 
-Public Class Rodrigues_ValidateKinect : Implements IDisposable
+Public Class Rodrigues_ValidateKinect
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Validate the Rodrigues calibration for Kinect camera (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -28,17 +28,17 @@ Public Class Rodrigues_ValidateKinect : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType(split(i), 10, 90 + i * 20, RESULT1))
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class Rodrigues_ValidateVector : Implements IDisposable
+Public Class Rodrigues_ValidateVector
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -75,7 +75,7 @@ Public Class Rodrigues_ValidateVector : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType("The T265 does not provide the Rotation Matrix but it is calculated from the Rotation Vector.", 10, 220, RESULT1))
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -83,10 +83,10 @@ End Class
 
 
 
-Public Class Rodrigues_RotationMatrix : Implements IDisposable
+Public Class Rodrigues_RotationMatrix
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Display the contents of the IMU Rotation Matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -107,7 +107,7 @@ Public Class Rodrigues_RotationMatrix : Implements IDisposable
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -117,10 +117,10 @@ End Class
 
 
 
-Public Class Rodrigues_Extrinsics : Implements IDisposable
+Public Class Rodrigues_Extrinsics
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -144,6 +144,6 @@ Public Class Rodrigues_Extrinsics : Implements IDisposable
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class

@@ -1,12 +1,10 @@
 ﻿Imports cv = OpenCvSharp
-Public Class DCT_RGB : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class DCT_RGB
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Apply OpenCV's Discrete Cosine Transform to an RGB image and use slider to remove the highest frequencies."
         ocvb.label1 = "Reconstituted RGB image"
         ocvb.label2 = "Difference from original"
@@ -34,22 +32,19 @@ Public Class DCT_RGB : Implements IDisposable
 
         cv.Cv2.Subtract(ocvb.color, ocvb.result1, ocvb.result2)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
-Public Class DCT_RGBDepth : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class DCT_RGBDepth
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.label2 = "Subtract DCT inverse from Grayscale depth"
+                ocvb.label2 = "Subtract DCT inverse from Grayscale depth"
         ocvb.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -68,21 +63,18 @@ Public Class DCT_RGBDepth : Implements IDisposable
 
         cv.Cv2.Subtract(gray, ocvb.result1, ocvb.result2)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
-Public Class DCT_Grayscale : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class DCT_Grayscale
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
         ocvb.label2 = "Difference from original"
     End Sub
@@ -102,23 +94,20 @@ Public Class DCT_Grayscale : Implements IDisposable
 
         cv.Cv2.Subtract(gray, ocvb.result1, ocvb.result2)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
-Public Class DCT_FeatureLess_MT : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public dct As DCT_Grayscale
+Public Class DCT_FeatureLess_MT
+    Inherits VB_Class
+        Public dct As DCT_Grayscale
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Run Length Minimum", 1, 100, 15)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         dct = New DCT_Grayscale(ocvb, "DCT_FeatureLess_MT")
         dct.sliders.TrackBar1.Value = 1
         ocvb.desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
@@ -151,9 +140,8 @@ Public Class DCT_FeatureLess_MT : Implements IDisposable
         ocvb.color.CopyTo(ocvb.result2, ocvb.result1)
         ocvb.label1 = "Mask of DCT with highest frequency removed"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        dct.Dispose()
+    Public Sub VBdispose()
+                dct.Dispose()
     End Sub
 End Class
 
@@ -161,14 +149,14 @@ End Class
 
 
 
-Public Class DCT_Surfaces_debug : Implements IDisposable
+Public Class DCT_Surfaces_debug
+    Inherits VB_Class
     Dim Mats As Mat_4to1
     Dim grid As Thread_Grid
     Dim dct As DCT_FeatureLess_MT
     Dim flow As Font_FlowText
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         flow = New Font_FlowText(ocvb, "DCT_Surfaces_debug")
         flow.externalUse = True
         flow.result1or2 = RESULT1
@@ -237,7 +225,7 @@ Public Class DCT_Surfaces_debug : Implements IDisposable
         flow.Run(ocvb)
         ocvb.label1 = "Largest flat surface segment stats"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         Mats.Dispose()
         dct.Dispose()
         grid.Dispose()
@@ -248,12 +236,12 @@ End Class
 
 
 
-Public Class DCT_CCompenents : Implements IDisposable
+Public Class DCT_CCompenents
+    Inherits VB_Class
     Dim dct As DCT_FeatureLess_MT
     Dim cc As CComp_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         dct = New DCT_FeatureLess_MT(ocvb, "DCT_CCompenents")
         cc = New CComp_Basics(ocvb, "DCT_CCompenents")
         cc.externalUse = True
@@ -266,7 +254,7 @@ Public Class DCT_CCompenents : Implements IDisposable
         cc.srcGray = ocvb.result1.Clone()
         cc.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         dct.Dispose()
         cc.Dispose()
     End Sub
@@ -277,15 +265,13 @@ End Class
 
 
 
-Public Class DCT_Rows : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class DCT_Rows
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 1)
         sliders.setupTrackBar2(ocvb, "Threshold after removal", 1, 255, 30)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -303,7 +289,6 @@ Public Class DCT_Rows : Implements IDisposable
         src32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC1, 255)
         ocvb.result2 = ocvb.result1.Threshold(sliders.TrackBar2.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class

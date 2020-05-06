@@ -1,11 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 ' http://answers.opencv.org/question/175486/meanshift-sample-code-in-c/
-Public Class MeanShift_Basics : Implements IDisposable
+Public Class MeanShift_Basics
+    Inherits VB_Class
     Public rectangleEdgeWidth As Int32 = 2
     Public trackbox As New cv.Rect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = "Draw anywhere to start mean shift tracking."
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track"
     End Sub
@@ -34,19 +34,19 @@ Public Class MeanShift_Basics : Implements IDisposable
             ocvb.result1 = ocvb.color
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class MeanShift_Depth : Implements IDisposable
+Public Class MeanShift_Depth
+    Inherits VB_Class
     Dim ms As MeanShift_Basics
     Dim blob As Depth_Foreground
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ms = New MeanShift_Basics(ocvb, "MeanShift_Depth")
         blob = New Depth_Foreground(ocvb, "MeanShift_Depth")
         ocvb.desc = "Use depth to start mean shift algorithm."
@@ -60,7 +60,7 @@ Public Class MeanShift_Depth : Implements IDisposable
         If ocvb.drawRect = New cv.Rect(0, 0, 0, 0) Or restartRequested Then blob.Run(ocvb)
         ms.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         ms.Dispose()
         blob.Dispose()
     End Sub
@@ -69,16 +69,14 @@ End Class
 
 
 'http://study.marearts.com/2014/12/opencv-meanshiftfiltering-example.html
-Public Class MeanShift_PyrFilter : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class MeanShift_PyrFilter
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "MeanShift Spatial Radius", 1, 100, 10)
         sliders.setupTrackBar2(ocvb, "MeanShift color Radius", 1, 100, 15)
         sliders.setupTrackBar3(ocvb, "MeanShift Max Pyramid level", 1, 8, 3)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Use PyrMeanShiftFiltering to segment an image."
+                ocvb.desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim spatialRadius = sliders.TrackBar1.Value
@@ -86,9 +84,8 @@ Public Class MeanShift_PyrFilter : Implements IDisposable
         Dim maxPyrLevel = sliders.TrackBar3.Value
         cv.Cv2.PyrMeanShiftFiltering(ocvb.color, ocvb.result1, spatialRadius, colorRadius, maxPyrLevel)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
@@ -96,15 +93,14 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
-Public Class Meanshift_TopObjects : Implements IDisposable
+Public Class Meanshift_TopObjects
+    Inherits VB_Class
     Dim blob As Blob_DepthClusters
     Dim cams(3) As MeanShift_Basics
-    Dim sliders As New OptionsSliders
-    Dim mats1 As Mat_4to1
+        Dim mats1 As Mat_4to1
     Dim mats2 As Mat_4to1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         mats1 = New Mat_4to1(ocvb, "Meanshift_TopObjects")
         mats1.externalUse = True
 
@@ -113,8 +109,7 @@ Public Class Meanshift_TopObjects : Implements IDisposable
 
         blob = New Blob_DepthClusters(ocvb, "Meanshift_TopObjects")
         sliders.setupTrackBar1(ocvb, "How often should camshift be reinitialized", 1, 500, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        For i = 0 To cams.Length - 1
+                For i = 0 To cams.Length - 1
             cams(i) = New MeanShift_Basics(ocvb, "Meanshift_TopObjects")
             cams(i).rectangleEdgeWidth = 8
         Next
@@ -142,13 +137,12 @@ Public Class Meanshift_TopObjects : Implements IDisposable
         ocvb.result1 = ocvb.result2.Clone()
         mats2.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         blob.Dispose()
         For i = 0 To cams.Length - 1
             cams(i).Dispose()
         Next
-        sliders.Dispose()
-        mats1.Dispose()
+                mats1.Dispose()
         mats2.Dispose()
     End Sub
 End Class

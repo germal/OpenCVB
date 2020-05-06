@@ -6,9 +6,9 @@ Module MinTriangle_Exports
     End Sub
 End Module
 
-Public Class Area_MinTriangle_CPP : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Dim numberOfPoints As Int32
+Public Class Area_MinTriangle_CPP
+    Inherits VB_Class
+        Dim numberOfPoints As Int32
     Public srcPoints() As cv.Point2f
     Public srcData() As Byte
     Public dstData() As Byte
@@ -20,12 +20,10 @@ Public Class Area_MinTriangle_CPP : Implements IDisposable
         ReDim dstData(3 * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' minTriangle returns 3 points 
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Area Number of Points", 1, 30, 5)
         sliders.setupTrackBar2(ocvb, "Area size", 10, 300, 200)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        setup(ocvb)
+                setup(ocvb)
 
         ocvb.desc = "Find minimum containing triangle for a set of points."
     End Sub
@@ -55,17 +53,16 @@ Public Class Area_MinTriangle_CPP : Implements IDisposable
             ocvb.result1.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
-Public Class Area_MinRect : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Dim numberOfPoints As Int32
+Public Class Area_MinRect
+    Inherits VB_Class
+        Dim numberOfPoints As Int32
     Public srcPoints() As cv.Point2f
     Public minRect As cv.RotatedRect
     Private Sub setup(ocvb As AlgorithmData)
@@ -73,12 +70,10 @@ Public Class Area_MinRect : Implements IDisposable
         ReDim srcPoints(numberOfPoints)
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Area Number of Points", 1, 200, 5)
         sliders.setupTrackBar2(ocvb, "Area size", 10, 300, 200)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        setup(ocvb)
+                setup(ocvb)
 
         ocvb.desc = "Find minimum containing rectangle for a set of points."
     End Sub
@@ -96,18 +91,17 @@ Public Class Area_MinRect : Implements IDisposable
         minRect = cv.Cv2.MinAreaRect(srcPoints)
         drawRotatedRectangle(minRect, ocvb.result1, cv.Scalar.Yellow)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
-Public Class Area_MinMotionRect : Implements IDisposable
+Public Class Area_MinMotionRect
+    Inherits VB_Class
     Dim input As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         input = New BGSubtract_MOG(ocvb, "Area_MinMotionRect")
         input.sliders.TrackBar1.Value = 100 ' low threshold to maximize motion
         ocvb.desc = "Use minRectArea to encompass detected motion"
@@ -138,7 +132,7 @@ Public Class Area_MinMotionRect : Implements IDisposable
         motionRectangles(gray, ocvb.result2, ocvb.rColors)
         ocvb.result2.SetTo(cv.Scalar.All(255), gray)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         input.Dispose()
     End Sub
 End Class
@@ -147,10 +141,10 @@ End Class
 
 
 
-Public Class Area_FindNonZero : Implements IDisposable
+Public Class Area_FindNonZero
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = "Non-zero original points"
         ocvb.label2 = "Coordinates of non-zero points"
         ocvb.desc = "Use FindNonZero API to get coordinates of non-zero points."
@@ -179,6 +173,6 @@ Public Class Area_FindNonZero : Implements IDisposable
         Next
         ocvb.putText(New ActiveClass.TrueType(outstr, 10, 50, RESULT2))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class

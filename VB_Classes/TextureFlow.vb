@@ -1,16 +1,14 @@
 ﻿Imports cv = OpenCvSharp
-Public Class TextureFlow_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public src As cv.Mat
+Public Class TextureFlow_Basics
+    Inherits VB_Class
+        Public src As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Texture Flow Delta", 2, 100, 12)
         sliders.setupTrackBar2(ocvb, "Texture Eigen BlockSize", 1, 100, 20)
         sliders.setupTrackBar3(ocvb, "Texture Eigen Ksize", 1, 15, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -32,19 +30,18 @@ Public Class TextureFlow_Basics : Implements IDisposable
             Next
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
-Public Class TextureFlow_Depth : Implements IDisposable
+Public Class TextureFlow_Depth
+    Inherits VB_Class
     Dim texture As TextureFlow_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         texture = New TextureFlow_Basics(ocvb, "TextureFlow_Depth")
         texture.externalUse = True
         ocvb.desc = "Display texture flow in the depth data"
@@ -53,7 +50,7 @@ Public Class TextureFlow_Depth : Implements IDisposable
         texture.src = ocvb.RGBDepth
         texture.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         texture.Dispose()
     End Sub
 End Class

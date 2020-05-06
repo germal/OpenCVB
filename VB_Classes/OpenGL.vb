@@ -3,7 +3,8 @@ Imports System.Runtime.InteropServices
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 
-Public Class OpenGL_Basics : Implements IDisposable
+Public Class OpenGL_Basics
+    Inherits VB_Class
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim pipeName As String ' this is name of pipe to the OpenGL task.  It is dynamic and increments.
     Dim pipe As NamedPipeServerStream
@@ -33,8 +34,7 @@ Public Class OpenGL_Basics : Implements IDisposable
     Public pointCloudInput As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         imu = New IMU_GravityVec(ocvb, "OpenGL_Basics")
         ' Dispose() ' make sure there wasn't an old OpenGLWindow sitting around...
         ocvb.desc = "Create an OpenGL window and update it with images"
@@ -50,13 +50,13 @@ Public Class OpenGL_Basics : Implements IDisposable
         For i = 0 To memMapValues.Length - 1
             ' only change this if you are changing the data in the OpenGL C++ code at the same time...
             memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy, ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy,
-                                            rgbInput.Width, rgbInput.Height, rgbInput.ElemSize * rgbInput.Total,
-                                            dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
-                                            ocvb.parms.IMU_AngularVelocity.X, ocvb.parms.IMU_AngularVelocity.Y, ocvb.parms.IMU_AngularVelocity.Z,
-                                            ocvb.parms.IMU_Acceleration.X, ocvb.parms.IMU_Acceleration.Y, ocvb.parms.IMU_Acceleration.Z, ocvb.parms.IMU_TimeStamp,
-                                            If(ocvb.parms.IMU_Present, 1, 0), eye.Item0 / 100, eye.Item1 / 100, eye.Item2 / 100, zTrans,
-                                            scaleXYZ.Item0 / 10, scaleXYZ.Item1 / 10, scaleXYZ.Item2 / 10, timeConversionUnits, imuAlphaFactor,
-                                            imageLabel.Length)
+                                                rgbInput.Width, rgbInput.Height, rgbInput.ElemSize * rgbInput.Total,
+                                                dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
+                                                ocvb.parms.IMU_AngularVelocity.X, ocvb.parms.IMU_AngularVelocity.Y, ocvb.parms.IMU_AngularVelocity.Z,
+                                                ocvb.parms.IMU_Acceleration.X, ocvb.parms.IMU_Acceleration.Y, ocvb.parms.IMU_Acceleration.Z, ocvb.parms.IMU_TimeStamp,
+                                                If(ocvb.parms.IMU_Present, 1, 0), eye.Item0 / 100, eye.Item1 / 100, eye.Item2 / 100, zTrans,
+                                                scaleXYZ.Item0 / 10, scaleXYZ.Item1 / 10, scaleXYZ.Item2 / 10, timeConversionUnits, imuAlphaFactor,
+                                                imageLabel.Length)
         Next
     End Sub
     Private Sub startOpenGLWindow(ocvb As AlgorithmData, pcSize As Integer)
@@ -69,7 +69,7 @@ Public Class OpenGL_Basics : Implements IDisposable
 
         startInfo.FileName = OpenGLTitle + ".exe"
         startInfo.Arguments = CStr(ocvb.openGLWidth) + " " + CStr(ocvb.openGLHeight) + " " + CStr(memMapbufferSize) + " " + pipeName + " " +
-                              CStr(pcSize)
+                                  CStr(pcSize)
         If ocvb.parms.ShowConsoleLog = False Then startInfo.WindowStyle = ProcessWindowStyle.Hidden
         Process.Start(startInfo)
 
@@ -122,7 +122,7 @@ Public Class OpenGL_Basics : Implements IDisposable
             pipe.Write(buff, 0, imageLabel.Length)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         If pipe IsNot Nothing Then
             If pipe.IsConnected Then
                 pipe.Flush()
@@ -165,22 +165,17 @@ Module OpenGL_Sliders_Module
         sliders.setupTrackBar2(ocvb, "OpenGL yaw (degrees)", -180, 180, -3)
         sliders.setupTrackBar3(ocvb, "OpenGL pitch (degrees)", -180, 180, 3)
         sliders.setupTrackBar4(ocvb, "OpenGL roll (degrees)", -180, 180, 0)
-        If ocvb.parms.ShowOptions Then sliders.Show()
     End Sub
 End Module
 
 
 
 
-Public Class OpenGL_Options : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public sliders1 As New OptionsSliders
-    Public sliders2 As New OptionsSliders
-    Public sliders3 As New OptionsSliders
+Public Class OpenGL_Options
+    Inherits VB_Class
     Public OpenGL As OpenGL_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         OpenGL = New OpenGL_Basics(ocvb, "OpenGL_Options")
         setOpenGLsliders(ocvb, sliders, sliders1, sliders2, sliders3)
         ocvb.desc = "Adjust point size and FOV in OpenGL"
@@ -207,11 +202,7 @@ Public Class OpenGL_Options : Implements IDisposable
 
         OpenGL.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        sliders1.Dispose()
-        sliders2.Dispose()
-        sliders3.Dispose()
+    Public Sub VBdispose()
         OpenGL.Dispose()
     End Sub
 End Class
@@ -219,11 +210,11 @@ End Class
 
 
 
-Public Class OpenGL_Callbacks : Implements IDisposable
+Public Class OpenGL_Callbacks
+    Inherits VB_Class
     Public ogl As OpenGL_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ogl = New OpenGL_Basics(ocvb, "OpenGL_Callbacks")
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         ocvb.desc = "Show the point cloud of 3D data and use callbacks to modify view."
@@ -232,7 +223,7 @@ Public Class OpenGL_Callbacks : Implements IDisposable
         ogl.rgbInput = ocvb.color
         ogl.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         ogl.Dispose()
     End Sub
 End Class
@@ -241,11 +232,11 @@ End Class
 
 
 'https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
-Public Class OpenGL_IMU : Implements IDisposable
+Public Class OpenGL_IMU
+    Inherits VB_Class
     Public ogl As OpenGL_Options
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.parms.ShowOptions = False
         ogl = New OpenGL_Options(ocvb, "OpenGL_IMU")
         ogl.OpenGL.OpenGLTitle = "OpenGL_IMU"
@@ -263,7 +254,7 @@ Public Class OpenGL_IMU : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType("No IMU present on this RealSense device", 20, 100))
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         ogl.Dispose()
     End Sub
 End Class
@@ -281,17 +272,15 @@ End Module
 
 
 ' https://docs.opencv.org/3.4/d1/d1d/tutorial_histo3D.html
-Public Class OpenGL_3Ddata : Implements IDisposable
+Public Class OpenGL_3Ddata
+    Inherits VB_Class
     Dim colors As Palette_Gradient
     Public ogl As OpenGL_Options
-    Dim sliders As New OptionsSliders
     Dim histInput() As Byte
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ogl = New OpenGL_Options(ocvb, "OpenGL_3Ddata")
         ogl.OpenGL.OpenGLTitle = "OpenGL_3Ddata"
@@ -327,8 +316,7 @@ Public Class OpenGL_3Ddata : Implements IDisposable
         ogl.OpenGL.dataInput = histogram.Clone()
         ogl.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
         ogl.Dispose()
     End Sub
 End Class
@@ -336,12 +324,12 @@ End Class
 
 
 
-Public Class OpenGL_Draw3D : Implements IDisposable
+Public Class OpenGL_Draw3D
+    Inherits VB_Class
     Dim circle As Draw_Circles
     Public ogl As OpenGL_Options
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         circle = New Draw_Circles(ocvb, "OpenGL_Draw3D")
         circle.sliders.TrackBar1.Value = 5
 
@@ -363,7 +351,7 @@ Public Class OpenGL_Draw3D : Implements IDisposable
         ogl.OpenGL.rgbInput = New cv.Mat(1, ocvb.rColors.Length - 1, cv.MatType.CV_8UC3, ocvb.rColors.ToArray)
         ogl.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         ogl.Dispose()
         circle.Dispose()
     End Sub
@@ -373,12 +361,12 @@ End Class
 
 
 
-Public Class OpenGL_Voxels : Implements IDisposable
+Public Class OpenGL_Voxels
+    Inherits VB_Class
     Public voxels As Voxels_Basics_MT
     Public ogl As OpenGL_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         voxels = New Voxels_Basics_MT(ocvb, "OpenGL_Voxels")
         voxels.check.Box(0).Checked = False
 
@@ -393,7 +381,7 @@ Public Class OpenGL_Voxels : Implements IDisposable
         ogl.dataInput *= 1 / (voxels.maxDepth - voxels.minDepth)
         ogl.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         voxels.Dispose()
         ogl.Dispose()
     End Sub
@@ -406,12 +394,12 @@ End Class
 
 ' https://open.gl/transformations
 ' https://www.codeproject.com/Articles/1247960/Learning-Basic-Math-Used-In-3D-Graphics-Engines
-Public Class OpenGL_GravityTransform : Implements IDisposable
+Public Class OpenGL_GravityTransform
+    Inherits VB_Class
     Dim imu As IMU_GravityVec
     Public ogl As OpenGL_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         imu = New IMU_GravityVec(ocvb, "OpenGL_GravityTransform")
         ogl = New OpenGL_Basics(ocvb, "OpenGL_GravityTransform")
         ogl.externalUse = True
@@ -455,7 +443,7 @@ Public Class OpenGL_GravityTransform : Implements IDisposable
                 Dim xz(4 * 4) As Single
                 For j = 0 To yRotate.Rows - 1
                     For i = 0 To yRotate.Cols - 1
-                        xz(i * 4 + j) = yRotate.Get(of Single)(i, j)
+                        xz(i * 4 + j) = yRotate.Get(Of Single)(i, j)
                     Next
                 Next
 
@@ -472,7 +460,7 @@ Public Class OpenGL_GravityTransform : Implements IDisposable
         ogl.Run(ocvb)
         If ocvb.frameCount Mod 30 = 0 Then rotateFlag += 1
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         ogl.Dispose()
         imu.Dispose()
     End Sub

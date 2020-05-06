@@ -1,16 +1,14 @@
 ﻿Imports cv = OpenCvSharp
-Public Class MotionBlur_Basics : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public externalUse As Boolean = False
+Public Class MotionBlur_Basics
+    Inherits VB_Class
+        Public externalUse As Boolean = False
     Public kernel As cv.Mat
     Public showDirection As Boolean = True
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Motion Blur Length", 1, 101, 51)
         sliders.setupTrackBar2(ocvb, "Motion Blur Angle", -90, 90, 0)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Use Filter2D to create a motion blur"
+                ocvb.desc = "Use Filter2D to create a motion blur"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then
@@ -31,19 +29,17 @@ Public Class MotionBlur_Basics : Implements IDisposable
         pt2 += New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
         If showDirection Then ocvb.result1.Line(pt1, pt2, cv.Scalar.Yellow, 5, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
 ' https://docs.opencv.org/trunk/d1/dfd/tutorial_motion_deblur_filter.html
-Public Class MotionBlur_Deblur : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim check As New OptionsCheckbox
-    Dim mblur As MotionBlur_Basics
+Public Class MotionBlur_Deblur
+    Inherits VB_Class
+            Dim mblur As MotionBlur_Basics
     Private Sub ResetBlurredImage(ocvb As AlgorithmData)
         mblur.sliders.TrackBar1.Value = ocvb.ms_rng.Next(mblur.sliders.TrackBar1.Minimum, mblur.sliders.TrackBar1.Maximum)
         mblur.sliders.TrackBar2.Value = ocvb.ms_rng.Next(mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum)
@@ -127,12 +123,10 @@ Public Class MotionBlur_Deblur : Implements IDisposable
         Return planes(0)
     End Function
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Redo motion blurred image"
-        If ocvb.parms.ShowOptions Then check.Show()
-
+        
         mblur = New MotionBlur_Basics(ocvb, "MotionBlur_Deblur")
         ResetBlurredImage(ocvb)
 
@@ -140,8 +134,7 @@ Public Class MotionBlur_Deblur : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "Deblur Angle of Restore Vector", mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum, 0)
         sliders.setupTrackBar3(ocvb, "Deblur Signal to Noise Ratio", 1, 1000, 700)
         sliders.setupTrackBar4(ocvb, "Deblur Gamma", 1, 100, 5)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Deblur a motion blurred image"
         ocvb.label1 = "Blurred Image Input"
         ocvb.label2 = "Deblurred Image Output"
@@ -175,9 +168,8 @@ Public Class MotionBlur_Deblur : Implements IDisposable
         imgOut.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
         ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        check.Dispose()
+    Public Sub VBdispose()
+                check.Dispose()
         mblur.Dispose()
     End Sub
 End Class

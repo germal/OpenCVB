@@ -17,11 +17,11 @@ End Module
 
 
 'https://github.com/omidsakhi/cv-hmm
-Public Class HMM_Example_CPP : Implements IDisposable
+Public Class HMM_Example_CPP
+    Inherits VB_Class
     Dim HMM As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         HMM = HMM_Open()
         ocvb.label1 = "HMM - see Visual Studio Output for results"
         ocvb.desc = "Simple test of Hidden Markov Model - text output"
@@ -40,7 +40,7 @@ Public Class HMM_Example_CPP : Implements IDisposable
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, IIf(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), dstData)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         HMM_Close(HMM)
     End Sub
 End Class

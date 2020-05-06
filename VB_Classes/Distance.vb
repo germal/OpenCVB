@@ -1,22 +1,18 @@
 ﻿Imports cv = OpenCvSharp
 
-Public Class Distance_Basics : Implements IDisposable
+Public Class Distance_Basics
+    Inherits VB_Class
     Dim foreground As kMeans_Depth_FG_BG
-    Dim radio As New OptionsRadioButtons
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         radio.Setup(ocvb, 3)
         radio.check(0).Text = "C"
         radio.check(1).Text = "L1"
         radio.check(2).Text = "L2"
         radio.check(2).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         sliders.setupTrackBar1(ocvb, "kernel size", 1, 5, 3)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         foreground = New kMeans_Depth_FG_BG(ocvb, "Distance_Basics")
         ocvb.desc = "Distance algorithm basics."
     End Sub
@@ -43,9 +39,8 @@ Public Class Distance_Basics : Implements IDisposable
         dist32f.ConvertTo(gray, cv.MatType.CV_8UC1)
         ocvb.result2 = gray.CvtColor(cv.ColorConversionCodes.gray2bgr)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        foreground.Dispose()
+    Public Sub VBdispose()
+                foreground.Dispose()
         radio.Dispose()
     End Sub
 End Class

@@ -1,21 +1,19 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Featureless_Basics_MT : Implements IDisposable
+Public Class Featureless_Basics_MT
+    Inherits VB_Class
     Public edges As Edges_Canny
     Public grid As Thread_Grid
-    Public sliders As New OptionsSliders
-    Public regionCount As Int32
+        Public regionCount As Int32
     Public mask As New cv.Mat
     Public objects As New List(Of cv.Mat)
     Public objectSize As New List(Of Int32)
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "FeatureLess rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar3(ocvb, "FeatureLess threshold", 1, 100, 3)
         sliders.setupTrackBar4(ocvb, "FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         edges = New Edges_Canny(ocvb, "Featureless_Basics_MT")
         edges.externalUse = True
 
@@ -77,25 +75,22 @@ Public Class Featureless_Basics_MT : Implements IDisposable
         Next
         ocvb.label2 = "FeatureLess Regions = " + CStr(regionCount)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         edges.Dispose()
         grid.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
 
 
-Public Class FeatureLess_Prediction : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Dim fLess As Featureless_Basics_MT
+Public Class FeatureLess_Prediction
+    Inherits VB_Class
+        Dim fLess As Featureless_Basics_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "FeatureLess Resize Percent", 1, 100, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         fLess = New Featureless_Basics_MT(ocvb, "FeatureLess_Prediction")
 
         ocvb.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image."
@@ -164,20 +159,19 @@ Public Class FeatureLess_Prediction : Implements IDisposable
         predictedDepth.Normalize(0, 255, cv.NormTypes.MinMax)
         predictedDepth.ConvertTo(mask, cv.MatType.CV_8U)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         fLess.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
 
 
-Public Class Featureless_DCT_MT : Implements IDisposable
+Public Class Featureless_DCT_MT
+    Inherits VB_Class
     Dim dct As DCT_FeatureLess_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         dct = New DCT_FeatureLess_MT(ocvb, "Featureless_DCT_MT")
 
         ocvb.desc = "Use DCT to find largest featureless region."
@@ -214,7 +208,7 @@ Public Class Featureless_DCT_MT : Implements IDisposable
         ocvb.label2 = "Largest FeatureLess Region (" + CStr(nonZ) + " " + Format(nonZ / label.Total, "#0.0%") + " pixels)"
         ocvb.result2.SetTo(cv.Scalar.White, label)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         dct.Dispose()
     End Sub
 End Class

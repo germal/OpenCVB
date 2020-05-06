@@ -20,17 +20,13 @@ End Module
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class OpenCVGL_Image_CPP : Implements IDisposable
+Public Class OpenCVGL_Image_CPP
+    Inherits VB_Class
     Dim imu As IMU_Basics
     Dim rgbData(0) As Byte
     Dim pointCloudData(0) As Byte
-    Public sliders As New OptionsSliders
-    Public sliders1 As New OptionsSliders
-    Public sliders2 As New OptionsSliders
-    Public sliders3 As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         imu = New IMU_Basics(ocvb, "OpenCVGL_Image_CPP")
         imu.externalUse = True
 
@@ -83,11 +79,7 @@ Public Class OpenCVGL_Image_CPP : Implements IDisposable
         handleRGB.Free()
         handlePointCloud.Free()
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        sliders1.Dispose()
-        sliders2.Dispose()
-        sliders3.Dispose()
+    Public Sub VBdispose()
         OpenCVGL_Image_Close()
         imu.Dispose()
     End Sub

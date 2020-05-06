@@ -1,12 +1,12 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.IO
-Public Class QRcode_Basics : Implements IDisposable
+Public Class QRcode_Basics
+    Inherits VB_Class
     Dim qrDecoder As New cv.QRCodeDetector
     Dim qrInput1 As New cv.Mat
     Dim qrInput2 As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         Dim fileInfo = New FileInfo(ocvb.parms.HomeDir + "data/QRcode1.png")
         If fileInfo.Exists Then qrInput1 = cv.Cv2.ImRead(fileInfo.FullName)
         fileInfo = New FileInfo(ocvb.parms.HomeDir + "Data/QRCode2.png")
@@ -39,6 +39,6 @@ Public Class QRcode_Basics : Implements IDisposable
         Next
         If refersTo <> "" Then ocvb.label1 = refersTo
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class

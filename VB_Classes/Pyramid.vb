@@ -1,13 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.3.1/d6/d73/Pyramids_8cpp-example.html
-Public Class Pyramid_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class Pyramid_Basics
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Zoom in and out", -1, 1, 0)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Use pyrup and pyrdown to zoom in and out of an image."
+                ocvb.desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim zoom = sliders.TrackBar1.Value
@@ -26,7 +24,6 @@ Public Class Pyramid_Basics : Implements IDisposable
             ocvb.color.CopyTo(ocvb.result1)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class

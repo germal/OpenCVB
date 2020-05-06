@@ -10,8 +10,7 @@ Module GetRotationMatrix
         radio.check(5).Text = radioName + " with WarpFillOutliers"
         radio.check(6).Text = radioName + " with WarpInverseMap"
         radio.check(3).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-    End Sub
+            End Sub
     Public Function getInterpolationRadioButtons(radio As OptionsRadioButtons) As cv.InterpolationFlags
         Dim warpFlag As cv.InterpolationFlags
         For i = 0 To radio.check.Length - 1
@@ -31,20 +30,17 @@ End Module
 
 
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
-Public Class GetRotationMatrix2D_Basics : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public radio As New OptionsRadioButtons
-    Public src As New cv.Mat
+Public Class GetRotationMatrix2D_Basics
+    Inherits VB_Class
+            Public src As New cv.Mat
     Public externalUse As Boolean
     Public M As cv.Mat
     Public Mflip As cv.Mat
     Public warpFlag As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "GetRotationMatrix2D Angle", 0, 360, 24)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        SetInterpolationRadioButtons(ocvb, radio, "Rotation2D")
+                SetInterpolationRadioButtons(ocvb, radio, "Rotation2D")
 
         ocvb.desc = "Rotate a rectangle of a specified angle"
     End Sub
@@ -57,9 +53,8 @@ Public Class GetRotationMatrix2D_Basics : Implements IDisposable
         ocvb.result1 = src.WarpAffine(M, src.Size(), warpFlag)
         If warpFlag = cv.InterpolationFlags.WarpInverseMap Then Mflip = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), -angle, 1)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        radio.Dispose()
+    Public Sub VBdispose()
+                radio.Dispose()
     End Sub
 End Class
 
@@ -68,11 +63,11 @@ End Class
 
 
 
-Public Class GetRotationMatrix2D_Box : Implements IDisposable
+Public Class GetRotationMatrix2D_Box
+    Inherits VB_Class
     Dim rotation As GetRotationMatrix2D_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         rotation = New GetRotationMatrix2D_Basics(ocvb, "GetRotationMatrix2D_Box")
         ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
 
@@ -106,7 +101,7 @@ Public Class GetRotationMatrix2D_Box : Implements IDisposable
             ocvb.result2.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         rotation.Dispose()
     End Sub
 End Class

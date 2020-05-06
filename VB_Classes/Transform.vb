@@ -1,12 +1,10 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Transform_Resize : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class Transform_Resize
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Resize Percent", 50, 1000, 50)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Resize an image based on the slider value."
+                ocvb.desc = "Resize an image based on the slider value."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim resizeFactor = sliders.TrackBar1.Value / 100
@@ -23,26 +21,23 @@ Public Class Transform_Resize : Implements IDisposable
             ocvb.result1(roi) = ocvb.color.Resize(New cv.Size(w, h), 0)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
-Public Class Transform_Rotate : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public src As cv.Mat
+Public Class Transform_Rotate
+    Inherits VB_Class
+        Public src As cv.Mat
     Public dst As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Angle", 0, 180, 30)
         sliders.setupTrackBar2(ocvb, "Scale Factor", 1, 100, 50)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Rotate and scale and image based on the slider values."
+                ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then
@@ -53,26 +48,23 @@ Public Class Transform_Rotate : Implements IDisposable
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.TrackBar1.Value, sliders.TrackBar2.Value / 100)
         cv.Cv2.WarpAffine(src, dst, rotationMat, New cv.Size())
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
-Public Class Transform_Sort : Implements IDisposable
-    Dim radio As New OptionsRadioButtons
+Public Class Transform_Sort
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         radio.Setup(ocvb, 4)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
         radio.check(2).Text = "EveryColumn"
         radio.check(3).Text = "EveryRow"
-        If ocvb.parms.ShowOptions Then radio.Show()
-        ocvb.desc = "Sort the pixels of a grayscale image."
+                ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -83,24 +75,22 @@ Public Class Transform_Sort : Implements IDisposable
         Dim sorted = gray.Sort(sortOption + cv.SortFlags.EveryColumn)
         ocvb.result1 = sorted.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
     End Sub
 End Class
 
 
 
-Public Class Transform_SortReshape : Implements IDisposable
-    Dim radio As New OptionsRadioButtons
+Public Class Transform_SortReshape
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         radio.Setup(ocvb, 2)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
-        If ocvb.parms.ShowOptions Then radio.Show()
-        ocvb.desc = "Sort the pixels of a grayscale image."
+                ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.bgr2gray)
@@ -111,7 +101,7 @@ Public Class Transform_SortReshape : Implements IDisposable
         sorted = sorted.Reshape(1, ocvb.color.Rows)
         ocvb.result1 = sorted.CvtColor(cv.ColorConversionCodes.gray2bgr)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
     End Sub
 End Class

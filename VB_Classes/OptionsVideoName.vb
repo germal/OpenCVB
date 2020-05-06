@@ -14,6 +14,7 @@ Public Class OptionsVideoName
         captureVideo = New cv.VideoCapture(fileinfo.FullName)
         TrackBar1.Minimum = 0
         TrackBar1.Maximum = captureVideo.FrameCount
+        If ocvb.parms.ShowOptions Then Me.Show()
     End Sub
     Public Function nextImage() As cv.Mat
         Static image As New cv.Mat

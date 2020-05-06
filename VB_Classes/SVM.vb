@@ -1,16 +1,12 @@
 ﻿Imports cv = OpenCvSharp
-Public Class SVM_Options : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public radio As New OptionsRadioButtons
-    Public radio1 As New OptionsRadioButtons
+Public Class SVM_Options
+    Inherits VB_Class
     Public kernelType = cv.ML.SVM.KernelTypes.Rbf
     Public SVMType = cv.ML.SVM.Types.CSvc
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "SampleCount", 10, 1000, 500)
         sliders.setupTrackBar2(ocvb, "Granularity", 1, 50, 5)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         radio.Setup(ocvb, 4)
         radio.check(0).Text = "kernel Type = Linear"
@@ -18,7 +14,6 @@ Public Class SVM_Options : Implements IDisposable
         radio.check(2).Text = "kernel Type = RBF"
         radio.check(2).Checked = True
         radio.check(3).Text = "kernel Type = Sigmoid"
-        If ocvb.parms.ShowOptions Then radio.Show()
 
         radio1.Setup(ocvb, 5)
         radio1.check(0).Text = "SVM Type = CSvc"
@@ -27,7 +22,7 @@ Public Class SVM_Options : Implements IDisposable
         radio1.check(2).Text = "SVM Type = NuSvc"
         radio1.check(3).Text = "SVM Type = NuSvr"
         radio1.check(4).Text = "SVM Type = OneClass"
-        If ocvb.parms.ShowOptions Then radio1.Show()
+        If ocvb.parms.ShowOptions Then radio.Show()
 
         ocvb.desc = "SVM has many options - enough to make a class for it."
     End Sub
@@ -46,20 +41,15 @@ Public Class SVM_Options : Implements IDisposable
             End If
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        radio.Dispose()
-        radio1.Dispose()
-    End Sub
 End Class
 
 
 
-Public Class SVM_Basics : Implements IDisposable
+Public Class SVM_Basics
+    Inherits VB_Class
     Dim svmOptions As SVM_Options
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         svmOptions = New SVM_Options(ocvb, "SVM_Basics")
         ocvb.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
         ocvb.label1 = "SVM_Basics input data"
@@ -131,7 +121,7 @@ Public Class SVM_Basics : Implements IDisposable
             Next
         End Using
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         svmOptions.Dispose()
     End Sub
 End Class
@@ -139,12 +129,12 @@ End Class
 
 
 
-Public Class SVM_Basics_MT : Implements IDisposable
+Public Class SVM_Basics_MT
+    Inherits VB_Class
     Dim grid As Thread_Grid
     Dim svmOptions As SVM_Options
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         svmOptions = New SVM_Options(ocvb, "SVM_Basics_MT")
         grid = New Thread_Grid(ocvb, "SVM_Basics_MT")
         grid.sliders.TrackBar1.Value = 100
@@ -229,7 +219,7 @@ Public Class SVM_Basics_MT : Implements IDisposable
             ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
         End Using
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         svmOptions.Dispose()
         grid.Dispose()
     End Sub
@@ -237,11 +227,11 @@ End Class
 
 
 
-Public Class SVM_Simple : Implements IDisposable
+Public Class SVM_Simple
+    Inherits VB_Class
     Dim svmOptions As SVM_Options
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         svmOptions = New SVM_Options(ocvb, "SVM_Simple")
         svmOptions.sliders.TrackBar1.Value = 50 ' set the samplecount 
         svmOptions.radio.check(1).Checked = True
@@ -254,9 +244,9 @@ Public Class SVM_Simple : Implements IDisposable
         Dim trainData As New cv.Mat(dataSize, 2, cv.MatType.CV_32F)
         Dim labels = New cv.Mat(dataSize, 1, cv.MatType.CV_32S)
         For i = 0 To dataSize
-            labels.Set(Of Int32)(i, 0, ocvb.ms_rng.next(-1, 1))
-            trainData.Set(Of Single)(i, 0, CSng(ocvb.ms_rng.next(0, ocvb.color.Width - 1)))
-            trainData.Set(Of Single)(i, 1, CSng(ocvb.ms_rng.next(0, ocvb.color.Height - 1)))
+            labels.Set(Of Int32)(i, 0, ocvb.ms_rng.Next(-1, 1))
+            trainData.Set(Of Single)(i, 0, CSng(ocvb.ms_rng.Next(0, ocvb.color.Width - 1)))
+            trainData.Set(Of Single)(i, 1, CSng(ocvb.ms_rng.Next(0, ocvb.color.Height - 1)))
         Next
         ' make sure that there always 2 classes present.
         labels.Set(Of Single)(0, 0, -1)
@@ -291,7 +281,7 @@ Public Class SVM_Simple : Implements IDisposable
             ' show the training data
             For i = 0 To trainData.Rows
                 Dim pt = New cv.Point(CInt(trainData.Get(Of Single)(i, 0)), CInt(trainData.Get(Of Single)(i, 1)))
-                If labels.Get(of Int32)(i) >= 0 Then
+                If labels.Get(Of Int32)(i) >= 0 Then
                     ocvb.result1.Circle(pt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
                 Else
                     ocvb.result1.Circle(pt, 5, cv.Scalar.Green, -1, cv.LineTypes.AntiAlias)
@@ -303,13 +293,13 @@ Public Class SVM_Simple : Implements IDisposable
             Dim thickness = 2
             If response.Rows > 1 Then
                 For i = 0 To response.Rows
-                    Dim v = response.Get(of cv.Vec2f)(i)
+                    Dim v = response.Get(Of cv.Vec2f)(i)
                     ocvb.result2.Circle(New cv.Point(v(0), v(1)), 6, cv.Scalar.Blue, thickness, cv.LineTypes.AntiAlias)
                 Next
             End If
         End Using
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         svmOptions.Dispose()
     End Sub
 End Class

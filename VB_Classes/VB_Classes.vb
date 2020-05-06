@@ -45,7 +45,8 @@ Module VB_Classes
     End Sub
 End Module
 
-Public Class ActiveClass : Implements IDisposable
+Public Class ActiveClass
+    Inherits VB_Class
     Public ocvb As AlgorithmData
     Public Const _RESULT1 = RESULT1
     Public Const _RESULT2 = RESULT2
@@ -186,7 +187,7 @@ Public Class ActiveClass : Implements IDisposable
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         If ActiveAlgorithm IsNot Nothing Then ActiveAlgorithm.dispose()
         If recordedData IsNot Nothing Then recordedData.Dispose()
     End Sub

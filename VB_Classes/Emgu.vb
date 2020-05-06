@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 
-Public Class Emgu_Basics : Implements IDisposable
+Public Class Emgu_Basics
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Test a sample EMGU usage."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -17,17 +17,17 @@ Public Class Emgu_Basics : Implements IDisposable
             ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, data)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class Emgu_Facedetection : Implements IDisposable
+Public Class Emgu_Facedetection
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use the simplest possible face detector in Emgu examples."
         ocvb.result1.SetTo(0)
     End Sub
@@ -45,7 +45,7 @@ Public Class Emgu_Facedetection : Implements IDisposable
             ocvb.result1(New cv.Rect(0, 0, tmp.Rows, tmp.Cols)) = tmp
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 

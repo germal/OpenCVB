@@ -1,14 +1,12 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/pca.cpp
-Public Class PCA_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public useDepthInput As Boolean
+Public Class PCA_Basics
+    Inherits VB_Class
+        Public useDepthInput As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Retained Variance", 1, 100, 95)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Reconstruct a video stream as a composite of X images."
+                ocvb.desc = "Reconstruct a video stream as a composite of X images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static images(7) As cv.Mat
@@ -40,18 +38,17 @@ Public Class PCA_Basics : Implements IDisposable
             ocvb.result1 = reconstruction.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
-Public Class PCA_Depth : Implements IDisposable
+Public Class PCA_Depth
+    Inherits VB_Class
     Dim pca As PCA_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         pca = New PCA_Basics(ocvb, "PCA_Depth")
         pca.useDepthInput = True
         ocvb.desc = "Reconstruct a depth stream as a composite of X images."
@@ -59,7 +56,7 @@ Public Class PCA_Depth : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         pca.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         pca.Dispose()
     End Sub
 End Class
@@ -68,12 +65,12 @@ End Class
 
 
 ' https://docs.opencv.org/3.1.0/d1/dee/tutorial_introduction_to_pca.html
-Public Class PCA_DrawImage : Implements IDisposable
+Public Class PCA_DrawImage
+    Inherits VB_Class
     Dim pca As PCA_Basics
     Dim image As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         pca = New PCA_Basics(ocvb, "PCA_DrawImage")
         image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/pca_test1.jpg")
         ocvb.desc = "Use PCA to find the principle direction of an object."
@@ -130,7 +127,7 @@ Public Class PCA_DrawImage : Implements IDisposable
             drawAxis(ocvb.result2, cntr, ept2, cv.Scalar.BlueViolet, 5) ' secondary principle component
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         pca.Dispose()
     End Sub
 End Class

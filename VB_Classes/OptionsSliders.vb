@@ -17,6 +17,7 @@ Public Class OptionsSliders
         TrackBar1.Value = value
         GroupBox1.Visible = True
         Me.Text = ocvb.caller + " Options"
+        If ocvb.parms.ShowOptions Then Me.Show()
     End Sub
     Public Sub setupTrackBar2(ocvb As AlgorithmData, label As String, min As Integer, max As Integer, value As Integer)
         LabelSlider2.Text = label

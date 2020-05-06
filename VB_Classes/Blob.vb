@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Blob_Input : Implements IDisposable
+Public Class Blob_Input
+    Inherits VB_Class
     Dim rectangles As Draw_rotatedRectangles
     Dim circles As Draw_Circles
     Dim ellipses As Draw_Ellipses
@@ -7,8 +8,7 @@ Public Class Blob_Input : Implements IDisposable
     Dim Mats As Mat_4to1
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         rectangles = New Draw_rotatedRectangles(ocvb, "Blob_Input")
         circles = New Draw_Circles(ocvb, "Blob_Input")
         ellipses = New Draw_Ellipses(ocvb, "Blob_Input")
@@ -50,7 +50,7 @@ Public Class Blob_Input : Implements IDisposable
             ocvb.result2.SetTo(0)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         rectangles.Dispose()
         circles.Dispose()
         ellipses.Dispose()
@@ -61,14 +61,12 @@ End Class
 
 
 
-Public Class Blob_Detector_CS : Implements IDisposable
+Public Class Blob_Detector_CS
+    Inherits VB_Class
     Dim input As Blob_Input
-    Dim check As New OptionsCheckbox
-    Dim sliders As New OptionsSliders
-    Dim blobDetector As New CS_Classes.Blob_Basics
+            Dim blobDetector As New CS_Classes.Blob_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         input = New Blob_Input(ocvb, "Blob_Detector_CS")
         input.updateFrequency = 1 ' it is pretty fast but sloppy...
         check.Setup(ocvb, 5)
@@ -77,14 +75,12 @@ Public Class Blob_Detector_CS : Implements IDisposable
         check.Box(2).Text = "FilterByConvexity"
         check.Box(3).Text = "FilterByInertia"
         check.Box(4).Text = "FilterByColor"
-        If ocvb.parms.ShowOptions Then check.Show()
-        check.Box(4).Checked = True ' filter by color...
+                check.Box(4).Checked = True ' filter by color...
 
         sliders.setupTrackBar1(ocvb, "min Threshold", 0, 255, 100)
         sliders.setupTrackBar2(ocvb, "max Threshold", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, "Threshold Step", 1, 50, 5)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.label1 = "Blob_Detector_CS Input"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -110,20 +106,19 @@ Public Class Blob_Detector_CS : Implements IDisposable
         ' The create method in SimpleBlobDetector is not available in VB.Net.  Not sure why.  To get around this, just use C# where create method works fine.
         blobDetector.Start(ocvb.result1, ocvb.result2, blobParams)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        input.Dispose()
+    Public Sub VBdispose()
+                input.Dispose()
         check.Dispose()
     End Sub
 End Class
 
 
 
-Public Class Blob_RenderBlobs : Implements IDisposable
+Public Class Blob_RenderBlobs
+    Inherits VB_Class
     Dim input As Blob_Input
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         input = New Blob_Input(ocvb, "Blob_RenderBlobs")
         input.updateFrequency = 1
 
@@ -152,7 +147,7 @@ Public Class Blob_RenderBlobs : Implements IDisposable
             Next
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         input.Dispose()
     End Sub
 End Class
@@ -162,14 +157,14 @@ End Class
 
 
 
-Public Class Blob_DepthClusters : Implements IDisposable
+Public Class Blob_DepthClusters
+    Inherits VB_Class
     Public histBlobs As Histogram_DepthClusters
     Public flood As FloodFill_RelativeRange
     Public externalUse As Boolean
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         shadow = New Depth_Holes(ocvb, "Blob_DepthClusters")
         shadow.externalUse = True
 
@@ -190,7 +185,7 @@ Public Class Blob_DepthClusters : Implements IDisposable
         flood.Run(ocvb)
         ocvb.label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         histBlobs.Dispose()
         flood.Dispose()
         shadow.Dispose()
@@ -202,7 +197,8 @@ End Class
 
 
 
-Public Class Blob_Rectangles : Implements IDisposable
+Public Class Blob_Rectangles
+    Inherits VB_Class
     Dim blobs As Blob_LargestBlob
     Dim kalman() As Kalman_Basics
     Private Class CompareRect : Implements IComparer(Of cv.Rect)
@@ -214,8 +210,7 @@ Public Class Blob_Rectangles : Implements IDisposable
         End Function
     End Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.parms.ShowOptions = False
         blobs = New Blob_LargestBlob(ocvb, "Blob_Rectangles")
         ocvb.desc = "Get the blobs and their masks and outline them with a rectangle."
@@ -249,7 +244,7 @@ Public Class Blob_Rectangles : Implements IDisposable
             ocvb.result1.Rectangle(rect, ocvb.colorScalar(i Mod 255), 2)
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         blobs.Dispose()
         If kalman IsNot Nothing Then
             For i = 0 To kalman.Length - 1
@@ -264,7 +259,8 @@ End Class
 
 
 
-Public Class Blob_LargestBlob : Implements IDisposable
+Public Class Blob_LargestBlob
+    Inherits VB_Class
     Dim blobs As Blob_DepthClusters
     Public rects As List(Of cv.Rect)
     Public masks As List(Of cv.Mat)
@@ -272,8 +268,7 @@ Public Class Blob_LargestBlob : Implements IDisposable
     Public kalman As Kalman_Basics
     Public blobIndex As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         kalman = New Kalman_Basics(ocvb, "Blob_LargestBlob")
         kalman.externalUse = True
 
@@ -294,7 +289,7 @@ Public Class Blob_LargestBlob : Implements IDisposable
         ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
         ocvb.label1 = "Show the largest blob of the " + CStr(rects.Count) + " blobs"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         blobs.Dispose()
         If kalman IsNot Nothing Then kalman.Dispose()
     End Sub
@@ -304,11 +299,11 @@ End Class
 
 
 
-Public Class Blob_LargestDepthCluster : Implements IDisposable
+Public Class Blob_LargestDepthCluster
+    Inherits VB_Class
     Dim blobs As Blob_DepthClusters
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         blobs = New Blob_DepthClusters(ocvb, "Blob_LargestDepthCluster")
 
         ocvb.desc = "Display only the largest depth cluster (might not be contiguous.)"
@@ -326,7 +321,7 @@ Public Class Blob_LargestDepthCluster : Implements IDisposable
         ocvb.color.CopyTo(ocvb.result1, mask)
         ocvb.label1 = "Largest Depth Blob: " + Format(maxSize, "#,000") + " pixels (" + Format(maxSize / ocvb.color.Total, "#0.0%") + ")"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         blobs.Dispose()
     End Sub
 End Class

@@ -2,17 +2,15 @@
 Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
-Public Class EMax_Basics : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public radio As New OptionsRadioButtons
-    Public samples As cv.Mat
+Public Class EMax_Basics
+    Inherits VB_Class
+            Public samples As cv.Mat
     Public labels As cv.Mat
     Public externalUse As Boolean
     Public grid As Thread_Grid
     Public regionCount As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "EMax_Basics")
 
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 2
@@ -21,15 +19,13 @@ Public Class EMax_Basics : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "EMax Number of Samples", 1, 200, 100)
         sliders.setupTrackBar2(ocvb, "EMax Prediction Step Size", 1, 20, 5)
         sliders.setupTrackBar3(ocvb, "EMax Sigma (spread)", 1, 100, 30)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         radio.Setup(ocvb, 3)
         radio.check(0).Text = "EMax matrix type Spherical"
         radio.check(1).Text = "EMax matrix type Diagonal"
         radio.check(2).Text = "EMax matrix type Generic"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         ocvb.desc = "OpenCV expectation maximization example."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -90,9 +86,8 @@ Public Class EMax_Basics : Implements IDisposable
             ocvb.result1.Circle(pt, 4, ocvb.rColors(labels.Get(Of Int32)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        radio.Dispose()
+    Public Sub VBdispose()
+                radio.Dispose()
         grid.Dispose()
     End Sub
 End Class
@@ -114,12 +109,12 @@ Module EMax_Exports
     End Function
 End Module
 
-Public Class EMax_Basics_CPP : Implements IDisposable
+Public Class EMax_Basics_CPP
+    Inherits VB_Class
     Dim emax As EMax_Basics
     Dim EMax_Basics As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         emax = New EMax_Basics(ocvb, "EMax_Basics_CPP")
         emax.externalUse = True
 
@@ -160,7 +155,7 @@ Public Class EMax_Basics_CPP : Implements IDisposable
         Dim mask = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         ocvb.result1.CopyTo(ocvb.result2, mask)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         EMax_Basics_Close(EMax_Basics)
         emax.Dispose()
     End Sub

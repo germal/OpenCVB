@@ -1,18 +1,16 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
-Public Class Random_Points : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public Points() As cv.Point
+Public Class Random_Points
+    Inherits VB_Class
+        Public Points() As cv.Point
     Public Points2f() As cv.Point2f
     Public externalUse As Boolean
     Public rangeRect As cv.Rect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Random Pixel Count", 1, ocvb.color.Width * ocvb.color.Height, 20)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ReDim Points(sliders.TrackBar1.Value - 1)
         ReDim Points2f(sliders.TrackBar1.Value - 1)
 
@@ -33,18 +31,17 @@ Public Class Random_Points : Implements IDisposable
             If externalUse = False Then cv.Cv2.Circle(ocvb.result1, Points(i), 3, cv.Scalar.Gray, -1, cv.LineTypes.AntiAlias, 0)
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
-Public Class Random_Shuffle : Implements IDisposable
+Public Class Random_Shuffle
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use randomShuffle to reorder an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -53,18 +50,18 @@ Public Class Random_Shuffle : Implements IDisposable
         cv.Cv2.RandShuffle(ocvb.result1, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
         ocvb.label1 = "Random_shuffle - wave at camera"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
-Public Class Random_LUTMask : Implements IDisposable
+Public Class Random_LUTMask
+    Inherits VB_Class
     Dim random As Random_Points
     Dim km As kMeans_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         km = New kMeans_Basics(ocvb, "Random_LUTMask")
         random = New Random_Points(ocvb, "Random_LUTMask")
         ocvb.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image.  Note how interpolation impacts results"
@@ -93,7 +90,7 @@ Public Class Random_LUTMask : Implements IDisposable
         ocvb.result2 = ocvb.color.LUT(lutMat)
         ocvb.label1 = "Using kmeans colors with interpolation"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         km.Dispose()
         random.Dispose()
     End Sub
@@ -101,12 +98,12 @@ End Class
 
 
 
-Public Class Random_UniformDist : Implements IDisposable
+Public Class Random_UniformDist
+    Inherits VB_Class
     Public uDist As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         uDist = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
         ocvb.desc = "Create a uniform distribution."
     End Sub
@@ -116,43 +113,40 @@ Public Class Random_UniformDist : Implements IDisposable
             ocvb.result1 = uDist.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
-Public Class Random_NormalDist : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public nDistImage As cv.Mat
+Public Class Random_NormalDist
+    Inherits VB_Class
+        Public nDistImage As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Random_NormalDist Blue Mean", 0, 255, 25)
         sliders.setupTrackBar2(ocvb, "Random_NormalDist Green Mean", 0, 255, 127)
         sliders.setupTrackBar3(ocvb, "Random_NormalDist Red Mean", 0, 255, 180)
         sliders.setupTrackBar4(ocvb, "Random_NormalDist Stdev", 0, 255, 50)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Create a normal distribution."
+                ocvb.desc = "Create a normal distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         cv.Cv2.Randn(ocvb.result1, New cv.Scalar(sliders.TrackBar1.Value, sliders.TrackBar2.Value, sliders.TrackBar3.Value), cv.Scalar.All(sliders.TrackBar4.Value))
         If externalUse Then nDistImage = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
-Public Class Random_CheckUniformDist : Implements IDisposable
+Public Class Random_CheckUniformDist
+    Inherits VB_Class
     Dim histogram As Histogram_KalmanSmoothed
     Dim rUniform As Random_UniformDist
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         histogram = New Histogram_KalmanSmoothed(ocvb, "Random_CheckUniformDist")
         histogram.externalUse = True
         histogram.sliders.TrackBar1.Value = 255
@@ -169,7 +163,7 @@ Public Class Random_CheckUniformDist : Implements IDisposable
         rUniform.uDist.CopyTo(histogram.gray)
         histogram.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         rUniform.Dispose()
         histogram.Dispose()
     End Sub
@@ -177,12 +171,12 @@ End Class
 
 
 
-Public Class Random_CheckNormalDist : Implements IDisposable
+Public Class Random_CheckNormalDist
+    Inherits VB_Class
     Dim histogram As Histogram_KalmanSmoothed
     Dim normalDist As Random_NormalDist
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         histogram = New Histogram_KalmanSmoothed(ocvb, "Random_CheckNormalDist")
         histogram.externalUse = True
         histogram.sliders.TrackBar1.Value = 255
@@ -198,7 +192,7 @@ Public Class Random_CheckNormalDist : Implements IDisposable
         normalDist.nDistImage.CopyTo(histogram.gray)
         histogram.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         normalDist.Dispose()
         histogram.Dispose()
     End Sub
@@ -223,11 +217,11 @@ End Module
 
 
 
-Public Class Random_PatternGenerator_CPP : Implements IDisposable
+Public Class Random_PatternGenerator_CPP
+    Inherits VB_Class
     Dim Random_PatternGenerator As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         Random_PatternGenerator = Random_PatternGenerator_Open()
         ocvb.desc = "Generate random patterns for use with 'Random Pattern Calibration'"
     End Sub
@@ -243,7 +237,7 @@ Public Class Random_PatternGenerator_CPP : Implements IDisposable
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         Random_PatternGenerator_Close(Random_PatternGenerator)
     End Sub
 End Class

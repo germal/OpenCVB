@@ -20,21 +20,19 @@ End Module
 
 
 
-Public Class SuperPixel_Basics_CPP : Implements IDisposable
+Public Class SuperPixel_Basics_CPP
+    Inherits VB_Class
     Dim spPtr As IntPtr = 0
-    Public sliders As New OptionsSliders
-    Public src As cv.Mat
+        Public src As cv.Mat
     Public dst1 As cv.Mat
     Public dst2 As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Number of SuperPixels", 1, 1000, 400)
         sliders.setupTrackBar2(ocvb, "Iterations", 0, 10, 4)
         sliders.setupTrackBar3(ocvb, "Prior", 1, 10, 2)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.label2 = "Superpixel label data (0-255)"
         ocvb.desc = "Sub-divide the image into super pixels."
     End Sub
@@ -83,10 +81,9 @@ Public Class SuperPixel_Basics_CPP : Implements IDisposable
         If numSuperPixels < 255 Then labels *= 255 / numSuperPixels
         labels.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         SuperPixel_Close(spPtr)
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
@@ -94,11 +91,11 @@ End Class
 
 
 
-Public Class SuperPixel_Depth : Implements IDisposable
+Public Class SuperPixel_Depth
+    Inherits VB_Class
     Dim pixels As SuperPixel_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         pixels = New SuperPixel_Basics_CPP(ocvb, "SuperPixel_Depth")
         pixels.externalUse = True
 
@@ -110,7 +107,7 @@ Public Class SuperPixel_Depth : Implements IDisposable
         ocvb.result1 = pixels.dst1
         ocvb.result2 = pixels.dst2
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         pixels.Dispose()
     End Sub
 End Class
@@ -120,12 +117,12 @@ End Class
 
 
 
-Public Class SuperPixel_WithCanny : Implements IDisposable
+Public Class SuperPixel_WithCanny
+    Inherits VB_Class
     Dim pixels As SuperPixel_Basics_CPP
     Dim edges As Edges_Canny
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         edges = New Edges_Canny(ocvb, "SuperPixel_WithCanny")
         edges.externalUse = True
 
@@ -145,7 +142,7 @@ Public Class SuperPixel_WithCanny : Implements IDisposable
         ocvb.result2.SetTo(cv.Scalar.Red, edges.dst)
         ocvb.label2 = "Edges provided by Canny in red"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         pixels.Dispose()
     End Sub
 End Class
@@ -155,12 +152,12 @@ End Class
 
 
 
-Public Class SuperPixel_WithLineDetector : Implements IDisposable
+Public Class SuperPixel_WithLineDetector
+    Inherits VB_Class
     Dim pixels As SuperPixel_Basics_CPP
     Dim lines As LineDetector_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         lines = New LineDetector_Basics(ocvb, "SuperPixel_WithLineDetector")
         lines.externalUse = True
 
@@ -181,7 +178,7 @@ Public Class SuperPixel_WithLineDetector : Implements IDisposable
         ' ocvb.result2.SetTo(cv.Scalar.Red, lines.dst)
         ' ocvb.label2 = "Edges provided by Canny in red"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         pixels.Dispose()
     End Sub
 End Class

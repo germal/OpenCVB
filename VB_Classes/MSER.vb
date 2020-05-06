@@ -1,19 +1,15 @@
 ﻿Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_Basics : Implements IDisposable
+Public Class MSER_Basics
+    Inherits VB_Class
     Public src As cv.Mat
     Public externalUse As Boolean
-    Public sliders As New OptionsSliders
-    Public sliders1 As New OptionsSliders
-    Public sliders2 As New OptionsSliders
     Public zone() As cv.Rect = Nothing
     Public region()() As cv.Point = Nothing
-    Public check As New OptionsCheckbox
     Dim saveParms() As Int32
     Dim mser As cv.MSER
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders2.setupTrackBar1(ocvb, "MSER Edge Blursize", 1, 20, 5)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
@@ -27,14 +23,12 @@ Public Class MSER_Basics : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "MSER Min Area", 1, 10000, 60)
         sliders.setupTrackBar3(ocvb, "MSER Max Area", 1000, 100000, 100000)
         sliders.setupTrackBar4(ocvb, "MSER Max Variation", 1, 100, 25)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         check.Setup(ocvb, 2)
         check.Box(0).Text = "Pass2Only"
         check.Box(1).Text = "Use Grayscale, not color input (default)"
         check.Box(0).Checked = True
         check.Box(1).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
 
         ReDim saveParms(10) ' 4 sliders + 4 sliders + 1 slider + 2 checkboxes
         ocvb.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
@@ -56,8 +50,8 @@ Public Class MSER_Basics : Implements IDisposable
         Dim changedParms As Boolean
         For i = 0 To saveParms.Length - 1
             Dim nextVal = Choose(i + 1, sliders.TrackBar1.Value, sliders.TrackBar2.Value, sliders.TrackBar3.Value, sliders.TrackBar4.Value,
-                                      sliders1.TrackBar1.Value, sliders1.TrackBar2.Value, sliders1.TrackBar3.Value, sliders1.TrackBar4.Value,
-                                      sliders2.TrackBar1.Value, check.Box(0).Checked)
+                                          sliders1.TrackBar1.Value, sliders1.TrackBar2.Value, sliders1.TrackBar3.Value, sliders1.TrackBar4.Value,
+                                          sliders2.TrackBar1.Value, check.Box(0).Checked)
             If nextVal <> saveParms(i) Then changedParms = True
             saveParms(i) = nextVal
         Next
@@ -85,11 +79,7 @@ Public Class MSER_Basics : Implements IDisposable
             ocvb.label1 = CStr(region.Length) + " Regions " + Format(pixels / region.Length, "#0.0") + " pixels/region (avg)"
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        sliders1.Dispose()
-        sliders2.Dispose()
-        check.Dispose()
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -98,7 +88,8 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_Synthetic : Implements IDisposable
+Public Class MSER_Synthetic
+    Inherits VB_Class
     Private Sub addNestedRectangles(img As cv.Mat, p0 As cv.Point, width() As Int32, color() As Int32, n As Int32)
         For i = 0 To n - 1
             img.Rectangle(New cv.Rect(p0.X, p0.Y, width(i), width(i)), color(i), 1)
@@ -113,8 +104,7 @@ Public Class MSER_Synthetic : Implements IDisposable
         Next
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -134,7 +124,7 @@ Public Class MSER_Synthetic : Implements IDisposable
         img = img.Resize(New cv.Size(ocvb.color.Height, ocvb.color.Height))
         ocvb.result1(New cv.Rect(0, 0, ocvb.color.Height, ocvb.color.Height)) = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -142,7 +132,8 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_TestSynthetic : Implements IDisposable
+Public Class MSER_TestSynthetic
+    Inherits VB_Class
     Dim mser As MSER_Basics
     Dim synth As MSER_Synthetic
     Private Function testSynthetic(ocvb As AlgorithmData, img As cv.Mat, pass2Only As Boolean, delta As Int32) As String
@@ -164,8 +155,7 @@ Public Class MSER_TestSynthetic : Implements IDisposable
         Return CStr(regionCount) + " Regions had " + CStr(pixels) + " pixels"
     End Function
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         mser = New MSER_Basics(ocvb, "MSER_TestSynthetic")
         mser.externalUse = True
         mser.sliders.TrackBar1.Value = 10
@@ -185,7 +175,7 @@ Public Class MSER_TestSynthetic : Implements IDisposable
         'testSynthetic(ocvb, ocvb.result1, False, 10)
         testSynthetic(ocvb, ocvb.result2, True, 100)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         mser.Dispose()
         synth.Dispose()
     End Sub
@@ -195,12 +185,12 @@ End Class
 
 
 ' https://github.com/shimat/opencvsharp/wiki/MSER
-Public Class MSER_CPPStyle : Implements IDisposable
+Public Class MSER_CPPStyle
+    Inherits VB_Class
     Dim gray As cv.Mat
     Dim image As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = "Contour regions from MSER"
         ocvb.label2 = "Box regions from MSER"
         ocvb.desc = "Maximally Stable Extremal Regions example - still image"
@@ -228,7 +218,7 @@ Public Class MSER_CPPStyle : Implements IDisposable
         Next
         ocvb.result2 = mat.Resize(ocvb.result2.Size())
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -237,11 +227,11 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/mser.py
-Public Class MSER_Contours : Implements IDisposable
+Public Class MSER_Contours
+    Inherits VB_Class
     Dim mser As MSER_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         mser = New MSER_Basics(ocvb, "MSER_Contours")
         mser.externalUse = True
         mser.sliders.TrackBar2.Value = 4000
@@ -269,7 +259,7 @@ Public Class MSER_Contours : Implements IDisposable
 
         ocvb.label1 = CStr(mser.region.Length) + " Regions " + Format(pixels / mser.region.Length, "#0.0") + " pixels/region (avg)"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         mser.Dispose()
     End Sub
 End Class

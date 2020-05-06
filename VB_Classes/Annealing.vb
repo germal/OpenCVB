@@ -17,7 +17,8 @@ End Module
 
 
 
-Public Class Annealing_Basics_CPP : Implements IDisposable
+Public Class Annealing_Basics_CPP
+    Inherits VB_Class
     Public numberOfCities As Int32 = 25
     Public restartComputation As Boolean
     Public externalUse As Boolean
@@ -67,8 +68,7 @@ Public Class Annealing_Basics_CPP : Implements IDisposable
         closed = False
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         setup(ocvb)
         ocvb.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
@@ -106,7 +106,7 @@ Public Class Annealing_Basics_CPP : Implements IDisposable
             closed = True
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         Annealing_Basics_Close(saPtr)
     End Sub
 End Class
@@ -115,12 +115,11 @@ End Class
 
 
 
-Public Class Annealing_CPP_MT : Implements IDisposable
+Public Class Annealing_CPP_MT
+    Inherits VB_Class
     Dim random As Random_Points
     Dim anneal(35) As Annealing_Basics_CPP
     Dim mats As Mat_4to1
-    Dim sliders As New OptionsSliders
-    Dim check As New OptionsCheckbox
     Dim flow As Font_FlowText
     Private Class CompareEnergy : Implements IComparer(Of Single)
         Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
@@ -154,8 +153,7 @@ Public Class Annealing_CPP_MT : Implements IDisposable
     End Sub
 
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         random = New Random_Points(ocvb, "Annealing_CPP_MT")
         random.externalUse = True
         random.sliders.Visible = False
@@ -165,7 +163,6 @@ Public Class Annealing_CPP_MT : Implements IDisposable
 
         sliders.setupTrackBar1(ocvb, "Anneal Number of Cities", 5, 500, 25)
         sliders.setupTrackBar2(ocvb, "Success = top X threads agree on energy level.", 2, anneal.Count, anneal.Count)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         check.Setup(ocvb, 3)
         check.Box(0).Text = "Restart TravelingSalesman"
@@ -173,7 +170,6 @@ Public Class Annealing_CPP_MT : Implements IDisposable
         check.Box(1).Checked = True
         check.Box(2).Text = "Circular pattern of cities (allows you to visually check if successful.)"
         check.Box(2).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
 
         flow = New Font_FlowText(ocvb, "Annealing_CPP_MT")
         flow.externalUse = True
@@ -242,12 +238,11 @@ Public Class Annealing_CPP_MT : Implements IDisposable
 
         If allClosed Then setup(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         random.Dispose()
         mats.Dispose()
         flow.Dispose()
         check.Dispose()
-        sliders.Dispose()
         For i = 0 To anneal.Length - 1
             If anneal(i).closed = False Then anneal(i).Dispose()
         Next
@@ -257,14 +252,13 @@ End Class
 
 
 
-Public Class Annealing_Options : Implements IDisposable
+Public Class Annealing_Options
+    Inherits VB_Class
     Dim random As Random_Points
     Public anneal As Annealing_Basics_CPP
-    Public check As New OptionsCheckbox
     Dim flow As Font_FlowText
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         random = New Random_Points(ocvb, "Annealing_Options")
         random.sliders.TrackBar1.Value = 25 ' change the default number of cities here.
         random.externalUse = True
@@ -274,7 +268,6 @@ Public Class Annealing_Options : Implements IDisposable
         check.Box(0).Text = "Restart TravelingSalesman"
         check.Box(1).Text = "Circular pattern of cities (allows you to visually check if successful.)"
         check.Box(1).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
 
         flow = New Font_FlowText(ocvb, "Annealing_Options")
         flow.externalUse = True
@@ -322,7 +315,7 @@ Public Class Annealing_Options : Implements IDisposable
         flow.msgs.Add(anneal.msg)
         flow.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         flow.Dispose()
         check.Dispose()
         anneal.Dispose()

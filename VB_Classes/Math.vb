@@ -1,23 +1,20 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Math_Subtract : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class Math_Subtract
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Red", 0, 255, 255)
         sliders.setupTrackBar2(ocvb, "Green", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, "Blue", 0, 255, 255)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Invert the image colors using subtract"
+                ocvb.desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim tmp = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3)
         tmp.SetTo(New cv.Scalar(sliders.TrackBar3.Value, sliders.TrackBar2.Value, sliders.TrackBar1.Value))
         cv.Cv2.Subtract(tmp, ocvb.color, ocvb.result1)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
@@ -48,8 +45,8 @@ End Module
 
 
 
-Public Class Math_Median_CDF : Implements IDisposable
-    Dim sliders As New OptionsSliders
+Public Class Math_Median_CDF
+    Inherits VB_Class
     Public src As cv.Mat
     Dim dst As cv.Mat
     Public medianVal As Double
@@ -58,11 +55,8 @@ Public Class Math_Median_CDF : Implements IDisposable
     Public externalUse As Boolean
     Public bins As Int32 = 10
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Histogram Bins", 4, 1000, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
         ocvb.desc = "Compute the src image median"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -86,8 +80,7 @@ Public Class Math_Median_CDF : Implements IDisposable
             ocvb.label2 = "Grayscale pixels < " + Format(medianVal, "#0.0")
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        If sliders IsNot Nothing Then sliders.Dispose()
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -95,11 +88,11 @@ End Class
 
 
 
-Public Class Math_DepthMeanStdev : Implements IDisposable
+Public Class Math_DepthMeanStdev
+    Inherits VB_Class
     Dim minMax As Depth_Stable
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         minMax = New Depth_Stable(ocvb, "Math_DepthMeanStdev")
         ocvb.desc = "This algorithm shows that just using the max depth at each pixel does not improve depth!  Mean and stdev don't change."
     End Sub
@@ -113,7 +106,7 @@ Public Class Math_DepthMeanStdev : Implements IDisposable
         cv.Cv2.MeanStdDev(depth32f, mean, stdev)
         ocvb.label1 = "raw depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         minMax.Dispose()
     End Sub
 End Class
@@ -122,12 +115,12 @@ End Class
 
 
 
-Public Class Math_RGBCorrelation : Implements IDisposable
+Public Class Math_RGBCorrelation
+    Inherits VB_Class
     Dim flow As Font_FlowText
     Dim corr As MatchTemplate_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         flow = New Font_FlowText(ocvb, "Math_RGBCorrelation")
         flow.externalUse = True
         flow.result1or2 = RESULT2
@@ -160,7 +153,7 @@ Public Class Math_RGBCorrelation : Implements IDisposable
         ocvb.label1 = ""
         ocvb.label2 = "Log of " + corr.matchText
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         corr.Dispose()
         flow.Dispose()
     End Sub

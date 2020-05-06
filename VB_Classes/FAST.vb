@@ -1,14 +1,12 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
-Public Class FAST_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public keypoints() As cv.KeyPoint
+Public Class FAST_Basics
+    Inherits VB_Class
+        Public keypoints() As cv.KeyPoint
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Threshold", 0, 200, 15)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
+                ocvb.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
         ocvb.label1 = "FAST_Basics nonMax = true"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -20,21 +18,20 @@ Public Class FAST_Basics : Implements IDisposable
             ocvb.result1.Circle(kp.Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
         Next kp
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
 
-Public Class FAST_Centroid : Implements IDisposable
+Public Class FAST_Centroid
+    Inherits VB_Class
     Dim fast As FAST_Basics
     Dim kalman As Kalman_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         kalman = New Kalman_Basics(ocvb, "FAST_Centroid")
         ReDim kalman.src(1) ' 2 elements - cv.point
         kalman.externalUse = True
@@ -57,7 +54,7 @@ Public Class FAST_Centroid : Implements IDisposable
             ocvb.result2.Circle(New cv.Point(kalman.dst(0), kalman.dst(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         fast.Dispose()
         kalman.Dispose()
     End Sub

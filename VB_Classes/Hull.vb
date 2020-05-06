@@ -23,16 +23,14 @@ End Module
 
 
 
-Public Class Hull_Basics : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public hull() As cv.Point
+Public Class Hull_Basics
+    Inherits VB_Class
+        Public hull() As cv.Point
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Hull random points", 1, 20, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Surround a set of random points with a convex hull"
         ocvb.label1 = "Convex Hull Output"
         ocvb.label2 = "Convex Hull Input"
@@ -68,7 +66,6 @@ Public Class Hull_Basics : Implements IDisposable
             Next
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class

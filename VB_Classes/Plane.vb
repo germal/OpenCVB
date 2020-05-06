@@ -94,11 +94,11 @@ End Module
 
 
 
-Public Class Plane_Detect : Implements IDisposable
+Public Class Plane_Detect
+    Inherits VB_Class
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "Plane_Detect")
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 64
@@ -163,7 +163,7 @@ Public Class Plane_Detect : Implements IDisposable
         Dim mask = grid.gridMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.BitwiseOr(ocvb.result1, mask, ocvb.result1)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         grid.Dispose()
     End Sub
 End Class
@@ -171,11 +171,11 @@ End Class
 
 
 
-Public Class Plane_DetectDebug : Implements IDisposable
+Public Class Plane_DetectDebug
+    Inherits VB_Class
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "Plane_DetectDebug")
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
@@ -240,7 +240,7 @@ Public Class Plane_DetectDebug : Implements IDisposable
         Dim mask = grid.gridMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.BitwiseOr(ocvb.result1, mask, ocvb.result1)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         grid.Dispose()
     End Sub
 End Class

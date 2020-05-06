@@ -1,10 +1,10 @@
 ﻿Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/modules/flann/doc/flann_fast_approximate_nearest_neighbor_search.html#
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FlannSample.vb
-Public Class FLANN_Test : Implements IDisposable
+Public Class FLANN_Test
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
         ocvb.label1 = "FLANN Basics"
     End Sub
@@ -41,23 +41,21 @@ Public Class FLANN_Test : Implements IDisposable
             End Using
         End Using
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
-Public Class FLANN_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim random As Random_Points
+Public Class FLANN_Basics
+    Inherits VB_Class
+        Dim random As Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         random = New Random_Points(ocvb, "FLANN_Basics")
 
         sliders.setupTrackBar1(ocvb, "Query Count", 1, 10000, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
         ocvb.label1 = "Yellow is query, Nearest points blue"
         ocvb.label2 = "FLANN Search Input"
@@ -89,8 +87,7 @@ Public Class FLANN_Basics : Implements IDisposable
             Next
         End Using
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        random.Dispose()
+    Public Sub VBdispose()
+                random.Dispose()
     End Sub
 End Class

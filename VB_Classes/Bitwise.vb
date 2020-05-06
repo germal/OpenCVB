@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Bitwise_Not : Implements IDisposable
+Public Class Bitwise_Not
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = "Color BitwiseNot"
         ocvb.label2 = "Gray BitwiseNot"
         ocvb.desc = "Gray and color bitwise_not"
@@ -12,6 +12,6 @@ Public Class Bitwise_Not : Implements IDisposable
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.BitwiseNot(gray, ocvb.result2)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class

@@ -1,11 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Stabilizer_BriskFeatures : Implements IDisposable
+Public Class Stabilizer_BriskFeatures
+    Inherits VB_Class
     Dim brisk As BRISK_Basics
     Dim stabilizer As Stabilizer_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         stabilizer = New Stabilizer_Basics(ocvb, "Stabilizer_BriskFeatures")
         stabilizer.externalUse = True
 
@@ -21,7 +21,7 @@ Public Class Stabilizer_BriskFeatures : Implements IDisposable
         stabilizer.features = brisk.features ' supply the features to track with Optical Flow
         stabilizer.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         brisk.Dispose()
         stabilizer.Dispose()
     End Sub
@@ -31,12 +31,12 @@ End Class
 
 
 
-Public Class Stabilizer_HarrisFeatures : Implements IDisposable
+Public Class Stabilizer_HarrisFeatures
+    Inherits VB_Class
     Dim harris As Harris_Detector_CPP
     Dim stabilizer As Stabilizer_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         stabilizer = New Stabilizer_Basics(ocvb, "Stabilizer_HarrisFeatures")
         stabilizer.externalUse = True
 
@@ -50,7 +50,7 @@ Public Class Stabilizer_HarrisFeatures : Implements IDisposable
         stabilizer.features = harris.FeaturePoints ' supply the features to track with Optical Flow
         stabilizer.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         harris.Dispose()
         stabilizer.Dispose()
     End Sub
@@ -62,7 +62,8 @@ End Class
 
 
 ' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
-Public Class Stabilizer_Basics : Implements IDisposable
+Public Class Stabilizer_Basics
+    Inherits VB_Class
     Public good As Features_GoodFeatures
     Public features As New List(Of cv.Point2f)
     Public lastFrame As cv.Mat
@@ -71,8 +72,7 @@ Public Class Stabilizer_Basics : Implements IDisposable
     Dim sumScale As cv.Mat, sScale As cv.Mat, features1 As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         good = New Features_GoodFeatures(ocvb, "Stabilizer_Basics")
         good.externalUse = True
 
@@ -164,7 +164,7 @@ Public Class Stabilizer_Basics : Implements IDisposable
         End If
         lastFrame = gray.Clone()
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         good.Dispose()
     End Sub
 End Class
@@ -186,13 +186,13 @@ Module Stabilizer_Basics_Module
     Public Function Stabilizer_Basics_Run(sPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
     End Function
 End Module
-Public Class Stabilizer_Basics_CPP : Implements IDisposable
+Public Class Stabilizer_Basics_CPP
+    Inherits VB_Class
     Dim srcData() As Byte
     Dim handleSrc As GCHandle
     Dim sPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ReDim srcData(ocvb.color.Total * ocvb.color.ElemSize - 1)
         sPtr = Stabilizer_Basics_Open()
         ocvb.desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work."
@@ -210,7 +210,7 @@ Public Class Stabilizer_Basics_CPP : Implements IDisposable
         '    ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, dstData)
         'End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         Stabilizer_Basics_Close(sPtr)
     End Sub
 End Class
@@ -221,12 +221,12 @@ End Class
 
 
 ' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
-Public Class Stabilizer_SideBySide : Implements IDisposable
+Public Class Stabilizer_SideBySide
+    Inherits VB_Class
     Dim original As Stabilizer_Basics_CPP
     Dim basics As Stabilizer_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         original = New Stabilizer_Basics_CPP(ocvb, "Stabilizer_SideBySide")
         basics = New Stabilizer_Basics(ocvb, "Stabilizer_SideBySide")
         ocvb.desc = "Run both the original and the VB.Net version of the video stabilizer.  Neither is working properly."
@@ -238,7 +238,7 @@ Public Class Stabilizer_SideBySide : Implements IDisposable
         ocvb.result2 = ocvb.result1.Clone()
         basics.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         original.Dispose()
         basics.Dispose()
     End Sub

@@ -1,9 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Plot_OverTime : Implements IDisposable
-    Public check As New OptionsCheckbox
-    Public sliders As New OptionsSliders
-    Public plotData As cv.Scalar
+Public Class Plot_OverTime
+    Inherits VB_Class
+        Public plotData As cv.Scalar
     Public plotCount As Int32 = 3
     Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.White}
     Public backColor = cv.Scalar.Aquamarine
@@ -18,18 +17,15 @@ Public Class Plot_OverTime : Implements IDisposable
     Public topBottomPad As Integer
     Dim myStopWatch As Stopwatch
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Reset the plot scale"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
-
+        
         sliders.setupTrackBar1(ocvb, "Plot Pixel Height", 1, 40, 4)
         sliders.setupTrackBar2(ocvb, "Plot Pixel Width", 1, 40, 4)
         sliders.setupTrackBar3(ocvb, "Plot (time) Font Size x10", 1, 20, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Plot an input variable over time"
+                ocvb.desc = "Plot an input variable over time"
         myStopWatch = Stopwatch.StartNew()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -108,9 +104,8 @@ Public Class Plot_OverTime : Implements IDisposable
         If externalUse = False Then ocvb.label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
         AddPlotScale(dst, minScale - topBottomPad, maxScale + topBottomPad, sliders.TrackBar3.Value / 10)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        check.Dispose()
+    Public Sub VBdispose()
+                check.Dispose()
     End Sub
 End Class
 
@@ -118,9 +113,9 @@ End Class
 
 
 
-Public Class Plot_Histogram : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public hist As New cv.Mat
+Public Class Plot_Histogram
+    Inherits VB_Class
+        Public hist As New cv.Mat
     Public dst As New cv.Mat
     Public bins As Int32 = 50
     Public minRange As Int32 = 0
@@ -128,11 +123,9 @@ Public Class Plot_Histogram : Implements IDisposable
     Public backColor As cv.Scalar = cv.Scalar.Red
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Histogram Font Size x10", 1, 20, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -168,9 +161,8 @@ Public Class Plot_Histogram : Implements IDisposable
             AddPlotScale(dst, 0, maxVal, sliders.TrackBar1.Value / 10)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
@@ -201,14 +193,14 @@ End Module
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
-Public Class Plot_Basics_CPP : Implements IDisposable
+Public Class Plot_Basics_CPP
+    Inherits VB_Class
     Public srcX(49) As Double
     Public srcY(49) As Double
     Public externalUse As Boolean
     Public dst As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -244,21 +236,21 @@ Public Class Plot_Basics_CPP : Implements IDisposable
         handleY.Free()
         ocvb.label1 = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + vbTab + " y-axis: " + CStr(minY) + " to " + CStr(maxY)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class Plot_Basics : Implements IDisposable
+Public Class Plot_Basics
+    Inherits VB_Class
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Basics
     Public plotCount As Int32 = 3
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         hist = New Histogram_Basics(ocvb, "Plot_Basics")
         hist.externalUse = True
         hist.plotRequested = True
@@ -288,7 +280,7 @@ Public Class Plot_Basics : Implements IDisposable
             ocvb.label1 = "histogram with " + ocvb.label1
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         plot.Dispose()
         hist.Dispose()
     End Sub
@@ -298,12 +290,12 @@ End Class
 
 
 
-Public Class Plot_Depth : Implements IDisposable
+Public Class Plot_Depth
+    Inherits VB_Class
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         hist = New Histogram_Depth(ocvb, "Plot_Depth")
         hist.externalUse = True
         hist.sliders.TrackBar1.Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!
@@ -329,7 +321,7 @@ Public Class Plot_Depth : Implements IDisposable
         plot.Run(ocvb)
         ocvb.label1 = "histogram with " + ocvb.label1
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         plot.Dispose()
         hist.Dispose()
     End Sub

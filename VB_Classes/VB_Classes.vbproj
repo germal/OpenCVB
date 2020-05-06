@@ -275,6 +275,7 @@
     <Compile Include="TransformationMatrix.vb" />
     <Compile Include="Undistort.vb" />
     <Compile Include="VBTestInterface.vb" />
+    <Compile Include="VB_Class.vb" />
     <Compile Include="VB_Classes.vb" />
     <Compile Include="OptionsCheckbox.Designer.vb">
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>

@@ -64,7 +64,8 @@ End Module
 
 
 
-Public Class Replay_Record : Implements IDisposable
+Public Class Replay_Record
+    Inherits VB_Class
     Dim recording As New OptionsRecordPlayback
     Dim binWrite As BinaryWriter
     Dim recordingActive As Boolean
@@ -73,8 +74,7 @@ Public Class Replay_Record : Implements IDisposable
     Dim depth16Bytes() As Byte
     Dim cloudBytes() As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         If ocvb.parms.ShowOptions Then recording.Show()
         ocvb.desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
@@ -127,7 +127,7 @@ Public Class Replay_Record : Implements IDisposable
             End If
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         If recordingActive Then binWrite.Close()
         recording.Dispose()
     End Sub
@@ -137,7 +137,8 @@ End Class
 
 
 
-Public Class Replay_Play : Implements IDisposable
+Public Class Replay_Play
+    Inherits VB_Class
     Dim playback As New OptionsRecordPlayback
     Dim binRead As BinaryReader
     Dim playbackActive As Boolean
@@ -148,8 +149,7 @@ Public Class Replay_Play : Implements IDisposable
     Dim fh As New fileHeader
     Dim fs As FileStream
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         playback.startButton.Text = "Start Playback"
         playback.Show() ' showing this options form is not optional (ha!)  The fileinfo is needed in Run so always initialize it.
         playback.Button2_Click(New Object, New EventArgs) ' autoplay the recorded data (if it exists.)
@@ -216,7 +216,7 @@ Public Class Replay_Play : Implements IDisposable
             End If
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         If playbackActive Then binRead.Close()
         playback.Dispose()
     End Sub
@@ -226,12 +226,12 @@ End Class
 
 
 
-Public Class Replay_OpenGL : Implements IDisposable
+Public Class Replay_OpenGL
+    Inherits VB_Class
     Dim ogl As OpenGL_Callbacks
     Dim replay As Replay_Play
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ogl = New OpenGL_Callbacks(ocvb, "Replay_OpenGL")
         replay = New Replay_Play(ocvb, "Replay_OpenGL")
         ocvb.desc = "Replay a recorded session with OpenGL"
@@ -241,7 +241,7 @@ Public Class Replay_OpenGL : Implements IDisposable
         replay.Run(ocvb)
         ogl.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         ogl.Dispose()
         replay.Dispose()
     End Sub

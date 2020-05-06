@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Module fastLineDetector_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function lineDetectorFast_Run(image As IntPtr, rows As Int32, cols As Int32, length_threshold As Int32, distance_threshold As Single, canny_th1 As Int32, canny_th2 As Int32,
-                                         canny_aperture_size As Int32, do_merge As Boolean) As Int32
+                                             canny_aperture_size As Int32, do_merge As Boolean) As Int32
     End Function
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -64,10 +64,10 @@ Module fastLineDetector_Exports
                 Dim d = endPoints(1)
                 Dim lenBD = Math.Sqrt((b.Item0 - d.Item0) * (b.Item0 - d.Item0) + (b.Item1 - d.Item1) * (b.Item1 - d.Item1) + (b.Item2 - d.Item2) * (b.Item2 - d.Item2))
                 cv.Cv2.PutText(ocvb.result2, Format(lenBD / 1000, "0.00") + "m", centerPoint, cv.HersheyFonts.HersheyTriplex, 0.4, cv.Scalar.White, 1,
-                               cv.LineTypes.AntiAlias)
+                                   cv.LineTypes.AntiAlias)
                 If endPoints(0).Item2 = endPoints(1).Item2 Then endPoints(0).Item2 += 1 ' prevent NaN
-                    cv.Cv2.PutText(ocvb.result2, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "0.00") + "y/z",
-                               New cv.Point(centerPoint.X, centerPoint.Y + 10), cv.HersheyFonts.HersheyTriplex, 0.4, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                cv.Cv2.PutText(ocvb.result2, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "0.00") + "y/z",
+                                   New cv.Point(centerPoint.X, centerPoint.Y + 10), cv.HersheyFonts.HersheyTriplex, 0.4, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 ' show the final endpoints in xy projection.
                 ocvb.result2.Circle(New cv.Point(b.Item3, b.Item4), 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
                 ocvb.result2.Circle(New cv.Point(d.Item3, d.Item4), 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
@@ -154,7 +154,7 @@ Module fastLineDetector_Exports
         For i = sortedLines.Count - 1 To 0 Step -1
             Dim v = sortedLines.ElementAt(i).Key
             If v(0) >= 0 And v(0) <= dst.Cols And v(1) >= 0 And v(1) <= dst.Rows And
-               v(2) >= 0 And v(2) <= dst.Cols And v(3) >= 0 And v(3) <= dst.Rows Then
+                   v(2) >= 0 And v(2) <= dst.Cols And v(3) >= 0 And v(3) <= dst.Rows Then
                 Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
                 Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
                 dst.Line(pt1, pt2, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
@@ -169,24 +169,19 @@ End Module
 
 
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
-Public Class lineDetector_FLD : Implements IDisposable
-    Public radio As New OptionsRadioButtons
-    Public sliders As New OptionsSliders
-    Public sliders2 As New OptionsSliders
-    Public check As New OptionsCheckbox
+Public Class lineDetector_FLD
+    Inherits VB_Class
     Public sortedLines As SortedList(Of cv.Vec6f, Integer)
     Public externalUse As Boolean
     Public src As cv.Mat
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         radio.Setup(ocvb, 3)
         radio.check(0).Text = "Low resolution - Factor 4"
         radio.check(1).Text = "Low resolution - Factor 2"
         radio.check(2).Text = "Low resolution - Factor 1"
         radio.check(1).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
 
         sliders2.setupTrackBar1(ocvb, "FLD - canny Threshold1", 1, 100, 50)
         sliders2.setupTrackBar2(ocvb, "FLD - canny Threshold2", 1, 100, 50)
@@ -195,12 +190,10 @@ Public Class lineDetector_FLD : Implements IDisposable
         sliders.setupTrackBar1(ocvb, "FLD - Min Length", 1, 200, 30)
         sliders.setupTrackBar2(ocvb, "FLD - max distance", 1, 100, 14)
         sliders.setupTrackBar3(ocvb, "FLD - Canny Aperture", 3, 7, 7)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         check.Setup(ocvb, 1)
         check.Box(0).Text = "FLD - incremental merge"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
         ocvb.desc = "Basics for a Fast Line Detector"
 
         sortedLines = New SortedList(Of cv.Vec6f, Integer)
@@ -241,23 +234,20 @@ Public Class lineDetector_FLD : Implements IDisposable
         If lineCount > 0 Then sortedLines = drawSegments(dst, lineCount, factor, dst)
         If externalUse = False Then dst.CopyTo(ocvb.result1)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        sliders2.Dispose()
-        check.Dispose()
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
-Public Class LineDetector_LSD : Implements IDisposable
+Public Class LineDetector_LSD
+    Inherits VB_Class
     Dim data() As Byte
     Public sortedLines As SortedList(Of cv.Vec6f, Integer)
     Public factor As Int32 = 4
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Fast Line Detector from the OpenCV contrib code base."
         Dim size = ocvb.color.Rows * ocvb.color.Cols
         ReDim data(size - 1)
@@ -286,23 +276,21 @@ Public Class LineDetector_LSD : Implements IDisposable
         sortedLines.Clear()
         If lineCount > 0 Then sortedLines = drawSegments(ocvb.result1, lineCount, factor, ocvb.result1)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class LineDetector_3D_LongestLine : Implements IDisposable
-    Dim sliders As New OptionsSliders
+Public Class LineDetector_3D_LongestLine
+    Inherits VB_Class
     Dim lines As lineDetector_FLD
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         lines = New lineDetector_FLD(ocvb, "LineDetector_3D_LongestLine")
 
         sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Identify planes using the lines present in the rgb image."
         ocvb.label2 = ""
@@ -321,25 +309,22 @@ Public Class LineDetector_3D_LongestLine : Implements IDisposable
             find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         lines.Dispose()
-        sliders.Dispose()
     End Sub
 End Class
 
 
 
 
-Public Class LineDetector_3D_FLD_MT : Implements IDisposable
-    Dim sliders As New OptionsSliders
+Public Class LineDetector_3D_FLD_MT
+    Inherits VB_Class
     Dim lines As lineDetector_FLD
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         lines = New lineDetector_FLD(ocvb, "LineDetector_3D_FLD_MT")
 
         sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
         ocvb.label2 = ""
@@ -355,27 +340,24 @@ Public Class LineDetector_3D_FLD_MT : Implements IDisposable
         Dim maskLineWidth As Int32 = sliders.TrackBar1.Value
         Dim mask = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, 0)
         Parallel.For(0, lines.sortedLines.Count - 1,
-        Sub(i)
-            find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
-        End Sub)
+            Sub(i)
+                find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
+            End Sub)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         lines.Dispose()
-        sliders.Dispose()
     End Sub
 End Class
 
 
 
-Public Class LineDetector_3D_LSD_MT : Implements IDisposable
-    Dim sliders As New OptionsSliders
+Public Class LineDetector_3D_LSD_MT
+    Inherits VB_Class
     Dim lines As LineDetector_LSD
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         lines = New LineDetector_LSD(ocvb, "LineDetector_3D_LSD_MT")
         sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Measure 3D line segments using a multi-threaded Line Stream Detector"
         ocvb.label2 = ""
@@ -397,40 +379,34 @@ Public Class LineDetector_3D_LSD_MT : Implements IDisposable
         Dim maskLineWidth As Int32 = sliders.TrackBar1.Value
         Dim mask = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, 0)
         Parallel.For(0, lines.sortedLines.Count - 1,
-        Sub(i)
-            find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
-        End Sub)
+            Sub(i)
+                find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
+            End Sub)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         lines.Dispose()
-        sliders.Dispose()
     End Sub
 End Class
 
 
 
 
-Public Class LineDetector_3D_FitLineZ : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim radio As New OptionsRadioButtons
-    Dim check As New OptionsCheckbox
+Public Class LineDetector_3D_FitLineZ
+    Inherits VB_Class
     Dim linesFLD As lineDetector_FLD
     Dim linesLSD As LineDetector_LSD
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         linesFLD = New lineDetector_FLD(ocvb, "LineDetector_3D_FitLineZ")
         linesLSD = New LineDetector_LSD(ocvb, "LineDetector_3D_FitLineZ")
 
         sliders.setupTrackBar1(ocvb, "Mask Line Width", 1, 20, 3)
         sliders.setupTrackBar2(ocvb, "Point count threshold", 5, 500, 50)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         check.Setup(ocvb, 2)
         check.Box(0).Text = "Fitline using x and z (unchecked it will use y and z)"
         check.Box(1).Text = "display output only once a second (to be readable)"
         check.Box(1).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
 
         radio.Setup(ocvb, 4)
         radio.check(0).Text = "Use Fast LineDetector"
@@ -438,7 +414,6 @@ Public Class LineDetector_3D_FitLineZ : Implements IDisposable
         radio.check(2).Text = "Debug FLD longest line"
         radio.check(3).Text = "Debug LSD longest line"
         radio.check(2).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
 
         ocvb.desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
         ocvb.label2 = ""
@@ -470,88 +445,85 @@ Public Class LineDetector_3D_FitLineZ : Implements IDisposable
             Dim longestLineOnly As Boolean = radio.check(2).Checked Or radio.check(3).Checked
             Dim pointCountThreshold = sliders.TrackBar2.Value
             Parallel.For(0, sortedlines.Count,
-            Sub(i)
-                If longestLineOnly And i < sortedlines.Count - 1 Then Exit Sub
-                Dim aa = sortedlines.ElementAt(i).Key
-                Dim pt1 = New cv.Point(aa(0), aa(1))
-                Dim pt2 = New cv.Point(aa(2), aa(3))
-                ocvb.result2.Line(pt1, pt2, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
-                mask.Line(pt1, pt2, New cv.Scalar(i), maskLineWidth, cv.LineTypes.AntiAlias)
+                Sub(i)
+                    If longestLineOnly And i < sortedlines.Count - 1 Then Exit Sub
+                    Dim aa = sortedlines.ElementAt(i).Key
+                    Dim pt1 = New cv.Point(aa(0), aa(1))
+                    Dim pt2 = New cv.Point(aa(2), aa(3))
+                    ocvb.result2.Line(pt1, pt2, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+                    mask.Line(pt1, pt2, New cv.Scalar(i), maskLineWidth, cv.LineTypes.AntiAlias)
 
-                Dim roi = New cv.Rect(Math.Min(aa(0), aa(2)), Math.Min(aa(1), aa(3)), Math.Abs(aa(0) - aa(2)), Math.Abs(aa(1) - aa(3)))
+                    Dim roi = New cv.Rect(Math.Min(aa(0), aa(2)), Math.Min(aa(1), aa(3)), Math.Abs(aa(0) - aa(2)), Math.Abs(aa(1) - aa(3)))
 
-                Dim worldDepth As New List(Of cv.Vec6f)
-                If roi.Width = 0 Then roi.Width = 1
-                If roi.Height = 0 Then roi.Height = 1
-                If roi.X + roi.Width >= mask.Width Then roi.Width = mask.Width - roi.X - 1
-                If roi.Y + roi.Height >= mask.Height Then roi.Height = mask.Height - roi.Y - 1
+                    Dim worldDepth As New List(Of cv.Vec6f)
+                    If roi.Width = 0 Then roi.Width = 1
+                    If roi.Height = 0 Then roi.Height = 1
+                    If roi.X + roi.Width >= mask.Width Then roi.Width = mask.Width - roi.X - 1
+                    If roi.Y + roi.Height >= mask.Height Then roi.Height = mask.Height - roi.Y - 1
 
-                Dim _mask = mask(roi).Clone()
-                Dim points As New List(Of cv.Point2f)
-                For y = 0 To roi.Height - 1
-                    For x = 0 To roi.Width - 1
-                        If _mask.Get(Of Byte)(y, x) = i Then
-                            Dim w = getWorldCoordinatesD6(ocvb, New cv.Point3f(x + roi.X, y + roi.Y, depth32f.Get(Of Single)(y, x)))
-                            points.Add(New cv.Point(If(useX, w.Item0, w.Item1), w.Item2))
-                            worldDepth.Add(w)
-                        End If
+                    Dim _mask = mask(roi).Clone()
+                    Dim points As New List(Of cv.Point2f)
+                    For y = 0 To roi.Height - 1
+                        For x = 0 To roi.Width - 1
+                            If _mask.Get(Of Byte)(y, x) = i Then
+                                Dim w = getWorldCoordinatesD6(ocvb, New cv.Point3f(x + roi.X, y + roi.Y, depth32f.Get(Of Single)(y, x)))
+                                points.Add(New cv.Point(If(useX, w.Item0, w.Item1), w.Item2))
+                                worldDepth.Add(w)
+                            End If
+                        Next
                     Next
-                Next
 
-                ' without a sufficient number of points, the results can vary widely.
-                If points.Count < pointCountThreshold Then Exit Sub
+                    ' without a sufficient number of points, the results can vary widely.
+                    If points.Count < pointCountThreshold Then Exit Sub
 
-                Dim line = cv.Cv2.FitLine(points, cv.DistanceTypes.L2, 1, 0.01, 0.01)
-                Dim mm = line.Vy / line.Vx
-                Dim bb = line.Y1 - mm * line.X1
-                Dim endPoints(2) As cv.Vec6f
-                Dim lastW = worldDepth.Count - 1
-                endPoints(0) = worldDepth(0)
-                endPoints(1) = worldDepth(lastW)
-                endPoints(0).Item2 = bb + mm * If(useX, worldDepth(0).Item3, worldDepth(0).Item4)
-                endPoints(1).Item2 = bb + mm * If(useX, worldDepth(lastW).Item3, worldDepth(lastW).Item4)
+                    Dim line = cv.Cv2.FitLine(points, cv.DistanceTypes.L2, 1, 0.01, 0.01)
+                    Dim mm = line.Vy / line.Vx
+                    Dim bb = line.Y1 - mm * line.X1
+                    Dim endPoints(2) As cv.Vec6f
+                    Dim lastW = worldDepth.Count - 1
+                    endPoints(0) = worldDepth(0)
+                    endPoints(1) = worldDepth(lastW)
+                    endPoints(0).Item2 = bb + mm * If(useX, worldDepth(0).Item3, worldDepth(0).Item4)
+                    endPoints(1).Item2 = bb + mm * If(useX, worldDepth(lastW).Item3, worldDepth(lastW).Item4)
 
-                Dim b = endPoints(0)
-                Dim d = endPoints(1)
-                Dim lenBD = Math.Sqrt((b.Item0 - d.Item0) * (b.Item0 - d.Item0) + (b.Item1 - d.Item1) * (b.Item1 - d.Item1) + (b.Item2 - d.Item2) * (b.Item2 - d.Item2))
+                    Dim b = endPoints(0)
+                    Dim d = endPoints(1)
+                    Dim lenBD = Math.Sqrt((b.Item0 - d.Item0) * (b.Item0 - d.Item0) + (b.Item1 - d.Item1) * (b.Item1 - d.Item1) + (b.Item2 - d.Item2) * (b.Item2 - d.Item2))
 
-                Dim ptIndex = (i / sortedlines.Count) * (worldDepth.Count - 1)
-                Dim textPoint = New cv.Point(worldDepth(ptIndex).Item3, worldDepth(ptIndex).Item4)
-                If textPoint.X > mask.Width - 50 Then textPoint.X = mask.Width - 50
-                If textPoint.Y > mask.Height - 50 Then textPoint.Y = mask.Height - 50
-                cv.Cv2.PutText(ocvb.result2, Format(lenBD / 1000, "#0.00") + "m", textPoint, cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                If endPoints(0).Item2 = endPoints(1).Item2 Then endPoints(0).Item2 += 1 ' prevent NaN
-                cv.Cv2.PutText(ocvb.result2, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "#0.00") + If(useX, "x/z", "y/z"),
-                                New cv.Point(textPoint.X, textPoint.Y + 10), cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    Dim ptIndex = (i / sortedlines.Count) * (worldDepth.Count - 1)
+                    Dim textPoint = New cv.Point(worldDepth(ptIndex).Item3, worldDepth(ptIndex).Item4)
+                    If textPoint.X > mask.Width - 50 Then textPoint.X = mask.Width - 50
+                    If textPoint.Y > mask.Height - 50 Then textPoint.Y = mask.Height - 50
+                    cv.Cv2.PutText(ocvb.result2, Format(lenBD / 1000, "#0.00") + "m", textPoint, cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    If endPoints(0).Item2 = endPoints(1).Item2 Then endPoints(0).Item2 += 1 ' prevent NaN
+                    cv.Cv2.PutText(ocvb.result2, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "#0.00") + If(useX, "x/z", "y/z"),
+                                    New cv.Point(textPoint.X, textPoint.Y + 10), cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-                ' show the final endpoints in xy projection.
-                ocvb.result2.Circle(New cv.Point(b.Item3, b.Item4), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-                ocvb.result2.Circle(New cv.Point(d.Item3, d.Item4), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-            End Sub)
+                    ' show the final endpoints in xy projection.
+                    ocvb.result2.Circle(New cv.Point(b.Item3, b.Item4), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                    ocvb.result2.Circle(New cv.Point(d.Item3, d.Item4), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                End Sub)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         linesFLD.Dispose()
         linesLSD.Dispose()
         check.Dispose()
         radio.Dispose()
-        sliders.Dispose()
     End Sub
 End Class
 
 
 
 
-Public Class LineDetector_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
+Public Class LineDetector_Basics
+    Inherits VB_Class
     Dim ld As cv.XImgProc.FastLineDetector
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "LineDetector thickness of line", 1, 20, 2)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         ocvb.label1 = "Manually drawn with thickness"
@@ -567,7 +539,7 @@ Public Class LineDetector_Basics : Implements IDisposable
         If externalUse = False Then dst = ocvb.result1
         For Each v In vectors
             If v(0) >= 0 And v(0) <= dst.Cols And v(1) >= 0 And v(1) <= dst.Rows And
-               v(2) >= 0 And v(2) <= dst.Cols And v(3) >= 0 And v(3) <= dst.Rows Then
+                   v(2) >= 0 And v(2) <= dst.Cols And v(3) >= 0 And v(3) <= dst.Rows Then
                 Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
                 Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
                 dst.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
@@ -578,8 +550,7 @@ Public Class LineDetector_Basics : Implements IDisposable
             ld.DrawSegments(ocvb.result2, vectors, False)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
         ld.Dispose()
     End Sub
 End Class

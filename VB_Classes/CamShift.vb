@@ -6,13 +6,12 @@ Imports System.IO.Pipes
 
 ' https://docs.opencv.org/3.4.1/d2/dc1/camshiftdemo_8cpp-example.html
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
-Public Class CamShift_Basics : Implements IDisposable
+Public Class CamShift_Basics
+    Inherits VB_Class
     Public plotHist As Plot_Histogram
     Public trackBox As New cv.RotatedRect
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         plotHist = New Plot_Histogram(ocvb, "CamShift_Basics")
         plotHist.externalUse = True
 
@@ -20,10 +19,8 @@ Public Class CamShift_Basics : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "CamShift vMax", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, "CamShift Smin", 0, 255, 60)
         sliders.setupTrackBar4(ocvb, "CamShift Histogram bins", 16, 255, 32)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.label1 = "Draw anywhere to create histogram and start camshift"
+        
+                ocvb.label1 = "Draw anywhere to create histogram and start camshift"
         ocvb.label2 = "Histogram of targeted region (hue only)"
         ocvb.desc = "CamShift Demo - draw on the images to define the object to track."
     End Sub
@@ -71,21 +68,20 @@ Public Class CamShift_Basics : Implements IDisposable
         ocvb.color.CopyTo(ocvb.result1, mask)
         If trackBox.Size.Width > 0 Then ocvb.result1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
-Public Class CamShift_Foreground : Implements IDisposable
+Public Class CamShift_Foreground
+    Inherits VB_Class
     Dim camshift As CamShift_Basics
     Dim blob As Depth_Foreground
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         camshift = New CamShift_Basics(ocvb, "CamShift_Foreground")
         blob = New Depth_Foreground(ocvb, "CamShift_Foreground")
         ocvb.label1 = "Automatically finding the head - top of nearest object"
@@ -107,7 +103,7 @@ Public Class CamShift_Foreground : Implements IDisposable
         camshift.Run(ocvb)
         ocvb.label2 = "Mask of objects closer than " + Format(depthMax / 1000, "#0.0") + " meters"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         camshift.Dispose()
         blob.Dispose()
     End Sub
@@ -119,12 +115,12 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
-Public Class Camshift_Object : Implements IDisposable
+Public Class Camshift_Object
+    Inherits VB_Class
     Dim blob As Blob_DepthClusters
     Dim camshift As CamShift_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         blob = New Blob_DepthClusters(ocvb, "Camshift_Object")
 
         camshift = New CamShift_Basics(ocvb, "Camshift_Object")
@@ -138,7 +134,7 @@ Public Class Camshift_Object : Implements IDisposable
         If camshift.trackBox.Size.Width = 0 Then ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
         camshift.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         blob.Dispose()
         camshift.Dispose()
     End Sub
@@ -148,21 +144,19 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
-Public Class Camshift_TopObjects : Implements IDisposable
+Public Class Camshift_TopObjects
+    Inherits VB_Class
     Dim blob As Blob_DepthClusters
     Dim cams(3) As CamShift_Basics
-    Dim sliders As New OptionsSliders
-    Dim mats As Mat_4to1
+        Dim mats As Mat_4to1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         mats = New Mat_4to1(ocvb, "Camshift_TopObjects")
         mats.externalUse = True
 
         blob = New Blob_DepthClusters(ocvb, "Camshift_TopObjects")
         sliders.setupTrackBar1(ocvb, "How often should camshift be reinitialized", 1, 500, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        For i = 0 To cams.Length - 1
+                For i = 0 To cams.Length - 1
             cams(i) = New CamShift_Basics(ocvb, "Camshift_TopObjects")
         Next
         ocvb.desc = "Track"
@@ -189,12 +183,11 @@ Public Class Camshift_TopObjects : Implements IDisposable
         Next
         mats.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         blob.Dispose()
         For i = 0 To cams.Length - 1
             cams(i).Dispose()
         Next
-        sliders.Dispose()
-        mats.Dispose()
+                mats.Dispose()
     End Sub
 End Class

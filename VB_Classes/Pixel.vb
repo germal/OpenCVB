@@ -2,11 +2,11 @@
 Imports System.Collections.Generic
 Imports System.Runtime.InteropServices
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/PixelAccess.cs
-Public Class Pixel_GetSet : Implements IDisposable
+Public Class Pixel_GetSet
+    Inherits VB_Class
     Dim mat4 As Mat_4to1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         mat4 = New Mat_4to1(ocvb, "Pixel_GetSet")
         mat4.externalUse = True
 
@@ -58,7 +58,7 @@ Public Class Pixel_GetSet : Implements IDisposable
 
         mat4.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         mat4.Dispose()
     End Sub
 End Class

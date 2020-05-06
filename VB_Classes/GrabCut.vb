@@ -1,17 +1,15 @@
 ﻿Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.3.1/de/dd0/grabcut_8cpp-example.html
-Public Class GrabCut_Basics : Implements IDisposable
+Public Class GrabCut_Basics
+    Inherits VB_Class
     Dim contours As Contours_Depth
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         contours = New Contours_Depth(ocvb, "GrabCut_Basics")
 
         sliders.setupTrackBar1(ocvb, "Erode iterations", 1, 20, 3)
         sliders.setupTrackBar2(ocvb, "Erode kernel size", 1, 21, 3)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Use grabcut to isolate what is in the foreground and background.  "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -42,8 +40,7 @@ Public Class GrabCut_Basics : Implements IDisposable
         End If
         ocvb.color.CopyTo(ocvb.result2, mask)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         contours.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class

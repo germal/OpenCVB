@@ -2,11 +2,11 @@
 Imports System.Runtime.InteropServices
 Imports System.Collections.Concurrent
 
-Public Class Thread_Grid : Implements IDisposable
+Public Class Thread_Grid
+    Inherits VB_Class
     Public roiList As List(Of cv.Rect)
     Public borderList As List(Of cv.Rect)
-    Public sliders As New OptionsSliders
-    Public gridMask As cv.Mat
+        Public gridMask As cv.Mat
     Public externalUse As Boolean
     Public tilesPerRow As Int32
     Public tilesPerCol As Int32
@@ -26,14 +26,12 @@ Public Class Thread_Grid : Implements IDisposable
         Next
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         src = ocvb.color
         sliders.setupTrackBar1(ocvb, "ThreadGrid Width", 5, src.Width, 32)
         sliders.setupTrackBar2(ocvb, "ThreadGrid Height", 5, src.Height, 32)
         sliders.setupTrackBar3(ocvb, "ThreadGrid Border", 0, 20, 0)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        roiList = New List(Of cv.Rect)
+                roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)
         gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
         ocvb.desc = "Create a grid for use with parallel.ForEach."
@@ -99,8 +97,7 @@ Public Class Thread_Grid : Implements IDisposable
                           CStr(roiList(0).Width) + "X" + CStr(roiList(0).Height) + " regions"
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        gridMask.Dispose()
+    Public Sub VBdispose()
+                gridMask.Dispose()
     End Sub
 End Class

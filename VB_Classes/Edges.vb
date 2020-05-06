@@ -2,19 +2,17 @@
 Imports System.Runtime.InteropServices
 Imports System.IO
 'https://docs.opencv.org/3.1.0/da/d22/tutorial_py_canny.html
-Public Class Edges_Canny : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public src As cv.Mat
+Public Class Edges_Canny
+    Inherits VB_Class
+        Public src As cv.Mat
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Canny threshold1", 1, 255, 50)
         sliders.setupTrackBar2(ocvb, "Canny threshold2", 1, 255, 50)
         sliders.setupTrackBar3(ocvb, "Canny Aperture", 3, 7, 3)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Show canny edge detection with varying thresholds"
         ocvb.label1 = "Canny using L1 Norm"
         ocvb.label2 = "Canny using L2 Norm"
@@ -34,20 +32,19 @@ Public Class Edges_Canny : Implements IDisposable
             dst = src.Canny(threshold1, threshold2, aperture, False)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
-Public Class Edges_CannyAndShadow : Implements IDisposable
+Public Class Edges_CannyAndShadow
+    Inherits VB_Class
     Dim shadow As Depth_Holes
     Dim canny As Edges_Canny
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         dilate = New DilateErode_Basics(ocvb, "Edges_CannyAndShadow")
         dilate.radio.check(2).Checked = True
         dilate.externalUse = True
@@ -77,7 +74,7 @@ Public Class Edges_CannyAndShadow : Implements IDisposable
         dilate.Run(ocvb)
         ocvb.result1.SetTo(0, shadow.holeMask)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         canny.Dispose()
         shadow.Dispose()
         dilate.Dispose()
@@ -86,15 +83,13 @@ End Class
 
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Public Class Edges_Laplacian : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class Edges_Laplacian
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Gaussian Kernel", 1, 32, 7)
         sliders.setupTrackBar2(ocvb, "Laplacian Kernel", 1, 32, 5)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Show Laplacian edge detection with varying kernel sizes"
+                ocvb.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gaussiankernelSize As Int32 = sliders.TrackBar1.Value
@@ -117,18 +112,17 @@ Public Class Edges_Laplacian : Implements IDisposable
         cv.Cv2.CvtColor(abs_dst, ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "Laplacian of Depth Image"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edges_Scharr : Implements IDisposable
+Public Class Edges_Scharr
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Scharr is more accurate with 3x3 kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -140,29 +134,25 @@ Public Class Edges_Scharr : Implements IDisposable
         xyField.ConvertTo(gray, cv.MatType.CV_8U, 0.5)
         ocvb.result1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
-Public Class Edges_Preserving : Implements IDisposable
-    Dim radio As New OptionsRadioButtons
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class Edges_Preserving
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         radio.Setup(ocvb, 2)
         radio.check(0).Text = "Edge RecurseFilter"
         radio.check(1).Text = "Edge NormconvFilter"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         sliders.setupTrackBar1(ocvb, "Edge Sigma_s", 0, 200, 10)
         sliders.setupTrackBar2(ocvb, "Edge Sigma_r", 1, 100, 40)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "OpenCV's edge preserving filter."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -179,10 +169,9 @@ Public Class Edges_Preserving : Implements IDisposable
             cv.Cv2.EdgePreservingFilter(ocvb.RGBDepth, ocvb.result2, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
@@ -202,16 +191,14 @@ End Module
 
 
 '  https://docs.opencv.org/3.1.0/d0/da5/tutorial_ximgproc_prediction.html
-Public Class Edges_RandomForest_CPP : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim rgbData() As Byte
+Public Class Edges_RandomForest_CPP
+    Inherits VB_Class
+        Dim rgbData() As Byte
     Dim EdgesPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Edges RF Threshold", 1, 255, 35)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Detect edges using structured forests - Opencv Contrib"
         ocvb.label1 = "Detected Edges"
 
@@ -243,28 +230,25 @@ Public Class Edges_RandomForest_CPP : Implements IDisposable
             ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, dstData).Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         Edges_RandomForest_Close(EdgesPtr)
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edges_Sobel : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public src As cv.Mat
+Public Class Edges_Sobel
+    Inherits VB_Class
+        Public src As cv.Mat
     Public dst As cv.Mat
     Public grayX As cv.Mat
     Public grayY As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Sobel kernel Size", 1, 32, 3)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
+                ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize As Int32 = sliders.TrackBar1.Value
@@ -280,19 +264,18 @@ Public Class Edges_Sobel : Implements IDisposable
         cv.Cv2.AddWeighted(abs_grayX, 0.5, abs_grayY, 0.5, 0, dst)
         If externalUse = False Then ocvb.result1 = dst
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
-Public Class Edges_LeftView : Implements IDisposable
+Public Class Edges_LeftView
+    Inherits VB_Class
     Dim red As LeftRightView_Basics
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         red = New LeftRightView_Basics(ocvb, "Edges_LeftView")
         sobel = New Edges_Sobel(ocvb, "Edges_LeftView")
         sobel.externalUse = True
@@ -313,7 +296,7 @@ Public Class Edges_LeftView : Implements IDisposable
         sobel.Run(ocvb)
         ocvb.result1 = sobel.dst
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         red.Dispose()
         sobel.Dispose()
     End Sub
@@ -321,18 +304,16 @@ End Class
 
 
 
-Public Class Edges_ResizeAdd : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public gray As New cv.Mat
+Public Class Edges_ResizeAdd
+    Inherits VB_Class
+        Public gray As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Border Vertical in Pixels", 1, 20, 5)
         sliders.setupTrackBar2(ocvb, "Border Horizontal in Pixels", 1, 20, 5)
         sliders.setupTrackBar3(ocvb, "Threshold for Pixel Difference", 1, 50, 16)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Find edges using a resize, subtract, and threshold."
         ocvb.label1 = ""
         ocvb.label2 = ""
@@ -345,23 +326,20 @@ Public Class Edges_ResizeAdd : Implements IDisposable
         ocvb.result1 = ocvb.result1.Threshold(sliders.TrackBar3.Value, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.Add(gray, ocvb.result1, ocvb.result2)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
-Public Class Edges_DCTfrequency : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class Edges_DCTfrequency
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 32)
         sliders.setupTrackBar2(ocvb, "Threshold after Removal", 1, 255, 20)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Find edges by removing all the highest frequencies."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -379,9 +357,8 @@ Public Class Edges_DCTfrequency : Implements IDisposable
         src32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC1, 255)
         ocvb.result2 = ocvb.result1.Threshold(sliders.TrackBar2.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
@@ -405,16 +382,14 @@ End Module
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/ximgproc/samples/dericheSample.py
-Public Class Edges_Deriche_CPP : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim Edges_Deriche As IntPtr
+Public Class Edges_Deriche_CPP
+    Inherits VB_Class
+        Dim Edges_Deriche As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Deriche Alpha", 1, 400, 100)
         sliders.setupTrackBar2(ocvb, "Deriche Omega", 1, 1000, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        Edges_Deriche = Edges_Deriche_Open()
+                Edges_Deriche = Edges_Deriche_Open()
         ocvb.desc = "Edge detection using the Deriche X and Y gradients"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -433,7 +408,7 @@ Public Class Edges_Deriche_CPP : Implements IDisposable
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         Edges_Deriche_Close(Edges_Deriche)
     End Sub
 End Class

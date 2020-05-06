@@ -2,10 +2,10 @@
 Imports OpenCvSharp.Aruco.CvAruco
 
 ' https://github.com/shimat/opencvsharp_samples/blob/master/SamplesCS/Samples/ArucoSample.cs
-Public Class Aruco_Basics : Implements IDisposable
+Public Class Aruco_Basics
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Show how to use the Aruco markers and rotate the image accordingly."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -23,18 +23,18 @@ Public Class Aruco_Basics : Implements IDisposable
                                               "The DetectMarkers API works in C# but fails in VB.Net." + vbCrLf +
                                               "To see the correct output, use Aruco_CS.", 10, 140, RESULT1))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class Aruco_CS : Implements IDisposable
+Public Class Aruco_CS
+    Inherits VB_Class
     Dim aruco As New CS_Classes.Aruco_Detect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = "Original Image with marker ID's"
         ocvb.label2 = "Normalized image after WarpPerspective."
         ocvb.desc = "Testing the Aruco marker detection in C#"
@@ -47,6 +47,6 @@ Public Class Aruco_CS : Implements IDisposable
         ocvb.result2(New cv.Rect(0, 0, ocvb.result2.Height, ocvb.result2.Height)) =
                     aruco.normalizedImage.Resize(New cv.Size(ocvb.result2.Height, ocvb.result2.Height))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class

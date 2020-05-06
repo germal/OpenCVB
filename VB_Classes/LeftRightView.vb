@@ -1,12 +1,10 @@
 ﻿Imports cv = OpenCvSharp
-Public Class LeftRightView_Basics : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class LeftRightView_Basics
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Show the left and right views from the 3D Camera"
+                ocvb.desc = "Show the left and right views from the 3D Camera"
         Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
                 ocvb.label1 = "Left Image"
@@ -28,9 +26,8 @@ Public Class LeftRightView_Basics : Implements IDisposable
         ocvb.result1 += sliders.TrackBar1.Value
         ocvb.result2 += sliders.TrackBar1.Value
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
@@ -38,20 +35,18 @@ End Class
 
 
 
-Public Class LeftRightView_CompareUndistorted : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public fisheye As FishEye_Rectified
+Public Class LeftRightView_CompareUndistorted
+    Inherits VB_Class
+        Public fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         fisheye = New FishEye_Rectified(ocvb, "LeftRightView_CompareUndistorted")
         fisheye.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 0)
         sliders.setupTrackBar2(ocvb, "Slice Starting Y", 0, 300, 100)
         sliders.setupTrackBar3(ocvb, "Slice Height", 1, 300, 50)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        Select Case ocvb.parms.cameraIndex
+                Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
                 ocvb.label1 = "Left Image"
                 ocvb.label2 = "Right Image"
@@ -96,9 +91,8 @@ Public Class LeftRightView_CompareUndistorted : Implements IDisposable
         ocvb.result1 += sliders.TrackBar1.Value
         ocvb.result2 += sliders.TrackBar1.Value
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        fisheye.Dispose()
+    Public Sub VBdispose()
+                fisheye.Dispose()
     End Sub
 End Class
 
@@ -106,17 +100,15 @@ End Class
 
 
 
-Public Class LeftRightView_CompareRaw : Implements IDisposable
+Public Class LeftRightView_CompareRaw
+    Inherits VB_Class
     Dim lrView As LeftRightView_Basics
-    Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "brightness", 0, 255, 100)
         sliders.setupTrackBar2(ocvb, "Slice Starting Y", 0, 300, 100)
         sliders.setupTrackBar3(ocvb, "Slice Height", 1, 120, 50)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        Select Case ocvb.parms.cameraIndex
+                Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
                 ocvb.label1 = "Left Image"
                 ocvb.label2 = "Right Image"
@@ -150,9 +142,8 @@ Public Class LeftRightView_CompareRaw : Implements IDisposable
         leftView(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100, leftView.Width, slideHeight)))
         ocvb.result2(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100 + slideHeight, leftView.Width, slideHeight)))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        lrView.Dispose()
+    Public Sub VBdispose()
+                lrView.Dispose()
     End Sub
 End Class
 
@@ -160,12 +151,12 @@ End Class
 
 
 
-Public Class LeftRightView_Features : Implements IDisposable
+Public Class LeftRightView_Features
+    Inherits VB_Class
     Dim lrView As LeftRightView_Basics
     Dim features As Features_GoodFeatures
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         features = New Features_GoodFeatures(ocvb, "LeftRightView_Features")
         features.externalUse = True
 
@@ -193,7 +184,7 @@ Public Class LeftRightView_Features : Implements IDisposable
             cv.Cv2.Circle(ocvb.result1, features.goodFeatures(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         features.Dispose()
         lrView.Dispose()
     End Sub
@@ -202,12 +193,12 @@ End Class
 
 
 
-Public Class LeftRightView_Palettized : Implements IDisposable
+Public Class LeftRightView_Palettized
+    Inherits VB_Class
     Dim lrView As LeftRightView_Basics
     Dim palette As Palette_ColorMap
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         lrView = New LeftRightView_Basics(ocvb, "LeftRightView_Palettized")
         palette = New Palette_ColorMap(ocvb, "LeftRightView_Palettized")
         palette.externalUse = True
@@ -231,7 +222,7 @@ Public Class LeftRightView_Palettized : Implements IDisposable
 
         ocvb.result1 = left
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         lrView.Dispose()
         palette.Dispose()
     End Sub
@@ -240,12 +231,12 @@ End Class
 
 
 
-Public Class LeftRightView_BRISK : Implements IDisposable
+Public Class LeftRightView_BRISK
+    Inherits VB_Class
     Dim lrView As LeftRightView_Basics
     Dim brisk As BRISK_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Add color to the 8-bit infrared images."
         ocvb.label1 = "Infrared Left Image"
         ocvb.label2 = "Infrared Right Image"
@@ -272,7 +263,7 @@ Public Class LeftRightView_BRISK : Implements IDisposable
             ocvb.result1.Circle(pt, 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         brisk.Dispose()
         lrView.Dispose()
     End Sub

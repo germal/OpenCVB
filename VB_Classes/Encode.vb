@@ -1,13 +1,11 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Encode_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class Encode_Basics
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
         sliders.setupTrackBar2(ocvb, "Encode Output Scaling", 1, 100, 7)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Error Level Analysis - to verify a jpg image has not been modified."
         ocvb.label1 = "absDiff with original"
         ocvb.label2 = "Original decompressed"
@@ -27,23 +25,19 @@ Public Class Encode_Basics : Implements IDisposable
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
         ocvb.label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
-Public Class Encode_Options : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim radio As New OptionsRadioButtons
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class Encode_Options
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
         sliders.setupTrackBar2(ocvb, "Encode Output Scaling", 1, 100, 85)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         radio.Setup(ocvb, 6)
         radio.check(0).Text = "JpegChromaQuality"
         radio.check(1).Text = "JpegLumaQuality"
@@ -52,8 +46,7 @@ Public Class Encode_Options : Implements IDisposable
         radio.check(4).Text = "JpegQuality"
         radio.check(5).Text = "WebPQuality"
         radio.check(4).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         ocvb.desc = "Encode options that affect quality."
         ocvb.label1 = "absDiff with original image"
     End Sub
@@ -89,8 +82,7 @@ Public Class Encode_Options : Implements IDisposable
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
         ocvb.label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        radio.Dispose()
+    Public Sub VBdispose()
+                radio.Dispose()
     End Sub
 End Class

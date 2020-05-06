@@ -1,17 +1,15 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp/blob/master/test/OpenCvSharp.Tests/stitching/StitchingTest.cs
-Public Class Stitch_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public src As New cv.Mat
+Public Class Stitch_Basics
+    Inherits VB_Class
+        Public src As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Number of random images", 10, 50, 10)
         sliders.setupTrackBar2(ocvb, "Rectangle width", ocvb.color.Width / 4, ocvb.color.Width - 1, ocvb.color.Width / 2)
         sliders.setupTrackBar3(ocvb, "Rectangle height", ocvb.color.Height / 4, ocvb.color.Height - 1, ocvb.color.Height / 2)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Stitch together random parts of a color image."
+                ocvb.desc = "Stitch together random parts of a color image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mats As New List(Of cv.Mat)
@@ -53,7 +51,6 @@ Public Class Stitch_Basics : Implements IDisposable
             End If
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class

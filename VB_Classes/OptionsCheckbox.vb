@@ -14,5 +14,6 @@ Public Class OptionsCheckbox
             Box(i).AutoSize = True
             FlowLayoutPanel1.Controls.Add(Box(i))
         Next
+        If ocvb.parms.ShowOptions Then Me.Show()
     End Sub
 End Class

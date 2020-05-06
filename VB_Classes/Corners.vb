@@ -1,16 +1,14 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
-Public Class Corners_Harris : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class Corners_Harris
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar2(ocvb, "Corner aperture size", 1, 21, 3)
         sliders.setupTrackBar3(ocvb, "Corner quality level", 1, 100, 50)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Find corners using Eigen values and vectors"
+                ocvb.desc = "Find corners using Eigen values and vectors"
         ocvb.label2 = "Corner Eigen values"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -55,24 +53,21 @@ Public Class Corners_Harris : Implements IDisposable
         cv.Cv2.Normalize(mc, McNormal, 127, 255, cv.NormTypes.MinMax)
         McNormal.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
-Public Class Corners_SubPix : Implements IDisposable
+Public Class Corners_SubPix
+    Inherits VB_Class
     Dim good As Features_GoodFeatures
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         good = New Features_GoodFeatures(ocvb, "Corners_SubPix")
         sliders.setupTrackBar1(ocvb, "SubPix kernel Size", 1, 20, 3)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Use PreCornerDetect to find features in the image."
         ocvb.label1 = "Output of GoodFeatures"
         ocvb.label2 = "Refined good features"
@@ -92,25 +87,22 @@ Public Class Corners_SubPix : Implements IDisposable
             cv.Cv2.Circle(ocvb.result2, p, 3, New cv.Scalar(0, 0, 255), -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        good.Dispose()
+    Public Sub VBdispose()
+                good.Dispose()
     End Sub
 End Class
 
 
 
 
-Public Class Corners_PreCornerDetect : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim median As Math_Median_CDF
+Public Class Corners_PreCornerDetect
+    Inherits VB_Class
+        Dim median As Math_Median_CDF
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         median = New Math_Median_CDF(ocvb, "Corners_PreCornerDetect")
         sliders.setupTrackBar1(ocvb, "kernel Size", 1, 20, 19)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Use PreCornerDetect to find features in the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -128,9 +120,8 @@ Public Class Corners_PreCornerDetect : Implements IDisposable
         ocvb.result2 = gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "median = " + CStr(median.medianVal)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        median.Dispose()
+    Public Sub VBdispose()
+                median.Dispose()
     End Sub
 End Class
 
@@ -145,16 +136,14 @@ End Module
 
 
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
-Public Class Corners_ShiTomasi_CPP : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class Corners_ShiTomasi_CPP
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar2(ocvb, "Corner aperture size", 1, 21, 3)
         sliders.setupTrackBar3(ocvb, "Corner quality level", 1, 100, 50)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Find corners using Eigen values and vectors"
+                ocvb.desc = "Find corners using Eigen values and vectors"
         ocvb.label2 = "Corner Eigen values"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -199,7 +188,6 @@ Public Class Corners_ShiTomasi_CPP : Implements IDisposable
         cv.Cv2.Normalize(dst, stNormal, 127, 255, cv.NormTypes.MinMax)
         stNormal.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class

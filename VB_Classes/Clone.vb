@@ -1,13 +1,13 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
-Public Class Clone_Normal : Implements IDisposable
+Public Class Clone_Normal
+    Inherits VB_Class
     Public colorChangeValues As cv.Vec3f
     Public illuminationChangeValues As cv.Vec2f
     Public textureFlatteningValues As cv.Vec2f
     Public cloneSpec As Int32 ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
         ocvb.label1 = "Clone result - draw anywhere to clone a region"
         ocvb.label2 = "Clone Region Mask"
@@ -31,91 +31,82 @@ Public Class Clone_Normal : Implements IDisposable
                 cv.Cv2.TextureFlattening(ocvb.color, mask, ocvb.result1, textureFlatteningValues(0), textureFlatteningValues(1))
         End Select
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class Clone_ColorChange : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim clone As Clone_Normal
+Public Class Clone_ColorChange
+    Inherits VB_Class
+        Dim clone As Clone_Normal
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         clone = New Clone_Normal(ocvb, "Clone_ColorChange")
         ocvb.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
 
         sliders.setupTrackBar1(ocvb, "Color Change - Red", 5, 25, 15)
         sliders.setupTrackBar2(ocvb, "Color Change - Green", 5, 25, 5)
         sliders.setupTrackBar3(ocvb, "Color Change - Blue", 5, 25, 5)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-    End Sub
+            End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(sliders.TrackBar1.Value / 10, sliders.TrackBar2.Value / 10, sliders.TrackBar1.Value / 10)
         clone.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         clone.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
 
 
-Public Class Clone_IlluminationChange : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim clone As Clone_Normal
+Public Class Clone_IlluminationChange
+    Inherits VB_Class
+        Dim clone As Clone_Normal
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         clone = New Clone_Normal(ocvb, "Clone_IlluminationChange")
         ocvb.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
 
         sliders.setupTrackBar1(ocvb, "Alpha", 0, 20, 2)
         sliders.setupTrackBar2(ocvb, "Beta", 0, 20, 2)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-    End Sub
+            End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(sliders.TrackBar1.Value / 10, sliders.TrackBar2.Value / 10)
         clone.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         clone.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
 
 
 
-Public Class Clone_TextureFlattening : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim clone As Clone_Normal
+Public Class Clone_TextureFlattening
+    Inherits VB_Class
+        Dim clone As Clone_Normal
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         clone = New Clone_Normal(ocvb, "Clone_TextureFlattening")
         ocvb.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
 
         sliders.setupTrackBar1(ocvb, "Low Threshold", 0, 100, 10)
         sliders.setupTrackBar2(ocvb, "High Threshold", 0, 100, 50)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-    End Sub
+            End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cv.Vec2f(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
         clone.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         clone.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
@@ -126,23 +117,21 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
 ' https://www.learnopencv.com/seamless-cloning-using-opencv-python-cpp/
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
-Public Class Clone_Eagle : Implements IDisposable
-    Dim radio As New OptionsRadioButtons
+Public Class Clone_Eagle
+    Inherits VB_Class
     Dim sourceImage As cv.Mat
     Dim mask As cv.Mat
     Dim srcROI As cv.Rect
     Dim maskROI As cv.Rect
     Dim pt As cv.Point
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         radio.Setup(ocvb, 3)
         radio.check(0).Text = "Seamless - Mixed Clone"
         radio.check(1).Text = "Seamless - MonochromeTransfer Clone"
         radio.check(2).Text = "Seamless - Normal Clone"
         radio.check(2).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         sourceImage = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/CloneSource.png")
         srcROI = New cv.Rect(0, 40, sourceImage.Width, sourceImage.Height)
 
@@ -177,7 +166,7 @@ Public Class Clone_Eagle : Implements IDisposable
         Next
         cv.Cv2.SeamlessClone(sourceImage, ocvb.result1, mask, pt, ocvb.result1, cloneFlag)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
     End Sub
 End Class
@@ -186,18 +175,16 @@ End Class
 
 
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Cv2.SeamlessClone(OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.Point,%20OpenCvSharp.OutputArray,%20OpenCvSharp.SeamlessCloneMethods)/
-Public Class Clone_Seamless : Implements IDisposable
-    Dim radio As New OptionsRadioButtons
+Public Class Clone_Seamless
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         radio.Setup(ocvb, 3)
         radio.check(0).Text = "Seamless Normal Clone"
         radio.check(1).Text = "Seamless Mono Clone"
         radio.check(2).Text = "Seamless Mixed Clone"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-        ocvb.label1 = "Mask for Clone"
+                ocvb.label1 = "Mask for Clone"
         ocvb.label2 = "Results for SeamlessClone"
         ocvb.desc = "Use the seamlessclone API to merge color and depth..."
     End Sub
@@ -223,7 +210,7 @@ Public Class Clone_Seamless : Implements IDisposable
         cv.Cv2.SeamlessClone(ocvb.RGBDepth, ocvb.color, ocvb.result1, center, ocvb.result2, style)
         ocvb.result2.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
     End Sub
 End Class

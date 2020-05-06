@@ -1,16 +1,14 @@
 ﻿Imports cv = OpenCvSharp
-Public Class BRISK_Basics : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public Brisk As cv.BRISK
+Public Class BRISK_Basics
+    Inherits VB_Class
+        Public Brisk As cv.BRISK
     Public features As New List(Of cv.Point2f)
     Public externalUse As Boolean
     Public src As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "BRISK Radius Threshold", 1, 100, 50)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Detect features with BRISK"
+                ocvb.desc = "Detect features with BRISK"
         Brisk = cv.BRISK.Create()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -33,7 +31,6 @@ Public Class BRISK_Basics : Implements IDisposable
             cv.Cv2.AddWeighted(ocvb.color, 0.5, wt, 0.5, 0, ocvb.result1)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class

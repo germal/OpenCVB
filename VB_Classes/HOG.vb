@@ -1,17 +1,15 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HOGSample.vb
-Public Class HOG_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim staticImage As cv.Mat
+Public Class HOG_Basics
+    Inherits VB_Class
+        Dim staticImage As cv.Mat
     Dim staticImageProcessed As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Threshold", 0, 100, 0)
         sliders.setupTrackBar2(ocvb, "Stride", 1, 100, 1)
         sliders.setupTrackBar3(ocvb, "Scale", 0, 2000, 300)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Find people with Histogram of Gradients (HOG) 2D feature"
+                ocvb.desc = "Find people with Histogram of Gradients (HOG) 2D feature"
         staticImage = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
         ocvb.result2 = staticImage.Resize(ocvb.result2.Size)
     End Sub
@@ -60,8 +58,7 @@ Public Class HOG_Basics : Implements IDisposable
             End If
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 

@@ -1,6 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
-Public Class GameOfLife_Basics : Implements IDisposable
+Public Class GameOfLife_Basics
+    Inherits VB_Class
     Dim random As Random_Points
     Dim grid As cv.Mat
     Dim nextgrid As cv.Mat
@@ -27,8 +28,7 @@ Public Class GameOfLife_Basics : Implements IDisposable
         Return CountNeighbors
     End Function
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New cv.Mat(ocvb.color.Height / factor, ocvb.color.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
 
@@ -89,7 +89,7 @@ Public Class GameOfLife_Basics : Implements IDisposable
         ocvb.label1 = "Population " + CStr(population) + " Generation = " + CStr(generation) + countdownText
         grid = nextgrid.Clone()
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         random.Dispose()
     End Sub
 End Class
@@ -99,12 +99,12 @@ End Class
 
 
 
-Public Class GameOfLife_Population : Implements IDisposable
+Public Class GameOfLife_Population
+    Inherits VB_Class
     Dim plot As Plot_OverTime
     Dim game As GameOfLife_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         game = New GameOfLife_Basics(ocvb, "GameOfLife_Population")
 
         plot = New Plot_OverTime(ocvb, "GameOfLife_Population")
@@ -121,7 +121,7 @@ Public Class GameOfLife_Population : Implements IDisposable
         plot.plotData = New cv.Scalar(game.population, 0, 0)
         plot.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         plot.Dispose()
         game.Dispose()
     End Sub

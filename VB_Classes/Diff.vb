@@ -1,13 +1,11 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Diff_Basics : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Dim lastFrame As New cv.Mat
+Public Class Diff_Basics
+    Inherits VB_Class
+        Dim lastFrame As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Diff - Color Threshold", 1, 255, 50)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.label1 = "Stable Gray Color"
+                ocvb.label1 = "Stable Gray Color"
         ocvb.label2 = "Unstable Gray Color"
         ocvb.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
@@ -21,21 +19,20 @@ Public Class Diff_Basics : Implements IDisposable
         End If
         lastFrame = gray.Clone()
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
-Public Class Diff_UnstableDepthAndColor : Implements IDisposable
+Public Class Diff_UnstableDepthAndColor
+    Inherits VB_Class
     Dim diff As Diff_Basics
     Dim depth As Depth_Stable
     Dim lastFrames() As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         diff = New Diff_Basics(ocvb, "Diff_UnstableDepthAndColor")
         diff.sliders.TrackBar1.Value = 20 ' this is color threshold - low means detecting more motion.
 
@@ -60,7 +57,7 @@ Public Class Diff_UnstableDepthAndColor : Implements IDisposable
             ocvb.label2 = "Stable (non-zero) Depth"
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         diff.Dispose()
         depth.Dispose()
     End Sub

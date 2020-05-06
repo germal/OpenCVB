@@ -2,7 +2,8 @@
 Imports System.Runtime.InteropServices
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
-Public Class PyStream_Basics : Implements IDisposable
+Public Class PyStream_Basics
+    Inherits VB_Class
     Dim pipeName As String
     Dim pipeImages As NamedPipeServerStream
     Dim rgbBuffer(1) As Byte
@@ -10,8 +11,7 @@ Public Class PyStream_Basics : Implements IDisposable
     Dim pythonReady As Boolean
     Dim memMap As Python_MemMap
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
         pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.Out)
         PipeTaskIndex += 1
@@ -51,7 +51,7 @@ Public Class PyStream_Basics : Implements IDisposable
             End If
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         memMap.Dispose()
         If pipeImages IsNot Nothing Then
             If pipeImages.IsConnected Then

@@ -1,13 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Brightness_Clahe : Implements IDisposable ' Contrast Limited Adaptive Histogram Equalization (CLAHE)
-    Dim sliders As New OptionsSliders
+Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization (CLAHE)
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Clip Limit", 1, 100, 10)
         sliders.setupTrackBar2(ocvb, "Grid Size", 1, 100, 8)
-        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -27,21 +25,18 @@ Public Class Brightness_Clahe : Implements IDisposable ' Contrast Limited Adapti
         cv.Cv2.CvtColor(imgGray, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.CvtColor(imgClahe, ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
-Public Class Brightness_Contrast : Implements IDisposable
-    Dim sliders As New OptionsSliders
+Public Class Brightness_Contrast
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Brightness", 1, 100, 50)
         sliders.setupTrackBar2(ocvb, "Contrast", 1, 100, 50)
-        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.desc = "Show image with vary contrast and brightness."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -49,18 +44,17 @@ Public Class Brightness_Contrast : Implements IDisposable
         ocvb.label1 = "Brightness/Contrast"
         ocvb.label2 = ""
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
-Public Class Brightness_hue : Implements IDisposable
+Public Class Brightness_hue
+    Inherits VB_Class
     Public hsv_planes(2) As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Show hue (Result1) and Saturation (Result2)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -73,42 +67,37 @@ Public Class Brightness_hue : Implements IDisposable
         cv.Cv2.CvtColor(hsv_planes(0), ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.CvtColor(hsv_planes(1), ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
-Public Class Brightness_AlphaBeta : Implements IDisposable
-    Dim sliders As New OptionsSliders
+Public Class Brightness_AlphaBeta
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use alpha and beta with ConvertScaleAbs."
         sliders.setupTrackBar1(ocvb, "Brightness Alpha (contrast)", 0, 500, 300)
         sliders.setupTrackBar2(ocvb, "Brightness Beta (brightness)", -100, 100, 0)
-        If ocvb.parms.ShowOptions Then sliders.Show()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1 = ocvb.color.ConvertScaleAbs(sliders.TrackBar1.Value / 500, sliders.TrackBar2.Value)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class Brightness_Gamma : Implements IDisposable
-    Dim sliders As New OptionsSliders
+Public Class Brightness_Gamma
+    Inherits VB_Class
     Dim lookupTable(255) As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use gamma with ConvertScaleAbs."
         sliders.setupTrackBar1(ocvb, "Brightness Gamma correction", 0, 200, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static lastGamma As Int32 = -1
@@ -120,8 +109,7 @@ Public Class Brightness_Gamma : Implements IDisposable
         End If
         ocvb.result1 = ocvb.color.LUT(lookupTable)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -145,14 +133,12 @@ End Module
 
 
 ' https://blog.csdn.net/just_sort/article/details/85982871
-Public Class Brightness_WhiteBalance_CPP : Implements IDisposable
-    Dim sliders As New OptionsSliders
+Public Class Brightness_WhiteBalance_CPP
+    Inherits VB_Class
     Dim wPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "White balance threshold X100", 1, 100, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         wPtr = WhiteBalance_Open()
         ocvb.label1 = "Image with auto white balance"
@@ -173,9 +159,8 @@ Public Class Brightness_WhiteBalance_CPP : Implements IDisposable
         diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         WhiteBalance_Close(wPtr)
-        sliders.Dispose()
     End Sub
 End Class
 
@@ -184,20 +169,18 @@ End Class
 
 
 ' https://blog.csdn.net/just_sort/article/details/85982871
-Public Class Brightness_WhiteBalance : Implements IDisposable
+Public Class Brightness_WhiteBalance
+    Inherits VB_Class
     Dim hist As Histogram_Basics
-    Dim sliders As New OptionsSliders
     Dim wPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         hist = New Histogram_Basics(ocvb, "Brightness_WhiteBalance")
         hist.bins = 256 * 3
         hist.maxRange = hist.bins
         hist.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "White balance threshold X100", 1, 100, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label1 = "Image with auto white balance"
         ocvb.label2 = "White pixels were altered from the original"
@@ -220,7 +203,7 @@ Public Class Brightness_WhiteBalance : Implements IDisposable
         Dim sum As Single
         Dim threshold As Int32
         For i = hist.histRaw(0).Rows - 1 To 0 Step -1
-            sum += hist.histRaw(0).Get(of Single)(i, 0)
+            sum += hist.histRaw(0).Get(Of Single)(i, 0)
             If sum > hist.src.Rows * hist.src.Cols * thresholdVal Then
                 threshold = i
                 Exit For
@@ -242,9 +225,8 @@ Public Class Brightness_WhiteBalance : Implements IDisposable
         diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         WhiteBalance_Close(wPtr)
-        sliders.Dispose()
         hist.Dispose()
     End Sub
 End Class

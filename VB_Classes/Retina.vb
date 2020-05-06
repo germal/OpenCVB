@@ -15,24 +15,20 @@ Module Retina_CPP_Module
 End Module
 
 'https://docs.opencv.org/3.4/d3/d86/tutorial_bioinspired_retina_model.html
-Public Class Retina_Basics_CPP : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim check As New OptionsCheckbox
-    Dim Retina As IntPtr
+Public Class Retina_Basics_CPP
+    Inherits VB_Class
+            Dim Retina As IntPtr
     Dim startInfo As New ProcessStartInfo
     Public src As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Retina Sample Factor", 1, 10, 2)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         check.Setup(ocvb, 2)
         check.Box(0).Text = "Use log sampling"
         check.Box(1).Text = "Open resulting xml file"
-        If ocvb.parms.ShowOptions Then check.Show()
-        ocvb.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
+                ocvb.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
         ocvb.label1 = "Retina Parvo"
         ocvb.label2 = "Retina Magno"
     End Sub
@@ -79,7 +75,7 @@ Public Class Retina_Basics_CPP : Implements IDisposable
             ocvb.result2 = magno.Resize(src.Size())
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         Retina_Basics_Close(Retina)
         check.Dispose()
     End Sub
@@ -90,11 +86,11 @@ End Class
 
 
 
-Public Class Retina_Depth : Implements IDisposable
+Public Class Retina_Depth
+    Inherits VB_Class
     Dim retina As Retina_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         retina = New Retina_Basics_CPP(ocvb, "Retina_Depth")
         retina.externalUse = True
 
@@ -110,7 +106,7 @@ Public Class Retina_Depth : Implements IDisposable
         cv.Cv2.BitwiseOr(lastMotion, ocvb.result2, ocvb.result1)
         lastMotion = ocvb.result2
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         retina.Dispose()
     End Sub
 End Class

@@ -56,13 +56,13 @@ Module ML__Exports
 End Module
 
 
-Public Class ML_FillRGBDepth_MT : Implements IDisposable
+Public Class ML_FillRGBDepth_MT
+    Inherits VB_Class
     Dim shadow As Depth_Holes
     Dim grid As Thread_Grid
     Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         colorizer = New Depth_Colorizer_CPP(ocvb, "ML_FillRGBDepth_MT")
         colorizer.externalUse = True
         grid = New Thread_Grid(ocvb, "ML_FillRGBDepth_MT")
@@ -89,7 +89,7 @@ Public Class ML_FillRGBDepth_MT : Implements IDisposable
         ocvb.result1 = colorizer.dst.Clone()
         ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         shadow.Dispose()
         grid.Dispose()
         colorizer.Dispose()
@@ -97,19 +97,17 @@ Public Class ML_FillRGBDepth_MT : Implements IDisposable
 End Class
 
 
-Public Class ML_FillRGBDepth : Implements IDisposable
+Public Class ML_FillRGBDepth
+    Inherits VB_Class
     Dim shadow As Depth_Holes
-    Dim sliders As New OptionsSliders
-    Dim colorizer As Depth_Colorizer_CPP
+        Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         colorizer = New Depth_Colorizer_CPP(ocvb, "ML_FillRGBDepth")
         colorizer.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "ML Min Learn Count", 2, 100, 5)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         shadow = New Depth_Holes(ocvb, "ML_FillRGBDepth")
         shadow.sliders.TrackBar1.Value = 3
 
@@ -126,22 +124,20 @@ Public Class ML_FillRGBDepth : Implements IDisposable
         colorizer.Run(ocvb)
         ocvb.result2 = colorizer.dst
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         shadow.Dispose()
-        sliders.Dispose()
-        colorizer.Dispose()
+                colorizer.Dispose()
     End Sub
 End Class
 
 
-Public Class ML_DepthFromColor_MT : Implements IDisposable
+Public Class ML_DepthFromColor_MT
+    Inherits VB_Class
     Dim colorizer As Depth_Colorizer_CPP
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         colorizer = New Depth_Colorizer_CPP(ocvb, "ML_DepthFromColor_MT")
         colorizer.externalUse = True
 
@@ -150,8 +146,7 @@ Public Class ML_DepthFromColor_MT : Implements IDisposable
         dilate.sliders.TrackBar2.Value = 2
 
         sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 500, 5000, 1000)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         grid = New Thread_Grid(ocvb, "ML_DepthFromColor_MT")
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
@@ -201,9 +196,8 @@ Public Class ML_DepthFromColor_MT : Implements IDisposable
         colorizer.Run(ocvb)
         ocvb.result1 = colorizer.dst
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        dilate.Dispose()
+    Public Sub VBdispose()
+                dilate.Dispose()
         grid.Dispose()
         colorizer.Dispose()
     End Sub
@@ -211,15 +205,14 @@ End Class
 
 
 
-Public Class ML_DepthFromColor : Implements IDisposable
+Public Class ML_DepthFromColor
+    Inherits VB_Class
     Dim colorizer As Depth_Colorizer_CPP
     Dim mats As Mat_4to1
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         colorizer = New Depth_Colorizer_CPP(ocvb, "ML_DepthFromColor")
         colorizer.externalUse = True
 
@@ -229,8 +222,7 @@ Public Class ML_DepthFromColor : Implements IDisposable
         shadow = New Depth_Holes(ocvb, "ML_DepthFromColor")
 
         sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 1000, 5000, 1500)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         resized = New Resize_Percentage(ocvb, "ML_DepthFromColor")
         resized.externalUse = True
         resized.sliders.TrackBar1.Value = 2 ' 2% of the image.
@@ -289,9 +281,8 @@ Public Class ML_DepthFromColor : Implements IDisposable
         ocvb.label1 = "Predicted Depth"
         ocvb.label2 = "shadow, empty, Depth Mask < " + CStr(sliders.TrackBar1.Value) + ", Learn Input"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        shadow.Dispose()
+    Public Sub VBdispose()
+                shadow.Dispose()
         mats.Dispose()
         resized.Dispose()
         colorizer.Dispose()
@@ -300,15 +291,14 @@ End Class
 
 
 
-Public Class ML_DepthFromXYColor : Implements IDisposable
+Public Class ML_DepthFromXYColor
+    Inherits VB_Class
     Dim mats As Mat_4to1
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
-    Dim sliders As New OptionsSliders
-    Dim colorizer As Depth_Colorizer_CPP
+        Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         colorizer = New Depth_Colorizer_CPP(ocvb, "ML_DepthFromXYColor")
         colorizer.externalUse = True
 
@@ -318,8 +308,7 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
         shadow = New Depth_Holes(ocvb, "ML_DepthFromXYColor")
 
         sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 1000, 5000, 1500)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         resized = New Resize_Percentage(ocvb, "ML_DepthFromXYColor")
         resized.externalUse = True
         resized.sliders.TrackBar1.Value = 2
@@ -395,9 +384,8 @@ Public Class ML_DepthFromXYColor : Implements IDisposable
         ocvb.result2 = mats.dst
         ocvb.label2 = "shadow, empty, Depth Mask < " + CStr(sliders.TrackBar1.Value) + ", Learn Input"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        shadow.Dispose()
+    Public Sub VBdispose()
+                shadow.Dispose()
         mats.Dispose()
         resized.Dispose()
         colorizer.Dispose()
@@ -407,14 +395,13 @@ End Class
 
 
 
-Public Class ML_EdgeDepth : Implements IDisposable
+Public Class ML_EdgeDepth
+    Inherits VB_Class
     Dim colorizer As Depth_Colorizer_CPP
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         colorizer = New Depth_Colorizer_CPP(ocvb, "ML_EdgeDepth")
         colorizer.externalUse = True
 
@@ -423,8 +410,7 @@ Public Class ML_EdgeDepth : Implements IDisposable
         dilate.sliders.TrackBar2.Value = 5
 
         sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 500, 5000, 1000)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         grid = New Thread_Grid(ocvb, "ML_EdgeDepth")
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
@@ -474,9 +460,8 @@ Public Class ML_EdgeDepth : Implements IDisposable
         colorizer.Run(ocvb)
         ocvb.result2 = colorizer.dst
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        dilate.Dispose()
+    Public Sub VBdispose()
+                dilate.Dispose()
         grid.Dispose()
         colorizer.Dispose()
     End Sub

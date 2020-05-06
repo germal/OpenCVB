@@ -3,10 +3,10 @@ Imports OpenCvSharp.XPhoto
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
 
-Public Class xPhoto_Bm3dDenoise : Implements IDisposable
+Public Class xPhoto_Bm3dDenoise
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Denoise image with block matching and filtering."
         ocvb.label1 = "Bm3dDenoising"
         ocvb.label2 = "Difference from Input"
@@ -21,7 +21,7 @@ Public Class xPhoto_Bm3dDenoise : Implements IDisposable
         ocvb.label2 = "Diff from input - max change=" + CStr(maxVal)
         ocvb.result2 = ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -29,10 +29,10 @@ End Class
 
 
 
-Public Class xPhoto_Bm3dDenoiseDepthImage : Implements IDisposable
+Public Class xPhoto_Bm3dDenoiseDepthImage
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Denoise the depth image with block matching and filtering."
         ocvb.label1 = "Bm3dDenoising"
         ocvb.label2 = "Difference from Input"
@@ -47,7 +47,7 @@ Public Class xPhoto_Bm3dDenoiseDepthImage : Implements IDisposable
         ocvb.label2 = "Diff from input - max change=" + CStr(maxVal)
         ocvb.result2 = ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -70,17 +70,14 @@ End Module
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/xphoto/samples/oil.cpp
-Public Class xPhoto_OilPaint_CPP : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim radio As New OptionsRadioButtons
-    Dim xPhoto_OilPaint As IntPtr
+Public Class xPhoto_OilPaint_CPP
+    Inherits VB_Class
+        Dim xPhoto_OilPaint As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "xPhoto Dynamic Ratio", 1, 127, 7)
         sliders.setupTrackBar2(ocvb, "xPhoto Block Size", 1, 100, 3)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         radio.Setup(ocvb, 5)
         radio.check(0).Text = "BGR2GRAY"
         radio.check(1).Text = "BGR2HSV"
@@ -88,8 +85,7 @@ Public Class xPhoto_OilPaint_CPP : Implements IDisposable
         radio.check(3).Text = "BGR2XYZ"
         radio.check(4).Text = "BGR2Lab"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         Application.DoEvents() ' because the rest of initialization takes so long, let the show() above take effect.
         xPhoto_OilPaint = xPhoto_OilPaint_Open()
         ocvb.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
@@ -131,7 +127,7 @@ Public Class xPhoto_OilPaint_CPP : Implements IDisposable
             End If
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         xPhoto_OilPaint_Close(xPhoto_OilPaint)
         radio.Dispose()
     End Sub

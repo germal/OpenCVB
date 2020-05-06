@@ -1,13 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 'https://www.pyimagesearch.com/2017/11/06/deep-learning-opencvs-blobfromimage-works/
-Public Class MeanSubtraction_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class MeanSubtraction_Basics
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Scaling Factor = mean/scaling factor X100", 1, 500, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Subtract the mean from the image with a scaling factor"
+                ocvb.desc = "Subtract the mean from the image with a scaling factor"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mean = cv.Cv2.Mean(ocvb.color)
@@ -15,7 +13,6 @@ Public Class MeanSubtraction_Basics : Implements IDisposable
         Dim scalingFactor = sliders.TrackBar1.Value / 100
         ocvb.result1 *= 1 / scalingFactor
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class

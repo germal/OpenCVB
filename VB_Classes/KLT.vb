@@ -1,8 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/lkdemo.cpp
-Public Class KLT_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim check As New OptionsCheckbox
+Public Class KLT_Basics
+    Inherits VB_Class
     Public gray As New cv.Mat
     Public prevGray As New cv.Mat
     Public inputPoints() As cv.Point2f
@@ -12,18 +11,15 @@ Public Class KLT_Basics : Implements IDisposable
     Public circleColor = cv.Scalar.Red
     Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "KLT - MaxCorners", 1, 200, 100)
         sliders.setupTrackBar2(ocvb, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
         sliders.setupTrackBar3(ocvb, "KLT - minDistance", 1, 100, 7)
         sliders.setupTrackBar4(ocvb, "KLT - BlockSize", 1, 100, 7)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         check.Setup(ocvb, 2)
         check.Box(0).Text = "KLT - Night Mode"
         check.Box(1).Text = "KLT - delete all Points"
-        If ocvb.parms.ShowOptions Then check.Show()
 
         ocvb.desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
@@ -80,8 +76,7 @@ Public Class KLT_Basics : Implements IDisposable
         prevGray = gray.Clone()
         ocvb.label1 = "KLT Basics - " + If(inputPoints Is Nothing, "0", CStr(inputPoints.Length)) + " points"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
         check.Dispose()
     End Sub
 End Class
@@ -89,12 +84,12 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/lk_track.py
-Public Class KLT_OpticalFlow : Implements IDisposable
+Public Class KLT_OpticalFlow
+    Inherits VB_Class
     Dim klt As KLT_Basics
     Dim lastpoints() As cv.Point2f
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         klt = New KLT_Basics(ocvb, "KLT_OpticalFlow")
         klt.externalUse = True ' we will compress the points file below.
         ocvb.desc = "KLT optical flow"
@@ -103,7 +98,7 @@ Public Class KLT_OpticalFlow : Implements IDisposable
         klt.Run(ocvb)
         If ocvb.frameCount > 0 And lastpoints IsNot Nothing And klt.inputPoints IsNot Nothing Then
             For i = 0 To klt.inputPoints.Length - 1
-                If klt.status.Get(of Byte)(i) And i < lastpoints.Length And i < klt.inputPoints.Length Then
+                If klt.status.Get(Of Byte)(i) And i < lastpoints.Length And i < klt.inputPoints.Length Then
                     ocvb.result1.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
                     ocvb.result2.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
                 End If
@@ -111,7 +106,7 @@ Public Class KLT_OpticalFlow : Implements IDisposable
         End If
         lastpoints = klt.inputPoints
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         klt.Dispose()
     End Sub
 End Class

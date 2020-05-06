@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Public Class Filter_Laplacian : Implements IDisposable
+Public Class Filter_Laplacian
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use a filter to approximate the Laplacian derivative."
         ocvb.label1 = "Sharpened image using Filter2D output"
         ocvb.label2 = "Output of Filter2D (approximated Laplacian)"
@@ -18,24 +18,22 @@ Public Class Filter_Laplacian : Implements IDisposable
         imgResult.ConvertTo(ocvb.result1, cv.MatType.CV_8UC3)
         imgLaplacian.ConvertTo(ocvb.result2, cv.MatType.CV_8UC3)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
-Public Class Filter_NormalizedKernel : Implements IDisposable
-    Dim radio As New OptionsRadioButtons
+Public Class Filter_NormalizedKernel
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         radio.Setup(ocvb, 4)
         radio.check(0).Text = "INF"
         radio.check(1).Text = "L1"
         radio.check(1).Checked = True
         radio.check(2).Text = "L2"
         radio.check(3).Text = "MinMax"
-        If ocvb.parms.ShowOptions Then radio.Show()
-        ocvb.desc = "Create a normalized kernel and use it."
+                ocvb.desc = "Create a normalized kernel and use it."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernel = New cv.Mat(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
@@ -58,17 +56,17 @@ Public Class Filter_NormalizedKernel : Implements IDisposable
         Dim dst32f = ocvb.color.Filter2D(cv.MatType.CV_32FC1, kernel, anchor:=New cv.Point(0, 0))
         dst32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC3)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
     End Sub
 End Class
 
 
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/filter_2d/filter_2d.html
-Public Class Filter_Normalized2D : Implements IDisposable
+Public Class Filter_Normalized2D
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Create and apply a normalized kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -77,7 +75,7 @@ Public Class Filter_Normalized2D : Implements IDisposable
         ocvb.result1 = ocvb.color.Filter2D(-1, kernel)
         ocvb.label1 = "Normalized KernelSize = " + CStr(kernelSize)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -85,21 +83,17 @@ End Class
 
 
 'https://www.cc.gatech.edu/classes/AY2015/cs4475_summer/documents/smoothing_separable.py
-Public Class Filter_SepFilter2D : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim check As New OptionsCheckbox
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class Filter_SepFilter2D
+    Inherits VB_Class
+            Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
-
+        
         sliders.setupTrackBar1(ocvb, "Kernel X size", 1, 21, 5)
         sliders.setupTrackBar2(ocvb, "Kernel Y size", 1, 21, 11)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.label1 = "Gaussian Blur result"
         ocvb.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
     End Sub
@@ -120,8 +114,7 @@ Public Class Filter_SepFilter2D : Implements IDisposable
             ocvb.label2 = "SepFilter2D Result"
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         check.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class

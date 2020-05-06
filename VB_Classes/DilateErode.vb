@@ -1,26 +1,22 @@
 ﻿Imports cv = OpenCvSharp
 
-Public Class DilateErode_Basics : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public radio As New OptionsRadioButtons
-    Public src As New cv.Mat
+Public Class DilateErode_Basics
+    Inherits VB_Class
+            Public src As New cv.Mat
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Dilate/Erode Kernel Size", 1, 32, 5)
         sliders.setupTrackBar2(ocvb, "Erode (-) to Dilate (+)", -32, 32, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Dilate and Erode the RGB and Depth image."
+                ocvb.desc = "Dilate and Erode the RGB and Depth image."
 
         radio.Setup(ocvb, 3)
         radio.check(0).Text = "Dilate/Erode shape: Cross"
         radio.check(1).Text = "Dilate/Erode shape: Ellipse"
         radio.check(2).Text = "Dilate/Erode shape: Rect"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-    End Sub
+            End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then
             src = ocvb.color
@@ -55,18 +51,17 @@ Public Class DilateErode_Basics : Implements IDisposable
             End If
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        radio.Dispose()
+    Public Sub VBdispose()
+                radio.Dispose()
     End Sub
 End Class
 
 
 
-Public Class DilateErode_DepthSeed : Implements IDisposable
+Public Class DilateErode_DepthSeed
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Erode depth to build a depth mask for inrange data."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -86,7 +81,7 @@ Public Class DilateErode_DepthSeed : Implements IDisposable
         ocvb.result1.SetTo(0)
         ocvb.RGBDepth.CopyTo(ocvb.result1, seeds)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -94,22 +89,18 @@ End Class
 
 
 
-Public Class DilateErode_OpenClose : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim radio As New OptionsRadioButtons
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class DilateErode_OpenClose
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         radio.Setup(ocvb, 3)
         radio.check(0).Text = "Open/Close shape: Cross"
         radio.check(1).Text = "Open/Close shape: Ellipse"
         radio.check(2).Text = "Open/Close shape: Rect"
         radio.check(2).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         sliders.setupTrackBar1(ocvb, "Dilate Open/Close Iterations", -10, 10, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
+                ocvb.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim n = sliders.TrackBar1.Value
@@ -130,9 +121,8 @@ Public Class DilateErode_OpenClose : Implements IDisposable
             cv.Cv2.MorphologyEx(ocvb.color, ocvb.result1, cv.MorphTypes.Close, element)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        radio.Dispose()
+    Public Sub VBdispose()
+                radio.Dispose()
     End Sub
 End Class
 

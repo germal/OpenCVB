@@ -3,14 +3,12 @@ Imports System.Runtime.InteropServices
 Imports CS_Classes
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Sift_Basics_CS : Implements IDisposable
-    Dim radio As New OptionsRadioButtons
-    Dim sliders As New OptionsSliders
-    Dim CS_SiftBasics As New CS_SiftBasics
+Public Class Sift_Basics_CS
+    Inherits VB_Class
+        Dim CS_SiftBasics As New CS_SiftBasics
     Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         fisheye = New FishEye_Rectified(ocvb, "Sift_Basics_CS")
         fisheye.externalUse = True
 
@@ -18,11 +16,9 @@ Public Class Sift_Basics_CS : Implements IDisposable
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         sliders.setupTrackBar1(ocvb, "Points to Match", 1, 1000, 200)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -41,9 +37,8 @@ Public Class Sift_Basics_CS : Implements IDisposable
 
         ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        radio.Dispose()
+    Public Sub VBdispose()
+                radio.Dispose()
         fisheye.Dispose()
     End Sub
 End Class
@@ -51,15 +46,13 @@ End Class
 
 
 
-Public Class Sift_Basics_CS_MT : Implements IDisposable
+Public Class Sift_Basics_CS_MT
+    Inherits VB_Class
     Dim grid As Thread_Grid
-    Dim radio As New OptionsRadioButtons
-    Dim sliders As New OptionsSliders
-    Dim CS_SiftBasics As New CS_SiftBasics
+        Dim CS_SiftBasics As New CS_SiftBasics
     Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         fisheye = New FishEye_Rectified(ocvb, "Sift_Basics_CS_MT")
         fisheye.externalUse = True
         grid = New Thread_Grid(ocvb, "Sift_Basics_CS_MT")
@@ -70,11 +63,9 @@ Public Class Sift_Basics_CS_MT : Implements IDisposable
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         sliders.setupTrackBar1(ocvb, "Points to Match", 1, 1000, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -108,10 +99,9 @@ Public Class Sift_Basics_CS_MT : Implements IDisposable
 
         ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         grid.Dispose()
-        sliders.Dispose()
-        radio.Dispose()
+                radio.Dispose()
         fisheye.Dispose()
     End Sub
 End Class

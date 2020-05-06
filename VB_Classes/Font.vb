@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Font_OpenCV : Implements IDisposable
+Public Class Font_OpenCV
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Display different font options available in OpenCV"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -23,18 +23,18 @@ Public Class Font_OpenCV : Implements IDisposable
             cv.Cv2.PutText(ocvb.result2, hersheyName + " " + Format(size, "#0.0"), New cv.Point(10, 30 + i * 30), hersheyFontItalics, size, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class Font_TrueType : Implements IDisposable
+Public Class Font_TrueType
+    Inherits VB_Class
     Dim font As New OptionsFont
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         If ocvb.parms.ShowOptions Then font.Show()
         ocvb.desc = "Display different TrueType fonts"
     End Sub
@@ -48,7 +48,7 @@ Public Class Font_TrueType : Implements IDisposable
                                               "Use 'ocvb.putText' with 'ocvb.fontName' and 'ocvb.fontSize' to exploit global font.",
                                               10, 50, "Times New Roman", 10, RESULT1))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         font.Dispose()
     End Sub
 End Class
@@ -56,13 +56,13 @@ End Class
 
 
 
-Public Class Font_FlowText : Implements IDisposable
+Public Class Font_FlowText
+    Inherits VB_Class
     Public msgs As New List(Of String)
     Public externalUse As Boolean
     Public result1or2 As Int32 = RESULT1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -91,6 +91,6 @@ Public Class Font_FlowText : Implements IDisposable
         End If
         lastCount = msgs.Count
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class

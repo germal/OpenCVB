@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp/wiki/Solve-Equation
-Public Class Solve_ByMat : Implements IDisposable
+Public Class Solve_ByMat
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Solve a set of equations with OpenCV's Solve API."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -19,7 +19,7 @@ Public Class Solve_ByMat : Implements IDisposable
 
         ocvb.putText(New ActiveClass.TrueType("Solution ByMat: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -27,10 +27,10 @@ End Class
 
 
 ' https://github.com/shimat/opencvsharp/wiki/Solve-Equation
-Public Class Solve_ByArray : Implements IDisposable
+Public Class Solve_ByArray
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -44,6 +44,6 @@ Public Class Solve_ByArray : Implements IDisposable
 
         ocvb.putText(New ActiveClass.TrueType("Solution ByArray: X1 = " + CStr(x.Get(of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(of Double)(0, 1)), 10, 125))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class

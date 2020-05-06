@@ -51,14 +51,14 @@ End Module
 
 
 
-Public Class Project_NoGravity_CPP : Implements IDisposable
+Public Class Project_NoGravity_CPP
+    Inherits VB_Class
     Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "Project_NoGravity_CPP")
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
@@ -100,7 +100,7 @@ Public Class Project_NoGravity_CPP : Implements IDisposable
         ocvb.label1 = "Top View (looking down)"
         ocvb.label2 = "Side View"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         foreground.Dispose()
         grid.Dispose()
         SimpleProjectionClose(cPtr)
@@ -109,14 +109,14 @@ End Class
 
 
 
-Public Class Project_NoGravity : Implements IDisposable
+Public Class Project_NoGravity
+    Inherits VB_Class
     Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "Project_NoGravity")
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
@@ -165,7 +165,7 @@ Public Class Project_NoGravity : Implements IDisposable
         ocvb.label1 = "Top View (looking down)"
         ocvb.label2 = "Side View"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         foreground.Dispose()
         grid.Dispose()
         SimpleProjectionClose(cPtr)
@@ -179,13 +179,12 @@ End Class
 
 
 
-Public Class Project_GravityVB : Implements IDisposable
+Public Class Project_GravityVB
+    Inherits VB_Class
     Dim imu As IMU_GravityVec
-    Dim sliders As New OptionsSliders
-    Dim grid As Thread_Grid
+        Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         imu = New IMU_GravityVec(ocvb, "Project_GravityVB")
         imu.result = RESULT2
         imu.externalUse = True
@@ -196,8 +195,7 @@ Public Class Project_GravityVB : Implements IDisposable
         grid.sliders.TrackBar2.Value = 32
 
         sliders.setupTrackBar1(ocvb, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -267,10 +265,9 @@ Public Class Project_GravityVB : Implements IDisposable
         ocvb.label1 = "View looking up from under floor"
         ocvb.label2 = "Side View"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         imu.Dispose()
-        sliders.Dispose()
-        grid.Dispose()
+                grid.Dispose()
     End Sub
 End Class
 
@@ -280,11 +277,11 @@ End Class
 
 
 
-Public Class Project_GravityHistogram : Implements IDisposable
+Public Class Project_GravityHistogram
+    Inherits VB_Class
     Public gravity As Project_Gravity_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         gravity = New Project_Gravity_CPP(ocvb, "Project_GravityHistogram")
         gravity.sliders.GroupBox2.Visible = True
         gravity.histogramRun = True
@@ -294,7 +291,7 @@ Public Class Project_GravityHistogram : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         gravity.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         gravity.Dispose()
     End Sub
 End Class
@@ -304,10 +301,10 @@ End Class
 
 
 
-Public Class Project_Gravity_CPP : Implements IDisposable
+Public Class Project_Gravity_CPP
+    Inherits VB_Class
     Dim imu As IMU_GravityVec
-    Public sliders As New OptionsSliders
-    Dim cPtr As IntPtr
+        Dim cPtr As IntPtr
     Dim histPtr As IntPtr
     Dim xyzBytes() As Byte
     Public histogramRun As Boolean
@@ -317,16 +314,14 @@ Public Class Project_Gravity_CPP : Implements IDisposable
     Public dst2 As cv.Mat
     Public maxZ As Single
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         imu = New IMU_GravityVec(ocvb, "Project_Gravity_CPP")
         imu.result = RESULT2
         imu.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
         sliders.setupTrackBar2(ocvb, "Threshold for histogram Count", 1, 100, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        sliders.GroupBox2.Visible = False ' default is not a histogramrun
+                sliders.GroupBox2.Visible = False ' default is not a histogramrun
 
         Dim fileInfo As New FileInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps/colorscale_jet.jpg")
         If fileInfo.Exists = False Then
@@ -417,10 +412,9 @@ Public Class Project_Gravity_CPP : Implements IDisposable
         End If
         handleXYZ.Free()
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         imu.Dispose()
-        sliders.Dispose()
-        Project_Gravity_Close(cPtr)
+                Project_Gravity_Close(cPtr)
         Project_GravityHist_Close(histPtr)
     End Sub
 End Class
@@ -430,22 +424,20 @@ End Class
 
 
 
-Public Class Project_Floodfill : Implements IDisposable
+Public Class Project_Floodfill
+    Inherits VB_Class
     Dim flood As FloodFill_Projection
-    Dim sliders As New OptionsSliders
-    Dim kalman As Kalman_Basics
+        Dim kalman As Kalman_Basics
     Public gravity As Project_Gravity_CPP
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         kalman = New Kalman_Basics(ocvb, "Project_Floodfill")
         ReDim kalman.src(10 * 4 - 1) ' max 10 objects. 
         kalman.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "epsilon for GroupRectangles X100", 0, 200, 80)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         gravity = New Project_Gravity_CPP(ocvb, "Project_Floodfill")
         gravity.sliders.GroupBox2.Visible = True
         gravity.externalUse = True
@@ -507,7 +499,7 @@ Public Class Project_Floodfill : Implements IDisposable
             ocvb.label2 = CStr(flood.objectRects.Count) + " objects combined into " + CStr(rects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         gravity.Dispose()
         flood.Dispose()
         kalman.Dispose()
@@ -519,13 +511,13 @@ End Class
 
 
 
-Public Class Project_Wall : Implements IDisposable
+Public Class Project_Wall
+    Inherits VB_Class
     Dim objects As Project_Floodfill
     Dim lines As lineDetector_FLD
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
 
         dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
         dilate.externalUse = True
@@ -551,7 +543,7 @@ Public Class Project_Wall : Implements IDisposable
         ocvb.label1 = "Top View with lines in red"
         ocvb.label2 = "Top View output without lines"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         objects.Dispose()
         lines.Dispose()
     End Sub

@@ -2,16 +2,14 @@
 Imports System.Windows.Forms
 
 ' Source: https://hackernoon.com/https-medium-com-matteoronchetti-pointillism-with-python-and-opencv-f4274e6bbb7b
-Public Class OilPaint_Pointilism : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim randomMask As cv.Mat
+Public Class OilPaint_Pointilism
+    Inherits VB_Class
+        Dim randomMask As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Stroke Scale", 1, 5, 3)
         sliders.setupTrackBar2(ocvb, "Smoothing Radius", 0, 100, 32)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        Application.DoEvents() ' because the rest of initialization takes so long, let the show take effect.
+                Application.DoEvents() ' because the rest of initialization takes so long, let the show take effect.
 
         Dim w = ocvb.color.Width / 8
         Dim h = ocvb.color.Height / 8
@@ -70,21 +68,20 @@ Public Class OilPaint_Pointilism : Implements IDisposable
             Next
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
 
-Public Class OilPaint_ColorProbability : Implements IDisposable
+Public Class OilPaint_ColorProbability
+    Inherits VB_Class
     Public color_probability() As Single
     Public km As kMeans_RGBFast
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         km = New kMeans_RGBFast(ocvb, "OilPaint_ColorProbability")
         km.sliders.TrackBar1.Value = 12 ' we would like a dozen colors or so in the color image.
         ReDim color_probability(km.sliders.TrackBar1.Value - 1)
@@ -110,7 +107,7 @@ Public Class OilPaint_ColorProbability : Implements IDisposable
             color_probability(i) /= ocvb.result2.Total
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         km.Dispose()
     End Sub
 End Class
@@ -119,15 +116,13 @@ End Class
 
 
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
-Public Class OilPaint_Manual : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class OilPaint_Manual
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Filter Size", 3, 15, 3)
         sliders.setupTrackBar2(ocvb, "Intensity", 5, 150, 25)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
+                ocvb.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
         Dim w = ocvb.color.Width / 8
         Dim h = ocvb.color.Height / 8
         ocvb.drawRect = New cv.Rect(w * 3, h * 3, w * 2, h * 2)
@@ -174,24 +169,21 @@ Public Class OilPaint_Manual : Implements IDisposable
         Next
         result1.CopyTo(ocvb.result1(roi))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
-Public Class OilPaint_Manual_CS : Implements IDisposable
+Public Class OilPaint_Manual_CS
+    Inherits VB_Class
     Dim oilPaint As New CS_Classes.OilPaintManual
-    Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 10, 4)
         sliders.setupTrackBar2(ocvb, "Intensity", 0, 250, 20)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
+                ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
         ocvb.label2 = "Selected area only"
 
         Dim w = ocvb.color.Width / 16
@@ -209,21 +201,20 @@ Public Class OilPaint_Manual_CS : Implements IDisposable
         Dim s = New cv.Size(roi.Width * factor, roi.Height * factor)
         cv.Cv2.Resize(ocvb.result1(roi), ocvb.result2(New cv.Rect(0, 0, s.Width, s.Height)), s)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
-Public Class OilPaint_Cartoon : Implements IDisposable
+Public Class OilPaint_Cartoon
+    Inherits VB_Class
     Dim oil As OilPaint_Manual_CS
     Dim laplacian As Edges_Laplacian
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         laplacian = New Edges_Laplacian(ocvb, "OilPaint_Cartoon")
 
         oil = New OilPaint_Manual_CS(ocvb, "OilPaint_Cartoon")
@@ -255,7 +246,7 @@ Public Class OilPaint_Cartoon : Implements IDisposable
             Next
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         laplacian.Dispose()
         oil.Dispose()
     End Sub

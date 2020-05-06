@@ -4,11 +4,11 @@ Imports System.Net
 Imports System.Linq
 Imports System.IO
 
-Public Class DNN_Test : Implements IDisposable
+Public Class DNN_Test
+    Inherits VB_Class
     Dim net As Net
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
     End Sub
@@ -37,7 +37,7 @@ Public Class DNN_Test : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -45,11 +45,11 @@ End Class
 
 
 
-Public Class DNN_Caffe_CS : Implements IDisposable
+Public Class DNN_Caffe_CS
+    Inherits VB_Class
     Dim caffeCS As CS_Classes.DNN
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
 
@@ -68,7 +68,7 @@ Public Class DNN_Caffe_CS : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType(str, 10, 100))
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -77,9 +77,9 @@ End Class
 
 
 ' https://github.com/twMr7/rscvdnn
-Public Class DNN_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim net As Net
+Public Class DNN_Basics
+    Inherits VB_Class
+        Dim net As Net
     Dim dnnPrepared As Boolean
     Dim crop As cv.Rect
     Dim dnnWidth As Int32, dnnHeight As Int32
@@ -88,12 +88,10 @@ Public Class DNN_Basics : Implements IDisposable
     Dim classNames() = {"background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse",
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "dnn Scale Factor", 1, 10000, 78)
         sliders.setupTrackBar2(ocvb, "dnn MeanVal", 1, 255, 127)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         dnnWidth = ocvb.color.Height ' height is always smaller than width...
         dnnHeight = ocvb.color.Height
         crop = New cv.Rect(ocvb.color.Width / 2 - dnnWidth / 2, ocvb.color.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
@@ -154,8 +152,7 @@ Public Class DNN_Basics : Implements IDisposable
             End If
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        If net IsNot Nothing Then net.Dispose()
+    Public Sub VBdispose()
+                If net IsNot Nothing Then net.Dispose()
     End Sub
 End Class

@@ -1,11 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 Imports OpenCvSharp.XFeatures2D
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
-Public Class FREAK_Basics : Implements IDisposable
+Public Class FREAK_Basics
+    Inherits VB_Class
     Dim orb As ORB_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         orb = New ORB_Basics(ocvb, "FREAK_Basics")
         orb.externalUse = True
         ocvb.desc = "Find keypoints using ORB and FREAK algorithm"
@@ -30,7 +30,7 @@ Public Class FREAK_Basics : Implements IDisposable
         ocvb.label2 = CStr(orb.keypoints.Count) + " FREAK Descriptors (resized to fit) Row = keypoint"
         If fDesc.Width > 0 And fDesc.Height > 0 Then ocvb.result2 = fDesc.Resize(ocvb.result2.Size())
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         orb.Dispose()
     End Sub
 End Class

@@ -1,19 +1,17 @@
 ﻿Imports cv = OpenCvSharp
 
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Features_GoodFeatures : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public goodFeatures As New List(Of cv.Point2f)
+Public Class Features_GoodFeatures
+    Inherits VB_Class
+        Public goodFeatures As New List(Of cv.Point2f)
     Public gray As cv.Mat = Nothing
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Number of Points", 10, 1000, 200)
         sliders.setupTrackBar2(ocvb, "Quality Level", 1, 100, 1)
         sliders.setupTrackBar3(ocvb, "Distance", 1, 100, 30)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Find good features to track in an RGB image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -30,7 +28,6 @@ Public Class Features_GoodFeatures : Implements IDisposable
             If externalUse = False Then cv.Cv2.Circle(ocvb.result1, features(i), 3, cv.Scalar.white, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class

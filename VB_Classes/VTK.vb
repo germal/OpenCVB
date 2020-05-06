@@ -4,7 +4,8 @@ Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 Imports System.IO
 
-Public Class VTK_Basics : Implements IDisposable
+Public Class VTK_Basics
+    Inherits VB_Class
     Dim pipeName As String ' this is name of pipe to the VTK task.  It is dynamic and increments.
     Dim startInfo As New ProcessStartInfo
     Dim hglobal As IntPtr
@@ -30,8 +31,7 @@ Public Class VTK_Basics : Implements IDisposable
     Public vtkTitle As String = "VTK_Data"
     Public vtkPresent As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         If ocvb.parms.vtkDirectory.Length > 0 Then vtkPresent = True
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
         If fileinfo.Exists = False Then vtkPresent = False
@@ -102,7 +102,7 @@ Public Class VTK_Basics : Implements IDisposable
             If dataInput.Rows > 0 Then pipe.Write(dataBuffer, 0, dataInput.Total * dataInput.ElemSize)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         If pipe IsNot Nothing Then
             If pipe.IsConnected Then
                 pipe.Flush()
@@ -122,19 +122,17 @@ End Class
 
 
 
-Public Class VTK_Histogram3D : Implements IDisposable
+Public Class VTK_Histogram3D
+    Inherits VB_Class
     Dim vtk As VTK_Basics
     Dim mats As Mat_4to1
     Dim random As Random_NormalDist
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Random Number Stdev", 0, 255, 10)
         sliders.setupTrackBar2(ocvb, "Hist 3D bins", 1, 100, 32)
         sliders.setupTrackBar3(ocvb, "Hist 3D bin Threshold X1000000", 10, 100, 20)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         mats = New Mat_4to1(ocvb, "VTK_Histogram3D")
         mats.externalUse = True
 
@@ -183,12 +181,11 @@ Public Class VTK_Histogram3D : Implements IDisposable
         vtk.dataInput = New cv.Mat ' ocvb.depth
         vtk.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         vtk.Dispose()
         mats.Dispose()
         random.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class
 
 

@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/37492663/how-to-use-magnitude-and-absdiff-opencv-functions-to-compute-distances
-Public Class Vector_Magnitude : Implements IDisposable
+Public Class Vector_Magnitude
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Compute Euclidian and Manhattan Distance on a single vector."
         ocvb.label1 = "Vector Magnitude"
     End Sub
@@ -31,6 +31,6 @@ Public Class Vector_Magnitude : Implements IDisposable
         other_manhattan_distance = other_manhattan_distance.Col(0) + other_manhattan_distance.Col(1)
         ocvb.putText(New ActiveClass.TrueType("other_manhattan_distance = " + CStr(other_manhattan_distance.Get(of Single)(0, 0)), 10, 120))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class

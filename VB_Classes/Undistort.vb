@@ -56,18 +56,16 @@ End Module
 
 
 ' https://stackoverflow.com/questions/26602981/correct-barrel-distortion-in-opencv-manually-without-chessboard-image
-Public Class Undistort_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim check As New OptionsCheckbox
-    Dim leftViewMap1 As New cv.Mat
+Public Class Undistort_Basics
+    Inherits VB_Class
+            Dim leftViewMap1 As New cv.Mat
     Dim leftViewMap2 As New cv.Mat
     Dim saveK As Int32, saveD As Int32, saveR As Int32, saveP As Int32
     Dim maxDisp As Int32
     Dim stereo_cx As Int32
     Dim stereo_cy As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "undistort intrinsics Left", 1, 200, 100)
 
         If ocvb.parms.cameraIndex = T265Camera Then
@@ -77,13 +75,11 @@ Public Class Undistort_Basics : Implements IDisposable
         End If
         sliders.setupTrackBar3(ocvb, "undistort stereo height", 1, ocvb.color.Height, ocvb.color.Height)
         sliders.setupTrackBar4(ocvb, "undistort Offset left/right", 1, 200, 112)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Restore Original matrices"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
-
+        
         ocvb.label1 = "Left Image with sliders applied"
         ocvb.desc = "Use sliders to control the undistort OpenCV API"
     End Sub
@@ -134,7 +130,6 @@ Public Class Undistort_Basics : Implements IDisposable
         ocvb.result1 = ocvb.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
         ocvb.result2 = ocvb.color.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class

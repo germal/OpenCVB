@@ -1,19 +1,17 @@
 ﻿Imports cv = OpenCvSharp
 ' http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
-Public Class Coherence_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public src As New cv.Mat
+Public Class Coherence_Basics
+    Inherits VB_Class
+        Public src As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Find lines that are artistically coherent in the image - Painterly Effect."
         sliders.setupTrackBar1(ocvb, "Coherence Sigma", 1, 15, 9)
         sliders.setupTrackBar2(ocvb, "Coherence Blend", 1, 10, 10)
         sliders.setupTrackBar3(ocvb, "Coherence str_sigma", 1, 15, 15)
         sliders.setupTrackBar4(ocvb, "Coherence eigen kernel", 1, 31, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.label1 = "Coherence - draw rectangle to apply"
+                ocvb.label1 = "Coherence - draw rectangle to apply"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim sigma = sliders.TrackBar1.Value * 2 + 1
@@ -71,19 +69,18 @@ Public Class Coherence_Basics : Implements IDisposable
         ocvb.result1.Rectangle(srcRect, cv.Scalar.Yellow, 2)
         ocvb.drawRect = srcRect
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
-Public Class Coherence_Depth : Implements IDisposable
+Public Class Coherence_Depth
+    Inherits VB_Class
     Dim coherent As Coherence_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         coherent = New Coherence_Basics(ocvb, "Coherence_Depth")
         coherent.externalUse = True
         ocvb.desc = "Find coherent lines in the depth image"
@@ -92,7 +89,7 @@ Public Class Coherence_Depth : Implements IDisposable
         coherent.src = ocvb.RGBDepth
         coherent.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         coherent.Dispose()
     End Sub
 End Class

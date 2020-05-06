@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Watershed_Basics : Implements IDisposable
+Public Class Watershed_Basics
+    Inherits VB_Class
     Public useDepthImage As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = "Draw with left-click to select region."
         ocvb.label2 = "Mask for watershed (selected regions)."
         ocvb.result2.SetTo(0)
@@ -56,17 +56,17 @@ Public Class Watershed_Basics : Implements IDisposable
             ocvb.result1 = ocvb.color
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
-Public Class Watershed_DepthAuto : Implements IDisposable
+Public Class Watershed_DepthAuto
+    Inherits VB_Class
     Dim watershed As Watershed_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.result2.SetTo(0)
         watershed = New Watershed_Basics(ocvb, "Watershed_DepthAuto")
         watershed.useDepthImage = True
@@ -83,7 +83,7 @@ Public Class Watershed_DepthAuto : Implements IDisposable
 
         watershed.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         watershed.Dispose()
     End Sub
 End Class
@@ -91,11 +91,11 @@ End Class
 
 
 
-Public Class Watershed_RGBSimpleAuto : Implements IDisposable
+Public Class Watershed_RGBSimpleAuto
+    Inherits VB_Class
     Dim watershed As Watershed_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.result2.SetTo(0)
 
         watershed = New Watershed_Basics(ocvb, "Watershed_RGBSimpleAuto")
@@ -114,7 +114,7 @@ Public Class Watershed_RGBSimpleAuto : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         watershed.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         watershed.Dispose()
     End Sub
 End Class
@@ -122,11 +122,11 @@ End Class
 
 
 
-Public Class Watershed_RGBDepthAuto : Implements IDisposable
+Public Class Watershed_RGBDepthAuto
+    Inherits VB_Class
     Dim watershed As Watershed_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.result2.SetTo(0)
 
         watershed = New Watershed_Basics(ocvb, "Watershed_RGBDepthAuto")
@@ -144,7 +144,7 @@ Public Class Watershed_RGBDepthAuto : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         watershed.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         watershed.Dispose()
     End Sub
 End Class

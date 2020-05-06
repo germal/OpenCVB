@@ -222,14 +222,14 @@ End Module
 
 
 ' https://github.com/nemanja-m/gaps
-Public Class Puzzle_Basics : Implements IDisposable
+Public Class Puzzle_Basics
+    Inherits VB_Class
     Public grid As Thread_Grid
     Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size. 
     Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size. 
     Public restartRequested As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "Puzzle_Basics")
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 10
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 8
@@ -270,7 +270,7 @@ Public Class Puzzle_Basics : Implements IDisposable
             If roi.Width = width And roi.Height = height And roi2.Width = width And roi2.Height = height Then ocvb.result1(roi2) = ocvb.color(roi)
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         grid.Dispose()
     End Sub
 End Class
@@ -279,16 +279,14 @@ End Class
 
 
 
-Public Class Puzzle_Solver : Implements IDisposable
+Public Class Puzzle_Solver
+    Inherits VB_Class
     Dim puzzle As Puzzle_Basics
     Public roilist() As cv.Rect
-    Dim radio As New OptionsRadioButtons
-    Dim check As New OptionsCheckbox
-    Dim usedList As New List(Of Integer)
+        Dim usedList As New List(Of Integer)
     Dim fitlist As New List(Of bestFit)
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         puzzle = New Puzzle_Basics(ocvb, "Puzzle_Solver")
         puzzle.grid.sliders.Hide()
 
@@ -297,12 +295,10 @@ Public Class Puzzle_Solver : Implements IDisposable
         radio.check(1).Text = "Medium Puzzle - tiles = 128x90"
         radio.check(2).Text = "Hard Puzzle - tiles = 64x90"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Reshuffle pieces"
-        If ocvb.parms.ShowOptions Then check.Show()
-
+        
         ocvb.desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."
     End Sub
     Private Function checkUsedList(best As List(Of Integer)) As bestFit
@@ -403,7 +399,7 @@ Public Class Puzzle_Solver : Implements IDisposable
         ocvb.label2 = "Puzzle_Solver output (ambiguities possible)"
         If radio.check(1).Checked Or radio.check(2).Checked Then Thread.Sleep(1000)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         puzzle.Dispose()
         radio.Dispose()
         check.Dispose()

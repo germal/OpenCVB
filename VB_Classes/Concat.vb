@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Concat_Basics : Implements IDisposable
+Public Class Concat_Basics
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Concatenate 2 images - horizontally and vertically"
         ocvb.label1 = "Horizontal concatenation"
         ocvb.label2 = "Vertical concatenation"
@@ -14,19 +14,19 @@ Public Class Concat_Basics : Implements IDisposable
         cv.Cv2.VConcat(ocvb.color, ocvb.RGBDepth, tmp)
         ocvb.result2 = tmp.Resize(ocvb.color.Size())
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class Concat_4way : Implements IDisposable
+Public Class Concat_4way
+    Inherits VB_Class
     Public img(3) As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Concatenate 4 images - horizontally and vertically"
         For i = 0 To img.Length - 1
             img(i) = New cv.Mat
@@ -45,6 +45,6 @@ Public Class Concat_4way : Implements IDisposable
         cv.Cv2.VConcat(tmp1, tmp2, tmp3)
         ocvb.result1 = tmp3.Resize(ocvb.color.Size())
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class

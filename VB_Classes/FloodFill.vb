@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Text.RegularExpressions
-Public Class FloodFill_Basics : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public srcGray As New cv.Mat
+Public Class FloodFill_Basics
+    Inherits VB_Class
+        Public srcGray As New cv.Mat
     Public externalUse As Boolean
 
     Public masks As New List(Of cv.Mat)
@@ -19,14 +19,12 @@ Public Class FloodFill_Basics : Implements IDisposable
         End Function
     End Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar3(ocvb, "FloodFill HiDiff", 1, 255, 5)
         sliders.setupTrackBar4(ocvb, "Step Size", 1, ocvb.color.Width / 2, 20)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
@@ -78,29 +76,26 @@ Public Class FloodFill_Basics : Implements IDisposable
         End If
         ocvb.label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
 
 
 
-Public Class FloodFill_Top16_MT : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Dim grid As Thread_Grid
+Public Class FloodFill_Top16_MT
+    Inherits VB_Class
+        Dim grid As Thread_Grid
     Public srcGray As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "FloodFill_Top16_MT")
         sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 500, 50)
         sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar3(ocvb, "FloodFill HiDiff", 1, 255, 5)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Use floodfill to build image segments with a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -126,23 +121,22 @@ Public Class FloodFill_Top16_MT : Implements IDisposable
             Next
         End Sub)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        grid.Dispose()
+    Public Sub VBdispose()
+                grid.Dispose()
     End Sub
 End Class
 
 
 
 
-Public Class FloodFill_Color_MT : Implements IDisposable
+Public Class FloodFill_Color_MT
+    Inherits VB_Class
     Dim flood As FloodFill_Top16_MT
     Dim grid As Thread_Grid
     Public src As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "FloodFill_Color_MT")
         flood = New FloodFill_Top16_MT(ocvb, "FloodFill_Color_MT")
 
@@ -173,7 +167,7 @@ Public Class FloodFill_Color_MT : Implements IDisposable
             Next
         End Sub)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         grid.Dispose()
         flood.Dispose()
     End Sub
@@ -182,12 +176,12 @@ End Class
 
 
 
-Public Class FloodFill_DCT : Implements IDisposable
+Public Class FloodFill_DCT
+    Inherits VB_Class
     Dim flood As FloodFill_Color_MT
     Dim dct As DCT_FeatureLess_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         flood = New FloodFill_Color_MT(ocvb, "FloodFill_DCT")
         flood.externalUse = True
 
@@ -203,7 +197,7 @@ Public Class FloodFill_DCT : Implements IDisposable
         flood.Run(ocvb)
         ocvb.result2.SetTo(0, mask)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         dct.Dispose()
         flood.Dispose()
     End Sub
@@ -213,12 +207,12 @@ End Class
 
 
 
-Public Class FloodFill_WithDepth : Implements IDisposable
+Public Class FloodFill_WithDepth
+    Inherits VB_Class
     Dim range As FloodFill_RelativeRange
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         shadow = New Depth_Holes(ocvb, "FloodFill_WithDepth")
         shadow.externalUse = True
 
@@ -234,7 +228,7 @@ Public Class FloodFill_WithDepth : Implements IDisposable
         range.fBasics.initialMask = shadow.holeMask
         range.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         range.Dispose()
         shadow.Dispose()
     End Sub
@@ -244,13 +238,13 @@ End Class
 
 
 
-Public Class FloodFill_CComp : Implements IDisposable
+Public Class FloodFill_CComp
+    Inherits VB_Class
     Dim ccomp As CComp_Basics
     Dim range As FloodFill_RelativeRange
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         shadow = New Depth_Holes(ocvb, "FloodFill_CComp")
         shadow.externalUse = True
 
@@ -272,7 +266,7 @@ Public Class FloodFill_CComp : Implements IDisposable
         range.fBasics.initialMask = shadow.holeMask
         range.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         ccomp.Dispose()
         range.Dispose()
         shadow.Dispose()
@@ -283,20 +277,18 @@ End Class
 
 
 
-Public Class FloodFill_RelativeRange : Implements IDisposable
+Public Class FloodFill_RelativeRange
+    Inherits VB_Class
     Public fBasics As FloodFill_Basics
-    Dim check As New OptionsCheckbox
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         fBasics = New FloodFill_Basics(ocvb, "FloodFill_RelativeRange")
         check.Setup(ocvb, 3)
         check.Box(0).Text = "Use Fixed range - when off, it means use relative range "
         check.Box(1).Text = "Use 4 nearest pixels (Link4) - when off, it means use 8 nearest pixels (Link8)"
         check.Box(1).Checked = True ' link4 produces better results.
         check.Box(2).Text = "Use 'Mask Only'"
-        If ocvb.parms.ShowOptions Then check.Show()
-        ocvb.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
+                ocvb.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         fBasics.floodFlag = 0
@@ -305,7 +297,7 @@ Public Class FloodFill_RelativeRange : Implements IDisposable
         If check.Box(2).Checked Then fBasics.floodFlag += cv.FloodFillFlags.MaskOnly
         fBasics.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         check.Dispose()
         fBasics.Dispose()
     End Sub
@@ -314,21 +306,19 @@ End Class
 
 
 
-Public Class FloodFill_Top16 : Implements IDisposable
+Public Class FloodFill_Top16
+    Inherits VB_Class
     Public flood As FloodFill_Basics
-    Dim check As New OptionsCheckbox
-    Public srcGray As New cv.Mat
+        Public srcGray As New cv.Mat
     Public externalUse As Boolean
 
     Public thumbNails As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
-        If ocvb.parms.ShowOptions Then check.Show()
-
+        
         flood = New FloodFill_Basics(ocvb, "FloodFill_Top16")
         flood.externalUse = True
 
@@ -364,7 +354,7 @@ Public Class FloodFill_Top16 : Implements IDisposable
         If check.Box(0).Checked Then ocvb.result2 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         check.Dispose()
     End Sub
 End Class
@@ -373,23 +363,21 @@ End Class
 
 
 
-Public Class FloodFill_Projection : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public srcGray As New cv.Mat
+Public Class FloodFill_Projection
+    Inherits VB_Class
+        Public srcGray As New cv.Mat
     Public dst As cv.Mat
     Public externalUse As Boolean
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public objectRects As New List(Of cv.Rect)
     Public minFloodSize As Integer
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar3(ocvb, "FloodFill HiDiff", 1, 255, 5)
         sliders.setupTrackBar4(ocvb, "Step Size", 1, ocvb.color.Width / 2, 20)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are."
     End Sub
@@ -427,7 +415,6 @@ Public Class FloodFill_Projection : Implements IDisposable
             ocvb.label2 = CStr(objectRects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class

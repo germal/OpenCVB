@@ -1,17 +1,15 @@
 ﻿Imports cv = OpenCvSharp
 
-Public Class Threshold_LaplacianFilter : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim edges As Filter_Laplacian
+Public Class Threshold_LaplacianFilter
+    Inherits VB_Class
+        Dim edges As Filter_Laplacian
     Dim trim As Depth_InRange
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         trim = New Depth_InRange(ocvb, "Threshold_LaplacianFilter")
         edges = New Filter_Laplacian(ocvb, "Threshold_LaplacianFilter")
         sliders.setupTrackBar1(ocvb, "dist Threshold", 1, 100, 40)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.label1 = "Foreground Input"
+                ocvb.label1 = "Foreground Input"
         ocvb.desc = "Threshold the output of a Laplacian derivative, mask with depth foreground."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -29,9 +27,8 @@ Public Class Threshold_LaplacianFilter : Implements IDisposable
         dist32f.ConvertTo(gray, cv.MatType.CV_8UC1, 255)
         ocvb.result1 = gray.CvtColor(cv.ColorConversionCodes.gray2bgr)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        edges.Dispose()
+    Public Sub VBdispose()
+                edges.Dispose()
         trim.Dispose()
     End Sub
 End Class

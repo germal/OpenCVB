@@ -38,12 +38,12 @@ End Module
 
 
 ' https://docs.opencv.org/3.1.0/d6/d10/tutorial_py_houghlines.html
-Public Class Hough_Circles : Implements IDisposable
+Public Class Hough_Circles
+    Inherits VB_Class
     Dim circles As Draw_Circles
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         circles = New Draw_Circles(ocvb, "Hough_Circles")
         circles.sliders.TrackBar1.Value = 3
         ocvb.desc = "Find circles using HoughCircles."
@@ -62,7 +62,7 @@ Public Class Hough_Circles : Implements IDisposable
             cv.Cv2.Circle(ocvb.result2, New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         circles.Dispose()
     End Sub
 End Class
@@ -71,15 +71,14 @@ End Class
 
 ' https://docs.opencv.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HoughLinesSample.vb
-Public Class Hough_Lines : Implements IDisposable
+Public Class Hough_Lines
+    Inherits VB_Class
     Dim edges As Edges_Canny
-    Dim sliders As New OptionsSliders
-    Public segments() As cv.LineSegmentPolar
+        Public segments() As cv.LineSegmentPolar
     Public externalUse As Boolean
     Public src As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         edges = New Edges_Canny(ocvb, "Hough_Lines")
         edges.externalUse = True
 
@@ -87,8 +86,7 @@ Public Class Hough_Lines : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar3(ocvb, "threshold", 1, 100, 50)
         sliders.setupTrackBar4(ocvb, "Lines to Plot", 1, 1000, 50)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Use Houghlines to find lines in the image."
+                ocvb.desc = "Use Houghlines to find lines in the image."
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
@@ -118,28 +116,25 @@ Public Class Hough_Lines : Implements IDisposable
             ocvb.label2 = "Probablistic lines = " + CStr(probSegments.Length)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         edges.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
 
 
 
-Public Class Hough_Lines_MT : Implements IDisposable
+Public Class Hough_Lines_MT
+    Inherits VB_Class
     Dim edges As Edges_Canny
     Public grid As Thread_Grid
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar3(ocvb, "threshold", 1, 100, 3)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         edges = New Edges_Canny(ocvb, "Hough_Lines_MT")
         edges.externalUse = True
 
@@ -175,9 +170,8 @@ Public Class Hough_Lines_MT : Implements IDisposable
         End Sub)
         ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         edges.Dispose()
         grid.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class

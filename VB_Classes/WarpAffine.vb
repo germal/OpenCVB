@@ -1,13 +1,13 @@
 ﻿Imports cv = OpenCvSharp
 ' http://opencvexamples.blogspot.com/
-Public Class WarpAffine_Captcha : Implements IDisposable
+Public Class WarpAffine_Captcha
+    Inherits VB_Class
     Const charHeight = 100
     Const charWidth = 80
     Const captchaLength = 8
     Dim rng As New System.Random
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use OpenCV to build a captcha Turing test."
     End Sub
     Private Sub addNoise(image As cv.Mat)
@@ -89,7 +89,7 @@ Public Class WarpAffine_Captcha : Implements IDisposable
         Dim roi As New cv.Rect(0, ocvb.color.Height / 2 - charHeight / 2, ocvb.result1.Cols, charHeight)
         ocvb.result1(roi) = outImage.Resize(New cv.Size(ocvb.result1.Cols, charHeight))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -97,14 +97,11 @@ End Class
 
 
 ' http://opencvexamples.blogspot.com/
-Public Class WarpAffine_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim radio As New OptionsRadioButtons
+Public Class WarpAffine_Basics
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Angle", 0, 360, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         SetInterpolationRadioButtons(ocvb, radio, "WarpAffine")
 
@@ -123,8 +120,7 @@ Public Class WarpAffine_Basics : Implements IDisposable
         ocvb.label1 = "Rotated with Warpaffine with angle: " + CStr(angle)
         ocvb.label2 = "Rotated back with inverse Warpaffine angle: " + CStr(-angle)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
         radio.Dispose()
     End Sub
 End Class
@@ -134,11 +130,11 @@ End Class
 
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
-Public Class WarpAffine_3Points : Implements IDisposable
+Public Class WarpAffine_3Points
+    Inherits VB_Class
     Dim triangle As Area_MinTriangle_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         triangle = New Area_MinTriangle_CPP(ocvb, "WarpAffine_3Points")
         triangle.sliders.TrackBar1.Value = 20
         triangle.sliders.TrackBar2.Value = 150
@@ -201,7 +197,7 @@ Public Class WarpAffine_3Points : Implements IDisposable
                                               Format(M.Get(Of Double)(1, 1), "#0.00") + vbTab +
                                               Format(M.Get(Of Double)(1, 2), "#0.00"), 10, ttStart, RESULT2))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         triangle.Dispose()
     End Sub
 End Class
@@ -211,11 +207,11 @@ End Class
 
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
-Public Class WarpAffine_4Points : Implements IDisposable
+Public Class WarpAffine_4Points
+    Inherits VB_Class
     Dim rect As Area_MinRect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         rect = New Area_MinRect(ocvb, "WarpAffine_4Points")
 
         ocvb.desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
@@ -269,7 +265,7 @@ Public Class WarpAffine_4Points : Implements IDisposable
         center = New cv.Point2f(50, ocvb.color.Height / 2)
         ocvb.result1.Circle(center, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         rect.Dispose()
     End Sub
 End Class

@@ -16,17 +16,15 @@ End Module
 
 
 
-Public Class Salience_Basics_CPP : Implements IDisposable
-    Dim sliders As OptionsSliders
+Public Class Salience_Basics_CPP
+    Inherits VB_Class
     Dim grayData() As Byte
     Dim rows As Int32, cols As Int32, numScales As Int32
     Dim salience As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders = New OptionsSliders
         sliders.setupTrackBar1(ocvb, "Salience numScales", 1, 6, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ReDim grayData(ocvb.color.Total - 1)
         rows = ocvb.color.Rows
@@ -60,24 +58,21 @@ Public Class Salience_Basics_CPP : Implements IDisposable
         ocvb.color.CopyTo(ocvb.result1)
         ocvb.result1(roi) = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         Salience_Close(salience)
-        sliders.Dispose()
     End Sub
 End Class
 
 
 
-Public Class Salience_Basics_MT : Implements IDisposable
-    Dim sliders As OptionsSliders
+Public Class Salience_Basics_MT
+    Inherits VB_Class
     Dim grayData() As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders = New OptionsSliders
         sliders.setupTrackBar1(ocvb, "Salience numScales", 1, 6, 1)
         sliders.setupTrackBar2(ocvb, "Salience Number of Threads", 1, 100, 36)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ReDim grayData(ocvb.color.Total - 1)
         ocvb.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
@@ -90,25 +85,24 @@ Public Class Salience_Basics_MT : Implements IDisposable
         Dim gray As New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, grayData)
 
         Parallel.For(0, threads - 1,
-        Sub(i)
-            Dim roi = New cv.Rect(0, i * h, ocvb.color.Width, Math.Min(h, ocvb.color.Height - i * h))
-            If roi.Height <= 0 Then Exit Sub
-            Dim grayInput = ocvb.color(roi).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            grayInput.CopyTo(gray(roi))
+            Sub(i)
+                Dim roi = New cv.Rect(0, i * h, ocvb.color.Width, Math.Min(h, ocvb.color.Height - i * h))
+                If roi.Height <= 0 Then Exit Sub
+                Dim grayInput = ocvb.color(roi).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                grayInput.CopyTo(gray(roi))
 
-            Dim salience = Salience_Open()
-            Dim imagePtr = Salience_Run(salience, numScales, gray(roi).Data, roi.Height, roi.Width)
+                Dim salience = Salience_Open()
+                Dim imagePtr = Salience_Run(salience, numScales, gray(roi).Data, roi.Height, roi.Width)
 
-            Dim dstData(roi.Width * roi.Height - 1) As Byte
-            Dim dst As New cv.Mat(roi.Height, roi.Width, cv.MatType.CV_8U, dstData)
-            Marshal.Copy(imagePtr, dstData, 0, roi.Height * roi.Width)
+                Dim dstData(roi.Width * roi.Height - 1) As Byte
+                Dim dst As New cv.Mat(roi.Height, roi.Width, cv.MatType.CV_8U, dstData)
+                Marshal.Copy(imagePtr, dstData, 0, roi.Height * roi.Width)
 
-            ocvb.result1(roi) = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            Salience_Close(salience)
-        End Sub)
+                ocvb.result1(roi) = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                Salience_Close(salience)
+            End Sub)
         grayHandle.Free()
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
     End Sub
 End Class

@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 'http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
-Public Class Kalman_Basics : Implements IDisposable
-    Public check As New OptionsCheckbox
+Public Class Kalman_Basics
+    Inherits VB_Class
     Dim kalman() As Kalman_Single
     Public src() As Single
     Public dst() As Single
@@ -11,13 +11,11 @@ Public Class Kalman_Basics : Implements IDisposable
     Public ErrorCovPost As Single = 1
 
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Turn Kalman filtering on in " + ocvb.caller
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
-
+        
         ocvb.desc = "Use Kalman to stabilize a set of value (such as a cv.rect.)"
     End Sub
     Private Sub setValues(ocvb As AlgorithmData)
@@ -76,7 +74,7 @@ Public Class Kalman_Basics : Implements IDisposable
             ocvb.result1.Rectangle(rect, cv.Scalar.Red, 1)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         If kalman IsNot Nothing Then
             For i = 0 To kalman.Count - 1
                 kalman(i).Dispose()
@@ -93,13 +91,13 @@ End Class
 
 
 ' http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
-Public Class Kalman_Compare : Implements IDisposable
+Public Class Kalman_Compare
+    Inherits VB_Class
     Dim kalman() As Kalman_Single
     Public plot As Plot_OverTime
     Public kPlot As Plot_OverTime
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         plot = New Plot_OverTime(ocvb, "Kalman_Compare")
         plot.externalUse = True
         plot.dst = ocvb.result1
@@ -151,7 +149,7 @@ Public Class Kalman_Compare : Implements IDisposable
         kPlot.plotData = New cv.Scalar(kalman(0).stateResult, kalman(1).stateResult, kalman(2).stateResult)
         kPlot.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         plot.Dispose()
         kPlot.Dispose()
     End Sub
@@ -161,7 +159,8 @@ End Class
 
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/kalman.cpp
-Public Class Kalman_RotatingPoint : Implements IDisposable
+Public Class Kalman_RotatingPoint
+    Inherits VB_Class
     Dim kf As New cv.KalmanFilter(2, 1, 0)
     Dim kState As New cv.Mat(2, 1, cv.MatType.CV_32F)
     Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
@@ -177,8 +176,7 @@ Public Class Kalman_RotatingPoint : Implements IDisposable
         cv.Cv2.Line(dst, New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = "Estimate Yellow < Real Red (if working)"
 
         cv.Cv2.Randn(kState, New cv.Scalar(0), cv.Scalar.All(0.1))
@@ -219,7 +217,7 @@ Public Class Kalman_RotatingPoint : Implements IDisposable
         cv.Cv2.Randn(processNoise, cv.Scalar.Black, cv.Scalar.All(Math.Sqrt(kf.ProcessNoiseCov.Get(Of Single)(0, 0))))
         kState = kf.TransitionMatrix * kState + processNoise
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -229,12 +227,12 @@ End Class
 
 
 'http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
-Public Class Kalman_MousePredict : Implements IDisposable
+Public Class Kalman_MousePredict
+    Inherits VB_Class
     Dim kalman As Kalman_Basics
     Dim locMultiplier = 1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         kalman = New Kalman_Basics(ocvb, "Kalman_MousePredict")
         ReDim kalman.src(1)
         ReDim kalman.dst(1)
@@ -258,7 +256,7 @@ Public Class Kalman_MousePredict : Implements IDisposable
         cv.Cv2.Line(ocvb.result1, ocvb.mousePoint * locMultiplier, lastRealMouse * locMultiplier, New cv.Scalar(0, 0, 255), 1, cv.LineTypes.AntiAlias)
         lastRealMouse = ocvb.mousePoint
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         kalman.Dispose()
     End Sub
 End Class
@@ -268,14 +266,14 @@ End Class
 
 
 
-Public Class Kalman_CVMat : Implements IDisposable
+Public Class Kalman_CVMat
+    Inherits VB_Class
     Dim kalman() As Kalman_Single
     Public src As cv.Mat
     Public dst As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = "Rectangle moves smoothly to random locations"
         ocvb.desc = "Use Kalman to stabilize a set of values (such as a cv.rect.)"
     End Sub
@@ -331,7 +329,7 @@ Public Class Kalman_CVMat : Implements IDisposable
             ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         If kalman IsNot Nothing Then
             For i = 0 To kalman.Count - 1
                 kalman(i).Dispose()
@@ -346,12 +344,12 @@ End Class
 
 
 
-Public Class Kalman_ImageSmall : Implements IDisposable
+Public Class Kalman_ImageSmall
+    Inherits VB_Class
     Dim kalman As Kalman_CVMat
     Dim resize As Resize_Percentage
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         kalman = New Kalman_CVMat(ocvb, "Kalman_ImageSmall")
         kalman.externalUse = True
 
@@ -380,7 +378,7 @@ Public Class Kalman_ImageSmall : Implements IDisposable
         dst = dst.Threshold(1, 255, cv.ThresholdTypes.Binary)
         ocvb.result2 = dst.Resize(ocvb.result1.Size())
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         kalman.Dispose()
         resize.Dispose()
     End Sub
@@ -390,12 +388,12 @@ End Class
 
 
 
-Public Class Kalman_DepthSmall : Implements IDisposable
+Public Class Kalman_DepthSmall
+    Inherits VB_Class
     Dim kalman As Kalman_CVMat
     Dim resize As Resize_Percentage
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         kalman = New Kalman_CVMat(ocvb, "Kalman_DepthSmall")
         kalman.externalUse = True
 
@@ -424,7 +422,7 @@ Public Class Kalman_DepthSmall : Implements IDisposable
         dst = dst.Reshape(1, resize.dst.Height)
         ocvb.result2 = dst.Resize(ocvb.result1.Size())
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         kalman.Dispose()
         resize.Dispose()
     End Sub
@@ -436,7 +434,8 @@ End Class
 
 
 
-Public Class Kalman_Single : Implements IDisposable
+Public Class Kalman_Single
+    Inherits VB_Class
     Dim plot As Plot_OverTime
     Dim kf As New cv.KalmanFilter(2, 1, 0)
     Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
@@ -450,8 +449,7 @@ Public Class Kalman_Single : Implements IDisposable
     Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
     Public newTransmissionMatrix As Boolean = True
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         Dim tMatrix() As Single = {1, 1, 0, 1}
         kf.TransitionMatrix = New cv.Mat(2, 2, cv.MatType.CV_32F, tMatrix)
         kf.MeasurementMatrix.SetIdentity(1)
@@ -486,7 +484,7 @@ Public Class Kalman_Single : Implements IDisposable
             ocvb.label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         If plot IsNot Nothing Then plot.Dispose()
     End Sub
 End Class

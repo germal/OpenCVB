@@ -15,16 +15,14 @@ End Module
 
 
 ' https://github.com/ufoym
-Public Class RecursiveBilateralFilter_CPP : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim srcData() As Byte
+Public Class RecursiveBilateralFilter_CPP
+    Inherits VB_Class
+        Dim srcData() As Byte
     Dim rbf As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "RBF Recursion count", 1, 20, 2)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ReDim srcData(ocvb.color.Total * ocvb.color.ElemSize - 1)
 
         rbf = RecursiveBilateralFilter_Open()
@@ -40,8 +38,7 @@ Public Class RecursiveBilateralFilter_CPP : Implements IDisposable
         Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
         ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, dstData)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         RecursiveBilateralFilter_Close(rbf)
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class

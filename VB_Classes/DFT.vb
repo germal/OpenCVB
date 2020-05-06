@@ -15,7 +15,8 @@ End Module
 
 
 ' http://stackoverflow.com/questions/19761526/how-to-do-inverse-dft-in-opencv
-Public Class DFT_Basics : Implements IDisposable
+Public Class DFT_Basics
+    Inherits VB_Class
     Dim mats As Mat_4to1
     Public magnitude As New cv.Mat
     Public spectrum As New cv.Mat
@@ -25,8 +26,7 @@ Public Class DFT_Basics : Implements IDisposable
     Public cols As Int32
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         mats = New Mat_4to1(ocvb, "DFT_Basics")
         mats.externalUse = True
         mats.noLines = True
@@ -75,7 +75,7 @@ Public Class DFT_Basics : Implements IDisposable
             ocvb.result1 = inverseDFT(complexImage)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         mats.Dispose()
     End Sub
 End Class
@@ -85,11 +85,11 @@ End Class
 
 
 ' http://opencvexamples.blogspot.com/
-Public Class DFT_Inverse : Implements IDisposable
+Public Class DFT_Inverse
+    Inherits VB_Class
     Dim mats As Mat_2to1
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         mats = New Mat_2to1(ocvb, "DFT_Inverse")
         mats.externalUse = True
         ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
@@ -119,7 +119,7 @@ Public Class DFT_Inverse : Implements IDisposable
             ocvb.result2.SetTo(0)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         mats.Dispose()
     End Sub
 End Class
@@ -130,16 +130,14 @@ End Class
 
 ' http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/c++/butterworth_lowpass.cpp
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
-Public Class DFT_ButterworthFilter : Implements IDisposable
+Public Class DFT_ButterworthFilter
+    Inherits VB_Class
     Public dft As DFT_Basics
-    Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "DFT B Filter - Radius", 1, ocvb.color.Height, ocvb.color.Height)
         sliders.setupTrackBar2(ocvb, "DFT B Filter - Order", 1, ocvb.color.Height, 2)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        dft = New DFT_Basics(ocvb, "DFT_ButterworthFilter")
+                dft = New DFT_Basics(ocvb, "DFT_ButterworthFilter")
         ocvb.desc = "Use the Butterworth filter on a DFT image - color image input."
         ocvb.label1 = "Image with Butterworth Low Pass Filter Applied"
         ocvb.label2 = "Same filter with radius / 2"
@@ -178,9 +176,8 @@ Public Class DFT_ButterworthFilter : Implements IDisposable
            If k = 0 Then ocvb.result1 = inverseDFT(complex) Else ocvb.result2 = inverseDFT(complex)
        End Sub)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        dft.Dispose()
+    Public Sub VBdispose()
+                dft.Dispose()
     End Sub
 End Class
 
@@ -191,11 +188,11 @@ End Class
 
 ' http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/c++/butterworth_lowpass.cpp
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
-Public Class DFT_ButterworthDepth : Implements IDisposable
+Public Class DFT_ButterworthDepth
+    Inherits VB_Class
     Dim bfilter As DFT_ButterworthFilter
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         bfilter = New DFT_ButterworthFilter(ocvb, "DFT_ButterworthDepth")
         bfilter.dft.externalUse = True
 
@@ -207,7 +204,7 @@ Public Class DFT_ButterworthDepth : Implements IDisposable
         bfilter.dft.gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bfilter.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         bfilter.Dispose()
     End Sub
 End Class

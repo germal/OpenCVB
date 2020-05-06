@@ -1,13 +1,13 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
-Public Class Gradient_Basics : Implements IDisposable
+Public Class Gradient_Basics
+    Inherits VB_Class
     Public src As cv.Mat
     Public externalUse As Boolean
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sobel = New Edges_Sobel(ocvb, "Gradient_Basics")
         sobel.externalUse = True
         ocvb.desc = "Use phase to compute gradient"
@@ -27,7 +27,7 @@ Public Class Gradient_Basics : Implements IDisposable
         gray.ConvertTo(ocvb.result2, cv.MatType.CV_8UC1)
         ocvb.result1 = sobel.dst
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         sobel.Dispose()
     End Sub
 End Class
@@ -35,11 +35,11 @@ End Class
 
 
 
-Public Class Gradient_Depth : Implements IDisposable
+Public Class Gradient_Depth
+    Inherits VB_Class
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sobel = New Edges_Sobel(ocvb, "Gradient_Depth")
         sobel.externalUse = True
         ocvb.desc = "Use phase to compute gradient on depth image"
@@ -58,7 +58,7 @@ Public Class Gradient_Depth : Implements IDisposable
         gray.ConvertTo(ocvb.result2, cv.MatType.CV_8UC1)
         ocvb.result1 = sobel.dst
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         sobel.Dispose()
     End Sub
 End Class
@@ -68,16 +68,14 @@ End Class
 
 
 
-Public Class Gradient_Flatland : Implements IDisposable
+Public Class Gradient_Flatland
+    Inherits VB_Class
     Dim grade As Gradient_Basics
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grade = New Gradient_Basics(ocvb, "Gradient_Flatland")
         sliders.setupTrackBar1(ocvb, "Reduction Factor", 1, 64, 16)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Reduced grayscale shows isobars in depth."
+                ocvb.desc = "Reduced grayscale shows isobars in depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim reductionFactor = sliders.TrackBar1.Maximum - sliders.TrackBar1.Value
@@ -86,8 +84,7 @@ Public Class Gradient_Flatland : Implements IDisposable
         ocvb.result1 *= reductionFactor
         grade.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        grade.Dispose()
+    Public Sub VBdispose()
+                grade.Dispose()
     End Sub
 End Class

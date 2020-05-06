@@ -12,13 +12,13 @@ End Module
 
 
 ' https://docs.opencv.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
-Public Class FitEllipse_Basics_CPP : Implements IDisposable
+Public Class FitEllipse_Basics_CPP
+    Inherits VB_Class
     Dim area As Area_MinTriangle_CPP
     Public dstHandle As GCHandle
     Public dstData(5 * 4 - 1) As Byte ' enough space for a float describing angle, center, and width/height - this will be filled in on the C++ side.
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         area = New Area_MinTriangle_CPP(ocvb, "FitEllipse_Basics_CPP")
 
         ocvb.desc = "Use FitEllipse to draw around a set of points"
@@ -66,6 +66,6 @@ Public Class FitEllipse_Basics_CPP : Implements IDisposable
         End If
         ocvb.label1 = "Using MinTriangle to generate " + CStr(area.srcPoints.Count) + " points"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class

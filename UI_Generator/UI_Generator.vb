@@ -2,7 +2,6 @@
 Imports System.Text.RegularExpressions
 Module UI_GeneratorMain
     Sub Main()
-        Dim line As String
         Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../../vb_classes")
         Dim fileNames As New List(Of String)
         Dim fileEntries As String() = Directory.GetFiles(VBcodeDir.FullName)
@@ -13,7 +12,7 @@ Module UI_GeneratorMain
         Dim projFile As New FileInfo(VBcodeDir.FullName + "/VB_Classes.vbproj")
         Dim readProj = New StreamReader(projFile.FullName)
         While readProj.EndOfStream = False
-            line = readProj.ReadLine()
+            Dim line = readProj.ReadLine()
             If Trim(line).StartsWith("<Content Include=") Then
                 If InStr(line, "Python") Then
                     Dim startName = InStr(line, "Python")
@@ -47,14 +46,20 @@ Module UI_GeneratorMain
             Else
                 Dim nextFile As New System.IO.StreamReader(fileName)
                 While nextFile.Peek() <> -1
-                    line = Trim(nextFile.ReadLine())
+                    Dim line = Trim(nextFile.ReadLine())
                     line = Replace(line, vbTab, "")
                     If line IsNot Nothing Then
                         If Len(line) > 0 Then CodeLineCount += 1
                         If LCase(line).StartsWith("public class") Then
+                            Dim split As String() = Regex.Split(line, "\W+")
                             If InStr(LCase(line), ": implements idisposable") Then
-                                Dim split As String() = Regex.Split(line, "\W+")
                                 className = split(2) ' public class <classname>
+                            Else
+                                ' next line must be "Inherits VB_Class"
+                                Dim line2 = Trim(nextFile.ReadLine())
+                                If LCase(line2) = "inherits vb_class" Then
+                                    className = split(2) ' public class <classname>
+                                End If
                             End If
                         End If
                         If LCase(line).StartsWith("public sub new(ocvb as algorithmdata") Then functionNames.Add(className)

@@ -1,17 +1,15 @@
 ﻿Imports cv = OpenCvSharp
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
-Public Class ORB_Basics : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public keypoints() As cv.KeyPoint
+Public Class ORB_Basics
+    Inherits VB_Class
+        Public keypoints() As cv.KeyPoint
     Public gray As New cv.Mat
     Public externalUse As Boolean
     Dim orb As cv.ORB
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "ORB - desired point count", 10, 2000, 700)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Find keypoints using ORB"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -27,8 +25,7 @@ Public Class ORB_Basics : Implements IDisposable
             ocvb.label1 = CStr(keypoints.Count) + " key points were identified"
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         orb.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class

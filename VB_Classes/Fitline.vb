@@ -1,22 +1,20 @@
 ﻿Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/js_contour_features_fitLine.html
-Public Class Fitline_Basics : Implements IDisposable
+Public Class Fitline_Basics
+    Inherits VB_Class
     Public draw As Draw_Line
-    Public sliders As New OptionsSliders
-    Public externalUse As Boolean
+        Public externalUse As Boolean
     Public src As New cv.Mat
     Public dst As New cv.Mat
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         draw = New Draw_Line(ocvb, "Fitline_Basics")
         draw.sliders.TrackBar1.Value = 2
 
         sliders.setupTrackBar1(ocvb, "Accuracy for the radius X100", 0, 100, 10)
         sliders.setupTrackBar2(ocvb, "Accuracy for the angle X100", 0, 100, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -50,18 +48,18 @@ Public Class Fitline_Basics : Implements IDisposable
             End If
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         draw.Dispose()
     End Sub
 End Class
 
 
 
-Public Class Fitline_3DBasics_MT : Implements IDisposable
+Public Class Fitline_3DBasics_MT
+    Inherits VB_Class
     Dim hlines As Hough_Lines_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         hlines = New Hough_Lines_MT(ocvb, "Fitline_3DBasics_MT")
         ocvb.desc = "Use visual lines to find 3D lines."
         ocvb.label2 = "White is featureless RGB, blue depth shadow"
@@ -111,34 +109,30 @@ Public Class Fitline_3DBasics_MT : Implements IDisposable
         Next
         ocvb.result1.SetTo(cv.Scalar.White, hlines.grid.gridMask)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         hlines.Dispose()
     End Sub
 End Class
 
 
 
-Public Class Fitline_RawInput : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public check As New OptionsCheckbox
+Public Class Fitline_RawInput
+    Inherits VB_Class
     Public points As List(Of cv.Point2f)
     Public m As Single
     Public bb As Single
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Random point count", 0, 500, 100)
         sliders.setupTrackBar2(ocvb, "Line Point Count", 0, 500, 20)
         sliders.setupTrackBar3(ocvb, "Line Noise", 1, 100, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         check.Setup(ocvb, 2)
         check.Box(0).Text = "Highlight Line Data"
         check.Box(1).Text = "Recompute with new random data"
         check.Box(0).Checked = True
         check.Box(1).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
-
+        
         ocvb.desc = "Generate a noisy line in a field of random data."
         Randomize()
     End Sub
@@ -193,9 +187,8 @@ Public Class Fitline_RawInput : Implements IDisposable
             Next
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        check.Dispose()
+    Public Sub VBdispose()
+                check.Dispose()
     End Sub
 End Class
 
@@ -203,11 +196,11 @@ End Class
 
 
 ' http://www.cs.cmu.edu/~youngwoo/doc/lineFittingTest.cpp
-Public Class Fitline_EigenFit : Implements IDisposable
+Public Class Fitline_EigenFit
+    Inherits VB_Class
     Dim noisyLine As Fitline_RawInput
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         noisyLine = New Fitline_RawInput(ocvb, "Fitline_EigenFit")
         noisyLine.sliders.TrackBar1.Value = 30
         noisyLine.sliders.TrackBar2.Value = 400
@@ -296,7 +289,7 @@ Public Class Fitline_EigenFit : Implements IDisposable
         p2 = New cv.Point(w, noisyLine.m * w + noisyLine.bb)
         ocvb.result2.Line(p1, p2, cv.Scalar.Blue, 3, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         noisyLine.Dispose()
     End Sub
 End Class

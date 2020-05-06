@@ -3,15 +3,13 @@ Imports System.IO
 Imports System.Runtime.InteropServices
 ' https://github.com/ycui11/-Colorizing-Prokudin-Gorskii-images-of-the-Russian-Empire
 ' https://github.com/petraohlin/Colorizing-the-Prokudin-Gorskii-Collection
-Public Class WarpModel_Input : Implements IDisposable
-    Public check As New OptionsCheckbox
-    Public radio As New OptionsRadioButtons
-    Public rgb(3 - 1) As cv.Mat
+Public Class WarpModel_Input
+    Inherits VB_Class
+        Public rgb(3 - 1) As cv.Mat
     Public gradient(3 - 1) As cv.Mat
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         radio.Setup(ocvb, 12)
         radio.check(0).Text = "building.jpg"
         radio.check(1).Text = "church.jpg"
@@ -26,12 +24,10 @@ Public Class WarpModel_Input : Implements IDisposable
         radio.check(10).Text = "Tablet.jpg"
         radio.check(11).Text = "Valley.jpg"
         radio.check(9).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Use Gradient in WarpInput"
-        If ocvb.parms.ShowOptions Then check.Show()
-
+        
         sobel = New Edges_Sobel(ocvb, "WarpModel_Input")
         sobel.externalUse = True
         ocvb.desc = "Import the misaligned input."
@@ -62,7 +58,7 @@ Public Class WarpModel_Input : Implements IDisposable
         ocvb.result1(r(0)) = rgb(0).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result2(r(0)) = merged
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
         sobel.Dispose()
         check.Dispose()
@@ -89,9 +85,9 @@ End Module
 
 
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
-Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
-    Public radio As New OptionsRadioButtons
-    Public input As WarpModel_Input
+Public Class WarpModel_FindTransformECC_CPP
+    Inherits VB_Class
+        Public input As WarpModel_Input
     Dim cPtr As IntPtr
     Public warpMatrix() As Single
     Public src1 As New cv.Mat
@@ -102,8 +98,7 @@ Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
     Public warpMode As Integer
     Public aligned As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         cPtr = WarpModel_Open()
 
         radio.Setup(ocvb, 4)
@@ -112,8 +107,7 @@ Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
         radio.check(2).Text = "Motion_Affine (very slow - Use CPP_Classes in Release Mode)"
         radio.check(3).Text = "Motion_Homography (even slower - Use CPP_Classes in Release Mode)"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         input = New WarpModel_Input(ocvb, "WarpModel_FindTransformECC_CPP")
 
         ocvb.desc = "Use FindTransformECC to align 2 images"
@@ -177,7 +171,7 @@ Public Class WarpModel_FindTransformECC_CPP : Implements IDisposable
         End If
         ocvb.putText(New ActiveClass.TrueType(outStr, aligned.Width + 10, 220, RESULT1))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         WarpModel_Close(cPtr)
         radio.Dispose()
         input.Dispose()
@@ -191,11 +185,11 @@ End Class
 
 
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
-Public Class WarpModel_AlignImages : Implements IDisposable
+Public Class WarpModel_AlignImages
+    Inherits VB_Class
     Dim ecc As WarpModel_FindTransformECC_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ecc = New WarpModel_FindTransformECC_CPP(ocvb, "WarpModel_AlignImages")
 
         ocvb.desc = "Align the RGB inputs raw images from the Prokudin examples."
@@ -223,7 +217,7 @@ Public Class WarpModel_AlignImages : Implements IDisposable
                                               "Other than that, images look the same." + vbCrLf +
                                               "Displacement increases with Sobel" + vbCrLf + "kernel size", merged.Width + 10, 100, RESULT1))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         ecc.Dispose()
     End Sub
 End Class

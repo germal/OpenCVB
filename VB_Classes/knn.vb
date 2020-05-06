@@ -1,16 +1,14 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class knn_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim random As Random_Points
+Public Class knn_Basics
+    Inherits VB_Class
+        Dim random As Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         random = New Random_Points(ocvb, "knn_Basics")
         sliders.setupTrackBar1(ocvb, "knn Query Points", 1, 10000, 10)
         sliders.setupTrackBar2(ocvb, "knn Known Points", 1, 10, 3)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
+                ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
         ocvb.label2 = "Search Input"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -44,9 +42,8 @@ Public Class knn_Basics : Implements IDisposable
             cv.Cv2.Circle(ocvb.result2, queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        random.Dispose()
+    Public Sub VBdispose()
+                random.Dispose()
     End Sub
 End Class
 
@@ -55,9 +52,9 @@ End Class
 
 
 
-Public Class knn_Cluster2D : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim knn As knn_Point2d
+Public Class knn_Cluster2D
+    Inherits VB_Class
+        Dim knn As knn_Point2d
     Public cityPositions() As cv.Point
     Public cityOrder() As Int32
     Public distances() As Int32
@@ -71,15 +68,13 @@ Public Class knn_Cluster2D : Implements IDisposable
         Next
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         knn = New knn_Point2d(ocvb, "knn_Cluster2D")
         knn.sliders.Visible = False
         knn.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "knn - number of cities", 10, 1000, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.label1 = ""
         ocvb.label2 = ""
         ocvb.desc = "Use knn to cluster cities as preparation for a solution to the traveling salesman problem."
@@ -156,9 +151,8 @@ Public Class knn_Cluster2D : Implements IDisposable
             ocvb.label1 = "knn clusters total=" + CStr(totalClusters) + " closedRegions=" + CStr(closedRegions)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        knn.Dispose()
+    Public Sub VBdispose()
+                knn.Dispose()
     End Sub
 End Class
 
@@ -167,20 +161,18 @@ End Class
 
 
 
-Public Class knn_Point2d : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public querySet() As cv.Point2f
+Public Class knn_Point2d
+    Inherits VB_Class
+        Public querySet() As cv.Point2f
     Public responseSet() As Int32
     Public lastSet() As cv.Point2f ' default usage: find and connect points in 2D for this number of points.
     Public externalUse As Boolean
     Public findXnearest As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "knn Query Points", 1, 50, 10)
         sliders.setupTrackBar2(ocvb, "knn k nearest points", 1, 5, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Use KNN to connect 2D points."
         ocvb.label1 = "Yellow=Queries, Blue=Best Responses"
     End Sub
@@ -229,9 +221,8 @@ Public Class knn_Point2d : Implements IDisposable
             End If
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
@@ -240,20 +231,18 @@ End Class
 
 
 
-Public Class knn_Point3d : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public querySet() As cv.Point3f
+Public Class knn_Point3d
+    Inherits VB_Class
+        Public querySet() As cv.Point3f
     Public responseSet() As Int32
     Public lastSet() As cv.Point3f ' default usage: find and connect points in 2D for this number of points.
     Public externalUse As Boolean
     Public findXnearest As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "knn Query Points", 1, 500, 10)
         sliders.setupTrackBar2(ocvb, "knn k nearest points", 0, 500, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
         ocvb.label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
         ocvb.label2 = "Top Down View to confirm 3D KNN is correct"
@@ -314,9 +303,8 @@ Public Class knn_Point3d : Implements IDisposable
             End If
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-    End Sub
+    Public Sub VBdispose()
+            End Sub
 End Class
 
 
@@ -324,15 +312,15 @@ End Class
 
 
 
-Public Class knn_ClusterNoisyLine : Implements IDisposable
+Public Class knn_ClusterNoisyLine
+    Inherits VB_Class
     Public noisyLine As Fitline_RawInput
     Public cityOrder() As Int32
     Public knn As knn_Point2d
     Dim numberofCities As Int32
     Public findXnearest As Int32 = 2
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         noisyLine = New Fitline_RawInput(ocvb, "knn_ClusterNoisyLine")
         knn = New knn_Point2d(ocvb, "knn_ClusterNoisyLine")
         knn.sliders.Visible = False
@@ -394,7 +382,7 @@ Public Class knn_ClusterNoisyLine : Implements IDisposable
             ocvb.label1 = "Input points = " + CStr(numberofCities)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         knn.Dispose()
         noisyLine.Dispose()
     End Sub

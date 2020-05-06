@@ -3,18 +3,16 @@ Imports System.Runtime.InteropServices
 Imports CS_Classes
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Surf_Basics_CS : Implements IDisposable
-    Public radio As New OptionsRadioButtons
-    Public sliders As New OptionsSliders
-    Public CS_SurfBasics As New CS_SurfBasics
+Public Class Surf_Basics_CS
+    Inherits VB_Class
+            Public CS_SurfBasics As New CS_SurfBasics
     Dim fisheye As FishEye_Rectified
     Public srcLeft As New cv.Mat
     Public srcRight As New cv.Mat
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         fisheye = New FishEye_Rectified(ocvb, "Surf_Basics_CS")
         fisheye.externalUse = True
 
@@ -22,11 +20,9 @@ Public Class Surf_Basics_CS : Implements IDisposable
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         sliders.setupTrackBar1(ocvb, "Hessian threshold", 1, 5000, 2000)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
         ocvb.label1 = "BF Matcher output"
     End Sub
@@ -51,9 +47,8 @@ Public Class Surf_Basics_CS : Implements IDisposable
             If CS_SurfBasics.keypoints1 IsNot Nothing Then ocvb.label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        radio.Dispose()
+    Public Sub VBdispose()
+                radio.Dispose()
         fisheye.Dispose()
     End Sub
 End Class
@@ -64,12 +59,12 @@ End Class
 
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Surf_Basics : Implements IDisposable
+Public Class Surf_Basics
+    Inherits VB_Class
     Dim surf As Surf_Basics_CS
     Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         fisheye = New FishEye_Rectified(ocvb, "Surf_Basics")
         fisheye.externalUse = True
 
@@ -92,7 +87,7 @@ Public Class Surf_Basics : Implements IDisposable
         surf.dst(New cv.Rect(0, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(ocvb.result1)
         surf.dst(New cv.Rect(surf.srcLeft.Width, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(ocvb.result2)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         surf.Dispose()
         fisheye.Dispose()
     End Sub
@@ -103,18 +98,16 @@ End Class
 
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Surf_DrawMatchManual_CS : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim surf As Surf_Basics_CS
+Public Class Surf_DrawMatchManual_CS
+    Inherits VB_Class
+        Dim surf As Surf_Basics_CS
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         surf = New Surf_Basics_CS(ocvb, "Surf_DrawMatchManual_CS")
         surf.CS_SurfBasics.drawPoints = False
 
         sliders.setupTrackBar1(ocvb, "Surf Vertical Range to Search", 0, 50, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -146,7 +139,7 @@ Public Class Surf_DrawMatchManual_CS : Implements IDisposable
         Next
         ocvb.label2 = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         surf.Dispose()
     End Sub
 End Class

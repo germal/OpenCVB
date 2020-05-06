@@ -1,18 +1,16 @@
 ﻿Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/stereo_match.cpp
-Public Class BlockMatching_Basics : Implements IDisposable
+Public Class BlockMatching_Basics
+    Inherits VB_Class
     Dim colorizer As Depth_Colorizer_CPP
-    Public sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         colorizer = New Depth_Colorizer_CPP(ocvb, "BlockMatching_Basics")
 
         sliders.setupTrackBar1(ocvb, "Blockmatch scale", 1, 200, 100)
         sliders.setupTrackBar2(ocvb, "Blockmatch max disparity", 1, 8, 1)
         sliders.setupTrackBar3(ocvb, "Blockmatch block size", 5, 255, 15)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Use OpenCV's block matching on left and right views."
+                ocvb.desc = "Use OpenCV's block matching on left and right views."
         ocvb.label1 = "Block matching disparity colorized like depth"
         ocvb.label2 = "Right Image (used with left image)"
     End Sub
@@ -48,8 +46,7 @@ Public Class BlockMatching_Basics : Implements IDisposable
         ocvb.result1 = ocvb.result1.Resize(ocvb.color.Size())
         ocvb.result2 = ocvb.rightView.Resize(ocvb.color.Size())
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        colorizer.Dispose()
+    Public Sub VBdispose()
+                colorizer.Dispose()
     End Sub
 End Class

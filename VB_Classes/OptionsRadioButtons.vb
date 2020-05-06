@@ -14,5 +14,6 @@ Public Class OptionsRadioButtons
             check(i).AutoSize = True
             FlowLayoutPanel1.Controls.Add(check(i))
         Next
+        If ocvb.parms.ShowOptions Then Me.Show()
     End Sub
 End Class

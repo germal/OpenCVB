@@ -1,20 +1,16 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Collections.Generic
 Imports System.Linq
-Public Class Polylines_IEnumerableExample : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim check As New OptionsCheckbox
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class Polylines_IEnumerableExample
+    Inherits VB_Class
+            Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         check.Setup(ocvb, 2)
         check.Box(0).Text = "Polyline closed if checked"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
-        sliders.setupTrackBar1(ocvb, "Polyline Count", 2, 500, 100)
+                sliders.setupTrackBar1(ocvb, "Polyline Count", 2, 500, 100)
         sliders.setupTrackBar2(ocvb, "Polyline Thickness", 0, 10, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
+                ocvb.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim points = Enumerable.Range(0, sliders.TrackBar1.Value).Select(Of cv.Point)(
@@ -28,9 +24,8 @@ Public Class Polylines_IEnumerableExample : Implements IDisposable
         ' NOTE: when there are 2 points, there will be 1 line.
         ocvb.result1.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, sliders.TrackBar2.Value, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        check.Dispose()
+    Public Sub VBdispose()
+                check.Dispose()
     End Sub
 End Class
 
@@ -40,10 +35,10 @@ End Class
 
 ' VB.Net implementation of the browse example in OpenCV. 
 ' https://github.com/opencv/opencv/blob/master/samples/python/browse.py
-Public Class Polylines_Random : Implements IDisposable
+Public Class Polylines_Random
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Create a random procedural image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -73,6 +68,6 @@ Public Class Polylines_Random : Implements IDisposable
         ocvb.label2 = CStr(zoomFactor) + "X zoom around mouse"
         ocvb.result2 = ocvb.result1.GetRectSubPix(New cv.Size(width, height), New cv.Point2f(x, y))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class

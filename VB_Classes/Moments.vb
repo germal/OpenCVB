@@ -1,10 +1,10 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Moments_CentroidKalman : Implements IDisposable
+Public Class Moments_CentroidKalman
+    Inherits VB_Class
     Dim foreground As kMeans_Depth_FG_BG
     Dim kalman As Kalman_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         kalman = New Kalman_Basics(ocvb, "Moments_CentroidKalman")
         ReDim kalman.src(2 - 1) ' 2 elements - cv.point
         kalman.externalUse = True
@@ -25,7 +25,7 @@ Public Class Moments_CentroidKalman : Implements IDisposable
             ocvb.result1.Circle(New cv.Point(kalman.dst(0), kalman.dst(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         foreground.Dispose()
         kalman.Dispose()
     End Sub

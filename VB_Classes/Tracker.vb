@@ -1,18 +1,16 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Tracker_Basics : Implements IDisposable
-    Public check As New OptionsCheckbox
+Public Class Tracker_Basics
+    Inherits VB_Class
     Public tracker As cv.Tracking.MultiTracker
     Public bbox As cv.Rect2d
     Public boxObject() As cv.Rect2d
     Public externalUse As Boolean
     Public trackerIndex As Int32 = 5 ' trackerMIL by default...
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Stop tracking selected object"
-        If ocvb.parms.ShowOptions Then check.Show()
-        ocvb.desc = "Track an object using cv.Tracking API"
+                ocvb.desc = "Track an object using cv.Tracking API"
         ocvb.putText(New ActiveClass.TrueType("Draw a rectangle around object to be tracked.", 10, 140, RESULT2))
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -58,7 +56,7 @@ Public Class Tracker_Basics : Implements IDisposable
             End If
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         If tracker IsNot Nothing Then tracker.Dispose()
         check.Dispose()
     End Sub
@@ -68,11 +66,11 @@ End Class
 
 
 
-Public Class Tracker_MultiObject : Implements IDisposable
+Public Class Tracker_MultiObject
+    Inherits VB_Class
     Dim trackers As New List(Of Tracker_Basics)
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Track any number of objects simultaneously"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -96,7 +94,7 @@ Public Class Tracker_MultiObject : Implements IDisposable
             End If
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         For Each tr In trackers
             tr.Dispose()
         Next
@@ -108,12 +106,11 @@ End Class
 
 
 
-Public Class Tracker_Methods : Implements IDisposable
+Public Class Tracker_Methods
+    Inherits VB_Class
     Dim tracker As Tracker_Basics
-    Dim radio As New OptionsRadioButtons
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         tracker = New Tracker_Basics(ocvb, "Tracker_Methods")
 
         radio.Setup(ocvb, 8)
@@ -127,8 +124,7 @@ Public Class Tracker_Methods : Implements IDisposable
         radio.check(6).Text = "TrackerMOSSE"
         radio.check(7).Text = "TrackerTLD"
         radio.check(5).Checked = True ' TrackerMIL is the default
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         ocvb.desc = "Experiment with the different types of tracking methods - apparently not much difference..."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -148,7 +144,7 @@ Public Class Tracker_Methods : Implements IDisposable
         End If
         saveMethod = tracker.trackerIndex
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
         tracker.Dispose()
     End Sub

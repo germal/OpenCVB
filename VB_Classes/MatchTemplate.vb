@@ -1,17 +1,15 @@
 ﻿Imports cv = OpenCvSharp
-Public Class MatchTemplate_Basics : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Dim flow As Font_FlowText
-    Public radio As New OptionsRadioButtons
-    Public sample1 As cv.Mat
+Public Class MatchTemplate_Basics
+    Inherits VB_Class
+        Dim flow As Font_FlowText
+        Public sample1 As cv.Mat
     Public sample2 As cv.Mat
     Public externalUse As Boolean
     Public matchText As String = ""
     Public correlationMat As New cv.Mat
     Public reportFreq = 10 ' report the results every x number of iterations.
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         flow = New Font_FlowText(ocvb, "MatchTemplate_Basics")
         flow.externalUse = True
         flow.result1or2 = RESULT2
@@ -24,10 +22,8 @@ Public Class MatchTemplate_Basics : Implements IDisposable
         radio.check(4).Text = "SqDiff"
         radio.check(5).Text = "SqDiffNormed"
         radio.check(1).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-        sliders.setupTrackBar1(ocvb, "Sample Size", 2, 10000, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-        ocvb.label2 = "Log of correlation results"
+                sliders.setupTrackBar1(ocvb, "Sample Size", 2, 10000, 100)
+                ocvb.label2 = "Log of correlation results"
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -59,21 +55,20 @@ Public Class MatchTemplate_Basics : Implements IDisposable
             End If
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        radio.Dispose()
+    Public Sub VBdispose()
+                radio.Dispose()
     End Sub
 End Class
 
 
 
 
-Public Class MatchTemplate_RowCorrelation : Implements IDisposable
+Public Class MatchTemplate_RowCorrelation
+    Inherits VB_Class
     Dim corr As MatchTemplate_Basics
     Dim flow As Font_FlowText
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         flow = New Font_FlowText(ocvb, "MatchTemplate_RowCorrelation")
         flow.externalUse = True
         flow.result1or2 = RESULT2
@@ -107,7 +102,7 @@ Public Class MatchTemplate_RowCorrelation : Implements IDisposable
         If correlation > maxCorrelation Then maxCorrelation = correlation
         ocvb.label1 = "Min = " + Format(minCorrelation, "#,##0.00") + " max = " + Format(maxCorrelation, "#,##0.0000")
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         corr.Dispose()
         flow.Dispose()
     End Sub
@@ -117,18 +112,16 @@ End Class
 
 
 
-Public Class MatchTemplate_DrawRect : Implements IDisposable
-    Dim radio As New OptionsRadioButtons
+Public Class MatchTemplate_DrawRect
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         radio.Setup(ocvb, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
         Next
         radio.check(5).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         ocvb.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
 
         ocvb.label1 = "Probabilities (draw rectangle to test again)"
@@ -160,7 +153,7 @@ Public Class MatchTemplate_DrawRect : Implements IDisposable
         ocvb.result1.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
         ocvb.result2.Circle(maxLoc.X + saveRect.Width / 2, maxLoc.Y + saveRect.Height / 2, 20, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
     End Sub
 End Class
@@ -169,13 +162,13 @@ End Class
 
 
 
-Public Class MatchTemplate_BestTemplate_MT : Implements IDisposable
+Public Class MatchTemplate_BestTemplate_MT
+    Inherits VB_Class
     Dim grid As Thread_Grid
     Dim entropies(0) As Entropy_Basics
     Dim match As MatchTemplate_DrawRect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "MatchTemplate_BestTemplate_MT")
         grid.sliders.TrackBar1.Value = 128
         grid.sliders.TrackBar2.Value = 128
@@ -223,7 +216,7 @@ Public Class MatchTemplate_BestTemplate_MT : Implements IDisposable
 
         match.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         grid.Dispose()
     End Sub
 End Class

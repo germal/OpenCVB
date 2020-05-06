@@ -25,7 +25,8 @@ End Module
 
 
 ' https://visualstudiomagazine.com/articles/2020/04/06/invert-matrix.aspx
-Public Class MatrixInverse_Basics_CS : Implements IDisposable
+Public Class MatrixInverse_Basics_CS
+    Inherits VB_Class
     Public matrix As New MatrixInverse
     Public externalUse As Boolean
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
@@ -33,8 +34,7 @@ Public Class MatrixInverse_Basics_CS : Implements IDisposable
     Public src As New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
     Public dst As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Manually invert a matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -49,7 +49,7 @@ Public Class MatrixInverse_Basics_CS : Implements IDisposable
         Dim outstr = printMatrixResults(src, dst)
         ocvb.putText(New ActiveClass.TrueType(outstr + vbCrLf + "Intermediate results are optionally available in the console log.", 10, 60, RESULT1))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -58,14 +58,14 @@ End Class
 
 
 
-Public Class MatrixInverse_OpenCV : Implements IDisposable
+Public Class MatrixInverse_OpenCV
+    Inherits VB_Class
     Public externalUse As Boolean
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
     Public src As New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
     Public dst As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use OpenCV to invert a matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -79,6 +79,6 @@ Public Class MatrixInverse_OpenCV : Implements IDisposable
         Dim outstr = printMatrixResults(src, dst)
         ocvb.putText(New ActiveClass.TrueType(outstr, 10, 60, RESULT1))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class

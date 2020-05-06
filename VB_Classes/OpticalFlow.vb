@@ -61,10 +61,9 @@ End Module
 
 
 
-Public Class OpticalFlow_DenseOptions : Implements IDisposable
-    Public radio As New OptionsRadioButtons
-    Public sliders As New OptionsSliders
-    Public sliders2 As New OptionsSliders
+Public Class OpticalFlow_DenseOptions
+    Inherits VB_Class
+
     Public pyrScale As Single
     Public levels As Int32
     Public winSize As Int32
@@ -74,8 +73,7 @@ Public Class OpticalFlow_DenseOptions : Implements IDisposable
     Public OpticalFlowFlags As cv.OpticalFlowFlags
     Public outputScaling As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         radio.Setup(ocvb, 5)
         radio.check(0).Text = "FarnebackGaussian"
         radio.check(1).Text = "LkGetMinEigenvals"
@@ -83,7 +81,6 @@ Public Class OpticalFlow_DenseOptions : Implements IDisposable
         radio.check(3).Text = "PyrAReady"
         radio.check(4).Text = "PyrBReady"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
 
         sliders2.setupTrackBar1(ocvb, "Optical Flow PolyN", 1, 15, 5)
         sliders2.setupTrackBar2(ocvb, "Optical Flow Scaling Output", 1, 100, 50)
@@ -93,7 +90,6 @@ Public Class OpticalFlow_DenseOptions : Implements IDisposable
         sliders.setupTrackBar2(ocvb, "Optical Flow Levels", 1, 10, 1)
         sliders.setupTrackBar3(ocvb, "Optical Flow winSize", 1, 9, 1)
         sliders.setupTrackBar4(ocvb, "Optical Flow Iterations", 1, 10, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Use dense optical flow algorithm options"
     End Sub
@@ -117,21 +113,19 @@ Public Class OpticalFlow_DenseOptions : Implements IDisposable
         Next
         outputScaling = sliders2.TrackBar2.Value
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
-        sliders2.Dispose()
-        radio.Dispose()
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class OpticalFlow_DenseBasics : Implements IDisposable
+Public Class OpticalFlow_DenseBasics
+    Inherits VB_Class
+
     Dim flow As OpticalFlow_DenseOptions
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         flow = New OpticalFlow_DenseOptions(ocvb, "OpticalFlow_DenseBasics")
         ocvb.desc = "Use dense optical flow algorithm  "
     End Sub
@@ -150,7 +144,7 @@ Public Class OpticalFlow_DenseBasics : Implements IDisposable
         End If
         oldGray = gray.Clone()
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         flow.Dispose()
     End Sub
 End Class
@@ -158,14 +152,14 @@ End Class
 
 
 
-Public Class OpticalFlow_DenseBasics_MT : Implements IDisposable
-    Public sliders As New OptionsSliders
+Public Class OpticalFlow_DenseBasics_MT
+    Inherits VB_Class
+
     Public grid As Thread_Grid
     Dim accum As New cv.Mat
     Dim flow As OpticalFlow_DenseOptions
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "OpticalFlow_DenseBasics_MT")
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 32
@@ -176,7 +170,6 @@ Public Class OpticalFlow_DenseBasics_MT : Implements IDisposable
         flow.sliders.TrackBar1.Value = 75
 
         sliders.setupTrackBar1(ocvb, "Correlation Threshold", 0, 1000, 1000)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "MultiThread dense optical flow algorithm  "
     End Sub
@@ -214,8 +207,7 @@ Public Class OpticalFlow_DenseBasics_MT : Implements IDisposable
             accum = ocvb.color.Clone()
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
         flow.Dispose()
         grid.Dispose()
     End Sub
@@ -225,9 +217,9 @@ End Class
 
 
 
-Public Class OpticalFlow_Sparse : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public radio As New OptionsRadioButtons
+Public Class OpticalFlow_Sparse
+    Inherits VB_Class
+
     Public features As New List(Of cv.Point2f)
     Public externalUse As Boolean
 
@@ -236,14 +228,12 @@ Public Class OpticalFlow_Sparse : Implements IDisposable
     Dim sumScale As cv.Mat, sScale As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         good = New Features_GoodFeatures(ocvb, "OpticalFlow_Sparse")
         good.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "OpticalFlow window", 1, 20, 3)
         sliders.setupTrackBar2(ocvb, "OpticalFlow Max Pixels Distance", 1, 100, 30)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         radio.Setup(ocvb, 6)
         radio.check(0).Text = "FarnebackGaussian"
@@ -254,7 +244,6 @@ Public Class OpticalFlow_Sparse : Implements IDisposable
         radio.check(5).Text = "UseInitialFlow"
         radio.check(5).Enabled = False
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
 
         ocvb.desc = "Show the optical flow of a sparse matrix."
         ocvb.label1 = ""
@@ -324,9 +313,8 @@ Public Class OpticalFlow_Sparse : Implements IDisposable
             lastFrame = gray.Clone()
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         good.Dispose()
         radio.Dispose()
-        sliders.Dispose()
     End Sub
 End Class

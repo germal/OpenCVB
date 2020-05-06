@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Mat_Repeat : Implements IDisposable
+Public Class Mat_Repeat
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Use the repeat method to replicate data."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -11,17 +11,17 @@ Public Class Mat_Repeat : Implements IDisposable
         small = ocvb.RGBDepth.Resize(New cv.Size(ocvb.color.Cols / 10, ocvb.color.Rows / 10))
         ocvb.result2 = small.Repeat(10, 10)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
-Public Class Mat_PointToMat : Implements IDisposable
+Public Class Mat_PointToMat
+    Inherits VB_Class
     Dim mask As Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         mask = New Random_Points(ocvb, "Mat_PointToMat")
         ocvb.desc = "Convert pointf3 into a mat of points."
         ocvb.label1 = "Random_Points points (original)"
@@ -38,18 +38,18 @@ Public Class Mat_PointToMat : Implements IDisposable
             ocvb.result2.Set(Of cv.Vec3b)(indexer(i).Item1, indexer(i).Item0, white)
         Next
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         mask.Dispose()
     End Sub
 End Class
 
 
 
-Public Class Mat_MatToPoint : Implements IDisposable
+Public Class Mat_MatToPoint
+    Inherits VB_Class
     Dim mask As Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         mask = New Random_Points(ocvb, "Mat_MatToPoint")
         ocvb.desc = "Convert a mat into a vector of points."
         ocvb.label1 = "Reconstructed RGB Image"
@@ -69,17 +69,17 @@ Public Class Mat_MatToPoint : Implements IDisposable
         Next
         ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, points)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         mask.Dispose()
     End Sub
 End Class
 
 
 
-Public Class Mat_Transpose : Implements IDisposable
+Public Class Mat_Transpose
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Transpose a Mat and show results."
         ocvb.label1 = "Color Image Transposed"
         ocvb.label2 = "Color Image Transposed Twice"
@@ -98,17 +98,17 @@ Public Class Mat_Transpose : Implements IDisposable
         ocvb.result2 = trBack.ToMat.Resize(ocvb.color.Size())
 #End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/Mat/-/php-mat-class-examples.html#0x95f170f4714e3258c220a78eacceeee99591440b9885a2997bbbc6b3aebdcf1c-19,,37,
-Public Class Mat_Tricks : Implements IDisposable
+Public Class Mat_Tricks
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Show some Mat tricks."
         ocvb.label1 = "Image squeezed into square Mat"
         ocvb.label2 = "Mat transposed around the diagonal"
@@ -125,14 +125,15 @@ Public Class Mat_Tricks : Implements IDisposable
         y = 40
         ocvb.result2(x, x + mat.Width, y, y + mat.Height) = mat.T
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class Mat_4to1 : Implements IDisposable
+Public Class Mat_4to1
+    Inherits VB_Class
     Dim mat1 As cv.Mat
     Dim mat2 As cv.Mat
     Dim mat3 As cv.Mat
@@ -142,8 +143,7 @@ Public Class Mat_4to1 : Implements IDisposable
     Public noLines As Boolean ' if they want lines or not...
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = ""
         mat1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
@@ -176,14 +176,15 @@ Public Class Mat_4to1 : Implements IDisposable
             dst.Line(New cv.Point(dst.Width / 2, 0), New cv.Point(dst.Width / 2, dst.Height), cv.Scalar.White, 2)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class Mat_2to1 : Implements IDisposable
+Public Class Mat_2to1
+    Inherits VB_Class
     Dim mat1 As cv.Mat
     Dim mat2 As cv.Mat
     Public mat() = {mat1, mat2}
@@ -191,8 +192,7 @@ Public Class Mat_2to1 : Implements IDisposable
     Public noLines As Boolean ' if they want lines or not...
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = ""
         mat1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
@@ -219,21 +219,21 @@ Public Class Mat_2to1 : Implements IDisposable
             dst.Line(New cv.Point(0, dst.Height / 2), New cv.Point(dst.Width, dst.Height / 2), cv.Scalar.White, 2)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class Mat_ImageXYZ_MT : Implements IDisposable
+Public Class Mat_ImageXYZ_MT
+    Inherits VB_Class
     Dim grid As Thread_Grid
     Public xyDepth As cv.Mat
     Public xyzPlanes() As cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "Mat_ImageXYZ_MT")
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
@@ -259,7 +259,7 @@ Public Class Mat_ImageXYZ_MT : Implements IDisposable
 
         If externalUse = False Then cv.Cv2.Merge(xyzPlanes, xyDepth)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         grid.Dispose()
     End Sub
 End Class
@@ -270,10 +270,10 @@ End Class
 
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/MatExpr/-/php-matexpr-class-examples.html
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/MatOperations.cs
-Public Class Mat_RowColRange : Implements IDisposable
+Public Class Mat_RowColRange
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.label1 = "BitwiseNot of RowRange and ColRange"
         ocvb.desc = "Perform operation on a range of cols and/or Rows."
     End Sub
@@ -284,7 +284,7 @@ Public Class Mat_RowColRange : Implements IDisposable
         cv.Cv2.BitwiseNot(ocvb.result1.RowRange(midY - 50, midY + 50), ocvb.result1.RowRange(midY - 50, midY + 50))
         cv.Cv2.BitwiseNot(ocvb.result1.ColRange(midX - 50, midX + 50), ocvb.result1.ColRange(midX - 50, midX + 50))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -292,10 +292,10 @@ End Class
 
 
 
-Public Class Mat_Managed : Implements IDisposable
+Public Class Mat_Managed
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "There is a limited ability to use Mat data in Managed code directly."
         ocvb.label1 = "Color change is in the managed cv.vec3b array"
     End Sub
@@ -313,6 +313,6 @@ Public Class Mat_Managed : Implements IDisposable
         Dim rect As New cv.Rect(autoRand.Next(0, ocvb.color.Width - 50), autoRand.Next(0, ocvb.color.Height - 50), 50, 50)
         ocvb.result1(rect).SetTo(0)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class

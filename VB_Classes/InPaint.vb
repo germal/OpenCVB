@@ -2,21 +2,17 @@
 
 
 ' https://docs.opencv.org/master/df/d3d/tutorial_py_inpainting.html#gsc.tab=0
-Public Class InPaint_Basics : Implements IDisposable
-    Dim radio As New OptionsRadioButtons
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class InPaint_Basics
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Thickness", 1, 25, 2)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         radio.Setup(ocvb, 2)
         radio.check(0).Text = "TELEA"
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         ocvb.desc = "Create a flaw in an image and then use inPaint to mask it."
         ocvb.label2 = "Repaired Image"
     End Sub
@@ -34,28 +30,25 @@ Public Class InPaint_Basics : Implements IDisposable
         mask.Line(p1, p2, cv.Scalar.All(255), thickness, cv.LineTypes.AntiAlias)
         cv.Cv2.Inpaint(ocvb.result1, mask, ocvb.result2, thickness, inPaintFlag)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
 
-Public Class InPaint_Noise : Implements IDisposable
+Public Class InPaint_Noise
+    Inherits VB_Class
     Dim noise As Draw_Noise
-    Dim radio As New OptionsRadioButtons
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         noise = New Draw_Noise(ocvb, "InPaint_Noise")
 
         radio.Setup(ocvb, 2)
         radio.check(0).Text = "TELEA"
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         ocvb.desc = "Create noise in an image and then use inPaint to remove it."
         ocvb.label2 = "Repaired Image"
     End Sub
@@ -65,7 +58,7 @@ Public Class InPaint_Noise : Implements IDisposable
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
         cv.Cv2.Inpaint(ocvb.result1, noise.noiseMask, ocvb.result2, noise.maxNoiseWidth, inPaintFlag)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
         noise.Dispose()
     End Sub

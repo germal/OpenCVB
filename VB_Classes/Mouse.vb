@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Mouse_Basics : Implements IDisposable
+Public Class Mouse_Basics
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Test the mousePoint interface"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -19,16 +19,16 @@ Public Class Mouse_Basics : Implements IDisposable
         If colorIndex >= ocvb.colorScalar.Count Then colorIndex = 0
         ocvb.putText(New ActiveClass.TrueType("Move the mouse through this image to show mouse tracking.", 10, 50))
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
-Public Class Mouse_LeftClick : Implements IDisposable
+Public Class Mouse_LeftClick
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Demonstrate what the left-click enables"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -42,17 +42,17 @@ Public Class Mouse_LeftClick : Implements IDisposable
             ocvb.result2 = ocvb.color(ocvb.drawRect).Resize(ocvb.result2.Size())
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class Mouse_RightClick : Implements IDisposable
+Public Class Mouse_RightClick
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Demonstrate what the right-click enables"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -64,6 +64,6 @@ Public Class Mouse_RightClick : Implements IDisposable
             ocvb.result2 = ocvb.color(ocvb.drawRect).Resize(ocvb.result2.Size())
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class

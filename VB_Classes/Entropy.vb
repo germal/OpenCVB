@@ -1,14 +1,14 @@
 ﻿Imports cv = OpenCvSharp
 ' http://areshopencv.blogspot.com/2011/12/computing-entropy-of-image.html
-Public Class Entropy_Basics : Implements IDisposable
+Public Class Entropy_Basics
+    Inherits VB_Class
     Dim flow As Font_FlowText
     Dim hist As Histogram_Basics
     Public src As cv.Mat
     Public externalUse As Boolean
     Public entropy As Single
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         flow = New Font_FlowText(ocvb, "Entropy_Basics")
         flow.externalUse = True
         flow.result1or2 = RESULT1
@@ -42,7 +42,7 @@ Public Class Entropy_Basics : Implements IDisposable
             flow.Run(ocvb)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         hist.Dispose()
         flow.Dispose()
     End Sub

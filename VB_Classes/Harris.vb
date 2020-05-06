@@ -27,19 +27,17 @@ End Module
 
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-Public Class Harris_Features_CPP : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim srcData() As Byte
+Public Class Harris_Features_CPP
+    Inherits VB_Class
+        Dim srcData() As Byte
     Dim Harris_Features As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Harris Threshold", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, "Harris Neighborhood", 1, 41, 21)
         sliders.setupTrackBar3(ocvb, "Harris aperture", 1, 33, 21)
         sliders.setupTrackBar4(ocvb, "Harris Parameter", 1, 100, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Use Harris feature detectors to identify interesting points."
 
         ReDim srcData(ocvb.color.Total - 1)
@@ -67,29 +65,26 @@ Public Class Harris_Features_CPP : Implements IDisposable
         ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.AddWeighted(ocvb.result1, 0.5, ocvb.color, 0.5, 0, ocvb.result2)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         Harris_Features_Close(Harris_Features)
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
 
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-Public Class Harris_Detector_CPP : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim srcData() As Byte
+Public Class Harris_Detector_CPP
+    Inherits VB_Class
+        Dim srcData() As Byte
     Dim ptCount(1) As Int32
     Dim Harris_Detector As IntPtr
     Public FeaturePoints As New List(Of cv.Point2f)
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Harris qualityLevel", 1, 100, 2)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Use Harris detector to identify interesting points."
 
         ReDim srcData(ocvb.color.Total - 1)
@@ -117,8 +112,7 @@ Public Class Harris_Detector_CPP : Implements IDisposable
             Next
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         Harris_Detector_Close(Harris_Detector)
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class

@@ -19,13 +19,14 @@ End Module
 
 
 ' https://github.com/epiception/SGM-Census
-'Public Class SemiGlobalMatching_CPP : Implements IDisposable
+'Public Class SemiGlobalMatching_CPP
+'    Inherits VB_Class
 '    Dim leftData() As Byte
 '    Dim rightData() As Byte
 '    Dim SemiGlobalMatching As IntPtr
 '     Public Sub New(ocvb As AlgorithmData, byVal caller as string)
 ' dim callerName = caller 
-' If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+' If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
 '        ReDim leftData(ocvb.color.Total - 1)
 '        ReDim rightData(ocvb.color.Total - 1)
 '        SemiGlobalMatching = SemiGlobalMatching_Open(ocvb.color.Rows, ocvb.color.Cols)
@@ -50,7 +51,7 @@ End Module
 '        Dim dst = New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols, cv.MatType.CV_8U, dstData)
 '        ocvb.result1 = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 '    End Sub
-'    Public Sub Dispose() Implements IDisposable.Dispose
+'    Public Sub VBdispose()
 '        SemiGlobalMatching_Close(SemiGlobalMatching)
 '    End Sub
 'End Class

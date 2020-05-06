@@ -1,13 +1,12 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Resize_Basics : Implements IDisposable
-    Public radio As New OptionsRadioButtons
-    Public externalUse As Boolean
+Public Class Resize_Basics
+    Inherits VB_Class
+        Public externalUse As Boolean
     Public src As cv.Mat
     Public dst As New cv.Mat
     Public newSize As cv.Size
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         SetInterpolationRadioButtons(ocvb, radio, "Resize")
         ' warp is not allowed in resize
         radio.check(5).Enabled = False
@@ -32,7 +31,7 @@ Public Class Resize_Basics : Implements IDisposable
             dst = src.Resize(newSize, 0, 0, resizeFlag)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
     End Sub
 End Class
@@ -41,12 +40,11 @@ End Class
 
 
 
-Public Class Resize_After8uc3 : Implements IDisposable
-    Public radio As New OptionsRadioButtons
-    Dim colorizer As Depth_Colorizer_CPP
+Public Class Resize_After8uc3
+    Inherits VB_Class
+        Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         colorizer = New Depth_Colorizer_CPP(ocvb, "Resize_After8uc3")
         colorizer.externalUse = True
         SetInterpolationRadioButtons(ocvb, radio, "Resize")
@@ -75,7 +73,7 @@ Public Class Resize_After8uc3 : Implements IDisposable
         colorizer.Run(ocvb)
         ocvb.result1 = colorizer.dst
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
         colorizer.Dispose()
     End Sub
@@ -86,21 +84,19 @@ End Class
 
 
 
-Public Class Resize_Percentage : Implements IDisposable
-    Public sliders As New OptionsSliders
-    Public src As New cv.Mat
+Public Class Resize_Percentage
+    Inherits VB_Class
+        Public src As New cv.Mat
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public resizeOptions As Resize_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         resizeOptions = New Resize_Basics(ocvb, "Resize_Percentage")
         resizeOptions.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Resize Percentage (%)", 1, 100, 3)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.desc = "Resize by a percentage of the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -121,8 +117,7 @@ Public Class Resize_Percentage : Implements IDisposable
             dst = resizeOptions.dst
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         resizeOptions.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class

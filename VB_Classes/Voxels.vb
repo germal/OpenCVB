@@ -1,28 +1,24 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Voxels_Basics_MT : Implements IDisposable
+Public Class Voxels_Basics_MT
+    Inherits VB_Class
     Public trim As Depth_InRange
-    Dim sliders As New OptionsSliders
-    Public grid As Thread_Grid
+        Public grid As Thread_Grid
     Public voxels() As Double
     Public voxelMat As cv.Mat
-    Public check As New OptionsCheckbox
     Public minDepth As Double
     Public maxDepth As Double
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         check.Setup(ocvb, 1)
         check.Box(0).Text = "Display intermediate results"
         check.Box(0).Checked = True
-        If ocvb.parms.ShowOptions Then check.Show()
-
+        
         trim = New Depth_InRange(ocvb, "Voxels_Basics_MT")
         trim.externalUse = True
         trim.sliders.TrackBar2.Value = 5000
 
         sliders.setupTrackBar1(ocvb, "Histogram Bins", 2, 200, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         grid = New Thread_Grid(ocvb, "Voxels_Basics_MT")
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
@@ -77,10 +73,9 @@ Public Class Voxels_Basics_MT : Implements IDisposable
             End Sub)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         grid.Dispose()
-        sliders.Dispose()
-        trim.Dispose()
+                trim.Dispose()
         check.Dispose()
     End Sub
 End Class

@@ -61,12 +61,12 @@ End Module
 
 
 
-Public Class Python_Run : Implements IDisposable
+Public Class Python_Run
+    Inherits VB_Class
     Dim pyStream As PyStream_Basics = Nothing
     Dim tryCount As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
@@ -92,7 +92,7 @@ Public Class Python_Run : Implements IDisposable
             End If
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         On Error Resume Next
         Dim proc = Process.GetProcessesByName("python")
         For i = 0 To proc.Count - 1
@@ -106,7 +106,8 @@ End Class
 
 
 
-Public Class Python_MemMap : Implements IDisposable
+Public Class Python_MemMap
+    Inherits VB_Class
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim memMapFile As MemoryMappedFile
     Dim memMapPtr As IntPtr
@@ -114,8 +115,7 @@ Public Class Python_MemMap : Implements IDisposable
     Public memMapbufferSize As Int32
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         If ocvb.PythonFileName Is Nothing Then
             ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_MemMap.py"
         Else
@@ -142,7 +142,7 @@ Public Class Python_MemMap : Implements IDisposable
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         If memMapPtr <> 0 Then Marshal.FreeHGlobal(memMapPtr)
         Dim proc = Process.GetProcessesByName("python")
         For i = 0 To proc.Count - 1
@@ -155,7 +155,8 @@ End Class
 
 
 
-Public Class Python_SurfaceBlit : Implements IDisposable
+Public Class Python_SurfaceBlit
+    Inherits VB_Class
     Dim memMap As Python_MemMap
     Dim pipeName As String
     Dim pipe As NamedPipeServerStream
@@ -163,8 +164,7 @@ Public Class Python_SurfaceBlit : Implements IDisposable
     Dim pointCloudBuffer(1) As Byte
     Dim PythonReady As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ' this Python script requires pygame to be present...
         If checkPythonPackage(ocvb, "pygame") = False Then
             PythonReady = False
@@ -210,7 +210,7 @@ Public Class Python_SurfaceBlit : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType("Python is not available", 10, 60, RESULT1))
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         If PythonReady = False Then Exit Sub ' none of this was created if Python wasn't found
         memMap.Dispose()
         If pipe IsNot Nothing Then

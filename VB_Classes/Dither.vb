@@ -80,15 +80,12 @@ End Module
 
 
 ' https://www.codeproject.com/Articles/5259216/Dither-Ordered-and-Floyd-Steinberg-Monochrome-Colo
-Public Class Dither_Basics : Implements IDisposable
-    Dim radio As New OptionsRadioButtons
-    Dim sliders As New OptionsSliders
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+Public Class Dither_Basics
+    Inherits VB_Class
+        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Bits per color plane", 1, 5, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         radio.Setup(ocvb, 24)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = Choose(i + 1, "Bayer16", "Bayer8", "Bayer4", "Bayer3", "Bayer2", "BayerRgbNbpp", "BayerRgb3bpp", "BayerRgb6bpp",
@@ -97,8 +94,7 @@ Public Class Dither_Basics : Implements IDisposable
                                      "SierraLiteRgbNbpp", "SierraLite", "SierraRgbNbpp", "Sierra")
         Next
         radio.check(4).Checked = True ' this one was interesting...
-        If ocvb.parms.ShowOptions Then radio.Show()
-
+        
         ocvb.desc = "Explore all the varieties of dithering"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -179,7 +175,7 @@ Public Class Dither_Basics : Implements IDisposable
         Next
         hpixels.Free()
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
     End Sub
 End Class

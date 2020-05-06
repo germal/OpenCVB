@@ -1,18 +1,16 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
-Public Class IMU_Basics : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim lastTimeStamp As Double
+Public Class IMU_Basics
+    Inherits VB_Class
+        Dim lastTimeStamp As Double
     Dim flow As Font_FlowText
     Public theta As cv.Point3f ' this is the description - x, y, and z - of the axes centered in the camera.
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         flow = New Font_FlowText(ocvb, "IMU_Basics")
         flow.externalUse = True
         flow.result1or2 = RESULT1
@@ -57,10 +55,9 @@ Public Class IMU_Basics : Implements IDisposable
         End If
         flow.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         flow.Dispose()
-        sliders.Dispose()
-    End Sub
+            End Sub
 End Class
 
 
@@ -68,11 +65,11 @@ End Class
 
 
 
-Public Class IMU_Stabilizer : Implements IDisposable
+Public Class IMU_Stabilizer
+    Inherits VB_Class
     Dim kalman As Kalman_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         kalman = New Kalman_Basics(ocvb, "IMU_Stabilizer")
         kalman.externalUse = True
 
@@ -116,7 +113,7 @@ Public Class IMU_Stabilizer : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType("No IMU present on this RealSense device", 20, 100))
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         kalman.Dispose()
     End Sub
 End Class
@@ -126,11 +123,11 @@ End Class
 
 
 
-Public Class IMU_Magnetometer : Implements IDisposable
+Public Class IMU_Magnetometer
+    Inherits VB_Class
     Public plot As Plot_OverTime
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         plot = New Plot_OverTime(ocvb, "IMU_Magnetometer")
         plot.externalUse = True
         plot.dst = ocvb.result2
@@ -152,7 +149,7 @@ Public Class IMU_Magnetometer : Implements IDisposable
                           " z (red) = " + Format(plot.plotData.Item(2), "#0.00")
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         plot.Dispose()
     End Sub
 End Class
@@ -160,10 +157,10 @@ End Class
 
 
 
-Public Class IMU_Barometer : Implements IDisposable
+Public Class IMU_Barometer
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Get the barometric pressure from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -174,17 +171,17 @@ Public Class IMU_Barometer : Implements IDisposable
                                                   "Barometric pressure is " + Format(ocvb.parms.IMU_Barometer * 0.02953, "#0.00") + " inches of mercury.", 10, 60))
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class IMU_Temperature : Implements IDisposable
+Public Class IMU_Temperature
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.desc = "Get the temperature of the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -193,22 +190,21 @@ Public Class IMU_Temperature : Implements IDisposable
                                                   "IMU Temperature is " + Format(ocvb.parms.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.", 10, 60))
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
     End Sub
 End Class
 
 
 
 
-Public Class IMU_FrameTime : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public plot As Plot_OverTime
+Public Class IMU_FrameTime
+    Inherits VB_Class
+        Public plot As Plot_OverTime
     Public CPUInterval As Double
     Public externalUse As Boolean
     Public IMUtoCaptureEstimate As Double
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         plot = New Plot_OverTime(ocvb, "IMU_FrameTime")
         plot.externalUse = True
         plot.dst = ocvb.result2
@@ -219,8 +215,7 @@ Public Class IMU_FrameTime : Implements IDisposable
 
         sliders.setupTrackBar1(ocvb, "Minimum IMU to Capture time (ms)", 1, 10, 2)
         sliders.setupTrackBar2(ocvb, "Number of Plot Values", 5, 30, 25)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.label2 = "IMU FT (blue) CPU FT (green) Latency est. (red)"
         ocvb.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
@@ -292,7 +287,7 @@ Public Class IMU_FrameTime : Implements IDisposable
             End If
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         plot.Dispose()
     End Sub
 End Class
@@ -301,15 +296,14 @@ End Class
 
 
 
-Public Class IMU_HostFrameTimes : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Public plot As Plot_OverTime
+Public Class IMU_HostFrameTimes
+    Inherits VB_Class
+        Public plot As Plot_OverTime
     Public CPUInterval As Double
     Public externalUse As Boolean
     Public HostInterruptDelayEstimate As Double
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         plot = New Plot_OverTime(ocvb, "IMU_HostFrameTimes")
         plot.externalUse = True
         plot.dst = ocvb.result2
@@ -320,8 +314,7 @@ Public Class IMU_HostFrameTimes : Implements IDisposable
 
         sliders.setupTrackBar1(ocvb, "Minimum Host interrupt delay (ms)", 1, 10, 4)
         sliders.setupTrackBar2(ocvb, "Number of Plot Values", 5, 30, 25)
-        If ocvb.parms.ShowOptions Then sliders.Show()
-
+        
         ocvb.label2 = "IMU FT (blue) CPU FT (green) Latency est. (red)"
         ocvb.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
@@ -382,7 +375,7 @@ Public Class IMU_HostFrameTimes : Implements IDisposable
             End If
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         plot.Dispose()
     End Sub
 End Class
@@ -390,15 +383,15 @@ End Class
 
 
 
-Public Class IMU_TotalDelay : Implements IDisposable
+Public Class IMU_TotalDelay
+    Inherits VB_Class
     Dim host As IMU_HostFrameTimes
     Dim imu As IMU_FrameTime
     Dim plot As Plot_OverTime
     Dim kalman As Kalman_Single
     Dim externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         ocvb.parms.ShowOptions = False
 
         host = New IMU_HostFrameTimes(ocvb, "IMU_TotalDelay")
@@ -465,7 +458,7 @@ Public Class IMU_TotalDelay : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType(allText, 10, 180))
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         host.Dispose()
         kalman.Dispose()
         imu.Dispose()
@@ -477,7 +470,8 @@ End Class
 
 
 
-Public Class IMU_GravityVec : Implements IDisposable
+Public Class IMU_GravityVec
+    Inherits VB_Class
     Dim kalman As Kalman_Basics
     Public angleX As Single ' in radians.
     Public angleY As Single ' in radians.
@@ -485,8 +479,7 @@ Public Class IMU_GravityVec : Implements IDisposable
     Public result As Integer = RESULT1 ' should be result1 or result2
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+                If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         kalman = New Kalman_Basics(ocvb, "IMU_GravityVec")
         ReDim kalman.src(6 - 1)
         kalman.externalUse = True
@@ -532,7 +525,7 @@ Public Class IMU_GravityVec : Implements IDisposable
             ocvb.putText(New ActiveClass.TrueType(valstr, 10, 200, result))
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         kalman.Dispose()
     End Sub
 End Class

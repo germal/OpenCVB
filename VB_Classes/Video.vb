@@ -1,15 +1,13 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.IO
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Public Class Video_Basics : Implements IDisposable
-    Public videoOptions As New OptionsVideoName
+Public Class Video_Basics
+    Inherits VB_Class
     Public srcVideo As String
     Dim currVideo As String
     Public image As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
-        If ocvb.parms.ShowOptions Then videoOptions.Show()
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         If srcVideo = "" Then srcVideo = ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4" ' default video...
         currVideo = srcVideo
         videoOptions.NewVideo(ocvb, srcVideo)
@@ -25,8 +23,7 @@ Public Class Video_Basics : Implements IDisposable
         image = videoOptions.nextImage
         If image.Empty() = False Then ocvb.result1 = image.Resize(ocvb.color.Size())
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        videoOptions.Dispose()
+    Public Sub VBdispose()
     End Sub
 End Class
 
@@ -34,13 +31,13 @@ End Class
 
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Public Class Video_CarCounting : Implements IDisposable
+Public Class Video_CarCounting
+    Inherits VB_Class
     Dim flow As Font_FlowText
     Dim video As Video_Basics
     Dim mog As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         mog = New BGSubtract_MOG(ocvb, "Video_CarCounting")
         mog.externalUse = True
 
@@ -87,7 +84,7 @@ Public Class Video_CarCounting : Implements IDisposable
             cv.Cv2.BitwiseOr(ocvb.result1, tmp, ocvb.result1)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         video.Dispose()
         mog.Dispose()
         flow.Dispose()
@@ -98,14 +95,14 @@ End Class
 
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Public Class Video_CarCComp : Implements IDisposable
+Public Class Video_CarCComp
+    Inherits VB_Class
     Dim cc As CComp_Basics
     Dim flow As Font_FlowText
     Dim video As Video_Basics
     Dim mog As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         mog = New BGSubtract_MOG(ocvb, "Video_CarCComp")
         mog.externalUse = True
 
@@ -130,7 +127,7 @@ Public Class Video_CarCComp : Implements IDisposable
             cc.Run(ocvb)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         cc.Dispose()
         video.Dispose()
         mog.Dispose()
@@ -142,14 +139,14 @@ End Class
 
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Public Class Video_MinRect : Implements IDisposable
+Public Class Video_MinRect
+    Inherits VB_Class
     Public video As Video_Basics
     Public mog As BGSubtract_MOG
     Public externalUse As Boolean
     Public contours As cv.Point()()
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         video = New Video_Basics(ocvb, "Video_MinRect")
         video.srcVideo = ocvb.parms.HomeDir + "Data/CarsDrivingUnderBridge.mp4"
         video.Run(ocvb)
@@ -175,7 +172,7 @@ Public Class Video_MinRect : Implements IDisposable
             ocvb.result2 = video.image.Resize(ocvb.color.Size())
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         video.Dispose()
         mog.Dispose()
     End Sub
@@ -185,11 +182,11 @@ End Class
 
 
 
-Public Class Video_MinCircle : Implements IDisposable
+Public Class Video_MinCircle
+    Inherits VB_Class
     Dim input As Video_MinRect
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         input = New Video_MinRect(ocvb, "Video_MinCircle")
         input.externalUse = True
         ocvb.desc = "Find area of car outline - example of using MinEnclosingCircle"
@@ -206,7 +203,7 @@ Public Class Video_MinCircle : Implements IDisposable
             Next
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         input.Dispose()
     End Sub
 End Class

@@ -1,15 +1,14 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
-Public Class BGSubtract_Basics_CPP : Implements IDisposable
-    Public radio As New OptionsRadioButtons
+Public Class BGSubtract_Basics_CPP
+    Inherits VB_Class
     Dim bgfs As IntPtr
     Public currMethod As Int32 = -1
     Public src As New cv.Mat
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         radio.Setup(ocvb, 7)
         radio.check(0).Text = "GMG"
         radio.check(1).Text = "CNT - Counting"
@@ -19,7 +18,6 @@ Public Class BGSubtract_Basics_CPP : Implements IDisposable
         radio.check(5).Text = "GSOC"
         radio.check(6).Text = "LSBP"
         radio.check(4).Checked = True ' mog2 appears to be the best...
-        If ocvb.parms.ShowOptions Then radio.Show()
         ocvb.desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -48,7 +46,7 @@ Public Class BGSubtract_Basics_CPP : Implements IDisposable
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         radio.Dispose()
         BGSubtract_BGFG_Close(bgfs)
     End Sub
@@ -58,21 +56,17 @@ End Class
 
 
 
-Public Class BGSubtract_MotionDetect_MT : Implements IDisposable
-    Dim sliders As New OptionsSliders
-    Dim radio As New OptionsRadioButtons
+Public Class BGSubtract_MotionDetect_MT
+    Inherits VB_Class
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Correlation Threshold", 0, 1000, 980)
-        If ocvb.parms.ShowOptions Then sliders.Show()
         radio.Setup(ocvb, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = CStr(2 ^ i) + " threads"
         Next
         radio.check(0).Text = "1 thread"
         radio.check(5).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
         ocvb.label2 = "Only Motion Added"
         ocvb.desc = "Detect Motion for use with background subtraction"
     End Sub
@@ -110,8 +104,7 @@ Public Class BGSubtract_MotionDetect_MT : Implements IDisposable
         Next
         Task.WaitAll(taskArray)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
         radio.Dispose()
     End Sub
 End Class
@@ -119,18 +112,16 @@ End Class
 
 
 
-Public Class BGSubtract_Basics_MT : Implements IDisposable
-    Public sliders As New OptionsSliders
+Public Class BGSubtract_Basics_MT
+    Inherits VB_Class
     Public grid As Thread_Grid
     Dim accum As New cv.Mat
     Public externalUse = False
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         grid = New Thread_Grid(ocvb, "BGSubtract_Basics_MT")
 
         sliders.setupTrackBar1(ocvb, "Correlation Threshold", 0, 1000, 980)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.label2 = "Only Motion Added"
         ocvb.desc = "Detect Motion in the color image"
@@ -151,20 +142,19 @@ Public Class BGSubtract_Basics_MT : Implements IDisposable
         End Sub)
         If externalUse = False Then accum.CopyTo(ocvb.result2) ' show the accumulated result if this is not some other object using me...
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
         grid.Dispose()
     End Sub
 End Class
 
 
 
-Public Class BGSubtract_Depth_MT : Implements IDisposable
+Public Class BGSubtract_Depth_MT
+    Inherits VB_Class
     Dim shadow As Depth_Holes
     Dim bgsub As BGSubtract_Basics_MT
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         bgsub = New BGSubtract_Basics_MT(ocvb, "BGSubtract_Depth_MT")
         bgsub.externalUse = True
         shadow = New Depth_Holes(ocvb, "BGSubtract_Depth_MT")
@@ -187,7 +177,7 @@ Public Class BGSubtract_Depth_MT : Implements IDisposable
         cv.Cv2.AddWeighted(ocvb.result1, 0.75, mask, 0.25, 0, ocvb.result1)
         ocvb.result2.SetTo(0, shadowMask)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         shadow.Dispose()
         bgsub.Dispose()
     End Sub
@@ -195,17 +185,15 @@ End Class
 
 
 
-Public Class BGSubtract_MOG : Implements IDisposable
-    Public sliders As New OptionsSliders
+Public Class BGSubtract_MOG
+    Inherits VB_Class
     Public src As New cv.Mat
     Public externalUse As Boolean
     Public gray As New cv.Mat
     Dim MOG As cv.BackgroundSubtractorMOG
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "MOG Learn Rate", 0, 1000, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         MOG = cv.BackgroundSubtractorMOG.Create()
         ocvb.desc = "Subtract background using a mixture of Gaussians"
@@ -219,25 +207,22 @@ Public Class BGSubtract_MOG : Implements IDisposable
         End If
         MOG.Apply(gray, ocvb.result1, sliders.TrackBar1.Value / 1000)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
         MOG.Dispose()
     End Sub
 End Class
 
 
 
-Public Class BGSubtract_MOG2 : Implements IDisposable
-    Public sliders As New OptionsSliders
+Public Class BGSubtract_MOG2
+    Inherits VB_Class
     Public src As New cv.Mat
     Public externalUse As Boolean
     Public gray As New cv.Mat
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "MOG Learn Rate", 0, 1000, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
         ocvb.desc = "Subtract background using a mixture of Gaussians"
@@ -250,23 +235,20 @@ Public Class BGSubtract_MOG2 : Implements IDisposable
         End If
         MOG2.Apply(gray, ocvb.result1, sliders.TrackBar1.Value / 1000)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
         MOG2.Dispose()
     End Sub
 End Class
 
 
 
-Public Class BGSubtract_GMG_KNN : Implements IDisposable
-    Public sliders As New OptionsSliders
+Public Class BGSubtract_GMG_KNN
+    Inherits VB_Class
     Dim gmg As cv.BackgroundSubtractorGMG
     Dim knn As cv.BackgroundSubtractorKNN
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Learn Rate", 1, 1000, 1)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         gmg = cv.BackgroundSubtractorGMG.Create()
         knn = cv.BackgroundSubtractorKNN.Create()
@@ -286,8 +268,7 @@ Public Class BGSubtract_GMG_KNN : Implements IDisposable
         knn.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
         ocvb.result2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
         gmg.Dispose()
         knn.Dispose()
     End Sub
@@ -297,16 +278,14 @@ End Class
 
 
 
-Public Class BGSubtract_MOG_RGBDepth : Implements IDisposable
-    Public sliders As New OptionsSliders
+Public Class BGSubtract_MOG_RGBDepth
+    Inherits VB_Class
     Public gray As New cv.Mat
     Dim MOGDepth As cv.BackgroundSubtractorMOG
     Dim MOGRGB As cv.BackgroundSubtractorMOG
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "MOG Learn Rate x1000", 0, 1000, 10)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         MOGDepth = cv.BackgroundSubtractorMOG.Create()
         MOGRGB = cv.BackgroundSubtractorMOG.Create()
@@ -323,8 +302,7 @@ Public Class BGSubtract_MOG_RGBDepth : Implements IDisposable
         MOGRGB.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
         ocvb.result2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        sliders.Dispose()
+    Public Sub VBdispose()
         MOGDepth.Dispose()
         MOGRGB.Dispose()
     End Sub
@@ -332,13 +310,12 @@ End Class
 
 
 
-Public Class BGSubtract_MOG_Retina : Implements IDisposable
+Public Class BGSubtract_MOG_Retina
+    Inherits VB_Class
     Dim input As BGSubtract_MOG
     Dim retina As Retina_Basics_CPP
-    Dim sliders As New OptionsSliders
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         input = New BGSubtract_MOG(ocvb, "BGSubtract_MOG_Retina")
 
         input.externalUse = True
@@ -348,7 +325,6 @@ Public Class BGSubtract_MOG_Retina : Implements IDisposable
         retina.externalUse = True
 
         sliders.setupTrackBar1(ocvb, "Uncertainty threshold", 1, 255, 100)
-        If ocvb.parms.ShowOptions Then sliders.Show()
 
         ocvb.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
         ocvb.label1 = "MOG results of depth motion"
@@ -361,21 +337,20 @@ Public Class BGSubtract_MOG_Retina : Implements IDisposable
         input.Run(ocvb)
         cv.Cv2.Subtract(ocvb.result1, ocvb.result2, ocvb.result2)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         input.Dispose()
         retina.Dispose()
-        sliders.Dispose()
     End Sub
 End Class
 
 
 
 
-Public Class BGSubtract_DepthOrColorMotion : Implements IDisposable
+Public Class BGSubtract_DepthOrColorMotion
+    Inherits VB_Class
     Dim motion As Diff_UnstableDepthAndColor
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         motion = New Diff_UnstableDepthAndColor(ocvb, "BGSubtract_DepthOrColorMotion")
         ocvb.desc = "Detect motion with both depth and color changes"
     End Sub
@@ -386,7 +361,7 @@ Public Class BGSubtract_DepthOrColorMotion : Implements IDisposable
         ocvb.color.CopyTo(ocvb.result2, tmp)
         ocvb.label2 = "Image with motion removed"
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         motion.Dispose()
     End Sub
 End Class
@@ -412,12 +387,12 @@ End Module
 
 
 
-Public Class BGSubtract_Video : Implements IDisposable
+Public Class BGSubtract_Video
+    Inherits VB_Class
     Dim bgfg As BGSubtract_Basics_CPP
     Dim video As Video_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         bgfg = New BGSubtract_Basics_CPP(ocvb, "BGSubtract_Video")
         bgfg.externalUse = True
 
@@ -430,7 +405,7 @@ Public Class BGSubtract_Video : Implements IDisposable
         bgfg.src = video.image
         bgfg.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         bgfg.Dispose()
         video.Dispose()
     End Sub
@@ -458,18 +433,16 @@ End Module
 
 
 
-Public Class BGSubtract_Synthetic_CPP : Implements IDisposable
+Public Class BGSubtract_Synthetic_CPP
+    Inherits VB_Class
     Dim synthPtr As IntPtr
-    Dim sliders As New OptionsSliders
     Dim amplitude As Double, magnitude As Double, waveSpeed As Double, objectSpeed As Double
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         sliders.setupTrackBar1(ocvb, "Synthetic Amplitude x100", 1, 400, 200)
         sliders.setupTrackBar2(ocvb, "Synthetic Magnitude", 1, 40, 20)
         sliders.setupTrackBar3(ocvb, "Synthetic Wavespeed x100", 1, 400, 20)
         sliders.setupTrackBar4(ocvb, "Synthetic ObjectSpeed", 1, 20, 15)
-        If ocvb.parms.ShowOptions Then sliders.Show()
         ocvb.label1 = ""
         ocvb.label2 = "Synthetic background/foreground image."
         ocvb.desc = "Generate a synthetic input to background subtraction method."
@@ -503,9 +476,8 @@ Public Class BGSubtract_Synthetic_CPP : Implements IDisposable
             ocvb.result2 = New cv.Mat(ocvb.result2.Rows, ocvb.result2.Cols, cv.MatType.CV_8UC3, dstData)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         BGSubtract_Synthetic_Close(synthPtr)
-        sliders.Dispose()
     End Sub
 End Class
 
@@ -514,12 +486,12 @@ End Class
 
 
 
-Public Class BGSubtract_Synthetic : Implements IDisposable
+Public Class BGSubtract_Synthetic
+    Inherits VB_Class
     Dim bgfg As BGSubtract_Basics_CPP
     Dim synth As BGSubtract_Synthetic_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        Dim callerName = caller
-        If callerName = "" Then callerName = Me.GetType.Name Else callerName += "-->" + Me.GetType.Name
+        If caller = "" Then callerName = Me.GetType.Name Else callerName = caller + "-->" + Me.GetType.Name
         bgfg = New BGSubtract_Basics_CPP(ocvb, "BGSubtract_Synthetic")
         bgfg.externalUse = True
 
@@ -531,7 +503,7 @@ Public Class BGSubtract_Synthetic : Implements IDisposable
         bgfg.src = ocvb.result2.Clone()
         bgfg.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub VBdispose()
         bgfg.Dispose()
         synth.Dispose()
     End Sub
