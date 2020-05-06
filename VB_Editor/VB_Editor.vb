@@ -1,8 +1,14 @@
 ﻿Imports System.IO
 Imports System.Text.RegularExpressions
 Module VB_EditorMain
+    Dim changeLines As Integer
     Private Function makeChange(line As String) As String
-        line = Mid(line, 1, InStr(line, "ocvb, ") + 5) + " callerName)"
+        If line.Contains(" = New ") And line.Contains("(ocvb, """) Then
+            Console.WriteLine(line)
+            line = Mid(line, 1, InStr(line, "ocvb, ") + 5) + "callerName)"
+            Console.WriteLine("Change to: " + line)
+            changeLines += 1
+        End If
         Return line
     End Function
     Sub Main()
@@ -11,33 +17,36 @@ Module VB_EditorMain
         Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../../VB_Classes")
         Dim fileEntries As String() = Directory.GetFiles(VBcodeDir.FullName)
 
-        Dim changeLines As Integer
-        Dim changeFiles As Integer
+        Dim changeFiles As New List(Of String)
         For Each fileName In fileEntries
             Dim nextFile As New System.IO.StreamReader(fileName)
             Dim saveChangeLines = changeLines
             While nextFile.Peek() <> -1
                 Dim line As String
                 line = Trim(nextFile.ReadLine())
-                If line.Contains(" = New ") And line.Contains("(ocvb, """) Then
-                    Console.WriteLine(line)
-                    Console.WriteLine("Change to: " + makeChange(line))
-                    changeLines += 1
-                End If
+                makeChange(line)
             End While
-            If saveChangeLines <> changeLines Then changeFiles += 1
+            If saveChangeLines <> changeLines Then changeFiles.Add(fileName)
         Next
+        Console.WriteLine(CStr(changeLines) + " matching lines found in " + CStr(changeFiles.Count) + " files")
 
-        Dim response = InputBox("You must respond 'Yes' to make the changes.", "Make Changes?", "")
+        Dim response = InputBox("Respond 'Yes' to make the changes.", "Make Changes?", "")
         If response = "Yes" Then
-
+            changeLines = 0
+            For Each filename In changeFiles
+                Dim code As String = File.ReadAllText(filename)
+                Dim lines = code.Split(vbCrLf)
+                For i = 0 To lines.Count - 1
+                    lines(i) = makeChange(lines(i))
+                Next
+                Dim FileInfo As New FileInfo(filename)
+                'dim sw = New StreamWriter(FilesInfo.FullName)
+                'For i = 0 To fileNames.Count - 1
+                '    sw.WriteLine(fileNames.Item(i))
+                'Next
+                'sw.Close()
+            Next
         End If
-        'Dim FilesInfo As New FileInfo(VBcodeDir.FullName + "/../Data/FileNames.txt")
-        'dim sw = New StreamWriter(FilesInfo.FullName)
-        'For i = 0 To fileNames.Count - 1
-        '    sw.WriteLine(fileNames.Item(i))
-        'Next
-        'sw.Close()
-        Console.WriteLine(CStr(changeLines) + " matching lines found in " + CStr(changeFiles) + " files")
+
     End Sub
 End Module

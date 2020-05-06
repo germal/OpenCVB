@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Imports System.IO
 Imports System.Text
-Module Projections
+Module Project
     ' for performance we are putting this in an optimized C++ interface to the Kinect camera for convenience...
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function SimpleProjectionRun(cPtr As IntPtr, depth As IntPtr, desiredMin As Single, desiredMax As Single, rows As Integer, cols As Integer) As IntPtr
