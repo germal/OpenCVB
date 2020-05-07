@@ -1,13 +1,13 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/davemk99/Cartoonify-Image/blob/master/main.cpp
 Public Class CartoonifyImage_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Cartoon Median Blur kernel", 1, 21, 7)
-        sliders.setupTrackBar2(ocvb, callerName, "Cartoon Median Blur kernel 2", 1, 21, 3)
-        sliders.setupTrackBar3(ocvb, callerName, "Cartoon threshold", 1, 255, 80)
-        sliders.setupTrackBar4(ocvb, callerName, "Cartoon Laplacian kernel", 1, 21, 5)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Cartoon Median Blur kernel", 1, 21, 7)
+        sliders.setupTrackBar2(ocvb, caller, "Cartoon Median Blur kernel 2", 1, 21, 3)
+        sliders.setupTrackBar3(ocvb, caller, "Cartoon threshold", 1, 255, 80)
+        sliders.setupTrackBar4(ocvb, caller, "Cartoon Laplacian kernel", 1, 21, 5)
         ocvb.label1 = "Mask for Cartoon"
         ocvb.label2 = "Cartoonify Result"
         ocvb.desc = "Create a cartoon from a color image - Painterly Effect"

@@ -21,17 +21,17 @@ End Module
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class OpenCVGL_Image_CPP
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim imu As IMU_Basics
     Dim rgbData(0) As Byte
     Dim pointCloudData(0) As Byte
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        imu = New IMU_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        imu = New IMU_Basics(ocvb, caller)
         imu.externalUse = True
 
         If ocvb.parms.testAllRunning = False Then
-            setOpenGLsliders(ocvb, callerName, sliders, sliders1, sliders2, sliders3)
+            setOpenGLsliders(ocvb, caller, sliders, sliders1, sliders2, sliders3)
             sliders2.TrackBar3.Value = -10 ' eye.z
             sliders.TrackBar1.Value = 30 ' FOV
             sliders.TrackBar2.Value = 0 ' Yaw

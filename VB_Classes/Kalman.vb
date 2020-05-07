@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 'http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
 Public Class Kalman_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim kalman() As Kalman_Single
     Public src() As Single
     Public dst() As Single
@@ -10,10 +10,10 @@ Public Class Kalman_Basics
     Public MeasurementNoiseCov As Single = 0.1
     Public ErrorCovPost As Single = 1
 
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        check.Setup(ocvb, callerName, 1)
-        check.Box(0).Text = "Turn Kalman filtering on in " + callerName
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Turn Kalman filtering on in " + caller
         check.Box(0).Checked = True
 
         ocvb.desc = "Use Kalman to stabilize a set of value (such as a cv.rect.)"
@@ -40,7 +40,7 @@ Public Class Kalman_Basics
             saveDimension = src.Length
             ReDim kalman(src.Length - 1)
             For i = 0 To src.Length - 1
-                kalman(i) = New Kalman_Single(ocvb, callerName)
+                kalman(i) = New Kalman_Single(ocvb, caller)
                 kalman(i).externalUse = True
                 kalman(i).ProcessNoiseCov = ProcessNoiseCov
                 kalman(i).MeasurementNoiseCov = MeasurementNoiseCov
@@ -91,19 +91,19 @@ End Class
 
 ' http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
 Public Class Kalman_Compare
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim kalman() As Kalman_Single
     Public plot As Plot_OverTime
     Public kPlot As Plot_OverTime
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        plot = New Plot_OverTime(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        plot = New Plot_OverTime(ocvb, caller)
         plot.externalUse = True
         plot.dst = ocvb.result1
         plot.plotCount = 3
         plot.topBottomPad = 20
 
-        kPlot = New Plot_OverTime(ocvb, callerName)
+        kPlot = New Plot_OverTime(ocvb, caller)
         kPlot.externalUse = True
         kPlot.dst = ocvb.result2
         kPlot.plotCount = 3
@@ -124,7 +124,7 @@ Public Class Kalman_Compare
             End If
             ReDim kalman(3 - 1)
             For i = 0 To kalman.Count - 1
-                kalman(i) = New Kalman_Single(ocvb, callerName)
+                kalman(i) = New Kalman_Single(ocvb, caller)
                 kalman(i).externalUse = True
             Next
         End If
@@ -159,7 +159,7 @@ End Class
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/kalman.cpp
 Public Class Kalman_RotatingPoint
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim kf As New cv.KalmanFilter(2, 1, 0)
     Dim kState As New cv.Mat(2, 1, cv.MatType.CV_32F)
     Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
@@ -174,8 +174,8 @@ Public Class Kalman_RotatingPoint
         cv.Cv2.Line(dst, New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
         cv.Cv2.Line(dst, New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.label1 = "Estimate Yellow < Real Red (if working)"
 
         cv.Cv2.Randn(kState, New cv.Scalar(0), cv.Scalar.All(0.1))
@@ -225,12 +225,12 @@ End Class
 
 'http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
 Public Class Kalman_MousePredict
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim kalman As Kalman_Basics
     Dim locMultiplier = 1
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        kalman = New Kalman_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        kalman = New Kalman_Basics(ocvb, caller)
         ReDim kalman.src(1)
         ReDim kalman.dst(1)
         kalman.externalUse = True
@@ -264,17 +264,17 @@ End Class
 
 
 Public Class Kalman_CVMat
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim kalman() As Kalman_Single
     Public src As cv.Mat
     Public dst As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.label1 = "Rectangle moves smoothly to random locations"
         ocvb.desc = "Use Kalman to stabilize a set of values (such as a cv.rect.)"
     End Sub
-    Private Sub setValues(ocvb As AlgorithmData, ByVal caller As String)
+    Private Sub setValues(ocvb As AlgorithmData, ByVal callerRaw As String)
         Static autoRand As New Random()
         Dim x = autoRand.Next(50, ocvb.color.Width - 50)
         Dim y = autoRand.Next(50, ocvb.color.Height - 50)
@@ -295,7 +295,7 @@ Public Class Kalman_CVMat
             saveDimension = src.Rows
             ReDim kalman(src.Rows - 1)
             For i = 0 To src.Rows - 1
-                kalman(i) = New Kalman_Single(ocvb, callerName)
+                kalman(i) = New Kalman_Single(ocvb, caller)
                 kalman(i).externalUse = True
             Next
             dst = New cv.Mat(src.Rows, 1, cv.MatType.CV_32F, 0)
@@ -342,15 +342,15 @@ End Class
 
 
 Public Class Kalman_ImageSmall
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim kalman As Kalman_CVMat
     Dim resize As Resize_Percentage
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        kalman = New Kalman_CVMat(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        kalman = New Kalman_CVMat(ocvb, caller)
         kalman.externalUse = True
 
-        resize = New Resize_Percentage(ocvb, callerName)
+        resize = New Resize_Percentage(ocvb, caller)
         resize.externalUse = True
 
         ocvb.label1 = "The small image is processed by the Kalman filter"
@@ -386,15 +386,15 @@ End Class
 
 
 Public Class Kalman_DepthSmall
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim kalman As Kalman_CVMat
     Dim resize As Resize_Percentage
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        kalman = New Kalman_CVMat(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        kalman = New Kalman_CVMat(ocvb, caller)
         kalman.externalUse = True
 
-        resize = New Resize_Percentage(ocvb, callerName)
+        resize = New Resize_Percentage(ocvb, caller)
         resize.externalUse = True
         resize.sliders.TrackBar1.Value = 4
 
@@ -432,7 +432,7 @@ End Class
 
 
 Public Class Kalman_Single
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim plot As Plot_OverTime
     Dim kf As New cv.KalmanFilter(2, 1, 0)
     Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
@@ -445,8 +445,8 @@ Public Class Kalman_Single
     Public ErrorCovPost As Single = 1
     Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
     Public newTransmissionMatrix As Boolean = True
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         Dim tMatrix() As Single = {1, 1, 0, 1}
         kf.TransitionMatrix = New cv.Mat(2, 2, cv.MatType.CV_32F, tMatrix)
         kf.MeasurementMatrix.SetIdentity(1)
@@ -459,7 +459,7 @@ Public Class Kalman_Single
     Public Sub Run(ocvb As AlgorithmData)
         If externalUse = False Then
             If ocvb.frameCount = 0 Then
-                plot = New Plot_OverTime(ocvb, callerName)
+                plot = New Plot_OverTime(ocvb, caller)
                 plot.externalUse = True
                 plot.dst = ocvb.result2
                 plot.maxScale = 150

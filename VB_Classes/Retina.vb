@@ -16,16 +16,16 @@ End Module
 
 'https://docs.opencv.org/3.4/d3/d86/tutorial_bioinspired_retina_model.html
 Public Class Retina_Basics_CPP
-    Inherits VB_Class
+    Inherits ocvbClass
             Dim Retina As IntPtr
     Dim startInfo As New ProcessStartInfo
     Public src As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Retina Sample Factor", 1, 10, 2)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Retina Sample Factor", 1, 10, 2)
 
-        check.Setup(ocvb, callerName,  2)
+        check.Setup(ocvb, caller,  2)
         check.Box(0).Text = "Use log sampling"
         check.Box(1).Text = "Open resulting xml file"
                 ocvb.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
@@ -86,11 +86,11 @@ End Class
 
 
 Public Class Retina_Depth
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim retina As Retina_Basics_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        retina = New Retina_Basics_CPP(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        retina = New Retina_Basics_CPP(ocvb, caller)
         retina.externalUse = True
 
         ocvb.desc = "Use the bio-inspired retina algorithm with the depth data."

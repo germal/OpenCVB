@@ -46,7 +46,7 @@ Module VB_Classes
 End Module
 
 Public Class ActiveClass
-    Inherits VB_Class
+    Inherits ocvbClass
     Public ocvb As AlgorithmData
     Public Const _RESULT1 = RESULT1
     Public Const _RESULT2 = RESULT2

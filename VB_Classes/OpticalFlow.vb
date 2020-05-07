@@ -62,7 +62,7 @@ End Module
 
 
 Public Class OpticalFlow_DenseOptions
-    Inherits VB_Class
+    Inherits ocvbClass
 
     Public pyrScale As Single
     Public levels As Int32
@@ -72,9 +72,9 @@ Public Class OpticalFlow_DenseOptions
     Public polySigma As Single
     Public OpticalFlowFlags As cv.OpticalFlowFlags
     Public outputScaling As Int32
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        radio.Setup(ocvb, callerName, 5)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        radio.Setup(ocvb, caller, 5)
         radio.check(0).Text = "FarnebackGaussian"
         radio.check(1).Text = "LkGetMinEigenvals"
         radio.check(2).Text = "None"
@@ -82,14 +82,14 @@ Public Class OpticalFlow_DenseOptions
         radio.check(4).Text = "PyrBReady"
         radio.check(0).Checked = True
 
-        sliders2.setupTrackBar1(ocvb, callerName, "Optical Flow PolyN", 1, 15, 5)
-        sliders2.setupTrackBar2(ocvb, callerName, "Optical Flow Scaling Output", 1, 100, 50)
+        sliders2.setupTrackBar1(ocvb, caller, "Optical Flow PolyN", 1, 15, 5)
+        sliders2.setupTrackBar2(ocvb, caller, "Optical Flow Scaling Output", 1, 100, 50)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
-        sliders.setupTrackBar1(ocvb, callerName, "Optical Flow pyrScale", 1, 100, 4)
-        sliders.setupTrackBar2(ocvb, callerName, "Optical Flow Levels", 1, 10, 1)
-        sliders.setupTrackBar3(ocvb, callerName, "Optical Flow winSize", 1, 9, 1)
-        sliders.setupTrackBar4(ocvb, callerName, "Optical Flow Iterations", 1, 10, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Optical Flow pyrScale", 1, 100, 4)
+        sliders.setupTrackBar2(ocvb, caller, "Optical Flow Levels", 1, 10, 1)
+        sliders.setupTrackBar3(ocvb, caller, "Optical Flow winSize", 1, 9, 1)
+        sliders.setupTrackBar4(ocvb, caller, "Optical Flow Iterations", 1, 10, 1)
 
         ocvb.desc = "Use dense optical flow algorithm options"
     End Sub
@@ -119,12 +119,12 @@ End Class
 
 
 Public Class OpticalFlow_DenseBasics
-    Inherits VB_Class
+    Inherits ocvbClass
 
     Dim flow As OpticalFlow_DenseOptions
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        flow = New OpticalFlow_DenseOptions(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        flow = New OpticalFlow_DenseOptions(ocvb, caller)
         ocvb.desc = "Use dense optical flow algorithm  "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -151,23 +151,23 @@ End Class
 
 
 Public Class OpticalFlow_DenseBasics_MT
-    Inherits VB_Class
+    Inherits ocvbClass
 
     Public grid As Thread_Grid
     Dim accum As New cv.Mat
     Dim flow As OpticalFlow_DenseOptions
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        grid = New Thread_Grid(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        grid = New Thread_Grid(ocvb, caller)
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
         grid.sliders.TrackBar3.Value = 0
 
-        flow = New OpticalFlow_DenseOptions(ocvb, callerName)
+        flow = New OpticalFlow_DenseOptions(ocvb, caller)
         flow.sliders.TrackBar1.Value = 75
 
-        sliders.setupTrackBar1(ocvb, callerName, "Correlation Threshold", 0, 1000, 1000)
+        sliders.setupTrackBar1(ocvb, caller, "Correlation Threshold", 0, 1000, 1000)
 
         ocvb.desc = "MultiThread dense optical flow algorithm  "
     End Sub
@@ -216,7 +216,7 @@ End Class
 
 
 Public Class OpticalFlow_Sparse
-    Inherits VB_Class
+    Inherits ocvbClass
 
     Public features As New List(Of cv.Point2f)
     Public externalUse As Boolean
@@ -225,15 +225,15 @@ Public Class OpticalFlow_Sparse
     Dim lastFrame As cv.Mat
     Dim sumScale As cv.Mat, sScale As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        good = New Features_GoodFeatures(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        good = New Features_GoodFeatures(ocvb, caller)
         good.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, callerName, "OpticalFlow window", 1, 20, 3)
-        sliders.setupTrackBar2(ocvb, callerName, "OpticalFlow Max Pixels Distance", 1, 100, 30)
+        sliders.setupTrackBar1(ocvb, caller, "OpticalFlow window", 1, 20, 3)
+        sliders.setupTrackBar2(ocvb, caller, "OpticalFlow Max Pixels Distance", 1, 100, 30)
 
-        radio.Setup(ocvb, callerName,6)
+        radio.Setup(ocvb, caller,6)
         radio.check(0).Text = "FarnebackGaussian"
         radio.check(1).Text = "LkGetMinEigenvals"
         radio.check(2).Text = "None"

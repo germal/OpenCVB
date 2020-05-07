@@ -1,11 +1,11 @@
 Imports cv = OpenCvSharp
 Public Class Math_Subtract
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Red", 0, 255, 255)
-        sliders.setupTrackBar2(ocvb, callerName, "Green", 0, 255, 255)
-        sliders.setupTrackBar3(ocvb, callerName, "Blue", 0, 255, 255)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Red", 0, 255, 255)
+        sliders.setupTrackBar2(ocvb, caller, "Green", 0, 255, 255)
+        sliders.setupTrackBar3(ocvb, caller, "Blue", 0, 255, 255)
         ocvb.desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -44,7 +44,7 @@ End Module
 
 
 Public Class Math_Median_CDF
-    Inherits VB_Class
+    Inherits ocvbClass
     Public src As cv.Mat
     Dim dst As cv.Mat
     Public medianVal As Double
@@ -52,9 +52,9 @@ Public Class Math_Median_CDF
     Public rangeMax As Integer = 255
     Public externalUse As Boolean
     Public bins As Int32 = 10
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Histogram Bins", 4, 1000, 100)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 4, 1000, 100)
         ocvb.desc = "Compute the src image median"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -85,11 +85,11 @@ End Class
 
 
 Public Class Math_DepthMeanStdev
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim minMax As Depth_Stable
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        minMax = New Depth_Stable(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        minMax = New Depth_Stable(ocvb, caller)
         ocvb.desc = "This algorithm shows that just using the max depth at each pixel does not improve depth!  Mean and stdev don't change."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -112,16 +112,16 @@ End Class
 
 
 Public Class Math_RGBCorrelation
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim flow As Font_FlowText
     Dim corr As MatchTemplate_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        flow = New Font_FlowText(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        flow = New Font_FlowText(ocvb, caller)
         flow.externalUse = True
         flow.result1or2 = RESULT2
 
-        corr = New MatchTemplate_Basics(ocvb, callerName)
+        corr = New MatchTemplate_Basics(ocvb, caller)
         corr.externalUse = True
         corr.reportFreq = 1
 

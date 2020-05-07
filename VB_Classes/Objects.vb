@@ -1,15 +1,15 @@
 Imports cv = OpenCvSharp
 Public Class Object_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim trim As Depth_InRange
     Dim ccomp As CComp_EdgeMask
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        trim = New Depth_InRange(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        trim = New Depth_InRange(ocvb, caller)
         trim.externalUse = True
 
-        ccomp = New CComp_EdgeMask(ocvb, callerName)
+        ccomp = New CComp_EdgeMask(ocvb, caller)
         ccomp.externalUse = True
 
         ocvb.desc = "Identify objects in the foreground."

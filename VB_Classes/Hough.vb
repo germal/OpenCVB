@@ -39,12 +39,12 @@ End Module
 
 ' https://docs.opencv.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 Public Class Hough_Circles
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim circles As Draw_Circles
     Public updateFrequency = 30
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        circles = New Draw_Circles(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        circles = New Draw_Circles(ocvb, caller)
         circles.sliders.TrackBar1.Value = 3
         ocvb.desc = "Find circles using HoughCircles."
         ocvb.label1 = "Input circles to Hough"
@@ -72,20 +72,20 @@ End Class
 ' https://docs.opencv.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HoughLinesSample.vb
 Public Class Hough_Lines
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim edges As Edges_Canny
         Public segments() As cv.LineSegmentPolar
     Public externalUse As Boolean
     Public src As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        edges = New Edges_Canny(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        edges = New Edges_Canny(ocvb, caller)
         edges.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, callerName, "rho", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, callerName, "theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3(ocvb, callerName,"threshold", 1, 100, 50)
-        sliders.setupTrackBar4(ocvb, callerName,  "Lines to Plot", 1, 1000, 50)
+        sliders.setupTrackBar1(ocvb, caller, "rho", 1, 100, 1)
+        sliders.setupTrackBar2(ocvb, caller, "theta", 1, 1000, 1000 * Math.PI / 180)
+        sliders.setupTrackBar3(ocvb, caller,"threshold", 1, 100, 50)
+        sliders.setupTrackBar4(ocvb, caller,  "Lines to Plot", 1, 1000, 50)
                 ocvb.desc = "Use Houghlines to find lines in the image."
     End Sub
 
@@ -126,19 +126,19 @@ End Class
 
 
 Public Class Hough_Lines_MT
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim edges As Edges_Canny
     Public grid As Thread_Grid
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "rho", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, callerName, "theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3(ocvb, callerName,"threshold", 1, 100, 3)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "rho", 1, 100, 1)
+        sliders.setupTrackBar2(ocvb, caller, "theta", 1, 1000, 1000 * Math.PI / 180)
+        sliders.setupTrackBar3(ocvb, caller,"threshold", 1, 100, 3)
 
-        edges = New Edges_Canny(ocvb, callerName)
+        edges = New Edges_Canny(ocvb, caller)
         edges.externalUse = True
 
-        grid = New Thread_Grid(ocvb, callerName)
+        grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
         grid.externalUse = True ' we don't need any results.

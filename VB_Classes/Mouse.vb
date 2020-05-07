@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Mouse_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Test the mousePoint interface"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -24,14 +24,14 @@ End Class
 
 
 Public Class Mouse_LeftClick
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Demonstrate what the left-click enables"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.putText(New ActiveClass.TrueType("Left-click and drag to select a region in any of the images." + vbCrLf +
-                                              "The selected area is presented to VB_Class in ocvb.drawRect." + vbCrLf +
+                                              "The selected area is presented to ocvbClass in ocvb.drawRect." + vbCrLf +
                                               "In this example, the selected region from the RGB image will be resized to fit in the Result2 image to the right." + vbCrLf +
                                               "Double-click an image to remove the selected region.", 10, 50))
 
@@ -46,9 +46,9 @@ End Class
 
 
 Public Class Mouse_RightClick
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Demonstrate what the right-click enables"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -5,7 +5,7 @@ Imports System.IO.Pipes
 Imports System.IO
 
 Public Class VTK_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim pipeName As String ' this is name of pipe to the VTK task.  It is dynamic and increments.
     Dim startInfo As New ProcessStartInfo
     Dim hglobal As IntPtr
@@ -30,8 +30,8 @@ Public Class VTK_Basics
     Public zFar As Single = 10.0
     Public vtkTitle As String = "VTK_Data"
     Public vtkPresent As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
         If ocvb.parms.vtkDirectory.Length > 0 Then vtkPresent = True
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
         If fileinfo.Exists = False Then vtkPresent = False
@@ -123,25 +123,25 @@ End Class
 
 
 Public Class VTK_Histogram3D
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim vtk As VTK_Basics
     Dim mats As Mat_4to1
     Dim random As Random_NormalDist
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Random Number Stdev", 0, 255, 10)
-        sliders.setupTrackBar2(ocvb, callerName, "Hist 3D bins", 1, 100, 32)
-        sliders.setupTrackBar3(ocvb, callerName,"Hist 3D bin Threshold X1000000", 10, 100, 20)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Random Number Stdev", 0, 255, 10)
+        sliders.setupTrackBar2(ocvb, caller, "Hist 3D bins", 1, 100, 32)
+        sliders.setupTrackBar3(ocvb, caller,"Hist 3D bin Threshold X1000000", 10, 100, 20)
 
-        mats = New Mat_4to1(ocvb, callerName)
+        mats = New Mat_4to1(ocvb, caller)
         mats.externalUse = True
 
         ocvb.label2 = "Input to VTK plot"
 
-        vtk = New VTK_Basics(ocvb, callerName)
+        vtk = New VTK_Basics(ocvb, caller)
         vtk.usingDepthAndRGB = False
 
-        random = New Random_NormalDist(ocvb, callerName)
+        random = New Random_NormalDist(ocvb, caller)
         random.externalUse = True
         ocvb.desc = "Create the test pattern and send it to VTK for 3D display."
     End Sub

@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Public Class Smoothing_Exterior
-    Inherits VB_Class
+    Inherits ocvbClass
 		Dim hull As Hull_Basics
 	Private Function getSplineInterpolationCatmullRom(points As List(Of cv.Point), nrOfInterpolatedPoints As Integer) As List(Of cv.Point)
 		Dim spline As New List(Of cv.Point)
@@ -38,13 +38,13 @@ Public Class Smoothing_Exterior
 		spline.Add(spoints(spoints.Count - 2))
 		Return spline
 	End Function
-	Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-				setCaller(caller)
-		hull = New Hull_Basics(ocvb, callerName)
+	Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+				setCaller(callerRaw)
+		hull = New Hull_Basics(ocvb, caller)
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.externalUse = True
 
-		sliders.setupTrackBar1(ocvb, callerName, "Smoothing iterations", 1, 20, 10)
+		sliders.setupTrackBar1(ocvb, caller, "Smoothing iterations", 1, 20, 10)
 		
 		ocvb.label1 = "Original Points (white) Smoothed (yellow)"
 		ocvb.label2 = ""
@@ -73,7 +73,7 @@ End Class
 
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Public Class Smoothing_Interior
-    Inherits VB_Class
+    Inherits ocvbClass
 		Dim hull As Hull_Basics
 	Private Function getCurveSmoothingChaikin(points As List(Of cv.Point), tension As Double, nrOfIterations As Integer) As List(Of cv.Point2d)
 		'the tension factor defines a scale between corner cutting distance in segment half length, i.e. between 0.05 and 0.45
@@ -113,15 +113,15 @@ Public Class Smoothing_Interior
 		Return nl
 	End Function
 
-	Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-				setCaller(caller)
-		hull = New Hull_Basics(ocvb, callerName)
+	Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+				setCaller(callerRaw)
+		hull = New Hull_Basics(ocvb, caller)
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.externalUse = True
 		hull.sliders.TrackBar1.Value = 16
 
-		sliders.setupTrackBar1(ocvb, callerName, "Smoothing iterations", 1, 20, 1)
-		sliders.setupTrackBar2(ocvb, callerName, "Smoothing tension X100", 1, 100, 50)
+		sliders.setupTrackBar1(ocvb, caller, "Smoothing iterations", 1, 20, 1)
+		sliders.setupTrackBar2(ocvb, caller, "Smoothing tension X100", 1, 100, 50)
 		
 		ocvb.label1 = "Original Points (white) Smoothed (yellow)"
 		ocvb.label2 = ""

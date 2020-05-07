@@ -4,7 +4,7 @@ Module VB_EditorMain
     Private Function makeChange(line As String) As String
         If line.Contains(" = New ") And line.Contains("(ocvb, """) Then
             Console.WriteLine(line)
-            line = Mid(line, 1, InStr(line, "ocvb, ") + 5) + "callerName)"
+            line = Mid(line, 1, InStr(line, "ocvb, ") + 5) + "caller)"
             Console.WriteLine("Change to: " + line)
             changeLines += 1
         End If

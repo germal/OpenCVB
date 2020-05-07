@@ -1,15 +1,15 @@
 Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/stereo_match.cpp
 Public Class BlockMatching_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim colorizer As Depth_Colorizer_CPP
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        colorizer = New Depth_Colorizer_CPP(ocvb, caller)
 
-        sliders.setupTrackBar1(ocvb, callerName, "Blockmatch scale", 1, 200, 100)
-        sliders.setupTrackBar2(ocvb, callerName, "Blockmatch max disparity", 1, 8, 1)
-        sliders.setupTrackBar3(ocvb, callerName,"Blockmatch block size", 5, 255, 15)
+        sliders.setupTrackBar1(ocvb, caller, "Blockmatch scale", 1, 200, 100)
+        sliders.setupTrackBar2(ocvb, caller, "Blockmatch max disparity", 1, 8, 1)
+        sliders.setupTrackBar3(ocvb, caller,"Blockmatch block size", 5, 255, 15)
                 ocvb.desc = "Use OpenCV's block matching on left and right views."
         ocvb.label1 = "Block matching disparity colorized like depth"
         ocvb.label2 = "Right Image (used with left image)"

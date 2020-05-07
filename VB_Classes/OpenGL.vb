@@ -4,7 +4,7 @@ Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 
 Public Class OpenGL_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim pipeName As String ' this is name of pipe to the OpenGL task.  It is dynamic and increments.
     Dim pipe As NamedPipeServerStream
@@ -33,9 +33,9 @@ Public Class OpenGL_Basics
     Public imu As IMU_GravityVec
     Public pointCloudInput As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        imu = New IMU_GravityVec(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        imu = New IMU_GravityVec(ocvb, caller)
         ' Dispose() ' make sure there wasn't an old OpenGLWindow sitting around...
         ocvb.desc = "Create an OpenGL window and update it with images"
     End Sub
@@ -142,29 +142,29 @@ End Class
 
 
 Module OpenGL_Sliders_Module
-    Public Sub setOpenGLsliders(ocvb As AlgorithmData, callerName As String, sliders As OptionsSliders, sliders1 As OptionsSliders, sliders2 As OptionsSliders, sliders3 As OptionsSliders)
-        sliders1.setupTrackBar1(ocvb, callerName, "OpenGL zNear", 0, 100, 0)
-        sliders1.setupTrackBar2(ocvb, callerName, "OpenGL zFar", -50, 200, 20)
-        sliders1.setupTrackBar3(ocvb, callerName, "OpenGL Point Size", 1, 20, 2)
-        sliders1.setupTrackBar4(ocvb, callerName, "zTrans", -1000, 1000, 50)
+    Public Sub setOpenGLsliders(ocvb As AlgorithmData, caller As String, sliders As OptionsSliders, sliders1 As OptionsSliders, sliders2 As OptionsSliders, sliders3 As OptionsSliders)
+        sliders1.setupTrackBar1(ocvb, caller, "OpenGL zNear", 0, 100, 0)
+        sliders1.setupTrackBar2(ocvb, caller, "OpenGL zFar", -50, 200, 20)
+        sliders1.setupTrackBar3(ocvb, caller, "OpenGL Point Size", 1, 20, 2)
+        sliders1.setupTrackBar4(ocvb, caller, "zTrans", -1000, 1000, 50)
         If ocvb.parms.ShowOptions Then sliders1.Show()
 
-        sliders2.setupTrackBar1(ocvb, callerName, "OpenGL Eye X", -180, 180, 0)
-        sliders2.setupTrackBar2(ocvb, callerName, "OpenGL Eye Y", -180, 180, 0)
-        sliders2.setupTrackBar3(ocvb, callerName, "OpenGL Eye Z", -180, 180, -40)
+        sliders2.setupTrackBar1(ocvb, caller, "OpenGL Eye X", -180, 180, 0)
+        sliders2.setupTrackBar2(ocvb, caller, "OpenGL Eye Y", -180, 180, 0)
+        sliders2.setupTrackBar3(ocvb, caller, "OpenGL Eye Z", -180, 180, -40)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
-        sliders3.setupTrackBar1(ocvb, callerName, "OpenGL Scale X", 1, 100, 10)
-        sliders3.setupTrackBar2(ocvb, callerName, "OpenGL Scale Y", 1, 100, 10)
-        sliders3.setupTrackBar3(ocvb, callerName, "OpenGL Scale Z", 1, 100, 1)
+        sliders3.setupTrackBar1(ocvb, caller, "OpenGL Scale X", 1, 100, 10)
+        sliders3.setupTrackBar2(ocvb, caller, "OpenGL Scale Y", 1, 100, 10)
+        sliders3.setupTrackBar3(ocvb, caller, "OpenGL Scale Z", 1, 100, 1)
         If ocvb.parms.ShowOptions Then sliders3.Show()
 
         ' this is last so it shows up on top of all the others.
-        sliders.setupTrackBar1(ocvb, callerName, "OpenGL FOV", 1, 180, 150)
+        sliders.setupTrackBar1(ocvb, caller, "OpenGL FOV", 1, 180, 150)
         If ocvb.parms.cameraIndex = D400Cam Then sliders.TrackBar1.Value = 135
-        sliders.setupTrackBar2(ocvb, callerName, "OpenGL yaw (degrees)", -180, 180, -3)
-        sliders.setupTrackBar3(ocvb, callerName, "OpenGL pitch (degrees)", -180, 180, 3)
-        sliders.setupTrackBar4(ocvb, callerName, "OpenGL roll (degrees)", -180, 180, 0)
+        sliders.setupTrackBar2(ocvb, caller, "OpenGL yaw (degrees)", -180, 180, -3)
+        sliders.setupTrackBar3(ocvb, caller, "OpenGL pitch (degrees)", -180, 180, 3)
+        sliders.setupTrackBar4(ocvb, caller, "OpenGL roll (degrees)", -180, 180, 0)
     End Sub
 End Module
 
@@ -172,12 +172,12 @@ End Module
 
 
 Public Class OpenGL_Options
-    Inherits VB_Class
+    Inherits ocvbClass
     Public OpenGL As OpenGL_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        OpenGL = New OpenGL_Basics(ocvb, callerName)
-        setOpenGLsliders(ocvb, callerName, sliders, sliders1, sliders2, sliders3)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        OpenGL = New OpenGL_Basics(ocvb, caller)
+        setOpenGLsliders(ocvb, caller, sliders, sliders1, sliders2, sliders3)
         ocvb.desc = "Adjust point size and FOV in OpenGL"
         ocvb.label1 = ""
     End Sub
@@ -211,11 +211,11 @@ End Class
 
 
 Public Class OpenGL_Callbacks
-    Inherits VB_Class
+    Inherits ocvbClass
     Public ogl As OpenGL_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        ogl = New OpenGL_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        ogl = New OpenGL_Basics(ocvb, caller)
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         ocvb.desc = "Show the point cloud of 3D data and use callbacks to modify view."
     End Sub
@@ -233,12 +233,12 @@ End Class
 
 'https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
 Public Class OpenGL_IMU
-    Inherits VB_Class
+    Inherits ocvbClass
     Public ogl As OpenGL_Options
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.parms.ShowOptions = False
-        ogl = New OpenGL_Options(ocvb, callerName)
+        ogl = New OpenGL_Options(ocvb, caller)
         ogl.OpenGL.OpenGLTitle = "OpenGL_IMU"
         ogl.sliders.TrackBar2.Value = 0 ' pitch
         ogl.sliders.TrackBar3.Value = 0 ' yaw
@@ -273,23 +273,23 @@ End Module
 
 ' https://docs.opencv.org/3.4/d1/d1d/tutorial_histo3D.html
 Public Class OpenGL_3Ddata
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim colors As Palette_Gradient
     Public ogl As OpenGL_Options
     Dim histInput() As Byte
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
 
-        ogl = New OpenGL_Options(ocvb, callerName)
+        ogl = New OpenGL_Options(ocvb, caller)
         ogl.OpenGL.OpenGLTitle = "OpenGL_3Ddata"
         ogl.sliders.TrackBar2.Value = -10
         ogl.sliders1.TrackBar3.Value = 5
         ogl.sliders.TrackBar3.Value = 10
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud when displaying data.
 
-        colors = New Palette_Gradient(ocvb, callerName)
+        colors = New Palette_Gradient(ocvb, caller)
         colors.externalUse = True
         colors.color1 = cv.Scalar.Yellow
         colors.color2 = cv.Scalar.Blue
@@ -325,15 +325,15 @@ End Class
 
 
 Public Class OpenGL_Draw3D
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim circle As Draw_Circles
     Public ogl As OpenGL_Options
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        circle = New Draw_Circles(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        circle = New Draw_Circles(ocvb, caller)
         circle.sliders.TrackBar1.Value = 5
 
-        ogl = New OpenGL_Options(ocvb, callerName)
+        ogl = New OpenGL_Options(ocvb, caller)
         ogl.OpenGL.OpenGLTitle = "OpenGL_3DShapes"
         ogl.sliders.TrackBar1.Value = 80
         ogl.sliders2.TrackBar1.Value = -140
@@ -362,15 +362,15 @@ End Class
 
 
 Public Class OpenGL_Voxels
-    Inherits VB_Class
+    Inherits ocvbClass
     Public voxels As Voxels_Basics_MT
     Public ogl As OpenGL_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        voxels = New Voxels_Basics_MT(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        voxels = New Voxels_Basics_MT(ocvb, caller)
         voxels.check.Box(0).Checked = False
 
-        ogl = New OpenGL_Basics(ocvb, callerName)
+        ogl = New OpenGL_Basics(ocvb, caller)
         ogl.OpenGLTitle = "OpenGL_Voxels"
         ocvb.desc = "Show the voxel representation in OpenGL"
     End Sub
@@ -395,13 +395,13 @@ End Class
 ' https://open.gl/transformations
 ' https://www.codeproject.com/Articles/1247960/Learning-Basic-Math-Used-In-3D-Graphics-Engines
 Public Class OpenGL_GravityTransform
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim imu As IMU_GravityVec
     Public ogl As OpenGL_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        imu = New IMU_GravityVec(ocvb, callerName)
-        ogl = New OpenGL_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        imu = New IMU_GravityVec(ocvb, caller)
+        ogl = New OpenGL_Basics(ocvb, caller)
         ogl.externalUse = True
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"

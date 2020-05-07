@@ -1,19 +1,19 @@
 Imports cv = OpenCvSharp
 
 Public Class Distance_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim foreground As kMeans_Depth_FG_BG
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        radio.Setup(ocvb, callerName,3)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        radio.Setup(ocvb, caller,3)
         radio.check(0).Text = "C"
         radio.check(1).Text = "L1"
         radio.check(2).Text = "L2"
         radio.check(2).Checked = True
 
-        sliders.setupTrackBar1(ocvb, callerName, "kernel size", 1, 5, 3)
+        sliders.setupTrackBar1(ocvb, caller, "kernel size", 1, 5, 3)
 
-        foreground = New kMeans_Depth_FG_BG(ocvb, callerName)
+        foreground = New kMeans_Depth_FG_BG(ocvb, caller)
         ocvb.desc = "Distance algorithm basics."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
 Public Class GameOfLife_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim random As Random_Points
     Dim grid As cv.Mat
     Dim nextgrid As cv.Mat
@@ -27,12 +27,12 @@ Public Class GameOfLife_Basics
         End If
         Return CountNeighbors
     End Function
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
         grid = New cv.Mat(ocvb.color.Height / factor, ocvb.color.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
 
-        random = New Random_Points(ocvb, callerName)
+        random = New Random_Points(ocvb, caller)
         random.externalUse = True
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
         random.sliders.TrackBar1.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
@@ -100,14 +100,14 @@ End Class
 
 
 Public Class GameOfLife_Population
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim plot As Plot_OverTime
     Dim game As GameOfLife_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        game = New GameOfLife_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        game = New GameOfLife_Basics(ocvb, caller)
 
-        plot = New Plot_OverTime(ocvb, callerName)
+        plot = New Plot_OverTime(ocvb, caller)
         plot.externalUse = True
         plot.dst = ocvb.result2
         plot.maxScale = 2000

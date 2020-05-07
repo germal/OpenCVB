@@ -4,13 +4,13 @@ Imports System.Runtime.InteropServices
 ' https://github.com/ycui11/-Colorizing-Prokudin-Gorskii-images-of-the-Russian-Empire
 ' https://github.com/petraohlin/Colorizing-the-Prokudin-Gorskii-Collection
 Public Class WarpModel_Input
-    Inherits VB_Class
+    Inherits ocvbClass
         Public rgb(3 - 1) As cv.Mat
     Public gradient(3 - 1) As cv.Mat
     Dim sobel As Edges_Sobel
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        radio.Setup(ocvb, callerName,12)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        radio.Setup(ocvb, caller,12)
         radio.check(0).Text = "building.jpg"
         radio.check(1).Text = "church.jpg"
         radio.check(2).Text = "emir.jpg"
@@ -25,10 +25,10 @@ Public Class WarpModel_Input
         radio.check(11).Text = "Valley.jpg"
         radio.check(9).Checked = True
 
-        check.Setup(ocvb, callerName,  1)
+        check.Setup(ocvb, caller,  1)
         check.Box(0).Text = "Use Gradient in WarpInput"
 
-        sobel = New Edges_Sobel(ocvb, callerName)
+        sobel = New Edges_Sobel(ocvb, caller)
         sobel.externalUse = True
         ocvb.desc = "Import the misaligned input."
     End Sub
@@ -84,7 +84,7 @@ End Module
 
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_FindTransformECC_CPP
-    Inherits VB_Class
+    Inherits ocvbClass
         Public input As WarpModel_Input
     Dim cPtr As IntPtr
     Public warpMatrix() As Single
@@ -95,18 +95,18 @@ Public Class WarpModel_FindTransformECC_CPP
     Public externalUse As Boolean
     Public warpMode As Integer
     Public aligned As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
         cPtr = WarpModel_Open()
 
-        radio.Setup(ocvb, callerName,4)
+        radio.Setup(ocvb, caller,4)
         radio.check(0).Text = "Motion_Translation (fastest)"
         radio.check(1).Text = "Motion_Euclidean"
         radio.check(2).Text = "Motion_Affine (very slow - Use CPP_Classes in Release Mode)"
         radio.check(3).Text = "Motion_Homography (even slower - Use CPP_Classes in Release Mode)"
         radio.check(0).Checked = True
 
-        input = New WarpModel_Input(ocvb, callerName)
+        input = New WarpModel_Input(ocvb, caller)
 
         ocvb.desc = "Use FindTransformECC to align 2 images"
     End Sub
@@ -183,11 +183,11 @@ End Class
 
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_AlignImages
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim ecc As WarpModel_FindTransformECC_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        ecc = New WarpModel_FindTransformECC_CPP(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        ecc = New WarpModel_FindTransformECC_CPP(ocvb, caller)
 
         ocvb.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub

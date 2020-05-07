@@ -1,10 +1,10 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Encode_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
-        sliders.setupTrackBar2(ocvb, callerName, "Encode Output Scaling", 1, 100, 7)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
+        sliders.setupTrackBar2(ocvb, caller, "Encode Output Scaling", 1, 100, 7)
 
         ocvb.desc = "Error Level Analysis - to verify a jpg image has not been modified."
         ocvb.label1 = "absDiff with original"
@@ -30,13 +30,13 @@ End Class
 
 
 Public Class Encode_Options
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
-        sliders.setupTrackBar2(ocvb, callerName, "Encode Output Scaling", 1, 100, 85)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
+        sliders.setupTrackBar2(ocvb, caller, "Encode Output Scaling", 1, 100, 85)
 
-        radio.Setup(ocvb, callerName, 6)
+        radio.Setup(ocvb, caller, 6)
         radio.check(0).Text = "JpegChromaQuality"
         radio.check(1).Text = "JpegLumaQuality"
         radio.check(2).Text = "JpegOptimize"

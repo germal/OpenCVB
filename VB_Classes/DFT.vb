@@ -16,7 +16,7 @@ End Module
 
 ' http://stackoverflow.com/questions/19761526/how-to-do-inverse-dft-in-opencv
 Public Class DFT_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim mats As Mat_4to1
     Public magnitude As New cv.Mat
     Public spectrum As New cv.Mat
@@ -25,9 +25,9 @@ Public Class DFT_Basics
     Public rows As Int32
     Public cols As Int32
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        mats = New Mat_4to1(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        mats = New Mat_4to1(ocvb, caller)
         mats.externalUse = True
         mats.noLines = True
 
@@ -86,11 +86,11 @@ End Class
 
 ' http://opencvexamples.blogspot.com/
 Public Class DFT_Inverse
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim mats As Mat_2to1
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        mats = New Mat_2to1(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        mats = New Mat_2to1(ocvb, caller)
         mats.externalUse = True
         ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
         ocvb.label1 = "Image after Inverse DFT"
@@ -131,13 +131,13 @@ End Class
 ' http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/c++/butterworth_lowpass.cpp
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
 Public Class DFT_ButterworthFilter
-    Inherits VB_Class
+    Inherits ocvbClass
     Public dft As DFT_Basics
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "DFT B Filter - Radius", 1, ocvb.color.Height, ocvb.color.Height)
-        sliders.setupTrackBar2(ocvb, callerName, "DFT B Filter - Order", 1, ocvb.color.Height, 2)
-                dft = New DFT_Basics(ocvb, callerName)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "DFT B Filter - Radius", 1, ocvb.color.Height, ocvb.color.Height)
+        sliders.setupTrackBar2(ocvb, caller, "DFT B Filter - Order", 1, ocvb.color.Height, 2)
+                dft = New DFT_Basics(ocvb, caller)
         ocvb.desc = "Use the Butterworth filter on a DFT image - color image input."
         ocvb.label1 = "Image with Butterworth Low Pass Filter Applied"
         ocvb.label2 = "Same filter with radius / 2"
@@ -189,11 +189,11 @@ End Class
 ' http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/c++/butterworth_lowpass.cpp
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
 Public Class DFT_ButterworthDepth
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim bfilter As DFT_ButterworthFilter
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        bfilter = New DFT_ButterworthFilter(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        bfilter = New DFT_ButterworthFilter(ocvb, caller)
         bfilter.dft.externalUse = True
 
         ocvb.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."

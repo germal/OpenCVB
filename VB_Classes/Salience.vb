@@ -17,14 +17,14 @@ End Module
 
 
 Public Class Salience_Basics_CPP
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim grayData() As Byte
     Dim rows As Int32, cols As Int32, numScales As Int32
     Dim salience As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         sliders = New OptionsSliders
-        sliders.setupTrackBar1(ocvb, callerName, "Salience numScales", 1, 6, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Salience numScales", 1, 6, 1)
 
         ReDim grayData(ocvb.color.Total - 1)
         rows = ocvb.color.Rows
@@ -66,13 +66,13 @@ End Class
 
 
 Public Class Salience_Basics_MT
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim grayData() As Byte
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         sliders = New OptionsSliders
-        sliders.setupTrackBar1(ocvb, callerName, "Salience numScales", 1, 6, 1)
-        sliders.setupTrackBar2(ocvb, callerName, "Salience Number of Threads", 1, 100, 36)
+        sliders.setupTrackBar1(ocvb, caller, "Salience numScales", 1, 6, 1)
+        sliders.setupTrackBar2(ocvb, caller, "Salience Number of Threads", 1, 100, 36)
 
         ReDim grayData(ocvb.color.Total - 1)
         ocvb.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."

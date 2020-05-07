@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 ' https://bytefish.de/blog/eigenvalues_in_opencv/
 Public Class EigenVecVals_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Solve system of equations using OpenCV's EigenVV"
         ocvb.label1 = "EigenVec (solution)"
         ocvb.label2 = "Relationship between Eigen Vec and Vals"

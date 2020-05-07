@@ -95,11 +95,11 @@ End Module
 
 
 Public Class Plane_Detect
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        grid = New Thread_Grid(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 64
         grid.externalUse = True ' we don't need any results.
@@ -172,11 +172,11 @@ End Class
 
 
 Public Class Plane_DetectDebug
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        grid = New Thread_Grid(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
         grid.externalUse = True ' we don't need any results.

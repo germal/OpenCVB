@@ -64,13 +64,14 @@ End Module
 '//		return (int *) cPtr->dst.data; // return this C++ allocated data to managed code
 '//}
 
-Public Class AnyName_CPP : Implements IDisposable
+Public Class AnyName_CPP
+    Inherits ocvbClass
     Dim anyname As IntPtr
-    Public Sub New(ocvb As AlgorithmData, optional byval callerName as string = "AnyName_CPP")
-        ocvb.callerName = callerName
-		anyname = Anyname_Open()
+    Public Sub New(ocvb As AlgorithmData, byval caller as string)
+        setCaller(caller)
+		    anyname = Anyname_Open()
         ocvb.desc = "description of class"
-	End Sub
+	  End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src = ocvb.color
         Dim srcData(src.Total * src.ElemSize) As Byte
@@ -85,7 +86,7 @@ Public Class AnyName_CPP : Implements IDisposable
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, IIf(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), dstData)
         End If
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub MyDispose() 
         Anyname_Close(anyname)
     End Sub
 End Class

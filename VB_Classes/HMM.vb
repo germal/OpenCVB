@@ -18,10 +18,10 @@ End Module
 
 'https://github.com/omidsakhi/cv-hmm
 Public Class HMM_Example_CPP
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim HMM As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
         HMM = HMM_Open()
         ocvb.label1 = "HMM - see Visual Studio Output for results"
         ocvb.desc = "Simple test of Hidden Markov Model - text output"

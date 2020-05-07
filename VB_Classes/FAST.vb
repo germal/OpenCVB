@@ -1,11 +1,11 @@
 Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
 Public Class FAST_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Public keypoints() As cv.KeyPoint
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Threshold", 0, 200, 15)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Threshold", 0, 200, 15)
         ocvb.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
         ocvb.label1 = "FAST_Basics nonMax = true"
     End Sub
@@ -25,16 +25,16 @@ End Class
 
 
 Public Class FAST_Centroid
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim fast As FAST_Basics
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        kalman = New Kalman_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        kalman = New Kalman_Basics(ocvb, caller)
         ReDim kalman.src(1) ' 2 elements - cv.point
         kalman.externalUse = True
 
-        fast = New FAST_Basics(ocvb, callerName)
+        fast = New FAST_Basics(ocvb, caller)
         ocvb.desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

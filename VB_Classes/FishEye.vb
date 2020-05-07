@@ -1,12 +1,12 @@
 ﻿
 Imports cv = OpenCvSharp
 Public Class FishEye_Rectified
-    Inherits VB_Class
+    Inherits ocvbClass
     Public externalUse As Boolean
     Public leftView As cv.Mat
     Public rightView As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Use OpenCV's FishEye API to undistort a fisheye lens input"
         ocvb.label1 = "Left View"
         ocvb.label2 = "Right View"
@@ -50,9 +50,9 @@ End Class
 
 
 Public Class FishEye_Raw
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Display the Raw FishEye images for the T265 (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

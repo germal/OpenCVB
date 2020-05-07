@@ -1,11 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Sharpen_UnsharpMask
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "sigma", 1, 2000, 100)
-        sliders.setupTrackBar2(ocvb, callerName, "threshold", 0, 255, 5)
-        sliders.setupTrackBar3(ocvb, callerName, "Shift Amount", 0, 5000, 1000)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "sigma", 1, 2000, 100)
+        sliders.setupTrackBar2(ocvb, caller, "threshold", 0, 255, 5)
+        sliders.setupTrackBar3(ocvb, caller, "Shift Amount", 0, 5000, 1000)
         ocvb.desc = "Sharpen an image"
         ocvb.label2 = "Unsharp mask (difference from Blur)"
     End Sub
@@ -28,11 +28,11 @@ End Class
 
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class Sharpen_DetailEnhance
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "DetailEnhance Sigma_s", 0, 200, 60)
-        sliders.setupTrackBar2(ocvb, callerName, "DetailEnhance Sigma_r", 1, 100, 7)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "DetailEnhance Sigma_s", 0, 200, 60)
+        sliders.setupTrackBar2(ocvb, caller, "DetailEnhance Sigma_r", 1, 100, 7)
         ocvb.desc = "Enhance detail on an image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -47,11 +47,11 @@ End Class
 
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class Sharpen_Stylize
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Stylize Sigma_s", 0, 200, 60)
-        sliders.setupTrackBar2(ocvb, callerName, "Stylize Sigma_r", 1, 100, 7)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Stylize Sigma_s", 0, 200, 60)
+        sliders.setupTrackBar2(ocvb, caller, "Stylize Sigma_r", 1, 100, 7)
         ocvb.desc = "Stylize an image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

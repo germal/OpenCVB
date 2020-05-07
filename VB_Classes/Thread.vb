@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Imports System.Collections.Concurrent
 
 Public Class Thread_Grid
-    Inherits VB_Class
+    Inherits ocvbClass
     Public roiList As List(Of cv.Rect)
     Public borderList As List(Of cv.Rect)
         Public gridMask As cv.Mat
@@ -25,12 +25,12 @@ Public Class Thread_Grid
             End If
         Next
     End Sub
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
         src = ocvb.color
-        sliders.setupTrackBar1(ocvb, callerName, "ThreadGrid Width", 5, src.Width, 32)
-        sliders.setupTrackBar2(ocvb, callerName, "ThreadGrid Height", 5, src.Height, 32)
-        sliders.setupTrackBar3(ocvb, callerName, "ThreadGrid Border", 0, 20, 0)
+        sliders.setupTrackBar1(ocvb, caller, "ThreadGrid Width", 5, src.Width, 32)
+        sliders.setupTrackBar2(ocvb, caller, "ThreadGrid Height", 5, src.Height, 32)
+        sliders.setupTrackBar3(ocvb, caller, "ThreadGrid Border", 0, 20, 0)
         roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)
         gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)

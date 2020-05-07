@@ -11,11 +11,11 @@ End Module
 
 ' https://docs.opencv.org/2.4/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html
 Public Class Face_Haar_LBP
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim haarCascade As cv.CascadeClassifier
     Dim lbpCascade As cv.CascadeClassifier
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         haarCascade = New cv.CascadeClassifier(ocvb.parms.HomeDir + "Data/haarcascade_frontalface_default.xml")
         lbpCascade = New cv.CascadeClassifier(ocvb.parms.HomeDir + "Data/lbpcascade_frontalface.xml")
         ocvb.desc = "Detect faces in the video stream."
@@ -33,10 +33,10 @@ End Class
 
 
 Public Class Face_Haar_Alt
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim haarCascade As cv.CascadeClassifier
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         haarCascade = New cv.CascadeClassifier(ocvb.parms.HomeDir + "Data/haarcascade_frontalface_alt.xml")
         ocvb.desc = "Detect faces Haar_alt database."
         ocvb.label1 = "Faces detected with Haar_Alt"

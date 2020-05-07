@@ -2,12 +2,12 @@ Imports cv = OpenCvSharp
 Imports System.IO
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Public srcVideo As String
     Dim currVideo As String
     Public image As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         If srcVideo = "" Then srcVideo = ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4" ' default video...
         currVideo = srcVideo
         videoOptions.NewVideo(ocvb, srcVideo)
@@ -30,18 +30,18 @@ End Class
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_CarCounting
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim flow As Font_FlowText
     Dim video As Video_Basics
     Dim mog As BGSubtract_MOG
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        mog = New BGSubtract_MOG(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        mog = New BGSubtract_MOG(ocvb, caller)
         mog.externalUse = True
 
-        video = New Video_Basics(ocvb, callerName)
+        video = New Video_Basics(ocvb, caller)
 
-        flow = New Font_FlowText(ocvb, callerName)
+        flow = New Font_FlowText(ocvb, caller)
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
@@ -94,22 +94,22 @@ End Class
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_CarCComp
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim cc As CComp_Basics
     Dim flow As Font_FlowText
     Dim video As Video_Basics
     Dim mog As BGSubtract_MOG
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        mog = New BGSubtract_MOG(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        mog = New BGSubtract_MOG(ocvb, caller)
         mog.externalUse = True
 
-        cc = New CComp_Basics(ocvb, callerName)
+        cc = New CComp_Basics(ocvb, caller)
         cc.externalUse = True
 
-        video = New Video_Basics(ocvb, callerName)
+        video = New Video_Basics(ocvb, caller)
 
-        flow = New Font_FlowText(ocvb, callerName)
+        flow = New Font_FlowText(ocvb, caller)
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
@@ -138,18 +138,18 @@ End Class
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_MinRect
-    Inherits VB_Class
+    Inherits ocvbClass
     Public video As Video_Basics
     Public mog As BGSubtract_MOG
     Public externalUse As Boolean
     Public contours As cv.Point()()
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        video = New Video_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        video = New Video_Basics(ocvb, caller)
         video.srcVideo = ocvb.parms.HomeDir + "Data/CarsDrivingUnderBridge.mp4"
         video.Run(ocvb)
 
-        mog = New BGSubtract_MOG(ocvb, callerName)
+        mog = New BGSubtract_MOG(ocvb, caller)
         mog.externalUse = True
         ocvb.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
@@ -181,11 +181,11 @@ End Class
 
 
 Public Class Video_MinCircle
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim input As Video_MinRect
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        input = New Video_MinRect(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        input = New Video_MinRect(ocvb, caller)
         input.externalUse = True
         ocvb.desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub

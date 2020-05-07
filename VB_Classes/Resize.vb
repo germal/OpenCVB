@@ -1,13 +1,13 @@
 Imports cv = OpenCvSharp
 Public Class Resize_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Public externalUse As Boolean
     Public src As cv.Mat
     Public dst As New cv.Mat
     Public newSize As cv.Size
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        SetInterpolationRadioButtons(ocvb, callerName, radio, "Resize")
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        SetInterpolationRadioButtons(ocvb, caller, radio, "Resize")
         ' warp is not allowed in resize
         radio.check(5).Enabled = False
         radio.check(6).Enabled = False
@@ -38,13 +38,13 @@ End Class
 
 
 Public Class Resize_After8uc3
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim colorizer As Depth_Colorizer_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        colorizer = New Depth_Colorizer_CPP(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        colorizer = New Depth_Colorizer_CPP(ocvb, caller)
         colorizer.externalUse = True
-        SetInterpolationRadioButtons(ocvb, callerName, radio, "Resize")
+        SetInterpolationRadioButtons(ocvb, caller, radio, "Resize")
         ' warp is not allowed in resize
         radio.check(5).Enabled = False
         radio.check(6).Enabled = False
@@ -81,17 +81,17 @@ End Class
 
 
 Public Class Resize_Percentage
-    Inherits VB_Class
+    Inherits ocvbClass
     Public src As New cv.Mat
     Public dst As New cv.Mat
     Public externalUse As Boolean
     Public resizeOptions As Resize_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        resizeOptions = New Resize_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        resizeOptions = New Resize_Basics(ocvb, caller)
         resizeOptions.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, callerName, "Resize Percentage (%)", 1, 100, 3)
+        sliders.setupTrackBar1(ocvb, caller, "Resize Percentage (%)", 1, 100, 3)
 
         ocvb.desc = "Resize by a percentage of the image."
     End Sub

@@ -62,16 +62,16 @@ End Module
 
 
 Public Class Python_Run
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim pyStream As PyStream_Basics = Nothing
     Dim tryCount As Int32
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
         If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
         If pythonApp.Name.EndsWith("_PS.py") Then
-            pyStream = New PyStream_Basics(ocvb, callerName)
+            pyStream = New PyStream_Basics(ocvb, caller)
         Else
             StartPython(ocvb, "")
         End If
@@ -107,15 +107,15 @@ End Class
 
 
 Public Class Python_MemMap
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim memMapFile As MemoryMappedFile
     Dim memMapPtr As IntPtr
     Public memMapValues(49) As Double ' more than we need - buffer for growth
     Public memMapbufferSize As Int32
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
         If ocvb.PythonFileName Is Nothing Then
             ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_MemMap.py"
         Else
@@ -156,15 +156,15 @@ End Class
 
 
 Public Class Python_SurfaceBlit
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim memMap As Python_MemMap
     Dim pipeName As String
     Dim pipe As NamedPipeServerStream
     Dim rgbBuffer(1) As Byte
     Dim pointCloudBuffer(1) As Byte
     Dim PythonReady As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
         ' this Python script requires pygame to be present...
         If checkPythonPackage(ocvb, "pygame") = False Then
             PythonReady = False
@@ -177,7 +177,7 @@ Public Class Python_SurfaceBlit
         ' this Python script assumes that fast processing is off - the pointcloud is being used and cannot be resized.
         ' ocvb.parms.lowResolution = False
         ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
-        memMap = New Python_MemMap(ocvb, callerName)
+        memMap = New Python_MemMap(ocvb, caller)
 
         If ocvb.parms.externalPythonInvocation Then
             PythonReady = True ' python was already running and invoked OpenCVB.

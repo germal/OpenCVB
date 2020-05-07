@@ -52,14 +52,10 @@ Module UI_GeneratorMain
                         If Len(line) > 0 Then CodeLineCount += 1
                         If LCase(line).StartsWith("public class") Then
                             Dim split As String() = Regex.Split(line, "\W+")
-                            If InStr(LCase(line), ": implements idisposable") Then
+                            ' next line must be "Inherits ocvbClass"
+                            Dim line2 = Trim(nextFile.ReadLine())
+                            If LCase(line2) = "inherits ocvbclass" Then
                                 className = split(2) ' public class <classname>
-                            Else
-                                ' next line must be "Inherits VB_Class"
-                                Dim line2 = Trim(nextFile.ReadLine())
-                                If LCase(line2) = "inherits vb_class" Then
-                                    className = split(2) ' public class <classname>
-                                End If
                             End If
                         End If
                         If LCase(line).StartsWith("public sub new(ocvb as algorithmdata") Then functionNames.Add(className)

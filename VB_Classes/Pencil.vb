@@ -1,12 +1,12 @@
 ﻿Imports cv = OpenCvSharp
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class Pencil_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Pencil Sigma_s", 0, 200, 60)
-        sliders.setupTrackBar2(ocvb, callerName, "Pencil Sigma_r", 1, 100, 7)
-        sliders.setupTrackBar3(ocvb, callerName, "Pencil Shade Factor", 1, 200, 40)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Pencil Sigma_s", 0, 200, 60)
+        sliders.setupTrackBar2(ocvb, caller, "Pencil Sigma_r", 1, 100, 7)
+        sliders.setupTrackBar3(ocvb, caller, "Pencil Shade Factor", 1, 200, 40)
         ocvb.desc = "Convert image to a pencil sketch - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -22,10 +22,10 @@ End Class
 
 ' https://cppsecrets.com/users/2582658986657266505064717765737646677977/Convert-photo-to-sketch-using-python.php?fbclid=IwAR3pOtiqxeOPiqouii7tmN9Q7yA5vG4dFdXGqA0XgZqcMB87w5a1PEMzGOw
 Public Class Pencil_Manual
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Blur kernel size", 2, 100, 10)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Blur kernel size", 2, 100, 10)
         ocvb.desc = "Break down the process of converting an image to a sketch - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

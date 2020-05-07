@@ -13,13 +13,13 @@ End Module
 
 ' https://docs.opencv.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
 Public Class FitEllipse_Basics_CPP
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim area As Area_MinTriangle_CPP
     Public dstHandle As GCHandle
     Public dstData(5 * 4 - 1) As Byte ' enough space for a float describing angle, center, and width/height - this will be filled in on the C++ side.
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        area = New Area_MinTriangle_CPP(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        area = New Area_MinTriangle_CPP(ocvb, caller)
 
         ocvb.desc = "Use FitEllipse to draw around a set of points"
         dstHandle = GCHandle.Alloc(dstData, GCHandleType.Pinned)

@@ -128,6 +128,7 @@
     <Compile Include="EMax.vb" />
     <Compile Include="Emgu.vb" />
     <Compile Include="Entropy.vb" />
+    <Compile Include="Etch.vb" />
     <Compile Include="FeatureLess.vb" />
     <Compile Include="FishEye.vb" />
     <Compile Include="FREAK.vb" />
@@ -275,7 +276,7 @@
     <Compile Include="TransformationMatrix.vb" />
     <Compile Include="Undistort.vb" />
     <Compile Include="VBTestInterface.vb" />
-    <Compile Include="VB_Class.vb" />
+    <Compile Include="ocvbClass.vb" />
     <Compile Include="VB_Classes.vb" />
     <Compile Include="OptionsCheckbox.Designer.vb">
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>

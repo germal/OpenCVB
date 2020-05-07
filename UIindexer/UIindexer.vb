@@ -77,9 +77,13 @@ Module IndexMain
                 Dim lcaseLine = " " + LCase(line)
                 If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
                 If lcaseLine.Contains("Painterly Effect") Then Painterly.Add(classname, classname)
-                Dim split As String() = Regex.Split(line, "\W+")
-                If LCase(line).StartsWith("public class") And InStr(line, "Implements IDisposable") Then
-                    classname = split(2) ' public class <classname>
+                If LCase(line).StartsWith("public class") Then
+                    Dim split As String() = Regex.Split(line, "\W+")
+                    ' next line must be "Inherits ocvbClass"
+                    Dim line2 = Trim(nextFile.ReadLine())
+                    If LCase(line2) = "inherits ocvbclass" Then
+                        classname = split(2) ' public class <classname>
+                    End If
                     If classname.StartsWith("Python_") Then PYnames.Add(classname, classname)
                     If classname.EndsWith("_PS.py") Then PYStreamNames.Add(classname, classname)
                     If classname.EndsWith("_MT") Then MTnames.Add(classname, classname)

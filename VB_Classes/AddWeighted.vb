@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class AddWeighted_RGBDepth
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Weight", 0, 100, 50)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Weight", 0, 100, 50)
         ocvb.desc = "Add depth and rgb with specified weights."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

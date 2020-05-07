@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 
 Public Class Emgu_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Test a sample EMGU usage."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -23,9 +23,9 @@ End Class
 
 
 Public Class Emgu_Facedetection
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Use the simplest possible face detector in Emgu examples."
         ocvb.result1.SetTo(0)
     End Sub

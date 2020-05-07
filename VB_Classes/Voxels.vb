@@ -1,25 +1,25 @@
 Imports cv = OpenCvSharp
 Public Class Voxels_Basics_MT
-    Inherits VB_Class
+    Inherits ocvbClass
     Public trim As Depth_InRange
         Public grid As Thread_Grid
     Public voxels() As Double
     Public voxelMat As cv.Mat
     Public minDepth As Double
     Public maxDepth As Double
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        check.Setup(ocvb, callerName,  1)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        check.Setup(ocvb, caller,  1)
         check.Box(0).Text = "Display intermediate results"
         check.Box(0).Checked = True
 
-        trim = New Depth_InRange(ocvb, callerName)
+        trim = New Depth_InRange(ocvb, caller)
         trim.externalUse = True
         trim.sliders.TrackBar2.Value = 5000
 
-        sliders.setupTrackBar1(ocvb, callerName, "Histogram Bins", 2, 200, 100)
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 2, 200, 100)
 
-        grid = New Thread_Grid(ocvb, callerName)
+        grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
         grid.externalUse = True

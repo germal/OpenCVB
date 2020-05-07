@@ -1,10 +1,10 @@
 Imports cv = OpenCvSharp
 Public Class Covariance_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim random As Random_Points
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        random = New Random_Points(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        random = New Random_Points(ocvb, caller)
         ocvb.desc = "Calculate the covariance of random depth data points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -27,9 +27,9 @@ End Class
 
 ' http://answers.opencv.org/question/31228/how-to-use-function-calccovarmatrix/
 Public Class Covariance_Test
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Calculate the covariance of random depth data points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

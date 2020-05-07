@@ -1,14 +1,14 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HOGSample.vb
 Public Class HOG_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim staticImage As cv.Mat
     Dim staticImageProcessed As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Threshold", 0, 100, 0)
-        sliders.setupTrackBar2(ocvb, callerName, "Stride", 1, 100, 1)
-        sliders.setupTrackBar3(ocvb, callerName, "Scale", 0, 2000, 300)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Threshold", 0, 100, 0)
+        sliders.setupTrackBar2(ocvb, caller, "Stride", 1, 100, 1)
+        sliders.setupTrackBar3(ocvb, caller, "Scale", 0, 2000, 300)
         ocvb.desc = "Find people with Histogram of Gradients (HOG) 2D feature"
         staticImage = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
         ocvb.result2 = staticImage.Resize(ocvb.result2.Size)

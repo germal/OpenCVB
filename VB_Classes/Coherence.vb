@@ -1,16 +1,16 @@
 Imports cv = OpenCvSharp
 ' http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
 Public Class Coherence_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Public src As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Find lines that are artistically coherent in the image - Painterly Effect."
-        sliders.setupTrackBar1(ocvb, callerName, "Coherence Sigma", 1, 15, 9)
-        sliders.setupTrackBar2(ocvb, callerName, "Coherence Blend", 1, 10, 10)
-        sliders.setupTrackBar3(ocvb, callerName, "Coherence str_sigma", 1, 15, 15)
-        sliders.setupTrackBar4(ocvb, callerName, "Coherence eigen kernel", 1, 31, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Coherence Sigma", 1, 15, 9)
+        sliders.setupTrackBar2(ocvb, caller, "Coherence Blend", 1, 10, 10)
+        sliders.setupTrackBar3(ocvb, caller, "Coherence str_sigma", 1, 15, 15)
+        sliders.setupTrackBar4(ocvb, caller, "Coherence eigen kernel", 1, 31, 1)
         ocvb.label1 = "Coherence - draw rectangle to apply"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -75,11 +75,11 @@ End Class
 
 
 Public Class Coherence_Depth
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim coherent As Coherence_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        coherent = New Coherence_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        coherent = New Coherence_Basics(ocvb, caller)
         coherent.externalUse = True
         ocvb.desc = "Find coherent lines in the depth image"
     End Sub

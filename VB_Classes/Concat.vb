@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Concat_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Concatenate 2 images - horizontally and vertically"
         ocvb.label1 = "Horizontal concatenation"
         ocvb.label2 = "Vertical concatenation"
@@ -20,11 +20,11 @@ End Class
 
 
 Public Class Concat_4way
-    Inherits VB_Class
+    Inherits ocvbClass
     Public img(3) As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Concatenate 4 images - horizontally and vertically"
         For i = 0 To img.Length - 1
             img(i) = New cv.Mat

@@ -1,14 +1,14 @@
 Imports cv = OpenCvSharp
 
 Public Class Contours_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Public rotatedRect As Draw_rotatedRectangles
     Public externalUse As Boolean
     Public src As New cv.Mat
     Public dst As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        radio.Setup(ocvb, callerName, 5)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        radio.Setup(ocvb, caller, 5)
         radio.Text = "Retrieval Mode Options"
         radio.check(0).Text = "CComp"
         radio.check(1).Text = "External"
@@ -18,7 +18,7 @@ Public Class Contours_Basics
         radio.check(4).Checked = True
         If ocvb.parms.ShowOptions Then radio.Show()
 
-        radio1.Setup(ocvb, callerName, 4)
+        radio1.Setup(ocvb, caller, 4)
         radio1.Text = "ContourApproximation Mode"
         radio1.check(0).Text = "ApproxNone"
         radio1.check(1).Text = "ApproxSimple"
@@ -27,7 +27,7 @@ Public Class Contours_Basics
         radio1.check(1).Checked = True
         If ocvb.parms.ShowOptions Then radio1.Show()
 
-        rotatedRect = New Draw_rotatedRectangles(ocvb, callerName)
+        rotatedRect = New Draw_rotatedRectangles(ocvb, caller)
         rotatedRect.rect.sliders.TrackBar1.Value = 5
         ocvb.desc = "Demo options on FindContours."
         ocvb.label2 = "FindContours output"
@@ -83,11 +83,11 @@ End Class
 
 
 Public Class Contours_FindandDraw
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim rotatedRect As Draw_rotatedRectangles
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        rotatedRect = New Draw_rotatedRectangles(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        rotatedRect = New Draw_rotatedRectangles(ocvb, caller)
         rotatedRect.rect.sliders.TrackBar1.Value = 5
         ocvb.label1 = "FindandDraw input"
         ocvb.label2 = "FindandDraw output"
@@ -116,11 +116,11 @@ End Class
 
 
 Public Class Contours_Depth
-    Inherits VB_Class
+    Inherits ocvbClass
     Public trim As Depth_InRange
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        trim = New Depth_InRange(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        trim = New Depth_InRange(ocvb, caller)
         ocvb.desc = "Find and draw the contour of the depth foreground."
         ocvb.label1 = "DepthContour input"
         ocvb.label2 = "DepthContour output"
@@ -148,11 +148,11 @@ End Class
 
 
 Public Class Contours_RGB
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim trim As Depth_InRange
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        trim = New Depth_InRange(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        trim = New Depth_InRange(ocvb, caller)
         ocvb.desc = "Find and draw the contour of the largest foreground RGB contour."
         ocvb.label2 = "Background"
     End Sub

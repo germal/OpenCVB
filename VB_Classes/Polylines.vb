@@ -2,14 +2,14 @@
 Imports System.Collections.Generic
 Imports System.Linq
 Public Class Polylines_IEnumerableExample
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        check.Setup(ocvb, callerName, 2)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Polyline closed if checked"
         check.Box(0).Checked = True
-        sliders.setupTrackBar1(ocvb, callerName, "Polyline Count", 2, 500, 100)
-        sliders.setupTrackBar2(ocvb, callerName, "Polyline Thickness", 0, 10, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Polyline Count", 2, 500, 100)
+        sliders.setupTrackBar2(ocvb, caller, "Polyline Thickness", 0, 10, 1)
         ocvb.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -33,9 +33,9 @@ End Class
 ' VB.Net implementation of the browse example in OpenCV. 
 ' https://github.com/opencv/opencv/blob/master/samples/python/browse.py
 Public Class Polylines_Random
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Create a random procedural image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

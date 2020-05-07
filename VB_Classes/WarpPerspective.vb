@@ -2,12 +2,12 @@
 
 ' http://opencvexamples.blogspot.com/
 Public Class WarpPerspective_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Warped Width", 0, ocvb.color.Cols, ocvb.color.Cols - 50)
-        sliders.setupTrackBar2(ocvb, callerName, "Warped Height", 0, ocvb.color.Rows, ocvb.color.Rows - 50)
-        sliders.setupTrackBar3(ocvb, callerName, "Warped Angle", 0, 360, 0)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Warped Width", 0, ocvb.color.Cols, ocvb.color.Cols - 50)
+        sliders.setupTrackBar2(ocvb, caller, "Warped Height", 0, ocvb.color.Rows, ocvb.color.Rows - 50)
+        sliders.setupTrackBar3(ocvb, caller, "Warped Angle", 0, 360, 0)
         ocvb.desc = "Use WarpPerspective to transform input images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

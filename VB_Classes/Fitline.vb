@@ -1,19 +1,19 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/js_contour_features_fitLine.html
 Public Class Fitline_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Public draw As Draw_Line
         Public externalUse As Boolean
     Public src As New cv.Mat
     Public dst As New cv.Mat
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        draw = New Draw_Line(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        draw = New Draw_Line(ocvb, caller)
         draw.sliders.TrackBar1.Value = 2
 
-        sliders.setupTrackBar1(ocvb, callerName, "Accuracy for the radius X100", 0, 100, 10)
-        sliders.setupTrackBar2(ocvb, callerName, "Accuracy for the angle X100", 0, 100, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Accuracy for the radius X100", 0, 100, 10)
+        sliders.setupTrackBar2(ocvb, caller, "Accuracy for the angle X100", 0, 100, 10)
 
         ocvb.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
@@ -56,11 +56,11 @@ End Class
 
 
 Public Class Fitline_3DBasics_MT
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim hlines As Hough_Lines_MT
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        hlines = New Hough_Lines_MT(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        hlines = New Hough_Lines_MT(ocvb, caller)
         ocvb.desc = "Use visual lines to find 3D lines."
         ocvb.label2 = "White is featureless RGB, blue depth shadow"
     End Sub
@@ -117,17 +117,17 @@ End Class
 
 
 Public Class Fitline_RawInput
-    Inherits VB_Class
+    Inherits ocvbClass
     Public points As List(Of cv.Point2f)
     Public m As Single
     Public bb As Single
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Random point count", 0, 500, 100)
-        sliders.setupTrackBar2(ocvb, callerName, "Line Point Count", 0, 500, 20)
-        sliders.setupTrackBar3(ocvb, callerName, "Line Noise", 1, 100, 10)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Random point count", 0, 500, 100)
+        sliders.setupTrackBar2(ocvb, caller, "Line Point Count", 0, 500, 20)
+        sliders.setupTrackBar3(ocvb, caller, "Line Noise", 1, 100, 10)
 
-        check.Setup(ocvb, callerName, 2)
+        check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Highlight Line Data"
         check.Box(1).Text = "Recompute with new random data"
         check.Box(0).Checked = True
@@ -194,11 +194,11 @@ End Class
 
 ' http://www.cs.cmu.edu/~youngwoo/doc/lineFittingTest.cpp
 Public Class Fitline_EigenFit
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim noisyLine As Fitline_RawInput
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        noisyLine = New Fitline_RawInput(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        noisyLine = New Fitline_RawInput(ocvb, caller)
         noisyLine.sliders.TrackBar1.Value = 30
         noisyLine.sliders.TrackBar2.Value = 400
         ocvb.label1 = "Raw input (use sliders below to explore)"

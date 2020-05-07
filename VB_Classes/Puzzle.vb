@@ -223,14 +223,14 @@ End Module
 
 ' https://github.com/nemanja-m/gaps
 Public Class Puzzle_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Public grid As Thread_Grid
     Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public restartRequested As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        grid = New Thread_Grid(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 10
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 8
         grid.Run(ocvb)
@@ -280,23 +280,23 @@ End Class
 
 
 Public Class Puzzle_Solver
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim puzzle As Puzzle_Basics
     Public roilist() As cv.Rect
         Dim usedList As New List(Of Integer)
     Dim fitlist As New List(Of bestFit)
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        puzzle = New Puzzle_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        puzzle = New Puzzle_Basics(ocvb, caller)
         puzzle.grid.sliders.Hide()
 
-        radio.Setup(ocvb, callerName,3)
+        radio.Setup(ocvb, caller,3)
         radio.check(0).Text = "Easy Puzzle - tiles = 256x180"
         radio.check(1).Text = "Medium Puzzle - tiles = 128x90"
         radio.check(2).Text = "Hard Puzzle - tiles = 64x90"
         radio.check(0).Checked = True
 
-        check.Setup(ocvb, callerName,  1)
+        check.Setup(ocvb, caller,  1)
         check.Box(0).Text = "Reshuffle pieces"
 
         ocvb.desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."

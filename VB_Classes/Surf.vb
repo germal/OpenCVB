@@ -4,24 +4,24 @@ Imports CS_Classes
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Surf_Basics_CS
-    Inherits VB_Class
+    Inherits ocvbClass
             Public CS_SurfBasics As New CS_SurfBasics
     Dim fisheye As FishEye_Rectified
     Public srcLeft As New cv.Mat
     Public srcRight As New cv.Mat
     Public dst As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        fisheye = New FishEye_Rectified(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        fisheye = New FishEye_Rectified(ocvb, caller)
         fisheye.externalUse = True
 
-        radio.Setup(ocvb, callerName,2)
+        radio.Setup(ocvb, caller,2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
 
-        sliders.setupTrackBar1(ocvb, callerName, "Hessian threshold", 1, 5000, 2000)
+        sliders.setupTrackBar1(ocvb, caller, "Hessian threshold", 1, 5000, 2000)
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
         ocvb.label1 = "BF Matcher output"
@@ -59,15 +59,15 @@ End Class
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Surf_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim surf As Surf_Basics_CS
     Dim fisheye As FishEye_Rectified
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        fisheye = New FishEye_Rectified(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        fisheye = New FishEye_Rectified(ocvb, caller)
         fisheye.externalUse = True
 
-        surf = New Surf_Basics_CS(ocvb, callerName)
+        surf = New Surf_Basics_CS(ocvb, caller)
         surf.externalUse = True
 
         ocvb.desc = "Use left and right views to match points in horizontal slices."
@@ -98,14 +98,14 @@ End Class
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Surf_DrawMatchManual_CS
-    Inherits VB_Class
+    Inherits ocvbClass
         Dim surf As Surf_Basics_CS
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        surf = New Surf_Basics_CS(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        surf = New Surf_Basics_CS(ocvb, caller)
         surf.CS_SurfBasics.drawPoints = False
 
-        sliders.setupTrackBar1(ocvb, callerName, "Surf Vertical Range to Search", 0, 50, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Surf Vertical Range to Search", 0, 50, 10)
 
         ocvb.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub

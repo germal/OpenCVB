@@ -52,19 +52,19 @@ End Module
 
 
 Public Class Projection_NoGravity_CPP
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        grid = New Thread_Grid(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        grid = New Thread_Grid(ocvb, caller)
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
-        foreground = New Depth_ManualTrim(ocvb, callerName)
+        foreground = New Depth_ManualTrim(ocvb, caller)
         foreground.externalUse = True
         foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
         foreground.sliders.TrackBar2.Value = 4000 ' fixed distance to keep the images stable.
@@ -110,19 +110,19 @@ End Class
 
 
 Public Class Projection_NoGravity
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        grid = New Thread_Grid(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        grid = New Thread_Grid(ocvb, caller)
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
-        foreground = New Depth_ManualTrim(ocvb, callerName)
+        foreground = New Depth_ManualTrim(ocvb, caller)
         foreground.externalUse = True
         foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
         foreground.sliders.TrackBar2.Value = 4000 ' fixed distance to keep the images stable.
@@ -180,21 +180,21 @@ End Class
 
 
 Public Class Projection_GravityVB
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim imu As IMU_GravityVec
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        imu = New IMU_GravityVec(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        imu = New IMU_GravityVec(ocvb, caller)
         imu.result = RESULT2
         imu.externalUse = True
 
-        grid = New Thread_Grid(ocvb, callerName)
+        grid = New Thread_Grid(ocvb, caller)
         grid.externalUse = True
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
-        sliders.setupTrackBar1(ocvb, callerName, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
+        sliders.setupTrackBar1(ocvb, caller, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
 
         ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
     End Sub
@@ -278,11 +278,11 @@ End Class
 
 
 Public Class Projection_GravityHistogram
-    Inherits VB_Class
+    Inherits ocvbClass
     Public gravity As Projection_Gravity_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        gravity = New Projection_Gravity_CPP(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        gravity = New Projection_Gravity_CPP(ocvb, caller)
         gravity.sliders.GroupBox2.Visible = True
         gravity.histogramRun = True
 
@@ -302,7 +302,7 @@ End Class
 
 
 Public Class Projection_Gravity_CPP
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim imu As IMU_GravityVec
     Dim cPtr As IntPtr
     Dim histPtr As IntPtr
@@ -313,14 +313,14 @@ Public Class Projection_Gravity_CPP
     Public dst1 As cv.Mat
     Public dst2 As cv.Mat
     Public maxZ As Single
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        imu = New IMU_GravityVec(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        imu = New IMU_GravityVec(ocvb, caller)
         imu.result = RESULT2
         imu.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, callerName, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
-        sliders.setupTrackBar2(ocvb, callerName, "Threshold for histogram Count", 1, 100, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
+        sliders.setupTrackBar2(ocvb, caller, "Threshold for histogram Count", 1, 100, 10)
         sliders.GroupBox2.Visible = False ' default is not a histogramrun
 
         Dim fileInfo As New FileInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps/colorscale_jet.jpg")
@@ -425,25 +425,25 @@ End Class
 
 
 Public Class Projection_Floodfill
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim flood As FloodFill_Projection
     Dim kalman As Kalman_Basics
     Public gravity As Projection_Gravity_CPP
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        kalman = New Kalman_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        kalman = New Kalman_Basics(ocvb, caller)
         ReDim kalman.src(10 * 4 - 1) ' max 10 objects.
         kalman.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, callerName, "epsilon for GroupRectangles X100", 0, 200, 80)
+        sliders.setupTrackBar1(ocvb, caller, "epsilon for GroupRectangles X100", 0, 200, 80)
 
-        gravity = New Projection_Gravity_CPP(ocvb, callerName)
+        gravity = New Projection_Gravity_CPP(ocvb, caller)
         gravity.sliders.GroupBox2.Visible = True
         gravity.externalUse = True
         gravity.histogramRun = True
 
-        flood = New FloodFill_Projection(ocvb, callerName)
+        flood = New FloodFill_Projection(ocvb, caller)
         flood.sliders.TrackBar1.Value = 100
         flood.sliders.TrackBar4.Value = 1
         flood.externalUse = True
@@ -512,12 +512,12 @@ End Class
 
 
 Public Class Projection_Wall
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim objects As Projection_Floodfill
     Dim lines As lineDetector_FLD
     Dim dilate As DilateErode_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
 
         dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
         dilate.externalUse = True

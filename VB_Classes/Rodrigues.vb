@@ -8,9 +8,9 @@ End Module
 
 
 Public Class Rodrigues_ValidateKinect
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Validate the Rodrigues calibration for Kinect camera (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -34,9 +34,9 @@ End Class
 
 
 Public Class Rodrigues_ValidateVector
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -80,9 +80,9 @@ End Class
 
 
 Public Class Rodrigues_RotationMatrix
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Display the contents of the IMU Rotation Matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -112,9 +112,9 @@ End Class
 
 
 Public Class Rodrigues_Extrinsics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

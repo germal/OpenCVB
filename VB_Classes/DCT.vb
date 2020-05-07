@@ -1,9 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class DCT_RGB
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Remove Frequencies < x", 0, 100, 1)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Remove Frequencies < x", 0, 100, 1)
 
         ocvb.desc = "Apply OpenCV's Discrete Cosine Transform to an RGB image and use slider to remove the highest frequencies."
         ocvb.label1 = "Reconstituted RGB image"
@@ -38,10 +38,10 @@ End Class
 
 
 Public Class DCT_RGBDepth
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Remove Frequencies < x", 0, 100, 1)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Remove Frequencies < x", 0, 100, 1)
         ocvb.label2 = "Subtract DCT inverse from Grayscale depth"
         ocvb.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub
@@ -66,10 +66,10 @@ End Class
 
 
 Public Class DCT_Grayscale
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Remove Frequencies < x", 0, 100, 1)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Remove Frequencies < x", 0, 100, 1)
 
         ocvb.desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
         ocvb.label2 = "Difference from original"
@@ -96,13 +96,13 @@ End Class
 
 
 Public Class DCT_FeatureLess_MT
-    Inherits VB_Class
+    Inherits ocvbClass
     Public dct As DCT_Grayscale
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Run Length Minimum", 1, 100, 15)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Run Length Minimum", 1, 100, 15)
 
-        dct = New DCT_Grayscale(ocvb, callerName)
+        dct = New DCT_Grayscale(ocvb, caller)
         dct.sliders.TrackBar1.Value = 1
         ocvb.desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
         ocvb.label2 = "FeatureLess RGB regions"
@@ -144,23 +144,23 @@ End Class
 
 
 Public Class DCT_Surfaces_debug
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim Mats As Mat_4to1
     Dim grid As Thread_Grid
     Dim dct As DCT_FeatureLess_MT
     Dim flow As Font_FlowText
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        flow = New Font_FlowText(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        flow = New Font_FlowText(ocvb, caller)
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
-        grid = New Thread_Grid(ocvb, callerName)
+        grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 100
         grid.sliders.TrackBar2.Value = 150
-        dct = New DCT_FeatureLess_MT(ocvb, callerName)
+        dct = New DCT_FeatureLess_MT(ocvb, caller)
         dct.dct.sliders.TrackBar1.Value = 1
-        Mats = New Mat_4to1(ocvb, callerName)
+        Mats = New Mat_4to1(ocvb, caller)
         Mats.externalUse = True
 
         ocvb.desc = "Find plane equation for a featureless surface - debugging one region for now."
@@ -231,13 +231,13 @@ End Class
 
 
 Public Class DCT_CCompenents
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim dct As DCT_FeatureLess_MT
     Dim cc As CComp_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        dct = New DCT_FeatureLess_MT(ocvb, callerName)
-        cc = New CComp_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        dct = New DCT_FeatureLess_MT(ocvb, caller)
+        cc = New CComp_Basics(ocvb, caller)
         cc.externalUse = True
 
         ocvb.desc = "Find surfaces that lack any texture with DCT (less highest frequency) and use connected components to isolate those surfaces."
@@ -260,11 +260,11 @@ End Class
 
 
 Public Class DCT_Rows
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Remove Frequencies < x", 0, 100, 1)
-        sliders.setupTrackBar2(ocvb, callerName, "Threshold after removal", 1, 255, 30)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Remove Frequencies < x", 0, 100, 1)
+        sliders.setupTrackBar2(ocvb, caller, "Threshold after removal", 1, 255, 30)
 
         ocvb.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub

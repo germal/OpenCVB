@@ -1,10 +1,10 @@
 ﻿Imports cv = OpenCvSharp
 'https://www.pyimagesearch.com/2017/11/06/deep-learning-opencvs-blobfromimage-works/
 Public Class MeanSubtraction_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Scaling Factor = mean/scaling factor X100", 1, 500, 100)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Scaling Factor = mean/scaling factor X100", 1, 500, 100)
         ocvb.desc = "Subtract the mean from the image with a scaling factor"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

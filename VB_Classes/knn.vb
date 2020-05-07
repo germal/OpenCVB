@@ -1,13 +1,13 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class knn_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
         Dim random As Random_Points
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        random = New Random_Points(ocvb, callerName)
-        sliders.setupTrackBar1(ocvb, callerName, "knn Query Points", 1, 10000, 10)
-        sliders.setupTrackBar2(ocvb, callerName, "knn Known Points", 1, 10, 3)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        random = New Random_Points(ocvb, caller)
+        sliders.setupTrackBar1(ocvb, caller, "knn Query Points", 1, 10000, 10)
+        sliders.setupTrackBar2(ocvb, caller, "knn Known Points", 1, 10, 3)
         ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
         ocvb.label2 = "Search Input"
     End Sub
@@ -53,7 +53,7 @@ End Class
 
 
 Public Class knn_Cluster2D
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim knn As knn_Point2d
     Public cityPositions() As cv.Point
     Public cityOrder() As Int32
@@ -67,13 +67,13 @@ Public Class knn_Cluster2D
             result.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 2)
         Next
     End Sub
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        knn = New knn_Point2d(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        knn = New knn_Point2d(ocvb, caller)
         knn.sliders.Visible = False
         knn.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, callerName, "knn - number of cities", 10, 1000, 100)
+        sliders.setupTrackBar1(ocvb, caller, "knn - number of cities", 10, 1000, 100)
 
         ocvb.label1 = ""
         ocvb.label2 = ""
@@ -162,16 +162,16 @@ End Class
 
 
 Public Class knn_Point2d
-    Inherits VB_Class
+    Inherits ocvbClass
     Public querySet() As cv.Point2f
     Public responseSet() As Int32
     Public lastSet() As cv.Point2f ' default usage: find and connect points in 2D for this number of points.
     Public externalUse As Boolean
     Public findXnearest As Int32
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "knn Query Points", 1, 50, 10)
-        sliders.setupTrackBar2(ocvb, callerName, "knn k nearest points", 1, 5, 1)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "knn Query Points", 1, 50, 10)
+        sliders.setupTrackBar2(ocvb, caller, "knn k nearest points", 1, 5, 1)
 
         ocvb.desc = "Use KNN to connect 2D points."
         ocvb.label1 = "Yellow=Queries, Blue=Best Responses"
@@ -230,16 +230,16 @@ End Class
 
 
 Public Class knn_Point3d
-    Inherits VB_Class
+    Inherits ocvbClass
     Public querySet() As cv.Point3f
     Public responseSet() As Int32
     Public lastSet() As cv.Point3f ' default usage: find and connect points in 2D for this number of points.
     Public externalUse As Boolean
     Public findXnearest As Int32
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "knn Query Points", 1, 500, 10)
-        sliders.setupTrackBar2(ocvb, callerName, "knn k nearest points", 0, 500, 1)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "knn Query Points", 1, 500, 10)
+        sliders.setupTrackBar2(ocvb, caller, "knn k nearest points", 0, 500, 1)
 
         ocvb.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
         ocvb.label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
@@ -309,16 +309,16 @@ End Class
 
 
 Public Class knn_ClusterNoisyLine
-    Inherits VB_Class
+    Inherits ocvbClass
     Public noisyLine As Fitline_RawInput
     Public cityOrder() As Int32
     Public knn As knn_Point2d
     Dim numberofCities As Int32
     Public findXnearest As Int32 = 2
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        noisyLine = New Fitline_RawInput(ocvb, callerName)
-        knn = New knn_Point2d(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        noisyLine = New Fitline_RawInput(ocvb, caller)
+        knn = New knn_Point2d(ocvb, caller)
         knn.sliders.Visible = False
         knn.externalUse = True
 

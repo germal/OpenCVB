@@ -8,9 +8,10 @@
             <Code Language="VB">
                 <![CDATA[
 Imports cv = OpenCvSharp
-Public Class newClass_Basics : Implements IDisposable
-    Public Sub New(ocvb As AlgorithmData, optional byval callerName as string = "Temp")
-        ocvb.callerName = callername
+Public Class newClass_Basics
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, byval caller as string)
+        setCaller(caller)
         ocvb.label1 = "NewClass_Basics"
         ocvb.label2 = ""
         ocvb.desc = "New class description"
@@ -18,7 +19,7 @@ Public Class newClass_Basics : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
  
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub MyDispose()
     End Sub
 End Class]]>
             </Code>

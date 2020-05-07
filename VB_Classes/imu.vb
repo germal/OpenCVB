@@ -1,17 +1,17 @@
 Imports cv = OpenCvSharp
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
 Public Class IMU_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
         Dim lastTimeStamp As Double
     Dim flow As Font_FlowText
     Public theta As cv.Point3f ' this is the description - x, y, and z - of the axes centered in the camera.
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
 
-        flow = New Font_FlowText(ocvb, callerName)
+        flow = New Font_FlowText(ocvb, caller)
         flow.externalUse = True
         flow.result1or2 = RESULT1
 
@@ -66,11 +66,11 @@ End Class
 
 
 Public Class IMU_Stabilizer
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        kalman = New Kalman_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        kalman = New Kalman_Basics(ocvb, caller)
         kalman.externalUse = True
 
         ocvb.desc = "Stabilize the image with the IMU data."
@@ -124,11 +124,11 @@ End Class
 
 
 Public Class IMU_Magnetometer
-    Inherits VB_Class
+    Inherits ocvbClass
     Public plot As Plot_OverTime
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        plot = New Plot_OverTime(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        plot = New Plot_OverTime(ocvb, caller)
         plot.externalUse = True
         plot.dst = ocvb.result2
         plot.maxScale = 10
@@ -158,9 +158,9 @@ End Class
 
 
 Public Class IMU_Barometer
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Get the barometric pressure from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -177,9 +177,9 @@ End Class
 
 
 Public Class IMU_Temperature
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Get the temperature of the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -194,14 +194,14 @@ End Class
 
 
 Public Class IMU_FrameTime
-    Inherits VB_Class
+    Inherits ocvbClass
     Public plot As Plot_OverTime
     Public CPUInterval As Double
     Public externalUse As Boolean
     Public IMUtoCaptureEstimate As Double
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        plot = New Plot_OverTime(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        plot = New Plot_OverTime(ocvb, caller)
         plot.externalUse = True
         plot.dst = ocvb.result2
         plot.maxScale = 150
@@ -209,8 +209,8 @@ Public Class IMU_FrameTime
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.setupTrackBar1(ocvb, callerName, "Minimum IMU to Capture time (ms)", 1, 10, 2)
-        sliders.setupTrackBar2(ocvb, callerName, "Number of Plot Values", 5, 30, 25)
+        sliders.setupTrackBar1(ocvb, caller, "Minimum IMU to Capture time (ms)", 1, 10, 2)
+        sliders.setupTrackBar2(ocvb, caller, "Number of Plot Values", 5, 30, 25)
 
         ocvb.label2 = "IMU FT (blue) CPU FT (green) Latency est. (red)"
         ocvb.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
@@ -293,14 +293,14 @@ End Class
 
 
 Public Class IMU_HostFrameTimes
-    Inherits VB_Class
+    Inherits ocvbClass
     Public plot As Plot_OverTime
     Public CPUInterval As Double
     Public externalUse As Boolean
     Public HostInterruptDelayEstimate As Double
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        plot = New Plot_OverTime(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        plot = New Plot_OverTime(ocvb, caller)
         plot.externalUse = True
         plot.dst = ocvb.result2
         plot.maxScale = 150
@@ -308,8 +308,8 @@ Public Class IMU_HostFrameTimes
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.setupTrackBar1(ocvb, callerName, "Minimum Host interrupt delay (ms)", 1, 10, 4)
-        sliders.setupTrackBar2(ocvb, callerName, "Number of Plot Values", 5, 30, 25)
+        sliders.setupTrackBar1(ocvb, caller, "Minimum Host interrupt delay (ms)", 1, 10, 4)
+        sliders.setupTrackBar2(ocvb, caller, "Number of Plot Values", 5, 30, 25)
 
         ocvb.label2 = "IMU FT (blue) CPU FT (green) Latency est. (red)"
         ocvb.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
@@ -380,26 +380,26 @@ End Class
 
 
 Public Class IMU_TotalDelay
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim host As IMU_HostFrameTimes
     Dim imu As IMU_FrameTime
     Dim plot As Plot_OverTime
     Dim kalman As Kalman_Single
     Dim externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.parms.ShowOptions = False
 
-        host = New IMU_HostFrameTimes(ocvb, callerName)
+        host = New IMU_HostFrameTimes(ocvb, caller)
         host.externalUse = True
-        imu = New IMU_FrameTime(ocvb, callerName)
+        imu = New IMU_FrameTime(ocvb, caller)
         imu.externalUse = True
-        kalman = New Kalman_Single(ocvb, callerName)
+        kalman = New Kalman_Single(ocvb, caller)
         kalman.externalUse = True
 
         ocvb.parms.ShowOptions = True ' just show plot options...
 
-        plot = New Plot_OverTime(ocvb, callerName)
+        plot = New Plot_OverTime(ocvb, caller)
         plot.externalUse = True
         plot.dst = ocvb.result2
         plot.maxScale = 50
@@ -467,16 +467,16 @@ End Class
 
 
 Public Class IMU_GravityVec
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim kalman As Kalman_Basics
     Public angleX As Single ' in radians.
     Public angleY As Single ' in radians.
     Public angleZ As Single ' in radians.
     Public result As Integer = RESULT1 ' should be result1 or result2
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        kalman = New Kalman_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        kalman = New Kalman_Basics(ocvb, caller)
         ReDim kalman.src(6 - 1)
         kalman.externalUse = True
 

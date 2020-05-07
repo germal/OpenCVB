@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Extrinsics_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Show the depth camera extrinsics."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

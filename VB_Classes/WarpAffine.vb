@@ -1,13 +1,13 @@
 Imports cv = OpenCvSharp
 ' http://opencvexamples.blogspot.com/
 Public Class WarpAffine_Captcha
-    Inherits VB_Class
+    Inherits ocvbClass
     Const charHeight = 100
     Const charWidth = 80
     Const captchaLength = 8
     Dim rng As New System.Random
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Use OpenCV to build a captcha Turing test."
     End Sub
     Private Sub addNoise(image As cv.Mat)
@@ -96,12 +96,12 @@ End Class
 
 ' http://opencvexamples.blogspot.com/
 Public Class WarpAffine_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Angle", 0, 360, 10)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Angle", 0, 360, 10)
 
-        SetInterpolationRadioButtons(ocvb, callerName, radio, "WarpAffine")
+        SetInterpolationRadioButtons(ocvb, caller, radio, "WarpAffine")
 
         ocvb.desc = "Use WarpAffine to transform input images."
     End Sub
@@ -126,11 +126,11 @@ End Class
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
 Public Class WarpAffine_3Points
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim triangle As Area_MinTriangle_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        triangle = New Area_MinTriangle_CPP(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        triangle = New Area_MinTriangle_CPP(ocvb, caller)
         triangle.sliders.TrackBar1.Value = 20
         triangle.sliders.TrackBar2.Value = 150
 
@@ -203,11 +203,11 @@ End Class
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
 Public Class WarpAffine_4Points
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim rect As Area_MinRect
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        rect = New Area_MinRect(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        rect = New Area_MinRect(ocvb, caller)
 
         ocvb.desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
         ocvb.label1 = "Color image with perspective transform applied"

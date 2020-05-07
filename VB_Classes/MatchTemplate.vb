@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class MatchTemplate_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim flow As Font_FlowText
     Public sample1 As cv.Mat
     Public sample2 As cv.Mat
@@ -8,13 +8,13 @@ Public Class MatchTemplate_Basics
     Public matchText As String = ""
     Public correlationMat As New cv.Mat
     Public reportFreq = 10 ' report the results every x number of iterations.
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        flow = New Font_FlowText(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        flow = New Font_FlowText(ocvb, caller)
         flow.externalUse = True
         flow.result1or2 = RESULT2
 
-        radio.Setup(ocvb, callerName, 6)
+        radio.Setup(ocvb, caller, 6)
         radio.check(0).Text = "CCoeff"
         radio.check(1).Text = "CCoeffNormed"
         radio.check(2).Text = "CCorr"
@@ -22,7 +22,7 @@ Public Class MatchTemplate_Basics
         radio.check(4).Text = "SqDiff"
         radio.check(5).Text = "SqDiffNormed"
         radio.check(1).Checked = True
-        sliders.setupTrackBar1(ocvb, callerName, "Sample Size", 2, 10000, 100)
+        sliders.setupTrackBar1(ocvb, caller, "Sample Size", 2, 10000, 100)
         ocvb.label2 = "Log of correlation results"
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
@@ -61,16 +61,16 @@ End Class
 
 
 Public Class MatchTemplate_RowCorrelation
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim corr As MatchTemplate_Basics
     Dim flow As Font_FlowText
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        flow = New Font_FlowText(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        flow = New Font_FlowText(ocvb, caller)
         flow.externalUse = True
         flow.result1or2 = RESULT2
 
-        corr = New MatchTemplate_Basics(ocvb, callerName)
+        corr = New MatchTemplate_Basics(ocvb, caller)
         corr.externalUse = True
         corr.sliders.Visible = False
 
@@ -110,10 +110,10 @@ End Class
 
 
 Public Class MatchTemplate_DrawRect
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        radio.Setup(ocvb, callerName, 6)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        radio.Setup(ocvb, caller, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
         Next
@@ -157,18 +157,18 @@ End Class
 
 
 Public Class MatchTemplate_BestTemplate_MT
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim grid As Thread_Grid
     Dim entropies(0) As Entropy_Basics
     Dim match As MatchTemplate_DrawRect
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        grid = New Thread_Grid(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 128
         grid.sliders.TrackBar2.Value = 128
         grid.externalUse = True
 
-        match = New MatchTemplate_DrawRect(ocvb, callerName)
+        match = New MatchTemplate_DrawRect(ocvb, caller)
 
         ocvb.parms.ShowOptions = False ' we won't need the options...
 
@@ -183,7 +183,7 @@ Public Class MatchTemplate_BestTemplate_MT
             If entropies.Length <> grid.roiList.Count Then
                 ReDim entropies(grid.roiList.Count - 1)
                 For i = 0 To entropies.Length - 1
-                    entropies(i) = New Entropy_Basics(ocvb, callerName)
+                    entropies(i) = New Entropy_Basics(ocvb, caller)
                     entropies(i).externalUse = True
                 Next
             End If

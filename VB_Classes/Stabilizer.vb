@@ -1,15 +1,15 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Stabilizer_BriskFeatures
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim brisk As BRISK_Basics
     Dim stabilizer As Stabilizer_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        stabilizer = New Stabilizer_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        stabilizer = New Stabilizer_Basics(ocvb, caller)
         stabilizer.externalUse = True
 
-        brisk = New BRISK_Basics(ocvb, callerName)
+        brisk = New BRISK_Basics(ocvb, caller)
         brisk.externalUse = True
         brisk.sliders.TrackBar1.Value = 10
 
@@ -32,15 +32,15 @@ End Class
 
 
 Public Class Stabilizer_HarrisFeatures
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim harris As Harris_Detector_CPP
     Dim stabilizer As Stabilizer_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        stabilizer = New Stabilizer_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        stabilizer = New Stabilizer_Basics(ocvb, caller)
         stabilizer.externalUse = True
 
-        harris = New Harris_Detector_CPP(ocvb, callerName)
+        harris = New Harris_Detector_CPP(ocvb, caller)
         harris.externalUse = True
 
         ocvb.desc = "Stabilize the video stream using Harris detector features"
@@ -63,7 +63,7 @@ End Class
 
 ' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
 Public Class Stabilizer_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Public good As Features_GoodFeatures
     Public features As New List(Of cv.Point2f)
     Public lastFrame As cv.Mat
@@ -71,9 +71,9 @@ Public Class Stabilizer_Basics
     Public borderCrop = 30
     Dim sumScale As cv.Mat, sScale As cv.Mat, features1 As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        good = New Features_GoodFeatures(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        good = New Features_GoodFeatures(ocvb, caller)
         good.externalUse = True
 
         ocvb.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
@@ -187,12 +187,12 @@ Module Stabilizer_Basics_Module
     End Function
 End Module
 Public Class Stabilizer_Basics_CPP
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim srcData() As Byte
     Dim handleSrc As GCHandle
     Dim sPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ReDim srcData(ocvb.color.Total * ocvb.color.ElemSize - 1)
         sPtr = Stabilizer_Basics_Open()
         ocvb.desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work."
@@ -222,13 +222,13 @@ End Class
 
 ' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
 Public Class Stabilizer_SideBySide
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim original As Stabilizer_Basics_CPP
     Dim basics As Stabilizer_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        original = New Stabilizer_Basics_CPP(ocvb, callerName)
-        basics = New Stabilizer_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        original = New Stabilizer_Basics_CPP(ocvb, caller)
+        basics = New Stabilizer_Basics(ocvb, caller)
         ocvb.desc = "Run both the original and the VB.Net version of the video stabilizer.  Neither is working properly."
         ocvb.label1 = "Stabilizer_Basic (VB.Net)"
         ocvb.label2 = "Stabilizer_Basic_CPP (C++)"

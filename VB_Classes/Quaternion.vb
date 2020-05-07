@@ -13,18 +13,18 @@ Module Quaternion_module
 End Module
 
 Public Class Quaterion_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders1.setupTrackBar1(ocvb, callerName, "quaternion A.x X100", -100, 100, 0)
-        sliders1.setupTrackBar2(ocvb, callerName, "quaternion A.y X100", -100, 100, 0)
-        sliders1.setupTrackBar3(ocvb, callerName, "quaternion A.z X100", -100, 100, 0)
-        sliders1.setupTrackBar4(ocvb, callerName, "quaternion Theta X100", -100, 100, 100)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders1.setupTrackBar1(ocvb, caller, "quaternion A.x X100", -100, 100, 0)
+        sliders1.setupTrackBar2(ocvb, caller, "quaternion A.y X100", -100, 100, 0)
+        sliders1.setupTrackBar3(ocvb, caller, "quaternion A.z X100", -100, 100, 0)
+        sliders1.setupTrackBar4(ocvb, caller, "quaternion Theta X100", -100, 100, 100)
 
-        sliders2.setupTrackBar1(ocvb, callerName, "quaternion B.x X100", -100, 100, 0)
-        sliders2.setupTrackBar2(ocvb, callerName, "quaternion B.y X100", -100, 100, 0)
-        sliders2.setupTrackBar3(ocvb, callerName, "quaternion B.z X100", -100, 100, 0)
-        sliders2.setupTrackBar4(ocvb, callerName, "quaternion Theta X100", -100, 100, 100)
+        sliders2.setupTrackBar1(ocvb, caller, "quaternion B.x X100", -100, 100, 0)
+        sliders2.setupTrackBar2(ocvb, caller, "quaternion B.y X100", -100, 100, 0)
+        sliders2.setupTrackBar3(ocvb, caller, "quaternion B.z X100", -100, 100, 0)
+        sliders2.setupTrackBar4(ocvb, caller, "quaternion Theta X100", -100, 100, 100)
 
         ocvb.desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub
@@ -47,11 +47,11 @@ End Class
 
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/pose-predict
 Public Class Quaterion_IMUPrediction
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim host As IMU_HostFrameTimes
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        host = New IMU_HostFrameTimes(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        host = New IMU_HostFrameTimes(ocvb, caller)
         host.externalUse = True
 
         ocvb.label1 = "Quaternion_IMUPrediction"

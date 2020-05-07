@@ -3,11 +3,11 @@ Imports System.Collections.Generic
 Imports System.Runtime.InteropServices
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/PixelAccess.cs
 Public Class Pixel_GetSet
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim mat4 As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        mat4 = New Mat_4to1(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        mat4 = New Mat_4to1(ocvb, caller)
         mat4.externalUse = True
 
         ocvb.label1 = "Log of times for each method"

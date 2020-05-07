@@ -1,12 +1,12 @@
 ﻿Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Laplacian_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Laplacian Kernel size", 1, 21, 3)
-        sliders.setupTrackBar2(ocvb, callerName, "Laplacian Scale", 0, 100, 100)
-        sliders.setupTrackBar3(ocvb, callerName, "Laplacian Delta", 0, 1000, 0)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Laplacian Kernel size", 1, 21, 3)
+        sliders.setupTrackBar2(ocvb, caller, "Laplacian Scale", 0, 100, 100)
+        sliders.setupTrackBar3(ocvb, caller, "Laplacian Delta", 0, 1000, 0)
         ocvb.desc = "Laplacian filter - the second derivative."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -27,14 +27,14 @@ End Class
 
 ' https://docs.opencv.org/3.2.0/de/db2/laplace_8cpp-example.html
 Public Class Laplacian_Blur
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Laplacian Kernel size", 1, 21, 3)
-        sliders.setupTrackBar2(ocvb, callerName, "Laplacian Scale", 0, 100, 100)
-        sliders.setupTrackBar3(ocvb, callerName, "Laplacian Delta", 0, 1000, 0)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Laplacian Kernel size", 1, 21, 3)
+        sliders.setupTrackBar2(ocvb, caller, "Laplacian Scale", 0, 100, 100)
+        sliders.setupTrackBar3(ocvb, caller, "Laplacian Delta", 0, 1000, 0)
 
-        radio.Setup(ocvb, callerName, 3)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Add Gaussian Blur"
         radio.check(1).Text = "Add boxfilter Blur"
         radio.check(2).Text = "Add median Blur"

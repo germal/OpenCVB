@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Remap_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Use remap to reflect an image in 4 directions."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -45,10 +45,10 @@ End Class
 
 
 Public Class Remap_Flip
-    Inherits VB_Class
+    Inherits ocvbClass
     Public direction = 0
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Use flip to remap an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

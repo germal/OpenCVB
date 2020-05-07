@@ -1,9 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class LeftRightView_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "brightness", 0, 255, 100)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "brightness", 0, 255, 100)
         ocvb.desc = "Show the left and right views from the 3D Camera"
         Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
@@ -34,16 +34,16 @@ End Class
 
 
 Public Class LeftRightView_CompareUndistorted
-    Inherits VB_Class
+    Inherits ocvbClass
     Public fisheye As FishEye_Rectified
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        fisheye = New FishEye_Rectified(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        fisheye = New FishEye_Rectified(ocvb, caller)
         fisheye.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, callerName, "brightness", 0, 255, 0)
-        sliders.setupTrackBar2(ocvb, callerName, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar3(ocvb, callerName, "Slice Height", 1, 300, 50)
+        sliders.setupTrackBar1(ocvb, caller, "brightness", 0, 255, 0)
+        sliders.setupTrackBar2(ocvb, caller, "Slice Starting Y", 0, 300, 100)
+        sliders.setupTrackBar3(ocvb, caller, "Slice Height", 1, 300, 50)
         Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
                 ocvb.label1 = "Left Image"
@@ -99,13 +99,13 @@ End Class
 
 
 Public Class LeftRightView_CompareRaw
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim lrView As LeftRightView_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "brightness", 0, 255, 100)
-        sliders.setupTrackBar2(ocvb, callerName, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar3(ocvb, callerName, "Slice Height", 1, 120, 50)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "brightness", 0, 255, 100)
+        sliders.setupTrackBar2(ocvb, caller, "Slice Starting Y", 0, 300, 100)
+        sliders.setupTrackBar3(ocvb, caller, "Slice Height", 1, 120, 50)
         Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
                 ocvb.label1 = "Left Image"
@@ -119,7 +119,7 @@ Public Class LeftRightView_CompareRaw
                 ocvb.label2 = "Raw Right Right Image"
                 sliders.TrackBar1.Value = 50
         End Select
-        lrView = New LeftRightView_Basics(ocvb, callerName)
+        lrView = New LeftRightView_Basics(ocvb, caller)
         lrView.sliders.Hide()
         ocvb.desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
@@ -150,15 +150,15 @@ End Class
 
 
 Public Class LeftRightView_Features
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim lrView As LeftRightView_Basics
     Dim features As Features_GoodFeatures
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        features = New Features_GoodFeatures(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        features = New Features_GoodFeatures(ocvb, caller)
         features.externalUse = True
 
-        lrView = New LeftRightView_Basics(ocvb, callerName)
+        lrView = New LeftRightView_Basics(ocvb, caller)
 
         ocvb.desc = "Find GoodFeatures in the left and right depalettized infrared images"
         ocvb.label1 = "Left Image"
@@ -192,13 +192,13 @@ End Class
 
 
 Public Class LeftRightView_Palettized
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim lrView As LeftRightView_Basics
     Dim palette As Palette_ColorMap
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        lrView = New LeftRightView_Basics(ocvb, callerName)
-        palette = New Palette_ColorMap(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        lrView = New LeftRightView_Basics(ocvb, caller)
+        palette = New Palette_ColorMap(ocvb, caller)
         palette.externalUse = True
 
         ocvb.desc = "Add color to the 8-bit infrared images."
@@ -230,20 +230,20 @@ End Class
 
 
 Public Class LeftRightView_BRISK
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim lrView As LeftRightView_Basics
     Dim brisk As BRISK_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Add color to the 8-bit infrared images."
         ocvb.label1 = "Infrared Left Image"
         ocvb.label2 = "Infrared Right Image"
 
-        brisk = New BRISK_Basics(ocvb, callerName)
+        brisk = New BRISK_Basics(ocvb, caller)
         brisk.externalUse = True
         brisk.sliders.TrackBar1.Value = 20
 
-        lrView = New LeftRightView_Basics(ocvb, callerName)
+        lrView = New LeftRightView_Basics(ocvb, caller)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         lrView.Run(ocvb)

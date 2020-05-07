@@ -1,9 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class Watershed_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Public useDepthImage As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.label1 = "Draw with left-click to select region."
         ocvb.label2 = "Mask for watershed (selected regions)."
         ocvb.result2.SetTo(0)
@@ -61,12 +61,12 @@ End Class
 
 
 Public Class Watershed_DepthAuto
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim watershed As Watershed_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.result2.SetTo(0)
-        watershed = New Watershed_Basics(ocvb, callerName)
+        watershed = New Watershed_Basics(ocvb, caller)
         watershed.useDepthImage = True
         ocvb.desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
@@ -90,13 +90,13 @@ End Class
 
 
 Public Class Watershed_RGBSimpleAuto
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim watershed As Watershed_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.result2.SetTo(0)
 
-        watershed = New Watershed_Basics(ocvb, callerName)
+        watershed = New Watershed_Basics(ocvb, caller)
 
         Dim topLeft = New cv.Rect(0, 0, 100, 100)
         Dim topRight = New cv.Rect(ocvb.color.Width - 100, 0, 100, 100)
@@ -121,13 +121,13 @@ End Class
 
 
 Public Class Watershed_RGBDepthAuto
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim watershed As Watershed_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.result2.SetTo(0)
 
-        watershed = New Watershed_Basics(ocvb, callerName)
+        watershed = New Watershed_Basics(ocvb, caller)
 
         Dim topLeft = New cv.Rect(0, 0, 100, 100)
         Dim topRight = New cv.Rect(ocvb.color.Width - 100, 0, 100, 100)

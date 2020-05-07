@@ -1,14 +1,14 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.3.1/de/dd0/grabcut_8cpp-example.html
 Public Class GrabCut_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim contours As Contours_Depth
-        Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        contours = New Contours_Depth(ocvb, callerName)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        contours = New Contours_Depth(ocvb, caller)
 
-        sliders.setupTrackBar1(ocvb, callerName, "Erode iterations", 1, 20, 3)
-        sliders.setupTrackBar2(ocvb, callerName, "Erode kernel size", 1, 21, 3)
+        sliders.setupTrackBar1(ocvb, caller, "Erode iterations", 1, 20, 3)
+        sliders.setupTrackBar2(ocvb, caller, "Erode kernel size", 1, 21, 3)
 
         ocvb.desc = "Use grabcut to isolate what is in the foreground and background.  "
     End Sub

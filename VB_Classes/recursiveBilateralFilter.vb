@@ -16,12 +16,12 @@ End Module
 
 ' https://github.com/ufoym
 Public Class RecursiveBilateralFilter_CPP
-    Inherits VB_Class
+    Inherits ocvbClass
         Dim srcData() As Byte
     Dim rbf As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "RBF Recursion count", 1, 20, 2)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "RBF Recursion count", 1, 20, 2)
         
         ReDim srcData(ocvb.color.Total * ocvb.color.ElemSize - 1)
 

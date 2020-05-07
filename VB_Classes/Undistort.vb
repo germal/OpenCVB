@@ -57,26 +57,26 @@ End Module
 
 ' https://stackoverflow.com/questions/26602981/correct-barrel-distortion-in-opencv-manually-without-chessboard-image
 Public Class Undistort_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim leftViewMap1 As New cv.Mat
     Dim leftViewMap2 As New cv.Mat
     Dim saveK As Int32, saveD As Int32, saveR As Int32, saveP As Int32
     Dim maxDisp As Int32
     Dim stereo_cx As Int32
     Dim stereo_cy As Int32
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "undistort intrinsics Left", 1, 200, 100)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "undistort intrinsics Left", 1, 200, 100)
 
         If ocvb.parms.cameraIndex = T265Camera Then
-            sliders.setupTrackBar2(ocvb, callerName, "undistort intrinsics coeff's", -100000, 100000, 100)
+            sliders.setupTrackBar2(ocvb, caller, "undistort intrinsics coeff's", -100000, 100000, 100)
         Else
-            sliders.setupTrackBar2(ocvb, callerName, "undistort intrinsics coeff's", -1000, 1000, 100)
+            sliders.setupTrackBar2(ocvb, caller, "undistort intrinsics coeff's", -1000, 1000, 100)
         End If
-        sliders.setupTrackBar3(ocvb, callerName, "undistort stereo height", 1, ocvb.color.Height, ocvb.color.Height)
-        sliders.setupTrackBar4(ocvb, callerName, "undistort Offset left/right", 1, 200, 112)
+        sliders.setupTrackBar3(ocvb, caller, "undistort stereo height", 1, ocvb.color.Height, ocvb.color.Height)
+        sliders.setupTrackBar4(ocvb, caller, "undistort Offset left/right", 1, 200, 112)
 
-        check.Setup(ocvb, callerName, 1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Restore Original matrices"
         check.Box(0).Checked = True
 

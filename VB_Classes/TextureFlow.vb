@@ -1,13 +1,13 @@
 Imports cv = OpenCvSharp
 Public Class TextureFlow_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
         Public src As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Texture Flow Delta", 2, 100, 12)
-        sliders.setupTrackBar2(ocvb, callerName, "Texture Eigen BlockSize", 1, 100, 20)
-        sliders.setupTrackBar3(ocvb, callerName,"Texture Eigen Ksize", 1, 15, 1)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Texture Flow Delta", 2, 100, 12)
+        sliders.setupTrackBar2(ocvb, caller, "Texture Eigen BlockSize", 1, 100, 20)
+        sliders.setupTrackBar3(ocvb, caller,"Texture Eigen Ksize", 1, 15, 1)
 
         ocvb.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub
@@ -38,11 +38,11 @@ End Class
 
 
 Public Class TextureFlow_Depth
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim texture As TextureFlow_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        texture = New TextureFlow_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        texture = New TextureFlow_Basics(ocvb, caller)
         texture.externalUse = True
         ocvb.desc = "Display texture flow in the depth data"
     End Sub

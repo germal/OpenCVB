@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Transform_Resize
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Resize Percent", 50, 1000, 50)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Resize Percent", 50, 1000, 50)
         ocvb.desc = "Resize an image based on the slider value."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -27,14 +27,14 @@ End Class
 
 
 Public Class Transform_Rotate
-    Inherits VB_Class
+    Inherits ocvbClass
     Public src As cv.Mat
     Public dst As cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Angle", 0, 180, 30)
-        sliders.setupTrackBar2(ocvb, callerName, "Scale Factor", 1, 100, 50)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Angle", 0, 180, 30)
+        sliders.setupTrackBar2(ocvb, caller, "Scale Factor", 1, 100, 50)
         ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -51,10 +51,10 @@ End Class
 
 
 Public Class Transform_Sort
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        radio.Setup(ocvb, callerName, 4)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        radio.Setup(ocvb, caller, 4)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
@@ -76,10 +76,10 @@ End Class
 
 
 Public Class Transform_SortReshape
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        radio.Setup(ocvb, callerName, 2)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        radio.Setup(ocvb, caller, 2)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"

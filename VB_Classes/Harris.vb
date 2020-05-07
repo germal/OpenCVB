@@ -28,15 +28,15 @@ End Module
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
 Public Class Harris_Features_CPP
-    Inherits VB_Class
+    Inherits ocvbClass
         Dim srcData() As Byte
     Dim Harris_Features As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Harris Threshold", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, callerName, "Harris Neighborhood", 1, 41, 21)
-        sliders.setupTrackBar3(ocvb, callerName,"Harris aperture", 1, 33, 21)
-        sliders.setupTrackBar4(ocvb, callerName,  "Harris Parameter", 1, 100, 1)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Harris Threshold", 1, 100, 1)
+        sliders.setupTrackBar2(ocvb, caller, "Harris Neighborhood", 1, 41, 21)
+        sliders.setupTrackBar3(ocvb, caller,"Harris aperture", 1, 33, 21)
+        sliders.setupTrackBar4(ocvb, caller,  "Harris Parameter", 1, 100, 1)
         
         ocvb.desc = "Use Harris feature detectors to identify interesting points."
 
@@ -75,15 +75,15 @@ End Class
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
 Public Class Harris_Detector_CPP
-    Inherits VB_Class
+    Inherits ocvbClass
         Dim srcData() As Byte
     Dim ptCount(1) As Int32
     Dim Harris_Detector As IntPtr
     Public FeaturePoints As New List(Of cv.Point2f)
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Harris qualityLevel", 1, 100, 2)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Harris qualityLevel", 1, 100, 2)
         
         ocvb.desc = "Use Harris detector to identify interesting points."
 

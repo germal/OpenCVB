@@ -3,24 +3,24 @@ Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
 Public Class EMax_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
             Public samples As cv.Mat
     Public labels As cv.Mat
     Public externalUse As Boolean
     Public grid As Thread_Grid
     Public regionCount As Int32
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        grid = New Thread_Grid(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        grid = New Thread_Grid(ocvb, caller)
 
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 2
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 2
 
-        sliders.setupTrackBar1(ocvb, callerName, "EMax Number of Samples", 1, 200, 100)
-        sliders.setupTrackBar2(ocvb, callerName, "EMax Prediction Step Size", 1, 20, 5)
-        sliders.setupTrackBar3(ocvb, callerName,"EMax Sigma (spread)", 1, 100, 30)
+        sliders.setupTrackBar1(ocvb, caller, "EMax Number of Samples", 1, 200, 100)
+        sliders.setupTrackBar2(ocvb, caller, "EMax Prediction Step Size", 1, 20, 5)
+        sliders.setupTrackBar3(ocvb, caller,"EMax Sigma (spread)", 1, 100, 30)
 
-        radio.Setup(ocvb, callerName,3)
+        radio.Setup(ocvb, caller,3)
         radio.check(0).Text = "EMax matrix type Spherical"
         radio.check(1).Text = "EMax matrix type Diagonal"
         radio.check(2).Text = "EMax matrix type Generic"
@@ -33,7 +33,7 @@ Public Class EMax_Basics
         regionCount = grid.roiList.Count - 1
 
         If externalUse = False Then
-            ocvb.putText(New ActiveClass.TrueType("The EMax VB_Class fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
+            ocvb.putText(New ActiveClass.TrueType("The EMax ocvbClass fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
                                                   "The EMax_Basics_CPP works fine and they are functionally identical.", 20, 100, RESULT2))
         End If
 
@@ -109,12 +109,12 @@ Module EMax_Exports
 End Module
 
 Public Class EMax_Basics_CPP
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim emax As EMax_Basics
     Dim EMax_Basics As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        emax = New EMax_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        emax = New EMax_Basics(ocvb, caller)
         emax.externalUse = True
 
         EMax_Basics = EMax_Basics_Open()

@@ -10,11 +10,12 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
-Public Class OpenGL_MyOpenGLtest : Implements IDisposable
+Public Class OpenGL_MyOpenGLtest 
+    Inherits ocvbClass
     Public ogl As OpenGL_Basics
-    Public Sub New(ocvb As AlgorithmData, optional byval callerName as string = "OpenGL_MyOpenGLtest")
-		ocvb.callerName = callerName
-		ogl = New OpenGL_Basics(ocvb)
+    Public Sub New(ocvb As AlgorithmData, byval caller as string)
+        setCaller(caller)
+		    ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_MyOpenGLtest"
         ocvb.desc = "Describe your algorithm"
     End Sub
@@ -22,7 +23,7 @@ Public Class OpenGL_MyOpenGLtest : Implements IDisposable
         ogl.rgbInput = ocvb.color
         ogl.Run(ocvb)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
+    Public Sub MyDispose() 
         ogl.Dispose()
     End Sub
 End Class

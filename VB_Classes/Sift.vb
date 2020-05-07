@@ -4,20 +4,20 @@ Imports CS_Classes
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Sift_Basics_CS
-    Inherits VB_Class
+    Inherits ocvbClass
         Dim CS_SiftBasics As New CS_SiftBasics
     Dim fisheye As FishEye_Rectified
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        fisheye = New FishEye_Rectified(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        fisheye = New FishEye_Rectified(ocvb, caller)
         fisheye.externalUse = True
 
-        radio.Setup(ocvb, callerName,2)
+        radio.Setup(ocvb, caller,2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
 
-        sliders.setupTrackBar1(ocvb, callerName, "Points to Match", 1, 1000, 200)
+        sliders.setupTrackBar1(ocvb, caller, "Points to Match", 1, 1000, 200)
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
@@ -46,24 +46,24 @@ End Class
 
 
 Public Class Sift_Basics_CS_MT
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim grid As Thread_Grid
         Dim CS_SiftBasics As New CS_SiftBasics
     Dim fisheye As FishEye_Rectified
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-                setCaller(caller)
-        fisheye = New FishEye_Rectified(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+                setCaller(callerRaw)
+        fisheye = New FishEye_Rectified(ocvb, caller)
         fisheye.externalUse = True
-        grid = New Thread_Grid(ocvb, callerName)
+        grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = ocvb.color.Width - 1 ' we are just taking horizontal slices of the image.
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 2
 
-        radio.Setup(ocvb, callerName,2)
+        radio.Setup(ocvb, caller,2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
 
-        sliders.setupTrackBar1(ocvb, callerName, "Points to Match", 1, 1000, 100)
+        sliders.setupTrackBar1(ocvb, caller, "Points to Match", 1, 1000, 100)
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub

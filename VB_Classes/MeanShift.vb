@@ -1,11 +1,11 @@
 Imports cv = OpenCvSharp
 ' http://answers.opencv.org/question/175486/meanshift-sample-code-in-c/
 Public Class MeanShift_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Public rectangleEdgeWidth As Int32 = 2
     Public trackbox As New cv.Rect
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.label1 = "Draw anywhere to start mean shift tracking."
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track"
     End Sub
@@ -40,13 +40,13 @@ End Class
 
 
 Public Class MeanShift_Depth
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim ms As MeanShift_Basics
     Dim blob As Depth_Foreground
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        ms = New MeanShift_Basics(ocvb, callerName)
-        blob = New Depth_Foreground(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        ms = New MeanShift_Basics(ocvb, caller)
+        blob = New Depth_Foreground(ocvb, caller)
         ocvb.desc = "Use depth to start mean shift algorithm."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -68,12 +68,12 @@ End Class
 
 'http://study.marearts.com/2014/12/opencv-meanshiftfiltering-example.html
 Public Class MeanShift_PyrFilter
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "MeanShift Spatial Radius", 1, 100, 10)
-        sliders.setupTrackBar2(ocvb, callerName, "MeanShift color Radius", 1, 100, 15)
-        sliders.setupTrackBar3(ocvb, callerName, "MeanShift Max Pyramid level", 1, 8, 3)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "MeanShift Spatial Radius", 1, 100, 10)
+        sliders.setupTrackBar2(ocvb, caller, "MeanShift color Radius", 1, 100, 15)
+        sliders.setupTrackBar3(ocvb, caller, "MeanShift Max Pyramid level", 1, 8, 3)
         ocvb.desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -90,23 +90,23 @@ End Class
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class Meanshift_TopObjects
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim blob As Blob_DepthClusters
     Dim cams(3) As MeanShift_Basics
     Dim mats1 As Mat_4to1
     Dim mats2 As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        mats1 = New Mat_4to1(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        mats1 = New Mat_4to1(ocvb, caller)
         mats1.externalUse = True
 
-        mats2 = New Mat_4to1(ocvb, callerName)
+        mats2 = New Mat_4to1(ocvb, caller)
         mats2.externalUse = True
 
-        blob = New Blob_DepthClusters(ocvb, callerName)
-        sliders.setupTrackBar1(ocvb, callerName, "How often should camshift be reinitialized", 1, 500, 100)
+        blob = New Blob_DepthClusters(ocvb, caller)
+        sliders.setupTrackBar1(ocvb, caller, "How often should camshift be reinitialized", 1, 500, 100)
                 For i = 0 To cams.Length - 1
-            cams(i) = New MeanShift_Basics(ocvb, callerName)
+            cams(i) = New MeanShift_Basics(ocvb, caller)
             cams(i).rectangleEdgeWidth = 8
         Next
         ocvb.desc = "Track"

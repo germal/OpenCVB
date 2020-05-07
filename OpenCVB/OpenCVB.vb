@@ -39,6 +39,7 @@ Public Class OpenCVB
     Dim GrabRectangleData As Boolean
     Dim HomeDir As DirectoryInfo
     Dim keyboardInput As String
+    Dim keyboardLastInput As String
 
     Dim LastX As Int32
     Dim LastY As Int32
@@ -219,7 +220,7 @@ Public Class OpenCVB
         TestAllTimer.Interval = optionsForm.TestAllDuration.Text * 1000
         FindPython()
 
-        End Sub
+    End Sub
     Private Sub RestartCamera()
         camera.closePipe()
         stopCameraThread = True
@@ -562,7 +563,7 @@ Public Class OpenCVB
                 For y = 0 To drawRect.Height - 1
                     sw.Write("Row " + Format(y, "000") + "," + vbTab)
                     For x = 0 To drawRect.Width - 1
-                        Dim pt = srcROI.Get(of cv.Vec3b)(y, x)
+                        Dim pt = srcROI.Get(Of cv.Vec3b)(y, x)
                         sw.Write(CStr(pt.Item0) + "," + CStr(pt.Item1) + "," + CStr(pt.Item2) + ",")
                     Next
                     sw.WriteLine("")
@@ -628,6 +629,36 @@ Public Class OpenCVB
         Catch ex As Exception
             Console.WriteLine("Error in camPic_MouseMove: " + ex.Message)
         End Try
+    End Sub
+    Private Sub AvailableAlgorithms_KeyDown(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyDown
+        e.SuppressKeyPress = True
+    End Sub
+    Private Sub OpenCVkeyword_KeyDown(sender As Object, e As KeyEventArgs) Handles OpenCVkeyword.KeyDown
+        e.SuppressKeyPress = True
+    End Sub
+    Private Sub keyholdTimer_Tick(sender As Object, e As EventArgs) Handles keyholdTimer.Tick
+        keyboardInput += keyboardLastInput ' press and hold means send this key again...
+    End Sub
+    Private Sub OpenCVB_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+        Dim repeated = keyholdTimer.Enabled
+        keyholdTimer.Enabled = False
+        If e.KeyCode = Keys.Escape Then
+            keyboardInput = ""
+            Exit Sub
+        End If
+
+        SyncLock bufferLock
+            If repeated Then
+                keyboardInput = (e.KeyData.ToString()).ToLower ' just the last key if we were repeating characters.
+            Else
+                keyboardInput += (e.KeyData.ToString()).ToLower
+            End If
+        End SyncLock
+        ' Console.WriteLine(keyboardInput + " " + e.KeyCode.ToString + " keyboardLastInput = " + keyboardLastInput.ToString())
+    End Sub
+    Private Sub OpenCVB_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        keyholdTimer.Enabled = True
+        keyboardLastInput = (e.KeyData.ToString()).ToLower
     End Sub
     Private Sub campic_DoubleClick(sender As Object, e As EventArgs)
         DrawingRectangle = False
@@ -1102,20 +1133,5 @@ Public Class OpenCVB
         If parms.testAllRunning Then
             Console.WriteLine(vbTab + "Ending " + parms.activeAlgorithm)
         End If
-    End Sub
-
-    Private Sub OpenCVB_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-        If e.KeyCode = Keys.Escape Then
-            keyboardInput = ""
-            Exit Sub
-        End If
-
-        SyncLock bufferLock
-            keyboardInput += (e.KeyData.ToString()).ToLower
-        End SyncLock
-        '  Console.WriteLine(keyboardInput + " " + e.KeyValue.ToString)
-    End Sub
-    Private Sub AvailableAlgorithms_KeyDown(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyDown
-        e.SuppressKeyPress = True
     End Sub
 End Class

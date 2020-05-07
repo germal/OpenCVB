@@ -1,13 +1,13 @@
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
 Public Class Clone_Normal
-    Inherits VB_Class
+    Inherits ocvbClass
     Public colorChangeValues As cv.Vec3f
     Public illuminationChangeValues As cv.Vec2f
     Public textureFlatteningValues As cv.Vec2f
     Public cloneSpec As Int32 ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
         ocvb.label1 = "Clone result - draw anywhere to clone a region"
         ocvb.label2 = "Clone Region Mask"
@@ -37,16 +37,16 @@ End Class
 
 
 Public Class Clone_ColorChange
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim clone As Clone_Normal
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        clone = New Clone_Normal(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        clone = New Clone_Normal(ocvb, caller)
         ocvb.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
 
-        sliders.setupTrackBar1(ocvb, callerName, "Color Change - Red", 5, 25, 15)
-        sliders.setupTrackBar2(ocvb, callerName, "Color Change - Green", 5, 25, 5)
-        sliders.setupTrackBar3(ocvb, callerName, "Color Change - Blue", 5, 25, 5)
+        sliders.setupTrackBar1(ocvb, caller, "Color Change - Red", 5, 25, 15)
+        sliders.setupTrackBar2(ocvb, caller, "Color Change - Green", 5, 25, 5)
+        sliders.setupTrackBar3(ocvb, caller, "Color Change - Blue", 5, 25, 5)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 0
@@ -62,15 +62,15 @@ End Class
 
 
 Public Class Clone_IlluminationChange
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim clone As Clone_Normal
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        clone = New Clone_Normal(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        clone = New Clone_Normal(ocvb, caller)
         ocvb.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
 
-        sliders.setupTrackBar1(ocvb, callerName, "Alpha", 0, 20, 2)
-        sliders.setupTrackBar2(ocvb, callerName, "Beta", 0, 20, 2)
+        sliders.setupTrackBar1(ocvb, caller, "Alpha", 0, 20, 2)
+        sliders.setupTrackBar2(ocvb, caller, "Beta", 0, 20, 2)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 1
@@ -87,15 +87,15 @@ End Class
 
 
 Public Class Clone_TextureFlattening
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim clone As Clone_Normal
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        clone = New Clone_Normal(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        clone = New Clone_Normal(ocvb, caller)
         ocvb.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
 
-        sliders.setupTrackBar1(ocvb, callerName, "Low Threshold", 0, 100, 10)
-        sliders.setupTrackBar2(ocvb, callerName, "High Threshold", 0, 100, 50)
+        sliders.setupTrackBar1(ocvb, caller, "Low Threshold", 0, 100, 10)
+        sliders.setupTrackBar2(ocvb, caller, "High Threshold", 0, 100, 50)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 2
@@ -116,15 +116,15 @@ End Class
 ' https://www.learnopencv.com/seamless-cloning-using-opencv-python-cpp/
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
 Public Class Clone_Eagle
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim sourceImage As cv.Mat
     Dim mask As cv.Mat
     Dim srcROI As cv.Rect
     Dim maskROI As cv.Rect
     Dim pt As cv.Point
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        radio.Setup(ocvb, callerName, 3)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Seamless - Mixed Clone"
         radio.check(1).Text = "Seamless - MonochromeTransfer Clone"
         radio.check(2).Text = "Seamless - Normal Clone"
@@ -171,10 +171,10 @@ End Class
 
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Cv2.SeamlessClone(OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.Point,%20OpenCvSharp.OutputArray,%20OpenCvSharp.SeamlessCloneMethods)/
 Public Class Clone_Seamless
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        radio.Setup(ocvb, callerName, 3)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Seamless Normal Clone"
         radio.check(1).Text = "Seamless Mono Clone"
         radio.check(2).Text = "Seamless Mixed Clone"

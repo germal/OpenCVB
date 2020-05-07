@@ -2,12 +2,12 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_Harris
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Corner block size", 1, 21, 3)
-        sliders.setupTrackBar2(ocvb, callerName, "Corner aperture size", 1, 21, 3)
-        sliders.setupTrackBar3(ocvb, callerName, "Corner quality level", 1, 100, 50)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Corner block size", 1, 21, 3)
+        sliders.setupTrackBar2(ocvb, caller, "Corner aperture size", 1, 21, 3)
+        sliders.setupTrackBar3(ocvb, caller, "Corner quality level", 1, 100, 50)
         ocvb.desc = "Find corners using Eigen values and vectors"
         ocvb.label2 = "Corner Eigen values"
     End Sub
@@ -59,12 +59,12 @@ End Class
 
 
 Public Class Corners_SubPix
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim good As Features_GoodFeatures
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        good = New Features_GoodFeatures(ocvb, callerName)
-        sliders.setupTrackBar1(ocvb, callerName, "SubPix kernel Size", 1, 20, 3)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        good = New Features_GoodFeatures(ocvb, caller)
+        sliders.setupTrackBar1(ocvb, caller, "SubPix kernel Size", 1, 20, 3)
 
         ocvb.desc = "Use PreCornerDetect to find features in the image."
         ocvb.label1 = "Output of GoodFeatures"
@@ -94,12 +94,12 @@ End Class
 
 
 Public Class Corners_PreCornerDetect
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim median As Math_Median_CDF
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        median = New Math_Median_CDF(ocvb, callerName)
-        sliders.setupTrackBar1(ocvb, callerName, "kernel Size", 1, 20, 19)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        median = New Math_Median_CDF(ocvb, caller)
+        sliders.setupTrackBar1(ocvb, caller, "kernel Size", 1, 20, 19)
 
         ocvb.desc = "Use PreCornerDetect to find features in the image."
     End Sub
@@ -135,12 +135,12 @@ End Module
 
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_ShiTomasi_CPP
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Corner block size", 1, 21, 3)
-        sliders.setupTrackBar2(ocvb, callerName, "Corner aperture size", 1, 21, 3)
-        sliders.setupTrackBar3(ocvb, callerName, "Corner quality level", 1, 100, 50)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Corner block size", 1, 21, 3)
+        sliders.setupTrackBar2(ocvb, caller, "Corner aperture size", 1, 21, 3)
+        sliders.setupTrackBar3(ocvb, caller, "Corner quality level", 1, 100, 50)
         ocvb.desc = "Find corners using Eigen values and vectors"
         ocvb.label2 = "Corner Eigen values"
     End Sub

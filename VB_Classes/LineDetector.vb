@@ -170,28 +170,28 @@ End Module
 
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
 Public Class lineDetector_FLD
-    Inherits VB_Class
+    Inherits ocvbClass
     Public sortedLines As SortedList(Of cv.Vec6f, Integer)
     Public externalUse As Boolean
     Public src As cv.Mat
     Public dst As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        radio.Setup(ocvb, callerName, 3)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Low resolution - Factor 4"
         radio.check(1).Text = "Low resolution - Factor 2"
         radio.check(2).Text = "Low resolution - Factor 1"
         radio.check(1).Checked = True
 
-        sliders2.setupTrackBar1(ocvb, callerName, "FLD - canny Threshold1", 1, 100, 50)
-        sliders2.setupTrackBar2(ocvb, callerName, "FLD - canny Threshold2", 1, 100, 50)
+        sliders2.setupTrackBar1(ocvb, caller, "FLD - canny Threshold1", 1, 100, 50)
+        sliders2.setupTrackBar2(ocvb, caller, "FLD - canny Threshold2", 1, 100, 50)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
-        sliders.setupTrackBar1(ocvb, callerName, "FLD - Min Length", 1, 200, 30)
-        sliders.setupTrackBar2(ocvb, callerName, "FLD - max distance", 1, 100, 14)
-        sliders.setupTrackBar3(ocvb, callerName, "FLD - Canny Aperture", 3, 7, 7)
+        sliders.setupTrackBar1(ocvb, caller, "FLD - Min Length", 1, 200, 30)
+        sliders.setupTrackBar2(ocvb, caller, "FLD - max distance", 1, 100, 14)
+        sliders.setupTrackBar3(ocvb, caller, "FLD - Canny Aperture", 3, 7, 7)
 
-        check.Setup(ocvb, callerName, 1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "FLD - incremental merge"
         check.Box(0).Checked = True
         ocvb.desc = "Basics for a Fast Line Detector"
@@ -240,12 +240,12 @@ End Class
 
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
 Public Class LineDetector_LSD
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim data() As Byte
     Public sortedLines As SortedList(Of cv.Vec6f, Integer)
     Public factor As Int32 = 4
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Fast Line Detector from the OpenCV contrib code base."
         Dim size = ocvb.color.Rows * ocvb.color.Cols
         ReDim data(size - 1)
@@ -280,13 +280,13 @@ End Class
 
 
 Public Class LineDetector_3D_LongestLine
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim lines As lineDetector_FLD
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        lines = New lineDetector_FLD(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        lines = New lineDetector_FLD(ocvb, caller)
 
-        sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Mask Line Width", 1, 20, 1)
 
         ocvb.desc = "Identify planes using the lines present in the rgb image."
         ocvb.label2 = ""
@@ -314,13 +314,13 @@ End Class
 
 
 Public Class LineDetector_3D_FLD_MT
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim lines As lineDetector_FLD
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        lines = New lineDetector_FLD(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        lines = New lineDetector_FLD(ocvb, caller)
 
-        sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Mask Line Width", 1, 20, 1)
 
         ocvb.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
         ocvb.label2 = ""
@@ -348,12 +348,12 @@ End Class
 
 
 Public Class LineDetector_3D_LSD_MT
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim lines As LineDetector_LSD
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        lines = New LineDetector_LSD(ocvb, callerName)
-        sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 1)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        lines = New LineDetector_LSD(ocvb, caller)
+        sliders.setupTrackBar1(ocvb, caller, "Mask Line Width", 1, 20, 1)
 
         ocvb.desc = "Measure 3D line segments using a multi-threaded Line Stream Detector"
         ocvb.label2 = ""
@@ -388,23 +388,23 @@ End Class
 
 
 Public Class LineDetector_3D_FitLineZ
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim linesFLD As lineDetector_FLD
     Dim linesLSD As LineDetector_LSD
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        linesFLD = New lineDetector_FLD(ocvb, callerName)
-        linesLSD = New LineDetector_LSD(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        linesFLD = New lineDetector_FLD(ocvb, caller)
+        linesLSD = New LineDetector_LSD(ocvb, caller)
 
-        sliders.setupTrackBar1(ocvb, callerName, "Mask Line Width", 1, 20, 3)
-        sliders.setupTrackBar2(ocvb, callerName, "Point count threshold", 5, 500, 50)
+        sliders.setupTrackBar1(ocvb, caller, "Mask Line Width", 1, 20, 3)
+        sliders.setupTrackBar2(ocvb, caller, "Point count threshold", 5, 500, 50)
 
-        check.Setup(ocvb, callerName, 2)
+        check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Fitline using x and z (unchecked it will use y and z)"
         check.Box(1).Text = "display output only once a second (to be readable)"
         check.Box(1).Checked = True
 
-        radio.Setup(ocvb, callerName, 4)
+        radio.Setup(ocvb, caller, 4)
         radio.check(0).Text = "Use Fast LineDetector"
         radio.check(1).Text = "Use Line Stream Detector"
         radio.check(2).Text = "Debug FLD longest line"
@@ -511,13 +511,13 @@ End Class
 
 
 Public Class LineDetector_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim ld As cv.XImgProc.FastLineDetector
     Public dst As New cv.Mat
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "LineDetector thickness of line", 1, 20, 2)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "LineDetector thickness of line", 1, 20, 2)
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         ocvb.label1 = "Manually drawn with thickness"

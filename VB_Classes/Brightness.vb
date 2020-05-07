@@ -1,11 +1,11 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization (CLAHE)
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Clip Limit", 1, 100, 10)
-        sliders.setupTrackBar2(ocvb, callerName, "Grid Size", 1, 100, 8)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Clip Limit", 1, 100, 10)
+        sliders.setupTrackBar2(ocvb, caller, "Grid Size", 1, 100, 8)
         ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -30,11 +30,11 @@ End Class
 
 
 Public Class Brightness_Contrast
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Brightness", 1, 100, 50)
-        sliders.setupTrackBar2(ocvb, callerName, "Contrast", 1, 100, 50)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Brightness", 1, 100, 50)
+        sliders.setupTrackBar2(ocvb, caller, "Contrast", 1, 100, 50)
         ocvb.desc = "Show image with vary contrast and brightness."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -47,10 +47,10 @@ End Class
 
 
 Public Class Brightness_hue
-    Inherits VB_Class
+    Inherits ocvbClass
     Public hsv_planes(2) As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Show hue (Result1) and Saturation (Result2)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -68,12 +68,12 @@ End Class
 
 
 Public Class Brightness_AlphaBeta
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Use alpha and beta with ConvertScaleAbs."
-        sliders.setupTrackBar1(ocvb, callerName, "Brightness Alpha (contrast)", 0, 500, 300)
-        sliders.setupTrackBar2(ocvb, callerName, "Brightness Beta (brightness)", -100, 100, 0)
+        sliders.setupTrackBar1(ocvb, caller, "Brightness Alpha (contrast)", 0, 500, 300)
+        sliders.setupTrackBar2(ocvb, caller, "Brightness Beta (brightness)", -100, 100, 0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1 = ocvb.color.ConvertScaleAbs(sliders.TrackBar1.Value / 500, sliders.TrackBar2.Value)
@@ -84,12 +84,12 @@ End Class
 
 
 Public Class Brightness_Gamma
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim lookupTable(255) As Byte
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Use gamma with ConvertScaleAbs."
-        sliders.setupTrackBar1(ocvb, callerName, "Brightness Gamma correction", 0, 200, 100)
+        sliders.setupTrackBar1(ocvb, caller, "Brightness Gamma correction", 0, 200, 100)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static lastGamma As Int32 = -1
@@ -124,11 +124,11 @@ End Module
 
 ' https://blog.csdn.net/just_sort/article/details/85982871
 Public Class Brightness_WhiteBalance_CPP
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim wPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "White balance threshold X100", 1, 100, 10)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "White balance threshold X100", 1, 100, 10)
 
         wPtr = WhiteBalance_Open()
         ocvb.label1 = "Image with auto white balance"
@@ -160,17 +160,17 @@ End Class
 
 ' https://blog.csdn.net/just_sort/article/details/85982871
 Public Class Brightness_WhiteBalance
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim hist As Histogram_Basics
     Dim wPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        hist = New Histogram_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        hist = New Histogram_Basics(ocvb, caller)
         hist.bins = 256 * 3
         hist.maxRange = hist.bins
         hist.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, callerName, "White balance threshold X100", 1, 100, 10)
+        sliders.setupTrackBar1(ocvb, caller, "White balance threshold X100", 1, 100, 10)
 
         ocvb.label1 = "Image with auto white balance"
         ocvb.label2 = "White pixels were altered from the original"

@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/lkdemo.cpp
 Public Class KLT_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Public gray As New cv.Mat
     Public prevGray As New cv.Mat
     Public inputPoints() As cv.Point2f
@@ -10,14 +10,14 @@ Public Class KLT_Basics
     Public outputMat As New cv.Mat
     Public circleColor = cv.Scalar.Red
     Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "KLT - MaxCorners", 1, 200, 100)
-        sliders.setupTrackBar2(ocvb, callerName, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
-        sliders.setupTrackBar3(ocvb, callerName, "KLT - minDistance", 1, 100, 7)
-        sliders.setupTrackBar4(ocvb, callerName, "KLT - BlockSize", 1, 100, 7)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "KLT - MaxCorners", 1, 200, 100)
+        sliders.setupTrackBar2(ocvb, caller, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
+        sliders.setupTrackBar3(ocvb, caller, "KLT - minDistance", 1, 100, 7)
+        sliders.setupTrackBar4(ocvb, caller, "KLT - BlockSize", 1, 100, 7)
 
-        check.Setup(ocvb, callerName, 2)
+        check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "KLT - Night Mode"
         check.Box(1).Text = "KLT - delete all Points"
 
@@ -82,12 +82,12 @@ End Class
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/lk_track.py
 Public Class KLT_OpticalFlow
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim klt As KLT_Basics
     Dim lastpoints() As cv.Point2f
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        klt = New KLT_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        klt = New KLT_Basics(ocvb, caller)
         klt.externalUse = True ' we will compress the points file below.
         ocvb.desc = "KLT optical flow"
     End Sub

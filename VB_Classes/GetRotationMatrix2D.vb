@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Module GetRotationMatrix
-    Public Sub SetInterpolationRadioButtons(ocvb As AlgorithmData, callerName As String, radio As OptionsRadioButtons, radioName As String)
-        radio.Setup(ocvb, callerName, 7)
+    Public Sub SetInterpolationRadioButtons(ocvb As AlgorithmData, caller As String, radio As OptionsRadioButtons, radioName As String)
+        radio.Setup(ocvb, caller, 7)
         radio.check(0).Text = radioName + " with Area"
         radio.check(1).Text = radioName + " with Cubic flag"
         radio.check(2).Text = radioName + " with Lanczos4"
@@ -31,16 +31,16 @@ End Module
 
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class GetRotationMatrix2D_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Public src As New cv.Mat
     Public externalUse As Boolean
     Public M As cv.Mat
     Public Mflip As cv.Mat
     Public warpFlag As Int32
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "GetRotationMatrix2D Angle", 0, 360, 24)
-        SetInterpolationRadioButtons(ocvb, callerName, radio, "Rotation2D")
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "GetRotationMatrix2D Angle", 0, 360, 24)
+        SetInterpolationRadioButtons(ocvb, caller, radio, "Rotation2D")
 
         ocvb.desc = "Rotate a rectangle of a specified angle"
     End Sub
@@ -61,11 +61,11 @@ End Class
 
 
 Public Class GetRotationMatrix2D_Box
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim rotation As GetRotationMatrix2D_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        rotation = New GetRotationMatrix2D_Basics(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        rotation = New GetRotationMatrix2D_Basics(ocvb, caller)
         ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
 
         ocvb.label1 = "Original Rectangle in the original perspective"

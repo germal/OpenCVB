@@ -2,15 +2,15 @@
 
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Features_GoodFeatures
-    Inherits VB_Class
+    Inherits ocvbClass
     Public goodFeatures As New List(Of cv.Point2f)
     Public gray As cv.Mat = Nothing
     Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders.setupTrackBar1(ocvb, callerName, "Number of Points", 10, 1000, 200)
-        sliders.setupTrackBar2(ocvb, callerName, "Quality Level", 1, 100, 1)
-        sliders.setupTrackBar3(ocvb, callerName, "Distance", 1, 100, 30)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Number of Points", 10, 1000, 200)
+        sliders.setupTrackBar2(ocvb, caller, "Quality Level", 1, 100, 1)
+        sliders.setupTrackBar3(ocvb, caller, "Distance", 1, 100, 30)
 
         ocvb.desc = "Find good features to track in an RGB image."
     End Sub

@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp_2410/blob/master/sample/CStyleSamplesCS/Samples/MDS.cs
 Public Class MultiDimensionScaling_Cities
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim CityDistance() As Double = { ' 10x10 array of distances for 10 cities
         0, 587, 1212, 701, 1936, 604, 748, 2139, 2182, 543,       ' Atlanta  
         587, 0, 920, 940, 1745, 1188, 713, 1858, 1737, 597,       ' Chicago  
@@ -13,8 +13,8 @@ Public Class MultiDimensionScaling_Cities
         2139, 1858, 949, 1645, 347, 2594, 2571, 0, 678, 2442,     ' San Francisco   
         2182, 1737, 1021, 1891, 959, 2734, 2408, 678, 0, 2329,    ' Seattle         
         543, 597, 1494, 1220, 2300, 923, 205, 2442, 2329, 0}      ' Washington D.C. 
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.label1 = "Resulting solution using cv.Eigen"
         ocvb.desc = "Use OpenCV's Eigen function to solve a system of equations"
     End Sub

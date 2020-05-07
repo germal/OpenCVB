@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 'https://gist.github.com/kendricktan/93f0da88d0b25087d751ed2244cf770c
 'https://medium.com/@anuj_shah/through-the-eyes-of-gabor-filter-17d1fdb3ac97
 Public Class Gabor_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Public gKernel As New cv.Mat
     Public src As New cv.Mat
     Public dst As New cv.Mat
@@ -14,16 +14,16 @@ Public Class Gabor_Basics
     Public lambda As Double
     Public gamma As Double
     Public phaseOffset As Double
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        sliders1.setupTrackBar1(ocvb, callerName, "Gabor gamma X10", 0, 10, 5)
-        sliders1.setupTrackBar2(ocvb, callerName, "Gabor Phase offset X100", 0, 100, 0)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders1.setupTrackBar1(ocvb, caller, "Gabor gamma X10", 0, 10, 5)
+        sliders1.setupTrackBar2(ocvb, caller, "Gabor Phase offset X100", 0, 100, 0)
         If ocvb.parms.ShowOptions Then sliders1.Show()
 
-        sliders.setupTrackBar1(ocvb, callerName, "Gabor Kernel Size", 0, 50, 15)
-        sliders.setupTrackBar2(ocvb, callerName, "Gabor Sigma", 0, 100, 5)
-        sliders.setupTrackBar3(ocvb, callerName, "Gabor Theta (degrees)", 0, 180, 90)
-        sliders.setupTrackBar4(ocvb, callerName, "Gabor lambda", 0, 100, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Gabor Kernel Size", 0, 50, 15)
+        sliders.setupTrackBar2(ocvb, caller, "Gabor Sigma", 0, 100, 5)
+        sliders.setupTrackBar3(ocvb, caller, "Gabor Theta (degrees)", 0, 180, 90)
+        sliders.setupTrackBar4(ocvb, caller, "Gabor lambda", 0, 100, 10)
 
         ocvb.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
@@ -57,29 +57,29 @@ End Class
 
 
 Public Class Gabor_Basics_MT
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim grid As Thread_Grid
     Dim gabor(31) As Gabor_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.label2 = "The 32 kernels used"
-        grid = New Thread_Grid(ocvb, callerName)
+        grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
         grid.Run(ocvb)
 
-        sliders1.setupTrackBar1(ocvb, callerName, "Gabor gamma X10", 0, 10, 5)
-        sliders1.setupTrackBar2(ocvb, callerName, "Gabor Phase offset X100", 0, 100, 0)
+        sliders1.setupTrackBar1(ocvb, caller, "Gabor gamma X10", 0, 10, 5)
+        sliders1.setupTrackBar2(ocvb, caller, "Gabor Phase offset X100", 0, 100, 0)
         If ocvb.parms.ShowOptions Then sliders1.Show()
 
-        sliders.setupTrackBar1(ocvb, callerName, "Gabor Kernel Size", 0, 50, 15)
-        sliders.setupTrackBar2(ocvb, callerName, "Gabor Sigma", 0, 100, 4)
-        sliders.setupTrackBar3(ocvb, callerName, "Gabor Theta (degrees)", 0, 180, 90)
-        sliders.setupTrackBar4(ocvb, callerName, "Gabor lambda", 0, 100, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Gabor Kernel Size", 0, 50, 15)
+        sliders.setupTrackBar2(ocvb, caller, "Gabor Sigma", 0, 100, 4)
+        sliders.setupTrackBar3(ocvb, caller, "Gabor Theta (degrees)", 0, 180, 90)
+        sliders.setupTrackBar4(ocvb, caller, "Gabor lambda", 0, 100, 10)
 
         ocvb.parms.ShowOptions = False ' no  options for the Gabor_Basics algorithm needed - just need them for the parent thread.
         For i = 0 To gabor.Length - 1
-            gabor(i) = New Gabor_Basics(ocvb, callerName)
+            gabor(i) = New Gabor_Basics(ocvb, caller)
             gabor(i).sliders.TrackBar3.Value = i * 180 / gabor.Length
             gabor(i).externalUse = True
         Next

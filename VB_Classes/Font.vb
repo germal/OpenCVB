@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Font_OpenCV
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Display different font options available in OpenCV"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -29,10 +29,10 @@ End Class
 
 
 Public Class Font_TrueType
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim font As New OptionsFont
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         If ocvb.parms.ShowOptions Then font.Show()
         ocvb.desc = "Display different TrueType fonts"
     End Sub
@@ -55,12 +55,12 @@ End Class
 
 
 Public Class Font_FlowText
-    Inherits VB_Class
+    Inherits ocvbClass
     Public msgs As New List(Of String)
     Public externalUse As Boolean
     Public result1or2 As Int32 = RESULT1
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         ocvb.desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

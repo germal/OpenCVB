@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Grayscale_Basics
-    Inherits VB_Class
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        check.Setup(ocvb, callerName, 1)
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Use OpenCV to create grayscale image"
         check.Box(0).Checked = True
 

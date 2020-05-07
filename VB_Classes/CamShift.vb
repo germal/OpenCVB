@@ -7,18 +7,18 @@ Imports System.IO.Pipes
 ' https://docs.opencv.org/3.4.1/d2/dc1/camshiftdemo_8cpp-example.html
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class CamShift_Basics
-    Inherits VB_Class
+    Inherits ocvbClass
     Public plotHist As Plot_Histogram
     Public trackBox As New cv.RotatedRect
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        plotHist = New Plot_Histogram(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        plotHist = New Plot_Histogram(ocvb, caller)
         plotHist.externalUse = True
 
-        sliders.setupTrackBar1(ocvb, callerName, "CamShift vMin", 0, 255, 32)
-        sliders.setupTrackBar2(ocvb, callerName, "CamShift vMax", 0, 255, 255)
-        sliders.setupTrackBar3(ocvb, callerName, "CamShift Smin", 0, 255, 60)
-        sliders.setupTrackBar4(ocvb, callerName, "CamShift Histogram bins", 16, 255, 32)
+        sliders.setupTrackBar1(ocvb, caller, "CamShift vMin", 0, 255, 32)
+        sliders.setupTrackBar2(ocvb, caller, "CamShift vMax", 0, 255, 255)
+        sliders.setupTrackBar3(ocvb, caller, "CamShift Smin", 0, 255, 60)
+        sliders.setupTrackBar4(ocvb, caller, "CamShift Histogram bins", 16, 255, 32)
 
         ocvb.label1 = "Draw anywhere to create histogram and start camshift"
         ocvb.label2 = "Histogram of targeted region (hue only)"
@@ -75,13 +75,13 @@ End Class
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class CamShift_Foreground
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim camshift As CamShift_Basics
     Dim blob As Depth_Foreground
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        camshift = New CamShift_Basics(ocvb, callerName)
-        blob = New Depth_Foreground(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        camshift = New CamShift_Basics(ocvb, caller)
+        blob = New Depth_Foreground(ocvb, caller)
         ocvb.label1 = "Automatically finding the head - top of nearest object"
         ocvb.desc = "Use depth to find the head and start the camshift demo. "
     End Sub
@@ -114,14 +114,14 @@ End Class
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class Camshift_Object
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim blob As Blob_DepthClusters
     Dim camshift As CamShift_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        blob = New Blob_DepthClusters(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        blob = New Blob_DepthClusters(ocvb, caller)
 
-        camshift = New CamShift_Basics(ocvb, callerName)
+        camshift = New CamShift_Basics(ocvb, caller)
 
         ocvb.desc = "Use the blob depth cluster as input to initialize a camshift algorithm"
     End Sub
@@ -143,19 +143,19 @@ End Class
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class Camshift_TopObjects
-    Inherits VB_Class
+    Inherits ocvbClass
     Dim blob As Blob_DepthClusters
     Dim cams(3) As CamShift_Basics
     Dim mats As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
-        setCaller(caller)
-        mats = New Mat_4to1(ocvb, callerName)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        mats = New Mat_4to1(ocvb, caller)
         mats.externalUse = True
 
-        blob = New Blob_DepthClusters(ocvb, callerName)
-        sliders.setupTrackBar1(ocvb, callerName, "How often should camshift be reinitialized", 1, 500, 100)
+        blob = New Blob_DepthClusters(ocvb, caller)
+        sliders.setupTrackBar1(ocvb, caller, "How often should camshift be reinitialized", 1, 500, 100)
         For i = 0 To cams.Length - 1
-            cams(i) = New CamShift_Basics(ocvb, callerName)
+            cams(i) = New CamShift_Basics(ocvb, caller)
         Next
         ocvb.desc = "Track"
     End Sub
