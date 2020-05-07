@@ -7,7 +7,6 @@ Imports System.Threading
 Imports System.Globalization
 Imports System.Text.RegularExpressions
 Imports System.Environment
-Imports VBTest
 Module opencv_module
     Public bufferLock As New PictureBox ' this is a global lock on the camera buffers.
 End Module
@@ -995,9 +994,6 @@ Public Class OpenCVB
         BothFirstAndLastReady = False
         OpenCVB.ocvb.fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         OpenCVB.ocvb.fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
-        If parms.activeAlgorithm = "VBTest_Interface" Then
-            OpenCVB.ocvb.parms.VBTestInterface = New VBTest.VBTest_Basics(OpenCVB.ocvb, "OpenCVB")
-        End If
         frameCount = 0 ' restart the count... 
         While 1
             ' wait until we have the latest camera data.
@@ -1127,8 +1123,6 @@ Public Class OpenCVB
         Catch ex As Exception
         End Try
 
-        If parms.activeAlgorithm = "VBTest_Interface" Then OpenCVB.ocvb.parms.VBTestInterface.Dispose()
-        OpenCVB.Dispose()
         frameCount = 0
         If parms.testAllRunning Then
             Console.WriteLine(vbTab + "Ending " + parms.activeAlgorithm)

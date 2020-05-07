@@ -205,10 +205,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VBTest\VBTest.vbproj">
-      <Project>{b7ebeef1-fd33-4457-a0e2-93a9fd24270a}</Project>
-      <Name>VBTest</Name>
-    </ProjectReference>
     <ProjectReference Include="..\VB_Classes\VB_Classes.vbproj">
       <Project>{735a2264-8a36-4d0a-ade0-2bfad6734401}</Project>
       <Name>VB_Classes</Name>

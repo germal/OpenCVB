@@ -275,7 +275,6 @@
     <Compile Include="Tracker.vb" />
     <Compile Include="TransformationMatrix.vb" />
     <Compile Include="Undistort.vb" />
-    <Compile Include="VBTestInterface.vb" />
     <Compile Include="ocvbClass.vb" />
     <Compile Include="VB_Classes.vb" />
     <Compile Include="OptionsCheckbox.Designer.vb">
