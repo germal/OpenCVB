@@ -1123,6 +1123,7 @@ Public Class OpenCVB
         Catch ex As Exception
         End Try
 
+        OpenCVB.Dispose()
         frameCount = 0
         If parms.testAllRunning Then
             Console.WriteLine(vbTab + "Ending " + parms.activeAlgorithm)

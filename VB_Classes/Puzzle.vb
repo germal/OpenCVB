@@ -401,6 +401,6 @@ Public Class Puzzle_Solver
     End Sub
     Public Sub MyDispose()
         puzzle.Dispose()
-                    End Sub
+    End Sub
 End Class
 

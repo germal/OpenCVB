@@ -9,6 +9,7 @@ Public Class ocvbClass : Implements IDisposable
     Public sliders2 As New OptionsSliders
     Public sliders3 As New OptionsSliders
     Public videoOptions As New OptionsVideoName
+    Public pyStream As PyStream_Basics = Nothing
     Dim algorithm As Object
     Public Sub setCaller(callerRaw As String)
         If callerRaw Is Nothing Then callerRaw = ""
@@ -18,8 +19,13 @@ Public Class ocvbClass : Implements IDisposable
         algorithm = Me
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        Dim type = algorithm.GetType
-        If type.GetProperty("MyDispose") IsNot Nothing Then algorithm.MyDispose()  ' dispose of any managed and unmanaged classes.
+        On Error Resume Next
+        Dim proc = Process.GetProcessesByName("python")
+        For i = 0 To proc.Count - 1
+            proc(i).Kill()
+        Next i
+        If pyStream IsNot Nothing Then pyStream.Dispose()
+        If algorithm.GetProperty("MyDispose") IsNot Nothing Then algorithm.MyDispose()  ' dispose of any managed and unmanaged classes.
         sliders.Dispose()
         sliders1.Dispose()
         sliders2.Dispose()

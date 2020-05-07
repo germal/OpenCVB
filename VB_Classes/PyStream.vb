@@ -11,7 +11,7 @@ Public Class PyStream_Basics
     Dim pythonReady As Boolean
     Dim memMap As Python_MemMap
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
         pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.Out)
         PipeTaskIndex += 1
@@ -50,20 +50,5 @@ Public Class PyStream_Basics
                 If pipeImages.IsConnected Then pipeImages.Write(depthBuffer, 0, depthBuffer.Length)
             End If
         End If
-    End Sub
-    Public Sub MyDispose()
-        memMap.Dispose()
-        If pipeImages IsNot Nothing Then
-            If pipeImages.IsConnected Then
-                pipeImages.Flush()
-                pipeImages.WaitForPipeDrain()
-                pipeImages.Disconnect()
-            End If
-        End If
-        On Error Resume Next
-        Dim proc = Process.GetProcessesByName("python")
-        For i = 0 To proc.Count - 1
-            proc(i).Kill()
-        Next i
     End Sub
 End Class

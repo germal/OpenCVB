@@ -63,10 +63,9 @@ End Module
 
 Public Class Python_Run
     Inherits ocvbClass
-    Dim pyStream As PyStream_Basics = Nothing
     Dim tryCount As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
@@ -92,14 +91,6 @@ Public Class Python_Run
             End If
         End If
     End Sub
-    Public Sub MyDispose()
-        On Error Resume Next
-        Dim proc = Process.GetProcessesByName("python")
-        For i = 0 To proc.Count - 1
-            proc(i).Kill()
-        Next i
-        If pyStream IsNot Nothing Then pyStream.Dispose()
-    End Sub
 End Class
 
 
@@ -115,7 +106,7 @@ Public Class Python_MemMap
     Public memMapbufferSize As Int32
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         If ocvb.PythonFileName Is Nothing Then
             ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_MemMap.py"
         Else
@@ -142,13 +133,6 @@ Public Class Python_MemMap
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
     End Sub
-    Public Sub MyDispose()
-        If memMapPtr <> 0 Then Marshal.FreeHGlobal(memMapPtr)
-        Dim proc = Process.GetProcessesByName("python")
-        For i = 0 To proc.Count - 1
-            proc(i).Kill()
-        Next i
-    End Sub
 End Class
 
 
@@ -164,7 +148,7 @@ Public Class Python_SurfaceBlit
     Dim pointCloudBuffer(1) As Byte
     Dim PythonReady As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         ' this Python script requires pygame to be present...
         If checkPythonPackage(ocvb, "pygame") = False Then
             PythonReady = False
@@ -209,22 +193,5 @@ Public Class Python_SurfaceBlit
         Else
             ocvb.putText(New ActiveClass.TrueType("Python is not available", 10, 60, RESULT1))
         End If
-    End Sub
-    Public Sub MyDispose()
-        If PythonReady = False Then Exit Sub ' none of this was created if Python wasn't found
-        memMap.Dispose()
-        If pipe IsNot Nothing Then
-            If pipe.IsConnected Then
-                pipe.Flush()
-                pipe.WaitForPipeDrain()
-                pipe.Disconnect()
-            End If
-        End If
-
-        On Error Resume Next
-        Dim proc = Process.GetProcessesByName("python")
-        For i = 0 To proc.Count - 1
-            proc(i).Kill()
-        Next i
     End Sub
 End Class

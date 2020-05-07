@@ -45,7 +45,7 @@ Module VB_Classes
     End Sub
 End Module
 
-Public Class ActiveClass
+Public Class ActiveClass : Implements IDisposable
     Public Class TrueType
         Public Const _RESULT1 = RESULT1
         Public Const _RESULT2 = RESULT2
@@ -189,5 +189,9 @@ Public Class ActiveClass
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        If recordedData IsNot Nothing Then recordedData.Dispose()
+        If ActiveAlgorithm IsNot Nothing Then ActiveAlgorithm.Dispose()
     End Sub
 End Class
