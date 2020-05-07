@@ -169,7 +169,7 @@ Public Class ML_DepthFromColor_MT
         mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         dilate.src = mask
         dilate.Run(ocvb)
-        mask = ocvb.result1
+        mask = dilate.dst
         ocvb.result2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat

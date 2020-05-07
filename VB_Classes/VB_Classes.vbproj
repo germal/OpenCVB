@@ -245,7 +245,7 @@
     </Compile>
     <Compile Include="ORB.vb" />
     <Compile Include="Pencil.vb" />
-    <Compile Include="Project.vb" />
+    <Compile Include="Projection.vb" />
     <Compile Include="PyStream.vb" />
     <Compile Include="Pixel.vb" />
     <Compile Include="Plane.vb" />

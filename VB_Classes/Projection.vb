@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
 Imports System.Text
-Module Project
+Module Projection
     ' for performance we are putting this in an optimized C++ interface to the Kinect camera for convenience...
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function SimpleProjectionRun(cPtr As IntPtr, depth As IntPtr, desiredMin As Single, desiredMax As Single, rows As Integer, cols As Integer) As IntPtr
@@ -51,7 +51,7 @@ End Module
 
 
 
-Public Class Project_NoGravity_CPP
+Public Class Projection_NoGravity_CPP
     Inherits VB_Class
     Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
@@ -109,7 +109,7 @@ End Class
 
 
 
-Public Class Project_NoGravity
+Public Class Projection_NoGravity
     Inherits VB_Class
     Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
@@ -179,7 +179,7 @@ End Class
 
 
 
-Public Class Project_GravityVB
+Public Class Projection_GravityVB
     Inherits VB_Class
     Dim imu As IMU_GravityVec
     Dim grid As Thread_Grid
@@ -277,12 +277,12 @@ End Class
 
 
 
-Public Class Project_GravityHistogram
+Public Class Projection_GravityHistogram
     Inherits VB_Class
-    Public gravity As Project_Gravity_CPP
+    Public gravity As Projection_Gravity_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         setCaller(caller)
-        gravity = New Project_Gravity_CPP(ocvb, callerName)
+        gravity = New Projection_Gravity_CPP(ocvb, callerName)
         gravity.sliders.GroupBox2.Visible = True
         gravity.histogramRun = True
 
@@ -301,7 +301,7 @@ End Class
 
 
 
-Public Class Project_Gravity_CPP
+Public Class Projection_Gravity_CPP
     Inherits VB_Class
     Dim imu As IMU_GravityVec
     Dim cPtr As IntPtr
@@ -424,11 +424,11 @@ End Class
 
 
 
-Public Class Project_Floodfill
+Public Class Projection_Floodfill
     Inherits VB_Class
     Dim flood As FloodFill_Projection
     Dim kalman As Kalman_Basics
-    Public gravity As Project_Gravity_CPP
+    Public gravity As Projection_Gravity_CPP
     Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         setCaller(caller)
@@ -438,7 +438,7 @@ Public Class Project_Floodfill
 
         sliders.setupTrackBar1(ocvb, callerName, "epsilon for GroupRectangles X100", 0, 200, 80)
 
-        gravity = New Project_Gravity_CPP(ocvb, callerName)
+        gravity = New Projection_Gravity_CPP(ocvb, callerName)
         gravity.sliders.GroupBox2.Visible = True
         gravity.externalUse = True
         gravity.histogramRun = True
@@ -511,9 +511,9 @@ End Class
 
 
 
-Public Class Project_Wall
+Public Class Projection_Wall
     Inherits VB_Class
-    Dim objects As Project_Floodfill
+    Dim objects As Projection_Floodfill
     Dim lines As lineDetector_FLD
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
@@ -522,7 +522,7 @@ Public Class Project_Wall
         dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
         dilate.externalUse = True
 
-        objects = New Project_Floodfill(ocvb, Me.GetType().Name)
+        objects = New Projection_Floodfill(ocvb, Me.GetType().Name)
         objects.externalUse = True
 
         lines = New lineDetector_FLD(ocvb, Me.GetType().Name)
