@@ -279,10 +279,10 @@ Partial Class OptionsDialog
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(111, 52)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(629, 20)
+        Me.Label1.Size = New System.Drawing.Size(620, 20)
         Me.Label1.TabIndex = 1
-        Me.Label1.Text = "Duration in seconds of each test when running ""Test All"" (there is a 10 second mi" &
-    "nimum)"
+        Me.Label1.Text = "Duration in seconds of each test when running ""Test All"" (there is a 5 second min" &
+    "imum)"
         '
         'GroupBox6
         '

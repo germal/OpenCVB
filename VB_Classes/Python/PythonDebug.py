@@ -1,62 +1,61 @@
+'''
+A program demonstrating the use and capabilities of a particular image segmentation algorithm described
+in Jasper R. R. Uijlings, Koen E. A. van de Sande, Theo Gevers, Arnold W. M. Smeulders:
+    "Selective Search for Object Recognition"
+International Journal of Computer Vision, Volume 104 (2), page 154-171, 2013
+Usage:
+    ./selectivesearchsegmentation_demo.py input_image (single|fast|quality)
+Use "a" to display less rects, 'd' to display more rects, "q" to quit.
+'''
+
 import cv2 as cv
-import numpy as np
-import math
 import sys
-from vcam import vcam,meshGen
-saveMode=0
 
-title_window = 'Distort video stream'
-def on_trackbar(val):
-	global saveMode 
-	saveMode = val 
+if __name__ == '__main__':
+    print(__doc__)
+    img = cv.imread('../../Data/chicky_512.png')
 
-def OpenCVCode(imgRGB, depth_colormap):
-	H,W = imgRGB.shape[:2]
-	# Creating the virtual camera object
-	c1 = vcam(H=H,W=W)
+    cv.setUseOptimized(True)
+    cv.setNumThreads(8)
 
-	# Creating the surface object
-	plane = meshGen(H,W)
+    gs = cv.ximgproc.segmentation.createSelectiveSearchSegmentation()
+    gs.setBaseImage(img)
+    gs.switchToSelectiveSearchFast()
+    #gs.switchToSelectiveSearchQuality()
 
-	mode = saveMode
+    #if (sys.argv[2][0] == 's'):
+    #    gs.switchToSingleStrategy()
 
-	# We generate a mirror where for each 3D point, its Z coordinate is defined as Z = F(X,Y)
-	if mode == 0:
-		plane.Z += 20*np.exp(-0.5*((plane.X*1.0/plane.W)/0.1)**2)/(0.1*np.sqrt(2*np.pi))
-	elif mode == 1:
-		plane.Z += 20*np.exp(-0.5*((plane.Y*1.0/plane.H)/0.1)**2)/(0.1*np.sqrt(2*np.pi))
-	elif mode == 2:
-		plane.Z -= 10*np.exp(-0.5*((plane.X*1.0/plane.W)/0.1)**2)/(0.1*np.sqrt(2*np.pi))
-	elif mode == 3:
-		plane.Z -= 10*np.exp(-0.5*((plane.Y*1.0/plane.W)/0.1)**2)/(0.1*np.sqrt(2*np.pi))
-	elif mode == 4:
-		plane.Z += 20*np.sin(2*np.pi*((plane.X-plane.W/4.0)/plane.W)) + 20*np.sin(2*np.pi*((plane.Y-plane.H/4.0)/plane.H))
-	elif mode == 5:
-		plane.Z -= 20*np.sin(2*np.pi*((plane.X-plane.W/4.0)/plane.W)) - 20*np.sin(2*np.pi*((plane.Y-plane.H/4.0)/plane.H))
-	elif mode == 6:
-		plane.Z += 100*np.sqrt((plane.X*1.0/plane.W)**2+(plane.Y*1.0/plane.H)**2)
-	elif mode == 7:
-		plane.Z -= 100*np.sqrt((plane.X*1.0/plane.W)**2+(plane.Y*1.0/plane.H)**2)
-	else:
-		print("Wrong mode selected")
-		exit(-1)
+    #elif (sys.argv[2][0] == 'f'):
+    #    gs.switchToSelectiveSearchFast()
 
-	# Extracting the generated 3D plane
-	pts3d = plane.getPlane()
+    #elif (sys.argv[2][0] == 'q'):
+    #    gs.switchToSelectiveSearchQuality()
+    #else:
+    #    print(__doc__)
+    #    sys.exit(1)
 
-	# Projecting (Capturing) the plane in the virtual camera
-	pts2d = c1.project(pts3d)
+    rects = gs.process()
+    nb_rects = 50
 
-	# Deriving mapping functions for mesh based warping.
-	map_x,map_y = c1.getMaps(pts2d)
+    while True:
+        wimg = img.copy()
 
-	output = cv.remap(imgRGB,map_x,map_y,interpolation=cv.INTER_LINEAR,borderMode=4)
-	output = cv.flip(output,1)
-	out1 = np.hstack((imgRGB,output))
-	out1 = cv.resize(out1,(700,350))
-	cv.imshow(title_window,out1)
+        for i in range(len(rects)):
+            if (i < nb_rects):
+                x, y, w, h = rects[i]
+                cv.rectangle(wimg, (x, y), (x+w, y+h), (0, 255, 0), 1, cv.LINE_AA)
 
-cv.createTrackbar(title_window, title_window, saveMode, 7, on_trackbar)
-on_trackbar(saveMode)
-from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'FunnyMirror_PS.py')
+        cv.imshow("Output", wimg);
+        c = cv.waitKey()
+
+        if (c == 100):
+            nb_rects += 10
+
+        elif (c == 97 and nb_rects > 10):
+            nb_rects -= 10
+
+        elif (c == 113):
+            break
+
+    cv.destroyAllWindows()

@@ -86,7 +86,7 @@ Public Class OpticalFlow_DenseOptions
         sliders2.setupTrackBar2(ocvb, caller, "Optical Flow Scaling Output", 1, 100, 50)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
-        sliders.setupTrackBar1(ocvb, caller, "Optical Flow pyrScale", 1, 100, 4)
+        sliders.setupTrackBar1(ocvb, caller, "Optical Flow pyrScale", 1, 100, 35)
         sliders.setupTrackBar2(ocvb, caller, "Optical Flow Levels", 1, 10, 1)
         sliders.setupTrackBar3(ocvb, caller, "Optical Flow winSize", 1, 9, 1)
         sliders.setupTrackBar4(ocvb, caller, "Optical Flow Iterations", 1, 10, 1)
@@ -120,7 +120,6 @@ End Class
 
 Public Class OpticalFlow_DenseBasics
     Inherits ocvbClass
-
     Dim flow As OpticalFlow_DenseOptions
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -160,9 +159,9 @@ Public Class OpticalFlow_DenseBasics_MT
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
         grid.externalUse = True
-        grid.sliders.TrackBar1.Value = 32
-        grid.sliders.TrackBar2.Value = 32
-        grid.sliders.TrackBar3.Value = 0
+        grid.sliders.TrackBar1.Value = ocvb.color.Width / 4
+        grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
+        grid.sliders.TrackBar3.Value = 5
 
         flow = New OpticalFlow_DenseOptions(ocvb, caller)
         flow.sliders.TrackBar1.Value = 75

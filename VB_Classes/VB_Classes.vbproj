@@ -385,7 +385,7 @@
     <Content Include="Python\ICP_Models.py" />
     <Content Include="Python\Reg_shift.py" />
     <Content Include="Python\RotateImage.py" />
-    <Content Include="Python\selectivesearchsegmentation_demo.py" />
+    <Content Include="Python\SelectiveSearchSegmentation_Demo.py" />
     <Content Include="Python\Superpixels_PS.py" />
     <Content Include="Python\Threshold_inRange_PS.py" />
     <Content Include="Python\TrackerPlane_AugmentedReality_PS.py" />
