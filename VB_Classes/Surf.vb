@@ -13,7 +13,6 @@ Public Class Surf_Basics_CS
         Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         fisheye = New FishEye_Rectified(ocvb, caller)
-        fisheye.standalone = True
 
         radio.Setup(ocvb, caller,2)
         radio.check(0).Text = "Use BF Matcher"
@@ -64,10 +63,8 @@ Public Class Surf_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         fisheye = New FishEye_Rectified(ocvb, caller)
-        fisheye.standalone = True
 
         surf = New Surf_Basics_CS(ocvb, caller)
-        surf.standalone = True
 
         ocvb.desc = "Use left and right views to match points in horizontal slices."
     End Sub

@@ -42,7 +42,6 @@ Public Class TextureFlow_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         texture = New TextureFlow_Basics(ocvb, caller)
-        texture.standalone = True
         ocvb.desc = "Display texture flow in the depth data"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

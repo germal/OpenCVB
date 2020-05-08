@@ -10,7 +10,6 @@ Public Class MatchTemplate_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         flow = New Font_FlowText(ocvb, caller)
-        flow.standalone = True
         flow.result1or2 = RESULT2
 
         radio.Setup(ocvb, caller, 6)
@@ -66,11 +65,9 @@ Public Class MatchTemplate_RowCorrelation
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         flow = New Font_FlowText(ocvb, caller)
-        flow.standalone = True
         flow.result1or2 = RESULT2
 
         corr = New MatchTemplate_Basics(ocvb, caller)
-        corr.standalone = True
         corr.sliders.Visible = False
 
         ocvb.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
@@ -165,7 +162,6 @@ Public Class MatchTemplate_BestTemplate_MT
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 128
         grid.sliders.TrackBar2.Value = 128
-        grid.standalone = True
 
         match = New MatchTemplate_DrawRect(ocvb, caller)
 
@@ -183,7 +179,6 @@ Public Class MatchTemplate_BestTemplate_MT
                 ReDim entropies(grid.roiList.Count - 1)
                 For i = 0 To entropies.Length - 1
                     entropies(i) = New Entropy_Basics(ocvb, caller)
-                    entropies(i).standalone = True
                 Next
             End If
 

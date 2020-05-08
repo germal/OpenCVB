@@ -79,7 +79,6 @@ Public Class Hough_Lines
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         edges = New Edges_Canny(ocvb, caller)
-        edges.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, caller, "theta", 1, 1000, 1000 * Math.PI / 180)
@@ -135,12 +134,10 @@ Public Class Hough_Lines_MT
         sliders.setupTrackBar3(ocvb, caller,"threshold", 1, 100, 3)
 
         edges = New Edges_Canny(ocvb, caller)
-        edges.standalone = True
 
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
-        grid.standalone = True ' we don't need any results.
         ocvb.desc = "Multithread Houghlines to find lines in image fragments."
         ocvb.label1 = "Hough_Lines_MT"
         ocvb.label2 = "Hough_Lines_MT"

@@ -37,12 +37,10 @@ Public Class Video_CarCounting
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         mog = New BGSubtract_MOG(ocvb, caller)
-        mog.standalone = True
 
         video = New Video_Basics(ocvb, caller)
 
         flow = New Font_FlowText(ocvb, caller)
-        flow.standalone = True
         flow.result1or2 = RESULT1
 
         ocvb.desc = "Count cars in a video file"
@@ -102,15 +100,12 @@ Public Class Video_CarCComp
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         mog = New BGSubtract_MOG(ocvb, caller)
-        mog.standalone = True
 
         cc = New CComp_Basics(ocvb, caller)
-        cc.standalone = True
 
         video = New Video_Basics(ocvb, caller)
 
         flow = New Font_FlowText(ocvb, caller)
-        flow.standalone = True
         flow.result1or2 = RESULT1
 
         ocvb.desc = "Outline cars with a rectangle"
@@ -149,7 +144,6 @@ Public Class Video_MinRect
         video.Run(ocvb)
 
         mog = New BGSubtract_MOG(ocvb, caller)
-        mog.standalone = True
         ocvb.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -185,7 +179,6 @@ Public Class Video_MinCircle
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         input = New Video_MinRect(ocvb, caller)
-        input.standalone = True
         ocvb.desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

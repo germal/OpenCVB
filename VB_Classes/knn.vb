@@ -71,7 +71,6 @@ Public Class knn_Cluster2D
         setCaller(callerRaw)
         knn = New knn_Point2d(ocvb, caller)
         knn.sliders.Visible = False
-        knn.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "knn - number of cities", 10, 1000, 100)
 
@@ -318,7 +317,6 @@ Public Class knn_ClusterNoisyLine
         noisyLine = New Fitline_RawInput(ocvb, caller)
         knn = New knn_Point2d(ocvb, caller)
         knn.sliders.Visible = False
-        knn.standalone = True
 
         ocvb.desc = "Use knn to cluster the output of noisyline class."
     End Sub

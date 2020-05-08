@@ -105,13 +105,10 @@ Public Class Blur_PlusHistogram
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         mat2to1 = New Mat_2to1(ocvb, caller)
-        mat2to1.standalone = True
 
         blur = New Blur_Bilateral(ocvb, caller)
-        blur.standalone = True
 
         myhist = New Histogram_EqualizeGray(ocvb, caller)
-        myhist.standalone = True
 
         ocvb.desc = "Compound algorithms Blur and Histogram"
     End Sub

@@ -241,11 +241,9 @@ Public Class Plot_Basics
         Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         hist = New Histogram_Basics(ocvb, caller)
-        hist.standalone = True
         hist.plotRequested = True
 
         plot = New Plot_Basics_CPP(ocvb, caller)
-        plot.standalone = True
 
         ocvb.label1 = "Plot of grayscale histogram"
         ocvb.label2 = "Same Data but using OpenCV C++ plot"
@@ -286,13 +284,11 @@ Public Class Plot_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         hist = New Histogram_Depth(ocvb, caller)
-        hist.standalone = True
         hist.sliders.TrackBar1.Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!
         hist.sliders.TrackBar1.Value = 200 ' a lot more bins in a plot than a bar chart.
         hist.trim.sliders.TrackBar2.Value = 5000 ' up to x meters.
 
         plot = New Plot_Basics_CPP(ocvb, caller)
-        plot.standalone = True
 
         ocvb.desc = "Show depth in a plot format with variable bins."
     End Sub

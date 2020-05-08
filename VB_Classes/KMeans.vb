@@ -7,7 +7,6 @@ Public Class kMeans_Clusters
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         Mats = New Mat_4to1(ocvb, caller)
-        Mats.standalone = True
 
         km = New kMeans_Basics(ocvb, caller)
 
@@ -564,7 +563,6 @@ Public Class kMeans_RGB4_MT
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 48
-        grid.standalone = True ' we don't need any results.
         ocvb.label1 = "kmeans - raw labels"
         ocvb.label2 = "Synchronized colors from raw labels"
         ocvb.desc = "Cluster a grid of segments individual and combine results.  Select the desired number of clusters/threads."
@@ -683,7 +681,6 @@ Public Class kMeans_Color_MT
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
-        grid.standalone = True ' we don't need any results.
 
         ocvb.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
@@ -771,7 +768,6 @@ Public Class kMeans_ColorDepth_MT
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
-        grid.standalone = True ' we don't need any results.
 
         ocvb.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub

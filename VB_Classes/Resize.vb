@@ -42,7 +42,6 @@ Public Class Resize_After8uc3
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         colorizer = New Depth_Colorizer_CPP(ocvb, caller)
-        colorizer.standalone = True
         SetInterpolationRadioButtons(ocvb, caller, radio, "Resize")
         ' warp is not allowed in resize
         radio.check(5).Enabled = False
@@ -87,7 +86,6 @@ Public Class Resize_Percentage
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         resizeOptions = New Resize_Basics(ocvb, caller)
-        resizeOptions.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "Resize Percentage (%)", 1, 100, 3)
 

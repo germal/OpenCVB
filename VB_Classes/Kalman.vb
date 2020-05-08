@@ -40,7 +40,6 @@ Public Class Kalman_Basics
             ReDim kalman(src.Length - 1)
             For i = 0 To src.Length - 1
                 kalman(i) = New Kalman_Single(ocvb, caller)
-                kalman(i).standalone = True
                 kalman(i).ProcessNoiseCov = ProcessNoiseCov
                 kalman(i).MeasurementNoiseCov = MeasurementNoiseCov
                 kalman(i).ErrorCovPost = ErrorCovPost
@@ -97,13 +96,11 @@ Public Class Kalman_Compare
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plot = New Plot_OverTime(ocvb, caller)
-        plot.standalone = True
         plot.dst = ocvb.result1
         plot.plotCount = 3
         plot.topBottomPad = 20
 
         kPlot = New Plot_OverTime(ocvb, caller)
-        kPlot.standalone = True
         kPlot.dst = ocvb.result2
         kPlot.plotCount = 3
         kPlot.topBottomPad = 20
@@ -124,7 +121,6 @@ Public Class Kalman_Compare
             ReDim kalman(3 - 1)
             For i = 0 To kalman.Count - 1
                 kalman(i) = New Kalman_Single(ocvb, caller)
-                kalman(i).standalone = True
             Next
         End If
 
@@ -232,7 +228,6 @@ Public Class Kalman_MousePredict
         kalman = New Kalman_Basics(ocvb, caller)
         ReDim kalman.src(1)
         ReDim kalman.dst(1)
-        kalman.standalone = True
 
         If ocvb.parms.lowResolution = False Then locMultiplier = 2 ' twice the size in both dimensions.
         ocvb.label1 = "Red is real mouse, white is prediction"
@@ -294,7 +289,6 @@ Public Class Kalman_CVMat
             ReDim kalman(src.Rows - 1)
             For i = 0 To src.Rows - 1
                 kalman(i) = New Kalman_Single(ocvb, caller)
-                kalman(i).standalone = True
             Next
             dst = New cv.Mat(src.Rows, 1, cv.MatType.CV_32F, 0)
         End If
@@ -346,10 +340,8 @@ Public Class Kalman_ImageSmall
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Kalman_CVMat(ocvb, caller)
-        kalman.standalone = True
 
         resize = New Resize_Percentage(ocvb, caller)
-        resize.standalone = True
 
         ocvb.label1 = "The small image is processed by the Kalman filter"
         ocvb.label2 = "Mask of the smoothed image minus original"
@@ -390,10 +382,8 @@ Public Class Kalman_DepthSmall
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Kalman_CVMat(ocvb, caller)
-        kalman.standalone = True
 
         resize = New Resize_Percentage(ocvb, caller)
-        resize.standalone = True
         resize.sliders.TrackBar1.Value = 4
 
         ocvb.label2 = "Brighter: depth is decreasing (object getting closer)"
@@ -457,7 +447,6 @@ Public Class Kalman_Single
         if standalone Then
             If ocvb.frameCount = 0 Then
                 plot = New Plot_OverTime(ocvb, caller)
-                plot.standalone = True
                 plot.dst = ocvb.result2
                 plot.maxScale = 150
                 plot.minScale = 80

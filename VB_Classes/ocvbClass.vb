@@ -13,8 +13,7 @@ Public Class ocvbClass : Implements IDisposable
     Public standalone As Boolean
     Dim algorithm As Object
     Public Sub setCaller(callerRaw As String)
-        If callerRaw Is Nothing Then callerRaw = ""
-        If callerRaw = "" Or callerRaw.Contains(Me.GetType.Name) Then
+        If callerRaw = "" Or callerRaw = Me.GetType.Name Then
             standalone = True
             caller = Me.GetType.Name
         Else

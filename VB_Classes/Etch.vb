@@ -1,4 +1,4 @@
-﻿
+
 Imports cv = OpenCvSharp
 Public Class Etch_ASketch
     Inherits ocvbClass
@@ -19,7 +19,6 @@ Public Class Etch_ASketch
         If ocvb.parms.testAllRunning Then check.Box(1).Checked = True
 
         keys = New Keyboard_Basics(ocvb, caller)
-        keys.standalone = True
 
         cursor = randomCursor(ocvb)
         ocvb.result1.SetTo(slateColor)

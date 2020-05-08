@@ -74,7 +74,6 @@ Public Class Tracker_MultiObject
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.drawRect.Width <> 0 Then
             Dim tr = New Tracker_Basics(ocvb, "Tracker_MultiObject")
-            tr.standalone = True
             tr.Run(ocvb)
             ocvb.drawRect = New cv.Rect
             trackers.Add(tr)

@@ -139,7 +139,6 @@ Public Class Annealing_CPP_MT
         anneal(0).Open() ' this will initialize the C++ copy of the city positions.
         For i = 1 To anneal.Length - 1
             anneal(i) = New Annealing_Basics_CPP(ocvb, caller)
-            anneal(i).standalone = True
             anneal(i).numberOfCities = sliders.TrackBar1.Value
             anneal(i).setup(ocvb)
             anneal(i).cityPositions = anneal(0).cityPositions.Clone() ' duplicate for all threads - working on the same set of points.
@@ -154,11 +153,9 @@ Public Class Annealing_CPP_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         random = New Random_Points(ocvb, caller)
-        random.standalone = True
         random.sliders.Visible = False
 
         mats = New Mat_4to1(ocvb, caller)
-        mats.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "Anneal Number of Cities", 5, 500, 25)
         sliders.setupTrackBar2(ocvb, caller, "Success = top X threads agree on energy level.", 2, anneal.Count, anneal.Count)
@@ -171,7 +168,6 @@ Public Class Annealing_CPP_MT
         check.Box(2).Checked = True
 
         flow = New Font_FlowText(ocvb, caller)
-        flow.standalone = True
         flow.result1or2 = RESULT1
 
         ocvb.label1 = "Log of Annealing progress"
@@ -259,7 +255,6 @@ Public Class Annealing_Options
         setCaller(callerRaw)
         random = New Random_Points(ocvb, caller)
         random.sliders.TrackBar1.Value = 25 ' change the default number of cities here.
-        random.standalone = True
         random.Run(ocvb) ' get the city positions (may or may not be used below.)
 
         check.Setup(ocvb, caller, 2)
@@ -268,14 +263,12 @@ Public Class Annealing_Options
         check.Box(1).Checked = True
 
         flow = New Font_FlowText(ocvb, caller)
-        flow.standalone = True
         flow.result1or2 = RESULT1
 
         ocvb.label1 = "Log of Annealing progress"
 
 
         anneal = New Annealing_Basics_CPP(ocvb, caller)
-        anneal.standalone = True
         anneal.numberOfCities = random.sliders.TrackBar1.Value
         anneal.circularPattern = check.Box(1).Checked
         If check.Box(1).Checked = False Then anneal.cityPositions = random.Points2f.Clone()

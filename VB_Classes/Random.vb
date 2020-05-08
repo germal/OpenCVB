@@ -137,12 +137,10 @@ Public Class Random_CheckUniformDist
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         histogram = New Histogram_KalmanSmoothed(ocvb, caller)
-        histogram.standalone = True
         histogram.sliders.TrackBar1.Value = 255
         histogram.gray = New cv.Mat
 
         rUniform = New Random_UniformDist(ocvb, caller)
-        rUniform.standalone = True
 
         ocvb.desc = "Display the histogram for a uniform distribution."
     End Sub
@@ -167,12 +165,10 @@ Public Class Random_CheckNormalDist
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         histogram = New Histogram_KalmanSmoothed(ocvb, caller)
-        histogram.standalone = True
         histogram.sliders.TrackBar1.Value = 255
         histogram.gray = New cv.Mat
         histogram.plotHist.minRange = 1
         normalDist = New Random_NormalDist(ocvb, caller)
-        normalDist.standalone = True
         ocvb.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

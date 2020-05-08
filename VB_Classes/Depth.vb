@@ -131,7 +131,6 @@ Public Class Depth_HolesRect
         sliders.setupTrackBar1(ocvb, caller, "shadowRect Min Size", 1, 20000, 2000)
 
         shadow = New Depth_Holes(ocvb, caller)
-        shadow.standalone = True
 
         ocvb.desc = "Identify the minimum rectangles of contours of the depth shadow"
     End Sub
@@ -460,16 +459,13 @@ Public Class Depth_MeanStdevPlot
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         shadow = New Depth_Holes(ocvb, caller)
-        shadow.standalone = True
 
         plot1 = New Plot_OverTime(ocvb, caller)
-        plot1.standalone = True
         plot1.dst = ocvb.result1
         plot1.maxScale = 2000
         plot1.plotCount = 1
 
         plot2 = New Plot_OverTime(ocvb, caller)
-        plot2.standalone = True
         plot2.dst = ocvb.result2
         plot2.maxScale = 1000
         plot2.plotCount = 1
@@ -509,7 +505,6 @@ Public Class Depth_Uncertainty
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         retina = New Retina_Basics_CPP(ocvb, caller)
-        retina.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "Uncertainty threshold", 1, 255, 100)
 
@@ -538,7 +533,6 @@ Public Class Depth_Palette
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         trim = New Depth_InRange(ocvb, caller)
-        trim.standalone = True
         trim.sliders.TrackBar2.Value = 5000
 
         customColorMap = colorTransition(cv.Scalar.Blue, cv.Scalar.Yellow, 256)
@@ -737,7 +731,6 @@ Public Class Depth_ColorizerFastFade_CPP
         dcPtr = Depth_Colorizer2_Open()
 
         trim = New Depth_InRange(ocvb, caller)
-        trim.standalone = True
 
         ocvb.label2 = "Mask from Depth_InRange"
         ocvb.desc = "Display depth data with inrange trim.  Higher contrast than others - yellow to blue always present."
@@ -830,7 +823,6 @@ Public Class Depth_ColorizerVB_MT
         sliders.setupTrackBar2(ocvb, caller, "Max Depth", 1001, 10000, 4000)
 
         grid = New Thread_Grid(ocvb, caller)
-        grid.standalone = True
 
         ocvb.desc = "Colorize depth manually with multi-threading."
     End Sub
@@ -900,7 +892,6 @@ Public Class Depth_Colorizer_MT
         sliders.setupTrackBar2(ocvb, caller, "Max Depth", 1001, 10000, 4000)
 
         grid = New Thread_Grid(ocvb, caller)
-        grid.standalone = True
 
         ocvb.desc = "Colorize normally uses CDF to stabilize the colors.  Just using sliders here - stabilized but not optimal range."
     End Sub
@@ -953,7 +944,6 @@ Public Class Depth_LocalMinMax_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
-        grid.standalone = True
 
         ocvb.label1 = "Red is min distance"
         ocvb.desc = "Find min and max depth in each segment."
@@ -1015,7 +1005,6 @@ Public Class Depth_LocalMinMax_Kalman_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         minmax = New Depth_LocalMinMax_MT(ocvb, caller)
-        minmax.standalone = True
         minmax.grid.sliders.TrackBar1.Value = 32
         minmax.grid.sliders.TrackBar2.Value = 32
         ocvb.parms.ShowOptions = False
@@ -1031,7 +1020,6 @@ Public Class Depth_LocalMinMax_Kalman_MT
             kalman = New Kalman_Basics(ocvb, caller)
             ReDim kalman.src(minmax.grid.roiList.Count - 1)
             saveCount = kalman.src.Count
-            kalman.standalone = True
         End If
 
         For i = 0 To kalman.src.Count - 1 Step 2
@@ -1101,7 +1089,6 @@ Public Class Depth_Increasing
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         depth = New Depth_Decreasing(ocvb, caller)
-        depth.standalone = True
         depth.Increasing = True
         ocvb.desc = "Identify where depth is increasing - retreating from the camera."
     End Sub
@@ -1124,7 +1111,6 @@ Public Class Depth_Punch
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         depth = New Depth_Decreasing(ocvb, caller)
-        depth.standalone = True
         ocvb.desc = "Identify the largest blob in the depth decreasing output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -1147,7 +1133,6 @@ Public Class Depth_ColorMap
         sliders.setupTrackBar1(ocvb, caller, "Depth ColorMap Alpha X100", 1, 100, 3)
 
         Palette = New Palette_ColorMap(ocvb, caller)
-        Palette.standalone = True
         ocvb.desc = "Display the depth as a color map"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -1210,7 +1195,6 @@ Public Class Depth_Stable
         ' sliders.setupTrackBar1(ocvb, caller, "")
         mog = New BGSubtract_Basics_CPP(ocvb, caller)
         mog.radio.check(1).Checked = True
-        mog.standalone = True
 
         ocvb.label2 = "Stable (non-zero) Depth"
         ocvb.desc = "Collect X frames, compute stable depth using the RGB Depth image."
@@ -1244,13 +1228,8 @@ Public Class Depth_Stabilizer
         setCaller(caller)
 
         mean = New Mean_Basics(ocvb, caller)
-        mean.standalone = True
-
         colorize = New Depth_Colorizer_CPP(ocvb, caller)
-        colorize.standalone = True
-
         stable = New Depth_Stable(ocvb, caller)
-        stable.standalone = True
 
         ocvb.desc = "Use the mask of stable depth (using RGBDepth) to stabilize the depth at any individual point."
     End Sub

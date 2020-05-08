@@ -150,9 +150,7 @@ Public Class BGSubtract_Depth_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         bgsub = New BGSubtract_Basics_MT(ocvb, caller)
-        bgsub.standalone = True
         shadow = New Depth_Holes(ocvb, caller)
-        shadow.standalone = True
         ocvb.desc = "Detect Motion in the depth image"
         ocvb.label2 = "Accumulated 3D image"
     End Sub
@@ -310,11 +308,9 @@ Public Class BGSubtract_MOG_Retina
         setCaller(callerRaw)
         input = New BGSubtract_MOG(ocvb, caller)
 
-        input.standalone = True
         input.sliders.TrackBar1.Value = 100
 
         retina = New Retina_Basics_CPP(ocvb, caller)
-        retina.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "Uncertainty threshold", 1, 255, 100)
 
@@ -386,7 +382,6 @@ Public Class BGSubtract_Video
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         bgfg = New BGSubtract_Basics_CPP(ocvb, caller)
-        bgfg.standalone = True
 
         video = New Video_Basics(ocvb, caller)
         video.srcVideo = ocvb.parms.HomeDir + "Data/vtest.avi"
@@ -485,7 +480,6 @@ Public Class BGSubtract_Synthetic
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         bgfg = New BGSubtract_Basics_CPP(ocvb, caller)
-        bgfg.standalone = True
 
         synth = New BGSubtract_Synthetic_CPP(ocvb, caller)
         ocvb.desc = "Demonstrate background subtraction algorithms with synthetic images."

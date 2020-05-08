@@ -32,7 +32,6 @@ Public Class FAST_Centroid
         setCaller(callerRaw)
         kalman = New Kalman_Basics(ocvb, caller)
         ReDim kalman.src(1) ' 2 elements - cv.point
-        kalman.standalone = True
 
         fast = New FAST_Basics(ocvb, caller)
         ocvb.desc = "Find interesting points with the FAST and smooth the centroid with kalman"

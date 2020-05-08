@@ -31,7 +31,8 @@ Module VB_EditorMain
             While nextFile.Peek() <> -1
                 Dim line As String
                 line = Trim(nextFile.ReadLine())
-                makeChange(line)
+                deleteLine(line)
+                ' makeChange(line)
             End While
             nextFile.Close()
             If saveChangeLines <> changeLines Then changeFiles.Add(fileName)
@@ -52,7 +53,11 @@ Module VB_EditorMain
 
                 Dim sw = New StreamWriter(filename)
                 For i = 0 To lines.Count - 1
-                    If deleteLine(lines(i)) = False Then sw.Write(lines(i))
+                    If deleteLine(lines(i)) Then
+                        Console.WriteLine("Deleting: " + lines(i))
+                    Else
+                        sw.Write(lines(i))
+                    End If
                 Next
                 sw.Close()
             Next

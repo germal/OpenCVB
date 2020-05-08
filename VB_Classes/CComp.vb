@@ -73,7 +73,6 @@ Public Class CComp_EdgeMask
         edges = New Edges_CannyAndShadow(ocvb, caller)
 
         ccomp = New CComp_Basics(ocvb, caller)
-        ccomp.standalone = True
 
         ocvb.desc = "Isolate Color connected components after applying the Edge Mask"
         ocvb.label1 = "Edges_CannyAndShadow (input to ccomp)"

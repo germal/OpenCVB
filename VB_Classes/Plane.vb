@@ -102,7 +102,6 @@ Public Class Plane_Detect
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 64
-        grid.standalone = True ' we don't need any results.
 
         ocvb.desc = "Identify planes in each segment."
         ocvb.label2 = "Blue, green, and red show different planes"
@@ -179,7 +178,6 @@ Public Class Plane_DetectDebug
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
-        grid.standalone = True ' we don't need any results.
 
         ocvb.desc = "Debug code to identify planes in just one segment."
         ocvb.label2 = "Blue, green, and red show different planes"

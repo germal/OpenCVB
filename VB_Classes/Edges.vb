@@ -44,15 +44,12 @@ Public Class Edges_CannyAndShadow
         setCaller(callerRaw)
         dilate = New DilateErode_Basics(ocvb, caller)
         dilate.radio.check(2).Checked = True
-        dilate.standalone = True
 
         canny = New Edges_Canny(ocvb, caller)
         canny.sliders.TrackBar1.Value = 100
         canny.sliders.TrackBar2.Value = 100
-        canny.standalone = True
 
         shadow = New Depth_Holes(ocvb, caller)
-        shadow.standalone = True
 
         ocvb.desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
         ocvb.label1 = "Edges in color and depth after dilate"
@@ -69,7 +66,8 @@ Public Class Edges_CannyAndShadow
 
         dilate.src = ocvb.result2
         dilate.Run(ocvb)
-        ocvb.result1.SetTo(0, shadow.holeMask)
+        dilate.dst.SetTo(0, shadow.holeMask)
+        If standalone Then ocvb.result1 = dilate.dst
     End Sub
     Public Sub MyDispose()
         canny.Dispose()
@@ -265,7 +263,6 @@ Public Class Edges_LeftView
         setCaller(callerRaw)
         red = New LeftRightView_Basics(ocvb, caller)
         sobel = New Edges_Sobel(ocvb, caller)
-        sobel.standalone = True
         sobel.sliders.TrackBar1.Value = 5
 
         ocvb.desc = "Find the edges in the LeftViewimages."

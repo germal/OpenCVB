@@ -90,7 +90,6 @@ Public Class Retina_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         retina = New Retina_Basics_CPP(ocvb, caller)
-        retina.standalone = True
 
         ocvb.desc = "Use the bio-inspired retina algorithm with the depth data."
         ocvb.label1 = "Last result || current result"

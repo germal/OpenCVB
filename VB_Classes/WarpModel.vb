@@ -29,7 +29,6 @@ Public Class WarpModel_Input
         check.Box(0).Text = "Use Gradient in WarpInput"
 
         sobel = New Edges_Sobel(ocvb, caller)
-        sobel.standalone = True
         ocvb.desc = "Import the misaligned input."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

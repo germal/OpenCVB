@@ -178,7 +178,6 @@ Public Class FloodFill_DCT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         flood = New FloodFill_Color_MT(ocvb, caller)
-        flood.standalone = True
 
         dct = New DCT_FeatureLess_MT(ocvb, caller)
         ocvb.desc = "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces."
@@ -209,10 +208,8 @@ Public Class FloodFill_WithDepth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         shadow = New Depth_Holes(ocvb, caller)
-        shadow.standalone = True
 
         range = New FloodFill_RelativeRange(ocvb, caller)
-        range.fBasics.standalone = True
 
         ocvb.desc = "Floodfill only the areas where there is depth"
     End Sub
@@ -241,13 +238,10 @@ Public Class FloodFill_CComp
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         shadow = New Depth_Holes(ocvb, caller)
-        shadow.standalone = True
 
         ccomp = New CComp_Basics(ocvb, caller)
-        ccomp.standalone = True
 
         range = New FloodFill_RelativeRange(ocvb, caller)
-        range.fBasics.standalone = True
 
         ocvb.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
     End Sub
@@ -313,7 +307,6 @@ Public Class FloodFill_Top16
         check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
 
         flood = New FloodFill_Basics(ocvb, caller)
-        flood.standalone = True
 
         ocvb.label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."

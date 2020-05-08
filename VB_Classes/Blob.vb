@@ -27,7 +27,6 @@ Public Class Blob_Input
         poly.radio.check(1).Checked = True ' we want the convex polygon filled.
 
         Mats = New Mat_4to1(ocvb, caller)
-        Mats.standalone = True
 
         ocvb.desc = "Test simple Blob Detector."
         ocvb.label2 = ""
@@ -164,14 +163,12 @@ Public Class Blob_DepthClusters
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         shadow = New Depth_Holes(ocvb, caller)
-        shadow.standalone = True
 
         histBlobs = New Histogram_DepthClusters(ocvb, caller)
 
         flood = New FloodFill_RelativeRange(ocvb, caller)
         flood.fBasics.sliders.TrackBar2.Value = 1 ' pixels are exact.
         flood.fBasics.sliders.TrackBar3.Value = 1 ' pixels are exact.
-        flood.fBasics.standalone = True
 
         ocvb.desc = "Highlight the distinct histogram blobs found with depth clustering."
     End Sub
@@ -229,7 +226,6 @@ Public Class Blob_Rectangles
             ReDim kalman(blobsToShow - 1)
             For i = 0 To blobsToShow - 1
                 kalman(i) = New Kalman_Basics(ocvb, caller)
-                kalman(i).standalone = True
             Next
         End If
 
@@ -267,7 +263,6 @@ Public Class Blob_LargestBlob
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Kalman_Basics(ocvb, caller)
-        kalman.standalone = True
 
         blobs = New Blob_DepthClusters(ocvb, caller)
         ocvb.desc = "Gather all the blob data and display the largest."

@@ -42,7 +42,6 @@ Public Class Smoothing_Exterior
 				setCaller(callerRaw)
 		hull = New Hull_Basics(ocvb, caller)
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
-		hull.standalone = True
 
 		sliders.setupTrackBar1(ocvb, caller, "Smoothing iterations", 1, 20, 10)
 		
@@ -117,7 +116,6 @@ Public Class Smoothing_Interior
 				setCaller(callerRaw)
 		hull = New Hull_Basics(ocvb, caller)
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
-		hull.standalone = True
 		hull.sliders.TrackBar1.Value = 16
 
 		sliders.setupTrackBar1(ocvb, caller, "Smoothing iterations", 1, 20, 1)

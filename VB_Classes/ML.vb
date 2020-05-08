@@ -64,11 +64,9 @@ Public Class ML_FillRGBDepth_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         colorizer = New Depth_Colorizer_CPP(ocvb, caller)
-        colorizer.standalone = True
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
-        grid.standalone = True ' we don't need any results.
         shadow = New Depth_Holes(ocvb, caller)
         ocvb.label1 = "ML filled shadow"
         ocvb.label2 = ""
@@ -104,7 +102,6 @@ Public Class ML_FillRGBDepth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         colorizer = New Depth_Colorizer_CPP(ocvb, caller)
-        colorizer.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "ML Min Learn Count", 2, 100, 5)
 
@@ -139,10 +136,8 @@ Public Class ML_DepthFromColor_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         colorizer = New Depth_Colorizer_CPP(ocvb, caller)
-        colorizer.standalone = True
 
         dilate = New DilateErode_Basics(ocvb, caller)
-        dilate.standalone = True
         dilate.sliders.TrackBar2.Value = 2
 
         sliders.setupTrackBar1(ocvb, caller, "Prediction Max Depth", 500, 5000, 1000)
@@ -150,7 +145,6 @@ Public Class ML_DepthFromColor_MT
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
-        grid.standalone = True
 
         ocvb.label1 = "Predicted Depth"
         ocvb.label2 = "Mask of color and depth input"
@@ -214,17 +208,14 @@ Public Class ML_DepthFromColor
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         colorizer = New Depth_Colorizer_CPP(ocvb, caller)
-        colorizer.standalone = True
 
         mats = New Mat_4to1(ocvb, caller)
-        mats.standalone = True
 
         shadow = New Depth_Holes(ocvb, caller)
 
         sliders.setupTrackBar1(ocvb, caller, "Prediction Max Depth", 1000, 5000, 1500)
 
         resized = New Resize_Percentage(ocvb, caller)
-        resized.standalone = True
         resized.sliders.TrackBar1.Value = 2 ' 2% of the image.
 
         ocvb.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
@@ -300,17 +291,14 @@ Public Class ML_DepthFromXYColor
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         colorizer = New Depth_Colorizer_CPP(ocvb, caller)
-        colorizer.standalone = True
 
         mats = New Mat_4to1(ocvb, caller)
-        mats.standalone = True
 
         shadow = New Depth_Holes(ocvb, caller)
 
         sliders.setupTrackBar1(ocvb, caller, "Prediction Max Depth", 1000, 5000, 1500)
 
         resized = New Resize_Percentage(ocvb, caller)
-        resized.standalone = True
         resized.sliders.TrackBar1.Value = 2
 
         ocvb.label1 = "Predicted Depth"
@@ -403,10 +391,8 @@ Public Class ML_EdgeDepth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         colorizer = New Depth_Colorizer_CPP(ocvb, caller)
-        colorizer.standalone = True
 
         dilate = New DilateErode_Basics(ocvb, caller)
-        dilate.standalone = True
         dilate.sliders.TrackBar2.Value = 5
 
         sliders.setupTrackBar1(ocvb, caller, "Prediction Max Depth", 500, 5000, 1000)
@@ -414,7 +400,6 @@ Public Class ML_EdgeDepth
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
-        grid.standalone = True
 
         ocvb.label1 = "Depth Shadow (inverse of color and depth)"
         ocvb.label2 = "Predicted Depth"

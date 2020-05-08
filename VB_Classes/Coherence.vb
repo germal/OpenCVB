@@ -79,7 +79,6 @@ Public Class Coherence_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         coherent = New Coherence_Basics(ocvb, caller)
-        coherent.standalone = True
         ocvb.desc = "Find coherent lines in the depth image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

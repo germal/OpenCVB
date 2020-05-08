@@ -6,10 +6,8 @@ Public Class Object_Basics
         Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         trim = New Depth_InRange(ocvb, caller)
-        trim.standalone = True
 
         ccomp = New CComp_EdgeMask(ocvb, caller)
-        ccomp.standalone = True
 
         ocvb.desc = "Identify objects in the foreground."
     End Sub

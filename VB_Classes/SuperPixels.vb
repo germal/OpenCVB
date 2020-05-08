@@ -96,7 +96,6 @@ Public Class SuperPixel_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         pixels = New SuperPixel_Basics_CPP(ocvb, caller)
-        pixels.standalone = True
 
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
@@ -123,10 +122,8 @@ Public Class SuperPixel_WithCanny
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         edges = New Edges_Canny(ocvb, caller)
-        edges.standalone = True
 
         pixels = New SuperPixel_Basics_CPP(ocvb, caller)
-        pixels.standalone = True
 
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
@@ -158,10 +155,8 @@ Public Class SuperPixel_WithLineDetector
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         lines = New LineDetector_Basics(ocvb, caller)
-        lines.standalone = True
 
         pixels = New SuperPixel_Basics_CPP(ocvb, caller)
-        pixels.standalone = True
 
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub

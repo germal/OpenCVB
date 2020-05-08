@@ -183,7 +183,6 @@ Public Class Palette_DrawTest
         Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         palette = New Palette_ColorMap(ocvb, caller)
-        palette.standalone = True
 
         draw = New Draw_RngImage(ocvb, caller)
         palette.src = ocvb.result1
@@ -287,7 +286,6 @@ Public Class Palette_ColorMap
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         gradMap = New Palette_BuildGradientColorMap(ocvb, caller)
-        gradMap.standalone = True
 
         radio.Setup(ocvb, caller, 21)
         For i = 0 To radio.check.Count - 1
@@ -353,7 +351,6 @@ Public Class Palette_DepthColorMap
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         holes = New Depth_Holes(ocvb, caller)
-        holes.standalone = True
 
         ocvb.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub

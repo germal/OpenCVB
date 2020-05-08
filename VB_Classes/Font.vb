@@ -65,7 +65,7 @@ Public Class Font_FlowText
     Public Sub Run(ocvb As AlgorithmData)
         if standalone And ocvb.frameCount = 0 Then
             msgs.Add("To get text to flow across an image in any other class, add flow = new Font_FlowText(ocvb) to your class constructor.")
-            msgs.Add("Also in your constructor, update flow.standalone = true and optionally indicate if you want result1 or result2 for text.")
+            msgs.Add("Also optionally indicate if you want result1 or result2 for text (the default is result1.)")
             msgs.Add("Then in your Run method, flow.msgs.add('your next line of text') - for as many msgs as you need on each pass.")
             msgs.Add("Then at the end of your Run method, invoke flow.Run(ocvb)")
         Else

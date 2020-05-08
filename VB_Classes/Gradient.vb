@@ -8,7 +8,6 @@ Public Class Gradient_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         sobel = New Edges_Sobel(ocvb, caller)
-        sobel.standalone = True
         ocvb.desc = "Use phase to compute gradient"
         ocvb.label2 = "Phase Output"
     End Sub
@@ -40,7 +39,6 @@ Public Class Gradient_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         sobel = New Edges_Sobel(ocvb, caller)
-        sobel.standalone = True
         ocvb.desc = "Use phase to compute gradient on depth image"
         ocvb.label2 = "Phase Output"
     End Sub

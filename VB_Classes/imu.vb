@@ -11,7 +11,6 @@ Public Class IMU_Basics
         sliders.setupTrackBar1(ocvb, caller, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
 
         flow = New Font_FlowText(ocvb, caller)
-        flow.standalone = True
         flow.result1or2 = RESULT1
 
         ocvb.desc = "Read and display the IMU coordinates"
@@ -70,7 +69,6 @@ Public Class IMU_Stabilizer
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Kalman_Basics(ocvb, caller)
-        kalman.standalone = True
 
         ocvb.desc = "Stabilize the image with the IMU data."
         ocvb.label1 = "IMU Stabilize (Move Camera + Select Kalman)"
@@ -128,7 +126,6 @@ Public Class IMU_Magnetometer
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plot = New Plot_OverTime(ocvb, caller)
-        plot.standalone = True
         plot.dst = ocvb.result2
         plot.maxScale = 10
         plot.minScale = -10
@@ -200,7 +197,6 @@ Public Class IMU_FrameTime
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plot = New Plot_OverTime(ocvb, caller)
-        plot.standalone = True
         plot.dst = ocvb.result2
         plot.maxScale = 150
         plot.minScale = 0
@@ -298,7 +294,6 @@ Public Class IMU_HostFrameTimes
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plot = New Plot_OverTime(ocvb, caller)
-        plot.standalone = True
         plot.dst = ocvb.result2
         plot.maxScale = 150
         plot.minScale = 0
@@ -387,16 +382,12 @@ Public Class IMU_TotalDelay
         ocvb.parms.ShowOptions = False
 
         host = New IMU_HostFrameTimes(ocvb, caller)
-        host.standalone = True
         imu = New IMU_FrameTime(ocvb, caller)
-        imu.standalone = True
         kalman = New Kalman_Single(ocvb, caller)
-        kalman.standalone = True
 
         ocvb.parms.ShowOptions = True ' just show plot options...
 
         plot = New Plot_OverTime(ocvb, caller)
-        plot.standalone = True
         plot.dst = ocvb.result2
         plot.maxScale = 50
         plot.minScale = 0
@@ -473,7 +464,6 @@ Public Class IMU_GVector
         setCaller(callerRaw)
         kalman = New Kalman_Basics(ocvb, caller)
         ReDim kalman.src(6 - 1)
-        kalman.standalone = True
 
         ocvb.desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub

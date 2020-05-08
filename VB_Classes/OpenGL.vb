@@ -288,7 +288,6 @@ Public Class OpenGL_3Ddata
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud when displaying data.
 
         colors = New Palette_Gradient(ocvb, caller)
-        colors.standalone = True
         colors.color1 = cv.Scalar.Yellow
         colors.color2 = cv.Scalar.Blue
         colors.Run(ocvb)
@@ -400,7 +399,6 @@ Public Class OpenGL_GravityTransform
         setCaller(callerRaw)
         imu = New IMU_GVector(ocvb, caller)
         ogl = New OpenGL_Basics(ocvb, caller)
-        ogl.standalone = True
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub

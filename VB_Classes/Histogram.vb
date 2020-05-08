@@ -138,7 +138,6 @@ Public Class Histogram_NormalizeGray
         sliders.setupTrackBar2(ocvb, caller, "Max Gray", 0, 255, 255)
 
         histogram = New Histogram_KalmanSmoothed(ocvb, caller)
-        histogram.standalone = True
 
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Normalize Before Histogram"
@@ -168,11 +167,9 @@ Public Class Histogram_EqualizeColor
         Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Histogram_KalmanSmoothed(ocvb, caller)
-        kalman.standalone = True
         kalman.sliders.TrackBar1.Value = 40
 
         mats = New Mat_2to1(ocvb, caller)
-        mats.standalone = True
 
         ocvb.desc = "Create an equalized histogram of the color image.  Histogram differences are very subtle but image is noticeably enhanced."
         ocvb.label1 = "Image Enhanced with Equalized Histogram"
@@ -276,7 +273,6 @@ Public Class Histogram_2D_XZ_YZ
         xyDepth = New Mat_ImageXYZ_MT(ocvb, caller)
 
         mats = New Mat_4to1(ocvb, caller)
-        mats.standalone = True
 
         trim = New Depth_InRange(ocvb, caller)
         trim.sliders.TrackBar2.Value = 1500 ' up to x meters away
@@ -326,7 +322,6 @@ Public Class Histogram_BackProjectionGrayScale
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         hist = New Histogram_KalmanSmoothed(ocvb, caller)
-        hist.standalone = True
         hist.dst = ocvb.result2
         hist.kalman.check.Box(0).Checked = False
 
@@ -417,13 +412,11 @@ Public Class Histogram_ColorsAndGray
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         mats = New Mat_4to1(ocvb, caller)
-        mats.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "Min Gray", 0, 255, 0)
         sliders.setupTrackBar2(ocvb, caller, "Max Gray", 0, 255, 255)
 
         histogram = New Histogram_KalmanSmoothed(ocvb, caller)
-        histogram.standalone = True
         histogram.kalman.check.Box(0).Checked = False
         histogram.kalman.check.Box(0).Enabled = False ' if we use Kalman, all the plots are identical as the values converge on the gray level setting...
         histogram.sliders.TrackBar1.Value = 40
@@ -474,10 +467,8 @@ Public Class Histogram_KalmanSmoothed
         setCaller(callerRaw)
         dst = ocvb.result2
         plotHist = New Plot_Histogram(ocvb, caller)
-        plotHist.standalone = True
 
         kalman = New Kalman_Basics(ocvb, caller)
-        kalman.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 1, 255, 50)
 
@@ -536,7 +527,6 @@ Public Class Histogram_Depth
         Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plotHist = New Plot_Histogram(ocvb, caller)
-        plotHist.standalone = True
 
         trim = New Depth_InRange(ocvb, caller)
         sliders.setupTrackBar1(ocvb, caller, "Histogram Depth Bins", 2, ocvb.color.Width, 50) ' max is the number of columns * 2
@@ -603,7 +593,6 @@ Public Class Histogram_DepthValleys
         hist.sliders.TrackBar1.Value = 40 ' number of bins.
 
         kalman = New Kalman_Basics(ocvb, caller)
-        kalman.standalone = True
 
         ocvb.desc = "Identify valleys in the Depth histogram."
     End Sub

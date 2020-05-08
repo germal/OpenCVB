@@ -108,8 +108,6 @@ Public Class Python_MemMap
         setCaller(callerRaw)
         If ocvb.PythonFileName Is Nothing Then
             ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_MemMap.py"
-        Else
-            standalone = True ' external users will set the pythonfilename.
         End If
 
         memMapbufferSize = System.Runtime.InteropServices.Marshal.SizeOf(GetType(Double)) * memMapValues.Length

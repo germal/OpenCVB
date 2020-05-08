@@ -9,11 +9,9 @@ Public Class Entropy_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         flow = New Font_FlowText(ocvb, caller)
-        flow.standalone = True
         flow.result1or2 = RESULT1
 
         hist = New Histogram_Basics(ocvb, caller)
-        hist.standalone = True
 
         ocvb.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub

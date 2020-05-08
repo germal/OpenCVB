@@ -13,7 +13,6 @@ Public Class CamShift_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plotHist = New Plot_Histogram(ocvb, caller)
-        plotHist.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "CamShift vMin", 0, 255, 32)
         sliders.setupTrackBar2(ocvb, caller, "CamShift vMax", 0, 255, 255)
@@ -150,7 +149,6 @@ Public Class Camshift_TopObjects
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         mats = New Mat_4to1(ocvb, caller)
-        mats.standalone = True
 
         blob = New Blob_DepthClusters(ocvb, caller)
         sliders.setupTrackBar1(ocvb, caller, "How often should camshift be reinitialized", 1, 500, 100)

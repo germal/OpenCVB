@@ -7,10 +7,8 @@ Public Class Stabilizer_BriskFeatures
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         stabilizer = New Stabilizer_Basics(ocvb, caller)
-        stabilizer.standalone = True
 
         brisk = New BRISK_Basics(ocvb, caller)
-        brisk.standalone = True
         brisk.sliders.TrackBar1.Value = 10
 
         ocvb.desc = "Stabilize the video stream using BRISK features (not GoodFeaturesToTrack)"
@@ -38,10 +36,8 @@ Public Class Stabilizer_HarrisFeatures
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         stabilizer = New Stabilizer_Basics(ocvb, caller)
-        stabilizer.standalone = True
 
         harris = New Harris_Detector_CPP(ocvb, caller)
-        harris.standalone = True
 
         ocvb.desc = "Stabilize the video stream using Harris detector features"
     End Sub
@@ -73,7 +69,6 @@ Public Class Stabilizer_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         good = New Features_GoodFeatures(ocvb, caller)
-        good.standalone = True
 
         ocvb.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
         ocvb.label1 = "Stabilized Image"

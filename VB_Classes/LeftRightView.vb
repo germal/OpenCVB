@@ -39,7 +39,6 @@ Public Class LeftRightView_CompareUndistorted
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         fisheye = New FishEye_Rectified(ocvb, caller)
-        fisheye.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "brightness", 0, 255, 0)
         sliders.setupTrackBar2(ocvb, caller, "Slice Starting Y", 0, 300, 100)
@@ -156,7 +155,6 @@ Public Class LeftRightView_Features
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         features = New Features_GoodFeatures(ocvb, caller)
-        features.standalone = True
 
         lrView = New LeftRightView_Basics(ocvb, caller)
 
@@ -199,7 +197,6 @@ Public Class LeftRightView_Palettized
         setCaller(callerRaw)
         lrView = New LeftRightView_Basics(ocvb, caller)
         palette = New Palette_ColorMap(ocvb, caller)
-        palette.standalone = True
 
         ocvb.desc = "Add color to the 8-bit infrared images."
         ocvb.label1 = "Left Image"
@@ -240,7 +237,6 @@ Public Class LeftRightView_BRISK
         ocvb.label2 = "Infrared Right Image"
 
         brisk = New BRISK_Basics(ocvb, caller)
-        brisk.standalone = True
         brisk.sliders.TrackBar1.Value = 20
 
         lrView = New LeftRightView_Basics(ocvb, caller)

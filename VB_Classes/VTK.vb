@@ -134,7 +134,6 @@ Public Class VTK_Histogram3D
         sliders.setupTrackBar3(ocvb, caller,"Hist 3D bin Threshold X1000000", 10, 100, 20)
 
         mats = New Mat_4to1(ocvb, caller)
-        mats.standalone = True
 
         ocvb.label2 = "Input to VTK plot"
 
@@ -142,7 +141,6 @@ Public Class VTK_Histogram3D
         vtk.usingDepthAndRGB = False
 
         random = New Random_NormalDist(ocvb, caller)
-        random.standalone = True
         ocvb.desc = "Create the test pattern and send it to VTK for 3D display."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

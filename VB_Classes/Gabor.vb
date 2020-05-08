@@ -80,7 +80,6 @@ Public Class Gabor_Basics_MT
         For i = 0 To gabor.Length - 1
             gabor(i) = New Gabor_Basics(ocvb, caller)
             gabor(i).sliders.TrackBar3.Value = i * 180 / gabor.Length
-            gabor(i).standalone = True
         Next
         ocvb.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
     End Sub

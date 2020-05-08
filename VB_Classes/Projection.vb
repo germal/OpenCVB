@@ -60,12 +60,10 @@ Public Class Projection_NoGravity_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
-        grid.standalone = True
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
         foreground = New Depth_ManualTrim(ocvb, caller)
-        foreground.standalone = True
         foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
         foreground.sliders.TrackBar2.Value = 4000 ' fixed distance to keep the images stable.
         ocvb.label1 = "Top View"
@@ -118,12 +116,10 @@ Public Class Projection_NoGravity
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
-        grid.standalone = True
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
         foreground = New Depth_ManualTrim(ocvb, caller)
-        foreground.standalone = True
         foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
         foreground.sliders.TrackBar2.Value = 4000 ' fixed distance to keep the images stable.
         ocvb.label1 = "Top View"
@@ -187,10 +183,8 @@ Public Class Projection_GravityVB
         setCaller(callerRaw)
         imu = New IMU_GVector(ocvb, caller)
         imu.result = RESULT2
-        imu.standalone = True
 
         grid = New Thread_Grid(ocvb, caller)
-        grid.standalone = True
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
@@ -321,11 +315,9 @@ Public Class Projection_G_CPP
         check.Box(0).Checked = True
 
         meanX = New Mean_Basics(ocvb, caller)
-        meanX.standalone = True
 
         imu = New IMU_GVector(ocvb, caller)
         imu.result = RESULT2
-        imu.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
         sliders.setupTrackBar2(ocvb, caller, "Threshold for histogram Count", 1, 100, 10)
@@ -450,19 +442,16 @@ Public Class Projection_Floodfill
         setCaller(callerRaw)
         kalman = New Kalman_Basics(ocvb, caller)
         ReDim kalman.src(10 * 4 - 1) ' max 10 objects.
-        kalman.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "epsilon for GroupRectangles X100", 0, 200, 80)
 
         gravity = New Projection_G_CPP(ocvb, caller)
         gravity.sliders.GroupBox2.Visible = True
-        gravity.standalone = True
         gravity.histogramRun = True
 
         flood = New FloodFill_Projection(ocvb, caller)
         flood.sliders.TrackBar1.Value = 100
         flood.sliders.TrackBar4.Value = 1
-        flood.standalone = True
 
         ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings)"
     End Sub
@@ -536,13 +525,10 @@ Public Class Projection_Wall
         setCaller(callerRaw)
 
         dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
-        dilate.standalone = True
 
         objects = New Projection_Floodfill(ocvb, Me.GetType().Name)
-        objects.standalone = True
 
         lines = New lineDetector_FLD(ocvb, Me.GetType().Name)
-        lines.standalone = True
 
         ocvb.desc = "Use the top down view to detect walls with a line detector algorithm"
     End Sub

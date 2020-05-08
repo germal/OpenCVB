@@ -27,7 +27,6 @@ Public Class DFT_Basics
         Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         mats = New Mat_4to1(ocvb, caller)
-        mats.standalone = True
         mats.noLines = True
 
         ocvb.desc = "Explore the Discrete Fourier Transform."
@@ -90,7 +89,6 @@ Public Class DFT_Inverse
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         mats = New Mat_2to1(ocvb, caller)
-        mats.standalone = True
         ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
         ocvb.label1 = "Image after Inverse DFT"
     End Sub
@@ -193,7 +191,6 @@ Public Class DFT_ButterworthDepth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         bfilter = New DFT_ButterworthFilter(ocvb, caller)
-        bfilter.dft.standalone = True
 
         ocvb.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
         ocvb.label1 = "Image with Butterworth Low Pass Filter Applied"

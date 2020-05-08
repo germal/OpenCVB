@@ -152,7 +152,6 @@ Public Class MSER_TestSynthetic
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         mser = New MSER_Basics(ocvb, caller)
-        mser.standalone = True
         mser.sliders.TrackBar1.Value = 10
         mser.sliders.TrackBar2.Value = 100
         mser.sliders.TrackBar3.Value = 5000
@@ -226,7 +225,6 @@ Public Class MSER_Contours
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         mser = New MSER_Basics(ocvb, caller)
-        mser.standalone = True
         mser.sliders.TrackBar2.Value = 4000
         ocvb.desc = "Use MSER but show the contours of each region."
     End Sub

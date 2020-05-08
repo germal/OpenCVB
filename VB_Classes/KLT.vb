@@ -87,7 +87,6 @@ Public Class KLT_OpticalFlow
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         klt = New KLT_Basics(ocvb, caller)
-        klt.standalone = True ' we will compress the points file below.
         ocvb.desc = "KLT optical flow"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

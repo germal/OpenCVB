@@ -114,7 +114,6 @@ Public Class EMax_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         emax = New EMax_Basics(ocvb, caller)
-        emax.standalone = True
 
         EMax_Basics = EMax_Basics_Open()
         ocvb.desc = "Use EMax - Expectation Maximization - to classify a series of points"
