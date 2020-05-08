@@ -152,7 +152,7 @@ Public Class DCT_Surfaces_debug
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         flow = New Font_FlowText(ocvb, caller)
-        flow.externalUse = True
+        flow.standalone = True
         flow.result1or2 = RESULT1
 
         grid = New Thread_Grid(ocvb, caller)
@@ -161,7 +161,7 @@ Public Class DCT_Surfaces_debug
         dct = New DCT_FeatureLess_MT(ocvb, caller)
         dct.dct.sliders.TrackBar1.Value = 1
         Mats = New Mat_4to1(ocvb, caller)
-        Mats.externalUse = True
+        Mats.standalone = True
 
         ocvb.desc = "Find plane equation for a featureless surface - debugging one region for now."
     End Sub
@@ -238,7 +238,7 @@ Public Class DCT_CCompenents
         setCaller(callerRaw)
         dct = New DCT_FeatureLess_MT(ocvb, caller)
         cc = New CComp_Basics(ocvb, caller)
-        cc.externalUse = True
+        cc.standalone = True
 
         ocvb.desc = "Find surfaces that lack any texture with DCT (less highest frequency) and use connected components to isolate those surfaces."
     End Sub

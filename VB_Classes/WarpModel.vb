@@ -29,7 +29,7 @@ Public Class WarpModel_Input
         check.Box(0).Text = "Use Gradient in WarpInput"
 
         sobel = New Edges_Sobel(ocvb, caller)
-        sobel.externalUse = True
+        sobel.standalone = True
         ocvb.desc = "Import the misaligned input."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -92,8 +92,7 @@ Public Class WarpModel_FindTransformECC_CPP
     Public src2 As New cv.Mat
     Public rgb1 As New cv.Mat
     Public rgb2 As New cv.Mat
-    Public externalUse As Boolean
-    Public warpMode As Integer
+        Public warpMode As Integer
     Public aligned As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
@@ -111,7 +110,7 @@ Public Class WarpModel_FindTransformECC_CPP
         ocvb.desc = "Use FindTransformECC to align 2 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then input.Run(ocvb)
+        if standalone Then input.Run(ocvb)
 
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then warpMode = i

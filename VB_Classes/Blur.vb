@@ -81,8 +81,7 @@ End Class
 Public Class Blur_Bilateral
     Inherits ocvbClass
     Public src As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 32, 5)
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
@@ -90,7 +89,7 @@ Public Class Blur_Bilateral
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize As Int32 = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
-        If externalUse = False Then src = ocvb.color.Clone()
+        if standalone Then src = ocvb.color.Clone()
         cv.Cv2.BilateralFilter(src, ocvb.result1, kernelSize, kernelSize * 2, kernelSize / 2)
     End Sub
 End Class
@@ -106,13 +105,13 @@ Public Class Blur_PlusHistogram
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         mat2to1 = New Mat_2to1(ocvb, caller)
-        mat2to1.externalUse = True
+        mat2to1.standalone = True
 
         blur = New Blur_Bilateral(ocvb, caller)
-        blur.externalUse = True
+        blur.standalone = True
 
         myhist = New Histogram_EqualizeGray(ocvb, caller)
-        myhist.externalUse = True
+        myhist.standalone = True
 
         ocvb.desc = "Compound algorithms Blur and Histogram"
     End Sub

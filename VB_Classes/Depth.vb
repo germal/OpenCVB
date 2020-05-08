@@ -131,7 +131,7 @@ Public Class Depth_HolesRect
         sliders.setupTrackBar1(ocvb, caller, "shadowRect Min Size", 1, 20000, 2000)
 
         shadow = New Depth_Holes(ocvb, caller)
-        shadow.externalUse = True
+        shadow.standalone = True
 
         ocvb.desc = "Identify the minimum rectangles of contours of the depth shadow"
     End Sub
@@ -460,16 +460,16 @@ Public Class Depth_MeanStdevPlot
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         shadow = New Depth_Holes(ocvb, caller)
-        shadow.externalUse = True
+        shadow.standalone = True
 
         plot1 = New Plot_OverTime(ocvb, caller)
-        plot1.externalUse = True
+        plot1.standalone = True
         plot1.dst = ocvb.result1
         plot1.maxScale = 2000
         plot1.plotCount = 1
 
         plot2 = New Plot_OverTime(ocvb, caller)
-        plot2.externalUse = True
+        plot2.standalone = True
         plot2.dst = ocvb.result2
         plot2.maxScale = 1000
         plot2.plotCount = 1
@@ -509,7 +509,7 @@ Public Class Depth_Uncertainty
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         retina = New Retina_Basics_CPP(ocvb, caller)
-        retina.externalUse = True
+        retina.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "Uncertainty threshold", 1, 255, 100)
 
@@ -529,34 +529,6 @@ End Class
 
 
 
-Public Class Depth_Stable
-    Inherits ocvbClass
-    Dim mog As BGSubtract_Basics_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        mog = New BGSubtract_Basics_CPP(ocvb, caller)
-        mog.radio.check(1).Checked = True
-        mog.externalUse = True
-
-        ocvb.label2 = "Stable (non-zero) Depth"
-        ocvb.desc = "Collect X frames, compute stable depth and color pixels using thresholds"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        mog.src = ocvb.RGBDepth
-        mog.Run(ocvb)
-
-        cv.Cv2.BitwiseNot(ocvb.result1, ocvb.result2)
-        ocvb.label1 = "Unstable Depth" + " using " + mog.radio.check(mog.currMethod).Text + " method"
-        Dim zeroDepth = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(1)
-        ocvb.result2.SetTo(0, zeroDepth)
-    End Sub
-    Public Sub MyDispose()
-        mog.Dispose()
-    End Sub
-End Class
-
-
-
 
 Public Class Depth_Palette
     Inherits ocvbClass
@@ -566,7 +538,7 @@ Public Class Depth_Palette
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         trim = New Depth_InRange(ocvb, caller)
-        trim.externalUse = True
+        trim.standalone = True
         trim.sliders.TrackBar2.Value = 5000
 
         customColorMap = colorTransition(cv.Scalar.Blue, cv.Scalar.Yellow, 256)
@@ -648,7 +620,6 @@ Public Class Depth_Colorizer_CPP
     Inherits ocvbClass
     Public dst As New cv.Mat
     Public src As New cv.Mat
-    Public externalUse As Boolean
     Dim dcPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -657,7 +628,7 @@ Public Class Depth_Colorizer_CPP
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
 
-        If externalUse = False Then src = getDepth32f(ocvb) Else dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        If standalone Then src = getDepth32f(ocvb) Else dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
 
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
@@ -669,7 +640,7 @@ Public Class Depth_Colorizer_CPP
             If dst.Rows = 0 Then dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
             Dim dstData(dst.Total * dst.ElemSize - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            If externalUse = False Then
+            If standalone Then
                 ocvb.result1 = New cv.Mat(ocvb.result1.Rows, ocvb.result1.Cols, cv.MatType.CV_8UC3, dstData)
             End If
 
@@ -688,7 +659,6 @@ End Class
 Public Class Depth_ManualTrim
     Inherits ocvbClass
     Public Mask As New cv.Mat
-    Public externalUse As Boolean
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -707,7 +677,7 @@ Public Class Depth_ManualTrim
         maskMin = dst.Threshold(minDepth, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         cv.Cv2.BitwiseAnd(Mask, maskMin, Mask)
 
-        If externalUse = False Then
+        If standalone Then
             ocvb.result1.SetTo(0)
             ocvb.RGBDepth.CopyTo(ocvb.result1, Mask)
         Else
@@ -729,7 +699,6 @@ Public Class Depth_InRange
     Public zeroMask As New cv.Mat
     Public dst As New cv.Mat
     Public depth32f As New cv.Mat
-    Public externalUse As Boolean
     Public minDepth As Double
     Public maxDepth As Double
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -748,7 +717,7 @@ Public Class Depth_InRange
         dst = depth32f.Clone()
         dst.SetTo(0, zeroMask)
 
-        If externalUse = False Then ocvb.result1 = dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If standalone Then ocvb.result1 = dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -762,14 +731,13 @@ Public Class Depth_ColorizerFastFade_CPP
     Dim trim As Depth_InRange
     Public dst As New cv.Mat
     Public src As New cv.Mat
-    Public externalUse As Boolean
     Dim dcPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         dcPtr = Depth_Colorizer2_Open()
 
         trim = New Depth_InRange(ocvb, caller)
-        trim.externalUse = True
+        trim.standalone = True
 
         ocvb.label2 = "Mask from Depth_InRange"
         ocvb.desc = "Display depth data with inrange trim.  Higher contrast than others - yellow to blue always present."
@@ -777,7 +745,7 @@ Public Class Depth_ColorizerFastFade_CPP
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
 
-        If externalUse = False Then src = trim.dst Else dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        If standalone Then src = trim.dst Else dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         ocvb.result2 = trim.Mask
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
@@ -789,7 +757,7 @@ Public Class Depth_ColorizerFastFade_CPP
             If dst.Rows = 0 Then dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
             Dim dstData(dst.Total * dst.ElemSize - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            If externalUse = False Then
+            If standalone Then
                 ocvb.result1 = New cv.Mat(ocvb.result1.Rows, ocvb.result1.Cols, cv.MatType.CV_8UC3, dstData)
             Else
                 dst = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
@@ -856,21 +824,20 @@ Public Class Depth_ColorizerVB_MT
     Inherits ocvbClass
     Dim grid As Thread_Grid
     Public src As cv.Mat
-    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Min Depth", 0, 1000, 0)
         sliders.setupTrackBar2(ocvb, caller, "Max Depth", 1001, 10000, 4000)
 
         grid = New Thread_Grid(ocvb, caller)
-        grid.externalUse = True
+        grid.standalone = True
 
         ocvb.desc = "Colorize depth manually with multi-threading."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
 
-        If externalUse = False Then src = getDepth32f(ocvb)
+        If standalone Then src = getDepth32f(ocvb)
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
 
@@ -927,21 +894,20 @@ Public Class Depth_Colorizer_MT
     Inherits ocvbClass
     Dim grid As Thread_Grid
     Public src As cv.Mat
-    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Min Depth", 100, 1000, 100)
         sliders.setupTrackBar2(ocvb, caller, "Max Depth", 1001, 10000, 4000)
 
         grid = New Thread_Grid(ocvb, caller)
-        grid.externalUse = True
+        grid.standalone = True
 
         ocvb.desc = "Colorize normally uses CDF to stabilize the colors.  Just using sliders here - stabilized but not optimal range."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
 
-        If externalUse = False Then src = getDepth32f(ocvb)
+        If standalone Then src = getDepth32f(ocvb)
         If src.Width <> ocvb.color.Width Then src = src.Resize(ocvb.color.Size())
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
@@ -984,11 +950,10 @@ Public Class Depth_LocalMinMax_MT
     Public ptListX() As Single
     Public ptListY() As Single
     Public pointList() As cv.Point2f
-    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
-        grid.externalUse = True
+        grid.standalone = True
 
         ocvb.label1 = "Red is min distance"
         ocvb.desc = "Find min and max depth in each segment."
@@ -1000,7 +965,7 @@ Public Class Depth_LocalMinMax_MT
         Dim mask = depth32f.Threshold(1, 5000, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8UC1)
 
-        If externalUse = False Then
+        If standalone Then
             ocvb.color.CopyTo(ocvb.result1)
             ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
         End If
@@ -1019,14 +984,14 @@ Public Class Depth_LocalMinMax_MT
             ptListY(i) = minPt.Y + roi.Y
             pointList(i) = New cv.Point(ptListX(i), ptListY(i))
 
-            If externalUse = False Then
+            If standalone Then
                 cv.Cv2.Circle(ocvb.result1(roi), minPt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
                 cv.Cv2.Circle(ocvb.result1(roi), maxPt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
             End If
         End Sub)
 
 
-        If externalUse = False Then
+        If standalone Then
             Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
             For i = 0 To ptListX.Count - 1
                 If ptListX(i) <> 0 And ptListY(i) <> 0 Then subdiv.Insert(New cv.Point2f(ptListX(i), ptListY(i)))
@@ -1050,7 +1015,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         minmax = New Depth_LocalMinMax_MT(ocvb, caller)
-        minmax.externalUse = True
+        minmax.standalone = True
         minmax.grid.sliders.TrackBar1.Value = 32
         minmax.grid.sliders.TrackBar2.Value = 32
         ocvb.parms.ShowOptions = False
@@ -1066,7 +1031,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
             kalman = New Kalman_Basics(ocvb, caller)
             ReDim kalman.src(minmax.grid.roiList.Count - 1)
             saveCount = kalman.src.Count
-            kalman.externalUse = True
+            kalman.standalone = True
         End If
 
         For i = 0 To kalman.src.Count - 1 Step 2
@@ -1101,11 +1066,8 @@ End Class
 
 
 
-
-
 Public Class Depth_Decreasing
     Inherits ocvbClass
-    Public externaluse As Boolean
     Public Increasing As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -1133,15 +1095,13 @@ End Class
 
 
 
-
-
 Public Class Depth_Increasing
     Inherits ocvbClass
     Dim depth As Depth_Decreasing
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         depth = New Depth_Decreasing(ocvb, caller)
-        depth.externaluse = True
+        depth.standalone = True
         depth.Increasing = True
         ocvb.desc = "Identify where depth is increasing - retreating from the camera."
     End Sub
@@ -1158,15 +1118,13 @@ End Class
 
 
 
-
-
 Public Class Depth_Punch
     Inherits ocvbClass
     Dim depth As Depth_Decreasing
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         depth = New Depth_Decreasing(ocvb, caller)
-        depth.externaluse = True
+        depth.standalone = True
         ocvb.desc = "Identify the largest blob in the depth decreasing output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -1189,7 +1147,7 @@ Public Class Depth_ColorMap
         sliders.setupTrackBar1(ocvb, caller, "Depth ColorMap Alpha X100", 1, 100, 3)
 
         Palette = New Palette_ColorMap(ocvb, caller)
-        Palette.externalUse = True
+        Palette.standalone = True
         ocvb.desc = "Display the depth as a color map"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -1208,7 +1166,6 @@ Public Class Depth_Holes
     Inherits ocvbClass
     Public holeMask As New cv.Mat
     Public borderMask As New cv.Mat
-    Public externalUse = False
     Dim element As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -1219,14 +1176,14 @@ Public Class Depth_Holes
         ocvb.desc = "Identify holes in the depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse Then sliders.Visible = False ' probably don't need this option except when running standalone.
+        If standalone Then sliders.Visible = False ' probably don't need this option except when running standalone.
         holeMask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
-        If externalUse = False Then ocvb.result1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If standalone Then ocvb.result1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         borderMask = New cv.Mat
         borderMask = holeMask.Dilate(element, Nothing, sliders.TrackBar1.Value)
         borderMask.SetTo(0, holeMask)
-        If externalUse = False Then
+        If standalone Then
             ocvb.result2.SetTo(0)
             ocvb.RGBDepth.CopyTo(ocvb.result2, borderMask)
         End If
@@ -1235,5 +1192,84 @@ Public Class Depth_Holes
         holeMask.Dispose()
         borderMask.Dispose()
         element.Dispose()
-            End Sub
+    End Sub
+End Class
+
+
+
+
+
+Public Class Depth_Stable
+    Inherits ocvbClass
+    Dim mog As BGSubtract_Basics_CPP
+    Public maskStable As New cv.Mat
+    Public maskUnstable As cv.Mat
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+
+        ' sliders.setupTrackBar1(ocvb, caller, "")
+        mog = New BGSubtract_Basics_CPP(ocvb, caller)
+        mog.radio.check(1).Checked = True
+        mog.standalone = True
+
+        ocvb.label2 = "Stable (non-zero) Depth"
+        ocvb.desc = "Collect X frames, compute stable depth using the RGB Depth image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        mog.src = ocvb.RGBDepth
+        mog.Run(ocvb)
+
+        maskUnstable = ocvb.result1
+        cv.Cv2.BitwiseNot(maskUnstable, maskStable)
+        ocvb.label1 = "Unstable Depth" + " using " + mog.radio.check(mog.currMethod).Text + " method"
+        Dim zeroDepth = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(1)
+        maskStable.SetTo(0, zeroDepth)
+        If standalone Then ocvb.result2 = maskStable
+    End Sub
+    Public Sub MyDispose()
+        mog.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+Public Class Depth_Stabilizer
+    Inherits ocvbClass
+    Public stable As Depth_Stable
+    Public mean As Mean_Basics
+    Public colorize As Depth_Colorizer_CPP
+    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+        setCaller(caller)
+
+        mean = New Mean_Basics(ocvb, caller)
+        mean.standalone = True
+
+        colorize = New Depth_Colorizer_CPP(ocvb, caller)
+        colorize.standalone = True
+
+        stable = New Depth_Stable(ocvb, caller)
+        stable.standalone = True
+
+        ocvb.desc = "Use the mask of stable depth (using RGBDepth) to stabilize the depth at any individual point."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        stable.Run(ocvb)
+
+        mean.src = getDepth32f(ocvb)
+        mean.src.SetTo(0, stable.maskUnstable)
+        mean.Run(ocvb)
+
+        If standalone Then
+            'colorize.src = mean.dst
+            'colorize.Run(ocvb)
+            'ocvb.result1 = colorize.dst
+        End If
+    End Sub
+    Public Sub MyDispose()
+        stable.Dispose()
+        mean.Dispose()
+        colorize.Dispose()
+    End Sub
 End Class

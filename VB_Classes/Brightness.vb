@@ -168,7 +168,7 @@ Public Class Brightness_WhiteBalance
         hist = New Histogram_Basics(ocvb, caller)
         hist.bins = 256 * 3
         hist.maxRange = hist.bins
-        hist.externalUse = True
+        hist.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "White balance threshold X100", 1, 100, 10)
 

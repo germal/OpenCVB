@@ -6,8 +6,7 @@ Public Class EMax_Basics
     Inherits ocvbClass
             Public samples As cv.Mat
     Public labels As cv.Mat
-    Public externalUse As Boolean
-    Public grid As Thread_Grid
+        Public grid As Thread_Grid
     Public regionCount As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
@@ -32,7 +31,7 @@ Public Class EMax_Basics
         grid.Run(ocvb)
         regionCount = grid.roiList.Count - 1
 
-        If externalUse = False Then
+        if standalone Then
             ocvb.putText(New ActiveClass.TrueType("The EMax ocvbClass fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
                                                   "The EMax_Basics_CPP works fine and they are functionally identical.", 20, 100, RESULT2))
         End If
@@ -51,7 +50,7 @@ Public Class EMax_Basics
 
         samples = samples.Reshape(1, 0)
 
-        If externalUse = False Then
+        if standalone Then
             ocvb.result1.SetTo(cv.Scalar.Black)
             Dim em_model = cv.EM.Create()
             em_model.ClustersNumber = regionCount
@@ -115,7 +114,7 @@ Public Class EMax_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         emax = New EMax_Basics(ocvb, caller)
-        emax.externalUse = True
+        emax.standalone = True
 
         EMax_Basics = EMax_Basics_Open()
         ocvb.desc = "Use EMax - Expectation Maximization - to classify a series of points"

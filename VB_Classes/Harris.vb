@@ -80,8 +80,7 @@ Public Class Harris_Detector_CPP
     Dim ptCount(1) As Int32
     Dim Harris_Detector As IntPtr
     Public FeaturePoints As New List(Of cv.Point2f)
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Harris qualityLevel", 1, 100, 2)
         
@@ -104,11 +103,11 @@ Public Class Harris_Detector_CPP
             Dim pts((ptCount(0) - 1) * 2 - 1) As Int32
             Marshal.Copy(ptPtr, pts, 0, ptCount(0))
             Dim ptMat = New cv.Mat(ptCount(0), 2, cv.MatType.CV_32S, pts)
-            If externalUse = False Then ocvb.color.CopyTo(ocvb.result1)
+            if standalone Then ocvb.color.CopyTo(ocvb.result1)
             FeaturePoints.Clear()
             For i = 0 To ptMat.Rows - 1
                 FeaturePoints.Add(New cv.Point2f(ptMat.Get(of Int32)(i, 0), ptMat.Get(of Int32)(i, 1)))
-                If externalUse = False Then ocvb.result1.Circle(FeaturePoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                if standalone Then ocvb.result1.Circle(FeaturePoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             Next
         End If
     End Sub

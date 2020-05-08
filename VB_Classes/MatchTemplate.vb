@@ -4,14 +4,13 @@ Public Class MatchTemplate_Basics
     Dim flow As Font_FlowText
     Public sample1 As cv.Mat
     Public sample2 As cv.Mat
-    Public externalUse As Boolean
-    Public matchText As String = ""
+        Public matchText As String = ""
     Public correlationMat As New cv.Mat
     Public reportFreq = 10 ' report the results every x number of iterations.
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         flow = New Font_FlowText(ocvb, caller)
-        flow.externalUse = True
+        flow.standalone = True
         flow.result1or2 = RESULT2
 
         radio.Setup(ocvb, caller, 6)
@@ -27,7 +26,7 @@ Public Class MatchTemplate_Basics
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
+        if standalone Then
             sample1 = New cv.Mat(New cv.Size(sliders.TrackBar1.Value, 1), cv.MatType.CV_32FC1)
             sample2 = New cv.Mat(New cv.Size(sliders.TrackBar1.Value, 1), cv.MatType.CV_32FC1)
             cv.Cv2.Randn(sample1, 100, 25)
@@ -48,7 +47,7 @@ Public Class MatchTemplate_Basics
         If ocvb.frameCount Mod reportFreq = 0 Then
             Dim correlation = correlationMat.Get(Of Single)(0, 0)
             ocvb.label1 = "Correlation = " + Format(correlation, "#,##0.000")
-            If externalUse = False Then
+            if standalone Then
                 ocvb.label1 = matchText + " for " + CStr(sample1.Rows) + " samples each = " + Format(correlation, "#,##0.00")
                 flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
                 flow.Run(ocvb)
@@ -67,11 +66,11 @@ Public Class MatchTemplate_RowCorrelation
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         flow = New Font_FlowText(ocvb, caller)
-        flow.externalUse = True
+        flow.standalone = True
         flow.result1or2 = RESULT2
 
         corr = New MatchTemplate_Basics(ocvb, caller)
-        corr.externalUse = True
+        corr.standalone = True
         corr.sliders.Visible = False
 
         ocvb.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
@@ -166,7 +165,7 @@ Public Class MatchTemplate_BestTemplate_MT
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 128
         grid.sliders.TrackBar2.Value = 128
-        grid.externalUse = True
+        grid.standalone = True
 
         match = New MatchTemplate_DrawRect(ocvb, caller)
 
@@ -184,7 +183,7 @@ Public Class MatchTemplate_BestTemplate_MT
                 ReDim entropies(grid.roiList.Count - 1)
                 For i = 0 To entropies.Length - 1
                     entropies(i) = New Entropy_Basics(ocvb, caller)
-                    entropies(i).externalUse = True
+                    entropies(i).standalone = True
                 Next
             End If
 

@@ -3,8 +3,7 @@ Imports cv = OpenCvSharp
 Public Class MSER_Basics
     Inherits ocvbClass
     Public src As cv.Mat
-    Public externalUse As Boolean
-    Public zone() As cv.Rect = Nothing
+        Public zone() As cv.Rect = Nothing
     Public region()() As cv.Point = Nothing
     Dim saveParms() As Int32
     Dim mser As cv.MSER
@@ -61,12 +60,12 @@ Public Class MSER_Basics
             mser.Pass2Only = check.Box(0).Checked
         End If
 
-        If externalUse = False Then src = ocvb.color.Clone()
+        if standalone Then src = ocvb.color.Clone()
         src = src.Blur(New cv.Size(edgeBlurSize, edgeBlurSize))
         If check.Box(1).Checked Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mser.DetectRegions(src, region, zone)
 
-        If externalUse = False Then
+        if standalone Then
             Dim pixels As Int32
             ocvb.result1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
             For i = 0 To region.Length - 1
@@ -153,7 +152,7 @@ Public Class MSER_TestSynthetic
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         mser = New MSER_Basics(ocvb, caller)
-        mser.externalUse = True
+        mser.standalone = True
         mser.sliders.TrackBar1.Value = 10
         mser.sliders.TrackBar2.Value = 100
         mser.sliders.TrackBar3.Value = 5000
@@ -227,7 +226,7 @@ Public Class MSER_Contours
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         mser = New MSER_Basics(ocvb, caller)
-        mser.externalUse = True
+        mser.standalone = True
         mser.sliders.TrackBar2.Value = 4000
         ocvb.desc = "Use MSER but show the contours of each region."
     End Sub

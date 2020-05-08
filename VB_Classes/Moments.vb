@@ -7,7 +7,7 @@ Public Class Moments_CentroidKalman
                 setCaller(callerRaw)
         kalman = New Kalman_Basics(ocvb, caller)
         ReDim kalman.src(2 - 1) ' 2 elements - cv.point
-        kalman.externalUse = True
+        kalman.standalone = True
 
         foreground = New kMeans_Depth_FG_BG(ocvb, caller)
 

@@ -24,11 +24,10 @@ Public Class DFT_Basics
     Public gray As cv.Mat
     Public rows As Int32
     Public cols As Int32
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         mats = New Mat_4to1(ocvb, caller)
-        mats.externalUse = True
+        mats.standalone = True
         mats.noLines = True
 
         ocvb.desc = "Explore the Discrete Fourier Transform."
@@ -36,7 +35,7 @@ Public Class DFT_Basics
         ocvb.label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        if standalone Then gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         rows = cv.Cv2.GetOptimalDFTSize(gray.Rows)
         cols = cv.Cv2.GetOptimalDFTSize(gray.Cols)
@@ -48,7 +47,7 @@ Public Class DFT_Basics
         cv.Cv2.Merge(planes, complexImage)
         cv.Cv2.Dft(complexImage, complexImage)
 
-        If externalUse = False Then
+        if standalone Then
             ' compute the magnitude And switch to logarithmic scale => log(1 + sqrt(Re(DFT(I))^2 + Im(DFT(I))^2))
             cv.Cv2.Split(complexImage, planes)
 
@@ -91,7 +90,7 @@ Public Class DFT_Inverse
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         mats = New Mat_2to1(ocvb, caller)
-        mats.externalUse = True
+        mats.standalone = True
         ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
         ocvb.label1 = "Image after Inverse DFT"
     End Sub
@@ -194,7 +193,7 @@ Public Class DFT_ButterworthDepth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         bfilter = New DFT_ButterworthFilter(ocvb, caller)
-        bfilter.dft.externalUse = True
+        bfilter.dft.standalone = True
 
         ocvb.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
         ocvb.label1 = "Image with Butterworth Low Pass Filter Applied"

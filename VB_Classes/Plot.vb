@@ -6,8 +6,7 @@ Public Class Plot_OverTime
     Public plotCount As Int32 = 3
     Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.White}
     Public backColor = cv.Scalar.Aquamarine
-    Public externalUse As Boolean
-    Public dst As cv.Mat
+        Public dst As cv.Mat
     Public minScale As Int32 = 50
     Public maxScale As Int32 = 200
     Public plotTriggerRescale = 50
@@ -32,7 +31,7 @@ Public Class Plot_OverTime
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
         If ocvb.frameCount = 0 Then
-            If externalUse = False Then dst = ocvb.result1
+            if standalone Then dst = ocvb.result1
         End If
         Dim pixelHeight = CInt(sliders.TrackBar1.Value)
         Dim pixelWidth = CInt(sliders.TrackBar2.Value)
@@ -41,7 +40,7 @@ Public Class Plot_OverTime
             columnIndex = 0
         End If
         dst.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
-        If externalUse = False Then plotData = ocvb.color.Mean()
+        if standalone Then plotData = ocvb.color.Mean()
 
         For i = 0 To plotCount - 1
             If Math.Floor(plotData.Item(i)) < minScale Or Math.Ceiling(plotData.Item(i)) > maxScale Then
@@ -101,7 +100,7 @@ Public Class Plot_OverTime
 
         columnIndex += pixelWidth
         dst.Col(columnIndex).SetTo(0)
-        If externalUse = False Then ocvb.label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
+        if standalone Then ocvb.label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
         AddPlotScale(dst, minScale - topBottomPad, maxScale + topBottomPad, sliders.TrackBar3.Value / 10)
     End Sub
 End Class
@@ -118,15 +117,14 @@ Public Class Plot_Histogram
     Public minRange As Int32 = 0
     Public maxRange As Int32 = 255
     Public backColor As cv.Scalar = cv.Scalar.Red
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Histogram Font Size x10", 1, 20, 10)
 
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse Then
+        If standalone Then
             sliders.Visible = False ' probably don't want this except when running standalone.
         Else
             Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -192,8 +190,7 @@ Public Class Plot_Basics_CPP
     Inherits ocvbClass
     Public srcX(49) As Double
     Public srcY(49) As Double
-    Public externalUse As Boolean
-    Public dst As cv.Mat
+        Public dst As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
@@ -206,7 +203,7 @@ Public Class Plot_Basics_CPP
         Dim plotData(ocvb.color.Total * ocvb.color.ElemSize - 1) As Byte
         Dim handlePlot = GCHandle.Alloc(plotData, GCHandleType.Pinned)
 
-        If externalUse = False Then
+        if standalone Then
             For i = 0 To srcX.Length - 1
                 srcX(i) = i
                 srcY(i) = i * i * i
@@ -241,22 +238,21 @@ Public Class Plot_Basics
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Basics
     Public plotCount As Int32 = 3
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         hist = New Histogram_Basics(ocvb, caller)
-        hist.externalUse = True
+        hist.standalone = True
         hist.plotRequested = True
 
         plot = New Plot_Basics_CPP(ocvb, caller)
-        plot.externalUse = True
+        plot.standalone = True
 
         ocvb.label1 = "Plot of grayscale histogram"
         ocvb.label2 = "Same Data but using OpenCV C++ plot"
         ocvb.desc = "Plot data provided in src Mat"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse Then
+        If standalone Then
             If hist.sliders.Visible Then hist.sliders.Hide()
         Else
             hist.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -290,13 +286,13 @@ Public Class Plot_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         hist = New Histogram_Depth(ocvb, caller)
-        hist.externalUse = True
+        hist.standalone = True
         hist.sliders.TrackBar1.Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!
         hist.sliders.TrackBar1.Value = 200 ' a lot more bins in a plot than a bar chart.
         hist.trim.sliders.TrackBar2.Value = 5000 ' up to x meters.
 
         plot = New Plot_Basics_CPP(ocvb, caller)
-        plot.externalUse = True
+        plot.standalone = True
 
         ocvb.desc = "Show depth in a plot format with variable bins."
     End Sub

@@ -33,8 +33,7 @@ End Module
 Public Class GetRotationMatrix2D_Basics
     Inherits ocvbClass
     Public src As New cv.Mat
-    Public externalUse As Boolean
-    Public M As cv.Mat
+        Public M As cv.Mat
     Public Mflip As cv.Mat
     Public warpFlag As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -45,7 +44,7 @@ Public Class GetRotationMatrix2D_Basics
         ocvb.desc = "Rotate a rectangle of a specified angle"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then src = ocvb.color
+        if standalone Then src = ocvb.color
         warpFlag = getInterpolationRadioButtons(radio)
 
         Dim angle = sliders.TrackBar1.Value

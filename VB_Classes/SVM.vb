@@ -139,7 +139,7 @@ Public Class SVM_Basics_MT
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 100
         grid.sliders.TrackBar2.Value = 16
-        grid.externalUse = True ' we don't need any results.
+        grid.standalone = True ' we don't need any results.
 
         ocvb.desc = "Use SVM to classify random points.  Testing the benefit of multi-threading prediction."
         ocvb.label1 = "SVM_Basics input data"

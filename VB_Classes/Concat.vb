@@ -22,8 +22,7 @@ End Class
 Public Class Concat_4way
     Inherits ocvbClass
     Public img(3) As cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Concatenate 4 images - horizontally and vertically"
         For i = 0 To img.Length - 1
@@ -31,7 +30,7 @@ Public Class Concat_4way
         Next
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
+        if standalone Then
             img(0) = ocvb.color
             img(1) = ocvb.RGBDepth
             img(2) = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(ocvb.color.Size())

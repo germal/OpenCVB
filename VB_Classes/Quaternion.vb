@@ -52,7 +52,7 @@ Public Class Quaterion_IMUPrediction
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         host = New IMU_HostFrameTimes(ocvb, caller)
-        host.externalUse = True
+        host.standalone = True
 
         ocvb.label1 = "Quaternion_IMUPrediction"
         ocvb.label2 = ""

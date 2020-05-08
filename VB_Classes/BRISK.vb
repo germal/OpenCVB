@@ -3,8 +3,7 @@ Public Class BRISK_Basics
     Inherits ocvbClass
     Public Brisk As cv.BRISK
     Public features As New List(Of cv.Point2f)
-    Public externalUse As Boolean
-    Public src As New cv.Mat
+        Public src As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "BRISK Radius Threshold", 1, 100, 50)
@@ -14,7 +13,7 @@ Public Class BRISK_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Dim wt As New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
 
-        If externalUse = False Then
+        if standalone Then
             ocvb.color.CopyTo(src)
             ocvb.color.CopyTo(ocvb.result1)
         End If
@@ -27,7 +26,7 @@ Public Class BRISK_Basics
                 wt.Circle(pt.Pt, 2, cv.Scalar.Green, r / 2, cv.LineTypes.AntiAlias)
             End If
         Next
-        If externalUse = False Then
+        if standalone Then
             cv.Cv2.AddWeighted(ocvb.color, 0.5, wt, 0.5, 0, ocvb.result1)
         End If
     End Sub

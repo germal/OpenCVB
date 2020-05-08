@@ -6,8 +6,7 @@ Public Class Edges_Canny
     Inherits ocvbClass
     Public src As cv.Mat
     Public dst As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Canny threshold1", 1, 255, 50)
         sliders.setupTrackBar2(ocvb, caller, "Canny threshold2", 1, 255, 50)
@@ -22,7 +21,7 @@ Public Class Edges_Canny
         Dim threshold2 As Int32 = sliders.TrackBar2.Value
         Dim aperture = sliders.TrackBar3.Value
         If aperture Mod 2 = 0 Then aperture += 1
-        If externalUse = False Then
+        if standalone Then
             src = ocvb.color.Clone
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             ocvb.result1 = gray.Canny(threshold1, threshold2, aperture, False)
@@ -45,15 +44,15 @@ Public Class Edges_CannyAndShadow
         setCaller(callerRaw)
         dilate = New DilateErode_Basics(ocvb, caller)
         dilate.radio.check(2).Checked = True
-        dilate.externalUse = True
+        dilate.standalone = True
 
         canny = New Edges_Canny(ocvb, caller)
         canny.sliders.TrackBar1.Value = 100
         canny.sliders.TrackBar2.Value = 100
-        canny.externalUse = True
+        canny.standalone = True
 
         shadow = New Depth_Holes(ocvb, caller)
-        shadow.externalUse = True
+        shadow.standalone = True
 
         ocvb.desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
         ocvb.label1 = "Edges in color and depth after dilate"
@@ -235,8 +234,7 @@ Public Class Edges_Sobel
     Public dst As cv.Mat
     Public grayX As cv.Mat
     Public grayY As cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Sobel kernel Size", 1, 32, 3)
         ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
@@ -245,7 +243,7 @@ Public Class Edges_Sobel
         Dim kernelSize As Int32 = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         Dim grad As New cv.Mat()
-        If externalUse = False Then src = ocvb.color
+        if standalone Then src = ocvb.color
         dst = New cv.Mat(src.Rows, src.Cols, src.Type)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         grayX = src.Sobel(cv.MatType.CV_16U, 1, 0, kernelSize)
@@ -253,7 +251,7 @@ Public Class Edges_Sobel
         grayY = src.Sobel(cv.MatType.CV_16U, 0, 1, kernelSize)
         Dim abs_grayY = grayY.ConvertScaleAbs()
         cv.Cv2.AddWeighted(abs_grayX, 0.5, abs_grayY, 0.5, 0, dst)
-        If externalUse = False Then ocvb.result1 = dst
+        if standalone Then ocvb.result1 = dst
     End Sub
 End Class
 
@@ -267,7 +265,7 @@ Public Class Edges_LeftView
         setCaller(callerRaw)
         red = New LeftRightView_Basics(ocvb, caller)
         sobel = New Edges_Sobel(ocvb, caller)
-        sobel.externalUse = True
+        sobel.standalone = True
         sobel.sliders.TrackBar1.Value = 5
 
         ocvb.desc = "Find the edges in the LeftViewimages."
@@ -296,8 +294,7 @@ End Class
 Public Class Edges_ResizeAdd
     Inherits ocvbClass
     Public gray As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Border Vertical in Pixels", 1, 20, 5)
         sliders.setupTrackBar2(ocvb, caller, "Border Horizontal in Pixels", 1, 20, 5)
@@ -308,7 +305,7 @@ Public Class Edges_ResizeAdd
         ocvb.label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        if standalone Then gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim newFrame = gray(New cv.Range(sliders.TrackBar1.Value, gray.Rows - sliders.TrackBar1.Value), New cv.Range(sliders.TrackBar2.Value, gray.Cols - sliders.TrackBar2.Value))
         newFrame = newFrame.Resize(gray.Size())
         cv.Cv2.Absdiff(gray, newFrame, ocvb.result1)

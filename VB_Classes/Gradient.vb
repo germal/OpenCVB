@@ -4,17 +4,16 @@ Imports System.Runtime.InteropServices
 Public Class Gradient_Basics
     Inherits ocvbClass
     Public src As cv.Mat
-    Public externalUse As Boolean
-    Dim sobel As Edges_Sobel
+        Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         sobel = New Edges_Sobel(ocvb, caller)
-        sobel.externalUse = True
+        sobel.standalone = True
         ocvb.desc = "Use phase to compute gradient"
         ocvb.label2 = "Phase Output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then src = ocvb.color
+        if standalone Then src = ocvb.color
         sobel.src = src
         sobel.Run(ocvb)
         Dim angle = New cv.Mat
@@ -41,7 +40,7 @@ Public Class Gradient_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         sobel = New Edges_Sobel(ocvb, caller)
-        sobel.externalUse = True
+        sobel.standalone = True
         ocvb.desc = "Use phase to compute gradient on depth image"
         ocvb.label2 = "Phase Output"
     End Sub

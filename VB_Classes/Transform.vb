@@ -30,7 +30,6 @@ Public Class Transform_Rotate
     Inherits ocvbClass
     Public src As cv.Mat
     Public dst As cv.Mat
-    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Angle", 0, 180, 30)
@@ -38,7 +37,7 @@ Public Class Transform_Rotate
         ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
+        If standalone Then
             src = ocvb.color
             dst = ocvb.result2
         End If

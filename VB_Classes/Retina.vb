@@ -20,8 +20,7 @@ Public Class Retina_Basics_CPP
             Dim Retina As IntPtr
     Dim startInfo As New ProcessStartInfo
     Public src As cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Retina Sample Factor", 1, 10, 2)
 
@@ -47,7 +46,7 @@ Public Class Retina_Basics_CPP
         End If
         Static useLogSampling As Int32 = check.Box(0).Checked
         Static samplingFactor As Single = -1 ' force open
-        If externalUse = False Then src = ocvb.color
+        if standalone Then src = ocvb.color
         If useLogSampling <> check.Box(0).Checked Or samplingFactor <> sliders.TrackBar1.Value Then
             If Retina <> 0 Then Retina_Basics_Close(Retina)
             useLogSampling = check.Box(0).Checked
@@ -91,7 +90,7 @@ Public Class Retina_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         retina = New Retina_Basics_CPP(ocvb, caller)
-        retina.externalUse = True
+        retina.standalone = True
 
         ocvb.desc = "Use the bio-inspired retina algorithm with the depth data."
         ocvb.label1 = "Last result || current result"

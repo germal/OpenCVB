@@ -104,13 +104,12 @@ Public Class Python_MemMap
     Dim memMapPtr As IntPtr
     Public memMapValues(49) As Double ' more than we need - buffer for growth
     Public memMapbufferSize As Int32
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         If ocvb.PythonFileName Is Nothing Then
             ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_MemMap.py"
         Else
-            externalUse = True ' external users will set the pythonfilename.
+            standalone = True ' external users will set the pythonfilename.
         End If
 
         memMapbufferSize = System.Runtime.InteropServices.Marshal.SizeOf(GetType(Double)) * memMapValues.Length
@@ -120,7 +119,7 @@ Public Class Python_MemMap
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length - 1)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
 
-        If externalUse = False Then
+        if standalone Then
             If ocvb.parms.externalPythonInvocation = False Then
                 StartPython(ocvb, "--MemMapLength=" + CStr(memMapbufferSize))
             End If
@@ -129,7 +128,7 @@ Public Class Python_MemMap
         End If
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then memMapValues(0) = ocvb.frameCount
+        if standalone Then memMapValues(0) = ocvb.frameCount
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
     End Sub

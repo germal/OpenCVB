@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class MotionBlur_Basics
     Inherits ocvbClass
-    Public externalUse As Boolean = False
     Public kernel As cv.Mat
     Public showDirection As Boolean = True
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -11,7 +10,7 @@ Public Class MotionBlur_Basics
         ocvb.desc = "Use Filter2D to create a motion blur"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
+        if standalone Then
             If sliders.TrackBar2.Value < sliders.TrackBar2.Maximum Then
                 sliders.TrackBar2.Value += 1
             Else

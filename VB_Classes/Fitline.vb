@@ -3,8 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Fitline_Basics
     Inherits ocvbClass
     Public draw As Draw_Line
-        Public externalUse As Boolean
-    Public src As New cv.Mat
+            Public src As New cv.Mat
     Public dst As New cv.Mat
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -18,7 +17,7 @@ Public Class Fitline_Basics
         ocvb.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
+        if standalone Then
             draw.Run(ocvb)
             src = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
             ocvb.result2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -40,7 +39,7 @@ Public Class Fitline_Basics
             Dim rightY = Math.Round((ocvb.color.Cols - line2d.X1) * slope + line2d.Y1)
             Dim p1 = New cv.Point(0, leftY)
             Dim p2 = New cv.Point(ocvb.color.Cols - 1, rightY)
-            If externalUse Then
+            If standalone Then
                 lines.Add(p1)
                 lines.Add(p2)
             Else

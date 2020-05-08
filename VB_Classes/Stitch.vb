@@ -3,8 +3,7 @@
 Public Class Stitch_Basics
     Inherits ocvbClass
     Public src As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Number of random images", 10, 50, 10)
         sliders.setupTrackBar2(ocvb, caller, "Rectangle width", ocvb.color.Width / 4, ocvb.color.Width - 1, ocvb.color.Width / 2)
@@ -16,7 +15,7 @@ Public Class Stitch_Basics
         Dim imageCount = sliders.TrackBar1.Value
         Dim width = sliders.TrackBar2.Value
         Dim height = sliders.TrackBar3.Value
-        If externalUse = False Then src = ocvb.color.Clone()
+        if standalone Then src = ocvb.color.Clone()
         ocvb.result1 = src.Clone()
         For i = 0 To imageCount - 1
             Dim x1 = CInt(ocvb.ms_rng.next(0, src.Width - width))

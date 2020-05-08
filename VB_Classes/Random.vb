@@ -5,8 +5,7 @@ Public Class Random_Points
     Inherits ocvbClass
     Public Points() As cv.Point
     Public Points2f() As cv.Point2f
-    Public externalUse As Boolean
-    Public rangeRect As cv.Rect
+        Public rangeRect As cv.Rect
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Random Pixel Count", 1, ocvb.color.Width * ocvb.color.Height, 20)
@@ -22,13 +21,13 @@ Public Class Random_Points
             ReDim Points(sliders.TrackBar1.Value - 1)
             ReDim Points2f(sliders.TrackBar1.Value - 1)
         End If
-        If externalUse = False Then ocvb.result1.SetTo(0)
+        if standalone Then ocvb.result1.SetTo(0)
         For i = 0 To Points.Length - 1
             Dim x = ocvb.ms_rng.Next(rangeRect.X, rangeRect.X + rangeRect.Width)
             Dim y = ocvb.ms_rng.Next(rangeRect.Y, rangeRect.Y + rangeRect.Height)
             Points(i) = New cv.Point2f(x, y)
             Points2f(i) = New cv.Point2f(x, y)
-            If externalUse = False Then cv.Cv2.Circle(ocvb.result1, Points(i), 3, cv.Scalar.Gray, -1, cv.LineTypes.AntiAlias, 0)
+            if standalone Then cv.Cv2.Circle(ocvb.result1, Points(i), 3, cv.Scalar.Gray, -1, cv.LineTypes.AntiAlias, 0)
         Next
     End Sub
 End Class
@@ -97,15 +96,14 @@ End Class
 Public Class Random_UniformDist
     Inherits ocvbClass
     Public uDist As cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         uDist = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
         ocvb.desc = "Create a uniform distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         cv.Cv2.Randu(uDist, 0, 255)
-        If externalUse = False Then
+        if standalone Then
             ocvb.result1 = uDist.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
     End Sub
@@ -116,8 +114,7 @@ End Class
 Public Class Random_NormalDist
     Inherits ocvbClass
     Public nDistImage As cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Random_NormalDist Blue Mean", 0, 255, 25)
         sliders.setupTrackBar2(ocvb, caller, "Random_NormalDist Green Mean", 0, 255, 127)
@@ -127,7 +124,7 @@ Public Class Random_NormalDist
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         cv.Cv2.Randn(ocvb.result1, New cv.Scalar(sliders.TrackBar1.Value, sliders.TrackBar2.Value, sliders.TrackBar3.Value), cv.Scalar.All(sliders.TrackBar4.Value))
-        If externalUse Then nDistImage = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then nDistImage = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class
 
@@ -140,12 +137,12 @@ Public Class Random_CheckUniformDist
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         histogram = New Histogram_KalmanSmoothed(ocvb, caller)
-        histogram.externalUse = True
+        histogram.standalone = True
         histogram.sliders.TrackBar1.Value = 255
         histogram.gray = New cv.Mat
 
         rUniform = New Random_UniformDist(ocvb, caller)
-        rUniform.externalUse = True
+        rUniform.standalone = True
 
         ocvb.desc = "Display the histogram for a uniform distribution."
     End Sub
@@ -170,12 +167,12 @@ Public Class Random_CheckNormalDist
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         histogram = New Histogram_KalmanSmoothed(ocvb, caller)
-        histogram.externalUse = True
+        histogram.standalone = True
         histogram.sliders.TrackBar1.Value = 255
         histogram.gray = New cv.Mat
         histogram.plotHist.minRange = 1
         normalDist = New Random_NormalDist(ocvb, caller)
-        normalDist.externalUse = True
+        normalDist.standalone = True
         ocvb.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

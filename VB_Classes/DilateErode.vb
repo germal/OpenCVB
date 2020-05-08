@@ -4,8 +4,7 @@ Public Class DilateErode_Basics
     Inherits ocvbClass
     Public src As New cv.Mat
     Public dst As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Dilate/Erode Kernel Size", 1, 32, 5)
         sliders.setupTrackBar2(ocvb, caller, "Erode (-) to Dilate (+)", -32, 32, 1)
@@ -18,7 +17,7 @@ Public Class DilateErode_Basics
         radio.check(0).Checked = True
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
+        if standalone Then
             src = ocvb.color
             dst = ocvb.result1
         Else
@@ -39,7 +38,7 @@ Public Class DilateErode_Basics
             src.Erode(element, Nothing, -iterations).CopyTo(dst)
         End If
 
-        If externalUse = False Then
+        if standalone Then
             If iterations >= 0 Then
                 ocvb.result2 = ocvb.RGBDepth.Dilate(element, Nothing, iterations)
                 ocvb.label1 = "Dilate RGB " + CStr(iterations) + " times"

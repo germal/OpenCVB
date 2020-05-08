@@ -3,8 +3,7 @@ Imports System.Text.RegularExpressions
 Public Class FloodFill_Basics
     Inherits ocvbClass
     Public srcGray As New cv.Mat
-    Public externalUse As Boolean
-
+    
     Public masks As New List(Of cv.Mat)
     Public maskSizes As New SortedList(Of Int32, Int32)(New CompareMaskSize)
     Public maskRects As New List(Of cv.Rect)
@@ -34,7 +33,7 @@ Public Class FloodFill_Basics
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
         Dim stepSize = sliders.TrackBar4.Value
 
-        If externalUse = False Then
+        if standalone Then
             srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
         initialMask = New cv.Mat(srcGray.Size, cv.MatType.CV_8U, 0)
@@ -66,7 +65,7 @@ Public Class FloodFill_Basics
             Next
         Next
 
-        If externalUse = False Then
+        if standalone Then
             ocvb.result2.SetTo(0)
             For i = 0 To masks.Count - 1
                 Dim maskIndex = maskSizes.ElementAt(i).Value
@@ -86,8 +85,7 @@ Public Class FloodFill_Top16_MT
     Inherits ocvbClass
     Dim grid As Thread_Grid
     Public srcGray As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
         sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 500, 50)
@@ -101,7 +99,7 @@ Public Class FloodFill_Top16_MT
         Dim loDiff = cv.Scalar.All(sliders.TrackBar2.Value)
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
 
-        If externalUse = False Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        if standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result2 = srcGray.Clone()
         grid.Run(ocvb)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
@@ -132,8 +130,7 @@ Public Class FloodFill_Color_MT
     Dim flood As FloodFill_Top16_MT
     Dim grid As Thread_Grid
     Public src As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
         flood = New FloodFill_Top16_MT(ocvb, caller)
@@ -145,7 +142,7 @@ Public Class FloodFill_Color_MT
         Dim loDiff = cv.Scalar.All(flood.sliders.TrackBar2.Value)
         Dim hiDiff = cv.Scalar.All(flood.sliders.TrackBar3.Value)
 
-        If externalUse = False Then src = ocvb.color.Clone()
+        if standalone Then src = ocvb.color.Clone()
         ocvb.result2 = src.Clone()
         grid.Run(ocvb)
         Dim vec255 = New cv.Vec3b(255, 255, 255)
@@ -181,7 +178,7 @@ Public Class FloodFill_DCT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         flood = New FloodFill_Color_MT(ocvb, caller)
-        flood.externalUse = True
+        flood.standalone = True
 
         dct = New DCT_FeatureLess_MT(ocvb, caller)
         ocvb.desc = "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces."
@@ -212,10 +209,10 @@ Public Class FloodFill_WithDepth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         shadow = New Depth_Holes(ocvb, caller)
-        shadow.externalUse = True
+        shadow.standalone = True
 
         range = New FloodFill_RelativeRange(ocvb, caller)
-        range.fBasics.externalUse = True
+        range.fBasics.standalone = True
 
         ocvb.desc = "Floodfill only the areas where there is depth"
     End Sub
@@ -244,13 +241,13 @@ Public Class FloodFill_CComp
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         shadow = New Depth_Holes(ocvb, caller)
-        shadow.externalUse = True
+        shadow.standalone = True
 
         ccomp = New CComp_Basics(ocvb, caller)
-        ccomp.externalUse = True
+        ccomp.standalone = True
 
         range = New FloodFill_RelativeRange(ocvb, caller)
-        range.fBasics.externalUse = True
+        range.fBasics.standalone = True
 
         ocvb.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
     End Sub
@@ -307,8 +304,7 @@ Public Class FloodFill_Top16
     Inherits ocvbClass
     Public flood As FloodFill_Basics
     Public srcGray As New cv.Mat
-    Public externalUse As Boolean
-
+    
     Public thumbNails As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -317,13 +313,13 @@ Public Class FloodFill_Top16
         check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
 
         flood = New FloodFill_Basics(ocvb, caller)
-        flood.externalUse = True
+        flood.standalone = True
 
         ocvb.label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        if standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         flood.srcGray = srcGray
 
         thumbNails = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
@@ -361,8 +357,7 @@ Public Class FloodFill_Projection
     Inherits ocvbClass
     Public srcGray As New cv.Mat
     Public dst As cv.Mat
-    Public externalUse As Boolean
-    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+        Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public objectRects As New List(Of cv.Rect)
     Public minFloodSize As Integer
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -381,7 +376,7 @@ Public Class FloodFill_Projection
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
         Dim stepSize = sliders.TrackBar4.Value
 
-        If externalUse = False Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        if standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result1 = srcGray.Clone()
         Dim maskPlus = New cv.Mat(New cv.Size(srcGray.Width + 2, srcGray.Height + 2), cv.MatType.CV_8UC1)
         Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
@@ -404,7 +399,7 @@ Public Class FloodFill_Projection
             Next
         Next
 
-        If externalUse = False Then
+        if standalone Then
             ocvb.result2 = dst
             ocvb.label2 = CStr(objectRects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
         End If

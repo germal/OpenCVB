@@ -158,7 +158,7 @@ Public Class OpticalFlow_DenseBasics_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
-        grid.externalUse = True
+        grid.standalone = True
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 4
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
         grid.sliders.TrackBar3.Value = 5
@@ -218,7 +218,6 @@ Public Class OpticalFlow_Sparse
     Inherits ocvbClass
 
     Public features As New List(Of cv.Point2f)
-    Public externalUse As Boolean
 
     Dim good As Features_GoodFeatures
     Dim lastFrame As cv.Mat
@@ -227,7 +226,7 @@ Public Class OpticalFlow_Sparse
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         good = New Features_GoodFeatures(ocvb, caller)
-        good.externalUse = True
+        good.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "OpticalFlow window", 1, 20, 3)
         sliders.setupTrackBar2(ocvb, caller, "OpticalFlow Max Pixels Distance", 1, 100, 30)

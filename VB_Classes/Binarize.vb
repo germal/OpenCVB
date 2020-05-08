@@ -10,12 +10,12 @@ Public Class Binarize_OTSU
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plotHist = New Plot_Histogram(ocvb, caller)
-        plotHist.externalUse = True
+        plotHist.standalone = True
 
         mats1 = New Mat_4to1(ocvb, caller)
-        mats1.externalUse = True
+        mats1.standalone = True
         mats2 = New Mat_4to1(ocvb, caller)
-        mats2.externalUse = True
+        mats2.standalone = True
 
         ocvb.desc = "Binarize an image using Threshold with OTSU."
         ocvb.label2 = "Histograms correspond to images on the left"

@@ -6,8 +6,7 @@ Public Class BGSubtract_Basics_CPP
     Dim bgfs As IntPtr
     Public currMethod As Int32 = -1
     Public src As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         radio.Setup(ocvb, caller, 7)
         radio.check(0).Text = "GMG"
@@ -33,7 +32,7 @@ Public Class BGSubtract_Basics_CPP
                 End If
             End If
         Next
-        If externalUse = False Then src = ocvb.color
+        if standalone Then src = ocvb.color
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
@@ -112,7 +111,6 @@ Public Class BGSubtract_Basics_MT
     Inherits ocvbClass
     Public grid As Thread_Grid
     Dim accum As New cv.Mat
-    Public externalUse = False
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
@@ -136,7 +134,7 @@ Public Class BGSubtract_Basics_MT
                 ocvb.color(roi).CopyTo(accum(roi))
             End If
         End Sub)
-        If externalUse = False Then accum.CopyTo(ocvb.result2) ' show the accumulated result if this is not some other object using me...
+        if standalone Then accum.CopyTo(ocvb.result2) ' show the accumulated result if this is not some other object using me...
     End Sub
     Public Sub MyDispose()
         grid.Dispose()
@@ -152,9 +150,9 @@ Public Class BGSubtract_Depth_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         bgsub = New BGSubtract_Basics_MT(ocvb, caller)
-        bgsub.externalUse = True
+        bgsub.standalone = True
         shadow = New Depth_Holes(ocvb, caller)
-        shadow.externalUse = True
+        shadow.standalone = True
         ocvb.desc = "Detect Motion in the depth image"
         ocvb.label2 = "Accumulated 3D image"
     End Sub
@@ -184,8 +182,7 @@ End Class
 Public Class BGSubtract_MOG
     Inherits ocvbClass
     Public src As New cv.Mat
-    Public externalUse As Boolean
-    Public gray As New cv.Mat
+        Public gray As New cv.Mat
     Dim MOG As cv.BackgroundSubtractorMOG
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -195,7 +192,7 @@ Public Class BGSubtract_MOG
         ocvb.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then src = ocvb.color
+        if standalone Then src = ocvb.color
         If src.Channels = 3 Then
             gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
@@ -213,8 +210,7 @@ End Class
 Public Class BGSubtract_MOG2
     Inherits ocvbClass
     Public src As New cv.Mat
-    Public externalUse As Boolean
-    Public gray As New cv.Mat
+        Public gray As New cv.Mat
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -224,7 +220,7 @@ Public Class BGSubtract_MOG2
         ocvb.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse Then
+        If standalone Then
             gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
             gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -314,11 +310,11 @@ Public Class BGSubtract_MOG_Retina
         setCaller(callerRaw)
         input = New BGSubtract_MOG(ocvb, caller)
 
-        input.externalUse = True
+        input.standalone = True
         input.sliders.TrackBar1.Value = 100
 
         retina = New Retina_Basics_CPP(ocvb, caller)
-        retina.externalUse = True
+        retina.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "Uncertainty threshold", 1, 255, 100)
 
@@ -390,7 +386,7 @@ Public Class BGSubtract_Video
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         bgfg = New BGSubtract_Basics_CPP(ocvb, caller)
-        bgfg.externalUse = True
+        bgfg.standalone = True
 
         video = New Video_Basics(ocvb, caller)
         video.srcVideo = ocvb.parms.HomeDir + "Data/vtest.avi"
@@ -489,7 +485,7 @@ Public Class BGSubtract_Synthetic
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         bgfg = New BGSubtract_Basics_CPP(ocvb, caller)
-        bgfg.externalUse = True
+        bgfg.standalone = True
 
         synth = New BGSubtract_Synthetic_CPP(ocvb, caller)
         ocvb.desc = "Demonstrate background subtraction algorithms with synthetic images."

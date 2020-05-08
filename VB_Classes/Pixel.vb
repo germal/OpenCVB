@@ -8,7 +8,7 @@ Public Class Pixel_GetSet
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         mat4 = New Mat_4to1(ocvb, caller)
-        mat4.externalUse = True
+        mat4.standalone = True
 
         ocvb.label1 = "Log of times for each method"
         ocvb.label2 = "GetSet/Generic Indexer/Marshal.Copy"

@@ -6,13 +6,12 @@ Public Class IMU_Basics
     Dim flow As Font_FlowText
     Public theta As cv.Point3f ' this is the description - x, y, and z - of the axes centered in the camera.
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
-    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
 
         flow = New Font_FlowText(ocvb, caller)
-        flow.externalUse = True
+        flow.standalone = True
         flow.result1or2 = RESULT1
 
         ocvb.desc = "Read and display the IMU coordinates"
@@ -43,7 +42,7 @@ Public Class IMU_Basics
                 theta.X = theta.X * alpha + accelAngle.X * (1 - alpha)
                 theta.Z = theta.Z * alpha + accelAngle.Z * (1 - alpha)
             End If
-            If externalUse = False Then
+            If standalone Then
                 flow.msgs.Add("ts = " + Format(ocvb.parms.IMU_TimeStamp, "#0.00") + " Acceleration (m/sec^2) x = " + Format(ocvb.parms.IMU_Acceleration.X, "#0.00") +
                               " y = " + Format(ocvb.parms.IMU_Acceleration.Y, "#0.00") + " z = " + Format(ocvb.parms.IMU_Acceleration.Z, "#0.00") + vbTab +
                               " Motion (rads/sec) pitch = " + Format(ocvb.parms.IMU_AngularVelocity.X, "#0.00") +
@@ -71,7 +70,7 @@ Public Class IMU_Stabilizer
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Kalman_Basics(ocvb, caller)
-        kalman.externalUse = True
+        kalman.standalone = True
 
         ocvb.desc = "Stabilize the image with the IMU data."
         ocvb.label1 = "IMU Stabilize (Move Camera + Select Kalman)"
@@ -129,7 +128,7 @@ Public Class IMU_Magnetometer
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plot = New Plot_OverTime(ocvb, caller)
-        plot.externalUse = True
+        plot.standalone = True
         plot.dst = ocvb.result2
         plot.maxScale = 10
         plot.minScale = -10
@@ -197,12 +196,11 @@ Public Class IMU_FrameTime
     Inherits ocvbClass
     Public plot As Plot_OverTime
     Public CPUInterval As Double
-    Public externalUse As Boolean
     Public IMUtoCaptureEstimate As Double
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plot = New Plot_OverTime(ocvb, caller)
-        plot.externalUse = True
+        plot.standalone = True
         plot.dst = ocvb.result2
         plot.maxScale = 150
         plot.minScale = 0
@@ -252,7 +250,7 @@ Public Class IMU_FrameTime
 
         histogramIMU(CInt(ocvb.parms.IMU_FrameTime)) += 1
 
-        If externalUse = False Then
+        If standalone Then
             ocvb.putText(New ActiveClass.TrueType("IMU_TimeStamp (ms) " + Format(ocvb.parms.IMU_TimeStamp, "00") + vbCrLf +
                                                   "CPU TimeStamp (ms) " + Format(ocvb.parms.CPU_TimeStamp, "00") + vbCrLf +
                                                   "IMU Frametime (ms, sampled) " + Format(sampledIMUFrameTime, "000.00") +
@@ -296,12 +294,11 @@ Public Class IMU_HostFrameTimes
     Inherits ocvbClass
     Public plot As Plot_OverTime
     Public CPUInterval As Double
-    Public externalUse As Boolean
     Public HostInterruptDelayEstimate As Double
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plot = New Plot_OverTime(ocvb, caller)
-        plot.externalUse = True
+        plot.standalone = True
         plot.dst = ocvb.result2
         plot.maxScale = 150
         plot.minScale = 0
@@ -340,7 +337,7 @@ Public Class IMU_HostFrameTimes
 
         hist(CInt(ocvb.parms.CPU_FrameTime)) += 1
 
-        If externalUse = False Then
+        If standalone Then
             ocvb.putText(New ActiveClass.TrueType("IMU_TimeStamp (ms) " + Format(ocvb.parms.IMU_TimeStamp, "00") + vbCrLf +
                                                   "CPU TimeStamp (ms) " + Format(ocvb.parms.CPU_TimeStamp, "00") + vbCrLf +
                                                   "CPU Frametime (ms, sampled) " + Format(sampledCPUFrameTime, "000.00") +
@@ -385,22 +382,21 @@ Public Class IMU_TotalDelay
     Dim imu As IMU_FrameTime
     Dim plot As Plot_OverTime
     Dim kalman As Kalman_Single
-    Dim externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.parms.ShowOptions = False
 
         host = New IMU_HostFrameTimes(ocvb, caller)
-        host.externalUse = True
+        host.standalone = True
         imu = New IMU_FrameTime(ocvb, caller)
-        imu.externalUse = True
+        imu.standalone = True
         kalman = New Kalman_Single(ocvb, caller)
-        kalman.externalUse = True
+        kalman.standalone = True
 
         ocvb.parms.ShowOptions = True ' just show plot options...
 
         plot = New Plot_OverTime(ocvb, caller)
-        plot.externalUse = True
+        plot.standalone = True
         plot.dst = ocvb.result2
         plot.maxScale = 50
         plot.minScale = 0
@@ -466,19 +462,18 @@ End Class
 
 
 
-Public Class IMU_GravityVec
+Public Class IMU_GVector
     Inherits ocvbClass
     Dim kalman As Kalman_Basics
     Public angleX As Single ' in radians.
     Public angleY As Single ' in radians.
     Public angleZ As Single ' in radians.
     Public result As Integer = RESULT1 ' should be result1 or result2
-    Public externalUse As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Kalman_Basics(ocvb, caller)
         ReDim kalman.src(6 - 1)
-        kalman.externalUse = True
+        kalman.standalone = True
 
         ocvb.desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
@@ -497,7 +492,7 @@ Public Class IMU_GravityVec
         gy = kalman.dst(1)
         gz = kalman.dst(2)
 
-        If externalUse = False Then
+        If standalone Then
             Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf
             outStr = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(gx, "#0.0000") + vbCrLf
             outStr += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(gy, "#0.0000") + vbCrLf

@@ -10,10 +10,17 @@ Public Class ocvbClass : Implements IDisposable
     Public sliders3 As New OptionsSliders
     Public videoOptions As New OptionsVideoName
     Public pyStream As PyStream_Basics = Nothing
+    Public standalone As Boolean
     Dim algorithm As Object
     Public Sub setCaller(callerRaw As String)
         If callerRaw Is Nothing Then callerRaw = ""
-        If callerRaw = "" Or callerRaw.Contains(Me.GetType.Name) Then caller = Me.GetType.Name Else caller = callerRaw + "-->" + Me.GetType.Name
+        If callerRaw = "" Or callerRaw.Contains(Me.GetType.Name) Then
+            standalone = True
+            caller = Me.GetType.Name
+        Else
+            standalone = False
+            caller = callerRaw + "-->" + Me.GetType.Name
+        End If
     End Sub
     Public Sub New()
         algorithm = Me

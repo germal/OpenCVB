@@ -28,7 +28,7 @@ Public Class OpenCVGL_Image_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         imu = New IMU_Basics(ocvb, caller)
-        imu.externalUse = True
+        imu.standalone = True
 
         If ocvb.parms.testAllRunning = False Then
             setOpenGLsliders(ocvb, caller, sliders, sliders1, sliders2, sliders3)

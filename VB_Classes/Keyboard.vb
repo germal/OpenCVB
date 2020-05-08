@@ -3,8 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Keyboard_Basics
     Inherits ocvbClass
     Public input As String
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.label1 = "Type in text to add to image"
         ocvb.desc = "Test the keyboard interface available to all algorithms"
@@ -13,7 +12,7 @@ Public Class Keyboard_Basics
         If ocvb.parms.keyboardInput <> "" Then
             input = ocvb.parms.keyboardInput
         End If
-        If externalUse = False Then
+        if standalone Then
             If input = "" Then
                 ocvb.putText(New ActiveClass.TrueType("Any text entered will appear here." + input, 10, 50, RESULT1))
             Else

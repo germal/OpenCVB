@@ -133,8 +133,7 @@ Public Class Mat_4to1
     Dim mat3 As cv.Mat
     Dim mat4 As cv.Mat
     Public mat() As cv.Mat = {mat1, mat2, mat3, mat4}
-    Public externalUse As Boolean
-    Public noLines As Boolean ' if they want lines or not...
+        Public noLines As Boolean ' if they want lines or not...
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -153,7 +152,7 @@ Public Class Mat_4to1
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Static roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         Static roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
-        If externalUse = False Then
+        if standalone Then
             mat1 = ocvb.color
             mat2 = ocvb.RGBDepth
             mat3 = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -180,8 +179,7 @@ Public Class Mat_2to1
     Dim mat1 As cv.Mat
     Dim mat2 As cv.Mat
     Public mat() = {mat1, mat2}
-    Public externalUse As Boolean
-    Public noLines As Boolean ' if they want lines or not...
+        Public noLines As Boolean ' if they want lines or not...
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -197,7 +195,7 @@ Public Class Mat_2to1
         Static nSize = New cv.Size(ocvb.color.Width, ocvb.color.Height / 2)
         Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
-        If externalUse = False Then
+        if standalone Then
             mat1 = ocvb.color
             mat2 = ocvb.RGBDepth
             mat = {mat1, mat2}
@@ -221,8 +219,7 @@ Public Class Mat_ImageXYZ_MT
     Dim grid As Thread_Grid
     Public xyDepth As cv.Mat
     Public xyzPlanes() As cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 32
@@ -247,7 +244,7 @@ Public Class Mat_ImageXYZ_MT
               xyzPlanes(2)(roi) = depth32f(roi)
           End Sub)
 
-        If externalUse = False Then cv.Cv2.Merge(xyzPlanes, xyDepth)
+        if standalone Then cv.Cv2.Merge(xyzPlanes, xyDepth)
     End Sub
     Public Sub MyDispose()
         grid.Dispose()

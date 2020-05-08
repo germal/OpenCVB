@@ -7,10 +7,10 @@ Public Class Stabilizer_BriskFeatures
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         stabilizer = New Stabilizer_Basics(ocvb, caller)
-        stabilizer.externalUse = True
+        stabilizer.standalone = True
 
         brisk = New BRISK_Basics(ocvb, caller)
-        brisk.externalUse = True
+        brisk.standalone = True
         brisk.sliders.TrackBar1.Value = 10
 
         ocvb.desc = "Stabilize the video stream using BRISK features (not GoodFeaturesToTrack)"
@@ -38,10 +38,10 @@ Public Class Stabilizer_HarrisFeatures
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         stabilizer = New Stabilizer_Basics(ocvb, caller)
-        stabilizer.externalUse = True
+        stabilizer.standalone = True
 
         harris = New Harris_Detector_CPP(ocvb, caller)
-        harris.externalUse = True
+        harris.standalone = True
 
         ocvb.desc = "Stabilize the video stream using Harris detector features"
     End Sub
@@ -67,14 +67,13 @@ Public Class Stabilizer_Basics
     Public good As Features_GoodFeatures
     Public features As New List(Of cv.Point2f)
     Public lastFrame As cv.Mat
-    Public externalUse As Boolean
-    Public borderCrop = 30
+        Public borderCrop = 30
     Dim sumScale As cv.Mat, sScale As cv.Mat, features1 As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         good = New Features_GoodFeatures(ocvb, caller)
-        good.externalUse = True
+        good.standalone = True
 
         ocvb.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
         ocvb.label1 = "Stabilized Image"
@@ -89,7 +88,7 @@ Public Class Stabilizer_Basics
             sScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0)
         End If
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If externalUse Then
+        If standalone Then
             features1 = New cv.Mat(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
         Else
             good.gray = gray.Clone()

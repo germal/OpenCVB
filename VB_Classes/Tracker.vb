@@ -4,8 +4,7 @@ Public Class Tracker_Basics
     Public tracker As cv.Tracking.MultiTracker
     Public bbox As cv.Rect2d
     Public boxObject() As cv.Rect2d
-    Public externalUse As Boolean
-    Public trackerIndex As Int32 = 5 ' trackerMIL by default...
+        Public trackerIndex As Int32 = 5 ' trackerMIL by default...
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         check.Setup(ocvb, caller, 1)
@@ -48,7 +47,7 @@ Public Class Tracker_Basics
         If tracker IsNot Nothing Then
             tracker.Update(ocvb.color)
             boxObject = tracker.GetObjects() ' just track one.  Tracking multiple is buggy.  Returns a lot of 0 width/height rect2d's.
-            If externalUse = False Then
+            if standalone Then
                 ocvb.result1 = ocvb.color.Clone()
                 Dim p1 = New cv.Point(boxObject(0).X, boxObject(0).Y)
                 Dim p2 = New cv.Point(boxObject(0).X + bbox.Width, boxObject(0).Y + bbox.Height)
@@ -75,7 +74,7 @@ Public Class Tracker_MultiObject
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.drawRect.Width <> 0 Then
             Dim tr = New Tracker_Basics(ocvb, "Tracker_MultiObject")
-            tr.externalUse = True
+            tr.standalone = True
             tr.Run(ocvb)
             ocvb.drawRect = New cv.Rect
             trackers.Add(tr)

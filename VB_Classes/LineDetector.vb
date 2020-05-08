@@ -172,8 +172,7 @@ End Module
 Public Class lineDetector_FLD
     Inherits ocvbClass
     Public sortedLines As SortedList(Of cv.Vec6f, Integer)
-    Public externalUse As Boolean
-    Public src As cv.Mat
+        Public src As cv.Mat
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -209,7 +208,7 @@ Public Class lineDetector_FLD
         Dim canny_th2 = sliders2.TrackBar2.Value
         Dim do_merge = check.Box(0).Checked
 
-        If externalUse = False Then src = ocvb.color
+        if standalone Then src = ocvb.color
 
         Dim factor As Int32 = 4
         If radio.check(0).Checked Then
@@ -232,7 +231,7 @@ Public Class lineDetector_FLD
 
         src.CopyTo(dst)
         If lineCount > 0 Then sortedLines = drawSegments(dst, lineCount, factor, dst)
-        If externalUse = False Then dst.CopyTo(ocvb.result1)
+        if standalone Then dst.CopyTo(ocvb.result1)
     End Sub
 End Class
 
@@ -514,8 +513,7 @@ Public Class LineDetector_Basics
     Inherits ocvbClass
     Dim ld As cv.XImgProc.FastLineDetector
     Public dst As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "LineDetector thickness of line", 1, 20, 2)
 
@@ -530,7 +528,7 @@ Public Class LineDetector_Basics
         ocvb.color.CopyTo(ocvb.result2)
         Dim thickness = sliders.TrackBar1.Value
 
-        If externalUse = False Then dst = ocvb.result1
+        if standalone Then dst = ocvb.result1
         For Each v In vectors
             If v(0) >= 0 And v(0) <= dst.Cols And v(1) >= 0 And v(1) <= dst.Rows And
                    v(2) >= 0 And v(2) <= dst.Cols And v(3) >= 0 And v(3) <= dst.Rows Then
@@ -539,7 +537,7 @@ Public Class LineDetector_Basics
                 dst.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
             End If
         Next
-        If externalUse = False Then
+        if standalone Then
             ocvb.label2 = "Drawn with DrawSegment (thickness=1)"
             ld.DrawSegments(ocvb.result2, vectors, False)
         End If

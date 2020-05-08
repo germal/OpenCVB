@@ -6,8 +6,7 @@ Public Class KLT_Basics
     Public prevGray As New cv.Mat
     Public inputPoints() As cv.Point2f
     Public status As New cv.Mat
-    Public externalUse As Boolean
-    Public outputMat As New cv.Mat
+        Public outputMat As New cv.Mat
     Public circleColor = cv.Scalar.Red
     Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -88,7 +87,7 @@ Public Class KLT_OpticalFlow
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         klt = New KLT_Basics(ocvb, caller)
-        klt.externalUse = True ' we will compress the points file below.
+        klt.standalone = True ' we will compress the points file below.
         ocvb.desc = "KLT optical flow"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

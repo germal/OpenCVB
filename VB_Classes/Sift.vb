@@ -10,7 +10,7 @@ Public Class Sift_Basics_CS
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         fisheye = New FishEye_Rectified(ocvb, caller)
-        fisheye.externalUse = True
+        fisheye.standalone = True
 
         radio.Setup(ocvb, caller,2)
         radio.check(0).Text = "Use BF Matcher"
@@ -53,7 +53,7 @@ Public Class Sift_Basics_CS_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         fisheye = New FishEye_Rectified(ocvb, caller)
-        fisheye.externalUse = True
+        fisheye.standalone = True
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = ocvb.color.Width - 1 ' we are just taking horizontal slices of the image.
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 2

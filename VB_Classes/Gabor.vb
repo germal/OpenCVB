@@ -7,8 +7,7 @@ Public Class Gabor_Basics
     Public gKernel As New cv.Mat
     Public src As New cv.Mat
     Public dst As New cv.Mat
-    Public externalUse As Boolean
-    Public ksize As Double
+        Public ksize As Double
     Public Sigma As Double
     Public theta As Double
     Public lambda As Double
@@ -28,7 +27,7 @@ Public Class Gabor_Basics
         ocvb.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
+        if standalone Then
             src = ocvb.color
             ksize = sliders.TrackBar1.Value * 2 + 1
             Sigma = sliders.TrackBar2.Value
@@ -42,7 +41,7 @@ Public Class Gabor_Basics
         Dim multiplier = gKernel.Sum()
         gKernel /= 1.5 * multiplier.Item(0)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If externalUse Then
+        If standalone Then
             dst = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
         Else
             ocvb.result1 = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
@@ -81,7 +80,7 @@ Public Class Gabor_Basics_MT
         For i = 0 To gabor.Length - 1
             gabor(i) = New Gabor_Basics(ocvb, caller)
             gabor(i).sliders.TrackBar3.Value = i * 180 / gabor.Length
-            gabor(i).externalUse = True
+            gabor(i).standalone = True
         Next
         ocvb.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
     End Sub

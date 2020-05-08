@@ -14,7 +14,7 @@ Public Class Voxels_Basics_MT
         check.Box(0).Checked = True
 
         trim = New Depth_InRange(ocvb, caller)
-        trim.externalUse = True
+        trim.standalone = True
         trim.sliders.TrackBar2.Value = 5000
 
         sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 2, 200, 100)
@@ -22,7 +22,7 @@ Public Class Voxels_Basics_MT
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
-        grid.externalUse = True
+        grid.standalone = True
 
         ocvb.label2 = "Voxels labeled with their median distance"
         ocvb.desc = "Use multi-threading to get median depth values as voxels."

@@ -50,22 +50,21 @@ Public Class Math_Median_CDF
     Public medianVal As Double
     Public rangeMin As Integer = 0
     Public rangeMax As Integer = 255
-    Public externalUse As Boolean
-    Public bins As Int32 = 10
+        Public bins As Int32 = 10
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 4, 1000, 100)
         ocvb.desc = "Compute the src image median"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
+        if standalone Then
             bins = sliders.TrackBar1.Value
             src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
 
         medianVal = computeMedian(src, New cv.Mat, bins, rangeMin, rangeMax)
 
-        If externalUse = False Then
+        if standalone Then
             Dim mask = New cv.Mat
             mask = src.GreaterThan(medianVal)
             ocvb.result1.SetTo(0)
@@ -118,11 +117,11 @@ Public Class Math_RGBCorrelation
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         flow = New Font_FlowText(ocvb, caller)
-        flow.externalUse = True
+        flow.standalone = True
         flow.result1or2 = RESULT2
 
         corr = New MatchTemplate_Basics(ocvb, caller)
-        corr.externalUse = True
+        corr.standalone = True
         corr.reportFreq = 1
 
         ocvb.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"

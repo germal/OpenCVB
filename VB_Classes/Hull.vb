@@ -26,8 +26,7 @@ End Module
 Public Class Hull_Basics
     Inherits ocvbClass
     Public hull() As cv.Point
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Hull random points", 1, 20, 10)
 
@@ -46,7 +45,7 @@ Public Class Hull_Basics
         Next
         hull = cv.Cv2.ConvexHull(points, True)
 
-        If externalUse = False Then
+        if standalone Then
             ocvb.result1.SetTo(0)
             ocvb.result2.SetTo(0)
             For i = 0 To hull.Count - 1

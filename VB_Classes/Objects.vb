@@ -3,20 +3,19 @@ Public Class Object_Basics
     Inherits ocvbClass
     Dim trim As Depth_InRange
     Dim ccomp As CComp_EdgeMask
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         trim = New Depth_InRange(ocvb, caller)
-        trim.externalUse = True
+        trim.standalone = True
 
         ccomp = New CComp_EdgeMask(ocvb, caller)
-        ccomp.externalUse = True
+        ccomp.standalone = True
 
         ocvb.desc = "Identify objects in the foreground."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
-        If externalUse = False Then
+        if standalone Then
             ocvb.result1 = trim.Mask
             ocvb.result2 = trim.zeroMask
         End If

@@ -30,12 +30,11 @@ Public Class OpenGL_Basics
     Public zTrans As Single = 0.5
     Public OpenGLTitle As String = "OpenGL_Basics"
     Public imageLabel As String
-    Public imu As IMU_GravityVec
+    Public imu As IMU_GVector
     Public pointCloudInput As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        imu = New IMU_GravityVec(ocvb, caller)
+        imu = New IMU_GVector(ocvb, caller)
         ' Dispose() ' make sure there wasn't an old OpenGLWindow sitting around...
         ocvb.desc = "Create an OpenGL window and update it with images"
     End Sub
@@ -86,7 +85,7 @@ Public Class OpenGL_Basics
             Exit Sub
         End If
 
-        If externalUse = False Then pointCloudInput = ocvb.pointCloud
+        if standalone Then pointCloudInput = ocvb.pointCloud
         imu.Run(ocvb)
 
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
@@ -277,8 +276,7 @@ Public Class OpenGL_3Ddata
     Dim colors As Palette_Gradient
     Public ogl As OpenGL_Options
     Dim histInput() As Byte
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
 
@@ -290,7 +288,7 @@ Public Class OpenGL_3Ddata
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud when displaying data.
 
         colors = New Palette_Gradient(ocvb, caller)
-        colors.externalUse = True
+        colors.standalone = True
         colors.color1 = cv.Scalar.Yellow
         colors.color2 = cv.Scalar.Blue
         colors.Run(ocvb)
@@ -396,13 +394,13 @@ End Class
 ' https://www.codeproject.com/Articles/1247960/Learning-Basic-Math-Used-In-3D-Graphics-Engines
 Public Class OpenGL_GravityTransform
     Inherits ocvbClass
-    Dim imu As IMU_GravityVec
+    Dim imu As IMU_GVector
     Public ogl As OpenGL_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        imu = New IMU_GravityVec(ocvb, caller)
+        imu = New IMU_GVector(ocvb, caller)
         ogl = New OpenGL_Basics(ocvb, caller)
-        ogl.externalUse = True
+        ogl.standalone = True
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub

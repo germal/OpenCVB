@@ -15,13 +15,13 @@ Public Class Featureless_Basics_MT
         sliders.setupTrackBar4(ocvb, caller,  "FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
 
         edges = New Edges_Canny(ocvb, caller)
-        edges.externalUse = True
+        edges.standalone = True
 
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = If(ocvb.color.Width > 1000, 16, 8)
         grid.sliders.TrackBar2.Value = If(ocvb.color.Width > 1000, 16, 8)
 
-        grid.externalUse = True ' we don't need any results.
+        grid.standalone = True ' we don't need any results.
         ocvb.desc = "Multithread Houghlines to find featureless regions in an image."
         ocvb.label1 = "MT grid"
         ocvb.label2 = "FeatureLess Regions"

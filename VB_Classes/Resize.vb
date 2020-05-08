@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Resize_Basics
     Inherits ocvbClass
-    Public externalUse As Boolean
-    Public src As cv.Mat
+        Public src As cv.Mat
     Public dst As New cv.Mat
     Public newSize As cv.Size
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -18,7 +17,7 @@ Public Class Resize_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim resizeFlag = getInterpolationRadioButtons(radio)
-        If externalUse = False Then
+        if standalone Then
             Dim roi = New cv.Rect(ocvb.color.Width / 4, ocvb.color.Height / 4, ocvb.color.Width / 2, ocvb.color.Height / 2)
             If ocvb.drawRect.Width <> 0 Then roi = ocvb.drawRect
 
@@ -43,7 +42,7 @@ Public Class Resize_After8uc3
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         colorizer = New Depth_Colorizer_CPP(ocvb, caller)
-        colorizer.externalUse = True
+        colorizer.standalone = True
         SetInterpolationRadioButtons(ocvb, caller, radio, "Resize")
         ' warp is not allowed in resize
         radio.check(5).Enabled = False
@@ -84,12 +83,11 @@ Public Class Resize_Percentage
     Inherits ocvbClass
     Public src As New cv.Mat
     Public dst As New cv.Mat
-    Public externalUse As Boolean
-    Public resizeOptions As Resize_Basics
+        Public resizeOptions As Resize_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         resizeOptions = New Resize_Basics(ocvb, caller)
-        resizeOptions.externalUse = True
+        resizeOptions.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "Resize Percentage (%)", 1, 100, 3)
 
@@ -97,14 +95,14 @@ Public Class Resize_Percentage
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim percent As Double = CDbl(sliders.TrackBar1.Value / 100)
-        If externalUse = False Then src = ocvb.color
+        if standalone Then src = ocvb.color
         dim resizePercent = sliders.TrackBar1.Value / 100
         resizePercent = Math.Sqrt(resizePercent)
         resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * resizePercent), Math.Ceiling(src.Height * resizePercent))
         resizeOptions.src = src
         resizeOptions.Run(ocvb)
 
-        If externalUse = False Then
+        if standalone Then
             Dim roi As New cv.Rect(0, 0, resizeOptions.dst.Width, resizeOptions.dst.Height)
             ocvb.result1 = resizeOptions.dst(roi).Resize(resizeOptions.dst.Size())
             ocvb.label1 = "Image after resizing to " + Format(sliders.TrackBar1.Value, "#0.0") + "% of original size"

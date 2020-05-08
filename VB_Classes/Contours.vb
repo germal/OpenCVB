@@ -3,8 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Contours_Basics
     Inherits ocvbClass
     Public rotatedRect As Draw_rotatedRectangles
-    Public externalUse As Boolean
-    Public src As New cv.Mat
+        Public src As New cv.Mat
     Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -49,7 +48,7 @@ Public Class Contours_Basics
             End If
         Next
 
-        If externalUse = False Then
+        if standalone Then
             src = New cv.Mat(ocvb.result1.Size(), cv.MatType.CV_8UC1)
             rotatedRect.Run(ocvb)
             src = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)

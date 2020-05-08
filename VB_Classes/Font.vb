@@ -57,16 +57,15 @@ End Class
 Public Class Font_FlowText
     Inherits ocvbClass
     Public msgs As New List(Of String)
-    Public externalUse As Boolean
-    Public result1or2 As Int32 = RESULT1
+        Public result1or2 As Int32 = RESULT1
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False And ocvb.frameCount = 0 Then
+        if standalone And ocvb.frameCount = 0 Then
             msgs.Add("To get text to flow across an image in any other class, add flow = new Font_FlowText(ocvb) to your class constructor.")
-            msgs.Add("Also in your constructor, update flow.externalUse = true and optionally indicate if you want result1 or result2 for text.")
+            msgs.Add("Also in your constructor, update flow.standalone = true and optionally indicate if you want result1 or result2 for text.")
             msgs.Add("Then in your Run method, flow.msgs.add('your next line of text') - for as many msgs as you need on each pass.")
             msgs.Add("Then at the end of your Run method, invoke flow.Run(ocvb)")
         Else

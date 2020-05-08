@@ -7,8 +7,7 @@ Public Class Thread_Grid
     Public roiList As List(Of cv.Rect)
     Public borderList As List(Of cv.Rect)
         Public gridMask As cv.Mat
-    Public externalUse As Boolean
-    Public tilesPerRow As Int32
+        Public tilesPerRow As Int32
     Public tilesPerCol As Int32
     Dim incompleteRegions As Int32
     Public src As New cv.Mat
@@ -83,14 +82,14 @@ Public Class Thread_Grid
                 borderList.Add(broi)
             Next
 
-            If externalUse = False Then drawGrid(borderList)
+            if standalone Then drawGrid(borderList)
 
             lastWidth = sliders.TrackBar1.Value
             lastHeight = sliders.TrackBar2.Value
             lastBorder = borderSize
         End If
 
-        If externalUse = False Then
+        if standalone Then
             src.CopyTo(ocvb.result1)
             ocvb.result1.SetTo(cv.Scalar.All(255), gridMask)
             ocvb.label1 = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +

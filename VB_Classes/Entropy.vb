@@ -5,16 +5,15 @@ Public Class Entropy_Basics
     Dim flow As Font_FlowText
     Dim hist As Histogram_Basics
     Public src As cv.Mat
-    Public externalUse As Boolean
-    Public entropy As Single
+        Public entropy As Single
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         flow = New Font_FlowText(ocvb, caller)
-        flow.externalUse = True
+        flow.standalone = True
         flow.result1or2 = RESULT1
 
         hist = New Histogram_Basics(ocvb, caller)
-        hist.externalUse = True
+        hist.standalone = True
 
         ocvb.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
@@ -27,7 +26,7 @@ Public Class Entropy_Basics
         Return entropy
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then src = ocvb.color
+        if standalone Then src = ocvb.color
         hist.src = src
         hist.Run(ocvb)
         entropy = 0
@@ -37,7 +36,7 @@ Public Class Entropy_Basics
             entropyChannels += "Entropy for " + Choose(i + 1, "Red", "Green", "Blue") + " " + Format(nextEntropy, "0.00") + ", "
             entropy += nextEntropy
         Next
-        If externalUse = False Then
+        if standalone Then
             flow.msgs.Add("Entropy total = " + Format(entropy, "0.00") + " - " + entropyChannels)
             flow.Run(ocvb)
         End If

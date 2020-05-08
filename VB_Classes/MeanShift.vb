@@ -98,10 +98,10 @@ Public Class Meanshift_TopObjects
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         mats1 = New Mat_4to1(ocvb, caller)
-        mats1.externalUse = True
+        mats1.standalone = True
 
         mats2 = New Mat_4to1(ocvb, caller)
-        mats2.externalUse = True
+        mats2.standalone = True
 
         blob = New Blob_DepthClusters(ocvb, caller)
         sliders.setupTrackBar1(ocvb, caller, "How often should camshift be reinitialized", 1, 500, 100)

@@ -28,8 +28,7 @@ End Module
 Public Class MatrixInverse_Basics_CS
     Inherits ocvbClass
     Public matrix As New MatrixInverse
-    Public externalUse As Boolean
-    Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
+        Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
     Dim defaultBVector() As Double = {12, 7, 7, 13}
     Public src As New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
     Public dst As cv.Mat
@@ -43,7 +42,7 @@ Public Class MatrixInverse_Basics_CS
             Exit Sub
         End If
 
-        If externalUse = False Then matrix.bVector = defaultBVector
+        if standalone Then matrix.bVector = defaultBVector
         dst = matrix.Run(src)
 
         Dim outstr = printMatrixResults(src, dst)
@@ -58,8 +57,7 @@ End Class
 
 Public Class MatrixInverse_OpenCV
     Inherits ocvbClass
-    Public externalUse As Boolean
-    Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
+        Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
     Public src As New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
     Public dst As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)

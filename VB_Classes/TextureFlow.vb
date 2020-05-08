@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Public Class TextureFlow_Basics
     Inherits ocvbClass
         Public src As cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Texture Flow Delta", 2, 100, 12)
         sliders.setupTrackBar2(ocvb, caller, "Texture Eigen BlockSize", 1, 100, 20)
@@ -15,7 +14,7 @@ Public Class TextureFlow_Basics
         Dim TFdelta = sliders.TrackBar1.Value
         Dim TFblockSize = sliders.TrackBar2.Value * 2 + 1
         Dim TFksize = sliders.TrackBar3.Value * 2 + 1
-        If externalUse = False Then src = ocvb.color
+        if standalone Then src = ocvb.color
         Dim gray = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2GRAY)
         ocvb.result1 = src.Clone
         Dim eigen = gray.CornerEigenValsAndVecs(TFblockSize, TFksize)
@@ -43,7 +42,7 @@ Public Class TextureFlow_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         texture = New TextureFlow_Basics(ocvb, caller)
-        texture.externalUse = True
+        texture.standalone = True
         ocvb.desc = "Display texture flow in the depth data"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

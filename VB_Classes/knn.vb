@@ -71,7 +71,7 @@ Public Class knn_Cluster2D
         setCaller(callerRaw)
         knn = New knn_Point2d(ocvb, caller)
         knn.sliders.Visible = False
-        knn.externalUse = True
+        knn.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "knn - number of cities", 10, 1000, 100)
 
@@ -166,8 +166,7 @@ Public Class knn_Point2d
     Public querySet() As cv.Point2f
     Public responseSet() As Int32
     Public lastSet() As cv.Point2f ' default usage: find and connect points in 2D for this number of points.
-    Public externalUse As Boolean
-    Public findXnearest As Int32
+        Public findXnearest As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "knn Query Points", 1, 50, 10)
@@ -178,7 +177,7 @@ Public Class knn_Point2d
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim knn = cv.ML.KNearest.Create()
-        If externalUse = False Then
+        if standalone Then
             ReDim lastSet(sliders.TrackBar1.Value - 1)
             ReDim querySet(sliders.TrackBar1.Value - 1)
             For i = 0 To lastSet.Count - 1
@@ -199,13 +198,13 @@ Public Class knn_Point2d
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, New cv.Mat(responses.Length, 1, cv.MatType.CV_32S, responses))
 
         Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
-        If externalUse = False Then
+        if standalone Then
             For i = 0 To lastSet.Count - 1
                 cv.Cv2.Circle(ocvb.result1, lastSet(i), 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
             Next
         End If
 
-        If externalUse = False Then findXnearest = sliders.TrackBar2.Value
+        if standalone Then findXnearest = sliders.TrackBar2.Value
         ReDim responseSet(querySet.Length * findXnearest - 1)
         For i = 0 To querySet.Count - 1
             query.Set(Of cv.Point2f)(0, 0, querySet(i))
@@ -213,7 +212,7 @@ Public Class knn_Point2d
             For j = 0 To findXnearest - 1
                 responseSet(i * findXnearest + j) = CInt(neighbors.Get(Of Single)(0, j))
             Next
-            If externalUse = False Then
+            if standalone Then
                 For j = 0 To findXnearest - 1
                     ocvb.result1.Line(lastSet(responseSet(i * findXnearest + j)), querySet(i), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                     cv.Cv2.Circle(ocvb.result1, querySet(i), 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
@@ -234,8 +233,7 @@ Public Class knn_Point3d
     Public querySet() As cv.Point3f
     Public responseSet() As Int32
     Public lastSet() As cv.Point3f ' default usage: find and connect points in 2D for this number of points.
-    Public externalUse As Boolean
-    Public findXnearest As Int32
+        Public findXnearest As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "knn Query Points", 1, 500, 10)
@@ -248,7 +246,7 @@ Public Class knn_Point3d
     Public Sub Run(ocvb As AlgorithmData)
         Dim maxDepth As Int32 = 4000 ' this is an arbitrary max dept    h
         Dim knn = cv.ML.KNearest.Create()
-        If externalUse = False Then
+        if standalone Then
             ReDim lastSet(sliders.TrackBar1.Value - 1)
             ReDim querySet(lastSet.Count - 1)
             For i = 0 To lastSet.Count - 1
@@ -278,7 +276,7 @@ Public Class knn_Point3d
             ocvb.result2.Circle(p, 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
         Next
 
-        If externalUse = False Then findXnearest = sliders.TrackBar2.Value
+        if standalone Then findXnearest = sliders.TrackBar2.Value
         ReDim responseSet(querySet.Length * findXnearest - 1)
         For i = 0 To querySet.Count - 1
             query.Set(Of cv.Point3f)(0, 0, querySet(i))
@@ -286,7 +284,7 @@ Public Class knn_Point3d
             For j = 0 To findXnearest - 1
                 responseSet(i * findXnearest + j) = CInt(neighbors.Get(Of Single)(0, j))
             Next
-            If externalUse = False Then
+            if standalone Then
                 For j = 0 To findXnearest - 1
                     Dim plast = New cv.Point2f(lastSet(responseSet(i * findXnearest + j)).X, lastSet(responseSet(i * findXnearest + j)).Y)
                     Dim pQ = New cv.Point2f(querySet(i).X, querySet(i).Y)
@@ -320,7 +318,7 @@ Public Class knn_ClusterNoisyLine
         noisyLine = New Fitline_RawInput(ocvb, caller)
         knn = New knn_Point2d(ocvb, caller)
         knn.sliders.Visible = False
-        knn.externalUse = True
+        knn.standalone = True
 
         ocvb.desc = "Use knn to cluster the output of noisyline class."
     End Sub

@@ -37,13 +37,12 @@ Public Class LUT_Color
     Inherits ocvbClass
     Public paletteMap(256) As cv.Vec3b
     Public src As cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
+        if standalone Then
             paletteMap = ocvb.rColors
             src = ocvb.color
             src /= 64

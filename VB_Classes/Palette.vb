@@ -180,11 +180,10 @@ Public Class Palette_DrawTest
     Dim palette As Palette_ColorMap
     Dim draw As Draw_RngImage
     Public src As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         palette = New Palette_ColorMap(ocvb, caller)
-        palette.externalUse = True
+        palette.standalone = True
 
         draw = New Draw_RngImage(ocvb, caller)
         palette.src = ocvb.result1
@@ -210,15 +209,14 @@ Public Class Palette_Gradient
     Public frameModulo As Int32 = 30 ' every 30 frames try a different pair of random colors.
     Public color1 As cv.Scalar
     Public color2 As cv.Scalar
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.label2 = "From and To colors"
         ocvb.desc = "Create gradient image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod frameModulo = 0 Then
-            If externalUse = False Then
+            if standalone Then
                 color1 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
                 color2 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
             End If
@@ -247,8 +245,7 @@ End Class
 Public Class Palette_BuildGradientColorMap
     Inherits ocvbClass
     Public gradientColorMap As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Number of color transitions (Used only with Random)", 1, 30, 5)
 
@@ -256,7 +253,7 @@ Public Class Palette_BuildGradientColorMap
         ocvb.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If (externalUse = False And ocvb.frameCount Mod 100 = 0) Or externalUse Then
+        If (standalone = False And ocvb.frameCount Mod 100 = 0) Or standalone Then
             Dim color1 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
             Dim color2 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
             Dim gradCount = sliders.TrackBar1.Value
@@ -275,7 +272,7 @@ Public Class Palette_BuildGradientColorMap
                 ocvb.result2(r) = gradientColorMap
             Next
         End If
-        If externalUse = False Then ocvb.result1 = Palette_Custom_Apply(ocvb.color, gradientColorMap)
+        if standalone Then ocvb.result1 = Palette_Custom_Apply(ocvb.color, gradientColorMap)
     End Sub
 End Class
 
@@ -286,12 +283,11 @@ End Class
 Public Class Palette_ColorMap
     Inherits ocvbClass
     Public src As New cv.Mat
-    Public externalUse As Boolean
-    Public gradMap As Palette_BuildGradientColorMap
+        Public gradMap As Palette_BuildGradientColorMap
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         gradMap = New Palette_BuildGradientColorMap(ocvb, caller)
-        gradMap.externalUse = True
+        gradMap.standalone = True
 
         radio.Setup(ocvb, caller, 21)
         For i = 0 To radio.check.Count - 1
@@ -303,7 +299,7 @@ Public Class Palette_ColorMap
     Public Sub Run(ocvb As AlgorithmData)
         Dim colormap = cv.ColormapTypes.Autumn
         Static buildNewRandomMap = False
-        If externalUse = False Then src = ocvb.color.Clone()
+        if standalone Then src = ocvb.color.Clone()
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then
                 colormap = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cool, cv.ColormapTypes.Hot,
@@ -357,7 +353,7 @@ Public Class Palette_DepthColorMap
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         holes = New Depth_Holes(ocvb, caller)
-        holes.externalUse = True
+        holes.standalone = True
 
         ocvb.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub

@@ -4,8 +4,7 @@ Imports System.Threading
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
 Public Class CComp_Basics
     Inherits ocvbClass
-    Public externalUse As Boolean
-    Public srcGray As New cv.Mat
+        Public srcGray As New cv.Mat
     Public dstGray As New cv.Mat
 
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -25,7 +24,7 @@ Public Class CComp_Basics
         Next
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        if standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim threshold = sliders.TrackBar1.Value
         Dim binary As New cv.Mat
@@ -69,13 +68,12 @@ Public Class CComp_EdgeMask
     Dim ccomp As CComp_Basics
     Dim edges As Edges_CannyAndShadow
     Public srcGray As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         edges = New Edges_CannyAndShadow(ocvb, caller)
 
         ccomp = New CComp_Basics(ocvb, caller)
-        ccomp.externalUse = True
+        ccomp.standalone = True
 
         ocvb.desc = "Isolate Color connected components after applying the Edge Mask"
         ocvb.label1 = "Edges_CannyAndShadow (input to ccomp)"
@@ -84,7 +82,7 @@ Public Class CComp_EdgeMask
     Public Sub Run(ocvb As AlgorithmData)
         edges.Run(ocvb)
 
-        If externalUse Then
+        If standalone Then
             ccomp.srcGray = srcGray
         Else
             ccomp.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -133,15 +131,14 @@ End Class
 
 Public Class CComp_Image
     Inherits ocvbClass
-    Public externalUse As Boolean
-    Public srcGray As New cv.Mat
+        Public srcGray As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Connect components throughout the image"
         ocvb.label1 = "Color Components with Mean Depth"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        if standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim binary = srcGray.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
         ocvb.result1.SetTo(0)
@@ -181,8 +178,7 @@ End Class
 
 Public Class CComp_InRange_MT
     Inherits ocvbClass
-    Public externalUse As Boolean
-    Public srcGray As New cv.Mat
+        Public srcGray As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "InRange # of ranges", 2, 255, 15)
@@ -195,7 +191,7 @@ Public Class CComp_InRange_MT
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1.SetTo(0)
         ocvb.result2.SetTo(0)
-        If externalUse = False Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        if standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Int32 = sliders.TrackBar1.Value
         Dim maxDepth = sliders.TrackBar2.Value
@@ -237,8 +233,7 @@ End Class
 
 Public Class CComp_InRange
     Inherits ocvbClass
-    Public externalUse As Boolean
-    Public srcGray As New cv.Mat
+        Public srcGray As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "InRange # of ranges", 1, 20, 15)
@@ -250,7 +245,7 @@ Public Class CComp_InRange
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1.SetTo(0)
         ocvb.result2.SetTo(0)
-        If externalUse = False Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        if standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Int32 = sliders.TrackBar1.Value
         Dim minBlobSize = sliders.TrackBar2.Value

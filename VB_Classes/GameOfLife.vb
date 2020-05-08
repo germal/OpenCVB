@@ -33,7 +33,7 @@ Public Class GameOfLife_Basics
         nextgrid = grid.Clone()
 
         random = New Random_Points(ocvb, caller)
-        random.externalUse = True
+        random.standalone = True
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
         random.sliders.TrackBar1.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         ocvb.desc = "Use OpenCV to implement the Game of Life"
@@ -108,7 +108,7 @@ Public Class GameOfLife_Population
         game = New GameOfLife_Basics(ocvb, caller)
 
         plot = New Plot_OverTime(ocvb, caller)
-        plot.externalUse = True
+        plot.standalone = True
         plot.dst = ocvb.result2
         plot.maxScale = 2000
         plot.plotCount = 1

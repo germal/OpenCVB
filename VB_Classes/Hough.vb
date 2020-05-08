@@ -75,12 +75,11 @@ Public Class Hough_Lines
     Inherits ocvbClass
     Dim edges As Edges_Canny
         Public segments() As cv.LineSegmentPolar
-    Public externalUse As Boolean
-    Public src As New cv.Mat
+        Public src As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         edges = New Edges_Canny(ocvb, caller)
-        edges.externalUse = True
+        edges.standalone = True
 
         sliders.setupTrackBar1(ocvb, caller, "rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, caller, "theta", 1, 1000, 1000 * Math.PI / 180)
@@ -90,11 +89,11 @@ Public Class Hough_Lines
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then src = ocvb.color
+        if standalone Then src = ocvb.color
         edges.src = src.Clone()
         edges.Run(ocvb)
 
-        If externalUse = False Then src = ocvb.result1.Clone()
+        if standalone Then src = ocvb.result1.Clone()
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rhoIn = sliders.TrackBar1.Value
@@ -104,7 +103,7 @@ Public Class Hough_Lines
         segments = cv.Cv2.HoughLines(src, rhoIn, thetaIn, threshold)
         ocvb.label1 = "Found " + CStr(segments.Length) + " Lines"
 
-        If externalUse = False Then
+        if standalone Then
             ocvb.color.CopyTo(ocvb.result1)
             ocvb.color.CopyTo(ocvb.result2)
             houghShowLines(ocvb.result1, segments, sliders.TrackBar4.Value)
@@ -136,12 +135,12 @@ Public Class Hough_Lines_MT
         sliders.setupTrackBar3(ocvb, caller,"threshold", 1, 100, 3)
 
         edges = New Edges_Canny(ocvb, caller)
-        edges.externalUse = True
+        edges.standalone = True
 
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
-        grid.externalUse = True ' we don't need any results.
+        grid.standalone = True ' we don't need any results.
         ocvb.desc = "Multithread Houghlines to find lines in image fragments."
         ocvb.label1 = "Hough_Lines_MT"
         ocvb.label2 = "Hough_Lines_MT"

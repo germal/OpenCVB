@@ -2,8 +2,7 @@
 Imports cv = OpenCvSharp
 Public Class FishEye_Rectified
     Inherits ocvbClass
-    Public externalUse As Boolean
-    Public leftView As cv.Mat
+        Public leftView As cv.Mat
     Public rightView As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -38,7 +37,7 @@ Public Class FishEye_Rectified
             leftView = ocvb.leftView
             rightView = ocvb.rightView
         End If
-        If externalUse = False Then
+        if standalone Then
             ocvb.result1 = leftView
             ocvb.result2 = rightView
         End If

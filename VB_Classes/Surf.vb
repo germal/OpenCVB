@@ -10,11 +10,10 @@ Public Class Surf_Basics_CS
     Public srcLeft As New cv.Mat
     Public srcRight As New cv.Mat
     Public dst As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         fisheye = New FishEye_Rectified(ocvb, caller)
-        fisheye.externalUse = True
+        fisheye.standalone = True
 
         radio.Setup(ocvb, caller,2)
         radio.check(0).Text = "Use BF Matcher"
@@ -27,7 +26,7 @@ Public Class Surf_Basics_CS
         ocvb.label1 = "BF Matcher output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
+        if standalone Then
             If ocvb.parms.cameraIndex = T265Camera Then
                 fisheye.Run(ocvb)
                 srcLeft = fisheye.leftView
@@ -40,7 +39,7 @@ Public Class Surf_Basics_CS
         CS_SurfBasics.Run(srcLeft, srcRight, dst, sliders.TrackBar1.Value, radio.check(0).Checked)
 
         'If dst.Width <> ocvb.color.Width * 2 Then dst = dst.Resize(New cv.Size(ocvb.color.Width * 2, srcLeft.Height))
-        If externalUse = False Then
+        if standalone Then
             dst(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(ocvb.result1)
             dst(New cv.Rect(ocvb.color.Width, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(ocvb.result2)
             ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
@@ -65,10 +64,10 @@ Public Class Surf_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         fisheye = New FishEye_Rectified(ocvb, caller)
-        fisheye.externalUse = True
+        fisheye.standalone = True
 
         surf = New Surf_Basics_CS(ocvb, caller)
-        surf.externalUse = True
+        surf.standalone = True
 
         ocvb.desc = "Use left and right views to match points in horizontal slices."
     End Sub

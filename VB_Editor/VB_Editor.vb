@@ -10,6 +10,14 @@ Module VB_EditorMain
         End If
         Return line
     End Function
+    Private Function deleteLine(line As String) As Boolean
+        If line.Contains(".standalone = True") Then
+            Console.WriteLine("Deleting line: " + line)
+            changeLines += 1
+            Return True
+        End If
+        Return False
+    End Function
     Sub Main()
         ' Regular expression are great but can be too complicated.  This app is just a simpler way to make global changes that 
         ' would normally be accomplished with regular expressions.
@@ -38,13 +46,13 @@ Module VB_EditorMain
                 Dim code As String = sr.ReadToEnd
                 sr.Close()
                 Dim lines = code.Split(vbCrLf)
-                For i = 0 To lines.Count - 1
-                    lines(i) = makeChange(Trim(lines(i)))
-                Next
+                'For i = 0 To lines.Count - 1
+                '    lines(i) = makeChange(Trim(lines(i)))
+                'Next
 
                 Dim sw = New StreamWriter(filename)
                 For i = 0 To lines.Count - 1
-                    sw.Write(lines(i))
+                    If deleteLine(lines(i)) = False Then sw.Write(lines(i))
                 Next
                 sw.Close()
             Next

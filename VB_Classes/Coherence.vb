@@ -3,8 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Coherence_Basics
     Inherits ocvbClass
     Public src As New cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Find lines that are artistically coherent in the image - Painterly Effect."
         sliders.setupTrackBar1(ocvb, caller, "Coherence Sigma", 1, 15, 9)
@@ -25,7 +24,7 @@ Public Class Coherence_Basics
         Dim yoffset = ocvb.color.Height / 2 - side / 2
         Dim srcRect = New cv.Rect(xoffset, yoffset, side, side)
         If ocvb.drawRect.Width <> 0 Then srcRect = ocvb.drawRect
-        If externalUse = False Then src = ocvb.color
+        if standalone Then src = ocvb.color
 
         ocvb.result1 = src.Clone()
         src = src(srcRect)
@@ -80,7 +79,7 @@ Public Class Coherence_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         coherent = New Coherence_Basics(ocvb, caller)
-        coherent.externalUse = True
+        coherent.standalone = True
         ocvb.desc = "Find coherent lines in the depth image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

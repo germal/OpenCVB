@@ -5,8 +5,7 @@ Public Class Kalman_Basics
     Dim kalman() As Kalman_Single
     Public src() As Single
     Public dst() As Single
-    Public externalUse As Boolean
-    Public ProcessNoiseCov As Single = 0.00001
+        Public ProcessNoiseCov As Single = 0.00001
     Public MeasurementNoiseCov As Single = 0.1
     Public ErrorCovPost As Single = 1
 
@@ -41,7 +40,7 @@ Public Class Kalman_Basics
             ReDim kalman(src.Length - 1)
             For i = 0 To src.Length - 1
                 kalman(i) = New Kalman_Single(ocvb, caller)
-                kalman(i).externalUse = True
+                kalman(i).standalone = True
                 kalman(i).ProcessNoiseCov = ProcessNoiseCov
                 kalman(i).MeasurementNoiseCov = MeasurementNoiseCov
                 kalman(i).ErrorCovPost = ErrorCovPost
@@ -62,7 +61,7 @@ Public Class Kalman_Basics
             dst = src ' do nothing to the input.
         End If
 
-        If externalUse = False Then
+        if standalone Then
             ocvb.result1 = ocvb.color.Clone()
             Static rect As New cv.Rect(CInt(dst(0)), CInt(dst(1)), CInt(dst(2)), CInt(dst(3)))
             If rect.X = CInt(dst(0)) And rect.Y = CInt(dst(1)) And rect.Width = CInt(dst(2)) And rect.Height = CInt(dst(3)) Then
@@ -98,13 +97,13 @@ Public Class Kalman_Compare
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plot = New Plot_OverTime(ocvb, caller)
-        plot.externalUse = True
+        plot.standalone = True
         plot.dst = ocvb.result1
         plot.plotCount = 3
         plot.topBottomPad = 20
 
         kPlot = New Plot_OverTime(ocvb, caller)
-        kPlot.externalUse = True
+        kPlot.standalone = True
         kPlot.dst = ocvb.result2
         kPlot.plotCount = 3
         kPlot.topBottomPad = 20
@@ -125,7 +124,7 @@ Public Class Kalman_Compare
             ReDim kalman(3 - 1)
             For i = 0 To kalman.Count - 1
                 kalman(i) = New Kalman_Single(ocvb, caller)
-                kalman(i).externalUse = True
+                kalman(i).standalone = True
             Next
         End If
 
@@ -233,7 +232,7 @@ Public Class Kalman_MousePredict
         kalman = New Kalman_Basics(ocvb, caller)
         ReDim kalman.src(1)
         ReDim kalman.dst(1)
-        kalman.externalUse = True
+        kalman.standalone = True
 
         If ocvb.parms.lowResolution = False Then locMultiplier = 2 ' twice the size in both dimensions.
         ocvb.label1 = "Red is real mouse, white is prediction"
@@ -268,8 +267,7 @@ Public Class Kalman_CVMat
     Dim kalman() As Kalman_Single
     Public src As cv.Mat
     Public dst As cv.Mat
-    Public externalUse As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.label1 = "Rectangle moves smoothly to random locations"
         ocvb.desc = "Use Kalman to stabilize a set of values (such as a cv.rect.)"
@@ -296,7 +294,7 @@ Public Class Kalman_CVMat
             ReDim kalman(src.Rows - 1)
             For i = 0 To src.Rows - 1
                 kalman(i) = New Kalman_Single(ocvb, caller)
-                kalman(i).externalUse = True
+                kalman(i).standalone = True
             Next
             dst = New cv.Mat(src.Rows, 1, cv.MatType.CV_32F, 0)
         End If
@@ -310,7 +308,7 @@ Public Class Kalman_CVMat
             dst.Set(Of Single)(i, 0, kalman(i).stateResult)
         Next
 
-        If externalUse = False Then
+        if standalone Then
             Dim rx(src.Rows - 1) As Single
             Dim testrect As New cv.Rect
             For i = 0 To src.Rows - 1
@@ -348,10 +346,10 @@ Public Class Kalman_ImageSmall
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Kalman_CVMat(ocvb, caller)
-        kalman.externalUse = True
+        kalman.standalone = True
 
         resize = New Resize_Percentage(ocvb, caller)
-        resize.externalUse = True
+        resize.standalone = True
 
         ocvb.label1 = "The small image is processed by the Kalman filter"
         ocvb.label2 = "Mask of the smoothed image minus original"
@@ -392,10 +390,10 @@ Public Class Kalman_DepthSmall
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Kalman_CVMat(ocvb, caller)
-        kalman.externalUse = True
+        kalman.standalone = True
 
         resize = New Resize_Percentage(ocvb, caller)
-        resize.externalUse = True
+        resize.standalone = True
         resize.sliders.TrackBar1.Value = 4
 
         ocvb.label2 = "Brighter: depth is decreasing (object getting closer)"
@@ -439,8 +437,7 @@ Public Class Kalman_Single
     Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, 0)
     Public inputReal As Single
     Public stateResult As Single
-    Public externalUse As Boolean
-    Public ProcessNoiseCov As Single = 0.00001
+        Public ProcessNoiseCov As Single = 0.00001
     Public MeasurementNoiseCov As Single = 0.1
     Public ErrorCovPost As Single = 1
     Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
@@ -457,10 +454,10 @@ Public Class Kalman_Single
         ocvb.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If externalUse = False Then
+        if standalone Then
             If ocvb.frameCount = 0 Then
                 plot = New Plot_OverTime(ocvb, caller)
-                plot.externalUse = True
+                plot.standalone = True
                 plot.dst = ocvb.result2
                 plot.maxScale = 150
                 plot.minScale = 80
@@ -474,7 +471,7 @@ Public Class Kalman_Single
         Dim prediction = kf.Predict()
         measurement.Set(Of Single)(0, 0, inputReal)
         stateResult = kf.Correct(measurement).Get(of Single)(0, 0)
-        If externalUse = False Then
+        if standalone Then
             plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
             plot.Run(ocvb)
             ocvb.label1 = "Mean of the grayscale image is predicted"
