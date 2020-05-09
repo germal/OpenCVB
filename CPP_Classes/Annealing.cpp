@@ -93,9 +93,8 @@ extern "C" __declspec(dllexport)
 char *Annealing_Basics_Run(CitySolver *ts, int *cityOrder, int count)
 {
 	ts->cityOrder.assign(cityOrder, cityOrder + count);
-	int changesApplied = ml::simulatedAnnealingSolver(*ts, ts->currentTemperature, ts->currentTemperature*0.97, 0.99, cityMultiplier * count, &ts->currentTemperature, ts->rng);
+	int changesApplied = ml::simulatedAnnealingSolver(*ts, ts->currentTemperature, ts->currentTemperature * 0.97, 0.99, cityMultiplier * count, &ts->currentTemperature, ts->rng);
 	copy(ts->cityOrder.begin(), ts->cityOrder.end(), cityOrder);
-
 	string msg = " changesApplied=" + to_string(changesApplied) + " temp=" + to_string(ts->currentTemperature) + " result = " + to_string(ts->energy());
 	strcpy_s(ts->outMsg, msg.c_str());
 	return ts->outMsg;

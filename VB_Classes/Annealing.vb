@@ -30,9 +30,7 @@ Public Class Annealing_Basics_CPP
     Public closed As Boolean
     Public circularPattern As Boolean = True
     Dim saPtr As IntPtr
-    Dim random As Random_Points
-    Dim flow As Font_FlowText
-    Private Sub drawResult(ocvb As AlgorithmData)
+    Public Sub drawMap(ocvb As AlgorithmData)
         For i = 0 To cityOrder.Length - 1
             dst.Circle(cityPositions(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             dst.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
@@ -69,10 +67,6 @@ Public Class Annealing_Basics_CPP
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-
-        flow = New Font_FlowText(ocvb, caller)
-        flow.result1or2 = RESULT2
-
         setup(ocvb)
         ocvb.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
@@ -82,7 +76,7 @@ Public Class Annealing_Basics_CPP
         End If
         Dim saveCityOrder = cityOrder.Clone()
         Dim hCityOrder = GCHandle.Alloc(cityOrder, GCHandleType.Pinned)
-        Dim out = Annealing_Basics_Run(saPtr, hCityOrder.AddrOfPinnedObject, cityPositions.Length)
+        Dim out As IntPtr = Annealing_Basics_Run(saPtr, hCityOrder.AddrOfPinnedObject, cityPositions.Length)
         hCityOrder.Free()
         msg = Marshal.PtrToStringAnsi(out)
         Dim split As String() = Regex.Split(msg, "\W+")
@@ -97,24 +91,32 @@ Public Class Annealing_Basics_CPP
         Next
 
         dst.SetTo(0)
-        drawResult(ocvb)
+        drawMap(ocvb)
+
+        Static lastEnergy = 0.0
+        Static countDown As Integer = 100
+        ocvb.label1 = Me.GetType.Name
+        If CInt(lastEnergy) = CInt(energy) Then
+            ocvb.label1 += "  countdown = " + CStr(countDown)
+            countDown -= 1
+            If countDown = 0 Then restartComputation = True
+        End If
+        lastEnergy = energy
 
         If restartComputation Or InStr(msg, "temp=0.000") Or InStr(msg, "changesApplied=0 temp") Then
             Annealing_Basics_Close(saPtr)
             restartComputation = False
+            countDown = 100
             If standalone Then
                 setup(ocvb)
                 Open()
             End If
             closed = True
         End If
-        flow.msgs.Add(msg)
-        flow.Run(ocvb)
         MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         Annealing_Basics_Close(saPtr)
-        flow.Dispose()
     End Sub
 End Class
 
@@ -257,8 +259,9 @@ End Class
 
 Public Class Annealing_Options
     Inherits ocvbClass
-    Public anneal As Annealing_Basics_CPP
     Dim random As Random_Points
+    Public anneal As Annealing_Basics_CPP
+    Dim flow As Font_FlowText
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         random = New Random_Points(ocvb, caller)
@@ -270,13 +273,19 @@ Public Class Annealing_Options
         check.Box(1).Text = "Circular pattern of cities (allows you to visually check if successful.)"
         check.Box(1).Checked = True
 
+        flow = New Font_FlowText(ocvb, caller)
+        flow.result1or2 = RESULT2
+
         ocvb.label1 = "Log of Annealing progress"
+
 
         anneal = New Annealing_Basics_CPP(ocvb, caller)
         anneal.numberOfCities = random.sliders.TrackBar1.Value
         anneal.circularPattern = check.Box(1).Checked
         If check.Box(1).Checked = False Then anneal.cityPositions = random.Points2f.Clone()
-        anneal.restartComputation = True
+        anneal.setup(ocvb)
+        anneal.Open()
+        ocvb.label2 = "Log of energy and temperature.."
         ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -292,22 +301,27 @@ Public Class Annealing_Options
         End If
 
         anneal.Run(ocvb)
-        ocvb.result2 = anneal.dst
+        dst = anneal.dst
 
         If anneal.restartComputation Then
             anneal.restartComputation = False
             random.Run(ocvb) ' get the city positions (may or may not be used below.)
             If check.Box(1).Checked = False Then anneal.cityPositions = random.Points2f.Clone()
+            anneal.setup(ocvb)
+            anneal.Open()
             Static startTime As DateTime
             Dim timeSpent = Now.Subtract(startTime)
             If timeSpent.TotalSeconds < 10000 Then Console.WriteLine("time spent on last problem = " + Format(timeSpent.TotalSeconds, "#0.0") + " seconds.")
             startTime = Now
         End If
+
+        flow.msgs.Add(anneal.msg)
+        flow.Run(ocvb)
         MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
+        flow.Dispose()
         anneal.Dispose()
         random.Dispose()
     End Sub
 End Class
-
