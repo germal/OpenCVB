@@ -101,6 +101,7 @@ Public Class Plot_OverTime
         dst.Col(columnIndex).SetTo(0)
         if standalone Then ocvb.label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
         AddPlotScale(dst, minScale - topBottomPad, maxScale + topBottomPad, sliders.TrackBar3.Value / 10)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -150,6 +151,7 @@ Public Class Plot_Histogram
             Next
             AddPlotScale(dst, 0, maxVal, sliders.TrackBar1.Value / 10)
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -221,6 +223,7 @@ Public Class Plot_Basics_CPP
         handleX.Free()
         handleY.Free()
         ocvb.label1 = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + vbTab + " y-axis: " + CStr(minY) + " to " + CStr(maxY)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -260,6 +263,7 @@ Public Class Plot_Basics
             plot.Run(ocvb)
             ocvb.label1 = "histogram with " + ocvb.label1
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         plot.Dispose()
@@ -299,6 +303,7 @@ Public Class Plot_Depth
         Next
         plot.Run(ocvb)
         ocvb.label1 = "histogram with " + ocvb.label1
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         plot.Dispose()

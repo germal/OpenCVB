@@ -56,6 +56,7 @@ Public Class Pixel_GetSet
         ocvb.putText(New ActiveClass.TrueType(output, 10, 60, RESULT1))
 
         mat4.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         mat4.Dispose()

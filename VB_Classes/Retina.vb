@@ -72,6 +72,7 @@ Public Class Retina_Basics_CPP
             Dim magno = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8U, magnoData)
             ocvb.result2 = magno.Resize(src.Size())
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         Retina_Basics_Close(Retina)
@@ -101,6 +102,7 @@ Public Class Retina_Depth
         If lastMotion.Width = 0 Then lastMotion = ocvb.result2
         cv.Cv2.BitwiseOr(lastMotion, ocvb.result2, ocvb.result1)
         lastMotion = ocvb.result2
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         retina.Dispose()

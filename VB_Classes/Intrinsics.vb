@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class intrinsicsLeft_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -39,5 +39,7 @@ Public Class intrinsicsLeft_Basics
 
         Dim ptLoc = New cv.Point(ocvb.color.Width / 2 + 4, ocvb.color.Height / 2 + 4)
         ocvb.result2.Line(ptLoc, New cv.Point(ttLocation.X / ocvb.parms.imageToTrueTypeLoc, ttLocation.Y / ocvb.parms.imageToTrueTypeLoc), cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+

@@ -101,6 +101,7 @@ Public Class Delaunay_Basics
         Next
 
         paint_voronoi(ocvb, ocvb.result1, subdiv)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -127,6 +128,7 @@ Public Class Delaunay_GoodFeatures
         Next
 
         paint_voronoi(ocvb, ocvb.result2, subdiv)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         features.Dispose()
@@ -181,5 +183,6 @@ Public Class Delauney_Subdiv2D
             Dim p2 = New cv.Point(edge.Item2, edge.Item3)
             ocvb.result1.Line(p1, p2, cv.Scalar.Green, 1)
         Next
+		MyBase.Finish(ocvb)
     End Sub
 End Class

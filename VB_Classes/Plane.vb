@@ -161,6 +161,7 @@ Public Class Plane_Detect
         End Sub)
         Dim mask = grid.gridMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.BitwiseOr(ocvb.result1, mask, ocvb.result1)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         grid.Dispose()
@@ -237,11 +238,13 @@ Public Class Plane_DetectDebug
         End Sub)
         Dim mask = grid.gridMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.BitwiseOr(ocvb.result1, mask, ocvb.result1)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         grid.Dispose()
     End Sub
 End Class
+
 
 
 

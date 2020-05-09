@@ -1,4 +1,4 @@
-﻿Imports System.Drawing
+Imports System.Drawing
 Imports cv = OpenCvSharp
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Extensions.BitmapConverter.ToBitmap(OpenCvSharp.Mat)/
 Public Class Bitmap_ToMat
@@ -15,5 +15,6 @@ Public Class Bitmap_ToMat
 
         bitmap = cv.Extensions.BitmapConverter.ToBitmap(ocvb.color)
         ocvb.result2 = cv.Extensions.BitmapConverter.ToMat(bitmap)
+		MyBase.Finish(ocvb)
     End Sub
 End Class

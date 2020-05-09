@@ -27,6 +27,7 @@ Public Class TextureFlow_Basics
                 ocvb.result1.Line(p1, p2, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
             Next
         Next
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
             End Sub
@@ -46,6 +47,7 @@ Public Class TextureFlow_Depth
     Public Sub Run(ocvb As AlgorithmData)
         texture.src = ocvb.RGBDepth
         texture.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         texture.Dispose()

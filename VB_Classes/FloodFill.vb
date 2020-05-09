@@ -72,6 +72,7 @@ Public Class FloodFill_Basics
             dst.SetTo(nextColor, masks(maskIndex))
         Next
         ocvb.label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -114,6 +115,7 @@ Public Class FloodFill_Top16_MT
                 Next
             Next
         End Sub)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         grid.Dispose()
@@ -158,6 +160,7 @@ Public Class FloodFill_Color_MT
                 Next
             Next
         End Sub)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         grid.Dispose()
@@ -187,6 +190,7 @@ Public Class FloodFill_DCT
         flood.src.SetTo(0, mask)
         flood.Run(ocvb)
         ocvb.result2.SetTo(0, mask)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         dct.Dispose()
@@ -216,6 +220,7 @@ Public Class FloodFill_WithDepth
         range.fBasics.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         range.fBasics.initialMask = shadow.holeMask
         range.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         range.Dispose()
@@ -251,6 +256,7 @@ Public Class FloodFill_CComp
         range.fBasics.srcGray = ccomp.dstGray
         range.fBasics.initialMask = shadow.holeMask
         range.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         ccomp.Dispose()
@@ -284,6 +290,7 @@ Public Class FloodFill_RelativeRange
         fBasics.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         fBasics.Run(ocvb)
         ocvb.result2 = fBasics.dst.Clone()
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         fBasics.Dispose()
@@ -338,6 +345,7 @@ Public Class FloodFill_Top16
         Next
         If check.Box(0).Checked Then ocvb.result2 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -394,5 +402,6 @@ Public Class FloodFill_Projection
             ocvb.result2 = dst
             ocvb.label2 = CStr(objectRects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class

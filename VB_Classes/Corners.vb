@@ -52,6 +52,7 @@ Public Class Corners_Harris
         Dim McNormal As New cv.Mat
         cv.Cv2.Normalize(mc, McNormal, 127, 255, cv.NormTypes.MinMax)
         McNormal.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -84,6 +85,7 @@ Public Class Corners_SubPix
             p.Y = CInt(good.goodFeatures(i).Y)
             cv.Cv2.Circle(ocvb.result2, p, 3, New cv.Scalar(0, 0, 255), -1, cv.LineTypes.AntiAlias)
         Next
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         good.Dispose()
@@ -117,6 +119,7 @@ Public Class Corners_PreCornerDetect
         ocvb.result1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result2 = gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "median = " + CStr(median.medianVal)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         median.Dispose()
@@ -185,5 +188,6 @@ Public Class Corners_ShiTomasi_CPP
         Dim stNormal As New cv.Mat
         cv.Cv2.Normalize(dst, stNormal, 127, 255, cv.NormTypes.MinMax)
         stNormal.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
+		MyBase.Finish(ocvb)
     End Sub
 End Class

@@ -101,6 +101,7 @@ Public Class VTK_Basics
             If rgbInput.Rows > 0 Then pipe.Write(rgbBuffer, 0, rgbInput.Total * rgbInput.ElemSize)
             If dataInput.Rows > 0 Then pipe.Write(dataBuffer, 0, dataInput.Total * dataInput.ElemSize)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         If pipe IsNot Nothing Then
@@ -178,6 +179,7 @@ Public Class VTK_Histogram3D
         vtk.rgbInput = ocvb.result2.Clone()
         vtk.dataInput = New cv.Mat ' ocvb.depth
         vtk.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         vtk.Dispose()
@@ -185,6 +187,7 @@ Public Class VTK_Histogram3D
         random.Dispose()
             End Sub
 End Class
+
 
 
 

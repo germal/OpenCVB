@@ -35,6 +35,7 @@ Public Class Sift_Basics_CS
         dst(New cv.Rect(ocvb.result1.Width, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result2)
 
         ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
                         fisheye.Dispose()
@@ -95,9 +96,11 @@ Public Class Sift_Basics_CS_MT
         dst(New cv.Rect(ocvb.result1.Width, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result2)
 
         ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         grid.Dispose()
                         fisheye.Dispose()
     End Sub
 End Class
+

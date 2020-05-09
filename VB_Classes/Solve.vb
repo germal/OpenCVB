@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp/wiki/Solve-Equation
 Public Class Solve_ByMat
     Inherits ocvbClass
@@ -18,6 +18,7 @@ Public Class Solve_ByMat
         cv.Cv2.Solve(a, y, x, cv.DecompTypes.LU)
 
         ocvb.putText(New ActiveClass.TrueType("Solution ByMat: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125))
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -41,5 +42,6 @@ Public Class Solve_ByArray
         cv.Cv2.Solve(cv.InputArray.Create(av), cv.InputArray.Create(yv), x, cv.DecompTypes.LU)
 
         ocvb.putText(New ActiveClass.TrueType("Solution ByArray: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125))
+		MyBase.Finish(ocvb)
     End Sub
 End Class

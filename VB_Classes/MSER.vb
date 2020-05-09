@@ -76,6 +76,7 @@ Public Class MSER_Basics
             Next
             ocvb.label1 = CStr(region.Length) + " Regions " + Format(pixels / region.Length, "#0.0") + " pixels/region (avg)"
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -119,6 +120,7 @@ Public Class MSER_Synthetic
 
         img = img.Resize(New cv.Size(ocvb.color.Height, ocvb.color.Height))
         ocvb.result1(New cv.Rect(0, 0, ocvb.color.Height, ocvb.color.Height)) = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -167,6 +169,7 @@ Public Class MSER_TestSynthetic
 
         'testSynthetic(ocvb, ocvb.result1, False, 10)
         testSynthetic(ocvb, ocvb.result2, True, 100)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         mser.Dispose()
@@ -210,6 +213,7 @@ Public Class MSER_CPPStyle
             mat.Rectangle(box, color, -1, cv.LineTypes.AntiAlias)
         Next
         ocvb.result2 = mat.Resize(ocvb.result2.Size())
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -248,6 +252,7 @@ Public Class MSER_Contours
         Next
 
         ocvb.label1 = CStr(mser.region.Length) + " Regions " + Format(pixels / mser.region.Length, "#0.0") + " pixels/region (avg)"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         mser.Dispose()

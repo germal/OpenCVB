@@ -29,6 +29,7 @@ Public Class Random_Points
             Points2f(i) = New cv.Point2f(x, y)
             if standalone Then cv.Cv2.Circle(ocvb.result1, Points(i), 3, cv.Scalar.Gray, -1, cv.LineTypes.AntiAlias, 0)
         Next
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -46,6 +47,7 @@ Public Class Random_Shuffle
         Dim myRNG As New cv.RNG
         cv.Cv2.RandShuffle(ocvb.result1, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
         ocvb.label1 = "Random_shuffle - wave at camera"
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -84,6 +86,7 @@ Public Class Random_LUTMask
         End If
         ocvb.result2 = ocvb.color.LUT(lutMat)
         ocvb.label1 = "Using kmeans colors with interpolation"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         km.Dispose()
@@ -106,6 +109,7 @@ Public Class Random_UniformDist
         if standalone Then
             ocvb.result1 = uDist.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -125,6 +129,7 @@ Public Class Random_NormalDist
     Public Sub Run(ocvb As AlgorithmData)
         cv.Cv2.Randn(ocvb.result1, New cv.Scalar(sliders.TrackBar1.Value, sliders.TrackBar2.Value, sliders.TrackBar3.Value), cv.Scalar.All(sliders.TrackBar4.Value))
         If standalone Then nDistImage = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -149,6 +154,7 @@ Public Class Random_CheckUniformDist
         ocvb.result1 = rUniform.uDist.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         rUniform.uDist.CopyTo(histogram.gray)
         histogram.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         rUniform.Dispose()
@@ -176,6 +182,7 @@ Public Class Random_CheckNormalDist
         ocvb.result1 = normalDist.nDistImage.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         normalDist.nDistImage.CopyTo(histogram.gray)
         histogram.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         normalDist.Dispose()
@@ -221,8 +228,10 @@ Public Class Random_PatternGenerator_CPP
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         Random_PatternGenerator_Close(Random_PatternGenerator)
     End Sub
 End Class
+

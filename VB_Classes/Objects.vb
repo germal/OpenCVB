@@ -21,6 +21,7 @@ Public Class Object_Basics
         ocvb.color.CopyTo(ccomp.srcGray, trim.Mask)
         ccomp.srcGray = ccomp.srcGray.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ccomp.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         trim.Dispose()

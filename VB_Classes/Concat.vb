@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Concat_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -13,6 +13,7 @@ Public Class Concat_Basics
         ocvb.result1 = tmp.Resize(ocvb.color.Size())
         cv.Cv2.VConcat(ocvb.color, ocvb.RGBDepth, tmp)
         ocvb.result2 = tmp.Resize(ocvb.color.Size())
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -41,5 +42,6 @@ Public Class Concat_4way
         cv.Cv2.HConcat(img(2), img(3), tmp2)
         cv.Cv2.VConcat(tmp1, tmp2, tmp3)
         ocvb.result1 = tmp3.Resize(ocvb.color.Size())
+		MyBase.Finish(ocvb)
     End Sub
 End Class

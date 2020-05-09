@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Features_GoodFeatures
@@ -26,5 +26,7 @@ Public Class Features_GoodFeatures
             goodFeatures.Add(features.ElementAt(i))
             if standalone Then cv.Cv2.Circle(ocvb.result1, features(i), 3, cv.Scalar.white, -1, cv.LineTypes.AntiAlias)
         Next
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+

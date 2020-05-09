@@ -41,6 +41,7 @@ Public Class knn_Basics
             cv.Cv2.Circle(ocvb.result1, queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
             cv.Cv2.Circle(ocvb.result2, queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
         Next
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         random.Dispose()
@@ -149,6 +150,7 @@ Public Class knn_Cluster2D
             cluster(ocvb.rColors, ocvb.result1)
             ocvb.label1 = "knn clusters total=" + CStr(totalClusters) + " closedRegions=" + CStr(closedRegions)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         knn.Dispose()
@@ -218,6 +220,7 @@ Public Class knn_Point2d
                 Next
             End If
         Next
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -297,6 +300,7 @@ Public Class knn_Point3d
                 Next
             End If
         Next
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -373,9 +377,11 @@ Public Class knn_ClusterNoisyLine
             ocvb.label2 = "knn clusters total=" + CStr(totalClusters)
             ocvb.label1 = "Input points = " + CStr(numberofCities)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         knn.Dispose()
         noisyLine.Dispose()
     End Sub
 End Class
+

@@ -48,6 +48,7 @@ Public Class Blob_Input
             ocvb.result2.CopyTo(ocvb.result1)
             ocvb.result2.SetTo(0)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         rectangles.Dispose()
@@ -104,6 +105,7 @@ Public Class Blob_Detector_CS
 
         ' The create method in SimpleBlobDetector is not available in VB.Net.  Not sure why.  To get around this, just use C# where create method works fine.
         blobDetector.Start(ocvb.result1, ocvb.result2, blobParams)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         input.Dispose()
@@ -144,6 +146,7 @@ Public Class Blob_RenderBlobs
                 ocvb.result1.Rectangle(blob.Rect, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
             Next
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         input.Dispose()
@@ -179,6 +182,7 @@ Public Class Blob_DepthClusters
         flood.fBasics.initialMask = shadow.holeMask
         flood.Run(ocvb)
         ocvb.label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         histBlobs.Dispose()
@@ -237,6 +241,7 @@ Public Class Blob_Rectangles
             rect = New cv.Rect(kalman(i).output(0), kalman(i).output(1), kalman(i).output(2), kalman(i).output(3))
             ocvb.result1.Rectangle(rect, ocvb.colorScalar(i Mod 255), 2)
         Next
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         blobs.Dispose()
@@ -282,6 +287,7 @@ Public Class Blob_Largest
             ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
         End If
         ocvb.label1 = "Show the largest blob of the " + CStr(rects.Count) + " blobs"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         blobs.Dispose()
@@ -314,6 +320,7 @@ Public Class Blob_LargestDepthCluster
         cv.Cv2.ConvertScaleAbs(tmp, mask)
         ocvb.color.CopyTo(ocvb.result1, mask)
         ocvb.label1 = "Largest Depth Blob: " + Format(maxSize, "#,000") + " pixels (" + Format(maxSize / ocvb.color.Total, "#0.0%") + ")"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         blobs.Dispose()

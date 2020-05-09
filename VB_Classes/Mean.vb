@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Mean_Basics
     Inherits ocvbClass
     Dim images As New List(Of cv.Mat)
@@ -26,6 +26,7 @@ Public Class Mean_Basics
         If images.Count > saveImageCount Then images.RemoveAt(0)
         If nextImage.Type <> src.Type Then nextImage.ConvertTo(dst, src.Type) Else dst = nextImage
         If standalone Then ocvb.result1 = dst
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
     End Sub

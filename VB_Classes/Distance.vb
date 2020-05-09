@@ -38,8 +38,10 @@ Public Class Distance_Basics
         Dim dist32f = dist.Normalize(0, 255, cv.NormTypes.MinMax)
         dist32f.ConvertTo(gray, cv.MatType.CV_8UC1)
         ocvb.result2 = gray.CvtColor(cv.ColorConversionCodes.gray2bgr)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
                 foreground.Dispose()
             End Sub
 End Class
+

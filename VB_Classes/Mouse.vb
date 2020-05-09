@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Mouse_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -18,6 +18,7 @@ Public Class Mouse_Basics
         colorIndex += 1
         If colorIndex >= ocvb.colorScalar.Count Then colorIndex = 0
         ocvb.putText(New ActiveClass.TrueType("Move the mouse through this image to show mouse tracking.", 10, 50))
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -39,6 +40,7 @@ Public Class Mouse_LeftClick
         If ocvb.drawRect <> zeroRect Then
             ocvb.result2 = ocvb.color(ocvb.drawRect).Resize(ocvb.result2.Size())
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -59,5 +61,7 @@ Public Class Mouse_RightClick
         If ocvb.drawRect <> zeroRect Then
             ocvb.result2 = ocvb.color(ocvb.drawRect).Resize(ocvb.result2.Size())
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+

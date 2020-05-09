@@ -126,6 +126,7 @@ Public Class Replay_Record
                 recordingActive = False
             End If
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         If recordingActive Then binWrite.Close()
@@ -215,6 +216,7 @@ Public Class Replay_Play
                 playbackActive = False
             End If
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         If playbackActive Then binRead.Close()
@@ -240,6 +242,7 @@ Public Class Replay_OpenGL
         ' the T265 has no pointcloud
         replay.Run(ocvb)
         ogl.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         ogl.Dispose()

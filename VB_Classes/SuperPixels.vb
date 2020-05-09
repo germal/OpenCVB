@@ -78,6 +78,7 @@ Public Class SuperPixel_Basics_CPP
         Dim labels = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32S, labelData)
         If numSuperPixels < 255 Then labels *= 255 / numSuperPixels
         labels.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         SuperPixel_Close(spPtr)
@@ -103,6 +104,7 @@ Public Class SuperPixel_Depth
         pixels.Run(ocvb)
         ocvb.result1 = pixels.dst1
         ocvb.result2 = pixels.dst2
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         pixels.Dispose()
@@ -136,6 +138,7 @@ Public Class SuperPixel_WithCanny
         ocvb.result2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result2.SetTo(cv.Scalar.Red, edges.dst)
         ocvb.label2 = "Edges provided by Canny in red"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         pixels.Dispose()
@@ -170,8 +173,10 @@ Public Class SuperPixel_WithLineDetector
         ' ocvb.result2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ' ocvb.result2.SetTo(cv.Scalar.Red, lines.dst)
         ' ocvb.label2 = "Edges provided by Canny in red"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         pixels.Dispose()
     End Sub
 End Class
+

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp_2410/blob/master/sample/CStyleSamplesCS/Samples/MDS.cs
 Public Class MultiDimensionScaling_Cities
     Inherits ocvbClass
@@ -85,5 +85,6 @@ Public Class MultiDimensionScaling_Cities
                                          "Seattle", "Washington D.C.")
             ocvb.result1.PutText(cityName, textPos, cv.HersheyFonts.HersheySimplex, 0.5, cv.Scalar.White)
         Next
+		MyBase.Finish(ocvb)
     End Sub
 End Class

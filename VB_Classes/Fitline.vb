@@ -44,6 +44,7 @@ Public Class Fitline_Basics
                 dst.Line(p1, p2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
             End If
         Next
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         draw.Dispose()
@@ -105,6 +106,7 @@ Public Class Fitline_3DBasics_MT
             houghShowLines3D(ocvb.result1(hlines.grid.roiList(i)), lines.ElementAt(i))
         Next
         ocvb.result1.SetTo(cv.Scalar.White, hlines.grid.gridMask)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         hlines.Dispose()
@@ -183,6 +185,7 @@ Public Class Fitline_RawInput
                 ocvb.result1.Circle(pt, dotSize, highLight, -1, cv.LineTypes.AntiAlias)
             Next
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -282,11 +285,13 @@ Public Class Fitline_EigenFit
         p1 = New cv.Point(0, noisyLine.bb)
         p2 = New cv.Point(w, noisyLine.m * w + noisyLine.bb)
         ocvb.result2.Line(p1, p2, cv.Scalar.Blue, 3, cv.LineTypes.AntiAlias)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         noisyLine.Dispose()
     End Sub
 End Class
+
 
 
 

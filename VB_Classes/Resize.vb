@@ -27,6 +27,7 @@ Public Class Resize_Basics
         Else
             dst = src.Resize(newSize, 0, 0, resizeFlag)
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -65,6 +66,7 @@ Public Class Resize_After8uc3
         colorizer.src = depth32f
         colorizer.Run(ocvb)
         ocvb.result1 = colorizer.dst
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         colorizer.Dispose()
@@ -104,8 +106,10 @@ Public Class Resize_Percentage
         Else
             dst = resizeOptions.dst
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         resizeOptions.Dispose()
             End Sub
 End Class
+

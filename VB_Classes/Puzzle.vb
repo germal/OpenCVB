@@ -269,6 +269,7 @@ Public Class Puzzle_Basics
             Dim roi2 = scrambled(i)
             If roi.Width = width And roi.Height = height And roi2.Width = width And roi2.Height = height Then ocvb.result1(roi2) = ocvb.color(roi)
         Next
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         grid.Dispose()
@@ -398,9 +399,11 @@ Public Class Puzzle_Solver
         ocvb.label1 = "Input to puzzle solver"
         ocvb.label2 = "Puzzle_Solver output (ambiguities possible)"
         If radio.check(1).Checked Or radio.check(2).Checked Then Thread.Sleep(1000)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         puzzle.Dispose()
     End Sub
 End Class
+
 

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.3.1/d6/d73/Pyramids_8cpp-example.html
 Public Class Pyramid_Basics
     Inherits ocvbClass
@@ -23,5 +23,7 @@ Public Class Pyramid_Basics
         Else
             ocvb.color.CopyTo(ocvb.result1)
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+

@@ -54,6 +54,7 @@ Public Class Tracker_Basics
                 ocvb.result1.Rectangle(p1, p2, cv.Scalar.Blue, 2)
             End If
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         If tracker IsNot Nothing Then tracker.Dispose()
@@ -90,6 +91,7 @@ Public Class Tracker_MultiObject
                 ocvb.result1.Rectangle(p1, p2, cv.Scalar.Blue, 2)
             End If
         Next
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         For Each tr In trackers
@@ -140,8 +142,10 @@ Public Class Tracker_Methods
             tracker.Run(ocvb)
         End If
         saveMethod = tracker.trackerIndex
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
                 tracker.Dispose()
     End Sub
 End Class
+

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Bitwise_Not
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -11,5 +11,6 @@ Public Class Bitwise_Not
         cv.Cv2.BitwiseNot(ocvb.color, ocvb.result1)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.BitwiseNot(gray, ocvb.result2)
+		MyBase.Finish(ocvb)
     End Sub
 End Class

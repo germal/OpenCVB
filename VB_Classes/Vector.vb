@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/37492663/how-to-use-magnitude-and-absdiff-opencv-functions-to-compute-distances
 Public Class Vector_Magnitude
     Inherits ocvbClass
@@ -30,5 +30,7 @@ Public Class Vector_Magnitude
         cv.Cv2.Absdiff(points1, points2, other_manhattan_distance)
         other_manhattan_distance = other_manhattan_distance.Col(0) + other_manhattan_distance.Col(1)
         ocvb.putText(New ActiveClass.TrueType("other_manhattan_distance = " + CStr(other_manhattan_distance.Get(Of Single)(0, 0)), 10, 120))
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+

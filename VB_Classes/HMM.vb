@@ -1,4 +1,4 @@
-﻿
+
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
@@ -39,8 +39,10 @@ Public Class HMM_Example_CPP
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, IIf(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), dstData)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         HMM_Close(HMM)
     End Sub
 End Class
+

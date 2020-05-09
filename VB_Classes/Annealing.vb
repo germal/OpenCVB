@@ -240,6 +240,7 @@ Public Class Annealing_CPP_MT
         End If
 
         If allClosed Then setup(ocvb)
+        MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         random.Dispose()
@@ -302,9 +303,11 @@ Public Class Annealing_Options
             If timeSpent.TotalSeconds < 10000 Then Console.WriteLine("time spent on last problem = " + Format(timeSpent.TotalSeconds, "#0.0") + " seconds.")
             startTime = Now
         End If
+        MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         anneal.Dispose()
         random.Dispose()
     End Sub
 End Class
+

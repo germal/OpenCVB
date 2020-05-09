@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Collections.Concurrent
 
@@ -94,6 +94,7 @@ Public Class Thread_Grid
             ocvb.label1 = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
                           CStr(roiList(0).Width) + "X" + CStr(roiList(0).Height) + " regions"
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
                 gridMask.Dispose()

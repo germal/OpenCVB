@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Grayscale_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -23,5 +23,6 @@ Public Class Grayscale_Basics
                 Next
             Next
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class

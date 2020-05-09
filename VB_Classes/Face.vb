@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Module FaceDetection_Exports
     Public Sub detectFace(ByRef src As cv.Mat, cascade As cv.CascadeClassifier)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -27,6 +27,7 @@ Public Class Face_Haar_LBP
         detectFace(ocvb.result1, haarCascade)
         ocvb.result2 = ocvb.color.Clone()
         detectFace(ocvb.result2, lbpCascade)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -44,6 +45,8 @@ Public Class Face_Haar_Alt
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1 = ocvb.color.Clone()
         detectFace(ocvb.result1, haarCascade)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+
 

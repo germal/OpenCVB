@@ -72,6 +72,7 @@ Public Class DFT_Basics
 
             ocvb.result1 = inverseDFT(complexImage)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         mats.Dispose()
@@ -115,6 +116,7 @@ Public Class DFT_Inverse
             ocvb.label2 = "InverseDFT reproduced original"
             ocvb.result2.SetTo(0)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         mats.Dispose()
@@ -172,6 +174,7 @@ Public Class DFT_ButterworthFilter
            cv.Cv2.MulSpectrums(butterworthFilter(k), dft.complexImage, complex, cv.DftFlags.None)
            If k = 0 Then ocvb.result1 = inverseDFT(complex) Else ocvb.result2 = inverseDFT(complex)
        End Sub)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
                 dft.Dispose()
@@ -199,6 +202,7 @@ Public Class DFT_ButterworthDepth
     Public Sub Run(ocvb As AlgorithmData)
         bfilter.dft.gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bfilter.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         bfilter.Dispose()

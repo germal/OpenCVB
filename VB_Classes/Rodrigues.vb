@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module Rodrigues_Basics_Exports
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -27,6 +27,7 @@ Public Class Rodrigues_ValidateKinect
         For i = 0 To split.Length - 1
             ocvb.putText(New ActiveClass.TrueType(split(i), 10, 90 + i * 20, RESULT1))
         Next
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -72,6 +73,7 @@ Public Class Rodrigues_ValidateVector
         If ocvb.parms.cameraIndex = T265Camera Then
             ocvb.putText(New ActiveClass.TrueType("The T265 does not provide the Rotation Matrix but it is calculated from the Rotation Vector.", 10, 220, RESULT1))
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -102,6 +104,7 @@ Public Class Rodrigues_RotationMatrix
             output += vbTab + Format(dst.Get(Of Single)(i), "#0.000000000") + vbTab
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -137,5 +140,7 @@ Public Class Rodrigues_Extrinsics
             output += vbTab + Format(dst.Get(Of Double)(i), "#0.000000000") + vbTab
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+

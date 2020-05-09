@@ -22,6 +22,7 @@ Public Class Video_Basics
         End If
         image = videoOptions.nextImage
         If image.Empty() = False Then ocvb.result1 = image.Resize(ocvb.color.Size())
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -79,6 +80,7 @@ Public Class Video_CarCounting
             flow.Run(ocvb)
             cv.Cv2.BitwiseOr(ocvb.result1, tmp, ocvb.result1)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         video.Dispose()
@@ -119,6 +121,7 @@ Public Class Video_CarCComp
             cc.srcGray = ocvb.result1.Clone()
             cc.Run(ocvb)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         cc.Dispose()
@@ -162,6 +165,7 @@ Public Class Video_MinRect
             End If
             ocvb.result2 = video.image.Resize(ocvb.color.Size())
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         video.Dispose()
@@ -192,6 +196,7 @@ Public Class Video_MinCircle
                 ocvb.result1.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         input.Dispose()

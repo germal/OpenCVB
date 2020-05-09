@@ -70,6 +70,7 @@ Public Class Voxels_Basics_MT
                 End If
             End Sub)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         grid.Dispose()

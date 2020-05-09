@@ -24,6 +24,7 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
         ocvb.label2 = "CLAHE Result"
         cv.Cv2.CvtColor(imgGray, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.CvtColor(imgClahe, ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -41,6 +42,7 @@ Public Class Brightness_Contrast
         ocvb.color.ConvertTo(ocvb.result1, -1, sliders.TrackBar2.Value / 50, sliders.TrackBar1.Value)
         ocvb.label1 = "Brightness/Contrast"
         ocvb.label2 = ""
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -62,6 +64,7 @@ Public Class Brightness_hue
         ocvb.label2 = "Saturation"
         cv.Cv2.CvtColor(hsv_planes(0), ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.CvtColor(hsv_planes(1), ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -77,6 +80,7 @@ Public Class Brightness_AlphaBeta
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1 = ocvb.color.ConvertScaleAbs(sliders.TrackBar1.Value / 500, sliders.TrackBar2.Value)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -100,6 +104,7 @@ Public Class Brightness_Gamma
             Next
         End If
         ocvb.result1 = ocvb.color.LUT(lookupTable)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -148,6 +153,7 @@ Public Class Brightness_WhiteBalance_CPP
         Dim diff = ocvb.result1 - ocvb.color
         diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         WhiteBalance_Close(wPtr)
@@ -213,6 +219,7 @@ Public Class Brightness_WhiteBalance
         Dim diff = ocvb.result1 - ocvb.color
         diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         WhiteBalance_Close(wPtr)

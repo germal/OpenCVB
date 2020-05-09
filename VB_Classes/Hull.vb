@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 
 Module Hull_module
     Public Function drawPoly(result As cv.Mat, polyPoints() As cv.Point, color As cv.Scalar) As List(Of cv.Point)
@@ -64,5 +64,7 @@ Public Class Hull_Basics
                 ocvb.result2.Circle(points(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             Next
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+

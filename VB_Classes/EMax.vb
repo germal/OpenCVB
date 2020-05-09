@@ -84,6 +84,7 @@ Public Class EMax_Basics
             Dim pt = New cv.Point(Math.Round(samples.Get(Of Single)(i, 0)), Math.Round(samples.Get(Of Single)(i, 1)))
             ocvb.result1.Circle(pt, 4, ocvb.rColors(labels.Get(Of Int32)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
         Next
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
                         grid.Dispose()
@@ -151,9 +152,11 @@ Public Class EMax_Basics_CPP
 
         Dim mask = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         ocvb.result1.CopyTo(ocvb.result2, mask)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         EMax_Basics_Close(EMax_Basics)
         emax.Dispose()
     End Sub
 End Class
+

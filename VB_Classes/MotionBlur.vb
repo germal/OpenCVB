@@ -27,6 +27,7 @@ Public Class MotionBlur_Basics
         pt1 += New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
         pt2 += New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
         If showDirection Then ocvb.result1.Line(pt1, pt2, cv.Scalar.Yellow, 5, cv.LineTypes.AntiAlias)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -164,6 +165,7 @@ Public Class MotionBlur_Deblur
         Dim imgOut = filter2DFreq(imgIn(roi), hW)
         imgOut.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
         ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
                         mblur.Dispose()

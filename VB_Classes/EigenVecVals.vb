@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://bytefish.de/blog/eigenvalues_in_opencv/
 Public Class EigenVecVals_Basics
     Inherits ocvbClass
@@ -47,5 +47,7 @@ Public Class EigenVecVals_Basics
             nextLine += " = " + vbTab + "0.0"
             ocvb.putText(New ActiveClass.TrueType(nextLine, 10, 50 + i * 30, RESULT2))
         Next
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+

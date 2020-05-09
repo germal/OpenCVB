@@ -38,6 +38,7 @@ Public Class Quaterion_Basics
         ocvb.putText(New ActiveClass.TrueType("q1 = " + q1.ToString() + vbCrLf +
                                                   "q2 = " + q2.ToString() + vbCrLf +
                                                   "Multiply q1 * q2" + quatmul.ToString(), 10, 60))
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -106,8 +107,10 @@ Public Class Quaterion_IMUPrediction
                                                   Format(diffq.X, "0.0000") + ", " + vbTab +
                                                   Format(diffq.Y, "0.0000") + ", " + vbTab +
                                                   Format(diffq.Z, "0.0000") + ", " + vbTab, 10, 40))
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         host.Dispose()
     End Sub
 End Class
+

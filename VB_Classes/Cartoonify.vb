@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://github.com/davemk99/Cartoonify-Image/blob/master/main.cpp
 Public Class CartoonifyImage_Basics
     Inherits ocvbClass
@@ -27,5 +27,7 @@ Public Class CartoonifyImage_Basics
         ocvb.result2 = ocvb.color.MedianBlur(medianBlur2)
         ocvb.result2 = ocvb.result2.MedianBlur(medianBlur2)
         ocvb.color.CopyTo(ocvb.result2, mask)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+

@@ -74,6 +74,7 @@ Public Class KLT_Basics
         End If
         prevGray = gray.Clone()
         ocvb.label1 = "KLT Basics - " + If(inputPoints Is Nothing, "0", CStr(inputPoints.Length)) + " points"
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -100,8 +101,10 @@ Public Class KLT_OpticalFlow
             Next
         End If
         lastpoints = klt.inputPoints
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         klt.Dispose()
     End Sub
 End Class
+

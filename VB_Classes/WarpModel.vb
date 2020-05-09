@@ -56,6 +56,7 @@ Public Class WarpModel_Input
         cv.Cv2.Merge(rgb, merged)
         ocvb.result1(r(0)) = rgb(0).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result2(r(0)) = merged
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
                 sobel.Dispose()
@@ -166,6 +167,7 @@ Public Class WarpModel_FindTransformECC_CPP
             outStr += vbCrLf + "NOTE: input resized for performance." + vbCrLf + "Results are probably distorted." + vbCrLf + "Gradients may give better results."
         End If
         ocvb.putText(New ActiveClass.TrueType(outStr, aligned.Width + 10, 220, RESULT1))
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         WarpModel_Close(cPtr)
@@ -211,8 +213,10 @@ Public Class WarpModel_AlignImages
         ocvb.putText(New ActiveClass.TrueType("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
                                               "Other than that, images look the same." + vbCrLf +
                                               "Displacement increases with Sobel" + vbCrLf + "kernel size", merged.Width + 10, 100, RESULT1))
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         ecc.Dispose()
     End Sub
 End Class
+

@@ -37,6 +37,7 @@ Public Class Entropy_Basics
             flow.msgs.Add("Entropy total = " + Format(entropy, "0.00") + " - " + entropyChannels)
             flow.Run(ocvb)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         hist.Dispose()

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module undistort_Mats
     Public Sub undistortSetup(ocvb As AlgorithmData, ByRef kMatLeft As cv.Mat, ByRef dMatLeft As cv.Mat, ByRef rMatLeft As cv.Mat, ByRef pMatLeft As cv.Mat,
@@ -129,5 +129,6 @@ Public Class Undistort_Basics
                                                cv.MatType.CV_32FC1, leftViewMap1, leftViewMap2)
         ocvb.result1 = ocvb.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
         ocvb.result2 = ocvb.color.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
+		MyBase.Finish(ocvb)
     End Sub
 End Class

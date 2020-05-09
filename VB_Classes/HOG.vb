@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HOGSample.vb
 Public Class HOG_Basics
     Inherits ocvbClass
@@ -57,6 +57,8 @@ Public Class HOG_Basics
                 ocvb.label2 = "Try adjusting slider bars."
             End If
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+
 

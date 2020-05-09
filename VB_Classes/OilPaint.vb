@@ -67,6 +67,7 @@ Public Class OilPaint_Pointilism
                 ocvb.result1(ocvb.drawRect).Circle(nPoint, slen / 4, nextColor, -1, cv.LineTypes.AntiAlias)
             Next
         Next
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -104,6 +105,7 @@ Public Class OilPaint_ColorProbability
         For i = 0 To color_probability.Length - 1
             color_probability(i) /= ocvb.result2.Total
         Next
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         km.Dispose()
@@ -166,6 +168,7 @@ Public Class OilPaint_Manual
             Next
         Next
         result1.CopyTo(ocvb.result1(roi))
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -196,6 +199,7 @@ Public Class OilPaint_Manual_CS
         Dim factor As Int32 = Math.Min(Math.Floor(ocvb.result2.Width / roi.Width), Math.Floor(ocvb.result2.Height / roi.Height))
         Dim s = New cv.Size(roi.Width * factor, roi.Height * factor)
         cv.Cv2.Resize(ocvb.result1(roi), ocvb.result2(New cv.Rect(0, 0, s.Width, s.Height)), s)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -239,6 +243,7 @@ Public Class OilPaint_Cartoon
                 End If
             Next
         Next
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         laplacian.Dispose()

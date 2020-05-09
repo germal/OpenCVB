@@ -97,6 +97,7 @@ Public Class Projection_NoGravity_CPP
         handleDepth.Free()
         ocvb.label1 = "Top View (looking down)"
         ocvb.label2 = "Side View"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         foreground.Dispose()
@@ -160,6 +161,7 @@ Public Class Projection_NoGravity
              End Sub)
         ocvb.label1 = "Top View (looking down)"
         ocvb.label2 = "Side View"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         foreground.Dispose()
@@ -258,6 +260,7 @@ Public Class Projection_GravityVB
              End Sub)
         ocvb.label1 = "View looking up from under floor"
         ocvb.label2 = "Side View"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         imu.Dispose()
@@ -284,6 +287,7 @@ Public Class Projection_GravityHistogram
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         gravity.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         gravity.Dispose()
@@ -418,6 +422,7 @@ Public Class Projection_G_CPP
             ocvb.result2.Circle(New cv.Point(shift + 10, xyz.Height / 2), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
         handleXYZ.Free()
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         imu.Dispose()
@@ -502,6 +507,7 @@ Public Class Projection_Floodfill
             Next
             ocvb.label2 = CStr(flood.objectRects.Count) + " objects combined into " + CStr(rects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         gravity.Dispose()
@@ -543,10 +549,12 @@ Public Class Projection_Wall
 
         ocvb.label1 = "Top View with lines in red"
         ocvb.label2 = "Top View output without lines"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         objects.Dispose()
         lines.Dispose()
     End Sub
 End Class
+
 

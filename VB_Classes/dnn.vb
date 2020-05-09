@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports OpenCvSharp.Dnn
 Imports System.Net
 Imports System.Linq
@@ -36,6 +36,7 @@ Public Class DNN_Test
         Else
             ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -65,6 +66,7 @@ Public Class DNN_Caffe_CS
         Else
             ocvb.putText(New ActiveClass.TrueType(str, 10, 100))
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -147,8 +149,10 @@ Public Class DNN_Basics
                 ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
             End If
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
                 If net IsNot Nothing Then net.Dispose()
     End Sub
 End Class
+

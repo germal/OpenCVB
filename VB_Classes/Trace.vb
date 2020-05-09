@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module Trace_OpenCV_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -38,11 +38,13 @@ Public Class Trace_OpenCV_CPP
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         Trace_OpenCV_Close(Trace_OpenCV)
     End Sub
 End Class
+
 
 
 

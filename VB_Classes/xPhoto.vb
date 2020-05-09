@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports OpenCvSharp.XPhoto
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
@@ -20,6 +20,7 @@ Public Class xPhoto_Bm3dDenoise
         ocvb.result2.MinMaxLoc(minVal, maxVal)
         ocvb.label2 = "Diff from input - max change=" + CStr(maxVal)
         ocvb.result2 = ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -44,6 +45,7 @@ Public Class xPhoto_Bm3dDenoiseDepthImage
         ocvb.result2.MinMaxLoc(minVal, maxVal)
         ocvb.label2 = "Diff from input - max change=" + CStr(maxVal)
         ocvb.result2 = ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -122,8 +124,10 @@ Public Class xPhoto_OilPaint_CPP
                 ocvb.result2 = dst.Resize(ocvb.result2.Size)
             End If
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         xPhoto_OilPaint_Close(xPhoto_OilPaint)
             End Sub
 End Class
+

@@ -12,6 +12,7 @@ Public Class Math_Subtract
         Dim tmp = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3)
         tmp.SetTo(New cv.Scalar(sliders.TrackBar3.Value, sliders.TrackBar2.Value, sliders.TrackBar1.Value))
         cv.Cv2.Subtract(tmp, ocvb.color, ocvb.result1)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -74,6 +75,7 @@ Public Class Math_Median_CDF
             ocvb.color.CopyTo(ocvb.result2, mask) ' show the other half.
             ocvb.label2 = "Grayscale pixels < " + Format(medianVal, "#0.0")
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -98,6 +100,7 @@ Public Class Math_DepthMeanStdev
         ocvb.label2 = "stablized depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
         cv.Cv2.MeanStdDev(depth32f, mean, stdev)
         ocvb.label1 = "raw depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         minMax.Dispose()
@@ -143,6 +146,7 @@ Public Class Math_RGBCorrelation
         flow.Run(ocvb)
         ocvb.label1 = ""
         ocvb.label2 = "Log of " + corr.matchText
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         corr.Dispose()

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Encode_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -24,6 +24,7 @@ Public Class Encode_Basics
         output.ConvertTo(ocvb.result1, cv.MatType.CV_8UC3, scale)
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
         ocvb.label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -79,5 +80,7 @@ Public Class Encode_Options
         output.ConvertTo(ocvb.result1, cv.MatType.CV_8UC3, scale)
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
         ocvb.label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+

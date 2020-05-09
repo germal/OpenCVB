@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Laplacian_Basics
     Inherits ocvbClass
@@ -21,6 +21,7 @@ Public Class Laplacian_Basics
         Dim dst = srcGray.Laplacian(ddepth, kernelSize, scale, delta)
         ocvb.result1 = dst.ConvertScaleAbs()
         ocvb.label1 = "Laplacian Filter k = " + CStr(kernelSize)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -64,5 +65,7 @@ Public Class Laplacian_Blur
         Dim dst = srcGray.Laplacian(ddepth, kernelSize, scale, delta)
         ocvb.result1 = dst.ConvertScaleAbs()
         ocvb.label1 = "Laplacian+" + blurText + " k = " + CStr(kernelSize)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+

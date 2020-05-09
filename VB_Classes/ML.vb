@@ -86,6 +86,7 @@ Public Class ML_FillRGBDepth_MT
         colorizer.Run(ocvb)
         ocvb.result1 = colorizer.dst.Clone()
         ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         shadow.Dispose()
@@ -120,6 +121,7 @@ Public Class ML_FillRGBDepth
         colorizer.src = depth32f
         colorizer.Run(ocvb)
         ocvb.result2 = colorizer.dst
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         shadow.Dispose()
@@ -189,6 +191,7 @@ Public Class ML_DepthFromColor_MT
         colorizer.src = predictedDepth
         colorizer.Run(ocvb)
         ocvb.result1 = colorizer.dst
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         dilate.Dispose()
@@ -271,6 +274,7 @@ Public Class ML_DepthFromColor
         ocvb.result2 = mats.dst
         ocvb.label1 = "Predicted Depth"
         ocvb.label2 = "shadow, empty, Depth Mask < " + CStr(sliders.TrackBar1.Value) + ", Learn Input"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         shadow.Dispose()
@@ -371,6 +375,7 @@ Public Class ML_DepthFromXYColor
         mats.Run(ocvb)
         ocvb.result2 = mats.dst
         ocvb.label2 = "shadow, empty, Depth Mask < " + CStr(sliders.TrackBar1.Value) + ", Learn Input"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         shadow.Dispose()
@@ -444,6 +449,7 @@ Public Class ML_EdgeDepth
         colorizer.src = predictedDepth
         colorizer.Run(ocvb)
         ocvb.result2 = colorizer.dst
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         dilate.Dispose()

@@ -23,6 +23,7 @@ Public Class Moments_CentroidKalman
             kalman.Run(ocvb)
             ocvb.result1.Circle(New cv.Point(kalman.output(0), kalman.output(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         foreground.Dispose()

@@ -30,6 +30,7 @@ Public Class Depth_WorldXYZ_MT
                 Next
             Next
         End Sub)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         grid.Dispose()
@@ -70,6 +71,7 @@ Public Class Depth_Median
         ocvb.RGBDepth.CopyTo(ocvb.result2, mask)
         ocvb.result2.SetTo(0, zeroMask)
         ocvb.label2 = "Median Depth > " + Format(median.medianVal, "#0.0")
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         median.Dispose()
@@ -94,6 +96,7 @@ Public Class Depth_Flatland
         ocvb.result1 *= reductionFactor
         ocvb.result2 = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -117,6 +120,7 @@ Public Class Depth_FirstLastDistance
         ocvb.result1.Circle(minPt, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         ocvb.label2 = "Max Depth " + CStr(maxVal) + " mm"
         ocvb.result2.Circle(maxPt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -153,6 +157,7 @@ Public Class Depth_HolesRect
                 End If
             End If
         Next
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         shadow.Dispose()
@@ -209,6 +214,7 @@ Public Class Depth_Foreground
             If yy + rectSize > ocvb.color.Height Then yy = ocvb.color.Height - rectSize
             ocvb.drawRect = New cv.Rect(xx, yy, rectSize, rectSize)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         trim.Dispose()
@@ -249,6 +255,7 @@ Public Class Depth_FlatData
         gray8u *= reductionFactor
 
         ocvb.result1 = gray8u.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         shadow.Dispose()
@@ -285,6 +292,7 @@ Public Class Depth_FlatBackground
         zeroMask.SetTo(255, shadow.holeMask)
         ocvb.color.CopyTo(ocvb.result1, zeroMask)
         dst.SetTo(maxDepth, zeroMask) ' set the depth to the maxdepth for any background
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         shadow.Dispose()
@@ -328,6 +336,7 @@ Public Class Depth_WorldXYZ
                 End If
             Next
         Next
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -358,6 +367,7 @@ Public Class Depth_WorldXYZ_CPP
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             pointCloud = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_32FC3, dstData)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         Depth_XYZ_OpenMP_Close(DepthXYZ)
@@ -443,6 +453,7 @@ Public Class Depth_MeanStdev_MT
         End If
 
         ocvb.label1 = "ROI Means: Min " + Format(minVal, "#0.0") + " Max " + Format(maxVal, "#0.0")
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         grid.Dispose()
@@ -488,6 +499,7 @@ Public Class Depth_MeanStdevPlot
         plot2.Run(ocvb)
         ocvb.label1 = "Plot of mean depth = " + Format(mean, "#0.0")
         ocvb.label2 = "Plot of depth stdev = " + Format(stdev, "#0.0")
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         plot1.Dispose()
@@ -513,6 +525,7 @@ Public Class Depth_Uncertainty
         retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
         ocvb.result2 = ocvb.result2.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         retina.Dispose()
@@ -549,6 +562,7 @@ Public Class Depth_Palette
         depth = depth.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result1 = Palette_Custom_Apply(depth, customColorMap)
         ocvb.result1.SetTo(0, trim.zeroMask)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         trim.Dispose()
@@ -637,6 +651,7 @@ Public Class Depth_Colorizer_CPP
 
             dst = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         Depth_Colorizer_Close(dcPtr)
@@ -675,6 +690,7 @@ Public Class Depth_ManualTrim
             cv.Cv2.BitwiseNot(Mask, notMask)
             dst.SetTo(0, notMask)
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -707,6 +723,7 @@ Public Class Depth_InRange
         dst.SetTo(0, zeroMask)
 
         If standalone Then ocvb.result1 = dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -749,6 +766,7 @@ Public Class Depth_ColorizerFastFade_CPP
                 dst = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
             End If
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         Depth_Colorizer2_Close(dcPtr)
@@ -799,6 +817,7 @@ Public Class Depth_ColorizerVB
             Next
         Next
         ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, rgbdata)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -864,6 +883,7 @@ Public Class Depth_ColorizerVB_MT
 
         End If
         ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         grid.Dispose()
@@ -916,6 +936,7 @@ Public Class Depth_Colorizer_MT
              ocvb.result1(roi) = New cv.Mat(depth.Rows, depth.Cols, cv.MatType.CV_8UC3, rgbdata)
          End Sub)
         ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         grid.Dispose()
@@ -979,6 +1000,7 @@ Public Class Depth_LocalMinMax_MT
             Next
             paint_voronoi(ocvb, ocvb.result2, subdiv)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         grid.Dispose()
@@ -1034,6 +1056,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
             cv.Cv2.Circle(ocvb.result1, New cv.Point(kalman.output(i), kalman.output(i + 1)), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
         paint_voronoi(ocvb, ocvb.result2, subdiv)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         kalman.Dispose()
@@ -1067,6 +1090,7 @@ Public Class Depth_Decreasing
         End If
         ocvb.result1 = diff.Threshold(thresholdCentimeters, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         lastDepth = depth32f
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -1085,6 +1109,7 @@ Public Class Depth_Increasing
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         depth.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         depth.Dispose()
@@ -1106,6 +1131,7 @@ Public Class Depth_Punch
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         depth.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         depth.Dispose()
@@ -1130,6 +1156,7 @@ Public Class Depth_ColorMap
         Dim alpha = sliders.TrackBar1.Value / 100
         cv.Cv2.ConvertScaleAbs(getDepth32f(ocvb), Palette.src, alpha)
         Palette.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         Palette.Dispose()
@@ -1161,6 +1188,7 @@ Public Class Depth_Holes
             ocvb.result2.SetTo(0)
             ocvb.RGBDepth.CopyTo(ocvb.result2, borderMask)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         holeMask.Dispose()
@@ -1198,6 +1226,7 @@ Public Class Depth_Stable
         Dim zeroDepth = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(1)
         maskStable.SetTo(0, zeroDepth)
         If standalone Then ocvb.result2 = maskStable
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         mog.Dispose()
@@ -1234,6 +1263,7 @@ Public Class Depth_Stabilizer
             'colorize.Run(ocvb)
             'ocvb.result1 = colorize.dst
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         stable.Dispose()

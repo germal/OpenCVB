@@ -1,4 +1,4 @@
-﻿
+
 Imports cv = OpenCvSharp
 Public Class Keyboard_Basics
     Inherits ocvbClass
@@ -20,5 +20,6 @@ Public Class Keyboard_Basics
             End If
         End If
         ocvb.parms.keyInputAccepted = True
+		MyBase.Finish(ocvb)
     End Sub
 End Class

@@ -39,8 +39,10 @@ Public Class GrabCut_Basics
             cv.Cv2.GrabCut(ocvb.color, mask, rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)
         End If
         ocvb.color.CopyTo(ocvb.result2, mask)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         contours.Dispose()
             End Sub
 End Class
+

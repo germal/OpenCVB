@@ -33,6 +33,7 @@ Public Class MeanShift_Basics
         Else
             ocvb.result1 = ocvb.color
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -57,6 +58,7 @@ Public Class MeanShift_Depth
         If blob.trim.sliders.TrackBar2.Value <> depthMax Then restartRequested = True
         If ocvb.drawRect = New cv.Rect(0, 0, 0, 0) Or restartRequested Then blob.Run(ocvb)
         ms.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         ms.Dispose()
@@ -81,6 +83,7 @@ Public Class MeanShift_PyrFilter
         Dim colorRadius = sliders.TrackBar2.Value
         Dim maxPyrLevel = sliders.TrackBar3.Value
         cv.Cv2.PyrMeanShiftFiltering(ocvb.color, ocvb.result1, spatialRadius, colorRadius, maxPyrLevel)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -130,6 +133,7 @@ Public Class Meanshift_TopObjects
         mats1.Run(ocvb)
         ocvb.result1 = ocvb.result2.Clone()
         mats2.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         blob.Dispose()
@@ -140,3 +144,4 @@ Public Class Meanshift_TopObjects
         mats2.Dispose()
     End Sub
 End Class
+

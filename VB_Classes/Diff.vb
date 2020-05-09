@@ -18,6 +18,7 @@ Public Class Diff_Basics
             ocvb.result1 = ocvb.color.Clone().SetTo(0, ocvb.result2)
         End If
         lastFrame = gray.Clone()
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
             End Sub
@@ -56,6 +57,7 @@ Public Class Diff_UnstableDepthAndColor
             ocvb.label1 = "Stable depth and color"
             ocvb.label2 = "Stable (non-zero) Depth"
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         diff.Dispose()

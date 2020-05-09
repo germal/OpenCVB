@@ -52,6 +52,7 @@ Public Class IMU_Basics
             If ocvb.frameCount = 0 Then flow.msgs.Add("No IMU present on this device")
         End If
         flow.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         flow.Dispose()
@@ -109,6 +110,7 @@ Public Class IMU_Stabilizer
         Else
             ocvb.putText(New ActiveClass.TrueType("No IMU present on this RealSense device", 20, 100))
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         kalman.Dispose()
@@ -144,6 +146,7 @@ Public Class IMU_Magnetometer
             ocvb.label2 = "x (blue) = " + Format(plot.plotData.Item(0), "#0.00") + " y (green) = " + Format(plot.plotData.Item(1), "#0.00") +
                           " z (red) = " + Format(plot.plotData.Item(2), "#0.00")
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         plot.Dispose()
@@ -166,6 +169,7 @@ Public Class IMU_Barometer
             ocvb.putText(New ActiveClass.TrueType("Barometric pressure is " + CStr(ocvb.parms.IMU_Barometer) + " hectopascal." + vbCrLf +
                                                   "Barometric pressure is " + Format(ocvb.parms.IMU_Barometer * 0.02953, "#0.00") + " inches of mercury.", 10, 60))
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -183,6 +187,7 @@ Public Class IMU_Temperature
             ocvb.putText(New ActiveClass.TrueType("IMU Temperature is " + Format(ocvb.parms.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
                                                   "IMU Temperature is " + Format(ocvb.parms.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.", 10, 60))
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -276,6 +281,7 @@ Public Class IMU_FrameTime
                 ocvb.putText(New ActiveClass.TrueType(allText, 10, 180))
             End If
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         plot.Dispose()
@@ -362,6 +368,7 @@ Public Class IMU_HostFrameTimes
                 ocvb.putText(New ActiveClass.TrueType(allText, 10, 180))
             End If
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         plot.Dispose()
@@ -440,6 +447,7 @@ Public Class IMU_TotalDelay
             Next
             ocvb.putText(New ActiveClass.TrueType(allText, 10, 180))
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         host.Dispose()
@@ -505,8 +513,10 @@ Public Class IMU_GVector
 
             ocvb.putText(New ActiveClass.TrueType(valstr, 10, 200, result))
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         kalman.Dispose()
     End Sub
 End Class
+

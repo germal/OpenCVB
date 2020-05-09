@@ -66,6 +66,7 @@ Public Class CamShift_Basics
         ocvb.result1.SetTo(0)
         ocvb.color.CopyTo(ocvb.result1, mask)
         If trackBox.Size.Width > 0 Then ocvb.result1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -99,6 +100,7 @@ Public Class CamShift_Foreground
         If restartRequested Then blob.Run(ocvb)
         camshift.Run(ocvb)
         ocvb.label2 = "Mask of objects closer than " + Format(depthMax / 1000, "#0.0") + " meters"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         camshift.Dispose()
@@ -130,6 +132,7 @@ Public Class Camshift_Object
         Dim largestMask = blob.flood.fBasics.maskSizes.ElementAt(0).Value
         If camshift.trackBox.Size.Width = 0 Then ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
         camshift.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         blob.Dispose()
@@ -178,6 +181,7 @@ Public Class Camshift_TopObjects
             ocvb.result1.Ellipse(trackBoxes(i), cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         Next
         mats.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         blob.Dispose()

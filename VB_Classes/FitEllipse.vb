@@ -65,5 +65,6 @@ Public Class FitEllipse_Basics_CPP
             ocvb.result2.Ellipse(box, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
         End If
         ocvb.label1 = "Using MinTriangle to generate " + CStr(area.srcPoints.Count) + " points"
+		MyBase.Finish(ocvb)
     End Sub
 End Class

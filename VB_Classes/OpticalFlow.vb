@@ -112,6 +112,7 @@ Public Class OpticalFlow_DenseOptions
             End If
         Next
         outputScaling = sliders2.TrackBar2.Value
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -140,6 +141,7 @@ Public Class OpticalFlow_DenseBasics
             ocvb.result2 = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
         oldGray = gray.Clone()
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         flow.Dispose()
@@ -202,6 +204,7 @@ Public Class OpticalFlow_DenseBasics_MT
             oldGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             accum = ocvb.color.Clone()
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         flow.Dispose()
@@ -306,6 +309,7 @@ Public Class OpticalFlow_Sparse
         Else
             lastFrame = gray.Clone()
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         good.Dispose()

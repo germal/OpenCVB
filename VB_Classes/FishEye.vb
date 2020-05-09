@@ -1,4 +1,4 @@
-﻿
+
 Imports cv = OpenCvSharp
 Public Class FishEye_Rectified
     Inherits ocvbClass
@@ -41,6 +41,7 @@ Public Class FishEye_Rectified
             ocvb.result1 = leftView
             ocvb.result2 = rightView
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -63,5 +64,6 @@ Public Class FishEye_Raw
         ocvb.label2 = "Right Fisheye Image"
         ocvb.result1 = ocvb.leftView
         ocvb.result2 = ocvb.rightView
+		MyBase.Finish(ocvb)
     End Sub
 End Class

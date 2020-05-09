@@ -28,6 +28,7 @@ Public Class Edges_Canny
             If src.Channels = 3 Then dst = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst = src.Canny(threshold1, threshold2, aperture, False)
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -66,6 +67,7 @@ Public Class Edges_CannyAndShadow
         dilate.Run(ocvb)
         dilate.dst.SetTo(0, shadow.holeMask)
         If standalone Then ocvb.result1 = dilate.dst
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         canny.Dispose()
@@ -104,6 +106,7 @@ Public Class Edges_Laplacian
         cv.Cv2.ConvertScaleAbs(dst, abs_dst)
         cv.Cv2.CvtColor(abs_dst, ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "Laplacian of Depth Image"
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -124,6 +127,7 @@ Public Class Edges_Scharr
         cv.Cv2.Add(xField, yField, xyField)
         xyField.ConvertTo(gray, cv.MatType.CV_8U, 0.5)
         ocvb.result1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -157,6 +161,7 @@ Public Class Edges_Preserving
         Else
             cv.Cv2.EdgePreservingFilter(ocvb.RGBDepth, ocvb.result2, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -215,6 +220,7 @@ Public Class Edges_RandomForest_CPP
             Marshal.Copy(gray8u, dstData, 0, dstData.Length)
             ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, dstData).Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         Edges_RandomForest_Close(EdgesPtr)
@@ -246,6 +252,7 @@ Public Class Edges_Sobel
         Dim abs_grayY = grayY.ConvertScaleAbs()
         cv.Cv2.AddWeighted(abs_grayX, 0.5, abs_grayY, 0.5, 0, dst)
         if standalone Then ocvb.result1 = dst
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -275,6 +282,7 @@ Public Class Edges_LeftView
         sobel.src = leftView
         sobel.Run(ocvb)
         ocvb.result1 = sobel.dst
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         red.Dispose()
@@ -304,6 +312,7 @@ Public Class Edges_ResizeAdd
         cv.Cv2.Absdiff(gray, newFrame, ocvb.result1)
         ocvb.result1 = ocvb.result1.Threshold(sliders.TrackBar3.Value, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.Add(gray, ocvb.result1, ocvb.result2)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -333,6 +342,7 @@ Public Class Edges_DCTfrequency
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
         src32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC1, 255)
         ocvb.result2 = ocvb.result1.Threshold(sliders.TrackBar2.Value, 255, cv.ThresholdTypes.Binary)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -382,8 +392,10 @@ Public Class Edges_Deriche_CPP
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         Edges_Deriche_Close(Edges_Deriche)
     End Sub
 End Class
+

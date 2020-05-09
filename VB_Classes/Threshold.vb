@@ -26,9 +26,11 @@ Public Class Threshold_LaplacianFilter
 
         dist32f.ConvertTo(gray, cv.MatType.CV_8UC1, 255)
         ocvb.result1 = gray.CvtColor(cv.ColorConversionCodes.gray2bgr)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
                 edges.Dispose()
         trim.Dispose()
     End Sub
 End Class
+

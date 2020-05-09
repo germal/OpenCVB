@@ -72,6 +72,7 @@ Public Class Featureless_Basics_MT
             ocvb.result2.SetTo(mean, label)
         Next
         ocvb.label2 = "FeatureLess Regions = " + CStr(regionCount)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         edges.Dispose()
@@ -156,6 +157,7 @@ Public Class FeatureLess_Prediction
         Dim predictedDepth = response.Reshape(1, depth32f.Height)
         predictedDepth.Normalize(0, 255, cv.NormTypes.MinMax)
         predictedDepth.ConvertTo(mask, cv.MatType.CV_8U)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         fLess.Dispose()
@@ -205,8 +207,10 @@ Public Class Featureless_DCT_MT
         Dim nonZ = label.CountNonZero()
         ocvb.label2 = "Largest FeatureLess Region (" + CStr(nonZ) + " " + Format(nonZ / label.Total, "#0.0%") + " pixels)"
         ocvb.result2.SetTo(cv.Scalar.White, label)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         dct.Dispose()
     End Sub
 End Class
+

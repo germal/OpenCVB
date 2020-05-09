@@ -18,6 +18,19 @@ Module VB_EditorMain
         End If
         Return False
     End Function
+
+    Private Function insertLine(line As String) As Boolean
+        Static insideRunFunction As Boolean
+        If Trim(line) = "Public Sub Run(ocvb As AlgorithmData)" Then insideRunFunction = True
+        If Trim(line) = "End Sub" And insideRunFunction Then
+            'Console.WriteLine(vbTab + vbTab + "MyBase.Finish(ocvb)")
+            changeLines += 1
+            insideRunFunction = False
+            Return True
+        End If
+        'Console.WriteLine(line)
+        Return False
+    End Function
     Sub Main()
         ' Regular expression are great but can be too complicated.  This app is just a simpler way to make global changes that 
         ' would normally be accomplished with regular expressions.
@@ -30,9 +43,10 @@ Module VB_EditorMain
             Dim saveChangeLines = changeLines
             While nextFile.Peek() <> -1
                 Dim line As String
-                line = Trim(nextFile.ReadLine())
-                deleteLine(line)
+                line = nextFile.ReadLine()
+                ' deleteLine(line)
                 ' makeChange(line)
+                insertLine(line)
             End While
             nextFile.Close()
             If saveChangeLines <> changeLines Then changeFiles.Add(fileName)
@@ -47,17 +61,24 @@ Module VB_EditorMain
                 Dim code As String = sr.ReadToEnd
                 sr.Close()
                 Dim lines = code.Split(vbCrLf)
+                If lines.Count = 1 Then
+                    lines = code.Split(vbLf) ' just in case they don't have CR.
+                End If
                 'For i = 0 To lines.Count - 1
                 '    lines(i) = makeChange(Trim(lines(i)))
                 'Next
 
                 Dim sw = New StreamWriter(filename)
                 For i = 0 To lines.Count - 1
-                    If deleteLine(lines(i)) Then
-                        Console.WriteLine("Deleting: " + lines(i))
-                    Else
-                        sw.Write(lines(i))
+                    If insertLine(lines(i)) Then
+                        sw.WriteLine(vbTab + vbTab + "MyBase.Finish(ocvb)")
                     End If
+                    sw.WriteLine(lines(i))
+                    'If deleteLine(lines(i)) Then
+                    '    Console.WriteLine("Deleting: " + lines(i))
+                    'Else
+                    '    sw.Write(lines(i))
+                    'End If
                 Next
                 sw.Close()
             Next

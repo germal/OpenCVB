@@ -50,6 +50,7 @@ Public Class GetRotationMatrix2D_Basics
         M = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), angle, 1)
         ocvb.result1 = src.WarpAffine(M, src.Size(), warpFlag)
         If warpFlag = cv.InterpolationFlags.WarpInverseMap Then Mflip = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), -angle, 1)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -95,6 +96,7 @@ Public Class GetRotationMatrix2D_Box
             Dim p2 = dstpoints.Get(of cv.Point2f)(0, (i + 1) Mod 4)
             ocvb.result2.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         Next
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         rotation.Dispose()

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
 Public Class ORB_Basics
     Inherits ocvbClass
@@ -23,6 +23,7 @@ Public Class ORB_Basics
             Next
             ocvb.label1 = CStr(keypoints.Count) + " key points were identified"
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         orb.Dispose()

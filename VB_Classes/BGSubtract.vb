@@ -43,6 +43,7 @@ Public Class BGSubtract_Basics_CPP
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         BGSubtract_BGFG_Close(bgfs)
@@ -100,6 +101,7 @@ Public Class BGSubtract_MotionDetect_MT
                 End Sub)
         Next
         Task.WaitAll(taskArray)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -134,6 +136,7 @@ Public Class BGSubtract_Basics_MT
             End If
         End Sub)
         if standalone Then accum.CopyTo(ocvb.result2) ' show the accumulated result if this is not some other object using me...
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         grid.Dispose()
@@ -167,6 +170,7 @@ Public Class BGSubtract_Depth_MT
         mask = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.AddWeighted(ocvb.result1, 0.75, mask, 0.25, 0, ocvb.result1)
         ocvb.result2.SetTo(0, shadowMask)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         shadow.Dispose()
@@ -195,6 +199,7 @@ Public Class BGSubtract_MOG
             gray = src
         End If
         MOG.Apply(gray, ocvb.result1, sliders.TrackBar1.Value / 1000)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         MOG.Dispose()
@@ -221,6 +226,7 @@ Public Class BGSubtract_MOG2
             gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
         MOG2.Apply(gray, ocvb.result1, sliders.TrackBar1.Value / 1000)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         MOG2.Dispose()
@@ -254,6 +260,7 @@ Public Class BGSubtract_GMG_KNN
 
         knn.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
         ocvb.result2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         gmg.Dispose()
@@ -288,6 +295,7 @@ Public Class BGSubtract_MOG_RGBDepth
         gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOGRGB.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
         ocvb.result2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         MOGDepth.Dispose()
@@ -321,6 +329,7 @@ Public Class BGSubtract_MOG_Retina
         input.src = ocvb.result2
         input.Run(ocvb)
         cv.Cv2.Subtract(ocvb.result1, ocvb.result2, ocvb.result2)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         input.Dispose()
@@ -345,6 +354,7 @@ Public Class BGSubtract_DepthOrColorMotion
         cv.Cv2.BitwiseNot(ocvb.result1, tmp)
         ocvb.color.CopyTo(ocvb.result2, tmp)
         ocvb.label2 = "Image with motion removed"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         motion.Dispose()
@@ -388,6 +398,7 @@ Public Class BGSubtract_Video
         video.Run(ocvb)
         bgfg.src = video.image
         bgfg.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         bgfg.Dispose()
@@ -459,6 +470,7 @@ Public Class BGSubtract_Synthetic_CPP
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             ocvb.result2 = New cv.Mat(ocvb.result2.Rows, ocvb.result2.Cols, cv.MatType.CV_8UC3, dstData)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         BGSubtract_Synthetic_Close(synthPtr)
@@ -485,6 +497,7 @@ Public Class BGSubtract_Synthetic
         synth.Run(ocvb)
         bgfg.src = ocvb.result2.Clone()
         bgfg.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         bgfg.Dispose()

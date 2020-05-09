@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Sharpen_UnsharpMask
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -21,6 +21,7 @@ Public Class Sharpen_UnsharpMask
         diff = diff.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
         ocvb.result1 = ocvb.color * (1 + amount) + diff * (-amount)
         diff.CopyTo(ocvb.result2)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -39,6 +40,7 @@ Public Class Sharpen_DetailEnhance
         Dim sigma_s = sliders.TrackBar1.Value
         Dim sigma_r = sliders.TrackBar2.Value / sliders.TrackBar2.Maximum
         cv.Cv2.DetailEnhance(ocvb.color, ocvb.result1, sigma_s, sigma_r)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -58,5 +60,7 @@ Public Class Sharpen_Stylize
         Dim sigma_s = sliders.TrackBar1.Value
         Dim sigma_r = sliders.TrackBar2.Value / sliders.TrackBar2.Maximum
         cv.Cv2.DetailEnhance(ocvb.color, ocvb.result1, sigma_s, sigma_r)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+

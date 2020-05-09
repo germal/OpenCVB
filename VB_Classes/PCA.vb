@@ -37,6 +37,7 @@ Public Class PCA_Basics
             reconstruction.ConvertTo(reconstruction, cv.MatType.CV_8UC1)
             ocvb.result1 = reconstruction.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -53,6 +54,7 @@ Public Class PCA_Depth
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         pca.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         pca.Dispose()
@@ -124,8 +126,10 @@ Public Class PCA_DrawImage
             drawAxis(ocvb.result2, cntr, ept1, cv.Scalar.Red, 1) ' primary principle component
             drawAxis(ocvb.result2, cntr, ept2, cv.Scalar.BlueViolet, 5) ' secondary principle component
         Next
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         pca.Dispose()
     End Sub
 End Class
+

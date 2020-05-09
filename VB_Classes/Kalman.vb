@@ -71,6 +71,7 @@ Public Class Kalman_Basics
             ocvb.result1.Rectangle(rect, cv.Scalar.White, 6)
             ocvb.result1.Rectangle(rect, cv.Scalar.Red, 1)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         If kalman IsNot Nothing Then
@@ -142,6 +143,7 @@ Public Class Kalman_Compare
         kPlot.minScale = plot.minScale
         kPlot.plotData = New cv.Scalar(kalman(0).stateResult, kalman(1).stateResult, kalman(2).stateResult)
         kPlot.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         plot.Dispose()
@@ -210,6 +212,7 @@ Public Class Kalman_RotatingPoint
 
         cv.Cv2.Randn(processNoise, cv.Scalar.Black, cv.Scalar.All(Math.Sqrt(kf.ProcessNoiseCov.Get(Of Single)(0, 0))))
         kState = kf.TransitionMatrix * kState + processNoise
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -246,6 +249,7 @@ Public Class Kalman_MousePredict
                                   cv.Scalar.All(255), 1, cv.LineTypes.AntiAlias)
         cv.Cv2.Line(ocvb.result1, ocvb.mousePoint * locMultiplier, lastRealMouse * locMultiplier, New cv.Scalar(0, 0, 255), 1, cv.LineTypes.AntiAlias)
         lastRealMouse = ocvb.mousePoint
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         kalman.Dispose()
@@ -315,6 +319,7 @@ Public Class Kalman_CVMat
             End If
             ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         If kalman IsNot Nothing Then
@@ -362,6 +367,7 @@ Public Class Kalman_ImageSmall
         cv.Cv2.Subtract(dst, saveOriginal, dst)
         dst = dst.Threshold(1, 255, cv.ThresholdTypes.Binary)
         ocvb.result2 = dst.Resize(ocvb.result1.Size())
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         kalman.Dispose()
@@ -404,6 +410,7 @@ Public Class Kalman_DepthSmall
         dst = depth32f.Threshold(0, 0, cv.ThresholdTypes.Tozero).ConvertScaleAbs()
         dst = dst.Reshape(1, resize.dst.Height)
         ocvb.result2 = dst.Resize(ocvb.result1.Size())
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         kalman.Dispose()
@@ -464,8 +471,10 @@ Public Class Kalman_Single
             ocvb.label1 = "Mean of the grayscale image is predicted"
             ocvb.label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         If plot IsNot Nothing Then plot.Dispose()
     End Sub
 End Class
+

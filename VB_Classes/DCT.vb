@@ -31,6 +31,7 @@ Public Class DCT_RGB
         cv.Cv2.Merge(srcPlanes, ocvb.result1)
 
         cv.Cv2.Subtract(ocvb.color, ocvb.result1, ocvb.result2)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -60,6 +61,7 @@ Public Class DCT_RGBDepth
         src32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC1, 255)
 
         cv.Cv2.Subtract(gray, ocvb.result1, ocvb.result2)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -89,6 +91,7 @@ Public Class DCT_Grayscale
         src32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC1, 255)
 
         cv.Cv2.Subtract(gray, ocvb.result1, ocvb.result2)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -133,6 +136,7 @@ Public Class DCT_FeatureLess_MT
         ocvb.result2.SetTo(0)
         ocvb.color.CopyTo(ocvb.result2, ocvb.result1)
         ocvb.label1 = "Mask of DCT with highest frequency removed"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         dct.Dispose()
@@ -216,6 +220,7 @@ Public Class DCT_Surfaces_debug
         End If
         flow.Run(ocvb)
         ocvb.label1 = "Largest flat surface segment stats"
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         Mats.Dispose()
@@ -244,6 +249,7 @@ Public Class DCT_CCompenents
 
         cc.srcGray = ocvb.result1.Clone()
         cc.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         dct.Dispose()
@@ -279,5 +285,6 @@ Public Class DCT_Rows
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse + cv.DctFlags.Rows)
         src32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC1, 255)
         ocvb.result2 = ocvb.result1.Threshold(sliders.TrackBar2.Value, 255, cv.ThresholdTypes.Binary)
+		MyBase.Finish(ocvb)
     End Sub
 End Class

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module Dither_module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -174,5 +174,6 @@ Public Class Dither_Basics
             End If
         Next
         hpixels.Free()
+		MyBase.Finish(ocvb)
     End Sub
 End Class

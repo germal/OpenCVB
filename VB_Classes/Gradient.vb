@@ -23,6 +23,7 @@ Public Class Gradient_Basics
         Dim gray = angle.Normalize(255, 0, cv.NormTypes.MinMax)
         gray.ConvertTo(ocvb.result2, cv.MatType.CV_8UC1)
         ocvb.result1 = sobel.dst
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         sobel.Dispose()
@@ -53,6 +54,7 @@ Public Class Gradient_Depth
         Dim gray = angle.Normalize(255, 0, cv.NormTypes.MinMax)
         gray.ConvertTo(ocvb.result2, cv.MatType.CV_8UC1)
         ocvb.result1 = sobel.dst
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         sobel.Dispose()
@@ -79,8 +81,10 @@ Public Class Gradient_Flatland
         ocvb.result1 /= reductionFactor
         ocvb.result1 *= reductionFactor
         grade.Run(ocvb)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
                 grade.Dispose()
     End Sub
 End Class
+

@@ -61,6 +61,7 @@ Public Class Hough_Circles
         For i = 0 To cFound.Length - 1
             cv.Cv2.Circle(ocvb.result2, New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, cv.LineTypes.AntiAlias)
         Next
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         circles.Dispose()
@@ -112,6 +113,7 @@ Public Class Hough_Lines
             Next
             ocvb.label2 = "Probablistic lines = " + CStr(probSegments.Length)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         edges.Dispose()
@@ -164,9 +166,11 @@ Public Class Hough_Lines_MT
             houghShowLines(ocvb.result2(roi), segments, 1)
         End Sub)
         ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         edges.Dispose()
         grid.Dispose()
             End Sub
 End Class
+

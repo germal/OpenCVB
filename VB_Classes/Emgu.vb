@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 
 Public Class Emgu_Basics
     Inherits ocvbClass
@@ -16,6 +16,7 @@ Public Class Emgu_Basics
             ' why not just have Draw return a Mat from Emgu?  Because an Emgu Mat is not an OpenCVSharp Mat!  But this works...
             ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, data)
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -42,6 +43,8 @@ Public Class Emgu_Facedetection
             tmp = tmp.Resize(New cv.Size(ocvb.result1.Rows, ocvb.result1.Rows))
             ocvb.result1(New cv.Rect(0, 0, tmp.Rows, tmp.Cols)) = tmp
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+
 

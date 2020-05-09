@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class Pencil_Basics
     Inherits ocvbClass
@@ -14,6 +14,7 @@ Public Class Pencil_Basics
         Dim sigma_r = sliders.TrackBar2.Value / sliders.TrackBar2.Maximum
         Dim shadowFactor = sliders.TrackBar3.Value / 1000
         cv.Cv2.PencilSketch(ocvb.color, ocvb.result2, ocvb.result1, sigma_s, sigma_r, shadowFactor)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -44,5 +45,7 @@ Public Class Pencil_Manual
             index += 1
             If index >= 3 Then index = 0
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class
+

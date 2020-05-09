@@ -50,5 +50,6 @@ Public Class PyStream_Basics
                 If pipeImages.IsConnected Then pipeImages.Write(depthBuffer, 0, depthBuffer.Length)
             End If
         End If
+		MyBase.Finish(ocvb)
     End Sub
 End Class

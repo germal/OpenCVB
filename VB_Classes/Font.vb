@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Font_OpenCV
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -22,6 +22,7 @@ Public Class Font_OpenCV
             Dim hersheyFontItalics = hersheyFont + cv.HersheyFonts.Italic
             cv.Cv2.PutText(ocvb.result2, hersheyName + " " + Format(size, "#0.0"), New cv.Point(10, 30 + i * 30), hersheyFontItalics, size, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -45,6 +46,7 @@ Public Class Font_TrueType
                                               "Global TrueType Font = " + ocvb.fontName + " with size " + CStr(ocvb.fontSize) + vbCrLf +
                                               "Use 'ocvb.putText' with 'ocvb.fontName' and 'ocvb.fontSize' to exploit global font.",
                                               10, 50, "Times New Roman", 10, RESULT1))
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         font.Dispose()
@@ -87,5 +89,6 @@ Public Class Font_FlowText
             Next
         End If
         lastCount = msgs.Count
+		MyBase.Finish(ocvb)
     End Sub
 End Class

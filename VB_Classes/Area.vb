@@ -52,6 +52,7 @@ Public Class Area_MinTriangle_CPP
             Dim p2 = triangle.Get(Of cv.Point2f)((i + 1) Mod 3)
             ocvb.result1.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         Next
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -88,6 +89,7 @@ Public Class Area_MinRect
 
         minRect = cv.Cv2.MinAreaRect(srcPoints)
         drawRotatedRectangle(minRect, ocvb.result1, cv.Scalar.Yellow)
+		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -127,6 +129,7 @@ Public Class Area_MinMotionRect
         gray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         motionRectangles(gray, ocvb.result2, ocvb.rColors)
         ocvb.result2.SetTo(cv.Scalar.All(255), gray)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         input.Dispose()
@@ -168,5 +171,6 @@ Public Class Area_FindNonZero
             outstr += "X = " + vbTab + CStr(pt.X) + vbTab + " y = " + vbTab + CStr(pt.Y) + vbCrLf
         Next
         ocvb.putText(New ActiveClass.TrueType(outstr, 10, 50, RESULT2))
+		MyBase.Finish(ocvb)
     End Sub
 End Class

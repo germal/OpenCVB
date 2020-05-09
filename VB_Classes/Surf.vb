@@ -43,6 +43,7 @@ Public Class Surf_Basics_CS
             ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
             If CS_SurfBasics.keypoints1 IsNot Nothing Then ocvb.label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
         End If
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
                         fisheye.Dispose()
@@ -80,6 +81,7 @@ Public Class Surf_Basics
         surf.Run(ocvb)
         surf.dst(New cv.Rect(0, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(ocvb.result1)
         surf.dst(New cv.Rect(surf.srcLeft.Width, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(ocvb.result2)
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         surf.Dispose()
@@ -132,6 +134,7 @@ Public Class Surf_DrawMatchManual_CS
             If pt.Y <> -1 Then ocvb.result2.Circle(keys2(i).Pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
         ocvb.label2 = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
+		MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         surf.Dispose()
