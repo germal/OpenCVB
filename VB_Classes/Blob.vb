@@ -194,7 +194,7 @@ End Class
 
 Public Class Blob_Rectangles
     Inherits ocvbClass
-    Dim blobs As Blob_LargestBlob
+    Dim blobs As Blob_Largest
     Dim kalman() As Kalman_Basics
     Private Class CompareRect : Implements IComparer(Of cv.Rect)
         Public Function Compare(ByVal a As cv.Rect, ByVal b As cv.Rect) As Integer Implements IComparer(Of cv.Rect).Compare
@@ -207,7 +207,7 @@ Public Class Blob_Rectangles
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.parms.ShowOptions = False
-        blobs = New Blob_LargestBlob(ocvb, caller)
+        blobs = New Blob_Largest(ocvb, caller)
         ocvb.desc = "Get the blobs and their masks and outline them with a rectangle."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -253,7 +253,7 @@ End Class
 
 
 
-Public Class Blob_LargestBlob
+Public Class Blob_Largest
     Inherits ocvbClass
     Dim blobs As Blob_DepthClusters
     Public rects As List(Of cv.Rect)

@@ -22,6 +22,7 @@ Public Class OpenGL_MyOpenGLtest
     Public Sub Run(ocvb As AlgorithmData)
         ogl.rgbInput = ocvb.color
         ogl.Run(ocvb)
+        MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose() 
         ogl.Dispose()

@@ -20,11 +20,14 @@ Public Class ocvbClass : Implements IDisposable
             caller = Me.GetType.Name
         Else
             standalone = False
-            caller = callerRaw + "-->" + Me.GetType.Name
+            caller = callerRaw + "/" + Me.GetType.Name
         End If
     End Sub
     Public Sub New()
         algorithm = Me
+    End Sub
+    Public Sub Finish(ocvb As AlgorithmData)
+        If standalone And dst.Width <> 0 Then ocvb.result1 = dst
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         On Error Resume Next

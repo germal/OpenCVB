@@ -2,7 +2,7 @@
 Public Class Mean_Basics
     Inherits ocvbClass
     Dim images As New List(Of cv.Mat)
-    Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw as string)
         setCaller(caller)
         sliders.setupTrackBar1(ocvb, caller, "Mean - number of input images", 1, 100, 10)
         ocvb.desc = "Create an image that is the mean of x number of previous images."
