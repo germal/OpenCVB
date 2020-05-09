@@ -4,9 +4,7 @@ Imports System.IO
 'https://docs.opencv.org/3.1.0/da/d22/tutorial_py_canny.html
 Public Class Edges_Canny
     Inherits ocvbClass
-    Public src As cv.Mat
-    Public dst As New cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Canny threshold1", 1, 255, 50)
         sliders.setupTrackBar2(ocvb, caller, "Canny threshold2", 1, 255, 50)
@@ -228,8 +226,6 @@ End Class
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edges_Sobel
     Inherits ocvbClass
-    Public src As cv.Mat
-    Public dst As cv.Mat
     Public grayX As cv.Mat
     Public grayY As cv.Mat
         Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)

@@ -1,12 +1,11 @@
 Imports cv = OpenCvSharp
 Public Class TextureFlow_Basics
     Inherits ocvbClass
-        Public src As cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Texture Flow Delta", 2, 100, 12)
         sliders.setupTrackBar2(ocvb, caller, "Texture Eigen BlockSize", 1, 100, 20)
-        sliders.setupTrackBar3(ocvb, caller,"Texture Eigen Ksize", 1, 15, 1)
+        sliders.setupTrackBar3(ocvb, caller, "Texture Eigen Ksize", 1, 15, 1)
 
         ocvb.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub

@@ -5,9 +5,7 @@ Imports cv = OpenCvSharp
 Public Class Gabor_Basics
     Inherits ocvbClass
     Public gKernel As New cv.Mat
-    Public src As New cv.Mat
-    Public dst As New cv.Mat
-        Public ksize As Double
+    Public ksize As Double
     Public Sigma As Double
     Public theta As Double
     Public lambda As Double

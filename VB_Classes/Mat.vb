@@ -133,8 +133,7 @@ Public Class Mat_4to1
     Dim mat3 As cv.Mat
     Dim mat4 As cv.Mat
     Public mat() As cv.Mat = {mat1, mat2, mat3, mat4}
-        Public noLines As Boolean ' if they want lines or not...
-    Public dst As New cv.Mat
+    Public noLines As Boolean ' if they want lines or not...
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.label1 = ""
@@ -179,8 +178,7 @@ Public Class Mat_2to1
     Dim mat1 As cv.Mat
     Dim mat2 As cv.Mat
     Public mat() = {mat1, mat2}
-        Public noLines As Boolean ' if they want lines or not...
-    Public dst As New cv.Mat
+    Public noLines As Boolean ' if they want lines or not...
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.label1 = ""

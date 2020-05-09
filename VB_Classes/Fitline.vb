@@ -3,8 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Fitline_Basics
     Inherits ocvbClass
     Public draw As Draw_Line
-            Public src As New cv.Mat
-    Public dst As New cv.Mat
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)

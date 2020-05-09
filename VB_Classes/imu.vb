@@ -84,11 +84,11 @@ Public Class IMU_Stabilizer
             Dim sx = 1 ' assume no scaling is taking place.
             Dim sy = 1 ' assume no scaling is taking place.
 
-            kalman.src = {dx, dy, da}
+            kalman.input = {dx, dy, da}
             kalman.Run(ocvb)
-            dx = kalman.dst(0)
-            dy = kalman.dst(1)
-            da = kalman.dst(2)
+            dx = kalman.output(0)
+            dy = kalman.output(1)
+            da = kalman.output(2)
 
             Dim smoothedMat = New cv.Mat(2, 3, cv.MatType.CV_64F)
             smoothedMat.Set(Of Double)(0, 0, sx * Math.Cos(da))
@@ -463,7 +463,7 @@ Public Class IMU_GVector
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Kalman_Basics(ocvb, caller)
-        ReDim kalman.src(6 - 1)
+        ReDim kalman.input(6 - 1)
 
         ocvb.desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
@@ -476,11 +476,11 @@ Public Class IMU_GVector
         angleY = Math.Atan2(gy, Math.Sqrt(gx * gx + gz * gz))
         angleZ = -Math.Atan2(gz, Math.Sqrt(gx * gx + gy * gy))
 
-        kalman.src = {gx, gy, gz, angleX, angleY, angleZ}
+        kalman.input = {gx, gy, gz, angleX, angleY, angleZ}
         kalman.Run(ocvb)
-        gx = kalman.dst(0)
-        gy = kalman.dst(1)
-        gz = kalman.dst(2)
+        gx = kalman.output(0)
+        gy = kalman.output(1)
+        gz = kalman.output(2)
 
         If standalone Then
             Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf

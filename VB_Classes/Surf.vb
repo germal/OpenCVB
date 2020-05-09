@@ -5,16 +5,15 @@ Imports CS_Classes
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Surf_Basics_CS
     Inherits ocvbClass
-            Public CS_SurfBasics As New CS_SurfBasics
+    Public CS_SurfBasics As New CS_SurfBasics
     Dim fisheye As FishEye_Rectified
     Public srcLeft As New cv.Mat
     Public srcRight As New cv.Mat
-    Public dst As New cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         fisheye = New FishEye_Rectified(ocvb, caller)
 
-        radio.Setup(ocvb, caller,2)
+        radio.Setup(ocvb, caller, 2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True

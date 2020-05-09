@@ -26,7 +26,6 @@ Public Class Annealing_Basics_CPP
     Public cityPositions() As cv.Point2f
     Public cityOrder() As Int32
 
-    Public dst As New cv.Mat
     Public energy As Single
     Public closed As Boolean
     Public circularPattern As Boolean = True

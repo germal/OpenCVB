@@ -159,7 +159,7 @@ Public Class Blob_DepthClusters
     Inherits ocvbClass
     Public histBlobs As Histogram_DepthClusters
     Public flood As FloodFill_RelativeRange
-        Dim shadow As Depth_Holes
+    Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         shadow = New Depth_Holes(ocvb, caller)
@@ -175,7 +175,7 @@ Public Class Blob_DepthClusters
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
         histBlobs.Run(ocvb)
-        flood.fBasics.srcGray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        flood.fBasics.srcGray = histBlobs.dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         flood.fBasics.initialMask = shadow.holeMask
         flood.Run(ocvb)
         ocvb.label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
@@ -232,9 +232,9 @@ Public Class Blob_Rectangles
         ocvb.label1 = "Showing top " + CStr(blobsToShow) + " of the " + CStr(blobs.rects.Count) + " blobs found "
         For i = 0 To blobsToShow - 1
             Dim rect = sortedBlobs.ElementAt(i).Key
-            kalman(i).src = {rect.X, rect.Y, rect.Width, rect.Height}
+            kalman(i).input = {rect.X, rect.Y, rect.Width, rect.Height}
             kalman(i).Run(ocvb)
-            rect = New cv.Rect(kalman(i).dst(0), kalman(i).dst(1), kalman(i).dst(2), kalman(i).dst(3))
+            rect = New cv.Rect(kalman(i).output(0), kalman(i).output(1), kalman(i).output(2), kalman(i).output(3))
             ocvb.result1.Rectangle(rect, ocvb.colorScalar(i Mod 255), 2)
         Next
     End Sub
@@ -258,7 +258,7 @@ Public Class Blob_LargestBlob
     Dim blobs As Blob_DepthClusters
     Public rects As List(Of cv.Rect)
     Public masks As List(Of cv.Mat)
-        Public kalman As Kalman_Basics
+    Public kalman As Kalman_Basics
     Public blobIndex As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -272,13 +272,15 @@ Public Class Blob_LargestBlob
         rects = blobs.flood.fBasics.maskRects
         masks = blobs.flood.fBasics.masks
 
-        Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(blobIndex).Value ' this is the largest contiguous blob
-        ocvb.color.CopyTo(ocvb.result1, masks(maskIndex))
-        kalman.src = {rects(maskIndex).X, rects(maskIndex).Y, rects(maskIndex).Width, rects(maskIndex).Height}
-        kalman.Run(ocvb)
-        Dim res = kalman.dst
-        Dim rect = New cv.Rect(CInt(res(0)), CInt(res(1)), CInt(res(2)), CInt(res(3)))
-        ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
+        If masks.Count > 0 Then
+            Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(blobIndex).Value ' this is the largest contiguous blob
+            ocvb.color.CopyTo(ocvb.result1, masks(maskIndex))
+            kalman.input = {rects(maskIndex).X, rects(maskIndex).Y, rects(maskIndex).Width, rects(maskIndex).Height}
+            kalman.Run(ocvb)
+            Dim res = kalman.output
+            Dim rect = New cv.Rect(CInt(res(0)), CInt(res(1)), CInt(res(2)), CInt(res(3)))
+            ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
+        End If
         ocvb.label1 = "Show the largest blob of the " + CStr(rects.Count) + " blobs"
     End Sub
     Public Sub MyDispose()

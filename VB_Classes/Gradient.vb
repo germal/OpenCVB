@@ -3,8 +3,7 @@ Imports System.Runtime.InteropServices
 
 Public Class Gradient_Basics
     Inherits ocvbClass
-    Public src As cv.Mat
-        Dim sobel As Edges_Sobel
+    Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         sobel = New Edges_Sobel(ocvb, caller)

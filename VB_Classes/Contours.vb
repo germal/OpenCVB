@@ -3,8 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Contours_Basics
     Inherits ocvbClass
     Public rotatedRect As Draw_rotatedRectangles
-        Public src As New cv.Mat
-    Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         radio.Setup(ocvb, caller, 5)

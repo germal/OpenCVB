@@ -11,6 +11,8 @@ Public Class ocvbClass : Implements IDisposable
     Public videoOptions As New OptionsVideoName
     Public pyStream As PyStream_Basics = Nothing
     Public standalone As Boolean
+    Public src As New cv.Mat
+    Public dst As New cv.Mat
     Dim algorithm As Object
     Public Sub setCaller(callerRaw As String)
         If callerRaw = "" Or callerRaw = Me.GetType.Name Then

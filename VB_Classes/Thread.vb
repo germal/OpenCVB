@@ -10,7 +10,6 @@ Public Class Thread_Grid
         Public tilesPerRow As Int32
     Public tilesPerCol As Int32
     Dim incompleteRegions As Int32
-    Public src As New cv.Mat
     Private Sub drawGrid(rList As List(Of cv.Rect))
         For Each roi In rList
             Dim p1 = New cv.Point(roi.X + roi.Width, roi.Y)

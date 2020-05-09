@@ -3,7 +3,6 @@ Imports System.Text.RegularExpressions
 Public Class FloodFill_Basics
     Inherits ocvbClass
     Public srcGray As New cv.Mat
-    
     Public masks As New List(Of cv.Mat)
     Public maskSizes As New SortedList(Of Int32, Int32)(New CompareMaskSize)
     Public maskRects As New List(Of cv.Rect)
@@ -33,11 +32,10 @@ Public Class FloodFill_Basics
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
         Dim stepSize = sliders.TrackBar4.Value
 
-        if standalone Then
-            srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        End If
-        initialMask = New cv.Mat(srcGray.Size, cv.MatType.CV_8U, 0)
+        If standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result1 = srcGray.Clone()
+        If dst Is Nothing Then dst = ocvb.result2
+        initialMask = srcGray.EmptyClone()
         Dim rect As New cv.Rect
         Dim maskPlus = New cv.Mat(New cv.Size(srcGray.Width + 2, srcGray.Height + 2), cv.MatType.CV_8UC1)
         Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
@@ -65,14 +63,12 @@ Public Class FloodFill_Basics
             Next
         Next
 
-        if standalone Then
-            ocvb.result2.SetTo(0)
-            For i = 0 To masks.Count - 1
-                Dim maskIndex = maskSizes.ElementAt(i).Value
-                Dim nextColor = ocvb.colorScalar(i Mod 255)
-                ocvb.result2.SetTo(nextColor, masks(maskIndex))
-            Next
-        End If
+        dst.SetTo(0)
+        For i = 0 To masks.Count - 1
+            Dim maskIndex = maskSizes.ElementAt(i).Value
+            Dim nextColor = ocvb.colorScalar(i Mod 255)
+            dst.SetTo(nextColor, masks(maskIndex))
+        Next
         ocvb.label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
 End Class
@@ -129,8 +125,7 @@ Public Class FloodFill_Color_MT
     Inherits ocvbClass
     Dim flood As FloodFill_Top16_MT
     Dim grid As Thread_Grid
-    Public src As New cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
         flood = New FloodFill_Top16_MT(ocvb, caller)
@@ -284,6 +279,7 @@ Public Class FloodFill_RelativeRange
         If check.Box(0).Checked Then fBasics.floodFlag += cv.FloodFillFlags.FixedRange
         If check.Box(1).Checked Then fBasics.floodFlag += cv.FloodFillFlags.Link4 Else fBasics.floodFlag += cv.FloodFillFlags.Link8
         If check.Box(2).Checked Then fBasics.floodFlag += cv.FloodFillFlags.MaskOnly
+        fBasics.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         fBasics.Run(ocvb)
     End Sub
     Public Sub MyDispose()
@@ -349,8 +345,7 @@ End Class
 Public Class FloodFill_Projection
     Inherits ocvbClass
     Public srcGray As New cv.Mat
-    Public dst As cv.Mat
-        Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public objectRects As New List(Of cv.Rect)
     Public minFloodSize As Integer
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)

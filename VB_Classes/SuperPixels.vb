@@ -23,7 +23,6 @@ End Module
 Public Class SuperPixel_Basics_CPP
     Inherits ocvbClass
     Dim spPtr As IntPtr = 0
-        Public src As cv.Mat
     Public dst1 As cv.Mat
     Public dst2 As cv.Mat
         Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)

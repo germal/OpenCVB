@@ -5,8 +5,7 @@ Public Class BGSubtract_Basics_CPP
     Inherits ocvbClass
     Dim bgfs As IntPtr
     Public currMethod As Int32 = -1
-    Public src As New cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         radio.Setup(ocvb, caller, 7)
         radio.check(0).Text = "GMG"
@@ -179,8 +178,7 @@ End Class
 
 Public Class BGSubtract_MOG
     Inherits ocvbClass
-    Public src As New cv.Mat
-        Public gray As New cv.Mat
+    Public gray As New cv.Mat
     Dim MOG As cv.BackgroundSubtractorMOG
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -207,8 +205,7 @@ End Class
 
 Public Class BGSubtract_MOG2
     Inherits ocvbClass
-    Public src As New cv.Mat
-        Public gray As New cv.Mat
+    Public gray As New cv.Mat
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)

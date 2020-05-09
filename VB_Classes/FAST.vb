@@ -31,7 +31,7 @@ Public Class FAST_Centroid
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Kalman_Basics(ocvb, caller)
-        ReDim kalman.src(1) ' 2 elements - cv.point
+        ReDim kalman.input(1) ' 2 elements - cv.point
 
         fast = New FAST_Basics(ocvb, caller)
         ocvb.desc = "Find interesting points with the FAST and smooth the centroid with kalman"
@@ -45,10 +45,10 @@ Public Class FAST_Centroid
         Dim gray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim m = cv.Cv2.Moments(gray, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
-            kalman.src(0) = m.M10 / m.M00
-            kalman.src(1) = m.M01 / m.M00
+            kalman.input(0) = m.M10 / m.M00
+            kalman.input(1) = m.M01 / m.M00
             kalman.Run(ocvb)
-            ocvb.result2.Circle(New cv.Point(kalman.dst(0), kalman.dst(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            ocvb.result2.Circle(New cv.Point(kalman.output(0), kalman.output(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
     End Sub
     Public Sub MyDispose()

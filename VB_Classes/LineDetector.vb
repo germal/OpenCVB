@@ -172,8 +172,6 @@ End Module
 Public Class lineDetector_FLD
     Inherits ocvbClass
     Public sortedLines As SortedList(Of cv.Vec6f, Integer)
-        Public src As cv.Mat
-    Public dst As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         radio.Setup(ocvb, caller, 3)
@@ -512,8 +510,7 @@ End Class
 Public Class LineDetector_Basics
     Inherits ocvbClass
     Dim ld As cv.XImgProc.FastLineDetector
-    Public dst As New cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "LineDetector thickness of line", 1, 20, 2)
 

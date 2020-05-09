@@ -4,8 +4,7 @@ Public Class Entropy_Basics
     Inherits ocvbClass
     Dim flow As Font_FlowText
     Dim hist As Histogram_Basics
-    Public src As cv.Mat
-        Public entropy As Single
+    Public entropy As Single
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
         flow = New Font_FlowText(ocvb, caller)

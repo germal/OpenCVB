@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Basics
     Inherits ocvbClass
-    Public src As cv.Mat
-        Public zone() As cv.Rect = Nothing
+    Public zone() As cv.Rect = Nothing
     Public region()() As cv.Point = Nothing
     Dim saveParms() As Int32
     Dim mser As cv.MSER

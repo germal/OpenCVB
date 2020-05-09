@@ -45,12 +45,10 @@ End Module
 
 Public Class Math_Median_CDF
     Inherits ocvbClass
-    Public src As cv.Mat
-    Dim dst As cv.Mat
     Public medianVal As Double
     Public rangeMin As Integer = 0
     Public rangeMax As Integer = 255
-        Public bins As Int32 = 10
+    Public bins As Int32 = 10
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 4, 1000, 100)

@@ -28,8 +28,6 @@ End Class
 
 Public Class Transform_Rotate
     Inherits ocvbClass
-    Public src As cv.Mat
-    Public dst As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Angle", 0, 180, 30)

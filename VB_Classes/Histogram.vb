@@ -75,7 +75,6 @@ Public Class Histogram_Basics
     Inherits ocvbClass
     Public histRaw(2) As cv.Mat
     Public histNormalized(2) As cv.Mat
-    Public src As New cv.Mat
     Public bins As Int32 = 50
     Public minRange As Int32 = 0
     Public maxRange As Int32 = 255
@@ -235,8 +234,6 @@ End Class
 Public Class Histogram_2D_HueSaturation
     Inherits ocvbClass
     Public histogram As New cv.Mat
-    Public dst As New cv.Mat
-    Public src As New cv.Mat
     Public hsv As cv.Mat
 
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -457,8 +454,7 @@ Public Class Histogram_KalmanSmoothed
     Inherits ocvbClass
     Public gray As cv.Mat
     Public mask As New cv.Mat
-    Public dst As New cv.Mat
-    
+
     Public histogram As New cv.Mat
     Public kalman As Kalman_Basics
     Public plotHist As Plot_Histogram
@@ -497,13 +493,13 @@ Public Class Histogram_KalmanSmoothed
         ocvb.result1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "Plot Histogram bins = " + CStr(plotHist.bins)
 
-        ReDim kalman.src(plotHist.bins - 1)
+        ReDim kalman.input(plotHist.bins - 1)
         For i = 0 To plotHist.bins - 1
-            kalman.src(i) = histogram.Get(Of Single)(i, 0)
+            kalman.input(i) = histogram.Get(Of Single)(i, 0)
         Next
         kalman.Run(ocvb)
         For i = 0 To plotHist.bins - 1
-            histogram.Set(Of Single)(i, 0, kalman.dst(i))
+            histogram.Set(Of Single)(i, 0, kalman.output(i))
         Next
 
         plotHist.hist = histogram
@@ -524,7 +520,7 @@ Public Class Histogram_Depth
     Inherits ocvbClass
     Public trim As Depth_InRange
     Public plotHist As Plot_Histogram
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plotHist = New Plot_Histogram(ocvb, caller)
 
@@ -538,13 +534,12 @@ Public Class Histogram_Depth
         plotHist.minRange = trim.sliders.TrackBar1.Value
         plotHist.maxRange = trim.sliders.TrackBar2.Value
         plotHist.bins = sliders.TrackBar1.Value
+
         Dim histSize() = {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
-
         cv.Cv2.CalcHist(New cv.Mat() {getDepth32f(ocvb)}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
-        if standalone Then
-            plotHist.dst = ocvb.result2
+        If standalone Then
             plotHist.Run(ocvb)
         End If
     End Sub
@@ -598,13 +593,13 @@ Public Class Histogram_DepthValleys
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        ReDim kalman.src(hist.plotHist.hist.Rows - 1)
+        ReDim kalman.input(hist.plotHist.hist.Rows - 1)
         For i = 0 To hist.plotHist.hist.Rows - 1
-            kalman.src(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
+            kalman.input(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
         kalman.Run(ocvb)
         For i = 0 To hist.plotHist.hist.Rows - 1
-            hist.plotHist.hist.Set(Of Single)(i, 0, kalman.dst(i))
+            hist.plotHist.hist.Set(Of Single)(i, 0, kalman.output(i))
         Next
 
         Dim depthIncr = CInt(hist.trim.sliders.TrackBar2.Value / hist.sliders.TrackBar1.Value) ' each bar represents this number of millimeters
@@ -612,13 +607,13 @@ Public Class Histogram_DepthValleys
         Dim startDepth = 1
         Dim startEndDepth As cv.Point
         Dim depthBoundaries As New SortedList(Of Single, cv.Point)(New CompareCounts)
-        For i = 0 To kalman.dst.Length - 1
-            Dim prev2 = If(i > 2, kalman.dst(i - 2), 0)
-            Dim prev = If(i > 1, kalman.dst(i - 1), 0)
-            Dim curr = kalman.dst(i)
-            Dim post = If(i < kalman.dst.Length - 1, kalman.dst(i + 1), 0)
-            Dim post2 = If(i < kalman.dst.Length - 2, kalman.dst(i + 2), 0)
-            pointCount += kalman.dst(i)
+        For i = 0 To kalman.output.Length - 1
+            Dim prev2 = If(i > 2, kalman.output(i - 2), 0)
+            Dim prev = If(i > 1, kalman.output(i - 1), 0)
+            Dim curr = kalman.output(i)
+            Dim post = If(i < kalman.output.Length - 1, kalman.output(i + 1), 0)
+            Dim post2 = If(i < kalman.output.Length - 2, kalman.output(i + 2), 0)
+            pointCount += kalman.output(i)
             If curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr Then
                 startEndDepth = New cv.Point(startDepth, i * depthIncr)
                 depthBoundaries.Add(pointCount, startEndDepth)
@@ -650,7 +645,6 @@ Public Class Histogram_DepthValleys
         Next
         histogramBarsValleys(ocvb.result1, hist.plotHist.hist, plotColors)
         ocvb.label1 = "Histogram clustered by valleys and smoothed"
-        ocvb.label2 = "Original (unsmoothed) histogram"
     End Sub
     Public Sub MyDispose()
         hist.Dispose()
@@ -665,7 +659,7 @@ End Class
 Public Class Histogram_DepthClusters
     Inherits ocvbClass
     Public valleys As Histogram_DepthValleys
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         valleys = New Histogram_DepthValleys(ocvb, caller)
         ocvb.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
@@ -673,17 +667,19 @@ Public Class Histogram_DepthClusters
     Public Sub Run(ocvb As AlgorithmData)
         valleys.Run(ocvb)
 
-        ocvb.result2.SetTo(0)
         Dim mask As New cv.Mat
         Dim tmp As New cv.Mat
+        If standalone Then dst = ocvb.result2 Else dst = ocvb.result1.EmptyClone
         For i = 0 To valleys.rangeBoundaries.Count - 1
             Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
             cv.Cv2.InRange(getDepth32f(ocvb), startEndDepth.X, startEndDepth.Y, tmp)
             cv.Cv2.ConvertScaleAbs(tmp, mask)
-            if standalone Then ocvb.result2.SetTo(ocvb.colorScalar(i), mask)
+            If standalone Then dst.SetTo(ocvb.colorScalar(i), mask)
         Next
-        ocvb.label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
-        ocvb.label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"
+        If standalone Then
+            ocvb.label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
+            ocvb.label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"
+        End If
     End Sub
     Public Sub MyDispose()
         valleys.Dispose()

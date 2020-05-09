@@ -1,8 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class Resize_Basics
     Inherits ocvbClass
-        Public src As cv.Mat
-    Public dst As New cv.Mat
     Public newSize As cv.Size
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -80,9 +78,7 @@ End Class
 
 Public Class Resize_Percentage
     Inherits ocvbClass
-    Public src As New cv.Mat
-    Public dst As New cv.Mat
-        Public resizeOptions As Resize_Basics
+    Public resizeOptions As Resize_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         resizeOptions = New Resize_Basics(ocvb, caller)

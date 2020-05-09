@@ -74,17 +74,16 @@ End Class
 Public Class Hough_Lines
     Inherits ocvbClass
     Dim edges As Edges_Canny
-        Public segments() As cv.LineSegmentPolar
-        Public src As New cv.Mat
+    Public segments() As cv.LineSegmentPolar
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         edges = New Edges_Canny(ocvb, caller)
 
         sliders.setupTrackBar1(ocvb, caller, "rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, caller, "theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3(ocvb, caller,"threshold", 1, 100, 50)
-        sliders.setupTrackBar4(ocvb, caller,  "Lines to Plot", 1, 1000, 50)
-                ocvb.desc = "Use Houghlines to find lines in the image."
+        sliders.setupTrackBar3(ocvb, caller, "threshold", 1, 100, 50)
+        sliders.setupTrackBar4(ocvb, caller, "Lines to Plot", 1, 1000, 50)
+        ocvb.desc = "Use Houghlines to find lines in the image."
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)

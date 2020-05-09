@@ -80,8 +80,7 @@ End Class
 
 Public Class Blur_Bilateral
     Inherits ocvbClass
-    Public src As New cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 32, 5)
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"

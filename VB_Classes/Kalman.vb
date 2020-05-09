@@ -3,9 +3,9 @@ Imports cv = OpenCvSharp
 Public Class Kalman_Basics
     Inherits ocvbClass
     Dim kalman() As Kalman_Single
-    Public src() As Single
-    Public dst() As Single
-        Public ProcessNoiseCov As Single = 0.00001
+    Public input() As Single
+    Public output() As Single
+    Public ProcessNoiseCov As Single = 0.00001
     Public MeasurementNoiseCov As Single = 0.1
     Public ErrorCovPost As Single = 1
 
@@ -20,15 +20,15 @@ Public Class Kalman_Basics
     Private Sub setValues(ocvb As AlgorithmData)
         ocvb.label1 = "Rectangle moves smoothly from random locations"
         Static autoRand As New Random()
-        ReDim src(4 - 1)
+        ReDim input(4 - 1)
         Dim w = ocvb.color.Width
         Dim h = ocvb.color.Height
-        src = {autoRand.Next(50, w - 50), autoRand.Next(50, h - 50), autoRand.Next(5, w / 4), autoRand.Next(5, h / 4)}
+        input = {autoRand.Next(50, w - 50), autoRand.Next(50, h - 50), autoRand.Next(5, w / 4), autoRand.Next(5, h / 4)}
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If src Is Nothing Then setValues(ocvb)
+        If input Is Nothing Then setValues(ocvb)
         Static saveDimension As Int32 = -1
-        If saveDimension <> src.Length Then
+        If saveDimension <> input.Length Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
                     For i = 0 To kalman.Count - 1
@@ -36,37 +36,37 @@ Public Class Kalman_Basics
                     Next
                 End If
             End If
-            saveDimension = src.Length
-            ReDim kalman(src.Length - 1)
-            For i = 0 To src.Length - 1
+            saveDimension = input.Length
+            ReDim kalman(input.Length - 1)
+            For i = 0 To input.Length - 1
                 kalman(i) = New Kalman_Single(ocvb, caller)
                 kalman(i).ProcessNoiseCov = ProcessNoiseCov
                 kalman(i).MeasurementNoiseCov = MeasurementNoiseCov
                 kalman(i).ErrorCovPost = ErrorCovPost
             Next
-            ReDim dst(src.Count - 1)
+            ReDim output(input.Count - 1)
         End If
 
         If check.Box(0).Checked Then
             For i = 0 To kalman.Length - 1
-                kalman(i).inputReal = src(i)
+                kalman(i).inputReal = input(i)
                 kalman(i).Run(ocvb)
             Next
 
-            For i = 0 To src.Length - 1
-                dst(i) = kalman(i).stateResult
+            For i = 0 To input.Length - 1
+                output(i) = kalman(i).stateResult
             Next
         Else
-            dst = src ' do nothing to the input.
+            output = input ' do nothing to the input.
         End If
 
         if standalone Then
             ocvb.result1 = ocvb.color.Clone()
-            Static rect As New cv.Rect(CInt(dst(0)), CInt(dst(1)), CInt(dst(2)), CInt(dst(3)))
-            If rect.X = CInt(dst(0)) And rect.Y = CInt(dst(1)) And rect.Width = CInt(dst(2)) And rect.Height = CInt(dst(3)) Then
+            Static rect As New cv.Rect(CInt(output(0)), CInt(output(1)), CInt(output(2)), CInt(output(3)))
+            If rect.X = CInt(output(0)) And rect.Y = CInt(output(1)) And rect.Width = CInt(output(2)) And rect.Height = CInt(output(3)) Then
                 setValues(ocvb)
             Else
-                rect = New cv.Rect(CInt(dst(0)), CInt(dst(1)), CInt(dst(2)), CInt(dst(3)))
+                rect = New cv.Rect(CInt(output(0)), CInt(output(1)), CInt(output(2)), CInt(output(3)))
             End If
             ocvb.result1.Rectangle(rect, cv.Scalar.White, 6)
             ocvb.result1.Rectangle(rect, cv.Scalar.Red, 1)
@@ -226,8 +226,8 @@ Public Class Kalman_MousePredict
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Kalman_Basics(ocvb, caller)
-        ReDim kalman.src(1)
-        ReDim kalman.dst(1)
+        ReDim kalman.input(1)
+        ReDim kalman.output(1)
 
         If ocvb.parms.lowResolution = False Then locMultiplier = 2 ' twice the size in both dimensions.
         ocvb.label1 = "Red is real mouse, white is prediction"
@@ -237,12 +237,12 @@ Public Class Kalman_MousePredict
         If ocvb.frameCount Mod 100 = 0 Then ocvb.result1.SetTo(0)
 
         Static lastRealMouse = ocvb.mousePoint
-        kalman.src(0) = ocvb.mousePoint.X
-        kalman.src(1) = ocvb.mousePoint.Y
-        Dim lastStateResult = New cv.Point(kalman.dst(0), kalman.dst(1))
+        kalman.input(0) = ocvb.mousePoint.X
+        kalman.input(1) = ocvb.mousePoint.Y
+        Dim lastStateResult = New cv.Point(kalman.output(0), kalman.output(1))
         kalman.Run(ocvb)
         cv.Cv2.Line(ocvb.result1, New cv.Point(lastStateResult.X, lastStateResult.Y) * locMultiplier,
-                                  New cv.Point(kalman.dst(0), kalman.dst(1)) * locMultiplier,
+                                  New cv.Point(kalman.output(0), kalman.output(1)) * locMultiplier,
                                   cv.Scalar.All(255), 1, cv.LineTypes.AntiAlias)
         cv.Cv2.Line(ocvb.result1, ocvb.mousePoint * locMultiplier, lastRealMouse * locMultiplier, New cv.Scalar(0, 0, 255), 1, cv.LineTypes.AntiAlias)
         lastRealMouse = ocvb.mousePoint
@@ -260,9 +260,7 @@ End Class
 Public Class Kalman_CVMat
     Inherits ocvbClass
     Dim kalman() As Kalman_Single
-    Public src As cv.Mat
-    Public dst As cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.label1 = "Rectangle moves smoothly to random locations"
         ocvb.desc = "Use Kalman to stabilize a set of values (such as a cv.rect.)"

@@ -32,8 +32,7 @@ End Module
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class GetRotationMatrix2D_Basics
     Inherits ocvbClass
-    Public src As New cv.Mat
-        Public M As cv.Mat
+    Public M As cv.Mat
     Public Mflip As cv.Mat
     Public warpFlag As Int32
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)

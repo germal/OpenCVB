@@ -302,7 +302,6 @@ Public Class Projection_G_CPP
     Dim histPtr As IntPtr
     Dim xyzBytes() As Byte
     Public histogramRun As Boolean
-    Public src As cv.Mat
     Public dst1 As cv.Mat
     Public dst2 As cv.Mat
     Public maxZ As Single
@@ -441,7 +440,7 @@ Public Class Projection_Floodfill
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Kalman_Basics(ocvb, caller)
-        ReDim kalman.src(10 * 4 - 1) ' max 10 objects.
+        ReDim kalman.input(10 * 4 - 1) ' max 10 objects.
 
         sliders.setupTrackBar1(ocvb, caller, "epsilon for GroupRectangles X100", 0, 200, 80)
 
@@ -472,18 +471,18 @@ Public Class Projection_Floodfill
         Dim epsilon = sliders.TrackBar1.Value / 100
         cv.Cv2.GroupRectangles(combinedRects, 1, epsilon)
 
-        For i = 0 To Math.Min(combinedRects.Count * 2, kalman.src.Count) - 1 Step 4
+        For i = 0 To Math.Min(combinedRects.Count * 2, kalman.input.Count) - 1 Step 4
             Dim rIndex = i / 2
-            kalman.src(i) = combinedRects(rIndex).X
-            kalman.src(i + 1) = combinedRects(rIndex).Y
-            kalman.src(i + 2) = combinedRects(rIndex).Width
-            kalman.src(i + 3) = combinedRects(rIndex).Height
+            kalman.input(i) = combinedRects(rIndex).X
+            kalman.input(i + 1) = combinedRects(rIndex).Y
+            kalman.input(i + 2) = combinedRects(rIndex).Width
+            kalman.input(i + 3) = combinedRects(rIndex).Height
         Next
         kalman.Run(ocvb)
         Dim rects As New List(Of cv.Rect)
-        For i = 0 To Math.Min(combinedRects.Count * 2, kalman.src.Count) - 1 Step 4
+        For i = 0 To Math.Min(combinedRects.Count * 2, kalman.input.Count) - 1 Step 4
             Dim rect = combinedRects(i / 2)
-            rects.Add(New cv.Rect(kalman.dst(i), kalman.dst(i + 1), kalman.dst(i + 2), kalman.dst(i + 3)))
+            rects.Add(New cv.Rect(kalman.output(i), kalman.output(i + 1), kalman.output(i + 2), kalman.output(i + 3)))
         Next
 
         ocvb.result2 = flood.dst.Resize(ocvb.color.Size())

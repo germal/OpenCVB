@@ -1,8 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Mean_Basics
     Inherits ocvbClass
-    Public src As cv.Mat
-    Public dst As cv.Mat
     Dim images As New List(Of cv.Mat)
     Public Sub New(ocvb As AlgorithmData, ByVal caller As String)
         setCaller(caller)

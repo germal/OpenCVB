@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 ' http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
 Public Class Coherence_Basics
     Inherits ocvbClass
-    Public src As New cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Find lines that are artistically coherent in the image - Painterly Effect."
         sliders.setupTrackBar1(ocvb, caller, "Coherence Sigma", 1, 15, 9)

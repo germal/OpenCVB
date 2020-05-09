@@ -2,9 +2,7 @@
 
 Public Class DilateErode_Basics
     Inherits ocvbClass
-    Public src As New cv.Mat
-    Public dst As New cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Dilate/Erode Kernel Size", 1, 32, 5)
         sliders.setupTrackBar2(ocvb, caller, "Erode (-) to Dilate (+)", -32, 32, 1)

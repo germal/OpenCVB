@@ -16,9 +16,9 @@ Public Class Quaterion_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        sliders1.setupTrackBar1(ocvb, caller, "quaternion A.x X100", -100, 100, 10)
+        sliders1.setupTrackBar1(ocvb, caller, "quaternion A.x X100", -100, 100, -50)
         sliders1.setupTrackBar2(ocvb, caller, "quaternion A.y X100", -100, 100, 10)
-        sliders1.setupTrackBar3(ocvb, caller, "quaternion A.z X100", -100, 100, 10)
+        sliders1.setupTrackBar3(ocvb, caller, "quaternion A.z X100", -100, 100, 20)
         sliders1.setupTrackBar4(ocvb, caller, "quaternion Theta X100", -100, 100, 100)
 
         sliders2.setupTrackBar1(ocvb, caller, "quaternion B.x X100", -100, 100, -10)
@@ -38,7 +38,6 @@ Public Class Quaterion_Basics
         ocvb.putText(New ActiveClass.TrueType("q1 = " + q1.ToString() + vbCrLf +
                                                   "q2 = " + q2.ToString() + vbCrLf +
                                                   "Multiply q1 * q2" + quatmul.ToString(), 10, 60))
-
     End Sub
 End Class
 

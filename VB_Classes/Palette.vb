@@ -179,8 +179,7 @@ Public Class Palette_DrawTest
     Inherits ocvbClass
     Dim palette As Palette_ColorMap
     Dim draw As Draw_RngImage
-    Public src As New cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         palette = New Palette_ColorMap(ocvb, caller)
 
@@ -281,8 +280,7 @@ End Class
 
 Public Class Palette_ColorMap
     Inherits ocvbClass
-    Public src As New cv.Mat
-        Public gradMap As Palette_BuildGradientColorMap
+    Public gradMap As Palette_BuildGradientColorMap
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         gradMap = New Palette_BuildGradientColorMap(ocvb, caller)

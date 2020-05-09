@@ -6,7 +6,6 @@ Public Class Plot_OverTime
     Public plotCount As Int32 = 3
     Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.White}
     Public backColor = cv.Scalar.Aquamarine
-        Public dst As cv.Mat
     Public minScale As Int32 = 50
     Public maxScale As Int32 = 200
     Public plotTriggerRescale = 50
@@ -112,27 +111,23 @@ End Class
 Public Class Plot_Histogram
     Inherits ocvbClass
     Public hist As New cv.Mat
-    Public dst As New cv.Mat
     Public bins As Int32 = 50
     Public minRange As Int32 = 0
     Public maxRange As Int32 = 255
     Public backColor As cv.Scalar = cv.Scalar.Red
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Histogram Font Size x10", 1, 20, 10)
-
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
-            sliders.Visible = False ' probably don't want this except when running standalone.
-        Else
             Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim dimensions() = New Integer() {bins}
             Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
             cv.Cv2.CalcHist(New cv.Mat() {gray}, New Integer() {0}, New cv.Mat(), hist, 1, dimensions, ranges)
-            dst = ocvb.result1
         End If
+        dst = ocvb.result1
         Dim barWidth = Int(dst.Width / hist.Rows)
         Dim minVal As Single, maxVal As Single
         hist.MinMaxLoc(minVal, maxVal)
@@ -190,7 +185,6 @@ Public Class Plot_Basics_CPP
     Inherits ocvbClass
     Public srcX(49) As Double
     Public srcY(49) As Double
-        Public dst As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
