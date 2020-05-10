@@ -29,7 +29,7 @@ Public Class AddWeighted_Test
     Public Sub Run(ocvb As AlgorithmData)
         weight.Run(ocvb)
         dst = weight.dst
-		MyBase.Finish(ocvb)
+        MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         weight.Dispose()

@@ -93,20 +93,9 @@ Public Class Annealing_Basics_CPP
         dst.SetTo(0)
         drawMap(ocvb)
 
-        Static lastEnergy = 0.0
-        Static countDown As Integer = 100
-        ocvb.label1 = Me.GetType.Name
-        If CInt(lastEnergy) = CInt(energy) Then
-            ocvb.label1 += "  countdown = " + CStr(countDown)
-            countDown -= 1
-            If countDown = 0 Then restartComputation = True
-        End If
-        lastEnergy = energy
-
         If restartComputation Or InStr(msg, "temp=0.000") Or InStr(msg, "changesApplied=0 temp") Then
             Annealing_Basics_Close(saPtr)
             restartComputation = False
-            countDown = 100
             If standalone Then
                 setup(ocvb)
                 Open()
@@ -285,7 +274,6 @@ Public Class Annealing_Options
         If check.Box(1).Checked = False Then anneal.cityPositions = random.Points2f.Clone()
         anneal.setup(ocvb)
         anneal.Open()
-        ocvb.label2 = "Log of energy and temperature.."
         ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
