@@ -161,10 +161,13 @@ Public Class Blob_DepthClusters
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
+        histBlobs.src = shadow.dst
         histBlobs.Run(ocvb)
-        flood.fBasics.srcGray = histBlobs.dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        flood.fBasics.initialMask = shadow.holeMask
-        flood.Run(ocvb)
+        dst = histBlobs.dst
+        dst2 = histBlobs.dst2
+        'flood.fBasics.srcGray = histBlobs.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        'flood.fBasics.initialMask = shadow.holeMask
+        'flood.Run(ocvb)
         ocvb.label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
     End Sub
 End Class

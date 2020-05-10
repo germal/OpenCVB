@@ -32,11 +32,7 @@ Public Class FloodFill_Basics
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
         Dim stepSize = sliders.TrackBar4.Value
 
-        If standalone Then
-            srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            dst = ocvb.result2
-        End If
-        ocvb.result1 = srcGray.Clone()
+        If standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         initialMask = srcGray.EmptyClone()
         Dim rect As New cv.Rect
         Dim maskPlus = New cv.Mat(New cv.Size(srcGray.Width + 2, srcGray.Height + 2), cv.MatType.CV_8UC1)
@@ -65,7 +61,7 @@ Public Class FloodFill_Basics
             Next
         Next
 
-        dst = ocvb.result2.EmptyClone
+        dst = ocvb.color.EmptyClone.SetTo(0)
         For i = 0 To masks.Count - 1
             Dim maskIndex = maskSizes.ElementAt(i).Value
             Dim nextColor = ocvb.colorScalar(i Mod 255)
@@ -261,9 +257,9 @@ Public Class FloodFill_RelativeRange
         If check.Box(0).Checked Then fBasics.floodFlag += cv.FloodFillFlags.FixedRange
         If check.Box(1).Checked Then fBasics.floodFlag += cv.FloodFillFlags.Link4 Else fBasics.floodFlag += cv.FloodFillFlags.Link8
         If check.Box(2).Checked Then fBasics.floodFlag += cv.FloodFillFlags.MaskOnly
-        fBasics.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then fBasics.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         fBasics.Run(ocvb)
-        ocvb.result2 = fBasics.dst.Clone()
+        dst2 = fBasics.dst.Clone()
     End Sub
 End Class
 

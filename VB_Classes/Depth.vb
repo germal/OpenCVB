@@ -675,7 +675,7 @@ Public Class Depth_InRange
         dst = depth32f.Clone()
         dst.SetTo(0, zeroMask)
 
-        If standalone Then ocvb.result1 = dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If standalone Then dst = dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -1099,13 +1099,13 @@ Public Class Depth_Holes
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         holeMask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
-        If standalone Then ocvb.result1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If standalone Then dst = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         borderMask = holeMask.Dilate(element, Nothing, sliders.TrackBar1.Value)
         cv.Cv2.BitwiseXor(borderMask, holeMask, borderMask)
         If standalone Then
-            ocvb.result2.SetTo(0)
-            ocvb.RGBDepth.CopyTo(ocvb.result2, borderMask)
+            dst2 = ocvb.color.EmptyClone.SetTo(0)
+            ocvb.RGBDepth.CopyTo(dst2, borderMask)
         End If
     End Sub
 End Class

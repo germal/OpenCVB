@@ -574,18 +574,20 @@ Public Class Histogram_DepthValleys
         Dim startDepth = 1
         Dim startEndDepth As cv.Point
         Dim depthBoundaries As New SortedList(Of Single, cv.Point)(New CompareCounts)
-        For i = 0 To kalman.output.Length - 1
+        For i = 2 To kalman.output.Length - 3
             Dim prev2 = If(i > 2, kalman.output(i - 2), 0)
             Dim prev = If(i > 1, kalman.output(i - 1), 0)
             Dim curr = kalman.output(i)
             Dim post = If(i < kalman.output.Length - 1, kalman.output(i + 1), 0)
             Dim post2 = If(i < kalman.output.Length - 2, kalman.output(i + 2), 0)
             pointCount += kalman.output(i)
-            If curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr Then
-                startEndDepth = New cv.Point(startDepth, i * depthIncr)
-                depthBoundaries.Add(pointCount, startEndDepth)
-                pointCount = 0
-                startDepth = i * depthIncr + 0.1
+            If prev2 > 1 And prev > 1 And curr > 1 And post > 1 And post2 > 1 Then
+                If curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr Then
+                    startEndDepth = New cv.Point(startDepth, i * depthIncr)
+                    depthBoundaries.Add(pointCount, startEndDepth)
+                    pointCount = 0
+                    startDepth = i * depthIncr + 0.1
+                End If
             End If
         Next
 
@@ -610,7 +612,8 @@ Public Class Histogram_DepthValleys
                 End If
             Next
         Next
-        histogramBarsValleys(ocvb.result1, hist.plotHist.hist, plotColors)
+        dst = ocvb.color.EmptyClone.SetTo(0)
+        histogramBarsValleys(dst, hist.plotHist.hist, plotColors)
         ocvb.label1 = "Histogram clustered by valleys and smoothed"
     End Sub
 End Class
@@ -629,15 +632,16 @@ Public Class Histogram_DepthClusters
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         valleys.Run(ocvb)
+        dst = valleys.dst
 
         Dim mask As New cv.Mat
         Dim tmp As New cv.Mat
-        If standalone Then dst = ocvb.result2 Else dst = ocvb.result1.EmptyClone
+        dst2 = ocvb.color.EmptyClone.SetTo(0)
         For i = 0 To valleys.rangeBoundaries.Count - 1
             Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
             cv.Cv2.InRange(getDepth32f(ocvb), startEndDepth.X, startEndDepth.Y, tmp)
             cv.Cv2.ConvertScaleAbs(tmp, mask)
-            If standalone Then dst.SetTo(ocvb.colorScalar(i), mask)
+            dst2.SetTo(ocvb.colorScalar(i), mask)
         Next
         If standalone Then
             ocvb.label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
