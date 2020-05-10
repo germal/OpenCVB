@@ -198,8 +198,8 @@ Public Class BGSubtract_MOG
         Else
             gray = src
         End If
-        MOG.Apply(gray, ocvb.result1, sliders.TrackBar1.Value / 1000)
-		MyBase.Finish(ocvb)
+        MOG.Apply(gray, dst, sliders.TrackBar1.Value / 1000)
+        MyBase.Finish(ocvb)
     End Sub
     Public Sub MyDispose()
         MOG.Dispose()

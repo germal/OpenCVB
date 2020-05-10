@@ -306,8 +306,6 @@ Public Class Projection_G_CPP
     Dim histPtr As IntPtr
     Dim xyzBytes() As Byte
     Public histogramRun As Boolean
-    Public dst1 As cv.Mat
-    Public dst2 As cv.Mat
     Public maxZ As Single
     Public meanX As Mean_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)

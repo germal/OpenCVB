@@ -23,13 +23,11 @@ End Module
 Public Class SuperPixel_Basics_CPP
     Inherits ocvbClass
     Dim spPtr As IntPtr = 0
-    Public dst1 As cv.Mat
-    Public dst2 As cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Number of SuperPixels", 1, 1000, 400)
         sliders.setupTrackBar2(ocvb, caller, "Iterations", 0, 10, 4)
-        sliders.setupTrackBar3(ocvb, caller,"Prior", 1, 10, 2)
+        sliders.setupTrackBar3(ocvb, caller, "Prior", 1, 10, 2)
 
         ocvb.label2 = "Superpixel label data (0-255)"
         ocvb.desc = "Sub-divide the image into super pixels."
