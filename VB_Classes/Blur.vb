@@ -11,7 +11,6 @@ Public Class Blur_Gaussian
         Dim kernelSize As Int32 = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         cv.Cv2.GaussianBlur(ocvb.color, ocvb.result1, New cv.Size(kernelSize, kernelSize), 0, 0)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -26,7 +25,6 @@ Public Class Blur_Gaussian_CS
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         CS_BlurGaussian.Run(ocvb.color, ocvb.result1, sliders.TrackBar1.Value)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -42,7 +40,6 @@ Public Class Blur_Median_CS
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         CS_BlurMedian.Run(ocvb.color, ocvb.result1, sliders.TrackBar1.Value)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -60,7 +57,6 @@ Public Class Blur_Homogeneous
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         ocvb.result1 = ocvb.color.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
         ocvb.result2 = ocvb.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -77,7 +73,6 @@ Public Class Blur_Median
         Dim kernelSize As Int32 = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         cv.Cv2.MedianBlur(ocvb.color, ocvb.result1, kernelSize)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -95,7 +90,6 @@ Public Class Blur_Bilateral
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         if standalone Then src = ocvb.color.Clone()
         cv.Cv2.BilateralFilter(src, ocvb.result1, kernelSize, kernelSize * 2, kernelSize / 2)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -130,12 +124,6 @@ Public Class Blur_PlusHistogram
         mat2to1.mat(1) = ocvb.result2.Clone()
         mat2to1.Run(ocvb)
         ocvb.label2 = "Top is before, Bottom is after"
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        blur.Dispose()
-        myhist.Dispose()
-        mat2to1.Dispose()
     End Sub
 End Class
 

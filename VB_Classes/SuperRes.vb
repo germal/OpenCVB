@@ -37,7 +37,6 @@ Public Class SuperRes_Basics : Implements IDisposable
     Public Sub Run(ocvb As AlgorithmData)
         Dim src = ocvb.color.Clone()
         'fs.NextFrame(src)
-		MyBase.Finish(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         fs.Dispose()
@@ -75,7 +74,6 @@ Public Class SuperRes_Video : Implements IDisposable
         'If normalFrame.Empty() Then Exit Sub
         'sr.NextFrame(srFrame)
         'cv.Cv2.ImShow("srFrame", srFrame)
-		MyBase.Finish(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         videoOptions.Dispose()
@@ -119,7 +117,6 @@ Public Class SuperRes_CPP : Implements IDisposable
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, IIf(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), dstData)
         End If
-		MyBase.Finish(ocvb)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         SuperRes_Close(SuperRes)

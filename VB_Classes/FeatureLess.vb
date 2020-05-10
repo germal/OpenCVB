@@ -3,16 +3,16 @@ Public Class Featureless_Basics_MT
     Inherits ocvbClass
     Public edges As Edges_Canny
     Public grid As Thread_Grid
-        Public regionCount As Int32
+    Public regionCount As Int32
     Public mask As New cv.Mat
     Public objects As New List(Of cv.Mat)
     Public objectSize As New List(Of Int32)
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "FeatureLess rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, caller, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3(ocvb, caller,"FeatureLess threshold", 1, 100, 3)
-        sliders.setupTrackBar4(ocvb, caller,  "FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
+        sliders.setupTrackBar3(ocvb, caller, "FeatureLess threshold", 1, 100, 3)
+        sliders.setupTrackBar4(ocvb, caller, "FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
 
         edges = New Edges_Canny(ocvb, caller)
 
@@ -72,12 +72,7 @@ Public Class Featureless_Basics_MT
             ocvb.result2.SetTo(mean, label)
         Next
         ocvb.label2 = "FeatureLess Regions = " + CStr(regionCount)
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
-        edges.Dispose()
-        grid.Dispose()
-            End Sub
 End Class
 
 
@@ -85,9 +80,9 @@ End Class
 
 Public Class FeatureLess_Prediction
     Inherits ocvbClass
-        Dim fLess As Featureless_Basics_MT
+    Dim fLess As Featureless_Basics_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "FeatureLess Resize Percent", 1, 100, 1)
 
         fLess = New Featureless_Basics_MT(ocvb, caller)
@@ -157,11 +152,7 @@ Public Class FeatureLess_Prediction
         Dim predictedDepth = response.Reshape(1, depth32f.Height)
         predictedDepth.Normalize(0, 255, cv.NormTypes.MinMax)
         predictedDepth.ConvertTo(mask, cv.MatType.CV_8U)
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
-        fLess.Dispose()
-            End Sub
 End Class
 
 
@@ -171,7 +162,7 @@ Public Class Featureless_DCT_MT
     Inherits ocvbClass
     Dim dct As DCT_FeatureLess_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         dct = New DCT_FeatureLess_MT(ocvb, caller)
 
         ocvb.desc = "Use DCT to find largest featureless region."
@@ -186,7 +177,7 @@ Public Class Featureless_DCT_MT
         Dim regionCount = 1
         For y = 0 To mask.Rows - 1
             For x = 0 To mask.Cols - 1
-                If mask.Get(of Byte)(y, x) = 255 Then
+                If mask.Get(Of Byte)(y, x) = 255 Then
                     Dim pt As New cv.Point(x, y)
                     Dim floodCount = mask.FloodFill(pt, regionCount)
                     objectSize.Add(floodCount)
@@ -207,10 +198,6 @@ Public Class Featureless_DCT_MT
         Dim nonZ = label.CountNonZero()
         ocvb.label2 = "Largest FeatureLess Region (" + CStr(nonZ) + " " + Format(nonZ / label.Total, "#0.0%") + " pixels)"
         ocvb.result2.SetTo(cv.Scalar.White, label)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        dct.Dispose()
     End Sub
 End Class
 

@@ -55,7 +55,6 @@ Public Class Watershed_Basics
         Else
             ocvb.result1 = ocvb.color
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -81,10 +80,6 @@ Public Class Watershed_DepthAuto
         ocvb.result2 = ocvb.result1.Erode(element, New cv.Point(3, 3), 5)
 
         watershed.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        watershed.Dispose()
     End Sub
 End Class
 
@@ -113,10 +108,6 @@ Public Class Watershed_RGBSimpleAuto
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         watershed.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        watershed.Dispose()
     End Sub
 End Class
 
@@ -144,10 +135,6 @@ Public Class Watershed_RGBDepthAuto
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         watershed.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        watershed.Dispose()
     End Sub
 End Class
 

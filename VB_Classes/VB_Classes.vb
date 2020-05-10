@@ -180,7 +180,7 @@ Public Class ActiveClass : Implements IDisposable
         Try
             If ocvb.parms.useRecordedData Then recordedData.Run(ocvb)
             If ocvb.color IsNot Nothing And ocvb.RGBDepth IsNot Nothing Then
-                ActiveAlgorithm.Run(ocvb)
+                ActiveAlgorithm.NextFrame(ocvb)
                 ocvb.frameCount += 1
 
                 MakeSureImage8uC3(ocvb.result1)

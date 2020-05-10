@@ -174,6 +174,5 @@ Public Class Dither_Basics
             End If
         Next
         hpixels.Free()
-		MyBase.Finish(ocvb)
     End Sub
 End Class

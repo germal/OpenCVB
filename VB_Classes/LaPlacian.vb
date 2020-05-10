@@ -21,7 +21,6 @@ Public Class Laplacian_Basics
         Dim dst = srcGray.Laplacian(ddepth, kernelSize, scale, delta)
         ocvb.result1 = dst.ConvertScaleAbs()
         ocvb.label1 = "Laplacian Filter k = " + CStr(kernelSize)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -65,7 +64,6 @@ Public Class Laplacian_Blur
         Dim dst = srcGray.Laplacian(ddepth, kernelSize, scale, delta)
         ocvb.result1 = dst.ConvertScaleAbs()
         ocvb.label1 = "Laplacian+" + blurText + " k = " + CStr(kernelSize)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

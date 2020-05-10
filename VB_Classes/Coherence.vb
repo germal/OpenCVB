@@ -66,7 +66,6 @@ Public Class Coherence_Basics
         ocvb.result1(srcRect) = src
         ocvb.result1.Rectangle(srcRect, cv.Scalar.Yellow, 2)
         ocvb.drawRect = srcRect
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -84,9 +83,5 @@ Public Class Coherence_Depth
     Public Sub Run(ocvb As AlgorithmData)
         coherent.src = ocvb.RGBDepth
         coherent.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        coherent.Dispose()
     End Sub
 End Class

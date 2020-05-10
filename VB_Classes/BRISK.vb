@@ -28,7 +28,6 @@ Public Class BRISK_Basics
         if standalone Then
             cv.Cv2.AddWeighted(ocvb.color, 0.5, wt, 0.5, 0, ocvb.result1)
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

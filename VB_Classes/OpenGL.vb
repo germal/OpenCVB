@@ -120,22 +120,13 @@ Public Class OpenGL_Basics
             Dim buff = System.Text.Encoding.UTF8.GetBytes(imageLabel)
             pipe.Write(buff, 0, imageLabel.Length)
         End If
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
-        If pipe IsNot Nothing Then
-            If pipe.IsConnected Then
-                pipe.Flush()
-                pipe.WaitForPipeDrain()
-                pipe.Disconnect()
-            End If
-        End If
+    Public Sub Close()
         Dim proc = Process.GetProcessesByName(OpenGLTitle)
         For i = 0 To proc.Count - 1
             proc(i).CloseMainWindow()
         Next i
         If memMapPtr <> 0 Then Marshal.FreeHGlobal(memMapPtr)
-        imu.Dispose()
     End Sub
 End Class
 
@@ -201,10 +192,6 @@ Public Class OpenGL_Options
         OpenGL.scaleXYZ.Item2 = sliders3.TrackBar3.Value
 
         OpenGL.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        OpenGL.Dispose()
     End Sub
 End Class
 
@@ -223,10 +210,6 @@ Public Class OpenGL_Callbacks
     Public Sub Run(ocvb As AlgorithmData)
         ogl.rgbInput = ocvb.color
         ogl.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        ogl.Dispose()
     End Sub
 End Class
 
@@ -255,10 +238,6 @@ Public Class OpenGL_IMU
         Else
             ocvb.putText(New ActiveClass.TrueType("No IMU present on this RealSense device", 20, 100))
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        ogl.Dispose()
     End Sub
 End Class
 
@@ -280,7 +259,7 @@ Public Class OpenGL_3Ddata
     Dim colors As Palette_Gradient
     Public ogl As OpenGL_Options
     Dim histInput() As Byte
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
 
@@ -316,10 +295,6 @@ Public Class OpenGL_3Ddata
 
         ogl.OpenGL.dataInput = histogram.Clone()
         ogl.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        ogl.Dispose()
     End Sub
 End Class
 
@@ -352,11 +327,6 @@ Public Class OpenGL_Draw3D
         ogl.OpenGL.dataInput = ocvb.result2
         ogl.OpenGL.rgbInput = New cv.Mat(1, ocvb.rColors.Length - 1, cv.MatType.CV_8UC3, ocvb.rColors.ToArray)
         ogl.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        ogl.Dispose()
-        circle.Dispose()
     End Sub
 End Class
 
@@ -383,11 +353,6 @@ Public Class OpenGL_Voxels
         ogl.dataInput = New cv.Mat(voxels.grid.tilesPerCol, voxels.grid.tilesPerRow, cv.MatType.CV_64F, voxels.voxels)
         ogl.dataInput *= 1 / (voxels.maxDepth - voxels.minDepth)
         ogl.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        voxels.Dispose()
-        ogl.Dispose()
     End Sub
 End Class
 
@@ -462,11 +427,6 @@ Public Class OpenGL_GravityTransform
         ogl.rgbInput = ocvb.color
         ogl.Run(ocvb)
         If ocvb.frameCount Mod 30 = 0 Then rotateFlag += 1
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        ogl.Dispose()
-        imu.Dispose()
     End Sub
 End Class
 

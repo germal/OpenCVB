@@ -20,7 +20,6 @@ Public Class Transform_Resize
             ocvb.result1.SetTo(0)
             ocvb.result1(roi) = ocvb.color.Resize(New cv.Size(w, h), 0)
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -43,7 +42,6 @@ Public Class Transform_Rotate
         Dim imageCenter = New cv.Point2f(src.Width / 2, src.Height / 2)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.TrackBar1.Value, sliders.TrackBar2.Value / 100)
         cv.Cv2.WarpAffine(src, dst, rotationMat, New cv.Size())
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -69,7 +67,6 @@ Public Class Transform_Sort
         If radio.check(3).Checked Then sortOption = cv.SortFlags.EveryRow
         Dim sorted = gray.Sort(sortOption + cv.SortFlags.EveryColumn)
         ocvb.result1 = sorted.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -93,7 +90,6 @@ Public Class Transform_SortReshape
         Dim sorted = gray.Sort(sortOption + cv.SortFlags.EveryColumn)
         sorted = sorted.Reshape(1, ocvb.color.Rows)
         ocvb.result1 = sorted.CvtColor(cv.ColorConversionCodes.gray2bgr)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

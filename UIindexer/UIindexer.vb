@@ -76,7 +76,7 @@ Module IndexMain
                 line = Trim(nextFile.ReadLine())
                 Dim lcaseLine = " " + LCase(line)
                 If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
-                If lcaseLine.Contains("Painterly Effect") Then Painterly.Add(classname, classname)
+                If lcaseLine.Contains("painterly") Then Painterly.Add(classname, classname)
                 If LCase(line).StartsWith("public class") Then
                     Dim split As String() = Regex.Split(line, "\W+")
                     ' next line must be "Inherits ocvbClass"

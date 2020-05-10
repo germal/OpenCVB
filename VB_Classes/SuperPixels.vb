@@ -76,11 +76,10 @@ Public Class SuperPixel_Basics_CPP
         Dim labels = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32S, labelData)
         If numSuperPixels < 255 Then labels *= 255 / numSuperPixels
         labels.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
+    Public Sub Close()
         SuperPixel_Close(spPtr)
-            End Sub
+    End Sub
 End Class
 
 
@@ -92,7 +91,7 @@ Public Class SuperPixel_Depth
     Inherits ocvbClass
     Dim pixels As SuperPixel_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         pixels = New SuperPixel_Basics_CPP(ocvb, caller)
 
         ocvb.desc = "Create SuperPixels using RGBDepth image."
@@ -102,10 +101,6 @@ Public Class SuperPixel_Depth
         pixels.Run(ocvb)
         ocvb.result1 = pixels.dst1
         ocvb.result2 = pixels.dst2
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        pixels.Dispose()
     End Sub
 End Class
 
@@ -119,7 +114,7 @@ Public Class SuperPixel_WithCanny
     Dim pixels As SuperPixel_Basics_CPP
     Dim edges As Edges_Canny
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         edges = New Edges_Canny(ocvb, caller)
 
         pixels = New SuperPixel_Basics_CPP(ocvb, caller)
@@ -136,10 +131,6 @@ Public Class SuperPixel_WithCanny
         ocvb.result2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result2.SetTo(cv.Scalar.Red, edges.dst)
         ocvb.label2 = "Edges provided by Canny in red"
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        pixels.Dispose()
     End Sub
 End Class
 
@@ -153,7 +144,7 @@ Public Class SuperPixel_WithLineDetector
     Dim pixels As SuperPixel_Basics_CPP
     Dim lines As LineDetector_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         lines = New LineDetector_Basics(ocvb, caller)
 
         pixels = New SuperPixel_Basics_CPP(ocvb, caller)
@@ -171,10 +162,6 @@ Public Class SuperPixel_WithLineDetector
         ' ocvb.result2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ' ocvb.result2.SetTo(cv.Scalar.Red, lines.dst)
         ' ocvb.label2 = "Edges provided by Canny in red"
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        pixels.Dispose()
     End Sub
 End Class
 

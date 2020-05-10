@@ -46,7 +46,6 @@ Public Class Gabor_Basics
             ocvb.result2.SetTo(0)
             ocvb.result2 = gKernel.Resize(ocvb.color.Size(), 0, 0, cv.InterpolationFlags.Cubic)
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -109,6 +108,5 @@ Public Class Gabor_Basics_MT
             End SyncLock
         End Sub)
         ocvb.result1 = accum
-		MyBase.Finish(ocvb)
     End Sub
 End Class

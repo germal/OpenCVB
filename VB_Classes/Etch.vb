@@ -62,6 +62,5 @@ Public Class Etch_ASketch
             lastCursor = cursor
         End If
         keys.input = ""
-		MyBase.Finish(ocvb)
     End Sub
 End Class

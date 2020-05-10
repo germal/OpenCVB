@@ -122,7 +122,6 @@ Public Class Histogram_Basics
             AddPlotScale(ocvb.result1, 0, maxVal, sliders.TrackBar3.Value / 10)
             ocvb.label1 = "Histogram for Color image above - " + CStr(bins) + " bins"
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -150,10 +149,6 @@ Public Class Histogram_NormalizeGray
             cv.Cv2.Normalize(histogram.gray, histogram.gray, sliders.TrackBar1.Value, sliders.TrackBar2.Value, cv.NormTypes.MinMax) ' only minMax is working...
         End If
         histogram.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        histogram.Dispose()
     End Sub
 End Class
 
@@ -165,7 +160,7 @@ Public Class Histogram_EqualizeColor
     Inherits ocvbClass
     Dim kalman As Histogram_KalmanSmoothed
     Dim mats As Mat_2to1
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Histogram_KalmanSmoothed(ocvb, caller)
         kalman.sliders.TrackBar1.Value = 40
@@ -185,7 +180,7 @@ Public Class Histogram_EqualizeColor
             cv.Cv2.EqualizeHist(rgb(i), rgbEq(i))
         Next
 
-        if standalone Then
+        If standalone Then
             kalman.gray = rgb(0).Clone() ' just show the green plane
             kalman.dst = mats.mat(0)
             kalman.plotHist.backColor = cv.Scalar.Green
@@ -200,11 +195,6 @@ Public Class Histogram_EqualizeColor
 
             cv.Cv2.Merge(rgbEq, ocvb.result1)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        kalman.Dispose()
-        mats.Dispose()
     End Sub
 End Class
 
@@ -214,19 +204,15 @@ End Class
 Public Class Histogram_EqualizeGray
     Inherits ocvbClass
     Public histogram As Histogram_KalmanSmoothed
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         histogram = New Histogram_KalmanSmoothed(ocvb, caller)
         ocvb.desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then histogram.gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then histogram.gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(histogram.gray, histogram.gray)
         histogram.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        histogram.Dispose()
     End Sub
 End Class
 
@@ -258,7 +244,6 @@ Public Class Histogram_2D_HueSaturation
         cv.Cv2.CalcHist(New cv.Mat() {hsv}, New Integer() {0, 1}, New cv.Mat(), histogram, 2, histSize, ranges)
 
         histogram2DPlot(histogram, dst, hbins, sbins)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -306,12 +291,6 @@ Public Class Histogram_2D_XZ_YZ
         histogram2DPlot(histogram, ocvb.result2, xbins, zbins)
         mats.mat(3) = ocvb.result2.Clone()
         mats.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        trim.Dispose()
-        xyDepth.Dispose()
-        mats.Dispose()
     End Sub
 End Class
 
@@ -360,10 +339,6 @@ Public Class Histogram_BackProjectionGrayScale
         ocvb.result1.SetTo(0)
         ocvb.color.CopyTo(ocvb.result1, mask)
         ocvb.label1 = "BackProjection of most frequent pixel + " + CStr(neighbors) + " neighbor" + If(neighbors <> 1, "s", "")
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        hist.Dispose()
     End Sub
 End Class
 
@@ -400,10 +375,6 @@ Public Class Histogram_BackProjection
         mask = mask.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
         ocvb.result1.SetTo(0)
         ocvb.color.CopyTo(ocvb.result1, mask)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        hist.Dispose()
     End Sub
 End Class
 
@@ -448,11 +419,6 @@ Public Class Histogram_ColorsAndGray
         Next
 
         mats.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        histogram.Dispose()
-        mats.Dispose()
     End Sub
 End Class
 
@@ -483,7 +449,7 @@ Public Class Histogram_KalmanSmoothed
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static splitIndex As Int32 = -1
-        if standalone Then
+        If standalone Then
             Dim split() = cv.Cv2.Split(ocvb.color)
             If ocvb.frameCount Mod 500 = 0 Then
                 splitIndex += 1
@@ -513,13 +479,8 @@ Public Class Histogram_KalmanSmoothed
 
         plotHist.hist = histogram
         plotHist.dst = dst
-        if standalone Then plotHist.backColor = splitColors(splitIndex)
+        If standalone Then plotHist.backColor = splitColors(splitIndex)
         plotHist.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        kalman.Dispose()
-        plotHist.Dispose()
     End Sub
 End Class
 
@@ -552,11 +513,6 @@ Public Class Histogram_Depth
         If standalone Then
             plotHist.Run(ocvb)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        trim.Dispose()
-        plotHist.Dispose()
     End Sub
 End Class
 
@@ -656,11 +612,6 @@ Public Class Histogram_DepthValleys
         Next
         histogramBarsValleys(ocvb.result1, hist.plotHist.hist, plotColors)
         ocvb.label1 = "Histogram clustered by valleys and smoothed"
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        hist.Dispose()
-        kalman.Dispose()
     End Sub
 End Class
 
@@ -692,9 +643,5 @@ Public Class Histogram_DepthClusters
             ocvb.label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
             ocvb.label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        valleys.Dispose()
     End Sub
 End Class

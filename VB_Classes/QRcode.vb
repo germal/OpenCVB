@@ -38,7 +38,6 @@ Public Class QRcode_Basics
             ocvb.result1.Line(box(i), box((i + 1) Mod 4), cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
         Next
         If refersTo <> "" Then ocvb.label1 = refersTo
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

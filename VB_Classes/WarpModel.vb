@@ -5,12 +5,12 @@ Imports System.Runtime.InteropServices
 ' https://github.com/petraohlin/Colorizing-the-Prokudin-Gorskii-Collection
 Public Class WarpModel_Input
     Inherits ocvbClass
-        Public rgb(3 - 1) As cv.Mat
+    Public rgb(3 - 1) As cv.Mat
     Public gradient(3 - 1) As cv.Mat
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
-        radio.Setup(ocvb, caller,12)
+        setCaller(callerRaw)
+        radio.Setup(ocvb, caller, 12)
         radio.check(0).Text = "building.jpg"
         radio.check(1).Text = "church.jpg"
         radio.check(2).Text = "emir.jpg"
@@ -25,7 +25,7 @@ Public Class WarpModel_Input
         radio.check(11).Text = "Valley.jpg"
         radio.check(9).Checked = True
 
-        check.Setup(ocvb, caller,  1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Use Gradient in WarpInput"
 
         sobel = New Edges_Sobel(ocvb, caller)
@@ -56,11 +56,7 @@ Public Class WarpModel_Input
         cv.Cv2.Merge(rgb, merged)
         ocvb.result1(r(0)) = rgb(0).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result2(r(0)) = merged
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
-                sobel.Dispose()
-            End Sub
 End Class
 
 
@@ -167,11 +163,9 @@ Public Class WarpModel_FindTransformECC_CPP
             outStr += vbCrLf + "NOTE: input resized for performance." + vbCrLf + "Results are probably distorted." + vbCrLf + "Gradients may give better results."
         End If
         ocvb.putText(New ActiveClass.TrueType(outStr, aligned.Width + 10, 220, RESULT1))
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
+    Public Sub Close()
         WarpModel_Close(cPtr)
-                input.Dispose()
     End Sub
 End Class
 
@@ -186,7 +180,7 @@ Public Class WarpModel_AlignImages
     Inherits ocvbClass
     Dim ecc As WarpModel_FindTransformECC_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         ecc = New WarpModel_FindTransformECC_CPP(ocvb, caller)
 
         ocvb.desc = "Align the RGB inputs raw images from the Prokudin examples."
@@ -213,10 +207,6 @@ Public Class WarpModel_AlignImages
         ocvb.putText(New ActiveClass.TrueType("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
                                               "Other than that, images look the same." + vbCrLf +
                                               "Displacement increases with Sobel" + vbCrLf + "kernel size", merged.Width + 10, 100, RESULT1))
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        ecc.Dispose()
     End Sub
 End Class
 

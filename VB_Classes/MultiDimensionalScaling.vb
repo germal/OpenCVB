@@ -85,6 +85,5 @@ Public Class MultiDimensionScaling_Cities
                                          "Seattle", "Washington D.C.")
             ocvb.result1.PutText(cityName, textPos, cv.HersheyFonts.HersheySimplex, 0.5, cv.Scalar.White)
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class

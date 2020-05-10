@@ -15,6 +15,5 @@ Public Class Bitmap_ToMat
 
         bitmap = cv.Extensions.BitmapConverter.ToBitmap(ocvb.color)
         ocvb.result2 = cv.Extensions.BitmapConverter.ToMat(bitmap)
-		MyBase.Finish(ocvb)
     End Sub
 End Class

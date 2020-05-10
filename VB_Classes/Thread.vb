@@ -6,8 +6,8 @@ Public Class Thread_Grid
     Inherits ocvbClass
     Public roiList As List(Of cv.Rect)
     Public borderList As List(Of cv.Rect)
-        Public gridMask As cv.Mat
-        Public tilesPerRow As Int32
+    Public gridMask As cv.Mat
+    Public tilesPerRow As Int32
     Public tilesPerCol As Int32
     Dim incompleteRegions As Int32
     Private Sub drawGrid(rList As List(Of cv.Rect))
@@ -24,7 +24,7 @@ Public Class Thread_Grid
         Next
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         src = ocvb.color
         sliders.setupTrackBar1(ocvb, caller, "ThreadGrid Width", 5, src.Width, 32)
         sliders.setupTrackBar2(ocvb, caller, "ThreadGrid Height", 5, src.Height, 32)
@@ -81,22 +81,18 @@ Public Class Thread_Grid
                 borderList.Add(broi)
             Next
 
-            if standalone Then drawGrid(borderList)
+            If standalone Then drawGrid(borderList)
 
             lastWidth = sliders.TrackBar1.Value
             lastHeight = sliders.TrackBar2.Value
             lastBorder = borderSize
         End If
 
-        if standalone Then
+        If standalone Then
             src.CopyTo(ocvb.result1)
             ocvb.result1.SetTo(cv.Scalar.All(255), gridMask)
             ocvb.label1 = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
                           CStr(roiList(0).Width) + "X" + CStr(roiList(0).Height) + " regions"
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-                gridMask.Dispose()
     End Sub
 End Class

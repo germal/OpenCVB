@@ -27,7 +27,6 @@ Public Class Resize_Basics
         Else
             dst = src.Resize(newSize, 0, 0, resizeFlag)
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -66,10 +65,6 @@ Public Class Resize_After8uc3
         colorizer.src = depth32f
         colorizer.Run(ocvb)
         ocvb.result1 = colorizer.dst
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        colorizer.Dispose()
     End Sub
 End Class
 
@@ -91,14 +86,14 @@ Public Class Resize_Percentage
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim percent As Double = CDbl(sliders.TrackBar1.Value / 100)
-        if standalone Then src = ocvb.color
-        dim resizePercent = sliders.TrackBar1.Value / 100
+        If standalone Then src = ocvb.color
+        Dim resizePercent = sliders.TrackBar1.Value / 100
         resizePercent = Math.Sqrt(resizePercent)
         resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * resizePercent), Math.Ceiling(src.Height * resizePercent))
         resizeOptions.src = src
         resizeOptions.Run(ocvb)
 
-        if standalone Then
+        If standalone Then
             Dim roi As New cv.Rect(0, 0, resizeOptions.dst.Width, resizeOptions.dst.Height)
             ocvb.result1 = resizeOptions.dst(roi).Resize(resizeOptions.dst.Size())
             ocvb.label1 = "Image after resizing to " + Format(sliders.TrackBar1.Value, "#0.0") + "% of original size"
@@ -106,10 +101,6 @@ Public Class Resize_Percentage
         Else
             dst = resizeOptions.dst
         End If
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
-        resizeOptions.Dispose()
-            End Sub
 End Class
 

@@ -23,6 +23,5 @@ Public Class Grayscale_Basics
                 Next
             Next
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class

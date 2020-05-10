@@ -17,10 +17,6 @@ Public Class Covariance_Basics
         If ocvb.frameCount Mod 100 = 0 Then
             ocvb.label1 = "covar(0) = " + Format(covar.Get(Of Double)(0), "#0.0") + " mean = " + Format(overallMean(0), "#0.00")
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        random.Dispose()
     End Sub
 End Class
 
@@ -41,7 +37,6 @@ Public Class Covariance_Test
         cv.Cv2.CalcCovarMatrix(samples, covar, mean, cv.CovarFlags.Cols)
         Dim overallMean = mean.Mean()
         ocvb.label1 = "covar(0) = " + Format(covar.Get(Of Double)(0), "#0.0") + " mean(overall) = " + Format(overallMean(0), "#0.00")
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

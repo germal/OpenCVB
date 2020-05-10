@@ -2,14 +2,14 @@ Imports cv = OpenCvSharp
 Public Class Voxels_Basics_MT
     Inherits ocvbClass
     Public trim As Depth_InRange
-        Public grid As Thread_Grid
+    Public grid As Thread_Grid
     Public voxels() As Double
     Public voxelMat As cv.Mat
     Public minDepth As Double
     Public maxDepth As Double
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
-        check.Setup(ocvb, caller,  1)
+        setCaller(callerRaw)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Display intermediate results"
         check.Box(0).Checked = True
 
@@ -61,7 +61,7 @@ Public Class Voxels_Basics_MT
             Parallel.For(0, gridCount,
             Sub(i)
                 Dim roi = grid.roiList(i)
-                Dim v = voxelMat.Get(of Double)(i)
+                Dim v = voxelMat.Get(Of Double)(i)
                 If v > 0 And v < 256 Then
                     Dim color = New cv.Scalar(((256 - v) * nearColor(0) + v * farColor(0)) >> 8,
                                               ((256 - v) * nearColor(1) + v * farColor(1)) >> 8,
@@ -70,10 +70,5 @@ Public Class Voxels_Basics_MT
                 End If
             End Sub)
         End If
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
-        grid.Dispose()
-                trim.Dispose()
-            End Sub
 End Class

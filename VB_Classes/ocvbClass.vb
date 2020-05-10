@@ -28,7 +28,8 @@ Public Class ocvbClass : Implements IDisposable
     Public Sub New()
         algorithm = Me
     End Sub
-    Public Sub Finish(ocvb As AlgorithmData)
+    Public Sub NextFrame(ocvb As AlgorithmData)
+        algorithm.Run(ocvb)
         If standalone And dst.Width <> 0 Then ocvb.result1 = dst
         If standalone And dst2.Width <> 0 Then ocvb.result2 = dst2
     End Sub
@@ -39,11 +40,12 @@ Public Class ocvbClass : Implements IDisposable
             proc(i).Kill()
         Next i
         If pyStream IsNot Nothing Then pyStream.Dispose()
-        If algorithm.GetProperty("MyDispose") IsNot Nothing Then algorithm.MyDispose()  ' dispose of any managed and unmanaged classes.
+        If algorithm.GetProperty("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
         sliders.Dispose()
         sliders1.Dispose()
         sliders2.Dispose()
         sliders3.Dispose()
+        check.Dispose()
         radio1.Dispose()
         videoOptions.Dispose()
     End Sub

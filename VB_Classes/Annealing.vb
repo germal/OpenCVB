@@ -102,9 +102,8 @@ Public Class Annealing_Basics_CPP
             End If
             closed = True
         End If
-        MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
+    Public Sub Close()
         Annealing_Basics_Close(saPtr)
     End Sub
 End Class
@@ -231,15 +230,6 @@ Public Class Annealing_CPP_MT
         End If
 
         If allClosed Then setup(ocvb)
-        MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        random.Dispose()
-        mats.Dispose()
-        flow.Dispose()
-        For i = 0 To anneal.Length - 1
-            If anneal(i).closed = False Then anneal(i).Dispose()
-        Next
     End Sub
 End Class
 
@@ -305,11 +295,5 @@ Public Class Annealing_Options
 
         flow.msgs.Add(anneal.msg)
         flow.Run(ocvb)
-        MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        flow.Dispose()
-        anneal.Dispose()
-        random.Dispose()
     End Sub
 End Class

@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Public Class Smoothing_Exterior
-    Inherits ocvbClass
-		Dim hull As Hull_Basics
+	Inherits ocvbClass
+	Dim hull As Hull_Basics
 	Private Function getSplineInterpolationCatmullRom(points As List(Of cv.Point), nrOfInterpolatedPoints As Integer) As List(Of cv.Point)
 		Dim spline As New List(Of cv.Point)
 		' Create a new pointlist to spline.  If you don't do this, the original pointlist is included with the extrapolated points
@@ -39,12 +39,12 @@ Public Class Smoothing_Exterior
 		Return spline
 	End Function
 	Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-				setCaller(callerRaw)
+		setCaller(callerRaw)
 		hull = New Hull_Basics(ocvb, caller)
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 
 		sliders.setupTrackBar1(ocvb, caller, "Smoothing iterations", 1, 20, 10)
-		
+
 		ocvb.label1 = "Original Points (white) Smoothed (yellow)"
 		ocvb.label2 = ""
 		ocvb.desc = "Smoothing the line connecting a series of points."
@@ -61,9 +61,6 @@ Public Class Smoothing_Exterior
 		Dim smoothPoints = getSplineInterpolationCatmullRom(points, sliders.TrackBar1.Value)
 		If smoothPoints.Count > 0 Then drawPoly(ocvb.result1, smoothPoints.ToArray, cv.Scalar.Yellow)
 	End Sub
-	Public Sub MyDispose()
-		hull.Dispose()
-			End Sub
 End Class
 
 
@@ -72,8 +69,8 @@ End Class
 
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Public Class Smoothing_Interior
-    Inherits ocvbClass
-		Dim hull As Hull_Basics
+	Inherits ocvbClass
+	Dim hull As Hull_Basics
 	Private Function getCurveSmoothingChaikin(points As List(Of cv.Point), tension As Double, nrOfIterations As Integer) As List(Of cv.Point2d)
 		'the tension factor defines a scale between corner cutting distance in segment half length, i.e. between 0.05 and 0.45
 		'the opposite corner will be cut by the inverse (i.e. 1-cutting distance) to keep symmetry
@@ -113,14 +110,14 @@ Public Class Smoothing_Interior
 	End Function
 
 	Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-				setCaller(callerRaw)
+		setCaller(callerRaw)
 		hull = New Hull_Basics(ocvb, caller)
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.sliders.TrackBar1.Value = 16
 
 		sliders.setupTrackBar1(ocvb, caller, "Smoothing iterations", 1, 20, 1)
 		sliders.setupTrackBar2(ocvb, caller, "Smoothing tension X100", 1, 100, 50)
-		
+
 		ocvb.label1 = "Original Points (white) Smoothed (yellow)"
 		ocvb.label2 = ""
 		ocvb.desc = "Smoothing the line connecting a series of points staying inside the outline."
@@ -141,7 +138,4 @@ Public Class Smoothing_Interior
 		Next
 		If smoothPoints.Count > 0 Then drawPoly(ocvb.result1, smoothPoints.ToArray, cv.Scalar.Yellow)
 	End Sub
-	Public Sub MyDispose()
-		hull.Dispose()
-			End Sub
 End Class

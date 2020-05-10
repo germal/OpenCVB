@@ -11,7 +11,7 @@ Module VB_EditorMain
         Return line
     End Function
     Private Function deleteLine(line As String) As Boolean
-        If line.Contains(".standalone = True") Then
+        If line.Contains("MyBase.Finish(ocvb)") Then
             Console.WriteLine("Deleting line: " + line)
             changeLines += 1
             Return True
@@ -44,9 +44,9 @@ Module VB_EditorMain
             While nextFile.Peek() <> -1
                 Dim line As String
                 line = nextFile.ReadLine()
-                ' deleteLine(line)
+                deleteLine(line)
                 ' makeChange(line)
-                insertLine(line)
+                'insertLine(line)
             End While
             nextFile.Close()
             If saveChangeLines <> changeLines Then changeFiles.Add(fileName)
@@ -70,15 +70,15 @@ Module VB_EditorMain
 
                 Dim sw = New StreamWriter(filename)
                 For i = 0 To lines.Count - 1
-                    If insertLine(lines(i)) Then
-                        sw.WriteLine(vbTab + vbTab + "MyBase.Finish(ocvb)")
-                    End If
-                    sw.WriteLine(lines(i))
-                    'If deleteLine(lines(i)) Then
-                    '    Console.WriteLine("Deleting: " + lines(i))
-                    'Else
-                    '    sw.Write(lines(i))
+                    'If insertLine(lines(i)) Then
+                    '    sw.WriteLine(vbTab + vbTab + "MyBase.Finish(ocvb)")
                     'End If
+                    'sw.WriteLine(lines(i))
+                    If deleteLine(lines(i)) Then
+                        Console.WriteLine("Deleting: " + lines(i))
+                    Else
+                        sw.Write(lines(i))
+                    End If
                 Next
                 sw.Close()
             Next

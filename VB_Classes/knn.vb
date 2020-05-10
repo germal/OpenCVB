@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class knn_Basics
     Inherits ocvbClass
-        Dim random As Random_Points
+    Dim random As Random_Points
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         random = New Random_Points(ocvb, caller)
@@ -41,10 +41,6 @@ Public Class knn_Basics
             cv.Cv2.Circle(ocvb.result1, queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
             cv.Cv2.Circle(ocvb.result2, queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
         Next
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        random.Dispose()
     End Sub
 End Class
 
@@ -150,10 +146,6 @@ Public Class knn_Cluster2D
             cluster(ocvb.rColors, ocvb.result1)
             ocvb.label1 = "knn clusters total=" + CStr(totalClusters) + " closedRegions=" + CStr(closedRegions)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        knn.Dispose()
     End Sub
 End Class
 
@@ -220,7 +212,6 @@ Public Class knn_Point2d
                 Next
             End If
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -300,7 +291,6 @@ Public Class knn_Point3d
                 Next
             End If
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -368,7 +358,7 @@ Public Class knn_ClusterNoisyLine
             Dim totalClusters As Int32
             For y = 0 To tmp.Rows - 1
                 For x = 0 To tmp.Cols - 1
-                    If tmp.Get(of Byte)(y, x) = 255 Then
+                    If tmp.Get(Of Byte)(y, x) = 255 Then
                         Dim byteCount = cv.Cv2.FloodFill(tmp, New cv.Point(x, y), black)
                         totalClusters += 1
                     End If
@@ -377,11 +367,6 @@ Public Class knn_ClusterNoisyLine
             ocvb.label2 = "knn clusters total=" + CStr(totalClusters)
             ocvb.label1 = "Input points = " + CStr(numberofCities)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        knn.Dispose()
-        noisyLine.Dispose()
     End Sub
 End Class
 

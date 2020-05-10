@@ -88,7 +88,6 @@ Public Class WarpAffine_Captcha
         addNoise(outImage)
         Dim roi As New cv.Rect(0, ocvb.color.Height / 2 - charHeight / 2, ocvb.result1.Cols, charHeight)
         ocvb.result1(roi) = outImage.Resize(New cv.Size(ocvb.result1.Cols, charHeight))
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -118,7 +117,6 @@ Public Class WarpAffine_Basics
         cv.Cv2.WarpAffine(ocvb.result1, ocvb.result2, rotationMatrix, ocvb.color.Size(), warpFlag)
         ocvb.label1 = "Rotated with Warpaffine with angle: " + CStr(angle)
         ocvb.label2 = "Rotated back with inverse Warpaffine angle: " + CStr(-angle)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -193,10 +191,6 @@ Public Class WarpAffine_3Points
                                               Format(M.Get(Of Double)(1, 0), "#0.00") + vbTab +
                                               Format(M.Get(Of Double)(1, 1), "#0.00") + vbTab +
                                               Format(M.Get(Of Double)(1, 2), "#0.00"), 10, ttStart, RESULT2))
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        triangle.Dispose()
     End Sub
 End Class
 
@@ -249,23 +243,19 @@ Public Class WarpAffine_4Points
         ocvb.result2.SetTo(0)
         Dim ttStart = 40
         ocvb.putText(New ActiveClass.TrueType("M defined as: " + vbCrLf +
-                                              Format(M.Get(of Double)(0, 0), "#0.00") + vbTab +
-                                              Format(M.Get(of Double)(0, 1), "#0.00") + vbTab +
-                                              Format(M.Get(of Double)(0, 2), "#0.00") + vbCrLf +
-                                              Format(M.Get(of Double)(1, 0), "#0.00") + vbTab +
-                                              Format(M.Get(of Double)(1, 1), "#0.00") + vbTab +
-                                              Format(M.Get(of Double)(1, 2), "#0.00") + vbCrLf +
-                                              Format(M.Get(of Double)(2, 0), "#0.00") + vbTab +
-                                              Format(M.Get(of Double)(2, 1), "#0.00") + vbTab +
-                                              Format(M.Get(of Double)(2, 2), "#0.00") + vbCrLf, 10, ttStart, RESULT2))
-        Dim center As New cv.Point2f(M.Get(of Double)(0, 2), M.Get(of Double)(1, 2))
+                                              Format(M.Get(Of Double)(0, 0), "#0.00") + vbTab +
+                                              Format(M.Get(Of Double)(0, 1), "#0.00") + vbTab +
+                                              Format(M.Get(Of Double)(0, 2), "#0.00") + vbCrLf +
+                                              Format(M.Get(Of Double)(1, 0), "#0.00") + vbTab +
+                                              Format(M.Get(Of Double)(1, 1), "#0.00") + vbTab +
+                                              Format(M.Get(Of Double)(1, 2), "#0.00") + vbCrLf +
+                                              Format(M.Get(Of Double)(2, 0), "#0.00") + vbTab +
+                                              Format(M.Get(Of Double)(2, 1), "#0.00") + vbTab +
+                                              Format(M.Get(Of Double)(2, 2), "#0.00") + vbCrLf, 10, ttStart, RESULT2))
+        Dim center As New cv.Point2f(M.Get(Of Double)(0, 2), M.Get(Of Double)(1, 2))
         ocvb.result1.Circle(center, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         center = New cv.Point2f(50, ocvb.color.Height / 2)
         ocvb.result1.Circle(center, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        rect.Dispose()
     End Sub
 End Class
 

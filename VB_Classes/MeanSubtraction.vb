@@ -12,6 +12,5 @@ Public Class MeanSubtraction_Basics
         cv.Cv2.Subtract(mean, ocvb.color, ocvb.result1)
         Dim scalingFactor = sliders.TrackBar1.Value / 100
         ocvb.result1 *= 1 / scalingFactor
-		MyBase.Finish(ocvb)
     End Sub
 End Class

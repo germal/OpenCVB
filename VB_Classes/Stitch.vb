@@ -48,7 +48,6 @@ Public Class Stitch_Basics
                 ocvb.result2.PutText("Need more images", New cv.Point(10, 60), cv.HersheyFonts.HersheySimplex, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             End If
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

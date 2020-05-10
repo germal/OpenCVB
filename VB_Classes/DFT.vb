@@ -24,8 +24,8 @@ Public Class DFT_Basics
     Public gray As cv.Mat
     Public rows As Int32
     Public cols As Int32
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         mats = New Mat_4to1(ocvb, caller)
         mats.noLines = True
 
@@ -34,7 +34,7 @@ Public Class DFT_Basics
         ocvb.label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         rows = cv.Cv2.GetOptimalDFTSize(gray.Rows)
         cols = cv.Cv2.GetOptimalDFTSize(gray.Cols)
@@ -46,7 +46,7 @@ Public Class DFT_Basics
         cv.Cv2.Merge(planes, complexImage)
         cv.Cv2.Dft(complexImage, complexImage)
 
-        if standalone Then
+        If standalone Then
             ' compute the magnitude And switch to logarithmic scale => log(1 + sqrt(Re(DFT(I))^2 + Im(DFT(I))^2))
             cv.Cv2.Split(complexImage, planes)
 
@@ -72,10 +72,6 @@ Public Class DFT_Basics
 
             ocvb.result1 = inverseDFT(complexImage)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        mats.Dispose()
     End Sub
 End Class
 
@@ -88,7 +84,7 @@ Public Class DFT_Inverse
     Inherits ocvbClass
     Dim mats As Mat_2to1
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         mats = New Mat_2to1(ocvb, caller)
         ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
         ocvb.label1 = "Image after Inverse DFT"
@@ -116,10 +112,6 @@ Public Class DFT_Inverse
             ocvb.label2 = "InverseDFT reproduced original"
             ocvb.result2.SetTo(0)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        mats.Dispose()
     End Sub
 End Class
 
@@ -132,11 +124,11 @@ End Class
 Public Class DFT_ButterworthFilter
     Inherits ocvbClass
     Public dft As DFT_Basics
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "DFT B Filter - Radius", 1, ocvb.color.Height, ocvb.color.Height)
         sliders.setupTrackBar2(ocvb, caller, "DFT B Filter - Order", 1, ocvb.color.Height, 2)
-                dft = New DFT_Basics(ocvb, caller)
+        dft = New DFT_Basics(ocvb, caller)
         ocvb.desc = "Use the Butterworth filter on a DFT image - color image input."
         ocvb.label1 = "Image with Butterworth Low Pass Filter Applied"
         ocvb.label2 = "Same filter with radius / 2"
@@ -174,10 +166,6 @@ Public Class DFT_ButterworthFilter
            cv.Cv2.MulSpectrums(butterworthFilter(k), dft.complexImage, complex, cv.DftFlags.None)
            If k = 0 Then ocvb.result1 = inverseDFT(complex) Else ocvb.result2 = inverseDFT(complex)
        End Sub)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-                dft.Dispose()
     End Sub
 End Class
 
@@ -192,7 +180,7 @@ Public Class DFT_ButterworthDepth
     Inherits ocvbClass
     Dim bfilter As DFT_ButterworthFilter
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         bfilter = New DFT_ButterworthFilter(ocvb, caller)
 
         ocvb.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
@@ -202,9 +190,5 @@ Public Class DFT_ButterworthDepth
     Public Sub Run(ocvb As AlgorithmData)
         bfilter.dft.gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bfilter.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        bfilter.Dispose()
     End Sub
 End Class

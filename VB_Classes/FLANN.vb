@@ -40,7 +40,6 @@ Public Class FLANN_Test
                 Next i
             End Using
         End Using
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -85,9 +84,5 @@ Public Class FLANN_Basics
                 cv.Cv2.Circle(ocvb.result2, pt2, 5, cv.Scalar.GreenYellow, -1, cv.LineTypes.AntiAlias, 0)
             Next
         End Using
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-                random.Dispose()
     End Sub
 End Class

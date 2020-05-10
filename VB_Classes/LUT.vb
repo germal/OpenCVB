@@ -26,7 +26,6 @@ Public Class LUT_Gray
             If i >= splits(splitIndex) Then splitIndex += 1
         Next
         ocvb.result1 = gray.LUT(myLut)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -51,6 +50,5 @@ Public Class LUT_Color
         Dim colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, paletteMap)
         ocvb.result1 = src.LUT(colorMat)
         ocvb.result2 = colorMat.Resize(src.Size())
-		MyBase.Finish(ocvb)
     End Sub
 End Class

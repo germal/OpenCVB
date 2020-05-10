@@ -23,7 +23,6 @@ Public Class Pyramid_Basics
         Else
             ocvb.color.CopyTo(ocvb.result1)
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

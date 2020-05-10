@@ -67,16 +67,15 @@ Public Class Retina_Basics_CPP
             Dim parvoData(src.Total * src.ElemSize / (nextFactor * nextFactor) - 1) As Byte
             Marshal.Copy(magnoPtr, parvoData, 0, parvoData.Length)
             Dim parvo = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8UC3, parvoData)
-            ocvb.result1 = parvo.Resize(src.Size())
+            dst = parvo.Resize(src.Size())
 
             Dim magno = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8U, magnoData)
-            ocvb.result2 = magno.Resize(src.Size())
+            dst2 = magno.Resize(src.Size())
         End If
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
+    Public Sub Close()
         Retina_Basics_Close(Retina)
-            End Sub
+    End Sub
 End Class
 
 
@@ -88,7 +87,7 @@ Public Class Retina_Depth
     Inherits ocvbClass
     Dim retina As Retina_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         retina = New Retina_Basics_CPP(ocvb, caller)
 
         ocvb.desc = "Use the bio-inspired retina algorithm with the depth data."
@@ -102,9 +101,5 @@ Public Class Retina_Depth
         If lastMotion.Width = 0 Then lastMotion = ocvb.result2
         cv.Cv2.BitwiseOr(lastMotion, ocvb.result2, ocvb.result1)
         lastMotion = ocvb.result2
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        retina.Dispose()
     End Sub
 End Class

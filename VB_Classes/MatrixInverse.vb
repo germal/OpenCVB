@@ -46,7 +46,6 @@ Public Class MatrixInverse_Basics_CS
 
         Dim outstr = printMatrixResults(src, dst)
         ocvb.putText(New ActiveClass.TrueType(outstr + vbCrLf + "Intermediate results are optionally available in the console log.", 10, 60, RESULT1))
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -73,6 +72,5 @@ Public Class MatrixInverse_OpenCV
         cv.Cv2.Invert(src, dst, cv.DecompTypes.LU)
         Dim outstr = printMatrixResults(src, dst)
         ocvb.putText(New ActiveClass.TrueType(outstr, 10, 60, RESULT1))
-		MyBase.Finish(ocvb)
     End Sub
 End Class

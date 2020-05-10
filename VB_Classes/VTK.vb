@@ -101,16 +101,8 @@ Public Class VTK_Basics
             If rgbInput.Rows > 0 Then pipe.Write(rgbBuffer, 0, rgbInput.Total * rgbInput.ElemSize)
             If dataInput.Rows > 0 Then pipe.Write(dataBuffer, 0, dataInput.Total * dataInput.ElemSize)
         End If
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
-        If pipe IsNot Nothing Then
-            If pipe.IsConnected Then
-                pipe.Flush()
-                pipe.WaitForPipeDrain()
-                pipe.Disconnect()
-            End If
-        End If
+    Public Sub Close()
         Dim proc = Process.GetProcessesByName(vtkTitle)
         For i = 0 To proc.Count - 1
             proc(i).CloseMainWindow()
@@ -128,11 +120,11 @@ Public Class VTK_Histogram3D
     Dim vtk As VTK_Basics
     Dim mats As Mat_4to1
     Dim random As Random_NormalDist
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Random Number Stdev", 0, 255, 10)
         sliders.setupTrackBar2(ocvb, caller, "Hist 3D bins", 1, 100, 32)
-        sliders.setupTrackBar3(ocvb, caller,"Hist 3D bin Threshold X1000000", 10, 100, 20)
+        sliders.setupTrackBar3(ocvb, caller, "Hist 3D bin Threshold X1000000", 10, 100, 20)
 
         mats = New Mat_4to1(ocvb, caller)
 
@@ -179,13 +171,7 @@ Public Class VTK_Histogram3D
         vtk.rgbInput = ocvb.result2.Clone()
         vtk.dataInput = New cv.Mat ' ocvb.depth
         vtk.Run(ocvb)
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
-        vtk.Dispose()
-        mats.Dispose()
-        random.Dispose()
-            End Sub
 End Class
 
 

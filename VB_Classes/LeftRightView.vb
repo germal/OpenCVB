@@ -25,7 +25,6 @@ Public Class LeftRightView_Basics
 
         ocvb.result1 += sliders.TrackBar1.Value
         ocvb.result2 += sliders.TrackBar1.Value
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -88,10 +87,6 @@ Public Class LeftRightView_CompareUndistorted
         ocvb.result2 = leftInput
         ocvb.result1 += sliders.TrackBar1.Value
         ocvb.result2 += sliders.TrackBar1.Value
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        fisheye.Dispose()
     End Sub
 End Class
 
@@ -140,10 +135,6 @@ Public Class LeftRightView_CompareRaw
         Dim rSrc = New cv.Rect(0, sliceY, leftView.Width, slideHeight)
         leftView(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100, leftView.Width, slideHeight)))
         ocvb.result2(rSrc).CopyTo(ocvb.result1(New cv.Rect(0, 100 + slideHeight, leftView.Width, slideHeight)))
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        lrView.Dispose()
     End Sub
 End Class
 
@@ -182,11 +173,6 @@ Public Class LeftRightView_Features
         For i = 0 To features.goodFeatures.Count - 1
             cv.Cv2.Circle(ocvb.result1, features.goodFeatures(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        features.Dispose()
-        lrView.Dispose()
     End Sub
 End Class
 
@@ -220,11 +206,6 @@ Public Class LeftRightView_Palettized
         ocvb.result2 = ocvb.result1
 
         ocvb.result1 = left
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        lrView.Dispose()
-        palette.Dispose()
     End Sub
 End Class
 
@@ -261,11 +242,6 @@ Public Class LeftRightView_BRISK
         For Each pt In brisk.features
             ocvb.result1.Circle(pt, 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        brisk.Dispose()
-        lrView.Dispose()
     End Sub
 End Class
 

@@ -64,11 +64,10 @@ Public Class Harris_Features_CPP
         gray32f.ConvertTo(ocvb.result1, cv.MatType.CV_8U)
         ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.AddWeighted(ocvb.result1, 0.5, ocvb.color, 0.5, 0, ocvb.result2)
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
+    Public Sub Close()
         Harris_Features_Close(Harris_Features)
-            End Sub
+    End Sub
 End Class
 
 
@@ -111,10 +110,9 @@ Public Class Harris_Detector_CPP
                 if standalone Then ocvb.result1.Circle(FeaturePoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             Next
         End If
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
+    Public Sub Close()
         Harris_Detector_Close(Harris_Detector)
-            End Sub
+    End Sub
 End Class
 

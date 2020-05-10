@@ -43,9 +43,8 @@ Public Class BGSubtract_Basics_CPP
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
         End If
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
+    Public Sub Close()
         BGSubtract_BGFG_Close(bgfs)
     End Sub
 End Class
@@ -101,7 +100,6 @@ Public Class BGSubtract_MotionDetect_MT
                 End Sub)
         Next
         Task.WaitAll(taskArray)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -135,11 +133,7 @@ Public Class BGSubtract_Basics_MT
                 ocvb.color(roi).CopyTo(accum(roi))
             End If
         End Sub)
-        if standalone Then accum.CopyTo(ocvb.result2) ' show the accumulated result if this is not some other object using me...
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        grid.Dispose()
+        If standalone Then accum.CopyTo(ocvb.result2) ' show the accumulated result if this is not some other object using me...
     End Sub
 End Class
 
@@ -170,11 +164,6 @@ Public Class BGSubtract_Depth_MT
         mask = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.AddWeighted(ocvb.result1, 0.75, mask, 0.25, 0, ocvb.result1)
         ocvb.result2.SetTo(0, shadowMask)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        shadow.Dispose()
-        bgsub.Dispose()
     End Sub
 End Class
 
@@ -192,17 +181,13 @@ Public Class BGSubtract_MOG
         ocvb.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then src = ocvb.color
+        If standalone Then src = ocvb.color
         If src.Channels = 3 Then
             gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
             gray = src
         End If
         MOG.Apply(gray, dst, sliders.TrackBar1.Value / 1000)
-        MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        MOG.Dispose()
     End Sub
 End Class
 
@@ -221,15 +206,11 @@ Public Class BGSubtract_MOG2
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
-            gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Else
             gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Else
+            gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
-        MOG2.Apply(gray, ocvb.result1, sliders.TrackBar1.Value / 1000)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        MOG2.Dispose()
+        MOG2.Apply(gray, dst, sliders.TrackBar1.Value / 1000)
     End Sub
 End Class
 
@@ -260,11 +241,6 @@ Public Class BGSubtract_GMG_KNN
 
         knn.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
         ocvb.result2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        gmg.Dispose()
-        knn.Dispose()
     End Sub
 End Class
 
@@ -295,11 +271,6 @@ Public Class BGSubtract_MOG_RGBDepth
         gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOGRGB.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
         ocvb.result2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        MOGDepth.Dispose()
-        MOGRGB.Dispose()
     End Sub
 End Class
 
@@ -326,14 +297,10 @@ Public Class BGSubtract_MOG_Retina
     Public Sub Run(ocvb As AlgorithmData)
         retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
-        input.src = ocvb.result2
+        input.src = retina.dst2
         input.Run(ocvb)
-        cv.Cv2.Subtract(ocvb.result1, ocvb.result2, ocvb.result2)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        input.Dispose()
-        retina.Dispose()
+        dst = input.dst
+        cv.Cv2.Subtract(input.dst, retina.dst2, dst2)
     End Sub
 End Class
 
@@ -354,10 +321,6 @@ Public Class BGSubtract_DepthOrColorMotion
         cv.Cv2.BitwiseNot(ocvb.result1, tmp)
         ocvb.color.CopyTo(ocvb.result2, tmp)
         ocvb.label2 = "Image with motion removed"
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        motion.Dispose()
     End Sub
 End Class
 
@@ -398,11 +361,6 @@ Public Class BGSubtract_Video
         video.Run(ocvb)
         bgfg.src = video.image
         bgfg.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        bgfg.Dispose()
-        video.Dispose()
     End Sub
 End Class
 
@@ -440,7 +398,7 @@ Public Class BGSubtract_Synthetic_CPP
         sliders.setupTrackBar4(ocvb, caller, "Synthetic ObjectSpeed", 1, 20, 15)
         ocvb.label1 = ""
         ocvb.label2 = "Synthetic background/foreground image."
-        ocvb.desc = "Generate a synthetic input to background subtraction method."
+        ocvb.desc = "Generate a synthetic input to background subtraction method - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If amplitude <> sliders.TrackBar1.Value Or magnitude <> sliders.TrackBar2.Value Or waveSpeed <> sliders.TrackBar3.Value Or
@@ -470,9 +428,8 @@ Public Class BGSubtract_Synthetic_CPP
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             ocvb.result2 = New cv.Mat(ocvb.result2.Rows, ocvb.result2.Cols, cv.MatType.CV_8UC3, dstData)
         End If
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
+    Public Sub Close()
         BGSubtract_Synthetic_Close(synthPtr)
     End Sub
 End Class
@@ -497,10 +454,5 @@ Public Class BGSubtract_Synthetic
         synth.Run(ocvb)
         bgfg.src = ocvb.result2.Clone()
         bgfg.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        bgfg.Dispose()
-        synth.Dispose()
     End Sub
 End Class

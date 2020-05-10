@@ -77,11 +77,9 @@ Public Class OpenCVGL_Image_CPP
         OpenCVGL_Image_Run(handleRGB.AddrOfPinnedObject(), handlePointCloud.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols)
         handleRGB.Free()
         handlePointCloud.Free()
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
+    Public Sub Close()
         OpenCVGL_Image_Close()
-        imu.Dispose()
     End Sub
 End Class
 

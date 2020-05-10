@@ -17,7 +17,6 @@ Public Class Filter_Laplacian
         imgResult.ConvertTo(imgResult, cv.MatType.CV_8UC3)
         imgResult.ConvertTo(ocvb.result1, cv.MatType.CV_8UC3)
         imgLaplacian.ConvertTo(ocvb.result2, cv.MatType.CV_8UC3)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -54,7 +53,6 @@ Public Class Filter_NormalizedKernel
 
         Dim dst32f = ocvb.color.Filter2D(cv.MatType.CV_32FC1, kernel, anchor:=New cv.Point(0, 0))
         dst32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC3)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -71,7 +69,6 @@ Public Class Filter_Normalized2D
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
         ocvb.result1 = ocvb.color.Filter2D(-1, kernel)
         ocvb.label1 = "Normalized KernelSize = " + CStr(kernelSize)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -109,6 +106,5 @@ Public Class Filter_SepFilter2D
         Else
             ocvb.label2 = "SepFilter2D Result"
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class

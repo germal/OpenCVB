@@ -4,7 +4,7 @@ Public Class Moments_CentroidKalman
     Dim foreground As kMeans_Depth_FG_BG
     Dim kalman As Kalman_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         kalman = New Kalman_Basics(ocvb, caller)
         ReDim kalman.input(2 - 1) ' 2 elements - cv.point
 
@@ -23,10 +23,5 @@ Public Class Moments_CentroidKalman
             kalman.Run(ocvb)
             ocvb.result1.Circle(New cv.Point(kalman.output(0), kalman.output(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        foreground.Dispose()
-        kalman.Dispose()
     End Sub
 End Class

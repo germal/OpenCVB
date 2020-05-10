@@ -18,11 +18,6 @@ Public Class Stabilizer_BriskFeatures
         brisk.Run(ocvb)
         stabilizer.features = brisk.features ' supply the features to track with Optical Flow
         stabilizer.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        brisk.Dispose()
-        stabilizer.Dispose()
     End Sub
 End Class
 
@@ -46,11 +41,6 @@ Public Class Stabilizer_HarrisFeatures
         harris.Run(ocvb)
         stabilizer.features = harris.FeaturePoints ' supply the features to track with Optical Flow
         stabilizer.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        harris.Dispose()
-        stabilizer.Dispose()
     End Sub
 End Class
 
@@ -65,7 +55,7 @@ Public Class Stabilizer_Basics
     Public good As Features_GoodFeatures
     Public features As New List(Of cv.Point2f)
     Public lastFrame As cv.Mat
-        Public borderCrop = 30
+    Public borderCrop = 30
     Dim sumScale As cv.Mat, sScale As cv.Mat, features1 As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -159,10 +149,6 @@ Public Class Stabilizer_Basics
             Next
         End If
         lastFrame = gray.Clone()
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        good.Dispose()
     End Sub
 End Class
 
@@ -206,9 +192,8 @@ Public Class Stabilizer_Basics_CPP
         '    Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
         '    ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, dstData)
         'End If
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
+    Public Sub Close()
         Stabilizer_Basics_Close(sPtr)
     End Sub
 End Class
@@ -235,11 +220,6 @@ Public Class Stabilizer_SideBySide
         original.Run(ocvb)
         ocvb.result2 = ocvb.result1.Clone()
         basics.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        original.Dispose()
-        basics.Dispose()
     End Sub
 End Class
 

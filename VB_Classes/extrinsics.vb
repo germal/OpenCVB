@@ -20,7 +20,6 @@ Public Class Extrinsics_Basics
         nextLine = Format(ocvb.parms.extrinsics.rotation(6), fmt) + vbTab + Format(ocvb.parms.extrinsics.rotation(7), fmt) + vbTab +
                        Format(ocvb.parms.extrinsics.rotation(8), fmt) + vbTab + vbTab + vbTab + Format(ocvb.parms.extrinsics.translation(2), fmt)
         ocvb.putText(New ActiveClass.TrueType(nextLine, 10, ttStart + 60, RESULT1))
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

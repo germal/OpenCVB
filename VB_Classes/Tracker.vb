@@ -4,7 +4,7 @@ Public Class Tracker_Basics
     Public tracker As cv.Tracking.MultiTracker
     Public bbox As cv.Rect2d
     Public boxObject() As cv.Rect2d
-        Public trackerIndex As Int32 = 5 ' trackerMIL by default...
+    Public trackerIndex As Int32 = 5 ' trackerMIL by default...
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         check.Setup(ocvb, caller, 1)
@@ -47,17 +47,13 @@ Public Class Tracker_Basics
         If tracker IsNot Nothing Then
             tracker.Update(ocvb.color)
             boxObject = tracker.GetObjects() ' just track one.  Tracking multiple is buggy.  Returns a lot of 0 width/height rect2d's.
-            if standalone Then
+            If standalone Then
                 ocvb.result1 = ocvb.color.Clone()
                 Dim p1 = New cv.Point(boxObject(0).X, boxObject(0).Y)
                 Dim p2 = New cv.Point(boxObject(0).X + bbox.Width, boxObject(0).Y + bbox.Height)
                 ocvb.result1.Rectangle(p1, p2, cv.Scalar.Blue, 2)
             End If
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        If tracker IsNot Nothing Then tracker.Dispose()
     End Sub
 End Class
 
@@ -91,12 +87,6 @@ Public Class Tracker_MultiObject
                 ocvb.result1.Rectangle(p1, p2, cv.Scalar.Blue, 2)
             End If
         Next
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        For Each tr In trackers
-            tr.Dispose()
-        Next
     End Sub
 End Class
 
@@ -112,7 +102,7 @@ Public Class Tracker_Methods
         setCaller(callerRaw)
         tracker = New Tracker_Basics(ocvb, caller)
 
-        radio.Setup(ocvb, caller,8)
+        radio.Setup(ocvb, caller, 8)
         radio.check(0).Text = "TrackerBoosting"
         radio.check(1).Text = "TrackerCSRT"
         radio.check(2).Text = "TrackerGOTURN - disabled (not working)"
@@ -142,10 +132,6 @@ Public Class Tracker_Methods
             tracker.Run(ocvb)
         End If
         saveMethod = tracker.trackerIndex
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-                tracker.Dispose()
     End Sub
 End Class
 

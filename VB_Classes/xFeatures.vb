@@ -20,7 +20,6 @@ Public Class XFeatures2D_StarDetector
                 cv.Cv2.Line(ocvb.result1, New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Scalar(0, 255, 0), 1, cv.LineTypes.Link8, 0)
             Next kpt
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

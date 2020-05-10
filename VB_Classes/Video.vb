@@ -22,7 +22,6 @@ Public Class Video_Basics
         End If
         image = videoOptions.nextImage
         If image.Empty() = False Then ocvb.result1 = image.Resize(ocvb.color.Size())
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -80,12 +79,6 @@ Public Class Video_CarCounting
             flow.Run(ocvb)
             cv.Cv2.BitwiseOr(ocvb.result1, tmp, ocvb.result1)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        video.Dispose()
-        mog.Dispose()
-        flow.Dispose()
     End Sub
 End Class
 
@@ -121,13 +114,6 @@ Public Class Video_CarCComp
             cc.srcGray = ocvb.result1.Clone()
             cc.Run(ocvb)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        cc.Dispose()
-        video.Dispose()
-        mog.Dispose()
-        flow.Dispose()
     End Sub
 End Class
 
@@ -139,7 +125,7 @@ Public Class Video_MinRect
     Inherits ocvbClass
     Public video As Video_Basics
     Public mog As BGSubtract_MOG
-        Public contours As cv.Point()()
+    Public contours As cv.Point()()
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         video = New Video_Basics(ocvb, caller)
@@ -157,7 +143,7 @@ Public Class Video_MinRect
 
             contours = cv.Cv2.FindContoursAsArray(ocvb.result1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
             ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            if standalone Then
+            If standalone Then
                 For i = 0 To contours.Length - 1
                     Dim minRect = cv.Cv2.MinAreaRect(contours(i))
                     drawRotatedRectangle(minRect, ocvb.result1, cv.Scalar.Red)
@@ -165,11 +151,6 @@ Public Class Video_MinRect
             End If
             ocvb.result2 = video.image.Resize(ocvb.color.Size())
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        video.Dispose()
-        mog.Dispose()
     End Sub
 End Class
 
@@ -196,9 +177,5 @@ Public Class Video_MinCircle
                 ocvb.result1.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        input.Dispose()
     End Sub
 End Class

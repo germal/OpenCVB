@@ -26,7 +26,6 @@ Public Class Features_GoodFeatures
             goodFeatures.Add(features.ElementAt(i))
             if standalone Then cv.Cv2.Circle(ocvb.result1, features(i), 3, cv.Scalar.white, -1, cv.LineTypes.AntiAlias)
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

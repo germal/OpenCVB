@@ -72,7 +72,6 @@ Public Class FloodFill_Basics
             dst.SetTo(nextColor, masks(maskIndex))
         Next
         ocvb.label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -84,7 +83,7 @@ Public Class FloodFill_Top16_MT
     Inherits ocvbClass
     Dim grid As Thread_Grid
     Public srcGray As New cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
         sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 500, 50)
@@ -98,7 +97,7 @@ Public Class FloodFill_Top16_MT
         Dim loDiff = cv.Scalar.All(sliders.TrackBar2.Value)
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
 
-        if standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result2 = srcGray.Clone()
         grid.Run(ocvb)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
@@ -115,10 +114,6 @@ Public Class FloodFill_Top16_MT
                 Next
             Next
         End Sub)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        grid.Dispose()
     End Sub
 End Class
 
@@ -141,7 +136,7 @@ Public Class FloodFill_Color_MT
         Dim loDiff = cv.Scalar.All(flood.sliders.TrackBar2.Value)
         Dim hiDiff = cv.Scalar.All(flood.sliders.TrackBar3.Value)
 
-        if standalone Then src = ocvb.color.Clone()
+        If standalone Then src = ocvb.color.Clone()
         ocvb.result2 = src.Clone()
         grid.Run(ocvb)
         Dim vec255 = New cv.Vec3b(255, 255, 255)
@@ -160,11 +155,6 @@ Public Class FloodFill_Color_MT
                 Next
             Next
         End Sub)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        grid.Dispose()
-        flood.Dispose()
     End Sub
 End Class
 
@@ -190,11 +180,6 @@ Public Class FloodFill_DCT
         flood.src.SetTo(0, mask)
         flood.Run(ocvb)
         ocvb.result2.SetTo(0, mask)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        dct.Dispose()
-        flood.Dispose()
     End Sub
 End Class
 
@@ -220,11 +205,6 @@ Public Class FloodFill_WithDepth
         range.fBasics.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         range.fBasics.initialMask = shadow.holeMask
         range.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        range.Dispose()
-        shadow.Dispose()
     End Sub
 End Class
 
@@ -256,12 +236,6 @@ Public Class FloodFill_CComp
         range.fBasics.srcGray = ccomp.dstGray
         range.fBasics.initialMask = shadow.holeMask
         range.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        ccomp.Dispose()
-        range.Dispose()
-        shadow.Dispose()
     End Sub
 End Class
 
@@ -290,10 +264,6 @@ Public Class FloodFill_RelativeRange
         fBasics.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         fBasics.Run(ocvb)
         ocvb.result2 = fBasics.dst.Clone()
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        fBasics.Dispose()
     End Sub
 End Class
 
@@ -345,7 +315,6 @@ Public Class FloodFill_Top16
         Next
         If check.Box(0).Checked Then ocvb.result2 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -402,6 +371,5 @@ Public Class FloodFill_Projection
             ocvb.result2 = dst
             ocvb.label2 = CStr(objectRects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class

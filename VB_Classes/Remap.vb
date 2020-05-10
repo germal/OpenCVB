@@ -38,7 +38,6 @@ Public Class Remap_Basics
             direction += 1
             direction = direction Mod 4
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -70,7 +69,6 @@ Public Class Remap_Flip
             direction += 1
             direction = direction Mod 4
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

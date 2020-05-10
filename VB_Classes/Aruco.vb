@@ -22,7 +22,6 @@ Public Class Aruco_Basics
         ocvb.putText(New ActiveClass.TrueType("This algorithm is currently failing in VB.Net (works in C#)." + vbCrLf +
                                                   "The DetectMarkers API works in C# but fails in VB.Net." + vbCrLf +
                                                   "To see the correct output, use Aruco_CS.", 10, 140, RESULT1))
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -45,6 +44,5 @@ Public Class Aruco_CS
 
         dst2 = ocvb.color.EmptyClone.SetTo(0)
         dst2(New cv.Rect(0, 0, dst2.Height, dst2.Height)) = aruco.normalizedImage.Resize(New cv.Size(ocvb.color.Height, ocvb.color.Height))
-        MyBase.Finish(ocvb)
     End Sub
 End Class

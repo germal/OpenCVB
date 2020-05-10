@@ -3,9 +3,9 @@ Imports cv = OpenCvSharp
 Public Class Distance_Basics
     Inherits ocvbClass
     Dim foreground As kMeans_Depth_FG_BG
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
-        radio.Setup(ocvb, caller,3)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "C"
         radio.check(1).Text = "L1"
         radio.check(2).Text = "L2"
@@ -38,10 +38,6 @@ Public Class Distance_Basics
         Dim dist32f = dist.Normalize(0, 255, cv.NormTypes.MinMax)
         dist32f.ConvertTo(gray, cv.MatType.CV_8UC1)
         ocvb.result2 = gray.CvtColor(cv.ColorConversionCodes.gray2bgr)
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
-                foreground.Dispose()
-            End Sub
 End Class
 

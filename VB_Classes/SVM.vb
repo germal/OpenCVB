@@ -40,7 +40,6 @@ Public Class SVM_Options
                 Exit For
             End If
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -121,10 +120,6 @@ Public Class SVM_Basics
                 ocvb.result2.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
         End Using
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        svmOptions.Dispose()
     End Sub
 End Class
 
@@ -219,11 +214,6 @@ Public Class SVM_Basics_MT
             Next
             ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
         End Using
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        svmOptions.Dispose()
-        grid.Dispose()
     End Sub
 End Class
 
@@ -300,10 +290,6 @@ Public Class SVM_Simple
                 Next
             End If
         End Using
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        svmOptions.Dispose()
     End Sub
 End Class
 

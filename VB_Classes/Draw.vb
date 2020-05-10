@@ -40,7 +40,6 @@ Public Class Draw_rectangles
                 End If
             Next
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -71,7 +70,6 @@ Public Class Draw_Noise
             ocvb.result1.Circle(center, noiseWidth, c, -1, cv.LineTypes.AntiAlias)
             noiseMask.Circle(center, noiseWidth, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -88,10 +86,6 @@ Public Class Draw_rotatedRectangles
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         rect.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        rect.Dispose()
     End Sub
 End Class
 
@@ -116,7 +110,6 @@ Public Class Draw_Ellipses
                 ocvb.result1.Ellipse(New cv.RotatedRect(nPoint, eSize, angle), nextColor, -1,)
             Next
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -140,7 +133,6 @@ Public Class Draw_Circles
                 ocvb.result1.Circle(nPoint, radius, nextColor, -1,)
             Next
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -164,7 +156,6 @@ Public Class Draw_Line
             Dim nextColor = New cv.Scalar(ocvb.rColors(i).Item0, ocvb.rColors(i).Item1, ocvb.rColors(i).Item2)
             ocvb.result1.Line(nPoint1, nPoint2, nextColor, thickness, cv.LineTypes.AntiAlias)
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -219,7 +210,6 @@ Public Class Draw_Polygon
             End If
         Next
         'End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -263,7 +253,6 @@ Public Class Draw_RngImage
                     ocvb.result1.Ellipse(center, New cv.Size(width / 2, height / 2), angle, 0, 360, color, -1, cv.LineTypes.Link8)
             End Select
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -337,6 +326,5 @@ Public Class Draw_SymmetricalShapes
         Next
 
         If check.Box(2).Checked Then ocvb.result1.FloodFill(center, fillColor)
-		MyBase.Finish(ocvb)
     End Sub
 End Class

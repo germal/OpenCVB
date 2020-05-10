@@ -17,7 +17,6 @@ Public Class FAST_Basics
         For Each kp As cv.KeyPoint In keypoints
             ocvb.result1.Circle(kp.Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
         Next kp
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -51,11 +50,6 @@ Public Class FAST_Centroid
             kalman.Run(ocvb)
             ocvb.result2.Circle(New cv.Point(kalman.output(0), kalman.output(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        fast.Dispose()
-        kalman.Dispose()
     End Sub
 End Class
 

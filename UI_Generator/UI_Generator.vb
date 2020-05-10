@@ -54,6 +54,7 @@ Module UI_GeneratorMain
                             Dim split As String() = Regex.Split(line, "\W+")
                             ' next line must be "Inherits ocvbClass"
                             Dim line2 = Trim(nextFile.ReadLine())
+                            If line2.StartsWith(vbTab) Then line2 = Mid(line2, 2)
                             If LCase(line2) = "inherits ocvbclass" Then
                                 className = split(2) ' public class <classname>
                             End If

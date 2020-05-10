@@ -57,9 +57,8 @@ Public Class Salience_Basics_CPP
 
         ocvb.color.CopyTo(ocvb.result1)
         ocvb.result1(roi) = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
+    Public Sub Close()
         Salience_Close(salience)
     End Sub
 End Class
@@ -103,7 +102,6 @@ Public Class Salience_Basics_MT
                 Salience_Close(salience)
             End Sub)
         grayHandle.Free()
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

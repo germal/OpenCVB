@@ -5,13 +5,13 @@ Imports CS_Classes
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Sift_Basics_CS
     Inherits ocvbClass
-        Dim CS_SiftBasics As New CS_SiftBasics
+    Dim CS_SiftBasics As New CS_SiftBasics
     Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         fisheye = New FishEye_Rectified(ocvb, caller)
 
-        radio.Setup(ocvb, caller,2)
+        radio.Setup(ocvb, caller, 2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
@@ -35,10 +35,6 @@ Public Class Sift_Basics_CS
         dst(New cv.Rect(ocvb.result1.Width, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result2)
 
         ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-                        fisheye.Dispose()
     End Sub
 End Class
 
@@ -48,16 +44,16 @@ End Class
 Public Class Sift_Basics_CS_MT
     Inherits ocvbClass
     Dim grid As Thread_Grid
-        Dim CS_SiftBasics As New CS_SiftBasics
+    Dim CS_SiftBasics As New CS_SiftBasics
     Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         fisheye = New FishEye_Rectified(ocvb, caller)
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = ocvb.color.Width - 1 ' we are just taking horizontal slices of the image.
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 2
 
-        radio.Setup(ocvb, caller,2)
+        radio.Setup(ocvb, caller, 2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
@@ -96,11 +92,6 @@ Public Class Sift_Basics_CS_MT
         dst(New cv.Rect(ocvb.result1.Width, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result2)
 
         ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        grid.Dispose()
-                        fisheye.Dispose()
     End Sub
 End Class
 

@@ -36,7 +36,6 @@ Public Class DNN_Test
         Else
             ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -66,7 +65,6 @@ Public Class DNN_Caffe_CS
         Else
             ocvb.putText(New ActiveClass.TrueType(str, 10, 100))
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -89,7 +87,7 @@ Public Class DNN_Basics
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "dnn Scale Factor", 1, 10000, 78)
         sliders.setupTrackBar2(ocvb, caller, "dnn MeanVal", 1, 255, 127)
-        
+
         dnnWidth = ocvb.color.Height ' height is always smaller than width...
         dnnHeight = ocvb.color.Height
         crop = New cv.Rect(ocvb.color.Width / 2 - dnnWidth / 2, ocvb.color.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
@@ -130,11 +128,11 @@ Public Class DNN_Basics
                 Dim cols = ocvb.color(crop).Cols
                 ocvb.label2 = ""
                 For i = 0 To detectionMat.Rows - 1
-                    Dim confidence = detectionMat.Get(of Single)(i, 2)
+                    Dim confidence = detectionMat.Get(Of Single)(i, 2)
                     If confidence > confidenceThreshold Then
-                        Dim nextName = classNames(CInt(detectionMat.Get(of Single)(i, 1)))
+                        Dim nextName = classNames(CInt(detectionMat.Get(Of Single)(i, 1)))
                         ocvb.label2 += nextName + " "  ' display the name of what we found.
-                        Dim vec = detectionMat.Get(of cv.Vec4f)(i, 3)
+                        Dim vec = detectionMat.Get(Of cv.Vec4f)(i, 3)
                         rect = New cv.Rect(vec.Item0 * cols + crop.Left, vec.Item1 * rows + crop.Top, (vec.Item2 - vec.Item0) * cols, (vec.Item3 - vec.Item1) * rows)
                         rect = New cv.Rect(rect.X, rect.Y, Math.Min(dnnWidth, rect.Width), Math.Min(dnnHeight, rect.Height))
                         ocvb.result2.Rectangle(rect, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)
@@ -149,10 +147,6 @@ Public Class DNN_Basics
                 ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
             End If
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-                If net IsNot Nothing Then net.Dispose()
     End Sub
 End Class
 

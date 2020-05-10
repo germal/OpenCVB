@@ -98,7 +98,7 @@ Public Class Plane_Detect
     Inherits ocvbClass
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 64
@@ -161,10 +161,6 @@ Public Class Plane_Detect
         End Sub)
         Dim mask = grid.gridMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.BitwiseOr(ocvb.result1, mask, ocvb.result1)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        grid.Dispose()
     End Sub
 End Class
 
@@ -175,7 +171,7 @@ Public Class Plane_DetectDebug
     Inherits ocvbClass
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
@@ -221,8 +217,8 @@ Public Class Plane_DetectDebug
             For j = 0 To lastj * stepj Step stepj
                 Dim p1 = contours(maxIndex)(j)
                 Dim p2 = contours(maxIndex)(k + stepj)
-                Dim w1 = getWorldCoordinatesD(ocvb, New cv.Point3f(roi.X + p1.X, roi.Y + p1.Y, depthROI.Get(of Single)(p1.Y, p1.X)))
-                Dim w2 = getWorldCoordinatesD(ocvb, New cv.Point3f(roi.X + p2.X, roi.Y + p2.Y, depthROI.Get(of Single)(p2.Y, p2.X)))
+                Dim w1 = getWorldCoordinatesD(ocvb, New cv.Point3f(roi.X + p1.X, roi.Y + p1.Y, depthROI.Get(Of Single)(p1.Y, p1.X)))
+                Dim w2 = getWorldCoordinatesD(ocvb, New cv.Point3f(roi.X + p2.X, roi.Y + p2.Y, depthROI.Get(Of Single)(p2.Y, p2.X)))
                 worldDepth.Add(w1)
                 worldDepth.Add(w2)
                 ocvb.result1(roi).Line(p1, p2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias) ' show the line connecting the 2 points used to create the normal
@@ -238,10 +234,6 @@ Public Class Plane_DetectDebug
         End Sub)
         Dim mask = grid.gridMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.BitwiseOr(ocvb.result1, mask, ocvb.result1)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        grid.Dispose()
     End Sub
 End Class
 

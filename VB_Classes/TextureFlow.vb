@@ -13,7 +13,7 @@ Public Class TextureFlow_Basics
         Dim TFdelta = sliders.TrackBar1.Value
         Dim TFblockSize = sliders.TrackBar2.Value * 2 + 1
         Dim TFksize = sliders.TrackBar3.Value * 2 + 1
-        if standalone Then src = ocvb.color
+        If standalone Then src = ocvb.color
         Dim gray = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2GRAY)
         ocvb.result1 = src.Clone
         Dim eigen = gray.CornerEigenValsAndVecs(TFblockSize, TFksize)
@@ -27,10 +27,7 @@ Public Class TextureFlow_Basics
                 ocvb.result1.Line(p1, p2, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
             Next
         Next
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -40,16 +37,12 @@ Public Class TextureFlow_Depth
     Inherits ocvbClass
     Dim texture As TextureFlow_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         texture = New TextureFlow_Basics(ocvb, caller)
         ocvb.desc = "Display texture flow in the depth data"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         texture.src = ocvb.RGBDepth
         texture.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        texture.Dispose()
     End Sub
 End Class

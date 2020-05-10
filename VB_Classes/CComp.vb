@@ -57,7 +57,6 @@ Public Class CComp_Basics
             ocvb.result2.Rectangle(rect, cv.Scalar.White, 2)
         Next
         lastImage = ocvb.result1.Clone()
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -69,7 +68,7 @@ Public Class CComp_EdgeMask
     Dim ccomp As CComp_Basics
     Dim edges As Edges_CannyAndShadow
     Public srcGray As New cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         edges = New Edges_CannyAndShadow(ocvb, caller)
 
@@ -91,11 +90,6 @@ Public Class CComp_EdgeMask
         ccomp.Run(ocvb)
         ocvb.label1 = "Edges_CannyAndShadow (input to ccomp)"
         ocvb.label2 = "Blob Rectangles with centroids (white)"
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        ccomp.Dispose()
-        edges.Dispose()
     End Sub
 End Class
 
@@ -124,7 +118,6 @@ Public Class CComp_ColorDepth
         For Each blob In cc.Blobs.Skip(1)
             ocvb.result1.Rectangle(blob.Rect, cv.Scalar.White, 2)
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -172,7 +165,6 @@ Public Class CComp_Image
             Dim avg = ocvb.RGBDepth(blobList(i)).Mean(binary(blobList(i)))
             ocvb.result1(blobList(i)).SetTo(avg, binary(blobList(i)))
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -228,7 +220,6 @@ Public Class CComp_InRange_MT
             Next
         End Sub)
         ocvb.label1 = "# of blobs = " + CStr(totalBlobs) + " in " + CStr(rangeCount) + " regions"
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -274,7 +265,6 @@ Public Class CComp_InRange
         Next
 
         ocvb.label1 = "# of blobs = " + CStr(roiList.Count) + " in " + CStr(rangeCount) + " regions"
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -317,7 +307,6 @@ Public Class CComp_Shapes
         matBot = matBot.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.VConcat(matTop, matBot, mat)
         ocvb.result2 = mat.Resize(ocvb.result2.Size())
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

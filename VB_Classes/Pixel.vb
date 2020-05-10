@@ -6,7 +6,7 @@ Public Class Pixel_GetSet
     Inherits ocvbClass
     Dim mat4 As Mat_4to1
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         mat4 = New Mat_4to1(ocvb, caller)
 
         ocvb.label1 = "Log of times for each method"
@@ -56,9 +56,5 @@ Public Class Pixel_GetSet
         ocvb.putText(New ActiveClass.TrueType(output, 10, 60, RESULT1))
 
         mat4.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        mat4.Dispose()
     End Sub
 End Class

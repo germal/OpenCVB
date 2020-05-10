@@ -112,7 +112,6 @@ Public Class OpticalFlow_DenseOptions
             End If
         Next
         outputScaling = sliders2.TrackBar2.Value
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -141,10 +140,6 @@ Public Class OpticalFlow_DenseBasics
             ocvb.result2 = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
         oldGray = gray.Clone()
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        flow.Dispose()
     End Sub
 End Class
 
@@ -204,11 +199,6 @@ Public Class OpticalFlow_DenseBasics_MT
             oldGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             accum = ocvb.color.Clone()
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        flow.Dispose()
-        grid.Dispose()
     End Sub
 End Class
 
@@ -232,7 +222,7 @@ Public Class OpticalFlow_Sparse
         sliders.setupTrackBar1(ocvb, caller, "OpticalFlow window", 1, 20, 3)
         sliders.setupTrackBar2(ocvb, caller, "OpticalFlow Max Pixels Distance", 1, 100, 30)
 
-        radio.Setup(ocvb, caller,6)
+        radio.Setup(ocvb, caller, 6)
         radio.check(0).Text = "FarnebackGaussian"
         radio.check(1).Text = "LkGetMinEigenvals"
         radio.check(2).Text = "None"
@@ -309,9 +299,5 @@ Public Class OpticalFlow_Sparse
         Else
             lastFrame = gray.Clone()
         End If
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
-        good.Dispose()
-            End Sub
 End Class

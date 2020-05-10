@@ -27,7 +27,6 @@ Public Class MotionBlur_Basics
         pt1 += New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
         pt2 += New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
         If showDirection Then ocvb.result1.Line(pt1, pt2, cv.Scalar.Yellow, 5, cv.LineTypes.AntiAlias)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -122,7 +121,7 @@ Public Class MotionBlur_Deblur
     End Function
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        check.Setup(ocvb, caller,  1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Redo motion blurred image"
 
         mblur = New MotionBlur_Basics(ocvb, caller)
@@ -130,8 +129,8 @@ Public Class MotionBlur_Deblur
 
         sliders.setupTrackBar1(ocvb, caller, "Deblur Restore Vector", 1, mblur.sliders.TrackBar1.Maximum, 10)
         sliders.setupTrackBar2(ocvb, caller, "Deblur Angle of Restore Vector", mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum, 0)
-        sliders.setupTrackBar3(ocvb, caller,"Deblur Signal to Noise Ratio", 1, 1000, 700)
-        sliders.setupTrackBar4(ocvb, caller,  "Deblur Gamma", 1, 100, 5)
+        sliders.setupTrackBar3(ocvb, caller, "Deblur Signal to Noise Ratio", 1, 1000, 700)
+        sliders.setupTrackBar4(ocvb, caller, "Deblur Gamma", 1, 100, 5)
 
         ocvb.desc = "Deblur a motion blurred image"
         ocvb.label1 = "Blurred Image Input"
@@ -165,9 +164,5 @@ Public Class MotionBlur_Deblur
         Dim imgOut = filter2DFreq(imgIn(roi), hW)
         imgOut.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
         ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-                        mblur.Dispose()
     End Sub
 End Class

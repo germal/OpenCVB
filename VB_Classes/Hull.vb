@@ -64,7 +64,6 @@ Public Class Hull_Basics
                 ocvb.result2.Circle(points(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             Next
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

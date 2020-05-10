@@ -57,7 +57,6 @@ Public Class HOG_Basics
                 ocvb.label2 = "Try adjusting slider bars."
             End If
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

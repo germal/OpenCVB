@@ -46,7 +46,7 @@ Public Class Contours_Basics
             End If
         Next
 
-        if standalone Then
+        If standalone Then
             src = New cv.Mat(ocvb.result1.Size(), cv.MatType.CV_8UC1)
             rotatedRect.Run(ocvb)
             src = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
@@ -71,10 +71,6 @@ Public Class Contours_Basics
         Next
 
         cv.Cv2.DrawContours(dst, contours, 0, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        rotatedRect.Dispose()
     End Sub
 End Class
 
@@ -105,10 +101,6 @@ Public Class Contours_FindandDraw
 
         ocvb.result2.SetTo(0)
         cv.Cv2.DrawContours(ocvb.result2, contours, 0, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        rotatedRect.Dispose()
     End Sub
 End Class
 
@@ -138,10 +130,6 @@ Public Class Contours_Depth
             End If
         Next
         cv.Cv2.DrawContours(ocvb.result2, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        trim.Dispose()
     End Sub
 End Class
 
@@ -186,10 +174,6 @@ Public Class Contours_RGB
         cv.Cv2.DrawContours(ocvb.result1, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
         ocvb.result2.SetTo(0)
         ocvb.color.CopyTo(ocvb.result2, trim.zeroMask)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        trim.Dispose()
     End Sub
 End Class
 

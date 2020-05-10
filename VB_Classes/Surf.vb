@@ -24,7 +24,7 @@ Public Class Surf_Basics_CS
         ocvb.label1 = "BF Matcher output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then
+        If standalone Then
             If ocvb.parms.cameraIndex = T265Camera Then
                 fisheye.Run(ocvb)
                 srcLeft = fisheye.leftView
@@ -37,16 +37,12 @@ Public Class Surf_Basics_CS
         CS_SurfBasics.Run(srcLeft, srcRight, dst, sliders.TrackBar1.Value, radio.check(0).Checked)
 
         'If dst.Width <> ocvb.color.Width * 2 Then dst = dst.Resize(New cv.Size(ocvb.color.Width * 2, srcLeft.Height))
-        if standalone Then
+        If standalone Then
             dst(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(ocvb.result1)
             dst(New cv.Rect(ocvb.color.Width, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(ocvb.result2)
             ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
             If CS_SurfBasics.keypoints1 IsNot Nothing Then ocvb.label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-                        fisheye.Dispose()
     End Sub
 End Class
 
@@ -61,7 +57,7 @@ Public Class Surf_Basics
     Dim surf As Surf_Basics_CS
     Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         fisheye = New FishEye_Rectified(ocvb, caller)
 
         surf = New Surf_Basics_CS(ocvb, caller)
@@ -81,11 +77,6 @@ Public Class Surf_Basics
         surf.Run(ocvb)
         surf.dst(New cv.Rect(0, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(ocvb.result1)
         surf.dst(New cv.Rect(surf.srcLeft.Width, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(ocvb.result2)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        surf.Dispose()
-        fisheye.Dispose()
     End Sub
 End Class
 
@@ -96,9 +87,9 @@ End Class
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Surf_DrawMatchManual_CS
     Inherits ocvbClass
-        Dim surf As Surf_Basics_CS
+    Dim surf As Surf_Basics_CS
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         surf = New Surf_Basics_CS(ocvb, caller)
         surf.CS_SurfBasics.drawPoints = False
 
@@ -134,9 +125,5 @@ Public Class Surf_DrawMatchManual_CS
             If pt.Y <> -1 Then ocvb.result2.Circle(keys2(i).Pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
         ocvb.label2 = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        surf.Dispose()
     End Sub
 End Class

@@ -6,7 +6,7 @@ Public Class Entropy_Basics
     Dim hist As Histogram_Basics
     Public entropy As Single
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         flow = New Font_FlowText(ocvb, caller)
         flow.result1or2 = RESULT1
 
@@ -17,13 +17,13 @@ Public Class Entropy_Basics
     Private Function channelEntropy(total As Int32, hist As cv.Mat) As Single
         Dim entropy As Single
         For i = 0 To hist.Rows - 1
-            Dim hc = Math.Abs(hist.Get(of Single)(i))
+            Dim hc = Math.Abs(hist.Get(Of Single)(i))
             If hc <> 0 Then entropy += -(hc / total) * Math.Log10(hc / total)
         Next
         Return entropy
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then src = ocvb.color
+        If standalone Then src = ocvb.color
         hist.src = src
         hist.Run(ocvb)
         entropy = 0
@@ -33,14 +33,9 @@ Public Class Entropy_Basics
             entropyChannels += "Entropy for " + Choose(i + 1, "Red", "Green", "Blue") + " " + Format(nextEntropy, "0.00") + ", "
             entropy += nextEntropy
         Next
-        if standalone Then
+        If standalone Then
             flow.msgs.Add("Entropy total = " + Format(entropy, "0.00") + " - " + entropyChannels)
             flow.Run(ocvb)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        hist.Dispose()
-        flow.Dispose()
     End Sub
 End Class

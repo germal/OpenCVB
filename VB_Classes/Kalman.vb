@@ -60,7 +60,7 @@ Public Class Kalman_Basics
             output = input ' do nothing to the input.
         End If
 
-        if standalone Then
+        If standalone Then
             ocvb.result1 = ocvb.color.Clone()
             Static rect As New cv.Rect(CInt(output(0)), CInt(output(1)), CInt(output(2)), CInt(output(3)))
             If rect.X = CInt(output(0)) And rect.Y = CInt(output(1)) And rect.Width = CInt(output(2)) And rect.Height = CInt(output(3)) Then
@@ -70,14 +70,6 @@ Public Class Kalman_Basics
             End If
             ocvb.result1.Rectangle(rect, cv.Scalar.White, 6)
             ocvb.result1.Rectangle(rect, cv.Scalar.Red, 1)
-        End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        If kalman IsNot Nothing Then
-            For i = 0 To kalman.Count - 1
-                kalman(i).Dispose()
-            Next
         End If
     End Sub
 End Class
@@ -143,11 +135,6 @@ Public Class Kalman_Compare
         kPlot.minScale = plot.minScale
         kPlot.plotData = New cv.Scalar(kalman(0).stateResult, kalman(1).stateResult, kalman(2).stateResult)
         kPlot.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        plot.Dispose()
-        kPlot.Dispose()
     End Sub
 End Class
 
@@ -212,7 +199,6 @@ Public Class Kalman_RotatingPoint
 
         cv.Cv2.Randn(processNoise, cv.Scalar.Black, cv.Scalar.All(Math.Sqrt(kf.ProcessNoiseCov.Get(Of Single)(0, 0))))
         kState = kf.TransitionMatrix * kState + processNoise
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -249,10 +235,6 @@ Public Class Kalman_MousePredict
                                   cv.Scalar.All(255), 1, cv.LineTypes.AntiAlias)
         cv.Cv2.Line(ocvb.result1, ocvb.mousePoint * locMultiplier, lastRealMouse * locMultiplier, New cv.Scalar(0, 0, 255), 1, cv.LineTypes.AntiAlias)
         lastRealMouse = ocvb.mousePoint
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        kalman.Dispose()
     End Sub
 End Class
 
@@ -304,7 +286,7 @@ Public Class Kalman_CVMat
             dst.Set(Of Single)(i, 0, kalman(i).stateResult)
         Next
 
-        if standalone Then
+        If standalone Then
             Dim rx(src.Rows - 1) As Single
             Dim testrect As New cv.Rect
             For i = 0 To src.Rows - 1
@@ -318,14 +300,6 @@ Public Class Kalman_CVMat
                 rect = New cv.Rect(CInt(rx(0)), CInt(rx(1)), CInt(rx(2)), CInt(rx(3)))
             End If
             ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
-        End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        If kalman IsNot Nothing Then
-            For i = 0 To kalman.Count - 1
-                kalman(i).Dispose()
-            Next
         End If
     End Sub
 End Class
@@ -367,11 +341,6 @@ Public Class Kalman_ImageSmall
         cv.Cv2.Subtract(dst, saveOriginal, dst)
         dst = dst.Threshold(1, 255, cv.ThresholdTypes.Binary)
         ocvb.result2 = dst.Resize(ocvb.result1.Size())
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        kalman.Dispose()
-        resize.Dispose()
     End Sub
 End Class
 
@@ -410,11 +379,6 @@ Public Class Kalman_DepthSmall
         dst = depth32f.Threshold(0, 0, cv.ThresholdTypes.Tozero).ConvertScaleAbs()
         dst = dst.Reshape(1, resize.dst.Height)
         ocvb.result2 = dst.Resize(ocvb.result1.Size())
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        kalman.Dispose()
-        resize.Dispose()
     End Sub
 End Class
 
@@ -432,7 +396,7 @@ Public Class Kalman_Single
     Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, 0)
     Public inputReal As Single
     Public stateResult As Single
-        Public ProcessNoiseCov As Single = 0.00001
+    Public ProcessNoiseCov As Single = 0.00001
     Public MeasurementNoiseCov As Single = 0.1
     Public ErrorCovPost As Single = 1
     Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
@@ -449,7 +413,7 @@ Public Class Kalman_Single
         ocvb.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then
+        If standalone Then
             If ocvb.frameCount = 0 Then
                 plot = New Plot_OverTime(ocvb, caller)
                 plot.dst = ocvb.result2
@@ -464,17 +428,13 @@ Public Class Kalman_Single
 
         Dim prediction = kf.Predict()
         measurement.Set(Of Single)(0, 0, inputReal)
-        stateResult = kf.Correct(measurement).Get(of Single)(0, 0)
-        if standalone Then
+        stateResult = kf.Correct(measurement).Get(Of Single)(0, 0)
+        If standalone Then
             plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
             plot.Run(ocvb)
             ocvb.label1 = "Mean of the grayscale image is predicted"
             ocvb.label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        If plot IsNot Nothing Then plot.Dispose()
     End Sub
 End Class
 

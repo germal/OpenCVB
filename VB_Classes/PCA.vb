@@ -37,7 +37,6 @@ Public Class PCA_Basics
             reconstruction.ConvertTo(reconstruction, cv.MatType.CV_8UC1)
             ocvb.result1 = reconstruction.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -54,10 +53,6 @@ Public Class PCA_Depth
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         pca.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        pca.Dispose()
     End Sub
 End Class
 
@@ -110,12 +105,12 @@ Public Class PCA_DrawImage
             Next
 
             Dim pca_analysis = New cv.PCA(data_pts, New cv.Mat, cv.PCA.Flags.DataAsRow)
-            Dim cntr = New cv.Point(CInt(pca_analysis.Mean.Get(of Double)(0, 0)), CInt(pca_analysis.Mean.Get(of Double)(0, 1)))
+            Dim cntr = New cv.Point(CInt(pca_analysis.Mean.Get(Of Double)(0, 0)), CInt(pca_analysis.Mean.Get(Of Double)(0, 1)))
             Dim eigen_vecs(2) As cv.Point2d
             Dim eigen_val(2) As Double
             For j = 0 To 1
-                eigen_vecs(j) = New cv.Point2d(pca_analysis.Eigenvectors.Get(of Double)(j, 0), pca_analysis.Eigenvectors.Get(of Double)(j, 1))
-                eigen_val(j) = pca_analysis.Eigenvalues.Get(of Double)(0, j)
+                eigen_vecs(j) = New cv.Point2d(pca_analysis.Eigenvectors.Get(Of Double)(j, 0), pca_analysis.Eigenvectors.Get(Of Double)(j, 1))
+                eigen_val(j) = pca_analysis.Eigenvalues.Get(Of Double)(0, j)
             Next
 
             ocvb.result2.Circle(cntr, 3, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
@@ -126,10 +121,6 @@ Public Class PCA_DrawImage
             drawAxis(ocvb.result2, cntr, ept1, cv.Scalar.Red, 1) ' primary principle component
             drawAxis(ocvb.result2, cntr, ept2, cv.Scalar.BlueViolet, 5) ' secondary principle component
         Next
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        pca.Dispose()
     End Sub
 End Class
 

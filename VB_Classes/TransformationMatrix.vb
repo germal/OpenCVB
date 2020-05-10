@@ -36,6 +36,5 @@ Public Class TransformationMatrix_Basics
         Else
             ocvb.putText(New ActiveClass.TrueType("The transformation matrix for the current camera has not been set", 10, 125))
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class

@@ -1,11 +1,11 @@
 Imports cv = OpenCvSharp
 Public Class Diff_Basics
     Inherits ocvbClass
-        Dim lastFrame As New cv.Mat
+    Dim lastFrame As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Diff - Color Threshold", 1, 255, 50)
-                ocvb.label1 = "Stable Gray Color"
+        ocvb.label1 = "Stable Gray Color"
         ocvb.label2 = "Unstable Gray Color"
         ocvb.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
@@ -18,10 +18,7 @@ Public Class Diff_Basics
             ocvb.result1 = ocvb.color.Clone().SetTo(0, ocvb.result2)
         End If
         lastFrame = gray.Clone()
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
-            End Sub
 End Class
 
 
@@ -33,7 +30,7 @@ Public Class Diff_UnstableDepthAndColor
     Dim depth As Depth_Stable
     Dim lastFrames() As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         diff = New Diff_Basics(ocvb, caller)
         diff.sliders.TrackBar1.Value = 20 ' this is color threshold - low means detecting more motion.
 
@@ -57,10 +54,5 @@ Public Class Diff_UnstableDepthAndColor
             ocvb.label1 = "Stable depth and color"
             ocvb.label2 = "Stable (non-zero) Depth"
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        diff.Dispose()
-        depth.Dispose()
     End Sub
 End Class

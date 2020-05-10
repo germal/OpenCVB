@@ -38,9 +38,8 @@ Public Class Trace_OpenCV_CPP
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
         End If
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
+    Public Sub Close()
         Trace_OpenCV_Close(Trace_OpenCV)
     End Sub
 End Class

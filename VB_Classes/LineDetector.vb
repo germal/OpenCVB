@@ -230,7 +230,6 @@ Public Class lineDetector_FLD
         src.CopyTo(dst)
         If lineCount > 0 Then sortedLines = drawSegments(dst, lineCount, factor, dst)
         if standalone Then dst.CopyTo(ocvb.result1)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -271,7 +270,6 @@ Public Class LineDetector_LSD
         ocvb.color.CopyTo(ocvb.result1)
         sortedLines.Clear()
         If lineCount > 0 Then sortedLines = drawSegments(ocvb.result1, lineCount, factor, ocvb.result1)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -303,10 +301,6 @@ Public Class LineDetector_3D_LongestLine
             Dim mask = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, 0)
             find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        lines.Dispose()
     End Sub
 End Class
 
@@ -339,10 +333,6 @@ Public Class LineDetector_3D_FLD_MT
             Sub(i)
                 find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
             End Sub)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        lines.Dispose()
     End Sub
 End Class
 
@@ -379,10 +369,6 @@ Public Class LineDetector_3D_LSD_MT
             Sub(i)
                 find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
             End Sub)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        lines.Dispose()
     End Sub
 End Class
 
@@ -502,11 +488,6 @@ Public Class LineDetector_3D_FitLineZ
                     ocvb.result2.Circle(New cv.Point(d.Item3, d.Item4), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
                 End Sub)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        linesFLD.Dispose()
-        linesLSD.Dispose()
     End Sub
 End Class
 
@@ -531,7 +512,7 @@ Public Class LineDetector_Basics
         ocvb.color.CopyTo(ocvb.result2)
         Dim thickness = sliders.TrackBar1.Value
 
-        if standalone Then dst = ocvb.result1
+        If standalone Then dst = ocvb.result1
         For Each v In vectors
             If v(0) >= 0 And v(0) <= dst.Cols And v(1) >= 0 And v(1) <= dst.Rows And
                    v(2) >= 0 And v(2) <= dst.Cols And v(3) >= 0 And v(3) <= dst.Rows Then
@@ -540,13 +521,9 @@ Public Class LineDetector_Basics
                 dst.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
             End If
         Next
-        if standalone Then
+        If standalone Then
             ocvb.label2 = "Drawn with DrawSegment (thickness=1)"
             ld.DrawSegments(ocvb.result2, vectors, False)
         End If
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        ld.Dispose()
     End Sub
 End Class

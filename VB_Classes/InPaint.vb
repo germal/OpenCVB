@@ -29,7 +29,6 @@ Public Class InPaint_Basics
         mask.SetTo(0)
         mask.Line(p1, p2, cv.Scalar.All(255), thickness, cv.LineTypes.AntiAlias)
         cv.Cv2.Inpaint(ocvb.result1, mask, ocvb.result2, thickness, inPaintFlag)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -42,7 +41,7 @@ Public Class InPaint_Noise
         setCaller(callerRaw)
         noise = New Draw_Noise(ocvb, caller)
 
-        radio.Setup(ocvb, caller,2)
+        radio.Setup(ocvb, caller, 2)
         radio.check(0).Text = "TELEA"
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True
@@ -55,10 +54,6 @@ Public Class InPaint_Noise
         noise.Run(ocvb) ' create some noise in the result1 image.
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
         cv.Cv2.Inpaint(ocvb.result1, noise.noiseMask, ocvb.result2, noise.maxNoiseWidth, inPaintFlag)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        noise.Dispose()
     End Sub
 End Class
 

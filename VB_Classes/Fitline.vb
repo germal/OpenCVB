@@ -15,7 +15,7 @@ Public Class Fitline_Basics
         ocvb.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then
+        If standalone Then
             draw.Run(ocvb)
             src = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
             ocvb.result2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -44,10 +44,6 @@ Public Class Fitline_Basics
                 dst.Line(p1, p2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
             End If
         Next
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        draw.Dispose()
     End Sub
 End Class
 
@@ -106,10 +102,6 @@ Public Class Fitline_3DBasics_MT
             houghShowLines3D(ocvb.result1(hlines.grid.roiList(i)), lines.ElementAt(i))
         Next
         ocvb.result1.SetTo(cv.Scalar.White, hlines.grid.gridMask)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        hlines.Dispose()
     End Sub
 End Class
 
@@ -185,7 +177,6 @@ Public Class Fitline_RawInput
                 ocvb.result1.Circle(pt, dotSize, highLight, -1, cv.LineTypes.AntiAlias)
             Next
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -260,7 +251,7 @@ Public Class Fitline_EigenFit
 
         Dim D = New cv.Mat(2, 2, cv.MatType.CV_32FC1, vec4f.ToArray)
         cv.Cv2.Eigen(D, eigenVal, eigenVec)
-        Dim theta = Math.Atan2(eigenVec.Get(of Single)(1, 0), eigenVec.Get(of Single)(0, 0))
+        Dim theta = Math.Atan2(eigenVec.Get(Of Single)(1, 0), eigenVec.Get(Of Single)(0, 0))
 
         Dim Len = Math.Sqrt(Math.Pow(maxX - minX, 2) + Math.Pow(maxY - minY, 2))
 
@@ -278,17 +269,13 @@ Public Class Fitline_EigenFit
         End If
 
         ocvb.putText(New ActiveClass.TrueType("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(Len)) + vbCrLf +
-                                              "Confidence = " + Format(eigenVal.Get(of Single)(0, 0) / eigenVal.Get(of Single)(1, 0), "#0.0") + vbCrLf +
-                                              "theta: atan2(" + Format(eigenVec.Get(of Single)(1, 0), "#0.0") + ", " + Format(eigenVec.Get(of Single)(0, 0), "#0.0") + ") = " +
+                                              "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), "#0.0") + vbCrLf +
+                                              "theta: atan2(" + Format(eigenVec.Get(Of Single)(1, 0), "#0.0") + ", " + Format(eigenVec.Get(Of Single)(0, 0), "#0.0") + ") = " +
                                               Format(theta, "#0.0000"), 10, 22, RESULT2))
 
         p1 = New cv.Point(0, noisyLine.bb)
         p2 = New cv.Point(w, noisyLine.m * w + noisyLine.bb)
         ocvb.result2.Line(p1, p2, cv.Scalar.Blue, 3, cv.LineTypes.AntiAlias)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        noisyLine.Dispose()
     End Sub
 End Class
 

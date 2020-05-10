@@ -28,7 +28,7 @@ Public Class GameOfLife_Basics
         Return CountNeighbors
     End Function
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         grid = New cv.Mat(ocvb.color.Height / factor, ocvb.color.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
 
@@ -87,10 +87,6 @@ Public Class GameOfLife_Basics
         lastPopulation = population
         ocvb.label1 = "Population " + CStr(population) + " Generation = " + CStr(generation) + countdownText
         grid = nextgrid.Clone()
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        random.Dispose()
     End Sub
 End Class
 
@@ -104,7 +100,7 @@ Public Class GameOfLife_Population
     Dim plot As Plot_OverTime
     Dim game As GameOfLife_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         game = New GameOfLife_Basics(ocvb, caller)
 
         plot = New Plot_OverTime(ocvb, caller)
@@ -119,10 +115,5 @@ Public Class GameOfLife_Population
 
         plot.plotData = New cv.Scalar(game.population, 0, 0)
         plot.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        plot.Dispose()
-        game.Dispose()
     End Sub
 End Class

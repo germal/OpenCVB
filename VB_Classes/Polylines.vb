@@ -23,7 +23,6 @@ Public Class Polylines_IEnumerableExample
         ocvb.result1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
         ' NOTE: when there are 2 points, there will be 1 line.
         ocvb.result1.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, sliders.TrackBar2.Value, cv.LineTypes.AntiAlias)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -65,6 +64,5 @@ Public Class Polylines_Random
         Dim y = Math.Min(ocvb.mousePoint.Y, ocvb.result1.Height - height)
         ocvb.label2 = CStr(zoomFactor) + "X zoom around mouse"
         ocvb.result2 = ocvb.result1.GetRectSubPix(New cv.Size(width, height), New cv.Point2f(x, y))
-		MyBase.Finish(ocvb)
     End Sub
 End Class

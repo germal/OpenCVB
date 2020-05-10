@@ -43,7 +43,7 @@ Public Class Hough_Circles
     Dim circles As Draw_Circles
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         circles = New Draw_Circles(ocvb, caller)
         circles.sliders.TrackBar1.Value = 3
         ocvb.desc = "Find circles using HoughCircles."
@@ -61,10 +61,6 @@ Public Class Hough_Circles
         For i = 0 To cFound.Length - 1
             cv.Cv2.Circle(ocvb.result2, New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, cv.LineTypes.AntiAlias)
         Next
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        circles.Dispose()
     End Sub
 End Class
 
@@ -88,11 +84,11 @@ Public Class Hough_Lines
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then src = ocvb.color
+        If standalone Then src = ocvb.color
         edges.src = src.Clone()
         edges.Run(ocvb)
 
-        if standalone Then src = ocvb.result1.Clone()
+        If standalone Then src = ocvb.result1.Clone()
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rhoIn = sliders.TrackBar1.Value
@@ -102,7 +98,7 @@ Public Class Hough_Lines
         segments = cv.Cv2.HoughLines(src, rhoIn, thetaIn, threshold)
         ocvb.label1 = "Found " + CStr(segments.Length) + " Lines"
 
-        if standalone Then
+        If standalone Then
             ocvb.color.CopyTo(ocvb.result1)
             ocvb.color.CopyTo(ocvb.result2)
             houghShowLines(ocvb.result1, segments, sliders.TrackBar4.Value)
@@ -113,11 +109,7 @@ Public Class Hough_Lines
             Next
             ocvb.label2 = "Probablistic lines = " + CStr(probSegments.Length)
         End If
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
-        edges.Dispose()
-            End Sub
 End Class
 
 
@@ -128,11 +120,11 @@ Public Class Hough_Lines_MT
     Inherits ocvbClass
     Dim edges As Edges_Canny
     Public grid As Thread_Grid
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, caller, "theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3(ocvb, caller,"threshold", 1, 100, 3)
+        sliders.setupTrackBar3(ocvb, caller, "threshold", 1, 100, 3)
 
         edges = New Edges_Canny(ocvb, caller)
 
@@ -166,11 +158,6 @@ Public Class Hough_Lines_MT
             houghShowLines(ocvb.result2(roi), segments, 1)
         End Sub)
         ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
-        edges.Dispose()
-        grid.Dispose()
-            End Sub
 End Class
 

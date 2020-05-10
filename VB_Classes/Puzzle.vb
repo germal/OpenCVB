@@ -229,7 +229,7 @@ Public Class Puzzle_Basics
     Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public restartRequested As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 10
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 8
@@ -269,10 +269,6 @@ Public Class Puzzle_Basics
             Dim roi2 = scrambled(i)
             If roi.Width = width And roi.Height = height And roi2.Width = width And roi2.Height = height Then ocvb.result1(roi2) = ocvb.color(roi)
         Next
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        grid.Dispose()
     End Sub
 End Class
 
@@ -284,20 +280,20 @@ Public Class Puzzle_Solver
     Inherits ocvbClass
     Dim puzzle As Puzzle_Basics
     Public roilist() As cv.Rect
-        Dim usedList As New List(Of Integer)
+    Dim usedList As New List(Of Integer)
     Dim fitlist As New List(Of bestFit)
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         puzzle = New Puzzle_Basics(ocvb, caller)
         puzzle.grid.sliders.Hide()
 
-        radio.Setup(ocvb, caller,3)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Easy Puzzle - tiles = 256x180"
         radio.check(1).Text = "Medium Puzzle - tiles = 128x90"
         radio.check(2).Text = "Hard Puzzle - tiles = 64x90"
         radio.check(0).Checked = True
 
-        check.Setup(ocvb, caller,  1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Reshuffle pieces"
 
         ocvb.desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."
@@ -399,10 +395,6 @@ Public Class Puzzle_Solver
         ocvb.label1 = "Input to puzzle solver"
         ocvb.label2 = "Puzzle_Solver output (ambiguities possible)"
         If radio.check(1).Checked Or radio.check(2).Checked Then Thread.Sleep(1000)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        puzzle.Dispose()
     End Sub
 End Class
 

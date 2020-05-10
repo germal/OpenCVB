@@ -10,7 +10,6 @@ Public Class Mat_Repeat
         ocvb.result1 = small.Repeat(10, 10)
         small = ocvb.RGBDepth.Resize(New cv.Size(ocvb.color.Cols / 10, ocvb.color.Rows / 10))
         ocvb.result2 = small.Repeat(10, 10)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -36,10 +35,6 @@ Public Class Mat_PointToMat
         For i = 0 To rows - 1
             ocvb.result2.Set(Of cv.Vec3b)(indexer(i).Item1, indexer(i).Item0, white)
         Next
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        mask.Dispose()
     End Sub
 End Class
 
@@ -68,10 +63,6 @@ Public Class Mat_MatToPoint
             Next
         Next
         ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, points)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        mask.Dispose()
     End Sub
 End Class
 
@@ -98,7 +89,6 @@ Public Class Mat_Transpose
 #Else
         ocvb.result2 = trBack.ToMat.Resize(ocvb.color.Size())
 #End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -124,7 +114,6 @@ Public Class Mat_Tricks
         x = 20
         y = 40
         ocvb.result2(x, x + mat.Width, y, y + mat.Height) = mat.T
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -172,7 +161,6 @@ Public Class Mat_4to1
             dst.Line(New cv.Point(0, dst.Height / 2), New cv.Point(dst.Width, dst.Height / 2), cv.Scalar.White, 2)
             dst.Line(New cv.Point(dst.Width / 2, 0), New cv.Point(dst.Width / 2, dst.Height), cv.Scalar.White, 2)
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -212,7 +200,6 @@ Public Class Mat_2to1
         If noLines = False Then
             dst.Line(New cv.Point(0, dst.Height / 2), New cv.Point(dst.Width, dst.Height / 2), cv.Scalar.White, 2)
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -224,7 +211,7 @@ Public Class Mat_ImageXYZ_MT
     Dim grid As Thread_Grid
     Public xyDepth As cv.Mat
     Public xyzPlanes() As cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 32
@@ -249,11 +236,7 @@ Public Class Mat_ImageXYZ_MT
               xyzPlanes(2)(roi) = depth32f(roi)
           End Sub)
 
-        if standalone Then cv.Cv2.Merge(xyzPlanes, xyDepth)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        grid.Dispose()
+        If standalone Then cv.Cv2.Merge(xyzPlanes, xyDepth)
     End Sub
 End Class
 
@@ -276,7 +259,6 @@ Public Class Mat_RowColRange
         ocvb.result1 = ocvb.color.Clone()
         cv.Cv2.BitwiseNot(ocvb.result1.RowRange(midY - 50, midY + 50), ocvb.result1.RowRange(midY - 50, midY + 50))
         cv.Cv2.BitwiseNot(ocvb.result1.ColRange(midX - 50, midX + 50), ocvb.result1.ColRange(midX - 50, midX + 50))
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -304,7 +286,6 @@ Public Class Mat_Managed
         Next
         Dim rect As New cv.Rect(autoRand.Next(0, ocvb.color.Width - 50), autoRand.Next(0, ocvb.color.Height - 50), 50, 50)
         ocvb.result1(rect).SetTo(0)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

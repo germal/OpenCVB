@@ -37,10 +37,9 @@ Public Class RecursiveBilateralFilter_CPP
         Dim dstData(ocvb.color.Total * ocvb.color.ElemSize - 1) As Byte
         Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
         ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, dstData)
-		MyBase.Finish(ocvb)
     End Sub
-    Public Sub MyDispose()
+    Public Sub Close()
         RecursiveBilateralFilter_Close(rbf)
-            End Sub
+    End Sub
 End Class
 

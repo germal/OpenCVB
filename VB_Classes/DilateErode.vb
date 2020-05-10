@@ -47,7 +47,6 @@ Public Class DilateErode_Basics
                 ocvb.label2 = "Erode Depth " + CStr(-iterations) + " times"
             End If
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -75,7 +74,6 @@ Public Class DilateErode_DepthSeed
         cv.Cv2.BitwiseAnd(seeds, validImg, seeds)
         ocvb.result1.SetTo(0)
         ocvb.RGBDepth.CopyTo(ocvb.result1, seeds)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -114,7 +112,6 @@ Public Class DilateErode_OpenClose
             cv.Cv2.MorphologyEx(ocvb.RGBDepth, ocvb.result2, cv.MorphTypes.Close, element)
             cv.Cv2.MorphologyEx(ocvb.color, ocvb.result1, cv.MorphTypes.Close, element)
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

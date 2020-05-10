@@ -47,7 +47,6 @@ Public Class EigenVecVals_Basics
             nextLine += " = " + vbTab + "0.0"
             ocvb.putText(New ActiveClass.TrueType(nextLine, 10, 50 + i * 30, RESULT2))
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 

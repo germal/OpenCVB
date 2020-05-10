@@ -52,7 +52,6 @@ Public Class MatchTemplate_Basics
                 flow.Run(ocvb)
             End If
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -95,11 +94,6 @@ Public Class MatchTemplate_RowCorrelation
         If correlation < minCorrelation Then minCorrelation = correlation
         If correlation > maxCorrelation Then maxCorrelation = correlation
         ocvb.label1 = "Min = " + Format(minCorrelation, "#,##0.00") + " max = " + Format(maxCorrelation, "#,##0.0000")
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        corr.Dispose()
-        flow.Dispose()
     End Sub
 End Class
 
@@ -147,7 +141,6 @@ Public Class MatchTemplate_DrawRect
         Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
         ocvb.result1.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
         ocvb.result2.Circle(maxLoc.X + saveRect.Width / 2, maxLoc.Y + saveRect.Height / 2, 20, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -206,9 +199,5 @@ Public Class MatchTemplate_BestTemplate_MT
         End If
 
         match.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        grid.Dispose()
     End Sub
 End Class

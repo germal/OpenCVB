@@ -3,14 +3,14 @@ Imports cv = OpenCvSharp
 Public Class BlockMatching_Basics
     Inherits ocvbClass
     Dim colorizer As Depth_Colorizer_CPP
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         colorizer = New Depth_Colorizer_CPP(ocvb, caller)
 
         sliders.setupTrackBar1(ocvb, caller, "Blockmatch scale", 1, 200, 100)
         sliders.setupTrackBar2(ocvb, caller, "Blockmatch max disparity", 1, 8, 1)
-        sliders.setupTrackBar3(ocvb, caller,"Blockmatch block size", 5, 255, 15)
-                ocvb.desc = "Use OpenCV's block matching on left and right views."
+        sliders.setupTrackBar3(ocvb, caller, "Blockmatch block size", 5, 255, 15)
+        ocvb.desc = "Use OpenCV's block matching on left and right views."
         ocvb.label1 = "Block matching disparity colorized like depth"
         ocvb.label2 = "Right Image (used with left image)"
     End Sub
@@ -45,10 +45,6 @@ Public Class BlockMatching_Basics
         colorizer.Run(ocvb)
         ocvb.result1 = ocvb.result1.Resize(ocvb.color.Size())
         ocvb.result2 = ocvb.rightView.Resize(ocvb.color.Size())
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        colorizer.Dispose()
     End Sub
 End Class
 

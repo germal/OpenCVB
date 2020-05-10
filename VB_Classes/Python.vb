@@ -90,7 +90,6 @@ Public Class Python_Run
                 tryCount += 1
             End If
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -130,7 +129,6 @@ Public Class Python_MemMap
         if standalone Then memMapValues(0) = ocvb.frameCount
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -192,6 +190,5 @@ Public Class Python_SurfaceBlit
         Else
             ocvb.putText(New ActiveClass.TrueType("Python is not available", 10, 60, RESULT1))
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class

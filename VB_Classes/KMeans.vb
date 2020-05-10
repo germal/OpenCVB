@@ -25,11 +25,6 @@ Public Class kMeans_Clusters
         Mats.Run(ocvb)
         km.sliders.TrackBar1.Value = 10 ' this will show kmeans with 10 clusters in Result1.
         km.Run(ocvb)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        km.Dispose()
-        Mats.Dispose()
     End Sub
 End Class
 
@@ -62,7 +57,6 @@ Public Class kMeans_Basics
             Dim mean = ocvb.RGBDepth.Mean(mask)
             ocvb.result1.SetTo(mean, mask)
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -104,7 +98,6 @@ Public Class kMeans_RGBFast
             Next
         Next
         ocvb.result1 = small8uC3.Resize(ocvb.result1.Size())
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -162,10 +155,6 @@ Public Class kMeans_RGB_Plus_XYDepth
                 End With
             Next
         Next
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        km.Dispose()
     End Sub
 End Class
 
@@ -250,7 +239,6 @@ Public Class kMeans_RGB1_MT
             allLabels = factor * allLabels
             cv.Cv2.CvtColor(allLabels, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
         End If
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -322,7 +310,6 @@ Public Class kMeans_RGB2_MT
         Dim factor = CInt(255.0 / clusterCount)
         allLabels = factor * allLabels
         cv.Cv2.CvtColor(allLabels, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -417,7 +404,6 @@ Public Class kMeans_RGB3_MT
         Dim factor = CInt(255.0 / clusterCount)
         allLabels = factor * allLabels
         cv.Cv2.CvtColor(allLabels, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -450,7 +436,6 @@ Public Class kMeans_ReducedRGB
             data.Set(Of cv.Vec3f)(i, 0, colors.Get(Of cv.Vec3f)(labels.Get(Of Int32)(i)))
         Next
         data.Reshape(3, src.Rows).ConvertTo(ocvb.result1, cv.MatType.CV_8U)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -487,7 +472,6 @@ Public Class kMeans_XYDepth
         Next
         ocvb.RGBDepth.CopyTo(ocvb.result1)
         columnVector.Reshape(3, ocvb.result1(roi).Height).ConvertTo(ocvb.result1(roi), cv.MatType.CV_8U)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -520,7 +504,6 @@ Public Class kMeans_Depth_FG_BG
         Dim shadowMask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         mask.SetTo(0, shadowMask)
         ocvb.result1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -558,7 +541,6 @@ Public Class kMeans_LAB
         lab32f.Reshape(3, roi.Height).ConvertTo(ocvb.result1(roi), cv.MatType.CV_8UC3)
         ocvb.result1(roi) = ocvb.result1(roi).CvtColor(cv.ColorConversionCodes.Lab2RGB)
         ocvb.result1.Rectangle(ocvb.drawRect, cv.Scalar.White, 1)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -642,10 +624,6 @@ Public Class kMeans_RGB4_MT
         Dim factor = CInt(255.0 / clusterCount)
         allLabels = factor * allLabels
         cv.Cv2.CvtColor(allLabels, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        grid.Dispose()
     End Sub
 End Class
 
@@ -676,7 +654,6 @@ Public Class kMeans_Color
             Dim mean = ocvb.RGBDepth.Mean(mask)
             ocvb.result1.SetTo(mean, mask)
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -721,10 +698,6 @@ Public Class kMeans_Color_MT
                 ocvb.result1(roi).SetTo(mean, mask)
             Next
         End Sub)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        grid.Dispose()
     End Sub
 End Class
 
@@ -765,7 +738,6 @@ Public Class kMeans_ColorDepth
             ocvb.result1.SetTo(mean, mask)
         Next
         ocvb.result1.SetTo(0, zeroMask)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -816,9 +788,5 @@ Public Class kMeans_ColorDepth_MT
                ocvb.result1(roi).SetTo(mean, mask)
            Next
        End Sub)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-                grid.Dispose()
     End Sub
 End Class

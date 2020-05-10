@@ -67,7 +67,6 @@ Public Class OilPaint_Pointilism
                 ocvb.result1(ocvb.drawRect).Circle(nPoint, slen / 4, nextColor, -1, cv.LineTypes.AntiAlias)
             Next
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -105,10 +104,6 @@ Public Class OilPaint_ColorProbability
         For i = 0 To color_probability.Length - 1
             color_probability(i) /= ocvb.result2.Total
         Next
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        km.Dispose()
     End Sub
 End Class
 
@@ -168,7 +163,6 @@ Public Class OilPaint_Manual
             Next
         Next
         result1.CopyTo(ocvb.result1(roi))
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -199,7 +193,6 @@ Public Class OilPaint_Manual_CS
         Dim factor As Int32 = Math.Min(Math.Floor(ocvb.result2.Width / roi.Width), Math.Floor(ocvb.result2.Height / roi.Height))
         Dim s = New cv.Size(roi.Width * factor, roi.Height * factor)
         cv.Cv2.Resize(ocvb.result1(roi), ocvb.result2(New cv.Rect(0, 0, s.Width, s.Height)), s)
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -220,7 +213,7 @@ Public Class OilPaint_Cartoon
         Dim h = ocvb.color.Height / 16
         ocvb.drawRect = New cv.Rect(ocvb.color.Width / 4 + w, ocvb.color.Height / 4 + h, w * 2, h * 2)
 
-        oil.sliders.setupTrackBar3(ocvb, caller,"Threshold", 0, 200, 25) ' add the third slider for the threshold.
+        oil.sliders.setupTrackBar3(ocvb, caller, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
         ocvb.desc = "Alter an image so it appears more like a cartoon - Painterly Effect"
         ocvb.label1 = "OilPaint_Cartoon"
         ocvb.label2 = "Laplacian Edges"
@@ -238,15 +231,10 @@ Public Class OilPaint_Cartoon
         Dim vec000 = New cv.Vec3b(0, 0, 0)
         For y = 0 To roi.Height - 1
             For x = 0 To roi.Width - 1
-                If edges(roi).Get(of Byte)(y, x) >= threshold Then
+                If edges(roi).Get(Of Byte)(y, x) >= threshold Then
                     ocvb.result1(roi).Set(Of cv.Vec3b)(y, x, vec000)
                 End If
             Next
         Next
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        laplacian.Dispose()
-        oil.Dispose()
     End Sub
 End Class

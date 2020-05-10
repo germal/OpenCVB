@@ -16,7 +16,6 @@ Public Class KAZE_KeypointsKAZE_CS
         For i = 0 To CS_Kaze.kazeKeyPoints.Count - 1
             ocvb.result1.Circle(CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -38,7 +37,6 @@ Public Class KAZE_KeypointsAKAZE_CS
         For i = 0 To CS_AKaze.akazeKeyPoints.Count - 1
             ocvb.result1.Circle(CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -58,7 +56,6 @@ Public Class KAZE_Sample_CS
     Public Sub Run(ocvb As AlgorithmData)
         Dim result = CS_Kaze.Run(box, box_in_scene)
         ocvb.result1 = result.Resize(ocvb.color.Size())
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
@@ -79,10 +76,6 @@ Public Class KAZE_Match_CS
         Dim result = CS_Kaze.Run(ocvb.result1, ocvb.result2)
         result(New cv.Rect(0, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result1)
         result(New cv.Rect(ocvb.result1.Width, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result2)
-		MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
-        red.Dispose()
     End Sub
 End Class
 
@@ -135,7 +128,6 @@ Public Class KAZE_LeftAligned_CS
         Next
         ocvb.label1 = "Right image has " + CStr(CS_KazeRight.kazeKeyPoints.Count) + " key points"
         ocvb.label2 = "Left image has " + CStr(CS_KazeLeft.kazeKeyPoints.Count) + " key points"
-		MyBase.Finish(ocvb)
     End Sub
 End Class
 
