@@ -127,7 +127,7 @@ Public Class Undistort_Basics
 
         cv.Cv2.FishEye.InitUndistortRectifyMap(kMat, dMat, rMatLeft, pMatLeft, New cv.Size(rawWidth, rawHeight),
                                                cv.MatType.CV_32FC1, leftViewMap1, leftViewMap2)
-        dst = ocvb.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
+        dst1 = ocvb.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
         ocvb.result2 = ocvb.color.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
     End Sub
 End Class

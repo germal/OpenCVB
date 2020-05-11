@@ -142,7 +142,7 @@ Public Class Stabilizer_Basics
 
             Dim smoothedFrame = ocvb.color.WarpAffine(smoothedMat, ocvb.color.Size())
             smoothedFrame = smoothedFrame(New cv.Range(vert_Border, smoothedFrame.Rows - vert_Border), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
-            dst = smoothedFrame.Resize(ocvb.color.Size())
+            dst1 = smoothedFrame.Resize(ocvb.color.Size())
 
             For i = 0 To features.Count - 1
                 ocvb.color.Circle(features.ElementAt(i), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
@@ -190,7 +190,7 @@ Public Class Stabilizer_Basics_CPP
         'If imagePtr <> 0 Then
         '    Dim dstData(ocvb.color.Total * ocvb.color.ElemSize - 1) As Byte
         '    Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-        '    dst = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, dstData)
+        '    dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, dstData)
         'End If
     End Sub
     Public Sub Close()
@@ -218,7 +218,7 @@ Public Class Stabilizer_SideBySide
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         original.Run(ocvb)
-        ocvb.result2 = dst.Clone()
+        ocvb.result2 = dst1.Clone()
         basics.Run(ocvb)
     End Sub
 End Class

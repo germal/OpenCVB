@@ -16,8 +16,8 @@ Public Class Threshold_LaplacianFilter
         edges.Run(ocvb)
         trim.Run(ocvb)
 
-        Dim gray = dst.CvtColor(cv.ColorConversionCodes.bgr2gray)
-        Dim mask = dst.CvtColor(cv.ColorConversionCodes.bgr2gray).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        Dim gray = dst1.CvtColor(cv.ColorConversionCodes.bgr2gray)
+        Dim mask = dst1.CvtColor(cv.ColorConversionCodes.bgr2gray).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
         gray.SetTo(0, mask)
 
         Dim dist = gray.DistanceTransform(cv.DistanceTypes.L2, 3)
@@ -25,7 +25,7 @@ Public Class Threshold_LaplacianFilter
         dist32f = dist.Threshold(sliders.TrackBar1.Value / 100, 1.0, cv.ThresholdTypes.Binary)
 
         dist32f.ConvertTo(gray, cv.MatType.CV_8UC1, 255)
-        dst = gray.CvtColor(cv.ColorConversionCodes.gray2bgr)
+        dst1 = gray.CvtColor(cv.ColorConversionCodes.gray2bgr)
     End Sub
 End Class
 

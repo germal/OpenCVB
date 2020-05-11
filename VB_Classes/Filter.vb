@@ -15,7 +15,7 @@ Public Class Filter_Laplacian
         ocvb.color.ConvertTo(sharp, cv.MatType.CV_32F)
         Dim imgResult As cv.Mat = sharp - imgLaplacian
         imgResult.ConvertTo(imgResult, cv.MatType.CV_8UC3)
-        imgResult.ConvertTo(dst, cv.MatType.CV_8UC3)
+        imgResult.ConvertTo(dst1, cv.MatType.CV_8UC3)
         imgLaplacian.ConvertTo(ocvb.result2, cv.MatType.CV_8UC3)
     End Sub
 End Class
@@ -52,7 +52,7 @@ Public Class Filter_NormalizedKernel
         ocvb.label1 = "kernel sum = " + Format(sum, "#0.000")
 
         Dim dst32f = ocvb.color.Filter2D(cv.MatType.CV_32FC1, kernel, anchor:=New cv.Point(0, 0))
-        dst32f.ConvertTo(dst, cv.MatType.CV_8UC3)
+        dst32f.ConvertTo(dst1, cv.MatType.CV_8UC3)
     End Sub
 End Class
 
@@ -67,7 +67,7 @@ Public Class Filter_Normalized2D
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize = 3 + (ocvb.frameCount Mod 20)
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
-        dst = ocvb.color.Filter2D(-1, kernel)
+        dst1 = ocvb.color.Filter2D(-1, kernel)
         ocvb.label1 = "Normalized KernelSize = " + CStr(kernelSize)
     End Sub
 End Class
@@ -96,11 +96,11 @@ Public Class Filter_SepFilter2D
         If xDim Mod 2 = 0 Then xDim += 1
         If yDim Mod 2 = 0 Then yDim += 1
         Dim kernel = cv.Cv2.GetGaussianKernel(xDim, 1.7)
-        dst = ocvb.color.GaussianBlur(New cv.Size(xDim, yDim), 1.7)
+        dst1 = ocvb.color.GaussianBlur(New cv.Size(xDim, yDim), 1.7)
         ocvb.result2 = ocvb.color.SepFilter2D(cv.MatType.CV_8UC3, kernel, kernel)
         If check.Box(0).Checked Then
             Dim graySep = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            Dim grayGauss = dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim grayGauss = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             ocvb.result2 = (graySep - grayGauss).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
             ocvb.label2 = "Gaussian - SepFilter2D " + CStr(ocvb.result2.CountNonZero()) + " pixels different."
         Else

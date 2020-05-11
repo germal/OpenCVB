@@ -16,8 +16,8 @@ on_trackbar(saveAlpha)
 def OpenCVCode(imgRGB, depth_colormap):
     alpha = saveAlpha / alpha_slider_max
     beta = ( 1.0 - alpha )
-    dst = cv.addWeighted(imgRGB, alpha, depth_colormap, beta, 0.0)
-    cv.imshow(title_window, dst)
+    dst1 = cv.addWeighted(imgRGB, alpha, depth_colormap, beta, 0.0)
+    cv.imshow(title_window, dst1)
 
 from PyStream import PyStreamRun
 PyStreamRun(OpenCVCode, 'AddWeighted_Trackbar_PS.py')

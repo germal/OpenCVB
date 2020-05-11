@@ -14,7 +14,7 @@ Public Class Object_Basics
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
         If standalone Then
-            dst = trim.Mask
+            dst1 = trim.Mask
             ocvb.result2 = trim.zeroMask
         End If
 

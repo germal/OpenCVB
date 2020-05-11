@@ -20,9 +20,9 @@ Public Class Polylines_IEnumerableExample
         Dim pts As New List(Of List(Of cv.Point))
         pts.Add(points)
 
-        dst = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
         ' NOTE: when there are 2 points, there will be 1 line.
-        dst.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, sliders.TrackBar2.Value, cv.LineTypes.AntiAlias)
+        dst1.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, sliders.TrackBar2.Value, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
@@ -52,17 +52,17 @@ Public Class Polylines_Random
             Next
             pts.Add(points)
 
-            dst = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
-            dst.Polylines(pts, False, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-            dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
+            dst1.Polylines(pts, False, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
 
         Dim zoomFactor = 4
-        Dim width = dst.Width / zoomFactor
-        Dim height = dst.Height / zoomFactor
-        Dim x = Math.Min(ocvb.mousePoint.X, dst.Width - width)
-        Dim y = Math.Min(ocvb.mousePoint.Y, dst.Height - height)
+        Dim width = dst1.Width / zoomFactor
+        Dim height = dst1.Height / zoomFactor
+        Dim x = Math.Min(ocvb.mousePoint.X, dst1.Width - width)
+        Dim y = Math.Min(ocvb.mousePoint.Y, dst1.Height - height)
         ocvb.label2 = CStr(zoomFactor) + "X zoom around mouse"
-        ocvb.result2 = dst.GetRectSubPix(New cv.Size(width, height), New cv.Point2f(x, y))
+        ocvb.result2 = dst1.GetRectSubPix(New cv.Size(width, height), New cv.Point2f(x, y))
     End Sub
 End Class

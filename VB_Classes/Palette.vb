@@ -15,7 +15,7 @@ Public Class Palette_Color
         Dim b = sliders.TrackBar1.Value
         Dim g = sliders.TrackBar2.Value
         Dim r = sliders.TrackBar3.Value
-        dst.SetTo(New cv.Scalar(b, g, r))
+        dst1.SetTo(New cv.Scalar(b, g, r))
         ocvb.result2.SetTo(New cv.Scalar(255 - b, 255 - g, 255 - r))
         ocvb.label1 = "Color (RGB) = " + CStr(b) + " " + CStr(g) + " " + CStr(r)
         ocvb.label2 = "Color (255 - RGB) = " + CStr(255 - b) + " " + CStr(255 - g) + " " + CStr(255 - r)
@@ -35,15 +35,15 @@ Public Class Palette_LinearPolar
         sliders.setupTrackBar1(ocvb, caller, "LinearPolar radius", 0, ocvb.color.Cols, ocvb.color.Cols / 2)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        For i = 0 To dst.Rows - 1
-            Dim c = i * 255 / dst.Rows
-            dst.Row(i).SetTo(New cv.Scalar(c, c, c))
+        For i = 0 To dst1.Rows - 1
+            Dim c = i * 255 / dst1.Rows
+            dst1.Row(i).SetTo(New cv.Scalar(c, c, c))
         Next
         Dim iFlag = getInterpolationRadioButtons(radio)
-        Static pt = New cv.Point2f(ocvb.ms_rng.Next(0, dst.Cols - 1), ocvb.ms_rng.Next(0, dst.Rows - 1))
-        Dim radius = sliders.TrackBar1.Value ' ocvb.ms_rng.next(0, dst.Cols)
+        Static pt = New cv.Point2f(ocvb.ms_rng.Next(0, dst1.Cols - 1), ocvb.ms_rng.Next(0, dst1.Rows - 1))
+        Dim radius = sliders.TrackBar1.Value ' ocvb.ms_rng.next(0, dst1.Cols)
         ocvb.result2.SetTo(0)
-        cv.Cv2.LinearPolar(dst, dst, pt, radius, iFlag)
+        cv.Cv2.LinearPolar(dst1, dst1, pt, radius, iFlag)
         cv.Cv2.LinearPolar(ocvb.color, ocvb.result2, pt, radius, iFlag)
     End Sub
 End Class
@@ -53,7 +53,7 @@ End Class
 
 Module Palette_Custom_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst As IntPtr, rows As Int32, cols As Int32, channels As Int32)
+    Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst1 As IntPtr, rows As Int32, cols As Int32, channels As Int32)
     End Sub
     Public mapNames() As String = {"Autumn", "Bone", "Cool", "Hot", "Hsv", "Jet", "Ocean", "Pink", "Rainbow", "Spring", "Summer", "Winter", "Parula", "Magma", "Inferno", "Viridis", "Cividis", "Twilight", "Twilight_Shifted", "Random", "None"}
     Public Function Palette_Custom_Apply(src As cv.Mat, customColorMap As cv.Mat) As cv.Mat
@@ -67,17 +67,17 @@ Module Palette_Custom_Module
         Marshal.Copy(customColorMap.Data, mapData, 0, mapData.Length)
 
         Dim dstData(src.Total * 3 - 1) As Byte ' it always comes back in color...
-        Dim handleDst = GCHandle.Alloc(dstData, GCHandleType.Pinned)
+        Dim handledst1 = GCHandle.Alloc(dstData, GCHandleType.Pinned)
 
         ' the custom colormap API is not implemented for custom color maps.  Only colormapTypes can be provided.
-        Palette_Custom(handleSrc.AddrOfPinnedObject, handleMap.AddrOfPinnedObject, handleDst.AddrOfPinnedObject, src.Rows, src.Cols, src.Channels)
+        Palette_Custom(handleSrc.AddrOfPinnedObject, handleMap.AddrOfPinnedObject, handledst1.AddrOfPinnedObject, src.Rows, src.Cols, src.Channels)
 
-        Dim dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-        Marshal.Copy(dstData, 0, dst.Data, dstData.Length)
+        Dim output = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        Marshal.Copy(dstData, 0, output.Data, dstData.Length)
         handleSrc.Free()
         handleMap.Free()
-        handleDst.Free()
-        Return dst
+        handledst1.Free()
+        Return output
     End Function
     Public Function colorTransition(color1 As cv.Scalar, color2 As cv.Scalar, width As Int32) As cv.Mat
         Dim f As Double = 1.0
@@ -121,13 +121,13 @@ Public Class Palette_Map
     End Class
 
     Public Sub Run(ocvb As AlgorithmData)
-        dst = ocvb.color / 64
-        dst *= 64
+        dst1 = ocvb.color / 64
+        dst1 *= 64
         Dim palette As New SortedList(Of cv.Vec3b, Integer)(New CompareVec3b)
         Dim black As New cv.Vec3b(0, 0, 0)
-        For y = 0 To dst.Height - 1
-            For x = 0 To dst.Width - 1
-                Dim nextVec = dst.Get(Of cv.Vec3b)(y, x)
+        For y = 0 To dst1.Height - 1
+            For x = 0 To dst1.Width - 1
+                Dim nextVec = dst1.Get(Of cv.Vec3b)(y, x)
                 If nextVec <> black Then
                     If palette.ContainsKey(nextVec) Then
                         palette(nextVec) = palette(nextVec) + 1
@@ -184,7 +184,7 @@ Public Class Palette_DrawTest
         palette = New Palette_ColorMap(ocvb, caller)
 
         draw = New Draw_RngImage(ocvb, caller)
-        palette.src = dst
+        palette.src = dst1
 
         ocvb.desc = "Experiment with palette using a drawn image"
     End Sub
@@ -217,16 +217,16 @@ Public Class Palette_Gradient
             ocvb.result2.SetTo(color1)
             ocvb.result2(New cv.Rect(0, 0, ocvb.result2.Width, ocvb.result2.Height / 2)).SetTo(color2)
 
-            Dim gradientColors As New cv.Mat(dst.Rows, 1, cv.MatType.CV_64FC3)
+            Dim gradientColors As New cv.Mat(dst1.Rows, 1, cv.MatType.CV_64FC3)
             Dim f As Double = 1.0
-            For i = 0 To dst.Rows - 1
+            For i = 0 To dst1.Rows - 1
                 gradientColors.Set(Of cv.Scalar)(i, 0, New cv.Scalar(f * color2(0) + (1 - f) * color1(0), f * color2(1) + (1 - f) * color1(1),
                                                                          f * color2(2) + (1 - f) * color1(2)))
-                f -= 1 / dst.Rows
+                f -= 1 / dst1.Rows
             Next
 
-            For i = 0 To dst.Rows - 1
-                dst.Row(i).SetTo(gradientColors.Get(Of cv.Scalar)(i))
+            For i = 0 To dst1.Rows - 1
+                dst1.Row(i).SetTo(gradientColors.Get(Of cv.Scalar)(i))
             Next
         End If
     End Sub
@@ -266,7 +266,7 @@ Public Class Palette_BuildGradientColorMap
                 ocvb.result2(r) = gradientColorMap
             Next
         End If
-        if standalone Then dst = Palette_Custom_Apply(ocvb.color, gradientColorMap)
+        if standalone Then dst1 = Palette_Custom_Apply(ocvb.color, gradientColorMap)
     End Sub
 End Class
 
@@ -315,16 +315,16 @@ Public Class Palette_ColorMap
                         buildNewRandomMap = True
                         gradMap.Run(ocvb)
                     End If
-                    dst = Palette_Custom_Apply(src, gradMap.gradientColorMap)
+                    dst1 = Palette_Custom_Apply(src, gradMap.gradientColorMap)
                     Exit For
                 End If
                 buildNewRandomMap = False ' if they select something other than random, then next random request will rebuild the map.
                 If colormap = 20 Then
-                    dst = src.Clone()
+                    dst1 = src.Clone()
                     ocvb.result2.SetTo(0)
                     Exit For
                 End If
-                cv.Cv2.ApplyColorMap(src, dst, colormap)
+                cv.Cv2.ApplyColorMap(src, dst1, colormap)
                 Exit For
             End If
         Next
@@ -359,10 +359,10 @@ Public Class Palette_DepthColorMap
         End If
         Dim depth8u = getDepth32f(ocvb).ConvertScaleAbs(0.1)
         If depth8u.Width <> ocvb.color.Width Then depth8u = depth8u.Resize(ocvb.color.Size())
-        dst = Palette_Custom_Apply(depth8u, gradientColorMap)
+        dst1 = Palette_Custom_Apply(depth8u, gradientColorMap)
 
         holes.Run(ocvb)
-        dst.SetTo(0, holes.holeMask)
+        dst1.SetTo(0, holes.holeMask)
 
         Dim r As New cv.Rect(100, 0, 255, 1)
         For i = 0 To ocvb.result2.Height - 1
@@ -385,6 +385,6 @@ Public Class Palette_DepthColorMapJet
     Public Sub Run(ocvb As AlgorithmData)
         Dim depth8u = getDepth32f(ocvb).ConvertScaleAbs(0.03)
         If depth8u.Width <> ocvb.color.Width Then depth8u = depth8u.Resize(ocvb.color.Size())
-        cv.Cv2.ApplyColorMap(255 - depth8u, dst, cv.ColormapTypes.Jet)
+        cv.Cv2.ApplyColorMap(255 - depth8u, dst1, cv.ColormapTypes.Jet)
     End Sub
 End Class

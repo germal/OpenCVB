@@ -34,12 +34,12 @@ Public Class Surf_Basics_CS
                 srcRight = ocvb.rightView
             End If
         End If
-        CS_SurfBasics.Run(srcLeft, srcRight, dst, sliders.TrackBar1.Value, radio.check(0).Checked)
+        CS_SurfBasics.Run(srcLeft, srcRight, dst1, sliders.TrackBar1.Value, radio.check(0).Checked)
 
-        'If dst.Width <> ocvb.color.Width * 2 Then dst = dst.Resize(New cv.Size(ocvb.color.Width * 2, srcLeft.Height))
+        'If dst1.Width <> ocvb.color.Width * 2 Then dst1 = dst1.Resize(New cv.Size(ocvb.color.Width * 2, srcLeft.Height))
         If standalone Then
-            dst(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(dst)
-            dst(New cv.Rect(ocvb.color.Width, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(ocvb.result2)
+            dst1(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(dst1)
+            dst1(New cv.Rect(ocvb.color.Width, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(ocvb.result2)
             ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
             If CS_SurfBasics.keypoints1 IsNot Nothing Then ocvb.label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
         End If
@@ -75,8 +75,8 @@ Public Class Surf_Basics
             surf.srcRight = ocvb.rightView
         End If
         surf.Run(ocvb)
-        surf.dst(New cv.Rect(0, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(dst)
-        surf.dst(New cv.Rect(surf.srcLeft.Width, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(ocvb.result2)
+        surf.dst1(New cv.Rect(0, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(dst1)
+        surf.dst1(New cv.Rect(surf.srcLeft.Width, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(ocvb.result2)
     End Sub
 End Class
 
@@ -99,13 +99,13 @@ Public Class Surf_DrawMatchManual_CS
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         surf.Run(ocvb)
-        dst = surf.srcLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = surf.srcLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result2 = surf.srcRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim keys1 = surf.CS_SurfBasics.keypoints1
         Dim keys2 = surf.CS_SurfBasics.keypoints2
 
         For i = 0 To keys1.Count - 1
-            dst.Circle(keys1(i).Pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(keys1(i).Pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
 
         Dim matchCount As Integer

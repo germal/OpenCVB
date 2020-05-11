@@ -122,7 +122,7 @@ for contour in contours:
     colors.append((rng.randint(0,256), rng.randint(0,256), rng.randint(0,256)))
 
 # Create the result image
-dst = np.zeros((markers.shape[0], markers.shape[1], 3), dtype=np.uint8)
+dst1 = np.zeros((markers.shape[0], markers.shape[1], 3), dtype=np.uint8)
 
 # Fill labeled objects with random colors
 for i in range(markers.shape[0]):
@@ -132,7 +132,7 @@ for i in range(markers.shape[0]):
             dst[i,j,:] = colors[index-1]
 
 # Visualize the final image
-cv.imshow('Final Result', dst)
+cv.imshow('Final Result', dst1)
 ## [watershed]
 
 cv.waitKey()

@@ -41,7 +41,7 @@ Public Class Salience_Basics_CPP
             cols = ocvb.drawRect.Width
             rows = ocvb.drawRect.Height
             roi = ocvb.drawRect
-            dst = ocvb.color.Clone()
+            dst1 = ocvb.color.Clone()
         End If
 
         Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
@@ -95,10 +95,10 @@ Public Class Salience_Basics_MT
                 Dim imagePtr = Salience_Run(salience, numScales, gray(roi).Data, roi.Height, roi.Width)
 
                 Dim dstData(roi.Width * roi.Height - 1) As Byte
-                Dim dst As New cv.Mat(roi.Height, roi.Width, cv.MatType.CV_8U, dstData)
+                Dim dst1 As New cv.Mat(roi.Height, roi.Width, cv.MatType.CV_8U, dstData)
                 Marshal.Copy(imagePtr, dstData, 0, roi.Height * roi.Width)
 
-                dst(roi) = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                dst1(roi) = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 Salience_Close(salience)
             End Sub)
         grayHandle.Free()

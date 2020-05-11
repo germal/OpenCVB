@@ -37,23 +37,23 @@ Public Class Watershed_Basics
                 End While
 
                 cv.Cv2.Watershed(src, markers)
-                dst.SetTo(0)
-                For y = 0 To dst.Rows - 1
-                    For x = 0 To dst.Cols - 1
+                dst1.SetTo(0)
+                For y = 0 To dst1.Rows - 1
+                    For x = 0 To dst1.Cols - 1
                         Dim idx = markers.Get(Of Int32)(y, x)
                         If idx = -1 Then
-                            dst.Set(Of cv.Vec3b)(y, x, New cv.Vec3b(255, 255, 255))
+                            dst1.Set(Of cv.Vec3b)(y, x, New cv.Vec3b(255, 255, 255))
                         ElseIf idx <= 0 Or idx > componentCount Then
                             ' already marked zero...
                         Else
-                            dst.Set(Of cv.Vec3b)(y, x, ocvb.rColors((idx - 1) Mod 255))
+                            dst1.Set(Of cv.Vec3b)(y, x, ocvb.rColors((idx - 1) Mod 255))
                         End If
                     Next
                 Next
-                dst = dst * 0.5 + src * 0.5
+                dst1 = dst1 * 0.5 + src * 0.5
             End If
         Else
-            dst = ocvb.color
+            dst1 = ocvb.color
         End If
     End Sub
 End Class
@@ -71,13 +71,13 @@ Public Class Watershed_DepthAuto
         ocvb.desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst = ocvb.RGBDepth / 64
-        dst *= 64
+        dst1 = ocvb.RGBDepth / 64
+        dst1 *= 64
 
         ' erode the blobs at distinct depths to keep them separate
         Dim morphShape = cv.MorphShapes.Cross
         Dim element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(5, 5))
-        ocvb.result2 = dst.Erode(element, New cv.Point(3, 3), 5)
+        ocvb.result2 = dst1.Erode(element, New cv.Point(3, 3), 5)
 
         watershed.Run(ocvb)
     End Sub

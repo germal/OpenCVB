@@ -40,7 +40,7 @@ Public Class Aruco_CS
     Public Sub Run(ocvb As AlgorithmData)
         src = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/aruco_markers_photo.jpg")
         aruco.Run(src)
-        dst = aruco.detectedMarkers.Resize(ocvb.color.Size())
+        dst1 = aruco.detectedMarkers.Resize(ocvb.color.Size())
 
         dst2 = ocvb.color.EmptyClone.SetTo(0)
         dst2(New cv.Rect(0, 0, dst2.Height, dst2.Height)) = aruco.normalizedImage.Resize(New cv.Size(ocvb.color.Height, ocvb.color.Height))

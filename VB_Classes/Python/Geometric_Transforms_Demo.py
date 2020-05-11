@@ -24,13 +24,13 @@ warp_mat = cv.getAffineTransform(srcTri, dstTri)
 ## [Get the Affine Transform]
 
 ## [Apply the Affine Transform just found to the src image]
-warp_dst = cv.warpAffine(src, warp_mat, (src.shape[1], src.shape[0]))
+warp_dst1 = cv.warpAffine(src, warp_mat, (src.shape[1], src.shape[0]))
 ## [Apply the Affine Transform just found to the src image]
 
 # Rotating the image after Warp
 
 ## [Compute a rotation matrix with respect to the center of the image]
-center = (warp_dst.shape[1]//2, warp_dst.shape[0]//2)
+center = (warp_dst1.shape[1]//2, warp_dst1.shape[0]//2)
 angle = -50
 scale = 0.6
 ## [Compute a rotation matrix with respect to the center of the image]
@@ -40,13 +40,13 @@ rot_mat = cv.getRotationMatrix2D( center, angle, scale )
 ## [Get the rotation matrix with the specifications above]
 
 ## [Rotate the warped image]
-warp_rotate_dst = cv.warpAffine(warp_dst, rot_mat, (warp_dst.shape[1], warp_dst.shape[0]))
+warp_rotate_dst1 = cv.warpAffine(warp_dst1, rot_mat, (warp_dst1.shape[1], warp_dst1.shape[0]))
 ## [Rotate the warped image]
 
 ## [Show what you got]
 cv.imshow('Source image', src)
-cv.imshow('Warp', warp_dst)
-cv.imshow('Warp + Rotate', warp_rotate_dst)
+cv.imshow('Warp', warp_dst1)
+cv.imshow('Warp + Rotate', warp_rotate_dst1)
 ## [Show what you got]
 
 ## [Wait until user exits the program]

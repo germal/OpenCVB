@@ -22,7 +22,7 @@ Public Class Gradient_Basics
         cv.Cv2.Phase(x32f, y32f, angle)
         Dim gray = angle.Normalize(255, 0, cv.NormTypes.MinMax)
         gray.ConvertTo(ocvb.result2, cv.MatType.CV_8UC1)
-        dst = sobel.dst
+        dst1 = sobel.dst1
     End Sub
 End Class
 
@@ -49,7 +49,7 @@ Public Class Gradient_Depth
         cv.Cv2.Phase(x32f, y32f, angle)
         Dim gray = angle.Normalize(255, 0, cv.NormTypes.MinMax)
         gray.ConvertTo(ocvb.result2, cv.MatType.CV_8UC1)
-        dst = sobel.dst
+        dst1 = sobel.dst1
     End Sub
 End Class
 
@@ -69,9 +69,9 @@ Public Class Gradient_Flatland
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim reductionFactor = sliders.TrackBar1.Maximum - sliders.TrackBar1.Value
-        dst = ocvb.RGBDepth.Clone()
-        dst /= reductionFactor
-        dst *= reductionFactor
+        dst1 = ocvb.RGBDepth.Clone()
+        dst1 /= reductionFactor
+        dst1 *= reductionFactor
         grade.Run(ocvb)
     End Sub
 End Class

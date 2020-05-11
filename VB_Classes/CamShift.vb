@@ -30,7 +30,7 @@ Public Class CamShift_Basics
         Static sBinsLast As cv.Scalar
         Static roi_hist As New cv.Mat
         Dim mask As New cv.Mat
-        ocvb.color.CopyTo(dst)
+        ocvb.color.CopyTo(dst1)
         Dim hsv = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim hue = hsv.EmptyClone()
         Dim bins = sliders.TrackBar4.Value
@@ -63,9 +63,9 @@ Public Class CamShift_Basics
             If ocvb.result2.Channels = 1 Then ocvb.result2 = ocvb.color.EmptyClone()
             ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         End If
-        dst.SetTo(0)
-        ocvb.color.CopyTo(dst, mask)
-        If trackBox.Size.Width > 0 Then dst.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst1.SetTo(0)
+        ocvb.color.CopyTo(dst1, mask)
+        If trackBox.Size.Width > 0 Then dst1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
@@ -167,7 +167,7 @@ Public Class Camshift_TopObjects
             End If
         Next
         For i = 0 To trackBoxes.Count - 1
-            dst.Ellipse(trackBoxes(i), cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+            dst1.Ellipse(trackBoxes(i), cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         Next
         mats.Run(ocvb)
     End Sub

@@ -13,7 +13,7 @@ Public Class Pencil_Basics
         Dim sigma_s = sliders.TrackBar1.Value
         Dim sigma_r = sliders.TrackBar2.Value / sliders.TrackBar2.Maximum
         Dim shadowFactor = sliders.TrackBar3.Value / 1000
-        cv.Cv2.PencilSketch(ocvb.color, ocvb.result2, dst, sigma_s, sigma_r, shadowFactor)
+        cv.Cv2.PencilSketch(ocvb.color, ocvb.result2, dst1, sigma_s, sigma_r, shadowFactor)
     End Sub
 End Class
 
@@ -35,7 +35,7 @@ Public Class Pencil_Manual
         Dim ksize = sliders.TrackBar1.Value
         If ksize Mod 2 = 0 Then ksize += 1
         Dim blur = grayinv.Blur(New cv.Size(ksize, ksize), New cv.Point(ksize / 2, ksize / 2))
-        cv.Cv2.Divide(gray, 255 - blur, dst, 256)
+        cv.Cv2.Divide(gray, 255 - blur, dst1, 256)
 
         Static index As Integer
         ocvb.label2 = "Intermediate result: " + Choose(index + 1, "gray", "grayinv", "blur")

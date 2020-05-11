@@ -40,9 +40,9 @@ Public Class Gabor_Basics
         gKernel /= 1.5 * multiplier.Item(0)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standalone Then
-            dst = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
+            dst1 = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
         Else
-            dst = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
+            dst1 = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
             ocvb.result2.SetTo(0)
             ocvb.result2 = gKernel.Resize(ocvb.color.Size(), 0, 0, cv.InterpolationFlags.Cubic)
         End If
@@ -103,10 +103,10 @@ Public Class Gabor_Basics_MT
             gabor(i).Run(ocvb)
             Dim roi = grid.roiList(i)
             SyncLock accum
-                cv.Cv2.Max(accum, gabor(i).dst, accum)
+                cv.Cv2.Max(accum, gabor(i).dst1, accum)
                 ocvb.result2(roi) = gabor(i).gKernel.Resize(New cv.Size(roi.Width, roi.Height), 0, 0, cv.InterpolationFlags.Cubic)
             End SyncLock
         End Sub)
-        dst = accum
+        dst1 = accum
     End Sub
 End Class

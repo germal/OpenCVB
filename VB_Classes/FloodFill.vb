@@ -228,7 +228,7 @@ Public Class FloodFill_CComp
         ccomp.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ccomp.Run(ocvb)
 
-        range.fBasics.src = ccomp.dst
+        range.fBasics.src = ccomp.dst1
         range.fBasics.initialMask = shadow.holeMask
         range.Run(ocvb)
     End Sub
@@ -259,7 +259,7 @@ Public Class FloodFill_RelativeRange
         If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         fBasics.src = src
         fBasics.Run(ocvb)
-        dst = src
+        dst1 = src
         dst2 = fBasics.dst2
     End Sub
 End Class
@@ -340,7 +340,7 @@ Public Class FloodFill_Projection
         Dim stepSize = sliders.TrackBar4.Value
 
         If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst = src.Clone()
+        dst1 = src.Clone()
         Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1)
 
         objectRects.Clear()

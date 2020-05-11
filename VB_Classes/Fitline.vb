@@ -17,9 +17,9 @@ Public Class Fitline_Basics
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
             draw.Run(ocvb)
-            src = dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+            src = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
             ocvb.result2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst = ocvb.result2
+            dst1 = ocvb.result2
         Else
             If draw.sliders.Visible Then draw.sliders.Visible = False
             lines.Clear()
@@ -41,7 +41,7 @@ Public Class Fitline_Basics
                 lines.Add(p1)
                 lines.Add(p2)
             Else
-                dst.Line(p1, p2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+                dst1.Line(p1, p2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
             End If
         Next
     End Sub
@@ -62,7 +62,7 @@ Public Class Fitline_3DBasics_MT
         hlines.Run(ocvb)
         Dim mask = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         ocvb.result2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.color.CopyTo(dst)
+        ocvb.color.CopyTo(dst1)
         Dim depth32f = getDepth32f(ocvb)
 
         Dim lines As New List(Of cv.Line3D)
@@ -99,9 +99,9 @@ Public Class Fitline_3DBasics_MT
         End Sub)
         ' putting this in the parallel for above causes a memory leak - could not find it...
         For i = 0 To hlines.grid.roiList.Count - 1
-            houghShowLines3D(dst(hlines.grid.roiList(i)), lines.ElementAt(i))
+            houghShowLines3D(dst1(hlines.grid.roiList(i)), lines.ElementAt(i))
         Next
-        dst.SetTo(cv.Scalar.White, hlines.grid.gridMask)
+        dst1.SetTo(cv.Scalar.White, hlines.grid.gridMask)
     End Sub
 End Class
 
@@ -129,7 +129,7 @@ Public Class Fitline_RawInput
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(1).Checked Or ocvb.frameCount = 0 Then
-            dst = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC1, 0)
+            dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC1, 0)
             Dim dotSize = 2
             Dim w = ocvb.color.Width
             Dim h = ocvb.color.Height
@@ -142,7 +142,7 @@ Public Class Fitline_RawInput
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > h Then pt.Y = h
                 points.Add(pt)
-                dst.Circle(points(i), dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                dst1.Circle(points(i), dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             Next
 
             Dim p1 As cv.Point2f, p2 As cv.Point2f
@@ -174,7 +174,7 @@ Public Class Fitline_RawInput
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > h Then pt.Y = h
                 points.Add(pt)
-                dst.Circle(pt, dotSize, highLight, -1, cv.LineTypes.AntiAlias)
+                dst1.Circle(pt, dotSize, highLight, -1, cv.LineTypes.AntiAlias)
             Next
         End If
     End Sub

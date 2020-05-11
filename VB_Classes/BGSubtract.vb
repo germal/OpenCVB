@@ -41,7 +41,7 @@ Public Class BGSubtract_Basics_CPP
         If imagePtr <> 0 Then
             Dim dstData(src.Total - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            dst = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
+            dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
         End If
     End Sub
     Public Sub Close()
@@ -68,7 +68,7 @@ Public Class BGSubtract_MotionDetect_MT
         ocvb.desc = "Detect Motion for use with background subtraction"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst.SetTo(0)
+        dst1.SetTo(0)
         If ocvb.frameCount = 0 Then ocvb.color.CopyTo(ocvb.result2)
         Dim threadData As New cv.Vec3i
         Dim w = ocvb.color.Width, h = ocvb.color.Height
@@ -94,7 +94,7 @@ Public Class BGSubtract_MotionDetect_MT
                     Dim correlation As New cv.Mat
                     cv.Cv2.MatchTemplate(ocvb.color(roi), ocvb.result2(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                     If CCthreshold > correlation.Get(Of Single)(0, 0) Then
-                        ocvb.color(roi).CopyTo(dst(roi))
+                        ocvb.color(roi).CopyTo(dst1(roi))
                         ocvb.color(roi).CopyTo(ocvb.result2(roi))
                     End If
                 End Sub)
@@ -121,17 +121,16 @@ Public Class BGSubtract_Basics_MT
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
         If standalone Then src = ocvb.color
-        dst = src.EmptyClone.SetTo(0)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = src.EmptyClone.SetTo(0)
         If ocvb.frameCount = 0 Then dst2 = src.Clone()
         Dim CCthreshold = CSng(sliders.TrackBar1.Value / sliders.TrackBar1.Maximum)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             Dim correlation As New cv.Mat
             cv.Cv2.MatchTemplate(src(roi), dst2(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
-            If CCthreshold > correlation.Get(Of Single)(0, 0) Then
-                src(roi).CopyTo(dst(roi))
-                src(roi).CopyTo(dst2(roi))
-            End If
+            If correlation.Get(Of Single)(0, 0) < CCthreshold Then src(roi).CopyTo(dst2(roi))
+            src(roi).CopyTo(dst1(roi))
         End Sub)
     End Sub
 End Class
@@ -147,14 +146,14 @@ Public Class BGSubtract_Depth_MT
         bgsub = New BGSubtract_Basics_MT(ocvb, caller)
         shadow = New Depth_Holes(ocvb, caller)
         ocvb.desc = "Detect Motion in the depth image"
-        ocvb.label1 = "Depth Shadow - no data"
+        ocvb.label1 = "Depth data input"
         ocvb.label2 = "Accumulated depth image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb) ' get where depth is zero
-        dst = shadow.holeMask
         bgsub.src = ocvb.RGBDepth
         bgsub.Run(ocvb)
+        dst1 = bgsub.src
         dst2 = bgsub.dst2
         dst2.SetTo(0, shadow.holeMask)
     End Sub
@@ -180,7 +179,7 @@ Public Class BGSubtract_MOG
         Else
             gray = src
         End If
-        MOG.Apply(gray, dst, sliders.TrackBar1.Value / 1000)
+        MOG.Apply(gray, dst1, sliders.TrackBar1.Value / 1000)
     End Sub
 End Class
 
@@ -203,7 +202,7 @@ Public Class BGSubtract_MOG2
         Else
             gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
-        MOG2.Apply(gray, dst, sliders.TrackBar1.Value / 1000)
+        MOG2.Apply(gray, dst1, sliders.TrackBar1.Value / 1000)
     End Sub
 End Class
 
@@ -229,7 +228,7 @@ Public Class BGSubtract_GMG_KNN
         End If
 
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         gmg.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
 
         knn.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
@@ -259,7 +258,7 @@ Public Class BGSubtract_MOG_RGBDepth
     Public Sub Run(ocvb As AlgorithmData)
         gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOGDepth.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
-        dst = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOGRGB.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
@@ -292,8 +291,8 @@ Public Class BGSubtract_MOG_Retina
         retina.Run(ocvb)
         input.src = retina.dst2
         input.Run(ocvb)
-        dst = input.dst
-        cv.Cv2.Subtract(input.dst, retina.dst2, dst2)
+        dst1 = input.dst1
+        cv.Cv2.Subtract(input.dst1, retina.dst2, dst2)
     End Sub
 End Class
 
@@ -311,7 +310,7 @@ Public Class BGSubtract_DepthOrColorMotion
     Public Sub Run(ocvb As AlgorithmData)
         motion.Run(ocvb)
         Dim tmp As New cv.Mat
-        cv.Cv2.BitwiseNot(dst, tmp)
+        cv.Cv2.BitwiseNot(dst1, tmp)
         ocvb.color.CopyTo(ocvb.result2, tmp)
         ocvb.label2 = "Image with motion removed"
     End Sub

@@ -36,7 +36,7 @@ Public Class CComp_Basics
         Static lastImage As New cv.Mat
 
         cc.RenderBlobs(ocvb.result1)
-        dst = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayDepth = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result1.CopyTo(ocvb.result2)
         For Each blob In cc.Blobs
@@ -46,14 +46,14 @@ Public Class CComp_Basics
             If rect.Width = src.Width And rect.Height = src.Height Then Continue For
             If rect.X + rect.Width > src.Width Or rect.Y + rect.Height > src.Height Then Continue For
 
-            Dim mask = dst(rect)
+            Dim mask = dst1(rect)
             Dim m = cv.Cv2.Moments(mask, True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
             Dim centroid = New cv.Point(CInt(m.M10 / m.M00), CInt(m.M01 / m.M00))
             ocvb.result2(rect).Circle(centroid, 5, cv.Scalar.White, -1)
             ocvb.result2.Rectangle(rect, cv.Scalar.White, 2)
         Next
-        lastImage = dst.Clone()
+        lastImage = dst1.Clone()
     End Sub
 End Class
 
@@ -82,7 +82,7 @@ Public Class CComp_EdgeMask
         Else
             ccomp.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
-        ccomp.src.SetTo(0, ccomp.dst)
+        ccomp.src.SetTo(0, ccomp.dst1)
         ccomp.Run(ocvb)
         ocvb.label1 = "Edges_CannyAndShadow (input to ccomp)"
         ocvb.label2 = "Blob Rectangles with centroids (white)"

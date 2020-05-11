@@ -32,7 +32,7 @@ Public Class Remap_Basics
             Next
         Next
 
-        If direction <> 0 Then cv.Cv2.Remap(ocvb.color, dst, map_x, map_y) Else dst = ocvb.color
+        If direction <> 0 Then cv.Cv2.Remap(ocvb.color, dst1, map_x, map_y) Else dst1 = ocvb.color
 
         If ocvb.frameCount Mod 30 = 0 Then
             direction += 1
@@ -57,13 +57,13 @@ Public Class Remap_Flip
 
         Select Case direction
             Case 0 ' do nothing!
-                ocvb.color.CopyTo(dst)
+                ocvb.color.CopyTo(dst1)
             Case 1 ' flip vertically  
-                cv.Cv2.Flip(ocvb.color, dst, cv.FlipMode.Y)
+                cv.Cv2.Flip(ocvb.color, dst1, cv.FlipMode.Y)
             Case 2 ' flip horizontally
-                cv.Cv2.Flip(ocvb.color, dst, cv.FlipMode.X)
+                cv.Cv2.Flip(ocvb.color, dst1, cv.FlipMode.X)
             Case 3 ' flip horizontally and vertically
-                cv.Cv2.Flip(ocvb.color, dst, cv.FlipMode.XY)
+                cv.Cv2.Flip(ocvb.color, dst1, cv.FlipMode.XY)
         End Select
         If ocvb.frameCount Mod 100 = 0 Then
             direction += 1

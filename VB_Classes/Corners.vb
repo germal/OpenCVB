@@ -21,17 +21,17 @@ Public Class Corners_Harris
             color = ocvb.color.Clone()
             gray = color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             mc = New cv.Mat(gray.Size(), cv.MatType.CV_32FC1, 0)
-            dst = New cv.Mat(gray.Size(), cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(gray.Size(), cv.MatType.CV_8U, 0)
             Dim blocksize = sliders.TrackBar1.Value
             If blocksize Mod 2 = 0 Then blocksize += 1
             Dim aperture = sliders.TrackBar2.Value
             If aperture Mod 2 = 0 Then aperture += 1
-            cv.Cv2.CornerEigenValsAndVecs(gray, dst, blocksize, aperture, cv.BorderTypes.Default)
+            cv.Cv2.CornerEigenValsAndVecs(gray, dst1, blocksize, aperture, cv.BorderTypes.Default)
 
             For j = 0 To gray.Rows - 1
                 For i = 0 To gray.Cols - 1
-                    Dim lambda_1 = dst.Get(Of cv.Vec6f)(j, i)(0)
-                    Dim lambda_2 = dst.Get(Of cv.Vec6f)(j, i)(1)
+                    Dim lambda_1 = dst1.Get(Of cv.Vec6f)(j, i)(0)
+                    Dim lambda_2 = dst1.Get(Of cv.Vec6f)(j, i)(1)
                     mc.Set(Of Single)(j, i, lambda_1 * lambda_2 - 0.04 * Math.Pow(lambda_1 + lambda_2, 2))
                 Next
             Next
@@ -39,12 +39,12 @@ Public Class Corners_Harris
             mc.MinMaxLoc(minval, maxval)
         End If
 
-        color.CopyTo(dst)
+        color.CopyTo(dst1)
         For j = 0 To gray.Rows - 1
             For i = 0 To gray.Cols - 1
                 If mc.Get(Of Single)(j, i) > minval + (maxval - minval) * sliders.TrackBar3.Value / sliders.TrackBar3.Maximum Then
-                    dst.Circle(New cv.Point(i, j), 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-                    dst.Circle(New cv.Point(i, j), 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                    dst1.Circle(New cv.Point(i, j), 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                    dst1.Circle(New cv.Point(i, j), 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
                 End If
             Next
         Next
@@ -111,7 +111,7 @@ Public Class Corners_PreCornerDetect
         prob.ConvertTo(gray, cv.MatType.CV_8U)
         median.src = gray.Clone()
         median.Run(ocvb)
-        dst = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result2 = gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "median = " + CStr(median.medianVal)
     End Sub

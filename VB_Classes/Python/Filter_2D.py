@@ -37,9 +37,9 @@ def main(argv):
         ## [update_kernel]
         ## [apply_filter]
         # Apply filter
-        dst = cv.filter2D(src, ddepth, kernel)
+        dst1 = cv.filter2D(src, ddepth, kernel)
         ## [apply_filter]
-        cv.imshow(window_name, dst)
+        cv.imshow(window_name, dst1)
 
         c = cv.waitKey(500)
         if c == 27:

@@ -111,7 +111,7 @@ Public Class Plane_Detect
         grid.Run(ocvb)
 
         ocvb.result2.SetTo(0)
-        ocvb.RGBDepth.CopyTo(dst)
+        ocvb.RGBDepth.CopyTo(dst1)
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
@@ -148,7 +148,7 @@ Public Class Plane_Detect
                 Dim w2 = getWorldCoordinatesD(ocvb, New cv.Point3f(roi.X + p2.X, roi.Y + p2.Y, depthROI.Get(Of Single)(p2.Y, p2.X)))
                 worldDepth.Add(w1)
                 worldDepth.Add(w2)
-                dst(roi).Line(p1, p2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias) ' show the line connecting the 2 points used to create the normal
+                dst1(roi).Line(p1, p2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias) ' show the line connecting the 2 points used to create the normal
             Next
 
             ' compute plane equation from the worlddepth points.
@@ -160,7 +160,7 @@ Public Class Plane_Detect
             cv.Cv2.AddWeighted(ocvb.color(roi), 0.5, showNormal, 0.5, 0, ocvb.result2(roi))
         End Sub)
         Dim mask = grid.gridMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.BitwiseOr(dst, mask, dst)
+        cv.Cv2.BitwiseOr(dst1, mask, dst1)
     End Sub
 End Class
 
@@ -184,7 +184,7 @@ Public Class Plane_DetectDebug
         grid.Run(ocvb)
 
         ocvb.result2.SetTo(0)
-        ocvb.RGBDepth.CopyTo(dst)
+        ocvb.RGBDepth.CopyTo(dst1)
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
@@ -221,7 +221,7 @@ Public Class Plane_DetectDebug
                 Dim w2 = getWorldCoordinatesD(ocvb, New cv.Point3f(roi.X + p2.X, roi.Y + p2.Y, depthROI.Get(Of Single)(p2.Y, p2.X)))
                 worldDepth.Add(w1)
                 worldDepth.Add(w2)
-                dst(roi).Line(p1, p2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias) ' show the line connecting the 2 points used to create the normal
+                dst1(roi).Line(p1, p2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias) ' show the line connecting the 2 points used to create the normal
             Next
 
             ' compute plane equation from the worlddepth points.
@@ -233,7 +233,7 @@ Public Class Plane_DetectDebug
             cv.Cv2.AddWeighted(ocvb.color(roi), 0.5, showNormal, 0.5, 0, ocvb.result2(roi))
         End Sub)
         Dim mask = grid.gridMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.BitwiseOr(dst, mask, dst)
+        cv.Cv2.BitwiseOr(dst1, mask, dst1)
     End Sub
 End Class
 

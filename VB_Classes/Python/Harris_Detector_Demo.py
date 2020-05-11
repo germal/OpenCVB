@@ -50,7 +50,7 @@ blockSize = 3
 apertureSize = 3
 
 # My Harris matrix -- Using cornerEigenValsAndVecs
-myHarris_dst = cv.cornerEigenValsAndVecs(src_gray, blockSize, apertureSize)
+myHarris_dst1 = cv.cornerEigenValsAndVecs(src_gray, blockSize, apertureSize)
 
 # calculate Mc
 Mc = np.empty(src_gray.shape, dtype=np.float32)
@@ -68,9 +68,9 @@ cv.createTrackbar('Quality Level:', myHarris_window, myHarris_qualityLevel, max_
 myHarris_function(myHarris_qualityLevel)
 
 # My Shi-Tomasi -- Using cornerMinEigenVal
-myShiTomasi_dst = cv.cornerMinEigenVal(src_gray, blockSize, apertureSize)
+myShiTomasi_dst1 = cv.cornerMinEigenVal(src_gray, blockSize, apertureSize)
 
-myShiTomasi_minVal, myShiTomasi_maxVal, _, _ = cv.minMaxLoc(myShiTomasi_dst)
+myShiTomasi_minVal, myShiTomasi_maxVal, _, _ = cv.minMaxLoc(myShiTomasi_dst1)
 
 # Create Window and Trackbar
 cv.namedWindow(myShiTomasi_window)

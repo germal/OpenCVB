@@ -100,7 +100,7 @@ Public Class DNN_Basics
                 dnnPrepared = True
             End If
         End If
-        dst.SetTo(0)
+        dst1.SetTo(0)
         If dnnPrepared = False Then
             ocvb.putText(New ActiveClass.TrueType("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100))
         End If
@@ -113,7 +113,7 @@ Public Class DNN_Basics
             Dim meanVal = CSng(sliders.TrackBar2.Value)
             Dim inputBlob = CvDnn.BlobFromImage(ocvb.color(crop), inScaleFactor, New cv.Size(300, 300), meanVal, False)
             ocvb.color.CopyTo(ocvb.result2)
-            ocvb.color(crop).CopyTo(dst(crop))
+            ocvb.color(crop).CopyTo(dst1(crop))
             net.SetInput(inputBlob, "data")
 
             ' The Forward method fails or blue-screen's my main machine so it is conditional here.
@@ -143,7 +143,7 @@ Public Class DNN_Basics
                     End If
                 Next
             Else
-                dst.SetTo(0)
+                dst1.SetTo(0)
                 ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
             End If
         End If

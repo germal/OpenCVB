@@ -14,7 +14,7 @@ if src is None:
 
 src = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
 
-dst = cv.equalizeHist(src)
+dst1 = cv.equalizeHist(src)
 
 both = np.empty((src.shape[0], src.shape[1]*2, 1), src.dtype)
 both = cv.hconcat([src, dst])

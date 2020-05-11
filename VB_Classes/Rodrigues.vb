@@ -54,12 +54,12 @@ Public Class Rodrigues_ValidateVector
         ocvb.putText(New ActiveClass.TrueType(output, 10, 90, RESULT1))
 
         Dim src As New cv.Mat(3, 3, cv.MatType.CV_32F, ocvb.parms.IMU_RotationMatrix)
-        Dim dst As New cv.Mat(3, 1, src.Type)
-        cv.Cv2.Rodrigues(src, dst)
+        Dim dst1 As New cv.Mat(3, 1, src.Type)
+        cv.Cv2.Rodrigues(src, dst1)
 
         output = "Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
-            output += vbTab + Format(dst.Get(Of Single)(i), "#0.000000000") + vbTab
+            output += vbTab + Format(dst1.Get(Of Single)(i), "#0.000000000") + vbTab
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
 
@@ -94,12 +94,12 @@ Public Class Rodrigues_RotationMatrix
         ocvb.putText(New ActiveClass.TrueType(output, 10, 90, RESULT1))
 
         Dim src As New cv.Mat(3, 3, cv.MatType.CV_32F, ocvb.parms.IMU_RotationMatrix)
-        Dim dst As New cv.Mat(3, 1, src.Type, 3)
-        cv.Cv2.Rodrigues(src, dst)
+        Dim dst1 As New cv.Mat(3, 1, src.Type, 3)
+        cv.Cv2.Rodrigues(src, dst1)
 
         output = "Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
-            output += vbTab + Format(dst.Get(Of Single)(i), "#0.000000000") + vbTab
+            output += vbTab + Format(dst1.Get(Of Single)(i), "#0.000000000") + vbTab
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
     End Sub
@@ -129,12 +129,12 @@ Public Class Rodrigues_Extrinsics
         Dim src As New cv.Mat
         src32f.ConvertTo(src, cv.MatType.CV_64F)
         Dim Jacobian As New cv.Mat(9, 3, src.Type, 0)
-        Dim dst As New cv.Mat(3, 1, src.Type, 3)
-        cv.Cv2.Rodrigues(src, dst)
+        Dim dst1 As New cv.Mat(3, 1, src.Type, 3)
+        cv.Cv2.Rodrigues(src, dst1)
 
         output = "Extrinsic Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
-            output += vbTab + Format(dst.Get(Of Double)(i), "#0.000000000") + vbTab
+            output += vbTab + Format(dst1.Get(Of Double)(i), "#0.000000000") + vbTab
         Next
         ocvb.putText(New ActiveClass.TrueType(output, 10, 150, RESULT1))
     End Sub

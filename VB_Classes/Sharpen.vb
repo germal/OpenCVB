@@ -19,7 +19,7 @@ Public Class Sharpen_UnsharpMask
         Dim diff As New cv.Mat
         cv.Cv2.Absdiff(ocvb.color, ocvb.result2, diff)
         diff = diff.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
-        dst = ocvb.color * (1 + amount) + diff * (-amount)
+        dst1 = ocvb.color * (1 + amount) + diff * (-amount)
         diff.CopyTo(ocvb.result2)
     End Sub
 End Class
@@ -38,7 +38,7 @@ Public Class Sharpen_DetailEnhance
     Public Sub Run(ocvb As AlgorithmData)
         Dim sigma_s = sliders.TrackBar1.Value
         Dim sigma_r = sliders.TrackBar2.Value / sliders.TrackBar2.Maximum
-        cv.Cv2.DetailEnhance(ocvb.color, dst, sigma_s, sigma_r)
+        cv.Cv2.DetailEnhance(ocvb.color, dst1, sigma_s, sigma_r)
     End Sub
 End Class
 
@@ -57,7 +57,7 @@ Public Class Sharpen_Stylize
     Public Sub Run(ocvb As AlgorithmData)
         Dim sigma_s = sliders.TrackBar1.Value
         Dim sigma_r = sliders.TrackBar2.Value / sliders.TrackBar2.Maximum
-        cv.Cv2.DetailEnhance(ocvb.color, dst, sigma_s, sigma_r)
+        cv.Cv2.DetailEnhance(ocvb.color, dst1, sigma_s, sigma_r)
     End Sub
 End Class
 

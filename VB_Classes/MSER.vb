@@ -66,12 +66,12 @@ Public Class MSER_Basics
 
         if standalone Then
             Dim pixels As Int32
-            dst = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
+            dst1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
             For i = 0 To region.Length - 1
                 Dim nextRegion = region(i)
                 pixels += nextRegion.Length
                 For Each pt In nextRegion
-                    dst.Set(Of cv.Vec3b)(pt.Y, pt.X, ocvb.RGBDepth.Get(Of cv.Vec3b)(pt.Y, pt.X))
+                    dst1.Set(Of cv.Vec3b)(pt.Y, pt.X, ocvb.RGBDepth.Get(Of cv.Vec3b)(pt.Y, pt.X))
                 Next
             Next
             ocvb.label1 = CStr(region.Length) + " Regions " + Format(pixels / region.Length, "#0.0") + " pixels/region (avg)"
@@ -118,7 +118,7 @@ Public Class MSER_Synthetic
         addNestedCircles(img, New cv.Point(600, 600), width, color4, 13)
 
         img = img.Resize(New cv.Size(ocvb.color.Height, ocvb.color.Height))
-        dst(New cv.Rect(0, 0, ocvb.color.Height, ocvb.color.Height)) = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1(New cv.Rect(0, 0, ocvb.color.Height, ocvb.color.Height)) = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -163,9 +163,9 @@ Public Class MSER_TestSynthetic
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         synth.Run(ocvb)
-        ocvb.result2 = dst.Clone()
+        ocvb.result2 = dst1.Clone()
 
-        'testSynthetic(ocvb, dst, False, 10)
+        'testSynthetic(ocvb, dst1, False, 10)
         testSynthetic(ocvb, ocvb.result2, True, 100)
     End Sub
 End Class
@@ -198,7 +198,7 @@ Public Class MSER_CPPStyle
                 mat.Circle(pt, 1, color)
             Next
         Next
-        dst = mat.Resize(dst.Size())
+        dst1 = mat.Resize(dst1.Size())
 
         mat = image.Clone()
         For Each box In boxes
@@ -228,7 +228,7 @@ Public Class MSER_Contours
         mser.Run(ocvb)
 
         Dim pixels As Int32
-        dst = ocvb.color
+        dst1 = ocvb.color
         Dim hull() As cv.Point
         For i = 0 To mser.region.Length - 1
             Dim nextRegion = mser.region(i)
@@ -240,7 +240,7 @@ Public Class MSER_Contours
                 points.Add(hull(j))
             Next
             listOfPoints.Add(points)
-            dst.DrawContours(listOfPoints, 0, cv.Scalar.Yellow, 1)
+            dst1.DrawContours(listOfPoints, 0, cv.Scalar.Yellow, 1)
         Next
 
         ocvb.label1 = CStr(mser.region.Length) + " Regions " + Format(pixels / mser.region.Length, "#0.0") + " pixels/region (avg)"

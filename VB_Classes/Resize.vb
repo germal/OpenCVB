@@ -19,13 +19,13 @@ Public Class Resize_Basics
             Dim roi = New cv.Rect(ocvb.color.Width / 4, ocvb.color.Height / 4, ocvb.color.Width / 2, ocvb.color.Height / 2)
             If ocvb.drawRect.Width <> 0 Then roi = ocvb.drawRect
 
-            dst = ocvb.color(roi).Resize(dst.Size(), 0, 0, resizeFlag)
+            dst1 = ocvb.color(roi).Resize(dst1.Size(), 0, 0, resizeFlag)
 
-            ocvb.result2 = (ocvb.color(roi).Resize(dst.Size(), 0, 0, cv.InterpolationFlags.Cubic) -
-                            dst).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            ocvb.result2 = (ocvb.color(roi).Resize(dst1.Size(), 0, 0, cv.InterpolationFlags.Cubic) -
+                            dst1).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
             ocvb.color.Rectangle(roi, cv.Scalar.White, 2)
         Else
-            dst = src.Resize(newSize, 0, 0, resizeFlag)
+            dst1 = src.Resize(newSize, 0, 0, resizeFlag)
         End If
     End Sub
 End Class
@@ -58,13 +58,13 @@ Public Class Resize_After8uc3
         ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
         colorizer.src = depth32f
         colorizer.Run(ocvb)
-        ocvb.result2 = colorizer.dst.Resize(newSize, 0, resizeFlag)
+        ocvb.result2 = colorizer.dst1.Resize(newSize, 0, resizeFlag)
 
         Dim depth16 = ocvb.depth16.Resize(newSize, 0, resizeFlag)
         depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
         colorizer.src = depth32f
         colorizer.Run(ocvb)
-        dst = colorizer.dst
+        dst1 = colorizer.dst1
     End Sub
 End Class
 
@@ -94,12 +94,12 @@ Public Class Resize_Percentage
         resizeOptions.Run(ocvb)
 
         If standalone Then
-            Dim roi As New cv.Rect(0, 0, resizeOptions.dst.Width, resizeOptions.dst.Height)
-            dst = resizeOptions.dst(roi).Resize(resizeOptions.dst.Size())
+            Dim roi As New cv.Rect(0, 0, resizeOptions.dst1.Width, resizeOptions.dst1.Height)
+            dst1 = resizeOptions.dst1(roi).Resize(resizeOptions.dst1.Size())
             ocvb.label1 = "Image after resizing to " + Format(sliders.TrackBar1.Value, "#0.0") + "% of original size"
             ocvb.label2 = ""
         Else
-            dst = resizeOptions.dst
+            dst1 = resizeOptions.dst1
         End If
     End Sub
 End Class

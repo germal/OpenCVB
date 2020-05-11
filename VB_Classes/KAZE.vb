@@ -12,9 +12,9 @@ Public Class KAZE_KeypointsKAZE_CS
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         CS_Kaze.GetKeypoints(gray)
-        ocvb.color.CopyTo(dst)
+        ocvb.color.CopyTo(dst1)
         For i = 0 To CS_Kaze.kazeKeyPoints.Count - 1
-            dst.Circle(CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
 End Class
@@ -33,9 +33,9 @@ Public Class KAZE_KeypointsAKAZE_CS
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         CS_AKaze.GetKeypoints(gray)
-        ocvb.color.CopyTo(dst)
+        ocvb.color.CopyTo(dst1)
         For i = 0 To CS_AKaze.akazeKeyPoints.Count - 1
-            dst.Circle(CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
 End Class
@@ -55,7 +55,7 @@ Public Class KAZE_Sample_CS
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim result = CS_Kaze.Run(box, box_in_scene)
-        dst = result.Resize(ocvb.color.Size())
+        dst1 = result.Resize(ocvb.color.Size())
     End Sub
 End Class
 
@@ -73,9 +73,9 @@ Public Class KAZE_Match_CS
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         red.Run(ocvb)
-        Dim result = CS_Kaze.Run(dst, ocvb.result2)
-        result(New cv.Rect(0, 0, dst.Width, dst.Height)).CopyTo(dst)
-        result(New cv.Rect(dst.Width, 0, dst.Width, dst.Height)).CopyTo(ocvb.result2)
+        Dim result = CS_Kaze.Run(dst1, ocvb.result2)
+        result(New cv.Rect(0, 0, dst1.Width, dst1.Height)).CopyTo(dst1)
+        result(New cv.Rect(dst1.Width, 0, dst1.Width, dst1.Height)).CopyTo(ocvb.result2)
     End Sub
 End Class
 
@@ -97,7 +97,7 @@ Public Class KAZE_LeftAligned_CS
         Dim CS_KazeRight As New CS_Classes.Kaze_Basics
         CS_KazeRight.GetKeypoints(ocvb.rightView)
 
-        dst = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result2 = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim topDistance = sliders.TrackBar2.Value
@@ -121,7 +121,7 @@ Public Class KAZE_LeftAligned_CS
             Next
             If minDistance < Single.MaxValue Then
                 ocvb.result2.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-                dst.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+                dst1.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
                 ocvb.result2.Circle(CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
                 ocvb.result2.Line(pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
             End If

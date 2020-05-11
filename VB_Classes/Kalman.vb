@@ -61,15 +61,15 @@ Public Class Kalman_Basics
         End If
 
         If standalone Then
-            dst = ocvb.color.Clone()
+            dst1 = ocvb.color.Clone()
             Static rect As New cv.Rect(CInt(output(0)), CInt(output(1)), CInt(output(2)), CInt(output(3)))
             If rect.X = CInt(output(0)) And rect.Y = CInt(output(1)) And rect.Width = CInt(output(2)) And rect.Height = CInt(output(3)) Then
                 setValues(ocvb)
             Else
                 rect = New cv.Rect(CInt(output(0)), CInt(output(1)), CInt(output(2)), CInt(output(3)))
             End If
-            dst.Rectangle(rect, cv.Scalar.White, 6)
-            dst.Rectangle(rect, cv.Scalar.Red, 1)
+            dst1.Rectangle(rect, cv.Scalar.White, 6)
+            dst1.Rectangle(rect, cv.Scalar.Red, 1)
         End If
     End Sub
 End Class
@@ -89,12 +89,12 @@ Public Class Kalman_Compare
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plot = New Plot_OverTime(ocvb, caller)
-        plot.dst = dst
+        plot.dst1 = dst1
         plot.plotCount = 3
         plot.topBottomPad = 20
 
         kPlot = New Plot_OverTime(ocvb, caller)
-        kPlot.dst = ocvb.result2
+        kPlot.dst1 = ocvb.result2
         kPlot.plotCount = 3
         kPlot.topBottomPad = 20
 
@@ -153,10 +153,10 @@ Public Class Kalman_RotatingPoint
     Private Function calcPoint(center As cv.Point2f, R As Double, angle As Double) As cv.Point
         Return center + New cv.Point2f(Math.Cos(angle), -Math.Sin(angle)) * R
     End Function
-    Private Sub drawCross(dst As cv.Mat, center As cv.Point, color As cv.Scalar)
+    Private Sub drawCross(dst1 As cv.Mat, center As cv.Point, color As cv.Scalar)
         Dim d As Int32 = 3
-        cv.Cv2.Line(dst, New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.Line(dst, New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.Line(dst1, New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.Line(dst1, New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -188,12 +188,12 @@ Public Class Kalman_RotatingPoint
         Dim measAngle = measurement.Get(Of Single)(0)
         Dim measPt = calcPoint(center, radius, measAngle)
 
-        dst.SetTo(0)
-        drawCross(dst, statePt, cv.Scalar.White)
-        drawCross(dst, measPt, cv.Scalar.White)
-        drawCross(dst, predictPt, cv.Scalar.White)
-        cv.Cv2.Line(dst, statePt, measPt, New cv.Scalar(0, 0, 255), 3, cv.LineTypes.AntiAlias)
-        cv.Cv2.Line(dst, statePt, predictPt, New cv.Scalar(0, 255, 255), 3, cv.LineTypes.AntiAlias)
+        dst1.SetTo(0)
+        drawCross(dst1, statePt, cv.Scalar.White)
+        drawCross(dst1, measPt, cv.Scalar.White)
+        drawCross(dst1, predictPt, cv.Scalar.White)
+        cv.Cv2.Line(dst1, statePt, measPt, New cv.Scalar(0, 0, 255), 3, cv.LineTypes.AntiAlias)
+        cv.Cv2.Line(dst1, statePt, predictPt, New cv.Scalar(0, 255, 255), 3, cv.LineTypes.AntiAlias)
 
         If ocvb.ms_rng.Next(0, 4) <> 0 Then kf.Correct(measurement)
 
@@ -223,17 +223,17 @@ Public Class Kalman_MousePredict
         ocvb.desc = "Use kalman filter to predict the next mouse location."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod 100 = 0 Then dst.SetTo(0)
+        If ocvb.frameCount Mod 100 = 0 Then dst1.SetTo(0)
 
         Static lastRealMouse = ocvb.mousePoint
         kalman.input(0) = ocvb.mousePoint.X
         kalman.input(1) = ocvb.mousePoint.Y
         Dim lastStateResult = New cv.Point(kalman.output(0), kalman.output(1))
         kalman.Run(ocvb)
-        cv.Cv2.Line(dst, New cv.Point(lastStateResult.X, lastStateResult.Y) * locMultiplier,
+        cv.Cv2.Line(dst1, New cv.Point(lastStateResult.X, lastStateResult.Y) * locMultiplier,
                                   New cv.Point(kalman.output(0), kalman.output(1)) * locMultiplier,
                                   cv.Scalar.All(255), 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.Line(dst, ocvb.mousePoint * locMultiplier, lastRealMouse * locMultiplier, New cv.Scalar(0, 0, 255), 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.Line(dst1, ocvb.mousePoint * locMultiplier, lastRealMouse * locMultiplier, New cv.Scalar(0, 0, 255), 1, cv.LineTypes.AntiAlias)
         lastRealMouse = ocvb.mousePoint
     End Sub
 End Class
@@ -274,7 +274,7 @@ Public Class Kalman_CVMat
             For i = 0 To src.Rows - 1
                 kalman(i) = New Kalman_Single(ocvb, caller)
             Next
-            dst = New cv.Mat(src.Rows, 1, cv.MatType.CV_32F, 0)
+            dst1 = New cv.Mat(src.Rows, 1, cv.MatType.CV_32F, 0)
         End If
 
         For i = 0 To kalman.Length - 1
@@ -283,23 +283,23 @@ Public Class Kalman_CVMat
         Next
 
         For i = 0 To src.Rows - 1
-            dst.Set(Of Single)(i, 0, kalman(i).stateResult)
+            dst1.Set(Of Single)(i, 0, kalman(i).stateResult)
         Next
 
         If standalone Then
             Dim rx(src.Rows - 1) As Single
             Dim testrect As New cv.Rect
             For i = 0 To src.Rows - 1
-                rx(i) = dst.Get(Of Single)(i, 0)
+                rx(i) = dst1.Get(Of Single)(i, 0)
             Next
-            dst = ocvb.color
+            dst1 = ocvb.color
             Static rect As New cv.Rect(CInt(rx(0)), CInt(rx(1)), CInt(rx(2)), CInt(rx(3)))
             If rect.X = CInt(rx(0)) And rect.Y = CInt(rx(1)) And rect.Width = CInt(rx(2)) And rect.Height = CInt(rx(3)) Then
                 setValues(ocvb, "Kalman_CVMat")
             Else
                 rect = New cv.Rect(CInt(rx(0)), CInt(rx(1)), CInt(rx(2)), CInt(rx(3)))
             End If
-            dst.Rectangle(rect, cv.Scalar.Red, 2)
+            dst1.Rectangle(rect, cv.Scalar.Red, 2)
         End If
     End Sub
 End Class
@@ -329,18 +329,18 @@ Public Class Kalman_ImageSmall
         resize.src = gray
         resize.Run(ocvb)
 
-        Dim saveOriginal = resize.dst.Clone()
+        Dim saveOriginal = resize.dst1.Clone()
         Dim gray32f As New cv.Mat
-        resize.dst.ConvertTo(gray32f, cv.MatType.CV_32F)
+        resize.dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
         kalman.src = gray32f.Reshape(1, gray32f.Width * gray32f.Height)
         kalman.Run(ocvb)
-        Dim dst As New cv.Mat
-        kalman.dst.ConvertTo(dst, cv.MatType.CV_8U)
-        dst = dst.Reshape(1, gray32f.Height)
-        dst = dst.Resize(dst.Size())
-        cv.Cv2.Subtract(dst, saveOriginal, dst)
-        dst = dst.Threshold(1, 255, cv.ThresholdTypes.Binary)
-        ocvb.result2 = dst.Resize(dst.Size())
+        Dim dst1 As New cv.Mat
+        kalman.dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst1 = dst1.Reshape(1, gray32f.Height)
+        dst1 = dst1.Resize(dst1.Size())
+        cv.Cv2.Subtract(dst1, saveOriginal, dst1)
+        dst1 = dst1.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        ocvb.result2 = dst1.Resize(dst1.Size())
     End Sub
 End Class
 
@@ -368,17 +368,17 @@ Public Class Kalman_DepthSmall
         resize.src = depth32f
         resize.Run(ocvb)
 
-        resize.dst.ConvertTo(depth32f, cv.MatType.CV_32F)
+        resize.dst1.ConvertTo(depth32f, cv.MatType.CV_32F)
         kalman.src = depth32f.Reshape(1, depth32f.Width * depth32f.Height)
         Dim saveOriginal = kalman.src.Clone()
         kalman.Run(ocvb)
-        Dim dst = kalman.dst.Reshape(1, depth32f.Height)
-        dst = dst.Resize(dst.Size())
-        dst = dst.ConvertScaleAbs()
-        cv.Cv2.Subtract(kalman.dst, saveOriginal, depth32f)
-        dst = depth32f.Threshold(0, 0, cv.ThresholdTypes.Tozero).ConvertScaleAbs()
-        dst = dst.Reshape(1, resize.dst.Height)
-        ocvb.result2 = dst.Resize(dst.Size())
+        Dim dst1 = kalman.dst1.Reshape(1, depth32f.Height)
+        dst1 = dst1.Resize(dst1.Size())
+        dst1 = dst1.ConvertScaleAbs()
+        cv.Cv2.Subtract(kalman.dst1, saveOriginal, depth32f)
+        dst1 = depth32f.Threshold(0, 0, cv.ThresholdTypes.Tozero).ConvertScaleAbs()
+        dst1 = dst1.Reshape(1, resize.dst1.Height)
+        ocvb.result2 = dst1.Resize(dst1.Size())
     End Sub
 End Class
 
@@ -416,14 +416,14 @@ Public Class Kalman_Single
         If standalone Then
             If ocvb.frameCount = 0 Then
                 plot = New Plot_OverTime(ocvb, caller)
-                plot.dst = ocvb.result2
+                plot.dst1 = ocvb.result2
                 plot.maxScale = 150
                 plot.minScale = 80
                 plot.plotCount = 2
             End If
 
-            dst = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            inputReal = dst.Mean().Item(0)
+            dst1 = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            inputReal = dst1.Mean().Item(0)
         End If
 
         Dim prediction = kf.Predict()

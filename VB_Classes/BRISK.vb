@@ -14,7 +14,7 @@ Public Class BRISK_Basics
 
         if standalone Then
             ocvb.color.CopyTo(src)
-            ocvb.color.CopyTo(dst)
+            ocvb.color.CopyTo(dst1)
         End If
         Dim keyPoints = Brisk.Detect(src)
         features.Clear()
@@ -26,7 +26,7 @@ Public Class BRISK_Basics
             End If
         Next
         if standalone Then
-            cv.Cv2.AddWeighted(ocvb.color, 0.5, wt, 0.5, 0, dst)
+            cv.Cv2.AddWeighted(ocvb.color, 0.5, wt, 0.5, 0, dst1)
         End If
     End Sub
 End Class

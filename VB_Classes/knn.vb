@@ -23,22 +23,22 @@ Public Class knn_Basics
 
         Dim queryPoints(sliders.TrackBar1.Value) As cv.Point2f
         For i = 0 To queryPoints.Length - 1
-            queryPoints(i) = New cv.Point2f(ocvb.ms_rng.Next(0, dst.Cols), ocvb.ms_rng.Next(0, dst.Rows))
+            queryPoints(i) = New cv.Point2f(ocvb.ms_rng.Next(0, dst1.Cols), ocvb.ms_rng.Next(0, dst1.Rows))
         Next
 
         Dim bluePoints = sliders.TrackBar2.Value
         ocvb.label1 = "Yellow is random, blue nearest " + CStr(bluePoints)
-        dst.CopyTo(ocvb.result2)
+        dst1.CopyTo(ocvb.result2)
         Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
         For i = 0 To queryPoints.Length - 1
             query.Set(Of cv.Point2f)(0, 0, queryPoints(i))
             knn.FindNearest(query, bluePoints, results, neighbors)
             For j = 0 To bluePoints - 1
                 Dim index = CInt(neighbors.Get(Of Single)(0, j))
-                cv.Cv2.Circle(dst, random.Points(index), 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
-                dst.Line(random.Points(index), queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+                cv.Cv2.Circle(dst1, random.Points(index), 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+                dst1.Line(random.Points(index), queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
             Next
-            cv.Cv2.Circle(dst, queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+            cv.Cv2.Circle(dst1, queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
             cv.Cv2.Circle(ocvb.result2, queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
         Next
     End Sub
@@ -142,8 +142,8 @@ Public Class knn_Cluster2D
                 knn.querySet(i) = New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y))
             Next
             knn.Run(ocvb) ' run only one time.
-            dst.SetTo(0)
-            cluster(ocvb.rColors, dst)
+            dst1.SetTo(0)
+            cluster(ocvb.rColors, dst1)
             ocvb.label1 = "knn clusters total=" + CStr(totalClusters) + " closedRegions=" + CStr(closedRegions)
         End If
     End Sub
@@ -174,13 +174,13 @@ Public Class knn_Point2d
             ReDim lastSet(sliders.TrackBar1.Value - 1)
             ReDim querySet(sliders.TrackBar1.Value - 1)
             For i = 0 To lastSet.Count - 1
-                lastSet(i) = New cv.Point2f(ocvb.ms_rng.Next(0, dst.Cols), ocvb.ms_rng.Next(0, dst.Rows))
+                lastSet(i) = New cv.Point2f(ocvb.ms_rng.Next(0, dst1.Cols), ocvb.ms_rng.Next(0, dst1.Rows))
             Next
 
             For i = 0 To querySet.Count - 1
-                querySet(i) = New cv.Point2f(ocvb.ms_rng.Next(0, dst.Cols), ocvb.ms_rng.Next(0, dst.Rows))
+                querySet(i) = New cv.Point2f(ocvb.ms_rng.Next(0, dst1.Cols), ocvb.ms_rng.Next(0, dst1.Rows))
             Next
-            dst.SetTo(0)
+            dst1.SetTo(0)
         End If
         Dim responses(lastSet.Length - 1) As Int32
         For i = 0 To responses.Length - 1
@@ -193,7 +193,7 @@ Public Class knn_Point2d
         Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
         if standalone Then
             For i = 0 To lastSet.Count - 1
-                cv.Cv2.Circle(dst, lastSet(i), 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+                cv.Cv2.Circle(dst1, lastSet(i), 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
             Next
         End If
 
@@ -207,8 +207,8 @@ Public Class knn_Point2d
             Next
             if standalone Then
                 For j = 0 To findXnearest - 1
-                    dst.Line(lastSet(responseSet(i * findXnearest + j)), querySet(i), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                    cv.Cv2.Circle(dst, querySet(i), 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+                    dst1.Line(lastSet(responseSet(i * findXnearest + j)), querySet(i), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    cv.Cv2.Circle(dst1, querySet(i), 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
                 Next
             End If
         Next
@@ -243,14 +243,14 @@ Public Class knn_Point3d
             ReDim lastSet(sliders.TrackBar1.Value - 1)
             ReDim querySet(lastSet.Count - 1)
             For i = 0 To lastSet.Count - 1
-                lastSet(i) = New cv.Point3f(ocvb.ms_rng.Next(0, dst.Cols), ocvb.ms_rng.Next(0, dst.Rows), ocvb.ms_rng.Next(0, maxDepth))
+                lastSet(i) = New cv.Point3f(ocvb.ms_rng.Next(0, dst1.Cols), ocvb.ms_rng.Next(0, dst1.Rows), ocvb.ms_rng.Next(0, maxDepth))
             Next
 
             For i = 0 To querySet.Count - 1
-                querySet(i) = New cv.Point3f(ocvb.ms_rng.Next(0, dst.Cols), ocvb.ms_rng.Next(0, dst.Rows), ocvb.ms_rng.Next(0, maxDepth))
+                querySet(i) = New cv.Point3f(ocvb.ms_rng.Next(0, dst1.Cols), ocvb.ms_rng.Next(0, dst1.Rows), ocvb.ms_rng.Next(0, maxDepth))
             Next
 
-            dst.SetTo(0)
+            dst1.SetTo(0)
             ocvb.result2.SetTo(0)
         End If
         Dim responses(lastSet.Length - 1) As Int32
@@ -264,7 +264,7 @@ Public Class knn_Point3d
         Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
         For i = 0 To lastSet.Count - 1
             Dim p = New cv.Point2f(lastSet(i).X, lastSet(i).Y)
-            dst.Circle(p, 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(p, 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
             p = New cv.Point2f(lastSet(i).X, lastSet(i).Z * ocvb.color.Rows / maxDepth)
             ocvb.result2.Circle(p, 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
         Next
@@ -281,8 +281,8 @@ Public Class knn_Point3d
                 For j = 0 To findXnearest - 1
                     Dim plast = New cv.Point2f(lastSet(responseSet(i * findXnearest + j)).X, lastSet(responseSet(i * findXnearest + j)).Y)
                     Dim pQ = New cv.Point2f(querySet(i).X, querySet(i).Y)
-                    dst.Line(plast, pQ, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                    dst.Circle(pQ, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+                    dst1.Line(plast, pQ, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    dst1.Circle(pQ, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
 
                     plast = New cv.Point2f(lastSet(responseSet(i * findXnearest + j)).X, lastSet(responseSet(i * findXnearest + j)).Z * ocvb.color.Rows / maxDepth)
                     pQ = New cv.Point2f(querySet(i).X, querySet(i).Z * ocvb.color.Rows / maxDepth)

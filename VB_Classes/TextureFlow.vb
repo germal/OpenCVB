@@ -15,16 +15,16 @@ Public Class TextureFlow_Basics
         Dim TFksize = sliders.TrackBar3.Value * 2 + 1
         If standalone Then src = ocvb.color
         Dim gray = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2GRAY)
-        dst = src.Clone
+        dst1 = src.Clone
         Dim eigen = gray.CornerEigenValsAndVecs(TFblockSize, TFksize)
         Dim split = eigen.Split()
         Dim d2 = TFdelta / 2
-        For y = d2 To dst.Height - 1 Step d2
-            For x = d2 To dst.Width - 1 Step d2
+        For y = d2 To dst1.Height - 1 Step d2
+            For x = d2 To dst1.Width - 1 Step d2
                 Dim delta = New cv.Point2f(split(4).Get(Of Single)(y, x), split(5).Get(Of Single)(y, x)) * TFdelta
                 Dim p1 = New cv.Point(x - delta.X, y - delta.Y)
                 Dim p2 = New cv.Point(x + delta.X, y + delta.Y)
-                dst.Line(p1, p2, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
+                dst1.Line(p1, p2, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
             Next
         Next
     End Sub

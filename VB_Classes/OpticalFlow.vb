@@ -135,9 +135,9 @@ Public Class OpticalFlow_DenseBasics
 
             Dim hsv = opticalFlow_Dense(oldGray, gray, flow.pyrScale, flow.levels, flow.winSize, flow.iterations, flow.polyN, flow.polySigma, flow.OpticalFlowFlags)
 
-            dst = hsv.CvtColor(cv.ColorConversionCodes.HSV2RGB)
-            dst = dst.ConvertScaleAbs(flow.outputScaling)
-            ocvb.result2 = dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst1 = hsv.CvtColor(cv.ColorConversionCodes.HSV2RGB)
+            dst1 = dst1.ConvertScaleAbs(flow.outputScaling)
+            ocvb.result2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
         oldGray = gray.Clone()
     End Sub
@@ -186,10 +186,10 @@ Public Class OpticalFlow_DenseBasics_MT
                     Dim gray = accum(broi).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                     Dim hsv = opticalFlow_Dense(oldGray(broi), gray, flow.pyrScale, flow.levels, flow.winSize, flow.iterations, flow.polyN, flow.polySigma, flow.OpticalFlowFlags)
                     Dim tROI = New cv.Rect(roi.X - broi.X, roi.Y - broi.Y, roi.Width, roi.Height)
-                    dst(roi) = hsv(tROI).CvtColor(cv.ColorConversionCodes.HSV2RGB)
-                    dst(roi) = dst(roi).ConvertScaleAbs(flow.outputScaling)
+                    dst1(roi) = hsv(tROI).CvtColor(cv.ColorConversionCodes.HSV2RGB)
+                    dst1(roi) = dst1(roi).ConvertScaleAbs(flow.outputScaling)
                 Else
-                    dst(roi).SetTo(0)
+                    dst1(roi).SetTo(0)
                 End If
                 oldGray(roi) = accum(roi).Clone()
             End Sub)
@@ -246,7 +246,7 @@ Public Class OpticalFlow_Sparse
         Next
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst = ocvb.color.Clone()
+        dst1 = ocvb.color.Clone()
         ocvb.result2 = ocvb.color.Clone()
 
         Dim OpticalFlowFlag As cv.OpticalFlowFlags
@@ -287,7 +287,7 @@ Public Class OpticalFlow_Sparse
                     If length < 30 Then
                         features.Add(pt1)
                         lastFeatures.Add(pt2)
-                        dst.Line(pt1, pt2, cv.Scalar.Red, 5, cv.LineTypes.AntiAlias)
+                        dst1.Line(pt1, pt2, cv.Scalar.Red, 5, cv.LineTypes.AntiAlias)
                         ocvb.result2.Circle(pt1, 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
                         ocvb.result2.Circle(pt2, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
                     End If

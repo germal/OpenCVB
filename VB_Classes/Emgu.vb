@@ -14,7 +14,7 @@ Public Class Emgu_Basics
         Else
             Emgu_Classes.DrawSubdivision.Draw(ocvb.color.Rows, ocvb.color.Cols, 20, data)
             ' why not just have Draw return a Mat from Emgu?  Because an Emgu Mat is not an OpenCVSharp Mat!  But this works...
-            dst = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, data)
+            dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, data)
         End If
     End Sub
 End Class
@@ -27,7 +27,7 @@ Public Class Emgu_Facedetection
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Use the simplest possible face detector in Emgu examples."
-        dst.SetTo(0)
+        dst1.SetTo(0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.testAllRunning Then
@@ -39,8 +39,8 @@ Public Class Emgu_Facedetection
             Emgu_Classes.FaceDetection.Detect(ocvb.parms.HomeDir + "Data\\Lena.jpg",
                                               ocvb.parms.HomeDir + "Data\\haarcascade_frontalface_alt.xml", data)
             Dim tmp = New cv.Mat(lena.Rows, lena.Cols, cv.MatType.CV_8UC3, data)
-            tmp = tmp.Resize(New cv.Size(dst.Rows, dst.Rows))
-            dst(New cv.Rect(0, 0, tmp.Rows, tmp.Cols)) = tmp
+            tmp = tmp.Resize(New cv.Size(dst1.Rows, dst1.Rows))
+            dst1(New cv.Rect(0, 0, tmp.Rows, tmp.Cols)) = tmp
         End If
     End Sub
 End Class

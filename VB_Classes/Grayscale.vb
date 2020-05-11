@@ -13,13 +13,13 @@ Public Class Grayscale_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(0).Checked Then
-            dst = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst1 = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
-            dst = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U)
+            dst1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U)
             For y = 0 To ocvb.color.Rows - 1
                 For x = 0 To ocvb.color.Cols - 1
                     Dim cc = ocvb.color.Get(Of cv.Vec3b)(y, x)
-                    dst.Set(Of Byte)(y, x, CByte((cc.Item0 * 1140 + cc.Item1 * 5870 + cc.Item2 * 2989) / 10000))
+                    dst1.Set(Of Byte)(y, x, CByte((cc.Item0 * 1140 + cc.Item1 * 5870 + cc.Item2 * 2989) / 10000))
                 Next
             Next
         End If

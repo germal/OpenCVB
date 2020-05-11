@@ -257,19 +257,19 @@ Public Class Depth_FlatBackground
         Dim mask As New cv.Mat
         Dim maxDepth = cv.Scalar.All(sliders.TrackBar1.Value)
         Dim tmp As New cv.Mat
-        dst = getDepth32f(ocvb)
-        cv.Cv2.InRange(dst, 0, maxDepth, tmp)
+        dst1 = getDepth32f(ocvb)
+        cv.Cv2.InRange(dst1, 0, maxDepth, tmp)
         cv.Cv2.ConvertScaleAbs(tmp, mask)
 
         Dim zeroMask As New cv.Mat
         cv.Cv2.BitwiseNot(mask, zeroMask)
-        dst.SetTo(0, zeroMask)
+        dst1.SetTo(0, zeroMask)
 
         ocvb.result1.SetTo(0)
         ocvb.RGBDepth.CopyTo(ocvb.result1, mask)
         zeroMask.SetTo(255, shadow.holeMask)
         ocvb.color.CopyTo(ocvb.result1, zeroMask)
-        dst.SetTo(maxDepth, zeroMask) ' set the depth to the maxdepth for any background
+        dst1.SetTo(maxDepth, zeroMask) ' set the depth to the maxdepth for any background
     End Sub
 End Class
 
@@ -439,12 +439,12 @@ Public Class Depth_MeanStdevPlot
         shadow = New Depth_Holes(ocvb, caller)
 
         plot1 = New Plot_OverTime(ocvb, caller)
-        plot1.dst = ocvb.result1
+        plot1.dst1 = ocvb.result1
         plot1.maxScale = 2000
         plot1.plotCount = 1
 
         plot2 = New Plot_OverTime(ocvb, caller)
-        plot2.dst = ocvb.result2
+        plot2.dst1 = ocvb.result2
         plot2.maxScale = 1000
         plot2.plotCount = 1
 
@@ -588,7 +588,7 @@ Public Class Depth_Colorizer_CPP
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
 
-        If standalone Then src = getDepth32f(ocvb) Else dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        If standalone Then src = getDepth32f(ocvb) Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
 
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
@@ -597,14 +597,14 @@ Public Class Depth_Colorizer_CPP
         handleSrc.Free()
 
         If imagePtr <> 0 Then
-            If dst.Rows = 0 Then dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-            Dim dstData(dst.Total * dst.ElemSize - 1) As Byte
+            If dst1.Rows = 0 Then dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+            Dim dstData(dst1.Total * dst1.ElemSize - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             If standalone Then
                 ocvb.result1 = New cv.Mat(ocvb.result1.Rows, ocvb.result1.Cols, cv.MatType.CV_8UC3, dstData)
             End If
 
-            dst = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
+            dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
         End If
     End Sub
     Public Sub Close()
@@ -629,11 +629,11 @@ Public Class Depth_ManualTrim
         If sliders.TrackBar1.Value >= sliders.TrackBar2.Value Then sliders.TrackBar2.Value = sliders.TrackBar1.Value + 1
         Dim minDepth = sliders.TrackBar1.Value
         Dim maxDepth = sliders.TrackBar2.Value
-        dst = getDepth32f(ocvb)
-        Mask = dst.Threshold(maxDepth, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
+        dst1 = getDepth32f(ocvb)
+        Mask = dst1.Threshold(maxDepth, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
 
         Dim maskMin As New cv.Mat
-        maskMin = dst.Threshold(minDepth, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        maskMin = dst1.Threshold(minDepth, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         cv.Cv2.BitwiseAnd(Mask, maskMin, Mask)
 
         If standalone Then
@@ -642,7 +642,7 @@ Public Class Depth_ManualTrim
         Else
             Dim notMask As New cv.Mat
             cv.Cv2.BitwiseNot(Mask, notMask)
-            dst.SetTo(0, notMask)
+            dst1.SetTo(0, notMask)
         End If
     End Sub
 End Class
@@ -672,10 +672,10 @@ Public Class Depth_InRange
         depth32f = getDepth32f(ocvb)
         cv.Cv2.InRange(depth32f, minDepth, maxDepth, Mask)
         cv.Cv2.BitwiseNot(Mask, zeroMask)
-        dst = depth32f.Clone()
-        dst.SetTo(0, zeroMask)
+        dst1 = depth32f.Clone()
+        dst1.SetTo(0, zeroMask)
 
-        If standalone Then dst = dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If standalone Then dst1 = dst1.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -700,7 +700,7 @@ Public Class Depth_ColorizerFastFade_CPP
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
 
-        If standalone Then src = trim.dst Else dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        If standalone Then src = trim.dst1 Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         ocvb.result2 = trim.Mask
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
@@ -709,13 +709,13 @@ Public Class Depth_ColorizerFastFade_CPP
         handleSrc.Free()
 
         If imagePtr <> 0 Then
-            If dst.Rows = 0 Then dst = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-            Dim dstData(dst.Total * dst.ElemSize - 1) As Byte
+            If dst1.Rows = 0 Then dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+            Dim dstData(dst1.Total * dst1.ElemSize - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             If standalone Then
                 ocvb.result1 = New cv.Mat(ocvb.result1.Rows, ocvb.result1.Cols, cv.MatType.CV_8UC3, dstData)
             Else
-                dst = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
+                dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
             End If
         End If
     End Sub
@@ -1099,7 +1099,7 @@ Public Class Depth_Holes
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         holeMask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
-        If standalone Then dst = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If standalone Then dst1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         borderMask = holeMask.Dilate(element, Nothing, sliders.TrackBar1.Value)
         cv.Cv2.BitwiseXor(borderMask, holeMask, borderMask)

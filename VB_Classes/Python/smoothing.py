@@ -9,7 +9,7 @@ DELAY_BLUR = 100
 MAX_KERNEL_LENGTH = 31
 
 src = None
-dst = None
+dst1 = None
 title_window = 'Smoothing.py'
 
 def main(argv):
@@ -29,7 +29,7 @@ def main(argv):
         return 0
 
     global dst
-    dst = np.copy(src)
+    dst1 = np.copy(src)
     if display_dst(DELAY_CAPTION) != 0:
         return 0
 
@@ -39,7 +39,7 @@ def main(argv):
 
     ## [blur]
     for i in range(1, MAX_KERNEL_LENGTH, 2):
-        dst = cv.blur(src, (i, i))
+        dst1 = cv.blur(src, (i, i))
         if display_dst(DELAY_BLUR) != 0:
             return 0
     ## [blur]
@@ -50,7 +50,7 @@ def main(argv):
 
     ## [gaussianblur]
     for i in range(1, MAX_KERNEL_LENGTH, 2):
-        dst = cv.GaussianBlur(src, (i, i), 0)
+        dst1 = cv.GaussianBlur(src, (i, i), 0)
         if display_dst(DELAY_BLUR) != 0:
             return 0
     ## [gaussianblur]
@@ -61,7 +61,7 @@ def main(argv):
 
     ## [medianblur]
     for i in range(1, MAX_KERNEL_LENGTH, 2):
-        dst = cv.medianBlur(src, i)
+        dst1 = cv.medianBlur(src, i)
         if display_dst(DELAY_BLUR) != 0:
             return 0
     ## [medianblur]
@@ -73,7 +73,7 @@ def main(argv):
     ## [bilateralfilter]
     # Remember, bilateral is a bit slow, so as value go higher, it takes long time
     for i in range(1, MAX_KERNEL_LENGTH, 2):
-        dst = cv.bilateralFilter(src, i, i * 2, i / 2)
+        dst1 = cv.bilateralFilter(src, i, i * 2, i / 2)
         if display_dst(DELAY_BLUR) != 0:
             return 0
     ## [bilateralfilter]
@@ -86,9 +86,9 @@ def main(argv):
 
 def display_caption(caption):
     global dst
-    dst = np.zeros(src.shape, src.dtype)
+    dst1 = np.zeros(src.shape, src.dtype)
     rows, cols, _ch = src.shape
-    cv.putText(dst, caption,
+    cv.putText(dst1, caption,
                 (int(cols / 4), int(rows / 2)),
                 cv.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255))
 
@@ -96,7 +96,7 @@ def display_caption(caption):
 
 
 def display_dst(delay):
-    cv.imshow(title_window, dst)
+    cv.imshow(title_window, dst1)
     c = cv.waitKey(delay)
     if c >= 0 : return -1
     return 0

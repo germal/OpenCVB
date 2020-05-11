@@ -97,10 +97,10 @@ Public Class IMU_Stabilizer
 
             Dim smoothedFrame = ocvb.color.WarpAffine(smoothedMat, ocvb.color.Size())
             smoothedFrame = smoothedFrame(New cv.Range(borderCrop, smoothedFrame.Rows - borderCrop), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
-            dst = smoothedFrame.Resize(ocvb.color.Size())
-            cv.Cv2.Subtract(ocvb.color, dst, ocvb.result2)
+            dst1 = smoothedFrame.Resize(ocvb.color.Size())
+            cv.Cv2.Subtract(ocvb.color, dst1, ocvb.result2)
 
-            dst(New cv.Rect(10, 95, 50, 50)).SetTo(0)
+            dst1(New cv.Rect(10, 95, 50, 50)).SetTo(0)
             Dim Text = "dx = " + Format(dx, "#0.00") + vbNewLine + "dy = " + Format(dy, "#0.00") + vbNewLine + "da = " + Format(da, "#0.00")
             ocvb.putText(New ActiveClass.TrueType(Text, 10, 100, RESULT1))
         Else
@@ -120,7 +120,7 @@ Public Class IMU_Magnetometer
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plot = New Plot_OverTime(ocvb, caller)
-        plot.dst = ocvb.result2
+        plot.dst1 = ocvb.result2
         plot.maxScale = 10
         plot.minScale = -10
 
@@ -188,7 +188,7 @@ Public Class IMU_FrameTime
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plot = New Plot_OverTime(ocvb, caller)
-        plot.dst = ocvb.result2
+        plot.dst1 = ocvb.result2
         plot.maxScale = 150
         plot.minScale = 0
         plot.backColor = cv.Scalar.Aquamarine
@@ -282,7 +282,7 @@ Public Class IMU_HostFrameTimes
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plot = New Plot_OverTime(ocvb, caller)
-        plot.dst = ocvb.result2
+        plot.dst1 = ocvb.result2
         plot.maxScale = 150
         plot.minScale = 0
         plot.backColor = cv.Scalar.Aquamarine
@@ -373,7 +373,7 @@ Public Class IMU_TotalDelay
         ocvb.parms.ShowOptions = True ' just show plot options...
 
         plot = New Plot_OverTime(ocvb, caller)
-        plot.dst = ocvb.result2
+        plot.dst1 = ocvb.result2
         plot.maxScale = 50
         plot.minScale = 0
         plot.plotCount = 4

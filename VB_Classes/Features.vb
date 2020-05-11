@@ -20,11 +20,11 @@ Public Class Features_GoodFeatures
         Dim minDistance = sliders.TrackBar3.Value
         Dim features = cv.Cv2.GoodFeaturesToTrack(gray, numPoints, quality, minDistance, Nothing, 7, True, 3)
 
-        if standalone Then gray.CopyTo(dst)
+        if standalone Then gray.CopyTo(dst1)
         goodFeatures.Clear()
         For i = 0 To features.Length - 1
             goodFeatures.Add(features.ElementAt(i))
-            if standalone Then cv.Cv2.Circle(dst, features(i), 3, cv.Scalar.white, -1, cv.LineTypes.AntiAlias)
+            if standalone Then cv.Cv2.Circle(dst1, features(i), 3, cv.Scalar.white, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
 End Class

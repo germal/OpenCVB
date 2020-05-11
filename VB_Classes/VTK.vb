@@ -160,13 +160,13 @@ Public Class VTK_Histogram3D
                 random.sliders.TrackBar3.Value = Choose(i + 1, 180, 180, 180, 244)
                 random.sliders.TrackBar4.Value = sliders.TrackBar1.Value
                 random.Run(ocvb)
-                mats.mat(i) = dst.Clone()
+                mats.mat(i) = dst1.Clone()
             Next
             lastStdev = sliders.TrackBar1.Value
         End If
 
         mats.Run(ocvb)
-        dst.SetTo(0)
+        dst1.SetTo(0)
 
         vtk.rgbInput = ocvb.result2.Clone()
         vtk.dataInput = New cv.Mat ' ocvb.depth

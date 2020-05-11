@@ -14,11 +14,11 @@ Public Class Transform_Resize
             Dim tmp As New cv.Mat
             tmp = ocvb.color.Resize(New cv.Size(w, h), 0)
             Dim roi = New cv.Rect((w - ocvb.color.Width) / 2, (h - ocvb.color.Height) / 2, ocvb.color.Width, ocvb.color.Height)
-            tmp(roi).CopyTo(dst)
+            tmp(roi).CopyTo(dst1)
         Else
             Dim roi = New cv.Rect((ocvb.color.Width - w) / 2, (ocvb.color.Height - h) / 2, w, h)
-            dst.SetTo(0)
-            dst(roi) = ocvb.color.Resize(New cv.Size(w, h), 0)
+            dst1.SetTo(0)
+            dst1(roi) = ocvb.color.Resize(New cv.Size(w, h), 0)
         End If
     End Sub
 End Class
@@ -37,11 +37,11 @@ Public Class Transform_Rotate
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
             src = ocvb.color
-            dst = ocvb.result2
+            dst1 = ocvb.result2
         End If
         Dim imageCenter = New cv.Point2f(src.Width / 2, src.Height / 2)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.TrackBar1.Value, sliders.TrackBar2.Value / 100)
-        cv.Cv2.WarpAffine(src, dst, rotationMat, New cv.Size())
+        cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
     End Sub
 End Class
 
@@ -66,7 +66,7 @@ Public Class Transform_Sort
         If radio.check(2).Checked Then sortOption = cv.SortFlags.EveryColumn
         If radio.check(3).Checked Then sortOption = cv.SortFlags.EveryRow
         Dim sorted = gray.Sort(sortOption + cv.SortFlags.EveryColumn)
-        dst = sorted.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = sorted.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -89,7 +89,7 @@ Public Class Transform_SortReshape
         gray = gray.Reshape(1, gray.Rows * gray.Cols)
         Dim sorted = gray.Sort(sortOption + cv.SortFlags.EveryColumn)
         sorted = sorted.Reshape(1, ocvb.color.Rows)
-        dst = sorted.CvtColor(cv.ColorConversionCodes.gray2bgr)
+        dst1 = sorted.CvtColor(cv.ColorConversionCodes.gray2bgr)
     End Sub
 End Class
 

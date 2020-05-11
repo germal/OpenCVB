@@ -48,8 +48,8 @@ End Module
 '        handleRight.Free() ' free the pinned memory...
 '        Dim dstData(ocvb.color.Total - 1) As Byte
 '        Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-'        Dim dst = New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols, cv.MatType.CV_8U, dstData)
-'        dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+'        Dim dst1 = New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols, cv.MatType.CV_8U, dstData)
+'        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 '    End Sub
 '    Public Sub Close()
 '        SemiGlobalMatching_Close(SemiGlobalMatching)

@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports CS_Classes
 Module matrixInverse_Module
-    Public Function printMatrixResults(src As cv.Mat, dst As cv.Mat) As String
+    Public Function printMatrixResults(src As cv.Mat, dst1 As cv.Mat) As String
         Dim outstr As String = "Original Matrix " + vbCrLf
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
@@ -12,7 +12,7 @@ Module matrixInverse_Module
         outstr += vbCrLf + "Matrix Inverse" + vbCrLf
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
-                outstr += Format(dst.Get(of Double)(y, x), "#0.0000") + vbTab
+                outstr += Format(dst1.Get(of Double)(y, x), "#0.0000") + vbTab
             Next
             outstr += vbCrLf
         Next
@@ -42,9 +42,9 @@ Public Class MatrixInverse_Basics_CS
         End If
 
         if standalone Then matrix.bVector = defaultBVector
-        dst = matrix.Run(src)
+        dst1 = matrix.Run(src)
 
-        Dim outstr = printMatrixResults(src, dst)
+        Dim outstr = printMatrixResults(src, dst1)
         ocvb.putText(New ActiveClass.TrueType(outstr + vbCrLf + "Intermediate results are optionally available in the console log.", 10, 60, RESULT1))
     End Sub
 End Class
@@ -68,9 +68,9 @@ Public Class MatrixInverse_OpenCV
             Exit Sub
         End If
 
-        dst = src.EmptyClone.SetTo(0)
-        cv.Cv2.Invert(src, dst, cv.DecompTypes.LU)
-        Dim outstr = printMatrixResults(src, dst)
+        dst1 = src.EmptyClone.SetTo(0)
+        cv.Cv2.Invert(src, dst1, cv.DecompTypes.LU)
+        Dim outstr = printMatrixResults(src, dst1)
         ocvb.putText(New ActiveClass.TrueType(outstr, 10, 60, RESULT1))
     End Sub
 End Class

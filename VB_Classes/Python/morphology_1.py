@@ -23,8 +23,8 @@ def erosion(val):
         erosion_type = cv.MORPH_ELLIPSE
 
     element = cv.getStructuringElement(erosion_type, (2*erosion_size + 1, 2*erosion_size+1), (erosion_size, erosion_size))
-    erosion_dst = cv.erode(src, element)
-    cv.imshow(title_erosion_window, erosion_dst)
+    erosion_dst1 = cv.erode(src, element)
+    cv.imshow(title_erosion_window, erosion_dst1)
 
 def dilatation(val):
     dilatation_size = cv.getTrackbarPos(title_trackbar_kernel_size, title_dilatation_window)
@@ -38,8 +38,8 @@ def dilatation(val):
         dilatation_type = cv.MORPH_ELLIPSE
 
     element = cv.getStructuringElement(dilatation_type, (2*dilatation_size + 1, 2*dilatation_size+1), (dilatation_size, dilatation_size))
-    dilatation_dst = cv.dilate(src, element)
-    cv.imshow(title_dilatation_window, dilatation_dst)
+    dilatation_dst1 = cv.dilate(src, element)
+    cv.imshow(title_dilatation_window, dilatation_dst1)
 
 parser = argparse.ArgumentParser(description='Code for Eroding and Dilating tutorial.')
 parser.add_argument('--input', help='Path to input image.', default='../../Data/LinuxLogo.jpg')

@@ -91,7 +91,7 @@ Public Class Projection_NoGravity_CPP
 
         Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, desiredMin, desiredMax, depth32f.Height, depth32f.Width)
 
-        dst = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         handleDepth.Free()
@@ -138,8 +138,8 @@ Public Class Projection_NoGravity
         Dim depth32f = getDepth32f(ocvb)
 
         ' this VB.Net version is much slower than the optimized C++ version below.
-        dst = ocvb.color.EmptyClone.SetTo(cv.Scalar.White)
-        dst2 = dst.Clone()
+        dst1 = ocvb.color.EmptyClone.SetTo(cv.Scalar.White)
+        dst2 = dst1.Clone()
         Dim black = New cv.Vec3b(0, 0, 0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
              Sub(roi)
@@ -149,7 +149,7 @@ Public Class Projection_NoGravity
                          If m > 0 Then
                              Dim depth = depth32f.Get(Of Single)(y, x)
                              Dim dy = CInt(h * (depth - desiredMin) / range)
-                             If dy < h And dy > 0 Then dst.Set(Of cv.Vec3b)(h - dy, x, black)
+                             If dy < h And dy > 0 Then dst1.Set(Of cv.Vec3b)(h - dy, x, black)
                              Dim dx = CInt(w * (depth - desiredMin) / range)
                              If dx < w And dx > 0 Then dst2.Set(Of cv.Vec3b)(y, dx, black)
                          End If
@@ -227,8 +227,8 @@ Public Class Projection_GravityVB
         vertSplit(0).MinMaxLoc(minval, maxval, minloc, maxloc, mask)
 
         Dim black = New cv.Vec3b(0, 0, 0)
-        dst = ocvb.color.SetTo(cv.Scalar.White)
-        dst2 = dst.Clone()
+        dst1 = ocvb.color.SetTo(cv.Scalar.White)
+        dst2 = dst1.Clone()
         Dim desiredMax = sliders.TrackBar1.Value / 1000
         Dim w = CSng(ocvb.color.Width)
         Dim h = CSng(ocvb.color.Height)
@@ -243,7 +243,7 @@ Public Class Projection_GravityVB
                              If depth < desiredMax Then
                                  Dim dx = xFactor * (vertSplit(0).Get(Of Single)(h - y - 1, x) - minval)
                                  Dim dy = Math.Round(h * (desiredMax - depth) / desiredMax)
-                                 If dy < h And dy > 0 Then dst.Set(Of cv.Vec3b)(CInt(h - dy), CInt(dx), black)
+                                 If dy < h And dy > 0 Then dst1.Set(Of cv.Vec3b)(CInt(h - dy), CInt(dx), black)
                                  dy = Math.Round(vertSplit(1).Get(Of Single)(y, x))
                                  dx = Math.Round(w * (desiredMax - depth) / desiredMax)
                                  If dy < h And dy > 0 Then dst2.Set(Of cv.Vec3b)(CInt(h - dy), CInt(dx), black)
@@ -361,7 +361,7 @@ Public Class Projection_G_CPP
             Dim histSide = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, Project_GravityHist_Side(histPtr))
 
             Dim threshold = sliders.TrackBar2.Value
-            dst = histTop.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+            dst1 = histTop.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             dst2 = histSide.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
             ocvb.label1 = "Top View after threshold"
@@ -369,7 +369,7 @@ Public Class Projection_G_CPP
         Else
             imagePtr = Project_Gravity_Run(cPtr, handleXYZ.AddrOfPinnedObject, maxZ, xyz.Height, xyz.Width)
 
-            dst = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
+            dst1 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
             dst2 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, Project_Gravity_Side(cPtr)).Clone()
 
             ocvb.label1 = "Top View (looking down)"
@@ -381,10 +381,10 @@ Public Class Projection_G_CPP
             Dim shift = CInt((xyz.Width - xyz.Height) / 2)
             ocvb.label1 += " - Red Dot is camera"
             ocvb.label2 += " - Red Dot is camera"
-            dst.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
+            dst1.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
             dst2.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
             Dim radius = 5
-            dst.Circle(New cv.Point(shift + xyz.Height / 2, xyz.Height - 15), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(New cv.Point(shift + xyz.Height / 2, xyz.Height - 15), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
             dst2.Circle(New cv.Point(shift, xyz.Height / 2), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
     End Sub
@@ -424,7 +424,7 @@ Public Class Projection_Flood
     Public Sub Run(ocvb As AlgorithmData)
         gravity.src = ocvb.pointCloud.Resize(ocvb.color.Size()) ' normally not a good idea to resize pointcloud but legit here because of histogram.
         gravity.Run(ocvb)
-        flood.src = gravity.dst
+        flood.src = gravity.dst1
         flood.Run(ocvb)
 
         ' Combine rectangles that are overlaping or touching.
@@ -499,9 +499,9 @@ Public Class Projection_Wall
         dilate.src = dst2
         dilate.Run(ocvb)
 
-        lines.src = dilate.dst
+        lines.src = dilate.dst1
         lines.Run(ocvb)
-        lines.dst.CopyTo(dst)
+        lines.dst1.CopyTo(dst1)
 
         ocvb.label1 = "Top View with lines in red"
         ocvb.label2 = "Top View output without lines"

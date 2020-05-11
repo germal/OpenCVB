@@ -31,11 +31,11 @@ Public Class Area_MinTriangle_CPP
         If numberOfPoints <> sliders.TrackBar1.Value Then setup(ocvb)
         Dim squareWidth = sliders.TrackBar2.Value / 2
 
-        dst = ocvb.color.EmptyClone().SetTo(0)
+        dst1 = ocvb.color.EmptyClone().SetTo(0)
         For i = 0 To srcPoints.Length - 1
             srcPoints(i).X = ocvb.ms_rng.Next(ocvb.color.Width / 2 - squareWidth, ocvb.color.Width / 2 + squareWidth)
             srcPoints(i).Y = ocvb.ms_rng.Next(ocvb.color.Height / 2 - squareWidth, ocvb.color.Height / 2 + squareWidth)
-            dst.Circle(srcPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(srcPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
         Dim input As New cv.Mat(numberOfPoints, 1, cv.MatType.CV_32FC2, srcPoints)
@@ -50,7 +50,7 @@ Public Class Area_MinTriangle_CPP
         For i = 0 To 2
             Dim p1 = triangle.Get(Of cv.Point2f)(i)
             Dim p2 = triangle.Get(Of cv.Point2f)((i + 1) Mod 3)
-            dst.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+            dst1.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         Next
     End Sub
 End Class
@@ -79,15 +79,15 @@ Public Class Area_MinRect
         If numberOfPoints <> sliders.TrackBar1.Value Then setup(ocvb)
         Dim squareWidth = sliders.TrackBar2.Value / 2
 
-        dst = ocvb.color.EmptyClone.SetTo(0)
+        dst1 = ocvb.color.EmptyClone.SetTo(0)
         For i = 0 To srcPoints.Length - 1
             srcPoints(i).X = ocvb.ms_rng.Next(ocvb.color.Width / 2 - squareWidth, ocvb.color.Width / 2 + squareWidth)
             srcPoints(i).Y = ocvb.ms_rng.Next(ocvb.color.Height / 2 - squareWidth, ocvb.color.Height / 2 + squareWidth)
-            dst.Circle(srcPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(srcPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
         minRect = cv.Cv2.MinAreaRect(srcPoints)
-        drawRotatedRectangle(minRect, dst, cv.Scalar.Yellow)
+        drawRotatedRectangle(minRect, dst1, cv.Scalar.Yellow)
     End Sub
 End Class
 
@@ -121,9 +121,9 @@ Public Class Area_MinMotionRect
         input.src = ocvb.color
         input.Run(ocvb)
         Dim gray As cv.Mat
-        If input.dst.Channels = 1 Then gray = input.dst Else gray = input.dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst = motionRectangles(gray, ocvb.rColors)
-        dst.SetTo(cv.Scalar.All(255), gray)
+        If input.dst1.Channels = 1 Then gray = input.dst1 Else gray = input.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = motionRectangles(gray, ocvb.rColors)
+        dst1.SetTo(cv.Scalar.All(255), gray)
     End Sub
 End Class
 
@@ -152,10 +152,10 @@ Public Class Area_FindNonZero
 
         Dim nonzero = gray.FindNonZero()
 
-        dst = gray.EmptyClone().SetTo(0)
+        dst1 = gray.EmptyClone().SetTo(0)
         ' mark the points so they are visible...
         For i = 0 To srcPoints.Length - 1
-            dst.Circle(srcPoints(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(srcPoints(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
         Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf

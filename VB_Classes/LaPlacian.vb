@@ -18,7 +18,7 @@ Public Class Laplacian_Basics
 
         If standalone Then src = ocvb.color.GaussianBlur(New cv.Size(kernelSize, kernelSize), 0, 0)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst = gray.Laplacian(ddepth, kernelSize, scale, delta).ConvertScaleAbs()
+        dst1 = gray.Laplacian(ddepth, kernelSize, scale, delta).ConvertScaleAbs()
         ocvb.label1 = "Laplacian Filter k = " + CStr(kernelSize)
     End Sub
 End Class
@@ -59,7 +59,7 @@ Public Class Laplacian_Blur
             blurText = "MedianBlur"
         End If
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst = gray.Laplacian(ddepth, kernelSize, scale, delta).ConvertScaleAbs()
+        dst1 = gray.Laplacian(ddepth, kernelSize, scale, delta).ConvertScaleAbs()
         ocvb.label1 = "Laplacian+" + blurText + " k = " + CStr(kernelSize)
     End Sub
 End Class

@@ -20,15 +20,15 @@ Public Class InPaint_Basics
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
 
         If ocvb.frameCount Mod 100 Then Exit Sub
-        ocvb.color.CopyTo(dst)
+        ocvb.color.CopyTo(dst1)
         Dim p1 = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
         Dim p2 = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
         Dim thickness = sliders.TrackBar1.Value
-        dst.Line(p1, p2, New cv.Scalar(0, 0, 0), thickness, cv.LineTypes.AntiAlias)
-        Dim mask = New cv.Mat(dst.Size(), cv.MatType.CV_8UC1)
+        dst1.Line(p1, p2, New cv.Scalar(0, 0, 0), thickness, cv.LineTypes.AntiAlias)
+        Dim mask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
         mask.SetTo(0)
         mask.Line(p1, p2, cv.Scalar.All(255), thickness, cv.LineTypes.AntiAlias)
-        cv.Cv2.Inpaint(dst, mask, ocvb.result2, thickness, inPaintFlag)
+        cv.Cv2.Inpaint(dst1, mask, ocvb.result2, thickness, inPaintFlag)
     End Sub
 End Class
 
@@ -53,7 +53,7 @@ Public Class InPaint_Noise
         If ocvb.frameCount Mod 100 Then Exit Sub ' give them time to review the inpaint results
         noise.Run(ocvb) ' create some noise in the result1 image.
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
-        cv.Cv2.Inpaint(dst, noise.noiseMask, ocvb.result2, noise.maxNoiseWidth, inPaintFlag)
+        cv.Cv2.Inpaint(dst1, noise.noiseMask, ocvb.result2, noise.maxNoiseWidth, inPaintFlag)
     End Sub
 End Class
 

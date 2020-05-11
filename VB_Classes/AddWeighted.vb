@@ -8,7 +8,7 @@ Public Class AddWeighted_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim alpha = sliders.TrackBar1.Value / sliders.TrackBar1.Maximum
-        cv.Cv2.AddWeighted(ocvb.color, alpha, ocvb.RGBDepth, 1.0 - alpha, 0, dst)
+        cv.Cv2.AddWeighted(ocvb.color, alpha, ocvb.RGBDepth, 1.0 - alpha, 0, dst1)
         ocvb.label1 = "depth " + Format(1 - sliders.TrackBar1.Value / 100, "#0%") + " RGB " + Format(sliders.TrackBar1.Value / 100, "#0%")
     End Sub
 End Class
@@ -27,6 +27,6 @@ Public Class AddWeighted_Test
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         weight.Run(ocvb)
-        dst = weight.dst
+        dst1 = weight.dst1
     End Sub
 End Class

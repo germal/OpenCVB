@@ -49,7 +49,7 @@ Public Class GameOfLife_Basics
         End If
         generation += 1
 
-        dst.SetTo(0)
+        dst1.SetTo(0)
         population = 0
         For y = 0 To grid.Height - 1
             For x = 0 To grid.Width - 1
@@ -65,7 +65,7 @@ Public Class GameOfLife_Basics
                 End If
                 If nextgrid.Get(Of Byte)(y, x) Then
                     Dim pt = New cv.Point(x, y) * factor
-                    dst.Circle(pt, factor / 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                    dst1.Circle(pt, factor / 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
                     population += 1
                 End If
             Next
@@ -104,7 +104,7 @@ Public Class GameOfLife_Population
         game = New GameOfLife_Basics(ocvb, caller)
 
         plot = New Plot_OverTime(ocvb, caller)
-        plot.dst = ocvb.result2
+        plot.dst1 = ocvb.result2
         plot.maxScale = 2000
         plot.plotCount = 1
 

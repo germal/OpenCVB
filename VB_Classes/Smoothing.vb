@@ -55,11 +55,11 @@ Public Class Smoothing_Exterior
 		hull.Run(ocvb)
 		Dim nextHull = hull.hull
 
-		dst.SetTo(0)
-		Dim points = drawPoly(dst, nextHull, cv.Scalar.White)
+		dst1.SetTo(0)
+		Dim points = drawPoly(dst1, nextHull, cv.Scalar.White)
 
 		Dim smoothPoints = getSplineInterpolationCatmullRom(points, sliders.TrackBar1.Value)
-		If smoothPoints.Count > 0 Then drawPoly(dst, smoothPoints.ToArray, cv.Scalar.Yellow)
+		If smoothPoints.Count > 0 Then drawPoly(dst1, smoothPoints.ToArray, cv.Scalar.Yellow)
 	End Sub
 End Class
 
@@ -128,14 +128,14 @@ Public Class Smoothing_Interior
 		hull.Run(ocvb)
 		Dim nextHull = hull.hull
 
-		dst.SetTo(0)
-		Dim points = drawPoly(dst, nextHull, cv.Scalar.White)
+		dst1.SetTo(0)
+		Dim points = drawPoly(dst1, nextHull, cv.Scalar.White)
 
 		Dim smoothPoints2d = getCurveSmoothingChaikin(points, sliders.TrackBar2.Value / 100, sliders.TrackBar1.Value)
 		Dim smoothPoints As New List(Of cv.Point)
 		For i = 0 To smoothPoints2d.Count - 1
 			smoothPoints.Add(New cv.Point(CInt(smoothPoints2d.ElementAt(i).X), CInt(smoothPoints2d.ElementAt(i).Y)))
 		Next
-		If smoothPoints.Count > 0 Then drawPoly(dst, smoothPoints.ToArray, cv.Scalar.Yellow)
+		If smoothPoints.Count > 0 Then drawPoly(dst1, smoothPoints.ToArray, cv.Scalar.Yellow)
 	End Sub
 End Class

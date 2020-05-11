@@ -23,8 +23,8 @@ Public Class Face_Haar_LBP
         ocvb.label2 = "Faces detected with LBP"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst = ocvb.color.Clone()
-        detectFace(dst, haarCascade)
+        dst1 = ocvb.color.Clone()
+        detectFace(dst1, haarCascade)
         ocvb.result2 = ocvb.color.Clone()
         detectFace(ocvb.result2, lbpCascade)
     End Sub
@@ -42,8 +42,8 @@ Public Class Face_Haar_Alt
         ocvb.label1 = "Faces detected with Haar_Alt"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst = ocvb.color.Clone()
-        detectFace(dst, haarCascade)
+        dst1 = ocvb.color.Clone()
+        detectFace(dst1, haarCascade)
     End Sub
 End Class
 

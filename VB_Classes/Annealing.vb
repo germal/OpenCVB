@@ -32,11 +32,11 @@ Public Class Annealing_Basics_CPP
     Dim saPtr As IntPtr
     Public Sub drawMap(ocvb As AlgorithmData)
         For i = 0 To cityOrder.Length - 1
-            dst.Circle(cityPositions(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-            dst.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            dst1.Circle(cityPositions(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst1.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
-        cv.Cv2.PutText(dst, "Energy", New cv.Point(10, 100), ocvb.bestOpenCVFont, ocvb.bestOpenCVFontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, Format(energy, "#0"), New cv.Point(10, 160), ocvb.bestOpenCVFont, ocvb.bestOpenCVFontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst1, "Energy", New cv.Point(10, 100), ocvb.bestOpenCVFont, ocvb.bestOpenCVFontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst1, Format(energy, "#0"), New cv.Point(10, 160), ocvb.bestOpenCVFont, ocvb.bestOpenCVFontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub setup(ocvb As AlgorithmData)
         ReDim cityOrder(numberOfCities - 1)
@@ -57,7 +57,7 @@ Public Class Annealing_Basics_CPP
         For i = 0 To cityOrder.Length - 1
             cityOrder(i) = (i + 1) Mod numberOfCities
         Next
-        dst = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
+        dst1 = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
     End Sub
     Public Sub Open()
         Dim hCityPosition = GCHandle.Alloc(cityPositions, GCHandleType.Pinned)
@@ -90,7 +90,7 @@ Public Class Annealing_Basics_CPP
             End If
         Next
 
-        dst.SetTo(0)
+        dst1.SetTo(0)
         drawMap(ocvb)
 
         If restartComputation Or InStr(msg, "temp=0.000") Or InStr(msg, "changesApplied=0 temp") Then
@@ -214,11 +214,11 @@ Public Class Annealing_CPP_MT
             ocvb.label1 = "Energy level is " + CStr(anneal(0).energy)
         End If
 
-        mats.mat(0) = anneal(CInt(bestList.ElementAt(0).Value)).dst
+        mats.mat(0) = anneal(CInt(bestList.ElementAt(0).Value)).dst1
         If bestList.Count >= 2 Then
-            mats.mat(1) = anneal(CInt(bestList.ElementAt(1).Value)).dst
-            mats.mat(2) = anneal(CInt(bestList.ElementAt(bestList.Count - 2).Value)).dst
-            mats.mat(3) = anneal(CInt(bestList.ElementAt(bestList.Count - 1).Value)).dst
+            mats.mat(1) = anneal(CInt(bestList.ElementAt(1).Value)).dst1
+            mats.mat(2) = anneal(CInt(bestList.ElementAt(bestList.Count - 2).Value)).dst1
+            mats.mat(3) = anneal(CInt(bestList.ElementAt(bestList.Count - 1).Value)).dst1
         End If
         mats.Run(ocvb)
 
@@ -279,7 +279,7 @@ Public Class Annealing_Options
         End If
 
         anneal.Run(ocvb)
-        dst = anneal.dst
+        dst1 = anneal.dst1
 
         If anneal.restartComputation Then
             anneal.restartComputation = False

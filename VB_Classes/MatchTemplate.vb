@@ -76,10 +76,10 @@ Public Class MatchTemplate_RowCorrelation
         Dim line1 = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
         Dim line2 = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
 
-        dst.SetTo(0)
-        Dim nextLine = dst.Row(line1)
+        dst1.SetTo(0)
+        Dim nextLine = dst1.Row(line1)
         nextLine = ocvb.color.Row(line1)
-        nextLine = dst.Row(line2)
+        nextLine = dst1.Row(line2)
         nextLine = ocvb.color.Row(line2)
 
         corr.sample1 = ocvb.color.Row(line1).Clone()
@@ -135,11 +135,11 @@ Public Class MatchTemplate_DrawRect
                 Exit For
             End If
         Next
-        cv.Cv2.MatchTemplate(ocvb.color, saveTemplate, dst, matchMethod)
+        cv.Cv2.MatchTemplate(ocvb.color, saveTemplate, dst1, matchMethod)
         ocvb.result2 = ocvb.color
         ocvb.result2.Rectangle(saveRect, cv.Scalar.White, 1)
         Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
-        dst.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
+        dst1.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
         ocvb.result2.Circle(maxLoc.X + saveRect.Width / 2, maxLoc.Y + saveRect.Height / 2, 20, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
     End Sub
 End Class

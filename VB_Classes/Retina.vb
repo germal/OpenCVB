@@ -67,7 +67,7 @@ Public Class Retina_Basics_CPP
             Dim parvoData(src.Total * src.ElemSize / (nextFactor * nextFactor) - 1) As Byte
             Marshal.Copy(magnoPtr, parvoData, 0, parvoData.Length)
             Dim parvo = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8UC3, parvoData)
-            dst = parvo.Resize(src.Size())
+            dst1 = parvo.Resize(src.Size())
 
             Dim magno = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8U, magnoData)
             dst2 = magno.Resize(src.Size())
@@ -99,7 +99,7 @@ Public Class Retina_Depth
         retina.Run(ocvb)
         Static lastMotion As New cv.Mat
         If lastMotion.Width = 0 Then lastMotion = ocvb.result2
-        cv.Cv2.BitwiseOr(lastMotion, ocvb.result2, dst)
+        cv.Cv2.BitwiseOr(lastMotion, ocvb.result2, dst1)
         lastMotion = ocvb.result2
     End Sub
 End Class

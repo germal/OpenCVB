@@ -10,18 +10,18 @@ Public Class Pyramid_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Dim zoom = sliders.TrackBar1.Value
         If zoom <> 0 Then
-            dst.SetTo(0)
+            dst1.SetTo(0)
             If zoom < 0 Then
                 Dim tmp = ocvb.color.PyrDown(New cv.Size(ocvb.color.Cols / 2, ocvb.color.Rows / 2))
                 Dim roi = New cv.Rect((ocvb.color.Cols - tmp.Cols) / 2, (ocvb.color.Rows - tmp.Rows) / 2, tmp.Width, tmp.Height)
-                dst(roi) = tmp
+                dst1(roi) = tmp
             Else
                 Dim tmp = ocvb.color.PyrUp(New cv.Size(ocvb.color.Cols * 2, ocvb.color.Rows * 2))
                 Dim roi = New cv.Rect((tmp.Cols - ocvb.color.Cols) / 2, (tmp.Rows - ocvb.color.Rows) / 2, ocvb.color.Width, ocvb.color.Height)
-                dst = tmp(roi)
+                dst1 = tmp(roi)
             End If
         Else
-            ocvb.color.CopyTo(dst)
+            ocvb.color.CopyTo(dst1)
         End If
     End Sub
 End Class

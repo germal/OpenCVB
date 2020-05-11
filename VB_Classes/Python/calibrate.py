@@ -117,14 +117,14 @@ def main():
         h, w = img.shape[:2]
         newcameramtx, roi = cv.getOptimalNewCameraMatrix(camera_matrix, dist_coefs, (w, h), 1, (w, h))
 
-        dst = cv.undistort(img, camera_matrix, dist_coefs, None, newcameramtx)
+        dst1 = cv.undistort(img, camera_matrix, dist_coefs, None, newcameramtx)
 
         # crop and save the image
         x, y, w, h = roi
-        dst = dst[y:y+h, x:x+w]
+        dst1 = dst[y:y+h, x:x+w]
 
         #print('Undistorted image written to: %s' % outfile)
-        #cv.imwrite(outfile, dst)
+        #cv.imwrite(outfile, dst1)
 
 
 if __name__ == '__main__':

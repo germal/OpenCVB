@@ -18,13 +18,13 @@ Public Class Mean_Basics
         If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(src, cv.MatType.CV_32F)
         cv.Cv2.Multiply(src, cv.Scalar.All(1 / saveImageCount), nextImage)
         images.Add(nextImage.Clone())
-        If dst Is Nothing Then dst = src.Clone()
+        If dst1 Is Nothing Then dst1 = src.Clone()
 
         nextImage.SetTo(0)
         For Each img In images
             nextImage += img
         Next
         If images.Count > saveImageCount Then images.RemoveAt(0)
-        If nextImage.Type <> src.Type Then nextImage.ConvertTo(dst, src.Type) Else dst = nextImage
+        If nextImage.Type <> src.Type Then nextImage.ConvertTo(dst1, src.Type) Else dst1 = nextImage
     End Sub
 End Class

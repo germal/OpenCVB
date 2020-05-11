@@ -29,16 +29,13 @@ Public Class Plot_OverTime
     Public Sub Run(ocvb As AlgorithmData)
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
-        If ocvb.frameCount = 0 Then
-            if standalone Then dst = dst
-        End If
         Dim pixelHeight = CInt(sliders.TrackBar1.Value)
         Dim pixelWidth = CInt(sliders.TrackBar2.Value)
         If columnIndex + pixelWidth >= ocvb.color.Width Then
-            dst.ColRange(columnIndex, ocvb.color.Width).SetTo(backColor)
+            dst1.ColRange(columnIndex, ocvb.color.Width).SetTo(backColor)
             columnIndex = 0
         End If
-        dst.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
+        dst1.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
         if standalone Then plotData = ocvb.color.Mean()
 
         For i = 0 To plotCount - 1
@@ -50,7 +47,7 @@ Public Class Plot_OverTime
 
         ' if enough points are off the charted area or if manually requested, then redo the scale.
         If (offChartCount > plotTriggerRescale Or check.Box(0).Checked) And lastXdelta.Count >= plotSeriesCount Then
-            dst.SetTo(0)
+            dst1.SetTo(0)
             check.Box(0).Checked = False
             maxScale = Int32.MinValue
             minScale = Int32.MaxValue
@@ -79,11 +76,11 @@ Public Class Plot_OverTime
             Dim rect = New cv.Rect(c.X, c.Y, pixelWidth * 2, pixelHeight * 2)
             Select Case i
                 Case 0
-                    dst.Circle(c, pixelWidth, plotColors(i), -1, cv.LineTypes.AntiAlias)
+                    dst1.Circle(c, pixelWidth, plotColors(i), -1, cv.LineTypes.AntiAlias)
                 Case 1
-                    dst.Rectangle(rect, plotColors(i), -1)
+                    dst1.Rectangle(rect, plotColors(i), -1)
                 Case 2
-                    dst.Ellipse(c, ellipseSize, 0, 0, 360, plotColors(i), -1)
+                    dst1.Ellipse(c, ellipseSize, 0, 0, 360, plotColors(i), -1)
                 Case 3
                     Dim rotatedRect = New cv.RotatedRect(c, rectSize, 45)
                     drawRotatedRectangle(rotatedRect, ocvb.result2, plotColors(i))
@@ -94,13 +91,13 @@ Public Class Plot_OverTime
         Dim nextWatchVal = myStopWatch.ElapsedMilliseconds
         If nextWatchVal - lastSeconds > 1000 Then
             lastSeconds = nextWatchVal
-            dst.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst.Height), cv.Scalar.White, 1)
+            dst1.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst1.Height), cv.Scalar.White, 1)
         End If
 
         columnIndex += pixelWidth
-        dst.Col(columnIndex).SetTo(0)
+        dst1.Col(columnIndex).SetTo(0)
         if standalone Then ocvb.label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
-        AddPlotScale(dst, minScale - topBottomPad, maxScale + topBottomPad, sliders.TrackBar3.Value / 10)
+        AddPlotScale(dst1, minScale - topBottomPad, maxScale + topBottomPad, sliders.TrackBar3.Value / 10)
     End Sub
 End Class
 
@@ -127,8 +124,7 @@ Public Class Plot_Histogram
             Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
             cv.Cv2.CalcHist(New cv.Mat() {gray}, New Integer() {0}, New cv.Mat(), hist, 1, dimensions, ranges)
         End If
-        dst = dst
-        Dim barWidth = Int(dst.Width / hist.Rows)
+        Dim barWidth = Int(dst1.Width / hist.Rows)
         Dim minVal As Single, maxVal As Single
         hist.MinMaxLoc(minVal, maxVal)
 
@@ -137,18 +133,18 @@ Public Class Plot_Histogram
         Static savedMaxVal = maxVal
         If maxVal < 0 Then maxVal = savedMaxVal
         If Math.Abs((maxVal - savedMaxVal)) / maxVal < 0.2 Then maxVal = savedMaxVal Else savedMaxVal = Math.Max(maxVal, savedMaxVal)
-        dst.SetTo(backColor)
+        dst1.SetTo(backColor)
         If maxVal > 0 And hist.Rows > 0 Then
             Dim incr = CInt(255 / hist.Rows)
             For i = 0 To hist.Rows - 1
                 Dim offset = hist.Get(Of Single)(i)
                 If Single.IsNaN(offset) Then offset = 0
-                Dim h = CInt(offset * dst.Height / maxVal)
+                Dim h = CInt(offset * dst1.Height / maxVal)
                 Dim color As cv.Scalar = cv.Scalar.Black
                 If hist.Rows <= 255 Then color = cv.Scalar.All((i Mod 255) * incr)
-                cv.Cv2.Rectangle(dst, New cv.Rect(i * barWidth, dst.Height - h, barWidth, h), color, -1)
+                cv.Cv2.Rectangle(dst1, New cv.Rect(i * barWidth, dst1.Height - h, barWidth, h), color, -1)
             Next
-            AddPlotScale(dst, 0, maxVal, sliders.TrackBar1.Value / 10)
+            AddPlotScale(dst1, 0, maxVal, sliders.TrackBar1.Value / 10)
         End If
     End Sub
 End Class
@@ -162,17 +158,17 @@ Module Plot_OpenCV_Module
     Public Sub Plot_OpenCVBasics(inX As IntPtr, inY As IntPtr, inLen As Int32, dstptr As IntPtr, rows As Int32, cols As Int32)
     End Sub
 
-    Public Sub AddPlotScale(dst As cv.Mat, minVal As Double, maxVal As Double, fontsize As Double)
+    Public Sub AddPlotScale(dst1 As cv.Mat, minVal As Double, maxVal As Double, fontsize As Double)
         ' draw a scale along the side
-        Dim spacer = CInt(dst.Height / 5)
+        Dim spacer = CInt(dst1.Height / 5)
         Dim spaceVal = CInt((maxVal - minVal) / 5)
         If spaceVal < 1 Then spaceVal = 1
         For i = 0 To 4
             Dim pt1 = New cv.Point(0, spacer * i)
-            Dim pt2 = New cv.Point(dst.Width, spacer * i)
-            dst.Line(pt1, pt2, cv.Scalar.White, 1)
+            Dim pt2 = New cv.Point(dst1.Width, spacer * i)
+            dst1.Line(pt1, pt2, cv.Scalar.White, 1)
             If i = 0 Then pt2.Y += 10
-            cv.Cv2.PutText(dst, Format(maxVal - spaceVal * i, "###,###,##0"), New cv.Point(pt1.X + 5, pt1.Y - 4),
+            cv.Cv2.PutText(dst1, Format(maxVal - spaceVal * i, "###,###,##0"), New cv.Point(pt1.X + 5, pt1.Y - 4),
                            cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.Black, 2)
         Next
     End Sub
@@ -202,7 +198,7 @@ Public Class Plot_Basics_CPP
                 srcX(i) = i
                 srcY(i) = i * i * i
             Next
-            dst = dst
+            dst1 = dst1
         End If
         For i = 0 To srcX.Length - 1
             If srcX(i) > maxX Then maxX = CInt(srcX(i))
@@ -216,7 +212,7 @@ Public Class Plot_Basics_CPP
 
         Plot_OpenCVBasics(handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, srcX.Length - 1, handlePlot.AddrOfPinnedObject, ocvb.color.Rows, ocvb.color.Cols)
 
-        Marshal.Copy(plotData, 0, dst.Data, plotData.Length)
+        Marshal.Copy(plotData, 0, dst1.Data, plotData.Length)
         handlePlot.Free()
         handleX.Free()
         handleY.Free()
@@ -250,7 +246,7 @@ Public Class Plot_Basics
             hist.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             hist.plotColors(0) = cv.Scalar.White
             hist.Run(ocvb)
-            plot.dst = ocvb.result2
+            plot.dst1 = ocvb.result2
             ReDim plot.srcX(hist.histRaw(0).Rows - 1)
             ReDim plot.srcY(hist.histRaw(0).Rows - 1)
             For i = 0 To plot.srcX.Length - 1
@@ -284,7 +280,7 @@ Public Class Plot_Depth
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        plot.dst = dst
+        plot.dst1 = dst1
         ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
         ReDim plot.srcY(hist.plotHist.hist.Rows - 1)
         Dim inRangeMin = hist.trim.sliders.TrackBar1.Value

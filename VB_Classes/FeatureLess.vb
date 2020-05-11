@@ -36,16 +36,16 @@ Public Class Featureless_Basics_MT
         Dim threshold = sliders.TrackBar3.Value
         Dim floodCountThreshold = sliders.TrackBar4.Value
 
-        ocvb.color.CopyTo(dst)
+        ocvb.color.CopyTo(dst1)
         ocvb.result2.SetTo(0)
         mask = New cv.Mat(ocvb.result2.Size(), cv.MatType.CV_8U, 0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
-            Dim segments() = cv.Cv2.HoughLines(edges.dst(roi), rhoIn, thetaIn, threshold)
+            Dim segments() = cv.Cv2.HoughLines(edges.dst1(roi), rhoIn, thetaIn, threshold)
             If segments.Count = 0 Then mask(roi).SetTo(255)
         End Sub)
-        ocvb.color.CopyTo(dst, mask)
-        dst.SetTo(cv.Scalar.White, grid.gridMask)
+        ocvb.color.CopyTo(dst1, mask)
+        dst1.SetTo(cv.Scalar.White, grid.gridMask)
 
         regionCount = 1
         For y = 0 To mask.Rows - 1
@@ -172,7 +172,7 @@ Public Class Featureless_DCT_MT
     Public Sub Run(ocvb As AlgorithmData)
         dct.Run(ocvb)
 
-        Dim mask = dst.Clone()
+        Dim mask = dst1.Clone()
         Dim objectSize As New List(Of Int32)
         Dim regionCount = 1
         For y = 0 To mask.Rows - 1

@@ -28,9 +28,9 @@ Public Class DilateErode_Basics
         Dim element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(kernelsize, kernelsize))
 
         If iterations >= 0 Then
-            src.Dilate(element, Nothing, iterations).CopyTo(dst)
+            src.Dilate(element, Nothing, iterations).CopyTo(dst1)
         Else
-            src.Erode(element, Nothing, -iterations).CopyTo(dst)
+            src.Erode(element, Nothing, -iterations).CopyTo(dst1)
         End If
 
         if standalone Then
@@ -69,8 +69,8 @@ Public Class DilateErode_DepthSeed
         validImg = depth32f.GreaterThan(0)
         validImg.SetTo(0, depth32f.GreaterThan(3000)) ' max distance
         cv.Cv2.BitwiseAnd(seeds, validImg, seeds)
-        dst.SetTo(0)
-        ocvb.RGBDepth.CopyTo(dst, seeds)
+        dst1.SetTo(0)
+        ocvb.RGBDepth.CopyTo(dst1, seeds)
     End Sub
 End Class
 
@@ -104,10 +104,10 @@ Public Class DilateErode_OpenClose
         Dim element = cv.Cv2.GetStructuringElement(elementShape, New cv.Size(an * 2 + 1, an * 2 + 1), New cv.Point(an, an))
         If n < 0 Then
             cv.Cv2.MorphologyEx(ocvb.RGBDepth, ocvb.result2, cv.MorphTypes.Open, element)
-            cv.Cv2.MorphologyEx(ocvb.color, dst, cv.MorphTypes.Open, element)
+            cv.Cv2.MorphologyEx(ocvb.color, dst1, cv.MorphTypes.Open, element)
         Else
             cv.Cv2.MorphologyEx(ocvb.RGBDepth, ocvb.result2, cv.MorphTypes.Close, element)
-            cv.Cv2.MorphologyEx(ocvb.color, dst, cv.MorphTypes.Close, element)
+            cv.Cv2.MorphologyEx(ocvb.color, dst1, cv.MorphTypes.Close, element)
         End If
     End Sub
 End Class

@@ -119,7 +119,7 @@ Module fastLineDetector_Exports
 
     ' there is a drawsegments in the contrib library but this code will operate on the full size of the image - not the small copy passed to the C++ code
     ' But, more importantly, this code uses anti-alias for the lines.  It adds the lines to a mask that may be useful with depth data.
-    Public Function drawSegments(dst As cv.Mat, lineCount As Int32, factor As Int32, lineMask As cv.Mat) As SortedList(Of cv.Vec6f, Integer)
+    Public Function drawSegments(dst1 As cv.Mat, lineCount As Int32, factor As Int32, lineMask As cv.Mat) As SortedList(Of cv.Vec6f, Integer)
         Dim sortedLines As New SortedList(Of cv.Vec6f, Integer)(New CompareVec6f)
 
         Dim lines(lineCount * 4 - 1) As Single ' there are 4 floats per line
@@ -153,11 +153,11 @@ Module fastLineDetector_Exports
 
         For i = sortedLines.Count - 1 To 0 Step -1
             Dim v = sortedLines.ElementAt(i).Key
-            If v(0) >= 0 And v(0) <= dst.Cols And v(1) >= 0 And v(1) <= dst.Rows And
-                   v(2) >= 0 And v(2) <= dst.Cols And v(3) >= 0 And v(3) <= dst.Rows Then
+            If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
+                   v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
                 Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
                 Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                dst.Line(pt1, pt2, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+                dst1.Line(pt1, pt2, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
                 lineMask.Line(pt1, pt2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
             End If
         Next
@@ -227,9 +227,9 @@ Public Class lineDetector_FLD
         Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, rows, cols, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
         handle.Free()
 
-        src.CopyTo(dst)
-        If lineCount > 0 Then sortedLines = drawSegments(dst, lineCount, factor, dst)
-        if standalone Then dst.CopyTo(dst)
+        src.CopyTo(dst1)
+        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, factor, dst1)
+        if standalone Then dst1.CopyTo(dst1)
     End Sub
 End Class
 
@@ -251,7 +251,7 @@ Public Class LineDetector_LSD
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.OpenCV_Version_ID <> "401" Then
-            dst.SetTo(0)
+            dst1.SetTo(0)
             ocvb.putText(New ActiveClass.TrueType("LSD linedetector is available only with OpenCV 4.01 - IP issue?", 10, 100, RESULT1))
             Exit Sub
         End If
@@ -267,9 +267,9 @@ Public Class LineDetector_LSD
         Dim lineCount = lineDetector_Run(tmp.Data, rows, cols)
         handle.Free()
 
-        ocvb.color.CopyTo(dst)
+        ocvb.color.CopyTo(dst1)
         sortedLines.Clear()
-        If lineCount > 0 Then sortedLines = drawSegments(dst, lineCount, factor, dst)
+        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, factor, dst1)
     End Sub
 End Class
 
@@ -351,7 +351,7 @@ Public Class LineDetector_3D_LSD_MT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.OpenCV_Version_ID <> "401" Then
-            dst.SetTo(0)
+            dst1.SetTo(0)
             ocvb.putText(New ActiveClass.TrueType("LSD linedetector is available only with OpenCV 4.01 - IP issue.", 10, 100, RESULT1))
             Exit Sub
         End If
@@ -408,7 +408,7 @@ Public Class LineDetector_3D_FitLineZ
         Dim useLSD As Boolean = True
         If radio.check(0).Checked Or radio.check(2).Checked Then useLSD = False
         If useLSD And ocvb.parms.OpenCV_Version_ID <> "401" Then
-            dst.SetTo(0)
+            dst1.SetTo(0)
             ocvb.result2.SetTo(0)
             ocvb.putText(New ActiveClass.TrueType("LSD linedetector is available only with OpenCV 4.01 - IP issue.", 10, 100, RESULT1))
             Exit Sub
@@ -508,17 +508,16 @@ Public Class LineDetector_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim vectors = ld.Detect(gray)
-        ocvb.color.CopyTo(dst)
+        ocvb.color.CopyTo(dst1)
         ocvb.color.CopyTo(ocvb.result2)
         Dim thickness = sliders.TrackBar1.Value
 
-        If standalone Then dst = dst
         For Each v In vectors
-            If v(0) >= 0 And v(0) <= dst.Cols And v(1) >= 0 And v(1) <= dst.Rows And
-                   v(2) >= 0 And v(2) <= dst.Cols And v(3) >= 0 And v(3) <= dst.Rows Then
+            If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
+                   v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
                 Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
                 Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                dst.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
+                dst1.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
             End If
         Next
         If standalone Then

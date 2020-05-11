@@ -25,16 +25,16 @@ def main(argv):
 
     ## [edge_detection]
     # Edge detection
-    dst = cv.Canny(src, 50, 200, None, 3)
+    dst1 = cv.Canny(src, 50, 200, None, 3)
     ## [edge_detection]
 
     # Copy edges to the images that will display the results in BGR
-    cdst = cv.cvtColor(dst, cv.COLOR_GRAY2BGR)
-    cdstP = np.copy(cdst)
+    cdst1 = cv.cvtColor(dst1, cv.COLOR_GRAY2BGR)
+    cdstP = np.copy(cdst1)
 
     ## [hough_lines]
     #  Standard Hough Line Transform
-    lines = cv.HoughLines(dst, 1, np.pi / 180, 150, None, 0, 0)
+    lines = cv.HoughLines(dst1, 1, np.pi / 180, 150, None, 0, 0)
     ## [hough_lines]
     ## [draw_lines]
     # Draw the lines
@@ -49,12 +49,12 @@ def main(argv):
             pt1 = (int(x0 + 1000*(-b)), int(y0 + 1000*(a)))
             pt2 = (int(x0 - 1000*(-b)), int(y0 - 1000*(a)))
 
-            cv.line(cdst, pt1, pt2, (0,0,255), 3, cv.LINE_AA)
+            cv.line(cdst1, pt1, pt2, (0,0,255), 3, cv.LINE_AA)
     ## [draw_lines]
 
     ## [hough_lines_p]
     # Probabilistic Line Transform
-    linesP = cv.HoughLinesP(dst, 1, np.pi / 180, 50, None, 50, 10)
+    linesP = cv.HoughLinesP(dst1, 1, np.pi / 180, 50, None, 50, 10)
     ## [hough_lines_p]
     ## [draw_lines_p]
     # Draw the lines
@@ -66,7 +66,7 @@ def main(argv):
     ## [imshow]
     # Show results
     cv.imshow("Source", src)
-    cv.imshow("Detected Lines (in red) - Standard Hough Line Transform", cdst)
+    cv.imshow("Detected Lines (in red) - Standard Hough Line Transform", cdst1)
     cv.imshow("Detected Lines (in red) - Probabilistic Line Transform", cdstP)
     ## [imshow]
     ## [exit]

@@ -11,7 +11,7 @@ Public Class Math_Subtract
     Public Sub Run(ocvb As AlgorithmData)
         Dim tmp = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3)
         tmp.SetTo(New cv.Scalar(sliders.TrackBar3.Value, sliders.TrackBar2.Value, sliders.TrackBar1.Value))
-        cv.Cv2.Subtract(tmp, ocvb.color, dst)
+        cv.Cv2.Subtract(tmp, ocvb.color, dst1)
     End Sub
 End Class
 
@@ -65,8 +65,8 @@ Public Class Math_Median_CDF
         if standalone Then
             Dim mask = New cv.Mat
             mask = src.GreaterThan(medianVal)
-            dst.SetTo(0)
-            ocvb.color.CopyTo(dst, mask)
+            dst1.SetTo(0)
+            ocvb.color.CopyTo(dst1, mask)
             ocvb.label1 = "Grayscale pixels > " + Format(medianVal, "#0.0")
 
             cv.Cv2.BitwiseNot(mask, mask)

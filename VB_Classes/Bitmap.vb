@@ -11,7 +11,7 @@ Public Class Bitmap_ToMat
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim bitmap = New Bitmap(ocvb.parms.HomeDir + "Data/lena.jpg")
-        dst = cv.Extensions.BitmapConverter.ToMat(bitmap).Resize(ocvb.color.Size)
+        dst1 = cv.Extensions.BitmapConverter.ToMat(bitmap).Resize(ocvb.color.Size)
 
         bitmap = cv.Extensions.BitmapConverter.ToBitmap(ocvb.color)
         ocvb.result2 = cv.Extensions.BitmapConverter.ToMat(bitmap)

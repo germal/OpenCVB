@@ -84,8 +84,8 @@ Public Class ML_FillRGBDepth_MT
 
         colorizer.src = depth32f
         colorizer.Run(ocvb)
-        dst = colorizer.dst.Clone()
-        dst.SetTo(cv.Scalar.White, grid.gridMask)
+        dst1 = colorizer.dst1.Clone()
+        dst1.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
 End Class
 
@@ -109,12 +109,12 @@ Public Class ML_FillRGBDepth
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
         Dim minLearnCount = sliders.TrackBar1.Value
-        ocvb.RGBDepth.CopyTo(dst)
+        ocvb.RGBDepth.CopyTo(dst1)
         Dim depth32f = getDepth32f(ocvb)
         depth32f = detectAndFillShadow(shadow.holeMask, shadow.borderMask, depth32f, ocvb.color, minLearnCount)
         colorizer.src = depth32f
         colorizer.Run(ocvb)
-        ocvb.result2 = colorizer.dst
+        ocvb.result2 = colorizer.dst1
     End Sub
 End Class
 
@@ -154,7 +154,7 @@ Public Class ML_DepthFromColor_MT
         mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         dilate.src = mask
         dilate.Run(ocvb)
-        mask = dilate.dst
+        mask = dilate.dst1
         ocvb.result2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat
@@ -179,7 +179,7 @@ Public Class ML_DepthFromColor_MT
         ocvb.label2 = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
         colorizer.src = predictedDepth
         colorizer.Run(ocvb)
-        dst = colorizer.dst
+        dst1 = colorizer.dst1
     End Sub
 End Class
 
@@ -216,7 +216,7 @@ Public Class ML_DepthFromColor
         resized.Run(ocvb)
 
         Dim colorROI As New cv.Rect(0, 0, resized.resizeOptions.newSize.Width, resized.resizeOptions.newSize.Height)
-        resized.dst.ConvertTo(color32f, cv.MatType.CV_32FC3)
+        resized.dst1.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim shadowSmall = mats.mat(0).Resize(color32f.Size()).Clone()
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
         Dim depth32f = getDepth32f(ocvb).Resize(color32f.Size())
@@ -230,11 +230,11 @@ Public Class ML_DepthFromColor
 
         colorizer.src = depth32f
         colorizer.Run(ocvb)
-        mats.mat(3) = colorizer.dst.Clone()
+        mats.mat(3) = colorizer.dst1.Clone()
 
         mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         Dim maskCount = mask.CountNonZero()
-        dst = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim learnInput = color32f.Reshape(1, color32f.Total)
         Dim depthResponse = depth32f.Reshape(1, depth32f.Total)
@@ -251,10 +251,10 @@ Public Class ML_DepthFromColor
 
         colorizer.src = predictedDepth
         colorizer.Run(ocvb)
-        dst = colorizer.dst.Clone()
+        dst1 = colorizer.dst1.Clone()
 
         mats.Run(ocvb)
-        ocvb.result2 = mats.dst
+        ocvb.result2 = mats.dst1
         ocvb.label1 = "Predicted Depth"
         ocvb.label2 = "shadow, empty, Depth Mask < " + CStr(sliders.TrackBar1.Value) + ", Learn Input"
     End Sub
@@ -294,7 +294,7 @@ Public Class ML_DepthFromXYColor
         resized.Run(ocvb)
 
         Dim colorROI As New cv.Rect(0, 0, resized.resizeOptions.newSize.Width, resized.resizeOptions.newSize.Height)
-        resized.dst.ConvertTo(color32f, cv.MatType.CV_32FC3)
+        resized.dst1.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim shadowSmall = shadow.holeMask.Resize(color32f.Size()).Clone()
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
         Dim depth32f = getDepth32f(ocvb).Resize(color32f.Size())
@@ -309,11 +309,11 @@ Public Class ML_DepthFromXYColor
 
         colorizer.src = depth32f
         colorizer.Run(ocvb)
-        mats.mat(3) = colorizer.dst.Clone()
+        mats.mat(3) = colorizer.dst1.Clone()
 
         mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         Dim maskCount = mask.CountNonZero()
-        dst = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim c = color32f.Reshape(1, color32f.Total)
         Dim depthResponse = depth32f.Reshape(1, depth32f.Total)
@@ -346,10 +346,10 @@ Public Class ML_DepthFromXYColor
 
         colorizer.src = predictedDepth
         colorizer.Run(ocvb)
-        dst = colorizer.dst.Clone()
+        dst1 = colorizer.dst1.Clone()
 
         mats.Run(ocvb)
-        ocvb.result2 = mats.dst
+        ocvb.result2 = mats.dst1
         ocvb.label2 = "shadow, empty, Depth Mask < " + CStr(sliders.TrackBar1.Value) + ", Learn Input"
     End Sub
 End Class
@@ -392,7 +392,7 @@ Public Class ML_EdgeDepth
         mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         dilate.src = mask
         dilate.Run(ocvb)
-        dst = dilate.src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = dilate.src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat
         ocvb.color.ConvertTo(color32f, cv.MatType.CV_32FC3)
@@ -417,6 +417,6 @@ Public Class ML_EdgeDepth
         ocvb.label2 = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
         colorizer.src = predictedDepth
         colorizer.Run(ocvb)
-        ocvb.result2 = colorizer.dst
+        ocvb.result2 = colorizer.dst1
     End Sub
 End Class

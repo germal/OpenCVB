@@ -25,7 +25,7 @@ Public Class Coherence_Basics
         If ocvb.drawRect.Width <> 0 Then srcRect = ocvb.drawRect
         if standalone Then src = ocvb.color
 
-        dst = src.Clone()
+        dst1 = src.Clone()
         src = src(srcRect)
 
         Dim gray As New cv.Mat
@@ -63,8 +63,8 @@ Public Class Coherence_Basics
             dilate.CopyTo(imgl, mask)
             src = src * (1 - blend) + imgl * blend
         Next
-        dst(srcRect) = src
-        dst.Rectangle(srcRect, cv.Scalar.Yellow, 2)
+        dst1(srcRect) = src
+        dst1.Rectangle(srcRect, cv.Scalar.Yellow, 2)
         ocvb.drawRect = srcRect
     End Sub
 End Class

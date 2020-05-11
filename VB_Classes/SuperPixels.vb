@@ -39,7 +39,7 @@ Public Class SuperPixel_Basics_CPP
         Dim dstx As New cv.Mat
         If standalone Then
             src = ocvb.color.Clone()
-            dstx = dst
+            dstx = dst1
         End If
         If numSuperPixels <> sliders.TrackBar1.Value Or numIterations <> sliders.TrackBar2.Value Or prior <> sliders.TrackBar3.Value Then
             numSuperPixels = sliders.TrackBar1.Value
@@ -66,8 +66,8 @@ Public Class SuperPixel_Basics_CPP
                 dstx.SetTo(cv.Scalar.White, dst2)
             Else
                 Dim tmp = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
-                dst = src
-                dst.SetTo(cv.Scalar.White, tmp)
+                dst1 = src
+                dst1.SetTo(cv.Scalar.White, tmp)
             End If
         End If
 
@@ -100,7 +100,7 @@ Public Class SuperPixel_Depth
     Public Sub Run(ocvb As AlgorithmData)
         pixels.src = ocvb.RGBDepth.Clone()
         pixels.Run(ocvb)
-        dst = pixels.dst1
+        dst1 = pixels.dst1
         ocvb.result2 = pixels.dst2
     End Sub
 End Class
@@ -126,11 +126,11 @@ Public Class SuperPixel_WithCanny
         edges.src = ocvb.color.Clone()
         edges.Run(ocvb)
         pixels.src = ocvb.color.Clone()
-        pixels.src.SetTo(cv.Scalar.White, edges.dst)
+        pixels.src.SetTo(cv.Scalar.White, edges.dst1)
         pixels.Run(ocvb)
-        dst = pixels.dst1
+        dst1 = pixels.dst1
         ocvb.result2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.result2.SetTo(cv.Scalar.Red, edges.dst)
+        ocvb.result2.SetTo(cv.Scalar.Red, edges.dst1)
         ocvb.label2 = "Edges provided by Canny in red"
     End Sub
 End Class
@@ -153,15 +153,15 @@ Public Class SuperPixel_WithLineDetector
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        lines.dst = dst
+        lines.dst1 = dst1
         lines.Run(ocvb)
-        pixels.src = dst.Clone()
-        ocvb.result2 = dst.Clone()
+        pixels.src = dst1.Clone()
+        ocvb.result2 = dst1.Clone()
         ocvb.label2 = "Input to superpixel basics."
         pixels.Run(ocvb)
-        dst = pixels.dst1
+        dst1 = pixels.dst1
         ' ocvb.result2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ' ocvb.result2.SetTo(cv.Scalar.Red, lines.dst)
+        ' ocvb.result2.SetTo(cv.Scalar.Red, lines.dst1)
         ' ocvb.label2 = "Edges provided by Canny in red"
     End Sub
 End Class

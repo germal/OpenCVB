@@ -184,7 +184,7 @@ Public Class Replay_Play
                     bytesTotal = 0
                 End If
                 playback.BytesMovedTrackbar.Value = bytesTotal / 1000000
-                dst = ocvb.color.Clone()
+                dst1 = ocvb.color.Clone()
                 ocvb.result2 = ocvb.RGBDepth.Clone()
             Else
                 If playback.fileinfo.Exists = False Then

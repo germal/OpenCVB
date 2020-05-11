@@ -23,14 +23,14 @@ Public Class WarpPerspective_Basics
         pts(2) = New cv.Point2f(ocvb.color.Width, 0)
         pts(3) = New cv.Point2f(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
 
-        Dim perpectiveTranx = cv.Cv2.GetPerspectiveTransform(src, dst)
-        cv.Cv2.WarpPerspective(ocvb.color, dst, perpectiveTranx, New cv.Size(ocvb.color.Cols, ocvb.color.Rows), cv.InterpolationFlags.Cubic,
+        Dim perpectiveTranx = cv.Cv2.GetPerspectiveTransform(src, dst1)
+        cv.Cv2.WarpPerspective(ocvb.color, dst1, perpectiveTranx, New cv.Size(ocvb.color.Cols, ocvb.color.Rows), cv.InterpolationFlags.Cubic,
                                cv.BorderTypes.Constant, cv.Scalar.White)
 
         Dim center = New cv.Point2f(ocvb.color.Cols / 2, ocvb.color.Rows / 2)
         Dim angle = sliders.TrackBar3.Value
         Dim rotationMatrix = cv.Cv2.GetRotationMatrix2D(center, angle, 1.0)
-        cv.Cv2.WarpAffine(dst, ocvb.result2, rotationMatrix, ocvb.color.Size(), cv.InterpolationFlags.Nearest)
+        cv.Cv2.WarpAffine(dst1, ocvb.result2, rotationMatrix, ocvb.color.Size(), cv.InterpolationFlags.Nearest)
     End Sub
 End Class
 

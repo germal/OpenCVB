@@ -26,12 +26,12 @@ Public Class MeanShift_Basics
             Dim backProj As New cv.Mat
             cv.Cv2.CalcBackProject(New cv.Mat() {hsv}, ch, roi_hist, backProj, ranges)
             cv.Cv2.MeanShift(backProj, trackbox, cv.TermCriteria.Both(10, 1))
-            dst = backProj.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst.Rectangle(trackbox, cv.Scalar.Red, rectangleEdgeWidth, cv.LineTypes.AntiAlias)
+            dst1 = backProj.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst1.Rectangle(trackbox, cv.Scalar.Red, rectangleEdgeWidth, cv.LineTypes.AntiAlias)
             Show_HSV_Hist(ocvb.result2, roi_hist)
             ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         Else
-            dst = ocvb.color
+            dst1 = ocvb.color
         End If
     End Sub
 End Class
@@ -76,7 +76,7 @@ Public Class MeanShift_PyrFilter
         Dim spatialRadius = sliders.TrackBar1.Value
         Dim colorRadius = sliders.TrackBar2.Value
         Dim maxPyrLevel = sliders.TrackBar3.Value
-        cv.Cv2.PyrMeanShiftFiltering(ocvb.color, dst, spatialRadius, colorRadius, maxPyrLevel)
+        cv.Cv2.PyrMeanShiftFiltering(ocvb.color, dst1, spatialRadius, colorRadius, maxPyrLevel)
     End Sub
 End Class
 
@@ -118,13 +118,13 @@ Public Class Meanshift_TopObjects
                 End If
 
                 cams(i).Run(ocvb)
-                mats1.mat(i) = dst.Clone()
+                mats1.mat(i) = dst1.Clone()
                 mats2.mat(i) = ocvb.result2.Clone()
                 trackBoxes.Add(cams(i).trackbox)
             End If
         Next
         mats1.Run(ocvb)
-        dst = ocvb.result2.Clone()
+        dst1 = ocvb.result2.Clone()
         mats2.Run(ocvb)
     End Sub
 End Class

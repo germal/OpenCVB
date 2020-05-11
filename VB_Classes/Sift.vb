@@ -21,18 +21,18 @@ Public Class Sift_Basics_CS
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim dst As New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols * 2, cv.MatType.CV_8UC3)
+        Dim dst1 As New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols * 2, cv.MatType.CV_8UC3)
 
         If ocvb.parms.cameraIndex = T265Camera Then
             fisheye.Run(ocvb)
-            CS_SiftBasics.Run(fisheye.leftView, fisheye.rightView, dst, radio.check(0).Checked, sliders.TrackBar1.Value)
+            CS_SiftBasics.Run(fisheye.leftView, fisheye.rightView, dst1, radio.check(0).Checked, sliders.TrackBar1.Value)
         Else
-            CS_SiftBasics.Run(ocvb.leftView, ocvb.rightView, dst, radio.check(0).Checked, sliders.TrackBar1.Value)
-            If ocvb.parms.lowResolution Then dst = dst.Resize(New cv.Size(dst.Width * 2, dst.Height))
+            CS_SiftBasics.Run(ocvb.leftView, ocvb.rightView, dst1, radio.check(0).Checked, sliders.TrackBar1.Value)
+            If ocvb.parms.lowResolution Then dst1 = dst1.Resize(New cv.Size(dst1.Width * 2, dst1.Height))
         End If
 
-        dst(New cv.Rect(0, 0, dst.Width, dst.Height)).CopyTo(dst)
-        dst(New cv.Rect(dst.Width, 0, dst.Width, dst.Height)).CopyTo(ocvb.result2)
+        dst1(New cv.Rect(0, 0, dst1.Width, dst1.Height)).CopyTo(dst1)
+        dst1(New cv.Rect(dst1.Width, 0, dst1.Width, dst1.Height)).CopyTo(ocvb.result2)
 
         ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
@@ -75,7 +75,7 @@ Public Class Sift_Basics_CS_MT
         End If
         grid.Run(ocvb)
 
-        Dim dst As New cv.Mat(ocvb.color.Rows, ocvb.color.Cols * 2, cv.MatType.CV_8UC3)
+        Dim output As New cv.Mat(ocvb.color.Rows, ocvb.color.Cols * 2, cv.MatType.CV_8UC3)
 
         Dim numFeatures = sliders.TrackBar1.Value
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
@@ -83,13 +83,13 @@ Public Class Sift_Basics_CS_MT
             Dim left = leftView(roi).Clone()  ' sift wants the inputs to be continuous and roi-modified Mats are not continuous.
             Dim right = rightView(roi).Clone()
             Dim dstROI = New cv.Rect(roi.X, roi.Y, roi.Width * 2, roi.Height)
-            Dim dstTmp = dst(dstROI).Clone()
+            Dim dstTmp = output(dstROI).Clone()
             CS_SiftBasics.Run(left, right, dstTmp, radio.check(0).Checked, numFeatures)
-            dstTmp.CopyTo(dst(dstROI))
+            dstTmp.CopyTo(output(dstROI))
         End Sub)
 
-        dst(New cv.Rect(0, 0, dst.Width, dst.Height)).CopyTo(dst)
-        dst(New cv.Rect(dst.Width, 0, dst.Width, dst.Height)).CopyTo(ocvb.result2)
+        output(New cv.Rect(0, 0, output.Width, output.Height)).CopyTo(dst1)
+        output(New cv.Rect(output.Width, 0, output.Width, output.Height)).CopyTo(dst2)
 
         ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
