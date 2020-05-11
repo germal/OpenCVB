@@ -59,9 +59,9 @@ Public Class CamShift_Basics
             cv.Cv2.CalcBackProject({hue}, {0, 0}, roi_hist, backproj, ranges)
             cv.Cv2.BitwiseAnd(backproj, mask, backproj)
             trackBox = cv.Cv2.CamShift(backproj, roi, cv.TermCriteria.Both(10, 1))
-            Show_HSV_Hist(ocvb.result2, roi_hist)
-            If ocvb.result2.Channels = 1 Then ocvb.result2 = ocvb.color.EmptyClone()
-            ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
+            Show_HSV_Hist(dst2, roi_hist)
+            If dst2.Channels = 1 Then dst2 = ocvb.color.EmptyClone()
+            dst2 = dst2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         End If
         dst1.SetTo(0)
         ocvb.color.CopyTo(dst1, mask)
@@ -162,7 +162,7 @@ Public Class Camshift_TopObjects
                 End If
 
                 cams(i).Run(ocvb)
-                mats.mat(i) = ocvb.result2.Clone()
+                mats.mat(i) = dst2.Clone()
                 trackBoxes.Add(cams(i).trackBox)
             End If
         Next

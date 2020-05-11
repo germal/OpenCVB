@@ -137,7 +137,7 @@ Public Class OpticalFlow_DenseBasics
 
             dst1 = hsv.CvtColor(cv.ColorConversionCodes.HSV2RGB)
             dst1 = dst1.ConvertScaleAbs(flow.outputScaling)
-            ocvb.result2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
         oldGray = gray.Clone()
     End Sub
@@ -193,8 +193,8 @@ Public Class OpticalFlow_DenseBasics_MT
                 End If
                 oldGray(roi) = accum(roi).Clone()
             End Sub)
-            ocvb.result2 = accum.Clone()
-            ocvb.result2.SetTo(cv.Scalar.All(255), grid.gridMask)
+            dst2 = accum.Clone()
+            dst2.SetTo(cv.Scalar.All(255), grid.gridMask)
         Else
             oldGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             accum = ocvb.color.Clone()
@@ -247,7 +247,7 @@ Public Class OpticalFlow_Sparse
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1 = ocvb.color.Clone()
-        ocvb.result2 = ocvb.color.Clone()
+        dst2 = ocvb.color.Clone()
 
         Dim OpticalFlowFlag As cv.OpticalFlowFlags
         For i = 0 To radio.check.Count - 1
@@ -288,8 +288,8 @@ Public Class OpticalFlow_Sparse
                         features.Add(pt1)
                         lastFeatures.Add(pt2)
                         dst1.Line(pt1, pt2, cv.Scalar.Red, 5, cv.LineTypes.AntiAlias)
-                        ocvb.result2.Circle(pt1, 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-                        ocvb.result2.Circle(pt2, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                        dst2.Circle(pt1, 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                        dst2.Circle(pt2, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
                     End If
                 End If
             Next

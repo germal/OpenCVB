@@ -52,7 +52,7 @@ Public Class Contours_Basics
             src = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
         End If
 
-        dst1 = New cv.Mat(ocvb.result2.Size(), cv.MatType.CV_8UC1, 0)
+        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
 
         Dim contours0 As cv.Point()()
         If retrievalMode = cv.RetrievalModes.FloodFill Then
@@ -99,8 +99,8 @@ Public Class Contours_FindandDraw
             contours(j) = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
         Next
 
-        ocvb.result2.SetTo(0)
-        cv.Cv2.DrawContours(ocvb.result2, contours, 0, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
+        dst2.SetTo(0)
+        cv.Cv2.DrawContours(dst2, contours, 0, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
@@ -118,7 +118,7 @@ Public Class Contours_Depth
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         Dim contours0 = cv.Cv2.FindContoursAsArray(trim.Mask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim maxIndex As Int32
         Dim maxNodes As Int32
@@ -129,7 +129,7 @@ Public Class Contours_Depth
                 maxNodes = contours.Length
             End If
         Next
-        cv.Cv2.DrawContours(ocvb.result2, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
+        cv.Cv2.DrawContours(dst2, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
     End Sub
 End Class
 
@@ -172,8 +172,8 @@ Public Class Contours_RGB
         listOfPoints.Add(points)
         cv.Cv2.DrawContours(dst1, listOfPoints, 0, New cv.Scalar(255, 0, 0), -1)
         cv.Cv2.DrawContours(dst1, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
-        ocvb.result2.SetTo(0)
-        ocvb.color.CopyTo(ocvb.result2, trim.zeroMask)
+        dst2.SetTo(0)
+        ocvb.color.CopyTo(dst2, trim.zeroMask)
     End Sub
 End Class
 

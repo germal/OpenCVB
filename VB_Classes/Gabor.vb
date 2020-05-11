@@ -43,8 +43,8 @@ Public Class Gabor_Basics
             dst1 = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
         Else
             dst1 = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
-            ocvb.result2.SetTo(0)
-            ocvb.result2 = gKernel.Resize(ocvb.color.Size(), 0, 0, cv.InterpolationFlags.Cubic)
+            dst2.SetTo(0)
+            dst2 = gKernel.Resize(ocvb.color.Size(), 0, 0, cv.InterpolationFlags.Cubic)
         End If
     End Sub
 End Class
@@ -82,7 +82,7 @@ Public Class Gabor_Basics_MT
         ocvb.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.result2 = New cv.Mat(ocvb.result2.Size(), cv.MatType.CV_32FC1, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC1, 0)
 
         ' theta is not set here but in the constructor above.
         Dim ksize = sliders.TrackBar1.Value * 2 + 1
@@ -104,7 +104,7 @@ Public Class Gabor_Basics_MT
             Dim roi = grid.roiList(i)
             SyncLock accum
                 cv.Cv2.Max(accum, gabor(i).dst1, accum)
-                ocvb.result2(roi) = gabor(i).gKernel.Resize(New cv.Size(roi.Width, roi.Height), 0, 0, cv.InterpolationFlags.Cubic)
+                dst2(roi) = gabor(i).gKernel.Resize(New cv.Size(roi.Width, roi.Height), 0, 0, cv.InterpolationFlags.Cubic)
             End SyncLock
         End Sub)
         dst1 = accum

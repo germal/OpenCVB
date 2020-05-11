@@ -51,7 +51,7 @@ Public Class Corners_Harris
 
         Dim McNormal As New cv.Mat
         cv.Cv2.Normalize(mc, McNormal, 127, 255, cv.NormTypes.MinMax)
-        McNormal.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
+        McNormal.ConvertTo(dst2, cv.MatType.CV_8U)
     End Sub
 End Class
 
@@ -77,12 +77,12 @@ Public Class Corners_SubPix
         Dim winSize = New cv.Size(sliders.TrackBar1.Value, sliders.TrackBar1.Value)
         cv.Cv2.CornerSubPix(gray, good.goodFeatures, winSize, New cv.Size(-1, -1), term)
 
-        ocvb.color.CopyTo(ocvb.result2)
+        ocvb.color.CopyTo(dst2)
         Dim p As New cv.Point
         For i = 0 To good.goodFeatures.Count - 1
             p.X = CInt(good.goodFeatures(i).X)
             p.Y = CInt(good.goodFeatures(i).Y)
-            cv.Cv2.Circle(ocvb.result2, p, 3, New cv.Scalar(0, 0, 255), -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst2, p, 3, New cv.Scalar(0, 0, 255), -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
 End Class
@@ -112,7 +112,7 @@ Public Class Corners_PreCornerDetect
         median.src = gray.Clone()
         median.Run(ocvb)
         dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.result2 = gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "median = " + CStr(median.medianVal)
     End Sub
 End Class
@@ -178,6 +178,6 @@ Public Class Corners_ShiTomasi_CPP
 
         Dim stNormal As New cv.Mat
         cv.Cv2.Normalize(output, stNormal, 127, 255, cv.NormTypes.MinMax)
-        stNormal.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
+        stNormal.ConvertTo(dst2, cv.MatType.CV_8U)
     End Sub
 End Class

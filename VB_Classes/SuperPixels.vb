@@ -76,7 +76,7 @@ Public Class SuperPixel_Basics_CPP
         Marshal.Copy(labelPtr, labelData, 0, labelData.Length)
         Dim labels = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32S, labelData)
         If numSuperPixels < 255 Then labels *= 255 / numSuperPixels
-        labels.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
+        labels.ConvertTo(dst2, cv.MatType.CV_8U)
     End Sub
     Public Sub Close()
         SuperPixel_Close(spPtr)
@@ -101,7 +101,7 @@ Public Class SuperPixel_Depth
         pixels.src = ocvb.RGBDepth.Clone()
         pixels.Run(ocvb)
         dst1 = pixels.dst1
-        ocvb.result2 = pixels.dst2
+        dst2 = pixels.dst2
     End Sub
 End Class
 
@@ -129,8 +129,8 @@ Public Class SuperPixel_WithCanny
         pixels.src.SetTo(cv.Scalar.White, edges.dst1)
         pixels.Run(ocvb)
         dst1 = pixels.dst1
-        ocvb.result2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.result2.SetTo(cv.Scalar.Red, edges.dst1)
+        dst2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2.SetTo(cv.Scalar.Red, edges.dst1)
         ocvb.label2 = "Edges provided by Canny in red"
     End Sub
 End Class
@@ -156,12 +156,12 @@ Public Class SuperPixel_WithLineDetector
         lines.dst1 = dst1
         lines.Run(ocvb)
         pixels.src = dst1.Clone()
-        ocvb.result2 = dst1.Clone()
+        dst2 = dst1.Clone()
         ocvb.label2 = "Input to superpixel basics."
         pixels.Run(ocvb)
         dst1 = pixels.dst1
-        ' ocvb.result2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ' ocvb.result2.SetTo(cv.Scalar.Red, lines.dst1)
+        ' dst2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        ' dst2.SetTo(cv.Scalar.Red, lines.dst1)
         ' ocvb.label2 = "Edges provided by Canny in red"
     End Sub
 End Class

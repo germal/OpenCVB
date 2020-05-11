@@ -120,13 +120,13 @@ Public Class Delaunay_GoodFeatures
 
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         For i = 0 To features.goodFeatures.Count - 1
-            locate_point(ocvb.result2, subdiv, features.goodFeatures(i), active_facet_color)
+            locate_point(dst2, subdiv, features.goodFeatures(i), active_facet_color)
             subdiv.Insert(features.goodFeatures(i))
         Next
 
-        paint_voronoi(ocvb, ocvb.result2, subdiv)
+        paint_voronoi(ocvb, dst2, subdiv)
     End Sub
 End Class
 
@@ -154,7 +154,7 @@ Public Class Delauney_Subdiv2D
         Next
 
         Dim subdiv = New cv.Subdiv2D()
-        subdiv.InitDelaunay(New cv.Rect(0, 0, ocvb.result2.Width, ocvb.result2.Height))
+        subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         subdiv.Insert(points)
 
         ' draw voronoi diagram
@@ -162,11 +162,11 @@ Public Class Delauney_Subdiv2D
         Dim facetCenters() As cv.Point2f = Nothing
         subdiv.GetVoronoiFacetList(Nothing, facetList, facetCenters)
 
-        ocvb.result2 = dst1.Clone()
+        dst2 = dst1.Clone()
         For Each list In facetList
             Dim before = list.Last()
             For Each p In list
-                ocvb.result2.Line(before, p, cv.Scalar.Green, 1)
+                dst2.Line(before, p, cv.Scalar.Green, 1)
                 before = p
             Next
         Next

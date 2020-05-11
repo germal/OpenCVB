@@ -202,11 +202,11 @@ Public Class Draw_Polygon
                 points.Add(New cv.Point(hull(j).X, hull(j).Y))
             Next
             listOfPoints.Add(points)
-            ocvb.result2.SetTo(cv.Scalar.White)
+            dst2.SetTo(cv.Scalar.White)
             If radio.check(0).Checked Then
-                cv.Cv2.DrawContours(ocvb.result2, listOfPoints, 0, polyColor, 2)
+                cv.Cv2.DrawContours(dst2, listOfPoints, 0, polyColor, 2)
             Else
-                cv.Cv2.DrawContours(ocvb.result2, listOfPoints, 0, polyColor, -1)
+                cv.Cv2.DrawContours(dst2, listOfPoints, 0, polyColor, -1)
             End If
         Next
         'End If

@@ -10,6 +10,6 @@ Public Class Bitwise_Not
     Public Sub Run(ocvb As AlgorithmData)
         cv.Cv2.BitwiseNot(ocvb.color, dst1)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.BitwiseNot(gray, ocvb.result2)
+        cv.Cv2.BitwiseNot(gray, dst2)
     End Sub
 End Class

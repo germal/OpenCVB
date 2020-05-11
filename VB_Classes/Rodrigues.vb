@@ -15,7 +15,7 @@ Public Class Rodrigues_ValidateKinect
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex <> Kinect4AzureCam Then
-            ocvb.result2.SetTo(0)
+            dst2.SetTo(0)
             ocvb.putText(New ActiveClass.TrueType("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140, RESULT1))
             Exit Sub
         End If
@@ -41,7 +41,7 @@ Public Class Rodrigues_ValidateVector
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex <> StereoLabsZED2 And ocvb.parms.cameraIndex <> T265Camera Then
-            ocvb.result2.SetTo(0)
+            dst2.SetTo(0)
             ocvb.putText(New ActiveClass.TrueType("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation", 10, 140, RESULT1))
             Exit Sub
         End If

@@ -70,8 +70,8 @@ Public Class Math_Median_CDF
             ocvb.label1 = "Grayscale pixels > " + Format(medianVal, "#0.0")
 
             cv.Cv2.BitwiseNot(mask, mask)
-            ocvb.result2.SetTo(0)
-            ocvb.color.CopyTo(ocvb.result2, mask) ' show the other half.
+            dst2.SetTo(0)
+            ocvb.color.CopyTo(dst2, mask) ' show the other half.
             ocvb.label2 = "Grayscale pixels < " + Format(medianVal, "#0.0")
         End If
     End Sub
@@ -92,7 +92,7 @@ Public Class Math_DepthMeanStdev
     Public Sub Run(ocvb As AlgorithmData)
         minMax.Run(ocvb)
         Dim mean As Single = 0, stdev As Single = 0
-        Dim mask = ocvb.result2 ' the mask for stable depth.
+        Dim mask = dst2 ' the mask for stable depth.
         Dim depth32f = getDepth32f(ocvb)
         cv.Cv2.MeanStdDev(depth32f, mean, stdev, mask)
         ocvb.label2 = "stablized depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")

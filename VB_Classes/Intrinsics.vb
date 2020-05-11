@@ -29,16 +29,16 @@ Public Class intrinsicsLeft_Basics
         End If
         ocvb.putText(New ActiveClass.TrueType(nextLine, 10, ttStart + 120))
 
-        ocvb.result2.SetTo(0)
-        ocvb.result2.Line(New cv.Point(ocvb.color.Width / 2, 0), New cv.Point(ocvb.color.Width / 2, ocvb.color.Height), cv.Scalar.White, 1)
-        ocvb.result2.Line(New cv.Point(0, ocvb.color.Height / 2), New cv.Point(ocvb.color.Width, ocvb.color.Height / 2), cv.Scalar.White, 1)
+        dst2.SetTo(0)
+        dst2.Line(New cv.Point(ocvb.color.Width / 2, 0), New cv.Point(ocvb.color.Width / 2, ocvb.color.Height), cv.Scalar.White, 1)
+        dst2.Line(New cv.Point(0, ocvb.color.Height / 2), New cv.Point(ocvb.color.Width, ocvb.color.Height / 2), cv.Scalar.White, 1)
 
         nextLine = "(" + CStr(ocvb.parms.intrinsicsLeft.ppx) + ", " + CStr(ocvb.parms.intrinsicsLeft.ppy) + ")"
         Dim ttLocation = New cv.Point(CInt(ocvb.parms.imageToTrueTypeLoc * ocvb.color.Width / 2) + 20, CInt(ocvb.parms.imageToTrueTypeLoc * ocvb.color.Height / 2) + 20)
         ocvb.putText(New ActiveClass.TrueType(nextLine, ttLocation.X, ttLocation.Y, RESULT2))
 
         Dim ptLoc = New cv.Point(ocvb.color.Width / 2 + 4, ocvb.color.Height / 2 + 4)
-        ocvb.result2.Line(ptLoc, New cv.Point(ttLocation.X / ocvb.parms.imageToTrueTypeLoc, ttLocation.Y / ocvb.parms.imageToTrueTypeLoc), cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+        dst2.Line(ptLoc, New cv.Point(ttLocation.X / ocvb.parms.imageToTrueTypeLoc, ttLocation.Y / ocvb.parms.imageToTrueTypeLoc), cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 

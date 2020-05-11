@@ -13,12 +13,12 @@ Module fastLineDetector_Exports
     Public Function lineDetector_Lines() As IntPtr
     End Function
 
-    Public Sub find3DLineSegment(ocvb As AlgorithmData, _mask As cv.Mat, _depth32f As cv.Mat, aa As cv.Vec6f, maskLineWidth As Int32)
+    Public Sub find3DLineSegment(ocvb As AlgorithmData, dst2 As cv.Mat, _mask As cv.Mat, _depth32f As cv.Mat, aa As cv.Vec6f, maskLineWidth As Int32)
         Dim pt1 = New cv.Point(aa(0), aa(1))
         Dim pt2 = New cv.Point(aa(2), aa(3))
         Dim centerPoint = New cv.Point((aa(0) + aa(2)) / 2, (aa(1) + aa(3)) / 2)
         _mask.Line(pt1, pt2, New cv.Scalar(1), maskLineWidth, cv.LineTypes.AntiAlias)
-        ocvb.result2.Line(pt1, pt2, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
+        dst2.Line(pt1, pt2, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
 
         Dim roi = New cv.Rect(Math.Min(aa(0), aa(2)), Math.Min(aa(1), aa(3)), Math.Abs(aa(0) - aa(2)), Math.Abs(aa(1) - aa(3)))
 
@@ -63,14 +63,14 @@ Module fastLineDetector_Exports
                 Dim b = endPoints(0)
                 Dim d = endPoints(1)
                 Dim lenBD = Math.Sqrt((b.Item0 - d.Item0) * (b.Item0 - d.Item0) + (b.Item1 - d.Item1) * (b.Item1 - d.Item1) + (b.Item2 - d.Item2) * (b.Item2 - d.Item2))
-                cv.Cv2.PutText(ocvb.result2, Format(lenBD / 1000, "0.00") + "m", centerPoint, cv.HersheyFonts.HersheyTriplex, 0.4, cv.Scalar.White, 1,
+                cv.Cv2.PutText(dst2, Format(lenBD / 1000, "0.00") + "m", centerPoint, cv.HersheyFonts.HersheyTriplex, 0.4, cv.Scalar.White, 1,
                                    cv.LineTypes.AntiAlias)
                 If endPoints(0).Item2 = endPoints(1).Item2 Then endPoints(0).Item2 += 1 ' prevent NaN
-                cv.Cv2.PutText(ocvb.result2, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "0.00") + "y/z",
+                cv.Cv2.PutText(dst2, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "0.00") + "y/z",
                                    New cv.Point(centerPoint.X, centerPoint.Y + 10), cv.HersheyFonts.HersheyTriplex, 0.4, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 ' show the final endpoints in xy projection.
-                ocvb.result2.Circle(New cv.Point(b.Item3, b.Item4), 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-                ocvb.result2.Circle(New cv.Point(d.Item3, d.Item4), 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                dst2.Circle(New cv.Point(b.Item3, b.Item4), 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                dst2.Circle(New cv.Point(d.Item3, d.Item4), 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             End If
         End If
     End Sub
@@ -206,7 +206,7 @@ Public Class lineDetector_FLD
         Dim canny_th2 = sliders2.TrackBar2.Value
         Dim do_merge = check.Box(0).Checked
 
-        if standalone Then src = ocvb.color
+        If standalone Then src = ocvb.color
 
         Dim factor As Int32 = 4
         If radio.check(0).Checked Then
@@ -229,7 +229,7 @@ Public Class lineDetector_FLD
 
         src.CopyTo(dst1)
         If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, factor, dst1)
-        if standalone Then dst1.CopyTo(dst1)
+        If standalone Then dst1.CopyTo(dst1)
     End Sub
 End Class
 
@@ -291,7 +291,7 @@ Public Class LineDetector_3D_LongestLine
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 30 Then Exit Sub
         lines.Run(ocvb)
-        ocvb.color.CopyTo(ocvb.result2)
+        ocvb.color.CopyTo(dst2)
 
         Dim depth32f = getDepth32f(ocvb)
 
@@ -299,7 +299,7 @@ Public Class LineDetector_3D_LongestLine
             ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
             Dim maskLineWidth As Int32 = sliders.TrackBar1.Value
             Dim mask = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, 0)
-            find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth)
+            find3DLineSegment(ocvb, dst2, mask, depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth)
         End If
     End Sub
 End Class
@@ -322,7 +322,7 @@ Public Class LineDetector_3D_FLD_MT
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 30 Then Exit Sub
         lines.Run(ocvb)
-        ocvb.color.CopyTo(ocvb.result2)
+        ocvb.color.CopyTo(dst2)
 
         Dim depth32f = getDepth32f(ocvb)
 
@@ -331,7 +331,7 @@ Public Class LineDetector_3D_FLD_MT
         Dim mask = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, 0)
         Parallel.For(0, lines.sortedLines.Count - 1,
             Sub(i)
-                find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
+                find3DLineSegment(ocvb, dst2, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
             End Sub)
     End Sub
 End Class
@@ -358,7 +358,7 @@ Public Class LineDetector_3D_LSD_MT
 
         If ocvb.frameCount Mod 30 Then Exit Sub
         lines.Run(ocvb)
-        ocvb.color.CopyTo(ocvb.result2)
+        ocvb.color.CopyTo(dst2)
 
         Dim depth32f = getDepth32f(ocvb)
 
@@ -367,7 +367,7 @@ Public Class LineDetector_3D_LSD_MT
         Dim mask = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, 0)
         Parallel.For(0, lines.sortedLines.Count - 1,
             Sub(i)
-                find3DLineSegment(ocvb, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
+                find3DLineSegment(ocvb, dst2, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
             End Sub)
     End Sub
 End Class
@@ -409,12 +409,12 @@ Public Class LineDetector_3D_FitLineZ
         If radio.check(0).Checked Or radio.check(2).Checked Then useLSD = False
         If useLSD And ocvb.parms.OpenCV_Version_ID <> "401" Then
             dst1.SetTo(0)
-            ocvb.result2.SetTo(0)
+            dst2.SetTo(0)
             ocvb.putText(New ActiveClass.TrueType("LSD linedetector is available only with OpenCV 4.01 - IP issue.", 10, 100, RESULT1))
             Exit Sub
         End If
         If useLSD Then linesLSD.Run(ocvb) Else linesFLD.Run(ocvb)
-        ocvb.color.CopyTo(ocvb.result2)
+        ocvb.color.CopyTo(dst2)
 
         Dim depth32f = getDepth32f(ocvb)
 
@@ -434,7 +434,7 @@ Public Class LineDetector_3D_FitLineZ
                     Dim aa = sortedlines.ElementAt(i).Key
                     Dim pt1 = New cv.Point(aa(0), aa(1))
                     Dim pt2 = New cv.Point(aa(2), aa(3))
-                    ocvb.result2.Line(pt1, pt2, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+                    dst2.Line(pt1, pt2, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
                     mask.Line(pt1, pt2, New cv.Scalar(i), maskLineWidth, cv.LineTypes.AntiAlias)
 
                     Dim roi = New cv.Rect(Math.Min(aa(0), aa(2)), Math.Min(aa(1), aa(3)), Math.Abs(aa(0) - aa(2)), Math.Abs(aa(1) - aa(3)))
@@ -478,14 +478,14 @@ Public Class LineDetector_3D_FitLineZ
                     Dim textPoint = New cv.Point(worldDepth(ptIndex).Item3, worldDepth(ptIndex).Item4)
                     If textPoint.X > mask.Width - 50 Then textPoint.X = mask.Width - 50
                     If textPoint.Y > mask.Height - 50 Then textPoint.Y = mask.Height - 50
-                    cv.Cv2.PutText(ocvb.result2, Format(lenBD / 1000, "#0.00") + "m", textPoint, cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    cv.Cv2.PutText(dst2, Format(lenBD / 1000, "#0.00") + "m", textPoint, cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                     If endPoints(0).Item2 = endPoints(1).Item2 Then endPoints(0).Item2 += 1 ' prevent NaN
-                    cv.Cv2.PutText(ocvb.result2, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "#0.00") + If(useX, "x/z", "y/z"),
+                    cv.Cv2.PutText(dst2, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "#0.00") + If(useX, "x/z", "y/z"),
                                     New cv.Point(textPoint.X, textPoint.Y + 10), cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
                     ' show the final endpoints in xy projection.
-                    ocvb.result2.Circle(New cv.Point(b.Item3, b.Item4), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-                    ocvb.result2.Circle(New cv.Point(d.Item3, d.Item4), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                    dst2.Circle(New cv.Point(b.Item3, b.Item4), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                    dst2.Circle(New cv.Point(d.Item3, d.Item4), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
                 End Sub)
         End If
     End Sub
@@ -509,7 +509,7 @@ Public Class LineDetector_Basics
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim vectors = ld.Detect(gray)
         ocvb.color.CopyTo(dst1)
-        ocvb.color.CopyTo(ocvb.result2)
+        ocvb.color.CopyTo(dst2)
         Dim thickness = sliders.TrackBar1.Value
 
         For Each v In vectors
@@ -522,7 +522,7 @@ Public Class LineDetector_Basics
         Next
         If standalone Then
             ocvb.label2 = "Drawn with DrawSegment (thickness=1)"
-            ld.DrawSegments(ocvb.result2, vectors, False)
+            ld.DrawSegments(dst2, vectors, False)
         End If
     End Sub
 End Class

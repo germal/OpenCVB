@@ -21,7 +21,7 @@ Public Class Resize_Basics
 
             dst1 = ocvb.color(roi).Resize(dst1.Size(), 0, 0, resizeFlag)
 
-            ocvb.result2 = (ocvb.color(roi).Resize(dst1.Size(), 0, 0, cv.InterpolationFlags.Cubic) -
+            dst2 = (ocvb.color(roi).Resize(dst1.Size(), 0, 0, cv.InterpolationFlags.Cubic) -
                             dst1).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
             ocvb.color.Rectangle(roi, cv.Scalar.White, 2)
         Else
@@ -58,7 +58,7 @@ Public Class Resize_After8uc3
         ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
         colorizer.src = depth32f
         colorizer.Run(ocvb)
-        ocvb.result2 = colorizer.dst1.Resize(newSize, 0, resizeFlag)
+        dst2 = colorizer.dst1.Resize(newSize, 0, resizeFlag)
 
         Dim depth16 = ocvb.depth16.Resize(newSize, 0, resizeFlag)
         depth16.ConvertTo(depth32f, cv.MatType.CV_32F)

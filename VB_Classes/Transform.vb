@@ -37,7 +37,7 @@ Public Class Transform_Rotate
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
             src = ocvb.color
-            dst1 = ocvb.result2
+            dst1 = dst2
         End If
         Dim imageCenter = New cv.Point2f(src.Width / 2, src.Height / 2)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.TrackBar1.Value, sliders.TrackBar2.Value / 100)

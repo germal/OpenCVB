@@ -20,9 +20,9 @@ Public Class GrabCut_Basics
         Dim morphShape = cv.MorphShapes.Cross
 
         Dim element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(kernelsize, kernelsize))
-        dst1 = ocvb.result2.Erode(element, Nothing, iterations)
+        dst1 = dst2.Erode(element, Nothing, iterations)
 
-        Dim gray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayEroded = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim fg = gray.Threshold(1, cv.GrabCutClasses.FGD, cv.ThresholdTypes.Binary)
         Dim bg = gray.Threshold(1, cv.GrabCutClasses.BGD, cv.ThresholdTypes.BinaryInv)
@@ -38,7 +38,7 @@ Public Class GrabCut_Basics
         If fg.CountNonZero() > 100 And bg.CountNonZero() > 100 Then
             cv.Cv2.GrabCut(ocvb.color, mask, rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)
         End If
-        ocvb.color.CopyTo(ocvb.result2, mask)
+        ocvb.color.CopyTo(dst2, mask)
     End Sub
 End Class
 

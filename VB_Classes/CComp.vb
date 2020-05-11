@@ -30,15 +30,15 @@ Public Class CComp_Basics
         Else
             binary = src.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.BinaryInv + OpenCvSharp.ThresholdTypes.Otsu)
         End If
-        ocvb.result1 = binary.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = binary.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
 
         Static lastImage As New cv.Mat
 
-        cc.RenderBlobs(ocvb.result1)
-        dst1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cc.RenderBlobs(dst1)
+        dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayDepth = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ocvb.result1.CopyTo(ocvb.result2)
+        dst1.CopyTo(dst2)
         For Each blob In cc.Blobs
             If blob.Area < sliders.TrackBar2.Value Then Continue For ' skip it if too small...
             Dim rect = blob.Rect
@@ -50,8 +50,8 @@ Public Class CComp_Basics
             Dim m = cv.Cv2.Moments(mask, True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
             Dim centroid = New cv.Point(CInt(m.M10 / m.M00), CInt(m.M01 / m.M00))
-            ocvb.result2(rect).Circle(centroid, 5, cv.Scalar.White, -1)
-            ocvb.result2.Rectangle(rect, cv.Scalar.White, 2)
+            dst2(rect).Circle(centroid, 5, cv.Scalar.White, -1)
+            dst2.Rectangle(rect, cv.Scalar.White, 2)
         Next
         lastImage = dst1.Clone()
     End Sub
@@ -101,18 +101,18 @@ Public Class CComp_ColorDepth
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim binary = gray.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
-        ocvb.result1 = binary.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = binary.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
-        cc.RenderBlobs(ocvb.result2)
+        cc.RenderBlobs(dst2)
 
         For Each blob In cc.Blobs.Skip(1)
             Dim roi = blob.Rect
             Dim avg = ocvb.RGBDepth(roi).Mean(binary(roi))
-            ocvb.result1(roi).SetTo(avg, binary(roi))
+            dst1(roi).SetTo(avg, binary(roi))
         Next
 
         For Each blob In cc.Blobs.Skip(1)
-            ocvb.result1.Rectangle(blob.Rect, cv.Scalar.White, 2)
+            dst1.Rectangle(blob.Rect, cv.Scalar.White, 2)
         Next
     End Sub
 End Class
@@ -131,7 +131,7 @@ Public Class CComp_Image
         If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim binary = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
-        ocvb.result1.SetTo(0)
+        dst1.SetTo(0)
 
         Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
 
@@ -144,7 +144,7 @@ Public Class CComp_Image
 
         For i = 0 To blobList.Count - 1
             Dim avg = ocvb.RGBDepth(blobList(i)).Mean(binary(blobList(i)))
-            ocvb.result1(blobList(i)).SetTo(avg, binary(blobList(i)))
+            dst1(blobList(i)).SetTo(avg, binary(blobList(i)))
         Next
 
         cv.Cv2.BitwiseNot(binary, binary)
@@ -158,7 +158,7 @@ Public Class CComp_Image
 
         For i = 0 To blobList.Count - 1
             Dim avg = ocvb.RGBDepth(blobList(i)).Mean(binary(blobList(i)))
-            ocvb.result1(blobList(i)).SetTo(avg, binary(blobList(i)))
+            dst1(blobList(i)).SetTo(avg, binary(blobList(i)))
         Next
     End Sub
 End Class
@@ -178,8 +178,8 @@ Public Class CComp_InRange_MT
         ocvb.label2 = "Blob rectangles - largest to smallest"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.result1.SetTo(0)
-        ocvb.result2.SetTo(0)
+        dst1.SetTo(0)
+        dst2.SetTo(0)
         If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Int32 = sliders.TrackBar1.Value
@@ -208,8 +208,8 @@ Public Class CComp_InRange_MT
                 Dim meanDepth = depth.Mean(mask(roiList(j)))
                 If meanDepth.Item(0) < maxDepth Then
                     Dim avg = ocvb.RGBDepth(roiList(j)).Mean(mask(roiList(j)))
-                    ocvb.result1(roiList(j)).SetTo(avg, bin)
-                    ocvb.result2(roiList(j)).SetTo(avg)
+                    dst1(roiList(j)).SetTo(avg, bin)
+                    dst2(roiList(j)).SetTo(avg)
                 End If
             Next
         End Sub)
@@ -231,15 +231,15 @@ Public Class CComp_InRange
         ocvb.label2 = "Blob rectangles - smallest to largest"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.result1.SetTo(0)
-        ocvb.result2.SetTo(0)
+        dst1.SetTo(0)
+        dst2.SetTo(0)
         If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Int32 = sliders.TrackBar1.Value
         Dim minBlobSize = sliders.TrackBar2.Value
 
         Dim mask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        ocvb.result1 = mask.Clone()
+        dst1 = mask.Clone()
 
         Dim roiList As New List(Of cv.Rect)
         For i = 0 To rangeCount - 1
@@ -254,7 +254,7 @@ Public Class CComp_InRange
         roiList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
         For i = 0 To roiList.Count - 1
             Dim avg = ocvb.RGBDepth(roiList(i)).Mean(mask(roiList(i)))
-            ocvb.result2(roiList(i)).SetTo(avg)
+            dst2(roiList(i)).SetTo(avg)
         Next
 
         ocvb.label1 = "# of blobs = " + CStr(roiList.Count) + " in " + CStr(rangeCount) + " regions"
@@ -292,14 +292,14 @@ Public Class CComp_Shapes
         Dim maxBlob = cc.GetLargestBlob()
         Dim filtered = New cv.Mat
         cc.FilterByBlob(shapes, filtered, maxBlob)
-        ocvb.result1 = filtered.Resize(ocvb.result1.Size())
+        dst1 = filtered.Resize(dst1.Size())
 
         Dim matTop As New cv.Mat, matBot As New cv.Mat, mat As New cv.Mat
         cv.Cv2.HConcat(rectView, labelview, matTop)
         cv.Cv2.HConcat(binary, gray, matBot)
         matBot = matBot.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.VConcat(matTop, matBot, mat)
-        ocvb.result2 = mat.Resize(ocvb.result2.Size())
+        dst2 = mat.Resize(dst2.Size())
     End Sub
 End Class
 

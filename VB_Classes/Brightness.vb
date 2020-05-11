@@ -23,7 +23,7 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
         ocvb.label1 = "GrayScale"
         ocvb.label2 = "CLAHE Result"
         cv.Cv2.CvtColor(imgGray, dst1, cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.CvtColor(imgClahe, ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(imgClahe, dst2, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -61,7 +61,7 @@ Public Class Brightness_hue
         ocvb.label1 = "Hue"
         ocvb.label2 = "Saturation"
         cv.Cv2.CvtColor(hsv_planes(0), dst1, cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.CvtColor(hsv_planes(1), ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(hsv_planes(1), dst2, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -147,7 +147,7 @@ Public Class Brightness_WhiteBalance_CPP
         dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, rgbPtr) ' no need to copy.  rgbPtr points to C++ data, not managed.
         Dim diff = dst1 - ocvb.color
         diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ocvb.result2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
     End Sub
     Public Sub Close()
         WhiteBalance_Close(wPtr)
@@ -212,7 +212,7 @@ Public Class Brightness_WhiteBalance
 
         Dim diff = dst1 - ocvb.color
         diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ocvb.result2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
     End Sub
     Public Sub Close()
         WhiteBalance_Close(wPtr)

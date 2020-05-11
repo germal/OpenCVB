@@ -347,9 +347,9 @@ Public Class Puzzle_Solver
         Dim cols = CInt(ocvb.color.Width / roilist(0).Width)
         Select Case bestCorner.corner
             Case cornerType.upperLeft, cornerType.upperRight
-                For nexty = 0 To ocvb.result2.Height - 1 Step roi.Height
-                    For nextx = 0 To ocvb.result2.Width - 1 Step roi.Width
-                        dst1(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
+                For nexty = 0 To dst2.Height - 1 Step roi.Height
+                    For nextx = 0 To dst2.Width - 1 Step roi.Width
+                        dst1(roi).CopyTo(dst2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
                         usedList.Add(fit.index)
                         col += 1
                         If col < cols Then
@@ -367,9 +367,9 @@ Public Class Puzzle_Solver
                     bestCorner = fit
                 Next
             Case cornerType.lowerLeft, cornerType.lowerRight
-                For nexty = ocvb.result2.Height - roi.Height To 0 Step -roi.Height
-                    For nextx = 0 To ocvb.result2.Width - 1 Step roi.Width
-                        dst1(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
+                For nexty = dst2.Height - roi.Height To 0 Step -roi.Height
+                    For nextx = 0 To dst2.Width - 1 Step roi.Width
+                        dst1(roi).CopyTo(dst2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
                         usedList.Add(fit.index)
                         col += 1
                         If col < cols Then

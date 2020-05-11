@@ -93,7 +93,7 @@ Public Class FloodFill_Top16_MT
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
 
         If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ocvb.result2 = src.Clone()
+        dst2 = src.Clone()
         grid.Run(ocvb)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
@@ -103,7 +103,7 @@ Public Class FloodFill_Top16_MT
                     If nextByte <> 255 And nextByte > 0 Then
                         Dim count = cv.Cv2.FloodFill(src, New cv.Point(x, y), cv.Scalar.White, roi, loDiff, hiDiff, cv.FloodFillFlags.FixedRange)
                         If count > minFloodSize Then
-                            count = cv.Cv2.FloodFill(ocvb.result2, New cv.Point(x, y), cv.Scalar.White, roi, loDiff, hiDiff, cv.FloodFillFlags.FixedRange)
+                            count = cv.Cv2.FloodFill(dst2, New cv.Point(x, y), cv.Scalar.White, roi, loDiff, hiDiff, cv.FloodFillFlags.FixedRange)
                         End If
                     End If
                 Next
@@ -132,7 +132,7 @@ Public Class FloodFill_Color_MT
         Dim hiDiff = cv.Scalar.All(flood.sliders.TrackBar3.Value)
 
         If standalone Then src = ocvb.color.Clone()
-        ocvb.result2 = src.Clone()
+        dst2 = src.Clone()
         grid.Run(ocvb)
         Dim vec255 = New cv.Vec3b(255, 255, 255)
         Dim vec0 = New cv.Vec3b(0, 0, 0)
@@ -144,7 +144,7 @@ Public Class FloodFill_Color_MT
                     If vec <> vec255 And vec <> vec0 Then
                         Dim count = cv.Cv2.FloodFill(src, New cv.Point(x, y), cv.Scalar.White, roi, loDiff, hiDiff, cv.FloodFillFlags.FixedRange + cv.FloodFillFlags.Link4)
                         If count > minFloodSize Then
-                            count = cv.Cv2.FloodFill(ocvb.result2, New cv.Point(x, y), cv.Scalar.White, roi, loDiff, hiDiff, cv.FloodFillFlags.FixedRange + cv.FloodFillFlags.Link4)
+                            count = cv.Cv2.FloodFill(dst2, New cv.Point(x, y), cv.Scalar.White, roi, loDiff, hiDiff, cv.FloodFillFlags.FixedRange + cv.FloodFillFlags.Link4)
                         End If
                     End If
                 Next
@@ -169,12 +169,12 @@ Public Class FloodFill_DCT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dct.Run(ocvb)
-        flood.src = ocvb.result2.Clone()
+        flood.src = dst2.Clone()
         Dim mask As New cv.Mat
-        cv.Cv2.BitwiseNot(ocvb.result1, mask)
+        cv.Cv2.BitwiseNot(dst1, mask)
         flood.src.SetTo(0, mask)
         flood.Run(ocvb)
-        ocvb.result2.SetTo(0, mask)
+        dst2.SetTo(0, mask)
     End Sub
 End Class
 
@@ -297,7 +297,7 @@ Public Class FloodFill_Top16
         For i = 0 To flood.masks.Count - 1
             Dim maskIndex = flood.maskSizes.ElementAt(i).Value
             Dim nextColor = ocvb.colorScalar(i Mod 255)
-            ocvb.result2.SetTo(nextColor, flood.masks(maskIndex))
+            dst2.SetTo(nextColor, flood.masks(maskIndex))
             If thumbCount < 16 Then
                 thumbNails(allRect) = flood.masks(maskIndex).Resize(allSize).Threshold(0, 255, cv.ThresholdTypes.Binary)
                 thumbNails.Rectangle(allRect, cv.Scalar.White, 1)
@@ -309,7 +309,7 @@ Public Class FloodFill_Top16
                 thumbCount += 1
             End If
         Next
-        If check.Box(0).Checked Then ocvb.result2 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If check.Box(0).Checked Then dst2 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
     End Sub
 End Class

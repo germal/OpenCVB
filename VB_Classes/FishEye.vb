@@ -39,7 +39,7 @@ Public Class FishEye_Rectified
         End If
         if standalone Then
             dst1 = leftView
-            ocvb.result2 = rightView
+            dst2 = rightView
         End If
     End Sub
 End Class
@@ -62,6 +62,6 @@ Public Class FishEye_Raw
         ocvb.label1 = "Left Fisheye Image"
         ocvb.label2 = "Right Fisheye Image"
         dst1 = ocvb.leftView
-        ocvb.result2 = ocvb.rightView
+        dst2 = ocvb.rightView
     End Sub
 End Class

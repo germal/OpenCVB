@@ -14,13 +14,13 @@ Public Class Sharpen_UnsharpMask
         Dim sigma As Double = sliders.TrackBar1.Value / 100
         Dim threshold As Double = sliders.TrackBar2.Value
         Dim amount As Double = sliders.TrackBar3.Value / 1000
-        cv.Cv2.GaussianBlur(ocvb.color, ocvb.result2, New cv.Size(), sigma, sigma)
+        cv.Cv2.GaussianBlur(ocvb.color, dst2, New cv.Size(), sigma, sigma)
 
         Dim diff As New cv.Mat
-        cv.Cv2.Absdiff(ocvb.color, ocvb.result2, diff)
+        cv.Cv2.Absdiff(ocvb.color, dst2, diff)
         diff = diff.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
         dst1 = ocvb.color * (1 + amount) + diff * (-amount)
-        diff.CopyTo(ocvb.result2)
+        diff.CopyTo(dst2)
     End Sub
 End Class
 

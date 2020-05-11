@@ -73,9 +73,9 @@ Public Class KAZE_Match_CS
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         red.Run(ocvb)
-        Dim result = CS_Kaze.Run(dst1, ocvb.result2)
+        Dim result = CS_Kaze.Run(dst1, dst2)
         result(New cv.Rect(0, 0, dst1.Width, dst1.Height)).CopyTo(dst1)
-        result(New cv.Rect(dst1.Width, 0, dst1.Width, dst1.Height)).CopyTo(ocvb.result2)
+        result(New cv.Rect(dst1.Width, 0, dst1.Width, dst1.Height)).CopyTo(dst2)
     End Sub
 End Class
 
@@ -98,7 +98,7 @@ Public Class KAZE_LeftAligned_CS
         CS_KazeRight.GetKeypoints(ocvb.rightView)
 
         dst1 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.result2 = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim topDistance = sliders.TrackBar2.Value
         Dim maxPoints = sliders.TrackBar1.Value
@@ -120,10 +120,10 @@ Public Class KAZE_LeftAligned_CS
                 End If
             Next
             If minDistance < Single.MaxValue Then
-                ocvb.result2.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+                dst2.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
                 dst1.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-                ocvb.result2.Circle(CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-                ocvb.result2.Line(pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+                dst2.Circle(CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                dst2.Line(pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
             End If
         Next
         ocvb.label1 = "Right image has " + CStr(CS_KazeRight.kazeKeyPoints.Count) + " key points"

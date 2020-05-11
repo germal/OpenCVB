@@ -57,7 +57,7 @@ Public Class Voxels_Basics_MT
             dst1.SetTo(cv.Scalar.White, grid.gridMask)
             Dim nearColor = cv.Scalar.Yellow
             Dim farColor = cv.Scalar.Blue
-            ocvb.result2.SetTo(0)
+            dst2.SetTo(0)
             Parallel.For(0, gridCount,
             Sub(i)
                 Dim roi = grid.roiList(i)
@@ -66,7 +66,7 @@ Public Class Voxels_Basics_MT
                     Dim color = New cv.Scalar(((256 - v) * nearColor(0) + v * farColor(0)) >> 8,
                                               ((256 - v) * nearColor(1) + v * farColor(1)) >> 8,
                                               ((256 - v) * nearColor(2) + v * farColor(2)) >> 8)
-                    ocvb.result2(roi).SetTo(color, trim.Mask(roi))
+                    dst2(roi).SetTo(color, trim.Mask(roi))
                 End If
             End Sub)
         End If

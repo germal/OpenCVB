@@ -63,7 +63,7 @@ Public Class Harris_Features_CPP
         Dim gray32f = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_32F, dstData)
         gray32f.ConvertTo(dst1, cv.MatType.CV_8U)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.AddWeighted(dst1, 0.5, ocvb.color, 0.5, 0, ocvb.result2)
+        cv.Cv2.AddWeighted(dst1, 0.5, ocvb.color, 0.5, 0, dst2)
     End Sub
     Public Sub Close()
         Harris_Features_Close(Harris_Features)

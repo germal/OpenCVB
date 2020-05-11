@@ -69,20 +69,20 @@ Public Class Random_LUTMask
             lutMat = cv.Mat.Zeros(New cv.Size(1, 256), cv.MatType.CV_8UC3)
             Dim lutIndex = 0
             km.Run(ocvb) ' sets result1
-            dst1.CopyTo(ocvb.result2)
+            dst1.CopyTo(dst2)
             For i = 0 To random.Points.Length - 1
                 Dim x = random.Points(i).X
                 Dim y = random.Points(i).Y
                 If x >= ocvb.drawRect.X And x < ocvb.drawRect.X + ocvb.drawRect.Width Then
                     If y >= ocvb.drawRect.Y And y < ocvb.drawRect.Y + ocvb.drawRect.Height Then
-                        lutMat.Set(lutIndex, 0, ocvb.result2.Get(Of cv.Vec3b)(y, x))
+                        lutMat.Set(lutIndex, 0, dst2.Get(Of cv.Vec3b)(y, x))
                         lutIndex += 1
                         If lutIndex >= lutMat.Rows Then Exit For
                     End If
                 End If
             Next
         End If
-        ocvb.result2 = ocvb.color.LUT(lutMat)
+        dst2 = ocvb.color.LUT(lutMat)
         ocvb.label1 = "Using kmeans colors with interpolation"
     End Sub
 End Class

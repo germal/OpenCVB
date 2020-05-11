@@ -15,7 +15,7 @@ Public Class Object_Basics
         trim.Run(ocvb)
         If standalone Then
             dst1 = trim.Mask
-            ocvb.result2 = trim.zeroMask
+            dst2 = trim.zeroMask
         End If
 
         ocvb.color.CopyTo(ccomp.src, trim.Mask)

@@ -18,7 +18,7 @@ Public Class Binarize_OTSU
         ocvb.label2 = "Histograms correspond to images on the left"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         Dim w = ocvb.color.Width, h = ocvb.color.Height
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim meanScalar = cv.Cv2.Mean(gray)
@@ -42,7 +42,7 @@ Public Class Binarize_OTSU
         Next
 
         mats1.Run(ocvb)
-        dst1 = ocvb.result2.Clone() ' mat_4to1 puts output in result2
+        dst1 = dst2.Clone() ' mat_4to1 puts output in result2
         mats2.Run(ocvb)
     End Sub
 End Class
@@ -73,7 +73,7 @@ Public Class Binarize_Niblack_Sauvola
         cv.Extensions.Binarizer.Niblack(gray, grayBin, kernelSize, sliders.TrackBar2.Value / 1000)
         dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Extensions.Binarizer.Sauvola(gray, grayBin, kernelSize, sliders.TrackBar3.Value / 1000, sliders.TrackBar4.Value)
-        ocvb.result2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -102,7 +102,7 @@ Public Class Binarize_Niblack_Nick
         cv.Extensions.Binarizer.Niblack(gray, grayBin, kernelSize, sliders.TrackBar2.Value / 1000)
         dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Extensions.Binarizer.Nick(gray, grayBin, kernelSize, sliders.TrackBar3.Value / 1000)
-        ocvb.result2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 

@@ -34,19 +34,19 @@ Public Class Blob_Input
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency = 0 Then
             rectangles.Run(ocvb)
-            Mats.mat(0) = ocvb.result1.Clone()
+            Mats.mat(0) = dst1.Clone()
 
             circles.Run(ocvb)
-            Mats.mat(1) = ocvb.result1.Clone()
+            Mats.mat(1) = dst1.Clone()
 
             ellipses.Run(ocvb)
-            Mats.mat(2) = ocvb.result1.Clone()
+            Mats.mat(2) = dst1.Clone()
 
             poly.Run(ocvb)
-            Mats.mat(3) = ocvb.result2.Clone()
+            Mats.mat(3) = dst2.Clone()
             Mats.Run(ocvb)
-            ocvb.result2.CopyTo(ocvb.result1)
-            ocvb.result2.SetTo(0)
+            dst2.CopyTo(dst1)
+            dst2.SetTo(0)
         End If
     End Sub
 End Class
@@ -96,7 +96,7 @@ Public Class Blob_Detector_CS
         input.Run(ocvb)
 
         ' The create method in SimpleBlobDetector is not available in VB.Net.  Not sure why.  To get around this, just use C# where create method works fine.
-        blobDetector.Start(ocvb.result1, ocvb.result2, blobParams)
+        blobDetector.Start(dst1, dst2, blobParams)
     End Sub
 End Class
 
@@ -116,9 +116,9 @@ Public Class Blob_RenderBlobs
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 100 = 0 Then
             input.Run(ocvb)
-            Dim gray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.BinaryInv)
-            Dim labelView = ocvb.result1.EmptyClone
+            Dim labelView = dst1.EmptyClone
             Dim stats As New cv.Mat
             Dim centroids As New cv.Mat
             Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
@@ -127,11 +127,11 @@ Public Class Blob_RenderBlobs
             cc.RenderBlobs(labelView)
 
             Dim maxBlob = cc.GetLargestBlob()
-            ocvb.result2.SetTo(0)
-            cc.FilterByBlob(ocvb.result1, ocvb.result2, maxBlob)
+            dst2.SetTo(0)
+            cc.FilterByBlob(dst1, dst2, maxBlob)
 
             For Each blob In cc.Blobs.Skip(1)
-                ocvb.result1.Rectangle(blob.Rect, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+                dst1.Rectangle(blob.Rect, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
             Next
         End If
     End Sub
@@ -197,7 +197,7 @@ Public Class Blob_Rectangles
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blobs.Run(ocvb)
-        ocvb.result1 = ocvb.color.Clone()
+        dst1 = ocvb.color.Clone()
 
         ' sort the blobs by size before delivery to kalman
         Dim sortedBlobs As New SortedList(Of cv.Rect, Integer)(New CompareRect)
@@ -220,7 +220,7 @@ Public Class Blob_Rectangles
             kalman(i).input = {rect.X, rect.Y, rect.Width, rect.Height}
             kalman(i).Run(ocvb)
             rect = New cv.Rect(kalman(i).output(0), kalman(i).output(1), kalman(i).output(2), kalman(i).output(3))
-            ocvb.result1.Rectangle(rect, ocvb.colorScalar(i Mod 255), 2)
+            dst1.Rectangle(rect, ocvb.colorScalar(i Mod 255), 2)
         Next
     End Sub
 End Class
@@ -251,12 +251,12 @@ Public Class Blob_Largest
 
         If masks.Count > 0 Then
             Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(blobIndex).Value ' this is the largest contiguous blob
-            ocvb.color.CopyTo(ocvb.result1, masks(maskIndex))
+            ocvb.color.CopyTo(dst1, masks(maskIndex))
             kalman.input = {rects(maskIndex).X, rects(maskIndex).Y, rects(maskIndex).Width, rects(maskIndex).Height}
             kalman.Run(ocvb)
             Dim res = kalman.output
             Dim rect = New cv.Rect(CInt(res(0)), CInt(res(1)), CInt(res(2)), CInt(res(3)))
-            ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
+            dst1.Rectangle(rect, cv.Scalar.Red, 2)
         End If
         ocvb.label1 = "Show the largest blob of the " + CStr(rects.Count) + " blobs"
     End Sub
@@ -280,12 +280,12 @@ Public Class Blob_LargestDepthCluster
         Dim blobList = blobs.histBlobs.valleys.rangeBoundaries
 
         Dim maxSize = blobs.histBlobs.valleys.sortedSizes.ElementAt(0)
-        ocvb.result1.SetTo(0)
+        dst1.SetTo(0)
         Dim startEndDepth = blobs.histBlobs.valleys.rangeBoundaries.ElementAt(0)
         Dim tmp As New cv.Mat, mask As New cv.Mat
         cv.Cv2.InRange(getDepth32f(ocvb), startEndDepth.X, startEndDepth.Y, tmp)
         cv.Cv2.ConvertScaleAbs(tmp, mask)
-        ocvb.color.CopyTo(ocvb.result1, mask)
+        ocvb.color.CopyTo(dst1, mask)
         ocvb.label1 = "Largest Depth Blob: " + Format(maxSize, "#,000") + " pixels (" + Format(maxSize / ocvb.color.Total, "#0.0%") + ")"
     End Sub
 End Class

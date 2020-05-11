@@ -55,7 +55,7 @@ Public Class WarpModel_Input
         Dim merged As New cv.Mat
         cv.Cv2.Merge(rgb, merged)
         dst1(r(0)) = rgb(0).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.result2(r(0)) = merged
+        dst2(r(0)) = merged
     End Sub
 End Class
 

@@ -35,7 +35,7 @@ Public Class KLT_Basics
 
         gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If ocvb.frameCount = 0 Or inputPoints Is Nothing Then
-            ocvb.result2.SetTo(0)
+            dst2.SetTo(0)
             inputPoints = cv.Cv2.GoodFeaturesToTrack(gray, maxCorners, qualityLevel, minDistance, New cv.Mat, blockSize, False, 0)
             If inputPoints.Length > 0 Then
                 inputPoints = cv.Cv2.CornerSubPix(gray, inputPoints, subPixWinSize, New cv.Size(-1, -1), term)
@@ -95,7 +95,7 @@ Public Class KLT_OpticalFlow
             For i = 0 To klt.inputPoints.Length - 1
                 If klt.status.Get(Of Byte)(i) And i < lastpoints.Length And i < klt.inputPoints.Length Then
                     dst1.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-                    ocvb.result2.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+                    dst2.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
                 End If
             Next
         End If

@@ -170,7 +170,7 @@ Public Class Dither_Basics
             If i = 0 Then
                 dst1 = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_8UC3, pixels).Clone()
             Else
-                ocvb.result2 = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_8UC3, pixels).Clone()
+                dst2 = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_8UC3, pixels).Clone()
             End If
         Next
         hpixels.Free()

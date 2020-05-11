@@ -37,7 +37,7 @@ Public Class Distance_Basics
         Dim dist = gray.DistanceTransform(DistanceType, kernelSize)
         Dim dist32f = dist.Normalize(0, 255, cv.NormTypes.MinMax)
         dist32f.ConvertTo(gray, cv.MatType.CV_8UC1)
-        ocvb.result2 = gray.CvtColor(cv.ColorConversionCodes.gray2bgr)
+        dst2 = gray.CvtColor(cv.ColorConversionCodes.gray2bgr)
     End Sub
 End Class
 

@@ -49,6 +49,6 @@ Public Class LUT_Color
         End If
         Dim colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, paletteMap)
         dst1 = src.LUT(colorMat)
-        ocvb.result2 = colorMat.Resize(src.Size())
+        dst2 = colorMat.Resize(src.Size())
     End Sub
 End Class

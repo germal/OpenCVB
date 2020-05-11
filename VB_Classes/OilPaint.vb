@@ -89,9 +89,9 @@ Public Class OilPaint_ColorProbability
         km.Run(ocvb)
         Dim c() = km.clusterColors
         If c Is Nothing Then Exit Sub
-        For y = 0 To ocvb.result2.Height - 1
-            For x = 0 To ocvb.result2.Width - 1
-                Dim pixel = ocvb.result2.Get(Of cv.Vec3b)(y, x)
+        For y = 0 To dst2.Height - 1
+            For x = 0 To dst2.Width - 1
+                Dim pixel = dst2.Get(Of cv.Vec3b)(y, x)
                 For i = 0 To c.Length - 1
                     If pixel = c(i) Then
                         color_probability(i) += 1
@@ -102,7 +102,7 @@ Public Class OilPaint_ColorProbability
         Next
 
         For i = 0 To color_probability.Length - 1
-            color_probability(i) /= ocvb.result2.Total
+            color_probability(i) /= dst2.Total
         Next
     End Sub
 End Class
@@ -189,10 +189,10 @@ Public Class OilPaint_Manual_CS
         Dim roi = ocvb.drawRect
         ocvb.color.CopyTo(dst1)
         oilPaint.Start(ocvb.color(roi), dst1(roi), kernelSize, sliders.TrackBar2.Value)
-        ocvb.result2.SetTo(0)
-        Dim factor As Int32 = Math.Min(Math.Floor(ocvb.result2.Width / roi.Width), Math.Floor(ocvb.result2.Height / roi.Height))
+        dst2.SetTo(0)
+        Dim factor As Int32 = Math.Min(Math.Floor(dst2.Width / roi.Width), Math.Floor(dst2.Height / roi.Height))
         Dim s = New cv.Size(roi.Width * factor, roi.Height * factor)
-        cv.Cv2.Resize(dst1(roi), ocvb.result2(New cv.Rect(0, 0, s.Width, s.Height)), s)
+        cv.Cv2.Resize(dst1(roi), dst2(New cv.Rect(0, 0, s.Width, s.Height)), s)
     End Sub
 End Class
 
@@ -221,11 +221,11 @@ Public Class OilPaint_Cartoon
     Public Sub Run(ocvb As AlgorithmData)
         Dim roi = ocvb.drawRect
         laplacian.Run(ocvb)
-        Dim edges = dst1.CvtColor(cv.ColorConversionCodes.bgr2gray)
+        Dim edges = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         oil.Run(ocvb)
 
-        ocvb.result2 = edges.CvtColor(cv.ColorConversionCodes.gray2bgr)
+        dst2 = edges.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim threshold = oil.sliders.TrackBar3.Value
         Dim vec000 = New cv.Vec3b(0, 0, 0)

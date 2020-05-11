@@ -28,8 +28,8 @@ Public Class MeanShift_Basics
             cv.Cv2.MeanShift(backProj, trackbox, cv.TermCriteria.Both(10, 1))
             dst1 = backProj.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst1.Rectangle(trackbox, cv.Scalar.Red, rectangleEdgeWidth, cv.LineTypes.AntiAlias)
-            Show_HSV_Hist(ocvb.result2, roi_hist)
-            ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
+            Show_HSV_Hist(dst2, roi_hist)
+            dst2 = dst2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         Else
             dst1 = ocvb.color
         End If
@@ -119,12 +119,12 @@ Public Class Meanshift_TopObjects
 
                 cams(i).Run(ocvb)
                 mats1.mat(i) = dst1.Clone()
-                mats2.mat(i) = ocvb.result2.Clone()
+                mats2.mat(i) = dst2.Clone()
                 trackBoxes.Add(cams(i).trackbox)
             End If
         Next
         mats1.Run(ocvb)
-        dst1 = ocvb.result2.Clone()
+        dst1 = dst2.Clone()
         mats2.Run(ocvb)
     End Sub
 End Class

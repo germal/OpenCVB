@@ -38,17 +38,17 @@ Public Class FAST_Centroid
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         fast.Run(ocvb)
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         For Each kp As cv.KeyPoint In fast.keypoints
-            ocvb.result2.Circle(kp.Pt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+            dst2.Circle(kp.Pt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
         Next kp
-        Dim gray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim m = cv.Cv2.Moments(gray, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
             kalman.input(0) = m.M10 / m.M00
             kalman.input(1) = m.M01 / m.M00
             kalman.Run(ocvb)
-            ocvb.result2.Circle(New cv.Point(kalman.output(0), kalman.output(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(New cv.Point(kalman.output(0), kalman.output(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
     End Sub
 End Class

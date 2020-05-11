@@ -15,11 +15,11 @@ Public Class xPhoto_Bm3dDenoise
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(gray, gray)
         CvXPhoto.Bm3dDenoising(gray, dst1)
-        cv.Cv2.Subtract(dst1, gray, ocvb.result2)
+        cv.Cv2.Subtract(dst1, gray, dst2)
         Dim minVal As Double, maxVal As Double
-        ocvb.result2.MinMaxLoc(minVal, maxVal)
+        dst2.MinMaxLoc(minVal, maxVal)
         ocvb.label2 = "Diff from input - max change=" + CStr(maxVal)
-        ocvb.result2 = ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
+        dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
 End Class
 
@@ -39,11 +39,11 @@ Public Class xPhoto_Bm3dDenoiseDepthImage
         Dim gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(gray, gray)
         CvXPhoto.Bm3dDenoising(gray, dst1)
-        cv.Cv2.Subtract(dst1, gray, ocvb.result2)
+        cv.Cv2.Subtract(dst1, gray, dst2)
         Dim minVal As Double, maxVal As Double
-        ocvb.result2.MinMaxLoc(minVal, maxVal)
+        dst2.MinMaxLoc(minVal, maxVal)
         ocvb.label2 = "Diff from input - max change=" + CStr(maxVal)
-        ocvb.result2 = ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
+        dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
 End Class
 
@@ -73,15 +73,15 @@ Public Class xPhoto_OilPaint_CPP
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "xPhoto Dynamic Ratio", 1, 127, 7)
         sliders.setupTrackBar2(ocvb, caller, "xPhoto Block Size", 1, 100, 3)
-        
-        radio.Setup(ocvb, caller,5)
+
+        radio.Setup(ocvb, caller, 5)
         radio.check(0).Text = "BGR2GRAY"
         radio.check(1).Text = "BGR2HSV"
         radio.check(2).Text = "BGR2YUV  "
         radio.check(3).Text = "BGR2XYZ"
         radio.check(4).Text = "BGR2Lab"
         radio.check(0).Checked = True
-        
+
         Application.DoEvents() ' because the rest of initialization takes so long, let the show() above take effect.
         xPhoto_OilPaint = xPhoto_OilPaint_Open()
         ocvb.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
@@ -117,7 +117,7 @@ Public Class xPhoto_OilPaint_CPP
             If ocvb.drawRect.Width <> 0 Then
                 dst1 = ocvb.color
                 dst1(ocvb.drawRect) = dst1
-                ocvb.result2 = dst1.Resize(ocvb.result2.Size)
+                dst2 = dst1.Resize(dst2.Size)
             End If
         End If
     End Sub

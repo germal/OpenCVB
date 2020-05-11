@@ -21,7 +21,7 @@ Public Class Gradient_Basics
         sobel.grayY.ConvertTo(y32f, cv.MatType.CV_32F)
         cv.Cv2.Phase(x32f, y32f, angle)
         Dim gray = angle.Normalize(255, 0, cv.NormTypes.MinMax)
-        gray.ConvertTo(ocvb.result2, cv.MatType.CV_8UC1)
+        gray.ConvertTo(dst2, cv.MatType.CV_8UC1)
         dst1 = sobel.dst1
     End Sub
 End Class
@@ -48,7 +48,7 @@ Public Class Gradient_Depth
         sobel.grayY.ConvertTo(y32f, cv.MatType.CV_32F)
         cv.Cv2.Phase(x32f, y32f, angle)
         Dim gray = angle.Normalize(255, 0, cv.NormTypes.MinMax)
-        gray.ConvertTo(ocvb.result2, cv.MatType.CV_8UC1)
+        gray.ConvertTo(dst2, cv.MatType.CV_8UC1)
         dst1 = sobel.dst1
     End Sub
 End Class

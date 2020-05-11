@@ -116,7 +116,7 @@ Public Class kMeans_RGB_Plus_XYDepth
         ocvb.desc = "Cluster with kMeans RGB, x, y, and depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        km.Run(ocvb) ' cluster the rgb image - output is in ocvb.result2
+        km.Run(ocvb) ' cluster the rgb image - output is in dst2
         Dim rgb32f As New cv.Mat
         km.dst1.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim xyDepth32f As New cv.Mat(rgb32f.Size(), cv.MatType.CV_32FC3, 0)
@@ -230,7 +230,7 @@ Public Class kMeans_RGB1_MT
                 For x = 0 To allLabels.Cols - 1
                     Dim cIndex = allLabels.Get(Of Byte)(y, x)
                     If cIndex < clusterColors.Count Then
-                        ocvb.result2.Set(Of cv.Vec3b)(y, x, clusterColors(cIndex))
+                        dst2.Set(Of cv.Vec3b)(y, x, clusterColors(cIndex))
                     End If
                 Next
             Next
@@ -396,7 +396,7 @@ Public Class kMeans_RGB3_MT
                                 ldst1.Set(y, x, New cv.Vec3b(finalColor(0), finalColor(1), finalColor(2)))
                             Next
                         Next
-                        ldst1.CopyTo(ocvb.result2(roi))
+                        ldst1.CopyTo(dst2(roi))
                     End Sub)
         Next
         Task.WaitAll(taskArray)
@@ -419,10 +419,10 @@ Public Class kMeans_ReducedRGB
         ocvb.desc = "Reduce each pixel by the reduction factor and then run kmeans."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.result2 = ocvb.color / sliders.TrackBar1.Value
-        ocvb.result2 *= sliders.TrackBar1.Value
+        dst2 = ocvb.color / sliders.TrackBar1.Value
+        dst2 *= sliders.TrackBar1.Value
 
-        Dim src = ocvb.result2
+        Dim src = dst2
         Dim k = sliders.TrackBar2.Value
         Dim n = src.Rows * src.Cols
         Dim data = src.Reshape(1, n)
@@ -619,7 +619,7 @@ Public Class kMeans_RGB4_MT
                             ldst1.Set(y, x, New cv.Vec3b(finalColor(0), finalColor(1), finalColor(2)))
                         Next
                     Next
-                    ldst1.CopyTo(ocvb.result2(roi))
+                    ldst1.CopyTo(dst2(roi))
                 End Sub)
         Dim factor = CInt(255.0 / clusterCount)
         allLabels = factor * allLabels

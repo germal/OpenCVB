@@ -13,7 +13,7 @@ Public Class TransformationMatrix_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1.SetTo(0)
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         If ocvb.parms.transformationMatrix IsNot Nothing Then
             Dim t = ocvb.parms.transformationMatrix
             Dim mul = sliders.TrackBar1.Value
@@ -28,7 +28,7 @@ Public Class TransformationMatrix_Basics
                 End If
 
                 If pt.Z > 0 And pt.Z < dst1.Width And pt.Y > 0 And pt.Y < ocvb.color.Height Then
-                    ocvb.result2.Circle(New cv.Point(pt.Z, pt.Y), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                    dst2.Circle(New cv.Point(pt.Z, pt.Y), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
                 End If
             Next
 

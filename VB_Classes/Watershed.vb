@@ -6,21 +6,21 @@ Public Class Watershed_Basics
         setCaller(callerRaw)
         ocvb.label1 = "Draw with left-click to select region."
         ocvb.label2 = "Mask for watershed (selected regions)."
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         ocvb.desc = "Watershed API experiment.  Draw on the image to test."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src = ocvb.color
         If useDepthImage = True Then src = ocvb.RGBDepth
         If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
-            cv.Cv2.Rectangle(ocvb.result2, ocvb.drawRect, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Rectangle(dst2, ocvb.drawRect, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
             ocvb.drawRect = New cv.Rect(0, 0, 0, 0)
         End If
 
-        Dim gray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If gray.CountNonZero() Then
             Dim markerMask As New cv.Mat
-            markerMask = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            markerMask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             cv.Cv2.Rectangle(markerMask, ocvb.drawRect, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
 
             Dim contours()() As cv.Point = Nothing
@@ -65,7 +65,7 @@ Public Class Watershed_DepthAuto
     Dim watershed As Watershed_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         watershed = New Watershed_Basics(ocvb, caller)
         watershed.useDepthImage = True
         ocvb.desc = "Watershed the depth image using shadow, close, and far points."
@@ -77,7 +77,7 @@ Public Class Watershed_DepthAuto
         ' erode the blobs at distinct depths to keep them separate
         Dim morphShape = cv.MorphShapes.Cross
         Dim element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(5, 5))
-        ocvb.result2 = dst1.Erode(element, New cv.Point(3, 3), 5)
+        dst2 = dst1.Erode(element, New cv.Point(3, 3), 5)
 
         watershed.Run(ocvb)
     End Sub
@@ -91,7 +91,7 @@ Public Class Watershed_RGBSimpleAuto
     Dim watershed As Watershed_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
 
         watershed = New Watershed_Basics(ocvb, caller)
 
@@ -100,10 +100,10 @@ Public Class Watershed_RGBSimpleAuto
         Dim botLeft = New cv.Rect(0, ocvb.color.Height - 100, 100, 100)
         Dim botRight = New cv.Rect(ocvb.color.Width - 100, ocvb.color.Height - 100, 100, 100)
 
-        cv.Cv2.Rectangle(ocvb.result2, topLeft, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
-        cv.Cv2.Rectangle(ocvb.result2, topRight, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
-        cv.Cv2.Rectangle(ocvb.result2, botLeft, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
-        cv.Cv2.Rectangle(ocvb.result2, botRight, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
+        cv.Cv2.Rectangle(dst2, topLeft, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
+        cv.Cv2.Rectangle(dst2, topRight, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
+        cv.Cv2.Rectangle(dst2, botLeft, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
+        cv.Cv2.Rectangle(dst2, botRight, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
         ocvb.desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -119,7 +119,7 @@ Public Class Watershed_RGBDepthAuto
     Dim watershed As Watershed_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
 
         watershed = New Watershed_Basics(ocvb, caller)
 
@@ -128,9 +128,9 @@ Public Class Watershed_RGBDepthAuto
         Dim botLeft = New cv.Rect(0, ocvb.color.Height - 100, 100, 100)
         Dim botRight = New cv.Rect(ocvb.color.Width - 100, ocvb.color.Height - 100, 100, 100)
 
-        cv.Cv2.Rectangle(ocvb.result2, topRight, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
-        cv.Cv2.Rectangle(ocvb.result2, botLeft, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
-        cv.Cv2.Rectangle(ocvb.result2, botRight, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
+        cv.Cv2.Rectangle(dst2, topRight, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
+        cv.Cv2.Rectangle(dst2, botLeft, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
+        cv.Cv2.Rectangle(dst2, botRight, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
         ocvb.desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

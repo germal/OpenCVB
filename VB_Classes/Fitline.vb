@@ -18,8 +18,8 @@ Public Class Fitline_Basics
         If standalone Then
             draw.Run(ocvb)
             src = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
-            ocvb.result2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst1 = ocvb.result2
+            dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst1 = dst2
         Else
             If draw.sliders.Visible Then draw.sliders.Visible = False
             lines.Clear()
@@ -60,8 +60,8 @@ Public Class Fitline_3DBasics_MT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hlines.Run(ocvb)
-        Dim mask = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        ocvb.result2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.color.CopyTo(dst1)
         Dim depth32f = getDepth32f(ocvb)
 
@@ -88,7 +88,7 @@ Public Class Fitline_3DBasics_MT
                 ' save the average color for this roi
                 Dim mean = ocvb.RGBDepth(roi).Mean()
                 mean(0) = 255 - mean(0)
-                ocvb.result2.Rectangle(roi, mean, -1, cv.LineTypes.AntiAlias)
+                dst2.Rectangle(roi, mean, -1, cv.LineTypes.AntiAlias)
             Else
                 Dim fitArray = points.ToArray()
                 line = cv.Cv2.FitLine(fitArray, cv.DistanceTypes.L2, 0, 0, 0.01)
@@ -216,14 +216,14 @@ Public Class Fitline_EigenFit
         highlight = noisyLine.check.Box(0).Checked
 
         Dim w = ocvb.color.Width
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
 
         Dim line = cv.Cv2.FitLine(noisyLine.points, cv.DistanceTypes.L2, 1, 0.01, 0.01)
         Dim m = line.Vy / line.Vx
         Dim bb = line.Y1 - m * line.X1
         Dim p1 = New cv.Point(0, bb)
         Dim p2 = New cv.Point(w, m * w + bb)
-        ocvb.result2.Line(p1, p2, cv.Scalar.Red, 20, cv.LineTypes.AntiAlias)
+        dst2.Line(p1, p2, cv.Scalar.Red, 20, cv.LineTypes.AntiAlias)
 
         Dim pointMat = New cv.Mat(noisyLine.points.Count, 1, cv.MatType.CV_32FC2, noisyLine.points.ToArray)
         Dim mean = pointMat.Mean()
@@ -260,12 +260,12 @@ Public Class Fitline_EigenFit
         Dim m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
 
         If Math.Abs(m2) > 1.0 Then
-            ocvb.result2.Line(p1, p2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
+            dst2.Line(p1, p2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
         Else
             p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * Len / 2, mean.Val1 - Math.Sin(-theta) * Len / 2)
             p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * Len / 2, mean.Val1 + Math.Sin(-theta) * Len / 2)
             m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
-            ocvb.result2.Line(p1, p2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
+            dst2.Line(p1, p2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
         End If
 
         ocvb.putText(New ActiveClass.TrueType("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(Len)) + vbCrLf +
@@ -275,7 +275,7 @@ Public Class Fitline_EigenFit
 
         p1 = New cv.Point(0, noisyLine.bb)
         p2 = New cv.Point(w, noisyLine.m * w + noisyLine.bb)
-        ocvb.result2.Line(p1, p2, cv.Scalar.Blue, 3, cv.LineTypes.AntiAlias)
+        dst2.Line(p1, p2, cv.Scalar.Blue, 3, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 

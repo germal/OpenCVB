@@ -11,7 +11,7 @@ Public Class HOG_Basics
         sliders.setupTrackBar3(ocvb, caller, "Scale", 0, 2000, 300)
         ocvb.desc = "Find people with Histogram of Gradients (HOG) 2D feature"
         staticImage = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
-        ocvb.result2 = staticImage.Resize(ocvb.result2.Size)
+        dst2 = staticImage.Resize(dst2.Size)
     End Sub
     Private Sub drawFoundRectangles(dst1 As cv.Mat, found() As cv.Rect)
         For Each rect As cv.Rect In found
@@ -47,8 +47,8 @@ Public Class HOG_Basics
         drawFoundRectangles(dst1, found)
 
         If staticImageProcessed = False Then
-            found = hog.DetectMultiScale(ocvb.result2, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)
-            drawFoundRectangles(ocvb.result2, found)
+            found = hog.DetectMultiScale(dst2, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)
+            drawFoundRectangles(dst2, found)
             If found.Length > 0 Then
                 staticImageProcessed = True
                 ocvb.label2 = String.Format("{0} region(s) found", found.Length)

@@ -44,7 +44,7 @@ Public Class BlockMatching_Basics
         colorizer.src = disparity
         colorizer.Run(ocvb)
         dst1 = dst1.Resize(ocvb.color.Size())
-        ocvb.result2 = ocvb.rightView.Resize(ocvb.color.Size())
+        dst2 = ocvb.rightView.Resize(ocvb.color.Size())
     End Sub
 End Class
 

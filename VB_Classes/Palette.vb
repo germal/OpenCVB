@@ -16,7 +16,7 @@ Public Class Palette_Color
         Dim g = sliders.TrackBar2.Value
         Dim r = sliders.TrackBar3.Value
         dst1.SetTo(New cv.Scalar(b, g, r))
-        ocvb.result2.SetTo(New cv.Scalar(255 - b, 255 - g, 255 - r))
+        dst2.SetTo(New cv.Scalar(255 - b, 255 - g, 255 - r))
         ocvb.label1 = "Color (RGB) = " + CStr(b) + " " + CStr(g) + " " + CStr(r)
         ocvb.label2 = "Color (255 - RGB) = " + CStr(255 - b) + " " + CStr(255 - g) + " " + CStr(255 - r)
     End Sub
@@ -42,9 +42,9 @@ Public Class Palette_LinearPolar
         Dim iFlag = getInterpolationRadioButtons(radio)
         Static pt = New cv.Point2f(ocvb.ms_rng.Next(0, dst1.Cols - 1), ocvb.ms_rng.Next(0, dst1.Rows - 1))
         Dim radius = sliders.TrackBar1.Value ' ocvb.ms_rng.next(0, dst1.Cols)
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         cv.Cv2.LinearPolar(dst1, dst1, pt, radius, iFlag)
-        cv.Cv2.LinearPolar(ocvb.color, ocvb.result2, pt, radius, iFlag)
+        cv.Cv2.LinearPolar(ocvb.color, dst2, pt, radius, iFlag)
     End Sub
 End Class
 
@@ -165,8 +165,8 @@ Public Class Palette_Map
 
             Dim maxCount = cv.Cv2.CountNonZero(mask)
 
-            ocvb.result2.SetTo(0)
-            ocvb.result2.SetTo(cv.Scalar.All(255), mask)
+            dst2.SetTo(0)
+            dst2.SetTo(cv.Scalar.All(255), mask)
             ocvb.label2 = "Most Common Color +- " + CStr(offset) + " count = " + CStr(maxCount)
         End If
     End Sub
@@ -203,19 +203,19 @@ Public Class Palette_Gradient
     Public frameModulo As Int32 = 30 ' every 30 frames try a different pair of random colors.
     Public color1 As cv.Scalar
     Public color2 As cv.Scalar
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.label2 = "From and To colors"
         ocvb.desc = "Create gradient image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod frameModulo = 0 Then
-            if standalone Then
+            If standalone Then
                 color1 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
                 color2 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
             End If
-            ocvb.result2.SetTo(color1)
-            ocvb.result2(New cv.Rect(0, 0, ocvb.result2.Width, ocvb.result2.Height / 2)).SetTo(color2)
+            dst2.SetTo(color1)
+            dst2(New cv.Rect(0, 0, dst2.Width, dst2.Height / 2)).SetTo(color2)
 
             Dim gradientColors As New cv.Mat(dst1.Rows, 1, cv.MatType.CV_64FC3)
             Dim f As Double = 1.0
@@ -239,7 +239,7 @@ End Class
 Public Class Palette_BuildGradientColorMap
     Inherits ocvbClass
     Public gradientColorMap As New cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Number of color transitions (Used only with Random)", 1, 30, 5)
 
@@ -259,14 +259,14 @@ Public Class Palette_BuildGradientColorMap
                 If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
             Next
             gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
-            ocvb.result2.SetTo(0)
+            dst2.SetTo(0)
             Dim r As New cv.Rect(0, 0, 255, 1)
-            For i = 0 To ocvb.result2.Height - 1
+            For i = 0 To dst2.Height - 1
                 r.Y = i
-                ocvb.result2(r) = gradientColorMap
+                dst2(r) = gradientColorMap
             Next
         End If
-        if standalone Then dst1 = Palette_Custom_Apply(ocvb.color, gradientColorMap)
+        If standalone Then dst1 = Palette_Custom_Apply(ocvb.color, gradientColorMap)
     End Sub
 End Class
 
@@ -304,7 +304,7 @@ Public Class Palette_ColorMap
                 Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + mapNames(i) + ".jpg")
                 If mapFile.Exists Then
                     Dim cmap = cv.Cv2.ImRead(mapFile.FullName)
-                    ocvb.result2 = cmap.Resize(ocvb.color.Size())
+                    dst2 = cmap.Resize(ocvb.color.Size())
                 End If
 
                 ' special case the random color map!
@@ -321,7 +321,7 @@ Public Class Palette_ColorMap
                 buildNewRandomMap = False ' if they select something other than random, then next random request will rebuild the map.
                 If colormap = 20 Then
                     dst1 = src.Clone()
-                    ocvb.result2.SetTo(0)
+                    dst2.SetTo(0)
                     Exit For
                 End If
                 cv.Cv2.ApplyColorMap(src, dst1, colormap)
@@ -365,9 +365,9 @@ Public Class Palette_DepthColorMap
         dst1.SetTo(0, holes.holeMask)
 
         Dim r As New cv.Rect(100, 0, 255, 1)
-        For i = 0 To ocvb.result2.Height - 1
+        For i = 0 To dst2.Height - 1
             r.Y = i
-            ocvb.result2(r) = gradientColorMap
+            dst2(r) = gradientColorMap
         Next
     End Sub
 End Class

@@ -106,11 +106,11 @@ Public Class DFT_Inverse
         mats.mat(1) = (diff * 50).ToMat
         mats.Run(ocvb)
         If mats.mat(0).countnonzero() > 0 Then
-            ocvb.result2 = mats.dst1
+            dst2 = mats.dst1
             ocvb.label2 = "Mask of difference (top) and relative diff (bot)"
         Else
             ocvb.label2 = "InverseDFT reproduced original"
-            ocvb.result2.SetTo(0)
+            dst2.SetTo(0)
         End If
     End Sub
 End Class
@@ -164,7 +164,7 @@ Public Class DFT_ButterworthFilter
        Sub(k)
            Dim complex As New cv.Mat
            cv.Cv2.MulSpectrums(butterworthFilter(k), dft.complexImage, complex, cv.DftFlags.None)
-           If k = 0 Then dst1 = inverseDFT(complex) Else ocvb.result2 = inverseDFT(complex)
+           If k = 0 Then dst1 = inverseDFT(complex) Else dst2 = inverseDFT(complex)
        End Sub)
     End Sub
 End Class

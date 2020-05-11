@@ -9,7 +9,7 @@ Public Class Mat_Repeat
         Dim small = ocvb.color.Resize(New cv.Size(ocvb.color.Cols / 10, ocvb.color.Rows / 10))
         dst1 = small.Repeat(10, 10)
         small = ocvb.RGBDepth.Resize(New cv.Size(ocvb.color.Cols / 10, ocvb.color.Rows / 10))
-        ocvb.result2 = small.Repeat(10, 10)
+        dst2 = small.Repeat(10, 10)
     End Sub
 End Class
 
@@ -30,10 +30,10 @@ Public Class Mat_PointToMat
         Dim rows = mask.Points.Length
         Dim pMat = New cv.Mat(rows, 1, cv.MatType.CV_32SC2, mask.Points)
         Dim indexer = pMat.GetGenericIndexer(Of cv.Vec2i)()
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         Dim white = New cv.Vec3b(255, 255, 255)
         For i = 0 To rows - 1
-            ocvb.result2.Set(Of cv.Vec3b)(indexer(i).Item1, indexer(i).Item0, white)
+            dst2.Set(Of cv.Vec3b)(indexer(i).Item1, indexer(i).Item0, white)
         Next
     End Sub
 End Class
@@ -85,9 +85,9 @@ Public Class Mat_Transpose
 #End If
         Dim trBack = dst1.T()
 #If opencvsharpOld Then
-        ocvb.result2 = trBack.Resize(New cv.Size(ocvb.color.Cols, ocvb.color.Rows))
+        dst2 = trBack.Resize(New cv.Size(ocvb.color.Cols, ocvb.color.Rows))
 #Else
-        ocvb.result2 = trBack.ToMat.Resize(ocvb.color.Size())
+        dst2 = trBack.ToMat.Resize(ocvb.color.Size())
 #End If
     End Sub
 End Class
@@ -110,10 +110,10 @@ Public Class Mat_Tricks
         Dim y = 80
         dst1(x, x + mat.Width, y, y + mat.Height) = mat
 
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         x = 20
         y = 40
-        ocvb.result2(x, x + mat.Width, y, y + mat.Height) = mat.T
+        dst2(x, x + mat.Width, y, y + mat.Height) = mat.T
     End Sub
 End Class
 
@@ -136,7 +136,7 @@ Public Class Mat_4to1
         mat3 = mat1.Clone()
         mat4 = mat1.Clone()
         mat = {mat1, mat2, mat3, mat4}
-        dst1 = ocvb.result2
+        dst1 = dst2
         ocvb.desc = "Use one Mat for up to 4 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -145,7 +145,7 @@ Public Class Mat_4to1
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Static roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         Static roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
-        if standalone Then
+        If standalone Then
             mat1 = ocvb.color
             mat2 = ocvb.RGBDepth
             mat3 = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -179,7 +179,7 @@ Public Class Mat_2to1
         mat1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
-        dst1 = ocvb.result2
+        dst1 = dst2
 
         ocvb.desc = "Fill a Mat with 2 images"
     End Sub

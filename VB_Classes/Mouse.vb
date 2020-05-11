@@ -37,7 +37,7 @@ Public Class Mouse_LeftClick
 
         Static zeroRect As New cv.Rect(0, 0, 0, 0)
         If ocvb.drawRect <> zeroRect Then
-            ocvb.result2 = ocvb.color(ocvb.drawRect).Resize(ocvb.result2.Size())
+            dst2 = ocvb.color(ocvb.drawRect).Resize(dst2.Size())
         End If
     End Sub
 End Class
@@ -57,7 +57,7 @@ Public Class Mouse_RightClick
                                               "Double-click an image to remove the selected region.", 10, 50))
         Static zeroRect As New cv.Rect(0, 0, 0, 0)
         If ocvb.drawRect <> zeroRect Then
-            ocvb.result2 = ocvb.color(ocvb.drawRect).Resize(ocvb.result2.Size())
+            dst2 = ocvb.color(ocvb.drawRect).Resize(dst2.Size())
         End If
     End Sub
 End Class

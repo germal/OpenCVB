@@ -78,7 +78,7 @@ Public Class Python_Run
         ocvb.label1 = ""
         ocvb.label2 = ""
         dst1.SetTo(0)
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If pyStream IsNot Nothing Then

@@ -104,7 +104,7 @@ Public Class GameOfLife_Population
         game = New GameOfLife_Basics(ocvb, caller)
 
         plot = New Plot_OverTime(ocvb, caller)
-        plot.dst1 = ocvb.result2
+        plot.dst1 = dst2
         plot.maxScale = 2000
         plot.plotCount = 1
 

@@ -218,7 +218,7 @@ Public Class Stabilizer_SideBySide
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         original.Run(ocvb)
-        ocvb.result2 = dst1.Clone()
+        dst2 = dst1.Clone()
         basics.Run(ocvb)
     End Sub
 End Class

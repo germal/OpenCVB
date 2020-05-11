@@ -94,7 +94,7 @@ Public Class Kalman_Compare
         plot.topBottomPad = 20
 
         kPlot = New Plot_OverTime(ocvb, caller)
-        kPlot.dst1 = ocvb.result2
+        kPlot.dst1 = dst2
         kPlot.plotCount = 3
         kPlot.topBottomPad = 20
 
@@ -340,7 +340,7 @@ Public Class Kalman_ImageSmall
         dst1 = dst1.Resize(dst1.Size())
         cv.Cv2.Subtract(dst1, saveOriginal, dst1)
         dst1 = dst1.Threshold(1, 255, cv.ThresholdTypes.Binary)
-        ocvb.result2 = dst1.Resize(dst1.Size())
+        dst2 = dst1.Resize(dst1.Size())
     End Sub
 End Class
 
@@ -378,7 +378,7 @@ Public Class Kalman_DepthSmall
         cv.Cv2.Subtract(kalman.dst1, saveOriginal, depth32f)
         dst1 = depth32f.Threshold(0, 0, cv.ThresholdTypes.Tozero).ConvertScaleAbs()
         dst1 = dst1.Reshape(1, resize.dst1.Height)
-        ocvb.result2 = dst1.Resize(dst1.Size())
+        dst2 = dst1.Resize(dst1.Size())
     End Sub
 End Class
 
@@ -416,7 +416,7 @@ Public Class Kalman_Single
         If standalone Then
             If ocvb.frameCount = 0 Then
                 plot = New Plot_OverTime(ocvb, caller)
-                plot.dst1 = ocvb.result2
+                plot.dst1 = dst2
                 plot.maxScale = 150
                 plot.minScale = 80
                 plot.plotCount = 2

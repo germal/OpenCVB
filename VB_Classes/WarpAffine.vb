@@ -114,7 +114,7 @@ Public Class WarpAffine_Basics
         cv.Cv2.WarpAffine(ocvb.color, dst1, rotationMatrix, ocvb.color.Size(), warpFlag)
         angle *= -1
         rotationMatrix = cv.Cv2.GetRotationMatrix2D(pt, angle, 1.0)
-        cv.Cv2.WarpAffine(dst1, ocvb.result2, rotationMatrix, ocvb.color.Size(), warpFlag)
+        cv.Cv2.WarpAffine(dst1, dst2, rotationMatrix, ocvb.color.Size(), warpFlag)
         ocvb.label1 = "Rotated with Warpaffine with angle: " + CStr(angle)
         ocvb.label2 = "Rotated back with inverse Warpaffine angle: " + CStr(-angle)
     End Sub
@@ -173,14 +173,14 @@ Public Class WarpAffine_3Points
         wideMat.Circle(corner, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
         dst1 = wideMat(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
-        ocvb.result2 = wideMat(New cv.Rect(ocvb.color.Width, 0, ocvb.color.Width, ocvb.color.Height))
+        dst2 = wideMat(New cv.Rect(ocvb.color.Width, 0, ocvb.color.Width, ocvb.color.Height))
 
         Dim pt As cv.Point
         For i = 0 To srcPoints1.Length - 1
             pt = New cv.Point(CInt(srcPoints1(i).x), CInt(srcPoints1(i).y))
             dst1.Circle(pt, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             pt = New cv.Point(CInt(srcPoints2(i).x), CInt(srcPoints2(i).y))
-            ocvb.result2.Circle(pt, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(pt, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
         Dim ttStart = 40
@@ -240,7 +240,7 @@ Public Class WarpAffine_4Points
             Next
         Next
 
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         Dim ttStart = 40
         ocvb.putText(New ActiveClass.TrueType("M defined as: " + vbCrLf +
                                               Format(M.Get(Of Double)(0, 0), "#0.00") + vbTab +

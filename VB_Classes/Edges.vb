@@ -23,7 +23,7 @@ Public Class Edges_Canny
             src = ocvb.color.Clone
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst1 = gray.Canny(threshold1, threshold2, aperture, False)
-            ocvb.result2 = gray.Canny(threshold1, threshold2, aperture, True)
+            dst2 = gray.Canny(threshold1, threshold2, aperture, True)
         Else
             If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst1 = src.Canny(threshold1, threshold2, aperture, False)
@@ -58,11 +58,11 @@ Public Class Edges_CannyAndShadow
         canny.Run(ocvb)
         shadow.Run(ocvb)
 
-        ocvb.result2.SetTo(0)
-        ocvb.result2 = shadow.borderMask
-        ocvb.result2 += canny.dst1.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst2.SetTo(0)
+        dst2 = shadow.borderMask
+        dst2 += canny.dst1.Threshold(1, 255, cv.ThresholdTypes.Binary)
 
-        dilate.src = ocvb.result2
+        dilate.src = dst2
         dilate.Run(ocvb)
         dilate.dst1.SetTo(0, shadow.holeMask)
         If standalone Then dst1 = dilate.dst1
@@ -93,11 +93,11 @@ Public Class Edges_Laplacian
         cv.Cv2.ConvertScaleAbs(dst1, abs_dst1)
         cv.Cv2.CvtColor(abs_dst1, dst1, cv.ColorConversionCodes.GRAY2BGR)
 
-        cv.Cv2.GaussianBlur(ocvb.RGBDepth, ocvb.result2, New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
-        cv.Cv2.CvtColor(ocvb.result2, gray, cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.GaussianBlur(ocvb.RGBDepth, dst2, New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
+        cv.Cv2.CvtColor(dst2, gray, cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.Laplacian(gray, dst1, cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
         cv.Cv2.ConvertScaleAbs(dst1, abs_dst1)
-        cv.Cv2.CvtColor(abs_dst1, ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(abs_dst1, dst2, cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "Laplacian of Depth Image"
     End Sub
 End Class
@@ -148,9 +148,9 @@ Public Class Edges_Preserving
             cv.Cv2.EdgePreservingFilter(ocvb.color, dst1, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
         End If
         If radio.check(0).Checked Then
-            cv.Cv2.EdgePreservingFilter(ocvb.RGBDepth, ocvb.result2, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
+            cv.Cv2.EdgePreservingFilter(ocvb.RGBDepth, dst2, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
         Else
-            cv.Cv2.EdgePreservingFilter(ocvb.RGBDepth, ocvb.result2, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
+            cv.Cv2.EdgePreservingFilter(ocvb.RGBDepth, dst2, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
         End If
     End Sub
 End Class
@@ -223,7 +223,7 @@ Public Class Edges_Sobel
     Inherits ocvbClass
     Public grayX As cv.Mat
     Public grayY As cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Sobel kernel Size", 1, 32, 3)
         ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
@@ -232,7 +232,7 @@ Public Class Edges_Sobel
         Dim kernelSize As Int32 = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         Dim grad As New cv.Mat()
-        if standalone Then src = ocvb.color
+        If standalone Then src = ocvb.color
         dst1 = New cv.Mat(src.Rows, src.Cols, src.Type)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         grayX = src.Sobel(cv.MatType.CV_16U, 1, 0, kernelSize)
@@ -263,9 +263,9 @@ Public Class Edges_LeftView
     Public Sub Run(ocvb As AlgorithmData)
         red.Run(ocvb)
         Dim leftView = dst1
-        sobel.src = ocvb.result2
+        sobel.src = dst2
         sobel.Run(ocvb)
-        ocvb.result2 = sobel.dst1.Clone()
+        dst2 = sobel.dst1.Clone()
 
         sobel.src = leftView
         sobel.Run(ocvb)
@@ -278,7 +278,7 @@ End Class
 Public Class Edges_ResizeAdd
     Inherits ocvbClass
     Public gray As New cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Border Vertical in Pixels", 1, 20, 5)
         sliders.setupTrackBar2(ocvb, caller, "Border Horizontal in Pixels", 1, 20, 5)
@@ -289,12 +289,12 @@ Public Class Edges_ResizeAdd
         ocvb.label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim newFrame = gray(New cv.Range(sliders.TrackBar1.Value, gray.Rows - sliders.TrackBar1.Value), New cv.Range(sliders.TrackBar2.Value, gray.Cols - sliders.TrackBar2.Value))
         newFrame = newFrame.Resize(gray.Size())
         cv.Cv2.Absdiff(gray, newFrame, dst1)
         dst1 = dst1.Threshold(sliders.TrackBar3.Value, 255, cv.ThresholdTypes.Binary)
-        cv.Cv2.Add(gray, dst1, ocvb.result2)
+        cv.Cv2.Add(gray, dst1, dst2)
     End Sub
 End Class
 
@@ -323,7 +323,7 @@ Public Class Edges_DCTfrequency
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
         src32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)
-        ocvb.result2 = dst1.Threshold(sliders.TrackBar2.Value, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst1.Threshold(sliders.TrackBar2.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 

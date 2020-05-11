@@ -30,7 +30,7 @@ Public Class WarpPerspective_Basics
         Dim center = New cv.Point2f(ocvb.color.Cols / 2, ocvb.color.Rows / 2)
         Dim angle = sliders.TrackBar3.Value
         Dim rotationMatrix = cv.Cv2.GetRotationMatrix2D(center, angle, 1.0)
-        cv.Cv2.WarpAffine(dst1, ocvb.result2, rotationMatrix, ocvb.color.Size(), cv.InterpolationFlags.Nearest)
+        cv.Cv2.WarpAffine(dst1, dst2, rotationMatrix, ocvb.color.Size(), cv.InterpolationFlags.Nearest)
     End Sub
 End Class
 

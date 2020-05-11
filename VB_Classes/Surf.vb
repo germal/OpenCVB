@@ -39,7 +39,7 @@ Public Class Surf_Basics_CS
         'If dst1.Width <> ocvb.color.Width * 2 Then dst1 = dst1.Resize(New cv.Size(ocvb.color.Width * 2, srcLeft.Height))
         If standalone Then
             dst1(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(dst1)
-            dst1(New cv.Rect(ocvb.color.Width, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(ocvb.result2)
+            dst1(New cv.Rect(ocvb.color.Width, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(dst2)
             ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
             If CS_SurfBasics.keypoints1 IsNot Nothing Then ocvb.label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
         End If
@@ -76,7 +76,7 @@ Public Class Surf_Basics
         End If
         surf.Run(ocvb)
         surf.dst1(New cv.Rect(0, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(dst1)
-        surf.dst1(New cv.Rect(surf.srcLeft.Width, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(ocvb.result2)
+        surf.dst1(New cv.Rect(surf.srcLeft.Width, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(dst2)
     End Sub
 End Class
 
@@ -100,7 +100,7 @@ Public Class Surf_DrawMatchManual_CS
     Public Sub Run(ocvb As AlgorithmData)
         surf.Run(ocvb)
         dst1 = surf.srcLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.result2 = surf.srcRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = surf.srcRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim keys1 = surf.CS_SurfBasics.keypoints1
         Dim keys2 = surf.CS_SurfBasics.keypoints2
 
@@ -113,7 +113,7 @@ Public Class Surf_DrawMatchManual_CS
             Dim pt = keys1(i).Pt
             For j = 0 To keys2.Count - 1
                 If Math.Abs(keys2(j).Pt.X - pt.X) < sliders.TrackBar1.Value And Math.Abs(keys2(j).Pt.Y - pt.Y) < sliders.TrackBar1.Value Then
-                    ocvb.result2.Circle(keys2(j).Pt, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                    dst2.Circle(keys2(j).Pt, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
                     keys2(j).Pt.Y = -1 ' so we don't match it again.
                     matchCount += 1
                 End If
@@ -122,7 +122,7 @@ Public Class Surf_DrawMatchManual_CS
         ' mark those that were not
         For i = 0 To keys2.Count - 1
             Dim pt = keys2(i).Pt
-            If pt.Y <> -1 Then ocvb.result2.Circle(keys2(i).Pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            If pt.Y <> -1 Then dst2.Circle(keys2(i).Pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
         ocvb.label2 = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
     End Sub

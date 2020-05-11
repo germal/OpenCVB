@@ -76,7 +76,7 @@ Public Class EMax_Basics
             Next
         Else
             dst1.SetTo(0)
-            ocvb.result2.SetTo(0)
+            dst2.SetTo(0)
         End If
 
         ' draw the clustered samples
@@ -139,15 +139,15 @@ Public Class EMax_Basics_CPP
                                        dst1.Rows, dst1.Cols, emax.regionCount, emax.sliders.TrackBar2.Value, covarianceMatrixType)
 
         If imagePtr <> 0 Then
-            Dim dstData(ocvb.result2.Total * ocvb.result2.ElemSize - 1) As Byte
+            Dim dstData(dst2.Total * dst2.ElemSize - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            ocvb.result2 = New cv.Mat(ocvb.result2.Rows, ocvb.result2.Cols, cv.MatType.CV_8UC3, dstData)
+            dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, dstData)
         End If
         handleSrc.Free() ' free the pinned memory...
         handleLabels.Free() ' free the pinned memory...
 
         Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        dst1.CopyTo(ocvb.result2, mask)
+        dst1.CopyTo(dst2, mask)
     End Sub
     Public Sub Close()
         EMax_Basics_Close(EMax_Basics)

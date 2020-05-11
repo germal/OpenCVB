@@ -53,19 +53,19 @@ Public Class Depth_Median
 
         Dim mask As cv.Mat
         mask = median.src.LessThan(median.medianVal)
-        ocvb.result1.SetTo(0)
-        ocvb.RGBDepth.CopyTo(ocvb.result1, mask)
+        dst1.SetTo(0)
+        ocvb.RGBDepth.CopyTo(dst1, mask)
 
         Dim zeroMask = median.src.Equals(0)
         cv.Cv2.ConvertScaleAbs(zeroMask, zeroMask.ToMat)
-        ocvb.result1.SetTo(0, zeroMask)
+        dst1.SetTo(0, zeroMask)
 
         ocvb.label1 = "Median Depth < " + Format(median.medianVal, "#0.0")
 
         cv.Cv2.BitwiseNot(mask, mask)
-        ocvb.result2.SetTo(0)
-        ocvb.RGBDepth.CopyTo(ocvb.result2, mask)
-        ocvb.result2.SetTo(0, zeroMask)
+        dst2.SetTo(0)
+        ocvb.RGBDepth.CopyTo(dst2, mask)
+        dst2.SetTo(0, zeroMask)
         ocvb.label2 = "Median Depth > " + Format(median.medianVal, "#0.0")
     End Sub
 End Class
@@ -84,10 +84,10 @@ Public Class Depth_Flatland
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim reductionFactor = sliders.TrackBar1.Maximum - sliders.TrackBar1.Value
-        ocvb.result1 = ocvb.RGBDepth / reductionFactor
-        ocvb.result1 *= reductionFactor
-        ocvb.result2 = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ocvb.result2 = ocvb.result2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = ocvb.RGBDepth / reductionFactor
+        dst1 *= reductionFactor
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -105,12 +105,12 @@ Public Class Depth_FirstLastDistance
         Dim minVal As Double, maxVal As Double
         Dim minPt As cv.Point, maxPt As cv.Point
         cv.Cv2.MinMaxLoc(depth32f, minVal, maxVal, minPt, maxPt, mask)
-        ocvb.RGBDepth.CopyTo(ocvb.result1)
-        ocvb.RGBDepth.CopyTo(ocvb.result2)
+        ocvb.RGBDepth.CopyTo(dst1)
+        ocvb.RGBDepth.CopyTo(dst2)
         ocvb.label1 = "Min Depth " + CStr(minVal) + " mm"
-        ocvb.result1.Circle(minPt, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst1.Circle(minPt, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         ocvb.label2 = "Max Depth " + CStr(maxVal) + " mm"
-        ocvb.result2.Circle(maxPt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(maxPt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
@@ -132,7 +132,7 @@ Public Class Depth_HolesRect
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
 
-        ocvb.result1.SetTo(0)
+        dst1.SetTo(0)
         Dim contours As cv.Point()()
         contours = cv.Cv2.FindContoursAsArray(shadow.borderMask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 
@@ -141,7 +141,7 @@ Public Class Depth_HolesRect
             Dim minRect = cv.Cv2.MinAreaRect(contours(i))
             If minRect.Size.Width * minRect.Size.Height > sliders.TrackBar1.Value Then
                 Dim nextColor = New cv.Scalar(ocvb.rColors(i Mod 255).Item0, ocvb.rColors(i Mod 255).Item1, ocvb.rColors(i Mod 255).Item2)
-                drawRotatedRectangle(minRect, ocvb.result1, nextColor)
+                drawRotatedRectangle(minRect, dst1, nextColor)
                 If contours(i).Length >= 5 Then
                     minEllipse(i) = cv.Cv2.FitEllipse(contours(i))
                 End If
@@ -162,8 +162,8 @@ Public Class Depth_Foreground
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
-        ocvb.result1.CopyTo(ocvb.result2)
-        Dim gray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst1.CopyTo(dst2)
+        Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         ' find the largest blob and use that as the body.  Head is highest in the image.
         Dim blobSize As New List(Of Int32)
@@ -236,7 +236,7 @@ Public Class Depth_FlatData
         gray8u = gray8u / reductionFactor
         gray8u *= reductionFactor
 
-        ocvb.result1 = gray8u.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = gray8u.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -265,10 +265,10 @@ Public Class Depth_FlatBackground
         cv.Cv2.BitwiseNot(mask, zeroMask)
         dst1.SetTo(0, zeroMask)
 
-        ocvb.result1.SetTo(0)
-        ocvb.RGBDepth.CopyTo(ocvb.result1, mask)
+        dst1.SetTo(0)
+        ocvb.RGBDepth.CopyTo(dst1, mask)
         zeroMask.SetTo(255, shadow.holeMask)
-        ocvb.color.CopyTo(ocvb.result1, zeroMask)
+        ocvb.color.CopyTo(dst1, zeroMask)
         dst1.SetTo(maxDepth, zeroMask) ' set the depth to the maxdepth for any background
     End Sub
 End Class
@@ -363,8 +363,8 @@ Public Class Depth_MeanStdev_MT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
-        ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U)
-        ocvb.result2 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U)
+        dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U)
+        dst2 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U)
 
         Dim maxDepth = sliders.TrackBar1.Value
         Dim meanCount = sliders.TrackBar2.Value
@@ -414,13 +414,13 @@ Public Class Depth_MeanStdev_MT
             Sub(i)
                 Dim roi = grid.roiList(i)
                 ' this marks all the regions where the depth is volatile.
-                ocvb.result2(roi).SetTo(255 * (stdValues.Get(Of Single)(i, 0) - minStdVal) / (maxStdVal - minStdVal))
-                ocvb.result2(roi).SetTo(0, outOfRangeMask(roi))
+                dst2(roi).SetTo(255 * (stdValues.Get(Of Single)(i, 0) - minStdVal) / (maxStdVal - minStdVal))
+                dst2(roi).SetTo(0, outOfRangeMask(roi))
 
-                ocvb.result1(roi).SetTo(255 * (meanValues.Get(Of Single)(i, 0) - minVal) / (maxVal - minVal))
-                ocvb.result1(roi).SetTo(0, outOfRangeMask(roi))
+                dst1(roi).SetTo(255 * (meanValues.Get(Of Single)(i, 0) - minVal) / (maxVal - minVal))
+                dst1(roi).SetTo(0, outOfRangeMask(roi))
             End Sub)
-            cv.Cv2.BitwiseOr(ocvb.result2, grid.gridMask, ocvb.result2)
+            cv.Cv2.BitwiseOr(dst2, grid.gridMask, dst2)
             ocvb.label2 = "ROI Stdev: Min " + Format(minStdVal, "#0.0") + " Max " + Format(maxStdVal, "#0.0")
         End If
 
@@ -439,12 +439,12 @@ Public Class Depth_MeanStdevPlot
         shadow = New Depth_Holes(ocvb, caller)
 
         plot1 = New Plot_OverTime(ocvb, caller)
-        plot1.dst1 = ocvb.result1
+        plot1.dst1 = dst1
         plot1.maxScale = 2000
         plot1.plotCount = 1
 
         plot2 = New Plot_OverTime(ocvb, caller)
-        plot2.dst1 = ocvb.result2
+        plot2.dst1 = dst2
         plot2.maxScale = 1000
         plot2.plotCount = 1
 
@@ -487,7 +487,7 @@ Public Class Depth_Uncertainty
     Public Sub Run(ocvb As AlgorithmData)
         retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
-        ocvb.result2 = ocvb.result2.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst2.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -519,8 +519,8 @@ Public Class Depth_Palette
         depthNorm.ConvertTo(depth, cv.MatType.CV_8U)
 
         depth = depth.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.result1 = Palette_Custom_Apply(depth, customColorMap)
-        ocvb.result1.SetTo(0, trim.zeroMask)
+        dst1 = Palette_Custom_Apply(depth, customColorMap)
+        dst1.SetTo(0, trim.zeroMask)
     End Sub
 End Class
 
@@ -601,7 +601,7 @@ Public Class Depth_Colorizer_CPP
             Dim dstData(dst1.Total * dst1.ElemSize - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             If standalone Then
-                ocvb.result1 = New cv.Mat(ocvb.result1.Rows, ocvb.result1.Cols, cv.MatType.CV_8UC3, dstData)
+                dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC3, dstData)
             End If
 
             dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
@@ -637,8 +637,8 @@ Public Class Depth_ManualTrim
         cv.Cv2.BitwiseAnd(Mask, maskMin, Mask)
 
         If standalone Then
-            ocvb.result1.SetTo(0)
-            ocvb.RGBDepth.CopyTo(ocvb.result1, Mask)
+            dst1.SetTo(0)
+            ocvb.RGBDepth.CopyTo(dst1, Mask)
         Else
             Dim notMask As New cv.Mat
             cv.Cv2.BitwiseNot(Mask, notMask)
@@ -701,7 +701,7 @@ Public Class Depth_ColorizerFastFade_CPP
         trim.Run(ocvb)
 
         If standalone Then src = trim.dst1 Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-        ocvb.result2 = trim.Mask
+        dst2 = trim.Mask
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, depthData, 0, depthData.Length)
@@ -713,7 +713,7 @@ Public Class Depth_ColorizerFastFade_CPP
             Dim dstData(dst1.Total * dst1.ElemSize - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             If standalone Then
-                ocvb.result1 = New cv.Mat(ocvb.result1.Rows, ocvb.result1.Cols, cv.MatType.CV_8UC3, dstData)
+                dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC3, dstData)
             Else
                 dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
             End If
@@ -766,7 +766,7 @@ Public Class Depth_ColorizerVB
                 End If
             Next
         Next
-        ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, rgbdata)
+        dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, rgbdata)
     End Sub
 End Class
 
@@ -827,11 +827,11 @@ Public Class Depth_ColorizerVB_MT
                        rgbIndex += 1
                    Next
                Next
-               ocvb.result1(roi) = New cv.Mat(depth.Rows, depth.Cols, cv.MatType.CV_8UC3, rgbdata)
+               dst1(roi) = New cv.Mat(depth.Rows, depth.Cols, cv.MatType.CV_8UC3, rgbdata)
            End Sub)
 
         End If
-        ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+        dst1.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
 End Class
 
@@ -878,9 +878,9 @@ Public Class Depth_Colorizer_MT
                      End If
                  Next
              Next
-             ocvb.result1(roi) = New cv.Mat(depth.Rows, depth.Cols, cv.MatType.CV_8UC3, rgbdata)
+             dst1(roi) = New cv.Mat(depth.Rows, depth.Cols, cv.MatType.CV_8UC3, rgbdata)
          End Sub)
-        ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+        dst1.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
 End Class
 
@@ -909,8 +909,8 @@ Public Class Depth_LocalMinMax_MT
         mask.ConvertTo(mask, cv.MatType.CV_8UC1)
 
         If standalone Then
-            ocvb.color.CopyTo(ocvb.result1)
-            ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+            ocvb.color.CopyTo(dst1)
+            dst1.SetTo(cv.Scalar.White, grid.gridMask)
         End If
 
         ReDim pointList(grid.roiList.Count - 1)
@@ -928,8 +928,8 @@ Public Class Depth_LocalMinMax_MT
             pointList(i) = New cv.Point(ptListX(i), ptListY(i))
 
             If standalone Then
-                cv.Cv2.Circle(ocvb.result1(roi), minPt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-                cv.Cv2.Circle(ocvb.result1(roi), maxPt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+                cv.Cv2.Circle(dst1(roi), minPt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                cv.Cv2.Circle(dst1(roi), maxPt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
             End If
         End Sub)
 
@@ -939,7 +939,7 @@ Public Class Depth_LocalMinMax_MT
             For i = 0 To ptListX.Count - 1
                 If ptListX(i) <> 0 And ptListY(i) <> 0 Then subdiv.Insert(New cv.Point2f(ptListX(i), ptListY(i)))
             Next
-            paint_voronoi(ocvb, ocvb.result2, subdiv)
+            paint_voronoi(ocvb, dst2, subdiv)
         End If
     End Sub
 End Class
@@ -978,8 +978,8 @@ Public Class Depth_LocalMinMax_Kalman_MT
         Next
         kalman.Run(ocvb)
 
-        ocvb.result1 = ocvb.color.Clone()
-        ocvb.result1.SetTo(cv.Scalar.White, minmax.grid.gridMask)
+        dst1 = ocvb.color.Clone()
+        dst1.SetTo(cv.Scalar.White, minmax.grid.gridMask)
 
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
         For i = 0 To kalman.output.Length - 1 Step 2
@@ -990,9 +990,9 @@ Public Class Depth_LocalMinMax_Kalman_MT
             subdiv.Insert(New cv.Point2f(kalman.output(i), kalman.output(i + 1)))
 
             ' just show the minimum (closest) point
-            cv.Cv2.Circle(ocvb.result1, New cv.Point(kalman.output(i), kalman.output(i + 1)), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst1, New cv.Point(kalman.output(i), kalman.output(i + 1)), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
-        paint_voronoi(ocvb, ocvb.result2, subdiv)
+        paint_voronoi(ocvb, dst2, subdiv)
     End Sub
 End Class
 
@@ -1020,7 +1020,7 @@ Public Class Depth_Decreasing
         Else
             cv.Cv2.Subtract(lastDepth, depth32f, diff)
         End If
-        ocvb.result1 = diff.Threshold(thresholdCentimeters, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        dst1 = diff.Threshold(thresholdCentimeters, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         lastDepth = depth32f
     End Sub
 End Class
@@ -1116,29 +1116,25 @@ End Class
 
 Public Class Depth_Stable
     Inherits ocvbClass
-    Dim mog As BGSubtract_Basics_CPP
-    Public maskStable As New cv.Mat
-    Public maskUnstable As cv.Mat
+    Public mog As BGSubtract_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
 
         ' sliders.setupTrackBar1(ocvb, caller, "")
         mog = New BGSubtract_Basics_CPP(ocvb, caller)
-        mog.radio.check(1).Checked = True
 
         ocvb.label2 = "Stable (non-zero) Depth"
-        ocvb.desc = "Collect X frames, compute stable depth using the RGB Depth image."
+        ocvb.desc = "Collect X frames, compute stable depth using the RGB and Depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        mog.src = ocvb.RGBDepth
+        If standalone Then src = ocvb.RGBDepth
+        mog.src = src
         mog.Run(ocvb)
-
-        maskUnstable = ocvb.result1
-        cv.Cv2.BitwiseNot(maskUnstable, maskStable)
+        dst1 = mog.dst1
+        cv.Cv2.BitwiseNot(mog.dst1, dst2)
         ocvb.label1 = "Unstable Depth" + " using " + mog.radio.check(mog.currMethod).Text + " method"
         Dim zeroDepth = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(1)
-        maskStable.SetTo(0, zeroDepth)
-        If standalone Then ocvb.result2 = maskStable
+        dst2.SetTo(0, zeroDepth)
     End Sub
 End Class
 
@@ -1164,13 +1160,13 @@ Public Class Depth_Stabilizer
         stable.Run(ocvb)
 
         mean.src = getDepth32f(ocvb)
-        mean.src.SetTo(0, stable.maskUnstable)
+        mean.src.SetTo(0, stable.dst1)
         mean.Run(ocvb)
 
         If standalone Then
             'colorize.src = mean.dst
             'colorize.Run(ocvb)
-            'ocvb.result1 = colorize.dst
+            'dst1 = colorize.dst
         End If
     End Sub
 End Class

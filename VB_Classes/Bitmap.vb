@@ -14,6 +14,6 @@ Public Class Bitmap_ToMat
         dst1 = cv.Extensions.BitmapConverter.ToMat(bitmap).Resize(ocvb.color.Size)
 
         bitmap = cv.Extensions.BitmapConverter.ToBitmap(ocvb.color)
-        ocvb.result2 = cv.Extensions.BitmapConverter.ToMat(bitmap)
+        dst2 = cv.Extensions.BitmapConverter.ToMat(bitmap)
     End Sub
 End Class

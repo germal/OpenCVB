@@ -162,7 +162,7 @@ Public Class MotionBlur_Deblur
         imgIn = edgeTaper(imgIn, gamma, beta)
 
         Dim imgOut = filter2DFreq(imgIn(roi), hW)
-        imgOut.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
-        ocvb.result2.Normalize(0, 255, cv.NormTypes.MinMax)
+        imgOut.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
 End Class

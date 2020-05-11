@@ -37,8 +37,8 @@ Public Class Featureless_Basics_MT
         Dim floodCountThreshold = sliders.TrackBar4.Value
 
         ocvb.color.CopyTo(dst1)
-        ocvb.result2.SetTo(0)
-        mask = New cv.Mat(ocvb.result2.Size(), cv.MatType.CV_8U, 0)
+        dst2.SetTo(0)
+        mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             Dim segments() = cv.Cv2.HoughLines(edges.dst1(roi), rhoIn, thetaIn, threshold)
@@ -69,7 +69,7 @@ Public Class Featureless_Basics_MT
             Dim label = mask.InRange(i, i)
             objects.Add(label.Clone())
             Dim mean = ocvb.RGBDepth.Mean(label)
-            ocvb.result2.SetTo(mean, label)
+            dst2.SetTo(mean, label)
         Next
         ocvb.label2 = "FeatureLess Regions = " + CStr(regionCount)
     End Sub
@@ -197,7 +197,7 @@ Public Class Featureless_DCT_MT
         Dim label = mask.InRange(maxIndex + 1, maxIndex + 1)
         Dim nonZ = label.CountNonZero()
         ocvb.label2 = "Largest FeatureLess Region (" + CStr(nonZ) + " " + Format(nonZ / label.Total, "#0.0%") + " pixels)"
-        ocvb.result2.SetTo(cv.Scalar.White, label)
+        dst2.SetTo(cv.Scalar.White, label)
     End Sub
 End Class
 

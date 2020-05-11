@@ -28,7 +28,7 @@ Public Class InPaint_Basics
         Dim mask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
         mask.SetTo(0)
         mask.Line(p1, p2, cv.Scalar.All(255), thickness, cv.LineTypes.AntiAlias)
-        cv.Cv2.Inpaint(dst1, mask, ocvb.result2, thickness, inPaintFlag)
+        cv.Cv2.Inpaint(dst1, mask, dst2, thickness, inPaintFlag)
     End Sub
 End Class
 
@@ -53,7 +53,7 @@ Public Class InPaint_Noise
         If ocvb.frameCount Mod 100 Then Exit Sub ' give them time to review the inpaint results
         noise.Run(ocvb) ' create some noise in the result1 image.
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
-        cv.Cv2.Inpaint(dst1, noise.noiseMask, ocvb.result2, noise.maxNoiseWidth, inPaintFlag)
+        cv.Cv2.Inpaint(dst1, noise.noiseMask, dst2, noise.maxNoiseWidth, inPaintFlag)
     End Sub
 End Class
 

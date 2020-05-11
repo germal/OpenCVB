@@ -63,7 +63,7 @@ Public Class FLANN_Basics
         Dim features As New cv.Mat(random.Points2f.Length, 2, cv.MatType.CV_32F, random.Points2f)
 
         Dim knnCount = sliders.TrackBar1.Value
-        dst1.CopyTo(ocvb.result2)
+        dst1.CopyTo(dst2)
         ' knnSearch
         Using nnIndex As New cv.Flann.Index(features, New cv.Flann.KDTreeIndexParams(4))
             Dim indices() As Integer = Nothing
@@ -81,7 +81,7 @@ Public Class FLANN_Basics
                     dst1.Line(pt1, pt2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
                 Next
                 cv.Cv2.Circle(dst1, pt2, 5, cv.Scalar.GreenYellow, -1, cv.LineTypes.AntiAlias, 0)
-                cv.Cv2.Circle(ocvb.result2, pt2, 5, cv.Scalar.GreenYellow, -1, cv.LineTypes.AntiAlias, 0)
+                cv.Cv2.Circle(dst2, pt2, 5, cv.Scalar.GreenYellow, -1, cv.LineTypes.AntiAlias, 0)
             Next
         End Using
     End Sub

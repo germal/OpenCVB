@@ -4,8 +4,8 @@ Imports System.IO
 Public Class Video_Basics
     Inherits ocvbClass
     Public srcVideo As String
-    Dim currVideo As String
     Public image As New cv.Mat
+    Dim currVideo As String
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         If srcVideo = "" Then srcVideo = ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4" ' default video...
@@ -21,7 +21,7 @@ Public Class Video_Basics
             videoOptions.NewVideo(ocvb, currVideo)
         End If
         image = videoOptions.nextImage
-        If image.Empty() = False Then ocvb.result1 = image.Resize(ocvb.color.Size())
+        If image.Empty() = False Then dst1 = image.Resize(ocvb.color.Size())
     End Sub
 End Class
 
@@ -47,37 +47,37 @@ Public Class Video_CarCounting
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         video.Run(ocvb)
-        If video.image.Empty() = False Then
-            mog.src = video.image.Clone()
+        If video.dst1.Empty() = False Then
+            mog.src = video.image
             mog.Run(ocvb)
-
-            ocvb.result2 = video.image.Clone()
+            dst1 = mog.gray
+            dst2 = video.dst1
 
             ' there are 5 lanes of traffic so setup 5 regions
             ' NOTE: if long shadows are present this approach will not work without provision for the width of a car.  Needs more sample data.
             Dim activeHeight = 30
-            Dim finishLine = mog.gray.Height - activeHeight * 8 ' the video is different size than the camera images...
+            Dim finishLine = mog.dst1.Height - activeHeight * 8
             Static activeState(5) As Boolean
             Static carCount As Int32
             For i = 1 To activeState.Length - 1
                 Dim lane = New cv.Rect(Choose(i, 230, 460, 680, 900, 1110), finishLine, 40, activeHeight)
-                Dim cellCount = ocvb.result1(lane).CountNonZero()
+                Dim cellCount = dst1(lane).CountNonZero()
                 If cellCount Then
                     activeState(i) = True
-                    ocvb.result1.Rectangle(lane, cv.Scalar.Red, -1)
-                    ocvb.result2.Rectangle(lane, cv.Scalar.Red, -1)
+                    dst1.Rectangle(lane, cv.Scalar.Red, -1)
+                    dst2.Rectangle(lane, cv.Scalar.Red, -1)
                 End If
                 If cellCount = 0 And activeState(i) = True Then
                     activeState(i) = False
                     carCount += 1
                 End If
-                ocvb.result2.Rectangle(lane, cv.Scalar.White, 2)
+                dst2.Rectangle(lane, cv.Scalar.White, 2)
             Next
 
-            Dim tmp = ocvb.result1.Clone()
+            Dim tmp = dst1.Clone()
             flow.msgs.Add("  Cars " + CStr(carCount))
             flow.Run(ocvb)
-            cv.Cv2.BitwiseOr(ocvb.result1, tmp, ocvb.result1)
+            cv.Cv2.BitwiseOr(dst1, tmp, dst1)
         End If
     End Sub
 End Class
@@ -107,12 +107,13 @@ Public Class Video_CarCComp
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         video.Run(ocvb)
-        If video.image.Empty() = False Then
-            mog.src = video.image.Clone()
+        If video.dst1.Empty() = False Then
+            mog.src = video.dst1
             mog.Run(ocvb)
-
             cc.src = mog.dst1
             cc.Run(ocvb)
+            dst1 = cc.dst1
+            dst2 = cc.dst2
         End If
     End Sub
 End Class
@@ -137,19 +138,19 @@ Public Class Video_MinRect
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         video.Run(ocvb)
-        If video.image.Empty() = False Then
-            mog.src = video.image.Resize(ocvb.color.Size())
+        If video.dst1.Empty() = False Then
+            mog.src = video.dst1
             mog.Run(ocvb)
 
-            contours = cv.Cv2.FindContoursAsArray(ocvb.result1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-            ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            contours = cv.Cv2.FindContoursAsArray(mog.dst1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+            dst1 = mog.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             If standalone Then
                 For i = 0 To contours.Length - 1
                     Dim minRect = cv.Cv2.MinAreaRect(contours(i))
-                    drawRotatedRectangle(minRect, ocvb.result1, cv.Scalar.Red)
+                    drawRotatedRectangle(minRect, dst1, cv.Scalar.Red)
                 Next
             End If
-            ocvb.result2 = video.image.Resize(ocvb.color.Size())
+            dst2 = video.dst1
         End If
     End Sub
 End Class
@@ -168,13 +169,15 @@ Public Class Video_MinCircle
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         input.Run(ocvb)
+        dst1 = input.dst1
+        dst2 = input.dst2
 
         Dim center As New cv.Point2f
         Dim radius As Single
         If input.contours IsNot Nothing Then
             For i = 0 To input.contours.Length - 1
                 cv.Cv2.MinEnclosingCircle(input.contours(i), center, radius)
-                ocvb.result1.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                dst1.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
         End If
     End Sub

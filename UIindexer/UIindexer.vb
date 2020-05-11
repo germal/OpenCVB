@@ -9,6 +9,7 @@ Module IndexMain
     Dim nonPYnames As New SortedList(Of String, String)
     Dim PYStreamNames As New SortedList(Of String, String)
     Dim Painterly As New SortedList(Of String, String)
+    Dim MoreWork As New SortedList(Of String, String)
     Private Function trimQuotes(line As String)
         While InStr(line, """")
             Dim startq = InStr(line, """")
@@ -77,6 +78,7 @@ Module IndexMain
                 Dim lcaseLine = " " + LCase(line)
                 If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
                 If lcaseLine.Contains("painterly") Then Painterly.Add(classname, classname)
+                If lcaseLine.Contains("more work needed") Then MoreWork.Add(classname, classname)
                 If LCase(line).StartsWith("public class") Then
                     Dim split As String() = Regex.Split(line, "\W+")
                     ' next line must be "Inherits ocvbClass"
@@ -173,6 +175,12 @@ Module IndexMain
         sw.Write("<Painterly>")
         For i = 0 To Painterly.Count - 1
             sw.Write("," + Painterly.ElementAt(i).Key)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<MoreWork>")
+        For i = 0 To MoreWork.Count - 1
+            sw.Write("," + MoreWork.ElementAt(i).Key)
         Next
         sw.WriteLine()
 

@@ -13,7 +13,7 @@ Public Class Pencil_Basics
         Dim sigma_s = sliders.TrackBar1.Value
         Dim sigma_r = sliders.TrackBar2.Value / sliders.TrackBar2.Maximum
         Dim shadowFactor = sliders.TrackBar3.Value / 1000
-        cv.Cv2.PencilSketch(ocvb.color, ocvb.result2, dst1, sigma_s, sigma_r, shadowFactor)
+        cv.Cv2.PencilSketch(ocvb.color, dst2, dst1, sigma_s, sigma_r, shadowFactor)
     End Sub
 End Class
 
@@ -39,7 +39,7 @@ Public Class Pencil_Manual
 
         Static index As Integer
         ocvb.label2 = "Intermediate result: " + Choose(index + 1, "gray", "grayinv", "blur")
-        ocvb.result2 = Choose(index + 1, gray, grayinv, blur)
+        dst2 = Choose(index + 1, gray, grayinv, blur)
         If ocvb.frameCount Mod 30 = 0 Then
             index += 1
             If index >= 3 Then index = 0

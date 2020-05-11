@@ -136,11 +136,11 @@ Public Class MatchTemplate_DrawRect
             End If
         Next
         cv.Cv2.MatchTemplate(ocvb.color, saveTemplate, dst1, matchMethod)
-        ocvb.result2 = ocvb.color
-        ocvb.result2.Rectangle(saveRect, cv.Scalar.White, 1)
+        dst2 = ocvb.color
+        dst2.Rectangle(saveRect, cv.Scalar.White, 1)
         Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
         dst1.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
-        ocvb.result2.Circle(maxLoc.X + saveRect.Width / 2, maxLoc.Y + saveRect.Height / 2, 20, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
+        dst2.Circle(maxLoc.X + saveRect.Width / 2, maxLoc.Y + saveRect.Height / 2, 20, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
@@ -193,7 +193,7 @@ Public Class MatchTemplate_BestTemplate_MT
                 End If
             Next
 
-            ocvb.result2 = ocvb.color.Clone()
+            dst2 = ocvb.color.Clone()
             bestContrast = grid.roiList(maxIndex)
             ocvb.drawRect = bestContrast
         End If

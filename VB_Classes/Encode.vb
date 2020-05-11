@@ -15,10 +15,10 @@ Public Class Encode_Basics
         Dim encodeParams() As Int32 = {cv.ImwriteFlags.JpegQuality, sliders.TrackBar1.Value}
 
         cv.Cv2.ImEncode(".jpg", ocvb.color, buf, encodeParams)
-        ocvb.result2 = cv.Cv2.ImDecode(buf, 1)
+        dst2 = cv.Cv2.ImDecode(buf, 1)
 
         Dim output As New cv.Mat
-        cv.Cv2.Absdiff(ocvb.color, ocvb.result2, output)
+        cv.Cv2.Absdiff(ocvb.color, dst2, output)
 
         Dim scale = sliders.TrackBar2.Value
         output.ConvertTo(dst1, cv.MatType.CV_8UC3, scale)
@@ -70,10 +70,10 @@ Public Class Encode_Options
         Dim encodeParams() As Int32 = {encodeOption, qualityLevel}
 
         cv.Cv2.ImEncode(fileExtension, ocvb.color, buf, encodeParams)
-        ocvb.result2 = cv.Cv2.ImDecode(buf, 1)
+        dst2 = cv.Cv2.ImDecode(buf, 1)
 
         Dim output As New cv.Mat
-        cv.Cv2.Absdiff(ocvb.color, ocvb.result2, output)
+        cv.Cv2.Absdiff(ocvb.color, dst2, output)
 
         Dim scale = sliders.TrackBar2.Value
         output.ConvertTo(dst1, cv.MatType.CV_8UC3, scale)

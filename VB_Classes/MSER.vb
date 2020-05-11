@@ -163,10 +163,10 @@ Public Class MSER_TestSynthetic
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         synth.Run(ocvb)
-        ocvb.result2 = dst1.Clone()
+        dst2 = dst1.Clone()
 
         'testSynthetic(ocvb, dst1, False, 10)
-        testSynthetic(ocvb, ocvb.result2, True, 100)
+        testSynthetic(ocvb, dst2, True, 100)
     End Sub
 End Class
 
@@ -205,7 +205,7 @@ Public Class MSER_CPPStyle
             Dim color = cv.Scalar.RandomColor
             mat.Rectangle(box, color, -1, cv.LineTypes.AntiAlias)
         Next
-        ocvb.result2 = mat.Resize(ocvb.result2.Size())
+        dst2 = mat.Resize(dst2.Size())
     End Sub
 End Class
 

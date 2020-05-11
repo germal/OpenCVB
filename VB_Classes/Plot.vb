@@ -83,7 +83,7 @@ Public Class Plot_OverTime
                     dst1.Ellipse(c, ellipseSize, 0, 0, 360, plotColors(i), -1)
                 Case 3
                     Dim rotatedRect = New cv.RotatedRect(c, rectSize, 45)
-                    drawRotatedRectangle(rotatedRect, ocvb.result2, plotColors(i))
+                    drawRotatedRectangle(rotatedRect, dst2, plotColors(i))
             End Select
         Next
 
@@ -96,7 +96,7 @@ Public Class Plot_OverTime
 
         columnIndex += pixelWidth
         dst1.Col(columnIndex).SetTo(0)
-        if standalone Then ocvb.label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
+        If standalone Then ocvb.label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
         AddPlotScale(dst1, minScale - topBottomPad, maxScale + topBottomPad, sliders.TrackBar3.Value / 10)
     End Sub
 End Class
@@ -193,7 +193,7 @@ Public Class Plot_Basics_CPP
         Dim plotData(ocvb.color.Total * ocvb.color.ElemSize - 1) As Byte
         Dim handlePlot = GCHandle.Alloc(plotData, GCHandleType.Pinned)
 
-        if standalone Then
+        If standalone Then
             For i = 0 To srcX.Length - 1
                 srcX(i) = i
                 srcY(i) = i * i * i
@@ -246,7 +246,7 @@ Public Class Plot_Basics
             hist.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             hist.plotColors(0) = cv.Scalar.White
             hist.Run(ocvb)
-            plot.dst1 = ocvb.result2
+            plot.dst1 = dst2
             ReDim plot.srcX(hist.histRaw(0).Rows - 1)
             ReDim plot.srcY(hist.histRaw(0).Rows - 1)
             For i = 0 To plot.srcX.Length - 1

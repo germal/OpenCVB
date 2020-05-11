@@ -21,10 +21,10 @@ Public Class LeftRightView_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1 = ocvb.leftView
-        ocvb.result2 = ocvb.rightView
+        dst2 = ocvb.rightView
 
         dst1 += sliders.TrackBar1.Value
-        ocvb.result2 += sliders.TrackBar1.Value
+        dst2 += sliders.TrackBar1.Value
     End Sub
 End Class
 
@@ -68,13 +68,13 @@ Public Class LeftRightView_CompareUndistorted
             rightInput = fisheye.rightView.Clone()
         Else
             dst1 = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_8UC1, 0)
-            ocvb.result2 = ocvb.rightView
+            dst2 = ocvb.rightView
             leftInput = ocvb.leftView
             rightInput = ocvb.rightView
         End If
 
         dst1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1, 0)
-        ocvb.result2 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1, 0)
+        dst2 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1, 0)
 
         If ocvb.parms.lowResolution Then
             leftInput = leftInput.Resize(ocvb.color.Size())
@@ -84,9 +84,9 @@ Public Class LeftRightView_CompareUndistorted
         leftInput(rSrc).CopyTo(dst1(New cv.Rect(0, 100, leftInput.Width, slideHeight)))
         rightInput(rSrc).CopyTo(dst1(New cv.Rect(0, 100 + slideHeight, leftInput.Width, slideHeight)))
 
-        ocvb.result2 = leftInput
+        dst2 = leftInput
         dst1 += sliders.TrackBar1.Value
-        ocvb.result2 += sliders.TrackBar1.Value
+        dst2 += sliders.TrackBar1.Value
     End Sub
 End Class
 
@@ -131,10 +131,10 @@ Public Class LeftRightView_CompareRaw
         Dim sliceY = sliders.TrackBar2.Value
         Dim slideHeight = sliders.TrackBar3.Value
         leftView(New cv.Rect(0, sliceY, leftView.Width, slideHeight)).CopyTo(dst1(New cv.Rect(0, 100, leftView.Width, slideHeight)))
-        ocvb.result2(New cv.Rect(0, sliceY, leftView.Width, slideHeight)).CopyTo(dst1(New cv.Rect(0, 100 + slideHeight, leftView.Width, slideHeight)))
+        dst2(New cv.Rect(0, sliceY, leftView.Width, slideHeight)).CopyTo(dst1(New cv.Rect(0, 100 + slideHeight, leftView.Width, slideHeight)))
         Dim rSrc = New cv.Rect(0, sliceY, leftView.Width, slideHeight)
         leftView(rSrc).CopyTo(dst1(New cv.Rect(0, 100, leftView.Width, slideHeight)))
-        ocvb.result2(rSrc).CopyTo(dst1(New cv.Rect(0, 100 + slideHeight, leftView.Width, slideHeight)))
+        dst2(rSrc).CopyTo(dst1(New cv.Rect(0, 100 + slideHeight, leftView.Width, slideHeight)))
     End Sub
 End Class
 
@@ -159,13 +159,13 @@ Public Class LeftRightView_Features
     Public Sub Run(ocvb As AlgorithmData)
         lrView.Run(ocvb)
         Dim leftView = dst1.Clone()
-        Dim rightView = ocvb.result2.Clone()
+        Dim rightView = dst2.Clone()
 
         features.gray = rightView.Clone()
         features.Run(ocvb)
-        rightView.CopyTo(ocvb.result2) ' save the right image
+        rightView.CopyTo(dst2) ' save the right image
         For i = 0 To features.goodFeatures.Count - 1
-            cv.Cv2.Circle(ocvb.result2, features.goodFeatures(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst2, features.goodFeatures(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
         features.gray = leftView
@@ -195,7 +195,7 @@ Public Class LeftRightView_Palettized
     Public Sub Run(ocvb As AlgorithmData)
         lrView.Run(ocvb)
         Dim left = dst1.Clone()
-        Dim right = ocvb.result2.Clone()
+        Dim right = dst2.Clone()
 
         palette.src = dst1
         palette.Run(ocvb)
@@ -203,7 +203,7 @@ Public Class LeftRightView_Palettized
 
         palette.src = right
         palette.Run(ocvb)
-        ocvb.result2 = dst1
+        dst2 = dst1
 
         dst1 = left
     End Sub
@@ -229,11 +229,11 @@ Public Class LeftRightView_BRISK
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         lrView.Run(ocvb)
-        brisk.src = ocvb.result2.Clone()
+        brisk.src = dst2.Clone()
         brisk.Run(ocvb)
 
         For Each pt In brisk.features
-            ocvb.result2.Circle(pt, 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(pt, 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
         brisk.src = dst1.Clone()

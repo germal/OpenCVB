@@ -168,7 +168,7 @@ Public Class VTK_Histogram3D
         mats.Run(ocvb)
         dst1.SetTo(0)
 
-        vtk.rgbInput = ocvb.result2.Clone()
+        vtk.rgbInput = dst2.Clone()
         vtk.dataInput = New cv.Mat ' ocvb.depth
         vtk.Run(ocvb)
     End Sub

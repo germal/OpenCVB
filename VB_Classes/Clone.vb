@@ -20,7 +20,7 @@ Public Class Clone_Normal
         Else
             cv.Cv2.Rectangle(mask, ocvb.drawRect, cv.Scalar.White, -1)
         End If
-        ocvb.result2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Select Case cloneSpec
             Case 0
@@ -127,8 +127,8 @@ Public Class Clone_Eagle
         mask = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/Clonemask.png")
         maskROI = New cv.Rect(srcROI.Width, 40, mask.Width, mask.Height)
 
-        ocvb.result2(srcROI) = sourceImage
-        ocvb.result2(maskROI) = mask
+        dst2(srcROI) = sourceImage
+        dst2(maskROI) = mask
 
         pt = New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
         ocvb.desc = "Clone an eagle into the video stream."
@@ -192,8 +192,8 @@ Public Class Clone_Seamless
                 Exit For
             End If
         Next
-        ocvb.result2 = ocvb.color.Clone()
-        cv.Cv2.SeamlessClone(ocvb.RGBDepth, ocvb.color, dst1, center, ocvb.result2, style)
-        ocvb.result2.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst2 = ocvb.color.Clone()
+        cv.Cv2.SeamlessClone(ocvb.RGBDepth, ocvb.color, dst1, center, dst2, style)
+        dst2.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
     End Sub
 End Class

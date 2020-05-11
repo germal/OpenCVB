@@ -12,7 +12,7 @@ Public Class Concat_Basics
         cv.Cv2.HConcat(ocvb.color, ocvb.RGBDepth, tmp)
         dst1 = tmp.Resize(ocvb.color.Size())
         cv.Cv2.VConcat(ocvb.color, ocvb.RGBDepth, tmp)
-        ocvb.result2 = tmp.Resize(ocvb.color.Size())
+        dst2 = tmp.Resize(ocvb.color.Size())
     End Sub
 End Class
 

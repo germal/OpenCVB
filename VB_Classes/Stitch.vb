@@ -37,15 +37,15 @@ Public Class Stitch_Basics
         ' stitcher may fail with an external exception if you make width and height too small.
         Dim status = stitcher.Stitch(mats, pano)
 
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         If status = cv.Stitcher.Status.OK Then
             Dim w = pano.Width, h = pano.Height
             If w > dst1.Width Then w = dst1.Width
             If h > dst1.Height Then h = dst1.Height
-            pano.CopyTo(ocvb.result2(New cv.Rect(0, 0, w, h)))
+            pano.CopyTo(dst2(New cv.Rect(0, 0, w, h)))
         Else
             If status = cv.Stitcher.Status.ErrorNeedMoreImgs Then
-                ocvb.result2.PutText("Need more images", New cv.Point(10, 60), cv.HersheyFonts.HersheySimplex, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                dst2.PutText("Need more images", New cv.Point(10, 60), cv.HersheyFonts.HersheySimplex, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             End If
         End If
     End Sub

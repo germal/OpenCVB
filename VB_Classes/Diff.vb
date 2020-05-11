@@ -6,16 +6,20 @@ Public Class Diff_Basics
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Diff - Color Threshold", 1, 255, 50)
         ocvb.label1 = "Stable Gray Color"
-        ocvb.label2 = "Unstable Gray Color"
+        ocvb.label2 = "Unstable Color mask"
         ocvb.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If ocvb.frameCount > 0 Then
             dst1 = lastFrame
-            cv.Cv2.Absdiff(gray, lastFrame, ocvb.result2)
-            ocvb.result2 = ocvb.result2.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
-            dst1 = ocvb.color.Clone().SetTo(0, ocvb.result2)
+            cv.Cv2.Absdiff(gray, lastFrame, dst2)
+            dst2 = dst2.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
+            dst1 = ocvb.color.Clone().SetTo(0, dst2)
+        Else
+            dst1 = ocvb.color
+            dst2 = ocvb.color.EmptyClone.SetTo(0)
         End If
         lastFrame = gray.Clone()
     End Sub
@@ -26,8 +30,8 @@ End Class
 
 Public Class Diff_UnstableDepthAndColor
     Inherits ocvbClass
-    Dim diff As Diff_Basics
-    Dim depth As Depth_Stable
+    Public diff As Diff_Basics
+    Public depth As Depth_Stable
     Dim lastFrames() As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -36,23 +40,24 @@ Public Class Diff_UnstableDepthAndColor
 
         depth = New Depth_Stable(ocvb, caller)
 
+        ocvb.label1 = "Stable depth and color"
         ocvb.desc = "Build a mask for any pixels that have either unstable depth or color"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If standalone Then src = ocvb.color
+        diff.src = src
         diff.Run(ocvb)
-        Dim unstableColor = ocvb.result2.Clone()
+        Dim unstableColor = diff.dst2.Clone()
+        depth.src = ocvb.RGBDepth
         depth.Run(ocvb)
-        If ocvb.result2.Channels = 1 Then
-            Dim unstableDepth As New cv.Mat
-            Dim mask As New cv.Mat
-            cv.Cv2.BitwiseNot(ocvb.result2, unstableDepth)
-            If unstableColor.Channels = 3 Then unstableColor = unstableColor.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            If dst1.Channels = 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            cv.Cv2.BitwiseOr(unstableColor, unstableDepth, mask)
-            dst1 = ocvb.color.Clone()
-            dst1.SetTo(0, mask)
-            ocvb.label1 = "Stable depth and color"
-            ocvb.label2 = "Stable (non-zero) Depth"
-        End If
+        Dim unstableDepth As New cv.Mat
+        Dim mask As New cv.Mat
+        cv.Cv2.BitwiseNot(depth.dst2, unstableDepth)
+        If unstableColor.Channels = 3 Then unstableColor = unstableColor.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.BitwiseOr(unstableColor, unstableDepth, mask)
+        dst1 = ocvb.color.Clone()
+        dst1.SetTo(0, mask)
+        ocvb.label2 = "Unstable depth/color mask"
+        dst2 = mask
     End Sub
 End Class

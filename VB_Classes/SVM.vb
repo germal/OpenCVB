@@ -61,7 +61,7 @@ Public Class SVM_Basics
     Public Sub Run(ocvb As AlgorithmData)
         svmOptions.Run(ocvb) ' update any options specified in the interface.
         dst1.SetTo(0)
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
 
         Dim points(svmOptions.sliders.TrackBar1.Value) As cv.Point2f
         Dim responses(points.Length - 1) As Int32
@@ -105,9 +105,9 @@ Public Class SVM_Basics
                     Dim ret = svmx.Predict(sampleMat)
                     Dim plotRect = New cv.Rect(x, ocvb.color.Height - 1 - y, granularity * 2, granularity * 2)
                     If ret = 1 Then
-                        ocvb.result2.Rectangle(plotRect, cv.Scalar.Red, -1)
+                        dst2.Rectangle(plotRect, cv.Scalar.Red, -1)
                     ElseIf ret = 2 Then
-                        ocvb.result2.Rectangle(plotRect, cv.Scalar.GreenYellow, -1)
+                        dst2.Rectangle(plotRect, cv.Scalar.GreenYellow, -1)
                     End If
                 Next
             Next
@@ -117,7 +117,7 @@ Public Class SVM_Basics
                 Dim y1 = CInt(ocvb.color.Height - f(x - 1))
                 Dim y2 = CInt(ocvb.color.Height - f(x))
                 dst1.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                ocvb.result2.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                dst2.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
         End Using
     End Sub
@@ -148,7 +148,7 @@ Public Class SVM_Basics_MT
         svmOptions.Run(ocvb)
         grid.Run(ocvb)
         dst1.SetTo(0)
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         Dim points(svmOptions.sliders.TrackBar1.Value) As cv.Point2f
         Dim responses(points.Length - 1) As Int32
         For i = 0 To points.Length - 1
@@ -198,9 +198,9 @@ Public Class SVM_Basics_MT
                         Dim ret = svmx.Predict(sampleMat)
                         Dim plotRect = New cv.Rect(x + roi.X, ocvb.color.Height - 1 - (y + roi.Y), granularity * 2, granularity * 2)
                         If ret = 1 Then
-                            ocvb.result2.Rectangle(plotRect, cv.Scalar.Red, -1)
+                            dst2.Rectangle(plotRect, cv.Scalar.Red, -1)
                         ElseIf ret = 2 Then
-                            ocvb.result2.Rectangle(plotRect, cv.Scalar.GreenYellow, -1)
+                            dst2.Rectangle(plotRect, cv.Scalar.GreenYellow, -1)
                         End If
                     Next
                 Next
@@ -210,7 +210,7 @@ Public Class SVM_Basics_MT
                 Dim y1 = CInt(ocvb.color.Height - f(x - 1))
                 Dim y2 = CInt(ocvb.color.Height - f(x))
                 dst1.Line(x - 1, y1, x, y2, cv.Scalar.LightBlue, 1, cv.LineTypes.AntiAlias)
-                ocvb.result2.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                dst2.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
             dst1.SetTo(cv.Scalar.White, grid.gridMask)
         End Using
@@ -261,12 +261,12 @@ Public Class SVM_Simple
             Dim green = New cv.Vec3b(0, 255, 0)
             Dim yellow = New cv.Vec3b(255, 255, 0)
             Dim sampleMat As New cv.Mat(1, 2, cv.MatType.CV_32F)
-            For y = 0 To ocvb.result2.Height - 1
-                For x = 0 To ocvb.result2.Width - 1
+            For y = 0 To dst2.Height - 1
+                For x = 0 To dst2.Width - 1
                     sampleMat.Set(Of Single)(0, 0, x)
                     sampleMat.Set(Of Single)(0, 1, y)
                     'Dim ret = CInt(svmx.Predict(sampleMat))
-                    'ocvb.result2.Set(Of cv.Vec3b)(y, x, If(ret = 1, green, yellow))
+                    'dst2.Set(Of cv.Vec3b)(y, x, If(ret = 1, green, yellow))
                 Next
             Next
 
@@ -281,12 +281,12 @@ Public Class SVM_Simple
             Next
 
             Dim response = svmx.GetSupportVectors()
-            ocvb.result2.SetTo(0)
+            dst2.SetTo(0)
             Dim thickness = 2
             If response.Rows > 1 Then
                 For i = 0 To response.Rows
                     Dim v = response.Get(Of cv.Vec2f)(i)
-                    ocvb.result2.Circle(New cv.Point(v(0), v(1)), 6, cv.Scalar.Blue, thickness, cv.LineTypes.AntiAlias)
+                    dst2.Circle(New cv.Point(v(0), v(1)), 6, cv.Scalar.Blue, thickness, cv.LineTypes.AntiAlias)
                 Next
             End If
         End Using

@@ -92,11 +92,11 @@ Public Class PCA_DrawImage
         Dim contours As cv.Point()() = Nothing
         cv.Cv2.FindContours(gray, contours, hierarchy, cv.RetrievalModes.List, cv.ContourApproximationModes.ApproxNone)
 
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         For i = 0 To contours.Length - 1
             Dim area = cv.Cv2.ContourArea(contours(i))
             If area < 100 Or area > 100000 Then Continue For
-            cv.Cv2.DrawContours(ocvb.result2, contours, i, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            cv.Cv2.DrawContours(dst2, contours, i, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
             Dim sz = contours(i).Length
             Dim data_pts = New cv.Mat(sz, 2, cv.MatType.CV_64FC1)
             For j = 0 To data_pts.Rows - 1
@@ -113,13 +113,13 @@ Public Class PCA_DrawImage
                 eigen_val(j) = pca_analysis.Eigenvalues.Get(Of Double)(0, j)
             Next
 
-            ocvb.result2.Circle(cntr, 3, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(cntr, 3, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
             Dim factor As Single = 0.02 ' scaling factor for the lines depicting the principle components.
             Dim ept1 = New cv.Point(cntr.X + factor * eigen_vecs(0).X * eigen_val(0), cntr.Y + factor * eigen_vecs(0).Y * eigen_val(0))
             Dim ept2 = New cv.Point(cntr.X - factor * eigen_vecs(1).X * eigen_val(1), cntr.Y - factor * eigen_vecs(1).Y * eigen_val(1))
 
-            drawAxis(ocvb.result2, cntr, ept1, cv.Scalar.Red, 1) ' primary principle component
-            drawAxis(ocvb.result2, cntr, ept2, cv.Scalar.BlueViolet, 5) ' secondary principle component
+            drawAxis(dst2, cntr, ept1, cv.Scalar.Red, 1) ' primary principle component
+            drawAxis(dst2, cntr, ept2, cv.Scalar.BlueViolet, 5) ' secondary principle component
         Next
     End Sub
 End Class

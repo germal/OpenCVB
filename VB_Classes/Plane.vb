@@ -110,7 +110,7 @@ Public Class Plane_Detect
         Dim depth32f = getDepth32f(ocvb)
         grid.Run(ocvb)
 
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         ocvb.RGBDepth.CopyTo(dst1)
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
@@ -157,7 +157,7 @@ Public Class Plane_Detect
 
             Dim showNormal As New cv.Mat(roi.Height, roi.Width, cv.MatType.CV_8UC3)
             showNormal.SetTo(New cv.Scalar(Math.Abs(255 * plane.Item0), Math.Abs(255 * plane.Item1), Math.Abs(255 * plane.Item2)))
-            cv.Cv2.AddWeighted(ocvb.color(roi), 0.5, showNormal, 0.5, 0, ocvb.result2(roi))
+            cv.Cv2.AddWeighted(ocvb.color(roi), 0.5, showNormal, 0.5, 0, dst2(roi))
         End Sub)
         Dim mask = grid.gridMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.BitwiseOr(dst1, mask, dst1)
@@ -183,7 +183,7 @@ Public Class Plane_DetectDebug
         Dim depth32f = getDepth32f(ocvb)
         grid.Run(ocvb)
 
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         ocvb.RGBDepth.CopyTo(dst1)
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
@@ -230,7 +230,7 @@ Public Class Plane_DetectDebug
 
             Dim showNormal As New cv.Mat(roi.Height, roi.Width, cv.MatType.CV_8UC3)
             showNormal.SetTo(New cv.Scalar(Math.Abs(255 * plane.Item0), Math.Abs(255 * plane.Item1), Math.Abs(255 * plane.Item2)))
-            cv.Cv2.AddWeighted(ocvb.color(roi), 0.5, showNormal, 0.5, 0, ocvb.result2(roi))
+            cv.Cv2.AddWeighted(ocvb.color(roi), 0.5, showNormal, 0.5, 0, dst2(roi))
         End Sub)
         Dim mask = grid.gridMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.BitwiseOr(dst1, mask, dst1)

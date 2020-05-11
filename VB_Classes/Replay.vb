@@ -185,7 +185,7 @@ Public Class Replay_Play
                 End If
                 playback.BytesMovedTrackbar.Value = bytesTotal / 1000000
                 dst1 = ocvb.color.Clone()
-                ocvb.result2 = ocvb.RGBDepth.Clone()
+                dst2 = ocvb.RGBDepth.Clone()
             Else
                 If playback.fileinfo.Exists = False Then
                     ocvb.putText(New ActiveClass.TrueType("File not found: " + playback.fileinfo.FullName, 10, 125))

@@ -56,7 +56,7 @@ Public Class Blur_Homogeneous
         Dim kernelSize As Int32 = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         dst1 = ocvb.color.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
-        ocvb.result2 = ocvb.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
+        dst2 = ocvb.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
     End Sub
 End Class
 
@@ -114,14 +114,14 @@ Public Class Blur_PlusHistogram
     Public Sub Run(ocvb As AlgorithmData)
         myhist.histogram.gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         myhist.Run(ocvb)
-        mat2to1.mat(0) = ocvb.result2.Clone()
+        mat2to1.mat(0) = dst2.Clone()
 
         blur.src = dst1.Clone()
         blur.Run(ocvb)
 
         myhist.histogram.gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         myhist.Run(ocvb)
-        mat2to1.mat(1) = ocvb.result2.Clone()
+        mat2to1.mat(1) = dst2.Clone()
         mat2to1.Run(ocvb)
         ocvb.label2 = "Top is before, Bottom is after"
     End Sub

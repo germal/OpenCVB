@@ -25,8 +25,8 @@ Public Class Face_Haar_LBP
     Public Sub Run(ocvb As AlgorithmData)
         dst1 = ocvb.color.Clone()
         detectFace(dst1, haarCascade)
-        ocvb.result2 = ocvb.color.Clone()
-        detectFace(ocvb.result2, lbpCascade)
+        dst2 = ocvb.color.Clone()
+        detectFace(dst2, lbpCascade)
     End Sub
 End Class
 

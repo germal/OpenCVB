@@ -26,7 +26,7 @@ Public Class DNN_Test
         net = Net.ReadNetFromCaffe(ocvb.parms.HomeDir + "Data/bvlc_googlenet.prototxt")
 
         Dim image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/space_shuttle.jpg")
-        ocvb.result2 = image.Resize(ocvb.result2.Size())
+        dst2 = image.Resize(dst2.Size())
         Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
         net.SetInput(inputBlob, "data")
         If ocvb.parms.AvoidDNNCrashes = False Then
@@ -59,7 +59,7 @@ Public Class DNN_Caffe_CS
     Public Sub Run(ocvb As AlgorithmData)
         Dim image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/space_shuttle.jpg")
         Dim str = caffeCS.Run(image, ocvb.parms.AvoidDNNCrashes)
-        ocvb.result2 = image.Resize(ocvb.result2.Size())
+        dst2 = image.Resize(dst2.Size())
         If ocvb.parms.AvoidDNNCrashes Then
             ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
         Else
@@ -112,7 +112,7 @@ Public Class DNN_Basics
             Dim inScaleFactor = sliders.TrackBar1.Value / sliders.TrackBar1.Maximum ' should be 0.0078 by default...
             Dim meanVal = CSng(sliders.TrackBar2.Value)
             Dim inputBlob = CvDnn.BlobFromImage(ocvb.color(crop), inScaleFactor, New cv.Size(300, 300), meanVal, False)
-            ocvb.color.CopyTo(ocvb.result2)
+            ocvb.color.CopyTo(dst2)
             ocvb.color(crop).CopyTo(dst1(crop))
             net.SetInput(inputBlob, "data")
 
@@ -135,10 +135,10 @@ Public Class DNN_Basics
                         Dim vec = detectionMat.Get(Of cv.Vec4f)(i, 3)
                         rect = New cv.Rect(vec.Item0 * cols + crop.Left, vec.Item1 * rows + crop.Top, (vec.Item2 - vec.Item0) * cols, (vec.Item3 - vec.Item1) * rows)
                         rect = New cv.Rect(rect.X, rect.Y, Math.Min(dnnWidth, rect.Width), Math.Min(dnnHeight, rect.Height))
-                        ocvb.result2.Rectangle(rect, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)
+                        dst2.Rectangle(rect, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)
                         rect.Width = 100
                         rect.Height = 30
-                        ocvb.result2.Rectangle(rect, cv.Scalar.Black, -1)
+                        dst2.Rectangle(rect, cv.Scalar.Black, -1)
                         ocvb.putText(New ActiveClass.TrueType(nextName, CInt(rect.X * ocvb.parms.imageToTrueTypeLoc), CInt(rect.Y * ocvb.parms.imageToTrueTypeLoc), RESULT2))
                     End If
                 Next

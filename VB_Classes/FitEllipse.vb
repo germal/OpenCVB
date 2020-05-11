@@ -27,17 +27,17 @@ Public Class FitEllipse_Basics_CPP
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         area.Run(ocvb)  ' get some random clusters of points
-        ocvb.result2.SetTo(0)
+        dst2.SetTo(0)
         If area.srcPoints.Count >= 5 Then
             Dim box = cv.Cv2.FitEllipse(area.srcPoints)
             ' draw a rotatedRectangle
             Dim vertices = box.Points()
             For j = 0 To vertices.Count - 1
-                ocvb.result2.Line(vertices(j), vertices((j + 1) Mod 4), cv.Scalar.Green, 2, cv.LineTypes.AntiAlias)
+                dst2.Line(vertices(j), vertices((j + 1) Mod 4), cv.Scalar.Green, 2, cv.LineTypes.AntiAlias)
             Next
-            ocvb.result2.Ellipse(box, cv.Scalar.Green, 2, cv.LineTypes.AntiAlias)
+            dst2.Ellipse(box, cv.Scalar.Green, 2, cv.LineTypes.AntiAlias)
             For i = 0 To area.srcPoints.Count - 1
-                ocvb.result2.Circle(area.srcPoints(i), 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                dst2.Circle(area.srcPoints(i), 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             Next
 
             ' AMS method
@@ -52,7 +52,7 @@ Public Class FitEllipse_Basics_CPP
             Dim center As New cv.Point2f(output.Get(Of Single)(1), output.Get(Of Single)(2))
             Dim size As New cv.Size2f(output.Get(Of Single)(3), output.Get(Of Single)(4))
             box = New cv.RotatedRect(center, size, angle)
-            ocvb.result2.Ellipse(box, cv.Scalar.Yellow, 6, cv.LineTypes.AntiAlias)
+            dst2.Ellipse(box, cv.Scalar.Yellow, 6, cv.LineTypes.AntiAlias)
 
             FitEllipse_Direct(srcHandle.AddrOfPinnedObject(), area.srcPoints.Count - 1, dstHandle.AddrOfPinnedObject)
             dstHandle.Free()
@@ -62,7 +62,7 @@ Public Class FitEllipse_Basics_CPP
             center = New cv.Point2f(output.Get(Of Single)(1), output.Get(Of Single)(2))
             size = New cv.Size2f(output.Get(Of Single)(3), output.Get(Of Single)(4))
             box = New cv.RotatedRect(center, size, angle)
-            ocvb.result2.Ellipse(box, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+            dst2.Ellipse(box, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
         End If
         ocvb.label1 = "Using MinTriangle to generate " + CStr(area.srcPoints.Count) + " points"
     End Sub

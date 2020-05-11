@@ -47,10 +47,10 @@ Public Class Hull_Basics
 
         if standalone Then
             dst1.SetTo(0)
-            ocvb.result2.SetTo(0)
+            dst2.SetTo(0)
             For i = 0 To hull.Count - 1
                 cv.Cv2.Line(dst1, hull.ElementAt(i), hull.ElementAt((i + 1) Mod hull.Count), cv.Scalar.White, 2)
-                cv.Cv2.Line(ocvb.result2, hull.ElementAt(i), hull.ElementAt((i + 1) Mod hull.Count), cv.Scalar.White, 2)
+                cv.Cv2.Line(dst2, hull.ElementAt(i), hull.ElementAt((i + 1) Mod hull.Count), cv.Scalar.White, 2)
             Next
 
             Dim pMat As New cv.Mat(hull.Count, 1, cv.MatType.CV_32SC2, hull)
@@ -61,7 +61,7 @@ Public Class Hull_Basics
 
             For i = 0 To Count - 1
                 dst1.Circle(points(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-                ocvb.result2.Circle(points(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                dst2.Circle(points(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             Next
         End If
     End Sub

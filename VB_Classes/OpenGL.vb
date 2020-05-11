@@ -323,8 +323,8 @@ Public Class OpenGL_Draw3D
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         circle.Run(ocvb)
-        ocvb.result2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ogl.OpenGL.dataInput = ocvb.result2
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ogl.OpenGL.dataInput = dst2
         ogl.OpenGL.rgbInput = New cv.Mat(1, ocvb.rColors.Length - 1, cv.MatType.CV_8UC3, ocvb.rColors.ToArray)
         ogl.Run(ocvb)
     End Sub

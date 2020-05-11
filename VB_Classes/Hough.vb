@@ -56,10 +56,10 @@ Public Class Hough_Circles
         Dim gray = New cv.Mat
         cv.Cv2.CvtColor(dst1, gray, cv.ColorConversionCodes.BGR2GRAY)
         Dim cFound = cv.Cv2.HoughCircles(gray, method, 1, dst1.Rows / 4, 100, 10, 1, 200)
-        cv.Cv2.CvtColor(gray, ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(gray, dst2, cv.ColorConversionCodes.GRAY2BGR)
         Dim foundColor = New cv.Scalar(0, 0, 255)
         For i = 0 To cFound.Length - 1
-            cv.Cv2.Circle(ocvb.result2, New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst2, New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, cv.LineTypes.AntiAlias)
         Next
     End Sub
 End Class
@@ -100,12 +100,12 @@ Public Class Hough_Lines
 
         If standalone Then
             ocvb.color.CopyTo(dst1)
-            ocvb.color.CopyTo(ocvb.result2)
+            ocvb.color.CopyTo(dst2)
             houghShowLines(dst1, segments, sliders.TrackBar4.Value)
             Dim probSegments = cv.Cv2.HoughLinesP(src, rhoIn, thetaIn, threshold)
             For i = 0 To Math.Min(probSegments.Length, sliders.TrackBar4.Value) - 1
                 Dim line = probSegments(i)
-                ocvb.result2.Line(line.P1, line.P2, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
+                dst2.Line(line.P1, line.P2, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
             Next
             ocvb.label2 = "Probablistic lines = " + CStr(probSegments.Length)
         End If
@@ -151,11 +151,11 @@ Public Class Hough_Lines_MT
         Sub(roi)
             Dim segments() = cv.Cv2.HoughLines(edges.dst1(roi), rhoIn, thetaIn, threshold)
             If segments.Count = 0 Then
-                ocvb.result2(roi) = ocvb.RGBDepth(roi)
+                dst2(roi) = ocvb.RGBDepth(roi)
                 Exit Sub
             End If
-            ocvb.result2(roi).SetTo(0)
-            houghShowLines(ocvb.result2(roi), segments, 1)
+            dst2(roi).SetTo(0)
+            houghShowLines(dst2(roi), segments, 1)
         End Sub)
         dst1.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub

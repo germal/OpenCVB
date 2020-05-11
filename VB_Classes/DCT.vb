@@ -28,9 +28,9 @@ Public Class DCT_RGB
         Next
         ocvb.label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed"
 
-        cv.Cv2.Merge(srcPlanes, ocvb.result1)
+        cv.Cv2.Merge(srcPlanes, dst1)
 
-        cv.Cv2.Subtract(ocvb.color, ocvb.result1, ocvb.result2)
+        cv.Cv2.Subtract(ocvb.color, dst1, dst2)
     End Sub
 End Class
 
@@ -57,9 +57,9 @@ Public Class DCT_RGBDepth
         ocvb.label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
-        src32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC1, 255)
+        src32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)
 
-        cv.Cv2.Subtract(gray, ocvb.result1, ocvb.result2)
+        cv.Cv2.Subtract(gray, dst1, dst2)
     End Sub
 End Class
 
@@ -86,9 +86,9 @@ Public Class DCT_Grayscale
         ocvb.label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
-        src32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC1, 255)
+        src32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)
 
-        cv.Cv2.Subtract(gray, ocvb.result1, ocvb.result2)
+        cv.Cv2.Subtract(gray, dst1, dst2)
     End Sub
 End Class
 
@@ -109,29 +109,29 @@ Public Class DCT_FeatureLess_MT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dct.Run(ocvb)
-        ocvb.result1.SetTo(0)
+        dst1.SetTo(0)
         Dim runLenMin = sliders.TrackBar1.Value
 
         ' Result2 contain the RGB image with highest frequency removed.
-        Parallel.For(0, ocvb.result2.Rows - 1,
+        Parallel.For(0, dst2.Rows - 1,
         Sub(i)
             Dim runLen As Int32 = 0
             Dim runStart As Int32 = 0
-            For j = 1 To ocvb.result2.Cols - 1
-                If ocvb.result2.Get(Of Byte)(i, j) = ocvb.result2.Get(Of Byte)(i, j - 1) Then
+            For j = 1 To dst2.Cols - 1
+                If dst2.Get(Of Byte)(i, j) = dst2.Get(Of Byte)(i, j - 1) Then
                     runLen += 1
                 Else
                     If runLen > runLenMin Then
                         Dim roi = New cv.Rect(runStart, i, runLen, 1)
-                        ocvb.result1(roi).SetTo(255)
+                        dst1(roi).SetTo(255)
                     End If
                     runStart = j
                     runLen = 1
                 End If
             Next
         End Sub)
-        ocvb.result2.SetTo(0)
-        ocvb.color.CopyTo(ocvb.result2, ocvb.result1)
+        dst2.SetTo(0)
+        ocvb.color.CopyTo(dst2, dst1)
         ocvb.label1 = "Mask of DCT with highest frequency removed"
     End Sub
 End Class
@@ -162,13 +162,13 @@ Public Class DCT_Surfaces_debug
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
-        Mats.mat(0) = ocvb.result1.Clone()
+        Mats.mat(0) = dst1.Clone()
 
         dct.Run(ocvb)
-        Mats.mat(1) = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Clone()
-        Mats.mat(2) = ocvb.result2.Clone()
+        Mats.mat(1) = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Clone()
+        Mats.mat(2) = dst2.Clone()
 
-        Dim mask = ocvb.result1.Clone() ' result1 contains the DCT mask of featureless surfaces.
+        Dim mask = dst1.Clone() ' result1 contains the DCT mask of featureless surfaces.
         Dim notMask As New cv.Mat
         cv.Cv2.BitwiseNot(mask, notMask)
         Dim depth32f = getDepth32f(ocvb)
@@ -264,7 +264,7 @@ Public Class DCT_Rows
         ocvb.label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse + cv.DctFlags.Rows)
-        src32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC1, 255)
-        ocvb.result2 = ocvb.result1.Threshold(sliders.TrackBar2.Value, 255, cv.ThresholdTypes.Binary)
+        src32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)
+        dst2 = dst1.Threshold(sliders.TrackBar2.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class

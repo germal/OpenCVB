@@ -27,6 +27,6 @@ Public Class FREAK_Basics
         Next
         ocvb.label1 = CStr(orb.keypoints.Count) + " key points were identified"
         ocvb.label2 = CStr(orb.keypoints.Count) + " FREAK Descriptors (resized to fit) Row = keypoint"
-        If fDesc.Width > 0 And fDesc.Height > 0 Then ocvb.result2 = fDesc.Resize(ocvb.result2.Size())
+        If fDesc.Width > 0 And fDesc.Height > 0 Then dst2 = fDesc.Resize(dst2.Size())
     End Sub
 End Class
