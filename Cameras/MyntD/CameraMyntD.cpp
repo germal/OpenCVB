@@ -162,7 +162,7 @@ extern "C" __declspec(dllexport) int* MyntDRightImage(CameraMyntD * MyntD)
 }
 extern "C" __declspec(dllexport) int* MyntDImageRGBdepth(CameraMyntD * MyntD)
 {
-	return (int*)MyntD->cPtr->dst.data;
+	return (int*)MyntD->cPtr->output.data;
 }
 extern "C" __declspec(dllexport) int* MyntDintrinsicsLeft(CameraMyntD * MyntD)
 {

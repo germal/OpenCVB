@@ -104,7 +104,7 @@ public:
 		zed.retrieveMeasure(depthSL32f, MEASURE::DEPTH, MEM::CPU);
 		cPtr->depth32f = cv::Mat(height, width, CV_32FC1, (void*)depthSL32f.getPtr<sl::uchar1>(sl::MEM::CPU)) * 1000;
 		cPtr->depth32f.convertTo(depth16, CV_16U);
-		cPtr->dst = cv::Mat(height, width, CV_8UC3);
+		cPtr->output = cv::Mat(height, width, CV_8UC3);
 		cPtr->Run();
 
 		zed.retrieveImage(leftViewSL, VIEW::LEFT_GRAY, MEM::CPU);
@@ -244,7 +244,7 @@ int* Zed2Color(StereoLabsZed2 * Zed2)
 extern "C" __declspec(dllexport)
 int* Zed2RGBDepth(StereoLabsZed2 * Zed2)
 {
-	return (int*)Zed2->cPtr->dst.data;
+	return (int*)Zed2->cPtr->output.data;
 }
 
 extern "C" __declspec(dllexport)

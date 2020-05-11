@@ -124,9 +124,9 @@ Public Class CameraT265
 
             IMU_RotationVector = New cv.Point3f(pose.rotation.X, pose.rotation.Y, pose.rotation.Z)
 
-            Dim src As New cv.Mat(3, 1, cv.MatType.CV_32F, IMU_RotationVector)
-            Dim dst As New cv.Mat(3, 3, src.Type, IMU_RotationMatrix)
-            cv.Cv2.Rodrigues(src, dst)
+            Dim Tsrc As New cv.Mat(3, 1, cv.MatType.CV_32F, IMU_RotationVector)
+            Dim Tdst As New cv.Mat(3, 3, Tsrc.Type, IMU_RotationMatrix)
+            cv.Cv2.Rodrigues(Tsrc, Tdst)
 
             Dim q = IMU_Rotation
             IMU_Translation = pose.translation

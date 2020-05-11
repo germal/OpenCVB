@@ -15,7 +15,7 @@ class EMax_Basics
 {
 private:
 public:
-    Mat samples, dst;
+    Mat samples, output;
 	Mat labels;
 	Mat testInput;
 	Ptr<EM> em_model;
@@ -41,17 +41,17 @@ public:
 
 		// classify every image pixel
 		Mat sample(1, 2, CV_32FC1);
-		for (int i = 0; i < dst.rows; i+=stepSize)
+		for (int i = 0; i < output.rows; i+=stepSize)
 		{
 //#pragma omp parallel for
-			for (int j = 0; j < dst.cols; j+= stepSize)
+			for (int j = 0; j < output.cols; j+= stepSize)
 			{
 				sample.at<float>(0) = (float)j;
 				sample.at<float>(1) = (float)i;
 				int response = cvRound(em_model->predict2(sample, noArray())[1]);
 				Scalar c = colors[response];
 
-				circle(dst, Point(j, i), stepSize, c*0.75, FILLED);
+				circle(output, Point(j, i), stepSize, c*0.75, FILLED);
 			}
 		}
     }
@@ -79,7 +79,7 @@ int *EMax_Basics_Run(EMax_Basics *EMax_BasicsPtr, int *samplePtr, int *labelsPtr
 	EMax_BasicsPtr->clusters = clusters;
 	EMax_BasicsPtr->labels = Mat(rows, 1, CV_32S, labelsPtr);
 	EMax_BasicsPtr->samples = Mat(rows, cols, CV_32FC1, samplePtr);
-	EMax_BasicsPtr->dst = Mat(imgRows, imgCols, CV_8UC3);
+	EMax_BasicsPtr->output = Mat(imgRows, imgCols, CV_8UC3);
 	EMax_BasicsPtr->Run();
-    return (int *) EMax_BasicsPtr->dst.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
+    return (int *) EMax_BasicsPtr->output.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
 }

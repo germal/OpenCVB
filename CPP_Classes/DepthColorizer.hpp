@@ -7,7 +7,7 @@ class Depth_Colorizer16
 {
 private:
 public:
-	Mat depth16, dst;
+	Mat depth16, output;
 	// remove this class when the depth16 is gone...
 	Depth_Colorizer16() { }
 	void Run()
@@ -15,7 +15,7 @@ public:
 		unsigned char nearColor[3] = { 0, 255, 255 };
 		unsigned char farColor[3] = { 255, 0, 0 };
 		int histogram[256 * 256] = { 1 };
-		dst = cv::Mat(depth16.size(), CV_8UC3);
+		output = cv::Mat(depth16.size(), CV_8UC3);
 		// Produce a cumulative histogram of depth values
 		unsigned short* depthImage = (unsigned short*)depth16.data;
 		for (int i = 0; i < depth16.cols * depth16.rows; ++i)
@@ -34,8 +34,8 @@ public:
 		}
 
 		// Produce RGB image by using the histogram to interpolate between two colors
-		auto rgb = (unsigned char*)dst.data;
-		for (int i = 0; i < dst.cols * dst.rows; i++)
+		auto rgb = (unsigned char*)output.data;
+		for (int i = 0; i < output.cols * output.rows; i++)
 		{
 			if (uint16_t d = depthImage[i]) // For valid depth values (depth > 0)
 			{
@@ -62,14 +62,14 @@ class Depth_Colorizer
 {
 private:
 public:
-	cv::Mat depth32f, dst;
+	cv::Mat depth32f, output;
 	Depth_Colorizer() {  }
 	void Run()
 	{
 		unsigned char nearColor[3] = { 0, 255, 255 };
 		unsigned char farColor[3] = { 255, 0, 0 };
 		int histogram[256 * 256] = { 1 };
-		dst = Mat(depth32f.size(), CV_32F);
+		output = Mat(depth32f.size(), CV_32F);
 		// Produce a cumulative histogram of depth values
 		float* depthImage = (float*)depth32f.data;
 		for (int i = 0; i < depth32f.cols * depth32f.rows; ++i)
@@ -88,8 +88,8 @@ public:
 		}
 
 		// Produce RGB image by using the histogram to interpolate between two colors
-		auto rgb = (unsigned char*)dst.data;
-		for (int i = 0; i < dst.cols * dst.rows; i++)
+		auto rgb = (unsigned char*)output.data;
+		for (int i = 0; i < output.cols * output.rows; i++)
 		{
 			if (int d = (int)depthImage[i]) // For valid depth values (depth > 0)
 			{
@@ -116,7 +116,7 @@ class Depth_ColorizerZed2
 {
 private:
 public:
-	cv::Mat depth32f, dst;
+	cv::Mat depth32f, output;
 	Depth_ColorizerZed2() {  }
 	void Run()
 	{
@@ -144,8 +144,8 @@ public:
 		}
 
 		// Produce RGB image by using the histogram to interpolate between two colors
-		auto rgb = (unsigned char*)dst.data;
-		for (int i = 0; i < dst.cols * dst.rows; i++)
+		auto rgb = (unsigned char*)output.data;
+		for (int i = 0; i < output.cols * output.rows; i++)
 		{
 			if (int d = (int)depthImage[i]) // For valid depth values (depth > 0)
 			{
@@ -172,7 +172,7 @@ class Depth_Colorizer2
 {
 private:
 public:
-	Mat depth32f, dst;
+	Mat depth32f, output;
 	int histSize = 255;
 	Depth_Colorizer2() {}
 	void Run()
@@ -189,7 +189,7 @@ public:
 			calcHist(&depth32f, 1, 0, Mat(), hist, 1, hbins, range, true, false);
 		}
 		else {
-			dst.setTo(0);
+			output.setTo(0);
 			return; // there is nothing to measure so just return zeros.
 		}
 
@@ -205,9 +205,9 @@ public:
 			hist *= 1.0f / histogram[histSize - 1];
 
 			// Produce RGB image by using the histogram to interpolate between two colors
-			auto rgb = (unsigned char*)dst.data;
+			auto rgb = (unsigned char*)output.data;
 			float* depthImage = (float*)depth32f.data;
-			for (int i = 0; i < dst.cols * dst.rows; i++)
+			for (int i = 0; i < output.cols * output.rows; i++)
 			{
 				if (int d = (int)depthImage[i]) // For valid depth values (depth > 0)
 				{
@@ -239,7 +239,7 @@ class Depth_Colorizer2OLD
 {
 private:
 public:
-	Mat depth16, dst;
+	Mat depth16, output;
 	int histSize = 255;
 	Depth_Colorizer2OLD() {}
 	void Run()
@@ -256,7 +256,7 @@ public:
 			calcHist(&depth16, 1, 0, Mat(), hist, 1, hbins, range, true, false);
 		}
 		else {
-			dst.setTo(0);
+			output.setTo(0);
 			return; // there is nothing to measure so just return zeros.
 		}
 
@@ -271,9 +271,9 @@ public:
 			hist *= 1.0f / histogram[histSize - 1];
 
 			// Produce RGB image by using the histogram to interpolate between two colors
-			auto rgb = (unsigned char*)dst.data;
+			auto rgb = (unsigned char*)output.data;
 			unsigned short *depthImage = (unsigned short *)depth16.data;
-			for (int i = 0; i < dst.cols * dst.rows; i++)
+			for (int i = 0; i < output.cols * output.rows; i++)
 			{
 				if (unsigned short d = depthImage[i]) // For valid depth values (depth > 0)
 				{

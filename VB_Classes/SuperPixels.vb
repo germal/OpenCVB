@@ -36,9 +36,10 @@ Public Class SuperPixel_Basics_CPP
         Static numSuperPixels As Int32
         Static numIterations As Int32
         Static prior As Int32
-        if standalone Then
+        Dim dstx As New cv.Mat
+        If standalone Then
             src = ocvb.color.Clone()
-            dst1 = dst
+            dstx = dst
         End If
         If numSuperPixels <> sliders.TrackBar1.Value Or numIterations <> sliders.TrackBar2.Value Or prior <> sliders.TrackBar3.Value Then
             numSuperPixels = sliders.TrackBar1.Value
@@ -61,8 +62,8 @@ Public Class SuperPixel_Basics_CPP
 
             If standalone Then
                 dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
-                dst1 = src
-                dst1.SetTo(cv.Scalar.White, dst2)
+                dstx = src
+                dstx.SetTo(cv.Scalar.White, dst2)
             Else
                 Dim tmp = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
                 dst = src

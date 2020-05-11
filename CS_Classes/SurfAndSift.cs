@@ -15,10 +15,10 @@ namespace CS_Classes
         public bool drawPoints = true;
         public KeyPoint[] keypoints1, keypoints2;
         public void New(){}
-        public void Run(Mat gray1, Mat gray2, out Mat dst, int hessianThreshold, bool useBFMatcher)
+        public void Run(Mat gray1, Mat gray2, out Mat output, int hessianThreshold, bool useBFMatcher)
         {
             var surf = SURF.Create(hessianThreshold, 4, 2, true);
-            dst = new Mat(gray1.Rows, gray1.Cols * 2, MatType.CV_8UC3);
+            output = new Mat(gray1.Rows, gray1.Cols * 2, MatType.CV_8UC3);
 
             var descriptors1 = new Mat();
             var descriptors2 = new Mat();
@@ -31,7 +31,7 @@ namespace CS_Classes
                 {
                     var bfMatcher = new BFMatcher(NormTypes.L2, false);
                     DMatch[] bfMatches = bfMatcher.Match(descriptors1, descriptors2);
-                    if (drawPoints) Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, bfMatches, dst);
+                    if (drawPoints) Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, bfMatches, output);
                 }
             }
             else
@@ -40,7 +40,7 @@ namespace CS_Classes
                 if (descriptors1.Width > 0 && descriptors2.Width > 0)
                 {
                     DMatch[] flannMatches = flannMatcher.Match(descriptors1, descriptors2);
-                    if (drawPoints) Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, flannMatches, dst);
+                    if (drawPoints) Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, flannMatches, output);
                 }
             }
         }

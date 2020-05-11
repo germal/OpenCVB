@@ -136,11 +136,11 @@ namespace CS_Classes
         static Point2d[] MyPerspectiveTransform1(Point2f[] yourData, Mat transformationMatrix)
         {
             using (Mat src = new Mat(yourData.Length, 1, MatType.CV_32FC2, yourData))
-            using (Mat dst = new Mat())
+            using (Mat output = new Mat())
             {
-                Cv2.PerspectiveTransform(src, dst, transformationMatrix);
-                Point2f[] dstArray = new Point2f[dst.Rows * dst.Cols];
-                dst.GetArray(out dstArray);
+                Cv2.PerspectiveTransform(src, output, transformationMatrix);
+                Point2f[] dstArray = new Point2f[output.Rows * output.Cols];
+                output.GetArray(out dstArray);
                 Point2d[] result = Array.ConvertAll(dstArray, Point2fToPoint2d);
                 return result;
             }

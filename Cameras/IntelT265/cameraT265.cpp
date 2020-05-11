@@ -206,7 +206,7 @@ public:
 			if (isnan(pc[i]) || isinf(pc[i])) pc[i] = 0;
 
 		cPtr->depth32f = depth32f;
-		cPtr->Run(); // the rgb output is in cPtr->dst
+		cPtr->Run(); 
 	}
 };
 
@@ -269,7 +269,7 @@ int* T265Color(t265Camera * tp)
 extern "C" __declspec(dllexport)
 int* T265RGBdepth(t265Camera * tp)
 {
-	return (int*)tp->cPtr->dst.data;
+	return (int*)tp->cPtr->output.data;
 }
 
 extern "C" __declspec(dllexport)

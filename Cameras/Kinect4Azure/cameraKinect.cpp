@@ -215,7 +215,7 @@ int* KinectLeftView(KinectCamera * kc)
 extern "C" __declspec(dllexport)
 int* KinectRGBdepth(KinectCamera * kc)
 {
-	return (int*)kc->dcptr->dst.data;
+	return (int*)kc->dcptr->output.data;
 }
 
 extern "C" __declspec(dllexport)

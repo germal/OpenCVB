@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 
 Module Delaunay_Exports
-    Public Sub draw_line(img As cv.Mat, org As cv.Point, dst As cv.Point, active_color As cv.Scalar)
+    Public Sub draw_line(img As cv.Mat, org As cv.Point, output As cv.Point, active_color As cv.Scalar)
         If org.X >= 0 And org.X <= img.Width Then
             If org.Y >= 0 And org.Y <= img.Height Then
-                If dst.X >= 0 And dst.X <= img.Width Then
-                    If dst.Y >= 0 And dst.Y <= img.Height Then
-                        cv.Cv2.Line(img, org, dst, active_color, 1, cv.LineTypes.AntiAlias, 0)
+                If output.X >= 0 And output.X <= img.Width Then
+                    If output.Y >= 0 And output.Y <= img.Height Then
+                        cv.Cv2.Line(img, org, output, active_color, 1, cv.LineTypes.AntiAlias, 0)
                     End If
                 End If
             End If
@@ -44,8 +44,8 @@ Module Delaunay_Exports
         If e0 > 0 Then
             Dim e = e0
             Do
-                Dim org As cv.Point2f, dst As cv.Point2f
-                If subdiv.EdgeOrg(e, org) > 0 And subdiv.EdgeDst(e, dst) > 0 Then
+                Dim org As cv.Point2f, dstpt As cv.Point2f
+                If subdiv.EdgeOrg(e, org) > 0 And subdiv.EdgeDst(e, dstpt) > 0 Then
                     'draw_line(img, org, dst, active_color)
                 End If
 
@@ -89,7 +89,7 @@ Public Class Delaunay_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
         Dim rect = New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)
-        dst.SetTo(0)
+        dst = ocvb.color.EmptyClone.SetTo(0)
 
         Dim subdiv As New cv.Subdiv2D(rect)
 

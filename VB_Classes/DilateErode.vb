@@ -15,11 +15,8 @@ Public Class DilateErode_Basics
         radio.check(0).Checked = True
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then
+        If standalone Then
             src = ocvb.color
-            dst = dst
-        Else
-            If dst Is Nothing Then dst = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3)
         End If
 
         Dim iterations = sliders.TrackBar2.Value
@@ -38,11 +35,11 @@ Public Class DilateErode_Basics
 
         if standalone Then
             If iterations >= 0 Then
-                ocvb.result2 = ocvb.RGBDepth.Dilate(element, Nothing, iterations)
+                dst2 = ocvb.RGBDepth.Dilate(element, Nothing, iterations)
                 ocvb.label1 = "Dilate RGB " + CStr(iterations) + " times"
                 ocvb.label2 = "Dilate Depth " + CStr(iterations) + " times"
             Else
-                ocvb.result2 = ocvb.RGBDepth.Erode(element, Nothing, -iterations)
+                dst2 = ocvb.RGBDepth.Erode(element, Nothing, -iterations)
                 ocvb.label1 = "Erode RGB " + CStr(-iterations) + " times"
                 ocvb.label2 = "Erode Depth " + CStr(-iterations) + " times"
             End If

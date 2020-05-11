@@ -13,7 +13,7 @@ class WhiteBalance
 {
 private:
 public:
-	Mat src, dst;
+	Mat src, output;
 	WhiteBalance(){}
 
 	void Run(float thresholdVal)
@@ -86,9 +86,9 @@ public:
 					else if (Blue < 0) {
 						Blue = 0;
 					}
-					dst.at<Vec3b>(i, j)[0] = Blue;
-					dst.at<Vec3b>(i, j)[1] = Green;
-					dst.at<Vec3b>(i, j)[2] = Red;
+					output.at<Vec3b>(i, j)[0] = Blue;
+					output.at<Vec3b>(i, j)[1] = Green;
+					output.at<Vec3b>(i, j)[2] = Red;
 				}
 			}
 		}
@@ -111,8 +111,8 @@ void WhiteBalance_Close(WhiteBalance * wPtr)
 extern "C" __declspec(dllexport)
 int* WhiteBalance_Run(WhiteBalance * wPtr, int* rgb, int rows, int cols, float thresholdVal)
 {
-	wPtr->dst = Mat(rows, cols, CV_8UC3);
+	wPtr->output = Mat(rows, cols, CV_8UC3);
 	wPtr->src = Mat(rows, cols, CV_8UC3, rgb);
 	wPtr->Run(thresholdVal);
-	return (int*)wPtr->dst.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
+	return (int*)wPtr->output.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
 }

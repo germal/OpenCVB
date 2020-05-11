@@ -13,7 +13,7 @@ class HMM
 {
 private:
 public:
-	Mat src, dst;
+	Mat src, output;
 	cv::Mat Transition, Emission, initialProbabilities;
 	HMM() 
 	{
@@ -114,7 +114,7 @@ public:
 		buffer << "\ndone.\n";
 	}
 	void Run() {
-		dst = src.clone();
+		output = src.clone();
 	}
 };
 
@@ -135,6 +135,6 @@ int* HMM_Run(HMM* HMMPtr, int* rgbPtr, int rows, int cols, int channels)
 {
 	HMMPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, rgbPtr);
 	HMMPtr->Run();
-	return (int*)HMMPtr->dst.data; // return this C++ allocated data to managed code
+	return (int*)HMMPtr->output.data; // return this C++ allocated data to managed code
 }
 

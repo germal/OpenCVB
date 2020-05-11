@@ -16,7 +16,7 @@ void Plot_OpenCVBasics(double *inX, double *inY, int len, int* dstptr, int rows,
 {
 	Mat srcX = Mat(1, len, CV_64F, inX);
 	Mat srcY = Mat(1, len, CV_64F, inY);
-	Mat dst = Mat(rows, cols, CV_8UC3, dstptr);
+	Mat output = Mat(rows, cols, CV_8UC3, dstptr);
 	Mat result;
 
 	Ptr<plot::Plot2d> plot = plot::Plot2d::create(srcX, srcY);
@@ -27,5 +27,5 @@ void Plot_OpenCVBasics(double *inX, double *inY, int len, int* dstptr, int rows,
 	plot->setPlotLineColor(Scalar(255, 0, 0));
 	plot->setPlotLineWidth(2);
 	plot->render(result);
-	resize(result, dst, dst.size());
+	resize(result, output, output.size());
 }

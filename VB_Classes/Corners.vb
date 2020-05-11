@@ -21,7 +21,7 @@ Public Class Corners_Harris
             color = ocvb.color.Clone()
             gray = color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             mc = New cv.Mat(gray.Size(), cv.MatType.CV_32FC1, 0)
-            Dim dst As New cv.Mat(gray.Size(), cv.MatType.CV_8U, 0)
+            dst = New cv.Mat(gray.Size(), cv.MatType.CV_8U, 0)
             Dim blocksize = sliders.TrackBar1.Value
             If blocksize Mod 2 = 0 Then blocksize += 1
             Dim aperture = sliders.TrackBar2.Value
@@ -144,7 +144,7 @@ Public Class Corners_ShiTomasi_CPP
         Dim crows = ocvb.color.Rows, ccols = ocvb.color.Cols
         Dim data(crows * ccols) As Byte
         Static data32f(crows * ccols) As Single
-        Static dst As New cv.Mat(crows, ccols, cv.MatType.CV_32FC1, data32f)
+        Static output As New cv.Mat(crows, ccols, cv.MatType.CV_32FC1, data32f)
 
         If ocvb.frameCount Mod 30 = 0 Then
             Dim blocksize = sliders.TrackBar1.Value
@@ -159,25 +159,25 @@ Public Class Corners_ShiTomasi_CPP
             Dim handle32f = GCHandle.Alloc(data32f, GCHandleType.Pinned)
             Dim tmp As New cv.Mat(crows, ccols, cv.MatType.CV_8U, data)
             gray.CopyTo(tmp)
-            Corners_ShiTomasi(tmp.Data, dst.Data, crows, ccols, blocksize, aperture)
+            Corners_ShiTomasi(tmp.Data, output.Data, crows, ccols, blocksize, aperture)
             handle.Free()
             handle32f.Free()
 
-            dst.MinMaxLoc(minval, maxval)
+            output.MinMaxLoc(minval, maxval)
         End If
 
-        color.CopyTo(dst)
+        color.CopyTo(output)
         For j = 0 To crows - 1
             For i = 0 To ccols - 1
-                If dst.Get(Of Single)(j, i) > minval + (maxval - minval) * sliders.TrackBar3.Value / sliders.TrackBar3.Maximum Then
-                    dst.Circle(New cv.Point(i, j), 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-                    dst.Circle(New cv.Point(i, j), 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                If output.Get(Of Single)(j, i) > minval + (maxval - minval) * sliders.TrackBar3.Value / sliders.TrackBar3.Maximum Then
+                    output.Circle(New cv.Point(i, j), 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                    output.Circle(New cv.Point(i, j), 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
                 End If
             Next
         Next
 
         Dim stNormal As New cv.Mat
-        cv.Cv2.Normalize(dst, stNormal, 127, 255, cv.NormTypes.MinMax)
+        cv.Cv2.Normalize(output, stNormal, 127, 255, cv.NormTypes.MinMax)
         stNormal.ConvertTo(ocvb.result2, cv.MatType.CV_8U)
     End Sub
 End Class

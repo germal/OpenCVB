@@ -14,8 +14,8 @@ void Corners_ShiTomasi(int *grayPtr, int *dstPtr, int rows, int cols, int blockS
 {
 	Mat gray = Mat(rows, cols, CV_8UC1, grayPtr);
 	Mat dstVB = Mat(gray.size(), CV_32FC1, dstPtr);
-	Mat dst = Mat::zeros(gray.size(), CV_32FC1);
+	Mat output = Mat::zeros(gray.size(), CV_32FC1);
 	/// My Shi-Tomasi -- Using cornerMinEigenVal - can't access this from opencvSharp...
-	cornerMinEigenVal(gray, dst, blockSize, apertureSize, BORDER_DEFAULT);
-	dst.copyTo(dstVB);
+	cornerMinEigenVal(gray, output, blockSize, apertureSize, BORDER_DEFAULT);
+	output.copyTo(dstVB);
 }

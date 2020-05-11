@@ -121,11 +121,11 @@ public:
 		colorizePtr->histSize = 256;
 
 		colorizePtr->depth16 = Mat(top16u.rows, top16u.cols, CV_16U, top16u.data);
-		colorizePtr->dst = viewTop;
+		colorizePtr->output = viewTop;
 		colorizePtr->Run();
 
 		colorizePtr->depth16 = Mat(side16u.rows, side16u.cols, CV_16U, side16u.data);
-		colorizePtr->dst = viewSide;
+		colorizePtr->output = viewSide;
 		colorizePtr->Run();
 	}
 };

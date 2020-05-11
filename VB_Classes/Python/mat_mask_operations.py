@@ -70,11 +70,11 @@ def main(argv):
                        [-1, 5, -1],
                        [0, -1, 0]], np.float32)  # kernel should be floating point type
     
-    dst1 = cv.filter2D(src, -1, kernel)
+    dstx = cv.filter2D(src, -1, kernel)
     t = (time.time() - t) 
   
     both = np.empty((src.shape[0], src.shape[1]*2, src.shape[2]), src.dtype)
-    both = cv.hconcat([src, dst1])
+    both = cv.hconcat([src, dstx])
     cv.imshow("Original and sharpened version", both)
 
     str = "Filter2D function time in seconds: {0} \r(Now hit enter to see how slow manual method is) ".format(t) 

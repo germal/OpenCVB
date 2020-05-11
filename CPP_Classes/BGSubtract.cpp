@@ -59,7 +59,7 @@ class BGSubtract_Synthetic
 private:
 public:
 	Ptr<bgsegm::SyntheticSequenceGenerator> gen;
-	Mat src, dst, fgMask;
+	Mat src, output, fgMask;
     BGSubtract_Synthetic(){}
     void Run() {
 	}
@@ -74,7 +74,7 @@ BGSubtract_Synthetic *BGSubtract_Synthetic_Open(int* rgbPtr, int rows, int cols,
 	Mat fg = imread(fgFilename, IMREAD_COLOR);
 	resize(fg, fg, cv::Size(10, 10)); // adjust the object size here...
 	synthPtr->gen = cv::bgsegm::createSyntheticSequenceGenerator(bg, fg, amplitude, magnitude, wavespeed, objectspeed);
-	synthPtr->gen->getNextFrame(synthPtr->dst, synthPtr->fgMask);
+	synthPtr->gen->getNextFrame(synthPtr->output, synthPtr->fgMask);
 	return synthPtr;
 }
 
@@ -87,6 +87,6 @@ void BGSubtract_Synthetic_Close(BGSubtract_Synthetic *synthPtr)
 extern "C" __declspec(dllexport)
 int *BGSubtract_Synthetic_Run(BGSubtract_Synthetic *synthPtr)
 {
-	synthPtr->gen->getNextFrame(synthPtr->dst, synthPtr->fgMask);
-    return (int *) synthPtr->dst.data; // return this C++ allocated data to managed code
+	synthPtr->gen->getNextFrame(synthPtr->output, synthPtr->fgMask);
+    return (int *) synthPtr->output.data; // return this C++ allocated data to managed code
 }
