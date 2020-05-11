@@ -21,7 +21,7 @@ Public Class Encode_Basics
         cv.Cv2.Absdiff(ocvb.color, ocvb.result2, output)
 
         Dim scale = sliders.TrackBar2.Value
-        output.ConvertTo(ocvb.result1, cv.MatType.CV_8UC3, scale)
+        output.ConvertTo(dst, cv.MatType.CV_8UC3, scale)
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
         ocvb.label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
     End Sub
@@ -76,7 +76,7 @@ Public Class Encode_Options
         cv.Cv2.Absdiff(ocvb.color, ocvb.result2, output)
 
         Dim scale = sliders.TrackBar2.Value
-        output.ConvertTo(ocvb.result1, cv.MatType.CV_8UC3, scale)
+        output.ConvertTo(dst, cv.MatType.CV_8UC3, scale)
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
         ocvb.label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
     End Sub

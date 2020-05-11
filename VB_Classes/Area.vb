@@ -124,10 +124,6 @@ Public Class Area_MinMotionRect
         If input.dst.Channels = 1 Then gray = input.dst Else gray = input.dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst = motionRectangles(gray, ocvb.rColors)
         dst.SetTo(cv.Scalar.All(255), gray)
-
-        gray = ocvb.result2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = motionRectangles(gray, ocvb.rColors)
-        dst2.SetTo(cv.Scalar.All(255), gray)
     End Sub
 End Class
 

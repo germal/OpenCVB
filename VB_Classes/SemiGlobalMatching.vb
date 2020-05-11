@@ -49,7 +49,7 @@ End Module
 '        Dim dstData(ocvb.color.Total - 1) As Byte
 '        Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
 '        Dim dst = New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols, cv.MatType.CV_8U, dstData)
-'        ocvb.result1 = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+'        dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 '    End Sub
 '    Public Sub Close()
 '        SemiGlobalMatching_Close(SemiGlobalMatching)

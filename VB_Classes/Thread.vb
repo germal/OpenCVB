@@ -89,8 +89,8 @@ Public Class Thread_Grid
         End If
 
         If standalone Then
-            src.CopyTo(ocvb.result1)
-            ocvb.result1.SetTo(cv.Scalar.All(255), gridMask)
+            src.CopyTo(dst)
+            dst.SetTo(cv.Scalar.All(255), gridMask)
             ocvb.label1 = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
                           CStr(roiList(0).Width) + "X" + CStr(roiList(0).Height) + " regions"
         End If

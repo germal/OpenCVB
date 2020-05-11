@@ -11,11 +11,11 @@ Public Class FAST_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ocvb.color.CopyTo(ocvb.result1)
+        ocvb.color.CopyTo(dst)
         keypoints = cv.Cv2.FAST(gray, sliders.TrackBar1.Value, True)
 
         For Each kp As cv.KeyPoint In keypoints
-            ocvb.result1.Circle(kp.Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+            dst.Circle(kp.Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
         Next kp
     End Sub
 End Class

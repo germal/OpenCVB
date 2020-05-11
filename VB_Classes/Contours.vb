@@ -47,9 +47,9 @@ Public Class Contours_Basics
         Next
 
         If standalone Then
-            src = New cv.Mat(ocvb.result1.Size(), cv.MatType.CV_8UC1)
+            src = New cv.Mat(dst.Size(), cv.MatType.CV_8UC1)
             rotatedRect.Run(ocvb)
-            src = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+            src = dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
         End If
 
         dst = New cv.Mat(ocvb.result2.Size(), cv.MatType.CV_8UC1, 0)
@@ -88,9 +88,9 @@ Public Class Contours_FindandDraw
         ocvb.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim img As New cv.Mat(ocvb.result1.Size(), cv.MatType.CV_8UC1)
+        Dim img As New cv.Mat(dst.Size(), cv.MatType.CV_8UC1)
         rotatedRect.Run(ocvb)
-        img = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+        img = dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
 
         Dim contours0 = cv.Cv2.FindContoursAsArray(img, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim contours()() As cv.Point = Nothing
@@ -162,7 +162,7 @@ Public Class Contours_RGB
 
         If contours0(maxIndex).Length = 0 Then Exit Sub
 
-        ocvb.result1.SetTo(New cv.Scalar(0))
+        dst.SetTo(New cv.Scalar(0))
         Dim hull() = cv.Cv2.ConvexHull(contours0(maxIndex), True)
         Dim listOfPoints = New List(Of List(Of cv.Point))
         Dim points = New List(Of cv.Point)
@@ -170,8 +170,8 @@ Public Class Contours_RGB
             points.Add(New cv.Point(hull(i).X, hull(i).Y))
         Next
         listOfPoints.Add(points)
-        cv.Cv2.DrawContours(ocvb.result1, listOfPoints, 0, New cv.Scalar(255, 0, 0), -1)
-        cv.Cv2.DrawContours(ocvb.result1, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
+        cv.Cv2.DrawContours(dst, listOfPoints, 0, New cv.Scalar(255, 0, 0), -1)
+        cv.Cv2.DrawContours(dst, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
         ocvb.result2.SetTo(0)
         ocvb.color.CopyTo(ocvb.result2, trim.zeroMask)
     End Sub

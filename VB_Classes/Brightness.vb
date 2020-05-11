@@ -22,7 +22,7 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
 
         ocvb.label1 = "GrayScale"
         ocvb.label2 = "CLAHE Result"
-        cv.Cv2.CvtColor(imgGray, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(imgGray, dst, cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.CvtColor(imgClahe, ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
@@ -38,7 +38,7 @@ Public Class Brightness_Contrast
         ocvb.desc = "Show image with vary contrast and brightness."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.color.ConvertTo(ocvb.result1, -1, sliders.TrackBar2.Value / 50, sliders.TrackBar1.Value)
+        ocvb.color.ConvertTo(dst, -1, sliders.TrackBar2.Value / 50, sliders.TrackBar1.Value)
         ocvb.label1 = "Brightness/Contrast"
         ocvb.label2 = ""
     End Sub
@@ -60,7 +60,7 @@ Public Class Brightness_hue
 
         ocvb.label1 = "Hue"
         ocvb.label2 = "Saturation"
-        cv.Cv2.CvtColor(hsv_planes(0), ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(hsv_planes(0), dst, cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.CvtColor(hsv_planes(1), ocvb.result2, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
@@ -76,7 +76,7 @@ Public Class Brightness_AlphaBeta
         sliders.setupTrackBar2(ocvb, caller, "Brightness Beta (brightness)", -100, 100, 0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.result1 = ocvb.color.ConvertScaleAbs(sliders.TrackBar1.Value / 500, sliders.TrackBar2.Value)
+        dst = ocvb.color.ConvertScaleAbs(sliders.TrackBar1.Value / 500, sliders.TrackBar2.Value)
     End Sub
 End Class
 
@@ -99,7 +99,7 @@ Public Class Brightness_Gamma
                 lookupTable(i) = Math.Pow(i / 255, sliders.TrackBar1.Value / 100) * 255
             Next
         End If
-        ocvb.result1 = ocvb.color.LUT(lookupTable)
+        dst = ocvb.color.LUT(lookupTable)
     End Sub
 End Class
 
@@ -144,8 +144,8 @@ Public Class Brightness_WhiteBalance_CPP
         Dim rgbPtr = WhiteBalance_Run(wPtr, handleSrc.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols, thresholdVal)
         handleSrc.Free()
 
-        ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, rgbPtr) ' no need to copy.  rgbPtr points to C++ data, not managed.
-        Dim diff = ocvb.result1 - ocvb.color
+        dst = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, rgbPtr) ' no need to copy.  rgbPtr points to C++ data, not managed.
+        Dim diff = dst - ocvb.color
         diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
     End Sub
@@ -208,9 +208,9 @@ Public Class Brightness_WhiteBalance
         Next
 
         cv.Cv2.Merge(planes, rgb32f)
-        rgb32f.ConvertTo(ocvb.result1, cv.MatType.CV_8UC3)
+        rgb32f.ConvertTo(dst, cv.MatType.CV_8UC3)
 
-        Dim diff = ocvb.result1 - ocvb.color
+        Dim diff = dst - ocvb.color
         diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
     End Sub

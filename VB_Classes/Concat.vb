@@ -10,7 +10,7 @@ Public Class Concat_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Dim tmp As New cv.Mat
         cv.Cv2.HConcat(ocvb.color, ocvb.RGBDepth, tmp)
-        ocvb.result1 = tmp.Resize(ocvb.color.Size())
+        dst = tmp.Resize(ocvb.color.Size())
         cv.Cv2.VConcat(ocvb.color, ocvb.RGBDepth, tmp)
         ocvb.result2 = tmp.Resize(ocvb.color.Size())
     End Sub
@@ -40,6 +40,6 @@ Public Class Concat_4way
         cv.Cv2.HConcat(img(0), img(1), tmp1)
         cv.Cv2.HConcat(img(2), img(3), tmp2)
         cv.Cv2.VConcat(tmp1, tmp2, tmp3)
-        ocvb.result1 = tmp3.Resize(ocvb.color.Size())
+        dst = tmp3.Resize(ocvb.color.Size())
     End Sub
 End Class

@@ -23,10 +23,10 @@ Public Class MotionBlur_Basics
         Dim pt1 = New cv.Point(0, (kernelSize - 1) / 2)
         Dim pt2 = New cv.Point(kernelSize * Math.Cos(theta) + pt1.X, kernelSize * Math.Sin(theta) + pt1.Y)
         kernel.Line(pt1, pt2, New cv.Scalar(1 / kernelSize))
-        ocvb.result1 = ocvb.color.Filter2D(-1, kernel)
+        dst = ocvb.color.Filter2D(-1, kernel)
         pt1 += New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
         pt2 += New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
-        If showDirection Then ocvb.result1.Line(pt1, pt2, cv.Scalar.Yellow, 5, cv.LineTypes.AntiAlias)
+        If showDirection Then dst.Line(pt1, pt2, cv.Scalar.Yellow, 5, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
@@ -156,7 +156,7 @@ Public Class MotionBlur_Deblur
         Dim h = calcPSF(roi.Size(), len, theta)
         Dim hW = calcWeinerFilter(h, 1.0 / SNR)
 
-        Dim gray8u = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray8u = dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim imgIn As New cv.Mat
         gray8u.ConvertTo(imgIn, cv.MatType.CV_32F)
         imgIn = edgeTaper(imgIn, gamma, beta)

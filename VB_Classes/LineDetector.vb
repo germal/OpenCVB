@@ -229,7 +229,7 @@ Public Class lineDetector_FLD
 
         src.CopyTo(dst)
         If lineCount > 0 Then sortedLines = drawSegments(dst, lineCount, factor, dst)
-        if standalone Then dst.CopyTo(ocvb.result1)
+        if standalone Then dst.CopyTo(dst)
     End Sub
 End Class
 
@@ -251,7 +251,7 @@ Public Class LineDetector_LSD
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.OpenCV_Version_ID <> "401" Then
-            ocvb.result1.SetTo(0)
+            dst.SetTo(0)
             ocvb.putText(New ActiveClass.TrueType("LSD linedetector is available only with OpenCV 4.01 - IP issue?", 10, 100, RESULT1))
             Exit Sub
         End If
@@ -267,9 +267,9 @@ Public Class LineDetector_LSD
         Dim lineCount = lineDetector_Run(tmp.Data, rows, cols)
         handle.Free()
 
-        ocvb.color.CopyTo(ocvb.result1)
+        ocvb.color.CopyTo(dst)
         sortedLines.Clear()
-        If lineCount > 0 Then sortedLines = drawSegments(ocvb.result1, lineCount, factor, ocvb.result1)
+        If lineCount > 0 Then sortedLines = drawSegments(dst, lineCount, factor, dst)
     End Sub
 End Class
 
@@ -351,7 +351,7 @@ Public Class LineDetector_3D_LSD_MT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.OpenCV_Version_ID <> "401" Then
-            ocvb.result1.SetTo(0)
+            dst.SetTo(0)
             ocvb.putText(New ActiveClass.TrueType("LSD linedetector is available only with OpenCV 4.01 - IP issue.", 10, 100, RESULT1))
             Exit Sub
         End If
@@ -408,7 +408,7 @@ Public Class LineDetector_3D_FitLineZ
         Dim useLSD As Boolean = True
         If radio.check(0).Checked Or radio.check(2).Checked Then useLSD = False
         If useLSD And ocvb.parms.OpenCV_Version_ID <> "401" Then
-            ocvb.result1.SetTo(0)
+            dst.SetTo(0)
             ocvb.result2.SetTo(0)
             ocvb.putText(New ActiveClass.TrueType("LSD linedetector is available only with OpenCV 4.01 - IP issue.", 10, 100, RESULT1))
             Exit Sub
@@ -508,11 +508,11 @@ Public Class LineDetector_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim vectors = ld.Detect(gray)
-        ocvb.color.CopyTo(ocvb.result1)
+        ocvb.color.CopyTo(dst)
         ocvb.color.CopyTo(ocvb.result2)
         Dim thickness = sliders.TrackBar1.Value
 
-        If standalone Then dst = ocvb.result1
+        If standalone Then dst = dst
         For Each v In vectors
             If v(0) >= 0 And v(0) <= dst.Cols And v(1) >= 0 And v(1) <= dst.Rows And
                    v(2) >= 0 And v(2) <= dst.Cols And v(3) >= 0 And v(3) <= dst.Rows Then

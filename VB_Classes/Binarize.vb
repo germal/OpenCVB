@@ -42,7 +42,7 @@ Public Class Binarize_OTSU
         Next
 
         mats1.Run(ocvb)
-        ocvb.result1 = ocvb.result2.Clone() ' mat_4to1 puts output in result2
+        dst = ocvb.result2.Clone() ' mat_4to1 puts output in result2
         mats2.Run(ocvb)
     End Sub
 End Class
@@ -71,7 +71,7 @@ Public Class Binarize_Niblack_Sauvola
 
         Dim grayBin As New cv.Mat
         cv.Extensions.Binarizer.Niblack(gray, grayBin, kernelSize, sliders.TrackBar2.Value / 1000)
-        ocvb.result1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Extensions.Binarizer.Sauvola(gray, grayBin, kernelSize, sliders.TrackBar3.Value / 1000, sliders.TrackBar4.Value)
         ocvb.result2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
@@ -100,7 +100,7 @@ Public Class Binarize_Niblack_Nick
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayBin As New cv.Mat
         cv.Extensions.Binarizer.Niblack(gray, grayBin, kernelSize, sliders.TrackBar2.Value / 1000)
-        ocvb.result1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Extensions.Binarizer.Nick(gray, grayBin, kernelSize, sliders.TrackBar3.Value / 1000)
         ocvb.result2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
@@ -134,7 +134,7 @@ Public Class Binarize_Bernson
         Else
             cv.Extensions.Binarizer.Bernsen(gray(ocvb.drawRect), grayBin(ocvb.drawRect), kernelSize, sliders.TrackBar2.Value, sliders.TrackBar3.Value)
         End If
-        ocvb.result1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -171,7 +171,7 @@ Public Class Binarize_Bernson_MT
             Sub(roi)
                 Dim grayBin = gray(roi).Clone()
                 cv.Extensions.Binarizer.Bernsen(gray(roi), grayBin, kernelSize, contrastMin, bgThreshold)
-                ocvb.result1(roi) = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                dst(roi) = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             End Sub)
     End Sub
 End Class

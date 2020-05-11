@@ -274,7 +274,7 @@ Public Class OpenGL_3Ddata
         colors.color1 = cv.Scalar.Yellow
         colors.color2 = cv.Scalar.Blue
         colors.Run(ocvb)
-        ogl.OpenGL.rgbInput = ocvb.result1.Clone() ' only need to set this once.
+        ogl.OpenGL.rgbInput = dst.Clone() ' only need to set this once.
 
         ocvb.label1 = "Input to Histogram 3D"
         ocvb.desc = "Plot the results of a 3D histogram in OpenGL."
@@ -323,7 +323,7 @@ Public Class OpenGL_Draw3D
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         circle.Run(ocvb)
-        ocvb.result2 = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ocvb.result2 = dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ogl.OpenGL.dataInput = ocvb.result2
         ogl.OpenGL.rgbInput = New cv.Mat(1, ocvb.rColors.Length - 1, cv.MatType.CV_8UC3, ocvb.rColors.ToArray)
         ogl.Run(ocvb)

@@ -9,8 +9,8 @@ Public Class MeanSubtraction_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mean = cv.Cv2.Mean(ocvb.color)
-        cv.Cv2.Subtract(mean, ocvb.color, ocvb.result1)
+        cv.Cv2.Subtract(mean, ocvb.color, dst)
         Dim scalingFactor = sliders.TrackBar1.Value / 100
-        ocvb.result1 *= 1 / scalingFactor
+        dst *= 1 / scalingFactor
     End Sub
 End Class

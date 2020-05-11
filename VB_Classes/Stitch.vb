@@ -15,12 +15,12 @@ Public Class Stitch_Basics
         Dim width = sliders.TrackBar2.Value
         Dim height = sliders.TrackBar3.Value
         if standalone Then src = ocvb.color.Clone()
-        ocvb.result1 = src.Clone()
+        dst = src.Clone()
         For i = 0 To imageCount - 1
             Dim x1 = CInt(ocvb.ms_rng.next(0, src.Width - width))
             Dim x2 = CInt(ocvb.ms_rng.next(0, src.Height - height))
             Dim rect = New cv.Rect(x1, x2, width, height)
-            ocvb.result1.Rectangle(rect, cv.Scalar.Red, 2)
+            dst.Rectangle(rect, cv.Scalar.Red, 2)
             mats.Add(src(rect).Clone())
         Next
 
@@ -40,8 +40,8 @@ Public Class Stitch_Basics
         ocvb.result2.SetTo(0)
         If status = cv.Stitcher.Status.OK Then
             Dim w = pano.Width, h = pano.Height
-            If w > ocvb.result1.Width Then w = ocvb.result1.Width
-            If h > ocvb.result1.Height Then h = ocvb.result1.Height
+            If w > dst.Width Then w = dst.Width
+            If h > dst.Height Then h = dst.Height
             pano.CopyTo(ocvb.result2(New cv.Rect(0, 0, w, h)))
         Else
             If status = cv.Stitcher.Status.ErrorNeedMoreImgs Then

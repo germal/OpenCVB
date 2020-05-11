@@ -77,7 +77,7 @@ Public Class Python_Run
         ocvb.desc = "Run Python app: " + pythonApp.Name
         ocvb.label1 = ""
         ocvb.label2 = ""
-        ocvb.result1.SetTo(0)
+        dst.SetTo(0)
         ocvb.result2.SetTo(0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -7,7 +7,7 @@ Public Class Mat_Repeat
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim small = ocvb.color.Resize(New cv.Size(ocvb.color.Cols / 10, ocvb.color.Rows / 10))
-        ocvb.result1 = small.Repeat(10, 10)
+        dst = small.Repeat(10, 10)
         small = ocvb.RGBDepth.Resize(New cv.Size(ocvb.color.Cols / 10, ocvb.color.Rows / 10))
         ocvb.result2 = small.Repeat(10, 10)
     End Sub
@@ -62,7 +62,7 @@ Public Class Mat_MatToPoint
                 index += 1
             Next
         Next
-        ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, points)
+        dst = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, points)
     End Sub
 End Class
 
@@ -79,11 +79,11 @@ Public Class Mat_Transpose
     Public Sub Run(ocvb As AlgorithmData)
         Dim trColor = ocvb.color.T()
 #If opencvsharpOld Then
-        ocvb.result1 = trColor.Resize(New cv.Size(ocvb.color.Cols, ocvb.color.Rows))
+        dst = trColor.Resize(New cv.Size(ocvb.color.Cols, ocvb.color.Rows))
 #Else
-        ocvb.result1 = trColor.ToMat.Resize(New cv.Size(ocvb.color.Cols, ocvb.color.Rows))
+        dst = trColor.ToMat.Resize(New cv.Size(ocvb.color.Cols, ocvb.color.Rows))
 #End If
-        Dim trBack = ocvb.result1.T()
+        Dim trBack = dst.T()
 #If opencvsharpOld Then
         ocvb.result2 = trBack.Resize(New cv.Size(ocvb.color.Cols, ocvb.color.Rows))
 #Else
@@ -105,10 +105,10 @@ Public Class Mat_Tricks
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mat = ocvb.color.Resize(New cv.Size(200, 200))
-        ocvb.result1.SetTo(0)
+        dst.SetTo(0)
         Dim x = 40
         Dim y = 80
-        ocvb.result1(x, x + mat.Width, y, y + mat.Height) = mat
+        dst(x, x + mat.Width, y, y + mat.Height) = mat
 
         ocvb.result2.SetTo(0)
         x = 20
@@ -256,9 +256,9 @@ Public Class Mat_RowColRange
     Public Sub Run(ocvb As AlgorithmData)
         Dim midX = ocvb.color.Width / 2
         Dim midY = ocvb.color.Height / 2
-        ocvb.result1 = ocvb.color.Clone()
-        cv.Cv2.BitwiseNot(ocvb.result1.RowRange(midY - 50, midY + 50), ocvb.result1.RowRange(midY - 50, midY + 50))
-        cv.Cv2.BitwiseNot(ocvb.result1.ColRange(midX - 50, midX + 50), ocvb.result1.ColRange(midX - 50, midX + 50))
+        dst = ocvb.color.Clone()
+        cv.Cv2.BitwiseNot(dst.RowRange(midY - 50, midY + 50), dst.RowRange(midY - 50, midY + 50))
+        cv.Cv2.BitwiseNot(dst.ColRange(midX - 50, midX + 50), dst.ColRange(midX - 50, midX + 50))
     End Sub
 End Class
 
@@ -276,7 +276,7 @@ Public Class Mat_Managed
     Public Sub Run(ocvb As AlgorithmData)
         Static autoRand As New Random()
         Static src(ocvb.color.Total) As cv.Vec3b
-        ocvb.result1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, src)
+        dst = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, src)
         Static nextColor As cv.Vec3b
         If ocvb.frameCount Mod 30 = 0 Then
             If nextColor = New cv.Vec3b(0, 0, 255) Then nextColor = New cv.Vec3b(0, 255, 0) Else nextColor = New cv.Vec3b(0, 0, 255)
@@ -285,7 +285,7 @@ Public Class Mat_Managed
             src(i) = nextColor
         Next
         Dim rect As New cv.Rect(autoRand.Next(0, ocvb.color.Width - 50), autoRand.Next(0, ocvb.color.Height - 50), 50, 50)
-        ocvb.result1(rect).SetTo(0)
+        dst(rect).SetTo(0)
     End Sub
 End Class
 

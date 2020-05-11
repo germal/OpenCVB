@@ -46,21 +46,21 @@ Public Class Hull_Basics
         hull = cv.Cv2.ConvexHull(points, True)
 
         if standalone Then
-            ocvb.result1.SetTo(0)
+            dst.SetTo(0)
             ocvb.result2.SetTo(0)
             For i = 0 To hull.Count - 1
-                cv.Cv2.Line(ocvb.result1, hull.ElementAt(i), hull.ElementAt((i + 1) Mod hull.Count), cv.Scalar.White, 2)
+                cv.Cv2.Line(dst, hull.ElementAt(i), hull.ElementAt((i + 1) Mod hull.Count), cv.Scalar.White, 2)
                 cv.Cv2.Line(ocvb.result2, hull.ElementAt(i), hull.ElementAt((i + 1) Mod hull.Count), cv.Scalar.White, 2)
             Next
 
             Dim pMat As New cv.Mat(hull.Count, 1, cv.MatType.CV_32SC2, hull)
             Dim sum = pMat.Sum()
             Dim center = New cv.Point(CInt(sum.Val0 / hull.Count), CInt(sum.Val1 / hull.Count))
-            Dim pixels = ocvb.result1.FloodFill(center, cv.Scalar.Yellow) ' because the shape is convex, we know the center is in the intere
-            ocvb.result1.Circle(center, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            Dim pixels = dst.FloodFill(center, cv.Scalar.Yellow) ' because the shape is convex, we know the center is in the intere
+            dst.Circle(center, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
 
             For i = 0 To Count - 1
-                ocvb.result1.Circle(points(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                dst.Circle(points(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
                 ocvb.result2.Circle(points(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             Next
         End If

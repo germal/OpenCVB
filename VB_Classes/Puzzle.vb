@@ -104,7 +104,7 @@ Module Puzzle_Solvers
         End If
         Return cornerType.none
     End Function
-    Public Function fitCheck(ocvb As AlgorithmData, roilist() As cv.Rect, ByRef fitlist As List(Of bestFit)) As List(Of bestFit)
+    Public Function fitCheck(ocvb As AlgorithmData, dst As cv.Mat, roilist() As cv.Rect, ByRef fitlist As List(Of bestFit)) As List(Of bestFit)
         Dim saveOptions = ocvb.parms.ShowOptions
         ocvb.parms.ShowOptions = False
         ocvb.parms.ShowOptions = saveOptions
@@ -117,18 +117,18 @@ Module Puzzle_Solvers
         For roiIndex = 0 To roilist.Count - 1
             Dim maxDiff() = {Single.MinValue, Single.MinValue, Single.MinValue, Single.MinValue}
             Dim roi1 = roilist(roiIndex)
-            sample(0) = ocvb.result1(roi1).Row(0)
-            sample(2) = ocvb.result1(roi1).Row(roi1.Height - 1)
-            sample(4) = ocvb.result1(roi1).Col(0)
-            sample(6) = ocvb.result1(roi1).Col(roi1.Width - 1)
+            sample(0) = dst(roi1).Row(0)
+            sample(2) = dst(roi1).Row(roi1.Height - 1)
+            sample(4) = dst(roi1).Col(0)
+            sample(6) = dst(roi1).Col(roi1.Width - 1)
             Dim nextFitList As New List(Of fit)
             For j = 0 To roilist.Count - 1
                 If roiIndex = j Then Continue For
                 Dim roi2 = roilist(j)
-                sample(1) = ocvb.result1(roi2).Row(roi1.Height - 1)
-                sample(3) = ocvb.result1(roi2).Row(0)
-                sample(5) = ocvb.result1(roi2).Col(roi2.Width - 1)
-                sample(7) = ocvb.result1(roi2).Col(0)
+                sample(1) = dst(roi2).Row(roi1.Height - 1)
+                sample(3) = dst(roi2).Row(0)
+                sample(5) = dst(roi2).Col(roi2.Width - 1)
+                sample(7) = dst(roi2).Col(0)
 
                 Dim absDiff() = computeMetric(sample)
                 For k = 0 To maxDiff.Count - 1
@@ -263,11 +263,11 @@ Public Class Puzzle_Basics
         End If
 
         ' display image with shuffled roi's
-        ocvb.result1.SetTo(0)
+        dst.SetTo(0)
         For i = 0 To scrambled.Count - 1
             Dim roi = grid.roiList(i)
             Dim roi2 = scrambled(i)
-            If roi.Width = width And roi.Height = height And roi2.Width = width And roi2.Height = height Then ocvb.result1(roi2) = ocvb.color(roi)
+            If roi.Width = width And roi.Height = height And roi2.Width = width And roi2.Height = height Then dst(roi2) = ocvb.color(roi)
         Next
     End Sub
 End Class
@@ -337,7 +337,7 @@ Public Class Puzzle_Solver
             roilist = puzzle.grid.roiList.ToArray
         End If
 
-        Dim cornerlist = fitCheck(ocvb, roilist, fitlist)
+        Dim cornerlist = fitCheck(ocvb, dst, roilist, fitlist)
 
         Dim bestCorner = cornerlist.ElementAt(0)
         Dim fit = bestCorner
@@ -349,7 +349,7 @@ Public Class Puzzle_Solver
             Case cornerType.upperLeft, cornerType.upperRight
                 For nexty = 0 To ocvb.result2.Height - 1 Step roi.Height
                     For nextx = 0 To ocvb.result2.Width - 1 Step roi.Width
-                        ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
+                        dst(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
                         usedList.Add(fit.index)
                         col += 1
                         If col < cols Then
@@ -369,7 +369,7 @@ Public Class Puzzle_Solver
             Case cornerType.lowerLeft, cornerType.lowerRight
                 For nexty = ocvb.result2.Height - roi.Height To 0 Step -roi.Height
                     For nextx = 0 To ocvb.result2.Width - 1 Step roi.Width
-                        ocvb.result1(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
+                        dst(roi).CopyTo(ocvb.result2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
                         usedList.Add(fit.index)
                         col += 1
                         If col < cols Then

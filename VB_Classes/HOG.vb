@@ -43,8 +43,8 @@ Public Class HOG_Basics
         Dim scale = sliders.TrackBar3.Value / 1000
         Dim found() As cv.Rect = hog.DetectMultiScale(ocvb.color, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)
         ocvb.label1 = String.Format("{0} region(s) found", found.Length)
-        ocvb.color.CopyTo(ocvb.result1)
-        drawFoundRectangles(ocvb.result1, found)
+        ocvb.color.CopyTo(dst)
+        drawFoundRectangles(dst, found)
 
         If staticImageProcessed = False Then
             found = hog.DetectMultiScale(ocvb.result2, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)

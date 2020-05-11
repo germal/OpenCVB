@@ -60,7 +60,7 @@ Public Class SVM_Basics
     End Function
     Public Sub Run(ocvb As AlgorithmData)
         svmOptions.Run(ocvb) ' update any options specified in the interface.
-        ocvb.result1.SetTo(0)
+        dst.SetTo(0)
         ocvb.result2.SetTo(0)
 
         Dim points(svmOptions.sliders.TrackBar1.Value) As cv.Point2f
@@ -77,7 +77,7 @@ Public Class SVM_Basics
             Dim res = responses(i)
             Dim color As cv.Scalar = If(res = 1, cv.Scalar.Red, cv.Scalar.GreenYellow)
             Dim cSize = If(res = 1, 2, 4)
-            ocvb.result1.Circle(x, y, cSize, color, -1)
+            dst.Circle(x, y, cSize, color, -1)
         Next
 
         Dim dataMat = New cv.Mat(points.Length - 1, 2, cv.MatType.CV_32FC1, points)
@@ -116,7 +116,7 @@ Public Class SVM_Basics
             For x = 1 To ocvb.color.Height - 1
                 Dim y1 = CInt(ocvb.color.Height - f(x - 1))
                 Dim y2 = CInt(ocvb.color.Height - f(x))
-                ocvb.result1.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                dst.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 ocvb.result2.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
         End Using
@@ -147,7 +147,7 @@ Public Class SVM_Basics_MT
     Public Sub Run(ocvb As AlgorithmData)
         svmOptions.Run(ocvb)
         grid.Run(ocvb)
-        ocvb.result1.SetTo(0)
+        dst.SetTo(0)
         ocvb.result2.SetTo(0)
         Dim points(svmOptions.sliders.TrackBar1.Value) As cv.Point2f
         Dim responses(points.Length - 1) As Int32
@@ -163,7 +163,7 @@ Public Class SVM_Basics_MT
             Dim res = responses(i)
             Dim color As cv.Scalar = If(res = 1, cv.Scalar.Red, cv.Scalar.GreenYellow)
             Dim cSize = If(res = 1, 2, 4)
-            ocvb.result1.Circle(x, y, cSize, color, -1)
+            dst.Circle(x, y, cSize, color, -1)
         Next
 
         Dim dataMat = New cv.Mat(points.Length - 1, 2, cv.MatType.CV_32FC1, points)
@@ -209,10 +209,10 @@ Public Class SVM_Basics_MT
             For x = 1 To ocvb.color.Height - 1
                 Dim y1 = CInt(ocvb.color.Height - f(x - 1))
                 Dim y2 = CInt(ocvb.color.Height - f(x))
-                ocvb.result1.Line(x - 1, y1, x, y2, cv.Scalar.LightBlue, 1, cv.LineTypes.AntiAlias)
+                dst.Line(x - 1, y1, x, y2, cv.Scalar.LightBlue, 1, cv.LineTypes.AntiAlias)
                 ocvb.result2.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
-            ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+            dst.SetTo(cv.Scalar.White, grid.gridMask)
         End Using
     End Sub
 End Class
@@ -244,7 +244,7 @@ Public Class SVM_Simple
         labels.Set(Of Single)(0, 0, -1)
         labels.Set(Of Single)(dataSize - 1, 0, 1)
 
-        ocvb.result1.SetTo(cv.Scalar.White)
+        dst.SetTo(cv.Scalar.White)
         Using svmx As cv.ML.SVM = cv.ML.SVM.Create()
             svmx.Type = svmOptions.SVMType
             svmx.KernelType = svmOptions.kernelType
@@ -274,9 +274,9 @@ Public Class SVM_Simple
             For i = 0 To trainData.Rows
                 Dim pt = New cv.Point(CInt(trainData.Get(Of Single)(i, 0)), CInt(trainData.Get(Of Single)(i, 1)))
                 If labels.Get(Of Int32)(i) >= 0 Then
-                    ocvb.result1.Circle(pt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+                    dst.Circle(pt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
                 Else
-                    ocvb.result1.Circle(pt, 5, cv.Scalar.Green, -1, cv.LineTypes.AntiAlias)
+                    dst.Circle(pt, 5, cv.Scalar.Green, -1, cv.LineTypes.AntiAlias)
                 End If
             Next
 

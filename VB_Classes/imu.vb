@@ -97,10 +97,10 @@ Public Class IMU_Stabilizer
 
             Dim smoothedFrame = ocvb.color.WarpAffine(smoothedMat, ocvb.color.Size())
             smoothedFrame = smoothedFrame(New cv.Range(borderCrop, smoothedFrame.Rows - borderCrop), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
-            ocvb.result1 = smoothedFrame.Resize(ocvb.color.Size())
-            cv.Cv2.Subtract(ocvb.color, ocvb.result1, ocvb.result2)
+            dst = smoothedFrame.Resize(ocvb.color.Size())
+            cv.Cv2.Subtract(ocvb.color, dst, ocvb.result2)
 
-            ocvb.result1(New cv.Rect(10, 95, 50, 50)).SetTo(0)
+            dst(New cv.Rect(10, 95, 50, 50)).SetTo(0)
             Dim Text = "dx = " + Format(dx, "#0.00") + vbNewLine + "dy = " + Format(dy, "#0.00") + vbNewLine + "da = " + Format(da, "#0.00")
             ocvb.putText(New ActiveClass.TrueType(Text, 10, 100, RESULT1))
         Else
@@ -439,7 +439,7 @@ Public Class IMU_GVector
     Public angleX As Single ' in radians.
     Public angleY As Single ' in radians.
     Public angleZ As Single ' in radians.
-    Public result As Integer = RESULT1 ' should be result1 or result2
+    Public result As Integer = RESULT1 ' could be result1 or result2
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         kalman = New Kalman_Basics(ocvb, caller)

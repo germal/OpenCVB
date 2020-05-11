@@ -23,7 +23,7 @@ Public Class Draw_rectangles
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency = 0 Then
-            ocvb.result1.SetTo(cv.Scalar.White)
+            dst.SetTo(cv.Scalar.White)
             For i = 0 To sliders.TrackBar1.Value - 1
                 Dim nPoint = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
                 Dim width = ocvb.ms_rng.Next(0, ocvb.color.Cols - nPoint.X - 1)
@@ -34,9 +34,9 @@ Public Class Draw_rectangles
 
                 Dim nextColor = New cv.Scalar(ocvb.rColors(i).Item0, ocvb.rColors(i).Item1, ocvb.rColors(i).Item2)
                 If drawRotatedRectangles Then
-                    drawRotatedRectangle(rotatedRect, ocvb.result1, nextColor)
+                    drawRotatedRectangle(rotatedRect, dst, nextColor)
                 Else
-                    cv.Cv2.Rectangle(ocvb.result1, New cv.Rect(nPoint.X, nPoint.Y, width, height), nextColor, -1)
+                    cv.Cv2.Rectangle(dst, New cv.Rect(nPoint.X, nPoint.Y, width, height), nextColor, -1)
                 End If
             Next
         End If
@@ -58,7 +58,7 @@ Public Class Draw_Noise
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         maxNoiseWidth = sliders.TrackBar2.Value
-        ocvb.color.CopyTo(ocvb.result1)
+        ocvb.color.CopyTo(dst)
         noiseMask = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1).SetTo(0)
         For n = 0 To sliders.TrackBar1.Value
             Dim i = ocvb.ms_rng.Next(0, ocvb.color.Cols - 1)
@@ -67,7 +67,7 @@ Public Class Draw_Noise
             Dim c = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
             If addRandomColor = False Then c = cv.Scalar.Black
             Dim noiseWidth = ocvb.ms_rng.Next(1, maxNoiseWidth)
-            ocvb.result1.Circle(center, noiseWidth, c, -1, cv.LineTypes.AntiAlias)
+            dst.Circle(center, noiseWidth, c, -1, cv.LineTypes.AntiAlias)
             noiseMask.Circle(center, noiseWidth, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
@@ -101,13 +101,13 @@ Public Class Draw_Ellipses
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency = 0 Then
-            ocvb.result1.SetTo(cv.Scalar.White)
+            dst.SetTo(cv.Scalar.White)
             For i = 0 To sliders.TrackBar1.Value - 1
                 Dim nPoint = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
                 Dim eSize = New cv.Size2f(CSng(ocvb.ms_rng.Next(0, ocvb.color.Cols - nPoint.X - 1)), CSng(ocvb.ms_rng.Next(0, ocvb.color.Rows - nPoint.Y - 1)))
                 Dim angle = 180.0F * CSng(ocvb.ms_rng.Next(0, 1000) / 1000.0F)
                 Dim nextColor = New cv.Scalar(ocvb.rColors(i).Item0, ocvb.rColors(i).Item1, ocvb.rColors(i).Item2)
-                ocvb.result1.Ellipse(New cv.RotatedRect(nPoint, eSize, angle), nextColor, -1,)
+                dst.Ellipse(New cv.RotatedRect(nPoint, eSize, angle), nextColor, -1,)
             Next
         End If
     End Sub
@@ -125,12 +125,12 @@ Public Class Draw_Circles
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency = 0 Then
-            ocvb.result1.SetTo(cv.Scalar.White)
+            dst.SetTo(cv.Scalar.White)
             For i = 0 To sliders.TrackBar1.Value - 1
                 Dim nPoint = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
                 Dim radius = ocvb.ms_rng.Next(10, 10 + ocvb.ms_rng.Next(ocvb.color.Cols / 4))
                 Dim nextColor = New cv.Scalar(ocvb.rColors(i).Item0, ocvb.rColors(i).Item1, ocvb.rColors(i).Item2)
-                ocvb.result1.Circle(nPoint, radius, nextColor, -1,)
+                dst.Circle(nPoint, radius, nextColor, -1,)
             Next
         End If
     End Sub
@@ -148,13 +148,13 @@ Public Class Draw_Line
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency Then Exit Sub
-        ocvb.result1.SetTo(cv.Scalar.White)
+        dst.SetTo(cv.Scalar.White)
         For i = 0 To sliders.TrackBar1.Value - 1
             Dim nPoint1 = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
             Dim nPoint2 = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
             Dim thickness = ocvb.ms_rng.Next(1, 10)
             Dim nextColor = New cv.Scalar(ocvb.rColors(i).Item0, ocvb.rColors(i).Item1, ocvb.rColors(i).Item2)
-            ocvb.result1.Line(nPoint1, nPoint2, nextColor, thickness, cv.LineTypes.AntiAlias)
+            dst.Line(nPoint1, nPoint2, nextColor, thickness, cv.LineTypes.AntiAlias)
         Next
     End Sub
 End Class
@@ -180,7 +180,7 @@ Public Class Draw_Polygon
         Dim w = ocvb.color.Width / 8
         Dim polyColor = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
         'If ocvb.frameCount Mod updateFrequency = 0 Then
-        ocvb.result1.SetTo(cv.Scalar.White)
+        dst.SetTo(cv.Scalar.White)
         For i = 0 To sliders.TrackBar1.Value - 1
             Dim points = New List(Of cv.Point)
             Dim listOfPoints = New List(Of List(Of cv.Point))
@@ -189,9 +189,9 @@ Public Class Draw_Polygon
             Next
             listOfPoints.Add(points)
             If radio.check(0).Checked Then
-                cv.Cv2.Polylines(ocvb.result1, listOfPoints, True, polyColor, 2, cv.LineTypes.AntiAlias)
+                cv.Cv2.Polylines(dst, listOfPoints, True, polyColor, 2, cv.LineTypes.AntiAlias)
             Else
-                ocvb.result1.FillPoly(listOfPoints, New cv.Scalar(0, 0, 255))
+                dst.FillPoly(listOfPoints, New cv.Scalar(0, 0, 255))
             End If
 
             Dim hull() As cv.Point
@@ -228,29 +228,29 @@ Public Class Draw_RngImage
         Dim rng As New cv.RNG
         Dim offsetX = 50, offsetY = 25, lineLength = 50, thickness = 2
 
-        ocvb.result1.SetTo(0)
+        dst.SetTo(0)
         For i = 1 To 256
-            ocvb.result1.Line(New cv.Point(thickness * i + offsetX, offsetY), New cv.Point(thickness * i + offsetX, offsetY + lineLength), New cv.Scalar(i, i, i), thickness)
+            dst.Line(New cv.Point(thickness * i + offsetX, offsetY), New cv.Point(thickness * i + offsetX, offsetY + lineLength), New cv.Scalar(i, i, i), thickness)
         Next
         For i = 1 To 256
             Dim color = New cv.Scalar(rng.Uniform(0, 255), rng.Uniform(0, 255), rng.Uniform(0, 255))
             Select Case rng.Uniform(0, 3)
                 Case 0 ' circle
-                    Dim center = New cv.Point(rng.Uniform(offsetX, ocvb.result1.Cols - offsetX), rng.Uniform(offsetY + lineLength, ocvb.result1.Rows - offsetY))
+                    Dim center = New cv.Point(rng.Uniform(offsetX, dst.Cols - offsetX), rng.Uniform(offsetY + lineLength, dst.Rows - offsetY))
                     Dim radius = rng.Uniform(1, Math.Min(offsetX, offsetY))
-                    ocvb.result1.Circle(center, radius, color, -1, cv.LineTypes.Link8)
+                    dst.Circle(center, radius, color, -1, cv.LineTypes.Link8)
                 Case 1 ' Rectangle
-                    Dim center = New cv.Point(rng.Uniform(offsetX, ocvb.result1.Cols - offsetX), rng.Uniform(offsetY + lineLength, ocvb.result1.Rows - offsetY))
+                    Dim center = New cv.Point(rng.Uniform(offsetX, dst.Cols - offsetX), rng.Uniform(offsetY + lineLength, dst.Rows - offsetY))
                     Dim width = rng.Uniform(1, Math.Min(offsetX, offsetY))
                     Dim height = rng.Uniform(1, Math.Min(offsetX, offsetY))
                     Dim rc = New cv.Rect(center.X - width, center.Y - height / 2, width, height)
-                    ocvb.result1.Rectangle(rc, color, -1, cv.LineTypes.Link8)
+                    dst.Rectangle(rc, color, -1, cv.LineTypes.Link8)
                 Case 2 ' Ellipse
-                    Dim center = New cv.Point(rng.Uniform(offsetX, ocvb.result1.Cols - offsetX), rng.Uniform(offsetY + lineLength, ocvb.result1.Rows - offsetY))
+                    Dim center = New cv.Point(rng.Uniform(offsetX, dst.Cols - offsetX), rng.Uniform(offsetY + lineLength, dst.Rows - offsetY))
                     Dim width = rng.Uniform(1, Math.Min(offsetX, offsetY))
                     Dim height = rng.Uniform(1, Math.Min(offsetX, offsetY))
                     Dim angle = rng.Uniform(0, 180)
-                    ocvb.result1.Ellipse(center, New cv.Size(width / 2, height / 2), angle, 0, 360, color, -1, cv.LineTypes.Link8)
+                    dst.Ellipse(center, New cv.Size(width / 2, height / 2), angle, 0, 360, color, -1, cv.LineTypes.Link8)
             End Select
         Next
     End Sub
@@ -297,7 +297,7 @@ Public Class Draw_SymmetricalShapes
 
         End If
 
-        ocvb.result1.SetTo(0)
+        dst.SetTo(0)
         Dim numPoints = sliders.TrackBar1.Value
         Dim nGenPer = sliders.TrackBar4.Value
         If check.Box(1).Checked Then numPoints = CInt(numPoints / nGenPer) * nGenPer ' harmonize
@@ -320,11 +320,11 @@ Public Class Draw_SymmetricalShapes
             points.Add(pt)
         Next
 
-        ocvb.result1.SetTo(0)
+        dst.SetTo(0)
         For i = 0 To numPoints - 1
-            ocvb.result1.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod numPoints), ocvb.colorScalar(i Mod ocvb.colorScalar.Count), 2, cv.LineTypes.AntiAlias)
+            dst.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod numPoints), ocvb.colorScalar(i Mod ocvb.colorScalar.Count), 2, cv.LineTypes.AntiAlias)
         Next
 
-        If check.Box(2).Checked Then ocvb.result1.FloodFill(center, fillColor)
+        If check.Box(2).Checked Then dst.FloodFill(center, fillColor)
     End Sub
 End Class

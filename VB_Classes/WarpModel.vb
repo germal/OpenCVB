@@ -54,7 +54,7 @@ Public Class WarpModel_Input
         Next
         Dim merged As New cv.Mat
         cv.Cv2.Merge(rgb, merged)
-        ocvb.result1(r(0)) = rgb(0).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst(r(0)) = rgb(0).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result2(r(0)) = merged
     End Sub
 End Class
@@ -202,7 +202,7 @@ Public Class WarpModel_AlignImages
         Dim mergeInput() = {ecc.input.rgb(0), aligned(1), aligned(0)} ' green and blue were aligned to the original red
         Dim merged As New cv.Mat
         cv.Cv2.Merge(mergeInput, merged)
-        ocvb.result1(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
+        dst(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
         ocvb.label1 = "Aligned image"
         ocvb.putText(New ActiveClass.TrueType("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
                                               "Other than that, images look the same." + vbCrLf +

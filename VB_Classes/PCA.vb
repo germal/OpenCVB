@@ -35,7 +35,7 @@ Public Class PCA_Basics
             Dim reconstruction = pca.BackProject(point)
             reconstruction = reconstruction.Reshape(images(0).Channels(), images(0).Rows)
             reconstruction.ConvertTo(reconstruction, cv.MatType.CV_8UC1)
-            ocvb.result1 = reconstruction.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst = reconstruction.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
     End Sub
 End Class
@@ -86,8 +86,8 @@ Public Class PCA_DrawImage
         img.Line(p, q, color, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.result1 = image.Resize(ocvb.result1.Size())
-        Dim gray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
+        dst = image.Resize(dst.Size())
+        Dim gray = dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
         Dim hierarchy() As cv.HierarchyIndex = Nothing
         Dim contours As cv.Point()() = Nothing
         cv.Cv2.FindContours(gray, contours, hierarchy, cv.RetrievalModes.List, cv.ContourApproximationModes.ApproxNone)

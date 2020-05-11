@@ -36,7 +36,7 @@ Public Class Trace_OpenCV_CPP
         If imagePtr <> 0 Then
             Dim dstData(src.Total - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
+            dst = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
         End If
     End Sub
     Public Sub Close()

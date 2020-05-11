@@ -1152,7 +1152,7 @@ Public Class Depth_Stabilizer
     Public mean As Mean_Basics
     Public colorize As Depth_Colorizer_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(caller)
+        setCaller(callerRaw)
 
         mean = New Mean_Basics(ocvb, caller)
         colorize = New Depth_Colorizer_CPP(ocvb, caller)

@@ -111,7 +111,7 @@ Public Class Video_CarCComp
             mog.src = video.image.Clone()
             mog.Run(ocvb)
 
-            cc.srcGray = ocvb.result1.Clone()
+            cc.src = mog.dst
             cc.Run(ocvb)
         End If
     End Sub

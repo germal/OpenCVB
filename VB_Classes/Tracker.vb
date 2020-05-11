@@ -14,7 +14,7 @@ Public Class Tracker_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(0).Checked Then
-            ocvb.result1.SetTo(0)
+            dst.SetTo(0)
             check.Box(0).Checked = False
             If tracker IsNot Nothing Then tracker.Dispose()
             tracker = Nothing
@@ -48,10 +48,10 @@ Public Class Tracker_Basics
             tracker.Update(ocvb.color)
             boxObject = tracker.GetObjects() ' just track one.  Tracking multiple is buggy.  Returns a lot of 0 width/height rect2d's.
             If standalone Then
-                ocvb.result1 = ocvb.color.Clone()
+                dst = ocvb.color.Clone()
                 Dim p1 = New cv.Point(boxObject(0).X, boxObject(0).Y)
                 Dim p2 = New cv.Point(boxObject(0).X + bbox.Width, boxObject(0).Y + bbox.Height)
-                ocvb.result1.Rectangle(p1, p2, cv.Scalar.Blue, 2)
+                dst.Rectangle(p1, p2, cv.Scalar.Blue, 2)
             End If
         End If
     End Sub
@@ -75,7 +75,7 @@ Public Class Tracker_MultiObject
             ocvb.drawRect = New cv.Rect
             trackers.Add(tr)
         End If
-        ocvb.result1 = ocvb.color.Clone()
+        dst = ocvb.color.Clone()
         For Each tr In trackers
             Dim closeIt As Boolean
             If tr.check.Box(0).Checked Then closeIt = True
@@ -84,7 +84,7 @@ Public Class Tracker_MultiObject
             If tr.tracker IsNot Nothing Then
                 Dim p1 = New cv.Point(tr.boxObject(0).X, tr.boxObject(0).Y)
                 Dim p2 = New cv.Point(tr.boxObject(0).X + tr.bbox.Width, tr.boxObject(0).Y + tr.bbox.Height)
-                ocvb.result1.Rectangle(p1, p2, cv.Scalar.Blue, 2)
+                dst.Rectangle(p1, p2, cv.Scalar.Blue, 2)
             End If
         Next
     End Sub

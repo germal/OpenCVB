@@ -70,7 +70,7 @@ Public Class DFT_Basics
             mats.mat(0) = padded(New cv.Rect(cx, cy, cx, cy)).Clone()
             mats.Run(ocvb)
 
-            ocvb.result1 = inverseDFT(complexImage)
+            dst = inverseDFT(complexImage)
         End If
     End Sub
 End Class
@@ -98,10 +98,10 @@ Public Class DFT_Inverse
         cv.Cv2.Merge(planes, complex)
         cv.Cv2.Dft(complex, complexImage)
 
-        ocvb.result1 = inverseDFT(complexImage)
+        dst = inverseDFT(complexImage)
 
         Dim diff As New cv.Mat
-        cv.Cv2.Absdiff(gray, ocvb.result1, diff)
+        cv.Cv2.Absdiff(gray, dst, diff)
         mats.mat(0) = diff.Threshold(1, 255, cv.ThresholdTypes.Binary)
         mats.mat(1) = (diff * 50).ToMat
         mats.Run(ocvb)
@@ -164,7 +164,7 @@ Public Class DFT_ButterworthFilter
        Sub(k)
            Dim complex As New cv.Mat
            cv.Cv2.MulSpectrums(butterworthFilter(k), dft.complexImage, complex, cv.DftFlags.None)
-           If k = 0 Then ocvb.result1 = inverseDFT(complex) Else ocvb.result2 = inverseDFT(complex)
+           If k = 0 Then dst = inverseDFT(complex) Else ocvb.result2 = inverseDFT(complex)
        End Sub)
     End Sub
 End Class

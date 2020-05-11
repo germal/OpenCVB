@@ -51,7 +51,7 @@ Public Class EMax_Basics
         samples = samples.Reshape(1, 0)
 
         If standalone Then
-            ocvb.result1.SetTo(cv.Scalar.Black)
+            dst.SetTo(cv.Scalar.Black)
             Dim em_model = cv.EM.Create()
             em_model.ClustersNumber = regionCount
             For i = 0 To radio.check.Count - 1
@@ -64,25 +64,25 @@ Public Class EMax_Basics
 
             ' now classify every image pixel based on the samples.
             Dim sample As New cv.Mat(1, 2, cv.MatType.CV_64F, 0)
-            For i = 0 To ocvb.result1.Rows - 1
-                For j = 0 To ocvb.result1.Cols - 1
+            For i = 0 To dst.Rows - 1
+                For j = 0 To dst.Cols - 1
                     sample.Set(Of Double)(0, 0, CSng(j))
                     sample.Set(Of Double)(0, 1, CSng(i))
                     ' remove the " 0 '" to see the error in Predict2.
                     Dim response = 0 ' Math.Round(em_model.Predict2(sample)(1))
                     Dim c = ocvb.rColors(response)
-                    ocvb.result1.Circle(New cv.Point(j, i), 1, c, -1)
+                    dst.Circle(New cv.Point(j, i), 1, c, -1)
                 Next
             Next
         Else
-            ocvb.result1.SetTo(0)
+            dst.SetTo(0)
             ocvb.result2.SetTo(0)
         End If
 
         ' draw the clustered samples
         For i = 0 To samples.Rows - 1
             Dim pt = New cv.Point(Math.Round(samples.Get(Of Single)(i, 0)), Math.Round(samples.Get(Of Single)(i, 1)))
-            ocvb.result1.Circle(pt, 4, ocvb.rColors(labels.Get(Of Int32)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
+            dst.Circle(pt, 4, ocvb.rColors(labels.Get(Of Int32)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
         Next
     End Sub
 End Class
@@ -136,7 +136,7 @@ Public Class EMax_Basics_CPP
             End If
         Next
         Dim imagePtr = EMax_Basics_Run(EMax_Basics, handleSrc.AddrOfPinnedObject(), handleLabels.AddrOfPinnedObject(), emax.samples.Rows, emax.samples.Cols,
-                                       ocvb.result1.Rows, ocvb.result1.Cols, emax.regionCount, emax.sliders.TrackBar2.Value, covarianceMatrixType)
+                                       dst.Rows, dst.Cols, emax.regionCount, emax.sliders.TrackBar2.Value, covarianceMatrixType)
 
         If imagePtr <> 0 Then
             Dim dstData(ocvb.result2.Total * ocvb.result2.ElemSize - 1) As Byte
@@ -146,8 +146,8 @@ Public Class EMax_Basics_CPP
         handleSrc.Free() ' free the pinned memory...
         handleLabels.Free() ' free the pinned memory...
 
-        Dim mask = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        ocvb.result1.CopyTo(ocvb.result2, mask)
+        Dim mask = dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst.CopyTo(ocvb.result2, mask)
     End Sub
     Public Sub Close()
         EMax_Basics_Close(EMax_Basics)

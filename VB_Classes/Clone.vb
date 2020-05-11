@@ -24,11 +24,11 @@ Public Class Clone_Normal
 
         Select Case cloneSpec
             Case 0
-                cv.Cv2.ColorChange(ocvb.color, mask, ocvb.result1, colorChangeValues(0), colorChangeValues(1), colorChangeValues(2))
+                cv.Cv2.ColorChange(ocvb.color, mask, dst, colorChangeValues(0), colorChangeValues(1), colorChangeValues(2))
             Case 1
-                cv.Cv2.IlluminationChange(ocvb.color, mask, ocvb.result1, illuminationChangeValues(0), illuminationChangeValues(1))
+                cv.Cv2.IlluminationChange(ocvb.color, mask, dst, illuminationChangeValues(0), illuminationChangeValues(1))
             Case 2
-                cv.Cv2.TextureFlattening(ocvb.color, mask, ocvb.result1, textureFlatteningValues(0), textureFlatteningValues(1))
+                cv.Cv2.TextureFlattening(ocvb.color, mask, dst, textureFlatteningValues(0), textureFlatteningValues(1))
         End Select
     End Sub
 End Class
@@ -136,7 +136,7 @@ Public Class Clone_Eagle
         ocvb.label2 = "Source image and source mask."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.result1 = ocvb.color.Clone()
+        dst = ocvb.color.Clone()
         If ocvb.mouseClickFlag Then
             pt = ocvb.mouseClickPoint ' pt corresponds to the center of the source image.  Roi can't be outside image boundary.
             If pt.X + srcROI.Width / 2 >= ocvb.color.Width Then pt.X = ocvb.color.Width - srcROI.Width / 2
@@ -153,7 +153,7 @@ Public Class Clone_Eagle
                 Exit For
             End If
         Next
-        cv.Cv2.SeamlessClone(sourceImage, ocvb.result1, mask, pt, ocvb.result1, cloneFlag)
+        cv.Cv2.SeamlessClone(sourceImage, dst, mask, pt, dst, cloneFlag)
     End Sub
 End Class
 
@@ -177,12 +177,12 @@ Public Class Clone_Seamless
     Public Sub Run(ocvb As AlgorithmData)
         Dim center As New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
         Dim radius = 100
-        ocvb.result1.SetTo(0)
+        dst.SetTo(0)
         If ocvb.drawRect = New cv.Rect Then
-            ocvb.result1.SetTo(255)
+            dst.SetTo(255)
         Else
-            cv.Cv2.Rectangle(ocvb.result1, ocvb.drawRect, cv.Scalar.White, -1)
-            ' ocvb.result1.Circle(center.X, center.Y, radius, cv.Scalar.White, -1)
+            cv.Cv2.Rectangle(dst, ocvb.drawRect, cv.Scalar.White, -1)
+            ' dst.Circle(center.X, center.Y, radius, cv.Scalar.White, -1)
         End If
 
         Dim style = cv.SeamlessCloneMethods.NormalClone
@@ -193,7 +193,7 @@ Public Class Clone_Seamless
             End If
         Next
         ocvb.result2 = ocvb.color.Clone()
-        cv.Cv2.SeamlessClone(ocvb.RGBDepth, ocvb.color, ocvb.result1, center, ocvb.result2, style)
+        cv.Cv2.SeamlessClone(ocvb.RGBDepth, ocvb.color, dst, center, ocvb.result2, style)
         ocvb.result2.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
     End Sub
 End Class

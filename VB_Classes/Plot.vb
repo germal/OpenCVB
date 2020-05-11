@@ -30,7 +30,7 @@ Public Class Plot_OverTime
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
         If ocvb.frameCount = 0 Then
-            if standalone Then dst = ocvb.result1
+            if standalone Then dst = dst
         End If
         Dim pixelHeight = CInt(sliders.TrackBar1.Value)
         Dim pixelWidth = CInt(sliders.TrackBar2.Value)
@@ -127,7 +127,7 @@ Public Class Plot_Histogram
             Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
             cv.Cv2.CalcHist(New cv.Mat() {gray}, New Integer() {0}, New cv.Mat(), hist, 1, dimensions, ranges)
         End If
-        dst = ocvb.result1
+        dst = dst
         Dim barWidth = Int(dst.Width / hist.Rows)
         Dim minVal As Single, maxVal As Single
         hist.MinMaxLoc(minVal, maxVal)
@@ -202,7 +202,7 @@ Public Class Plot_Basics_CPP
                 srcX(i) = i
                 srcY(i) = i * i * i
             Next
-            dst = ocvb.result1
+            dst = dst
         End If
         For i = 0 To srcX.Length - 1
             If srcX(i) > maxX Then maxX = CInt(srcX(i))
@@ -284,7 +284,7 @@ Public Class Plot_Depth
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        plot.dst = ocvb.result1
+        plot.dst = dst
         ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
         ReDim plot.srcY(hist.plotHist.hist.Rows - 1)
         Dim inRangeMin = hist.trim.sliders.TrackBar1.Value

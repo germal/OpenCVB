@@ -3,7 +3,7 @@ Public Class Mean_Basics
     Inherits ocvbClass
     Dim images As New List(Of cv.Mat)
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(caller)
+        setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Mean - number of input images", 1, 100, 10)
         ocvb.desc = "Create an image that is the mean of x number of previous images."
     End Sub
@@ -15,7 +15,8 @@ Public Class Mean_Basics
         End If
         If standalone Then src = ocvb.color
         Dim nextImage As New cv.Mat
-        If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(nextImage, cv.MatType.CV_32F, 1 / saveImageCount) Else nextImage = src
+        If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(src, cv.MatType.CV_32F)
+        cv.Cv2.Multiply(src, cv.Scalar.All(1 / saveImageCount), nextImage)
         images.Add(nextImage.Clone())
         If dst Is Nothing Then dst = src.Clone()
 
@@ -25,6 +26,5 @@ Public Class Mean_Basics
         Next
         If images.Count > saveImageCount Then images.RemoveAt(0)
         If nextImage.Type <> src.Type Then nextImage.ConvertTo(dst, src.Type) Else dst = nextImage
-        If standalone Then ocvb.result1 = dst
     End Sub
 End Class

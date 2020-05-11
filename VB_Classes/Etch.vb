@@ -21,7 +21,7 @@ Public Class Etch_ASketch
         keys = New Keyboard_Basics(ocvb, caller)
 
         cursor = randomCursor(ocvb)
-        ocvb.result1.SetTo(slateColor)
+        dst.SetTo(slateColor)
         ocvb.desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -36,7 +36,7 @@ Public Class Etch_ASketch
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
             cursor = randomCursor(ocvb)
-            ocvb.result1.SetTo(slateColor)
+            dst.SetTo(slateColor)
         End If
         keys.Run(ocvb)
         For i = 0 To directionCount - 1
@@ -54,7 +54,7 @@ Public Class Etch_ASketch
             If cursor.Y < 0 Then cursor.Y = cursor = randomCursor(ocvb)
             If cursor.X > ocvb.color.Width Then cursor = randomCursor(ocvb)
             If cursor.Y > ocvb.color.Height Then cursor = randomCursor(ocvb)
-            ocvb.result1.Set(Of cv.Vec3b)(cursor.Y, cursor.X, black)
+            dst.Set(Of cv.Vec3b)(cursor.Y, cursor.X, black)
         Next
         If check.Box(1).Checked Then
             Static lastCursor = cursor

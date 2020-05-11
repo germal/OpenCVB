@@ -12,9 +12,9 @@ Public Class Mouse_Basics
         lastPoint = ocvb.mousePoint
         Dim radius = 10
         Static colorIndex As Int32
-        If colorIndex = 0 Then ocvb.result1.SetTo(0)
+        If colorIndex = 0 Then dst.SetTo(0)
         Dim nextColor = ocvb.colorScalar(colorIndex)
-        ocvb.result1.Circle(ocvb.mousePoint, radius, nextColor, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(ocvb.mousePoint, radius, nextColor, -1, cv.LineTypes.AntiAlias)
         colorIndex += 1
         If colorIndex >= ocvb.colorScalar.Count Then colorIndex = 0
         ocvb.putText(New ActiveClass.TrueType("Move the mouse through this image to show mouse tracking.", 10, 50))

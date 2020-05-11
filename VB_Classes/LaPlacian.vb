@@ -16,10 +16,9 @@ Public Class Laplacian_Basics
         Dim delta = sliders.TrackBar3.Value / 100
         Dim ddepth = cv.MatType.CV_16S
 
-        Dim src = ocvb.color.GaussianBlur(New cv.Size(kernelSize, kernelSize), 0, 0)
-        Dim srcGray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim dst = srcGray.Laplacian(ddepth, kernelSize, scale, delta)
-        ocvb.result1 = dst.ConvertScaleAbs()
+        If standalone Then src = ocvb.color.GaussianBlur(New cv.Size(kernelSize, kernelSize), 0, 0)
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst = gray.Laplacian(ddepth, kernelSize, scale, delta).ConvertScaleAbs()
         ocvb.label1 = "Laplacian Filter k = " + CStr(kernelSize)
     End Sub
 End Class
@@ -48,7 +47,6 @@ Public Class Laplacian_Blur
         Dim delta = sliders.TrackBar3.Value / 100
         Dim ddepth = cv.MatType.CV_16S
 
-        Dim src As cv.Mat
         Dim blurText As String
         If radio.check(0).Checked Then
             src = ocvb.color.GaussianBlur(New cv.Size(kernelSize, kernelSize), 0, 0)
@@ -60,9 +58,8 @@ Public Class Laplacian_Blur
             src = ocvb.color.MedianBlur(kernelSize)
             blurText = "MedianBlur"
         End If
-        Dim srcGray = src.CvtColor(cv.ColorConversionCodes.bgr2gray)
-        Dim dst = srcGray.Laplacian(ddepth, kernelSize, scale, delta)
-        ocvb.result1 = dst.ConvertScaleAbs()
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst = gray.Laplacian(ddepth, kernelSize, scale, delta).ConvertScaleAbs()
         ocvb.label1 = "Laplacian+" + blurText + " k = " + CStr(kernelSize)
     End Sub
 End Class

@@ -99,7 +99,7 @@ Public Class Retina_Depth
         retina.Run(ocvb)
         Static lastMotion As New cv.Mat
         If lastMotion.Width = 0 Then lastMotion = ocvb.result2
-        cv.Cv2.BitwiseOr(lastMotion, ocvb.result2, ocvb.result1)
+        cv.Cv2.BitwiseOr(lastMotion, ocvb.result2, dst)
         lastMotion = ocvb.result2
     End Sub
 End Class

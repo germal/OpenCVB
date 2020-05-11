@@ -14,8 +14,8 @@ Public Class xPhoto_Bm3dDenoise
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(gray, gray)
-        CvXPhoto.Bm3dDenoising(gray, ocvb.result1)
-        cv.Cv2.Subtract(ocvb.result1, gray, ocvb.result2)
+        CvXPhoto.Bm3dDenoising(gray, dst)
+        cv.Cv2.Subtract(dst, gray, ocvb.result2)
         Dim minVal As Double, maxVal As Double
         ocvb.result2.MinMaxLoc(minVal, maxVal)
         ocvb.label2 = "Diff from input - max change=" + CStr(maxVal)
@@ -38,8 +38,8 @@ Public Class xPhoto_Bm3dDenoiseDepthImage
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(gray, gray)
-        CvXPhoto.Bm3dDenoising(gray, ocvb.result1)
-        cv.Cv2.Subtract(ocvb.result1, gray, ocvb.result2)
+        CvXPhoto.Bm3dDenoising(gray, dst)
+        cv.Cv2.Subtract(dst, gray, ocvb.result2)
         Dim minVal As Double, maxVal As Double
         ocvb.result2.MinMaxLoc(minVal, maxVal)
         ocvb.label2 = "Diff from input - max change=" + CStr(maxVal)
@@ -115,10 +115,10 @@ Public Class xPhoto_OilPaint_CPP
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             Dim dst = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
             If ocvb.drawRect.Width = 0 Then
-                ocvb.result1 = dst
+                dst = dst
             Else
-                ocvb.result1 = ocvb.color
-                ocvb.result1(ocvb.drawRect) = dst
+                dst = ocvb.color
+                dst(ocvb.drawRect) = dst
                 ocvb.result2 = dst.Resize(ocvb.result2.Size)
             End If
         End If

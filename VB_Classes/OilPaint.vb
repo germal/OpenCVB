@@ -18,8 +18,8 @@ Public Class OilPaint_Pointilism
         ocvb.desc = "Alter the image to effect the pointilism style - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.result1 = ocvb.color.Clone()
-        Dim src = ocvb.result1(ocvb.drawRect)
+        dst = ocvb.color.Clone()
+        Dim src = dst(ocvb.drawRect)
         Static saveDrawRect As New cv.Rect
         If saveDrawRect <> ocvb.drawRect Then
             saveDrawRect = ocvb.drawRect
@@ -64,7 +64,7 @@ Public Class OilPaint_Pointilism
                 Dim angle = direction * 180.0 / Math.PI + 90
 
                 Dim nextColor = ocvb.color(ocvb.drawRect).Get(Of cv.Vec3b)(nPt.Y, nPt.X)
-                ocvb.result1(ocvb.drawRect).Circle(nPoint, slen / 4, nextColor, -1, cv.LineTypes.AntiAlias)
+                dst(ocvb.drawRect).Circle(nPoint, slen / 4, nextColor, -1, cv.LineTypes.AntiAlias)
             Next
         Next
     End Sub
@@ -128,7 +128,7 @@ Public Class OilPaint_Manual
 
         If filtersize Mod 2 = 0 Then filtersize += 1 ' must be odd
         Dim roi = ocvb.drawRect
-        ocvb.color.CopyTo(ocvb.result1)
+        ocvb.color.CopyTo(dst)
         Dim color = ocvb.color(roi)
         Dim result1 = color.Clone()
         For y = filtersize To roi.Height - filtersize - 1
@@ -162,7 +162,7 @@ Public Class OilPaint_Manual
                 result1.Set(Of cv.Vec3b)(y, x, vec)
             Next
         Next
-        result1.CopyTo(ocvb.result1(roi))
+        result1.CopyTo(dst(roi))
     End Sub
 End Class
 
@@ -187,12 +187,12 @@ Public Class OilPaint_Manual_CS
         Dim kernelSize = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         Dim roi = ocvb.drawRect
-        ocvb.color.CopyTo(ocvb.result1)
-        oilPaint.Start(ocvb.color(roi), ocvb.result1(roi), kernelSize, sliders.TrackBar2.Value)
+        ocvb.color.CopyTo(dst)
+        oilPaint.Start(ocvb.color(roi), dst(roi), kernelSize, sliders.TrackBar2.Value)
         ocvb.result2.SetTo(0)
         Dim factor As Int32 = Math.Min(Math.Floor(ocvb.result2.Width / roi.Width), Math.Floor(ocvb.result2.Height / roi.Height))
         Dim s = New cv.Size(roi.Width * factor, roi.Height * factor)
-        cv.Cv2.Resize(ocvb.result1(roi), ocvb.result2(New cv.Rect(0, 0, s.Width, s.Height)), s)
+        cv.Cv2.Resize(dst(roi), ocvb.result2(New cv.Rect(0, 0, s.Width, s.Height)), s)
     End Sub
 End Class
 
@@ -221,7 +221,7 @@ Public Class OilPaint_Cartoon
     Public Sub Run(ocvb As AlgorithmData)
         Dim roi = ocvb.drawRect
         laplacian.Run(ocvb)
-        Dim edges = ocvb.result1.CvtColor(cv.ColorConversionCodes.bgr2gray)
+        Dim edges = dst.CvtColor(cv.ColorConversionCodes.bgr2gray)
 
         oil.Run(ocvb)
 
@@ -232,7 +232,7 @@ Public Class OilPaint_Cartoon
         For y = 0 To roi.Height - 1
             For x = 0 To roi.Width - 1
                 If edges(roi).Get(Of Byte)(y, x) >= threshold Then
-                    ocvb.result1(roi).Set(Of cv.Vec3b)(y, x, vec000)
+                    dst(roi).Set(Of cv.Vec3b)(y, x, vec000)
                 End If
             Next
         Next

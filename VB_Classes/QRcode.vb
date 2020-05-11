@@ -33,9 +33,9 @@ Public Class QRcode_Basics
         Dim rectifiedImage As New cv.Mat
         Dim refersTo = qrDecoder.DetectAndDecode(input, box, rectifiedImage)
 
-        input.CopyTo(ocvb.result1)
+        input.CopyTo(dst)
         For i = 0 To box.Length - 1
-            ocvb.result1.Line(box(i), box((i + 1) Mod 4), cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
+            dst.Line(box(i), box((i + 1) Mod 4), cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
         Next
         If refersTo <> "" Then ocvb.label1 = refersTo
     End Sub

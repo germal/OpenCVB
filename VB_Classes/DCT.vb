@@ -233,7 +233,7 @@ Public Class DCT_CCompenents
     Public Sub Run(ocvb As AlgorithmData)
         dct.Run(ocvb)
 
-        cc.srcGray = ocvb.result1.Clone()
+        cc.src = dct.dst.Clone()
         cc.Run(ocvb)
     End Sub
 End Class

@@ -510,9 +510,7 @@ Public Class Histogram_Depth
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {getDepth32f(ocvb)}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
-        If standalone Then
-            plotHist.Run(ocvb)
-        End If
+        If standalone Then plotHist.Run(ocvb)
     End Sub
 End Class
 

@@ -61,9 +61,9 @@ Public Class Harris_Features_CPP
         Dim dstData(ocvb.color.Total - 1) As Single
         Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
         Dim gray32f = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_32F, dstData)
-        gray32f.ConvertTo(ocvb.result1, cv.MatType.CV_8U)
-        ocvb.result1 = ocvb.result1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.AddWeighted(ocvb.result1, 0.5, ocvb.color, 0.5, 0, ocvb.result2)
+        gray32f.ConvertTo(dst, cv.MatType.CV_8U)
+        dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.AddWeighted(dst, 0.5, ocvb.color, 0.5, 0, ocvb.result2)
     End Sub
     Public Sub Close()
         Harris_Features_Close(Harris_Features)
@@ -103,11 +103,11 @@ Public Class Harris_Detector_CPP
             Dim pts((ptCount(0) - 1) * 2 - 1) As Int32
             Marshal.Copy(ptPtr, pts, 0, ptCount(0))
             Dim ptMat = New cv.Mat(ptCount(0), 2, cv.MatType.CV_32S, pts)
-            if standalone Then ocvb.color.CopyTo(ocvb.result1)
+            if standalone Then ocvb.color.CopyTo(dst)
             FeaturePoints.Clear()
             For i = 0 To ptMat.Rows - 1
                 FeaturePoints.Add(New cv.Point2f(ptMat.Get(of Int32)(i, 0), ptMat.Get(of Int32)(i, 1)))
-                if standalone Then ocvb.result1.Circle(FeaturePoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                if standalone Then dst.Circle(FeaturePoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             Next
         End If
     End Sub

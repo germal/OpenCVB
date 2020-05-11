@@ -42,7 +42,7 @@ Public Class Gabor_Basics
         If standalone Then
             dst = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
         Else
-            ocvb.result1 = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
+            dst = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
             ocvb.result2.SetTo(0)
             ocvb.result2 = gKernel.Resize(ocvb.color.Size(), 0, 0, cv.InterpolationFlags.Cubic)
         End If
@@ -107,6 +107,6 @@ Public Class Gabor_Basics_MT
                 ocvb.result2(roi) = gabor(i).gKernel.Resize(New cv.Size(roi.Width, roi.Height), 0, 0, cv.InterpolationFlags.Cubic)
             End SyncLock
         End Sub)
-        ocvb.result1 = accum
+        dst = accum
     End Sub
 End Class

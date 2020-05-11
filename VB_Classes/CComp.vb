@@ -4,9 +4,6 @@ Imports System.Threading
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
 Public Class CComp_Basics
     Inherits ocvbClass
-        Public srcGray As New cv.Mat
-    Public dstGray As New cv.Mat
-
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "CComp Threshold", 0, 255, 10)
@@ -24,14 +21,14 @@ Public Class CComp_Basics
         Next
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim threshold = sliders.TrackBar1.Value
         Dim binary As New cv.Mat
         If threshold < 128 Then
-            binary = srcGray.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
+            binary = src.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
         Else
-            binary = srcGray.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.BinaryInv + OpenCvSharp.ThresholdTypes.Otsu)
+            binary = src.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.BinaryInv + OpenCvSharp.ThresholdTypes.Otsu)
         End If
         ocvb.result1 = binary.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
@@ -39,24 +36,24 @@ Public Class CComp_Basics
         Static lastImage As New cv.Mat
 
         cc.RenderBlobs(ocvb.result1)
-        dstGray = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayDepth = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.result1.CopyTo(ocvb.result2)
         For Each blob In cc.Blobs
             If blob.Area < sliders.TrackBar2.Value Then Continue For ' skip it if too small...
             Dim rect = blob.Rect
             ' if it covers everything, then forget it...
-            If rect.Width = srcGray.Width And rect.Height = srcGray.Height Then Continue For
-            If rect.X + rect.Width > srcGray.Width Or rect.Y + rect.Height > srcGray.Height Then Continue For
+            If rect.Width = src.Width And rect.Height = src.Height Then Continue For
+            If rect.X + rect.Width > src.Width Or rect.Y + rect.Height > src.Height Then Continue For
 
-            Dim mask = dstGray(rect)
+            Dim mask = dst(rect)
             Dim m = cv.Cv2.Moments(mask, True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
             Dim centroid = New cv.Point(CInt(m.M10 / m.M00), CInt(m.M01 / m.M00))
             ocvb.result2(rect).Circle(centroid, 5, cv.Scalar.White, -1)
             ocvb.result2.Rectangle(rect, cv.Scalar.White, 2)
         Next
-        lastImage = ocvb.result1.Clone()
+        lastImage = dst.Clone()
     End Sub
 End Class
 
@@ -67,7 +64,6 @@ Public Class CComp_EdgeMask
     Inherits ocvbClass
     Dim ccomp As CComp_Basics
     Dim edges As Edges_CannyAndShadow
-    Public srcGray As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         edges = New Edges_CannyAndShadow(ocvb, caller)
@@ -82,11 +78,11 @@ Public Class CComp_EdgeMask
         edges.Run(ocvb)
 
         If standalone Then
-            ccomp.srcGray = srcGray
+            ccomp.src = src
         Else
-            ccomp.srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            ccomp.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
-        ccomp.srcGray.SetTo(0, ccomp.dstGray)
+        ccomp.src.SetTo(0, ccomp.dst)
         ccomp.Run(ocvb)
         ocvb.label1 = "Edges_CannyAndShadow (input to ccomp)"
         ocvb.label2 = "Blob Rectangles with centroids (white)"
@@ -126,16 +122,15 @@ End Class
 
 Public Class CComp_Image
     Inherits ocvbClass
-        Public srcGray As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Connect components throughout the image"
         ocvb.label1 = "Color Components with Mean Depth"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim binary = srcGray.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
+        Dim binary = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
         ocvb.result1.SetTo(0)
 
         Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
@@ -173,7 +168,6 @@ End Class
 
 Public Class CComp_InRange_MT
     Inherits ocvbClass
-        Public srcGray As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "InRange # of ranges", 2, 255, 15)
@@ -186,7 +180,7 @@ Public Class CComp_InRange_MT
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1.SetTo(0)
         ocvb.result2.SetTo(0)
-        if standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Int32 = sliders.TrackBar1.Value
         Dim maxDepth = sliders.TrackBar2.Value
@@ -200,7 +194,7 @@ Public Class CComp_InRange_MT
         Sub(i)
             Dim lowerBound = i * (255 / rangeCount)
             Dim upperBound = (i + 1) * (255 / rangeCount)
-            Dim binary = srcGray.InRange(lowerBound, upperBound)
+            Dim binary = src.InRange(lowerBound, upperBound)
             Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
             Dim roiList As New List(Of cv.Rect)
             For Each blob In cc.Blobs.Skip(1) ' skip the blob for the whole image.
@@ -228,7 +222,6 @@ End Class
 
 Public Class CComp_InRange
     Inherits ocvbClass
-        Public srcGray As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "InRange # of ranges", 1, 20, 15)
@@ -240,7 +233,7 @@ Public Class CComp_InRange
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1.SetTo(0)
         ocvb.result2.SetTo(0)
-        if standalone Then srcGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Int32 = sliders.TrackBar1.Value
         Dim minBlobSize = sliders.TrackBar2.Value
@@ -252,7 +245,7 @@ Public Class CComp_InRange
         For i = 0 To rangeCount - 1
             Dim lowerBound = i * (255 / rangeCount)
             Dim upperBound = (i + 1) * (255 / rangeCount)
-            Dim binary = srcGray.InRange(lowerBound, upperBound)
+            Dim binary = src.InRange(lowerBound, upperBound)
             Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
             For Each blob In cc.Blobs.Skip(1) ' skip the blob for the whole image.
                 If blob.Rect.Width * blob.Rect.Height > minBlobSize Then roiList.Add(blob.Rect)

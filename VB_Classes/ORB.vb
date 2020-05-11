@@ -16,10 +16,10 @@ Public Class ORB_Basics
         orb = cv.ORB.Create(sliders.TrackBar1.Value)
         keypoints = orb.Detect(gray)
         If standalone Then
-            ocvb.result1 = ocvb.color.Clone()
+            dst = ocvb.color.Clone()
 
             For Each kpt In keypoints
-                ocvb.result1.Circle(kpt.Pt, 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                dst.Circle(kpt.Pt, 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             Next
             ocvb.label1 = CStr(keypoints.Count) + " key points were identified"
         End If

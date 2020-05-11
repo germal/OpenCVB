@@ -19,10 +19,10 @@ Public Class Resize_Basics
             Dim roi = New cv.Rect(ocvb.color.Width / 4, ocvb.color.Height / 4, ocvb.color.Width / 2, ocvb.color.Height / 2)
             If ocvb.drawRect.Width <> 0 Then roi = ocvb.drawRect
 
-            ocvb.result1 = ocvb.color(roi).Resize(ocvb.result1.Size(), 0, 0, resizeFlag)
+            dst = ocvb.color(roi).Resize(dst.Size(), 0, 0, resizeFlag)
 
-            ocvb.result2 = (ocvb.color(roi).Resize(ocvb.result1.Size(), 0, 0, cv.InterpolationFlags.Cubic) -
-                            ocvb.result1).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            ocvb.result2 = (ocvb.color(roi).Resize(dst.Size(), 0, 0, cv.InterpolationFlags.Cubic) -
+                            dst).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
             ocvb.color.Rectangle(roi, cv.Scalar.White, 2)
         Else
             dst = src.Resize(newSize, 0, 0, resizeFlag)
@@ -64,7 +64,7 @@ Public Class Resize_After8uc3
         depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
         colorizer.src = depth32f
         colorizer.Run(ocvb)
-        ocvb.result1 = colorizer.dst
+        dst = colorizer.dst
     End Sub
 End Class
 
@@ -95,7 +95,7 @@ Public Class Resize_Percentage
 
         If standalone Then
             Dim roi As New cv.Rect(0, 0, resizeOptions.dst.Width, resizeOptions.dst.Height)
-            ocvb.result1 = resizeOptions.dst(roi).Resize(resizeOptions.dst.Size())
+            dst = resizeOptions.dst(roi).Resize(resizeOptions.dst.Size())
             ocvb.label1 = "Image after resizing to " + Format(sliders.TrackBar1.Value, "#0.0") + "% of original size"
             ocvb.label2 = ""
         Else

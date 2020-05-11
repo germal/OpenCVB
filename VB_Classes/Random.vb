@@ -21,13 +21,13 @@ Public Class Random_Points
             ReDim Points(sliders.TrackBar1.Value - 1)
             ReDim Points2f(sliders.TrackBar1.Value - 1)
         End If
-        if standalone Then ocvb.result1.SetTo(0)
+        if standalone Then dst.SetTo(0)
         For i = 0 To Points.Length - 1
             Dim x = ocvb.ms_rng.Next(rangeRect.X, rangeRect.X + rangeRect.Width)
             Dim y = ocvb.ms_rng.Next(rangeRect.Y, rangeRect.Y + rangeRect.Height)
             Points(i) = New cv.Point2f(x, y)
             Points2f(i) = New cv.Point2f(x, y)
-            if standalone Then cv.Cv2.Circle(ocvb.result1, Points(i), 3, cv.Scalar.Gray, -1, cv.LineTypes.AntiAlias, 0)
+            if standalone Then cv.Cv2.Circle(dst, Points(i), 3, cv.Scalar.Gray, -1, cv.LineTypes.AntiAlias, 0)
         Next
     End Sub
 End Class
@@ -42,9 +42,9 @@ Public Class Random_Shuffle
         ocvb.desc = "Use randomShuffle to reorder an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.RGBDepth.CopyTo(ocvb.result1)
+        ocvb.RGBDepth.CopyTo(dst)
         Dim myRNG As New cv.RNG
-        cv.Cv2.RandShuffle(ocvb.result1, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
+        cv.Cv2.RandShuffle(dst, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
         ocvb.label1 = "Random_shuffle - wave at camera"
     End Sub
 End Class
@@ -69,7 +69,7 @@ Public Class Random_LUTMask
             lutMat = cv.Mat.Zeros(New cv.Size(1, 256), cv.MatType.CV_8UC3)
             Dim lutIndex = 0
             km.Run(ocvb) ' sets result1
-            ocvb.result1.CopyTo(ocvb.result2)
+            dst.CopyTo(ocvb.result2)
             For i = 0 To random.Points.Length - 1
                 Dim x = random.Points(i).X
                 Dim y = random.Points(i).Y
@@ -100,7 +100,7 @@ Public Class Random_UniformDist
     Public Sub Run(ocvb As AlgorithmData)
         cv.Cv2.Randu(uDist, 0, 255)
         if standalone Then
-            ocvb.result1 = uDist.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst = uDist.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
     End Sub
 End Class
@@ -119,8 +119,8 @@ Public Class Random_NormalDist
         ocvb.desc = "Create a normal distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        cv.Cv2.Randn(ocvb.result1, New cv.Scalar(sliders.TrackBar1.Value, sliders.TrackBar2.Value, sliders.TrackBar3.Value), cv.Scalar.All(sliders.TrackBar4.Value))
-        If standalone Then nDistImage = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.Randn(dst, New cv.Scalar(sliders.TrackBar1.Value, sliders.TrackBar2.Value, sliders.TrackBar3.Value), cv.Scalar.All(sliders.TrackBar4.Value))
+        If standalone Then nDistImage = dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class
 
@@ -142,7 +142,7 @@ Public Class Random_CheckUniformDist
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         rUniform.Run(ocvb)
-        ocvb.result1 = rUniform.uDist.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst = rUniform.uDist.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         rUniform.uDist.CopyTo(histogram.gray)
         histogram.Run(ocvb)
     End Sub
@@ -165,7 +165,7 @@ Public Class Random_CheckNormalDist
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         normalDist.Run(ocvb)
-        ocvb.result1 = normalDist.nDistImage.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst = normalDist.nDistImage.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         normalDist.nDistImage.CopyTo(histogram.gray)
         histogram.Run(ocvb)
     End Sub
@@ -207,7 +207,7 @@ Public Class Random_PatternGenerator_CPP
         If imagePtr <> 0 Then
             Dim dstData(src.Total - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            ocvb.result1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
+            dst = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
         End If
     End Sub
     Public Sub Close()

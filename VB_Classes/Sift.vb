@@ -28,11 +28,11 @@ Public Class Sift_Basics_CS
             CS_SiftBasics.Run(fisheye.leftView, fisheye.rightView, dst, radio.check(0).Checked, sliders.TrackBar1.Value)
         Else
             CS_SiftBasics.Run(ocvb.leftView, ocvb.rightView, dst, radio.check(0).Checked, sliders.TrackBar1.Value)
-            If ocvb.parms.lowResolution Then dst = dst.Resize(New cv.Size(ocvb.result1.Width * 2, ocvb.result1.Height))
+            If ocvb.parms.lowResolution Then dst = dst.Resize(New cv.Size(dst.Width * 2, dst.Height))
         End If
 
-        dst(New cv.Rect(0, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result1)
-        dst(New cv.Rect(ocvb.result1.Width, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result2)
+        dst(New cv.Rect(0, 0, dst.Width, dst.Height)).CopyTo(dst)
+        dst(New cv.Rect(dst.Width, 0, dst.Width, dst.Height)).CopyTo(ocvb.result2)
 
         ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
@@ -88,8 +88,8 @@ Public Class Sift_Basics_CS_MT
             dstTmp.CopyTo(dst(dstROI))
         End Sub)
 
-        dst(New cv.Rect(0, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result1)
-        dst(New cv.Rect(ocvb.result1.Width, 0, ocvb.result1.Width, ocvb.result1.Height)).CopyTo(ocvb.result2)
+        dst(New cv.Rect(0, 0, dst.Width, dst.Height)).CopyTo(dst)
+        dst(New cv.Rect(dst.Width, 0, dst.Width, dst.Height)).CopyTo(ocvb.result2)
 
         ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub

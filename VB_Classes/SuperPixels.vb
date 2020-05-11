@@ -38,7 +38,7 @@ Public Class SuperPixel_Basics_CPP
         Static prior As Int32
         if standalone Then
             src = ocvb.color.Clone()
-            dst1 = ocvb.result1
+            dst1 = dst
         End If
         If numSuperPixels <> sliders.TrackBar1.Value Or numIterations <> sliders.TrackBar2.Value Or prior <> sliders.TrackBar3.Value Then
             numSuperPixels = sliders.TrackBar1.Value
@@ -65,8 +65,8 @@ Public Class SuperPixel_Basics_CPP
                 dst1.SetTo(cv.Scalar.White, dst2)
             Else
                 Dim tmp = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
-                ocvb.result1 = src
-                ocvb.result1.SetTo(cv.Scalar.White, tmp)
+                dst = src
+                dst.SetTo(cv.Scalar.White, tmp)
             End If
         End If
 
@@ -99,7 +99,7 @@ Public Class SuperPixel_Depth
     Public Sub Run(ocvb As AlgorithmData)
         pixels.src = ocvb.RGBDepth.Clone()
         pixels.Run(ocvb)
-        ocvb.result1 = pixels.dst1
+        dst = pixels.dst1
         ocvb.result2 = pixels.dst2
     End Sub
 End Class
@@ -127,7 +127,7 @@ Public Class SuperPixel_WithCanny
         pixels.src = ocvb.color.Clone()
         pixels.src.SetTo(cv.Scalar.White, edges.dst)
         pixels.Run(ocvb)
-        ocvb.result1 = pixels.dst1
+        dst = pixels.dst1
         ocvb.result2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result2.SetTo(cv.Scalar.Red, edges.dst)
         ocvb.label2 = "Edges provided by Canny in red"
@@ -152,13 +152,13 @@ Public Class SuperPixel_WithLineDetector
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        lines.dst = ocvb.result1
+        lines.dst = dst
         lines.Run(ocvb)
-        pixels.src = ocvb.result1.Clone()
-        ocvb.result2 = ocvb.result1.Clone()
+        pixels.src = dst.Clone()
+        ocvb.result2 = dst.Clone()
         ocvb.label2 = "Input to superpixel basics."
         pixels.Run(ocvb)
-        ocvb.result1 = pixels.dst1
+        dst = pixels.dst1
         ' ocvb.result2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ' ocvb.result2.SetTo(cv.Scalar.Red, lines.dst)
         ' ocvb.label2 = "Edges provided by Canny in red"

@@ -20,7 +20,7 @@ Public Class kMeans_Clusters
         For i = 0 To 3
             km.sliders.TrackBar1.Value = (i + 1) * 2
             km.Run(ocvb)
-            Mats.mat(i) = ocvb.result1.Resize(New cv.Size(ocvb.result1.Cols / 2, ocvb.result1.Rows / 2))
+            Mats.mat(i) = dst.Resize(New cv.Size(dst.Cols / 2, dst.Rows / 2))
         Next
         Mats.Run(ocvb)
         km.sliders.TrackBar1.Value = 10 ' this will show kmeans with 10 clusters in Result1.
@@ -55,7 +55,7 @@ Public Class kMeans_Basics
         For i = 0 To clusterCount - 1
             Dim mask = labels.InRange(i, i)
             Dim mean = ocvb.RGBDepth.Mean(mask)
-            ocvb.result1.SetTo(mean, mask)
+            dst.SetTo(mean, mask)
         Next
     End Sub
 End Class
@@ -97,7 +97,7 @@ Public Class kMeans_RGBFast
                 small8uC3.Set(Of cv.Vec3b)(y, x, clusterColors(cIndex))
             Next
         Next
-        ocvb.result1 = small8uC3.Resize(ocvb.result1.Size())
+        dst = small8uC3.Resize(dst.Size())
     End Sub
 End Class
 
@@ -118,7 +118,7 @@ Public Class kMeans_RGB_Plus_XYDepth
     Public Sub Run(ocvb As AlgorithmData)
         km.Run(ocvb) ' cluster the rgb image - output is in ocvb.result2
         Dim rgb32f As New cv.Mat
-        ocvb.result1.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
+        km.dst.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim xyDepth32f As New cv.Mat(rgb32f.Size(), cv.MatType.CV_32FC3, 0)
         Dim depth32f = getDepth32f(ocvb)
         For y = 0 To xyDepth32f.Rows - 1
@@ -129,9 +129,9 @@ Public Class kMeans_RGB_Plus_XYDepth
         Next
         Dim src() = New cv.Mat() {rgb32f, xyDepth32f}
         Dim all32f = New cv.Mat(rgb32f.Size(), cv.MatType.CV_32FC(6)) ' output will have 6 channels!
-        Dim dst() = New cv.Mat() {all32f}
+        Dim mixed() = New cv.Mat() {all32f}
         Dim from_to() = New Int32() {0, 0, 0, 1, 0, 2, 3, 3, 4, 4, 5, 5}
-        cv.Cv2.MixChannels(src, dst, from_to)
+        cv.Cv2.MixChannels(src, mixed, from_to)
 
         Dim columnVector As New cv.Mat
         columnVector = all32f.Reshape(all32f.Channels, all32f.Rows * all32f.Cols)
@@ -151,7 +151,7 @@ Public Class kMeans_RGB_Plus_XYDepth
             For x = 0 To labelImage.Cols - 1
                 Dim cIndex = labelImage.Get(Of Byte)(y, x)
                 With clusterColors(cIndex)
-                    ocvb.result1.Set(Of cv.Vec3b)(y, x, New cv.Vec3b(10 * .Item0 Mod 255, 10 * .Item1 Mod 255, 10 * .Item2 Mod 255))
+                    dst.Set(Of cv.Vec3b)(y, x, New cv.Vec3b(10 * .Item0 Mod 255, 10 * .Item1 Mod 255, 10 * .Item2 Mod 255))
                 End With
             Next
         Next
@@ -237,7 +237,7 @@ Public Class kMeans_RGB1_MT
 
             Dim factor = CInt(255.0 / clusterCount)
             allLabels = factor * allLabels
-            cv.Cv2.CvtColor(allLabels, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
+            cv.Cv2.CvtColor(allLabels, dst, cv.ColorConversionCodes.GRAY2BGR)
         End If
     End Sub
 End Class
@@ -309,7 +309,7 @@ Public Class kMeans_RGB2_MT
 
         Dim factor = CInt(255.0 / clusterCount)
         allLabels = factor * allLabels
-        cv.Cv2.CvtColor(allLabels, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(allLabels, dst, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -403,7 +403,7 @@ Public Class kMeans_RGB3_MT
 
         Dim factor = CInt(255.0 / clusterCount)
         allLabels = factor * allLabels
-        cv.Cv2.CvtColor(allLabels, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(allLabels, dst, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -435,7 +435,7 @@ Public Class kMeans_ReducedRGB
         For i = 0 To n - 1
             data.Set(Of cv.Vec3f)(i, 0, colors.Get(Of cv.Vec3f)(labels.Get(Of Int32)(i)))
         Next
-        data.Reshape(3, src.Rows).ConvertTo(ocvb.result1, cv.MatType.CV_8U)
+        data.Reshape(3, src.Rows).ConvertTo(dst, cv.MatType.CV_8U)
     End Sub
 End Class
 
@@ -470,8 +470,8 @@ Public Class kMeans_XYDepth
         For i = 0 To columnVector.Rows - 1
             columnVector.Set(Of cv.Vec3f)(i, 0, colors.Get(Of cv.Vec3f)(labels.Get(Of Int32)(i)))
         Next
-        ocvb.RGBDepth.CopyTo(ocvb.result1)
-        columnVector.Reshape(3, ocvb.result1(roi).Height).ConvertTo(ocvb.result1(roi), cv.MatType.CV_8U)
+        ocvb.RGBDepth.CopyTo(dst)
+        columnVector.Reshape(3, dst(roi).Height).ConvertTo(dst(roi), cv.MatType.CV_8U)
     End Sub
 End Class
 
@@ -503,7 +503,7 @@ Public Class kMeans_Depth_FG_BG
         Dim mask = labels.InRange(foregroundLabel, foregroundLabel)
         Dim shadowMask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         mask.SetTo(0, shadowMask)
-        ocvb.result1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -537,10 +537,10 @@ Public Class kMeans_LAB
         For i = 0 To columnVector.Rows - 1
             lab32f.Set(Of cv.Vec3f)(i, 0, colors.Get(Of cv.Vec3f)(labels.Get(Of Int32)(i)))
         Next
-        ocvb.color.CopyTo(ocvb.result1)
-        lab32f.Reshape(3, roi.Height).ConvertTo(ocvb.result1(roi), cv.MatType.CV_8UC3)
-        ocvb.result1(roi) = ocvb.result1(roi).CvtColor(cv.ColorConversionCodes.Lab2RGB)
-        ocvb.result1.Rectangle(ocvb.drawRect, cv.Scalar.White, 1)
+        ocvb.color.CopyTo(dst)
+        lab32f.Reshape(3, roi.Height).ConvertTo(dst(roi), cv.MatType.CV_8UC3)
+        dst(roi) = dst(roi).CvtColor(cv.ColorConversionCodes.Lab2RGB)
+        dst.Rectangle(ocvb.drawRect, cv.Scalar.White, 1)
     End Sub
 End Class
 
@@ -562,8 +562,8 @@ Public Class kMeans_RGB4_MT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
-        ocvb.color.CopyTo(ocvb.result1)
-        ocvb.result1.SetTo(cv.Scalar.White, grid.gridMask)
+        ocvb.color.CopyTo(dst)
+        dst.SetTo(cv.Scalar.White, grid.gridMask)
 
         Dim clusterCount = sliders.TrackBar1.Value
         Dim allLabels As New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
@@ -623,7 +623,7 @@ Public Class kMeans_RGB4_MT
                 End Sub)
         Dim factor = CInt(255.0 / clusterCount)
         allLabels = factor * allLabels
-        cv.Cv2.CvtColor(allLabels, ocvb.result1, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(allLabels, dst, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -652,7 +652,7 @@ Public Class kMeans_Color
         For i = 0 To clusterCount - 1
             Dim mask = labels.InRange(i, i)
             Dim mean = ocvb.RGBDepth.Mean(mask)
-            ocvb.result1.SetTo(mean, mask)
+            dst.SetTo(mean, mask)
         Next
     End Sub
 End Class
@@ -695,7 +695,7 @@ Public Class kMeans_Color_MT
                 Dim mask = labels.InRange(i, i)
                 mask.SetTo(0, zeroDepth) ' don't include the zeros in the mean depth computation.
                 Dim mean = ocvb.RGBDepth(roi).Mean(mask)
-                ocvb.result1(roi).SetTo(mean, mask)
+                dst(roi).SetTo(mean, mask)
             Next
         End Sub)
     End Sub
@@ -735,9 +735,9 @@ Public Class kMeans_ColorDepth
         For i = 0 To clusterCount - 1
             Dim mask = labels.InRange(i, i)
             Dim mean = ocvb.RGBDepth.Mean(mask)
-            ocvb.result1.SetTo(mean, mask)
+            dst.SetTo(mean, mask)
         Next
-        ocvb.result1.SetTo(0, zeroMask)
+        dst.SetTo(0, zeroMask)
     End Sub
 End Class
 
@@ -785,7 +785,7 @@ Public Class kMeans_ColorDepth_MT
            For i = 0 To clusterCount - 1
                Dim mask = labels.InRange(i, i)
                Dim mean = ocvb.RGBDepth(roi).Mean(mask)
-               ocvb.result1(roi).SetTo(mean, mask)
+               dst(roi).SetTo(mean, mask)
            Next
        End Sub)
     End Sub

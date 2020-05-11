@@ -726,8 +726,8 @@ Public Class OpenCVB
         Dim cameraFPS As Single = camFrames / (fpsTimer.Interval / 1000)
 
         Me.Text = "OpenCVB (" + CStr(AlgorithmCount) + " algorithms " + Format(CodeLineCount, "###,##0") + " lines) - " +
-                  optionsForm.cameraRadioButton(optionsForm.cameraIndex).Text + "/Algorithm FPS " + Format(cameraFPS, "#0.0") +
-                  "/" + Format(fps, "#0.0") + " WorkingSet = " + CStr(totalBytesOfMemoryUsed) + " Mb"
+                  optionsForm.cameraRadioButton(optionsForm.cameraIndex).Text + " - " + Format(cameraFPS, "#0.0") +
+                  "/" + Format(fps, "#0.0") + " " + CStr(totalBytesOfMemoryUsed) + " Mb (working set)"
     End Sub
     Private Sub saveLayout()
         SaveSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)

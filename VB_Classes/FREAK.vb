@@ -17,13 +17,13 @@ Public Class FREAK_Basics
         Dim fDesc = New cv.Mat
         freak.Compute(ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY), orb.keypoints, fDesc)
 
-        ocvb.result1 = ocvb.color.Clone()
+        dst = ocvb.color.Clone()
 
         For Each kpt In orb.keypoints
             Dim r = kpt.Size / 2
-            ocvb.result1.Circle(kpt.Pt, r, cv.Scalar.Green)
-            ocvb.result1.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), cv.Scalar.Green)
-            ocvb.result1.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), cv.Scalar.Green)
+            dst.Circle(kpt.Pt, r, cv.Scalar.Green)
+            dst.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), cv.Scalar.Green)
+            dst.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), cv.Scalar.Green)
         Next
         ocvb.label1 = CStr(orb.keypoints.Count) + " key points were identified"
         ocvb.label2 = CStr(orb.keypoints.Count) + " FREAK Descriptors (resized to fit) Row = keypoint"

@@ -14,12 +14,12 @@ Public Class Object_Basics
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
         If standalone Then
-            ocvb.result1 = trim.Mask
+            dst = trim.Mask
             ocvb.result2 = trim.zeroMask
         End If
 
-        ocvb.color.CopyTo(ccomp.srcGray, trim.Mask)
-        ccomp.srcGray = ccomp.srcGray.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ocvb.color.CopyTo(ccomp.src, trim.Mask)
+        ccomp.src = ccomp.src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ccomp.Run(ocvb)
     End Sub
 End Class

@@ -18,7 +18,7 @@ Public Class Distance_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         foreground.Run(ocvb)
-        Dim fg = ocvb.result1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim fg = dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.bgr2gray)
         Dim DistanceType = cv.DistanceTypes.L2

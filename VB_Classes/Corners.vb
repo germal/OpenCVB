@@ -39,12 +39,12 @@ Public Class Corners_Harris
             mc.MinMaxLoc(minval, maxval)
         End If
 
-        color.CopyTo(ocvb.result1)
+        color.CopyTo(dst)
         For j = 0 To gray.Rows - 1
             For i = 0 To gray.Cols - 1
                 If mc.Get(Of Single)(j, i) > minval + (maxval - minval) * sliders.TrackBar3.Value / sliders.TrackBar3.Maximum Then
-                    ocvb.result1.Circle(New cv.Point(i, j), 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-                    ocvb.result1.Circle(New cv.Point(i, j), 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                    dst.Circle(New cv.Point(i, j), 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                    dst.Circle(New cv.Point(i, j), 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
                 End If
             Next
         Next
@@ -111,7 +111,7 @@ Public Class Corners_PreCornerDetect
         prob.ConvertTo(gray, cv.MatType.CV_8U)
         median.src = gray.Clone()
         median.Run(ocvb)
-        ocvb.result1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.result2 = gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ocvb.label2 = "median = " + CStr(median.medianVal)
     End Sub
@@ -166,12 +166,12 @@ Public Class Corners_ShiTomasi_CPP
             dst.MinMaxLoc(minval, maxval)
         End If
 
-        color.CopyTo(ocvb.result1)
+        color.CopyTo(dst)
         For j = 0 To crows - 1
             For i = 0 To ccols - 1
                 If dst.Get(Of Single)(j, i) > minval + (maxval - minval) * sliders.TrackBar3.Value / sliders.TrackBar3.Maximum Then
-                    ocvb.result1.Circle(New cv.Point(i, j), 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-                    ocvb.result1.Circle(New cv.Point(i, j), 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                    dst.Circle(New cv.Point(i, j), 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                    dst.Circle(New cv.Point(i, j), 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
                 End If
             Next
         Next

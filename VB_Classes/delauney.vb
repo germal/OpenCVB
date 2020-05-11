@@ -89,18 +89,18 @@ Public Class Delaunay_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
         Dim rect = New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)
-        ocvb.result1.SetTo(0)
+        dst.SetTo(0)
 
         Dim subdiv As New cv.Subdiv2D(rect)
 
         For i = 0 To 100
             Dim fp = New cv.Point2f(ocvb.ms_rng.Next(0, rect.Width), ocvb.ms_rng.Next(0, rect.Height))
-            locate_point(ocvb.result1, subdiv, fp, active_facet_color)
+            locate_point(dst, subdiv, fp, active_facet_color)
             subdiv.Insert(fp)
-            draw_subdiv(ocvb.result1, subdiv, cv.Scalar.White, ocvb.frameCount Mod 2)
+            draw_subdiv(dst, subdiv, cv.Scalar.White, ocvb.frameCount Mod 2)
         Next
 
-        paint_voronoi(ocvb, ocvb.result1, subdiv)
+        paint_voronoi(ocvb, dst, subdiv)
     End Sub
 End Class
 
@@ -148,9 +148,9 @@ Public Class Delauney_Subdiv2D
             Function(i)
                 Return New cv.Point2f(rand.Next(0, ocvb.color.Width), rand.Next(0, ocvb.color.Height))
             End Function).ToArray()
-        ocvb.result1.SetTo(0)
+        dst.SetTo(0)
         For Each p In points
-            ocvb.result1.Circle(p, 4, cv.Scalar.Red, -1)
+            dst.Circle(p, 4, cv.Scalar.Red, -1)
         Next
 
         Dim subdiv = New cv.Subdiv2D()
@@ -162,7 +162,7 @@ Public Class Delauney_Subdiv2D
         Dim facetCenters() As cv.Point2f = Nothing
         subdiv.GetVoronoiFacetList(Nothing, facetList, facetCenters)
 
-        ocvb.result2 = ocvb.result1.Clone()
+        ocvb.result2 = dst.Clone()
         For Each list In facetList
             Dim before = list.Last()
             For Each p In list
@@ -176,7 +176,7 @@ Public Class Delauney_Subdiv2D
         For Each edge In edgelist
             Dim p1 = New cv.Point(edge.Item0, edge.Item1)
             Dim p2 = New cv.Point(edge.Item2, edge.Item3)
-            ocvb.result1.Line(p1, p2, cv.Scalar.Green, 1)
+            dst.Line(p1, p2, cv.Scalar.Green, 1)
         Next
     End Sub
 End Class

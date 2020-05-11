@@ -61,7 +61,7 @@ Public Class MultiDimensionScaling_Cities
 
         result.Normalize(0, 800, cv.NormTypes.MinMax)
 
-        ocvb.result1.SetTo(0)
+        dst.SetTo(0)
         at = result.GetGenericIndexer(Of Double)()
         Dim maxX As Double, maxY As Double, minX As Double = Double.MaxValue, minY As Double = Double.MaxValue
         For c = 0 To size - 1
@@ -72,18 +72,18 @@ Public Class MultiDimensionScaling_Cities
             If minX > x Then minX = x
             If minY > y Then minY = y
         Next
-        Dim w = ocvb.result1.Width
-        Dim h = ocvb.result1.Height
+        Dim w = dst.Width
+        Dim h = dst.Height
         For c = 0 To size - 1
             Dim x = -at(0, c)
             Dim y = at(1, c)
             x = w * 0.1 + 0.7 * w * (x - minX) / (maxX - minX)
             y = h * 0.1 + 0.7 * h * (y - minY) / (maxY - minY)
-            ocvb.result1.Circle(CInt(x), CInt(y), 5, cv.Scalar.Red, -1)
+            dst.Circle(CInt(x), CInt(y), 5, cv.Scalar.Red, -1)
             Dim textPos = New cv.Point(x + 5, y + 10)
             Dim cityName = Choose(c + 1, "Atlanta", "Chicago", "Denver", "Houston", "Los Angeles", "Miami", "New York", "San Francisco",
                                          "Seattle", "Washington D.C.")
-            ocvb.result1.PutText(cityName, textPos, cv.HersheyFonts.HersheySimplex, 0.5, cv.Scalar.White)
+            dst.PutText(cityName, textPos, cv.HersheyFonts.HersheySimplex, 0.5, cv.Scalar.White)
         Next
     End Sub
 End Class

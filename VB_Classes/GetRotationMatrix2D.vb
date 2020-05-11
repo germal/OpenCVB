@@ -48,7 +48,7 @@ Public Class GetRotationMatrix2D_Basics
 
         Dim angle = sliders.TrackBar1.Value
         M = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), angle, 1)
-        ocvb.result1 = src.WarpAffine(M, src.Size(), warpFlag)
+        dst = src.WarpAffine(M, src.Size(), warpFlag)
         If warpFlag = cv.InterpolationFlags.WarpInverseMap Then Mflip = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), -angle, 1)
     End Sub
 End Class
@@ -73,11 +73,11 @@ Public Class GetRotationMatrix2D_Box
     Public Sub Run(ocvb As AlgorithmData)
         rotation.src = ocvb.color
         rotation.Run(ocvb)
-        ocvb.result2 = ocvb.result1.Clone()
+        ocvb.result2 = dst.Clone()
 
         Dim r = ocvb.drawRect
-        ocvb.result1 = ocvb.color.Clone()
-        ocvb.result1.Rectangle(r, cv.Scalar.White, 1)
+        dst = ocvb.color.Clone()
+        dst.Rectangle(r, cv.Scalar.White, 1)
 
         Dim center = New cv.Point2f(r.X + r.Width / 2, r.Y + r.Height / 2)
         Dim drawBox = New cv.RotatedRect(center, New cv.Size2f(r.Width, r.Height), 0)

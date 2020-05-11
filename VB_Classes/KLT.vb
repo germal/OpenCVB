@@ -31,7 +31,7 @@ Public Class KLT_Basics
         Dim subPixWinSize As New cv.Size(10, 10)
         Dim nightMode = check.Box(0).Checked
 
-        If nightMode Then ocvb.result1.SetTo(0) Else ocvb.color.CopyTo(ocvb.result1)
+        If nightMode Then dst.SetTo(0) Else ocvb.color.CopyTo(dst)
 
         gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If ocvb.frameCount = 0 Or inputPoints Is Nothing Then
@@ -51,7 +51,7 @@ Public Class KLT_Basics
                 Dim pt = outputMat.Get(Of cv.Point2f)(i)
                 If pt.X >= 0 And pt.X <= ocvb.color.Cols And pt.Y >= 0 And pt.Y <= ocvb.color.Rows Then
                     If status.Get(Of Byte)(i) Then
-                        ocvb.result1.Circle(pt, 3, circleColor, -1, cv.LineTypes.AntiAlias)
+                        dst.Circle(pt, 3, circleColor, -1, cv.LineTypes.AntiAlias)
                     End If
                 Else
                     status.Set(Of Byte)(i, 0) ' this point is not visible!
@@ -94,7 +94,7 @@ Public Class KLT_OpticalFlow
         If ocvb.frameCount > 0 And lastpoints IsNot Nothing And klt.inputPoints IsNot Nothing Then
             For i = 0 To klt.inputPoints.Length - 1
                 If klt.status.Get(Of Byte)(i) And i < lastpoints.Length And i < klt.inputPoints.Length Then
-                    ocvb.result1.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+                    dst.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
                     ocvb.result2.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
                 End If
             Next
