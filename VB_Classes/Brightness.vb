@@ -9,21 +9,15 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
         ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim imgGray = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
-        Dim imgClahe = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
-        cv.Cv2.CvtColor(ocvb.color, imgGray, cv.ColorConversionCodes.BGR2GRAY)
-
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
-        ' claheObj.SetTilesGridSize(New cv.Size(sliders.TrackBar1.Value, sliders.TrackBar2.Value))
-        ' claheObj.SetClipLimit(sliders.TrackBar1.Value)
         claheObj.TilesGridSize() = New cv.Size(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
         claheObj.ClipLimit = sliders.TrackBar1.Value
-        claheObj.Apply(imgGray, imgClahe)
+        claheObj.Apply(src, dst2)
 
         ocvb.label1 = "GrayScale"
         ocvb.label2 = "CLAHE Result"
-        cv.Cv2.CvtColor(imgGray, dst1, cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.CvtColor(imgClahe, dst2, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -76,7 +70,8 @@ Public Class Brightness_AlphaBeta
         sliders.setupTrackBar2(ocvb, caller, "Brightness Beta (brightness)", -100, 100, 0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst1 = ocvb.color.ConvertScaleAbs(sliders.TrackBar1.Value / 500, sliders.TrackBar2.Value)
+        If standalone Then src = ocvb.color
+        dst1 = src.ConvertScaleAbs(sliders.TrackBar1.Value / 500, sliders.TrackBar2.Value)
     End Sub
 End Class
 

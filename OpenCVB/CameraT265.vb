@@ -104,7 +104,7 @@ Public Class CameraT265
         leftView = New cv.Mat(h, w, cv.MatType.CV_8U, 0)
 
         rawSrcRect = New cv.Rect((rawWidth - rawWidth * h / rawHeight) / 2, 0, rawWidth * h / rawHeight, h)
-        rawDstRect = New cv.Rect(0, 0, rawSrcRect.Width, rawSrcRect.Height)
+        rawDstRect = New cv.Rect((w - rawSrcRect.Width) / 2, 0, rawSrcRect.Width, rawSrcRect.Height)
 
         RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, 0)
         depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, 0)

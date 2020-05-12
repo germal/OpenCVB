@@ -88,7 +88,8 @@ Public Class Blur_Bilateral
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize As Int32 = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
-        if standalone Then src = ocvb.color.Clone()
+        If standalone Then src = ocvb.color.Clone()
+
         cv.Cv2.BilateralFilter(src, dst1, kernelSize, kernelSize * 2, kernelSize / 2)
     End Sub
 End Class
@@ -112,17 +113,21 @@ Public Class Blur_PlusHistogram
         ocvb.desc = "Compound algorithms Blur and Histogram"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        '    myhist.histogram.gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        '    myhist.Run(ocvb)
-        '    mat2to1.mat(0) = myhist.dst1
+        myhist.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        myhist.Run(ocvb)
 
-        '    blur.src = dst1.Clone()
-        '    blur.Run(ocvb)
+        mat2to1.mat(0) = myhist.dst2.Clone()
 
-        '    myhist.histogram.gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        '    myhist.Run(ocvb)
-        '    mat2to1.mat(1) = myhist.dst2.Clone()
-        '    mat2to1.Run(ocvb)
+        blur.src = myhist.src
+        blur.sliders.TrackBar1.Value = 15 ' kernel size is big to get a blur...
+        blur.Run(ocvb)
+
+        myhist.src = blur.dst1
+        myhist.Run(ocvb)
+        mat2to1.mat(1) = myhist.dst2.Clone()
+        mat2to1.Run(ocvb)
+        dst2 = mat2to1.dst1
+        dst1 = myhist.src
         ocvb.label2 = "Top is before, Bottom is after"
     End Sub
 End Class

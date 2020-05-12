@@ -73,6 +73,8 @@ Public Class KAZE_Match_CS
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         red.Run(ocvb)
+        dst1 = red.dst1
+        dst2 = red.dst2
         Dim result = CS_Kaze.Run(dst1, dst2)
         result(New cv.Rect(0, 0, dst1.Width, dst1.Height)).CopyTo(dst1)
         result(New cv.Rect(dst1.Width, 0, dst1.Width, dst1.Height)).CopyTo(dst2)

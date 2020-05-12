@@ -187,11 +187,12 @@ Public Class Mat_2to1
         Static nSize = New cv.Size(ocvb.color.Width, ocvb.color.Height / 2)
         Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
-        if standalone Then
+        If standalone Then
             mat1 = ocvb.color
             mat2 = ocvb.RGBDepth
             mat = {mat1, mat2}
         End If
+        dst1 = ocvb.color.EmptyClone
         If dst1.Type <> mat(0).Type Then dst1 = New cv.Mat(ocvb.color.Size(), mat(0).type)
         For i = 0 To 1
             Dim roi = Choose(i + 1, roiTop, roibot)
@@ -216,7 +217,6 @@ Public Class Mat_ImageXYZ_MT
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
-
 
         xyDepth = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32FC3, 0)
         Dim xyz As New cv.Point3f

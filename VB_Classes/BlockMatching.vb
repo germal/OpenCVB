@@ -15,6 +15,9 @@ Public Class BlockMatching_Basics
         ocvb.label2 = "Right Image (used with left image)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.cameraIndex = Kinect4AzureCam Then
+            ocvb.putText(New ActiveClass.TrueType("For the Kinect 4 Azure camera, the left and right views are the same.", 10, 50, RESULT1))
+        End If
         dst1 = ocvb.color.EmptyClone.SetTo(0)
 
         Dim numDisparity = sliders.TrackBar1.Value * 16 ' must be a multiple of 16

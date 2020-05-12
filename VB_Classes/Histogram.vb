@@ -210,7 +210,8 @@ Public Class Histogram_EqualizeGray
         ocvb.desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then histogram.gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        histogram.gray = src
 
         cv.Cv2.EqualizeHist(histogram.gray, histogram.gray)
         dst1 = histogram.gray
