@@ -1,5 +1,61 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
+Public Class Histogram_Basics
+    Inherits ocvbClass
+    Public histRaw(2) As cv.Mat
+    Public histNormalized(2) As cv.Mat
+    Public bins As Int32 = 50
+    Public minRange As Int32 = 0
+    Public maxRange As Int32 = 255
+    Public plotRequested As Boolean
+    Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 2, 256, 256)
+        sliders.setupTrackBar2(ocvb, caller, "Histogram line thickness", 1, 20, 3)
+        sliders.setupTrackBar3(ocvb, caller, "Histogram Font Size x10", 1, 20, 10)
+
+        ocvb.desc = "Plot histograms for up to 3 channels."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If standalone Then src = ocvb.color
+        bins = sliders.TrackBar1.Value
+
+        Dim thickness = sliders.TrackBar2.Value
+        Dim dimensions() = New Integer() {bins}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
+
+        dst1 = ocvb.color.EmptyClone.SetTo(0)
+        Dim lineWidth = dst1.Cols / bins
+
+        Dim maxVal As Double
+        For i = 0 To src.Channels - 1
+            Dim hist As New cv.Mat
+            cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {i}, New cv.Mat(), hist, 1, dimensions, ranges)
+            histRaw(i) = hist.Clone()
+            histRaw(i).MinMaxLoc(0, maxVal)
+            histNormalized(i) = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
+            If standalone Or plotRequested Then
+                Dim points = New List(Of cv.Point)
+                Dim listOfPoints = New List(Of List(Of cv.Point))
+                For j = 0 To bins - 1
+                    points.Add(New cv.Point(CInt(j * lineWidth), dst1.Rows - dst1.Rows * histRaw(i).Get(Of Single)(j, 0) / maxVal))
+                Next
+                listOfPoints.Add(points)
+                dst1.Polylines(listOfPoints, False, plotColors(i), thickness, cv.LineTypes.AntiAlias)
+            End If
+        Next
+
+        If standalone Or plotRequested Then
+            maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
+            AddPlotScale(dst1, 0, maxVal, sliders.TrackBar3.Value / 10)
+            ocvb.label1 = "Histogram for src image (default color) - " + CStr(bins) + " bins"
+        End If
+    End Sub
+End Class
+
+
 
 
 
@@ -70,63 +126,6 @@ End Module
 
 
 
-' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
-Public Class Histogram_Basics
-    Inherits ocvbClass
-    Public histRaw(2) As cv.Mat
-    Public histNormalized(2) As cv.Mat
-    Public bins As Int32 = 50
-    Public minRange As Int32 = 0
-    Public maxRange As Int32 = 255
-    Public plotRequested As Boolean
-    Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 2, 256, 256)
-        sliders.setupTrackBar2(ocvb, caller, "Histogram line thickness", 1, 20, 3)
-        sliders.setupTrackBar3(ocvb, caller, "Histogram Font Size x10", 1, 20, 10)
-
-        ocvb.desc = "Plot histograms for up to 3 channels."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
-        bins = sliders.TrackBar1.Value
-
-        Dim thickness = sliders.TrackBar2.Value
-        Dim dimensions() = New Integer() {bins}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-
-        dst1.SetTo(0)
-        Dim lineWidth = dst1.Cols / bins
-
-        Dim maxVal As Double
-        For i = 0 To src.Channels - 1
-            Dim hist As New cv.Mat
-            cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {i}, New cv.Mat(), hist, 1, dimensions, ranges)
-            histRaw(i) = hist.Clone()
-            histRaw(i).MinMaxLoc(0, maxVal)
-            histNormalized(i) = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
-            If standalone Or plotRequested Then
-                Dim points = New List(Of cv.Point)
-                Dim listOfPoints = New List(Of List(Of cv.Point))
-                For j = 0 To bins - 1
-                    points.Add(New cv.Point(CInt(j * lineWidth), dst1.Rows - dst1.Rows * histRaw(i).Get(Of Single)(j, 0) / maxVal))
-                Next
-                listOfPoints.Add(points)
-                dst1.Polylines(listOfPoints, False, plotColors(i), thickness, cv.LineTypes.AntiAlias)
-            End If
-        Next
-
-        If standalone Or plotRequested Then
-            maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
-            AddPlotScale(dst1, 0, maxVal, sliders.TrackBar3.Value / 10)
-            ocvb.label1 = "Histogram for Color image above - " + CStr(bins) + " bins"
-        End If
-    End Sub
-End Class
-
-
-
 
 Public Class Histogram_NormalizeGray
     Inherits ocvbClass
@@ -173,25 +172,26 @@ Public Class Histogram_EqualizeColor
     Public Sub Run(ocvb As AlgorithmData)
         Dim rgb(2) As cv.Mat
         Dim rgbEq(2) As cv.Mat
-        cv.Cv2.Split(ocvb.color, rgb)
+        cv.Cv2.Split(ocvb.color, rgbEq)
 
         For i = 0 To rgb.Count - 1
-            rgbEq(i) = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
-            cv.Cv2.EqualizeHist(rgb(i), rgbEq(i))
+            cv.Cv2.EqualizeHist(rgbEq(i), rgbEq(i))
         Next
 
         If standalone Then
-            kalman.gray = rgb(0).Clone() ' just show the green plane
-            kalman.dst1 = mats.mat(0)
-            kalman.plotHist.backColor = cv.Scalar.Green
+            cv.Cv2.Split(ocvb.color, rgb) ' equalizehist alters the input...
+            kalman.gray = rgb(2).Clone() ' just show the green plane
+            kalman.plotHist.backColor = cv.Scalar.Red
             kalman.Run(ocvb)
+            mats.mat(0) = kalman.dst1.Clone()
 
-            kalman.gray = rgbEq(0).Clone()
-            kalman.dst1 = mats.mat(1)
+            kalman.gray = rgbEq(2).Clone()
             kalman.Run(ocvb)
+            mats.mat(1) = kalman.dst1.Clone()
 
             mats.Run(ocvb)
-            ocvb.label2 = "Before (top) and After Green Histograms"
+            dst2 = mats.dst1
+            ocvb.label2 = "Before (top) and After Red Histogram (only subtle)"
 
             cv.Cv2.Merge(rgbEq, dst1)
         End If
@@ -211,8 +211,11 @@ Public Class Histogram_EqualizeGray
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then histogram.gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
         cv.Cv2.EqualizeHist(histogram.gray, histogram.gray)
+        dst1 = histogram.gray
         histogram.Run(ocvb)
+        dst2 = histogram.dst1
     End Sub
 End Class
 
@@ -231,7 +234,6 @@ Public Class Histogram_2D_HueSaturation
         sliders.setupTrackBar1(ocvb, caller, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
         sliders.setupTrackBar2(ocvb, caller, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
         ocvb.desc = "Create a histogram for hue and saturation."
-        dst1 = dst1
         src = ocvb.color
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -478,9 +480,9 @@ Public Class Histogram_KalmanSmoothed
         Next
 
         plotHist.hist = histogram
-        plotHist.dst1 = dst1
         If standalone Then plotHist.backColor = splitColors(splitIndex)
         plotHist.Run(ocvb)
+        dst1 = plotHist.dst1
     End Sub
 End Class
 

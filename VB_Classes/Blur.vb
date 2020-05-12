@@ -112,17 +112,17 @@ Public Class Blur_PlusHistogram
         ocvb.desc = "Compound algorithms Blur and Histogram"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        myhist.histogram.gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        myhist.Run(ocvb)
-        mat2to1.mat(0) = dst2.Clone()
+        '    myhist.histogram.gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        '    myhist.Run(ocvb)
+        '    mat2to1.mat(0) = myhist.dst1
 
-        blur.src = dst1.Clone()
-        blur.Run(ocvb)
+        '    blur.src = dst1.Clone()
+        '    blur.Run(ocvb)
 
-        myhist.histogram.gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        myhist.Run(ocvb)
-        mat2to1.mat(1) = dst2.Clone()
-        mat2to1.Run(ocvb)
+        '    myhist.histogram.gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        '    myhist.Run(ocvb)
+        '    mat2to1.mat(1) = myhist.dst2.Clone()
+        '    mat2to1.Run(ocvb)
         ocvb.label2 = "Top is before, Bottom is after"
     End Sub
 End Class
