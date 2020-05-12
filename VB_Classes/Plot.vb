@@ -1,5 +1,96 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Public Class Plot_Basics
+    Inherits ocvbClass
+    Dim plot As Plot_Basics_CPP
+    Dim hist As Histogram_Basics
+    Public plotCount As Int32 = 3
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        hist = New Histogram_Basics(ocvb, caller)
+        hist.plotRequested = True
+
+        plot = New Plot_Basics_CPP(ocvb, caller)
+
+        ocvb.label1 = "Plot of grayscale histogram"
+        ocvb.label2 = "Same Data but using OpenCV C++ plot"
+        ocvb.desc = "Plot data provided in src Mat"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If standalone Then
+            hist.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            hist.plotColors(0) = cv.Scalar.White
+            hist.Run(ocvb)
+            plot.dst1 = hist.dst1
+            ReDim plot.srcX(hist.histRaw(0).Rows - 1)
+            ReDim plot.srcY(hist.histRaw(0).Rows - 1)
+            For i = 0 To plot.srcX.Length - 1
+                plot.srcX(i) = i
+                plot.srcY(i) = hist.histRaw(0).Get(Of Single)(i, 0)
+            Next
+            plot.Run(ocvb)
+            dst1 = plot.dst1
+            ocvb.label1 = "histogram with " + ocvb.label1
+        Else
+            If hist.sliders.Visible Then hist.sliders.Hide()
+        End If
+    End Sub
+End Class
+
+
+
+
+' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
+Public Class Plot_Basics_CPP
+    Inherits ocvbClass
+    Public srcX() As Double
+    Public srcY() As Double
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        ocvb.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim maxX As Double = Double.MinValue
+        Dim minX As Double = Double.MaxValue
+        Dim maxY As Double = Double.MinValue
+        Dim minY As Double = Double.MaxValue
+        Dim plotData(ocvb.color.Total * ocvb.color.ElemSize - 1) As Byte
+        Dim handlePlot = GCHandle.Alloc(plotData, GCHandleType.Pinned)
+
+        If standalone Then
+            ReDim srcX(50 - 1)
+            ReDim srcY(50 - 1)
+            For i = 0 To srcX.Length - 1
+                srcX(i) = i
+                srcY(i) = i * i * i
+            Next
+        End If
+        For i = 0 To srcX.Length - 1
+            If srcX(i) > maxX Then maxX = CInt(srcX(i))
+            If srcX(i) < minX Then minX = CInt(srcX(i))
+            If srcY(i) > maxY Then maxY = CInt(srcY(i))
+            If srcY(i) < minY Then minY = CInt(srcY(i))
+        Next
+
+        Dim handleX = GCHandle.Alloc(srcX, GCHandleType.Pinned)
+        Dim handleY = GCHandle.Alloc(srcY, GCHandleType.Pinned)
+
+        Plot_OpenCVBasics(handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, srcX.Length - 1, handlePlot.AddrOfPinnedObject, ocvb.color.Rows, ocvb.color.Cols)
+
+        dst1 = ocvb.color.EmptyClone
+        Marshal.Copy(plotData, 0, dst1.Data, plotData.Length)
+        handlePlot.Free()
+        handleX.Free()
+        handleY.Free()
+        ocvb.label1 = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + vbTab + " y-axis: " + CStr(minY) + " to " + CStr(maxY)
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class Plot_OverTime
     Inherits ocvbClass
     Public plotData As cv.Scalar
@@ -31,6 +122,7 @@ Public Class Plot_OverTime
         lastXdelta.Add(plotData)
         Dim pixelHeight = CInt(sliders.TrackBar1.Value)
         Dim pixelWidth = CInt(sliders.TrackBar2.Value)
+        If ocvb.frameCount = 0 Then dst1 = ocvb.color.EmptyClone
         If columnIndex + pixelWidth >= ocvb.color.Width Then
             dst1.ColRange(columnIndex, ocvb.color.Width).SetTo(backColor)
             columnIndex = 0
@@ -124,6 +216,7 @@ Public Class Plot_Histogram
             Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
             cv.Cv2.CalcHist(New cv.Mat() {gray}, New Integer() {0}, New cv.Mat(), hist, 1, dimensions, ranges)
         End If
+        dst1 = ocvb.color.EmptyClone.SetTo(backColor)
         Dim barWidth = Int(dst1.Width / hist.Rows)
         Dim minVal As Single, maxVal As Single
         hist.MinMaxLoc(minVal, maxVal)
@@ -133,7 +226,6 @@ Public Class Plot_Histogram
         Static savedMaxVal = maxVal
         If maxVal < 0 Then maxVal = savedMaxVal
         If Math.Abs((maxVal - savedMaxVal)) / maxVal < 0.2 Then maxVal = savedMaxVal Else savedMaxVal = Math.Max(maxVal, savedMaxVal)
-        dst1.SetTo(backColor)
         If maxVal > 0 And hist.Rows > 0 Then
             Dim incr = CInt(255 / hist.Rows)
             For i = 0 To hist.Rows - 1
@@ -176,90 +268,6 @@ End Module
 
 
 
-' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
-Public Class Plot_Basics_CPP
-    Inherits ocvbClass
-    Public srcX(49) As Double
-    Public srcY(49) As Double
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        ocvb.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Dim maxX As Double = Double.MinValue
-        Dim minX As Double = Double.MaxValue
-        Dim maxY As Double = Double.MinValue
-        Dim minY As Double = Double.MaxValue
-        Dim plotData(ocvb.color.Total * ocvb.color.ElemSize - 1) As Byte
-        Dim handlePlot = GCHandle.Alloc(plotData, GCHandleType.Pinned)
-
-        If standalone Then
-            For i = 0 To srcX.Length - 1
-                srcX(i) = i
-                srcY(i) = i * i * i
-            Next
-            dst1 = dst1
-        End If
-        For i = 0 To srcX.Length - 1
-            If srcX(i) > maxX Then maxX = CInt(srcX(i))
-            If srcX(i) < minX Then minX = CInt(srcX(i))
-            If srcY(i) > maxY Then maxY = CInt(srcY(i))
-            If srcY(i) < minY Then minY = CInt(srcY(i))
-        Next
-
-        Dim handleX = GCHandle.Alloc(srcX, GCHandleType.Pinned)
-        Dim handleY = GCHandle.Alloc(srcY, GCHandleType.Pinned)
-
-        Plot_OpenCVBasics(handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, srcX.Length - 1, handlePlot.AddrOfPinnedObject, ocvb.color.Rows, ocvb.color.Cols)
-
-        Marshal.Copy(plotData, 0, dst1.Data, plotData.Length)
-        handlePlot.Free()
-        handleX.Free()
-        handleY.Free()
-        ocvb.label1 = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + vbTab + " y-axis: " + CStr(minY) + " to " + CStr(maxY)
-    End Sub
-End Class
-
-
-
-
-Public Class Plot_Basics
-    Inherits ocvbClass
-    Dim plot As Plot_Basics_CPP
-    Dim hist As Histogram_Basics
-    Public plotCount As Int32 = 3
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        hist = New Histogram_Basics(ocvb, caller)
-        hist.plotRequested = True
-
-        plot = New Plot_Basics_CPP(ocvb, caller)
-
-        ocvb.label1 = "Plot of grayscale histogram"
-        ocvb.label2 = "Same Data but using OpenCV C++ plot"
-        ocvb.desc = "Plot data provided in src Mat"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then
-            If hist.sliders.Visible Then hist.sliders.Hide()
-        Else
-            hist.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            hist.plotColors(0) = cv.Scalar.White
-            hist.Run(ocvb)
-            plot.dst1 = dst2
-            ReDim plot.srcX(hist.histRaw(0).Rows - 1)
-            ReDim plot.srcY(hist.histRaw(0).Rows - 1)
-            For i = 0 To plot.srcX.Length - 1
-                plot.srcX(i) = i
-                plot.srcY(i) = hist.histRaw(0).Get(Of Single)(i, 0)
-            Next
-            plot.Run(ocvb)
-            ocvb.label1 = "histogram with " + ocvb.label1
-        End If
-    End Sub
-End Class
-
-
 
 
 
@@ -280,7 +288,6 @@ Public Class Plot_Depth
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        plot.dst1 = dst1
         ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
         ReDim plot.srcY(hist.plotHist.hist.Rows - 1)
         Dim inRangeMin = hist.trim.sliders.TrackBar1.Value
@@ -290,6 +297,7 @@ Public Class Plot_Depth
             plot.srcY(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
         plot.Run(ocvb)
+        dst1 = plot.dst1
         ocvb.label1 = "histogram with " + ocvb.label1
     End Sub
 End Class

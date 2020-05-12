@@ -20,8 +20,8 @@ Public Class Binarize_OTSU
     Public Sub Run(ocvb As AlgorithmData)
         dst2.SetTo(0)
         Dim w = ocvb.color.Width, h = ocvb.color.Height
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim meanScalar = cv.Cv2.Mean(gray)
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim meanScalar = cv.Cv2.Mean(src)
         ocvb.label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
         plotHist.bins = 255
         Dim dimensions() = New Integer() {plotHist.bins}
@@ -30,20 +30,20 @@ Public Class Binarize_OTSU
 
         For i = 0 To histogram.Length - 1
             histogram(i) = New cv.Mat
-            If i = histogram.Length - 1 Then gray = gray.Blur(New cv.Size(5, 5), New cv.Point(3, 3)) ' just blur the last one...
-            cv.Cv2.CalcHist(New cv.Mat() {gray}, New Integer() {0}, New cv.Mat(), histogram(i), 1, dimensions, ranges)
+            If i = histogram.Length - 1 Then src = src.Blur(New cv.Size(5, 5), New cv.Point(3, 3)) ' just blur the last one...
+            cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat(), histogram(i), 1, dimensions, ranges)
             plotHist.hist = histogram(i).Clone()
-            plotHist.dst1 = mats2.mat(i)
             plotHist.Run(ocvb)
-
+            mats2.mat(i) = plotHist.dst1
             Dim thresholdType = Choose(i + 1, cv.ThresholdTypes.Binary, cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu,
                                               cv.ThresholdTypes.Otsu, cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu)
-            mats1.mat(i) = gray.Threshold(meanScalar(0), 255, thresholdType).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            mats1.mat(i) = src.Threshold(meanScalar(0), 255, thresholdType).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Next
 
         mats1.Run(ocvb)
-        dst1 = dst2.Clone() ' mat_4to1 puts output in result2
+        dst1 = mats1.dst1
         mats2.Run(ocvb)
+        dst2 = mats2.dst1
     End Sub
 End Class
 
@@ -67,12 +67,12 @@ Public Class Binarize_Niblack_Sauvola
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim grayBin As New cv.Mat
-        cv.Extensions.Binarizer.Niblack(gray, grayBin, kernelSize, sliders.TrackBar2.Value / 1000)
+        cv.Extensions.Binarizer.Niblack(src, grayBin, kernelSize, sliders.TrackBar2.Value / 1000)
         dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Extensions.Binarizer.Sauvola(gray, grayBin, kernelSize, sliders.TrackBar3.Value / 1000, sliders.TrackBar4.Value)
+        cv.Extensions.Binarizer.Sauvola(src, grayBin, kernelSize, sliders.TrackBar3.Value / 1000, sliders.TrackBar4.Value)
         dst2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
@@ -97,11 +97,11 @@ Public Class Binarize_Niblack_Nick
         Dim kernelSize = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayBin As New cv.Mat
-        cv.Extensions.Binarizer.Niblack(gray, grayBin, kernelSize, sliders.TrackBar2.Value / 1000)
+        cv.Extensions.Binarizer.Niblack(src, grayBin, kernelSize, sliders.TrackBar2.Value / 1000)
         dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Extensions.Binarizer.Nick(gray, grayBin, kernelSize, sliders.TrackBar3.Value / 1000)
+        cv.Extensions.Binarizer.Nick(src, grayBin, kernelSize, sliders.TrackBar3.Value / 1000)
         dst2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
@@ -166,11 +166,12 @@ Public Class Binarize_Bernson_MT
         Dim contrastMin = sliders.TrackBar2.Value
         Dim bgThreshold = sliders.TrackBar3.Value
 
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = ocvb.color.EmptyClone.SetTo(0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
             Sub(roi)
-                Dim grayBin = gray(roi).Clone()
-                cv.Extensions.Binarizer.Bernsen(gray(roi), grayBin, kernelSize, contrastMin, bgThreshold)
+                Dim grayBin = src(roi).Clone()
+                cv.Extensions.Binarizer.Bernsen(src(roi), grayBin, kernelSize, contrastMin, bgThreshold)
                 dst1(roi) = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             End Sub)
     End Sub

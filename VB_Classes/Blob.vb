@@ -22,7 +22,6 @@ Public Class Blob_Input
         rectangles.rect.updateFrequency = 1
         circles.updateFrequency = 1
         ellipses.updateFrequency = 1
-        poly.updateFrequency = 1
 
         poly.radio.check(1).Checked = True ' we want the convex polygon filled.
 
@@ -34,19 +33,18 @@ Public Class Blob_Input
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency = 0 Then
             rectangles.Run(ocvb)
-            Mats.mat(0) = dst1.Clone()
+            Mats.mat(0) = rectangles.dst1
 
             circles.Run(ocvb)
-            Mats.mat(1) = dst1.Clone()
+            Mats.mat(1) = circles.dst1
 
             ellipses.Run(ocvb)
-            Mats.mat(2) = dst1.Clone()
+            Mats.mat(2) = ellipses.dst1
 
             poly.Run(ocvb)
-            Mats.mat(3) = dst2.Clone()
+            Mats.mat(3) = poly.dst2
             Mats.Run(ocvb)
-            dst2.CopyTo(dst1)
-            dst2.SetTo(0)
+            Mats.dst1.CopyTo(dst1)
         End If
     End Sub
 End Class
@@ -94,6 +92,8 @@ Public Class Blob_Detector_CS
         blobParams.MinRepeatability = 1
 
         input.Run(ocvb)
+        dst1 = input.dst1
+        dst2 = dst1.EmptyClone
 
         ' The create method in SimpleBlobDetector is not available in VB.Net.  Not sure why.  To get around this, just use C# where create method works fine.
         blobDetector.Start(dst1, dst2, blobParams)
@@ -111,11 +111,13 @@ Public Class Blob_RenderBlobs
         input.updateFrequency = 1
 
         ocvb.desc = "Use connected components to find blobs."
+        ocvb.label1 = "Input blobs"
         ocvb.label2 = "Showing only the largest blob in test data"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 100 = 0 Then
             input.Run(ocvb)
+            dst1 = input.dst1
             Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.BinaryInv)
             Dim labelView = dst1.EmptyClone
@@ -164,7 +166,7 @@ Public Class Blob_DepthClusters
         histBlobs.src = shadow.dst1
         histBlobs.Run(ocvb)
         dst1 = histBlobs.dst1
-        flood.fBasics.src = histBlobs.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        flood.src = histBlobs.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         flood.fBasics.initialMask = shadow.holeMask
         flood.Run(ocvb)
         dst2 = flood.fBasics.dst2
@@ -198,6 +200,7 @@ Public Class Blob_Rectangles
     Public Sub Run(ocvb As AlgorithmData)
         blobs.Run(ocvb)
         dst1 = ocvb.color.Clone()
+        dst2 = blobs.dst2
 
         ' sort the blobs by size before delivery to kalman
         Dim sortedBlobs As New SortedList(Of cv.Rect, Integer)(New CompareRect)
@@ -246,9 +249,11 @@ Public Class Blob_Largest
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blobs.Run(ocvb)
+        dst2 = blobs.dst2
         rects = blobs.flood.fBasics.maskRects
         masks = blobs.flood.fBasics.masks
 
+        dst1 = ocvb.color.EmptyClone.SetTo(0)
         If masks.Count > 0 Then
             Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(blobIndex).Value ' this is the largest contiguous blob
             ocvb.color.CopyTo(dst1, masks(maskIndex))
@@ -277,10 +282,11 @@ Public Class Blob_LargestDepthCluster
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blobs.Run(ocvb)
+        dst2 = blobs.dst2
         Dim blobList = blobs.histBlobs.valleys.rangeBoundaries
 
         Dim maxSize = blobs.histBlobs.valleys.sortedSizes.ElementAt(0)
-        dst1.SetTo(0)
+        dst1 = ocvb.color.EmptyClone.SetTo(0)
         Dim startEndDepth = blobs.histBlobs.valleys.rangeBoundaries.ElementAt(0)
         Dim tmp As New cv.Mat, mask As New cv.Mat
         cv.Cv2.InRange(getDepth32f(ocvb), startEndDepth.X, startEndDepth.Y, tmp)

@@ -11,7 +11,7 @@ namespace CS_Classes
     {
         public void New() { }
 
-        public void Start(cv.Mat input, cv.Mat dst1, cv.SimpleBlobDetector.Params detectorParams)
+        public void Start(cv.Mat input, cv.Mat output, cv.SimpleBlobDetector.Params detectorParams)
         { 
             var binaryImage = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             cv.Cv2.Threshold(binaryImage, binaryImage, thresh: 100, maxval: 255, type: cv.ThresholdTypes.Binary);
@@ -22,7 +22,7 @@ namespace CS_Classes
             cv.Cv2.DrawKeypoints(
                     image: binaryImage,
                     keypoints: keyPoints,
-                    outImage: dst1,
+                    outImage: output,
                     color: cv.Scalar.FromRgb(255, 0, 0),
                     flags: cv.DrawMatchesFlags.DrawRichKeypoints);
         }
