@@ -7,24 +7,18 @@ Public Class BlockMatching_Basics
         setCaller(callerRaw)
         colorizer = New Depth_Colorizer_CPP(ocvb, caller)
 
-        sliders.setupTrackBar1(ocvb, caller, "Blockmatch scale", 1, 200, 100)
-        sliders.setupTrackBar2(ocvb, caller, "Blockmatch max disparity", 1, 5, 1)
-        sliders.setupTrackBar3(ocvb, caller, "Blockmatch block size", 5, 255, 15)
-        ocvb.desc = "Use OpenCV's block matching on left and right views - needs more work"
+        sliders.setupTrackBar1(ocvb, caller, "Blockmatch max disparity", 2, 5, 2)
+        sliders.setupTrackBar2(ocvb, caller, "Blockmatch block size", 5, 255, 15)
+        sliders.setupTrackBar3(ocvb, caller, "Blockmatch distance factor (approx) X1000", 1, 100, 20)
+        ocvb.desc = "Use OpenCV's block matching on left and right views"
         ocvb.label1 = "Block matching disparity colorized like depth"
         ocvb.label2 = "Right Image (used with left image)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1 = ocvb.color.EmptyClone.SetTo(0)
-        Dim scale = sliders.TrackBar1.Value / 100
-        If sliders.TrackBar1.Value <> 100 Then
-            Dim method = If(scale < 1.0, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic)
-            ocvb.leftView = ocvb.leftView.Resize(New cv.Size(ocvb.leftView.Width * scale, ocvb.leftView.Height * scale), 0, 0, method)
-            ocvb.rightView = ocvb.rightView.Resize(New cv.Size(ocvb.rightView.Width * scale, ocvb.rightView.Height * scale), 0, 0, method)
-        End If
 
-        Dim numDisparity = sliders.TrackBar2.Value * 16 ' must be a multiple of 16
-        Dim blockSize = sliders.TrackBar3.Value
+        Dim numDisparity = sliders.TrackBar1.Value * 16 ' must be a multiple of 16
+        Dim blockSize = sliders.TrackBar2.Value
         If blockSize Mod 2 = 0 Then blockSize += 1 ' must be odd
 
         Static blockMatch = cv.StereoBM.Create()
@@ -42,11 +36,15 @@ Public Class BlockMatching_Basics
 
         Dim disparity As New cv.Mat
         blockMatch.compute(ocvb.leftView, ocvb.rightView, disparity)
-        disparity.ConvertTo(colorizer.src, cv.MatType.CV_32F, 1000 / 16)
-        colorizer.src.Threshold(0, 0, cv.ThresholdTypes.Tozero)
-        colorizer.Run(ocvb)
+        disparity.ConvertTo(colorizer.src, cv.MatType.CV_32F, 1 / 16)
+        colorizer.src = colorizer.src.Threshold(0, 0, cv.ThresholdTypes.Tozero)
         Dim topMargin = 10, sideMargin = 8
         Dim rect = New cv.Rect(numDisparity + sideMargin, topMargin, ocvb.color.Width - numDisparity - sideMargin * 2, ocvb.color.Height - topMargin * 2)
+        Dim tmp = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32F, 0)
+        Dim distance = sliders.TrackBar3.Value * 1000
+        cv.Cv2.Divide(distance, colorizer.src(rect), colorizer.src(rect)) ' this needs much more refinement.  The trackbar3 value is just an approximation.
+        colorizer.src(rect) = colorizer.src(rect).Threshold(10000, 10000, cv.ThresholdTypes.Trunc)
+        colorizer.Run(ocvb)
         dst1(rect) = colorizer.dst1(rect)
         dst2 = ocvb.rightView.Resize(ocvb.color.Size())
     End Sub
