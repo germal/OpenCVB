@@ -138,7 +138,7 @@ Public Class Delauney_Subdiv2D
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label2 = "Voronoi facets for the same subdiv2D"
+        label2 = "Voronoi facets for the same subdiv2D"
         ocvb.desc = "Generate random points and divide the image around those points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

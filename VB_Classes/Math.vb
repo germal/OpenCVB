@@ -67,12 +67,12 @@ Public Class Math_Median_CDF
             mask = src.GreaterThan(medianVal)
             dst1.SetTo(0)
             ocvb.color.CopyTo(dst1, mask)
-            ocvb.label1 = "Grayscale pixels > " + Format(medianVal, "#0.0")
+            label1 = "Grayscale pixels > " + Format(medianVal, "#0.0")
 
             cv.Cv2.BitwiseNot(mask, mask)
             dst2.SetTo(0)
             ocvb.color.CopyTo(dst2, mask) ' show the other half.
-            ocvb.label2 = "Grayscale pixels < " + Format(medianVal, "#0.0")
+            label2 = "Grayscale pixels < " + Format(medianVal, "#0.0")
         End If
     End Sub
 End Class
@@ -95,9 +95,9 @@ Public Class Math_DepthMeanStdev
         Dim mask = dst2 ' the mask for stable depth.
         Dim depth32f = getDepth32f(ocvb)
         cv.Cv2.MeanStdDev(depth32f, mean, stdev, mask)
-        ocvb.label2 = "stablized depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
+        label2 = "stablized depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
         cv.Cv2.MeanStdDev(depth32f, mean, stdev)
-        ocvb.label1 = "raw depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
+        label1 = "raw depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
     End Sub
 End Class
 
@@ -138,7 +138,7 @@ Public Class Math_RGBCorrelation
 
         flow.msgs.Add(blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation)
         flow.Run(ocvb)
-        ocvb.label1 = ""
-        ocvb.label2 = "Log of " + corr.matchText
+        label1 = ""
+        label2 = "Log of " + corr.matchText
     End Sub
 End Class

@@ -38,7 +38,7 @@ Public Class Pencil_Manual
         cv.Cv2.Divide(gray, 255 - blur, dst1, 256)
 
         Static index As Integer
-        ocvb.label2 = "Intermediate result: " + Choose(index + 1, "gray", "grayinv", "blur")
+        label2 = "Intermediate result: " + Choose(index + 1, "gray", "grayinv", "blur")
         dst2 = Choose(index + 1, gray, grayinv, blur)
         If ocvb.frameCount Mod 30 = 0 Then
             index += 1

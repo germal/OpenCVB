@@ -15,7 +15,7 @@ Public Class MultiDimensionScaling_Cities
         543, 597, 1494, 1220, 2300, 923, 205, 2442, 2329, 0}      ' Washington D.C. 
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = "Resulting solution using cv.Eigen"
+        label1 = "Resulting solution using cv.Eigen"
         ocvb.desc = "Use OpenCV's Eigen function to solve a system of equations"
     End Sub
     Private Function Torgerson(src As cv.Mat) As Double

@@ -62,7 +62,7 @@ Public Class Polylines_Random
         Dim height = dst1.Height / zoomFactor
         Dim x = Math.Min(ocvb.mousePoint.X, dst1.Width - width)
         Dim y = Math.Min(ocvb.mousePoint.Y, dst1.Height - height)
-        ocvb.label2 = CStr(zoomFactor) + "X zoom around mouse"
+        label2 = CStr(zoomFactor) + "X zoom around mouse"
         dst2 = dst1.GetRectSubPix(New cv.Size(width, height), New cv.Point2f(x, y))
     End Sub
 End Class

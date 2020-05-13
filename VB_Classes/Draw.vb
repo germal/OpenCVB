@@ -172,7 +172,7 @@ Public Class Draw_Polygon
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Poly Count", 1, 255, 1)
         ocvb.desc = "Draw Polygon figures"
-        ocvb.label2 = "Convex Hull for the same polygon"
+        label2 = "Convex Hull for the same polygon"
 
         radio.Setup(ocvb, caller, 2) ' ask for 2 radio buttons
         radio.check(0).Text = "Polygon Outline"

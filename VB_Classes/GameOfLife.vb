@@ -85,7 +85,7 @@ Public Class GameOfLife_Basics
             End If
         End If
         lastPopulation = population
-        ocvb.label1 = "Population " + CStr(population) + " Generation = " + CStr(generation) + countdownText
+        label1 = "Population " + CStr(population) + " Generation = " + CStr(generation) + countdownText
         grid = nextgrid.Clone()
     End Sub
 End Class

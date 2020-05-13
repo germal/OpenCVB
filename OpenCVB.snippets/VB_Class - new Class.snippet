@@ -10,16 +10,13 @@
 Imports cv = OpenCvSharp
 Public Class newClass_Basics
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, byval caller as string)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, byval callerRaw as string)
+        setCaller(callerRaw)
         ocvb.label1 = "NewClass_Basics"
         ocvb.label2 = ""
         ocvb.desc = "New class description"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-         MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose()
     End Sub
 End Class]]>
             </Code>

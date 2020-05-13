@@ -47,7 +47,7 @@ Public Class IMU_Basics
                               " Motion (rads/sec) pitch = " + Format(ocvb.parms.IMU_AngularVelocity.X, "#0.00") +
                               " Yaw = " + Format(ocvb.parms.IMU_AngularVelocity.Y, "#0.00") + " Roll = " + Format(ocvb.parms.IMU_AngularVelocity.Z, "#0.00"))
             End If
-            ocvb.label1 = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
+            label1 = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
         Else
             If ocvb.frameCount = 0 Then flow.msgs.Add("No IMU present on this device")
         End If
@@ -68,8 +68,8 @@ Public Class IMU_Stabilizer
         kalman = New Kalman_Basics(ocvb, caller)
 
         ocvb.desc = "Stabilize the image with the IMU data."
-        ocvb.label1 = "IMU Stabilize (Move Camera + Select Kalman)"
-        ocvb.label2 = "Difference from Color Image"
+        label1 = "IMU Stabilize (Move Camera + Select Kalman)"
+        label2 = "Difference from Color Image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.IMU_Present Then
@@ -135,7 +135,7 @@ Public Class IMU_Magnetometer
                                                   "Uncalibrated IMU Magnetometer reading:  z = " + CStr(ocvb.parms.IMU_Magnetometer.Z), 10, 60))
             plot.plotData = New cv.Scalar(ocvb.parms.IMU_Magnetometer.X, ocvb.parms.IMU_Magnetometer.Y, ocvb.parms.IMU_Magnetometer.Z)
             plot.Run(ocvb)
-            ocvb.label2 = "x (blue) = " + Format(plot.plotData.Item(0), "#0.00") + " y (green) = " + Format(plot.plotData.Item(1), "#0.00") +
+            label2 = "x (blue) = " + Format(plot.plotData.Item(0), "#0.00") + " y (green) = " + Format(plot.plotData.Item(1), "#0.00") +
                           " z (red) = " + Format(plot.plotData.Item(2), "#0.00")
         End If
     End Sub
@@ -197,7 +197,7 @@ Public Class IMU_FrameTime
         sliders.setupTrackBar1(ocvb, caller, "Minimum IMU to Capture time (ms)", 1, 10, 2)
         sliders.setupTrackBar2(ocvb, caller, "Number of Plot Values", 5, 30, 25)
 
-        ocvb.label2 = "IMU FT (blue) CPU FT (green) Latency est. (red)"
+        label2 = "IMU FT (blue) CPU FT (green) Latency est. (red)"
         ocvb.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -291,7 +291,7 @@ Public Class IMU_HostFrameTimes
         sliders.setupTrackBar1(ocvb, caller, "Minimum Host interrupt delay (ms)", 1, 10, 4)
         sliders.setupTrackBar2(ocvb, caller, "Number of Plot Values", 5, 30, 25)
 
-        ocvb.label2 = "IMU FT (blue) CPU FT (green) Latency est. (red)"
+        label2 = "IMU FT (blue) CPU FT (green) Latency est. (red)"
         ocvb.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -378,8 +378,8 @@ Public Class IMU_TotalDelay
         plot.minScale = 0
         plot.plotCount = 4
 
-        ocvb.label1 = "Timing data - total (white) right image"
-        ocvb.label2 = "IMU (blue) host (green) Total delay est. (red)"
+        label1 = "Timing data - total (white) right image"
+        label2 = "IMU (blue) host (green) Total delay est. (red)"
         ocvb.desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

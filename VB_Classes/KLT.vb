@@ -73,7 +73,7 @@ Public Class KLT_Basics
             check.Box(1).Checked = False
         End If
         prevGray = gray.Clone()
-        ocvb.label1 = "KLT Basics - " + If(inputPoints Is Nothing, "0", CStr(inputPoints.Length)) + " points"
+        label1 = "KLT Basics - " + If(inputPoints Is Nothing, "0", CStr(inputPoints.Length)) + " points"
     End Sub
 End Class
 

@@ -117,7 +117,7 @@ Public Class EMax_Basics_CPP
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         emax.Run(ocvb)
-        ocvb.label1 = CStr(emax.sliders.TrackBar1.Value) + " Random samples in " + CStr(emax.regionCount) + " clusters"
+        label1 = CStr(emax.sliders.TrackBar1.Value) + " Random samples in " + CStr(emax.regionCount) + " clusters"
 
         Dim srcData((emax.sliders.TrackBar1.Value - 1) * 2 - 1) As Single
         Dim handleSrc As GCHandle

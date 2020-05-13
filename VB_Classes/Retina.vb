@@ -27,8 +27,8 @@ Public Class Retina_Basics_CPP
         check.Box(0).Text = "Use log sampling"
         check.Box(1).Text = "Open resulting xml file"
         ocvb.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
-        ocvb.label1 = "Retina Parvo"
-        ocvb.label2 = "Retina Magno"
+        label1 = "Retina Parvo"
+        label2 = "Retina Magno"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(1).Checked Then
@@ -45,7 +45,7 @@ Public Class Retina_Basics_CPP
         End If
         Static useLogSampling As Int32 = check.Box(0).Checked
         Static samplingFactor As Single = -1 ' force open
-        if standalone Then src = ocvb.color
+        If standalone or src.width = 0 Then src = ocvb.color
         If useLogSampling <> check.Box(0).Checked Or samplingFactor <> sliders.TrackBar1.Value Then
             If Retina <> 0 Then Retina_Basics_Close(Retina)
             useLogSampling = check.Box(0).Checked
@@ -91,8 +91,8 @@ Public Class Retina_Depth
         retina = New Retina_Basics_CPP(ocvb, caller)
 
         ocvb.desc = "Use the bio-inspired retina algorithm with the depth data."
-        ocvb.label1 = "Last result || current result"
-        ocvb.label2 = "Current depth motion result"
+        label1 = "Last result || current result"
+        label2 = "Current depth motion result"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         retina.src = ocvb.RGBDepth

@@ -60,13 +60,13 @@ Public Class Depth_Median
         cv.Cv2.ConvertScaleAbs(zeroMask, zeroMask.ToMat)
         dst1.SetTo(0, zeroMask)
 
-        ocvb.label1 = "Median Depth < " + Format(median.medianVal, "#0.0")
+        label1 = "Median Depth < " + Format(median.medianVal, "#0.0")
 
         cv.Cv2.BitwiseNot(mask, mask)
         dst2.SetTo(0)
         ocvb.RGBDepth.CopyTo(dst2, mask)
         dst2.SetTo(0, zeroMask)
-        ocvb.label2 = "Median Depth > " + Format(median.medianVal, "#0.0")
+        label2 = "Median Depth > " + Format(median.medianVal, "#0.0")
     End Sub
 End Class
 
@@ -79,7 +79,7 @@ Public Class Depth_Flatland
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Region Count", 1, 250, 10)
 
-        ocvb.label2 = "Grayscale version"
+        label2 = "Grayscale version"
         ocvb.desc = "Attempt to stabilize the depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -107,9 +107,9 @@ Public Class Depth_FirstLastDistance
         cv.Cv2.MinMaxLoc(depth32f, minVal, maxVal, minPt, maxPt, mask)
         ocvb.RGBDepth.CopyTo(dst1)
         ocvb.RGBDepth.CopyTo(dst2)
-        ocvb.label1 = "Min Depth " + CStr(minVal) + " mm"
+        label1 = "Min Depth " + CStr(minVal) + " mm"
         dst1.Circle(minPt, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        ocvb.label2 = "Max Depth " + CStr(maxVal) + " mm"
+        label2 = "Max Depth " + CStr(maxVal) + " mm"
         dst2.Circle(maxPt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
     End Sub
 End Class
@@ -162,17 +162,15 @@ Public Class Depth_Foreground
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
-        dst1.CopyTo(dst2)
-        Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-
+        dst1 = trim.dst1.Clone()
         ' find the largest blob and use that as the body.  Head is highest in the image.
         Dim blobSize As New List(Of Int32)
         Dim blobLocation As New List(Of cv.Point)
-        For y = 0 To gray.Height - 1
-            For x = 0 To gray.Width - 1
-                Dim nextByte = gray.Get(Of Byte)(y, x)
+        For y = 0 To trim.dst1.Height - 1
+            For x = 0 To trim.dst1.Width - 1
+                Dim nextByte = trim.dst1.Get(Of Byte)(y, x)
                 If nextByte <> 0 Then
-                    Dim count = gray.FloodFill(New cv.Point(x, y), 0)
+                    Dim count = trim.dst1.FloodFill(New cv.Point(x, y), 0)
                     If count > 10 Then
                         blobSize.Add(count)
                         blobLocation.Add(New cv.Point(x, y))
@@ -190,14 +188,12 @@ Public Class Depth_Foreground
         Next
 
         If maxIndex >= 0 Then
-            Dim rectSize = 150
+            Dim rectSize = 50
             If ocvb.color.Width > 1000 Then rectSize = 250
             Dim xx = blobLocation.Item(maxIndex).X - rectSize / 2
-            Dim yy = blobLocation.Item(maxIndex).Y - rectSize / 2
+            Dim yy = blobLocation.Item(maxIndex).Y
             If xx < 0 Then xx = 0
-            If yy < 0 Then yy = 0
-            If xx + rectSize > ocvb.color.Width Then xx = ocvb.color.Width - rectSize
-            If yy + rectSize > ocvb.color.Height Then yy = ocvb.color.Height - rectSize
+            If xx + rectSize / 2 > ocvb.color.Width Then xx = ocvb.color.Width - rectSize
             ocvb.drawRect = New cv.Rect(xx, yy, rectSize, rectSize)
         End If
     End Sub
@@ -217,8 +213,8 @@ Public Class Depth_FlatData
 
         sliders.setupTrackBar1(ocvb, caller, "FlatData Region Count", 1, 250, 200)
 
-        ocvb.label1 = "Reduced resolution RGBDepth"
-        ocvb.label2 = "Contours of the Depth Shadow"
+        label1 = "Reduced resolution RGBDepth"
+        label2 = "Contours of the Depth Shadow"
         ocvb.desc = "Attempt to stabilize the depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -239,6 +235,8 @@ Public Class Depth_FlatData
         dst1 = gray8u.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
+
+
 
 
 
@@ -321,7 +319,7 @@ Public Class Depth_WorldXYZ_CPP
     Dim DepthXYZ As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = "xyzFrame is built"
+        label1 = "xyzFrame is built"
         ocvb.desc = "Get the X, Y, Depth in the image coordinates (not the 3D image coordinates.)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -421,10 +419,10 @@ Public Class Depth_MeanStdev_MT
                 dst1(roi).SetTo(0, outOfRangeMask(roi))
             End Sub)
             cv.Cv2.BitwiseOr(dst2, grid.gridMask, dst2)
-            ocvb.label2 = "ROI Stdev: Min " + Format(minStdVal, "#0.0") + " Max " + Format(maxStdVal, "#0.0")
+            label2 = "ROI Stdev: Min " + Format(minStdVal, "#0.0") + " Max " + Format(maxStdVal, "#0.0")
         End If
 
-        ocvb.label1 = "ROI Means: Min " + Format(minVal, "#0.0") + " Max " + Format(maxVal, "#0.0")
+        label1 = "ROI Means: Min " + Format(minVal, "#0.0") + " Max " + Format(maxVal, "#0.0")
     End Sub
 End Class
 
@@ -465,8 +463,8 @@ Public Class Depth_MeanStdevPlot
         plot1.Run(ocvb)
         plot2.plotData = New cv.Scalar(stdev, 0, 0)
         plot2.Run(ocvb)
-        ocvb.label1 = "Plot of mean depth = " + Format(mean, "#0.0")
-        ocvb.label2 = "Plot of depth stdev = " + Format(stdev, "#0.0")
+        label1 = "Plot of mean depth = " + Format(mean, "#0.0")
+        label2 = "Plot of depth stdev = " + Format(stdev, "#0.0")
     End Sub
 End Class
 
@@ -671,10 +669,8 @@ Public Class Depth_InRange
         depth32f = getDepth32f(ocvb)
         cv.Cv2.InRange(depth32f, minDepth, maxDepth, Mask)
         cv.Cv2.BitwiseNot(Mask, zeroMask)
-        dst1 = depth32f.Clone()
-        dst1.SetTo(0, zeroMask)
-
-        If standalone Then dst1 = dst1.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = Mask
+        dst2 = zeroMask
     End Sub
 End Class
 
@@ -693,7 +689,7 @@ Public Class Depth_ColorizerFastFade_CPP
 
         trim = New Depth_InRange(ocvb, caller)
 
-        ocvb.label2 = "Mask from Depth_InRange"
+        label2 = "Mask from Depth_InRange"
         ocvb.desc = "Display depth data with inrange trim.  Higher contrast than others - yellow to blue always present."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -897,7 +893,7 @@ Public Class Depth_LocalMinMax_MT
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
 
-        ocvb.label1 = "Red is min distance"
+        label1 = "Red is min distance"
         ocvb.desc = "Find min and max depth in each segment."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -1092,7 +1088,7 @@ Public Class Depth_Holes
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Amount of dilation around depth holes", 1, 10, 1)
 
-        ocvb.label2 = "Shadow Edges (use sliders to expand)"
+        label2 = "Shadow Edges (use sliders to expand)"
         element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
         ocvb.desc = "Identify holes in the depth image."
     End Sub
@@ -1122,7 +1118,7 @@ Public Class Depth_Stable
         ' sliders.setupTrackBar1(ocvb, caller, "")
         mog = New BGSubtract_Basics_CPP(ocvb, caller)
 
-        ocvb.label2 = "Stable (non-zero) Depth"
+        label2 = "Stable (non-zero) Depth"
         ocvb.desc = "Collect X frames, compute stable depth using the RGB and Depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -1131,7 +1127,7 @@ Public Class Depth_Stable
         mog.Run(ocvb)
         dst1 = mog.dst1
         cv.Cv2.BitwiseNot(mog.dst1, dst2)
-        ocvb.label1 = "Unstable Depth" + " using " + mog.radio.check(mog.currMethod).Text + " method"
+        label1 = "Unstable Depth" + " using " + mog.radio.check(mog.currMethod).Text + " method"
         Dim zeroDepth = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(1)
         dst2.SetTo(0, zeroDepth)
     End Sub

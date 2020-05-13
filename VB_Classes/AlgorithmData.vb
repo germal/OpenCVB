@@ -35,6 +35,7 @@ Public Class AlgorithmData
     Public rightView As cv.Mat
     Public result1 As New cv.Mat
     Public result2 As New cv.Mat
+    Public suppressOptions As Boolean
     Public TTtextData(3) As List(Of ActiveClass.TrueType)
     Public Sub New(parms As ActiveClass.algorithmParameters)
         optionsTop = parms.mainFormLoc.Y + parms.mainFormHeight

@@ -5,8 +5,8 @@ Public Class Bitmap_ToMat
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = "Convert color bitmap to Mat"
-        ocvb.label2 = "Convert Mat to bitmap and then back to Mat"
+        label1 = "Convert color bitmap to Mat"
+        label2 = "Convert Mat to bitmap and then back to Mat"
         ocvb.desc = "Convert a color and grayscale bitmap to a cv.Mat"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

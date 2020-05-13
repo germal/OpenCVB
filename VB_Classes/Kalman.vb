@@ -18,7 +18,7 @@ Public Class Kalman_Basics
         ocvb.desc = "Use Kalman to stabilize a set of value (such as a cv.rect.)"
     End Sub
     Private Sub setValues(ocvb As AlgorithmData)
-        ocvb.label1 = "Rectangle moves smoothly from random locations"
+        label1 = "Rectangle moves smoothly from random locations"
         Static autoRand As New Random()
         ReDim input(4 - 1)
         Dim w = ocvb.color.Width
@@ -98,8 +98,8 @@ Public Class Kalman_Compare
         kPlot.plotCount = 3
         kPlot.topBottomPad = 20
 
-        ocvb.label1 = "Kalman input: mean values for RGB"
-        ocvb.label2 = "Kalman output: smoothed mean values for RGB"
+        label1 = "Kalman input: mean values for RGB"
+        label2 = "Kalman output: smoothed mean values for RGB"
         ocvb.desc = "Use this kalman filter to predict the next value."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -160,7 +160,7 @@ Public Class Kalman_RotatingPoint
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = "Estimate Yellow < Real Red (if working)"
+        label1 = "Estimate Yellow < Real Red (if working)"
 
         cv.Cv2.Randn(kState, New cv.Scalar(0), cv.Scalar.All(0.1))
         kf.TransitionMatrix = New cv.Mat(2, 2, cv.MatType.CV_32F, New Single() {1, 1, 0, 1})
@@ -219,7 +219,7 @@ Public Class Kalman_MousePredict
         ReDim kalman.output(1)
 
         If ocvb.parms.lowResolution = False Then locMultiplier = 2 ' twice the size in both dimensions.
-        ocvb.label1 = "Red is real mouse, white is prediction"
+        label1 = "Red is real mouse, white is prediction"
         ocvb.desc = "Use kalman filter to predict the next mouse location."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -248,7 +248,7 @@ Public Class Kalman_CVMat
     Dim kalman() As Kalman_Single
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = "Rectangle moves smoothly to random locations"
+        label1 = "Rectangle moves smoothly to random locations"
         ocvb.desc = "Use Kalman to stabilize a set of values (such as a cv.rect.)"
     End Sub
     Private Sub setValues(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -320,8 +320,8 @@ Public Class Kalman_ImageSmall
 
         resize = New Resize_Percentage(ocvb, caller)
 
-        ocvb.label1 = "The small image is processed by the Kalman filter"
-        ocvb.label2 = "Mask of the smoothed image minus original"
+        label1 = "The small image is processed by the Kalman filter"
+        label2 = "Mask of the smoothed image minus original"
         ocvb.desc = "Resize the image to allow the Kalman filter to process the whole image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -359,8 +359,8 @@ Public Class Kalman_DepthSmall
         resize = New Resize_Percentage(ocvb, caller)
         resize.sliders.TrackBar1.Value = 4
 
-        ocvb.label2 = "Brighter: depth is decreasing (object getting closer)"
-        ocvb.label1 = "Mask of non-zero depth after Kalman smoothing"
+        label2 = "Brighter: depth is decreasing (object getting closer)"
+        label1 = "Mask of non-zero depth after Kalman smoothing"
         ocvb.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -432,8 +432,8 @@ Public Class Kalman_Single
         If standalone Then
             plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
             plot.Run(ocvb)
-            ocvb.label1 = "Mean of the grayscale image is predicted"
-            ocvb.label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
+            label1 = "Mean of the grayscale image is predicted"
+            label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
         End If
     End Sub
 End Class

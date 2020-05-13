@@ -8,24 +8,21 @@ Public Class CartoonifyImage_Basics
         sliders.setupTrackBar2(ocvb, caller, "Cartoon Median Blur kernel 2", 1, 21, 3)
         sliders.setupTrackBar3(ocvb, caller, "Cartoon threshold", 1, 255, 80)
         sliders.setupTrackBar4(ocvb, caller, "Cartoon Laplacian kernel", 1, 21, 5)
-        ocvb.label1 = "Mask for Cartoon"
-        ocvb.label2 = "Cartoonify Result"
+        label1 = "Mask for Cartoon"
+        label2 = "Cartoonify Result"
         ocvb.desc = "Create a cartoon from a color image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim medianBlur = sliders.TrackBar1.Value
-        If medianBlur Mod 2 = 0 Then medianBlur += 1
-        Dim medianBlur2 = sliders.TrackBar2.Value
-        If medianBlur2 Mod 2 = 0 Then medianBlur2 += 1
-        Dim kernelSize = sliders.TrackBar4.Value
-        If kernelSize Mod 2 = 0 Then kernelSize += 1
-        Dim gray8u = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim medianBlur = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value + 1)
+        Dim medianBlur2 = If(sliders.TrackBar2.Value Mod 2, sliders.TrackBar2.Value, sliders.TrackBar2.Value + 1)
+        Dim kernelSize = If(sliders.TrackBar4.Value Mod 2, sliders.TrackBar4.Value, sliders.TrackBar4.Value + 1)
+        If standalone Or src.Width = 0 Then src = ocvb.color
+        Dim gray8u = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         gray8u = gray8u.MedianBlur(medianBlur)
         Dim edges = gray8u.Laplacian(cv.MatType.CV_8U, kernelSize)
         Dim mask = edges.Threshold(sliders.TrackBar3.Value, 255, cv.ThresholdTypes.Binary)
         dst1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = ocvb.color.MedianBlur(medianBlur2)
-        dst2 = dst2.MedianBlur(medianBlur2)
+        dst2 = ocvb.color.MedianBlur(medianBlur2).MedianBlur(medianBlur2)
         ocvb.color.CopyTo(dst2, mask)
     End Sub
 End Class

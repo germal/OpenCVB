@@ -5,12 +5,12 @@ Public Class Diff_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Diff - Color Threshold", 1, 255, 50)
-        ocvb.label1 = "Stable Gray Color"
-        ocvb.label2 = "Unstable Color mask"
+        label1 = "Stable Gray Color"
+        label2 = "Unstable Color mask"
         ocvb.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
+        If standalone Or src.Width = 0 Then src = ocvb.color
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If ocvb.frameCount > 0 Then
             dst1 = lastFrame
@@ -40,11 +40,11 @@ Public Class Diff_UnstableDepthAndColor
 
         depth = New Depth_Stable(ocvb, caller)
 
-        ocvb.label1 = "Stable depth and color"
+        label1 = "Stable depth and color"
         ocvb.desc = "Build a mask for any pixels that have either unstable depth or color"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
+        If standalone Or src.Width = 0 Then src = ocvb.color
         diff.src = src
         diff.Run(ocvb)
         Dim unstableColor = diff.dst2.Clone()
@@ -57,7 +57,7 @@ Public Class Diff_UnstableDepthAndColor
         cv.Cv2.BitwiseOr(unstableColor, unstableDepth, mask)
         dst1 = ocvb.color.Clone()
         dst1.SetTo(0, mask)
-        ocvb.label2 = "Unstable depth/color mask"
+        label2 = "Unstable depth/color mask"
         dst2 = mask
     End Sub
 End Class

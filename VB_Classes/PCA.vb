@@ -69,8 +69,8 @@ Public Class PCA_DrawImage
         pca = New PCA_Basics(ocvb, caller)
         image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/pca_test1.jpg")
         ocvb.desc = "Use PCA to find the principle direction of an object."
-        ocvb.label1 = "Original image"
-        ocvb.label2 = "PCA Output"
+        label1 = "Original image"
+        label2 = "PCA Output"
     End Sub
     Private Sub drawAxis(img As cv.Mat, p As cv.Point, q As cv.Point, color As cv.Scalar, scale As Single)
         Dim angle = Math.Atan2(p.Y - q.Y, p.X - q.X) ' angle in radians

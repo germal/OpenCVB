@@ -5,7 +5,7 @@ Public Class Keyboard_Basics
     Public input As String
         Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = "Type in text to add to image"
+        label1 = "Type in text to add to image"
         ocvb.desc = "Test the keyboard interface available to all algorithms"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

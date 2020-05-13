@@ -9,7 +9,7 @@ Public Class knn_Basics
         sliders.setupTrackBar1(ocvb, caller, "knn Query Points", 1, 10000, 10)
         sliders.setupTrackBar2(ocvb, caller, "knn Known Points", 1, 10, 3)
         ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
-        ocvb.label2 = "Search Input"
+        label2 = "Search Input"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim knn = cv.ML.KNearest.Create()
@@ -27,7 +27,7 @@ Public Class knn_Basics
         Next
 
         Dim bluePoints = sliders.TrackBar2.Value
-        ocvb.label1 = "Yellow is random, blue nearest " + CStr(bluePoints)
+        label1 = "Yellow is random, blue nearest " + CStr(bluePoints)
         dst1.CopyTo(dst2)
         Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
         For i = 0 To queryPoints.Length - 1
@@ -71,8 +71,8 @@ Public Class knn_Cluster2D
 
         sliders.setupTrackBar1(ocvb, caller, "knn - number of cities", 10, 1000, 100)
 
-        ocvb.label1 = ""
-        ocvb.label2 = ""
+        label1 = ""
+        label2 = ""
         ocvb.desc = "Use knn to cluster cities as preparation for a solution to the traveling salesman problem."
     End Sub
     Private Sub cluster(rColors() As cv.Vec3b, result As cv.Mat)
@@ -144,7 +144,7 @@ Public Class knn_Cluster2D
             knn.Run(ocvb) ' run only one time.
             dst1.SetTo(0)
             cluster(ocvb.rColors, dst1)
-            ocvb.label1 = "knn clusters total=" + CStr(totalClusters) + " closedRegions=" + CStr(closedRegions)
+            label1 = "knn clusters total=" + CStr(totalClusters) + " closedRegions=" + CStr(closedRegions)
         End If
     End Sub
 End Class
@@ -166,7 +166,7 @@ Public Class knn_Point2d
         sliders.setupTrackBar2(ocvb, caller, "knn k nearest points", 1, 5, 1)
 
         ocvb.desc = "Use KNN to connect 2D points."
-        ocvb.label1 = "Yellow=Queries, Blue=Best Responses"
+        label1 = "Yellow=Queries, Blue=Best Responses"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim knn = cv.ML.KNearest.Create()
@@ -233,8 +233,8 @@ Public Class knn_Point3d
         sliders.setupTrackBar2(ocvb, caller, "knn k nearest points", 0, 500, 1)
 
         ocvb.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
-        ocvb.label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
-        ocvb.label2 = "Top Down View to confirm 3D KNN is correct"
+        label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
+        label2 = "Top Down View to confirm 3D KNN is correct"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim maxDepth As Int32 = 4000 ' this is an arbitrary max dept    h
@@ -364,8 +364,8 @@ Public Class knn_ClusterNoisyLine
                     End If
                 Next
             Next
-            ocvb.label2 = "knn clusters total=" + CStr(totalClusters)
-            ocvb.label1 = "Input points = " + CStr(numberofCities)
+            label2 = "knn clusters total=" + CStr(totalClusters)
+            label1 = "Input points = " + CStr(numberofCities)
         End If
     End Sub
 End Class

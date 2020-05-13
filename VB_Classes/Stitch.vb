@@ -14,7 +14,7 @@ Public Class Stitch_Basics
         Dim imageCount = sliders.TrackBar1.Value
         Dim width = sliders.TrackBar2.Value
         Dim height = sliders.TrackBar3.Value
-        if standalone Then src = ocvb.color.Clone()
+        If standalone or src.width = 0 Then src = ocvb.color.Clone()
         dst1 = src.Clone()
         For i = 0 To imageCount - 1
             Dim x1 = CInt(ocvb.ms_rng.next(0, src.Width - width))

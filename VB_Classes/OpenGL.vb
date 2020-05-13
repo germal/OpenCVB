@@ -170,7 +170,7 @@ Public Class OpenGL_Options
         OpenGL = New OpenGL_Basics(ocvb, caller)
         setOpenGLsliders(ocvb, caller, sliders, sliders1, sliders2, sliders3)
         ocvb.desc = "Adjust point size and FOV in OpenGL"
-        ocvb.label1 = ""
+        label1 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         OpenGL.FOV = sliders.TrackBar1.Value
@@ -276,7 +276,7 @@ Public Class OpenGL_3Ddata
         colors.Run(ocvb)
         ogl.OpenGL.rgbInput = dst1.Clone() ' only need to set this once.
 
-        ocvb.label1 = "Input to Histogram 3D"
+        label1 = "Input to Histogram 3D"
         ocvb.desc = "Plot the results of a 3D histogram in OpenGL."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -318,7 +318,7 @@ Public Class OpenGL_Draw3D
         ogl.sliders1.TrackBar3.Value = 16
         ogl.sliders2.TrackBar3.Value = -30
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud when displaying data.
-        ocvb.label2 = "Grayscale image sent to OpenGL"
+        label2 = "Grayscale image sent to OpenGL"
         ocvb.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

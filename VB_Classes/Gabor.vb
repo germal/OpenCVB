@@ -25,8 +25,8 @@ Public Class Gabor_Basics
         ocvb.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then
-            src = ocvb.color
+        If standalone Or src.Width = 0 Then src = ocvb.color
+        If standalone Then
             ksize = sliders.TrackBar1.Value * 2 + 1
             Sigma = sliders.TrackBar2.Value
             lambda = sliders.TrackBar4.Value
@@ -59,7 +59,7 @@ Public Class Gabor_Basics_MT
     Dim gabor(31) As Gabor_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label2 = "The 32 kernels used"
+        label2 = "The 32 kernels used"
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
@@ -99,7 +99,6 @@ Public Class Gabor_Basics_MT
             gabor(i).lambda = lambda
             gabor(i).gamma = gamma
             gabor(i).phaseOffset = phaseOffset
-            gabor(i).src = ocvb.color
             gabor(i).Run(ocvb)
             Dim roi = grid.roiList(i)
             SyncLock accum

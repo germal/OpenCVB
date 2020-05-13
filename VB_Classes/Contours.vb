@@ -27,7 +27,7 @@ Public Class Contours_Basics
         rotatedRect = New Draw_rotatedRectangles(ocvb, caller)
         rotatedRect.rect.sliders.TrackBar1.Value = 5
         ocvb.desc = "Demo options on FindContours."
-        ocvb.label2 = "FindContours output"
+        label2 = "FindContours output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim retrievalMode As cv.RetrievalModes
@@ -46,20 +46,25 @@ Public Class Contours_Basics
             End If
         Next
 
+        Dim imageInput As New cv.Mat
+        If standalone Or src.Width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standalone Then
-            src = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
             rotatedRect.Run(ocvb)
-            src = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+            imageInput = rotatedRect.dst1
+            If imageInput.Channels = 3 Then
+                src = imageInput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+            Else
+                src = imageInput.Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+            End If
         End If
-
-        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
 
         Dim contours0 As cv.Point()()
         If retrievalMode = cv.RetrievalModes.FloodFill Then
-            Dim img32sc1 As New cv.Mat
-            src.ConvertTo(img32sc1, cv.MatType.CV_32SC1)
-            contours0 = cv.Cv2.FindContoursAsArray(img32sc1, retrievalMode, ApproximationMode)
-            img32sc1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+            '    Dim img32sc1 As New cv.Mat
+            '    src.ConvertTo(img32sc1, cv.MatType.CV_32SC1)
+            '    contours0 = cv.Cv2.FindContoursAsArray(img32sc1, retrievalMode, ApproximationMode)
+            '    img32sc1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+            contours0 = cv.Cv2.FindContoursAsArray(src, cv.RetrievalModes.Tree, ApproximationMode)
         Else
             contours0 = cv.Cv2.FindContoursAsArray(src, retrievalMode, ApproximationMode)
         End If
@@ -70,7 +75,13 @@ Public Class Contours_Basics
             contours(j) = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
         Next
 
-        cv.Cv2.DrawContours(dst1, contours, 0, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
+        dst1 = imageInput
+        dst2 = ocvb.color.EmptyClone.SetTo(0)
+        If retrievalMode = cv.RetrievalModes.FloodFill Then
+            cv.Cv2.DrawContours(dst2, contours, 0, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        Else
+            cv.Cv2.DrawContours(dst2, contours, 0, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+        End If
     End Sub
 End Class
 
@@ -83,13 +94,14 @@ Public Class Contours_FindandDraw
         setCaller(callerRaw)
         rotatedRect = New Draw_rotatedRectangles(ocvb, caller)
         rotatedRect.rect.sliders.TrackBar1.Value = 5
-        ocvb.label1 = "FindandDraw input"
-        ocvb.label2 = "FindandDraw output"
+        label1 = "FindandDraw input"
+        label2 = "FindandDraw output"
         ocvb.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim img As New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
         rotatedRect.Run(ocvb)
+        dst1 = rotatedRect.dst1
         img = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
 
         Dim contours0 = cv.Cv2.FindContoursAsArray(img, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
@@ -99,7 +111,7 @@ Public Class Contours_FindandDraw
             contours(j) = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
         Next
 
-        dst2.SetTo(0)
+        dst2 = ocvb.color.EmptyClone.SetTo(0)
         cv.Cv2.DrawContours(dst2, contours, 0, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
@@ -113,12 +125,13 @@ Public Class Contours_Depth
         setCaller(callerRaw)
         trim = New Depth_InRange(ocvb, caller)
         ocvb.desc = "Find and draw the contour of the depth foreground."
-        ocvb.label1 = "DepthContour input"
-        ocvb.label2 = "DepthContour output"
+        label1 = "DepthContour input"
+        label2 = "DepthContour output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
-        dst2.SetTo(0)
+        dst1 = trim.dst1
+        dst2 = ocvb.color.EmptyClone.SetTo(0)
         Dim contours0 = cv.Cv2.FindContoursAsArray(trim.Mask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim maxIndex As Int32
         Dim maxNodes As Int32
@@ -142,7 +155,7 @@ Public Class Contours_RGB
         setCaller(callerRaw)
         trim = New Depth_InRange(ocvb, caller)
         ocvb.desc = "Find and draw the contour of the largest foreground RGB contour."
-        ocvb.label2 = "Background"
+        label2 = "Background"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
@@ -162,7 +175,8 @@ Public Class Contours_RGB
 
         If contours0(maxIndex).Length = 0 Then Exit Sub
 
-        dst1.SetTo(New cv.Scalar(0))
+        dst1 = ocvb.color.EmptyClone.SetTo(0)
+        dst2 = dst1.Clone()
         Dim hull() = cv.Cv2.ConvexHull(contours0(maxIndex), True)
         Dim listOfPoints = New List(Of List(Of cv.Point))
         Dim points = New List(Of cv.Point)
@@ -172,7 +186,6 @@ Public Class Contours_RGB
         listOfPoints.Add(points)
         cv.Cv2.DrawContours(dst1, listOfPoints, 0, New cv.Scalar(255, 0, 0), -1)
         cv.Cv2.DrawContours(dst1, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
-        dst2.SetTo(0)
         ocvb.color.CopyTo(dst2, trim.zeroMask)
     End Sub
 End Class

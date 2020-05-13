@@ -8,10 +8,10 @@ Public Class Gradient_Basics
         setCaller(callerRaw)
         sobel = New Edges_Sobel(ocvb, caller)
         ocvb.desc = "Use phase to compute gradient"
-        ocvb.label2 = "Phase Output"
+        label2 = "Phase Output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
+        If standalone or src.width = 0 Then src = ocvb.color
         sobel.src = src
         sobel.Run(ocvb)
         Dim angle = New cv.Mat
@@ -36,7 +36,7 @@ Public Class Gradient_Depth
         setCaller(callerRaw)
         sobel = New Edges_Sobel(ocvb, caller)
         ocvb.desc = "Use phase to compute gradient on depth image"
-        ocvb.label2 = "Phase Output"
+        label2 = "Phase Output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         sobel.src = ocvb.RGBDepth.Clone()

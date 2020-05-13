@@ -29,7 +29,7 @@ Public Class SuperPixel_Basics_CPP
         sliders.setupTrackBar2(ocvb, caller, "Iterations", 0, 10, 4)
         sliders.setupTrackBar3(ocvb, caller, "Prior", 1, 10, 2)
 
-        ocvb.label2 = "Superpixel label data (0-255)"
+        label2 = "Superpixel label data (0-255)"
         ocvb.desc = "Sub-divide the image into super pixels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -131,7 +131,7 @@ Public Class SuperPixel_WithCanny
         dst1 = pixels.dst1
         dst2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2.SetTo(cv.Scalar.Red, edges.dst1)
-        ocvb.label2 = "Edges provided by Canny in red"
+        label2 = "Edges provided by Canny in red"
     End Sub
 End Class
 
@@ -157,12 +157,12 @@ Public Class SuperPixel_WithLineDetector
         lines.Run(ocvb)
         pixels.src = dst1.Clone()
         dst2 = dst1.Clone()
-        ocvb.label2 = "Input to superpixel basics."
+        label2 = "Input to superpixel basics."
         pixels.Run(ocvb)
         dst1 = pixels.dst1
         ' dst2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ' dst2.SetTo(cv.Scalar.Red, lines.dst1)
-        ' ocvb.label2 = "Edges provided by Canny in red"
+        ' label2 = "Edges provided by Canny in red"
     End Sub
 End Class
 

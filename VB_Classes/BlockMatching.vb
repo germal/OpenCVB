@@ -11,8 +11,8 @@ Public Class BlockMatching_Basics
         sliders.setupTrackBar2(ocvb, caller, "Blockmatch block size", 5, 255, 15)
         sliders.setupTrackBar3(ocvb, caller, "Blockmatch distance factor (approx) X1000", 1, 100, 20)
         ocvb.desc = "Use OpenCV's block matching on left and right views"
-        ocvb.label1 = "Block matching disparity colorized like depth"
-        ocvb.label2 = "Right Image (used with left image)"
+        label1 = "Block matching disparity colorized like depth"
+        label2 = "Right Image (used with left image)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = Kinect4AzureCam Then

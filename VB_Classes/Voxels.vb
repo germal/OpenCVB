@@ -22,7 +22,7 @@ Public Class Voxels_Basics_MT
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
 
-        ocvb.label2 = "Voxels labeled with their median distance"
+        label2 = "Voxels labeled with their median distance"
         ocvb.desc = "Use multi-threading to get median depth values as voxels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

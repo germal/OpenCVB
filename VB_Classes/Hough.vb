@@ -47,8 +47,8 @@ Public Class Hough_Circles
         circles = New Draw_Circles(ocvb, caller)
         circles.sliders.TrackBar1.Value = 3
         ocvb.desc = "Find circles using HoughCircles."
-        ocvb.label1 = "Input circles to Hough"
-        ocvb.label2 = "Hough Circles found"
+        label1 = "Input circles to Hough"
+        label2 = "Hough Circles found"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         circles.Run(ocvb)
@@ -84,7 +84,7 @@ Public Class Hough_Lines
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
+        If standalone or src.width = 0 Then src = ocvb.color
         edges.src = src.Clone()
         edges.Run(ocvb)
 
@@ -96,7 +96,7 @@ Public Class Hough_Lines
         Dim threshold = sliders.TrackBar3.Value
 
         segments = cv.Cv2.HoughLines(src, rhoIn, thetaIn, threshold)
-        ocvb.label1 = "Found " + CStr(segments.Length) + " Lines"
+        label1 = "Found " + CStr(segments.Length) + " Lines"
 
         If standalone Then
             ocvb.color.CopyTo(dst1)
@@ -107,7 +107,7 @@ Public Class Hough_Lines
                 Dim line = probSegments(i)
                 dst2.Line(line.P1, line.P2, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
             Next
-            ocvb.label2 = "Probablistic lines = " + CStr(probSegments.Length)
+            label2 = "Probablistic lines = " + CStr(probSegments.Length)
         End If
     End Sub
 End Class
@@ -132,14 +132,13 @@ Public Class Hough_Lines_MT
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
         ocvb.desc = "Multithread Houghlines to find lines in image fragments."
-        ocvb.label1 = "Hough_Lines_MT"
-        ocvb.label2 = "Hough_Lines_MT"
+        label1 = "Hough_Lines_MT"
+        label2 = "Hough_Lines_MT"
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
 
-        edges.src = ocvb.color
         edges.Run(ocvb)
 
         Dim rhoIn = sliders.TrackBar1.Value

@@ -45,8 +45,8 @@ Public Class Smoothing_Exterior
 
 		sliders.setupTrackBar1(ocvb, caller, "Smoothing iterations", 1, 20, 10)
 
-		ocvb.label1 = "Original Points (white) Smoothed (yellow)"
-		ocvb.label2 = ""
+		label1 = "Original Points (white) Smoothed (yellow)"
+		label2 = ""
 		ocvb.desc = "Smoothing the line connecting a series of points."
 	End Sub
 	Public Sub Run(ocvb As AlgorithmData)
@@ -118,8 +118,8 @@ Public Class Smoothing_Interior
 		sliders.setupTrackBar1(ocvb, caller, "Smoothing iterations", 1, 20, 1)
 		sliders.setupTrackBar2(ocvb, caller, "Smoothing tension X100", 1, 100, 50)
 
-		ocvb.label1 = "Original Points (white) Smoothed (yellow)"
-		ocvb.label2 = ""
+		label1 = "Original Points (white) Smoothed (yellow)"
+		label2 = ""
 		ocvb.desc = "Smoothing the line connecting a series of points staying inside the outline."
 	End Sub
 	Public Sub Run(ocvb As AlgorithmData)

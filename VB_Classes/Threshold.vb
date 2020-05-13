@@ -9,7 +9,7 @@ Public Class Threshold_LaplacianFilter
         trim = New Depth_InRange(ocvb, caller)
         edges = New Filter_Laplacian(ocvb, caller)
         sliders.setupTrackBar1(ocvb, caller, "dist Threshold", 1, 100, 40)
-        ocvb.label1 = "Foreground Input"
+        label1 = "Foreground Input"
         ocvb.desc = "Threshold the output of a Laplacian derivative, mask with depth foreground."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

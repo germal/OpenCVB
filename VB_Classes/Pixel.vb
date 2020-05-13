@@ -9,8 +9,8 @@ Public Class Pixel_GetSet
         setCaller(callerRaw)
         mat4 = New Mat_4to1(ocvb, caller)
 
-        ocvb.label1 = "Log of times for each method"
-        ocvb.label2 = "GetSet/Generic Indexer/Marshal.Copy"
+        label1 = "Log of times for each method"
+        label2 = "GetSet/Generic Indexer/Marshal.Copy"
         ocvb.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

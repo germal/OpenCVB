@@ -33,8 +33,8 @@ Public Class Aruco_CS
     Dim aruco As New CS_Classes.Aruco_Detect
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = "Original Image with marker ID's"
-        ocvb.label2 = "Normalized image after WarpPerspective."
+        label1 = "Original Image with marker ID's"
+        label2 = "Normalized image after WarpPerspective."
         ocvb.desc = "Testing the Aruco marker detection in C#"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

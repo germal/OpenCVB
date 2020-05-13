@@ -10,8 +10,8 @@ Public Class Resize_Basics
         radio.check(6).Enabled = False
 
         ocvb.desc = "Resize with different options and compare them"
-        ocvb.label1 = "Rectangle highlight above resized"
-        ocvb.label2 = "Difference from Cubic Resize (Best)"
+        label1 = "Rectangle highlight above resized"
+        label2 = "Difference from Cubic Resize (Best)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim resizeFlag = getInterpolationRadioButtons(radio)
@@ -45,8 +45,8 @@ Public Class Resize_After8uc3
         radio.check(5).Enabled = False
         radio.check(6).Enabled = False
 
-        ocvb.label1 = "Resized depth16 before running thru colorizer"
-        ocvb.label2 = "Resized depth8UC3 after running thru colorizer"
+        label1 = "Resized depth16 before running thru colorizer"
+        label2 = "Resized depth8UC3 after running thru colorizer"
         ocvb.desc = "When you resize depth16 is important.  Use depth16 at high resolution and resize the 8UC3 result"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -86,7 +86,7 @@ Public Class Resize_Percentage
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim percent As Double = CDbl(sliders.TrackBar1.Value / 100)
-        If standalone Then src = ocvb.color
+        If standalone or src.width = 0 Then src = ocvb.color
         Dim resizePercent = sliders.TrackBar1.Value / 100
         resizePercent = Math.Sqrt(resizePercent)
         resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * resizePercent), Math.Ceiling(src.Height * resizePercent))
@@ -96,8 +96,8 @@ Public Class Resize_Percentage
         If standalone Then
             Dim roi As New cv.Rect(0, 0, resizeOptions.dst1.Width, resizeOptions.dst1.Height)
             dst1 = resizeOptions.dst1(roi).Resize(resizeOptions.dst1.Size())
-            ocvb.label1 = "Image after resizing to " + Format(sliders.TrackBar1.Value, "#0.0") + "% of original size"
-            ocvb.label2 = ""
+            label1 = "Image after resizing to " + Format(sliders.TrackBar1.Value, "#0.0") + "% of original size"
+            label2 = ""
         Else
             dst1 = resizeOptions.dst1
         End If

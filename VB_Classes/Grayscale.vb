@@ -8,8 +8,8 @@ Public Class Grayscale_Basics
         check.Box(0).Checked = True
 
         ocvb.desc = "Manually create a grayscale image.  The only reason for this example is to show how slow it can be to do the work manually in VB.Net"
-        ocvb.label1 = "Grayscale_Basics"
-        ocvb.label2 = ""
+        label1 = "Grayscale_Basics"
+        label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(0).Checked Then

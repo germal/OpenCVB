@@ -52,8 +52,8 @@ Public Class Quaterion_IMUPrediction
         setCaller(callerRaw)
         host = New IMU_HostFrameTimes(ocvb, caller)
 
-        ocvb.label1 = "Quaternion_IMUPrediction"
-        ocvb.label2 = ""
+        label1 = "Quaternion_IMUPrediction"
+        label2 = ""
         ocvb.desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
     End Sub
 

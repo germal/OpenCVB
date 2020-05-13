@@ -12,8 +12,8 @@ Public Class Plot_Basics
 
         plot = New Plot_Basics_CPP(ocvb, caller)
 
-        ocvb.label1 = "Plot of grayscale histogram"
-        ocvb.label2 = "Same Data but using OpenCV C++ plot"
+        label1 = "Plot of grayscale histogram"
+        label2 = "Same Data but using OpenCV C++ plot"
         ocvb.desc = "Plot data provided in src Mat"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -30,7 +30,7 @@ Public Class Plot_Basics
             Next
             plot.Run(ocvb)
             dst1 = plot.dst1
-            ocvb.label1 = "histogram with " + ocvb.label1
+            label1 = "histogram with " + ocvb.label1
         Else
             If hist.sliders.Visible Then hist.sliders.Hide()
         End If
@@ -82,7 +82,7 @@ Public Class Plot_Basics_CPP
         handlePlot.Free()
         handleX.Free()
         handleY.Free()
-        ocvb.label1 = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + vbTab + " y-axis: " + CStr(minY) + " to " + CStr(maxY)
+        label1 = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + vbTab + " y-axis: " + CStr(minY) + " to " + CStr(maxY)
     End Sub
 End Class
 
@@ -188,7 +188,7 @@ Public Class Plot_OverTime
 
         columnIndex += pixelWidth
         dst1.Col(columnIndex).SetTo(0)
-        If standalone Then ocvb.label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
+        If standalone Then label1 = "PlotData: x = " + Format(plotData.Item(0), "#0.0") + " y = " + Format(plotData.Item(1), "#0.0") + " z = " + Format(plotData.Item(2), "#0.0")
         AddPlotScale(dst1, minScale - topBottomPad, maxScale + topBottomPad, sliders.TrackBar3.Value / 10)
     End Sub
 End Class
@@ -298,6 +298,6 @@ Public Class Plot_Depth
         Next
         plot.Run(ocvb)
         dst1 = plot.dst1
-        ocvb.label1 = "histogram with " + ocvb.label1
+        label1 = "histogram with " + ocvb.label1
     End Sub
 End Class

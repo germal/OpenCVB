@@ -7,7 +7,7 @@ Public Class Sharpen_UnsharpMask
         sliders.setupTrackBar2(ocvb, caller, "threshold", 0, 255, 5)
         sliders.setupTrackBar3(ocvb, caller, "Shift Amount", 0, 5000, 1000)
         ocvb.desc = "Sharpen an image"
-        ocvb.label2 = "Unsharp mask (difference from Blur)"
+        label2 = "Unsharp mask (difference from Blur)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim blurred As New cv.Mat

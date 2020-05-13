@@ -12,11 +12,8 @@ Public Class BRISK_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Dim wt As New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
 
-        if standalone Then
-            ocvb.color.CopyTo(src)
-            ocvb.color.CopyTo(dst1)
-        End If
-        Dim keyPoints = Brisk.Detect(src)
+        If standalone Then ocvb.color.CopyTo(dst1)
+        Dim keyPoints = Brisk.Detect(ocvb.color)
         features.Clear()
         For Each pt In keyPoints
             Dim r = pt.Size
@@ -25,9 +22,7 @@ Public Class BRISK_Basics
                 wt.Circle(pt.Pt, 2, cv.Scalar.Green, r / 2, cv.LineTypes.AntiAlias)
             End If
         Next
-        if standalone Then
-            cv.Cv2.AddWeighted(ocvb.color, 0.5, wt, 0.5, 0, dst1)
-        End If
+        If standalone Then cv.Cv2.AddWeighted(ocvb.color, 0.5, wt, 0.5, 0, dst1)
     End Sub
 End Class
 

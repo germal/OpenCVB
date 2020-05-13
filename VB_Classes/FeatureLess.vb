@@ -21,8 +21,8 @@ Public Class Featureless_Basics_MT
         grid.sliders.TrackBar2.Value = If(ocvb.color.Width > 1000, 16, 8)
 
         ocvb.desc = "Multithread Houghlines to find featureless regions in an image."
-        ocvb.label1 = "MT grid"
-        ocvb.label2 = "FeatureLess Regions"
+        label1 = "MT grid"
+        label2 = "FeatureLess Regions"
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
@@ -71,7 +71,7 @@ Public Class Featureless_Basics_MT
             Dim mean = ocvb.RGBDepth.Mean(label)
             dst2.SetTo(mean, label)
         Next
-        ocvb.label2 = "FeatureLess Regions = " + CStr(regionCount)
+        label2 = "FeatureLess Regions = " + CStr(regionCount)
     End Sub
 End Class
 
@@ -166,7 +166,7 @@ Public Class Featureless_DCT_MT
         dct = New DCT_FeatureLess_MT(ocvb, caller)
 
         ocvb.desc = "Use DCT to find largest featureless region."
-        ocvb.label2 = "Largest FeatureLess Region"
+        label2 = "Largest FeatureLess Region"
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
@@ -196,7 +196,7 @@ Public Class Featureless_DCT_MT
 
         Dim label = mask.InRange(maxIndex + 1, maxIndex + 1)
         Dim nonZ = label.CountNonZero()
-        ocvb.label2 = "Largest FeatureLess Region (" + CStr(nonZ) + " " + Format(nonZ / label.Total, "#0.0%") + " pixels)"
+        label2 = "Largest FeatureLess Region (" + CStr(nonZ) + " " + Format(nonZ / label.Total, "#0.0%") + " pixels)"
         dst2.SetTo(cv.Scalar.White, label)
     End Sub
 End Class

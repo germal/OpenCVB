@@ -233,8 +233,8 @@ Public Class OpticalFlow_Sparse
         radio.check(0).Checked = True
 
         ocvb.desc = "Show the optical flow of a sparse matrix."
-        ocvb.label1 = ""
-        ocvb.label2 = ""
+        label1 = ""
+        label2 = ""
     End Sub
     Private Sub kalmanFilter()
         Dim f1err As New cv.Mat
@@ -293,7 +293,7 @@ Public Class OpticalFlow_Sparse
                     End If
                 End If
             Next
-            ocvb.label1 = "Matched " + CStr(features.Count) + " points "
+            label1 = "Matched " + CStr(features.Count) + " points "
 
             If ocvb.frameCount Mod 10 = 0 Then lastFrame = gray.Clone()
         Else

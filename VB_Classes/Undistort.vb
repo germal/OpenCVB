@@ -80,7 +80,7 @@ Public Class Undistort_Basics
         check.Box(0).Text = "Restore Original matrices"
         check.Box(0).Checked = True
 
-        ocvb.label1 = "Left Image with sliders applied"
+        label1 = "Left Image with sliders applied"
         ocvb.desc = "Use sliders to control the undistort OpenCV API"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

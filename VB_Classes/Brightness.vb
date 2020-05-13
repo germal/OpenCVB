@@ -9,15 +9,15 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
         ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Or src.Width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
         claheObj.TilesGridSize() = New cv.Size(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
         claheObj.ClipLimit = sliders.TrackBar1.Value
         claheObj.Apply(src, dst2)
 
-        ocvb.label1 = "GrayScale"
-        ocvb.label2 = "CLAHE Result"
+        label1 = "GrayScale"
+        label2 = "CLAHE Result"
     End Sub
 End Class
 
@@ -33,8 +33,8 @@ Public Class Brightness_Contrast
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.color.ConvertTo(dst1, -1, sliders.TrackBar2.Value / 50, sliders.TrackBar1.Value)
-        ocvb.label1 = "Brightness/Contrast"
-        ocvb.label2 = ""
+        label1 = "Brightness/Contrast"
+        label2 = ""
     End Sub
 End Class
 
@@ -52,8 +52,8 @@ Public Class Brightness_hue
         cv.Cv2.CvtColor(ocvb.color, imghsv, cv.ColorConversionCodes.RGB2HSV)
         cv.Cv2.Split(imghsv, hsv_planes)
 
-        ocvb.label1 = "Hue"
-        ocvb.label2 = "Saturation"
+        label1 = "Hue"
+        label2 = "Saturation"
         cv.Cv2.CvtColor(hsv_planes(0), dst1, cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.CvtColor(hsv_planes(1), dst2, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
@@ -70,7 +70,7 @@ Public Class Brightness_AlphaBeta
         sliders.setupTrackBar2(ocvb, caller, "Brightness Beta (brightness)", -100, 100, 0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
+        If standalone Or src.Width = 0 Then src = ocvb.color
         dst1 = src.ConvertScaleAbs(sliders.TrackBar1.Value / 500, sliders.TrackBar2.Value)
     End Sub
 End Class
@@ -126,8 +126,8 @@ Public Class Brightness_WhiteBalance_CPP
         sliders.setupTrackBar1(ocvb, caller, "White balance threshold X100", 1, 100, 10)
 
         wPtr = WhiteBalance_Open()
-        ocvb.label1 = "Image with auto white balance"
-        ocvb.label2 = "White pixels were altered from the original"
+        label1 = "Image with auto white balance"
+        label2 = "White pixels were altered from the original"
         ocvb.desc = "Automate getting the right white balance"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -163,19 +163,18 @@ Public Class Brightness_WhiteBalance
         hist = New Histogram_Basics(ocvb, caller)
         hist.bins = 256 * 3
         hist.maxRange = hist.bins
+        If standalone = False Then hist.sliders.Visible = False
 
         sliders.setupTrackBar1(ocvb, caller, "White balance threshold X100", 1, 100, 10)
 
-        ocvb.label1 = "Image with auto white balance"
-        ocvb.label2 = "White pixels were altered from the original"
+        label1 = "Image with auto white balance"
         ocvb.desc = "Automate getting the right white balance - faster than the C++ version (in debug mode)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim rgb32f As New cv.Mat
         ocvb.color.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
-        Dim maxInput = New cv.Mat(rgb32f.Rows, rgb32f.Cols * 3, cv.MatType.CV_32F, rgb32f.Data)
         Dim maxVal As Double, minVal As Double
-        maxInput.MinMaxLoc(minVal, maxVal)
+        rgb32f.MinMaxLoc(minVal, maxVal)
 
         Dim planes() = rgb32f.Split()
         Dim sum32f = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32F)
@@ -204,12 +203,97 @@ Public Class Brightness_WhiteBalance
 
         cv.Cv2.Merge(planes, rgb32f)
         rgb32f.ConvertTo(dst1, cv.MatType.CV_8UC3)
-
-        Dim diff = dst1 - ocvb.color
-        diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
     End Sub
     Public Sub Close()
         WhiteBalance_Close(wPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+' https://blog.csdn.net/just_sort/article/details/85982871
+Public Class Brightness_ChangeMask
+    Inherits ocvbClass
+    Dim white As Brightness_WhiteBalance
+    Dim whiteCPP As Brightness_WhiteBalance_CPP
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        white = New Brightness_WhiteBalance(ocvb, caller)
+        If standalone = False Then white.sliders.Visible = False
+        whiteCPP = New Brightness_WhiteBalance_CPP(ocvb, caller)
+        If standalone = False Then whiteCPP.sliders.Visible = False
+
+        ocvb.desc = "Create a mask for the changed pixels after white balance"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static countdown = 60
+        Static whiteFlag As Boolean
+        If countdown = 0 Then
+            countdown = 60
+            whiteFlag = Not whiteFlag
+        End If
+        countdown -= 1
+
+        If whiteFlag Then
+            white.Run(ocvb)
+            dst1 = white.dst1
+            label1 = "White balanced image - VB version"
+            label2 = "Mask of changed pixels - VB version"
+        Else
+            whiteCPP.Run(ocvb)
+            dst1 = whiteCPP.dst1
+            label1 = "White balanced image - C++ version"
+            label2 = "Mask of changed pixels - C++ version"
+        End If
+        Dim diff = dst1 - ocvb.color
+        dst2 = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+' https://blog.csdn.net/just_sort/article/details/85982871
+Public Class Brightness_PlotHist
+    Inherits ocvbClass
+    Dim white As Brightness_ChangeMask
+    Public hist1 As Histogram_KalmanSmoothed
+    Public hist2 As Histogram_KalmanSmoothed
+    Dim mat2to1 As Mat_2to1
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        white = New Brightness_ChangeMask(ocvb, caller)
+
+        hist1 = New Histogram_KalmanSmoothed(ocvb, caller)
+        hist1.sliders.Visible = False
+        hist1.plotHist.sliders.Visible = False
+
+        hist2 = New Histogram_KalmanSmoothed(ocvb, caller)
+        hist2.sliders.Visible = False
+        hist2.plotHist.sliders.Visible = False
+
+        mat2to1 = New Mat_2to1(ocvb, caller)
+
+        ocvb.desc = "Plot the histogram of the before and after white balancing"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        hist1.gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        hist1.Run(ocvb)
+        mat2to1.mat(0) = hist1.dst1
+
+        white.Run(ocvb)
+        dst1 = white.dst1
+
+        hist2.gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        hist2.Run(ocvb)
+        mat2to1.mat(1) = hist2.dst1
+
+        mat2to1.Run(ocvb)
+        dst2 = mat2to1.dst1
+        label2 = "The top is before white balance"
     End Sub
 End Class

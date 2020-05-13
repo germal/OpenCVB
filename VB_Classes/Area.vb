@@ -103,7 +103,7 @@ Public Class Area_MinMotionRect
         input = New BGSubtract_MOG(ocvb, caller)
         input.sliders.TrackBar1.Value = 100 ' low threshold to maximize motion
         ocvb.desc = "Use minRectArea to encompass detected motion"
-        ocvb.label1 = "MinRectArea of MOG motion"
+        label1 = "MinRectArea of MOG motion"
     End Sub
 
     Private Function motionRectangles(gray As cv.Mat, rColors() As cv.Vec3b) As cv.Mat
@@ -118,7 +118,6 @@ Public Class Area_MinMotionRect
         Return gray
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        input.src = ocvb.color
         input.Run(ocvb)
         Dim gray As cv.Mat
         If input.dst1.Channels = 1 Then gray = input.dst1 Else gray = input.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -137,8 +136,8 @@ Public Class Area_FindNonZero
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = "Non-zero original points"
-        ocvb.label2 = "Coordinates of non-zero points"
+        label1 = "Non-zero original points"
+        label2 = "Coordinates of non-zero points"
         ocvb.desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

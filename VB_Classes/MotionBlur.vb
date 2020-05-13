@@ -133,8 +133,8 @@ Public Class MotionBlur_Deblur
         sliders.setupTrackBar4(ocvb, caller, "Deblur Gamma", 1, 100, 5)
 
         ocvb.desc = "Deblur a motion blurred image"
-        ocvb.label1 = "Blurred Image Input"
-        ocvb.label2 = "Deblurred Image Output"
+        label1 = "Blurred Image Input"
+        label2 = "Deblurred Image Output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(0).Checked Then

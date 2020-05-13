@@ -75,8 +75,8 @@ Public Class Python_Run
             StartPython(ocvb, "")
         End If
         ocvb.desc = "Run Python app: " + pythonApp.Name
-        ocvb.label1 = ""
-        ocvb.label2 = ""
+        label1 = ""
+        label2 = ""
         dst1.SetTo(0)
         dst2.SetTo(0)
     End Sub

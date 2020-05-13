@@ -34,7 +34,7 @@ Public Class Sift_Basics_CS
         dst1(New cv.Rect(0, 0, dst1.Width, dst1.Height)).CopyTo(dst1)
         dst1(New cv.Rect(dst1.Width, 0, dst1.Width, dst1.Height)).CopyTo(dst2)
 
-        ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
+        label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
 End Class
 
@@ -91,7 +91,7 @@ Public Class Sift_Basics_CS_MT
         output(New cv.Rect(0, 0, output.Width, output.Height)).CopyTo(dst1)
         output(New cv.Rect(output.Width, 0, output.Width, output.Height)).CopyTo(dst2)
 
-        ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
+        label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
 End Class
 

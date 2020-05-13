@@ -13,14 +13,15 @@ Public Class CamShift_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plotHist = New Plot_Histogram(ocvb, caller)
+        plotHist.sliders.Visible = False
 
         sliders.setupTrackBar1(ocvb, caller, "CamShift vMin", 0, 255, 32)
         sliders.setupTrackBar2(ocvb, caller, "CamShift vMax", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, caller, "CamShift Smin", 0, 255, 60)
         sliders.setupTrackBar4(ocvb, caller, "CamShift Histogram bins", 16, 255, 32)
 
-        ocvb.label1 = "Draw anywhere to create histogram and start camshift"
-        ocvb.label2 = "Histogram of targeted region (hue only)"
+        label1 = "Draw anywhere to create histogram and start camshift"
+        label2 = "Histogram of targeted region (hue only)"
         ocvb.desc = "CamShift Demo - draw on the images to define the object to track."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -29,8 +30,6 @@ Public Class CamShift_Basics
         Static vMaxLast As Int32
         Static sBinsLast As cv.Scalar
         Static roi_hist As New cv.Mat
-        Dim mask As New cv.Mat
-        ocvb.color.CopyTo(dst1)
         Dim hsv = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim hue = hsv.EmptyClone()
         Dim bins = sliders.TrackBar4.Value
@@ -41,7 +40,7 @@ Public Class CamShift_Basics
         Dim sbins = New cv.Scalar(0, sliders.TrackBar3.Value, min)
 
         cv.Cv2.MixChannels({hsv}, {hue}, {0, 0})
-        mask = hsv.InRange(sbins, New cv.Scalar(180, 255, max))
+        Dim mask = hsv.InRange(sbins, New cv.Scalar(180, 255, max))
 
         If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
             vMinLast = min
@@ -63,7 +62,7 @@ Public Class CamShift_Basics
             If dst2.Channels = 1 Then dst2 = ocvb.color.EmptyClone()
             dst2 = dst2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         End If
-        dst1.SetTo(0)
+        dst1 = ocvb.color.EmptyClone.SetTo(0)
         ocvb.color.CopyTo(dst1, mask)
         If trackBox.Size.Width > 0 Then dst1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
     End Sub
@@ -76,29 +75,30 @@ End Class
 Public Class CamShift_Foreground
     Inherits ocvbClass
     Dim camshift As CamShift_Basics
-    Dim blob As Depth_Foreground
+    Dim fore As Depth_Foreground
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         camshift = New CamShift_Basics(ocvb, caller)
-        blob = New Depth_Foreground(ocvb, caller)
-        ocvb.label1 = "Automatically finding the head - top of nearest object"
+        fore = New Depth_Foreground(ocvb, caller)
+        label1 = "Automatically finding the head - top of nearest object"
         ocvb.desc = "Use depth to find the head and start the camshift demo. "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim restartRequested As Boolean
         Static depthMin As Int32
         Static depthMax As Int32
-        If blob.trim.sliders.TrackBar1.Value <> depthMin Then
-            depthMin = blob.trim.sliders.TrackBar1.Value
+        If camshift.trackBox.Size.Width < 50 Then restartRequested = True
+        If fore.trim.sliders.TrackBar1.Value <> depthMin Then
+            depthMin = fore.trim.sliders.TrackBar1.Value
             restartRequested = True
         End If
-        If blob.trim.sliders.TrackBar2.Value <> depthMax Then
-            depthMax = blob.trim.sliders.TrackBar2.Value
+        If fore.trim.sliders.TrackBar2.Value <> depthMax Then
+            depthMax = fore.trim.sliders.TrackBar2.Value
             restartRequested = True
         End If
-        If restartRequested Then blob.Run(ocvb)
+        If restartRequested Then fore.Run(ocvb)
         camshift.Run(ocvb)
-        ocvb.label2 = "Mask of objects closer than " + Format(depthMax / 1000, "#0.0") + " meters"
+        dst1 = camshift.dst1
     End Sub
 End Class
 
@@ -118,14 +118,25 @@ Public Class Camshift_Object
 
         camshift = New CamShift_Basics(ocvb, caller)
 
+        label1 = "Largest blob with hue tracked.  Draw enabled."
+        label2 = "Backprojection of depth clusters masked with hue"
         ocvb.desc = "Use the blob depth cluster as input to initialize a camshift algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blob.Run(ocvb)
+        dst2 = blob.dst2.Clone()
 
         Dim largestMask = blob.flood.fBasics.maskSizes.ElementAt(0).Value
-        If camshift.trackBox.Size.Width = 0 Then ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
+        If camshift.trackBox.Size.Width > ocvb.color.Width Or camshift.trackBox.Size.Height > ocvb.color.Height Then
+            ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
+        End If
+        If camshift.trackBox.Size.Width < 50 Then ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
         camshift.Run(ocvb)
+        dst1 = camshift.dst1
+        Dim mask = camshift.dst1.ConvertScaleAbs(255)
+        cv.Cv2.BitwiseNot(mask, mask)
+        dst2.SetTo(0, mask)
+        If camshift.trackBox.Size.Width > 0 Then dst2.Ellipse(camshift.trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
@@ -142,15 +153,20 @@ Public Class Camshift_TopObjects
         setCaller(callerRaw)
         mats = New Mat_4to1(ocvb, caller)
 
+        ocvb.suppressOptions = True
         blob = New Blob_DepthClusters(ocvb, caller)
-        sliders.setupTrackBar1(ocvb, caller, "How often should camshift be reinitialized", 1, 500, 100)
+        blob.sliders.Visible = False
         For i = 0 To cams.Length - 1
             cams(i) = New CamShift_Basics(ocvb, caller)
         Next
+
+        ocvb.suppressOptions = False
+        sliders.setupTrackBar1(ocvb, caller, "Reinitialize camshift after x frames", 1, 500, 100)
         ocvb.desc = "Track"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blob.Run(ocvb)
+        dst1 = blob.dst2
 
         Dim updateFrequency = sliders.TrackBar1.Value
         Dim trackBoxes As New List(Of cv.RotatedRect)
@@ -162,7 +178,7 @@ Public Class Camshift_TopObjects
                 End If
 
                 cams(i).Run(ocvb)
-                mats.mat(i) = dst2.Clone()
+                mats.mat(i) = cams(i).dst1.Clone()
                 trackBoxes.Add(cams(i).trackBox)
             End If
         Next
@@ -170,5 +186,6 @@ Public Class Camshift_TopObjects
             dst1.Ellipse(trackBoxes(i), cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         Next
         mats.Run(ocvb)
+        dst2 = mats.dst1
     End Sub
 End Class

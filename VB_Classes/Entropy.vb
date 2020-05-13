@@ -23,7 +23,7 @@ Public Class Entropy_Basics
         Return entropy
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
+        If standalone Or src.Width = 0 Then src = ocvb.color
         hist.src = src
         hist.Run(ocvb)
         entropy = 0

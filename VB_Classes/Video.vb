@@ -12,7 +12,7 @@ Public Class Video_Basics
         currVideo = srcVideo
         videoOptions.NewVideo(ocvb, srcVideo)
 
-        ocvb.label1 = srcVideo
+        label1 = srcVideo
         ocvb.desc = "Show a video file"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

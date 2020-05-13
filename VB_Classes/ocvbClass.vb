@@ -14,6 +14,8 @@ Public Class ocvbClass : Implements IDisposable
     Public src As New cv.Mat
     Public dst1 As New cv.Mat
     Public dst2 As New cv.Mat
+    Public label1 As String
+    Public label2 As String
     Dim algorithm As Object
     Public Sub setCaller(callerRaw As String)
         If callerRaw = "" Or callerRaw = Me.GetType.Name Then
@@ -26,11 +28,18 @@ Public Class ocvbClass : Implements IDisposable
     End Sub
     Public Sub New()
         algorithm = Me
+        label1 = Me.GetType.Name
     End Sub
     Public Sub NextFrame(ocvb As AlgorithmData)
         algorithm.Run(ocvb)
-        If standalone And dst1.Width <> 0 Then ocvb.result1 = dst1
-        If standalone And dst2.Width <> 0 Then ocvb.result2 = dst2
+        If standalone Then
+            If dst1.Width <> 0 Then ocvb.result1 = dst1
+            If dst2.Width <> 0 Then ocvb.result2 = dst2
+            ocvb.label1 = label1
+            ocvb.label2 = label2
+        End If
+        If standalone Then
+        End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         On Error Resume Next

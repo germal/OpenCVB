@@ -28,10 +28,10 @@ Public Class Etch_ASketch
         Dim directionCount = 1
         If check.Box(1).Checked Then
             keys.input = Choose(ms_rng.Next(1, 5), "down", "up", "left", "right")
-            ocvb.label1 = "Etch_ASketch demo mode - moving randomly"
+            label1 = "Etch_ASketch demo mode - moving randomly"
             directionCount = ms_rng.Next(10, 50)
         Else
-            ocvb.label1 = "Use Up/Down/Left/Right keys to create image"
+            label1 = "Use Up/Down/Left/Right keys to create image"
         End If
         If check.Box(0).Checked Then
             check.Box(0).Checked = False

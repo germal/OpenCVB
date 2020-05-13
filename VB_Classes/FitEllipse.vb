@@ -23,7 +23,7 @@ Public Class FitEllipse_Basics_CPP
 
         ocvb.desc = "Use FitEllipse to draw around a set of points"
         dstHandle = GCHandle.Alloc(dstData, GCHandleType.Pinned)
-        ocvb.label2 = "Green FitEllipse, Yellow=AMS, Red=Direct"
+        label2 = "Green FitEllipse, Yellow=AMS, Red=Direct"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         area.Run(ocvb)  ' get some random clusters of points
@@ -64,6 +64,6 @@ Public Class FitEllipse_Basics_CPP
             box = New cv.RotatedRect(center, size, angle)
             dst2.Ellipse(box, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
         End If
-        ocvb.label1 = "Using MinTriangle to generate " + CStr(area.srcPoints.Count) + " points"
+        label1 = "Using MinTriangle to generate " + CStr(area.srcPoints.Count) + " points"
     End Sub
 End Class

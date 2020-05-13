@@ -10,7 +10,7 @@ Public Class Moments_CentroidKalman
 
         foreground = New kMeans_Depth_FG_BG(ocvb, caller)
 
-        ocvb.label1 = "Red dot = Kalman smoothed centroid"
+        label1 = "Red dot = Kalman smoothed centroid"
         ocvb.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

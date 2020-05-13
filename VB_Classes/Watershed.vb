@@ -4,8 +4,8 @@ Public Class Watershed_Basics
     Public useDepthImage As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = "Draw with left-click to select region."
-        ocvb.label2 = "Mask for watershed (selected regions)."
+        label1 = "Draw with left-click to select region."
+        label2 = "Mask for watershed (selected regions)."
         dst2.SetTo(0)
         ocvb.desc = "Watershed API experiment.  Draw on the image to test."
     End Sub

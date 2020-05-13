@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
-Public Class Clone_Normal
+Public Class Clone_Basics
     Inherits ocvbClass
     Public colorChangeValues As cv.Vec3f
     Public illuminationChangeValues As cv.Vec2f
@@ -8,12 +8,14 @@ Public Class Clone_Normal
     Public cloneSpec As Int32 ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
+
+        label1 = "Clone result - draw anywhere to clone a region"
+        label2 = "Clone Region Mask"
         ocvb.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
-        ocvb.label1 = "Clone result - draw anywhere to clone a region"
-        ocvb.label2 = "Clone Region Mask"
         ocvb.drawRect = New cv.Rect(ocvb.color.Width / 4, ocvb.color.Height / 4, ocvb.color.Width / 2, ocvb.color.Height / 2)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If standalone Or src.Width = 0 Then src = ocvb.color
         Dim mask As New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
         If ocvb.drawRect = New cv.Rect Then
             mask.SetTo(255)
@@ -22,7 +24,8 @@ Public Class Clone_Normal
         End If
         dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        Select Case cloneSpec
+        If standalone And ocvb.frameCount Mod 10 = 0 Then cloneSpec += 1
+        Select Case cloneSpec Mod 3
             Case 0
                 cv.Cv2.ColorChange(ocvb.color, mask, dst1, colorChangeValues(0), colorChangeValues(1), colorChangeValues(2))
             Case 1
@@ -38,20 +41,25 @@ End Class
 
 Public Class Clone_ColorChange
     Inherits ocvbClass
-    Dim clone As Clone_Normal
+    Dim clone As Clone_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        clone = New Clone_Normal(ocvb, caller)
-        ocvb.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
+        clone = New Clone_Basics(ocvb, caller)
 
         sliders.setupTrackBar1(ocvb, caller, "Color Change - Red", 5, 25, 15)
         sliders.setupTrackBar2(ocvb, caller, "Color Change - Green", 5, 25, 5)
         sliders.setupTrackBar3(ocvb, caller, "Color Change - Blue", 5, 25, 5)
+
+        label1 = "Draw anywhere to select different clone region"
+        label2 = "Mask used for clone"
+        ocvb.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(sliders.TrackBar1.Value / 10, sliders.TrackBar2.Value / 10, sliders.TrackBar1.Value / 10)
         clone.Run(ocvb)
+        dst1 = clone.dst1
+        dst2 = clone.dst2
     End Sub
 End Class
 
@@ -60,19 +68,24 @@ End Class
 
 Public Class Clone_IlluminationChange
     Inherits ocvbClass
-    Dim clone As Clone_Normal
+    Dim clone As Clone_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        clone = New Clone_Normal(ocvb, caller)
-        ocvb.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
+        clone = New Clone_Basics(ocvb, caller)
 
         sliders.setupTrackBar1(ocvb, caller, "Alpha", 0, 20, 2)
         sliders.setupTrackBar2(ocvb, caller, "Beta", 0, 20, 2)
+
+        label1 = "Draw anywhere to select different clone region"
+        label2 = "Mask used for clone"
+        ocvb.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(sliders.TrackBar1.Value / 10, sliders.TrackBar2.Value / 10)
         clone.Run(ocvb)
+        dst1 = clone.dst1
+        dst2 = clone.dst2
     End Sub
 End Class
 
@@ -82,19 +95,24 @@ End Class
 
 Public Class Clone_TextureFlattening
     Inherits ocvbClass
-    Dim clone As Clone_Normal
+    Dim clone As Clone_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        clone = New Clone_Normal(ocvb, caller)
-        ocvb.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
+        clone = New Clone_Basics(ocvb, caller)
 
         sliders.setupTrackBar1(ocvb, caller, "Low Threshold", 0, 100, 10)
         sliders.setupTrackBar2(ocvb, caller, "High Threshold", 0, 100, 50)
+
+        label1 = "Draw anywhere to select different clone region"
+        label2 = "mask used for clone"
+        ocvb.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cv.Vec2f(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
         clone.Run(ocvb)
+        dst1 = clone.dst1
+        dst2 = clone.dst2
     End Sub
 End Class
 
@@ -127,13 +145,14 @@ Public Class Clone_Eagle
         mask = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/Clonemask.png")
         maskROI = New cv.Rect(srcROI.Width, 40, mask.Width, mask.Height)
 
+        dst2 = ocvb.color.EmptyClone.SetTo(0)
         dst2(srcROI) = sourceImage
         dst2(maskROI) = mask
 
         pt = New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
+        label1 = "Move Eagle by clicking in any location."
+        label2 = "Source image and source mask."
         ocvb.desc = "Clone an eagle into the video stream."
-        ocvb.label1 = "Move Eagle by clicking in any location."
-        ocvb.label2 = "Source image and source mask."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1 = ocvb.color.Clone()
@@ -170,8 +189,8 @@ Public Class Clone_Seamless
         radio.check(1).Text = "Seamless Mono Clone"
         radio.check(2).Text = "Seamless Mixed Clone"
         radio.check(0).Checked = True
-        ocvb.label1 = "Mask for Clone"
-        ocvb.label2 = "Results for SeamlessClone"
+        label1 = "Mask for Clone"
+        label2 = "Results for SeamlessClone"
         ocvb.desc = "Use the seamlessclone API to merge color and depth..."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

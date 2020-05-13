@@ -68,8 +68,8 @@ Public Class ML_FillRGBDepth_MT
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
         shadow = New Depth_Holes(ocvb, caller)
-        ocvb.label1 = "ML filled shadow"
-        ocvb.label2 = ""
+        label1 = "ML filled shadow"
+        label2 = ""
         ocvb.desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -103,7 +103,7 @@ Public Class ML_FillRGBDepth
         shadow = New Depth_Holes(ocvb, caller)
         shadow.sliders.TrackBar1.Value = 3
 
-        ocvb.label2 = "ML filled shadow"
+        label2 = "ML filled shadow"
         ocvb.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -137,8 +137,8 @@ Public Class ML_DepthFromColor_MT
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
 
-        ocvb.label1 = "Predicted Depth"
-        ocvb.label2 = "Mask of color and depth input"
+        label1 = "Predicted Depth"
+        label2 = "Mask of color and depth input"
         ocvb.desc = "Use RGB, X, and Y to predict depth across the entire image, maxDepth = slider value."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -176,7 +176,7 @@ Public Class ML_DepthFromColor_MT
                     predictedDepth(roi) = depthResponse.Reshape(1, roi.Height)
                 End If
             End Sub)
-        ocvb.label2 = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
+        label2 = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
         colorizer.src = predictedDepth
         colorizer.Run(ocvb)
         dst1 = colorizer.dst1
@@ -255,8 +255,8 @@ Public Class ML_DepthFromColor
 
         mats.Run(ocvb)
         dst2 = mats.dst1
-        ocvb.label1 = "Predicted Depth"
-        ocvb.label2 = "shadow, empty, Depth Mask < " + CStr(sliders.TrackBar1.Value) + ", Learn Input"
+        label1 = "Predicted Depth"
+        label2 = "shadow, empty, Depth Mask < " + CStr(sliders.TrackBar1.Value) + ", Learn Input"
     End Sub
 End Class
 
@@ -281,7 +281,7 @@ Public Class ML_DepthFromXYColor
         resized = New Resize_Percentage(ocvb, caller)
         resized.sliders.TrackBar1.Value = 2
 
-        ocvb.label1 = "Predicted Depth"
+        label1 = "Predicted Depth"
         ocvb.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -350,7 +350,7 @@ Public Class ML_DepthFromXYColor
 
         mats.Run(ocvb)
         dst2 = mats.dst1
-        ocvb.label2 = "shadow, empty, Depth Mask < " + CStr(sliders.TrackBar1.Value) + ", Learn Input"
+        label2 = "shadow, empty, Depth Mask < " + CStr(sliders.TrackBar1.Value) + ", Learn Input"
     End Sub
 End Class
 
@@ -375,8 +375,8 @@ Public Class ML_EdgeDepth
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
 
-        ocvb.label1 = "Depth Shadow (inverse of color and depth)"
-        ocvb.label2 = "Predicted Depth"
+        label1 = "Depth Shadow (inverse of color and depth)"
+        label2 = "Predicted Depth"
         ocvb.desc = "Use RGB to predict depth near edges."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -414,7 +414,7 @@ Public Class ML_EdgeDepth
                     predictedDepth(roi) = depthResponse.Reshape(1, roi.Height)
                 End If
             End Sub)
-        ocvb.label2 = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
+        label2 = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
         colorizer.src = predictedDepth
         colorizer.Run(ocvb)
         dst2 = colorizer.dst1

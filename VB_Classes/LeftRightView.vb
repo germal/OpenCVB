@@ -7,15 +7,15 @@ Public Class LeftRightView_Basics
         ocvb.desc = "Show the left and right views from the 3D Camera"
         Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
-                ocvb.label1 = "Left Image"
-                ocvb.label2 = "Right Image"
+                label1 = "Left Image"
+                label2 = "Right Image"
             Case Kinect4AzureCam
-                ocvb.label1 = "Infrared Image"
-                ocvb.label2 = "There is only one infrared image with Kinect"
+                label1 = "Infrared Image"
+                label2 = "There is only one infrared image with Kinect"
                 sliders.TrackBar1.Value = 0
             Case T265Camera
-                ocvb.label1 = "Raw Left View Image (clipped to fit)"
-                ocvb.label2 = "Raw Right Right Image (clipped to fit)"
+                label1 = "Raw Left View Image (clipped to fit)"
+                label2 = "Raw Right Right Image (clipped to fit)"
                 sliders.TrackBar1.Value = 0
         End Select
     End Sub
@@ -45,15 +45,15 @@ Public Class LeftRightView_CompareUndistorted
         sliders.setupTrackBar3(ocvb, caller, "Slice Height", 1, 300, 50)
         Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
-                ocvb.label1 = "Left Image"
-                ocvb.label2 = "Right Image"
+                label1 = "Left Image"
+                label2 = "Right Image"
             Case Kinect4AzureCam
-                ocvb.label1 = "Infrared Image"
-                ocvb.label2 = "There is only one infrared image with Kinect"
+                label1 = "Infrared Image"
+                label2 = "There is only one infrared image with Kinect"
                 sliders.TrackBar1.Value = 0
             Case T265Camera
-                ocvb.label1 = "Undistorted Slices of Left and Right Views"
-                ocvb.label2 = "Undistorted Right Image"
+                label1 = "Undistorted Slices of Left and Right Views"
+                label2 = "Undistorted Right Image"
                 sliders.TrackBar1.Value = 50
         End Select
         ocvb.desc = "Show slices of the left and right view next to each other for visual comparison"
@@ -104,15 +104,15 @@ Public Class LeftRightView_CompareRaw
         sliders.setupTrackBar3(ocvb, caller, "Slice Height", 1, 120, 50)
         Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
-                ocvb.label1 = "Left Image"
-                ocvb.label2 = "Right Image"
+                label1 = "Left Image"
+                label2 = "Right Image"
             Case Kinect4AzureCam
-                ocvb.label1 = "Infrared Image"
-                ocvb.label2 = "There is only one infrared image with Kinect"
+                label1 = "Infrared Image"
+                label2 = "There is only one infrared image with Kinect"
                 sliders.TrackBar1.Value = 0
             Case T265Camera
-                ocvb.label1 = "Raw Left View Image"
-                ocvb.label2 = "Raw Right Right Image"
+                label1 = "Raw Left View Image"
+                label2 = "Raw Right Right Image"
                 sliders.TrackBar1.Value = 50
         End Select
         lrView = New LeftRightView_Basics(ocvb, caller)
@@ -153,8 +153,8 @@ Public Class LeftRightView_Features
         lrView = New LeftRightView_Basics(ocvb, caller)
 
         ocvb.desc = "Find GoodFeatures in the left and right depalettized infrared images"
-        ocvb.label1 = "Left Image"
-        ocvb.label2 = "Right Image"
+        label1 = "Left Image"
+        label2 = "Right Image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         lrView.Run(ocvb)
@@ -189,8 +189,8 @@ Public Class LeftRightView_Palettized
         palette = New Palette_ColorMap(ocvb, caller)
 
         ocvb.desc = "Add color to the 8-bit infrared images."
-        ocvb.label1 = "Left Image"
-        ocvb.label2 = "Right Image"
+        label1 = "Left Image"
+        label2 = "Right Image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         lrView.Run(ocvb)
@@ -219,8 +219,8 @@ Public Class LeftRightView_BRISK
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Add color to the 8-bit infrared images."
-        ocvb.label1 = "Infrared Left Image"
-        ocvb.label2 = "Infrared Right Image"
+        label1 = "Infrared Left Image"
+        label2 = "Infrared Right Image"
 
         brisk = New BRISK_Basics(ocvb, caller)
         brisk.sliders.TrackBar1.Value = 20

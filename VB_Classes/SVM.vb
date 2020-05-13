@@ -52,8 +52,8 @@ Public Class SVM_Basics
         setCaller(callerRaw)
         svmOptions = New SVM_Options(ocvb, caller)
         ocvb.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
-        ocvb.label1 = "SVM_Basics input data"
-        ocvb.label2 = "Results - line is ground truth"
+        label1 = "SVM_Basics input data"
+        label2 = "Results - line is ground truth"
     End Sub
     Private Function f(x As Double) As Double
         Return x + 50 * Math.Sin(x / 15.0)
@@ -138,8 +138,8 @@ Public Class SVM_Basics_MT
         grid.sliders.TrackBar2.Value = 16
 
         ocvb.desc = "Use SVM to classify random points.  Testing the benefit of multi-threading prediction."
-        ocvb.label1 = "SVM_Basics input data"
-        ocvb.label2 = "Predictions - line is ground truth"
+        label1 = "SVM_Basics input data"
+        label2 = "Predictions - line is ground truth"
     End Sub
     Private Function f(x As Double) As Double
         Return x + 50 * Math.Sin(x / 15.0)

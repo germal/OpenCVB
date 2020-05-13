@@ -19,7 +19,7 @@ Public Class Histogram_Basics
         ocvb.desc = "Plot histograms for up to 3 channels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
+        If standalone or src.width = 0 Then src = ocvb.color
         bins = sliders.TrackBar1.Value
 
         Dim thickness = sliders.TrackBar2.Value
@@ -50,7 +50,7 @@ Public Class Histogram_Basics
         If standalone Or plotRequested Then
             maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
             AddPlotScale(dst1, 0, maxVal, sliders.TrackBar3.Value / 10)
-            ocvb.label1 = "Histogram for src image (default color) - " + CStr(bins) + " bins"
+            label1 = "Histogram for src image (default color) - " + CStr(bins) + " bins"
         End If
     End Sub
 End Class
@@ -167,7 +167,7 @@ Public Class Histogram_EqualizeColor
         mats = New Mat_2to1(ocvb, caller)
 
         ocvb.desc = "Create an equalized histogram of the color image.  Histogram differences are very subtle but image is noticeably enhanced."
-        ocvb.label1 = "Image Enhanced with Equalized Histogram"
+        label1 = "Image Enhanced with Equalized Histogram"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim rgb(2) As cv.Mat
@@ -191,7 +191,7 @@ Public Class Histogram_EqualizeColor
 
             mats.Run(ocvb)
             dst2 = mats.dst1
-            ocvb.label2 = "Before (top) and After Red Histogram (only subtle)"
+            label2 = "Before (top) and After Red Histogram (only subtle)"
 
             cv.Cv2.Merge(rgbEq, dst1)
         End If
@@ -210,7 +210,7 @@ Public Class Histogram_EqualizeGray
         ocvb.desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone or src.width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         histogram.gray = src
 
         cv.Cv2.EqualizeHist(histogram.gray, histogram.gray)
@@ -271,7 +271,7 @@ Public Class Histogram_2D_XZ_YZ
         sliders.setupTrackBar2(ocvb, caller, "Histogram Z bins", 1, 200, 100)
 
         ocvb.desc = "Create a 2D histogram for depth in XZ and YZ."
-        ocvb.label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
+        label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         xyDepth.Run(ocvb) ' get xyDepth coordinates - note: in image coordinates not physical coordinates.
@@ -314,7 +314,7 @@ Public Class Histogram_BackProjectionGrayScale
         sliders.setupTrackBar2(ocvb, caller, "Number of neighbors to include", 0, 10, 1)
 
         ocvb.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
-        ocvb.label2 = "Grayscale Histogram"
+        label2 = "Grayscale Histogram"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.sliders.TrackBar1.Value = sliders.TrackBar1.Value ' reflect the number of bins into the histogram code.
@@ -341,7 +341,7 @@ Public Class Histogram_BackProjectionGrayScale
         Dim mask = hist.gray.InRange(pixelMin, pixelMax)
         dst1.SetTo(0)
         ocvb.color.CopyTo(dst1, mask)
-        ocvb.label1 = "BackProjection of most frequent pixel + " + CStr(neighbors) + " neighbor" + If(neighbors <> 1, "s", "")
+        label1 = "BackProjection of most frequent pixel + " + CStr(neighbors) + " neighbor" + If(neighbors <> 1, "s", "")
     End Sub
 End Class
 
@@ -359,8 +359,8 @@ Public Class Histogram_BackProjection
         hist.dst1 = dst2
 
         ocvb.desc = "Backproject from a hue and saturation histogram."
-        ocvb.label1 = "Backprojection of detected hue and saturation."
-        ocvb.label2 = "2D Histogram for Hue (X) vs. Saturation (Y)"
+        label1 = "Backprojection of detected hue and saturation."
+        label2 = "2D Histogram for Hue (X) vs. Saturation (Y)"
 
         ocvb.drawRect = New cv.Rect(100, 100, 200, 100)  ' an arbitrary rectangle to use for the backprojection.
     End Sub
@@ -439,15 +439,14 @@ Public Class Histogram_KalmanSmoothed
     Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        dst1 = dst2
         plotHist = New Plot_Histogram(ocvb, caller)
 
         kalman = New Kalman_Basics(ocvb, caller)
 
         sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 1, 255, 50)
 
-        ocvb.label1 = "Gray scale input to histogram"
-        ocvb.label2 = "Histogram - x=bins/y=count"
+        label1 = "Gray scale input to histogram"
+        label2 = "Histogram - x=bins/y=count"
         ocvb.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -469,7 +468,7 @@ Public Class Histogram_KalmanSmoothed
         cv.Cv2.CalcHist(New cv.Mat() {gray}, New Integer() {0}, mask, histogram, 1, dimensions, ranges)
 
         dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.label2 = "Plot Histogram bins = " + CStr(plotHist.bins)
+        label2 = "Plot Histogram bins = " + CStr(plotHist.bins)
 
         ReDim kalman.input(plotHist.bins - 1)
         For i = 0 To plotHist.bins - 1
@@ -615,7 +614,7 @@ Public Class Histogram_DepthValleys
         Next
         dst1 = ocvb.color.EmptyClone.SetTo(0)
         histogramBarsValleys(dst1, hist.plotHist.hist, plotColors)
-        ocvb.label1 = "Histogram clustered by valleys and smoothed"
+        label1 = "Histogram clustered by valleys and smoothed"
     End Sub
 End Class
 
@@ -645,8 +644,8 @@ Public Class Histogram_DepthClusters
             dst2.SetTo(ocvb.colorScalar(i), mask)
         Next
         If standalone Then
-            ocvb.label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
-            ocvb.label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"
+            label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
+            label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"
         End If
     End Sub
 End Class

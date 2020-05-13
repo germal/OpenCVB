@@ -9,7 +9,7 @@ Public Class DNN_Test
     Dim net As Net
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label2 = "Input Image"
+        label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -48,7 +48,7 @@ Public Class DNN_Caffe_CS
     Dim caffeCS As CS_Classes.DNN
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label2 = "Input Image"
+        label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
 
         Dim protoTxt = ocvb.parms.HomeDir + "Data/bvlc_googlenet.prototxt"
@@ -105,7 +105,7 @@ Public Class DNN_Basics
             ocvb.putText(New ActiveClass.TrueType("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100))
         End If
         ocvb.desc = "Use OpenCV's dnn from Caffe file."
-        ocvb.label1 = "Cropped Input Image - must be square!"
+        label1 = "Cropped Input Image - must be square!"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If dnnPrepared Then
@@ -126,7 +126,7 @@ Public Class DNN_Basics
                 Dim confidenceThreshold = 0.8F
                 Dim rows = ocvb.color(crop).Rows
                 Dim cols = ocvb.color(crop).Cols
-                ocvb.label2 = ""
+                label2 = ""
                 For i = 0 To detectionMat.Rows - 1
                     Dim confidence = detectionMat.Get(Of Single)(i, 2)
                     If confidence > confidenceThreshold Then

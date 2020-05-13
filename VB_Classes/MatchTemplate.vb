@@ -21,7 +21,7 @@ Public Class MatchTemplate_Basics
         radio.check(5).Text = "SqDiffNormed"
         radio.check(1).Checked = True
         sliders.setupTrackBar1(ocvb, caller, "Sample Size", 2, 10000, 100)
-        ocvb.label2 = "Log of correlation results"
+        label2 = "Log of correlation results"
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -45,9 +45,9 @@ Public Class MatchTemplate_Basics
         cv.Cv2.MatchTemplate(sample1, sample2, correlationMat, matchOption)
         If ocvb.frameCount Mod reportFreq = 0 Then
             Dim correlation = correlationMat.Get(Of Single)(0, 0)
-            ocvb.label1 = "Correlation = " + Format(correlation, "#,##0.000")
+            label1 = "Correlation = " + Format(correlation, "#,##0.000")
             if standalone Then
-                ocvb.label1 = matchText + " for " + CStr(sample1.Rows) + " samples each = " + Format(correlation, "#,##0.00")
+                label1 = matchText + " for " + CStr(sample1.Rows) + " samples each = " + Format(correlation, "#,##0.00")
                 flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
                 flow.Run(ocvb)
             End If
@@ -93,7 +93,7 @@ Public Class MatchTemplate_RowCorrelation
         Static maxCorrelation = Single.NegativeInfinity
         If correlation < minCorrelation Then minCorrelation = correlation
         If correlation > maxCorrelation Then maxCorrelation = correlation
-        ocvb.label1 = "Min = " + Format(minCorrelation, "#,##0.00") + " max = " + Format(maxCorrelation, "#,##0.0000")
+        label1 = "Min = " + Format(minCorrelation, "#,##0.00") + " max = " + Format(maxCorrelation, "#,##0.0000")
     End Sub
 End Class
 
@@ -113,8 +113,8 @@ Public Class MatchTemplate_DrawRect
 
         ocvb.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
 
-        ocvb.label1 = "Probabilities (draw rectangle to test again)"
-        ocvb.label2 = "White is input, Red circle centers highest probability"
+        label1 = "Probabilities (draw rectangle to test again)"
+        label2 = "White is input, Red circle centers highest probability"
         ocvb.desc = "Find the requested template in an image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -163,8 +163,8 @@ Public Class MatchTemplate_BestTemplate_MT
 
         ocvb.parms.ShowOptions = False ' we won't need the options...
 
-        ocvb.label1 = "Probabilities - drawing is not used."
-        ocvb.label2 = "White is highest entropy (input). Red is best match."
+        label1 = "Probabilities - drawing is not used."
+        label2 = "White is highest entropy (input). Red is best match."
         ocvb.desc = "Find the best object to track in the image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -26,12 +26,12 @@ Public Class BGSubtract_Basics_CPP
                 Else
                     If ocvb.frameCount > 0 Then BGSubtract_BGFG_Close(bgfs)
                     currMethod = i
-                    ocvb.label1 = "Method = " + radio.check(i).Text
+                    label1 = "Method = " + radio.check(i).Text
                     bgfs = BGSubtract_BGFG_Open(currMethod)
                 End If
             End If
         Next
-        if standalone Then src = ocvb.color
+        If standalone Or src.Width = 0 Then src = ocvb.color
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
@@ -64,7 +64,7 @@ Public Class BGSubtract_MotionDetect_MT
         Next
         radio.check(0).Text = "1 thread"
         radio.check(5).Checked = True
-        ocvb.label2 = "Only Motion Added"
+        label2 = "Only Motion Added"
         ocvb.desc = "Detect Motion for use with background subtraction"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -115,12 +115,12 @@ Public Class BGSubtract_Basics_MT
 
         sliders.setupTrackBar1(ocvb, caller, "Correlation Threshold", 0, 1000, 980)
 
-        ocvb.label2 = "Only Motion Added"
+        label2 = "Only Motion Added"
         ocvb.desc = "Detect Motion in the color image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
-        If standalone Then src = ocvb.color
+        If standalone Or src.Width = 0 Then src = ocvb.color
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.EmptyClone.SetTo(0)
         If ocvb.frameCount = 0 Then dst2 = src.Clone()
@@ -146,8 +146,8 @@ Public Class BGSubtract_Depth_MT
         bgsub = New BGSubtract_Basics_MT(ocvb, caller)
         shadow = New Depth_Holes(ocvb, caller)
         ocvb.desc = "Detect Motion in the depth image - more work needed"
-        ocvb.label1 = "Depth data input"
-        ocvb.label2 = "Accumulated depth image"
+        label1 = "Depth data input"
+        label2 = "Accumulated depth image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb) ' get where depth is zero
@@ -173,7 +173,7 @@ Public Class BGSubtract_MOG
         ocvb.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
+        If standalone Or src.Width = 0 Then src = ocvb.color
         If src.Channels = 3 Then
             gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
@@ -222,7 +222,7 @@ Public Class BGSubtract_GMG_KNN
         ocvb.desc = "GMG and KNN API's to subtract background"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
+        If standalone Or src.Width = 0 Then src = ocvb.color
         If ocvb.frameCount < 120 Then
             ocvb.putText(New ActiveClass.TrueType("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(ocvb.frameCount), 10, 60, RESULT2))
         Else
@@ -250,8 +250,8 @@ Public Class BGSubtract_MOG_RGBDepth
 
         MOGDepth = cv.BackgroundSubtractorMOG.Create()
         MOGRGB = cv.BackgroundSubtractorMOG.Create()
-        ocvb.label1 = "Unstable depth"
-        ocvb.label1 = "Unstable color"
+        label1 = "Unstable depth"
+        label1 = "Unstable color"
         ocvb.desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -282,8 +282,8 @@ Public Class BGSubtract_MOG_Retina
         sliders.setupTrackBar1(ocvb, caller, "Uncertainty threshold", 1, 255, 100)
 
         ocvb.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
-        ocvb.label1 = "MOG results of depth motion"
-        ocvb.label2 = "Difference from retina depth motion."
+        label1 = "MOG results of depth motion"
+        label2 = "Difference from retina depth motion."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         retina.src = ocvb.RGBDepth
@@ -307,14 +307,13 @@ Public Class BGSubtract_DepthOrColorMotion
         ocvb.desc = "Detect motion with both depth and color changes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        motion.src = ocvb.color
         motion.Run(ocvb)
         dst1 = motion.dst1
         dst2 = motion.dst2
         Dim mask As New cv.Mat
         cv.Cv2.BitwiseNot(dst1, mask)
         ocvb.color.CopyTo(dst2, mask)
-        ocvb.label2 = "Image with instability filled with color data"
+        label2 = "Image with instability filled with color data"
     End Sub
 End Class
 
@@ -391,12 +390,12 @@ Public Class BGSubtract_Synthetic_CPP
         sliders.setupTrackBar2(ocvb, caller, "Synthetic Magnitude", 1, 40, 20)
         sliders.setupTrackBar3(ocvb, caller, "Synthetic Wavespeed x100", 1, 400, 20)
         sliders.setupTrackBar4(ocvb, caller, "Synthetic ObjectSpeed", 1, 20, 15)
-        ocvb.label1 = ""
-        ocvb.label2 = "Synthetic background/foreground image."
+        label1 = ""
+        label2 = "Synthetic background/foreground image."
         ocvb.desc = "Generate a synthetic input to background subtraction method - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
+        If standalone Or src.Width = 0 Then src = ocvb.color
         If amplitude <> sliders.TrackBar1.Value Or magnitude <> sliders.TrackBar2.Value Or waveSpeed <> sliders.TrackBar3.Value Or
             objectSpeed <> sliders.TrackBar4.Value Then
 
@@ -447,7 +446,6 @@ Public Class BGSubtract_Synthetic
         ocvb.desc = "Demonstrate background subtraction algorithms with synthetic images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        synth.src = ocvb.color
         synth.Run(ocvb)
         dst2 = synth.dst2
         bgfg.src = dst2

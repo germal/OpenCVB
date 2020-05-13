@@ -4,7 +4,7 @@ Public Class intrinsicsLeft_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Show the depth camera intrinsicsLeft."
-        ocvb.label2 = "ppx/ppy location"
+        label2 = "ppx/ppy location"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim ttStart = 40

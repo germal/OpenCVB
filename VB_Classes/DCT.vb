@@ -6,8 +6,8 @@ Public Class DCT_RGB
         sliders.setupTrackBar1(ocvb, caller, "Remove Frequencies < x", 0, 100, 1)
 
         ocvb.desc = "Apply OpenCV's Discrete Cosine Transform to an RGB image and use slider to remove the highest frequencies."
-        ocvb.label1 = "Reconstituted RGB image"
-        ocvb.label2 = "Difference from original"
+        label1 = "Reconstituted RGB image"
+        label2 = "Difference from original"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim srcPlanes() As cv.Mat = Nothing
@@ -26,7 +26,7 @@ Public Class DCT_RGB
             cv.Cv2.Dct(freqPlanes(i), src32f, cv.DctFlags.Inverse)
             src32f.ConvertTo(srcPlanes(i), cv.MatType.CV_8UC1, 255)
         Next
-        ocvb.label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed"
+        label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed"
 
         cv.Cv2.Merge(srcPlanes, dst1)
 
@@ -42,7 +42,7 @@ Public Class DCT_RGBDepth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Remove Frequencies < x", 0, 100, 1)
-        ocvb.label2 = "Subtract DCT inverse from Grayscale depth"
+        label2 = "Subtract DCT inverse from Grayscale depth"
         ocvb.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -54,7 +54,7 @@ Public Class DCT_RGBDepth
 
         Dim roi As New cv.Rect(0, 0, sliders.TrackBar1.Value, src32f.Height)
         If roi.Width > 0 Then frequencies(roi).SetTo(0)
-        ocvb.label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed"
+        label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
         src32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)
@@ -72,7 +72,7 @@ Public Class DCT_Grayscale
         sliders.setupTrackBar1(ocvb, caller, "Remove Frequencies < x", 0, 100, 1)
 
         ocvb.desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
-        ocvb.label2 = "Difference from original"
+        label2 = "Difference from original"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -83,7 +83,7 @@ Public Class DCT_Grayscale
 
         Dim roi As New cv.Rect(0, 0, sliders.TrackBar1.Value, src32f.Height)
         If roi.Width > 0 Then frequencies(roi).SetTo(0)
-        ocvb.label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed"
+        label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
         src32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)
@@ -105,7 +105,7 @@ Public Class DCT_FeatureLess_MT
         dct = New DCT_Grayscale(ocvb, caller)
         dct.sliders.TrackBar1.Value = 1
         ocvb.desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
-        ocvb.label2 = "FeatureLess RGB regions"
+        label2 = "FeatureLess RGB regions"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dct.Run(ocvb)
@@ -132,7 +132,7 @@ Public Class DCT_FeatureLess_MT
         End Sub)
         dst2.SetTo(0)
         ocvb.color.CopyTo(dst2, dst1)
-        ocvb.label1 = "Mask of DCT with highest frequency removed"
+        label1 = "Mask of DCT with highest frequency removed"
     End Sub
 End Class
 
@@ -212,7 +212,7 @@ Public Class DCT_Surfaces_debug
             End If
         End If
         flow.Run(ocvb)
-        ocvb.label1 = "Largest flat surface segment stats"
+        label1 = "Largest flat surface segment stats"
     End Sub
 End Class
 
@@ -261,7 +261,7 @@ Public Class DCT_Rows
 
         Dim roi As New cv.Rect(0, 0, sliders.TrackBar1.Value, src32f.Height)
         If roi.Width > 0 Then frequencies(roi).SetTo(0)
-        ocvb.label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed"
+        label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse + cv.DctFlags.Rows)
         src32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)

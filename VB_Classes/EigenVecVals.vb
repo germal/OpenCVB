@@ -5,8 +5,8 @@ Public Class EigenVecVals_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Solve system of equations using OpenCV's EigenVV"
-        ocvb.label1 = "EigenVec (solution)"
-        ocvb.label2 = "Relationship between Eigen Vec and Vals"
+        label1 = "EigenVec (solution)"
+        label2 = "Relationship between Eigen Vec and Vals"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim a() As Double = {1.96, -6.49, -0.47, -7.2, -0.65,

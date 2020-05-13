@@ -21,7 +21,7 @@ Public Class Surf_Basics_CS
         sliders.setupTrackBar1(ocvb, caller, "Hessian threshold", 1, 5000, 2000)
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
-        ocvb.label1 = "BF Matcher output"
+        label1 = "BF Matcher output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
@@ -40,7 +40,7 @@ Public Class Surf_Basics_CS
         If standalone Then
             dst1(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(dst1)
             dst1(New cv.Rect(ocvb.color.Width, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(dst2)
-            ocvb.label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
+            label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
             If CS_SurfBasics.keypoints1 IsNot Nothing Then ocvb.label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
         End If
     End Sub
@@ -124,6 +124,6 @@ Public Class Surf_DrawMatchManual_CS
             Dim pt = keys2(i).Pt
             If pt.Y <> -1 Then dst2.Circle(keys2(i).Pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
-        ocvb.label2 = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
+        label2 = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
     End Sub
 End Class

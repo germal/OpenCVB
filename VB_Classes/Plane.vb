@@ -104,7 +104,7 @@ Public Class Plane_Detect
         grid.sliders.TrackBar2.Value = 64
 
         ocvb.desc = "Identify planes in each segment."
-        ocvb.label2 = "Blue, green, and red show different planes"
+        label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim depth32f = getDepth32f(ocvb)
@@ -177,7 +177,7 @@ Public Class Plane_DetectDebug
         grid.sliders.TrackBar2.Value = 32
 
         ocvb.desc = "Debug code to identify planes in just one segment."
-        ocvb.label2 = "Blue, green, and red show different planes"
+        label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim depth32f = getDepth32f(ocvb)

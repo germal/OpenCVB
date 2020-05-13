@@ -10,7 +10,7 @@ Public Class Remap_Basics
         Dim map_y = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32F)
         Static Dim direction = 0
 
-        ocvb.label1 = Choose(direction + 1, "Remap_Basics - original", "Remap veritically", "Remap horizontally",
+        label1 = Choose(direction + 1, "Remap_Basics - original", "Remap veritically", "Remap horizontally",
                                             "Remap horizontally and vertically")
 
         Dim src As cv.Mat = ocvb.color
@@ -52,7 +52,7 @@ Public Class Remap_Flip
         ocvb.desc = "Use flip to remap an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.label1 = Choose(direction + 1, "Remap_Flip - original", "Remap_Flip - flip horizontal", "Remap_Flip - flip veritical",
+        label1 = Choose(direction + 1, "Remap_Flip - original", "Remap_Flip - flip horizontal", "Remap_Flip - flip veritical",
                                             "Remap_Flip - flip horizontal and vertical")
 
         Select Case direction

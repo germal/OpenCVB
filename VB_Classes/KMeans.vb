@@ -10,8 +10,8 @@ Public Class kMeans_Clusters
 
         km = New kMeans_Basics(ocvb, caller)
 
-        ocvb.label1 = "kmeans - k=10"
-        ocvb.label2 = "kmeans - k=2,4,6,8"
+        label1 = "kmeans - k=10"
+        label2 = "kmeans - k=2,4,6,8"
         ocvb.desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -112,7 +112,7 @@ Public Class kMeans_RGB_Plus_XYDepth
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "kMeans k", 2, 32, 4)
         km = New kMeans_Basics(ocvb, caller)
-        ocvb.label1 = "kmeans - RGB, XY, and Depth Raw"
+        label1 = "kmeans - RGB, XY, and Depth Raw"
         ocvb.desc = "Cluster with kMeans RGB, x, y, and depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -167,8 +167,8 @@ Public Class kMeans_RGB1_MT
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "kMeans k", 2, 32, 4)
         sliders.setupTrackBar2(ocvb, caller, "Thread Count", 1, 32, 4)
-        ocvb.label1 = "kmeans - raw labels"
-        ocvb.label2 = "kmeans - clusterColors"
+        label1 = "kmeans - raw labels"
+        label2 = "kmeans - clusterColors"
         ocvb.desc = "Cluster the segmented rgb image using kMeans with multiple threads.  Select the desired number of clusters/threads."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -256,7 +256,7 @@ Public Class kMeans_RGB2_MT
         Next
         radio.check(0).Text = "1 thread"
         radio.check(5).Checked = True
-        ocvb.label1 = "kmeans - raw labels"
+        label1 = "kmeans - raw labels"
         ocvb.desc = "Cluster the segmented rgb image using kMeans with multiple threads.  Select the desired number of clusters/threads."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -326,8 +326,8 @@ Public Class kMeans_RGB3_MT
         Next
         radio.check(0).Text = "1 thread"
         radio.check(5).Checked = True
-        ocvb.label1 = "kmeans - raw labels"
-        ocvb.label2 = "Synchronized colors from raw labels"
+        label1 = "kmeans - raw labels"
+        label2 = "Synchronized colors from raw labels"
         ocvb.desc = "Cluster the segmented rgb image using kMeans with multiple threads.  Select the desired number of clusters/threads."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -415,7 +415,7 @@ Public Class kMeans_ReducedRGB
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Reduction factor", 2, 64, 64)
         sliders.setupTrackBar2(ocvb, caller, "kmeans k", 2, 64, 4)
-        ocvb.label2 = "Reduced color image."
+        label2 = "Reduced color image."
         ocvb.desc = "Reduce each pixel by the reduction factor and then run kmeans."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -515,7 +515,7 @@ Public Class kMeans_LAB
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "kMeans k", 2, 32, 4)
-        ocvb.label1 = "kMeans_LAB - draw to select region"
+        label1 = "kMeans_LAB - draw to select region"
         Dim w = ocvb.color.Width / 4
         Dim h = ocvb.color.Height / 4
         ocvb.drawRect = New cv.Rect(w, h, w * 2, h * 2)
@@ -556,8 +556,8 @@ Public Class kMeans_RGB4_MT
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 48
-        ocvb.label1 = "kmeans - raw labels"
-        ocvb.label2 = "Synchronized colors from raw labels"
+        label1 = "kmeans - raw labels"
+        label2 = "Synchronized colors from raw labels"
         ocvb.desc = "Cluster a grid of segments individual and combine results.  Select the desired number of clusters/threads."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

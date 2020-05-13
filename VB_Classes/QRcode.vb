@@ -37,7 +37,7 @@ Public Class QRcode_Basics
         For i = 0 To box.Length - 1
             dst1.Line(box(i), box((i + 1) Mod 4), cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
         Next
-        If refersTo <> "" Then ocvb.label1 = refersTo
+        If refersTo <> "" Then label1 = refersTo
     End Sub
 End Class
 

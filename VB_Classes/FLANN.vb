@@ -6,7 +6,7 @@ Public Class FLANN_Test
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
-        ocvb.label1 = "FLANN Basics"
+        label1 = "FLANN Basics"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount > 0 Then Exit Sub ' we are already done - it is a one-pass algorithm.
@@ -55,8 +55,8 @@ Public Class FLANN_Basics
         sliders.setupTrackBar1(ocvb, caller, "Query Count", 1, 10000, 10)
 
         ocvb.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
-        ocvb.label1 = "Yellow is query, Nearest points blue"
-        ocvb.label2 = "FLANN Search Input"
+        label1 = "Yellow is query, Nearest points blue"
+        label2 = "FLANN Search Input"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         random.Run(ocvb) ' fill result1 with random points in x and y range of the image.

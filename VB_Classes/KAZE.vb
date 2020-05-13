@@ -7,7 +7,7 @@ Public Class KAZE_KeypointsKAZE_CS
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Find keypoints using KAZE algorithm."
-        ocvb.label1 = "KAZE key points"
+        label1 = "KAZE key points"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -28,7 +28,7 @@ Public Class KAZE_KeypointsAKAZE_CS
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Find keypoints using AKAZE algorithm."
-        ocvb.label1 = "AKAZE key points"
+        label1 = "AKAZE key points"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -128,8 +128,8 @@ Public Class KAZE_LeftAligned_CS
                 dst2.Line(pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
             End If
         Next
-        ocvb.label1 = "Right image has " + CStr(CS_KazeRight.kazeKeyPoints.Count) + " key points"
-        ocvb.label2 = "Left image has " + CStr(CS_KazeLeft.kazeKeyPoints.Count) + " key points"
+        label1 = "Right image has " + CStr(CS_KazeRight.kazeKeyPoints.Count) + " key points"
+        label2 = "Left image has " + CStr(CS_KazeLeft.kazeKeyPoints.Count) + " key points"
     End Sub
 End Class
 

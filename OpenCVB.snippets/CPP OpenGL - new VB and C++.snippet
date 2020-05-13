@@ -13,8 +13,8 @@ Imports System.Runtime.InteropServices
 Public Class OpenGL_MyOpenGLtest 
     Inherits ocvbClass
     Public ogl As OpenGL_Basics
-    Public Sub New(ocvb As AlgorithmData, byval caller as string)
-        setCaller(caller)
+    Public Sub New(ocvb As AlgorithmData, byval callerRaw as string)
+        setCaller(callerRaw)
 		    ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_MyOpenGLtest"
         ocvb.desc = "Describe your algorithm"
@@ -22,10 +22,6 @@ Public Class OpenGL_MyOpenGLtest
     Public Sub Run(ocvb As AlgorithmData)
         ogl.rgbInput = ocvb.color
         ogl.Run(ocvb)
-        MyBase.Finish(ocvb)
-    End Sub
-    Public Sub MyDispose() 
-        ogl.Dispose()
     End Sub
 End Class
 

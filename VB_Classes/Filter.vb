@@ -5,8 +5,8 @@ Public Class Filter_Laplacian
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Use a filter to approximate the Laplacian derivative."
-        ocvb.label1 = "Sharpened image using Filter2D output"
-        ocvb.label2 = "Output of Filter2D (approximated Laplacian)"
+        label1 = "Sharpened image using Filter2D output"
+        label2 = "Output of Filter2D (approximated Laplacian)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernel = New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1})
@@ -49,7 +49,7 @@ Public Class Filter_NormalizedKernel
         For i = 0 To kernel.Width - 1
             sum += Math.Abs(kernel.Get(Of Single)(0, i))
         Next
-        ocvb.label1 = "kernel sum = " + Format(sum, "#0.000")
+        label1 = "kernel sum = " + Format(sum, "#0.000")
 
         Dim dst32f = ocvb.color.Filter2D(cv.MatType.CV_32FC1, kernel, anchor:=New cv.Point(0, 0))
         dst32f.ConvertTo(dst1, cv.MatType.CV_8UC3)
@@ -68,7 +68,7 @@ Public Class Filter_Normalized2D
         Dim kernelSize = 3 + (ocvb.frameCount Mod 20)
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
         dst1 = ocvb.color.Filter2D(-1, kernel)
-        ocvb.label1 = "Normalized KernelSize = " + CStr(kernelSize)
+        label1 = "Normalized KernelSize = " + CStr(kernelSize)
     End Sub
 End Class
 
@@ -87,7 +87,7 @@ Public Class Filter_SepFilter2D
         sliders.setupTrackBar1(ocvb, caller, "Kernel X size", 1, 21, 5)
         sliders.setupTrackBar2(ocvb, caller, "Kernel Y size", 1, 21, 11)
 
-        ocvb.label1 = "Gaussian Blur result"
+        label1 = "Gaussian Blur result"
         ocvb.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -102,9 +102,9 @@ Public Class Filter_SepFilter2D
             Dim graySep = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim grayGauss = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst2 = (graySep - grayGauss).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            ocvb.label2 = "Gaussian - SepFilter2D " + CStr(dst2.CountNonZero()) + " pixels different."
+            label2 = "Gaussian - SepFilter2D " + CStr(dst2.CountNonZero()) + " pixels different."
         Else
-            ocvb.label2 = "SepFilter2D Result"
+            label2 = "SepFilter2D Result"
         End If
     End Sub
 End Class

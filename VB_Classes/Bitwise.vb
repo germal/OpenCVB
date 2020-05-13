@@ -3,8 +3,8 @@ Public Class Bitwise_Not
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = "Color BitwiseNot"
-        ocvb.label2 = "Gray BitwiseNot"
+        label1 = "Color BitwiseNot"
+        label2 = "Gray BitwiseNot"
         ocvb.desc = "Gray and color bitwise_not"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

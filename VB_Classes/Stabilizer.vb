@@ -63,7 +63,7 @@ Public Class Stabilizer_Basics
         good = New Features_GoodFeatures(ocvb, caller)
 
         ocvb.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
-        ocvb.label1 = "Stabilized Image"
+        label1 = "Stabilized Image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim vert_Border = borderCrop * ocvb.color.Rows / ocvb.color.Cols
@@ -213,8 +213,8 @@ Public Class Stabilizer_SideBySide
         original = New Stabilizer_Basics_CPP(ocvb, caller)
         basics = New Stabilizer_Basics(ocvb, caller)
         ocvb.desc = "Run both the original and the VB.Net version of the video stabilizer.  Neither is working properly."
-        ocvb.label1 = "Stabilizer_Basic (VB.Net)"
-        ocvb.label2 = "Stabilizer_Basic_CPP (C++)"
+        label1 = "Stabilizer_Basic (VB.Net)"
+        label2 = "Stabilizer_Basic_CPP (C++)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         original.Run(ocvb)

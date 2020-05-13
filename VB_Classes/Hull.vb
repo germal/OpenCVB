@@ -31,8 +31,8 @@ Public Class Hull_Basics
         sliders.setupTrackBar1(ocvb, caller, "Hull random points", 1, 20, 10)
 
         ocvb.desc = "Surround a set of random points with a convex hull"
-        ocvb.label1 = "Convex Hull Output"
-        ocvb.label2 = "Convex Hull Input"
+        label1 = "Convex Hull Output"
+        label2 = "Convex Hull Input"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim Count = sliders.TrackBar1.Value

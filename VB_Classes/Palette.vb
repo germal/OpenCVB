@@ -17,8 +17,8 @@ Public Class Palette_Color
         Dim r = sliders.TrackBar3.Value
         dst1.SetTo(New cv.Scalar(b, g, r))
         dst2.SetTo(New cv.Scalar(255 - b, 255 - g, 255 - r))
-        ocvb.label1 = "Color (RGB) = " + CStr(b) + " " + CStr(g) + " " + CStr(r)
-        ocvb.label2 = "Color (255 - RGB) = " + CStr(255 - b) + " " + CStr(255 - g) + " " + CStr(255 - r)
+        label1 = "Color (RGB) = " + CStr(b) + " " + CStr(g) + " " + CStr(r)
+        label2 = "Color (255 - RGB) = " + CStr(255 - b) + " " + CStr(255 - g) + " " + CStr(255 - r)
     End Sub
 End Class
 
@@ -106,7 +106,7 @@ Public Class Palette_Map
         sliders = New OptionsSliders
         sliders.setupTrackBar1(ocvb, caller, "inRange offset", 1, 100, 10)
         ocvb.desc = "Map colors to different palette - Painterly Effect."
-        ocvb.label1 = "Reduced Colors"
+        label1 = "Reduced Colors"
     End Sub
     Private Class CompareVec3b : Implements IComparer(Of cv.Vec3b)
         Public Function Compare(ByVal a As cv.Vec3b, ByVal b As cv.Vec3b) As Integer Implements IComparer(Of cv.Vec3b).Compare
@@ -138,7 +138,7 @@ Public Class Palette_Map
             Next
         Next
 
-        ocvb.label1 = "palette count = " + CStr(palette.Count)
+        label1 = "palette count = " + CStr(palette.Count)
         Dim max As Integer
         Dim maxIndex As Integer
         For i = 0 To palette.Count - 1
@@ -167,7 +167,7 @@ Public Class Palette_Map
 
             dst2.SetTo(0)
             dst2.SetTo(cv.Scalar.All(255), mask)
-            ocvb.label2 = "Most Common Color +- " + CStr(offset) + " count = " + CStr(maxCount)
+            label2 = "Most Common Color +- " + CStr(offset) + " count = " + CStr(maxCount)
         End If
     End Sub
 End Class
@@ -205,7 +205,7 @@ Public Class Palette_Gradient
     Public color2 As cv.Scalar
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label2 = "From and To colors"
+        label2 = "From and To colors"
         ocvb.desc = "Create gradient image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -243,7 +243,7 @@ Public Class Palette_BuildGradientColorMap
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Number of color transitions (Used only with Random)", 1, 30, 5)
 
-        ocvb.label2 = "Generated colormap"
+        label2 = "Generated colormap"
         ocvb.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -291,14 +291,14 @@ Public Class Palette_ColorMap
     Public Sub Run(ocvb As AlgorithmData)
         Dim colormap = cv.ColormapTypes.Autumn
         Static buildNewRandomMap = False
-        If standalone Then src = ocvb.color.Clone()
+        If standalone or src.width = 0 Then src = ocvb.color.Clone()
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then
                 colormap = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cool, cv.ColormapTypes.Hot,
                                              cv.ColormapTypes.Hsv, cv.ColormapTypes.Jet, cv.ColormapTypes.Ocean, cv.ColormapTypes.Pink,
                                              cv.ColormapTypes.Rainbow, cv.ColormapTypes.Spring, cv.ColormapTypes.Summer, cv.ColormapTypes.Winter,
                                              12, 13, 14, 15, 16, 17, 18, 19, 20) ' missing some colorMapType definitions but they are there...
-                ocvb.label1 = "ColorMap = " + mapNames(i)
+                label1 = "ColorMap = " + mapNames(i)
 
                 Static cMapDir As New DirectoryInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps")
                 Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + mapNames(i) + ".jpg")

@@ -161,7 +161,6 @@ Public Class ActiveClass : Implements IDisposable
         slidersOffset = New cv.Point
         radioOffset = New cv.Point
         ocvb.name = parms.activeAlgorithm
-        ocvb.label1 = parms.activeAlgorithm
         ActiveAlgorithm = algoList.createAlgorithm(ocvb)
         If ActiveAlgorithm Is Nothing Then
             MsgBox("The algorithm: " + parms.activeAlgorithm + " was not found in the algorithmList.vb code." + vbCrLf +

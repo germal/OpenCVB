@@ -128,7 +128,7 @@ Public Class VTK_Histogram3D
 
         mats = New Mat_4to1(ocvb, caller)
 
-        ocvb.label2 = "Input to VTK plot"
+        label2 = "Input to VTK plot"
 
         vtk = New VTK_Basics(ocvb, caller)
         vtk.usingDepthAndRGB = False

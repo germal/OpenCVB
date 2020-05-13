@@ -168,8 +168,8 @@ Public Class Annealing_CPP_MT
         flow = New Font_FlowText(ocvb, caller)
         flow.result1or2 = RESULT1
 
-        ocvb.label1 = "Log of Annealing progress"
-        ocvb.label2 = "Top 2 are best solutions, bottom 2 are worst."
+        label1 = "Log of Annealing progress"
+        label2 = "Top 2 are best solutions, bottom 2 are worst."
 
         setup(ocvb)
         ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
@@ -206,12 +206,12 @@ Public Class Annealing_CPP_MT
             Next
             If sameEnergy = sliders.TrackBar2.Value Then allClosed = True
             If sameEnergy = 1 Then
-                ocvb.label1 = "There is only " + CStr(sameEnergy) + " thread at the best energy level."
+                label1 = "There is only " + CStr(sameEnergy) + " thread at the best energy level."
             Else
-                ocvb.label1 = "There are " + CStr(sameEnergy) + " threads at the best energy level."
+                label1 = "There are " + CStr(sameEnergy) + " threads at the best energy level."
             End If
         Else
-            ocvb.label1 = "Energy level is " + CStr(anneal(0).energy)
+            label1 = "Energy level is " + CStr(anneal(0).energy)
         End If
 
         mats.mat(0) = anneal(CInt(bestList.ElementAt(0).Value)).dst1
@@ -221,6 +221,7 @@ Public Class Annealing_CPP_MT
             mats.mat(3) = anneal(CInt(bestList.ElementAt(bestList.Count - 1).Value)).dst1
         End If
         mats.Run(ocvb)
+        dst2 = mats.dst1
 
         ' copy the top half of the solutions to the bottom half (worst solutions)
         If check.Box(1).Checked Then
@@ -255,7 +256,7 @@ Public Class Annealing_Options
         flow = New Font_FlowText(ocvb, caller)
         flow.result1or2 = RESULT2
 
-        ocvb.label1 = "Log of Annealing progress"
+        label1 = "Log of Annealing progress"
 
 
         anneal = New Annealing_Basics_CPP(ocvb, caller)

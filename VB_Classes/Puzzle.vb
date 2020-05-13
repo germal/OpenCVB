@@ -392,8 +392,8 @@ Public Class Puzzle_Solver
         usedList.Clear()
         check.Box(0).Checked = False
 
-        ocvb.label1 = "Input to puzzle solver"
-        ocvb.label2 = "Puzzle_Solver output (ambiguities possible)"
+        label1 = "Input to puzzle solver"
+        label2 = "Puzzle_Solver output (ambiguities possible)"
         If radio.check(1).Checked Or radio.check(2).Checked Then Thread.Sleep(1000)
     End Sub
 End Class

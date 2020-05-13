@@ -66,8 +66,8 @@ Public Class Projection_NoGravity_CPP
         foreground = New Depth_ManualTrim(ocvb, caller)
         foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
         foreground.sliders.TrackBar2.Value = 4000 ' fixed distance to keep the images stable.
-        ocvb.label1 = "Top View"
-        ocvb.label2 = "Side View"
+        label1 = "Top View"
+        label2 = "Side View"
         ocvb.desc = "Project the depth data onto a top view and side view."
 
         cPtr = SimpleProjectionOpen()
@@ -95,8 +95,8 @@ Public Class Projection_NoGravity_CPP
         dst2 = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         handleDepth.Free()
-        ocvb.label1 = "Top View (looking down)"
-        ocvb.label2 = "Side View"
+        label1 = "Top View (looking down)"
+        label2 = "Side View"
     End Sub
     Public Sub Close()
         SimpleProjectionClose(cPtr)
@@ -120,8 +120,8 @@ Public Class Projection_NoGravity
         foreground = New Depth_ManualTrim(ocvb, caller)
         foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
         foreground.sliders.TrackBar2.Value = 4000 ' fixed distance to keep the images stable.
-        ocvb.label1 = "Top View"
-        ocvb.label2 = "Side View"
+        label1 = "Top View"
+        label2 = "Side View"
         ocvb.desc = "Project the depth data onto a top view and side view - using only VB code (too slow.)"
 
         cPtr = SimpleProjectionOpen()
@@ -156,8 +156,8 @@ Public Class Projection_NoGravity
                      Next
                  Next
              End Sub)
-        ocvb.label1 = "Top View (looking down)"
-        ocvb.label2 = "Side View"
+        label1 = "Top View (looking down)"
+        label2 = "Side View"
     End Sub
     Public Sub Close()
         SimpleProjectionClose(cPtr)
@@ -252,8 +252,8 @@ Public Class Projection_GravityVB
                      Next
                  Next
              End Sub)
-        ocvb.label1 = "View looking up from under floor"
-        ocvb.label2 = "Side View"
+        label1 = "View looking up from under floor"
+        label2 = "Side View"
     End Sub
 End Class
 
@@ -364,16 +364,16 @@ Public Class Projection_G_CPP
             dst1 = histTop.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             dst2 = histSide.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
-            ocvb.label1 = "Top View after threshold"
-            ocvb.label2 = "Side View after threshold"
+            label1 = "Top View after threshold"
+            label2 = "Side View after threshold"
         Else
             imagePtr = Project_Gravity_Run(cPtr, handleXYZ.AddrOfPinnedObject, maxZ, xyz.Height, xyz.Width)
 
             dst1 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
             dst2 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, Project_Gravity_Side(cPtr)).Clone()
 
-            ocvb.label1 = "Top View (looking down)"
-            ocvb.label2 = "Side View"
+            label1 = "Top View (looking down)"
+            label2 = "Side View"
         End If
         handleXYZ.Free()
 
@@ -467,7 +467,7 @@ Public Class Projection_Flood
                 Dim pt = New cv.Point(rect.X, rect.Y - 10)
                 cv.Cv2.PutText(dst2, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
-            ocvb.label2 = CStr(flood.objectRects.Count) + " objects combined into " + CStr(rects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
+            label2 = CStr(flood.objectRects.Count) + " objects combined into " + CStr(rects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
         End If
     End Sub
 End Class
@@ -503,8 +503,8 @@ Public Class Projection_Wall
         lines.Run(ocvb)
         lines.dst1.CopyTo(dst1)
 
-        ocvb.label1 = "Top View with lines in red"
-        ocvb.label2 = "Top View output without lines"
+        label1 = "Top View with lines in red"
+        label2 = "Top View output without lines"
     End Sub
 End Class
 

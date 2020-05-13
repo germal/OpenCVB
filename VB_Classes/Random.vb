@@ -45,7 +45,7 @@ Public Class Random_Shuffle
         ocvb.RGBDepth.CopyTo(dst1)
         Dim myRNG As New cv.RNG
         cv.Cv2.RandShuffle(dst1, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
-        ocvb.label1 = "Random_shuffle - wave at camera"
+        label1 = "Random_shuffle - wave at camera"
     End Sub
 End Class
 
@@ -60,7 +60,7 @@ Public Class Random_LUTMask
         km = New kMeans_Basics(ocvb, caller)
         random = New Random_Points(ocvb, caller)
         ocvb.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image.  Note how interpolation impacts results"
-        ocvb.label2 = "kmeans run To Get colors"
+        label2 = "kmeans run To Get colors"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static lutMat As cv.Mat
@@ -83,7 +83,7 @@ Public Class Random_LUTMask
             Next
         End If
         dst2 = ocvb.color.LUT(lutMat)
-        ocvb.label1 = "Using kmeans colors with interpolation"
+        label1 = "Using kmeans colors with interpolation"
     End Sub
 End Class
 

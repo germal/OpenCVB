@@ -7,8 +7,8 @@ Public Class FishEye_Rectified
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Use OpenCV's FishEye API to undistort a fisheye lens input"
-        ocvb.label1 = "Left View"
-        ocvb.label2 = "Right View"
+        label1 = "Left View"
+        label2 = "Right View"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static kMatLeft As cv.Mat, dMatLeft As cv.Mat, rMatLeft As cv.Mat, pMatLeft As cv.Mat
@@ -32,8 +32,8 @@ Public Class FishEye_Rectified
             leftView = ocvb.leftView.Remap(leftviewMap1, leftviewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
             rightView = ocvb.rightView.Remap(rightViewMap1, rightViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
         Else
-            ocvb.label1 = "Left View (no fisheye lens present)"
-            ocvb.label2 = "Right View (no fisheye lens present)"
+            label1 = "Left View (no fisheye lens present)"
+            label2 = "Right View (no fisheye lens present)"
             leftView = ocvb.leftView
             rightView = ocvb.rightView
         End If
@@ -59,8 +59,8 @@ Public Class FishEye_Raw
             ocvb.putText(New ActiveClass.TrueType("Only the T265 camera is has FishEye images at this point.", 10, 100, RESULT1))
             Exit Sub
         End If
-        ocvb.label1 = "Left Fisheye Image"
-        ocvb.label2 = "Right Fisheye Image"
+        label1 = "Left Fisheye Image"
+        label2 = "Right Fisheye Image"
         dst1 = ocvb.leftView
         dst2 = ocvb.rightView
     End Sub

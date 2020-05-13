@@ -59,7 +59,7 @@ Public Class MSER_Basics
             mser.Pass2Only = check.Box(0).Checked
         End If
 
-        if standalone Then src = ocvb.color.Clone()
+        If standalone or src.width = 0 Then src = ocvb.color.Clone()
         src = src.Blur(New cv.Size(edgeBlurSize, edgeBlurSize))
         If check.Box(1).Checked Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mser.DetectRegions(src, region, zone)
@@ -74,7 +74,7 @@ Public Class MSER_Basics
                     dst1.Set(Of cv.Vec3b)(pt.Y, pt.X, ocvb.RGBDepth.Get(Of cv.Vec3b)(pt.Y, pt.X))
                 Next
             Next
-            ocvb.label1 = CStr(region.Length) + " Regions " + Format(pixels / region.Length, "#0.0") + " pixels/region (avg)"
+            label1 = CStr(region.Length) + " Regions " + Format(pixels / region.Length, "#0.0") + " pixels/region (avg)"
         End If
     End Sub
 End Class
@@ -180,8 +180,8 @@ Public Class MSER_CPPStyle
     Dim image As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = "Contour regions from MSER"
-        ocvb.label2 = "Box regions from MSER"
+        label1 = "Contour regions from MSER"
+        label2 = "Box regions from MSER"
         ocvb.desc = "Maximally Stable Extremal Regions example - still image"
         image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/01.jpg", cv.ImreadModes.Color)
         gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -243,6 +243,6 @@ Public Class MSER_Contours
             dst1.DrawContours(listOfPoints, 0, cv.Scalar.Yellow, 1)
         Next
 
-        ocvb.label1 = CStr(mser.region.Length) + " Regions " + Format(pixels / mser.region.Length, "#0.0") + " pixels/region (avg)"
+        label1 = CStr(mser.region.Length) + " Regions " + Format(pixels / mser.region.Length, "#0.0") + " pixels/region (avg)"
     End Sub
 End Class

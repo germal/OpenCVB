@@ -15,14 +15,14 @@ Public Class Binarize_OTSU
         mats2 = New Mat_4to1(ocvb, caller)
 
         ocvb.desc = "Binarize an image using Threshold with OTSU."
-        ocvb.label2 = "Histograms correspond to images on the left"
+        label2 = "Histograms correspond to images on the left"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst2.SetTo(0)
         Dim w = ocvb.color.Width, h = ocvb.color.Height
-        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Or src.Width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim meanScalar = cv.Cv2.Mean(src)
-        ocvb.label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
+        label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
         plotHist.bins = 255
         Dim dimensions() = New Integer() {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.bins)}
@@ -61,13 +61,13 @@ Public Class Binarize_Niblack_Sauvola
         sliders.setupTrackBar4(ocvb, caller, "Sauvola r", 1, 100, 64)
 
         ocvb.desc = "Binarize an image using Niblack and Sauvola"
-        ocvb.label1 = "Binarize Niblack"
-        ocvb.label2 = "Binarize Sauvola"
+        label1 = "Binarize Niblack"
+        label2 = "Binarize Sauvola"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
-        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Or src.Width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim grayBin As New cv.Mat
         cv.Extensions.Binarizer.Niblack(src, grayBin, kernelSize, sliders.TrackBar2.Value / 1000)
@@ -90,14 +90,14 @@ Public Class Binarize_Niblack_Nick
         sliders.setupTrackBar3(ocvb, caller, "Nick k", -1000, 1000, 100)
 
         ocvb.desc = "Binarize an image using Niblack and Nick"
-        ocvb.label1 = "Binarize Niblack"
-        ocvb.label2 = "Binarize Nick"
+        label1 = "Binarize Niblack"
+        label2 = "Binarize Nick"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
-        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Or src.Width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayBin As New cv.Mat
         cv.Extensions.Binarizer.Niblack(src, grayBin, kernelSize, sliders.TrackBar2.Value / 1000)
         dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -118,7 +118,7 @@ Public Class Binarize_Bernson
         sliders.setupTrackBar2(ocvb, caller, "Contrast min", 0, 255, 50)
         sliders.setupTrackBar3(ocvb, caller, "bg Threshold", 0, 255, 100)
 
-        ocvb.label1 = "Binarize Bernson (Draw Enabled)"
+        label1 = "Binarize Bernson (Draw Enabled)"
 
         ' ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
         ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
@@ -156,7 +156,7 @@ Public Class Binarize_Bernson_MT
         sliders.setupTrackBar3(ocvb, caller, "bg Threshold", 0, 255, 100)
 
         ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
-        ocvb.label1 = "Binarize Bernson"
+        label1 = "Binarize Bernson"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize = sliders.TrackBar1.Value
@@ -166,7 +166,7 @@ Public Class Binarize_Bernson_MT
         Dim contrastMin = sliders.TrackBar2.Value
         Dim bgThreshold = sliders.TrackBar3.Value
 
-        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Or src.Width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = ocvb.color.EmptyClone.SetTo(0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
             Sub(roi)

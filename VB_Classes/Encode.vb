@@ -7,8 +7,8 @@ Public Class Encode_Basics
         sliders.setupTrackBar2(ocvb, caller, "Encode Output Scaling", 1, 100, 7)
 
         ocvb.desc = "Error Level Analysis - to verify a jpg image has not been modified."
-        ocvb.label1 = "absDiff with original"
-        ocvb.label2 = "Original decompressed"
+        label1 = "absDiff with original"
+        label2 = "Original decompressed"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim buf(ocvb.color.Width * ocvb.color.Height * ocvb.color.ElemSize) As Byte
@@ -23,7 +23,7 @@ Public Class Encode_Basics
         Dim scale = sliders.TrackBar2.Value
         output.ConvertTo(dst1, cv.MatType.CV_8UC3, scale)
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
-        ocvb.label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
+        label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
     End Sub
 End Class
 
@@ -46,7 +46,7 @@ Public Class Encode_Options
         radio.check(4).Checked = True
 
         ocvb.desc = "Encode options that affect quality."
-        ocvb.label1 = "absDiff with original image"
+        label1 = "absDiff with original image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim buf(ocvb.color.Width * ocvb.color.Height * ocvb.color.ElemSize) As Byte
@@ -78,7 +78,7 @@ Public Class Encode_Options
         Dim scale = sliders.TrackBar2.Value
         output.ConvertTo(dst1, cv.MatType.CV_8UC3, scale)
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
-        ocvb.label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
+        label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
     End Sub
 End Class
 

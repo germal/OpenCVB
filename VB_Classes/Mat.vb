@@ -22,8 +22,8 @@ Public Class Mat_PointToMat
         setCaller(callerRaw)
         mask = New Random_Points(ocvb, caller)
         ocvb.desc = "Convert pointf3 into a mat of points."
-        ocvb.label1 = "Random_Points points (original)"
-        ocvb.label2 = "Random_Points points after format change"
+        label1 = "Random_Points points (original)"
+        label2 = "Random_Points points after format change"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         mask.Run(ocvb) ' generates a set of points
@@ -47,7 +47,7 @@ Public Class Mat_MatToPoint
         setCaller(callerRaw)
         mask = New Random_Points(ocvb, caller)
         ocvb.desc = "Convert a mat into a vector of points."
-        ocvb.label1 = "Reconstructed RGB Image"
+        label1 = "Reconstructed RGB Image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim points(ocvb.color.Rows * ocvb.color.Cols - 1) As cv.Vec3b
@@ -73,8 +73,8 @@ Public Class Mat_Transpose
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Transpose a Mat and show results."
-        ocvb.label1 = "Color Image Transposed"
-        ocvb.label2 = "Color Image Transposed Twice"
+        label1 = "Color Image Transposed"
+        label2 = "Color Image Transposed Twice"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim trColor = ocvb.color.T()
@@ -100,8 +100,8 @@ Public Class Mat_Tricks
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Show some Mat tricks."
-        ocvb.label1 = "Image squeezed into square Mat"
-        ocvb.label2 = "Mat transposed around the diagonal"
+        label1 = "Image squeezed into square Mat"
+        label2 = "Mat transposed around the diagonal"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mat = ocvb.color.Resize(New cv.Size(200, 200))
@@ -130,7 +130,7 @@ Public Class Mat_4to1
     Public noLines As Boolean ' if they want lines or not...
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = ""
+        label1 = ""
         mat1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat3 = mat1.Clone()
@@ -175,7 +175,7 @@ Public Class Mat_2to1
     Public noLines As Boolean ' if they want lines or not...
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = ""
+        label1 = ""
         mat1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
@@ -250,7 +250,7 @@ Public Class Mat_RowColRange
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = "BitwiseNot of RowRange and ColRange"
+        label1 = "BitwiseNot of RowRange and ColRange"
         ocvb.desc = "Perform operation on a range of cols and/or Rows."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -271,7 +271,7 @@ Public Class Mat_Managed
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "There is a limited ability to use Mat data in Managed code directly."
-        ocvb.label1 = "Color change is in the managed cv.vec3b array"
+        label1 = "Color change is in the managed cv.vec3b array"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static autoRand As New Random()

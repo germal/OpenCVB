@@ -30,8 +30,8 @@ Public Class DFT_Basics
         mats.noLines = True
 
         ocvb.desc = "Explore the Discrete Fourier Transform."
-        ocvb.label1 = "Image after inverse DFT"
-        ocvb.label2 = "DFT_Basics Spectrum Magnitude"
+        label1 = "Image after inverse DFT"
+        label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -87,7 +87,7 @@ Public Class DFT_Inverse
         setCaller(callerRaw)
         mats = New Mat_2to1(ocvb, caller)
         ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
-        ocvb.label1 = "Image after Inverse DFT"
+        label1 = "Image after Inverse DFT"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -107,9 +107,9 @@ Public Class DFT_Inverse
         mats.Run(ocvb)
         If mats.mat(0).countnonzero() > 0 Then
             dst2 = mats.dst1
-            ocvb.label2 = "Mask of difference (top) and relative diff (bot)"
+            label2 = "Mask of difference (top) and relative diff (bot)"
         Else
-            ocvb.label2 = "InverseDFT reproduced original"
+            label2 = "InverseDFT reproduced original"
             dst2.SetTo(0)
         End If
     End Sub
@@ -130,8 +130,8 @@ Public Class DFT_ButterworthFilter
         sliders.setupTrackBar2(ocvb, caller, "DFT B Filter - Order", 1, ocvb.color.Height, 2)
         dft = New DFT_Basics(ocvb, caller)
         ocvb.desc = "Use the Butterworth filter on a DFT image - color image input."
-        ocvb.label1 = "Image with Butterworth Low Pass Filter Applied"
-        ocvb.label2 = "Same filter with radius / 2"
+        label1 = "Image with Butterworth Low Pass Filter Applied"
+        label2 = "Same filter with radius / 2"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dft.Run(ocvb)
@@ -184,8 +184,8 @@ Public Class DFT_ButterworthDepth
         bfilter = New DFT_ButterworthFilter(ocvb, caller)
 
         ocvb.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
-        ocvb.label1 = "Image with Butterworth Low Pass Filter Applied"
-        ocvb.label2 = "Same filter with radius / 2"
+        label1 = "Image with Butterworth Low Pass Filter Applied"
+        label2 = "Same filter with radius / 2"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         bfilter.dft.gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

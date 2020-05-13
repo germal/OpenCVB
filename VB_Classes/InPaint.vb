@@ -14,7 +14,7 @@ Public Class InPaint_Basics
         radio.check(0).Checked = True
 
         ocvb.desc = "Create a flaw in an image and then use inPaint to mask it."
-        ocvb.label2 = "Repaired Image"
+        label2 = "Repaired Image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
@@ -47,7 +47,7 @@ Public Class InPaint_Noise
         radio.check(0).Checked = True
 
         ocvb.desc = "Create noise in an image and then use inPaint to remove it."
-        ocvb.label2 = "Repaired Image"
+        label2 = "Repaired Image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 100 Then Exit Sub ' give them time to review the inpaint results

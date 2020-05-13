@@ -56,7 +56,7 @@ Public Class Fitline_3DBasics_MT
         setCaller(callerRaw)
         hlines = New Hough_Lines_MT(ocvb, caller)
         ocvb.desc = "Use visual lines to find 3D lines."
-        ocvb.label2 = "White is featureless RGB, blue depth shadow"
+        label2 = "White is featureless RGB, blue depth shadow"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hlines.Run(ocvb)
@@ -192,8 +192,8 @@ Public Class Fitline_EigenFit
         noisyLine = New Fitline_RawInput(ocvb, caller)
         noisyLine.sliders.TrackBar1.Value = 30
         noisyLine.sliders.TrackBar2.Value = 400
-        ocvb.label1 = "Raw input (use sliders below to explore)"
-        ocvb.label2 = "blue=GT, red=fitline, yellow=EigenFit"
+        label1 = "Raw input (use sliders below to explore)"
+        label2 = "blue=GT, red=fitline, yellow=EigenFit"
         ocvb.desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -122,7 +122,7 @@ Public Class Tracker_Methods
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked = True Then
                 tracker.trackerIndex = i
-                ocvb.label1 = "Method: " + radio.check(i).Text
+                label1 = "Method: " + radio.check(i).Text
                 Exit For
             End If
         Next

@@ -21,7 +21,7 @@ Public Class ORB_Basics
             For Each kpt In keypoints
                 dst1.Circle(kpt.Pt, 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             Next
-            ocvb.label1 = CStr(keypoints.Count) + " key points were identified"
+            label1 = CStr(keypoints.Count) + " key points were identified"
         End If
     End Sub
 End Class

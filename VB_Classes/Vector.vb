@@ -5,7 +5,7 @@ Public Class Vector_Magnitude
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Compute Euclidian and Manhattan Distance on a single vector."
-        ocvb.label1 = "Vector Magnitude"
+        label1 = "Vector Magnitude"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim cVector() As Single = {1, 4, 4, 8}

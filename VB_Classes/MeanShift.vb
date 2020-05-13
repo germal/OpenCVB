@@ -6,7 +6,7 @@ Public Class MeanShift_Basics
     Public trackbox As New cv.Rect
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.label1 = "Draw anywhere to start mean shift tracking."
+        label1 = "Draw anywhere to start mean shift tracking."
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

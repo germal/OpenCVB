@@ -28,7 +28,7 @@ Public Class Blob_Input
         Mats = New Mat_4to1(ocvb, caller)
 
         ocvb.desc = "Test simple Blob Detector."
-        ocvb.label2 = ""
+        label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency = 0 Then
@@ -71,7 +71,7 @@ Public Class Blob_Detector_CS
         sliders.setupTrackBar2(ocvb, caller, "max Threshold", 0, 255, 255)
         sliders.setupTrackBar3(ocvb, caller, "Threshold Step", 1, 50, 5)
 
-        ocvb.label1 = "Blob_Detector_CS Input"
+        label1 = "Blob_Detector_CS Input"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim blobParams = New cv.SimpleBlobDetector.Params
@@ -111,8 +111,8 @@ Public Class Blob_RenderBlobs
         input.updateFrequency = 1
 
         ocvb.desc = "Use connected components to find blobs."
-        ocvb.label1 = "Input blobs"
-        ocvb.label2 = "Showing only the largest blob in test data"
+        label1 = "Input blobs"
+        label2 = "Showing only the largest blob in test data"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 100 = 0 Then
@@ -151,6 +151,7 @@ Public Class Blob_DepthClusters
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
+
         shadow = New Depth_Holes(ocvb, caller)
 
         histBlobs = New Histogram_DepthClusters(ocvb, caller)
@@ -170,7 +171,7 @@ Public Class Blob_DepthClusters
         flood.fBasics.initialMask = shadow.holeMask
         flood.Run(ocvb)
         dst2 = flood.fBasics.dst2
-        ocvb.label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
+        label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
     End Sub
 End Class
 
@@ -217,7 +218,7 @@ Public Class Blob_Rectangles
             Next
         End If
 
-        ocvb.label1 = "Showing top " + CStr(blobsToShow) + " of the " + CStr(blobs.rects.Count) + " blobs found "
+        label1 = "Showing top " + CStr(blobsToShow) + " of the " + CStr(blobs.rects.Count) + " blobs found "
         For i = 0 To blobsToShow - 1
             Dim rect = sortedBlobs.ElementAt(i).Key
             kalman(i).input = {rect.X, rect.Y, rect.Width, rect.Height}
@@ -263,7 +264,7 @@ Public Class Blob_Largest
             Dim rect = New cv.Rect(CInt(res(0)), CInt(res(1)), CInt(res(2)), CInt(res(3)))
             dst1.Rectangle(rect, cv.Scalar.Red, 2)
         End If
-        ocvb.label1 = "Show the largest blob of the " + CStr(rects.Count) + " blobs"
+        label1 = "Show the largest blob of the " + CStr(rects.Count) + " blobs"
     End Sub
 End Class
 
@@ -292,6 +293,6 @@ Public Class Blob_LargestDepthCluster
         cv.Cv2.InRange(getDepth32f(ocvb), startEndDepth.X, startEndDepth.Y, tmp)
         cv.Cv2.ConvertScaleAbs(tmp, mask)
         ocvb.color.CopyTo(dst1, mask)
-        ocvb.label1 = "Largest Depth Blob: " + Format(maxSize, "#,000") + " pixels (" + Format(maxSize / ocvb.color.Total, "#0.0%") + ")"
+        label1 = "Largest Depth Blob: " + Format(maxSize, "#,000") + " pixels (" + Format(maxSize / ocvb.color.Total, "#0.0%") + ")"
     End Sub
 End Class

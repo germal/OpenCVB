@@ -206,7 +206,7 @@ Public Class lineDetector_FLD
         Dim canny_th2 = sliders2.TrackBar2.Value
         Dim do_merge = check.Box(0).Checked
 
-        If standalone Then src = ocvb.color
+        If standalone or src.width = 0 Then src = ocvb.color
 
         Dim factor As Int32 = 4
         If radio.check(0).Checked Then
@@ -246,7 +246,7 @@ Public Class LineDetector_LSD
         ocvb.desc = "Fast Line Detector from the OpenCV contrib code base."
         Dim size = ocvb.color.Rows * ocvb.color.Cols
         ReDim data(size - 1)
-        ocvb.label2 = "Mask of lines detected"
+        label2 = "Mask of lines detected"
         sortedLines = New SortedList(Of cv.Vec6f, Integer)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -286,7 +286,7 @@ Public Class LineDetector_3D_LongestLine
         sliders.setupTrackBar1(ocvb, caller, "Mask Line Width", 1, 20, 1)
 
         ocvb.desc = "Identify planes using the lines present in the rgb image."
-        ocvb.label2 = ""
+        label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 30 Then Exit Sub
@@ -317,7 +317,7 @@ Public Class LineDetector_3D_FLD_MT
         sliders.setupTrackBar1(ocvb, caller, "Mask Line Width", 1, 20, 1)
 
         ocvb.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
-        ocvb.label2 = ""
+        label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 30 Then Exit Sub
@@ -347,7 +347,7 @@ Public Class LineDetector_3D_LSD_MT
         sliders.setupTrackBar1(ocvb, caller, "Mask Line Width", 1, 20, 1)
 
         ocvb.desc = "Measure 3D line segments using a multi-threaded Line Stream Detector"
-        ocvb.label2 = ""
+        label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.OpenCV_Version_ID <> "401" Then
@@ -400,7 +400,7 @@ Public Class LineDetector_3D_FitLineZ
         radio.check(2).Checked = True
 
         ocvb.desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
-        ocvb.label2 = ""
+        label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(1).Checked And ocvb.frameCount Mod 30 Then Exit Sub
@@ -502,7 +502,7 @@ Public Class LineDetector_Basics
         sliders.setupTrackBar1(ocvb, caller, "LineDetector thickness of line", 1, 20, 2)
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        ocvb.label1 = "Manually drawn with thickness"
+        label1 = "Manually drawn with thickness"
         ocvb.desc = "Use ximgproc to find all the lines present."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -521,7 +521,7 @@ Public Class LineDetector_Basics
             End If
         Next
         If standalone Then
-            ocvb.label2 = "Drawn with DrawSegment (thickness=1)"
+            label2 = "Drawn with DrawSegment (thickness=1)"
             ld.DrawSegments(dst2, vectors, False)
         End If
     End Sub

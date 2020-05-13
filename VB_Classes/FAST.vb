@@ -7,7 +7,7 @@ Public Class FAST_Basics
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Threshold", 0, 200, 15)
         ocvb.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
-        ocvb.label1 = "FAST_Basics nonMax = true"
+        label1 = "FAST_Basics nonMax = true"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

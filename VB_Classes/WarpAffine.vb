@@ -115,8 +115,8 @@ Public Class WarpAffine_Basics
         angle *= -1
         rotationMatrix = cv.Cv2.GetRotationMatrix2D(pt, angle, 1.0)
         cv.Cv2.WarpAffine(dst1, dst2, rotationMatrix, ocvb.color.Size(), warpFlag)
-        ocvb.label1 = "Rotated with Warpaffine with angle: " + CStr(angle)
-        ocvb.label2 = "Rotated back with inverse Warpaffine angle: " + CStr(-angle)
+        label1 = "Rotated with Warpaffine with angle: " + CStr(angle)
+        label2 = "Rotated back with inverse Warpaffine angle: " + CStr(-angle)
     End Sub
 End Class
 
@@ -135,8 +135,8 @@ Public Class WarpAffine_3Points
         triangle.sliders.TrackBar2.Value = 150
 
         ocvb.desc = "Use 3 non-colinear points to build an affine transform and apply it to the color image."
-        ocvb.label1 = "Triangles define the affine transform"
-        ocvb.label2 = "Image with affine transform applied"
+        label1 = "Triangles define the affine transform"
+        label2 = "Image with affine transform applied"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 60 <> 0 Then Exit Sub
@@ -207,7 +207,7 @@ Public Class WarpAffine_4Points
         rect = New Area_MinRect(ocvb, caller)
 
         ocvb.desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
-        ocvb.label1 = "Color image with perspective transform applied"
+        label1 = "Color image with perspective transform applied"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 60 <> 0 Then Exit Sub

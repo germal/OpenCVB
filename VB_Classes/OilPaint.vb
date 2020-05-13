@@ -177,7 +177,7 @@ Public Class OilPaint_Manual_CS
         sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 10, 4)
         sliders.setupTrackBar2(ocvb, caller, "Intensity", 0, 250, 20)
         ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
-        ocvb.label2 = "Selected area only"
+        label2 = "Selected area only"
 
         Dim w = ocvb.color.Width / 16
         Dim h = ocvb.color.Height / 16
@@ -215,8 +215,8 @@ Public Class OilPaint_Cartoon
 
         oil.sliders.setupTrackBar3(ocvb, caller, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
         ocvb.desc = "Alter an image so it appears more like a cartoon - Painterly Effect"
-        ocvb.label1 = "OilPaint_Cartoon"
-        ocvb.label2 = "Laplacian Edges"
+        label1 = "OilPaint_Cartoon"
+        label2 = "Laplacian Edges"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim roi = ocvb.drawRect

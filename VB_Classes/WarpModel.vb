@@ -38,8 +38,8 @@ Public Class WarpModel_Input
             If nextRadio.Checked Then
                 Dim photo As New FileInfo(ocvb.parms.HomeDir + "Data\Prokudin\" + nextRadio.Text)
                 img = cv.Cv2.ImRead(photo.FullName, cv.ImreadModes.Grayscale)
-                ocvb.label1 = photo.Name + " - red image"
-                ocvb.label2 = photo.Name + " - Misaligned merge"
+                label1 = photo.Name + " - red image"
+                label2 = photo.Name + " - Misaligned merge"
                 Exit For
             End If
         Next
@@ -203,7 +203,7 @@ Public Class WarpModel_AlignImages
         Dim merged As New cv.Mat
         cv.Cv2.Merge(mergeInput, merged)
         dst1(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
-        ocvb.label1 = "Aligned image"
+        label1 = "Aligned image"
         ocvb.putText(New ActiveClass.TrueType("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
                                               "Other than that, images look the same." + vbCrLf +
                                               "Displacement increases with Sobel" + vbCrLf + "kernel size", merged.Width + 10, 100, RESULT1))

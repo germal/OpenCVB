@@ -42,7 +42,7 @@ Public Class Harris_Features_CPP
 
         ReDim srcData(ocvb.color.Total - 1)
         Harris_Features = Harris_Features_Open()
-        ocvb.label2 = "RGB overlaid with Harris result"
+        label2 = "RGB overlaid with Harris result"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

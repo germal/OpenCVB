@@ -8,8 +8,8 @@ Public Class xPhoto_Bm3dDenoise
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Denoise image with block matching and filtering."
-        ocvb.label1 = "Bm3dDenoising"
-        ocvb.label2 = "Difference from Input"
+        label1 = "Bm3dDenoising"
+        label2 = "Difference from Input"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -18,7 +18,7 @@ Public Class xPhoto_Bm3dDenoise
         cv.Cv2.Subtract(dst1, gray, dst2)
         Dim minVal As Double, maxVal As Double
         dst2.MinMaxLoc(minVal, maxVal)
-        ocvb.label2 = "Diff from input - max change=" + CStr(maxVal)
+        label2 = "Diff from input - max change=" + CStr(maxVal)
         dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
 End Class
@@ -32,8 +32,8 @@ Public Class xPhoto_Bm3dDenoiseDepthImage
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Denoise the depth image with block matching and filtering."
-        ocvb.label1 = "Bm3dDenoising"
-        ocvb.label2 = "Difference from Input"
+        label1 = "Bm3dDenoising"
+        label2 = "Difference from Input"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -42,7 +42,7 @@ Public Class xPhoto_Bm3dDenoiseDepthImage
         cv.Cv2.Subtract(dst1, gray, dst2)
         Dim minVal As Double, maxVal As Double
         dst2.MinMaxLoc(minVal, maxVal)
-        ocvb.label2 = "Diff from input - max change=" + CStr(maxVal)
+        label2 = "Diff from input - max change=" + CStr(maxVal)
         dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
 End Class

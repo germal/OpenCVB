@@ -36,12 +36,12 @@ Public Class DilateErode_Basics
         if standalone Then
             If iterations >= 0 Then
                 dst2 = ocvb.RGBDepth.Dilate(element, Nothing, iterations)
-                ocvb.label1 = "Dilate RGB " + CStr(iterations) + " times"
-                ocvb.label2 = "Dilate Depth " + CStr(iterations) + " times"
+                label1 = "Dilate RGB " + CStr(iterations) + " times"
+                label2 = "Dilate Depth " + CStr(iterations) + " times"
             Else
                 dst2 = ocvb.RGBDepth.Erode(element, Nothing, -iterations)
-                ocvb.label1 = "Erode RGB " + CStr(-iterations) + " times"
-                ocvb.label2 = "Erode Depth " + CStr(-iterations) + " times"
+                label1 = "Erode RGB " + CStr(-iterations) + " times"
+                label2 = "Erode Depth " + CStr(-iterations) + " times"
             End If
         End If
     End Sub
