@@ -53,7 +53,7 @@ Public Class Depth_Median
 
         Dim mask As cv.Mat
         mask = median.src.LessThan(median.medianVal)
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         ocvb.RGBDepth.CopyTo(dst1, mask)
 
         Dim zeroMask = median.src.Equals(0)
@@ -63,7 +63,7 @@ Public Class Depth_Median
         label1 = "Median Depth < " + Format(median.medianVal, "#0.0")
 
         cv.Cv2.BitwiseNot(mask, mask)
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         ocvb.RGBDepth.CopyTo(dst2, mask)
         dst2.SetTo(0, zeroMask)
         label2 = "Median Depth > " + Format(median.medianVal, "#0.0")
@@ -132,7 +132,7 @@ Public Class Depth_HolesRect
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
 
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         Dim contours As cv.Point()()
         contours = cv.Cv2.FindContoursAsArray(shadow.borderMask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 
@@ -263,7 +263,7 @@ Public Class Depth_FlatBackground
         cv.Cv2.BitwiseNot(mask, zeroMask)
         dst1.SetTo(0, zeroMask)
 
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         ocvb.RGBDepth.CopyTo(dst1, mask)
         zeroMask.SetTo(255, shadow.holeMask)
         ocvb.color.CopyTo(dst1, zeroMask)
@@ -634,7 +634,7 @@ Public Class Depth_ManualTrim
         cv.Cv2.BitwiseAnd(Mask, maskMin, Mask)
 
         If standalone Then
-            dst1.SetTo(0)
+            dst1 = ocvb.Color.EmptyClone.SetTo(0)
             ocvb.RGBDepth.CopyTo(dst1, Mask)
         Else
             Dim notMask As New cv.Mat

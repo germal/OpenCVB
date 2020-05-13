@@ -323,7 +323,7 @@ Public Class Draw_SymmetricalShapes
             points.Add(pt)
         Next
 
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         For i = 0 To numPoints - 1
             dst1.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod numPoints), ocvb.colorScalar(i Mod ocvb.colorScalar.Count), 2, cv.LineTypes.AntiAlias)
         Next

@@ -188,7 +188,7 @@ Public Class Kalman_RotatingPoint
         Dim measAngle = measurement.Get(Of Single)(0)
         Dim measPt = calcPoint(center, radius, measAngle)
 
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         drawCross(dst1, statePt, cv.Scalar.White)
         drawCross(dst1, measPt, cv.Scalar.White)
         drawCross(dst1, predictPt, cv.Scalar.White)
@@ -223,7 +223,7 @@ Public Class Kalman_MousePredict
         ocvb.desc = "Use kalman filter to predict the next mouse location."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod 100 = 0 Then dst1.SetTo(0)
+        If ocvb.frameCount Mod 100 = 0 Then dst1 = ocvb.Color.EmptyClone.SetTo(0)
 
         Static lastRealMouse = ocvb.mousePoint
         kalman.input(0) = ocvb.mousePoint.X

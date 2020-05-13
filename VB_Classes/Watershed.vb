@@ -6,7 +6,7 @@ Public Class Watershed_Basics
         setCaller(callerRaw)
         label1 = "Draw with left-click to select region."
         label2 = "Mask for watershed (selected regions)."
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         ocvb.desc = "Watershed API experiment.  Draw on the image to test."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -37,7 +37,7 @@ Public Class Watershed_Basics
                 End While
 
                 cv.Cv2.Watershed(src, markers)
-                dst1.SetTo(0)
+                dst1 = ocvb.Color.EmptyClone.SetTo(0)
                 For y = 0 To dst1.Rows - 1
                     For x = 0 To dst1.Cols - 1
                         Dim idx = markers.Get(Of Int32)(y, x)
@@ -65,7 +65,7 @@ Public Class Watershed_DepthAuto
     Dim watershed As Watershed_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         watershed = New Watershed_Basics(ocvb, caller)
         watershed.useDepthImage = True
         ocvb.desc = "Watershed the depth image using shadow, close, and far points."
@@ -91,7 +91,7 @@ Public Class Watershed_RGBSimpleAuto
     Dim watershed As Watershed_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
 
         watershed = New Watershed_Basics(ocvb, caller)
 
@@ -119,7 +119,7 @@ Public Class Watershed_RGBDepthAuto
     Dim watershed As Watershed_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
 
         watershed = New Watershed_Basics(ocvb, caller)
 

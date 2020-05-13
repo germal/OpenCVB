@@ -29,7 +29,7 @@ Public Class intrinsicsLeft_Basics
         End If
         ocvb.putText(New ActiveClass.TrueType(nextLine, 10, ttStart + 120))
 
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         dst2.Line(New cv.Point(ocvb.color.Width / 2, 0), New cv.Point(ocvb.color.Width / 2, ocvb.color.Height), cv.Scalar.White, 1)
         dst2.Line(New cv.Point(0, ocvb.color.Height / 2), New cv.Point(ocvb.color.Width, ocvb.color.Height / 2), cv.Scalar.White, 1)
 

@@ -216,7 +216,7 @@ Public Class Fitline_EigenFit
         highlight = noisyLine.check.Box(0).Checked
 
         Dim w = ocvb.color.Width
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
 
         Dim line = cv.Cv2.FitLine(noisyLine.points, cv.DistanceTypes.L2, 1, 0.01, 0.01)
         Dim m = line.Vy / line.Vx

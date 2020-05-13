@@ -90,7 +90,7 @@ Public Class Annealing_Basics_CPP
             End If
         Next
 
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         drawMap(ocvb)
 
         If restartComputation Or InStr(msg, "temp=0.000") Or InStr(msg, "changesApplied=0 temp") Then

@@ -37,7 +37,7 @@ Public Class Stitch_Basics
         ' stitcher may fail with an external exception if you make width and height too small.
         Dim status = stitcher.Stitch(mats, pano)
 
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         If status = cv.Stitcher.Status.OK Then
             Dim w = pano.Width, h = pano.Height
             If w > dst1.Width Then w = dst1.Width

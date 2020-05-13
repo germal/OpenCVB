@@ -27,7 +27,7 @@ Public Class FitEllipse_Basics_CPP
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         area.Run(ocvb)  ' get some random clusters of points
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         If area.srcPoints.Count >= 5 Then
             Dim box = cv.Cv2.FitEllipse(area.srcPoints)
             ' draw a rotatedRectangle

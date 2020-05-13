@@ -37,7 +37,7 @@ Public Class Featureless_Basics_MT
         Dim floodCountThreshold = sliders.TrackBar4.Value
 
         ocvb.color.CopyTo(dst1)
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)

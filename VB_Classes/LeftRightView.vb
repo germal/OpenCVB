@@ -126,7 +126,7 @@ Public Class LeftRightView_CompareRaw
 
         lrView.Run(ocvb)
         Dim leftView = dst1.Clone() ' we will be using result1 for output now.
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
 
         Dim sliceY = sliders.TrackBar2.Value
         Dim slideHeight = sliders.TrackBar3.Value

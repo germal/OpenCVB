@@ -71,7 +71,7 @@ Public Class WarpAffine_Captcha
         Dim charactersSize = characters.Length / characters(0).Length
 
         Dim outImage As New cv.Mat(charHeight, charWidth * captchaLength, cv.MatType.CV_8UC3, cv.Scalar.White)
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
 
         For i = 0 To captchaLength - 1
             Dim charImage = New cv.Mat(charHeight, charWidth, cv.MatType.CV_8UC3, cv.Scalar.White)
@@ -213,7 +213,7 @@ Public Class WarpAffine_4Points
         If ocvb.frameCount Mod 60 <> 0 Then Exit Sub
 
         Dim roi = New cv.Rect(50, ocvb.color.Height / 2, ocvb.color.Width / 6, ocvb.color.Height / 6)
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         Dim smallImage = ocvb.color.Resize(New cv.Size(roi.Width, roi.Height))
         Dim rectangles(1) As cv.RotatedRect
         rect.Run(ocvb)
@@ -240,7 +240,7 @@ Public Class WarpAffine_4Points
             Next
         Next
 
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         Dim ttStart = 40
         ocvb.putText(New ActiveClass.TrueType("M defined as: " + vbCrLf +
                                               Format(M.Get(Of Double)(0, 0), "#0.00") + vbTab +

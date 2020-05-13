@@ -129,7 +129,7 @@ Public Class Blob_RenderBlobs
             cc.RenderBlobs(labelView)
 
             Dim maxBlob = cc.GetLargestBlob()
-            dst2.SetTo(0)
+            dst2 = ocvb.Color.EmptyClone.SetTo(0)
             cc.FilterByBlob(dst1, dst2, maxBlob)
 
             For Each blob In cc.Blobs.Skip(1)

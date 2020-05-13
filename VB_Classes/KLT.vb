@@ -31,11 +31,11 @@ Public Class KLT_Basics
         Dim subPixWinSize As New cv.Size(10, 10)
         Dim nightMode = check.Box(0).Checked
 
-        If nightMode Then dst1.SetTo(0) Else ocvb.color.CopyTo(dst1)
+        If nightMode Then dst1 = ocvb.Color.EmptyClone.SetTo(0) Else ocvb.color.CopyTo(dst1)
 
         gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If ocvb.frameCount = 0 Or inputPoints Is Nothing Then
-            dst2.SetTo(0)
+            dst2 = ocvb.Color.EmptyClone.SetTo(0)
             inputPoints = cv.Cv2.GoodFeaturesToTrack(gray, maxCorners, qualityLevel, minDistance, New cv.Mat, blockSize, False, 0)
             If inputPoints.Length > 0 Then
                 inputPoints = cv.Cv2.CornerSubPix(gray, inputPoints, subPixWinSize, New cv.Size(-1, -1), term)

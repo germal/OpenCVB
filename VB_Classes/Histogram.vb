@@ -339,7 +339,7 @@ Public Class Histogram_BackProjectionGrayScale
         pixelMin -= incr
         pixelMax += incr
         Dim mask = hist.gray.InRange(pixelMin, pixelMax)
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         ocvb.color.CopyTo(dst1, mask)
         label1 = "BackProjection of most frequent pixel + " + CStr(neighbors) + " neighbor" + If(neighbors <> 1, "s", "")
     End Sub
@@ -376,7 +376,7 @@ Public Class Histogram_BackProjection
         cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
 
         mask = mask.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         ocvb.color.CopyTo(dst1, mask)
     End Sub
 End Class

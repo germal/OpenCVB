@@ -92,7 +92,7 @@ Public Class PCA_DrawImage
         Dim contours As cv.Point()() = Nothing
         cv.Cv2.FindContours(gray, contours, hierarchy, cv.RetrievalModes.List, cv.ContourApproximationModes.ApproxNone)
 
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         For i = 0 To contours.Length - 1
             Dim area = cv.Cv2.ContourArea(contours(i))
             If area < 100 Or area > 100000 Then Continue For

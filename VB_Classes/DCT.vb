@@ -75,7 +75,8 @@ Public Class DCT_Grayscale
         label2 = "Difference from original"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Or src.Width = 0 Then src = ocvb.color
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
         gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
@@ -109,7 +110,8 @@ Public Class DCT_FeatureLess_MT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dct.Run(ocvb)
-        dst1.SetTo(0)
+        dst1 = ocvb.color.EmptyClone.SetTo(0)
+        dst2 = dct.dst1
         Dim runLenMin = sliders.TrackBar1.Value
 
         ' Result2 contain the RGB image with highest frequency removed.
@@ -130,7 +132,7 @@ Public Class DCT_FeatureLess_MT
                 End If
             Next
         End Sub)
-        dst2.SetTo(0)
+        dst2 = ocvb.color.EmptyClone.SetTo(0)
         ocvb.color.CopyTo(dst2, dst1)
         label1 = "Mask of DCT with highest frequency removed"
     End Sub
@@ -233,8 +235,8 @@ Public Class DCT_CCompenents
     Public Sub Run(ocvb As AlgorithmData)
         dct.Run(ocvb)
 
-        cc.src = dct.dst1.Clone()
-        cc.Run(ocvb)
+        'cc.src = dct.dst1.Clone()
+        'cc.Run(ocvb)
     End Sub
 End Class
 

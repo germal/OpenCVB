@@ -69,7 +69,7 @@ Public Class DilateErode_DepthSeed
         validImg = depth32f.GreaterThan(0)
         validImg.SetTo(0, depth32f.GreaterThan(3000)) ' max distance
         cv.Cv2.BitwiseAnd(seeds, validImg, seeds)
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         ocvb.RGBDepth.CopyTo(dst1, seeds)
     End Sub
 End Class

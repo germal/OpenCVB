@@ -110,7 +110,7 @@ Public Class DFT_Inverse
             label2 = "Mask of difference (top) and relative diff (bot)"
         Else
             label2 = "InverseDFT reproduced original"
-            dst2.SetTo(0)
+            dst2 = ocvb.Color.EmptyClone.SetTo(0)
         End If
     End Sub
 End Class

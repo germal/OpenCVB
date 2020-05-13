@@ -263,7 +263,7 @@ Public Class Puzzle_Basics
         End If
 
         ' display image with shuffled roi's
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         For i = 0 To scrambled.Count - 1
             Dim roi = grid.roiList(i)
             Dim roi2 = scrambled(i)

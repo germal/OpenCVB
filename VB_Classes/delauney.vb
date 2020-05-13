@@ -120,7 +120,7 @@ Public Class Delaunay_GoodFeatures
 
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         For i = 0 To features.goodFeatures.Count - 1
             locate_point(dst2, subdiv, features.goodFeatures(i), active_facet_color)
             subdiv.Insert(features.goodFeatures(i))
@@ -148,7 +148,7 @@ Public Class Delauney_Subdiv2D
             Function(i)
                 Return New cv.Point2f(rand.Next(0, ocvb.color.Width), rand.Next(0, ocvb.color.Height))
             End Function).ToArray()
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         For Each p In points
             dst1.Circle(p, 4, cv.Scalar.Red, -1)
         Next

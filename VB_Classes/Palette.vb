@@ -42,7 +42,7 @@ Public Class Palette_LinearPolar
         Dim iFlag = getInterpolationRadioButtons(radio)
         Static pt = New cv.Point2f(ocvb.ms_rng.Next(0, dst1.Cols - 1), ocvb.ms_rng.Next(0, dst1.Rows - 1))
         Dim radius = sliders.TrackBar1.Value ' ocvb.ms_rng.next(0, dst1.Cols)
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         cv.Cv2.LinearPolar(dst1, dst1, pt, radius, iFlag)
         cv.Cv2.LinearPolar(ocvb.color, dst2, pt, radius, iFlag)
     End Sub
@@ -165,7 +165,7 @@ Public Class Palette_Map
 
             Dim maxCount = cv.Cv2.CountNonZero(mask)
 
-            dst2.SetTo(0)
+            dst2 = ocvb.Color.EmptyClone.SetTo(0)
             dst2.SetTo(cv.Scalar.All(255), mask)
             label2 = "Most Common Color +- " + CStr(offset) + " count = " + CStr(maxCount)
         End If
@@ -259,7 +259,7 @@ Public Class Palette_BuildGradientColorMap
                 If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
             Next
             gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
-            dst2.SetTo(0)
+            dst2 = ocvb.Color.EmptyClone.SetTo(0)
             Dim r As New cv.Rect(0, 0, 255, 1)
             For i = 0 To dst2.Height - 1
                 r.Y = i
@@ -321,7 +321,7 @@ Public Class Palette_ColorMap
                 buildNewRandomMap = False ' if they select something other than random, then next random request will rebuild the map.
                 If colormap = 20 Then
                     dst1 = src.Clone()
-                    dst2.SetTo(0)
+                    dst2 = ocvb.Color.EmptyClone.SetTo(0)
                     Exit For
                 End If
                 cv.Cv2.ApplyColorMap(src, dst1, colormap)

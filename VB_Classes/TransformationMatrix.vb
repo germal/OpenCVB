@@ -12,8 +12,8 @@ Public Class TransformationMatrix_Basics
         ocvb.desc = "Show the contents of the transformation matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst1.SetTo(0)
-        dst2.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         If ocvb.parms.transformationMatrix IsNot Nothing Then
             Dim t = ocvb.parms.transformationMatrix
             Dim mul = sliders.TrackBar1.Value

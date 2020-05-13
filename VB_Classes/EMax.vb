@@ -75,8 +75,8 @@ Public Class EMax_Basics
                 Next
             Next
         Else
-            dst1.SetTo(0)
-            dst2.SetTo(0)
+            dst1 = ocvb.Color.EmptyClone.SetTo(0)
+            dst2 = ocvb.Color.EmptyClone.SetTo(0)
         End If
 
         ' draw the clustered samples

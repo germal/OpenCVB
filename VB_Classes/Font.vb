@@ -7,8 +7,8 @@ Public Class Font_OpenCV
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 30 Then Exit Sub
-        dst1.SetTo(0)
-        dst2.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         Dim hersheyFont = Choose(ocvb.frameCount Mod 7 + 1, cv.HersheyFonts.HersheyComplex, cv.HersheyFonts.HersheyComplexSmall, cv.HersheyFonts.HersheyDuplex,
                                  cv.HersheyFonts.HersheyPlain, cv.HersheyFonts.HersheyScriptComplex, cv.HersheyFonts.HersheyScriptSimplex, cv.HersheyFonts.HersheySimplex,
                                  cv.HersheyFonts.HersheyTriplex, cv.HersheyFonts.Italic)
@@ -66,7 +66,7 @@ Public Class Font_FlowText
             msgs.Add("Then in your Run method, flow.msgs.add('your next line of text') - for as many msgs as you need on each pass.")
             msgs.Add("Then at the end of your Run method, invoke flow.Run(ocvb)")
         Else
-            If result1or2 = RESULT1 Then dst1.SetTo(0) Else dst2.SetTo(0)
+            If result1or2 = RESULT1 Then dst1 = ocvb.Color.EmptyClone.SetTo(0) Else dst2 = ocvb.Color.EmptyClone.SetTo(0)
         End If
 
         For i = 0 To msgs.Count - 1

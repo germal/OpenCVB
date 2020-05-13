@@ -110,7 +110,7 @@ Public Class Plane_Detect
         Dim depth32f = getDepth32f(ocvb)
         grid.Run(ocvb)
 
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         ocvb.RGBDepth.CopyTo(dst1)
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
@@ -183,7 +183,7 @@ Public Class Plane_DetectDebug
         Dim depth32f = getDepth32f(ocvb)
         grid.Run(ocvb)
 
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         ocvb.RGBDepth.CopyTo(dst1)
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,

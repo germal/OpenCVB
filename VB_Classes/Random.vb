@@ -21,7 +21,7 @@ Public Class Random_Points
             ReDim Points(sliders.TrackBar1.Value - 1)
             ReDim Points2f(sliders.TrackBar1.Value - 1)
         End If
-        if standalone Then dst1.SetTo(0)
+        if standalone Then dst1 = ocvb.Color.EmptyClone.SetTo(0)
         For i = 0 To Points.Length - 1
             Dim x = ocvb.ms_rng.Next(rangeRect.X, rangeRect.X + rangeRect.Width)
             Dim y = ocvb.ms_rng.Next(rangeRect.Y, rangeRect.Y + rangeRect.Height)

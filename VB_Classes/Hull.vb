@@ -46,8 +46,8 @@ Public Class Hull_Basics
         hull = cv.Cv2.ConvexHull(points, True)
 
         if standalone Then
-            dst1.SetTo(0)
-            dst2.SetTo(0)
+            dst1 = ocvb.Color.EmptyClone.SetTo(0)
+            dst2 = ocvb.Color.EmptyClone.SetTo(0)
             For i = 0 To hull.Count - 1
                 cv.Cv2.Line(dst1, hull.ElementAt(i), hull.ElementAt((i + 1) Mod hull.Count), cv.Scalar.White, 2)
                 cv.Cv2.Line(dst2, hull.ElementAt(i), hull.ElementAt((i + 1) Mod hull.Count), cv.Scalar.White, 2)

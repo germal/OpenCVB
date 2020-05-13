@@ -27,7 +27,7 @@ Public Class Emgu_Facedetection
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Use the simplest possible face detector in Emgu examples."
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.testAllRunning Then

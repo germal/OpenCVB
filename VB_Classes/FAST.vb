@@ -38,7 +38,7 @@ Public Class FAST_Centroid
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         fast.Run(ocvb)
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         For Each kp As cv.KeyPoint In fast.keypoints
             dst2.Circle(kp.Pt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
         Next kp

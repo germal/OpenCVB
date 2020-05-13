@@ -189,7 +189,7 @@ Public Class OilPaint_Manual_CS
         Dim roi = ocvb.drawRect
         ocvb.color.CopyTo(dst1)
         oilPaint.Start(ocvb.color(roi), dst1(roi), kernelSize, sliders.TrackBar2.Value)
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         Dim factor As Int32 = Math.Min(Math.Floor(dst2.Width / roi.Width), Math.Floor(dst2.Height / roi.Height))
         Dim s = New cv.Size(roi.Width * factor, roi.Height * factor)
         cv.Cv2.Resize(dst1(roi), dst2(New cv.Rect(0, 0, s.Width, s.Height)), s)

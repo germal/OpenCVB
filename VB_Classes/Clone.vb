@@ -196,7 +196,7 @@ Public Class Clone_Seamless
     Public Sub Run(ocvb As AlgorithmData)
         Dim center As New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
         Dim radius = 100
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         If ocvb.drawRect = New cv.Rect Then
             dst1.SetTo(255)
         Else

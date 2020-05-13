@@ -43,7 +43,7 @@ Public Class Gabor_Basics
             dst1 = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
         Else
             dst1 = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
-            dst2.SetTo(0)
+            dst2 = ocvb.Color.EmptyClone.SetTo(0)
             dst2 = gKernel.Resize(ocvb.color.Size(), 0, 0, cv.InterpolationFlags.Cubic)
         End If
     End Sub

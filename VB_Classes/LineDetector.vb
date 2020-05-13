@@ -251,7 +251,7 @@ Public Class LineDetector_LSD
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.OpenCV_Version_ID <> "401" Then
-            dst1.SetTo(0)
+            dst1 = ocvb.Color.EmptyClone.SetTo(0)
             ocvb.putText(New ActiveClass.TrueType("LSD linedetector is available only with OpenCV 4.01 - IP issue?", 10, 100, RESULT1))
             Exit Sub
         End If
@@ -351,7 +351,7 @@ Public Class LineDetector_3D_LSD_MT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.OpenCV_Version_ID <> "401" Then
-            dst1.SetTo(0)
+            dst1 = ocvb.Color.EmptyClone.SetTo(0)
             ocvb.putText(New ActiveClass.TrueType("LSD linedetector is available only with OpenCV 4.01 - IP issue.", 10, 100, RESULT1))
             Exit Sub
         End If
@@ -408,8 +408,8 @@ Public Class LineDetector_3D_FitLineZ
         Dim useLSD As Boolean = True
         If radio.check(0).Checked Or radio.check(2).Checked Then useLSD = False
         If useLSD And ocvb.parms.OpenCV_Version_ID <> "401" Then
-            dst1.SetTo(0)
-            dst2.SetTo(0)
+            dst1 = ocvb.Color.EmptyClone.SetTo(0)
+            dst2 = ocvb.Color.EmptyClone.SetTo(0)
             ocvb.putText(New ActiveClass.TrueType("LSD linedetector is available only with OpenCV 4.01 - IP issue.", 10, 100, RESULT1))
             Exit Sub
         End If

@@ -30,7 +30,7 @@ Public Class Mat_PointToMat
         Dim rows = mask.Points.Length
         Dim pMat = New cv.Mat(rows, 1, cv.MatType.CV_32SC2, mask.Points)
         Dim indexer = pMat.GetGenericIndexer(Of cv.Vec2i)()
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         Dim white = New cv.Vec3b(255, 255, 255)
         For i = 0 To rows - 1
             dst2.Set(Of cv.Vec3b)(indexer(i).Item1, indexer(i).Item0, white)
@@ -105,12 +105,12 @@ Public Class Mat_Tricks
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mat = ocvb.color.Resize(New cv.Size(200, 200))
-        dst1.SetTo(0)
+        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         Dim x = 40
         Dim y = 80
         dst1(x, x + mat.Width, y, y + mat.Height) = mat
 
-        dst2.SetTo(0)
+        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         x = 20
         y = 40
         dst2(x, x + mat.Width, y, y + mat.Height) = mat.T
