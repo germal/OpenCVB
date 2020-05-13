@@ -254,7 +254,6 @@ Public Class Blob_Largest
         rects = blobs.flood.fBasics.maskRects
         masks = blobs.flood.fBasics.masks
 
-        dst1 = ocvb.color.EmptyClone.SetTo(0)
         If masks.Count > 0 Then
             Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(blobIndex).Value ' this is the largest contiguous blob
             ocvb.color.CopyTo(dst1, masks(maskIndex))
@@ -287,7 +286,6 @@ Public Class Blob_LargestDepthCluster
         Dim blobList = blobs.histBlobs.valleys.rangeBoundaries
 
         Dim maxSize = blobs.histBlobs.valleys.sortedSizes.ElementAt(0)
-        dst1 = ocvb.color.EmptyClone.SetTo(0)
         Dim startEndDepth = blobs.histBlobs.valleys.rangeBoundaries.ElementAt(0)
         Dim tmp As New cv.Mat, mask As New cv.Mat
         cv.Cv2.InRange(getDepth32f(ocvb), startEndDepth.X, startEndDepth.Y, tmp)

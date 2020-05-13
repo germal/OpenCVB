@@ -76,7 +76,6 @@ Public Class MatchTemplate_RowCorrelation
         Dim line1 = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
         Dim line2 = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
 
-        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         Dim nextLine = dst1.Row(line1)
         nextLine = ocvb.color.Row(line1)
         nextLine = dst1.Row(line2)

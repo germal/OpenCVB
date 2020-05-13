@@ -166,7 +166,6 @@ Public Class VTK_Histogram3D
         End If
 
         mats.Run(ocvb)
-        dst1 = ocvb.Color.EmptyClone.SetTo(0)
 
         vtk.rgbInput = dst2.Clone()
         vtk.dataInput = New cv.Mat ' ocvb.depth

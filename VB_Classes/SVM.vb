@@ -60,9 +60,6 @@ Public Class SVM_Basics
     End Function
     Public Sub Run(ocvb As AlgorithmData)
         svmOptions.Run(ocvb) ' update any options specified in the interface.
-        dst1 = ocvb.Color.EmptyClone.SetTo(0)
-        dst2 = ocvb.Color.EmptyClone.SetTo(0)
-
         Dim points(svmOptions.sliders.TrackBar1.Value) As cv.Point2f
         Dim responses(points.Length - 1) As Int32
         For i = 0 To points.Length - 1
@@ -147,8 +144,6 @@ Public Class SVM_Basics_MT
     Public Sub Run(ocvb As AlgorithmData)
         svmOptions.Run(ocvb)
         grid.Run(ocvb)
-        dst1 = ocvb.Color.EmptyClone.SetTo(0)
-        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         Dim points(svmOptions.sliders.TrackBar1.Value) As cv.Point2f
         Dim responses(points.Length - 1) As Int32
         For i = 0 To points.Length - 1

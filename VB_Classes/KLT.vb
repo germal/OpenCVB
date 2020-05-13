@@ -31,7 +31,7 @@ Public Class KLT_Basics
         Dim subPixWinSize As New cv.Size(10, 10)
         Dim nightMode = check.Box(0).Checked
 
-        If nightMode Then dst1 = ocvb.Color.EmptyClone.SetTo(0) Else ocvb.color.CopyTo(dst1)
+        If nightMode Then dst1.SetTo(0) Else ocvb.color.CopyTo(dst1)
 
         gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If ocvb.frameCount = 0 Or inputPoints Is Nothing Then

@@ -65,7 +65,6 @@ Public Class Math_Median_CDF
         if standalone Then
             Dim mask = New cv.Mat
             mask = src.GreaterThan(medianVal)
-            dst1 = ocvb.Color.EmptyClone.SetTo(0)
             ocvb.color.CopyTo(dst1, mask)
             label1 = "Grayscale pixels > " + Format(medianVal, "#0.0")
 

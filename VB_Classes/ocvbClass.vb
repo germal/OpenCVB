@@ -27,6 +27,8 @@ Public Class ocvbClass : Implements IDisposable
         End If
     End Sub
     Public Sub New()
+        dst1 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
         algorithm = Me
         label1 = Me.GetType.Name
     End Sub
@@ -37,8 +39,6 @@ Public Class ocvbClass : Implements IDisposable
             If dst2.Width <> 0 Then ocvb.result2 = dst2
             ocvb.label1 = label1
             ocvb.label2 = label2
-        End If
-        If standalone Then
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

@@ -68,7 +68,6 @@ Public Class BGSubtract_MotionDetect_MT
         ocvb.desc = "Detect Motion for use with background subtraction"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst1 = ocvb.color.EmptyClone.SetTo(0)
         If ocvb.frameCount = 0 Then ocvb.color.CopyTo(dst2)
         Dim threadData As New cv.Vec3i
         Dim w = ocvb.color.Width, h = ocvb.color.Height

@@ -37,7 +37,6 @@ Public Class Watershed_Basics
                 End While
 
                 cv.Cv2.Watershed(src, markers)
-                dst1 = ocvb.Color.EmptyClone.SetTo(0)
                 For y = 0 To dst1.Rows - 1
                     For x = 0 To dst1.Cols - 1
                         Dim idx = markers.Get(Of Int32)(y, x)

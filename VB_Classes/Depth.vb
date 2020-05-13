@@ -1,41 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Depth_WorldXYZ_MT
-    Inherits ocvbClass
-    Dim grid As Thread_Grid
-    Public xyzFrame As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        grid = New Thread_Grid(ocvb, caller)
-        grid.sliders.TrackBar1.Value = 32
-        grid.sliders.TrackBar2.Value = 32
-        xyzFrame = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32FC3)
-        ocvb.desc = "Create OpenGL point cloud from depth data (too slow to be useful)"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        grid.Run(ocvb)
-
-        xyzFrame.SetTo(0)
-        Dim depth32f = getDepth32f(ocvb)
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
-        Sub(roi)
-            Dim xy As New cv.Point3f
-            For xy.Y = roi.Y To roi.Y + roi.Height - 1
-                For xy.X = roi.X To roi.X + roi.Width - 1
-                    xy.Z = depth32f.Get(Of UInt16)(xy.Y, xy.X)
-                    If xy.Z <> 0 Then
-                        Dim w = getWorldCoordinatesD(ocvb, xy)
-                        xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, w)
-                    End If
-                Next
-            Next
-        End Sub)
-    End Sub
-End Class
-
-
-
-
 Public Class Depth_Median
     Inherits ocvbClass
     Dim median As Math_Median_CDF
@@ -53,7 +17,6 @@ Public Class Depth_Median
 
         Dim mask As cv.Mat
         mask = median.src.LessThan(median.medianVal)
-        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         ocvb.RGBDepth.CopyTo(dst1, mask)
 
         Dim zeroMask = median.src.Equals(0)
@@ -63,7 +26,7 @@ Public Class Depth_Median
         label1 = "Median Depth < " + Format(median.medianVal, "#0.0")
 
         cv.Cv2.BitwiseNot(mask, mask)
-        dst2 = ocvb.Color.EmptyClone.SetTo(0)
+        dst2 = ocvb.color.EmptyClone.SetTo(0)
         ocvb.RGBDepth.CopyTo(dst2, mask)
         dst2.SetTo(0, zeroMask)
         label2 = "Median Depth > " + Format(median.medianVal, "#0.0")
@@ -108,11 +71,12 @@ Public Class Depth_FirstLastDistance
         ocvb.RGBDepth.CopyTo(dst1)
         ocvb.RGBDepth.CopyTo(dst2)
         label1 = "Min Depth " + CStr(minVal) + " mm"
-        dst1.Circle(minPt, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst1.Circle(minPt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         label2 = "Max Depth " + CStr(maxVal) + " mm"
         dst2.Circle(maxPt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
     End Sub
 End Class
+
 
 
 
@@ -132,7 +96,6 @@ Public Class Depth_HolesRect
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
 
-        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         Dim contours As cv.Point()()
         contours = cv.Cv2.FindContoursAsArray(shadow.borderMask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 
@@ -147,17 +110,25 @@ Public Class Depth_HolesRect
                 End If
             End If
         Next
+        cv.Cv2.AddWeighted(dst1, 0.5, ocvb.RGBDepth, 0.5, 0, dst1)
     End Sub
 End Class
+
+
 
 
 
 Public Class Depth_Foreground
     Inherits ocvbClass
     Public trim As Depth_InRange
+    Public kalman As Kalman_Basics
+    Public trustedRect As cv.Rect
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         trim = New Depth_InRange(ocvb, caller)
+        kalman = New Kalman_Basics(ocvb, caller)
+        ReDim kalman.input(4 - 1) ' cv.rect...
+        label1 = "Blue is current, red is kalman, green is trusted"
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Use depth to find the top of the head and then meanshift to the face."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -194,7 +165,18 @@ Public Class Depth_Foreground
             Dim yy = blobLocation.Item(maxIndex).Y
             If xx < 0 Then xx = 0
             If xx + rectSize / 2 > ocvb.color.Width Then xx = ocvb.color.Width - rectSize
+            dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+            kalman.input = {xx, yy, rectSize, rectSize}
+            kalman.Run(ocvb)
             ocvb.drawRect = New cv.Rect(xx, yy, rectSize, rectSize)
+            Dim kRect = New cv.Rect(kalman.output(0), kalman.output(1), kalman.output(2), kalman.output(3))
+            dst1.Rectangle(kRect, cv.Scalar.Red, 2)
+            dst1.Rectangle(ocvb.drawRect, cv.Scalar.Blue, 2)
+            If Math.Abs(kRect.X - ocvb.drawRect.X) < rectSize / 4 And Math.Abs(kRect.Y - ocvb.drawRect.Y) < rectSize / 4 Then
+                trustedRect = kRect
+                dst1.Rectangle(trustedRect, cv.Scalar.Green, 5)
+            End If
         End If
     End Sub
 End Class
@@ -263,7 +245,6 @@ Public Class Depth_FlatBackground
         cv.Cv2.BitwiseNot(mask, zeroMask)
         dst1.SetTo(0, zeroMask)
 
-        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         ocvb.RGBDepth.CopyTo(dst1, mask)
         zeroMask.SetTo(255, shadow.holeMask)
         ocvb.color.CopyTo(dst1, zeroMask)
@@ -297,7 +278,7 @@ Public Class Depth_WorldXYZ
         ocvb.desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim depth32f = getDepth32f(ocvb)
+        Dim depth32f = (getDepth32f(ocvb) * 0.001).ToMat ' convert to meters.
         Dim xy As New cv.Point3f
         For xy.Y = 0 To xyzFrame.Height - 1
             For xy.X = 0 To xyzFrame.Width - 1
@@ -308,8 +289,54 @@ Public Class Depth_WorldXYZ
                 End If
             Next
         Next
+        ocvb.putText(New ActiveClass.TrueType("OpenGL data prepared.", 10, 50, RESULT1))
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Depth_WorldXYZ_MT
+    Inherits ocvbClass
+    Dim grid As Thread_Grid
+    Dim trim As Depth_InRange
+    Public xyzFrame As cv.Mat
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        grid = New Thread_Grid(ocvb, caller)
+        grid.sliders.TrackBar1.Value = 32
+        grid.sliders.TrackBar2.Value = 32
+
+        trim = New Depth_InRange(ocvb, caller)
+
+        xyzFrame = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32FC3)
+        ocvb.desc = "Create OpenGL point cloud from depth data (too slow to be useful)"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        trim.Run(ocvb)
+        grid.Run(ocvb)
+
+        xyzFrame.SetTo(0)
+        Dim depth32f = (trim.depth32f * 0.001).ToMat ' convert to meters.
+        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Sub(roi)
+            Dim xy As New cv.Point3f
+            For xy.Y = roi.Y To roi.Y + roi.Height - 1
+                For xy.X = roi.X To roi.X + roi.Width - 1
+                    xy.Z = depth32f.Get(Of Single)(xy.Y, xy.X)
+                    If xy.Z <> 0 Then
+                        Dim w = getWorldCoordinatesD(ocvb, xy)
+                        xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, w)
+                    End If
+                Next
+            Next
+        End Sub)
+        ocvb.putText(New ActiveClass.TrueType("OpenGL data prepared.", 10, 50, RESULT1))
+    End Sub
+End Class
+
 
 
 
@@ -319,30 +346,29 @@ Public Class Depth_WorldXYZ_CPP
     Dim DepthXYZ As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
+        DepthXYZ = Depth_XYZ_OpenMP_Open(ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy,
+                                         ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy)
         label1 = "xyzFrame is built"
         ocvb.desc = "Get the X, Y, Depth in the image coordinates (not the 3D image coordinates.)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount = 0 Then DepthXYZ = Depth_XYZ_OpenMP_Open(ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy,
-                                                                     ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy)
-
-        Dim depth32f = getDepth32f(ocvb)
+        Dim depth32f = getDepth32f(ocvb) ' the C++ code will convert it to meters.
         Dim depthData(depth32f.Total * depth32f.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned) ' pin it for the duration...
         Marshal.Copy(depth32f.Data, depthData, 0, depthData.Length)
         Dim imagePtr = Depth_XYZ_OpenMP_Run(DepthXYZ, handleSrc.AddrOfPinnedObject(), depth32f.Rows, depth32f.Cols)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then
-            Dim dstData(depth32f.Total * 3 * 4 - 1) As Byte
-            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            pointCloud = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_32FC3, dstData)
-        End If
+        If imagePtr <> 0 Then pointCloud = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_32FC3, imagePtr)
+        ocvb.putText(New ActiveClass.TrueType("OpenGL data prepared.", 10, 50, RESULT1))
     End Sub
     Public Sub Close()
         Depth_XYZ_OpenMP_Close(DepthXYZ)
     End Sub
 End Class
+
+
+
 
 
 Public Class Depth_MeanStdev_MT
@@ -498,7 +524,6 @@ Public Class Depth_Palette
     Inherits ocvbClass
     Public trim As Depth_InRange
     Dim customColorMap As New cv.Mat
-    Dim depth As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         trim = New Depth_InRange(ocvb, caller)
@@ -512,8 +537,9 @@ Public Class Depth_Palette
         Dim minDepth = trim.sliders.TrackBar1.Value
         Dim maxDepth = trim.sliders.TrackBar2.Value
 
-        Dim depthNorm = getDepth32f(ocvb)
+        Dim depthNorm = trim.depth32f
         depthNorm *= 255 / (maxDepth - minDepth) ' do the normalize manually to use the min and max Depth (more stable)
+        Dim depth As New cv.Mat
         depthNorm.ConvertTo(depth, cv.MatType.CV_8U)
 
         depth = depth.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -593,16 +619,7 @@ Public Class Depth_Colorizer_CPP
         Dim imagePtr = Depth_Colorizer_Run(dcPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then
-            If dst1.Rows = 0 Then dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-            Dim dstData(dst1.Total * dst1.ElemSize - 1) As Byte
-            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            If standalone Then
-                dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC3, dstData)
-            End If
-
-            dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
-        End If
+        If imagePtr <> 0 Then dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
     End Sub
     Public Sub Close()
         Depth_Colorizer_Close(dcPtr)
@@ -634,7 +651,6 @@ Public Class Depth_ManualTrim
         cv.Cv2.BitwiseAnd(Mask, maskMin, Mask)
 
         If standalone Then
-            dst1 = ocvb.Color.EmptyClone.SetTo(0)
             ocvb.RGBDepth.CopyTo(dst1, Mask)
         Else
             Dim notMask As New cv.Mat
@@ -671,6 +687,7 @@ Public Class Depth_InRange
         cv.Cv2.BitwiseNot(Mask, zeroMask)
         dst1 = Mask
         dst2 = zeroMask
+        depth32f.SetTo(0, zeroMask)
     End Sub
 End Class
 
@@ -694,25 +711,16 @@ Public Class Depth_ColorizerFastFade_CPP
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
-
-        If standalone Then src = trim.dst1 Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         dst2 = trim.Mask
+
+        If standalone Then src = trim.depth32f Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, depthData, 0, depthData.Length)
         Dim imagePtr = Depth_Colorizer2_Run(dcPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, trim.maxDepth)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then
-            If dst1.Rows = 0 Then dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-            Dim dstData(dst1.Total * dst1.ElemSize - 1) As Byte
-            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            If standalone Then
-                dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC3, dstData)
-            Else
-                dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
-            End If
-        End If
+        If imagePtr <> 0 Then dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
     End Sub
     Public Sub Close()
         Depth_Colorizer2_Close(dcPtr)
@@ -803,6 +811,7 @@ Public Class Depth_ColorizerVB_MT
         For i = 1 To histogram.Length - 1
             histogram(i) += histogram(i - 1)
         Next
+
         Dim maxHist = histogram(histSize - 1)
         If maxHist > 0 Then
             Parallel.ForEach(Of cv.Rect)(grid.roiList,

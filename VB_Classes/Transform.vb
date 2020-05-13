@@ -17,7 +17,6 @@ Public Class Transform_Resize
             tmp(roi).CopyTo(dst1)
         Else
             Dim roi = New cv.Rect((ocvb.color.Width - w) / 2, (ocvb.color.Height - h) / 2, w, h)
-            dst1 = ocvb.Color.EmptyClone.SetTo(0)
             dst1(roi) = ocvb.color.Resize(New cv.Size(w, h), 0)
         End If
     End Sub

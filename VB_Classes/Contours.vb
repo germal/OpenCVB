@@ -175,8 +175,6 @@ Public Class Contours_RGB
 
         If contours0(maxIndex).Length = 0 Then Exit Sub
 
-        dst1 = ocvb.color.EmptyClone.SetTo(0)
-        dst2 = dst1.Clone()
         Dim hull() = cv.Cv2.ConvexHull(contours0(maxIndex), True)
         Dim listOfPoints = New List(Of List(Of cv.Point))
         Dim points = New List(Of cv.Point)

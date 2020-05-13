@@ -142,7 +142,6 @@ Public Class knn_Cluster2D
                 knn.querySet(i) = New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y))
             Next
             knn.Run(ocvb) ' run only one time.
-            dst1 = ocvb.Color.EmptyClone.SetTo(0)
             cluster(ocvb.rColors, dst1)
             label1 = "knn clusters total=" + CStr(totalClusters) + " closedRegions=" + CStr(closedRegions)
         End If
@@ -170,7 +169,7 @@ Public Class knn_Point2d
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim knn = cv.ML.KNearest.Create()
-        if standalone Then
+        If standalone Then
             ReDim lastSet(sliders.TrackBar1.Value - 1)
             ReDim querySet(sliders.TrackBar1.Value - 1)
             For i = 0 To lastSet.Count - 1
@@ -180,7 +179,6 @@ Public Class knn_Point2d
             For i = 0 To querySet.Count - 1
                 querySet(i) = New cv.Point2f(ocvb.ms_rng.Next(0, dst1.Cols), ocvb.ms_rng.Next(0, dst1.Rows))
             Next
-            dst1 = ocvb.Color.EmptyClone.SetTo(0)
         End If
         Dim responses(lastSet.Length - 1) As Int32
         For i = 0 To responses.Length - 1
@@ -239,7 +237,7 @@ Public Class knn_Point3d
     Public Sub Run(ocvb As AlgorithmData)
         Dim maxDepth As Int32 = 4000 ' this is an arbitrary max dept    h
         Dim knn = cv.ML.KNearest.Create()
-        if standalone Then
+        If standalone Then
             ReDim lastSet(sliders.TrackBar1.Value - 1)
             ReDim querySet(lastSet.Count - 1)
             For i = 0 To lastSet.Count - 1
@@ -249,9 +247,6 @@ Public Class knn_Point3d
             For i = 0 To querySet.Count - 1
                 querySet(i) = New cv.Point3f(ocvb.ms_rng.Next(0, dst1.Cols), ocvb.ms_rng.Next(0, dst1.Rows), ocvb.ms_rng.Next(0, maxDepth))
             Next
-
-            dst1 = ocvb.Color.EmptyClone.SetTo(0)
-            dst2 = ocvb.Color.EmptyClone.SetTo(0)
         End If
         Dim responses(lastSet.Length - 1) As Int32
         For i = 0 To responses.Length - 1

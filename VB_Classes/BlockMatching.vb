@@ -18,7 +18,6 @@ Public Class BlockMatching_Basics
         If ocvb.parms.cameraIndex = Kinect4AzureCam Then
             ocvb.putText(New ActiveClass.TrueType("For the Kinect 4 Azure camera, the left and right views are the same.", 10, 50, RESULT1))
         End If
-        dst1 = ocvb.color.EmptyClone.SetTo(0)
 
         Dim numDisparity = sliders.TrackBar1.Value * 16 ' must be a multiple of 16
         Dim blockSize = sliders.TrackBar2.Value

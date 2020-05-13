@@ -12,7 +12,6 @@ Public Class Mouse_Basics
         lastPoint = ocvb.mousePoint
         Dim radius = 10
         Static colorIndex As Int32
-        If colorIndex = 0 Then dst1 = ocvb.Color.EmptyClone.SetTo(0)
         Dim nextColor = ocvb.colorScalar(colorIndex)
         dst1.Circle(ocvb.mousePoint, radius, nextColor, -1, cv.LineTypes.AntiAlias)
         colorIndex += 1

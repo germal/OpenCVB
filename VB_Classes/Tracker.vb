@@ -14,7 +14,6 @@ Public Class Tracker_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(0).Checked Then
-            dst1 = ocvb.Color.EmptyClone.SetTo(0)
             check.Box(0).Checked = False
             If tracker IsNot Nothing Then tracker.Dispose()
             tracker = Nothing

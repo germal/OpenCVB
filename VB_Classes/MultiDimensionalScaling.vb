@@ -61,7 +61,6 @@ Public Class MultiDimensionScaling_Cities
 
         result.Normalize(0, 800, cv.NormTypes.MinMax)
 
-        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         at = result.GetGenericIndexer(Of Double)()
         Dim maxX As Double, maxY As Double, minX As Double = Double.MaxValue, minY As Double = Double.MaxValue
         For c = 0 To size - 1

@@ -77,8 +77,6 @@ Public Class Python_Run
         ocvb.desc = "Run Python app: " + pythonApp.Name
         label1 = ""
         label2 = ""
-        dst1 = ocvb.Color.EmptyClone.SetTo(0)
-        dst2 = ocvb.Color.EmptyClone.SetTo(0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If pyStream IsNot Nothing Then

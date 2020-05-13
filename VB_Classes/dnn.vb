@@ -100,7 +100,6 @@ Public Class DNN_Basics
                 dnnPrepared = True
             End If
         End If
-        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         If dnnPrepared = False Then
             ocvb.putText(New ActiveClass.TrueType("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100))
         End If
@@ -143,7 +142,6 @@ Public Class DNN_Basics
                     End If
                 Next
             Else
-                dst1 = ocvb.Color.EmptyClone.SetTo(0)
                 ocvb.putText(New ActiveClass.TrueType("DNN has been turned off.  See Options.", 10, 100))
             End If
         End If

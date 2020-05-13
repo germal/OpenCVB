@@ -49,7 +49,6 @@ Public Class GameOfLife_Basics
         End If
         generation += 1
 
-        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         population = 0
         For y = 0 To grid.Height - 1
             For x = 0 To grid.Width - 1

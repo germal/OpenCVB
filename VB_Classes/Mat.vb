@@ -105,7 +105,6 @@ Public Class Mat_Tricks
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mat = ocvb.color.Resize(New cv.Size(200, 200))
-        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         Dim x = 40
         Dim y = 80
         dst1(x, x + mat.Width, y, y + mat.Height) = mat

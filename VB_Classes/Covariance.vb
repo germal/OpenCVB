@@ -13,7 +13,6 @@ Public Class Covariance_Basics
         If standalone Then
             random.Run(ocvb)
             samples = New cv.Mat(random.Points.Length, 2, cv.MatType.CV_32F, random.Points2f)
-            dst1 = ocvb.color.EmptyClone.SetTo(0)
             For i = 0 To random.Points.Length - 1
                 dst1.Circle(random.Points(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             Next

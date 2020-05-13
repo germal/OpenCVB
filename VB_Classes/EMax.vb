@@ -74,9 +74,6 @@ Public Class EMax_Basics
                     dst1.Circle(New cv.Point(j, i), 1, c, -1)
                 Next
             Next
-        Else
-            dst1 = ocvb.Color.EmptyClone.SetTo(0)
-            dst2 = ocvb.Color.EmptyClone.SetTo(0)
         End If
 
         ' draw the clustered samples

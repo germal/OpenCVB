@@ -12,6 +12,8 @@ Module VB_Classes
     Public Const FRAME_DEPTH = 1
     Public Const RESULT1 = 2
     Public Const RESULT2 = 3
+    Public colorCols As Int32
+    Public colorRows As Int32
 
     Public Const D400Cam As Int32 = 0 ' Must be defined in OptionsDialog.vb the same way!
     Public Const Kinect4AzureCam As Int32 = 1 ' Must be defined in OptionsDialog.vb the same way!
@@ -161,6 +163,8 @@ Public Class ActiveClass : Implements IDisposable
         slidersOffset = New cv.Point
         radioOffset = New cv.Point
         ocvb.name = parms.activeAlgorithm
+        colorRows = ocvb.color.Rows
+        colorCols = ocvb.color.Cols
         ActiveAlgorithm = algoList.createAlgorithm(ocvb)
         If ActiveAlgorithm Is Nothing Then
             MsgBox("The algorithm: " + parms.activeAlgorithm + " was not found in the algorithmList.vb code." + vbCrLf +

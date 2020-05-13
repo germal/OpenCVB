@@ -96,7 +96,7 @@ Public Class CComp_ColorDepth
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Or src.Width = 0 Then src = ocvb.color
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = gray.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
         dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim cc = cv.Cv2.ConnectedComponentsEx(dst2)
@@ -138,7 +138,6 @@ Public Class CComp_Image
 
         blobList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
 
-        dst1 = ocvb.color.EmptyClone.SetTo(0)
         For i = 0 To blobList.Count - 1
             Dim avg = ocvb.RGBDepth(blobList(i)).Mean(dst2(blobList(i)))
             dst1(blobList(i)).SetTo(avg, dst2(blobList(i)))
@@ -175,8 +174,6 @@ Public Class CComp_InRange_MT
         label2 = "Blob rectangles - largest to smallest"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst1 = ocvb.color.EmptyClone.SetTo(0)
-        dst2 = dst1.Clone()
         If standalone Or src.Width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Int32 = sliders.TrackBar1.Value
@@ -228,9 +225,6 @@ Public Class CComp_InRange
         label2 = "Blob rectangles - smallest to largest"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst1 = ocvb.color.EmptyClone.SetTo(0)
-        dst2 = dst1.Clone()
-
         If standalone Or src.Width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Int32 = sliders.TrackBar1.Value
@@ -289,8 +283,6 @@ Public Class CComp_Shapes
         Dim maxBlob = cc.GetLargestBlob()
         Dim filtered = New cv.Mat
         cc.FilterByBlob(shapes, filtered, maxBlob)
-        dst1 = ocvb.color.EmptyClone.SetTo(0)
-        dst2 = dst1.Clone()
         dst1 = filtered.Resize(dst1.Size())
 
         Dim matTop As New cv.Mat, matBot As New cv.Mat, mat As New cv.Mat

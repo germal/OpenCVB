@@ -167,7 +167,6 @@ Public Class Binarize_Bernson_MT
         Dim bgThreshold = sliders.TrackBar3.Value
 
         If standalone Or src.Width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = ocvb.color.EmptyClone.SetTo(0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
             Sub(roi)
                 Dim grayBin = src(roi).Clone()

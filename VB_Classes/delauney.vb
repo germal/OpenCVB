@@ -89,7 +89,6 @@ Public Class Delaunay_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
         Dim rect = New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)
-        dst1 = ocvb.color.EmptyClone.SetTo(0)
 
         Dim subdiv As New cv.Subdiv2D(rect)
 
@@ -116,17 +115,19 @@ Public Class Delaunay_GoodFeatures
         ocvb.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        features.src = ocvb.color
         features.Run(ocvb)
 
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
-        dst2 = ocvb.Color.EmptyClone.SetTo(0)
         For i = 0 To features.goodFeatures.Count - 1
-            locate_point(dst2, subdiv, features.goodFeatures(i), active_facet_color)
+            locate_point(dst1, subdiv, features.goodFeatures(i), active_facet_color)
             subdiv.Insert(features.goodFeatures(i))
         Next
 
-        paint_voronoi(ocvb, dst2, subdiv)
+        cv.Cv2.AddWeighted(dst1, 0.5, ocvb.color, 0.5, 0, dst2)
+        paint_voronoi(ocvb, dst1, subdiv)
+        cv.Cv2.AddWeighted(dst1, 0.5, dst2, 0.5, 0, dst1)
     End Sub
 End Class
 
@@ -148,10 +149,10 @@ Public Class Delauney_Subdiv2D
             Function(i)
                 Return New cv.Point2f(rand.Next(0, ocvb.color.Width), rand.Next(0, ocvb.color.Height))
             End Function).ToArray()
-        dst1 = ocvb.Color.EmptyClone.SetTo(0)
         For Each p In points
             dst1.Circle(p, 4, cv.Scalar.Red, -1)
         Next
+        dst2 = dst1.Clone()
 
         Dim subdiv = New cv.Subdiv2D()
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
@@ -162,7 +163,6 @@ Public Class Delauney_Subdiv2D
         Dim facetCenters() As cv.Point2f = Nothing
         subdiv.GetVoronoiFacetList(Nothing, facetList, facetCenters)
 
-        dst2 = dst1.Clone()
         For Each list In facetList
             Dim before = list.Last()
             For Each p In list
