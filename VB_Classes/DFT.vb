@@ -34,7 +34,8 @@ Public Class DFT_Basics
         label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color
+        gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         rows = cv.Cv2.GetOptimalDFTSize(gray.Rows)
         cols = cv.Cv2.GetOptimalDFTSize(gray.Cols)
@@ -69,6 +70,7 @@ Public Class DFT_Basics
             mats.mat(1) = padded(New cv.Rect(0, cy, cx, cy)).Clone()
             mats.mat(0) = padded(New cv.Rect(cx, cy, cx, cy)).Clone()
             mats.Run(ocvb)
+            dst2 = mats.dst1
 
             dst1 = inverseDFT(complexImage)
         End If
@@ -128,12 +130,23 @@ Public Class DFT_ButterworthFilter
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "DFT B Filter - Radius", 1, ocvb.color.Height, ocvb.color.Height)
         sliders.setupTrackBar2(ocvb, caller, "DFT B Filter - Order", 1, ocvb.color.Height, 2)
+
+        radio.Setup(ocvb, caller, 6)
+        radio.check(0).Text = "DFT Flags ComplexOutput"
+        radio.check(1).Text = "DFT Flags Inverse"
+        radio.check(2).Text = "DFT Flags None"
+        radio.check(3).Text = "DFT Flags RealOutput"
+        radio.check(4).Text = "DFT Flags Rows"
+        radio.check(5).Text = "DFT Flags Scale"
+        radio.check(0).Checked = True
+
         dft = New DFT_Basics(ocvb, caller)
         ocvb.desc = "Use the Butterworth filter on a DFT image - color image input."
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        dft.src = ocvb.color
         dft.Run(ocvb)
 
         Static radius As Int32
@@ -160,10 +173,19 @@ Public Class DFT_ButterworthFilter
                 cv.Cv2.Merge(tmpMerge, butterworthFilter(k))
             End Sub)
         End If
+
+        Dim dftFlag As cv.DctFlags
+        For i = 0 To radio.check.Count - 1
+            If radio.check(i).Checked Then
+                dftFlag = Choose(i + 1, cv.DftFlags.ComplexOutput, cv.DftFlags.Inverse, cv.DftFlags.None,
+                                        cv.DftFlags.RealOutput, cv.DftFlags.Rows, cv.DftFlags.Scale)
+            End If
+        Next
+
         Parallel.For(0, 2,
        Sub(k)
            Dim complex As New cv.Mat
-           cv.Cv2.MulSpectrums(butterworthFilter(k), dft.complexImage, complex, cv.DftFlags.None)
+           cv.Cv2.MulSpectrums(butterworthFilter(k), dft.complexImage, complex, dftFlag)
            If k = 0 Then dst1 = inverseDFT(complex) Else dst2 = inverseDFT(complex)
        End Sub)
     End Sub
@@ -188,7 +210,9 @@ Public Class DFT_ButterworthDepth
         label2 = "Same filter with radius / 2"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        bfilter.dft.gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        'bfilter.dft.gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bfilter.Run(ocvb)
+        dst1 = bfilter.dst1
+        dst2 = bfilter.dst2
     End Sub
 End Class

@@ -78,12 +78,9 @@ Public Class Edges_Laplacian
         ocvb.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gaussiankernelSize As Int32 = sliders.TrackBar1.Value
-        If gaussiankernelSize Mod 2 = 0 Then gaussiankernelSize -= 1 ' kernel size must be odd
-        Dim laplaciankernelSize As Int32 = sliders.TrackBar2.Value
-        If laplaciankernelSize Mod 2 = 0 Then laplaciankernelSize -= 1 ' kernel size must be odd
+        Dim gaussiankernelSize = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value - 1)
+        Dim laplaciankernelSize = If(sliders.TrackBar2.Value Mod 2, sliders.TrackBar2.Value, sliders.TrackBar2.Value - 1)
         Dim gray As New cv.Mat()
-        Dim dst1 As New cv.Mat()
         Dim abs_dst1 As New cv.Mat()
         cv.Cv2.GaussianBlur(ocvb.color, dst1, New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
         cv.Cv2.CvtColor(dst1, gray, cv.ColorConversionCodes.BGR2GRAY)
@@ -179,10 +176,8 @@ Public Class Edges_RandomForest_CPP
         sliders.setupTrackBar1(ocvb, caller, "Edges RF Threshold", 1, 255, 35)
 
         ocvb.desc = "Detect edges using structured forests - Opencv Contrib"
-        label1 = "Detected Edges"
-
         ReDim rgbData(ocvb.color.Total * ocvb.color.ElemSize - 1)
-        label2 = "Thresholded Edge Mask (use slider to adjust)"
+        label1 = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.testAllRunning Then
@@ -194,6 +189,8 @@ Public Class Edges_RandomForest_CPP
             ocvb.putText(New ActiveClass.TrueType("On the first call only, it takes a few seconds to load the randomForest model." + vbCrLf +
                                                   "If running 'Test All' and the duration of each test < load time, it will finish loading before continuing to the next algorithm.", 10, 100, RESULT2))
         End If
+
+        ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
         If ocvb.frameCount = 5 Then
             Dim modelInfo = New FileInfo(ocvb.parms.HomeDir + "Data/model.yml.gz")
             EdgesPtr = Edges_RandomForest_Open(modelInfo.FullName)
@@ -204,9 +201,7 @@ Public Class Edges_RandomForest_CPP
             Dim gray8u = Edges_RandomForest_Run(EdgesPtr, handleRGB.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols)
             handleRGB.Free() ' free the pinned memory...
 
-            Dim dstData(ocvb.color.Total - 1) As Byte
-            Marshal.Copy(gray8u, dstData, 0, dstData.Length)
-            dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, dstData).Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
+            dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, gray8u).Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
         End If
     End Sub
     Public Sub Close()
@@ -260,8 +255,8 @@ Public Class Edges_LeftView
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         red.Run(ocvb)
-        Dim leftView = dst1
-        sobel.src = dst2
+        Dim leftView = red.dst1
+        sobel.src = red.dst2
         sobel.Run(ocvb)
         dst2 = sobel.dst1.Clone()
 
@@ -306,6 +301,7 @@ Public Class Edges_DCTfrequency
         sliders.setupTrackBar1(ocvb, caller, "Remove Frequencies < x", 0, 100, 32)
         sliders.setupTrackBar2(ocvb, caller, "Threshold after Removal", 1, 255, 20)
 
+        label2 = "Mask for the isolated frequencies"
         ocvb.desc = "Find edges by removing all the highest frequencies."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -354,7 +350,7 @@ Public Class Edges_Deriche_CPP
         sliders.setupTrackBar1(ocvb, caller, "Deriche Alpha", 1, 400, 100)
         sliders.setupTrackBar2(ocvb, caller, "Deriche Omega", 1, 1000, 100)
                 Edges_Deriche = Edges_Deriche_Open()
-        ocvb.desc = "Edge detection using the Deriche X and Y gradients"
+        ocvb.desc = "Edge detection using the Deriche X and Y gradients - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src = ocvb.color

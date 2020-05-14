@@ -62,7 +62,7 @@ Public Class DCT_RGB
         cv.Cv2.Split(ocvb.color, srcPlanes)
 
         Dim freqPlanes(2) As cv.Mat
-        For i = 0 To 2
+        For i = 0 To radio.check.Count - 1
             Dim src32f As New cv.Mat
             srcPlanes(i).ConvertTo(src32f, cv.MatType.CV_32FC3, 1 / 255)
             freqPlanes(i) = New cv.Mat

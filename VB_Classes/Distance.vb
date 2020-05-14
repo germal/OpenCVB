@@ -11,33 +11,29 @@ Public Class Distance_Basics
         radio.check(2).Text = "L2"
         radio.check(2).Checked = True
 
-        sliders.setupTrackBar1(ocvb, caller, "kernel size", 1, 5, 3)
-
         foreground = New kMeans_Depth_FG_BG(ocvb, caller)
+        label1 = "Distance results"
+        label2 = "Input mask to distance transformm"
         ocvb.desc = "Distance algorithm basics."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         foreground.Run(ocvb)
-        Dim fg = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst2 = foreground.dst1
+        Dim fg = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.bgr2gray)
         Dim DistanceType = cv.DistanceTypes.L2
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
-                DistanceType = Choose(i + 1, cv.DistanceTypes.C, cv.DistanceTypes.L1, cv.DistanceTypes.L2)
-                Exit For
-            End If
-        Next
+        If radio.check(0).Checked Then DistanceType = cv.DistanceTypes.C
+        If radio.check(1).Checked Then DistanceType = cv.DistanceTypes.L1
+        If radio.check(2).Checked Then DistanceType = cv.DistanceTypes.L2
 
         cv.Cv2.BitwiseAnd(gray, fg, gray)
-        Dim kernelSize = sliders.TrackBar1.Value
-        If kernelSize Mod 2 = 0 Then kernelSize += 1
-        If kernelSize = 1 Then kernelSize = 0 ' this is precise distance (there is no distance of 1)
+        Dim kernelSize = 0 ' this is precise distance (there is no distance of 1)
 
         Dim dist = gray.DistanceTransform(DistanceType, kernelSize)
         Dim dist32f = dist.Normalize(0, 255, cv.NormTypes.MinMax)
         dist32f.ConvertTo(gray, cv.MatType.CV_8UC1)
-        dst2 = gray.CvtColor(cv.ColorConversionCodes.gray2bgr)
+        dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
