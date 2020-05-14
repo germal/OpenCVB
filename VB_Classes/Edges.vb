@@ -104,16 +104,17 @@ Public Class Edges_Scharr
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.desc = "Scharr is more accurate with 3x3 kernel."
+        sliders.setupTrackBar1(ocvb, caller, "Scharr multiplier X100", 1, 500, 50)
+        label2 = "x field + y field in CV_32F format"
+        ocvb.desc = "Scharr is most accurate with 3x3 kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim xField = gray.Scharr(cv.MatType.CV_32FC1, 1, 0)
         Dim yField = gray.Scharr(cv.MatType.CV_32FC1, 0, 1)
-        Dim xyField As New cv.Mat
-        cv.Cv2.Add(xField, yField, xyField)
-        xyField.ConvertTo(gray, cv.MatType.CV_8U, 0.5)
-        dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.Add(xField, yField, dst2)
+        dst2.ConvertTo(dst1, cv.MatType.CV_8U, sliders.TrackBar1.Value / 100)
     End Sub
 End Class
 
@@ -222,9 +223,7 @@ Public Class Edges_Sobel
         ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize As Int32 = sliders.TrackBar1.Value
-        If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
-        Dim grad As New cv.Mat()
+        Dim kernelSize = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value - 1)
         If standalone Or src.Width = 0 Then src = ocvb.color
         dst1 = New cv.Mat(src.Rows, src.Cols, src.Type)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -233,7 +232,6 @@ Public Class Edges_Sobel
         grayY = src.Sobel(cv.MatType.CV_16U, 0, 1, kernelSize)
         Dim abs_grayY = grayY.ConvertScaleAbs()
         cv.Cv2.AddWeighted(abs_grayX, 0.5, abs_grayY, 0.5, 0, dst1)
-        If standalone Then dst1 = dst1
     End Sub
 End Class
 
@@ -270,7 +268,6 @@ End Class
 
 Public Class Edges_ResizeAdd
     Inherits ocvbClass
-    Public gray As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Border Vertical in Pixels", 1, 20, 5)
@@ -278,12 +275,14 @@ Public Class Edges_ResizeAdd
         sliders.setupTrackBar3(ocvb, caller, "Threshold for Pixel Difference", 1, 50, 16)
 
         ocvb.desc = "Find edges using a resize, subtract, and threshold."
-        label1 = ""
-        label2 = ""
+        label1 = "Edges found with just resizing"
+        label2 = "Found edges added to grayscale image source."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim newFrame = gray(New cv.Range(sliders.TrackBar1.Value, gray.Rows - sliders.TrackBar1.Value), New cv.Range(sliders.TrackBar2.Value, gray.Cols - sliders.TrackBar2.Value))
+        If standalone Then src = ocvb.color
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim newFrame = gray(New cv.Range(sliders.TrackBar1.Value, gray.Rows - sliders.TrackBar1.Value),
+                            New cv.Range(sliders.TrackBar2.Value, gray.Cols - sliders.TrackBar2.Value))
         newFrame = newFrame.Resize(gray.Size())
         cv.Cv2.Absdiff(gray, newFrame, dst1)
         dst1 = dst1.Threshold(sliders.TrackBar3.Value, 255, cv.ThresholdTypes.Binary)

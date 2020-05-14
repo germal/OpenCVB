@@ -23,17 +23,6 @@ Module VB_Classes
 
     Public term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public recordedData As Replay_Play
-    Public Sub MakeSureImage8uC3(ByRef src As cv.Mat)
-        If src.Type = cv.MatType.CV_32F Then
-            ' it must be a 1 channel 32f image so convert it to 8-bit and let it get converted to RGB below
-            src = src.Normalize(0, 255, cv.NormTypes.MinMax)
-            src.ConvertTo(src, cv.MatType.CV_8UC1)
-        End If
-        If src.Channels = 1 And src.Type = cv.MatType.CV_8UC1 Then
-            src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        End If
-    End Sub
-
     <System.Runtime.CompilerServices.Extension()>
     Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
         Dim tempObj = thisObj
@@ -182,13 +171,7 @@ Public Class ActiveClass : Implements IDisposable
     Public Sub RunAlgorithm()
         Try
             If ocvb.parms.useRecordedData Then recordedData.Run(ocvb)
-            If ocvb.color IsNot Nothing And ocvb.RGBDepth IsNot Nothing Then
-                ActiveAlgorithm.NextFrame(ocvb)
-                ocvb.frameCount += 1
-
-                MakeSureImage8uC3(ocvb.result1)
-                MakeSureImage8uC3(ocvb.result2)
-            End If
+            If ocvb.color IsNot Nothing And ocvb.RGBDepth IsNot Nothing Then ActiveAlgorithm.NextFrame(ocvb)
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try

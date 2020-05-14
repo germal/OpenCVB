@@ -39,3 +39,60 @@ Public Class Entropy_Basics
         End If
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Entropy_Highest_MT
+    Inherits ocvbClass
+    Dim entropies(0) As Entropy_Basics
+    Public grid As Thread_Grid
+    Public bestContrast As cv.Rect
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        grid = New Thread_Grid(ocvb, caller)
+        grid.sliders.TrackBar1.Value = 64
+        grid.sliders.TrackBar2.Value = 64
+        sliders.Visible = False ' troublesome memory problem is reallocated...
+        label1 = "Red rectangle show the location of the highest entropy"
+        ocvb.desc = "Find the highest entropy section of the color image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If standalone Then src = ocvb.color
+        grid.Run(ocvb)
+
+        If entropies.Length <> grid.roiList.Count Then
+            For i = 0 To entropies.Count - 1
+                If entropies(i) IsNot Nothing Then entropies(i).Dispose()
+            Next
+            ocvb.suppressOptions = True
+                ReDim entropies(grid.roiList.Count - 1)
+            For i = 0 To entropies.Length - 1
+                entropies(i) = New Entropy_Basics(ocvb, caller)
+            Next
+        End If
+
+        Parallel.For(0, grid.roiList.Count - 1,
+         Sub(i)
+             entropies(i).src = src(grid.roiList(i))
+             entropies(i).Run(ocvb)
+         End Sub)
+
+        Dim maxEntropy As Single
+        Dim maxIndex As Int32
+        For i = 0 To entropies.Count - 1
+            If entropies(i).entropy > maxEntropy Then
+                maxEntropy = entropies(i).entropy
+                maxIndex = i
+            End If
+        Next
+
+        bestContrast = grid.roiList(maxIndex)
+        If standalone Then
+            dst1 = src
+            dst1.Rectangle(bestContrast, cv.Scalar.Red, 2)
+        End If
+    End Sub
+End Class

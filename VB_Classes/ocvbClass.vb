@@ -32,13 +32,30 @@ Public Class ocvbClass : Implements IDisposable
         algorithm = Me
         label1 = Me.GetType.Name
     End Sub
+    Private Sub MakeSureImage8uC3(ByRef src As cv.Mat)
+        If src.Type = cv.MatType.CV_32F Then
+            ' it must be a 1 channel 32f image so convert it to 8-bit and let it get converted to RGB below
+            src = src.Normalize(0, 255, cv.NormTypes.MinMax)
+            src.ConvertTo(src, cv.MatType.CV_8UC1)
+        End If
+        If src.Channels = 1 And src.Type = cv.MatType.CV_8UC1 Then
+            src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        End If
+    End Sub
     Public Sub NextFrame(ocvb As AlgorithmData)
         algorithm.Run(ocvb)
         If standalone Then
-            If dst1.Width <> 0 Then ocvb.result1 = dst1
-            If dst2.Width <> 0 Then ocvb.result2 = dst2
+            If dst1.Width <> 0 Then
+                ocvb.result1 = dst1
+                MakeSureImage8uC3(ocvb.result1)
+            End If
+            If dst2.Width <> 0 Then
+                ocvb.result2 = dst2
+                MakeSureImage8uC3(ocvb.result2)
+            End If
             ocvb.label1 = label1
             ocvb.label2 = label2
+            ocvb.frameCount += 1
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

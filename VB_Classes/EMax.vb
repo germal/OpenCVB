@@ -50,8 +50,8 @@ Public Class EMax_Basics
 
         samples = samples.Reshape(1, 0)
 
+        dst1.SetTo(cv.Scalar.Black)
         If standalone Then
-            dst1.SetTo(cv.Scalar.Black)
             Dim em_model = cv.EM.Create()
             em_model.ClustersNumber = regionCount
             For i = 0 To radio.check.Count - 1
@@ -114,7 +114,15 @@ Public Class EMax_Basics_CPP
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         emax.Run(ocvb)
+        dst1 = emax.dst1
         label1 = CStr(emax.sliders.TrackBar1.Value) + " Random samples in " + CStr(emax.regionCount) + " clusters"
+
+        Dim covarianceMatrixType As Int32 = 0
+        For i = 0 To 3 - 1
+            If emax.radio.check(i).Checked = True Then
+                covarianceMatrixType = Choose(i + 1, cv.EM.Types.CovMatSpherical, cv.EM.Types.CovMatDiagonal, cv.EM.Types.CovMatGeneric)
+            End If
+        Next
 
         Dim srcData((emax.sliders.TrackBar1.Value - 1) * 2 - 1) As Single
         Dim handleSrc As GCHandle
@@ -126,22 +134,12 @@ Public Class EMax_Basics_CPP
         handleLabels = GCHandle.Alloc(labelData, GCHandleType.Pinned)
         Marshal.Copy(emax.labels.Data, labelData, 0, labelData.Length)
 
-        Dim covarianceMatrixType As Int32 = 0
-        For i = 0 To 2
-            If emax.radio.check(i).Checked = True Then
-                covarianceMatrixType = Choose(i + 1, cv.EM.Types.CovMatSpherical, cv.EM.Types.CovMatDiagonal, cv.EM.Types.CovMatGeneric)
-            End If
-        Next
         Dim imagePtr = EMax_Basics_Run(EMax_Basics, handleSrc.AddrOfPinnedObject(), handleLabels.AddrOfPinnedObject(), emax.samples.Rows, emax.samples.Cols,
                                        dst1.Rows, dst1.Cols, emax.regionCount, emax.sliders.TrackBar2.Value, covarianceMatrixType)
-
-        If imagePtr <> 0 Then
-            Dim dstData(dst2.Total * dst2.ElemSize - 1) As Byte
-            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, dstData)
-        End If
-        handleSrc.Free() ' free the pinned memory...
         handleLabels.Free() ' free the pinned memory...
+        handleSrc.Free() ' free the pinned memory...
+
+        If imagePtr <> 0 Then dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
 
         Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         dst1.CopyTo(dst2, mask)

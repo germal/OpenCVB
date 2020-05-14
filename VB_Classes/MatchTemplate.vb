@@ -102,6 +102,8 @@ End Class
 
 Public Class MatchTemplate_DrawRect
     Inherits ocvbClass
+    Public saveTemplate As cv.Mat
+    Public saveRect As cv.Rect
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         radio.Setup(ocvb, caller, 6)
@@ -109,16 +111,14 @@ Public Class MatchTemplate_DrawRect
             radio.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
         Next
         radio.check(5).Checked = True
-
-        ocvb.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
+        If standalone Then ocvb.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
 
         label1 = "Probabilities (draw rectangle to test again)"
         label2 = "White is input, Red circle centers highest probability"
         ocvb.desc = "Find the requested template in an image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static saveTemplate As cv.Mat
-        Static saveRect As cv.Rect
+        If standalone Then src = ocvb.color
         If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
             If ocvb.drawRect.X + ocvb.drawRect.Width >= ocvb.color.Width Then ocvb.drawRect.Width = ocvb.color.Width - ocvb.drawRect.X
             If ocvb.drawRect.Y + ocvb.drawRect.Height >= ocvb.color.Height Then ocvb.drawRect.Height = ocvb.color.Height - ocvb.drawRect.Y
@@ -134,8 +134,8 @@ Public Class MatchTemplate_DrawRect
                 Exit For
             End If
         Next
-        cv.Cv2.MatchTemplate(ocvb.color, saveTemplate, dst1, matchMethod)
-        dst2 = ocvb.color
+        cv.Cv2.MatchTemplate(src, saveTemplate, dst1, matchMethod)
+        dst2 = src
         dst2.Rectangle(saveRect, cv.Scalar.White, 1)
         Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
         dst1.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
@@ -147,56 +147,34 @@ End Class
 
 
 
-Public Class MatchTemplate_BestTemplate_MT
+Public Class MatchTemplate_BestEntropy_MT
     Inherits ocvbClass
-    Dim grid As Thread_Grid
-    Dim entropies(0) As Entropy_Basics
+    Dim entropy As Entropy_Highest_MT
     Dim match As MatchTemplate_DrawRect
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        grid = New Thread_Grid(ocvb, caller)
-        grid.sliders.TrackBar1.Value = 128
-        grid.sliders.TrackBar2.Value = 128
 
         match = New MatchTemplate_DrawRect(ocvb, caller)
 
+        entropy = New Entropy_Highest_MT(ocvb, caller)
+
         ocvb.parms.ShowOptions = False ' we won't need the options...
 
-        label1 = "Probabilities - drawing is not used."
-        label2 = "White is highest entropy (input). Red is best match."
-        ocvb.desc = "Find the best object to track in the image"
+        label1 = "Probabilities that the template matches image"
+        label2 = "Red is the best template to match (highest entropy)"
+        ocvb.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static bestContrast As cv.Rect
+        If standalone Then src = ocvb.color
         If ocvb.frameCount Mod 30 = 0 Then
-            grid.Run(ocvb)
-            If entropies.Length <> grid.roiList.Count Then
-                ReDim entropies(grid.roiList.Count - 1)
-                For i = 0 To entropies.Length - 1
-                    entropies(i) = New Entropy_Basics(ocvb, caller)
-                Next
-            End If
-
-            Parallel.For(0, grid.roiList.Count - 1,
-             Sub(i)
-                 entropies(i).src = ocvb.color(grid.roiList(i))
-                 entropies(i).Run(ocvb)
-             End Sub)
-
-            Dim maxEntropy As Single
-            Dim maxIndex As Int32
-            For i = 0 To entropies.Count - 1
-                If entropies(i).entropy > maxEntropy Then
-                    maxEntropy = entropies(i).entropy
-                    maxIndex = i
-                End If
-            Next
-
-            dst2 = ocvb.color.Clone()
-            bestContrast = grid.roiList(maxIndex)
-            ocvb.drawRect = bestContrast
+            entropy.src = src
+            entropy.Run(ocvb)
+            ocvb.drawRect = entropy.bestContrast
         End If
 
+        match.src = src ' ocvb.drawrect is the input showing the highest entropy.
         match.Run(ocvb)
+        dst1 = match.dst1
+        dst2 = match.dst2
     End Sub
 End Class

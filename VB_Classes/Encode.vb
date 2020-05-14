@@ -43,7 +43,7 @@ Public Class Encode_Options
         radio.check(3).Text = "JpegProgressive"
         radio.check(4).Text = "JpegQuality"
         radio.check(5).Text = "WebPQuality"
-        radio.check(4).Checked = True
+        radio.check(0).Checked = True
 
         ocvb.desc = "Encode options that affect quality."
         label1 = "absDiff with original image"
@@ -61,12 +61,8 @@ Public Class Encode_Options
 
         Dim fileExtension = ".jpg"
         Dim qualityLevel = sliders.TrackBar1.Value
-        If encodeOption = cv.ImwriteFlags.JpegProgressive Then
-            qualityLevel = 1 ' just on or off
-        End If
-        If encodeOption = cv.ImwriteFlags.JpegOptimize Then
-            qualityLevel = 1 ' just on or off
-        End If
+        If encodeOption = cv.ImwriteFlags.JpegProgressive Then qualityLevel = 1 ' just on or off
+        If encodeOption = cv.ImwriteFlags.JpegOptimize Then qualityLevel = 1 ' just on or off
         Dim encodeParams() As Int32 = {encodeOption, qualityLevel}
 
         cv.Cv2.ImEncode(fileExtension, ocvb.color, buf, encodeParams)
@@ -78,7 +74,7 @@ Public Class Encode_Options
         Dim scale = sliders.TrackBar2.Value
         output.ConvertTo(dst1, cv.MatType.CV_8UC3, scale)
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
-        label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
+        label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.0%") + ")"
     End Sub
 End Class
 
