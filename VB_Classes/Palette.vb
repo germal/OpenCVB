@@ -247,25 +247,23 @@ Public Class Palette_BuildGradientColorMap
         ocvb.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If (standalone = False And ocvb.frameCount Mod 100 = 0) Or standalone Then
-            Dim color1 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
-            Dim color2 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
-            Dim gradCount = sliders.TrackBar1.Value
-            Dim gradMat As New cv.Mat
-            For i = 0 To gradCount - 1
-                gradMat = colorTransition(color1, color2, ocvb.color.Width)
-                color2 = color1
-                color1 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
-                If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
-            Next
-            gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
-            dst2 = ocvb.Color.EmptyClone.SetTo(0)
-            Dim r As New cv.Rect(0, 0, 255, 1)
-            For i = 0 To dst2.Height - 1
-                r.Y = i
-                dst2(r) = gradientColorMap
-            Next
-        End If
+        If standalone Then If ocvb.frameCount Mod 100 Then Exit Sub
+        Dim color1 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
+        Dim color2 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
+        Dim gradCount = sliders.TrackBar1.Value
+        Dim gradMat As New cv.Mat
+        For i = 0 To gradCount - 1
+            gradMat = colorTransition(color1, color2, ocvb.color.Width)
+            color2 = color1
+            color1 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
+            If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
+        Next
+        gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
+        Dim r As New cv.Rect(0, 0, 255, 1)
+        For i = 0 To dst2.Height - 1
+            r.Y = i
+            dst2(r) = gradientColorMap
+        Next
         If standalone Then dst1 = Palette_Custom_Apply(ocvb.color, gradientColorMap)
     End Sub
 End Class
@@ -316,12 +314,13 @@ Public Class Palette_ColorMap
                         gradMap.Run(ocvb)
                     End If
                     dst1 = Palette_Custom_Apply(src, gradMap.gradientColorMap)
+                    dst2 = gradMap.dst2
                     Exit For
                 End If
                 buildNewRandomMap = False ' if they select something other than random, then next random request will rebuild the map.
                 If colormap = 20 Then
                     dst1 = src.Clone()
-                    dst2 = ocvb.Color.EmptyClone.SetTo(0)
+                    dst2 = dst2.SetTo(0)
                     Exit For
                 End If
                 cv.Cv2.ApplyColorMap(src, dst1, colormap)

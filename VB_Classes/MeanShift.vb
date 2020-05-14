@@ -3,26 +3,33 @@ Imports cv = OpenCvSharp
 Public Class MeanShift_Basics
     Inherits ocvbClass
     Public rectangleEdgeWidth As Int32 = 2
+    Public inputRect As cv.Rect
     Public trackbox As New cv.Rect
+    Public usingDrawRect As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         label1 = "Draw anywhere to start mean shift tracking."
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim hsv = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        If standalone Then
+            src = ocvb.color
+            usingDrawRect = True
+        End If
+        If usingDrawRect Then inputRect = ocvb.drawRect
+        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim ch() As Int32 = {0, 1, 2}
         Dim hsize() As Int32 = {16, 16, 16}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180)}
         Static roi_hist As New cv.Mat
-        If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
-            trackbox = ocvb.drawRect
-            Dim maskROI = hsv(ocvb.drawRect).InRange(New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255))
-            cv.Cv2.CalcHist(New cv.Mat() {hsv(ocvb.drawRect)}, ch, maskROI, roi_hist, 1, hsize, ranges)
+        If inputRect.Width > 0 And inputRect.Height > 0 Then
+            If usingDrawRect Then trackbox = ocvb.drawRect Else trackbox = inputRect
+            Dim maskROI = hsv(inputRect).InRange(New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255))
+            cv.Cv2.CalcHist(New cv.Mat() {hsv(inputRect)}, ch, maskROI, roi_hist, 1, hsize, ranges)
             roi_hist = roi_hist.Normalize(0, 255, cv.NormTypes.MinMax)
-            ocvb.drawRectClear = True
+            If usingDrawRect Then ocvb.drawRectClear = True
         End If
-        If roi_hist.Rows <> 0 Then
+        If trackbox.Width <> 0 Then
             Dim backProj As New cv.Mat
             cv.Cv2.CalcBackProject(New cv.Mat() {hsv}, ch, roi_hist, backProj, ranges)
             cv.Cv2.MeanShift(backProj, trackbox, cv.TermCriteria.Both(10, 1))
@@ -47,16 +54,33 @@ Public Class MeanShift_Depth
         setCaller(callerRaw)
         ms = New MeanShift_Basics(ocvb, caller)
         blob = New Depth_Foreground(ocvb, caller)
+        label1 = "Draw anywhere to start mean shift tracking."
         ocvb.desc = "Use depth to start mean shift algorithm."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim restartRequested As Boolean
-        Dim depthMin As Int32
-        Dim depthMax As Int32
-        If blob.trim.sliders.TrackBar1.Value <> depthMin Then restartRequested = True
-        If blob.trim.sliders.TrackBar2.Value <> depthMax Then restartRequested = True
-        If ocvb.drawRect = New cv.Rect(0, 0, 0, 0) Or restartRequested Then blob.Run(ocvb)
-        ms.Run(ocvb)
+        If ocvb.drawRect.Width > 0 Then
+            ms.usingDrawRect = True
+            ms.inputRect = New cv.Rect
+        End If
+        If ms.usingDrawRect Then
+            ms.src = ocvb.color
+            ms.Run(ocvb)
+            dst1 = ms.dst1
+            dst2 = ms.dst2
+        Else
+            blob.Run(ocvb)
+            dst1 = blob.dst1
+
+            If blob.trustworthy Then
+                ms.src = ocvb.color
+                ms.inputRect = blob.trustedRect
+                ms.Run(ocvb)
+                dst2 = ms.dst2
+                dst1 = ms.dst1
+            Else
+                dst2 = ocvb.color
+            End If
+        End If
     End Sub
 End Class
 

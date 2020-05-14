@@ -123,10 +123,12 @@ Public Class Depth_Foreground
     Public trim As Depth_InRange
     Public kalman As Kalman_Basics
     Public trustedRect As cv.Rect
+    Public trustworthy As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         trim = New Depth_InRange(ocvb, caller)
         kalman = New Kalman_Basics(ocvb, caller)
+        kalman.check.Visible = False ' we don't allow turning off kalman with this algorithm.
         ReDim kalman.input(4 - 1) ' cv.rect...
         label1 = "Blue is current, red is kalman, green is trusted"
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Use depth to find the top of the head and then meanshift to the face."
@@ -158,6 +160,7 @@ Public Class Depth_Foreground
             End If
         Next
 
+        trustworthy = False
         If maxIndex >= 0 Then
             Dim rectSize = 50
             If ocvb.color.Width > 1000 Then rectSize = 250
@@ -169,12 +172,13 @@ Public Class Depth_Foreground
 
             kalman.input = {xx, yy, rectSize, rectSize}
             kalman.Run(ocvb)
-            ocvb.drawRect = New cv.Rect(xx, yy, rectSize, rectSize)
+            Dim nextRect = New cv.Rect(xx, yy, rectSize, rectSize)
             Dim kRect = New cv.Rect(kalman.output(0), kalman.output(1), kalman.output(2), kalman.output(3))
             dst1.Rectangle(kRect, cv.Scalar.Red, 2)
-            dst1.Rectangle(ocvb.drawRect, cv.Scalar.Blue, 2)
-            If Math.Abs(kRect.X - ocvb.drawRect.X) < rectSize / 4 And Math.Abs(kRect.Y - ocvb.drawRect.Y) < rectSize / 4 Then
-                trustedRect = kRect
+            dst1.Rectangle(nextRect, cv.Scalar.Blue, 2)
+            If Math.Abs(kRect.X - nextRect.X) < rectSize / 4 And Math.Abs(kRect.Y - nextRect.Y) < rectSize / 4 Then
+                trustedRect = validateRect(kRect)
+                trustworthy = True
                 dst1.Rectangle(trustedRect, cv.Scalar.Green, 5)
             End If
         End If
@@ -196,7 +200,6 @@ Public Class Depth_FlatData
         sliders.setupTrackBar1(ocvb, caller, "FlatData Region Count", 1, 250, 200)
 
         label1 = "Reduced resolution RGBDepth"
-        label2 = "Contours of the Depth Shadow"
         ocvb.desc = "Attempt to stabilize the depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -447,7 +450,6 @@ Public Class Depth_MeanStdev_MT
             cv.Cv2.BitwiseOr(dst2, grid.gridMask, dst2)
             label2 = "ROI Stdev: Min " + Format(minStdVal, "#0.0") + " Max " + Format(maxStdVal, "#0.0")
         End If
-
         label1 = "ROI Means: Min " + Format(minVal, "#0.0") + " Max " + Format(maxVal, "#0.0")
     End Sub
 End Class
@@ -487,8 +489,10 @@ Public Class Depth_MeanStdevPlot
 
         plot1.plotData = New cv.Scalar(mean, 0, 0)
         plot1.Run(ocvb)
+        dst1 = plot1.dst1
         plot2.plotData = New cv.Scalar(stdev, 0, 0)
         plot2.Run(ocvb)
+        dst2 = plot2.dst1
         label1 = "Plot of mean depth = " + Format(mean, "#0.0")
         label2 = "Plot of depth stdev = " + Format(stdev, "#0.0")
     End Sub
@@ -506,12 +510,14 @@ Public Class Depth_Uncertainty
 
         sliders.setupTrackBar1(ocvb, caller, "Uncertainty threshold", 1, 255, 100)
 
+        label2 = "Mask of areas with unstable depth"
         ocvb.desc = "Use the bio-inspired retina algorithm to determine depth uncertainty."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
-        dst2 = dst2.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
+        dst1 = retina.dst1
+        dst2 = retina.dst2.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -530,21 +536,16 @@ Public Class Depth_Palette
         trim.sliders.TrackBar2.Value = 5000
 
         customColorMap = colorTransition(cv.Scalar.Blue, cv.Scalar.Yellow, 256)
-        ocvb.desc = "Use a palette to display depth from the raw depth data.  Will it be faster Depth_Colorizer?  (Of course)"
+        ocvb.desc = "Use a palette to display depth from the raw depth data."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
         Dim minDepth = trim.sliders.TrackBar1.Value
         Dim maxDepth = trim.sliders.TrackBar2.Value
 
-        Dim depthNorm = trim.depth32f
-        depthNorm *= 255 / (maxDepth - minDepth) ' do the normalize manually to use the min and max Depth (more stable)
-        Dim depth As New cv.Mat
-        depthNorm.ConvertTo(depth, cv.MatType.CV_8U)
-
-        depth = depth.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst1 = Palette_Custom_Apply(depth, customColorMap)
-        dst1.SetTo(0, trim.zeroMask)
+        Dim depthNorm = (trim.depth32f * 255 / (maxDepth - minDepth)).ToMat ' do the normalize manually to use the min and max Depth (more stable)
+        depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
+        dst1 = Palette_Custom_Apply(depthNorm.CvtColor(cv.ColorConversionCodes.GRAY2BGR), customColorMap).SetTo(0, trim.zeroMask)
     End Sub
 End Class
 
@@ -592,12 +593,18 @@ Module Depth_Colorizer_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Depth_Colorizer32f2_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, histSize As Int32) As IntPtr
     End Function
-
     Public Function getDepth32f(ocvb As AlgorithmData) As cv.Mat
         Dim depth32f As New cv.Mat
         ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
         If ocvb.parms.lowResolution Then Return depth32f.Resize(ocvb.color.Size())
         Return depth32f
+    End Function
+    Public Function validateRect(r As cv.Rect) As cv.Rect
+        If r.X < 0 Then r.X = 0
+        If r.Y < 0 Then r.Y = 0
+        If r.X > colorCols Then r.X = colorCols
+        If r.Y > colorRows Then r.Y = colorRows
+        Return r
     End Function
 End Module
 
@@ -646,8 +653,7 @@ Public Class Depth_ManualTrim
         dst1 = getDepth32f(ocvb)
         Mask = dst1.Threshold(maxDepth, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
 
-        Dim maskMin As New cv.Mat
-        maskMin = dst1.Threshold(minDepth, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        Dim maskMin = dst1.Threshold(minDepth, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         cv.Cv2.BitwiseAnd(Mask, maskMin, Mask)
 
         If standalone Then
@@ -895,14 +901,15 @@ End Class
 Public Class Depth_LocalMinMax_MT
     Inherits ocvbClass
     Public grid As Thread_Grid
-    Public ptListX() As Single
-    Public ptListY() As Single
-    Public pointList() As cv.Point2f
+    Public minPoint(0) As cv.Point2f
+    Public maxPoint(0) As cv.Point2f
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
+        grid.sliders.TrackBar1.Value = 64
+        grid.sliders.TrackBar2.Value = 64
 
-        label1 = "Red is min distance"
+        label1 = "Red is min distance, blue is max distance"
         ocvb.desc = "Find min and max depth in each segment."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -917,9 +924,10 @@ Public Class Depth_LocalMinMax_MT
             dst1.SetTo(cv.Scalar.White, grid.gridMask)
         End If
 
-        ReDim pointList(grid.roiList.Count - 1)
-        ReDim ptListX(grid.roiList.Count - 1)
-        ReDim ptListY(grid.roiList.Count - 1)
+        If minPoint.Length <> grid.roiList.Count Then
+            ReDim minPoint(grid.roiList.Count - 1)
+            ReDim maxPoint(grid.roiList.Count - 1)
+        End If
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)
@@ -927,24 +935,12 @@ Public Class Depth_LocalMinMax_MT
             Dim minPt As cv.Point, maxPt As cv.Point
             cv.Cv2.MinMaxLoc(depth32f(roi), minVal, maxVal, minPt, maxPt, mask(roi))
             If minPt.X < 0 Or minPt.Y < 0 Then minPt = New cv.Point2f(0, 0)
-            ptListX(i) = minPt.X + roi.X
-            ptListY(i) = minPt.Y + roi.Y
-            pointList(i) = New cv.Point(ptListX(i), ptListY(i))
+            minPoint(i) = New cv.Point(minPt.X + roi.X, minPt.Y + roi.Y)
+            maxPoint(i) = New cv.Point(maxPt.X + roi.X, maxPt.Y + roi.Y)
 
-            If standalone Then
-                cv.Cv2.Circle(dst1(roi), minPt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-                cv.Cv2.Circle(dst1(roi), maxPt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-            End If
+            cv.Cv2.Circle(dst1(roi), minPt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst1(roi), maxPt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
         End Sub)
-
-
-        If standalone Then
-            Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
-            For i = 0 To ptListX.Count - 1
-                If ptListX(i) <> 0 And ptListY(i) <> 0 Then subdiv.Insert(New cv.Point2f(ptListX(i), ptListY(i)))
-            Next
-            paint_voronoi(ocvb, dst2, subdiv)
-        End If
     End Sub
 End Class
 
@@ -959,10 +955,9 @@ Public Class Depth_LocalMinMax_Kalman_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         minmax = New Depth_LocalMinMax_MT(ocvb, caller)
-        minmax.grid.sliders.TrackBar1.Value = 32
-        minmax.grid.sliders.TrackBar2.Value = 32
         ocvb.parms.ShowOptions = False
 
+        label1 = "Red is min distance, blue is max distance"
         ocvb.desc = "Find minimum depth in each segment."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -972,13 +967,15 @@ Public Class Depth_LocalMinMax_Kalman_MT
         If minmax.grid.roiList.Count <> saveCount Then
             If kalman IsNot Nothing Then kalman.Dispose()
             kalman = New Kalman_Basics(ocvb, caller)
-            ReDim kalman.input(minmax.grid.roiList.Count - 1)
-            saveCount = kalman.input.Count
+            ReDim kalman.input(minmax.grid.roiList.Count * 4 - 1)
+            saveCount = minmax.grid.roiList.Count
         End If
 
-        For i = 0 To kalman.input.Count - 1 Step 2
-            kalman.input(i) = minmax.pointList(i).X
-            kalman.input(i + 1) = minmax.pointList(i).Y
+        For i = 0 To minmax.minPoint.Count - 1
+            kalman.input(i * 4) = minmax.minPoint(i).X
+            kalman.input(i * 4 + 1) = minmax.minPoint(i).Y
+            kalman.input(i * 4 + 2) = minmax.maxPoint(i).X
+            kalman.input(i * 4 + 3) = minmax.maxPoint(i).Y
         Next
         kalman.Run(ocvb)
 
@@ -986,15 +983,20 @@ Public Class Depth_LocalMinMax_Kalman_MT
         dst1.SetTo(cv.Scalar.White, minmax.grid.gridMask)
 
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
-        For i = 0 To kalman.output.Length - 1 Step 2
+        Dim radius = 5
+        For i = 0 To kalman.output.Length - 1 Step 4
             If kalman.output(i) >= ocvb.color.Width Then kalman.output(i) = ocvb.color.Width - 1
             If kalman.output(i) < 0 Then kalman.output(i) = 0
             If kalman.output(i + 1) >= ocvb.color.Height Then kalman.output(i + 1) = ocvb.color.Height - 1
             If kalman.output(i + 1) < 0 Then kalman.output(i + 1) = 0
-            subdiv.Insert(New cv.Point2f(kalman.output(i), kalman.output(i + 1)))
 
-            ' just show the minimum (closest) point
-            cv.Cv2.Circle(dst1, New cv.Point(kalman.output(i), kalman.output(i + 1)), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            If kalman.output(i + 2) >= ocvb.color.Width Then kalman.output(i + 2) = ocvb.color.Width - 1
+            If kalman.output(i + 2) < 0 Then kalman.output(i) = 0
+            If kalman.output(i + 3) >= ocvb.color.Height Then kalman.output(i + 3) = ocvb.color.Height - 1
+            If kalman.output(i + 3) < 0 Then kalman.output(i + 3) = 0
+            subdiv.Insert(New cv.Point2f(kalman.output(i), kalman.output(i + 1))) ' subdiv based on the minPoints after kalman
+            cv.Cv2.Circle(dst1, New cv.Point2f(kalman.output(i), kalman.output(i + 1)), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst1, New cv.Point2f(kalman.output(i + 2), kalman.output(i + 3)), radius, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
         Next
         paint_voronoi(ocvb, dst2, subdiv)
     End Sub
@@ -1044,6 +1046,7 @@ Public Class Depth_Increasing
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         depth.Run(ocvb)
+        dst1 = depth.dst1
     End Sub
 End Class
 
@@ -1082,7 +1085,10 @@ Public Class Depth_ColorMap
     Public Sub Run(ocvb As AlgorithmData)
         Dim alpha = sliders.TrackBar1.Value / 100
         cv.Cv2.ConvertScaleAbs(getDepth32f(ocvb), Palette.src, alpha)
+        Palette.src = ocvb.RGBDepth
         Palette.Run(ocvb)
+        dst1 = Palette.dst1
+        dst2 = Palette.dst2
     End Sub
 End Class
 
@@ -1168,9 +1174,9 @@ Public Class Depth_Stabilizer
         mean.Run(ocvb)
 
         If standalone Then
-            'colorize.src = mean.dst
-            'colorize.Run(ocvb)
-            'dst1 = colorize.dst
+            colorize.src = mean.dst1
+            colorize.Run(ocvb)
+            dst1 = colorize.dst1
         End If
     End Sub
 End Class
