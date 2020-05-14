@@ -45,7 +45,7 @@ Public Class Retina_Basics_CPP
         End If
         Static useLogSampling As Int32 = check.Box(0).Checked
         Static samplingFactor As Single = -1 ' force open
-        If standalone or src.width = 0 Then src = ocvb.color
+        If standalone Then src = ocvb.color
         If useLogSampling <> check.Box(0).Checked Or samplingFactor <> sliders.TrackBar1.Value Then
             If Retina <> 0 Then Retina_Basics_Close(Retina)
             useLogSampling = check.Box(0).Checked

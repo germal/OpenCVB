@@ -16,7 +16,7 @@ Public Class CartoonifyImage_Basics
         Dim medianBlur = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value + 1)
         Dim medianBlur2 = If(sliders.TrackBar2.Value Mod 2, sliders.TrackBar2.Value, sliders.TrackBar2.Value + 1)
         Dim kernelSize = If(sliders.TrackBar4.Value Mod 2, sliders.TrackBar4.Value, sliders.TrackBar4.Value + 1)
-        If standalone Or src.Width = 0 Then src = ocvb.color
+        If standalone Then src = ocvb.color
         Dim gray8u = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         gray8u = gray8u.MedianBlur(medianBlur)
         Dim edges = gray8u.Laplacian(cv.MatType.CV_8U, kernelSize)

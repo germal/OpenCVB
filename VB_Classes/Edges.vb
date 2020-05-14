@@ -18,7 +18,7 @@ Public Class Edges_Canny
         Dim threshold1 As Int32 = sliders.TrackBar1.Value
         Dim threshold2 As Int32 = sliders.TrackBar2.Value
         Dim aperture = If(sliders.TrackBar3.Value Mod 2, sliders.TrackBar3.Value, sliders.TrackBar3.Value + 1)
-        If standalone Or src.Width = 0 Then src = ocvb.color.Clone()
+        If standalone Then src = ocvb.color.Clone()
         Dim gray As New cv.Mat
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = gray.Canny(threshold1, threshold2, aperture, False)
@@ -49,7 +49,7 @@ Public Class Edges_CannyAndShadow
         label2 = "Edges in color and depth no dilate"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Or src.Width = 0 Then src = ocvb.color.Clone()
+        If standalone Then src = ocvb.color.Clone()
         canny.src = src
         canny.Run(ocvb)
         shadow.Run(ocvb)
@@ -224,7 +224,7 @@ Public Class Edges_Sobel
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value - 1)
-        If standalone Or src.Width = 0 Then src = ocvb.color
+        If standalone Then src = ocvb.color
         dst1 = New cv.Mat(src.Rows, src.Cols, src.Type)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         grayX = src.Sobel(cv.MatType.CV_16U, 1, 0, kernelSize)

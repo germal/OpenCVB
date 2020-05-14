@@ -16,6 +16,7 @@ Public Class Etch_ASketch
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Etch_ASketch clean slate"
         check.Box(1).Text = "Demo mode"
+        check.Box(1).Checked = True
         If ocvb.parms.testAllRunning Then check.Box(1).Checked = True
 
         keys = New Keyboard_Basics(ocvb, caller)
@@ -50,10 +51,10 @@ Public Class Etch_ASketch
                 Case "right"
                     cursor.X += 1
             End Select
-            If cursor.X < 0 Then cursor.X = cursor = randomCursor(ocvb)
-            If cursor.Y < 0 Then cursor.Y = cursor = randomCursor(ocvb)
-            If cursor.X > ocvb.color.Width Then cursor = randomCursor(ocvb)
-            If cursor.Y > ocvb.color.Height Then cursor = randomCursor(ocvb)
+            If cursor.X < 0 Then cursor.X = 0
+            If cursor.Y < 0 Then cursor.Y = 0
+            If cursor.X >= ocvb.color.Width Then cursor.X = ocvb.color.Width - 1
+            If cursor.Y >= ocvb.color.Height Then cursor.Y = ocvb.color.Height - 1
             dst1.Set(Of cv.Vec3b)(cursor.Y, cursor.X, black)
         Next
         If check.Box(1).Checked Then

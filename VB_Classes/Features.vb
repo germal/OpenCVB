@@ -14,18 +14,18 @@ Public Class Features_GoodFeatures
         ocvb.desc = "Find good features to track in an RGB image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Or src.Width = 0 Then src = ocvb.color
+        If standalone Then src = ocvb.color
         gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim numPoints = sliders.TrackBar1.Value
         Dim quality = sliders.TrackBar2.Value / 100
         Dim minDistance = sliders.TrackBar3.Value
         Dim features = cv.Cv2.GoodFeaturesToTrack(gray, numPoints, quality, minDistance, Nothing, 7, True, 3)
 
-        if standalone Then gray.CopyTo(dst1)
+        If standalone Then src.CopyTo(dst1)
         goodFeatures.Clear()
         For i = 0 To features.Length - 1
             goodFeatures.Add(features.ElementAt(i))
-            if standalone Then cv.Cv2.Circle(dst1, features(i), 3, cv.Scalar.white, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst1, features(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
 End Class

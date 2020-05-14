@@ -21,7 +21,7 @@ Public Class CComp_Basics
         Next
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Or src.Width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim threshold = sliders.TrackBar1.Value
         Dim binary As New cv.Mat
@@ -95,7 +95,7 @@ Public Class CComp_ColorDepth
         label2 = "Binary image using threshold binary+Otsu"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Or src.Width = 0 Then src = ocvb.color
+        If standalone Then src = ocvb.color
         Dim gray = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = gray.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
         dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -125,7 +125,7 @@ Public Class CComp_Image
         label2 = "Mask binary+otsu to help compute mean depth"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Or src.Width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         dst2 = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
 
@@ -174,7 +174,7 @@ Public Class CComp_InRange_MT
         label2 = "Blob rectangles - largest to smallest"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Or src.Width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Int32 = sliders.TrackBar1.Value
         Dim maxDepth = sliders.TrackBar2.Value
@@ -225,7 +225,7 @@ Public Class CComp_InRange
         label2 = "Blob rectangles - smallest to largest"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Or src.Width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Int32 = sliders.TrackBar1.Value
         Dim minBlobSize = sliders.TrackBar2.Value * 1000

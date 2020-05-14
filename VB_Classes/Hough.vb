@@ -84,7 +84,7 @@ Public Class Hough_Lines
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone or src.width = 0 Then src = ocvb.color
+        If standalone Then src = ocvb.color
         edges.src = src.Clone()
         edges.Run(ocvb)
 

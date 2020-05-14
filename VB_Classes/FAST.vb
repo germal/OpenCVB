@@ -6,17 +6,21 @@ Public Class FAST_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Threshold", 0, 200, 15)
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Use Non-Max = True"
+        check.Box(0).Checked = True
+
         ocvb.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
-        label1 = "FAST_Basics nonMax = true"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ocvb.color.CopyTo(dst1)
-        keypoints = cv.Cv2.FAST(gray, sliders.TrackBar1.Value, True)
+        keypoints = cv.Cv2.FAST(gray, sliders.TrackBar1.Value, If(check.Box(0).Checked, True, False))
 
         For Each kp As cv.KeyPoint In keypoints
             dst1.Circle(kp.Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
         Next kp
+        label1 = "FAST_Basics nonMax = " + If(check.Box(0).Checked, "True", "False")
     End Sub
 End Class
 
@@ -38,6 +42,7 @@ Public Class FAST_Centroid
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         fast.Run(ocvb)
+        dst1 = fast.dst1
         dst2 = ocvb.Color.EmptyClone.SetTo(0)
         For Each kp As cv.KeyPoint In fast.keypoints
             dst2.Circle(kp.Pt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)

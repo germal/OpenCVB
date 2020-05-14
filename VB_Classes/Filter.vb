@@ -9,11 +9,12 @@ Public Class Filter_Laplacian
         label2 = "Output of Filter2D (approximated Laplacian)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If standalone Then src = ocvb.color
         Dim kernel = New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1})
-        Dim imgLaplacian = ocvb.color.Filter2D(cv.MatType.CV_32F, kernel)
+        Dim imgLaplacian = src.Filter2D(cv.MatType.CV_32F, kernel)
         Dim sharp As New cv.Mat
-        ocvb.color.ConvertTo(sharp, cv.MatType.CV_32F)
-        Dim imgResult As cv.Mat = sharp - imgLaplacian
+        src.ConvertTo(sharp, cv.MatType.CV_32F)
+        Dim imgResult = (sharp - imgLaplacian).ToMat
         imgResult.ConvertTo(imgResult, cv.MatType.CV_8UC3)
         imgResult.ConvertTo(dst1, cv.MatType.CV_8UC3)
         imgLaplacian.ConvertTo(dst2, cv.MatType.CV_8UC3)
@@ -31,9 +32,11 @@ Public Class Filter_NormalizedKernel
         radio.check(1).Checked = True
         radio.check(2).Text = "L2"
         radio.check(3).Text = "MinMax"
+        sliders.setupTrackBar1(ocvb, caller, "Normalize alpha X10", 1, 100, 10)
         ocvb.desc = "Create a normalized kernel and use it."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If standalone Then src = ocvb.color
         Dim kernel = New cv.Mat(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
         Dim normType = cv.NormTypes.L1
         For i = 0 To radio.check.Count - 1
@@ -43,7 +46,7 @@ Public Class Filter_NormalizedKernel
             End If
         Next
 
-        kernel = kernel.Normalize(1, 0, normType)
+        kernel = kernel.Normalize(sliders.TrackBar1.Value / 10, 0, normType)
 
         Dim sum As Double
         For i = 0 To kernel.Width - 1
@@ -51,7 +54,7 @@ Public Class Filter_NormalizedKernel
         Next
         label1 = "kernel sum = " + Format(sum, "#0.000")
 
-        Dim dst32f = ocvb.color.Filter2D(cv.MatType.CV_32FC1, kernel, anchor:=New cv.Point(0, 0))
+        Dim dst32f = src.Filter2D(cv.MatType.CV_32FC1, kernel, anchor:=New cv.Point(0, 0))
         dst32f.ConvertTo(dst1, cv.MatType.CV_8UC3)
     End Sub
 End Class
@@ -62,12 +65,14 @@ Public Class Filter_Normalized2D
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Filter_Normalized2D kernel size", 1, 21, 3)
         ocvb.desc = "Create and apply a normalized kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = 3 + (ocvb.frameCount Mod 20)
+        If standalone Then src = ocvb.color
+        Dim kernelSize = If(standalone, (ocvb.frameCount Mod 20) + 1, sliders.TrackBar1.Value)
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
-        dst1 = ocvb.color.Filter2D(-1, kernel)
+        dst1 = src.Filter2D(-1, kernel)
         label1 = "Normalized KernelSize = " + CStr(kernelSize)
     End Sub
 End Class
@@ -86,18 +91,18 @@ Public Class Filter_SepFilter2D
 
         sliders.setupTrackBar1(ocvb, caller, "Kernel X size", 1, 21, 5)
         sliders.setupTrackBar2(ocvb, caller, "Kernel Y size", 1, 21, 11)
-
+        sliders.setupTrackBar3(ocvb, caller, "SepFilter2D Sigma X10", 0, 100, 17)
         label1 = "Gaussian Blur result"
         ocvb.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim xDim = sliders.TrackBar1.Value
-        Dim yDim = sliders.TrackBar2.Value
-        If xDim Mod 2 = 0 Then xDim += 1
-        If yDim Mod 2 = 0 Then yDim += 1
-        Dim kernel = cv.Cv2.GetGaussianKernel(xDim, 1.7)
-        dst1 = ocvb.color.GaussianBlur(New cv.Size(xDim, yDim), 1.7)
-        dst2 = ocvb.color.SepFilter2D(cv.MatType.CV_8UC3, kernel, kernel)
+        If standalone Then src = ocvb.color
+        Dim xDim = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value + 1)
+        Dim yDim = If(sliders.TrackBar2.Value Mod 2, sliders.TrackBar2.Value, sliders.TrackBar2.Value + 1)
+        Dim sigma = sliders.TrackBar3.Value / 10
+        Dim kernel = cv.Cv2.GetGaussianKernel(xDim, sigma)
+        dst1 = src.GaussianBlur(New cv.Size(xDim, yDim), sigma)
+        dst2 = src.SepFilter2D(cv.MatType.CV_8UC3, kernel, kernel)
         If check.Box(0).Checked Then
             Dim graySep = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim grayGauss = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

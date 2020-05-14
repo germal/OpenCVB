@@ -15,7 +15,7 @@ Public Class Clone_Basics
         ocvb.drawRect = New cv.Rect(ocvb.color.Width / 4, ocvb.color.Height / 4, ocvb.color.Width / 2, ocvb.color.Height / 2)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Or src.Width = 0 Then src = ocvb.color
+        If standalone Then src = ocvb.color
         Dim mask As New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
         If ocvb.drawRect = New cv.Rect Then
             mask.SetTo(255)

@@ -86,7 +86,7 @@ Public Class Resize_Percentage
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim percent As Double = CDbl(sliders.TrackBar1.Value / 100)
-        If standalone or src.width = 0 Then src = ocvb.color
+        If standalone Then src = ocvb.color
         Dim resizePercent = sliders.TrackBar1.Value / 100
         resizePercent = Math.Sqrt(resizePercent)
         resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * resizePercent), Math.Ceiling(src.Height * resizePercent))

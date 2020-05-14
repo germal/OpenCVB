@@ -21,14 +21,14 @@ Public Class Featureless_Basics_MT
         grid.sliders.TrackBar2.Value = If(ocvb.color.Width > 1000, 16, 8)
 
         ocvb.desc = "Multithread Houghlines to find featureless regions in an image."
-        label1 = "MT grid"
-        label2 = "FeatureLess Regions"
+        label1 = "Featureless regions with mask in depth color"
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
+        If standalone Then src = ocvb.color
         grid.Run(ocvb)
 
-        edges.src = ocvb.color
+        edges.src = src
         edges.Run(ocvb)
 
         Dim rhoIn = sliders.TrackBar1.Value
@@ -36,17 +36,13 @@ Public Class Featureless_Basics_MT
         Dim threshold = sliders.TrackBar3.Value
         Dim floodCountThreshold = sliders.TrackBar4.Value
 
-        ocvb.color.CopyTo(dst1)
-        dst2 = ocvb.Color.EmptyClone.SetTo(0)
+        src.CopyTo(dst1)
         mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             Dim segments() = cv.Cv2.HoughLines(edges.dst1(roi), rhoIn, thetaIn, threshold)
             If segments.Count = 0 Then mask(roi).SetTo(255)
         End Sub)
-        ocvb.color.CopyTo(dst1, mask)
-        dst1.SetTo(cv.Scalar.White, grid.gridMask)
-
         regionCount = 1
         For y = 0 To mask.Rows - 1
             For x = 0 To mask.Cols - 1
@@ -65,12 +61,14 @@ Public Class Featureless_Basics_MT
 
         objects.Clear()
         objectSize.Clear()
+        dst2.SetTo(0)
         For i = 1 To regionCount - 1
             Dim label = mask.InRange(i, i)
             objects.Add(label.Clone())
             Dim mean = ocvb.RGBDepth.Mean(label)
             dst2.SetTo(mean, label)
         Next
+        cv.Cv2.AddWeighted(src, 0.5, dst2, 0.5, 0, dst1)
         label2 = "FeatureLess Regions = " + CStr(regionCount)
     End Sub
 End Class
@@ -87,20 +85,23 @@ Public Class FeatureLess_Prediction
 
         fLess = New Featureless_Basics_MT(ocvb, caller)
 
-        ocvb.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image."
+        ocvb.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If standalone Then src = ocvb.color
+        fLess.src = src
         fLess.Run(ocvb)
+        dst1 = fLess.dst1
+        dst2 = fLess.dst2
         Dim labels = fLess.mask.Clone()
         fLess.mask = fLess.mask.Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         Dim percent = Math.Sqrt(sliders.TrackBar1.Value / 100)
-        Dim newSize = New cv.Size(ocvb.color.Width * percent, ocvb.color.Height * percent)
+        Dim newSize = New cv.Size(src.Width * percent, src.Height * percent)
 
-        Dim rgb = ocvb.color.Clone(), depth32f = getDepth32f(ocvb).Resize(newSize), mask = fLess.mask
+        Dim rgb = src.Clone(), depth32f = getDepth32f(ocvb).Resize(newSize), mask = fLess.mask
 
         rgb = rgb.Resize(newSize)
-        Dim saveDepth = depth32f.Clone()
 
         ' manually resize the mask to make sure there is no dithering...
         mask = New cv.Mat(depth32f.Size(), cv.MatType.CV_8U, 0)
@@ -152,6 +153,7 @@ Public Class FeatureLess_Prediction
         Dim predictedDepth = response.Reshape(1, depth32f.Height)
         predictedDepth.Normalize(0, 255, cv.NormTypes.MinMax)
         predictedDepth.ConvertTo(mask, cv.MatType.CV_8U)
+        dst2 = mask.ConvertScaleAbs().Resize(src.Size())
     End Sub
 End Class
 
@@ -170,7 +172,11 @@ Public Class Featureless_DCT_MT
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
+        If standalone Then src = ocvb.color
+        dct.src = src
         dct.Run(ocvb)
+        dst1 = dct.dst1
+        dst2 = dct.dst2
 
         Dim mask = dst1.Clone()
         Dim objectSize As New List(Of Int32)

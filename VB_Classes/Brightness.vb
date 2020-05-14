@@ -9,7 +9,7 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
         ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Or src.Width = 0 Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
         claheObj.TilesGridSize() = New cv.Size(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
@@ -70,7 +70,7 @@ Public Class Brightness_AlphaBeta
         sliders.setupTrackBar2(ocvb, caller, "Brightness Beta (brightness)", -100, 100, 0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Or src.Width = 0 Then src = ocvb.color
+        If standalone Then src = ocvb.color
         dst1 = src.ConvertScaleAbs(sliders.TrackBar1.Value / 500, sliders.TrackBar2.Value)
     End Sub
 End Class
