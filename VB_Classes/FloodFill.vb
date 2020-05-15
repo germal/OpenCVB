@@ -31,7 +31,7 @@ Public Class FloodFill_Basics
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
         Dim stepSize = sliders.TrackBar4.Value
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src
         Dim rect As New cv.Rect
         Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1)
@@ -93,7 +93,7 @@ Public Class FloodFill_Top16_MT
         Dim loDiff = cv.Scalar.All(sliders.TrackBar2.Value)
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.Clone()
         grid.Run(ocvb)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
@@ -230,7 +230,7 @@ Public Class FloodFill_CComp
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
 
-        ccomp.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ccomp.src = src
         ccomp.Run(ocvb)
 
         range.src = ccomp.dst1
@@ -265,7 +265,6 @@ Public Class FloodFill_RelativeRange
         If check.Box(0).Checked Then fBasics.floodFlag += cv.FloodFillFlags.FixedRange
         If check.Box(1).Checked Then fBasics.floodFlag += cv.FloodFillFlags.Link4 Else fBasics.floodFlag += cv.FloodFillFlags.Link8
         If check.Box(2).Checked Then fBasics.floodFlag += cv.FloodFillFlags.MaskOnly
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         fBasics.src = src
         fBasics.Run(ocvb)
         dst1 = src
@@ -293,7 +292,7 @@ Public Class FloodFill_Top16
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         flood.src = src
 
         thumbNails = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
@@ -348,7 +347,7 @@ Public Class FloodFill_Projection
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
         Dim stepSize = sliders.TrackBar4.Value
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Clone()
         Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1)
 

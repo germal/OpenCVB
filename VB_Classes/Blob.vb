@@ -160,6 +160,7 @@ Public Class Blob_DepthClusters
         flood.fBasics.sliders.TrackBar2.Value = 1 ' pixels are exact.
         flood.fBasics.sliders.TrackBar3.Value = 1 ' pixels are exact.
 
+        label2 = "Backprojection of identified histogram depth clusters."
         ocvb.desc = "Highlight the distinct histogram blobs found with depth clustering."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -167,7 +168,7 @@ Public Class Blob_DepthClusters
         histBlobs.src = shadow.dst1
         histBlobs.Run(ocvb)
         dst1 = histBlobs.dst1
-        flood.src = histBlobs.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        flood.src = histBlobs.dst2
         flood.fBasics.initialMask = shadow.holeMask
         flood.Run(ocvb)
         dst2 = flood.fBasics.dst2
@@ -255,6 +256,7 @@ Public Class Blob_Largest
         masks = blobs.flood.fBasics.masks
 
         If masks.Count > 0 Then
+            dst1.SetTo(0)
             Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(blobIndex).Value ' this is the largest contiguous blob
             ocvb.color.CopyTo(dst1, masks(maskIndex))
             kalman.input = {rects(maskIndex).X, rects(maskIndex).Y, rects(maskIndex).Width, rects(maskIndex).Height}

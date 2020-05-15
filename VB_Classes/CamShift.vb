@@ -62,6 +62,7 @@ Public Class CamShift_Basics
             If dst2.Channels = 1 Then dst2 = ocvb.color.EmptyClone()
             dst2 = dst2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         End If
+        dst1.SetTo(0)
         ocvb.color.CopyTo(dst1, mask)
         If trackBox.Size.Width > 0 Then dst1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
     End Sub

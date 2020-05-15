@@ -18,16 +18,15 @@ Public Class Edges_Canny
         Dim threshold1 As Int32 = sliders.TrackBar1.Value
         Dim threshold2 As Int32 = sliders.TrackBar2.Value
         Dim aperture = If(sliders.TrackBar3.Value Mod 2, sliders.TrackBar3.Value, sliders.TrackBar3.Value + 1)
-        Dim gray As New cv.Mat
-        If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = gray.Canny(threshold1, threshold2, aperture, False)
-        dst2 = gray.Canny(threshold1, threshold2, aperture, True)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = src.Canny(threshold1, threshold2, aperture, False)
+        dst2 = src.Canny(threshold1, threshold2, aperture, True)
     End Sub
 End Class
 
 
 
-Public Class Edges_CannyAndShadow
+Public Class Edges_DepthAndColor
     Inherits ocvbClass
     Dim shadow As Depth_Holes
     Dim canny As Edges_Canny
@@ -130,6 +129,7 @@ Public Class Edges_Preserving
         sliders.setupTrackBar1(ocvb, caller, "Edge Sigma_s", 0, 200, 10)
         sliders.setupTrackBar2(ocvb, caller, "Edge Sigma_r", 1, 100, 40)
 
+        label2 = "Edge preserving blur for RGB depth image above"
         ocvb.desc = "OpenCV's edge preserving filter."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -343,7 +343,8 @@ Public Class Edges_Deriche_CPP
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Deriche Alpha", 1, 400, 100)
         sliders.setupTrackBar2(ocvb, caller, "Deriche Omega", 1, 1000, 100)
-                Edges_Deriche = Edges_Deriche_Open()
+        Edges_Deriche = Edges_Deriche_Open()
+        label2 = "Image enhanced with Deriche results"
         ocvb.desc = "Edge detection using the Deriche X and Y gradients - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -361,6 +362,7 @@ Public Class Edges_Deriche_CPP
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
         End If
+        cv.Cv2.BitwiseOr(src, dst1, dst2)
     End Sub
     Public Sub Close()
         Edges_Deriche_Close(Edges_Deriche)

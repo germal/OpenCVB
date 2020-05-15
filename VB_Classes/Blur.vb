@@ -112,7 +112,7 @@ Public Class Blur_PlusHistogram
         ocvb.desc = "Compound algorithms Blur and Histogram"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        myhist.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        myhist.src = src
         myhist.Run(ocvb)
 
         mat2to1.mat(0) = myhist.dst2.Clone()

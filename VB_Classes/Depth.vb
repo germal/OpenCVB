@@ -1065,6 +1065,7 @@ Public Class Depth_Punch
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         depth.Run(ocvb)
+        dst1 = depth.dst1
     End Sub
 End Class
 
@@ -1167,6 +1168,7 @@ Public Class Depth_Stabilizer
         ocvb.desc = "Use the mask of stable depth (using RGBDepth) to stabilize the depth at any individual point."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        stable.src = src
         stable.Run(ocvb)
 
         mean.src = getDepth32f(ocvb)

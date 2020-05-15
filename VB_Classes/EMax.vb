@@ -110,6 +110,7 @@ Public Class EMax_Basics_CPP
         emax = New EMax_Basics(ocvb, caller)
 
         EMax_Basics = EMax_Basics_Open()
+        label2 = "Emax regions around clusters"
         ocvb.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

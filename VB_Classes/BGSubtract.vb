@@ -118,7 +118,7 @@ Public Class BGSubtract_Basics_MT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.EmptyClone.SetTo(0)
         If ocvb.frameCount = 0 Then dst2 = src.Clone()
         Dim CCthreshold = CSng(sliders.TrackBar1.Value / sliders.TrackBar1.Maximum)
@@ -347,7 +347,8 @@ Public Class BGSubtract_Video
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         video.Run(ocvb)
-        bgfg.src = video.dst1
+        dst2 = video.dst1
+        bgfg.src = dst2
         bgfg.Run(ocvb)
         dst1 = bgfg.dst1
     End Sub
@@ -385,8 +386,7 @@ Public Class BGSubtract_Synthetic_CPP
         sliders.setupTrackBar2(ocvb, caller, "Synthetic Magnitude", 1, 40, 20)
         sliders.setupTrackBar3(ocvb, caller, "Synthetic Wavespeed x100", 1, 400, 20)
         sliders.setupTrackBar4(ocvb, caller, "Synthetic ObjectSpeed", 1, 20, 15)
-        label1 = ""
-        label2 = "Synthetic background/foreground image."
+        label1 = "Synthetic background/foreground image."
         ocvb.desc = "Generate a synthetic input to background subtraction method - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -410,8 +410,7 @@ Public Class BGSubtract_Synthetic_CPP
             handleSrc.Free()
         End If
         Dim imagePtr = BGSubtract_Synthetic_Run(synthPtr)
-
-        If imagePtr <> 0 Then dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
+        If imagePtr <> 0 Then dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC3, imagePtr)
     End Sub
     Public Sub Close()
         BGSubtract_Synthetic_Close(synthPtr)

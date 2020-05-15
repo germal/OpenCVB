@@ -22,7 +22,7 @@ Public Class CComp_Basics
         Next
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim threshold = sliders.TrackBar1.Value
         Dim binary As New cv.Mat
@@ -64,22 +64,23 @@ End Class
 Public Class CComp_EdgeMask
     Inherits ocvbClass
     Dim ccomp As CComp_ColorDepth
-    Dim edges As Edges_CannyAndShadow
+    Dim edges As Edges_DepthAndColor
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        edges = New Edges_CannyAndShadow(ocvb, caller)
+        edges = New Edges_DepthAndColor(ocvb, caller)
 
         ccomp = New CComp_ColorDepth(ocvb, caller)
 
         ocvb.desc = "Isolate Color connected components after applying the Edge Mask"
-        label1 = "Edges_CannyAndShadow (input to ccomp)"
+        label1 = "Edges_DepthAndColor (input to ccomp)"
         label2 = "Blob Rectangles with centroids (white)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        edges.src = src
         edges.Run(ocvb)
         dst1 = edges.dst1
 
-        ccomp.src = If(standalone, edges.src, ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        ccomp.src = If(standalone, edges.src, ocvb.color)
         ccomp.Run(ocvb)
         dst2 = ccomp.dst1
     End Sub
@@ -96,8 +97,8 @@ Public Class CComp_ColorDepth
         label2 = "Binary image using threshold binary+Otsu"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst2 = gray.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
         dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim cc = cv.Cv2.ConnectedComponentsEx(dst2)
 
@@ -125,7 +126,7 @@ Public Class CComp_Image
         label2 = "Mask binary+otsu to help compute mean depth"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         dst2 = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
 
@@ -174,7 +175,7 @@ Public Class CComp_InRange_MT
         label2 = "Blob rectangles - largest to smallest"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Int32 = sliders.TrackBar1.Value
         Dim maxDepth = sliders.TrackBar2.Value
@@ -183,6 +184,7 @@ Public Class CComp_InRange_MT
         Dim depth32f = getDepth32f(ocvb)
         Dim mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
+        dst1.SetTo(0)
         Dim totalBlobs As Int32
         Parallel.For(0, rangeCount - 1,
         Sub(i)
@@ -222,10 +224,9 @@ Public Class CComp_InRange
         sliders.setupTrackBar2(ocvb, caller, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
 
         ocvb.desc = "Connect components in specific ranges"
-        label2 = "Blob rectangles - smallest to largest"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Int32 = sliders.TrackBar1.Value
         Dim minBlobSize = sliders.TrackBar2.Value * 1000
@@ -245,10 +246,11 @@ Public Class CComp_InRange
         roiList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
         For i = 0 To roiList.Count - 1
             Dim avg = ocvb.RGBDepth(roiList(i)).Mean(mask(roiList(i)))
-            dst2(roiList(i)).SetTo(avg)
+            dst1(roiList(i)).SetTo(avg)
         Next
 
-        label1 = "# of blobs = " + CStr(roiList.Count) + " in " + CStr(rangeCount) + " regions"
+        cv.Cv2.AddWeighted(dst1, 0.5, ocvb.color, 0.5, 0, dst1)
+        label1 = "# of blobs = " + CStr(roiList.Count) + " in " + CStr(rangeCount) + " regions - smallest in front"
     End Sub
 End Class
 

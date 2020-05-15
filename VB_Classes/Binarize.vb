@@ -20,7 +20,7 @@ Public Class Binarize_OTSU
     Public Sub Run(ocvb As AlgorithmData)
         dst2 = ocvb.Color.EmptyClone.SetTo(0)
         Dim w = ocvb.color.Width, h = ocvb.color.Height
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim meanScalar = cv.Cv2.Mean(src)
         label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
         plotHist.bins = 255
@@ -67,7 +67,7 @@ Public Class Binarize_Niblack_Sauvola
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim grayBin As New cv.Mat
         cv.Extensions.Binarizer.Niblack(src, grayBin, kernelSize, sliders.TrackBar2.Value / 1000)
@@ -97,7 +97,7 @@ Public Class Binarize_Niblack_Nick
         Dim kernelSize = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayBin As New cv.Mat
         cv.Extensions.Binarizer.Niblack(src, grayBin, kernelSize, sliders.TrackBar2.Value / 1000)
         dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -166,7 +166,7 @@ Public Class Binarize_Bernson_MT
         Dim contrastMin = sliders.TrackBar2.Value
         Dim bgThreshold = sliders.TrackBar3.Value
 
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
             Sub(roi)
                 Dim grayBin = src(roi).Clone()

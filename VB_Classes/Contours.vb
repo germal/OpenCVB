@@ -47,7 +47,7 @@ Public Class Contours_Basics
         Next
 
         Dim imageInput As New cv.Mat
-        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standalone Then
             rotatedRect.Run(ocvb)
             imageInput = rotatedRect.dst1
@@ -184,6 +184,7 @@ Public Class Contours_RGB
         listOfPoints.Add(points)
         cv.Cv2.DrawContours(dst1, listOfPoints, 0, New cv.Scalar(255, 0, 0), -1)
         cv.Cv2.DrawContours(dst1, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
+        dst2.SetTo(0)
         ocvb.color.CopyTo(dst2, trim.zeroMask)
     End Sub
 End Class

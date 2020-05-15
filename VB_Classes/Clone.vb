@@ -188,18 +188,18 @@ Public Class Clone_Seamless
         radio.check(1).Text = "Seamless Mono Clone"
         radio.check(2).Text = "Seamless Mixed Clone"
         radio.check(0).Checked = True
-        label1 = "Mask for Clone"
-        label2 = "Results for SeamlessClone"
+        label1 = "Results for SeamlessClone"
+        label2 = "Mask for Clone"
         ocvb.desc = "Use the seamlessclone API to merge color and depth..."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim center As New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
         Dim radius = 100
         If ocvb.drawRect = New cv.Rect Then
-            dst1.SetTo(255)
+            dst2.SetTo(0)
+            dst2.Circle(center.X, center.Y, radius, cv.Scalar.White, -1)
         Else
-            cv.Cv2.Rectangle(dst1, ocvb.drawRect, cv.Scalar.White, -1)
-            ' dst1.Circle(center.X, center.Y, radius, cv.Scalar.White, -1)
+            cv.Cv2.Rectangle(dst2, ocvb.drawRect, cv.Scalar.White, -1)
         End If
 
         Dim style = cv.SeamlessCloneMethods.NormalClone
@@ -209,8 +209,8 @@ Public Class Clone_Seamless
                 Exit For
             End If
         Next
-        dst2 = ocvb.color.Clone()
-        cv.Cv2.SeamlessClone(ocvb.RGBDepth, ocvb.color, dst1, center, dst2, style)
-        dst2.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst1 = ocvb.color.Clone()
+        cv.Cv2.SeamlessClone(ocvb.RGBDepth, ocvb.color, dst2, center, dst1, style)
+        dst1.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
     End Sub
 End Class

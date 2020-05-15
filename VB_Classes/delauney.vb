@@ -112,12 +112,15 @@ Public Class Delaunay_GoodFeatures
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         features = New Features_GoodFeatures(ocvb, caller)
+        features.sliders.setupTrackBar4(ocvb, caller, "Image mix percentage X100", 0, 100, 50)
+        label2 = "Voronoi facets of delauney good features"
         ocvb.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        features.src = ocvb.color
+        features.src = src
         features.Run(ocvb)
 
+        dst1 = src
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
         For i = 0 To features.goodFeatures.Count - 1
@@ -125,9 +128,9 @@ Public Class Delaunay_GoodFeatures
             subdiv.Insert(features.goodFeatures(i))
         Next
 
-        cv.Cv2.AddWeighted(dst1, 0.5, ocvb.color, 0.5, 0, dst2)
-        paint_voronoi(ocvb, dst1, subdiv)
-        cv.Cv2.AddWeighted(dst1, 0.5, dst2, 0.5, 0, dst1)
+        Dim mixPercent = features.sliders.TrackBar4.Value / 100
+        paint_voronoi(ocvb, dst2, subdiv)
+        cv.Cv2.AddWeighted(dst2, 1 - mixPercent, src, mixPercent, 0, dst2)
     End Sub
 End Class
 
@@ -137,14 +140,16 @@ End Class
 ' https://github.com/shimat/opencvsharp/wiki/Subdiv2D
 Public Class Delauney_Subdiv2D
     Inherits ocvbClass
+    Public updateFrequency As Integer = 30
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         label2 = "Voronoi facets for the same subdiv2D"
         ocvb.desc = "Generate random points and divide the image around those points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod 30 <> 0 Then Exit Sub ' too fast otherwise...
+        If ocvb.frameCount Mod updateFrequency <> 0 Then Exit Sub ' too fast otherwise...
         Dim rand As New Random()
+        dst1.SetTo(0)
         Dim points = Enumerable.Range(0, 100).Select(Of cv.Point2f)(
             Function(i)
                 Return New cv.Point2f(rand.Next(0, ocvb.color.Width), rand.Next(0, ocvb.color.Height))
@@ -178,5 +183,29 @@ Public Class Delauney_Subdiv2D
             Dim p2 = New cv.Point(edge.Item2, edge.Item3)
             dst1.Line(p1, p2, cv.Scalar.Green, 1)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Delauney_Coverage
+    Inherits ocvbClass
+    Dim delauney As Delauney_Subdiv2D
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        delauney = New Delauney_Subdiv2D(ocvb, caller)
+        delauney.updateFrequency = 1
+        sliders.setupTrackBar1(ocvb, caller, "Clear image after x frames", 1, 100, 50)
+        label1 = "Coverage of space"
+        ocvb.desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.frameCount Mod sliders.TrackBar1.Value = 0 Then dst1.SetTo(0)
+        delauney.src = ocvb.color
+        delauney.Run(ocvb)
+        cv.Cv2.BitwiseOr(delauney.dst1, dst1, dst1)
     End Sub
 End Class
