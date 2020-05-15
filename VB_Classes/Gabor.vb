@@ -25,7 +25,6 @@ Public Class Gabor_Basics
         ocvb.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         If standalone Then
             ksize = sliders.TrackBar1.Value * 2 + 1
             Sigma = sliders.TrackBar2.Value

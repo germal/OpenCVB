@@ -45,7 +45,6 @@ Public Class Retina_Basics_CPP
         End If
         Static useLogSampling As Int32 = check.Box(0).Checked
         Static samplingFactor As Single = -1 ' force open
-        If standalone Then src = ocvb.color
         If useLogSampling <> check.Box(0).Checked Or samplingFactor <> sliders.TrackBar1.Value Then
             If Retina <> 0 Then Retina_Basics_Close(Retina)
             useLogSampling = check.Box(0).Checked
@@ -64,13 +63,8 @@ Public Class Retina_Basics_CPP
         If magnoPtr <> 0 Then
             Dim nextFactor = samplingFactor
             If useLogSampling = False Then nextFactor = 1
-            Dim parvoData(src.Total * src.ElemSize / (nextFactor * nextFactor) - 1) As Byte
-            Marshal.Copy(magnoPtr, parvoData, 0, parvoData.Length)
-            Dim parvo = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8UC3, parvoData)
-            dst1 = parvo.Resize(src.Size())
-
-            Dim magno = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8U, magnoData)
-            dst2 = magno.Resize(src.Size())
+            dst1 = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8UC3, magnoPtr).Resize(src.Size())
+            dst2 = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8U, magnoData).Resize(src.Size())
         End If
     End Sub
     Public Sub Close()

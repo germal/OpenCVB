@@ -31,6 +31,7 @@ Public Class Area_MinTriangle_CPP
         If numberOfPoints <> sliders.TrackBar1.Value Then setup(ocvb)
         Dim squareWidth = sliders.TrackBar2.Value / 2
 
+        dst1.SetTo(0)
         For i = 0 To srcPoints.Length - 1
             srcPoints(i).X = ocvb.ms_rng.Next(ocvb.color.Width / 2 - squareWidth, ocvb.color.Width / 2 + squareWidth)
             srcPoints(i).Y = ocvb.ms_rng.Next(ocvb.color.Height / 2 - squareWidth, ocvb.color.Height / 2 + squareWidth)
@@ -78,6 +79,7 @@ Public Class Area_MinRect
         If numberOfPoints <> sliders.TrackBar1.Value Then setup(ocvb)
         Dim squareWidth = sliders.TrackBar2.Value / 2
 
+        dst1.SetTo(0)
         For i = 0 To srcPoints.Length - 1
             srcPoints(i).X = ocvb.ms_rng.Next(ocvb.color.Width / 2 - squareWidth, ocvb.color.Width / 2 + squareWidth)
             srcPoints(i).Y = ocvb.ms_rng.Next(ocvb.color.Height / 2 - squareWidth, ocvb.color.Height / 2 + squareWidth)
@@ -116,6 +118,7 @@ Public Class Area_MinMotionRect
         Return gray
     End Function
     Public Sub Run(ocvb As AlgorithmData)
+        input.src = ocvb.color
         input.Run(ocvb)
         Dim gray As cv.Mat
         If input.dst1.Channels = 1 Then gray = input.dst1 Else gray = input.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

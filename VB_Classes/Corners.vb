@@ -17,7 +17,6 @@ Public Class Corners_Harris
         Static mc As New cv.Mat
         Static minval As Double, maxval As Double
 
-        If standalone Then src = ocvb.color
         gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mc = New cv.Mat(gray.Size(), cv.MatType.CV_32FC1, 0)
         dst1 = New cv.Mat(gray.Size(), cv.MatType.CV_8U, 0)
@@ -67,7 +66,6 @@ Public Class Corners_SubPix
         ocvb.desc = "Use PreCornerDetect to find features in the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         good.src = src
         good.Run(ocvb)
         If good.goodFeatures.Count = 0 Then Exit Sub ' no good features right now...
@@ -99,7 +97,6 @@ Public Class Corners_PreCornerDetect
         ocvb.desc = "Use PreCornerDetect to find features in the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim ksize = sliders.TrackBar1.Value
         If ksize Mod 2 = 0 Then ksize += 1
@@ -144,7 +141,6 @@ Public Class Corners_ShiTomasi_CPP
         Dim blocksize = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value + 1)
         Dim aperture = If(sliders.TrackBar2.Value Mod 2, sliders.TrackBar2.Value, sliders.TrackBar2.Value + 1)
 
-        If standalone Then src = ocvb.color
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)

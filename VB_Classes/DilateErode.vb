@@ -15,8 +15,6 @@ Public Class DilateErode_Basics
         radio.check(0).Checked = True
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
-
         Dim iterations = sliders.TrackBar2.Value
         Dim kernelsize = sliders.TrackBar1.Value
         If kernelsize Mod 2 = 0 Then kernelsize += 1

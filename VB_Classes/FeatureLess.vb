@@ -25,7 +25,6 @@ Public Class Featureless_Basics_MT
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         grid.Run(ocvb)
 
         edges.src = src
@@ -88,7 +87,6 @@ Public Class FeatureLess_Prediction
         ocvb.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         fLess.src = src
         fLess.Run(ocvb)
         dst1 = fLess.dst1
@@ -172,7 +170,6 @@ Public Class Featureless_DCT_MT
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         dct.src = src
         dct.Run(ocvb)
         dst1 = dct.dst1

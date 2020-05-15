@@ -11,7 +11,6 @@ Public Class Gradient_Basics
         label2 = "Phase Output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         sobel.src = src
         sobel.Run(ocvb)
         Dim angle = New cv.Mat

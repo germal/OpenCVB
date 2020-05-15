@@ -23,7 +23,6 @@ Public Class Entropy_Basics
         Return entropy
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         hist.src = src
         hist.Run(ocvb)
         entropy = 0
@@ -60,7 +59,6 @@ Public Class Entropy_Highest_MT
         ocvb.desc = "Find the highest entropy section of the color image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         grid.Run(ocvb)
 
         If entropies.Length <> grid.roiList.Count Then

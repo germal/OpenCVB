@@ -289,7 +289,6 @@ Public Class Palette_ColorMap
     Public Sub Run(ocvb As AlgorithmData)
         Dim colormap = cv.ColormapTypes.Autumn
         Static buildNewRandomMap = False
-        If standalone Then src = ocvb.color.Clone()
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then
                 colormap = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cool, cv.ColormapTypes.Hot,

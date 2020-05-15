@@ -17,7 +17,7 @@ Public Class Fitline_Basics
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
             draw.Run(ocvb)
-            src = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+            src = draw.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
             dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst1 = dst2
         Else
@@ -34,15 +34,14 @@ Public Class Fitline_Basics
             Dim line2d = cv.Cv2.FitLine(cnt, cv.DistanceTypes.L2, 0, radiusAccuracy, angleAccuracy)
             Dim slope = line2d.Vy / line2d.Vx
             Dim leftY = Math.Round(-line2d.X1 * slope + line2d.Y1)
-            Dim rightY = Math.Round((ocvb.color.Cols - line2d.X1) * slope + line2d.Y1)
+            Dim rightY = Math.Round((src.Cols - line2d.X1) * slope + line2d.Y1)
             Dim p1 = New cv.Point(0, leftY)
-            Dim p2 = New cv.Point(ocvb.color.Cols - 1, rightY)
+            Dim p2 = New cv.Point(src.Cols - 1, rightY)
             If standalone Then
                 lines.Add(p1)
                 lines.Add(p2)
-            Else
-                dst1.Line(p1, p2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
             End If
+            dst1.Line(p1, p2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
         Next
     End Sub
 End Class
@@ -59,10 +58,12 @@ Public Class Fitline_3DBasics_MT
         label2 = "White is featureless RGB, blue depth shadow"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        hlines.src = src
         hlines.Run(ocvb)
+        dst2 = hlines.dst2
         Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ocvb.color.CopyTo(dst1)
+        src.CopyTo(dst1)
         Dim depth32f = getDepth32f(ocvb)
 
         Dim lines As New List(Of cv.Line3D)
@@ -72,7 +73,7 @@ Public Class Fitline_3DBasics_MT
             Dim depth = depth32f(roi)
             Dim fMask = mask(roi)
             Dim points As New List(Of cv.Point3f)
-            Dim rows = ocvb.color.Rows, cols = ocvb.color.Cols
+            Dim rows = src.Rows, cols = src.Cols
             For y = 0 To roi.Height - 1
                 For x = 0 To roi.Width - 1
                     If fMask.Get(Of Byte)(y, x) > 0 Then
@@ -109,7 +110,7 @@ End Class
 
 Public Class Fitline_RawInput
     Inherits ocvbClass
-    Public points As List(Of cv.Point2f)
+    Public points As New List(Of cv.Point2f)
     Public m As Single
     Public bb As Single
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -129,12 +130,12 @@ Public Class Fitline_RawInput
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(1).Checked Or ocvb.frameCount = 0 Then
-            dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC1, 0)
+            dst1.SetTo(0)
             Dim dotSize = 2
             Dim w = ocvb.color.Width
             Dim h = ocvb.color.Height
 
-            points = New List(Of cv.Point2f)
+            points.Clear()
             For i = 0 To sliders.TrackBar1.Value - 1
                 Dim pt = New cv.Point2f(Rnd() * w, Rnd() * h)
                 If pt.X < 0 Then pt.X = 0
@@ -207,6 +208,8 @@ Public Class Fitline_EigenFit
         '    noisyLine.sliders.TrackBar3.Value <> lineNoise Or noisyLine.check.Box(0).Checked <> highlight Or noisyLine.check.Box(1).Checked Then
         noisyLine.check.Box(1).Checked = True
         noisyLine.Run(ocvb)
+        dst1 = noisyLine.dst1
+        dst2.SetTo(0)
         noisyLine.check.Box(1).Checked = False
         'End If
 
@@ -215,8 +218,7 @@ Public Class Fitline_EigenFit
         lineNoise = noisyLine.sliders.TrackBar3.Value
         highlight = noisyLine.check.Box(0).Checked
 
-        Dim w = ocvb.color.Width
-        dst2 = ocvb.Color.EmptyClone.SetTo(0)
+        Dim w = src.Width
 
         Dim line = cv.Cv2.FitLine(noisyLine.points, cv.DistanceTypes.L2, 1, 0.01, 0.01)
         Dim m = line.Vy / line.Vx

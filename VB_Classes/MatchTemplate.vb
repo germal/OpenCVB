@@ -118,7 +118,6 @@ Public Class MatchTemplate_DrawRect
         ocvb.desc = "Find the requested template in an image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
             If ocvb.drawRect.X + ocvb.drawRect.Width >= ocvb.color.Width Then ocvb.drawRect.Width = ocvb.color.Width - ocvb.drawRect.X
             If ocvb.drawRect.Y + ocvb.drawRect.Height >= ocvb.color.Height Then ocvb.drawRect.Height = ocvb.color.Height - ocvb.drawRect.Y
@@ -165,7 +164,6 @@ Public Class MatchTemplate_BestEntropy_MT
         ocvb.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         If ocvb.frameCount Mod 30 = 0 Then
             entropy.src = src
             entropy.Run(ocvb)

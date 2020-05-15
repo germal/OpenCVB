@@ -84,7 +84,6 @@ Public Class Hough_Lines
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         edges.src = src.Clone()
         edges.Run(ocvb)
 
@@ -139,16 +138,17 @@ Public Class Hough_Lines_MT
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
 
+        edges.src = src
         edges.Run(ocvb)
+        dst1 = edges.dst1
 
         Dim rhoIn = sliders.TrackBar1.Value
         Dim thetaIn = sliders.TrackBar2.Value / 1000
         Dim threshold = sliders.TrackBar3.Value
 
-        ocvb.color.CopyTo(dst1)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
-            Dim segments() = cv.Cv2.HoughLines(edges.dst1(roi), rhoIn, thetaIn, threshold)
+            Dim segments() = cv.Cv2.HoughLines(dst1(roi), rhoIn, thetaIn, threshold)
             If segments.Count = 0 Then
                 dst2(roi) = ocvb.RGBDepth(roi)
                 Exit Sub

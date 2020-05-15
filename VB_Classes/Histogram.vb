@@ -19,7 +19,6 @@ Public Class Histogram_Basics
         ocvb.desc = "Plot histograms for up to 3 channels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         bins = sliders.TrackBar1.Value
 
         Dim thickness = sliders.TrackBar2.Value
@@ -209,7 +208,7 @@ Public Class Histogram_EqualizeGray
         ocvb.desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         histogram.gray = src
 
         cv.Cv2.EqualizeHist(histogram.gray, histogram.gray)

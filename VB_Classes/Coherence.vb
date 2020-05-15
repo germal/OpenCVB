@@ -23,7 +23,6 @@ Public Class Coherence_Basics
         Dim yoffset = ocvb.color.Height / 2 - side / 2
         Dim srcRect = New cv.Rect(xoffset, yoffset, side, side)
         If ocvb.drawRect.Width <> 0 Then srcRect = ocvb.drawRect
-        If standalone Then src = ocvb.color
 
         dst1 = src.Clone()
         src = src(srcRect)

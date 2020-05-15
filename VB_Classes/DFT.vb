@@ -34,7 +34,6 @@ Public Class DFT_Basics
         label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         rows = cv.Cv2.GetOptimalDFTSize(gray.Rows)

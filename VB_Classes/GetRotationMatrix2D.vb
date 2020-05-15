@@ -43,7 +43,6 @@ Public Class GetRotationMatrix2D_Basics
         ocvb.desc = "Rotate a rectangle of a specified angle"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         warpFlag = getInterpolationRadioButtons(radio)
 
         Dim angle = sliders.TrackBar1.Value

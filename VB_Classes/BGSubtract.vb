@@ -31,7 +31,6 @@ Public Class BGSubtract_Basics_CPP
                 End If
             End If
         Next
-        If standalone Then src = ocvb.color
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
@@ -119,7 +118,6 @@ Public Class BGSubtract_Basics_MT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
-        If standalone Then src = ocvb.color
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.EmptyClone.SetTo(0)
         If ocvb.frameCount = 0 Then dst2 = src.Clone()
@@ -172,7 +170,6 @@ Public Class BGSubtract_MOG
         ocvb.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         If src.Channels = 3 Then
             gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
@@ -221,7 +218,6 @@ Public Class BGSubtract_GMG_KNN
         ocvb.desc = "GMG and KNN API's to subtract background"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         If ocvb.frameCount < 120 Then
             ocvb.putText(New ActiveClass.TrueType("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(ocvb.frameCount), 10, 60, RESULT2))
         Else
@@ -268,13 +264,12 @@ End Class
 
 Public Class BGSubtract_MOG_Retina
     Inherits ocvbClass
-    Dim input As BGSubtract_MOG
+    Dim mog As BGSubtract_MOG
     Dim retina As Retina_Basics_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        input = New BGSubtract_MOG(ocvb, caller)
-
-        input.sliders.TrackBar1.Value = 100
+        mog = New BGSubtract_MOG(ocvb, caller)
+        mog.sliders.TrackBar1.Value = 100
 
         retina = New Retina_Basics_CPP(ocvb, caller)
 
@@ -287,10 +282,10 @@ Public Class BGSubtract_MOG_Retina
     Public Sub Run(ocvb As AlgorithmData)
         retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
-        input.src = retina.dst2
-        input.Run(ocvb)
-        dst1 = input.dst1
-        cv.Cv2.Subtract(input.dst1, retina.dst2, dst2)
+        mog.src = retina.dst2.Clone()
+        mog.Run(ocvb)
+        dst1 = mog.dst1
+        cv.Cv2.Subtract(mog.dst1, retina.dst2, dst2)
     End Sub
 End Class
 
@@ -306,6 +301,7 @@ Public Class BGSubtract_DepthOrColorMotion
         ocvb.desc = "Detect motion with both depth and color changes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        motion.src = ocvb.color
         motion.Run(ocvb)
         dst1 = motion.dst1
         dst2 = motion.dst2
@@ -394,7 +390,6 @@ Public Class BGSubtract_Synthetic_CPP
         ocvb.desc = "Generate a synthetic input to background subtraction method - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         If amplitude <> sliders.TrackBar1.Value Or magnitude <> sliders.TrackBar2.Value Or waveSpeed <> sliders.TrackBar3.Value Or
             objectSpeed <> sliders.TrackBar4.Value Then
 
@@ -416,12 +411,7 @@ Public Class BGSubtract_Synthetic_CPP
         End If
         Dim imagePtr = BGSubtract_Synthetic_Run(synthPtr)
 
-        If imagePtr <> 0 Then
-            dst2 = ocvb.color.EmptyClone.SetTo(0)
-            Dim dstData(dst2.Total * dst2.ElemSize - 1) As Byte
-            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, dstData)
-        End If
+        If imagePtr <> 0 Then dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
     End Sub
     Public Sub Close()
         BGSubtract_Synthetic_Close(synthPtr)
@@ -442,9 +432,10 @@ Public Class BGSubtract_Synthetic
         bgfg = New BGSubtract_Basics_CPP(ocvb, caller)
 
         synth = New BGSubtract_Synthetic_CPP(ocvb, caller)
-        ocvb.desc = "Demonstrate background subtraction algorithms with synthetic images."
+        ocvb.desc = "Demonstrate background subtraction algorithms with synthetic images - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        synth.src = src
         synth.Run(ocvb)
         dst2 = synth.dst2
         bgfg.src = dst2

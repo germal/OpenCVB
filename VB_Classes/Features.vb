@@ -14,7 +14,6 @@ Public Class Features_GoodFeatures
         ocvb.desc = "Find good features to track in an RGB image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim numPoints = sliders.TrackBar1.Value
         Dim quality = sliders.TrackBar2.Value / 100

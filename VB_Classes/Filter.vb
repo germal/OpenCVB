@@ -9,7 +9,6 @@ Public Class Filter_Laplacian
         label2 = "Output of Filter2D (approximated Laplacian)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         Dim kernel = New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1})
         Dim imgLaplacian = src.Filter2D(cv.MatType.CV_32F, kernel)
         Dim sharp As New cv.Mat
@@ -36,7 +35,6 @@ Public Class Filter_NormalizedKernel
         ocvb.desc = "Create a normalized kernel and use it."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         Dim kernel = New cv.Mat(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
         Dim normType = cv.NormTypes.L1
         For i = 0 To radio.check.Count - 1
@@ -69,7 +67,6 @@ Public Class Filter_Normalized2D
         ocvb.desc = "Create and apply a normalized kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         Dim kernelSize = If(standalone, (ocvb.frameCount Mod 20) + 1, sliders.TrackBar1.Value)
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
         dst1 = src.Filter2D(-1, kernel)
@@ -96,7 +93,6 @@ Public Class Filter_SepFilter2D
         ocvb.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         Dim xDim = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value + 1)
         Dim yDim = If(sliders.TrackBar2.Value Mod 2, sliders.TrackBar2.Value, sliders.TrackBar2.Value + 1)
         Dim sigma = sliders.TrackBar3.Value / 10

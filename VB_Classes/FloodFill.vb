@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Imports System.Text.RegularExpressions
+Imports System.Threading
 Public Class FloodFill_Basics
     Inherits ocvbClass
     Public masks As New List(Of cv.Mat)
@@ -31,7 +31,7 @@ Public Class FloodFill_Basics
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
         Dim stepSize = sliders.TrackBar4.Value
 
-        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src
         Dim rect As New cv.Rect
         Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1)
@@ -93,7 +93,7 @@ Public Class FloodFill_Top16_MT
         Dim loDiff = cv.Scalar.All(sliders.TrackBar2.Value)
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
 
-        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.Clone()
         grid.Run(ocvb)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
@@ -132,11 +132,11 @@ Public Class FloodFill_Color_MT
         Dim loDiff = cv.Scalar.All(flood.sliders.TrackBar2.Value)
         Dim hiDiff = cv.Scalar.All(flood.sliders.TrackBar3.Value)
 
-        If standalone Then src = ocvb.color.Clone()
-        dst2 = src.Clone()
+        dst1 = src.Clone()
         grid.Run(ocvb)
         Dim vec255 = New cv.Vec3b(255, 255, 255)
         Dim vec0 = New cv.Vec3b(0, 0, 0)
+        Dim regionCount As Integer = 0
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             For y = roi.Y To roi.Y + roi.Height - 1
@@ -145,12 +145,14 @@ Public Class FloodFill_Color_MT
                     If vec <> vec255 And vec <> vec0 Then
                         Dim count = cv.Cv2.FloodFill(src, New cv.Point(x, y), cv.Scalar.White, roi, loDiff, hiDiff, cv.FloodFillFlags.FixedRange + cv.FloodFillFlags.Link4)
                         If count > minFloodSize Then
-                            count = cv.Cv2.FloodFill(dst2, New cv.Point(x, y), cv.Scalar.White, roi, loDiff, hiDiff, cv.FloodFillFlags.FixedRange + cv.FloodFillFlags.Link4)
+                            Interlocked.Increment(regionCount)
+                            count = cv.Cv2.FloodFill(dst1, New cv.Point(x, y), cv.Scalar.White, roi, loDiff, hiDiff, cv.FloodFillFlags.FixedRange + cv.FloodFillFlags.Link4)
                         End If
                     End If
                 Next
             Next
         End Sub)
+        label1 = CStr(regionCount) + " regions were filled with Floodfill"
     End Sub
 End Class
 
@@ -169,10 +171,11 @@ Public Class FloodFill_DCT
         ocvb.desc = "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        dct.src = src
         dct.Run(ocvb)
-        flood.src = dst2.Clone()
+        flood.src = dct.dst1.Clone()
         Dim mask As New cv.Mat
-        cv.Cv2.BitwiseNot(dst1, mask)
+        cv.Cv2.BitwiseNot(dct.dst1, mask)
         flood.src.SetTo(0, mask)
         flood.Run(ocvb)
         dst2.SetTo(0, mask)
@@ -221,17 +224,22 @@ Public Class FloodFill_CComp
 
         range = New FloodFill_RelativeRange(ocvb, caller)
 
+        label1 = "Input to Floodfill "
         ocvb.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
 
-        ccomp.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ccomp.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ccomp.Run(ocvb)
 
-        range.fBasics.src = ccomp.dst1
+        range.src = ccomp.dst1
         range.fBasics.initialMask = shadow.holeMask
         range.Run(ocvb)
+        dst1 = range.dst1
+        dst2 = range.dst2
+        label2 = CStr(ccomp.connectedComponents.blobs.length) + " blobs found. " + CStr(range.fBasics.maskRects.Count) + " were more than " +
+                      CStr(range.fBasics.sliders.TrackBar1.Value) + " pixels"
     End Sub
 End Class
 
@@ -257,7 +265,7 @@ Public Class FloodFill_RelativeRange
         If check.Box(0).Checked Then fBasics.floodFlag += cv.FloodFillFlags.FixedRange
         If check.Box(1).Checked Then fBasics.floodFlag += cv.FloodFillFlags.Link4 Else fBasics.floodFlag += cv.FloodFillFlags.Link8
         If check.Box(2).Checked Then fBasics.floodFlag += cv.FloodFillFlags.MaskOnly
-        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         fBasics.src = src
         fBasics.Run(ocvb)
         dst1 = src
@@ -285,7 +293,7 @@ Public Class FloodFill_Top16
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         flood.src = src
 
         thumbNails = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
@@ -340,7 +348,7 @@ Public Class FloodFill_Projection
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
         Dim stepSize = sliders.TrackBar4.Value
 
-        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Clone()
         Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1)
 

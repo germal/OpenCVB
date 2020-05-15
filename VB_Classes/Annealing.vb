@@ -31,6 +31,7 @@ Public Class Annealing_Basics_CPP
     Public circularPattern As Boolean = True
     Dim saPtr As IntPtr
     Public Sub drawMap(ocvb As AlgorithmData)
+        dst1.SetTo(0)
         For i = 0 To cityOrder.Length - 1
             dst1.Circle(cityPositions(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             dst1.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)

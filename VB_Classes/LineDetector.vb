@@ -206,8 +206,6 @@ Public Class lineDetector_FLD
         Dim canny_th2 = sliders2.TrackBar2.Value
         Dim do_merge = check.Box(0).Checked
 
-        If standalone Then src = ocvb.color
-
         Dim factor As Int32 = 4
         If radio.check(0).Checked Then
             factor = 4

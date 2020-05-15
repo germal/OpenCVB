@@ -13,7 +13,6 @@ Public Class Mean_Basics
             saveImageCount = sliders.TrackBar1.Value
             images.Clear()
         End If
-        If standalone Then src = ocvb.color
         Dim nextImage As New cv.Mat
         If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(src, cv.MatType.CV_32F)
         cv.Cv2.Multiply(src, cv.Scalar.All(1 / saveImageCount), nextImage)

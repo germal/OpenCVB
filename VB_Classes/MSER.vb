@@ -59,7 +59,6 @@ Public Class MSER_Basics
             mser.Pass2Only = check.Box(0).Checked
         End If
 
-        If standalone Then src = ocvb.color.Clone()
         src = src.Blur(New cv.Size(edgeBlurSize, edgeBlurSize))
         If check.Box(1).Checked Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mser.DetectRegions(src, region, zone)

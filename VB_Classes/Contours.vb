@@ -47,7 +47,7 @@ Public Class Contours_Basics
         Next
 
         Dim imageInput As New cv.Mat
-        If standalone Then src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standalone Then
             rotatedRect.Run(ocvb)
             imageInput = rotatedRect.dst1

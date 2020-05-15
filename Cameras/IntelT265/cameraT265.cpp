@@ -188,7 +188,12 @@ public:
 
 		rs2::frame rightImage = fs.get_fisheye_frame(2);
 		rightViewRaw = Mat(rawHeight, rawWidth, CV_8U, (void*)rightImage.get_data());
+		
+		//remap(rightViewRaw, tmpColor, rightViewMap1, rightViewMap2, INTER_LINEAR);
+		//resize(tmpColor, tmpColor, Size(width, height));
+
 		cv::remap(rightViewRaw, remapRight, rm1, rm2, INTER_LINEAR);
+
 		depth16s = sgm->Run(remapLeft, remapRight, maxDisp);
 
 		Rect validRect = Rect(maxDisp, 0, depth16s.cols - maxDisp, depth16s.rows);

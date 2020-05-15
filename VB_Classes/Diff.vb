@@ -10,7 +10,6 @@ Public Class Diff_Basics
         ocvb.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If ocvb.frameCount > 0 Then
             dst1 = lastFrame
@@ -41,7 +40,6 @@ Public Class Diff_UnstableDepthAndColor
         ocvb.desc = "Build a mask for any pixels that have either unstable depth or color"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = ocvb.color
         diff.src = src
         diff.Run(ocvb)
         Dim unstableColor = diff.dst2.Clone()

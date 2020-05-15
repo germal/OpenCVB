@@ -43,6 +43,7 @@ Public Class ocvbClass : Implements IDisposable
         End If
     End Sub
     Public Sub NextFrame(ocvb As AlgorithmData)
+        If standalone Then src = ocvb.color
         algorithm.Run(ocvb)
         If standalone Then
             If dst1.Width <> 0 Then

@@ -88,7 +88,6 @@ Public Class Blur_Bilateral
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize As Int32 = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
-        If standalone Then src = ocvb.color.Clone()
 
         cv.Cv2.BilateralFilter(src, dst1, kernelSize, kernelSize * 2, kernelSize / 2)
     End Sub
