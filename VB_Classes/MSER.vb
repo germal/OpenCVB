@@ -15,7 +15,6 @@ Public Class MSER_Basics
         sliders1.setupTrackBar2(ocvb, caller, "MSER Max Evolution", 1, 1000, 200)
         sliders1.setupTrackBar3(ocvb, caller, "MSER Area Threshold", 1, 101, 101)
         sliders1.setupTrackBar4(ocvb, caller, "MSER Min Margin", 1, 100, 3)
-        If ocvb.parms.ShowOptions Then sliders1.Show()
 
         sliders.setupTrackBar1(ocvb, caller, "MSER Delta", 1, 100, 5)
         sliders.setupTrackBar2(ocvb, caller, "MSER Min Area", 1, 10000, 60)

@@ -14,6 +14,8 @@ Public Class Font_OpenCV
                                  "HersheyScriptSimplex", "HersheySimplex", "HersheyTriplex", "Italic")
         label1 = hersheyName
         label2 = "Italicized " + hersheyName
+        dst1.SetTo(0)
+        dst2.SetTo(0)
         For i = 1 To 10
             Dim size = 1.5 - i * 0.1
             cv.Cv2.PutText(dst1, hersheyName + " " + Format(size, "#0.0"), New cv.Point(10, 30 + i * 30), hersheyFont, size, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
@@ -59,10 +61,10 @@ Public Class Font_FlowText
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone And ocvb.frameCount = 0 Then
-            msgs.Add("To get text to flow across an image in any other class, add flow = new Font_FlowText(ocvb) to your class constructor.")
+            msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText(ocvb)' to the class constructor.")
             msgs.Add("Also optionally indicate if you want result1 or result2 for text (the default is result1.)")
-            msgs.Add("Then in your Run method, flow.msgs.add('your next line of text') - for as many msgs as you need on each pass.")
-            msgs.Add("Then at the end of your Run method, invoke flow.Run(ocvb)")
+            msgs.Add("Then in the Run method, flow.msgs.add('your next line of text') - for as many msgs as you need on each pass.")
+            msgs.Add("Then at the end of the Run method, invoke flow.Run(ocvb)")
         End If
 
         For i = 0 To msgs.Count - 1

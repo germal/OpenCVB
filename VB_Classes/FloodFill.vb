@@ -82,7 +82,7 @@ Public Class FloodFill_Top16_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
-        sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 500, 50)
+        sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 5000, 2000)
         sliders.setupTrackBar2(ocvb, caller, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar3(ocvb, caller, "FloodFill HiDiff", 1, 255, 5)
 
@@ -94,7 +94,7 @@ Public Class FloodFill_Top16_MT
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = src.Clone()
+        dst1 = src.Clone()
         grid.Run(ocvb)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
@@ -104,7 +104,7 @@ Public Class FloodFill_Top16_MT
                     If nextByte <> 255 And nextByte > 0 Then
                         Dim count = cv.Cv2.FloodFill(src, New cv.Point(x, y), cv.Scalar.White, roi, loDiff, hiDiff, cv.FloodFillFlags.FixedRange)
                         If count > minFloodSize Then
-                            count = cv.Cv2.FloodFill(dst2, New cv.Point(x, y), cv.Scalar.White, roi, loDiff, hiDiff, cv.FloodFillFlags.FixedRange)
+                            count = cv.Cv2.FloodFill(dst1, New cv.Point(x, y), cv.Scalar.White, roi, loDiff, hiDiff, cv.FloodFillFlags.FixedRange)
                         End If
                     End If
                 Next
@@ -173,12 +173,10 @@ Public Class FloodFill_DCT
     Public Sub Run(ocvb As AlgorithmData)
         dct.src = src
         dct.Run(ocvb)
-        flood.src = dct.dst1.Clone()
-        Dim mask As New cv.Mat
-        cv.Cv2.BitwiseNot(dct.dst1, mask)
-        flood.src.SetTo(0, mask)
+
+        flood.src = dct.dst2.Clone()
         flood.Run(ocvb)
-        dst2.SetTo(0, mask)
+        dst1 = flood.dst1
     End Sub
 End Class
 
@@ -196,14 +194,17 @@ Public Class FloodFill_WithDepth
 
         range = New FloodFill_RelativeRange(ocvb, caller)
 
+        label2 = "Floodfill results after removing unknown depth"
         ocvb.desc = "Floodfill only the areas where there is depth"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
 
-        range.fBasics.src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        range.src = src
         range.fBasics.initialMask = shadow.holeMask
         range.Run(ocvb)
+        dst1 = range.dst1
+        dst2 = range.dst2
     End Sub
 End Class
 
@@ -258,6 +259,8 @@ Public Class FloodFill_RelativeRange
         check.Box(1).Text = "Use 4 nearest pixels (Link4) - when off, it means use 8 nearest pixels (Link8)"
         check.Box(1).Checked = True ' link4 produces better results.
         check.Box(2).Text = "Use 'Mask Only'"
+        label1 = "Input to floodfill basics"
+        label2 = "Output of floodfill basics"
         ocvb.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -300,12 +303,13 @@ Public Class FloodFill_Top16
 
         flood.Run(ocvb)
 
+        dst1.SetTo(0)
         Dim thumbCount As Int32
         Dim allRect = New cv.Rect(0, 0, allSize.Width, allSize.Height)
         For i = 0 To flood.masks.Count - 1
             Dim maskIndex = flood.maskSizes.ElementAt(i).Value
             Dim nextColor = ocvb.colorScalar(i Mod 255)
-            dst2.SetTo(nextColor, flood.masks(maskIndex))
+            dst1.SetTo(nextColor, flood.masks(maskIndex))
             If thumbCount < 16 Then
                 thumbNails(allRect) = flood.masks(maskIndex).Resize(allSize).Threshold(0, 255, cv.ThresholdTypes.Binary)
                 thumbNails.Rectangle(allRect, cv.Scalar.White, 1)
@@ -317,8 +321,8 @@ Public Class FloodFill_Top16
                 thumbCount += 1
             End If
         Next
-        If check.Box(0).Checked Then dst2 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        label2 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
+        If check.Box(0).Checked Then dst1 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        label1 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
     End Sub
 End Class
 
@@ -339,7 +343,7 @@ Public Class FloodFill_Projection
         sliders.setupTrackBar4(ocvb, caller, "Step Size", 1, ocvb.color.Width / 2, 20)
 
         label1 = "Input image to floodfill"
-        ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are."
+        ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - more work needed"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         minFloodSize = sliders.TrackBar1.Value
@@ -352,7 +356,7 @@ Public Class FloodFill_Projection
         Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1)
 
         objectRects.Clear()
-        dst2 = src.EmptyClone.SetTo(0)
+        dst2.SetTo(0)
         cv.Cv2.BitwiseNot(src, src) ' floodfill where there are zeros.
         For y = 0 To src.Height - 1 Step stepSize
             For x = 0 To src.Width - 1 Step stepSize

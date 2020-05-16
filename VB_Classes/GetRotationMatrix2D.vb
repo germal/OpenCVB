@@ -70,11 +70,12 @@ Public Class GetRotationMatrix2D_Box
         ocvb.desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        rotation.src = src
         rotation.Run(ocvb)
         dst2 = dst1.Clone()
 
         Dim r = ocvb.drawRect
-        dst1 = ocvb.color.Clone()
+        dst1 = src.Clone()
         dst1.Rectangle(r, cv.Scalar.White, 1)
 
         Dim center = New cv.Point2f(r.X + r.Width / 2, r.Y + r.Height / 2)

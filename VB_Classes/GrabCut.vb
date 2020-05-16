@@ -13,7 +13,9 @@ Public Class GrabCut_Basics
         ocvb.desc = "Use grabcut to isolate what is in the foreground and background.  "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        contours.src = src
         contours.Run(ocvb)
+        dst2 = contours.dst2
         Dim iterations = sliders.TrackBar1.Value
         Dim kernelsize = sliders.TrackBar2.Value
         If kernelsize Mod 2 = 0 Then kernelsize += 1
@@ -36,9 +38,9 @@ Public Class GrabCut_Basics
         Static bgModel As New cv.Mat, fgModel As New cv.Mat
         Dim rect As New cv.Rect
         If fg.CountNonZero() > 100 And bg.CountNonZero() > 100 Then
-            cv.Cv2.GrabCut(ocvb.color, mask, rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)
+            cv.Cv2.GrabCut(src, mask, rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)
         End If
-        ocvb.color.CopyTo(dst2, mask)
+        src.CopyTo(dst2, mask)
     End Sub
 End Class
 

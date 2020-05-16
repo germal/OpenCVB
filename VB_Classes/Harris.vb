@@ -29,7 +29,7 @@ End Module
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
 Public Class Harris_Features_CPP
     Inherits ocvbClass
-        Dim srcData() As Byte
+    Dim srcData() As Byte
     Dim Harris_Features As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
                 setCaller(callerRaw)
@@ -45,8 +45,8 @@ Public Class Harris_Features_CPP
         label2 = "RGB overlaid with Harris result"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Marshal.Copy(gray.Data, srcData, 0, srcData.Length)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim threshold = sliders.TrackBar1.Value / 10000
         Dim neighborhood = sliders.TrackBar2.Value
         If neighborhood Mod 2 = 0 Then neighborhood += 1
@@ -54,13 +54,11 @@ Public Class Harris_Features_CPP
         If aperture Mod 2 = 0 Then aperture += 1
         Dim HarrisParm = sliders.TrackBar4.Value / 100
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
-        Dim imagePtr = Harris_Features_Run(Harris_Features, handleSrc.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols, threshold,
+        Dim imagePtr = Harris_Features_Run(Harris_Features, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, threshold,
                                            neighborhood, aperture, HarrisParm)
-
         handleSrc.Free() ' free the pinned memory...
-        Dim dstData(ocvb.color.Total - 1) As Single
-        Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-        Dim gray32f = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_32F, dstData)
+
+        Dim gray32f = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr)
         gray32f.ConvertTo(dst1, cv.MatType.CV_8U)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.AddWeighted(dst1, 0.5, ocvb.color, 0.5, 0, dst2)
@@ -76,34 +74,34 @@ End Class
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
 Public Class Harris_Detector_CPP
     Inherits ocvbClass
-        Dim srcData() As Byte
+    Dim srcData() As Byte
     Dim ptCount(1) As Int32
     Dim Harris_Detector As IntPtr
     Public FeaturePoints As New List(Of cv.Point2f)
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Harris qualityLevel", 1, 100, 2)
-        
+
         ocvb.desc = "Use Harris detector to identify interesting points."
 
         ReDim srcData(ocvb.color.Total - 1)
         Harris_Detector = Harris_Detector_Open()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Marshal.Copy(gray.Data, srcData, 0, srcData.Length)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim qualityLevel = sliders.TrackBar1.Value / 100
 
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned) 
-        Dim handleCount = GCHandle.Alloc(ptCount, GCHandleType.Pinned) 
-        Dim ptPtr = Harris_Detector_Run(Harris_Detector, handleSrc.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols, qualityLevel, handleCount.AddrOfPinnedObject())
+        Dim handleCount = GCHandle.Alloc(ptCount, GCHandleType.Pinned)
+        Dim ptPtr = Harris_Detector_Run(Harris_Detector, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, qualityLevel, handleCount.AddrOfPinnedObject())
         handleSrc.Free()
         handleCount.Free()
         If ptCount(0) > 1 And ptPtr <> 0 Then
             Dim pts((ptCount(0) - 1) * 2 - 1) As Int32
             Marshal.Copy(ptPtr, pts, 0, ptCount(0))
             Dim ptMat = New cv.Mat(ptCount(0), 2, cv.MatType.CV_32S, pts)
-            if standalone Then ocvb.color.CopyTo(dst1)
+            If standalone Then src.CopyTo(dst1)
             FeaturePoints.Clear()
             For i = 0 To ptMat.Rows - 1
                 FeaturePoints.Add(New cv.Point2f(ptMat.Get(of Int32)(i, 0), ptMat.Get(of Int32)(i, 1)))

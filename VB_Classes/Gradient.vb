@@ -71,7 +71,9 @@ Public Class Gradient_Flatland
         dst1 = ocvb.RGBDepth.Clone()
         dst1 /= reductionFactor
         dst1 *= reductionFactor
+        grade.src = src
         grade.Run(ocvb)
+        dst2 = grade.dst2
     End Sub
 End Class
 

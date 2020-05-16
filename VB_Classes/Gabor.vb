@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 'https://medium.com/@anuj_shah/through-the-eyes-of-gabor-filter-17d1fdb3ac97
 Public Class Gabor_Basics
     Inherits ocvbClass
-    Public gKernel As New cv.Mat
+    Public gKernel As cv.Mat
     Public ksize As Double
     Public Sigma As Double
     Public theta As Double
@@ -15,10 +15,9 @@ Public Class Gabor_Basics
         setCaller(callerRaw)
         sliders1.setupTrackBar1(ocvb, caller, "Gabor gamma X10", 0, 10, 5)
         sliders1.setupTrackBar2(ocvb, caller, "Gabor Phase offset X100", 0, 100, 0)
-        If ocvb.parms.ShowOptions Then sliders1.Show()
 
         sliders.setupTrackBar1(ocvb, caller, "Gabor Kernel Size", 0, 50, 15)
-        sliders.setupTrackBar2(ocvb, caller, "Gabor Sigma", 0, 100, 5)
+        sliders.setupTrackBar2(ocvb, caller, "Gabor Sigma", 0, 100, 4)
         sliders.setupTrackBar3(ocvb, caller, "Gabor Theta (degrees)", 0, 180, 90)
         sliders.setupTrackBar4(ocvb, caller, "Gabor lambda", 0, 100, 10)
 
@@ -31,20 +30,12 @@ Public Class Gabor_Basics
             lambda = sliders.TrackBar4.Value
             gamma = sliders1.TrackBar1.Value / 10
             phaseOffset = sliders1.TrackBar2.Value / 1000
+            theta = Math.PI * sliders.TrackBar3.Value / 180
         End If
-        theta = Math.PI * sliders.TrackBar3.Value / 180
-
         gKernel = cv.Cv2.GetGaborKernel(New cv.Size(ksize, ksize), Sigma, theta, lambda, gamma, phaseOffset, cv.MatType.CV_32F)
         Dim multiplier = gKernel.Sum()
         gKernel /= 1.5 * multiplier.Item(0)
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If standalone Then
-            dst1 = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
-        Else
-            dst1 = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
-            dst2 = ocvb.Color.EmptyClone.SetTo(0)
-            dst2 = gKernel.Resize(ocvb.color.Size(), 0, 0, cv.InterpolationFlags.Cubic)
-        End If
+        dst1 = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
     End Sub
 End Class
 
@@ -62,49 +53,43 @@ Public Class Gabor_Basics_MT
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
-        grid.Run(ocvb)
+        grid.Run(ocvb) ' we only run this one time!  It needs to be 32 Gabor filters only.
+        grid.sliders.Visible = False
 
-        sliders1.setupTrackBar1(ocvb, caller, "Gabor gamma X10", 0, 10, 5)
-        sliders1.setupTrackBar2(ocvb, caller, "Gabor Phase offset X100", 0, 100, 0)
-        If ocvb.parms.ShowOptions Then sliders1.Show()
-
-        sliders.setupTrackBar1(ocvb, caller, "Gabor Kernel Size", 0, 50, 15)
-        sliders.setupTrackBar2(ocvb, caller, "Gabor Sigma", 0, 100, 4)
-        sliders.setupTrackBar3(ocvb, caller, "Gabor Theta (degrees)", 0, 180, 90)
-        sliders.setupTrackBar4(ocvb, caller, "Gabor lambda", 0, 100, 10)
-
-        ocvb.parms.ShowOptions = False ' no  options for the Gabor_Basics algorithm needed - just need them for the parent thread.
+        ocvb.suppressOptions = True
         For i = 0 To gabor.Length - 1
             gabor(i) = New Gabor_Basics(ocvb, caller)
             gabor(i).sliders.TrackBar3.Value = i * 180 / gabor.Length
         Next
+
+        gabor(0).sliders1.Visible = True
+        gabor(0).sliders.Visible = True
+        gabor(0).sliders.GroupBox3.Enabled = False
         ocvb.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC1, 0)
+        For i = 0 To gabor.Count - 1
+            gabor(i).ksize = gabor(0).sliders.TrackBar1.Value * 2 + 1
+            gabor(i).Sigma = gabor(0).sliders.TrackBar2.Value
+            gabor(i).lambda = gabor(0).sliders.TrackBar4.Value
+            gabor(i).gamma = gabor(0).sliders1.TrackBar1.Value / 10
+            gabor(i).phaseOffset = gabor(0).sliders1.TrackBar2.Value / 1000
+            gabor(i).theta = Math.PI * i / gabor.Length
+        Next
 
-        ' theta is not set here but in the constructor above.
-        Dim ksize = sliders.TrackBar1.Value * 2 + 1
-        Dim Sigma = sliders.TrackBar2.Value
-        Dim lambda = sliders.TrackBar4.Value
-        Dim gamma = sliders1.TrackBar1.Value / 10
-        Dim phaseOffset = sliders1.TrackBar2.Value / 1000
-
-        Dim accum = ocvb.color.Clone()
-        Parallel.For(0, gabor.Length,
+        Dim accum = src.Clone()
+        Dim dst32f = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_32F, 0)
+        Parallel.For(0, grid.roiList.Count,
         Sub(i)
-            gabor(i).ksize = ksize
-            gabor(i).Sigma = Sigma
-            gabor(i).lambda = lambda
-            gabor(i).gamma = gamma
-            gabor(i).phaseOffset = phaseOffset
-            gabor(i).Run(ocvb)
             Dim roi = grid.roiList(i)
+            gabor(i).src = src
+            gabor(i).Run(ocvb)
             SyncLock accum
                 cv.Cv2.Max(accum, gabor(i).dst1, accum)
-                dst2(roi) = gabor(i).gKernel.Resize(New cv.Size(roi.Width, roi.Height), 0, 0, cv.InterpolationFlags.Cubic)
+                dst32f(roi) = gabor(i).gKernel.Normalize(0, 255, cv.NormTypes.MinMax).Resize(New cv.Size(roi.Width, roi.Height))
             End SyncLock
         End Sub)
         dst1 = accum
+        dst2 = dst32f ' ocvbclass will convert this to 8uc3
     End Sub
 End Class

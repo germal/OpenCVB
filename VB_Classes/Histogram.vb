@@ -27,6 +27,7 @@ Public Class Histogram_Basics
 
         Dim lineWidth = dst1.Cols / bins
 
+        dst1.SetTo(0)
         Dim maxVal As Double
         For i = 0 To src.Channels - 1
             Dim hist As New cv.Mat
@@ -141,11 +142,12 @@ Public Class Histogram_NormalizeGray
         ocvb.desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        histogram.gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        histogram.gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If check.Box(0).Checked Then
             cv.Cv2.Normalize(histogram.gray, histogram.gray, sliders.TrackBar1.Value, sliders.TrackBar2.Value, cv.NormTypes.MinMax) ' only minMax is working...
         End If
         histogram.Run(ocvb)
+        dst1 = histogram.dst1
     End Sub
 End Class
 
@@ -205,13 +207,15 @@ Public Class Histogram_EqualizeGray
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         histogram = New Histogram_KalmanSmoothed(ocvb, caller)
+        label1 = "Note the difference in the histogram bar color"
+        label2 = "After EqualizeHist"
         ocvb.desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         histogram.gray = src
+        dst1 = histogram.dst1
         cv.Cv2.EqualizeHist(histogram.gray, histogram.gray)
-        dst1 = histogram.gray
         histogram.Run(ocvb)
         dst2 = histogram.dst1
     End Sub
@@ -253,13 +257,10 @@ End Class
 Public Class Histogram_2D_XZ_YZ
     Inherits ocvbClass
     Dim xyDepth As Mat_ImageXYZ_MT
-    Dim mats As Mat_4to1
     Dim trim As Depth_InRange
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         xyDepth = New Mat_ImageXYZ_MT(ocvb, caller)
-
-        mats = New Mat_4to1(ocvb, caller)
 
         trim = New Depth_InRange(ocvb, caller)
         trim.sliders.TrackBar2.Value = 1500 ' up to x meters away
@@ -271,6 +272,7 @@ Public Class Histogram_2D_XZ_YZ
         label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        xyDepth.src = src
         xyDepth.Run(ocvb) ' get xyDepth coordinates - note: in image coordinates not physical coordinates.
         Dim xbins = sliders.TrackBar1.Value
         Dim zbins = sliders.TrackBar2.Value
@@ -283,14 +285,11 @@ Public Class Histogram_2D_XZ_YZ
 
         Dim rangesX() = New cv.Rangef() {New cv.Rangef(0, ocvb.color.Width - 1), New cv.Rangef(minRange, maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {xyDepth.xyDepth}, New Integer() {2, 0}, New cv.Mat(), histogram, 2, histSize, rangesX)
-        histogram2DPlot(histogram, dst2, xbins, zbins)
-        mats.mat(2) = dst2.Clone()
+        histogram2DPlot(histogram, dst1, xbins, zbins)
 
         Dim rangesY() = New cv.Rangef() {New cv.Rangef(0, ocvb.color.Height - 1), New cv.Rangef(minRange, maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {xyDepth.xyDepth}, New Integer() {1, 2}, New cv.Mat(), histogram, 2, histSize, rangesY)
         histogram2DPlot(histogram, dst2, xbins, zbins)
-        mats.mat(3) = dst2.Clone()
-        mats.Run(ocvb)
     End Sub
 End Class
 

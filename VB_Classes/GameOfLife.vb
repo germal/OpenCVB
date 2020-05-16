@@ -50,6 +50,7 @@ Public Class GameOfLife_Basics
         generation += 1
 
         population = 0
+        dst1.SetTo(0)
         For y = 0 To grid.Height - 1
             For x = 0 To grid.Width - 1
                 Dim neighbors = CountNeighbors(x, y)
@@ -111,8 +112,10 @@ Public Class GameOfLife_Population
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         game.Run(ocvb)
+        dst1 = game.dst1
 
         plot.plotData = New cv.Scalar(game.population, 0, 0)
         plot.Run(ocvb)
+        dst2 = plot.dst1
     End Sub
 End Class

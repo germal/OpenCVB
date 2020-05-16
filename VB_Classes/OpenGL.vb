@@ -138,7 +138,6 @@ Module OpenGL_Sliders_Module
         sliders1.setupTrackBar2(ocvb, caller, "OpenGL zFar", -50, 200, 20)
         sliders1.setupTrackBar3(ocvb, caller, "OpenGL Point Size", 1, 20, 2)
         sliders1.setupTrackBar4(ocvb, caller, "zTrans", -1000, 1000, 50)
-        If ocvb.parms.ShowOptions Then sliders1.Show()
 
         sliders2.setupTrackBar1(ocvb, caller, "OpenGL Eye X", -180, 180, 0)
         sliders2.setupTrackBar2(ocvb, caller, "OpenGL Eye Y", -180, 180, 0)

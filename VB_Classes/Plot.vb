@@ -122,13 +122,13 @@ Public Class Plot_OverTime
         lastXdelta.Add(plotData)
         Dim pixelHeight = CInt(sliders.TrackBar1.Value)
         Dim pixelWidth = CInt(sliders.TrackBar2.Value)
-        If ocvb.frameCount = 0 Then dst1 = ocvb.color.EmptyClone
+        If ocvb.frameCount = 0 Then dst1.SetTo(0)
         If columnIndex + pixelWidth >= ocvb.color.Width Then
             dst1.ColRange(columnIndex, ocvb.color.Width).SetTo(backColor)
             columnIndex = 0
         End If
         dst1.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
-        if standalone Then plotData = ocvb.color.Mean()
+        If standalone Then plotData = src.Mean()
 
         For i = 0 To plotCount - 1
             If Math.Floor(plotData.Item(i)) < minScale Or Math.Ceiling(plotData.Item(i)) > maxScale Then
