@@ -235,7 +235,7 @@ Public Class Mat_ImageXYZ_MT
               xyzPlanes(2)(roi) = depth32f(roi)
           End Sub)
 
-        If standalone Then cv.Cv2.Merge(xyzPlanes, xyDepth)
+        cv.Cv2.Merge(xyzPlanes, xyDepth)
     End Sub
 End Class
 

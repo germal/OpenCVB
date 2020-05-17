@@ -290,7 +290,7 @@ Public Class Draw_SymmetricalShapes
                 If sliders.TrackBar2.Value < sliders.TrackBar2.Maximum - 10 Then sliders.TrackBar2.Value += 10 Else sliders.TrackBar2.Value = 1
                 If sliders.TrackBar3.Value > 13 Then sliders.TrackBar3.Value -= 13 Else sliders.TrackBar3.Value = sliders.TrackBar3.Maximum
                 If sliders.TrackBar4.Value > 27 Then sliders.TrackBar4.Value -= 27 Else sliders.TrackBar4.Value = sliders.TrackBar4.Maximum
-                fillColor = ocvb.colorScalar(ocvb.frameCount Mod 255)
+                fillColor = ocvb.scalarColors(ocvb.frameCount Mod 255)
             End If
             If ocvb.frameCount Mod 37 = 0 Then check.Box(0).Checked = Not check.Box(0).Checked
             If ocvb.frameCount Mod 222 = 0 Then check.Box(1).Checked = Not check.Box(1).Checked
@@ -324,7 +324,7 @@ Public Class Draw_SymmetricalShapes
         Next
 
         For i = 0 To numPoints - 1
-            dst1.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod numPoints), ocvb.colorScalar(i Mod ocvb.colorScalar.Count), 2, cv.LineTypes.AntiAlias)
+            dst1.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod numPoints), ocvb.scalarColors(i Mod ocvb.scalarColors.Count), 2, cv.LineTypes.AntiAlias)
         Next
 
         If check.Box(2).Checked Then dst1.FloodFill(center, fillColor)

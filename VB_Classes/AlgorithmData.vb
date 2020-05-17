@@ -5,7 +5,7 @@ Public Class AlgorithmData
     Public bestOpenCVFont = cv.HersheyFonts.HersheyComplex
     Public bestOpenCVFontSize = 1.5
     Public color As cv.Mat
-    Public colorScalar(255) As cv.Scalar
+    Public scalarColors(255) As cv.Scalar
     Public RGBDepth As cv.Mat
     Public desc As String
     Public drawRect As cv.Rect ' filled in if the user draws on any of the images.
@@ -50,7 +50,7 @@ Public Class AlgorithmData
         ms_rng = New System.Random
         For i = 0 To rColors.Length - 1
             rColors(i) = New cv.Vec3b(ms_rng.Next(100, 255), ms_rng.Next(100, 255), ms_rng.Next(100, 255))
-            colorScalar(i) = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)
+            scalarColors(i) = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)
         Next
         For i = 0 To TTtextData.Count - 1
             TTtextData(i) = New List(Of ActiveClass.TrueType)

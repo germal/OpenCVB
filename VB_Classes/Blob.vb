@@ -225,7 +225,7 @@ Public Class Blob_Rectangles
             kalman(i).input = {rect.X, rect.Y, rect.Width, rect.Height}
             kalman(i).Run(ocvb)
             rect = New cv.Rect(kalman(i).output(0), kalman(i).output(1), kalman(i).output(2), kalman(i).output(3))
-            dst1.Rectangle(rect, ocvb.colorScalar(i Mod 255), 2)
+            dst1.Rectangle(rect, ocvb.scalarColors(i Mod 255), 2)
         Next
     End Sub
 End Class

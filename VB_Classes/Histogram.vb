@@ -172,14 +172,14 @@ Public Class Histogram_EqualizeColor
     Public Sub Run(ocvb As AlgorithmData)
         Dim rgb(2) As cv.Mat
         Dim rgbEq(2) As cv.Mat
-        cv.Cv2.Split(ocvb.color, rgbEq)
+        cv.Cv2.Split(src, rgbEq)
 
         For i = 0 To rgb.Count - 1
             cv.Cv2.EqualizeHist(rgbEq(i), rgbEq(i))
         Next
 
         If standalone Then
-            cv.Cv2.Split(ocvb.color, rgb) ' equalizehist alters the input...
+            cv.Cv2.Split(src, rgb) ' equalizehist alters the input...
             kalman.gray = rgb(2).Clone() ' just show the green plane
             kalman.plotHist.backColor = cv.Scalar.Red
             kalman.Run(ocvb)
@@ -236,7 +236,6 @@ Public Class Histogram_2D_HueSaturation
         sliders.setupTrackBar1(ocvb, caller, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
         sliders.setupTrackBar2(ocvb, caller, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
         ocvb.desc = "Create a histogram for hue and saturation."
-        src = ocvb.color
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hsv = src.CvtColor(cv.ColorConversionCodes.RGB2HSV)
@@ -283,11 +282,11 @@ Public Class Histogram_2D_XZ_YZ
 
         Dim histogram As New cv.Mat
 
-        Dim rangesX() = New cv.Rangef() {New cv.Rangef(0, ocvb.color.Width - 1), New cv.Rangef(minRange, maxRange)}
+        Dim rangesX() = New cv.Rangef() {New cv.Rangef(0, src.Width - 1), New cv.Rangef(minRange, maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {xyDepth.xyDepth}, New Integer() {2, 0}, New cv.Mat(), histogram, 2, histSize, rangesX)
         histogram2DPlot(histogram, dst1, xbins, zbins)
 
-        Dim rangesY() = New cv.Rangef() {New cv.Rangef(0, ocvb.color.Height - 1), New cv.Rangef(minRange, maxRange)}
+        Dim rangesY() = New cv.Rangef() {New cv.Rangef(0, src.Height - 1), New cv.Rangef(minRange, maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {xyDepth.xyDepth}, New Integer() {1, 2}, New cv.Mat(), histogram, 2, histSize, rangesY)
         histogram2DPlot(histogram, dst2, xbins, zbins)
     End Sub
@@ -300,8 +299,11 @@ End Class
 Public Class Histogram_BackProjectionGrayScale
     Inherits ocvbClass
     Dim hist As Histogram_KalmanSmoothed
+    Dim edges As Edges_Canny
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
+        edges = New Edges_Canny(ocvb, caller)
+
         hist = New Histogram_KalmanSmoothed(ocvb, caller)
         hist.dst1 = dst2
         hist.kalman.check.Box(0).Checked = False
@@ -315,11 +317,12 @@ Public Class Histogram_BackProjectionGrayScale
     Public Sub Run(ocvb As AlgorithmData)
         hist.sliders.TrackBar1.Value = sliders.TrackBar1.Value ' reflect the number of bins into the histogram code.
 
-        hist.gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        hist.gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(ocvb)
+        dst2 = hist.dst1
 
         Dim minVal As Single, maxVal As Single
-        Dim minIdx(2) As Int32, maxIdx(2) As Int32
+        Dim minIdx(3 - 1) As Int32, maxIdx(3 - 1) As Int32
         hist.histogram.MinMaxIdx(minVal, maxVal, minIdx, maxIdx)
         Dim pixelMin = CInt(255 * maxIdx(0) / hist.sliders.TrackBar1.Value)
         Dim pixelMax = CInt(255 * (maxIdx(0) + 1) / hist.sliders.TrackBar1.Value)
@@ -332,10 +335,19 @@ Public Class Histogram_BackProjectionGrayScale
             pixelMin -= incr * ((neighbors / 2) + 1)
             pixelMax += incr * ((neighbors - 1) / 2)
         End If
-        pixelMin -= incr
-        pixelMax += incr
-        Dim mask = hist.gray.InRange(pixelMin, pixelMax)
-        ocvb.color.CopyTo(dst1, mask)
+        dst1.SetTo(0)
+        Dim count As Integer
+        For y = 0 To hist.gray.Rows - 1
+            For x = 0 To hist.gray.Cols - 1
+                If hist.gray.Get(Of Byte)(y, x) < pixelMax Then count += 1
+            Next
+        Next
+        Dim mask = hist.gray.InRange(If(pixelMin >= 0, pixelMin, 0), pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        src.CopyTo(dst1, mask)
+        edges.src = dst1
+        edges.Run(ocvb)
+        cv.Cv2.BitwiseOr(edges.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR), dst1, dst1)
+
         label1 = "BackProjection of most frequent pixel + " + CStr(neighbors) + " neighbor" + If(neighbors <> 1, "s", "")
     End Sub
 End Class
@@ -357,21 +369,22 @@ Public Class Histogram_BackProjection
         label1 = "Backprojection of detected hue and saturation."
         label2 = "2D Histogram for Hue (X) vs. Saturation (Y)"
 
-        ocvb.drawRect = New cv.Rect(100, 100, 200, 100)  ' an arbitrary rectangle to use for the backprojection.
+        If standalone Then ocvb.drawRect = New cv.Rect(100, 100, 200, 100)  ' an arbitrary rectangle to use for the backprojection.
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        hist.src = ocvb.color(ocvb.drawRect)
+        hist.src = src(ocvb.drawRect)
         hist.Run(ocvb)
         Dim histogram = hist.histogram.Normalize(0, 255, cv.NormTypes.MinMax)
         Dim bins() = {0, 1}
-        Dim hsv = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim mat() As cv.Mat = {hsv}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256)}
         Dim mask As New cv.Mat
         cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
 
+        dst1.SetTo(0)
         mask = mask.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
-        ocvb.color.CopyTo(dst1, mask)
+        src.CopyTo(dst1, mask)
     End Sub
 End Class
 
@@ -391,7 +404,7 @@ Public Class Histogram_ColorsAndGray
 
         histogram = New Histogram_KalmanSmoothed(ocvb, caller)
         histogram.kalman.check.Box(0).Checked = False
-        histogram.kalman.check.Box(0).Enabled = False ' if we use Kalman, all the plots are identical as the values converge on the gray level setting...
+        histogram.kalman.check.Box(0).Enabled = False
         histogram.sliders.TrackBar1.Value = 40
 
         check.Setup(ocvb, caller, 1)
@@ -400,9 +413,9 @@ Public Class Histogram_ColorsAndGray
         ocvb.desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim split = ocvb.color.Split()
-        ReDim Preserve split(3)
-        split(3) = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim split = src.Split()
+        ReDim Preserve split(4 - 1)
+        split(4 - 1) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         histogram.gray = New cv.Mat
         For i = 0 To split.Length - 1
             If check.Box(0).Checked Then
@@ -416,6 +429,7 @@ Public Class Histogram_ColorsAndGray
         Next
 
         mats.Run(ocvb)
+        dst1 = mats.dst1
     End Sub
 End Class
 
@@ -439,19 +453,20 @@ Public Class Histogram_KalmanSmoothed
 
         sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 1, 255, 50)
 
-        label1 = "Gray scale input to histogram"
         label2 = "Histogram - x=bins/y=count"
         ocvb.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static splitIndex As Int32 = -1
+        Static colorName As String
         If standalone Then
-            Dim split() = cv.Cv2.Split(ocvb.color)
-            If ocvb.frameCount Mod 500 = 0 Then
+            Dim split() = cv.Cv2.Split(src)
+            If ocvb.frameCount Mod 100 = 0 Then
                 splitIndex += 1
                 If splitIndex > 2 Then splitIndex = 0
             End If
             gray = split(splitIndex).Clone
+            colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
         End If
         plotHist.bins = sliders.TrackBar1.Value
         plotHist.minRange = 0
@@ -477,6 +492,7 @@ Public Class Histogram_KalmanSmoothed
         If standalone Then plotHist.backColor = splitColors(splitIndex)
         plotHist.Run(ocvb)
         dst1 = plotHist.dst1
+        label1 = colorName + " input to histogram"
     End Sub
 End Class
 
@@ -506,7 +522,11 @@ Public Class Histogram_Depth
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {getDepth32f(ocvb)}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
-        If standalone Then plotHist.Run(ocvb)
+        If standalone Then
+            plotHist.Run(ocvb)
+            dst1 = plotHist.dst1
+        End If
+        label1 = "Histogram Depth: " + Format(plotHist.minRange / 1000, "0.0") + "m to " + Format(plotHist.maxRange / 1000, "0.0") + " m"
     End Sub
 End Class
 
@@ -601,7 +621,7 @@ Public Class Histogram_DepthValleys
             For j = 0 To rangeBoundaries.Count - 1
                 Dim startEnd = rangeBoundaries.ElementAt(j)
                 If depth >= startEnd.X And depth < startEnd.Y Then
-                    plotColors(i) = ocvb.colorScalar(j Mod 255)
+                    plotColors(i) = ocvb.scalarColors(j Mod 255)
                     Exit For
                 End If
             Next
@@ -629,12 +649,12 @@ Public Class Histogram_DepthClusters
 
         Dim mask As New cv.Mat
         Dim tmp As New cv.Mat
-        dst2 = ocvb.color.EmptyClone.SetTo(0)
+        dst2.SetTo(0)
         For i = 0 To valleys.rangeBoundaries.Count - 1
             Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
             cv.Cv2.InRange(getDepth32f(ocvb), startEndDepth.X, startEndDepth.Y, tmp)
             cv.Cv2.ConvertScaleAbs(tmp, mask)
-            dst2.SetTo(ocvb.colorScalar(i), mask)
+            dst2.SetTo(ocvb.scalarColors(i), mask)
         Next
         If standalone Then
             label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"

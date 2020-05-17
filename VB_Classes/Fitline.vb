@@ -126,7 +126,6 @@ Public Class Fitline_RawInput
         check.Box(1).Checked = True
 
         ocvb.desc = "Generate a noisy line in a field of random data."
-        Randomize()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(1).Checked Or ocvb.frameCount = 0 Then

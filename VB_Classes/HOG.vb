@@ -28,7 +28,6 @@ Public Class HOG_Basics
         Next rect
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-
         Dim hog As New cv.HOGDescriptor()
         hog.SetSVMDetector(cv.HOGDescriptor.GetDefaultPeopleDetector())
 
@@ -41,9 +40,9 @@ Public Class HOG_Basics
         Dim threshold = sliders.TrackBar1.Value
         Dim stride = sliders.TrackBar2.Value
         Dim scale = sliders.TrackBar3.Value / 1000
-        Dim found() As cv.Rect = hog.DetectMultiScale(ocvb.color, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)
+        Dim found() As cv.Rect = hog.DetectMultiScale(src, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)
         label1 = String.Format("{0} region(s) found", found.Length)
-        ocvb.color.CopyTo(dst1)
+        src.CopyTo(dst1)
         drawFoundRectangles(dst1, found)
 
         If staticImageProcessed = False Then

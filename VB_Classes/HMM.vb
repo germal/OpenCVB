@@ -21,9 +21,9 @@ Public Class HMM_Example_CPP
     Inherits ocvbClass
     Dim HMM As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         HMM = HMM_Open()
-        label1 = "HMM - see Visual Studio Output for results"
+        label1 = "Text output with explanation will appear in the Visual Studio output."
         ocvb.desc = "Simple test of Hidden Markov Model - text output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -34,11 +34,7 @@ Public Class HMM_Example_CPP
         Dim imagePtr = HMM_Run(HMM, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then
-            Dim dstData(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            dst1 = New cv.Mat(src.Rows, src.Cols, IIf(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), dstData)
-        End If
+        If imagePtr <> 0 Then dst1 = New cv.Mat(src.Rows, src.Cols, IIf(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr)
     End Sub
     Public Sub Close()
         HMM_Close(HMM)

@@ -15,11 +15,12 @@ private:
 public:
 	Mat src, output;
 	cv::Mat Transition, Emission, initialProbabilities;
-	HMM() 
+	HMM() {}
+	void sampleRun()
 	{
 		std::stringstream buffer;
 		buffer << "First we define Transition, Emission and Initial Probabilities of the model\n";
-		OutputDebugStringA(buffer.str().c_str()); buffer.clear();
+		printf(buffer.str().c_str()); buffer.clear();
 		double TRANSdata[] = { 0.5, 0.5, 0.0,
 							   0.0, 0.7, 0.3,
 							   0.0, 0.0, 1.0 };
@@ -37,7 +38,7 @@ public:
 
 		//----------------------------------------------------------------------------------
 		buffer << "\nAs an example, we generate 25 sequences each with 20 observations\nper sequence using the defined Markov model\n";
-		OutputDebugStringA(buffer.str().c_str()); buffer.clear();
+		printf(buffer.str().c_str()); buffer.clear();
 		srand((unsigned int)time(NULL));
 		cv::Mat seq, states;
 		hmm.generate(20, 25, Transition, Emission, initialProbabilities, seq, states);
@@ -108,13 +109,15 @@ public:
 		double INITGUESSdata[] = { 0.6  , 0.2 , 0.2 };
 		cv::Mat INITGUESS = cv::Mat(1, 3, CV_64F, INITGUESSdata).clone();
 		hmm.train(seq, 100, TRGUESS, EMITGUESS, INITGUESS);
-		OutputDebugStringA(buffer.str().c_str());
+		printf(buffer.str().c_str());
 		hmm.printModel(TRGUESS, EMITGUESS, INITGUESS);
 		//----------------------------------------------------------------------------------
 		buffer << "\ndone.\n";
 	}
 	void Run() {
 		output = src.clone();
+		static int testCount = 0;
+		if (testCount++ % 100 == 0) sampleRun();
 	}
 };
 

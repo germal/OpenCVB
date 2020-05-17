@@ -41,7 +41,6 @@ End Module
 Public Class Hough_Circles
     Inherits ocvbClass
     Dim circles As Draw_Circles
-    Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         circles = New Draw_Circles(ocvb, caller)
@@ -52,15 +51,16 @@ Public Class Hough_Circles
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         circles.Run(ocvb)
+        dst1 = circles.dst1
         Static Dim method As Int32 = 3
-        Dim gray = New cv.Mat
-        cv.Cv2.CvtColor(dst1, gray, cv.ColorConversionCodes.BGR2GRAY)
-        Dim cFound = cv.Cv2.HoughCircles(gray, method, 1, dst1.Rows / 4, 100, 10, 1, 200)
-        cv.Cv2.CvtColor(gray, dst2, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(dst1, dst2, cv.ColorConversionCodes.BGR2GRAY)
+        Dim cFound = cv.Cv2.HoughCircles(dst2, method, 1, dst1.Rows / 4, 100, 10, 1, 200)
         Dim foundColor = New cv.Scalar(0, 0, 255)
+        dst1.CopyTo(dst2)
         For i = 0 To cFound.Length - 1
             cv.Cv2.Circle(dst2, New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, cv.LineTypes.AntiAlias)
         Next
+        label2 = CStr(cFound.Length) + " circles were identified"
     End Sub
 End Class
 
@@ -79,7 +79,7 @@ Public Class Hough_Lines
         sliders.setupTrackBar1(ocvb, caller, "rho", 1, 100, 1)
         sliders.setupTrackBar2(ocvb, caller, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar3(ocvb, caller, "threshold", 1, 100, 50)
-        sliders.setupTrackBar4(ocvb, caller, "Lines to Plot", 1, 1000, 50)
+        sliders.setupTrackBar4(ocvb, caller, "Lines to Plot", 1, 1000, 25)
         ocvb.desc = "Use Houghlines to find lines in the image."
     End Sub
 
@@ -87,21 +87,19 @@ Public Class Hough_Lines
         edges.src = src.Clone()
         edges.Run(ocvb)
 
-        If standalone Then src = dst1.Clone()
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
         Dim rhoIn = sliders.TrackBar1.Value
         Dim thetaIn = sliders.TrackBar2.Value / 1000
         Dim threshold = sliders.TrackBar3.Value
 
-        segments = cv.Cv2.HoughLines(src, rhoIn, thetaIn, threshold)
+        segments = cv.Cv2.HoughLines(edges.dst1, rhoIn, thetaIn, threshold)
         label1 = "Found " + CStr(segments.Length) + " Lines"
 
         If standalone Then
-            ocvb.color.CopyTo(dst1)
-            ocvb.color.CopyTo(dst2)
+            src.CopyTo(dst1)
+            dst1.SetTo(cv.Scalar.White, edges.dst1)
+            src.CopyTo(dst2)
             houghShowLines(dst1, segments, sliders.TrackBar4.Value)
-            Dim probSegments = cv.Cv2.HoughLinesP(src, rhoIn, thetaIn, threshold)
+            Dim probSegments = cv.Cv2.HoughLinesP(edges.dst1, rhoIn, thetaIn, threshold)
             For i = 0 To Math.Min(probSegments.Length, sliders.TrackBar4.Value) - 1
                 Dim line = probSegments(i)
                 dst2.Line(line.P1, line.P2, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)

@@ -197,7 +197,7 @@ Public Class IMU_FrameTime
         sliders.setupTrackBar1(ocvb, caller, "Minimum IMU to Capture time (ms)", 1, 10, 2)
         sliders.setupTrackBar2(ocvb, caller, "Number of Plot Values", 5, 30, 25)
 
-        label2 = "IMU FT (blue) CPU FT (green) Latency est. (red)"
+        label2 = "IMU FT (blue) Host FT (green) Latency est. (red)"
         ocvb.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -258,7 +258,7 @@ Public Class IMU_FrameTime
             If plot.lastXdelta.Count > plotLastX Then
                 Dim allText As String = ""
                 For i = 0 To plot.plotCount - 1
-                    Dim outStr = "Last " + CStr(plotLastX) + Choose(i + 1, " IMU FrameTime", " CPU Frame Time", " IMUtoCapture ms", " IMU Center time") + vbTab
+                    Dim outStr = "Last " + CStr(plotLastX) + Choose(i + 1, " IMU FrameTime", " Host Frame Time", " IMUtoCapture ms", " IMU Center time") + vbTab
                     For j = plot.lastXdelta.Count - plotLastX - 1 To plot.lastXdelta.Count - 1
                         outStr += Format(plot.lastXdelta.Item(j).Item(i), "00") + ", "
                     Next
@@ -291,7 +291,7 @@ Public Class IMU_HostFrameTimes
         sliders.setupTrackBar1(ocvb, caller, "Minimum Host interrupt delay (ms)", 1, 10, 4)
         sliders.setupTrackBar2(ocvb, caller, "Number of Plot Values", 5, 30, 25)
 
-        label2 = "IMU FT (blue) CPU FT (green) Latency est. (red)"
+        label2 = "IMU FT (blue) Host FT (green) Latency est. (red)"
         ocvb.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -323,7 +323,7 @@ Public Class IMU_HostFrameTimes
         If standalone Then
             ocvb.putText(New ActiveClass.TrueType("IMU_TimeStamp (ms) " + Format(ocvb.parms.IMU_TimeStamp, "00") + vbCrLf +
                                                   "CPU TimeStamp (ms) " + Format(ocvb.parms.CPU_TimeStamp, "00") + vbCrLf +
-                                                  "CPU Frametime (ms, sampled) " + Format(sampledCPUFrameTime, "000.00") +
+                                                  "Host Frametime (ms, sampled) " + Format(sampledCPUFrameTime, "000.00") +
                                                   " CPUanchor = " + Format(CPUanchor, "00") +
                                                   " latest = " + Format(ocvb.parms.CPU_FrameTime, "00.00") + vbCrLf +
                                                   "Host Interrupt Delay (ms, sampled, in red) " + Format(HostInterruptDelayEstimate, "00") + vbCrLf + vbCrLf +
@@ -341,7 +341,7 @@ Public Class IMU_HostFrameTimes
             If plot.lastXdelta.Count > plotLastX Then
                 Dim allText As String = ""
                 For i = 0 To plot.plotCount - 1
-                    Dim outStr = "Last " + CStr(plotLastX) + Choose(i + 1, " IMU FrameTime", " CPU Frametime", " Host Delay ms", " CPUanchor FT") + vbTab
+                    Dim outStr = "Last " + CStr(plotLastX) + Choose(i + 1, " IMU FrameTime", " Host Frametime", " Host Delay ms", " CPUanchor FT") + vbTab
                     For j = plot.lastXdelta.Count - plotLastX - 1 To plot.lastXdelta.Count - 1
                         outStr += Format(plot.lastXdelta.Item(j).Item(i), "00") + ", "
                     Next

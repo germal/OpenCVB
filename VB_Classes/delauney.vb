@@ -69,7 +69,7 @@ Module Delaunay_Exports
             For j = 0 To facets(i).Length - 1
                 ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
             Next
-            Dim nextColor = ocvb.colorScalar(i Mod ocvb.colorScalar.Length)
+            Dim nextColor = ocvb.scalarColors(i Mod ocvb.scalarColors.Length)
             ifacets(0) = ifacet
             cv.Cv2.FillConvexPoly(img, ifacet, nextColor, cv.LineTypes.AntiAlias)
             cv.Cv2.Polylines(img, ifacets, True, New cv.Scalar(0), 1, cv.LineTypes.AntiAlias, 0)

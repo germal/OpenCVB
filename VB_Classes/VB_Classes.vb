@@ -144,6 +144,7 @@ Public Class ActiveClass : Implements IDisposable
         Dim width As Int32
     End Structure
     Public Sub New(parms As algorithmParameters)
+        Randomize() ' just in case anyone uses VB.Net's Rnd
         UpdateHostLocation(parms.mainFormLoc.X, parms.mainFormLoc.Y, parms.mainFormHeight)
         ocvb = New AlgorithmData(parms)
         If LCase(parms.activeAlgorithm).EndsWith(".py") Then ocvb.PythonFileName = parms.activeAlgorithm

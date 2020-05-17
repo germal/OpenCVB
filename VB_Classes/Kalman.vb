@@ -16,17 +16,29 @@ Public Class Kalman_Basics
         check.Box(0).Checked = True
 
         ocvb.desc = "Use Kalman to stabilize a set of value (such as a cv.rect.)"
+        input = {0, 0, 0, 0}
     End Sub
-    Private Sub setValues(ocvb As AlgorithmData)
-        label1 = "Rectangle moves smoothly from random locations"
-        Static autoRand As New Random()
-        ReDim input(4 - 1)
-        Dim w = ocvb.color.Width
-        Dim h = ocvb.color.Height
-        input = {autoRand.Next(50, w - 50), autoRand.Next(50, h - 50), autoRand.Next(5, w / 4), autoRand.Next(5, h / 4)}
-    End Sub
+    Public Function initRandomRect(w As Integer, h As Integer, margin As Integer) As Single()
+        Dim x = (w - margin * 2) * Rnd() + margin
+        Dim y = (h - margin * 2) * Rnd() + margin
+        Dim width = (w - x) * Rnd()
+        Dim height = (h - y) * Rnd()
+
+        Return {x, y, width, height}
+    End Function
+    Public Function validateKalmanRect(rect As cv.Rect, img As cv.Mat, margin As Integer) As cv.Rect
+        If rect.X < margin Then rect.X = margin
+        If rect.X > img.Width - margin Then rect.X = img.Width - margin
+        If rect.Y < margin Then rect.Y = margin
+        If rect.Y > img.Height - margin Then rect.Y = img.Height - margin
+
+        If rect.Width <= 0 Then rect.Width = 5
+        If rect.Height <= 0 Then rect.Height = 5
+        If rect.Width > img.Width Then rect.Width = img.Width
+        If rect.Height > img.Height Then rect.Height = img.Height
+        Return rect
+    End Function
     Public Sub Run(ocvb As AlgorithmData)
-        If input Is Nothing Then setValues(ocvb)
         Static saveDimension As Int32 = -1
         If saveDimension <> input.Length Then
             If kalman IsNot Nothing Then
@@ -51,9 +63,6 @@ Public Class Kalman_Basics
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = input(i)
                 kalman(i).Run(ocvb)
-            Next
-
-            For i = 0 To input.Length - 1
                 output(i) = kalman(i).stateResult
             Next
         Else
@@ -61,20 +70,17 @@ Public Class Kalman_Basics
         End If
 
         If standalone Then
-            dst1 = ocvb.color.Clone()
-            Static rect As New cv.Rect(CInt(output(0)), CInt(output(1)), CInt(output(2)), CInt(output(3)))
-            If rect.X = CInt(output(0)) And rect.Y = CInt(output(1)) And rect.Width = CInt(output(2)) And rect.Height = CInt(output(3)) Then
-                setValues(ocvb)
-            Else
-                rect = New cv.Rect(CInt(output(0)), CInt(output(1)), CInt(output(2)), CInt(output(3)))
-            End If
+            dst1 = src.Clone()
+            Dim rect = New cv.Rect(CInt(output(0)), CInt(output(1)), CInt(output(2)), CInt(output(3)))
+            rect = validateKalmanRect(rect, src, 50)
+            Static lastRect = rect
+            If rect = lastRect Then input = initRandomRect(src.Width, src.Height, 50)
+            lastRect = rect
             dst1.Rectangle(rect, cv.Scalar.White, 6)
             dst1.Rectangle(rect, cv.Scalar.Red, 1)
         End If
     End Sub
 End Class
-
-
 
 
 
@@ -89,12 +95,10 @@ Public Class Kalman_Compare
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         plot = New Plot_OverTime(ocvb, caller)
-        plot.dst1 = dst1
         plot.plotCount = 3
         plot.topBottomPad = 20
 
         kPlot = New Plot_OverTime(ocvb, caller)
-        kPlot.dst1 = dst2
         kPlot.plotCount = 3
         kPlot.topBottomPad = 20
 
@@ -123,8 +127,9 @@ Public Class Kalman_Compare
             plot.offChartCount = plot.plotTriggerRescale + 1
         End If
 
-        plot.plotData = ocvb.color.Mean()
+        plot.plotData = src.Mean()
         plot.Run(ocvb)
+        dst1 = plot.dst1
 
         For i = 0 To kalman.Count - 1
             kalman(i).inputReal = plot.plotData.Item(i)
@@ -135,6 +140,7 @@ Public Class Kalman_Compare
         kPlot.minScale = plot.minScale
         kPlot.plotData = New cv.Scalar(kalman(0).stateResult, kalman(1).stateResult, kalman(2).stateResult)
         kPlot.Run(ocvb)
+        dst2 = kPlot.dst1
     End Sub
 End Class
 
@@ -170,8 +176,8 @@ Public Class Kalman_RotatingPoint
         cv.Cv2.SetIdentity(kf.MeasurementNoiseCov, cv.Scalar.All(0.1))
         cv.Cv2.SetIdentity(kf.ErrorCovPost, cv.Scalar.All(1))
         cv.Cv2.Randn(kf.StatePost, New cv.Scalar(0), cv.Scalar.All(1))
-        radius = ocvb.color.Rows / 2.4 ' so we see the entire circle...
-        center = New cv.Point2f(ocvb.color.Cols / 2, ocvb.color.Height / 2)
+        radius = src.Rows / 2.4 ' so we see the entire circle...
+        center = New cv.Point2f(src.Cols / 2, src.Rows / 2)
         ocvb.desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -188,6 +194,7 @@ Public Class Kalman_RotatingPoint
         Dim measAngle = measurement.Get(Of Single)(0)
         Dim measPt = calcPoint(center, radius, measAngle)
 
+        dst1.SetTo(0)
         drawCross(dst1, statePt, cv.Scalar.White)
         drawCross(dst1, measPt, cv.Scalar.White)
         drawCross(dst1, predictPt, cv.Scalar.White)
@@ -242,25 +249,24 @@ End Class
 
 
 
+
 Public Class Kalman_CVMat
     Inherits ocvbClass
     Dim kalman() As Kalman_Single
+    Public input As New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
+    Public output As cv.Mat
+    Dim basics As Kalman_Basics
+    Dim margin = 25
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        label1 = "Rectangle moves smoothly to random locations"
+        basics = New Kalman_Basics(ocvb, caller)
+        ocvb.label1 = "Rectangle moves smoothly to random locations"
         ocvb.desc = "Use Kalman to stabilize a set of values (such as a cv.rect.)"
     End Sub
-    Private Sub setValues(ocvb As AlgorithmData, ByVal callerRaw As String)
-        Static autoRand As New Random()
-        Dim x = autoRand.Next(50, ocvb.color.Width - 50)
-        Dim y = autoRand.Next(50, ocvb.color.Height - 50)
-        Dim vals() As Single = {x, y, autoRand.Next(5, ocvb.color.Width - x), autoRand.Next(5, ocvb.color.Height - y)}
-        src = New cv.Mat(4, 1, cv.MatType.CV_32F, vals)
-    End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If src Is Nothing Then setValues(ocvb, "Kalman_CVMat")
+        If standalone = False Then input = src
         Static saveDimension As Int32 = -1
-        If saveDimension <> src.Rows Then
+        If saveDimension <> input.Rows Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
                     For i = 0 To kalman.Count - 1
@@ -268,37 +274,46 @@ Public Class Kalman_CVMat
                     Next
                 End If
             End If
-            saveDimension = src.Rows
-            ReDim kalman(src.Rows - 1)
-            For i = 0 To src.Rows - 1
+            saveDimension = input.Rows
+            ReDim kalman(input.Rows - 1)
+            For i = 0 To input.Rows - 1
                 kalman(i) = New Kalman_Single(ocvb, caller)
             Next
-            dst1 = New cv.Mat(src.Rows, 1, cv.MatType.CV_32F, 0)
+            output = New cv.Mat(input.Rows, 1, cv.MatType.CV_32F, 0)
         End If
 
-        For i = 0 To kalman.Length - 1
-            kalman(i).inputReal = src.Get(Of Single)(i, 0)
-            kalman(i).Run(ocvb)
-        Next
+        If basics.check.Box(0).Checked Then
+            For i = 0 To kalman.Length - 1
+                kalman(i).inputReal = input.Get(Of Single)(i, 0)
+                kalman(i).Run(ocvb)
+                output.Set(Of Single)(i, 0, kalman(i).stateResult)
+            Next
+        Else
+            output = input ' do nothing to the input.
+        End If
 
-        For i = 0 To src.Rows - 1
-            dst1.Set(Of Single)(i, 0, kalman(i).stateResult)
-        Next
 
         If standalone Then
-            Dim rx(src.Rows - 1) As Single
+            Dim rx(input.Rows - 1) As Single
             Dim testrect As New cv.Rect
-            For i = 0 To src.Rows - 1
-                rx(i) = dst1.Get(Of Single)(i, 0)
+            For i = 0 To input.Rows - 1
+                rx(i) = output.Get(Of Single)(i, 0)
             Next
-            dst1 = ocvb.color
-            Static rect As New cv.Rect(CInt(rx(0)), CInt(rx(1)), CInt(rx(2)), CInt(rx(3)))
-            If rect.X = CInt(rx(0)) And rect.Y = CInt(rx(1)) And rect.Width = CInt(rx(2)) And rect.Height = CInt(rx(3)) Then
-                setValues(ocvb, "Kalman_CVMat")
-            Else
-                rect = New cv.Rect(CInt(rx(0)), CInt(rx(1)), CInt(rx(2)), CInt(rx(3)))
-            End If
+            dst1 = src
+            Dim rect = New cv.Rect(CInt(rx(0)), CInt(rx(1)), CInt(rx(2)), CInt(rx(3)))
+            rect = basics.validateKalmanRect(rect, src, 50)
+
+            Static lastRect As cv.Rect = rect
+            If lastRect = rect Then input = New cv.Mat(4, 1, cv.MatType.CV_32F, basics.initRandomRect(src.Width, src.Height, margin))
             dst1.Rectangle(rect, cv.Scalar.Red, 2)
+            lastRect = rect
+        End If
+    End Sub
+    Public Sub MyDispose()
+        If kalman IsNot Nothing Then
+            For i = 0 To kalman.Count - 1
+                kalman(i).Dispose()
+            Next
         End If
     End Sub
 End Class
@@ -324,16 +339,15 @@ Public Class Kalman_ImageSmall
         ocvb.desc = "Resize the image to allow the Kalman filter to process the whole image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        resize.src = gray
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        resize.src = src
         resize.Run(ocvb)
 
         Dim saveOriginal = resize.dst1.Clone()
         Dim gray32f As New cv.Mat
         resize.dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
-        kalman.src = gray32f.Reshape(1, gray32f.Width * gray32f.Height)
+        kalman.input = gray32f.Reshape(1, gray32f.Width * gray32f.Height)
         kalman.Run(ocvb)
-        Dim dst1 As New cv.Mat
         kalman.dst1.ConvertTo(dst1, cv.MatType.CV_8U)
         dst1 = dst1.Reshape(1, gray32f.Height)
         dst1 = dst1.Resize(dst1.Size())
@@ -421,7 +435,7 @@ Public Class Kalman_Single
                 plot.plotCount = 2
             End If
 
-            dst1 = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             inputReal = dst1.Mean().Item(0)
         End If
 
