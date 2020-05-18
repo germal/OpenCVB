@@ -140,6 +140,7 @@ Public Class Plot_OverTime
         ' if enough points are off the charted area or if manually requested, then redo the scale.
         If (offChartCount > plotTriggerRescale Or check.Box(0).Checked) And lastXdelta.Count >= plotSeriesCount Then
             check.Box(0).Checked = False
+            dst1.SetTo(0)
             maxScale = Int32.MinValue
             minScale = Int32.MaxValue
             For i = 0 To lastXdelta.Count - 1

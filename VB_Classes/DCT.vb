@@ -144,7 +144,7 @@ Public Class DCT_FeatureLess_MT
         dst2 = dct.dst2
 
         ' Result2 contain the RGB image with highest frequency removed.
-        Parallel.For(0, dst2.Rows - 1,
+        Parallel.For(0, dst2.Rows,
         Sub(i)
             Dim runLen As Int32 = 0
             Dim runStart As Int32 = 0

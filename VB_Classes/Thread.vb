@@ -49,7 +49,7 @@ Public Class Thread_Grid
             For y = 0 To src.Height - 1 Step sliders.TrackBar2.Value
                 For x = 0 To src.Width - 1 Step sliders.TrackBar1.Value
                     Dim roi = New cv.Rect(x, y, sliders.TrackBar1.Value, sliders.TrackBar2.Value)
-                    If x + roi.Width > src.Width Then roi.Width = src.Width - x
+                    If x + roi.Width >= src.Width Then roi.Width = src.Width - x
                     If y + roi.Height >= src.Height Then roi.Height = src.Height - y
                     If roi.Width > 0 And roi.Height > 0 Then
                         If y = 0 Then tilesPerRow += 1
@@ -61,8 +61,7 @@ Public Class Thread_Grid
                 drawGrid(roiList)
             Next
 
-            For i = 0 To roiList.Count - 1
-                Dim roi = roiList(i)
+            For Each roi In roiList
                 Dim broi = New cv.Rect(roi.X - borderSize, roi.Y - borderSize, roi.Width + 2 * borderSize, roi.Height + 2 * borderSize)
                 If broi.X < 0 Then
                     broi.Width += broi.X
@@ -94,5 +93,43 @@ Public Class Thread_Grid
             label1 = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
                           CStr(roiList(0).Width) + "X" + CStr(roiList(0).Height) + " regions"
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Thread_GridTest
+    Inherits ocvbClass
+    Dim grid As Thread_Grid
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        grid = New Thread_Grid(ocvb, caller)
+        grid.sliders.TrackBar1.Value = 64
+        grid.sliders.TrackBar2.Value = 40
+        label1 = ""
+        ocvb.desc = "Validation test for thread_grid algorithm"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        grid.Run(ocvb)
+        Dim mean = cv.Cv2.Mean(src)
+
+        Parallel.For(0, grid.roiList.Count,
+         Sub(i)
+             Dim roi = grid.roiList(i)
+             cv.Cv2.Subtract(mean, src(roi), dst1(roi))
+             cv.Cv2.PutText(dst1(roi), CStr(i), New cv.Point(10, 20), cv.HersheyFonts.HersheyDuplex, 0.7, cv.Scalar.White, 1)
+         End Sub)
+        dst1.SetTo(cv.Scalar.White, grid.gridMask)
+
+        dst2.SetTo(0)
+        Parallel.For(0, grid.roiList.Count,
+         Sub(i)
+             Dim roi = grid.roiList(i)
+             cv.Cv2.Subtract(mean, src(roi), dst2(roi))
+             dst2(roi).Line(New cv.Point(0, 0), New cv.Point(roi.Width, roi.Height), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+         End Sub)
     End Sub
 End Class

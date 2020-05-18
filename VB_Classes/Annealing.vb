@@ -115,7 +115,7 @@ End Class
 Public Class Annealing_CPP_MT
     Inherits ocvbClass
     Dim random As Random_Points
-    Dim anneal(35) As Annealing_Basics_CPP
+    Dim anneal(32) As Annealing_Basics_CPP
     Dim mats As Mat_4to1
     Dim flow As Font_FlowText
     Private Class CompareEnergy : Implements IComparer(Of Single)

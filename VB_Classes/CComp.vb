@@ -186,7 +186,7 @@ Public Class CComp_InRange_MT
 
         dst1.SetTo(0)
         Dim totalBlobs As Int32
-        Parallel.For(0, rangeCount - 1,
+        Parallel.For(0, rangeCount,
         Sub(i)
             Dim lowerBound = i * (255 / rangeCount)
             Dim upperBound = (i + 1) * (255 / rangeCount)

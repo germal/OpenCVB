@@ -84,7 +84,7 @@ Public Class Salience_Basics_MT
         Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
         Dim gray As New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, grayData)
 
-        Parallel.For(0, threads - 1,
+        Parallel.For(0, threads,
             Sub(i)
                 Dim roi = New cv.Rect(0, i * h, ocvb.color.Width, Math.Min(h, ocvb.color.Height - i * h))
                 If roi.Height <= 0 Then Exit Sub

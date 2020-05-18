@@ -174,7 +174,7 @@ Public Class OpticalFlow_DenseBasics_MT
             flow.Run(ocvb)
 
             Dim CCthreshold = CSng(sliders.TrackBar1.Value / sliders.TrackBar1.Maximum)
-            Parallel.For(0, grid.borderList.Count - 1,
+            Parallel.For(0, grid.borderList.Count,
             Sub(i)
                 Dim broi = grid.borderList(i)
                 Dim roi = grid.roiList(i)

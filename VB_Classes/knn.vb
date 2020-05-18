@@ -3,31 +3,40 @@ Imports System.Runtime.InteropServices
 Public Class knn_Basics
     Inherits ocvbClass
     Dim random As Random_Points
+    Public input() As cv.Point2f
+    Public queryPoints() As cv.Point2f
+    Dim knn As cv.ML.KNearest
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        random = New Random_Points(ocvb, caller)
-        sliders.setupTrackBar1(ocvb, caller, "knn Query Points", 1, 10000, 10)
-        sliders.setupTrackBar2(ocvb, caller, "knn Known Points", 1, 10, 3)
+        If standalone Then
+            random = New Random_Points(ocvb, caller)
+            sliders.setupTrackBar1(ocvb, caller, "knn Query Points", 1, 10000, 10)
+            sliders.setupTrackBar2(ocvb, caller, "knn Known Points", 1, 10, 3)
+        End If
         ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
-        label2 = "Search Input"
+        label2 = "Query points"
+        knn = cv.ML.KNearest.Create()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim knn = cv.ML.KNearest.Create()
-        random.Run(ocvb)
-        Dim trainData = New cv.Mat(random.Points.Length, 2, cv.MatType.CV_32F, random.Points2f)
-        Dim responses(random.Points.Length - 1) As Int32
+        dst1.SetTo(0)
+        If standalone Then
+            random.Run(ocvb)
+            input = random.Points2f
+        End If
+        Dim trainData = New cv.Mat(input.Length, 2, cv.MatType.CV_32F, input)
+        Dim responses(input.Length - 1) As Int32
         For i = 0 To responses.Length - 1
             responses(i) = i
         Next
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, New cv.Mat(responses.Length, 1, cv.MatType.CV_32S, responses))
 
-        Dim queryPoints(sliders.TrackBar1.Value) As cv.Point2f
+        ReDim queryPoints(sliders.TrackBar1.Value)
         For i = 0 To queryPoints.Length - 1
             queryPoints(i) = New cv.Point2f(ocvb.ms_rng.Next(0, dst1.Cols), ocvb.ms_rng.Next(0, dst1.Rows))
         Next
-
         Dim bluePoints = sliders.TrackBar2.Value
-        label1 = "Yellow is random, blue nearest " + CStr(bluePoints)
+
+        label1 = "Yellow is query point, blue nearest for " + CStr(bluePoints) + " queries"
         dst1.CopyTo(dst2)
         Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
         For i = 0 To queryPoints.Length - 1

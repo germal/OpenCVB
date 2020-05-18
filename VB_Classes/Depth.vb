@@ -382,7 +382,7 @@ Public Class Depth_MeanStdev_MT
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 64
-        grid.sliders.TrackBar2.Value = 64
+        grid.sliders.TrackBar2.Value = 40
 
         sliders.setupTrackBar1(ocvb, caller, "MeanStdev Max Depth Range", 1, 20000, 3500)
         sliders.setupTrackBar2(ocvb, caller, "MeanStdev Frame Series", 1, 100, 5)
@@ -398,7 +398,7 @@ Public Class Depth_MeanStdev_MT
 
         Static lastMeanCount As Int32
         If grid.roiList.Count <> meanSeries.Rows Or meanCount <> lastMeanCount Then
-            meanSeries = New cv.Mat(grid.roiList.Count - 1, meanCount, cv.MatType.CV_32F, 0)
+            meanSeries = New cv.Mat(grid.roiList.Count, meanCount, cv.MatType.CV_32F, 0)
             lastMeanCount = meanCount
         End If
 
@@ -416,7 +416,7 @@ Public Class Depth_MeanStdev_MT
         Dim meanIndex = ocvb.frameCount Mod meanCount
         Dim meanValues As New cv.Mat(grid.roiList.Count - 1, 1, cv.MatType.CV_32F)
         Dim stdValues As New cv.Mat(grid.roiList.Count - 1, 1, cv.MatType.CV_32F)
-        Parallel.For(0, grid.roiList.Count - 1,
+        Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)
             Dim mean As Single = 0, stdev As Single = 0
@@ -431,13 +431,12 @@ Public Class Depth_MeanStdev_MT
 
         If ocvb.frameCount >= meanCount Then
             Dim minStdVal As Double, maxStdVal As Double
-
             Dim meanmask = meanValues.Threshold(1, maxDepth, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             cv.Cv2.MinMaxLoc(meanValues, minVal, maxVal, minPt, maxPt, meanmask)
             Dim stdMask = stdValues.Threshold(0.001, maxDepth, cv.ThresholdTypes.Binary).ConvertScaleAbs() ' volatile region is x cm stdev.
             cv.Cv2.MinMaxLoc(stdValues, minStdVal, maxStdVal, minPt, maxPt, stdMask)
 
-            Parallel.For(0, grid.roiList.Count - 1,
+            Parallel.For(0, grid.roiList.Count,
             Sub(i)
                 Dim roi = grid.roiList(i)
                 ' this marks all the regions where the depth is volatile.
@@ -448,9 +447,9 @@ Public Class Depth_MeanStdev_MT
                 dst1(roi).SetTo(0, outOfRangeMask(roi))
             End Sub)
             cv.Cv2.BitwiseOr(dst2, grid.gridMask, dst2)
-            label2 = "ROI Stdev: Min " + Format(minStdVal, "#0.0") + " Max " + Format(maxStdVal, "#0.0")
+            label2 = "Stdev for each ROI (normalized): Min " + Format(minStdVal, "#0.0") + " Max " + Format(maxStdVal, "#0.0")
         End If
-        label1 = "ROI Means: Min " + Format(minVal, "#0.0") + " Max " + Format(maxVal, "#0.0")
+        label1 = "Mean for each ROI (normalized): Min " + Format(minVal, "#0.0") + " Max " + Format(maxVal, "#0.0")
     End Sub
 End Class
 

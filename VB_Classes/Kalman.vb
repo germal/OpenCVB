@@ -253,18 +253,19 @@ End Class
 Public Class Kalman_CVMat
     Inherits ocvbClass
     Dim kalman() As Kalman_Single
-    Public input As New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
+    Public input As cv.Mat
     Public output As cv.Mat
     Dim basics As Kalman_Basics
-    Dim margin = 25
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        basics = New Kalman_Basics(ocvb, caller)
-        ocvb.label1 = "Rectangle moves smoothly to random locations"
-        ocvb.desc = "Use Kalman to stabilize a set of values (such as a cv.rect.)"
+        If standalone Then
+            basics = New Kalman_Basics(ocvb, caller)
+            ocvb.label1 = "Rectangle moves smoothly to random locations"
+            input = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
+        End If
+        ocvb.desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone = False Then input = src
         Static saveDimension As Int32 = -1
         If saveDimension <> input.Rows Then
             If kalman IsNot Nothing Then
@@ -301,7 +302,8 @@ Public Class Kalman_CVMat
             Next
             dst1 = src
             Dim rect = New cv.Rect(CInt(rx(0)), CInt(rx(1)), CInt(rx(2)), CInt(rx(3)))
-            rect = basics.validateKalmanRect(rect, src, 50)
+            Dim margin = 25
+            rect = basics.validateKalmanRect(rect, src, margin)
 
             Static lastRect As cv.Rect = rect
             If lastRect = rect Then input = New cv.Mat(4, 1, cv.MatType.CV_32F, basics.initRandomRect(src.Width, src.Height, margin))
@@ -309,13 +311,6 @@ Public Class Kalman_CVMat
             lastRect = rect
         End If
     End Sub
-    Public Sub MyDispose()
-        If kalman IsNot Nothing Then
-            For i = 0 To kalman.Count - 1
-                kalman(i).Dispose()
-            Next
-        End If
-    End Sub
 End Class
 
 
@@ -324,76 +319,77 @@ End Class
 
 
 
-Public Class Kalman_ImageSmall
-    Inherits ocvbClass
-    Dim kalman As Kalman_CVMat
-    Dim resize As Resize_Percentage
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        kalman = New Kalman_CVMat(ocvb, caller)
+'Public Class Kalman_ImageSmall
+'    Inherits ocvbClass
+'    Dim kalman As Kalman_CVMat
+'    Dim resize As Resize_Percentage
+'    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+'        setCaller(callerRaw)
+'        kalman = New Kalman_CVMat(ocvb, caller)
 
-        resize = New Resize_Percentage(ocvb, caller)
+'        resize = New Resize_Percentage(ocvb, caller)
 
-        label1 = "The small image is processed by the Kalman filter"
-        label2 = "Mask of the smoothed image minus original"
-        ocvb.desc = "Resize the image to allow the Kalman filter to process the whole image."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        resize.src = src
-        resize.Run(ocvb)
+'        label1 = "The small image is processed by the Kalman filter"
+'        label2 = "Mask of the smoothed image minus original"
+'        ocvb.desc = "Resize the image to allow the Kalman filter to process the whole image."
+'    End Sub
+'    Public Sub Run(ocvb As AlgorithmData)
+'        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'        resize.src = src
+'        resize.Run(ocvb)
 
-        Dim saveOriginal = resize.dst1.Clone()
-        Dim gray32f As New cv.Mat
-        resize.dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
-        kalman.input = gray32f.Reshape(1, gray32f.Width * gray32f.Height)
-        kalman.Run(ocvb)
-        kalman.dst1.ConvertTo(dst1, cv.MatType.CV_8U)
-        dst1 = dst1.Reshape(1, gray32f.Height)
-        dst1 = dst1.Resize(dst1.Size())
-        cv.Cv2.Subtract(dst1, saveOriginal, dst1)
-        dst1 = dst1.Threshold(1, 255, cv.ThresholdTypes.Binary)
-        dst2 = dst1.Resize(dst1.Size())
-    End Sub
-End Class
-
-
-
+'        Dim saveOriginal = resize.dst1.Clone()
+'        Dim gray32f As New cv.Mat
+'        resize.dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
+'        kalman.input = gray32f.Reshape(1, gray32f.Width * gray32f.Height)
+'        kalman.Run(ocvb)
+'        Dim tmp As New cv.Mat
+'        kalman.output.ConvertTo(tmp, cv.MatType.CV_8U)
+'        tmp = tmp.Reshape(1, gray32f.Height)
+'        dst1 = tmp.Resize(dst1.Size())
+'        cv.Cv2.Subtract(tmp, saveOriginal, dst2)
+'        dst2 = dst2.Threshold(1, 255, cv.ThresholdTypes.Binary)
+'        dst2 = dst2.Resize(dst1.Size())
+'    End Sub
+'End Class
 
 
-Public Class Kalman_DepthSmall
-    Inherits ocvbClass
-    Dim kalman As Kalman_CVMat
-    Dim resize As Resize_Percentage
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        kalman = New Kalman_CVMat(ocvb, caller)
 
-        resize = New Resize_Percentage(ocvb, caller)
-        resize.sliders.TrackBar1.Value = 4
 
-        label2 = "Brighter: depth is decreasing (object getting closer)"
-        label1 = "Mask of non-zero depth after Kalman smoothing"
-        ocvb.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Dim depth32f = getDepth32f(ocvb)
-        resize.src = depth32f
-        resize.Run(ocvb)
 
-        resize.dst1.ConvertTo(depth32f, cv.MatType.CV_32F)
-        kalman.src = depth32f.Reshape(1, depth32f.Width * depth32f.Height)
-        Dim saveOriginal = kalman.src.Clone()
-        kalman.Run(ocvb)
-        Dim dst1 = kalman.dst1.Reshape(1, depth32f.Height)
-        dst1 = dst1.Resize(dst1.Size())
-        dst1 = dst1.ConvertScaleAbs()
-        cv.Cv2.Subtract(kalman.dst1, saveOriginal, depth32f)
-        dst1 = depth32f.Threshold(0, 0, cv.ThresholdTypes.Tozero).ConvertScaleAbs()
-        dst1 = dst1.Reshape(1, resize.dst1.Height)
-        dst2 = dst1.Resize(dst1.Size())
-    End Sub
-End Class
+'Public Class Kalman_DepthSmall
+'    Inherits ocvbClass
+'    Dim kalman As Kalman_CVMat
+'    Dim resize As Resize_Percentage
+'    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+'        setCaller(callerRaw)
+'        kalman = New Kalman_CVMat(ocvb, caller)
+
+'        resize = New Resize_Percentage(ocvb, caller)
+'        resize.sliders.TrackBar1.Value = 4
+
+'        label2 = "Brighter: depth is decreasing (object getting closer)"
+'        label1 = "Mask of non-zero depth after Kalman smoothing"
+'        ocvb.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
+'    End Sub
+'    Public Sub Run(ocvb As AlgorithmData)
+'        Dim depth32f = getDepth32f(ocvb)
+'        resize.src = depth32f
+'        resize.Run(ocvb)
+
+'        resize.dst1.ConvertTo(depth32f, cv.MatType.CV_32F)
+'        kalman.src = depth32f.Reshape(1, depth32f.Width * depth32f.Height)
+'        Dim saveOriginal = kalman.src.Clone()
+'        kalman.Run(ocvb)
+'        Dim dst1 = kalman.dst1.Reshape(1, depth32f.Height)
+'        dst1 = dst1.Resize(dst1.Size())
+'        dst1 = dst1.ConvertScaleAbs()
+'        cv.Cv2.Subtract(kalman.dst1, saveOriginal, depth32f)
+'        dst1 = depth32f.Threshold(0, 0, cv.ThresholdTypes.Tozero).ConvertScaleAbs()
+'        dst1 = dst1.Reshape(1, resize.dst1.Height)
+'        dst2 = dst1.Resize(dst1.Size())
+'    End Sub
+'End Class
 
 
 
@@ -429,7 +425,6 @@ Public Class Kalman_Single
         If standalone Then
             If ocvb.frameCount = 0 Then
                 plot = New Plot_OverTime(ocvb, caller)
-                plot.dst1 = dst2
                 plot.maxScale = 150
                 plot.minScale = 80
                 plot.plotCount = 2
@@ -445,6 +440,7 @@ Public Class Kalman_Single
         If standalone Then
             plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
             plot.Run(ocvb)
+            dst2 = plot.dst1
             label1 = "Mean of the grayscale image is predicted"
             label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
         End If

@@ -10,9 +10,8 @@ Public Class KAZE_KeypointsKAZE_CS
         label1 = "KAZE key points"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        CS_Kaze.GetKeypoints(gray)
-        ocvb.color.CopyTo(dst1)
+        CS_Kaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        src.CopyTo(dst1)
         For i = 0 To CS_Kaze.kazeKeyPoints.Count - 1
             dst1.Circle(CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
@@ -31,9 +30,8 @@ Public Class KAZE_KeypointsAKAZE_CS
         label1 = "AKAZE key points"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        CS_AKaze.GetKeypoints(gray)
-        ocvb.color.CopyTo(dst1)
+        CS_AKaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        src.CopyTo(dst1)
         For i = 0 To CS_AKaze.akazeKeyPoints.Count - 1
             dst1.Circle(CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
@@ -86,6 +84,8 @@ End Class
 
 Public Class KAZE_LeftAligned_CS
     Inherits ocvbClass
+    Dim CS_KazeLeft As New CS_Classes.Kaze_Basics
+    Dim CS_KazeRight As New CS_Classes.Kaze_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Max number of points to match", 1, 300, 100)
@@ -94,9 +94,7 @@ Public Class KAZE_LeftAligned_CS
         ocvb.desc = "Match keypoints in the left and right images but display it as movement in the right image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim CS_KazeLeft As New CS_Classes.Kaze_Basics
         CS_KazeLeft.GetKeypoints(ocvb.leftView)
-        Dim CS_KazeRight As New CS_Classes.Kaze_Basics
         CS_KazeRight.GetKeypoints(ocvb.rightView)
 
         dst1 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

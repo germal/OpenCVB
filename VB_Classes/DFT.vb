@@ -122,7 +122,7 @@ End Class
 
 ' http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/c++/butterworth_lowpass.cpp
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
-Public Class DFT_ButterworthFilter
+Public Class DFT_ButterworthFilter_MT
     Inherits ocvbClass
     Public dft As DFT_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -199,10 +199,10 @@ End Class
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
 Public Class DFT_ButterworthDepth
     Inherits ocvbClass
-    Dim bfilter As DFT_ButterworthFilter
+    Dim bfilter As DFT_ButterworthFilter_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        bfilter = New DFT_ButterworthFilter(ocvb, caller)
+        bfilter = New DFT_ButterworthFilter_MT(ocvb, caller)
 
         ocvb.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
         label1 = "Image with Butterworth Low Pass Filter Applied"
