@@ -51,7 +51,7 @@ Public Class FishEye_Rectified
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = T265Camera Then
-            leftView = ocvb.color ' the left view is rectified in the camera interface code.  Only the right view needs to be rectified here.
+            leftView = src ' the left view is rectified in the camera interface code.  Only the right view needs to be rectified here.
 
             Dim tmp = ocvb.rightView.Resize(ocvb.pointCloud.Size())
             Dim rightTmp = New cv.Mat(t265Original.Height, t265Original.Width, cv.MatType.CV_8U, 255) ' 848, 800

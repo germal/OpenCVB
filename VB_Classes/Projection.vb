@@ -480,7 +480,7 @@ End Class
 Public Class Projection_Wall
     Inherits ocvbClass
     Dim objects As Projection_Flood
-    Dim lines As lineDetector_FLD
+    Dim lines As lineDetector_FLD_CPP
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -489,7 +489,7 @@ Public Class Projection_Wall
 
         objects = New Projection_Flood(ocvb, Me.GetType().Name)
 
-        lines = New lineDetector_FLD(ocvb, Me.GetType().Name)
+        lines = New lineDetector_FLD_CPP(ocvb, Me.GetType().Name)
 
         ocvb.desc = "Use the top down view to detect walls with a line detector algorithm"
     End Sub

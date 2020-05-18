@@ -58,8 +58,8 @@ Public Class Laplacian_Blur
             src = ocvb.color.MedianBlur(kernelSize)
             blurText = "MedianBlur"
         End If
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = gray.Laplacian(ddepth, kernelSize, scale, delta).ConvertScaleAbs()
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = src.Laplacian(ddepth, kernelSize, scale, delta).ConvertScaleAbs()
         label1 = "Laplacian+" + blurText + " k = " + CStr(kernelSize)
     End Sub
 End Class

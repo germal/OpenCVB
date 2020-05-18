@@ -27,24 +27,26 @@ End Module
 ' https://visualstudiomagazine.com/articles/2020/04/06/invert-matrix.aspx
 Public Class MatrixInverse_Basics_CS
     Inherits ocvbClass
-    Public matrix As New MatrixInverse
+    Public matrix As New MatrixInverse ' NOTE: C# class
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
     Dim defaultBVector() As Double = {12, 7, 7, 13}
+    Dim input As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        src = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
+        input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
         ocvb.desc = "Manually invert a matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If src.Width <> src.Height Then
+        If input.Width <> input.Height Then
             ocvb.putText(New ActiveClass.TrueType("The src matrix must be square!", 10, 60, RESULT1))
             Exit Sub
         End If
 
-        if standalone Then matrix.bVector = defaultBVector
-        dst1 = matrix.Run(src)
+        If standalone Then matrix.bVector = defaultBVector
 
-        Dim outstr = printMatrixResults(src, dst1)
+        Dim result = matrix.Run(input) ' C# class Run - not ocvbClass...
+
+        Dim outstr = printMatrixResults(input, result)
         ocvb.putText(New ActiveClass.TrueType(outstr + vbCrLf + "Intermediate results are optionally available in the console log.", 10, 60, RESULT1))
     End Sub
 End Class
@@ -57,20 +59,21 @@ End Class
 Public Class MatrixInverse_OpenCV
     Inherits ocvbClass
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
+    Dim input As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        src = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
+        input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
         ocvb.desc = "Use OpenCV to invert a matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If src.Width <> src.Height Then
-            ocvb.putText(New ActiveClass.TrueType("The src matrix must be square!", 10, 60, RESULT1))
+        If Input.Width <> Input.Height Then
+            ocvb.putText(New ActiveClass.TrueType("The input matrix must be square!", 10, 60, RESULT1))
             Exit Sub
         End If
 
-        dst1 = src.EmptyClone.SetTo(0)
-        cv.Cv2.Invert(src, dst1, cv.DecompTypes.LU)
-        Dim outstr = printMatrixResults(src, dst1)
+        Dim result As New cv.Mat
+        cv.Cv2.Invert(input, result, cv.DecompTypes.LU)
+        Dim outstr = printMatrixResults(input, result)
         ocvb.putText(New ActiveClass.TrueType(outstr, 10, 60, RESULT1))
     End Sub
 End Class

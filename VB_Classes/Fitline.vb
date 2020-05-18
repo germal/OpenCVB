@@ -121,7 +121,7 @@ Public Class Fitline_RawInput
 
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Highlight Line Data"
-        check.Box(1).Text = "Recompute with new random data"
+        check.Box(1).Text = "Demo mode (Recompute with new random data)"
         check.Box(0).Checked = True
         check.Box(1).Checked = True
 
@@ -129,6 +129,7 @@ Public Class Fitline_RawInput
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(1).Checked Or ocvb.frameCount = 0 Then
+            If ocvb.parms.testAllRunning = False Then check.Box(1).Checked = False
             dst1.SetTo(0)
             Dim dotSize = 2
             Dim w = ocvb.color.Width

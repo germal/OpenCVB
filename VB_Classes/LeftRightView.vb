@@ -42,7 +42,8 @@ Public Class LeftRightView_CompareUndistorted
 
         sliders.setupTrackBar1(ocvb, caller, "brightness", 0, 255, 0)
         sliders.setupTrackBar2(ocvb, caller, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar3(ocvb, caller, "Slice Height", 1, 300, 50)
+        sliders.setupTrackBar3(ocvb, caller, "Slice Height", 1, (colorRows - 100) / 2, 50)
+
         Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
                 label1 = "Left Image"
@@ -56,30 +57,25 @@ Public Class LeftRightView_CompareUndistorted
                 label2 = "Undistorted Right Image"
                 sliders.TrackBar1.Value = 50
         End Select
-        ocvb.desc = "Show slices of the left and right view next to each other for visual comparison"
+        ocvb.desc = "Show slices of the left and right view next to each other for visual comparison - right view needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim sliceY = sliders.TrackBar2.Value
         Dim slideHeight = sliders.TrackBar3.Value
         Dim leftInput As cv.Mat, rightInput As cv.Mat
         If ocvb.parms.cameraIndex = T265Camera Then
+            fisheye.src = src
             fisheye.Run(ocvb)
-            leftInput = fisheye.leftView.Clone()
-            rightInput = fisheye.rightView.Clone()
+            leftInput = fisheye.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            rightInput = fisheye.rightView
         Else
-            dst1 = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_8UC1, 0)
-            dst2 = ocvb.rightView
             leftInput = ocvb.leftView
             rightInput = ocvb.rightView
         End If
 
-        dst1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1, 0)
-        dst2 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1, 0)
+        dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC1, 0)
+        dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8UC1, 0)
 
-        If ocvb.parms.lowResolution Then
-            leftInput = leftInput.Resize(ocvb.color.Size())
-            rightInput = rightInput.Resize(ocvb.color.Size())
-        End If
         Dim rSrc = New cv.Rect(0, sliceY, leftInput.Width, slideHeight)
         leftInput(rSrc).CopyTo(dst1(New cv.Rect(0, 100, leftInput.Width, slideHeight)))
         rightInput(rSrc).CopyTo(dst1(New cv.Rect(0, 100 + slideHeight, leftInput.Width, slideHeight)))
@@ -101,9 +97,9 @@ Public Class LeftRightView_CompareRaw
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "brightness", 0, 255, 100)
         sliders.setupTrackBar2(ocvb, caller, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar3(ocvb, caller, "Slice Height", 1, 120, 50)
+        sliders.setupTrackBar3(ocvb, caller, "Slice Height", 1, (colorRows - 100) / 2, 50)
         Select Case ocvb.parms.cameraIndex
-            Case D400Cam, StereoLabsZED2
+            Case D400Cam, StereoLabsZED2, 
                 label1 = "Left Image"
                 label2 = "Right Image"
             Case Kinect4AzureCam
@@ -120,20 +116,19 @@ Public Class LeftRightView_CompareRaw
         ocvb.desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-
-        ocvb.leftView += sliders.TrackBar1.Value
-        ocvb.rightView += sliders.TrackBar1.Value
-
         lrView.Run(ocvb)
-        Dim leftView = dst1.Clone() ' we will be using result1 for output now.
+
+        dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, 0)
 
         Dim sliceY = sliders.TrackBar2.Value
         Dim slideHeight = sliders.TrackBar3.Value
-        leftView(New cv.Rect(0, sliceY, leftView.Width, slideHeight)).CopyTo(dst1(New cv.Rect(0, 100, leftView.Width, slideHeight)))
-        dst2(New cv.Rect(0, sliceY, leftView.Width, slideHeight)).CopyTo(dst1(New cv.Rect(0, 100 + slideHeight, leftView.Width, slideHeight)))
-        Dim rSrc = New cv.Rect(0, sliceY, leftView.Width, slideHeight)
-        leftView(rSrc).CopyTo(dst1(New cv.Rect(0, 100, leftView.Width, slideHeight)))
-        dst2(rSrc).CopyTo(dst1(New cv.Rect(0, 100 + slideHeight, leftView.Width, slideHeight)))
+        Dim r1 = New cv.Rect(0, sliceY, lrView.dst1.Width, slideHeight)
+        Dim r2 = New cv.Rect(0, 100, lrView.dst1.Width, slideHeight)
+        lrView.dst1(r1).CopyTo(dst1(r2))
+
+        r2.Y += slideHeight
+        lrView.dst2(r1).CopyTo(dst1(r2))
+        dst2 = lrView.dst2
     End Sub
 End Class
 
@@ -157,18 +152,19 @@ Public Class LeftRightView_Features
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         lrView.Run(ocvb)
-        Dim leftView = dst1.Clone()
-        Dim rightView = dst2.Clone()
 
-        features.gray = rightView.Clone()
+        features.gray = lrView.dst2
+        features.src = lrView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         features.Run(ocvb)
-        rightView.CopyTo(dst2) ' save the right image
+        lrView.dst2.CopyTo(dst2)
         For i = 0 To features.goodFeatures.Count - 1
             cv.Cv2.Circle(dst2, features.goodFeatures(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
-        features.gray = leftView
+        features.gray = lrView.dst1
+        features.src = lrView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         features.Run(ocvb)
+        lrView.dst1.CopyTo(dst1)
         For i = 0 To features.goodFeatures.Count - 1
             cv.Cv2.Circle(dst1, features.goodFeatures(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
@@ -193,18 +189,14 @@ Public Class LeftRightView_Palettized
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         lrView.Run(ocvb)
-        Dim left = dst1.Clone()
-        Dim right = dst2.Clone()
 
-        palette.src = dst1
+        palette.src = lrView.dst1
         palette.Run(ocvb)
-        left = dst1.Clone()
+        dst1 = palette.dst1
 
-        palette.src = right
+        palette.src = lrView.dst2
         palette.Run(ocvb)
-        dst2 = dst1
-
-        dst1 = left
+        dst2 = palette.dst1
     End Sub
 End Class
 
@@ -228,19 +220,13 @@ Public Class LeftRightView_BRISK
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         lrView.Run(ocvb)
-        brisk.src = dst2.Clone()
+        brisk.src = lrView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         brisk.Run(ocvb)
+        dst2 = brisk.dst1
 
-        For Each pt In brisk.features
-            dst2.Circle(pt, 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-        Next
-
-        brisk.src = dst1.Clone()
+        brisk.src = lrView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         brisk.Run(ocvb)
-
-        For Each pt In brisk.features
-            dst1.Circle(pt, 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-        Next
+        dst1 = brisk.dst1
     End Sub
 End Class
 

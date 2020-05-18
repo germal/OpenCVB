@@ -7,10 +7,11 @@ Public Class MatchTemplate_Basics
         Public matchText As String = ""
     Public correlationMat As New cv.Mat
     Public reportFreq = 10 ' report the results every x number of iterations.
+    Public matchOption As cv.TemplateMatchModes
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         flow = New Font_FlowText(ocvb, caller)
-        flow.result1or2 = RESULT2
+        flow.result1or2 = RESULT1
 
         radio.Setup(ocvb, caller, 6)
         radio.check(0).Text = "CCoeff"
@@ -21,7 +22,6 @@ Public Class MatchTemplate_Basics
         radio.check(5).Text = "SqDiffNormed"
         radio.check(1).Checked = True
         sliders.setupTrackBar1(ocvb, caller, "Sample Size", 2, 10000, 100)
-        label2 = "Log of correlation results"
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -34,12 +34,13 @@ Public Class MatchTemplate_Basics
             sliders.Visible = False
         End If
 
-        Dim matchOption = cv.TemplateMatchModes.CCoeffNormed
+        matchOption = cv.TemplateMatchModes.CCoeffNormed
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then
                 matchOption = Choose(i + 1, cv.TemplateMatchModes.CCoeff, cv.TemplateMatchModes.CCoeffNormed, cv.TemplateMatchModes.CCorr,
                                             cv.TemplateMatchModes.CCorrNormed, cv.TemplateMatchModes.SqDiff, cv.TemplateMatchModes.SqDiffNormed)
                 matchText = Choose(i + 1, "CCoeff", "CCoeffNormed", "CCorr", "CCorrNormed", "SqDiff", "SqDiffNormed")
+                Exit For
             End If
         Next
         cv.Cv2.MatchTemplate(sample1, sample2, correlationMat, matchOption)
@@ -47,7 +48,7 @@ Public Class MatchTemplate_Basics
             Dim correlation = correlationMat.Get(Of Single)(0, 0)
             label1 = "Correlation = " + Format(correlation, "#,##0.000")
             if standalone Then
-                label1 = matchText + " for " + CStr(sample1.Rows) + " samples each = " + Format(correlation, "#,##0.00")
+                label1 = matchText + " for " + CStr(sample1.Cols) + " samples = " + Format(correlation, "#,##0.00")
                 flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
                 flow.Run(ocvb)
             End If
@@ -65,7 +66,7 @@ Public Class MatchTemplate_RowCorrelation
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         flow = New Font_FlowText(ocvb, caller)
-        flow.result1or2 = RESULT2
+        flow.result1or2 = RESULT1
 
         corr = New MatchTemplate_Basics(ocvb, caller)
         corr.sliders.Visible = False
@@ -73,23 +74,26 @@ Public Class MatchTemplate_RowCorrelation
         ocvb.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim line1 = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
-        Dim line2 = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
+        Dim line1 = ocvb.ms_rng.Next(0, src.Height - 1)
+        Dim line2 = ocvb.ms_rng.Next(0, src.Height - 1)
 
-        Dim nextLine = dst1.Row(line1)
-        nextLine = ocvb.color.Row(line1)
-        nextLine = dst1.Row(line2)
-        nextLine = ocvb.color.Row(line2)
-
-        corr.sample1 = ocvb.color.Row(line1).Clone()
-        corr.sample2 = ocvb.color.Row(line2 + 1).Clone()
+        corr.sample1 = src.Row(line1)
+        corr.sample2 = src.Row(line2 + 1)
         corr.Run(ocvb)
         Dim correlation = corr.correlationMat.Get(Of Single)(0, 0)
         flow.msgs.Add(corr.matchText + " between lines " + CStr(line1) + " and line " + CStr(line2) + " = " + Format(correlation, "#,##0.00"))
         flow.Run(ocvb)
 
-        Static minCorrelation = Single.PositiveInfinity
-        Static maxCorrelation = Single.NegativeInfinity
+        Static minCorrelation As Single
+        Static maxCorrelation As Single
+
+        Static saveCorrType = corr.matchOption
+        If ocvb.frameCount = 0 Or saveCorrType <> corr.matchOption Then
+            minCorrelation = Single.PositiveInfinity
+            maxCorrelation = Single.NegativeInfinity
+            saveCorrType = corr.matchOption
+        End If
+
         If correlation < minCorrelation Then minCorrelation = correlation
         If correlation > maxCorrelation Then maxCorrelation = correlation
         label1 = "Min = " + Format(minCorrelation, "#,##0.00") + " max = " + Format(maxCorrelation, "#,##0.0000")
@@ -119,10 +123,10 @@ Public Class MatchTemplate_DrawRect
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
-            If ocvb.drawRect.X + ocvb.drawRect.Width >= ocvb.color.Width Then ocvb.drawRect.Width = ocvb.color.Width - ocvb.drawRect.X
-            If ocvb.drawRect.Y + ocvb.drawRect.Height >= ocvb.color.Height Then ocvb.drawRect.Height = ocvb.color.Height - ocvb.drawRect.Y
+            If ocvb.drawRect.X + ocvb.drawRect.Width >= src.Width Then ocvb.drawRect.Width = src.Width - ocvb.drawRect.X
+            If ocvb.drawRect.Y + ocvb.drawRect.Height >= src.Height Then ocvb.drawRect.Height = src.Height - ocvb.drawRect.Y
             saveRect = ocvb.drawRect
-            saveTemplate = ocvb.color(ocvb.drawRect).Clone()
+            saveTemplate = src(ocvb.drawRect).Clone()
             ocvb.drawRectClear = True
         End If
         Dim matchMethod As cv.TemplateMatchModes
@@ -170,7 +174,7 @@ Public Class MatchTemplate_BestEntropy_MT
             ocvb.drawRect = entropy.bestContrast
         End If
 
-        match.src = src ' ocvb.drawrect is the input showing the highest entropy.
+        match.src = src
         match.Run(ocvb)
         dst1 = match.dst1
         dst2 = match.dst2

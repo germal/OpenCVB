@@ -9,9 +9,9 @@ Public Class Math_Subtract
         ocvb.desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim tmp = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3)
+        Dim tmp = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         tmp.SetTo(New cv.Scalar(sliders.TrackBar3.Value, sliders.TrackBar2.Value, sliders.TrackBar1.Value))
-        cv.Cv2.Subtract(tmp, ocvb.color, dst1)
+        cv.Cv2.Subtract(tmp, src, dst1)
     End Sub
 End Class
 
@@ -55,22 +55,22 @@ Public Class Math_Median_CDF
         ocvb.desc = "Compute the src image median"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then
-            bins = sliders.TrackBar1.Value
-            src = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        End If
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If standalone Then bins = sliders.TrackBar1.Value
 
         medianVal = computeMedian(src, New cv.Mat, bins, rangeMin, rangeMax)
 
-        if standalone Then
+        If standalone Then
             Dim mask = New cv.Mat
             mask = src.GreaterThan(medianVal)
-            ocvb.color.CopyTo(dst1, mask)
+
+            dst1.SetTo(0)
+            src.CopyTo(dst1, mask)
             label1 = "Grayscale pixels > " + Format(medianVal, "#0.0")
 
             cv.Cv2.BitwiseNot(mask, mask)
-            dst2 = ocvb.Color.EmptyClone.SetTo(0)
-            ocvb.color.CopyTo(dst2, mask) ' show the other half.
+            dst2.SetTo(0)
+            src.CopyTo(dst2, mask) ' show the other half.
             label2 = "Grayscale pixels < " + Format(medianVal, "#0.0")
         End If
     End Sub
@@ -86,15 +86,20 @@ Public Class Math_DepthMeanStdev
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         minMax = New Depth_Stable(ocvb, caller)
-        ocvb.desc = "This algorithm shows that just using the max depth at each pixel does not improve depth!  Mean and stdev don't change."
+        ocvb.desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        minMax.src = src
         minMax.Run(ocvb)
         Dim mean As Single = 0, stdev As Single = 0
-        Dim mask = dst2 ' the mask for stable depth.
+        Dim mask = minMax.dst2 ' the mask for stable depth.
+        dst2.SetTo(0)
+        ocvb.RGBDepth.CopyTo(dst2, mask)
         Dim depth32f = getDepth32f(ocvb)
         cv.Cv2.MeanStdDev(depth32f, mean, stdev, mask)
         label2 = "stablized depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
+
+        dst1 = ocvb.RGBDepth
         cv.Cv2.MeanStdDev(depth32f, mean, stdev)
         label1 = "raw depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
     End Sub
@@ -111,7 +116,7 @@ Public Class Math_RGBCorrelation
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         flow = New Font_FlowText(ocvb, caller)
-        flow.result1or2 = RESULT2
+        flow.result1or2 = RESULT1
 
         corr = New MatchTemplate_Basics(ocvb, caller)
         corr.reportFreq = 1
@@ -119,25 +124,24 @@ Public Class Math_RGBCorrelation
         ocvb.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim split = ocvb.color.Split()
+        Dim split = src.Split()
         corr.sample1 = split(0)
         corr.sample2 = split(1)
         corr.Run(ocvb)
-        Dim blueGreenCorrelation = "Blue-Green " + ocvb.label1
+        Dim blueGreenCorrelation = "Blue-Green " + corr.label1
 
         corr.sample1 = split(2)
         corr.sample2 = split(1)
         corr.Run(ocvb)
-        Dim redGreenCorrelation = "Red-Green " + ocvb.label1
+        Dim redGreenCorrelation = "Red-Green " + corr.label1
 
         corr.sample1 = split(2)
         corr.sample2 = split(0)
         corr.Run(ocvb)
-        Dim redBlueCorrelation = "Red-Blue " + ocvb.label1
+        Dim redBlueCorrelation = "Red-Blue " + corr.label1
 
         flow.msgs.Add(blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation)
         flow.Run(ocvb)
-        label1 = ""
-        label2 = "Log of " + corr.matchText
+        label1 = "Log of " + corr.matchText
     End Sub
 End Class

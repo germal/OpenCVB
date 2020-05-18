@@ -79,6 +79,9 @@ Public Class knn_Cluster2D
         knn.sliders.Visible = False
 
         sliders.setupTrackBar1(ocvb, caller, "knn - number of cities", 10, 1000, 100)
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Demo Mode (continuous update)"
+        If ocvb.parms.testAllRunning Then check.Box(0).Checked = True
 
         label1 = ""
         label2 = ""
@@ -129,7 +132,7 @@ Public Class knn_Cluster2D
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ' If they changed Then number of elements in the set
-        If sliders.TrackBar1.Value <> numberofCities Then
+        If sliders.TrackBar1.Value <> numberofCities Or check.Box(0).Checked Then
             numberofCities = sliders.TrackBar1.Value
             knn.findXnearest = numberofCities
 
@@ -139,8 +142,8 @@ Public Class knn_Cluster2D
             Dim gen As New System.Random()
             Dim r As New cv.RNG(gen.Next(0, 1000000))
             For i = 0 To numberofCities - 1
-                cityPositions(i).X = r.Uniform(0, ocvb.color.Width)
-                cityPositions(i).Y = r.Uniform(0, ocvb.color.Height)
+                cityPositions(i).X = r.Uniform(0, src.Width)
+                cityPositions(i).Y = r.Uniform(0, src.Height)
             Next
 
             ' find the nearest neighbor for each city - first will be the current city, next will be nearest real neighbors in order
@@ -151,6 +154,9 @@ Public Class knn_Cluster2D
                 knn.querySet(i) = New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y))
             Next
             knn.Run(ocvb) ' run only one time.
+            dst1.SetTo(0)
+            totalClusters = 0
+            closedRegions = 0
             cluster(ocvb.rColors, dst1)
             label1 = "knn clusters total=" + CStr(totalClusters) + " closedRegions=" + CStr(closedRegions)
         End If
@@ -167,7 +173,8 @@ Public Class knn_Point2d
     Public querySet() As cv.Point2f
     Public responseSet() As Int32
     Public lastSet() As cv.Point2f ' default usage: find and connect points in 2D for this number of points.
-        Public findXnearest As Int32
+    Public findXnearest As Int32
+    Dim knn As cv.ML.KNearest
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "knn Query Points", 1, 50, 10)
@@ -175,9 +182,9 @@ Public Class knn_Point2d
 
         ocvb.desc = "Use KNN to connect 2D points."
         label1 = "Yellow=Queries, Blue=Best Responses"
+        knn = cv.ML.KNearest.Create()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim knn = cv.ML.KNearest.Create()
         If standalone Then
             ReDim lastSet(sliders.TrackBar1.Value - 1)
             ReDim querySet(sliders.TrackBar1.Value - 1)
@@ -198,13 +205,14 @@ Public Class knn_Point2d
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, New cv.Mat(responses.Length, 1, cv.MatType.CV_32S, responses))
 
         Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
-        if standalone Then
+        dst1.SetTo(0)
+        If standalone Then
             For i = 0 To lastSet.Count - 1
                 cv.Cv2.Circle(dst1, lastSet(i), 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
             Next
         End If
 
-        if standalone Then findXnearest = sliders.TrackBar2.Value
+        If standalone Then findXnearest = sliders.TrackBar2.Value
         ReDim responseSet(querySet.Length * findXnearest - 1)
         For i = 0 To querySet.Count - 1
             query.Set(Of cv.Point2f)(0, 0, querySet(i))
@@ -266,10 +274,12 @@ Public Class knn_Point3d
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, New cv.Mat(responses.Length, 1, cv.MatType.CV_32S, responses))
 
         Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
+        dst1.SetTo(0)
+        dst2.SetTo(0)
         For i = 0 To lastSet.Count - 1
             Dim p = New cv.Point2f(lastSet(i).X, lastSet(i).Y)
             dst1.Circle(p, 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-            p = New cv.Point2f(lastSet(i).X, lastSet(i).Z * ocvb.color.Rows / maxDepth)
+            p = New cv.Point2f(lastSet(i).X, lastSet(i).Z * src.Rows / maxDepth)
             dst2.Circle(p, 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
         Next
 
@@ -288,8 +298,8 @@ Public Class knn_Point3d
                     dst1.Line(plast, pQ, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                     dst1.Circle(pQ, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
 
-                    plast = New cv.Point2f(lastSet(responseSet(i * findXnearest + j)).X, lastSet(responseSet(i * findXnearest + j)).Z * ocvb.color.Rows / maxDepth)
-                    pQ = New cv.Point2f(querySet(i).X, querySet(i).Z * ocvb.color.Rows / maxDepth)
+                    plast = New cv.Point2f(lastSet(responseSet(i * findXnearest + j)).X, lastSet(responseSet(i * findXnearest + j)).Z * src.Rows / maxDepth)
+                    pQ = New cv.Point2f(querySet(i).X, querySet(i).Z * src.Rows / maxDepth)
                     dst2.Line(plast, pQ, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                     dst2.Circle(pQ, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
                 Next
@@ -322,17 +332,18 @@ Public Class knn_ClusterNoisyLine
         Static linePointCount As Int32
         Static lineNoise As Int32
         Static highlight As Boolean
-        ' If they changed Then number of elements in the set or options, then recompute...
+        ' If the number of elements in the set changes, then recompute...
         If (noisyLine.sliders.TrackBar1.Value + noisyLine.sliders.TrackBar2.Value) <> numberofCities Or noisyLine.sliders.TrackBar3.Value <> lineNoise Or
             noisyLine.check.Box(0).Checked <> highlight Or noisyLine.check.Box(1).Checked = True Then
 
             linePointCount = noisyLine.sliders.TrackBar2.Value
             lineNoise = noisyLine.sliders.TrackBar3.Value
             highlight = noisyLine.check.Box(0).Checked
-            noisyLine.check.Box(1).Checked = False
+            noisyLine.check.Box(1).Checked = True
             numberofCities = noisyLine.sliders.TrackBar1.Value + linePointCount
             ReDim cityOrder(numberofCities - 1)
             noisyLine.Run(ocvb)
+            dst1 = noisyLine.dst1
 
             knn.findXnearest = findXnearest
 
@@ -344,7 +355,7 @@ Public Class knn_ClusterNoisyLine
                 knn.querySet(i) = noisyLine.points(i)
             Next
             knn.Run(ocvb) ' run only one time.
-            dst2 = ocvb.Color.EmptyClone.SetTo(0)
+            dst2.SetTo(0)
             For i = 0 To numberofCities - 1
                 Dim nearestCity = knn.responseSet(i * knn.findXnearest + 1)
                 cityOrder(i) = nearestCity
