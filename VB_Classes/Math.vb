@@ -18,22 +18,20 @@ End Class
 
 
 Module Math_Functions
-    Public Function computeMedian(src As cv.Mat, mask As cv.Mat, bins As Int32, rangeMin As Single, rangeMax As Single) As Double
+    Public Function computeMedian(src As cv.Mat, mask As cv.Mat, totalPixels As Integer, bins As Int32, rangeMin As Single, rangeMax As Single) As Double
         Dim dimensions() = New Integer() {bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(rangeMin, rangeMax)}
 
         Dim hist As New cv.Mat()
         cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, mask, hist, 1, dimensions, ranges)
-        Dim totalPixels = mask.CountNonZero()
-        If totalPixels = 0 Then totalPixels = src.Total
         Dim halfPixels = totalPixels / 2
 
         Dim median As Double
         Dim cdfVal As Double = hist.Get(Of Single)(0)
         For i = 1 To bins - 1
             cdfVal += hist.Get(Of Single)(i)
-            If cdfVal > halfPixels Then
-                median = i * (rangeMax - rangeMin) / bins
+            If cdfVal >= halfPixels Then
+                median = (rangeMax - rangeMin) * i / bins
                 Exit For
             End If
         Next
@@ -58,7 +56,7 @@ Public Class Math_Median_CDF
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standalone Then bins = sliders.TrackBar1.Value
 
-        medianVal = computeMedian(src, New cv.Mat, bins, rangeMin, rangeMax)
+        medianVal = computeMedian(src, New cv.Mat, src.Total, bins, rangeMin, rangeMax)
 
         If standalone Then
             Dim mask = New cv.Mat

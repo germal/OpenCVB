@@ -37,7 +37,7 @@ Public Class OpenCVGL_Image_CPP
             sliders.TrackBar3.Value = 0 ' pitch
             sliders.TrackBar4.Value = 0 ' roll
 
-            OpenCVGL_Image_Open(ocvb.color.Width, ocvb.color.Height)
+            OpenCVGL_Image_Open(colorCols, colorRows)
         End If
         ocvb.desc = "Use the OpenCV implementation of OpenGL to render a 3D image with depth."
     End Sub
@@ -65,16 +65,16 @@ Public Class OpenCVGL_Image_CPP
         Dim zTrans = sliders1.TrackBar4.Value / 100
 
         OpenCVGL_Image_Control(ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy,
-                               FOV, zNear, zFar, eye, yaw, roll, pitch, pointSize, zTrans, ocvb.color.Width, ocvb.color.Height)
+                               FOV, zNear, zFar, eye, yaw, roll, pitch, pointSize, zTrans, src.Width, src.Height)
 
         Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
-        If rgbData.Length <> ocvb.color.Total * ocvb.color.ElemSize Then ReDim rgbData(ocvb.color.Total * ocvb.color.ElemSize - 1)
+        If rgbData.Length <> src.Total * src.ElemSize Then ReDim rgbData(src.Total * src.ElemSize - 1)
         If pointCloudData.Length <> pcSize Then ReDim pointCloudData(pcSize - 1)
-        Marshal.Copy(ocvb.color.Data, rgbData, 0, rgbData.Length)
+        Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
         Marshal.Copy(ocvb.pointCloud.Data, pointCloudData, 0, pcSize)
         Dim handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned)
         Dim handlePointCloud = GCHandle.Alloc(pointCloudData, GCHandleType.Pinned)
-        OpenCVGL_Image_Run(handleRGB.AddrOfPinnedObject(), handlePointCloud.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols)
+        OpenCVGL_Image_Run(handleRGB.AddrOfPinnedObject(), handlePointCloud.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleRGB.Free()
         handlePointCloud.Free()
     End Sub

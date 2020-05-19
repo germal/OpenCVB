@@ -26,6 +26,7 @@ Public Class Voxels_Basics_MT
         ocvb.desc = "Use multi-threading to get median depth values as voxels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        trim.src = src
         trim.Run(ocvb)
         minDepth = trim.sliders.TrackBar1.Value
         maxDepth = trim.sliders.TrackBar2.Value
@@ -39,29 +40,32 @@ Public Class Voxels_Basics_MT
         End If
 
         Dim bins = sliders.TrackBar1.Value
-        Dim gridCount = grid.roiList.Count
         Dim depth32f = getDepth32f(ocvb)
-        Parallel.For(0, gridCount,
-        Sub(i)
+        'Parallel.For(0, grid.roiList.Count,
+        'Sub(i)
+        For i = 0 To grid.roiList.Count - 1
             Dim roi = grid.roiList(i)
-            If depth32f(roi).CountNonZero() Then
-                voxels(i) = computeMedian(depth32f(roi), trim.Mask(roi), bins, minDepth, maxDepth)
+            Dim count = trim.Mask(roi).CountNonZero()
+            If count > 0 Then
+                voxels(i) = computeMedian(depth32f(roi), trim.Mask(roi), count, bins, minDepth, maxDepth)
             Else
                 voxels(i) = 0
             End If
-        End Sub)
-        voxelMat = New cv.Mat(voxels.Length - 1, 1, cv.MatType.CV_64F, voxels)
+        Next
+
+        'End Sub)
+        voxelMat = New cv.Mat(voxels.Length, 1, cv.MatType.CV_64F, voxels)
         voxelMat *= 255 / (maxDepth - minDepth) ' do the normalize manually to use the min and max Depth (more stable image)
         If check.Box(0).Checked Then ' do they want to display results?
             dst1 = ocvb.RGBDepth.Clone()
             dst1.SetTo(cv.Scalar.White, grid.gridMask)
             Dim nearColor = cv.Scalar.Yellow
             Dim farColor = cv.Scalar.Blue
-            dst2 = ocvb.Color.EmptyClone.SetTo(0)
-            Parallel.For(0, gridCount,
+            dst2.SetTo(0)
+                Parallel.For(0, grid.roiList.Count,
             Sub(i)
                 Dim roi = grid.roiList(i)
-                Dim v = voxelMat.Get(Of Double)(i)
+                Dim v = voxels(i)
                 If v > 0 And v < 256 Then
                     Dim color = New cv.Scalar(((256 - v) * nearColor(0) + v * farColor(0)) >> 8,
                                               ((256 - v) * nearColor(1) + v * farColor(1)) >> 8,
@@ -69,6 +73,6 @@ Public Class Voxels_Basics_MT
                     dst2(roi).SetTo(color, trim.Mask(roi))
                 End If
             End Sub)
-        End If
+            End If
     End Sub
 End Class

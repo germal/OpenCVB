@@ -9,7 +9,10 @@ Public Class OilPaint_Pointilism
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Stroke Scale", 1, 5, 3)
         sliders.setupTrackBar2(ocvb, caller, "Smoothing Radius", 0, 100, 32)
-        Application.DoEvents() ' because the rest of initialization takes so long, let the show take effect.
+        radio.Setup(ocvb, caller, 2)
+        radio.check(0).Text = "Use Elliptical stroke"
+        radio.check(1).Text = "Use Circular stroke"
+        radio.check(1).Checked = True
 
         ocvb.drawRect = New cv.Rect(colorCols * 3 / 8, colorRows * 3 / 8, colorCols * 2 / 8, colorRows * 2 / 8)
         ocvb.desc = "Alter the image to effect the pointilism style - Painterly Effect"
@@ -44,13 +47,12 @@ Public Class OilPaint_Pointilism
         Dim smoothingRadius = sliders.TrackBar2.Value * 2 + 1
         cv.Cv2.GaussianBlur(fieldx, fieldx, New cv.Size(smoothingRadius, smoothingRadius), 0, 0)
         cv.Cv2.GaussianBlur(fieldy, fieldy, New cv.Size(smoothingRadius, smoothingRadius), 0, 0)
-        cv.Cv2.ImShow("src", src)
 
         Dim strokeSize = sliders.TrackBar1.Value
-        img.SetTo(0)
         For y = 0 To img.Height - 1
             For x = 0 To img.Width - 1
                 Dim nPt = rand.Get(Of cv.Point)(y, x)
+                Dim nextColor = src.Get(Of cv.Vec3b)(saveDrawRect.Y + nPt.Y, saveDrawRect.X + nPt.X)
                 Dim fx = fieldx(saveDrawRect).Get(Of Single)(nPt.Y, nPt.X)
                 Dim fy = fieldy(saveDrawRect).Get(Of Single)(nPt.Y, nPt.X)
                 Dim nPoint = New cv.Point2f(nPt.X, nPt.Y)
@@ -59,10 +61,13 @@ Public Class OilPaint_Pointilism
                 Dim eSize = New cv.Size2f(slen, strokeSize)
                 Dim direction = Math.Atan2(fx, fy)
                 Dim angle = direction * 180.0 / Math.PI + 90
-                Dim nextColor = src.Get(Of cv.Vec3b)(saveDrawRect.Y + nPt.Y, saveDrawRect.X + nPt.X)
 
                 Dim rotatedRect = New cv.RotatedRect(nPoint, eSize, angle)
-                dst1(saveDrawRect).Ellipse(rotatedRect, nextColor, -1, cv.LineTypes.AntiAlias)
+                If radio.check(0).Checked Then
+                    dst1(saveDrawRect).Ellipse(rotatedRect, nextColor, -1, cv.LineTypes.AntiAlias)
+                Else
+                    dst1(saveDrawRect).Circle(nPoint, slen / 4, nextColor, -1, cv.LineTypes.AntiAlias)
+                End If
             Next
         Next
     End Sub

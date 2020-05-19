@@ -17,7 +17,6 @@ Public Class OpenGL_Basics
     Dim pointCloudBuffer(0) As Byte
     Public memMapValues(49) As Double ' more than needed - buffer for growth.
     Public pointSize As Int32 = 2
-    Public rgbInput As New cv.Mat
     Public dataInput As New cv.Mat
     Public FOV As Single = 150
     Public yaw As Single = 0
@@ -32,10 +31,9 @@ Public Class OpenGL_Basics
     Public imageLabel As String
     Public imu As IMU_GVector
     Public pointCloudInput As New cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         imu = New IMU_GVector(ocvb, caller)
-        ' Dispose() ' make sure there wasn't an old OpenGLWindow sitting around...
         ocvb.desc = "Create an OpenGL window and update it with images"
     End Sub
     Private Sub memMapUpdate(ocvb As AlgorithmData)
@@ -45,11 +43,10 @@ Public Class OpenGL_Basics
             timeConversionUnits = 1000 * 1000
             imuAlphaFactor = 0.99
         End If
-        ' setup the memory mapped area and initialize the intrinsicsLeft needed to convert imageXYZ to worldXYZ and for command/control of the interface.
         For i = 0 To memMapValues.Length - 1
             ' only change this if you are changing the data in the OpenGL C++ code at the same time...
             memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy, ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy,
-                                                rgbInput.Width, rgbInput.Height, rgbInput.ElemSize * rgbInput.Total,
+                                                src.Width, src.Height, src.ElemSize * src.Total,
                                                 dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
                                                 ocvb.parms.IMU_AngularVelocity.X, ocvb.parms.IMU_AngularVelocity.Y, ocvb.parms.IMU_AngularVelocity.Z,
                                                 ocvb.parms.IMU_Acceleration.X, ocvb.parms.IMU_Acceleration.Y, ocvb.parms.IMU_Acceleration.Z, ocvb.parms.IMU_TimeStamp,
@@ -98,8 +95,7 @@ Public Class OpenGL_Basics
             End If
         End If
 
-        If rgbInput.Width = 0 Then rgbInput = ocvb.color
-        Dim rgb = rgbInput.CvtColor(cv.ColorConversionCodes.BGR2RGB) ' OpenGL needs RGB, not BGR
+        Dim rgb = src.CvtColor(cv.ColorConversionCodes.BGR2RGB) ' OpenGL needs RGB, not BGR
         If rgbBuffer.Length <> rgb.Total * rgb.ElemSize Then ReDim rgbBuffer(rgb.Total * rgb.ElemSize - 1)
         If dataBuffer.Length <> dataInput.Total * dataInput.ElemSize Then ReDim dataBuffer(dataInput.Total * dataInput.ElemSize - 1)
         memMapUpdate(ocvb)
@@ -190,6 +186,8 @@ Public Class OpenGL_Options
         OpenGL.scaleXYZ.Item1 = sliders3.TrackBar2.Value
         OpenGL.scaleXYZ.Item2 = sliders3.TrackBar3.Value
 
+        OpenGL.src = src
+        OpenGL.pointCloudInput = ocvb.pointCloud
         OpenGL.Run(ocvb)
     End Sub
 End Class
@@ -207,7 +205,8 @@ Public Class OpenGL_Callbacks
         ocvb.desc = "Show the point cloud of 3D data and use callbacks to modify view."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ogl.rgbInput = ocvb.color
+        ogl.src = src
+        ogl.pointCloudInput = ocvb.pointCloud
         ogl.Run(ocvb)
     End Sub
 End Class
@@ -233,6 +232,7 @@ Public Class OpenGL_IMU
     Public Sub Run(ocvb As AlgorithmData)
         ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
         If ocvb.parms.IMU_Present Then
+            ogl.src = src
             ogl.Run(ocvb) ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
         Else
             ocvb.putText(New ActiveClass.TrueType("No IMU present on this RealSense device", 20, 100))
@@ -273,7 +273,7 @@ Public Class OpenGL_3Ddata
         colors.color1 = cv.Scalar.Yellow
         colors.color2 = cv.Scalar.Blue
         colors.Run(ocvb)
-        ogl.OpenGL.rgbInput = dst1.Clone() ' only need to set this once.
+        ogl.OpenGL.src = dst1.Clone() ' only need to set this once.
 
         label1 = "Input to Histogram 3D"
         ocvb.desc = "Plot the results of a 3D histogram in OpenGL."
@@ -281,11 +281,11 @@ Public Class OpenGL_3Ddata
     Public Sub Run(ocvb As AlgorithmData)
         Dim bins = sliders.TrackBar1.Value
 
-        If histInput Is Nothing Then ReDim histInput(ocvb.color.Total * ocvb.color.ElemSize - 1)
-        Marshal.Copy(ocvb.color.Data, histInput, 0, histInput.Length)
+        If histInput Is Nothing Then ReDim histInput(src.Total * src.ElemSize - 1)
+        Marshal.Copy(src.Data, histInput, 0, histInput.Length)
 
         Dim handleRGB = GCHandle.Alloc(histInput, GCHandleType.Pinned) ' and pin it as well
-        Dim dstPtr = Histogram_3D_RGB(handleRGB.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols, bins)
+        Dim dstPtr = Histogram_3D_RGB(handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols, bins)
         handleRGB.Free() ' free the pinned memory...
         Dim dstData(bins * bins * bins - 1) As Single
         Marshal.Copy(dstPtr, dstData, 0, dstData.Length)
@@ -293,6 +293,7 @@ Public Class OpenGL_3Ddata
         histogram = histogram.Normalize(255)
 
         ogl.OpenGL.dataInput = histogram.Clone()
+        ogl.src = src
         ogl.Run(ocvb)
     End Sub
 End Class
@@ -324,7 +325,8 @@ Public Class OpenGL_Draw3D
         circle.Run(ocvb)
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ogl.OpenGL.dataInput = dst2
-        ogl.OpenGL.rgbInput = New cv.Mat(1, ocvb.rColors.Length - 1, cv.MatType.CV_8UC3, ocvb.rColors.ToArray)
+        ogl.OpenGL.src = New cv.Mat(1, ocvb.rColors.Length - 1, cv.MatType.CV_8UC3, ocvb.rColors.ToArray)
+        ogl.src = src
         ogl.Run(ocvb)
     End Sub
 End Class
@@ -347,10 +349,12 @@ Public Class OpenGL_Voxels
         ocvb.desc = "Show the voxel representation in OpenGL"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        voxels.src = src
         voxels.Run(ocvb)
 
         ogl.dataInput = New cv.Mat(voxels.grid.tilesPerCol, voxels.grid.tilesPerRow, cv.MatType.CV_64F, voxels.voxels)
         ogl.dataInput *= 1 / (voxels.maxDepth - voxels.minDepth)
+        ogl.src = src
         ogl.Run(ocvb)
     End Sub
 End Class
@@ -423,7 +427,7 @@ Public Class OpenGL_GravityTransform
         End Select
         cv.Cv2.Merge(vertSplit, ogl.pointCloudInput)
 
-        ogl.rgbInput = ocvb.color
+        ogl.src = src
         ogl.Run(ocvb)
         If ocvb.frameCount Mod 30 = 0 Then rotateFlag += 1
     End Sub
