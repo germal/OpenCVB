@@ -9,7 +9,7 @@ Public Class Object_Basics
 
         ccomp = New CComp_ColorDepth(ocvb, caller)
 
-        label1 = "Connected components for objects in the foreground"
+        label1 = "Connected components for objects in the foreground - tracker algorithm"
         label2 = "Mask for background"
         ocvb.desc = "Identify objects in the foreground."
     End Sub

@@ -16,6 +16,7 @@ Public Class ocvbClass : Implements IDisposable
     Public dst2 As New cv.Mat
     Public label1 As String
     Public label2 As String
+    Public myRNG As New cv.RNG
     Dim algorithm As Object
     Public Sub setCaller(callerRaw As String)
         If callerRaw = "" Or callerRaw = Me.GetType.Name Then

@@ -44,7 +44,6 @@ Public Class Random_Shuffle
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.RGBDepth.CopyTo(dst1)
-        Dim myRNG As New cv.RNG
         cv.Cv2.RandShuffle(dst1, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
         label1 = "Random_shuffle - wave at camera"
     End Sub

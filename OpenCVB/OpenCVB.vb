@@ -795,15 +795,16 @@ Public Class OpenCVB
             totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
             If totalBytesOfMemoryUsed > 4000 Then MsgBox("OpenCVB appears to have a memory leak in the current algorithm" + vbCrLf +
                                                          "The memory footprint has grown above 2Gb which is way more than expected.")
-            If frameCount > 10 Then
+            Static myFrames As Integer = 0
+            If myFrames > 10 Then
                 For i = 0 To 4 - 1
                     Dim m = Choose(i + 1, camera.color, camera.rgbdepth, camera.depth16, camera.pointcloud)
                     If m.width = 0 Or m.height = 0 Then
                         MsgBox("Restart camera - it failed to provide " + Choose(i + 1, "color", "RGBDepth", "Depth16", "Pointcloud") + " image")
-                        End
                     End If
                 Next
             End If
+            myFrames += 1
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
         camera.frameCount = 0
