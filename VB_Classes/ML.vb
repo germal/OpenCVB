@@ -65,8 +65,8 @@ Public Class ML_FillRGBDepth_MT
         setCaller(callerRaw)
         colorizer = New Depth_Colorizer_CPP(ocvb, caller)
         grid = New Thread_Grid(ocvb, caller)
-        grid.sliders.TrackBar1.Value = ocvb.color.Width / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
-        grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
+        grid.sliders.TrackBar1.Value = colorCols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
+        grid.sliders.TrackBar2.Value = colorRows / 4
         shadow = New Depth_Holes(ocvb, caller)
         label1 = "ML filled shadow"
         label2 = ""
@@ -79,7 +79,7 @@ Public Class ML_FillRGBDepth_MT
         Dim minLearnCount = 5
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
             Sub(roi)
-                depth32f(roi) = detectAndFillShadow(shadow.holeMask(roi), shadow.borderMask(roi), depth32f(roi), ocvb.color(roi), minLearnCount)
+                depth32f(roi) = detectAndFillShadow(shadow.holeMask(roi), shadow.borderMask(roi), depth32f(roi), src(roi), minLearnCount)
             End Sub)
 
         colorizer.src = depth32f
@@ -111,7 +111,7 @@ Public Class ML_FillRGBDepth
         Dim minLearnCount = sliders.TrackBar1.Value
         ocvb.RGBDepth.CopyTo(dst1)
         Dim depth32f = getDepth32f(ocvb)
-        depth32f = detectAndFillShadow(shadow.holeMask, shadow.borderMask, depth32f, ocvb.color, minLearnCount)
+        depth32f = detectAndFillShadow(shadow.holeMask, shadow.borderMask, depth32f, src, minLearnCount)
         colorizer.src = depth32f
         colorizer.Run(ocvb)
         dst2 = colorizer.dst1
@@ -158,7 +158,7 @@ Public Class ML_DepthFromColor_MT
         dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat
-        ocvb.color.ConvertTo(color32f, cv.MatType.CV_32FC3)
+        src.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim predictedRegions As Int32
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
             Sub(roi)
@@ -212,7 +212,7 @@ Public Class ML_DepthFromColor
 
         Dim color32f As New cv.Mat
 
-        resized.src = ocvb.color.Clone()
+        resized.src = src
         resized.Run(ocvb)
 
         Dim colorROI As New cv.Rect(0, 0, resized.resizeOptions.newSize.Width, resized.resizeOptions.newSize.Height)
@@ -243,11 +243,11 @@ Public Class ML_DepthFromColor
         Dim rtree = cv.ML.RTrees.Create()
         rtree.Train(learnInput, cv.ML.SampleTypes.RowSample, depthResponse)
 
-        ocvb.color.ConvertTo(color32f, cv.MatType.CV_32FC3)
+        src.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim input = color32f.Reshape(1, color32f.Total) ' test the entire original image.
         Dim output As New cv.Mat
         rtree.Predict(input, output)
-        Dim predictedDepth = output.Reshape(1, ocvb.color.Height)
+        Dim predictedDepth = output.Reshape(1, src.Height)
 
         colorizer.src = predictedDepth
         colorizer.Run(ocvb)
@@ -290,7 +290,7 @@ Public Class ML_DepthFromXYColor
 
         Dim color32f As New cv.Mat
 
-        resized.src = ocvb.color.Clone()
+        resized.src = src.Clone()
         resized.Run(ocvb)
 
         Dim colorROI As New cv.Rect(0, 0, resized.resizeOptions.newSize.Width, resized.resizeOptions.newSize.Height)
@@ -330,7 +330,7 @@ Public Class ML_DepthFromXYColor
         Dim rtree = cv.ML.RTrees.Create()
         rtree.Train(learnInput, cv.ML.SampleTypes.RowSample, depthResponse)
 
-        ocvb.color.ConvertTo(color32f, cv.MatType.CV_32FC3)
+        src.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim allC = color32f.Reshape(1, color32f.Total) ' test the entire original image.
         Dim input As New cv.Mat(allC.Rows, 6, cv.MatType.CV_32F, 0)
         For y = 0 To allC.Rows - 1
@@ -342,7 +342,7 @@ Public Class ML_DepthFromXYColor
 
         Dim output As New cv.Mat
         rtree.Predict(input, output)
-        Dim predictedDepth = output.Reshape(1, ocvb.color.Height)
+        Dim predictedDepth = output.Reshape(1, src.Height)
 
         colorizer.src = predictedDepth
         colorizer.Run(ocvb)
@@ -395,7 +395,7 @@ Public Class ML_EdgeDepth
         dst1 = dilate.src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat
-        ocvb.color.ConvertTo(color32f, cv.MatType.CV_32FC3)
+        src.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim predictedRegions As Int32
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
             Sub(roi)

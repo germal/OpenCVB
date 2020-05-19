@@ -10,6 +10,7 @@ Module IndexMain
     Dim PYStreamNames As New SortedList(Of String, String)
     Dim Painterly As New SortedList(Of String, String)
     Dim MoreWork As New SortedList(Of String, String)
+    Dim Trackers As New SortedList(Of String, String)
     Private Function trimQuotes(line As String)
         While InStr(line, """")
             Dim startq = InStr(line, """")
@@ -80,6 +81,7 @@ Module IndexMain
                 ' when the classification source is ocvb.desc, it may be there twice in the code accidently.
                 If lcaseLine.Contains("painterly") And Painterly.ContainsKey(classname) = False Then Painterly.Add(classname, classname)
                 If lcaseLine.Contains("more work needed") And MoreWork.ContainsKey(classname) = False Then MoreWork.Add(classname, classname)
+                If lcaseLine.EndsWith("tracker algorithm") And Trackers.ContainsKey(classname) = False Then Trackers.Add(classname, classname)
                 If LCase(line).StartsWith("public class") Then
                     Dim split As String() = Regex.Split(line, "\W+")
                     ' next line must be "Inherits ocvbClass"
@@ -182,6 +184,12 @@ Module IndexMain
         sw.Write("<MoreWork>")
         For i = 0 To MoreWork.Count - 1
             sw.Write("," + MoreWork.ElementAt(i).Key)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<Trackers>")
+        For i = 0 To Trackers.Count - 1
+            sw.Write("," + Trackers.ElementAt(i).Key)
         Next
         sw.WriteLine()
 

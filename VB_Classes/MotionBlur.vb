@@ -23,9 +23,9 @@ Public Class MotionBlur_Basics
         Dim pt1 = New cv.Point(0, (kernelSize - 1) / 2)
         Dim pt2 = New cv.Point(kernelSize * Math.Cos(theta) + pt1.X, kernelSize * Math.Sin(theta) + pt1.Y)
         kernel.Line(pt1, pt2, New cv.Scalar(1 / kernelSize))
-        dst1 = ocvb.color.Filter2D(-1, kernel)
-        pt1 += New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
-        pt2 += New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
+        dst1 = src.Filter2D(-1, kernel)
+        pt1 += New cv.Point(src.Width / 2, src.Height / 2)
+        pt2 += New cv.Point(src.Width / 2, src.Height / 2)
         If showDirection Then dst1.Line(pt1, pt2, cv.Scalar.Yellow, 5, cv.LineTypes.AntiAlias)
     End Sub
 End Class
@@ -37,12 +37,6 @@ End Class
 Public Class MotionBlur_Deblur
     Inherits ocvbClass
     Dim mblur As MotionBlur_Basics
-    Private Sub ResetBlurredImage(ocvb As AlgorithmData)
-        mblur.sliders.TrackBar1.Value = ocvb.ms_rng.Next(mblur.sliders.TrackBar1.Minimum, mblur.sliders.TrackBar1.Maximum)
-        mblur.sliders.TrackBar2.Value = ocvb.ms_rng.Next(mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum)
-        mblur.Run(ocvb)
-        mblur.showDirection = False
-    End Sub
     Private Function calcPSF(filterSize As cv.Size, len As Int32, theta As Double) As cv.Mat
         Dim h As New cv.Mat(filterSize, cv.MatType.CV_32F, 0)
         Dim pt = New cv.Point(filterSize.Width / 2, filterSize.Height / 2)
@@ -123,9 +117,9 @@ Public Class MotionBlur_Deblur
         setCaller(callerRaw)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Redo motion blurred image"
+        check.Box(0).Checked = True
 
         mblur = New MotionBlur_Basics(ocvb, caller)
-        ResetBlurredImage(ocvb)
 
         sliders.setupTrackBar1(ocvb, caller, "Deblur Restore Vector", 1, mblur.sliders.TrackBar1.Maximum, 10)
         sliders.setupTrackBar2(ocvb, caller, "Deblur Angle of Restore Vector", mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum, 0)
@@ -137,11 +131,17 @@ Public Class MotionBlur_Deblur
         label2 = "Deblurred Image Output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        mblur.src = src
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
-            ResetBlurredImage(ocvb)
+            mblur.sliders.TrackBar1.Value = ocvb.ms_rng.Next(mblur.sliders.TrackBar1.Minimum, mblur.sliders.TrackBar1.Maximum)
+            mblur.sliders.TrackBar2.Value = ocvb.ms_rng.Next(mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum)
+            mblur.Run(ocvb)
+            mblur.showDirection = False
+        Else
+            mblur.Run(ocvb) ' the motion blurred image is in result1
         End If
-        mblur.Run(ocvb) ' the motion blurred image is in result1
+        dst1 = mblur.dst1
 
         Dim len = sliders.TrackBar1.Value
         Dim theta = sliders.TrackBar2.Value / (180 / Math.PI)
@@ -149,8 +149,8 @@ Public Class MotionBlur_Deblur
         Dim gamma = CDbl(sliders.TrackBar4.Value)
         Dim beta = 0.2
 
-        Dim width = ocvb.color.Width
-        Dim height = ocvb.color.Height
+        Dim width = src.Width
+        Dim height = src.Height
         Dim roi = New cv.Rect(0, 0, If(width Mod 2, width - 1, width), If(height Mod 2, height - 1, height))
 
         Dim h = calcPSF(roi.Size(), len, theta)

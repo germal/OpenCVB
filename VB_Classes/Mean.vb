@@ -14,10 +14,9 @@ Public Class Mean_Basics
             images.Clear()
         End If
         Dim nextImage As New cv.Mat
-        If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(src, cv.MatType.CV_32F)
-        cv.Cv2.Multiply(src, cv.Scalar.All(1 / saveImageCount), nextImage)
+        If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(nextImage, cv.MatType.CV_32F)
+        cv.Cv2.Multiply(nextImage, cv.Scalar.All(1 / saveImageCount), nextImage)
         images.Add(nextImage.Clone())
-        If dst1 Is Nothing Then dst1 = src.Clone()
 
         nextImage.SetTo(0)
         For Each img In images

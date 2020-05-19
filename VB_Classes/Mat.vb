@@ -124,7 +124,7 @@ Public Class Mat_4to1
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         label1 = ""
-        mat1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
+        mat1 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat3 = mat1.Clone()
         mat4 = mat1.Clone()
@@ -132,7 +132,7 @@ Public Class Mat_4to1
         ocvb.desc = "Use one Mat for up to 4 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static nSize = New cv.Size(src.Width / 2, src.Height / 2)
+        Static nSize = New cv.Size(mat(0).Width / 2, mat(0).Height / 2)
         Static roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Static roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
@@ -144,9 +144,8 @@ Public Class Mat_4to1
             mat4 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             mat = {mat1, mat2, mat3, mat4}
         End If
-        dst1 = src.EmptyClone
         If mat(0).Channels <> dst1.Channels Then dst1 = New cv.Mat(src.Size(), mat(0).Type, 0)
-        For i = 0 To 3
+        For i = 0 To 4 - 1
             Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
             dst1(roi) = mat(i).Resize(nSize)
         Next

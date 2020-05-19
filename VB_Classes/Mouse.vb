@@ -35,9 +35,7 @@ Public Class Mouse_LeftClick
                                               "Double-click an image to remove the selected region.", 10, 50))
 
         Static zeroRect As New cv.Rect(0, 0, 0, 0)
-        If ocvb.drawRect <> zeroRect Then
-            dst2 = ocvb.color(ocvb.drawRect).Resize(dst2.Size())
-        End If
+        If ocvb.drawRect <> zeroRect Then dst2 = src(ocvb.drawRect).Resize(dst2.Size())
     End Sub
 End Class
 
@@ -55,9 +53,7 @@ Public Class Mouse_RightClick
                                               "The selected image data will be opened in a spreadsheet.  Give it a try!" + vbCrLf +
                                               "Double-click an image to remove the selected region.", 10, 50))
         Static zeroRect As New cv.Rect(0, 0, 0, 0)
-        If ocvb.drawRect <> zeroRect Then
-            dst2 = ocvb.color(ocvb.drawRect).Resize(dst2.Size())
-        End If
+        If ocvb.drawRect <> zeroRect Then dst2 = src(ocvb.drawRect).Resize(dst2.Size())
     End Sub
 End Class
 

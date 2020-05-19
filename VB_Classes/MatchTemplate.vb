@@ -119,7 +119,7 @@ Public Class MatchTemplate_DrawRect
 
         label1 = "Probabilities (draw rectangle to test again)"
         label2 = "White is input, Red circle centers highest probability"
-        ocvb.desc = "Find the requested template in an image"
+        ocvb.desc = "Find the requested template in an image.  Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
@@ -165,7 +165,7 @@ Public Class MatchTemplate_BestEntropy_MT
 
         label1 = "Probabilities that the template matches image"
         label2 = "Red is the best template to match (highest entropy)"
-        ocvb.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate."
+        ocvb.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 30 = 0 Then

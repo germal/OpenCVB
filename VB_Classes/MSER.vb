@@ -27,7 +27,7 @@ Public Class MSER_Basics
         check.Box(0).Checked = True
         check.Box(1).Checked = True
 
-        ReDim saveParms(10) ' 4 sliders + 4 sliders + 1 slider + 2 checkboxes
+        ReDim saveParms(11 - 1) ' 4 sliders + 4 sliders + 1 slider + 2 checkboxes
         ocvb.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -64,7 +64,7 @@ Public Class MSER_Basics
 
         if standalone Then
             Dim pixels As Int32
-            dst1 = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
+            dst1.SetTo(0)
             For i = 0 To region.Length - 1
                 Dim nextRegion = region(i)
                 pixels += nextRegion.Length
@@ -115,8 +115,8 @@ Public Class MSER_Synthetic
         addNestedRectangles(img, New cv.Point(410, 10), width, color3, 13)
         addNestedCircles(img, New cv.Point(600, 600), width, color4, 13)
 
-        img = img.Resize(New cv.Size(ocvb.color.Height, ocvb.color.Height))
-        dst1(New cv.Rect(0, 0, ocvb.color.Height, ocvb.color.Height)) = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        img = img.Resize(New cv.Size(colorRows, colorRows))
+        dst1(New cv.Rect(0, 0, colorRows, colorRows)) = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -131,7 +131,7 @@ Public Class MSER_TestSynthetic
     Private Function testSynthetic(ocvb As AlgorithmData, img As cv.Mat, pass2Only As Boolean, delta As Int32) As String
         mser.check.Box(0).Checked = pass2Only
         mser.sliders.TrackBar1.Value = delta
-        mser.src = img.Clone()
+        mser.src = img
         mser.Run(ocvb)
 
         Dim pixels As Int32
@@ -157,13 +157,15 @@ Public Class MSER_TestSynthetic
         mser.check.Box(1).Checked = False ' the grayscale result is quite unimpressive.
 
         synth = New MSER_Synthetic(ocvb, caller)
+        label1 = "Input image to MSER"
+        label1 = "Output image from MSER"
         ocvb.desc = "Test MSER with the synthetic image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         synth.Run(ocvb)
-        dst2 = dst1.Clone()
+        dst1 = synth.dst1.Clone()
+        dst2 = synth.dst1
 
-        'testSynthetic(ocvb, dst1, False, 10)
         testSynthetic(ocvb, dst2, True, 100)
     End Sub
 End Class
@@ -222,11 +224,11 @@ Public Class MSER_Contours
         ocvb.desc = "Use MSER but show the contours of each region."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        mser.src = ocvb.color.Clone()
+        mser.src = src
         mser.Run(ocvb)
 
         Dim pixels As Int32
-        dst1 = ocvb.color
+        dst1 = src
         Dim hull() As cv.Point
         For i = 0 To mser.region.Length - 1
             Dim nextRegion = mser.region(i)

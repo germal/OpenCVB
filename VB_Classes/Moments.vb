@@ -15,6 +15,7 @@ Public Class Moments_CentroidKalman
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         foreground.Run(ocvb)
+        dst1 = foreground.dst1
         Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim m = cv.Cv2.Moments(mask, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
