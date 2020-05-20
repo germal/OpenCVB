@@ -181,11 +181,13 @@ Module IndexMain
         Next
         sw.WriteLine()
 
-        sw.Write("<MoreWork>")
-        For i = 0 To MoreWork.Count - 1
-            sw.Write("," + MoreWork.ElementAt(i).Key)
-        Next
-        sw.WriteLine()
+        If MoreWork.Count > 0 Then
+            sw.Write("<MoreWork>")
+            For i = 0 To MoreWork.Count - 1
+                sw.Write("," + MoreWork.ElementAt(i).Key)
+            Next
+            sw.WriteLine()
+        End If
 
         sw.Write("<Trackers>")
         For i = 0 To Trackers.Count - 1
