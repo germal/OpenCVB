@@ -9,12 +9,12 @@ Public Class Random_Points
     Public plotPoints As Boolean = False
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Random Pixel Count", 1, ocvb.color.Width * ocvb.color.Height, 20)
+        sliders.setupTrackBar1(ocvb, caller, "Random Pixel Count", 1, colorCols * colorRows, 20)
 
         ReDim Points(sliders.TrackBar1.Value - 1)
         ReDim Points2f(sliders.TrackBar1.Value - 1)
 
-        rangeRect = New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)
+        rangeRect = New cv.Rect(0, 0, colorCols, colorRows)
         ocvb.desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -59,7 +59,7 @@ Public Class Random_LUTMask
         setCaller(callerRaw)
         km = New kMeans_Basics(ocvb, caller)
         random = New Random_Points(ocvb, caller)
-        ocvb.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image.  Note how interpolation impacts results"
+        ocvb.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
         label2 = "kmeans run To Get colors"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -68,21 +68,18 @@ Public Class Random_LUTMask
             random.Run(ocvb)
             lutMat = cv.Mat.Zeros(New cv.Size(1, 256), cv.MatType.CV_8UC3)
             Dim lutIndex = 0
-            km.Run(ocvb) ' sets result1
-            dst1.CopyTo(dst2)
+            km.src = src
+            km.Run(ocvb)
+            dst1 = km.dst1
             For i = 0 To random.Points.Length - 1
                 Dim x = random.Points(i).X
                 Dim y = random.Points(i).Y
-                If x >= ocvb.drawRect.X And x < ocvb.drawRect.X + ocvb.drawRect.Width Then
-                    If y >= ocvb.drawRect.Y And y < ocvb.drawRect.Y + ocvb.drawRect.Height Then
-                        lutMat.Set(lutIndex, 0, dst2.Get(Of cv.Vec3b)(y, x))
-                        lutIndex += 1
-                        If lutIndex >= lutMat.Rows Then Exit For
-                    End If
-                End If
+                lutMat.Set(lutIndex, 0, dst1.Get(Of cv.Vec3b)(y, x))
+                lutIndex += 1
+                If lutIndex >= lutMat.Rows Then Exit For
             Next
         End If
-        dst2 = ocvb.color.LUT(lutMat)
+        dst2 = src.LUT(lutMat)
         label1 = "Using kmeans colors with interpolation"
     End Sub
 End Class
@@ -91,17 +88,13 @@ End Class
 
 Public Class Random_UniformDist
     Inherits ocvbClass
-    Public uDist As cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        uDist = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
         ocvb.desc = "Create a uniform distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        cv.Cv2.Randu(uDist, 0, 255)
-        if standalone Then
-            dst1 = uDist.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        End If
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U)
+        cv.Cv2.Randu(dst1, 0, 255)
     End Sub
 End Class
 
@@ -109,24 +102,22 @@ End Class
 
 Public Class Random_NormalDist
     Inherits ocvbClass
-    Public nDistImage As cv.Mat
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Random_NormalDist Blue Mean", 0, 255, 25)
         sliders.setupTrackBar2(ocvb, caller, "Random_NormalDist Green Mean", 0, 255, 127)
         sliders.setupTrackBar3(ocvb, caller, "Random_NormalDist Red Mean", 0, 255, 180)
         sliders.setupTrackBar4(ocvb, caller, "Random_NormalDist Stdev", 0, 255, 50)
-        ocvb.desc = "Create a normal distribution."
+        ocvb.desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         cv.Cv2.Randn(dst1, New cv.Scalar(sliders.TrackBar1.Value, sliders.TrackBar2.Value, sliders.TrackBar3.Value), cv.Scalar.All(sliders.TrackBar4.Value))
-        If standalone Then nDistImage = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class
 
 
 
-Public Class Random_CheckUniformDist
+Public Class Random_CheckUniformSmoothed
     Inherits ocvbClass
     Dim histogram As Histogram_KalmanSmoothed
     Dim rUniform As Random_UniformDist
@@ -134,23 +125,83 @@ Public Class Random_CheckUniformDist
         setCaller(callerRaw)
         histogram = New Histogram_KalmanSmoothed(ocvb, caller)
         histogram.sliders.TrackBar1.Value = 255
-        histogram.gray = New cv.Mat
+
+        rUniform = New Random_UniformDist(ocvb, caller)
+
+        ocvb.desc = "Display the smoothed histogram for a uniform distribution."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        rUniform.src = src
+        rUniform.Run(ocvb)
+        dst1 = rUniform.dst1
+        histogram.src = dst1
+        histogram.plotHist.maxRange = 255
+        histogram.Run(ocvb)
+        dst2 = histogram.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Random_CheckUniformDist
+    Inherits ocvbClass
+    Dim histogram As Histogram_Basics
+    Dim rUniform As Random_UniformDist
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        histogram = New Histogram_Basics(ocvb, caller)
+        histogram.sliders.TrackBar1.Value = 255
 
         rUniform = New Random_UniformDist(ocvb, caller)
 
         ocvb.desc = "Display the histogram for a uniform distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        rUniform.src = src
         rUniform.Run(ocvb)
-        dst1 = rUniform.uDist.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        rUniform.uDist.CopyTo(histogram.gray)
+        dst1 = rUniform.dst1
+        histogram.src = dst1
+        histogram.plotRequested = True
         histogram.Run(ocvb)
+        dst2 = histogram.dst1
     End Sub
 End Class
 
 
 
+
+
+
 Public Class Random_CheckNormalDist
+    Inherits ocvbClass
+    Dim histogram As Histogram_Basics
+    Dim normalDist As Random_NormalDist
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        histogram = New Histogram_Basics(ocvb, caller)
+        histogram.sliders.TrackBar1.Value = 255
+        normalDist = New Random_NormalDist(ocvb, caller)
+        ocvb.desc = "Display the histogram for a Normal distribution."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        normalDist.src = src
+        normalDist.Run(ocvb)
+        dst1 = normalDist.dst1
+        histogram.src = dst1
+        histogram.plotRequested = True
+        histogram.Run(ocvb)
+        dst2 = histogram.dst1
+    End Sub
+End Class
+
+
+
+
+
+Public Class Random_CheckNormalDistSmoothed
     Inherits ocvbClass
     Dim histogram As Histogram_KalmanSmoothed
     Dim normalDist As Random_NormalDist
@@ -158,16 +209,17 @@ Public Class Random_CheckNormalDist
         setCaller(callerRaw)
         histogram = New Histogram_KalmanSmoothed(ocvb, caller)
         histogram.sliders.TrackBar1.Value = 255
-        histogram.gray = New cv.Mat
         histogram.plotHist.minRange = 1
         normalDist = New Random_NormalDist(ocvb, caller)
         ocvb.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        normalDist.src = src
         normalDist.Run(ocvb)
-        dst1 = normalDist.nDistImage.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        normalDist.nDistImage.CopyTo(histogram.gray)
+        dst1 = normalDist.dst1
+        histogram.src = dst1
         histogram.Run(ocvb)
+        dst2 = histogram.dst1
     End Sub
 End Class
 
@@ -199,7 +251,6 @@ Public Class Random_PatternGenerator_CPP
         ocvb.desc = "Generate random patterns for use with 'Random Pattern Calibration'"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim src = ocvb.color
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim imagePtr = Random_PatternGenerator_Run(Random_PatternGenerator, src.Rows, src.Cols, src.Channels)

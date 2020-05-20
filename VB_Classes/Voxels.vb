@@ -41,6 +41,7 @@ Public Class Voxels_Basics_MT
 
         Dim bins = sliders.TrackBar1.Value
         Dim depth32f = getDepth32f(ocvb)
+        ' putting the calchist into a parallel.for seems to cause a memory leak.  Avoiding it here...
         'Parallel.For(0, grid.roiList.Count,
         'Sub(i)
         For i = 0 To grid.roiList.Count - 1
@@ -52,7 +53,6 @@ Public Class Voxels_Basics_MT
                 voxels(i) = 0
             End If
         Next
-
         'End Sub)
         voxelMat = New cv.Mat(voxels.Length, 1, cv.MatType.CV_64F, voxels)
         voxelMat *= 255 / (maxDepth - minDepth) ' do the normalize manually to use the min and max Depth (more stable image)
@@ -62,17 +62,17 @@ Public Class Voxels_Basics_MT
             Dim nearColor = cv.Scalar.Yellow
             Dim farColor = cv.Scalar.Blue
             dst2.SetTo(0)
-                Parallel.For(0, grid.roiList.Count,
-            Sub(i)
-                Dim roi = grid.roiList(i)
-                Dim v = voxels(i)
-                If v > 0 And v < 256 Then
-                    Dim color = New cv.Scalar(((256 - v) * nearColor(0) + v * farColor(0)) >> 8,
-                                              ((256 - v) * nearColor(1) + v * farColor(1)) >> 8,
-                                              ((256 - v) * nearColor(2) + v * farColor(2)) >> 8)
-                    dst2(roi).SetTo(color, trim.Mask(roi))
-                End If
-            End Sub)
-            End If
+            Parallel.For(0, grid.roiList.Count,
+                Sub(i)
+                    Dim roi = grid.roiList(i)
+                    Dim v = voxels(i)
+                    If v > 0 And v < 256 Then
+                        Dim color = New cv.Scalar(((256 - v) * nearColor(0) + v * farColor(0)) >> 8,
+                                                  ((256 - v) * nearColor(1) + v * farColor(1)) >> 8,
+                                                  ((256 - v) * nearColor(2) + v * farColor(2)) >> 8)
+                        dst2(roi).SetTo(color, trim.Mask(roi))
+                    End If
+                End Sub)
+        End If
     End Sub
 End Class

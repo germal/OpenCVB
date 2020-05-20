@@ -76,8 +76,8 @@ Public Class Projection_NoGravity_CPP
         grid.Run(ocvb)
         foreground.Run(ocvb)
 
-        Dim h = ocvb.color.Height
-        Dim w = ocvb.color.Width
+        Dim h = src.Height
+        Dim w = src.Width
         Dim desiredMin = CSng(foreground.sliders.TrackBar1.Value)
         Dim desiredMax = CSng(foreground.sliders.TrackBar2.Value)
         Dim range = CSng(desiredMax - desiredMin)
@@ -102,6 +102,8 @@ Public Class Projection_NoGravity_CPP
         SimpleProjectionClose(cPtr)
     End Sub
 End Class
+
+
 
 
 
@@ -130,15 +132,15 @@ Public Class Projection_NoGravity
         grid.Run(ocvb)
         foreground.Run(ocvb)
 
-        Dim h = ocvb.color.Height
-        Dim w = ocvb.color.Width
+        Dim h = src.Height
+        Dim w = src.Width
         Dim desiredMin = CSng(foreground.sliders.TrackBar1.Value)
         Dim desiredMax = CSng(foreground.sliders.TrackBar2.Value)
         Dim range = CSng(desiredMax - desiredMin)
         Dim depth32f = getDepth32f(ocvb)
 
         ' this VB.Net version is much slower than the optimized C++ version below.
-        dst1 = ocvb.color.EmptyClone.SetTo(cv.Scalar.White)
+        dst1 = src.EmptyClone.SetTo(cv.Scalar.White)
         dst2 = dst1.Clone()
         Dim black = New cv.Vec3b(0, 0, 0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
@@ -220,18 +222,18 @@ Public Class Projection_GravityVB
 
         Dim mask = vertSplit(2).Threshold(0.001, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
-        cv.Cv2.Normalize(vertSplit(1), vertSplit(1), 0, ocvb.color.Height, cv.NormTypes.MinMax, -1, mask)
+        cv.Cv2.Normalize(vertSplit(1), vertSplit(1), 0, src.Height, cv.NormTypes.MinMax, -1, mask)
 
         Dim minval As Double, maxval As Double
         Dim minloc As cv.Point, maxloc As cv.Point
         vertSplit(0).MinMaxLoc(minval, maxval, minloc, maxloc, mask)
 
         Dim black = New cv.Vec3b(0, 0, 0)
-        dst1 = ocvb.color.SetTo(cv.Scalar.White)
+        dst1 = src.SetTo(cv.Scalar.White)
         dst2 = dst1.Clone()
         Dim desiredMax = sliders.TrackBar1.Value / 1000
-        Dim w = CSng(ocvb.color.Width)
-        Dim h = CSng(ocvb.color.Height)
+        Dim w = CSng(src.Width)
+        Dim h = CSng(src.Height)
         Dim xFactor = w / (maxval - minval)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
              Sub(roi)
@@ -275,7 +277,10 @@ Public Class Projection_GravityHistogram
         ocvb.desc = "Use the top/down projection to create a histogram of 3D points"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        gravity.src = src
         gravity.Run(ocvb)
+        dst1 = gravity.dst1
+        dst2 = gravity.dst2
     End Sub
 End Class
 
@@ -316,8 +321,8 @@ Public Class Projection_G_CPP
         imu.Run(ocvb)
 
         ' normally it is not desirable to resize the point cloud but it can be here because we are building a histogram.
-        If standalone Then src = ocvb.pointCloud.Resize(ocvb.color.Size())
-        Dim split() = cv.Cv2.Split(src)
+        Dim pc = ocvb.pointCloud.Resize(src.Size())
+        Dim split() = cv.Cv2.Split(pc)
         Dim vertSplit = split
 
         Dim zCos = Math.Cos(imu.angleZ)
@@ -383,8 +388,8 @@ Public Class Projection_G_CPP
             ocvb.label2 += " - Red Dot is camera"
             dst1.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
             dst2.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
-            Dim radius = 5
-            dst1.Circle(New cv.Point(shift + xyz.Height / 2, xyz.Height - 15), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            Dim radius = If(ocvb.parms.lowResolution, 5, 15)
+            dst1.Circle(New cv.Point(shift + xyz.Height / 2, xyz.Height - 5), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
             dst2.Circle(New cv.Point(shift, xyz.Height / 2), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
     End Sub
@@ -417,15 +422,16 @@ Public Class Projection_Flood
 
         flood = New FloodFill_Projection(ocvb, caller)
         flood.sliders.TrackBar1.Value = 100
-        flood.sliders.TrackBar4.Value = 1
+        ' flood.sliders.TrackBar4.Value = 1
 
-        ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings)"
+        ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings) - more work needed"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        gravity.src = ocvb.pointCloud.Resize(ocvb.color.Size()) ' normally not a good idea to resize pointcloud but legit here because of histogram.
+        gravity.src = src
         gravity.Run(ocvb)
         flood.src = gravity.dst1
         flood.Run(ocvb)
+        dst1 = flood.dst1
 
         ' Combine rectangles that are overlaping or touching.
         Dim combinedRects As New List(Of cv.Rect)
@@ -452,15 +458,15 @@ Public Class Projection_Flood
             rects.Add(New cv.Rect(kalman.output(i), kalman.output(i + 1), kalman.output(i + 2), kalman.output(i + 3)))
         Next
 
-        dst2 = flood.dst2.Resize(ocvb.color.Size())
+        dst2 = flood.dst2.Resize(src.Size())
         If standalone Then
             Dim fontSize As Single = 1.0
             If ocvb.parms.lowResolution Then fontSize = 0.6
             Dim maxDepth = gravity.sliders.TrackBar1.Value
-            Dim mmPerPixel = maxDepth / ocvb.color.Height
+            Dim mmPerPixel = maxDepth / src.Height
             For Each rect In rects
                 dst2.Rectangle(rect, cv.Scalar.White, 1)
-                Dim distanceFromCamera = (ocvb.color.Height - rect.Y - rect.Height) * mmPerPixel
+                Dim distanceFromCamera = (src.Height - rect.Y - rect.Height) * mmPerPixel
                 Dim objectWidth = rect.Width * mmPerPixel
                 Dim text = "depth=" + Format(distanceFromCamera / 1000, "#0.0") + "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
 
@@ -491,12 +497,13 @@ Public Class Projection_Wall
 
         lines = New lineDetector_FLD_CPP(ocvb, Me.GetType().Name)
 
-        ocvb.desc = "Use the top down view to detect walls with a line detector algorithm"
+        ocvb.desc = "Use the top down view to detect walls with a line detector algorithm - more work needed"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        objects.src = src
         objects.Run(ocvb)
 
-        dilate.src = dst2
+        dilate.src = objects.dst2
         dilate.Run(ocvb)
 
         lines.src = dilate.dst1

@@ -19,6 +19,8 @@ Public Class Retina_Basics_CPP
     Inherits ocvbClass
     Dim Retina As IntPtr
     Dim startInfo As New ProcessStartInfo
+    Dim magnoData(0) As Byte
+    Dim srcData(0) As Byte
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Retina Sample Factor", 1, 10, 2)
@@ -47,14 +49,13 @@ Public Class Retina_Basics_CPP
         Static samplingFactor As Single = -1 ' force open
         If useLogSampling <> check.Box(0).Checked Or samplingFactor <> sliders.TrackBar1.Value Then
             If Retina <> 0 Then Retina_Basics_Close(Retina)
+            ReDim magnoData(src.Total - 1)
+            ReDim srcData(src.Total * src.ElemSize - 1)
             useLogSampling = check.Box(0).Checked
             samplingFactor = sliders.TrackBar1.Value
             Retina = Retina_Basics_Open(src.Rows, src.Cols, useLogSampling, samplingFactor)
         End If
-        Dim magnoData(src.Total - 1) As Byte
         Dim handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned)
-
-        Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim magnoPtr = Retina_Basics_Run(Retina, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleMagno.AddrOfPinnedObject(), useLogSampling)
@@ -91,9 +92,10 @@ Public Class Retina_Depth
     Public Sub Run(ocvb As AlgorithmData)
         retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
+        dst2 = retina.dst2
         Static lastMotion As New cv.Mat
-        If lastMotion.Width = 0 Then lastMotion = dst2
-        cv.Cv2.BitwiseOr(lastMotion, dst2, dst1)
-        lastMotion = dst2
+        If lastMotion.Width = 0 Then lastMotion = retina.dst2
+        cv.Cv2.BitwiseOr(lastMotion, retina.dst2, dst1)
+        lastMotion = retina.dst2
     End Sub
 End Class

@@ -11,16 +11,16 @@ Public Class Pyramid_Basics
         Dim zoom = sliders.TrackBar1.Value
         If zoom <> 0 Then
             If zoom < 0 Then
-                Dim tmp = ocvb.color.PyrDown(New cv.Size(ocvb.color.Cols / 2, ocvb.color.Rows / 2))
-                Dim roi = New cv.Rect((ocvb.color.Cols - tmp.Cols) / 2, (ocvb.color.Rows - tmp.Rows) / 2, tmp.Width, tmp.Height)
+                Dim tmp = src.PyrDown(New cv.Size(src.Cols / 2, src.Rows / 2))
+                Dim roi = New cv.Rect((src.Cols - tmp.Cols) / 2, (src.Rows - tmp.Rows) / 2, tmp.Width, tmp.Height)
                 dst1(roi) = tmp
             Else
-                Dim tmp = ocvb.color.PyrUp(New cv.Size(ocvb.color.Cols * 2, ocvb.color.Rows * 2))
-                Dim roi = New cv.Rect((tmp.Cols - ocvb.color.Cols) / 2, (tmp.Rows - ocvb.color.Rows) / 2, ocvb.color.Width, ocvb.color.Height)
+                Dim tmp = src.PyrUp(New cv.Size(src.Cols * 2, src.Rows * 2))
+                Dim roi = New cv.Rect((tmp.Cols - src.Cols) / 2, (tmp.Rows - src.Rows) / 2, src.Width, src.Height)
                 dst1 = tmp(roi)
             End If
         Else
-            ocvb.color.CopyTo(dst1)
+            src.CopyTo(dst1)
         End If
     End Sub
 End Class

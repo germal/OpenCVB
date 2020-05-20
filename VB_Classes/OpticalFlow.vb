@@ -91,6 +91,7 @@ Public Class OpticalFlow_DenseOptions
         sliders.setupTrackBar3(ocvb, caller, "Optical Flow winSize", 1, 9, 1)
         sliders.setupTrackBar4(ocvb, caller, "Optical Flow Iterations", 1, 10, 1)
 
+        label1 = "No output - just option settings..."
         ocvb.desc = "Use dense optical flow algorithm options"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -128,18 +129,18 @@ Public Class OpticalFlow_DenseBasics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static oldGray As New cv.Mat
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If ocvb.frameCount > 0 Then
             flow.Run(ocvb)
 
-            Dim hsv = opticalFlow_Dense(oldGray, gray, flow.pyrScale, flow.levels, flow.winSize, flow.iterations, flow.polyN, flow.polySigma, flow.OpticalFlowFlags)
+            Dim hsv = opticalFlow_Dense(oldGray, src, flow.pyrScale, flow.levels, flow.winSize, flow.iterations, flow.polyN, flow.polySigma, flow.OpticalFlowFlags)
 
             dst1 = hsv.CvtColor(cv.ColorConversionCodes.HSV2RGB)
             dst1 = dst1.ConvertScaleAbs(flow.outputScaling)
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
-        oldGray = gray.Clone()
+        oldGray = src.Clone()
     End Sub
 End Class
 
@@ -155,8 +156,8 @@ Public Class OpticalFlow_DenseBasics_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
-        grid.sliders.TrackBar1.Value = ocvb.color.Width / 4
-        grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
+        grid.sliders.TrackBar1.Value = colorCols / 4
+        grid.sliders.TrackBar2.Value = colorRows / 4
         grid.sliders.TrackBar3.Value = 5
 
         flow = New OpticalFlow_DenseOptions(ocvb, caller)
@@ -179,10 +180,10 @@ Public Class OpticalFlow_DenseBasics_MT
                 Dim broi = grid.borderList(i)
                 Dim roi = grid.roiList(i)
                 Dim correlation As New cv.Mat
-                Dim src = ocvb.color(roi)
-                cv.Cv2.MatchTemplate(src, accum(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+                Dim img = src(roi)
+                cv.Cv2.MatchTemplate(img, accum(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                 If CCthreshold > correlation.Get(Of Single)(0, 0) Then
-                    src.CopyTo(accum(roi))
+                    img.CopyTo(accum(roi))
                     Dim gray = accum(broi).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                     Dim hsv = opticalFlow_Dense(oldGray(broi), gray, flow.pyrScale, flow.levels, flow.winSize, flow.iterations, flow.polyN, flow.polySigma, flow.OpticalFlowFlags)
                     Dim tROI = New cv.Rect(roi.X - broi.X, roi.Y - broi.Y, roi.Width, roi.Height)
@@ -196,8 +197,8 @@ Public Class OpticalFlow_DenseBasics_MT
             dst2 = accum.Clone()
             dst2.SetTo(cv.Scalar.All(255), grid.gridMask)
         Else
-            oldGray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            accum = ocvb.color.Clone()
+            oldGray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            accum = src.Clone()
         End If
     End Sub
 End Class
@@ -246,8 +247,8 @@ Public Class OpticalFlow_Sparse
         Next
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst1 = ocvb.color.Clone()
-        dst2 = ocvb.color.Clone()
+        dst1 = src.Clone()
+        dst2 = src.Clone()
 
         Dim OpticalFlowFlag As cv.OpticalFlowFlags
         For i = 0 To radio.check.Count - 1
@@ -266,8 +267,8 @@ Public Class OpticalFlow_Sparse
             sScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0)
         End If
 
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        good.gray = gray.Clone()
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        good.src = src
         good.Run(ocvb)
         features = good.goodFeatures
         Dim features1 = New cv.Mat(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
@@ -276,7 +277,7 @@ Public Class OpticalFlow_Sparse
             Dim status As New cv.Mat
             Dim err As New cv.Mat
             Dim winSize As New cv.Size(3, 3)
-            cv.Cv2.CalcOpticalFlowPyrLK(gray, lastFrame, features1, features2, status, err, winSize, 3, term, OpticalFlowFlag)
+            cv.Cv2.CalcOpticalFlowPyrLK(src, lastFrame, features1, features2, status, err, winSize, 3, term, OpticalFlowFlag)
             features = New List(Of cv.Point2f)
             Dim lastFeatures As New List(Of cv.Point2f)
             For i = 0 To status.Rows - 1
@@ -295,9 +296,9 @@ Public Class OpticalFlow_Sparse
             Next
             label1 = "Matched " + CStr(features.Count) + " points "
 
-            If ocvb.frameCount Mod 10 = 0 Then lastFrame = gray.Clone()
+            If ocvb.frameCount Mod 10 = 0 Then lastFrame = src.Clone()
         Else
-            lastFrame = gray.Clone()
+            lastFrame = src.Clone()
         End If
     End Sub
 End Class

@@ -120,6 +120,7 @@ Public Class Python_MemMap
                 StartPython(ocvb, "--MemMapLength=" + CStr(memMapbufferSize))
             End If
             Dim pythonApp = New FileInfo(ocvb.PythonFileName)
+            label1 = "No output for Python_MemMap - see Python console"
             ocvb.desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
         End If
     End Sub
@@ -170,11 +171,11 @@ Public Class Python_SurfaceBlit
         If PythonReady Then
             Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
             For i = 0 To memMap.memMapValues.Length - 1
-                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.color.Total * ocvb.color.ElemSize, pcSize, ocvb.color.Rows, ocvb.color.Cols)
+                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, src.Total * src.ElemSize, pcSize, src.Rows, src.Cols)
             Next
             memMap.Run(ocvb)
 
-            Dim rgb = ocvb.color.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2RGB)
+            Dim rgb = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2RGB)
             If rgbBuffer.Length <> rgb.Total * rgb.ElemSize Then ReDim rgbBuffer(rgb.Total * rgb.ElemSize - 1)
             Marshal.Copy(rgb.Data, rgbBuffer, 0, rgb.Total * rgb.ElemSize)
 

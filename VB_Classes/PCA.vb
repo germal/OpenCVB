@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/pca.cpp
 Public Class PCA_Basics
     Inherits ocvbClass
-    Public useDepthInput As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Retained Variance", 1, 100, 95)
@@ -12,18 +11,13 @@ Public Class PCA_Basics
         Static images(7) As cv.Mat
         Static images32f(images.Length) As cv.Mat
         Dim index = ocvb.frameCount Mod images.Length
-        If useDepthInput Then
-            images(index) = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Else
-            images(index) = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        End If
+        images(index) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         images(index).ConvertTo(gray32f, cv.MatType.CV_32F)
         gray32f = gray32f.Normalize(0, 255, cv.NormTypes.MinMax)
-        images32f(index) = New cv.Mat
-        gray32f.Clone().Reshape(1, 1).ConvertTo(images32f(index), cv.MatType.CV_32F)
+        images32f(index) = gray32f.Reshape(1, 1)
         If ocvb.frameCount >= images.Length Then
-            Dim data = New cv.Mat(images.Length, ocvb.color.Rows * ocvb.color.Cols, cv.MatType.CV_32F)
+            Dim data = New cv.Mat(images.Length, src.Rows * src.Cols, cv.MatType.CV_32F)
             For i = 0 To images.Length - 1
                 images32f(i).CopyTo(data.Row(i))
             Next
@@ -34,8 +28,7 @@ Public Class PCA_Basics
             Dim point = pca.Project(data.Row(0))
             Dim reconstruction = pca.BackProject(point)
             reconstruction = reconstruction.Reshape(images(0).Channels(), images(0).Rows)
-            reconstruction.ConvertTo(reconstruction, cv.MatType.CV_8UC1)
-            dst1 = reconstruction.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            reconstruction.ConvertTo(dst1, cv.MatType.CV_8UC1)
         End If
     End Sub
 End Class
@@ -48,11 +41,12 @@ Public Class PCA_Depth
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         pca = New PCA_Basics(ocvb, caller)
-        pca.useDepthInput = True
         ocvb.desc = "Reconstruct a depth stream as a composite of X images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        pca.src = ocvb.RGBDepth
         pca.Run(ocvb)
+        dst1 = pca.dst1
     End Sub
 End Class
 
@@ -92,7 +86,7 @@ Public Class PCA_DrawImage
         Dim contours As cv.Point()() = Nothing
         cv.Cv2.FindContours(gray, contours, hierarchy, cv.RetrievalModes.List, cv.ContourApproximationModes.ApproxNone)
 
-        dst2 = ocvb.Color.EmptyClone.SetTo(0)
+        dst2.SetTo(0)
         For i = 0 To contours.Length - 1
             Dim area = cv.Cv2.ContourArea(contours(i))
             If area < 100 Or area > 100000 Then Continue For

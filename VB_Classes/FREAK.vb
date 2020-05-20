@@ -10,7 +10,7 @@ Public Class FREAK_Basics
         ocvb.desc = "Find keypoints using ORB and FREAK algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        orb.gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        orb.src = src
         orb.Run(ocvb)
 
         Dim freak = cv.XFeatures2D.FREAK.Create()

@@ -104,11 +104,7 @@ Module Puzzle_Solvers
         End If
         Return cornerType.none
     End Function
-    Public Function fitCheck(ocvb As AlgorithmData, dst1 As cv.Mat, roilist() As cv.Rect, ByRef fitlist As List(Of bestFit)) As List(Of bestFit)
-        Dim saveOptions = ocvb.parms.ShowOptions
-        ocvb.parms.ShowOptions = False
-        ocvb.parms.ShowOptions = saveOptions
-
+    Public Function fitCheck(dst1 As cv.Mat, roilist() As cv.Rect, ByRef fitlist As List(Of bestFit)) As List(Of bestFit)
         ' compute absDiff of every top/bottom to every left/right side
         Dim sample(8 - 1) As cv.Mat
         Dim corners As New List(Of bestFit)
@@ -231,10 +227,10 @@ Public Class Puzzle_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
-        grid.sliders.TrackBar1.Value = ocvb.color.Width / 10
-        grid.sliders.TrackBar2.Value = ocvb.color.Height / 8
+        grid.sliders.TrackBar1.Value = colorCols / 10
+        grid.sliders.TrackBar2.Value = colorRows / 8
         grid.Run(ocvb)
-        ocvb.desc = "Create the puzzle pieces for a genetic matching algorithm."
+        ocvb.desc = "Create the puzzle pieces for toy genetic or annealing algorithm."
     End Sub
     Function Shuffle(Of T)(collection As IEnumerable(Of T)) As List(Of T)
         Dim r As Random = New Random()
@@ -266,7 +262,7 @@ Public Class Puzzle_Basics
         For i = 0 To scrambled.Count - 1
             Dim roi = grid.roiList(i)
             Dim roi2 = scrambled(i)
-            If roi.Width = width And roi.Height = height And roi2.Width = width And roi2.Height = height Then dst1(roi2) = ocvb.color(roi)
+            If roi.Width = width And roi.Height = height And roi2.Width = width And roi2.Height = height Then dst1(roi2) = src(roi)
         Next
     End Sub
 End Class
@@ -306,17 +302,10 @@ Public Class Puzzle_Solver
         Return fit
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        Static saveIndex As Integer
-        For i = 0 To 3 - 1
-            If radio.check(i).Checked Then
-                If i <> saveIndex Then check.Box(0).Checked = True
-                saveIndex = i
-            End If
-        Next
         Static saveWidth As Integer
-        If ocvb.color.Width <> saveWidth Then
+        If src.Width <> saveWidth Then
             check.Box(0).Checked = True
-            saveWidth = ocvb.color.Width
+            saveWidth = src.Width
         End If
         If check.Box(0).Checked Or ocvb.parms.testAllRunning Then
             Dim factor = 1
@@ -332,18 +321,20 @@ Public Class Puzzle_Solver
                 puzzle.grid.sliders.TrackBar2.Value = 90 / factor
             End If
             puzzle.restartRequested = True
+            puzzle.src = src
             puzzle.Run(ocvb)
             roilist = puzzle.grid.roiList.ToArray
         End If
 
-        Dim cornerlist = fitCheck(ocvb, dst1, roilist, fitlist)
+        dst1 = puzzle.dst1
+        Dim cornerlist = fitCheck(dst1, roilist, fitlist)
 
         Dim bestCorner = cornerlist.ElementAt(0)
         Dim fit = bestCorner
         Dim roi = roilist(fit.index)
         Dim startcorner = bestCorner.corner
         Dim col As Integer
-        Dim cols = CInt(ocvb.color.Width / roilist(0).Width)
+        Dim cols = CInt(src.Width / roilist(0).Width)
         Select Case bestCorner.corner
             Case cornerType.upperLeft, cornerType.upperRight
                 For nexty = 0 To dst2.Height - 1 Step roi.Height

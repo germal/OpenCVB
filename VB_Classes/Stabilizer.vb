@@ -78,7 +78,7 @@ Public Class Stabilizer_Basics
         If standalone Then
             features1 = New cv.Mat(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
         Else
-            good.gray = gray.Clone()
+            good.src = src
             good.Run(ocvb)
             features = good.goodFeatures
         End If

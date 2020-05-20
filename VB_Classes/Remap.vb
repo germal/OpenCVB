@@ -6,14 +6,12 @@ Public Class Remap_Basics
         ocvb.desc = "Use remap to reflect an image in 4 directions."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim map_x = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32F)
-        Dim map_y = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32F)
+        Dim map_x = New cv.Mat(src.Size(), cv.MatType.CV_32F)
+        Dim map_y = New cv.Mat(src.Size(), cv.MatType.CV_32F)
         Static Dim direction = 0
 
         label1 = Choose(direction + 1, "Remap_Basics - original", "Remap veritically", "Remap horizontally",
                                             "Remap horizontally and vertically")
-
-        Dim src As cv.Mat = ocvb.color
         ' build a map for use with remap!
         For j = 0 To map_x.Rows - 1
             For i = 0 To map_x.Cols - 1
@@ -32,7 +30,7 @@ Public Class Remap_Basics
             Next
         Next
 
-        If direction <> 0 Then cv.Cv2.Remap(ocvb.color, dst1, map_x, map_y) Else dst1 = ocvb.color
+        If direction <> 0 Then cv.Cv2.Remap(src, dst1, map_x, map_y) Else dst1 = src
 
         If ocvb.frameCount Mod 30 = 0 Then
             direction += 1
@@ -54,16 +52,15 @@ Public Class Remap_Flip
     Public Sub Run(ocvb As AlgorithmData)
         label1 = Choose(direction + 1, "Remap_Flip - original", "Remap_Flip - flip horizontal", "Remap_Flip - flip veritical",
                                             "Remap_Flip - flip horizontal and vertical")
-
         Select Case direction
             Case 0 ' do nothing!
-                ocvb.color.CopyTo(dst1)
+                src.CopyTo(dst1)
             Case 1 ' flip vertically  
-                cv.Cv2.Flip(ocvb.color, dst1, cv.FlipMode.Y)
+                cv.Cv2.Flip(src, dst1, cv.FlipMode.Y)
             Case 2 ' flip horizontally
-                cv.Cv2.Flip(ocvb.color, dst1, cv.FlipMode.X)
+                cv.Cv2.Flip(src, dst1, cv.FlipMode.X)
             Case 3 ' flip horizontally and vertically
-                cv.Cv2.Flip(ocvb.color, dst1, cv.FlipMode.XY)
+                cv.Cv2.Flip(src, dst1, cv.FlipMode.XY)
         End Select
         If ocvb.frameCount Mod 100 = 0 Then
             direction += 1

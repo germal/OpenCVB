@@ -280,14 +280,14 @@ Public Class Brightness_PlotHist
         ocvb.desc = "Plot the histogram of the before and after white balancing"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        hist1.gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        hist1.src = src
         hist1.Run(ocvb)
         mat2to1.mat(0) = hist1.dst1
 
         white.Run(ocvb)
         dst1 = white.dst1
 
-        hist2.gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        hist2.src = dst1
         hist2.Run(ocvb)
         mat2to1.mat(1) = hist2.dst1
 

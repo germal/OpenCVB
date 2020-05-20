@@ -16,14 +16,12 @@ Public Class Resize_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Dim resizeFlag = getInterpolationRadioButtons(radio)
         if standalone Then
-            Dim roi = New cv.Rect(ocvb.color.Width / 4, ocvb.color.Height / 4, ocvb.color.Width / 2, ocvb.color.Height / 2)
+            Dim roi = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
             If ocvb.drawRect.Width <> 0 Then roi = ocvb.drawRect
 
-            dst1 = ocvb.color(roi).Resize(dst1.Size(), 0, 0, resizeFlag)
-
-            dst2 = (ocvb.color(roi).Resize(dst1.Size(), 0, 0, cv.InterpolationFlags.Cubic) -
-                            dst1).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            ocvb.color.Rectangle(roi, cv.Scalar.White, 2)
+            dst1 = src(roi).Resize(dst1.Size(), 0, 0, resizeFlag)
+            dst2 = (src(roi).Resize(dst1.Size(), 0, 0, cv.InterpolationFlags.Cubic) - dst1).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            src.Rectangle(roi, cv.Scalar.White, 2)
         Else
             dst1 = src.Resize(newSize, 0, 0, resizeFlag)
         End If
@@ -51,8 +49,8 @@ Public Class Resize_After8uc3
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim resizeFlag = getInterpolationRadioButtons(radio)
-        Dim newSize = ocvb.color.Size()
-        If ocvb.parms.lowResolution = False Then newSize = New cv.Size(ocvb.color.Height / 2, ocvb.color.Width / 2)
+        Dim newSize = src.Size()
+        If ocvb.parms.lowResolution = False Then newSize = New cv.Size(src.Height / 2, src.Width / 2)
 
         Dim depth32f As New cv.Mat
         ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)

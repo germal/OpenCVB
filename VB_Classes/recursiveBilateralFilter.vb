@@ -17,26 +17,22 @@ End Module
 ' https://github.com/ufoym
 Public Class RecursiveBilateralFilter_CPP
     Inherits ocvbClass
-        Dim srcData() As Byte
+    Dim srcData(0) As Byte
     Dim rbf As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "RBF Recursion count", 1, 20, 2)
-        
-        ReDim srcData(ocvb.color.Total * ocvb.color.ElemSize - 1)
-
         rbf = RecursiveBilateralFilter_Open()
         ocvb.desc = "Apply the recursive bilateral filter"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Marshal.Copy(ocvb.color.Data, srcData, 0, srcData.Length)
+        If srcData.Length <> src.Total * src.ElemSize Then ReDim srcData(src.Total * src.ElemSize - 1)
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
-        Dim imagePtr = RecursiveBilateralFilter_Run(rbf, handleSrc.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols, sliders.TrackBar1.Value)
+        Dim imagePtr = RecursiveBilateralFilter_Run(rbf, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, sliders.TrackBar1.Value)
         handleSrc.Free() ' free the pinned memory...
 
-        Dim dstData(ocvb.color.Total * ocvb.color.ElemSize - 1) As Byte
-        Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-        dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, dstData)
+        dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
     End Sub
     Public Sub Close()
         RecursiveBilateralFilter_Close(rbf)
