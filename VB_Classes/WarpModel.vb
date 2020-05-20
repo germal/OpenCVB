@@ -54,6 +54,8 @@ Public Class WarpModel_Input
         Next
         Dim merged As New cv.Mat
         cv.Cv2.Merge(rgb, merged)
+        dst1.SetTo(0)
+        dst2.SetTo(0)
         dst1(r(0)) = rgb(0).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2(r(0)) = merged
     End Sub
@@ -81,17 +83,17 @@ End Module
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_FindTransformECC_CPP
     Inherits ocvbClass
-        Public input As WarpModel_Input
+    Public input As WarpModel_Input
     Dim cPtr As IntPtr
     Public warpMatrix() As Single
     Public src1 As New cv.Mat
     Public src2 As New cv.Mat
     Public rgb1 As New cv.Mat
     Public rgb2 As New cv.Mat
-        Public warpMode As Integer
+    Public warpMode As Integer
     Public aligned As New cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         cPtr = WarpModel_Open()
 
         radio.Setup(ocvb, caller,4)
@@ -106,7 +108,9 @@ Public Class WarpModel_FindTransformECC_CPP
         ocvb.desc = "Use FindTransformECC to align 2 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then input.Run(ocvb)
+        input.src = src
+        input.Run(ocvb)
+        dst1 = input.dst1
 
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then warpMode = i
@@ -195,6 +199,7 @@ Public Class WarpModel_AlignImages
                 ecc.src1 = Choose(i + 1, ecc.input.rgb(0), ecc.input.rgb(0))
                 ecc.src2 = Choose(i + 1, ecc.input.rgb(1), ecc.input.rgb(2))
             End If
+            ecc.src = src
             ecc.Run(ocvb)
             aligned(i) = ecc.aligned.Clone()
         Next

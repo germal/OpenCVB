@@ -3,14 +3,13 @@ Imports System.Runtime.InteropServices
 
 Module SemiGlobalMatching_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SemiGlobalMatching_Open(rows As Int32, cols As Int32) As IntPtr
+    Public Function SemiGlobalMatching_Open(rows As Integer, cols As Integer, disparityRange As Integer) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub SemiGlobalMatching_Close(SemiGlobalMatchingPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SemiGlobalMatching_Run(SemiGlobalMatchingPtr As IntPtr, leftPtr As IntPtr, rightPtr As IntPtr, rows As Int32, cols As Int32,
-                                           disparityRange As Int32) As IntPtr
+    Public Function SemiGlobalMatching_Run(SemiGlobalMatchingPtr As IntPtr, leftPtr As IntPtr, rightPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
     End Function
 End Module
 
@@ -21,15 +20,11 @@ End Module
 ' https://github.com/epiception/SGM-Census
 'Public Class SemiGlobalMatching_CPP
 '    Inherits ocvbClass
-'    Dim leftData() As Byte
-'    Dim rightData() As Byte
-'    Dim SemiGlobalMatching As IntPtr
-'     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-' dim caller = caller 
-' setCaller(callerRaw)
-'        ReDim leftData(ocvb.color.Total - 1)
-'        ReDim rightData(ocvb.color.Total - 1)
-'        SemiGlobalMatching = SemiGlobalMatching_Open(ocvb.color.Rows, ocvb.color.Cols)
+'    Dim leftData(1 - 1) As Byte
+'    Dim rightData(1 - 1) As Byte
+'    Dim cPtr As IntPtr
+'    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+'        setCaller(callerRaw)
 '        ocvb.desc = "Find depth using the semi-global matching algorithm."
 '    End Sub
 '    Public Sub Run(ocvb As AlgorithmData)
@@ -38,20 +33,26 @@ End Module
 '            ocvb.putText(New ActiveClass.TrueType("The left and right views are identical with the Microsoft Kinect 4 Azure camera.", 10, 60, RESULT1))
 '            Exit Sub
 '        End If
+
+'        If leftData.Length <> src.Total Then
+'            ReDim leftData(src.Total - 1)
+'            ReDim rightData(src.Total - 1)
+'            cPtr = SemiGlobalMatching_Open(src.Rows, src.Cols, 3)
+'        End If
+
 '        Marshal.Copy(ocvb.leftView.Data, leftData, 0, leftData.Length)
 '        Marshal.Copy(ocvb.rightView.Data, rightData, 0, rightData.Length)
+
 '        Dim handleLeft = GCHandle.Alloc(leftData, GCHandleType.Pinned)
 '        Dim handleRight = GCHandle.Alloc(rightData, GCHandleType.Pinned)
-'        Dim imagePtr = SemiGlobalMatching_Run(SemiGlobalMatching, handleLeft.AddrOfPinnedObject(), handleRight.AddrOfPinnedObject(),
-'                                              ocvb.leftView.Rows, ocvb.leftView.Cols, 3)
-'        handleLeft.Free() ' free the pinned memory...
-'        handleRight.Free() ' free the pinned memory...
-'        Dim dstData(ocvb.color.Total - 1) As Byte
-'        Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-'        Dim dst1 = New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols, cv.MatType.CV_8U, dstData)
-'        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+'        Dim imagePtr = SemiGlobalMatching_Run(cPtr, handleLeft.AddrOfPinnedObject(), handleRight.AddrOfPinnedObject(),
+'                                              ocvb.leftView.Rows, ocvb.leftView.Cols)
+'        handleLeft.Free()
+'        handleRight.Free()
+
+'        Dim dst1 = New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols, cv.MatType.CV_8U, imagePtr)
 '    End Sub
 '    Public Sub Close()
-'        SemiGlobalMatching_Close(SemiGlobalMatching)
+'        SemiGlobalMatching_Close(cPtr)
 '    End Sub
 'End Class

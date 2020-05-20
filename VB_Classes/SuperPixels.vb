@@ -36,11 +36,6 @@ Public Class SuperPixel_Basics_CPP
         Static numSuperPixels As Int32
         Static numIterations As Int32
         Static prior As Int32
-        Dim dstx As New cv.Mat
-        If standalone Then
-            src = ocvb.color.Clone()
-            dstx = dst1
-        End If
         If numSuperPixels <> sliders.TrackBar1.Value Or numIterations <> sliders.TrackBar2.Value Or prior <> sliders.TrackBar3.Value Then
             numSuperPixels = sliders.TrackBar1.Value
             numIterations = sliders.TrackBar2.Value
@@ -56,19 +51,9 @@ Public Class SuperPixel_Basics_CPP
         handleSrc.Free()
 
         If imagePtr <> 0 Then
-
-            Dim dstData(src.Total - 1) As Byte
-            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-
-            If standalone Then
-                dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
-                dstx = src
-                dstx.SetTo(cv.Scalar.White, dst2)
-            Else
-                Dim tmp = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
-                dst1 = src
-                dst1.SetTo(cv.Scalar.White, tmp)
-            End If
+            dst1 = src
+            dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
+            dst1.SetTo(cv.Scalar.White, dst2)
         End If
 
         Dim labelData(src.Total * 4 - 1) As Byte ' labels are 32-bit integers.
@@ -150,19 +135,16 @@ Public Class SuperPixel_WithLineDetector
 
         pixels = New SuperPixel_Basics_CPP(ocvb, caller)
 
+        label2 = "Input to superpixel basics."
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        lines.dst1 = dst1
+        lines.src = src
         lines.Run(ocvb)
-        pixels.src = dst1.Clone()
-        dst2 = dst1.Clone()
-        label2 = "Input to superpixel basics."
+        dst2 = lines.dst1
+        pixels.src = dst2
         pixels.Run(ocvb)
         dst1 = pixels.dst1
-        ' dst2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        ' dst2.SetTo(cv.Scalar.Red, lines.dst1)
-        ' label2 = "Edges provided by Canny in red"
     End Sub
 End Class
 

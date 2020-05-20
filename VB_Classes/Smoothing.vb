@@ -52,9 +52,11 @@ Public Class Smoothing_Exterior
 	Public Sub Run(ocvb As AlgorithmData)
 		If ocvb.frameCount Mod 30 Then Exit Sub
 
+		hull.src = src
 		hull.Run(ocvb)
 		Dim nextHull = hull.hull
 
+		dst1.SetTo(0)
 		Dim points = drawPoly(dst1, nextHull, cv.Scalar.White)
 
 		Dim smoothPoints = getSplineInterpolationCatmullRom(points, sliders.TrackBar1.Value)
@@ -124,9 +126,11 @@ Public Class Smoothing_Interior
 	Public Sub Run(ocvb As AlgorithmData)
 		If ocvb.frameCount Mod 30 Then Exit Sub
 
+		hull.src = src
 		hull.Run(ocvb)
 		Dim nextHull = hull.hull
 
+		dst1.SetTo(0)
 		Dim points = drawPoly(dst1, nextHull, cv.Scalar.White)
 
 		Dim smoothPoints2d = getCurveSmoothingChaikin(points, sliders.TrackBar2.Value / 100, sliders.TrackBar1.Value)

@@ -31,7 +31,7 @@ Public Class VTK_Basics
     Public vtkTitle As String = "VTK_Data"
     Public vtkPresent As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
+        setCaller(callerRaw)
         If ocvb.parms.vtkDirectory.Length > 0 Then vtkPresent = True
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
         If fileinfo.Exists = False Then vtkPresent = False
@@ -42,7 +42,7 @@ Public Class VTK_Basics
         ' setup the memory mapped area and initialize the intrinsicsLeft needed to convert imageXYZ to worldXYZ and for command/control of the interface.
         For i = 0 To memMapSysData.Length - 1
             ' only change this if you are changing the data in the VTK C++ code at the same time...
-            memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.color.Width, ocvb.color.Height, dataInput.Total * dataInput.ElemSize,
+            memMapValues(i) = Choose(i + 1, ocvb.frameCount, src.Width, src.Height, dataInput.Total * dataInput.ElemSize,
                                          dataInput.Width, dataInput.Height, rgbInput.Total * rgbInput.ElemSize)
         Next
 
@@ -84,7 +84,7 @@ Public Class VTK_Basics
         End If
 
         If usingDepthAndRGB Then
-            rgbInput = ocvb.color.Clone()
+            rgbInput = src.Clone()
             dataInput = getDepth32f(ocvb)
         End If
 
@@ -159,16 +159,18 @@ Public Class VTK_Histogram3D
                 random.sliders.TrackBar2.Value = Choose(i + 1, 127, 127, 65, 65)
                 random.sliders.TrackBar3.Value = Choose(i + 1, 180, 180, 180, 244)
                 random.sliders.TrackBar4.Value = sliders.TrackBar1.Value
+                random.src = src
                 random.Run(ocvb)
-                mats.mat(i) = dst1.Clone()
+                mats.mat(i) = random.dst1
             Next
             lastStdev = sliders.TrackBar1.Value
         End If
 
         mats.Run(ocvb)
 
-        vtk.rgbInput = dst2.Clone()
+        vtk.rgbInput = mats.dst1
         vtk.dataInput = New cv.Mat ' ocvb.depth
+        vtk.src = src
         vtk.Run(ocvb)
     End Sub
 End Class

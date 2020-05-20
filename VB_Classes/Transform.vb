@@ -8,16 +8,16 @@ Public Class Transform_Resize
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim resizeFactor = sliders.TrackBar1.Value / 100
-        Dim w = CInt(resizeFactor * ocvb.color.Width)
-        Dim h = CInt(resizeFactor * ocvb.color.Height)
+        Dim w = CInt(resizeFactor * src.Width)
+        Dim h = CInt(resizeFactor * src.Height)
         If resizeFactor > 1 Then
             Dim tmp As New cv.Mat
-            tmp = ocvb.color.Resize(New cv.Size(w, h), 0)
-            Dim roi = New cv.Rect((w - ocvb.color.Width) / 2, (h - ocvb.color.Height) / 2, ocvb.color.Width, ocvb.color.Height)
+            tmp = src.Resize(New cv.Size(w, h), 0)
+            Dim roi = New cv.Rect((w - src.Width) / 2, (h - src.Height) / 2, src.Width, src.Height)
             tmp(roi).CopyTo(dst1)
         Else
-            Dim roi = New cv.Rect((ocvb.color.Width - w) / 2, (ocvb.color.Height - h) / 2, w, h)
-            dst1(roi) = ocvb.color.Resize(New cv.Size(w, h), 0)
+            Dim roi = New cv.Rect((src.Width - w) / 2, (src.Height - h) / 2, w, h)
+            dst1(roi) = src.Resize(New cv.Size(w, h), 0)
         End If
     End Sub
 End Class
@@ -34,10 +34,6 @@ Public Class Transform_Rotate
         ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then
-            src = ocvb.color
-            dst1 = dst2
-        End If
         Dim imageCenter = New cv.Point2f(src.Width / 2, src.Height / 2)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.TrackBar1.Value, sliders.TrackBar2.Value / 100)
         cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
@@ -59,13 +55,12 @@ Public Class Transform_Sort
         ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim sortOption = cv.SortFlags.Ascending
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
         If radio.check(2).Checked Then sortOption = cv.SortFlags.EveryColumn
         If radio.check(3).Checked Then sortOption = cv.SortFlags.EveryRow
-        Dim sorted = gray.Sort(sortOption + cv.SortFlags.EveryColumn)
-        dst1 = sorted.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = src.Sort(sortOption + cv.SortFlags.EveryColumn)
     End Sub
 End Class
 
@@ -82,13 +77,12 @@ Public Class Transform_SortReshape
         ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.bgr2gray)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim sortOption = cv.SortFlags.Ascending
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
-        gray = gray.Reshape(1, gray.Rows * gray.Cols)
-        Dim sorted = gray.Sort(sortOption + cv.SortFlags.EveryColumn)
-        sorted = sorted.Reshape(1, ocvb.color.Rows)
-        dst1 = sorted.CvtColor(cv.ColorConversionCodes.gray2bgr)
+        src = src.Reshape(1, src.Rows * src.Cols)
+        Dim sorted = src.Sort(sortOption + cv.SortFlags.EveryColumn)
+        dst1 = sorted.Reshape(1, src.Rows)
     End Sub
 End Class
 

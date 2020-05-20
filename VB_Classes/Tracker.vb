@@ -9,7 +9,7 @@ Public Class Tracker_Basics
         setCaller(callerRaw)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Stop tracking selected object"
-        ocvb.desc = "Track an object using cv.Tracking API"
+        ocvb.desc = "Track an object using cv.Tracking API - tracker algorithm"
         ocvb.putText(New ActiveClass.TrueType("Draw a rectangle around object to be tracked.", 10, 140, RESULT2))
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -25,33 +25,31 @@ Public Class Tracker_Basics
             ocvb.drawRectClear = True
             Select Case trackerIndex
                 Case 0
-                    tracker.Add(cv.Tracking.TrackerBoosting.Create(), ocvb.color, bbox)
+                    tracker.Add(cv.Tracking.TrackerBoosting.Create(), src, bbox)
                 Case 1
-                    tracker.Add(cv.Tracking.TrackerCSRT.Create(), ocvb.color, bbox)
+                    tracker.Add(cv.Tracking.TrackerCSRT.Create(), src, bbox)
                 Case 2
-                    tracker.Add(cv.Tracking.TrackerGOTURN.Create(), ocvb.color, bbox)
+                    tracker.Add(cv.Tracking.TrackerGOTURN.Create(), src, bbox)
                 Case 3
-                    tracker.Add(cv.Tracking.TrackerKCF.Create(), ocvb.color, bbox)
+                    tracker.Add(cv.Tracking.TrackerKCF.Create(), src, bbox)
                 Case 4
-                    tracker.Add(cv.Tracking.TrackerMedianFlow.Create(), ocvb.color, bbox)
+                    tracker.Add(cv.Tracking.TrackerMedianFlow.Create(), src, bbox)
                 Case 5
-                    tracker.Add(cv.Tracking.TrackerMIL.Create(), ocvb.color, bbox)
+                    tracker.Add(cv.Tracking.TrackerMIL.Create(), src, bbox)
                 Case 6
-                    tracker.Add(cv.Tracking.TrackerMOSSE.Create(), ocvb.color, bbox)
+                    tracker.Add(cv.Tracking.TrackerMOSSE.Create(), src, bbox)
                 Case 7
-                    tracker.Add(cv.Tracking.TrackerTLD.Create(), ocvb.color, bbox)
+                    tracker.Add(cv.Tracking.TrackerTLD.Create(), src, bbox)
             End Select
         End If
 
+        dst1 = src.Clone()
         If tracker IsNot Nothing Then
-            tracker.Update(ocvb.color)
+            tracker.Update(src)
             boxObject = tracker.GetObjects() ' just track one.  Tracking multiple is buggy.  Returns a lot of 0 width/height rect2d's.
-            If standalone Then
-                dst1 = ocvb.color.Clone()
-                Dim p1 = New cv.Point(boxObject(0).X, boxObject(0).Y)
-                Dim p2 = New cv.Point(boxObject(0).X + bbox.Width, boxObject(0).Y + bbox.Height)
-                dst1.Rectangle(p1, p2, cv.Scalar.Blue, 2)
-            End If
+            Dim p1 = New cv.Point(boxObject(0).X, boxObject(0).Y)
+            Dim p2 = New cv.Point(boxObject(0).X + bbox.Width, boxObject(0).Y + bbox.Height)
+            dst1.Rectangle(p1, p2, cv.Scalar.Blue, 2)
         End If
     End Sub
 End Class
@@ -65,19 +63,21 @@ Public Class Tracker_MultiObject
     Dim trackers As New List(Of Tracker_Basics)
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.desc = "Track any number of objects simultaneously"
+        ocvb.desc = "Track any number of objects simultaneously - tracker algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.drawRect.Width <> 0 Then
             Dim tr = New Tracker_Basics(ocvb, "Tracker_MultiObject")
+            tr.src = src
             tr.Run(ocvb)
             ocvb.drawRect = New cv.Rect
             trackers.Add(tr)
         End If
-        dst1 = ocvb.color.Clone()
+        dst1 = src.Clone()
         For Each tr In trackers
             Dim closeIt As Boolean
             If tr.check.Box(0).Checked Then closeIt = True
+            tr.src = src
             tr.Run(ocvb)
             If closeIt Then tr.check.Dispose()
             If tr.tracker IsNot Nothing Then
@@ -128,7 +128,9 @@ Public Class Tracker_Methods
         If saveMethod <> tracker.trackerIndex Then
             tracker.check.Box(0).Checked = True
         Else
+            tracker.src = src
             tracker.Run(ocvb)
+            dst1 = tracker.dst1
         End If
         saveMethod = tracker.trackerIndex
     End Sub

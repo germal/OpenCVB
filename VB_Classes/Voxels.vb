@@ -41,7 +41,7 @@ Public Class Voxels_Basics_MT
 
         Dim bins = sliders.TrackBar1.Value
         Dim depth32f = getDepth32f(ocvb)
-        ' putting the calchist into a parallel.for seems to cause a memory leak.  Avoiding it here...
+        ' putting the calcHist into a parallel.for (inside computeMedian below) seems to cause a memory leak.  Avoiding it here...
         'Parallel.For(0, grid.roiList.Count,
         'Sub(i)
         For i = 0 To grid.roiList.Count - 1
@@ -55,7 +55,6 @@ Public Class Voxels_Basics_MT
         Next
         'End Sub)
         voxelMat = New cv.Mat(voxels.Length, 1, cv.MatType.CV_64F, voxels)
-        voxelMat *= 255 / (maxDepth - minDepth) ' do the normalize manually to use the min and max Depth (more stable image)
         If check.Box(0).Checked Then ' do they want to display results?
             dst1 = ocvb.RGBDepth.Clone()
             dst1.SetTo(cv.Scalar.White, grid.gridMask)
@@ -74,5 +73,6 @@ Public Class Voxels_Basics_MT
                     End If
                 End Sub)
         End If
+        voxelMat *= 255 / (maxDepth - minDepth) ' do the normalize manually to use the min and max Depth (more stable image)
     End Sub
 End Class

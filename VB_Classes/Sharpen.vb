@@ -6,7 +6,7 @@ Public Class Sharpen_UnsharpMask
         sliders.setupTrackBar1(ocvb, caller, "sigma", 1, 2000, 100)
         sliders.setupTrackBar2(ocvb, caller, "threshold", 0, 255, 5)
         sliders.setupTrackBar3(ocvb, caller, "Shift Amount", 0, 5000, 1000)
-        ocvb.desc = "Sharpen an image"
+        ocvb.desc = "Sharpen an image - Painterly Effect"
         label2 = "Unsharp mask (difference from Blur)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -14,12 +14,12 @@ Public Class Sharpen_UnsharpMask
         Dim sigma As Double = sliders.TrackBar1.Value / 100
         Dim threshold As Double = sliders.TrackBar2.Value
         Dim amount As Double = sliders.TrackBar3.Value / 1000
-        cv.Cv2.GaussianBlur(ocvb.color, dst2, New cv.Size(), sigma, sigma)
+        cv.Cv2.GaussianBlur(src, dst2, New cv.Size(), sigma, sigma)
 
         Dim diff As New cv.Mat
-        cv.Cv2.Absdiff(ocvb.color, dst2, diff)
+        cv.Cv2.Absdiff(src, dst2, diff)
         diff = diff.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
-        dst1 = ocvb.color * (1 + amount) + diff * (-amount)
+        dst1 = src * (1 + amount) + diff * (-amount)
         diff.CopyTo(dst2)
     End Sub
 End Class
@@ -38,7 +38,7 @@ Public Class Sharpen_DetailEnhance
     Public Sub Run(ocvb As AlgorithmData)
         Dim sigma_s = sliders.TrackBar1.Value
         Dim sigma_r = sliders.TrackBar2.Value / sliders.TrackBar2.Maximum
-        cv.Cv2.DetailEnhance(ocvb.color, dst1, sigma_s, sigma_r)
+        cv.Cv2.DetailEnhance(src, dst1, sigma_s, sigma_r)
     End Sub
 End Class
 
@@ -57,7 +57,7 @@ Public Class Sharpen_Stylize
     Public Sub Run(ocvb As AlgorithmData)
         Dim sigma_s = sliders.TrackBar1.Value
         Dim sigma_r = sliders.TrackBar2.Value / sliders.TrackBar2.Maximum
-        cv.Cv2.DetailEnhance(ocvb.color, dst1, sigma_s, sigma_r)
+        cv.Cv2.DetailEnhance(src, dst1, sigma_s, sigma_r)
     End Sub
 End Class
 

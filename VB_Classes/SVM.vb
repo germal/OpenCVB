@@ -24,6 +24,7 @@ Public Class SVM_Options
         radio1.check(4).Text = "SVM Type = OneClass"
         If ocvb.parms.ShowOptions Then radio.Show()
 
+        label1 = "SVM_Options - only options, no output"
         ocvb.desc = "SVM has many options - enough to make a class for it."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -63,14 +64,15 @@ Public Class SVM_Basics
         Dim points(svmOptions.sliders.TrackBar1.Value) As cv.Point2f
         Dim responses(points.Length - 1) As Int32
         For i = 0 To points.Length - 1
-            Dim x = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
-            Dim y = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
+            Dim x = ocvb.ms_rng.Next(0, src.Height - 1)
+            Dim y = ocvb.ms_rng.Next(0, src.Height - 1)
             points(i) = New cv.Point2f(x, y)
             responses(i) = If(y > f(x), 1, 2)
         Next
+        dst1.SetTo(0)
         For i = 0 To points.Length - 1
             Dim x = CInt(points(i).X)
-            Dim y = CInt(ocvb.color.Height - points(i).Y)
+            Dim y = CInt(src.Height - points(i).Y)
             Dim res = responses(i)
             Dim color As cv.Scalar = If(res = 1, cv.Scalar.Red, cv.Scalar.GreenYellow)
             Dim cSize = If(res = 1, 2, 4)
@@ -80,7 +82,7 @@ Public Class SVM_Basics
         Dim dataMat = New cv.Mat(points.Length - 1, 2, cv.MatType.CV_32FC1, points)
         Dim resMat = New cv.Mat(responses.Length - 1, 1, cv.MatType.CV_32SC1, responses)
         Using svmx As cv.ML.SVM = cv.ML.SVM.Create()
-            dataMat /= (ocvb.color.Height - 1)
+            dataMat /= (src.Height - 1)
             svmx.Type = svmOptions.SVMType
             svmx.KernelType = svmOptions.kernelType
             svmx.TermCriteria = cv.TermCriteria.Both(1000, 0.000001)
@@ -95,12 +97,12 @@ Public Class SVM_Basics
 
             Dim granularity = svmOptions.sliders.TrackBar2.Value
             Dim sampleMat As New cv.Mat(1, 2, cv.MatType.CV_32F)
-            For x = 0 To ocvb.color.Height - 1 Step granularity
-                For y = 0 To ocvb.color.Height - 1 Step granularity
-                    sampleMat.Set(Of Single)(0, 0, x / CSng(ocvb.color.Height))
-                    sampleMat.Set(Of Single)(0, 1, y / CSng(ocvb.color.Height))
+            For x = 0 To src.Height - 1 Step granularity
+                For y = 0 To src.Height - 1 Step granularity
+                    sampleMat.Set(Of Single)(0, 0, x / CSng(src.Height))
+                    sampleMat.Set(Of Single)(0, 1, y / CSng(src.Height))
                     Dim ret = svmx.Predict(sampleMat)
-                    Dim plotRect = New cv.Rect(x, ocvb.color.Height - 1 - y, granularity * 2, granularity * 2)
+                    Dim plotRect = New cv.Rect(x, src.Height - 1 - y, granularity * 2, granularity * 2)
                     If ret = 1 Then
                         dst2.Rectangle(plotRect, cv.Scalar.Red, -1)
                     ElseIf ret = 2 Then
@@ -110,9 +112,9 @@ Public Class SVM_Basics
             Next
 
             ' draw the function in both plots to show ground truth.
-            For x = 1 To ocvb.color.Height - 1
-                Dim y1 = CInt(ocvb.color.Height - f(x - 1))
-                Dim y2 = CInt(ocvb.color.Height - f(x))
+            For x = 1 To src.Height - 1
+                Dim y1 = CInt(src.Height - f(x - 1))
+                Dim y2 = CInt(src.Height - f(x))
                 dst1.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 dst2.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
@@ -147,14 +149,15 @@ Public Class SVM_Basics_MT
         Dim points(svmOptions.sliders.TrackBar1.Value) As cv.Point2f
         Dim responses(points.Length - 1) As Int32
         For i = 0 To points.Length - 1
-            Dim x = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
-            Dim y = ocvb.ms_rng.Next(0, ocvb.color.Height - 1)
+            Dim x = ocvb.ms_rng.Next(0, src.Height - 1)
+            Dim y = ocvb.ms_rng.Next(0, src.Height - 1)
             points(i) = New cv.Point2f(x, y)
             responses(i) = If(y > f(x), 1, 2)
         Next
+        dst1.SetTo(0)
         For i = 0 To points.Length - 1
             Dim x = CInt(points(i).X)
-            Dim y = CInt(ocvb.color.Height - points(i).Y)
+            Dim y = CInt(src.Height - points(i).Y)
             Dim res = responses(i)
             Dim color As cv.Scalar = If(res = 1, cv.Scalar.Red, cv.Scalar.GreenYellow)
             Dim cSize = If(res = 1, 2, 4)
@@ -164,7 +167,7 @@ Public Class SVM_Basics_MT
         Dim dataMat = New cv.Mat(points.Length - 1, 2, cv.MatType.CV_32FC1, points)
         Dim resMat = New cv.Mat(responses.Length - 1, 1, cv.MatType.CV_32SC1, responses)
         Using svmx As cv.ML.SVM = cv.ML.SVM.Create()
-            dataMat /= (ocvb.color.Height - 1)
+            dataMat /= (src.Height - 1)
             svmx.Type = svmOptions.SVMType
             svmx.KernelType = svmOptions.kernelType
             svmx.TermCriteria = cv.TermCriteria.Both(1000, 0.000001)
@@ -180,18 +183,18 @@ Public Class SVM_Basics_MT
             Dim granularity = svmOptions.sliders.TrackBar2.Value
             Parallel.ForEach(Of cv.Rect)(grid.roiList,
             Sub(roi)
-                If roi.X + roi.Width > ocvb.color.Height Then
-                    roi.Width = ocvb.color.Height - roi.X
+                If roi.X + roi.Width > src.Height Then
+                    roi.Width = src.Height - roi.X
                     If roi.Width <= 0 Then Exit Sub ' the prediction region must be square.  This roi is too far to the right.
                 End If
                 Dim sampleMat As New cv.Mat(1, 2, cv.MatType.CV_32F)
 
                 For y = 0 To roi.Height - 1 Step granularity
                     For x = 0 To roi.Width - 1 Step granularity
-                        sampleMat.Set(Of Single)(0, 0, (x + roi.X) / ocvb.color.Height)
-                        sampleMat.Set(Of Single)(0, 1, (y + roi.Y) / ocvb.color.Height)
+                        sampleMat.Set(Of Single)(0, 0, (x + roi.X) / src.Height)
+                        sampleMat.Set(Of Single)(0, 1, (y + roi.Y) / src.Height)
                         Dim ret = svmx.Predict(sampleMat)
-                        Dim plotRect = New cv.Rect(x + roi.X, ocvb.color.Height - 1 - (y + roi.Y), granularity * 2, granularity * 2)
+                        Dim plotRect = New cv.Rect(x + roi.X, src.Height - 1 - (y + roi.Y), granularity * 2, granularity * 2)
                         If ret = 1 Then
                             dst2.Rectangle(plotRect, cv.Scalar.Red, -1)
                         ElseIf ret = 2 Then
@@ -201,9 +204,9 @@ Public Class SVM_Basics_MT
                 Next
             End Sub)
 
-            For x = 1 To ocvb.color.Height - 1
-                Dim y1 = CInt(ocvb.color.Height - f(x - 1))
-                Dim y2 = CInt(ocvb.color.Height - f(x))
+            For x = 1 To src.Height - 1
+                Dim y1 = CInt(src.Height - f(x - 1))
+                Dim y2 = CInt(src.Height - f(x))
                 dst1.Line(x - 1, y1, x, y2, cv.Scalar.LightBlue, 1, cv.LineTypes.AntiAlias)
                 dst2.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
@@ -232,8 +235,8 @@ Public Class SVM_Simple
         Dim labels = New cv.Mat(dataSize, 1, cv.MatType.CV_32S)
         For i = 0 To dataSize
             labels.Set(Of Int32)(i, 0, ocvb.ms_rng.Next(-1, 1))
-            trainData.Set(Of Single)(i, 0, CSng(ocvb.ms_rng.Next(0, ocvb.color.Width - 1)))
-            trainData.Set(Of Single)(i, 1, CSng(ocvb.ms_rng.Next(0, ocvb.color.Height - 1)))
+            trainData.Set(Of Single)(i, 0, CSng(ocvb.ms_rng.Next(0, src.Width - 1)))
+            trainData.Set(Of Single)(i, 1, CSng(ocvb.ms_rng.Next(0, src.Height - 1)))
         Next
         ' make sure that there always 2 classes present.
         labels.Set(Of Single)(0, 0, -1)
@@ -276,7 +279,7 @@ Public Class SVM_Simple
             Next
 
             Dim response = svmx.GetSupportVectors()
-            dst2 = ocvb.Color.EmptyClone.SetTo(0)
+            dst2.SetTo(0)
             Dim thickness = 2
             If response.Rows > 1 Then
                 For i = 0 To response.Rows

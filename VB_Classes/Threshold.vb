@@ -13,19 +13,21 @@ Public Class Threshold_LaplacianFilter
         ocvb.desc = "Threshold the output of a Laplacian derivative, mask with depth foreground."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        edges.src = src
         edges.Run(ocvb)
+        dst2 = edges.dst2
+        trim.src = src
         trim.Run(ocvb)
+        Dim gray = trim.dst1
 
-        Dim gray = dst1.CvtColor(cv.ColorConversionCodes.bgr2gray)
-        Dim mask = dst1.CvtColor(cv.ColorConversionCodes.bgr2gray).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        Dim mask = gray.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
         gray.SetTo(0, mask)
 
         Dim dist = gray.DistanceTransform(cv.DistanceTypes.L2, 3)
         Dim dist32f = dist.Normalize(0, 1, cv.NormTypes.MinMax)
         dist32f = dist.Threshold(sliders.TrackBar1.Value / 100, 1.0, cv.ThresholdTypes.Binary)
 
-        dist32f.ConvertTo(gray, cv.MatType.CV_8UC1, 255)
-        dst1 = gray.CvtColor(cv.ColorConversionCodes.gray2bgr)
+        dist32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)
     End Sub
 End Class
 

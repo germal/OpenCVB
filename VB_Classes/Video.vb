@@ -21,7 +21,7 @@ Public Class Video_Basics
             videoOptions.NewVideo(ocvb, currVideo)
         End If
         image = videoOptions.nextImage
-        If image.Empty() = False Then dst1 = image.Resize(ocvb.color.Size())
+        If image.Empty() = False Then dst1 = image.Resize(src.Size())
     End Sub
 End Class
 

@@ -43,5 +43,6 @@ Public Class TextureFlow_Depth
     Public Sub Run(ocvb As AlgorithmData)
         texture.src = ocvb.RGBDepth
         texture.Run(ocvb)
+        dst1 = texture.dst1
     End Sub
 End Class

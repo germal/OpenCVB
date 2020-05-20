@@ -12,10 +12,10 @@ Public Class xPhoto_Bm3dDenoise
         label2 = "Difference from Input"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.EqualizeHist(gray, gray)
-        CvXPhoto.Bm3dDenoising(gray, dst1)
-        cv.Cv2.Subtract(dst1, gray, dst2)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.EqualizeHist(src, src)
+        CvXPhoto.Bm3dDenoising(src, dst1)
+        cv.Cv2.Subtract(dst1, src, dst2)
         Dim minVal As Double, maxVal As Double
         dst2.MinMaxLoc(minVal, maxVal)
         label2 = "Diff from input - max change=" + CStr(maxVal)
@@ -32,7 +32,6 @@ Public Class xPhoto_Bm3dDenoiseDepthImage
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Denoise the depth image with block matching and filtering."
-        label1 = "Bm3dDenoising"
         label2 = "Difference from Input"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -87,13 +86,6 @@ Public Class xPhoto_OilPaint_CPP
         ocvb.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim src As New cv.Mat
-        If ocvb.drawRect.Width = 0 Then
-            src = ocvb.color.Clone()
-        Else
-            src = ocvb.color(ocvb.drawRect).Clone()
-        End If
-
         Dim colorCode As Int32 = cv.ColorConversionCodes.BGR2GRAY
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then
@@ -110,16 +102,7 @@ Public Class xPhoto_OilPaint_CPP
                                            sliders.TrackBar2.Value, sliders.TrackBar1.Value, colorCode)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then
-            Dim dstData(src.Total * src.ElemSize - 1) As Byte
-            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
-            If ocvb.drawRect.Width <> 0 Then
-                dst1 = ocvb.color
-                dst1(ocvb.drawRect) = dst1
-                dst2 = dst1.Resize(dst2.Size)
-            End If
-        End If
+        If imagePtr <> 0 Then dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
     End Sub
     Public Sub Close()
         xPhoto_OilPaint_Close(xPhoto_OilPaint)

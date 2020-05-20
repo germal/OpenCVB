@@ -73,7 +73,7 @@ Public Class Undistort_Basics
         Else
             sliders.setupTrackBar2(ocvb, caller, "undistort intrinsics coeff's", -1000, 1000, 100)
         End If
-        sliders.setupTrackBar3(ocvb, caller, "undistort stereo height", 1, ocvb.color.Height, ocvb.color.Height)
+        sliders.setupTrackBar3(ocvb, caller, "undistort stereo height", 1, colorRows, colorRows)
         sliders.setupTrackBar4(ocvb, caller, "undistort Offset left/right", 1, 200, 112)
 
         check.Setup(ocvb, caller, 1)
@@ -81,7 +81,7 @@ Public Class Undistort_Basics
         check.Box(0).Checked = True
 
         label1 = "Left Image with sliders applied"
-        ocvb.desc = "Use sliders to control the undistort OpenCV API"
+        ocvb.desc = "Use sliders to control the undistort OpenCV API - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static kMatLeft As cv.Mat, dMatLeft As cv.Mat, rMatLeft As cv.Mat, pMatLeft As cv.Mat
@@ -127,7 +127,7 @@ Public Class Undistort_Basics
 
         cv.Cv2.FishEye.InitUndistortRectifyMap(kMat, dMat, rMatLeft, pMatLeft, New cv.Size(rawWidth, rawHeight),
                                                cv.MatType.CV_32FC1, leftViewMap1, leftViewMap2)
-        dst1 = ocvb.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
-        dst2 = ocvb.color.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
+        dst1 = ocvb.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
+        dst2 = src.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
     End Sub
 End Class

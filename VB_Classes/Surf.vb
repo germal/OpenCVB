@@ -21,25 +21,22 @@ Public Class Surf_Basics_CS
         sliders.setupTrackBar1(ocvb, caller, "Hessian threshold", 1, 5000, 2000)
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
-        label1 = "BF Matcher output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then
-            If ocvb.parms.cameraIndex = T265Camera Then
-                fisheye.Run(ocvb)
-                srcLeft = fisheye.leftView
-                srcRight = fisheye.rightView
-            Else
-                srcLeft = ocvb.leftView
-                srcRight = ocvb.rightView
-            End If
+        If ocvb.parms.cameraIndex = T265Camera Then
+            fisheye.Run(ocvb)
+            srcLeft = fisheye.leftView
+            srcRight = fisheye.rightView
+        Else
+            srcLeft = ocvb.leftView
+            srcRight = ocvb.rightView
         End If
-        CS_SurfBasics.Run(srcLeft, srcRight, dst1, sliders.TrackBar1.Value, radio.check(0).Checked)
+        Dim doubleSize As New cv.Mat
+        CS_SurfBasics.Run(srcLeft, srcRight, doubleSize, sliders.TrackBar1.Value, radio.check(0).Checked)
 
-        'If dst1.Width <> ocvb.color.Width * 2 Then dst1 = dst1.Resize(New cv.Size(ocvb.color.Width * 2, srcLeft.Height))
         If standalone Then
-            dst1(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(dst1)
-            dst1(New cv.Rect(ocvb.color.Width, 0, ocvb.color.Width, ocvb.color.Height)).CopyTo(dst2)
+            doubleSize(New cv.Rect(0, 0, src.Width, src.Height)).CopyTo(dst1)
+            doubleSize(New cv.Rect(src.Width, 0, src.Width, src.Height)).CopyTo(dst2)
             label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
             If CS_SurfBasics.keypoints1 IsNot Nothing Then ocvb.label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
         End If
@@ -67,13 +64,7 @@ Public Class Surf_Basics
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = T265Camera Then fisheye.Run(ocvb)
 
-        If ocvb.parms.cameraIndex = T265Camera Then
-            surf.srcLeft = fisheye.leftView
-            surf.srcRight = fisheye.rightView
-        Else
-            surf.srcLeft = ocvb.leftView
-            surf.srcRight = ocvb.rightView
-        End If
+        surf.src = src
         surf.Run(ocvb)
         surf.dst1(New cv.Rect(0, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(dst1)
         surf.dst1(New cv.Rect(surf.srcLeft.Width, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(dst2)
@@ -98,6 +89,7 @@ Public Class Surf_DrawMatchManual_CS
         ocvb.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        surf.src = src
         surf.Run(ocvb)
         dst1 = surf.srcLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = surf.srcRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

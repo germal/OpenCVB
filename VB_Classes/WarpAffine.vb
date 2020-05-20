@@ -46,23 +46,16 @@ Public Class WarpAffine_Captcha
         cv.Cv2.WarpAffine(input, output, rotationMatrix, input.Size(), cv.InterpolationFlags.Linear, cv.BorderTypes.Constant, cv.Scalar.White)
     End Sub
     Private Sub transformPerspective(ByRef charImage As cv.Mat)
-        Dim src(3) As cv.Point2f
-        src(0) = New cv.Point2f(0, 0)
-        src(1) = New cv.Point2f(0, charHeight)
-        src(2) = New cv.Point2f(charWidth, 0)
-        src(3) = New cv.Point2f(charWidth, charHeight)
+        Dim srcPt() = {New cv.Point2f(0, 0), New cv.Point2f(0, charHeight), New cv.Point2f(charWidth, 0), New cv.Point2f(charWidth, charHeight)}
 
-        Dim dst(3) As cv.Point2f
-        dst(0) = New cv.Point2f(0, 0)
-        dst(1) = New cv.Point2f(0, charHeight)
-        dst(2) = New cv.Point2f(charWidth, 0)
         Dim varWidth = charWidth / 2
         Dim varHeight = charHeight / 2
         Dim widthWarp = charHeight - varWidth + rng.NextDouble() * varWidth
         Dim heightWarp = charHeight - varHeight + rng.NextDouble() * varHeight
-        dst(3) = New cv.Point2f(widthWarp, heightWarp)
 
-        Dim perpectiveTranx = cv.Cv2.GetPerspectiveTransform(src, dst1)
+        Dim dstPt() = {New cv.Point2f(0, 0), New cv.Point2f(0, charHeight), New cv.Point2f(charWidth, 0), New cv.Point2f(widthWarp, heightWarp)}
+
+        Dim perpectiveTranx = cv.Cv2.GetPerspectiveTransform(srcPt, dstPt)
         cv.Cv2.WarpPerspective(charImage, charImage, perpectiveTranx, New cv.Size(charImage.Cols, charImage.Rows), cv.InterpolationFlags.Cubic,
                                cv.BorderTypes.Constant, cv.Scalar.White)
     End Sub
@@ -85,7 +78,7 @@ Public Class WarpAffine_Captcha
 
         addLines(outImage)
         addNoise(outImage)
-        Dim roi As New cv.Rect(0, ocvb.color.Height / 2 - charHeight / 2, dst1.Cols, charHeight)
+        Dim roi As New cv.Rect(0, src.Height / 2 - charHeight / 2, dst1.Cols, charHeight)
         dst1(roi) = outImage.Resize(New cv.Size(dst1.Cols, charHeight))
     End Sub
 End Class
@@ -107,13 +100,13 @@ Public Class WarpAffine_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Dim warpFlag = getInterpolationRadioButtons(radio)
 
-        Dim pt = New cv.Point2f(ocvb.color.Cols / 2, ocvb.color.Rows / 2)
+        Dim pt = New cv.Point2f(src.Cols / 2, src.Rows / 2)
         Dim angle = sliders.TrackBar1.Value
         Dim rotationMatrix = cv.Cv2.GetRotationMatrix2D(pt, angle, 1.0)
-        cv.Cv2.WarpAffine(ocvb.color, dst1, rotationMatrix, ocvb.color.Size(), warpFlag)
+        cv.Cv2.WarpAffine(src, dst1, rotationMatrix, src.Size(), warpFlag)
         angle *= -1
         rotationMatrix = cv.Cv2.GetRotationMatrix2D(pt, angle, 1.0)
-        cv.Cv2.WarpAffine(dst1, dst2, rotationMatrix, ocvb.color.Size(), warpFlag)
+        cv.Cv2.WarpAffine(dst1, dst2, rotationMatrix, src.Size(), warpFlag)
         label1 = "Rotated with Warpaffine with angle: " + CStr(angle)
         label2 = "Rotated back with inverse Warpaffine angle: " + CStr(-angle)
     End Sub
@@ -140,6 +133,7 @@ Public Class WarpAffine_3Points
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 60 <> 0 Then Exit Sub
         Dim triangles(1) As cv.Mat
+        triangle.src = src
         triangle.Run(ocvb)
         triangles(0) = triangle.triangle.Clone()
         Dim srcPoints1 = triangle.srcPoints.Clone()
@@ -147,20 +141,20 @@ Public Class WarpAffine_3Points
         triangles(1) = triangle.triangle.Clone()
         Dim srcPoints2 = triangle.srcPoints.Clone()
 
-        Dim tOriginal = New cv.Mat(3, 1, cv.MatType.CV_32FC2, New Single() {0, 0, 0, ocvb.color.Height, ocvb.color.Width, ocvb.color.Height})
+        Dim tOriginal = New cv.Mat(3, 1, cv.MatType.CV_32FC2, New Single() {0, 0, 0, src.Height, src.Width, src.Height})
         Dim M = cv.Cv2.GetAffineTransform(tOriginal, triangles(1))
 
-        Dim wideMat = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols * 2, cv.MatType.CV_8UC3, 0)
+        Dim wideMat = New cv.Mat(src.Rows, src.Cols * 2, cv.MatType.CV_8UC3, 0)
         ' uncomment this line to see original pose of the left triangle
         ' triangles(0) = tOriginal
         For j = 0 To 1
             For i = 0 To triangles(j).Rows - 1
-                Dim p1 = triangles(j).Get(Of cv.Point2f)(i) + New cv.Point2f(j * ocvb.color.Width, 0)
-                Dim p2 = triangles(j).Get(Of cv.Point2f)((i + 1) Mod 3) + New cv.Point2f(j * ocvb.color.Width, 0)
+                Dim p1 = triangles(j).Get(Of cv.Point2f)(i) + New cv.Point2f(j * src.Width, 0)
+                Dim p2 = triangles(j).Get(Of cv.Point2f)((i + 1) Mod 3) + New cv.Point2f(j * src.Width, 0)
                 Dim color = Choose(i + 1, cv.Scalar.Red, cv.Scalar.White, cv.Scalar.Yellow)
                 wideMat.Line(p1, p2, color, 4, cv.LineTypes.AntiAlias)
                 If j = 0 Then
-                    Dim p3 = triangles(j + 1).Get(Of cv.Point2f)(i) + New cv.Point2f(ocvb.color.Width, 0)
+                    Dim p3 = triangles(j + 1).Get(Of cv.Point2f)(i) + New cv.Point2f(src.Width, 0)
                     wideMat.Line(p1, p3, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 End If
             Next
@@ -168,11 +162,11 @@ Public Class WarpAffine_3Points
 
         Dim corner = triangles(0).Get(Of cv.Point2f)(0)
         wideMat.Circle(corner, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        corner = New cv.Point2f(M.Get(Of Double)(0, 2) + ocvb.color.Width, M.Get(Of Double)(1, 2))
+        corner = New cv.Point2f(M.Get(Of Double)(0, 2) + src.Width, M.Get(Of Double)(1, 2))
         wideMat.Circle(corner, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
-        dst1 = wideMat(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
-        dst2 = wideMat(New cv.Rect(ocvb.color.Width, 0, ocvb.color.Width, ocvb.color.Height))
+        dst1 = wideMat(New cv.Rect(0, 0, src.Width, src.Height))
+        dst2 = wideMat(New cv.Rect(src.Width, 0, src.Width, src.Height))
 
         Dim pt As cv.Point
         For i = 0 To srcPoints1.Length - 1
@@ -211,16 +205,17 @@ Public Class WarpAffine_4Points
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 60 <> 0 Then Exit Sub
 
-        Dim roi = New cv.Rect(50, ocvb.color.Height / 2, ocvb.color.Width / 6, ocvb.color.Height / 6)
-        Dim smallImage = ocvb.color.Resize(New cv.Size(roi.Width, roi.Height))
+        Dim roi = New cv.Rect(50, src.Height / 2, src.Width / 6, src.Height / 6)
+        Dim smallImage = src.Resize(New cv.Size(roi.Width, roi.Height))
         Dim rectangles(1) As cv.RotatedRect
+        rect.src = src
         rect.Run(ocvb)
         rectangles(1) = rect.minRect
-        rectangles(1).Center.X = ocvb.color.Width - rectangles(0).Center.X - roi.Width
+        rectangles(1).Center.X = src.Width - rectangles(0).Center.X - roi.Width
 
-        rectangles(0) = New cv.RotatedRect(New cv.Point2f(ocvb.color.Width / 2, ocvb.color.Height / 2), New cv.Size2f(ocvb.color.Width, ocvb.color.Height), 0)
+        rectangles(0) = New cv.RotatedRect(New cv.Point2f(src.Width / 2, src.Height / 2), New cv.Size2f(src.Width, src.Height), 0)
         Dim M = cv.Cv2.GetPerspectiveTransform(rectangles(0).Points.ToArray, rectangles(1).Points.ToArray)
-        cv.Cv2.WarpPerspective(ocvb.color, dst1, M, ocvb.color.Size())
+        cv.Cv2.WarpPerspective(src, dst1, M, src.Size())
         dst1(roi) = smallImage
 
         ' comment this line to see the real original dimensions and location.
@@ -238,7 +233,7 @@ Public Class WarpAffine_4Points
             Next
         Next
 
-        dst2 = ocvb.Color.EmptyClone.SetTo(0)
+        dst2.SetTo(0)
         Dim ttStart = 40
         ocvb.putText(New ActiveClass.TrueType("M defined as: " + vbCrLf +
                                               Format(M.Get(Of Double)(0, 0), "#0.00") + vbTab +
@@ -252,7 +247,7 @@ Public Class WarpAffine_4Points
                                               Format(M.Get(Of Double)(2, 2), "#0.00") + vbCrLf, 10, ttStart, RESULT2))
         Dim center As New cv.Point2f(M.Get(Of Double)(0, 2), M.Get(Of Double)(1, 2))
         dst1.Circle(center, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        center = New cv.Point2f(50, ocvb.color.Height / 2)
+        center = New cv.Point2f(50, src.Height / 2)
         dst1.Circle(center, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
     End Sub
 End Class

@@ -38,10 +38,10 @@ Public Class Hull_Basics
         Dim Count = sliders.TrackBar1.Value
         Dim points(Count - 1) As cv.Point
         Dim pad = 4
-        Dim w = ocvb.color.Width - ocvb.color.Width / pad
-        Dim h = ocvb.color.Height - ocvb.color.Height / pad
+        Dim w = src.Width - src.Width / pad
+        Dim h = src.Height - src.Height / pad
         For i = 0 To Count - 1
-            points(i) = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Width / pad, w), ocvb.ms_rng.Next(ocvb.color.Height / pad, h))
+            points(i) = New cv.Point2f(ocvb.ms_rng.Next(src.Width / pad, w), ocvb.ms_rng.Next(src.Height / pad, h))
         Next
         hull = cv.Cv2.ConvexHull(points, True)
 
