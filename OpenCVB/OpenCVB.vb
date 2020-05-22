@@ -16,6 +16,7 @@ Public Class OpenCVB
     Dim AlgorithmCount As Int32
     Dim AlgorithmTestCount As Int32
     Dim algorithmTaskHandle As Thread
+    Dim saveAlgorithmName As String
     Dim border As Int32 = 6
     Dim BothFirstAndLastReady As Boolean
     Dim camera As Object
@@ -793,8 +794,8 @@ Public Class OpenCVB
             cameraRefresh = True
             Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
             totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
-            If totalBytesOfMemoryUsed > 4000 Then MsgBox("OpenCVB appears to have a memory leak in the current algorithm" + vbCrLf +
-                                                         "The memory footprint has grown above 2Gb which is way more than expected.")
+            If totalBytesOfMemoryUsed > 4000 Then MsgBox("OpenCVB appears to have a memory leak in the " + saveAlgorithmName + " algorithm" + vbCrLf +
+                                                         "The memory footprint has grown above 4Gb which is more than expected.")
             Static myFrames As Integer = 0
             If myFrames > 10 Then
                 For i = 0 To 4 - 1
@@ -906,6 +907,7 @@ Public Class OpenCVB
         ReDim parms.IMU_RotationMatrix(9 - 1)
         lowResolution = optionsForm.lowResolution.Checked
 
+        saveAlgorithmName = AvailableAlgorithms.Text ' to share with the camera task...
         parms.activeAlgorithm = AvailableAlgorithms.Text
         ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
         If parms.activeAlgorithm.Contains("OpenGL") Or parms.activeAlgorithm.Contains("OpenCVGL") Then lowResolution = False

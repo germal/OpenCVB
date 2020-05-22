@@ -101,6 +101,7 @@ def main():
     print("\nRMS:", rms)
     print("camera matrix:\n", camera_matrix)
     print("distortion coefficients: ", dist_coefs.ravel())
+    cv.waitKey(10000)
 
     # undistort the image with the calibration
     print('')

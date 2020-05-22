@@ -1,3 +1,4 @@
+cd ..\
 rmdir OpenCV /s
 "c:\Program Files\Git\bin\git.exe" clone "https://github.com/opencv/opencv"
 cd OpenCV

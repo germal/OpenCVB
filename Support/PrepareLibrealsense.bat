@@ -1,3 +1,4 @@
+cd ..\
 if exist librealsense (rmdir librealsense /s)
 "c:\Program Files\Git\bin\git.exe" clone "https://github.com/IntelRealSense/librealsense"
 

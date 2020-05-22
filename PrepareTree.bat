@@ -1,5 +1,5 @@
 
-start PrepareOpenCV.bat
-start PrepareLibrealSense.bat
-start PrepareAzure4Kinect.bat
+start Support/PrepareOpenCV.bat
+start Support/PrepareLibrealSense.bat
+start Support/PrepareAzure4Kinect.bat
 exit

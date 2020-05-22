@@ -1,3 +1,4 @@
+cd ..\
 rmdir vtk /s
 
 "c:\Program Files\Git\bin\git.exe" clone "https://gitlab.kitware.com/vtk/vtk.git"

@@ -129,7 +129,7 @@ for i in range(markers.shape[0]):
     for j in range(markers.shape[1]):
         index = markers[i,j]
         if index > 0 and index <= len(contours):
-            dst[i,j,:] = colors[index-1]
+            dst1[i,j,:] = colors[index-1]
 
 # Visualize the final image
 cv.imshow('Final Result', dst1)

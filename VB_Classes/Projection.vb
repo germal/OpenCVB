@@ -387,30 +387,30 @@ Public Class Projection_Flood
         flood.Run(ocvb)
         dst1 = flood.dst1
 
-        ' Combine rectangles that are overlaping or touching.
-        Dim combinedRects As New List(Of cv.Rect)
-        ' first duplicate all the current rectangles so all originals (by themselves) will be returned.
-        For i = 0 To flood.objectRects.Count - 1
-            combinedRects.Add(flood.objectRects(i))
-            combinedRects.Add(flood.objectRects(i))
-        Next
+        '' Combine rectangles that are overlaping or touching.
+        'Dim combinedRects As New List(Of cv.Rect)
+        '' first duplicate all the current rectangles so all originals (by themselves) will be returned.
+        'For i = 0 To flood.objectRects.Count - 1
+        '    combinedRects.Add(flood.objectRects(i))
+        '    combinedRects.Add(flood.objectRects(i))
+        'Next
 
-        Dim epsilon = sliders.TrackBar1.Value / 100
-        cv.Cv2.GroupRectangles(combinedRects, 1, epsilon)
+        'Dim epsilon = sliders.TrackBar1.Value / 100
+        'cv.Cv2.GroupRectangles(combinedRects, 1, epsilon)
 
-        For i = 0 To Math.Min(combinedRects.Count * 2, kalman.input.Count) - 1 Step 4
-            Dim rIndex = i / 2
-            kalman.input(i) = combinedRects(rIndex).X
-            kalman.input(i + 1) = combinedRects(rIndex).Y
-            kalman.input(i + 2) = combinedRects(rIndex).Width
-            kalman.input(i + 3) = combinedRects(rIndex).Height
-        Next
-        kalman.Run(ocvb)
-        Dim rects As New List(Of cv.Rect)
-        For i = 0 To Math.Min(combinedRects.Count * 2, kalman.input.Count) - 1 Step 4
-            Dim rect = combinedRects(i / 2)
-            rects.Add(New cv.Rect(kalman.output(i), kalman.output(i + 1), kalman.output(i + 2), kalman.output(i + 3)))
-        Next
+        'For i = 0 To Math.Min(combinedRects.Count * 2, kalman.input.Count) - 1 Step 4
+        '    Dim rIndex = i / 2
+        '    kalman.input(i) = combinedRects(rIndex).X
+        '    kalman.input(i + 1) = combinedRects(rIndex).Y
+        '    kalman.input(i + 2) = combinedRects(rIndex).Width
+        '    kalman.input(i + 3) = combinedRects(rIndex).Height
+        'Next
+        'kalman.Run(ocvb)
+        'Dim rects As New List(Of cv.Rect)
+        'For i = 0 To Math.Min(combinedRects.Count * 2, kalman.input.Count) - 1 Step 4
+        '    Dim rect = combinedRects(i / 2)
+        '    rects.Add(New cv.Rect(kalman.output(i), kalman.output(i + 1), kalman.output(i + 2), kalman.output(i + 3)))
+        'Next
 
         dst2 = flood.dst2.Resize(src.Size())
         If standalone Then
@@ -418,7 +418,9 @@ Public Class Projection_Flood
             If ocvb.parms.lowResolution Then fontSize = 0.6
             Dim maxDepth = gravity.sliders.TrackBar1.Value
             Dim mmPerPixel = maxDepth / src.Height
-            For Each rect In rects
+            Dim maxCount = Math.Min(flood.objectRects.Count, 10)
+            For i = 0 To maxCount - 1
+                Dim rect = flood.objectRects(i)
                 dst2.Rectangle(rect, cv.Scalar.White, 1)
                 Dim distanceFromCamera = (src.Height - rect.Y - rect.Height) * mmPerPixel
                 Dim objectWidth = rect.Width * mmPerPixel
@@ -427,7 +429,7 @@ Public Class Projection_Flood
                 Dim pt = New cv.Point(rect.X, rect.Y - 10)
                 cv.Cv2.PutText(dst2, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
-            label2 = CStr(flood.objectRects.Count) + " objects combined into " + CStr(rects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
+            label2 = "Showing the top " + CStr(maxCount) + " objects out of " + CStr(flood.objectRects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
         End If
     End Sub
 End Class

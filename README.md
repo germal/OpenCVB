@@ -65,7 +65,7 @@ follow. OpenCVB is an opportunity to experiment with the features of these
 cameras and apply the same algorithm to all cameras.
 
 The algorithms are notably short, almost always less than a page of code,
-labelled reasonably well, easily searched and grouped and combined, while often
+labelled reasonably well, easily searched, and easily combined, while often
 providing links to online documentation and versions for other platforms. Many
 downloadable algorithms are encumbered by environmental considerations that can
 obscure the meaning or context of an algorithm. All the algorithms here contain
@@ -85,7 +85,7 @@ You will need to download and install the following before starting:
 
     -   <https://cmake.org/download/>
 
--   The latest TortoiseGit and Git
+-   TortoiseGit and Git
 
     -   <https://tortoisegit.org/>
 
@@ -480,7 +480,7 @@ work with or without VTK installed but if it is not present, the VTK algorithms
 will simply display a message explaining how to enable VTK with the following
 steps:
 
--   Run “PrepareVTK.bat” in \<OpenCVB_Home\>
+-   Run “Support\\PrepareVTK.bat” in \<OpenCVB_Home\>
 
 -   Build VTK for both Debug and Release
 
