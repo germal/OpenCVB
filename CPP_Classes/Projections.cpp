@@ -87,7 +87,7 @@ public:
 	void Run(float maxZ, int w, int h)
 	{
 		float zHalf = maxZ / 2;
-		float range = (float)h;
+		float dFactor = (float)h / maxZ;
 		int shift = int((viewTop.cols - viewTop.rows) / 2); // shift to the center of the image.
 #pragma omp parallel for
 		for (int y = 0; y < xyz.rows; ++y)
@@ -99,18 +99,18 @@ public:
 				if (d > 0 and d < maxZ)
 				{
 					float fx = pt.x;
-					float dpixel = range * d / maxZ;
+					float dpixel = dFactor * d;
 					if (fx > -zHalf && fx < zHalf)
 					{
-						float dx = range * (zHalf + fx) / maxZ; // maintain a 1:1 aspect ratio
-						if (dx > 0 && dx < range) top16u.at<ushort>((int)(range - dpixel), (int)dx + shift) = int(255 * d / maxZ);
+						float dx = dFactor * (zHalf + fx); // maintain a 1:1 aspect ratio
+						top16u.at<ushort>((int)((float)h - dpixel), (int)dx + shift) = int(255 * d / maxZ);
 					}
 
 					float fy = pt.y;
 					if (fy > -zHalf && fy < zHalf)
 					{
-						float dy = range * (zHalf + fy) / maxZ; // maintain a 1:1 aspect ratio
-						if (dy < range && dy > 0) side16u.at<ushort>(int(dy), (int)dpixel + shift) = int(255 * d / maxZ);
+						float dy = dFactor * (zHalf + fy); // maintain a 1:1 aspect ratio
+						side16u.at<ushort>(int(dy), (int)dpixel + shift) = int(255 * d / maxZ);
 					}
 				}
 			}
