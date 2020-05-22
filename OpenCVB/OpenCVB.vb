@@ -934,8 +934,6 @@ Public Class OpenCVB
         parms.AvoidDNNCrashes = optionsForm.AvoidDNNCrashes.Checked
 
         If parms.lowResolution Then parms.speedFactor = 2 Else parms.speedFactor = 1
-        parms.width = regWidth / parms.speedFactor
-        parms.height = regHeight / parms.speedFactor
         If parms.lowResolution Then parms.imageToTrueTypeLoc *= parms.speedFactor
 
         PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
@@ -976,17 +974,16 @@ Public Class OpenCVB
         Dim saveAlgorithmTestCount = AlgorithmTestCount ' use this to confirm that this task is to terminate.
         drawRect = New cv.Rect
         Dim saveLowResSetting As Boolean = parms.lowResolution
-        Dim OpenCVB = New VB_Classes.ActiveClass(parms)
+        Dim OpenCVB = New VB_Classes.ActiveClass(parms, regWidth / parms.speedFactor, regHeight / parms.speedFactor)
         textDesc = OpenCVB.ocvb.desc
 
         Console.WriteLine("textDesc = " + textDesc) ' Debugging a label problem...
 
-        ' some algorithms need to turn off the lowResolution (OpenGL apps run at full resolution.)  
         ' Here we check to see if the algorithm constructor changed lowResolution.
         If OpenCVB.ocvb.parms.lowResolution <> saveLowResSetting Then
             If OpenCVB.ocvb.parms.lowResolution Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
-            OpenCVB.ocvb.parms.width = regWidth / OpenCVB.ocvb.parms.speedFactor
-            OpenCVB.ocvb.parms.height = regHeight / OpenCVB.ocvb.parms.speedFactor
+            OpenCVB.ocvb.w = regWidth / OpenCVB.ocvb.parms.speedFactor
+            OpenCVB.ocvb.h = regHeight / OpenCVB.ocvb.parms.speedFactor
             OpenCVB.ocvb.parms.imageToTrueTypeLoc = 1 / resizeForDisplay
             If OpenCVB.ocvb.parms.lowResolution Then OpenCVB.ocvb.parms.imageToTrueTypeLoc *= OpenCVB.ocvb.parms.speedFactor
         End If
