@@ -38,8 +38,6 @@ Public Class Font_TrueType
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ' get the font on every iteration because it could have changed.  This should be done in any algorithm using OptionsFont.
-        ocvb.fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
-        ocvb.fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
         ocvb.putText(New ActiveClass.TrueType("TrueType Font Example (override default font) = Times New Roman with size 10" + vbCrLf +
                                               "Use 'Change' button in the font dialog below to set a global font: " + ocvb.fontName + vbCrLf +
                                               "Global TrueType Font = " + ocvb.fontName + " with size " + CStr(ocvb.fontSize) + vbCrLf +

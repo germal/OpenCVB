@@ -37,7 +37,7 @@ Public Class Surf_Basics_CS
         doubleSize(New cv.Rect(0, 0, src.Width, src.Height)).CopyTo(dst1)
         doubleSize(New cv.Rect(src.Width, 0, src.Width, src.Height)).CopyTo(dst2)
         label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
-        If CS_SurfBasics.keypoints1 IsNot Nothing Then ocvb.label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
+        If CS_SurfBasics.keypoints1 IsNot Nothing Then label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
     End Sub
 End Class
 

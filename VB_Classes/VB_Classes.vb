@@ -103,7 +103,6 @@ Public Class ActiveClass : Implements IDisposable
         Dim cameraName As String
         Dim externalPythonInvocation As Boolean
         Dim extrinsics As Extrinsics_VB
-        Dim height As Int32
         Dim HomeDir As String
         Dim VBTestInterface As Object
         Dim imageToTrueTypeLoc As Single
@@ -141,28 +140,26 @@ Public Class ActiveClass : Implements IDisposable
         Dim transformationMatrix() As Single
         Dim useRecordedData As Boolean
         Dim vtkDirectory As String
-        Dim width As Int32
     End Structure
-    Public Sub New(parms As algorithmParameters)
+    Public Sub New(parms As algorithmParameters, _width As Integer, _height As Integer)
         Randomize() ' just in case anyone uses VB.Net's Rnd
         UpdateHostLocation(parms.mainFormLoc.X, parms.mainFormLoc.Y, parms.mainFormHeight)
-        ocvb = New AlgorithmData(parms)
+        ocvb = New AlgorithmData(parms, _width, _height)
         If LCase(parms.activeAlgorithm).EndsWith(".py") Then ocvb.PythonFileName = parms.activeAlgorithm
         ocvb.PythonExe = parms.PythonExe
         ocvb.parms = parms
         slidersOffset = New cv.Point
         radioOffset = New cv.Point
-        ocvb.name = parms.activeAlgorithm
         colorRows = ocvb.color.Rows
         colorCols = ocvb.color.Cols
-        ActiveAlgorithm = algoList.createAlgorithm(ocvb)
+        ActiveAlgorithm = algoList.createAlgorithm(ocvb, parms.activeAlgorithm)
         If ActiveAlgorithm Is Nothing Then
             MsgBox("The algorithm: " + parms.activeAlgorithm + " was not found in the algorithmList.vb code." + vbCrLf +
                    "Review the code to determine why.")
         End If
         If ActiveAlgorithm Is Nothing And parms.activeAlgorithm.EndsWith(".py") Then
             parms.activeAlgorithm = parms.activeAlgorithm.Substring(0, Len(parms.activeAlgorithm) - 3)
-            ActiveAlgorithm = algoList.createAlgorithm(ocvb)
+            ActiveAlgorithm = algoList.createAlgorithm(ocvb, parms.activeAlgorithm)
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb, "VB_Classes.vb")
     End Sub

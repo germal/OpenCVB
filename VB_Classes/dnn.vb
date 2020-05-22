@@ -130,7 +130,7 @@ Public Class DNN_Basics
                     Dim confidence = detectionMat.Get(Of Single)(i, 2)
                     If confidence > confidenceThreshold Then
                         Dim nextName = classNames(CInt(detectionMat.Get(Of Single)(i, 1)))
-                        ocvb.label2 += nextName + " "  ' display the name of what we found.
+                        label2 += nextName + " "  ' display the name of what we found.
                         Dim vec = detectionMat.Get(Of cv.Vec4f)(i, 3)
                         rect = New cv.Rect(vec.Item0 * cols + crop.Left, vec.Item1 * rows + crop.Top, (vec.Item2 - vec.Item0) * cols, (vec.Item3 - vec.Item1) * rows)
                         rect = New cv.Rect(rect.X, rect.Y, Math.Min(dnnWidth, rect.Width), Math.Min(dnnHeight, rect.Height))

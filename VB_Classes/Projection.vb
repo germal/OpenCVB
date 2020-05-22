@@ -300,7 +300,6 @@ Public Class Projection_G_CPP
         maxZ = sliders.TrackBar1.Value / 1000
 
         gCloud.Run(ocvb)
-
         Dim xyz As New cv.Mat
         cv.Cv2.Merge(gCloud.vertSplit, xyz)
 
@@ -377,6 +376,11 @@ Public Class Projection_Flood
         ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings) - more work needed"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.cameraIndex = T265Camera Then
+            ocvb.putText(New ActiveClass.TrueType("There is no point cloud available on the T265 camera", 10, 60, RESULT1))
+            Exit Sub
+        End If
+
         gravity.src = src
         gravity.Run(ocvb)
         flood.src = gravity.dst1

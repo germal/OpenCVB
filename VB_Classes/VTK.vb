@@ -70,7 +70,7 @@ Public Class VTK_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If vtkPresent = False Then
-            ocvb.vtkInstructions()
+            vtkInstructions(ocvb)
             Exit Sub
         End If
         If ocvb.frameCount = 0 Then startVTKWindow(ocvb)
@@ -138,7 +138,7 @@ Public Class VTK_Histogram3D
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If vtk.vtkPresent = False Then
-            ocvb.vtkInstructions()
+            vtkInstructions(ocvb)
             Exit Sub
         End If
 

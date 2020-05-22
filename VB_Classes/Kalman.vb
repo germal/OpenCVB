@@ -260,7 +260,7 @@ Public Class Kalman_CVMat
         setCaller(callerRaw)
         If standalone Then
             basics = New Kalman_Basics(ocvb, caller)
-            ocvb.label1 = "Rectangle moves smoothly to random locations"
+            label1 = "Rectangle moves smoothly to random locations"
             input = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
         End If
         ocvb.desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
