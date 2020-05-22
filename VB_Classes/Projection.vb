@@ -412,7 +412,7 @@ Public Class Projection_Flood
         '    rects.Add(New cv.Rect(kalman.output(i), kalman.output(i + 1), kalman.output(i + 2), kalman.output(i + 3)))
         'Next
 
-        dst2 = flood.dst2.Resize(src.Size())
+        dst2 = dst1.Clone()
         If standalone Then
             Dim fontSize As Single = 1.0
             If ocvb.parms.lowResolution Then fontSize = 0.6
@@ -429,7 +429,7 @@ Public Class Projection_Flood
                 Dim pt = New cv.Point(rect.X, rect.Y - 10)
                 cv.Cv2.PutText(dst2, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
-            label2 = "Showing the top " + CStr(maxCount) + " objects out of " + CStr(flood.objectRects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
+            label2 = "Showing the top " + CStr(maxCount) + " out of " + CStr(flood.objectRects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
         End If
     End Sub
 End Class
