@@ -80,6 +80,7 @@ Public Class Python_Run
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If pyStream IsNot Nothing Then
+            pyStream.src = src
             pyStream.Run(ocvb)
         Else
             Dim proc = Process.GetProcessesByName("python")
