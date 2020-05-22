@@ -32,15 +32,19 @@ Public Class Blob_Input
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency = 0 Then
+            rectangles.src = src
             rectangles.Run(ocvb)
             Mats.mat(0) = rectangles.dst1
 
+            circles.src = src
             circles.Run(ocvb)
             Mats.mat(1) = circles.dst1
 
+            ellipses.src = src
             ellipses.Run(ocvb)
             Mats.mat(2) = ellipses.dst1
 
+            poly.src = src
             poly.Run(ocvb)
             Mats.mat(3) = poly.dst2
             Mats.Run(ocvb)
@@ -91,6 +95,7 @@ Public Class Blob_Detector_CS
         blobParams.MinDistBetweenBlobs = 10
         blobParams.MinRepeatability = 1
 
+        input.src = src
         input.Run(ocvb)
         dst1 = input.dst1
         dst2 = dst1.EmptyClone
@@ -116,6 +121,7 @@ Public Class Blob_RenderBlobs
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 100 = 0 Then
+            input.src = src
             input.Run(ocvb)
             dst1 = input.dst1
             Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -129,7 +135,7 @@ Public Class Blob_RenderBlobs
             cc.RenderBlobs(labelView)
 
             Dim maxBlob = cc.GetLargestBlob()
-            dst2 = ocvb.Color.EmptyClone.SetTo(0)
+            dst2.SetTo(0)
             cc.FilterByBlob(dst1, dst2, maxBlob)
 
             For Each blob In cc.Blobs.Skip(1)
@@ -283,6 +289,7 @@ Public Class Blob_LargestDepthCluster
         ocvb.desc = "Display only the largest depth cluster (might not be contiguous.)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        blobs.src = src
         blobs.Run(ocvb)
         dst2 = blobs.dst2
         Dim blobList = blobs.histBlobs.valleys.rangeBoundaries
@@ -292,6 +299,7 @@ Public Class Blob_LargestDepthCluster
         Dim tmp As New cv.Mat, mask As New cv.Mat
         cv.Cv2.InRange(getDepth32f(ocvb), startEndDepth.X, startEndDepth.Y, tmp)
         cv.Cv2.ConvertScaleAbs(tmp, mask)
+        dst1.SetTo(0)
         ocvb.color.CopyTo(dst1, mask)
         label1 = "Largest Depth Blob: " + Format(maxSize, "#,000") + " pixels (" + Format(maxSize / ocvb.color.Total, "#0.0%") + ")"
     End Sub

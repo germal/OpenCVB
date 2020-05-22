@@ -51,6 +51,7 @@ Public Class InPaint_Noise
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 100 Then Exit Sub ' give them time to review the inpaint results
+        noise.src = src
         noise.Run(ocvb) ' create some noise in the result1 image.
         dst1 = noise.dst1
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)

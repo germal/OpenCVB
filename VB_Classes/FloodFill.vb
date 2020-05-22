@@ -20,7 +20,7 @@ Public Class FloodFill_Basics
         sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar2(ocvb, caller, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar3(ocvb, caller, "FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar4(ocvb, caller, "Step Size", 1, ocvb.color.Width / 2, 20)
+        sliders.setupTrackBar4(ocvb, caller, "Step Size", 1, colorCols / 2, 20)
 
         label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."
@@ -62,7 +62,7 @@ Public Class FloodFill_Basics
             Next
         Next
 
-        dst2 = ocvb.color.EmptyClone.SetTo(0)
+        dst2.SetTo(0)
         For i = 0 To masks.Count - 1
             Dim maskIndex = maskSizes.ElementAt(i).Value
             Dim nextColor = ocvb.scalarColors(i Mod 255)
@@ -298,7 +298,7 @@ Public Class FloodFill_Top16
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         flood.src = src
 
-        thumbNails = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
+        thumbNails = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         Dim allSize = New cv.Size(thumbNails.Width / 4, thumbNails.Height / 4) ' show the first 16 masks
 
         flood.Run(ocvb)
@@ -340,7 +340,7 @@ Public Class FloodFill_Projection
         sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar2(ocvb, caller, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar3(ocvb, caller, "FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar4(ocvb, caller, "Step Size", 1, ocvb.color.Width / 2, 20)
+        sliders.setupTrackBar4(ocvb, caller, "Step Size", 1, colorCols / 2, 20)
 
         label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - more work needed"

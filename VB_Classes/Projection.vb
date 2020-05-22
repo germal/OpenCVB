@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
-Imports System.Text
 Module Projection
     ' for performance we are putting this in an optimized C++ interface to the Kinect camera for convenience...
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -175,87 +174,69 @@ End Class
 
 Public Class Projection_GravityVB
     Inherits ocvbClass
-    Dim imu As IMU_GVector
+    Dim gCloud As Transform_Gravity
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        imu = New IMU_GVector(ocvb, caller)
-        imu.result = RESULT2
+
+        gCloud = New Transform_Gravity(ocvb, caller)
 
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 64
-        grid.sliders.TrackBar2.Value = 32
+        grid.sliders.TrackBar2.Value = 40
 
         sliders.setupTrackBar1(ocvb, caller, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
 
+        label1 = "View looking up from under floor"
+        label2 = "Side View"
         ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
-        imu.Run(ocvb)
-        Dim split() = cv.Cv2.Split(ocvb.pointCloud)
-        Dim vertSplit = split
+        gCloud.Run(ocvb)
 
-        Dim zCos = Math.Cos(imu.angleZ)
-        Dim zSin = Math.Sin(imu.angleZ)
+        dst1.SetTo(0)
+        dst2.SetTo(0)
 
-        Dim xCos = Math.Cos(imu.angleX)
-        Dim xSin = Math.Sin(imu.angleX)
-
-        Dim xArray(,) As Single = {{1, 0, 0, 0}, {0, zCos, -zSin, 0}, {0, zSin, zCos, 0}, {0, 0, 0, 1}}
-        Dim xRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, xArray)
-
-        Dim zArray(,) As Single = {{xCos, -xSin, 0, 0}, {xSin, xCos, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}
-        Dim zRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, zArray)
-        Dim yRotate = (xRotate * zRotate).ToMat
-
-        Dim xz(4 * 4) As Single
-        For j = 0 To yRotate.Rows - 1
-            For i = 0 To yRotate.Cols - 1
-                xz(i * 4 + j) = yRotate.Get(Of Single)(i, j)
-            Next
-        Next
-
-        vertSplit(0) = xz(0) * split(0) + xz(1) * split(1) + xz(2) * split(2)
-        vertSplit(1) = xz(4) * split(0) + xz(5) * split(1) + xz(6) * split(2)
-        vertSplit(2) = xz(8) * split(0) + xz(9) * split(1) + xz(10) * split(2)
-
-        Dim mask = vertSplit(2).Threshold(0.001, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-
-        cv.Cv2.Normalize(vertSplit(1), vertSplit(1), 0, src.Height, cv.NormTypes.MinMax, -1, mask)
-
-        Dim minval As Double, maxval As Double
-        Dim minloc As cv.Point, maxloc As cv.Point
-        vertSplit(0).MinMaxLoc(minval, maxval, minloc, maxloc, mask)
-
-        Dim black = New cv.Vec3b(0, 0, 0)
-        dst1 = src.SetTo(cv.Scalar.White)
-        dst2 = dst1.Clone()
-        Dim desiredMax = sliders.TrackBar1.Value / 1000
+        Dim white = New cv.Vec3b(255, 255, 255)
+        Dim maxZ = sliders.TrackBar1.Value / 1000
         Dim w = CSng(src.Width)
         Dim h = CSng(src.Height)
-        Dim xFactor = w / (maxval - minval)
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
-             Sub(roi)
-                 For y = roi.Y + roi.Height - 1 To roi.Y Step -1
-                     For x = roi.X To roi.X + roi.Width - 1
-                         Dim m = mask.Get(Of Byte)(h - y - 1, x)
-                         If m > 0 Then
-                             Dim depth = vertSplit(2).Get(Of Single)(h - y - 1, x)
-                             If depth < desiredMax Then
-                                 Dim dx = xFactor * (vertSplit(0).Get(Of Single)(h - y - 1, x) - minval)
-                                 Dim dy = Math.Round(h * (desiredMax - depth) / desiredMax)
-                                 If dy < h And dy > 0 Then dst1.Set(Of cv.Vec3b)(CInt(h - dy), CInt(dx), black)
-                                 dy = Math.Round(vertSplit(1).Get(Of Single)(y, x))
-                                 dx = Math.Round(w * (desiredMax - depth) / desiredMax)
-                                 If dy < h And dy > 0 Then dst2.Set(Of cv.Vec3b)(CInt(h - dy), CInt(dx), black)
-                             End If
-                         End If
-                     Next
-                 Next
-             End Sub)
-        label1 = "View looking up from under floor"
-        label2 = "Side View"
+        Dim dFactor = h / maxZ ' the scale in the x-Direction.
+        Dim zHalf As Single = maxZ / 2
+        Dim shift = (w - h) / 2
+
+        Parallel.For(0, CInt(gCloud.xyz.Length / 3),
+            Sub(i)
+                Dim d = gCloud.xyz(i * 3 + 2)
+                If d > 0 And d < maxZ Then
+                    Dim t = CInt(255 * d / maxZ)
+                    Dim color = New cv.Vec3b(t, 255 - t, 255 - t)
+
+                    Dim dPixel = dFactor * d
+                    Dim fx = gCloud.xyz(i * 3)
+                    If fx > -zHalf And fx < zHalf Then
+                        fx = dFactor * (zHalf + fx)
+                        dst1.Set(Of cv.Vec3b)(CInt(h - dPixel), CInt(shift + fx), color)
+                    End If
+
+                    Dim fy = gCloud.xyz(i * 3 + 1)
+                    If fy > -zHalf And fy < zHalf Then
+                        fy = dFactor * (zHalf + fy)
+                        dst2.Set(Of cv.Vec3b)(CInt(fy), CInt(shift + dPixel), color)
+                    End If
+                End If
+            End Sub)
+
+        If standalone Then
+            label1 += " - Red Dot is camera"
+            label2 += " - Red Dot is camera"
+            dst1.Rectangle(New cv.Rect(shift, 0, dst1.Height, dst1.Height), cv.Scalar.White, 1)
+            dst2.Rectangle(New cv.Rect(shift, 0, dst1.Height, dst1.Height), cv.Scalar.White, 1)
+            Dim radius = If(ocvb.parms.lowResolution, 5, 15)
+            dst1.Circle(New cv.Point(shift + dst1.Height / 2, dst1.Height - 5), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(New cv.Point(shift, dst1.Height / 2), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        End If
     End Sub
 End Class
 
@@ -291,7 +272,7 @@ End Class
 
 Public Class Projection_G_CPP
     Inherits ocvbClass
-    Dim imu As IMU_GVector
+    Dim gCloud As Transform_Gravity
     Dim cPtr As IntPtr
     Dim histPtr As IntPtr
     Dim xyzBytes() As Byte
@@ -300,8 +281,7 @@ Public Class Projection_G_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
 
-        imu = New IMU_GVector(ocvb, caller)
-        imu.result = RESULT2
+        gCloud = New Transform_Gravity(ocvb, caller)
 
         sliders.setupTrackBar1(ocvb, caller, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
         sliders.setupTrackBar2(ocvb, caller, "Threshold for histogram Count", 1, 100, 10)
@@ -317,42 +297,12 @@ Public Class Projection_G_CPP
         ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.cameraIndex = T265Camera Then ocvb.putText(New ActiveClass.TrueType("T265 camera has no pointcloud data", 10, 125))
-        imu.Run(ocvb)
-
-        ' normally it is not desirable to resize the point cloud but it can be here because we are building a histogram.
-        Dim pc = ocvb.pointCloud.Resize(src.Size())
-        Dim split() = cv.Cv2.Split(pc)
-        Dim vertSplit = split
-
-        Dim zCos = Math.Cos(imu.angleZ)
-        Dim zSin = Math.Sin(imu.angleZ)
-
-        Dim xCos = Math.Cos(imu.angleX)
-        Dim xSin = Math.Sin(imu.angleX)
-
-        Dim xArray(,) As Single = {{1, 0, 0, 0}, {0, zCos, -zSin, 0}, {0, zSin, zCos, 0}, {0, 0, 0, 1}}
-        Dim xRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, xArray)
-
-        Dim zArray(,) As Single = {{xCos, -xSin, 0, 0}, {xSin, xCos, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}
-        Dim zRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, zArray)
-        Dim yRotate = (xRotate * zRotate).ToMat
-
-        Dim xz(4 * 4) As Single
-        For j = 0 To yRotate.Rows - 1
-            For i = 0 To yRotate.Cols - 1
-                xz(i * 4 + j) = yRotate.Get(Of Single)(i, j)
-            Next
-        Next
-
-        vertSplit(0) = xz(0) * split(0) + xz(1) * split(1) + xz(2) * split(2)
-        vertSplit(1) = xz(4) * split(0) + xz(5) * split(1) + xz(6) * split(2)
-        vertSplit(2) = xz(8) * split(0) + xz(9) * split(1) + xz(10) * split(2)
-
         maxZ = sliders.TrackBar1.Value / 1000
 
+        gCloud.Run(ocvb)
+
         Dim xyz As New cv.Mat
-        cv.Cv2.Merge(vertSplit, xyz)
+        cv.Cv2.Merge(gCloud.vertSplit, xyz)
 
         If xyzBytes Is Nothing Then ReDim xyzBytes(xyz.Total * xyz.ElemSize - 1)
         Marshal.Copy(xyz.Data, xyzBytes, 0, xyzBytes.Length)
@@ -384,8 +334,8 @@ Public Class Projection_G_CPP
 
         If standalone Then
             Dim shift = CInt((xyz.Width - xyz.Height) / 2)
-            ocvb.label1 += " - Red Dot is camera"
-            ocvb.label2 += " - Red Dot is camera"
+            label1 += " - Red Dot is camera"
+            label2 += " - Red Dot is camera"
             dst1.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
             dst2.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
             Dim radius = If(ocvb.parms.lowResolution, 5, 15)
@@ -485,7 +435,7 @@ End Class
 
 Public Class Projection_Wall
     Inherits ocvbClass
-    Dim objects As Projection_Flood
+    Dim pFlood As Projection_Flood
     Dim lines As lineDetector_FLD_CPP
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -493,25 +443,25 @@ Public Class Projection_Wall
 
         dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
 
-        objects = New Projection_Flood(ocvb, Me.GetType().Name)
+        pFlood = New Projection_Flood(ocvb, Me.GetType().Name)
 
         lines = New lineDetector_FLD_CPP(ocvb, Me.GetType().Name)
 
+        label1 = "Top View with lines in red"
+        label2 = "Top View output without lines"
         ocvb.desc = "Use the top down view to detect walls with a line detector algorithm - more work needed"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        objects.src = src
-        objects.Run(ocvb)
+        pFlood.src = src
+        pFlood.Run(ocvb)
+        dst1 = pFlood.dst1
 
-        dilate.src = objects.dst2
+        dilate.src = dst1
         dilate.Run(ocvb)
 
-        lines.src = dilate.dst1
+        lines.src = dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lines.Run(ocvb)
-        lines.dst1.CopyTo(dst1)
-
-        label1 = "Top View with lines in red"
-        label2 = "Top View output without lines"
+        dst2 = lines.dst1
     End Sub
 End Class
 

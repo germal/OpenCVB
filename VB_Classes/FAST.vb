@@ -13,9 +13,9 @@ Public Class FAST_Basics
         ocvb.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ocvb.color.CopyTo(dst1)
-        keypoints = cv.Cv2.FAST(gray, sliders.TrackBar1.Value, If(check.Box(0).Checked, True, False))
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src.CopyTo(dst1)
+        keypoints = cv.Cv2.FAST(src, sliders.TrackBar1.Value, If(check.Box(0).Checked, True, False))
 
         For Each kp As cv.KeyPoint In keypoints
             dst1.Circle(kp.Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
@@ -41,9 +41,10 @@ Public Class FAST_Centroid
         ocvb.desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        fast.src = src
         fast.Run(ocvb)
         dst1 = fast.dst1
-        dst2 = ocvb.Color.EmptyClone.SetTo(0)
+        dst2.SetTo(0)
         For Each kp As cv.KeyPoint In fast.keypoints
             dst2.Circle(kp.Pt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
         Next kp

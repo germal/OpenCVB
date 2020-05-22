@@ -11,10 +11,9 @@ Public Class ORB_Basics
         ocvb.desc = "Find keypoints using ORB"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray As New cv.Mat
-        If standalone Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         orb = cv.ORB.Create(sliders.TrackBar1.Value)
-        keypoints = orb.Detect(gray)
+        keypoints = orb.Detect(src)
         If standalone Then
             dst1 = src.Clone()
             For Each kpt In keypoints

@@ -132,7 +132,7 @@ Public Class Mat_4to1
         ocvb.desc = "Use one Mat for up to 4 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static nSize = New cv.Size(mat(0).Width / 2, mat(0).Height / 2)
+        Static nSize = New cv.Size(ocvb.color.Width / 2, ocvb.color.Height / 2)
         Static roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Static roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
@@ -144,10 +144,10 @@ Public Class Mat_4to1
             mat4 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             mat = {mat1, mat2, mat3, mat4}
         End If
-        If mat(0).Channels <> dst1.Channels Then dst1 = New cv.Mat(src.Size(), mat(0).Type, 0)
+        If mat(0).Channels <> dst1.Channels Then dst1 = New cv.Mat(ocvb.color.Size(), mat(0).Type, 0)
         For i = 0 To 4 - 1
             Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
-            dst1(roi) = mat(i).Resize(nSize)
+            If mat(i).Empty = False Then dst1(roi) = mat(i).Resize(nSize)
         Next
         If noLines = False Then
             dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, 2)
@@ -168,7 +168,7 @@ Public Class Mat_2to1
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         label1 = ""
-        mat1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
+        mat1 = New cv.Mat(New cv.Size(colorRows, colorCols), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
         dst1 = dst2
@@ -176,7 +176,7 @@ Public Class Mat_2to1
         ocvb.desc = "Fill a Mat with 2 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static nSize = New cv.Size(src.Width, src.Height / 2)
+        Static nSize = New cv.Size(ocvb.color.Width, ocvb.color.Height / 2)
         Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         If standalone Then
@@ -185,10 +185,10 @@ Public Class Mat_2to1
             mat = {mat1, mat2}
         End If
         dst1.SetTo(0)
-        If dst1.Type <> mat(0).Type Then dst1 = New cv.Mat(src.Size(), mat(0).type)
+        If dst1.Type <> mat(0).Type Then dst1 = New cv.Mat(ocvb.color.Size(), mat(0).type)
         For i = 0 To 1
             Dim roi = Choose(i + 1, roiTop, roibot)
-            dst1(roi) = mat(i).Resize(nSize)
+            If mat(i).Empty = False Then dst1(roi) = mat(i).Resize(nSize)
         Next
         If noLines = False Then
             dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, 2)

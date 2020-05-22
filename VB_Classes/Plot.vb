@@ -17,24 +17,20 @@ Public Class Plot_Basics
         ocvb.desc = "Plot data provided in src Mat"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then
-            hist.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            hist.plotColors(0) = cv.Scalar.White
-            hist.Run(ocvb)
-            plot.dst1 = hist.dst1
-            ReDim plot.srcX(hist.histRaw(0).Rows - 1)
-            ReDim plot.srcY(hist.histRaw(0).Rows - 1)
-            For i = 0 To plot.srcX.Length - 1
-                plot.srcX(i) = i
-                plot.srcY(i) = hist.histRaw(0).Get(Of Single)(i, 0)
-            Next
-            plot.src = src
-            plot.Run(ocvb)
-            dst1 = plot.dst1
-            label1 = "histogram with " + ocvb.label1
-        Else
-            If hist.sliders.Visible Then hist.sliders.Hide()
-        End If
+        hist.src = src
+        hist.plotColors(0) = cv.Scalar.White
+        hist.Run(ocvb)
+        dst1 = hist.dst1
+
+        ReDim plot.srcX(hist.histRaw(0).Rows - 1)
+        ReDim plot.srcY(hist.histRaw(0).Rows - 1)
+        For i = 0 To plot.srcX.Length - 1
+            plot.srcX(i) = i
+            plot.srcY(i) = hist.histRaw(0).Get(Of Single)(i, 0)
+        Next
+        plot.Run(ocvb)
+        dst2 = plot.dst1
+        label1 = hist.label1
     End Sub
 End Class
 
@@ -55,8 +51,6 @@ Public Class Plot_Basics_CPP
         Dim minX As Double = Double.MaxValue
         Dim maxY As Double = Double.MinValue
         Dim minY As Double = Double.MaxValue
-        Dim plotData(src.Total * src.ElemSize - 1) As Byte
-        Dim handlePlot = GCHandle.Alloc(plotData, GCHandleType.Pinned)
 
         If standalone Then
             ReDim srcX(50 - 1)
@@ -73,12 +67,13 @@ Public Class Plot_Basics_CPP
             If srcY(i) < minY Then minY = CInt(srcY(i))
         Next
 
+        Dim plotData(dst1.Total * dst1.ElemSize - 1) As Byte
+        Dim handlePlot = GCHandle.Alloc(plotData, GCHandleType.Pinned)
         Dim handleX = GCHandle.Alloc(srcX, GCHandleType.Pinned)
         Dim handleY = GCHandle.Alloc(srcY, GCHandleType.Pinned)
 
-        Plot_OpenCVBasics(handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, srcX.Length - 1, handlePlot.AddrOfPinnedObject, src.Rows, src.Cols)
+        Plot_OpenCVBasics(handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, srcX.Length - 1, handlePlot.AddrOfPinnedObject, dst1.Rows, dst1.Cols)
 
-        dst1 = src.EmptyClone
         Marshal.Copy(plotData, 0, dst1.Data, plotData.Length)
         handlePlot.Free()
         handleX.Free()
@@ -124,8 +119,8 @@ Public Class Plot_OverTime
         Dim pixelHeight = CInt(sliders.TrackBar1.Value)
         Dim pixelWidth = CInt(sliders.TrackBar2.Value)
         If ocvb.frameCount = 0 Then dst1.SetTo(0)
-        If columnIndex + pixelWidth >= src.Width Then
-            dst1.ColRange(columnIndex, src.Width).SetTo(backColor)
+        If columnIndex + pixelWidth >= ocvb.color.Width Then
+            dst1.ColRange(columnIndex, ocvb.color.Width).SetTo(backColor)
             columnIndex = 0
         End If
         dst1.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
@@ -164,7 +159,7 @@ Public Class Plot_OverTime
         Dim ellipseSize = New cv.Size(pixelWidth, pixelHeight * 2)
         For i = 0 To plotCount - 1
             Dim y = 1 - (plotData.Item(i) - minScale) / (maxScale - minScale)
-            y *= src.Height - 1
+            y *= ocvb.color.Height - 1
             Dim c As New cv.Point(columnIndex - pixelWidth, y - pixelHeight)
             Dim rect = New cv.Rect(c.X, c.Y, pixelWidth * 2, pixelHeight * 2)
             Select Case i
@@ -297,7 +292,6 @@ Public Class Plot_Depth
             plot.srcX(i) = inRangeMin + i * (inRangeMax - inRangeMin) / plot.srcX.Length
             plot.srcY(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
-        plot.src = src
         plot.Run(ocvb)
         dst1 = plot.dst1
         label1 = "histogram: " + plot.label1

@@ -42,8 +42,8 @@ Public Class Annealing_Basics_CPP
     Public Sub setup(ocvb As AlgorithmData)
         ReDim cityOrder(numberOfCities - 1)
 
-        Dim radius = ocvb.color.Height * 0.45
-        Dim center = New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
+        Dim radius = colorRows * 0.45
+        Dim center = New cv.Point(colorCols / 2, colorRows / 2)
         If circularPattern Then
             ReDim cityPositions(numberOfCities - 1)
             Dim gen As New System.Random()
@@ -73,7 +73,10 @@ Public Class Annealing_Basics_CPP
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
-            If ocvb.frameCount = 0 Then Open()
+            If ocvb.frameCount = 0 Then
+                setup(ocvb)
+                Open()
+            End If
         End If
         Dim saveCityOrder = cityOrder.Clone()
         Dim hCityOrder = GCHandle.Alloc(cityOrder, GCHandleType.Pinned)
@@ -82,14 +85,6 @@ Public Class Annealing_Basics_CPP
         msg = Marshal.PtrToStringAnsi(out)
         Dim split As String() = Regex.Split(msg, "\W+")
         energy = CSng(split(split.Length - 2) + "." + split(split.Length - 1))
-
-        Dim changed As Boolean
-        For i = 0 To cityOrder.Length - 1
-            If saveCityOrder(i) <> cityOrder(i) Then
-                changed = True
-                Exit For
-            End If
-        Next
 
         drawMap(ocvb)
 
@@ -115,7 +110,7 @@ End Class
 Public Class Annealing_CPP_MT
     Inherits ocvbClass
     Dim random As Random_Points
-    Dim anneal(32) As Annealing_Basics_CPP
+    Dim anneal(32 - 1) As Annealing_Basics_CPP
     Dim mats As Mat_4to1
     Dim flow As Font_FlowText
     Private Class CompareEnergy : Implements IComparer(Of Single)
@@ -171,11 +166,10 @@ Public Class Annealing_CPP_MT
         label1 = "Log of Annealing progress"
         label2 = "Top 2 are best solutions, bottom 2 are worst."
 
-        setup(ocvb)
         ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount < 10 Then Exit Sub
+        If anneal(0) Is Nothing Then setup(ocvb) ' setup here rather than in algorithm so all threads work on the same problem.
         If anneal(0).numberOfCities <> sliders.TrackBar1.Value Or check.Box(0).Checked Or check.Box(2).Checked <> anneal(0).circularPattern Then setup(ocvb)
         check.Box(0).Checked = False
         Dim allClosed As Boolean = True
@@ -186,6 +180,7 @@ Public Class Annealing_CPP_MT
                     allClosed = False
                 End If
             End Sub)
+
 
         ' find the best result and start all the others with it.
         Dim minEnergy As Single = Single.MaxValue

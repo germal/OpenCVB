@@ -1,4 +1,5 @@
 Imports cv = OpenCvSharp
+Imports System.Runtime.InteropServices
 Public Class Transform_Resize
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -86,3 +87,58 @@ Public Class Transform_SortReshape
     End Sub
 End Class
 
+
+Public Class Transform_Gravity
+    Inherits ocvbClass
+    Dim imu As IMU_GVector
+    Public vertSplit() As cv.Mat
+    Public xyz(0) As Single
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        imu = New IMU_GVector(ocvb, caller)
+        ocvb.desc = "Transform the pointcloud with the gravity vector"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.cameraIndex = T265Camera Then
+            ocvb.putText(New ActiveClass.TrueType("T265 camera has no pointcloud data", 10, 125))
+            Exit Sub
+        End If
+
+        imu.Run(ocvb)
+
+        ' normally it is not desirable to resize the point cloud but it can be here because we are building a histogram.
+        Dim pc = ocvb.pointCloud.Resize(ocvb.color.Size())
+        Dim split() = cv.Cv2.Split(pc)
+        vertSplit = split
+
+        Dim zCos = Math.Cos(imu.angleZ)
+        Dim zSin = Math.Sin(imu.angleZ)
+
+        Dim xCos = Math.Cos(imu.angleX)
+        Dim xSin = Math.Sin(imu.angleX)
+
+        Dim xArray(,) As Single = {{1, 0, 0, 0}, {0, zCos, -zSin, 0}, {0, zSin, zCos, 0}, {0, 0, 0, 1}}
+        Dim xRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, xArray)
+
+        Dim zArray(,) As Single = {{xCos, -xSin, 0, 0}, {xSin, xCos, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}
+        Dim zRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, zArray)
+        Dim yRotate = (xRotate * zRotate).ToMat
+
+        Dim xz(4 * 4) As Single
+        For j = 0 To yRotate.Rows - 1
+            For i = 0 To yRotate.Cols - 1
+                xz(i * 4 + j) = yRotate.Get(Of Single)(i, j)
+            Next
+        Next
+
+        vertSplit(0) = xz(0) * split(0) + xz(1) * split(1) + xz(2) * split(2)
+        vertSplit(1) = xz(4) * split(0) + xz(5) * split(1) + xz(6) * split(2)
+        vertSplit(2) = xz(8) * split(0) + xz(9) * split(1) + xz(10) * split(2)
+
+        cv.Cv2.Merge(vertSplit, pc)
+        If xyz.Length <> pc.Total * 3 Then ReDim xyz(pc.Total * 3 - 1)
+        Marshal.Copy(pc.Data, xyz, 0, xyz.Length) ' why copy it?  To avoid memory leak in parallel for's.
+
+        If standalone Then ocvb.putText(New ActiveClass.TrueType("Pointcloud is now oriented toward gravity.", 10, 125))
+    End Sub
+End Class

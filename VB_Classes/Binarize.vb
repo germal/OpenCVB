@@ -18,7 +18,7 @@ Public Class Binarize_OTSU
         label2 = "Histograms correspond to images on the left"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst2 = ocvb.Color.EmptyClone.SetTo(0)
+        dst2.SetTo(0)
         Dim w = ocvb.color.Width, h = ocvb.color.Height
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim meanScalar = cv.Cv2.Mean(src)

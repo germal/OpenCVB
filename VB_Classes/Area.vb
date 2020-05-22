@@ -33,8 +33,8 @@ Public Class Area_MinTriangle_CPP
 
         dst1.SetTo(0)
         For i = 0 To srcPoints.Length - 1
-            srcPoints(i).X = ocvb.ms_rng.Next(ocvb.color.Width / 2 - squareWidth, ocvb.color.Width / 2 + squareWidth)
-            srcPoints(i).Y = ocvb.ms_rng.Next(ocvb.color.Height / 2 - squareWidth, ocvb.color.Height / 2 + squareWidth)
+            srcPoints(i).X = ocvb.ms_rng.Next(src.Width / 2 - squareWidth, src.Width / 2 + squareWidth)
+            srcPoints(i).Y = ocvb.ms_rng.Next(src.Height / 2 - squareWidth, src.Height / 2 + squareWidth)
             dst1.Circle(srcPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
@@ -81,8 +81,8 @@ Public Class Area_MinRect
 
         dst1.SetTo(0)
         For i = 0 To srcPoints.Length - 1
-            srcPoints(i).X = ocvb.ms_rng.Next(ocvb.color.Width / 2 - squareWidth, ocvb.color.Width / 2 + squareWidth)
-            srcPoints(i).Y = ocvb.ms_rng.Next(ocvb.color.Height / 2 - squareWidth, ocvb.color.Height / 2 + squareWidth)
+            srcPoints(i).X = ocvb.ms_rng.Next(src.Width / 2 - squareWidth, src.Width / 2 + squareWidth)
+            srcPoints(i).Y = ocvb.ms_rng.Next(src.Height / 2 - squareWidth, src.Height / 2 + squareWidth)
             dst1.Circle(srcPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
@@ -118,7 +118,7 @@ Public Class Area_MinMotionRect
         Return gray
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        input.src = ocvb.color
+        input.src = src
         input.Run(ocvb)
         Dim gray As cv.Mat
         If input.dst1.Channels = 1 Then gray = input.dst1 Else gray = input.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -142,11 +142,11 @@ Public Class Area_FindNonZero
         ocvb.desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
+        Dim gray = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         Dim srcPoints(10 - 1) As cv.Point ' doesn't really matter how many there are.
         For i = 0 To srcPoints.Length - 1
-            srcPoints(i).X = ocvb.ms_rng.Next(0, ocvb.color.Width)
-            srcPoints(i).Y = ocvb.ms_rng.Next(0, ocvb.color.Height)
+            srcPoints(i).X = ocvb.ms_rng.Next(0, src.Width)
+            srcPoints(i).Y = ocvb.ms_rng.Next(0, src.Height)
             gray.Set(Of Byte)(srcPoints(i).Y, srcPoints(i).X, 255)
         Next
 

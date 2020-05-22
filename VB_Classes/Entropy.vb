@@ -90,7 +90,8 @@ Public Class Entropy_Highest_MT
             End If
             If entropies(i).entropy < minEntropy Then minEntropy = entropies(i).entropy
         Next
-        dst2 = entropyMap.ConvertScaleAbs(255 / (maxEntropy - minEntropy), minEntropy).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = entropyMap.ConvertScaleAbs(255 / (maxEntropy - minEntropy), minEntropy)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.AddWeighted(dst2, 0.5, src, 0.5, 0, dst2)
 
         Dim minval As Double, maxval As Double

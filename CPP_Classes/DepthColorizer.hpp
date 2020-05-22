@@ -69,7 +69,7 @@ public:
 		unsigned char nearColor[3] = { 0, 255, 255 };
 		unsigned char farColor[3] = { 255, 0, 0 };
 		int histogram[256 * 256] = { 1 };
-		output = Mat(depth32f.size(), CV_32F);
+		output = Mat(depth32f.size(), CV_8UC3);
 		// Produce a cumulative histogram of depth values
 		float* depthImage = (float*)depth32f.data;
 		for (int i = 0; i < depth32f.cols * depth32f.rows; ++i)
@@ -329,7 +329,7 @@ public:
 	{
 		depthxyz = Mat(depth.rows, depth.cols, CV_32FC3);
 #ifdef _DEBUG
-#pragma omp parallel for  // doubles performance in debug mode but is much worse in Release mode.
+//#pragma omp parallel for  // doubles performance in debug mode but is much worse in Release mode.
 #endif
 		for (int y = 0; y < depth.rows; y++)
 		{

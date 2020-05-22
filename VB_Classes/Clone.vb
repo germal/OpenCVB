@@ -144,7 +144,7 @@ Public Class Clone_Eagle
         mask = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/Clonemask.png")
         maskROI = New cv.Rect(srcROI.Width, 40, mask.Width, mask.Height)
 
-        dst2 = ocvb.color.EmptyClone.SetTo(0)
+        dst2.SetTo(0)
         dst2(srcROI) = sourceImage
         dst2(maskROI) = mask
 

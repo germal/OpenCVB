@@ -26,6 +26,7 @@ Public Class AddWeighted_Test
         ocvb.desc = "Testing AddWeighted_Basics as a derivative algorithm."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        weight.src = src
         weight.Run(ocvb)
         dst1 = weight.dst1
     End Sub

@@ -49,6 +49,7 @@ Public Class Contours_Basics
         Dim imageInput As New cv.Mat
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standalone Then
+            rotatedRect.src = src
             rotatedRect.Run(ocvb)
             imageInput = rotatedRect.dst1
             If imageInput.Channels = 3 Then
@@ -76,7 +77,7 @@ Public Class Contours_Basics
         Next
 
         dst1 = imageInput
-        dst2 = ocvb.color.EmptyClone.SetTo(0)
+        dst2.SetTo(0)
         If retrievalMode = cv.RetrievalModes.FloodFill Then
             cv.Cv2.DrawContours(dst2, contours, 0, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Else
@@ -100,6 +101,7 @@ Public Class Contours_FindandDraw
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim img As New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
+        rotatedRect.src = src
         rotatedRect.Run(ocvb)
         dst1 = rotatedRect.dst1
         img = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
@@ -111,7 +113,7 @@ Public Class Contours_FindandDraw
             contours(j) = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
         Next
 
-        dst2 = ocvb.color.EmptyClone.SetTo(0)
+        dst2.SetTo(0)
         cv.Cv2.DrawContours(dst2, contours, 0, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
@@ -131,7 +133,7 @@ Public Class Contours_Depth
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
         dst1 = trim.dst1
-        dst2 = ocvb.color.EmptyClone.SetTo(0)
+        dst2.SetTo(0)
         Dim contours0 = cv.Cv2.FindContoursAsArray(trim.Mask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim maxIndex As Int32
         Dim maxNodes As Int32

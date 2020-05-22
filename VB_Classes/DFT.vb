@@ -91,9 +91,9 @@ Public Class DFT_Inverse
         label1 = "Image after Inverse DFT"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
-        gray.ConvertTo(gray32f, cv.MatType.CV_32F)
+        src.ConvertTo(gray32f, cv.MatType.CV_32F)
         Dim planes() = {gray32f, New cv.Mat(gray32f.Size(), cv.MatType.CV_32F, 0)}
         Dim complex As New cv.Mat, complexImage As New cv.Mat
         cv.Cv2.Merge(planes, complex)
@@ -102,8 +102,8 @@ Public Class DFT_Inverse
         dst1 = inverseDFT(complexImage)
 
         Dim diff As New cv.Mat
-        cv.Cv2.Absdiff(gray, dst1, diff)
-        mats.mat(0) = diff.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Absdiff(src, dst1, diff)
+        mats.mat(0) = diff.Threshold(0, 255, cv.ThresholdTypes.Binary)
         mats.mat(1) = (diff * 50).ToMat
         mats.Run(ocvb)
         If mats.mat(0).countnonzero() > 0 Then
@@ -111,7 +111,7 @@ Public Class DFT_Inverse
             label2 = "Mask of difference (top) and relative diff (bot)"
         Else
             label2 = "InverseDFT reproduced original"
-            dst2 = ocvb.Color.EmptyClone.SetTo(0)
+            dst2.SetTo(0)
         End If
     End Sub
 End Class
@@ -127,8 +127,8 @@ Public Class DFT_ButterworthFilter_MT
     Public dft As DFT_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "DFT B Filter - Radius", 1, ocvb.color.Height, ocvb.color.Height)
-        sliders.setupTrackBar2(ocvb, caller, "DFT B Filter - Order", 1, ocvb.color.Height, 2)
+        sliders.setupTrackBar1(ocvb, caller, "DFT B Filter - Radius", 1, colorRows, colorRows)
+        sliders.setupTrackBar2(ocvb, caller, "DFT B Filter - Order", 1, colorRows, 2)
 
         radio.Setup(ocvb, caller, 6)
         radio.check(0).Text = "DFT Flags ComplexOutput"

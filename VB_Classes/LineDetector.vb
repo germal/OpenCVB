@@ -194,8 +194,7 @@ Module fastLineDetector_Exports
 
         For i = sortedLines.Count - 1 To 0 Step -1
             Dim v = sortedLines.ElementAt(i).Key
-            If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
-                   v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
+            If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
                 Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
                 Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
                 dst1.Line(pt1, pt2, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
@@ -242,16 +241,17 @@ Public Class lineDetector_FLD_CPP
         Dim canny_th2 = sliders2.TrackBar2.Value
         Dim do_merge = check.Box(0).Checked
 
+        src.CopyTo(dst1)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim cols = src.Width
         Dim rows = src.Height
         Dim data(src.Total - 1) As Byte
 
-        Marshal.Copy(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Data, data, 0, data.Length)
+        Marshal.Copy(src.Data, data, 0, data.Length)
         Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
         Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, rows, cols, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
         handle.Free()
 
-        src.CopyTo(dst1)
         If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, 1, dst1)
         If standalone Then dst1.CopyTo(dst1)
     End Sub

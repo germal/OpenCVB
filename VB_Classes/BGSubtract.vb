@@ -67,9 +67,9 @@ Public Class BGSubtract_MotionDetect_MT
         ocvb.desc = "Detect Motion for use with background subtraction"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount = 0 Then ocvb.color.CopyTo(dst2)
+        If ocvb.frameCount = 0 Then src.CopyTo(dst2)
         Dim threadData As New cv.Vec3i
-        Dim w = ocvb.color.Width, h = ocvb.color.Height
+        Dim w = src.Width, h = src.Height
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then
                 threadData = Choose(i + 1, New cv.Vec3i(1, w, h), New cv.Vec3i(2, w / 2, h), New cv.Vec3i(4, w / 2, h / 2),
@@ -81,8 +81,8 @@ Public Class BGSubtract_MotionDetect_MT
         w = threadData(1)
         h = threadData(2)
         Dim taskArray(threadCount - 1) As Task
-        Dim xfactor = CInt(ocvb.color.Width / w)
-        Dim yfactor = Math.Max(CInt(ocvb.color.Height / h), CInt(ocvb.color.Width / w))
+        Dim xfactor = CInt(src.Width / w)
+        Dim yfactor = Math.Max(CInt(src.Height / h), CInt(src.Width / w))
         Dim CCthreshold = CSng(sliders.TrackBar1.Value / sliders.TrackBar1.Maximum)
         For i = 0 To threadCount - 1
             Dim section = i
@@ -90,10 +90,10 @@ Public Class BGSubtract_MotionDetect_MT
                 Sub()
                     Dim roi = New cv.Rect((section Mod xfactor) * w, h * Math.Floor(section / yfactor), w, h)
                     Dim correlation As New cv.Mat
-                    cv.Cv2.MatchTemplate(ocvb.color(roi), dst2(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+                    cv.Cv2.MatchTemplate(src(roi), dst2(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                     If CCthreshold > correlation.Get(Of Single)(0, 0) Then
-                        ocvb.color(roi).CopyTo(dst1(roi))
-                        ocvb.color(roi).CopyTo(dst2(roi))
+                        src(roi).CopyTo(dst1(roi))
+                        src(roi).CopyTo(dst2(roi))
                     End If
                 End Sub)
         Next
@@ -194,12 +194,8 @@ Public Class BGSubtract_MOG2
         ocvb.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then
-            gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Else
-            gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        End If
-        MOG2.Apply(gray, dst1, sliders.TrackBar1.Value / 1000)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        MOG2.Apply(src, dst1, sliders.TrackBar1.Value / 1000)
     End Sub
 End Class
 
@@ -254,9 +250,8 @@ Public Class BGSubtract_MOG_RGBDepth
         MOGDepth.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
         dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOGRGB.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
-        dst2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        MOGRGB.Apply(src, src, sliders.TrackBar1.Value / 1000)
     End Sub
 End Class
 
@@ -390,6 +385,7 @@ Public Class BGSubtract_Synthetic_CPP
         ocvb.desc = "Generate a synthetic input to background subtraction method - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.frameCount < 10 Then Exit Sub ' darker images at the start?
         If amplitude <> sliders.TrackBar1.Value Or magnitude <> sliders.TrackBar2.Value Or waveSpeed <> sliders.TrackBar3.Value Or
             objectSpeed <> sliders.TrackBar4.Value Then
 
@@ -436,7 +432,7 @@ Public Class BGSubtract_Synthetic
     Public Sub Run(ocvb As AlgorithmData)
         synth.src = src
         synth.Run(ocvb)
-        dst2 = synth.dst2
+        dst2 = synth.dst1
         bgfg.src = dst2
         bgfg.Run(ocvb)
         dst1 = bgfg.dst1

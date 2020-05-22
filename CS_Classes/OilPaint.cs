@@ -50,6 +50,7 @@ namespace CS_Classes
                         }
                     }
 
+                    if (maxIntensity == 0) maxIntensity = 1;
                     double blue = bins[maxIndex].Item0 / maxIntensity;
                     double green = bins[maxIndex].Item1 / maxIntensity;
                     double red = bins[maxIndex].Item2 / maxIntensity;

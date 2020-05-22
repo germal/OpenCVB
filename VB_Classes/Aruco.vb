@@ -42,7 +42,7 @@ Public Class Aruco_CS
         aruco.Run(src)
         dst1 = aruco.detectedMarkers.Resize(ocvb.color.Size())
 
-        dst2 = ocvb.color.EmptyClone.SetTo(0)
-        dst2(New cv.Rect(0, 0, dst2.Height, dst2.Height)) = aruco.normalizedImage.Resize(New cv.Size(ocvb.color.Height, ocvb.color.Height))
+        dst2.SetTo(0)
+        dst2(New cv.Rect(0, 0, dst2.Height, dst2.Height)) = aruco.normalizedImage.Resize(New cv.Size(dst1.Height, dst1.Height))
     End Sub
 End Class

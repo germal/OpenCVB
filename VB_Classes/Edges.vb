@@ -72,25 +72,20 @@ Public Class Edges_Laplacian
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Gaussian Kernel", 1, 32, 7)
         sliders.setupTrackBar2(ocvb, caller, "Laplacian Kernel", 1, 32, 5)
+        label2 = "Laplacian of Depth Image"
         ocvb.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gaussiankernelSize = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value - 1)
         Dim laplaciankernelSize = If(sliders.TrackBar2.Value Mod 2, sliders.TrackBar2.Value, sliders.TrackBar2.Value - 1)
-        Dim gray As New cv.Mat()
-        Dim abs_dst1 As New cv.Mat()
-        cv.Cv2.GaussianBlur(ocvb.color, dst1, New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
-        cv.Cv2.CvtColor(dst1, gray, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.Laplacian(gray, dst1, cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
-        cv.Cv2.ConvertScaleAbs(dst1, abs_dst1)
-        cv.Cv2.CvtColor(abs_dst1, dst1, cv.ColorConversionCodes.GRAY2BGR)
 
-        cv.Cv2.GaussianBlur(ocvb.RGBDepth, dst2, New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
-        cv.Cv2.CvtColor(dst2, gray, cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.Laplacian(gray, dst1, cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
-        cv.Cv2.ConvertScaleAbs(dst1, abs_dst1)
-        cv.Cv2.CvtColor(abs_dst1, dst2, cv.ColorConversionCodes.GRAY2BGR)
-        label2 = "Laplacian of Depth Image"
+        dst1 = src.GaussianBlur(New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
+        dst1 = dst1.Laplacian(cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
+        dst1 = dst1.ConvertScaleAbs()
+
+        dst2 = ocvb.RGBDepth.GaussianBlur(New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
+        dst2 = dst2.Laplacian(cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
+        dst2 = dst2.ConvertScaleAbs()
     End Sub
 End Class
 

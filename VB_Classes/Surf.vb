@@ -34,12 +34,10 @@ Public Class Surf_Basics_CS
         Dim doubleSize As New cv.Mat
         CS_SurfBasics.Run(srcLeft, srcRight, doubleSize, sliders.TrackBar1.Value, radio.check(0).Checked)
 
-        If standalone Then
-            doubleSize(New cv.Rect(0, 0, src.Width, src.Height)).CopyTo(dst1)
-            doubleSize(New cv.Rect(src.Width, 0, src.Width, src.Height)).CopyTo(dst2)
-            label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
-            If CS_SurfBasics.keypoints1 IsNot Nothing Then ocvb.label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
-        End If
+        doubleSize(New cv.Rect(0, 0, src.Width, src.Height)).CopyTo(dst1)
+        doubleSize(New cv.Rect(src.Width, 0, src.Width, src.Height)).CopyTo(dst2)
+        label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
+        If CS_SurfBasics.keypoints1 IsNot Nothing Then ocvb.label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
     End Sub
 End Class
 
@@ -66,8 +64,8 @@ Public Class Surf_Basics
 
         surf.src = src
         surf.Run(ocvb)
-        surf.dst1(New cv.Rect(0, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(dst1)
-        surf.dst1(New cv.Rect(surf.srcLeft.Width, 0, surf.srcLeft.Width, surf.srcLeft.Height)).CopyTo(dst2)
+        dst1 = surf.dst1
+        dst2 = surf.dst2
     End Sub
 End Class
 

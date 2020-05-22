@@ -50,6 +50,7 @@ Public Class Hough_Circles
         label2 = "Hough Circles found"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        circles.src = src
         circles.Run(ocvb)
         dst1 = circles.dst1
         Static Dim method As Int32 = 3

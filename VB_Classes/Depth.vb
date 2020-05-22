@@ -26,7 +26,7 @@ Public Class Depth_Median
         label1 = "Median Depth < " + Format(median.medianVal, "#0.0")
 
         cv.Cv2.BitwiseNot(mask, mask)
-        dst2 = ocvb.color.EmptyClone.SetTo(0)
+        dst2.SetTo(0)
         ocvb.RGBDepth.CopyTo(dst2, mask)
         dst2.SetTo(0, zeroMask)
         label2 = "Median Depth > " + Format(median.medianVal, "#0.0")
@@ -343,32 +343,32 @@ End Class
 
 
 
-Public Class Depth_WorldXYZ_CPP
-    Inherits ocvbClass
-    Public pointCloud As cv.Mat
-    Dim DepthXYZ As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        DepthXYZ = Depth_XYZ_OpenMP_Open(ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy,
-                                         ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy)
-        label1 = "xyzFrame is built"
-        ocvb.desc = "Get the X, Y, Depth in the image coordinates (not the 3D image coordinates.)"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Dim depth32f = getDepth32f(ocvb) ' the C++ code will convert it to meters.
-        Dim depthData(depth32f.Total * depth32f.ElemSize - 1) As Byte
-        Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned) ' pin it for the duration...
-        Marshal.Copy(depth32f.Data, depthData, 0, depthData.Length)
-        Dim imagePtr = Depth_XYZ_OpenMP_Run(DepthXYZ, handleSrc.AddrOfPinnedObject(), depth32f.Rows, depth32f.Cols)
-        handleSrc.Free()
+'Public Class Depth_WorldXYZ_CPP
+'    Inherits ocvbClass
+'    Public pointCloud As cv.Mat
+'    Dim DepthXYZ As IntPtr
+'    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+'        setCaller(callerRaw)
+'        DepthXYZ = Depth_XYZ_OpenMP_Open(ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy,
+'                                         ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy)
+'        label1 = "xyzFrame is built"
+'        ocvb.desc = "Get the X, Y, Depth in the image coordinates (not the 3D image coordinates.)"
+'    End Sub
+'    Public Sub Run(ocvb As AlgorithmData)
+'        Dim depth32f = getDepth32f(ocvb) ' the C++ code will convert it to meters.
+'        Dim depthData(depth32f.Total * depth32f.ElemSize - 1) As Byte
+'        Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned) ' pin it for the duration...
+'        Marshal.Copy(depth32f.Data, depthData, 0, depthData.Length)
+'        Dim imagePtr = Depth_XYZ_OpenMP_Run(DepthXYZ, handleSrc.AddrOfPinnedObject(), depth32f.Rows, depth32f.Cols)
+'        handleSrc.Free()
 
-        If imagePtr <> 0 Then pointCloud = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_32FC3, imagePtr)
-        ocvb.putText(New ActiveClass.TrueType("OpenGL data prepared.", 10, 50, RESULT1))
-    End Sub
-    Public Sub Close()
-        Depth_XYZ_OpenMP_Close(DepthXYZ)
-    End Sub
-End Class
+'        If imagePtr <> 0 Then pointCloud = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_32FC3, imagePtr)
+'        ocvb.putText(New ActiveClass.TrueType("OpenGL data prepared.", 10, 50, RESULT1))
+'    End Sub
+'    Public Sub Close()
+'        Depth_XYZ_OpenMP_Close(DepthXYZ)
+'    End Sub
+'End Class
 
 
 
@@ -489,9 +489,11 @@ Public Class Depth_MeanStdevPlot
         plot1.plotData = New cv.Scalar(mean, 0, 0)
         plot1.Run(ocvb)
         dst1 = plot1.dst1
+
         plot2.plotData = New cv.Scalar(stdev, 0, 0)
         plot2.Run(ocvb)
         dst2 = plot2.dst1
+
         label1 = "Plot of mean depth = " + Format(mean, "#0.0")
         label2 = "Plot of depth stdev = " + Format(stdev, "#0.0")
     End Sub
@@ -597,13 +599,6 @@ Module Depth_Colorizer_CPP_Module
         ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
         If ocvb.parms.lowResolution Then Return depth32f.Resize(ocvb.color.Size())
         Return depth32f
-    End Function
-    Public Function validateRect(r As cv.Rect) As cv.Rect
-        If r.X < 0 Then r.X = 0
-        If r.Y < 0 Then r.Y = 0
-        If r.X > colorCols Then r.X = colorCols
-        If r.Y > colorRows Then r.Y = colorRows
-        Return r
     End Function
 End Module
 
@@ -1114,7 +1109,7 @@ Public Class Depth_Holes
         borderMask = holeMask.Dilate(element, Nothing, sliders.TrackBar1.Value)
         cv.Cv2.BitwiseXor(borderMask, holeMask, borderMask)
         If standalone Then
-            dst2 = ocvb.color.EmptyClone.SetTo(0)
+            dst2.SetTo(0)
             ocvb.RGBDepth.CopyTo(dst2, borderMask)
         End If
     End Sub
@@ -1175,7 +1170,7 @@ Public Class Depth_Stabilizer
         mean.Run(ocvb)
 
         If standalone Then
-            colorize.src = mean.dst1
+            colorize.src = mean.dst1.Threshold(256 * 256 - 1, 256 * 256 - 1, cv.ThresholdTypes.Trunc)
             colorize.Run(ocvb)
             dst1 = colorize.dst1
         End If

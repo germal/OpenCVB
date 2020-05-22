@@ -27,6 +27,15 @@ Public Class ocvbClass : Implements IDisposable
             caller = callerRaw + "/" + Me.GetType.Name
         End If
     End Sub
+    Public Function validateRect(r As cv.Rect) As cv.Rect
+        If r.X < 0 Then r.X = 0
+        If r.Y < 0 Then r.Y = 0
+        If r.X > colorCols Then r.X = colorCols
+        If r.Y > colorRows Then r.Y = colorRows
+        If r.X + r.Width > colorCols Then r.Width = colorCols - r.X
+        If r.Y + r.Height > colorRows Then r.Height = colorRows - r.Y
+        Return r
+    End Function
     Public Sub New()
         dst1 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
@@ -44,6 +53,7 @@ Public Class ocvbClass : Implements IDisposable
         End If
     End Sub
     Public Sub NextFrame(ocvb As AlgorithmData)
+        If ocvb.drawRect.Width <> 0 Then ocvb.drawRect = validateRect(ocvb.drawRect)
         If standalone Then src = ocvb.color
         algorithm.Run(ocvb)
         If standalone Then

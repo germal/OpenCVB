@@ -14,11 +14,12 @@ private:
 	unsigned int ****A; // single path cost array path_nos x W x H x D
 public:
 	Mat leftImage, rightImage;
-	int disparityRange;
+	int disparityRange = 3;
 	Mat disparityMapstage2;
 
-	SemiGlobalMatching(int rows, int cols)
+	SemiGlobalMatching(int rows, int cols, int _disparityRange)
 	{
+		disparityRange = _disparityRange;
 		// allocate cost arrays
 		C = new unsigned long**[rows];
 		S = new unsigned long**[rows];
@@ -63,9 +64,9 @@ public:
 
 
 extern "C" __declspec(dllexport)
-SemiGlobalMatching *SemiGlobalMatching_Open(int rows, int cols)
+SemiGlobalMatching *SemiGlobalMatching_Open(int rows, int cols, int disparityRange)
 {
-  SemiGlobalMatching *SemiGlobalMatchingPtr = new SemiGlobalMatching(rows, cols);
+  SemiGlobalMatching *SemiGlobalMatchingPtr = new SemiGlobalMatching(rows, cols, disparityRange);
   return SemiGlobalMatchingPtr;
 }
 
@@ -77,11 +78,10 @@ void SemiGlobalMatching_Close(SemiGlobalMatching *SemiGlobalMatchingPtr)
 
 // https://github.com/epiception/SGM-Census
 extern "C" __declspec(dllexport)
-int *SemiGlobalMatching_Run(SemiGlobalMatching *SemiGlobalMatchingPtr, int *leftPtr, int *rightPtr, int rows, int cols, int disparityRange)
+int *SemiGlobalMatching_Run(SemiGlobalMatching *SemiGlobalMatchingPtr, int *leftPtr, int *rightPtr, int rows, int cols)
 {
 	SemiGlobalMatchingPtr->leftImage = Mat(rows, cols, CV_8U, leftPtr);
 	SemiGlobalMatchingPtr->rightImage = Mat(rows, cols, CV_8U, leftPtr);
-	SemiGlobalMatchingPtr->disparityRange = disparityRange;
 	SemiGlobalMatchingPtr->Run();
 
 	return (int *) SemiGlobalMatchingPtr->disparityMapstage2.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy

@@ -89,12 +89,14 @@ Public Class OilPaint_ColorProbability
         ocvb.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        km.src = src
         km.Run(ocvb)
+        dst1 = km.dst1
         Dim c() = km.clusterColors
         If c Is Nothing Then Exit Sub
-        For y = 0 To dst2.Height - 1
-            For x = 0 To dst2.Width - 1
-                Dim pixel = dst2.Get(Of cv.Vec3b)(y, x)
+        For y = 0 To dst1.Height - 1
+            For x = 0 To dst1.Width - 1
+                Dim pixel = dst1.Get(Of cv.Vec3b)(y, x)
                 For i = 0 To c.Length - 1
                     If pixel = c(i) Then
                         color_probability(i) += 1
@@ -105,7 +107,7 @@ Public Class OilPaint_ColorProbability
         Next
 
         For i = 0 To color_probability.Length - 1
-            color_probability(i) /= dst2.Total
+            color_probability(i) /= dst1.Total
         Next
     End Sub
 End Class
@@ -175,8 +177,8 @@ Public Class OilPaint_Manual_CS
     Dim oilPaint As New CS_Classes.OilPaintManual
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 10, 4)
-        sliders.setupTrackBar2(ocvb, caller, "Intensity", 0, 250, 20)
+        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 2, 10, 4)
+        sliders.setupTrackBar2(ocvb, caller, "Intensity", 1, 250, 20)
         ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
         label2 = "Selected area only"
 
@@ -217,18 +219,19 @@ Public Class OilPaint_Cartoon
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim roi = ocvb.drawRect
+        laplacian.src = src
         laplacian.Run(ocvb)
-        Dim edges = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = laplacian.dst1
 
+        oil.src = src
         oil.Run(ocvb)
-
-        dst2 = edges.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = oil.dst1
 
         Dim threshold = oil.sliders.TrackBar3.Value
         Dim vec000 = New cv.Vec3b(0, 0, 0)
         For y = 0 To roi.Height - 1
             For x = 0 To roi.Width - 1
-                If edges(roi).Get(Of Byte)(y, x) >= threshold Then
+                If dst2(roi).Get(Of Byte)(y, x) >= threshold Then
                     dst1(roi).Set(Of cv.Vec3b)(y, x, vec000)
                 End If
             Next

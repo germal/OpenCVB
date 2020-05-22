@@ -30,7 +30,7 @@ Public Class CamShift_Basics
         Static vMaxLast As Int32
         Static sBinsLast As cv.Scalar
         Static roi_hist As New cv.Mat
-        Dim hsv = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim hue = hsv.EmptyClone()
         Dim bins = sliders.TrackBar4.Value
         Dim hsize() As Int32 = {bins, bins, bins}
@@ -46,8 +46,8 @@ Public Class CamShift_Basics
             vMinLast = min
             vMaxLast = max
             sBinsLast = sbins
-            If ocvb.drawRect.X + ocvb.drawRect.Width > ocvb.color.Width Then ocvb.drawRect.Width = ocvb.color.Width - ocvb.drawRect.X - 1
-            If ocvb.drawRect.Y + ocvb.drawRect.Height > ocvb.color.Height Then ocvb.drawRect.Height = ocvb.color.Height - ocvb.drawRect.Y - 1
+            If ocvb.drawRect.X + ocvb.drawRect.Width > src.Width Then ocvb.drawRect.Width = src.Width - ocvb.drawRect.X - 1
+            If ocvb.drawRect.Y + ocvb.drawRect.Height > src.Height Then ocvb.drawRect.Height = src.Height - ocvb.drawRect.Y - 1
             cv.Cv2.CalcHist(New cv.Mat() {hue(ocvb.drawRect)}, {0, 0}, mask(ocvb.drawRect), roi_hist, 1, hsize, ranges)
             roi_hist = roi_hist.Normalize(0, 255, cv.NormTypes.MinMax)
             roi = ocvb.drawRect
@@ -59,11 +59,11 @@ Public Class CamShift_Basics
             cv.Cv2.BitwiseAnd(backproj, mask, backproj)
             trackBox = cv.Cv2.CamShift(backproj, roi, cv.TermCriteria.Both(10, 1))
             Show_HSV_Hist(dst2, roi_hist)
-            If dst2.Channels = 1 Then dst2 = ocvb.color.EmptyClone()
+            If dst2.Channels = 1 Then dst2 = src
             dst2 = dst2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         End If
         dst1.SetTo(0)
-        ocvb.color.CopyTo(dst1, mask)
+        src.CopyTo(dst1, mask)
         If trackBox.Size.Width > 0 Then dst1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
@@ -97,6 +97,7 @@ Public Class CamShift_Foreground
             restartRequested = True
         End If
         If restartRequested Then fore.Run(ocvb)
+        camshift.src = src
         camshift.Run(ocvb)
         dst1 = camshift.dst1
     End Sub
@@ -127,10 +128,11 @@ Public Class Camshift_Object
         dst2 = blob.dst2.Clone()
 
         Dim largestMask = blob.flood.fBasics.maskSizes.ElementAt(0).Value
-        If camshift.trackBox.Size.Width > ocvb.color.Width Or camshift.trackBox.Size.Height > ocvb.color.Height Then
+        If camshift.trackBox.Size.Width > src.Width Or camshift.trackBox.Size.Height > src.Height Then
             ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
         End If
         If camshift.trackBox.Size.Width < 50 Then ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
+        camshift.src = src
         camshift.Run(ocvb)
         dst1 = camshift.dst1
         Dim mask = camshift.dst1.ConvertScaleAbs(255)
@@ -177,6 +179,7 @@ Public Class Camshift_TopObjects
                     ocvb.drawRect = blob.flood.fBasics.maskRects(camIndex)
                 End If
 
+                cams(i).src = src
                 cams(i).Run(ocvb)
                 mats.mat(i) = cams(i).dst1.Clone()
                 trackBoxes.Add(cams(i).trackBox)
