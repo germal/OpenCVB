@@ -46,6 +46,20 @@ Module Projection
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Project_GravityHist_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
     End Function
+
+
+
+    Public Sub CameraLocationBot(dst As cv.Mat, radius As Integer)
+        Dim shift = (dst.Width - dst.Height) / 2
+        dst.Rectangle(New cv.Rect(shift, 0, dst.Height, dst.Height), cv.Scalar.White, 1)
+        dst.Circle(New cv.Point(shift + dst.Height / 2, dst.Height - 5), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+    End Sub
+
+    Public Sub CameraLocationLeft(dst As cv.Mat, radius As Integer)
+        Dim shift = (dst.Width - dst.Height) / 2
+        dst.Rectangle(New cv.Rect(shift, 0, dst.Height, dst.Height), cv.Scalar.White, 1)
+        dst.Circle(New cv.Point(shift, dst.Height / 2), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+    End Sub
 End Module
 
 
@@ -187,8 +201,8 @@ Public Class Projection_GravityVB
 
         sliders.setupTrackBar1(ocvb, caller, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
 
-        label1 = "View looking up from under floor"
-        label2 = "Side View"
+        label1 = "View looking up from under floor - Red Dot is camera"
+        label2 = "Side View - Red Dot is camera"
         ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -228,15 +242,8 @@ Public Class Projection_GravityVB
                 End If
             End Sub)
 
-        If standalone Then
-            label1 += " - Red Dot is camera"
-            label2 += " - Red Dot is camera"
-            dst1.Rectangle(New cv.Rect(shift, 0, dst1.Height, dst1.Height), cv.Scalar.White, 1)
-            dst2.Rectangle(New cv.Rect(shift, 0, dst1.Height, dst1.Height), cv.Scalar.White, 1)
-            Dim radius = If(ocvb.parms.lowResolution, 5, 15)
-            dst1.Circle(New cv.Point(shift + dst1.Height / 2, dst1.Height - 5), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(New cv.Point(shift, dst1.Height / 2), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        End If
+        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15))
+        If standalone Then CameraLocationLeft(dst2, If(ocvb.parms.lowResolution, 5, 15))
     End Sub
 End Class
 
@@ -331,16 +338,8 @@ Public Class Projection_G_CPP
         End If
         handleXYZ.Free()
 
-        If standalone Then
-            Dim shift = CInt((xyz.Width - xyz.Height) / 2)
-            label1 += " - Red Dot is camera"
-            label2 += " - Red Dot is camera"
-            dst1.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
-            dst2.Rectangle(New cv.Rect(shift, 0, xyz.Height, xyz.Height), cv.Scalar.White, 1)
-            Dim radius = If(ocvb.parms.lowResolution, 5, 15)
-            dst1.Circle(New cv.Point(shift + xyz.Height / 2, xyz.Height - 5), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(New cv.Point(shift, xyz.Height / 2), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        End If
+        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15))
+        If standalone Then CameraLocationLeft(dst2, If(ocvb.parms.lowResolution, 5, 15))
     End Sub
     Public Sub Close()
         Project_Gravity_Close(cPtr)
@@ -356,12 +355,9 @@ End Class
 Public Class Projection_Flood
     Inherits ocvbClass
     Dim flood As FloodFill_Projection
-    Dim kalman As Kalman_Basics
     Public gravity As Projection_G_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        kalman = New Kalman_Basics(ocvb, caller)
-        ReDim kalman.input(10 * 4 - 1) ' max 10 objects.
 
         sliders.setupTrackBar1(ocvb, caller, "epsilon for GroupRectangles X100", 0, 200, 80)
 
@@ -371,8 +367,8 @@ Public Class Projection_Flood
 
         flood = New FloodFill_Projection(ocvb, caller)
         flood.sliders.TrackBar1.Value = 100
-        ' flood.sliders.TrackBar4.Value = 1
 
+        label1 = "Isolated objects - Red dot is camera"
         ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings) - more work needed"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -387,50 +383,27 @@ Public Class Projection_Flood
         flood.Run(ocvb)
         dst1 = flood.dst1
 
-        '' Combine rectangles that are overlaping or touching.
-        'Dim combinedRects As New List(Of cv.Rect)
-        '' first duplicate all the current rectangles so all originals (by themselves) will be returned.
-        'For i = 0 To flood.objectRects.Count - 1
-        '    combinedRects.Add(flood.objectRects(i))
-        '    combinedRects.Add(flood.objectRects(i))
-        'Next
-
-        'Dim epsilon = sliders.TrackBar1.Value / 100
-        'cv.Cv2.GroupRectangles(combinedRects, 1, epsilon)
-
-        'For i = 0 To Math.Min(combinedRects.Count * 2, kalman.input.Count) - 1 Step 4
-        '    Dim rIndex = i / 2
-        '    kalman.input(i) = combinedRects(rIndex).X
-        '    kalman.input(i + 1) = combinedRects(rIndex).Y
-        '    kalman.input(i + 2) = combinedRects(rIndex).Width
-        '    kalman.input(i + 3) = combinedRects(rIndex).Height
-        'Next
-        'kalman.Run(ocvb)
-        'Dim rects As New List(Of cv.Rect)
-        'For i = 0 To Math.Min(combinedRects.Count * 2, kalman.input.Count) - 1 Step 4
-        '    Dim rect = combinedRects(i / 2)
-        '    rects.Add(New cv.Rect(kalman.output(i), kalman.output(i + 1), kalman.output(i + 2), kalman.output(i + 3)))
-        'Next
-
         dst2 = dst1.Clone()
-        If standalone Then
-            Dim fontSize As Single = 1.0
-            If ocvb.parms.lowResolution Then fontSize = 0.6
-            Dim maxDepth = gravity.sliders.TrackBar1.Value
-            Dim mmPerPixel = maxDepth / src.Height
-            Dim maxCount = Math.Min(flood.objectRects.Count, 10)
-            For i = 0 To maxCount - 1
-                Dim rect = flood.objectRects(i)
-                dst2.Rectangle(rect, cv.Scalar.White, 1)
-                Dim distanceFromCamera = (src.Height - rect.Y - rect.Height) * mmPerPixel
-                Dim objectWidth = rect.Width * mmPerPixel
-                Dim text = "depth=" + Format(distanceFromCamera / 1000, "#0.0") + "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
+        Dim fontSize As Single = 1.0
+        If ocvb.parms.lowResolution Then fontSize = 0.6
+        Dim maxDepth = gravity.sliders.TrackBar1.Value
+        Dim mmPerPixel = maxDepth / src.Height
+        Dim maxCount = Math.Min(flood.objectRects.Count, 10)
+        For i = 0 To maxCount - 1
+            Dim rect = flood.objectRects(i)
+            dst2.Rectangle(rect, cv.Scalar.White, 1)
+            Dim distanceFromCamera = (src.Height - rect.Y - rect.Height) * mmPerPixel
+            Dim objectWidth = rect.Width * mmPerPixel
+            Dim text = "depth=" + Format(distanceFromCamera / 1000, "#0.0") + "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
 
-                Dim pt = New cv.Point(rect.X, rect.Y - 10)
-                cv.Cv2.PutText(dst2, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-            Next
-            label2 = "Showing the top " + CStr(maxCount) + " out of " + CStr(flood.objectRects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
-        End If
+            Dim pt = New cv.Point(rect.X, rect.Y - 10)
+            cv.Cv2.PutText(dst2, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        Next
+        label2 = "Showing the top " + CStr(maxCount) + " out of " + CStr(flood.objectRects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
+        If dst1.Channels = 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15))
+        If standalone Then CameraLocationBot(dst2, If(ocvb.parms.lowResolution, 5, 15))
     End Sub
 End Class
 
@@ -453,8 +426,8 @@ Public Class Projection_Wall
 
         lines = New lineDetector_FLD_CPP(ocvb, Me.GetType().Name)
 
-        label1 = "Top View with lines in red"
-        label2 = "Top View output without lines"
+        label1 = "Top View: walls in red, Red dot is camera"
+        label2 = "Identified objects"
         ocvb.desc = "Use the top down view to detect walls with a line detector algorithm - more work needed"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -465,9 +438,14 @@ Public Class Projection_Wall
         dilate.src = dst1
         dilate.Run(ocvb)
 
-        lines.src = dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lines.src = dilate.dst1.Clone()
         lines.Run(ocvb)
-        dst2 = lines.dst1
+        dst1 = lines.dst1.Clone()
+
+        dst2 = pFlood.dst2
+
+        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15))
+        If standalone Then CameraLocationBot(dst2, If(ocvb.parms.lowResolution, 5, 15))
     End Sub
 End Class
 

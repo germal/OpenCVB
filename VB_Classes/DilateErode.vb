@@ -8,10 +8,11 @@ Public Class DilateErode_Basics
         sliders.setupTrackBar2(ocvb, caller, "Erode (-) to Dilate (+)", -32, 32, 1)
         ocvb.desc = "Dilate and Erode the RGB and Depth image."
 
-        radio.Setup(ocvb, caller, 3)
+        radio.Setup(ocvb, caller, 4)
         radio.check(0).Text = "Dilate/Erode shape: Cross"
         radio.check(1).Text = "Dilate/Erode shape: Ellipse"
         radio.check(2).Text = "Dilate/Erode shape: Rect"
+        radio.check(3).Text = "Dilate/Erode shape: None"
         radio.check(0).Checked = True
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -19,18 +20,22 @@ Public Class DilateErode_Basics
         Dim kernelsize = sliders.TrackBar1.Value
         If kernelsize Mod 2 = 0 Then kernelsize += 1
         Dim morphShape = cv.MorphShapes.Cross
-        If radio.check(0).Checked Then morphShape = cv.MorphShapes.Cross
         If radio.check(1).Checked Then morphShape = cv.MorphShapes.Ellipse
         If radio.check(2).Checked Then morphShape = cv.MorphShapes.Rect
         Dim element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(kernelsize, kernelsize))
 
-        If iterations >= 0 Then
-            src.Dilate(element, Nothing, iterations).CopyTo(dst1)
+        If radio.check(3).Checked Then
+            dst1 = src
         Else
-            src.Erode(element, Nothing, -iterations).CopyTo(dst1)
+            If iterations >= 0 Then
+                src.Dilate(element, Nothing, iterations).CopyTo(dst1)
+            Else
+                src.Erode(element, Nothing, -iterations).CopyTo(dst1)
+            End If
         End If
 
-        if standalone Then
+
+        If standalone Then
             If iterations >= 0 Then
                 dst2 = ocvb.RGBDepth.Dilate(element, Nothing, iterations)
                 label1 = "Dilate RGB " + CStr(iterations) + " times"
