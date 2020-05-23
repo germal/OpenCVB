@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
-Public Class GameOfLife_Basics
+Public Class CellAuto_Life
     Inherits ocvbClass
     Dim random As Random_Points
     Dim grid As cv.Mat
@@ -95,13 +95,13 @@ End Class
 
 
 
-Public Class GameOfLife_Population
+Public Class CellAuto_LifePopulation
     Inherits ocvbClass
     Dim plot As Plot_OverTime
-    Dim game As GameOfLife_Basics
+    Dim game As CellAuto_Life
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        game = New GameOfLife_Basics(ocvb, caller)
+        game = New CellAuto_Life(ocvb, caller)
 
         plot = New Plot_OverTime(ocvb, caller)
         plot.dst1 = dst2

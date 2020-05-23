@@ -355,7 +355,7 @@ End Class
 Public Class Projection_Flood
     Inherits ocvbClass
     Dim flood As FloodFill_Projection
-    Public gravity As Projection_G_CPP
+    Dim gravity As Projection_G_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
 
@@ -389,19 +389,21 @@ Public Class Projection_Flood
         Dim maxDepth = gravity.sliders.TrackBar1.Value
         Dim mmPerPixel = maxDepth / src.Height
         Dim maxCount = Math.Min(flood.objectRects.Count, 10)
+        If dst1.Channels = 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For i = 0 To maxCount - 1
             Dim rect = flood.objectRects(i)
             dst2.Rectangle(rect, cv.Scalar.White, 1)
-            Dim distanceFromCamera = (src.Height - rect.Y - rect.Height) * mmPerPixel
+            Dim distanceFromCamera = (src.Height - rect.Y - rect.Height / 2) * mmPerPixel
             Dim objectWidth = rect.Width * mmPerPixel
+
+            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.lowResolution, 5, 15), cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
             Dim text = "depth=" + Format(distanceFromCamera / 1000, "#0.0") + "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
 
             Dim pt = New cv.Point(rect.X, rect.Y - 10)
             cv.Cv2.PutText(dst2, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
         label2 = "Showing the top " + CStr(maxCount) + " out of " + CStr(flood.objectRects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
-        If dst1.Channels = 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15))
         If standalone Then CameraLocationBot(dst2, If(ocvb.parms.lowResolution, 5, 15))
     End Sub
@@ -420,11 +422,9 @@ Public Class Projection_Wall
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
 
-        dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
-
-        pFlood = New Projection_Flood(ocvb, Me.GetType().Name)
-
         lines = New lineDetector_FLD_CPP(ocvb, Me.GetType().Name)
+        pFlood = New Projection_Flood(ocvb, Me.GetType().Name)
+        dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
 
         label1 = "Top View: walls in red, Red dot is camera"
         label2 = "Identified objects"
@@ -449,4 +449,19 @@ Public Class Projection_Wall
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Projection_Backprojection
+    Inherits ocvbClass
+    Dim pFlood As Projection_Flood
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        ocvb.desc = "Use Projection_Flood to find objects and then backproject them into front-facing view."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+    End Sub
+End Class
 

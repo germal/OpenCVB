@@ -797,7 +797,7 @@ Public Class OpenCVB
             If totalBytesOfMemoryUsed > 4000 Then MsgBox("OpenCVB appears to have a memory leak in the " + saveAlgorithmName + " algorithm" + vbCrLf +
                                                          "The memory footprint has grown above 4Gb which is more than expected.")
             Static myFrames As Integer = 0
-            If myFrames > 10 Then
+            If myFrames > 200 Then
                 For i = 0 To 4 - 1
                     Dim m = Choose(i + 1, camera.color, camera.rgbdepth, camera.depth16, camera.pointcloud)
                     If m.width = 0 Or m.height = 0 Then
