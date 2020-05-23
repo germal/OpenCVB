@@ -64,8 +64,6 @@ Public Class CameraD400VB
             Dim dintrinsicsLeft = pipeline_profile.GetStream(rs.Stream.Color).As(Of rs.VideoStreamProfile).GetIntrinsics
             MyBase.w = dintrinsicsLeft.width
             MyBase.h = dintrinsicsLeft.height
-            intrinsicsLeft_VB.width = dintrinsicsLeft.width
-            intrinsicsLeft_VB.height = dintrinsicsLeft.height
             intrinsicsLeft_VB.ppx = dintrinsicsLeft.ppx
             intrinsicsLeft_VB.ppy = dintrinsicsLeft.ppy
             intrinsicsLeft_VB.fx = dintrinsicsLeft.fx

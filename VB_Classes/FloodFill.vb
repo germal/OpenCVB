@@ -20,7 +20,7 @@ Public Class FloodFill_Basics
         sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar2(ocvb, caller, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar3(ocvb, caller, "FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar4(ocvb, caller, "Step Size", 1, colorCols / 2, 20)
+        sliders.setupTrackBar4(ocvb, caller, "Step Size", 1, ocvb.color.cols / 2, 20)
 
         label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."
@@ -340,7 +340,7 @@ Public Class FloodFill_Projection
         sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar2(ocvb, caller, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar3(ocvb, caller, "FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar4(ocvb, caller, "Step Size", 1, colorCols / 2, 20)
+        sliders.setupTrackBar4(ocvb, caller, "Step Size", 1, ocvb.color.cols / 2, 20)
 
         label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - more work needed"

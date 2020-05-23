@@ -42,7 +42,7 @@ Public Class LeftRightView_CompareUndistorted
 
         sliders.setupTrackBar1(ocvb, caller, "brightness", 0, 255, 0)
         sliders.setupTrackBar2(ocvb, caller, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar3(ocvb, caller, "Slice Height", 1, (colorRows - 100) / 2, 50)
+        sliders.setupTrackBar3(ocvb, caller, "Slice Height", 1, (ocvb.color.Rows - 100) / 2, 50)
 
         Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2
@@ -97,7 +97,7 @@ Public Class LeftRightView_CompareRaw
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "brightness", 0, 255, 100)
         sliders.setupTrackBar2(ocvb, caller, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar3(ocvb, caller, "Slice Height", 1, (colorRows - 100) / 2, 50)
+        sliders.setupTrackBar3(ocvb, caller, "Slice Height", 1, (ocvb.color.Rows - 100) / 2, 50)
         Select Case ocvb.parms.cameraIndex
             Case D400Cam, StereoLabsZED2, 
                 label1 = "Left Image"

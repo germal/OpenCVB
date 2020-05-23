@@ -156,8 +156,8 @@ Public Class OpticalFlow_DenseBasics_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
-        grid.sliders.TrackBar1.Value = colorCols / 4
-        grid.sliders.TrackBar2.Value = colorRows / 4
+        grid.sliders.TrackBar1.Value = ocvb.color.cols / 4
+        grid.sliders.TrackBar2.Value = ocvb.color.Rows / 4
         grid.sliders.TrackBar3.Value = 5
 
         flow = New OpticalFlow_DenseOptions(ocvb, caller)

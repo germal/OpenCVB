@@ -50,8 +50,8 @@ Public Class Sift_Basics_CS_MT
         setCaller(callerRaw)
         fisheye = New FishEye_Rectified(ocvb, caller)
         grid = New Thread_Grid(ocvb, caller)
-        grid.sliders.TrackBar1.Maximum = colorCols * 2
-        grid.sliders.TrackBar1.Value = colorCols * 2 ' we are just taking horizontal slices of the image.
+        grid.sliders.TrackBar1.Maximum = ocvb.color.cols * 2
+        grid.sliders.TrackBar1.Value = ocvb.color.cols * 2 ' we are just taking horizontal slices of the image.
         grid.sliders.TrackBar2.Value = 10
 
         siftBasics = New Sift_Basics_CS(ocvb, caller)

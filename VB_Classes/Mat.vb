@@ -124,7 +124,7 @@ Public Class Mat_4to1
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         label1 = ""
-        mat1 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
+        mat1 = New cv.Mat(ocvb.color.Rows, ocvb.color.cols, cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat3 = mat1.Clone()
         mat4 = mat1.Clone()
@@ -168,7 +168,7 @@ Public Class Mat_2to1
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         label1 = ""
-        mat1 = New cv.Mat(New cv.Size(colorRows, colorCols), cv.MatType.CV_8UC3, 0)
+        mat1 = New cv.Mat(New cv.Size(ocvb.color.Rows, ocvb.color.cols), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
         dst1 = dst2

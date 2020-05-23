@@ -227,8 +227,8 @@ Public Class Puzzle_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
-        grid.sliders.TrackBar1.Value = colorCols / 10
-        grid.sliders.TrackBar2.Value = colorRows / 8
+        grid.sliders.TrackBar1.Value = ocvb.color.cols / 10
+        grid.sliders.TrackBar2.Value = ocvb.color.Rows / 8
         grid.Run(ocvb)
         ocvb.desc = "Create the puzzle pieces for toy genetic or annealing algorithm."
     End Sub

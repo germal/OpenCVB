@@ -37,7 +37,7 @@ Public Class Salience_Basics_CPP
         Dim imagePtr = Salience_Run(salience, sliders.TrackBar1.Value, grayHandle.AddrOfPinnedObject, src.Height, src.Width)
         grayHandle.Free()
 
-        dst1 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8U, imagePtr)
+        dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.cols, cv.MatType.CV_8U, imagePtr)
     End Sub
     Public Sub Close()
         Salience_Close(salience)

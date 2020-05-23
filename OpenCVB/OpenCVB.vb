@@ -66,7 +66,6 @@ Public Class OpenCVB
     Dim textDesc As String = ""
     Dim totalBytesOfMemoryUsed As Integer
     Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.ActiveClass.TrueType)
-    Dim vtkDirectory As String = ""
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -918,7 +917,6 @@ Public Class OpenCVB
         parms.cameraName = camera.deviceName
 
         parms.PythonExe = optionsForm.PythonExeName.Text
-        parms.vtkDirectory = vtkDirectory
         parms.HomeDir = HomeDir.FullName
 
         parms.OpenCVfullPath = OpenCVfullPath
@@ -984,8 +982,6 @@ Public Class OpenCVB
         ' Here we check to see if the algorithm constructor changed lowResolution.
         If OpenCVB.ocvb.parms.lowResolution <> saveLowResSetting Then
             If OpenCVB.ocvb.parms.lowResolution Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
-            OpenCVB.ocvb.w = regWidth / OpenCVB.ocvb.parms.speedFactor
-            OpenCVB.ocvb.h = regHeight / OpenCVB.ocvb.parms.speedFactor
             OpenCVB.ocvb.parms.imageToTrueTypeLoc = 1 / resizeForDisplay
             If OpenCVB.ocvb.parms.lowResolution Then OpenCVB.ocvb.parms.imageToTrueTypeLoc *= OpenCVB.ocvb.parms.speedFactor
         End If

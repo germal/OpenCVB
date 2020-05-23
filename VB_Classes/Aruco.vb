@@ -38,8 +38,8 @@ Public Class Aruco_CS
         ocvb.desc = "Testing the Aruco marker detection in C#"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        src = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/aruco_markers_photo.jpg")
-        aruco.Run(src)
+        Dim tmp = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/aruco_markers_photo.jpg")
+        aruco.Run(tmp)
         dst1 = aruco.detectedMarkers.Resize(ocvb.color.Size())
 
         dst2.SetTo(0)

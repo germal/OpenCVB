@@ -126,8 +126,6 @@ Public Class CameraMyntD
             intrinsicsLeft_VB.coeffs(2) = intrinsics.p1
             intrinsicsLeft_VB.coeffs(3) = intrinsics.p2
             intrinsicsLeft_VB.coeffs(4) = intrinsics.k3
-            intrinsicsLeft_VB.width = intrinsics.width
-            intrinsicsLeft_VB.height = intrinsics.height
 
             ptr = MyntDRotationMatrix(cPtr)
             Marshal.Copy(ptr, rotationMatrix, 0, rotationMatrix.Length)
@@ -147,8 +145,6 @@ Public Class CameraMyntD
             intrinsicsRight_VB.coeffs(2) = intrinsics.p1
             intrinsicsRight_VB.coeffs(3) = intrinsics.p2
             intrinsicsRight_VB.coeffs(4) = intrinsics.k3
-            intrinsicsRight_VB.width = intrinsics.width
-            intrinsicsRight_VB.height = intrinsics.height
 
             IMU_Present = True
             IMUtask = New Task(Sub() IMUdataCollection())

@@ -32,7 +32,7 @@ Public Class Palette_LinearPolar
         ocvb.desc = "Use LinearPolar to create gradient image"
         SetInterpolationRadioButtons(ocvb, caller, radio, "LinearPolar")
 
-        sliders.setupTrackBar1(ocvb, caller, "LinearPolar radius", 0, colorCols, colorCols / 2)
+        sliders.setupTrackBar1(ocvb, caller, "LinearPolar radius", 0, ocvb.color.cols, ocvb.color.cols / 2)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1.SetTo(0)

@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Drawing
 
-Module VB_Classes
+Module Algorithm_Module
     Public appLocation As cv.Rect
     Public offsetIncr = 25
     Public slidersOffset As cv.Point
@@ -87,8 +87,6 @@ Public Class ActiveClass : Implements IDisposable
         Public translation As Single()
     End Structure
     Public Structure intrinsics_VB
-        Public width As Integer
-        Public height As Integer
         Public ppx As Single
         Public ppy As Single
         Public fx As Single
@@ -139,7 +137,6 @@ Public Class ActiveClass : Implements IDisposable
         Dim testAllRunning As Boolean
         Dim transformationMatrix() As Single
         Dim useRecordedData As Boolean
-        Dim vtkDirectory As String
     End Structure
     Public Sub New(parms As algorithmParameters, _width As Integer, _height As Integer)
         Randomize() ' just in case anyone uses VB.Net's Rnd

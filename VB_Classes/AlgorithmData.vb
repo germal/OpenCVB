@@ -35,19 +35,13 @@ Public Class AlgorithmData
     Public result2 As New cv.Mat
     Public suppressOptions As Boolean
     Public TTtextData(3) As List(Of ActiveClass.TrueType)
-    Public w As Integer
-    Public h As Integer
     Public Sub New(parms As ActiveClass.algorithmParameters, width As Integer, height As Integer)
-        w = width
-        h = height
         optionsTop = parms.mainFormLoc.Y + parms.mainFormHeight
         optionsLeft = parms.mainFormLoc.X
-        color = New cv.Mat(h, w, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        result1 = New cv.Mat(h, w, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        result2 = New cv.Mat(h, w, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        label1 = ""
-        label2 = ""
+        color = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        result1 = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        result2 = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         ms_rng = New System.Random
         For i = 0 To rColors.Length - 1
             rColors(i) = New cv.Vec3b(ms_rng.Next(100, 255), ms_rng.Next(100, 255), ms_rng.Next(100, 255))

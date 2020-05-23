@@ -176,8 +176,8 @@ Public Class Kalman_RotatingPoint
         cv.Cv2.SetIdentity(kf.MeasurementNoiseCov, cv.Scalar.All(0.1))
         cv.Cv2.SetIdentity(kf.ErrorCovPost, cv.Scalar.All(1))
         cv.Cv2.Randn(kf.StatePost, New cv.Scalar(0), cv.Scalar.All(1))
-        radius = colorRows / 2.4 ' so we see the entire circle...
-        center = New cv.Point2f(colorCols / 2, colorRows / 2)
+        radius = ocvb.color.Rows / 2.4 ' so we see the entire circle...
+        center = New cv.Point2f(ocvb.color.cols / 2, ocvb.color.Rows / 2)
         ocvb.desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -139,8 +139,6 @@ Public Class CameraZED2
             intrinsicsLeft_VB.coeffs(2) = intrinsics.p1
             intrinsicsLeft_VB.coeffs(3) = intrinsics.p2
             intrinsicsLeft_VB.coeffs(4) = intrinsics.k3
-            intrinsicsLeft_VB.width = intrinsics.width
-            intrinsicsLeft_VB.height = intrinsics.height
 
             ptr = Zed2intrinsicsRight(cPtr)
             intrinsics = Marshal.PtrToStructure(Of intrinsicsLeftZed)(ptr)
@@ -158,8 +156,6 @@ Public Class CameraZED2
             intrinsicsRight_VB.coeffs(2) = intrinsics.p1
             intrinsicsRight_VB.coeffs(3) = intrinsics.p2
             intrinsicsRight_VB.coeffs(4) = intrinsics.k3
-            intrinsicsRight_VB.width = intrinsics.width
-            intrinsicsRight_VB.height = intrinsics.height
         End If
     End Sub
 

@@ -9,12 +9,12 @@ Public Class Random_Points
     Public plotPoints As Boolean = False
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Random Pixel Count", 1, colorCols * colorRows, 20)
+        sliders.setupTrackBar1(ocvb, caller, "Random Pixel Count", 1, ocvb.color.cols * ocvb.color.Rows, 20)
 
         ReDim Points(sliders.TrackBar1.Value - 1)
         ReDim Points2f(sliders.TrackBar1.Value - 1)
 
-        rangeRect = New cv.Rect(0, 0, colorCols, colorRows)
+        rangeRect = New cv.Rect(0, 0, ocvb.color.cols, ocvb.color.Rows)
         ocvb.desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

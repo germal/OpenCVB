@@ -265,7 +265,7 @@ Public Class Histogram_2D_XZ_YZ
         trim = New Depth_InRange(ocvb, caller)
         trim.sliders.TrackBar2.Value = 1500 ' up to x meters away
 
-        sliders.setupTrackBar1(ocvb, caller, "Histogram X bins", 1, colorCols / 2, 30)
+        sliders.setupTrackBar1(ocvb, caller, "Histogram X bins", 1, ocvb.color.cols / 2, 30)
         sliders.setupTrackBar2(ocvb, caller, "Histogram Z bins", 1, 200, 100)
 
         ocvb.desc = "Create a 2D histogram for depth in XZ and YZ."
@@ -510,7 +510,7 @@ Public Class Histogram_Depth
         plotHist = New Plot_Histogram(ocvb, caller)
 
         trim = New Depth_InRange(ocvb, caller)
-        sliders.setupTrackBar1(ocvb, caller, "Histogram Depth Bins", 2, colorCols, 50) ' max is the number of columns * 2
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Depth Bins", 2, ocvb.color.cols, 50) ' max is the number of columns * 2
 
         ocvb.desc = "Show depth data as a histogram."
     End Sub

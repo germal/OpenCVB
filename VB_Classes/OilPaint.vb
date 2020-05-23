@@ -14,7 +14,7 @@ Public Class OilPaint_Pointilism
         radio.check(1).Text = "Use Circular stroke"
         radio.check(1).Checked = True
 
-        ocvb.drawRect = New cv.Rect(colorCols * 3 / 8, colorRows * 3 / 8, colorCols * 2 / 8, colorRows * 2 / 8)
+        ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
         ocvb.desc = "Alter the image to effect the pointilism style - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -123,7 +123,7 @@ Public Class OilPaint_Manual
         sliders.setupTrackBar1(ocvb, caller, "Filter Size", 3, 15, 3)
         sliders.setupTrackBar2(ocvb, caller, "Intensity", 5, 150, 25)
         ocvb.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
-        ocvb.drawRect = New cv.Rect(colorCols * 3 / 8, colorRows * 3 / 8, colorCols * 2 / 8, colorRows * 2 / 8)
+        ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim filtersize = sliders.TrackBar1.Value
@@ -182,7 +182,7 @@ Public Class OilPaint_Manual_CS
         ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
         label2 = "Selected area only"
 
-        ocvb.drawRect = New cv.Rect(colorCols * 3 / 8, colorRows * 3 / 8, colorCols * 2 / 8, colorRows * 2 / 8)
+        ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize = sliders.TrackBar1.Value
@@ -210,7 +210,7 @@ Public Class OilPaint_Cartoon
         laplacian = New Edges_Laplacian(ocvb, caller)
 
         oil = New OilPaint_Manual_CS(ocvb, caller)
-        ocvb.drawRect = New cv.Rect(colorCols * 3 / 8, colorRows * 3 / 8, colorCols * 2 / 8, colorRows * 2 / 8)
+        ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
 
         oil.sliders.setupTrackBar3(ocvb, caller, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
         ocvb.desc = "Alter an image so it appears more like a cartoon - Painterly Effect"

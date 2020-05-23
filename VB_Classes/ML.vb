@@ -65,8 +65,8 @@ Public Class ML_FillRGBDepth_MT
         setCaller(callerRaw)
         colorizer = New Depth_Colorizer_CPP(ocvb, caller)
         grid = New Thread_Grid(ocvb, caller)
-        grid.sliders.TrackBar1.Value = colorCols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
-        grid.sliders.TrackBar2.Value = colorRows / 4
+        grid.sliders.TrackBar1.Value = ocvb.color.cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
+        grid.sliders.TrackBar2.Value = ocvb.color.Rows / 4
         shadow = New Depth_Holes(ocvb, caller)
         label1 = "ML filled shadow"
         label2 = ""

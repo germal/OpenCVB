@@ -9,7 +9,7 @@ Public Class intrinsicsLeft_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Dim ttStart = 40
 
-        Dim nextLine = "Width = " + CStr(ocvb.parms.intrinsicsLeft.width) + vbTab + " height = " + CStr(ocvb.parms.intrinsicsLeft.height)
+        Dim nextLine = "Width = " + CStr(ocvb.color.Width) + vbTab + " height = " + CStr(ocvb.color.Height)
         ocvb.putText(New ActiveClass.TrueType(nextLine, 10, ttStart))
 
         nextLine = "fx = " + CStr(ocvb.parms.intrinsicsLeft.fx) + vbTab + " fy = " + CStr(ocvb.parms.intrinsicsLeft.fy)

@@ -80,8 +80,6 @@ Public Class Camera
     End Structure
     Public Function setintrinsics(intrinsicsHW As rs.Intrinsics) As VB_Classes.ActiveClass.intrinsics_VB
         Dim intrinsics As New VB_Classes.ActiveClass.intrinsics_VB
-        intrinsics.width = intrinsicsHW.width
-        intrinsics.height = intrinsicsHW.height
         intrinsics.ppx = intrinsicsHW.ppx
         intrinsics.ppy = intrinsicsHW.ppy
         intrinsics.fx = intrinsicsHW.fx

@@ -41,9 +41,7 @@ Public Class VTK_Basics
     Public vtkPresent As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        If ocvb.parms.vtkDirectory.Length > 0 Then vtkPresent = True
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
-        If fileinfo.Exists = False Then vtkPresent = False
         Dispose() ' make sure there wasn't an old VTKWindow sitting around...
         ocvb.desc = "Create VTK window and update it with images"
     End Sub

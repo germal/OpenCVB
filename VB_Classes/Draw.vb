@@ -269,8 +269,8 @@ Public Class Draw_SymmetricalShapes
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Number of points", 200, 1000, 500)
-        sliders.setupTrackBar2(ocvb, caller, "Radius 1", 1, colorRows / 2, colorRows / 4)
-        sliders.setupTrackBar3(ocvb, caller, "Radius 2", 1, colorRows / 2, colorRows / 8)
+        sliders.setupTrackBar2(ocvb, caller, "Radius 1", 1, ocvb.color.Rows / 2, ocvb.color.Rows / 4)
+        sliders.setupTrackBar3(ocvb, caller, "Radius 2", 1, ocvb.color.Rows / 2, ocvb.color.Rows / 8)
         sliders.setupTrackBar4(ocvb, caller, "nGenPer", 1, 500, 100)
 
         check.Setup(ocvb, caller, 5)
