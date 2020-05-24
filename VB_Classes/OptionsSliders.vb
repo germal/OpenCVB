@@ -19,6 +19,8 @@ Public Class OptionsSliders
             If ocvb.suppressOptions = False Then
                 slidersOffset.X += offsetIncr
                 slidersOffset.Y += offsetIncr
+                If slidersOffset.X > 100 Then slidersOffset.X = 0
+                If slidersOffset.Y > 100 Then slidersOffset.Y = 0
                 Me.Show()
             End If
         End If
