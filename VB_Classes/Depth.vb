@@ -900,8 +900,6 @@ Public Class Depth_LocalMinMax_MT
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         grid = New Thread_Grid(ocvb, caller)
-        grid.sliders.TrackBar1.Value = 64
-        grid.sliders.TrackBar2.Value = 64
 
         label1 = "Red is min distance, blue is max distance"
         ocvb.desc = "Find min and max depth in each segment."
@@ -944,53 +942,60 @@ End Class
 
 Public Class Depth_LocalMinMax_Kalman_MT
     Inherits ocvbClass
-    Dim minmax As Depth_LocalMinMax_MT
     Dim kalman As Kalman_Basics
+    Public grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        minmax = New Depth_LocalMinMax_MT(ocvb, caller)
-        ocvb.parms.ShowOptions = False
+        grid = New Thread_Grid(ocvb, caller)
+        grid.sliders.TrackBar1.Value = 128
+        grid.sliders.TrackBar2.Value = 90
+
+        kalman = New Kalman_Basics(ocvb, caller)
 
         label1 = "Red is min distance, blue is max distance"
         ocvb.desc = "Find minimum depth in each segment."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static saveCount As Integer
-        minmax.Run(ocvb)
+        grid.Run(ocvb)
+        Dim depth32f = getDepth32f(ocvb)
+        Dim mask = depth32f.Threshold(1, 5000, cv.ThresholdTypes.Binary)
+        mask.ConvertTo(mask, cv.MatType.CV_8UC1)
 
-        If minmax.grid.roiList.Count <> saveCount Then
+        If grid.roiList.Count * 4 <> kalman.input.Length Then
             If kalman IsNot Nothing Then kalman.Dispose()
             kalman = New Kalman_Basics(ocvb, caller)
-            ReDim kalman.input(minmax.grid.roiList.Count * 4 - 1)
-            saveCount = minmax.grid.roiList.Count
+            ReDim kalman.input(grid.roiList.Count * 4 - 1)
         End If
 
-        For i = 0 To minmax.minPoint.Count - 1
-            kalman.input(i * 4) = minmax.minPoint(i).X
-            kalman.input(i * 4 + 1) = minmax.minPoint(i).Y
-            kalman.input(i * 4 + 2) = minmax.maxPoint(i).X
-            kalman.input(i * 4 + 3) = minmax.maxPoint(i).Y
-        Next
-        kalman.Run(ocvb)
-
         dst1 = ocvb.color.Clone()
-        dst1.SetTo(cv.Scalar.White, minmax.grid.gridMask)
+        dst1.SetTo(cv.Scalar.White, grid.gridMask)
+
+        Parallel.For(0, grid.roiList.Count,
+        Sub(i)
+            Dim roi = grid.roiList(i)
+            Dim minVal As Double, maxVal As Double
+            Dim minPt As cv.Point, maxPt As cv.Point
+            cv.Cv2.MinMaxLoc(depth32f(roi), minVal, maxVal, minPt, maxPt, mask(roi))
+            If minPt.X < 0 Or minPt.Y < 0 Then minPt = New cv.Point2f(0, 0)
+            kalman.input(i * 4) = minPt.X
+            kalman.input(i * 4 + 1) = minPt.Y
+            kalman.input(i * 4 + 2) = maxPt.X
+            kalman.input(i * 4 + 3) = maxPt.Y
+        End Sub)
+
+        kalman.Run(ocvb)
 
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
         Dim radius = 5
-        For i = 0 To kalman.output.Length - 1 Step 4
-            If kalman.output(i) >= ocvb.color.Width Then kalman.output(i) = ocvb.color.Width - 1
-            If kalman.output(i) < 0 Then kalman.output(i) = 0
-            If kalman.output(i + 1) >= ocvb.color.Height Then kalman.output(i + 1) = ocvb.color.Height - 1
-            If kalman.output(i + 1) < 0 Then kalman.output(i + 1) = 0
-
-            If kalman.output(i + 2) >= ocvb.color.Width Then kalman.output(i + 2) = ocvb.color.Width - 1
-            If kalman.output(i + 2) < 0 Then kalman.output(i) = 0
-            If kalman.output(i + 3) >= ocvb.color.Height Then kalman.output(i + 3) = ocvb.color.Height - 1
-            If kalman.output(i + 3) < 0 Then kalman.output(i + 3) = 0
-            subdiv.Insert(New cv.Point2f(kalman.output(i), kalman.output(i + 1))) ' subdiv based on the minPoints after kalman
-            cv.Cv2.Circle(dst1, New cv.Point2f(kalman.output(i), kalman.output(i + 1)), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            cv.Cv2.Circle(dst1, New cv.Point2f(kalman.output(i + 2), kalman.output(i + 3)), radius, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+        For i = 0 To grid.roiList.Count - 1
+            Dim roi = grid.roiList(i)
+            Dim ptmin = New cv.Point2f(kalman.output(i * 4) + roi.X, kalman.output(i * 4 + 1) + roi.Y)
+            Dim ptmax = New cv.Point2f(kalman.output(i * 4 + 2) + roi.X, kalman.output(i * 4 + 3) + roi.Y)
+            ptmin = validatePoint2f(ptmin)
+            ptmax = validatePoint2f(ptmax)
+            subdiv.Insert(ptmin)
+            cv.Cv2.Circle(dst1, ptmin, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst1, ptmax, radius, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
         Next
         paint_voronoi(ocvb, dst2, subdiv)
     End Sub

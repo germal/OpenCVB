@@ -28,13 +28,22 @@ Public Class ocvbClass : Implements IDisposable
         End If
     End Sub
     Public Function validateRect(r As cv.Rect) As cv.Rect
+        If r.Width < 0 Then r.Width = 1
+        If r.Height < 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X > colorCols Then r.X = colorCols
-        If r.Y > colorRows Then r.Y = colorRows
-        If r.X + r.Width > colorCols Then r.Width = colorCols - r.X
-        If r.Y + r.Height > colorRows Then r.Height = colorRows - r.Y
+        If r.X > dst1.Width Then r.X = dst1.Width
+        If r.Y > dst1.Height Then r.Y = dst1.Height
+        If r.X + r.Width > dst1.Width Then r.Width = dst1.Width - r.X
+        If r.Y + r.Height > dst1.Height Then r.Height = dst1.Height - r.Y
         Return r
+    End Function
+    Public Function validatePoint2f(p As cv.Point2f) As cv.Point2f
+        If p.X < 0 Then p.X = 0
+        If p.Y < 0 Then p.Y = 0
+        If p.X > dst1.Width Then p.X = dst1.Width - 1
+        If p.Y > dst1.Height Then p.Y = dst1.Height - 1
+        Return p
     End Function
     Public Sub New()
         dst1 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
