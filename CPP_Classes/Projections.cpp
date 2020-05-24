@@ -179,7 +179,7 @@ public:
 		float zHalf = maxZ / 2;
 		float range = (float)h;
 		int shift = int((histTop.cols - histTop.rows) / 2); // shift to the center of the image.
-//#pragma omp parallel for  // this is faster without OpenMP!  On my system 21 FPS single-threaded, 15 FPS multi-threaded.
+//#pragma omp parallel for  // this is faster without OpenMP!  But try it again when opportunity arrives...
 		for (int y = 0; y < xyz.rows; ++y)
 		{
 			for (int x = 0; x < xyz.cols; ++x)

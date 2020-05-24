@@ -799,16 +799,6 @@ Public Class OpenCVB
                        "The memory footprint has grown above 4Gb which is more than expected.")
                 warningIssued = True
             End If
-            Static myFrames As Integer = 0
-            If myFrames > 200 Then
-                For i = 0 To 4 - 1
-                    Dim m = Choose(i + 1, camera.color, camera.rgbdepth, camera.depth16, camera.pointcloud)
-                    If m.width = 0 Or m.height = 0 Then
-                        MsgBox("Restart camera - it failed to provide " + Choose(i + 1, "color", "RGBDepth", "Depth16", "Pointcloud") + " image")
-                    End If
-                Next
-            End If
-            myFrames += 1
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
         camera.frameCount = 0
@@ -1122,11 +1112,11 @@ Public Class OpenCVB
 
         ' remove all options forms.  They can only be made topmost (see OptionsBringToFront above) when created on the same thread.
         ' This deletes the options forms for the current thread so they will be created again with the next thread.
-        Dim frmlist As New List(Of Form)
-        For Each frm In Application.OpenForms
-            If frm.name.startswith("Option") Then frmlist.Add(frm)
-        Next
         Try
+            Dim frmlist As New List(Of Form)
+            For Each frm In Application.OpenForms
+                If frm.name.startswith("Option") Then frmlist.Add(frm)
+            Next
             For Each frm In frmlist
                 frm.Close()
             Next

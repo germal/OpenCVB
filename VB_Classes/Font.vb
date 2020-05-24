@@ -64,17 +64,18 @@ Public Class Font_FlowText
             msgs.Add("Then in the Run method, flow.msgs.add('your next line of text') - for as many msgs as you need on each pass.")
             msgs.Add("Then at the end of the Run method, invoke flow.Run(ocvb)")
         End If
-
-        For i = 0 To msgs.Count - 1
-            ocvb.putText(New ActiveClass.TrueType(msgs(i), 10, (i + 1) * 15 + 10, "Microsoft Sans Serif", 8, result1or2))
-        Next
-
         Static lastCount As Int32
         Dim maxLines As Int32 = 21
-        If ocvb.color.Height = 480 Or ocvb.color.Height = 240 Then maxLines = 29
-        If msgs.Count > maxLines Then
+
+        Dim firstLine = If(msgs.Count - maxLines < 0, 0, msgs.Count - maxLines)
+        For i = firstLine To msgs.Count - 1
+            ocvb.putText(New ActiveClass.TrueType(msgs(i), 10, (i - firstLine) * 15 + 20, "Microsoft Sans Serif", 8, result1or2))
+        Next
+
+        If ocvb.color.Width > 1000 Then maxLines = 29 ' larger mat gets more lines.
+        If msgs.Count >= maxLines Then
             Dim index As Int32
-            For i = lastCount To maxLines - 1 Step -1
+            For i = 0 To lastCount - maxLines - 1
                 msgs.RemoveAt(index) ' maxlines was tested with the font specified above. 
                 index += 1
             Next

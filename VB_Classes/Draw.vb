@@ -11,6 +11,21 @@ Module Draw_Exports
         Next
         cv.Cv2.FillConvexPoly(dst1, vertices, color, cv.LineTypes.AntiAlias)
     End Sub
+    Public Function initRandomRect(w As Integer, h As Integer, margin As Integer) As cv.Rect
+
+        Dim width As Integer, x As Integer, height As Integer, y As Integer
+        While width < 5 ' don't let the w/h get too small...
+            x = (w - margin * 2) * Rnd() + margin
+            width = (w - x - margin * 2) * Rnd()
+        End While
+
+        While height < 5 ' don't let the w/h get too small...
+            y = (h - margin * 2) * Rnd() + margin
+            height = (h - y - margin * 2) * Rnd()
+        End While
+
+        Return New cv.Rect(x, y, width, height)
+    End Function
 End Module
 
 
@@ -329,5 +344,58 @@ Public Class Draw_SymmetricalShapes
         Next
 
         If check.Box(2).Checked Then dst1.FloodFill(center, fillColor)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Draw_ClipLine
+    Inherits ocvbClass
+    Dim kalman As Kalman_Basics
+    Dim flow As Font_FlowText
+    Dim lastRect As cv.Rect
+    Dim pt1 As cv.Point
+    Dim pt2 As cv.Point
+    Dim rect As cv.Rect
+    Private Sub setup()
+        ReDim kalman.input(8)
+        Dim r = initRandomRect(dst1.Width, dst1.Height, 25)
+        pt1 = New cv.Point(r.X, r.Y)
+        pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
+        rect = initRandomRect(dst1.Width, dst1.Height, 25)
+        flow.msgs.Add("--------------------------- setup run -------------------------")
+    End Sub
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+
+        flow = New Font_FlowText(ocvb, caller)
+        flow.result1or2 = RESULT2
+
+        kalman = New Kalman_Basics(ocvb, caller)
+        setup()
+
+        label2 = "test"
+        ocvb.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        dst1 = src
+        kalman.input = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
+        kalman.Run(ocvb)
+        Dim p1 = New cv.Point(kalman.output(0), kalman.output(1))
+        Dim p2 = New cv.Point(kalman.output(2), kalman.output(3))
+
+        If kalman.output(6) < 5 Then kalman.output(6) = 5 ' don't let the w/h get too small...
+        If kalman.output(7) < 5 Then kalman.output(7) = 5
+        Dim r = New cv.Rect(kalman.output(4), kalman.output(5), kalman.output(6), kalman.output(7))
+
+        Dim clipped = cv.Cv2.ClipLine(r, p1, p2) ' Returns false when the line and the rectangle don't intersect.
+        dst1.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), 2, cv.LineTypes.AntiAlias)
+        dst1.Rectangle(r, If(clipped, cv.Scalar.Yellow, cv.Scalar.Red), 2, cv.LineTypes.AntiAlias)
+
+        flow.msgs.Add("line " + If(clipped, "interects rectangle", "does not intersect rectangle"))
+        If r = rect Then setup()
+        flow.Run(ocvb)
     End Sub
 End Class

@@ -355,7 +355,7 @@ End Class
 Public Class Projection_Flood
     Inherits ocvbClass
     Dim flood As FloodFill_Projection
-    Dim gravity As Projection_G_CPP
+    Public gravity As Projection_G_CPP
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
 
@@ -397,7 +397,8 @@ Public Class Projection_Flood
             Dim distanceFromCamera = (src.Height - rect.Y - rect.Height / 2) * mmPerPixel
             Dim objectWidth = rect.Width * mmPerPixel
 
-            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.lowResolution, 5, 15), cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.lowResolution, 6, 15), cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.lowResolution, 3, 15), cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
             Dim text = "depth=" + Format(distanceFromCamera / 1000, "#0.0") + "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
 
             Dim pt = New cv.Point(rect.X, rect.Y - 10)
@@ -424,6 +425,7 @@ Public Class Projection_Wall
 
         lines = New lineDetector_FLD_CPP(ocvb, Me.GetType().Name)
         pFlood = New Projection_Flood(ocvb, Me.GetType().Name)
+        pFlood.gravity.histogramRun = True
         dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
 
         label1 = "Top View: walls in red, Red dot is camera"

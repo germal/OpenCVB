@@ -15,14 +15,7 @@ Public Class Kalman_Basics
         ocvb.desc = "Use Kalman to stabilize a set of value (such as a cv.rect.)"
         input = {0, 0, 0, 0}
     End Sub
-    Public Function initRandomRect(w As Integer, h As Integer, margin As Integer) As Single()
-        Dim x = (w - margin * 2) * Rnd() + margin
-        Dim y = (h - margin * 2) * Rnd() + margin
-        Dim width = (w - x) * Rnd()
-        Dim height = (h - y) * Rnd()
 
-        Return {x, y, width, height}
-    End Function
     Public Sub Run(ocvb As AlgorithmData)
         Static saveDimension As Int32 = -1
         If saveDimension <> input.Length Then
@@ -56,7 +49,10 @@ Public Class Kalman_Basics
             Dim rect = New cv.Rect(CInt(output(0)), CInt(output(1)), CInt(output(2)), CInt(output(3)))
             rect = validateRect(rect)
             Static lastRect = rect
-            If rect = lastRect Then input = initRandomRect(src.Width, src.Height, 50)
+            If rect = lastRect Then
+                Dim r = initRandomRect(src.Width, src.Height, 50)
+                input = {r.X, r.Y, r.Width, r.Height}
+            End If
             lastRect = rect
             dst1.Rectangle(rect, cv.Scalar.White, 6)
             dst1.Rectangle(rect, cv.Scalar.Red, 1)
@@ -282,10 +278,13 @@ Public Class Kalman_CVMat
             dst1 = src
             Dim rect = New cv.Rect(CInt(rx(0)), CInt(rx(1)), CInt(rx(2)), CInt(rx(3)))
             rect = validateRect(rect)
-            Console.WriteLine("w = " + CStr(rect.Width) + " h = " + CStr(rect.Height))
 
             Static lastRect As cv.Rect = rect
-            If lastRect = rect Then input = New cv.Mat(4, 1, cv.MatType.CV_32F, basics.initRandomRect(src.Width, src.Height, 25))
+            If lastRect = rect Then
+                Dim r = initRandomRect(src.Width, src.Height, 25)
+                Dim array() As Single = {r.X, r.Y, r.Width, r.Height}
+                input = New cv.Mat(4, 1, cv.MatType.CV_32F, array)
+            End If
             dst1.Rectangle(rect, cv.Scalar.Red, 2)
             lastRect = rect
         End If
