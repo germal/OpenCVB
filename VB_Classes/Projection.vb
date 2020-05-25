@@ -49,16 +49,26 @@ Module Projection
 
 
 
-    Public Sub CameraLocationBot(dst As cv.Mat, radius As Integer)
+    Public Sub CameraLocationBot(dst As cv.Mat, radius As Integer, maxMeters As Integer, fontsize As Single)
         Dim shift = (dst.Width - dst.Height) / 2
         dst.Rectangle(New cv.Rect(shift, 0, dst.Height, dst.Height), cv.Scalar.White, 1)
         dst.Circle(New cv.Point(shift + dst.Height / 2, dst.Height - 5), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        For i = maxMeters - 1 To 0 Step -1
+            Dim y = dst.Height * i / maxMeters
+            dst.Line(New cv.Point(shift, y), New cv.Point(dst.Width - shift, y), cv.Scalar.AliceBlue, 1)
+            cv.Cv2.PutText(dst, CStr(maxMeters - i) + "m", New cv.Point(shift - 25, y + 10), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        Next
     End Sub
 
-    Public Sub CameraLocationLeft(dst As cv.Mat, radius As Integer)
+    Public Sub CameraLocationLeft(dst As cv.Mat, radius As Integer, maxMeters As Integer, fontsize As Single)
         Dim shift = (dst.Width - dst.Height) / 2
         dst.Rectangle(New cv.Rect(shift, 0, dst.Height, dst.Height), cv.Scalar.White, 1)
         dst.Circle(New cv.Point(shift, dst.Height / 2), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        For i = 1 To maxMeters
+            Dim x = (dst.Width - 2 * shift) * i / maxMeters
+            dst.Line(New cv.Point(shift + x, 0), New cv.Point(shift + x, dst.Height), cv.Scalar.AliceBlue, 1)
+            cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(shift + x + 10, 15), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        Next
     End Sub
 End Module
 
@@ -242,8 +252,10 @@ Public Class Projection_GravityVB
                 End If
             End Sub)
 
-        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15))
-        If standalone Then CameraLocationLeft(dst2, If(ocvb.parms.lowResolution, 5, 15))
+        Dim fontSize As Single = 1.0
+        If ocvb.parms.lowResolution Then fontSize = 0.6
+        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15), maxZ, fontSize)
+        If standalone Then CameraLocationLeft(dst2, If(ocvb.parms.lowResolution, 5, 15), maxZ, fontSize)
     End Sub
 End Class
 
@@ -338,8 +350,10 @@ Public Class Projection_G_CPP
         End If
         handleXYZ.Free()
 
-        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15))
-        If standalone Then CameraLocationLeft(dst2, If(ocvb.parms.lowResolution, 5, 15))
+        Dim fontSize As Single = 1.0
+        If ocvb.parms.lowResolution Then fontSize = 0.6
+        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15), maxZ, fontSize)
+        If standalone Then CameraLocationLeft(dst2, If(ocvb.parms.lowResolution, 5, 15), maxZ, fontSize)
     End Sub
     Public Sub Close()
         Project_Gravity_Close(cPtr)
@@ -352,10 +366,54 @@ End Class
 
 
 
-Public Class Projection_Flood
+
+Public Class Projection_Wall
+    Inherits ocvbClass
+    Dim pFlood As Projection_Objects
+    Dim lines As lineDetector_FLD_CPP
+    Dim dilate As DilateErode_Basics
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+
+        lines = New lineDetector_FLD_CPP(ocvb, Me.GetType().Name)
+        pFlood = New Projection_Objects(ocvb, Me.GetType().Name)
+        pFlood.gravity.histogramRun = True
+        dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
+
+        label1 = "Top View: walls in red, Red dot is camera"
+        ocvb.desc = "Use the top down view to detect walls with a line detector algorithm - more work needed"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        pFlood.src = src
+        pFlood.Run(ocvb)
+        dst1 = pFlood.dst1
+
+        dilate.src = dst1
+        dilate.Run(ocvb)
+
+        lines.src = dilate.dst1.Clone()
+        lines.Run(ocvb)
+        dst1 = lines.dst1.Clone()
+
+        dst2 = pFlood.dst2
+        label2 = pFlood.label2
+
+        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15), pFlood.maxZ, pFlood.fontSize)
+        If standalone Then CameraLocationBot(dst2, If(ocvb.parms.lowResolution, 5, 15), pFlood.maxZ, pFlood.fontSize)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Projection_Objects
     Inherits ocvbClass
     Dim flood As FloodFill_Projection
+    Public fontSize As Single = 1.0
     Public gravity As Projection_G_CPP
+    Public maxZ As Single
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
 
@@ -384,73 +442,31 @@ Public Class Projection_Flood
         dst1 = flood.dst1
 
         dst2 = dst1.Clone()
-        Dim fontSize As Single = 1.0
         If ocvb.parms.lowResolution Then fontSize = 0.6
-        Dim maxDepth = gravity.sliders.TrackBar1.Value
-        Dim mmPerPixel = maxDepth / src.Height
+        maxZ = gravity.sliders.TrackBar1.Value / 1000
+        Dim mmPerPixel = maxZ * 1000 / src.Height
         Dim maxCount = Math.Min(flood.objectRects.Count, 10)
         If dst1.Channels = 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For i = 0 To maxCount - 1
             Dim rect = flood.objectRects(i)
             dst2.Rectangle(rect, cv.Scalar.White, 1)
-            Dim distanceFromCamera = (src.Height - rect.Y - rect.Height / 2) * mmPerPixel
+            Dim minDistanceFromCamera = (src.Height - rect.Y - rect.Height) * mmPerPixel
+            Dim maxDistanceFromCamera = (src.Height - rect.Y) * mmPerPixel
             Dim objectWidth = rect.Width * mmPerPixel
 
             dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.lowResolution, 6, 15), cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.lowResolution, 3, 15), cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-            Dim text = "depth=" + Format(distanceFromCamera / 1000, "#0.0") + "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
+            Dim text = "depth=" + Format(minDistanceFromCamera / 1000, "#0.0") + "-" + Format(maxDistanceFromCamera / 1000, "0.0") + "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
 
             Dim pt = New cv.Point(rect.X, rect.Y - 10)
             cv.Cv2.PutText(dst2, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
         label2 = "Showing the top " + CStr(maxCount) + " out of " + CStr(flood.objectRects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
-        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15))
-        If standalone Then CameraLocationBot(dst2, If(ocvb.parms.lowResolution, 5, 15))
+        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15), maxZ, fontSize)
+        If standalone Then CameraLocationBot(dst2, If(ocvb.parms.lowResolution, 5, 15), maxZ, fontSize)
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Projection_Wall
-    Inherits ocvbClass
-    Dim pFlood As Projection_Flood
-    Dim lines As lineDetector_FLD_CPP
-    Dim dilate As DilateErode_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-
-        lines = New lineDetector_FLD_CPP(ocvb, Me.GetType().Name)
-        pFlood = New Projection_Flood(ocvb, Me.GetType().Name)
-        pFlood.gravity.histogramRun = True
-        dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
-
-        label1 = "Top View: walls in red, Red dot is camera"
-        label2 = "Identified objects"
-        ocvb.desc = "Use the top down view to detect walls with a line detector algorithm - more work needed"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        pFlood.src = src
-        pFlood.Run(ocvb)
-        dst1 = pFlood.dst1
-
-        dilate.src = dst1
-        dilate.Run(ocvb)
-
-        lines.src = dilate.dst1.Clone()
-        lines.Run(ocvb)
-        dst1 = lines.dst1.Clone()
-
-        dst2 = pFlood.dst2
-
-        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15))
-        If standalone Then CameraLocationBot(dst2, If(ocvb.parms.lowResolution, 5, 15))
-    End Sub
-End Class
-
 
 
 
@@ -458,10 +474,10 @@ End Class
 
 Public Class Projection_Backprojection
     Inherits ocvbClass
-    Dim pFlood As Projection_Flood
+    Dim pFlood As Projection_Objects
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        ocvb.desc = "Use Projection_Flood to find objects and then backproject them into front-facing view."
+        ocvb.desc = "Use Projection_Objects to find objects and then backproject them into front-facing view."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
     End Sub

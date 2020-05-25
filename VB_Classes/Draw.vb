@@ -365,7 +365,7 @@ Public Class Draw_ClipLine
         pt1 = New cv.Point(r.X, r.Y)
         pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
         rect = initRandomRect(dst1.Width, dst1.Height, 25)
-        flow.msgs.Add("--------------------------- setup run -------------------------")
+        If kalman.check.Box(0).Checked Then flow.msgs.Add("--------------------------- setup ---------------------------")
     End Sub
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
@@ -376,7 +376,6 @@ Public Class Draw_ClipLine
         kalman = New Kalman_Basics(ocvb, caller)
         setup()
 
-        label2 = "test"
         ocvb.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
