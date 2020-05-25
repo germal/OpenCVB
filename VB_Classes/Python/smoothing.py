@@ -28,7 +28,7 @@ def main(argv):
     if display_caption('Original Image') != 0:
         return 0
 
-    global dst
+    global dst1
     dst1 = np.copy(src)
     if display_dst(DELAY_CAPTION) != 0:
         return 0
@@ -85,7 +85,7 @@ def main(argv):
 
 
 def display_caption(caption):
-    global dst
+    global dst1
     dst1 = np.zeros(src.shape, src.dtype)
     rows, cols, _ch = src.shape
     cv.putText(dst1, caption,

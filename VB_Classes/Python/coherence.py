@@ -48,7 +48,7 @@ def main():
         blend = cv.getTrackbarPos('blend', 'control') / 10.0
         print('sigma: %d  str_sigma: %d  blend_coef: %f' % (sigma, str_sigma, blend))
         dst1 = coherence_filter(src, sigma=sigma, str_sigma = str_sigma, blend = blend)
-        cv.imshow('dst', dst1)
+        cv.imshow('dst1', dst1)
 
     def controlUpdate(val): # placeholder for all the trackbars.
         pass

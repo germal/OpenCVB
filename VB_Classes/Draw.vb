@@ -3,13 +3,19 @@ Imports cv = OpenCvSharp
 Module Draw_Exports
     Dim rng As System.Random
     Public Sub drawRotatedRectangle(rotatedRect As cv.RotatedRect, dst1 As cv.Mat, color As cv.Scalar)
-        Dim vertices2f(3) As cv.Point2f
-        vertices2f = rotatedRect.Points()
+        Dim vertices2f = rotatedRect.Points()
         Dim vertices(vertices2f.Length - 1) As cv.Point
         For j = 0 To vertices2f.Length - 1
             vertices(j) = New cv.Point(CInt(vertices2f(j).X), CInt(vertices2f(j).Y))
         Next
         cv.Cv2.FillConvexPoly(dst1, vertices, color, cv.LineTypes.AntiAlias)
+    End Sub
+    Public Sub drawRotatedOutline(rr As cv.RotatedRect, dst1 As cv.Mat, color As cv.Scalar)
+        Dim vertices = rr.Points()
+        For i = 0 To 4 - 1
+            dst1.Line(New cv.Point(vertices(i).X, vertices(i).Y), New cv.Point(vertices((i + 1) Mod 4).X, vertices((i + 1) Mod 4).Y), cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
+        Next
+        dst1.Rectangle(rr.BoundingRect, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Function initRandomRect(w As Integer, h As Integer, margin As Integer) As cv.Rect
 
@@ -353,8 +359,8 @@ End Class
 
 Public Class Draw_ClipLine
     Inherits ocvbClass
-    Dim kalman As Kalman_Basics
     Dim flow As Font_FlowText
+    Dim kalman As Kalman_Basics
     Dim lastRect As cv.Rect
     Dim pt1 As cv.Point
     Dim pt2 As cv.Point
@@ -393,8 +399,94 @@ Public Class Draw_ClipLine
         dst1.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), 2, cv.LineTypes.AntiAlias)
         dst1.Rectangle(r, If(clipped, cv.Scalar.Yellow, cv.Scalar.Red), 2, cv.LineTypes.AntiAlias)
 
-        flow.msgs.Add("line " + If(clipped, "interects rectangle", "does not intersect rectangle"))
+        Static linenum = 0
+        flow.msgs.Add("(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle"))
+        linenum += 1
+
+        Static hitCount = 0
+        hitCount += If(clipped, 1, 0)
+        ocvb.putText(New ActiveClass.TrueType("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
+                                              CInt(ocvb.color.Width / 2), 200, RESULT2))
         If r = rect Then setup()
         flow.Run(ocvb)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Draw_Arc
+    Inherits ocvbClass
+    Dim kalman As Kalman_Basics
+    Dim saveArcAngle As Integer
+    Dim saveMargin As Integer
+    Dim rect As cv.Rect
+
+    Dim angle As Single
+    Dim startAngle As Single
+    Dim endAngle As Single
+
+    Dim colorIndex As Integer
+    Dim thickness As Integer
+    Private Sub setup(ocvb As AlgorithmData)
+        Dim margin = sliders.TrackBar1.Value ' work in the middle of the image.
+
+        rect = initRandomRect(dst1.Width, dst1.Height, margin)
+        angle = ocvb.ms_rng.Next(0, 360)
+        colorIndex = ocvb.ms_rng.Next(0, 255)
+        thickness = ocvb.ms_rng.Next(1, 5)
+        startAngle = ocvb.ms_rng.Next(1, 360)
+        endAngle = ocvb.ms_rng.Next(1, 360)
+
+        kalman.input = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
+
+        saveMargin = sliders.TrackBar1.Value
+    End Sub
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+
+        kalman = New Kalman_Basics(ocvb, caller)
+        ReDim kalman.input(7 - 1)
+
+        sliders.setupTrackBar1(ocvb, caller, "Clearance from image edge (margin size)", 0, ocvb.color.Width / 4, ocvb.color.Width / 8)
+        radio.Setup(ocvb, caller, 3)
+        radio.check(0).Text = "Draw Full Ellipse"
+        radio.check(1).Text = "Draw Filled Arc"
+        radio.check(2).Text = "Draw Arc"
+        radio.check(1).Checked = True
+
+        setup(ocvb)
+
+        ocvb.desc = "Use OpenCV's ellipse function to draw an arc"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If kalman.check.Box(0).Checked Then
+            kalman.input = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
+            kalman.Run(ocvb)
+        Else
+            kalman.output = kalman.input ' do nothing...
+        End If
+        Dim r = New cv.Rect(kalman.output(0), kalman.output(1), kalman.output(2), kalman.output(3))
+        If r.Width <= 5 Then r.Width = 5
+        If r.Height <= 5 Then r.Height = 5
+        Dim rr = New cv.RotatedRect(New cv.Point2f(r.X, r.Y), New cv.Size2f(r.Width, r.Height), angle)
+        Dim color = ocvb.scalarColors(colorIndex)
+
+        dst1.SetTo(cv.Scalar.White)
+        If radio.check(0).Checked Then
+            dst1.Ellipse(rr, color, thickness, cv.LineTypes.AntiAlias)
+            drawRotatedOutline(rr, dst1, ocvb.scalarColors(colorIndex))
+        Else
+            Dim angle = kalman.output(4)
+            Dim startAngle = kalman.output(5)
+            Dim endAngle = kalman.output(6)
+            If radio.check(1).Checked Then thickness = -1
+            dst1.Ellipse(New cv.Point(rr.Center.X, rr.Center.Y), New cv.Size(rr.BoundingRect.Size.Width, rr.BoundingRect.Size.Height),
+                         angle, startAngle, endAngle, color, thickness, cv.LineTypes.AntiAlias)
+            Console.WriteLine("angle = " + CStr(angle) + "startangle = " + CStr(startAngle) + "endangle = " + CStr(endAngle))
+        End If
+        If r = rect Or sliders.TrackBar1.Value <> saveMargin Then setup(ocvb)
     End Sub
 End Class

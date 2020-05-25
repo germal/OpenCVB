@@ -28,7 +28,7 @@ def myShiTomasi_function(val):
 
     for i in range(src_gray.shape[0]):
         for j in range(src_gray.shape[1]):
-            if myShiTomasi_dst[i,j] > myShiTomasi_minVal + ( myShiTomasi_maxVal - myShiTomasi_minVal )*myShiTomasi_qualityLevel/max_qualityLevel:
+            if myShiTomasi_dst1[i,j] > myShiTomasi_minVal + ( myShiTomasi_maxVal - myShiTomasi_minVal )*myShiTomasi_qualityLevel/max_qualityLevel:
                 cv.circle(myShiTomasi_copy, (j,i), 4, (rng.randint(0,256), rng.randint(0,256), rng.randint(0,256)), cv.FILLED)
 
     cv.imshow(myShiTomasi_window, myShiTomasi_copy)
@@ -56,8 +56,8 @@ myHarris_dst1 = cv.cornerEigenValsAndVecs(src_gray, blockSize, apertureSize)
 Mc = np.empty(src_gray.shape, dtype=np.float32)
 for i in range(src_gray.shape[0]):
     for j in range(src_gray.shape[1]):
-        lambda_1 = myHarris_dst[i,j,0]
-        lambda_2 = myHarris_dst[i,j,1]
+        lambda_1 = myHarris_dst1[i,j,0]
+        lambda_2 = myHarris_dst1[i,j,1]
         Mc[i,j] = lambda_1*lambda_2 - 0.04*pow( ( lambda_1 + lambda_2 ), 2 )
 
 myHarris_minVal, myHarris_maxVal, _, _ = cv.minMaxLoc(Mc)

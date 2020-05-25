@@ -17,7 +17,7 @@ src = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
 dst1 = cv.equalizeHist(src)
 
 both = np.empty((src.shape[0], src.shape[1]*2, 1), src.dtype)
-both = cv.hconcat([src, dst])
+both = cv.hconcat([src, dst1])
 cv.imshow("Original (left) and Equalized Image (right)", both)
 
 cv.waitKey()
