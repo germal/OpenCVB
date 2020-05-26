@@ -15,12 +15,6 @@ Public Class OptionsDialog
 
         SaveSetting("OpenCVB", "ShowLabels", "ShowLabels", ShowLabels.Checked)
 
-        SaveSetting("OpenCVB", "DecimationFilter", "DecimationFilter", DecimationFilter.Checked)
-        SaveSetting("OpenCVB", "ThresholdFilter", "ThresholdFilter", ThresholdFilter.Checked)
-        SaveSetting("OpenCVB", "SpatialFilter", "SpatialFilter", SpatialFilter.Checked)
-        SaveSetting("OpenCVB", "TemporalFilter", "TemporalFilter", TemporalFilter.Checked)
-        SaveSetting("OpenCVB", "HoleFillingFilter", "HoleFillingFilter", HoleFillingFilter.Checked)
-
         SaveSetting("OpenCVB", "TestAllDuration", "TestAllDuration", TestAllDuration.Value)
         SaveSetting("OpenCVB", "SnapToGrid", "SnapToGrid", SnapToGrid.Checked)
         SaveSetting("OpenCVB", "PythonExe", "PythonExe", PythonExeName.Text)
@@ -64,12 +58,6 @@ Public Class OptionsDialog
         cameraRadioButton(cameraIndex).Checked = True
 
         ShowLabels.Checked = GetSetting("OpenCVB", "ShowLabels", "ShowLabels", False)
-
-        DecimationFilter.Checked = GetSetting("OpenCVB", "DecimationFilter", "DecimationFilter", False)
-        ThresholdFilter.Checked = GetSetting("OpenCVB", "ThresholdFilter", "ThresholdFilter", False)
-        SpatialFilter.Checked = GetSetting("OpenCVB", "SpatialFilter", "SpatialFilter", True)
-        TemporalFilter.Checked = GetSetting("OpenCVB", "TemporalFilter", "TemporalFilter", False)
-        HoleFillingFilter.Checked = GetSetting("OpenCVB", "HoleFillingFilter", "HoleFillingFilter", True)
 
         TestAllDuration.Value = GetSetting("OpenCVB", "TestAllDuration", "TestAllDuration", 10)
         SnapToGrid.Checked = GetSetting("OpenCVB", "SnapToGrid", "SnapToGrid", True)

@@ -38,7 +38,7 @@ Public Class Gradient_Depth
         label2 = "Phase Output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        sobel.src = ocvb.RGBDepth.Clone()
+        If ocvb.drawRect.Width > 0 Then sobel.src = ocvb.RGBDepth(ocvb.drawRect) Else sobel.src = ocvb.RGBDepth.Clone()
         sobel.Run(ocvb)
         Dim angle = New cv.Mat
         Dim x32f As New cv.Mat
@@ -77,3 +77,33 @@ Public Class Gradient_Flatland
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class Gradient_DepthSmoothing
+    Inherits ocvbClass
+    Dim grad As Gradient_Depth
+    Dim cmat As Depth_Colorizer_CPP
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        cmat = New Depth_Colorizer_CPP(ocvb, caller)
+
+        grad = New Gradient_Depth(ocvb, caller)
+
+        ocvb.desc = "Use gradient to smooth the depth values"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.drawRect.Width > 0 Then grad.src = src(ocvb.drawRect) Else grad.src = src
+        grad.Run(ocvb)
+        dst1 = grad.dst2.Resize(dst1.Size())
+
+        Dim depth32f = getDepth32f(ocvb)
+        If ocvb.drawRect.Width > 0 Then cmat.src = depth32f(ocvb.drawRect) Else cmat.src = depth32f
+        cmat.Run(ocvb)
+        dst2 = cmat.dst1.Resize(dst2.Size())
+    End Sub
+End Class

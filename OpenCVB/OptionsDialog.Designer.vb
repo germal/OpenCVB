@@ -33,12 +33,6 @@ Partial Class OptionsDialog
         Me.AvoidDNNCrashes = New System.Windows.Forms.CheckBox()
         Me.ShowConsoleLog = New System.Windows.Forms.CheckBox()
         Me.ShowLabels = New System.Windows.Forms.CheckBox()
-        Me.Filters = New System.Windows.Forms.GroupBox()
-        Me.HoleFillingFilter = New System.Windows.Forms.CheckBox()
-        Me.TemporalFilter = New System.Windows.Forms.CheckBox()
-        Me.SpatialFilter = New System.Windows.Forms.CheckBox()
-        Me.ThresholdFilter = New System.Windows.Forms.CheckBox()
-        Me.DecimationFilter = New System.Windows.Forms.CheckBox()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
         Me.ShowOptions = New System.Windows.Forms.CheckBox()
         Me.TestAllDuration = New System.Windows.Forms.NumericUpDown()
@@ -54,7 +48,6 @@ Partial Class OptionsDialog
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.RefreshRate, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.Filters.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
         CType(Me.TestAllDuration, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox6.SuspendLayout()
@@ -178,76 +171,12 @@ Partial Class OptionsDialog
         Me.ShowLabels.Text = "Show Image Labels"
         Me.ShowLabels.UseVisualStyleBackColor = True
         '
-        'Filters
-        '
-        Me.Filters.Controls.Add(Me.HoleFillingFilter)
-        Me.Filters.Controls.Add(Me.TemporalFilter)
-        Me.Filters.Controls.Add(Me.SpatialFilter)
-        Me.Filters.Controls.Add(Me.ThresholdFilter)
-        Me.Filters.Controls.Add(Me.DecimationFilter)
-        Me.Filters.Location = New System.Drawing.Point(21, 566)
-        Me.Filters.Name = "Filters"
-        Me.Filters.Size = New System.Drawing.Size(936, 207)
-        Me.Filters.TabIndex = 7
-        Me.Filters.TabStop = False
-        Me.Filters.Text = "RealSense Camera Filters (Running in the DSP chip)"
-        '
-        'HoleFillingFilter
-        '
-        Me.HoleFillingFilter.AutoSize = True
-        Me.HoleFillingFilter.Location = New System.Drawing.Point(16, 165)
-        Me.HoleFillingFilter.Name = "HoleFillingFilter"
-        Me.HoleFillingFilter.Size = New System.Drawing.Size(151, 24)
-        Me.HoleFillingFilter.TabIndex = 5
-        Me.HoleFillingFilter.Text = "Hole Filling Filter"
-        Me.HoleFillingFilter.UseVisualStyleBackColor = True
-        '
-        'TemporalFilter
-        '
-        Me.TemporalFilter.AutoSize = True
-        Me.TemporalFilter.Location = New System.Drawing.Point(16, 136)
-        Me.TemporalFilter.Name = "TemporalFilter"
-        Me.TemporalFilter.Size = New System.Drawing.Size(140, 24)
-        Me.TemporalFilter.TabIndex = 4
-        Me.TemporalFilter.Text = "Temporal Filter"
-        Me.TemporalFilter.UseVisualStyleBackColor = True
-        '
-        'SpatialFilter
-        '
-        Me.SpatialFilter.AutoSize = True
-        Me.SpatialFilter.Location = New System.Drawing.Point(16, 106)
-        Me.SpatialFilter.Name = "SpatialFilter"
-        Me.SpatialFilter.Size = New System.Drawing.Size(123, 24)
-        Me.SpatialFilter.TabIndex = 3
-        Me.SpatialFilter.Text = "Spatial Filter"
-        Me.SpatialFilter.UseVisualStyleBackColor = True
-        '
-        'ThresholdFilter
-        '
-        Me.ThresholdFilter.AutoSize = True
-        Me.ThresholdFilter.Location = New System.Drawing.Point(16, 76)
-        Me.ThresholdFilter.Name = "ThresholdFilter"
-        Me.ThresholdFilter.Size = New System.Drawing.Size(144, 24)
-        Me.ThresholdFilter.TabIndex = 1
-        Me.ThresholdFilter.Text = "Threshold Filter"
-        Me.ThresholdFilter.UseVisualStyleBackColor = True
-        '
-        'DecimationFilter
-        '
-        Me.DecimationFilter.AutoSize = True
-        Me.DecimationFilter.Location = New System.Drawing.Point(16, 46)
-        Me.DecimationFilter.Name = "DecimationFilter"
-        Me.DecimationFilter.Size = New System.Drawing.Size(154, 24)
-        Me.DecimationFilter.TabIndex = 0
-        Me.DecimationFilter.Text = "Decimation Filter"
-        Me.DecimationFilter.UseVisualStyleBackColor = True
-        '
         'GroupBox4
         '
         Me.GroupBox4.Controls.Add(Me.ShowOptions)
         Me.GroupBox4.Controls.Add(Me.TestAllDuration)
         Me.GroupBox4.Controls.Add(Me.Label1)
-        Me.GroupBox4.Location = New System.Drawing.Point(22, 774)
+        Me.GroupBox4.Location = New System.Drawing.Point(22, 579)
         Me.GroupBox4.Name = "GroupBox4"
         Me.GroupBox4.Size = New System.Drawing.Size(935, 139)
         Me.GroupBox4.TabIndex = 8
@@ -289,7 +218,7 @@ Partial Class OptionsDialog
         Me.GroupBox6.Controls.Add(Me.PythonExeName)
         Me.GroupBox6.Controls.Add(Me.SelectPythonFile)
         Me.GroupBox6.Controls.Add(Me.Label2)
-        Me.GroupBox6.Location = New System.Drawing.Point(21, 914)
+        Me.GroupBox6.Location = New System.Drawing.Point(21, 719)
         Me.GroupBox6.Name = "GroupBox6"
         Me.GroupBox6.Size = New System.Drawing.Size(936, 116)
         Me.GroupBox6.TabIndex = 9
@@ -347,12 +276,11 @@ Partial Class OptionsDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1049, 1052)
+        Me.ClientSize = New System.Drawing.Size(1008, 841)
         Me.Controls.Add(Me.Cancel_Button)
         Me.Controls.Add(Me.OKButton)
         Me.Controls.Add(Me.GroupBox6)
         Me.Controls.Add(Me.GroupBox4)
-        Me.Controls.Add(Me.Filters)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.CameraGroup)
@@ -370,8 +298,6 @@ Partial Class OptionsDialog
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         CType(Me.RefreshRate, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.Filters.ResumeLayout(False)
-        Me.Filters.PerformLayout()
         Me.GroupBox4.ResumeLayout(False)
         Me.GroupBox4.PerformLayout()
         CType(Me.TestAllDuration, System.ComponentModel.ISupportInitialize).EndInit()
@@ -387,12 +313,6 @@ Partial Class OptionsDialog
     Friend WithEvents lowResolution As RadioButton
     Friend WithEvents GroupBox2 As GroupBox
     Friend WithEvents ShowLabels As CheckBox
-    Friend WithEvents Filters As GroupBox
-    Friend WithEvents HoleFillingFilter As CheckBox
-    Friend WithEvents TemporalFilter As CheckBox
-    Friend WithEvents SpatialFilter As CheckBox
-    Friend WithEvents ThresholdFilter As CheckBox
-    Friend WithEvents DecimationFilter As CheckBox
     Friend WithEvents GroupBox4 As GroupBox
     Friend WithEvents TestAllDuration As NumericUpDown
     Friend WithEvents Label1 As Label

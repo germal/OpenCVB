@@ -698,7 +698,7 @@ End Class
 
 Public Class Depth_ColorizerFastFade_CPP
     Inherits ocvbClass
-    Dim trim As Depth_InRange
+    Public trim As Depth_InRange
     Dim dcPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)

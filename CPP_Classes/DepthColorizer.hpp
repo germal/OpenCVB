@@ -182,6 +182,7 @@ public:
 		float hRange[] = { 1, float(histSize) }; // ranges are exclusive at the top of the range
 		const float* range[] = { hRange };
 		int hbins[] = { histSize };
+		output = Mat(depth32f.size(), CV_8UC3);
 		Mat hist;
 		if (countNonZero(depth32f) > 0)
 		{
