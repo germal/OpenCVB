@@ -330,9 +330,14 @@ Public Class Puzzle_Solver
         Dim cornerlist = fitCheck(dst1, roilist, fitlist)
 
         Dim bestCorner = cornerlist.ElementAt(0)
+        For i = 0 To cornerlist.Count - 1
+            bestCorner = cornerlist.ElementAt(i)
+            If bestCorner.corner <> cornerType.none Then Exit For
+        Next
         Dim fit = bestCorner
         Dim roi = roilist(fit.index)
         Dim startcorner = bestCorner.corner
+
         Dim col As Integer
         Dim cols = CInt(src.Width / roilist(0).Width)
         Select Case bestCorner.corner

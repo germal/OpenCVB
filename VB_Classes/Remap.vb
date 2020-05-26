@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Remap_Basics
     Inherits ocvbClass
+    Public direction = 3 ' default to remap horizontally and vertically
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Use remap to reflect an image in 4 directions."
@@ -8,9 +9,8 @@ Public Class Remap_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Dim map_x = New cv.Mat(src.Size(), cv.MatType.CV_32F)
         Dim map_y = New cv.Mat(src.Size(), cv.MatType.CV_32F)
-        Static Dim direction = 0
 
-        label1 = Choose(direction + 1, "Remap_Basics - original", "Remap veritically", "Remap horizontally",
+        label1 = Choose(direction + 1, "Remap_Basics - original", "Remap vertically", "Remap horizontally",
                                             "Remap horizontally and vertically")
         ' build a map for use with remap!
         For j = 0 To map_x.Rows - 1

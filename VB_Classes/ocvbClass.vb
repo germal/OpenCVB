@@ -46,6 +46,7 @@ Public Class ocvbClass : Implements IDisposable
         Return p
     End Function
     Public Sub New()
+        src = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
         dst1 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
         algorithm = Me

@@ -18,20 +18,6 @@ Module Projection
 
 
 
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Project_Gravity_Open(filename As String) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Project_Gravity_Close(cPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Project_Gravity_Side(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Project_Gravity_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
-    End Function
-
-
 
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -46,31 +32,78 @@ Module Projection
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Project_GravityHist_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
     End Function
+End Module
 
 
 
-    Public Sub CameraLocationBot(dst As cv.Mat, radius As Integer, maxMeters As Integer, fontsize As Single)
+
+
+Public Class Projection_ColorizeMat
+    Inherits ocvbClass
+    Dim palette As Palette_Gradient
+    Public rect As cv.Rect
+    Public shift As Integer
+    Public colorizeMat As cv.Mat
+    Public colorizeMatFlip As cv.Mat
+    Dim fontSize As Single
+    Dim radius As Integer
+    Public Function CameraLocationBot(mask As cv.Mat) As cv.Mat
+        Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
+        dst1.CopyTo(dst, mask)
         Dim shift = (dst.Width - dst.Height) / 2
         dst.Rectangle(New cv.Rect(shift, 0, dst.Height, dst.Height), cv.Scalar.White, 1)
         dst.Circle(New cv.Point(shift + dst.Height / 2, dst.Height - 5), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        For i = maxMeters - 1 To 0 Step -1
-            Dim y = dst.Height * i / maxMeters
+        Dim maxZ = sliders.TrackBar1.Value / 1000
+        For i = maxZ - 1 To 0 Step -1
+            Dim y = dst.Height * i / maxZ
             dst.Line(New cv.Point(shift, y), New cv.Point(dst.Width - shift, y), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst, CStr(maxMeters - i) + "m", New cv.Point(shift - 25, y + 10), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            cv.Cv2.PutText(dst, CStr(maxZ - i) + "m", New cv.Point(shift - 45, y + 10), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
-    End Sub
+        Return dst
+    End Function
 
-    Public Sub CameraLocationLeft(dst As cv.Mat, radius As Integer, maxMeters As Integer, fontsize As Single)
+    Public Function CameraLocationLeft(ByRef mask As cv.Mat) As cv.Mat
+        Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
+        dst2.CopyTo(dst, mask)
         Dim shift = (dst.Width - dst.Height) / 2
         dst.Rectangle(New cv.Rect(shift, 0, dst.Height, dst.Height), cv.Scalar.White, 1)
         dst.Circle(New cv.Point(shift, dst.Height / 2), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        For i = 1 To maxMeters
-            Dim x = (dst.Width - 2 * shift) * i / maxMeters
+        Dim maxZ = sliders.TrackBar1.Value / 1000
+        For i = 1 To maxZ
+            Dim x = (dst.Width - 2 * shift) * i / maxZ
             dst.Line(New cv.Point(shift + x, 0), New cv.Point(shift + x, dst.Height), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(shift + x + 10, 15), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(shift + x + 10, dst.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
+        Return dst
+    End Function
+
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+
+        fontSize = 1.0
+        If ocvb.parms.lowResolution Then fontSize = 0.6
+        radius = If(ocvb.parms.lowResolution, 5, 12)
+        shift = (src.Width - src.Height) / 2
+        rect = New cv.Rect(shift, 0, dst1.Height, dst1.Height)
+
+        palette = New Palette_Gradient(ocvb, caller)
+        palette.color1 = cv.Scalar.Yellow
+        palette.color2 = cv.Scalar.Blue
+        palette.frameModulo = 1
+
+        sliders.setupTrackBar1(ocvb, caller, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
+        sliders.setupTrackBar2(ocvb, caller, "Threshold for histogram count", 0, 100, 3)
+
+        ocvb.desc = "Create the colorizeMat's used for projections"
     End Sub
-End Module
+    Public Sub Run(ocvb As AlgorithmData)
+        palette.Run(ocvb)
+        dst1 = palette.dst1
+        dst2 = dst1.Clone
+        cv.Cv2.Rotate(dst1(rect), dst2(rect), cv.RotateFlags.Rotate90Clockwise)
+    End Sub
+End Class
+
 
 
 
@@ -196,20 +229,22 @@ End Class
 
 
 
-Public Class Projection_GravityVB
+Public Class Projection_Gravity
     Inherits ocvbClass
     Dim gCloud As Transform_Gravity
     Dim grid As Thread_Grid
+    Public cMats As Projection_ColorizeMat
+    Public topView As cv.Mat
+    Public sideView As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-
         gCloud = New Transform_Gravity(ocvb, caller)
-
         grid = New Thread_Grid(ocvb, caller)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 40
 
-        sliders.setupTrackBar1(ocvb, caller, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
+        cMats = New Projection_ColorizeMat(ocvb, caller)
+        cMats.Run(ocvb)
 
         label1 = "View looking up from under floor - Red Dot is camera"
         label2 = "Side View - Red Dot is camera"
@@ -219,43 +254,47 @@ Public Class Projection_GravityVB
         grid.Run(ocvb)
         gCloud.Run(ocvb)
 
-        dst1.SetTo(0)
-        dst2.SetTo(0)
+        topView = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
+        sideView = topView.Clone()
 
         Dim white = New cv.Vec3b(255, 255, 255)
-        Dim maxZ = sliders.TrackBar1.Value / 1000
+        Dim maxZ = cMats.sliders.TrackBar1.Value / 1000
         Dim w = CSng(src.Width)
         Dim h = CSng(src.Height)
         Dim dFactor = h / maxZ ' the scale in the x-Direction.
         Dim zHalf As Single = maxZ / 2
-        Dim shift = (w - h) / 2
 
         Parallel.For(0, CInt(gCloud.xyz.Length / 3),
             Sub(i)
                 Dim d = gCloud.xyz(i * 3 + 2)
                 If d > 0 And d < maxZ Then
                     Dim t = CInt(255 * d / maxZ)
-                    Dim color = New cv.Vec3b(t, 255 - t, 255 - t)
 
                     Dim dPixel = dFactor * d
                     Dim fx = gCloud.xyz(i * 3)
                     If fx > -zHalf And fx < zHalf Then
                         fx = dFactor * (zHalf + fx)
-                        dst1.Set(Of cv.Vec3b)(CInt(h - dPixel), CInt(shift + fx), color)
+                        Dim count = topView.Get(Of Byte)(CInt(h - dPixel), CInt(cMats.shift + fx)) + 1
+                        topView.Set(Of Byte)(CInt(h - dPixel), CInt(cMats.shift + fx), If(count < 255, count, 255))
                     End If
 
                     Dim fy = gCloud.xyz(i * 3 + 1)
                     If fy > -zHalf And fy < zHalf Then
-                        fy = dFactor * (zHalf + fy)
-                        dst2.Set(Of cv.Vec3b)(CInt(fy), CInt(shift + dPixel), color)
+                        fy = CInt(dFactor * (zHalf + fy))
+                        Dim count = sideView.Get(Of Byte)(fy, CInt(cMats.shift + dPixel)) + 1
+                        sideView.Set(Of Byte)(fy, CInt(cMats.shift + dPixel), If(count < 255, count, 255))
                     End If
                 End If
             End Sub)
 
-        Dim fontSize As Single = 1.0
-        If ocvb.parms.lowResolution Then fontSize = 0.6
-        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15), maxZ, fontSize)
-        If standalone Then CameraLocationLeft(dst2, If(ocvb.parms.lowResolution, 5, 15), maxZ, fontSize)
+        If standalone Then
+            Dim threshold = cMats.sliders.TrackBar2.Value
+            Dim topMask = topView.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+            Dim sideMask = sideView.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+
+            dst1 = cMats.CameraLocationBot(topMask)
+            dst2 = cMats.CameraLocationLeft(sideMask)
+        End If
     End Sub
 End Class
 
@@ -265,58 +304,26 @@ End Class
 
 
 
-Public Class Projection_GravityHistogram
-    Inherits ocvbClass
-    Public gravity As Projection_G_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        gravity = New Projection_G_CPP(ocvb, caller)
-        gravity.sliders.GroupBox2.Visible = True
-        gravity.histogramRun = True
-
-        ocvb.desc = "Use the top/down projection to create a histogram of 3D points"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        gravity.src = src
-        gravity.Run(ocvb)
-        dst1 = gravity.dst1
-        dst2 = gravity.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Projection_G_CPP
+Public Class Projection_Gravity_CPP
     Inherits ocvbClass
     Dim gCloud As Transform_Gravity
+    Public cMats As Projection_ColorizeMat
     Dim cPtr As IntPtr
-    Dim histPtr As IntPtr
     Dim xyzBytes() As Byte
-    Public histogramRun As Boolean
-    Public maxZ As Single
+    Public topMask As cv.Mat
+    Public sideMask As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-
         gCloud = New Transform_Gravity(ocvb, caller)
+        cPtr = Project_GravityHist_Open()
 
-        sliders.setupTrackBar1(ocvb, caller, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
-        sliders.setupTrackBar2(ocvb, caller, "Threshold for histogram Count", 1, 100, 10)
-        sliders.GroupBox2.Visible = False ' default is not a histogramrun
-
-        Dim fileInfo As New FileInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps/colorscale_jet.jpg")
-        If fileInfo.Exists = False Then
-            MsgBox("The colormaps have moved!  Project_Gravity_CPP won't work." + vbCrLf + "Look for this file:" + fileInfo.FullName)
-        End If
-        cPtr = Project_Gravity_Open(fileInfo.FullName)
-        histPtr = Project_GravityHist_Open()
+        cMats = New Projection_ColorizeMat(ocvb, caller)
+        cMats.Run(ocvb)
 
         ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        maxZ = sliders.TrackBar1.Value / 1000
+        Dim maxZ = cMats.sliders.TrackBar1.Value / 1000
 
         gCloud.Run(ocvb)
         Dim xyz As New cv.Mat
@@ -327,37 +334,31 @@ Public Class Projection_G_CPP
         Dim handleXYZ = GCHandle.Alloc(xyzBytes, GCHandleType.Pinned)
 
         Dim imagePtr As IntPtr
-        If histogramRun Then
-            imagePtr = Project_GravityHist_Run(histPtr, handleXYZ.AddrOfPinnedObject, maxZ, xyz.Height, xyz.Width)
+        imagePtr = Project_GravityHist_Run(cPtr, handleXYZ.AddrOfPinnedObject, maxZ, xyz.Height, xyz.Width)
 
-            Dim histTop = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, imagePtr)
-            Dim histSide = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, Project_GravityHist_Side(histPtr))
+        Dim histTop = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, imagePtr)
+        Dim histSide = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, Project_GravityHist_Side(cPtr))
 
-            Dim threshold = sliders.TrackBar2.Value
-            dst1 = histTop.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-            dst2 = histSide.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        Dim threshold = cMats.sliders.TrackBar2.Value
+        topMask = histTop.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        sideMask = histSide.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
-            label1 = "Top View after threshold"
-            label2 = "Side View after threshold"
-        Else
-            imagePtr = Project_Gravity_Run(cPtr, handleXYZ.AddrOfPinnedObject, maxZ, xyz.Height, xyz.Width)
-
-            dst1 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, imagePtr).Clone()
-            dst2 = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_8UC3, Project_Gravity_Side(cPtr)).Clone()
-
-            label1 = "Top View (looking down)"
-            label2 = "Side View"
-        End If
+        label1 = "Top View after threshold"
+        label2 = "Side View after threshold"
         handleXYZ.Free()
 
         Dim fontSize As Single = 1.0
         If ocvb.parms.lowResolution Then fontSize = 0.6
-        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15), maxZ, fontSize)
-        If standalone Then CameraLocationLeft(dst2, If(ocvb.parms.lowResolution, 5, 15), maxZ, fontSize)
+        If standalone Then
+            dst1 = cMats.CameraLocationBot(topMask)
+            dst2 = cMats.CameraLocationLeft(sideMask)
+        Else
+            dst1 = topMask
+            dst2 = sideMask
+        End If
     End Sub
     Public Sub Close()
-        Project_Gravity_Close(cPtr)
-        Project_GravityHist_Close(histPtr)
+        Project_GravityHist_Close(cPtr)
     End Sub
 End Class
 
@@ -369,37 +370,33 @@ End Class
 
 Public Class Projection_Wall
     Inherits ocvbClass
-    Dim pFlood As Projection_Objects
+    Dim objects As Projection_Objects
     Dim lines As lineDetector_FLD_CPP
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
 
         lines = New lineDetector_FLD_CPP(ocvb, Me.GetType().Name)
-        pFlood = New Projection_Objects(ocvb, Me.GetType().Name)
-        pFlood.gravity.histogramRun = True
+        objects = New Projection_Objects(ocvb, Me.GetType().Name)
         dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
 
-        label1 = "Top View: walls in red, Red dot is camera"
+        label1 = "Top View: walls in red"
         ocvb.desc = "Use the top down view to detect walls with a line detector algorithm - more work needed"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        pFlood.src = src
-        pFlood.Run(ocvb)
-        dst1 = pFlood.dst1
+        objects.src = src
+        objects.Run(ocvb)
+        dst1 = objects.dst1
 
         dilate.src = dst1
         dilate.Run(ocvb)
 
-        lines.src = dilate.dst1.Clone()
+        lines.src = dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lines.Run(ocvb)
         dst1 = lines.dst1.Clone()
 
-        dst2 = pFlood.dst2
-        label2 = pFlood.label2
-
-        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15), pFlood.maxZ, pFlood.fontSize)
-        If standalone Then CameraLocationBot(dst2, If(ocvb.parms.lowResolution, 5, 15), pFlood.maxZ, pFlood.fontSize)
+        dst2 = objects.dst2
+        label2 = objects.label2
     End Sub
 End Class
 
@@ -412,16 +409,14 @@ Public Class Projection_Objects
     Inherits ocvbClass
     Dim flood As FloodFill_Projection
     Public fontSize As Single = 1.0
-    Public gravity As Projection_G_CPP
+    Public gravity As Projection_Gravity_CPP
     Public maxZ As Single
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
 
         sliders.setupTrackBar1(ocvb, caller, "epsilon for GroupRectangles X100", 0, 200, 80)
 
-        gravity = New Projection_G_CPP(ocvb, caller)
-        gravity.sliders.GroupBox2.Visible = True
-        gravity.histogramRun = True
+        gravity = New Projection_Gravity_CPP(ocvb, caller)
 
         flood = New FloodFill_Projection(ocvb, caller)
         flood.sliders.TrackBar1.Value = 100
@@ -446,8 +441,8 @@ Public Class Projection_Objects
         maxZ = gravity.sliders.TrackBar1.Value / 1000
         Dim mmPerPixel = maxZ * 1000 / src.Height
         Dim maxCount = Math.Min(flood.objectRects.Count, 10)
-        If dst1.Channels = 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        'dst1 = cMats.CameraLocationBot(objects.gravity.topMask)
+        'dst2 = cMats.CameraLocationLeft(objects.gravity.sideMask)
         For i = 0 To maxCount - 1
             Dim rect = flood.objectRects(i)
             dst2.Rectangle(rect, cv.Scalar.White, 1)
@@ -455,16 +450,14 @@ Public Class Projection_Objects
             Dim maxDistanceFromCamera = (src.Height - rect.Y) * mmPerPixel
             Dim objectWidth = rect.Width * mmPerPixel
 
-            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.lowResolution, 6, 15), cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.lowResolution, 3, 15), cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.lowResolution, 6, 10), cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.lowResolution, 3, 5), cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
             Dim text = "depth=" + Format(minDistanceFromCamera / 1000, "#0.0") + "-" + Format(maxDistanceFromCamera / 1000, "0.0") + "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
 
             Dim pt = New cv.Point(rect.X, rect.Y - 10)
             cv.Cv2.PutText(dst2, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
         label2 = "Showing the top " + CStr(maxCount) + " out of " + CStr(flood.objectRects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
-        If standalone Then CameraLocationBot(dst1, If(ocvb.parms.lowResolution, 5, 15), maxZ, fontSize)
-        If standalone Then CameraLocationBot(dst2, If(ocvb.parms.lowResolution, 5, 15), maxZ, fontSize)
     End Sub
 End Class
 

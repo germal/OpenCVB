@@ -160,7 +160,7 @@ Module fastLineDetector_Exports
 
     ' there is a drawsegments in the contrib library but this code will operate on the full size of the image - not the small copy passed to the C++ code
     ' But, more importantly, this code uses anti-alias for the lines.  It adds the lines to a mask that may be useful with depth data.
-    Public Function drawSegments(dst1 As cv.Mat, lineCount As Int32, factor As Int32, lineMask As cv.Mat) As SortedList(Of cv.Vec6f, Integer)
+    Public Function drawSegments(dst1 As cv.Mat, lineCount As Int32, thickness As Integer) As SortedList(Of cv.Vec6f, Integer)
         Dim sortedLines As New SortedList(Of cv.Vec6f, Integer)(New CompareVec6f)
 
         Dim lines(lineCount * 4 - 1) As Single ' there are 4 floats per line
@@ -177,10 +177,10 @@ Module fastLineDetector_Exports
                 If v(j) < 0 Then v(j) = 0
             Next
 
-            v6(0) = v(0) * factor
-            v6(1) = v(1) * factor
-            v6(2) = v(2) * factor
-            v6(3) = v(3) * factor
+            v6(0) = v(0)
+            v6(1) = v(1)
+            v6(2) = v(2)
+            v6(3) = v(3)
             v6(4) = Math.Sqrt((v(0) - v(2)) * (v(0) - v(2)) + (v(1) - v(3)) * (v(1) - v(3))) ' vector carries the length in pixels with it.
             v6(5) = 0 ' unused...
 
@@ -197,8 +197,7 @@ Module fastLineDetector_Exports
             If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
                 Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
                 Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                dst1.Line(pt1, pt2, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
-                lineMask.Line(pt1, pt2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+                dst1.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
             End If
         Next
         Return sortedLines
@@ -222,6 +221,7 @@ Public Class lineDetector_FLD_CPP
         sliders.setupTrackBar1(ocvb, caller, "FLD - Min Length", 1, 200, 30)
         sliders.setupTrackBar2(ocvb, caller, "FLD - max distance", 1, 100, 14)
         sliders.setupTrackBar3(ocvb, caller, "FLD - Canny Aperture", 3, 7, 7)
+        sliders.setupTrackBar4(ocvb, caller, "FLD - Line Thickness", 1, 7, 3)
 
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "FLD - incremental merge"
@@ -252,8 +252,7 @@ Public Class lineDetector_FLD_CPP
         Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, rows, cols, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
         handle.Free()
 
-        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, 1, dst1)
-        If standalone Then dst1.CopyTo(dst1)
+        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, sliders.TrackBar4.Value)
     End Sub
 End Class
 

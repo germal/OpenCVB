@@ -67,6 +67,9 @@ End Class
 
 
 
+
+
+
 Public Class Transform_SortReshape
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
@@ -86,6 +89,10 @@ Public Class Transform_SortReshape
         dst1 = sorted.Reshape(1, src.Rows)
     End Sub
 End Class
+
+
+
+
 
 
 Public Class Transform_Gravity
