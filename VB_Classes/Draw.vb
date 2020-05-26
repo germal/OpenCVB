@@ -485,7 +485,6 @@ Public Class Draw_Arc
             If radio.check(1).Checked Then thickness = -1
             dst1.Ellipse(New cv.Point(rr.Center.X, rr.Center.Y), New cv.Size(rr.BoundingRect.Size.Width, rr.BoundingRect.Size.Height),
                          angle, startAngle, endAngle, color, thickness, cv.LineTypes.AntiAlias)
-            Console.WriteLine("angle = " + CStr(angle) + "startangle = " + CStr(startAngle) + "endangle = " + CStr(endAngle))
         End If
         If r = rect Or sliders.TrackBar1.Value <> saveMargin Then setup(ocvb)
     End Sub
