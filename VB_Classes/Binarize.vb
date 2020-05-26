@@ -19,7 +19,7 @@ Public Class Binarize_OTSU
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst2.SetTo(0)
-        Dim w = ocvb.color.Width, h = ocvb.color.Height
+        Dim w = src.Width, h = src.Height
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim meanScalar = cv.Cv2.Mean(src)
         label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
@@ -127,7 +127,7 @@ Public Class Binarize_Bernson
         Dim kernelSize = sliders.TrackBar1.Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayBin = gray.Clone()
         If ocvb.drawRect = New cv.Rect() Then
             cv.Extensions.Binarizer.Bernsen(gray, grayBin, kernelSize, sliders.TrackBar2.Value, sliders.TrackBar3.Value)

@@ -80,7 +80,7 @@ Public Class CComp_EdgeMask
         edges.Run(ocvb)
         dst1 = edges.dst1
 
-        ccomp.src = If(standalone, edges.src, ocvb.color)
+        ccomp.src = If(standalone, edges.src, src)
         ccomp.Run(ocvb)
         dst2 = ccomp.dst1
     End Sub
@@ -249,7 +249,7 @@ Public Class CComp_InRange
             dst1(roiList(i)).SetTo(avg)
         Next
 
-        cv.Cv2.AddWeighted(dst1, 0.5, ocvb.color, 0.5, 0, dst1)
+        cv.Cv2.AddWeighted(dst1, 0.5, src, 0.5, 0, dst1)
         label1 = "# of blobs = " + CStr(roiList.Count) + " in " + CStr(rangeCount) + " regions - smallest in front"
     End Sub
 End Class

@@ -18,9 +18,9 @@ Public Class Coherence_Basics
         Dim eigenKernelSize = sliders.TrackBar4.Value * 2 + 1
 
         Dim side = 512
-        If ocvb.color.Height < side Then side = 256
-        Dim xoffset = ocvb.color.Width / 2 - side / 2
-        Dim yoffset = ocvb.color.Height / 2 - side / 2
+        If src.Height < side Then side = 256
+        Dim xoffset = src.Width / 2 - side / 2
+        Dim yoffset = src.Height / 2 - side / 2
         Dim srcRect = New cv.Rect(xoffset, yoffset, side, side)
         If ocvb.drawRect.Width <> 0 Then srcRect = ocvb.drawRect
 

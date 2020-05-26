@@ -207,7 +207,7 @@ Public Class Blob_Rectangles
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blobs.Run(ocvb)
-        dst1 = ocvb.color.Clone()
+        dst1 = src.Clone()
         dst2 = blobs.dst2
 
         ' sort the blobs by size before delivery to kalman
@@ -264,7 +264,7 @@ Public Class Blob_Largest
         If masks.Count > 0 Then
             dst1.SetTo(0)
             Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(blobIndex).Value ' this is the largest contiguous blob
-            ocvb.color.CopyTo(dst1, masks(maskIndex))
+            src.CopyTo(dst1, masks(maskIndex))
             kalman.input = {rects(maskIndex).X, rects(maskIndex).Y, rects(maskIndex).Width, rects(maskIndex).Height}
             kalman.Run(ocvb)
             Dim res = kalman.output
@@ -300,7 +300,7 @@ Public Class Blob_LargestDepthCluster
         cv.Cv2.InRange(getDepth32f(ocvb), startEndDepth.X, startEndDepth.Y, tmp)
         cv.Cv2.ConvertScaleAbs(tmp, mask)
         dst1.SetTo(0)
-        ocvb.color.CopyTo(dst1, mask)
-        label1 = "Largest Depth Blob: " + Format(maxSize, "#,000") + " pixels (" + Format(maxSize / ocvb.color.Total, "#0.0%") + ")"
+        src.CopyTo(dst1, mask)
+        label1 = "Largest Depth Blob: " + Format(maxSize, "#,000") + " pixels (" + Format(maxSize / src.Total, "#0.0%") + ")"
     End Sub
 End Class

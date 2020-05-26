@@ -12,10 +12,10 @@ Public Class Clone_Basics
         label1 = "Clone result - draw anywhere to clone a region"
         label2 = "Clone Region Mask"
         ocvb.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
-        ocvb.drawRect = New cv.Rect(ocvb.color.Width / 4, ocvb.color.Height / 4, ocvb.color.Width / 2, ocvb.color.Height / 2)
+        ocvb.drawRect = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim mask As New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
+        Dim mask As New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         If ocvb.drawRect = New cv.Rect Then
             mask.SetTo(255)
         Else
@@ -26,11 +26,11 @@ Public Class Clone_Basics
         If standalone And ocvb.frameCount Mod 10 = 0 Then cloneSpec += 1
         Select Case cloneSpec Mod 3
             Case 0
-                cv.Cv2.ColorChange(ocvb.color, mask, dst1, colorChangeValues(0), colorChangeValues(1), colorChangeValues(2))
+                cv.Cv2.ColorChange(src, mask, dst1, colorChangeValues(0), colorChangeValues(1), colorChangeValues(2))
             Case 1
-                cv.Cv2.IlluminationChange(ocvb.color, mask, dst1, illuminationChangeValues(0), illuminationChangeValues(1))
+                cv.Cv2.IlluminationChange(src, mask, dst1, illuminationChangeValues(0), illuminationChangeValues(1))
             Case 2
-                cv.Cv2.TextureFlattening(ocvb.color, mask, dst1, textureFlatteningValues(0), textureFlatteningValues(1))
+                cv.Cv2.TextureFlattening(src, mask, dst1, textureFlatteningValues(0), textureFlatteningValues(1))
         End Select
     End Sub
 End Class
@@ -148,18 +148,18 @@ Public Class Clone_Eagle
         dst2(srcROI) = sourceImage
         dst2(maskROI) = mask
 
-        pt = New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
+        pt = New cv.Point(src.Width / 2, src.Height / 2)
         label1 = "Move Eagle by clicking in any location."
         label2 = "Source image and source mask."
         ocvb.desc = "Clone an eagle into the video stream."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst1 = ocvb.color.Clone()
+        dst1 = src.Clone()
         If ocvb.mouseClickFlag Then
             pt = ocvb.mouseClickPoint ' pt corresponds to the center of the source image.  Roi can't be outside image boundary.
-            If pt.X + srcROI.Width / 2 >= ocvb.color.Width Then pt.X = ocvb.color.Width - srcROI.Width / 2
+            If pt.X + srcROI.Width / 2 >= src.Width Then pt.X = src.Width - srcROI.Width / 2
             If pt.X - srcROI.Width / 2 < 0 Then pt.X = srcROI.Width / 2
-            If pt.Y + srcROI.Height >= ocvb.color.Height Then pt.Y = ocvb.color.Height - srcROI.Height / 2
+            If pt.Y + srcROI.Height >= src.Height Then pt.Y = src.Height - srcROI.Height / 2
             If pt.Y - srcROI.Height < 0 Then pt.Y = srcROI.Height / 2
             ocvb.mouseClickFlag = False
         End If
@@ -193,7 +193,7 @@ Public Class Clone_Seamless
         ocvb.desc = "Use the seamlessclone API to merge color and depth..."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim center As New cv.Point(ocvb.color.Width / 2, ocvb.color.Height / 2)
+        Dim center As New cv.Point(src.Width / 2, src.Height / 2)
         Dim radius = 100
         If ocvb.drawRect = New cv.Rect Then
             dst2.SetTo(0)
@@ -209,8 +209,8 @@ Public Class Clone_Seamless
                 Exit For
             End If
         Next
-        dst1 = ocvb.color.Clone()
-        cv.Cv2.SeamlessClone(ocvb.RGBDepth, ocvb.color, dst2, center, dst1, style)
+        dst1 = src.Clone()
+        cv.Cv2.SeamlessClone(ocvb.RGBDepth, src, dst2, center, dst1, style)
         dst1.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
     End Sub
 End Class

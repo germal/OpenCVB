@@ -161,7 +161,7 @@ Public Class Contours_RGB
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.Run(ocvb)
-        Dim img = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim img = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         img.SetTo(0, trim.zeroMask)
 
         Dim contours0 = cv.Cv2.FindContoursAsArray(img, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
@@ -187,7 +187,7 @@ Public Class Contours_RGB
         cv.Cv2.DrawContours(dst1, listOfPoints, 0, New cv.Scalar(255, 0, 0), -1)
         cv.Cv2.DrawContours(dst1, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
         dst2.SetTo(0)
-        ocvb.color.CopyTo(dst2, trim.zeroMask)
+        src.CopyTo(dst2, trim.zeroMask)
     End Sub
 End Class
 

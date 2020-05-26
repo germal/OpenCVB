@@ -88,7 +88,7 @@ Public Class Delaunay_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
-        Dim rect = New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height)
+        Dim rect = New cv.Rect(0, 0, src.Width, src.Height)
 
         Dim subdiv As New cv.Subdiv2D(rect)
 
@@ -122,7 +122,7 @@ Public Class Delaunay_GoodFeatures
 
         dst1 = src
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
-        Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
+        Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, src.Width, src.Height))
         For i = 0 To features.goodFeatures.Count - 1
             locate_point(dst1, subdiv, features.goodFeatures(i), active_facet_color)
             subdiv.Insert(features.goodFeatures(i))
@@ -152,7 +152,7 @@ Public Class Delauney_Subdiv2D
         dst1.SetTo(0)
         Dim points = Enumerable.Range(0, 100).Select(Of cv.Point2f)(
             Function(i)
-                Return New cv.Point2f(rand.Next(0, ocvb.color.Width), rand.Next(0, ocvb.color.Height))
+                Return New cv.Point2f(rand.Next(0, src.Width), rand.Next(0, src.Height))
             End Function).ToArray()
         For Each p In points
             dst1.Circle(p, 4, cv.Scalar.Red, -1)
@@ -204,7 +204,7 @@ Public Class Delauney_Coverage
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod sliders.TrackBar1.Value = 0 Then dst1.SetTo(0)
-        delauney.src = ocvb.color
+        delauney.src = src
         delauney.Run(ocvb)
         cv.Cv2.BitwiseOr(delauney.dst1, dst1, dst1)
     End Sub

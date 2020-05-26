@@ -84,7 +84,7 @@ Public Class DCT_RGB
 
         cv.Cv2.Merge(srcPlanes, dst1)
 
-        cv.Cv2.Subtract(ocvb.color, dst1, dst2)
+        cv.Cv2.Subtract(src, dst1, dst2)
     End Sub
 End Class
 
@@ -136,7 +136,6 @@ Public Class DCT_FeatureLess_MT
         label2 = "FeatureLess RGB regions"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src=ocvb.color
         dct.src = src
         dct.Run(ocvb)
         Dim runLenMin = dct.sliders.TrackBar2.Value
@@ -222,12 +221,12 @@ Public Class DCT_Surfaces_debug
             If roiCounts(i) > roiCounts(maxIndex) Then maxIndex = i
         Next
 
-        Mats.mat(3) = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
-        ocvb.color(grid.roiList(maxIndex)).CopyTo(Mats.mat(3)(grid.roiList(maxIndex)), mask(grid.roiList(maxIndex)))
+        Mats.mat(3) = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
+        src(grid.roiList(maxIndex)).CopyTo(Mats.mat(3)(grid.roiList(maxIndex)), mask(grid.roiList(maxIndex)))
         Mats.Run(ocvb)
         dst2 = Mats.dst1
 
-        Dim world As New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32FC3, 0)
+        Dim world As New cv.Mat(src.Size(), cv.MatType.CV_32FC3, 0)
         Dim roi = grid.roiList(maxIndex) ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
         If roi.X = grid.roiList(maxIndex).X And roi.Y = grid.roiList(maxIndex).Y Then
             If roiCounts(maxIndex) > roi.Width * roi.Height / 4 Then

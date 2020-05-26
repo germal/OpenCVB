@@ -21,8 +21,8 @@ Public Class CartoonifyImage_Basics
         Dim edges = gray8u.Laplacian(cv.MatType.CV_8U, kernelSize)
         Dim mask = edges.Threshold(sliders.TrackBar3.Value, 255, cv.ThresholdTypes.Binary)
         dst1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = ocvb.color.MedianBlur(medianBlur2).MedianBlur(medianBlur2)
-        ocvb.color.CopyTo(dst2, mask)
+        dst2 = src.MedianBlur(medianBlur2).MedianBlur(medianBlur2)
+        src.CopyTo(dst2, mask)
     End Sub
 End Class
 

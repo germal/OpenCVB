@@ -32,7 +32,7 @@ Public Class Brightness_Contrast
         ocvb.desc = "Show image with vary contrast and brightness."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.color.ConvertTo(dst1, -1, sliders.TrackBar2.Value / 50, sliders.TrackBar1.Value)
+        src.ConvertTo(dst1, -1, sliders.TrackBar2.Value / 50, sliders.TrackBar1.Value)
         label1 = "Brightness/Contrast"
         label2 = ""
     End Sub
@@ -48,8 +48,8 @@ Public Class Brightness_hue
         ocvb.desc = "Show hue (Result1) and Saturation (Result2)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim imghsv = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3)
-        cv.Cv2.CvtColor(ocvb.color, imghsv, cv.ColorConversionCodes.RGB2HSV)
+        Dim imghsv = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        cv.Cv2.CvtColor(src, imghsv, cv.ColorConversionCodes.RGB2HSV)
         cv.Cv2.Split(imghsv, hsv_planes)
 
         label1 = "Hue"
@@ -93,7 +93,7 @@ Public Class Brightness_Gamma
                 lookupTable(i) = Math.Pow(i / 255, sliders.TrackBar1.Value / 100) * 255
             Next
         End If
-        dst1 = ocvb.color.LUT(lookupTable)
+        dst1 = src.LUT(lookupTable)
     End Sub
 End Class
 
@@ -130,16 +130,16 @@ Public Class Brightness_WhiteBalance_CPP
         ocvb.desc = "Automate getting the right white balance"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim rgbData(ocvb.color.Total * ocvb.color.ElemSize - 1) As Byte
+        Dim rgbData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
-        Marshal.Copy(ocvb.color.Data, rgbData, 0, rgbData.Length)
+        Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
 
         Dim thresholdVal As Single = sliders.TrackBar1.Value / 100
-        Dim rgbPtr = WhiteBalance_Run(wPtr, handleSrc.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols, thresholdVal)
+        Dim rgbPtr = WhiteBalance_Run(wPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, thresholdVal)
         handleSrc.Free()
 
-        dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, rgbPtr) ' no need to copy.  rgbPtr points to C++ data, not managed.
-        Dim diff = dst1 - ocvb.color
+        dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, rgbPtr) ' no need to copy.  rgbPtr points to C++ data, not managed.
+        Dim diff = dst1 - src
         diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
     End Sub
@@ -171,12 +171,12 @@ Public Class Brightness_WhiteBalance
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim rgb32f As New cv.Mat
-        ocvb.color.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
+        src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim maxVal As Double, minVal As Double
         rgb32f.MinMaxLoc(minVal, maxVal)
 
         Dim planes() = rgb32f.Split()
-        Dim sum32f = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32F)
+        Dim sum32f = New cv.Mat(src.Size(), cv.MatType.CV_32F)
         sum32f = planes(0) + planes(1) + planes(2)
         hist.src = sum32f
         hist.Run(ocvb)
@@ -247,7 +247,7 @@ Public Class Brightness_ChangeMask
             label1 = "White balanced image - C++ version"
             label2 = "Mask of changed pixels - C++ version"
         End If
-        Dim diff = dst1 - ocvb.color
+        Dim diff = dst1 - src
         dst2 = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class

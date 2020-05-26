@@ -136,7 +136,7 @@ Public Class Corners_ShiTomasi_CPP
         label2 = "Corner Eigen values"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim data(ocvb.color.Total - 1) As Byte
+        Dim data(src.Total - 1) As Byte
 
         Dim blocksize = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value + 1)
         Dim aperture = If(sliders.TrackBar2.Value Mod 2, sliders.TrackBar2.Value, sliders.TrackBar2.Value + 1)
@@ -145,10 +145,10 @@ Public Class Corners_ShiTomasi_CPP
 
         Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
         Marshal.Copy(dst1.Data, data, 0, data.Length)
-        Dim imagePtr = Corners_ShiTomasi(handle.AddrOfPinnedObject, ocvb.color.Rows, ocvb.color.Cols, blocksize, aperture)
+        Dim imagePtr = Corners_ShiTomasi(handle.AddrOfPinnedObject, src.Rows, src.Cols, blocksize, aperture)
         handle.Free()
 
-        Dim output As New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_32F, imagePtr)
+        Dim output As New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr)
 
         Dim stNormal As New cv.Mat
         cv.Cv2.Normalize(output, stNormal, sliders.TrackBar4.Value, 255, cv.NormTypes.MinMax)

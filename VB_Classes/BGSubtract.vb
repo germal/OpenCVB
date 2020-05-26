@@ -296,13 +296,13 @@ Public Class BGSubtract_DepthOrColorMotion
         ocvb.desc = "Detect motion with both depth and color changes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        motion.src = ocvb.color
+        motion.src = src.Clone()
         motion.Run(ocvb)
         dst1 = motion.dst1
         dst2 = motion.dst2
-        Dim mask As New cv.Mat
-        cv.Cv2.BitwiseNot(dst1, mask)
-        ocvb.color.CopyTo(dst2, mask)
+        Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs()
+        cv.Cv2.BitwiseNot(mask, mask)
+        src.CopyTo(dst2, mask)
         label2 = "Image with instability filled with color data"
     End Sub
 End Class
@@ -400,7 +400,7 @@ Public Class BGSubtract_Synthetic_CPP
             Marshal.Copy(src.Data, srcData, 0, srcData.Length)
             Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
 
-            synthPtr = BGSubtract_Synthetic_Open(handleSrc.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols,
+            synthPtr = BGSubtract_Synthetic_Open(handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
                                                 ocvb.parms.HomeDir + "Data/baboon.jpg",
                                                 amplitude / 100, magnitude, waveSpeed / 100, objectSpeed)
             handleSrc.Free()

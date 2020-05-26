@@ -41,14 +41,14 @@ Public Class BlockMatching_Basics
         disparity.ConvertTo(colorizer.src, cv.MatType.CV_32F, 1 / 16)
         colorizer.src = colorizer.src.Threshold(0, 0, cv.ThresholdTypes.Tozero)
         Dim topMargin = 10, sideMargin = 8
-        Dim rect = New cv.Rect(numDisparity + sideMargin, topMargin, ocvb.color.Width - numDisparity - sideMargin * 2, ocvb.color.Height - topMargin * 2)
-        Dim tmp = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32F, 0)
+        Dim rect = New cv.Rect(numDisparity + sideMargin, topMargin, src.Width - numDisparity - sideMargin * 2, src.Height - topMargin * 2)
+        Dim tmp = New cv.Mat(src.Size(), cv.MatType.CV_32F, 0)
         Dim distance = sliders.TrackBar3.Value * 1000
         cv.Cv2.Divide(distance, colorizer.src(rect), colorizer.src(rect)) ' this needs much more refinement.  The trackbar3 value is just an approximation.
         colorizer.src(rect) = colorizer.src(rect).Threshold(10000, 10000, cv.ThresholdTypes.Trunc)
         colorizer.Run(ocvb)
         dst1(rect) = colorizer.dst1(rect)
-        dst2 = ocvb.rightView.Resize(ocvb.color.Size())
+        dst2 = ocvb.rightView.Resize(src.Size())
     End Sub
 End Class
 

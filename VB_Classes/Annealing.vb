@@ -44,8 +44,8 @@ Public Class Annealing_Basics_CPP
     Public Sub setup(ocvb As AlgorithmData)
         ReDim cityOrder(numberOfCities - 1)
 
-        Dim radius = ocvb.color.Rows * 0.45
-        Dim center = New cv.Point(ocvb.color.Cols / 2, ocvb.color.Rows / 2)
+        Dim radius = src.Rows * 0.45
+        Dim center = New cv.Point(src.Cols / 2, src.Rows / 2)
         If circularPattern Then
             ReDim cityPositions(numberOfCities - 1)
             Dim gen As New System.Random()
@@ -60,7 +60,7 @@ Public Class Annealing_Basics_CPP
         For i = 0 To cityOrder.Length - 1
             cityOrder(i) = (i + 1) Mod numberOfCities
         Next
-        dst1 = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
+        dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
     End Sub
     Public Sub Open()
         Dim hCityPosition = GCHandle.Alloc(cityPositions, GCHandleType.Pinned)

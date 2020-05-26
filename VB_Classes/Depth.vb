@@ -163,11 +163,11 @@ Public Class Depth_Foreground
         trustworthy = False
         If maxIndex >= 0 Then
             Dim rectSize = 50
-            If ocvb.color.Width > 1000 Then rectSize = 250
+            If src.Width > 1000 Then rectSize = 250
             Dim xx = blobLocation.Item(maxIndex).X - rectSize / 2
             Dim yy = blobLocation.Item(maxIndex).Y
             If xx < 0 Then xx = 0
-            If xx + rectSize / 2 > ocvb.color.Width Then xx = ocvb.color.Width - rectSize
+            If xx + rectSize / 2 > src.Width Then xx = src.Width - rectSize
             dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
             kalman.input = {xx, yy, rectSize, rectSize}
@@ -250,7 +250,7 @@ Public Class Depth_FlatBackground
 
         ocvb.RGBDepth.CopyTo(dst1, mask)
         zeroMask.SetTo(255, shadow.holeMask)
-        ocvb.color.CopyTo(dst1, zeroMask)
+        src.CopyTo(dst1, zeroMask)
         dst1.SetTo(maxDepth, zeroMask) ' set the depth to the maxdepth for any background
     End Sub
 End Class
@@ -277,7 +277,7 @@ Public Class Depth_WorldXYZ
     Public xyzFrame As cv.Mat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        xyzFrame = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32FC3)
+        xyzFrame = New cv.Mat(src.Size(), cv.MatType.CV_32FC3)
         ocvb.desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -314,7 +314,7 @@ Public Class Depth_WorldXYZ_MT
 
         trim = New Depth_InRange(ocvb, caller)
 
-        xyzFrame = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32FC3)
+        xyzFrame = New cv.Mat(src.Size(), cv.MatType.CV_32FC3)
         ocvb.desc = "Create OpenGL point cloud from depth data (too slow to be useful)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -390,8 +390,8 @@ Public Class Depth_MeanStdev_MT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
-        dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U)
-        dst2 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U)
+        dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U)
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U)
 
         Dim maxDepth = sliders.TrackBar1.Value
         Dim meanCount = sliders.TrackBar2.Value
@@ -859,7 +859,7 @@ Public Class Depth_Colorizer_MT
         grid.Run(ocvb)
 
         If standalone Then src = getDepth32f(ocvb)
-        If src.Width <> ocvb.color.Width Then src = src.Resize(ocvb.color.Size())
+        If src.Width <> src.Width Then src = src.Resize(src.Size())
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
 
@@ -912,7 +912,7 @@ Public Class Depth_LocalMinMax_MT
         mask.ConvertTo(mask, cv.MatType.CV_8UC1)
 
         If standalone Then
-            ocvb.color.CopyTo(dst1)
+            src.CopyTo(dst1)
             dst1.SetTo(cv.Scalar.White, grid.gridMask)
         End If
 
@@ -967,7 +967,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
             ReDim kalman.input(grid.roiList.Count * 4 - 1)
         End If
 
-        dst1 = ocvb.color.Clone()
+        dst1 = src.Clone()
         dst1.SetTo(cv.Scalar.White, grid.gridMask)
 
         Parallel.For(0, grid.roiList.Count,
@@ -985,7 +985,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
 
         kalman.Run(ocvb)
 
-        Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, ocvb.color.Width, ocvb.color.Height))
+        Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, src.Width, src.Height))
         Dim radius = 5
         For i = 0 To grid.roiList.Count - 1
             Dim roi = grid.roiList(i)

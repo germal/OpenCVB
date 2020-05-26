@@ -9,10 +9,10 @@ Public Class Concat_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim tmp As New cv.Mat
-        cv.Cv2.HConcat(ocvb.color, ocvb.RGBDepth, tmp)
-        dst1 = tmp.Resize(ocvb.color.Size())
-        cv.Cv2.VConcat(ocvb.color, ocvb.RGBDepth, tmp)
-        dst2 = tmp.Resize(ocvb.color.Size())
+        cv.Cv2.HConcat(src, ocvb.RGBDepth, tmp)
+        dst1 = tmp.Resize(src.Size())
+        cv.Cv2.VConcat(src, ocvb.RGBDepth, tmp)
+        dst2 = tmp.Resize(src.Size())
     End Sub
 End Class
 
@@ -32,15 +32,15 @@ Public Class Concat_4way
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         if standalone Then
-            img(0) = ocvb.color
+            img(0) = src
             img(1) = ocvb.RGBDepth
-            img(2) = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(ocvb.color.Size())
-            img(3) = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(ocvb.color.Size())
+            img(2) = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size())
+            img(3) = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size())
         End If
         Dim tmp1 As New cv.Mat, tmp2 As New cv.Mat, tmp3 As New cv.Mat
         cv.Cv2.HConcat(img(0), img(1), tmp1)
         cv.Cv2.HConcat(img(2), img(3), tmp2)
         cv.Cv2.VConcat(tmp1, tmp2, tmp3)
-        dst1 = tmp3.Resize(ocvb.color.Size())
+        dst1 = tmp3.Resize(src.Size())
     End Sub
 End Class
