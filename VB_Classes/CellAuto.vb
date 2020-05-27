@@ -119,3 +119,73 @@ Public Class CellAuto_LifePopulation
         dst2 = plot.dst1
     End Sub
 End Class
+
+
+
+
+
+
+Public Class CellAuto_Basics
+    Inherits ocvbClass
+    Dim inputCombo = "111,110,101,100,011,010,001,000"
+    Dim input(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
+    Dim i18 As New List(Of String)
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        i18.Add("00011110 Rule 30 (chaotic)")
+        i18.Add("00110110 Rule 54")
+        i18.Add("00111100 Rule 60")
+        i18.Add("00111110 Rule 62")
+        i18.Add("01011010 Rule 90")
+        i18.Add("01011110 Rule 94")
+        i18.Add("01100110 Rule 102")
+        i18.Add("01101110 Rule 110")
+        i18.Add("01111010 Rule 122")
+
+        i18.Add("01111110 Rule 126")
+        i18.Add("10010110 Rule 150")
+        i18.Add("10011110 Rule 158")
+        i18.Add("10110110 Rule 182")
+        i18.Add("10111100 Rule 188")
+        i18.Add("10111110 Rule 190")
+        i18.Add("11011100 Rule 220")
+        i18.Add("11011110 Rule 222")
+        i18.Add("11111010 Rule 250")
+
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Rotate through the different rules"
+        check.Box(0).Checked = True
+
+        Dim label = "The 18 most interesting automata from the first 256 in 'New Kind of Science'" + vbCrLf + "The input combinations are: " + inputCombo
+        combo.Setup(ocvb, caller, label + vbCrLf + "output below:", i18)
+        ocvb.desc = "Visualize the 30 interesting examples from the first 256 in 'New Kind of Science'"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim outcomes(8 - 1) As Byte
+        Dim outStr = combo.Box.Text
+        For i = 0 To outcomes.Length - 1
+            outcomes(i) = Integer.Parse(outStr.Substring(i, 1))
+        Next
+        Dim dst = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst.Set(Of Byte)(0, dst.Width / 2, 1)
+        For y = 0 To dst.Height - 2
+            For x = 1 To dst.Width - 2
+                Dim x1 = dst.Get(Of Byte)(y, x - 1)
+                Dim x2 = dst.Get(Of Byte)(y, x)
+                Dim x3 = dst.Get(Of Byte)(y, x + 1)
+                For i = 0 To input.Length - 1
+                    If x1 = input(i, 0) And x2 = input(i, 1) And x3 = input(i, 2) Then
+                        dst.Set(Of Byte)(y + 1, x, outcomes(i))
+                        Exit For
+                    End If
+                Next
+            Next
+        Next
+        If ocvb.frameCount Mod 2 = 0 Then dst1 = dst.ConvertScaleAbs(255) Else dst2 = dst.ConvertScaleAbs(255)
+        If ocvb.frameCount Mod 2 = 0 Then label1 = combo.Box.Text Else label2 = combo.Box.Text
+        If check.Box(0).Checked Then
+            Dim index = combo.Box.SelectedIndex
+            If index + 1 < i18.Count - 1 Then combo.Box.SelectedIndex += 1 Else combo.Box.SelectedIndex = 0
+        End If
+    End Sub
+End Class

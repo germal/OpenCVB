@@ -22,22 +22,22 @@ Partial Class OptionsCombo
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.ComboBox = New System.Windows.Forms.ComboBox()
+        Me.Box = New System.Windows.Forms.ComboBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.SuspendLayout()
         '
-        'ComboBox
+        'Box
         '
-        Me.ComboBox.FormattingEnabled = True
-        Me.ComboBox.Location = New System.Drawing.Point(29, 55)
-        Me.ComboBox.Name = "ComboBox"
-        Me.ComboBox.Size = New System.Drawing.Size(637, 28)
-        Me.ComboBox.TabIndex = 0
+        Me.Box.FormattingEnabled = True
+        Me.Box.Location = New System.Drawing.Point(29, 88)
+        Me.Box.Name = "Box"
+        Me.Box.Size = New System.Drawing.Size(637, 28)
+        Me.Box.TabIndex = 0
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(29, 18)
+        Me.Label1.Location = New System.Drawing.Point(29, 13)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(57, 20)
         Me.Label1.TabIndex = 1
@@ -49,7 +49,7 @@ Partial Class OptionsCombo
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(851, 322)
         Me.Controls.Add(Me.Label1)
-        Me.Controls.Add(Me.ComboBox)
+        Me.Controls.Add(Me.Box)
         Me.Name = "OptionsCombo"
         Me.Text = "OptionsCombo"
         Me.ResumeLayout(False)
@@ -57,6 +57,6 @@ Partial Class OptionsCombo
 
     End Sub
 
-    Friend WithEvents ComboBox As Windows.Forms.ComboBox
+    Friend WithEvents Box As Windows.Forms.ComboBox
     Friend WithEvents Label1 As Windows.Forms.Label
 End Class

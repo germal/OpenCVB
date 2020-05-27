@@ -21,6 +21,8 @@ Public Class ocvbClass : Implements IDisposable
     Dim algorithm As Object
     Public scalarColors(255) As cv.Scalar
     Public rColors(255) As cv.Vec3b
+    Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
+    Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Sub setCaller(callerRaw As String)
         If callerRaw = "" Or callerRaw = Me.GetType.Name Then
             standalone = True

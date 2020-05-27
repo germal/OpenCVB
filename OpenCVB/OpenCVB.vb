@@ -990,7 +990,7 @@ Public Class OpenCVB
 
         End If
 
-        For i = VB_Classes.ActiveClass._RESULT1 To VB_Classes.ActiveClass._RESULT2
+        For i = VB_Classes.ActiveClass.RESULT1 To VB_Classes.ActiveClass.RESULT2
             TTtextData(i).Clear()
         Next
         BothFirstAndLastReady = False
@@ -1078,7 +1078,7 @@ Public Class OpenCVB
                         algorithmRefresh = True
                         formResult1 = OpenCVB.ocvb.result1.Clone()
                         formResult2 = OpenCVB.ocvb.result2.Clone()
-                        For i = VB_Classes.ActiveClass._RESULT1 To VB_Classes.ActiveClass._RESULT2
+                        For i = VB_Classes.ActiveClass.RESULT1 To VB_Classes.ActiveClass.RESULT2
                             If OpenCVB.ocvb.TTtextData(i).Count Then
                                 TTtextData(i).Clear()
                                 For j = 0 To OpenCVB.ocvb.TTtextData(i).Count - 1

@@ -2,16 +2,15 @@ Imports cv = OpenCvSharp
 Imports System.Drawing
 
 Module Algorithm_Module
+    ' these are all global settings that are updated by individual algorithms.  
     Public appLocation As cv.Rect
     Public offsetIncr = 25
     Public slidersOffset As cv.Point
     Public radioOffset As cv.Point
     Public PipeTaskIndex As Int32
     Public vtkTaskIndex As Int32
-    Public Const FRAME_RGB = 0
-    Public Const FRAME_DEPTH = 1
-    Public Const RESULT1 = 2
-    Public Const RESULT2 = 3
+    Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
+    Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
     Public colorCols As Int32
     Public colorRows As Int32
 
@@ -38,8 +37,8 @@ End Module
 
 Public Class ActiveClass : Implements IDisposable
     Public Class TrueType
-        Public Const _RESULT1 = RESULT1
-        Public Const _RESULT2 = RESULT2
+        Public Const RESULT1 = 2
+        Public Const RESULT2 = 3
         Public text As String
 
         ' Change the default TrueType font and font size here.  Any individual ocvbClass can override with a specific font if needed.
@@ -53,7 +52,7 @@ Public Class ActiveClass : Implements IDisposable
         Public x As Int32
         Public y As Int32
         Public Sub New(_text As String, _x As Int32, _y As Int32, Optional _fontName As String = defaultFont,
-                       Optional _fontSize As Double = defaultFontSize, Optional _picTag As Int32 = _RESULT1)
+                       Optional _fontSize As Double = defaultFontSize, Optional _picTag As Int32 = RESULT1)
             text = _text
             x = _x
             y = _y
@@ -72,13 +71,13 @@ Public Class ActiveClass : Implements IDisposable
             text = _text
             x = _x
             y = _y
-            picTag = _RESULT1
+            picTag = RESULT1
         End Sub
     End Class
 
     Public ocvb As AlgorithmData
-    Public Const _RESULT1 = RESULT1
-    Public Const _RESULT2 = RESULT2
+    Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
+    Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
 
     Dim algoList As New algorithmList
     Dim ActiveAlgorithm As Object
