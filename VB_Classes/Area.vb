@@ -33,8 +33,8 @@ Public Class Area_MinTriangle_CPP
 
         dst1.SetTo(0)
         For i = 0 To srcPoints.Length - 1
-            srcPoints(i).X = ocvb.ms_rng.Next(src.Width / 2 - squareWidth, src.Width / 2 + squareWidth)
-            srcPoints(i).Y = ocvb.ms_rng.Next(src.Height / 2 - squareWidth, src.Height / 2 + squareWidth)
+            srcPoints(i).X = msRNG.Next(src.Width / 2 - squareWidth, src.Width / 2 + squareWidth)
+            srcPoints(i).Y = msRNG.Next(src.Height / 2 - squareWidth, src.Height / 2 + squareWidth)
             dst1.Circle(srcPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
@@ -81,8 +81,8 @@ Public Class Area_MinRect
 
         dst1.SetTo(0)
         For i = 0 To srcPoints.Length - 1
-            srcPoints(i).X = ocvb.ms_rng.Next(src.Width / 2 - squareWidth, src.Width / 2 + squareWidth)
-            srcPoints(i).Y = ocvb.ms_rng.Next(src.Height / 2 - squareWidth, src.Height / 2 + squareWidth)
+            srcPoints(i).X = msRNG.Next(src.Width / 2 - squareWidth, src.Width / 2 + squareWidth)
+            srcPoints(i).Y = msRNG.Next(src.Height / 2 - squareWidth, src.Height / 2 + squareWidth)
             dst1.Circle(srcPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
@@ -122,7 +122,7 @@ Public Class Area_MinMotionRect
         input.Run(ocvb)
         Dim gray As cv.Mat
         If input.dst1.Channels = 1 Then gray = input.dst1 Else gray = input.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = motionRectangles(gray, ocvb.rColors)
+        dst1 = motionRectangles(gray, rColors)
         dst1.SetTo(cv.Scalar.All(255), gray)
     End Sub
 End Class
@@ -145,8 +145,8 @@ Public Class Area_FindNonZero
         Dim gray = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         Dim srcPoints(10 - 1) As cv.Point ' doesn't really matter how many there are.
         For i = 0 To srcPoints.Length - 1
-            srcPoints(i).X = ocvb.ms_rng.Next(0, src.Width)
-            srcPoints(i).Y = ocvb.ms_rng.Next(0, src.Height)
+            srcPoints(i).X = msRNG.Next(0, src.Width)
+            srcPoints(i).Y = msRNG.Next(0, src.Height)
             gray.Set(Of Byte)(srcPoints(i).Y, srcPoints(i).X, 255)
         Next
 

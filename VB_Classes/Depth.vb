@@ -103,7 +103,7 @@ Public Class Depth_HolesRect
         For i = 0 To contours.Length - 1
             Dim minRect = cv.Cv2.MinAreaRect(contours(i))
             If minRect.Size.Width * minRect.Size.Height > sliders.TrackBar1.Value Then
-                Dim nextColor = New cv.Scalar(ocvb.rColors(i Mod 255).Item0, ocvb.rColors(i Mod 255).Item1, ocvb.rColors(i Mod 255).Item2)
+                Dim nextColor = New cv.Scalar(rColors(i Mod 255).Item0, rColors(i Mod 255).Item1, rColors(i Mod 255).Item2)
                 drawRotatedRectangle(minRect, dst1, nextColor)
                 If contours(i).Length >= 5 Then
                     minEllipse(i) = cv.Cv2.FitEllipse(contours(i))
@@ -997,7 +997,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
             cv.Cv2.Circle(dst1, ptmin, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
             cv.Cv2.Circle(dst1, ptmax, radius, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
         Next
-        paint_voronoi(ocvb, dst2, subdiv)
+        paint_voronoi(scalarColors, dst2, subdiv)
     End Sub
 End Class
 

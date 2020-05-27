@@ -5,6 +5,7 @@ Imports System.Windows.Forms
 Public Class OilPaint_Pointilism
     Inherits ocvbClass
     Dim randomMask As cv.Mat
+    Dim myRNG As New cv.RNG
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "Stroke Scale", 1, 5, 3)
@@ -14,7 +15,7 @@ Public Class OilPaint_Pointilism
         radio.check(1).Text = "Use Circular stroke"
         radio.check(1).Checked = True
 
-        ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
+        ocvb.drawRect = New cv.Rect(ocvb.color.Cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.Cols * 2 / 8, ocvb.color.Rows * 2 / 8)
         ocvb.desc = "Alter the image to effect the pointilism style - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -28,8 +29,8 @@ Public Class OilPaint_Pointilism
             Dim nPt As New cv.Point
             For y = 0 To randomMask.Height - 1
                 For x = 0 To randomMask.Width - 1
-                    nPt.X = (ocvb.ms_rng.Next(-1, 1) + x) Mod (randomMask.Width - 1)
-                    nPt.Y = (ocvb.ms_rng.Next(-1, 1) + y) Mod (randomMask.Height - 1)
+                    nPt.X = (msRNG.Next(-1, 1) + x) Mod (randomMask.Width - 1)
+                    nPt.Y = (msRNG.Next(-1, 1) + y) Mod (randomMask.Height - 1)
                     If nPt.X < 0 Then nPt.X = 0
                     If nPt.Y < 0 Then nPt.Y = 0
                     randomMask.Set(Of cv.Point)(y, x, nPt)

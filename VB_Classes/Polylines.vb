@@ -13,7 +13,7 @@ Public Class Polylines_IEnumerableExample
     Public Sub Run(ocvb As AlgorithmData)
         Dim points = Enumerable.Range(0, sliders.TrackBar1.Value).Select(Of cv.Point)(
             Function(i)
-                Return New cv.Point(CInt(ocvb.ms_rng.Next(0, src.Width)), CInt(ocvb.ms_rng.Next(0, src.Height)))
+                Return New cv.Point(CInt(msRNG.Next(0, src.Width)), CInt(msRNG.Next(0, src.Height)))
             End Function).ToList
         Dim pts As New List(Of List(Of cv.Point))
         pts.Add(points)

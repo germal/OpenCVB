@@ -14,10 +14,10 @@ Public Class FLANN_Test
 
         ' creates data set
         Using features As New cv.Mat(10000, 2, cv.MatType.CV_32FC1)
-            cv.Cv2.Randu(features, 0, ocvb.ms_rng.Next(9900, 10000))
+            cv.Cv2.Randu(features, 0, msRNG.Next(9900, 10000))
 
             ' query
-            Dim queryPoint As New cv.Point2f(ocvb.ms_rng.Next(0, 10000), ocvb.ms_rng.Next(0, 10000))
+            Dim queryPoint As New cv.Point2f(msRNG.Next(0, 10000), msRNG.Next(0, 10000))
             Dim queries As New cv.Mat(1, 2, cv.MatType.CV_32FC1, queryPoint)
             Console.WriteLine(String.Format("query:({0}, {1})", queryPoint.X, queryPoint.Y))
             Console.WriteLine(String.Format("-----"))

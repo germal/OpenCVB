@@ -70,7 +70,7 @@ Public Class EMax_Basics
                     sample.Set(Of Double)(0, 1, CSng(i))
                     ' remove the " 0 '" to see the error in Predict2.
                     Dim response = 0 ' Math.Round(em_model.Predict2(sample)(1))
-                    Dim c = ocvb.rColors(response)
+                    Dim c = rColors(response)
                     dst1.Circle(New cv.Point(j, i), 1, c, -1)
                 Next
             Next
@@ -79,7 +79,7 @@ Public Class EMax_Basics
         ' draw the clustered samples
         For i = 0 To samples.Rows - 1
             Dim pt = New cv.Point(Math.Round(samples.Get(Of Single)(i, 0)), Math.Round(samples.Get(Of Single)(i, 1)))
-            dst1.Circle(pt, 4, ocvb.rColors(labels.Get(Of Int32)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
+            dst1.Circle(pt, 4, rColors(labels.Get(Of Int32)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
         Next
     End Sub
 End Class

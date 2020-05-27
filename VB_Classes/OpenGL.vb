@@ -31,6 +31,8 @@ Public Class OpenGL_Basics
     Public imageLabel As String
     Public imu As IMU_GVector
     Public pointCloudInput As New cv.Mat
+    Dim openGLHeight = 1200
+    Dim openGLWidth = 1500
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         imu = New IMU_GVector(ocvb, caller)
@@ -64,7 +66,7 @@ Public Class OpenGL_Basics
         memMapbufferSize = 8 * memMapValues.Length - 1
 
         startInfo.FileName = OpenGLTitle + ".exe"
-        startInfo.Arguments = CStr(ocvb.openGLWidth) + " " + CStr(ocvb.openGLHeight) + " " + CStr(memMapbufferSize) + " " + pipeName + " " +
+        startInfo.Arguments = CStr(openGLWidth) + " " + CStr(openGLHeight) + " " + CStr(memMapbufferSize) + " " + pipeName + " " +
                                   CStr(pcSize)
         If ocvb.parms.ShowConsoleLog = False Then startInfo.WindowStyle = ProcessWindowStyle.Hidden
         Process.Start(startInfo)
@@ -325,7 +327,7 @@ Public Class OpenGL_Draw3D
         circle.Run(ocvb)
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ogl.OpenGL.dataInput = dst2
-        ogl.OpenGL.src = New cv.Mat(1, ocvb.rColors.Length - 1, cv.MatType.CV_8UC3, ocvb.rColors.ToArray)
+        ogl.OpenGL.src = New cv.Mat(1, rColors.Length - 1, cv.MatType.CV_8UC3, rColors.ToArray)
         ogl.src = src
         ogl.Run(ocvb)
     End Sub

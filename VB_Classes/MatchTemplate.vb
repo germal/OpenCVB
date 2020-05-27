@@ -74,8 +74,8 @@ Public Class MatchTemplate_RowCorrelation
         ocvb.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim line1 = ocvb.ms_rng.Next(0, src.Height - 1)
-        Dim line2 = ocvb.ms_rng.Next(0, src.Height - 1)
+        Dim line1 = msRNG.Next(0, src.Height - 1)
+        Dim line2 = msRNG.Next(0, src.Height - 1)
 
         corr.sample1 = src.Row(line1)
         corr.sample2 = src.Row(line2 + 1)

@@ -994,8 +994,6 @@ Public Class OpenCVB
             TTtextData(i).Clear()
         Next
         BothFirstAndLastReady = False
-        OpenCVB.ocvb.fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
-        OpenCVB.ocvb.fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
         frameCount = 0 ' restart the count... 
         While 1
             ' wait until we have the latest camera data.

@@ -6,9 +6,9 @@ Public Class Palette_Color
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "blue", 0, 255, ocvb.ms_rng.Next(0, 255))
-        sliders.setupTrackBar2(ocvb, caller, "green", 0, 255, ocvb.ms_rng.Next(0, 255))
-        sliders.setupTrackBar3(ocvb, caller, "red", 0, 255, ocvb.ms_rng.Next(0, 255))
+        sliders.setupTrackBar1(ocvb, caller, "blue", 0, 255, msRNG.Next(0, 255))
+        sliders.setupTrackBar2(ocvb, caller, "green", 0, 255, msRNG.Next(0, 255))
+        sliders.setupTrackBar3(ocvb, caller, "red", 0, 255, msRNG.Next(0, 255))
         ocvb.desc = "Define a color using sliders."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -41,8 +41,8 @@ Public Class Palette_LinearPolar
             dst1.Row(i).SetTo(New cv.Scalar(c, c, c))
         Next
         Dim iFlag = getInterpolationRadioButtons(radio)
-        Static pt = New cv.Point2f(ocvb.ms_rng.Next(0, dst1.Cols - 1), ocvb.ms_rng.Next(0, dst1.Rows - 1))
-        Dim radius = sliders.TrackBar1.Value ' ocvb.ms_rng.next(0, dst1.Cols)
+        Static pt = New cv.Point2f(msRNG.Next(0, dst1.Cols - 1), msRNG.Next(0, dst1.Rows - 1))
+        Dim radius = sliders.TrackBar1.Value ' msRNG.next(0, dst1.Cols)
         dst2.SetTo(0)
         If iFlag = cv.InterpolationFlags.WarpInverseMap Then sliders.TrackBar1.Value = sliders.TrackBar1.Maximum
         cv.Cv2.LinearPolar(dst1, dst1, pt, radius, iFlag)
@@ -213,8 +213,8 @@ Public Class Palette_Gradient
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod frameModulo = 0 Then
             If standalone Then
-                color1 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
-                color2 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
+                color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             End If
             dst2.SetTo(color1)
             dst2(New cv.Rect(0, 0, dst2.Width, dst2.Height / 2)).SetTo(color2)
@@ -250,14 +250,14 @@ Public Class Palette_BuildGradientColorMap
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then If ocvb.frameCount Mod 100 Then Exit Sub
-        Dim color1 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
-        Dim color2 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
+        Dim color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+        Dim color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
         Dim gradCount = sliders.TrackBar1.Value
         Dim gradMat As New cv.Mat
         For i = 0 To gradCount - 1
             gradMat = colorTransition(color1, color2, src.Width)
             color2 = color1
-            color1 = New cv.Scalar(ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255), ocvb.ms_rng.Next(0, 255))
+            color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
         Next
         gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))

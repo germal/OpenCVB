@@ -21,8 +21,8 @@ Public Class InPaint_Basics
 
         If ocvb.frameCount Mod 100 Then Exit Sub
         src.CopyTo(dst1)
-        Dim p1 = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
-        Dim p2 = New cv.Point2f(ocvb.ms_rng.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), ocvb.ms_rng.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
+        Dim p1 = New cv.Point2f(msRNG.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), msRNG.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
+        Dim p2 = New cv.Point2f(msRNG.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), msRNG.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
         Dim thickness = sliders.TrackBar1.Value
         dst1.Line(p1, p2, New cv.Scalar(0, 0, 0), thickness, cv.LineTypes.AntiAlias)
         Dim mask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)

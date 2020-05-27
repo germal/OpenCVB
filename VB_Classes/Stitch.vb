@@ -16,8 +16,8 @@ Public Class Stitch_Basics
         Dim height = sliders.TrackBar3.Value
         dst1 = src.Clone()
         For i = 0 To imageCount - 1
-            Dim x1 = CInt(ocvb.ms_rng.next(0, src.Width - width))
-            Dim x2 = CInt(ocvb.ms_rng.next(0, src.Height - height))
+            Dim x1 = CInt(msRNG.next(0, src.Width - width))
+            Dim x2 = CInt(msRNG.next(0, src.Height - height))
             Dim rect = New cv.Rect(x1, x2, width, height)
             dst1.Rectangle(rect, cv.Scalar.Red, 2)
             mats.Add(src(rect).Clone())

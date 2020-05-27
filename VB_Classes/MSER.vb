@@ -140,7 +140,7 @@ Public Class MSER_TestSynthetic
             regionCount += 1
             Dim nextRegion = mser.region(i)
             For Each pt In nextRegion
-                img.Set(Of cv.Vec3b)(pt.Y, pt.X, ocvb.rColors(i Mod ocvb.rColors.Length))
+                img.Set(Of cv.Vec3b)(pt.Y, pt.X, rColors(i Mod rColors.Length))
                 pixels += 1
             Next
         Next

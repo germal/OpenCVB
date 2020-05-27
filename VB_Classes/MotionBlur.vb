@@ -134,8 +134,8 @@ Public Class MotionBlur_Deblur
         mblur.src = src
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
-            mblur.sliders.TrackBar1.Value = ocvb.ms_rng.Next(mblur.sliders.TrackBar1.Minimum, mblur.sliders.TrackBar1.Maximum)
-            mblur.sliders.TrackBar2.Value = ocvb.ms_rng.Next(mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum)
+            mblur.sliders.TrackBar1.Value = msRNG.Next(mblur.sliders.TrackBar1.Minimum, mblur.sliders.TrackBar1.Maximum)
+            mblur.sliders.TrackBar2.Value = msRNG.Next(mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum)
             mblur.Run(ocvb)
             mblur.showDirection = False
         Else

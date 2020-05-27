@@ -13,6 +13,8 @@ Public Class OptionsRadioButtons
             If ocvb.suppressOptions = False Then
                 radioOffset.X += offsetIncr
                 radioOffset.Y += offsetIncr
+                If radioOffset.X > 100 Then radioOffset.X = 0
+                If radioOffset.Y > 100 Then radioOffset.Y = 0
                 Me.Show()
             End If
         End If

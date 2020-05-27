@@ -24,8 +24,8 @@ Public Class Random_Points
         End If
         dst1.SetTo(0)
         For i = 0 To Points.Length - 1
-            Dim x = ocvb.ms_rng.Next(rangeRect.X, rangeRect.X + rangeRect.Width)
-            Dim y = ocvb.ms_rng.Next(rangeRect.Y, rangeRect.Y + rangeRect.Height)
+            Dim x = msRNG.Next(rangeRect.X, rangeRect.X + rangeRect.Width)
+            Dim y = msRNG.Next(rangeRect.Y, rangeRect.Y + rangeRect.Height)
             Points(i) = New cv.Point2f(x, y)
             Points2f(i) = New cv.Point2f(x, y)
             If standalone Or plotPoints = True Then cv.Cv2.Circle(dst1, Points(i), 3, cv.Scalar.Gray, -1, cv.LineTypes.AntiAlias, 0)
@@ -38,6 +38,7 @@ End Class
 
 Public Class Random_Shuffle
     Inherits ocvbClass
+    Dim myRNG As New cv.RNG
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Use randomShuffle to reorder an image."

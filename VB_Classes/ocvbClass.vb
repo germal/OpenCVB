@@ -2,6 +2,7 @@
 Public Class ocvbClass : Implements IDisposable
     Public caller As String
     Public check As New OptionsCheckbox
+    Public combo As New OptionsCombo
     Public radio As New OptionsRadioButtons
     Public radio1 As New OptionsRadioButtons
     Public sliders As New OptionsSliders
@@ -16,8 +17,10 @@ Public Class ocvbClass : Implements IDisposable
     Public dst2 As New cv.Mat
     Public label1 As String
     Public label2 As String
-    Public myRNG As New cv.RNG
+    Public msRNG As New System.Random
     Dim algorithm As Object
+    Public scalarColors(255) As cv.Scalar
+    Public rColors(255) As cv.Vec3b
     Public Sub setCaller(callerRaw As String)
         If callerRaw = "" Or callerRaw = Me.GetType.Name Then
             standalone = True
@@ -51,6 +54,10 @@ Public Class ocvbClass : Implements IDisposable
         dst2 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
         algorithm = Me
         label1 = Me.GetType.Name
+        For i = 0 To rColors.Length - 1
+            rColors(i) = New cv.Vec3b(msRNG.Next(100, 255), msRNG.Next(100, 255), msRNG.Next(100, 255))
+            scalarColors(i) = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)
+        Next
     End Sub
     Private Sub MakeSureImage8uC3(ByRef src As cv.Mat)
         If src.Type = cv.MatType.CV_32F Then
@@ -92,6 +99,7 @@ Public Class ocvbClass : Implements IDisposable
         sliders1.Dispose()
         sliders2.Dispose()
         sliders3.Dispose()
+        combo.Dispose()
         check.Dispose()
         radio1.Dispose()
         videoOptions.Dispose()

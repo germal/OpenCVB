@@ -42,7 +42,7 @@ Public Class Watershed_Basics
                         ElseIf idx <= 0 Or idx > componentCount Then
                             ' already marked zero...
                         Else
-                            dst1.Set(Of cv.Vec3b)(y, x, ocvb.rColors((idx - 1) Mod 255))
+                            dst1.Set(Of cv.Vec3b)(y, x, rColors((idx - 1) Mod 255))
                         End If
                     Next
                 Next

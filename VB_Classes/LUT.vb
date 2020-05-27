@@ -41,7 +41,7 @@ Public Class LUT_Color
         ocvb.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        paletteMap = ocvb.rColors
+        paletteMap = rColors
         src /= 64
         src *= 64
         Dim colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, paletteMap)

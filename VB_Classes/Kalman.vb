@@ -178,7 +178,7 @@ Public Class Kalman_RotatingPoint
         cv.Cv2.Line(dst1, statePt, measPt, New cv.Scalar(0, 0, 255), 3, cv.LineTypes.AntiAlias)
         cv.Cv2.Line(dst1, statePt, predictPt, New cv.Scalar(0, 255, 255), 3, cv.LineTypes.AntiAlias)
 
-        If ocvb.ms_rng.Next(0, 4) <> 0 Then kf.Correct(measurement)
+        If msRNG.Next(0, 4) <> 0 Then kf.Correct(measurement)
 
         cv.Cv2.Randn(processNoise, cv.Scalar.Black, cv.Scalar.All(Math.Sqrt(kf.ProcessNoiseCov.Get(Of Single)(0, 0))))
         kState = kf.TransitionMatrix * kState + processNoise

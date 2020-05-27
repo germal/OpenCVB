@@ -237,6 +237,12 @@
     <Compile Include="OpenCVGL.vb" />
     <Compile Include="OpenGL.vb" />
     <Compile Include="OpticalFlow.vb" />
+    <Compile Include="OptionsCombo.Designer.vb">
+      <DependentUpon>OptionsCombo.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsCombo.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="OptionsRecordPlayback.Designer.vb">
       <DependentUpon>OptionsRecordPlayback.vb</DependentUpon>
     </Compile>
@@ -337,6 +343,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsCheckbox.resx">
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptionsCombo.resx">
+      <DependentUpon>OptionsCombo.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsRecordPlayback.resx">
       <DependentUpon>OptionsRecordPlayback.vb</DependentUpon>

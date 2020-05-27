@@ -32,7 +32,7 @@ Public Class knn_Basics
 
         ReDim queryPoints(sliders.TrackBar1.Value)
         For i = 0 To queryPoints.Length - 1
-            queryPoints(i) = New cv.Point2f(ocvb.ms_rng.Next(0, dst1.Cols), ocvb.ms_rng.Next(0, dst1.Rows))
+            queryPoints(i) = New cv.Point2f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows))
         Next
         Dim bluePoints = sliders.TrackBar2.Value
 
@@ -157,7 +157,7 @@ Public Class knn_Cluster2D
             dst1.SetTo(0)
             totalClusters = 0
             closedRegions = 0
-            cluster(ocvb.rColors, dst1)
+            cluster(rColors, dst1)
             label1 = "knn clusters total=" + CStr(totalClusters) + " closedRegions=" + CStr(closedRegions)
         End If
     End Sub
@@ -189,11 +189,11 @@ Public Class knn_Point2d
             ReDim lastSet(sliders.TrackBar1.Value - 1)
             ReDim querySet(sliders.TrackBar1.Value - 1)
             For i = 0 To lastSet.Count - 1
-                lastSet(i) = New cv.Point2f(ocvb.ms_rng.Next(0, dst1.Cols), ocvb.ms_rng.Next(0, dst1.Rows))
+                lastSet(i) = New cv.Point2f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows))
             Next
 
             For i = 0 To querySet.Count - 1
-                querySet(i) = New cv.Point2f(ocvb.ms_rng.Next(0, dst1.Cols), ocvb.ms_rng.Next(0, dst1.Rows))
+                querySet(i) = New cv.Point2f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows))
             Next
         End If
         Dim responses(lastSet.Length - 1) As Int32
@@ -258,11 +258,11 @@ Public Class knn_Point3d
             ReDim lastSet(sliders.TrackBar1.Value - 1)
             ReDim querySet(lastSet.Count - 1)
             For i = 0 To lastSet.Count - 1
-                lastSet(i) = New cv.Point3f(ocvb.ms_rng.Next(0, dst1.Cols), ocvb.ms_rng.Next(0, dst1.Rows), ocvb.ms_rng.Next(0, maxDepth))
+                lastSet(i) = New cv.Point3f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows), msRNG.Next(0, maxDepth))
             Next
 
             For i = 0 To querySet.Count - 1
-                querySet(i) = New cv.Point3f(ocvb.ms_rng.Next(0, dst1.Cols), ocvb.ms_rng.Next(0, dst1.Rows), ocvb.ms_rng.Next(0, maxDepth))
+                querySet(i) = New cv.Point3f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows), msRNG.Next(0, maxDepth))
             Next
         End If
         Dim responses(lastSet.Length - 1) As Int32

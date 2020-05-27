@@ -41,7 +41,7 @@ Public Class Hull_Basics
         Dim w = src.Width - src.Width / pad
         Dim h = src.Height - src.Height / pad
         For i = 0 To Count - 1
-            points(i) = New cv.Point2f(ocvb.ms_rng.Next(src.Width / pad, w), ocvb.ms_rng.Next(src.Height / pad, h))
+            points(i) = New cv.Point2f(msRNG.Next(src.Width / pad, w), msRNG.Next(src.Height / pad, h))
         Next
         hull = cv.Cv2.ConvexHull(points, True)
 

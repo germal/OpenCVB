@@ -68,7 +68,7 @@ Public Class WarpAffine_Captcha
         For i = 0 To captchaLength - 1
             Dim charImage = New cv.Mat(charHeight, charWidth, cv.MatType.CV_8UC3, cv.Scalar.White)
             Dim c = characters(rng.Next(0, characters.Length - 1))
-            cv.Cv2.PutText(charImage, c, New cv.Point(10, charHeight - 10), ocvb.ms_rng.Next(1, 6), ocvb.ms_rng.Next(3, 4), ocvb.rColors(i), ocvb.ms_rng.Next(1, 5),
+            cv.Cv2.PutText(charImage, c, New cv.Point(10, charHeight - 10), msRNG.Next(1, 6), msRNG.Next(3, 4), rColors(i), msRNG.Next(1, 5),
                            cv.LineTypes.AntiAlias)
             transformPerspective(charImage)
             rotateImg(charImage, charImage)
