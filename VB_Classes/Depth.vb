@@ -1005,73 +1005,6 @@ End Class
 
 
 
-Public Class Depth_Decreasing
-    Inherits ocvbClass
-    Public Increasing As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Threshold in millimeters", 0, 1000, 8)
-
-        ocvb.desc = "Identify where depth is decreasing - coming toward the camera."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Dim depth32f = getDepth32f(ocvb)
-        Static lastDepth As cv.Mat = depth32f.Clone()
-
-        Dim thresholdCentimeters = sliders.TrackBar1.Value
-        Dim diff As New cv.Mat
-        If Increasing Then
-            cv.Cv2.Subtract(depth32f, lastDepth, diff)
-        Else
-            cv.Cv2.Subtract(lastDepth, depth32f, diff)
-        End If
-        dst1 = diff.Threshold(thresholdCentimeters, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        lastDepth = depth32f
-    End Sub
-End Class
-
-
-
-
-
-Public Class Depth_Increasing
-    Inherits ocvbClass
-    Dim depth As Depth_Decreasing
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        depth = New Depth_Decreasing(ocvb, caller)
-        depth.Increasing = True
-        ocvb.desc = "Identify where depth is increasing - retreating from the camera."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        depth.Run(ocvb)
-        dst1 = depth.dst1
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Depth_Punch
-    Inherits ocvbClass
-    Dim depth As Depth_Decreasing
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        depth = New Depth_Decreasing(ocvb, caller)
-        ocvb.desc = "Identify the largest blob in the depth decreasing output"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        depth.Run(ocvb)
-        dst1 = depth.dst1
-    End Sub
-End Class
-
-
-
-
-
 Public Class Depth_ColorMap
     Inherits ocvbClass
     Dim Palette As Palette_ColorMap
@@ -1181,3 +1114,113 @@ Public Class Depth_Stabilizer
         End If
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Depth_Decreasing
+    Inherits ocvbClass
+    Public Increasing As Boolean
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "Threshold in millimeters", 0, 1000, 8)
+
+        ocvb.desc = "Identify where depth is decreasing - coming toward the camera."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim depth32f = If(standalone, getDepth32f(ocvb), src)
+        Static lastDepth As cv.Mat = depth32f.Clone()
+        If lastDepth.Size <> depth32f.Size Then lastDepth = depth32f
+
+        Dim thresholdCentimeters = sliders.TrackBar1.Value
+        If Increasing Then
+            cv.Cv2.Subtract(depth32f, lastDepth, dst1)
+        Else
+            cv.Cv2.Subtract(lastDepth, depth32f, dst1)
+        End If
+        If standalone Then
+            dst1 = dst1.Threshold(thresholdCentimeters, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        Else
+            dst1 = dst1.Threshold(thresholdCentimeters, 0, cv.ThresholdTypes.Tozero)
+        End If
+        lastDepth = depth32f
+    End Sub
+End Class
+
+
+
+
+
+Public Class Depth_Increasing
+    Inherits ocvbClass
+    Public depth As Depth_Decreasing
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        depth = New Depth_Decreasing(ocvb, caller)
+        depth.Increasing = True
+        ocvb.desc = "Identify where depth is increasing - retreating from the camera."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        depth.src = src
+        depth.Run(ocvb)
+        dst1 = depth.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_Punch
+    Inherits ocvbClass
+    Dim depth As Depth_Decreasing
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        depth = New Depth_Decreasing(ocvb, caller)
+        ocvb.desc = "Identify the largest blob in the depth decreasing output"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        depth.Run(ocvb)
+        dst1 = depth.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_Smoothing
+    Inherits ocvbClass
+    Dim inc As Depth_Increasing
+    Dim dec As Depth_Decreasing
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        inc = New Depth_Increasing(ocvb, caller)
+        dec = New Depth_Decreasing(ocvb, caller)
+
+        ocvb.desc = "Use depth rate of change to smooth the depth values"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim depth32f = getDepth32f(ocvb)
+        If ocvb.drawRect.Width <> 0 Then depth32f = depth32f
+        Dim rect = If(ocvb.drawRect.Width, ocvb.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
+        inc.src = depth32f(rect)
+        inc.Run(ocvb)
+        dec.src = depth32f(rect)
+        dec.Run(ocvb)
+
+        dst1.SetTo(0)
+        Dim maskInc = inc.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary).Resize(depth32f.Size()).ConvertScaleAbs()
+        dst1.SetTo(cv.Scalar.Blue, maskInc)
+
+        Dim maskDec = dec.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary).Resize(depth32f.Size()).ConvertScaleAbs()
+        dst1.SetTo(cv.Scalar.Yellow, maskDec)
+    End Sub
+End Class
+
+
