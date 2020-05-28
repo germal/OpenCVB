@@ -5,8 +5,8 @@ Public Class OptionsSliders
         Me.SetDesktopLocation(appLocation.Left + slidersOffset.X, appLocation.Top + appLocation.Height + slidersOffset.Y)
         slidersOffset.X += offsetIncr
         slidersOffset.Y += offsetIncr
-        If slidersOffset.X > 100 Then slidersOffset.X = 0
-        If slidersOffset.Y > 100 Then slidersOffset.Y = 0
+        If slidersOffset.X > offsetMax Then slidersOffset.X = 0
+        If slidersOffset.Y > offsetMax Then slidersOffset.Y = 0
 
         Label1.Text = CStr(TrackBar1.Value)
         Label2.Text = CStr(TrackBar2.Value)

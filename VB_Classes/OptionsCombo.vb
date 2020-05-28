@@ -4,8 +4,8 @@ Public Class OptionsCombo
         Me.SetDesktopLocation(appLocation.Left + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
         radioOffset.X += offsetIncr
         radioOffset.Y += offsetIncr
-        If radioOffset.X > 100 Then radioOffset.X = 0
-        If radioOffset.Y > 100 Then radioOffset.Y = 0
+        If radioOffset.X > offsetMax Then radioOffset.X = 0
+        If radioOffset.Y > offsetMax Then radioOffset.Y = 0
     End Sub
     Public Sub Setup(ocvb As AlgorithmData, caller As String, label As String, comboList As List(Of String))
         Me.Text = caller + " Options"

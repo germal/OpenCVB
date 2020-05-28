@@ -4,9 +4,10 @@ Imports System.Drawing
 Module Algorithm_Module
     ' these are all global settings that are updated by individual algorithms.  
     Public appLocation As cv.Rect
-    Public offsetIncr = 25
-    Public slidersOffset As New cv.Point(10, 10)
-    Public radioOffset As New cv.Point(10, 10)
+    Public Const offsetIncr = 25
+    Public Const offsetMax = 150
+    Public slidersOffset As cv.Point
+    Public radioOffset As cv.Point
     Public PipeTaskIndex As Int32
     Public vtkTaskIndex As Int32
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
@@ -138,6 +139,8 @@ Public Class ActiveClass : Implements IDisposable
         Dim useRecordedData As Boolean
     End Structure
     Public Sub New(parms As algorithmParameters, _width As Integer, _height As Integer)
+        slidersOffset = New cv.Point(10, 10)
+        radioOffset = New cv.Point(10, 10)
         Randomize() ' just in case anyone uses VB.Net's Rnd
         UpdateHostLocation(parms.mainFormLoc.X, parms.mainFormLoc.Y, parms.mainFormHeight)
         ocvb = New AlgorithmData(parms, _width, _height)

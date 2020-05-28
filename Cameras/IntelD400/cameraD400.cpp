@@ -157,7 +157,7 @@ int* D400RGBDepth(D400Camera * tp)
 extern "C" __declspec(dllexport)
 int* D400RawDepth(D400Camera * tp)
 {
-	return (int*)tp->frames.get_depth_frame().get_data();
+	return (int*)tp->processedFrames.get_depth_frame().get_data();
 }
 
 extern "C" __declspec(dllexport)

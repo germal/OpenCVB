@@ -17,7 +17,7 @@ Public Class OptionsCheckbox
         Me.SetDesktopLocation(appLocation.Left + Me.Width + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
         radioOffset.X += offsetIncr
         radioOffset.Y += offsetIncr
-        If radioOffset.X > 100 Then radioOffset.X = 0
-        If radioOffset.Y > 100 Then radioOffset.Y = 0
+        If radioOffset.X > offsetMax Then radioOffset.X = 0
+        If radioOffset.Y > offsetMax Then radioOffset.Y = 0
     End Sub
 End Class
