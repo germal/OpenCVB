@@ -74,7 +74,8 @@ public:
 		float* depthImage = (float*)depth32f.data;
 		for (int i = 0; i < depth32f.cols * depth32f.rows; ++i)
 		{
-			if (auto d = (int)depthImage[i]) ++histogram[d];
+			auto d = (int)depthImage[i];
+			if (d >= 0 && d < 65536) ++histogram[d];
 		}
 		for (int i = 1; i < 256 * 256; i++)
 		{
@@ -91,7 +92,8 @@ public:
 		auto rgb = (unsigned char*)output.data;
 		for (int i = 0; i < output.cols * output.rows; i++)
 		{
-			if (int d = (int)depthImage[i]) // For valid depth values (depth > 0)
+			auto d = (int)depthImage[i];
+			if (d >= 0 && d < 65536) // For valid depth values (depth > 0)
 			{
 				auto t = histogram[d]; // Use the histogram entry (in the range of 0..256) to interpolate between nearColor and farColor
 				*rgb++ = ((256 - t) * nearColor[0] + t * farColor[0]) >> 8;

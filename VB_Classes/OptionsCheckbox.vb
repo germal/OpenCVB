@@ -10,16 +10,14 @@ Public Class OptionsCheckbox
             FlowLayoutPanel1.Controls.Add(Box(i))
         Next
         If ocvb.parms.ShowOptions Then
-            If ocvb.suppressOptions = False Then
-                radioOffset.X += offsetIncr
-                radioOffset.Y += offsetIncr
-                If radioOffset.X > 100 Then radioOffset.X = 0
-                If radioOffset.Y > 100 Then radioOffset.Y = 0
-                Me.Show()
-            End If
+            If ocvb.suppressOptions = False Then Me.Show()
         End If
     End Sub
     Private Sub OptionsCheckbox_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.SetDesktopLocation(appLocation.Left + Me.Width + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
+        radioOffset.X += offsetIncr
+        radioOffset.Y += offsetIncr
+        If radioOffset.X > 100 Then radioOffset.X = 0
+        If radioOffset.Y > 100 Then radioOffset.Y = 0
     End Sub
 End Class

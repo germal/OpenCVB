@@ -1194,20 +1194,30 @@ End Class
 
 
 
-Public Class Depth_Smoothing
+Public Class Depth_SmoothingData
     Inherits ocvbClass
-    Dim inc As Depth_Increasing
-    Dim dec As Depth_Decreasing
+    Public inc As Depth_Increasing
+    Public dec As Depth_Decreasing
+    Public depth32f As cv.Mat
+    Public trim As Depth_InRange
+    Public maskInc As cv.Mat
+    Public maskDec As cv.Mat
+    Dim flow As Font_FlowText
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         inc = New Depth_Increasing(ocvb, caller)
         dec = New Depth_Decreasing(ocvb, caller)
+        trim = New Depth_InRange(ocvb, caller)
+        flow = New Font_FlowText(ocvb, caller)
+        flow.result1or2 = RESULT2
 
-        ocvb.desc = "Use depth rate of change to smooth the depth values"
+        ocvb.desc = "Use depth rate of change to smooth the depth values beyond close range"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim depth32f = getDepth32f(ocvb)
-        If ocvb.drawRect.Width <> 0 Then depth32f = depth32f
+        trim.Run(ocvb)
+        depth32f = getDepth32f(ocvb)
+        depth32f.SetTo(0, trim.Mask)
+
         Dim rect = If(ocvb.drawRect.Width, ocvb.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
         inc.src = depth32f(rect)
         inc.Run(ocvb)
@@ -1215,12 +1225,57 @@ Public Class Depth_Smoothing
         dec.Run(ocvb)
 
         dst1.SetTo(0)
-        Dim maskInc = inc.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary).Resize(depth32f.Size()).ConvertScaleAbs()
-        dst1.SetTo(cv.Scalar.Blue, maskInc)
+        maskInc = inc.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        Dim tmp = maskInc.Resize(src.Size()).ConvertScaleAbs()
+        dst1.SetTo(cv.Scalar.Blue, tmp)
 
-        Dim maskDec = dec.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary).Resize(depth32f.Size()).ConvertScaleAbs()
-        dst1.SetTo(cv.Scalar.Yellow, maskDec)
+        maskDec = dec.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        tmp = maskDec.Resize(src.Size()).ConvertScaleAbs()
+        dst1.SetTo(cv.Scalar.Yellow, tmp)
+
+        Dim mask = inc.dst1.ConvertScaleAbs(255)
+
+        Dim minVal As Double, maxVal As Double
+        cv.Cv2.MinMaxLoc(inc.dst1, minVal, maxVal)
+
+        Dim mean As cv.Scalar, stdev As cv.Scalar
+        cv.Cv2.MeanStdDev(inc.dst1, mean, stdev, mask)
+        flow.msgs.Add("Blue pixels range from " + Format(minVal, "0") + " mm to " + Format(maxVal, "0") + " mm with mean = " +
+                      Format(mean.Item(0), "0") + " stdev = " + Format(stdev.Item(0), "0"))
+
+        cv.Cv2.MinMaxLoc(dec.dst1, minVal, maxVal)
+        flow.msgs.Add("Yellow pixels range from " + Format(minVal, "0") + " mm To " + Format(maxVal, "0") + " mm with mean = " +
+                      Format(mean.Item(0), "0") + " stdev = " + Format(stdev.Item(0), "0"))
+
+        flow.Run(ocvb)
     End Sub
 End Class
 
 
+
+
+
+
+'Public Class Depth_Smoothing1
+'    Inherits ocvbClass
+'    Dim smooth As Depth_SmoothingData
+'    Dim colorize As Depth_Colorizer_CPP
+'    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+'        setCaller(callerRaw)
+
+'        smooth = New Depth_SmoothingData(ocvb, caller)
+'        colorize = New Depth_Colorizer_CPP(ocvb, caller)
+
+'        ocvb.desc = "New class description"
+'    End Sub
+'    Public Sub Run(ocvb As AlgorithmData)
+'        smooth.Run(ocvb)
+'        Dim depth32f As New cv.Mat(src.Size(), cv.MatType.CV_32F)
+'        cv.Cv2.Subtract(smooth.depth32f, smooth.inc.dst1, depth32f, smooth.maskInc.ConvertScaleAbs(255))
+'        cv.Cv2.Subtract(depth32f, smooth.dec.dst1, depth32f, smooth.maskDec.ConvertScaleAbs(255))
+
+'        colorize.src = depth32f
+'        colorize.Run(ocvb)
+'        dst1 = colorize.dst1
+'    End Sub
+'End Class

@@ -5,8 +5,8 @@ Module Algorithm_Module
     ' these are all global settings that are updated by individual algorithms.  
     Public appLocation As cv.Rect
     Public offsetIncr = 25
-    Public slidersOffset As cv.Point
-    Public radioOffset As cv.Point
+    Public slidersOffset As New cv.Point(10, 10)
+    Public radioOffset As New cv.Point(10, 10)
     Public PipeTaskIndex As Int32
     Public vtkTaskIndex As Int32
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
@@ -144,8 +144,6 @@ Public Class ActiveClass : Implements IDisposable
         If LCase(parms.activeAlgorithm).EndsWith(".py") Then ocvb.PythonFileName = parms.activeAlgorithm
         ocvb.PythonExe = parms.PythonExe
         ocvb.parms = parms
-        slidersOffset = New cv.Point
-        radioOffset = New cv.Point
         colorRows = ocvb.color.Rows
         colorCols = ocvb.color.Cols
         ActiveAlgorithm = algoList.createAlgorithm(ocvb, parms.activeAlgorithm)

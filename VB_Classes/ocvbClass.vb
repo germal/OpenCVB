@@ -101,9 +101,9 @@ Public Class ocvbClass : Implements IDisposable
         sliders1.Dispose()
         sliders2.Dispose()
         sliders3.Dispose()
-        combo.Dispose()
         check.Dispose()
         radio1.Dispose()
         videoOptions.Dispose()
+        combo.Dispose()
     End Sub
 End Class

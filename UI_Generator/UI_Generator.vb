@@ -49,16 +49,18 @@ Module UI_GeneratorMain
                     Dim line = Trim(nextFile.ReadLine())
                     line = Replace(line, vbTab, "")
                     If line IsNot Nothing Then
-                        If Len(line) > 0 Then CodeLineCount += 1
-                        If LCase(line).StartsWith("public class") Then
-                            Dim split As String() = Regex.Split(line, "\W+")
-                            ' next line must be "Inherits ocvbClass"
-                            Dim line2 = Trim(nextFile.ReadLine())
-                            CodeLineCount += 1
-                            If line2.StartsWith(vbTab) Then line2 = Mid(line2, 2)
-                            If LCase(line2) = "inherits ocvbclass" Then className = split(2) ' public class <classname>
+                        If line.Substring(0, 1) <> "'" Then
+                            If Len(line) > 0 Then CodeLineCount += 1
+                            If LCase(line).StartsWith("public class") Then
+                                Dim split As String() = Regex.Split(line, "\W+")
+                                ' next line must be "Inherits ocvbClass"
+                                Dim line2 = Trim(nextFile.ReadLine())
+                                CodeLineCount += 1
+                                If line2.StartsWith(vbTab) Then line2 = Mid(line2, 2)
+                                If LCase(line2) = "inherits ocvbclass" Then className = split(2) ' public class <classname>
+                            End If
+                            If LCase(line).StartsWith("public sub new(ocvb as algorithmdata") Then functionNames.Add(className)
                         End If
-                        If LCase(line).StartsWith("public sub new(ocvb as algorithmdata") Then functionNames.Add(className)
                     End If
                 End While
             End If

@@ -3,6 +3,11 @@
 Public Class OptionsSliders
     Private Sub optionsSliders_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.SetDesktopLocation(appLocation.Left + slidersOffset.X, appLocation.Top + appLocation.Height + slidersOffset.Y)
+        slidersOffset.X += offsetIncr
+        slidersOffset.Y += offsetIncr
+        If slidersOffset.X > 100 Then slidersOffset.X = 0
+        If slidersOffset.Y > 100 Then slidersOffset.Y = 0
+
         Label1.Text = CStr(TrackBar1.Value)
         Label2.Text = CStr(TrackBar2.Value)
         Label3.Text = CStr(TrackBar3.Value)
@@ -16,13 +21,7 @@ Public Class OptionsSliders
         GroupBox1.Visible = True
         Me.Text = caller + " Options"
         If ocvb.parms.ShowOptions Then
-            If ocvb.suppressOptions = False Then
-                slidersOffset.X += offsetIncr
-                slidersOffset.Y += offsetIncr
-                If slidersOffset.X > 100 Then slidersOffset.X = 0
-                If slidersOffset.Y > 100 Then slidersOffset.Y = 0
-                Me.Show()
-            End If
+            If ocvb.suppressOptions = False Then Me.Show()
         End If
     End Sub
     Public Sub setupTrackBar2(ocvb As AlgorithmData, caller As String, label As String, min As Integer, max As Integer, value As Integer)

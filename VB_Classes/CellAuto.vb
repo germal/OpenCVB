@@ -95,6 +95,7 @@ End Class
 
 
 
+' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
 Public Class CellAuto_LifePopulation
     Inherits ocvbClass
     Dim plot As Plot_OverTime
@@ -125,11 +126,37 @@ End Class
 
 
 
+' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
 Public Class CellAuto_Basics
     Inherits ocvbClass
-    Dim inputCombo = "111,110,101,100,011,010,001,000"
-    Dim input(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
-    Dim i18 As New List(Of String)
+    Public i18 As New List(Of String)
+    Public Function createCells(outStr As String) As cv.Mat
+        Dim inputCombo = "111,110,101,100,011,010,001,000"
+        Dim input(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
+
+        Dim outcomes(8 - 1) As Byte
+        For i = 0 To outcomes.Length - 1
+            outcomes(i) = Integer.Parse(outStr.Substring(i, 1))
+        Next
+
+        Dim dst = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst.Set(Of Byte)(0, dst.Width / 2, 1)
+        For y = 0 To dst.Height - 2
+            For x = 1 To dst.Width - 2
+                Dim x1 = dst.Get(Of Byte)(y, x - 1)
+                Dim x2 = dst.Get(Of Byte)(y, x)
+                Dim x3 = dst.Get(Of Byte)(y, x + 1)
+                For i = 0 To input.Length - 1
+                    If x1 = input(i, 0) And x2 = input(i, 1) And x3 = input(i, 2) Then
+                        dst.Set(Of Byte)(y + 1, x, outcomes(i))
+                        Exit For
+                    End If
+                Next
+            Next
+        Next
+        Return dst.ConvertScaleAbs(255)
+    End Function
+
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         i18.Add("00011110 Rule 30 (chaotic)")
@@ -152,40 +179,95 @@ Public Class CellAuto_Basics
         i18.Add("11011110 Rule 222")
         i18.Add("11111010 Rule 250")
 
+        Dim inputCombo = "111,110,101,100,011,010,001,000"
+        Dim label = "The 18 most interesting automata from the first 256 in 'New Kind of Science'" + vbCrLf + "The input combinations are: " + inputCombo
+        combo.Setup(ocvb, caller, label + vbCrLf + "output below:", i18)
+
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Rotate through the different rules"
         check.Box(0).Checked = True
 
-        Dim label = "The 18 most interesting automata from the first 256 in 'New Kind of Science'" + vbCrLf + "The input combinations are: " + inputCombo
-        combo.Setup(ocvb, caller, label + vbCrLf + "output below:", i18)
         ocvb.desc = "Visualize the 30 interesting examples from the first 256 in 'New Kind of Science'"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim outcomes(8 - 1) As Byte
-        Dim outStr = combo.Box.Text
-        For i = 0 To outcomes.Length - 1
-            outcomes(i) = Integer.Parse(outStr.Substring(i, 1))
-        Next
-        Dim dst = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
-        dst.Set(Of Byte)(0, dst.Width / 2, 1)
-        For y = 0 To dst.Height - 2
-            For x = 1 To dst.Width - 2
-                Dim x1 = dst.Get(Of Byte)(y, x - 1)
-                Dim x2 = dst.Get(Of Byte)(y, x)
-                Dim x3 = dst.Get(Of Byte)(y, x + 1)
-                For i = 0 To input.Length - 1
-                    If x1 = input(i, 0) And x2 = input(i, 1) And x3 = input(i, 2) Then
-                        dst.Set(Of Byte)(y + 1, x, outcomes(i))
-                        Exit For
-                    End If
-                Next
-            Next
-        Next
-        If ocvb.frameCount Mod 2 = 0 Then dst1 = dst.ConvertScaleAbs(255) Else dst2 = dst.ConvertScaleAbs(255)
-        If ocvb.frameCount Mod 2 = 0 Then label1 = combo.Box.Text Else label2 = combo.Box.Text
+        If ocvb.frameCount Mod 2 Then dst2 = createCells(combo.Box.Text) Else dst1 = createCells(combo.Box.Text)
         If check.Box(0).Checked Then
             Dim index = combo.Box.SelectedIndex
             If index + 1 < i18.Count - 1 Then combo.Box.SelectedIndex += 1 Else combo.Box.SelectedIndex = 0
         End If
+    End Sub
+End Class
+
+
+' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
+Public Class CellAuto_Basics_MP
+    Inherits ocvbClass
+    Dim cell As CellAuto_Basics
+    Dim i18 As New List(Of String)
+    Dim i18Index As Integer
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+
+        cell = New CellAuto_Basics(ocvb, caller)
+        i18 = cell.i18
+
+        ocvb.desc = "Multi-threaded version of CellAuto_Basics"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Parallel.For(0, 2,
+          Sub(i)
+              Select Case i
+                  Case 0
+                      label1 = i18.ElementAt(i18Index)
+                      dst1 = cell.createCells(label1)
+                  Case 1
+                      If i18Index + 1 < i18.Count - 1 Then i18Index += 1 Else i18Index = 0
+                      label2 = i18.ElementAt(i18Index)
+                      dst2 = cell.createCells(label2)
+              End Select
+          End Sub)
+    End Sub
+End Class
+
+
+
+
+' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
+Public Class CellAuto_All256
+    Inherits ocvbClass
+    Dim cell As CellAuto_Basics
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        cell = New CellAuto_Basics(ocvb, caller)
+        cell.combo.Visible = False ' won't need this...
+
+        sliders.setupTrackBar1(ocvb, caller, "Current Rule", 0, 255, 0)
+        ocvb.desc = "Run through all 256 combinations of outcomes"
+    End Sub
+    Private Function createOutcome(val As Integer) As String
+        Dim outstr As String = ""
+        For i = 0 To 8 - 1
+            outstr = CStr(val Mod 2) + outstr
+            val = Math.Floor(val / 2)
+        Next
+        Return outstr
+    End Function
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim index = sliders.TrackBar1.Value
+        Dim mtOn = cell.check.Box(0).Checked
+        Parallel.For(0, 2,
+          Sub(i)
+              Select Case i
+                  Case 0
+                      label1 = createOutcome(index) + " index = " + CStr(index)
+                      dst1 = cell.createCells(label1)
+                  Case 1
+                      If mtOn = False Then Exit Sub
+                      If index < 255 Then index += 1 Else index = 0
+                      label2 = createOutcome(index) + " index = " + CStr(index)
+                      dst2 = cell.createCells(label2)
+              End Select
+          End Sub)
+        sliders.TrackBar1.Value = index
     End Sub
 End Class
