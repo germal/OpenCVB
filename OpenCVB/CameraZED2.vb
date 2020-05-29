@@ -166,12 +166,12 @@ Public Class CameraZED2
         SyncLock bufferLock
             Zed2GetData(cPtr)
 
-            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, Zed2Color(cPtr))
-            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, Zed2RGBDepth(cPtr))
-            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, Zed2Depth16(cPtr))
-            leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2LeftView(cPtr))
-            rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2RightView(cPtr))
-            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, Zed2PointCloud(cPtr))
+            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, Zed2Color(cPtr)).Clone()
+            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, Zed2RGBDepth(cPtr)).Clone()
+            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, Zed2Depth16(cPtr)).Clone()
+            leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2LeftView(cPtr)).Clone()
+            rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2RightView(cPtr)).Clone()
+            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone()
 
             Dim imuFrame = Zed2GetPoseData(cPtr)
             Dim acc = Zed2Acceleration(cPtr)
