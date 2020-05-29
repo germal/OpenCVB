@@ -100,8 +100,14 @@ Public Class Transform_Gravity
     Dim imu As IMU_GVector
     Public vertSplit() As cv.Mat
     Public xyz(0) As Single
+    Dim smooth As Depth_SmoothingMat
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
+        smooth = New Depth_SmoothingMat(ocvb, caller)
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Apply smoothing to depth data"
+        check.Box(0).Checked = True
+
         imu = New IMU_GVector(ocvb, caller)
         ocvb.desc = "Transform the pointcloud with the gravity vector"
     End Sub
@@ -116,6 +122,14 @@ Public Class Transform_Gravity
         ' normally it is not desirable to resize the point cloud but it can be here because we are building a histogram.
         Dim pc = ocvb.pointCloud.Resize(ocvb.color.Size())
         Dim split() = cv.Cv2.Split(pc)
+        If check.Box(0).Checked Then
+            smooth.inputInMeters = True
+            smooth.src = split(2)
+            smooth.Run(ocvb)
+            dst1 = smooth.dst1
+            cv.Cv2.Add(split(2), dst1, split(2))
+            label1 = smooth.label1
+        End If
         vertSplit = split
 
         Dim zCos = Math.Cos(imu.angleZ)
@@ -144,8 +158,9 @@ Public Class Transform_Gravity
 
         cv.Cv2.Merge(vertSplit, pc)
         If xyz.Length <> pc.Total * 3 Then ReDim xyz(pc.Total * 3 - 1)
-        Marshal.Copy(pc.Data, xyz, 0, xyz.Length) ' why copy it?  To avoid memory leak in parallel for's.
+        Marshal.Copy(pc.Data, xyz, 0, xyz.Length) ' why copy it?  To avoid memory leak in parallel for's.  Not sure...
 
-        If standalone Then ocvb.putText(New ActiveClass.TrueType("Pointcloud is now oriented toward gravity.", 10, 125))
+        If standalone Then ocvb.putText(New ActiveClass.TrueType("Pointcloud is now oriented toward gravity " +
+                                        If(check.Box(0).Checked, "using smoothed depth data.", "."), 10, 125,,, RESULT2))
     End Sub
 End Class

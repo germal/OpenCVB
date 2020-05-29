@@ -142,7 +142,7 @@ Public Class BGSubtract_Depth_MT
         setCaller(callerRaw)
         bgsub = New BGSubtract_Basics_MT(ocvb, caller)
         shadow = New Depth_Holes(ocvb, caller)
-        ocvb.desc = "Detect Motion in the depth image - more work needed"
+        ocvb.desc = "Detect Motion in the depth image - needs more work"
         label1 = "Depth data input"
         label2 = "Accumulated depth image"
     End Sub

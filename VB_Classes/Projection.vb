@@ -227,83 +227,6 @@ End Class
 
 
 
-
-
-Public Class Projection_Gravity
-    Inherits ocvbClass
-    Dim gCloud As Transform_Gravity
-    Dim grid As Thread_Grid
-    Public cMats As Projection_ColorizeMat
-    Public topView As cv.Mat
-    Public sideView As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        gCloud = New Transform_Gravity(ocvb, caller)
-        grid = New Thread_Grid(ocvb, caller)
-        grid.sliders.TrackBar1.Value = 64
-        grid.sliders.TrackBar2.Value = 40
-
-        cMats = New Projection_ColorizeMat(ocvb, caller)
-        cMats.Run(ocvb)
-
-        label1 = "View looking up from under floor - Red Dot is camera"
-        label2 = "Side View - Red Dot is camera"
-        ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        grid.Run(ocvb)
-        gCloud.Run(ocvb)
-
-        topView = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
-        sideView = topView.Clone()
-
-        Dim white = New cv.Vec3b(255, 255, 255)
-        Dim maxZ = cMats.sliders.TrackBar1.Value / 1000
-        Dim w = CSng(src.Width)
-        Dim h = CSng(src.Height)
-        Dim dFactor = h / maxZ ' the scale in the x-Direction.
-        Dim zHalf As Single = maxZ / 2
-
-        Parallel.For(0, CInt(gCloud.xyz.Length / 3),
-            Sub(i)
-                Dim d = gCloud.xyz(i * 3 + 2)
-                If d > 0 And d < maxZ Then
-                    Dim t = CInt(255 * d / maxZ)
-
-                    Dim dPixel = dFactor * d
-                    Dim fx = gCloud.xyz(i * 3)
-                    If fx > -zHalf And fx < zHalf Then
-                        fx = dFactor * (zHalf + fx)
-                        Dim count = topView.Get(Of Byte)(CInt(h - dPixel), CInt(cMats.shift + fx)) + 1
-                        topView.Set(Of Byte)(CInt(h - dPixel), CInt(cMats.shift + fx), If(count < 255, count, 255))
-                    End If
-
-                    Dim fy = gCloud.xyz(i * 3 + 1)
-                    If fy > -zHalf And fy < zHalf Then
-                        fy = CInt(dFactor * (zHalf + fy))
-                        Dim count = sideView.Get(Of Byte)(fy, CInt(cMats.shift + dPixel)) + 1
-                        sideView.Set(Of Byte)(fy, CInt(cMats.shift + dPixel), If(count < 255, count, 255))
-                    End If
-                End If
-            End Sub)
-
-        If standalone Then
-            Dim threshold = cMats.sliders.TrackBar2.Value
-            Dim topMask = topView.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-            Dim sideMask = sideView.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-
-            dst1 = cMats.CameraLocationBot(topMask)
-            dst2 = cMats.CameraLocationLeft(sideMask)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Projection_Gravity_CPP
     Inherits ocvbClass
     Dim gCloud As Transform_Gravity
@@ -381,7 +304,7 @@ Public Class Projection_Wall
         dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
 
         label1 = "Top View: walls in red"
-        ocvb.desc = "Use the top down view to detect walls with a line detector algorithm - more work needed"
+        ocvb.desc = "Use the top down view to detect walls with a line detector algorithm - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         objects.src = src
@@ -422,7 +345,7 @@ Public Class Projection_Objects
         flood.sliders.TrackBar1.Value = 100
 
         label1 = "Isolated objects - Red dot is camera"
-        ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings) - more work needed"
+        ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings) - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = T265Camera Then
@@ -441,8 +364,6 @@ Public Class Projection_Objects
         maxZ = gravity.sliders.TrackBar1.Value / 1000
         Dim mmPerPixel = maxZ * 1000 / src.Height
         Dim maxCount = Math.Min(flood.objectRects.Count, 10)
-        'dst1 = cMats.CameraLocationBot(objects.gravity.topMask)
-        'dst2 = cMats.CameraLocationLeft(objects.gravity.sideMask)
         For i = 0 To maxCount - 1
             Dim rect = flood.objectRects(i)
             dst2.Rectangle(rect, cv.Scalar.White, 1)
@@ -476,3 +397,78 @@ Public Class Projection_Backprojection
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class Projection_Gravity
+    Inherits ocvbClass
+    Dim gCloud As Transform_Gravity
+    Dim grid As Thread_Grid
+    Public cMats As Projection_ColorizeMat
+    Public topView As cv.Mat
+    Public sideView As cv.Mat
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        gCloud = New Transform_Gravity(ocvb, caller)
+        grid = New Thread_Grid(ocvb, caller)
+        grid.sliders.TrackBar1.Value = 64
+        grid.sliders.TrackBar2.Value = 40
+
+        cMats = New Projection_ColorizeMat(ocvb, caller)
+        cMats.Run(ocvb)
+
+        label1 = "View looking up from under floor - Red Dot is camera"
+        label2 = "Side View - Red Dot is camera"
+        ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        grid.Run(ocvb)
+        gCloud.Run(ocvb)
+
+        topView = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
+        sideView = topView.Clone()
+
+        Dim white = New cv.Vec3b(255, 255, 255)
+        Dim maxZ = cMats.sliders.TrackBar1.Value / 1000
+        Dim w = CSng(src.Width)
+        Dim h = CSng(src.Height)
+        Dim dFactor = h / maxZ ' the scale in the x-Direction.
+        Dim zHalf As Single = maxZ / 2
+
+        Parallel.For(0, CInt(gCloud.xyz.Length / 3),
+            Sub(i)
+                Dim d = gCloud.xyz(i * 3 + 2)
+                If d > 0 And d < maxZ Then
+                    Dim t = CInt(255 * d / maxZ)
+
+                    Dim dPixel = dFactor * d
+                    Dim fx = gCloud.xyz(i * 3)
+                    If fx > -zHalf And fx < zHalf Then
+                        fx = dFactor * (zHalf + fx)
+                        Dim count = topView.Get(Of Byte)(CInt(h - dPixel), CInt(cMats.shift + fx)) + 1
+                        topView.Set(Of Byte)(CInt(h - dPixel), CInt(cMats.shift + fx), If(count < 255, count, 255))
+                    End If
+
+                    Dim fy = gCloud.xyz(i * 3 + 1)
+                    If fy > -zHalf And fy < zHalf Then
+                        fy = CInt(dFactor * (zHalf + fy))
+                        Dim count = sideView.Get(Of Byte)(fy, CInt(cMats.shift + dPixel)) + 1
+                        sideView.Set(Of Byte)(fy, CInt(cMats.shift + dPixel), If(count < 255, count, 255))
+                    End If
+                End If
+            End Sub)
+
+        If standalone Then
+            Dim threshold = cMats.sliders.TrackBar2.Value
+            Dim topMask = topView.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+            Dim sideMask = sideView.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+
+            dst1 = cMats.CameraLocationBot(topMask)
+            dst2 = cMats.CameraLocationLeft(sideMask)
+        End If
+    End Sub
+End Class

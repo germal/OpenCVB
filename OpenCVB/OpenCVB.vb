@@ -1051,6 +1051,7 @@ Public Class OpenCVB
                     GrabRectangleData = False
                     Dim ratio = camPic(0).Width / OpenCVB.ocvb.color.Width ' relative size of displayed image and algorithm size image.
                     OpenCVB.ocvb.drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
+                    If OpenCVB.ocvb.drawRect.Width <= 2 Then OpenCVB.ocvb.drawRect.Width = 0 ' too small?
                     BothFirstAndLastReady = False
                 End If
 

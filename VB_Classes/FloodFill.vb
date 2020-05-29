@@ -343,7 +343,7 @@ Public Class FloodFill_Projection
         sliders.setupTrackBar4(ocvb, caller, "Step Size", 1, ocvb.color.cols / 2, 20)
 
         label1 = "Input image to floodfill"
-        ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - more work needed"
+        ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         minFloodSize = sliders.TrackBar1.Value

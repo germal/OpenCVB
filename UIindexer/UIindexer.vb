@@ -80,7 +80,7 @@ Module IndexMain
                 If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
                 ' when the classification source is ocvb.desc, it may be there twice in the code accidently.
                 If lcaseLine.Contains("painterly") And Painterly.ContainsKey(classname) = False Then Painterly.Add(classname, classname)
-                If lcaseLine.Contains("more work needed") And MoreWork.ContainsKey(classname) = False Then MoreWork.Add(classname, classname)
+                If lcaseLine.Contains("needs more work") And MoreWork.ContainsKey(classname) = False Then MoreWork.Add(classname, classname)
                 If lcaseLine.Contains("tracker algorithm") And Trackers.ContainsKey(classname) = False Then Trackers.Add(classname, classname)
                 If LCase(line).StartsWith("public class") Then
                     Dim split As String() = Regex.Split(line, "\W+")

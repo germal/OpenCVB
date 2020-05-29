@@ -37,10 +37,10 @@ Public Class ocvbClass : Implements IDisposable
         If r.Height < 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X > dst1.Width Then r.X = dst1.Width
-        If r.Y > dst1.Height Then r.Y = dst1.Height
-        If r.X + r.Width > dst1.Width Then r.Width = dst1.Width - r.X
-        If r.Y + r.Height > dst1.Height Then r.Height = dst1.Height - r.Y
+        If r.X > src.Width Then r.X = src.Width
+        If r.Y > src.Height Then r.Y = src.Height
+        If r.X + r.Width > src.Width Then r.Width = src.Width - r.X
+        If r.Y + r.Height > src.Height Then r.Height = src.Height - r.Y
         Return r
     End Function
     Public Function validatePoint2f(p As cv.Point2f) As cv.Point2f

@@ -665,39 +665,6 @@ End Class
 
 
 
-Public Class Depth_InRange
-    Inherits ocvbClass
-    Public Mask As New cv.Mat
-    Public zeroMask As New cv.Mat
-    Public depth32f As New cv.Mat
-    Public minDepth As Double
-    Public maxDepth As Double
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "InRange Min Depth", 200, 1000, 200)
-        sliders.setupTrackBar2(ocvb, caller, "InRange Max Depth", 200, 10000, 1400)
-        label1 = "Depth values that are in-range"
-        label2 = "Depth values that are out of range (and < 8m)"
-        ocvb.desc = "Show depth with OpenCV using varying min and max depths."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If sliders.TrackBar1.Value >= sliders.TrackBar2.Value Then sliders.TrackBar2.Value = sliders.TrackBar1.Value + 1
-        minDepth = cv.Scalar.All(sliders.TrackBar1.Value)
-        maxDepth = cv.Scalar.All(sliders.TrackBar2.Value)
-        depth32f = getDepth32f(ocvb)
-        cv.Cv2.InRange(depth32f, minDepth, maxDepth, Mask)
-        cv.Cv2.BitwiseNot(Mask, zeroMask)
-        dst1 = depth32f.Clone.SetTo(0, zeroMask)
-        dst2 = depth32f.Clone.SetTo(0, Mask)
-        dst2 = dst2.Threshold(8000, 8000, cv.ThresholdTypes.Trunc) ' the data beyond 8 meters is suspect and will distort the image output
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Depth_ColorizerFastFade_CPP
     Inherits ocvbClass
     Public trim As Depth_InRange
@@ -1195,19 +1162,62 @@ End Class
 
 
 
+Public Class Depth_InRange
+    Inherits ocvbClass
+    Public Mask As New cv.Mat
+    Public zeroMask As New cv.Mat
+    Public depth32f As New cv.Mat
+    Public minDepth As Double
+    Public maxDepth As Double
+    Public inputInMeters As Boolean
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+        sliders.setupTrackBar1(ocvb, caller, "InRange Min Depth", 200, 1000, 200)
+        sliders.setupTrackBar2(ocvb, caller, "InRange Max Depth", 200, 10000, 1400)
+        label1 = "Depth values that are in-range"
+        label2 = "Depth values that are out of range (and < 8m)"
+        ocvb.desc = "Show depth with OpenCV using varying min and max depths."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If sliders.TrackBar1.Value >= sliders.TrackBar2.Value Then sliders.TrackBar2.Value = sliders.TrackBar1.Value + 1
+        minDepth = cv.Scalar.All(sliders.TrackBar1.Value)
+        maxDepth = cv.Scalar.All(sliders.TrackBar2.Value)
+        If inputInMeters Then
+            minDepth /= 1000
+            maxDepth /= 1000
+        End If
+        If src.Type = cv.MatType.CV_32F Then depth32f = src Else depth32f = getDepth32f(ocvb)
+        cv.Cv2.InRange(depth32f, minDepth, maxDepth, Mask)
+        cv.Cv2.BitwiseNot(Mask, zeroMask)
+        dst1 = depth32f.Clone.SetTo(0, zeroMask)
+        dst2 = depth32f.Clone.SetTo(0, Mask)
+        dst2 = dst2.Threshold(8000, 8000, cv.ThresholdTypes.Trunc) ' the data beyond 8 meters is suspect and will distort the image output
+    End Sub
+End Class
+
+
+
+
+
+
 
 Public Class Depth_SmoothingMat
     Inherits ocvbClass
     Public trim As Depth_InRange
-    Public smoothingMat As cv.Mat
+    Public inputInMeters As Boolean
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         trim = New Depth_InRange(ocvb, caller)
 
-        sliders.setupTrackBar1(ocvb, caller, "Threshold in millimeters", 0, 1000, 100)
+        sliders.setupTrackBar1(ocvb, caller, "Threshold in millimeters", 1, 1000, 100)
+        label2 = "Depth pixels after smoothing"
         ocvb.desc = "Use depth rate of change to smooth the depth values beyond close range"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If standalone Then src = getDepth32f(ocvb)
+        trim.inputInMeters = inputInMeters
+        Dim rect = If(ocvb.drawRect.Width <> 0, ocvb.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
+        trim.src = src(rect)
         trim.Run(ocvb)
         Static lastDepth = trim.dst2 ' the far depth needs to be smoothed
         If lastDepth.Size <> trim.dst2.Size Then lastDepth = trim.dst2
@@ -1215,12 +1225,44 @@ Public Class Depth_SmoothingMat
         dst1 = New cv.Mat
         cv.Cv2.Subtract(lastDepth, trim.dst2, dst1)
 
-        Dim mmThreshold = sliders.TrackBar1.Value
+        Dim mmThreshold = CSng(sliders.TrackBar1.Value)
+        If inputInMeters Then mmThreshold /= 1000
         dst1 = dst1.Threshold(mmThreshold, 0, cv.ThresholdTypes.TozeroInv)
         dst1 = dst1.Threshold(-mmThreshold, 0, cv.ThresholdTypes.Tozero)
-        dst2 = dst1.ConvertScaleAbs(255)
-        smoothingMat = dst1
+        cv.Cv2.Add(trim.dst2, dst1, dst2)
         lastDepth = trim.dst2
+        label1 = "Smoothing Mat: range from -" + CStr(sliders.TrackBar1.Value) + " to +" + CStr(sliders.TrackBar1.Value)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Depth_Smoothing
+    Inherits ocvbClass
+    Dim smooth As Depth_SmoothingMat
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+
+        smooth = New Depth_SmoothingMat(ocvb, caller)
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Smooth the dst2 output "
+        check.Box(0).Checked = True
+
+        ocvb.desc = "This attempt to get the depth data to 'calm' down (for the D435i) is not working well enough to be useful - needs more work"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        smooth.src = getDepth32f(ocvb)
+        smooth.Run(ocvb)
+        dst1 = smooth.dst1
+        If check.Box(0).Checked Then
+            cv.Cv2.Add(smooth.dst2, dst1, dst2)
+            label2 = "Depth with smoothing applied"
+        Else
+            dst2 = smooth.dst2
+            label2 = "Depth without smoothing "
+        End If
     End Sub
 End Class
 
