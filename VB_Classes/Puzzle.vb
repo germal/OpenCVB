@@ -309,7 +309,7 @@ Public Class Puzzle_Solver
         End If
         If check.Box(0).Checked Or ocvb.parms.testAllRunning Then
             Dim factor = 1
-            If ocvb.parms.lowResolution Then factor = 2
+            If ocvb.parms.resolution = resMed Then factor = 2
             If radio.check(0).Checked Then
                 puzzle.grid.sliders.TrackBar1.Value = 256 / factor
                 puzzle.grid.sliders.TrackBar2.Value = 180 / factor

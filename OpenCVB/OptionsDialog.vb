@@ -6,6 +6,10 @@ Public Class OptionsDialog
     Public Const T265Camera As Int32 = 2 ' Must be defined in VB_Classes.vb the same way!
     Public Const StereoLabsZED2 As Int32 = 3 ' Must be defined in VB_Classes.vb the same way!
     Public Const MyntD1000 As Int32 = 4 ' Must be defined in VB_Classes.vb the same way!
+    Public Const resLow = 0 ' Must be defined in OptionsDialog.vb the same way!
+    Public Const resMed = 1 ' Must be defined in OptionsDialog.vb the same way!
+    Public Const resHigh = 2 ' Must be defined in OptionsDialog.vb the same way!
+
     Public cameraDeviceCount(MyntD1000) As Int32
     Public cameraRadioButton(MyntD1000) As RadioButton
     Public cameraTotalCount As Integer = 0

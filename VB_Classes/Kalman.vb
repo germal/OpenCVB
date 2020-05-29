@@ -201,7 +201,7 @@ Public Class Kalman_MousePredict
         ReDim kalman.input(1)
         ReDim kalman.output(1)
 
-        If ocvb.parms.lowResolution = False Then locMultiplier = 2 ' twice the size in both dimensions.
+        If ocvb.parms.resolution = resHigh Then locMultiplier = 2 ' twice the size in both dimensions.
         label1 = "Red is real mouse, white is prediction"
         ocvb.desc = "Use kalman filter to predict the next mouse location."
     End Sub

@@ -50,7 +50,7 @@ Public Class Resize_After8uc3
     Public Sub Run(ocvb As AlgorithmData)
         Dim resizeFlag = getInterpolationRadioButtons(radio)
         Dim newSize = src.Size()
-        If ocvb.parms.lowResolution = False Then newSize = New cv.Size(src.Height / 2, src.Width / 2)
+        If ocvb.parms.resolution = resHigh Then newSize = New cv.Size(src.Height / 2, src.Width / 2)
 
         Dim depth32f As New cv.Mat
         ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)

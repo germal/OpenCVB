@@ -156,7 +156,6 @@ Public Class Python_SurfaceBlit
         PipeTaskIndex += 1
 
         ' this Python script assumes that fast processing is off - the pointcloud is being used and cannot be resized.
-        ' ocvb.parms.lowResolution = False
         ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
         memMap = New Python_MemMap(ocvb, caller)
 

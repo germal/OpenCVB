@@ -37,7 +37,7 @@ Public Class Annealing_Basics_CPP
             dst1.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
         Dim fontSize = 1.5
-        If ocvb.parms.lowResolution Then fontSize = 1.0
+        If ocvb.parms.resolution = resMed Then fontSize = 1.0
         cv.Cv2.PutText(dst1, "Energy", New cv.Point(10, 100), cv.HersheyFonts.HersheyComplex, fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
         cv.Cv2.PutText(dst1, Format(energy, "#0"), New cv.Point(10, 160), cv.HersheyFonts.HersheyComplex, fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
     End Sub

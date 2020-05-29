@@ -81,8 +81,8 @@ Public Class Projection_ColorizeMat
         setCaller(callerRaw)
 
         fontSize = 1.0
-        If ocvb.parms.lowResolution Then fontSize = 0.6
-        radius = If(ocvb.parms.lowResolution, 5, 12)
+        If ocvb.parms.resolution = resMed Then fontSize = 0.6
+        radius = If(ocvb.parms.resolution = resMed, 5, 12)
         shift = (src.Width - src.Height) / 2
         rect = New cv.Rect(shift, 0, dst1.Height, dst1.Height)
 
@@ -271,7 +271,7 @@ Public Class Projection_Gravity_CPP
         handleXYZ.Free()
 
         Dim fontSize As Single = 1.0
-        If ocvb.parms.lowResolution Then fontSize = 0.6
+        If ocvb.parms.resolution = resMed Then fontSize = 0.6
         If standalone Then
             dst1 = cMats.CameraLocationBot(topMask)
             dst2 = cMats.CameraLocationLeft(sideMask)
@@ -360,7 +360,7 @@ Public Class Projection_Objects
         dst1 = flood.dst1
 
         dst2 = dst1.Clone()
-        If ocvb.parms.lowResolution Then fontSize = 0.6
+        If ocvb.parms.resolution = resMed Then fontSize = 0.6
         maxZ = gravity.sliders.TrackBar1.Value / 1000
         Dim mmPerPixel = maxZ * 1000 / src.Height
         Dim maxCount = Math.Min(flood.objectRects.Count, 10)
@@ -371,8 +371,8 @@ Public Class Projection_Objects
             Dim maxDistanceFromCamera = (src.Height - rect.Y) * mmPerPixel
             Dim objectWidth = rect.Width * mmPerPixel
 
-            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.lowResolution, 6, 10), cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.lowResolution, 3, 5), cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.resolution = resMed, 6, 10), cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.resolution = resMed, 3, 5), cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
             Dim text = "depth=" + Format(minDistanceFromCamera / 1000, "#0.0") + "-" + Format(maxDistanceFromCamera / 1000, "0.0") + "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
 
             Dim pt = New cv.Point(rect.X, rect.Y - 10)

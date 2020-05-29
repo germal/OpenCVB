@@ -8,18 +8,18 @@ Module Algorithm_Module
     Public Const offsetMax = 150
     Public slidersOffset As cv.Point
     Public radioOffset As cv.Point
-    Public PipeTaskIndex As Int32
-    Public vtkTaskIndex As Int32
+    Public PipeTaskIndex As Integer
+    Public vtkTaskIndex As Integer
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
-    Public colorCols As Int32
-    Public colorRows As Int32
+    Public colorCols As Integer
+    Public colorRows As Integer
 
-    Public Const D400Cam As Int32 = 0 ' Must be defined in OptionsDialog.vb the same way!
-    Public Const Kinect4AzureCam As Int32 = 1 ' Must be defined in OptionsDialog.vb the same way!
-    Public Const T265Camera As Int32 = 2 ' Must be defined in OptionsDialog.vb the same way!
-    Public Const StereoLabsZED2 As Int32 = 3 ' Must be defined in OptionsDialog.vb the same way!
-    Public Const MyntD1000 As Int32 = 4 ' Must be defined in OptionsDialog.vb the same way!
+    Public Const D400Cam = 0 ' Must be defined in OptionsDialog.vb the same way!
+    Public Const Kinect4AzureCam = 1 ' Must be defined in OptionsDialog.vb the same way!
+    Public Const T265Camera = 2 ' Must be defined in OptionsDialog.vb the same way!
+    Public Const StereoLabsZED2 = 3 ' Must be defined in OptionsDialog.vb the same way!
+    Public Const MyntD1000 = 4 ' Must be defined in OptionsDialog.vb the same way!
 
     Public term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public recordedData As Replay_Play
@@ -34,6 +34,10 @@ Module Algorithm_Module
         b = a
         a = temp
     End Sub
+
+    Public Const resLow = 0 ' Must be defined in OptionsDialog.vb the same way!
+    Public Const resMed = 1 ' Must be defined in OptionsDialog.vb the same way!
+    Public Const resHigh = 2 ' Must be defined in OptionsDialog.vb the same way!
 End Module
 
 Public Class ActiveClass : Implements IDisposable
@@ -97,7 +101,7 @@ Public Class ActiveClass : Implements IDisposable
     Public Structure algorithmParameters
         Dim activeAlgorithm As Object
         Dim AvoidDNNCrashes As Boolean
-        Dim cameraIndex As Int32
+        Dim cameraIndex As Integer
         Dim cameraName As String
         Dim externalPythonInvocation As Boolean
         Dim extrinsics As Extrinsics_VB
@@ -124,8 +128,8 @@ Public Class ActiveClass : Implements IDisposable
         Dim CPU_FrameTime As Double
         Dim intrinsicsLeft As intrinsics_VB
         Dim intrinsicsRight As intrinsics_VB
-        Dim lowResolution As Boolean
-        Dim mainFormHeight As Int32
+        Dim resolution As Integer
+        Dim mainFormHeight As Integer
         Dim mainFormLoc As Point
         Dim minimizeMemoryFootprint As Boolean
         Dim OpenCV_Version_ID As String
@@ -133,7 +137,7 @@ Public Class ActiveClass : Implements IDisposable
         Dim PythonExe As String
         Dim ShowConsoleLog As Boolean
         Dim ShowOptions As Boolean
-        Dim speedFactor As Int32
+        Dim speedFactor As Integer
         Dim testAllRunning As Boolean
         Dim transformationMatrix() As Single
         Dim useRecordedData As Boolean

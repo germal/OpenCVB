@@ -597,7 +597,7 @@ Module Depth_Colorizer_CPP_Module
     Public Function getDepth32f(ocvb As AlgorithmData) As cv.Mat
         Dim depth32f As New cv.Mat
         ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
-        If ocvb.parms.lowResolution Then Return depth32f.Resize(ocvb.color.Size())
+        If ocvb.parms.resolution = resMed Then Return depth32f.Resize(ocvb.color.Size())
         Return depth32f
     End Function
 End Module

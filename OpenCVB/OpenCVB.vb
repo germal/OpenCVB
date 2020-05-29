@@ -737,8 +737,8 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "OpenCVBWidth", "OpenCVBWidth", Me.Width)
         SaveSetting("OpenCVB", "OpenCVBHeight", "OpenCVBHeight", Me.Height)
 
-        Dim details = CStr(regWidth) + "x" + CStr(regHeight) + " display " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + " lowResolution="
-        If optionsForm.lowResolution.Checked Then details += "On" Else details += "Off"
+        Dim details = CStr(regWidth) + "x" + CStr(regHeight) + " display " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + " Resolution="
+        If optionsForm.lowResolution.Checked Then details += "Med" Else details += "High"
         picLabels(0) = "Input " + details
         picLabels(1) = "Depth " + details
     End Sub
@@ -908,7 +908,7 @@ Public Class OpenCVB
         If parms.activeAlgorithm.Contains("OpenGL") Or parms.activeAlgorithm.Contains("OpenCVGL") Then lowResolution = False
         fastSize = If(lowResolution, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
 
-        parms.lowResolution = lowResolution
+        parms.resolution = If(lowResolution, OptionsDialog.resMed, OptionsDialog.resHigh)
         parms.cameraIndex = optionsForm.cameraIndex ' index of active camera
         parms.cameraName = camera.deviceName
 
@@ -929,8 +929,8 @@ Public Class OpenCVB
         parms.ShowConsoleLog = optionsForm.ShowConsoleLog.Checked
         parms.AvoidDNNCrashes = optionsForm.AvoidDNNCrashes.Checked
 
-        If parms.lowResolution Then parms.speedFactor = 2 Else parms.speedFactor = 1
-        If parms.lowResolution Then parms.imageToTrueTypeLoc *= parms.speedFactor
+        If parms.resolution = OptionsDialog.resMed Then parms.speedFactor = 2 Else parms.speedFactor = 1
+        If parms.resolution = OptionsDialog.resMed Then parms.imageToTrueTypeLoc *= parms.speedFactor
 
         PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
 
@@ -969,17 +969,17 @@ Public Class OpenCVB
         End If
         Dim saveAlgorithmTestCount = AlgorithmTestCount ' use this to confirm that this task is to terminate.
         drawRect = New cv.Rect
-        Dim saveLowResSetting As Boolean = parms.lowResolution
+        Dim saveLowResSetting As Boolean = parms.resolution
         Dim OpenCVB = New VB_Classes.ActiveClass(parms, regWidth / parms.speedFactor, regHeight / parms.speedFactor)
         textDesc = OpenCVB.ocvb.desc
 
         Console.WriteLine("textDesc = " + textDesc) ' Debugging a label problem...
 
         ' Here we check to see if the algorithm constructor changed lowResolution.
-        If OpenCVB.ocvb.parms.lowResolution <> saveLowResSetting Then
-            If OpenCVB.ocvb.parms.lowResolution Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
+        If OpenCVB.ocvb.parms.resolution <> saveLowResSetting Then
+            If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
             OpenCVB.ocvb.parms.imageToTrueTypeLoc = 1 / resizeForDisplay
-            If OpenCVB.ocvb.parms.lowResolution Then OpenCVB.ocvb.parms.imageToTrueTypeLoc *= OpenCVB.ocvb.parms.speedFactor
+            If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.imageToTrueTypeLoc *= OpenCVB.ocvb.parms.speedFactor
         End If
 
         ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
