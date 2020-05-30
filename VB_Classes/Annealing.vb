@@ -112,7 +112,7 @@ End Class
 Public Class Annealing_CPP_MT
     Inherits ocvbClass
     Dim random As Random_Points
-    Dim anneal(32 - 1) As Annealing_Basics_CPP
+    Dim anneal() As Annealing_Basics_CPP
     Dim mats As Mat_4to1
     Dim flow As Font_FlowText
     Private Class CompareEnergy : Implements IComparer(Of Single)
@@ -152,6 +152,7 @@ Public Class Annealing_CPP_MT
 
         mats = New Mat_4to1(ocvb, caller)
 
+        ReDim anneal(Environment.ProcessorCount - 1)
         sliders.setupTrackBar1(ocvb, caller, "Anneal Number of Cities", 5, 500, 25)
         sliders.setupTrackBar2(ocvb, caller, "Success = top X threads agree on energy level.", 2, anneal.Count, anneal.Count)
 

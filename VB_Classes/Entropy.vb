@@ -143,7 +143,7 @@ Public Class Entropy_Simple
         channelEntropy = 0
         For i = 0 To hist.Rows - 1
             Dim hc = Math.Abs(hist.Get(Of Single)(i))
-            channelEntropy += -(hc / total) * Math.Log10(hc / total)
+            If hc <> 0 Then channelEntropy += -(hc / total) * Math.Log10(hc / total)
         Next
         Return channelEntropy
     End Function
