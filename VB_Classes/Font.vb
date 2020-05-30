@@ -38,11 +38,8 @@ Public Class Font_TrueType
         Dim fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         Dim fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
         ' get the font on every iteration because it could have changed.  This should be done in any algorithm using OptionsFont.
-        ocvb.putText(New oTrueType("TrueType Font Example (override default font) = Times New Roman with size 10" + vbCrLf +
-                                              "Use 'Change' button in the font dialog below to set a global font: " + fontName + vbCrLf +
-                                              "Global TrueType Font = " + fontName + " with size " + CStr(fontSize) + vbCrLf +
-                                              "Use 'ocvb.putText' with 'ocvb.fontName' and 'ocvb.fontSize' to exploit global font.",
-                                              10, 50, RESULT1))
+        ocvb.putText(New oTrueType("TrueType Font is currently set to " + fontName + " with size = " + CStr(fontSize) + vbCrLf +
+                                   "Use the Settings button above to change the font name and size.", 10, 50, RESULT1))
     End Sub
 End Class
 
@@ -60,7 +57,7 @@ Public Class Font_FlowText
     Public Sub Run(ocvb As AlgorithmData)
         If standalone And ocvb.frameCount = 0 Then
             msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText(ocvb)' to the class constructor.")
-            msgs.Add("Also optionally indicate if you want result1 or result2 for text (the default is result1.)")
+        msgs.Add("Also optionally indicate if you want result1 or result2 for text (the default is result1.)")
             msgs.Add("Then in the Run method, flow.msgs.add('your next line of text') - for as many msgs as you need on each pass.")
             msgs.Add("Then at the end of the Run method, invoke flow.Run(ocvb)")
         End If

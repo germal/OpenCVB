@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-
 Module Puzzle_Solvers
     Public Enum tileSide
         top
@@ -60,10 +59,10 @@ Module Puzzle_Solvers
         Dim tmp As New cv.Mat
         Dim absDiff(4 - 1) As Single
         For i = 0 To 8 - 1 Step 2
-            cv.Cv2.Absdiff(sample(i), sample(i + 1), tmp)
+            cv.Cv2.Absdiff(sample(i), sample(i + 1), tmp) ' compare the 4 sides so there are 8 sample inputs
             Dim absD = cv.Cv2.Sum(tmp)
             For j = 0 To 3 - 1
-                If absDiff(i / 2) < absD.Item(j) Then absDiff(i / 2) = absD.Item(j)
+                If absDiff(i / 2) < absD.Item(j) Then absDiff(i / 2) = absD.Item(j) ' which channel has the best absdiff
             Next
         Next
         Return absDiff
@@ -283,9 +282,9 @@ Public Class Puzzle_Solver
         puzzle.grid.sliders.Hide()
 
         radio.Setup(ocvb, caller, 3)
-        radio.check(0).Text = "Easy Puzzle - tiles = 256x180"
-        radio.check(1).Text = "Medium Puzzle - tiles = 128x90"
-        radio.check(2).Text = "Hard Puzzle - tiles = 64x90"
+        radio.check(0).Text = "256x180 tile - Easy Puzzle"
+        radio.check(1).Text = "128x90  tile - Medium Puzzle"
+        radio.check(2).Text = "64x90   tile - Hard Puzzle"
         radio.check(0).Checked = True
 
         check.Setup(ocvb, caller, 1)
@@ -294,12 +293,12 @@ Public Class Puzzle_Solver
         ocvb.desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."
     End Sub
     Private Function checkUsedList(best As List(Of Integer)) As bestFit
-        Dim fit As New bestFit
+        Dim bfit As New bestFit
         For i = 0 To best.Count - 1
-            fit = fitlist.ElementAt(best.ElementAt(i))
-            If usedList.Contains(fit.index) = False Then Exit For
+            bfit = fitlist.ElementAt(best.ElementAt(i))
+            If usedList.Contains(bfit.index) = False Then Exit For
         Next
-        Return fit
+        Return bfit
     End Function
     Public Sub Run(ocvb As AlgorithmData)
         Static saveWidth As Integer
@@ -340,6 +339,7 @@ Public Class Puzzle_Solver
 
         Dim col As Integer
         Dim cols = CInt(src.Width / roilist(0).Width)
+
         Select Case bestCorner.corner
             Case cornerType.upperLeft, cornerType.upperRight
                 For nexty = 0 To dst2.Height - 1 Step roi.Height
@@ -383,6 +383,39 @@ Public Class Puzzle_Solver
                 Next
         End Select
 
+        ' how well did we do?
+        Dim tmp As New cv.Mat
+        Dim left As cv.Mat, right As cv.Mat, bottom As cv.Mat, top As cv.Mat
+        Dim fontsize = 0.9
+        If ocvb.parms.resolution = resMed Then fontsize = 0.4
+        For y = 0 To dst2.Height - 1 Step roi.Height
+            For x = 0 To dst2.Width - 1 Step roi.Width
+                Dim tileRoi = New cv.Rect(x, y, roi.Width, roi.Height)
+                Dim tileRight = New cv.Rect(x + roi.Width, y, roi.Width, roi.Height)
+                Dim tileBelow = New cv.Rect(x, y + roi.Height, roi.Width, roi.Height)
+                If x <> dst2.Width - roi.Width Then
+                    right = dst2(tileRoi).Col(roi.Width - 1)
+                    left = dst2(tileRight).Col(0)
+                    cv.Cv2.MatchTemplate(right, left, tmp, cv.TemplateMatchModes.CCoeffNormed)
+                    Dim correlationRight = tmp.Get(Of Single)(0, 0)
+                    cv.Cv2.PutText(dst2, Format(correlationRight, "0.00"), New cv.Point(x + roi.Width * 3 / 4, y + roi.Height / 2),
+                                   cv.HersheyFonts.HersheySimplex, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                End If
+
+                If y <> dst2.Height - roi.Height Then
+                    bottom = dst2(tileRoi).Row(roi.Height - 1)
+                    top = dst2(tileBelow).Row(0)
+
+                    cv.Cv2.MatchTemplate(bottom, top, tmp, cv.TemplateMatchModes.CCoeffNormed)
+                    Dim correlationBottom = tmp.Get(Of Single)(0, 0)
+
+                    cv.Cv2.PutText(dst2, Format(correlationBottom, "0.00"), New cv.Point(x + roi.Width / 3, y + roi.Height * 7 / 8),
+                                   cv.HersheyFonts.HersheySimplex, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                End If
+            Next
+        Next
+
+        dst2.SetTo(cv.Scalar.White, puzzle.grid.gridMask)
         fitlist.Clear()
         usedList.Clear()
         check.Box(0).Checked = False

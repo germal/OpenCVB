@@ -4,7 +4,7 @@ Public Class MatchTemplate_Basics
     Dim flow As Font_FlowText
     Public sample1 As cv.Mat
     Public sample2 As cv.Mat
-        Public matchText As String = ""
+    Public matchText As String = ""
     Public correlationMat As New cv.Mat
     Public reportFreq = 10 ' report the results every x number of iterations.
     Public matchOption As cv.TemplateMatchModes
