@@ -3,11 +3,11 @@ Imports System.Runtime.InteropServices
 ' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
 Public Class Histogram_Basics
     Inherits ocvbClass
-    Public histRaw(2) As cv.Mat
-    Public histNormalized(2) As cv.Mat
-    Public bins As Int32 = 50
-    Public minRange As Int32 = 0
-    Public maxRange As Int32 = 255
+    Public histRaw(3 - 1) As cv.Mat
+    Public histNormalized(3 - 1) As cv.Mat
+    Public bins As Integer = 50
+    Public minRange As Integer = 0
+    Public maxRange As Integer = 255
     Public backColor = cv.Scalar.Gray
     Public plotRequested As Boolean
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
