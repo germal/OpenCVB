@@ -292,7 +292,7 @@ Public Class Depth_WorldXYZ
                 End If
             Next
         Next
-        ocvb.putText(New ActiveClass.TrueType("OpenGL data prepared.", 10, 50, RESULT1))
+        ocvb.putText(New oTrueType("OpenGL data prepared.", 10, 50, RESULT1))
     End Sub
 End Class
 
@@ -336,7 +336,7 @@ Public Class Depth_WorldXYZ_MT
                 Next
             Next
         End Sub)
-        ocvb.putText(New ActiveClass.TrueType("OpenGL data prepared.", 10, 50, RESULT1))
+        ocvb.putText(New oTrueType("OpenGL data prepared.", 10, 50, RESULT1))
     End Sub
 End Class
 
@@ -363,7 +363,7 @@ End Class
 '        handleSrc.Free()
 
 '        If imagePtr <> 0 Then pointCloud = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_32FC3, imagePtr)
-'        ocvb.putText(New ActiveClass.TrueType("OpenGL data prepared.", 10, 50, RESULT1))
+'        ocvb.putText(New oTrueType("OpenGL data prepared.", 10, 50, RESULT1))
 '    End Sub
 '    Public Sub Close()
 '        Depth_XYZ_OpenMP_Close(DepthXYZ)

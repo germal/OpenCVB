@@ -65,7 +65,7 @@ Public Class OpenCVB
     Dim stopCameraThread As Boolean
     Dim textDesc As String = ""
     Dim totalBytesOfMemoryUsed As Integer
-    Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.ActiveClass.TrueType)
+    Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.oTrueType)
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -220,6 +220,81 @@ Public Class OpenCVB
         FindPython()
 
     End Sub
+    Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
+        Dim g As Graphics = e.Graphics
+        Dim pic = DirectCast(sender, PictureBox)
+        g.ScaleTransform(1, 1)
+        g.DrawImage(pic.Image, 0, 0)
+        If pic.Tag = 0 Or pic.Tag = 1 Then
+            If drawRect.Width > 0 And drawRect.Height > 0 Then
+                g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
+            End If
+        End If
+        If algorithmRefresh And (pic.Tag = 2 Or pic.Tag = 3) Then
+            algorithmRefresh = False
+            Try
+                SyncLock formResult1
+                    If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Then
+                        Dim result1 = formResult1
+                        Dim result2 = formResult2
+                        result1 = result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
+                        result2 = result2.Resize(New cv.Size(camPic(3).Size.Width, camPic(3).Size.Height))
+                        cvext.BitmapConverter.ToBitmap(result1, camPic(2).Image)
+                        cvext.BitmapConverter.ToBitmap(result2, camPic(3).Image)
+                    Else
+                        cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
+                        cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
+                    End If
+                End SyncLock
+            Catch ex As Exception
+                Console.WriteLine("Paint exception occurred updating results1/2: " + ex.Message)
+            End Try
+        End If
+        If cameraRefresh And (pic.Tag = 0 Or pic.Tag = 1) Then
+            cameraRefresh = False
+            Dim RGBDepth As New cv.Mat
+            Dim color As New cv.Mat
+            Try
+                SyncLock bufferLock ' avoid updating the image while copying into it in the algorithm and camera tasks
+                    If camera.color IsNot Nothing Then
+                        If RGBDepth.Width = 0 Then RGBDepth = New cv.Mat
+                        RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
+                        color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
+                        cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
+                        cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
+                    End If
+                End SyncLock
+            Catch ex As Exception
+                Console.WriteLine("Paint exception occurred updating RGB and RGBdepth: " + ex.Message)
+            End Try
+        End If
+        Try
+            ' draw any TrueType font data on the image 
+            Dim maxline = 21
+            SyncLock bufferLock
+                For i = 0 To TTtextData(pic.Tag).Count - 1 ' using enumeration here would occasionally generate a mistaken warning.
+                    Dim tt = TTtextData(pic.Tag)(i)
+                    If tt IsNot Nothing Then
+                        g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White), tt.x, tt.y)
+                        If tt.x >= camPic(pic.Tag).Width Or tt.y >= camPic(pic.Tag).Height Then
+                            Console.WriteLine("TrueType text off image!  " + tt.text + " is being written to " + CStr(tt.x) + " and " + CStr(tt.y))
+                        End If
+                        maxline -= 1
+                        If maxline <= 0 Then Exit For
+                    End If
+                Next
+                If optionsForm.ShowLabels.Checked Then
+                    ' with the low resolution display, we need to use the entire width of the image to display the RGB and Depth text area.
+                    Dim textRect As New Rectangle(0, 0, pic.Width / 2, If(resizeForDisplay = 4, 12, 20))
+                    If Len(picLabels(pic.Tag)) Then g.FillRectangle(myBrush, textRect)
+                    g.DrawString(picLabels(pic.Tag), optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.Black), 0, 0)
+                End If
+            End SyncLock
+            AlgorithmDesc.Text = textDesc
+        Catch ex As Exception
+            Console.WriteLine("Paint exception occurred updating image labels: " + ex.Message)
+        End Try
+    End Sub
     Private Sub RestartCamera()
         camera.closePipe()
         stopCameraThread = True
@@ -236,76 +311,6 @@ Public Class OpenCVB
         If camera.devicename = "" Then camera.initialize(fps, regWidth, regHeight)
         camera.pipelineclosed = False
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
-    End Sub
-    Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
-        Dim g As Graphics = e.Graphics
-        Try
-            Dim pic = DirectCast(sender, PictureBox)
-            g.ScaleTransform(1, 1)
-            g.DrawImage(pic.Image, 0, 0)
-            If pic.Tag = 0 Or pic.Tag = 1 Then
-                If drawRect.Width > 0 And drawRect.Height > 0 Then
-                    g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
-                End If
-            End If
-            If algorithmRefresh And (pic.Tag = 2 Or pic.Tag = 3) Then
-                algorithmRefresh = False
-                SyncLock formResult1
-                    If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Then
-                        Dim result1 = formResult1
-                        Dim result2 = formResult2
-                        result1 = result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
-                        result2 = result2.Resize(New cv.Size(camPic(3).Size.Width, camPic(3).Size.Height))
-                        cvext.BitmapConverter.ToBitmap(result1, camPic(2).Image)
-                        cvext.BitmapConverter.ToBitmap(result2, camPic(3).Image)
-                    Else
-                        cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
-                        cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
-                    End If
-                End SyncLock
-            End If
-            If cameraRefresh And (pic.Tag = 0 Or pic.Tag = 1) Then
-                cameraRefresh = False
-                Dim RGBDepth As New cv.Mat
-                Dim color As New cv.Mat
-                SyncLock bufferLock ' avoid updating the image while copying into it in the algorithm and camera tasks
-                    If camera.color IsNot Nothing Then
-                        If RGBDepth.Width = 0 Then RGBDepth = New cv.Mat
-                        RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
-                        color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
-                        cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
-                        cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
-                    End If
-                End SyncLock
-            End If
-            SyncLock bufferLock
-                ' draw any TrueType font data on the image 
-                Dim white = System.Drawing.Color.White
-                Dim maxline = 21
-                For i = 0 To TTtextData(pic.Tag).Count - 1 ' using enumeration here would occasionally generate a mistaken warning.
-                    Dim tt = TTtextData(pic.Tag)(i)
-                    If tt IsNot Nothing Then
-                        g.DrawString(tt.text, New Font(tt.fontName, tt.fontSize), New SolidBrush(white), tt.x, tt.y)
-                        If tt.x >= camPic(pic.Tag).Width Or tt.y >= camPic(pic.Tag).Height Then
-                            Console.WriteLine("TrueType text off image!  " + tt.text + " is being written to " + CStr(tt.x) + " and " + CStr(tt.y))
-                        End If
-                        maxline -= 1
-                        If maxline <= 0 Then Exit For
-                    End If
-                Next
-                If optionsForm.ShowLabels.Checked Then
-                    ' with the low resolution display, we need to use the entire width of the image to display the RGB and Depth text area.
-                    Dim textRect As New Rectangle(0, 0, pic.Width / 2, If(resizeForDisplay = 4, 12, 20))
-                    If Len(picLabels(pic.Tag)) Then g.FillRectangle(myBrush, textRect)
-                    Dim black = System.Drawing.Color.Black
-                    Dim fontSize = If(resizeForDisplay = 4, 6, 10)
-                    g.DrawString(picLabels(pic.Tag), New Font("Microsoft Sans Serif", fontSize), New SolidBrush(black), 0, 0)
-                End If
-                AlgorithmDesc.Text = textDesc
-            End SyncLock
-        Catch ex As Exception
-            Console.WriteLine("Paint exception occurred: " + ex.Message)
-        End Try
     End Sub
     Private Sub OpenCVB_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         If camPic Is Nothing Then Exit Sub ' when first opening, campic may not be built yet
@@ -391,7 +396,7 @@ Public Class OpenCVB
         End If
 
         For i = 0 To TTtextData.Count - 1
-            TTtextData(i) = New List(Of VB_Classes.ActiveClass.TrueType)
+            TTtextData(i) = New List(Of VB_Classes.oTrueType)
         Next
 
         For i = 0 To camPic.Length - 1
@@ -738,7 +743,7 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "OpenCVBHeight", "OpenCVBHeight", Me.Height)
 
         Dim details = CStr(regWidth) + "x" + CStr(regHeight) + " display " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + " Resolution="
-        If optionsForm.lowResolution.Checked Then details += "Med" Else details += "High"
+        If optionsForm.lowResolution.Checked Then details += "Medium" Else details += "High"
         picLabels(0) = "Input " + details
         picLabels(1) = "Depth " + details
     End Sub

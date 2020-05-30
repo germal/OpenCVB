@@ -14,28 +14,30 @@ requirements:
 
     -   Microsoft Kinect for Azure
 
-    -   Intel RealSense camera – D415, D435, D435i or T265
+    -   Intel RealSense camera –D435i
+
+    -   Intel T265 camera (no point cloud or depth data)
 
     -   StereoLabs ZED2
 
     -   Mynt Eye D 1000
 
-The Microsoft Kinect for Azure camera has an IMU (Inertial Measurement Unit) and
-has better depth accuracy but requires more power and is not as portable as the
-Intel D4xx cameras.
+All of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft
+Kinect for Azure has the best depth accuracy but requires more power and is not
+as portable as the Intel D435i camera.
 
 **The Objective**
 
-This software is targeting cameras that produce depth as well as color. These
-newer cameras have prompted a review of existing vision algorithms to see how
-they can be improved if depth is known. To enable revisiting many existing
-algorithms, this software provides a single application that can run over 600
-OpenCV algorithms on any of the cameras listed above.
+OpenCVB is targeting cameras that produce depth as well as color. These newer
+cameras have prompted a review of existing vision algorithms to see how they can
+be improved if depth is known. To enable revisiting many existing algorithms,
+this software provides a single application that can run over 600 OpenCV
+algorithms on any of the cameras listed above.
 
 There are many computer vision examples on the web but too often something is
 missing. OpenCVB is designed to collect these algorithms into a single
-application and guarantees that each will build and run. In addition, the
-process of adding variants and experimenting with the example is simplified.
+application and guarantee that each will build and run. In addition, the process
+of adding variants and experimenting with algorithms is simplified.
 
 The languages used are those often found in computer vision projects - C++, C\#,
 Python and even VB.Net. Secondly, it is important to get access to multiple

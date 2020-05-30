@@ -35,7 +35,7 @@ Public Class Quaterion_Basics
                                     CSng(sliders2.TrackBar3.Value / 100), CSng(sliders2.TrackBar4.Value / 100))
 
         Dim quatmul = Quaternion.Multiply(q1, q2)
-        ocvb.putText(New ActiveClass.TrueType("q1 = " + q1.ToString() + vbCrLf +
+        ocvb.putText(New oTrueType("q1 = " + q1.ToString() + vbCrLf +
                                                   "q2 = " + q2.ToString() + vbCrLf +
                                                   "Multiply q1 * q2" + quatmul.ToString(), 10, 60))
     End Sub
@@ -77,7 +77,7 @@ Public Class Quaterion_IMUPrediction
 
         Dim diffq = Quaternion.Subtract(ocvb.parms.IMU_Rotation, predictedRotation)
 
-        ocvb.putText(New ActiveClass.TrueType("IMU_Acceleration = " + vbTab +
+        ocvb.putText(New oTrueType("IMU_Acceleration = " + vbTab +
                                                   Format(ocvb.parms.IMU_Acceleration.X, "0.0000") + ", " + vbTab +
                                                   Format(ocvb.parms.IMU_Acceleration.Y, "0.0000") + ", " + vbTab +
                                                   Format(ocvb.parms.IMU_Acceleration.Z, "0.0000") + ", " + vbTab + vbCrLf +

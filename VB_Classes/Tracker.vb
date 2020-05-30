@@ -10,7 +10,7 @@ Public Class Tracker_Basics
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Stop tracking selected object"
         ocvb.desc = "Track an object using cv.Tracking API - tracker algorithm"
-        ocvb.putText(New ActiveClass.TrueType("Draw a rectangle around object to be tracked.", 10, 140, RESULT2))
+        ocvb.putText(New oTrueType("Draw a rectangle around object to be tracked.", 10, 140, RESULT2))
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(0).Checked Then

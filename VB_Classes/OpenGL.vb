@@ -80,7 +80,7 @@ Public Class OpenGL_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = T265Camera Then
-            ocvb.putText(New ActiveClass.TrueType("The T265 camera doesn't have a point cloud.", 10, 60, RESULT1))
+            ocvb.putText(New oTrueType("The T265 camera doesn't have a point cloud.", 10, 60, RESULT1))
             Exit Sub
         End If
 
@@ -93,7 +93,7 @@ Public Class OpenGL_Basics
         If ocvb.frameCount > 0 And pipe IsNot Nothing Then
             Dim bytesRead = pipe.Read(readPipe, 0, 4)
             If bytesRead = 0 Then
-                ocvb.putText(New ActiveClass.TrueType("The OpenGL process appears to have stopped.", 20, 100))
+                ocvb.putText(New oTrueType("The OpenGL process appears to have stopped.", 20, 100))
             End If
         End If
 
@@ -237,7 +237,7 @@ Public Class OpenGL_IMU
             ogl.src = src
             ogl.Run(ocvb) ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
         Else
-            ocvb.putText(New ActiveClass.TrueType("No IMU present on this RealSense device", 20, 100))
+            ocvb.putText(New oTrueType("No IMU present on this RealSense device", 20, 100))
         End If
     End Sub
 End Class
@@ -381,7 +381,7 @@ Public Class OpenGL_GravityTransform
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = T265Camera Then
-            ocvb.putText(New ActiveClass.TrueType("The T265 camera doesn't have a point cloud.", 10, 60, RESULT1))
+            ocvb.putText(New oTrueType("The T265 camera doesn't have a point cloud.", 10, 60, RESULT1))
             Exit Sub
         End If
 

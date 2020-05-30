@@ -14,9 +14,9 @@ Public Class Keyboard_Basics
         End If
         if standalone Then
             If input = "" Then
-                ocvb.putText(New ActiveClass.TrueType("Any text entered will appear here." + input, 10, 50, RESULT1))
+                ocvb.putText(New oTrueType("Any text entered will appear here." + input, 10, 50, RESULT1))
             Else
-                ocvb.putText(New ActiveClass.TrueType("The last key that was hit was: " + input, 10, 50, RESULT1))
+                ocvb.putText(New oTrueType("The last key that was hit was: " + input, 10, 50, RESULT1))
             End If
         End If
         ocvb.parms.keyInputAccepted = True

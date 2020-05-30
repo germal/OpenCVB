@@ -26,6 +26,8 @@ Public Class OptionsDialog
         SaveSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", ShowConsoleLog.Checked)
         SaveSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", AvoidDNNCrashes.Checked)
         SaveSetting("OpenCVB", "RefreshRate", "RefreshRate", RefreshRate.Value)
+        SaveSetting("OpenCVB", "FontName", "FontName", fontInfo.Font.Name)
+        SaveSetting("OpenCVB", "FontSize", "FontSize", fontInfo.Font.Size)
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
@@ -72,6 +74,11 @@ Public Class OptionsDialog
         AvoidDNNCrashes.Checked = GetSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", False)
         RefreshRate.Value = GetSetting("OpenCVB", "RefreshRate", "RefreshRate", 15)
 
+        Dim defaultSize = GetSetting("OpenCVB", "FontSize", "FontSize", 8)
+        Dim DefaultFont = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
+        fontInfo.Font = New Drawing.Font(DefaultFont, defaultSize)
+        fontInfo.Text = DefaultFont + " with size = " + CStr(defaultSize)
+
         Dim selectionName = GetSetting("OpenCVB", "PythonExe", "PythonExe", "")
         Dim selectionInfo As FileInfo = Nothing
         If selectionName <> "" Then
@@ -106,5 +113,20 @@ Public Class OptionsDialog
 
     Private Sub TestAllDuration_ValueChanged(sender As Object, e As EventArgs) Handles TestAllDuration.ValueChanged
         If TestAllDuration.Value < 5 Then TestAllDuration.Value = 5
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        FontDialog1.ShowColor = False
+        FontDialog1.ShowApply = False
+        FontDialog1.ShowEffects = False
+        FontDialog1.ShowHelp = True
+
+        FontDialog1.MaxSize = 40
+        FontDialog1.MinSize = 5
+
+        If FontDialog1.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            fontInfo.Font = FontDialog1.Font
+            fontInfo.Text = FontDialog1.Font.Name + " with size = " + CStr(fontInfo.Font.Size)
+        End If
     End Sub
 End Class

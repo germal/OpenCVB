@@ -188,7 +188,7 @@ Public Class Replay_Play
                 dst2 = ocvb.RGBDepth.Clone()
             Else
                 If playback.fileinfo.Exists = False Then
-                    ocvb.putText(New ActiveClass.TrueType("File not found: " + playback.fileinfo.FullName, 10, 125))
+                    ocvb.putText(New oTrueType("File not found: " + playback.fileinfo.FullName, 10, 125))
                     playback.Button2_Click(New Object, New EventArgs)
                     Exit Sub
                 End If

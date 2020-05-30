@@ -28,17 +28,17 @@ Public Class AlgorithmData
     Public PythonExe As String
     Public PythonFileName As String
     Public suppressOptions As Boolean
-    Public TTtextData(3) As List(Of ActiveClass.TrueType)
+    Public TTtextData(3) As List(Of oTrueType)
     Public Sub New(parms As ActiveClass.algorithmParameters, width As Integer, height As Integer)
         color = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         result1 = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         result2 = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         For i = 0 To TTtextData.Count - 1
-            TTtextData(i) = New List(Of ActiveClass.TrueType)
+            TTtextData(i) = New List(Of oTrueType)
         Next
     End Sub
-    Public Sub putText(tt As ActiveClass.TrueType)
+    Public Sub putText(tt As oTrueType)
         TTtextData(tt.picTag).Add(tt)
     End Sub
 End Class

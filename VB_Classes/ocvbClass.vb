@@ -1,4 +1,25 @@
 ﻿Imports cv = OpenCvSharp
+Public Class oTrueType
+    Public Const RESULT1 = 2
+    Public Const RESULT2 = 3
+    Public text As String
+
+    Public picTag As Int32
+    Public x As Int32
+    Public y As Int32
+    Public Sub New(_text As String, _x As Int32, _y As Int32, Optional _picTag As Int32 = RESULT1)
+        text = _text
+        x = _x
+        y = _y
+        picTag = _picTag
+    End Sub
+    Public Sub New(_text As String, _x As Int32, _y As Int32)
+        text = _text
+        x = _x
+        y = _y
+        picTag = RESULT1
+    End Sub
+End Class
 Public Class ocvbClass : Implements IDisposable
     Public caller As String
     Public check As New OptionsCheckbox
@@ -23,6 +44,7 @@ Public Class ocvbClass : Implements IDisposable
     Public rColors(255) As cv.Vec3b
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
+
     Public Sub setCaller(callerRaw As String)
         If callerRaw = "" Or callerRaw = Me.GetType.Name Then
             standalone = True

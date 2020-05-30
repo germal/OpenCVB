@@ -15,12 +15,11 @@ Public Class Entropy_Basics
         ocvb.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
     Private Function channelEntropy(total As Int32, hist As cv.Mat) As Single
-        Dim entropy As Single
         For i = 0 To hist.Rows - 1
             Dim hc = Math.Abs(hist.Get(Of Single)(i))
-            If hc <> 0 Then entropy += -(hc / total) * Math.Log10(hc / total)
+            If hc <> 0 Then channelEntropy += -(hc / total) * Math.Log10(hc / total)
         Next
-        Return entropy
+        Return channelEntropy
     End Function
     Public Sub Run(ocvb As AlgorithmData)
         hist.src = src
@@ -128,5 +127,30 @@ Public Class Entropy_FAST
         entropy.Run(ocvb)
         dst1 = entropy.dst1
         dst2 = entropy.dst2
+    End Sub
+End Class
+
+
+
+
+
+' This algorithm is different and does not inherit from ocvbClass.  It is used to reduce the memory load when running MT algorithms above.
+Public Class Entropy_Simple
+    Public entropy As Single
+    Private Function channelEntropy(total As Int32, hist As cv.Mat) As Single
+        For i = 0 To hist.Rows - 1
+            Dim hc = Math.Abs(hist.Get(Of Single)(i))
+            If hc <> 0 Then channelEntropy += -(hc / total) * Math.Log10(hc / total)
+        Next
+        Return channelEntropy
+    End Function
+    Public Sub Run(src As cv.Mat)
+        entropy = 0
+        Dim entropyChannels As String = ""
+        For i = 0 To src.Channels - 1
+            Dim nextEntropy = channelEntropy(src.Total, src)
+            entropyChannels += "Entropy for " + Choose(i + 1, "Red", "Green", "Blue") + " " + Format(nextEntropy, "0.00") + ", "
+            entropy += nextEntropy
+        Next
     End Sub
 End Class

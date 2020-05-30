@@ -36,12 +36,14 @@ Module UI_GeneratorMain
         readProj.Close()
 
         Dim className As String = ""
-        Dim functionNames As New List(Of String)
         Dim CodeLineCount As Int32
+        Dim sortedNames As New SortedList(Of String, Int32)
+        Dim sIndex As Integer
         For Each fileName In fileNames
             If fileName.EndsWith(".py") Then
                 Dim fileinfo As New FileInfo(fileName)
-                functionNames.Add(fileinfo.Name)
+                sortedNames.Add(fileinfo.Name, sIndex)
+                sIndex += 1
                 fileName = fileinfo.FullName
             Else
                 Dim nextFile As New System.IO.StreamReader(fileName)
@@ -59,16 +61,14 @@ Module UI_GeneratorMain
                                 If line2.StartsWith(vbTab) Then line2 = Mid(line2, 2)
                                 If LCase(line2) = "inherits ocvbclass" Then className = split(2) ' public class <classname>
                             End If
-                            If LCase(line).StartsWith("public sub new(ocvb as algorithmdata") Then functionNames.Add(className)
+                            If LCase(line).StartsWith("public sub new(ocvb as algorithmdata") Then
+                                sortedNames.Add(className, sIndex)
+                                sIndex += 1
+                            End If
                         End If
                     End If
                 End While
             End If
-        Next
-
-        Dim sortedNames As New SortedList(Of String, Int32)
-        For i = 0 To functionNames.Count - 1
-            sortedNames.Add(functionNames.ElementAt(i), i)
         Next
 
         Dim cleanNames As New List(Of String)

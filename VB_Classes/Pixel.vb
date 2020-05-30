@@ -53,7 +53,7 @@ Public Class Pixel_GetSet
         watch.Stop()
         output += "Marshal Copy took " + CStr(watch.ElapsedMilliseconds) + "ms" + vbCrLf
 
-        ocvb.putText(New ActiveClass.TrueType(output, 10, 60, RESULT1))
+        ocvb.putText(New oTrueType(output, 10, 60, RESULT1))
 
         mats.Run(ocvb)
         dst2 = mats.dst1

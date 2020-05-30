@@ -106,14 +106,15 @@ Public Class Transform_Gravity
         smooth = New Depth_SmoothingMat(ocvb, caller)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Apply smoothing to depth data"
-        check.Box(0).Checked = True
+        check.Box(0).Checked = False
+        check.Visible = False ' smoothing is not working well enough yet...
 
         imu = New IMU_GVector(ocvb, caller)
         ocvb.desc = "Transform the pointcloud with the gravity vector"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = T265Camera Then
-            ocvb.putText(New ActiveClass.TrueType("T265 camera has no pointcloud data", 10, 125))
+            ocvb.putText(New oTrueType("T265 camera has no pointcloud data", 10, 125))
             Exit Sub
         End If
 
@@ -160,7 +161,7 @@ Public Class Transform_Gravity
         If xyz.Length <> pc.Total * 3 Then ReDim xyz(pc.Total * 3 - 1)
         Marshal.Copy(pc.Data, xyz, 0, xyz.Length) ' why copy it?  To avoid memory leak in parallel for's.  Not sure...
 
-        If standalone Then ocvb.putText(New ActiveClass.TrueType("Pointcloud is now oriented toward gravity " +
-                                        If(check.Box(0).Checked, "using smoothed depth data.", "."), 10, 125,,, RESULT2))
+        If standalone Then ocvb.putText(New oTrueType("Pointcloud is now oriented toward gravity " +
+                                        If(check.Box(0).Checked, "using smoothed depth data.", "."), 10, 125, RESULT2))
     End Sub
 End Class

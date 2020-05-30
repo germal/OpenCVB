@@ -25,6 +25,7 @@ Partial Class OptionsDialog
         Me.CameraGroup = New System.Windows.Forms.GroupBox()
         Me.SnapToGrid = New System.Windows.Forms.CheckBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.RadioButton1 = New System.Windows.Forms.RadioButton()
         Me.AccurateProcessing = New System.Windows.Forms.RadioButton()
         Me.lowResolution = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
@@ -44,6 +45,11 @@ Partial Class OptionsDialog
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.OKButton = New System.Windows.Forms.Button()
         Me.Cancel_Button = New System.Windows.Forms.Button()
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox()
+        Me.fontInfo = New System.Windows.Forms.Label()
+        Me.Button1 = New System.Windows.Forms.Button()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.FontDialog1 = New System.Windows.Forms.FontDialog()
         Me.CameraGroup.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -51,6 +57,7 @@ Partial Class OptionsDialog
         Me.GroupBox4.SuspendLayout()
         CType(Me.TestAllDuration, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox6.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
         Me.SuspendLayout()
         '
         'CameraGroup
@@ -75,6 +82,7 @@ Partial Class OptionsDialog
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.RadioButton1)
         Me.GroupBox1.Controls.Add(Me.AccurateProcessing)
         Me.GroupBox1.Controls.Add(Me.lowResolution)
         Me.GroupBox1.Location = New System.Drawing.Point(21, 240)
@@ -82,28 +90,40 @@ Partial Class OptionsDialog
         Me.GroupBox1.Size = New System.Drawing.Size(936, 128)
         Me.GroupBox1.TabIndex = 4
         Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Speed"
+        Me.GroupBox1.Text = "Resolution"
+        '
+        'RadioButton1
+        '
+        Me.RadioButton1.AutoSize = True
+        Me.RadioButton1.Enabled = False
+        Me.RadioButton1.Location = New System.Drawing.Point(17, 25)
+        Me.RadioButton1.Name = "RadioButton1"
+        Me.RadioButton1.Size = New System.Drawing.Size(210, 24)
+        Me.RadioButton1.TabIndex = 2
+        Me.RadioButton1.TabStop = True
+        Me.RadioButton1.Text = "320x180 - Low resolution"
+        Me.RadioButton1.UseVisualStyleBackColor = True
         '
         'AccurateProcessing
         '
         Me.AccurateProcessing.AutoSize = True
-        Me.AccurateProcessing.Location = New System.Drawing.Point(16, 70)
+        Me.AccurateProcessing.Location = New System.Drawing.Point(18, 85)
         Me.AccurateProcessing.Name = "AccurateProcessing"
-        Me.AccurateProcessing.Size = New System.Drawing.Size(225, 24)
+        Me.AccurateProcessing.Size = New System.Drawing.Size(223, 24)
         Me.AccurateProcessing.TabIndex = 1
         Me.AccurateProcessing.TabStop = True
-        Me.AccurateProcessing.Text = "Run algorithm at 1280x720"
+        Me.AccurateProcessing.Text = "1280x720 - High resolution"
         Me.AccurateProcessing.UseVisualStyleBackColor = True
         '
         'lowResolution
         '
         Me.lowResolution.AutoSize = True
-        Me.lowResolution.Location = New System.Drawing.Point(16, 40)
+        Me.lowResolution.Location = New System.Drawing.Point(18, 55)
         Me.lowResolution.Name = "lowResolution"
-        Me.lowResolution.Size = New System.Drawing.Size(471, 24)
+        Me.lowResolution.Size = New System.Drawing.Size(237, 24)
         Me.lowResolution.TabIndex = 0
         Me.lowResolution.TabStop = True
-        Me.lowResolution.Text = "Run algorithm after resizing image to 640x360 (lowResolution)"
+        Me.lowResolution.Text = "640x360 - Medium resolution"
         Me.lowResolution.UseVisualStyleBackColor = True
         '
         'GroupBox2
@@ -272,11 +292,51 @@ Partial Class OptionsDialog
         Me.Cancel_Button.Text = "Cancel"
         Me.Cancel_Button.UseVisualStyleBackColor = True
         '
+        'GroupBox3
+        '
+        Me.GroupBox3.Controls.Add(Me.fontInfo)
+        Me.GroupBox3.Controls.Add(Me.Button1)
+        Me.GroupBox3.Controls.Add(Me.Label4)
+        Me.GroupBox3.Location = New System.Drawing.Point(22, 841)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(936, 116)
+        Me.GroupBox3.TabIndex = 12
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "TrueType Font "
+        '
+        'fontInfo
+        '
+        Me.fontInfo.AutoSize = True
+        Me.fontInfo.Location = New System.Drawing.Point(72, 70)
+        Me.fontInfo.Name = "fontInfo"
+        Me.fontInfo.Size = New System.Drawing.Size(255, 20)
+        Me.fontInfo.TabIndex = 4
+        Me.fontInfo.Text = "Select the font for all TrueType text"
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(15, 68)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(43, 30)
+        Me.Button1.TabIndex = 3
+        Me.Button1.Text = "..."
+        Me.Button1.UseVisualStyleBackColor = True
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(12, 37)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(255, 20)
+        Me.Label4.TabIndex = 1
+        Me.Label4.Text = "Select the font for all TrueType text"
+        '
         'OptionsDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1008, 841)
+        Me.ClientSize = New System.Drawing.Size(1008, 964)
+        Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.Cancel_Button)
         Me.Controls.Add(Me.OKButton)
         Me.Controls.Add(Me.GroupBox6)
@@ -303,6 +363,8 @@ Partial Class OptionsDialog
         CType(Me.TestAllDuration, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox6.ResumeLayout(False)
         Me.GroupBox6.PerformLayout()
+        Me.GroupBox3.ResumeLayout(False)
+        Me.GroupBox3.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -328,4 +390,10 @@ Partial Class OptionsDialog
     Friend WithEvents Cancel_Button As Button
     Friend WithEvents Label3 As Label
     Friend WithEvents RefreshRate As NumericUpDown
+    Friend WithEvents GroupBox3 As GroupBox
+    Friend WithEvents Button1 As Button
+    Friend WithEvents Label4 As Label
+    Friend WithEvents fontInfo As Label
+    Friend WithEvents FontDialog1 As FontDialog
+    Friend WithEvents RadioButton1 As RadioButton
 End Class

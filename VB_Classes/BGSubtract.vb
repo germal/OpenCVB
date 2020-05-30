@@ -215,9 +215,9 @@ Public Class BGSubtract_GMG_KNN
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount < 120 Then
-            ocvb.putText(New ActiveClass.TrueType("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(ocvb.frameCount), 10, 60, RESULT2))
+            ocvb.putText(New oTrueType("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(ocvb.frameCount), 10, 60, RESULT2))
         Else
-            ocvb.putText(New ActiveClass.TrueType("", 10, 60, RESULT2))
+            ocvb.putText(New oTrueType("", 10, 60, RESULT2))
         End If
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

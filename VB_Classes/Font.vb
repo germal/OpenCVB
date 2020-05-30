@@ -30,21 +30,19 @@ End Class
 
 Public Class Font_TrueType
     Inherits ocvbClass
-    Dim font As New OptionsFont
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
-        If ocvb.parms.ShowOptions Then font.Show()
         ocvb.desc = "Display different TrueType fonts"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         Dim fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
         ' get the font on every iteration because it could have changed.  This should be done in any algorithm using OptionsFont.
-        ocvb.putText(New ActiveClass.TrueType("TrueType Font Example (override default font) = Times New Roman with size 10" + vbCrLf +
+        ocvb.putText(New oTrueType("TrueType Font Example (override default font) = Times New Roman with size 10" + vbCrLf +
                                               "Use 'Change' button in the font dialog below to set a global font: " + fontName + vbCrLf +
                                               "Global TrueType Font = " + fontName + " with size " + CStr(fontSize) + vbCrLf +
                                               "Use 'ocvb.putText' with 'ocvb.fontName' and 'ocvb.fontSize' to exploit global font.",
-                                              10, 50, "Times New Roman", 10, RESULT1))
+                                              10, 50, RESULT1))
     End Sub
 End Class
 
@@ -54,7 +52,7 @@ End Class
 Public Class Font_FlowText
     Inherits ocvbClass
     Public msgs As New List(Of String)
-        Public result1or2 As Int32 = RESULT1
+    Public result1or2 As Int32 = RESULT1
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         ocvb.desc = "Show TrueType text flowing through an image."
@@ -71,7 +69,7 @@ Public Class Font_FlowText
 
         Dim firstLine = If(msgs.Count - maxLines < 0, 0, msgs.Count - maxLines)
         For i = firstLine To msgs.Count - 1
-            ocvb.putText(New ActiveClass.TrueType(msgs(i), 10, (i - firstLine) * 15 + 20, "Microsoft Sans Serif", 8, result1or2))
+            ocvb.putText(New oTrueType(msgs(i), 10, (i - firstLine) * 15 + 20, result1or2))
         Next
 
         If ocvb.color.Width > 1000 Then maxLines = 29 ' larger mat gets more lines.

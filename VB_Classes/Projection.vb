@@ -47,11 +47,12 @@ Public Class Projection_ColorizeMat
     Public colorizeMatFlip As cv.Mat
     Dim fontSize As Single
     Dim radius As Integer
-    Public Function CameraLocationBot(mask As cv.Mat) As cv.Mat
+    Public Function CameraLocationBot(ocvb As AlgorithmData, mask As cv.Mat) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
         dst1.CopyTo(dst, mask)
         Dim shift = (dst.Width - dst.Height) / 2
         dst.Rectangle(New cv.Rect(shift, 0, dst.Height, dst.Height), cv.Scalar.White, 1)
+        Dim cameraLocation = New cv.Point(shift + dst.Height / 2, dst.Height - 5)
         dst.Circle(New cv.Point(shift + dst.Height / 2, dst.Height - 5), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Dim maxZ = sliders.TrackBar1.Value / 1000
         For i = maxZ - 1 To 0 Step -1
@@ -59,10 +60,16 @@ Public Class Projection_ColorizeMat
             dst.Line(New cv.Point(shift, y), New cv.Point(dst.Width - shift, y), cv.Scalar.AliceBlue, 1)
             cv.Cv2.PutText(dst, CStr(maxZ - i) + "m", New cv.Point(shift - 45, y + 10), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
+        Dim angle As Single, startAngle As Single, endAngle As Single = 0 ' assume D435i
+        startAngle = Choose(ocvb.parms.cameraIndex + 1, 55, 43, 0, 37, 48) ' T265 is not supported here...
+        angle = -startAngle
+        dst.Ellipse(New cv.Point(dst.Width / 2, dst.Height - 1), New cv.Size(100, 100), angle, startAngle, endAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        Dim labelLocation = New cv.Point(dst.Width / 2 + shift * 3 / 4, dst.Height * 7 / 8)
+        If ocvb.parms.resolution = resHigh Then labelLocation = New cv.Point(dst.Width / 2 + shift * 3 / 8, dst.Height * 15 / 16)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " degrees", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Return dst
     End Function
-
-    Public Function CameraLocationLeft(ByRef mask As cv.Mat) As cv.Mat
+    Public Function CameraLocationLeft(ocvb As AlgorithmData, ByRef mask As cv.Mat) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
         dst2.CopyTo(dst, mask)
         Dim shift = (dst.Width - dst.Height) / 2
@@ -76,7 +83,6 @@ Public Class Projection_ColorizeMat
         Next
         Return dst
     End Function
-
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
 
@@ -273,8 +279,8 @@ Public Class Projection_Gravity_CPP
         Dim fontSize As Single = 1.0
         If ocvb.parms.resolution = resMed Then fontSize = 0.6
         If standalone Then
-            dst1 = cMats.CameraLocationBot(topMask)
-            dst2 = cMats.CameraLocationLeft(sideMask)
+            dst1 = cMats.CameraLocationBot(ocvb, topMask)
+            dst2 = cMats.CameraLocationLeft(ocvb, sideMask)
         Else
             dst1 = topMask
             dst2 = sideMask
@@ -349,7 +355,7 @@ Public Class Projection_Objects
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = T265Camera Then
-            ocvb.putText(New ActiveClass.TrueType("There is no point cloud available on the T265 camera", 10, 60, RESULT1))
+            ocvb.putText(New oTrueType("There is no point cloud available on the T265 camera", 10, 60, RESULT1))
             Exit Sub
         End If
 
@@ -467,8 +473,8 @@ Public Class Projection_Gravity
             Dim topMask = topView.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             Dim sideMask = sideView.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
-            dst1 = cMats.CameraLocationBot(topMask)
-            dst2 = cMats.CameraLocationLeft(sideMask)
+            dst1 = cMats.CameraLocationBot(ocvb, topMask)
+            dst2 = cMats.CameraLocationLeft(ocvb, sideMask)
         End If
     End Sub
 End Class

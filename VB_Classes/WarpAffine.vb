@@ -177,7 +177,7 @@ Public Class WarpAffine_3Points
         Next
 
         Dim ttStart = 40
-        ocvb.putText(New ActiveClass.TrueType("M defined as: " + vbCrLf +
+        ocvb.putText(New oTrueType("M defined as: " + vbCrLf +
                                               Format(M.Get(Of Double)(0, 0), "#0.00") + vbTab +
                                               Format(M.Get(Of Double)(0, 1), "#0.00") + vbTab +
                                               Format(M.Get(Of Double)(0, 2), "#0.00") + vbCrLf +
@@ -235,7 +235,7 @@ Public Class WarpAffine_4Points
 
         dst2.SetTo(0)
         Dim ttStart = 40
-        ocvb.putText(New ActiveClass.TrueType("M defined as: " + vbCrLf +
+        ocvb.putText(New oTrueType("M defined as: " + vbCrLf +
                                               Format(M.Get(Of Double)(0, 0), "#0.00") + vbTab +
                                               Format(M.Get(Of Double)(0, 1), "#0.00") + vbTab +
                                               Format(M.Get(Of Double)(0, 2), "#0.00") + vbCrLf +

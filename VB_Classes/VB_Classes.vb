@@ -41,45 +41,6 @@ Module Algorithm_Module
 End Module
 
 Public Class ActiveClass : Implements IDisposable
-    Public Class TrueType
-        Public Const RESULT1 = 2
-        Public Const RESULT2 = 3
-        Public text As String
-
-        ' Change the default TrueType font and font size here.  Any individual ocvbClass can override with a specific font if needed.
-        ' To use the global TrueType font, specify _fontName = ocvb.fontName and _fontSize = ocvb.fontSize on the TrueType constructor.
-        Const defaultFont = "Microsoft Sans Serif"
-        Const defaultFontSize = 8
-
-        Public fontName As String = defaultFont
-        Public fontSize As Double = defaultFontSize
-        Public picTag As Int32
-        Public x As Int32
-        Public y As Int32
-        Public Sub New(_text As String, _x As Int32, _y As Int32, Optional _fontName As String = defaultFont,
-                       Optional _fontSize As Double = defaultFontSize, Optional _picTag As Int32 = RESULT1)
-            text = _text
-            x = _x
-            y = _y
-            fontName = _fontName
-            fontSize = _fontSize
-            picTag = _picTag
-        End Sub
-        Public Sub New(_text As String, _x As Int32, _y As Int32, _picTag As Int32)
-            text = _text
-            x = _x
-            y = _y
-            picTag = _picTag
-        End Sub
-
-        Public Sub New(_text As String, _x As Int32, _y As Int32)
-            text = _text
-            x = _x
-            y = _y
-            picTag = RESULT1
-        End Sub
-    End Class
-
     Public ocvb As AlgorithmData
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2

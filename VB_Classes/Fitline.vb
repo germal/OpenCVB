@@ -270,7 +270,7 @@ Public Class Fitline_EigenFit
             dst2.Line(p1, p2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
         End If
 
-        ocvb.putText(New ActiveClass.TrueType("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(Len)) + vbCrLf +
+        ocvb.putText(New oTrueType("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(Len)) + vbCrLf +
                                               "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), "#0.0") + vbCrLf +
                                               "theta: atan2(" + Format(eigenVec.Get(Of Single)(1, 0), "#0.0") + ", " + Format(eigenVec.Get(Of Single)(0, 0), "#0.0") + ") = " +
                                               Format(theta, "#0.0000"), 10, 22, RESULT2))

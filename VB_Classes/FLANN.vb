@@ -33,10 +33,10 @@ Public Class FLANN_Test
                     Dim index As Integer = indices(i)
                     Dim dist As Single = dists(i)
                     Dim pt As New cv.Point2f(features.Get(Of Single)(index, 0), features.Get(Of Single)(index, 1))
-                    ocvb.putText(New ActiveClass.TrueType(String.Format("No.{0}" & vbTab, i), 10 + i * 30, 30 + i * 15))
-                    ocvb.putText(New ActiveClass.TrueType(String.Format("index:{0}", index), 10 + i * 30, 30 + i * 15 + 30))
-                    ocvb.putText(New ActiveClass.TrueType(String.Format("distance:{0}", dist), 10 + i * 30, 30 + i * 15 + 60))
-                    ocvb.putText(New ActiveClass.TrueType(String.Format("data:({0}, {1})", pt.X, pt.Y), 10, 30 + i * 15 + 90))
+                    ocvb.putText(New oTrueType(String.Format("No.{0}" & vbTab, i), 10 + i * 30, 30 + i * 15))
+                    ocvb.putText(New oTrueType(String.Format("index:{0}", index), 10 + i * 30, 30 + i * 15 + 30))
+                    ocvb.putText(New oTrueType(String.Format("distance:{0}", dist), 10 + i * 30, 30 + i * 15 + 60))
+                    ocvb.putText(New oTrueType(String.Format("data:({0}, {1})", pt.X, pt.Y), 10, 30 + i * 15 + 90))
                 Next i
             End Using
         End Using

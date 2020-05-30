@@ -163,6 +163,6 @@ Public Class Area_FindNonZero
             Dim pt = nonzero.Get(Of cv.Point)(0, i)
             outstr += "X = " + vbTab + CStr(pt.X) + vbTab + " y = " + vbTab + CStr(pt.Y) + vbCrLf
         Next
-        ocvb.putText(New ActiveClass.TrueType(outstr, 10, 50, RESULT2))
+        ocvb.putText(New oTrueType(outstr, 10, 50, RESULT2))
     End Sub
 End Class
