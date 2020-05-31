@@ -279,7 +279,6 @@ Public Class Puzzle_Solver
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         puzzle = New Puzzle_Basics(ocvb, caller)
-        puzzle.grid.sliders.Hide()
 
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "256x180 tile - Easy Puzzle"
@@ -287,8 +286,12 @@ Public Class Puzzle_Solver
         radio.check(2).Text = "64x90   tile - Hard Puzzle"
         radio.check(0).Checked = True
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(ocvb, caller, 3)
         check.Box(0).Text = "Reshuffle pieces"
+        check.Box(1).Text = "Show only the poor correlation coefficients"
+        check.Box(2).Text = "Clean display (no grid or correlations)"
+        check.Box(0).Checked = True
+        check.Box(1).Checked = True
 
         ocvb.desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."
     End Sub
@@ -306,23 +309,51 @@ Public Class Puzzle_Solver
             check.Box(0).Checked = True
             saveWidth = src.Width
         End If
-        If check.Box(0).Checked Or ocvb.parms.testAllRunning Then
+        Dim radioIndex As Integer
+        For i = 0 To radio.check.Count - 1
+            If radio.check(i).Checked Then
+                radioIndex = i
+                Exit For
+            End If
+        Next
+        Static saveRadioIndex As Integer
+        Static saveResolution As Integer
+        Static fontsize = 0.9
+        Static xxOffset As Integer
+        Static xyOffset As Integer
+        Static yxOffset As Integer
+        Static yyOffset As Integer
+        If check.Box(0).Checked Or ocvb.parms.testAllRunning Or saveRadioIndex <> radioIndex Or saveResolution <> ocvb.parms.resolution Then
             Dim factor = 1
+            saveRadioIndex = radioIndex
+            saveResolution = ocvb.parms.resolution
             If ocvb.parms.resolution = resMed Then factor = 2
             If radio.check(0).Checked Then
                 puzzle.grid.sliders.TrackBar1.Value = 256 / factor
                 puzzle.grid.sliders.TrackBar2.Value = 180 / factor
+                fontsize = 0.9
+                xxOffset = puzzle.grid.sliders.TrackBar1.Value / 2
+                yxOffset = puzzle.grid.sliders.TrackBar1.Value * 3 / 4
             ElseIf radio.check(1).Checked Then
                 puzzle.grid.sliders.TrackBar1.Value = 128 / factor
                 puzzle.grid.sliders.TrackBar2.Value = 90 / factor
+                fontsize = 0.7
+                xxOffset = puzzle.grid.sliders.TrackBar1.Value / 3
+                yxOffset = puzzle.grid.sliders.TrackBar1.Value * 3 / 4
             Else
                 puzzle.grid.sliders.TrackBar1.Value = 64 / factor
                 puzzle.grid.sliders.TrackBar2.Value = 90 / factor
+                fontsize = 0.5
+                xxOffset = puzzle.grid.sliders.TrackBar1.Value / 4
+                yxOffset = puzzle.grid.sliders.TrackBar1.Value / 2
             End If
+            xyOffset = puzzle.grid.sliders.TrackBar2.Value * 9 / 10
+            yyOffset = puzzle.grid.sliders.TrackBar2.Value / 2
             puzzle.restartRequested = True
             puzzle.src = src
             puzzle.Run(ocvb)
             roilist = puzzle.grid.roiList.ToArray
+            If ocvb.parms.resolution = resMed Then fontsize -= 0.3
         End If
 
         dst1 = puzzle.dst1
@@ -383,45 +414,50 @@ Public Class Puzzle_Solver
                 Next
         End Select
 
-        ' how well did we do?
-        Dim tmp As New cv.Mat
-        Dim left As cv.Mat, right As cv.Mat, bottom As cv.Mat, top As cv.Mat
-        Dim fontsize = 0.9
-        If ocvb.parms.resolution = resMed Then fontsize = 0.4
-        For y = 0 To dst2.Height - 1 Step roi.Height
-            For x = 0 To dst2.Width - 1 Step roi.Width
-                Dim tileRoi = New cv.Rect(x, y, roi.Width, roi.Height)
-                Dim tileRight = New cv.Rect(x + roi.Width, y, roi.Width, roi.Height)
-                Dim tileBelow = New cv.Rect(x, y + roi.Height, roi.Width, roi.Height)
-                If x <> dst2.Width - roi.Width Then
-                    right = dst2(tileRoi).Col(roi.Width - 1)
-                    left = dst2(tileRight).Col(0)
-                    cv.Cv2.MatchTemplate(right, left, tmp, cv.TemplateMatchModes.CCoeffNormed)
-                    Dim correlationRight = tmp.Get(Of Single)(0, 0)
-                    cv.Cv2.PutText(dst2, Format(correlationRight, "0.00"), New cv.Point(x + roi.Width * 3 / 4, y + roi.Height / 2),
-                                   cv.HersheyFonts.HersheySimplex, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                End If
+        If check.Box(2).Checked = False Then
+            ' how well did we do?
+            Dim tmp As New cv.Mat
+            Dim left As cv.Mat, right As cv.Mat, bottom As cv.Mat, top As cv.Mat
+            For y = 0 To dst2.Height - 1 Step roi.Height
+                For x = 0 To dst2.Width - 1 Step roi.Width
+                    Dim tileRoi = New cv.Rect(x, y, roi.Width, roi.Height)
+                    Dim tileRight = New cv.Rect(x + roi.Width, y, roi.Width, roi.Height)
+                    Dim tileBelow = New cv.Rect(x, y + roi.Height, roi.Width, roi.Height)
+                    If x <> dst2.Width - roi.Width Then
+                        right = dst2(tileRoi).Col(roi.Width - 1)
+                        left = dst2(tileRight).Col(0)
+                        cv.Cv2.MatchTemplate(right, left, tmp, cv.TemplateMatchModes.CCoeffNormed)
+                        Dim correlationRight = tmp.Get(Of Single)(0, 0)
+                        If check.Box(1).Checked = False Or correlationRight < 0.9 Then
+                            cv.Cv2.PutText(dst2, Format(correlationRight, "0.00"), New cv.Point(x + yxOffset, y + yyOffset),
+                                       cv.HersheyFonts.HersheySimplex, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                        End If
+                    End If
 
-                If y <> dst2.Height - roi.Height Then
-                    bottom = dst2(tileRoi).Row(roi.Height - 1)
-                    top = dst2(tileBelow).Row(0)
+                    If y <> dst2.Height - roi.Height Then
+                        bottom = dst2(tileRoi).Row(roi.Height - 1)
+                        top = dst2(tileBelow).Row(0)
 
-                    cv.Cv2.MatchTemplate(bottom, top, tmp, cv.TemplateMatchModes.CCoeffNormed)
-                    Dim correlationBottom = tmp.Get(Of Single)(0, 0)
+                        cv.Cv2.MatchTemplate(bottom, top, tmp, cv.TemplateMatchModes.CCoeffNormed)
+                        Dim correlationBottom = tmp.Get(Of Single)(0, 0)
 
-                    cv.Cv2.PutText(dst2, Format(correlationBottom, "0.00"), New cv.Point(x + roi.Width / 3, y + roi.Height * 7 / 8),
-                                   cv.HersheyFonts.HersheySimplex, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                End If
+                        If check.Box(1).Checked = False Or correlationBottom < 0.9 Then
+                            cv.Cv2.PutText(dst2, Format(correlationBottom, "0.00"), New cv.Point(x + xxOffset, y + xyOffset),
+                                       cv.HersheyFonts.HersheySimplex, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                        End If
+                    End If
+                Next
             Next
-        Next
 
-        dst2.SetTo(cv.Scalar.White, puzzle.grid.gridMask)
+            dst2.SetTo(cv.Scalar.White, puzzle.grid.gridMask)
+        End If
+
         fitlist.Clear()
         usedList.Clear()
         check.Box(0).Checked = False
 
         label1 = "Input to puzzle solver"
-        label2 = "Puzzle_Solver output (ambiguities possible)"
+        label2 = "Solution with edge correlations (ambiguities possible)"
         If radio.check(1).Checked Or radio.check(2).Checked Then Thread.Sleep(1000)
     End Sub
 End Class
