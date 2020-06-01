@@ -1,4 +1,5 @@
 Imports cv = OpenCvSharp
+' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class SVM_Options
     Inherits ocvbClass
     Public kernelType = cv.ML.SVM.KernelTypes.Rbf
@@ -9,7 +10,12 @@ Public Class SVM_Options
         setCaller(callerRaw)
         sliders.setupTrackBar1(ocvb, caller, "SampleCount", 5, 1000, 500)
         sliders.setupTrackBar2(ocvb, caller, "Granularity", 1, 50, 5)
-
+        sliders.setupTrackBar3(ocvb, caller, "SVM Degree", 1, 200, 100)
+        sliders.setupTrackBar4(ocvb, caller, "SVM Gamma ", 1, 200, 100)
+        sliders1.setupTrackBar1(ocvb, caller, "SVM Coef0 X100", 1, 200, 100)
+        sliders1.setupTrackBar2(ocvb, caller, "SVM C X100", 0, 100, 100)
+        sliders1.setupTrackBar3(ocvb, caller, "SVM Nu X100", 1, 85, 50)
+        sliders1.setupTrackBar4(ocvb, caller, "SVM P X100", 0, 100, 10)
         radio.Setup(ocvb, caller, 4)
         radio.check(0).Text = "kernel Type = Linear"
         radio.check(1).Text = "kernel Type = Poly"
@@ -25,6 +31,7 @@ Public Class SVM_Options
         radio1.check(3).Text = "SVM Type = NuSvr"
         radio1.check(4).Text = "SVM Type = OneClass"
         If ocvb.parms.ShowOptions Then radio.Show()
+
 
         label1 = "SVM_Options - only options, no output"
         ocvb.desc = "SVM has many options - enough to make a class for it."
@@ -48,12 +55,12 @@ Public Class SVM_Options
         svmx.Type = SVMType
         svmx.KernelType = kernelType
         svmx.TermCriteria = cv.TermCriteria.Both(1000, 0.000001)
-        svmx.Degree = 100.0
-        svmx.Gamma = 100.0
-        svmx.Coef0 = 1.0
-        svmx.C = 1.0
-        svmx.Nu = 0.5
-        svmx.P = 0.1
+        svmx.Degree = CSng(sliders.TrackBar3.Value)
+        svmx.Gamma = CSng(sliders.TrackBar4.Value)
+        svmx.Coef0 = sliders1.TrackBar1.Value / 100
+        svmx.C = sliders1.TrackBar2.Value / 100
+        svmx.Nu = sliders1.TrackBar3.Value / 100
+        svmx.P = sliders1.TrackBar4.Value / 100
 
         Return svmx
     End Function
@@ -87,7 +94,6 @@ End Class
 Public Class SVM_Basics
     Inherits ocvbClass
     Dim svmOptions As SVM_Options
-    Dim svm As New SVM_Simple
     Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
         setCaller(callerRaw)
         svmOptions = New SVM_Options(ocvb, caller)
@@ -107,7 +113,21 @@ Public Class SVM_Basics
 
         svmx.Train(dataMat, cv.ML.SampleTypes.RowSample, resMat)
 
-        dst2 = svm.RunSVM(svmx, src, dataMat, resMat, svmOptions.sliders.TrackBar2.Value)
+        Dim granularity = svmOptions.sliders.TrackBar2.Value
+        Dim sampleMat As New cv.Mat(1, 2, cv.MatType.CV_32F)
+        For x = 0 To src.Height - 1 Step granularity
+            For y = 0 To src.Height - 1 Step granularity
+                sampleMat.Set(Of Single)(0, 0, x / CSng(src.Height))
+                sampleMat.Set(Of Single)(0, 1, y / CSng(src.Height))
+                Dim ret = svmx.Predict(sampleMat)
+                Dim plotRect = New cv.Rect(x, src.Height - 1 - y, granularity * 2, granularity * 2)
+                If ret = 1 Then
+                    dst2.Rectangle(plotRect, cv.Scalar.Red, -1)
+                ElseIf ret = 2 Then
+                    dst2.Rectangle(plotRect, cv.Scalar.GreenYellow, -1)
+                End If
+            Next
+        Next
 
         ' draw the function in both plots to show ground truth.
         For x = 1 To src.Height - 1
@@ -131,8 +151,11 @@ Public Class SVM_Random
         svmOptions.sliders.TrackBar2.Value = 15
         ocvb.drawRect = New cv.Rect(ocvb.color.Cols / 4, ocvb.color.Rows / 4, ocvb.color.Cols / 2, ocvb.color.Rows / 2)
 
-        ocvb.label1 = "SVM Training data"
-        ocvb.desc = "Use SVM to classify random points - testing if height must equal width."
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Restrict random test to square area"
+
+        label1 = "SVM Training data"
+        ocvb.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         svmOptions.Run(ocvb)
@@ -144,19 +167,28 @@ Public Class SVM_Random
         Dim dataSize = svmOptions.sliders.TrackBar1.Value ' get the sample count
         Dim trainData As New cv.Mat(dataSize, 2, cv.MatType.CV_32F)
         Dim response = New cv.Mat(dataSize, 1, cv.MatType.CV_32S)
+        Dim width = src.Width
+        If check.Box(0).Checked Then
+            width = src.Height
+            rect.X = 0
+            rect.Y = src.Height - rect.Height
+            rect.Width = width
+        End If
+        trainData *= 1 / width
         For i = 0 To dataSize
-            Dim pt = New cv.Point2f(msRNG.Next(0, src.Width - 1), msRNG.Next(0, src.Height - 1))
+            Dim pt = New cv.Point2f(msRNG.Next(0, width - 1), msRNG.Next(0, src.Height - 1))
             If pt.X > rect.X And pt.X < rect.X + rect.Width And pt.Y > rect.Y And pt.Y < rect.Y + rect.Height Then
-                response.Set(Of Integer)(i, 0, 1)
+                response.Set(Of Int32)(i, 0, 1)
                 dst1.Circle(pt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
             Else
-                response.Set(Of Integer)(i, 0, -1)
+                response.Set(Of Int32)(i, 0, -1)
                 dst1.Circle(pt, 5, cv.Scalar.Green, -1, cv.LineTypes.AntiAlias)
             End If
             trainData.Set(Of Single)(i, 0, pt.X)
             trainData.Set(Of Single)(i, 1, pt.Y)
         Next
 
+        Dim output As New List(Of Single)
         Using svmx = cv.ML.SVM.Create()
             svmx.Train(trainData, cv.ML.SampleTypes.RowSample, response)
 
@@ -164,19 +196,22 @@ Public Class SVM_Random
             Dim granularity = svmOptions.sliders.TrackBar2.Value
             Dim blueCount As Integer = 0
             For y = 0 To dst2.Height - 1 Step granularity
-                For x = 0 To dst2.Width - 1 Step granularity
+                For x = 0 To width - 1 Step granularity
                     sampleMat.Set(Of Single)(0, 0, x)
                     sampleMat.Set(Of Single)(0, 1, y)
-                    If CInt(svmx.Predict(sampleMat)) >= 0 Then
+                    Dim ret = svmx.Predict(sampleMat)
+                    output.Add(ret)
+                    If ret >= 0 Then
                         dst2.Circle(New cv.Point(x, y), 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+                        blueCount += 1
                     Else
                         dst2.Circle(New cv.Point(x, y), 5, cv.Scalar.Green, -1, cv.LineTypes.AntiAlias)
                     End If
                 Next
             Next
             label2 = "There were " + CStr(blueCount) + " blue predictions"
-            dst1.Rectangle(ocvb.drawRect, cv.Scalar.Black, 2)
-            dst2.Rectangle(ocvb.drawRect, cv.Scalar.Black, 2)
+            dst1.Rectangle(rect, cv.Scalar.Black, 2)
+            dst2.Rectangle(rect, cv.Scalar.Black, 2)
         End Using
     End Sub
 End Class
@@ -186,25 +221,25 @@ End Class
 
 
 
-' this class encapsulates the simplest elements of SVM and is used above.  It does not inherit from ocvbClass.
-Public Class SVM_Simple
-    Public Function RunSVM(svmx As cv.ML.SVM, src As cv.Mat, trainInput As cv.Mat, response As cv.Mat, granularity As Integer) As cv.Mat
-        Dim dst As New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-        svmx.Train(trainInput, cv.ML.SampleTypes.RowSample, response)
-        Dim sampleMat As New cv.Mat(1, 2, cv.MatType.CV_32F)
-        For x = 0 To src.Height - 1 Step granularity
-            For y = 0 To src.Height - 1 Step granularity
-                sampleMat.Set(Of Single)(0, 0, x / CSng(src.Height))
-                sampleMat.Set(Of Single)(0, 1, y / CSng(src.Height))
-                Dim ret = svmx.Predict(sampleMat)
-                Dim plotRect = New cv.Rect(x, src.Height - 1 - y, granularity * 2, granularity * 2)
-                If ret = 1 Then
-                    dst.Rectangle(plotRect, cv.Scalar.Red, -1)
-                ElseIf ret = 2 Then
-                    dst.Rectangle(plotRect, cv.Scalar.GreenYellow, -1)
-                End If
-            Next
-        Next
-        Return dst
-    End Function
+' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
+
+Public Class SVM_TestCase
+    Inherits ocvbClass
+    Dim labels() As Int32 = {1, -1, -1, -1}
+    Dim trainData(,) As Single = {{501, 10}, {255, 10}, {501, 255}, {10, 501}}
+    Dim trainMat As cv.Mat
+    Dim labelsMat As cv.Mat
+    Dim svm As SVM_Options
+    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
+        setCaller(callerRaw)
+
+        trainMat = New cv.Mat(4, 2, cv.MatType.CV_32F, trainData)
+        labelsMat = New cv.Mat(4, 1, cv.MatType.CV_32SC1, labels)
+
+        svm = New SVM_Options(ocvb, caller)
+        ocvb.desc = "Text book example on SVM"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+
+    End Sub
 End Class
