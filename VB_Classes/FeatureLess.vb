@@ -7,16 +7,16 @@ Public Class Featureless_Basics_MT
     Public mask As New cv.Mat
     Public objects As New List(Of cv.Mat)
     Public objectSize As New List(Of Int32)
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "FeatureLess rho", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, caller, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3(ocvb, caller, "FeatureLess threshold", 1, 100, 3)
-        sliders.setupTrackBar4(ocvb, caller, "FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "FeatureLess rho", 1, 100, 1)
+        sliders.setupTrackBar2(ocvb, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
+        sliders.setupTrackBar3(ocvb, "FeatureLess threshold", 1, 100, 3)
+        sliders.setupTrackBar4(ocvb, "FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
 
-        edges = New Edges_Canny(ocvb, caller)
+        edges = New Edges_Canny(ocvb)
 
-        grid = New Thread_Grid(ocvb, caller)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = If(ocvb.color.Width > 1000, 16, 8)
         grid.sliders.TrackBar2.Value = If(ocvb.color.Width > 1000, 16, 8)
 
@@ -78,11 +78,11 @@ End Class
 Public Class FeatureLess_Prediction
     Inherits ocvbClass
     Dim fLess As Featureless_Basics_MT
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "FeatureLess Resize Percent", 1, 100, 1)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "FeatureLess Resize Percent", 1, 100, 1)
 
-        fLess = New Featureless_Basics_MT(ocvb, caller)
+        fLess = New Featureless_Basics_MT(ocvb)
 
         ocvb.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
     End Sub
@@ -161,9 +161,9 @@ End Class
 Public Class Featureless_DCT_MT
     Inherits ocvbClass
     Dim dct As DCT_FeatureLess_MT
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        dct = New DCT_FeatureLess_MT(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        dct = New DCT_FeatureLess_MT(ocvb)
 
         ocvb.desc = "Use DCT to find largest featureless region."
         label2 = "Largest FeatureLess Region"

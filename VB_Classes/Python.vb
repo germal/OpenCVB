@@ -64,13 +64,13 @@ End Module
 Public Class Python_Run
     Inherits ocvbClass
     Dim tryCount As Int32
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
         If pythonApp.Name.EndsWith("_PS.py") Then
-            pyStream = New PyStream_Basics(ocvb, caller)
+            pyStream = New PyStream_Basics(ocvb)
         Else
             StartPython(ocvb, "")
         End If
@@ -103,8 +103,8 @@ Public Class Python_MemMap
     Dim memMapPtr As IntPtr
     Public memMapValues(49) As Double ' more than we need - buffer for growth
     Public memMapbufferSize As Int32
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+        Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         If ocvb.PythonFileName Is Nothing Then
             ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_MemMap.py"
         End If
@@ -144,8 +144,8 @@ Public Class Python_SurfaceBlit
     Dim rgbBuffer(1) As Byte
     Dim pointCloudBuffer(1) As Byte
     Dim PythonReady As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ' this Python script requires pygame to be present...
         If checkPythonPackage(ocvb, "pygame") = False Then
             PythonReady = False
@@ -157,7 +157,7 @@ Public Class Python_SurfaceBlit
 
         ' this Python script assumes that fast processing is off - the pointcloud is being used and cannot be resized.
         ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
-        memMap = New Python_MemMap(ocvb, caller)
+        memMap = New Python_MemMap(ocvb)
 
         If ocvb.parms.externalPythonInvocation Then
             PythonReady = True ' python was already running and invoked OpenCVB.

@@ -19,9 +19,9 @@ Public Class RecursiveBilateralFilter_CPP
     Inherits ocvbClass
     Dim srcData(0) As Byte
     Dim rbf As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "RBF Recursion count", 1, 20, 2)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "RBF Recursion count", 1, 20, 2)
         rbf = RecursiveBilateralFilter_Open()
         ocvb.desc = "Apply the recursive bilateral filter"
     End Sub

@@ -2,10 +2,10 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization (CLAHE)
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Clip Limit", 1, 100, 10)
-        sliders.setupTrackBar2(ocvb, caller, "Grid Size", 1, 100, 8)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Clip Limit", 1, 100, 10)
+        sliders.setupTrackBar2(ocvb, "Grid Size", 1, 100, 8)
         ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -25,10 +25,10 @@ End Class
 
 Public Class Brightness_Contrast
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Brightness", 1, 100, 50)
-        sliders.setupTrackBar2(ocvb, caller, "Contrast", 1, 100, 50)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Brightness", 1, 100, 50)
+        sliders.setupTrackBar2(ocvb, "Contrast", 1, 100, 50)
         ocvb.desc = "Show image with vary contrast and brightness."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -43,8 +43,8 @@ End Class
 Public Class Brightness_hue
     Inherits ocvbClass
     Public hsv_planes(2) As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Show hue (Result1) and Saturation (Result2)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -63,11 +63,11 @@ End Class
 
 Public Class Brightness_AlphaBeta
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Use alpha and beta with ConvertScaleAbs."
-        sliders.setupTrackBar1(ocvb, caller, "Brightness Alpha (contrast)", 0, 500, 300)
-        sliders.setupTrackBar2(ocvb, caller, "Brightness Beta (brightness)", -100, 100, 0)
+        sliders.setupTrackBar1(ocvb, "Brightness Alpha (contrast)", 0, 500, 300)
+        sliders.setupTrackBar2(ocvb, "Brightness Beta (brightness)", -100, 100, 0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1 = src.ConvertScaleAbs(sliders.TrackBar1.Value / 500, sliders.TrackBar2.Value)
@@ -80,10 +80,10 @@ End Class
 Public Class Brightness_Gamma
     Inherits ocvbClass
     Dim lookupTable(255) As Byte
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Use gamma with ConvertScaleAbs."
-        sliders.setupTrackBar1(ocvb, caller, "Brightness Gamma correction", 0, 200, 100)
+        sliders.setupTrackBar1(ocvb, "Brightness Gamma correction", 0, 200, 100)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static lastGamma As Int32 = -1
@@ -120,9 +120,9 @@ End Module
 Public Class Brightness_WhiteBalance_CPP
     Inherits ocvbClass
     Dim wPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "White balance threshold X100", 1, 100, 10)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "White balance threshold X100", 1, 100, 10)
 
         wPtr = WhiteBalance_Open()
         label1 = "Image with auto white balance"
@@ -157,14 +157,14 @@ Public Class Brightness_WhiteBalance
     Inherits ocvbClass
     Dim hist As Histogram_Basics
     Dim wPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        hist = New Histogram_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        hist = New Histogram_Basics(ocvb)
         hist.bins = 256 * 3
         hist.maxRange = hist.bins
         If standalone = False Then hist.sliders.Visible = False
 
-        sliders.setupTrackBar1(ocvb, caller, "White balance threshold X100", 1, 100, 10)
+        sliders.setupTrackBar1(ocvb, "White balance threshold X100", 1, 100, 10)
 
         label1 = "Image with auto white balance"
         ocvb.desc = "Automate getting the right white balance - faster than the C++ version (in debug mode)"
@@ -218,11 +218,11 @@ Public Class Brightness_ChangeMask
     Inherits ocvbClass
     Dim white As Brightness_WhiteBalance
     Dim whiteCPP As Brightness_WhiteBalance_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        white = New Brightness_WhiteBalance(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        white = New Brightness_WhiteBalance(ocvb)
         If standalone = False Then white.sliders.Visible = False
-        whiteCPP = New Brightness_WhiteBalance_CPP(ocvb, caller)
+        whiteCPP = New Brightness_WhiteBalance_CPP(ocvb)
         If standalone = False Then whiteCPP.sliders.Visible = False
 
         ocvb.desc = "Create a mask for the changed pixels after white balance"
@@ -263,19 +263,19 @@ Public Class Brightness_PlotHist
     Public hist1 As Histogram_KalmanSmoothed
     Public hist2 As Histogram_KalmanSmoothed
     Dim mat2to1 As Mat_2to1
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        white = New Brightness_ChangeMask(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        white = New Brightness_ChangeMask(ocvb)
 
-        hist1 = New Histogram_KalmanSmoothed(ocvb, caller)
+        hist1 = New Histogram_KalmanSmoothed(ocvb)
         hist1.sliders.Visible = False
         hist1.plotHist.sliders.Visible = False
 
-        hist2 = New Histogram_KalmanSmoothed(ocvb, caller)
+        hist2 = New Histogram_KalmanSmoothed(ocvb)
         hist2.sliders.Visible = False
         hist2.plotHist.sliders.Visible = False
 
-        mat2to1 = New Mat_2to1(ocvb, caller)
+        mat2to1 = New Mat_2to1(ocvb)
 
         ocvb.desc = "Plot the histogram of the before and after white balancing"
     End Sub

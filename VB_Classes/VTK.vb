@@ -39,8 +39,8 @@ Public Class VTK_Basics
     Public zFar As Single = 10.0
     Public vtkTitle As String = "VTK_Data"
     Public vtkPresent As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
         Dispose() ' make sure there wasn't an old VTKWindow sitting around...
         ocvb.desc = "Create VTK window and update it with images"
@@ -127,20 +127,20 @@ Public Class VTK_Histogram3D
     Dim vtk As VTK_Basics
     Dim mats As Mat_4to1
     Dim random As Random_NormalDist
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Random Number Stdev", 0, 255, 10)
-        sliders.setupTrackBar2(ocvb, caller, "Hist 3D bins", 1, 100, 32)
-        sliders.setupTrackBar3(ocvb, caller, "Hist 3D bin Threshold X1000000", 10, 100, 20)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Random Number Stdev", 0, 255, 10)
+        sliders.setupTrackBar2(ocvb, "Hist 3D bins", 1, 100, 32)
+        sliders.setupTrackBar3(ocvb, "Hist 3D bin Threshold X1000000", 10, 100, 20)
 
-        mats = New Mat_4to1(ocvb, caller)
+        mats = New Mat_4to1(ocvb)
 
         label2 = "Input to VTK plot"
 
-        vtk = New VTK_Basics(ocvb, caller)
+        vtk = New VTK_Basics(ocvb)
         vtk.usingDepthAndRGB = False
 
-        random = New Random_NormalDist(ocvb, caller)
+        random = New Random_NormalDist(ocvb)
         ocvb.desc = "Create the test pattern and send it to VTK for 3D display."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

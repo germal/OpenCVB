@@ -27,12 +27,12 @@ Public Class CellAuto_Life
         End If
         Return CountNeighbors
     End Function
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         grid = New cv.Mat(src.Height / factor, src.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
 
-        random = New Random_Points(ocvb, caller)
+        random = New Random_Points(ocvb)
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
         random.sliders.TrackBar1.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         ocvb.desc = "Use OpenCV to implement the Game of Life"
@@ -100,11 +100,11 @@ Public Class CellAuto_LifePopulation
     Inherits ocvbClass
     Dim plot As Plot_OverTime
     Dim game As CellAuto_Life
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        game = New CellAuto_Life(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        game = New CellAuto_Life(ocvb)
 
-        plot = New Plot_OverTime(ocvb, caller)
+        plot = New Plot_OverTime(ocvb)
         plot.dst1 = dst2
         plot.maxScale = 2000
         plot.plotCount = 1
@@ -157,8 +157,8 @@ Public Class CellAuto_Basics
         Return dst.ConvertScaleAbs(255)
     End Function
 
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         i18.Add("00011110 Rule 30 (chaotic)")
         i18.Add("00110110 Rule 54")
         i18.Add("00111100 Rule 60")
@@ -181,9 +181,9 @@ Public Class CellAuto_Basics
 
         Dim inputCombo = "111,110,101,100,011,010,001,000"
         Dim label = "The 18 most interesting automata from the first 256 in 'New Kind of Science'" + vbCrLf + "The input combinations are: " + inputCombo
-        combo.Setup(ocvb, caller, label + vbCrLf + "output below:", i18)
+        combo.Setup(ocvb, label + vbCrLf + "output below:", i18)
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(ocvb, 1)
         check.Box(0).Text = "Rotate through the different rules"
         check.Box(0).Checked = True
 
@@ -205,10 +205,10 @@ Public Class CellAuto_Basics_MP
     Dim cell As CellAuto_Basics
     Dim i18 As New List(Of String)
     Dim i18Index As Integer
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
 
-        cell = New CellAuto_Basics(ocvb, caller)
+        cell = New CellAuto_Basics(ocvb)
         i18 = cell.i18
 
         ocvb.desc = "Multi-threaded version of CellAuto_Basics"
@@ -236,12 +236,12 @@ End Class
 Public Class CellAuto_All256
     Inherits ocvbClass
     Dim cell As CellAuto_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        cell = New CellAuto_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        cell = New CellAuto_Basics(ocvb)
         cell.combo.Visible = False ' won't need this...
 
-        sliders.setupTrackBar1(ocvb, caller, "Current Rule", 0, 255, 0)
+        sliders.setupTrackBar1(ocvb, "Current Rule", 0, 255, 0)
         ocvb.desc = "Run through all 256 combinations of outcomes"
     End Sub
     Private Function createOutcome(val As Integer) As String

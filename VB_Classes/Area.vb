@@ -19,10 +19,10 @@ Public Class Area_MinTriangle_CPP
         ReDim srcData(numberOfPoints * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' input is a list of points.
         ReDim dstData(3 * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' minTriangle returns 3 points
     End Sub
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Area Number of Points", 1, 30, 5)
-        sliders.setupTrackBar2(ocvb, caller, "Area size", 10, 300, 200)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Area Number of Points", 1, 30, 5)
+        sliders.setupTrackBar2(ocvb, "Area size", 10, 300, 200)
         setup(ocvb)
 
         ocvb.desc = "Find minimum containing triangle for a set of points."
@@ -67,10 +67,10 @@ Public Class Area_MinRect
         numberOfPoints = sliders.TrackBar1.Value
         ReDim srcPoints(numberOfPoints)
     End Sub
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Area Number of Points", 1, 200, 5)
-        sliders.setupTrackBar2(ocvb, caller, "Area size", 10, 300, 200)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Area Number of Points", 1, 200, 5)
+        sliders.setupTrackBar2(ocvb, "Area size", 10, 300, 200)
         setup(ocvb)
 
         ocvb.desc = "Find minimum containing rectangle for a set of points."
@@ -98,9 +98,9 @@ End Class
 Public Class Area_MinMotionRect
     Inherits ocvbClass
     Dim input As BGSubtract_MOG
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        input = New BGSubtract_MOG(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        input = New BGSubtract_MOG(ocvb)
         input.sliders.TrackBar1.Value = 100 ' low threshold to maximize motion
         ocvb.desc = "Use minRectArea to encompass detected motion"
         label1 = "MinRectArea of MOG motion"
@@ -135,8 +135,8 @@ End Class
 
 Public Class Area_FindNonZero
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         label1 = "Non-zero original points"
         label2 = "Coordinates of non-zero points"
         ocvb.desc = "Use FindNonZero API to get coordinates of non-zero points."

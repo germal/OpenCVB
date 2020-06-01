@@ -3,11 +3,11 @@ Public Class Object_Basics
     Inherits ocvbClass
     Dim trim As Depth_InRange
     Dim ccomp As CComp_ColorDepth
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        trim = New Depth_InRange(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        trim = New Depth_InRange(ocvb)
 
-        ccomp = New CComp_ColorDepth(ocvb, caller)
+        ccomp = New CComp_ColorDepth(ocvb)
 
         label1 = "Connected components for objects in the foreground - tracker algorithm"
         label2 = "Mask for background"

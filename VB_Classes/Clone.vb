@@ -6,8 +6,8 @@ Public Class Clone_Basics
     Public illuminationChangeValues As cv.Vec2f
     Public textureFlatteningValues As cv.Vec2f
     Public cloneSpec As Int32 ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
 
         label1 = "Clone result - draw anywhere to clone a region"
         label2 = "Clone Region Mask"
@@ -41,13 +41,13 @@ End Class
 Public Class Clone_ColorChange
     Inherits ocvbClass
     Dim clone As Clone_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        clone = New Clone_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        clone = New Clone_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Color Change - Red", 5, 25, 15)
-        sliders.setupTrackBar2(ocvb, caller, "Color Change - Green", 5, 25, 5)
-        sliders.setupTrackBar3(ocvb, caller, "Color Change - Blue", 5, 25, 5)
+        sliders.setupTrackBar1(ocvb, "Color Change - Red", 5, 25, 15)
+        sliders.setupTrackBar2(ocvb, "Color Change - Green", 5, 25, 5)
+        sliders.setupTrackBar3(ocvb, "Color Change - Blue", 5, 25, 5)
 
         label1 = "Draw anywhere to select different clone region"
         label2 = "Mask used for clone"
@@ -68,12 +68,12 @@ End Class
 Public Class Clone_IlluminationChange
     Inherits ocvbClass
     Dim clone As Clone_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        clone = New Clone_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        clone = New Clone_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Alpha", 0, 20, 2)
-        sliders.setupTrackBar2(ocvb, caller, "Beta", 0, 20, 2)
+        sliders.setupTrackBar1(ocvb, "Alpha", 0, 20, 2)
+        sliders.setupTrackBar2(ocvb, "Beta", 0, 20, 2)
 
         label1 = "Draw anywhere to select different clone region"
         label2 = "Mask used for clone"
@@ -95,12 +95,12 @@ End Class
 Public Class Clone_TextureFlattening
     Inherits ocvbClass
     Dim clone As Clone_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        clone = New Clone_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        clone = New Clone_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Low Threshold", 0, 100, 10)
-        sliders.setupTrackBar2(ocvb, caller, "High Threshold", 0, 100, 50)
+        sliders.setupTrackBar1(ocvb, "Low Threshold", 0, 100, 10)
+        sliders.setupTrackBar2(ocvb, "High Threshold", 0, 100, 50)
 
         label1 = "Draw anywhere to select different clone region"
         label2 = "mask used for clone"
@@ -130,9 +130,9 @@ Public Class Clone_Eagle
     Dim srcROI As cv.Rect
     Dim maskROI As cv.Rect
     Dim pt As cv.Point
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        radio.Setup(ocvb, caller, 3)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        radio.Setup(ocvb, 3)
         radio.check(0).Text = "Seamless - Mixed Clone"
         radio.check(1).Text = "Seamless - MonochromeTransfer Clone"
         radio.check(2).Text = "Seamless - Normal Clone"
@@ -181,9 +181,9 @@ End Class
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Cv2.SeamlessClone(OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.Point,%20OpenCvSharp.OutputArray,%20OpenCvSharp.SeamlessCloneMethods)/
 Public Class Clone_Seamless
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        radio.Setup(ocvb, caller, 3)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        radio.Setup(ocvb, 3)
         radio.check(0).Text = "Seamless Normal Clone"
         radio.check(1).Text = "Seamless Mono Clone"
         radio.check(2).Text = "Seamless Mixed Clone"

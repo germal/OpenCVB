@@ -6,10 +6,10 @@ Public Class Kalman_Basics
     Public input() As Single
     Public output() As Single
 
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Turn Kalman filtering on" + If(callerRaw = "", "", " in " + callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        check.Setup(ocvb, 1)
+        check.Box(0).Text = "Turn Kalman filtering on" + If(ocvb.caller = "", "", " in " + ocvb.caller)
         check.Box(0).Checked = True
 
         ocvb.desc = "Use Kalman to stabilize a set of value (such as a cv.rect.)"
@@ -70,13 +70,13 @@ Public Class Kalman_Compare
     Dim kalman() As Kalman_Single
     Public plot As Plot_OverTime
     Public kPlot As Plot_OverTime
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        plot = New Plot_OverTime(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        plot = New Plot_OverTime(ocvb)
         plot.plotCount = 3
         plot.topBottomPad = 20
 
-        kPlot = New Plot_OverTime(ocvb, caller)
+        kPlot = New Plot_OverTime(ocvb)
         kPlot.plotCount = 3
         kPlot.topBottomPad = 20
 
@@ -95,7 +95,7 @@ Public Class Kalman_Compare
             End If
             ReDim kalman(3 - 1)
             For i = 0 To kalman.Count - 1
-                kalman(i) = New Kalman_Single(ocvb, caller)
+                kalman(i) = New Kalman_Single(ocvb)
             Next
         End If
 
@@ -141,8 +141,8 @@ Public Class Kalman_RotatingPoint
         cv.Cv2.Line(dst1, New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
         cv.Cv2.Line(dst1, New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         label1 = "Estimate Yellow < Real Red (if working)"
 
         cv.Cv2.Randn(kState, New cv.Scalar(0), cv.Scalar.All(0.1))
@@ -195,9 +195,9 @@ Public Class Kalman_MousePredict
     Inherits ocvbClass
     Dim kalman As Kalman_Basics
     Dim locMultiplier = 1
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        kalman = New Kalman_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(1)
         ReDim kalman.output(1)
 
@@ -233,9 +233,9 @@ Public Class Kalman_CVMat
     Public input As cv.Mat
     Public output As cv.Mat
     Dim basics As Kalman_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        basics = New Kalman_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        basics = New Kalman_Basics(ocvb)
         input = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
         If standalone Then label1 = "Rectangle moves smoothly to random locations"
         ocvb.desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
@@ -301,11 +301,11 @@ Public Class Kalman_ImageSmall
     Inherits ocvbClass
     Dim kalman As Kalman_CVMat
     Dim resize As Resize_Percentage
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        kalman = New Kalman_CVMat(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        kalman = New Kalman_CVMat(ocvb)
 
-        resize = New Resize_Percentage(ocvb, caller)
+        resize = New Resize_Percentage(ocvb)
 
         label1 = "The small image is processed by the Kalman filter"
         label2 = "Mask of the smoothed image minus original"
@@ -338,9 +338,9 @@ End Class
 Public Class Kalman_DepthSmall
     Inherits ocvbClass
     Dim kalman As Kalman_ImageSmall
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        kalman = New Kalman_ImageSmall(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        kalman = New Kalman_ImageSmall(ocvb)
 
         label1 = "Mask of non-zero depth after Kalman smoothing"
         label2 = "Mask of the smoothed image minus original"
@@ -364,11 +364,11 @@ Public Class Kalman_Depth32f
     Inherits ocvbClass
     Dim kalman As Kalman_CVMat
     Dim resize As Resize_Percentage
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        kalman = New Kalman_CVMat(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        kalman = New Kalman_CVMat(ocvb)
 
-        resize = New Resize_Percentage(ocvb, caller)
+        resize = New Resize_Percentage(ocvb)
         resize.sliders.TrackBar1.Value = 4
 
         label1 = "Mask of non-zero depth after Kalman smoothing"
@@ -408,8 +408,8 @@ Public Class Kalman_Single
     Public ErrorCovPost As Single = 1
     Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
     Public newTransmissionMatrix As Boolean = True
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         Dim tMatrix() As Single = {1, 1, 0, 1}
         kf.TransitionMatrix = New cv.Mat(2, 2, cv.MatType.CV_32F, tMatrix)
         kf.MeasurementMatrix.SetIdentity(1)
@@ -422,7 +422,7 @@ Public Class Kalman_Single
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
             If ocvb.frameCount = 0 Then
-                plot = New Plot_OverTime(ocvb, caller)
+                plot = New Plot_OverTime(ocvb)
                 plot.maxScale = 150
                 plot.minScale = 80
                 plot.plotCount = 2

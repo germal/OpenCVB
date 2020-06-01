@@ -21,7 +21,6 @@ Public Class oTrueType
     End Sub
 End Class
 Public Class ocvbClass : Implements IDisposable
-    Public caller As String
     Public check As New OptionsCheckbox
     Public combo As New OptionsCombo
     Public radio As New OptionsRadioButtons
@@ -45,13 +44,13 @@ Public Class ocvbClass : Implements IDisposable
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
 
-    Public Sub setCaller(callerRaw As String)
-        If callerRaw = "" Or callerRaw = Me.GetType.Name Then
+    Public Sub setCaller(ocvb As AlgorithmData)
+        If ocvb.caller = "" Then
             standalone = True
-            caller = Me.GetType.Name
+            ocvb.caller = Me.GetType.Name
         Else
             standalone = False
-            caller = callerRaw + "/" + Me.GetType.Name
+            ocvb.caller += "/" + Me.GetType.Name
         End If
     End Sub
     Public Function validateRect(r As cv.Rect) As cv.Rect

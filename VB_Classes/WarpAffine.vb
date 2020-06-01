@@ -6,8 +6,8 @@ Public Class WarpAffine_Captcha
     Const charWidth = 80
     Const captchaLength = 8
     Dim rng As New System.Random
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Use OpenCV to build a captcha Turing test."
     End Sub
     Private Sub addNoise(image As cv.Mat)
@@ -89,11 +89,11 @@ End Class
 ' http://opencvexamples.blogspot.com/
 Public Class WarpAffine_Basics
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Angle", 0, 360, 10)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Angle", 0, 360, 10)
 
-        SetInterpolationRadioButtons(ocvb, caller, radio, "WarpAffine")
+        SetInterpolationRadioButtons(ocvb, radio, "WarpAffine")
 
         ocvb.desc = "Use WarpAffine to transform input images."
     End Sub
@@ -120,9 +120,9 @@ End Class
 Public Class WarpAffine_3Points
     Inherits ocvbClass
     Dim triangle As Area_MinTriangle_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        triangle = New Area_MinTriangle_CPP(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        triangle = New Area_MinTriangle_CPP(ocvb)
         triangle.sliders.TrackBar1.Value = 20
         triangle.sliders.TrackBar2.Value = 150
 
@@ -195,9 +195,9 @@ End Class
 Public Class WarpAffine_4Points
     Inherits ocvbClass
     Dim rect As Area_MinRect
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        rect = New Area_MinRect(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        rect = New Area_MinRect(ocvb)
 
         ocvb.desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
         label1 = "Color image with perspective transform applied"

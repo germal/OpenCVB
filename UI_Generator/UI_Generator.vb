@@ -93,9 +93,9 @@ Module UI_GeneratorMain
                     sw.WriteLine(vbTab + "case """ + UCase(nextName) + """")
                     If nextName.EndsWith(".py") Then
                         sw.WriteLine(vbTab + vbTab + "ocvb.PythonFileName = """ + pythonAppDir.FullName + nextName + """")
-                        sw.WriteLine(vbTab + vbTab + "return new Python_Run(ocvb, """")")
+                        sw.WriteLine(vbTab + vbTab + "return new Python_Run(ocvb)")
                     Else
-                        sw.WriteLine(vbTab + vbTab + "return new " + nextName + "(ocvb, """")")
+                        sw.WriteLine(vbTab + vbTab + "return new " + nextName + "(ocvb)")
                     End If
                 End If
             Next

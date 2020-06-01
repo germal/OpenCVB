@@ -7,9 +7,9 @@ Public Class Random_Points
     Public Points2f() As cv.Point2f
     Public rangeRect As cv.Rect
     Public plotPoints As Boolean = False
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Random Pixel Count", 1, ocvb.color.cols * ocvb.color.Rows, 20)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Random Pixel Count", 1, ocvb.color.cols * ocvb.color.Rows, 20)
 
         ReDim Points(sliders.TrackBar1.Value - 1)
         ReDim Points2f(sliders.TrackBar1.Value - 1)
@@ -39,8 +39,8 @@ End Class
 Public Class Random_Shuffle
     Inherits ocvbClass
     Dim myRNG As New cv.RNG
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Use randomShuffle to reorder an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -56,10 +56,10 @@ Public Class Random_LUTMask
     Inherits ocvbClass
     Dim random As Random_Points
     Dim km As kMeans_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        km = New kMeans_Basics(ocvb, caller)
-        random = New Random_Points(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        km = New kMeans_Basics(ocvb)
+        random = New Random_Points(ocvb)
         ocvb.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
         label2 = "kmeans run To Get colors"
     End Sub
@@ -89,8 +89,8 @@ End Class
 
 Public Class Random_UniformDist
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Create a uniform distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -103,12 +103,12 @@ End Class
 
 Public Class Random_NormalDist
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Random_NormalDist Blue Mean", 0, 255, 25)
-        sliders.setupTrackBar2(ocvb, caller, "Random_NormalDist Green Mean", 0, 255, 127)
-        sliders.setupTrackBar3(ocvb, caller, "Random_NormalDist Red Mean", 0, 255, 180)
-        sliders.setupTrackBar4(ocvb, caller, "Random_NormalDist Stdev", 0, 255, 50)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Random_NormalDist Blue Mean", 0, 255, 25)
+        sliders.setupTrackBar2(ocvb, "Random_NormalDist Green Mean", 0, 255, 127)
+        sliders.setupTrackBar3(ocvb, "Random_NormalDist Red Mean", 0, 255, 180)
+        sliders.setupTrackBar4(ocvb, "Random_NormalDist Stdev", 0, 255, 50)
         ocvb.desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -122,12 +122,12 @@ Public Class Random_CheckUniformSmoothed
     Inherits ocvbClass
     Dim histogram As Histogram_KalmanSmoothed
     Dim rUniform As Random_UniformDist
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        histogram = New Histogram_KalmanSmoothed(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        histogram = New Histogram_KalmanSmoothed(ocvb)
         histogram.sliders.TrackBar1.Value = 255
 
-        rUniform = New Random_UniformDist(ocvb, caller)
+        rUniform = New Random_UniformDist(ocvb)
 
         ocvb.desc = "Display the smoothed histogram for a uniform distribution."
     End Sub
@@ -151,12 +151,12 @@ Public Class Random_CheckUniformDist
     Inherits ocvbClass
     Dim histogram As Histogram_Basics
     Dim rUniform As Random_UniformDist
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        histogram = New Histogram_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        histogram = New Histogram_Basics(ocvb)
         histogram.sliders.TrackBar1.Value = 255
 
-        rUniform = New Random_UniformDist(ocvb, caller)
+        rUniform = New Random_UniformDist(ocvb)
 
         ocvb.desc = "Display the histogram for a uniform distribution."
     End Sub
@@ -180,11 +180,11 @@ Public Class Random_CheckNormalDist
     Inherits ocvbClass
     Dim histogram As Histogram_Basics
     Dim normalDist As Random_NormalDist
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        histogram = New Histogram_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        histogram = New Histogram_Basics(ocvb)
         histogram.sliders.TrackBar1.Value = 255
-        normalDist = New Random_NormalDist(ocvb, caller)
+        normalDist = New Random_NormalDist(ocvb)
         ocvb.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -206,12 +206,12 @@ Public Class Random_CheckNormalDistSmoothed
     Inherits ocvbClass
     Dim histogram As Histogram_KalmanSmoothed
     Dim normalDist As Random_NormalDist
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        histogram = New Histogram_KalmanSmoothed(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        histogram = New Histogram_KalmanSmoothed(ocvb)
         histogram.sliders.TrackBar1.Value = 255
         histogram.plotHist.minRange = 1
-        normalDist = New Random_NormalDist(ocvb, caller)
+        normalDist = New Random_NormalDist(ocvb)
         ocvb.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -246,8 +246,8 @@ End Module
 Public Class Random_PatternGenerator_CPP
     Inherits ocvbClass
     Dim Random_PatternGenerator As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         Random_PatternGenerator = Random_PatternGenerator_Open()
         ocvb.desc = "Generate random patterns for use with 'Random Pattern Calibration'"
     End Sub

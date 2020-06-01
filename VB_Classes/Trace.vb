@@ -20,8 +20,8 @@ End Module
 Public Class Trace_OpenCV_CPP
     Inherits ocvbClass
     Dim Trace_OpenCV As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         Trace_OpenCV = Trace_OpenCV_Open()
         ocvb.desc = "Use OpenCV's Trace facility - applicable to C++ code - and requires Intel's VTune (see link in code.)"
     End Sub

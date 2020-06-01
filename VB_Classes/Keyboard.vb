@@ -3,8 +3,8 @@ Imports cv = OpenCvSharp
 Public Class Keyboard_Basics
     Inherits ocvbClass
     Public input As String
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+        Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         label1 = "Type in text to add to image"
         ocvb.desc = "Test the keyboard interface available to all algorithms"
     End Sub

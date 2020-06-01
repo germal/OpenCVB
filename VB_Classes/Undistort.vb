@@ -64,19 +64,19 @@ Public Class Undistort_Basics
     Dim maxDisp As Int32
     Dim stereo_cx As Int32
     Dim stereo_cy As Int32
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "undistort intrinsics Left", 1, 200, 100)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "undistort intrinsics Left", 1, 200, 100)
 
         If ocvb.parms.cameraIndex = T265Camera Then
-            sliders.setupTrackBar2(ocvb, caller, "undistort intrinsics coeff's", -100000, 100000, 100)
+            sliders.setupTrackBar2(ocvb, "undistort intrinsics coeff's", -100000, 100000, 100)
         Else
-            sliders.setupTrackBar2(ocvb, caller, "undistort intrinsics coeff's", -1000, 1000, 100)
+            sliders.setupTrackBar2(ocvb, "undistort intrinsics coeff's", -1000, 1000, 100)
         End If
-        sliders.setupTrackBar3(ocvb, caller, "undistort stereo height", 1, ocvb.color.Rows, ocvb.color.Rows)
-        sliders.setupTrackBar4(ocvb, caller, "undistort Offset left/right", 1, 200, 112)
+        sliders.setupTrackBar3(ocvb, "undistort stereo height", 1, ocvb.color.Rows, ocvb.color.Rows)
+        sliders.setupTrackBar4(ocvb, "undistort Offset left/right", 1, 200, 112)
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(ocvb, 1)
         check.Box(0).Text = "Restore Original matrices"
         check.Box(0).Checked = True
 

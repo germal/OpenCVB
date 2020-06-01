@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 Public Class Mouse_Basics
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Test the mousePoint interface"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -24,8 +24,8 @@ End Class
 
 Public Class Mouse_LeftClick
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Demonstrate what the left-click enables"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -44,8 +44,8 @@ End Class
 
 Public Class Mouse_RightClick
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Demonstrate what the right-click enables"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

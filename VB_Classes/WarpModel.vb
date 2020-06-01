@@ -8,9 +8,9 @@ Public Class WarpModel_Input
     Public rgb(3 - 1) As cv.Mat
     Public gradient(3 - 1) As cv.Mat
     Dim sobel As Edges_Sobel
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        radio.Setup(ocvb, caller, 12)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        radio.Setup(ocvb, 12)
         radio.check(0).Text = "building.jpg"
         radio.check(1).Text = "church.jpg"
         radio.check(2).Text = "emir.jpg"
@@ -25,10 +25,10 @@ Public Class WarpModel_Input
         radio.check(11).Text = "Valley.jpg"
         radio.check(9).Checked = True
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(ocvb, 1)
         check.Box(0).Text = "Use Gradient in WarpInput"
 
-        sobel = New Edges_Sobel(ocvb, caller)
+        sobel = New Edges_Sobel(ocvb)
         ocvb.desc = "Import the misaligned input."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -92,18 +92,18 @@ Public Class WarpModel_FindTransformECC_CPP
     Public rgb2 As New cv.Mat
     Public warpMode As Integer
     Public aligned As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         cPtr = WarpModel_Open()
 
-        radio.Setup(ocvb, caller,4)
+        radio.Setup(ocvb,4)
         radio.check(0).Text = "Motion_Translation (fastest)"
         radio.check(1).Text = "Motion_Euclidean"
         radio.check(2).Text = "Motion_Affine (very slow - Use CPP_Classes in Release Mode)"
         radio.check(3).Text = "Motion_Homography (even slower - Use CPP_Classes in Release Mode)"
         radio.check(0).Checked = True
 
-        input = New WarpModel_Input(ocvb, caller)
+        input = New WarpModel_Input(ocvb)
 
         ocvb.desc = "Use FindTransformECC to align 2 images"
     End Sub
@@ -183,9 +183,9 @@ End Class
 Public Class WarpModel_AlignImages
     Inherits ocvbClass
     Dim ecc As WarpModel_FindTransformECC_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        ecc = New WarpModel_FindTransformECC_CPP(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        ecc = New WarpModel_FindTransformECC_CPP(ocvb)
 
         ocvb.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub

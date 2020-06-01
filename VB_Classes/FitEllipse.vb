@@ -16,9 +16,9 @@ Public Class FitEllipse_Basics_CPP
     Inherits ocvbClass
     Dim area As Area_MinTriangle_CPP
     Public dstData(5 * 4 - 1) As Byte ' enough space for a float describing angle, center, and width/height - this will be filled in on the C++ side.
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        area = New Area_MinTriangle_CPP(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        area = New Area_MinTriangle_CPP(ocvb)
 
         label1 = "Green FitEllipse, Yellow=AMS, Red=Direct"
         ocvb.desc = "Use FitEllipse to draw around a set of points"

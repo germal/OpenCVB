@@ -5,10 +5,10 @@ Imports System.Threading
 Public Class CComp_Basics
     Inherits ocvbClass
     Public connectedComponents As Object
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "CComp Threshold", 0, 255, 10)
-        sliders.setupTrackBar2(ocvb, caller, "CComp Min Area", 0, 10000, 500)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "CComp Threshold", 0, 255, 10)
+        sliders.setupTrackBar2(ocvb, "CComp Min Area", 0, 10000, 500)
 
         ocvb.desc = "Draw bounding boxes around RGB binarized connected Components"
         label1 = "CComp binary"
@@ -65,11 +65,11 @@ Public Class CComp_EdgeMask
     Inherits ocvbClass
     Dim ccomp As CComp_ColorDepth
     Dim edges As Edges_DepthAndColor
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        edges = New Edges_DepthAndColor(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        edges = New Edges_DepthAndColor(ocvb)
 
-        ccomp = New CComp_ColorDepth(ocvb, caller)
+        ccomp = New CComp_ColorDepth(ocvb)
 
         ocvb.desc = "Isolate Color connected components after applying the Edge Mask"
         label1 = "Edges_DepthAndColor (input to ccomp)"
@@ -90,8 +90,8 @@ End Class
 
 Public Class CComp_ColorDepth
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Color connected components based on their depth"
         label1 = "Color by Mean Depth"
         label2 = "Binary image using threshold binary+Otsu"
@@ -119,8 +119,8 @@ End Class
 
 Public Class CComp_Image
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Connect components throughout the image"
         label1 = "Connected Components colored with Mean Depth"
         label2 = "Mask binary+otsu to help compute mean depth"
@@ -165,11 +165,11 @@ End Class
 
 Public Class CComp_InRange_MT
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "InRange # of ranges", 2, 255, 15)
-        sliders.setupTrackBar2(ocvb, caller, "InRange Max Depth", 150, 10000, 3000)
-        sliders.setupTrackBar3(ocvb, caller, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "InRange # of ranges", 2, 255, 15)
+        sliders.setupTrackBar2(ocvb, "InRange Max Depth", 150, 10000, 3000)
+        sliders.setupTrackBar3(ocvb, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
 
         ocvb.desc = "Connected components in specific ranges"
         label2 = "Blob rectangles - largest to smallest"
@@ -218,10 +218,10 @@ End Class
 
 Public Class CComp_InRange
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "InRange # of ranges", 1, 20, 15)
-        sliders.setupTrackBar2(ocvb, caller, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "InRange # of ranges", 1, 20, 15)
+        sliders.setupTrackBar2(ocvb, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
 
         ocvb.desc = "Connect components in specific ranges"
     End Sub
@@ -262,8 +262,8 @@ End Class
 Public Class CComp_Shapes
     Inherits ocvbClass
     Dim shapes As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         shapes = New cv.Mat(ocvb.parms.HomeDir + "Data/Shapes.png", cv.ImreadModes.Color)
         label1 = "Largest connected component"
         label2 = "RectView, LabelView, Binary, grayscale"

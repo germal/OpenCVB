@@ -6,11 +6,11 @@ Public Class IMU_Basics
     Dim flow As Font_FlowText
     Public theta As cv.Point3f ' this is the description - x, y, and z - of the axes centered in the camera.
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
 
-        flow = New Font_FlowText(ocvb, caller)
+        flow = New Font_FlowText(ocvb)
         flow.result1or2 = RESULT1
 
         ocvb.desc = "Read and display the IMU coordinates"
@@ -63,9 +63,9 @@ End Class
 Public Class IMU_Stabilizer
     Inherits ocvbClass
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        kalman = New Kalman_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        kalman = New Kalman_Basics(ocvb)
 
         ocvb.desc = "Stabilize the image with the IMU data."
         label1 = "IMU Stabilize (Move Camera + Select Kalman)"
@@ -117,9 +117,9 @@ End Class
 Public Class IMU_Magnetometer
     Inherits ocvbClass
     Public plot As Plot_OverTime
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        plot = New Plot_OverTime(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        plot = New Plot_OverTime(ocvb)
         plot.dst1 = dst2
         plot.maxScale = 10
         plot.minScale = -10
@@ -146,8 +146,8 @@ End Class
 
 Public Class IMU_Barometer
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Get the barometric pressure from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -165,8 +165,8 @@ End Class
 
 Public Class IMU_Temperature
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Get the temperature of the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -185,17 +185,17 @@ Public Class IMU_FrameTime
     Public plot As Plot_OverTime
     Public CPUInterval As Double
     Public IMUtoCaptureEstimate As Double
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        plot = New Plot_OverTime(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        plot = New Plot_OverTime(ocvb)
         plot.dst1 = dst2
         plot.maxScale = 150
         plot.minScale = 0
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.setupTrackBar1(ocvb, caller, "Minimum IMU to Capture time (ms)", 1, 10, 2)
-        sliders.setupTrackBar2(ocvb, caller, "Number of Plot Values", 5, 30, 25)
+        sliders.setupTrackBar1(ocvb, "Minimum IMU to Capture time (ms)", 1, 10, 2)
+        sliders.setupTrackBar2(ocvb, "Number of Plot Values", 5, 30, 25)
 
         label2 = "IMU FT (blue) Host FT (green) Latency est. (red)"
         ocvb.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
@@ -279,17 +279,17 @@ Public Class IMU_HostFrameTimes
     Public plot As Plot_OverTime
     Public CPUInterval As Double
     Public HostInterruptDelayEstimate As Double
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        plot = New Plot_OverTime(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        plot = New Plot_OverTime(ocvb)
         plot.dst1 = dst2
         plot.maxScale = 150
         plot.minScale = 0
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.setupTrackBar1(ocvb, caller, "Minimum Host interrupt delay (ms)", 1, 10, 4)
-        sliders.setupTrackBar2(ocvb, caller, "Number of Plot Values", 5, 30, 25)
+        sliders.setupTrackBar1(ocvb, "Minimum Host interrupt delay (ms)", 1, 10, 4)
+        sliders.setupTrackBar2(ocvb, "Number of Plot Values", 5, 30, 25)
 
         label2 = "IMU FT (blue) Host FT (green) Latency est. (red)"
         ocvb.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
@@ -362,17 +362,17 @@ Public Class IMU_TotalDelay
     Dim imu As IMU_FrameTime
     Dim plot As Plot_OverTime
     Dim kalman As Kalman_Single
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.parms.ShowOptions = False
 
-        host = New IMU_HostFrameTimes(ocvb, caller)
-        imu = New IMU_FrameTime(ocvb, caller)
-        kalman = New Kalman_Single(ocvb, caller)
+        host = New IMU_HostFrameTimes(ocvb)
+        imu = New IMU_FrameTime(ocvb)
+        kalman = New Kalman_Single(ocvb)
 
         ocvb.parms.ShowOptions = True ' just show plot options...
 
-        plot = New Plot_OverTime(ocvb, caller)
+        plot = New Plot_OverTime(ocvb)
         plot.dst1 = dst2
         plot.maxScale = 50
         plot.minScale = 0
@@ -440,9 +440,9 @@ Public Class IMU_GVector
     Public angleY As Single ' in radians.
     Public angleZ As Single ' in radians.
     Public result As Integer = RESULT1 ' could be result1 or result2
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        kalman = New Kalman_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(6 - 1)
 
         ocvb.desc = "Find the angle of tilt for the camera with respect to gravity."

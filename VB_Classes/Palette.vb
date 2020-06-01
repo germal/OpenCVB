@@ -4,11 +4,11 @@ Imports System.IO
 
 Public Class Palette_Color
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "blue", 0, 255, msRNG.Next(0, 255))
-        sliders.setupTrackBar2(ocvb, caller, "green", 0, 255, msRNG.Next(0, 255))
-        sliders.setupTrackBar3(ocvb, caller, "red", 0, 255, msRNG.Next(0, 255))
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "blue", 0, 255, msRNG.Next(0, 255))
+        sliders.setupTrackBar2(ocvb, "green", 0, 255, msRNG.Next(0, 255))
+        sliders.setupTrackBar3(ocvb, "red", 0, 255, msRNG.Next(0, 255))
         ocvb.desc = "Define a color using sliders."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -27,12 +27,12 @@ End Class
 
 Public Class Palette_LinearPolar
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Use LinearPolar to create gradient image"
-        SetInterpolationRadioButtons(ocvb, caller, radio, "LinearPolar")
+        SetInterpolationRadioButtons(ocvb, radio, "LinearPolar")
 
-        sliders.setupTrackBar1(ocvb, caller, "LinearPolar radius", 0, ocvb.color.cols, ocvb.color.cols / 2)
+        sliders.setupTrackBar1(ocvb, "LinearPolar radius", 0, ocvb.color.cols, ocvb.color.cols / 2)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1.SetTo(0)
@@ -103,10 +103,10 @@ End Module
 
 Public Class Palette_Map
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         sliders = New OptionsSliders
-        sliders.setupTrackBar1(ocvb, caller, "inRange offset", 1, 100, 10)
+        sliders.setupTrackBar1(ocvb, "inRange offset", 1, 100, 10)
         ocvb.desc = "Map colors to different palette - Painterly Effect."
         label1 = "Reduced Colors"
     End Sub
@@ -181,11 +181,11 @@ Public Class Palette_DrawTest
     Inherits ocvbClass
     Dim palette As Palette_ColorMap
     Dim draw As Draw_RngImage
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        palette = New Palette_ColorMap(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        palette = New Palette_ColorMap(ocvb)
 
-        draw = New Draw_RngImage(ocvb, caller)
+        draw = New Draw_RngImage(ocvb)
         palette.src = dst1
 
         ocvb.desc = "Experiment with palette using a drawn image"
@@ -205,8 +205,8 @@ Public Class Palette_Gradient
     Public frameModulo As Int32 = 30 ' every 30 frames try a different pair of random colors.
     Public color1 As cv.Scalar
     Public color2 As cv.Scalar
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         label2 = "From and To colors"
         ocvb.desc = "Create gradient image"
     End Sub
@@ -241,9 +241,9 @@ End Class
 Public Class Palette_BuildGradientColorMap
     Inherits ocvbClass
     Public gradientColorMap As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Number of color transitions (Used only with Random)", 1, 30, 5)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Number of color transitions (Used only with Random)", 1, 30, 5)
 
         label2 = "Generated colormap"
         ocvb.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
@@ -277,11 +277,11 @@ End Class
 Public Class Palette_ColorMap
     Inherits ocvbClass
     Public gradMap As Palette_BuildGradientColorMap
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        gradMap = New Palette_BuildGradientColorMap(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        gradMap = New Palette_BuildGradientColorMap(ocvb)
 
-        radio.Setup(ocvb, caller, 21)
+        radio.Setup(ocvb, 21)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = mapNames(i)
         Next
@@ -339,9 +339,9 @@ Public Class Palette_DepthColorMap
     Inherits ocvbClass
     Public gradientColorMap As New cv.Mat
     Dim holes As Depth_Holes
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        holes = New Depth_Holes(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        holes = New Depth_Holes(ocvb)
 
         ocvb.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
@@ -378,8 +378,8 @@ End Class
 
 Public Class Palette_DepthColorMapJet
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Use the Jet colormap to display depth. "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

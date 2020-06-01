@@ -223,9 +223,9 @@ Public Class Puzzle_Basics
     Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public restartRequested As Boolean
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        grid = New Thread_Grid(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = ocvb.color.cols / 10
         grid.sliders.TrackBar2.Value = ocvb.color.Rows / 8
         grid.Run(ocvb)
@@ -276,17 +276,17 @@ Public Class Puzzle_Solver
     Public roilist() As cv.Rect
     Dim usedList As New List(Of Integer)
     Dim fitlist As New List(Of bestFit)
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        puzzle = New Puzzle_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        puzzle = New Puzzle_Basics(ocvb)
 
-        radio.Setup(ocvb, caller, 3)
+        radio.Setup(ocvb, 3)
         radio.check(0).Text = "256x180 tile - Easy Puzzle"
         radio.check(1).Text = "128x90  tile - Medium Puzzle"
         radio.check(2).Text = "64x90   tile - Hard Puzzle"
         radio.check(0).Checked = True
 
-        check.Setup(ocvb, caller, 3)
+        check.Setup(ocvb, 3)
         check.Box(0).Text = "Reshuffle pieces"
         check.Box(1).Text = "Show only the poor correlation coefficients"
         check.Box(2).Text = "Clean display (no grid or correlations)"

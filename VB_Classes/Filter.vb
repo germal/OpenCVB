@@ -2,8 +2,8 @@ Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Filter_Laplacian
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Use a filter to approximate the Laplacian derivative."
         label1 = "Sharpened image using Filter2D output"
         label2 = "Output of Filter2D (approximated Laplacian)"
@@ -23,15 +23,15 @@ End Class
 
 Public Class Filter_NormalizedKernel
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        radio.Setup(ocvb, caller, 4)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        radio.Setup(ocvb, 4)
         radio.check(0).Text = "INF"
         radio.check(1).Text = "L1"
         radio.check(1).Checked = True
         radio.check(2).Text = "L2"
         radio.check(3).Text = "MinMax"
-        sliders.setupTrackBar1(ocvb, caller, "Normalize alpha X10", 1, 100, 10)
+        sliders.setupTrackBar1(ocvb, "Normalize alpha X10", 1, 100, 10)
         ocvb.desc = "Create a normalized kernel and use it."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -61,9 +61,9 @@ End Class
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/filter_2d/filter_2d.html
 Public Class Filter_Normalized2D
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Filter_Normalized2D kernel size", 1, 21, 3)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Filter_Normalized2D kernel size", 1, 21, 3)
         ocvb.desc = "Create and apply a normalized kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -80,15 +80,15 @@ End Class
 'https://www.cc.gatech.edu/classes/AY2015/cs4475_summer/documents/smoothing_separable.py
 Public Class Filter_SepFilter2D
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        check.Setup(ocvb, caller, 1)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        check.Setup(ocvb, 1)
         check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"
         check.Box(0).Checked = True
 
-        sliders.setupTrackBar1(ocvb, caller, "Kernel X size", 1, 21, 5)
-        sliders.setupTrackBar2(ocvb, caller, "Kernel Y size", 1, 21, 11)
-        sliders.setupTrackBar3(ocvb, caller, "SepFilter2D Sigma X10", 0, 100, 17)
+        sliders.setupTrackBar1(ocvb, "Kernel X size", 1, 21, 5)
+        sliders.setupTrackBar2(ocvb, "Kernel Y size", 1, 21, 11)
+        sliders.setupTrackBar3(ocvb, "SepFilter2D Sigma X10", 0, 100, 17)
         label1 = "Gaussian Blur result"
         ocvb.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
     End Sub

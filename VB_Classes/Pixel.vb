@@ -5,9 +5,9 @@ Imports System.Runtime.InteropServices
 Public Class Pixel_GetSet
     Inherits ocvbClass
     Dim mats As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        mats = New Mat_4to1(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        mats = New Mat_4to1(ocvb)
 
         label1 = "Log of times for each method"
         label2 = "GetSet/Generic Indexer/Marshal.Copy"

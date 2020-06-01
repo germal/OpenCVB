@@ -23,8 +23,8 @@ End Module
 '    Dim leftData(1 - 1) As Byte
 '    Dim rightData(1 - 1) As Byte
 '    Dim cPtr As IntPtr
-'    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-'        setCaller(callerRaw)
+'    Public Sub New(ocvb As AlgorithmData)
+'        setCaller(ocvb)
 '        ocvb.desc = "Find depth using the semi-global matching algorithm."
 '    End Sub
 '    Public Sub Run(ocvb As AlgorithmData)

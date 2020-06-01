@@ -9,16 +9,16 @@ Public Class Surf_Basics_CS
     Dim fisheye As FishEye_Rectified
     Public srcLeft As New cv.Mat
     Public srcRight As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        fisheye = New FishEye_Rectified(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        fisheye = New FishEye_Rectified(ocvb)
 
-        radio.Setup(ocvb, caller, 2)
+        radio.Setup(ocvb, 2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
 
-        sliders.setupTrackBar1(ocvb, caller, "Hessian threshold", 1, 5000, 2000)
+        sliders.setupTrackBar1(ocvb, "Hessian threshold", 1, 5000, 2000)
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
@@ -51,11 +51,11 @@ Public Class Surf_Basics
     Inherits ocvbClass
     Dim surf As Surf_Basics_CS
     Dim fisheye As FishEye_Rectified
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        fisheye = New FishEye_Rectified(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        fisheye = New FishEye_Rectified(ocvb)
 
-        surf = New Surf_Basics_CS(ocvb, caller)
+        surf = New Surf_Basics_CS(ocvb)
 
         ocvb.desc = "Use left and right views to match points in horizontal slices."
     End Sub
@@ -77,12 +77,12 @@ End Class
 Public Class Surf_DrawMatchManual_CS
     Inherits ocvbClass
     Dim surf As Surf_Basics_CS
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        surf = New Surf_Basics_CS(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        surf = New Surf_Basics_CS(ocvb)
         surf.CS_SurfBasics.drawPoints = False
 
-        sliders.setupTrackBar1(ocvb, caller, "Surf Vertical Range to Search", 0, 50, 10)
+        sliders.setupTrackBar1(ocvb, "Surf Vertical Range to Search", 0, 50, 10)
 
         ocvb.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub

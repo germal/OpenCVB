@@ -72,9 +72,9 @@ Public Class OpticalFlow_DenseOptions
     Public polySigma As Single
     Public OpticalFlowFlags As cv.OpticalFlowFlags
     Public outputScaling As Int32
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        radio.Setup(ocvb, caller, 5)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        radio.Setup(ocvb, 5)
         radio.check(0).Text = "FarnebackGaussian"
         radio.check(1).Text = "LkGetMinEigenvals"
         radio.check(2).Text = "None"
@@ -82,14 +82,14 @@ Public Class OpticalFlow_DenseOptions
         radio.check(4).Text = "PyrBReady"
         radio.check(0).Checked = True
 
-        sliders2.setupTrackBar1(ocvb, caller, "Optical Flow PolyN", 1, 15, 5)
-        sliders2.setupTrackBar2(ocvb, caller, "Optical Flow Scaling Output", 1, 100, 50)
+        sliders2.setupTrackBar1(ocvb, "Optical Flow PolyN", 1, 15, 5)
+        sliders2.setupTrackBar2(ocvb, "Optical Flow Scaling Output", 1, 100, 50)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
-        sliders.setupTrackBar1(ocvb, caller, "Optical Flow pyrScale", 1, 100, 35)
-        sliders.setupTrackBar2(ocvb, caller, "Optical Flow Levels", 1, 10, 1)
-        sliders.setupTrackBar3(ocvb, caller, "Optical Flow winSize", 1, 9, 1)
-        sliders.setupTrackBar4(ocvb, caller, "Optical Flow Iterations", 1, 10, 1)
+        sliders.setupTrackBar1(ocvb, "Optical Flow pyrScale", 1, 100, 35)
+        sliders.setupTrackBar2(ocvb, "Optical Flow Levels", 1, 10, 1)
+        sliders.setupTrackBar3(ocvb, "Optical Flow winSize", 1, 9, 1)
+        sliders.setupTrackBar4(ocvb, "Optical Flow Iterations", 1, 10, 1)
 
         label1 = "No output - just option settings..."
         ocvb.desc = "Use dense optical flow algorithm options"
@@ -122,9 +122,9 @@ End Class
 Public Class OpticalFlow_DenseBasics
     Inherits ocvbClass
     Dim flow As OpticalFlow_DenseOptions
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        flow = New OpticalFlow_DenseOptions(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        flow = New OpticalFlow_DenseOptions(ocvb)
         ocvb.desc = "Use dense optical flow algorithm  "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -153,17 +153,17 @@ Public Class OpticalFlow_DenseBasics_MT
     Public grid As Thread_Grid
     Dim accum As New cv.Mat
     Dim flow As OpticalFlow_DenseOptions
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        grid = New Thread_Grid(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = ocvb.color.cols / 4
         grid.sliders.TrackBar2.Value = ocvb.color.Rows / 4
         grid.sliders.TrackBar3.Value = 5
 
-        flow = New OpticalFlow_DenseOptions(ocvb, caller)
+        flow = New OpticalFlow_DenseOptions(ocvb)
         flow.sliders.TrackBar1.Value = 75
 
-        sliders.setupTrackBar1(ocvb, caller, "Correlation Threshold", 0, 1000, 1000)
+        sliders.setupTrackBar1(ocvb, "Correlation Threshold", 0, 1000, 1000)
 
         ocvb.desc = "MultiThread dense optical flow algorithm  "
     End Sub
@@ -216,14 +216,14 @@ Public Class OpticalFlow_Sparse
     Dim lastFrame As cv.Mat
     Dim sumScale As cv.Mat, sScale As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        good = New Features_GoodFeatures(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        good = New Features_GoodFeatures(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "OpticalFlow window", 1, 20, 3)
-        sliders.setupTrackBar2(ocvb, caller, "OpticalFlow Max Pixels Distance", 1, 100, 30)
+        sliders.setupTrackBar1(ocvb, "OpticalFlow window", 1, 20, 3)
+        sliders.setupTrackBar2(ocvb, "OpticalFlow Max Pixels Distance", 1, 100, 30)
 
-        radio.Setup(ocvb, caller, 6)
+        radio.Setup(ocvb, 6)
         radio.check(0).Text = "FarnebackGaussian"
         radio.check(1).Text = "LkGetMinEigenvals"
         radio.check(2).Text = "None"

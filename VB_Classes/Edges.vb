@@ -4,11 +4,11 @@ Imports System.IO
 'https://docs.opencv.org/3.1.0/da/d22/tutorial_py_canny.html
 Public Class Edges_Canny
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Canny threshold1", 1, 255, 50)
-        sliders.setupTrackBar2(ocvb, caller, "Canny threshold2", 1, 255, 50)
-        sliders.setupTrackBar3(ocvb, caller, "Canny Aperture", 3, 7, 3)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Canny threshold1", 1, 255, 50)
+        sliders.setupTrackBar2(ocvb, "Canny threshold2", 1, 255, 50)
+        sliders.setupTrackBar3(ocvb, "Canny Aperture", 3, 7, 3)
 
         ocvb.desc = "Show canny edge detection with varying thresholds"
         label1 = "Canny using L1 Norm"
@@ -31,16 +31,16 @@ Public Class Edges_DepthAndColor
     Dim shadow As Depth_Holes
     Dim canny As Edges_Canny
     Dim dilate As DilateErode_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        dilate = New DilateErode_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        dilate = New DilateErode_Basics(ocvb)
         dilate.radio.check(2).Checked = True
 
-        canny = New Edges_Canny(ocvb, caller)
+        canny = New Edges_Canny(ocvb)
         canny.sliders.TrackBar1.Value = 100
         canny.sliders.TrackBar2.Value = 100
 
-        shadow = New Depth_Holes(ocvb, caller)
+        shadow = New Depth_Holes(ocvb)
 
         ocvb.desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
         label1 = "Edges in color and depth after dilate"
@@ -68,10 +68,10 @@ End Class
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Edges_Laplacian
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Gaussian Kernel", 1, 32, 7)
-        sliders.setupTrackBar2(ocvb, caller, "Laplacian Kernel", 1, 32, 5)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Gaussian Kernel", 1, 32, 7)
+        sliders.setupTrackBar2(ocvb, "Laplacian Kernel", 1, 32, 5)
         label2 = "Laplacian of Depth Image"
         ocvb.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
@@ -94,9 +94,9 @@ End Class
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edges_Scharr
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Scharr multiplier X100", 1, 500, 50)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Scharr multiplier X100", 1, 500, 50)
         label2 = "x field + y field in CV_32F format"
         ocvb.desc = "Scharr is most accurate with 3x3 kernel."
     End Sub
@@ -114,15 +114,15 @@ End Class
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class Edges_Preserving
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        radio.Setup(ocvb, caller, 2)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        radio.Setup(ocvb, 2)
         radio.check(0).Text = "Edge RecurseFilter"
         radio.check(1).Text = "Edge NormconvFilter"
         radio.check(0).Checked = True
 
-        sliders.setupTrackBar1(ocvb, caller, "Edge Sigma_s", 0, 200, 10)
-        sliders.setupTrackBar2(ocvb, caller, "Edge Sigma_r", 1, 100, 40)
+        sliders.setupTrackBar1(ocvb, "Edge Sigma_s", 0, 200, 10)
+        sliders.setupTrackBar2(ocvb, "Edge Sigma_r", 1, 100, 40)
 
         label2 = "Edge preserving blur for RGB depth image above"
         ocvb.desc = "OpenCV's edge preserving filter."
@@ -164,9 +164,9 @@ Public Class Edges_RandomForest_CPP
     Inherits ocvbClass
     Dim rgbData() As Byte
     Dim EdgesPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Edges RF Threshold", 1, 255, 35)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Edges RF Threshold", 1, 255, 35)
 
         ocvb.desc = "Detect edges using structured forests - Opencv Contrib"
         ReDim rgbData(ocvb.color.Total * ocvb.color.ElemSize - 1)
@@ -209,9 +209,9 @@ Public Class Edges_Sobel
     Inherits ocvbClass
     Public grayX As cv.Mat
     Public grayY As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Sobel kernel Size", 1, 32, 3)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Sobel kernel Size", 1, 32, 3)
         ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -232,10 +232,10 @@ Public Class Edges_LeftView
     Inherits ocvbClass
     Dim red As LeftRightView_Basics
     Dim sobel As Edges_Sobel
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        red = New LeftRightView_Basics(ocvb, caller)
-        sobel = New Edges_Sobel(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        red = New LeftRightView_Basics(ocvb)
+        sobel = New Edges_Sobel(ocvb)
         sobel.sliders.TrackBar1.Value = 5
 
         ocvb.desc = "Find the edges in the LeftViewimages."
@@ -259,11 +259,11 @@ End Class
 
 Public Class Edges_ResizeAdd
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Border Vertical in Pixels", 1, 20, 5)
-        sliders.setupTrackBar2(ocvb, caller, "Border Horizontal in Pixels", 1, 20, 5)
-        sliders.setupTrackBar3(ocvb, caller, "Threshold for Pixel Difference", 1, 50, 16)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Border Vertical in Pixels", 1, 20, 5)
+        sliders.setupTrackBar2(ocvb, "Border Horizontal in Pixels", 1, 20, 5)
+        sliders.setupTrackBar3(ocvb, "Threshold for Pixel Difference", 1, 50, 16)
 
         ocvb.desc = "Find edges using a resize, subtract, and threshold."
         label1 = "Edges found with just resizing"
@@ -285,10 +285,10 @@ End Class
 
 Public Class Edges_DCTfrequency
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Remove Frequencies < x", 0, 100, 32)
-        sliders.setupTrackBar2(ocvb, caller, "Threshold after Removal", 1, 255, 20)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 32)
+        sliders.setupTrackBar2(ocvb, "Threshold after Removal", 1, 255, 20)
 
         label2 = "Mask for the isolated frequencies"
         ocvb.desc = "Find edges by removing all the highest frequencies."
@@ -334,10 +334,10 @@ End Module
 Public Class Edges_Deriche_CPP
     Inherits ocvbClass
     Dim Edges_Deriche As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Deriche Alpha", 1, 400, 100)
-        sliders.setupTrackBar2(ocvb, caller, "Deriche Omega", 1, 1000, 100)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Deriche Alpha", 1, 400, 100)
+        sliders.setupTrackBar2(ocvb, "Deriche Omega", 1, 1000, 100)
         Edges_Deriche = Edges_Deriche_Open()
         label2 = "Image enhanced with Deriche results"
         ocvb.desc = "Edge detection using the Deriche X and Y gradients - Painterly"

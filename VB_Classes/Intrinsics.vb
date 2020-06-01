@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 Public Class intrinsicsLeft_Basics
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Show the depth camera intrinsicsLeft."
         label2 = "ppx/ppy location"
     End Sub

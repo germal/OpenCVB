@@ -5,9 +5,9 @@ Public Class BGSubtract_Basics_CPP
     Inherits ocvbClass
     Dim bgfs As IntPtr
     Public currMethod As Int32 = -1
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        radio.Setup(ocvb, caller, 7)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        radio.Setup(ocvb, 7)
         radio.check(0).Text = "GMG"
         radio.check(1).Text = "CNT - Counting"
         radio.check(2).Text = "KNN"
@@ -54,10 +54,10 @@ End Class
 
 Public Class BGSubtract_MotionDetect_MT
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Correlation Threshold", 0, 1000, 980)
-        radio.Setup(ocvb, caller, 6)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Correlation Threshold", 0, 1000, 980)
+        radio.Setup(ocvb, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = CStr(2 ^ i) + " threads"
         Next
@@ -107,11 +107,11 @@ End Class
 Public Class BGSubtract_Basics_MT
     Inherits ocvbClass
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        grid = New Thread_Grid(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        grid = New Thread_Grid(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Correlation Threshold", 0, 1000, 980)
+        sliders.setupTrackBar1(ocvb, "Correlation Threshold", 0, 1000, 980)
 
         label2 = "Only Motion Added"
         ocvb.desc = "Detect Motion in the color image"
@@ -138,10 +138,10 @@ Public Class BGSubtract_Depth_MT
     Inherits ocvbClass
     Dim shadow As Depth_Holes
     Dim bgsub As BGSubtract_Basics_MT
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        bgsub = New BGSubtract_Basics_MT(ocvb, caller)
-        shadow = New Depth_Holes(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        bgsub = New BGSubtract_Basics_MT(ocvb)
+        shadow = New Depth_Holes(ocvb)
         ocvb.desc = "Detect Motion in the depth image - needs more work"
         label1 = "Depth data input"
         label2 = "Accumulated depth image"
@@ -162,9 +162,9 @@ Public Class BGSubtract_MOG
     Inherits ocvbClass
     Dim MOG As cv.BackgroundSubtractorMOG
     Public gray As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "MOG Learn Rate", 0, 1000, 10)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "MOG Learn Rate", 0, 1000, 10)
 
         MOG = cv.BackgroundSubtractorMOG.Create()
         ocvb.desc = "Subtract background using a mixture of Gaussians"
@@ -186,9 +186,9 @@ Public Class BGSubtract_MOG2
     Inherits ocvbClass
     Public gray As New cv.Mat
     Dim MOG2 As cv.BackgroundSubtractorMOG2
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "MOG Learn Rate", 0, 1000, 10)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "MOG Learn Rate", 0, 1000, 10)
 
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
         ocvb.desc = "Subtract background using a mixture of Gaussians"
@@ -205,9 +205,9 @@ Public Class BGSubtract_GMG_KNN
     Inherits ocvbClass
     Dim gmg As cv.BackgroundSubtractorGMG
     Dim knn As cv.BackgroundSubtractorKNN
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Learn Rate", 1, 1000, 1)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Learn Rate", 1, 1000, 1)
 
         gmg = cv.BackgroundSubtractorGMG.Create()
         knn = cv.BackgroundSubtractorKNN.Create()
@@ -235,9 +235,9 @@ Public Class BGSubtract_MOG_RGBDepth
     Public gray As New cv.Mat
     Dim MOGDepth As cv.BackgroundSubtractorMOG
     Dim MOGRGB As cv.BackgroundSubtractorMOG
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "MOG Learn Rate x1000", 0, 1000, 10)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "MOG Learn Rate x1000", 0, 1000, 10)
 
         MOGDepth = cv.BackgroundSubtractorMOG.Create()
         MOGRGB = cv.BackgroundSubtractorMOG.Create()
@@ -261,14 +261,14 @@ Public Class BGSubtract_MOG_Retina
     Inherits ocvbClass
     Dim mog As BGSubtract_MOG
     Dim retina As Retina_Basics_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        mog = New BGSubtract_MOG(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        mog = New BGSubtract_MOG(ocvb)
         mog.sliders.TrackBar1.Value = 100
 
-        retina = New Retina_Basics_CPP(ocvb, caller)
+        retina = New Retina_Basics_CPP(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Uncertainty threshold", 1, 255, 100)
+        sliders.setupTrackBar1(ocvb, "Uncertainty threshold", 1, 255, 100)
 
         ocvb.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
         label1 = "MOG results of depth motion"
@@ -290,9 +290,9 @@ End Class
 Public Class BGSubtract_DepthOrColorMotion
     Inherits ocvbClass
     Public motion As Diff_UnstableDepthAndColor
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        motion = New Diff_UnstableDepthAndColor(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        motion = New Diff_UnstableDepthAndColor(ocvb)
         ocvb.desc = "Detect motion with both depth and color changes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -332,11 +332,11 @@ Public Class BGSubtract_Video
     Inherits ocvbClass
     Dim bgfg As BGSubtract_Basics_CPP
     Dim video As Video_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        bgfg = New BGSubtract_Basics_CPP(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        bgfg = New BGSubtract_Basics_CPP(ocvb)
 
-        video = New Video_Basics(ocvb, caller)
+        video = New Video_Basics(ocvb)
         video.srcVideo = ocvb.parms.HomeDir + "Data/vtest.avi"
         ocvb.desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
@@ -375,12 +375,12 @@ Public Class BGSubtract_Synthetic_CPP
     Inherits ocvbClass
     Dim synthPtr As IntPtr
     Dim amplitude As Double, magnitude As Double, waveSpeed As Double, objectSpeed As Double
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Synthetic Amplitude x100", 1, 400, 200)
-        sliders.setupTrackBar2(ocvb, caller, "Synthetic Magnitude", 1, 40, 20)
-        sliders.setupTrackBar3(ocvb, caller, "Synthetic Wavespeed x100", 1, 400, 20)
-        sliders.setupTrackBar4(ocvb, caller, "Synthetic ObjectSpeed", 1, 20, 15)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Synthetic Amplitude x100", 1, 400, 200)
+        sliders.setupTrackBar2(ocvb, "Synthetic Magnitude", 1, 40, 20)
+        sliders.setupTrackBar3(ocvb, "Synthetic Wavespeed x100", 1, 400, 20)
+        sliders.setupTrackBar4(ocvb, "Synthetic ObjectSpeed", 1, 20, 15)
         label1 = "Synthetic background/foreground image."
         ocvb.desc = "Generate a synthetic input to background subtraction method - Painterly"
     End Sub
@@ -422,11 +422,11 @@ Public Class BGSubtract_Synthetic
     Inherits ocvbClass
     Dim bgfg As BGSubtract_Basics_CPP
     Dim synth As BGSubtract_Synthetic_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        bgfg = New BGSubtract_Basics_CPP(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        bgfg = New BGSubtract_Basics_CPP(ocvb)
 
-        synth = New BGSubtract_Synthetic_CPP(ocvb, caller)
+        synth = New BGSubtract_Synthetic_CPP(ocvb)
         ocvb.desc = "Demonstrate background subtraction algorithms with synthetic images - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

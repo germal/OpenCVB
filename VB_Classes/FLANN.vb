@@ -3,8 +3,8 @@ Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FlannSample.vb
 Public Class FLANN_Test
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
         label1 = "FLANN Basics"
     End Sub
@@ -48,11 +48,11 @@ End Class
 Public Class FLANN_Basics
     Inherits ocvbClass
     Dim random As Random_Points
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        random = New Random_Points(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        random = New Random_Points(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Query Count", 1, 10000, 10)
+        sliders.setupTrackBar1(ocvb, "Query Count", 1, 10000, 10)
 
         ocvb.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
         label1 = "Yellow is query, Nearest points blue"

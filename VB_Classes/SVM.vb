@@ -6,24 +6,24 @@ Public Class SVM_Options
     Public SVMType = cv.ML.SVM.Types.CSvc
     Public points() As cv.Point2f
     Public responses() As Integer
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "SampleCount", 5, 1000, 500)
-        sliders.setupTrackBar2(ocvb, caller, "Granularity", 1, 50, 5)
-        sliders.setupTrackBar3(ocvb, caller, "SVM Degree", 1, 200, 100)
-        sliders.setupTrackBar4(ocvb, caller, "SVM Gamma ", 1, 200, 100)
-        sliders1.setupTrackBar1(ocvb, caller, "SVM Coef0 X100", 1, 200, 100)
-        sliders1.setupTrackBar2(ocvb, caller, "SVM C X100", 0, 100, 100)
-        sliders1.setupTrackBar3(ocvb, caller, "SVM Nu X100", 1, 85, 50)
-        sliders1.setupTrackBar4(ocvb, caller, "SVM P X100", 0, 100, 10)
-        radio.Setup(ocvb, caller, 4)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "SampleCount", 5, 1000, 500)
+        sliders.setupTrackBar2(ocvb, "Granularity", 1, 50, 5)
+        sliders.setupTrackBar3(ocvb, "SVM Degree", 1, 200, 100)
+        sliders.setupTrackBar4(ocvb, "SVM Gamma ", 1, 200, 100)
+        sliders1.setupTrackBar1(ocvb, "SVM Coef0 X100", 1, 200, 100)
+        sliders1.setupTrackBar2(ocvb, "SVM C X100", 0, 100, 100)
+        sliders1.setupTrackBar3(ocvb, "SVM Nu X100", 1, 85, 50)
+        sliders1.setupTrackBar4(ocvb, "SVM P X100", 0, 100, 10)
+        radio.Setup(ocvb, 4)
         radio.check(0).Text = "kernel Type = Linear"
         radio.check(1).Text = "kernel Type = Poly"
         radio.check(2).Text = "kernel Type = RBF"
         radio.check(2).Checked = True
         radio.check(3).Text = "kernel Type = Sigmoid"
 
-        radio1.Setup(ocvb, caller, 5)
+        radio1.Setup(ocvb, 5)
         radio1.check(0).Text = "SVM Type = CSvc"
         radio1.check(0).Checked = True
         radio1.check(1).Text = "SVM Type = EpsSvr"
@@ -94,9 +94,9 @@ End Class
 Public Class SVM_Basics
     Inherits ocvbClass
     Dim svmOptions As SVM_Options
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        svmOptions = New SVM_Options(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        svmOptions = New SVM_Options(ocvb)
         ocvb.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
         label1 = "SVM_Basics input data"
         label2 = "Results - line is ground truth"
@@ -145,13 +145,13 @@ End Class
 Public Class SVM_Random
     Inherits ocvbClass
     Dim svmOptions As SVM_Options
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        svmOptions = New SVM_Options(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        svmOptions = New SVM_Options(ocvb)
         svmOptions.sliders.TrackBar2.Value = 15
         ocvb.drawRect = New cv.Rect(ocvb.color.Cols / 4, ocvb.color.Rows / 4, ocvb.color.Cols / 2, ocvb.color.Rows / 2)
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(ocvb, 1)
         check.Box(0).Text = "Restrict random test to square area"
 
         label1 = "SVM Training data"
@@ -230,13 +230,13 @@ Public Class SVM_TestCase
     Dim trainMat As cv.Mat
     Dim labelsMat As cv.Mat
     Dim svm As SVM_Options
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
 
         trainMat = New cv.Mat(4, 2, cv.MatType.CV_32F, trainData)
         labelsMat = New cv.Mat(4, 1, cv.MatType.CV_32SC1, labels)
 
-        svm = New SVM_Options(ocvb, caller)
+        svm = New SVM_Options(ocvb)
         ocvb.desc = "Text book example on SVM"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

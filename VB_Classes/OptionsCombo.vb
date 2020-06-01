@@ -7,8 +7,8 @@ Public Class OptionsCombo
         If radioOffset.X > offsetMax Then radioOffset.X = 0
         If radioOffset.Y > offsetMax Then radioOffset.Y = 0
     End Sub
-    Public Sub Setup(ocvb As AlgorithmData, caller As String, label As String, comboList As List(Of String))
-        Me.Text = caller + " Options"
+    Public Sub Setup(ocvb As AlgorithmData, label As String, comboList As List(Of String))
+        Me.Text = ocvb.caller + " Options"
         If ocvb.parms.ShowOptions Then
             If ocvb.suppressOptions = False Then Me.Show()
         End If

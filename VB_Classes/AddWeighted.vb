@@ -1,9 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class AddWeighted_Basics
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Weight", 0, 100, 50)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Weight", 0, 100, 50)
         ocvb.desc = "Add depth and rgb with specified weights."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -20,9 +20,9 @@ End Class
 Public Class AddWeighted_Test
     Inherits ocvbClass
     Dim weight As AddWeighted_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        weight = New AddWeighted_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        weight = New AddWeighted_Basics(ocvb)
         ocvb.desc = "Testing AddWeighted_Basics as a derivative algorithm."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

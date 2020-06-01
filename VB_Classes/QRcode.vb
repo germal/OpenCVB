@@ -5,8 +5,8 @@ Public Class QRcode_Basics
     Dim qrDecoder As New cv.QRCodeDetector
     Dim qrInput1 As New cv.Mat
     Dim qrInput2 As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         Dim fileInfo = New FileInfo(ocvb.parms.HomeDir + "data/QRcode1.png")
         If fileInfo.Exists Then qrInput1 = cv.Cv2.ImRead(fileInfo.FullName)
         fileInfo = New FileInfo(ocvb.parms.HomeDir + "Data/QRCode2.png")

@@ -6,11 +6,11 @@ Public Class OilPaint_Pointilism
     Inherits ocvbClass
     Dim randomMask As cv.Mat
     Dim myRNG As New cv.RNG
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Stroke Scale", 1, 5, 3)
-        sliders.setupTrackBar2(ocvb, caller, "Smoothing Radius", 0, 100, 32)
-        radio.Setup(ocvb, caller, 2)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Stroke Scale", 1, 5, 3)
+        sliders.setupTrackBar2(ocvb, "Smoothing Radius", 0, 100, 32)
+        radio.Setup(ocvb, 2)
         radio.check(0).Text = "Use Elliptical stroke"
         radio.check(1).Text = "Use Circular stroke"
         radio.check(1).Checked = True
@@ -82,9 +82,9 @@ Public Class OilPaint_ColorProbability
     Inherits ocvbClass
     Public color_probability() As Single
     Public km As kMeans_RGBFast
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        km = New kMeans_RGBFast(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        km = New kMeans_RGBFast(ocvb)
         km.sliders.TrackBar1.Value = 12 ' we would like a dozen colors or so in the color image.
         ReDim color_probability(km.sliders.TrackBar1.Value - 1)
         ocvb.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
@@ -119,10 +119,10 @@ End Class
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
 Public Class OilPaint_Manual
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Filter Size", 3, 15, 3)
-        sliders.setupTrackBar2(ocvb, caller, "Intensity", 5, 150, 25)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Filter Size", 3, 15, 3)
+        sliders.setupTrackBar2(ocvb, "Intensity", 5, 150, 25)
         ocvb.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
         ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
     End Sub
@@ -176,10 +176,10 @@ End Class
 Public Class OilPaint_Manual_CS
     Inherits ocvbClass
     Dim oilPaint As New CS_Classes.OilPaintManual
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 2, 10, 4)
-        sliders.setupTrackBar2(ocvb, caller, "Intensity", 1, 250, 20)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Kernel Size", 2, 10, 4)
+        sliders.setupTrackBar2(ocvb, "Intensity", 1, 250, 20)
         ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
         label2 = "Selected area only"
 
@@ -206,14 +206,14 @@ Public Class OilPaint_Cartoon
     Inherits ocvbClass
     Dim oil As OilPaint_Manual_CS
     Dim laplacian As Edges_Laplacian
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        laplacian = New Edges_Laplacian(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        laplacian = New Edges_Laplacian(ocvb)
 
-        oil = New OilPaint_Manual_CS(ocvb, caller)
+        oil = New OilPaint_Manual_CS(ocvb)
         ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
 
-        oil.sliders.setupTrackBar3(ocvb, caller, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
+        oil.sliders.setupTrackBar3(ocvb, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
         ocvb.desc = "Alter an image so it appears more like a cartoon - Painterly Effect"
         label1 = "OilPaint_Cartoon"
         label2 = "Laplacian Edges"

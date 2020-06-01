@@ -23,11 +23,11 @@ End Module
 Public Class SuperPixel_Basics_CPP
     Inherits ocvbClass
     Dim spPtr As IntPtr = 0
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Number of SuperPixels", 1, 1000, 400)
-        sliders.setupTrackBar2(ocvb, caller, "Iterations", 0, 10, 4)
-        sliders.setupTrackBar3(ocvb, caller, "Prior", 1, 10, 2)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Number of SuperPixels", 1, 1000, 400)
+        sliders.setupTrackBar2(ocvb, "Iterations", 0, 10, 4)
+        sliders.setupTrackBar3(ocvb, "Prior", 1, 10, 2)
 
         label2 = "Superpixel label data (0-255)"
         ocvb.desc = "Sub-divide the image into super pixels."
@@ -76,9 +76,9 @@ End Class
 Public Class SuperPixel_Depth
     Inherits ocvbClass
     Dim pixels As SuperPixel_Basics_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        pixels = New SuperPixel_Basics_CPP(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        pixels = New SuperPixel_Basics_CPP(ocvb)
 
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
@@ -99,11 +99,11 @@ Public Class SuperPixel_WithCanny
     Inherits ocvbClass
     Dim pixels As SuperPixel_Basics_CPP
     Dim edges As Edges_Canny
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        edges = New Edges_Canny(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        edges = New Edges_Canny(ocvb)
 
-        pixels = New SuperPixel_Basics_CPP(ocvb, caller)
+        pixels = New SuperPixel_Basics_CPP(ocvb)
 
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
@@ -129,11 +129,11 @@ Public Class SuperPixel_WithLineDetector
     Inherits ocvbClass
     Dim pixels As SuperPixel_Basics_CPP
     Dim lines As LineDetector_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        lines = New LineDetector_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        lines = New LineDetector_Basics(ocvb)
 
-        pixels = New SuperPixel_Basics_CPP(ocvb, caller)
+        pixels = New SuperPixel_Basics_CPP(ocvb)
 
         label2 = "Input to superpixel basics."
         ocvb.desc = "Create SuperPixels using RGBDepth image."

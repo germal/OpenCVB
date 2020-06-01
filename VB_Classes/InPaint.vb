@@ -4,11 +4,11 @@ Imports cv = OpenCvSharp
 ' https://docs.opencv.org/master/df/d3d/tutorial_py_inpainting.html#gsc.tab=0
 Public Class InPaint_Basics
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Thickness", 1, 25, 2)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Thickness", 1, 25, 2)
 
-        radio.Setup(ocvb, caller, 2)
+        radio.Setup(ocvb, 2)
         radio.check(0).Text = "TELEA"
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True
@@ -37,11 +37,11 @@ End Class
 Public Class InPaint_Noise
     Inherits ocvbClass
     Dim noise As Draw_Noise
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        noise = New Draw_Noise(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        noise = New Draw_Noise(ocvb)
 
-        radio.Setup(ocvb, caller, 2)
+        radio.Setup(ocvb, 2)
         radio.check(0).Text = "TELEA"
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True

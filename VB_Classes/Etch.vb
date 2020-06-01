@@ -10,16 +10,16 @@ Public Class Etch_ASketch
     Private Function randomCursor(ocvb As AlgorithmData)
         Return New cv.Point(ms_rng.Next(0, ocvb.color.Width), ms_rng.Next(0, ocvb.color.Height))
     End Function
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
 
-        check.Setup(ocvb, caller, 2)
+        check.Setup(ocvb, 2)
         check.Box(0).Text = "Etch_ASketch clean slate"
         check.Box(1).Text = "Demo mode"
         check.Box(1).Checked = True
         If ocvb.parms.testAllRunning Then check.Box(1).Checked = True
 
-        keys = New Keyboard_Basics(ocvb, caller)
+        keys = New Keyboard_Basics(ocvb)
 
         cursor = randomCursor(ocvb)
         dst1.SetTo(slateColor)

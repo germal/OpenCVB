@@ -2,9 +2,9 @@ Imports cv = OpenCvSharp
 Public Class Resize_Basics
     Inherits ocvbClass
     Public newSize As cv.Size
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        SetInterpolationRadioButtons(ocvb, caller, radio, "Resize")
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        SetInterpolationRadioButtons(ocvb, radio, "Resize")
         ' warp is not allowed in resize
         radio.check(5).Enabled = False
         radio.check(6).Enabled = False
@@ -35,10 +35,10 @@ End Class
 Public Class Resize_After8uc3
     Inherits ocvbClass
     Dim colorizer As Depth_Colorizer_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        colorizer = New Depth_Colorizer_CPP(ocvb, caller)
-        SetInterpolationRadioButtons(ocvb, caller, radio, "Resize")
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        colorizer = New Depth_Colorizer_CPP(ocvb)
+        SetInterpolationRadioButtons(ocvb, radio, "Resize")
         ' warp is not allowed in resize
         radio.check(5).Enabled = False
         radio.check(6).Enabled = False
@@ -74,11 +74,11 @@ End Class
 Public Class Resize_Percentage
     Inherits ocvbClass
     Public resizeOptions As Resize_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        resizeOptions = New Resize_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        resizeOptions = New Resize_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Resize Percentage (%)", 1, 100, 3)
+        sliders.setupTrackBar1(ocvb, "Resize Percentage (%)", 1, 100, 3)
 
         ocvb.desc = "Resize by a percentage of the image."
     End Sub

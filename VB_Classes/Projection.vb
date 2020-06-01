@@ -83,8 +83,8 @@ Public Class Projection_ColorizeMat
         Next
         Return dst
     End Function
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
 
         fontSize = 1.0
         If ocvb.parms.resolution = resMed Then fontSize = 0.6
@@ -92,13 +92,13 @@ Public Class Projection_ColorizeMat
         shift = (src.Width - src.Height) / 2
         rect = New cv.Rect(shift, 0, dst1.Height, dst1.Height)
 
-        palette = New Palette_Gradient(ocvb, caller)
+        palette = New Palette_Gradient(ocvb)
         palette.color1 = cv.Scalar.Yellow
         palette.color2 = cv.Scalar.Blue
         palette.frameModulo = 1
 
-        sliders.setupTrackBar1(ocvb, caller, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
-        sliders.setupTrackBar2(ocvb, caller, "Threshold for histogram count", 0, 100, 3)
+        sliders.setupTrackBar1(ocvb, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
+        sliders.setupTrackBar2(ocvb, "Threshold for histogram count", 0, 100, 3)
 
         ocvb.desc = "Create the colorizeMat's used for projections"
     End Sub
@@ -119,13 +119,13 @@ Public Class Projection_NoGravity_CPP
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        grid = New Thread_Grid(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
-        foreground = New Depth_ManualTrim(ocvb, caller)
+        foreground = New Depth_ManualTrim(ocvb)
         foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
         foreground.sliders.TrackBar2.Value = 4000 ' fixed distance to keep the images stable.
         label1 = "Top View"
@@ -175,13 +175,13 @@ Public Class Projection_NoGravity
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        grid = New Thread_Grid(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 32
 
-        foreground = New Depth_ManualTrim(ocvb, caller)
+        foreground = New Depth_ManualTrim(ocvb)
         foreground.sliders.TrackBar1.Value = 300  ' fixed distance to keep the images stable.
         foreground.sliders.TrackBar2.Value = 4000 ' fixed distance to keep the images stable.
         label1 = "Top View"
@@ -241,12 +241,12 @@ Public Class Projection_Gravity_CPP
     Dim xyzBytes() As Byte
     Public topMask As cv.Mat
     Public sideMask As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        gCloud = New Transform_Gravity(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        gCloud = New Transform_Gravity(ocvb)
         cPtr = Project_GravityHist_Open()
 
-        cMats = New Projection_ColorizeMat(ocvb, caller)
+        cMats = New Projection_ColorizeMat(ocvb)
         cMats.Run(ocvb)
 
         ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
@@ -302,12 +302,12 @@ Public Class Projection_Wall
     Dim objects As Projection_Objects
     Dim lines As lineDetector_FLD_CPP
     Dim dilate As DilateErode_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
 
-        lines = New lineDetector_FLD_CPP(ocvb, Me.GetType().Name)
-        objects = New Projection_Objects(ocvb, Me.GetType().Name)
-        dilate = New DilateErode_Basics(ocvb, Me.GetType().Name)
+        lines = New lineDetector_FLD_CPP(ocvb)
+        objects = New Projection_Objects(ocvb)
+        dilate = New DilateErode_Basics(ocvb)
 
         label1 = "Top View: walls in red"
         ocvb.desc = "Use the top down view to detect walls with a line detector algorithm - needs more work"
@@ -340,14 +340,14 @@ Public Class Projection_Objects
     Public fontSize As Single = 1.0
     Public gravity As Projection_Gravity_CPP
     Public maxZ As Single
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "epsilon for GroupRectangles X100", 0, 200, 80)
+        sliders.setupTrackBar1(ocvb, "epsilon for GroupRectangles X100", 0, 200, 80)
 
-        gravity = New Projection_Gravity_CPP(ocvb, caller)
+        gravity = New Projection_Gravity_CPP(ocvb)
 
-        flood = New FloodFill_Projection(ocvb, caller)
+        flood = New FloodFill_Projection(ocvb)
         flood.sliders.TrackBar1.Value = 100
 
         label1 = "Isolated objects - Red dot is camera"
@@ -395,8 +395,8 @@ End Class
 Public Class Projection_Backprojection
     Inherits ocvbClass
     Dim pFlood As Projection_Objects
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Use Projection_Objects to find objects and then backproject them into front-facing view."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -417,14 +417,14 @@ Public Class Projection_Gravity
     Public cMats As Projection_ColorizeMat
     Public topView As cv.Mat
     Public sideView As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        gCloud = New Transform_Gravity(ocvb, caller)
-        grid = New Thread_Grid(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        gCloud = New Transform_Gravity(ocvb)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 40
 
-        cMats = New Projection_ColorizeMat(ocvb, caller)
+        cMats = New Projection_ColorizeMat(ocvb)
         cMats.Run(ocvb)
 
         label1 = "View looking up from under floor - Red Dot is camera"

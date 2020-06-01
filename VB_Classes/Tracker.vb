@@ -5,9 +5,9 @@ Public Class Tracker_Basics
     Public bbox As cv.Rect2d
     Public boxObject() As cv.Rect2d
     Public trackerIndex As Int32 = 5 ' trackerMIL by default...
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        check.Setup(ocvb, caller, 1)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        check.Setup(ocvb, 1)
         check.Box(0).Text = "Stop tracking selected object"
         ocvb.desc = "Track an object using cv.Tracking API - tracker algorithm"
         ocvb.putText(New oTrueType("Draw a rectangle around object to be tracked.", 10, 140, RESULT2))
@@ -61,13 +61,13 @@ End Class
 Public Class Tracker_MultiObject
     Inherits ocvbClass
     Dim trackers As New List(Of Tracker_Basics)
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Track any number of objects simultaneously - tracker algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.drawRect.Width <> 0 Then
-            Dim tr = New Tracker_Basics(ocvb, "Tracker_MultiObject")
+            Dim tr = New Tracker_Basics(ocvb)
             tr.src = src
             tr.Run(ocvb)
             ocvb.drawRect = New cv.Rect
@@ -97,11 +97,11 @@ End Class
 Public Class Tracker_Methods
     Inherits ocvbClass
     Dim tracker As Tracker_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        tracker = New Tracker_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        tracker = New Tracker_Basics(ocvb)
 
-        radio.Setup(ocvb, caller, 8)
+        radio.Setup(ocvb, 8)
         radio.check(0).Text = "TrackerBoosting"
         radio.check(1).Text = "TrackerCSRT"
         radio.check(2).Text = "TrackerGOTURN - disabled (not working)"

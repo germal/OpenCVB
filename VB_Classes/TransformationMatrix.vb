@@ -2,9 +2,9 @@ Imports cv = OpenCvSharp
 Public Class TransformationMatrix_Basics
     Inherits ocvbClass
     Dim topLocations As New List(Of cv.Point3d)
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "TMatrix Top View multiplier", 1, 1000, 500)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "TMatrix Top View multiplier", 1, 1000, 500)
         If ocvb.parms.cameraIndex = StereoLabsZED2 Then sliders.TrackBar1.Value = 1 ' need a smaller multiplier...
 
         label1 = "View from above the camera"

@@ -31,12 +31,12 @@ Public Class Harris_Features_CPP
     Inherits ocvbClass
     Dim srcData() As Byte
     Dim Harris_Features As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Harris Threshold", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, caller, "Harris Neighborhood", 1, 41, 21)
-        sliders.setupTrackBar3(ocvb, caller,"Harris aperture", 1, 33, 21)
-        sliders.setupTrackBar4(ocvb, caller,  "Harris Parameter", 1, 100, 1)
+    Public Sub New(ocvb As AlgorithmData)
+                setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Harris Threshold", 1, 100, 1)
+        sliders.setupTrackBar2(ocvb, "Harris Neighborhood", 1, 41, 21)
+        sliders.setupTrackBar3(ocvb,"Harris aperture", 1, 33, 21)
+        sliders.setupTrackBar4(ocvb,  "Harris Parameter", 1, 100, 1)
         
         ocvb.desc = "Use Harris feature detectors to identify interesting points."
 
@@ -78,9 +78,9 @@ Public Class Harris_Detector_CPP
     Dim ptCount(1) As Int32
     Dim Harris_Detector As IntPtr
     Public FeaturePoints As New List(Of cv.Point2f)
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Harris qualityLevel", 1, 100, 2)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Harris qualityLevel", 1, 100, 2)
 
         ocvb.desc = "Use Harris detector to identify interesting points."
 

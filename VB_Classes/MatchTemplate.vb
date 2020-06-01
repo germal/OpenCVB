@@ -8,12 +8,12 @@ Public Class MatchTemplate_Basics
     Public correlationMat As New cv.Mat
     Public reportFreq = 10 ' report the results every x number of iterations.
     Public matchOption As cv.TemplateMatchModes
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        flow = New Font_FlowText(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        flow = New Font_FlowText(ocvb)
         flow.result1or2 = RESULT1
 
-        radio.Setup(ocvb, caller, 6)
+        radio.Setup(ocvb, 6)
         radio.check(0).Text = "CCoeff"
         radio.check(1).Text = "CCoeffNormed"
         radio.check(2).Text = "CCorr"
@@ -21,7 +21,7 @@ Public Class MatchTemplate_Basics
         radio.check(4).Text = "SqDiff"
         radio.check(5).Text = "SqDiffNormed"
         radio.check(1).Checked = True
-        sliders.setupTrackBar1(ocvb, caller, "Sample Size", 2, 10000, 100)
+        sliders.setupTrackBar1(ocvb, "Sample Size", 2, 10000, 100)
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -63,12 +63,12 @@ Public Class MatchTemplate_RowCorrelation
     Inherits ocvbClass
     Dim corr As MatchTemplate_Basics
     Dim flow As Font_FlowText
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        flow = New Font_FlowText(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        flow = New Font_FlowText(ocvb)
         flow.result1or2 = RESULT1
 
-        corr = New MatchTemplate_Basics(ocvb, caller)
+        corr = New MatchTemplate_Basics(ocvb)
         corr.sliders.Visible = False
 
         ocvb.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
@@ -108,9 +108,9 @@ Public Class MatchTemplate_DrawRect
     Inherits ocvbClass
     Public saveTemplate As cv.Mat
     Public saveRect As cv.Rect
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        radio.Setup(ocvb, caller, 6)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        radio.Setup(ocvb, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
         Next
@@ -154,12 +154,12 @@ Public Class MatchTemplate_BestEntropy_MT
     Inherits ocvbClass
     Dim entropy As Entropy_Highest_MT
     Dim match As MatchTemplate_DrawRect
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
 
-        match = New MatchTemplate_DrawRect(ocvb, caller)
+        match = New MatchTemplate_DrawRect(ocvb)
 
-        entropy = New Entropy_Highest_MT(ocvb, caller)
+        entropy = New Entropy_Highest_MT(ocvb)
 
         ocvb.parms.ShowOptions = False ' we won't need the options...
 

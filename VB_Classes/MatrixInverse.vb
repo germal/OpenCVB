@@ -31,8 +31,8 @@ Public Class MatrixInverse_Basics_CS
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
     Dim defaultBVector() As Double = {12, 7, 7, 13}
     Dim input As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
         ocvb.desc = "Manually invert a matrix"
     End Sub
@@ -60,8 +60,8 @@ Public Class MatrixInverse_OpenCV
     Inherits ocvbClass
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
     Dim input As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
         ocvb.desc = "Use OpenCV to invert a matrix"
     End Sub

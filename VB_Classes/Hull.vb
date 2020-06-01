@@ -26,9 +26,9 @@ End Module
 Public Class Hull_Basics
     Inherits ocvbClass
     Public hull() As cv.Point
-        Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Hull random points", 1, 20, 10)
+        Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Hull random points", 1, 20, 10)
 
         ocvb.desc = "Surround a set of random points with a convex hull"
         label1 = "Convex Hull Output"

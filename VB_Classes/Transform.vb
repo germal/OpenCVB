@@ -2,9 +2,9 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Transform_Resize
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Resize Percent", 50, 1000, 50)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Resize Percent", 50, 1000, 50)
         ocvb.desc = "Resize an image based on the slider value."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -28,10 +28,10 @@ End Class
 
 Public Class Transform_Rotate
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Angle", 0, 180, 30)
-        sliders.setupTrackBar2(ocvb, caller, "Scale Factor", 1, 100, 50)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Angle", 0, 180, 30)
+        sliders.setupTrackBar2(ocvb, "Scale Factor", 1, 100, 50)
         ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -45,9 +45,9 @@ End Class
 
 Public Class Transform_Sort
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        radio.Setup(ocvb, caller, 4)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        radio.Setup(ocvb, 4)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
@@ -72,9 +72,9 @@ End Class
 
 Public Class Transform_SortReshape
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        radio.Setup(ocvb, caller, 2)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        radio.Setup(ocvb, 2)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
@@ -101,15 +101,15 @@ Public Class Transform_Gravity
     Public vertSplit() As cv.Mat
     Public xyz(0) As Single
     Dim smooth As Depth_SmoothingMat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        smooth = New Depth_SmoothingMat(ocvb, caller)
-        check.Setup(ocvb, caller, 1)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        smooth = New Depth_SmoothingMat(ocvb)
+        check.Setup(ocvb, 1)
         check.Box(0).Text = "Apply smoothing to depth data"
         check.Box(0).Checked = False
         check.Visible = False ' smoothing is not working well enough yet...
 
-        imu = New IMU_GVector(ocvb, caller)
+        imu = New IMU_GVector(ocvb)
         ocvb.desc = "Transform the pointcloud with the gravity vector"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -10,15 +10,15 @@ Public Class CamShift_Basics
     Inherits ocvbClass
     Public plotHist As Plot_Histogram
     Public trackBox As New cv.RotatedRect
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        plotHist = New Plot_Histogram(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        plotHist = New Plot_Histogram(ocvb)
         plotHist.sliders.Visible = False
 
-        sliders.setupTrackBar1(ocvb, caller, "CamShift vMin", 0, 255, 32)
-        sliders.setupTrackBar2(ocvb, caller, "CamShift vMax", 0, 255, 255)
-        sliders.setupTrackBar3(ocvb, caller, "CamShift Smin", 0, 255, 60)
-        sliders.setupTrackBar4(ocvb, caller, "CamShift Histogram bins", 16, 255, 32)
+        sliders.setupTrackBar1(ocvb, "CamShift vMin", 0, 255, 32)
+        sliders.setupTrackBar2(ocvb, "CamShift vMax", 0, 255, 255)
+        sliders.setupTrackBar3(ocvb, "CamShift Smin", 0, 255, 60)
+        sliders.setupTrackBar4(ocvb, "CamShift Histogram bins", 16, 255, 32)
 
         label1 = "Draw anywhere to create histogram and start camshift"
         label2 = "Histogram of targeted region (hue only)"
@@ -76,10 +76,10 @@ Public Class CamShift_Foreground
     Inherits ocvbClass
     Dim camshift As CamShift_Basics
     Dim fore As Depth_Foreground
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        camshift = New CamShift_Basics(ocvb, caller)
-        fore = New Depth_Foreground(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        camshift = New CamShift_Basics(ocvb)
+        fore = New Depth_Foreground(ocvb)
         label1 = "Automatically finding the head - top of nearest object"
         ocvb.desc = "Use depth to find the head and start the camshift demo.  Tracker Algorithm"
     End Sub
@@ -113,11 +113,11 @@ Public Class Camshift_Object
     Inherits ocvbClass
     Dim blob As Blob_DepthClusters
     Dim camshift As CamShift_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        blob = New Blob_DepthClusters(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        blob = New Blob_DepthClusters(ocvb)
 
-        camshift = New CamShift_Basics(ocvb, caller)
+        camshift = New CamShift_Basics(ocvb)
 
         label1 = "Largest blob with hue tracked.  Draw enabled."
         label2 = "Backprojection of depth clusters masked with hue"
@@ -151,19 +151,19 @@ Public Class Camshift_TopObjects
     Dim blob As Blob_DepthClusters
     Dim cams(3) As CamShift_Basics
     Dim mats As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        mats = New Mat_4to1(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        mats = New Mat_4to1(ocvb)
 
         ocvb.suppressOptions = True
-        blob = New Blob_DepthClusters(ocvb, caller)
+        blob = New Blob_DepthClusters(ocvb)
         blob.sliders.Visible = False
         For i = 0 To cams.Length - 1
-            cams(i) = New CamShift_Basics(ocvb, caller)
+            cams(i) = New CamShift_Basics(ocvb)
         Next
 
         ocvb.suppressOptions = False
-        sliders.setupTrackBar1(ocvb, caller, "Reinitialize camshift after x frames", 1, 500, 100)
+        sliders.setupTrackBar1(ocvb, "Reinitialize camshift after x frames", 1, 500, 100)
         ocvb.desc = "Track - Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

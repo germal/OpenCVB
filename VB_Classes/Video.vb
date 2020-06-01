@@ -6,8 +6,8 @@ Public Class Video_Basics
     Public srcVideo As String
     Public image As New cv.Mat
     Dim currVideo As String
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         If srcVideo = "" Then srcVideo = ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4" ' default video...
         currVideo = srcVideo
         videoOptions.NewVideo(ocvb, srcVideo)
@@ -34,13 +34,13 @@ Public Class Video_CarCounting
     Dim flow As Font_FlowText
     Dim video As Video_Basics
     Dim mog As BGSubtract_MOG
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        mog = New BGSubtract_MOG(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        mog = New BGSubtract_MOG(ocvb)
 
-        video = New Video_Basics(ocvb, caller)
+        video = New Video_Basics(ocvb)
 
-        flow = New Font_FlowText(ocvb, caller)
+        flow = New Font_FlowText(ocvb)
         flow.result1or2 = RESULT1
 
         ocvb.desc = "Count cars in a video file"
@@ -92,15 +92,15 @@ Public Class Video_CarCComp
     Dim flow As Font_FlowText
     Dim video As Video_Basics
     Dim mog As BGSubtract_MOG
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        mog = New BGSubtract_MOG(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        mog = New BGSubtract_MOG(ocvb)
 
-        cc = New CComp_Basics(ocvb, caller)
+        cc = New CComp_Basics(ocvb)
 
-        video = New Video_Basics(ocvb, caller)
+        video = New Video_Basics(ocvb)
 
-        flow = New Font_FlowText(ocvb, caller)
+        flow = New Font_FlowText(ocvb)
         flow.result1or2 = RESULT1
 
         ocvb.desc = "Outline cars with a rectangle"
@@ -127,13 +127,13 @@ Public Class Video_MinRect
     Public video As Video_Basics
     Public mog As BGSubtract_MOG
     Public contours As cv.Point()()
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        video = New Video_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        video = New Video_Basics(ocvb)
         video.srcVideo = ocvb.parms.HomeDir + "Data/CarsDrivingUnderBridge.mp4"
         video.Run(ocvb)
 
-        mog = New BGSubtract_MOG(ocvb, caller)
+        mog = New BGSubtract_MOG(ocvb)
         ocvb.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -162,9 +162,9 @@ End Class
 Public Class Video_MinCircle
     Inherits ocvbClass
     Dim input As Video_MinRect
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        input = New Video_MinRect(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        input = New Video_MinRect(ocvb)
         ocvb.desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

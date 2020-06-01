@@ -7,16 +7,16 @@ Public Class Sift_Basics_CS
     Inherits ocvbClass
     Dim siftCS As New CS_SiftBasics
     Dim fisheye As FishEye_Rectified
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        fisheye = New FishEye_Rectified(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        fisheye = New FishEye_Rectified(ocvb)
 
-        radio.Setup(ocvb, caller, 2)
+        radio.Setup(ocvb, 2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
 
-        sliders.setupTrackBar1(ocvb, caller, "Points to Match", 1, 1000, 200)
+        sliders.setupTrackBar1(ocvb, "Points to Match", 1, 1000, 200)
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
@@ -46,15 +46,15 @@ Public Class Sift_Basics_CS_MT
     Dim siftCS As New CS_SiftBasics
     Dim siftBasics As Sift_Basics_CS
     Dim fisheye As FishEye_Rectified
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        fisheye = New FishEye_Rectified(ocvb, caller)
-        grid = New Thread_Grid(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        fisheye = New FishEye_Rectified(ocvb)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Maximum = ocvb.color.cols * 2
         grid.sliders.TrackBar1.Value = ocvb.color.cols * 2 ' we are just taking horizontal slices of the image.
         grid.sliders.TrackBar2.Value = 10
 
-        siftBasics = New Sift_Basics_CS(ocvb, caller)
+        siftBasics = New Sift_Basics_CS(ocvb)
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
     End Sub

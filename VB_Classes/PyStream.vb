@@ -10,8 +10,8 @@ Public Class PyStream_Basics
     Dim depthBuffer(1) As Byte
     Dim pythonReady As Boolean
     Dim memMap As Python_MemMap
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
         pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.Out)
         PipeTaskIndex += 1
@@ -21,7 +21,7 @@ Public Class PyStream_Basics
             ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/AddWeighted_Trackbar_PS.py"
         End If
 
-        memMap = New Python_MemMap(ocvb, caller)
+        memMap = New Python_MemMap(ocvb)
 
         If ocvb.parms.externalPythonInvocation Then
             pythonReady = True ' python was already running and invoked OpenCVB.

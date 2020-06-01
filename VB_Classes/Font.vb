@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 Public Class Font_OpenCV
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Display different font options available in OpenCV"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -30,8 +30,8 @@ End Class
 
 Public Class Font_TrueType
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Display different TrueType fonts"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -50,8 +50,8 @@ Public Class Font_FlowText
     Inherits ocvbClass
     Public msgs As New List(Of String)
     Public result1or2 As Int32 = RESULT1
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

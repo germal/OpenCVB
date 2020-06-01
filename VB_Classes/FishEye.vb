@@ -8,8 +8,8 @@ Public Class FishEye_Rectified
     Dim rightViewMap1 As New cv.Mat, rightViewMap2 As New cv.Mat
     Dim t265Rect As cv.Rect
     Dim t265Original As cv.Rect
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         Dim minDisp = 0
         Dim dispOffset = 112
         Dim numDisp = dispOffset - minDisp
@@ -74,8 +74,8 @@ End Class
 
 Public Class FishEye_Raw
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Display the Raw FishEye images for the T265 (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

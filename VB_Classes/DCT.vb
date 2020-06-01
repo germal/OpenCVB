@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 Public Class DCT_Basics
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Remove Frequencies < x", 0, 100, 1)
-        sliders.setupTrackBar2(ocvb, caller, "Run Length Minimum", 1, 100, 15)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 1)
+        sliders.setupTrackBar2(ocvb, "Run Length Minimum", 1, 100, 15)
         sliders.GroupBox2.Visible = False
-        radio.Setup(ocvb, caller, 3)
+        radio.Setup(ocvb, 3)
         radio.check(0).Text = "DCT Flags None"
         radio.check(1).Text = "DCT Flags Row"
         radio.check(2).Text = "DCT Flags Inverse"
@@ -46,9 +46,9 @@ End Class
 Public Class DCT_RGB
     Inherits ocvbClass
     Public dct As DCT_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        dct = New DCT_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        dct = New DCT_Basics(ocvb)
         dct.sliders.TrackBar1.Value = 1
         dct.sliders.GroupBox2.Visible = False ' no runlenmin
 
@@ -94,9 +94,9 @@ End Class
 Public Class DCT_Depth
     Inherits ocvbClass
     Public dct As DCT_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        dct = New DCT_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        dct = New DCT_Basics(ocvb)
         dct.sliders.TrackBar1.Value = 1
         dct.sliders.GroupBox2.Visible = False ' no runlenmin
         label2 = "Subtract DCT inverse from Grayscale depth"
@@ -127,10 +127,10 @@ End Class
 Public Class DCT_FeatureLess_MT
     Inherits ocvbClass
     Public dct As DCT_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
 
-        dct = New DCT_Basics(ocvb, caller)
+        dct = New DCT_Basics(ocvb)
         dct.sliders.TrackBar1.Value = 1
         ocvb.desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
         label2 = "FeatureLess RGB regions"
@@ -181,17 +181,17 @@ Public Class DCT_Surfaces_debug
     Dim grid As Thread_Grid
     Dim dct As DCT_FeatureLess_MT
     Dim flow As Font_FlowText
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        flow = New Font_FlowText(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        flow = New Font_FlowText(ocvb)
         flow.result1or2 = RESULT1
 
-        grid = New Thread_Grid(ocvb, caller)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 100
         grid.sliders.TrackBar2.Value = 150
-        dct = New DCT_FeatureLess_MT(ocvb, caller)
+        dct = New DCT_FeatureLess_MT(ocvb)
         dct.dct.sliders.TrackBar1.Value = 1
-        Mats = New Mat_4to1(ocvb, caller)
+        Mats = New Mat_4to1(ocvb)
 
         label1 = "Largest flat surface segment stats"
         label2 = "Lower right image identifies potential flat surface"
@@ -262,10 +262,10 @@ Public Class DCT_CComponents
     Inherits ocvbClass
     Dim dct As DCT_FeatureLess_MT
     Dim cc As CComp_ColorDepth
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        dct = New DCT_FeatureLess_MT(ocvb, caller)
-        cc = New CComp_ColorDepth(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        dct = New DCT_FeatureLess_MT(ocvb)
+        cc = New CComp_ColorDepth(ocvb)
 
         label1 = "DCT masks colorized with average depth."
         label2 = "DCT mask"

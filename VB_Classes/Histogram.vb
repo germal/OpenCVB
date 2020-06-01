@@ -11,11 +11,11 @@ Public Class Histogram_Basics
     Public backColor = cv.Scalar.Gray
     Public plotRequested As Boolean
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 2, 256, 256)
-        sliders.setupTrackBar2(ocvb, caller, "Histogram line thickness", 1, 20, 3)
-        sliders.setupTrackBar3(ocvb, caller, "Histogram Font Size x10", 1, 20, 10)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Histogram Bins", 2, 256, 256)
+        sliders.setupTrackBar2(ocvb, "Histogram line thickness", 1, 20, 3)
+        sliders.setupTrackBar3(ocvb, "Histogram Font Size x10", 1, 20, 10)
 
         ocvb.desc = "Plot histograms for up to 3 channels."
     End Sub
@@ -130,14 +130,14 @@ End Module
 Public Class Histogram_NormalizeGray
     Inherits ocvbClass
     Public histogram As Histogram_KalmanSmoothed
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Min Gray", 0, 255, 0)
-        sliders.setupTrackBar2(ocvb, caller, "Max Gray", 0, 255, 255)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Min Gray", 0, 255, 0)
+        sliders.setupTrackBar2(ocvb, "Max Gray", 0, 255, 255)
 
-        histogram = New Histogram_KalmanSmoothed(ocvb, caller)
+        histogram = New Histogram_KalmanSmoothed(ocvb)
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(ocvb, 1)
         check.Box(0).Text = "Normalize Before Histogram"
         check.Box(0).Checked = True
         ocvb.desc = "Create a histogram of a normalized image"
@@ -160,12 +160,12 @@ Public Class Histogram_EqualizeColor
     Inherits ocvbClass
     Dim kalman As Histogram_KalmanSmoothed
     Dim mats As Mat_2to1
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        kalman = New Histogram_KalmanSmoothed(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        kalman = New Histogram_KalmanSmoothed(ocvb)
         kalman.sliders.TrackBar1.Value = 40
 
-        mats = New Mat_2to1(ocvb, caller)
+        mats = New Mat_2to1(ocvb)
 
         ocvb.desc = "Create an equalized histogram of the color image.  Histogram differences are very subtle but image is noticeably enhanced."
         label1 = "Image Enhanced with Equalized Histogram"
@@ -205,9 +205,9 @@ End Class
 Public Class Histogram_EqualizeGray
     Inherits ocvbClass
     Public histogram As Histogram_KalmanSmoothed
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        histogram = New Histogram_KalmanSmoothed(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        histogram = New Histogram_KalmanSmoothed(ocvb)
         label1 = "Note the difference in the histogram bar color"
         label2 = "After EqualizeHist"
         ocvb.desc = "Create an equalized histogram of the grayscale image."
@@ -232,10 +232,10 @@ Public Class Histogram_2D_HueSaturation
     Public histogram As New cv.Mat
     Public hsv As cv.Mat
 
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
-        sliders.setupTrackBar2(ocvb, caller, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
+        sliders.setupTrackBar2(ocvb, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
         ocvb.desc = "Create a histogram for hue and saturation."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -258,15 +258,15 @@ Public Class Histogram_2D_XZ_YZ
     Inherits ocvbClass
     Dim xyDepth As Mat_ImageXYZ_MT
     Dim trim As Depth_InRange
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        xyDepth = New Mat_ImageXYZ_MT(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        xyDepth = New Mat_ImageXYZ_MT(ocvb)
 
-        trim = New Depth_InRange(ocvb, caller)
+        trim = New Depth_InRange(ocvb)
         trim.sliders.TrackBar2.Value = 1500 ' up to x meters away
 
-        sliders.setupTrackBar1(ocvb, caller, "Histogram X bins", 1, ocvb.color.cols / 2, 30)
-        sliders.setupTrackBar2(ocvb, caller, "Histogram Z bins", 1, 200, 100)
+        sliders.setupTrackBar1(ocvb, "Histogram X bins", 1, ocvb.color.cols / 2, 30)
+        sliders.setupTrackBar2(ocvb, "Histogram Z bins", 1, 200, 100)
 
         ocvb.desc = "Create a 2D histogram for depth in XZ and YZ."
         label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
@@ -301,16 +301,16 @@ Public Class Histogram_BackProjectionGrayScale
     Inherits ocvbClass
     Dim hist As Histogram_KalmanSmoothed
     Dim edges As Edges_Canny
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        edges = New Edges_Canny(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        edges = New Edges_Canny(ocvb)
 
-        hist = New Histogram_KalmanSmoothed(ocvb, caller)
+        hist = New Histogram_KalmanSmoothed(ocvb)
         hist.dst1 = dst2
         hist.kalman.check.Box(0).Checked = False
 
-        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 1, 255, 50)
-        sliders.setupTrackBar2(ocvb, caller, "Number of neighbors to include", 0, 10, 1)
+        sliders.setupTrackBar1(ocvb, "Histogram Bins", 1, 255, 50)
+        sliders.setupTrackBar2(ocvb, "Number of neighbors to include", 0, 10, 1)
 
         ocvb.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
         label2 = "Grayscale Histogram"
@@ -359,11 +359,11 @@ End Class
 Public Class Histogram_BackProjection
     Inherits ocvbClass
     Dim hist As Histogram_2D_HueSaturation
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Backprojection Mask Threshold", 0, 255, 10)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Backprojection Mask Threshold", 0, 255, 10)
 
-        hist = New Histogram_2D_HueSaturation(ocvb, caller)
+        hist = New Histogram_2D_HueSaturation(ocvb)
         hist.dst1 = dst2
 
         ocvb.desc = "Backproject from a hue and saturation histogram."
@@ -396,19 +396,19 @@ Public Class Histogram_ColorsAndGray
     Inherits ocvbClass
     Dim histogram As Histogram_KalmanSmoothed
     Dim mats As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        mats = New Mat_4to1(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        mats = New Mat_4to1(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Min Gray", 0, 255, 0)
-        sliders.setupTrackBar2(ocvb, caller, "Max Gray", 0, 255, 255)
+        sliders.setupTrackBar1(ocvb, "Min Gray", 0, 255, 0)
+        sliders.setupTrackBar2(ocvb, "Max Gray", 0, 255, 255)
 
-        histogram = New Histogram_KalmanSmoothed(ocvb, caller)
+        histogram = New Histogram_KalmanSmoothed(ocvb)
         histogram.kalman.check.Box(0).Checked = False
         histogram.kalman.check.Box(0).Enabled = False
         histogram.sliders.TrackBar1.Value = 40
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(ocvb, 1)
         check.Box(0).Text = "Normalize Before Histogram"
         check.Box(0).Checked = True
         ocvb.desc = "Create a histogram of a normalized image"
@@ -445,14 +445,14 @@ Public Class Histogram_KalmanSmoothed
     Public kalman As Kalman_Basics
     Public plotHist As Plot_Histogram
     Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        plotHist = New Plot_Histogram(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        plotHist = New Plot_Histogram(ocvb)
         plotHist.minRange = 0
 
-        kalman = New Kalman_Basics(ocvb, caller)
+        kalman = New Kalman_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 1, 255, 50)
+        sliders.setupTrackBar1(ocvb, "Histogram Bins", 1, 255, 50)
 
         label2 = "Histogram - x=bins/y=count"
         ocvb.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
@@ -505,12 +505,12 @@ Public Class Histogram_Depth
     Inherits ocvbClass
     Public trim As Depth_InRange
     Public plotHist As Plot_Histogram
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        plotHist = New Plot_Histogram(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        plotHist = New Plot_Histogram(ocvb)
 
-        trim = New Depth_InRange(ocvb, caller)
-        sliders.setupTrackBar1(ocvb, caller, "Histogram Depth Bins", 2, ocvb.color.cols, 50) ' max is the number of columns * 2
+        trim = New Depth_InRange(ocvb)
+        sliders.setupTrackBar1(ocvb, "Histogram Depth Bins", 2, ocvb.color.cols, 50) ' max is the number of columns * 2
 
         ocvb.desc = "Show depth data as a histogram."
     End Sub
@@ -564,13 +564,13 @@ Public Class Histogram_DepthValleys
             cv.Cv2.Rectangle(img, barRect, plotColors(i), -1)
         Next
     End Sub
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        hist = New Histogram_Depth(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        hist = New Histogram_Depth(ocvb)
         hist.trim.sliders.TrackBar2.Value = 5000 ' depth to 5 meters.
         hist.sliders.TrackBar1.Value = 40 ' number of bins.
 
-        kalman = New Kalman_Basics(ocvb, caller)
+        kalman = New Kalman_Basics(ocvb)
 
         ocvb.desc = "Identify valleys in the Depth histogram."
     End Sub
@@ -640,9 +640,9 @@ End Class
 Public Class Histogram_DepthClusters
     Inherits ocvbClass
     Public valleys As Histogram_DepthValleys
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        valleys = New Histogram_DepthValleys(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        valleys = New Histogram_DepthValleys(ocvb)
         ocvb.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

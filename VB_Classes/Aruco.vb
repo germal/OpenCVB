@@ -4,8 +4,8 @@ Imports OpenCvSharp.Aruco.CvAruco
 ' https://github.com/shimat/opencvsharp_samples/blob/master/SamplesCS/Samples/ArucoSample.cs
 Public Class Aruco_Basics
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Show how to use the Aruco markers and rotate the image accordingly."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -31,8 +31,8 @@ End Class
 Public Class Aruco_CS
     Inherits ocvbClass
     Dim aruco As New CS_Classes.Aruco_Detect
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         label1 = "Original Image with marker ID's"
         label2 = "Normalized image after WarpPerspective."
         ocvb.desc = "Testing the Aruco marker detection in C#"

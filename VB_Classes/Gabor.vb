@@ -11,15 +11,15 @@ Public Class Gabor_Basics
     Public lambda As Double
     Public gamma As Double
     Public phaseOffset As Double
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders1.setupTrackBar1(ocvb, caller, "Gabor gamma X10", 0, 10, 5)
-        sliders1.setupTrackBar2(ocvb, caller, "Gabor Phase offset X100", 0, 100, 0)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders1.setupTrackBar1(ocvb, "Gabor gamma X10", 0, 10, 5)
+        sliders1.setupTrackBar2(ocvb, "Gabor Phase offset X100", 0, 100, 0)
 
-        sliders.setupTrackBar1(ocvb, caller, "Gabor Kernel Size", 0, 50, 15)
-        sliders.setupTrackBar2(ocvb, caller, "Gabor Sigma", 0, 100, 4)
-        sliders.setupTrackBar3(ocvb, caller, "Gabor Theta (degrees)", 0, 180, 90)
-        sliders.setupTrackBar4(ocvb, caller, "Gabor lambda", 0, 100, 10)
+        sliders.setupTrackBar1(ocvb, "Gabor Kernel Size", 0, 50, 15)
+        sliders.setupTrackBar2(ocvb, "Gabor Sigma", 0, 100, 4)
+        sliders.setupTrackBar3(ocvb, "Gabor Theta (degrees)", 0, 180, 90)
+        sliders.setupTrackBar4(ocvb, "Gabor lambda", 0, 100, 10)
 
         ocvb.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
@@ -47,10 +47,10 @@ Public Class Gabor_Basics_MT
     Inherits ocvbClass
     Dim grid As Thread_Grid
     Dim gabor(31) As Gabor_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         label2 = "The 32 kernels used"
-        grid = New Thread_Grid(ocvb, caller)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
         grid.Run(ocvb) ' we only run this one time!  It needs to be 32 Gabor filters only.
@@ -58,7 +58,7 @@ Public Class Gabor_Basics_MT
 
         ocvb.suppressOptions = True
         For i = 0 To gabor.Length - 1
-            gabor(i) = New Gabor_Basics(ocvb, caller)
+            gabor(i) = New Gabor_Basics(ocvb)
             gabor(i).sliders.TrackBar3.Value = i * 180 / gabor.Length
         Next
 

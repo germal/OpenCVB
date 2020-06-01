@@ -7,8 +7,8 @@ Imports System.IO
 Public Class DNN_Test
     Inherits ocvbClass
     Dim net As Net
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
     End Sub
@@ -46,8 +46,8 @@ End Class
 Public Class DNN_Caffe_CS
     Inherits ocvbClass
     Dim caffeCS As CS_Classes.DNN
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
 
@@ -83,10 +83,10 @@ Public Class DNN_Basics
     Public rect As cv.Rect
     Dim classNames() = {"background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse",
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "dnn Scale Factor", 1, 10000, 78)
-        sliders.setupTrackBar2(ocvb, caller, "dnn MeanVal", 1, 255, 127)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "dnn Scale Factor", 1, 10000, 78)
+        sliders.setupTrackBar2(ocvb, "dnn MeanVal", 1, 255, 127)
 
         dnnWidth = ocvb.color.Height ' height is always smaller than width...
         dnnHeight = ocvb.color.Height

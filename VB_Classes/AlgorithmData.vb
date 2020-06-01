@@ -29,6 +29,8 @@ Public Class AlgorithmData
     Public PythonFileName As String
     Public suppressOptions As Boolean
     Public TTtextData(3) As List(Of oTrueType)
+
+    Public caller As String
     Public Sub New(parms As ActiveClass.algorithmParameters, width As Integer, height As Integer)
         color = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))

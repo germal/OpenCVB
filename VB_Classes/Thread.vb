@@ -23,12 +23,12 @@ Public Class Thread_Grid
             End If
         Next
     End Sub
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         src = ocvb.color
-        sliders.setupTrackBar1(ocvb, caller, "ThreadGrid Width", 5, src.Width, 32)
-        sliders.setupTrackBar2(ocvb, caller, "ThreadGrid Height", 5, src.Height, 32)
-        sliders.setupTrackBar3(ocvb, caller, "ThreadGrid Border", 0, 20, 0)
+        sliders.setupTrackBar1(ocvb, "ThreadGrid Width", 5, src.Width, 32)
+        sliders.setupTrackBar2(ocvb, "ThreadGrid Height", 5, src.Height, 32)
+        sliders.setupTrackBar3(ocvb, "ThreadGrid Border", 0, 20, 0)
         roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)
         gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
@@ -104,9 +104,9 @@ End Class
 Public Class Thread_GridTest
     Inherits ocvbClass
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        grid = New Thread_Grid(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 40
         label1 = ""

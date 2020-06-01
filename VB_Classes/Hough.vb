@@ -41,9 +41,9 @@ End Module
 Public Class Hough_Circles
     Inherits ocvbClass
     Dim circles As Draw_Circles
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        circles = New Draw_Circles(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        circles = New Draw_Circles(ocvb)
         circles.sliders.TrackBar1.Value = 3
         ocvb.desc = "Find circles using HoughCircles."
         label1 = "Input circles to Hough"
@@ -73,14 +73,14 @@ Public Class Hough_Lines
     Inherits ocvbClass
     Dim edges As Edges_Canny
     Public segments() As cv.LineSegmentPolar
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        edges = New Edges_Canny(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        edges = New Edges_Canny(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "rho", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, caller, "theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3(ocvb, caller, "threshold", 1, 100, 50)
-        sliders.setupTrackBar4(ocvb, caller, "Lines to Plot", 1, 1000, 25)
+        sliders.setupTrackBar1(ocvb, "rho", 1, 100, 1)
+        sliders.setupTrackBar2(ocvb, "theta", 1, 1000, 1000 * Math.PI / 180)
+        sliders.setupTrackBar3(ocvb, "threshold", 1, 100, 50)
+        sliders.setupTrackBar4(ocvb, "Lines to Plot", 1, 1000, 25)
         ocvb.desc = "Use Houghlines to find lines in the image."
     End Sub
 
@@ -118,15 +118,15 @@ Public Class Hough_Lines_MT
     Inherits ocvbClass
     Dim edges As Edges_Canny
     Public grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "rho", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, caller, "theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3(ocvb, caller, "threshold", 1, 100, 3)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "rho", 1, 100, 1)
+        sliders.setupTrackBar2(ocvb, "theta", 1, 1000, 1000 * Math.PI / 180)
+        sliders.setupTrackBar3(ocvb, "threshold", 1, 100, 3)
 
-        edges = New Edges_Canny(ocvb, caller)
+        edges = New Edges_Canny(ocvb)
 
-        grid = New Thread_Grid(ocvb, caller)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 16
         grid.sliders.TrackBar2.Value = 16
         ocvb.desc = "Multithread Houghlines to find lines in image fragments."

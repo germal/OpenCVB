@@ -2,8 +2,8 @@ Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/37492663/how-to-use-magnitude-and-absdiff-opencv-functions-to-compute-distances
 Public Class Vector_Magnitude
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Compute Euclidian and Manhattan Distance on a single vector."
         label1 = "Vector Magnitude"
     End Sub

@@ -2,8 +2,8 @@ Imports cv = OpenCvSharp
 Public Class Watershed_Basics
     Inherits ocvbClass
     Public markerMask As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         label1 = "Draw with left-click to select region."
         label2 = "Mask for watershed (selected regions)."
         ocvb.desc = "Watershed API experiment.  Draw on the image to test."
@@ -59,9 +59,9 @@ End Class
 Public Class Watershed_DepthAuto
     Inherits ocvbClass
     Dim watershed As Watershed_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        watershed = New Watershed_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        watershed = New Watershed_Basics(ocvb)
         ocvb.desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -85,8 +85,8 @@ End Class
 Public Class Watershed_RGBSimpleAuto
     Inherits ocvbClass
     Dim watershed As Watershed_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         dst2.SetTo(0)
 
         Dim topLeft = New cv.Rect(0, 0, 100, 100)
@@ -99,7 +99,7 @@ Public Class Watershed_RGBSimpleAuto
         cv.Cv2.Rectangle(dst2, botLeft, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
         cv.Cv2.Rectangle(dst2, botRight, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
 
-        watershed = New Watershed_Basics(ocvb, caller)
+        watershed = New Watershed_Basics(ocvb)
         watershed.markerMask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         ocvb.desc = "Watershed the depth image using shadow, close, and far points."
@@ -117,8 +117,8 @@ End Class
 Public Class Watershed_RGBDepthAuto
     Inherits ocvbClass
     Dim watershed As Watershed_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
 
         Dim topLeft = New cv.Rect(0, 0, 100, 100)
         Dim topRight = New cv.Rect(ocvb.color.cols - 100, 0, 100, 100)
@@ -130,7 +130,7 @@ Public Class Watershed_RGBDepthAuto
         cv.Cv2.Rectangle(dst2, botLeft, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
         cv.Cv2.Rectangle(dst2, botRight, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
 
-        watershed = New Watershed_Basics(ocvb, caller)
+        watershed = New Watershed_Basics(ocvb)
         watershed.markerMask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         ocvb.desc = "Watershed the depth image using shadow, close, and far points."

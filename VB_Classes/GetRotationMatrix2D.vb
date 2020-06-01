@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Module GetRotationMatrix
-    Public Sub SetInterpolationRadioButtons(ocvb As AlgorithmData, caller As String, radio As OptionsRadioButtons, radioName As String)
-        radio.Setup(ocvb, caller, 7)
+    Public Sub SetInterpolationRadioButtons(ocvb As AlgorithmData, radio As OptionsRadioButtons, radioName As String)
+        radio.Setup(ocvb, 7)
         radio.check(0).Text = radioName + " with Area"
         radio.check(1).Text = radioName + " with Cubic flag"
         radio.check(2).Text = radioName + " with Lanczos4"
@@ -35,10 +35,10 @@ Public Class GetRotationMatrix2D_Basics
     Public M As cv.Mat
     Public Mflip As cv.Mat
     Public warpFlag As Int32
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "GetRotationMatrix2D Angle", 0, 360, 24)
-        SetInterpolationRadioButtons(ocvb, caller, radio, "Rotation2D")
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "GetRotationMatrix2D Angle", 0, 360, 24)
+        SetInterpolationRadioButtons(ocvb, radio, "Rotation2D")
 
         ocvb.desc = "Rotate a rectangle of a specified angle"
     End Sub
@@ -60,9 +60,9 @@ End Class
 Public Class GetRotationMatrix2D_Box
     Inherits ocvbClass
     Dim rotation As GetRotationMatrix2D_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        rotation = New GetRotationMatrix2D_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        rotation = New GetRotationMatrix2D_Basics(ocvb)
         ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
 
         label1 = "Original Rectangle in the original perspective"

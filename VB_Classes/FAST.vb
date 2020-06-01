@@ -3,10 +3,10 @@ Imports cv = OpenCvSharp
 Public Class FAST_Basics
     Inherits ocvbClass
     Public keypoints() As cv.KeyPoint
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Threshold", 0, 200, 15)
-        check.Setup(ocvb, caller, 1)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Threshold", 0, 200, 15)
+        check.Setup(ocvb, 1)
         check.Box(0).Text = "Use Non-Max = True"
         check.Box(0).Checked = True
 
@@ -32,12 +32,12 @@ Public Class FAST_Centroid
     Inherits ocvbClass
     Dim fast As FAST_Basics
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        kalman = New Kalman_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(1) ' 2 elements - cv.point
 
-        fast = New FAST_Basics(ocvb, caller)
+        fast = New FAST_Basics(ocvb)
         ocvb.desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

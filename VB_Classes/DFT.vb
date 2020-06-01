@@ -24,9 +24,9 @@ Public Class DFT_Basics
     Public gray As cv.Mat
     Public rows As Int32
     Public cols As Int32
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        mats = New Mat_4to1(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        mats = New Mat_4to1(ocvb)
         mats.noLines = True
 
         ocvb.desc = "Explore the Discrete Fourier Transform."
@@ -84,9 +84,9 @@ End Class
 Public Class DFT_Inverse
     Inherits ocvbClass
     Dim mats As Mat_2to1
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        mats = New Mat_2to1(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        mats = New Mat_2to1(ocvb)
         ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
         label1 = "Image after Inverse DFT"
     End Sub
@@ -125,12 +125,12 @@ End Class
 Public Class DFT_ButterworthFilter_MT
     Inherits ocvbClass
     Public dft As DFT_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "DFT B Filter - Radius", 1, ocvb.color.Rows, ocvb.color.Rows)
-        sliders.setupTrackBar2(ocvb, caller, "DFT B Filter - Order", 1, ocvb.color.Rows, 2)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "DFT B Filter - Radius", 1, ocvb.color.Rows, ocvb.color.Rows)
+        sliders.setupTrackBar2(ocvb, "DFT B Filter - Order", 1, ocvb.color.Rows, 2)
 
-        radio.Setup(ocvb, caller, 6)
+        radio.Setup(ocvb, 6)
         radio.check(0).Text = "DFT Flags ComplexOutput"
         radio.check(1).Text = "DFT Flags Inverse"
         radio.check(2).Text = "DFT Flags None"
@@ -139,7 +139,7 @@ Public Class DFT_ButterworthFilter_MT
         radio.check(5).Text = "DFT Flags Scale"
         radio.check(0).Checked = True
 
-        dft = New DFT_Basics(ocvb, caller)
+        dft = New DFT_Basics(ocvb)
         ocvb.desc = "Use the Butterworth filter on a DFT image - color image input."
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
@@ -200,9 +200,9 @@ End Class
 Public Class DFT_ButterworthDepth
     Inherits ocvbClass
     Dim bfilter As DFT_ButterworthFilter_MT
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        bfilter = New DFT_ButterworthFilter_MT(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        bfilter = New DFT_ButterworthFilter_MT(ocvb)
 
         ocvb.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
         label1 = "Image with Butterworth Low Pass Filter Applied"

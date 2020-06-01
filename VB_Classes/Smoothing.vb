@@ -38,12 +38,12 @@ Public Class Smoothing_Exterior
 		spline.Add(spoints(spoints.Count - 2))
 		Return spline
 	End Function
-	Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-		setCaller(callerRaw)
-		hull = New Hull_Basics(ocvb, caller)
+	Public Sub New(ocvb As AlgorithmData)
+		setCaller(ocvb)
+		hull = New Hull_Basics(ocvb)
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 
-		sliders.setupTrackBar1(ocvb, caller, "Smoothing iterations", 1, 20, 10)
+		sliders.setupTrackBar1(ocvb, "Smoothing iterations", 1, 20, 10)
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
@@ -110,14 +110,14 @@ Public Class Smoothing_Interior
 		Return nl
 	End Function
 
-	Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-		setCaller(callerRaw)
-		hull = New Hull_Basics(ocvb, caller)
+	Public Sub New(ocvb As AlgorithmData)
+		setCaller(ocvb)
+		hull = New Hull_Basics(ocvb)
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.sliders.TrackBar1.Value = 16
 
-		sliders.setupTrackBar1(ocvb, caller, "Smoothing iterations", 1, 20, 1)
-		sliders.setupTrackBar2(ocvb, caller, "Smoothing tension X100", 1, 100, 50)
+		sliders.setupTrackBar1(ocvb, "Smoothing iterations", 1, 20, 1)
+		sliders.setupTrackBar2(ocvb, "Smoothing tension X100", 1, 100, 50)
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""

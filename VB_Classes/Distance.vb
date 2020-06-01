@@ -3,15 +3,15 @@ Imports cv = OpenCvSharp
 Public Class Distance_Basics
     Inherits ocvbClass
     Dim foreground As kMeans_Depth_FG_BG
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        radio.Setup(ocvb, caller, 3)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        radio.Setup(ocvb, 3)
         radio.check(0).Text = "C"
         radio.check(1).Text = "L1"
         radio.check(2).Text = "L2"
         radio.check(2).Checked = True
 
-        foreground = New kMeans_Depth_FG_BG(ocvb, caller)
+        foreground = New kMeans_Depth_FG_BG(ocvb)
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"
         ocvb.desc = "Distance algorithm basics."

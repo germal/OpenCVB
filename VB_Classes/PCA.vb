@@ -2,9 +2,9 @@ Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/pca.cpp
 Public Class PCA_Basics
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Retained Variance", 1, 100, 95)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Retained Variance", 1, 100, 95)
         ocvb.desc = "Reconstruct a video stream as a composite of X images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -38,9 +38,9 @@ End Class
 Public Class PCA_Depth
     Inherits ocvbClass
     Dim pca As PCA_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        pca = New PCA_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        pca = New PCA_Basics(ocvb)
         ocvb.desc = "Reconstruct a depth stream as a composite of X images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -58,9 +58,9 @@ Public Class PCA_DrawImage
     Inherits ocvbClass
     Dim pca As PCA_Basics
     Dim image As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        pca = New PCA_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        pca = New PCA_Basics(ocvb)
         image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/pca_test1.jpg")
         ocvb.desc = "Use PCA to find the principle direction of an object."
         label1 = "Original image"

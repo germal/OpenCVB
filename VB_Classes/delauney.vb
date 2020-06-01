@@ -82,8 +82,8 @@ End Module
 
 Public Class Delaunay_Basics
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -109,10 +109,10 @@ End Class
 Public Class Delaunay_GoodFeatures
     Inherits ocvbClass
     Dim features As Features_GoodFeatures
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        features = New Features_GoodFeatures(ocvb, caller)
-        features.sliders.setupTrackBar4(ocvb, caller, "Image mix percentage X100", 0, 100, 50)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        features = New Features_GoodFeatures(ocvb)
+        features.sliders.setupTrackBar4(ocvb, "Image mix percentage X100", 0, 100, 50)
         label2 = "Voronoi facets of delauney good features"
         ocvb.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
@@ -141,8 +141,8 @@ End Class
 Public Class Delauney_Subdiv2D
     Inherits ocvbClass
     Public updateFrequency As Integer = 30
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         label2 = "Voronoi facets for the same subdiv2D"
         ocvb.desc = "Generate random points and divide the image around those points."
     End Sub
@@ -194,11 +194,11 @@ End Class
 Public Class Delauney_Coverage
     Inherits ocvbClass
     Dim delauney As Delauney_Subdiv2D
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        delauney = New Delauney_Subdiv2D(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        delauney = New Delauney_Subdiv2D(ocvb)
         delauney.updateFrequency = 1
-        sliders.setupTrackBar1(ocvb, caller, "Clear image after x frames", 1, 100, 50)
+        sliders.setupTrackBar1(ocvb, "Clear image after x frames", 1, 100, 50)
         label1 = "Coverage of space"
         ocvb.desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
     End Sub

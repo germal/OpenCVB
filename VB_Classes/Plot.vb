@@ -5,12 +5,12 @@ Public Class Plot_Basics
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Basics
     Public plotCount As Int32 = 3
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        hist = New Histogram_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        hist = New Histogram_Basics(ocvb)
         hist.plotRequested = True
 
-        plot = New Plot_Basics_CPP(ocvb, caller)
+        plot = New Plot_Basics_CPP(ocvb)
 
         label1 = "Plot of grayscale histogram"
         label2 = "Same Data but using OpenCV C++ plot"
@@ -42,8 +42,8 @@ Public Class Plot_Basics_CPP
     Inherits ocvbClass
     Public srcX() As Double
     Public srcY() As Double
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -101,15 +101,15 @@ Public Class Plot_OverTime
     Public lastXdelta As New List(Of cv.Scalar)
     Public topBottomPad As Integer
     Dim myStopWatch As Stopwatch
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        check.Setup(ocvb, caller, 1)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        check.Setup(ocvb, 1)
         check.Box(0).Text = "Reset the plot scale"
         check.Box(0).Checked = True
 
-        sliders.setupTrackBar1(ocvb, caller, "Plot Pixel Height", 1, 40, 4)
-        sliders.setupTrackBar2(ocvb, caller, "Plot Pixel Width", 1, 40, 4)
-        sliders.setupTrackBar3(ocvb, caller, "Plot (time) Font Size x10", 1, 20, 10)
+        sliders.setupTrackBar1(ocvb, "Plot Pixel Height", 1, 40, 4)
+        sliders.setupTrackBar2(ocvb, "Plot Pixel Width", 1, 40, 4)
+        sliders.setupTrackBar3(ocvb, "Plot (time) Font Size x10", 1, 20, 10)
         ocvb.desc = "Plot an input variable over time"
         myStopWatch = Stopwatch.StartNew()
     End Sub
@@ -200,9 +200,9 @@ Public Class Plot_Histogram
     Public minRange As Int32 = 0
     Public maxRange As Int32 = 255
     Public backColor As cv.Scalar = cv.Scalar.Red
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Histogram Font Size x10", 1, 20, 10)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Histogram Font Size x10", 1, 20, 10)
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -271,14 +271,14 @@ Public Class Plot_Depth
     Inherits ocvbClass
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Depth
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        hist = New Histogram_Depth(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        hist = New Histogram_Depth(ocvb)
         hist.sliders.TrackBar1.Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!
         hist.sliders.TrackBar1.Value = 200 ' a lot more bins in a plot than a bar chart.
         hist.trim.sliders.TrackBar2.Value = 5000 ' up to x meters.
 
-        plot = New Plot_Basics_CPP(ocvb, caller)
+        plot = New Plot_Basics_CPP(ocvb)
 
         ocvb.desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub

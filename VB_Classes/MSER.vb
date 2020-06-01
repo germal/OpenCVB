@@ -6,22 +6,22 @@ Public Class MSER_Basics
     Public region()() As cv.Point = Nothing
     Dim saveParms() As Int32
     Dim mser As cv.MSER
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders2.setupTrackBar1(ocvb, caller, "MSER Edge Blursize", 1, 20, 5)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders2.setupTrackBar1(ocvb, "MSER Edge Blursize", 1, 20, 5)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
-        sliders1.setupTrackBar1(ocvb, caller, "Min Diversity", 0, 100, 20)
-        sliders1.setupTrackBar2(ocvb, caller, "MSER Max Evolution", 1, 1000, 200)
-        sliders1.setupTrackBar3(ocvb, caller, "MSER Area Threshold", 1, 101, 101)
-        sliders1.setupTrackBar4(ocvb, caller, "MSER Min Margin", 1, 100, 3)
+        sliders1.setupTrackBar1(ocvb, "Min Diversity", 0, 100, 20)
+        sliders1.setupTrackBar2(ocvb, "MSER Max Evolution", 1, 1000, 200)
+        sliders1.setupTrackBar3(ocvb, "MSER Area Threshold", 1, 101, 101)
+        sliders1.setupTrackBar4(ocvb, "MSER Min Margin", 1, 100, 3)
 
-        sliders.setupTrackBar1(ocvb, caller, "MSER Delta", 1, 100, 5)
-        sliders.setupTrackBar2(ocvb, caller, "MSER Min Area", 1, 10000, 60)
-        sliders.setupTrackBar3(ocvb, caller, "MSER Max Area", 1000, 100000, 100000)
-        sliders.setupTrackBar4(ocvb, caller, "MSER Max Variation", 1, 100, 25)
+        sliders.setupTrackBar1(ocvb, "MSER Delta", 1, 100, 5)
+        sliders.setupTrackBar2(ocvb, "MSER Min Area", 1, 10000, 60)
+        sliders.setupTrackBar3(ocvb, "MSER Max Area", 1000, 100000, 100000)
+        sliders.setupTrackBar4(ocvb, "MSER Max Variation", 1, 100, 25)
 
-        check.Setup(ocvb, caller, 2)
+        check.Setup(ocvb, 2)
         check.Box(0).Text = "Pass2Only"
         check.Box(1).Text = "Use Grayscale, not color input (default)"
         check.Box(0).Checked = True
@@ -97,8 +97,8 @@ Public Class MSER_Synthetic
             img.FloodFill(p0, color(i))
         Next
     End Sub
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -146,9 +146,9 @@ Public Class MSER_TestSynthetic
         Next
         Return CStr(regionCount) + " Regions had " + CStr(pixels) + " pixels"
     End Function
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        mser = New MSER_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        mser = New MSER_Basics(ocvb)
         mser.sliders.TrackBar1.Value = 10
         mser.sliders.TrackBar2.Value = 100
         mser.sliders.TrackBar3.Value = 5000
@@ -156,7 +156,7 @@ Public Class MSER_TestSynthetic
         mser.sliders1.TrackBar1.Value = 0
         mser.check.Box(1).Checked = False ' the grayscale result is quite unimpressive.
 
-        synth = New MSER_Synthetic(ocvb, caller)
+        synth = New MSER_Synthetic(ocvb)
         label1 = "Input image to MSER"
         label1 = "Output image from MSER"
         ocvb.desc = "Test MSER with the synthetic image."
@@ -178,8 +178,8 @@ Public Class MSER_CPPStyle
     Inherits ocvbClass
     Dim gray As cv.Mat
     Dim image As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         label1 = "Contour regions from MSER"
         label2 = "Box regions from MSER"
         ocvb.desc = "Maximally Stable Extremal Regions example - still image"
@@ -217,9 +217,9 @@ End Class
 Public Class MSER_Contours
     Inherits ocvbClass
     Dim mser As MSER_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        mser = New MSER_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        mser = New MSER_Basics(ocvb)
         mser.sliders.TrackBar2.Value = 4000
         ocvb.desc = "Use MSER but show the contours of each region."
     End Sub

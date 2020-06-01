@@ -4,9 +4,9 @@ Public Class ORB_Basics
     Inherits ocvbClass
     Public keypoints() As cv.KeyPoint
     Dim orb As cv.ORB
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "ORB - desired point count", 10, 2000, 100)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "ORB - desired point count", 10, 2000, 100)
 
         ocvb.desc = "Find keypoints using ORB"
     End Sub

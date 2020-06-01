@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Numerics
-Imports rs = Intel.RealSense
+Imports rs = Intel.Realsense
 Public Class Camera
     Public pipelineClosed As Boolean = False
     Public transformationMatrix() As Single

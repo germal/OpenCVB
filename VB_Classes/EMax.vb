@@ -8,18 +8,18 @@ Public Class EMax_Basics
     Public labels As cv.Mat
     Public grid As Thread_Grid
     Public regionCount As Int32
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        grid = New Thread_Grid(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        grid = New Thread_Grid(ocvb)
 
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 2
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 2
 
-        sliders.setupTrackBar1(ocvb, caller, "EMax Number of Samples", 1, 200, 100)
-        sliders.setupTrackBar2(ocvb, caller, "EMax Prediction Step Size", 1, 20, 5)
-        sliders.setupTrackBar3(ocvb, caller, "EMax Sigma (spread)", 1, 100, 30)
+        sliders.setupTrackBar1(ocvb, "EMax Number of Samples", 1, 200, 100)
+        sliders.setupTrackBar2(ocvb, "EMax Prediction Step Size", 1, 20, 5)
+        sliders.setupTrackBar3(ocvb, "EMax Sigma (spread)", 1, 100, 30)
 
-        radio.Setup(ocvb, caller, 3)
+        radio.Setup(ocvb, 3)
         radio.check(0).Text = "EMax matrix type Spherical"
         radio.check(1).Text = "EMax matrix type Diagonal"
         radio.check(2).Text = "EMax matrix type Generic"
@@ -105,9 +105,9 @@ Public Class EMax_Basics_CPP
     Inherits ocvbClass
     Dim emax As EMax_Basics
     Dim EMax_Basics As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-                setCaller(callerRaw)
-        emax = New EMax_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+                setCaller(ocvb)
+        emax = New EMax_Basics(ocvb)
 
         EMax_Basics = EMax_Basics_Open()
         label2 = "Emax regions around clusters"

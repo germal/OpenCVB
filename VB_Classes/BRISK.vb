@@ -3,9 +3,9 @@ Public Class BRISK_Basics
     Inherits ocvbClass
     Public Brisk As cv.BRISK
     Public features As New List(Of cv.Point2f)
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "BRISK Radius Threshold", 1, 100, 50)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "BRISK Radius Threshold", 1, 100, 50)
         ocvb.desc = "Detect features with BRISK"
         Brisk = cv.BRISK.Create()
     End Sub

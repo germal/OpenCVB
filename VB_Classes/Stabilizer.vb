@@ -8,9 +8,9 @@ Public Class Stabilizer_Basics
     Public borderCrop = 30
     Dim sumScale As cv.Mat, sScale As cv.Mat, features1 As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        good = New Features_GoodFeatures(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        good = New Features_GoodFeatures(ocvb)
 
         ocvb.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
         label1 = "Stabilized Image"
@@ -117,11 +117,11 @@ Public Class Stabilizer_BriskFeatures
     Inherits ocvbClass
     Dim brisk As BRISK_Basics
     Dim stabilizer As Stabilizer_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        stabilizer = New Stabilizer_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        stabilizer = New Stabilizer_Basics(ocvb)
 
-        brisk = New BRISK_Basics(ocvb, caller)
+        brisk = New BRISK_Basics(ocvb)
         brisk.sliders.TrackBar1.Value = 10
 
         ocvb.desc = "Stabilize the video stream using BRISK features (not GoodFeaturesToTrack)"
@@ -145,11 +145,11 @@ Public Class Stabilizer_HarrisFeatures
     Inherits ocvbClass
     Dim harris As Harris_Detector_CPP
     Dim stabilizer As Stabilizer_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        stabilizer = New Stabilizer_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        stabilizer = New Stabilizer_Basics(ocvb)
 
-        harris = New Harris_Detector_CPP(ocvb, caller)
+        harris = New Harris_Detector_CPP(ocvb)
 
         ocvb.desc = "Stabilize the video stream using Harris detector features"
     End Sub
@@ -186,8 +186,8 @@ Public Class Stabilizer_Basics_CPP
     Dim srcData() As Byte
     Dim handleSrc As GCHandle
     Dim sPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ReDim srcData(src.Total * src.ElemSize - 1)
         sPtr = Stabilizer_Basics_Open()
         ocvb.desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work."
@@ -220,10 +220,10 @@ Public Class Stabilizer_SideBySide
     Inherits ocvbClass
     Dim original As Stabilizer_Basics
     Dim basics As Stabilizer_HarrisFeatures
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        original = New Stabilizer_Basics(ocvb, caller)
-        basics = New Stabilizer_HarrisFeatures(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        original = New Stabilizer_Basics(ocvb)
+        basics = New Stabilizer_HarrisFeatures(ocvb)
         ocvb.desc = "Run both the original and the VB.Net version of the video stabilizer.  Neither is working properly."
         label1 = "Stabilizer_Basic (VB.Net)"
         label2 = "Stabilizer_HarrisFeatures"

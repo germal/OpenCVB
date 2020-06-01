@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 Public Class Bitwise_Not
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         label1 = "Color BitwiseNot"
         label2 = "Gray BitwiseNot"
         ocvb.desc = "Gray and color bitwise_not"

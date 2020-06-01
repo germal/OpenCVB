@@ -7,14 +7,14 @@ Public Class KLT_Basics
     Public outputMat As New cv.Mat
     Public circleColor = cv.Scalar.Red
     Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "KLT - MaxCorners", 1, 200, 100)
-        sliders.setupTrackBar2(ocvb, caller, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
-        sliders.setupTrackBar3(ocvb, caller, "KLT - minDistance", 1, 100, 7)
-        sliders.setupTrackBar4(ocvb, caller, "KLT - BlockSize", 1, 100, 7)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "KLT - MaxCorners", 1, 200, 100)
+        sliders.setupTrackBar2(ocvb, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
+        sliders.setupTrackBar3(ocvb, "KLT - minDistance", 1, 100, 7)
+        sliders.setupTrackBar4(ocvb, "KLT - BlockSize", 1, 100, 7)
 
-        check.Setup(ocvb, caller, 2)
+        check.Setup(ocvb, 2)
         check.Box(0).Text = "KLT - Night Mode"
         check.Box(1).Text = "KLT - delete all Points"
 
@@ -86,9 +86,9 @@ Public Class KLT_OpticalFlow
     Inherits ocvbClass
     Dim klt As KLT_Basics
     Dim lastpoints() As cv.Point2f
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        klt = New KLT_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        klt = New KLT_Basics(ocvb)
         ocvb.desc = "KLT optical flow - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -7,12 +7,12 @@ Public Class Binarize_OTSU
     Dim mats1 As Mat_4to1
     Dim mats2 As Mat_4to1
     Dim plotHist As Plot_Histogram
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        plotHist = New Plot_Histogram(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        plotHist = New Plot_Histogram(ocvb)
 
-        mats1 = New Mat_4to1(ocvb, caller)
-        mats2 = New Mat_4to1(ocvb, caller)
+        mats1 = New Mat_4to1(ocvb)
+        mats2 = New Mat_4to1(ocvb)
 
         ocvb.desc = "Binarize an image using Threshold with OTSU."
         label2 = "Histograms correspond to images on the left"
@@ -52,13 +52,13 @@ End Class
 
 Public Class Binarize_Niblack_Sauvola
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         sliders.Label1.Text = "Kernel Size"
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar2(ocvb, caller, "Niblack k", -1000, 1000, -200)
-        sliders.setupTrackBar3(ocvb, caller, "Sauvola k", -1000, 1000, 100)
-        sliders.setupTrackBar4(ocvb, caller, "Sauvola r", 1, 100, 64)
+        sliders.setupTrackBar1(ocvb, "Kernel Size", 3, 500, 51)
+        sliders.setupTrackBar2(ocvb, "Niblack k", -1000, 1000, -200)
+        sliders.setupTrackBar3(ocvb, "Sauvola k", -1000, 1000, 100)
+        sliders.setupTrackBar4(ocvb, "Sauvola r", 1, 100, 64)
 
         ocvb.desc = "Binarize an image using Niblack and Sauvola"
         label1 = "Binarize Niblack"
@@ -82,12 +82,12 @@ End Class
 
 Public Class Binarize_Niblack_Nick
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         sliders.Label1.Text = "Kernel Size"
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar2(ocvb, caller, "Niblack k", -1000, 1000, -200)
-        sliders.setupTrackBar3(ocvb, caller, "Nick k", -1000, 1000, 100)
+        sliders.setupTrackBar1(ocvb, "Kernel Size", 3, 500, 51)
+        sliders.setupTrackBar2(ocvb, "Niblack k", -1000, 1000, -200)
+        sliders.setupTrackBar3(ocvb, "Nick k", -1000, 1000, 100)
 
         ocvb.desc = "Binarize an image using Niblack and Nick"
         label1 = "Binarize Niblack"
@@ -111,12 +111,12 @@ End Class
 
 Public Class Binarize_Bernson
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         sliders.Label1.Text = "Kernel Size"
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar2(ocvb, caller, "Contrast min", 0, 255, 50)
-        sliders.setupTrackBar3(ocvb, caller, "bg Threshold", 0, 255, 100)
+        sliders.setupTrackBar1(ocvb, "Kernel Size", 3, 500, 51)
+        sliders.setupTrackBar2(ocvb, "Contrast min", 0, 255, 50)
+        sliders.setupTrackBar3(ocvb, "bg Threshold", 0, 255, 100)
 
         label1 = "Binarize Bernson (Draw Enabled)"
 
@@ -144,16 +144,16 @@ End Class
 Public Class Binarize_Bernson_MT
     Inherits ocvbClass
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        grid = New Thread_Grid(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
 
         sliders.Label1.Text = "Kernel Size"
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar2(ocvb, caller, "Contrast min", 0, 255, 50)
-        sliders.setupTrackBar3(ocvb, caller, "bg Threshold", 0, 255, 100)
+        sliders.setupTrackBar1(ocvb, "Kernel Size", 3, 500, 51)
+        sliders.setupTrackBar2(ocvb, "Contrast min", 0, 255, 50)
+        sliders.setupTrackBar3(ocvb, "bg Threshold", 0, 255, 100)
 
         ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
         label1 = "Binarize Bernson"

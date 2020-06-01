@@ -1,9 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class kMeans_Basics
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "kMeans k", 2, 32, 4)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 4)
         ocvb.desc = "Cluster the rgb image pixels using kMeans."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -37,11 +37,11 @@ Public Class kMeans_Clusters
     Inherits ocvbClass
     Dim Mats As Mat_4to1
     Dim km As kMeans_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        Mats = New Mat_4to1(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        Mats = New Mat_4to1(ocvb)
 
-        km = New kMeans_Basics(ocvb, caller)
+        km = New kMeans_Basics(ocvb)
 
         label1 = "kmeans - k=10"
         label2 = "kmeans - k=2,4,6,8"
@@ -73,9 +73,9 @@ Public Class kMeans_RGBFast
     Public clusterColors() As cv.Vec3b
     Public resizeFactor = 2
     Public clusterCount = 6
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "kMeans k", 2, 32, 4)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 4)
         ocvb.desc = "Cluster a small rgb image using kMeans.  Specify clusterCount value."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -113,10 +113,10 @@ Public Class kMeans_RGB_Plus_XYDepth
     Inherits ocvbClass
     Dim km As kMeans_Basics
     Dim clusterColors() As cv.Vec6i
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "kMeans k", 2, 32, 4)
-        km = New kMeans_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 4)
+        km = New kMeans_Basics(ocvb)
         label1 = "kmeans - RGB, XY, and Depth Raw"
         ocvb.desc = "Cluster with kMeans RGB, x, y, and depth."
     End Sub
@@ -173,11 +173,11 @@ End Class
 Public Class kMeans_RGB_MT
     Inherits ocvbClass
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "kMeans k", 2, 32, 10)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 10)
 
-        grid = New Thread_Grid(ocvb, caller)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 48
         label1 = "kmeans - raw labels"
@@ -257,10 +257,10 @@ End Class
 
 Public Class kMeans_ReducedRGB
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Reduction factor", 2, 64, 64)
-        sliders.setupTrackBar2(ocvb, caller, "kmeans k", 2, 64, 4)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Reduction factor", 2, 64, 64)
+        sliders.setupTrackBar2(ocvb, "kmeans k", 2, 64, 4)
         label2 = "Reduced color image."
         ocvb.desc = "Reduce each pixel by the reduction factor and then run kmeans."
     End Sub
@@ -290,9 +290,9 @@ End Class
 
 Public Class kMeans_XYDepth
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "kMeans k", 2, 32, 4)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 4)
         Dim w = ocvb.color.cols / 4
         Dim h = ocvb.color.Rows / 4
         ocvb.drawRect = New cv.Rect(w, h, w * 2, h * 2)
@@ -328,8 +328,8 @@ End Class
 
 Public Class kMeans_Depth_FG_BG
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         label1 = "Foreground Mask"
         label2 = "Background Mask"
         ocvb.desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
@@ -365,9 +365,9 @@ End Class
 
 Public Class kMeans_LAB
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "kMeans k", 2, 32, 4)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 4)
         label1 = "kMeans_LAB - draw to select region"
         Dim w = ocvb.color.cols / 4
         Dim h = ocvb.color.Rows / 4
@@ -404,9 +404,9 @@ End Class
 
 Public Class kMeans_Color
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "kMeans cluster count (k)", 2, 32, 3)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "kMeans cluster count (k)", 2, 32, 3)
         ocvb.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -435,11 +435,11 @@ End Class
 Public Class kMeans_Color_MT
     Inherits ocvbClass
     Public grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "kMeans k", 2, 32, 2)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 2)
 
-        grid = New Thread_Grid(ocvb, caller)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
 
@@ -479,9 +479,9 @@ End Class
 
 Public Class kMeans_ColorDepth
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "kMeans k", 2, 32, 3)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 3)
         ocvb.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -520,11 +520,11 @@ End Class
 Public Class kMeans_ColorDepth_MT
     Inherits ocvbClass
     Public grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "kMeans k", 2, 32, 3)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 3)
 
-        grid = New Thread_Grid(ocvb, caller)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 32
         grid.sliders.TrackBar2.Value = 32
 

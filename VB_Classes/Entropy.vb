@@ -6,12 +6,12 @@ Public Class Entropy_Basics
     Dim hist As Histogram_Basics
     Dim simple = New Entropy_Simple
     Public entropy As Single
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        flow = New Font_FlowText(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        flow = New Font_FlowText(ocvb)
         flow.result1or2 = RESULT1
 
-        hist = New Histogram_Basics(ocvb, caller)
+        hist = New Histogram_Basics(ocvb)
         hist.sliders.GroupBox2.Visible = False
         hist.sliders.GroupBox3.Visible = False
 
@@ -45,14 +45,14 @@ Public Class Entropy_Highest_MT
     Dim hist As Histogram_Basics
     Public grid As Thread_Grid
     Public bestContrast As cv.Rect
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
 
-        grid = New Thread_Grid(ocvb, caller)
+        grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 80
 
-        hist = New Histogram_Basics(ocvb, caller)
+        hist = New Histogram_Basics(ocvb)
         hist.sliders.GroupBox2.Visible = False
         hist.sliders.GroupBox3.Visible = False
 
@@ -110,10 +110,10 @@ Public Class Entropy_FAST
     Inherits ocvbClass
     Dim fast As FAST_Basics
     Dim entropy As Entropy_Highest_MT
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        fast = New FAST_Basics(ocvb, caller)
-        entropy = New Entropy_Highest_MT(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        fast = New FAST_Basics(ocvb)
+        entropy = New Entropy_Highest_MT(ocvb)
         ocvb.desc = "Use FAST markings to add to entropy"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

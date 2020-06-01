@@ -123,7 +123,7 @@ Public Class ActiveClass : Implements IDisposable
             parms.activeAlgorithm = parms.activeAlgorithm.Substring(0, Len(parms.activeAlgorithm) - 3)
             ActiveAlgorithm = algoList.createAlgorithm(ocvb, parms.activeAlgorithm)
         End If
-        If parms.useRecordedData Then recordedData = New Replay_Play(ocvb, "VB_Classes.vb")
+        If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
     End Sub
     Public Sub UpdateHostLocation(left As Int32, top As Int32, height As Int32)
         appLocation = New cv.Rect(left, top, 0, height)

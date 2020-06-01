@@ -1,11 +1,11 @@
 Imports cv = OpenCvSharp
 Public Class Math_Subtract
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Red", 0, 255, 255)
-        sliders.setupTrackBar2(ocvb, caller, "Green", 0, 255, 255)
-        sliders.setupTrackBar3(ocvb, caller, "Blue", 0, 255, 255)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Red", 0, 255, 255)
+        sliders.setupTrackBar2(ocvb, "Green", 0, 255, 255)
+        sliders.setupTrackBar3(ocvb, "Blue", 0, 255, 255)
         ocvb.desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -47,9 +47,9 @@ Public Class Math_Median_CDF
     Public rangeMin As Integer = 0
     Public rangeMax As Integer = 255
     Public bins As Int32 = 10
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 4, 1000, 100)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, "Histogram Bins", 4, 1000, 100)
         ocvb.desc = "Compute the src image median"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -81,9 +81,9 @@ End Class
 Public Class Math_DepthMeanStdev
     Inherits ocvbClass
     Dim minMax As Depth_Stable
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        minMax = New Depth_Stable(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        minMax = New Depth_Stable(ocvb)
         ocvb.desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -111,12 +111,12 @@ Public Class Math_RGBCorrelation
     Inherits ocvbClass
     Dim flow As Font_FlowText
     Dim corr As MatchTemplate_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        flow = New Font_FlowText(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        flow = New Font_FlowText(ocvb)
         flow.result1or2 = RESULT1
 
-        corr = New MatchTemplate_Basics(ocvb, caller)
+        corr = New MatchTemplate_Basics(ocvb)
         corr.reportFreq = 1
 
         ocvb.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"

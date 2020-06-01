@@ -21,10 +21,10 @@ Public Class Salience_Basics_CPP
     Dim grayData(0) As Byte
     Dim numScales As Int32
     Dim salience As IntPtr
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         sliders = New OptionsSliders
-        sliders.setupTrackBar1(ocvb, caller, "Salience numScales", 1, 6, 6)
+        sliders.setupTrackBar1(ocvb, "Salience numScales", 1, 6, 6)
 
         salience = Salience_Open()
         ocvb.desc = "Show results of Salience algorithm when using C++"
@@ -49,9 +49,9 @@ End Class
 Public Class Salience_Basics_MT
     Inherits ocvbClass
     Dim salience As Salience_Basics_CPP
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        salience = New Salience_Basics_CPP(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        salience = New Salience_Basics_CPP(ocvb)
         salience.sliders.TrackBar2.Value = 2
 
         ocvb.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."

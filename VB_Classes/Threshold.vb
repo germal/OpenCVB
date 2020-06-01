@@ -4,11 +4,11 @@ Public Class Threshold_LaplacianFilter
     Inherits ocvbClass
     Dim edges As Filter_Laplacian
     Dim trim As Depth_InRange
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        trim = New Depth_InRange(ocvb, caller)
-        edges = New Filter_Laplacian(ocvb, caller)
-        sliders.setupTrackBar1(ocvb, caller, "dist Threshold", 1, 100, 40)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        trim = New Depth_InRange(ocvb)
+        edges = New Filter_Laplacian(ocvb)
+        sliders.setupTrackBar1(ocvb, "dist Threshold", 1, 100, 40)
         label1 = "Foreground Input"
         ocvb.desc = "Threshold the output of a Laplacian derivative, mask with depth foreground."
     End Sub

@@ -3,12 +3,12 @@ Public Class Moments_CentroidKalman
     Inherits ocvbClass
     Dim foreground As kMeans_Depth_FG_BG
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As AlgorithmData, ByVal callerRaw As String)
-        setCaller(callerRaw)
-        kalman = New Kalman_Basics(ocvb, caller)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(2 - 1) ' 2 elements - cv.point
 
-        foreground = New kMeans_Depth_FG_BG(ocvb, caller)
+        foreground = New kMeans_Depth_FG_BG(ocvb)
 
         label1 = "Red dot = Kalman smoothed centroid"
         ocvb.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
