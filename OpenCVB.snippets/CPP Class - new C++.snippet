@@ -67,8 +67,8 @@ End Module
 Public Class AnyName_CPP
     Inherits ocvbClass
     Dim anyname As IntPtr
-    Public Sub New(ocvb As AlgorithmData, byval callerRaw as string)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
 		    anyname = Anyname_Open()
         ocvb.desc = "description of class"
 	  End Sub

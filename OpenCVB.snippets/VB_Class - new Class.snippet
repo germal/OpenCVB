@@ -10,8 +10,8 @@
 Imports cv = OpenCvSharp
 Public Class newClass_Basics
     Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData, byval callerRaw as string)
-        setCaller(callerRaw)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
         ocvb.desc = "New class description"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

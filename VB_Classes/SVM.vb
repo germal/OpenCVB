@@ -8,19 +8,22 @@ Public Class SVM_Options
     Public responses() As Integer
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "SampleCount", 5, 1000, 500)
-        sliders.setupTrackBar2(ocvb, "Granularity", 1, 50, 5)
-        sliders.setupTrackBar3(ocvb, "SVM Degree", 1, 200, 100)
-        sliders.setupTrackBar4(ocvb, "SVM Gamma ", 1, 200, 100)
+
         sliders1.setupTrackBar1(ocvb, "SVM Coef0 X100", 1, 200, 100)
         sliders1.setupTrackBar2(ocvb, "SVM C X100", 0, 100, 100)
         sliders1.setupTrackBar3(ocvb, "SVM Nu X100", 1, 85, 50)
         sliders1.setupTrackBar4(ocvb, "SVM P X100", 0, 100, 10)
+
+        sliders.setupTrackBar1(ocvb, "SampleCount", 5, 1000, 500)
+        sliders.setupTrackBar2(ocvb, "Granularity", 1, 50, 5)
+        sliders.setupTrackBar3(ocvb, "SVM Degree", 1, 200, 100)
+        sliders.setupTrackBar4(ocvb, "SVM Gamma ", 1, 200, 100)
+
         radio.Setup(ocvb, 4)
         radio.check(0).Text = "kernel Type = Linear"
+        radio.check(0).Checked = True
         radio.check(1).Text = "kernel Type = Poly"
         radio.check(2).Text = "kernel Type = RBF"
-        radio.check(2).Checked = True
         radio.check(3).Text = "kernel Type = Sigmoid"
 
         radio1.Setup(ocvb, 5)
@@ -149,6 +152,7 @@ Public Class SVM_Random
         setCaller(ocvb)
         svmOptions = New SVM_Options(ocvb)
         svmOptions.sliders.TrackBar2.Value = 15
+
         ocvb.drawRect = New cv.Rect(ocvb.color.Cols / 4, ocvb.color.Rows / 4, ocvb.color.Cols / 2, ocvb.color.Rows / 2)
 
         check.Setup(ocvb, 1)
@@ -168,22 +172,24 @@ Public Class SVM_Random
         Dim trainData As New cv.Mat(dataSize, 2, cv.MatType.CV_32F)
         Dim response = New cv.Mat(dataSize, 1, cv.MatType.CV_32S)
         Dim width = src.Width
-        If check.Box(0).Checked Then
+        Dim setLinear = check.Box(0).Checked
+        If setLinear Then
             width = src.Height
             rect.X = 0
             rect.Y = src.Height - rect.Height
             rect.Width = width
         End If
-        trainData *= 1 / width
+
         For i = 0 To dataSize
             Dim pt = New cv.Point2f(msRNG.Next(0, width - 1), msRNG.Next(0, src.Height - 1))
-            If pt.X > rect.X And pt.X < rect.X + rect.Width And pt.Y > rect.Y And pt.Y < rect.Y + rect.Height Then
-                response.Set(Of Int32)(i, 0, 1)
-                dst1.Circle(pt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            Dim resp As Int32
+            If setLinear Then
+                If pt.X >= pt.Y Then resp = 1 Else resp = -1
             Else
-                response.Set(Of Int32)(i, 0, -1)
-                dst1.Circle(pt, 5, cv.Scalar.Green, -1, cv.LineTypes.AntiAlias)
+                If pt.X > rect.X And pt.X < rect.X + rect.Width And pt.Y > rect.Y And pt.Y < rect.Y + rect.Height Then resp = 1 Else resp = -1
             End If
+            response.Set(Of Int32)(i, 0, resp)
+            dst1.Circle(pt, 5, If(resp = 1, cv.Scalar.Blue, cv.Scalar.Green), -1, cv.LineTypes.AntiAlias)
             trainData.Set(Of Single)(i, 0, pt.X)
             trainData.Set(Of Single)(i, 1, pt.Y)
         Next
@@ -210,8 +216,10 @@ Public Class SVM_Random
                 Next
             Next
             label2 = "There were " + CStr(blueCount) + " blue predictions"
-            dst1.Rectangle(rect, cv.Scalar.Black, 2)
-            dst2.Rectangle(rect, cv.Scalar.Black, 2)
+            If setLinear = False Then
+                dst1.Rectangle(rect, cv.Scalar.Black, 2)
+                dst2.Rectangle(rect, cv.Scalar.Black, 2)
+            End If
         End Using
     End Sub
 End Class
@@ -222,24 +230,50 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-
 Public Class SVM_TestCase
     Inherits ocvbClass
     Dim labels() As Int32 = {1, -1, -1, -1}
-    Dim trainData(,) As Single = {{501, 10}, {255, 10}, {501, 255}, {10, 501}}
+    Dim trainData(,) As Single = {{501, 50}, {255, 50}, {501, 255}, {50, 200}}
     Dim trainMat As cv.Mat
     Dim labelsMat As cv.Mat
-    Dim svm As SVM_Options
+    Dim svmOptions As SVM_Options
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         trainMat = New cv.Mat(4, 2, cv.MatType.CV_32F, trainData)
         labelsMat = New cv.Mat(4, 1, cv.MatType.CV_32SC1, labels)
 
-        svm = New SVM_Options(ocvb)
+        svmOptions = New SVM_Options(ocvb)
+        svmOptions.sliders.TrackBar2.Value = 15
+        svmOptions.radio.check(3).Enabled = False
+
         ocvb.desc = "Text book example on SVM"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        dst1.SetTo(cv.Scalar.White)
+        dst2.SetTo(0)
+        svmOptions.Run(ocvb)
 
+        Dim svmx = svmOptions.createSVM()
+        svmx.Train(trainMat, cv.ML.SampleTypes.RowSample, labelsMat)
+
+        Dim sampleMat As New cv.Mat(1, 2, cv.MatType.CV_32F)
+        Dim granularity = svmOptions.sliders.TrackBar2.Value
+        For y = 0 To dst1.Height - 1 Step granularity
+            For x = 0 To dst1.Width - 1 Step granularity
+                sampleMat.Set(Of Single)(0, 0, x)
+                sampleMat.Set(Of Single)(0, 1, y)
+                Dim response = svmx.Predict(sampleMat)
+                Dim color = If(response >= 0, cv.Scalar.Blue, cv.Scalar.Green)
+                dst2.Circle(New cv.Point(x, y), 5, color, -1, cv.LineTypes.AntiAlias)
+            Next
+        Next
+
+        For i = 0 To trainMat.Rows - 1
+            Dim color = If(labelsMat.Get(Of Int32)(i) = 1, cv.Scalar.Yellow, cv.Scalar.Red)
+            Dim pt = New cv.Point(trainMat.Get(Of Single)(i, 0), trainMat.Get(Of Single)(i, 1))
+            dst1.Circle(pt, 5, color, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(pt, 5, color, -1, cv.LineTypes.AntiAlias)
+        Next
     End Sub
 End Class
