@@ -167,94 +167,6 @@ End Class
 
 
 
-
-
-
-Public Class kMeans_RGB_MT
-    Inherits ocvbClass
-    Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 10)
-
-        grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = 64
-        grid.sliders.TrackBar2.Value = 48
-        label1 = "kmeans - raw labels"
-        label2 = "Synchronized colors from raw labels"
-        ocvb.desc = "Cluster a grid of segments individual and combine results.  Select the desired number of clusters/threads - needs more work"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        grid.Run(ocvb)
-        src.CopyTo(dst1)
-        dst1.SetTo(cv.Scalar.White, grid.gridMask)
-
-        'Dim clusterCount = sliders.TrackBar1.Value
-        'Dim allLabels As New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
-        'Dim clusterColors As New cv.Mat(New cv.Size(3, clusterCount * (grid.roiList.Count - 1)), cv.MatType.CV_32FC1)
-        'Dim roiList As New List(Of cv.Rect)
-        'For i = 0 To grid.roiList.Count - 1
-        '    ' if the number of pixels is less than the clusterCount kmeans will fail!  (Segments near boundaries can be tiny.)
-        '    If grid.roiList(i).Width * grid.roiList(i).Height >= clusterCount Then
-        '        roiList.Add(grid.roiList(i))
-        '    End If
-        'Next
-
-        'Parallel.For(0, roiList.Count,
-        ' Sub(i)
-        '     Dim roi = roiList(i)
-        '     Dim img As New cv.Mat(roi.Width, roi.Height, cv.MatType.CV_8UC3)
-        '     src(roi).CopyTo(img)
-        '     Dim columnVector As New cv.Mat
-        '     columnVector = img.Reshape(img.Channels, roi.Height * roi.Width)
-        '     Dim rgb32f As New cv.Mat
-        '     columnVector.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
-
-        '     Dim labels = New cv.Mat()
-        '     Dim centers As New cv.Mat
-        '     cv.Cv2.Kmeans(rgb32f, clusterCount, labels, term, 3, cv.KMeansFlags.PpCenters, centers)
-
-        '     Dim labelImage = labels.Reshape(1, roi.Height)
-        '     Dim labels8uC1 As New cv.Mat
-        '     labelImage.ConvertTo(labels8uC1, cv.MatType.CV_8UC1)
-        '     labels8uC1.CopyTo(allLabels(roi))
-        '     For j = 0 To clusterCount - 1
-        '         clusterColors.Set(Of cv.Vec3f)(j + i * clusterCount, centers.Get(Of cv.Vec3f)(j))
-        '     Next
-        ' End Sub)
-
-        'Dim finalColorLabels As New cv.Mat
-        'Dim finalColorCenters As New cv.Mat
-
-        'cv.Cv2.Kmeans(clusterColors, clusterCount, finalColorLabels, term, 3, cv.KMeansFlags.PpCenters, finalColorCenters)
-        'If finalColorCenters.Rows = 0 Then Exit Sub ' failure.  Problem moving slider?
-        'Parallel.For(0, roiList.Count,
-        '        Sub(i)
-        '            Dim roi = roiList(i)
-        '            Dim val As Int32, colorLabel As Int32, finalColor As cv.Vec3f
-        '            Dim lSrc As New cv.Mat
-        '            allLabels(roi).CopyTo(lSrc)
-        '            Dim ldst1 As New cv.Mat(lSrc.Size(), cv.MatType.CV_8UC3)
-        '            For y = 0 To roi.Height - 1
-        '                For x = 0 To roi.Width - 1
-        '                    val = lSrc.Get(Of Byte)(y, x)
-        '                    colorLabel = finalColorLabels.Get(Of Int32)(i * clusterCount + val)
-        '                    finalColor = finalColorCenters.Get(Of cv.Vec3f)(colorLabel)
-        '                    ldst1.Set(y, x, New cv.Vec3b(finalColor(0), finalColor(1), finalColor(2)))
-        '                Next
-        '            Next
-        '            ldst1.CopyTo(dst2(roi))
-        '        End Sub)
-        'Dim factor = CInt(255.0 / clusterCount)
-        'allLabels = factor * allLabels
-        'cv.Cv2.CvtColor(allLabels, dst1, cv.ColorConversionCodes.GRAY2BGR)
-    End Sub
-End Class
-
-
-
-
-
 Public Class kMeans_ReducedRGB
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
@@ -440,8 +352,8 @@ Public Class kMeans_Color_MT
         sliders.setupTrackBar1(ocvb, "kMeans k", 2, 32, 2)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = 32
-        grid.sliders.TrackBar2.Value = 32
+        grid.sliders.TrackBar1.Value = 128
+        grid.sliders.TrackBar2.Value = 160
 
         ocvb.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
