@@ -10,8 +10,8 @@ Public Class knn_Basics
         setCaller(ocvb)
         If standalone Then
             random = New Random_Points(ocvb)
-            sliders.setupTrackBar1(ocvb, "knn Query Points", 1, 10000, 10)
-            sliders.setupTrackBar2(ocvb, "knn Known Points", 1, 10, 3)
+            sliders.setupTrackBar1(ocvb, caller, "knn Query Points", 1, 10000, 10)
+            sliders.setupTrackBar2("knn Known Points", 1, 10, 3)
         End If
         ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
         label2 = "Query points"
@@ -78,8 +78,8 @@ Public Class knn_Cluster2D
         knn = New knn_Point2d(ocvb)
         knn.sliders.Visible = False
 
-        sliders.setupTrackBar1(ocvb, "knn - number of cities", 10, 1000, 100)
-        check.Setup(ocvb, 1)
+        sliders.setupTrackBar1(ocvb, caller, "knn - number of cities", 10, 1000, 100)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Demo Mode (continuous update)"
         If ocvb.parms.testAllRunning Then check.Box(0).Checked = True
 
@@ -177,8 +177,8 @@ Public Class knn_Point2d
     Dim knn As cv.ML.KNearest
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "knn Query Points", 1, 50, 10)
-        sliders.setupTrackBar2(ocvb, "knn k nearest points", 1, 5, 1)
+        sliders.setupTrackBar1(ocvb, caller, "knn Query Points", 1, 50, 10)
+        sliders.setupTrackBar2("knn k nearest points", 1, 5, 1)
 
         ocvb.desc = "Use KNN to connect 2D points."
         label1 = "Yellow=Queries, Blue=Best Responses"
@@ -244,8 +244,8 @@ Public Class knn_Point3d
         Public findXnearest As Int32
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "knn Query Points", 1, 500, 10)
-        sliders.setupTrackBar2(ocvb, "knn k nearest points", 0, 500, 1)
+        sliders.setupTrackBar1(ocvb, caller, "knn Query Points", 1, 500, 10)
+        sliders.setupTrackBar2("knn k nearest points", 0, 500, 1)
 
         ocvb.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
         label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"

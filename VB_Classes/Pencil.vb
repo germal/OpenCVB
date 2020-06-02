@@ -4,9 +4,9 @@ Public Class Pencil_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Pencil Sigma_s", 0, 200, 60)
-        sliders.setupTrackBar2(ocvb, "Pencil Sigma_r", 1, 100, 7)
-        sliders.setupTrackBar3(ocvb, "Pencil Shade Factor", 1, 200, 40)
+        sliders.setupTrackBar1(ocvb, caller, "Pencil Sigma_s", 0, 200, 60)
+        sliders.setupTrackBar2("Pencil Sigma_r", 1, 100, 7)
+        sliders.setupTrackBar3("Pencil Shade Factor", 1, 200, 40)
         ocvb.desc = "Convert image to a pencil sketch - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -25,7 +25,7 @@ Public Class Pencil_Manual
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Blur kernel size", 2, 100, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Blur kernel size", 2, 100, 10)
         ocvb.desc = "Break down the process of converting an image to a sketch - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

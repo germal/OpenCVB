@@ -13,32 +13,30 @@ Public Class OptionsSliders
         Label3.Text = CStr(TrackBar3.Value)
         Label4.Text = CStr(TrackBar4.Value)
     End Sub
-    Public Sub setupTrackBar1(ocvb As AlgorithmData, label As String, min As Integer, max As Integer, value As Integer)
+    Public Sub setupTrackBar1(ocvb As AlgorithmData, owner As String, label As String, min As Integer, max As Integer, value As Integer)
         LabelSlider1.Text = label
         TrackBar1.Minimum = min
         TrackBar1.Maximum = max
         TrackBar1.Value = value
         GroupBox1.Visible = True
-        Me.Text = ocvb.caller + " Options"
-        If ocvb.parms.ShowOptions Then
-            If ocvb.suppressOptions = False Then Me.Show()
-        End If
+        Me.Text = owner + " Options"
+        If ocvb.parms.ShowOptions Then If ocvb.suppressOptions = False Then Me.Show()
     End Sub
-    Public Sub setupTrackBar2(ocvb As AlgorithmData, label As String, min As Integer, max As Integer, value As Integer)
+    Public Sub setupTrackBar2(label As String, min As Integer, max As Integer, value As Integer)
         LabelSlider2.Text = label
         TrackBar2.Minimum = min
         TrackBar2.Maximum = max
         TrackBar2.Value = value
         GroupBox2.Visible = True
     End Sub
-    Public Sub setupTrackBar3(ocvb As AlgorithmData, label As String, min As Integer, max As Integer, value As Integer)
+    Public Sub setupTrackBar3(label As String, min As Integer, max As Integer, value As Integer)
         LabelSlider3.Text = label
         TrackBar3.Minimum = min
         TrackBar3.Maximum = max
         TrackBar3.Value = value
         GroupBox3.Visible = True
     End Sub
-    Public Sub setupTrackBar4(ocvb As AlgorithmData, label As String, min As Integer, max As Integer, value As Integer)
+    Public Sub setupTrackBar4(label As String, min As Integer, max As Integer, value As Integer)
         LabelSlider4.Text = label
         TrackBar4.Minimum = min
         TrackBar4.Maximum = max

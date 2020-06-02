@@ -10,7 +10,7 @@ Public Class WarpModel_Input
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        radio.Setup(ocvb, 12)
+        radio.Setup(ocvb, caller, 12)
         radio.check(0).Text = "building.jpg"
         radio.check(1).Text = "church.jpg"
         radio.check(2).Text = "emir.jpg"
@@ -25,7 +25,7 @@ Public Class WarpModel_Input
         radio.check(11).Text = "Valley.jpg"
         radio.check(9).Checked = True
 
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Use Gradient in WarpInput"
 
         sobel = New Edges_Sobel(ocvb)
@@ -96,7 +96,7 @@ Public Class WarpModel_FindTransformECC_CPP
         setCaller(ocvb)
         cPtr = WarpModel_Open()
 
-        radio.Setup(ocvb,4)
+        radio.Setup(ocvb, caller,4)
         radio.check(0).Text = "Motion_Translation (fastest)"
         radio.check(1).Text = "Motion_Euclidean"
         radio.check(2).Text = "Motion_Affine (very slow - Use CPP_Classes in Release Mode)"

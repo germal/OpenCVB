@@ -6,9 +6,9 @@ Public Class HOG_Basics
     Dim staticImageProcessed As Boolean
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Threshold", 0, 100, 0)
-        sliders.setupTrackBar2(ocvb, "Stride", 1, 100, 1)
-        sliders.setupTrackBar3(ocvb, "Scale", 0, 2000, 300)
+        sliders.setupTrackBar1(ocvb, caller, "Threshold", 0, 100, 0)
+        sliders.setupTrackBar2("Stride", 1, 100, 1)
+        sliders.setupTrackBar3("Scale", 0, 2000, 300)
         ocvb.desc = "Find people with Histogram of Gradients (HOG) 2D feature"
         staticImage = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
         dst2 = staticImage.Resize(dst2.Size)

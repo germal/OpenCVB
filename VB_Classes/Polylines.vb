@@ -3,11 +3,11 @@ Public Class Polylines_IEnumerableExample
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        check.Setup(ocvb, 2)
+        check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Polyline closed if checked"
         check.Box(0).Checked = True
-        sliders.setupTrackBar1(ocvb, "Polyline Count", 2, 500, 100)
-        sliders.setupTrackBar2(ocvb, "Polyline Thickness", 0, 10, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Polyline Count", 2, 500, 100)
+        sliders.setupTrackBar2("Polyline Thickness", 0, 10, 1)
         ocvb.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

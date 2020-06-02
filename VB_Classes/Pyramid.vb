@@ -4,7 +4,7 @@ Public Class Pyramid_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Zoom in and out", -1, 1, 0)
+        sliders.setupTrackBar1(ocvb, caller, "Zoom in and out", -1, 1, 0)
         ocvb.desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

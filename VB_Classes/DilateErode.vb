@@ -4,11 +4,11 @@ Public Class DilateErode_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Dilate/Erode Kernel Size", 1, 32, 5)
-        sliders.setupTrackBar2(ocvb, "Erode (-) to Dilate (+)", -32, 32, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Dilate/Erode Kernel Size", 1, 32, 5)
+        sliders.setupTrackBar2("Erode (-) to Dilate (+)", -32, 32, 1)
         ocvb.desc = "Dilate and Erode the RGB and Depth image."
 
-        radio.Setup(ocvb, 4)
+        radio.Setup(ocvb, caller, 4)
         radio.check(0).Text = "Dilate/Erode shape: Cross"
         radio.check(1).Text = "Dilate/Erode shape: Ellipse"
         radio.check(2).Text = "Dilate/Erode shape: Rect"
@@ -60,8 +60,8 @@ Public Class DilateErode_DepthSeed
         setCaller(ocvb)
         dilate = New DilateErode_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "DepthSeed flat depth", 1, 200, 100)
-        sliders.setupTrackBar2(ocvb, "DepthSeed max Depth", 1, 5000, 3000)
+        sliders.setupTrackBar1(ocvb, caller, "DepthSeed flat depth", 1, 200, 100)
+        sliders.setupTrackBar2("DepthSeed max Depth", 1, 5000, 3000)
         ocvb.desc = "Erode depth to build a depth mask for inrange data."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -94,13 +94,13 @@ Public Class DilateErode_OpenClose
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Open/Close shape: Cross"
         radio.check(1).Text = "Open/Close shape: Ellipse"
         radio.check(2).Text = "Open/Close shape: Rect"
         radio.check(2).Checked = True
 
-        sliders.setupTrackBar1(ocvb, "Dilate Open/Close Iterations", -10, 10, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Dilate Open/Close Iterations", -10, 10, 10)
         ocvb.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

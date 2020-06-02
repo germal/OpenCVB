@@ -77,10 +77,10 @@ Public Class Hough_Lines
         setCaller(ocvb)
         edges = New Edges_Canny(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "rho", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, "theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3(ocvb, "threshold", 1, 100, 50)
-        sliders.setupTrackBar4(ocvb, "Lines to Plot", 1, 1000, 25)
+        sliders.setupTrackBar1(ocvb, caller, "rho", 1, 100, 1)
+        sliders.setupTrackBar2("theta", 1, 1000, 1000 * Math.PI / 180)
+        sliders.setupTrackBar3("threshold", 1, 100, 50)
+        sliders.setupTrackBar4("Lines to Plot", 1, 1000, 25)
         ocvb.desc = "Use Houghlines to find lines in the image."
     End Sub
 
@@ -120,9 +120,9 @@ Public Class Hough_Lines_MT
     Public grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "rho", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, "theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3(ocvb, "threshold", 1, 100, 3)
+        sliders.setupTrackBar1(ocvb, caller, "rho", 1, 100, 1)
+        sliders.setupTrackBar2("theta", 1, 1000, 1000 * Math.PI / 180)
+        sliders.setupTrackBar3("threshold", 1, 100, 3)
 
         edges = New Edges_Canny(ocvb)
 

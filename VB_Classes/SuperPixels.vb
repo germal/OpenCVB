@@ -25,9 +25,9 @@ Public Class SuperPixel_Basics_CPP
     Dim spPtr As IntPtr = 0
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Number of SuperPixels", 1, 1000, 400)
-        sliders.setupTrackBar2(ocvb, "Iterations", 0, 10, 4)
-        sliders.setupTrackBar3(ocvb, "Prior", 1, 10, 2)
+        sliders.setupTrackBar1(ocvb, caller, "Number of SuperPixels", 1, 1000, 400)
+        sliders.setupTrackBar2("Iterations", 0, 10, 4)
+        sliders.setupTrackBar3("Prior", 1, 10, 2)
 
         label2 = "Superpixel label data (0-255)"
         ocvb.desc = "Sub-divide the image into super pixels."

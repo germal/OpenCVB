@@ -6,9 +6,9 @@ Public Class Features_GoodFeatures
     Public goodFeatures As New List(Of cv.Point2f)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Number of Points", 10, 1000, 200)
-        sliders.setupTrackBar2(ocvb, "Quality Level", 1, 100, 1)
-        sliders.setupTrackBar3(ocvb, "Distance", 1, 100, 30)
+        sliders.setupTrackBar1(ocvb, caller, "Number of Points", 10, 1000, 200)
+        sliders.setupTrackBar2("Quality Level", 1, 100, 1)
+        sliders.setupTrackBar3("Distance", 1, 100, 30)
 
         ocvb.desc = "Find good features to track in an RGB image."
     End Sub

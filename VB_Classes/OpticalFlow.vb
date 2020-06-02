@@ -74,7 +74,7 @@ Public Class OpticalFlow_DenseOptions
     Public outputScaling As Int32
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        radio.Setup(ocvb, 5)
+        radio.Setup(ocvb, caller, 5)
         radio.check(0).Text = "FarnebackGaussian"
         radio.check(1).Text = "LkGetMinEigenvals"
         radio.check(2).Text = "None"
@@ -82,14 +82,14 @@ Public Class OpticalFlow_DenseOptions
         radio.check(4).Text = "PyrBReady"
         radio.check(0).Checked = True
 
-        sliders2.setupTrackBar1(ocvb, "Optical Flow PolyN", 1, 15, 5)
-        sliders2.setupTrackBar2(ocvb, "Optical Flow Scaling Output", 1, 100, 50)
+        sliders2.setupTrackBar1(ocvb, caller, "Optical Flow PolyN", 1, 15, 5)
+        sliders2.setupTrackBar2("Optical Flow Scaling Output", 1, 100, 50)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
-        sliders.setupTrackBar1(ocvb, "Optical Flow pyrScale", 1, 100, 35)
-        sliders.setupTrackBar2(ocvb, "Optical Flow Levels", 1, 10, 1)
-        sliders.setupTrackBar3(ocvb, "Optical Flow winSize", 1, 9, 1)
-        sliders.setupTrackBar4(ocvb, "Optical Flow Iterations", 1, 10, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Optical Flow pyrScale", 1, 100, 35)
+        sliders.setupTrackBar2("Optical Flow Levels", 1, 10, 1)
+        sliders.setupTrackBar3("Optical Flow winSize", 1, 9, 1)
+        sliders.setupTrackBar4("Optical Flow Iterations", 1, 10, 1)
 
         label1 = "No output - just option settings..."
         ocvb.desc = "Use dense optical flow algorithm options"
@@ -163,7 +163,7 @@ Public Class OpticalFlow_DenseBasics_MT
         flow = New OpticalFlow_DenseOptions(ocvb)
         flow.sliders.TrackBar1.Value = 75
 
-        sliders.setupTrackBar1(ocvb, "Correlation Threshold", 0, 1000, 1000)
+        sliders.setupTrackBar1(ocvb, caller, "Correlation Threshold", 0, 1000, 1000)
 
         ocvb.desc = "MultiThread dense optical flow algorithm  "
     End Sub
@@ -220,10 +220,10 @@ Public Class OpticalFlow_Sparse
         setCaller(ocvb)
         good = New Features_GoodFeatures(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "OpticalFlow window", 1, 20, 3)
-        sliders.setupTrackBar2(ocvb, "OpticalFlow Max Pixels Distance", 1, 100, 30)
+        sliders.setupTrackBar1(ocvb, caller, "OpticalFlow window", 1, 20, 3)
+        sliders.setupTrackBar2("OpticalFlow Max Pixels Distance", 1, 100, 30)
 
-        radio.Setup(ocvb, 6)
+        radio.Setup(ocvb, caller, 6)
         radio.check(0).Text = "FarnebackGaussian"
         radio.check(1).Text = "LkGetMinEigenvals"
         radio.check(2).Text = "None"

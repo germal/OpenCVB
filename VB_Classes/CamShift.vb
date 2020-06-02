@@ -15,10 +15,10 @@ Public Class CamShift_Basics
         plotHist = New Plot_Histogram(ocvb)
         plotHist.sliders.Visible = False
 
-        sliders.setupTrackBar1(ocvb, "CamShift vMin", 0, 255, 32)
-        sliders.setupTrackBar2(ocvb, "CamShift vMax", 0, 255, 255)
-        sliders.setupTrackBar3(ocvb, "CamShift Smin", 0, 255, 60)
-        sliders.setupTrackBar4(ocvb, "CamShift Histogram bins", 16, 255, 32)
+        sliders.setupTrackBar1(ocvb, caller, "CamShift vMin", 0, 255, 32)
+        sliders.setupTrackBar2("CamShift vMax", 0, 255, 255)
+        sliders.setupTrackBar3("CamShift Smin", 0, 255, 60)
+        sliders.setupTrackBar4("CamShift Histogram bins", 16, 255, 32)
 
         label1 = "Draw anywhere to create histogram and start camshift"
         label2 = "Histogram of targeted region (hue only)"
@@ -163,7 +163,7 @@ Public Class Camshift_TopObjects
         Next
 
         ocvb.suppressOptions = False
-        sliders.setupTrackBar1(ocvb, "Reinitialize camshift after x frames", 1, 500, 100)
+        sliders.setupTrackBar1(ocvb, caller, "Reinitialize camshift after x frames", 1, 500, 100)
         ocvb.desc = "Track - Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

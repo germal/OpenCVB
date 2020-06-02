@@ -4,9 +4,9 @@ Public Class Laplacian_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Laplacian Kernel size", 1, 21, 3)
-        sliders.setupTrackBar2(ocvb, "Laplacian Scale", 0, 100, 100)
-        sliders.setupTrackBar3(ocvb, "Laplacian Delta", 0, 1000, 0)
+        sliders.setupTrackBar1(ocvb, caller, "Laplacian Kernel size", 1, 21, 3)
+        sliders.setupTrackBar2("Laplacian Scale", 0, 100, 100)
+        sliders.setupTrackBar3("Laplacian Delta", 0, 1000, 0)
         ocvb.desc = "Laplacian filter - the second derivative."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -29,11 +29,11 @@ Public Class Laplacian_Blur
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Laplacian Kernel size", 1, 21, 3)
-        sliders.setupTrackBar2(ocvb, "Laplacian Scale", 0, 100, 100)
-        sliders.setupTrackBar3(ocvb, "Laplacian Delta", 0, 1000, 0)
+        sliders.setupTrackBar1(ocvb, caller, "Laplacian Kernel size", 1, 21, 3)
+        sliders.setupTrackBar2("Laplacian Scale", 0, 100, 100)
+        sliders.setupTrackBar3("Laplacian Delta", 0, 1000, 0)
 
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Add Gaussian Blur"
         radio.check(1).Text = "Add boxfilter Blur"
         radio.check(2).Text = "Add median Blur"

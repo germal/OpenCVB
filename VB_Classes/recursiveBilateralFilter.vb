@@ -21,7 +21,7 @@ Public Class RecursiveBilateralFilter_CPP
     Dim rbf As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "RBF Recursion count", 1, 20, 2)
+        sliders.setupTrackBar1(ocvb, caller, "RBF Recursion count", 1, 20, 2)
         rbf = RecursiveBilateralFilter_Open()
         ocvb.desc = "Apply the recursive bilateral filter"
     End Sub

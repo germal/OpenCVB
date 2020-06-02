@@ -45,9 +45,9 @@ Public Class Clone_ColorChange
         setCaller(ocvb)
         clone = New Clone_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "Color Change - Red", 5, 25, 15)
-        sliders.setupTrackBar2(ocvb, "Color Change - Green", 5, 25, 5)
-        sliders.setupTrackBar3(ocvb, "Color Change - Blue", 5, 25, 5)
+        sliders.setupTrackBar1(ocvb, caller, "Color Change - Red", 5, 25, 15)
+        sliders.setupTrackBar2("Color Change - Green", 5, 25, 5)
+        sliders.setupTrackBar3("Color Change - Blue", 5, 25, 5)
 
         label1 = "Draw anywhere to select different clone region"
         label2 = "Mask used for clone"
@@ -72,8 +72,8 @@ Public Class Clone_IlluminationChange
         setCaller(ocvb)
         clone = New Clone_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "Alpha", 0, 20, 2)
-        sliders.setupTrackBar2(ocvb, "Beta", 0, 20, 2)
+        sliders.setupTrackBar1(ocvb, caller, "Alpha", 0, 20, 2)
+        sliders.setupTrackBar2("Beta", 0, 20, 2)
 
         label1 = "Draw anywhere to select different clone region"
         label2 = "Mask used for clone"
@@ -99,8 +99,8 @@ Public Class Clone_TextureFlattening
         setCaller(ocvb)
         clone = New Clone_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "Low Threshold", 0, 100, 10)
-        sliders.setupTrackBar2(ocvb, "High Threshold", 0, 100, 50)
+        sliders.setupTrackBar1(ocvb, caller, "Low Threshold", 0, 100, 10)
+        sliders.setupTrackBar2("High Threshold", 0, 100, 50)
 
         label1 = "Draw anywhere to select different clone region"
         label2 = "mask used for clone"
@@ -132,7 +132,7 @@ Public Class Clone_Eagle
     Dim pt As cv.Point
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Seamless - Mixed Clone"
         radio.check(1).Text = "Seamless - MonochromeTransfer Clone"
         radio.check(2).Text = "Seamless - Normal Clone"
@@ -183,7 +183,7 @@ Public Class Clone_Seamless
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Seamless Normal Clone"
         radio.check(1).Text = "Seamless Mono Clone"
         radio.check(2).Text = "Seamless Mixed Clone"

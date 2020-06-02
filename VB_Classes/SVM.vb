@@ -9,24 +9,24 @@ Public Class SVM_Options
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        sliders1.setupTrackBar1(ocvb, "SVM Coef0 X100", 1, 200, 100)
-        sliders1.setupTrackBar2(ocvb, "SVM C X100", 0, 100, 100)
-        sliders1.setupTrackBar3(ocvb, "SVM Nu X100", 1, 85, 50)
-        sliders1.setupTrackBar4(ocvb, "SVM P X100", 0, 100, 10)
+        sliders1.setupTrackBar1(ocvb, caller, "SVM Coef0 X100", 1, 200, 100)
+        sliders1.setupTrackBar2("SVM C X100", 0, 100, 100)
+        sliders1.setupTrackBar3("SVM Nu X100", 1, 85, 50)
+        sliders1.setupTrackBar4("SVM P X100", 0, 100, 10)
 
-        sliders.setupTrackBar1(ocvb, "SampleCount", 5, 1000, 500)
-        sliders.setupTrackBar2(ocvb, "Granularity", 1, 50, 5)
-        sliders.setupTrackBar3(ocvb, "SVM Degree", 1, 200, 100)
-        sliders.setupTrackBar4(ocvb, "SVM Gamma ", 1, 200, 100)
+        sliders.setupTrackBar1(ocvb, caller, "SampleCount", 5, 1000, 500)
+        sliders.setupTrackBar2("Granularity", 1, 50, 5)
+        sliders.setupTrackBar3("SVM Degree", 1, 200, 100)
+        sliders.setupTrackBar4("SVM Gamma ", 1, 200, 100)
 
-        radio.Setup(ocvb, 4)
+        radio.Setup(ocvb, caller, 4)
         radio.check(0).Text = "kernel Type = Linear"
         radio.check(0).Checked = True
         radio.check(1).Text = "kernel Type = Poly"
         radio.check(2).Text = "kernel Type = RBF"
         radio.check(3).Text = "kernel Type = Sigmoid"
 
-        radio1.Setup(ocvb, 5)
+        radio1.Setup(ocvb, caller, 5)
         radio1.check(0).Text = "SVM Type = CSvc"
         radio1.check(0).Checked = True
         radio1.check(1).Text = "SVM Type = EpsSvr"
@@ -155,7 +155,7 @@ Public Class SVM_Random
 
         ocvb.drawRect = New cv.Rect(ocvb.color.Cols / 4, ocvb.color.Rows / 4, ocvb.color.Cols / 2, ocvb.color.Rows / 2)
 
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Restrict random test to square area"
 
         label1 = "SVM Training data"

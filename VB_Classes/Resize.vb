@@ -4,7 +4,7 @@ Public Class Resize_Basics
     Public newSize As cv.Size
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        SetInterpolationRadioButtons(ocvb, radio, "Resize")
+        SetInterpolationRadioButtons(ocvb, caller, radio, "Resize")
         ' warp is not allowed in resize
         radio.check(5).Enabled = False
         radio.check(6).Enabled = False
@@ -38,7 +38,7 @@ Public Class Resize_After8uc3
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
-        SetInterpolationRadioButtons(ocvb, radio, "Resize")
+        SetInterpolationRadioButtons(ocvb, caller, radio, "Resize")
         ' warp is not allowed in resize
         radio.check(5).Enabled = False
         radio.check(6).Enabled = False
@@ -78,7 +78,7 @@ Public Class Resize_Percentage
         setCaller(ocvb)
         resizeOptions = New Resize_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "Resize Percentage (%)", 1, 100, 3)
+        sliders.setupTrackBar1(ocvb, caller, "Resize Percentage (%)", 1, 100, 3)
 
         ocvb.desc = "Resize by a percentage of the image."
     End Sub

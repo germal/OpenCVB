@@ -7,7 +7,7 @@ Public Class Tracker_Basics
     Public trackerIndex As Int32 = 5 ' trackerMIL by default...
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Stop tracking selected object"
         ocvb.desc = "Track an object using cv.Tracking API - tracker algorithm"
         ocvb.putText(New oTrueType("Draw a rectangle around object to be tracked.", 10, 140, RESULT2))
@@ -101,7 +101,7 @@ Public Class Tracker_Methods
         setCaller(ocvb)
         tracker = New Tracker_Basics(ocvb)
 
-        radio.Setup(ocvb, 8)
+        radio.Setup(ocvb, caller, 8)
         radio.check(0).Text = "TrackerBoosting"
         radio.check(1).Text = "TrackerCSRT"
         radio.check(2).Text = "TrackerGOTURN - disabled (not working)"

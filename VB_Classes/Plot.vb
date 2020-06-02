@@ -103,13 +103,13 @@ Public Class Plot_OverTime
     Dim myStopWatch As Stopwatch
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Reset the plot scale"
         check.Box(0).Checked = True
 
-        sliders.setupTrackBar1(ocvb, "Plot Pixel Height", 1, 40, 4)
-        sliders.setupTrackBar2(ocvb, "Plot Pixel Width", 1, 40, 4)
-        sliders.setupTrackBar3(ocvb, "Plot (time) Font Size x10", 1, 20, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Plot Pixel Height", 1, 40, 4)
+        sliders.setupTrackBar2("Plot Pixel Width", 1, 40, 4)
+        sliders.setupTrackBar3("Plot (time) Font Size x10", 1, 20, 10)
         ocvb.desc = "Plot an input variable over time"
         myStopWatch = Stopwatch.StartNew()
     End Sub
@@ -202,7 +202,7 @@ Public Class Plot_Histogram
     Public backColor As cv.Scalar = cv.Scalar.Red
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Histogram Font Size x10", 1, 20, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Font Size x10", 1, 20, 10)
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

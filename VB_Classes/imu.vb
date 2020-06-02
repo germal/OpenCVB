@@ -8,7 +8,7 @@ Public Class IMU_Basics
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
+        sliders.setupTrackBar1(ocvb, caller, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
 
         flow = New Font_FlowText(ocvb)
         flow.result1or2 = RESULT1
@@ -194,8 +194,8 @@ Public Class IMU_FrameTime
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.setupTrackBar1(ocvb, "Minimum IMU to Capture time (ms)", 1, 10, 2)
-        sliders.setupTrackBar2(ocvb, "Number of Plot Values", 5, 30, 25)
+        sliders.setupTrackBar1(ocvb, caller, "Minimum IMU to Capture time (ms)", 1, 10, 2)
+        sliders.setupTrackBar2("Number of Plot Values", 5, 30, 25)
 
         label2 = "IMU FT (blue) Host FT (green) Latency est. (red)"
         ocvb.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
@@ -288,8 +288,8 @@ Public Class IMU_HostFrameTimes
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.setupTrackBar1(ocvb, "Minimum Host interrupt delay (ms)", 1, 10, 4)
-        sliders.setupTrackBar2(ocvb, "Number of Plot Values", 5, 30, 25)
+        sliders.setupTrackBar1(ocvb, caller, "Minimum Host interrupt delay (ms)", 1, 10, 4)
+        sliders.setupTrackBar2("Number of Plot Values", 5, 30, 25)
 
         label2 = "IMU FT (blue) Host FT (green) Latency est. (red)"
         ocvb.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"

@@ -13,9 +13,9 @@ Public Class Histogram_Basics
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Histogram Bins", 2, 256, 256)
-        sliders.setupTrackBar2(ocvb, "Histogram line thickness", 1, 20, 3)
-        sliders.setupTrackBar3(ocvb, "Histogram Font Size x10", 1, 20, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 2, 256, 256)
+        sliders.setupTrackBar2("Histogram line thickness", 1, 20, 3)
+        sliders.setupTrackBar3("Histogram Font Size x10", 1, 20, 10)
 
         ocvb.desc = "Plot histograms for up to 3 channels."
     End Sub
@@ -132,12 +132,12 @@ Public Class Histogram_NormalizeGray
     Public histogram As Histogram_KalmanSmoothed
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Min Gray", 0, 255, 0)
-        sliders.setupTrackBar2(ocvb, "Max Gray", 0, 255, 255)
+        sliders.setupTrackBar1(ocvb, caller, "Min Gray", 0, 255, 0)
+        sliders.setupTrackBar2("Max Gray", 0, 255, 255)
 
         histogram = New Histogram_KalmanSmoothed(ocvb)
 
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Normalize Before Histogram"
         check.Box(0).Checked = True
         ocvb.desc = "Create a histogram of a normalized image"
@@ -234,8 +234,8 @@ Public Class Histogram_2D_HueSaturation
 
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
-        sliders.setupTrackBar2(ocvb, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
+        sliders.setupTrackBar1(ocvb, caller, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
+        sliders.setupTrackBar2("Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
         ocvb.desc = "Create a histogram for hue and saturation."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -265,8 +265,8 @@ Public Class Histogram_2D_XZ_YZ
         trim = New Depth_InRange(ocvb)
         trim.sliders.TrackBar2.Value = 1500 ' up to x meters away
 
-        sliders.setupTrackBar1(ocvb, "Histogram X bins", 1, ocvb.color.cols / 2, 30)
-        sliders.setupTrackBar2(ocvb, "Histogram Z bins", 1, 200, 100)
+        sliders.setupTrackBar1(ocvb, caller, "Histogram X bins", 1, ocvb.color.cols / 2, 30)
+        sliders.setupTrackBar2("Histogram Z bins", 1, 200, 100)
 
         ocvb.desc = "Create a 2D histogram for depth in XZ and YZ."
         label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
@@ -309,8 +309,8 @@ Public Class Histogram_BackProjectionGrayScale
         hist.dst1 = dst2
         hist.kalman.check.Box(0).Checked = False
 
-        sliders.setupTrackBar1(ocvb, "Histogram Bins", 1, 255, 50)
-        sliders.setupTrackBar2(ocvb, "Number of neighbors to include", 0, 10, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 1, 255, 50)
+        sliders.setupTrackBar2("Number of neighbors to include", 0, 10, 1)
 
         ocvb.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
         label2 = "Grayscale Histogram"
@@ -361,7 +361,7 @@ Public Class Histogram_BackProjection
     Dim hist As Histogram_2D_HueSaturation
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Backprojection Mask Threshold", 0, 255, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Backprojection Mask Threshold", 0, 255, 10)
 
         hist = New Histogram_2D_HueSaturation(ocvb)
         hist.dst1 = dst2
@@ -400,15 +400,15 @@ Public Class Histogram_ColorsAndGray
         setCaller(ocvb)
         mats = New Mat_4to1(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "Min Gray", 0, 255, 0)
-        sliders.setupTrackBar2(ocvb, "Max Gray", 0, 255, 255)
+        sliders.setupTrackBar1(ocvb, caller, "Min Gray", 0, 255, 0)
+        sliders.setupTrackBar2("Max Gray", 0, 255, 255)
 
         histogram = New Histogram_KalmanSmoothed(ocvb)
         histogram.kalman.check.Box(0).Checked = False
         histogram.kalman.check.Box(0).Enabled = False
         histogram.sliders.TrackBar1.Value = 40
 
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Normalize Before Histogram"
         check.Box(0).Checked = True
         ocvb.desc = "Create a histogram of a normalized image"
@@ -452,7 +452,7 @@ Public Class Histogram_KalmanSmoothed
 
         kalman = New Kalman_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "Histogram Bins", 1, 255, 50)
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 1, 255, 50)
 
         label2 = "Histogram - x=bins/y=count"
         ocvb.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
@@ -510,7 +510,7 @@ Public Class Histogram_Depth
         plotHist = New Plot_Histogram(ocvb)
 
         trim = New Depth_InRange(ocvb)
-        sliders.setupTrackBar1(ocvb, "Histogram Depth Bins", 2, ocvb.color.cols, 50) ' max is the number of columns * 2
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Depth Bins", 2, ocvb.color.cols, 50) ' max is the number of columns * 2
 
         ocvb.desc = "Show depth data as a histogram."
     End Sub

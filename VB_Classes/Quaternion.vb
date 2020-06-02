@@ -16,15 +16,15 @@ Public Class Quaterion_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders1.setupTrackBar1(ocvb, "quaternion A.x X100", -100, 100, -50)
-        sliders1.setupTrackBar2(ocvb, "quaternion A.y X100", -100, 100, 10)
-        sliders1.setupTrackBar3(ocvb, "quaternion A.z X100", -100, 100, 20)
-        sliders1.setupTrackBar4(ocvb, "quaternion Theta X100", -100, 100, 100)
+        sliders1.setupTrackBar1(ocvb, caller, "quaternion A.x X100", -100, 100, -50)
+        sliders1.setupTrackBar2("quaternion A.y X100", -100, 100, 10)
+        sliders1.setupTrackBar3("quaternion A.z X100", -100, 100, 20)
+        sliders1.setupTrackBar4("quaternion Theta X100", -100, 100, 100)
 
-        sliders2.setupTrackBar1(ocvb, "quaternion B.x X100", -100, 100, -10)
-        sliders2.setupTrackBar2(ocvb, "quaternion B.y X100", -100, 100, -10)
-        sliders2.setupTrackBar3(ocvb, "quaternion B.z X100", -100, 100, -10)
-        sliders2.setupTrackBar4(ocvb, "quaternion Theta X100", -100, 100, 100)
+        sliders2.setupTrackBar1(ocvb, caller, "quaternion B.x X100", -100, 100, -10)
+        sliders2.setupTrackBar2("quaternion B.y X100", -100, 100, -10)
+        sliders2.setupTrackBar3("quaternion B.z X100", -100, 100, -10)
+        sliders2.setupTrackBar4("quaternion Theta X100", -100, 100, 100)
 
         ocvb.desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub

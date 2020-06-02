@@ -23,9 +23,9 @@ Public Class Retina_Basics_CPP
     Dim srcData(0) As Byte
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Retina Sample Factor", 1, 10, 2)
+        sliders.setupTrackBar1(ocvb, caller, "Retina Sample Factor", 1, 10, 2)
 
-        check.Setup(ocvb, 2)
+        check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Use log sampling"
         check.Box(1).Text = "Open resulting xml file"
         ocvb.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."

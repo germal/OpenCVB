@@ -13,7 +13,7 @@ Public Class Etch_ASketch
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        check.Setup(ocvb, 2)
+        check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Etch_ASketch clean slate"
         check.Box(1).Text = "Demo mode"
         check.Box(1).Checked = True

@@ -33,10 +33,10 @@ Public Class Harris_Features_CPP
     Dim Harris_Features As IntPtr
     Public Sub New(ocvb As AlgorithmData)
                 setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Harris Threshold", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, "Harris Neighborhood", 1, 41, 21)
-        sliders.setupTrackBar3(ocvb,"Harris aperture", 1, 33, 21)
-        sliders.setupTrackBar4(ocvb,  "Harris Parameter", 1, 100, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Harris Threshold", 1, 100, 1)
+        sliders.setupTrackBar2("Harris Neighborhood", 1, 41, 21)
+        sliders.setupTrackBar3("Harris aperture", 1, 33, 21)
+        sliders.setupTrackBar4( "Harris Parameter", 1, 100, 1)
         
         ocvb.desc = "Use Harris feature detectors to identify interesting points."
 
@@ -80,7 +80,7 @@ Public Class Harris_Detector_CPP
     Public FeaturePoints As New List(Of cv.Point2f)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Harris qualityLevel", 1, 100, 2)
+        sliders.setupTrackBar1(ocvb, caller, "Harris qualityLevel", 1, 100, 2)
 
         ocvb.desc = "Use Harris detector to identify interesting points."
 

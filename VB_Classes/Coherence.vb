@@ -4,10 +4,10 @@ Public Class Coherence_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Coherence Sigma", 1, 15, 9)
-        sliders.setupTrackBar2(ocvb, "Coherence Blend", 1, 10, 10)
-        sliders.setupTrackBar3(ocvb, "Coherence str_sigma", 1, 15, 15)
-        sliders.setupTrackBar4(ocvb, "Coherence eigen kernel", 1, 31, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Coherence Sigma", 1, 15, 9)
+        sliders.setupTrackBar2("Coherence Blend", 1, 10, 10)
+        sliders.setupTrackBar3("Coherence str_sigma", 1, 15, 15)
+        sliders.setupTrackBar4("Coherence eigen kernel", 1, 31, 1)
         label1 = "Coherence - draw rectangle to apply"
         ocvb.desc = "Find lines that are artistically coherent in the image - Painterly"
     End Sub

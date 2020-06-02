@@ -9,14 +9,14 @@ Public Class Voxels_Basics_MT
     Public maxDepth As Double
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Display intermediate results"
         check.Box(0).Checked = True
 
         trim = New Depth_InRange(ocvb)
         trim.sliders.TrackBar2.Value = 5000
 
-        sliders.setupTrackBar1(ocvb, "Histogram Bins", 2, 200, 100)
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 2, 200, 100)
 
         grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 16

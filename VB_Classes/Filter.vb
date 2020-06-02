@@ -25,13 +25,13 @@ Public Class Filter_NormalizedKernel
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        radio.Setup(ocvb, 4)
+        radio.Setup(ocvb, caller, 4)
         radio.check(0).Text = "INF"
         radio.check(1).Text = "L1"
         radio.check(1).Checked = True
         radio.check(2).Text = "L2"
         radio.check(3).Text = "MinMax"
-        sliders.setupTrackBar1(ocvb, "Normalize alpha X10", 1, 100, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Normalize alpha X10", 1, 100, 10)
         ocvb.desc = "Create a normalized kernel and use it."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -63,7 +63,7 @@ Public Class Filter_Normalized2D
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Filter_Normalized2D kernel size", 1, 21, 3)
+        sliders.setupTrackBar1(ocvb, caller, "Filter_Normalized2D kernel size", 1, 21, 3)
         ocvb.desc = "Create and apply a normalized kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -82,13 +82,13 @@ Public Class Filter_SepFilter2D
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"
         check.Box(0).Checked = True
 
-        sliders.setupTrackBar1(ocvb, "Kernel X size", 1, 21, 5)
-        sliders.setupTrackBar2(ocvb, "Kernel Y size", 1, 21, 11)
-        sliders.setupTrackBar3(ocvb, "SepFilter2D Sigma X10", 0, 100, 17)
+        sliders.setupTrackBar1(ocvb, caller, "Kernel X size", 1, 21, 5)
+        sliders.setupTrackBar2("Kernel Y size", 1, 21, 11)
+        sliders.setupTrackBar3("SepFilter2D Sigma X10", 0, 100, 17)
         label1 = "Gaussian Blur result"
         ocvb.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
     End Sub

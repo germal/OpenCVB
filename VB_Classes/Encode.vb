@@ -3,8 +3,8 @@ Public Class Encode_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
-        sliders.setupTrackBar2(ocvb, "Encode Output Scaling", 1, 100, 7)
+        sliders.setupTrackBar1(ocvb, caller, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
+        sliders.setupTrackBar2("Encode Output Scaling", 1, 100, 7)
 
         ocvb.desc = "Error Level Analysis - to verify a jpg image has not been modified."
         label1 = "absDiff with original"
@@ -33,10 +33,10 @@ Public Class Encode_Options
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
-        sliders.setupTrackBar2(ocvb, "Encode Output Scaling", 1, 100, 85)
+        sliders.setupTrackBar1(ocvb, caller, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
+        sliders.setupTrackBar2("Encode Output Scaling", 1, 100, 85)
 
-        radio.Setup(ocvb, 6)
+        radio.Setup(ocvb, caller, 6)
         radio.check(0).Text = "JpegChromaQuality"
         radio.check(1).Text = "JpegLumaQuality"
         radio.check(2).Text = "JpegOptimize"

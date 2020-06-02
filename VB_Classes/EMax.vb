@@ -15,11 +15,11 @@ Public Class EMax_Basics
         grid.sliders.TrackBar1.Value = ocvb.color.Width / 2
         grid.sliders.TrackBar2.Value = ocvb.color.Height / 2
 
-        sliders.setupTrackBar1(ocvb, "EMax Number of Samples", 1, 200, 100)
-        sliders.setupTrackBar2(ocvb, "EMax Prediction Step Size", 1, 20, 5)
-        sliders.setupTrackBar3(ocvb, "EMax Sigma (spread)", 1, 100, 30)
+        sliders.setupTrackBar1(ocvb, caller, "EMax Number of Samples", 1, 200, 100)
+        sliders.setupTrackBar2("EMax Prediction Step Size", 1, 20, 5)
+        sliders.setupTrackBar3("EMax Sigma (spread)", 1, 100, 30)
 
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "EMax matrix type Spherical"
         radio.check(1).Text = "EMax matrix type Diagonal"
         radio.check(2).Text = "EMax matrix type Generic"

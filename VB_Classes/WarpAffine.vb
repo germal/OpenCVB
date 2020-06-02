@@ -91,9 +91,9 @@ Public Class WarpAffine_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Angle", 0, 360, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Angle", 0, 360, 10)
 
-        SetInterpolationRadioButtons(ocvb, radio, "WarpAffine")
+        SetInterpolationRadioButtons(ocvb, caller, radio, "WarpAffine")
 
         ocvb.desc = "Use WarpAffine to transform input images."
     End Sub

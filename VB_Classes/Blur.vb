@@ -4,7 +4,7 @@ Public Class Blur_Gaussian
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
+        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 32, 5)
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -20,7 +20,7 @@ Public Class Blur_Gaussian_CS
     Dim CS_BlurGaussian As New CS_BlurGaussian
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
+        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 32, 5)
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -35,7 +35,7 @@ Public Class Blur_Median_CS
     Dim CS_BlurMedian As New CS_BlurMedian
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
+        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 32, 5)
         ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -49,7 +49,7 @@ Public Class Blur_Homogeneous
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
+        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 32, 5)
         ocvb.desc = "Smooth each pixel with a kernel of 1's of different sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -66,7 +66,7 @@ Public Class Blur_Median
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
+        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 32, 5)
         ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -82,7 +82,7 @@ Public Class Blur_Bilateral
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Kernel Size", 1, 32, 5)
+        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 32, 5)
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

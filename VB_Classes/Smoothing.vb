@@ -43,7 +43,7 @@ Public Class Smoothing_Exterior
 		hull = New Hull_Basics(ocvb)
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 
-		sliders.setupTrackBar1(ocvb, "Smoothing iterations", 1, 20, 10)
+		sliders.setupTrackBar1(ocvb, caller, "Smoothing iterations", 1, 20, 10)
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
@@ -116,8 +116,8 @@ Public Class Smoothing_Interior
 		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.sliders.TrackBar1.Value = 16
 
-		sliders.setupTrackBar1(ocvb, "Smoothing iterations", 1, 20, 1)
-		sliders.setupTrackBar2(ocvb, "Smoothing tension X100", 1, 100, 50)
+		sliders.setupTrackBar1(ocvb, caller, "Smoothing iterations", 1, 20, 1)
+		sliders.setupTrackBar2("Smoothing tension X100", 1, 100, 50)
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""

@@ -21,8 +21,8 @@ Public Class Area_MinTriangle_CPP
     End Sub
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Area Number of Points", 1, 30, 5)
-        sliders.setupTrackBar2(ocvb, "Area size", 10, 300, 200)
+        sliders.setupTrackBar1(ocvb, caller, "Area Number of Points", 1, 30, 5)
+        sliders.setupTrackBar2("Area size", 10, 300, 200)
         setup(ocvb)
 
         ocvb.desc = "Find minimum containing triangle for a set of points."
@@ -69,8 +69,8 @@ Public Class Area_MinRect
     End Sub
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Area Number of Points", 1, 200, 5)
-        sliders.setupTrackBar2(ocvb, "Area size", 10, 300, 200)
+        sliders.setupTrackBar1(ocvb, caller, "Area Number of Points", 1, 200, 5)
+        sliders.setupTrackBar2("Area size", 10, 300, 200)
         setup(ocvb)
 
         ocvb.desc = "Find minimum containing rectangle for a set of points."

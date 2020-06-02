@@ -9,10 +9,10 @@ Public Class Featureless_Basics_MT
     Public objectSize As New List(Of Int32)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "FeatureLess rho", 1, 100, 1)
-        sliders.setupTrackBar2(ocvb, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3(ocvb, "FeatureLess threshold", 1, 100, 3)
-        sliders.setupTrackBar4(ocvb, "FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
+        sliders.setupTrackBar1(ocvb, caller, "FeatureLess rho", 1, 100, 1)
+        sliders.setupTrackBar2("FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
+        sliders.setupTrackBar3("FeatureLess threshold", 1, 100, 3)
+        sliders.setupTrackBar4("FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
 
         edges = New Edges_Canny(ocvb)
 
@@ -80,7 +80,7 @@ Public Class FeatureLess_Prediction
     Dim fLess As Featureless_Basics_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "FeatureLess Resize Percent", 1, 100, 1)
+        sliders.setupTrackBar1(ocvb, caller, "FeatureLess Resize Percent", 1, 100, 1)
 
         fLess = New Featureless_Basics_MT(ocvb)
 

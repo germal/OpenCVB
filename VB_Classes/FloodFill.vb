@@ -17,10 +17,10 @@ Public Class FloodFill_Basics
     End Class
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 5000, 2500)
-        sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar3(ocvb, "FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar4(ocvb, "Step Size", 1, ocvb.color.cols / 2, 20)
+        sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 5000, 2500)
+        sliders.setupTrackBar2("FloodFill LoDiff", 1, 255, 5)
+        sliders.setupTrackBar3("FloodFill HiDiff", 1, 255, 5)
+        sliders.setupTrackBar4("Step Size", 1, ocvb.color.cols / 2, 20)
 
         label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."
@@ -82,9 +82,9 @@ Public Class FloodFill_Top16_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 5000, 2000)
-        sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar3(ocvb, "FloodFill HiDiff", 1, 255, 5)
+        sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 5000, 2000)
+        sliders.setupTrackBar2("FloodFill LoDiff", 1, 255, 5)
+        sliders.setupTrackBar3("FloodFill HiDiff", 1, 255, 5)
 
         ocvb.desc = "Use floodfill to build image segments with a grayscale image."
     End Sub
@@ -254,7 +254,7 @@ Public Class FloodFill_RelativeRange
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         fBasics = New FloodFill_Basics(ocvb)
-        check.Setup(ocvb, 3)
+        check.Setup(ocvb, caller, 3)
         check.Box(0).Text = "Use Fixed range - when off, it means use relative range "
         check.Box(1).Text = "Use 4 nearest pixels (Link4) - when off, it means use 8 nearest pixels (Link8)"
         check.Box(1).Checked = True ' link4 produces better results.
@@ -286,7 +286,7 @@ Public Class FloodFill_Top16
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
 
         flood = New FloodFill_Basics(ocvb)
@@ -337,10 +337,10 @@ Public Class FloodFill_Projection
     Public minFloodSize As Integer
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "FloodFill Minimum Size", 1, 5000, 2500)
-        sliders.setupTrackBar2(ocvb, "FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar3(ocvb, "FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar4(ocvb, "Step Size", 1, ocvb.color.cols / 2, 20)
+        sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 5000, 2500)
+        sliders.setupTrackBar2("FloodFill LoDiff", 1, 255, 5)
+        sliders.setupTrackBar3("FloodFill HiDiff", 1, 255, 5)
+        sliders.setupTrackBar4("Step Size", 1, ocvb.color.cols / 2, 20)
 
         label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"

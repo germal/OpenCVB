@@ -9,7 +9,7 @@ Public Class Random_Points
     Public plotPoints As Boolean = False
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Random Pixel Count", 1, ocvb.color.cols * ocvb.color.Rows, 20)
+        sliders.setupTrackBar1(ocvb, caller, "Random Pixel Count", 1, ocvb.color.cols * ocvb.color.Rows, 20)
 
         ReDim Points(sliders.TrackBar1.Value - 1)
         ReDim Points2f(sliders.TrackBar1.Value - 1)
@@ -105,10 +105,10 @@ Public Class Random_NormalDist
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Random_NormalDist Blue Mean", 0, 255, 25)
-        sliders.setupTrackBar2(ocvb, "Random_NormalDist Green Mean", 0, 255, 127)
-        sliders.setupTrackBar3(ocvb, "Random_NormalDist Red Mean", 0, 255, 180)
-        sliders.setupTrackBar4(ocvb, "Random_NormalDist Stdev", 0, 255, 50)
+        sliders.setupTrackBar1(ocvb, caller, "Random_NormalDist Blue Mean", 0, 255, 25)
+        sliders.setupTrackBar2("Random_NormalDist Green Mean", 0, 255, 127)
+        sliders.setupTrackBar3("Random_NormalDist Red Mean", 0, 255, 180)
+        sliders.setupTrackBar4("Random_NormalDist Stdev", 0, 255, 50)
         ocvb.desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

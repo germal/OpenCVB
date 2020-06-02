@@ -5,7 +5,7 @@ Public Class Contours_Basics
     Public rotatedRect As Draw_rotatedRectangles
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        radio.Setup(ocvb, 5)
+        radio.Setup(ocvb, caller, 5)
         radio.Text = "Retrieval Mode Options"
         radio.check(0).Text = "CComp"
         radio.check(1).Text = "External"
@@ -15,7 +15,7 @@ Public Class Contours_Basics
         radio.check(4).Checked = True
         If ocvb.parms.ShowOptions Then radio.Show()
 
-        radio1.Setup(ocvb, 4)
+        radio1.Setup(ocvb, caller, 4)
         radio1.Text = "ContourApproximation Mode"
         radio1.check(0).Text = "ApproxNone"
         radio1.check(1).Text = "ApproxSimple"

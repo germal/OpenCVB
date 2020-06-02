@@ -43,7 +43,7 @@ Public Class Draw_rectangles
     Public drawRotatedRectangles As Boolean
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Rectangle Count", 1, 255, 3)
+        sliders.setupTrackBar1(ocvb, caller, "Rectangle Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of rotated rectangles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -77,8 +77,8 @@ Public Class Draw_Noise
     Public noiseMask As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Noise Count", 1, 1000, 100)
-        sliders.setupTrackBar2(ocvb, "Noise Width", 1, 10, 3)
+        sliders.setupTrackBar1(ocvb, caller, "Noise Count", 1, 1000, 100)
+        sliders.setupTrackBar2("Noise Width", 1, 10, 3)
         ocvb.desc = "Add Noise to the color image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -123,7 +123,7 @@ Public Class Draw_Ellipses
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Ellipse Count", 1, 255, 3)
+        sliders.setupTrackBar1(ocvb, caller, "Ellipse Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of ellipses."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -147,7 +147,7 @@ Public Class Draw_Circles
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Circle Count", 1, 255, 3)
+        sliders.setupTrackBar1(ocvb, caller, "Circle Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of circles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -170,7 +170,7 @@ Public Class Draw_Line
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Line Count", 1, 255, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Line Count", 1, 255, 1)
         ocvb.desc = "Draw the requested number of Lines."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -192,11 +192,11 @@ Public Class Draw_Polygon
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Poly Count", 1, 255, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Poly Count", 1, 255, 1)
         ocvb.desc = "Draw Polygon figures"
         label2 = "Convex Hull for the same polygon"
 
-        radio.Setup(ocvb, 2) ' ask for 2 radio buttons
+        radio.Setup(ocvb, caller, 2) ' ask for 2 radio buttons
         radio.check(0).Text = "Polygon Outline"
         radio.check(1).Text = "Polygon Filled"
         radio.check(0).Checked = True
@@ -289,12 +289,12 @@ Public Class Draw_SymmetricalShapes
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Number of points", 200, 1000, 500)
-        sliders.setupTrackBar2(ocvb, "Radius 1", 1, ocvb.color.Rows / 2, ocvb.color.Rows / 4)
-        sliders.setupTrackBar3(ocvb, "Radius 2", 1, ocvb.color.Rows / 2, ocvb.color.Rows / 8)
-        sliders.setupTrackBar4(ocvb, "nGenPer", 1, 500, 100)
+        sliders.setupTrackBar1(ocvb, caller, "Number of points", 200, 1000, 500)
+        sliders.setupTrackBar2("Radius 1", 1, ocvb.color.Rows / 2, ocvb.color.Rows / 4)
+        sliders.setupTrackBar3("Radius 2", 1, ocvb.color.Rows / 2, ocvb.color.Rows / 8)
+        sliders.setupTrackBar4("nGenPer", 1, 500, 100)
 
-        check.Setup(ocvb, 5)
+        check.Setup(ocvb, caller, 5)
         check.Box(0).Text = "Symmetric Ripple"
         check.Box(1).Text = "Only Regular Shapes"
         check.Box(2).Text = "Filled Shapes"
@@ -450,8 +450,8 @@ Public Class Draw_Arc
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(7 - 1)
 
-        sliders.setupTrackBar1(ocvb, "Clearance from image edge (margin size)", 0, ocvb.color.Width / 4, ocvb.color.Width / 8)
-        radio.Setup(ocvb, 3)
+        sliders.setupTrackBar1(ocvb, caller, "Clearance from image edge (margin size)", 0, ocvb.color.Width / 4, ocvb.color.Width / 8)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Draw Full Ellipse"
         radio.check(1).Text = "Draw Filled Arc"
         radio.check(2).Text = "Draw Arc"

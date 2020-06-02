@@ -85,8 +85,8 @@ Public Class DNN_Basics
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "dnn Scale Factor", 1, 10000, 78)
-        sliders.setupTrackBar2(ocvb, "dnn MeanVal", 1, 255, 127)
+        sliders.setupTrackBar1(ocvb, caller, "dnn Scale Factor", 1, 10000, 78)
+        sliders.setupTrackBar2("dnn MeanVal", 1, 255, 127)
 
         dnnWidth = ocvb.color.Height ' height is always smaller than width...
         dnnHeight = ocvb.color.Height

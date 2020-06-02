@@ -3,9 +3,9 @@ Public Class Math_Subtract
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Red", 0, 255, 255)
-        sliders.setupTrackBar2(ocvb, "Green", 0, 255, 255)
-        sliders.setupTrackBar3(ocvb, "Blue", 0, 255, 255)
+        sliders.setupTrackBar1(ocvb, caller, "Red", 0, 255, 255)
+        sliders.setupTrackBar2("Green", 0, 255, 255)
+        sliders.setupTrackBar3("Blue", 0, 255, 255)
         ocvb.desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -49,7 +49,7 @@ Public Class Math_Median_CDF
     Public bins As Int32 = 10
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Histogram Bins", 4, 1000, 100)
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 4, 1000, 100)
         ocvb.desc = "Compute the src image median"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -3,10 +3,10 @@ Public Class DCT_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Remove Frequencies < x", 0, 100, 1)
-        sliders.setupTrackBar2(ocvb, "Run Length Minimum", 1, 100, 15)
+        sliders.setupTrackBar1(ocvb, caller, "Remove Frequencies < x", 0, 100, 1)
+        sliders.setupTrackBar2("Run Length Minimum", 1, 100, 15)
         sliders.GroupBox2.Visible = False
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "DCT Flags None"
         radio.check(1).Text = "DCT Flags Row"
         radio.check(2).Text = "DCT Flags Inverse"

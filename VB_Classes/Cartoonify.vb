@@ -4,10 +4,10 @@ Public Class CartoonifyImage_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Cartoon Median Blur kernel", 1, 21, 7)
-        sliders.setupTrackBar2(ocvb, "Cartoon Median Blur kernel 2", 1, 21, 3)
-        sliders.setupTrackBar3(ocvb, "Cartoon threshold", 1, 255, 80)
-        sliders.setupTrackBar4(ocvb, "Cartoon Laplacian kernel", 1, 21, 5)
+        sliders.setupTrackBar1(ocvb, caller, "Cartoon Median Blur kernel", 1, 21, 7)
+        sliders.setupTrackBar2("Cartoon Median Blur kernel 2", 1, 21, 3)
+        sliders.setupTrackBar3("Cartoon threshold", 1, 255, 80)
+        sliders.setupTrackBar4("Cartoon Laplacian kernel", 1, 21, 5)
         label1 = "Mask for Cartoon"
         label2 = "Cartoonify Result"
         ocvb.desc = "Create a cartoon from a color image - Painterly Effect"

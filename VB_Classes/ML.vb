@@ -98,7 +98,7 @@ Public Class ML_FillRGBDepth
         setCaller(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "ML Min Learn Count", 2, 100, 5)
+        sliders.setupTrackBar1(ocvb, caller, "ML Min Learn Count", 2, 100, 5)
 
         shadow = New Depth_Holes(ocvb)
         shadow.sliders.TrackBar1.Value = 3
@@ -131,7 +131,7 @@ Public Class ML_DepthFromColor_MT
         dilate = New DilateErode_Basics(ocvb)
         dilate.sliders.TrackBar2.Value = 2
 
-        sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 500, 5000, 1000)
+        sliders.setupTrackBar1(ocvb, caller, "Prediction Max Depth", 500, 5000, 1000)
 
         grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 16
@@ -199,7 +199,7 @@ Public Class ML_DepthFromColor
 
         shadow = New Depth_Holes(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 1000, 5000, 1500)
+        sliders.setupTrackBar1(ocvb, caller, "Prediction Max Depth", 1000, 5000, 1500)
 
         resized = New Resize_Percentage(ocvb)
         resized.sliders.TrackBar1.Value = 2 ' 2% of the image.
@@ -276,7 +276,7 @@ Public Class ML_DepthFromXYColor
 
         shadow = New Depth_Holes(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 1000, 5000, 1500)
+        sliders.setupTrackBar1(ocvb, caller, "Prediction Max Depth", 1000, 5000, 1500)
 
         resized = New Resize_Percentage(ocvb)
         resized.sliders.TrackBar1.Value = 2
@@ -369,7 +369,7 @@ Public Class ML_EdgeDepth
         dilate = New DilateErode_Basics(ocvb)
         dilate.sliders.TrackBar2.Value = 5
 
-        sliders.setupTrackBar1(ocvb, "Prediction Max Depth", 500, 5000, 1000)
+        sliders.setupTrackBar1(ocvb, caller, "Prediction Max Depth", 500, 5000, 1000)
 
         grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 16

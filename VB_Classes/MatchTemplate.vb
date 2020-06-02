@@ -13,7 +13,7 @@ Public Class MatchTemplate_Basics
         flow = New Font_FlowText(ocvb)
         flow.result1or2 = RESULT1
 
-        radio.Setup(ocvb, 6)
+        radio.Setup(ocvb, caller, 6)
         radio.check(0).Text = "CCoeff"
         radio.check(1).Text = "CCoeffNormed"
         radio.check(2).Text = "CCorr"
@@ -21,7 +21,7 @@ Public Class MatchTemplate_Basics
         radio.check(4).Text = "SqDiff"
         radio.check(5).Text = "SqDiffNormed"
         radio.check(1).Checked = True
-        sliders.setupTrackBar1(ocvb, "Sample Size", 2, 10000, 100)
+        sliders.setupTrackBar1(ocvb, caller, "Sample Size", 2, 10000, 100)
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -110,7 +110,7 @@ Public Class MatchTemplate_DrawRect
     Public saveRect As cv.Rect
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        radio.Setup(ocvb, 6)
+        radio.Setup(ocvb, caller, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
         Next

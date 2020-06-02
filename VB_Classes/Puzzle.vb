@@ -280,13 +280,13 @@ Public Class Puzzle_Solver
         setCaller(ocvb)
         puzzle = New Puzzle_Basics(ocvb)
 
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "256x180 tile - Easy Puzzle"
         radio.check(1).Text = "128x90  tile - Medium Puzzle"
         radio.check(2).Text = "64x90   tile - Hard Puzzle"
         radio.check(0).Checked = True
 
-        check.Setup(ocvb, 3)
+        check.Setup(ocvb, caller, 3)
         check.Box(0).Text = "Reshuffle pieces"
         check.Box(1).Text = "Show only the poor correlation coefficients"
         check.Box(2).Text = "Clean display (no grid or correlations)"

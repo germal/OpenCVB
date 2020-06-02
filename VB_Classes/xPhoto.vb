@@ -70,10 +70,10 @@ Public Class xPhoto_OilPaint_CPP
     Dim xPhoto_OilPaint As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "xPhoto Dynamic Ratio", 1, 127, 7)
-        sliders.setupTrackBar2(ocvb, "xPhoto Block Size", 1, 100, 3)
+        sliders.setupTrackBar1(ocvb, caller, "xPhoto Dynamic Ratio", 1, 127, 7)
+        sliders.setupTrackBar2("xPhoto Block Size", 1, 100, 3)
 
-        radio.Setup(ocvb, 5)
+        radio.Setup(ocvb, caller, 5)
         radio.check(0).Text = "BGR2GRAY"
         radio.check(1).Text = "BGR2HSV"
         radio.check(2).Text = "BGR2YUV  "

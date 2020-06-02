@@ -88,8 +88,8 @@ Public Class KAZE_LeftAligned_CS
     Dim CS_KazeRight As New CS_Classes.Kaze_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Max number of points to match", 1, 300, 100)
-        sliders.setupTrackBar2(ocvb, "When matching, max possible distance", 1, 200, 100)
+        sliders.setupTrackBar1(ocvb, caller, "Max number of points to match", 1, 300, 100)
+        sliders.setupTrackBar2("When matching, max possible distance", 1, 200, 100)
 
         ocvb.desc = "Match keypoints in the left and right images but display it as movement in the right image."
     End Sub

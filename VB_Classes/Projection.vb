@@ -97,8 +97,8 @@ Public Class Projection_ColorizeMat
         palette.color2 = cv.Scalar.Blue
         palette.frameModulo = 1
 
-        sliders.setupTrackBar1(ocvb, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
-        sliders.setupTrackBar2(ocvb, "Threshold for histogram count", 0, 100, 3)
+        sliders.setupTrackBar1(ocvb, caller, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
+        sliders.setupTrackBar2("Threshold for histogram count", 0, 100, 3)
 
         ocvb.desc = "Create the colorizeMat's used for projections"
     End Sub
@@ -343,7 +343,7 @@ Public Class Projection_Objects
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "epsilon for GroupRectangles X100", 0, 200, 80)
+        sliders.setupTrackBar1(ocvb, caller, "epsilon for GroupRectangles X100", 0, 200, 80)
 
         gravity = New Projection_Gravity_CPP(ocvb)
 

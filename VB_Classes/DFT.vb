@@ -127,10 +127,10 @@ Public Class DFT_ButterworthFilter_MT
     Public dft As DFT_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "DFT B Filter - Radius", 1, ocvb.color.Rows, ocvb.color.Rows)
-        sliders.setupTrackBar2(ocvb, "DFT B Filter - Order", 1, ocvb.color.Rows, 2)
+        sliders.setupTrackBar1(ocvb, caller, "DFT B Filter - Radius", 1, ocvb.color.Rows, ocvb.color.Rows)
+        sliders.setupTrackBar2("DFT B Filter - Order", 1, ocvb.color.Rows, 2)
 
-        radio.Setup(ocvb, 6)
+        radio.Setup(ocvb, caller, 6)
         radio.check(0).Text = "DFT Flags ComplexOutput"
         radio.check(1).Text = "DFT Flags Inverse"
         radio.check(2).Text = "DFT Flags None"

@@ -155,9 +155,9 @@ Public Class CellAuto_Basics
         i18.Add("11111010 Rule 250")
 
         Dim label = "The 18 most interesting automata from the first 256 in 'New Kind of Science'" + vbCrLf + "The input combinations are: " + inputCombo
-        combo.Setup(ocvb, label + vbCrLf + "output below:", i18)
+        combo.Setup(ocvb, caller, label + vbCrLf + "output below:", i18)
 
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Rotate through the different rules"
         check.Box(0).Checked = True
 
@@ -258,7 +258,7 @@ Public Class CellAuto_All256
         cell = New CellAuto_Basics(ocvb)
         cell.combo.Visible = False ' won't need this...
 
-        sliders.setupTrackBar1(ocvb, "Current Rule", 0, 255, 0)
+        sliders.setupTrackBar1(ocvb, caller, "Current Rule", 0, 255, 0)
         ocvb.desc = "Run through all 256 combinations of outcomes"
     End Sub
     Private Function createOutcome(val As Integer) As String

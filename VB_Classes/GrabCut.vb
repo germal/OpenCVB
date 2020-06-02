@@ -7,8 +7,8 @@ Public Class GrabCut_Basics
         setCaller(ocvb)
         contours = New Contours_Depth(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "Erode iterations", 1, 20, 3)
-        sliders.setupTrackBar2(ocvb, "Erode kernel size", 1, 21, 3)
+        sliders.setupTrackBar1(ocvb, caller, "Erode iterations", 1, 20, 3)
+        sliders.setupTrackBar2("Erode kernel size", 1, 21, 3)
 
         ocvb.desc = "Use grabcut to isolate what is in the foreground and background.  "
     End Sub

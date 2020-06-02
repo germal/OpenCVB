@@ -8,7 +8,7 @@ Public Class Kalman_Basics
 
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        check.Setup(ocvb, 1)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Turn Kalman filtering on" + If(ocvb.caller = "", "", " in " + ocvb.caller)
         check.Box(0).Checked = True
 

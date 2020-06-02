@@ -7,9 +7,9 @@ Public Class BlockMatching_Basics
         setCaller(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "Blockmatch max disparity", 2, 5, 2)
-        sliders.setupTrackBar2(ocvb, "Blockmatch block size", 5, 255, 15)
-        sliders.setupTrackBar3(ocvb, "Blockmatch distance factor (approx) X1000", 1, 100, 20)
+        sliders.setupTrackBar1(ocvb, caller, "Blockmatch max disparity", 2, 5, 2)
+        sliders.setupTrackBar2("Blockmatch block size", 5, 255, 15)
+        sliders.setupTrackBar3("Blockmatch distance factor (approx) X1000", 1, 100, 20)
         ocvb.desc = "Use OpenCV's block matching on left and right views"
         label1 = "Block matching disparity colorized like depth"
         label2 = "Right Image (used with left image)"

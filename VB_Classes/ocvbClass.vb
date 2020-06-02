@@ -38,6 +38,7 @@ Public Class ocvbClass : Implements IDisposable
     Public label1 As String
     Public label2 As String
     Public msRNG As New System.Random
+    Public caller As String = ""
     Dim algorithm As Object
     Public scalarColors(255) As cv.Scalar
     Public rColors(255) As cv.Vec3b
@@ -50,7 +51,7 @@ Public Class ocvbClass : Implements IDisposable
             ocvb.caller = Me.GetType.Name
         Else
             standalone = False
-            ocvb.caller += "/" + Me.GetType.Name
+            caller += Me.GetType.Name
         End If
     End Sub
     Public Function validateRect(r As cv.Rect) As cv.Rect

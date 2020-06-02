@@ -52,7 +52,7 @@ Public Class FLANN_Basics
         setCaller(ocvb)
         random = New Random_Points(ocvb)
 
-        sliders.setupTrackBar1(ocvb, "Query Count", 1, 10000, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Query Count", 1, 10000, 10)
 
         ocvb.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
         label1 = "Yellow is query, Nearest points blue"

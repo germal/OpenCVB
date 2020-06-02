@@ -24,7 +24,7 @@ Public Class Salience_Basics_CPP
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders = New OptionsSliders
-        sliders.setupTrackBar1(ocvb, "Salience numScales", 1, 6, 6)
+        sliders.setupTrackBar1(ocvb, caller, "Salience numScales", 1, 6, 6)
 
         salience = Salience_Open()
         ocvb.desc = "Show results of Salience algorithm when using C++"

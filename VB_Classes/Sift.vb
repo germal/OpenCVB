@@ -11,12 +11,12 @@ Public Class Sift_Basics_CS
         setCaller(ocvb)
         fisheye = New FishEye_Rectified(ocvb)
 
-        radio.Setup(ocvb, 2)
+        radio.Setup(ocvb, caller, 2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
 
-        sliders.setupTrackBar1(ocvb, "Points to Match", 1, 1000, 200)
+        sliders.setupTrackBar1(ocvb, caller, "Points to Match", 1, 1000, 200)
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub

@@ -4,7 +4,7 @@ Public Class PCA_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Retained Variance", 1, 100, 95)
+        sliders.setupTrackBar1(ocvb, caller, "Retained Variance", 1, 100, 95)
         ocvb.desc = "Reconstruct a video stream as a composite of X images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

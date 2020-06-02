@@ -30,7 +30,7 @@ Public Class OpenCVGL_Image_CPP
         imu = New IMU_Basics(ocvb)
 
         If ocvb.parms.testAllRunning = False Then
-            setOpenGLsliders(ocvb, sliders, sliders1, sliders2, sliders3)
+            setOpenGLsliders(ocvb, caller, sliders, sliders1, sliders2, sliders3)
             sliders2.TrackBar3.Value = -10 ' eye.z
             sliders.TrackBar1.Value = 30 ' FOV
             sliders.TrackBar2.Value = 0 ' Yaw

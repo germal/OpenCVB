@@ -63,7 +63,7 @@ Public Class Blob_Detector_CS
         setCaller(ocvb)
         input = New Blob_Input(ocvb)
         input.updateFrequency = 1 ' it is pretty fast but sloppy...
-        check.Setup(ocvb, 5)
+        check.Setup(ocvb, caller, 5)
         check.Box(0).Text = "FilterByArea"
         check.Box(1).Text = "FilterByCircularity"
         check.Box(2).Text = "FilterByConvexity"
@@ -71,9 +71,9 @@ Public Class Blob_Detector_CS
         check.Box(4).Text = "FilterByColor"
         check.Box(4).Checked = True ' filter by color...
 
-        sliders.setupTrackBar1(ocvb, "min Threshold", 0, 255, 100)
-        sliders.setupTrackBar2(ocvb, "max Threshold", 0, 255, 255)
-        sliders.setupTrackBar3(ocvb, "Threshold Step", 1, 50, 5)
+        sliders.setupTrackBar1(ocvb, caller, "min Threshold", 0, 255, 100)
+        sliders.setupTrackBar2("max Threshold", 0, 255, 255)
+        sliders.setupTrackBar3("Threshold Step", 1, 50, 5)
 
         label1 = "Blob_Detector_CS Input"
     End Sub

@@ -112,7 +112,7 @@ Public Class Delaunay_GoodFeatures
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         features = New Features_GoodFeatures(ocvb)
-        features.sliders.setupTrackBar4(ocvb, "Image mix percentage X100", 0, 100, 50)
+        features.sliders.setupTrackBar4("Image mix percentage X100", 0, 100, 50)
         label2 = "Voronoi facets of delauney good features"
         ocvb.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
@@ -198,7 +198,7 @@ Public Class Delauney_Coverage
         setCaller(ocvb)
         delauney = New Delauney_Subdiv2D(ocvb)
         delauney.updateFrequency = 1
-        sliders.setupTrackBar1(ocvb, "Clear image after x frames", 1, 100, 50)
+        sliders.setupTrackBar1(ocvb, caller, "Clear image after x frames", 1, 100, 50)
         label1 = "Coverage of space"
         ocvb.desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
     End Sub

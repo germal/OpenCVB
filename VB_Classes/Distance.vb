@@ -5,7 +5,7 @@ Public Class Distance_Basics
     Dim foreground As kMeans_Depth_FG_BG
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        radio.Setup(ocvb, 3)
+        radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "C"
         radio.check(1).Text = "L1"
         radio.check(2).Text = "L2"

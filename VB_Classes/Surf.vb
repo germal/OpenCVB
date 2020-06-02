@@ -13,12 +13,12 @@ Public Class Surf_Basics_CS
         setCaller(ocvb)
         fisheye = New FishEye_Rectified(ocvb)
 
-        radio.Setup(ocvb, 2)
+        radio.Setup(ocvb, caller, 2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
 
-        sliders.setupTrackBar1(ocvb, "Hessian threshold", 1, 5000, 2000)
+        sliders.setupTrackBar1(ocvb, caller, "Hessian threshold", 1, 5000, 2000)
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
@@ -82,7 +82,7 @@ Public Class Surf_DrawMatchManual_CS
         surf = New Surf_Basics_CS(ocvb)
         surf.CS_SurfBasics.drawPoints = False
 
-        sliders.setupTrackBar1(ocvb, "Surf Vertical Range to Search", 0, 50, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Surf Vertical Range to Search", 0, 50, 10)
 
         ocvb.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub

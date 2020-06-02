@@ -6,9 +6,9 @@ Public Class Palette_Color
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "blue", 0, 255, msRNG.Next(0, 255))
-        sliders.setupTrackBar2(ocvb, "green", 0, 255, msRNG.Next(0, 255))
-        sliders.setupTrackBar3(ocvb, "red", 0, 255, msRNG.Next(0, 255))
+        sliders.setupTrackBar1(ocvb, caller, "blue", 0, 255, msRNG.Next(0, 255))
+        sliders.setupTrackBar2("green", 0, 255, msRNG.Next(0, 255))
+        sliders.setupTrackBar3("red", 0, 255, msRNG.Next(0, 255))
         ocvb.desc = "Define a color using sliders."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -30,9 +30,9 @@ Public Class Palette_LinearPolar
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         ocvb.desc = "Use LinearPolar to create gradient image"
-        SetInterpolationRadioButtons(ocvb, radio, "LinearPolar")
+        SetInterpolationRadioButtons(ocvb, caller, radio, "LinearPolar")
 
-        sliders.setupTrackBar1(ocvb, "LinearPolar radius", 0, ocvb.color.cols, ocvb.color.cols / 2)
+        sliders.setupTrackBar1(ocvb, caller, "LinearPolar radius", 0, ocvb.color.cols, ocvb.color.cols / 2)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1.SetTo(0)
@@ -106,7 +106,7 @@ Public Class Palette_Map
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders = New OptionsSliders
-        sliders.setupTrackBar1(ocvb, "inRange offset", 1, 100, 10)
+        sliders.setupTrackBar1(ocvb, caller, "inRange offset", 1, 100, 10)
         ocvb.desc = "Map colors to different palette - Painterly Effect."
         label1 = "Reduced Colors"
     End Sub
@@ -243,7 +243,7 @@ Public Class Palette_BuildGradientColorMap
     Public gradientColorMap As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Number of color transitions (Used only with Random)", 1, 30, 5)
+        sliders.setupTrackBar1(ocvb, caller, "Number of color transitions (Used only with Random)", 1, 30, 5)
 
         label2 = "Generated colormap"
         ocvb.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
@@ -281,7 +281,7 @@ Public Class Palette_ColorMap
         setCaller(ocvb)
         gradMap = New Palette_BuildGradientColorMap(ocvb)
 
-        radio.Setup(ocvb, 21)
+        radio.Setup(ocvb, caller, 21)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = mapNames(i)
         Next

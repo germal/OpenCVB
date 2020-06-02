@@ -5,7 +5,7 @@ Public Class BRISK_Basics
     Public features As New List(Of cv.Point2f)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "BRISK Radius Threshold", 1, 100, 50)
+        sliders.setupTrackBar1(ocvb, caller, "BRISK Radius Threshold", 1, 100, 50)
         ocvb.desc = "Detect features with BRISK"
         Brisk = cv.BRISK.Create()
     End Sub

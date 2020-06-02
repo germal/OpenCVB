@@ -4,7 +4,7 @@ Public Class Diff_Basics
     Dim lastFrame As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Diff - Color Threshold", 1, 255, 5)
+        sliders.setupTrackBar1(ocvb, caller, "Diff - Color Threshold", 1, 255, 5)
         label1 = "Stable Gray Color"
         label2 = "Unstable Color mask"
         ocvb.desc = "Capture an image and compare it to previous frame using absDiff and threshold"

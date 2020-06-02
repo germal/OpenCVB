@@ -8,20 +8,20 @@ Public Class MSER_Basics
     Dim mser As cv.MSER
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders2.setupTrackBar1(ocvb, "MSER Edge Blursize", 1, 20, 5)
+        sliders2.setupTrackBar1(ocvb, caller, "MSER Edge Blursize", 1, 20, 5)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
-        sliders1.setupTrackBar1(ocvb, "Min Diversity", 0, 100, 20)
-        sliders1.setupTrackBar2(ocvb, "MSER Max Evolution", 1, 1000, 200)
-        sliders1.setupTrackBar3(ocvb, "MSER Area Threshold", 1, 101, 101)
-        sliders1.setupTrackBar4(ocvb, "MSER Min Margin", 1, 100, 3)
+        sliders1.setupTrackBar1(ocvb, caller, "Min Diversity", 0, 100, 20)
+        sliders1.setupTrackBar2("MSER Max Evolution", 1, 1000, 200)
+        sliders1.setupTrackBar3("MSER Area Threshold", 1, 101, 101)
+        sliders1.setupTrackBar4("MSER Min Margin", 1, 100, 3)
 
-        sliders.setupTrackBar1(ocvb, "MSER Delta", 1, 100, 5)
-        sliders.setupTrackBar2(ocvb, "MSER Min Area", 1, 10000, 60)
-        sliders.setupTrackBar3(ocvb, "MSER Max Area", 1000, 100000, 100000)
-        sliders.setupTrackBar4(ocvb, "MSER Max Variation", 1, 100, 25)
+        sliders.setupTrackBar1(ocvb, caller, "MSER Delta", 1, 100, 5)
+        sliders.setupTrackBar2("MSER Min Area", 1, 10000, 60)
+        sliders.setupTrackBar3("MSER Max Area", 1000, 100000, 100000)
+        sliders.setupTrackBar4("MSER Max Variation", 1, 100, 25)
 
-        check.Setup(ocvb, 2)
+        check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Pass2Only"
         check.Box(1).Text = "Use Grayscale, not color input (default)"
         check.Box(0).Checked = True

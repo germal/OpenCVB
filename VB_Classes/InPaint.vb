@@ -6,9 +6,9 @@ Public Class InPaint_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Thickness", 1, 25, 2)
+        sliders.setupTrackBar1(ocvb, caller, "Thickness", 1, 25, 2)
 
-        radio.Setup(ocvb, 2)
+        radio.Setup(ocvb, caller, 2)
         radio.check(0).Text = "TELEA"
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True
@@ -41,7 +41,7 @@ Public Class InPaint_Noise
         setCaller(ocvb)
         noise = New Draw_Noise(ocvb)
 
-        radio.Setup(ocvb, 2)
+        radio.Setup(ocvb, caller, 2)
         radio.check(0).Text = "TELEA"
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True

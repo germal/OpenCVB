@@ -5,9 +5,9 @@ Public Class Corners_Harris
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Corner block size", 1, 21, 3)
-        sliders.setupTrackBar2(ocvb, "Corner aperture size", 1, 21, 3)
-        sliders.setupTrackBar3(ocvb, "Corner quality level", 1, 100, 50)
+        sliders.setupTrackBar1(ocvb, caller, "Corner block size", 1, 21, 3)
+        sliders.setupTrackBar2("Corner aperture size", 1, 21, 3)
+        sliders.setupTrackBar3("Corner quality level", 1, 100, 50)
         ocvb.desc = "Find corners using Eigen values and vectors"
         label2 = "Corner Eigen values"
     End Sub
@@ -61,7 +61,7 @@ Public Class Corners_SubPix
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         good = New Features_GoodFeatures(ocvb)
-        sliders.setupTrackBar1(ocvb, "SubPix kernel Size", 1, 20, 3)
+        sliders.setupTrackBar1(ocvb, caller, "SubPix kernel Size", 1, 20, 3)
         label1 = "Output of GoodFeatures"
         ocvb.desc = "Use PreCornerDetect to find features in the image."
     End Sub
@@ -92,7 +92,7 @@ Public Class Corners_PreCornerDetect
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         median = New Math_Median_CDF(ocvb)
-        sliders.setupTrackBar1(ocvb, "kernel Size", 1, 20, 19)
+        sliders.setupTrackBar1(ocvb, caller, "kernel Size", 1, 20, 19)
 
         ocvb.desc = "Use PreCornerDetect to find features in the image."
     End Sub
@@ -128,10 +128,10 @@ Public Class Corners_ShiTomasi_CPP
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Corner block size", 1, 21, 3)
-        sliders.setupTrackBar2(ocvb, "Corner aperture size", 1, 21, 3)
-        sliders.setupTrackBar3(ocvb, "Corner quality level", 1, 100, 50)
-        sliders.setupTrackBar4(ocvb, "Corner normalize alpha", 1, 255, 127)
+        sliders.setupTrackBar1(ocvb, caller, "Corner block size", 1, 21, 3)
+        sliders.setupTrackBar2("Corner aperture size", 1, 21, 3)
+        sliders.setupTrackBar3("Corner quality level", 1, 100, 50)
+        sliders.setupTrackBar4("Corner normalize alpha", 1, 255, 127)
         ocvb.desc = "Find corners using Eigen values and vectors"
         label2 = "Corner Eigen values"
     End Sub

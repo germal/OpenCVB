@@ -13,13 +13,13 @@ Public Class Gabor_Basics
     Public phaseOffset As Double
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders1.setupTrackBar1(ocvb, "Gabor gamma X10", 0, 10, 5)
-        sliders1.setupTrackBar2(ocvb, "Gabor Phase offset X100", 0, 100, 0)
+        sliders1.setupTrackBar1(ocvb, caller, "Gabor gamma X10", 0, 10, 5)
+        sliders1.setupTrackBar2("Gabor Phase offset X100", 0, 100, 0)
 
-        sliders.setupTrackBar1(ocvb, "Gabor Kernel Size", 0, 50, 15)
-        sliders.setupTrackBar2(ocvb, "Gabor Sigma", 0, 100, 4)
-        sliders.setupTrackBar3(ocvb, "Gabor Theta (degrees)", 0, 180, 90)
-        sliders.setupTrackBar4(ocvb, "Gabor lambda", 0, 100, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Gabor Kernel Size", 0, 50, 15)
+        sliders.setupTrackBar2("Gabor Sigma", 0, 100, 4)
+        sliders.setupTrackBar3("Gabor Theta (degrees)", 0, 180, 90)
+        sliders.setupTrackBar4("Gabor lambda", 0, 100, 10)
 
         ocvb.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub

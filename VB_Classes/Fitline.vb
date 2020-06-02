@@ -9,8 +9,8 @@ Public Class Fitline_Basics
         draw = New Draw_Line(ocvb)
         draw.sliders.TrackBar1.Value = 2
 
-        sliders.setupTrackBar1(ocvb, "Accuracy for the radius X100", 0, 100, 10)
-        sliders.setupTrackBar2(ocvb, "Accuracy for the angle X100", 0, 100, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Accuracy for the radius X100", 0, 100, 10)
+        sliders.setupTrackBar2("Accuracy for the angle X100", 0, 100, 10)
 
         ocvb.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
@@ -115,11 +115,11 @@ Public Class Fitline_RawInput
     Public bb As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Random point count", 0, 500, 100)
-        sliders.setupTrackBar2(ocvb, "Line Point Count", 0, 500, 20)
-        sliders.setupTrackBar3(ocvb, "Line Noise", 1, 100, 10)
+        sliders.setupTrackBar1(ocvb, caller, "Random point count", 0, 500, 100)
+        sliders.setupTrackBar2("Line Point Count", 0, 500, 20)
+        sliders.setupTrackBar3("Line Noise", 1, 100, 10)
 
-        check.Setup(ocvb, 2)
+        check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Highlight Line Data"
         check.Box(1).Text = "Demo mode (Recompute with new random data)"
         check.Box(0).Checked = True

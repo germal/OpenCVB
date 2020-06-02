@@ -3,9 +3,9 @@ Public Class TextureFlow_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Texture Flow Delta", 2, 100, 12)
-        sliders.setupTrackBar2(ocvb, "Texture Eigen BlockSize", 1, 100, 20)
-        sliders.setupTrackBar3(ocvb, "Texture Eigen Ksize", 1, 15, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Texture Flow Delta", 2, 100, 12)
+        sliders.setupTrackBar2("Texture Eigen BlockSize", 1, 100, 20)
+        sliders.setupTrackBar3("Texture Eigen Ksize", 1, 15, 1)
 
         ocvb.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub

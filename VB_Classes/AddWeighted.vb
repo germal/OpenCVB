@@ -3,7 +3,7 @@ Public Class AddWeighted_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Weight", 0, 100, 50)
+        sliders.setupTrackBar1(ocvb, caller, "Weight", 0, 100, 50)
         ocvb.desc = "Add depth and rgb with specified weights."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

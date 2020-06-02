@@ -9,12 +9,12 @@ Public Class KLT_Basics
     Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "KLT - MaxCorners", 1, 200, 100)
-        sliders.setupTrackBar2(ocvb, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
-        sliders.setupTrackBar3(ocvb, "KLT - minDistance", 1, 100, 7)
-        sliders.setupTrackBar4(ocvb, "KLT - BlockSize", 1, 100, 7)
+        sliders.setupTrackBar1(ocvb, caller, "KLT - MaxCorners", 1, 200, 100)
+        sliders.setupTrackBar2("KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
+        sliders.setupTrackBar3("KLT - minDistance", 1, 100, 7)
+        sliders.setupTrackBar4("KLT - BlockSize", 1, 100, 7)
 
-        check.Setup(ocvb, 2)
+        check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "KLT - Night Mode"
         check.Box(1).Text = "KLT - delete all Points"
 

@@ -131,28 +131,28 @@ End Class
 
 
 Module OpenGL_Sliders_Module
-    Public Sub setOpenGLsliders(ocvb As AlgorithmData, sliders As OptionsSliders, sliders1 As OptionsSliders, sliders2 As OptionsSliders, sliders3 As OptionsSliders)
-        sliders1.setupTrackBar1(ocvb, "OpenGL zNear", 0, 100, 0)
-        sliders1.setupTrackBar2(ocvb, "OpenGL zFar", -50, 200, 20)
-        sliders1.setupTrackBar3(ocvb, "OpenGL Point Size", 1, 20, 2)
-        sliders1.setupTrackBar4(ocvb, "zTrans", -1000, 1000, 50)
+    Public Sub setOpenGLsliders(ocvb As AlgorithmData, caller As String, sliders As OptionsSliders, sliders1 As OptionsSliders, sliders2 As OptionsSliders, sliders3 As OptionsSliders)
+        sliders1.setupTrackBar1(ocvb, caller, "OpenGL zNear", 0, 100, 0)
+        sliders1.setupTrackBar2("OpenGL zFar", -50, 200, 20)
+        sliders1.setupTrackBar3("OpenGL Point Size", 1, 20, 2)
+        sliders1.setupTrackBar4("zTrans", -1000, 1000, 50)
 
-        sliders2.setupTrackBar1(ocvb, "OpenGL Eye X", -180, 180, 0)
-        sliders2.setupTrackBar2(ocvb, "OpenGL Eye Y", -180, 180, 0)
-        sliders2.setupTrackBar3(ocvb, "OpenGL Eye Z", -180, 180, -40)
+        sliders2.setupTrackBar1(ocvb, caller, "OpenGL Eye X", -180, 180, 0)
+        sliders2.setupTrackBar2("OpenGL Eye Y", -180, 180, 0)
+        sliders2.setupTrackBar3("OpenGL Eye Z", -180, 180, -40)
         If ocvb.parms.ShowOptions Then sliders2.Show()
 
-        sliders3.setupTrackBar1(ocvb, "OpenGL Scale X", 1, 100, 10)
-        sliders3.setupTrackBar2(ocvb, "OpenGL Scale Y", 1, 100, 10)
-        sliders3.setupTrackBar3(ocvb, "OpenGL Scale Z", 1, 100, 1)
+        sliders3.setupTrackBar1(ocvb, caller, "OpenGL Scale X", 1, 100, 10)
+        sliders3.setupTrackBar2("OpenGL Scale Y", 1, 100, 10)
+        sliders3.setupTrackBar3("OpenGL Scale Z", 1, 100, 1)
         If ocvb.parms.ShowOptions Then sliders3.Show()
 
         ' this is last so it shows up on top of all the others.
-        sliders.setupTrackBar1(ocvb, "OpenGL FOV", 1, 180, 150)
+        sliders.setupTrackBar1(ocvb, caller, "OpenGL FOV", 1, 180, 150)
         If ocvb.parms.cameraIndex = D400Cam Then sliders.TrackBar1.Value = 135
-        sliders.setupTrackBar2(ocvb, "OpenGL yaw (degrees)", -180, 180, -3)
-        sliders.setupTrackBar3(ocvb, "OpenGL pitch (degrees)", -180, 180, 3)
-        sliders.setupTrackBar4(ocvb, "OpenGL roll (degrees)", -180, 180, 0)
+        sliders.setupTrackBar2("OpenGL yaw (degrees)", -180, 180, -3)
+        sliders.setupTrackBar3("OpenGL pitch (degrees)", -180, 180, 3)
+        sliders.setupTrackBar4("OpenGL roll (degrees)", -180, 180, 0)
     End Sub
 End Module
 
@@ -165,7 +165,7 @@ Public Class OpenGL_Options
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         OpenGL = New OpenGL_Basics(ocvb)
-        setOpenGLsliders(ocvb, sliders, sliders1, sliders2, sliders3)
+        setOpenGLsliders(ocvb, caller, sliders, sliders1, sliders2, sliders3)
         ocvb.desc = "Adjust point size and FOV in OpenGL"
         label1 = ""
     End Sub
@@ -262,7 +262,7 @@ Public Class OpenGL_3Ddata
     Dim histInput() As Byte
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
 
         ogl = New OpenGL_Options(ocvb)
         ogl.OpenGL.OpenGLTitle = "OpenGL_3Ddata"

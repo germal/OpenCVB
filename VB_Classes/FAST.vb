@@ -5,8 +5,8 @@ Public Class FAST_Basics
     Public keypoints() As cv.KeyPoint
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, "Threshold", 0, 200, 15)
-        check.Setup(ocvb, 1)
+        sliders.setupTrackBar1(ocvb, caller, "Threshold", 0, 200, 15)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Use Non-Max = True"
         check.Box(0).Checked = True
 

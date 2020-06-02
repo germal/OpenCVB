@@ -1,9 +1,9 @@
 ﻿Imports System.Windows.Forms
 Public Class OptionsRadioButtons
     Public check() As RadioButton
-    Public Sub Setup(ocvb As AlgorithmData, count As Int32)
+    Public Sub Setup(ocvb As AlgorithmData, caller As String, count As Int32)
         ReDim check(count - 1)
-        Me.Text = ocvb.caller + " Options"
+        Me.Text = caller + " Options"
         For i = 0 To check.Count - 1
             check(i) = New RadioButton
             check(i).AutoSize = True
