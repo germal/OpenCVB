@@ -66,7 +66,7 @@ Public Class CameraKinect
         Dim metric_radius As Single ' Metric radius */
     End Structure
 
-    Public Sub initialize(fps As Int32, width As Int32, height As Int32)
+    Public Sub initialize(fps As Int32)
         cPtr = KinectOpen()
         deviceName = "Kinect for Azure"
         IMU_Present = True
@@ -74,8 +74,6 @@ Public Class CameraKinect
             deviceCount = KinectDeviceCount(cPtr)
             Dim strPtr = KinectDeviceName(cPtr) ' The width and height of the image are set in the constructor.
             serialNumber = Marshal.PtrToStringAnsi(strPtr)
-            w = width
-            h = height
             leftView = New cv.Mat
 
             Dim ptr = KinectExtrinsics(cPtr)
@@ -100,7 +98,7 @@ Public Class CameraKinect
 
             intrinsicsRight_VB = intrinsicsLeft_VB ' there is no right lens - just copy for compatibility.
 
-            ReDim RGBDepthBytes(w * h * 3 - 1)
+            ReDim RGBDepthBytes(width * height * 3 - 1)
             pointCloud = New cv.Mat()
         End If
     End Sub
@@ -134,16 +132,16 @@ Public Class CameraKinect
 
         Dim colorBuffer = KinectRGBA(cPtr)
         If colorBuffer <> 0 Then ' it can be zero on startup...
-            Dim colorRGBA = New cv.Mat(h, w, cv.MatType.CV_8UC4, colorBuffer)
+            Dim colorRGBA = New cv.Mat(height, width, cv.MatType.CV_8UC4, colorBuffer)
             SyncLock bufferLock
                 color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
-                depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, KinectRawDepth(cPtr)).Clone()
-                RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, KinectRGBdepth(cPtr)).Clone()
+                depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, KinectRawDepth(cPtr)).Clone()
+                RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, KinectRGBdepth(cPtr)).Clone()
                 ' if you normalize here instead of just a fixed multiply, the image will pulse with different brightness values.  Not pretty.
-                leftView = (New cv.Mat(h, w, cv.MatType.CV_16U, KinectLeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs() ' so depth data fits into 0-255 (approximately)
+                leftView = (New cv.Mat(height, width, cv.MatType.CV_16U, KinectLeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs() ' so depth data fits into 0-255 (approximately)
                 rightView = leftView
 
-                Dim pc = New cv.Mat(h, w, cv.MatType.CV_16SC3, KinectPointCloud(cPtr))
+                Dim pc = New cv.Mat(height, width, cv.MatType.CV_16SC3, KinectPointCloud(cPtr))
                 ' This is less efficient than using 16-bit pixels but consistent with the other cameras
                 pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3, 0.001) ' convert to meters...
                 MyBase.GetNextFrameCounts(IMU_FrameTime)

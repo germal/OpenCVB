@@ -19,7 +19,7 @@ Public Class Binarize_OTSU
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst2.SetTo(0)
-        Dim w = src.Width, h = src.Height
+        Dim width = src.Width, height = src.Height
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim meanScalar = cv.Cv2.Mean(src)
         label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"

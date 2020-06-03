@@ -287,8 +287,8 @@ Public Class Depth_WorldXYZ
             For xy.X = 0 To xyzFrame.Width - 1
                 xy.Z = depth32f.Get(Of Single)(xy.Y, xy.X)
                 If xy.Z <> 0 Then
-                    Dim w = getWorldCoordinatesD(ocvb, xy)
-                    xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, w)
+                    Dim width = getWorldCoordinatesD(ocvb, xy)
+                    xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, width)
                 End If
             Next
         Next
@@ -330,8 +330,8 @@ Public Class Depth_WorldXYZ_MT
                 For xy.X = roi.X To roi.X + roi.Width - 1
                     xy.Z = depth32f.Get(Of Single)(xy.Y, xy.X)
                     If xy.Z <> 0 Then
-                        Dim w = getWorldCoordinatesD(ocvb, xy)
-                        xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, w)
+                        Dim width = getWorldCoordinatesD(ocvb, xy)
+                        xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, width)
                     End If
                 Next
             Next

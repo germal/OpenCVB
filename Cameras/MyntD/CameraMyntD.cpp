@@ -36,7 +36,7 @@ public:
 	{
 		cam.Close();
 	}
-	CameraMyntD(int w, int h, int fps)
+	CameraMyntD(int width, int height, int fps)
 	{
 		DeviceInfo dev_info;
 		if (!util::select(cam, &dev_info))
@@ -55,12 +55,12 @@ public:
 		cam.Open(params);
 
 		cPtr = new Depth_Colorizer16();
-		rows = h;
-		cols = w;
+		rows = height;
+		cols = width;
 		intrinsicsBoth = cam.GetStreamIntrinsics(params.stream_mode);
 		bool ex_ok;
 		extrinsics = cam.GetStreamExtrinsics(StreamMode::STREAM_2560x720, &ex_ok);
-		pointCloud = cv::Mat(h, w, CV_32FC3);
+		pointCloud = cv::Mat(height, width, CV_32FC3);
 
 	}
 
@@ -143,9 +143,9 @@ extern "C" __declspec(dllexport) int* MyntDWaitFrame(CameraMyntD * MyntD)
 {
 	return MyntD->waitForFrame();
 }
-extern "C" __declspec(dllexport) int* MyntDOpen(int w, int h, int fps)
+extern "C" __declspec(dllexport) int* MyntDOpen(int width, int height, int fps)
 {
-	CameraMyntD* MyntD = new CameraMyntD(w, h, fps);
+	CameraMyntD* MyntD = new CameraMyntD(width, height, fps);
 	return (int*)MyntD;
 }
 extern "C" __declspec(dllexport) void MyntDClose(CameraMyntD * MyntD)

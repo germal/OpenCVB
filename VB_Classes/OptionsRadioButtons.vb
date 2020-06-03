@@ -14,7 +14,7 @@ Public Class OptionsRadioButtons
         End If
     End Sub
     Private Sub OptionsRadioButtons_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.SetDesktopLocation(appLocation.Left + Me.Width + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
+        Me.SetDesktopLocation(midFormX + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
         radioOffset.X += offsetIncr
         radioOffset.Y += offsetIncr
         If radioOffset.X > offsetMax Then radioOffset.X = 0

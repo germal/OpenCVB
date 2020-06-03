@@ -792,3 +792,12 @@ software.
 Fremont, California
 
 Spring 2020
+
+Addendum 1: Comparing Cameras
+
+The are 4 supported cameras with a point cloud – Intel D435i, Microsoft
+Kinect4Azure, StereoLabs Zed 2, and Mynt Eye D1000. The 4 cameras are setup to
+measure the distance to the same wall in the same environment. Here is a look at
+how the cameras were setup:
+
+![](media/47d590eaf2bc85a84db1fc73fe5a54e9.png)

@@ -25,7 +25,7 @@ def OpenCVCode(imgRGB, depth_colormap):
     global frameCount, prev_imgRGB
     h, w = imgRGB.shape[:2]
     motion_history = np.zeros((h, w), np.float32)
-    hsv = np.zeros((h, w, 3), np.uint8)
+    hsv = np.zeros((height, width, 3), np.uint8)
     hsv[:,:,1] = 255
      
     if frameCount > 0:

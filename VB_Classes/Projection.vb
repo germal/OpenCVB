@@ -47,40 +47,71 @@ Public Class Projection_ColorizeMat
     Public colorizeMatFlip As cv.Mat
     Dim fontSize As Single
     Dim radius As Integer
+    Dim hFOVangles() As Single = {54, 44, 0, 37, 49}  ' T265 has no point cloud so there is a 0 where it would have been.
+    Dim vFOVangles() As Single = {69, 59, 0, 52, 65}  ' T265 has no point cloud so there is a 0 where it would have been.
     Public Function CameraLocationBot(ocvb As AlgorithmData, mask As cv.Mat) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
         dst1.CopyTo(dst, mask)
-        Dim shift = (dst.Width - dst.Height) / 2
+        Dim cameraPt = New cv.Point(dst.Width / 2, dst.Height)
         dst.Rectangle(New cv.Rect(shift, 0, dst.Height, dst.Height), cv.Scalar.White, 1)
         Dim cameraLocation = New cv.Point(shift + dst.Height / 2, dst.Height - 5)
-        dst.Circle(New cv.Point(shift + dst.Height / 2, dst.Height - 5), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(cameraPt, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Dim maxZ = sliders.TrackBar1.Value / 1000
         For i = maxZ - 1 To 0 Step -1
-            Dim y = dst.Height * i / maxZ
-            dst.Line(New cv.Point(shift, y), New cv.Point(dst.Width - shift, y), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst, CStr(maxZ - i) + "m", New cv.Point(shift - 45, y + 10), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            Dim ymeter = dst.Height * i / maxZ
+            dst.Line(New cv.Point(shift, ymeter), New cv.Point(dst.Width - shift, ymeter), cv.Scalar.AliceBlue, 1)
+            cv.Cv2.PutText(dst, CStr(maxZ - i) + "m", New cv.Point(shift - 45, ymeter + 10), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
-        Dim angle As Single, startAngle As Single, endAngle As Single = 0 ' assume D435i
-        startAngle = Choose(ocvb.parms.cameraIndex + 1, 55, 43, 0, 37, 48) ' T265 is not supported here...
-        angle = -startAngle
-        dst.Ellipse(New cv.Point(dst.Width / 2, dst.Height - 1), New cv.Size(100, 100), angle, startAngle, endAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+
+        ' draw the arc showing the camera FOV
+        Dim startAngle = sliders.TrackBar3.Value
+        Dim x = dst.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
+        Dim xloc = cameraPt.X + x
+
+        Dim fovRight = New cv.Point(xloc, 0)
+        Dim fovLeft = New cv.Point(cameraPt.X - x, fovRight.Y)
+
+        dst.Ellipse(cameraPt, New cv.Size(100, 100), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Ellipse(cameraPt, New cv.Size(100, 100), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Line(cameraPt, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+
         Dim labelLocation = New cv.Point(dst.Width / 2 + shift * 3 / 4, dst.Height * 7 / 8)
         If ocvb.parms.resolution = resHigh Then labelLocation = New cv.Point(dst.Width / 2 + shift * 3 / 8, dst.Height * 15 / 16)
         cv.Cv2.PutText(dst, CStr(startAngle) + " degrees", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Line(cameraPt, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+
         Return dst
     End Function
     Public Function CameraLocationLeft(ocvb As AlgorithmData, ByRef mask As cv.Mat) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
         dst2.CopyTo(dst, mask)
-        Dim shift = (dst.Width - dst.Height) / 2
+        Dim cameraPt = New cv.Point(shift, dst.Height / 2)
         dst.Rectangle(New cv.Rect(shift, 0, dst.Height, dst.Height), cv.Scalar.White, 1)
-        dst.Circle(New cv.Point(shift, dst.Height / 2), radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(cameraPt, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Dim maxZ = sliders.TrackBar1.Value / 1000
         For i = 1 To maxZ
-            Dim x = (dst.Width - 2 * shift) * i / maxZ
-            dst.Line(New cv.Point(shift + x, 0), New cv.Point(shift + x, dst.Height), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(shift + x + 10, dst.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            Dim xmeter = (dst.Width - 2 * shift) * i / maxZ
+            dst.Line(New cv.Point(shift + xmeter, 0), New cv.Point(shift + xmeter, dst.Height), cv.Scalar.AliceBlue, 1)
+            cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(shift + xmeter + 10, dst.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
+
+        ' draw the arc showing the camera FOV
+        Dim startAngle = sliders.TrackBar4.Value
+        Dim y = (dst.Width - shift) / Math.Tan(startAngle * cv.Cv2.PI / 180)
+        Dim yloc = cameraPt.Y - y
+
+        Dim fovTop = New cv.Point(dst.Width, yloc)
+        Dim fovBot = New cv.Point(dst.Width, cameraPt.Y + y)
+
+        dst.Ellipse(cameraPt, New cv.Size(100, 100), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Ellipse(cameraPt, New cv.Size(100, 100), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Line(cameraPt, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+
+        Dim labelLocation = New cv.Point(shift + 10, dst.Height * 3 / 4)
+        ' If ocvb.parms.resolution = resHigh Then labelLocation = New cv.Point(shift * 3 / 8, dst.Height * 15 / 16)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " degrees", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Line(cameraPt, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+
         Return dst
     End Function
     Public Sub New(ocvb As AlgorithmData)
@@ -99,6 +130,8 @@ Public Class Projection_ColorizeMat
 
         sliders.setupTrackBar1(ocvb, caller, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
         sliders.setupTrackBar2("Threshold for histogram count", 0, 100, 3)
+        sliders.setupTrackBar3("Top View angle for FOV", 0, 180, hFOVangles(ocvb.parms.cameraIndex))
+        sliders.setupTrackBar4("Side View angle for FOV", 0, 180, vFOVangles(ocvb.parms.cameraIndex))
 
         ocvb.desc = "Create the colorizeMat's used for projections"
     End Sub
@@ -453,17 +486,24 @@ Public Class Projection_Gravity
 
                     Dim dPixel = dFactor * d
                     Dim fx = gCloud.xyz(i * 3)
-                    If fx > -zHalf And fx < zHalf Then
-                        fx = dFactor * (zHalf + fx)
-                        Dim count = topView.Get(Of Byte)(CInt(h - dPixel), CInt(cMats.shift + fx)) + 1
-                        topView.Set(Of Byte)(CInt(h - dPixel), CInt(cMats.shift + fx), If(count < 255, count, 255))
+                    Dim x = Math.Truncate(cMats.shift + dFactor * (zHalf + fx))
+                    Dim y = Math.Truncate(h - dPixel)
+                    If x > 0 And x < topView.Width And y >= 0 And y < topView.Height Then
+                        Dim count = topView.Get(Of Byte)(y, x) + 1
+                        topView.Set(Of Byte)(y, x, If(count < 255, count, 255))
                     End If
+
 
                     Dim fy = gCloud.xyz(i * 3 + 1)
                     If fy > -zHalf And fy < zHalf Then
-                        fy = CInt(dFactor * (zHalf + fy))
-                        Dim count = sideView.Get(Of Byte)(fy, CInt(cMats.shift + dPixel)) + 1
-                        sideView.Set(Of Byte)(fy, CInt(cMats.shift + dPixel), If(count < 255, count, 255))
+                        x = Math.Truncate(cMats.shift + dPixel)
+                        y = Math.Truncate(dFactor * (zHalf + fy))
+                        If x > 0 And x < topView.Width And y >= 0 And y < topView.Height Then
+                            Dim count = sideView.Get(Of Byte)(y, x) + 1
+                            sideView.Set(Of Byte)(y, x, If(count < 255, count, 255))
+                        Else
+                            h = h
+                        End If
                     End If
                 End If
             End Sub)

@@ -51,7 +51,7 @@ def update(_=None):
     outn = int(n*r)
 
     p0, p1 = (90, 80), (w-90, h-80)
-    img = np.zeros((h, w, 3), np.uint8)
+    img = np.zeros((height, width, 3), np.uint8)
     cv.line(img, toint(p0), toint(p1), (0, 255, 0))
 
     if n > 0:

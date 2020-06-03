@@ -94,13 +94,11 @@ Public Class CameraMyntD
     Private Sub IMUdataCollection()
         MyntDtaskIMU(cPtr)
     End Sub
-    Public Sub initialize(fps As Int32, width As Int32, height As Int32)
+    Public Sub initialize(fps As Int32)
         cPtr = MyntDOpen(width, height, 30)
         MyBase.deviceName = "MyntEyeD 1000"
         If cPtr <> 0 Then
             deviceCount = 1
-            w = width
-            h = height
 
             Dim ptr = MyntDExtrinsics(cPtr)
             Dim rotationTranslation(12) As Double ' Mynt is using doubles but the VB copy will be a single.
@@ -174,12 +172,12 @@ Public Class CameraMyntD
         Dim pcPtr = MyntDPointCloud(cPtr)
         If imagePtr <> 0 And depthRGBPtr <> 0 And rightPtr <> 0 And depth16Ptr <> 0 And pcPtr <> 0 Then
             SyncLock bufferLock
-                If imagePtr <> 0 Then color = New cv.Mat(h, w, cv.MatType.CV_8UC3, imagePtr).Clone()
+                color = New cv.Mat(height, width, cv.MatType.CV_8UC3, imagePtr).Clone()
                 leftView = color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                If rightPtr <> 0 Then rightView = New cv.Mat(h, w, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                If depthRGBPtr <> 0 Then RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, depthRGBPtr).Clone()
-                pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, pcPtr).Clone()
-                depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, depth16Ptr).Clone()
+                rightView = New cv.Mat(height, width, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, depthRGBPtr).Clone()
+                pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, pcPtr).Clone()
+                depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, depth16Ptr).Clone()
             End SyncLock
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End If

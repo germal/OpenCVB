@@ -104,7 +104,7 @@ Public Class CameraZED2
         Dim height As Int64
     End Structure
 
-    Public Sub initialize(fps As Int32, width As Int32, height As Int32)
+    Public Sub initialize(fps As Int32)
         cPtr = Zed2Open(width, height, 60)
         deviceName = "StereoLabs ZED 2"
         IMU_Present = True
@@ -112,8 +112,6 @@ Public Class CameraZED2
             deviceCount = 1
             Dim serialNumber = Zed2SerialNumber(cPtr)
             Console.WriteLine("ZED 2 serial number = " + CStr(serialNumber))
-            w = width
-            h = height
 
             ReDim Extrinsics_VB.rotation(9 - 1)
             Dim ptr = Zed2ExtrinsicsRotationMatrix(cPtr)
@@ -166,12 +164,12 @@ Public Class CameraZED2
         SyncLock bufferLock
             Zed2GetData(cPtr)
 
-            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, Zed2Color(cPtr)).Clone()
-            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, Zed2RGBDepth(cPtr)).Clone()
-            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, Zed2Depth16(cPtr)).Clone()
-            leftView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2LeftView(cPtr)).Clone()
-            rightView = New cv.Mat(h, w, cv.MatType.CV_8UC1, Zed2RightView(cPtr)).Clone()
-            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone()
+            color = New cv.Mat(height, width, cv.MatType.CV_8UC3, Zed2Color(cPtr)).Clone()
+            RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, Zed2RGBDepth(cPtr)).Clone()
+            depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, Zed2Depth16(cPtr)).Clone()
+            leftView = New cv.Mat(height, width, cv.MatType.CV_8UC1, Zed2LeftView(cPtr)).Clone()
+            rightView = New cv.Mat(height, width, cv.MatType.CV_8UC1, Zed2RightView(cPtr)).Clone()
+            pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone()
 
             Dim imuFrame = Zed2GetPoseData(cPtr)
             Dim acc = Zed2Acceleration(cPtr)

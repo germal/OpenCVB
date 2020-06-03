@@ -46,7 +46,7 @@ if __name__ == '__main__':
     print(__doc__)
     img = make_image()
     h, w = img.shape[:2]
-    vis = np.zeros((h, w, 3), np.uint8)
+    vis = np.zeros((height, width, 3), np.uint8)
     contours0, hierarchy = cv.findContours( img.copy(), cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
     contours = [cv.approxPolyDP(cnt, 3, True) for cnt in contours0]
 

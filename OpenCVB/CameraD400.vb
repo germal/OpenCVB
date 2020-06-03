@@ -5,7 +5,7 @@ Imports cv = OpenCvSharp
 
 Module D400_Module_CPP
     <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function D400Open(w As Int32, h As Int32, IMUPresent As Boolean) As IntPtr
+    Public Function D400Open(width As Int32, height As Int32, IMUPresent As Boolean) As IntPtr
     End Function
     <DllImport(("Cam_D400.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub D400WaitForFrame(tp As IntPtr)
@@ -71,11 +71,9 @@ Public Class CameraD400
     Public pc As New rs.PointCloud
     Public Sub New()
     End Sub
-    Public Sub initialize(fps As Int32, width As Int32, height As Int32)
+    Public Sub initialize(fps As Int32)
         deviceName = "Intel D400"
         IMU_Present = False
-        w = width
-        h = height
         Dim d435icount = OpenCVB.USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
         If d435icount > 0 Then IMU_Present = True
         Dim ctx As New rs.Context
@@ -101,7 +99,7 @@ Public Class CameraD400
         D400WaitForFrame(cPtr)
 
         SyncLock bufferLock
-            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, D400Color(cPtr)).Clone()
+            color = New cv.Mat(height, width, cv.MatType.CV_8UC3, D400Color(cPtr)).Clone()
 
             Dim accelFrame = D400Accel(cPtr)
             If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
@@ -113,11 +111,11 @@ Public Class CameraD400
             Static imuStartTime = D400IMUTimeStamp(cPtr)
             IMU_TimeStamp = D400IMUTimeStamp(cPtr) - imuStartTime
 
-            RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, D400RGBDepth(cPtr)).Clone()
-            depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, D400RawDepth(cPtr)).Clone()
-            leftView = New cv.Mat(h, w, cv.MatType.CV_8U, D400LeftRaw(cPtr)).Clone()
-            rightView = New cv.Mat(h, w, cv.MatType.CV_8U, D400RightRaw(cPtr)).Clone()
-            pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, D400PointCloud(cPtr)).Clone()
+            RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, D400RGBDepth(cPtr)).Clone()
+            depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, D400RawDepth(cPtr)).Clone()
+            leftView = New cv.Mat(height, width, cv.MatType.CV_8U, D400LeftRaw(cPtr)).Clone()
+            rightView = New cv.Mat(height, width, cv.MatType.CV_8U, D400RightRaw(cPtr)).Clone()
+            pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, D400PointCloud(cPtr)).Clone()
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End SyncLock
     End Sub

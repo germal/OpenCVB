@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class OptionsCombo
     Private Sub OptionsFilename_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.SetDesktopLocation(appLocation.Left + Me.Width + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
+        Me.SetDesktopLocation(midFormX + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
         radioOffset.X += offsetIncr
         radioOffset.Y += offsetIncr
         If radioOffset.X > offsetMax Then radioOffset.X = 0

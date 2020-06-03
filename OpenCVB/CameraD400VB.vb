@@ -32,7 +32,7 @@ Public Class CameraD400VB
     Dim rawRight As rs.Frame
     Dim rawLeft As rs.Frame
 
-    Public Sub initialize(fps As Int32, width As Int32, height As Int32)
+    Public Sub initialize(fps As Int32)
         devices = ctx.QueryDevices()
         device = devices(0)
         deviceName = device.Info.Item(rs.CameraInfo.Name)
@@ -62,8 +62,6 @@ Public Class CameraD400VB
             deviceCount = 0
         Else
             Dim dintrinsicsLeft = pipeline_profile.GetStream(rs.Stream.Color).As(Of rs.VideoStreamProfile).GetIntrinsics
-            MyBase.w = dintrinsicsLeft.width
-            MyBase.h = dintrinsicsLeft.height
             intrinsicsLeft_VB.ppx = dintrinsicsLeft.ppx
             intrinsicsLeft_VB.ppy = dintrinsicsLeft.ppy
             intrinsicsLeft_VB.fx = dintrinsicsLeft.fx
@@ -125,12 +123,12 @@ Public Class CameraD400VB
                     IMU_AngularAcceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame.Data)
                 End If
 
-                color = New cv.Mat(h, w, cv.MatType.CV_8UC3, colorFrame.Data)
-                RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, RGBdepthFrame.Data)
-                leftView = New cv.Mat(h, w, cv.MatType.CV_8U, rawLeft.Data)
-                rightView = New cv.Mat(h, w, cv.MatType.CV_8U, rawRight.Data)
+                color = New cv.Mat(height, width, cv.MatType.CV_8UC3, colorFrame.Data)
+                RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, RGBdepthFrame.Data)
+                leftView = New cv.Mat(height, width, cv.MatType.CV_8U, rawLeft.Data)
+                rightView = New cv.Mat(height, width, cv.MatType.CV_8U, rawRight.Data)
                 Dim points = pc.Process(depthFrame).As(Of rs.Points)
-                pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, points.Data)
+                pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, points.Data)
                 MyBase.GetNextFrameCounts(IMU_FrameTime)
             End SyncLock
 

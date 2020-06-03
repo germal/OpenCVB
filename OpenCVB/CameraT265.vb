@@ -6,7 +6,7 @@ Imports System.IO
 
 Module T265_Module_CPP
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265Open(w As Int32, h As Int32) As IntPtr
+    Public Function T265Open(width As Int32, height As Int32) As IntPtr
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function T265RawWidth(tp As IntPtr) As Int32
@@ -76,12 +76,10 @@ Public Class CameraT265
 
     Public Sub New()
     End Sub
-    Public Sub initialize(fps As Int32, width As Int32, height As Int32)
+    Public Sub initialize(fps As Int32)
         deviceName = "Intel T265"
         deviceCount = 1
         IMU_Present = True
-        w = width
-        h = height
 
         cPtr = T265Open(width, height)
         rawWidth = T265RawWidth(cPtr)
@@ -100,15 +98,15 @@ Public Class CameraT265
         Extrinsics_VB.rotation = extrinsics.rotation
         Extrinsics_VB.translation = extrinsics.translation
 
-        rightView = New cv.Mat(h, w, cv.MatType.CV_8U, 0)
-        leftView = New cv.Mat(h, w, cv.MatType.CV_8U, 0)
+        rightView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
+        leftView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
 
-        rawSrcRect = New cv.Rect((rawWidth - rawWidth * h / rawHeight) / 2, 0, rawWidth * h / rawHeight, h)
-        rawDstRect = New cv.Rect((w - rawSrcRect.Width) / 2, 0, rawSrcRect.Width, rawSrcRect.Height)
+        rawSrcRect = New cv.Rect((rawWidth - rawWidth * height / rawHeight) / 2, 0, rawWidth * height / rawHeight, height)
+        rawDstRect = New cv.Rect((width - rawSrcRect.Width) / 2, 0, rawSrcRect.Width, rawSrcRect.Height)
 
-        RGBDepth = New cv.Mat(h, w, cv.MatType.CV_8UC3, 0)
-        depth16 = New cv.Mat(h, w, cv.MatType.CV_16U, 0)
-        pointCloud = New cv.Mat(h, w, cv.MatType.CV_32FC3, 0) ' we build an empty point cloud for the T265
+        RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, 0)
+        depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, 0)
+        pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, 0) ' we build an empty point cloud for the T265
     End Sub
     Public Sub GetNextFrame()
         If pipelineClosed Or cPtr = 0 Then Exit Sub
@@ -143,7 +141,7 @@ Public Class CameraT265
                         t.X, t.Y, t.Z, 1.0}
             transformationMatrix = mat
 
-            color = New cv.Mat(h, w, cv.MatType.CV_8UC3, T265Color(cPtr)).Clone()
+            color = New cv.Mat(height, width, cv.MatType.CV_8UC3, T265Color(cPtr)).Clone()
 
             Dim right = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265RightRaw(cPtr)).Clone()
             Dim left = New cv.Mat(rawHeight, rawWidth, cv.MatType.CV_8U, T265LeftRaw(cPtr)).Clone()

@@ -132,27 +132,27 @@ Public Class Fitline_RawInput
             If ocvb.parms.testAllRunning = False Then check.Box(1).Checked = False
             dst1.SetTo(0)
             Dim dotSize = 2
-            Dim w = ocvb.color.Width
-            Dim h = ocvb.color.Height
+            Dim width = ocvb.color.Width
+            Dim height = ocvb.color.Height
 
             points.Clear()
             For i = 0 To sliders.TrackBar1.Value - 1
-                Dim pt = New cv.Point2f(Rnd() * w, Rnd() * h)
+                Dim pt = New cv.Point2f(Rnd() * width, Rnd() * height)
                 If pt.X < 0 Then pt.X = 0
-                If pt.X > w Then pt.X = w
+                If pt.X > width Then pt.X = width
                 If pt.Y < 0 Then pt.Y = 0
-                If pt.Y > h Then pt.Y = h
+                If pt.Y > height Then pt.Y = height
                 points.Add(pt)
                 dst1.Circle(points(i), dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             Next
 
             Dim p1 As cv.Point2f, p2 As cv.Point2f
             If Rnd() * 2 - 1 >= 0 Then
-                p1 = New cv.Point(Rnd() * w, 0)
-                p2 = New cv.Point(Rnd() * w, h)
+                p1 = New cv.Point(Rnd() * width, 0)
+                p2 = New cv.Point(Rnd() * width, height)
             Else
-                p1 = New cv.Point(0, Rnd() * h)
-                p2 = New cv.Point(w, Rnd() * h)
+                p1 = New cv.Point(0, Rnd() * height)
+                p2 = New cv.Point(width, Rnd() * height)
             End If
 
             If p1.X = p2.X Then p1.X += 1
@@ -169,11 +169,11 @@ Public Class Fitline_RawInput
             For i = 0 To sliders.TrackBar2.Value - 1
                 Dim noiseOffsetX = (Rnd() * 2 - 1) * sliders.TrackBar3.Value
                 Dim noiseOffsetY = (Rnd() * 2 - 1) * sliders.TrackBar3.Value
-                Dim pt = New cv.Point(startx + i * incr + noiseOffsetX, Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, h)))
+                Dim pt = New cv.Point(startx + i * incr + noiseOffsetX, Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, height)))
                 If pt.X < 0 Then pt.X = 0
-                If pt.X > w Then pt.X = w
+                If pt.X > width Then pt.X = width
                 If pt.Y < 0 Then pt.Y = 0
-                If pt.Y > h Then pt.Y = h
+                If pt.Y > height Then pt.Y = height
                 points.Add(pt)
                 dst1.Circle(pt, dotSize, highLight, -1, cv.LineTypes.AntiAlias)
             Next
@@ -218,13 +218,13 @@ Public Class Fitline_EigenFit
         lineNoise = noisyLine.sliders.TrackBar3.Value
         highlight = noisyLine.check.Box(0).Checked
 
-        Dim w = src.Width
+        Dim width = src.Width
 
         Dim line = cv.Cv2.FitLine(noisyLine.points, cv.DistanceTypes.L2, 1, 0.01, 0.01)
         Dim m = line.Vy / line.Vx
         Dim bb = line.Y1 - m * line.X1
         Dim p1 = New cv.Point(0, bb)
-        Dim p2 = New cv.Point(w, m * w + bb)
+        Dim p2 = New cv.Point(width, m * width + bb)
         dst2.Line(p1, p2, cv.Scalar.Red, 20, cv.LineTypes.AntiAlias)
 
         Dim pointMat = New cv.Mat(noisyLine.points.Count, 1, cv.MatType.CV_32FC2, noisyLine.points.ToArray)
@@ -276,7 +276,7 @@ Public Class Fitline_EigenFit
                                               Format(theta, "#0.0000"), 10, 22, RESULT2))
 
         p1 = New cv.Point(0, noisyLine.bb)
-        p2 = New cv.Point(w, noisyLine.m * w + noisyLine.bb)
+        p2 = New cv.Point(width, noisyLine.m * width + noisyLine.bb)
         dst2.Line(p1, p2, cv.Scalar.Blue, 3, cv.LineTypes.AntiAlias)
     End Sub
 End Class

@@ -28,7 +28,7 @@ def main():
     h, w = img.shape[:2]
 
     eigen = cv.cornerEigenValsAndVecs(gray, 15, 3)
-    eigen = eigen.reshape(h, w, 3, 2)  # [[e1, e2], v1, v2]
+    eigen = eigen.reshape(height, width, 3, 2)  # [[e1, e2], v1, v2]
     flow = eigen[:,:,2]
 
     vis = img.copy()

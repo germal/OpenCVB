@@ -17,17 +17,17 @@ Module Draw_Exports
         Next
         dst1.Rectangle(rr.BoundingRect, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
     End Sub
-    Public Function initRandomRect(w As Integer, h As Integer, margin As Integer) As cv.Rect
+    Public Function initRandomRect(width As Integer, height As Integer, margin As Integer) As cv.Rect
 
-        Dim width As Integer, x As Integer, height As Integer, y As Integer
-        While width < 5 ' don't let the w/h get too small...
-            x = (w - margin * 2) * Rnd() + margin
-            width = (w - x - margin * 2) * Rnd()
+        Dim x As Integer, y As Integer
+        While width < 5 ' don't let the width/height get too small...
+            x = (width - margin * 2) * Rnd() + margin
+            width = (width - x - margin * 2) * Rnd()
         End While
 
-        While height < 5 ' don't let the w/h get too small...
-            y = (h - margin * 2) * Rnd() + margin
-            height = (h - y - margin * 2) * Rnd()
+        While height < 5 ' don't let the width/height get too small...
+            y = (height - margin * 2) * Rnd() + margin
+            height = (height - y - margin * 2) * Rnd()
         End While
 
         Return New cv.Rect(x, y, width, height)
@@ -202,8 +202,8 @@ Public Class Draw_Polygon
         radio.check(0).Checked = True
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim h = src.Height / 8
-        Dim w = src.Width / 8
+        Dim height = src.Height / 8
+        Dim width = src.Width / 8
         Dim polyColor = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
         dst1.SetTo(cv.Scalar.White)
         dst2 = dst1.Clone()
@@ -211,7 +211,7 @@ Public Class Draw_Polygon
             Dim points = New List(Of cv.Point)
             Dim listOfPoints = New List(Of List(Of cv.Point))
             For j = 0 To 10
-                points.Add(New cv.Point(CInt(msRNG.Next(w, w * 7)), CInt(msRNG.Next(h, h * 7))))
+                points.Add(New cv.Point(CInt(msRNG.Next(width, width * 7)), CInt(msRNG.Next(height, height * 7))))
             Next
             listOfPoints.Add(points)
             If radio.check(0).Checked Then
@@ -391,7 +391,7 @@ Public Class Draw_ClipLine
         Dim p1 = New cv.Point(kalman.output(0), kalman.output(1))
         Dim p2 = New cv.Point(kalman.output(2), kalman.output(3))
 
-        If kalman.output(6) < 5 Then kalman.output(6) = 5 ' don't let the w/h get too small...
+        If kalman.output(6) < 5 Then kalman.output(6) = 5 ' don't let the width/height get too small...
         If kalman.output(7) < 5 Then kalman.output(7) = 5
         Dim r = New cv.Rect(kalman.output(4), kalman.output(5), kalman.output(6), kalman.output(7))
 

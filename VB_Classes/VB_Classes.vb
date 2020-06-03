@@ -3,11 +3,12 @@ Imports System.Drawing
 
 Module Algorithm_Module
     ' these are all global settings that are updated by individual algorithms.  
-    Public appLocation As cv.Rect
     Public Const offsetIncr = 25
     Public Const offsetMax = 150
+    Public applocation As New cv.Rect
     Public slidersOffset As cv.Point
     Public radioOffset As cv.Point
+    Public midFormX As Integer
     Public PipeTaskIndex As Integer
     Public vtkTaskIndex As Integer
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
@@ -90,8 +91,6 @@ Public Class ActiveClass : Implements IDisposable
         Dim intrinsicsLeft As intrinsics_VB
         Dim intrinsicsRight As intrinsics_VB
         Dim resolution As Integer
-        Dim mainFormHeight As Integer
-        Dim mainFormLoc As Point
         Dim minimizeMemoryFootprint As Boolean
         Dim OpenCV_Version_ID As String
         Dim OpenCVfullPath As String
@@ -103,12 +102,12 @@ Public Class ActiveClass : Implements IDisposable
         Dim transformationMatrix() As Single
         Dim useRecordedData As Boolean
     End Structure
-    Public Sub New(parms As algorithmParameters, _width As Integer, _height As Integer)
+    Public Sub New(parms As algorithmParameters, _width As Integer, _height As Integer, location As cv.Rect)
         slidersOffset = New cv.Point(10, 10)
         radioOffset = New cv.Point(10, 10)
         Randomize() ' just in case anyone uses VB.Net's Rnd
-        UpdateHostLocation(parms.mainFormLoc.X, parms.mainFormLoc.Y, parms.mainFormHeight)
         ocvb = New AlgorithmData(parms, _width, _height)
+        UpdateHostLocation(location)
         If LCase(parms.activeAlgorithm).EndsWith(".py") Then ocvb.PythonFileName = parms.activeAlgorithm
         ocvb.PythonExe = parms.PythonExe
         ocvb.parms = parms
@@ -125,8 +124,9 @@ Public Class ActiveClass : Implements IDisposable
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
     End Sub
-    Public Sub UpdateHostLocation(left As Int32, top As Int32, height As Int32)
-        appLocation = New cv.Rect(left, top, 0, height)
+    Public Sub UpdateHostLocation(location As cv.Rect)
+        applocation = location
+        midFormX = location.Left + location.Width / 2 + 40
     End Sub
     Public Sub RunAlgorithm()
         Try

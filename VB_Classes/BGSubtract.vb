@@ -69,26 +69,26 @@ Public Class BGSubtract_MotionDetect_MT
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount = 0 Then src.CopyTo(dst2)
         Dim threadData As New cv.Vec3i
-        Dim w = src.Width, h = src.Height
+        Dim width = src.Width, height = src.Height
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then
-                threadData = Choose(i + 1, New cv.Vec3i(1, w, h), New cv.Vec3i(2, w / 2, h), New cv.Vec3i(4, w / 2, h / 2),
-                                           New cv.Vec3i(8, w / 4, h / 2), New cv.Vec3i(16, w / 4, h / 4), New cv.Vec3i(32, w / 8, h / 4))
+                threadData = Choose(i + 1, New cv.Vec3i(1, width, height), New cv.Vec3i(2, width / 2, height), New cv.Vec3i(4, width / 2, height / 2),
+                                           New cv.Vec3i(8, width / 4, height / 2), New cv.Vec3i(16, width / 4, height / 4), New cv.Vec3i(32, width / 8, height / 4))
                 Exit For
             End If
         Next
         Dim threadCount = threadData(0)
-        w = threadData(1)
-        h = threadData(2)
+        width = threadData(1)
+        height = threadData(2)
         Dim taskArray(threadCount - 1) As Task
-        Dim xfactor = CInt(src.Width / w)
-        Dim yfactor = Math.Max(CInt(src.Height / h), CInt(src.Width / w))
+        Dim xfactor = CInt(src.Width / width)
+        Dim yfactor = Math.Max(CInt(src.Height / height), CInt(src.Width / width))
         Dim CCthreshold = CSng(sliders.TrackBar1.Value / sliders.TrackBar1.Maximum)
         For i = 0 To threadCount - 1
             Dim section = i
             taskArray(i) = Task.Factory.StartNew(
                 Sub()
-                    Dim roi = New cv.Rect((section Mod xfactor) * w, h * Math.Floor(section / yfactor), w, h)
+                    Dim roi = New cv.Rect((section Mod xfactor) * width, height * Math.Floor(section / yfactor), width, height)
                     Dim correlation As New cv.Mat
                     cv.Cv2.MatchTemplate(src(roi), dst2(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                     If CCthreshold > correlation.Get(Of Single)(0, 0) Then
