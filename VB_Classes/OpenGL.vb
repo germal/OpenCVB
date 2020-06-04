@@ -370,13 +370,20 @@ End Class
 ' https://www.codeproject.com/Articles/1247960/Learning-Basic-Math-Used-In-3D-Graphics-Engines
 Public Class OpenGL_GravityTransform
     Inherits ocvbClass
-    Dim imu As IMU_GVector
     Public ogl As OpenGL_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        imu = New IMU_GVector(ocvb)
+
         ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_Callbacks"
+
+        radio.Setup(ocvb, caller, 4)
+        radio.check(0).Text = "Rotate around X-axis using gravity vector"
+        radio.check(1).Text = "Rotate around Z-axis using gravity vector"
+        radio.check(2).Text = "Rotate around both X-axis and Z-axis using gravity vector"
+        radio.check(3).Text = "No rotation"
+        radio.check(2).Checked = True
+
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -385,18 +392,24 @@ Public Class OpenGL_GravityTransform
             Exit Sub
         End If
 
-        imu.Run(ocvb)
-        Static rotateFlag = 0
+        ogl.imu.Run(ocvb)
         Dim split() = cv.Cv2.Split(ocvb.pointCloud)
         Dim vertSplit = split
 
-        Dim zCos = Math.Cos(imu.angleZ)
-        Dim zSin = Math.Sin(imu.angleZ)
+        Dim zCos = Math.Cos(ogl.imu.angleZ)
+        Dim zSin = Math.Sin(ogl.imu.angleZ)
 
-        Dim xCos = Math.Cos(imu.angleX)
-        Dim xSin = Math.Sin(imu.angleX)
+        Dim xCos = Math.Cos(ogl.imu.angleX)
+        Dim xSin = Math.Sin(ogl.imu.angleX)
 
-        Select Case rotateFlag Mod 4
+        Dim rotateFlag = 2 ' assume both x ans z axis rotation
+        For i = 0 To radio.check.Count - 1
+            If radio.check(i).Checked Then
+                rotateFlag = i
+                Exit For
+            End If
+        Next
+        Select Case rotateFlag
             Case 0 ' rotate around x-axis - AKA YZ plane rotation matrix
                 vertSplit(1) = zCos * split(1) - zSin * split(2)
                 vertSplit(2) = zSin * split(1) + zCos * split(2)
@@ -431,7 +444,6 @@ Public Class OpenGL_GravityTransform
 
         ogl.src = src
         ogl.Run(ocvb)
-        If ocvb.frameCount Mod 30 = 0 Then rotateFlag += 1
     End Sub
 End Class
 

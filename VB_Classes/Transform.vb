@@ -97,7 +97,7 @@ End Class
 
 Public Class Transform_Gravity
     Inherits ocvbClass
-    Dim imu As IMU_GVector
+    Public imu As IMU_GVector
     Public vertSplit() As cv.Mat
     Public xyz(0) As Single
     Dim smooth As Depth_SmoothingMat

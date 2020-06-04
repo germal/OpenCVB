@@ -232,7 +232,6 @@ Public Class OpenCVB
         End If
         If algorithmRefresh And (pic.Tag = 2 Or pic.Tag = 3) Then
             algorithmRefresh = False
-            ' Try
             SyncLock formResult1
                 If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Then
                     Dim result1 = formResult1
@@ -246,29 +245,23 @@ Public Class OpenCVB
                     cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
                 End If
             End SyncLock
-            '    Catch ex As Exception
-            '        Console.WriteLine("Paint exception occurred updating results1/2: " + ex.Message)
-            '    End Try
         End If
         If cameraRefresh And (pic.Tag = 0 Or pic.Tag = 1) Then
             cameraRefresh = False
             Dim RGBDepth As New cv.Mat
             Dim color As New cv.Mat
-            'Try
             SyncLock bufferLock ' avoid updating the image while copying into it in the algorithm and camera tasks
                 If camera.color IsNot Nothing Then
-                    If RGBDepth.Width = 0 Then RGBDepth = New cv.Mat
-                    RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
-                    color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
-                    cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
-                    cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
+                    If camera.color.width > 0 Then
+                        If RGBDepth.Width = 0 Then RGBDepth = New cv.Mat
+                        RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
+                        color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
+                        cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
+                        cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
+                    End If
                 End If
             End SyncLock
-            'Catch ex As Exception
-            '    Console.WriteLine("Paint exception occurred updating RGB and RGBdepth: " + ex.Message)
-            'End Try
         End If
-        'Try
         ' draw any TrueType font data on the image 
         Dim maxline = 21
         SyncLock bufferLock
@@ -291,9 +284,6 @@ Public Class OpenCVB
             End If
         End SyncLock
         AlgorithmDesc.Text = textDesc
-        'Catch ex As Exception
-        '    Console.WriteLine("Paint exception occurred updating image labels: " + ex.Message)
-        'End Try
     End Sub
     Private Sub RestartCamera()
         camera.closePipe()

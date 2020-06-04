@@ -102,18 +102,16 @@ public:
 				if (d > 0 and d < maxZ)
 				{
 					float fx = pt.x;
-					float dpixel = range * d / maxZ;
-					if (fx > -zHalf && fx < zHalf)
-					{
-						float dx = range * (zHalf + fx) / maxZ; // maintain a 1:1 aspect ratio
-						if (dx > 0 && dx < range) histTop.at<float>((int)(range - dpixel), (int)dx + shift) += 1;
-					}
+					int x = int(range * (zHalf + fx) / maxZ + shift); // maintain a 1:1 aspect ratio
+					int y = int(range - range * d / maxZ);
+					if (x >= 0 && x < xyz.cols && y >= 0 && y < xyz.rows) histTop.at<float>(y, x) += 1;
 
 					float fy = pt.y;
 					if (fy > -zHalf && fy < zHalf)
 					{
-						float dy = range * (zHalf + fy) / maxZ; // maintain a 1:1 aspect ratio
-						if (dy < range && dy > 0) histSide.at<float>(int(dy), (int)dpixel + shift) += 1;
+						int x = int(range * d / maxZ + shift);
+						int y = int(range * (zHalf + fy) / maxZ); // maintain a 1:1 aspect ratio
+						if (x >= 0 && x < xyz.cols && y >= 0 && y < xyz.rows) histSide.at<float>(y, x) += 1;
 					}
 				}
 			}

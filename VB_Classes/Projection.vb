@@ -47,8 +47,9 @@ Public Class Projection_ColorizeMat
     Public colorizeMatFlip As cv.Mat
     Dim fontSize As Single
     Dim radius As Integer
-    Dim hFOVangles() As Single = {54, 44, 0, 37, 49}  ' T265 has no point cloud so there is a 0 where it would have been.
-    Dim vFOVangles() As Single = {69, 59, 0, 52, 65}  ' T265 has no point cloud so there is a 0 where it would have been.
+    Dim arcSize As Integer = 100
+    Dim hFOVangles() As Single = {54, 44, 0, 42, 49}  ' T265 has no point cloud so there is a 0 where it would have been.
+    Dim vFOVangles() As Single = {69, 59, 0, 58, 65}  ' T265 has no point cloud so there is a 0 where it would have been.
     Public Function CameraLocationBot(ocvb As AlgorithmData, mask As cv.Mat) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
         dst1.CopyTo(dst, mask)
@@ -71,13 +72,17 @@ Public Class Projection_ColorizeMat
         Dim fovRight = New cv.Point(xloc, 0)
         Dim fovLeft = New cv.Point(cameraPt.X - x, fovRight.Y)
 
-        dst.Ellipse(cameraPt, New cv.Size(100, 100), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Ellipse(cameraPt, New cv.Size(100, 100), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Ellipse(cameraPt, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Ellipse(cameraPt, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         dst.Line(cameraPt, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
+        ' https://www.intelrealsense.com/depth-camera-d435i/
+        ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
+        ' https://www.stereolabs.com/zed/
+        ' https://www.mynteye.com/pages/mynt-eye-d
         Dim labelLocation = New cv.Point(dst.Width / 2 + shift * 3 / 4, dst.Height * 7 / 8)
         If ocvb.parms.resolution = resHigh Then labelLocation = New cv.Point(dst.Width / 2 + shift * 3 / 8, dst.Height * 15 / 16)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " degrees", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " degrees" + " FOV=" + CStr(180 - startAngle * 2), labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(cameraPt, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst
@@ -103,13 +108,14 @@ Public Class Projection_ColorizeMat
         Dim fovTop = New cv.Point(dst.Width, yloc)
         Dim fovBot = New cv.Point(dst.Width, cameraPt.Y + y)
 
-        dst.Ellipse(cameraPt, New cv.Size(100, 100), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Ellipse(cameraPt, New cv.Size(100, 100), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+
+        dst.Ellipse(cameraPt, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Ellipse(cameraPt, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(cameraPt, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Dim labelLocation = New cv.Point(shift + 10, dst.Height * 3 / 4)
         ' If ocvb.parms.resolution = resHigh Then labelLocation = New cv.Point(shift * 3 / 8, dst.Height * 15 / 16)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " degrees", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " degrees" + " FOV=" + CStr(180 - startAngle * 2), labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(cameraPt, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst
@@ -127,6 +133,7 @@ Public Class Projection_ColorizeMat
         palette.color1 = cv.Scalar.Yellow
         palette.color2 = cv.Scalar.Blue
         palette.frameModulo = 1
+        If ocvb.parms.resolution <> resHigh Then arcSize = 50
 
         sliders.setupTrackBar1(ocvb, caller, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
         sliders.setupTrackBar2("Threshold for histogram count", 0, 100, 3)
@@ -277,6 +284,7 @@ Public Class Projection_Gravity_CPP
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         gCloud = New Transform_Gravity(ocvb)
+        gCloud.imu.showLog = False
         cPtr = Project_GravityHist_Open()
 
         cMats = New Projection_ColorizeMat(ocvb)

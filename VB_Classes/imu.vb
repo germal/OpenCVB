@@ -439,7 +439,8 @@ Public Class IMU_GVector
     Public angleX As Single ' in radians.
     Public angleY As Single ' in radians.
     Public angleZ As Single ' in radians.
-    Public result As Integer = RESULT1 ' could be result1 or result2
+    Public result As Integer = RESULT1
+    Public showLog As Boolean = True
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         kalman = New Kalman_Basics(ocvb)
@@ -462,7 +463,11 @@ Public Class IMU_GVector
         gy = kalman.output(1)
         gz = kalman.output(2)
 
-        If standalone Then
+        angleX = kalman.output(3)
+        angleY = kalman.output(4)
+        angleZ = kalman.output(5)
+
+        If showLog Then
             Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf
             outStr = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(gx, "#0.0000") + vbCrLf
             outStr += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(gy, "#0.0000") + vbCrLf
@@ -478,10 +483,10 @@ Public Class IMU_GVector
 
             ' validate the result
             Dim valstr = "sqrt (" + vbTab + Format(gx, "#0.0000") + "*" + Format(gx, "#0.0000") + vbTab +
-                                    vbTab + Format(gy, "#0.0000") + "*" + Format(gy, "#0.0000") + vbTab +
-                                    vbTab + Format(gz, "#0.0000") + "*" + Format(gz, "#0.0000") + " ) = " + vbTab +
-                                    vbTab + Format(Math.Sqrt(gx * gx + gy * gy + gz * gz), "#0.0000") + vbCrLf +
-                                    "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
+                            vbTab + Format(gy, "#0.0000") + "*" + Format(gy, "#0.0000") + vbTab +
+                            vbTab + Format(gz, "#0.0000") + "*" + Format(gz, "#0.0000") + " ) = " + vbTab +
+                            vbTab + Format(Math.Sqrt(gx * gx + gy * gy + gz * gz), "#0.0000") + vbCrLf +
+                            "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
 
             ocvb.putText(New oTrueType(valstr, 10, 200, result))
         End If
