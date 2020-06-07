@@ -79,12 +79,7 @@ Public Class OpenGL_Basics
         pipe.WaitForConnection()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.cameraIndex = T265Camera Then
-            ocvb.putText(New oTrueType("The T265 camera doesn't have a point cloud.", 10, 60, RESULT1))
-            Exit Sub
-        End If
-
-        if standalone Then pointCloudInput = ocvb.pointCloud
+        If standalone Then pointCloudInput = ocvb.pointCloud
         imu.Run(ocvb)
 
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
@@ -387,11 +382,6 @@ Public Class OpenGL_GravityTransform
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.cameraIndex = T265Camera Then
-            ocvb.putText(New oTrueType("The T265 camera doesn't have a point cloud.", 10, 60, RESULT1))
-            Exit Sub
-        End If
-
         ogl.imu.Run(ocvb)
         Dim split() = cv.Cv2.Split(ocvb.pointCloud)
         Dim vertSplit = split

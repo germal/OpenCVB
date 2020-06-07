@@ -30,14 +30,18 @@ Public Class Transform_Rotate
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Angle", 0, 180, 30)
-        sliders.setupTrackBar2("Scale Factor", 1, 100, 50)
+        sliders.setupTrackBar1(ocvb, caller, "Angle", 0, 360, 30)
+        sliders.setupTrackBar2("Scale Factor", 1, 100, 100)
+        sliders.setupTrackBar3("Rotation center X", 1, src.Width, src.Width / 2)
+        sliders.setupTrackBar4("Rotation center Y", 1, src.Height, src.Height / 2)
         ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim imageCenter = New cv.Point2f(src.Width / 2, src.Height / 2)
+        Dim imageCenter = New cv.Point2f(sliders.TrackBar3.Value, sliders.TrackBar4.Value)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.TrackBar1.Value, sliders.TrackBar2.Value / 100)
         cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
+        dst1.Circle(imageCenter, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        dst1.Circle(imageCenter, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
@@ -94,11 +98,78 @@ End Class
 
 
 
+Public Class Transform_Affine3D
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        check.Setup(ocvb, caller, 2)
+        check.Box(0).Text = "Check to snap the first point cloud"
+        check.Box(1).Text = "Check to snap the second point cloud"
+        ocvb.desc = "Using 2 point clouds compute the 3D affine transform between them"
+        ocvb.putText(New oTrueType("Use the check boxes to snapshot the different point clouds", 10, 50, RESULT1))
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static pc1 As cv.Mat
+        Static pc2 As cv.Mat
+        Static affineTransform As cv.Mat
 
-Public Class Transform_Gravity
+        If ocvb.parms.testAllRunning Then
+            If ocvb.frameCount = 30 Then check.Box(0).Checked = True
+            If ocvb.frameCount = 60 Then check.Box(1).Checked = True
+        End If
+
+        If check.Box(0).Checked Then
+            pc1 = ocvb.pointCloud.Clone()
+            check.Box(0).Checked = False
+            ocvb.putText(New oTrueType("First point cloud captured", 10, 50, RESULT1))
+            affineTransform = Nothing
+        End If
+
+        If check.Box(1).Checked Then
+            pc2 = ocvb.pointCloud.Clone()
+            check.Box(1).Checked = False
+            ocvb.putText(New oTrueType("Second point cloud captured", 10, 70, RESULT1))
+            affineTransform = Nothing
+        End If
+
+        If pc1 IsNot Nothing Then
+            If pc2 IsNot Nothing Then
+                Dim inliers = New cv.Mat
+                affineTransform = New cv.Mat(3, 4, cv.MatType.CV_64F)
+                pc1 = pc1.Reshape(3, pc1.Rows * pc1.Cols)
+                pc2 = pc2.Reshape(3, pc2.Rows * pc2.Cols)
+                cv.Cv2.EstimateAffine3D(pc1, pc2, affineTransform, inliers)
+                pc1 = Nothing
+                pc2 = Nothing
+            End If
+        End If
+
+        If affineTransform IsNot Nothing Then
+            ocvb.putText(New oTrueType("Affine Transform 3D results:", 10, 90, RESULT1))
+            For i = 0 To 3 - 1
+                Dim outstr = ""
+                For j = 0 To 4 - 1
+                    outstr += Format(affineTransform.Get(Of Double)(i, j), "0.000") + vbTab
+                Next
+                ocvb.putText(New oTrueType(outstr, 10, 110 + i * 25, RESULT1))
+            Next
+            ocvb.putText(New oTrueType("0" + vbTab + "0" + vbTab + "0" + vbTab + "1", 10, 80 + 4 * 25, RESULT1))
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
+' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
+Public Class Transform_Gravity1
     Inherits ocvbClass
     Public imu As IMU_GVector
-    Public vertSplit() As cv.Mat
+    Public vertSplit(3 - 1) As cv.Mat
     Public xyz(0) As Single
     Dim smooth As Depth_SmoothingMat
     Public Sub New(ocvb As AlgorithmData)
@@ -108,16 +179,15 @@ Public Class Transform_Gravity
         check.Box(0).Text = "Apply smoothing to depth data"
         check.Box(0).Checked = False
         check.Visible = False ' smoothing is not working well enough yet...
+        vertSplit(0) = New cv.Mat
+        vertSplit(1) = New cv.Mat
+        vertSplit(2) = New cv.Mat
 
         imu = New IMU_GVector(ocvb)
+        imu.showLog = False
         ocvb.desc = "Transform the pointcloud with the gravity vector"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.cameraIndex = T265Camera Then
-            ocvb.putText(New oTrueType("T265 camera has no pointcloud data", 10, 125))
-            Exit Sub
-        End If
-
         imu.Run(ocvb)
 
         ' normally it is not desirable to resize the point cloud but it can be here because we are building a histogram.
@@ -131,7 +201,6 @@ Public Class Transform_Gravity
             cv.Cv2.Add(split(2), dst1, split(2))
             label1 = smooth.label1
         End If
-        vertSplit = split
 
         Dim zCos = Math.Cos(imu.angleZ)
         Dim zSin = Math.Sin(imu.angleZ)
@@ -140,9 +209,9 @@ Public Class Transform_Gravity
         Dim xSin = Math.Sin(imu.angleX)
 
         Dim xArray(,) As Single = {{1, 0, 0, 0}, {0, zCos, -zSin, 0}, {0, zSin, zCos, 0}, {0, 0, 0, 1}}
-        Dim xRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, xArray)
-
         Dim zArray(,) As Single = {{xCos, -xSin, 0, 0}, {xSin, xCos, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}
+
+        Dim xRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, xArray)
         Dim zRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, zArray)
         Dim yRotate = (xRotate * zRotate).ToMat
 
@@ -162,6 +231,46 @@ Public Class Transform_Gravity
         Marshal.Copy(pc.Data, xyz, 0, xyz.Length) ' why copy it?  To avoid memory leak in parallel for's.  Not sure...
 
         If standalone Then ocvb.putText(New oTrueType("Pointcloud is now oriented toward gravity " +
-                                        If(check.Box(0).Checked, "using smoothed depth data.", "."), 10, 125, RESULT2))
+                                                      If(check.Box(0).Checked, "using smoothed depth data.", "."), 10, 125))
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
+' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
+Public Class Transform_GravityXaxis
+    Inherits ocvbClass
+    Public imu As IMU_GVector
+    Public xyz(0) As Single
+    Public trim As Depth_InRange
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        trim = New Depth_InRange(ocvb)
+        imu = New IMU_GVector(ocvb)
+        imu.showLog = False
+        ocvb.desc = "Transform the pointcloud with the gravity vector"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        imu.Run(ocvb)
+        '[1      0       0] rotate the point cloud around the x-axis only.
+        '[0 cos(a) -sin(a)]
+        '[0 sin(a)  cos(a)]
+        Dim rotateX(,) = {{1, 0, 0},
+                          {0, Math.Cos(imu.angleZ), -Math.Sin(imu.angleZ)},
+                          {0, Math.Sin(imu.angleZ), Math.Cos(imu.angleZ)}}
+
+        Dim pc = ocvb.pointCloud.Resize(ocvb.color.Size())
+        Dim split() = cv.Cv2.Split(pc)
+
+        Dim imageCenter = New cv.Point2f(0, src.Height / 2)
+        Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, imu.angleZ * cv.Cv2.PI / 180, 100)
+        cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
+
+        If standalone Then ocvb.putText(New oTrueType("Pointcloud is now oriented toward gravity ", 10, 125))
     End Sub
 End Class

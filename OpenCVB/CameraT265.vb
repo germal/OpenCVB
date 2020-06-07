@@ -106,7 +106,7 @@ Public Class CameraT265
 
         RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, 0)
         depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, 0)
-        pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, 0) ' we build an empty point cloud for the T265
+        pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, 0)
     End Sub
     Public Sub GetNextFrame()
         If pipelineClosed Or cPtr = 0 Then Exit Sub

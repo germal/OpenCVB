@@ -264,7 +264,7 @@ Public Class OpenCVB
         End If
         ' draw any TrueType font data on the image 
         Dim maxline = 21
-        SyncLock bufferLock
+        SyncLock formResult1
             For i = 0 To TTtextData(pic.Tag).Count - 1 ' using enumeration here would occasionally generate a mistaken warning.
                 Dim tt = TTtextData(pic.Tag)(i)
                 If tt IsNot Nothing Then

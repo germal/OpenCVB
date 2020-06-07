@@ -1162,44 +1162,6 @@ End Class
 
 
 
-Public Class Depth_InRange
-    Inherits ocvbClass
-    Public Mask As New cv.Mat
-    Public zeroMask As New cv.Mat
-    Public depth32f As New cv.Mat
-    Public minDepth As Double
-    Public maxDepth As Double
-    Public inputInMeters As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "InRange Min Depth", 200, 1000, 200)
-        sliders.setupTrackBar2("InRange Max Depth", 200, 10000, 1400)
-        label1 = "Depth values that are in-range"
-        label2 = "Depth values that are out of range (and < 8m)"
-        ocvb.desc = "Show depth with OpenCV using varying min and max depths."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If sliders.TrackBar1.Value >= sliders.TrackBar2.Value Then sliders.TrackBar2.Value = sliders.TrackBar1.Value + 1
-        minDepth = cv.Scalar.All(sliders.TrackBar1.Value)
-        maxDepth = cv.Scalar.All(sliders.TrackBar2.Value)
-        If inputInMeters Then
-            minDepth /= 1000
-            maxDepth /= 1000
-        End If
-        If src.Type = cv.MatType.CV_32F Then depth32f = src Else depth32f = getDepth32f(ocvb)
-        cv.Cv2.InRange(depth32f, minDepth, maxDepth, Mask)
-        cv.Cv2.BitwiseNot(Mask, zeroMask)
-        dst1 = depth32f.Clone.SetTo(0, zeroMask)
-        dst2 = depth32f.Clone.SetTo(0, Mask)
-        dst2 = dst2.Threshold(8000, 8000, cv.ThresholdTypes.Trunc) ' the data beyond 8 meters is suspect and will distort the image output
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Depth_SmoothingMat
     Inherits ocvbClass
@@ -1266,3 +1228,75 @@ Public Class Depth_Smoothing
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class Depth_PointCloudInRange
+    Inherits ocvbClass
+    Public Mask As New cv.Mat
+    Public minMeters As Double
+    Public maxMeters As Double
+    Public split() As cv.Mat
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, caller, "InRange Min Depth (mm)", 0, 1000, 200)
+        sliders.setupTrackBar2("InRange Max Depth (mm)", 200, 10000, 2000)
+        label1 = ""
+        label2 = "Mask for depth values that are in-range"
+        ocvb.desc = "Show depth with OpenCV using varying min and max depths."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If sliders.TrackBar1.Value >= sliders.TrackBar2.Value Then sliders.TrackBar2.Value = sliders.TrackBar1.Value + 1
+        minMeters = sliders.TrackBar1.Value / 1000
+        maxMeters = sliders.TrackBar2.Value / 1000
+
+        split = cv.Cv2.Split(ocvb.pointCloud)
+
+        cv.Cv2.InRange(split(2), cv.Scalar.All(minMeters), cv.Scalar.All(maxMeters), Mask)
+        cv.Cv2.Merge(split, dst1)
+        If standalone Then dst2 = Mask
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Depth_InRange
+    Inherits ocvbClass
+    Public Mask As New cv.Mat
+    Public zeroMask As New cv.Mat
+    Public depth32f As New cv.Mat
+    Public minDepth As Double
+    Public maxDepth As Double
+    Public inputInMeters As Boolean
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, caller, "InRange Min Depth", 0, 1000, 200)
+        sliders.setupTrackBar2("InRange Max Depth", 200, 10000, 1400)
+        label1 = "Depth values that are in-range"
+        label2 = "Depth values that are out of range (and < 8m)"
+        ocvb.desc = "Show depth with OpenCV using varying min and max depths."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If sliders.TrackBar1.Value >= sliders.TrackBar2.Value Then sliders.TrackBar2.Value = sliders.TrackBar1.Value + 1
+        minDepth = cv.Scalar.All(sliders.TrackBar1.Value)
+        maxDepth = cv.Scalar.All(sliders.TrackBar2.Value)
+        If inputInMeters Then
+            minDepth /= 1000
+            maxDepth /= 1000
+        End If
+        If src.Type = cv.MatType.CV_32F Then depth32f = src Else depth32f = getDepth32f(ocvb)
+        cv.Cv2.InRange(depth32f, minDepth, maxDepth, Mask)
+        cv.Cv2.BitwiseNot(Mask, zeroMask)
+        dst1 = depth32f.Clone.SetTo(0, zeroMask)
+        dst2 = depth32f.Clone.SetTo(0, Mask)
+        dst2 = dst2.Threshold(8000, 8000, cv.ThresholdTypes.Trunc) ' the data beyond 8 meters is suspect and will distort the image output
+    End Sub
+End Class

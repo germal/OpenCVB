@@ -275,7 +275,7 @@ End Class
 
 Public Class Projection_Gravity_CPP
     Inherits ocvbClass
-    Dim gCloud As Transform_Gravity
+    Dim gCloud As Transform_Gravity1
     Public cMats As Projection_ColorizeMat
     Dim cPtr As IntPtr
     Dim xyzBytes() As Byte
@@ -283,7 +283,7 @@ Public Class Projection_Gravity_CPP
     Public sideMask As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        gCloud = New Transform_Gravity(ocvb)
+        gCloud = New Transform_Gravity1(ocvb)
         gCloud.imu.showLog = False
         cPtr = Project_GravityHist_Open()
 
@@ -453,14 +453,14 @@ End Class
 
 Public Class Projection_Gravity
     Inherits ocvbClass
-    Dim gCloud As Transform_Gravity
+    Dim gCloud As Transform_Gravity1
     Dim grid As Thread_Grid
     Public cMats As Projection_ColorizeMat
     Public topView As cv.Mat
     Public sideView As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        gCloud = New Transform_Gravity(ocvb)
+        gCloud = New Transform_Gravity1(ocvb)
         grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 40
@@ -509,8 +509,6 @@ Public Class Projection_Gravity
                         If x > 0 And x < topView.Width And y >= 0 And y < topView.Height Then
                             Dim count = sideView.Get(Of Byte)(y, x) + 1
                             sideView.Set(Of Byte)(y, x, If(count < 255, count, 255))
-                        Else
-                            h = h
                         End If
                     End If
                 End If

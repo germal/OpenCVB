@@ -265,7 +265,7 @@ Public Class Histogram_2D_XZ_YZ
         trim = New Depth_InRange(ocvb)
         trim.sliders.TrackBar2.Value = 1500 ' up to x meters away
 
-        sliders.setupTrackBar1(ocvb, caller, "Histogram X bins", 1, ocvb.color.cols / 2, 30)
+        sliders.setupTrackBar1(ocvb, caller, "Histogram X bins", 1, ocvb.color.Cols / 2, 30)
         sliders.setupTrackBar2("Histogram Z bins", 1, 200, 100)
 
         ocvb.desc = "Create a 2D histogram for depth in XZ and YZ."
@@ -290,6 +290,54 @@ Public Class Histogram_2D_XZ_YZ
         Dim rangesY() = New cv.Rangef() {New cv.Rangef(0, src.Height - 1), New cv.Rangef(minRange, maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {xyDepth.xyDepth}, New Integer() {1, 2}, New cv.Mat(), histogram, 2, histSize, rangesY)
         histogram2DPlot(histogram, dst2, xbins, zbins)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Histogram_2D_YZ
+    Inherits ocvbClass
+    Dim trimPC As Depth_PointCloudInRange
+    Dim offset As Integer
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        sliders.setupTrackBar1(ocvb, caller, "Histogram threshold", 1, 1000, 3)
+        sliders.setupTrackBar2("Y range", 1, 10, 2)
+
+        trimPC = New Depth_PointCloudInRange(ocvb)
+        trimPC.sliders.TrackBar1.Value = 0
+        trimPC.sliders.TrackBar2.Value = 4000
+
+        offset = (src.Width - src.Height) / 2 ' center the image which is going to be square
+        ocvb.desc = "Create a 2D histogram for depth in YZ."
+        label1 = "YZ (Side View)"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim minVal As Double, maxVal As Double
+        Dim histSize() = {src.Height, src.Height}
+        Dim pixelsPerMeterX = CInt(src.Height * 1000 / (trimPC.sliders.TrackBar2.Value - trimPC.sliders.TrackBar1.Value))
+        If pixelsPerMeterX < 20 Then pixelsPerMeterX = 20
+
+        trimPC.Run(ocvb)
+        trimPC.split(1).MinMaxLoc(minVal, maxVal)
+
+        'ocvb.putText(New oTrueType("Z range = (0, " + CStr(trimPC.sliders.TrackBar2.Value) + " mm, Y range = (" + Format(minVal, "0.00") +
+        '                           ", " + Format(maxVal, "0.00"), 10, 80, RESULT2))
+        'ocvb.putText(New oTrueType("Pixels per meter = " + Format(src.Height / Math.Abs(maxVal - minVal)), 10, 120, RESULT2))
+
+        Dim yRange = sliders.TrackBar2.Value * pixelsPerMeterX
+        trimPC.split(1).ConvertTo(trimPC.split(1), cv.MatType.CV_32F, pixelsPerMeterX, yRange)
+        trimPC.split(2).ConvertTo(trimPC.split(2), cv.MatType.CV_32F, pixelsPerMeterX)
+
+        Dim histinput As New cv.Mat
+        cv.Cv2.Merge(trimPC.split, histinput)
+
+        Dim rangesY() = New cv.Rangef() {New cv.Rangef(0, src.Height), New cv.Rangef(0, yRange)}
+        cv.Cv2.CalcHist(New cv.Mat() {histinput}, New Integer() {1, 2}, trimPC.Mask, dst1, 2, histSize, rangesY)
+        If standalone Then dst1 = dst1.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 

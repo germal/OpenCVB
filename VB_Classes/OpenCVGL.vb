@@ -49,10 +49,7 @@ Public Class OpenCVGL_Image_CPP
                                                   "Skipping it during a 'Test All' just so all the other tests can be exercised.", 10, 60, RESULT1))
             Exit Sub
         End If
-        If ocvb.parms.cameraIndex = T265Camera Then
-            ocvb.putText(New oTrueType("The T265 camera doesn't have a point cloud.", 10, 60, RESULT1))
-            Exit Sub
-        End If
+
         imu.Run(ocvb)
         Dim FOV = sliders.TrackBar1.Value
         Dim yaw = sliders.TrackBar2.Value
