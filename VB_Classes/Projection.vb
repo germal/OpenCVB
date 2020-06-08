@@ -43,13 +43,12 @@ Public Class Projection_ColorizeMat
     Dim palette As Palette_Gradient
     Public rect As cv.Rect
     Public shift As Integer
-    Public colorizeMat As cv.Mat
-    Public colorizeMatFlip As cv.Mat
+    Public labelShift As Integer
     Dim fontSize As Single
     Dim radius As Integer
     Dim arcSize As Integer = 100
-    Dim hFOVangles() As Single = {54, 44, 0, 42, 49}  ' T265 has no point cloud so there is a 0 where it would have been.
-    Dim vFOVangles() As Single = {69, 59, 0, 58, 65}  ' T265 has no point cloud so there is a 0 where it would have been.
+    Dim hFOVangles() As Single = {55, 45, 0, 40, 51}  ' T265 has no point cloud so there is a 0 where it would have been.
+    Dim vFOVangles() As Single = {69, 60, 0, 55, 65}  ' T265 has no point cloud so there is a 0 where it would have been.
     Public Function CameraLocationBot(ocvb As AlgorithmData, mask As cv.Mat) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
         dst1.CopyTo(dst, mask)
@@ -80,14 +79,14 @@ Public Class Projection_ColorizeMat
         ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
         ' https://www.stereolabs.com/zed/
         ' https://www.mynteye.com/pages/mynt-eye-d
-        Dim labelLocation = New cv.Point(dst.Width / 2 + shift * 3 / 4, dst.Height * 7 / 8)
-        If ocvb.parms.resolution = resHigh Then labelLocation = New cv.Point(dst.Width / 2 + shift * 3 / 8, dst.Height * 15 / 16)
+        Dim labelLocation = New cv.Point(dst.Width / 2 + labelShift * 3 / 4, dst.Height * 7 / 8)
+        If ocvb.parms.resolution = resHigh Then labelLocation = New cv.Point(dst.Width / 2 + labelShift * 3 / 8, dst.Height * 15 / 16)
         cv.Cv2.PutText(dst, CStr(startAngle) + " degrees" + " FOV=" + CStr(180 - startAngle * 2), labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(cameraPt, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst
     End Function
-    Public Function CameraLocationLeft(ocvb As AlgorithmData, ByRef mask As cv.Mat) As cv.Mat
+    Public Function CameraLocationSide(ocvb As AlgorithmData, ByRef mask As cv.Mat) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
         dst2.CopyTo(dst, mask)
         Dim cameraPt = New cv.Point(shift, dst.Height / 2)
@@ -109,12 +108,12 @@ Public Class Projection_ColorizeMat
         Dim fovBot = New cv.Point(dst.Width, cameraPt.Y + y)
 
 
-        dst.Ellipse(cameraPt, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        dst.Ellipse(cameraPt, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Ellipse(cameraPt, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Ellipse(cameraPt, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         dst.Line(cameraPt, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        Dim labelLocation = New cv.Point(shift + 10, dst.Height * 3 / 4)
-        ' If ocvb.parms.resolution = resHigh Then labelLocation = New cv.Point(shift * 3 / 8, dst.Height * 15 / 16)
+        Dim labelLocation = New cv.Point(10, dst.Height * 3 / 4)
+        ' If ocvb.parms.resolution = resHigh Then labelLocation = New cv.Point(labelShift * 3 / 8, dst.Height * 15 / 16)
         cv.Cv2.PutText(dst, CStr(startAngle) + " degrees" + " FOV=" + CStr(180 - startAngle * 2), labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(cameraPt, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
@@ -127,7 +126,7 @@ Public Class Projection_ColorizeMat
         If ocvb.parms.resolution = resMed Then fontSize = 0.6
         radius = If(ocvb.parms.resolution = resMed, 5, 12)
         shift = (src.Width - src.Height) / 2
-        rect = New cv.Rect(shift, 0, dst1.Height, dst1.Height)
+        labelShift = shift
 
         palette = New Palette_Gradient(ocvb)
         palette.color1 = cv.Scalar.Yellow
@@ -146,6 +145,7 @@ Public Class Projection_ColorizeMat
         palette.Run(ocvb)
         dst1 = palette.dst1
         dst2 = dst1.Clone
+        rect = New cv.Rect(shift, 0, dst1.Height, dst1.Height)
         cv.Cv2.Rotate(dst1(rect), dst2(rect), cv.RotateFlags.Rotate90Clockwise)
     End Sub
 End Class
@@ -153,7 +153,7 @@ End Class
 
 
 
-Public Class Projection_NoGravity_CPP
+Public Class Projection_Raw_CPP
     Inherits ocvbClass
     Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
@@ -209,7 +209,7 @@ End Class
 
 
 
-Public Class Projection_NoGravity
+Public Class Projection_Raw
     Inherits ocvbClass
     Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
@@ -321,7 +321,7 @@ Public Class Projection_Gravity_CPP
         If ocvb.parms.resolution = resMed Then fontSize = 0.6
         If standalone Then
             dst1 = cMats.CameraLocationBot(ocvb, topMask)
-            dst2 = cMats.CameraLocationLeft(ocvb, sideMask)
+            dst2 = cMats.CameraLocationSide(ocvb, sideMask)
         Else
             dst1 = topMask
             dst2 = sideMask
@@ -520,7 +520,59 @@ Public Class Projection_Gravity
             Dim sideMask = sideView.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
             dst1 = cMats.CameraLocationBot(ocvb, topMask)
-            dst2 = cMats.CameraLocationLeft(ocvb, sideMask)
+            dst2 = cMats.CameraLocationSide(ocvb, sideMask)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Projection_NoGravity_SideView
+    Inherits ocvbClass
+    Dim hist As Histogram_2D_SideView
+    Public cMats As Projection_ColorizeMat
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        hist = New Histogram_2D_SideView(ocvb)
+        cMats = New Projection_ColorizeMat(ocvb)
+        cMats.shift = 0
+        cMats.Run(ocvb)
+
+        ocvb.desc = "Display the histogram without adjusting for gravity"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        hist.Run(ocvb)
+        dst1 = cMats.CameraLocationSide(ocvb, hist.histOutput.ConvertScaleAbs(255))
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Projection_NoGravity_TopView
+    Inherits ocvbClass
+    Dim hist As Histogram_2D_TopView
+    Public cMats As Projection_ColorizeMat
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        hist = New Histogram_2D_TopView(ocvb)
+        cMats = New Projection_ColorizeMat(ocvb)
+        cMats.shift = 0
+        cMats.Run(ocvb)
+
+        ocvb.desc = "Display the histogram without adjusting for gravity"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        hist.Run(ocvb)
+        dst1 = cMats.CameraLocationBot(ocvb, hist.histOutput.ConvertScaleAbs(255))
     End Sub
 End Class

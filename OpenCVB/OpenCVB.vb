@@ -264,8 +264,19 @@ Public Class OpenCVB
         End If
         ' draw any TrueType font data on the image 
         Dim maxline = 21
-        SyncLock formResult1
-            For i = 0 To TTtextData(pic.Tag).Count - 1 ' using enumeration here would occasionally generate a mistaken warning.
+        SyncLock TTtextData
+            For i = 0 To TTtextData(pic.Tag).Count - 1
+                Dim tt = TTtextData(pic.Tag)(i)
+                If tt IsNot Nothing Then
+                    g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White), tt.x, tt.y)
+                    If tt.x >= camPic(pic.Tag).Width Or tt.y >= camPic(pic.Tag).Height Then
+                        Console.WriteLine("TrueType text off image!  " + tt.text + " is being written to " + CStr(tt.x) + " and " + CStr(tt.y))
+                    End If
+                    maxline -= 1
+                    If maxline <= 0 Then Exit For
+                End If
+            Next
+            For i = 0 To TTtextData(pic.Tag).Count - 1
                 Dim tt = TTtextData(pic.Tag)(i)
                 If tt IsNot Nothing Then
                     g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White), tt.x, tt.y)
@@ -1072,7 +1083,7 @@ Public Class OpenCVB
                 picLabels(3) = OpenCVB.ocvb.label2
                 If RefreshAvailable Then
                     ' share the results of the algorithm task.
-                    SyncLock formResult1
+                    SyncLock TTtextData
                         If OpenCVB.ocvb.parms.keyInputAccepted Then keyboardInput = ""
                         algorithmRefresh = True
                         formResult1 = OpenCVB.ocvb.result1.Clone()

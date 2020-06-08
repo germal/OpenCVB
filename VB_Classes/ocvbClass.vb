@@ -51,8 +51,8 @@ Public Class ocvbClass : Implements IDisposable
             ocvb.caller = Me.GetType.Name
         Else
             standalone = False
-            caller += Me.GetType.Name
         End If
+        caller += Me.GetType.Name
     End Sub
     Public Function validateRect(r As cv.Rect) As cv.Rect
         If r.Width < 0 Then r.Width = 1
