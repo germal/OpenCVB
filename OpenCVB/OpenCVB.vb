@@ -276,17 +276,7 @@ Public Class OpenCVB
                     If maxline <= 0 Then Exit For
                 End If
             Next
-            For i = 0 To TTtextData(pic.Tag).Count - 1
-                Dim tt = TTtextData(pic.Tag)(i)
-                If tt IsNot Nothing Then
-                    g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White), tt.x, tt.y)
-                    If tt.x >= camPic(pic.Tag).Width Or tt.y >= camPic(pic.Tag).Height Then
-                        Console.WriteLine("TrueType text off image!  " + tt.text + " is being written to " + CStr(tt.x) + " and " + CStr(tt.y))
-                    End If
-                    maxline -= 1
-                    If maxline <= 0 Then Exit For
-                End If
-            Next
+            TTtextData(pic.Tag).Clear()
             If optionsForm.ShowLabels.Checked Then
                 ' with the low resolution display, we need to use the entire width of the image to display the RGB and Depth text area.
                 Dim textRect As New Rectangle(0, 0, pic.Width / 2, If(resizeForDisplay = 4, 12, 20))
@@ -572,7 +562,7 @@ Public Class OpenCVB
                 Next
                 sw.WriteLine()
                 For y = 0 To drawRect.Height - 1
-                    sw.Write("Row " + Format(y, "000") + "," + vbTab)
+                    sw.Write("Row " + Format(drawRect.Y, "000") + "," + vbTab)
                     For x = 0 To drawRect.Width - 1
                         Dim pt = srcROI.Get(Of cv.Vec3b)(y, x)
                         sw.Write(CStr(pt.Item0) + "," + CStr(pt.Item1) + "," + CStr(pt.Item2) + ",")

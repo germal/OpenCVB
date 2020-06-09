@@ -38,33 +38,36 @@ End Module
 
 
 
+' https://www.intelrealsense.com/depth-camera-d435i/
+' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
+' https://www.stereolabs.com/zed/
+' https://www.mynteye.com/pages/mynt-eye-d
 Public Class Projection_ColorizeMat
     Inherits ocvbClass
     Dim palette As Palette_Gradient
     Public rect As cv.Rect
     Public shift As Integer
     Public labelShift As Integer
+    Public pixelsPerMeter As Single
     Dim fontSize As Single
     Dim radius As Integer
     Dim arcSize As Integer = 100
     Dim hFOVangles() As Single = {55, 45, 0, 40, 51}  ' T265 has no point cloud so there is a 0 where it would have been.
     Dim vFOVangles() As Single = {69, 60, 0, 55, 65}  ' T265 has no point cloud so there is a 0 where it would have been.
-    Public Function CameraLocationBot(ocvb As AlgorithmData, mask As cv.Mat) As cv.Mat
+    Public Function CameraLocationBot(ocvb As AlgorithmData, mask As cv.Mat, maxZ As Single) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
         dst1.CopyTo(dst, mask)
-        Dim cameraPt = New cv.Point(dst.Width / 2, dst.Height)
-        dst.Rectangle(New cv.Rect(shift, 0, dst.Height, dst.Height), cv.Scalar.White, 1)
+        Dim cameraPt = New cv.Point(dst.Height, dst.Height)
         Dim cameraLocation = New cv.Point(shift + dst.Height / 2, dst.Height - 5)
         dst.Circle(cameraPt, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        Dim maxZ = sliders.TrackBar1.Value / 1000
         For i = maxZ - 1 To 0 Step -1
             Dim ymeter = dst.Height * i / maxZ
             dst.Line(New cv.Point(shift, ymeter), New cv.Point(dst.Width - shift, ymeter), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst, CStr(maxZ - i) + "m", New cv.Point(shift - 45, ymeter + 10), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            cv.Cv2.PutText(dst, CStr(maxZ - i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
         ' draw the arc showing the camera FOV
-        Dim startAngle = sliders.TrackBar3.Value
+        Dim startAngle = sliders.TrackBar1.Value
         Dim x = dst.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
         Dim xloc = cameraPt.X + x
 
@@ -75,10 +78,6 @@ Public Class Projection_ColorizeMat
         dst.Ellipse(cameraPt, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         dst.Line(cameraPt, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        ' https://www.intelrealsense.com/depth-camera-d435i/
-        ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
-        ' https://www.stereolabs.com/zed/
-        ' https://www.mynteye.com/pages/mynt-eye-d
         Dim labelLocation = New cv.Point(dst.Width / 2 + labelShift * 3 / 4, dst.Height * 7 / 8)
         If ocvb.parms.resolution = resHigh Then labelLocation = New cv.Point(dst.Width / 2 + labelShift * 3 / 8, dst.Height * 15 / 16)
         cv.Cv2.PutText(dst, CStr(startAngle) + " degrees" + " FOV=" + CStr(180 - startAngle * 2), labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
@@ -86,21 +85,20 @@ Public Class Projection_ColorizeMat
 
         Return dst
     End Function
-    Public Function CameraLocationSide(ocvb As AlgorithmData, ByRef mask As cv.Mat) As cv.Mat
+    Public Function CameraLocationSide(ocvb As AlgorithmData, ByRef mask As cv.Mat, maxZ As Single) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
         dst2.CopyTo(dst, mask)
-        Dim cameraPt = New cv.Point(shift, dst.Height / 2)
-        dst.Rectangle(New cv.Rect(shift, 0, dst.Height, dst.Height), cv.Scalar.White, 1)
+        Dim cameraPt = New cv.Point(shift, src.Height - (src.Width - src.Height) / 2)
+        dst.Rectangle(New cv.Rect(shift, 0, src.Height, src.Height), cv.Scalar.White, 1)
         dst.Circle(cameraPt, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        Dim maxZ = sliders.TrackBar1.Value / 1000
-        For i = 1 To maxZ
-            Dim xmeter = (dst.Width - 2 * shift) * i / maxZ
+        For i = 0 To maxZ
+            Dim xmeter = dst.Height * i / maxZ
             dst.Line(New cv.Point(shift + xmeter, 0), New cv.Point(shift + xmeter, dst.Height), cv.Scalar.AliceBlue, 1)
             cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(shift + xmeter + 10, dst.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
         ' draw the arc showing the camera FOV
-        Dim startAngle = sliders.TrackBar4.Value
+        Dim startAngle = sliders.TrackBar2.Value
         Dim y = (dst.Width - shift) / Math.Tan(startAngle * cv.Cv2.PI / 180)
         Dim yloc = cameraPt.Y - y
 
@@ -134,19 +132,18 @@ Public Class Projection_ColorizeMat
         palette.frameModulo = 1
         If ocvb.parms.resolution <> resHigh Then arcSize = 50
 
-        sliders.setupTrackBar1(ocvb, caller, "Gravity Transform Max Depth (in millimeters)", 0, 10000, 4000)
-        sliders.setupTrackBar2("Threshold for histogram count", 0, 100, 3)
-        sliders.setupTrackBar3("Top View angle for FOV", 0, 180, hFOVangles(ocvb.parms.cameraIndex))
-        sliders.setupTrackBar4("Side View angle for FOV", 0, 180, vFOVangles(ocvb.parms.cameraIndex))
+        sliders.setupTrackBar1(ocvb, caller, "Top View angle for FOV", 0, 180, hFOVangles(ocvb.parms.cameraIndex))
+        sliders.setupTrackBar2("Side View angle for FOV", 0, 180, vFOVangles(ocvb.parms.cameraIndex))
 
-        ocvb.desc = "Create the colorizeMat's used for projections"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
         palette.Run(ocvb)
         dst1 = palette.dst1
         dst2 = dst1.Clone
         rect = New cv.Rect(shift, 0, dst1.Height, dst1.Height)
         cv.Cv2.Rotate(dst1(rect), dst2(rect), cv.RotateFlags.Rotate90Clockwise)
+
+        ocvb.desc = "Create the colorizeMat's used for projections"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
     End Sub
 End Class
 
@@ -275,7 +272,7 @@ End Class
 
 Public Class Projection_Gravity_CPP
     Inherits ocvbClass
-    Dim gCloud As Transform_Gravity1
+    Dim gCloud As Transform_Gravity
     Public cMats As Projection_ColorizeMat
     Dim cPtr As IntPtr
     Dim xyzBytes() As Byte
@@ -283,7 +280,7 @@ Public Class Projection_Gravity_CPP
     Public sideMask As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        gCloud = New Transform_Gravity1(ocvb)
+        gCloud = New Transform_Gravity(ocvb)
         gCloud.imu.showLog = False
         cPtr = Project_GravityHist_Open()
 
@@ -309,7 +306,7 @@ Public Class Projection_Gravity_CPP
         Dim histTop = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, imagePtr)
         Dim histSide = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, Project_GravityHist_Side(cPtr))
 
-        Dim threshold = cMats.sliders.TrackBar2.Value
+        Dim threshold = 1 ' cMats.sliders.TrackBar1.Value
         topMask = histTop.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         sideMask = histSide.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
@@ -320,8 +317,8 @@ Public Class Projection_Gravity_CPP
         Dim fontSize As Single = 1.0
         If ocvb.parms.resolution = resMed Then fontSize = 0.6
         If standalone Then
-            dst1 = cMats.CameraLocationBot(ocvb, topMask)
-            dst2 = cMats.CameraLocationSide(ocvb, sideMask)
+            dst1 = cMats.CameraLocationBot(ocvb, topMask, 4)
+            dst2 = cMats.CameraLocationSide(ocvb, sideMask, 4)
         Else
             dst1 = topMask
             dst2 = sideMask
@@ -453,14 +450,14 @@ End Class
 
 Public Class Projection_Gravity
     Inherits ocvbClass
-    Dim gCloud As Transform_Gravity1
+    Dim gCloud As Transform_Gravity
     Dim grid As Thread_Grid
     Public cMats As Projection_ColorizeMat
     Public topView As cv.Mat
     Public sideView As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        gCloud = New Transform_Gravity1(ocvb)
+        gCloud = New Transform_Gravity(ocvb)
         grid = New Thread_Grid(ocvb)
         grid.sliders.TrackBar1.Value = 64
         grid.sliders.TrackBar2.Value = 40
@@ -515,12 +512,12 @@ Public Class Projection_Gravity
             End Sub)
 
         If standalone Then
-            Dim threshold = cMats.sliders.TrackBar2.Value
+            Dim threshold = 1 ' cMats.sliders.TrackBar1.Value
             Dim topMask = topView.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             Dim sideMask = sideView.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
-            dst1 = cMats.CameraLocationBot(ocvb, topMask)
-            dst2 = cMats.CameraLocationSide(ocvb, sideMask)
+            dst1 = cMats.CameraLocationBot(ocvb, topMask, 4)
+            dst2 = cMats.CameraLocationSide(ocvb, sideMask, 4)
         End If
     End Sub
 End Class
@@ -538,16 +535,17 @@ Public Class Projection_NoGravity_SideView
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        hist = New Histogram_2D_SideView(ocvb)
         cMats = New Projection_ColorizeMat(ocvb)
-        cMats.shift = 0
+        cMats.shift = (src.Width - src.Height) / 2
         cMats.Run(ocvb)
+
+        hist = New Histogram_2D_SideView(ocvb)
 
         ocvb.desc = "Display the histogram without adjusting for gravity"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        dst1 = cMats.CameraLocationSide(ocvb, hist.histOutput.ConvertScaleAbs(255))
+        dst1 = cMats.CameraLocationSide(ocvb, hist.dst1.ConvertScaleAbs(255), hist.hist.trimPC.sliders.TrackBar1.Value / 1000)
     End Sub
 End Class
 
@@ -564,15 +562,16 @@ Public Class Projection_NoGravity_TopView
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        hist = New Histogram_2D_TopView(ocvb)
         cMats = New Projection_ColorizeMat(ocvb)
         cMats.shift = 0
         cMats.Run(ocvb)
+
+        hist = New Histogram_2D_TopView(ocvb)
 
         ocvb.desc = "Display the histogram without adjusting for gravity"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        dst1 = cMats.CameraLocationBot(ocvb, hist.histOutput.ConvertScaleAbs(255))
+        dst1 = cMats.CameraLocationBot(ocvb, hist.dst1.ConvertScaleAbs(255), hist.trimPC.sliders.TrackBar1.Value / 1000)
     End Sub
 End Class

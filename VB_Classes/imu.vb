@@ -454,7 +454,7 @@ Public Class IMU_GVector
         Dim gz = ocvb.parms.IMU_Acceleration.Z
 
         angleX = Math.Atan2(gy, gx) + cv.Cv2.PI / 2
-        angleY = Math.Atan2(gx, gy) + cv.Cv2.PI / 2
+        angleY = Math.Atan2(gx, gy) - cv.Cv2.PI / 2
         angleZ = Math.Atan2(gy, gz) + cv.Cv2.PI / 2
 
         kalman.input = {gx, gy, gz, angleX, angleY, angleZ}

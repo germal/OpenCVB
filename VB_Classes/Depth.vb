@@ -343,35 +343,6 @@ End Class
 
 
 
-'Public Class Depth_WorldXYZ_CPP
-'    Inherits ocvbClass
-'    Public pointCloud As cv.Mat
-'    Dim DepthXYZ As IntPtr
-'    Public Sub New(ocvb As AlgorithmData)
-'        setCaller(ocvb)
-'        DepthXYZ = Depth_XYZ_OpenMP_Open(ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy,
-'                                         ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy)
-'        label1 = "xyzFrame is built"
-'        ocvb.desc = "Get the X, Y, Depth in the image coordinates (not the 3D image coordinates.)"
-'    End Sub
-'    Public Sub Run(ocvb As AlgorithmData)
-'        Dim depth32f = getDepth32f(ocvb) ' the C++ code will convert it to meters.
-'        Dim depthData(depth32f.Total * depth32f.ElemSize - 1) As Byte
-'        Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned) ' pin it for the duration...
-'        Marshal.Copy(depth32f.Data, depthData, 0, depthData.Length)
-'        Dim imagePtr = Depth_XYZ_OpenMP_Run(DepthXYZ, handleSrc.AddrOfPinnedObject(), depth32f.Rows, depth32f.Cols)
-'        handleSrc.Free()
-
-'        If imagePtr <> 0 Then pointCloud = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_32FC3, imagePtr)
-'        ocvb.putText(New oTrueType("OpenGL data prepared.", 10, 50, RESULT1))
-'    End Sub
-'    Public Sub Close()
-'        Depth_XYZ_OpenMP_Close(DepthXYZ)
-'    End Sub
-'End Class
-
-
-
 
 
 Public Class Depth_MeanStdev_MT
@@ -1233,41 +1204,6 @@ End Class
 
 
 
-
-Public Class Depth_PointCloudInRange
-    Inherits ocvbClass
-    Public Mask As New cv.Mat
-    Public minMeters As Double
-    Public maxMeters As Double
-    Public split() As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "InRange Min Depth (mm)", 0, 1000, 200)
-        sliders.setupTrackBar2("InRange Max Depth (mm)", 200, 10000, 2000)
-        label1 = ""
-        label2 = "Mask for depth values that are in-range"
-        ocvb.desc = "Show depth with OpenCV using varying min and max depths."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If sliders.TrackBar1.Value >= sliders.TrackBar2.Value Then sliders.TrackBar2.Value = sliders.TrackBar1.Value + 1
-        minMeters = sliders.TrackBar1.Value / 1000
-        maxMeters = sliders.TrackBar2.Value / 1000
-
-        split = cv.Cv2.Split(ocvb.pointCloud)
-
-        cv.Cv2.InRange(split(2), cv.Scalar.All(minMeters), cv.Scalar.All(maxMeters), Mask)
-        cv.Cv2.Merge(split, dst1)
-        If standalone Then dst2 = Mask
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Depth_InRange
     Inherits ocvbClass
     Public Mask As New cv.Mat
@@ -1298,5 +1234,81 @@ Public Class Depth_InRange
         dst1 = depth32f.Clone.SetTo(0, zeroMask)
         dst2 = depth32f.Clone.SetTo(0, Mask)
         dst2 = dst2.Threshold(8000, 8000, cv.ThresholdTypes.Trunc) ' the data beyond 8 meters is suspect and will distort the image output
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_PointCloudInRange
+    Inherits ocvbClass
+    Public Mask As New cv.Mat
+    Public maxMeters As Double
+    Public split() As cv.Mat
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, caller, "InRange Max Depth (mm)", 0, 10000, 4000)
+        label1 = "Mask for depth values that are in-range"
+        ocvb.desc = "Show PointCloud while varying the max depth."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        maxMeters = sliders.TrackBar1.Value / 1000
+
+        split = cv.Cv2.Split(ocvb.pointCloud)
+
+        Dim tmp As New cv.Mat
+        cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxMeters), Mask)
+        Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+        Mask = Mask.SetTo(0, zeroDepth)
+
+        dst1 = Mask
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
+' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
+Public Class Depth_PointCloudInRange_IMU
+    Inherits ocvbClass
+    Public Mask As New cv.Mat
+    Public maxMeters As Double
+    Public split() As cv.Mat
+    Public imu As IMU_GVector
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        imu = New IMU_GVector(ocvb)
+        If standalone = False Then imu.result = RESULT2
+
+        sliders.setupTrackBar1(ocvb, caller, "InRange Max Depth (mm)", 0, 10000, 4000)
+        label2 = "Mask for depth values that are in-range"
+        ocvb.desc = "Transform the PointCloud using the gravity vector from the IMU."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        maxMeters = sliders.TrackBar1.Value / 1000
+        split = cv.Cv2.Split(ocvb.pointCloud)
+
+        imu.Run(ocvb)
+        '[1      0       0] rotate the point cloud around the x-axis only.
+        '[0 cos(a) -sin(a)]
+        '[0 sin(a)  cos(a)]
+        Dim xZ(,) = {{1, 0, 0}, {0, Math.Cos(-imu.angleZ), -Math.Sin(-imu.angleZ)}, {0, Math.Sin(-imu.angleZ), Math.Cos(-imu.angleZ)}}
+
+        ' split(0) = xZ(0, 0) * split(0) + xZ(0, 1) * split(1) + xZ(0, 2) * split(2)
+        split(1) = xZ(1, 1) * split(1) + xZ(1, 2) * split(2)
+        split(2) = xZ(2, 1) * split(1) + xZ(2, 2) * split(2)
+
+        cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxMeters), Mask)
+        Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+        Mask = Mask.SetTo(0, zeroDepth)
+        If standalone Then dst2 = Mask
     End Sub
 End Class

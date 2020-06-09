@@ -166,7 +166,7 @@ End Class
 
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
-Public Class Transform_Gravity1
+Public Class Transform_Gravity
     Inherits ocvbClass
     Public imu As IMU_GVector
     Public vertSplit(3 - 1) As cv.Mat
@@ -232,45 +232,5 @@ Public Class Transform_Gravity1
 
         If standalone Then ocvb.putText(New oTrueType("Pointcloud is now oriented toward gravity " +
                                                       If(check.Box(0).Checked, "using smoothed depth data.", "."), 10, 125))
-    End Sub
-End Class
-
-
-
-
-
-
-
-' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
-' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
-Public Class Transform_GravityXaxis
-    Inherits ocvbClass
-    Public imu As IMU_GVector
-    Public xyz(0) As Single
-    Public trim As Depth_InRange
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        trim = New Depth_InRange(ocvb)
-        imu = New IMU_GVector(ocvb)
-        imu.showLog = False
-        ocvb.desc = "Transform the pointcloud with the gravity vector"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        imu.Run(ocvb)
-        '[1      0       0] rotate the point cloud around the x-axis only.
-        '[0 cos(a) -sin(a)]
-        '[0 sin(a)  cos(a)]
-        Dim rotateX(,) = {{1, 0, 0},
-                          {0, Math.Cos(imu.angleZ), -Math.Sin(imu.angleZ)},
-                          {0, Math.Sin(imu.angleZ), Math.Cos(imu.angleZ)}}
-
-        Dim pc = ocvb.pointCloud.Resize(ocvb.color.Size())
-        Dim split() = cv.Cv2.Split(pc)
-
-        Dim imageCenter = New cv.Point2f(0, src.Height / 2)
-        Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, imu.angleZ * cv.Cv2.PI / 180, 100)
-        cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
-
-        If standalone Then ocvb.putText(New oTrueType("Pointcloud is now oriented toward gravity ", 10, 125))
     End Sub
 End Class

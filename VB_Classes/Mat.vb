@@ -229,7 +229,7 @@ Public Class Mat_ImageXYZ_MT
           End Sub)
 
         cv.Cv2.Merge(xyzPlanes, xyDepth)
-        ocvb.putText(New oTrueType("Mat built with X, Y, and Z (Depth)", 10, 125))
+        If standalone Then ocvb.putText(New oTrueType("Mat built with X, Y, and Z (Depth)", 10, 125))
     End Sub
 End Class
 
