@@ -1255,7 +1255,7 @@ Public Class Depth_PointCloudInRange
         ocvb.desc = "Show PointCloud while varying the max depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        maxMeters = sliders.TrackBar1.Value / 1000
+        maxMeters = histOpts.sliders.TrackBar2.Value / 1000
 
         split = cv.Cv2.Split(ocvb.pointCloud)
 
@@ -1329,6 +1329,6 @@ Public Class Depth_PointCloudInRange_IMU
         cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxMeters), Mask)
         Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
         Mask = Mask.SetTo(0, zeroDepth)
-        If standalone Then dst2 = Mask
+        If standalone Then dst1 = Mask
     End Sub
 End Class

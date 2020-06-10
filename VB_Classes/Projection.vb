@@ -465,6 +465,9 @@ End Class
 
 
 
+
+
+
 Public Class Projection_View_TopObjects
     Inherits ocvbClass
     Dim gVecTop As Projection_View_SideObjects
@@ -472,7 +475,7 @@ Public Class Projection_View_TopObjects
         setCaller(ocvb)
 
         gVecTop = New Projection_View_SideObjects(ocvb)
-        gVecTop.gVec = New Projection_GVector_TopView(ocvb)
+        gVecTop.gVec = New Projection_GVector_TopView(ocvb) ' yeah.  This is the top view but the code for side view is the same.
 
         ocvb.desc = "Show identified clusters of depth data in the top view"
     End Sub
@@ -484,6 +487,9 @@ Public Class Projection_View_TopObjects
         label2 = gVecTop.label2
     End Sub
 End Class
+
+
+
 
 
 

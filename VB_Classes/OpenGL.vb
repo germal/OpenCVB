@@ -29,13 +29,11 @@ Public Class OpenGL_Basics
     Public zTrans As Single = 0.5
     Public OpenGLTitle As String = "OpenGL_Basics"
     Public imageLabel As String
-    'Public imu As IMU_GVector
     Public pointCloudInput As New cv.Mat
     Dim openGLHeight = 1200
     Dim openGLWidth = 1500
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        'imu = New IMU_GVector(ocvb)
         ocvb.desc = "Create an OpenGL window and update it with images"
     End Sub
     Private Sub memMapUpdate(ocvb As AlgorithmData)
@@ -80,7 +78,6 @@ Public Class OpenGL_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then pointCloudInput = ocvb.pointCloud
-        'imu.Run(ocvb)
 
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
         If ocvb.frameCount = 0 Then startOpenGLWindow(ocvb, pcSize)
@@ -215,8 +212,12 @@ End Class
 Public Class OpenGL_IMU
     Inherits ocvbClass
     Public ogl As OpenGL_Options
+    Public imu As IMU_GVector
+
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
+        imu = New IMU_GVector(ocvb)
+
         ocvb.parms.ShowOptions = False
         ogl = New OpenGL_Options(ocvb)
         ogl.OpenGL.OpenGLTitle = "OpenGL_IMU"
@@ -227,6 +228,7 @@ Public Class OpenGL_IMU
         ocvb.desc = "Show how to use IMU coordinates in OpenGL"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        imu.Run(ocvb)
         ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
         If ocvb.parms.IMU_Present Then
             ogl.src = src
