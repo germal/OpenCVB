@@ -249,6 +249,7 @@ Public Class CComp_InRange
             dst1(roiList(i)).SetTo(avg)
         Next
 
+        src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.AddWeighted(dst1, 0.5, src, 0.5, 0, dst1)
         label1 = "# of blobs = " + CStr(roiList.Count) + " in " + CStr(rangeCount) + " regions - smallest in front"
     End Sub
