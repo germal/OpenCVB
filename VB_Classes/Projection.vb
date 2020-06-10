@@ -270,85 +270,20 @@ End Class
 
 
 
-Public Class Projection_Gravity_CPP
-    Inherits ocvbClass
-    Dim gCloud As Transform_Gravity
-    Public cMats As Projection_ColorizeMat
-    Dim cPtr As IntPtr
-    Dim xyzBytes() As Byte
-    Public topMask As cv.Mat
-    Public sideMask As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        gCloud = New Transform_Gravity(ocvb)
-        gCloud.imu.showLog = False
-        cPtr = Project_GravityHist_Open()
-
-        cMats = New Projection_ColorizeMat(ocvb)
-        cMats.Run(ocvb)
-
-        ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Dim maxZ = cMats.sliders.TrackBar1.Value / 1000
-
-        gCloud.Run(ocvb)
-        Dim xyz As New cv.Mat
-        cv.Cv2.Merge(gCloud.vertSplit, xyz)
-
-        If xyzBytes Is Nothing Then ReDim xyzBytes(xyz.Total * xyz.ElemSize - 1)
-        Marshal.Copy(xyz.Data, xyzBytes, 0, xyzBytes.Length)
-        Dim handleXYZ = GCHandle.Alloc(xyzBytes, GCHandleType.Pinned)
-
-        Dim imagePtr As IntPtr
-        imagePtr = Project_GravityHist_Run(cPtr, handleXYZ.AddrOfPinnedObject, maxZ, xyz.Height, xyz.Width)
-
-        Dim histTop = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, imagePtr)
-        Dim histSide = New cv.Mat(xyz.Rows, xyz.Cols, cv.MatType.CV_32F, Project_GravityHist_Side(cPtr))
-
-        Dim threshold = 1 ' cMats.sliders.TrackBar1.Value
-        topMask = histTop.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        sideMask = histSide.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-
-        label1 = "Top View after threshold"
-        label2 = "Side View after threshold"
-        handleXYZ.Free()
-
-        Dim fontSize As Single = 1.0
-        If ocvb.parms.resolution = resMed Then fontSize = 0.6
-        If standalone Then
-            dst1 = cMats.CameraLocationBot(ocvb, topMask, 4)
-            dst2 = cMats.CameraLocationSide(ocvb, sideMask, 4)
-        Else
-            dst1 = topMask
-            dst2 = sideMask
-        End If
-    End Sub
-    Public Sub Close()
-        Project_GravityHist_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Projection_Wall
     Inherits ocvbClass
-    Dim objects As Projection_Objects
+    Dim objects As Projection_TopViewObjects
     Dim lines As lineDetector_FLD_CPP
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         lines = New lineDetector_FLD_CPP(ocvb)
-        objects = New Projection_Objects(ocvb)
+        objects = New Projection_TopViewObjects(ocvb)
         dilate = New DilateErode_Basics(ocvb)
 
         label1 = "Top View: walls in red"
-        ocvb.desc = "Use the top down view to detect walls with a line detector algorithm - needs more work"
+        ocvb.desc = "Use the top down view to detect walls with a line detector algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         objects.src = src
@@ -372,24 +307,24 @@ End Class
 
 
 
-Public Class Projection_Objects
+Public Class Projection_TopViewObjects
     Inherits ocvbClass
     Dim flood As FloodFill_Projection
     Public fontSize As Single = 1.0
-    Public gravity As Projection_Gravity_CPP
+    Public gravity As Projection_TopView
     Public maxZ As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "epsilon for GroupRectangles X100", 0, 200, 80)
-
-        gravity = New Projection_Gravity_CPP(ocvb)
+        gravity = New Projection_TopView(ocvb)
+        gravity.hist.histOpts.check.Box(0).Checked = True ' we want the IMU to rotate the data.
+        gravity.hist.histOpts.sliders.TrackBar1.Value = 5 ' a better default for flood fill
 
         flood = New FloodFill_Projection(ocvb)
         flood.sliders.TrackBar1.Value = 100
 
         label1 = "Isolated objects - Red dot is camera"
-        ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings) - needs more work"
+        ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = T265Camera Then
@@ -399,13 +334,14 @@ Public Class Projection_Objects
 
         gravity.src = src
         gravity.Run(ocvb)
-        flood.src = gravity.dst1
+        Dim tmp = gravity.hist.histOutput.Threshold(gravity.hist.histOpts.sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
+        flood.src = tmp.ConvertScaleAbs(255)
         flood.Run(ocvb)
         dst1 = flood.dst1
 
-        dst2 = dst1.Clone()
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If ocvb.parms.resolution = resMed Then fontSize = 0.6
-        maxZ = gravity.sliders.TrackBar1.Value / 1000
+        maxZ = gravity.hist.histOpts.sliders.TrackBar2.Value / 1000
         Dim mmPerPixel = maxZ * 1000 / src.Height
         Dim maxCount = Math.Min(flood.objectRects.Count, 10)
         For i = 0 To maxCount - 1
@@ -430,14 +366,95 @@ End Class
 
 
 
-Public Class Projection_Backprojection
+Public Class Projection_CeilingFloor
     Inherits ocvbClass
-    Dim pFlood As Projection_Objects
+    Dim objects As Projection_SideViewObjects
+    Dim lines As lineDetector_FLD_CPP
+    Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Use Projection_Objects to find objects and then backproject them into front-facing view."
+
+        lines = New lineDetector_FLD_CPP(ocvb)
+        objects = New Projection_SideViewObjects(ocvb)
+        dilate = New DilateErode_Basics(ocvb)
+
+        label1 = "Top View: walls in red"
+        ocvb.desc = "Use the side view to detect ceilings and floors with a line detector algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        objects.src = src
+        objects.Run(ocvb)
+        dst1 = objects.dst1
+
+        dilate.src = dst1
+        dilate.Run(ocvb)
+
+        lines.src = dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lines.Run(ocvb)
+        dst1 = lines.dst1.Clone()
+
+        dst2 = objects.dst2
+        label2 = objects.label2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Projection_SideViewObjects
+    Inherits ocvbClass
+    Dim flood As FloodFill_Projection
+    Public fontSize As Single = 1.0
+    Public gravity As Projection_SideView
+    Public maxZ As Single
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        gravity = New Projection_SideView(ocvb)
+        gravity.hist.histOpts.check.Box(0).Checked = True ' we want the IMU to rotate the data.
+        gravity.hist.histOpts.sliders.TrackBar1.Value = 5 ' a better default for flood fill
+
+        flood = New FloodFill_Projection(ocvb)
+        flood.sliders.TrackBar1.Value = 100
+
+        label1 = "Isolated objects - Red dot is camera"
+        ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings)"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.cameraIndex = T265Camera Then
+            ocvb.putText(New oTrueType("There is no point cloud available on the T265 camera", 10, 60, RESULT1))
+            Exit Sub
+        End If
+
+        gravity.src = src
+        gravity.Run(ocvb)
+        Dim tmp = gravity.hist.histOutput.Threshold(gravity.hist.histOpts.sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
+        flood.src = tmp.ConvertScaleAbs(255)
+        flood.Run(ocvb)
+        dst1 = flood.dst1
+
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If ocvb.parms.resolution = resMed Then fontSize = 0.6
+        maxZ = gravity.hist.histOpts.sliders.TrackBar2.Value / 1000
+        Dim mmPerPixel = maxZ * 1000 / src.Height
+        Dim maxCount = Math.Min(flood.objectRects.Count, 10)
+        For i = 0 To maxCount - 1
+            Dim rect = flood.objectRects(i)
+            dst2.Rectangle(rect, cv.Scalar.White, 1)
+            Dim minDistanceFromCamera = (src.Height - rect.Y - rect.Height) * mmPerPixel
+            Dim maxDistanceFromCamera = (src.Height - rect.Y) * mmPerPixel
+            Dim objectWidth = rect.Width * mmPerPixel
+
+            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.resolution = resMed, 6, 10), cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.resolution = resMed, 3, 5), cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            Dim text = "depth=" + Format(minDistanceFromCamera / 1000, "#0.0") + "-" + Format(maxDistanceFromCamera / 1000, "0.0") + "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
+
+            Dim pt = New cv.Point(rect.X, rect.Y - 10)
+            cv.Cv2.PutText(dst2, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        Next
+        label2 = "Showing the top " + CStr(maxCount) + " out of " + CStr(flood.objectRects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
     End Sub
 End Class
 
@@ -448,76 +465,29 @@ End Class
 
 
 
-Public Class Projection_Gravity
+
+Public Class Projection_SideView
     Inherits ocvbClass
-    Dim gCloud As Transform_Gravity
-    Dim grid As Thread_Grid
+    Public hist As Histogram_2D_SideView
     Public cMats As Projection_ColorizeMat
-    Public topView As cv.Mat
-    Public sideView As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        gCloud = New Transform_Gravity(ocvb)
-        grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = 64
-        grid.sliders.TrackBar2.Value = 40
 
         cMats = New Projection_ColorizeMat(ocvb)
+        cMats.shift = (src.Width - src.Height) / 2
         cMats.Run(ocvb)
 
-        label1 = "View looking up from under floor - Red Dot is camera"
-        label2 = "Side View - Red Dot is camera"
-        ocvb.desc = "Rotate the point cloud data with the gravity data and project a top down and side view"
+        hist = New Histogram_2D_SideView(ocvb)
+        hist.histOpts.check.Box(0).Checked = False
+
+        ocvb.desc = "Display the histogram with and without adjusting for gravity"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        grid.Run(ocvb)
-        gCloud.Run(ocvb)
-
-        topView = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8U, 0)
-        sideView = topView.Clone()
-
-        Dim white = New cv.Vec3b(255, 255, 255)
-        Dim maxZ = cMats.sliders.TrackBar1.Value / 1000
-        Dim w = CSng(src.Width)
-        Dim h = CSng(src.Height)
-        Dim dFactor = h / maxZ ' the scale in the x-Direction.
-        Dim zHalf As Single = maxZ / 2
-
-        Parallel.For(0, CInt(gCloud.xyz.Length / 3),
-            Sub(i)
-                Dim d = gCloud.xyz(i * 3 + 2)
-                If d > 0 And d < maxZ Then
-                    Dim t = CInt(255 * d / maxZ)
-
-                    Dim dPixel = dFactor * d
-                    Dim fx = gCloud.xyz(i * 3)
-                    Dim x = Math.Truncate(cMats.shift + dFactor * (zHalf + fx))
-                    Dim y = Math.Truncate(h - dPixel)
-                    If x > 0 And x < topView.Width And y >= 0 And y < topView.Height Then
-                        Dim count = topView.Get(Of Byte)(y, x) + 1
-                        topView.Set(Of Byte)(y, x, If(count < 255, count, 255))
-                    End If
-
-
-                    Dim fy = gCloud.xyz(i * 3 + 1)
-                    If fy > -zHalf And fy < zHalf Then
-                        x = Math.Truncate(cMats.shift + dPixel)
-                        y = Math.Truncate(dFactor * (zHalf + fy))
-                        If x > 0 And x < topView.Width And y >= 0 And y < topView.Height Then
-                            Dim count = sideView.Get(Of Byte)(y, x) + 1
-                            sideView.Set(Of Byte)(y, x, If(count < 255, count, 255))
-                        End If
-                    End If
-                End If
-            End Sub)
-
-        If standalone Then
-            Dim threshold = 1 ' cMats.sliders.TrackBar1.Value
-            Dim topMask = topView.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-            Dim sideMask = sideView.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-
-            dst1 = cMats.CameraLocationBot(ocvb, topMask, 4)
-            dst2 = cMats.CameraLocationSide(ocvb, sideMask, 4)
+        hist.Run(ocvb)
+        If hist.histOpts.check.Box(0).Checked = False Then
+            dst1 = cMats.CameraLocationSide(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.TrackBar2.Value / 1000)
+        Else
+            dst1 = hist.dst1
         End If
     End Sub
 End Class
@@ -528,36 +498,9 @@ End Class
 
 
 
-Public Class Projection_NoGravity_SideView
+Public Class Projection_TopView
     Inherits ocvbClass
-    Dim hist As Histogram_2D_SideView
-    Public cMats As Projection_ColorizeMat
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-
-        cMats = New Projection_ColorizeMat(ocvb)
-        cMats.shift = (src.Width - src.Height) / 2
-        cMats.Run(ocvb)
-
-        hist = New Histogram_2D_SideView(ocvb)
-
-        ocvb.desc = "Display the histogram without adjusting for gravity"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        hist.Run(ocvb)
-        dst1 = cMats.CameraLocationSide(ocvb, hist.dst1.ConvertScaleAbs(255), hist.hist.trimPC.sliders.TrackBar1.Value / 1000)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Projection_NoGravity_TopView
-    Inherits ocvbClass
-    Dim hist As Histogram_2D_TopView
+    Public hist As Histogram_2D_TopView
     Public cMats As Projection_ColorizeMat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -567,11 +510,16 @@ Public Class Projection_NoGravity_TopView
         cMats.Run(ocvb)
 
         hist = New Histogram_2D_TopView(ocvb)
+        hist.histOpts.check.Box(0).Checked = False
 
         ocvb.desc = "Display the histogram without adjusting for gravity"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        dst1 = cMats.CameraLocationBot(ocvb, hist.dst1.ConvertScaleAbs(255), hist.trimPC.sliders.TrackBar1.Value / 1000)
+        If hist.histOpts.check.Box(0).Checked = False Then
+            dst1 = cMats.CameraLocationBot(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.TrackBar2.Value / 1000)
+        Else
+            dst1 = hist.dst1
+        End If
     End Sub
 End Class

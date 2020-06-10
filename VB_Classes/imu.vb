@@ -440,7 +440,6 @@ Public Class IMU_GVector
     Public angleY As Single ' in radians.
     Public angleZ As Single ' in radians.
     Public result As Integer = RESULT1
-    Public showLog As Boolean = True
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         kalman = New Kalman_Basics(ocvb)
@@ -467,7 +466,7 @@ Public Class IMU_GVector
         angleY = kalman.output(4)
         angleZ = kalman.output(5)
 
-        If showLog Then
+        If standalone Then
             Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf
             outStr = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(gx, "#0.0000") + vbCrLf
             outStr += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(gy, "#0.0000") + vbCrLf

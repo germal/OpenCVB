@@ -665,15 +665,34 @@ Public Class Histogram_2D_XZ_YZ
     End Sub
 End Class
 
+Public Class Histogram_ProjectionOptions
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, caller, "Histogram threshold", 0, 1000, 3)
+        sliders.setupTrackBar2("InRange Max Depth (mm)", 0, 10000, 4000)
+        If standalone Then sliders.TrackBar1.Value = 1
+
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Use IMU gravity vector to rotate around the x-axis."
+        check.Box(0).Checked = True
+
+        ocvb.desc = "The options for the histogram projections with and without using the gravity vector"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        ocvb.putText(New oTrueType("This algorithm only has options used by several other algorithms", 10, 50, RESULT1))
+    End Sub
+End Class
 
 
 
 
 Public Class Histogram_2D_TopView
     Inherits ocvbClass
+    Public histOpts As Histogram_ProjectionOptions
     Public trimPC As Object
-    Dim trimPC1 As Depth_PointCloudInRange
-    Dim trimPC2 As Depth_PointCloudInRange_IMU
+    Dim trimPCStatic As Depth_PointCloudInRange
+    Dim trimPCGravity As Depth_PointCloudInRange_IMU_Xaxis
     Public XorYdata As Integer = 0
     Public Zdata As Integer = 2
     Public histOutput As New cv.Mat
@@ -681,15 +700,13 @@ Public Class Histogram_2D_TopView
     Public useIMU As Boolean = False
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
+        trimPCGravity = New Depth_PointCloudInRange_IMU_Xaxis(ocvb)
+        trimPCStatic = New Depth_PointCloudInRange(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Histogram threshold", 0, 1000, 3)
-        If standalone Then sliders.TrackBar1.Value = 1
-
-        check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Use IMU gravity vector to rotate around the x-axis."
-
-        trimPC2 = New Depth_PointCloudInRange_IMU(ocvb)
-        trimPC1 = New Depth_PointCloudInRange(ocvb)
+        histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.sliders.TrackBar1.Value = 1
+        trimPCGravity.histOpts = histOpts
+        trimPCStatic.histOpts = histOpts
 
         label1 = "XZ (Top Down View)"
         ocvb.desc = "Create a 2D histogram for depth in XZ (a top down view.)"
@@ -697,12 +714,12 @@ Public Class Histogram_2D_TopView
     Public Sub Run(ocvb As AlgorithmData)
         Dim histSize() = {src.Height, src.Width}
 
-        If useIMU <> check.Box(0).Checked Or ocvb.frameCount = 0 Then
-            useIMU = check.Box(0).Checked
-            If useIMU Then trimPC = trimPC2 Else trimPC = trimPC1
+        If useIMU <> histOpts.check.Box(0).Checked Or ocvb.frameCount = 0 Then
+            useIMU = histOpts.check.Box(0).Checked
+            trimPC = If(useIMU, trimPCGravity, trimPCStatic)
         End If
 
-        Dim zRange = trimPC.sliders.TrackBar1.Value / 1000
+        Dim zRange = histOpts.sliders.TrackBar2.Value / 1000
         trimPC.Run(ocvb)
         dst2 = trimPC.dst1
 
@@ -716,7 +733,7 @@ Public Class Histogram_2D_TopView
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, src.Height), New cv.Rangef(0, src.Width)}
         cv.Cv2.CalcHist(New cv.Mat() {histinput}, New Integer() {Zdata, XorYdata}, New cv.Mat, histOutput, 2, histSize, ranges)
         histOutput = histOutput.Flip(cv.FlipMode.X)
-        dst1 = histOutput.Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
+        dst1 = histOutput.Threshold(histOpts.sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -730,24 +747,58 @@ End Class
 
 Public Class Histogram_2D_SideView
     Inherits ocvbClass
-    Public hist As Histogram_2D_TopView
+    Public trimPC As Object
+    Public histOpts As Histogram_ProjectionOptions
+    Dim trimPCStatic As Depth_PointCloudInRange
+    Dim trimPCGravity As Depth_PointCloudInRange_IMU_XZaxis
+    Public XorYdata As Integer = 1
+    Public Zdata As Integer = 2
+    Public histOutput As New cv.Mat
     Public pixelsPerMeter As Single
+    Public useIMU As Boolean = False
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        hist = New Histogram_2D_TopView(ocvb)
-        hist.XorYdata = 1 ' we are showing the y-data not the x-data in the side view.
+        trimPCGravity = New Depth_PointCloudInRange_IMU_XZaxis(ocvb)
+        trimPCStatic = New Depth_PointCloudInRange(ocvb)
+
+        histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.sliders.TrackBar1.Value = 1
+
+        trimPCGravity.histOpts = histOpts
+        trimPCStatic.histOpts = histOpts
 
         label1 = "YZ (Side View)"
         ocvb.desc = "Create a 2D histogram for depth in YZ (Side View.)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        hist.Run(ocvb)
-        dst2 = hist.dst2
+        Dim histSize() = {src.Height, src.Width}
 
+        If useIMU <> histOpts.check.Box(0).Checked Or ocvb.frameCount = 0 Then
+            useIMU = histOpts.check.Box(0).Checked
+            trimPC = If(useIMU, trimPCGravity, trimPCStatic)
+        End If
+
+        Dim zRange = histOpts.sliders.TrackBar2.Value / 1000
+        trimPC.Run(ocvb)
+        dst2 = trimPC.dst1
+
+        pixelsPerMeter = src.Height / zRange
+        trimPC.split(XorYdata).ConvertTo(trimPC.split(XorYdata), cv.MatType.CV_32F, pixelsPerMeter, pixelsPerMeter * zRange)
+        trimPC.split(Zdata).ConvertTo(trimPC.split(Zdata), cv.MatType.CV_32F, pixelsPerMeter)
+
+        Dim histinput As New cv.Mat
+        cv.Cv2.Merge(trimPC.split, histinput)
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, src.Height), New cv.Rangef(0, src.Width)}
+        cv.Cv2.CalcHist(New cv.Mat() {histinput}, New Integer() {Zdata, XorYdata}, New cv.Mat, histOutput, 2, histSize, ranges)
+        histOutput = histOutput.Flip(cv.FlipMode.X)
+        dst1 = histOutput.Threshold(histOpts.sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
+        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         Dim rect As New cv.Rect((src.Width - src.Height) / 2, 0, src.Height, src.Height)
-        cv.Cv2.Rotate(hist.dst1(rect), dst1(rect), cv.RotateFlags.Rotate90Clockwise)
+        cv.Cv2.Rotate(dst1(rect), dst1(rect), cv.RotateFlags.Rotate90Clockwise)
+        cv.Cv2.Rotate(histOutput(rect), histOutput(rect), cv.RotateFlags.Rotate90Clockwise)
 
-        pixelsPerMeter = hist.pixelsPerMeter
+        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
