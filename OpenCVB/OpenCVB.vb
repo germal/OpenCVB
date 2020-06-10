@@ -233,17 +233,20 @@ Public Class OpenCVB
         If algorithmRefresh And (pic.Tag = 2 Or pic.Tag = 3) Then
             algorithmRefresh = False
             SyncLock formResult1
-                If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Then
-                    Dim result1 = formResult1
-                    Dim result2 = formResult2
-                    result1 = result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
-                    result2 = result2.Resize(New cv.Size(camPic(3).Size.Width, camPic(3).Size.Height))
-                    cvext.BitmapConverter.ToBitmap(result1, camPic(2).Image)
-                    cvext.BitmapConverter.ToBitmap(result2, camPic(3).Image)
-                Else
-                    cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
-                    cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
-                End If
+                Try
+                    If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Then
+                        Dim result1 = formResult1
+                        Dim result2 = formResult2
+                        result1 = result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
+                        result2 = result2.Resize(New cv.Size(camPic(3).Size.Width, camPic(3).Size.Height))
+                        cvext.BitmapConverter.ToBitmap(result1, camPic(2).Image)
+                        cvext.BitmapConverter.ToBitmap(result2, camPic(3).Image)
+                    Else
+                        cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
+                        cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
+                    End If
+                Catch ex As Exception
+                End Try
             End SyncLock
         End If
         If cameraRefresh And (pic.Tag = 0 Or pic.Tag = 1) Then
@@ -253,11 +256,14 @@ Public Class OpenCVB
             SyncLock bufferLock ' avoid updating the image while copying into it in the algorithm and camera tasks
                 If camera.color IsNot Nothing Then
                     If camera.color.width > 0 Then
-                        If RGBDepth.Width = 0 Then RGBDepth = New cv.Mat
-                        RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
-                        color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
-                        cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
-                        cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
+                        Try
+                            If RGBDepth.Width = 0 Then RGBDepth = New cv.Mat
+                            RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
+                            color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
+                            cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
+                            cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
+                        Catch ex As Exception
+                        End Try
                     End If
                 End If
             End SyncLock
