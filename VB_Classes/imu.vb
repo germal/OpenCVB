@@ -457,14 +457,17 @@ Public Class IMU_GVector
         angleZ = Math.Atan2(gy, gz) + cv.Cv2.PI / 2
 
         kalman.input = {gx, gy, gz, angleX, angleY, angleZ}
-        kalman.Run(ocvb)
-        gx = kalman.output(0)
-        gy = kalman.output(1)
-        gz = kalman.output(2)
 
-        angleX = kalman.output(3)
-        angleY = kalman.output(4)
-        angleZ = kalman.output(5)
+        If kalman.check.Box(0).Checked Then
+            kalman.Run(ocvb)
+            gx = kalman.output(0)
+            gy = kalman.output(1)
+            gz = kalman.output(2)
+
+            angleX = kalman.output(3)
+            angleY = kalman.output(4)
+            angleZ = kalman.output(5)
+        End If
 
         If standalone Then
             Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf

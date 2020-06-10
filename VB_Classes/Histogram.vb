@@ -665,6 +665,11 @@ Public Class Histogram_2D_XZ_YZ
     End Sub
 End Class
 
+
+
+
+
+
 Public Class Histogram_ProjectionOptions
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
@@ -687,12 +692,15 @@ End Class
 
 
 
+
+
+
 Public Class Histogram_2D_TopView
     Inherits ocvbClass
     Public histOpts As Histogram_ProjectionOptions
     Public trimPC As Object
     Dim trimPCStatic As Depth_PointCloudInRange
-    Dim trimPCGravity As Depth_PointCloudInRange_IMU_Xaxis
+    Dim trimPCGravity As Depth_PointCloudInRange_IMU
     Public XorYdata As Integer = 0
     Public Zdata As Integer = 2
     Public histOutput As New cv.Mat
@@ -700,7 +708,7 @@ Public Class Histogram_2D_TopView
     Public useIMU As Boolean = False
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        trimPCGravity = New Depth_PointCloudInRange_IMU_Xaxis(ocvb)
+        trimPCGravity = New Depth_PointCloudInRange_IMU(ocvb)
         trimPCStatic = New Depth_PointCloudInRange(ocvb)
 
         histOpts = New Histogram_ProjectionOptions(ocvb)
@@ -750,7 +758,7 @@ Public Class Histogram_2D_SideView
     Public trimPC As Object
     Public histOpts As Histogram_ProjectionOptions
     Dim trimPCStatic As Depth_PointCloudInRange
-    Dim trimPCGravity As Depth_PointCloudInRange_IMU_XZaxis
+    Dim trimPCGravity As Depth_PointCloudInRange_IMU
     Public XorYdata As Integer = 1
     Public Zdata As Integer = 2
     Public histOutput As New cv.Mat
@@ -759,7 +767,7 @@ Public Class Histogram_2D_SideView
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        trimPCGravity = New Depth_PointCloudInRange_IMU_XZaxis(ocvb)
+        trimPCGravity = New Depth_PointCloudInRange_IMU(ocvb)
         trimPCStatic = New Depth_PointCloudInRange(ocvb)
 
         histOpts = New Histogram_ProjectionOptions(ocvb)

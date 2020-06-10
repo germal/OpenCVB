@@ -29,13 +29,13 @@ Public Class OpenGL_Basics
     Public zTrans As Single = 0.5
     Public OpenGLTitle As String = "OpenGL_Basics"
     Public imageLabel As String
-    Public imu As IMU_GVector
+    'Public imu As IMU_GVector
     Public pointCloudInput As New cv.Mat
     Dim openGLHeight = 1200
     Dim openGLWidth = 1500
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        imu = New IMU_GVector(ocvb)
+        'imu = New IMU_GVector(ocvb)
         ocvb.desc = "Create an OpenGL window and update it with images"
     End Sub
     Private Sub memMapUpdate(ocvb As AlgorithmData)
@@ -80,7 +80,7 @@ Public Class OpenGL_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then pointCloudInput = ocvb.pointCloud
-        imu.Run(ocvb)
+        'imu.Run(ocvb)
 
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
         If ocvb.frameCount = 0 Then startOpenGLWindow(ocvb, pcSize)
@@ -366,8 +366,12 @@ End Class
 Public Class OpenGL_GravityTransform
     Inherits ocvbClass
     Public ogl As OpenGL_Basics
+    Public gCloud As Depth_PointCloudInRange_IMU
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
+
+        gCloud = New Depth_PointCloudInRange_IMU(ocvb)
+        gCloud.histOpts = New Histogram_ProjectionOptions(ocvb)
 
         ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_Callbacks"
@@ -382,56 +386,25 @@ Public Class OpenGL_GravityTransform
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ogl.imu.Run(ocvb)
-        Dim split() = cv.Cv2.Split(ocvb.pointCloud)
-        Dim vertSplit = split
+        If radio.check(0).Checked Then
+            gCloud.xRotation = True
+            gCloud.zRotation = False
+        End If
+        If radio.check(1).Checked Then
+            gCloud.xRotation = False
+            gCloud.zRotation = True
+        End If
+        If radio.check(2).Checked Then
+            gCloud.xRotation = True
+            gCloud.zRotation = True
+        End If
+        If radio.check(3).Checked Then
+            gCloud.xRotation = False
+            gCloud.zRotation = False
+        End If
 
-        Dim zCos = Math.Cos(ogl.imu.angleZ)
-        Dim zSin = Math.Sin(ogl.imu.angleZ)
-
-        Dim xCos = Math.Cos(ogl.imu.angleX)
-        Dim xSin = Math.Sin(ogl.imu.angleX)
-
-        Dim rotateFlag = 2 ' assume both x ans z axis rotation
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
-                rotateFlag = i
-                Exit For
-            End If
-        Next
-        Select Case rotateFlag
-            Case 0 ' rotate around x-axis - AKA YZ plane rotation matrix
-                vertSplit(1) = zCos * split(1) - zSin * split(2)
-                vertSplit(2) = zSin * split(1) + zCos * split(2)
-                ogl.imageLabel = "Rotating around the x-axis"
-            Case 1 ' rotate around z-axis - AKA XY plane rotation
-                vertSplit(0) = xCos * split(0) - xSin * split(1)
-                vertSplit(1) = xSin * split(0) + xCos * split(1)
-                ogl.imageLabel = "Rotating around the z-axis"
-            Case 2 ' rotate around x-axis and z-axis
-                Dim xArray(,) As Single = {{1, 0, 0, 0}, {0, zCos, -zSin, 0}, {0, zSin, zCos, 0}, {0, 0, 0, 1}}
-                Dim xRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, xArray)
-
-                Dim zArray(,) As Single = {{xCos, -xSin, 0, 0}, {xSin, xCos, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}
-                Dim zRotate = New cv.Mat(4, 4, cv.MatType.CV_32F, zArray)
-                Dim yRotate = (xRotate * zRotate).ToMat
-
-                Dim xz(4 * 4) As Single
-                For j = 0 To yRotate.Rows - 1
-                    For i = 0 To yRotate.Cols - 1
-                        xz(i * 4 + j) = yRotate.Get(Of Single)(i, j)
-                    Next
-                Next
-
-                vertSplit(0) = xz(0) * split(0) + xz(1) * split(1) + xz(2) * split(2)
-                vertSplit(1) = xz(4) * split(0) + xz(5) * split(1) + xz(6) * split(2)
-                vertSplit(2) = xz(8) * split(0) + xz(9) * split(1) + xz(10) * split(2)
-                ogl.imageLabel = "Rotating around the x-axis and the z-axis"
-            Case 3
-                ogl.imageLabel = "No rotation "
-        End Select
-        cv.Cv2.Merge(vertSplit, ogl.pointCloudInput)
-
+        gCloud.Run(ocvb)
+        cv.Cv2.Merge(gCloud.split, ogl.pointCloudInput)
         ogl.src = src
         ogl.Run(ocvb)
     End Sub

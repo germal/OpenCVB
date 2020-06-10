@@ -1275,74 +1275,23 @@ End Class
 
 
 
+
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
-Public Class Depth_PointCloudInRange_IMU_Xaxis
+Public Class Depth_PointCloudInRange_IMU
     Inherits ocvbClass
     Public histOpts As Histogram_ProjectionOptions
     Public Mask As New cv.Mat
     Public maxMeters As Double
     Public split(3 - 1) As cv.Mat
     Public imu As IMU_GVector
+    Public xRotation As Boolean = True
+    Public zRotation As Boolean = True
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         imu = New IMU_GVector(ocvb)
         If standalone = False Then imu.result = RESULT2
-        split(0) = New cv.Mat
-        split(1) = New cv.Mat
-        split(2) = New cv.Mat
-
-        If standalone Then histOpts = New Histogram_ProjectionOptions(ocvb)
-
-        label2 = "Mask for depth values that are in-range"
-        ocvb.desc = "Rotate the PointCloud around the X-axis using the gravity vector from the IMU."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        maxMeters = histOpts.sliders.TrackBar1.Value / 1000
-        Dim tSplit = cv.Cv2.Split(ocvb.pointCloud)
-
-        imu.Run(ocvb)
-        '[1      0       0] rotate the point cloud around the x-axis only.
-        '[0 cos(a) -sin(a)]
-        '[0 sin(a)  cos(a)]
-        Dim xZ(,) = {{1, 0, 0}, {0, Math.Cos(-imu.angleZ), -Math.Sin(-imu.angleZ)}, {0, Math.Sin(-imu.angleZ), Math.Cos(-imu.angleZ)}}
-
-        split(0) = tSplit(0)
-        split(1) = xZ(1, 1) * tSplit(1) + xZ(1, 2) * tSplit(2)
-        split(2) = xZ(2, 1) * tSplit(1) + xZ(2, 2) * tSplit(2)
-
-        cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxMeters), Mask)
-        Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
-        Mask = Mask.SetTo(0, zeroDepth)
-        If standalone Then dst2 = Mask
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
-' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
-Public Class Depth_PointCloudInRange_IMU_XZaxis
-    Inherits ocvbClass
-    Public histOpts As Histogram_ProjectionOptions
-    Public Mask As New cv.Mat
-    Public maxMeters As Double
-    Public split(3 - 1) As cv.Mat
-    Public imu As IMU_GVector
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-
-        imu = New IMU_GVector(ocvb)
-        If standalone = False Then imu.result = RESULT2
-        split(0) = New cv.Mat
-        split(1) = New cv.Mat
-        split(2) = New cv.Mat
 
         If standalone Then histOpts = New Histogram_ProjectionOptions(ocvb)
         label2 = "Mask for depth values that are in-range"
@@ -1351,26 +1300,31 @@ Public Class Depth_PointCloudInRange_IMU_XZaxis
     Public Sub Run(ocvb As AlgorithmData)
         maxMeters = histOpts.sliders.TrackBar2.Value / 1000
         Dim tSplit = cv.Cv2.Split(ocvb.pointCloud)
+        split = tSplit
 
         imu.Run(ocvb)
-        '[cos(a) -sin(a) 0]
-        '[sin(a)  cos(a) 0]
-        '[0      0       1] rotate the point cloud around the z-axis.
-        Dim yZ(,) = {{Math.Cos(-imu.angleX), -Math.Sin(-imu.angleX), 0}, {Math.Sin(-imu.angleX), Math.Cos(-imu.angleX), 0}, {0, 0, 1}}
+        If zRotation Then
+            '[cos(a) -sin(a) 0]
+            '[sin(a)  cos(a) 0]
+            '[0      0       1] rotate the point cloud around the z-axis.
+            Dim yZ(,) = {{Math.Cos(-imu.angleX), -Math.Sin(-imu.angleX), 0}, {Math.Sin(-imu.angleX), Math.Cos(-imu.angleX), 0}, {0, 0, 1}}
 
-        split(0) = yZ(0, 0) * tSplit(0) + yZ(0, 1) * tSplit(1)
-        split(1) = yZ(1, 0) * tSplit(0) + yZ(1, 1) * tSplit(1)
-        split(2) = tSplit(2)
-        tSplit = split
+            split(0) = yZ(0, 0) * tSplit(0) + yZ(0, 1) * tSplit(1)
+            split(1) = yZ(1, 0) * tSplit(0) + yZ(1, 1) * tSplit(1)
+            split(2) = tSplit(2)
+            tSplit = split
+        End If
 
-        '[1      0       0] rotate the point cloud around the x-axis.
-        '[0 cos(a) -sin(a)]
-        '[0 sin(a)  cos(a)]
-        Dim xZ(,) = {{1, 0, 0}, {0, Math.Cos(-imu.angleZ), -Math.Sin(-imu.angleZ)}, {0, Math.Sin(-imu.angleZ), Math.Cos(-imu.angleZ)}}
+        If xRotation Then
+            '[1      0       0] rotate the point cloud around the x-axis.
+            '[0 cos(a) -sin(a)]
+            '[0 sin(a)  cos(a)]
+            Dim xZ(,) = {{1, 0, 0}, {0, Math.Cos(-imu.angleZ), -Math.Sin(-imu.angleZ)}, {0, Math.Sin(-imu.angleZ), Math.Cos(-imu.angleZ)}}
 
-        split(0) = tSplit(0)
-        split(1) = xZ(1, 1) * tSplit(1) + xZ(1, 2) * tSplit(2)
-        split(2) = xZ(2, 1) * tSplit(1) + xZ(2, 2) * tSplit(2)
+            split(0) = tSplit(0)
+            split(1) = xZ(1, 1) * tSplit(1) + xZ(1, 2) * tSplit(2)
+            split(2) = xZ(2, 1) * tSplit(1) + xZ(2, 2) * tSplit(2)
+        End If
 
         cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxMeters), Mask)
         Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)

@@ -270,16 +270,16 @@ End Class
 
 
 
-Public Class Projection_Wall
+Public Class Projection_Plane_Walls
     Inherits ocvbClass
-    Dim objects As Projection_TopViewObjects
+    Dim objects As Projection_GVector_TopView
     Dim lines As lineDetector_FLD_CPP
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         lines = New lineDetector_FLD_CPP(ocvb)
-        objects = New Projection_TopViewObjects(ocvb)
+        objects = New Projection_GVector_TopView(ocvb)
         dilate = New DilateErode_Basics(ocvb)
 
         label1 = "Top View: walls in red"
@@ -307,18 +307,17 @@ End Class
 
 
 
-Public Class Projection_TopViewObjects
+Public Class Projection_GVector_TopView
     Inherits ocvbClass
-    Dim flood As FloodFill_Projection
-    Public fontSize As Single = 1.0
-    Public gravity As Projection_TopView
+    Public flood As FloodFill_Projection
+    Public view As Projection_TopView
     Public maxZ As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        gravity = New Projection_TopView(ocvb)
-        gravity.hist.histOpts.check.Box(0).Checked = True ' we want the IMU to rotate the data.
-        gravity.hist.histOpts.sliders.TrackBar1.Value = 5 ' a better default for flood fill
+        view = New Projection_TopView(ocvb)
+        view.hist.histOpts.check.Box(0).Checked = True ' we want the IMU to rotate the data.
+        view.hist.histOpts.sliders.TrackBar1.Value = 5 ' a better default for flood fill
 
         flood = New FloodFill_Projection(ocvb)
         flood.sliders.TrackBar1.Value = 100
@@ -332,33 +331,12 @@ Public Class Projection_TopViewObjects
             Exit Sub
         End If
 
-        gravity.src = src
-        gravity.Run(ocvb)
-        Dim tmp = gravity.hist.histOutput.Threshold(gravity.hist.histOpts.sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
+        view.src = src
+        view.Run(ocvb)
+        Dim tmp = view.hist.histOutput.Threshold(view.hist.histOpts.sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
         flood.src = tmp.ConvertScaleAbs(255)
         flood.Run(ocvb)
         dst1 = flood.dst1
-
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        If ocvb.parms.resolution = resMed Then fontSize = 0.6
-        maxZ = gravity.hist.histOpts.sliders.TrackBar2.Value / 1000
-        Dim mmPerPixel = maxZ * 1000 / src.Height
-        Dim maxCount = Math.Min(flood.objectRects.Count, 10)
-        For i = 0 To maxCount - 1
-            Dim rect = flood.objectRects(i)
-            dst2.Rectangle(rect, cv.Scalar.White, 1)
-            Dim minDistanceFromCamera = (src.Height - rect.Y - rect.Height) * mmPerPixel
-            Dim maxDistanceFromCamera = (src.Height - rect.Y) * mmPerPixel
-            Dim objectWidth = rect.Width * mmPerPixel
-
-            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.resolution = resMed, 6, 10), cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.resolution = resMed, 3, 5), cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-            Dim text = "depth=" + Format(minDistanceFromCamera / 1000, "#0.0") + "-" + Format(maxDistanceFromCamera / 1000, "0.0") + "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
-
-            Dim pt = New cv.Point(rect.X, rect.Y - 10)
-            cv.Cv2.PutText(dst2, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        Next
-        label2 = "Showing the top " + CStr(maxCount) + " out of " + CStr(flood.objectRects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
     End Sub
 End Class
 
@@ -366,16 +344,16 @@ End Class
 
 
 
-Public Class Projection_CeilingFloor
+Public Class Projection_Planes_CeilingFloor
     Inherits ocvbClass
-    Dim objects As Projection_SideViewObjects
+    Dim objects As Projection_GVector_SideView
     Dim lines As lineDetector_FLD_CPP
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         lines = New lineDetector_FLD_CPP(ocvb)
-        objects = New Projection_SideViewObjects(ocvb)
+        objects = New Projection_GVector_SideView(ocvb)
         dilate = New DilateErode_Basics(ocvb)
 
         label1 = "Top View: walls in red"
@@ -403,18 +381,16 @@ End Class
 
 
 
-Public Class Projection_SideViewObjects
+Public Class Projection_GVector_SideView
     Inherits ocvbClass
-    Dim flood As FloodFill_Projection
-    Public fontSize As Single = 1.0
-    Public gravity As Projection_SideView
-    Public maxZ As Single
+    Public flood As FloodFill_Projection
+    Public view As Projection_SideView
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        gravity = New Projection_SideView(ocvb)
-        gravity.hist.histOpts.check.Box(0).Checked = True ' we want the IMU to rotate the data.
-        gravity.hist.histOpts.sliders.TrackBar1.Value = 5 ' a better default for flood fill
+        view = New Projection_SideView(ocvb)
+        view.hist.histOpts.check.Box(0).Checked = True ' we want the IMU to rotate the data.
+        view.hist.histOpts.sliders.TrackBar1.Value = 5 ' a better default for flood fill
 
         flood = New FloodFill_Projection(ocvb)
         flood.sliders.TrackBar1.Value = 100
@@ -428,33 +404,12 @@ Public Class Projection_SideViewObjects
             Exit Sub
         End If
 
-        gravity.src = src
-        gravity.Run(ocvb)
-        Dim tmp = gravity.hist.histOutput.Threshold(gravity.hist.histOpts.sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
+        view.src = src
+        view.Run(ocvb)
+        Dim tmp = view.hist.histOutput.Threshold(view.hist.histOpts.sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
         flood.src = tmp.ConvertScaleAbs(255)
         flood.Run(ocvb)
         dst1 = flood.dst1
-
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        If ocvb.parms.resolution = resMed Then fontSize = 0.6
-        maxZ = gravity.hist.histOpts.sliders.TrackBar2.Value / 1000
-        Dim mmPerPixel = maxZ * 1000 / src.Height
-        Dim maxCount = Math.Min(flood.objectRects.Count, 10)
-        For i = 0 To maxCount - 1
-            Dim rect = flood.objectRects(i)
-            dst2.Rectangle(rect, cv.Scalar.White, 1)
-            Dim minDistanceFromCamera = (src.Height - rect.Y - rect.Height) * mmPerPixel
-            Dim maxDistanceFromCamera = (src.Height - rect.Y) * mmPerPixel
-            Dim objectWidth = rect.Width * mmPerPixel
-
-            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.resolution = resMed, 6, 10), cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.resolution = resMed, 3, 5), cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-            Dim text = "depth=" + Format(minDistanceFromCamera / 1000, "#0.0") + "-" + Format(maxDistanceFromCamera / 1000, "0.0") + "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
-
-            Dim pt = New cv.Point(rect.X, rect.Y - 10)
-            cv.Cv2.PutText(dst2, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        Next
-        label2 = "Showing the top " + CStr(maxCount) + " out of " + CStr(flood.objectRects.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
     End Sub
 End Class
 
@@ -463,6 +418,72 @@ End Class
 
 
 
+
+Public Class Projection_View_SideObjects
+    Inherits ocvbClass
+    Public gVec As Object
+    Dim fontSize As Single = 1.0
+    Public maxZ As Single
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        If standalone Then gVec = New Projection_GVector_SideView(ocvb)
+
+        ocvb.desc = "Show identified clusters of depth data in a side view"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        gVec.Run(ocvb)
+
+        dst1 = gVec.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If ocvb.parms.resolution = resMed Then fontSize = 0.6
+        maxZ = gVec.view.hist.histOpts.sliders.TrackBar2.Value / 1000
+        Dim mmPerPixel = maxZ * 1000 / src.Height
+        Dim maxCount = Math.Min(gVec.flood.objectRects.Count, 10)
+        dst2 = dst1.Clone
+        Dim dst = dst1
+        For i = 0 To maxCount - 1
+            If i > maxCount / 2 Then dst = dst2
+            Dim rect As cv.Rect = gVec.flood.objectRects(i)
+            Dim minDistanceFromCamera = (src.Height - rect.Y - rect.Height) * mmPerPixel
+            Dim maxDistanceFromCamera = (src.Height - rect.Y) * mmPerPixel
+            Dim objectWidth = rect.Width * mmPerPixel
+
+            dst.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.resolution = resMed, 6, 10),
+                       cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.resolution = resMed, 3, 5),
+                       cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            Dim text = "depth=" + Format(minDistanceFromCamera / 1000, "#0.0") + "-" + Format(maxDistanceFromCamera / 1000, "0.0") +
+                       "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
+
+            Dim pt = New cv.Point(rect.X, rect.Y - 10)
+            cv.Cv2.PutText(dst, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        Next
+        Dim objCount = gVec.flood.objectRects.Count
+        label1 = "Objects 1-" + CStr(CInt(maxCount / 2)) + " > " + CStr(gVec.flood.minFloodSize) + " pixels"
+        label2 = "Objects " + CStr(CInt(maxCount / 2) + 1) + "-" + CStr(objCount) + " > " + CStr(gVec.flood.minFloodSize) + " pixels"
+    End Sub
+End Class
+
+
+
+Public Class Projection_View_TopObjects
+    Inherits ocvbClass
+    Dim gVecTop As Projection_View_SideObjects
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        gVecTop = New Projection_View_SideObjects(ocvb)
+        gVecTop.gVec = New Projection_GVector_TopView(ocvb)
+
+        ocvb.desc = "Show identified clusters of depth data in the top view"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        gVecTop.Run(ocvb)
+        dst1 = gVecTop.dst1
+        dst2 = gVecTop.dst2
+        label1 = gVecTop.label1
+        label2 = gVecTop.label2
+    End Sub
+End Class
 
 
 
@@ -474,6 +495,7 @@ Public Class Projection_SideView
         setCaller(ocvb)
 
         cMats = New Projection_ColorizeMat(ocvb)
+        cMats.sliders.Visible = standalone
         cMats.shift = (src.Width - src.Height) / 2
         cMats.Run(ocvb)
 
@@ -484,10 +506,10 @@ Public Class Projection_SideView
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        If hist.histOpts.check.Box(0).Checked = False Then
-            dst1 = cMats.CameraLocationSide(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.TrackBar2.Value / 1000)
-        Else
+        If hist.histOpts.check.Box(0).Checked Then
             dst1 = hist.dst1
+        Else
+            dst1 = cMats.CameraLocationSide(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.TrackBar2.Value / 1000)
         End If
     End Sub
 End Class
@@ -506,6 +528,7 @@ Public Class Projection_TopView
         setCaller(ocvb)
 
         cMats = New Projection_ColorizeMat(ocvb)
+        cMats.sliders.Visible = standalone
         cMats.shift = 0
         cMats.Run(ocvb)
 
@@ -516,10 +539,10 @@ Public Class Projection_TopView
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        If hist.histOpts.check.Box(0).Checked = False Then
-            dst1 = cMats.CameraLocationBot(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.TrackBar2.Value / 1000)
-        Else
+        If hist.histOpts.check.Box(0).Checked Then
             dst1 = hist.dst1
+        Else
+            dst1 = cMats.CameraLocationBot(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.TrackBar2.Value / 1000)
         End If
     End Sub
 End Class
