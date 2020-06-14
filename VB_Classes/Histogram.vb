@@ -158,16 +158,19 @@ End Class
 
 Public Class Histogram_EqualizeColor
     Inherits ocvbClass
+    Dim kalmanEq As Histogram_KalmanSmoothed
     Dim kalman As Histogram_KalmanSmoothed
     Dim mats As Mat_2to1
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
+        kalmaneq = New Histogram_KalmanSmoothed(ocvb)
         kalman = New Histogram_KalmanSmoothed(ocvb)
+        kalmanEq.sliders.TrackBar1.Value = 40
         kalman.sliders.TrackBar1.Value = 40
 
         mats = New Mat_2to1(ocvb)
 
-        ocvb.desc = "Create an equalized histogram of the color image.  Histogram differences are very subtle but image is noticeably enhanced."
+        ocvb.desc = "Create an equalized histogram of the color image. Image is noticeably enhanced."
         label1 = "Image Enhanced with Equalized Histogram"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -181,18 +184,18 @@ Public Class Histogram_EqualizeColor
 
         If standalone Then
             cv.Cv2.Split(src, rgb) ' equalizehist alters the input...
-            kalman.src = rgb(2).Clone() ' just show the green plane
+            kalman.src = rgb(2).Clone()
             kalman.plotHist.backColor = cv.Scalar.Red
             kalman.Run(ocvb)
             mats.mat(0) = kalman.dst1.Clone()
 
-            kalman.src = rgbEq(2).Clone()
-            kalman.Run(ocvb)
-            mats.mat(1) = kalman.dst1.Clone()
+            kalmanEq.src = rgbEq(2).Clone()
+            kalmanEq.Run(ocvb)
+            mats.mat(1) = kalmanEq.dst1.Clone()
 
             mats.Run(ocvb)
             dst2 = mats.dst1
-            label2 = "Before (top) and After Red Histogram (only subtle)"
+            label2 = "Before (top) and After Red Histogram"
 
             cv.Cv2.Merge(rgbEq, dst1)
         End If
@@ -204,21 +207,24 @@ End Class
 
 Public Class Histogram_EqualizeGray
     Inherits ocvbClass
+    Public histogramEq As Histogram_KalmanSmoothed
     Public histogram As Histogram_KalmanSmoothed
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
+        histogramEq = New Histogram_KalmanSmoothed(ocvb)
         histogram = New Histogram_KalmanSmoothed(ocvb)
-        label1 = "Note the difference in the histogram bar color"
+        label1 = "Before EqualizeHist"
         label2 = "After EqualizeHist"
         ocvb.desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        histogram.src = src
-        dst1 = histogram.dst1
-        cv.Cv2.EqualizeHist(histogram.src, histogram.src)
+        histogram.src = src.Clone
         histogram.Run(ocvb)
-        dst2 = histogram.dst1
+        dst1 = histogram.dst1.Clone
+        cv.Cv2.EqualizeHist(histogram.src, histogramEq.src)
+        histogramEq.Run(ocvb)
+        dst2 = histogramEq.dst1
     End Sub
 End Class
 
