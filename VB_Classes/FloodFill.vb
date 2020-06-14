@@ -340,7 +340,7 @@ Public Class FloodFill_Projection
         sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar2("FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar3("FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar4("Step Size", 1, ocvb.color.cols / 2, 20)
+        sliders.setupTrackBar4("Step Size", 1, ocvb.color.Cols / 2, 20)
 
         label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
@@ -357,7 +357,8 @@ Public Class FloodFill_Projection
 
         objectRects.Clear()
         dst2.SetTo(0)
-        cv.Cv2.BitwiseNot(src, src) ' floodfill where there are zeros.
+        cv.Cv2.BitwiseNot(src, src)
+        Dim nextColor As cv.Vec3b
         For y = 0 To src.Height - 1 Step stepSize
             For x = 0 To src.Width - 1 Step stepSize
                 If src.Get(Of Byte)(y, x) = 0 Then
@@ -365,16 +366,15 @@ Public Class FloodFill_Projection
                     maskPlus.SetTo(0)
                     Dim count = cv.Cv2.FloodFill(src, maskPlus, New cv.Point(x, y), cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
                     If count > minFloodSize Then
-                        Dim nextColor = scalarColors(objectRects.Count Mod 255)
+                        nextColor = rColors(objectRects.Count Mod 255)
                         objectRects.Add(rect)
-                        If standalone Then dst2(rect).SetTo(nextColor, maskPlus(rect))
+                        dst2(rect).SetTo(nextColor, maskPlus(rect))
+                        dst2.Rectangle(rect, cv.Scalar.White, 1)
                     End If
                 End If
             Next
         Next
 
-        If standalone Then
-            label2 = CStr(objectRects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
-        End If
+        label2 = CStr(objectRects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
 End Class

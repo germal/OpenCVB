@@ -755,6 +755,7 @@ Public Class Histogram_EqualizeColor
     Public kalman As Histogram_KalmanSmoothed
     Dim mats As Mat_2to1
     Public displayHist As Boolean = False
+    Public channel = 2
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         kalmanEq = New Histogram_KalmanSmoothed(ocvb)
@@ -778,12 +779,12 @@ Public Class Histogram_EqualizeColor
 
         If standalone Or displayHist Then
             cv.Cv2.Split(src, rgb) ' equalizehist alters the input...
-            kalman.src = rgb(2).Clone()
+            kalman.src = rgb(channel).Clone()
             kalman.plotHist.backColor = cv.Scalar.Red
             kalman.Run(ocvb)
             mats.mat(0) = kalman.dst1.Clone()
 
-            kalmanEq.src = rgbEq(2).Clone()
+            kalmanEq.src = rgbEq(channel).Clone()
             kalmanEq.Run(ocvb)
             mats.mat(1) = kalmanEq.dst1.Clone()
 
@@ -810,6 +811,7 @@ Public Class Histogram_EqualizeGray
         setCaller(ocvb)
         histogramEq = New Histogram_KalmanSmoothed(ocvb)
         histogram = New Histogram_KalmanSmoothed(ocvb)
+
         label1 = "Before EqualizeHist"
         label2 = "After EqualizeHist"
         ocvb.desc = "Create an equalized histogram of the grayscale image."
@@ -841,11 +843,19 @@ Public Class Histogram_Equalize255
         eqHist.kalman.sliders.TrackBar1.Value = 255
         eqHist.displayHist = True
 
+        radio.Setup(ocvb, caller, 3)
+        radio.check(0).Text = "Equalize the Blue channel"
+        radio.check(1).Text = "Equalize the Green channel"
+        radio.check(2).Text = "Equalize the Red channel"
+        radio.check(2).Checked = True
         label1 = "Resulting equalized image"
         label2 = "Upper plot is before equalization.  Bottom is after."
         ocvb.desc = "Reproduce the results of the hist.py example with existing algorithms"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        For i = 0 To 3 - 1
+            If radio.check(i).Checked Then eqHist.channel = i
+        Next
         eqHist.src = src
         eqHist.Run(ocvb)
         dst1 = eqHist.dst1.Clone
