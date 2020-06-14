@@ -156,81 +156,6 @@ End Class
 
 
 
-Public Class Histogram_EqualizeColor
-    Inherits ocvbClass
-    Dim kalmanEq As Histogram_KalmanSmoothed
-    Dim kalman As Histogram_KalmanSmoothed
-    Dim mats As Mat_2to1
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        kalmaneq = New Histogram_KalmanSmoothed(ocvb)
-        kalman = New Histogram_KalmanSmoothed(ocvb)
-        kalmanEq.sliders.TrackBar1.Value = 40
-        kalman.sliders.TrackBar1.Value = 40
-
-        mats = New Mat_2to1(ocvb)
-
-        ocvb.desc = "Create an equalized histogram of the color image. Image is noticeably enhanced."
-        label1 = "Image Enhanced with Equalized Histogram"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Dim rgb(2) As cv.Mat
-        Dim rgbEq(2) As cv.Mat
-        cv.Cv2.Split(src, rgbEq)
-
-        For i = 0 To rgb.Count - 1
-            cv.Cv2.EqualizeHist(rgbEq(i), rgbEq(i))
-        Next
-
-        If standalone Then
-            cv.Cv2.Split(src, rgb) ' equalizehist alters the input...
-            kalman.src = rgb(2).Clone()
-            kalman.plotHist.backColor = cv.Scalar.Red
-            kalman.Run(ocvb)
-            mats.mat(0) = kalman.dst1.Clone()
-
-            kalmanEq.src = rgbEq(2).Clone()
-            kalmanEq.Run(ocvb)
-            mats.mat(1) = kalmanEq.dst1.Clone()
-
-            mats.Run(ocvb)
-            dst2 = mats.dst1
-            label2 = "Before (top) and After Red Histogram"
-
-            cv.Cv2.Merge(rgbEq, dst1)
-        End If
-    End Sub
-End Class
-
-
-
-
-Public Class Histogram_EqualizeGray
-    Inherits ocvbClass
-    Public histogramEq As Histogram_KalmanSmoothed
-    Public histogram As Histogram_KalmanSmoothed
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        histogramEq = New Histogram_KalmanSmoothed(ocvb)
-        histogram = New Histogram_KalmanSmoothed(ocvb)
-        label1 = "Before EqualizeHist"
-        label2 = "After EqualizeHist"
-        ocvb.desc = "Create an equalized histogram of the grayscale image."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        histogram.src = src.Clone
-        histogram.Run(ocvb)
-        dst1 = histogram.dst1.Clone
-        cv.Cv2.EqualizeHist(histogram.src, histogramEq.src)
-        histogramEq.Run(ocvb)
-        dst2 = histogramEq.dst1
-    End Sub
-End Class
-
-
-
-
 
 ' https://docs.opencv.org/2.4/modules/imgproc/doc/histograms.html
 Public Class Histogram_2D_HueSaturation
@@ -814,5 +739,116 @@ Public Class Histogram_2D_SideView
         cv.Cv2.Rotate(histOutput(rect), histOutput(rect), cv.RotateFlags.Rotate90Clockwise)
 
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
+Public Class Histogram_EqualizeColor
+    Inherits ocvbClass
+    Public kalmanEq As Histogram_KalmanSmoothed
+    Public kalman As Histogram_KalmanSmoothed
+    Dim mats As Mat_2to1
+    Public displayHist As Boolean = False
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        kalmanEq = New Histogram_KalmanSmoothed(ocvb)
+        kalman = New Histogram_KalmanSmoothed(ocvb)
+        kalmanEq.sliders.TrackBar1.Value = 40
+        kalman.sliders.TrackBar1.Value = 40
+
+        mats = New Mat_2to1(ocvb)
+
+        ocvb.desc = "Create an equalized histogram of the color image. Image is noticeably enhanced."
+        label1 = "Image Enhanced with Equalized Histogram"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim rgb(2) As cv.Mat
+        Dim rgbEq(2) As cv.Mat
+        cv.Cv2.Split(src, rgbEq)
+
+        For i = 0 To rgb.Count - 1
+            cv.Cv2.EqualizeHist(rgbEq(i), rgbEq(i))
+        Next
+
+        If standalone Or displayHist Then
+            cv.Cv2.Split(src, rgb) ' equalizehist alters the input...
+            kalman.src = rgb(2).Clone()
+            kalman.plotHist.backColor = cv.Scalar.Red
+            kalman.Run(ocvb)
+            mats.mat(0) = kalman.dst1.Clone()
+
+            kalmanEq.src = rgbEq(2).Clone()
+            kalmanEq.Run(ocvb)
+            mats.mat(1) = kalmanEq.dst1.Clone()
+
+            mats.Run(ocvb)
+            dst2 = mats.dst1
+            label2 = "Before (top) and After Red Histogram"
+
+            cv.Cv2.Merge(rgbEq, dst1)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+'https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
+Public Class Histogram_EqualizeGray
+    Inherits ocvbClass
+    Public histogramEq As Histogram_KalmanSmoothed
+    Public histogram As Histogram_KalmanSmoothed
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        histogramEq = New Histogram_KalmanSmoothed(ocvb)
+        histogram = New Histogram_KalmanSmoothed(ocvb)
+        label1 = "Before EqualizeHist"
+        label2 = "After EqualizeHist"
+        ocvb.desc = "Create an equalized histogram of the grayscale image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        histogram.src = src.Clone
+        histogram.Run(ocvb)
+        dst1 = histogram.dst1.Clone
+        cv.Cv2.EqualizeHist(histogram.src, histogramEq.src)
+        histogramEq.Run(ocvb)
+        dst2 = histogramEq.dst1
+    End Sub
+End Class
+
+
+
+
+
+' https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
+Public Class Histogram_Equalize255
+    Inherits ocvbClass
+    Dim eqHist As Histogram_EqualizeColor
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        eqHist = New Histogram_EqualizeColor(ocvb)
+        eqHist.kalmanEq.sliders.TrackBar1.Value = 255
+        eqHist.kalman.sliders.TrackBar1.Value = 255
+        eqHist.displayHist = True
+
+        label1 = "Resulting equalized image"
+        label2 = "Upper plot is before equalization.  Bottom is after."
+        ocvb.desc = "Reproduce the results of the hist.py example with existing algorithms"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        eqHist.src = src
+        eqHist.Run(ocvb)
+        dst1 = eqHist.dst1.Clone
+        dst2 = eqHist.dst2.Clone
     End Sub
 End Class

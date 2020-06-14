@@ -1,23 +1,125 @@
-import cv2 as cv
-import argparse
+#!/usr/bin/env python
+
+''' This is a sample for histogram plotting for RGB images and grayscale images for better understanding of colour distribution
+
+Benefit : Learn how to draw histogram of images
+          Get familier with cv.calcHist, cv.equalizeHist,cv.normalize and some drawing functions
+
+Level : Beginner or Intermediate
+
+Functions : 1) hist_curve : returns histogram of an image drawn as curves
+            2) hist_lines : return histogram of an image drawn as bins ( only for grayscale images )
+
+Usage : python hist.py <image_file>
+
+Abid Rahman 3/14/12 debug Gary Bradski
+'''
+
+# Python 2/3 compatibility
+from __future__ import print_function
+
 import numpy as np
-title_window = 'EqualizedHist_Demo.py'
+import cv2 as cv
 
-parser = argparse.ArgumentParser(description='Code for Histogram Equalization tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='../../Data/lena.jpg')
-args = parser.parse_args()
+bins = np.arange(256).reshape(256,1)
 
-src = cv.imread(cv.samples.findFile(args.input))
-if src is None:
-    print('Could not open or find the image:', args.input)
-    exit(0)
+def hist_curve(im):
+    h = np.zeros((300,256,3))
+    if len(im.shape) == 2:
+        color = [(255,255,255)]
+    elif im.shape[2] == 3:
+        color = [ (255,0,0),(0,255,0),(0,0,255) ]
+    for ch, col in enumerate(color):
+        hist_item = cv.calcHist([im],[ch],None,[256],[0,256])
+        cv.normalize(hist_item,hist_item,0,255,cv.NORM_MINMAX)
+        hist=np.int32(np.around(hist_item))
+        pts = np.int32(np.column_stack((bins,hist)))
+        cv.polylines(h,[pts],False,col)
+    y=np.flipud(h)
+    return y
 
-src = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
+def hist_lines(im):
+    h = np.zeros((300,256,3))
+    if len(im.shape)!=2:
+        print("hist_lines applicable only for grayscale images")
+        #print("so converting image to grayscale for representation"
+        im = cv.cvtColor(im,cv.COLOR_BGR2GRAY)
+    hist_item = cv.calcHist([im],[0],None,[255],[0,255])
+    cv.normalize(hist_item,hist_item,0,255,cv.NORM_MINMAX)
+    hist=np.int32(np.around(hist_item))
+    for x in hist:
+        cv.line(h,(int(x),0),(int(x),255),(255,255,255))
+    y = np.flipud(h)
+    return y
 
-dst1 = cv.equalizeHist(src)
 
-both = np.empty((src.shape[0], src.shape[1]*2, 1), src.dtype)
-both = cv.hconcat([src, dst1])
-cv.imshow("Original (left) and Equalized Image (right)", both)
+def main():
+    import sys
 
-cv.waitKey()
+    if len(sys.argv)>1:
+        fname = sys.argv[1]
+    else :
+        fname = '../../Data/lena.jpg'
+        print("usage : python hist.py <image_file>")
+
+    im = cv.imread(cv.samples.findFile(fname))
+
+    if im is None:
+        print('Failed to load image file:', fname)
+        sys.exit(1)
+
+    gray = cv.cvtColor(im,cv.COLOR_BGR2GRAY)
+
+
+    print(''' Histogram plotting \n
+    Keymap :\n
+    a - show histogram for color image in curve mode \n
+    b - show histogram in bin mode \n
+    c - show equalized histogram (always in bin mode) \n
+    d - show histogram for color image in curve mode \n
+    e - show histogram for a normalized image in curve mode \n
+    Esc - exit \n
+    ''')
+
+    cv.imshow('image',im)
+    while True:
+        k = cv.waitKey(0)
+        if k == ord('a'):
+            curve = hist_curve(im)
+            cv.imshow('histogram',curve)
+            cv.imshow('image',im)
+            print('a')
+        elif k == ord('b'):
+            print('b')
+            lines = hist_lines(gray)
+            cv.imshow('histogram',lines)
+            cv.imshow('image',gray)
+        elif k == ord('c'):
+            print('c')
+            equ = cv.equalizeHist(gray)
+            lines = hist_lines(equ)
+            cv.imshow('histogram',lines)
+            cv.imshow('image',equ)
+        elif k == ord('d'):
+            print('d')
+            curve = hist_curve(gray)
+            cv.imshow('histogram',curve)
+            cv.imshow('image',gray)
+        elif k == ord('e'):
+            print('e')
+            norm = cv.normalize(gray, gray, alpha = 0,beta = 255,norm_type = cv.NORM_MINMAX)
+            lines = hist_lines(norm)
+            cv.imshow('histogram',lines)
+            cv.imshow('image',norm)
+        elif k == 27:
+            print('ESC')
+            cv.destroyAllWindows()
+            break
+
+    print('Done')
+
+
+if __name__ == '__main__':
+    print(__doc__)
+    main()
+    cv.destroyAllWindows()
