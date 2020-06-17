@@ -333,7 +333,8 @@ End Class
 Public Class FloodFill_Projection
     Inherits ocvbClass
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
-    Public objectRects As New List(Of cv.Rect)
+    Public rects As New List(Of cv.Rect)
+    Public masks As New List(Of cv.Mat)
     Public minFloodSize As Integer
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -355,7 +356,8 @@ Public Class FloodFill_Projection
         dst1 = src.Clone()
         Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1)
 
-        objectRects.Clear()
+        rects.Clear()
+        masks.Clear()
         dst2.SetTo(0)
         cv.Cv2.BitwiseNot(src, src)
         Dim nextColor As cv.Vec3b
@@ -366,15 +368,19 @@ Public Class FloodFill_Projection
                     maskPlus.SetTo(0)
                     Dim count = cv.Cv2.FloodFill(src, maskPlus, New cv.Point(x, y), cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
                     If count > minFloodSize Then
-                        nextColor = rColors(objectRects.Count Mod 255)
-                        objectRects.Add(rect)
-                        dst2(rect).SetTo(nextColor, maskPlus(rect))
-                        dst2.Rectangle(rect, cv.Scalar.White, 1)
+                        rects.Add(rect)
+                        masks.Add(maskPlus(rect).Clone())
                     End If
                 End If
             Next
         Next
 
-        label2 = CStr(objectRects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+        For i = 0 To masks.Count - 1
+            Dim rect = rects(i)
+            nextColor = rColors(rects.Count Mod 255)
+            dst2(rect).SetTo(nextColor, masks(i))
+            dst2.Rectangle(rect, cv.Scalar.White, 1)
+        Next
+        label2 = CStr(rects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
 End Class

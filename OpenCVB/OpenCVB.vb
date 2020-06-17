@@ -283,7 +283,6 @@ Public Class OpenCVB
                         If maxline <= 0 Then Exit For
                     End If
                 Next
-                TTtextData(pic.Tag).Clear()
             Catch ex As Exception
             End Try
 

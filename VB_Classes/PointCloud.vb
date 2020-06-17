@@ -438,12 +438,12 @@ Public Class PointCloud_View_SideObjects
         If ocvb.parms.resolution = resMed Then fontSize = 0.6
         maxZ = gVec.view.hist.histOpts.sliders.TrackBar2.Value / 1000
         Dim mmPerPixel = maxZ * 1000 / src.Height
-        Dim maxCount = Math.Min(gVec.flood.objectRects.Count, 10)
+        Dim maxCount = Math.Min(gVec.flood.Rects.Count, 10)
         dst2 = dst1.Clone
         Dim dst = dst1
         For i = 0 To maxCount - 1
             If i > maxCount / 2 Then dst = dst2
-            Dim rect As cv.Rect = gVec.flood.objectRects(i)
+            Dim rect As cv.Rect = gVec.flood.Rects(i)
             Dim minDistanceFromCamera = (src.Height - rect.Y - rect.Height) * mmPerPixel
             Dim maxDistanceFromCamera = (src.Height - rect.Y) * mmPerPixel
             Dim objectWidth = rect.Width * mmPerPixel
@@ -458,7 +458,7 @@ Public Class PointCloud_View_SideObjects
             Dim pt = New cv.Point(rect.X, rect.Y - 10)
             cv.Cv2.PutText(dst, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
-        Dim objCount = gVec.flood.objectRects.Count
+        Dim objCount = gVec.flood.Rects.Count
         label1 = "Objects 1-" + CStr(CInt(maxCount / 2)) + " > " + CStr(gVec.flood.minFloodSize) + " pixels"
         label2 = "Objects " + CStr(CInt(maxCount / 2) + 1) + "-" + CStr(objCount) + " > " + CStr(gVec.flood.minFloodSize) + " pixels"
     End Sub
@@ -542,7 +542,7 @@ Public Class PointCloud_TopView
         hist = New Histogram_2D_TopView(ocvb)
         hist.histOpts.check.Box(0).Checked = False
 
-        ocvb.desc = "Display the histogram without adjusting for gravity"
+        ocvb.desc = "Display the histogram with and without adjusting for gravity"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
