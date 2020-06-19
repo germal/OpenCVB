@@ -60,9 +60,6 @@ Public Class Fractal_MandelbrotZoom
         End If
         If ocvb.drawRect.Width <> 0 Then
             Dim Height = ocvb.drawRect.Width * src.Height / src.Width ' maintain aspect ratio across zooms...
-            Console.WriteLine("before startx = " + CStr(startX) + " endx = " + CStr(endX))
-            Console.WriteLine("before starty = " + CStr(startY) + " endy = " + CStr(endY))
-
             Dim newStartX = startX + (endX - startX) * ocvb.drawRect.X / src.Width
             endX = startX + (endX - startX) * (ocvb.drawRect.X + ocvb.drawRect.Width) / src.Width
             startX = newStartX
@@ -71,8 +68,6 @@ Public Class Fractal_MandelbrotZoom
             endY = startY + (endY - startY) * (ocvb.drawRect.Y + Height) / src.Height
             startY = newStartY
 
-            Console.WriteLine("after startx = " + CStr(startX) + " endx = " + CStr(endX))
-            Console.WriteLine("after starty = " + CStr(startY) + " endy = " + CStr(endY))
             saveIterations = 0
             ocvb.drawRectClear = True
         End If
