@@ -225,10 +225,8 @@ Public Class OpenCVB
         Dim pic = DirectCast(sender, PictureBox)
         g.ScaleTransform(1, 1)
         g.DrawImage(pic.Image, 0, 0)
-        If pic.Tag = 0 Or pic.Tag = 1 Then
-            If drawRect.Width > 0 And drawRect.Height > 0 Then
-                g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
-            End If
+        If drawRect.Width > 0 And drawRect.Height > 0 Then
+            g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
         End If
         If algorithmRefresh And (pic.Tag = 2 Or pic.Tag = 3) Then
             algorithmRefresh = False

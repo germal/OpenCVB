@@ -141,6 +141,7 @@
     <Compile Include="Etch.vb" />
     <Compile Include="FeatureLess.vb" />
     <Compile Include="FishEye.vb" />
+    <Compile Include="Fractal.vb" />
     <Compile Include="FREAK.vb" />
     <Compile Include="Gabor.vb" />
     <Compile Include="CellAuto.vb" />
