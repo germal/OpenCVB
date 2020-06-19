@@ -59,13 +59,20 @@ Public Class Fractal_MandelbrotZoom
             saveIterations = 0
         End If
         If ocvb.drawRect.Width <> 0 Then
-            ocvb.drawRect.Height = ocvb.drawRect.Width * src.Height / src.Width ' maintain aspect ratio across zooms...
+            Dim Height = ocvb.drawRect.Width * src.Height / src.Width ' maintain aspect ratio across zooms...
             Console.WriteLine("before startx = " + CStr(startX) + " endx = " + CStr(endX))
-            startX = startX + (endX - startX) * ocvb.drawRect.X / src.Width
+            Console.WriteLine("before starty = " + CStr(startY) + " endy = " + CStr(endY))
+
+            Dim newStartX = startX + (endX - startX) * ocvb.drawRect.X / src.Width
             endX = startX + (endX - startX) * (ocvb.drawRect.X + ocvb.drawRect.Width) / src.Width
-            startY = startY + (endY - startY) * ocvb.drawRect.Y / src.Height
-            endY = startY + (endY - startY) * (ocvb.drawRect.Y + ocvb.drawRect.Height) / src.Height
+            startX = newStartX
+
+            Dim newStartY = startY + (endY - startY) * ocvb.drawRect.Y / src.Height
+            endY = startY + (endY - startY) * (ocvb.drawRect.Y + Height) / src.Height
+            startY = newStartY
+
             Console.WriteLine("after startx = " + CStr(startX) + " endx = " + CStr(endX))
+            Console.WriteLine("after starty = " + CStr(startY) + " endy = " + CStr(endY))
             saveIterations = 0
             ocvb.drawRectClear = True
         End If
@@ -87,7 +94,7 @@ Public Class Fractal_MandelbrotZoom
             Next
             check.Box(0).Checked = False
         End If
-        label1 = If(endX - startX >= 3.999, "Mandelbrot Zoom - draw anywhere", "Mandelbrot Zoom = " + Format(CInt(4 / (endX - startX)), "###,###") + "X zoom")
+        label1 = If(endX - startX >= 3.999, "Mandelbrot Zoom - draw anywhere", "Mandelbrot Zoom = " + Format(4 / (endX - startX), "###,###") + "X zoom")
     End Sub
 End Class
 
@@ -99,12 +106,13 @@ End Class
 Public Class Fractal_MandelbrotZoomColor
     Inherits ocvbClass
     Dim mandel As Fractal_MandelbrotZoom
-    Dim palette As Palette_ColorMap
+    Public palette As Palette_ColorMap
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         mandel = New Fractal_MandelbrotZoom(ocvb)
         palette = New Palette_ColorMap(ocvb)
-        ocvb.desc = "New class description"
+        palette.radio.check(5).Checked = True
+        ocvb.desc = "Classic Mandelbrot in color"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         mandel.Run(ocvb)
@@ -112,5 +120,72 @@ Public Class Fractal_MandelbrotZoomColor
         palette.Run(ocvb)
         dst1 = palette.dst1
         label1 = mandel.label1
+    End Sub
+End Class
+
+
+
+
+' http://www.malinc.se/m/JuliaSets.php
+' https://www.geeksforgeeks.org/julia-fractal-set-in-c-c-using-graphics/
+Public Class Fractal_Julia
+    Inherits ocvbClass
+    Dim mandel As Fractal_MandelbrotZoomColor
+    Dim rt As Double = 0.282
+    Dim mt As Double = -0.58
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        mandel = New Fractal_MandelbrotZoomColor(ocvb)
+        ocvb.desc = "Build Julia set from any point in the Mandelbrot fractal"
+    End Sub
+    Private Function julia_point(x As Single, y As Single, r As Integer, depth As Integer, max As Integer, c As Complex, z As Complex)
+        If Complex.Abs(z) > r Then
+            Dim mt = (255 * Math.Pow(max - depth, 2) Mod (max * max)) Mod 255
+            dst1.Set(Of Byte)(y, x, 255 - mt)
+            depth = 0
+        End If
+        If Math.Sqrt(Math.Pow(x - src.Width / 2, 2) + Math.Pow(y - src.Height / 2, 2)) > src.Height / 2 Then dst1.Set(Of Byte)(y, x, 0)
+        If depth < max / 4 Then Return 0
+        Return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c)
+    End Function
+    Public Sub Run(ocvb As AlgorithmData)
+        Static savedX As Integer = -1
+        Static savedY As Integer = -1
+        Dim restartComputation As Boolean
+        If ocvb.drawRect.X <> savedX Or ocvb.drawRect.Y <> savedY Then
+            restartComputation = True
+            savedX = ocvb.drawRect.X
+            savedY = ocvb.drawRect.Y
+        End If
+        If ocvb.drawRect.Width <> 0 Then
+                rt = (ocvb.drawRect.X - src.Width / 2) / (src.Width / 4)
+                mt = (ocvb.drawRect.Y - src.Height / 2) / (src.Height / 4)
+                ocvb.drawRect = New cv.Rect
+                ocvb.drawRectClear = True
+            End If
+
+        If restartComputation Then
+            mandel.Run(ocvb)
+            dst2 = mandel.dst1.Clone
+
+            Dim x = src.Width / 2 - src.Height / 2
+            Dim detail = 1
+            Dim depth = 100
+            Dim r = 2
+            Dim c = New Complex(rt, mt)
+            dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+            While x < src.Width / 2 + src.Height / 2
+                Dim y = 0
+                While y < src.Height
+                    Dim z = New Complex(2 * r * (x - src.Width / 2) / src.Height, 2 * r * (y - src.Height / 2) / src.Height)
+                    julia_point(x, y, r, depth, depth, c, z)
+                    y += detail
+                End While
+                x += detail
+            End While
+            mandel.palette.src = dst1
+            mandel.palette.Run(ocvb)
+            dst1 = mandel.palette.dst1
+        End If
     End Sub
 End Class
