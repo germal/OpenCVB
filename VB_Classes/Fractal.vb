@@ -131,6 +131,7 @@ Public Class Fractal_Julia
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         mandel = New Fractal_MandelbrotZoomColor(ocvb)
+        label2 = "Draw anywhere to select different Julia Sets"
         ocvb.desc = "Build Julia set from any point in the Mandelbrot fractal"
     End Sub
     Private Function julia_point(x As Single, y As Single, r As Integer, depth As Integer, max As Integer, c As Complex, z As Complex)
