@@ -3,29 +3,40 @@ Imports cv = OpenCvSharp
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_Mandelbrot
     Inherits ocvbClass
+    Public startX As Single = -2
+    Public endX As Single = 2
+    Public startY As Single = -1.5
+    Public endY As Single = 1.5
+    Public saveIterations As Integer
+    Public incrX As Single
+    Public incrY As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders.setupTrackBar1(ocvb, caller, "Mandelbrot iterations", 1, 50, 34)
         ocvb.desc = "Run the classic Mandalbrot algorithm"
         dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+        saveIterations = 0
+    End Sub
+    Public Sub mandelbrotLoop(y As Integer, iterations As Integer)
+        incrX = (endX - startX) / src.Width
+        incrY = (endY - startY) / src.Height
+        For x = 0 To src.Width - 1
+            Dim c = New Complex(startX + x * incrX, startY + y * incrY)
+            Dim z = New Complex(0, 0)
+            Dim iter = 0
+            While Complex.Abs(z) < 2 And iter < iterations
+                z = z * z + c
+                iter += 1
+            End While
+            dst1.Set(Of Byte)(y, x, If(iter < iterations, 255 * iter / (iterations - 1), 0))
+        Next
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim iterations = sliders.TrackBar1.Value
-        Static saveIterations As Integer
         If saveIterations <> iterations Then
             saveIterations = iterations
-            dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
             For y = 0 To src.Height - 1
-                For x = 0 To src.Width - 1
-                    Dim c = New Complex(x * 4 / src.Width - 2, y * 3 / src.Height - 1.5)
-                    Dim z = New Complex(0, 0)
-                    Dim iter = 0
-                    While Complex.Abs(z) < 2 And iter < iterations
-                        z = z * z + c
-                        iter += 1
-                    End While
-                    dst1.Set(Of Byte)(y, x, If(iter < iterations, 255 * iter / (iterations - 1), 0))
-                Next
+                mandelbrotLoop(y, iterations)
             Next
         End If
     End Sub
@@ -38,28 +49,19 @@ End Class
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_Mandelbrot_MT
     Inherits ocvbClass
+    Dim mandel As Fractal_Mandelbrot
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Mandelbrot iterations", 1, 50, 34)
+        mandel = New Fractal_Mandelbrot(ocvb)
         ocvb.desc = "Run a multi-threaded version of the Mandalbrot algorithm"
-        dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim iterations = sliders.TrackBar1.Value
-        dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+        Dim iterations = mandel.sliders.TrackBar1.Value
         Parallel.For(0, src.Height,
         Sub(y)
-            For x = 0 To src.Width - 1
-                Dim c = New Complex(x * 4 / src.Width - 2, y * 3 / src.Height - 1.5)
-                Dim z = New Complex(0, 0)
-                Dim iter = 0
-                While Complex.Abs(z) < 2 And iter < iterations
-                    z = z * z + c
-                    iter += 1
-                End While
-                dst1.Set(Of Byte)(y, x, If(iter < iterations, 255 * iter / (iterations - 1), 0))
-            Next
+            mandel.mandelbrotLoop(y, iterations)
         End Sub)
+        dst1 = mandel.dst1
     End Sub
 End Class
 
@@ -71,58 +73,45 @@ End Class
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_MandelbrotZoom
     Inherits ocvbClass
+    Public mandel As Fractal_Mandelbrot
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Mandelbrot iterations", 1, 50, 34)
+        mandel = New Fractal_Mandelbrot(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Reset to original Mandelbrot"
         ocvb.desc = "Run the classic Mandalbrot algorithm and allow zooming in"
-        dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim iterations = sliders.TrackBar1.Value
-        Static saveIterations As Integer
+        Dim iterations = mandel.sliders.TrackBar1.Value
 
-        Static startX As Double = -2.0, endX As Double = 2.0, startY As Double = -1.0, endY As Double = 1.0
         If check.Box(0).Checked Then
-            startX = -2.0
-            endX = 2.0
-            startY = -1.0
-            endY = 1.0
-            saveIterations = 0
+            mandel.Dispose()
+            mandel = New Fractal_Mandelbrot(ocvb)
         End If
         If ocvb.drawRect.Width <> 0 Then
+            Dim newStartX = mandel.startX + (mandel.endX - mandel.startX) * ocvb.drawRect.X / src.Width
+            mandel.endX = mandel.startX + (mandel.endX - mandel.startX) * (ocvb.drawRect.X + ocvb.drawRect.Width) / src.Width
+            mandel.startX = newStartX
+
+            Dim newStartY = mandel.startY + (mandel.endY - mandel.startY) * ocvb.drawRect.Y / src.Height
             Dim Height = ocvb.drawRect.Width * src.Height / src.Width ' maintain aspect ratio across zooms...
-            Dim newStartX = startX + (endX - startX) * ocvb.drawRect.X / src.Width
-            endX = startX + (endX - startX) * (ocvb.drawRect.X + ocvb.drawRect.Width) / src.Width
-            startX = newStartX
+            mandel.endY = mandel.startY + (mandel.endY - mandel.startY) * (ocvb.drawRect.Y + Height) / src.Height
+            mandel.startY = newStartY
 
-            Dim newStartY = startY + (endY - startY) * ocvb.drawRect.Y / src.Height
-            endY = startY + (endY - startY) * (ocvb.drawRect.Y + Height) / src.Height
-            startY = newStartY
-
-            saveIterations = 0
+            mandel.saveIterations = 0
             ocvb.drawRectClear = True
         End If
-        Dim incrX = CDbl(endX - startX) / src.Width, incrY = CDbl(endY - startY) / src.Height
-        If saveIterations <> iterations Then
-            saveIterations = iterations
-            dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
-            For y = 0 To src.Height - 1
-                For x = 0 To src.Width - 1
-                    Dim c = New Complex(startX + incrX * x, startY + incrY * y)
-                    Dim z = New Complex(0, 0)
-                    Dim iter = 0
-                    While Complex.Abs(z) < 2 And iter < iterations
-                        z = z * z + c
-                        iter += 1
-                    End While
-                    dst1.Set(Of Byte)(y, x, If(iter < iterations, 255 * iter / (iterations - 1), 0))
-                Next
-            Next
+        If mandel.saveIterations <> iterations Then
+            mandel.saveIterations = iterations
+            Parallel.For(0, src.Height,
+            Sub(y)
+                mandel.mandelbrotLoop(y, iterations)
+            End Sub)
             check.Box(0).Checked = False
         End If
-        label1 = If(endX - startX >= 3.999, "Mandelbrot Zoom - draw anywhere", "Mandelbrot Zoom = " + Format(4 / (endX - startX), "###,###") + "X zoom")
+        dst1 = mandel.dst1
+        label1 = If(mandel.endX - mandel.startX >= 3.999, "Mandelbrot Zoom - draw anywhere", "Mandelbrot Zoom = ~" +
+                                                          Format(4 / (mandel.endX - mandel.startX), "###,###.0") + "X zoom")
     End Sub
 End Class
 
@@ -133,7 +122,7 @@ End Class
 
 Public Class Fractal_MandelbrotZoomColor
     Inherits ocvbClass
-    Dim mandel As Fractal_MandelbrotZoom
+    Public mandel As Fractal_MandelbrotZoom
     Public palette As Palette_ColorMap
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -168,7 +157,7 @@ Public Class Fractal_Julia
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         mandel = New Fractal_MandelbrotZoomColor(ocvb)
-        label2 = "Draw anywhere to select different Julia Sets"
+        label2 = "Mouse selects different Julia Sets - zoom for detail"
         ocvb.desc = "Build Julia set from any point in the Mandelbrot fractal"
     End Sub
     Private Function julia_point(x As Single, y As Single, r As Integer, depth As Integer, max As Integer, c As Complex, z As Complex)
@@ -182,36 +171,31 @@ Public Class Fractal_Julia
         Return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c)
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        Static savedX As Integer = -1
-        Static savedY As Integer = -1
-        Dim restartComputation As Boolean
-        If ocvb.drawRect.X <> savedX Or ocvb.drawRect.Y <> savedY Then
-            restartComputation = True
-            savedX = ocvb.drawRect.X
-            savedY = ocvb.drawRect.Y
-        End If
-        If ocvb.drawRect.Width <> 0 Then
-            rt = (ocvb.drawRect.X - src.Width / 2) / (src.Width / 4)
-            mt = (ocvb.drawRect.Y - src.Height / 2) / (src.Height / 4)
-            ocvb.drawRect = New cv.Rect
-            ocvb.drawRectClear = True
-        End If
-
-        If restartComputation Then
+        Static savedMouse = New cv.Point(-1, -1)
+        If savedMouse <> ocvb.mousePoint Or mandel.mandel.check.Box(0).Checked Then
+            savedMouse = ocvb.mousePoint
             mandel.Run(ocvb)
             dst2 = mandel.dst1.Clone
 
             Dim detail = 1
             Dim depth = 100
             Dim r = 2
-            Dim c = New Complex(rt, mt)
             dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
-            For x = src.Width / 2 - src.Height / 2 To src.Width / 2 + src.Height / 2 - 1 Step detail
-                For y = 0 To src.Height - 1 Step detail
-                    Dim z = New Complex(2 * r * (x - src.Width / 2) / src.Height, 2 * r * (y - src.Height / 2) / src.Height)
-                    julia_point(x, y, r, depth, depth, c, z)
-                Next
-            Next
+            Dim pt = ocvb.mousePoint
+            If ocvb.parms.resolution = resHigh Then pt = New cv.Point(pt.X * 2, pt.Y * 2)
+            'rt = pt.X * mandel.mandel.mandel.incrX ' (pt.X - src.Width / 2) / (src.Width / 4)
+            'mt = pt.Y * mandel.mandel.mandel.incrY ' (pt.Y - src.Height / 2) / (src.Height / 4)
+            Dim m = mandel.mandel.mandel
+            rt = m.startX + (m.endX - m.startX) * pt.X / src.Width
+            mt = m.startY + (m.endY - m.startY) * pt.Y / src.Height
+            Dim c = New Complex(rt, mt)
+            Parallel.For(CInt(src.Width / 2 - src.Height / 2), CInt(src.Width / 2 + src.Height / 2),
+                Sub(x)
+                    For y = 0 To src.Height - 1 Step detail
+                        Dim z = New Complex(2 * r * (x - src.Width / 2) / src.Height, 2 * r * (y - src.Height / 2) / src.Height)
+                        julia_point(x, y, r, depth, depth, c, z)
+                    Next
+                End Sub)
             mandel.palette.src = dst1
             mandel.palette.Run(ocvb)
             dst1 = mandel.palette.dst1
