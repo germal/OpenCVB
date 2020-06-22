@@ -1,6 +1,8 @@
 ﻿Imports Numpy
 Imports System.Text
 Imports cv = OpenCvSharp
+' https://docs.scipy.org/doc/scipy/reference/tutorial/fft.html
+' https://github.com/SciSharp/Numpy.NET
 Public Class NumPy_Test
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)

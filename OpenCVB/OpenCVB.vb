@@ -719,7 +719,7 @@ Public Class OpenCVB
         RefreshAvailable = True
     End Sub
     Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
-        If camera.color.width Then Me.Refresh()
+        If camera IsNot Nothing Then If camera.color.width Then Me.Refresh()
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastFrame As Int32

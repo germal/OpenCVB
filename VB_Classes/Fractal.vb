@@ -36,6 +36,39 @@ End Class
 
 
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
+Public Class Fractal_Mandelbrot_MT
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, caller, "Mandelbrot iterations", 1, 50, 34)
+        ocvb.desc = "Run a multi-threaded version of the Mandalbrot algorithm"
+        dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim iterations = sliders.TrackBar1.Value
+        dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+        Parallel.For(0, src.Height,
+        Sub(y)
+            For x = 0 To src.Width - 1
+                Dim c = New Complex(x * 4 / src.Width - 2, y * 3 / src.Height - 1.5)
+                Dim z = New Complex(0, 0)
+                Dim iter = 0
+                While Complex.Abs(z) < 2 And iter < iterations
+                    z = z * z + c
+                    iter += 1
+                End While
+                dst1.Set(Of Byte)(y, x, If(iter < iterations, 255 * iter / (iterations - 1), 0))
+            Next
+        End Sub)
+    End Sub
+End Class
+
+
+
+
+
+
+' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_MandelbrotZoom
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
@@ -121,6 +154,10 @@ End Class
 
 
 
+
+
+
+
 ' http://www.malinc.se/m/JuliaSets.php
 ' https://www.geeksforgeeks.org/julia-fractal-set-in-c-c-using-graphics/
 Public Class Fractal_Julia
@@ -154,31 +191,27 @@ Public Class Fractal_Julia
             savedY = ocvb.drawRect.Y
         End If
         If ocvb.drawRect.Width <> 0 Then
-                rt = (ocvb.drawRect.X - src.Width / 2) / (src.Width / 4)
-                mt = (ocvb.drawRect.Y - src.Height / 2) / (src.Height / 4)
-                ocvb.drawRect = New cv.Rect
-                ocvb.drawRectClear = True
-            End If
+            rt = (ocvb.drawRect.X - src.Width / 2) / (src.Width / 4)
+            mt = (ocvb.drawRect.Y - src.Height / 2) / (src.Height / 4)
+            ocvb.drawRect = New cv.Rect
+            ocvb.drawRectClear = True
+        End If
 
         If restartComputation Then
             mandel.Run(ocvb)
             dst2 = mandel.dst1.Clone
 
-            Dim x = src.Width / 2 - src.Height / 2
             Dim detail = 1
             Dim depth = 100
             Dim r = 2
             Dim c = New Complex(rt, mt)
             dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
-            While x < src.Width / 2 + src.Height / 2
-                Dim y = 0
-                While y < src.Height
+            For x = src.Width / 2 - src.Height / 2 To src.Width / 2 + src.Height / 2 - 1 Step detail
+                For y = 0 To src.Height - 1 Step detail
                     Dim z = New Complex(2 * r * (x - src.Width / 2) / src.Height, 2 * r * (y - src.Height / 2) / src.Height)
                     julia_point(x, y, r, depth, depth, c, z)
-                    y += detail
-                End While
-                x += detail
-            End While
+                Next
+            Next
             mandel.palette.src = dst1
             mandel.palette.Run(ocvb)
             dst1 = mandel.palette.dst1
