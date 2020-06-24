@@ -119,7 +119,7 @@
     <ClCompile Include="WarpModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Projections.cpp">
+    <ClCompile Include="PointCloud.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
