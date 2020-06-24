@@ -132,7 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.vb" />
-    <Compile Include="CameraD400.vb" />
+    <Compile Include="CameraRS2.vb" />
     <Compile Include="CameraD400VB.vb" />
     <Compile Include="CameraMyntD.vb" />
     <Compile Include="CameraT265.vb" />

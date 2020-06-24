@@ -1,9 +1,10 @@
-﻿Imports System.Windows.Controls
+﻿#If 0 Then
+Imports System.Windows.Controls
 Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Imports System.Threading
-Public Class CameraD400VB
+Public Class CameraRS2VB
     Inherits Camera
 
     Dim align As rs.Align
@@ -92,7 +93,7 @@ Public Class CameraD400VB
             Next
 
             procf = colorizer.Process(frames)
-            procf = align.Process(frames)
+            procf = align.Process(frames)i
 
             frames = procf.As(Of rs.FrameSet)()
             depthFrame = frames.DepthFrame()
@@ -138,3 +139,4 @@ Public Class CameraD400VB
         End Try
     End Sub
 End Class
+#end if

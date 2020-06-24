@@ -98,8 +98,8 @@ Public Class Undistort_Basics
             Dim stereo_height_px = sliders.TrackBar3.Value
             undistortSetup(ocvb, kMatLeft, dMatLeft, rMatLeft, pMatLeft, maxDisp, stereo_height_px, ocvb.parms.intrinsicsLeft)
 
-            ' the intrinsic coeff's on the Intel D400 series are always zero.  Here we just make up some numbers so we can show the impact.
-            If ocvb.parms.cameraIndex = D400Cam Then
+            ' the intrinsic coeff's on the Intel RS2 series are always zero.  Here we just make up some numbers so we can show the impact.
+            If ocvb.parms.cameraIndex = D435i Then
                 Dim d() As Double = {0.5, -2, 1.5, 0.5}
                 dMatLeft = New cv.Mat(1, 4, cv.MatType.CV_64F, d)
             End If

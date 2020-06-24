@@ -6,12 +6,12 @@ Public Class LeftRightView_Basics
         sliders.setupTrackBar1(ocvb, caller, "brightness", 0, 255, 100)
         ocvb.desc = "Show the left and right views from the 3D Camera"
         Select Case ocvb.parms.cameraIndex
-            Case D400Cam, StereoLabsZED2
+            Case D435i, StereoLabsZED2
                 label1 = "Left Image"
                 label2 = "Right Image"
-            Case Kinect4AzureCam
+            Case Kinect4AzureCam, L515
                 label1 = "Infrared Image"
-                label2 = "There is only one infrared image with Kinect"
+                label2 = "There is only one infrared image"
                 sliders.TrackBar1.Value = 0
             Case T265Camera
                 label1 = "Raw Left View Image (clipped to fit)"
@@ -45,12 +45,12 @@ Public Class LeftRightView_CompareUndistorted
         sliders.setupTrackBar3("Slice Height", 1, (ocvb.color.Rows - 100) / 2, 50)
 
         Select Case ocvb.parms.cameraIndex
-            Case D400Cam, StereoLabsZED2
+            Case D435i, StereoLabsZED2
                 label1 = "Left Image"
                 label2 = "Right Image"
-            Case Kinect4AzureCam
+            Case Kinect4AzureCam, L515
                 label1 = "Infrared Image"
-                label2 = "There is only one infrared image with Kinect"
+                label2 = "There is only one infrared image"
                 sliders.TrackBar1.Value = 0
             Case T265Camera
                 label1 = "Undistorted Slices of Left and Right Views"
@@ -99,12 +99,12 @@ Public Class LeftRightView_CompareRaw
         sliders.setupTrackBar2("Slice Starting Y", 0, 300, 100)
         sliders.setupTrackBar3("Slice Height", 1, (ocvb.color.Rows - 100) / 2, 50)
         Select Case ocvb.parms.cameraIndex
-            Case D400Cam, StereoLabsZED2, 
+            Case D435i, StereoLabsZED2,
                 label1 = "Left Image"
                 label2 = "Right Image"
-            Case Kinect4AzureCam
+            Case Kinect4AzureCam, L515
                 label1 = "Infrared Image"
-                label2 = "There is only one infrared image with Kinect"
+                label2 = "There is only one infrared image"
                 sliders.TrackBar1.Value = 0
             Case T265Camera
                 label1 = "Raw Left View Image"

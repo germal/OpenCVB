@@ -612,6 +612,10 @@ Public Class Histogram_ProjectionOptions
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Use IMU gravity vector to rotate around the x-axis."
         check.Box(0).Checked = True
+        If ocvb.parms.cameraIndex = L515 Or ocvb.parms.cameraIndex = T265Camera Then
+            check.Box(0).Checked = False
+            check.Box(0).Enabled = False
+        End If
 
         ocvb.desc = "The options for the histogram projections with and without using the gravity vector"
     End Sub

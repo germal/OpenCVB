@@ -21,7 +21,7 @@
 using namespace std;
 using namespace cv;
 
-class D400Camera
+class RealSense2Camera
 {
 public:
 	rs2_intrinsics intrinsicsLeft;
@@ -40,21 +40,28 @@ public:
 private:
 
 	rs2::context ctx;
+	bool lidarCam;
 
 public:
-	~D400Camera(){}
+	~RealSense2Camera(){}
 
-	D400Camera(int w, int h, bool IMUPresent)
+	RealSense2Camera(int w, int h, bool IMUPresent, bool _lidarCam)
 	{
+		lidarCam = _lidarCam;
 		rs2_error* e = 0;
 		width = w;
 		height = h;
 
 		rs2::config cfg;
 		cfg.enable_stream(RS2_STREAM_COLOR, width, height, RS2_FORMAT_BGR8);
-		cfg.enable_stream(RS2_STREAM_DEPTH, width, height, RS2_FORMAT_Z16);
-		cfg.enable_stream(RS2_STREAM_INFRARED, 1, width, height, RS2_FORMAT_Y8);
-		cfg.enable_stream(RS2_STREAM_INFRARED, 2, width, height, RS2_FORMAT_Y8);
+		if (lidarCam)
+		{
+			cfg.enable_stream(RS2_STREAM_DEPTH, 1024, 768, RS2_FORMAT_Z16);
+		} else { 
+			cfg.enable_stream(RS2_STREAM_DEPTH, width, height, RS2_FORMAT_Z16);
+			cfg.enable_stream(RS2_STREAM_INFRARED, 1, width, height, RS2_FORMAT_Y8);
+			cfg.enable_stream(RS2_STREAM_INFRARED, 2, width, height, RS2_FORMAT_Y8);
+		}
 
 		if (IMUPresent)
 		{
@@ -67,9 +74,12 @@ public:
 		auto stream = profiles.get_stream(RS2_STREAM_COLOR);
 		intrinsicsLeft = stream.as<rs2::video_stream_profile>().get_intrinsics();
 		auto fromStream = profiles.get_stream(RS2_STREAM_COLOR);
-		auto toStream = profiles.get_stream(RS2_STREAM_INFRARED);
+		if (lidarCam == false)
+		{
+			auto toStream = profiles.get_stream(RS2_STREAM_INFRARED);
+			extrinsics = fromStream.get_extrinsics_to(toStream);
+		}
 
-		extrinsics = fromStream.get_extrinsics_to(toStream);
 	}
 
 	void waitForFrame()
@@ -82,53 +92,53 @@ public:
 
 
 extern "C" __declspec(dllexport)
-int *D400Open(int w, int h, bool IMUPresent)
+int *RS2Open(int w, int h, bool IMUPresent, bool lidarCam)
 {
-	D400Camera* tp = new D400Camera(w, h, IMUPresent);
+	RealSense2Camera* tp = new RealSense2Camera(w, h, IMUPresent, lidarCam);
 	return (int *)tp;
 }
 
 extern "C" __declspec(dllexport)
-int* D400intrinsicsLeft(D400Camera * tp)
+int* RS2intrinsicsLeft(RealSense2Camera * tp)
 {
 	return (int*)&tp->intrinsicsLeft;
 }
 
 extern "C" __declspec(dllexport)
-int* D400Extrinsics(D400Camera* tp)
+int* RS2Extrinsics(RealSense2Camera* tp)
 {
 	return (int *) &tp->extrinsics;
 }
 
 extern "C" __declspec(dllexport)
-double D400IMUTimeStamp(D400Camera* tp)
+double RS2IMUTimeStamp(RealSense2Camera* tp)
 {
 	if (tp->gyro == 0) return 0;
 	return tp->gyro.get_timestamp();
 }
 
 extern "C" __declspec(dllexport)
-int* D400Gyro(D400Camera * tp)
+int* RS2Gyro(RealSense2Camera * tp)
 {
 	if (tp->gyro == 0) return 0;
 	return (int*)tp->gyro.get_data();
 }
 
 extern "C" __declspec(dllexport)
-int * D400Accel(D400Camera * tp)
+int * RS2Accel(RealSense2Camera * tp)
 {
 	if (tp->accel == 0) return 0;
 	return (int *)tp->accel.get_data();
 }
 
 extern "C" __declspec(dllexport)
-int* D400PointCloud(D400Camera * tp)
+int* RS2PointCloud(RealSense2Camera * tp)
 {
 	return (int*)tp->pc.process(tp->processedFrames.get_depth_frame()).as<rs2::points>().get_data();
 }
 
 extern "C" __declspec(dllexport)
-int* D400Color(D400Camera * tp)
+int* RS2Color(RealSense2Camera * tp)
 {
 	tp->processedFrames = tp->colorizer.process(tp->frames);
 	tp->processedFrames = tp->align.process(tp->processedFrames);
@@ -136,31 +146,31 @@ int* D400Color(D400Camera * tp)
 }
 
 extern "C" __declspec(dllexport)
-int* D400LeftRaw(D400Camera* tp)
+int* RS2LeftRaw(RealSense2Camera* tp)
 {
 	return (int*)tp->frames.get_infrared_frame(1).get_data();
 }
 
 extern "C" __declspec(dllexport)
-int* D400RightRaw(D400Camera * tp)
+int* RS2RightRaw(RealSense2Camera * tp)
 {
 	return (int*)tp->frames.get_infrared_frame(2).get_data();
 }
 
 extern "C" __declspec(dllexport)
-int* D400RGBDepth(D400Camera * tp)
+int* RS2RGBDepth(RealSense2Camera * tp)
 {
 	return (int*)tp->colorizer.process(tp->processedFrames.get_depth_frame()).get_data();
 }
 
 extern "C" __declspec(dllexport)
-int* D400RawDepth(D400Camera * tp)
+int* RS2RawDepth(RealSense2Camera * tp)
 {
 	return (int*)tp->processedFrames.get_depth_frame().get_data();
 }
 
 extern "C" __declspec(dllexport)
-void D400WaitForFrame(D400Camera * tp)
+void RS2WaitForFrame(RealSense2Camera * tp)
 {
 	tp->waitForFrame();
 }

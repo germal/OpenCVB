@@ -16,11 +16,12 @@ Module Algorithm_Module
     Public colorCols As Integer
     Public colorRows As Integer
 
-    Public Const D400Cam = 0 ' Must be defined in OptionsDialog.vb the same way!
-    Public Const Kinect4AzureCam = 1 ' Must be defined in OptionsDialog.vb the same way!
-    Public Const T265Camera = 2 ' Must be defined in OptionsDialog.vb the same way!
-    Public Const StereoLabsZED2 = 3 ' Must be defined in OptionsDialog.vb the same way!
-    Public Const MyntD1000 = 4 ' Must be defined in OptionsDialog.vb the same way!
+    Public Const Kinect4AzureCam As Int32 = 0 ' Must be defined in OptionDialog.vb the same way!
+    Public Const T265Camera As Int32 = 1 ' Must be defined in OptionDialog.vb the same way!
+    Public Const StereoLabsZED2 As Int32 = 2 ' Must be defined in OptionDialog.vb the same way!
+    Public Const MyntD1000 As Int32 = 3 ' Must be defined in OptionDialog.vb the same way!
+    Public Const D435i As Int32 = 4 ' Must be defined in OptionDialog.vb the same way!
+    Public Const L515 As Int32 = 5 ' Must be defined in OptionDialog.vb the same way!
 
     Public term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public recordedData As Replay_Play

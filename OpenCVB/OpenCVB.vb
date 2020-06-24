@@ -20,7 +20,9 @@ Public Class OpenCVB
     Dim border As Int32 = 6
     Dim BothFirstAndLastReady As Boolean
     Dim camera As Object
-    Dim cameraD400Series As Object
+    Dim cameraRS2Generic As Object ' used only to initialize D435i and L515
+    Dim cameraD435i As Object
+    Dim cameraL515 As Object
     Dim cameraKinect As Object
     Dim cameraMyntD As Object
     Dim cameraZed2 As Object
@@ -94,7 +96,7 @@ Public Class OpenCVB
 
         ' check to make sure there are no camera dll's in the Debug directory by mistake!
         For i = 0 To 5
-            Dim dllName = Choose(i + 1, "Cam_Kinect4.dll", "Cam_MyntD.dll", "Cam_T265.dll", "Cam_Zed2.dll", "Cam_D400.dll", "CPP_Classes.dll")
+            Dim dllName = Choose(i + 1, "Cam_Kinect4.dll", "Cam_MyntD.dll", "Cam_T265.dll", "Cam_Zed2.dll", "Cam_RS2.dll", "CPP_Classes.dll")
             Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
             If dllFile.Exists Then
                 ' if the debug dll exists, then remove the Release version because Release is ahead of Debug in the path for this app.
@@ -130,10 +132,8 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
-        optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = USBenumeration("Depth Camera 435")
-        optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) += USBenumeration("RealSense(TM) 415 Depth")
-        optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) += USBenumeration("RealSense(TM) 435 With RGB Module Depth")
-        If optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) > 1 Then optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) = 1 ' support only 1 at a time.
+        optionsForm.cameraDeviceCount(OptionsDialog.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
+        optionsForm.cameraDeviceCount(OptionsDialog.L515) = USBenumeration("Intel(R) RealSense(TM) 515 RGB")
         optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
         optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = USBenumeration("T265")
         If optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = 0 Then optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = USBenumeration("Movidius MA2X5X")
@@ -167,13 +167,14 @@ Public Class OpenCVB
 
         ' if the default camera is not present, try to find another.
         If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
-            If optionsForm.cameraDeviceCount(OptionsDialog.D400Cam) Then optionsForm.cameraIndex = OptionsDialog.D400Cam
             If optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) Then optionsForm.cameraIndex = OptionsDialog.Kinect4AzureCam
             If optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) Then optionsForm.cameraIndex = OptionsDialog.T265Camera
             If optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) Then optionsForm.cameraIndex = OptionsDialog.StereoLabsZED2
             If optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) Then optionsForm.cameraIndex = OptionsDialog.MyntD1000
+            If optionsForm.cameraDeviceCount(OptionsDialog.D435i) Then optionsForm.cameraIndex = OptionsDialog.D435i
+            If optionsForm.cameraDeviceCount(OptionsDialog.L515) Then optionsForm.cameraIndex = OptionsDialog.L515
             If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
-                MsgBox("There are no supported cameras present.  Connect a D400series, Kinect 4 Azure, T265, MyntEyeD 1000, or StereoLabs Zed2.")
+                MsgBox("There are no supported cameras present.  Connect a RS2series, Kinect 4 Azure, T265, MyntEyeD 1000, or StereoLabs Zed2.")
                 End
             End If
         End If
@@ -202,9 +203,24 @@ Public Class OpenCVB
             If optionsForm.cameraDeviceCount(i) > 0 Then optionsForm.cameraTotalCount += 1
         Next
 
-        cameraD400Series = New CameraD400
+        cameraRS2Generic = New CameraRS2
+        Dim RS2count = cameraRS2Generic.queryDeviceCount()
+        For i = 0 To RS2count - 1
+            Dim deviceName = cameraRS2Generic.queryDevice(i)
+            Select Case deviceName
+                Case "Intel RealSense D435I"
+                    cameraD435i = New CameraRS2
+                    cameraD435i.IMU_Present = True
+                    cameraD435i.deviceName = deviceName
+                Case "Intel RealSense L515"
+                    cameraL515 = New CameraRS2
+                    cameraL515.deviceName = deviceName
+                Case "Intel RealSense T265"
+                    cameraT265 = New CameraT265
+                    cameraT265.deviceName = deviceName
+            End Select
+        Next
         cameraKinect = New CameraKinect
-        cameraT265 = New CameraT265
         cameraZed2 = New CameraZED2
         cameraMyntD = New CameraMyntD
 
@@ -304,9 +320,8 @@ Public Class OpenCVB
         updateCamera()
     End Sub
     Public Sub updateCamera()
-        camera = Choose(optionsForm.cameraIndex + 1, cameraD400Series, cameraKinect, cameraT265, cameraZed2, cameraMyntD) ' order is same as in optionsdialog enum
-        ' if it hasn't been initialized then do so now...
-        If camera.devicename = "" Then
+        camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraT265, cameraZed2, cameraMyntD, cameraD435i, cameraL515) ' order is same as in optionsdialog enum
+        If camera.devicename = "" Or camera.devicename.startswith("Intel RealSense") Then
             camera.width = regWidth
             camera.height = regHeight
             camera.initialize(fps)

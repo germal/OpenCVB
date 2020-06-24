@@ -65,7 +65,7 @@ Partial Class OptionsDialog
         Me.CameraGroup.Controls.Add(Me.SnapToGrid)
         Me.CameraGroup.Location = New System.Drawing.Point(21, 12)
         Me.CameraGroup.Name = "CameraGroup"
-        Me.CameraGroup.Size = New System.Drawing.Size(771, 227)
+        Me.CameraGroup.Size = New System.Drawing.Size(771, 285)
         Me.CameraGroup.TabIndex = 3
         Me.CameraGroup.TabStop = False
         Me.CameraGroup.Text = "Camera"
@@ -73,7 +73,7 @@ Partial Class OptionsDialog
         'SnapToGrid
         '
         Me.SnapToGrid.AutoSize = True
-        Me.SnapToGrid.Location = New System.Drawing.Point(63, 190)
+        Me.SnapToGrid.Location = New System.Drawing.Point(63, 248)
         Me.SnapToGrid.Name = "SnapToGrid"
         Me.SnapToGrid.Size = New System.Drawing.Size(354, 24)
         Me.SnapToGrid.TabIndex = 2
@@ -85,7 +85,7 @@ Partial Class OptionsDialog
         Me.GroupBox1.Controls.Add(Me.RadioButton1)
         Me.GroupBox1.Controls.Add(Me.AccurateProcessing)
         Me.GroupBox1.Controls.Add(Me.lowResolution)
-        Me.GroupBox1.Location = New System.Drawing.Point(21, 240)
+        Me.GroupBox1.Location = New System.Drawing.Point(21, 303)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(936, 128)
         Me.GroupBox1.TabIndex = 4
@@ -133,7 +133,7 @@ Partial Class OptionsDialog
         Me.GroupBox2.Controls.Add(Me.AvoidDNNCrashes)
         Me.GroupBox2.Controls.Add(Me.ShowConsoleLog)
         Me.GroupBox2.Controls.Add(Me.ShowLabels)
-        Me.GroupBox2.Location = New System.Drawing.Point(21, 372)
+        Me.GroupBox2.Location = New System.Drawing.Point(21, 435)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(936, 192)
         Me.GroupBox2.TabIndex = 5
@@ -196,7 +196,7 @@ Partial Class OptionsDialog
         Me.GroupBox4.Controls.Add(Me.ShowOptions)
         Me.GroupBox4.Controls.Add(Me.TestAllDuration)
         Me.GroupBox4.Controls.Add(Me.Label1)
-        Me.GroupBox4.Location = New System.Drawing.Point(22, 579)
+        Me.GroupBox4.Location = New System.Drawing.Point(22, 642)
         Me.GroupBox4.Name = "GroupBox4"
         Me.GroupBox4.Size = New System.Drawing.Size(935, 139)
         Me.GroupBox4.TabIndex = 8
@@ -238,7 +238,7 @@ Partial Class OptionsDialog
         Me.GroupBox6.Controls.Add(Me.PythonExeName)
         Me.GroupBox6.Controls.Add(Me.SelectPythonFile)
         Me.GroupBox6.Controls.Add(Me.Label2)
-        Me.GroupBox6.Location = New System.Drawing.Point(21, 719)
+        Me.GroupBox6.Location = New System.Drawing.Point(21, 782)
         Me.GroupBox6.Name = "GroupBox6"
         Me.GroupBox6.Size = New System.Drawing.Size(936, 116)
         Me.GroupBox6.TabIndex = 9
@@ -297,7 +297,7 @@ Partial Class OptionsDialog
         Me.GroupBox3.Controls.Add(Me.fontInfo)
         Me.GroupBox3.Controls.Add(Me.Button1)
         Me.GroupBox3.Controls.Add(Me.Label4)
-        Me.GroupBox3.Location = New System.Drawing.Point(22, 841)
+        Me.GroupBox3.Location = New System.Drawing.Point(22, 904)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(936, 116)
         Me.GroupBox3.TabIndex = 12
@@ -335,7 +335,7 @@ Partial Class OptionsDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1008, 964)
+        Me.ClientSize = New System.Drawing.Size(1008, 1032)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.Cancel_Button)
         Me.Controls.Add(Me.OKButton)

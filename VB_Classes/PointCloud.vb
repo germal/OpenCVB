@@ -52,8 +52,8 @@ Public Class PointCloud_Colorize
     Dim fontSize As Single
     Dim radius As Integer
     Dim arcSize As Integer = 100
-    Dim hFOVangles() As Single = {55, 45, 0, 40, 51}  ' T265 has no point cloud so there is a 0 where it would have been.
-    Dim vFOVangles() As Single = {69, 60, 0, 55, 65}  ' T265 has no point cloud so there is a 0 where it would have been.
+    Dim hFOVangles() As Single = {45, 0, 40, 51, 55, 55}  ' T265 has no point cloud so there is a 0 where it would have been.
+    Dim vFOVangles() As Single = {60, 0, 55, 65, 69, 67}  ' T265 has no point cloud so there is a 0 where it would have been.
     Public Function CameraLocationBot(ocvb As AlgorithmData, mask As cv.Mat, maxZ As Single) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
         dst1.CopyTo(dst, mask)
@@ -289,16 +289,15 @@ Public Class PointCloud_Plane_Walls
         objects.src = src
         objects.Run(ocvb)
         dst1 = objects.dst1
+        dst2 = objects.dst2
+        label2 = objects.label2
 
         dilate.src = dst1
         dilate.Run(ocvb)
 
-        lines.src = dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        lines.Run(ocvb)
-        dst1 = lines.dst1.Clone()
-
-        dst2 = objects.dst2
-        label2 = objects.label2
+        'lines.src = If(dilate.dst1.Channels = 3, dilate.dst1.Clone(), dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+        'lines.Run(ocvb)
+        'dst1 = lines.dst1.Clone()
     End Sub
 End Class
 
@@ -316,7 +315,7 @@ Public Class PointCloud_GVector_TopView
         setCaller(ocvb)
 
         view = New PointCloud_TopView(ocvb)
-        view.hist.histOpts.check.Box(0).Checked = True ' we want the IMU to rotate the data.
+        If ocvb.parms.cameraIndex <> L515 And ocvb.parms.cameraIndex <> T265Camera Then view.hist.histOpts.check.Box(0).Checked = True ' we want the IMU to rotate the data.
         view.hist.histOpts.sliders.TrackBar1.Value = 5 ' a better default for flood fill
 
         flood = New FloodFill_Projection(ocvb)

@@ -39,7 +39,7 @@ Public Class OpenGL_Basics
     Private Sub memMapUpdate(ocvb As AlgorithmData)
         Dim timeConversionUnits As Double = 1000
         Dim imuAlphaFactor As Double = 0.98 ' theta is a mix of acceleration data and gyro data.
-        If ocvb.parms.cameraIndex <> D400Cam Then
+        If ocvb.parms.cameraIndex <> D435i Then
             timeConversionUnits = 1000 * 1000
             imuAlphaFactor = 0.99
         End If
@@ -141,7 +141,7 @@ Module OpenGL_Sliders_Module
 
         ' this is last so it shows up on top of all the others.
         sliders.setupTrackBar1(ocvb, caller, "OpenGL FOV", 1, 180, 150)
-        If ocvb.parms.cameraIndex = D400Cam Then sliders.TrackBar1.Value = 135
+        If ocvb.parms.cameraIndex = D435i Then sliders.TrackBar1.Value = 135
         sliders.setupTrackBar2("OpenGL yaw (degrees)", -180, 180, -3)
         sliders.setupTrackBar3("OpenGL pitch (degrees)", -180, 180, 3)
         sliders.setupTrackBar4("OpenGL roll (degrees)", -180, 180, 0)
