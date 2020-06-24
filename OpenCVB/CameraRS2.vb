@@ -46,6 +46,9 @@ Module RS2_Module_CPP
     <DllImport(("Cam_RS2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function RS2Accel(tp As IntPtr) As IntPtr
     End Function
+    <DllImport(("Cam_RS2.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RS2DepthScale(tp As IntPtr) As Single
+    End Function
 End Module
 
 Structure RS2IMUdata
@@ -74,6 +77,7 @@ Public Class CameraRS2
     Dim lidarCam As Boolean
     Dim lidarRect As New cv.Rect
     Dim lidarWidth = 1024
+    Dim depthScale As Single
     Public Sub New()
     End Sub
     Public Function queryDeviceCount() As Integer
@@ -87,7 +91,7 @@ Public Class CameraRS2
     Public Sub initialize(fps As Int32)
         lidarCam = If(deviceName = "Intel RealSense L515", True, False)
         cPtr = RS2Open(width, height, IMU_Present, lidarCam)
-
+        depthScale = RS2DepthScale(cPtr) * 1000
         Dim intrin = RS2intrinsicsLeft(cPtr)
         intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
         intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)
@@ -124,7 +128,8 @@ Public Class CameraRS2
             End If
 
             RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, RS2RGBDepth(cPtr)).Clone()
-            depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, RS2RawDepth(cPtr)).Clone()
+            Dim tmp = New cv.Mat(height, width, cv.MatType.CV_16U, RS2RawDepth(cPtr))
+            depth16 = tmp * depthScale
             If lidarCam = False Then
                 leftView = New cv.Mat(height, width, cv.MatType.CV_8U, RS2LeftRaw(cPtr)).Clone()
                 rightView = New cv.Mat(height, width, cv.MatType.CV_8U, RS2RightRaw(cPtr)).Clone()

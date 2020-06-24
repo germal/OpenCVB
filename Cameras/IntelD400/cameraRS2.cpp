@@ -36,6 +36,7 @@ public:
 	rs2::frame RGBDepth;
 	int width, height;
 	rs2::frame accel, gyro;
+	float depth_scale;
 
 private:
 
@@ -44,6 +45,20 @@ private:
 
 public:
 	~RealSense2Camera(){}
+
+	float get_depth_scale(rs2::device dev)
+	{
+		// Go over the device's sensors
+		for (rs2::sensor& sensor : dev.query_sensors())
+		{
+			// Check if the sensor if a depth sensor
+			if (rs2::depth_sensor dpt = sensor.as<rs2::depth_sensor>())
+			{
+				return dpt.get_depth_scale();
+			}
+		}
+		throw std::runtime_error("Device does not have a depth sensor");
+	}
 
 	RealSense2Camera(int w, int h, bool IMUPresent, bool _lidarCam)
 	{
@@ -57,7 +72,7 @@ public:
 		if (lidarCam)
 		{
 			cfg.enable_stream(RS2_STREAM_DEPTH, 1024, 768, RS2_FORMAT_Z16);
-		} else { 
+		} else {
 			cfg.enable_stream(RS2_STREAM_DEPTH, width, height, RS2_FORMAT_Z16);
 			cfg.enable_stream(RS2_STREAM_INFRARED, 1, width, height, RS2_FORMAT_Y8);
 			cfg.enable_stream(RS2_STREAM_INFRARED, 2, width, height, RS2_FORMAT_Y8);
@@ -70,6 +85,8 @@ public:
 		}
 
 		profiles = pipeline.start(cfg);
+
+		depth_scale = get_depth_scale(profiles.get_device());
 
 		auto stream = profiles.get_stream(RS2_STREAM_COLOR);
 		intrinsicsLeft = stream.as<rs2::video_stream_profile>().get_intrinsics();
@@ -173,4 +190,10 @@ extern "C" __declspec(dllexport)
 void RS2WaitForFrame(RealSense2Camera * tp)
 {
 	tp->waitForFrame();
+}
+
+extern "C" __declspec(dllexport)
+float RS2DepthScale(RealSense2Camera * tp)
+{
+	return tp->depth_scale;
 }
