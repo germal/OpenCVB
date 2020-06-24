@@ -1,123 +1,71 @@
-#!/usr/bin/env python
-
-''' This is a sample for histogram plotting for RGB images and grayscale images for better understanding of colour distribution
-
-Benefit : Learn how to draw histogram of images
-          Get familier with cv.calcHist, cv.equalizeHist,cv.normalize and some drawing functions
-
-Level : Beginner or Intermediate
-
-Functions : 1) hist_curve : returns histogram of an image drawn as curves
-            2) hist_lines : return histogram of an image drawn as bins ( only for grayscale images )
-
-Usage : python hist.py <image_file>
-
-Abid Rahman 3/14/12 debug Gary Bradski
 '''
+Coherence-enhancing filtering example
+=====================================
 
-# Python 2/3 compatibility
-from __future__ import print_function
-
+inspired by
+  Joachim Weickert "Coherence-Enhancing Shock Filters"
+  http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
+'''
+import sys
+title_window = 'Coherence.py'
 import numpy as np
 import cv2 as cv
+desc = "Painterly Effect" #include this to put this example in the 'Painterly Effect' group.
 
-bins = np.arange(256).reshape(256,1)
+def coherence_filter(img, sigma = 11, str_sigma = 11, blend = 0.5, iter_n = 4):
+    h, w = img.shape[:2]
 
-def hist_curve(im):
-    h = np.zeros((300,256,3))
-    if len(im.shape) == 2:
-        color = [(255,255,255)]
-    elif im.shape[2] == 3:
-        color = [ (255,0,0),(0,255,0),(0,0,255) ]
-    for ch, col in enumerate(color):
-        hist_item = cv.calcHist([im],[ch],None,[256],[0,256])
-        cv.normalize(hist_item,hist_item,0,255,cv.NORM_MINMAX)
-        hist=np.int32(np.around(hist_item))
-        pts = np.int32(np.column_stack((bins,hist)))
-        cv.polylines(h,[pts],False,col)
-    y=np.flipud(h)
-    return y
+    for i in range(iter_n):
+        print(i)
 
-def hist_lines(im):
-    h = np.zeros((300,256,3))
-    if len(im.shape)!=2:
-        print("hist_lines applicable only for grayscale images")
-        #print("so converting image to grayscale for representation"
-        im = cv.cvtColor(im,cv.COLOR_BGR2GRAY)
-    hist_item = cv.calcHist([im],[0],None,[255],[0,255])
-    cv.normalize(hist_item,hist_item,0,255,cv.NORM_MINMAX)
-    hist=np.int32(np.around(hist_item))
-    for x in hist:
-        cv.line(h,(int(x),0),(int(x),255),(255,255,255))
-    y = np.flipud(h)
-    return y
+        gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        eigen = cv.cornerEigenValsAndVecs(gray, str_sigma, 3)
+        eigen = eigen.reshape(h, w, 3, 2)  # [[e1, e2], v1, v2]
+        x, y = eigen[:,:,1,0], eigen[:,:,1,1]
+
+        gxx = cv.Sobel(gray, cv.CV_32F, 2, 0, ksize=sigma)
+        gxy = cv.Sobel(gray, cv.CV_32F, 1, 1, ksize=sigma)
+        gyy = cv.Sobel(gray, cv.CV_32F, 0, 2, ksize=sigma)
+        gvv = x*x*gxx + 2*x*y*gxy + y*y*gyy
+        m = gvv < 0
+
+        ero = cv.erode(img, None)
+        dil = cv.dilate(img, None)
+        img1 = ero
+        img1[m] = dil[m]
+        img = np.uint8(img*(1.0 - blend) + img1*blend)
+    print('done')
+    return img
 
 
 def main():
     import sys
+    src = cv.imread('../../Data/baboon.jpg')
 
-    if len(sys.argv)>1:
-        fname = sys.argv[1]
-    else :
-        fname = '../../Data/lena.jpg'
-        print("usage : python hist.py <image_file>")
+    def update():
+        sigma = cv.getTrackbarPos('sigma', 'control')*2+1
+        str_sigma = cv.getTrackbarPos('str_sigma', 'control')*2+1
+        blend = cv.getTrackbarPos('blend', 'control') / 10.0
+        print('sigma: %d  str_sigma: %d  blend_coef: %f' % (sigma, str_sigma, blend))
+        dst1 = coherence_filter(src, sigma=sigma, str_sigma = str_sigma, blend = blend)
+        cv.imshow('dst1', dst1)
 
-    im = cv.imread(cv.samples.findFile(fname))
+    def controlUpdate(val): # placeholder for all the trackbars.
+        pass
 
-    if im is None:
-        print('Failed to load image file:', fname)
-        sys.exit(1)
+    cv.namedWindow('control', 0)
+    cv.createTrackbar('sigma', 'control', 9, 15, controlUpdate)
+    cv.createTrackbar('blend', 'control', 7, 10, controlUpdate)
+    cv.createTrackbar('str_sigma', 'control', 9, 15, controlUpdate)
 
-    gray = cv.cvtColor(im,cv.COLOR_BGR2GRAY)
+    print('Press SPACE to update the image\n')
 
-
-    print(''' Histogram plotting \n
-    Keymap :\n
-    a - show histogram for color image in curve mode \n
-    b - show histogram in bin mode \n
-    c - show equalized histogram (always in bin mode) \n
-    d - show histogram for color image in curve mode \n
-    e - show histogram for a normalized image in curve mode \n
-    Esc - exit \n
-    ''')
-
-    cv.imshow('image',im)
+    cv.imshow('src', src)
+    update()
     while True:
-        k = cv.waitKey(0)
-        if k == ord('a'):
-            curve = hist_curve(im)
-            cv.imshow('histogram',curve)
-            cv.imshow('image',im)
-            print('a')
-        elif k == ord('b'):
-            print('b')
-            lines = hist_lines(gray)
-            cv.imshow('histogram',lines)
-            cv.imshow('image',gray)
-        elif k == ord('c'):
-            print('c')
-            equ = cv.equalizeHist(gray)
-            lines = hist_lines(equ)
-            cv.imshow('histogram',lines)
-            cv.imshow('image',equ)
-        elif k == ord('d'):
-            print('d')
-            curve = hist_curve(gray)
-            cv.imshow('histogram',curve)
-            cv.imshow('image',gray)
-        elif k == ord('e'):
-            print('e')
-            norm = cv.normalize(gray, gray, alpha = 0,beta = 255,norm_type = cv.NORM_MINMAX)
-            lines = hist_lines(norm)
-            cv.imshow('histogram',lines)
-            cv.imshow('image',norm)
-        elif k == 27:
-            print('ESC')
-            cv.destroyAllWindows()
-            break
-
-    print('Done')
-
+        ch = cv.waitKey()
+        if ch == ord(' '):
+            update()
 
 if __name__ == '__main__':
     print(__doc__)
