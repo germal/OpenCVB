@@ -251,7 +251,6 @@ Public Class Draw_RngImage
         ocvb.desc = "Use RNG to draw the same set of shapes every time"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim rng As New cv.RNG
         Dim offsetX = 50, offsetY = 25, lineLength = 50, thickness = 2
 
         dst1.SetTo(cv.Scalar.White)
@@ -259,23 +258,23 @@ Public Class Draw_RngImage
             dst1.Line(New cv.Point(thickness * i + offsetX, offsetY), New cv.Point(thickness * i + offsetX, offsetY + lineLength), New cv.Scalar(i, i, i), thickness)
         Next
         For i = 1 To 256
-            Dim color = New cv.Scalar(rng.Uniform(0, 255), rng.Uniform(0, 255), rng.Uniform(0, 255))
-            Select Case rng.Uniform(0, 3)
+            Dim color = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+            Select Case msRNG.Next(0, 3)
                 Case 0 ' circle
-                    Dim center = New cv.Point(rng.Uniform(offsetX, dst1.Cols - offsetX), rng.Uniform(offsetY + lineLength, dst1.Rows - offsetY))
-                    Dim radius = rng.Uniform(1, Math.Min(offsetX, offsetY))
+                    Dim center = New cv.Point(msRNG.Next(offsetX, dst1.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst1.Rows - offsetY))
+                    Dim radius = msRNG.Next(1, Math.Min(offsetX, offsetY))
                     dst1.Circle(center, radius, color, -1, cv.LineTypes.Link8)
                 Case 1 ' Rectangle
-                    Dim center = New cv.Point(rng.Uniform(offsetX, dst1.Cols - offsetX), rng.Uniform(offsetY + lineLength, dst1.Rows - offsetY))
-                    Dim width = rng.Uniform(1, Math.Min(offsetX, offsetY))
-                    Dim height = rng.Uniform(1, Math.Min(offsetX, offsetY))
+                    Dim center = New cv.Point(msRNG.Next(offsetX, dst1.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst1.Rows - offsetY))
+                    Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
+                    Dim height = msRNG.Next(1, Math.Min(offsetX, offsetY))
                     Dim rc = New cv.Rect(center.X - width, center.Y - height / 2, width, height)
                     dst1.Rectangle(rc, color, -1, cv.LineTypes.Link8)
                 Case 2 ' Ellipse
-                    Dim center = New cv.Point(rng.Uniform(offsetX, dst1.Cols - offsetX), rng.Uniform(offsetY + lineLength, dst1.Rows - offsetY))
-                    Dim width = rng.Uniform(1, Math.Min(offsetX, offsetY))
-                    Dim height = rng.Uniform(1, Math.Min(offsetX, offsetY))
-                    Dim angle = rng.Uniform(0, 180)
+                    Dim center = New cv.Point(msRNG.Next(offsetX, dst1.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst1.Rows - offsetY))
+                    Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
+                    Dim height = msRNG.Next(1, Math.Min(offsetX, offsetY))
+                    Dim angle = msRNG.Next(0, 180)
                     dst1.Ellipse(center, New cv.Size(width / 2, height / 2), angle, 0, 360, color, -1, cv.LineTypes.Link8)
             End Select
         Next

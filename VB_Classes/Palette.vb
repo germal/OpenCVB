@@ -192,7 +192,9 @@ Public Class Palette_DrawTest
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         draw.Run(ocvb)
+        palette.src = draw.dst1
         palette.Run(ocvb)
+        dst1 = palette.dst1
     End Sub
 End Class
 
