@@ -363,7 +363,7 @@ Public Class FloodFill_Projection
         Dim nextColor As cv.Vec3b
         For y = 0 To src.Height - 1 Step stepSize
             For x = 0 To src.Width - 1 Step stepSize
-                If src.Get(Of Byte)(y, x) = 0 Then
+                If src.Get(Of Byte)(y, x) < 255 Then
                     Dim rect As New cv.Rect
                     maskPlus.SetTo(0)
                     Dim count = cv.Cv2.FloodFill(src, maskPlus, New cv.Point(x, y), cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
