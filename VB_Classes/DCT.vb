@@ -200,7 +200,8 @@ Public Class DCT_Surfaces_debug
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
 
-        Mats.mat(0) = src.SetTo(cv.Scalar.White, grid.gridMask)
+        Mats.mat(0) = src.Clone
+        Mats.mat(0).SetTo(cv.Scalar.White, grid.gridMask)
 
         dct.src = src
         dct.Run(ocvb)

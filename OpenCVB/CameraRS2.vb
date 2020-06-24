@@ -128,8 +128,7 @@ Public Class CameraRS2
             End If
 
             RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, RS2RGBDepth(cPtr)).Clone()
-            Dim tmp = New cv.Mat(height, width, cv.MatType.CV_16U, RS2RawDepth(cPtr))
-            depth16 = tmp * depthScale
+            depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, RS2RawDepth(cPtr)) * depthScale
             If lidarCam = False Then
                 leftView = New cv.Mat(height, width, cv.MatType.CV_8U, RS2LeftRaw(cPtr)).Clone()
                 rightView = New cv.Mat(height, width, cv.MatType.CV_8U, RS2RightRaw(cPtr)).Clone()
