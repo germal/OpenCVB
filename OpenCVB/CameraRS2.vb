@@ -100,6 +100,8 @@ Public Class CameraRS2
         lidarRect = New cv.Rect((width - lidarWidth) / 2, 0, lidarWidth, height)
         leftView = New cv.Mat(height, width, cv.MatType.CV_8U, 0) ' lidarCam won't have these so initialize here.
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
+        cv.Cv2.PutText(rightView, "Intel RealSense L515 camera has no right view", New cv.Point(10, 200), cv.HersheyFonts.HersheyComplex, 1.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(leftView, "Intel RealSense L515 camera has no left view", New cv.Point(10, 200), cv.HersheyFonts.HersheyComplex, 1.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub GetNextFrame()
         If pipelineClosed Or cPtr = 0 Then Exit Sub
