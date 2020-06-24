@@ -94,8 +94,8 @@ Public Class ocvbClass : Implements IDisposable
         End If
     End Sub
     Public Sub NextFrame(ocvb As AlgorithmData)
-        If ocvb.drawRect.Width <> 0 Then ocvb.drawRect = validateRect(ocvb.drawRect)
         If standalone Then src = ocvb.color
+        If ocvb.drawRect.Width <> 0 Then ocvb.drawRect = validateRect(ocvb.drawRect)
         algorithm.Run(ocvb)
         If standalone Then
             If dst1.Width <> 0 Then

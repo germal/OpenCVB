@@ -64,7 +64,6 @@ Public Class Coherence_Basics
         Next
         dst1(srcRect) = src
         dst1.Rectangle(srcRect, cv.Scalar.Yellow, 2)
-        ocvb.drawRect = srcRect
     End Sub
 End Class
 
