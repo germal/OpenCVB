@@ -202,10 +202,7 @@ def mosaic(w, imgs):
     imgs -- images (must have same size and format)
     '''
     imgs = iter(imgs)
-    if PY3:
-        img0 = next(imgs)
-    else:
-        img0 = imgs.next()
+    img0 = next(imgs)
     pad = np.zeros_like(img0)
     imgs = it.chain([img0], imgs)
     rows = grouper(w, imgs, pad)

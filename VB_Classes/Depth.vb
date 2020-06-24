@@ -1085,11 +1085,7 @@ Public Class Depth_Decreasing
         Else
             cv.Cv2.Subtract(lastDepth, depth32f, dst1)
         End If
-        If standalone Then
-            dst1 = dst1.Threshold(mmThreshold, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        Else
-            dst1 = dst1.Threshold(mmThreshold, 0, cv.ThresholdTypes.Tozero)
-        End If
+        dst1 = dst1.Threshold(mmThreshold, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         lastDepth = depth32f
     End Sub
 End Class
@@ -1128,6 +1124,7 @@ Public Class Depth_Punch
         ocvb.desc = "Identify the largest blob in the depth decreasing output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        depth.src = getDepth32f(ocvb)
         depth.Run(ocvb)
         dst1 = depth.dst1
     End Sub
@@ -1308,33 +1305,37 @@ Public Class Depth_PointCloudInRange_IMU
         Dim tSplit = cv.Cv2.Split(ocvb.pointCloud)
         split = tSplit
 
-        imu.Run(ocvb)
-        If zRotation Then
-            '[cos(a) -sin(a) 0]
-            '[sin(a)  cos(a) 0]
-            '[0      0       1] rotate the point cloud around the z-axis.
-            Dim yZ(,) = {{Math.Cos(-imu.angleX), -Math.Sin(-imu.angleX), 0}, {Math.Sin(-imu.angleX), Math.Cos(-imu.angleX), 0}, {0, 0, 1}}
+        If ocvb.parms.cameraIndex = T265Camera Or ocvb.parms.cameraIndex = L515 Then
+            ocvb.putText(New oTrueType("IMU unavailable (?) for this camera", 10, 50, RESULT1))
+        Else
+            imu.Run(ocvb)
+            If zRotation Then
+                '[cos(a) -sin(a) 0]
+                '[sin(a)  cos(a) 0]
+                '[0      0       1] rotate the point cloud around the z-axis.
+                Dim yZ(,) = {{Math.Cos(-imu.angleX), -Math.Sin(-imu.angleX), 0}, {Math.Sin(-imu.angleX), Math.Cos(-imu.angleX), 0}, {0, 0, 1}}
 
-            split(0) = yZ(0, 0) * tSplit(0) + yZ(0, 1) * tSplit(1)
-            split(1) = yZ(1, 0) * tSplit(0) + yZ(1, 1) * tSplit(1)
-            split(2) = tSplit(2)
-            tSplit = split
+                split(0) = yZ(0, 0) * tSplit(0) + yZ(0, 1) * tSplit(1)
+                split(1) = yZ(1, 0) * tSplit(0) + yZ(1, 1) * tSplit(1)
+                split(2) = tSplit(2)
+                tSplit = split
+            End If
+
+            If xRotation Then
+                '[1      0       0] rotate the point cloud around the x-axis.
+                '[0 cos(a) -sin(a)]
+                '[0 sin(a)  cos(a)]
+                Dim xZ(,) = {{1, 0, 0}, {0, Math.Cos(-imu.angleZ), -Math.Sin(-imu.angleZ)}, {0, Math.Sin(-imu.angleZ), Math.Cos(-imu.angleZ)}}
+
+                split(0) = tSplit(0)
+                split(1) = xZ(1, 1) * tSplit(1) + xZ(1, 2) * tSplit(2)
+                split(2) = xZ(2, 1) * tSplit(1) + xZ(2, 2) * tSplit(2)
+            End If
+
+            cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxMeters), Mask)
+            Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+            Mask = Mask.SetTo(0, zeroDepth)
+            If standalone Then dst1 = Mask
         End If
-
-        If xRotation Then
-            '[1      0       0] rotate the point cloud around the x-axis.
-            '[0 cos(a) -sin(a)]
-            '[0 sin(a)  cos(a)]
-            Dim xZ(,) = {{1, 0, 0}, {0, Math.Cos(-imu.angleZ), -Math.Sin(-imu.angleZ)}, {0, Math.Sin(-imu.angleZ), Math.Cos(-imu.angleZ)}}
-
-            split(0) = tSplit(0)
-            split(1) = xZ(1, 1) * tSplit(1) + xZ(1, 2) * tSplit(2)
-            split(2) = xZ(2, 1) * tSplit(1) + xZ(2, 2) * tSplit(2)
-        End If
-
-        cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxMeters), Mask)
-        Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
-        Mask = Mask.SetTo(0, zeroDepth)
-        If standalone Then dst1 = Mask
     End Sub
 End Class

@@ -18,19 +18,20 @@ Module Draw_Exports
         dst1.Rectangle(rr.BoundingRect, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Function initRandomRect(width As Integer, height As Integer, margin As Integer) As cv.Rect
-
-        Dim x As Integer, y As Integer
-        While width < 5 ' don't let the width/height get too small...
+        Dim x As Integer, y As Integer, w As Integer, h As Integer
+        While 1
             x = (width - margin * 2) * Rnd() + margin
-            width = (width - x - margin * 2) * Rnd()
+            w = (width - x - margin * 2) * Rnd()
+            If w > 5 Then Exit While  ' don't let the width/height get too small...
         End While
 
-        While height < 5 ' don't let the width/height get too small...
+        While 1
             y = (height - margin * 2) * Rnd() + margin
-            height = (height - y - margin * 2) * Rnd()
+            h = (height - y - margin * 2) * Rnd()
+            If h > 5 Then Exit While  ' don't let the width/height get too small...
         End While
 
-        Return New cv.Rect(x, y, width, height)
+        Return New cv.Rect(x, y, w, h)
     End Function
 End Module
 
@@ -431,9 +432,9 @@ Public Class Draw_Arc
     Dim colorIndex As Integer
     Dim thickness As Integer
     Private Sub setup(ocvb As AlgorithmData)
-        Dim margin = sliders.TrackBar1.Value ' work in the middle of the image.
+        saveMargin = sliders.TrackBar1.Value ' work in the middle of the image.
 
-        rect = initRandomRect(dst1.Width, dst1.Height, margin)
+        rect = initRandomRect(dst1.Width, dst1.Height, saveMargin)
         angle = msRNG.Next(0, 360)
         colorIndex = msRNG.Next(0, 255)
         thickness = msRNG.Next(1, 5)
@@ -441,8 +442,6 @@ Public Class Draw_Arc
         endAngle = msRNG.Next(1, 360)
 
         kalman.input = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
-
-        saveMargin = sliders.TrackBar1.Value
     End Sub
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -450,7 +449,7 @@ Public Class Draw_Arc
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(7 - 1)
 
-        sliders.setupTrackBar1(ocvb, caller, "Clearance from image edge (margin size)", 0, ocvb.color.Width / 4, ocvb.color.Width / 8)
+        sliders.setupTrackBar1(ocvb, caller, "Clearance from image edge (margin size)", 0, ocvb.color.Width / 8, ocvb.color.Width / 16)
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Draw Full Ellipse"
         radio.check(1).Text = "Draw Filled Arc"
