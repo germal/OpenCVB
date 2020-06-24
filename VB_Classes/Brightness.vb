@@ -237,11 +237,13 @@ Public Class Brightness_ChangeMask
         countdown -= 1
 
         If whiteFlag Then
+            white.src = src
             white.Run(ocvb)
             dst1 = white.dst1
             label1 = "White balanced image - VB version"
             label2 = "Mask of changed pixels - VB version"
         Else
+            whiteCPP.src = src
             whiteCPP.Run(ocvb)
             dst1 = whiteCPP.dst1
             label1 = "White balanced image - C++ version"
@@ -284,8 +286,10 @@ Public Class Brightness_PlotHist
         hist1.Run(ocvb)
         mat2to1.mat(0) = hist1.dst1
 
+        white.src = src
         white.Run(ocvb)
         dst1 = white.dst1
+        label1 = white.label1
 
         hist2.src = dst1
         hist2.Run(ocvb)
