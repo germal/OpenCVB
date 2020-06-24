@@ -3,10 +3,7 @@
 # Python 2/3 compatibility
 from __future__ import print_function
 import sys
-PY3 = sys.version_info[0] == 3
-
-if PY3:
-    xrange = range
+xrange = range
 
 import numpy as np
 import cv2 as cv

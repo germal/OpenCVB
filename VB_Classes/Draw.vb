@@ -449,7 +449,7 @@ Public Class Draw_Arc
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(7 - 1)
 
-        sliders.setupTrackBar1(ocvb, caller, "Clearance from image edge (margin size)", 0, ocvb.color.Width / 8, ocvb.color.Width / 16)
+        sliders.setupTrackBar1(ocvb, caller, "Clearance from image edge (margin size)", 5, ocvb.color.Width / 8, ocvb.color.Width / 16)
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Draw Full Ellipse"
         radio.check(1).Text = "Draw Filled Arc"

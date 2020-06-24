@@ -3,7 +3,7 @@ This module contains some common routines used by other samples.
 '''
 import sys
 import numpy as np
-import cv2 as cv
+import cv2 as cv 
 
 # built-in modules
 import os

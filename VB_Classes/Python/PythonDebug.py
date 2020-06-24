@@ -20,9 +20,10 @@ Following preprocessing is applied to the dataset:
 Usage:
    digits.py
 '''
+title_window = 'Digits_SVM_KNearest_adjust.py'
+
 import numpy as np
 import cv2 as cv
-title_window = 'Digits_SVM_KNearest.py'
 
 # built-in modules
 from multiprocessing.pool import ThreadPool
