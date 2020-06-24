@@ -15,7 +15,7 @@ Public Class Threshold_LaplacianFilter
         edges.src = src
         edges.Run(ocvb)
         dst2 = edges.dst2
-        trim.src = src
+        trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
         dst1 = trim.dst1
 

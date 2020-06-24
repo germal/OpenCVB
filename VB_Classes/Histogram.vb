@@ -404,6 +404,7 @@ Public Class Histogram_Depth
         ocvb.desc = "Show depth data as a histogram."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
         plotHist.minRange = trim.sliders.TrackBar1.Value
         plotHist.maxRange = trim.sliders.TrackBar2.Value
@@ -580,6 +581,7 @@ Public Class Histogram_2D_XZ_YZ
         Dim xbins = sliders.TrackBar1.Value
         Dim zbins = sliders.TrackBar2.Value
         Dim histSize() = {xbins, zbins}
+        trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
         Dim minRange = trim.sliders.TrackBar1.Value
         Dim maxRange = trim.sliders.TrackBar2.Value

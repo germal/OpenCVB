@@ -134,16 +134,18 @@ Public Class Depth_Foreground
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Use depth to find the top of the head and then meanshift to the face."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
-        dst1 = trim.dst1.Clone()
+        dst1 = trim.dst1.ConvertScaleAbs(255)
+        Dim tmp = trim.dst1.ConvertScaleAbs(255)
         ' find the largest blob and use that as the body.  Head is highest in the image.
         Dim blobSize As New List(Of Int32)
         Dim blobLocation As New List(Of cv.Point)
-        For y = 0 To trim.dst1.Height - 1
-            For x = 0 To trim.dst1.Width - 1
-                Dim nextByte = trim.dst1.Get(Of Byte)(y, x)
+        For y = 0 To tmp.Height - 1
+            For x = 0 To tmp.Width - 1
+                Dim nextByte = tmp.Get(Of Byte)(y, x)
                 If nextByte <> 0 Then
-                    Dim count = trim.dst1.FloodFill(New cv.Point(x, y), 0)
+                    Dim count = tmp.FloodFill(New cv.Point(x, y), 0)
                     If count > 10 Then
                         blobSize.Add(count)
                         blobLocation.Add(New cv.Point(x, y))
@@ -318,6 +320,7 @@ Public Class Depth_WorldXYZ_MT
         ocvb.desc = "Create OpenGL point cloud from depth data (too slow to be useful)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
         grid.Run(ocvb)
 
@@ -511,6 +514,7 @@ Public Class Depth_Palette
         ocvb.desc = "Use a palette to display depth from the raw depth data."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
         Dim minDepth = trim.sliders.TrackBar1.Value
         Dim maxDepth = trim.sliders.TrackBar2.Value
@@ -650,6 +654,7 @@ Public Class Depth_ColorizerFastFade_CPP
         ocvb.desc = "Display depth data with inrange trim.  Higher contrast than others - yellow to blue always present."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
         dst2 = trim.Mask
 
@@ -1150,7 +1155,8 @@ Public Class Depth_SmoothingMat
         If standalone Then src = getDepth32f(ocvb)
         trim.inputInMeters = inputInMeters
         Dim rect = If(ocvb.drawRect.Width <> 0, ocvb.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
-        trim.src = src(rect)
+        trim.src = getDepth32f(ocvb)
+        trim.src = trim.src(rect)
         trim.Run(ocvb)
         Static lastDepth = trim.dst2 ' the far depth needs to be smoothed
         If lastDepth.Size <> trim.dst2.Size Then lastDepth = trim.dst2

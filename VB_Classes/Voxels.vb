@@ -26,7 +26,7 @@ Public Class Voxels_Basics_MT
         ocvb.desc = "Use multi-threading to get median depth values as voxels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        trim.src = src
+        trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
         minDepth = trim.sliders.TrackBar1.Value
         maxDepth = trim.sliders.TrackBar2.Value

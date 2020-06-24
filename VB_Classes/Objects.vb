@@ -14,6 +14,7 @@ Public Class Object_Basics
         ocvb.desc = "Identify objects in the foreground."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
         If standalone Then
             dst1 = trim.Mask

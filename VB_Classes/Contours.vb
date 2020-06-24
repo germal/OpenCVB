@@ -131,6 +131,7 @@ Public Class Contours_Depth
         label2 = "DepthContour output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
         dst1 = trim.dst1
         dst2.SetTo(0)
@@ -160,6 +161,7 @@ Public Class Contours_RGB
         label2 = "Background"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
         Dim img = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         img.SetTo(0, trim.zeroMask)
