@@ -1,180 +1,91 @@
 '''
-SVM and KNearest digit recognition.
+Robust line fitting.
+==================
 
-Sample loads a dataset of handwritten digits from 'digits.png'.
-Then it trains a SVM and KNearest classifiers on it and evaluates
-their accuracy.
+Example of using cv.fitLine function for fitting line
+to points in presence of outliers.
 
-Following preprocessing is applied to the dataset:
- - Moment-based image deskew (see deskew())
- - Digit images are split into 4 10x10 cells and 16-bin
-   histogram of oriented gradients is computed for each
-   cell
- - Transform histograms to space with Hellinger metric (see [1] (RootSIFT))
+Usage
+-----
+fitline.py
 
+Switch through different M-estimator functions and see,
+how well the robust functions fit the line even
+in case of ~50% of outliers.
 
-[1] R. Arandjelovic, A. Zisserman
-    "Three things everyone should know to improve object retrieval"
-    http://www.robots.ox.ac.uk/~vgg/publications/2012/Arandjelovic12/arandjelovic12.pdf
-
-Usage:
-   digits.py
+Keys
+----
+SPACE - generate random points
+f     - change distance function
+ESC   - exit
 '''
-title_window = 'Digits_SVM_KNearest_adjust.py'
-
+import sys
 import numpy as np
 import cv2 as cv
 
 # built-in modules
-from multiprocessing.pool import ThreadPool
-
-from numpy.linalg import norm
+import itertools as it
 
 # local modules
-from common import clock, mosaic
+from common import draw_str
+title_window = 'Fitline.py'
 
-SZ = 20 # size of each digit is SZ x SZ
-CLASS_N = 10
-DIGITS_FN = '../../Data/digits.png'
+width, height = 512, 256
 
-def split2d(img, cell_size, flatten=True):
-    h, w = img.shape[:2]
-    sx, sy = cell_size
-    cells = [np.hsplit(row, w//sx) for row in np.vsplit(img, h//sy)]
-    cells = np.array(cells)
-    if flatten:
-        cells = cells.reshape(-1, sy, sx)
-    return cells
+def toint(p):
+    return tuple(map(int, p))
 
-def load_digits(fn):
-    fn = cv.samples.findFile(fn)
-    print('loading "%s" ...' % fn)
-    digits_img = cv.imread(fn, cv.IMREAD_GRAYSCALE)
-    digits = split2d(digits_img, (SZ, SZ))
-    labels = np.repeat(np.arange(CLASS_N), len(digits)/CLASS_N)
-    return digits, labels
+def sample_line(p1, p2, n, noise=0.0):
+    p1 = np.float32(p1)
+    t = np.random.rand(n,1)
+    return p1 + (p2-p1)*t + np.random.normal(size=(n, 2))*noise
 
-def deskew(img):
-    m = cv.moments(img)
-    if abs(m['mu02']) < 1e-2:
-        return img.copy()
-    skew = m['mu11']/m['mu02']
-    M = np.float32([[1, skew, -0.5*SZ*skew], [0, 1, 0]])
-    img = cv.warpAffine(img, M, (SZ, SZ), flags=cv.WARP_INVERSE_MAP | cv.INTER_LINEAR)
-    return img
+dist_func_names = it.cycle('DIST_L2 DIST_L1 DIST_L12 DIST_FAIR DIST_WELSCH DIST_HUBER'.split())
 
-class StatModel(object):
-    def load(self, fn):
-        self.model.load(fn)  # Known bug: https://github.com/opencv/opencv/issues/4969
-    def save(self, fn):
-        self.model.save(fn)
+cur_func_name = next(dist_func_names)
 
-class KNearest(StatModel):
-    def __init__(self, k = 3):
-        self.k = k
-        self.model = cv.ml.KNearest_create()
+def update(_=None):
+    noise = cv.getTrackbarPos('noise', 'fit line')
+    n = cv.getTrackbarPos('point n', 'fit line')
+    r = cv.getTrackbarPos('outlier %', 'fit line') / 100.0
+    outn = int(n*r)
 
-    def train(self, samples, responses):
-        self.model.train(samples, cv.ml.ROW_SAMPLE, responses)
+    p0, p1 = (90, 80), (width-90, height-80)
+    img = np.zeros((height, width, 3), np.uint8)
+    cv.line(img, toint(p0), toint(p1), (0, 255, 0))
 
-    def predict(self, samples):
-        _retval, results, _neigh_resp, _dists = self.model.findNearest(samples, self.k)
-        return results.ravel()
+    if n > 0:
+        line_points = sample_line(p0, p1, n-outn, noise)
+        outliers = np.random.rand(outn, 2) * (width, height)
+        points = np.vstack([line_points, outliers])
+        for p in line_points:
+            cv.circle(img, toint(p), 2, (255, 255, 255), -1)
+        for p in outliers:
+            cv.circle(img, toint(p), 2, (64, 64, 255), -1)
+        func = getattr(cv, cur_func_name)
+        vx, vy, cx, cy = cv.fitLine(np.float32(points), func, 0, 0.01, 0.01)
+        cv.line(img, (int(cx-vx*width), int(cy-vy*width)), (int(cx+vx*width), int(cy+vy*width)), (0, 0, 255))
 
-class SVM(StatModel):
-    def __init__(self, C = 1, gamma = 0.5):
-        self.model = cv.ml.SVM_create()
-        self.model.setGamma(gamma)
-        self.model.setC(C)
-        self.model.setKernel(cv.ml.SVM_RBF)
-        self.model.setType(cv.ml.SVM_C_SVC)
+    draw_str(img, (20, 20), cur_func_name)
+    cv.imshow('fit line', img)
 
-    def train(self, samples, responses):
-        self.model.train(samples, cv.ml.ROW_SAMPLE, responses)
+def main():
+    cv.namedWindow('fit line')
+    cv.createTrackbar('noise', 'fit line', 3, 50, update)
+    cv.createTrackbar('point n', 'fit line', 100, 500, update)
+    cv.createTrackbar('outlier %', 'fit line', 30, 100, update)
+    while True:
+        update()
+        ch = cv.waitKey(0)
+        if ch == ord('f'):
+            cur_func_name = next(dist_func_names)
+        if ch == 27:
+            break
 
-    def predict(self, samples):
-        return self.model.predict(samples)[1].ravel()
-
-
-def evaluate_model(model, digits, samples, labels):
-    resp = model.predict(samples)
-    err = (labels != resp).mean()
-    print('error: %.2f %%' % (err*100))
-
-    confusion = np.zeros((10, 10), np.int32)
-    for i, j in zip(labels, resp):
-        confusion[i, int(j)] += 1
-    print('confusion matrix:')
-    print(confusion)
-    print()
-
-    vis = []
-    for img, flag in zip(digits, resp == labels):
-        img = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
-        if not flag:
-            img[...,:2] = 0
-        vis.append(img)
-    return mosaic(25, vis)
-
-def preprocess_simple(digits):
-    return np.float32(digits).reshape(-1, SZ*SZ) / 255.0
-
-def preprocess_hog(digits):
-    samples = []
-    for img in digits:
-        gx = cv.Sobel(img, cv.CV_32F, 1, 0)
-        gy = cv.Sobel(img, cv.CV_32F, 0, 1)
-        mag, ang = cv.cartToPolar(gx, gy)
-        bin_n = 16
-        bin = np.int32(bin_n*ang/(2*np.pi))
-        bin_cells = bin[:10,:10], bin[10:,:10], bin[:10,10:], bin[10:,10:]
-        mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
-        hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]
-        hist = np.hstack(hists)
-
-        # transform to Hellinger kernel
-        eps = 1e-7
-        hist /= hist.sum() + eps
-        hist = np.sqrt(hist)
-        hist /= norm(hist) + eps
-
-        samples.append(hist)
-    return np.float32(samples)
+    print('Done')
 
 
 if __name__ == '__main__':
     print(__doc__)
-
-    digits, labels = load_digits(DIGITS_FN)
-
-    print('preprocessing...')
-    # shuffle digits
-    rand = np.random.RandomState(321)
-    shuffle = rand.permutation(len(digits))
-    digits, labels = digits[shuffle], labels[shuffle]
-
-    digits2 = list(map(deskew, digits))
-    samples = preprocess_hog(digits2)
-
-    train_n = int(0.9*len(samples))
-    cv.imshow('test set', mosaic(25, digits[train_n:]))
-    digits_train, digits_test = np.split(digits2, [train_n])
-    samples_train, samples_test = np.split(samples, [train_n])
-    labels_train, labels_test = np.split(labels, [train_n])
-
-
-    print('training KNearest...')
-    model = KNearest(k=4)
-    model.train(samples_train, labels_train)
-    vis = evaluate_model(model, digits_test, samples_test, labels_test)
-    cv.imshow('KNearest test', vis)
-
-    print('training SVM...')
-    model = SVM(C=2.67, gamma=5.383)
-    model.train(samples_train, labels_train)
-    vis = evaluate_model(model, digits_test, samples_test, labels_test)
-    cv.imshow('SVM test', vis)
-    print('saving SVM as "digits_svm.dat"...')
-    #model.save('digits_svm.dat')
-
-    cv.waitKey(0)
+    main()
+    cv.destroyAllWindows()

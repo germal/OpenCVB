@@ -30,7 +30,7 @@ import itertools as it
 from common import draw_str
 title_window = 'Fitline.py'
 
-w, h = 512, 256
+width, height = 512, 256
 
 def toint(p):
     return tuple(map(int, p))
@@ -50,13 +50,13 @@ def update(_=None):
     r = cv.getTrackbarPos('outlier %', 'fit line') / 100.0
     outn = int(n*r)
 
-    p0, p1 = (90, 80), (w-90, h-80)
+    p0, p1 = (90, 80), (width-90, height-80)
     img = np.zeros((height, width, 3), np.uint8)
     cv.line(img, toint(p0), toint(p1), (0, 255, 0))
 
     if n > 0:
         line_points = sample_line(p0, p1, n-outn, noise)
-        outliers = np.random.rand(outn, 2) * (w, h)
+        outliers = np.random.rand(outn, 2) * (width, height)
         points = np.vstack([line_points, outliers])
         for p in line_points:
             cv.circle(img, toint(p), 2, (255, 255, 255), -1)
@@ -64,7 +64,7 @@ def update(_=None):
             cv.circle(img, toint(p), 2, (64, 64, 255), -1)
         func = getattr(cv, cur_func_name)
         vx, vy, cx, cy = cv.fitLine(np.float32(points), func, 0, 0.01, 0.01)
-        cv.line(img, (int(cx-vx*w), int(cy-vy*w)), (int(cx+vx*w), int(cy+vy*w)), (0, 0, 255))
+        cv.line(img, (int(cx-vx*width), int(cy-vy*width)), (int(cx+vx*width), int(cy+vy*width)), (0, 0, 255))
 
     draw_str(img, (20, 20), cur_func_name)
     cv.imshow('fit line', img)
