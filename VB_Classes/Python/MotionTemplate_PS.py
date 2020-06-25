@@ -23,8 +23,8 @@ def draw_motion_comp(vis, rect, angle, color):
 
 def OpenCVCode(imgRGB, depth_colormap):
     global frameCount, prev_imgRGB
-    h, w = imgRGB.shape[:2]
-    motion_history = np.zeros((h, w), np.float32)
+    height, width = imgRGB.shape[:2]
+    motion_history = np.zeros((height, width), np.float32)
     hsv = np.zeros((height, width, 3), np.uint8)
     hsv[:,:,1] = 255
      
@@ -51,7 +51,7 @@ def OpenCVCode(imgRGB, depth_colormap):
             hsv[:,:,2] = mg_mask*255
             vis = cv.cvtColor(hsv, cv.COLOR_HSV2BGR)
 
-        for i, rect in enumerate([(0, 0, w, h)] + list(seg_bounds)):
+        for i, rect in enumerate([(0, 0, width, height)] + list(seg_bounds)):
             x, y, rw, rh = rect
             area = rw*rh
             if area < 64**2:

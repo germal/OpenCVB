@@ -1,91 +1,71 @@
-'''
-Robust line fitting.
-==================
-
-Example of using cv.fitLine function for fitting line
-to points in presence of outliers.
-
-Usage
------
-fitline.py
-
-Switch through different M-estimator functions and see,
-how well the robust functions fit the line even
-in case of ~50% of outliers.
-
-Keys
-----
-SPACE - generate random points
-f     - change distance function
-ESC   - exit
-'''
-import sys
-import numpy as np
 import cv2 as cv
+import numpy as np
+import argparse
+title_window = 'Histogram_BackProject_Demo1.py'
 
-# built-in modules
-import itertools as it
+def Hist_and_Backproj(val):
+    ## [initialize]
+    bins = val
+    histSize = max(bins, 2)
+    ranges = [0, 180] # hue_range
+    ## [initialize]
 
-# local modules
-from common import draw_str
-title_window = 'Fitline.py'
+    ## [Get the Histogram and normalize it]
+    hist = cv.calcHist([hue], [0], None, [histSize], ranges, accumulate=False)
+    cv.normalize(hist, hist, alpha=0, beta=255, norm_type=cv.NORM_MINMAX)
+    ## [Get the Histogram and normalize it]
 
-width, height = 512, 256
+    ## [Get Backprojection]
+    backproj = cv.calcBackProject([hue], [0], hist, ranges, scale=1)
+    ## [Get Backprojection]
 
-def toint(p):
-    return tuple(map(int, p))
+    ## [Draw the backproj]
+    cv.imshow('BackProj', backproj)
+    ## [Draw the backproj]
 
-def sample_line(p1, p2, n, noise=0.0):
-    p1 = np.float32(p1)
-    t = np.random.rand(n,1)
-    return p1 + (p2-p1)*t + np.random.normal(size=(n, 2))*noise
+    ## [Draw the histogram]
+    width = 400
+    height = 400
+    bin_w = int(round(width / histSize))
+    histImg = np.zeros((height, width, 3), dtype=np.uint8)
 
-dist_func_names = it.cycle('DIST_L2 DIST_L1 DIST_L12 DIST_FAIR DIST_WELSCH DIST_HUBER'.split())
+    for i in range(bins):
+        cv.rectangle(histImg, (i*bin_w, height), ( (i+1)*bin_w, height - int(np.round( hist[i]*height/255.0 )) ), (0, 0, 255), cv.FILLED)
 
-cur_func_name = next(dist_func_names)
+    cv.imshow('Histogram', histImg)
+    ## [Draw the histogram]
 
-def update(_=None):
-    noise = cv.getTrackbarPos('noise', 'fit line')
-    n = cv.getTrackbarPos('point n', 'fit line')
-    r = cv.getTrackbarPos('outlier %', 'fit line') / 100.0
-    outn = int(n*r)
+## [Read the image]
+parser = argparse.ArgumentParser(description='Code for Back Projection tutorial.')
+parser.add_argument('--input', help='Path to input image.', default='../../Data/graf1.png')
+args = parser.parse_args()
 
-    p0, p1 = (90, 80), (width-90, height-80)
-    img = np.zeros((height, width, 3), np.uint8)
-    cv.line(img, toint(p0), toint(p1), (0, 255, 0))
+src = cv.imread(args.input)
+if src is None:
+    print('Could not open or find the image:', args.input)
+    exit(0)
+## [Read the image]
 
-    if n > 0:
-        line_points = sample_line(p0, p1, n-outn, noise)
-        outliers = np.random.rand(outn, 2) * (width, height)
-        points = np.vstack([line_points, outliers])
-        for p in line_points:
-            cv.circle(img, toint(p), 2, (255, 255, 255), -1)
-        for p in outliers:
-            cv.circle(img, toint(p), 2, (64, 64, 255), -1)
-        func = getattr(cv, cur_func_name)
-        vx, vy, cx, cy = cv.fitLine(np.float32(points), func, 0, 0.01, 0.01)
-        cv.line(img, (int(cx-vx*width), int(cy-vy*width)), (int(cx+vx*width), int(cy+vy*width)), (0, 0, 255))
+## [Transform it to HSV]
+hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
+## [Transform it to HSV]
 
-    draw_str(img, (20, 20), cur_func_name)
-    cv.imshow('fit line', img)
+## [Use only the Hue value]
+ch = (0, 0)
+hue = np.empty(hsv.shape, hsv.dtype)
+cv.mixChannels([hsv], [hue], ch)
+## [Use only the Hue value]
 
-def main():
-    cv.namedWindow('fit line')
-    cv.createTrackbar('noise', 'fit line', 3, 50, update)
-    cv.createTrackbar('point n', 'fit line', 100, 500, update)
-    cv.createTrackbar('outlier %', 'fit line', 30, 100, update)
-    while True:
-        update()
-        ch = cv.waitKey(0)
-        if ch == ord('f'):
-            cur_func_name = next(dist_func_names)
-        if ch == 27:
-            break
+## [Create Trackbar to enter the number of bins]
+window_image = 'Source image'
+cv.namedWindow(window_image)
+bins = 25
+cv.createTrackbar('* Hue  bins: ', window_image, bins, 180, Hist_and_Backproj )
+Hist_and_Backproj(bins)
+## [Create Trackbar to enter the number of bins]
 
-    print('Done')
+## [Show the image]
+cv.imshow(window_image, src)
+cv.waitKey()
+## [Show the image]
 
-
-if __name__ == '__main__':
-    print(__doc__)
-    main()
-    cv.destroyAllWindows()

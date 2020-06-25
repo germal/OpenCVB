@@ -24,13 +24,13 @@ def Hist_and_Backproj(val):
     ## [Draw the backproj]
 
     ## [Draw the histogram]
-    w = 400
-    h = 400
-    bin_w = int(round(w / histSize))
+    width = 400
+    height = 400
+    bin_w = int(round(width / histSize))
     histImg = np.zeros((height, width, 3), dtype=np.uint8)
 
     for i in range(bins):
-        cv.rectangle(histImg, (i*bin_w, h), ( (i+1)*bin_w, h - int(np.round( hist[i]*h/255.0 )) ), (0, 0, 255), cv.FILLED)
+        cv.rectangle(histImg, (i*bin_w, height), ( (i+1)*bin_w, height - int(np.round( hist[i]*height/255.0 )) ), (0, 0, 255), cv.FILLED)
 
     cv.imshow('Histogram', histImg)
     ## [Draw the histogram]
