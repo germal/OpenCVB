@@ -3,8 +3,8 @@ import cv2 as cv
 import sys
 
 def draw_flow(img, flow, step=16):
-    h, w = img.shape[:2]
-    y, x = np.mgrid[step/2:h:step, step/2:w:step].reshape(2,-1).astype(int)
+    height, width = img.shape[:2]
+    y, x = np.mgrid[step/2:height:step, step/2:width:step].reshape(2,-1).astype(int)
     fx, fy = flow[y,x].T
     lines = np.vstack([x, y, x+fx, y+fy]).T.reshape(-1, 2, 2)
     lines = np.int32(lines + 0.5)
@@ -16,7 +16,7 @@ def draw_flow(img, flow, step=16):
 
 
 def draw_hsv(flow):
-    h, w = flow.shape[:2]
+    height, width = flow.shape[:2]
     fx, fy = flow[:,:,0], flow[:,:,1]
     ang = np.arctan2(fy, fx) + np.pi
     v = np.sqrt(fx*fx+fy*fy)
@@ -29,10 +29,10 @@ def draw_hsv(flow):
 
 
 def warp_flow(img, flow):
-    h, w = flow.shape[:2]
+    height, width = flow.shape[:2]
     flow = -flow
-    flow[:,:,0] += np.arange(w)
-    flow[:,:,1] += np.arange(h)[:,np.newaxis]
+    flow[:,:,0] += np.arange(width)
+    flow[:,:,1] += np.arange(height)[:,np.newaxis]
     res = cv.remap(img, flow, None, cv.INTER_LINEAR)
     return res
 

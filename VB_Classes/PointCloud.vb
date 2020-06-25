@@ -363,16 +363,15 @@ Public Class PointCloud_Planes_CeilingFloor
         objects.src = src
         objects.Run(ocvb)
         dst1 = objects.dst1
-
-        dilate.src = dst1
-        dilate.Run(ocvb)
-
-        lines.src = dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        lines.Run(ocvb)
-        dst1 = lines.dst1.Clone()
-
         dst2 = objects.dst2
         label2 = objects.label2
+
+        'dilate.src = dst1
+        'dilate.Run(ocvb)
+
+        'lines.src = dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        'lines.Run(ocvb)
+        'dst1 = lines.dst1.Clone()
     End Sub
 End Class
 

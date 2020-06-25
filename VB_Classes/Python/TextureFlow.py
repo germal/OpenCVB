@@ -25,7 +25,7 @@ def main():
         sys.exit(1)
 
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    h, w = img.shape[:2]
+    height, width = img.shape[:2]
 
     eigen = cv.cornerEigenValsAndVecs(gray, 15, 3)
     eigen = eigen.reshape(height, width, 3, 2)  # [[e1, e2], v1, v2]
@@ -34,7 +34,7 @@ def main():
     vis = img.copy()
     vis[:] = (192 + np.uint32(vis)) / 2
     d = 12
-    points =  np.dstack( np.mgrid[d/2:w:d, d/2:h:d] ).reshape(-1, 2)
+    points =  np.dstack( np.mgrid[d/2:width:d, d/2:height:d] ).reshape(-1, 2)
     for x, y in np.int32(points):
         vx, vy = np.int32(flow[y, x]*d)
         cv.line(vis, (x-vx, y-vy), (x+vx, y+vy), (0, 0, 0), 1, cv.LINE_AA)
