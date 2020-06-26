@@ -653,6 +653,7 @@ Public Class OpenCVB
             Console.WriteLine("Error in camPic_MouseMove: " + ex.Message)
         End Try
     End Sub
+#If Enable_Keyboard_Input Then
     Private Sub AvailableAlgorithms_KeyDown(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyDown
         e.SuppressKeyPress = True
     End Sub
@@ -683,6 +684,7 @@ Public Class OpenCVB
         keyholdTimer.Enabled = True
         keyboardLastInput = (e.KeyData.ToString()).ToLower
     End Sub
+#End If
     Private Sub campic_DoubleClick(sender As Object, e As EventArgs)
         DrawingRectangle = False
     End Sub

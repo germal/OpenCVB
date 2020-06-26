@@ -436,7 +436,7 @@ Public Class PointCloud_View_SideObjects
         If ocvb.parms.resolution = resMed Then fontSize = 0.6
         maxZ = gVec.view.hist.histOpts.sliders.TrackBar2.Value / 1000
         Dim mmPerPixel = maxZ * 1000 / src.Height
-        Dim maxCount = Math.Min(gVec.flood.Rects.Count, 10)
+        Dim maxCount = Math.Min(gVec.flood.Rects.Count, 3)
         dst2 = dst1.Clone
         Dim dst = dst1
         For i = 0 To maxCount - 1

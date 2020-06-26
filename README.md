@@ -1,10 +1,24 @@
 **Introduction**
 
 There is no better documentation of an algorithm than a working example. Now
-imagine hundreds of computer vision examples in a single app where each
-algorithm is less than a page of code and is in a familiar language – C++, C\#,
-Python, or VB.Net. That is what "OpenCVB" Version 1.0 provides. Here are the
-requirements:
+imagine hundreds of OpenCV examples in a single app where each algorithm is less
+than a page of code and is in a familiar language – C++, C\#, Python, or VB.Net.
+That is what "OpenCVB" Version 1.0 provides. Here is what it looks like:
+
+![](media/b1e011f4681611111d7a7c752e274599.png)
+
+*The lower left image shows the “PointCloud_GVector_TopView” algorithm which
+renders the point cloud as if seen from directly above – a useful view to find
+walls and objects. The data is colored the same as the RGB Depth data in the
+upper right image. The upper left image is the RGB output. The lower right image
+has isolated the objects found and with each rectangle has a measure of the
+width and breadth of each object in the field of view.*
+
+The “Sample Results” section below provides numerous examples.
+
+**Pre-Install Requirements**
+
+Here are the requirements:
 
 -   Windows 10
 
@@ -22,41 +36,43 @@ requirements:
 
     -   Mynt Eye D 1000
 
-All of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft
+    -   Intel RealSense L515 – a Lidar-based camera without an IMU
+
+Most of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft
 Kinect for Azure has the best depth accuracy but requires more power and is not
 as portable as the Intel D435i camera.
 
 **The Objective**
 
-OpenCVB is targeting cameras that produce depth as well as color. These newer
-cameras have prompted a review of existing vision algorithms to see how they can
-be improved if depth is known. To enable revisiting many existing algorithms,
-this software provides a single application that can run over 600 OpenCV
-algorithms on any of the cameras listed above.
+OpenCVB is targeting only cameras that produce depth as well as color. These
+newer cameras have prompted a review of existing vision algorithms to see how
+they can be improved if depth is known. To enable revisiting many existing
+algorithms, this software provides a single application that can run over 600
+OpenCV algorithms on any of the cameras listed above.
 
 There are many computer vision examples on the web but too often something is
 missing. OpenCVB is designed to collect these algorithms into a single
 application and guarantee that each will build and run. In addition, the process
 of adding variants and experimenting with algorithms is simplified.
 
-The languages used are those often found in computer vision projects - C++, C\#,
-Python and even VB.Net. Secondly, it is important to get access to multiple
-libraries - OpenCV, OpenCVSharp, OpenGL, Emgu, and OpenMP. And lastly, it is
+The languages used are those often found in OpenCV projects - C++, C\#, Python
+and even VB.Net. Secondly, it is important to get access to multiple libraries -
+OpenCV, OpenCVSharp, OpenGL, Emgu, NumPy, and OpenMP. And lastly, it is
 important to use all the possible image representations - 3D, bitmaps, plots,
 bar charts, spreadsheets, or text.
 
 Making these languages and libraries available while using the same
-infrastructure shaped a standardized class for computer vision examples.
-Implementing hundreds of examples with the same reusable class structure has
-confirmed the approach is useful. The result is a starting point to add depth
-and explore computer vision.
+infrastructure shaped a standardized class for OpenCV examples. Implementing
+hundreds of examples with the same reusable class structure has confirmed the
+approach is useful. The result is a starting point to add depth and explore
+OpenCV.
 
 There are other objectives. Convolutions combined with neural nets (CNN’s) are a
 successful approach to computer vision. CNN’s detect differences within a set of
 images and identify content surprisingly well. OpenCVB is a pathway to search
-for more and better features than convolutions, features that are measured and
-essential. Depth, infrared, gravity, and camera motion are the kind of objective
-features that can enhance almost any color image algorithm.
+for more and better features than convolutions, features that are measured,
+objective, and essential. Depth, infrared, gravity, and camera motion are the
+kind of objective features that can enhance almost any imaging algorithm.
 
 And what if all cameras had depth and an IMU? Making this assumption explains
 why only a few cameras from Intel, Microsoft, and others are currently
@@ -93,7 +109,7 @@ You will need to download and install the following before starting:
 
     -   <https://git-scm.com/downloads>
 
-**Installation – Quick Reference Overview**
+**Installation – Quick Reference**
 
 -   <https://github.com/bobdavies2000/OpenCVB> - download OpenCVB from GitHub
 
@@ -791,13 +807,37 @@ software.
 
 Fremont, California
 
-Spring 2020
+Summer 2020
 
 Addendum 1: Comparing Cameras
 
-The are 4 supported cameras with a point cloud – Intel D435i, Microsoft
-Kinect4Azure, StereoLabs Zed 2, and Mynt Eye D1000. The 4 cameras are setup to
-measure the distance to the same wall in the same environment. Here is a look at
-how the cameras were setup:
+There are 5 supported cameras that generate a point cloud – Intel RealSense
+D435i, Intel RealSense L515, Microsoft Kinect4Azure, StereoLabs Zed 2, and Mynt
+Eye D1000. The ameras are setup to measure the distance to the same wall in the
+same environment. Here is a look at how the cameras were setup:
 
-![](media/47d590eaf2bc85a84db1fc73fe5a54e9.png)
+![](media/e15606605299f00d6ae1f4fb8da73c09.jpg)
+
+Using the “PointCloud_GVector_TopView”, all the above cameras were used to
+measure the distance to the wall approximately 2.5 meters from the cameras. The
+results are before.
+
+![](media/a2bdd27cd813f1c37d92db977fc74a00.png)
+
+Microsoft Kinect 4 Azure results.
+
+![](media/528653ce39895622cffe3622778a5e21.png)
+
+Intel Realsense L515 Lidar camera
+
+![](media/4d64891bc8325de3fb0926b4db21c6a1.png)
+
+Intel RealSense D435i camera. (Distance to the wall looks incorrect.)
+
+![](media/ed464a9db22610b7e3dfd5ed1057d238.png)
+
+StereoLabs Zed 2 camera. FOV looks a little skewed to the right.
+
+![](media/1e2803ceab3c74d9cbd59249369035b1.png)
+
+Mynt Eye D 1000 camera
