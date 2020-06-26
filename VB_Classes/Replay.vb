@@ -74,7 +74,7 @@ Public Class Replay_Record
     Dim depth16Bytes() As Byte
     Dim cloudBytes() As Byte
     Public Sub New(ocvb As AlgorithmData)
-                setCaller(ocvb)
+        setCaller(ocvb)
         If ocvb.parms.ShowOptions Then recording.Show()
         ocvb.desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
