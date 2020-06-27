@@ -79,15 +79,6 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bass.Net, Version=2.4.10.3, Culture=neutral, PublicKeyToken=b7566c273e6ef480, processorArchitecture=MSIL">
-      <HintPath>..\packages\Bass.Net.1.0.0\lib\Bass.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="Emgu.CV.Platform.NetFramework, Version=4.3.0.3890, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
-      <HintPath>..\packages\Emgu.CV.4.3.0.3890\lib\net461\Emgu.CV.Platform.NetFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="Emgu.CV.Platform.NetStandard, Version=4.3.0.3890, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
-      <HintPath>..\packages\Emgu.CV.4.3.0.3890\lib\net461\Emgu.CV.Platform.NetStandard.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Numpy, Version=3.7.1.16, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Numpy.3.7.1.16\lib\netstandard2.0\Numpy.dll</HintPath>
@@ -253,6 +244,12 @@
     <Compile Include="OpenCVGL.vb" />
     <Compile Include="OpenGL.vb" />
     <Compile Include="OpticalFlow.vb" />
+    <Compile Include="OptionsAudio.Designer.vb">
+      <DependentUpon>OptionsAudio.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsAudio.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="OptionsCombo.Designer.vb">
       <DependentUpon>OptionsCombo.vb</DependentUpon>
     </Compile>
@@ -352,6 +349,9 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="OptionsAudio.resx">
+      <DependentUpon>OptionsAudio.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="OptionsCheckbox.resx">
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>
     </EmbeddedResource>
@@ -388,10 +388,6 @@
     <ProjectReference Include="..\CS_Classes\CS_Classes.csproj">
       <Project>{fefe40b6-eb52-45c7-bd10-27968e1d6b2d}</Project>
       <Name>CS_Classes</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Emgu_Classes\Emgu_Classes.csproj">
-      <Project>{63393192-2893-4b1d-8f64-2818864c3d09}</Project>
-      <Name>Emgu_Classes</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

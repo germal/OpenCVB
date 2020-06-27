@@ -21,17 +21,17 @@ Public Class OptionsRecordPlayback
             End If
         End If
     End Sub
-    Private Sub OptionsKinectRecord_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub OptionsRecordPlayback_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim inputfile = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", "")
         If inputfile = "" Then inputfile = CurDir() + "/../../Data/Recording.bob"
         fileinfo = New FileInfo(inputfile)
 
         Filename.Text = fileinfo.FullName
-        Me.SetDesktopLocation(appLocation.Left + slidersOffset.X, appLocation.Top + appLocation.Height + slidersOffset.Y)
+        Me.SetDesktopLocation(applocation.Left + slidersOffset.X, applocation.Top + applocation.Height + slidersOffset.Y)
         slidersOffset.X += offsetIncr
         slidersOffset.Y += offsetIncr
     End Sub
-    Private Sub OptionsKinectRecord_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+    Private Sub OptionsRecordPlayback_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         startRecordPlayback = False
     End Sub
     Private Sub Filename_TextChanged(sender As Object, e As EventArgs) Handles Filename.TextChanged

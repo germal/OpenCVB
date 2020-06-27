@@ -17,6 +17,7 @@ End Class
 
 
 
+
 Public Class AddWeighted_Test
     Inherits ocvbClass
     Dim weight As AddWeighted_Basics
