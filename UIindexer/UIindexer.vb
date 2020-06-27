@@ -157,6 +157,14 @@ Module IndexMain
         Next
         sw.WriteLine()
 
+        If MoreWork.Count > 0 Then
+            sw.Write("<MoreWork>")
+            For i = 0 To MoreWork.Count - 1
+                sw.Write("," + MoreWork.ElementAt(i).Key)
+            Next
+            sw.WriteLine()
+        End If
+
         sw.Write("<Multi-Threaded Algorithms>")
         For i = 0 To MTnames.Count - 1
             sw.Write("," + MTnames.ElementAt(i).Key)
@@ -181,20 +189,6 @@ Module IndexMain
         Next
         sw.WriteLine()
 
-        If MoreWork.Count > 0 Then
-            sw.Write("<MoreWork>")
-            For i = 0 To MoreWork.Count - 1
-                sw.Write("," + MoreWork.ElementAt(i).Key)
-            Next
-            sw.WriteLine()
-        End If
-
-        sw.Write("<Trackers>")
-        For i = 0 To Trackers.Count - 1
-            sw.Write("," + Trackers.ElementAt(i).Key)
-        Next
-        sw.WriteLine()
-
         sw.Write("<Python>")
         For i = 0 To PYnames.Count - 1
             sw.Write("," + PYnames.ElementAt(i).Key)
@@ -204,6 +198,12 @@ Module IndexMain
         sw.Write("<PyStream>")
         For i = 0 To PYStreamNames.Count - 1
             sw.Write("," + PYStreamNames.ElementAt(i).Key)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<Trackers>")
+        For i = 0 To Trackers.Count - 1
+            sw.Write("," + Trackers.ElementAt(i).Key)
         Next
         sw.WriteLine()
 
