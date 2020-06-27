@@ -1,5 +1,4 @@
-﻿Imports System.Windows.Controls
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Module MyntD_Interface
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>

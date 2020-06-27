@@ -24,6 +24,7 @@ Partial Class OptionsAudio
     Private Sub InitializeComponent()
         Me.BytesMovedTrackbar = New System.Windows.Forms.TrackBar()
         Me.Filename = New System.Windows.Forms.TextBox()
+        Me.PlayButton = New System.Windows.Forms.Button()
         CType(Me.BytesMovedTrackbar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -42,11 +43,21 @@ Partial Class OptionsAudio
         Me.Filename.Size = New System.Drawing.Size(710, 26)
         Me.Filename.TabIndex = 5
         '
+        'PlayButton
+        '
+        Me.PlayButton.Location = New System.Drawing.Point(37, 134)
+        Me.PlayButton.Name = "PlayButton"
+        Me.PlayButton.Size = New System.Drawing.Size(105, 42)
+        Me.PlayButton.TabIndex = 7
+        Me.PlayButton.Text = "Play"
+        Me.PlayButton.UseVisualStyleBackColor = True
+        '
         'OptionsAudio
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(949, 241)
+        Me.Controls.Add(Me.PlayButton)
         Me.Controls.Add(Me.BytesMovedTrackbar)
         Me.Controls.Add(Me.Filename)
         Me.Name = "OptionsAudio"
@@ -59,4 +70,5 @@ Partial Class OptionsAudio
 
     Friend WithEvents BytesMovedTrackbar As Windows.Forms.TrackBar
     Friend WithEvents Filename As Windows.Forms.TextBox
+    Friend WithEvents PlayButton As Windows.Forms.Button
 End Class

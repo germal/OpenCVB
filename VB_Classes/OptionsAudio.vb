@@ -1,7 +1,10 @@
 ﻿Imports System.IO
 Imports System.Windows.Forms
+Imports NAudio.Wave
 Public Class OptionsAudio
     Public fileinfo As FileInfo
+    Dim player As IWavePlayer
+    Dim reader As MediaFoundationReader
     Private Sub OptionsAudio_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.SetDesktopLocation(applocation.Left + slidersOffset.X, applocation.Top + applocation.Height + slidersOffset.Y)
         slidersOffset.X += offsetIncr
@@ -17,5 +20,19 @@ Public Class OptionsAudio
     Private Sub Filename_TextChanged(sender As Object, e As EventArgs) Handles Filename.TextChanged
         fileinfo = New FileInfo(Filename.Text)
         SaveSetting("OpenCVB", "ReplayFileName", "ReplayFileName", fileinfo.FullName)
+    End Sub
+
+    Private Sub PlayButton_Click(sender As Object, e As EventArgs) Handles PlayButton.Click
+        If PlayButton.Text = "Play" Then
+            Dim reader = New MediaFoundationReader(fileinfo.FullName)
+            player = New WaveOutEvent()
+            player.Init(reader)
+            player.Play()
+            PlayButton.Text = "Stop"
+        Else
+            player.Stop()
+            player.Dispose()
+            PlayButton.Text = "Play"
+        End If
     End Sub
 End Class
