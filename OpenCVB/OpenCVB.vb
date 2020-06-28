@@ -677,7 +677,6 @@ Public Class OpenCVB
                 keyboardInput += (e.KeyData.ToString()).ToLower
             End If
         End SyncLock
-        ' Console.WriteLine(keyboardInput + " " + e.KeyCode.ToString + " keyboardLastInput = " + keyboardLastInput.ToString())
     End Sub
     Private Sub OpenCVB_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         keyholdTimer.Enabled = True

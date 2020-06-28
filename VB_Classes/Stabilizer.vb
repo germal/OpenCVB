@@ -190,7 +190,7 @@ Public Class Stabilizer_Basics_CPP
         setCaller(ocvb)
         ReDim srcData(src.Total * src.ElemSize - 1)
         sPtr = Stabilizer_Basics_Open()
-        ocvb.desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work."
+        ocvb.desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work.  Needs more work."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.putText(New oTrueType("this algorithm is not stable.", 10, 100, RESULT1))

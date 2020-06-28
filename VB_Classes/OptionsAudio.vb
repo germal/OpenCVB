@@ -19,7 +19,7 @@ Public Class OptionsAudio
     End Sub
     Private Sub Filename_TextChanged(sender As Object, e As EventArgs) Handles Filename.TextChanged
         fileinfo = New FileInfo(Filename.Text)
-        SaveSetting("OpenCVB", "ReplayFileName", "ReplayFileName", fileinfo.FullName)
+        SaveSetting("OpenCVB", "AudioFileName", "AudioFileName", fileinfo.FullName)
     End Sub
 
     Private Sub PlayButton_Click(sender As Object, e As EventArgs) Handles PlayButton.Click
