@@ -132,7 +132,7 @@ Public Class ActiveClass : Implements IDisposable
     Public Sub RunAlgorithm()
         Try
             If ocvb.parms.useRecordedData Then recordedData.Run(ocvb)
-            If ocvb.color IsNot Nothing And ocvb.RGBDepth IsNot Nothing Then ActiveAlgorithm.NextFrame(ocvb)
+            ActiveAlgorithm.NextFrame(ocvb)
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try

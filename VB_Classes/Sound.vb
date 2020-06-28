@@ -6,12 +6,13 @@ Public Class Sound_ToPCM
     Inherits ocvbClass
     Dim audio As New OptionsAudio
     Dim reader As MediaFoundationReader
-    Public memData As WaveBuffer
-    Public pcmData() As Short
-    Public pcm32f As New cv.Mat
+    Dim memData As WaveBuffer
+    Dim pcmData() As Short
     Dim saveFileName As String
+    Public pcm32f As New cv.Mat
     Private Sub LoadSoundData()
         If audio.fileinfo.Exists Then
+            If reader IsNot Nothing Then reader.Dispose()
             reader = New MediaFoundationReader(audio.fileinfo.FullName)
             Dim tmp(reader.Length - 1) As Byte
             Dim count = reader.Read(tmp, 0, tmp.Length)
