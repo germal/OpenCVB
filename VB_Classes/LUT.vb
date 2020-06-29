@@ -38,14 +38,42 @@ Public Class LUT_Color
     Public paletteMap(256) As cv.Vec3b
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
+        paletteMap = rColors
+        sliders.setupTrackBar1(ocvb, caller, "Reduction for color image", 1, 256, 32)
         ocvb.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        paletteMap = rColors
-        src /= 64
-        src *= 64
+        Dim reduction = sliders.TrackBar1.Value
+        If standalone Then
+            src /= reduction
+            src *= reduction
+        End If
         Dim colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, paletteMap)
         dst1 = src.LUT(colorMat)
-        dst2 = colorMat.Resize(src.Size())
+        If standalone Then dst2 = colorMat.Resize(src.Size())
+    End Sub
+End Class
+
+
+
+
+
+
+' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
+' https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
+Public Class LUT_Basics
+    Inherits ocvbClass
+    Public paletteMap(256 - 1) As Byte
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        For i = 0 To paletteMap.Count - 1
+            paletteMap(i) = i
+        Next
+        ocvb.desc = "Rebuild any grayscale image with a 256 element Look-Up Table"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim lut = New cv.Mat(1, 256, cv.MatType.CV_8U, paletteMap)
+        dst1 = src.LUT(lut)
+        If standalone Then dst2 = lut.Resize(src.Size())
     End Sub
 End Class

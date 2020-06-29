@@ -5,7 +5,6 @@ Public Class Kalman_Basics
     Dim kalman() As Kalman_Simple
     Public input() As Single
     Public output() As Single
-
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         check.Setup(ocvb, caller, 1)
@@ -15,7 +14,6 @@ Public Class Kalman_Basics
         ocvb.desc = "Use Kalman to stabilize a set of value (such as a cv.rect.)"
         input = {0, 0, 0, 0}
     End Sub
-
     Public Sub Run(ocvb As AlgorithmData)
         Static saveDimension As Int32 = -1
         If saveDimension <> input.Length Then

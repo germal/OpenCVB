@@ -399,7 +399,7 @@ Public Class Histogram_Depth
         plotHist = New Plot_Histogram(ocvb)
 
         trim = New Depth_InRange(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Histogram Depth Bins", 2, ocvb.color.cols, 50) ' max is the number of columns * 2
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Depth Bins", 2, ocvb.color.Cols, 50)
 
         ocvb.desc = "Show depth data as a histogram."
     End Sub
@@ -866,5 +866,33 @@ Public Class Histogram_Equalize255
         eqHist.Run(ocvb)
         dst1 = eqHist.dst1.Clone
         dst2 = eqHist.dst2.Clone
+    End Sub
+End Class
+
+
+
+
+
+Public Class Histogram_Simple
+    Inherits ocvbClass
+    Public plotHist As Plot_Histogram
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        plotHist = New Plot_Histogram(ocvb)
+
+        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 2, ocvb.color.Cols, 50)
+
+        ocvb.desc = "Build a simple and reusable histogram for grayscale images."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        plotHist.bins = sliders.TrackBar1.Value
+
+        Dim histSize() = {plotHist.bins}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
+        cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
+
+        plotHist.Run(ocvb)
+        dst1 = plotHist.dst1
     End Sub
 End Class

@@ -68,8 +68,13 @@ Public Class EMax_Basics
                 For j = 0 To dst1.Cols - 1
                     sample.Set(Of Double)(0, 0, CSng(j))
                     sample.Set(Of Double)(0, 1, CSng(i))
+
+                    ' remove the " 0 '" to see the error in Predict2.
+                    ' remove the " 0 '" to see the error in Predict2.
+                    ' remove the " 0 '" to see the error in Predict2.
                     ' remove the " 0 '" to see the error in Predict2.
                     Dim response = 0 ' Math.Round(em_model.Predict2(sample)(1))
+
                     Dim c = rColors(response)
                     dst1.Circle(New cv.Point(j, i), 1, c, -1)
                 Next
@@ -96,17 +101,18 @@ Module EMax_Exports
     Public Sub EMax_Basics_Close(EMax_BasicsPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function EMax_Basics_Run(EMax_BasicsPtr As IntPtr, samplesPtr As IntPtr, labelsPtr As IntPtr, rows As Int32, cols As Int32,
-                                    imgRows As Int32, imgCols As Int32, clusters As Int32, stepSize As Int32, covarianceMatrixType As Int32) As IntPtr
+    Public Function EMax_Basics_Run(EMax_BasicsPtr As IntPtr, samplesPtr As IntPtr, labelsPtr As IntPtr, rows As Int32, cols As Int32, imgRows As Int32,
+                                    imgCols As Int32, clusters As Int32, stepSize As Int32, covarianceMatrixType As Int32) As IntPtr
     End Function
 End Module
 
 Public Class EMax_Basics_CPP
     Inherits ocvbClass
-    Dim emax As EMax_Basics
+    Public emax As EMax_Basics
+    Public showInput As Boolean = True
     Dim EMax_Basics As IntPtr
     Public Sub New(ocvb As AlgorithmData)
-                setCaller(ocvb)
+        setCaller(ocvb)
         emax = New EMax_Basics(ocvb)
 
         EMax_Basics = EMax_Basics_Open()
@@ -116,7 +122,8 @@ Public Class EMax_Basics_CPP
     Public Sub Run(ocvb As AlgorithmData)
         emax.Run(ocvb)
         dst1 = emax.dst1
-        label1 = CStr(emax.sliders.TrackBar1.Value) + " Random samples in " + CStr(emax.regionCount) + " clusters"
+        Dim srcCount = emax.sliders.TrackBar1.Value
+        label1 = CStr(srcCount) + " Random samples in " + CStr(emax.regionCount) + " clusters"
 
         Dim covarianceMatrixType As Int32 = 0
         For i = 0 To 3 - 1
@@ -125,25 +132,27 @@ Public Class EMax_Basics_CPP
             End If
         Next
 
-        Dim srcData((emax.sliders.TrackBar1.Value - 1) * 2 - 1) As Single
+        Dim srcData((srcCount - 1) * 2) As Single
         Dim handleSrc As GCHandle
         handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Marshal.Copy(emax.samples.Data, srcData, 0, srcData.Length)
 
-        Dim labelData(emax.sliders.TrackBar1.Value - 1) As Int32
+        Dim labelData(srcCount - 1) As Int32
         Dim handleLabels As GCHandle
         handleLabels = GCHandle.Alloc(labelData, GCHandleType.Pinned)
         Marshal.Copy(emax.labels.Data, labelData, 0, labelData.Length)
 
-        Dim imagePtr = EMax_Basics_Run(EMax_Basics, handleSrc.AddrOfPinnedObject(), handleLabels.AddrOfPinnedObject(), emax.samples.Rows, emax.samples.Cols,
+        Dim imagePtr = EMax_Basics_Run(EMax_Basics, handleSrc.AddrOfPinnedObject(), handleLabels.AddrOfPinnedObject(), srcCount, 2,
                                        dst1.Rows, dst1.Cols, emax.regionCount, emax.sliders.TrackBar2.Value, covarianceMatrixType)
         handleLabels.Free() ' free the pinned memory...
         handleSrc.Free() ' free the pinned memory...
 
         If imagePtr <> 0 Then dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
 
-        Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        dst1.CopyTo(dst2, mask)
+        If showInput Then
+            Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+            dst1.CopyTo(dst2, mask)
+        End If
     End Sub
     Public Sub Close()
         EMax_Basics_Close(EMax_Basics)

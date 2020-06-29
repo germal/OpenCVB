@@ -390,3 +390,164 @@ Public Class Palette_DepthColorMapJet
         cv.Cv2.ApplyColorMap(255 - depth8u, dst1, cv.ColormapTypes.Jet)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Palette_Consistency
+    Inherits ocvbClass
+    Dim emax As EMax_Basics_CPP
+    Public hist As Histogram_Simple
+    Dim lut As LUT_Basics
+    Private Class CompareHistCounts : Implements IComparer(Of Single)
+        Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
+            If a > b Then Return 1
+            Return -1 ' never returns equal because duplicates can happen.
+        End Function
+    End Class
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        emax = New EMax_Basics_CPP(ocvb)
+        emax.emax.sliders.TrackBar2.Value = 15
+
+        hist = New Histogram_Simple(ocvb)
+        hist.sliders.TrackBar1.Value = 255
+        hist.sliders.Visible = False ' it must remain at 255...
+
+        lut = New LUT_Basics(ocvb)
+
+        ocvb.desc = "Using a histogram, assign the same colors to the same areas across frames"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If standalone Then
+            emax.Run(ocvb)
+            src = emax.dst2
+        End If
+        Dim size = New cv.Size(ocvb.color.Width / 4, ocvb.color.Height / 4)
+        Dim img = src.Resize(size, 0, 0, cv.InterpolationFlags.Cubic)
+        img = img.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        img = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        hist.src = img
+        hist.Run(ocvb)
+        If standalone Then dst2 = hist.dst1.Resize(ocvb.color.Size)
+
+        Dim histogram = hist.plotHist.hist
+        Dim orderedByCount As New SortedList(Of Single, Integer)(New CompareHistCounts)
+        For i = 0 To histogram.Rows - 1
+            Dim nextVal = histogram.Get(Of Single)(i)
+            If nextVal > 500 Then orderedByCount.Add(nextVal, i)
+        Next
+
+        Dim grayIndex As Integer
+        Dim grayIncr As Integer = CInt(255 / orderedByCount.Count)
+        For i = orderedByCount.Count - 1 To 0 Step -1
+            Dim paletteIndex = orderedByCount.ElementAt(i).Value
+            lut.paletteMap(paletteIndex) = grayIndex
+            grayIndex += grayIncr
+        Next
+
+        lut.src = img
+        lut.Run(ocvb)
+        dst1 = lut.dst1.Resize(ocvb.color.Size())
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Palette_ConsistentCentroid
+    Inherits ocvbClass
+    Dim emax As EMax_Basics_CPP
+    Dim lut As LUT_Basics
+    Dim flood As FloodFill_Projection
+    Dim knn As knn_Basics
+    Dim scaleFactor = 1
+    Dim cent() As Moments_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        emax = New EMax_Basics_CPP(ocvb)
+        emax.emax.sliders.TrackBar2.Value = 15
+        emax.showInput = False
+
+        lut = New LUT_Basics(ocvb)
+
+        flood = New FloodFill_Projection(ocvb)
+        flood.sliders.TrackBar1.Value /= scaleFactor
+        knn = New knn_Basics(ocvb)
+        ReDim knn.input(1)
+        knn.sliders.TrackBar2.Value = 1
+
+        ReDim cent(10 - 1)
+        ocvb.parms.ShowOptions = False
+
+        ocvb.desc = "Using a histogram, assign the same colors to the same areas across frames"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        dst1.SetTo(0)
+        If standalone Then
+            emax.Run(ocvb)
+            src = emax.dst2
+        End If
+        Dim size = New cv.Size(CInt(ocvb.color.Width / scaleFactor), CInt(ocvb.color.Height / scaleFactor))
+        Dim img = src.Resize(size, 0, 0, cv.InterpolationFlags.Cubic)
+        img = img.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        flood.src = img
+        flood.Run(ocvb)
+
+        If flood.rects.Count > 0 Then
+            dst2 = src
+            If knn.input.Count <> flood.rects.Count Then
+                For i = 0 To cent.Count - 1
+                    If cent(i) IsNot Nothing Then cent(i).Dispose()
+                Next
+                ReDim cent(flood.rects.Count - 1)
+                For i = 0 To cent.Count - 1
+                    cent(i) = New Moments_Basics(ocvb)
+                    cent(i).scaleFactor = scaleFactor
+                    cent(i).minPixelCount = 50
+                Next
+                ReDim knn.input(flood.rects.Count - 1)
+                ReDim knn.queryPoints(flood.rects.Count - 1)
+
+                For i = 0 To flood.rects.Count - 1
+                    knn.input(i) = cent(i).centroid
+                Next
+            End If
+
+            For i = 0 To flood.rects.Count - 1
+                cent(i).inputMask = flood.masks(i)
+                cent(i).offsetPt = New cv.Point(flood.rects(i).X, flood.rects(i).Y)
+                cent(i).Run(ocvb)
+            Next
+
+            For i = 0 To flood.rects.Count - 1
+                knn.queryPoints(i) = cent(i).centroid
+            Next
+
+            knn.Run(ocvb)
+
+            For i = 0 To flood.rects.Count - 1
+                knn.queryPoints(i) = cent(i).centroid
+                dst2.Circle(knn.matchedPoints(i), 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            Next
+
+            For i = 0 To knn.matchedPoints.Count - 1
+                dst1.Circle(knn.queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                dst1.Circle(knn.matchedPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                dst1.Line(knn.matchedPoints(i), knn.queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            Next
+
+            ' learn the latest configuration of centroids.
+            For i = 0 To flood.rects.Count - 1
+                knn.input(i) = cent(i).centroid
+            Next
+        End If
+    End Sub
+End Class

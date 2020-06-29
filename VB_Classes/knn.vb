@@ -1,55 +1,66 @@
 Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 Public Class knn_Basics
     Inherits ocvbClass
     Dim random As Random_Points
     Public input() As cv.Point2f
     Public queryPoints() As cv.Point2f
+    Public matchedPoints() As cv.Point2f
     Dim knn As cv.ML.KNearest
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         If standalone Then
             random = New Random_Points(ocvb)
-            sliders.setupTrackBar1(ocvb, caller, "knn Query Points", 1, 10000, 10)
-            sliders.setupTrackBar2("knn Known Points", 1, 10, 3)
         End If
+        sliders.setupTrackBar1(ocvb, caller, "knn Query Points", 1, 10000, 10)
+        sliders.setupTrackBar2("knn output Points", 1, 10, If(standalone, 3, 1))
         ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
         label2 = "Query points"
         knn = cv.ML.KNearest.Create()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst1.SetTo(0)
         If standalone Then
+            dst1.SetTo(0)
             random.Run(ocvb)
             input = random.Points2f
         End If
+
         Dim trainData = New cv.Mat(input.Length, 2, cv.MatType.CV_32F, input)
         Dim responses(input.Length - 1) As Int32
         For i = 0 To responses.Length - 1
             responses(i) = i
         Next
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, New cv.Mat(responses.Length, 1, cv.MatType.CV_32S, responses))
+        ReDim matchedPoints(input.Count - 1)
 
-        ReDim queryPoints(sliders.TrackBar1.Value)
-        For i = 0 To queryPoints.Length - 1
-            queryPoints(i) = New cv.Point2f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows))
-        Next
-        Dim bluePoints = sliders.TrackBar2.Value
-
-        label1 = "Yellow is query point, blue nearest for " + CStr(bluePoints) + " queries"
-        dst1.CopyTo(dst2)
-        Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
-        For i = 0 To queryPoints.Length - 1
-            query.Set(Of cv.Point2f)(0, 0, queryPoints(i))
-            knn.FindNearest(query, bluePoints, results, neighbors)
-            For j = 0 To bluePoints - 1
-                Dim index = CInt(neighbors.Get(Of Single)(0, j))
-                cv.Cv2.Circle(dst1, random.Points(index), 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
-                dst1.Line(random.Points(index), queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+        Dim qPointCount = sliders.TrackBar2.Value
+        If standalone Then
+            ReDim queryPoints(qPointCount)
+            For i = 0 To qPointCount - 1
+                queryPoints(i) = New cv.Point2f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows))
             Next
-            cv.Cv2.Circle(dst1, queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
-            cv.Cv2.Circle(dst2, queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
-        Next
+            label1 = "Yellow is query point, blue nearest for " + CStr(qPointCount) + " queries"
+
+            dst1.CopyTo(dst2)
+            Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
+            For i = 0 To queryPoints.Length - 1
+                query.Set(Of cv.Point2f)(0, 0, queryPoints(i))
+                knn.FindNearest(query, qPointCount, results, neighbors)
+                For j = 0 To qPointCount - 1
+                    Dim index = CInt(neighbors.Get(Of Single)(0, j))
+                    cv.Cv2.Circle(dst1, random.Points(index), 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+                    dst1.Line(random.Points(index), queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+                Next
+                cv.Cv2.Circle(dst1, queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+                cv.Cv2.Circle(dst2, queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+            Next
+        Else
+            Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
+            For i = 0 To queryPoints.Length - 1
+                query.Set(Of cv.Point2f)(0, 0, queryPoints(i))
+                knn.FindNearest(query, qPointCount, results, neighbors)
+                matchedPoints(i) = input(CInt(neighbors.Get(Of Single)(0, 0)))
+            Next
+        End If
     End Sub
 End Class
 
@@ -83,8 +94,6 @@ Public Class knn_Cluster2D
         check.Box(0).Text = "Demo Mode (continuous update)"
         If ocvb.parms.testAllRunning Then check.Box(0).Checked = True
 
-        label1 = ""
-        label2 = ""
         ocvb.desc = "Use knn to cluster cities as preparation for a solution to the traveling salesman problem."
     End Sub
     Private Sub cluster(rColors() As cv.Vec3b, result As cv.Mat)
