@@ -267,9 +267,6 @@ Public Class kMeans_Depth_FG_BG
         Dim foregroundLabel = 0
         If depthCenters.Get(Of Single)(0, 0) > depthCenters.Get(Of Single)(1, 0) Then foregroundLabel = 1
 
-        ' if one of the centers is way out there, leave the mask alone.  KMeans clustered an unreasonably small cluster.
-        ' If depthCenters.Get(of Single)(0, 0) > 20000 Or depthCenters.Get(of Single)(1, 0) > 20000 Then Exit Sub
-
         Dim mask = labels.InRange(foregroundLabel, foregroundLabel)
         Dim shadowMask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         mask.SetTo(0, shadowMask)

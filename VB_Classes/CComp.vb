@@ -5,10 +5,12 @@ Imports System.Threading
 Public Class CComp_Basics
     Inherits ocvbClass
     Public connectedComponents As Object
+    Public rects As New List(Of cv.Rect)
+    Public centroids As New List(Of cv.Point2f)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders.setupTrackBar1(ocvb, caller, "CComp Threshold", 0, 255, 10)
-        sliders.setupTrackBar2("CComp Min Area", 0, 10000, 500)
+        sliders.setupTrackBar2("CComp Min Area", 0, src.Width * src.Height, 500)
 
         ocvb.desc = "Draw bounding boxes around RGB binarized connected Components"
         label1 = "CComp binary"
@@ -38,18 +40,22 @@ Public Class CComp_Basics
         connectedComponents.RenderBlobs(dst1)
         dst1.CopyTo(dst2)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        rects.Clear()
+        centroids.Clear()
         For Each blob In connectedComponents.Blobs
             If blob.Area < sliders.TrackBar2.Value Then Continue For ' skip it if too small...
             Dim rect = blob.Rect
             ' if it covers everything, then forget it...
             If rect.Width = src.Width And rect.Height = src.Height Then Continue For
             If rect.X + rect.Width > src.Width Or rect.Y + rect.Height > src.Height Then Continue For
-
+            rects.Add(rect)
             Dim mask = dst1(rect)
 
             Dim m = cv.Cv2.Moments(mask, True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
             Dim centroid = New cv.Point(CInt(m.M10 / m.M00), CInt(m.M01 / m.M00))
+
+            centroids.Add(centroid)
 
             dst2(rect).Circle(centroid, 5, cv.Scalar.White, -1)
             dst2.Rectangle(rect, cv.Scalar.White, 2)

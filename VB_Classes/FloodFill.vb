@@ -335,7 +335,6 @@ Public Class FloodFill_Projection
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
-    Public minFloodSize As Integer
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 5000, 2500)
@@ -347,7 +346,7 @@ Public Class FloodFill_Projection
         ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        minFloodSize = sliders.TrackBar1.Value
+        Dim minFloodSize = sliders.TrackBar1.Value
         Dim loDiff = cv.Scalar.All(sliders.TrackBar2.Value)
         Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
         Dim stepSize = sliders.TrackBar4.Value

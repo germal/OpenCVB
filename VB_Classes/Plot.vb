@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Text.RegularExpressions
 Public Class Plot_Basics
     Inherits ocvbClass
     Dim plot As Plot_Basics_CPP
@@ -284,16 +285,27 @@ Public Class Plot_Depth
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
-        ReDim plot.srcY(hist.plotHist.hist.Rows - 1)
         Dim inRangeMin = hist.trim.sliders.TrackBar1.Value
         Dim inRangeMax = hist.trim.sliders.TrackBar2.Value
+        ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
+        ReDim plot.srcY(hist.plotHist.hist.Rows - 1)
         For i = 0 To plot.srcX.Length - 1
             plot.srcX(i) = inRangeMin + i * (inRangeMax - inRangeMin) / plot.srcX.Length
             plot.srcY(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
         plot.Run(ocvb)
         dst1 = plot.dst1
+
         label1 = "histogram: " + plot.label1
+        Dim Split = Regex.Split(label1, "\W+")
+        Dim lineCount = CInt(Split(5) / 1000)
+        If lineCount > 0 Then
+            Dim meterDepth = CInt(src.Width / lineCount)
+            For i = 1 To lineCount
+                Dim x = i * meterDepth
+                dst1.Line(New cv.Point(x, 0), New cv.Point(x, src.Height), cv.Scalar.White, 1)
+                cv.Cv2.PutText(dst1, Format(i, "0") + "m", New cv.Point(x + 5, src.Height - 10), cv.HersheyFonts.HersheyComplexSmall, 0.7, cv.Scalar.White, 2)
+            Next
+        End If
     End Sub
 End Class

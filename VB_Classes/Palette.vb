@@ -503,40 +503,34 @@ Public Class Palette_ConsistentCentroid
 
         If flood.rects.Count > 0 Then
             dst2 = src
+            Dim reallocated As Boolean
             If knn.input.Count <> flood.rects.Count Then
-                For i = 0 To cent.Count - 1
-                    If cent(i) IsNot Nothing Then cent(i).Dispose()
-                Next
+                Console.WriteLine("Reallocation with " + CStr(flood.rects.Count))
                 ReDim cent(flood.rects.Count - 1)
                 For i = 0 To cent.Count - 1
                     cent(i) = New Moments_Basics(ocvb)
                     cent(i).scaleFactor = scaleFactor
-                    cent(i).minPixelCount = 50
                 Next
                 ReDim knn.input(flood.rects.Count - 1)
                 ReDim knn.queryPoints(flood.rects.Count - 1)
-
-                For i = 0 To flood.rects.Count - 1
-                    knn.input(i) = cent(i).centroid
-                Next
+                reallocated = True
             End If
 
             For i = 0 To flood.rects.Count - 1
                 cent(i).inputMask = flood.masks(i)
                 cent(i).offsetPt = New cv.Point(flood.rects(i).X, flood.rects(i).Y)
                 cent(i).Run(ocvb)
+                knn.queryPoints(i) = cent(i).centroid
+                dst2.Circle(knn.queryPoints(i), 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             Next
 
-            For i = 0 To flood.rects.Count - 1
-                knn.queryPoints(i) = cent(i).centroid
-            Next
+            If reallocated Then
+                For i = 0 To flood.rects.Count - 1
+                    knn.input(i) = cent(i).centroid
+                Next
+            End If
 
             knn.Run(ocvb)
-
-            For i = 0 To flood.rects.Count - 1
-                knn.queryPoints(i) = cent(i).centroid
-                dst2.Circle(knn.matchedPoints(i), 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-            Next
 
             For i = 0 To knn.matchedPoints.Count - 1
                 dst1.Circle(knn.queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
@@ -546,7 +540,7 @@ Public Class Palette_ConsistentCentroid
 
             ' learn the latest configuration of centroids.
             For i = 0 To flood.rects.Count - 1
-                knn.input(i) = cent(i).centroid
+                knn.input(i) = cent(knn.matchedIndex(i)).centroid
             Next
         End If
     End Sub

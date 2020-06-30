@@ -4,7 +4,8 @@ Public Class knn_Basics
     Dim random As Random_Points
     Public input() As cv.Point2f
     Public queryPoints() As cv.Point2f
-    Public matchedPoints() As cv.Point2f
+    Public matchedPoints(1) As cv.Point2f
+    Public matchedIndex() As Integer
     Dim knn As cv.ML.KNearest
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -30,7 +31,10 @@ Public Class knn_Basics
             responses(i) = i
         Next
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, New cv.Mat(responses.Length, 1, cv.MatType.CV_32S, responses))
-        ReDim matchedPoints(input.Count - 1)
+        If input.Count <> matchedPoints.Count Then
+            ReDim matchedPoints(input.Count - 1)
+            ReDim matchedIndex(input.Count - 1)
+        End If
 
         Dim qPointCount = sliders.TrackBar2.Value
         If standalone Then
@@ -58,7 +62,8 @@ Public Class knn_Basics
             For i = 0 To queryPoints.Length - 1
                 query.Set(Of cv.Point2f)(0, 0, queryPoints(i))
                 knn.FindNearest(query, qPointCount, results, neighbors)
-                matchedPoints(i) = input(CInt(neighbors.Get(Of Single)(0, 0)))
+                matchedIndex(i) = CInt(neighbors.Get(Of Single)(0, 0))
+                matchedPoints(i) = input(matchedIndex(i))
             Next
         End If
     End Sub

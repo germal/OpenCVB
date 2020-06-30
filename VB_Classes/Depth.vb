@@ -1236,6 +1236,7 @@ Public Class Depth_InRange
         cv.Cv2.BitwiseNot(Mask, zeroMask)
         dst1 = depth32f.Clone.SetTo(0, zeroMask)
         dst2 = depth32f.Clone.SetTo(0, Mask)
+        depth32f.SetTo(0, zeroMask)
         dst2 = dst2.Threshold(8000, 8000, cv.ThresholdTypes.Trunc) ' the data beyond 8 meters is suspect and will distort the image output
     End Sub
 End Class

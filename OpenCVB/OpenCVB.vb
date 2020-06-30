@@ -1,5 +1,4 @@
-﻿
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Imports System.IO
 Imports System.ComponentModel
