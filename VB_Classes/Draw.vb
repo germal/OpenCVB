@@ -487,3 +487,77 @@ Public Class Draw_Arc
         If r = rect Or sliders.TrackBar1.Value <> saveMargin Then setup(ocvb)
     End Sub
 End Class
+
+
+
+
+
+Public Class Draw_OverlappingRectangles
+    Inherits ocvbClass
+    Dim flood As FloodFill_Projection
+    Public inputRects As New List(Of cv.Rect)
+    Public inputMasks As New List(Of cv.Mat)
+    Public rects As New List(Of cv.Rect)
+    Public masks As New List(Of cv.Mat)
+    Public sortedMasks As New SortedList(Of cv.Rect, cv.Mat)(New CompareMasks)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        If standalone Then flood = New FloodFill_Projection(ocvb)
+
+        label1 = "Redundant rectangles are yellow"
+        label2 = "Unique rectangles with their respective masks"
+        ocvb.desc = "Use Clipline to find rectangles that are completely overlapping - one contained in the other."
+    End Sub
+    Private Class CompareMasks : Implements IComparer(Of cv.Rect)
+        Public Function Compare(ByVal a As cv.Rect, ByVal b As cv.Rect) As Integer Implements IComparer(Of cv.Rect).Compare
+            If a.Width * a.Height > b.Width * b.Height Then Return 1
+            Return -1 ' never returns equal because duplicates can happen.
+        End Function
+    End Class
+    Private Function testRect(r1 As cv.Rect, r2 As cv.Rect)
+        Dim w = r1.Width
+        Dim h = r1.Height
+        For i = 0 To 4 - 1
+            Dim p1 = Choose(i + 1, New cv.Point(r1.X, r1.Y), New cv.Point(r1.X, r1.Y), New cv.Point(r1.X + w, r1.Y), New cv.Point(r1.X, r1.Y + h))
+            Dim p2 = Choose(i + 1, New cv.Point(r1.X + w, r1.Y), New cv.Point(r1.X, r1.Y + h), New cv.Point(r1.X + w, r1.Y + h), New cv.Point(r1.X + w, r1.Y + h))
+            If cv.Cv2.ClipLine(r2, p1, p2) = False Then Return False
+        Next
+        Return True
+    End Function
+    Public Sub Run(ocvb As AlgorithmData)
+        If standalone Then
+            flood.src = src
+            flood.Run(ocvb)
+            dst1 = flood.dst2
+            inputRects = flood.rects
+            inputMasks = flood.masks
+        End If
+
+        Dim redundantRects As New List(Of cv.Rect)
+        For i = 0 To inputRects.Count - 1
+            Dim r1 = inputRects(i)
+            For j = i + 1 To inputRects.Count - 1
+                Dim r2 = inputRects(j)
+                If testRect(r1, r2) Then
+                    dst1.Rectangle(r1, cv.Scalar.Yellow, 2)
+                    redundantRects.Add(r1)
+                ElseIf testRect(r2, r1) Then
+                    dst1.Rectangle(r2, cv.Scalar.Yellow, 2)
+                    redundantRects.Add(r2)
+                End If
+            Next
+        Next
+        dst2.SetTo(0)
+        sortedMasks.Clear()
+
+        For i = 0 To inputRects.Count - 1
+            If redundantRects.Contains(inputRects(i)) = False Then
+                Dim rect = inputRects(i)
+                dst2(rect).SetTo(cv.Scalar.White, inputMasks(i))
+                dst2.Rectangle(rect, cv.Scalar.Red, 2)
+                sortedMasks.Add(rect, inputMasks(i))
+            End If
+        Next
+    End Sub
+End Class

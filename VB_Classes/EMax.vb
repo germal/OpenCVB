@@ -37,6 +37,7 @@ Public Class EMax_Basics
         End If
 
         samples = New cv.Mat(sliders.TrackBar1.Value, 2, cv.MatType.CV_32FC1, 0)
+        If regionCount > samples.Rows / 2 Then regionCount = samples.Rows / 2
         labels = New cv.Mat(sliders.TrackBar1.Value, 1, cv.MatType.CV_32S, 0)
         samples = samples.Reshape(2, 0)
         Dim sigma = sliders.TrackBar3.Value
@@ -110,6 +111,7 @@ Public Class EMax_Basics_CPP
     Inherits ocvbClass
     Public emax As EMax_Basics
     Public showInput As Boolean = True
+    Public inputDataMask As cv.Mat
     Dim EMax_Basics As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -149,13 +151,70 @@ Public Class EMax_Basics_CPP
 
         If imagePtr <> 0 Then dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
 
-        If showInput Then
-            Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-            dst1.CopyTo(dst2, mask)
-        End If
+        inputDataMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        If showInput Then dst1.CopyTo(dst2, inputDataMask)
     End Sub
     Public Sub Close()
         EMax_Basics_Close(EMax_Basics)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class EMax_ConsistentPalette
+    Inherits ocvbClass
+    Dim emax As EMax_Basics_CPP
+    Dim flood As FloodFill_Basics
+    Dim dilate As DilateErode_Basics
+    Dim canny As Edges_Canny
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        dilate = New DilateErode_Basics(ocvb)
+
+        canny = New Edges_Canny(ocvb)
+        canny.sliders.TrackBar1.Value = 1
+        canny.sliders.TrackBar2.Value = 1
+
+        emax = New EMax_Basics_CPP(ocvb)
+        emax.showInput = False
+        emax.emax.sliders.TrackBar2.Value = 15
+
+        flood = New FloodFill_Basics(ocvb)
+
+        ocvb.desc = "Display EMax results with a consisten palette from frame to frame"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        emax.Run(ocvb)
+        emax.dst2.Rectangle(New cv.Rect(0, 0, src.Width, src.Height), cv.Scalar.White, 1)
+
+        canny.src = emax.dst2
+        canny.Run(ocvb)
+
+        dilate.src = canny.dst2
+        dilate.Run(ocvb)
+
+        dst1 = dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
+        Dim maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
+        maskPlus(maskRect).SetTo(255, dilate.dst1)
+        Dim stepsize = 50
+        Dim cIndex As Integer
+        Dim rect As New cv.Rect
+        Dim zeroVec As New cv.Vec3b
+        For y = 0 To dst1.Height - 1 Step stepsize
+            For x = 0 To dst1.Width - 1 Step stepsize
+                If dst1.Get(Of cv.Vec3b)(y, x) = zeroVec Then
+                    cv.Cv2.FloodFill(dst1, maskPlus, New cv.Point(x, y), scalarColors(cIndex Mod 256), rect, 1, 1,
+                                     cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
+                    cIndex += 1
+                End If
+            Next
+        Next
+        dst1.SetTo(0, emax.inputDataMask)
     End Sub
 End Class
 

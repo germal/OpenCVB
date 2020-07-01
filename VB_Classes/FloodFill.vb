@@ -33,7 +33,6 @@ Public Class FloodFill_Basics
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src
-        Dim rect As New cv.Rect
         Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1)
         Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
         initialMask = src.EmptyClone().SetTo(0)
@@ -49,6 +48,7 @@ Public Class FloodFill_Basics
         For y = 0 To gray.Height - 1 Step stepSize
             For x = 0 To gray.Width - 1 Step stepSize
                 If gray.Get(Of Byte)(y, x) > 0 Then
+                    Dim rect As New cv.Rect
                     Dim count = cv.Cv2.FloodFill(gray, maskPlus, New cv.Point(x, y), cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
                     If count > minFloodSize Then
                         masks.Add(maskPlus(maskRect).Clone().SetTo(0, ignoreMasks))

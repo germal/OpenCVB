@@ -461,14 +461,14 @@ End Class
 
 
 
-Public Class Palette_ConsistentCentroid
+Public Class Palette_ConsistentCentroid_3PointOnly
     Inherits ocvbClass
     Dim emax As EMax_Basics_CPP
     Dim lut As LUT_Basics
     Dim flood As FloodFill_Projection
     Dim knn As knn_Basics
     Dim scaleFactor = 1
-    Dim cent() As Moments_Basics
+    Dim moment() As Moments_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         emax = New EMax_Basics_CPP(ocvb)
@@ -483,10 +483,10 @@ Public Class Palette_ConsistentCentroid
         ReDim knn.input(1)
         knn.sliders.TrackBar2.Value = 1
 
-        ReDim cent(10 - 1)
+        ReDim moment(10 - 1)
         ocvb.parms.ShowOptions = False
 
-        ocvb.desc = "Using a histogram, assign the same colors to the same areas across frames"
+        ocvb.desc = "Try to keep track of the centroids from frame to frame - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1.SetTo(0)
@@ -504,29 +504,37 @@ Public Class Palette_ConsistentCentroid
         If flood.rects.Count > 0 Then
             dst2 = src
             Dim reallocated As Boolean
-            If knn.input.Count <> flood.rects.Count Then
-                Console.WriteLine("Reallocation with " + CStr(flood.rects.Count))
-                ReDim cent(flood.rects.Count - 1)
-                For i = 0 To cent.Count - 1
-                    cent(i) = New Moments_Basics(ocvb)
-                    cent(i).scaleFactor = scaleFactor
+            Dim cCount = flood.rects.Count
+            If knn.input.Count <> cCount Then
+                Console.WriteLine("Reallocation with " + CStr(cCount))
+                ReDim moment(cCount - 1)
+                For i = 0 To moment.Count - 1
+                    moment(i) = New Moments_Basics(ocvb)
+                    moment(i).scaleFactor = scaleFactor
                 Next
-                ReDim knn.input(flood.rects.Count - 1)
-                ReDim knn.queryPoints(flood.rects.Count - 1)
+                ReDim knn.input(cCount - 1)
+                ReDim knn.queryPoints(cCount - 1)
                 reallocated = True
             End If
 
-            For i = 0 To flood.rects.Count - 1
-                cent(i).inputMask = flood.masks(i)
-                cent(i).offsetPt = New cv.Point(flood.rects(i).X, flood.rects(i).Y)
-                cent(i).Run(ocvb)
-                knn.queryPoints(i) = cent(i).centroid
-                dst2.Circle(knn.queryPoints(i), 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            For i = 0 To cCount - 1
+                moment(i).inputMask = flood.masks(i)
+                moment(i).offsetPt = New cv.Point(flood.rects(i).X, flood.rects(i).Y)
+                moment(i).useKalman = False
+                moment(i).Run(ocvb)
+                knn.queryPoints(i) = moment(i).centroid
+                If reallocated Then
+                    knn.input(i) = moment(i).centroid
+                End If
             Next
 
+            knn.Run(ocvb)
+
             If reallocated Then
-                For i = 0 To flood.rects.Count - 1
-                    knn.input(i) = cent(i).centroid
+                For i = 0 To cCount - 1
+                    knn.input(i) = moment(knn.matchedIndex(i)).centroid
+                    moment(i).useKalman = True
+                    moment(i).Run(ocvb)
                 Next
             End If
 
@@ -536,11 +544,11 @@ Public Class Palette_ConsistentCentroid
                 dst1.Circle(knn.queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
                 dst1.Circle(knn.matchedPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
                 dst1.Line(knn.matchedPoints(i), knn.queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+                dst2.Circle(moment(i).centroid, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             Next
 
-            ' learn the latest configuration of centroids.
-            For i = 0 To flood.rects.Count - 1
-                knn.input(i) = cent(knn.matchedIndex(i)).centroid
+            For i = 0 To cCount - 1
+                knn.input(i) = moment(knn.matchedIndex(i)).centroid
             Next
         End If
     End Sub

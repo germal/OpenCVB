@@ -6,14 +6,15 @@ Public Class Moments_Basics
     Dim foreground As kMeans_Depth_FG_BG
     Public scaleFactor As Integer = 1
     Public offsetPt As cv.Point
-    'Dim kalman As Kalman_Basics
+    Public kalman As Kalman_Basics
+    Public useKalman As Boolean = True
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         If standalone Then foreground = New kMeans_Depth_FG_BG(ocvb)
 
-        'kalman = New Kalman_Basics(ocvb)
-        'ReDim kalman.input(2 - 1) ' 2 elements - cv.point
+        kalman = New Kalman_Basics(ocvb)
+        ReDim kalman.input(2 - 1) ' 2 elements - cv.point
 
         label1 = "Red dot = Kalman smoothed centroid"
         ocvb.desc = "Compute the centroid of the provided mask file."
@@ -26,12 +27,15 @@ Public Class Moments_Basics
         End If
         Dim m = cv.Cv2.Moments(inputMask, True)
 
-        'kalman.input(0) = m.M10 / m.M00
-        'kalman.input(1) = m.M01 / m.M00
-        'kalman.Run(ocvb)
-
-        'Dim center = New cv.Point2f(kalman.output(0), kalman.output(1))
-        Dim center = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
+        Dim center As cv.Point2f
+        If kalman.check.Box(0).Checked Or useKalman Then
+            kalman.input(0) = m.M10 / m.M00
+            kalman.input(1) = m.M01 / m.M00
+            kalman.Run(ocvb)
+            center = New cv.Point2f(kalman.output(0), kalman.output(1))
+        Else
+            center = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
+        End If
         If standalone Then dst1.Circle(center, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         centroid = New cv.Point2f(scaleFactor * (offsetPt.X + center.X), scaleFactor * (offsetPt.Y + center.Y))
     End Sub

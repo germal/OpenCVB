@@ -557,6 +557,17 @@ Public Class OpenCVB
             MsgBox("DisplayOfficeFile failed with error = " + ex.Message)
         End Try
     End Sub
+    Public Function validateRect(src As cv.Mat, r As cv.Rect) As cv.Rect
+        If r.Width < 0 Then r.Width = 1
+        If r.Height < 0 Then r.Height = 1
+        If r.X < 0 Then r.X = 0
+        If r.Y < 0 Then r.Y = 0
+        If r.X > src.Width Then r.X = src.Width
+        If r.Y > src.Height Then r.Y = src.Height
+        If r.X + r.Width > src.Width Then r.Width = src.Width - r.X
+        If r.Y + r.Height > src.Height Then r.Height = src.Height - r.Y
+        Return r
+    End Function
     Private Sub camPic_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Try
             If e.Button = Windows.Forms.MouseButtons.Left Then
@@ -570,7 +581,7 @@ Public Class OpenCVB
 
                 Dim pic = DirectCast(sender, PictureBox)
                 Dim src = Choose(pic.Tag + 1, camera.Color, camera.RGBDepth, formResult1, formResult2)
-
+                drawRect = validateRect(src, drawRect)
                 Dim srcROI = New cv.Mat
                 srcROI = src(drawRect).clone()
                 Dim csvName As New FileInfo(System.IO.Path.GetTempFileName() + ".csv")
@@ -583,7 +594,7 @@ Public Class OpenCVB
                 Next
                 sw.WriteLine()
                 For y = 0 To drawRect.Height - 1
-                    sw.Write("Row " + Format(drawRect.Y, "000") + "," + vbTab)
+                    sw.Write("Row " + Format(drawRect.Y + y, "000") + "," + vbTab)
                     For x = 0 To drawRect.Width - 1
                         Dim pt = srcROI.Get(Of cv.Vec3b)(y, x)
                         sw.Write(CStr(pt.Item0) + "," + CStr(pt.Item1) + "," + CStr(pt.Item2) + ",")

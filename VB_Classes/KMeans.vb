@@ -1,12 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class kMeans_Basics
     Inherits ocvbClass
-    Dim palette As Palette_Consistency
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders.setupTrackBar1(ocvb, caller, "kMeans k", 2, 32, 4)
-
-        palette = New Palette_Consistency(ocvb)
 
         ocvb.desc = "Cluster the rgb image pixels using kMeans."
     End Sub
@@ -31,9 +28,6 @@ Public Class kMeans_Basics
             dst1.SetTo(mean, mask)
         Next
         dst2 = dst1
-        palette.src = dst1
-        palette.Run(ocvb)
-        dst1 = palette.dst1
     End Sub
 End Class
 

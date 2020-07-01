@@ -6,7 +6,9 @@ Public Class CComp_Basics
     Inherits ocvbClass
     Public connectedComponents As Object
     Public rects As New List(Of cv.Rect)
+    Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
+    Public drawRectangles As Boolean = True
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders.setupTrackBar1(ocvb, caller, "CComp Threshold", 0, 255, 10)
@@ -42,6 +44,7 @@ Public Class CComp_Basics
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         rects.Clear()
         centroids.Clear()
+        masks.Clear()
         For Each blob In connectedComponents.Blobs
             If blob.Area < sliders.TrackBar2.Value Then Continue For ' skip it if too small...
             Dim rect = blob.Rect
@@ -50,6 +53,7 @@ Public Class CComp_Basics
             If rect.X + rect.Width > src.Width Or rect.Y + rect.Height > src.Height Then Continue For
             rects.Add(rect)
             Dim mask = dst1(rect)
+            masks.Add(mask)
 
             Dim m = cv.Cv2.Moments(mask, True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
@@ -57,8 +61,10 @@ Public Class CComp_Basics
 
             centroids.Add(centroid)
 
-            dst2(rect).Circle(centroid, 5, cv.Scalar.White, -1)
-            dst2.Rectangle(rect, cv.Scalar.White, 2)
+            If drawRectangles Then
+                dst2(rect).Circle(centroid, 5, cv.Scalar.Yellow, -1)
+                dst2.Rectangle(rect, cv.Scalar.White, 2)
+            End If
         Next
         lastImage = dst1.Clone()
     End Sub
@@ -303,3 +309,42 @@ Public Class CComp_Shapes
     End Sub
 End Class
 
+
+
+
+
+
+Public Class CComp_OverlappingRectangles
+    Inherits ocvbClass
+    Dim ccomp As CComp_Basics
+    Dim overlap As Draw_OverlappingRectangles
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        ccomp = New CComp_Basics(ocvb)
+        ccomp.sliders.TrackBar2.Value = 10 ' allow very small regions.
+
+        overlap = New Draw_OverlappingRectangles(ocvb)
+
+        label1 = "Input Image with all ccomp rectangles"
+        label2 = "Unique rectangles (largest to smallest) colored by size"
+        ocvb.desc = "Define unique regions in the RGB image by eliminating overlapping rectangles."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        ccomp.src = src
+        ccomp.Run(ocvb)
+        dst1 = ccomp.dst2
+
+        overlap.inputRects = ccomp.rects
+        overlap.inputMasks = ccomp.masks
+        overlap.Run(ocvb)
+
+        dst2.SetTo(0)
+        For i = 0 To overlap.sortedMasks.Count - 1
+            Dim mask = overlap.sortedMasks.ElementAt(overlap.sortedMasks.Count - i - 1).Value
+            Dim rect = overlap.sortedMasks.ElementAt(overlap.sortedMasks.Count - i - 1).Key
+            dst2(rect).SetTo(scalarColors(i), mask)
+            dst2.Rectangle(rect, cv.Scalar.White, 2)
+        Next
+    End Sub
+End Class
