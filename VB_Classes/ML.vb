@@ -357,7 +357,7 @@ End Class
 
 
 
-Public Class ML_EdgeDepth
+Public Class ML_EdgeDepth_MT
     Inherits ocvbClass
     Dim colorizer As Depth_Colorizer_CPP
     Dim grid As Thread_Grid
@@ -427,96 +427,53 @@ End Class
 
 
 
-
-Public Class ML_LearnPalette
+Public Class ML_Simple
     Inherits ocvbClass
-    Dim emax As EMax_Basics_CPP
-    Dim lut As LUT_Basics
-    Dim flood As FloodFill_Projection
-    Dim knn As knn_Basics
-    Dim scaleFactor = 1
-    Dim moment() As Moments_Basics
+    Public trainData As cv.Mat
+    Public response As cv.Mat
+    Public predictions As New cv.Mat
+    Dim rtree = cv.ML.RTrees.Create()
+    Dim emax As EMax_ConsistentPalette
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        emax = New EMax_Basics_CPP(ocvb)
-        emax.emax.sliders.TrackBar2.Value = 15
-        emax.showInput = False
 
-        lut = New LUT_Basics(ocvb)
+        emax = New EMax_ConsistentPalette(ocvb)
+        emax.emax.emax.grid.sliders.TrackBar1.Value = 270
+        emax.emax.emax.grid.sliders.TrackBar2.Value = 150
 
-        flood = New FloodFill_Projection(ocvb)
-        flood.sliders.TrackBar1.Value /= scaleFactor
-        knn = New knn_Basics(ocvb)
-        ReDim knn.input(1)
-        knn.sliders.TrackBar2.Value = 1
-
-        ReDim moment(10 - 1)
-        ocvb.parms.ShowOptions = False
-
-        ocvb.desc = "Using a histogram, assign the same colors to the same areas across frames"
+        ocvb.desc = "Simplest form for using RandomForest in OpenCV"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst1.SetTo(0)
         If standalone Then
             emax.Run(ocvb)
-            src = emax.dst2
+            src = emax.dst1
+            dst1 = emax.dst1
         End If
-        Dim size = New cv.Size(CInt(ocvb.color.Width / scaleFactor), CInt(ocvb.color.Height / scaleFactor))
-        Dim img = src.Resize(size, 0, 0, cv.InterpolationFlags.Cubic)
-        img = img.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        flood.src = img
-        flood.Run(ocvb)
-
-        If flood.rects.Count > 0 Then
-            dst2 = src
-            Dim reallocated As Boolean
-            Dim cCount = flood.rects.Count
-            If knn.input.Count <> cCount Then
-                Console.WriteLine("Reallocation with " + CStr(cCount))
-                ReDim moment(cCount - 1)
-                For i = 0 To moment.Count - 1
-                    moment(i) = New Moments_Basics(ocvb)
-                    moment(i).scaleFactor = scaleFactor
-                Next
-                ReDim knn.input(cCount - 1)
-                ReDim knn.queryPoints(cCount - 1)
-                reallocated = True
+        Dim nextResponse = emax.response
+        Dim nextInput = emax.descriptors
+        If ocvb.frameCount = 0 Then
+            trainData = emax.descriptors.Clone()
+            response = nextResponse.Clone()
+            rtree.Train(trainData, cv.ML.SampleTypes.RowSample, nextResponse)
+        Else
+            Dim residual As Integer = 20 * trainData.Rows ' we need about x iterations to settle in on the right values...
+            If trainData.Rows > residual Then
+                cv.Cv2.VConcat(trainData(New cv.Rect(0, trainData.Rows - residual, trainData.Cols, residual)), nextInput, trainData)
+                cv.Cv2.VConcat(response(New cv.Rect(0, response.Rows - residual, response.Cols, residual)), nextResponse, response)
+            Else
+                cv.Cv2.VConcat(trainData, nextInput, trainData)
+                cv.Cv2.VConcat(response, nextResponse, response)
             End If
-
-            For i = 0 To cCount - 1
-                moment(i).inputMask = flood.masks(i)
-                moment(i).offsetPt = New cv.Point(flood.rects(i).X, flood.rects(i).Y)
-                moment(i).useKalman = False
-                moment(i).Run(ocvb)
-                knn.queryPoints(i) = moment(i).centroid
-                If reallocated Then
-                    knn.input(i) = moment(i).centroid
-                End If
-            Next
-
-            knn.Run(ocvb)
-
-            If reallocated Then
-                For i = 0 To cCount - 1
-                    knn.input(i) = moment(knn.matchedIndex(i)).centroid
-                    moment(i).useKalman = True
-                    moment(i).Run(ocvb)
-                Next
-            End If
-
-            knn.Run(ocvb)
-
-            For i = 0 To knn.matchedPoints.Count - 1
-                dst1.Circle(knn.queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-                dst1.Circle(knn.matchedPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-                dst1.Line(knn.matchedPoints(i), knn.queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
-                dst2.Circle(moment(i).centroid, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-            Next
-
-            For i = 0 To cCount - 1
-                knn.input(i) = moment(knn.matchedIndex(i)).centroid
-            Next
         End If
+
+        rtree.Predict(nextInput, predictions)
+
+        For i = 0 To predictions.Rows - 1
+            Console.Write("p(" + CStr(i) + ") = " + CStr(CInt(predictions.Get(Of Single)(i, 0))) + vbTab)
+        Next
+        Console.WriteLine("")
+
+        rtree.Train(trainData, cv.ML.SampleTypes.RowSample, response)
     End Sub
 End Class

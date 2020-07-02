@@ -53,34 +53,39 @@ Partial Class OptionsSliders
         Me.GroupBox1.Controls.Add(Me.TrackBar1)
         Me.GroupBox1.Controls.Add(Me.LabelSlider1)
         Me.GroupBox1.Controls.Add(Me.Label1)
-        Me.GroupBox1.Location = New System.Drawing.Point(14, 12)
+        Me.GroupBox1.Location = New System.Drawing.Point(21, 18)
+        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(578, 53)
+        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.GroupBox1.Size = New System.Drawing.Size(867, 82)
         Me.GroupBox1.TabIndex = 7
         Me.GroupBox1.TabStop = False
         '
         'TrackBar1
         '
-        Me.TrackBar1.Location = New System.Drawing.Point(146, 8)
+        Me.TrackBar1.Location = New System.Drawing.Point(219, 12)
+        Me.TrackBar1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TrackBar1.Maximum = 100
         Me.TrackBar1.Name = "TrackBar1"
-        Me.TrackBar1.Size = New System.Drawing.Size(365, 45)
+        Me.TrackBar1.Size = New System.Drawing.Size(548, 69)
         Me.TrackBar1.TabIndex = 5
         '
         'LabelSlider1
         '
-        Me.LabelSlider1.Location = New System.Drawing.Point(10, 16)
+        Me.LabelSlider1.Location = New System.Drawing.Point(15, 25)
+        Me.LabelSlider1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.LabelSlider1.Name = "LabelSlider1"
-        Me.LabelSlider1.Size = New System.Drawing.Size(200, 60)
+        Me.LabelSlider1.Size = New System.Drawing.Size(214, 92)
         Me.LabelSlider1.TabIndex = 6
         Me.LabelSlider1.Text = "LabelSlider1"
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(528, 27)
+        Me.Label1.Location = New System.Drawing.Point(792, 42)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(39, 13)
+        Me.Label1.Size = New System.Drawing.Size(57, 20)
         Me.Label1.TabIndex = 7
         Me.Label1.Text = "Label1"
         '
@@ -89,35 +94,40 @@ Partial Class OptionsSliders
         Me.GroupBox2.Controls.Add(Me.TrackBar2)
         Me.GroupBox2.Controls.Add(Me.LabelSlider2)
         Me.GroupBox2.Controls.Add(Me.Label2)
-        Me.GroupBox2.Location = New System.Drawing.Point(14, 64)
+        Me.GroupBox2.Location = New System.Drawing.Point(21, 98)
+        Me.GroupBox2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(578, 55)
+        Me.GroupBox2.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.GroupBox2.Size = New System.Drawing.Size(867, 85)
         Me.GroupBox2.TabIndex = 8
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Visible = False
         '
         'TrackBar2
         '
-        Me.TrackBar2.Location = New System.Drawing.Point(146, 10)
+        Me.TrackBar2.Location = New System.Drawing.Point(219, 15)
+        Me.TrackBar2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TrackBar2.Maximum = 100
         Me.TrackBar2.Name = "TrackBar2"
-        Me.TrackBar2.Size = New System.Drawing.Size(365, 45)
+        Me.TrackBar2.Size = New System.Drawing.Size(548, 69)
         Me.TrackBar2.TabIndex = 5
         '
         'LabelSlider2
         '
-        Me.LabelSlider2.Location = New System.Drawing.Point(10, 19)
+        Me.LabelSlider2.Location = New System.Drawing.Point(15, 29)
+        Me.LabelSlider2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.LabelSlider2.Name = "LabelSlider2"
-        Me.LabelSlider2.Size = New System.Drawing.Size(200, 60)
+        Me.LabelSlider2.Size = New System.Drawing.Size(214, 92)
         Me.LabelSlider2.TabIndex = 6
         Me.LabelSlider2.Text = "LabelSlider2"
         '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(528, 19)
+        Me.Label2.Location = New System.Drawing.Point(792, 29)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(39, 13)
+        Me.Label2.Size = New System.Drawing.Size(57, 20)
         Me.Label2.TabIndex = 7
         Me.Label2.Text = "Label3"
         '
@@ -126,35 +136,40 @@ Partial Class OptionsSliders
         Me.GroupBox3.Controls.Add(Me.TrackBar3)
         Me.GroupBox3.Controls.Add(Me.LabelSlider3)
         Me.GroupBox3.Controls.Add(Me.Label3)
-        Me.GroupBox3.Location = New System.Drawing.Point(14, 118)
+        Me.GroupBox3.Location = New System.Drawing.Point(21, 182)
+        Me.GroupBox3.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(578, 53)
+        Me.GroupBox3.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.GroupBox3.Size = New System.Drawing.Size(867, 82)
         Me.GroupBox3.TabIndex = 9
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Visible = False
         '
         'TrackBar3
         '
-        Me.TrackBar3.Location = New System.Drawing.Point(146, 13)
+        Me.TrackBar3.Location = New System.Drawing.Point(219, 20)
+        Me.TrackBar3.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TrackBar3.Maximum = 100
         Me.TrackBar3.Name = "TrackBar3"
-        Me.TrackBar3.Size = New System.Drawing.Size(365, 45)
+        Me.TrackBar3.Size = New System.Drawing.Size(548, 69)
         Me.TrackBar3.TabIndex = 5
         '
         'LabelSlider3
         '
-        Me.LabelSlider3.Location = New System.Drawing.Point(10, 18)
+        Me.LabelSlider3.Location = New System.Drawing.Point(15, 28)
+        Me.LabelSlider3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.LabelSlider3.Name = "LabelSlider3"
-        Me.LabelSlider3.Size = New System.Drawing.Size(200, 60)
+        Me.LabelSlider3.Size = New System.Drawing.Size(214, 92)
         Me.LabelSlider3.TabIndex = 6
         Me.LabelSlider3.Text = "LabelSlider3"
         '
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(528, 18)
+        Me.Label3.Location = New System.Drawing.Point(792, 28)
+        Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(39, 13)
+        Me.Label3.Size = New System.Drawing.Size(57, 20)
         Me.Label3.TabIndex = 7
         Me.Label3.Text = "Label5"
         '
@@ -163,48 +178,54 @@ Partial Class OptionsSliders
         Me.GroupBox4.Controls.Add(Me.TrackBar4)
         Me.GroupBox4.Controls.Add(Me.LabelSlider4)
         Me.GroupBox4.Controls.Add(Me.Label4)
-        Me.GroupBox4.Location = New System.Drawing.Point(14, 170)
+        Me.GroupBox4.Location = New System.Drawing.Point(21, 262)
+        Me.GroupBox4.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBox4.Name = "GroupBox4"
-        Me.GroupBox4.Size = New System.Drawing.Size(578, 53)
+        Me.GroupBox4.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.GroupBox4.Size = New System.Drawing.Size(867, 82)
         Me.GroupBox4.TabIndex = 10
         Me.GroupBox4.TabStop = False
         Me.GroupBox4.Visible = False
         '
         'TrackBar4
         '
-        Me.TrackBar4.Location = New System.Drawing.Point(146, 12)
+        Me.TrackBar4.Location = New System.Drawing.Point(219, 19)
+        Me.TrackBar4.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TrackBar4.Maximum = 100
         Me.TrackBar4.Name = "TrackBar4"
-        Me.TrackBar4.Size = New System.Drawing.Size(365, 45)
+        Me.TrackBar4.Size = New System.Drawing.Size(548, 69)
         Me.TrackBar4.TabIndex = 5
         '
         'LabelSlider4
         '
-        Me.LabelSlider4.Location = New System.Drawing.Point(7, 16)
+        Me.LabelSlider4.Location = New System.Drawing.Point(10, 25)
+        Me.LabelSlider4.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.LabelSlider4.Name = "LabelSlider4"
-        Me.LabelSlider4.Size = New System.Drawing.Size(200, 60)
+        Me.LabelSlider4.Size = New System.Drawing.Size(219, 92)
         Me.LabelSlider4.TabIndex = 6
         Me.LabelSlider4.Text = "Label6"
         '
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(528, 16)
+        Me.Label4.Location = New System.Drawing.Point(792, 25)
+        Me.Label4.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(39, 13)
+        Me.Label4.Size = New System.Drawing.Size(57, 20)
         Me.Label4.TabIndex = 7
         Me.Label4.Text = "Label7"
         '
         'OptionsSliders
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(605, 226)
+        Me.ClientSize = New System.Drawing.Size(908, 348)
         Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "OptionsSliders"

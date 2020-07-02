@@ -166,10 +166,13 @@ End Class
 
 Public Class EMax_ConsistentPalette
     Inherits ocvbClass
-    Dim emax As EMax_Basics_CPP
-    Dim flood As FloodFill_Basics
-    Dim dilate As DilateErode_Basics
-    Dim canny As Edges_Canny
+    Public emax As EMax_Basics_CPP
+    Public flood As FloodFill_Basics
+    Public dilate As DilateErode_Basics
+    Public canny As Edges_Canny
+    Public stepsize = 50
+    Public descriptors As New cv.Mat
+    Public response As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
@@ -201,19 +204,37 @@ Public Class EMax_ConsistentPalette
         Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
         Dim maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
         maskPlus(maskRect).SetTo(255, dilate.dst1)
-        Dim stepsize = 50
         Dim cIndex As Integer
         Dim rect As New cv.Rect
         Dim zeroVec As New cv.Vec3b
+        Dim rects As New List(Of cv.Rect)
+        Dim pixelCount As New List(Of Integer)
+        Dim colors As New List(Of Integer)
         For y = 0 To dst1.Height - 1 Step stepsize
             For x = 0 To dst1.Width - 1 Step stepsize
                 If dst1.Get(Of cv.Vec3b)(y, x) = zeroVec Then
-                    cv.Cv2.FloodFill(dst1, maskPlus, New cv.Point(x, y), scalarColors(cIndex Mod 256), rect, 1, 1,
-                                     cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
+                    cv.Cv2.FloodFill(dst1, maskPlus, New cv.Point2f(x, y), scalarColors(cIndex Mod 256), rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
+                    rects.Add(rect)
+                    pixelCount.Add(cv.Cv2.CountNonZero(maskPlus))
+                    colors.Add(cIndex)
                     cIndex += 1
                 End If
             Next
         Next
+        response = New cv.Mat(rects.Count, 1, cv.MatType.CV_32S, colors.ToArray)
+        response.ConvertTo(response, cv.MatType.CV_32F)
+
+        Dim split(2 - 1) As cv.Mat
+
+        split(0) = New cv.Mat(rects.Count, 1, cv.MatType.CV_32S, pixelCount.ToArray)
+        split(0).ConvertTo(split(0), cv.MatType.CV_32F)
+
+        split(1) = New cv.Mat(rects.Count, 1, cv.MatType.CV_32SC4, rects.ToArray)
+        split(1).ConvertTo(split(1), cv.MatType.CV_32FC4)
+
+        cv.Cv2.Merge(split, descriptors)
+        descriptors = New cv.Mat(rects.Count, 5, cv.MatType.CV_32F, descriptors.Data).Clone()
+
         dst1.SetTo(0, emax.inputDataMask)
     End Sub
 End Class
