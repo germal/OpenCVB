@@ -431,33 +431,45 @@ Public Class ML_Simple
     Inherits ocvbClass
     Public trainData As cv.Mat
     Public response As cv.Mat
-    Public predictions As New cv.Mat
     Dim rtree = cv.ML.RTrees.Create()
-    Dim emax As EMax_ConsistentPalette
+    Public predictions As New cv.Mat
+    Dim emax As EMax_PaletteConsistencyCentroid
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        emax = New EMax_ConsistentPalette(ocvb)
-        emax.emax.emax.grid.sliders.TrackBar1.Value = 270
-        emax.emax.emax.grid.sliders.TrackBar2.Value = 150
-
-        ocvb.desc = "Simplest form for using RandomForest in OpenCV"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
-            emax.Run(ocvb)
-            src = emax.dst1
-            dst1 = emax.dst1
+            emax = New EMax_PaletteConsistencyCentroid(ocvb)
+            emax.emaxCPP.basics.grid.sliders.TrackBar1.Value = 270
+            emax.emaxCPP.basics.grid.sliders.TrackBar2.Value = 150
         End If
 
-        Dim nextResponse = emax.response
-        Dim nextInput = emax.descriptors
+        label1 = ""
+        label2 = ""
+        ocvb.desc = "Simplest form for using RandomForest in OpenCV"
+    End Sub
+    Private Function convertScalarToVec3b(s As cv.Scalar) As cv.Vec3b
+        Dim vec As New cv.Mat
+        Dim tmp = New cv.Mat(1, 1, cv.MatType.CV_32FC3, s)
+        tmp.ConvertTo(vec, cv.MatType.CV_8UC3)
+        Return New cv.Vec3b(vec.Get(Of Byte)(0, 0), vec.Get(Of Byte)(0, 1), vec.Get(Of Byte)(0, 2))
+    End Function
+
+
+    Public Sub Run(ocvb As AlgorithmData)
+        Static lastColors As New cv.Mat
+        If standalone Then
+            emax.Run(ocvb)
+            dst1 = emax.dst1.Clone()
+        End If
+        Dim nextResponse = emax.response.Clone
+        Dim nextInput = emax.descriptors.Clone
         If ocvb.frameCount = 0 Then
-            trainData = emax.descriptors.Clone()
-            response = nextResponse.Clone()
-            rtree.Train(trainData, cv.ML.SampleTypes.RowSample, nextResponse)
+            trainData = nextInput
+            response = nextResponse
+            rtree.Train(trainData, cv.ML.SampleTypes.RowSample, response)
+            lastColors = emax.dst1.Clone()
         Else
-            Dim residual As Integer = 20 * trainData.Rows ' we need about x iterations to settle in on the right values...
+            Dim residual As Integer = 20 * nextInput.Rows ' we need about x iterations to settle in on the right values...
             If trainData.Rows > residual Then
                 cv.Cv2.VConcat(trainData(New cv.Rect(0, trainData.Rows - residual, trainData.Cols, residual)), nextInput, trainData)
                 cv.Cv2.VConcat(response(New cv.Rect(0, response.Rows - residual, response.Cols, residual)), nextResponse, response)
@@ -469,11 +481,22 @@ Public Class ML_Simple
 
         rtree.Predict(nextInput, predictions)
 
-        For i = 0 To predictions.Rows - 1
-            Console.Write("p(" + CStr(i) + ") = " + CStr(CInt(predictions.Get(Of Single)(i, 0))) + vbTab)
-        Next
-        Console.WriteLine("")
+        If standalone Then
+            Dim truthCount As Integer
+            For i = 0 To nextInput.Rows - 1
+                Dim pt = nextInput.Get(Of cv.Point2f)(i, 0)
+                Dim cIndex = CInt(predictions.Get(Of Single)(i, 0))
+                cv.Cv2.FloodFill(dst1, New cv.Mat, pt, scalarColors(cIndex), New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
+                Dim vec = convertScalarToVec3b(scalarColors(cIndex))
+                If vec = lastColors.Get(Of cv.Vec3b)(pt.Y, pt.X) Then truthCount += 1
+                dst1.Circle(pt, 10, cv.Scalar.Black, -1, cv.LineTypes.AntiAlias)
+            Next
+            dst2 = (dst1 - lastColors).ToMat
+            label2 = CStr(truthCount) + " colors correctly predicted with centroid"
+        End If
 
-        rtree.Train(trainData, cv.ML.SampleTypes.RowSample, response)
+        rtree.Train(trainData, cv.ML.SampleTypes.RowSample, response) ' use the latest results to train the next iteration.
+        cv.Cv2.ImShow("lastColors", lastColors)
+        lastColors = emax.dst1.Clone()
     End Sub
 End Class

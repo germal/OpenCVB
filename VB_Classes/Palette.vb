@@ -410,7 +410,7 @@ Public Class Palette_Consistency
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         emax = New EMax_Basics_CPP(ocvb)
-        emax.emax.sliders.TrackBar2.Value = 15
+        emax.basics.sliders.TrackBar2.Value = 15
 
         hist = New Histogram_Simple(ocvb)
         hist.sliders.TrackBar1.Value = 255
@@ -461,95 +461,95 @@ End Class
 
 
 
-Public Class Palette_ConsistentCentroid_3PointOnly
-    Inherits ocvbClass
-    Dim emax As EMax_Basics_CPP
-    Dim lut As LUT_Basics
-    Dim flood As FloodFill_Projection
-    Dim knn As knn_Basics
-    Dim scaleFactor = 1
-    Dim moment() As Moments_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        emax = New EMax_Basics_CPP(ocvb)
-        emax.emax.sliders.TrackBar2.Value = 15
-        emax.showInput = False
+'Public Class Palette_ConsistentCentroid_3PointOnly
+'    Inherits ocvbClass
+'    Dim emax As EMax_Basics_CPP
+'    Dim lut As LUT_Basics
+'    Dim flood As FloodFill_Projection
+'    Dim knn As knn_Basics
+'    Dim scaleFactor = 1
+'    Dim moment() As Moments_Basics
+'    Public Sub New(ocvb As AlgorithmData)
+'        setCaller(ocvb)
+'        emax = New EMax_Basics_CPP(ocvb)
+'        emax.basics.sliders.TrackBar2.Value = 15
+'        emax.showInput = False
 
-        lut = New LUT_Basics(ocvb)
+'        lut = New LUT_Basics(ocvb)
 
-        flood = New FloodFill_Projection(ocvb)
-        flood.sliders.TrackBar1.Value /= scaleFactor
-        knn = New knn_Basics(ocvb)
-        ReDim knn.input(1)
-        knn.sliders.TrackBar2.Value = 1
+'        flood = New FloodFill_Projection(ocvb)
+'        flood.sliders.TrackBar1.Value /= scaleFactor
+'        knn = New knn_Basics(ocvb)
+'        ReDim knn.input(1)
+'        knn.sliders.TrackBar2.Value = 1
 
-        ReDim moment(10 - 1)
-        ocvb.parms.ShowOptions = False
+'        ReDim moment(10 - 1)
+'        ocvb.parms.ShowOptions = False
 
-        ocvb.desc = "Try to keep track of the centroids from frame to frame - needs more work"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        dst1.SetTo(0)
-        If standalone Then
-            emax.Run(ocvb)
-            src = emax.dst2
-        End If
-        Dim size = New cv.Size(CInt(ocvb.color.Width / scaleFactor), CInt(ocvb.color.Height / scaleFactor))
-        Dim img = src.Resize(size, 0, 0, cv.InterpolationFlags.Cubic)
-        img = img.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'        ocvb.desc = "Try to keep track of the centroids from frame to frame - needs more work"
+'    End Sub
+'    Public Sub Run(ocvb As AlgorithmData)
+'        dst1.SetTo(0)
+'        If standalone Then
+'            emax.Run(ocvb)
+'            src = emax.dst2
+'        End If
+'        Dim size = New cv.Size(CInt(ocvb.color.Width / scaleFactor), CInt(ocvb.color.Height / scaleFactor))
+'        Dim img = src.Resize(size, 0, 0, cv.InterpolationFlags.Cubic)
+'        img = img.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        flood.src = img
-        flood.Run(ocvb)
+'        flood.src = img
+'        flood.Run(ocvb)
 
-        If flood.rects.Count > 0 Then
-            dst2 = src
-            Dim reallocated As Boolean
-            Dim cCount = flood.rects.Count
-            If knn.input.Count <> cCount Then
-                Console.WriteLine("Reallocation with " + CStr(cCount))
-                ReDim moment(cCount - 1)
-                For i = 0 To moment.Count - 1
-                    moment(i) = New Moments_Basics(ocvb)
-                    moment(i).scaleFactor = scaleFactor
-                Next
-                ReDim knn.input(cCount - 1)
-                ReDim knn.queryPoints(cCount - 1)
-                reallocated = True
-            End If
+'        If flood.rects.Count > 0 Then
+'            dst2 = src
+'            Dim reallocated As Boolean
+'            Dim cCount = flood.rects.Count
+'            If knn.input.Count <> cCount Then
+'                Console.WriteLine("Reallocation with " + CStr(cCount))
+'                ReDim moment(cCount - 1)
+'                For i = 0 To moment.Count - 1
+'                    moment(i) = New Moments_Basics(ocvb)
+'                    moment(i).scaleFactor = scaleFactor
+'                Next
+'                ReDim knn.input(cCount - 1)
+'                ReDim knn.queryPoints(cCount - 1)
+'                reallocated = True
+'            End If
 
-            For i = 0 To cCount - 1
-                moment(i).inputMask = flood.masks(i)
-                moment(i).offsetPt = New cv.Point(flood.rects(i).X, flood.rects(i).Y)
-                moment(i).useKalman = False
-                moment(i).Run(ocvb)
-                knn.queryPoints(i) = moment(i).centroid
-                If reallocated Then
-                    knn.input(i) = moment(i).centroid
-                End If
-            Next
+'            For i = 0 To cCount - 1
+'                moment(i).inputMask = flood.masks(i)
+'                moment(i).offsetPt = New cv.Point(flood.rects(i).X, flood.rects(i).Y)
+'                moment(i).useKalman = False
+'                moment(i).Run(ocvb)
+'                knn.queryPoints(i) = moment(i).centroid
+'                If reallocated Then
+'                    knn.input(i) = moment(i).centroid
+'                End If
+'            Next
 
-            knn.Run(ocvb)
+'            knn.Run(ocvb)
 
-            If reallocated Then
-                For i = 0 To cCount - 1
-                    knn.input(i) = moment(knn.matchedIndex(i)).centroid
-                    moment(i).useKalman = True
-                    moment(i).Run(ocvb)
-                Next
-            End If
+'            If reallocated Then
+'                For i = 0 To cCount - 1
+'                    knn.input(i) = moment(knn.matchedIndex(i)).centroid
+'                    moment(i).useKalman = True
+'                    moment(i).Run(ocvb)
+'                Next
+'            End If
 
-            knn.Run(ocvb)
+'            knn.Run(ocvb)
 
-            For i = 0 To knn.matchedPoints.Count - 1
-                dst1.Circle(knn.queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-                dst1.Circle(knn.matchedPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-                dst1.Line(knn.matchedPoints(i), knn.queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
-                dst2.Circle(moment(i).centroid, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-            Next
+'            For i = 0 To knn.matchedPoints.Count - 1
+'                dst1.Circle(knn.queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+'                dst1.Circle(knn.matchedPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+'                dst1.Line(knn.matchedPoints(i), knn.queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+'                dst2.Circle(moment(i).centroid, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+'            Next
 
-            For i = 0 To cCount - 1
-                knn.input(i) = moment(knn.matchedIndex(i)).centroid
-            Next
-        End If
-    End Sub
-End Class
+'            For i = 0 To cCount - 1
+'                knn.input(i) = moment(knn.matchedIndex(i)).centroid
+'            Next
+'        End If
+'    End Sub
+'End Class

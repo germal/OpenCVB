@@ -109,27 +109,27 @@ End Module
 
 Public Class EMax_Basics_CPP
     Inherits ocvbClass
-    Public emax As EMax_Basics
+    Public basics As EMax_Basics
     Public showInput As Boolean = True
     Public inputDataMask As cv.Mat
     Dim EMax_Basics As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        emax = New EMax_Basics(ocvb)
+        basics = New EMax_Basics(ocvb)
 
         EMax_Basics = EMax_Basics_Open()
         label2 = "Emax regions around clusters"
         ocvb.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        emax.Run(ocvb)
-        dst1 = emax.dst1
-        Dim srcCount = emax.sliders.TrackBar1.Value
-        label1 = CStr(srcCount) + " Random samples in " + CStr(emax.regionCount) + " clusters"
+        basics.Run(ocvb)
+        dst1 = basics.dst1
+        Dim srcCount = basics.sliders.TrackBar1.Value
+        label1 = CStr(srcCount) + " Random samples in " + CStr(basics.regionCount) + " clusters"
 
         Dim covarianceMatrixType As Int32 = 0
         For i = 0 To 3 - 1
-            If emax.radio.check(i).Checked = True Then
+            If basics.radio.check(i).Checked = True Then
                 covarianceMatrixType = Choose(i + 1, cv.EM.Types.CovMatSpherical, cv.EM.Types.CovMatDiagonal, cv.EM.Types.CovMatGeneric)
             End If
         Next
@@ -137,15 +137,15 @@ Public Class EMax_Basics_CPP
         Dim srcData((srcCount - 1) * 2) As Single
         Dim handleSrc As GCHandle
         handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
-        Marshal.Copy(emax.samples.Data, srcData, 0, srcData.Length)
+        Marshal.Copy(basics.samples.Data, srcData, 0, srcData.Length)
 
         Dim labelData(srcCount - 1) As Int32
         Dim handleLabels As GCHandle
         handleLabels = GCHandle.Alloc(labelData, GCHandleType.Pinned)
-        Marshal.Copy(emax.labels.Data, labelData, 0, labelData.Length)
+        Marshal.Copy(basics.labels.Data, labelData, 0, labelData.Length)
 
         Dim imagePtr = EMax_Basics_Run(EMax_Basics, handleSrc.AddrOfPinnedObject(), handleLabels.AddrOfPinnedObject(), srcCount, 2,
-                                       dst1.Rows, dst1.Cols, emax.regionCount, emax.sliders.TrackBar2.Value, covarianceMatrixType)
+                                       dst1.Rows, dst1.Cols, basics.regionCount, basics.sliders.TrackBar2.Value, covarianceMatrixType)
         handleLabels.Free() ' free the pinned memory...
         handleSrc.Free() ' free the pinned memory...
 
@@ -164,9 +164,9 @@ End Class
 
 
 
-Public Class EMax_ConsistentPalette
+Public Class EMax_PaletteConsistencyRect
     Inherits ocvbClass
-    Public emax As EMax_Basics_CPP
+    Public emaxCPP As EMax_Basics_CPP
     Public flood As FloodFill_Basics
     Public dilate As DilateErode_Basics
     Public canny As Edges_Canny
@@ -182,60 +182,119 @@ Public Class EMax_ConsistentPalette
         canny.sliders.TrackBar1.Value = 1
         canny.sliders.TrackBar2.Value = 1
 
-        emax = New EMax_Basics_CPP(ocvb)
-        emax.showInput = False
-        emax.emax.sliders.TrackBar2.Value = 15
+        emaxCPP = New EMax_Basics_CPP(ocvb)
+        emaxCPP.showInput = False
+        emaxCPP.basics.sliders.TrackBar2.Value = 15
 
         flood = New FloodFill_Basics(ocvb)
 
-        ocvb.desc = "Display EMax results with a consisten palette from frame to frame"
+        ocvb.desc = "Try to display EMax results with a consistent palette from frame to frame - not successful"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        emax.Run(ocvb)
-        emax.dst2.Rectangle(New cv.Rect(0, 0, src.Width, src.Height), cv.Scalar.White, 1)
 
-        canny.src = emax.dst2
+        emaxCPP.Run(ocvb)
+        emaxCPP.dst2.Rectangle(New cv.Rect(0, 0, src.Width, src.Height), cv.Scalar.White, 1)
+
+        canny.src = emaxCPP.dst2
         canny.Run(ocvb)
 
         dilate.src = canny.dst2
         dilate.Run(ocvb)
-
         dst1 = dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
+
         Dim maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
+        Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
         maskPlus(maskRect).SetTo(255, dilate.dst1)
+
         Dim cIndex As Integer
         Dim rect As New cv.Rect
-        Dim zeroVec As New cv.Vec3b
         Dim rects As New List(Of cv.Rect)
-        Dim pixelCount As New List(Of Integer)
         Dim colors As New List(Of Integer)
+        Dim zeroVec As New cv.Vec3b
         For y = 0 To dst1.Height - 1 Step stepsize
             For x = 0 To dst1.Width - 1 Step stepsize
                 If dst1.Get(Of cv.Vec3b)(y, x) = zeroVec Then
                     cv.Cv2.FloodFill(dst1, maskPlus, New cv.Point2f(x, y), scalarColors(cIndex Mod 256), rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
                     rects.Add(rect)
-                    pixelCount.Add(cv.Cv2.CountNonZero(maskPlus))
                     colors.Add(cIndex)
                     cIndex += 1
                 End If
             Next
         Next
         response = New cv.Mat(rects.Count, 1, cv.MatType.CV_32S, colors.ToArray)
-        response.ConvertTo(response, cv.MatType.CV_32F)
+        descriptors = New cv.Mat(rects.Count, 4, cv.MatType.CV_32S, rects.ToArray)
+        descriptors.ConvertTo(descriptors, cv.MatType.CV_32F)
 
-        Dim split(2 - 1) As cv.Mat
-
-        split(0) = New cv.Mat(rects.Count, 1, cv.MatType.CV_32S, pixelCount.ToArray)
-        split(0).ConvertTo(split(0), cv.MatType.CV_32F)
-
-        split(1) = New cv.Mat(rects.Count, 1, cv.MatType.CV_32SC4, rects.ToArray)
-        split(1).ConvertTo(split(1), cv.MatType.CV_32FC4)
-
-        cv.Cv2.Merge(split, descriptors)
-        descriptors = New cv.Mat(rects.Count, 5, cv.MatType.CV_32F, descriptors.Data).Clone()
-
-        dst1.SetTo(0, emax.inputDataMask)
+        'dst1.SetTo(0, emaxCPP.inputDataMask)
     End Sub
 End Class
 
+
+
+
+
+
+Public Class EMax_PaletteConsistencyCentroid
+    Inherits ocvbClass
+    Public emaxCPP As EMax_Basics_CPP
+    Public flood As FloodFill_Basics
+    Public dilate As DilateErode_Basics
+    Public canny As Edges_Canny
+    Public stepsize = 50
+    Public descriptors As New cv.Mat
+    Public response As New cv.Mat
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        dilate = New DilateErode_Basics(ocvb)
+
+        canny = New Edges_Canny(ocvb)
+        canny.sliders.TrackBar1.Value = 1
+        canny.sliders.TrackBar2.Value = 1
+
+        emaxCPP = New EMax_Basics_CPP(ocvb)
+        emaxCPP.showInput = False
+        emaxCPP.basics.sliders.TrackBar2.Value = 15
+
+        flood = New FloodFill_Basics(ocvb)
+
+        ocvb.desc = "Try to display EMax results with a consistent palette from frame to frame - not successful for > 3 rows"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+
+        emaxCPP.Run(ocvb)
+        emaxCPP.dst2.Rectangle(New cv.Rect(0, 0, src.Width, src.Height), cv.Scalar.White, 1)
+
+        canny.src = emaxCPP.dst2
+        canny.Run(ocvb)
+
+        dilate.src = canny.dst2
+        dilate.Run(ocvb)
+        dst1 = dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        Dim maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
+        Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
+        maskPlus(maskRect).SetTo(255, dilate.dst1)
+
+        Dim cIndex As Integer
+        Dim rect As New cv.Rect
+        Dim centroids As New List(Of cv.Point2f)
+        Dim colors As New List(Of Integer)
+        Dim zeroVec As New cv.Vec3b
+        For y = 0 To dst1.Height - 1 Step stepsize
+            For x = 0 To dst1.Width - 1 Step stepsize
+                If dst1.Get(Of cv.Vec3b)(y, x) = zeroVec Then
+                    cv.Cv2.FloodFill(dst1, maskPlus, New cv.Point2f(x, y), scalarColors(cIndex Mod 256), rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
+                    Dim m = cv.Cv2.Moments(maskPlus(rect), True)
+                    centroids.Add(New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00))
+                    colors.Add(cIndex)
+                    cIndex += 1
+                End If
+            Next
+        Next
+        response = New cv.Mat(centroids.Count, 1, cv.MatType.CV_32S, colors.ToArray)
+        descriptors = New cv.Mat(centroids.Count, 2, cv.MatType.CV_32F, centroids.ToArray)
+
+        'dst1.SetTo(0, emaxCPP.inputDataMask)
+    End Sub
+End Class

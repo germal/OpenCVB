@@ -2,11 +2,12 @@ Imports cv = OpenCvSharp
 Public Class knn_Basics
     Inherits ocvbClass
     Dim random As Random_Points
-    Public input() As cv.Point2f
-    Public queryPoints() As cv.Point2f
+    Public trainData As cv.Mat
+    Public queryPoints As cv.Mat
     Public matchedPoints(1) As cv.Point2f
     Public matchedIndex() As Integer
     Dim knn As cv.ML.KNearest
+    Public retrainNeeded As Boolean = True
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         If standalone Then
@@ -19,57 +20,88 @@ Public Class knn_Basics
         knn = cv.ML.KNearest.Create()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        Dim qPointCount = sliders.TrackBar2.Value
         If standalone Then
             dst1.SetTo(0)
             random.Run(ocvb)
-            input = random.Points2f
-        End If
+            trainData = New cv.Mat(random.Points2f.Count, 2, cv.MatType.CV_32F, random.Points2f)
 
-        Dim trainData = New cv.Mat(input.Length, 2, cv.MatType.CV_32F, input)
-        Dim responses(input.Length - 1) As Int32
-        For i = 0 To responses.Length - 1
-            responses(i) = i
-        Next
-        knn.Train(trainData, cv.ML.SampleTypes.RowSample, New cv.Mat(responses.Length, 1, cv.MatType.CV_32S, responses))
-        If input.Count <> matchedPoints.Count Then
-            ReDim matchedPoints(input.Count - 1)
-            ReDim matchedIndex(input.Count - 1)
-        End If
-
-        Dim qPointCount = sliders.TrackBar2.Value
-        If standalone Then
-            ReDim queryPoints(qPointCount)
+            queryPoints = New cv.Mat(qPointCount, 1, cv.MatType.CV_32FC2, 0)
             For i = 0 To qPointCount - 1
-                queryPoints(i) = New cv.Point2f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows))
-            Next
-            label1 = "Yellow is query point, blue nearest for " + CStr(qPointCount) + " queries"
-
-            dst1.CopyTo(dst2)
-            Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
-            For i = 0 To queryPoints.Length - 1
-                query.Set(Of cv.Point2f)(0, 0, queryPoints(i))
-                knn.FindNearest(query, qPointCount, results, neighbors)
-                For j = 0 To qPointCount - 1
-                    Dim index = CInt(neighbors.Get(Of Single)(0, j))
-                    cv.Cv2.Circle(dst1, random.Points(index), 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
-                    dst1.Line(random.Points(index), queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
-                Next
-                cv.Cv2.Circle(dst1, queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
-                cv.Cv2.Circle(dst2, queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
-            Next
-        Else
-            Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
-            For i = 0 To queryPoints.Length - 1
-                query.Set(Of cv.Point2f)(0, 0, queryPoints(i))
-                knn.FindNearest(query, qPointCount, results, neighbors)
-                matchedIndex(i) = CInt(neighbors.Get(Of Single)(0, 0))
-                matchedPoints(i) = input(matchedIndex(i))
+                queryPoints.Set(Of cv.Point2f)(i, 0, New cv.Point2f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows)))
             Next
         End If
+
+        If retrainNeeded Or trainData.Rows <> matchedPoints.Length Then
+            Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S)
+            For i = 0 To trainData.Rows - 1
+                response.Set(Of Integer)(i, 0, i)
+                cv.Cv2.Circle(dst1, trainData.Get(Of cv.Point2f)(i, 0), 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+            Next
+            knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
+            If trainData.Rows <> matchedPoints.Count Then
+                ReDim matchedPoints(trainData.Rows - 1)
+                ReDim matchedIndex(trainData.Rows - 1)
+            End If
+        End If
+
+        label1 = "Yellow is query, nearest " + CStr(qPointCount) + " blue points to query"
+
+        Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
+        For i = 0 To queryPoints.Rows - 1
+            query.Set(Of cv.Point2f)(0, 0, queryPoints.Get(Of cv.Point2f)(i, 0))
+            knn.FindNearest(query, qPointCount, results, neighbors)
+            Dim qPoint = queryPoints.Get(Of cv.Point2f)(i, 0)
+            For j = 0 To Math.Min(qPointCount, neighbors.Cols) - 1
+                matchedIndex(i) = CInt(neighbors.Get(Of Single)(0, j))
+                matchedPoints(i) = trainData.Get(Of cv.Point2f)(matchedIndex(i), 0)
+                cv.Cv2.Circle(dst1, matchedPoints(i), 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+                dst1.Line(matchedPoints(i), qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            Next
+            cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+        Next
     End Sub
 End Class
 
 
+
+
+
+Public Class KNN_Centroids
+    Inherits ocvbClass
+    Dim emax As EMax_PaletteConsistencyCentroid
+    Public originalCentroids As New cv.Mat
+    Dim knn As knn_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        emax = New EMax_PaletteConsistencyCentroid(ocvb)
+        emax.emaxCPP.basics.grid.sliders.TrackBar1.Value = 270
+        emax.emaxCPP.basics.grid.sliders.TrackBar2.Value = 150
+        emax.emaxCPP.showInput = False
+
+        knn = New knn_Basics(ocvb)
+        knn.sliders.TrackBar2.Value = 1
+
+        ocvb.desc = "Reorder the centroids from the Emax distribution so they are in the same order every time."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        dst1.SetTo(0)
+        knn.trainData = emax.descriptors
+
+        If standalone Then emax.Run(ocvb)
+
+        If knn.trainData.Rows <> emax.descriptors.Rows Then knn.trainData = emax.descriptors
+
+        knn.queryPoints = emax.descriptors
+        knn.dst1 = emax.dst1.Clone
+        knn.Run(ocvb)
+        dst1 = knn.dst1
+
+        For i = 0 To knn.matchedIndex.Count - 1
+            cv.Cv2.PutText(dst1, "Is " + CStr(i) + " was " + CStr(knn.matchedIndex(i)), knn.matchedPoints(i), cv.HersheyFonts.HersheyComplex, 0.5, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
+        Next
+    End Sub
+End Class
 
 
 
@@ -180,8 +212,6 @@ End Class
 
 
 
-
-
 Public Class knn_Point2d
     Inherits ocvbClass
     Public querySet() As cv.Point2f
@@ -243,9 +273,6 @@ Public Class knn_Point2d
         Next
     End Sub
 End Class
-
-
-
 
 
 
@@ -321,8 +348,6 @@ Public Class knn_Point3d
         Next
     End Sub
 End Class
-
-
 
 
 
