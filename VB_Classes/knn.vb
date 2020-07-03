@@ -75,8 +75,6 @@ Public Class KNN_Centroids
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         emax = New EMax_PaletteConsistencyCentroid(ocvb)
-        emax.emaxCPP.basics.grid.sliders.TrackBar1.Value = 270
-        emax.emaxCPP.basics.grid.sliders.TrackBar2.Value = 150
         emax.emaxCPP.showInput = False
 
         knn = New knn_Basics(ocvb)
@@ -98,6 +96,7 @@ Public Class KNN_Centroids
         dst1 = knn.dst1
 
         For i = 0 To knn.matchedIndex.Count - 1
+            knn.matchedPoints(i).X += 10
             cv.Cv2.PutText(dst1, "Is " + CStr(i) + " was " + CStr(knn.matchedIndex(i)), knn.matchedPoints(i), cv.HersheyFonts.HersheyComplex, 0.5, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
         Next
     End Sub

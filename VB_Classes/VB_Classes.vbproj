@@ -136,6 +136,7 @@
     <Compile Include="AddWeighted.vb" />
     <Compile Include="AlgorithmData.vb" />
     <Compile Include="..\UI_Generator\AlgorithmList.vb" />
+    <Compile Include="AlphaChannel.vb" />
     <Compile Include="Aruco.vb" />
     <Compile Include="Bitmap.vb" />
     <Compile Include="Bitwise.vb" />
@@ -247,6 +248,12 @@
     <Compile Include="OpenCVGL.vb" />
     <Compile Include="OpenGL.vb" />
     <Compile Include="OpticalFlow.vb" />
+    <Compile Include="OptionsAlphaBlend.Designer.vb">
+      <DependentUpon>OptionsAlphaBlend.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsAlphaBlend.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="OptionsAudio.Designer.vb">
       <DependentUpon>OptionsAudio.vb</DependentUpon>
     </Compile>
@@ -351,6 +358,9 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptionsAlphaBlend.resx">
+      <DependentUpon>OptionsAlphaBlend.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsAudio.resx">
       <DependentUpon>OptionsAudio.vb</DependentUpon>
