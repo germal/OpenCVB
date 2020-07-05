@@ -143,18 +143,16 @@ Public Class Gradient_NumPy
         src.ConvertTo(gradient.src, cv.MatType.CV_32FC3, 1 / 255)
         gradient.Run(ocvb)
 
-        gradient.sobel.grayX.ConvertTo(dst1, cv.MatType.CV_32F)
-        gradient.sobel.grayY.ConvertTo(dst2, cv.MatType.CV_32F)
-
         If ocvb.parms.NumPyEnabled Then
+            gradient.sobel.grayX.ConvertTo(dst1, cv.MatType.CV_32F)
+            gradient.sobel.grayY.ConvertTo(dst2, cv.MatType.CV_32F)
+
             cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
             magnitude = magnitude.Normalize()
-            'Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ 
             Dim npMag = MatToNumPyFloat(magnitude)
             Dim exponent = sliders.TrackBar1.Value / 100
             Numpy.np.power(npMag, exponent, npMag)
             NumPyFloatToMat(npMag, dst1)
-            'End Using
         Else
             ocvb.putText(New oTrueType("Enable Embedded NumPy in the OptionsDialog", 10, 60, RESULT1))
         End If

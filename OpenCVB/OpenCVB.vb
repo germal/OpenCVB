@@ -999,7 +999,6 @@ Public Class OpenCVB
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
         If parms.testAllRunning Then AlgorithmTestCount += 1
-        Dim saveAlgorithmTestCount = AlgorithmTestCount ' use this to confirm that this task is to terminate.
         drawRect = New cv.Rect
         Dim saveLowResSetting As Boolean = parms.resolution
         Dim OpenCVB = New VB_Classes.ActiveClass(parms, regWidth / parms.speedFactor, regHeight / parms.speedFactor, New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
@@ -1025,7 +1024,37 @@ Public Class OpenCVB
             TTtextData(i).Clear()
         Next
         BothFirstAndLastReady = False
-        frameCount = 0 ' restart the count... 
+        frameCount = 0 ' restart the count...
+        If OpenCVB.ocvb.parms.NumPyEnabled Then
+            Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ 
+                Run(OpenCVB)
+            End Using
+        Else
+            Run(OpenCVB)
+        End If
+
+        ' remove all options forms.  They can only be made topmost (see OptionsBringToFront above) when created on the same thread.
+        ' This deletes the options forms for the current thread so they will be created again with the next thread.
+        Try
+            Dim frmlist As New List(Of Form)
+            For Each frm In Application.OpenForms
+                If frm.name.startswith("Option") Then frmlist.Add(frm)
+            Next
+            For Each frm In frmlist
+                frm.Close()
+            Next
+        Catch ex As Exception
+            Console.WriteLine("Error in ttextData update: " + ex.Message)
+        End Try
+
+        OpenCVB.Dispose()
+        frameCount = 0
+        If parms.testAllRunning Then
+            Console.WriteLine(vbTab + "Ending " + parms.activeAlgorithm)
+        End If
+    End Sub
+    Private Sub Run(OpenCVB As VB_Classes.ActiveClass)
+        Dim saveAlgorithmTestCount = AlgorithmTestCount ' use this to confirm that this task is to terminate.
         While 1
             ' wait until we have the latest camera data.
             While 1
@@ -1092,13 +1121,7 @@ Public Class OpenCVB
                 OpenCVB.ocvb.mouseClickPoint = mouseClickPoint
                 mouseClickFlag = False
 
-                If OpenCVB.ocvb.parms.NumPyEnabled Then
-                    Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ 
-                        OpenCVB.RunAlgorithm()
-                    End Using
-                Else
-                    OpenCVB.RunAlgorithm()
-                End If
+                OpenCVB.RunAlgorithm()
 
                 If OpenCVB.ocvb.drawRectClear Then
                     drawRect = New cv.Rect
@@ -1146,25 +1169,5 @@ Public Class OpenCVB
             End Try
             frameCount += 1
         End While
-
-        ' remove all options forms.  They can only be made topmost (see OptionsBringToFront above) when created on the same thread.
-        ' This deletes the options forms for the current thread so they will be created again with the next thread.
-        Try
-            Dim frmlist As New List(Of Form)
-            For Each frm In Application.OpenForms
-                If frm.name.startswith("Option") Then frmlist.Add(frm)
-            Next
-            For Each frm In frmlist
-                frm.Close()
-            Next
-        Catch ex As Exception
-            Console.WriteLine("Error in ttextData update: " + ex.Message)
-        End Try
-
-        OpenCVB.Dispose()
-        frameCount = 0
-        If parms.testAllRunning Then
-            Console.WriteLine(vbTab + "Ending " + parms.activeAlgorithm)
-        End If
     End Sub
 End Class
