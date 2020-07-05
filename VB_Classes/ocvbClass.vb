@@ -1,4 +1,5 @@
 ﻿Imports Numpy
+Imports py = Python.Runtime
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class oTrueType
@@ -73,6 +74,16 @@ Public Class ocvbClass : Implements IDisposable
         If p.X > dst1.Width Then p.X = dst1.Width - 1
         If p.Y > dst1.Height Then p.Y = dst1.Height - 1
         Return p
+    End Function
+    Public Function UseNumPy(ocvb As AlgorithmData) As Boolean
+        Static useNumPyLibrary As Boolean = True
+        Static gilState As py.Py.GILState
+        If useNumPyLibrary Then
+            If gilState Is Nothing Then gilState = py.Py.GIL() ' for explanation see http://pythonnet.github.io/ 
+            Return True
+        Else
+            Return False
+        End If
     End Function
     Public Function MatToNumPyFloat(mat As cv.Mat) As NDarray
         Dim array(mat.Total - 1) As Single

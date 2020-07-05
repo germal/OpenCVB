@@ -90,6 +90,7 @@ class GeneticDrawing:
     
     def calc_sampling_mask(self, blur_percent):
         img = np.copy(self.img_grey)
+        cv2.imshow("img", img)
         # Calculate gradient 
         gx = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=1)
         gy = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=1)

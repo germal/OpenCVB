@@ -10,7 +10,6 @@ Public Class GeneticDrawing_Basics
         setCaller(ocvb)
         If standalone Then
             dst1 = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size())
-            'samplingMask = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/Genetic")
         End If
         dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         seed = msRNG.NextDouble() * 100000000000
@@ -27,8 +26,8 @@ Public Class GeneticDrawing_Basics
         ocvb.desc = "Create a painting from the current video input using a genetic algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static generationTotal = sliders.TrackBar1.Value
-        Static stageTotal As Integer
+        Static generationTotal As Integer
+        Static stageTotal = sliders.TrackBar2.Value
         Static stage As Integer
         Static generation As Integer
         If stage >= stageTotal Then Exit Sub ' request is complete...
@@ -50,20 +49,24 @@ Public Class GeneticDrawing_Basics
         End If
 
         If samplingMask IsNot Nothing Then
+            dst2 = samplingMask
             samplingMask = Nothing
         Else
             Dim startStage = stageTotal * 0.2
             If stage >= startStage Then
                 Dim blurPercent = (1.0 - (stage - startStage) / Math.Max(stageTotal - startStage - 1, 1)) * 0.25 + 0.005
+                Dim kernelSize = CInt(blurPercent * dst1.Width)
+                If kernelSize Mod 2 = 0 Then kernelSize += 1
+                If kernelSize > 1 Then cv.Cv2.GaussianBlur(gradient.magnitude, gradient.magnitude, New cv.Size(kernelSize, kernelSize), 0, 0)
+                samplingMask = gradient.magnitude.Normalize(255)
             End If
         End If
-
         generation += 1
         If generation = generationTotal Then
             generation = 0
             samplingMask = Nothing
             stage += 1
         End If
-        label2 = "Generation " + CStr(generation) + " stage " + CStr(stage)
+        label2 = " stage " + CStr(stage) + " Generation " + CStr(generation)
     End Sub
 End Class
