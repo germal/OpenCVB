@@ -31,34 +31,38 @@ Public Class GeneticDrawing_Basics
         Static stageTotal As Integer
         Static stage As Integer
         Static generation As Integer
-        If stage < stageTotal Then
-            If generationTotal <> sliders.TrackBar1.Value Or stageTotal <> sliders.TrackBar2.Value Or check.Box(0).Checked Then
-                If check.Box(0).Checked Then
-                    dst1 = src
-                    check.Box(0).Checked = False
-                End If
-                generationTotal = sliders.TrackBar1.Value
-                stageTotal = sliders.TrackBar2.Value
-                generation = 0
-                stage = 0
-                samplingMask = Nothing
-
-                If standalone = False Then dst1 = src
-                dst1 = If(dst1.Channels = 3, dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst1)
+        If stage >= stageTotal Then Exit Sub ' request is complete...
+        If generationTotal <> sliders.TrackBar1.Value Or stageTotal <> sliders.TrackBar2.Value Or check.Box(0).Checked Then
+            If check.Box(0).Checked Then
+                dst1 = src
+                check.Box(0).Checked = False
             End If
+            generationTotal = sliders.TrackBar1.Value
+            stageTotal = sliders.TrackBar2.Value
+            generation = 0
+            stage = 0
+            samplingMask = Nothing
+
+            If standalone = False Then dst1 = src
+            dst1 = If(dst1.Channels = 3, dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst1)
             gradient.src = dst1
             gradient.Run(ocvb)
+        End If
 
+        If samplingMask IsNot Nothing Then
+            samplingMask = Nothing
+        Else
             Dim startStage = stageTotal * 0.2
             If stage >= startStage Then
                 Dim blurPercent = (1.0 - (stage - startStage) / Math.Max(stageTotal - startStage - 1, 1)) * 0.25 + 0.005
             End If
+        End If
 
-            generation += 1
-            If generation = generationTotal Then
-                generation = 0
-                stage += 1
-            End If
+        generation += 1
+        If generation = generationTotal Then
+            generation = 0
+            samplingMask = Nothing
+            stage += 1
         End If
         label2 = "Generation " + CStr(generation) + " stage " + CStr(stage)
     End Sub

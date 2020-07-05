@@ -75,7 +75,6 @@ class GeneticDrawing:
     this function precalculates angles and their magnitudes for later use inside DNA class
     '''
     def _imgGradient(self, img):
-        cv2.imshow("img", img)
         #convert to 0 to 1 float representation
         img = np.float32(img) / 255.0 
         # Calculate gradient 
