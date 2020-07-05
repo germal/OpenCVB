@@ -252,9 +252,9 @@ Partial Class OptionsDialog
         Me.EnableNumPy.AutoSize = True
         Me.EnableNumPy.Location = New System.Drawing.Point(77, 106)
         Me.EnableNumPy.Name = "EnableNumPy"
-        Me.EnableNumPy.Size = New System.Drawing.Size(420, 24)
+        Me.EnableNumPy.Size = New System.Drawing.Size(608, 24)
         Me.EnableNumPy.TabIndex = 8
-        Me.EnableNumPy.Text = "Enable the embedded use of NumPy in VB.Net and C#"
+        Me.EnableNumPy.Text = "Enable Embedded Python/NumPy in VB.Net.   (It reduces memory footprint if off.) "
         Me.EnableNumPy.UseVisualStyleBackColor = True
         '
         'PythonExeName

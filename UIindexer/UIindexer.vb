@@ -78,9 +78,8 @@ Module IndexMain
             While nextFile.Peek() <> -1
                 line = Trim(nextFile.ReadLine())
                 Dim lcaseLine = " " + LCase(line)
-                If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
-                ' when the classification source is ocvb.desc, it may be there twice in the code accidently.
                 If lcaseLine.Contains("painterly") And Painterly.ContainsKey(classname) = False Then Painterly.Add(classname, classname)
+                If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
                 If lcaseLine.Contains("needs more work") And MoreWork.ContainsKey(classname) = False Then MoreWork.Add(classname, classname)
                 If lcaseLine.Contains("tracker algorithm") And Trackers.ContainsKey(classname) = False Then Trackers.Add(classname, classname)
                 If (lcaseLine.Contains("np.") Or LCase(classname).Contains("numpy")) And numpy.ContainsKey(classname) = False Then numpy.Add(classname, classname)

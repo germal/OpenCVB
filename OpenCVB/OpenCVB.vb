@@ -6,6 +6,8 @@ Imports System.Threading
 Imports System.Globalization
 Imports System.Text.RegularExpressions
 Imports System.Environment
+Imports Numpy
+Imports py = Python.Runtime
 Module opencv_module
     Public bufferLock As New PictureBox ' this is a global lock on the camera buffers.
 End Module
@@ -1090,7 +1092,13 @@ Public Class OpenCVB
                 OpenCVB.ocvb.mouseClickPoint = mouseClickPoint
                 mouseClickFlag = False
 
-                OpenCVB.RunAlgorithm()
+                If OpenCVB.ocvb.parms.NumPyEnabled Then
+                    Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ 
+                        OpenCVB.RunAlgorithm()
+                    End Using
+                Else
+                    OpenCVB.RunAlgorithm()
+                End If
 
                 If OpenCVB.ocvb.drawRectClear Then
                     drawRect = New cv.Rect

@@ -1,4 +1,5 @@
 # https://github.com/anopara/genetic-drawing
+# painterly
 import cv2
 import numpy as np
 import time
@@ -20,7 +21,7 @@ class GeneticDrawing:
         #start with an empty black img
         self.imgBuffer = [np.zeros((self.img_grey.shape[0], self.img_grey.shape[1]), np.uint8)]
         
-    def generate(self, stages=10, generations=100, brushstrokesCount=10, show_progress_imgs=False):
+    def generate(self, stages=10, generations=100, brushstrokesCount=10):
         for s in range(stages):
             #initialize new DNA
             if self.sampling_mask is not None:
@@ -38,16 +39,10 @@ class GeneticDrawing:
                 self.myDNA.evolveDNASeq(self.img_grey, self.seed + time.time() + g)
                 clear_output(wait=True)
                 print("Stage ", s+1, ". Generation ", g+1, "/", generations)
-                if show_progress_imgs is True:
-                    #plt.imshow(sampling_mask, cmap='gray')
-                    plt.imshow(self.myDNA.get_cached_image(), cmap='gray')
-                    plt.show()
+                cv2.imshow("cached image", self.myDNA.get_cached_image())
+                cv2.waitKey(1)
             self.imgBuffer.append(self.myDNA.get_cached_image())
-            if show_progress_imgs is True:
-                if s % 5 == 0:
-                    plt.imshow(self.myDNA.get_cached_image(), cmap='gray')
-                    plt.show()
-
+ 
         return self.myDNA.get_cached_image()
     
     def calcBrushRange(self, stage, total_stages):
@@ -100,6 +95,7 @@ class GeneticDrawing:
             mag = cv2.GaussianBlur(mag,(0,0), w, cv2.BORDER_DEFAULT)
         #ensure range from 0-255 (mostly for visual debugging, since in sampling we will renormalize it anyway)
         scale = 255.0/mag.max()
+        
         return mag*scale
         
     
@@ -167,7 +163,8 @@ class DNA:
             color = random.randrange(0, 255)
             #random size
             random.seed(seed-i+4)
-            size = random.random()*(self.maxSize-self.minSize) + self.minSize
+            test = random.random()
+            size = test*(self.maxSize-self.minSize) + self.minSize
             #random pos
             posY, posX = self.gen_new_positions()
             #random rotation

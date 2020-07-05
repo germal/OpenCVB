@@ -5,7 +5,8 @@ Public Class GeneticDrawing_Basics
     Dim samplingMask As cv.Mat
     Dim seed As Double
     Dim gradient As Gradient_NumPy
-    Dim brushesRange(,) As Double = {{0.1, 0.3}, {0.3, 0.7}}
+    Dim minBrush = New cv.Size2f(0.1, 0.3)
+    Dim maxBrush = New cv.Size2f(0.3, 0.7)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         If standalone Then
@@ -16,6 +17,7 @@ Public Class GeneticDrawing_Basics
 
         sliders.setupTrackBar1(ocvb, caller, "Number of Generations", 1, 100, 20)
         sliders.setupTrackBar2("Number of Stages", 1, 200, 100)
+        sliders.setupTrackBar3("Brushstroke count ", 1, 100, 10)
 
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Snapshot Video input to initialize genetic drawing"
@@ -23,7 +25,14 @@ Public Class GeneticDrawing_Basics
         gradient = New Gradient_NumPy(ocvb)
 
         label1 = "Original Image"
-        ocvb.desc = "Create a painting from the current video input using a genetic algorithm"
+        ocvb.desc = "Create a painting from the current video input using a genetic algorithm - painterly"
+    End Sub
+    Private Sub initRandom()
+        Dim brushstrokeCount = sliders.TrackBar3.Value
+        For i = 0 To brushstrokeCount - 1
+            Dim gray = msRNG.Next(0, 255)
+            Dim size = msRNG.NextDouble() * (maxBrush.height - minBrush.height) + minBrush.height
+        Next
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static generationTotal As Integer
@@ -62,6 +71,14 @@ Public Class GeneticDrawing_Basics
             End If
         End If
         generation += 1
+
+        'self.myDNA = DNA(self.img_grey.shape,
+        '                     self.img_grads,
+        '                     self.calcBrushRange(s, stages),
+        '                     canvas = self.imgBuffer[-1], 
+        '                     sampling_mask = sampling_mask)
+
+
         If generation = generationTotal Then
             generation = 0
             samplingMask = Nothing

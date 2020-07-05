@@ -1,4 +1,5 @@
 # https://github.com/anopara/genetic-drawing
+# painterly
 import cv2
 import numpy as np
 import time
@@ -20,7 +21,7 @@ class GeneticDrawing:
         #start with an empty black img
         self.imgBuffer = [np.zeros((self.img_grey.shape[0], self.img_grey.shape[1]), np.uint8)]
         
-    def generate(self, stages=10, generations=100, brushstrokesCount=10, show_progress_imgs=False):
+    def generate(self, stages=10, generations=100, brushstrokesCount=10):
         for s in range(stages):
             #initialize new DNA
             if self.sampling_mask is not None:
@@ -38,16 +39,10 @@ class GeneticDrawing:
                 self.myDNA.evolveDNASeq(self.img_grey, self.seed + time.time() + g)
                 clear_output(wait=True)
                 print("Stage ", s+1, ". Generation ", g+1, "/", generations)
-                if show_progress_imgs is True:
-                    #plt.imshow(sampling_mask, cmap='gray')
-                    plt.imshow(self.myDNA.get_cached_image(), cmap='gray')
-                    plt.show()
+                cv2.imshow("cached image", self.myDNA.get_cached_image())
+                cv2.waitKey(1)
             self.imgBuffer.append(self.myDNA.get_cached_image())
-            if show_progress_imgs is True:
-                if s % 5 == 0:
-                    plt.imshow(self.myDNA.get_cached_image(), cmap='gray')
-                    plt.show()
-
+ 
         return self.myDNA.get_cached_image()
     
     def calcBrushRange(self, stage, total_stages):
@@ -65,7 +60,6 @@ class GeneticDrawing:
         sampling_mask = None
         if s >= start_stage:
             t = (1.0 - (s-start_stage)/max(stages-start_stage-1,1)) * 0.25 + 0.005
-            print(t)
             sampling_mask = self.calc_sampling_mask(t)
         return sampling_mask
         
@@ -90,7 +84,6 @@ class GeneticDrawing:
     
     def calc_sampling_mask(self, blur_percent):
         img = np.copy(self.img_grey)
-        cv2.imshow("img", img)
         # Calculate gradient 
         gx = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=1)
         gy = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=1)
@@ -170,7 +163,8 @@ class DNA:
             color = random.randrange(0, 255)
             #random size
             random.seed(seed-i+4)
-            size = random.random()*(self.maxSize-self.minSize) + self.minSize
+            test = random.random()
+            size = test*(self.maxSize-self.minSize) + self.minSize
             #random pos
             posY, posX = self.gen_new_positions()
             #random rotation
@@ -352,7 +346,7 @@ class DNA:
 if __name__ == '__main__':
     #load the example image and set the generator for 100 stages with 20 generations each
     gen = GeneticDrawing('../../Data/GeneticDrawingExample.jpg', seed=time.time())
-    out = gen.generate(10, 20)
+    out = gen.generate(100, 20)
     
     #load a custom mask and set a smaller brush size for finer details
     #gen.sampling_mask = cv2.cvtColor(cv2.imread("../../Data/GeneticDrawingMask.jpg"), cv2.COLOR_BGR2GRAY)
