@@ -17,9 +17,13 @@ Public Class newClass_Basics
         ocvb.desc = "New class description"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-	    Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ 
-			' Insert any NumPy code here (delete using and imports above otherwise.)
-        End Using
+		If ocvb.parms.NumPyEnabled Then
+			Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ 
+				' Insert any NumPy code here (delete using and imports above otherwise.)
+			End Using
+		Else
+			ocvb.putText(New oTrueType("Enable Embedded NumPy in the OptionsDialog", 10, 60, RESULT1))
+		End If
     End Sub
 End Class]]>
             </Code>

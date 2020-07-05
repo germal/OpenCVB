@@ -134,6 +134,7 @@ Public Class Gradient_NumPy
 
         sliders.setupTrackBar1(ocvb, caller, "Contrast exponent to use X100", 0, 200, 30)
 
+
         label1 = "CartToPolar Magnitude Output Normalized"
         label2 = "CartToPolar Angle Output"
         ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
@@ -145,15 +146,17 @@ Public Class Gradient_NumPy
         gradient.sobel.grayX.ConvertTo(dst1, cv.MatType.CV_32F)
         gradient.sobel.grayY.ConvertTo(dst2, cv.MatType.CV_32F)
 
-        cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
-
-        magnitude = magnitude.Normalize()
-
-        Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ 
-            Dim npMag = MatToNumPyFloat(magnitude)
-            Dim exponent = sliders.TrackBar1.Value / 100
-            Numpy.np.power(npMag, exponent, npMag)
-            NumPyFloatToMat(npMag, dst1)
-        End Using
+        If ocvb.parms.NumPyEnabled Then
+            cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
+            magnitude = magnitude.Normalize()
+            Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ 
+                Dim npMag = MatToNumPyFloat(magnitude)
+                Dim exponent = sliders.TrackBar1.Value / 100
+                Numpy.np.power(npMag, exponent, npMag)
+                NumPyFloatToMat(npMag, dst1)
+            End Using
+        Else
+            ocvb.putText(New oTrueType("Enable Embedded NumPy in the OptionsDialog", 10, 60, RESULT1))
+        End If
     End Sub
 End Class

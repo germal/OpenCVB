@@ -39,6 +39,7 @@ Partial Class OptionsDialog
         Me.TestAllDuration = New System.Windows.Forms.NumericUpDown()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.GroupBox6 = New System.Windows.Forms.GroupBox()
+        Me.EnableNumPy = New System.Windows.Forms.CheckBox()
         Me.PythonExeName = New System.Windows.Forms.TextBox()
         Me.SelectPythonFile = New System.Windows.Forms.Button()
         Me.Label2 = New System.Windows.Forms.Label()
@@ -235,15 +236,26 @@ Partial Class OptionsDialog
         '
         'GroupBox6
         '
+        Me.GroupBox6.Controls.Add(Me.EnableNumPy)
         Me.GroupBox6.Controls.Add(Me.PythonExeName)
         Me.GroupBox6.Controls.Add(Me.SelectPythonFile)
         Me.GroupBox6.Controls.Add(Me.Label2)
         Me.GroupBox6.Location = New System.Drawing.Point(21, 782)
         Me.GroupBox6.Name = "GroupBox6"
-        Me.GroupBox6.Size = New System.Drawing.Size(936, 116)
+        Me.GroupBox6.Size = New System.Drawing.Size(936, 146)
         Me.GroupBox6.TabIndex = 9
         Me.GroupBox6.TabStop = False
         Me.GroupBox6.Text = "Python "
+        '
+        'EnableNumPy
+        '
+        Me.EnableNumPy.AutoSize = True
+        Me.EnableNumPy.Location = New System.Drawing.Point(77, 106)
+        Me.EnableNumPy.Name = "EnableNumPy"
+        Me.EnableNumPy.Size = New System.Drawing.Size(420, 24)
+        Me.EnableNumPy.TabIndex = 8
+        Me.EnableNumPy.Text = "Enable the embedded use of NumPy in VB.Net and C#"
+        Me.EnableNumPy.UseVisualStyleBackColor = True
         '
         'PythonExeName
         '
@@ -297,7 +309,7 @@ Partial Class OptionsDialog
         Me.GroupBox3.Controls.Add(Me.fontInfo)
         Me.GroupBox3.Controls.Add(Me.Button1)
         Me.GroupBox3.Controls.Add(Me.Label4)
-        Me.GroupBox3.Location = New System.Drawing.Point(22, 904)
+        Me.GroupBox3.Location = New System.Drawing.Point(22, 948)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(936, 116)
         Me.GroupBox3.TabIndex = 12
@@ -335,7 +347,7 @@ Partial Class OptionsDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1008, 1032)
+        Me.ClientSize = New System.Drawing.Size(1008, 1073)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.Cancel_Button)
         Me.Controls.Add(Me.OKButton)
@@ -396,4 +408,5 @@ Partial Class OptionsDialog
     Friend WithEvents fontInfo As Label
     Friend WithEvents FontDialog1 As FontDialog
     Friend WithEvents RadioButton1 As RadioButton
+    Friend WithEvents EnableNumPy As CheckBox
 End Class

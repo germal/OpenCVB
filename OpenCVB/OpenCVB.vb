@@ -1,8 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Imports System.IO
-Imports Numpy
-Imports py = Python.Runtime
 Imports System.ComponentModel
 Imports System.Threading
 Imports System.Globalization
@@ -235,11 +233,6 @@ Public Class OpenCVB
 
         TestAllTimer.Interval = optionsForm.TestAllDuration.Text * 1000
         FindPython()
-
-        ' This allows the VB_Classes to use NumPy and then reuse it.  OpenCVB.exe does not use NumPy but must do this to allow the child threads to use NumPy
-        ' see https://github.com/SciSharp/Numpy.NET
-        np.arange(1)
-        py.PythonEngine.BeginAllowThreads()
     End Sub
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
         Dim g As Graphics = e.Graphics
@@ -899,6 +892,7 @@ Public Class OpenCVB
         Dim OKcancel = optionsForm.ShowDialog()
 
         If OKcancel = DialogResult.OK Then
+            optionsForm.TestEnableNumPy()
             If saveCurrentCamera <> optionsForm.cameraIndex Then RestartCamera()
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
             RefreshTimer.Interval = CInt(1000 / optionsForm.RefreshRate.Value)
@@ -966,7 +960,7 @@ Public Class OpenCVB
         If parms.testAllRunning Then parms.ShowOptions = optionsForm.ShowOptions.Checked Else parms.ShowOptions = True ' always show options when not running 'test all'
         parms.ShowConsoleLog = optionsForm.ShowConsoleLog.Checked
         parms.AvoidDNNCrashes = optionsForm.AvoidDNNCrashes.Checked
-
+        parms.NumPyEnabled = optionsForm.EnableNumPy.Checked
 
         If parms.resolution = OptionsDialog.resMed Then parms.speedFactor = 2 Else parms.speedFactor = 1
         If parms.resolution = OptionsDialog.resMed Then parms.imageToTrueTypeLoc *= parms.speedFactor

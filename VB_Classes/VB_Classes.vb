@@ -101,6 +101,7 @@ Public Class ActiveClass : Implements IDisposable
         Dim testAllRunning As Boolean
         Dim transformationMatrix() As Single
         Dim useRecordedData As Boolean
+        Dim NumPyEnabled As Boolean
     End Structure
     Public Sub New(parms As algorithmParameters, _width As Integer, _height As Integer, location As cv.Rect)
         slidersOffset = New cv.Point(10, 10)

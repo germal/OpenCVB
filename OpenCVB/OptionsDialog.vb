@@ -1,4 +1,6 @@
 ﻿Imports System.IO
+Imports Numpy
+Imports py = Python.Runtime
 Public Class OptionsDialog
     Public cameraIndex As Int32 ' an index into the cameraRadioButton array.
     Public Const Kinect4AzureCam As Int32 = 0 ' Must be defined in VB_Classes.vb the same way!
@@ -15,6 +17,7 @@ Public Class OptionsDialog
     Public cameraDeviceCount(L515) As Int32
     Public cameraRadioButton(L515) As RadioButton
     Public cameraTotalCount As Integer = 0
+    Dim numPyEnabled As Boolean = False
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
         SaveSetting("OpenCVB", "FastAccurate", "FastAccurate", lowResolution.Checked)
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", cameraIndex)
@@ -27,9 +30,11 @@ Public Class OptionsDialog
         SaveSetting("OpenCVB", "ShowOptions", "ShowOptions", ShowOptions.Checked)
         SaveSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", ShowConsoleLog.Checked)
         SaveSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", AvoidDNNCrashes.Checked)
+        SaveSetting("OpenCVB", "EnableNumPy", "EnableNumPy", EnableNumPy.Checked)
         SaveSetting("OpenCVB", "RefreshRate", "RefreshRate", RefreshRate.Value)
         SaveSetting("OpenCVB", "FontName", "FontName", fontInfo.Font.Name)
         SaveSetting("OpenCVB", "FontSize", "FontSize", fontInfo.Font.Size)
+
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
@@ -40,6 +45,17 @@ Public Class OptionsDialog
         For i = 0 To cameraRadioButton.Count - 1
             If cameraDeviceCount(i) > 0 Then cameraRadioButton(i).Enabled = True
         Next
+    End Sub
+    Public Sub TestEnableNumPy()
+        If EnableNumPy.Checked Then
+            If numPyEnabled = False Then
+                numPyEnabled = True
+                ' This allows the VB_Classes to use NumPy and then reuse it.  OpenCVB.exe does not use NumPy but must do this to allow the child threads to use NumPy
+                ' see https://github.com/SciSharp/Numpy.NET
+                np.arange(1)
+                py.PythonEngine.BeginAllowThreads()
+            End If
+        End If
     End Sub
     Public Sub OptionsDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         For i = 0 To cameraRadioButton.Count - 1
@@ -71,6 +87,7 @@ Public Class OptionsDialog
         SnapToGrid.Checked = GetSetting("OpenCVB", "SnapToGrid", "SnapToGrid", True)
         ShowOptions.Checked = GetSetting("OpenCVB", "ShowOptions", "ShowOptions", False)
         ShowConsoleLog.Checked = GetSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", False)
+        EnableNumPy.Checked = GetSetting("OpenCVB", "EnableNumPy", "EnableNumPy", False)
         AvoidDNNCrashes.Checked = GetSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", False)
         RefreshRate.Value = GetSetting("OpenCVB", "RefreshRate", "RefreshRate", 15)
 
@@ -85,6 +102,7 @@ Public Class OptionsDialog
             selectionInfo = New FileInfo(selectionName)
             PythonExeName.Text = selectionInfo.FullName
         End If
+        TestEnableNumPy()
     End Sub
     Private Sub OptionsDialog_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         Me.Hide()
