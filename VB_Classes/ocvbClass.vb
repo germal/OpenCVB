@@ -2,7 +2,7 @@
 Imports py = Python.Runtime
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class oTrueType
+Public Class TTtext
     Public Const RESULT1 = 2
     Public Const RESULT2 = 3
     Public text As String

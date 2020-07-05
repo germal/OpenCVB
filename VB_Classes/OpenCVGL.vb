@@ -45,7 +45,7 @@ Public Class OpenCVGL_Image_CPP
         If ocvb.parms.testAllRunning Then
             ' It runs fine but after several cycles, it will fail with an external exception.
             ' Only happens on 'Test All' runs.  Runs fine otherwise.
-            ocvb.putText(New oTrueType("OpenCVGL only fails when running 'Test All'.  Can't get it to fail otherwise." + vbCrLf +
+            ocvb.putText(New TTtext("OpenCVGL only fails when running 'Test All'.  Can't get it to fail otherwise." + vbCrLf +
                                                   "Skipping it during a 'Test All' just so all the other tests can be exercised.", 10, 60, RESULT1))
             Exit Sub
         End If

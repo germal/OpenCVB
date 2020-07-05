@@ -7,7 +7,7 @@ Module Python_Module
     Public Function checkPythonPackage(ocvb As AlgorithmData, packageName As String) As Boolean
         ' make sure that opencv-python and numpy are installed on this system.
         If ocvb.PythonExe = "" Then
-            ocvb.putText(New oTrueType("Python is not present and needs to be installed." + vbCrLf +
+            ocvb.putText(New TTtext("Python is not present and needs to be installed." + vbCrLf +
                                                   "Get Python 3.7+ with Visual Studio's Install app.", 10, 60, RESULT1))
             Return False
         End If
@@ -17,7 +17,7 @@ Module Python_Module
         Dim packageFiles = packageFolder.GetDirectories(packageName, IO.SearchOption.TopDirectoryOnly)
 
         If packageFiles.Count = 0 Then
-            ocvb.putText(New oTrueType("Python is present but the packages needed by this Python script are not present." + vbCrLf +
+            ocvb.putText(New TTtext("Python is present but the packages needed by this Python script are not present." + vbCrLf +
                                                   "Use the PythonPackages.py script to show which imports are missing.'" + vbCrLf +
                                                   "Go to the Visual Studio menu 'Tools/Python/Python Environments'" + vbCrLf +
                                                   "Select 'Packages' in the combo box and search for packages required by this script.", 10, 60, RESULT1))
@@ -50,7 +50,7 @@ Module Python_Module
             If ocvb.parms.ShowConsoleLog = False Then p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
             If p.Start() = False Then MsgBox("The Python script " + pythonApp.Name + " failed to start")
         Else
-            ocvb.putText(New oTrueType(pythonApp.FullName + " is missing.", 10, 60, RESULT1))
+            ocvb.putText(New TTtext(pythonApp.FullName + " is missing.", 10, 60, RESULT1))
             Return False
         End If
         Return True
@@ -184,10 +184,10 @@ Public Class Python_SurfaceBlit
                 pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
                 If pipe.IsConnected Then pipe.Write(pointCloudBuffer, 0, pcSize)
             End If
-            ocvb.putText(New oTrueType("Blit works fine when run inline but fails with Python callback." + vbCrLf +
+            ocvb.putText(New TTtext("Blit works fine when run inline but fails with Python callback." + vbCrLf +
                                                   "See 'Python_SurfaceBlit_PS.py' for the surfaceBlit failure", 10, 60, RESULT1))
         Else
-            ocvb.putText(New oTrueType("Python is not available", 10, 60, RESULT1))
+            ocvb.putText(New TTtext("Python is not available", 10, 60, RESULT1))
         End If
     End Sub
 End Class

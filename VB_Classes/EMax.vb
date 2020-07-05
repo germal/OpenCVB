@@ -32,7 +32,7 @@ Public Class EMax_Basics
         regionCount = grid.roiList.Count - 1
 
         If standalone Then
-            ocvb.putText(New oTrueType("The EMax ocvbClass fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
+            ocvb.putText(New TTtext("The EMax ocvbClass fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
                                                   "The EMax_Basics_CPP works fine and they are functionally identical.", 20, 100, RESULT2))
         End If
 

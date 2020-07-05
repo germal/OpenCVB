@@ -38,7 +38,7 @@ Public Class Font_TrueType
         Dim fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         Dim fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
         ' get the font on every iteration because it could have changed.  This should be done in any algorithm using OptionsFont.
-        ocvb.putText(New oTrueType("TrueType Font is currently set to " + fontName + " with size = " + CStr(fontSize) + vbCrLf +
+        ocvb.putText(New TTtext("TrueType Font is currently set to " + fontName + " with size = " + CStr(fontSize) + vbCrLf +
                                    "Use the Settings button above to change the font name and size.", 10, 50, RESULT1))
     End Sub
 End Class
@@ -66,7 +66,7 @@ Public Class Font_FlowText
 
         Dim firstLine = If(msgs.Count - maxLines < 0, 0, msgs.Count - maxLines)
         For i = firstLine To msgs.Count - 1
-            ocvb.putText(New oTrueType(msgs(i), 10, (i - firstLine) * 15 + 20, result1or2))
+            ocvb.putText(New TTtext(msgs(i), 10, (i - firstLine) * 15 + 20, result1or2))
         Next
 
         If ocvb.color.Width > 1000 Then maxLines = 29 ' larger mat gets more lines.

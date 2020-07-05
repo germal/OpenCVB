@@ -30,11 +30,11 @@ Public Class DNN_Test
         Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
         net.SetInput(inputBlob, "data")
         If ocvb.parms.AvoidDNNCrashes = False Then
-            ocvb.putText(New oTrueType("This example is not working.  Forward fails with 'blobs.size() != 0'.", 10, 100))
+            ocvb.putText(New TTtext("This example is not working.  Forward fails with 'blobs.size() != 0'.", 10, 100))
             'Dim prob = net.Forward("prob") ' <--- this fails in VB.Net but works in C# (below)
             ' finish this ...
         Else
-            ocvb.putText(New oTrueType("DNN has been turned off.  See Options.", 10, 100))
+            ocvb.putText(New TTtext("DNN has been turned off.  See Options.", 10, 100))
         End If
     End Sub
 End Class
@@ -61,9 +61,9 @@ Public Class DNN_Caffe_CS
         Dim str = caffeCS.Run(image, ocvb.parms.AvoidDNNCrashes)
         dst2 = image.Resize(dst2.Size())
         If ocvb.parms.AvoidDNNCrashes Then
-            ocvb.putText(New oTrueType("DNN has been turned off.  See Options.", 10, 100))
+            ocvb.putText(New TTtext("DNN has been turned off.  See Options.", 10, 100))
         Else
-            ocvb.putText(New oTrueType(str, 10, 100))
+            ocvb.putText(New TTtext(str, 10, 100))
         End If
     End Sub
 End Class
@@ -101,7 +101,7 @@ Public Class DNN_Basics
             End If
         End If
         If dnnPrepared = False Then
-            ocvb.putText(New oTrueType("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100))
+            ocvb.putText(New TTtext("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100))
         End If
         ocvb.desc = "Use OpenCV's dnn from Caffe file."
         label1 = "Cropped Input Image - must be square!"
@@ -138,11 +138,11 @@ Public Class DNN_Basics
                         rect.Width = 100
                         rect.Height = 30
                         dst2.Rectangle(rect, cv.Scalar.Black, -1)
-                        ocvb.putText(New oTrueType(nextName, CInt(rect.X * ocvb.parms.imageToTrueTypeLoc), CInt(rect.Y * ocvb.parms.imageToTrueTypeLoc), RESULT2))
+                        ocvb.putText(New TTtext(nextName, CInt(rect.X * ocvb.parms.imageTTTtextLoc), CInt(rect.Y * ocvb.parms.imageTTTtextLoc), RESULT2))
                     End If
                 Next
             Else
-                ocvb.putText(New oTrueType("DNN has been turned off.  See Options.", 10, 100))
+                ocvb.putText(New TTtext("DNN has been turned off.  See Options.", 10, 100))
             End If
         End If
     End Sub

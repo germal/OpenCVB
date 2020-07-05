@@ -102,9 +102,9 @@ Public Class IMU_Stabilizer
 
             dst1(New cv.Rect(10, 95, 50, 50)).SetTo(0)
             Dim Text = "dx = " + Format(dx, "#0.00") + vbNewLine + "dy = " + Format(dy, "#0.00") + vbNewLine + "da = " + Format(da, "#0.00")
-            ocvb.putText(New oTrueType(Text, 10, 100, RESULT1))
+            ocvb.putText(New TTtext(Text, 10, 100, RESULT1))
         Else
-            ocvb.putText(New oTrueType("No IMU present on this RealSense device", 20, 100))
+            ocvb.putText(New TTtext("No IMU present on this RealSense device", 20, 100))
         End If
     End Sub
 End Class
@@ -128,9 +128,9 @@ Public Class IMU_Magnetometer
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.IMU_Magnetometer = New cv.Point3f Then
-            ocvb.putText(New oTrueType("The IMU for this camera does not have Magnetometer readings.", 10, 125))
+            ocvb.putText(New TTtext("The IMU for this camera does not have Magnetometer readings.", 10, 125))
         Else
-            ocvb.putText(New oTrueType("Uncalibrated IMU Magnetometer reading:  x = " + CStr(ocvb.parms.IMU_Magnetometer.X) + vbCrLf +
+            ocvb.putText(New TTtext("Uncalibrated IMU Magnetometer reading:  x = " + CStr(ocvb.parms.IMU_Magnetometer.X) + vbCrLf +
                                                   "Uncalibrated IMU Magnetometer reading:  y = " + CStr(ocvb.parms.IMU_Magnetometer.Y) + vbCrLf +
                                                   "Uncalibrated IMU Magnetometer reading:  z = " + CStr(ocvb.parms.IMU_Magnetometer.Z), 10, 60))
             plot.plotData = New cv.Scalar(ocvb.parms.IMU_Magnetometer.X, ocvb.parms.IMU_Magnetometer.Y, ocvb.parms.IMU_Magnetometer.Z)
@@ -152,9 +152,9 @@ Public Class IMU_Barometer
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.IMU_Barometer = 0 Then
-            ocvb.putText(New oTrueType("The IMU for this camera does not have barometric pressure.", 10, 125))
+            ocvb.putText(New TTtext("The IMU for this camera does not have barometric pressure.", 10, 125))
         Else
-            ocvb.putText(New oTrueType("Barometric pressure is " + CStr(ocvb.parms.IMU_Barometer) + " hectopascal." + vbCrLf +
+            ocvb.putText(New TTtext("Barometric pressure is " + CStr(ocvb.parms.IMU_Barometer) + " hectopascal." + vbCrLf +
                                                   "Barometric pressure is " + Format(ocvb.parms.IMU_Barometer * 0.02953, "#0.00") + " inches of mercury.", 10, 60))
         End If
     End Sub
@@ -171,7 +171,7 @@ Public Class IMU_Temperature
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.IMU_Present Then
-            ocvb.putText(New oTrueType("IMU Temperature is " + Format(ocvb.parms.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
+            ocvb.putText(New TTtext("IMU Temperature is " + Format(ocvb.parms.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
                                                   "IMU Temperature is " + Format(ocvb.parms.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.", 10, 60))
         End If
     End Sub
@@ -211,7 +211,7 @@ Public Class IMU_FrameTime
             Static allZeroCount As Integer
             allZeroCount += 1
             If allZeroCount > 20 Then
-                ocvb.putText(New oTrueType("Is IMU present?  No IMU FrameTimes", 10, 40))
+                ocvb.putText(New TTtext("Is IMU present?  No IMU FrameTimes", 10, 40))
                 allZeroCount = Integer.MinValue ' don't show message again.
             End If
             Exit Sub ' if the IMU frametime was 0, then no new IMU data was generated (or it is unsupported!)
@@ -238,7 +238,7 @@ Public Class IMU_FrameTime
         histogramIMU(CInt(ocvb.parms.IMU_FrameTime)) += 1
 
         If standalone Then
-            ocvb.putText(New oTrueType("IMU_TimeStamp (ms) " + Format(ocvb.parms.IMU_TimeStamp, "00") + vbCrLf +
+            ocvb.putText(New TTtext("IMU_TimeStamp (ms) " + Format(ocvb.parms.IMU_TimeStamp, "00") + vbCrLf +
                                                   "CPU TimeStamp (ms) " + Format(ocvb.parms.CPU_TimeStamp, "00") + vbCrLf +
                                                   "IMU Frametime (ms, sampled) " + Format(sampledIMUFrameTime, "000.00") +
                                                   " IMUanchor = " + Format(IMUanchor, "00") +
@@ -264,7 +264,7 @@ Public Class IMU_FrameTime
                     Next
                     allText += outStr + vbCrLf
                 Next
-                ocvb.putText(New oTrueType(allText, 10, 180))
+                ocvb.putText(New TTtext(allText, 10, 180))
             End If
         End If
     End Sub
@@ -321,7 +321,7 @@ Public Class IMU_HostFrameTimes
         hist(CInt(ocvb.parms.CPU_FrameTime)) += 1
 
         If standalone Then
-            ocvb.putText(New oTrueType("IMU_TimeStamp (ms) " + Format(ocvb.parms.IMU_TimeStamp, "00") + vbCrLf +
+            ocvb.putText(New TTtext("IMU_TimeStamp (ms) " + Format(ocvb.parms.IMU_TimeStamp, "00") + vbCrLf +
                                                   "CPU TimeStamp (ms) " + Format(ocvb.parms.CPU_TimeStamp, "00") + vbCrLf +
                                                   "Host Frametime (ms, sampled) " + Format(sampledCPUFrameTime, "000.00") +
                                                   " CPUanchor = " + Format(CPUanchor, "00") +
@@ -347,7 +347,7 @@ Public Class IMU_HostFrameTimes
                     Next
                     allText += outStr + vbCrLf
                 Next
-                ocvb.putText(New oTrueType(allText, 10, 180))
+                ocvb.putText(New TTtext(allText, 10, 180))
             End If
         End If
     End Sub
@@ -401,7 +401,7 @@ Public Class IMU_TotalDelay
             sampledSmooth = kalman.stateResult
         End If
 
-        ocvb.putText(New oTrueType("Estimated host delay (ms, sampled) " + Format(sampledCPUDelay, "00") + vbCrLf +
+        ocvb.putText(New TTtext("Estimated host delay (ms, sampled) " + Format(sampledCPUDelay, "00") + vbCrLf +
                                               "Estimated IMU delay (ms, sampled) " + Format(sampledIMUDelay, "00") + vbCrLf +
                                               "Estimated Total delay (ms, sampled) " + Format(sampledTotalDelay, "00") + vbCrLf +
                                               "Estimated Total delay Smoothed (ms, sampled, in White) " + Format(sampledSmooth, "00") + vbCrLf + vbCrLf +
@@ -423,7 +423,7 @@ Public Class IMU_TotalDelay
                 Next
                 allText += outStr + vbCrLf
             Next
-            ocvb.putText(New oTrueType(allText, 10, 180))
+            ocvb.putText(New TTtext(allText, 10, 180))
         End If
     End Sub
 End Class
@@ -481,7 +481,7 @@ Public Class IMU_GVector
             If Math.Abs(Math.Sqrt(gx * gx + gy * gy + gz * gz) - 9.807) > 0.05 Then
                 outStr += vbCrLf + "Camera appears to be moving because the gravity vector is not 9.8.  Results may not be valid." + vbCrLf
             End If
-            ocvb.putText(New oTrueType(outStr, 10, 40, result))
+            ocvb.putText(New TTtext(outStr, 10, 40, result))
 
             ' validate the result
             Dim valstr = "sqrt (" + vbTab + Format(gx, "#0.0000") + "*" + Format(gx, "#0.0000") + vbTab +
@@ -490,7 +490,7 @@ Public Class IMU_GVector
                             vbTab + Format(Math.Sqrt(gx * gx + gy * gy + gz * gz), "#0.0000") + vbCrLf +
                             "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
 
-            ocvb.putText(New oTrueType(valstr, 10, 200, result))
+            ocvb.putText(New TTtext(valstr, 10, 200, result))
         End If
     End Sub
 End Class

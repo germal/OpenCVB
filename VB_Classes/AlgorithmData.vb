@@ -27,7 +27,7 @@ Public Class AlgorithmData
     Public PythonExe As String
     Public PythonFileName As String
     Public suppressOptions As Boolean
-    Public TTtextData(4 - 1) As List(Of oTrueType)
+    Public TTtextData(4 - 1) As List(Of TTtext)
 
     Public caller As String
     Public Sub New(parms As ActiveClass.algorithmParameters, width As Integer, height As Integer)
@@ -36,10 +36,10 @@ Public Class AlgorithmData
         result1 = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         result2 = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         For i = 0 To TTtextData.Count - 1
-            TTtextData(i) = New List(Of oTrueType)
+            TTtextData(i) = New List(Of TTtext)
         Next
     End Sub
-    Public Sub putText(tt As oTrueType)
+    Public Sub putText(tt As TTtext)
         TTtextData(tt.picTag).Add(tt)
     End Sub
 End Class

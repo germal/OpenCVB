@@ -69,7 +69,7 @@ Public Class ActiveClass : Implements IDisposable
         Dim extrinsics As Extrinsics_VB
         Dim HomeDir As String
         Dim VBTestInterface As Object
-        Dim imageToTrueTypeLoc As Single
+        Dim imageTTTtextLoc As Single
         Dim keyboardInput As String
         Dim keyInputAccepted As Boolean
         Dim IMU_Barometer As Single

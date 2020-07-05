@@ -326,7 +326,7 @@ Public Class PointCloud_GVector_TopView
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = T265Camera Then
-            ocvb.putText(New oTrueType("There is no point cloud available on the T265 camera", 10, 60, RESULT1))
+            ocvb.putText(New TTtext("There is no point cloud available on the T265 camera", 10, 60, RESULT1))
             Exit Sub
         End If
 
@@ -398,7 +398,7 @@ Public Class PointCloud_GVector_SideView
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = T265Camera Then
-            ocvb.putText(New oTrueType("There is no point cloud available on the T265 camera", 10, 60, RESULT1))
+            ocvb.putText(New TTtext("There is no point cloud available on the T265 camera", 10, 60, RESULT1))
             Exit Sub
         End If
 

@@ -1,11 +1,12 @@
 ﻿Imports Numpy
 Imports System.Text
 Imports cv = OpenCvSharp
-Imports py = Python.Runtime
+Imports epy = Python.Runtime
+Imports System.Dynamic
 
 ' https://docs.scipy.org/doc/scipy/reference/tutorial/fft.html
 ' https://github.com/SciSharp/Numpy.NET
-Public Class NumPy_Test
+Public Class NumPy_FFT
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -20,9 +21,32 @@ Public Class NumPy_Test
             sb.AppendFormat("FFT output of above 1-dimensional vector" + vbCrLf + "{0:N}", y)
             Dim inverse = np.fft.ifft(y)
             sb.AppendFormat(vbCrLf + vbCrLf + "Inverse FFT output" + "{0:N}" + vbCrLf + vbCrLf + "Should reflect original input above", inverse)
-            ocvb.putText(New oTrueType(sb.ToString, 10, 60, RESULT1))
+            ocvb.putText(New TTtext(sb.ToString, 10, 60, RESULT1))
         Else
-            ocvb.putText(New oTrueType("Enable Embedded NumPy in the OptionsDialog", 10, 60, RESULT1))
+            ocvb.putText(New TTtext("Enable Embedded NumPy in the OptionsDialog", 10, 60, RESULT1))
+        End If
+    End Sub
+End Class
+
+
+
+' http://pythonnet.github.io/
+' https://github.com/pythonnet/pythonnet
+Public Class NumPy_EmbeddedTest
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        ocvb.desc = "Run an embedded Python script"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.NumPyEnabled Then
+            Dim mynp = epy.Py.Import("numpy")
+            'mynp.sin(np.sin * 2)
+            'Dim mySin = mynp.GetType().GetMethod("sin")(np.pi * 2)
+            'Console.WriteLine("testing " + CStr(mySin(np.pi * 2))
+            ' Console.WriteLine("Cos(2*PI) = " + CStr(np.sin(np.pi * 2)))
+        Else
+            ocvb.putText(New TTtext("Enable Embedded NumPy/Python in the Global OptionsDialog", 10, 60, RESULT1))
         End If
     End Sub
 End Class

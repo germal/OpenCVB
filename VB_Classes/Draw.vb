@@ -405,7 +405,7 @@ Public Class Draw_ClipLine
 
         Static hitCount = 0
         hitCount += If(clipped, 1, 0)
-        ocvb.putText(New oTrueType("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
+        ocvb.putText(New TTtext("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
                                               CInt(ocvb.color.Width / 2), 200, RESULT2))
         If r = rect Then setup()
         flow.Run(ocvb)

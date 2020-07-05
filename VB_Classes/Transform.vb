@@ -106,7 +106,7 @@ Public Class Transform_Affine3D
         check.Box(0).Text = "Check to snap the first point cloud"
         check.Box(1).Text = "Check to snap the second point cloud"
         ocvb.desc = "Using 2 point clouds compute the 3D affine transform between them"
-        ocvb.putText(New oTrueType("Use the check boxes to snapshot the different point clouds", 10, 50, RESULT1))
+        ocvb.putText(New TTtext("Use the check boxes to snapshot the different point clouds", 10, 50, RESULT1))
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static pc1 As cv.Mat
@@ -121,14 +121,14 @@ Public Class Transform_Affine3D
         If check.Box(0).Checked Then
             pc1 = ocvb.pointCloud.Clone()
             check.Box(0).Checked = False
-            ocvb.putText(New oTrueType("First point cloud captured", 10, 50, RESULT1))
+            ocvb.putText(New TTtext("First point cloud captured", 10, 50, RESULT1))
             affineTransform = Nothing
         End If
 
         If check.Box(1).Checked Then
             pc2 = ocvb.pointCloud.Clone()
             check.Box(1).Checked = False
-            ocvb.putText(New oTrueType("Second point cloud captured", 10, 70, RESULT1))
+            ocvb.putText(New TTtext("Second point cloud captured", 10, 70, RESULT1))
             affineTransform = Nothing
         End If
 
@@ -145,15 +145,15 @@ Public Class Transform_Affine3D
         End If
 
         If affineTransform IsNot Nothing Then
-            ocvb.putText(New oTrueType("Affine Transform 3D results:", 10, 90, RESULT1))
+            ocvb.putText(New TTtext("Affine Transform 3D results:", 10, 90, RESULT1))
             For i = 0 To 3 - 1
                 Dim outstr = ""
                 For j = 0 To 4 - 1
                     outstr += Format(affineTransform.Get(Of Double)(i, j), "0.000") + vbTab
                 Next
-                ocvb.putText(New oTrueType(outstr, 10, 110 + i * 25, RESULT1))
+                ocvb.putText(New TTtext(outstr, 10, 110 + i * 25, RESULT1))
             Next
-            ocvb.putText(New oTrueType("0" + vbTab + "0" + vbTab + "0" + vbTab + "1", 10, 80 + 4 * 25, RESULT1))
+            ocvb.putText(New TTtext("0" + vbTab + "0" + vbTab + "0" + vbTab + "1", 10, 80 + 4 * 25, RESULT1))
         End If
     End Sub
 End Class

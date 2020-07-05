@@ -80,7 +80,7 @@ Public Class FishEye_Raw
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex <> T265Camera Then
-            ocvb.putText(New oTrueType("Only the T265 camera is has FishEye images at this point.", 10, 100, RESULT1))
+            ocvb.putText(New TTtext("Only the T265 camera is has FishEye images at this point.", 10, 100, RESULT1))
             Exit Sub
         End If
         label1 = "Left Fisheye Image"

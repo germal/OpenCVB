@@ -68,7 +68,7 @@ Public Class OpenCVB
     Dim stopCameraThread As Boolean
     Dim textDesc As String = ""
     Dim totalBytesOfMemoryUsed As Integer
-    Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.oTrueType)
+    Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.TTtext)
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -416,7 +416,7 @@ Public Class OpenCVB
         End If
 
         For i = 0 To TTtextData.Count - 1
-            TTtextData(i) = New List(Of VB_Classes.oTrueType)
+            TTtextData(i) = New List(Of VB_Classes.TTtext)
         Next
 
         For i = 0 To camPic.Length - 1
@@ -954,7 +954,7 @@ Public Class OpenCVB
         parms.OpenCVfullPath = OpenCVfullPath
         parms.transformationMatrix = camera.transformationmatrix
         parms.OpenCV_Version_ID = Environment.GetEnvironmentVariable("OpenCV_Version")
-        parms.imageToTrueTypeLoc = 1 / resizeForDisplay
+        parms.imageTTTtextLoc = 1 / resizeForDisplay
         parms.useRecordedData = OpenCVkeyword.Text = "<All using recorded data>"
         parms.testAllRunning = TestAllButton.Text = "Stop Test"
         parms.keyboardInput = keyboardInput
@@ -965,7 +965,7 @@ Public Class OpenCVB
         parms.NumPyEnabled = optionsForm.EnableNumPy.Checked
 
         If parms.resolution = OptionsDialog.resMed Then parms.speedFactor = 2 Else parms.speedFactor = 1
-        If parms.resolution = OptionsDialog.resMed Then parms.imageToTrueTypeLoc *= parms.speedFactor
+        If parms.resolution = OptionsDialog.resMed Then parms.imageTTTtextLoc *= parms.speedFactor
 
         PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
 
@@ -1009,8 +1009,8 @@ Public Class OpenCVB
         ' Here we check to see if the algorithm constructor changed lowResolution.
         If OpenCVB.ocvb.parms.resolution <> saveLowResSetting Then
             If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
-            OpenCVB.ocvb.parms.imageToTrueTypeLoc = 1 / resizeForDisplay
-            If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.imageToTrueTypeLoc *= OpenCVB.ocvb.parms.speedFactor
+            OpenCVB.ocvb.parms.imageTTTtextLoc = 1 / resizeForDisplay
+            If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.imageTTTtextLoc *= OpenCVB.ocvb.parms.speedFactor
         End If
 
         ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
@@ -1026,7 +1026,7 @@ Public Class OpenCVB
         BothFirstAndLastReady = False
         frameCount = 0 ' restart the count...
         If OpenCVB.ocvb.parms.NumPyEnabled Then
-            Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ 
+            Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ and https://github.com/SciSharp/Numpy.NET (see multi-threading (Must read!))
                 Run(OpenCVB)
             End Using
         Else

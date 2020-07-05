@@ -18,11 +18,9 @@ Public Class newClass_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
 		If ocvb.parms.NumPyEnabled Then
-			Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ 
-				' Insert any NumPy code here (delete using and imports above otherwise.)
-			End Using
+			' Insert any NumPy code here (delete using and imports above otherwise.)
 		Else
-			ocvb.putText(New oTrueType("Enable Embedded NumPy in the OptionsDialog", 10, 60, RESULT1))
+			ocvb.putText(New oTrueType("Enable Embedded NumPy/Python in the Global OptionsDialog", 10, 60, RESULT1))
 		End If
     End Sub
 End Class]]>

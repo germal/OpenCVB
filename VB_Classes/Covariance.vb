@@ -22,11 +22,11 @@ Public Class Covariance_Basics
         Dim samples2 = samples.Reshape(2)
         cv.Cv2.CalcCovarMatrix(samples, covariance, mean, cv.CovarFlags.Cols)
         Dim overallMean = samples2.Mean()
-        ocvb.putText(New oTrueType("Covar(0, 0), Covar(0, 1)" + vbTab + Format(covariance.Get(Of Double)(0, 0), "#0.0") + vbTab +
+        ocvb.putText(New TTtext("Covar(0, 0), Covar(0, 1)" + vbTab + Format(covariance.Get(Of Double)(0, 0), "#0.0") + vbTab +
                      Format(covariance.Get(Of Double)(0, 1), "#0.0"), 20, 60, result1or2))
-        ocvb.putText(New oTrueType("Covar(1 0), Covar(1, 1)" + vbTab + Format(covariance.Get(Of Double)(1, 0), "#0.0") + vbTab +
+        ocvb.putText(New TTtext("Covar(1 0), Covar(1, 1)" + vbTab + Format(covariance.Get(Of Double)(1, 0), "#0.0") + vbTab +
                      Format(covariance.Get(Of Double)(1, 1), "#0.0"), 20, 90, result1or2))
-        ocvb.putText(New oTrueType("Mean X, Mean Y" + vbTab + vbTab + Format(overallMean(0), "#0.00") + vbTab + vbTab +
+        ocvb.putText(New TTtext("Mean X, Mean Y" + vbTab + vbTab + Format(overallMean(0), "#0.00") + vbTab + vbTab +
                      Format(overallMean(1), "#0.00"), 20, 120, result1or2))
         If standalone Then
             Dim newCenter = New cv.Point(overallMean(0), overallMean(1))
@@ -35,7 +35,7 @@ Public Class Covariance_Basics
             dst1.Circle(lastCenter, 5, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
             dst1.Line(newCenter, lastCenter, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
             lastCenter = newCenter
-            ocvb.putText(New oTrueType("Yellow is last center, red is the current center", 20, 150, result1or2))
+            ocvb.putText(New TTtext("Yellow is last center, red is the current center", 20, 150, result1or2))
         End If
     End Sub
 End Class
@@ -57,7 +57,7 @@ Public Class Covariance_Test
         covar.samples = New cv.Mat(10, 2, cv.MatType.CV_64F, testInput)
         covar.result1or2 = RESULT1
         covar.Run(ocvb)
-        ocvb.putText(New oTrueType("Results should be a symmetric array with 2.1 and -2.1", 20, 150, RESULT1))
+        ocvb.putText(New TTtext("Results should be a symmetric array with 2.1 and -2.1", 20, 150, RESULT1))
     End Sub
 End Class
 

@@ -294,7 +294,7 @@ Public Class Depth_WorldXYZ
                 End If
             Next
         Next
-        ocvb.putText(New oTrueType("OpenGL data prepared.", 10, 50, RESULT1))
+        ocvb.putText(New TTtext("OpenGL data prepared.", 10, 50, RESULT1))
     End Sub
 End Class
 
@@ -339,7 +339,7 @@ Public Class Depth_WorldXYZ_MT
                 Next
             Next
         End Sub)
-        ocvb.putText(New oTrueType("OpenGL data prepared.", 10, 50, RESULT1))
+        ocvb.putText(New TTtext("OpenGL data prepared.", 10, 50, RESULT1))
     End Sub
 End Class
 
@@ -1307,7 +1307,7 @@ Public Class Depth_PointCloudInRange_IMU
         split = tSplit
 
         If ocvb.parms.cameraIndex = T265Camera Or ocvb.parms.cameraIndex = L515 Then
-            ocvb.putText(New oTrueType("IMU unavailable (?) for this camera", 10, 50, RESULT1))
+            ocvb.putText(New TTtext("IMU unavailable (?) for this camera", 10, 50, RESULT1))
         Else
             imu.Run(ocvb)
             If zRotation Then
