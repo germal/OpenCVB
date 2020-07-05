@@ -204,27 +204,6 @@ End Class
 
 
 
-'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edges_Sobel
-    Inherits ocvbClass
-    Public grayX As cv.Mat
-    Public grayY As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Sobel kernel Size", 1, 32, 3)
-        ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value - 1)
-        dst1 = New cv.Mat(src.Rows, src.Cols, src.Type)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        grayX = src.Sobel(cv.MatType.CV_16U, 1, 0, kernelSize)
-        Dim abs_grayX = grayX.ConvertScaleAbs()
-        grayY = src.Sobel(cv.MatType.CV_16U, 0, 1, kernelSize)
-        Dim abs_grayY = grayY.ConvertScaleAbs()
-        cv.Cv2.AddWeighted(abs_grayX, 0.5, abs_grayY, 0.5, 0, dst1)
-    End Sub
-End Class
 
 
 
@@ -364,3 +343,30 @@ Public Class Edges_Deriche_CPP
     End Sub
 End Class
 
+
+
+
+
+
+
+'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edges_Sobel
+    Inherits ocvbClass
+    Public grayX As cv.Mat
+    Public grayY As cv.Mat
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.setupTrackBar1(ocvb, caller, "Sobel kernel Size", 1, 32, 3)
+        ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim kernelSize = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value - 1)
+        dst1 = New cv.Mat(src.Rows, src.Cols, src.Type)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        grayX = src.Sobel(cv.MatType.CV_32F, 1, 0, kernelSize)
+        Dim abs_grayX = grayX.ConvertScaleAbs()
+        grayY = src.Sobel(cv.MatType.CV_32F, 0, 1, kernelSize)
+        Dim abs_grayY = grayY.ConvertScaleAbs()
+        cv.Cv2.AddWeighted(abs_grayX, 0.5, abs_grayY, 0.5, 0, dst1)
+    End Sub
+End Class

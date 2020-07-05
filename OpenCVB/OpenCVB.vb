@@ -1,6 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Imports System.IO
+Imports Numpy
+Imports py = Python.Runtime
 Imports System.ComponentModel
 Imports System.Threading
 Imports System.Globalization
@@ -88,8 +90,8 @@ Public Class OpenCVB
 
         HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
 
-        '' Camera DLL's are built in Release mode even when configured for Debug (for performance while debugging algorithms).  
-        '' It is not likely they will need debugging and the camera interface runs a lot faster in Debug mode.
+        ' Camera DLL's are built in Release mode even when configured for Debug (performance while debugging an algorithm is much better).  
+        ' It is not likely camera interfaces will need debugging but to do so change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
         Dim releaseDir = HomeDir.FullName + "\bin\Release\"
         updatePath(releaseDir, "Release Version of camera DLL's.")
 
@@ -234,6 +236,10 @@ Public Class OpenCVB
         TestAllTimer.Interval = optionsForm.TestAllDuration.Text * 1000
         FindPython()
 
+        ' This allows the VB_Classes to use NumPy and then reuse it.  OpenCVB.exe does not use NumPy but must do this to allow the child threads to use NumPy
+        ' see https://github.com/SciSharp/Numpy.NET
+        np.arange(1)
+        py.PythonEngine.BeginAllowThreads()
     End Sub
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
         Dim g As Graphics = e.Graphics
@@ -915,7 +921,7 @@ Public Class OpenCVB
         ' some algorithms can take a long time to finish a single iteration.  
         ' Each algorithm must run dispose() - to kill options forms and external Python or OpenGL taskes.  Wait until exit...
         While frame
-            Thread.Sleep(100)  ' to allow the algorithm task to gracefully end and dispose OpenCVB.
+            Thread.Sleep(10)  ' to allow the algorithm task to gracefully end and dispose OpenCVB.
             sleepCount += 1
             If sleepCount > 10 Then Return False
         End While
@@ -993,166 +999,163 @@ Public Class OpenCVB
         fpsTimer.Enabled = True
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
-        If parms.testAllRunning Then
-            AlgorithmTestCount += 1
-            Console.WriteLine(vbTab + "Starting " + parms.activeAlgorithm + " " + CStr(AlgorithmTestCount) + " algorithms tested.")
-        End If
         Dim saveAlgorithmTestCount = AlgorithmTestCount ' use this to confirm that this task is to terminate.
         drawRect = New cv.Rect
         Dim saveLowResSetting As Boolean = parms.resolution
         Dim OpenCVB = New VB_Classes.ActiveClass(parms, regWidth / parms.speedFactor, regHeight / parms.speedFactor, New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
         textDesc = OpenCVB.ocvb.desc
 
-        Console.WriteLine("textDesc = " + textDesc) ' Debugging a label problem...
+        If parms.testAllRunning Then
+            AlgorithmTestCount += 1
+            Console.WriteLine(vbTab + "Starting " + parms.activeAlgorithm + " " + textDesc + " Algorithms tested: " + CStr(AlgorithmTestCount))
+        End If
 
         ' Here we check to see if the algorithm constructor changed lowResolution.
         If OpenCVB.ocvb.parms.resolution <> saveLowResSetting Then
-            If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
-            OpenCVB.ocvb.parms.imageToTrueTypeLoc = 1 / resizeForDisplay
-            If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.imageToTrueTypeLoc *= OpenCVB.ocvb.parms.speedFactor
-        End If
+                If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
+                OpenCVB.ocvb.parms.imageToTrueTypeLoc = 1 / resizeForDisplay
+                If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.imageToTrueTypeLoc *= OpenCVB.ocvb.parms.speedFactor
+            End If
 
-        ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
-        If OpenCVB.ocvb.drawRect <> New cv.Rect(0, 0, 0, 0) Then ' the constructor defined drawrect.  Adjust it because lowResolution selected
-            drawRect = OpenCVB.ocvb.drawRect
-            Dim ratio = OpenCVB.ocvb.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
-            drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
+            ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
+            If OpenCVB.ocvb.drawRect <> New cv.Rect(0, 0, 0, 0) Then ' the constructor defined drawrect.  Adjust it because lowResolution selected
+                drawRect = OpenCVB.ocvb.drawRect
+                Dim ratio = OpenCVB.ocvb.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
+                drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
+            End If
 
-        End If
-
-        For i = VB_Classes.ActiveClass.RESULT1 To VB_Classes.ActiveClass.RESULT2
-            TTtextData(i).Clear()
-        Next
-        BothFirstAndLastReady = False
-        frameCount = 0 ' restart the count... 
-        While 1
-            ' wait until we have the latest camera data.
+            For i = VB_Classes.ActiveClass.RESULT1 To VB_Classes.ActiveClass.RESULT2
+                TTtextData(i).Clear()
+            Next
+            BothFirstAndLastReady = False
+            frameCount = 0 ' restart the count... 
             While 1
-                If stopAlgorithmThread Then Exit While ' really exit the while loop below...
-                Application.DoEvents() ' this will allow any options for the algorithm to be updated...
-                If camera.newImagesAvailable Then Exit While
+                ' wait until we have the latest camera data.
+                While 1
+                    If stopAlgorithmThread Then Exit While ' really exit the while loop below...
+                    Application.DoEvents() ' this will allow any options for the algorithm to be updated...
+                    If camera.newImagesAvailable Then Exit While
+                End While
+                If stopAlgorithmThread Then Exit While
+                If saveAlgorithmTestCount <> AlgorithmTestCount Then Exit While ' a failsafe provision.  This task needs to exit.
+
+                If camera.color.width = 0 Or camera.RGBDepth.width = 0 Or camera.leftView.width = 0 Or camera.rightView.width = 0 Then Continue While
+
+                ' bring the data into the algorithm task.
+                SyncLock bufferLock
+                    camera.newImagesAvailable = False
+
+                    If lowResolution Then
+                        OpenCVB.ocvb.color = camera.color.Resize(fastSize)
+                        OpenCVB.ocvb.RGBDepth = camera.RGBDepth.Resize(fastSize)
+                        OpenCVB.ocvb.leftView = camera.leftView.Resize(fastSize)
+                        OpenCVB.ocvb.rightView = camera.rightView.Resize(fastSize)
+                    Else
+                        OpenCVB.ocvb.color = camera.color
+                        OpenCVB.ocvb.RGBDepth = camera.RGBDepth
+                        OpenCVB.ocvb.leftView = camera.leftView
+                        OpenCVB.ocvb.rightView = camera.rightView
+                    End If
+                    OpenCVB.ocvb.pointCloud = camera.PointCloud
+                    OpenCVB.ocvb.depth16 = camera.depth16
+                    OpenCVB.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
+                    OpenCVB.ocvb.parms.transformationMatrix = camera.transformationMatrix
+                    OpenCVB.ocvb.parms.IMU_TimeStamp = camera.IMU_TimeStamp
+                    OpenCVB.ocvb.parms.IMU_Barometer = camera.IMU_Barometer
+                    OpenCVB.ocvb.parms.IMU_Magnetometer = camera.IMU_Magnetometer
+                    OpenCVB.ocvb.parms.IMU_Temperature = camera.IMU_Temperature
+                    OpenCVB.ocvb.parms.IMU_Rotation = camera.IMU_Rotation
+                    OpenCVB.ocvb.parms.IMU_RotationMatrix = camera.IMU_RotationMatrix
+                    OpenCVB.ocvb.parms.IMU_RotationVector = camera.IMU_RotationVector
+                    OpenCVB.ocvb.parms.IMU_Translation = camera.IMU_Translation
+                    OpenCVB.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
+                    OpenCVB.ocvb.parms.IMU_Velocity = camera.IMU_Velocity
+                    OpenCVB.ocvb.parms.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
+                    OpenCVB.ocvb.parms.IMU_AngularVelocity = camera.IMU_AngularVelocity
+                    OpenCVB.ocvb.parms.IMU_FrameTime = camera.IMU_FrameTime
+                    OpenCVB.ocvb.parms.CPU_TimeStamp = camera.CPU_TimeStamp
+                    OpenCVB.ocvb.parms.CPU_FrameTime = camera.CPU_FrameTime
+                    OpenCVB.ocvb.parms.keyboardInput = keyboardInput
+                End SyncLock
+
+                OpenCVB.UpdateHostLocation(New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
+
+                Try
+                    If GrabRectangleData Then
+                        GrabRectangleData = False
+                        Dim ratio = camPic(0).Width / OpenCVB.ocvb.color.Width ' relative size of displayed image and algorithm size image.
+                        OpenCVB.ocvb.drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
+                        If OpenCVB.ocvb.drawRect.Width <= 2 Then OpenCVB.ocvb.drawRect.Width = 0 ' too small?
+                        BothFirstAndLastReady = False
+                    End If
+
+                    OpenCVB.ocvb.mousePoint = mousePoint
+                    OpenCVB.ocvb.mousePicTag = mousePicTag
+                    OpenCVB.ocvb.mouseClickFlag = mouseClickFlag
+                    OpenCVB.ocvb.mouseClickPoint = mouseClickPoint
+                    mouseClickFlag = False
+
+                    OpenCVB.RunAlgorithm()
+
+                    If OpenCVB.ocvb.drawRectClear Then
+                        drawRect = New cv.Rect
+                        OpenCVB.ocvb.drawRect = drawRect
+                        OpenCVB.ocvb.drawRectClear = False
+                    End If
+
+                    picLabels(2) = OpenCVB.ocvb.label1
+                    picLabels(3) = OpenCVB.ocvb.label2
+                    If RefreshAvailable Then
+                        ' share the results of the algorithm task.
+                        SyncLock TTtextData
+                            If OpenCVB.ocvb.parms.keyInputAccepted Then keyboardInput = ""
+                            algorithmRefresh = True
+                            formResult1 = OpenCVB.ocvb.result1.Clone()
+                            formResult2 = OpenCVB.ocvb.result2.Clone()
+                            For i = VB_Classes.ActiveClass.RESULT1 To VB_Classes.ActiveClass.RESULT2
+                                If OpenCVB.ocvb.TTtextData(i).Count Then
+                                    TTtextData(i).Clear()
+                                    For j = 0 To OpenCVB.ocvb.TTtextData(i).Count - 1
+                                        TTtextData(i).Add(OpenCVB.ocvb.TTtextData(i)(j)) ' pull over any truetype text data so paint can access it.
+                                    Next
+                                    OpenCVB.ocvb.TTtextData(i).Clear()
+                                End If
+                            Next
+                        End SyncLock
+                    End If
+                    If OptionsBringToFront And TestAllTimer.Enabled = False Then
+                        OptionsBringToFront = False
+                        Try
+                            For Each frm In Application.OpenForms
+                                If frm.name.startswith("Option") Then frm.topmost = True
+                            Next
+                            For Each frm In Application.OpenForms
+                                If frm.name.startswith("Option") Then frm.topmost = False
+                            Next
+                        Catch ex As Exception ' ignoring exceptions here.  It is a transition to another class and form was activated...
+                            Console.WriteLine("Error in OptionsBringToFront: " + ex.Message)
+                        End Try
+                    End If
+                    If Me.IsDisposed Then Exit While
+                Catch ex As Exception
+                    Console.WriteLine("Error in AlgorithmTask: " + ex.Message)
+                    Exit While
+                End Try
+                frameCount += 1
             End While
-            If stopAlgorithmThread Then Exit While
-            If saveAlgorithmTestCount <> AlgorithmTestCount Then Exit While ' a failsafe provision.  This task needs to exit.
 
-            If camera.color.width = 0 Or camera.RGBDepth.width = 0 Or camera.leftView.width = 0 Or camera.rightView.width = 0 Then Continue While
-
-            ' bring the data into the algorithm task.
-            SyncLock bufferLock
-                camera.newImagesAvailable = False
-
-                If lowResolution Then
-                    OpenCVB.ocvb.color = camera.color.Resize(fastSize)
-                    OpenCVB.ocvb.RGBDepth = camera.RGBDepth.Resize(fastSize)
-                    OpenCVB.ocvb.leftView = camera.leftView.Resize(fastSize)
-                    OpenCVB.ocvb.rightView = camera.rightView.Resize(fastSize)
-                Else
-                    OpenCVB.ocvb.color = camera.color
-                    OpenCVB.ocvb.RGBDepth = camera.RGBDepth
-                    OpenCVB.ocvb.leftView = camera.leftView
-                    OpenCVB.ocvb.rightView = camera.rightView
-                End If
-                OpenCVB.ocvb.pointCloud = camera.PointCloud
-                OpenCVB.ocvb.depth16 = camera.depth16
-                OpenCVB.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
-                OpenCVB.ocvb.parms.transformationMatrix = camera.transformationMatrix
-                OpenCVB.ocvb.parms.IMU_TimeStamp = camera.IMU_TimeStamp
-                OpenCVB.ocvb.parms.IMU_Barometer = camera.IMU_Barometer
-                OpenCVB.ocvb.parms.IMU_Magnetometer = camera.IMU_Magnetometer
-                OpenCVB.ocvb.parms.IMU_Temperature = camera.IMU_Temperature
-                OpenCVB.ocvb.parms.IMU_Rotation = camera.IMU_Rotation
-                OpenCVB.ocvb.parms.IMU_RotationMatrix = camera.IMU_RotationMatrix
-                OpenCVB.ocvb.parms.IMU_RotationVector = camera.IMU_RotationVector
-                OpenCVB.ocvb.parms.IMU_Translation = camera.IMU_Translation
-                OpenCVB.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
-                OpenCVB.ocvb.parms.IMU_Velocity = camera.IMU_Velocity
-                OpenCVB.ocvb.parms.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
-                OpenCVB.ocvb.parms.IMU_AngularVelocity = camera.IMU_AngularVelocity
-                OpenCVB.ocvb.parms.IMU_FrameTime = camera.IMU_FrameTime
-                OpenCVB.ocvb.parms.CPU_TimeStamp = camera.CPU_TimeStamp
-                OpenCVB.ocvb.parms.CPU_FrameTime = camera.CPU_FrameTime
-                OpenCVB.ocvb.parms.keyboardInput = keyboardInput
-            End SyncLock
-
-            OpenCVB.UpdateHostLocation(New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
-
+            ' remove all options forms.  They can only be made topmost (see OptionsBringToFront above) when created on the same thread.
+            ' This deletes the options forms for the current thread so they will be created again with the next thread.
             Try
-                If GrabRectangleData Then
-                    GrabRectangleData = False
-                    Dim ratio = camPic(0).Width / OpenCVB.ocvb.color.Width ' relative size of displayed image and algorithm size image.
-                    OpenCVB.ocvb.drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
-                    If OpenCVB.ocvb.drawRect.Width <= 2 Then OpenCVB.ocvb.drawRect.Width = 0 ' too small?
-                    BothFirstAndLastReady = False
-                End If
-
-                OpenCVB.ocvb.mousePoint = mousePoint
-                OpenCVB.ocvb.mousePicTag = mousePicTag
-                OpenCVB.ocvb.mouseClickFlag = mouseClickFlag
-                OpenCVB.ocvb.mouseClickPoint = mouseClickPoint
-                mouseClickFlag = False
-
-
-                OpenCVB.RunAlgorithm()
-
-                If OpenCVB.ocvb.drawRectClear Then
-                    drawRect = New cv.Rect
-                    OpenCVB.ocvb.drawRect = drawRect
-                    OpenCVB.ocvb.drawRectClear = False
-                End If
-
-                picLabels(2) = OpenCVB.ocvb.label1
-                picLabels(3) = OpenCVB.ocvb.label2
-                If RefreshAvailable Then
-                    ' share the results of the algorithm task.
-                    SyncLock TTtextData
-                        If OpenCVB.ocvb.parms.keyInputAccepted Then keyboardInput = ""
-                        algorithmRefresh = True
-                        formResult1 = OpenCVB.ocvb.result1.Clone()
-                        formResult2 = OpenCVB.ocvb.result2.Clone()
-                        For i = VB_Classes.ActiveClass.RESULT1 To VB_Classes.ActiveClass.RESULT2
-                            If OpenCVB.ocvb.TTtextData(i).Count Then
-                                TTtextData(i).Clear()
-                                For j = 0 To OpenCVB.ocvb.TTtextData(i).Count - 1
-                                    TTtextData(i).Add(OpenCVB.ocvb.TTtextData(i)(j)) ' pull over any truetype text data so paint can access it.
-                                Next
-                                OpenCVB.ocvb.TTtextData(i).Clear()
-                            End If
-                        Next
-                    End SyncLock
-                End If
-                If OptionsBringToFront And TestAllTimer.Enabled = False Then
-                    OptionsBringToFront = False
-                    Try
-                        For Each frm In Application.OpenForms
-                            If frm.name.startswith("Option") Then frm.topmost = True
-                        Next
-                        For Each frm In Application.OpenForms
-                            If frm.name.startswith("Option") Then frm.topmost = False
-                        Next
-                    Catch ex As Exception ' ignoring exceptions here.  It is a transition to another class and form was activated...
-                        Console.WriteLine("Error in OptionsBringToFront: " + ex.Message)
-                    End Try
-                End If
-                If Me.IsDisposed Then Exit While
+                Dim frmlist As New List(Of Form)
+                For Each frm In Application.OpenForms
+                    If frm.name.startswith("Option") Then frmlist.Add(frm)
+                Next
+                For Each frm In frmlist
+                    frm.Close()
+                Next
             Catch ex As Exception
-                Console.WriteLine("Error in AlgorithmTask: " + ex.Message)
-                Exit While
             End Try
-            frameCount += 1
-        End While
-
-        ' remove all options forms.  They can only be made topmost (see OptionsBringToFront above) when created on the same thread.
-        ' This deletes the options forms for the current thread so they will be created again with the next thread.
-        Try
-            Dim frmlist As New List(Of Form)
-            For Each frm In Application.OpenForms
-                If frm.name.startswith("Option") Then frmlist.Add(frm)
-            Next
-            For Each frm In frmlist
-                frm.Close()
-            Next
-        Catch ex As Exception
-        End Try
 
         OpenCVB.Dispose()
         frameCount = 0

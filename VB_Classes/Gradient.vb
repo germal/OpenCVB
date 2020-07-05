@@ -1,9 +1,10 @@
 Imports cv = OpenCvSharp
+Imports Numpy
+Imports py = Python.Runtime
 Imports System.Runtime.InteropServices
-
 Public Class Gradient_Basics
     Inherits ocvbClass
-    Dim sobel As Edges_Sobel
+    Public sobel As Edges_Sobel
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sobel = New Edges_Sobel(ocvb)
@@ -74,5 +75,85 @@ Public Class Gradient_Flatland
         grade.src = src
         grade.Run(ocvb)
         dst2 = grade.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://github.com/anopara/genetic-drawing
+Public Class Gradient_CartToPolar
+    Inherits ocvbClass
+    Public gradient As Gradient_Basics
+    Public magnitude As New cv.Mat
+    Public angle As New cv.Mat
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        gradient = New Gradient_Basics(ocvb)
+        gradient.sobel.sliders.TrackBar1.Value = 1
+
+        sliders.setupTrackBar1(ocvb, caller, "Contrast exponent to use X100", 0, 200, 30)
+        label1 = "CartToPolar Magnitude Output Normalized"
+        label2 = "CartToPolar Angle Output"
+        ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        src.ConvertTo(gradient.src, cv.MatType.CV_32FC3, 1 / 255)
+        gradient.Run(ocvb)
+
+        gradient.sobel.grayX.ConvertTo(dst1, cv.MatType.CV_32F)
+        gradient.sobel.grayY.ConvertTo(dst2, cv.MatType.CV_32F)
+
+        cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
+        magnitude = magnitude.Normalize()
+        Dim exponent = sliders.TrackBar1.Value / 100
+        magnitude = magnitude.Pow(exponent)
+
+        dst1 = magnitude
+    End Sub
+End Class
+
+
+
+
+
+
+' https://github.com/SciSharp/Numpy.NET
+Public Class Gradient_NumPy
+    Inherits ocvbClass
+    Public gradient As Gradient_Basics
+    Public magnitude As New cv.Mat
+    Public angle As New cv.Mat
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        gradient = New Gradient_Basics(ocvb)
+        gradient.sobel.sliders.TrackBar1.Value = 1
+
+        sliders.setupTrackBar1(ocvb, caller, "Contrast exponent to use X100", 0, 200, 30)
+
+        label1 = "CartToPolar Magnitude Output Normalized"
+        label2 = "CartToPolar Angle Output"
+        ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        src.ConvertTo(gradient.src, cv.MatType.CV_32FC3, 1 / 255)
+        gradient.Run(ocvb)
+
+        gradient.sobel.grayX.ConvertTo(dst1, cv.MatType.CV_32F)
+        gradient.sobel.grayY.ConvertTo(dst2, cv.MatType.CV_32F)
+
+        cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
+
+        magnitude = magnitude.Normalize()
+
+        Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ 
+            Dim npMag = MatToNumPyFloat(magnitude)
+            Dim exponent = sliders.TrackBar1.Value / 100
+            Numpy.np.power(npMag, exponent, npMag)
+            NumPyFloatToMat(npMag, dst1)
+        End Using
     End Sub
 End Class

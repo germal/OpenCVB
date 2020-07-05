@@ -13,22 +13,3 @@ Public Class AddWeighted_Basics
     End Sub
 End Class
 
-
-
-
-
-
-Public Class AddWeighted_Test
-    Inherits ocvbClass
-    Dim weight As AddWeighted_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        weight = New AddWeighted_Basics(ocvb)
-        ocvb.desc = "Testing AddWeighted_Basics as a derivative algorithm."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        weight.src = src
-        weight.Run(ocvb)
-        dst1 = weight.dst1
-    End Sub
-End Class

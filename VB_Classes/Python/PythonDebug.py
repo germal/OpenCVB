@@ -65,6 +65,7 @@ class GeneticDrawing:
         sampling_mask = None
         if s >= start_stage:
             t = (1.0 - (s-start_stage)/max(stages-start_stage-1,1)) * 0.25 + 0.005
+            print(t)
             sampling_mask = self.calc_sampling_mask(t)
         return sampling_mask
         
@@ -74,6 +75,7 @@ class GeneticDrawing:
     this function precalculates angles and their magnitudes for later use inside DNA class
     '''
     def _imgGradient(self, img):
+        cv2.imshow("img", img)
         #convert to 0 to 1 float representation
         img = np.float32(img) / 255.0 
         # Calculate gradient 
@@ -100,6 +102,7 @@ class GeneticDrawing:
             mag = cv2.GaussianBlur(mag,(0,0), w, cv2.BORDER_DEFAULT)
         #ensure range from 0-255 (mostly for visual debugging, since in sampling we will renormalize it anyway)
         scale = 255.0/mag.max()
+        
         return mag*scale
         
     
@@ -349,7 +352,7 @@ class DNA:
 if __name__ == '__main__':
     #load the example image and set the generator for 100 stages with 20 generations each
     gen = GeneticDrawing('../../Data/GeneticDrawingExample.jpg', seed=time.time())
-    out = gen.generate(100, 20)
+    out = gen.generate(10, 20)
     
     #load a custom mask and set a smaller brush size for finer details
     #gen.sampling_mask = cv2.cvtColor(cv2.imread("../../Data/GeneticDrawingMask.jpg"), cv2.COLOR_BGR2GRAY)

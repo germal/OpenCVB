@@ -143,6 +143,7 @@
     <Compile Include="Cartoonify.vb" />
     <Compile Include="Coherence.vb" />
     <Compile Include="Concat.vb" />
+    <Compile Include="Contrast.vb" />
     <Compile Include="Dither.vb" />
     <Compile Include="EMax.vb" />
     <Compile Include="Emgu.vb" />
@@ -154,6 +155,7 @@
     <Compile Include="FREAK.vb" />
     <Compile Include="Gabor.vb" />
     <Compile Include="CellAuto.vb" />
+    <Compile Include="GeneticDrawing.vb" />
     <Compile Include="GetRotationMatrix2D.vb" />
     <Compile Include="Grayscale.vb" />
     <Compile Include="Harris.vb" />

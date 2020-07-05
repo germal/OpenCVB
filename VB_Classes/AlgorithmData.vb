@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 
 Public Class AlgorithmData
     ' all the items here are used to communicate to/from the host user interface.  Other variables common to all algorithms should be ocvbClass.vb

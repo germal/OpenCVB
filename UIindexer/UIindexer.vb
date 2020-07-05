@@ -5,6 +5,7 @@ Module IndexMain
     Dim MTnames As New SortedList(Of String, String)
     Dim CSnames As New SortedList(Of String, String)
     Dim OpenGLnames As New SortedList(Of String, String)
+    Dim numpy As New SortedList(Of String, String)
     Dim PYnames As New SortedList(Of String, String)
     Dim nonPYnames As New SortedList(Of String, String)
     Dim PYStreamNames As New SortedList(Of String, String)
@@ -82,6 +83,7 @@ Module IndexMain
                 If lcaseLine.Contains("painterly") And Painterly.ContainsKey(classname) = False Then Painterly.Add(classname, classname)
                 If lcaseLine.Contains("needs more work") And MoreWork.ContainsKey(classname) = False Then MoreWork.Add(classname, classname)
                 If lcaseLine.Contains("tracker algorithm") And Trackers.ContainsKey(classname) = False Then Trackers.Add(classname, classname)
+                If (lcaseLine.Contains("np.") Or LCase(classname).Contains("numpy")) And numpy.ContainsKey(classname) = False Then numpy.Add(classname, classname)
                 If LCase(line).StartsWith("public class") Then
                     Dim split As String() = Regex.Split(line, "\W+")
                     ' next line must be "Inherits ocvbClass"
@@ -174,6 +176,12 @@ Module IndexMain
         sw.Write("<non-Python>")
         For i = 0 To nonPYnames.Count - 1
             sw.Write("," + nonPYnames.ElementAt(i).Key)
+        Next
+        sw.WriteLine()
+
+        sw.Write("<NumPy>")
+        For i = 0 To numpy.Count - 1
+            sw.Write("," + numpy.ElementAt(i).Key)
         Next
         sw.WriteLine()
 

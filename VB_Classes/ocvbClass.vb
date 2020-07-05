@@ -1,4 +1,6 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports Numpy
+Imports System.Runtime.InteropServices
+Imports cv = OpenCvSharp
 Public Class oTrueType
     Public Const RESULT1 = 2
     Public Const RESULT2 = 3
@@ -72,6 +74,15 @@ Public Class ocvbClass : Implements IDisposable
         If p.Y > dst1.Height Then p.Y = dst1.Height - 1
         Return p
     End Function
+    Public Function MatToNumPyFloat(mat As cv.Mat) As NDarray
+        Dim array(mat.Total - 1) As Single
+        Marshal.Copy(mat.Data, array, 0, array.Length)
+        Dim ndarray = Numpy.np.asarray(Of Single)(array)
+        Return ndarray
+    End Function
+    Public Sub NumPyFloatToMat(array As NDarray, ByRef mat As cv.Mat)
+        Marshal.Copy(array.GetData(Of Single), 0, mat.Data, mat.Total)
+    End Sub
     Public Sub New()
         src = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
         dst1 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)

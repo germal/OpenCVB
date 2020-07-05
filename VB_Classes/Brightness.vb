@@ -23,23 +23,6 @@ End Class
 
 
 
-Public Class Brightness_Contrast
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Brightness", 1, 100, 50)
-        sliders.setupTrackBar2("Contrast", 1, 100, 50)
-        ocvb.desc = "Show image with vary contrast and brightness."
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        src.ConvertTo(dst1, -1, sliders.TrackBar2.Value / 50, sliders.TrackBar1.Value)
-        label1 = "Brightness/Contrast"
-        label2 = ""
-    End Sub
-End Class
-
-
-
 Public Class Brightness_hue
     Inherits ocvbClass
     Public hsv_planes(2) As cv.Mat

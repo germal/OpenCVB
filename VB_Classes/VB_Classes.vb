@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports System.Drawing
 
 Module Algorithm_Module
     ' these are all global settings that are updated by individual algorithms.  
