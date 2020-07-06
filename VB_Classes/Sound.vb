@@ -28,6 +28,7 @@ Public Class Sound_ToPCM
             Next
         End If
         saveFileName = audio.fileinfo.FullName
+        audio.PlayButton.PerformClick()
     End Sub
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -45,5 +46,8 @@ Public Class Sound_ToPCM
 
             'Next
         End If
+    End Sub
+    Public Sub Close()
+        If audio.PlayButton.Text = "Stop" Then audio.PlayButton.PerformClick()
     End Sub
 End Class

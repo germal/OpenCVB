@@ -148,7 +148,7 @@ Public Class Replay_Play
     Dim fh As New fileHeader
     Dim fs As FileStream
     Public Sub New(ocvb As AlgorithmData)
-                setCaller(ocvb)
+        setCaller(ocvb)
         playback.startButton.Text = "Start Playback"
         playback.Show() ' showing this options form is not optional (ha!)  The fileinfo is needed in Run so always initialize it.
         playback.Button2_Click(New Object, New EventArgs) ' autoplay the recorded data (if it exists.)
