@@ -32,19 +32,41 @@ End Class
 
 ' http://pythonnet.github.io/
 ' https://github.com/pythonnet/pythonnet
-Public Class NumPy_EmbeddedTest
+Public Class NumPy_EmbeddedTest_CS
     Inherits ocvbClass
+    Dim embed = New CS_Classes.NumPy_EmbeddedTest
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         ocvb.desc = "Run an embedded Python script"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.NumPyEnabled Then
-            Dim mynp = epy.Py.Import("numpy")
-            'mynp.sin(np.sin * 2)
-            'Dim mySin = mynp.GetType().GetMethod("sin")(np.pi * 2)
-            'Console.WriteLine("testing " + CStr(mySin(np.pi * 2))
-            ' Console.WriteLine("Cos(2*PI) = " + CStr(np.sin(np.pi * 2)))
+            embed.Run()
+        Else
+            ocvb.putText(New TTtext("Enable Embedded NumPy/Python in the Global OptionsDialog", 10, 60, RESULT1))
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+' http://pythonnet.github.io/
+' https://github.com/pythonnet/pythonnet
+Public Class NumPy_EmbeddedMat_CS
+    Inherits ocvbClass
+    Dim embed = New CS_Classes.NumPy_EmbeddedMat
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        ocvb.desc = "Run an embedded Python script to display an image"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.NumPyEnabled Then
+            Dim cmd = "import ctypes # An included library with Python install." + vbCrLf + "import sys" + vbCrLf + "def Mbox(title, text, style):" + vbCrLf + vbTab +
+                      "return ctypes.windll.user32.MessageBoxW(0, text, title, style)" + vbCrLf + "Mbox('NumPy_Embedded testing', 'test', 1)"
+            embed.Run(src, cmd)
         Else
             ocvb.putText(New TTtext("Enable Embedded NumPy/Python in the Global OptionsDialog", 10, 60, RESULT1))
         End If
