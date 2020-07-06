@@ -102,8 +102,6 @@ Public Class GeneticDrawing_Basics
             End If
         End If
 
-        initRandom()
-
         generation += 1
 
         'self.myDNA = DNA(self.img_grey.shape,
@@ -112,6 +110,7 @@ Public Class GeneticDrawing_Basics
         '                     canvas = self.imgBuffer[-1], 
         '                     sampling_mask = sampling_mask)
 
+        initRandom()
 
         If generation = generationTotal Then
             generation = 0
