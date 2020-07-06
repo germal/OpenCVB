@@ -64,9 +64,58 @@ Public Class NumPy_EmbeddedMat_CS
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.NumPyEnabled Then
-            Dim cmd = "import ctypes # An included library with Python install." + vbCrLf + "import sys" + vbCrLf + "def Mbox(title, text, style):" + vbCrLf + vbTab +
-                      "return ctypes.windll.user32.MessageBoxW(0, text, title, style)" + vbCrLf + "Mbox('NumPy_Embedded testing', 'test', 1)"
+            'Dim cmd = "import ctypes # An included library with Python install." + vbCrLf + "import sys" + vbCrLf + "def Mbox(title, text, style):" + vbCrLf + vbTab +
+            '          "return ctypes.windll.user32.MessageBoxW(0, text, title, style)" + vbCrLf + "Mbox('NumPy_Embedded testing', 'test', 1)"
+            Dim cmd = "from time import time,ctime" ' + vbCrLf + "Console.Writeline('Today is',ctime(time()))" + vbCrLf
             embed.Run(src, cmd)
+        Else
+            ocvb.putText(New TTtext("Enable Embedded NumPy/Python in the Global OptionsDialog", 10, 60, RESULT1))
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+' http://pythonnet.github.io/
+' https://github.com/pythonnet/pythonnet
+Public Class NumPy_CmdLine
+    Inherits ocvbClass
+    Dim embed = New CS_Classes.NumPy_Cmds
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        ocvb.desc = "Run an embedded Python string of commands"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.NumPyEnabled Then
+            embed.Run()
+        Else
+            ocvb.putText(New TTtext("Enable Embedded NumPy/Python in the Global OptionsDialog", 10, 60, RESULT1))
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+' http://pythonnet.github.io/
+' https://github.com/pythonnet/pythonnet
+Public Class NumPy_EmbeddedCmd
+    Inherits ocvbClass
+    Dim embed = New CS_Classes.NumPy_EmbeddedCmd
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        ocvb.desc = "Install a package on the embedded Python with Pip"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.NumPyEnabled Then
+            embed.Run("from code import InteractiveConsole" + vbCrLf + "class Console(InteractiveConsole):" + vbCrLf + vbTab +
+                      "def __init__(*args): InteractiveConsole.__init__(*args)" + vbCrLf + "a = 0" + vbCrLf + "code = 'a = 1; print(a)'" + vbCrLf +
+                      "console = Console()" + vbCrLf + "console.runcode(code)" + vbCrLf + "print(a)")
         Else
             ocvb.putText(New TTtext("Enable Embedded NumPy/Python in the Global OptionsDialog", 10, 60, RESULT1))
         End If

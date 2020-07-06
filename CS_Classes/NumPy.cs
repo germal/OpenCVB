@@ -41,6 +41,7 @@ namespace CS_Classes
 
 
 
+
     public class NumPy_EmbeddedMat
     {
         public void Run(OpenCvSharp.Mat src, string cmd)
@@ -49,8 +50,52 @@ namespace CS_Classes
             {
                 PyObject pySrc = src.ToPython();
                 scope.Set("src", pySrc);
-                scope.Exec("import sys");
                 scope.Exec(cmd);
+            }
+        }
+    }
+
+
+
+
+
+    public class NumPy_EmbeddedCmd
+    {
+        public void Run(string cmd)
+        {
+            using (PyScope scope = Py.CreateScope())
+            {
+                scope.Exec(cmd);
+            }
+        }
+    }
+
+
+
+
+
+    public class NumPy_Cmds
+    {
+        public void Run()
+        {
+            using (PyScope scope = Py.CreateScope())
+            {
+                dynamic np = Py.Import("numpy");
+                Console.WriteLine(np.cos(np.pi * 2));
+
+                dynamic sin = np.sin;
+                Console.WriteLine(sin(5));
+
+                Double c = np.cos(5) + sin(5);
+                Console.WriteLine(c);
+
+                dynamic a = np.array(new List<float> { 1, 2, 3});
+                Console.WriteLine(a.dtype);
+
+                dynamic b = np.array(new List<float> { 6, 5, 4}, dtype: np.int32);
+                Console.WriteLine(b.dtype);
+
+                Console.WriteLine(a * b);
             }
         }
     }

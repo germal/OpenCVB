@@ -3,10 +3,8 @@
 import cv2
 import numpy as np
 import time
-import matplotlib.pyplot as plt
 import string
 import random
-from IPython.display import clear_output
 
 class GeneticDrawing:
     def __init__(self, img_path, seed=0, brushesRange=[[0.1, 0.3], [0.3, 0.7]]):
@@ -37,7 +35,6 @@ class GeneticDrawing:
             #evolve DNA
             for g in range(generations):
                 self.myDNA.evolveDNASeq(self.img_grey, self.seed + time.time() + g)
-                clear_output(wait=True)
                 print("Stage ", s+1, ". Generation ", g+1, "/", generations)
                 cv2.imshow("cached image", self.myDNA.get_cached_image())
                 cv2.waitKey(1)
