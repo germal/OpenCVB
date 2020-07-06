@@ -995,7 +995,9 @@ Public Class OpenCVB
         Dim OpenCVB = New VB_Classes.ActiveClass(parms, regWidth / parms.speedFactor, regHeight / parms.speedFactor, New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
         textDesc = OpenCVB.ocvb.desc
 
-        Console.WriteLine(vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested: ")
+        If parms.testAllRunning Then
+            Console.WriteLine(vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested: ")
+        End If
 
         ' Here we check to see if the algorithm constructor changed lowResolution.
         If OpenCVB.ocvb.parms.resolution <> saveLowResSetting Then

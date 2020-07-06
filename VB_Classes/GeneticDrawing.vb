@@ -12,7 +12,7 @@ Public Class GeneticDrawing_Basics
     Inherits ocvbClass
     Dim samplingMask As cv.Mat
     Dim seed As Double
-    Dim gradient As Gradient_NumPy
+    Dim gradient As Gradient_CartToPolar
     Dim minBrush As cv.Size2f
     Dim maxBrush As cv.Size2f
     Dim maxBrushNumber = 4
@@ -32,7 +32,7 @@ Public Class GeneticDrawing_Basics
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Snapshot Video input to initialize genetic drawing"
 
-        gradient = New Gradient_NumPy(ocvb)
+        gradient = New Gradient_CartToPolar(ocvb)
 
         reinitialize()
 

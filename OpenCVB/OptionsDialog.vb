@@ -87,7 +87,7 @@ Public Class OptionsDialog
         SnapToGrid.Checked = GetSetting("OpenCVB", "SnapToGrid", "SnapToGrid", True)
         ShowOptions.Checked = GetSetting("OpenCVB", "ShowOptions", "ShowOptions", False)
         ShowConsoleLog.Checked = GetSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", False)
-        EnableNumPy.Checked = GetSetting("OpenCVB", "EnableNumPy", "EnableNumPy", False)
+        EnableNumPy.Checked = False ' GetSetting("OpenCVB", "EnableNumPy", "EnableNumPy", False)
         AvoidDNNCrashes.Checked = GetSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", False)
         RefreshRate.Value = GetSetting("OpenCVB", "RefreshRate", "RefreshRate", 15)
 
