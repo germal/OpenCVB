@@ -180,7 +180,7 @@ class DNA:
             #append data
             self.DNASeq.append([color, posY, posX, size, rotation, brushNumber])
         #calculate cache error and image
-        self.cached_error, self_cached_image = self.calcTotalError(target_image)
+        self.cached_error, self.cached_image = self.calcTotalError(target_image)
         
     def get_cached_image(self):
         return self.cached_image

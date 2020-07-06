@@ -1,12 +1,22 @@
 ﻿Imports cv = OpenCvSharp
 Imports py = Python.Runtime
+Imports Numpy
+Public Structure DNAentry
+    Dim gray As Byte
+    Dim pt As cv.Point
+    Dim size As Single
+    Dim rotation As Single
+    Dim brushNumber As Integer
+End Structure
 Public Class GeneticDrawing_Basics
     Inherits ocvbClass
     Dim samplingMask As cv.Mat
     Dim seed As Double
     Dim gradient As Gradient_NumPy
-    Dim minBrush = New cv.Size2f(0.1, 0.3)
-    Dim maxBrush = New cv.Size2f(0.3, 0.7)
+    Dim minBrush As cv.Size2f
+    Dim maxBrush As cv.Size2f
+    Dim maxBrushNumber = 4
+    Dim DNAseq As New List(Of DNAentry)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         If standalone Then
@@ -24,15 +34,36 @@ Public Class GeneticDrawing_Basics
 
         gradient = New Gradient_NumPy(ocvb)
 
+        reinitialize()
+
         label1 = "Original Image"
         ocvb.desc = "Create a painting from the current video input using a genetic algorithm - painterly"
     End Sub
     Private Sub initRandom()
         Dim brushstrokeCount = sliders.TrackBar3.Value
         For i = 0 To brushstrokeCount - 1
-            Dim gray = msRNG.Next(0, 255)
-            Dim size = msRNG.NextDouble() * (maxBrush.height - minBrush.height) + minBrush.height
+            Dim e = New DNAentry
+            e.gray = msRNG.Next(0, 255)
+            e.size = msRNG.NextDouble() * (maxBrush.Height - minBrush.Height) + minBrush.Height
+            e.pt = newPosition()
+            Dim localMagnitude = gradient.magnitude.Get(Of Single)(e.pt.Y, e.pt.X)
+            Dim localAngle = gradient.angle.Get(Of Single)(e.pt.Y, e.pt.X) + cv.Cv2.PI
+            e.rotation = (msRNG.Next(-cv.Cv2.PI, cv.Cv2.PI) * (1 - localMagnitude) + localAngle) * 57.2958
+            e.brushNumber = CInt(msRNG.Next(1, maxBrushNumber))
+            DNAseq.Add(e)
         Next
+    End Sub
+    Private Function newPosition() As cv.Point2f
+        If samplingMask IsNot Nothing Then
+
+        End If
+        Return New cv.Point2f(msRNG.Next(src.Width), msRNG.Next(src.Height))
+    End Function
+    Private Sub reinitialize()
+        DNAseq.Clear()
+        minBrush = New cv.Size2f(0.1, 0.3)
+        maxBrush = New cv.Size2f(0.3, 0.7)
+
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static generationTotal As Integer
@@ -70,6 +101,9 @@ Public Class GeneticDrawing_Basics
                 samplingMask = gradient.magnitude.Normalize(255)
             End If
         End If
+
+        initRandom()
+
         generation += 1
 
         'self.myDNA = DNA(self.img_grey.shape,
@@ -83,6 +117,7 @@ Public Class GeneticDrawing_Basics
             generation = 0
             samplingMask = Nothing
             stage += 1
+            reinitialize()
         End If
         label2 = " stage " + CStr(stage) + " Generation " + CStr(generation)
     End Sub

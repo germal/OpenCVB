@@ -136,6 +136,9 @@ class DNA:
         #CACHE
         self.cached_image = None
         self.cached_error = None
+
+        cv2.imshow("canvas", canvas)
+        cv2.waitKey(1)
         
     def preload_brushes(self, path, maxBrushNumber):
         imgs = []
@@ -153,7 +156,7 @@ class DNA:
             posX = int(random.randrange(0, self.bound[1]))
         return [posY, posX]
      
-    def initRandom(self, target_image, count, seed):
+    def initRandom(self, img_grey, count, seed):
         #initialize random DNA sequence
         for i in range(count):
             #random color
@@ -180,7 +183,7 @@ class DNA:
             #append data
             self.DNASeq.append([color, posY, posX, size, rotation, brushNumber])
         #calculate cache error and image
-        self.cached_error, self_cached_image = self.calcTotalError(target_image)
+        self.cached_error, self.cached_image = self.calcTotalError(img_grey)
         
     def get_cached_image(self):
         return self.cached_image

@@ -316,9 +316,6 @@ Public Class OpenCVB
         camera.closePipe()
         stopCameraThread = True
         If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
-        If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
-        If cameraTaskHandle IsNot Nothing Then cameraTaskHandle.Abort()
-        If cameraTaskHandle IsNot Nothing Then cameraTaskHandle.Abort()
         cameraTaskHandle = Nothing
         updateCamera()
     End Sub
@@ -783,9 +780,6 @@ Public Class OpenCVB
         Application.DoEvents()
         camera.closePipe()
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
-        If algorithmTaskHandle IsNot Nothing Then algorithmTaskHandle.Abort()
-        If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
-        If cameraTaskHandle IsNot Nothing Then cameraTaskHandle.Abort()
         textDesc = ""
         saveLayout()
     End Sub
@@ -922,7 +916,7 @@ Public Class OpenCVB
         While frame
             Thread.Sleep(10)  ' to allow the algorithm task to gracefully end and dispose OpenCVB.
             sleepCount += 1
-            If sleepCount > 10 Then Return False
+            If sleepCount > 1000 Then Return False
         End While
         Return True
     End Function
@@ -930,9 +924,6 @@ Public Class OpenCVB
         stopAlgorithmThread = True
         ' there may be a long-running algorithmtask that doesn't see that the algorithm has been stopped.
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
-        If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
-        If algorithmTaskHandle IsNot Nothing Then algorithmTaskHandle.Abort()
-        If algorithmTaskHandle IsNot Nothing Then algorithmTaskHandle.Abort()
 
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
         ReDim parms.IMU_RotationMatrix(9 - 1)
@@ -1004,7 +995,7 @@ Public Class OpenCVB
         Dim OpenCVB = New VB_Classes.ActiveClass(parms, regWidth / parms.speedFactor, regHeight / parms.speedFactor, New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
         textDesc = OpenCVB.ocvb.desc
 
-        Console.WriteLine(vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + "Algorithms tested: " + CStr(AlgorithmTestCount))
+        Console.WriteLine(vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested: ")
 
         ' Here we check to see if the algorithm constructor changed lowResolution.
         If OpenCVB.ocvb.parms.resolution <> saveLowResSetting Then
