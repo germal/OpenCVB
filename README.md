@@ -128,8 +128,8 @@ You will need to download and install the following before starting:
     -   After “PrepareTree.bat” completes, Visual Studio projects will open. Run
         “Batch Build” in each Visual Studio project.
 
--   Set Environmental variable OpenCV_Version to 430. – This depends on the
-    version of OpenCV, currently 4.30.
+-   Set Environmental variable OpenCV_Version to 440. – This depends on the
+    version of OpenCV, currently 4.40.
 
 -   <https://docs.microsoft.com/en-us/azure/Kinect-dk/sensor-sdk-download> –
     Select “Windows Installer” to get proprietary Kinect4Azure support.
@@ -169,9 +169,9 @@ After all the packages have been built, then there is one environmental variable
 that needs to be set and it will depend on which version of OpenCV was just
 downloaded and built.
 
--   Environmental variable “OpenCV_Version” should be set to 430
+-   Environmental variable “OpenCV_Version” should be set to 440
 
-The currently available OpenCV download is 4.30 so setting OpenCV_Version to 430
+The currently available OpenCV download is 4.40 so setting OpenCV_Version to 440
 reflects that but note that OpenCV is updated several times a year and the
 environmental variable may need to be updated.
 
@@ -206,8 +206,8 @@ Support for some optional cameras can be easily added:
 Some typical problems with new installations:
 
 -   Link problems: check the “OpenCV_Version” environmental variable for OpenCV
-    version. It may need to reflect a newer version of OpenCV. For OpenCV 4.3,
-    the environmental variable is OpenCV_Version = 430. Make sure that OpenCV
+    version. It may need to reflect a newer version of OpenCV. For OpenCV 4.4,
+    the environmental variable is OpenCV_Version = 440. Make sure that OpenCV
     Debug and Release versions were built successfully.
 
 -   Camera Failure: check the camera installation by testing with examples
@@ -418,6 +418,13 @@ Visual Studio menu:
 
 To check that all the necessary packages are installed, run the
 ‘PythonPackages.py’ algorithm from OpenCVB’s user interface.
+
+NumPy is included in the list of NuGet packages that come with OpenCVB but the
+code has not been stable. Using Python as it is normally consumed – with Python
+scripts running in their own process – means that the script will be reusable
+elsewhere. There is a check box in the Global Options dialog box to allow new
+versions of NumPy to be tested with the existing NumPy algorithms. Because it
+has been unreliable, the enabled setting is not saved when OpenCVB is closed.
 
 **Python Debugging**
 
