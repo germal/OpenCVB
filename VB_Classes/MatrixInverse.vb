@@ -24,32 +24,32 @@ End Module
 
 
 
-' https://visualstudiomagazine.com/articles/2020/04/06/invert-matrix.aspx
-Public Class MatrixInverse_Basics_CS
-    Inherits ocvbClass
-    Public matrix As New MatrixInverse ' NOTE: C# class
-    Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
-    Dim defaultBVector() As Double = {12, 7, 7, 13}
-    Dim input As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
-        ocvb.desc = "Manually invert a matrix"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If input.Width <> input.Height Then
-            ocvb.putText(New TTtext("The src matrix must be square!", 10, 60, RESULT1))
-            Exit Sub
-        End If
+'' https://visualstudiomagazine.com/articles/2020/04/06/invert-matrix.aspx
+'Public Class MatrixInverse_Basics_CS
+'    Inherits ocvbClass
+'    Public matrix As New MatrixInverse ' NOTE: C# class
+'    Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
+'    Dim defaultBVector() As Double = {12, 7, 7, 13}
+'    Dim input As cv.Mat
+'    Public Sub New(ocvb As AlgorithmData)
+'        setCaller(ocvb)
+'        input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
+'        ocvb.desc = "Manually invert a matrix"
+'    End Sub
+'    Public Sub Run(ocvb As AlgorithmData)
+'        If input.Width <> input.Height Then
+'            ocvb.putText(New TTtext("The src matrix must be square!", 10, 60, RESULT1))
+'            Exit Sub
+'        End If
 
-        If standalone Then matrix.bVector = defaultBVector
+'        If standalone Then matrix.bVector = defaultBVector
 
-        Dim result = matrix.Run(input) ' C# class Run - not ocvbClass...
+'        Dim result = matrix.Run(input) ' C# class Run - not ocvbClass...
 
-        Dim outstr = printMatrixResults(input, result)
-        ocvb.putText(New TTtext(outstr + vbCrLf + "Intermediate results are optionally available in the console log.", 10, 60, RESULT1))
-    End Sub
-End Class
+'        Dim outstr = printMatrixResults(input, result)
+'        ocvb.putText(New TTtext(outstr + vbCrLf + "Intermediate results are optionally available in the console log.", 10, 60, RESULT1))
+'    End Sub
+'End Class
 
 
 
