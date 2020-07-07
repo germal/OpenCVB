@@ -189,11 +189,14 @@ Public Class OpenCVB
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
         ' Post an issue if this Is Not a valid assumption
         Dim kinectDLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.3.0\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
+        If kinectDLL.Exists = False Then ' try a later version.
+            kinectDLL = New FileInfo("C:\Program Files\Azure Kinect SDK v1.4.0\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
+        End If
         If kinectDLL.Exists = False Then
             MsgBox("The Microsoft installer for the Kinect camera proprietary portion" + vbCrLf +
-                   "was not installed in the expected place. (Has it changed?)" + vbCrLf +
-                   "It was expected to be in " + kinectDLL.FullName + vbCrLf +
-                   "Update the code near this message and restart.")
+                   "was not installed in:" + vbCrLf + vbCrLf + kinectDLL.FullName + vbCrLf + vbCrLf +
+                   "Did a new Version get installed?" + vbCrLf +
+                   "Support for the Kinect camera may not work up you update the code near this message.")
             optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = 0 ' we can't use this device
         Else
             updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
