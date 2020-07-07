@@ -35,7 +35,6 @@ Partial Class OptionsDialog
         Me.ShowConsoleLog = New System.Windows.Forms.CheckBox()
         Me.ShowLabels = New System.Windows.Forms.CheckBox()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
-        Me.ShowOptions = New System.Windows.Forms.CheckBox()
         Me.TestAllDuration = New System.Windows.Forms.NumericUpDown()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.GroupBox6 = New System.Windows.Forms.GroupBox()
@@ -194,7 +193,6 @@ Partial Class OptionsDialog
         '
         'GroupBox4
         '
-        Me.GroupBox4.Controls.Add(Me.ShowOptions)
         Me.GroupBox4.Controls.Add(Me.TestAllDuration)
         Me.GroupBox4.Controls.Add(Me.Label1)
         Me.GroupBox4.Location = New System.Drawing.Point(22, 642)
@@ -203,16 +201,6 @@ Partial Class OptionsDialog
         Me.GroupBox4.TabIndex = 8
         Me.GroupBox4.TabStop = False
         Me.GroupBox4.Text = "Test All Options"
-        '
-        'ShowOptions
-        '
-        Me.ShowOptions.AutoSize = True
-        Me.ShowOptions.Location = New System.Drawing.Point(76, 94)
-        Me.ShowOptions.Name = "ShowOptions"
-        Me.ShowOptions.Size = New System.Drawing.Size(310, 24)
-        Me.ShowOptions.TabIndex = 7
-        Me.ShowOptions.Text = "Show algorithm options during 'Test All'"
-        Me.ShowOptions.UseVisualStyleBackColor = True
         '
         'TestAllDuration
         '
@@ -395,7 +383,6 @@ Partial Class OptionsDialog
     Friend WithEvents SelectPythonFile As Button
     Friend WithEvents Label2 As Label
     Friend WithEvents OpenFileDialog1 As OpenFileDialog
-    Friend WithEvents ShowOptions As CheckBox
     Friend WithEvents ShowConsoleLog As CheckBox
     Friend WithEvents AvoidDNNCrashes As CheckBox
     Friend WithEvents OKButton As Button

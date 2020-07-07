@@ -27,7 +27,6 @@ Public Class OptionsDialog
         SaveSetting("OpenCVB", "TestAllDuration", "TestAllDuration", TestAllDuration.Value)
         SaveSetting("OpenCVB", "SnapToGrid", "SnapToGrid", SnapToGrid.Checked)
         SaveSetting("OpenCVB", "PythonExe", "PythonExe", PythonExeName.Text)
-        SaveSetting("OpenCVB", "ShowOptions", "ShowOptions", ShowOptions.Checked)
         SaveSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", ShowConsoleLog.Checked)
         SaveSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", AvoidDNNCrashes.Checked)
         SaveSetting("OpenCVB", "EnableNumPy", "EnableNumPy", EnableNumPy.Checked)
@@ -85,7 +84,6 @@ Public Class OptionsDialog
 
         TestAllDuration.Value = GetSetting("OpenCVB", "TestAllDuration", "TestAllDuration", 10)
         SnapToGrid.Checked = GetSetting("OpenCVB", "SnapToGrid", "SnapToGrid", True)
-        ShowOptions.Checked = GetSetting("OpenCVB", "ShowOptions", "ShowOptions", False)
         ShowConsoleLog.Checked = GetSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", False)
         EnableNumPy.Checked = False ' GetSetting("OpenCVB", "EnableNumPy", "EnableNumPy", False)
         AvoidDNNCrashes.Checked = GetSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", False)

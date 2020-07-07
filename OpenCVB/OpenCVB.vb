@@ -950,7 +950,7 @@ Public Class OpenCVB
         parms.testAllRunning = TestAllButton.Text = "Stop Test"
         parms.keyboardInput = keyboardInput
         parms.externalPythonInvocation = externalPythonInvocation
-        If parms.testAllRunning Then parms.ShowOptions = optionsForm.ShowOptions.Checked Else parms.ShowOptions = True ' always show options when not running 'test all'
+        parms.ShowOptions = True ' always show the options now...
         parms.ShowConsoleLog = optionsForm.ShowConsoleLog.Checked
         parms.AvoidDNNCrashes = optionsForm.AvoidDNNCrashes.Checked
         parms.NumPyEnabled = optionsForm.EnableNumPy.Checked
