@@ -136,9 +136,6 @@ class DNA:
         #CACHE
         self.cached_image = None
         self.cached_error = None
-
-        cv2.imshow("canvas", canvas)
-        cv2.waitKey(1)
         
     def preload_brushes(self, path, maxBrushNumber):
         imgs = []
