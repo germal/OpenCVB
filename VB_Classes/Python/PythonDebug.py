@@ -48,9 +48,6 @@ class GeneticDrawing:
     def set_brush_range(self, ranges):
         self.brushesRange = ranges
         
-    def set_sampling_mask(self, img_path):
-        self.sampling_mask = cv2.cvtColor(cv2.imread(img_path),cv2.COLOR_BGR2GRAY)
-        
     def create_sampling_mask(self, s, stages):
         percent = 0.2
         start_stage = int(stages*percent)
@@ -145,6 +142,8 @@ class DNA:
     
     def gen_new_positions(self):
         if self.sampling_mask is not None:
+            cv2.imshow("sampling_mask", self.sampling_mask.ConvertScaleAbs(255))
+            cv2.waitKey(1)
             pos = util_sample_from_img(self.sampling_mask)
             posY = pos[0][0]
             posX = pos[1][0]
@@ -198,20 +197,10 @@ class DNA:
         totalDiff = cv2.add(diff1, diff2)
         totalDiff = np.sum(totalDiff)
         return (totalDiff, myImg)
-            
-    def draw(self):
-        myImg = self.drawAll(self.DNASeq)
-        return myImg
         
     def drawAll(self, DNASeq):
-        #set image to pre generated
-        if self.canvas is None: #if we do not have an image specified
-            inImg = np.zeros((self.bound[0], self.bound[1]), np.uint8)
-        else:
-            inImg = np.copy(self.canvas)
-        #apply padding
         p = self.padding
-        inImg = cv2.copyMakeBorder(inImg, p,p,p,p,cv2.BORDER_CONSTANT,value=[0,0,0])
+        inImg = cv2.copyMakeBorder(self.canvas, p,p,p,p,cv2.BORDER_CONSTANT,value=[0,0,0])
         #draw every DNA
         for i in range(len(DNASeq)):
             inImg = self.__drawDNA(DNASeq[i], inImg)
@@ -244,7 +233,6 @@ class DNA:
         myClr[:, :] = color
 
         #find ROI
-        inImg_rows, inImg_cols = inImg.shape
         y_min = int(posY - rows/2)
         y_max = int(posY + (rows - rows/2))
         x_min = int(posX - cols/2)
@@ -343,7 +331,7 @@ class DNA:
 if __name__ == '__main__':
     #load the example image and set the generator for 100 stages with 20 generations each
     gen = GeneticDrawing('../../Data/GeneticDrawingExample.jpg', seed=time.time())
-    out = gen.generate(100, 20)
+    out = gen.generate(40, 20)
     
     #load a custom mask and set a smaller brush size for finer details
     #gen.sampling_mask = cv2.cvtColor(cv2.imread("../../Data/GeneticDrawingMask.jpg"), cv2.COLOR_BGR2GRAY)

@@ -48,9 +48,6 @@ class GeneticDrawing:
     def set_brush_range(self, ranges):
         self.brushesRange = ranges
         
-    def set_sampling_mask(self, img_path):
-        self.sampling_mask = cv2.cvtColor(cv2.imread(img_path),cv2.COLOR_BGR2GRAY)
-        
     def create_sampling_mask(self, s, stages):
         percent = 0.2
         start_stage = int(stages*percent)
@@ -153,7 +150,7 @@ class DNA:
             posX = int(random.randrange(0, self.bound[1]))
         return [posY, posX]
      
-    def initRandom(self, target_image, count, seed):
+    def initRandom(self, img_grey, count, seed):
         #initialize random DNA sequence
         for i in range(count):
             #random color
@@ -180,7 +177,7 @@ class DNA:
             #append data
             self.DNASeq.append([color, posY, posX, size, rotation, brushNumber])
         #calculate cache error and image
-        self.cached_error, self.cached_image = self.calcTotalError(target_image)
+        self.cached_error, self.cached_image = self.calcTotalError(img_grey)
         
     def get_cached_image(self):
         return self.cached_image
@@ -198,20 +195,10 @@ class DNA:
         totalDiff = cv2.add(diff1, diff2)
         totalDiff = np.sum(totalDiff)
         return (totalDiff, myImg)
-            
-    def draw(self):
-        myImg = self.drawAll(self.DNASeq)
-        return myImg
         
     def drawAll(self, DNASeq):
-        #set image to pre generated
-        if self.canvas is None: #if we do not have an image specified
-            inImg = np.zeros((self.bound[0], self.bound[1]), np.uint8)
-        else:
-            inImg = np.copy(self.canvas)
-        #apply padding
         p = self.padding
-        inImg = cv2.copyMakeBorder(inImg, p,p,p,p,cv2.BORDER_CONSTANT,value=[0,0,0])
+        inImg = cv2.copyMakeBorder(self.canvas, p,p,p,p,cv2.BORDER_CONSTANT,value=[0,0,0])
         #draw every DNA
         for i in range(len(DNASeq)):
             inImg = self.__drawDNA(DNASeq[i], inImg)
@@ -244,7 +231,6 @@ class DNA:
         myClr[:, :] = color
 
         #find ROI
-        inImg_rows, inImg_cols = inImg.shape
         y_min = int(posY - rows/2)
         y_max = int(posY + (rows - rows/2))
         x_min = int(posX - cols/2)
@@ -255,7 +241,6 @@ class DNA:
         background = inImg[y_min:y_max,x_min:x_max].astype(float) #get ROI
         # Normalize the alpha mask to keep intensity between 0 and 1
         alpha = brushImg.astype(float)/255.0
-        
 
         try:
             # Multiply the foreground with the alpha matte
