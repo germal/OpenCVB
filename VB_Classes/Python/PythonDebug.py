@@ -142,8 +142,11 @@ class DNA:
     
     def gen_new_positions(self):
         if self.sampling_mask is not None:
-            cv2.imshow("sampling_mask", self.sampling_mask.ConvertScaleAbs(255))
-            cv2.waitKey(1)
+            rows = self.sampling_mask.shape[0]
+            cols = self.sampling_mask.shape[1]
+            test = self.sampling_mask[0:rows, 0:cols].astype(np.uint8)
+            cv2.imshow("test", test)
+            #cv2.waitKey(1)
             pos = util_sample_from_img(self.sampling_mask)
             posY = pos[0][0]
             posX = pos[1][0]
@@ -331,7 +334,7 @@ class DNA:
 if __name__ == '__main__':
     #load the example image and set the generator for 100 stages with 20 generations each
     gen = GeneticDrawing('../../Data/GeneticDrawingExample.jpg', seed=time.time())
-    out = gen.generate(40, 20)
+    out = gen.generate(10, 20)
     
     #load a custom mask and set a smaller brush size for finer details
     #gen.sampling_mask = cv2.cvtColor(cv2.imread("../../Data/GeneticDrawingMask.jpg"), cv2.COLOR_BGR2GRAY)

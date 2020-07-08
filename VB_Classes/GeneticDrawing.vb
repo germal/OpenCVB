@@ -136,7 +136,6 @@ Public Class GeneticDrawing_Basics
         End If
 
         If samplingMask IsNot Nothing Then
-            'dst2 = samplingMask
             samplingMask = Nothing
         Else
             Dim startStage = stageTotal * 0.2
@@ -146,6 +145,7 @@ Public Class GeneticDrawing_Basics
                 If kernelSize Mod 2 = 0 Then kernelSize += 1
                 If kernelSize > 1 Then cv.Cv2.GaussianBlur(gradient.magnitude, gradient.magnitude, New cv.Size(kernelSize, kernelSize), 0, 0)
                 samplingMask = gradient.magnitude.Normalize(255)
+                cv.Cv2.ImShow("samplingMask", samplingMask.ConvertScaleAbs(255))
             End If
         End If
 

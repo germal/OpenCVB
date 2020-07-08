@@ -142,6 +142,11 @@ class DNA:
     
     def gen_new_positions(self):
         if self.sampling_mask is not None:
+            rows = self.sampling_mask.shape[0]
+            cols = self.sampling_mask.shape[1]
+            test = self.sampling_mask[0:rows, 0:cols].astype(np.uint8)
+            cv2.imshow("test", test)
+            #cv2.waitKey(1)
             pos = util_sample_from_img(self.sampling_mask)
             posY = pos[0][0]
             posX = pos[1][0]
@@ -241,6 +246,7 @@ class DNA:
         background = inImg[y_min:y_max,x_min:x_max].astype(float) #get ROI
         # Normalize the alpha mask to keep intensity between 0 and 1
         alpha = brushImg.astype(float)/255.0
+        
 
         try:
             # Multiply the foreground with the alpha matte
