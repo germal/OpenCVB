@@ -8,8 +8,6 @@
             <Code Language="VB">
                 <![CDATA[
 Imports cv = OpenCvSharp
-Imports py = Python.Runtime
-Imports Numpy
 Public Class newClass_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
@@ -17,11 +15,6 @@ Public Class newClass_Basics
         ocvb.desc = "New class description"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-		If ocvb.parms.NumPyEnabled Then
-			' Insert any NumPy code here (delete using and imports above otherwise.)
-		Else
-			ocvb.putText(New oTrueType("Enable Embedded NumPy/Python in the Global OptionsDialog", 10, 60, RESULT1))
-		End If
     End Sub
 End Class]]>
             </Code>

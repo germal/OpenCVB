@@ -269,6 +269,8 @@ class DNA:
             print('bg: ', background.shape)
             print('alpha: ', alpha.shape)
         
+        cv2.imshow("__drawDNA inImg", inImg)
+        cv2.waitKey(1)
         return inImg
 
         
@@ -296,7 +298,7 @@ class DNA:
             #move it the change list
             changeIndices.append(indexOptions.pop(indexToTake))
         #mutate selected items
-        np.sort(changeIndices)
+        #np.sort(changeIndices)
         changeIndices[:] = changeIndices[::-1]
         for changeIndex in changeIndices:
             if changeIndex == 0:# if color
@@ -326,6 +328,8 @@ class DNA:
             self.DNASeq[index] = child[:]
             self.cached_image = child_img
             self.cached_error = child_error
+            cv2.imshow("child_img", child_img)
+            cv2.waitKey(1)
         
     def evolveDNASeq(self, inImg, seed):
         for i in range(len(self.DNASeq)):

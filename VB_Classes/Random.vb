@@ -267,3 +267,82 @@ Public Class Random_PatternGenerator_CPP
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class Random_CustomDistribution
+    Inherits ocvbClass
+    Dim cdf As cv.Mat
+    Dim histogram As cv.Mat
+    Public plotHist As Plot_Histogram
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        Dim loadedDice() As Single = {1, 3, 0.5, 0.5, 0.5, 0.5}
+        cdf = New cv.Mat(loadedDice.Length, 1, cv.MatType.CV_32F, loadedDice)
+        cdf *= 1 / 6
+
+        plotHist = New Plot_Histogram(ocvb)
+
+        ocvb.desc = "Create a custom random number distribution from any histogram"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If cdf.Get(Of Single)(cdf.Rows - 1, 0) < 0.9 Then ' convert the input histogram to a cdf.
+            For i = 1 To cdf.Rows - 1
+                cdf.Set(Of Single)(i, 0, cdf.Get(Of Single)(i - 1, 0) + cdf.Get(Of Single)(i, 0))
+            Next
+        End If
+        histogram = New cv.Mat(cdf.Size(), cv.MatType.CV_32F, 0)
+        Dim size = histogram.Rows
+        For i = 0 To 1000
+            Dim uniformR1 = msRNG.NextDouble()
+            For j = 1 To size - 1S
+                If uniformR1 > cdf.Get(Of Single)(j, 0) Then
+                    histogram.Set(Of Single)(j - 1, 0, histogram.Get(Of Single)(j - 1, 0) + 1)
+                End If
+            Next
+        Next
+
+        plotHist.hist = histogram
+        plotHist.Run(ocvb)
+        dst1 = plotHist.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+' https://www.khanacademy.org/computing/computer-programming/programming-natural-simulations/programming-randomness/a/custom-distribution-of-random-numbers
+Public Class Random_MonteCarlo
+    Inherits ocvbClass
+    Public plotHist As Plot_Histogram
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        plotHist = New Plot_Histogram(ocvb)
+        ocvb.desc = "Generate random numbers but prefer higher values"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim dimension = 100
+        Dim histogram = New cv.Mat(dimension, 1, cv.MatType.CV_32F, 0)
+        For i = 0 To 20000
+            While (1)
+                Dim r1 = msRNG.NextDouble()
+                Dim r2 = msRNG.NextDouble()
+                If r2 < r1 Then
+                    Dim index = CInt(dimension * r1)
+                    histogram.Set(Of Single)(index, 0, histogram.Get(Of Single)(index, 0) + 1)
+                    Exit While
+                End If
+            End While
+        Next
+
+        plotHist.hist = histogram
+        plotHist.Run(ocvb)
+        dst1 = plotHist.dst1
+    End Sub
+End Class
