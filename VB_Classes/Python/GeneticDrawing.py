@@ -146,7 +146,7 @@ class DNA:
             cols = self.sampling_mask.shape[1]
             test = self.sampling_mask[0:rows, 0:cols].astype(np.uint8)
             cv2.imshow("test", test)
-            #cv2.waitKey(1)
+            cv2.waitKey(1)
             pos = util_sample_from_img(self.sampling_mask)
             posY = pos[0][0]
             posX = pos[1][0]
