@@ -616,6 +616,7 @@ Public Class Depth_ManualTrim
     Public Mask As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
+        sliders.Setup(ocvb, caller, 2)
         sliders.setupTrackBar(0, "Min Depth", 200, 1000, 200)
         sliders.setupTrackBar(1, "Max Depth", 200, 10000, 1400)
         ocvb.desc = "Manually show depth with varying min and max depths."
