@@ -66,7 +66,7 @@ Public Class KAZE_Match_CS
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         red = New LeftRightView_Basics(ocvb)
-        red.sliders.TrackBar1.Value = 45
+        red.sliders.sliders(0).Value = 45
         ocvb.desc = "Match keypoints in the left and right images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -88,8 +88,9 @@ Public Class KAZE_LeftAligned_CS
     Dim CS_KazeRight As New CS_Classes.Kaze_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Max number of points to match", 1, 300, 100)
-        sliders.setupTrackBar2("When matching, max possible distance", 1, 200, 100)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Max number of points to match", 1, 300, 100)
+        sliders.setupTrackBar(1, "When matching, max possible distance", 1, 200, 100)
 
         ocvb.desc = "Match keypoints in the left and right images but display it as movement in the right image."
     End Sub
@@ -100,8 +101,8 @@ Public Class KAZE_LeftAligned_CS
         dst1 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        Dim topDistance = sliders.TrackBar2.Value
-        Dim maxPoints = sliders.TrackBar1.Value
+        Dim topDistance = sliders.sliders(1).Value
+        Dim maxPoints = sliders.sliders(0).Value
         Dim maxCount = Math.Min(maxPoints, Math.Min(CS_KazeRight.kazeKeyPoints.Count, CS_KazeLeft.kazeKeyPoints.Count))
         For i = 0 To maxCount - 1
             Dim pt1 = CS_KazeRight.kazeKeyPoints.ElementAt(i)

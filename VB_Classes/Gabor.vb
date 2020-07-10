@@ -13,24 +13,25 @@ Public Class Gabor_Basics
     Public phaseOffset As Double
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders1.setupTrackBar1(ocvb, caller, "Gabor gamma X10", 0, 10, 5)
-        sliders1.setupTrackBar2("Gabor Phase offset X100", 0, 100, 0)
 
-        sliders.setupTrackBar1(ocvb, caller, "Gabor Kernel Size", 0, 50, 15)
-        sliders.setupTrackBar2("Gabor Sigma", 0, 100, 4)
-        sliders.setupTrackBar3("Gabor Theta (degrees)", 0, 180, 90)
-        sliders.setupTrackBar4("Gabor lambda", 0, 100, 10)
+        sliders.Setup(ocvb, caller, 6)
+        sliders.setupTrackBar(0, "Gabor Kernel Size", 0, 50, 15)
+        sliders.setupTrackBar(1, "Gabor Sigma", 0, 100, 4)
+        sliders.setupTrackBar(2, "Gabor Theta (degrees)", 0, 180, 90)
+        sliders.setupTrackBar(3, "Gabor lambda", 0, 100, 10)
+        sliders.setupTrackBar(4, "Gabor gamma X10", 0, 10, 5)
+        sliders.setupTrackBar(5, "Gabor Phase offset X100", 0, 100, 0)
 
         ocvb.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
-            ksize = sliders.TrackBar1.Value * 2 + 1
-            Sigma = sliders.TrackBar2.Value
-            lambda = sliders.TrackBar4.Value
-            gamma = sliders1.TrackBar1.Value / 10
-            phaseOffset = sliders1.TrackBar2.Value / 1000
-            theta = Math.PI * sliders.TrackBar3.Value / 180
+            ksize = sliders.sliders(0).Value * 2 + 1
+            Sigma = sliders.sliders(1).Value
+            lambda = sliders.sliders(3).Value
+            gamma = sliders.sliders(4).Value / 10
+            phaseOffset = sliders.sliders(5).Value / 1000
+            theta = Math.PI * sliders.sliders(2).Value / 180
         End If
         gKernel = cv.Cv2.GetGaborKernel(New cv.Size(ksize, ksize), Sigma, theta, lambda, gamma, phaseOffset, cv.MatType.CV_32F)
         Dim multiplier = gKernel.Sum()
@@ -51,29 +52,27 @@ Public Class Gabor_Basics_MT
         setCaller(ocvb)
         label2 = "The 32 kernels used"
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = ocvb.color.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
-        grid.sliders.TrackBar2.Value = ocvb.color.Height / 4
+        grid.sliders.sliders(0).Value = ocvb.color.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
+        grid.sliders.sliders(1).Value = ocvb.color.Height / 4
         grid.Run(ocvb) ' we only run this one time!  It needs to be 32 Gabor filters only.
         grid.sliders.Visible = False
 
         ocvb.suppressOptions = True
         For i = 0 To gabor.Length - 1
             gabor(i) = New Gabor_Basics(ocvb)
-            gabor(i).sliders.TrackBar3.Value = i * 180 / gabor.Length
+            gabor(i).sliders.sliders(2).Value = i * 180 / gabor.Length
         Next
 
-        gabor(0).sliders1.Visible = True
         gabor(0).sliders.Visible = True
-        gabor(0).sliders.GroupBox3.Enabled = False
         ocvb.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         For i = 0 To gabor.Count - 1
-            gabor(i).ksize = gabor(0).sliders.TrackBar1.Value * 2 + 1
-            gabor(i).Sigma = gabor(0).sliders.TrackBar2.Value
-            gabor(i).lambda = gabor(0).sliders.TrackBar4.Value
-            gabor(i).gamma = gabor(0).sliders1.TrackBar1.Value / 10
-            gabor(i).phaseOffset = gabor(0).sliders1.TrackBar2.Value / 1000
+            gabor(i).ksize = gabor(0).sliders.sliders(0).Value * 2 + 1
+            gabor(i).Sigma = gabor(0).sliders.sliders(1).Value
+            gabor(i).lambda = gabor(0).sliders.sliders(3).Value
+            gabor(i).gamma = gabor(0).sliders.sliders(4).Value / 10
+            gabor(i).phaseOffset = gabor(0).sliders.sliders(5).Value / 1000
             gabor(i).theta = Math.PI * i / gabor.Length
         Next
 

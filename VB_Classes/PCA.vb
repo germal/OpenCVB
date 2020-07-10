@@ -4,7 +4,8 @@ Public Class PCA_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Retained Variance", 1, 100, 95)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Retained Variance", 1, 100, 95)
         ocvb.desc = "Reconstruct a video stream as a composite of X images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -22,7 +23,7 @@ Public Class PCA_Basics
                 images32f(i).CopyTo(data.Row(i))
             Next
 
-            Dim retainedVariance = sliders.TrackBar1.Value / 100
+            Dim retainedVariance = sliders.sliders(0).Value / 100
             Dim pca = New cv.PCA(data, New cv.Mat, cv.PCA.Flags.DataAsRow, retainedVariance)  ' the pca inputarray cannot be static so we reallocate each time.
 
             Dim point = pca.Project(data.Row(0))

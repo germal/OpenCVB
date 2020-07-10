@@ -6,12 +6,13 @@ Public Class Polylines_IEnumerableExample
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Polyline closed if checked"
         check.Box(0).Checked = True
-        sliders.setupTrackBar1(ocvb, caller, "Polyline Count", 2, 500, 100)
-        sliders.setupTrackBar2("Polyline Thickness", 0, 10, 1)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Polyline Count", 2, 500, 100)
+        sliders.setupTrackBar(1, "Polyline Thickness", 0, 10, 1)
         ocvb.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim points = Enumerable.Range(0, sliders.TrackBar1.Value).Select(Of cv.Point)(
+        Dim points = Enumerable.Range(0, sliders.sliders(0).Value).Select(Of cv.Point)(
             Function(i)
                 Return New cv.Point(CInt(msRNG.Next(0, src.Width)), CInt(msRNG.Next(0, src.Height)))
             End Function).ToList
@@ -20,7 +21,7 @@ Public Class Polylines_IEnumerableExample
 
         dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         ' NOTE: when there are 2 points, there will be 1 line.
-        dst1.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, sliders.TrackBar2.Value, cv.LineTypes.AntiAlias)
+        dst1.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, sliders.sliders(1).Value, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 

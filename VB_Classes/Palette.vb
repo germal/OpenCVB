@@ -6,15 +6,16 @@ Public Class Palette_Color
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "blue", 0, 255, msRNG.Next(0, 255))
-        sliders.setupTrackBar2("green", 0, 255, msRNG.Next(0, 255))
-        sliders.setupTrackBar3("red", 0, 255, msRNG.Next(0, 255))
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "blue", 0, 255, msRNG.Next(0, 255))
+        sliders.setupTrackBar(1, "green", 0, 255, msRNG.Next(0, 255))
+        sliders.setupTrackBar(2, "red", 0, 255, msRNG.Next(0, 255))
         ocvb.desc = "Define a color using sliders."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim b = sliders.TrackBar1.Value
-        Dim g = sliders.TrackBar2.Value
-        Dim r = sliders.TrackBar3.Value
+        Dim b = sliders.sliders(0).Value
+        Dim g = sliders.sliders(1).Value
+        Dim r = sliders.sliders(2).Value
         dst1.SetTo(New cv.Scalar(b, g, r))
         dst2.SetTo(New cv.Scalar(255 - b, 255 - g, 255 - r))
         label1 = "Color (RGB) = " + CStr(b) + " " + CStr(g) + " " + CStr(r)
@@ -32,7 +33,8 @@ Public Class Palette_LinearPolar
         ocvb.desc = "Use LinearPolar to create gradient image"
         SetInterpolationRadioButtons(ocvb, caller, radio, "LinearPolar")
 
-        sliders.setupTrackBar1(ocvb, caller, "LinearPolar radius", 0, ocvb.color.cols, ocvb.color.cols / 2)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "LinearPolar radius", 0, ocvb.color.Cols, ocvb.color.Cols / 2)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1.SetTo(0)
@@ -42,9 +44,9 @@ Public Class Palette_LinearPolar
         Next
         Dim iFlag = getInterpolationRadioButtons(radio)
         Static pt = New cv.Point2f(msRNG.Next(0, dst1.Cols - 1), msRNG.Next(0, dst1.Rows - 1))
-        Dim radius = sliders.TrackBar1.Value ' msRNG.next(0, dst1.Cols)
+        Dim radius = sliders.sliders(0).Value ' msRNG.next(0, dst1.Cols)
         dst2.SetTo(0)
-        If iFlag = cv.InterpolationFlags.WarpInverseMap Then sliders.TrackBar1.Value = sliders.TrackBar1.Maximum
+        If iFlag = cv.InterpolationFlags.WarpInverseMap Then sliders.sliders(0).Value = sliders.sliders(0).Maximum
         cv.Cv2.LinearPolar(dst1, dst1, pt, radius, iFlag)
         cv.Cv2.LinearPolar(src, dst2, pt, radius, iFlag)
     End Sub
@@ -105,8 +107,8 @@ Public Class Palette_Map
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders = New OptionsSliders
-        sliders.setupTrackBar1(ocvb, caller, "inRange offset", 1, 100, 10)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "inRange offset", 1, 100, 10)
         ocvb.desc = "Map colors to different palette - Painterly Effect."
         label1 = "Reduced Colors"
     End Sub
@@ -152,7 +154,7 @@ Public Class Palette_Map
 
         If palette.Count > 0 Then
             Dim c = palette.ElementAt(maxIndex).Key
-            Dim offset = sliders.TrackBar1.Value
+            Dim offset = sliders.sliders(0).Value
             Dim loValue As New cv.Scalar(c(0) - offset, c(1) - offset, c(2) - offset)
             Dim hiValue As New cv.Scalar(c(0) + offset, c(1) + offset, c(2) + offset)
             If loValue.Item(0) < 0 Then loValue.Item(0) = 0
@@ -245,7 +247,8 @@ Public Class Palette_BuildGradientColorMap
     Public gradientColorMap As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Number of color transitions (Used only with Random)", 1, 30, 5)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 30, 5)
 
         label2 = "Generated colormap"
         ocvb.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
@@ -254,7 +257,7 @@ Public Class Palette_BuildGradientColorMap
         If standalone Then If ocvb.frameCount Mod 100 Then Exit Sub
         Dim color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
         Dim color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-        Dim gradCount = sliders.TrackBar1.Value
+        Dim gradCount = sliders.sliders(0).Value
         Dim gradMat As New cv.Mat
         For i = 0 To gradCount - 1
             gradMat = colorTransition(color1, color2, src.Width)
@@ -310,9 +313,9 @@ Public Class Palette_ColorMap
 
                 ' special case the random color map!
                 If colormap = 19 Then
-                    Static saveTransitionCount = gradMap.sliders.TrackBar1.Value
-                    If buildNewRandomMap = False Or saveTransitionCount <> gradMap.sliders.TrackBar1.Value Then
-                        saveTransitionCount = gradMap.sliders.TrackBar1.Value
+                    Static saveTransitionCount = gradMap.sliders.sliders(0).Value
+                    If buildNewRandomMap = False Or saveTransitionCount <> gradMap.sliders.sliders(0).Value Then
+                        saveTransitionCount = gradMap.sliders.sliders(0).Value
                         buildNewRandomMap = True
                         gradMap.Run(ocvb)
                     End If
@@ -410,10 +413,10 @@ Public Class Palette_Consistency
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         emax = New EMax_Basics_CPP(ocvb)
-        emax.basics.sliders.TrackBar2.Value = 15
+        emax.basics.sliders.sliders(1).Value = 15
 
         hist = New Histogram_Simple(ocvb)
-        hist.sliders.TrackBar1.Value = 255
+        hist.sliders.sliders(0).Value = 255
         hist.sliders.Visible = False ' it must remain at 255...
 
         lut = New LUT_Basics(ocvb)
@@ -472,16 +475,16 @@ End Class
 '    Public Sub New(ocvb As AlgorithmData)
 '        setCaller(ocvb)
 '        emax = New EMax_Basics_CPP(ocvb)
-'        emax.basics.sliders.TrackBar2.Value = 15
+'        emax.basics.sliders.sliders(1).Value = 15
 '        emax.showInput = False
 
 '        lut = New LUT_Basics(ocvb)
 
 '        flood = New FloodFill_Projection(ocvb)
-'        flood.sliders.TrackBar1.Value /= scaleFactor
+'        flood.sliders.sliders(0).Value /= scaleFactor
 '        knn = New knn_Basics(ocvb)
 '        ReDim knn.input(1)
-'        knn.sliders.TrackBar2.Value = 1
+'        knn.sliders.sliders(1).Value = 1
 
 '        ReDim moment(10 - 1)
 '        ocvb.parms.ShowOptions = False

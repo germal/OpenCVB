@@ -8,18 +8,17 @@ Public Class MSER_Basics
     Dim mser As cv.MSER
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders2.setupTrackBar1(ocvb, caller, "MSER Edge Blursize", 1, 20, 5)
-        If ocvb.parms.ShowOptions Then sliders2.Show()
+        sliders.Setup(ocvb, caller, 9)
 
-        sliders1.setupTrackBar1(ocvb, caller, "Min Diversity", 0, 100, 20)
-        sliders1.setupTrackBar2("MSER Max Evolution", 1, 1000, 200)
-        sliders1.setupTrackBar3("MSER Area Threshold", 1, 101, 101)
-        sliders1.setupTrackBar4("MSER Min Margin", 1, 100, 3)
-
-        sliders.setupTrackBar1(ocvb, caller, "MSER Delta", 1, 100, 5)
-        sliders.setupTrackBar2("MSER Min Area", 1, 10000, 60)
-        sliders.setupTrackBar3("MSER Max Area", 1000, 100000, 100000)
-        sliders.setupTrackBar4("MSER Max Variation", 1, 100, 25)
+        sliders.setupTrackBar(0, "MSER Delta", 1, 100, 5)
+        sliders.setupTrackBar(1, "MSER Min Area", 1, 10000, 60)
+        sliders.setupTrackBar(2, "MSER Max Area", 1000, 100000, 100000)
+        sliders.setupTrackBar(3, "MSER Max Variation", 1, 100, 25)
+        sliders.setupTrackBar(3, "Min Diversity", 0, 100, 20)
+        sliders.setupTrackBar(4, "MSER Max Evolution", 1, 1000, 200)
+        sliders.setupTrackBar(5, "MSER Area Threshold", 1, 101, 101)
+        sliders.setupTrackBar(6, "MSER Min Margin", 1, 100, 3)
+        sliders.setupTrackBar(7, "MSER Edge Blursize", 1, 20, 5)
 
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Pass2Only"
@@ -31,24 +30,24 @@ Public Class MSER_Basics
         ocvb.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim delta = sliders.TrackBar1.Value
-        Dim minArea = sliders.TrackBar2.Value
-        Dim maxArea = sliders.TrackBar3.Value
-        Dim maxVariation = sliders.TrackBar4.Value / 100
+        Dim delta = sliders.sliders(0).Value
+        Dim minArea = sliders.sliders(1).Value
+        Dim maxArea = sliders.sliders(2).Value
+        Dim maxVariation = sliders.sliders(3).Value / 100
 
-        Dim minDiversity = sliders1.TrackBar1.Value / 100
-        Dim maxEvolution = sliders1.TrackBar2.Value
-        Dim areaThreshold = sliders1.TrackBar3.Value / 100
-        Dim minMargin = sliders1.TrackBar4.Value / 1000
+        Dim minDiversity = sliders.sliders(4).Value / 100
+        Dim maxEvolution = sliders.sliders(5).Value
+        Dim areaThreshold = sliders.sliders(6).Value / 100
+        Dim minMargin = sliders.sliders(7).Value / 1000
 
-        Dim edgeBlurSize = sliders2.TrackBar1.Value
+        Dim edgeBlurSize = sliders.sliders(8).Value
         If edgeBlurSize Mod 2 = 0 Then edgeBlurSize += 1 ' must be odd.
 
         Dim changedParms As Boolean
         For i = 0 To saveParms.Length - 1
-            Dim nextVal = Choose(i + 1, sliders.TrackBar1.Value, sliders.TrackBar2.Value, sliders.TrackBar3.Value, sliders.TrackBar4.Value,
-                                          sliders1.TrackBar1.Value, sliders1.TrackBar2.Value, sliders1.TrackBar3.Value, sliders1.TrackBar4.Value,
-                                          sliders2.TrackBar1.Value, check.Box(0).Checked)
+            Dim nextVal = Choose(i + 1, sliders.sliders(0).Value, sliders.sliders(1).Value, sliders.sliders(2).Value, sliders.sliders(3).Value,
+                                          sliders.sliders(4).Value, sliders.sliders(5).Value, sliders.sliders(6).Value, sliders.sliders(7).Value,
+                                          sliders.sliders(8).Value, check.Box(0).Checked)
             If nextVal <> saveParms(i) Then changedParms = True
             saveParms(i) = nextVal
         Next
@@ -62,7 +61,7 @@ Public Class MSER_Basics
         If check.Box(1).Checked Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mser.DetectRegions(src, region, zone)
 
-        if standalone Then
+        If standalone Then
             Dim pixels As Int32
             dst1.SetTo(0)
             For i = 0 To region.Length - 1
@@ -130,7 +129,7 @@ Public Class MSER_TestSynthetic
     Dim synth As MSER_Synthetic
     Private Function testSynthetic(ocvb As AlgorithmData, img As cv.Mat, pass2Only As Boolean, delta As Int32) As String
         mser.check.Box(0).Checked = pass2Only
-        mser.sliders.TrackBar1.Value = delta
+        mser.sliders.sliders(0).Value = delta
         mser.src = img
         mser.Run(ocvb)
 
@@ -149,11 +148,11 @@ Public Class MSER_TestSynthetic
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         mser = New MSER_Basics(ocvb)
-        mser.sliders.TrackBar1.Value = 10
-        mser.sliders.TrackBar2.Value = 100
-        mser.sliders.TrackBar3.Value = 5000
-        mser.sliders.TrackBar4.Value = 2
-        mser.sliders1.TrackBar1.Value = 0
+        mser.sliders.sliders(0).Value = 10
+        mser.sliders.sliders(1).Value = 100
+        mser.sliders.sliders(2).Value = 5000
+        mser.sliders.sliders(3).Value = 2
+        mser.sliders.sliders(4).Value = 0
         mser.check.Box(1).Checked = False ' the grayscale result is quite unimpressive.
 
         synth = New MSER_Synthetic(ocvb)
@@ -220,7 +219,7 @@ Public Class MSER_Contours
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         mser = New MSER_Basics(ocvb)
-        mser.sliders.TrackBar2.Value = 4000
+        mser.sliders.sliders(1).Value = 4000
         ocvb.desc = "Use MSER but show the contours of each region."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

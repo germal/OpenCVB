@@ -30,12 +30,12 @@ Public Class OpenCVGL_Image_CPP
         imu = New IMU_Basics(ocvb)
 
         If ocvb.parms.testAllRunning = False Then
-            setOpenGLsliders(ocvb, caller, sliders, sliders1, sliders2, sliders3)
-            sliders2.TrackBar3.Value = -10 ' eye.z
-            sliders.TrackBar1.Value = 30 ' FOV
-            sliders.TrackBar2.Value = 0 ' Yaw
-            sliders.TrackBar3.Value = 0 ' pitch
-            sliders.TrackBar4.Value = 0 ' roll
+            setOpenGLsliders(ocvb, caller, sliders)
+            sliders.sliders(10).Value = -10 ' eye.z
+            sliders.sliders(0).Value = 30 ' FOV
+            sliders.sliders(1).Value = 0 ' Yaw
+            sliders.sliders(2).Value = 0 ' pitch
+            sliders.sliders(3).Value = 0 ' roll
 
             OpenCVGL_Image_Open(ocvb.color.Cols, ocvb.color.Rows)
         End If
@@ -51,15 +51,15 @@ Public Class OpenCVGL_Image_CPP
         End If
 
         imu.Run(ocvb)
-        Dim FOV = sliders.TrackBar1.Value
-        Dim yaw = sliders.TrackBar2.Value
-        Dim pitch = sliders.TrackBar3.Value
-        Dim roll = sliders.TrackBar4.Value
-        Dim zNear = sliders1.TrackBar1.Value
-        Dim zFar = sliders1.TrackBar2.Value
-        Dim pointSize = sliders1.TrackBar3.Value
-        Dim eye As New cv.Vec3f(sliders2.TrackBar1.Value, sliders2.TrackBar2.Value, sliders2.TrackBar3.Value)
-        Dim zTrans = sliders1.TrackBar4.Value / 100
+        Dim FOV = sliders.sliders(0).Value
+        Dim yaw = sliders.sliders(1).Value
+        Dim pitch = sliders.sliders(2).Value
+        Dim roll = sliders.sliders(3).Value
+        Dim zNear = sliders.sliders(4).Value
+        Dim zFar = sliders.sliders(5).Value
+        Dim pointSize = sliders.sliders(6).Value
+        Dim eye As New cv.Vec3f(sliders.sliders(8).Value, sliders.sliders(9).Value, sliders.sliders(10).Value)
+        Dim zTrans = sliders.sliders(7).Value / 100
 
         OpenCVGL_Image_Control(ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy,
                                FOV, zNear, zFar, eye, yaw, roll, pitch, pointSize, zTrans, src.Width, src.Height)

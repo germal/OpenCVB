@@ -84,7 +84,8 @@ Public Class Dither_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Bits per color plane (Nbpp only)", 1, 5, 1)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Bits per color plane (Nbpp only)", 1, 5, 1)
 
         radio.Setup(ocvb, caller, 24)
         For i = 0 To radio.check.Count - 1
@@ -104,14 +105,14 @@ Public Class Dither_Basics
         Next
         Select Case radioIndex
             Case 5, 12, 20, 22
-                sliders.TrackBar1.Enabled = True
+                sliders.sliders(0).Enabled = True
             Case Else
-                sliders.TrackBar1.Enabled = False
+                sliders.sliders(0).Enabled = False
         End Select
 
         Dim w = dst1.Width
         Dim h = dst1.Height
-        Dim nColors = Choose(sliders.TrackBar1.Value, 1, 3, 7, 15, 31) ' indicate 3, 6, 9, 12, 15 bits per pixel.
+        Dim nColors = Choose(sliders.sliders(0).Value, 1, 3, 7, 15, 31) ' indicate 3, 6, 9, 12, 15 bits per pixel.
         Dim pixels(dst1.Total * dst1.ElemSize - 1) As Byte
         Dim hpixels = GCHandle.Alloc(pixels, GCHandleType.Pinned)
         For i = 0 To 1

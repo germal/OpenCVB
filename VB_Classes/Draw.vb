@@ -44,13 +44,14 @@ Public Class Draw_rectangles
     Public drawRotatedRectangles As Boolean
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Rectangle Count", 1, 255, 3)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Rectangle Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of rotated rectangles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.White)
-            For i = 0 To sliders.TrackBar1.Value - 1
+            For i = 0 To sliders.sliders(0).Value - 1
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim width = msRNG.Next(0, src.Cols - nPoint.X - 1)
                 Dim height = msRNG.Next(0, src.Rows - nPoint.Y - 1)
@@ -78,15 +79,16 @@ Public Class Draw_Noise
     Public noiseMask As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Noise Count", 1, 1000, 100)
-        sliders.setupTrackBar2("Noise Width", 1, 10, 3)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Noise Count", 1, 1000, 100)
+        sliders.setupTrackBar(1, "Noise Width", 1, 10, 3)
         ocvb.desc = "Add Noise to the color image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        maxNoiseWidth = sliders.TrackBar2.Value
+        maxNoiseWidth = sliders.sliders(1).Value
         src.CopyTo(dst1)
         noiseMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1).SetTo(0)
-        For n = 0 To sliders.TrackBar1.Value
+        For n = 0 To sliders.sliders(0).Value
             Dim i = msRNG.Next(0, src.Cols - 1)
             Dim j = msRNG.Next(0, src.Rows - 1)
             Dim center = New cv.Point2f(i, j)
@@ -124,13 +126,14 @@ Public Class Draw_Ellipses
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Ellipse Count", 1, 255, 3)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Ellipse Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of ellipses."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.White)
-            For i = 0 To sliders.TrackBar1.Value - 1
+            For i = 0 To sliders.sliders(0).Value - 1
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim eSize = New cv.Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
                 Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
@@ -148,13 +151,14 @@ Public Class Draw_Circles
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Circle Count", 1, 255, 3)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Circle Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of circles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.White)
-            For i = 0 To sliders.TrackBar1.Value - 1
+            For i = 0 To sliders.sliders(0).Value - 1
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim radius = msRNG.Next(10, 10 + msRNG.Next(src.Cols / 4))
                 Dim nextColor = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)
@@ -171,13 +175,14 @@ Public Class Draw_Line
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Line Count", 1, 255, 1)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Line Count", 1, 255, 1)
         ocvb.desc = "Draw the requested number of Lines."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency Then Exit Sub
         dst1.SetTo(cv.Scalar.White)
-        For i = 0 To sliders.TrackBar1.Value - 1
+        For i = 0 To sliders.sliders(0).Value - 1
             Dim nPoint1 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
             Dim nPoint2 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
             Dim thickness = msRNG.Next(1, 10)
@@ -193,7 +198,8 @@ Public Class Draw_Polygon
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Poly Count", 1, 255, 1)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Poly Count", 1, 255, 1)
         ocvb.desc = "Draw Polygon figures"
         label2 = "Convex Hull for the same polygon"
 
@@ -208,7 +214,7 @@ Public Class Draw_Polygon
         Dim polyColor = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
         dst1.SetTo(cv.Scalar.White)
         dst2 = dst1.Clone()
-        For i = 0 To sliders.TrackBar1.Value - 1
+        For i = 0 To sliders.sliders(0).Value - 1
             Dim points = New List(Of cv.Point)
             Dim listOfPoints = New List(Of List(Of cv.Point))
             For j = 0 To 10
@@ -289,10 +295,11 @@ Public Class Draw_SymmetricalShapes
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Number of points", 200, 1000, 500)
-        sliders.setupTrackBar2("Radius 1", 1, ocvb.color.Rows / 2, ocvb.color.Rows / 4)
-        sliders.setupTrackBar3("Radius 2", 1, ocvb.color.Rows / 2, ocvb.color.Rows / 8)
-        sliders.setupTrackBar4("nGenPer", 1, 500, 100)
+        sliders.Setup(ocvb, caller, 4)
+        sliders.setupTrackBar(0, "Number of points", 200, 1000, 500)
+        sliders.setupTrackBar(1, "Radius 1", 1, ocvb.color.Rows / 2, ocvb.color.Rows / 4)
+        sliders.setupTrackBar(2, "Radius 2", 1, ocvb.color.Rows / 2, ocvb.color.Rows / 8)
+        sliders.setupTrackBar(3, "nGenPer", 1, 500, 100)
 
         check.Setup(ocvb, caller, 5)
         check.Box(0).Text = "Symmetric Ripple"
@@ -308,10 +315,10 @@ Public Class Draw_SymmetricalShapes
         Static fillColor = cv.Scalar.Red
         If check.Box(4).Checked Then
             If ocvb.frameCount Mod 30 = 0 Then
-                If sliders.TrackBar1.Value < sliders.TrackBar1.Maximum - 17 Then sliders.TrackBar1.Value += 17 Else sliders.TrackBar1.Value = sliders.TrackBar1.Minimum
-                If sliders.TrackBar2.Value < sliders.TrackBar2.Maximum - 10 Then sliders.TrackBar2.Value += 10 Else sliders.TrackBar2.Value = 1
-                If sliders.TrackBar3.Value > 13 Then sliders.TrackBar3.Value -= 13 Else sliders.TrackBar3.Value = sliders.TrackBar3.Maximum
-                If sliders.TrackBar4.Value > 27 Then sliders.TrackBar4.Value -= 27 Else sliders.TrackBar4.Value = sliders.TrackBar4.Maximum
+                If sliders.sliders(0).Value < sliders.sliders(0).Maximum - 17 Then sliders.sliders(0).Value += 17 Else sliders.sliders(0).Value = sliders.sliders(0).Minimum
+                If sliders.sliders(1).Value < sliders.sliders(1).Maximum - 10 Then sliders.sliders(1).Value += 10 Else sliders.sliders(1).Value = 1
+                If sliders.sliders(2).Value > 13 Then sliders.sliders(2).Value -= 13 Else sliders.sliders(2).Value = sliders.sliders(2).Maximum
+                If sliders.sliders(3).Value > 27 Then sliders.sliders(3).Value -= 27 Else sliders.sliders(3).Value = sliders.sliders(3).Maximum
                 fillColor = scalarColors(ocvb.frameCount Mod 255)
             End If
             If ocvb.frameCount Mod 37 = 0 Then check.Box(0).Checked = Not check.Box(0).Checked
@@ -323,11 +330,11 @@ Public Class Draw_SymmetricalShapes
         End If
 
         dst1.SetTo(cv.Scalar.White)
-        Dim numPoints = sliders.TrackBar1.Value
-        Dim nGenPer = sliders.TrackBar4.Value
+        Dim numPoints = sliders.sliders(0).Value
+        Dim nGenPer = sliders.sliders(3).Value
         If check.Box(1).Checked Then numPoints = CInt(numPoints / nGenPer) * nGenPer ' harmonize
-        Dim radius1 = sliders.TrackBar2.Value
-        Dim radius2 = sliders.TrackBar3.Value
+        Dim radius1 = sliders.sliders(1).Value
+        Dim radius2 = sliders.sliders(2).Value
         Dim dTheta = 2 * cv.Cv2.PI / numPoints
         Dim symmetricRipple = check.Box(0).Checked
         Dim reverseInOut = check.Box(3).Checked
@@ -431,7 +438,7 @@ Public Class Draw_Arc
     Dim colorIndex As Integer
     Dim thickness As Integer
     Private Sub setup(ocvb As AlgorithmData)
-        saveMargin = sliders.TrackBar1.Value ' work in the middle of the image.
+        saveMargin = sliders.sliders(0).Value ' work in the middle of the image.
 
         rect = initRandomRect(dst1.Width, dst1.Height, saveMargin)
         angle = msRNG.Next(0, 360)
@@ -448,7 +455,8 @@ Public Class Draw_Arc
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(7 - 1)
 
-        sliders.setupTrackBar1(ocvb, caller, "Clearance from image edge (margin size)", 5, ocvb.color.Width / 8, ocvb.color.Width / 16)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Clearance from image edge (margin size)", 5, ocvb.color.Width / 8, ocvb.color.Width / 16)
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Draw Full Ellipse"
         radio.check(1).Text = "Draw Filled Arc"
@@ -484,7 +492,7 @@ Public Class Draw_Arc
             dst1.Ellipse(New cv.Point(rr.Center.X, rr.Center.Y), New cv.Size(rr.BoundingRect.Size.Width, rr.BoundingRect.Size.Height),
                          angle, startAngle, endAngle, color, thickness, cv.LineTypes.AntiAlias)
         End If
-        If r = rect Or sliders.TrackBar1.Value <> saveMargin Then setup(ocvb)
+        If r = rect Or sliders.sliders(0).Value <> saveMargin Then setup(ocvb)
     End Sub
 End Class
 

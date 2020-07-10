@@ -82,25 +82,24 @@ Public Class OpticalFlow_DenseOptions
         radio.check(4).Text = "PyrBReady"
         radio.check(0).Checked = True
 
-        sliders2.setupTrackBar1(ocvb, caller, "Optical Flow PolyN", 1, 15, 5)
-        sliders2.setupTrackBar2("Optical Flow Scaling Output", 1, 100, 50)
-        If ocvb.parms.ShowOptions Then sliders2.Show()
-
-        sliders.setupTrackBar1(ocvb, caller, "Optical Flow pyrScale", 1, 100, 35)
-        sliders.setupTrackBar2("Optical Flow Levels", 1, 10, 1)
-        sliders.setupTrackBar3("Optical Flow winSize", 1, 9, 1)
-        sliders.setupTrackBar4("Optical Flow Iterations", 1, 10, 1)
+        sliders.Setup(ocvb, caller, 6)
+        sliders.setupTrackBar(0, "Optical Flow pyrScale", 1, 100, 35)
+        sliders.setupTrackBar(1, "Optical Flow Levels", 1, 10, 1)
+        sliders.setupTrackBar(2, "Optical Flow winSize", 1, 9, 1)
+        sliders.setupTrackBar(3, "Optical Flow Iterations", 1, 10, 1)
+        sliders.setupTrackBar(4, "Optical Flow PolyN", 1, 15, 5)
+        sliders.setupTrackBar(5, "Optical Flow Scaling Output", 1, 100, 50)
 
         label1 = "No output - just option settings..."
         ocvb.desc = "Use dense optical flow algorithm options"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        pyrScale = sliders.TrackBar1.Value / sliders.TrackBar1.Maximum
-        levels = sliders.TrackBar2.Value
-        winSize = sliders.TrackBar3.Value
-        iterations = sliders.TrackBar4.Value
+        pyrScale = sliders.sliders(0).Value / sliders.sliders(0).Maximum
+        levels = sliders.sliders(1).Value
+        winSize = sliders.sliders(2).Value
+        iterations = sliders.sliders(3).Value
         If winSize Mod 2 = 0 Then winSize += 1
-        polyN = sliders2.TrackBar1.Value
+        polyN = sliders.sliders(4).Value
         If polyN Mod 2 = 0 Then polyN += 1
         polySigma = 1.5
         If polyN <= 5 Then polySigma = 1.1
@@ -112,7 +111,7 @@ Public Class OpticalFlow_DenseOptions
                 Exit For
             End If
         Next
-        outputScaling = sliders2.TrackBar2.Value
+        outputScaling = sliders.sliders(5).Value
     End Sub
 End Class
 
@@ -156,14 +155,15 @@ Public Class OpticalFlow_DenseBasics_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = ocvb.color.cols / 4
-        grid.sliders.TrackBar2.Value = ocvb.color.Rows / 4
-        grid.sliders.TrackBar3.Value = 5
+        grid.sliders.sliders(0).Value = ocvb.color.Cols / 4
+        grid.sliders.sliders(1).Value = ocvb.color.Rows / 4
+        grid.sliders.sliders(2).Value = 5
 
         flow = New OpticalFlow_DenseOptions(ocvb)
-        flow.sliders.TrackBar1.Value = 75
+        flow.sliders.sliders(0).Value = 75
 
-        sliders.setupTrackBar1(ocvb, caller, "Correlation Threshold", 0, 1000, 1000)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 1000)
 
         ocvb.desc = "MultiThread dense optical flow algorithm  "
     End Sub
@@ -174,7 +174,7 @@ Public Class OpticalFlow_DenseBasics_MT
             grid.Run(ocvb)
             flow.Run(ocvb)
 
-            Dim CCthreshold = CSng(sliders.TrackBar1.Value / sliders.TrackBar1.Maximum)
+            Dim CCthreshold = CSng(sliders.sliders(0).Value / sliders.sliders(0).Maximum)
             Parallel.For(0, grid.borderList.Count,
             Sub(i)
                 Dim broi = grid.borderList(i)
@@ -220,8 +220,9 @@ Public Class OpticalFlow_Sparse
         setCaller(ocvb)
         good = New Features_GoodFeatures(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "OpticalFlow window", 1, 20, 3)
-        sliders.setupTrackBar2("OpticalFlow Max Pixels Distance", 1, 100, 30)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "OpticalFlow window", 1, 20, 3)
+        sliders.setupTrackBar(1, "OpticalFlow Max Pixels Distance", 1, 100, 30)
 
         radio.Setup(ocvb, caller, 6)
         radio.check(0).Text = "FarnebackGaussian"

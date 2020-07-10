@@ -3,16 +3,17 @@ Public Class TextureFlow_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Texture Flow Delta", 2, 100, 12)
-        sliders.setupTrackBar2("Texture Eigen BlockSize", 1, 100, 20)
-        sliders.setupTrackBar3("Texture Eigen Ksize", 1, 15, 1)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Texture Flow Delta", 2, 100, 12)
+        sliders.setupTrackBar(1, "Texture Eigen BlockSize", 1, 100, 20)
+        sliders.setupTrackBar(2, "Texture Eigen Ksize", 1, 15, 1)
 
         ocvb.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim TFdelta = sliders.TrackBar1.Value
-        Dim TFblockSize = sliders.TrackBar2.Value * 2 + 1
-        Dim TFksize = sliders.TrackBar3.Value * 2 + 1
+        Dim TFdelta = sliders.sliders(0).Value
+        Dim TFblockSize = sliders.sliders(1).Value * 2 + 1
+        Dim TFksize = sliders.sliders(2).Value * 2 + 1
         Dim gray = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Clone
         Dim eigen = gray.CornerEigenValsAndVecs(TFblockSize, TFksize)

@@ -6,18 +6,19 @@ Public Class Edges_Canny
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Canny threshold1", 1, 255, 50)
-        sliders.setupTrackBar2("Canny threshold2", 1, 255, 50)
-        sliders.setupTrackBar3("Canny Aperture", 3, 7, 3)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Canny threshold1", 1, 255, 50)
+        sliders.setupTrackBar(1, "Canny threshold2", 1, 255, 50)
+        sliders.setupTrackBar(2, "Canny Aperture", 3, 7, 3)
 
         ocvb.desc = "Show canny edge detection with varying thresholds"
         label1 = "Canny using L1 Norm"
         label2 = "Canny using L2 Norm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim threshold1 As Int32 = sliders.TrackBar1.Value
-        Dim threshold2 As Int32 = sliders.TrackBar2.Value
-        Dim aperture = If(sliders.TrackBar3.Value Mod 2, sliders.TrackBar3.Value, sliders.TrackBar3.Value + 1)
+        Dim threshold1 As Int32 = sliders.sliders(0).Value
+        Dim threshold2 As Int32 = sliders.sliders(1).Value
+        Dim aperture = If(sliders.sliders(2).Value Mod 2, sliders.sliders(2).Value, sliders.sliders(2).Value + 1)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Canny(threshold1, threshold2, aperture, False)
         dst2 = src.Canny(threshold1, threshold2, aperture, True)
@@ -37,8 +38,8 @@ Public Class Edges_DepthAndColor
         dilate.radio.check(2).Checked = True
 
         canny = New Edges_Canny(ocvb)
-        canny.sliders.TrackBar1.Value = 100
-        canny.sliders.TrackBar2.Value = 100
+        canny.sliders.sliders(0).Value = 100
+        canny.sliders.sliders(1).Value = 100
 
         shadow = New Depth_Holes(ocvb)
 
@@ -70,14 +71,15 @@ Public Class Edges_Laplacian
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Gaussian Kernel", 1, 32, 7)
-        sliders.setupTrackBar2("Laplacian Kernel", 1, 32, 5)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Gaussian Kernel", 1, 32, 7)
+        sliders.setupTrackBar(1, "Laplacian Kernel", 1, 32, 5)
         label2 = "Laplacian of Depth Image"
         ocvb.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gaussiankernelSize = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value - 1)
-        Dim laplaciankernelSize = If(sliders.TrackBar2.Value Mod 2, sliders.TrackBar2.Value, sliders.TrackBar2.Value - 1)
+        Dim gaussiankernelSize = If(sliders.sliders(0).Value Mod 2, sliders.sliders(0).Value, sliders.sliders(0).Value - 1)
+        Dim laplaciankernelSize = If(sliders.sliders(1).Value Mod 2, sliders.sliders(1).Value, sliders.sliders(1).Value - 1)
 
         dst1 = src.GaussianBlur(New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
         dst1 = dst1.Laplacian(cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
@@ -96,7 +98,8 @@ Public Class Edges_Scharr
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Scharr multiplier X100", 1, 500, 50)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Scharr multiplier X100", 1, 500, 50)
         label2 = "x field + y field in CV_32F format"
         ocvb.desc = "Scharr is most accurate with 3x3 kernel."
     End Sub
@@ -105,7 +108,7 @@ Public Class Edges_Scharr
         Dim xField = gray.Scharr(cv.MatType.CV_32FC1, 1, 0)
         Dim yField = gray.Scharr(cv.MatType.CV_32FC1, 0, 1)
         cv.Cv2.Add(xField, yField, dst2)
-        dst2.ConvertTo(dst1, cv.MatType.CV_8U, sliders.TrackBar1.Value / 100)
+        dst2.ConvertTo(dst1, cv.MatType.CV_8U, sliders.sliders(0).Value / 100)
     End Sub
 End Class
 
@@ -121,15 +124,16 @@ Public Class Edges_Preserving
         radio.check(1).Text = "Edge NormconvFilter"
         radio.check(0).Checked = True
 
-        sliders.setupTrackBar1(ocvb, caller, "Edge Sigma_s", 0, 200, 10)
-        sliders.setupTrackBar2("Edge Sigma_r", 1, 100, 40)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Edge Sigma_s", 0, 200, 10)
+        sliders.setupTrackBar(1, "Edge Sigma_r", 1, 100, 40)
 
         label2 = "Edge preserving blur for RGB depth image above"
         ocvb.desc = "OpenCV's edge preserving filter."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim sigma_s = sliders.TrackBar1.Value
-        Dim sigma_r = sliders.TrackBar2.Value / sliders.TrackBar2.Maximum
+        Dim sigma_s = sliders.sliders(0).Value
+        Dim sigma_r = sliders.sliders(1).Value / sliders.sliders(1).Maximum
         If radio.check(0).Checked Then
             cv.Cv2.EdgePreservingFilter(ocvb.color, dst1, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
         Else
@@ -166,7 +170,8 @@ Public Class Edges_RandomForest_CPP
     Dim EdgesPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Edges RF Threshold", 1, 255, 35)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Edges RF Threshold", 1, 255, 35)
 
         ocvb.desc = "Detect edges using structured forests - Opencv Contrib"
         ReDim rgbData(ocvb.color.Total * ocvb.color.ElemSize - 1)
@@ -194,7 +199,7 @@ Public Class Edges_RandomForest_CPP
             Dim gray8u = Edges_RandomForest_Run(EdgesPtr, handleRGB.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols)
             handleRGB.Free() ' free the pinned memory...
 
-            dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, gray8u).Threshold(sliders.TrackBar1.Value, 255, cv.ThresholdTypes.Binary)
+            dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, gray8u).Threshold(sliders.sliders(0).Value, 255, cv.ThresholdTypes.Binary)
         End If
     End Sub
     Public Sub Close()
@@ -215,7 +220,7 @@ Public Class Edges_LeftView
         setCaller(ocvb)
         red = New LeftRightView_Basics(ocvb)
         sobel = New Edges_Sobel(ocvb)
-        sobel.sliders.TrackBar1.Value = 5
+        sobel.sliders.sliders(0).Value = 5
 
         ocvb.desc = "Find the edges in the LeftViewimages."
         label1 = "Edges in Left Image"
@@ -240,9 +245,10 @@ Public Class Edges_ResizeAdd
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Border Vertical in Pixels", 1, 20, 5)
-        sliders.setupTrackBar2("Border Horizontal in Pixels", 1, 20, 5)
-        sliders.setupTrackBar3("Threshold for Pixel Difference", 1, 50, 16)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Border Vertical in Pixels", 1, 20, 5)
+        sliders.setupTrackBar(1, "Border Horizontal in Pixels", 1, 20, 5)
+        sliders.setupTrackBar(2, "Threshold for Pixel Difference", 1, 50, 16)
 
         ocvb.desc = "Find edges using a resize, subtract, and threshold."
         label1 = "Edges found with just resizing"
@@ -250,11 +256,11 @@ Public Class Edges_ResizeAdd
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim newFrame = gray(New cv.Range(sliders.TrackBar1.Value, gray.Rows - sliders.TrackBar1.Value),
-                            New cv.Range(sliders.TrackBar2.Value, gray.Cols - sliders.TrackBar2.Value))
+        Dim newFrame = gray(New cv.Range(sliders.sliders(0).Value, gray.Rows - sliders.sliders(0).Value),
+                            New cv.Range(sliders.sliders(1).Value, gray.Cols - sliders.sliders(1).Value))
         newFrame = newFrame.Resize(gray.Size())
         cv.Cv2.Absdiff(gray, newFrame, dst1)
-        dst1 = dst1.Threshold(sliders.TrackBar3.Value, 255, cv.ThresholdTypes.Binary)
+        dst1 = dst1.Threshold(sliders.sliders(2).Value, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.Add(gray, dst1, dst2)
     End Sub
 End Class
@@ -266,8 +272,9 @@ Public Class Edges_DCTfrequency
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Remove Frequencies < x", 0, 100, 32)
-        sliders.setupTrackBar2("Threshold after Removal", 1, 255, 20)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Remove Frequencies < x", 0, 100, 32)
+        sliders.setupTrackBar(1, "Threshold after Removal", 1, 255, 20)
 
         label2 = "Mask for the isolated frequencies"
         ocvb.desc = "Find edges by removing all the highest frequencies."
@@ -279,13 +286,13 @@ Public Class Edges_DCTfrequency
         gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
         cv.Cv2.Dct(src32f, frequencies, cv.DctFlags.None)
 
-        Dim roi As New cv.Rect(0, 0, sliders.TrackBar1.Value, src32f.Height)
+        Dim roi As New cv.Rect(0, 0, sliders.sliders(0).Value, src32f.Height)
         If roi.Width > 0 Then frequencies(roi).SetTo(0)
-        label1 = "Highest " + CStr(sliders.TrackBar1.Value) + " frequencies removed from RGBDepth"
+        label1 = "Highest " + CStr(sliders.sliders(0).Value) + " frequencies removed from RGBDepth"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
         src32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)
-        dst2 = dst1.Threshold(sliders.TrackBar2.Value, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst1.Threshold(sliders.sliders(1).Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -315,8 +322,9 @@ Public Class Edges_Deriche_CPP
     Dim Edges_Deriche As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Deriche Alpha", 1, 400, 100)
-        sliders.setupTrackBar2("Deriche Omega", 1, 1000, 100)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Deriche Alpha", 1, 400, 100)
+        sliders.setupTrackBar(1, "Deriche Omega", 1, 1000, 100)
         Edges_Deriche = Edges_Deriche_Open()
         label2 = "Image enhanced with Deriche results"
         ocvb.desc = "Edge detection using the Deriche X and Y gradients - Painterly"
@@ -326,8 +334,8 @@ Public Class Edges_Deriche_CPP
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
-        Dim alpha = sliders.TrackBar1.Value / 100
-        Dim omega = sliders.TrackBar2.Value / 1000
+        Dim alpha = sliders.sliders(0).Value / 100
+        Dim omega = sliders.sliders(1).Value / 1000
         Dim imagePtr = Edges_Deriche_Run(Edges_Deriche, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, alpha, omega)
         handleSrc.Free()
 
@@ -356,11 +364,12 @@ Public Class Edges_Sobel
     Public grayY As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Sobel kernel Size", 1, 32, 3)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 3)
         ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value - 1)
+        Dim kernelSize = If(sliders.sliders(0).Value Mod 2, sliders.sliders(0).Value, sliders.sliders(0).Value - 1)
         dst1 = New cv.Mat(src.Rows, src.Cols, src.Type)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         grayX = src.Sobel(cv.MatType.CV_32F, 1, 0, kernelSize)

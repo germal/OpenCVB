@@ -4,11 +4,12 @@ Public Class Pyramid_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Zoom in and out", -1, 1, 0)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Zoom in and out", -1, 1, 0)
         ocvb.desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim zoom = sliders.TrackBar1.Value
+        Dim zoom = sliders.sliders(0).Value
         If zoom <> 0 Then
             If zoom < 0 Then
                 Dim tmp = src.PyrDown(New cv.Size(src.Cols / 2, src.Rows / 2))

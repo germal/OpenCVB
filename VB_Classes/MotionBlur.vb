@@ -5,21 +5,22 @@ Public Class MotionBlur_Basics
     Public showDirection As Boolean = True
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Motion Blur Length", 1, 101, 51)
-        sliders.setupTrackBar2("Motion Blur Angle", -90, 90, 0)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Motion Blur Length", 1, 101, 51)
+        sliders.setupTrackBar(1, "Motion Blur Angle", -90, 90, 0)
         ocvb.desc = "Use Filter2D to create a motion blur"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         if standalone Then
-            If sliders.TrackBar2.Value < sliders.TrackBar2.Maximum Then
-                sliders.TrackBar2.Value += 1
+            If sliders.sliders(1).Value < sliders.sliders(1).Maximum Then
+                sliders.sliders(1).Value += 1
             Else
-                sliders.TrackBar2.Value = sliders.TrackBar2.Minimum
+                sliders.sliders(1).Value = sliders.sliders(1).Minimum
             End If
         End If
-        Dim kernelSize = sliders.TrackBar1.Value
+        Dim kernelSize = sliders.sliders(0).Value
         kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F, 0)
-        Dim theta = sliders.TrackBar2.Value / (180 / Math.PI)
+        Dim theta = sliders.sliders(1).Value / (180 / Math.PI)
         Dim pt1 = New cv.Point(0, (kernelSize - 1) / 2)
         Dim pt2 = New cv.Point(kernelSize * Math.Cos(theta) + pt1.X, kernelSize * Math.Sin(theta) + pt1.Y)
         kernel.Line(pt1, pt2, New cv.Scalar(1 / kernelSize))
@@ -121,10 +122,11 @@ Public Class MotionBlur_Deblur
 
         mblur = New MotionBlur_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Deblur Restore Vector", 1, mblur.sliders.TrackBar1.Maximum, 10)
-        sliders.setupTrackBar2("Deblur Angle of Restore Vector", mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum, 0)
-        sliders.setupTrackBar3("Deblur Signal to Noise Ratio", 1, 1000, 700)
-        sliders.setupTrackBar4("Deblur Gamma", 1, 100, 5)
+        sliders.Setup(ocvb, caller, 4)
+        sliders.setupTrackBar(0, "Deblur Restore Vector", 1, mblur.sliders.sliders(0).Maximum, 10)
+        sliders.setupTrackBar(1, "Deblur Angle of Restore Vector", mblur.sliders.sliders(1).Minimum, mblur.sliders.sliders(1).Maximum, 0)
+        sliders.setupTrackBar(2, "Deblur Signal to Noise Ratio", 1, 1000, 700)
+        sliders.setupTrackBar(3, "Deblur Gamma", 1, 100, 5)
 
         ocvb.desc = "Deblur a motion blurred image"
         label1 = "Blurred Image Input"
@@ -134,8 +136,8 @@ Public Class MotionBlur_Deblur
         mblur.src = src
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
-            mblur.sliders.TrackBar1.Value = msRNG.Next(mblur.sliders.TrackBar1.Minimum, mblur.sliders.TrackBar1.Maximum)
-            mblur.sliders.TrackBar2.Value = msRNG.Next(mblur.sliders.TrackBar2.Minimum, mblur.sliders.TrackBar2.Maximum)
+            mblur.sliders.sliders(0).Value = msRNG.Next(mblur.sliders.sliders(0).Minimum, mblur.sliders.sliders(0).Maximum)
+            mblur.sliders.sliders(1).Value = msRNG.Next(mblur.sliders.sliders(1).Minimum, mblur.sliders.sliders(1).Maximum)
             mblur.Run(ocvb)
             mblur.showDirection = False
         Else
@@ -143,10 +145,10 @@ Public Class MotionBlur_Deblur
         End If
         dst1 = mblur.dst1
 
-        Dim len = sliders.TrackBar1.Value
-        Dim theta = sliders.TrackBar2.Value / (180 / Math.PI)
-        Dim SNR = CDbl(sliders.TrackBar3.Value)
-        Dim gamma = CDbl(sliders.TrackBar4.Value)
+        Dim len = sliders.sliders(0).Value
+        Dim theta = sliders.sliders(1).Value / (180 / Math.PI)
+        Dim SNR = CDbl(sliders.sliders(2).Value)
+        Dim gamma = CDbl(sliders.sliders(3).Value)
         Dim beta = 0.2
 
         Dim width = src.Width

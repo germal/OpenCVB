@@ -6,6 +6,8 @@ Public Class OptionsSliders
     Public sliders() As TrackBar
     Public sLabels() As Label
     Public countLabel() As Label
+    Dim heightSetting = 260
+    Dim widthSetting = 630
     Public Sub Setup(ocvb As AlgorithmData, caller As String, count As Int32)
         ReDim sliders(count - 1)
         ReDim sLabels(count - 1)
@@ -32,6 +34,10 @@ Public Class OptionsSliders
             FlowLayoutPanel1.Controls.Add(countLabel(i))
             FlowLayoutPanel1.SetFlowBreak(countLabel(i), True)
         Next
+        If count > 4 Then
+            heightSetting = count * 58 ' add space for the additional unexpected sliders.
+            FlowLayoutPanel1.Height = heightSetting - 30
+        End If
         If ocvb.parms.ShowOptions Then
             If ocvb.suppressOptions = False Then Me.Show()
         End If
@@ -46,28 +52,23 @@ Public Class OptionsSliders
         countLabel(index).Text = CStr(value)
         countLabel(index).Visible = True
     End Sub
-    Public Sub setupTrackBar1(label As String, min As Integer, max As Integer, value As Integer)
-        setTrackbar(0, label, min, max, value)
-    End Sub
-    Public Sub setupTrackBar2(label As String, min As Integer, max As Integer, value As Integer)
-        setTrackbar(1, label, min, max, value)
-    End Sub
-    Public Sub setupTrackBar3(label As String, min As Integer, max As Integer, value As Integer)
-        setTrackbar(2, label, min, max, value)
-    End Sub
-    Public Sub setupTrackBar4(label As String, min As Integer, max As Integer, value As Integer)
-        setTrackbar(3, label, min, max, value)
+    Public Sub setupTrackBar(index As Integer, label As String, min As Integer, max As Integer, value As Integer)
+        setTrackbar(index, label, min, max, value)
     End Sub
     Private Sub TrackBar_ValueChanged(sender As Object, e As EventArgs)
         countLabel(sender.tag).Text = CStr(sliders(sender.tag).Value)
     End Sub
     Private Sub OptionsSlider_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Width = 630
-        Me.Height = 260
+        Me.Width = widthSetting
+        Me.Height = heightSetting
         Me.SetDesktopLocation(applocation.Left + slidersOffset.X, applocation.Top + applocation.Height + slidersOffset.Y)
         slidersOffset.X += offsetIncr
         slidersOffset.Y += offsetIncr
         If slidersOffset.X > offsetMax Then slidersOffset.X = 0
         If slidersOffset.Y > offsetMax Then slidersOffset.Y = 0
+    End Sub
+
+    Private Sub OptionsSliders_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        Console.WriteLine("testing")
     End Sub
 End Class

@@ -25,9 +25,10 @@ Public Class SuperPixel_Basics_CPP
     Dim spPtr As IntPtr = 0
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Number of SuperPixels", 1, 1000, 400)
-        sliders.setupTrackBar2("Iterations", 0, 10, 4)
-        sliders.setupTrackBar3("Prior", 1, 10, 2)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Number of SuperPixels", 1, 1000, 400)
+        sliders.setupTrackBar(1, "Iterations", 0, 10, 4)
+        sliders.setupTrackBar(2, "Prior", 1, 10, 2)
 
         label2 = "Superpixel label data (0-255)"
         ocvb.desc = "Sub-divide the image into super pixels."
@@ -36,10 +37,10 @@ Public Class SuperPixel_Basics_CPP
         Static numSuperPixels As Int32
         Static numIterations As Int32
         Static prior As Int32
-        If numSuperPixels <> sliders.TrackBar1.Value Or numIterations <> sliders.TrackBar2.Value Or prior <> sliders.TrackBar3.Value Then
-            numSuperPixels = sliders.TrackBar1.Value
-            numIterations = sliders.TrackBar2.Value
-            prior = sliders.TrackBar3.Value
+        If numSuperPixels <> sliders.sliders(0).Value Or numIterations <> sliders.sliders(1).Value Or prior <> sliders.sliders(2).Value Then
+            numSuperPixels = sliders.sliders(0).Value
+            numIterations = sliders.sliders(1).Value
+            prior = sliders.sliders(2).Value
             If spPtr <> 0 Then SuperPixel_Close(spPtr)
             spPtr = SuperPixel_Open(src.Width, src.Height, numSuperPixels, numIterations, prior)
         End If

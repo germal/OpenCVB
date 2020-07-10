@@ -6,13 +6,14 @@ Public Class ORB_Basics
     Dim orb As cv.ORB
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "ORB - desired point count", 10, 2000, 100)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "ORB - desired point count", 10, 2000, 100)
 
         ocvb.desc = "Find keypoints using ORB"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        orb = cv.ORB.Create(sliders.TrackBar1.Value)
+        orb = cv.ORB.Create(sliders.sliders(0).Value)
         keypoints = orb.Detect(src)
         If standalone Then
             dst1 = src.Clone()

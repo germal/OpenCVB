@@ -56,7 +56,8 @@ Public Class BGSubtract_MotionDetect_MT
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Correlation Threshold", 0, 1000, 980)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
         radio.Setup(ocvb, caller, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = CStr(2 ^ i) + " threads"
@@ -83,7 +84,7 @@ Public Class BGSubtract_MotionDetect_MT
         Dim taskArray(threadCount - 1) As Task
         Dim xfactor = CInt(src.Width / width)
         Dim yfactor = Math.Max(CInt(src.Height / height), CInt(src.Width / width))
-        Dim CCthreshold = CSng(sliders.TrackBar1.Value / sliders.TrackBar1.Maximum)
+        Dim CCthreshold = CSng(sliders.sliders(0).Value / sliders.sliders(0).Maximum)
         For i = 0 To threadCount - 1
             Dim section = i
             taskArray(i) = Task.Factory.StartNew(
@@ -111,7 +112,8 @@ Public Class BGSubtract_Basics_MT
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Correlation Threshold", 0, 1000, 980)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
 
         label2 = "Only Motion Added"
         ocvb.desc = "Detect Motion in the color image"
@@ -121,7 +123,7 @@ Public Class BGSubtract_Basics_MT
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.EmptyClone.SetTo(0)
         If ocvb.frameCount = 0 Then dst2 = src.Clone()
-        Dim CCthreshold = CSng(sliders.TrackBar1.Value / sliders.TrackBar1.Maximum)
+        Dim CCthreshold = CSng(sliders.sliders(0).Value / sliders.sliders(0).Maximum)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             Dim correlation As New cv.Mat
@@ -164,7 +166,8 @@ Public Class BGSubtract_MOG
     Public gray As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "MOG Learn Rate", 0, 1000, 10)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "MOG Learn Rate", 0, 1000, 10)
 
         MOG = cv.BackgroundSubtractorMOG.Create()
         ocvb.desc = "Subtract background using a mixture of Gaussians"
@@ -175,7 +178,7 @@ Public Class BGSubtract_MOG
         Else
             gray = src
         End If
-        MOG.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
+        MOG.Apply(gray, gray, sliders.sliders(0).Value / 1000)
         dst1 = gray
     End Sub
 End Class
@@ -188,14 +191,15 @@ Public Class BGSubtract_MOG2
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "MOG Learn Rate", 0, 1000, 10)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "MOG Learn Rate", 0, 1000, 10)
 
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
         ocvb.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOG2.Apply(src, dst1, sliders.TrackBar1.Value / 1000)
+        MOG2.Apply(src, dst1, sliders.sliders(0).Value / 1000)
     End Sub
 End Class
 
@@ -207,7 +211,8 @@ Public Class BGSubtract_GMG_KNN
     Dim knn As cv.BackgroundSubtractorKNN
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Learn Rate", 1, 1000, 1)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Learn Rate", 1, 1000, 1)
 
         gmg = cv.BackgroundSubtractorGMG.Create()
         knn = cv.BackgroundSubtractorKNN.Create()
@@ -221,8 +226,8 @@ Public Class BGSubtract_GMG_KNN
         End If
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        gmg.Apply(dst1, dst1, sliders.TrackBar1.Value / 1000)
-        knn.Apply(dst1, dst1, sliders.TrackBar1.Value / 1000)
+        gmg.Apply(dst1, dst1, sliders.sliders(0).Value / 1000)
+        knn.Apply(dst1, dst1, sliders.sliders(0).Value / 1000)
     End Sub
 End Class
 
@@ -237,7 +242,8 @@ Public Class BGSubtract_MOG_RGBDepth
     Dim MOGRGB As cv.BackgroundSubtractorMOG
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "MOG Learn Rate x1000", 0, 1000, 10)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "MOG Learn Rate x1000", 0, 1000, 10)
 
         MOGDepth = cv.BackgroundSubtractorMOG.Create()
         MOGRGB = cv.BackgroundSubtractorMOG.Create()
@@ -247,11 +253,11 @@ Public Class BGSubtract_MOG_RGBDepth
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOGDepth.Apply(gray, gray, sliders.TrackBar1.Value / 1000)
+        MOGDepth.Apply(gray, gray, sliders.sliders(0).Value / 1000)
         dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOGRGB.Apply(src, src, sliders.TrackBar1.Value / 1000)
+        MOGRGB.Apply(src, src, sliders.sliders(0).Value / 1000)
     End Sub
 End Class
 
@@ -264,11 +270,12 @@ Public Class BGSubtract_MOG_Retina
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         mog = New BGSubtract_MOG(ocvb)
-        mog.sliders.TrackBar1.Value = 100
+        mog.sliders.sliders(0).Value = 100
 
         retina = New Retina_Basics_CPP(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Uncertainty threshold", 1, 255, 100)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Uncertainty threshold", 1, 255, 100)
 
         ocvb.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
         label1 = "MOG results of depth motion"
@@ -377,24 +384,25 @@ Public Class BGSubtract_Synthetic_CPP
     Dim amplitude As Double, magnitude As Double, waveSpeed As Double, objectSpeed As Double
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Synthetic Amplitude x100", 1, 400, 200)
-        sliders.setupTrackBar2("Synthetic Magnitude", 1, 40, 20)
-        sliders.setupTrackBar3("Synthetic Wavespeed x100", 1, 400, 20)
-        sliders.setupTrackBar4("Synthetic ObjectSpeed", 1, 20, 15)
+        sliders.Setup(ocvb, caller, 4)
+        sliders.setupTrackBar(0, "Synthetic Amplitude x100", 1, 400, 200)
+        sliders.setupTrackBar(1, "Synthetic Magnitude", 1, 40, 20)
+        sliders.setupTrackBar(2, "Synthetic Wavespeed x100", 1, 400, 20)
+        sliders.setupTrackBar(3, "Synthetic ObjectSpeed", 1, 20, 15)
         label1 = "Synthetic background/foreground image."
         ocvb.desc = "Generate a synthetic input to background subtraction method - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount < 10 Then Exit Sub ' darker images at the start?
-        If amplitude <> sliders.TrackBar1.Value Or magnitude <> sliders.TrackBar2.Value Or waveSpeed <> sliders.TrackBar3.Value Or
-            objectSpeed <> sliders.TrackBar4.Value Then
+        If amplitude <> sliders.sliders(0).Value Or magnitude <> sliders.sliders(1).Value Or waveSpeed <> sliders.sliders(2).Value Or
+            objectSpeed <> sliders.sliders(3).Value Then
 
             If ocvb.frameCount <> 0 Then BGSubtract_Synthetic_Close(synthPtr)
 
-            amplitude = sliders.TrackBar1.Value
-            magnitude = sliders.TrackBar2.Value
-            waveSpeed = sliders.TrackBar3.Value
-            objectSpeed = sliders.TrackBar4.Value
+            amplitude = sliders.sliders(0).Value
+            magnitude = sliders.sliders(1).Value
+            waveSpeed = sliders.sliders(2).Value
+            objectSpeed = sliders.sliders(3).Value
 
             Dim srcData(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, srcData, 0, srcData.Length)

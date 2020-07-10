@@ -90,15 +90,16 @@ Public Class MeanShift_PyrFilter
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "MeanShift Spatial Radius", 1, 100, 10)
-        sliders.setupTrackBar2("MeanShift color Radius", 1, 100, 15)
-        sliders.setupTrackBar3("MeanShift Max Pyramid level", 1, 8, 3)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "MeanShift Spatial Radius", 1, 100, 10)
+        sliders.setupTrackBar(1, "MeanShift color Radius", 1, 100, 15)
+        sliders.setupTrackBar(2, "MeanShift Max Pyramid level", 1, 8, 3)
         ocvb.desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim spatialRadius = sliders.TrackBar1.Value
-        Dim colorRadius = sliders.TrackBar2.Value
-        Dim maxPyrLevel = sliders.TrackBar3.Value
+        Dim spatialRadius = sliders.sliders(0).Value
+        Dim colorRadius = sliders.sliders(1).Value
+        Dim maxPyrLevel = sliders.sliders(2).Value
         cv.Cv2.PyrMeanShiftFiltering(src, dst1, spatialRadius, colorRadius, maxPyrLevel)
     End Sub
 End Class
@@ -121,7 +122,8 @@ Public Class Meanshift_TopObjects
         mats2 = New Mat_4to1(ocvb)
 
         blob = New Blob_DepthClusters(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "How often should meanshift be reinitialized", 1, 500, 100)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "How often should meanshift be reinitialized", 1, 500, 100)
         For i = 0 To cams.Length - 1
             cams(i) = New MeanShift_Basics(ocvb)
             cams(i).rectangleEdgeWidth = 8
@@ -132,7 +134,7 @@ Public Class Meanshift_TopObjects
         blob.src = src
         blob.Run(ocvb)
 
-        Dim updateFrequency = sliders.TrackBar1.Value
+        Dim updateFrequency = sliders.sliders(0).Value
         Dim trackBoxes As New List(Of cv.Rect)
         For i = 0 To cams.Length - 1
             If blob.flood.fBasics.maskSizes.Count > i Then

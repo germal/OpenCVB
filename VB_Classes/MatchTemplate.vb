@@ -21,13 +21,14 @@ Public Class MatchTemplate_Basics
         radio.check(4).Text = "SqDiff"
         radio.check(5).Text = "SqDiffNormed"
         radio.check(1).Checked = True
-        sliders.setupTrackBar1(ocvb, caller, "Sample Size", 2, 10000, 100)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Sample Size", 2, 10000, 100)
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         if standalone Then
-            sample1 = New cv.Mat(New cv.Size(sliders.TrackBar1.Value, 1), cv.MatType.CV_32FC1)
-            sample2 = New cv.Mat(New cv.Size(sliders.TrackBar1.Value, 1), cv.MatType.CV_32FC1)
+            sample1 = New cv.Mat(New cv.Size(sliders.sliders(0).Value, 1), cv.MatType.CV_32FC1)
+            sample2 = New cv.Mat(New cv.Size(sliders.sliders(0).Value, 1), cv.MatType.CV_32FC1)
             cv.Cv2.Randn(sample1, 100, 25)
             cv.Cv2.Randn(sample2, 0, 25)
         Else

@@ -5,7 +5,8 @@ Public Class FAST_Basics
     Public keypoints() As cv.KeyPoint
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Threshold", 0, 200, 15)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Threshold", 0, 200, 15)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Use Non-Max = True"
         check.Box(0).Checked = True
@@ -15,7 +16,7 @@ Public Class FAST_Basics
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         src.CopyTo(dst1)
-        keypoints = cv.Cv2.FAST(src, sliders.TrackBar1.Value, If(check.Box(0).Checked, True, False))
+        keypoints = cv.Cv2.FAST(src, sliders.sliders(0).Value, If(check.Box(0).Checked, True, False))
 
         For Each kp As cv.KeyPoint In keypoints
             dst1.Circle(kp.Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)

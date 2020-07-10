@@ -64,11 +64,12 @@ Public Class Gradient_Flatland
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grade = New Gradient_Basics(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Reduction Factor", 1, 64, 16)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Reduction Factor", 1, 64, 16)
         ocvb.desc = "Reduced grayscale shows isobars in depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim reductionFactor = sliders.TrackBar1.Maximum - sliders.TrackBar1.Value
+        Dim reductionFactor = sliders.sliders(0).Maximum - sliders.sliders(0).Value
         dst1 = ocvb.RGBDepth.Clone()
         dst1 /= reductionFactor
         dst1 *= reductionFactor
@@ -93,9 +94,10 @@ Public Class Gradient_CartToPolar
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         gradient = New Gradient_Basics(ocvb)
-        gradient.sobel.sliders.TrackBar1.Value = 1
+        gradient.sobel.sliders.sliders(0).Value = 1
 
-        sliders.setupTrackBar1(ocvb, caller, "Contrast exponent to use X100", 0, 200, 30)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
         label1 = "CartToPolar Magnitude Output Normalized"
         label2 = "CartToPolar Angle Output"
         ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
@@ -109,7 +111,7 @@ Public Class Gradient_CartToPolar
 
         cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
         magnitude = magnitude.Normalize()
-        Dim exponent = sliders.TrackBar1.Value / 100
+        Dim exponent = sliders.sliders(0).Value / 100
         magnitude = magnitude.Pow(exponent)
 
         dst1 = magnitude
@@ -130,10 +132,10 @@ Public Class Gradient_NumPy
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         gradient = New Gradient_Basics(ocvb)
-        gradient.sobel.sliders.TrackBar1.Value = 1
+        gradient.sobel.sliders.sliders(0).Value = 1
 
-        sliders.setupTrackBar1(ocvb, caller, "Contrast exponent to use X100", 0, 200, 30)
-
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
 
         label1 = "CartToPolar Magnitude Output Normalized"
         label2 = "CartToPolar Angle Output"
@@ -150,7 +152,7 @@ Public Class Gradient_NumPy
             cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
             magnitude = magnitude.Normalize()
             Dim npMag = MatToNumPyFloat(magnitude)
-            Dim exponent = sliders.TrackBar1.Value / 100
+            Dim exponent = sliders.sliders(0).Value / 100
             Numpy.np.power(npMag, exponent, npMag)
             NumPyFloatToMat(npMag, dst1)
         Else

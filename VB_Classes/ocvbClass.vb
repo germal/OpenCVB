@@ -28,11 +28,7 @@ Public Class ocvbClass : Implements IDisposable
     Public combo As New OptionsCombo
     Public radio As New OptionsRadioButtons
     Public radio1 As New OptionsRadioButtons
-    Public slider As New OptionsSliders
     Public sliders As New OptionsSliders
-    Public sliders1 As New OptionsSliders
-    Public sliders2 As New OptionsSliders
-    Public sliders3 As New OptionsSliders
     Public videoOptions As New OptionsVideoName
     Public pyStream As PyStream_Basics = Nothing
     Public standalone As Boolean
@@ -134,9 +130,6 @@ Public Class ocvbClass : Implements IDisposable
         Console.WriteLine("The following System.MissingMemberException is harmless if algorithm has no 'Close' method.")
         algorithm.Close()  ' Close any unmanaged classes...
         sliders.Dispose()
-        sliders1.Dispose()
-        sliders2.Dispose()
-        sliders3.Dispose()
         check.Dispose()
         radio1.Dispose()
         videoOptions.Dispose()

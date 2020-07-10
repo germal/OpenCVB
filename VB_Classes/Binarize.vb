@@ -54,25 +54,25 @@ Public Class Binarize_Niblack_Sauvola
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Label1.Text = "Kernel Size"
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar2("Niblack k", -1000, 1000, -200)
-        sliders.setupTrackBar3("Sauvola k", -1000, 1000, 100)
-        sliders.setupTrackBar4("Sauvola r", 1, 100, 64)
+        sliders.Setup(ocvb, caller, 4)
+        sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
+        sliders.setupTrackBar(1, "Niblack k", -1000, 1000, -200)
+        sliders.setupTrackBar(2, "Sauvola k", -1000, 1000, 100)
+        sliders.setupTrackBar(3, "Sauvola r", 1, 100, 64)
 
         ocvb.desc = "Binarize an image using Niblack and Sauvola"
         label1 = "Binarize Niblack"
         label2 = "Binarize Sauvola"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = sliders.TrackBar1.Value
+        Dim kernelSize = sliders.sliders(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim grayBin As New cv.Mat
-        cv.Extensions.Binarizer.Niblack(src, grayBin, kernelSize, sliders.TrackBar2.Value / 1000)
+        cv.Extensions.Binarizer.Niblack(src, grayBin, kernelSize, sliders.sliders(1).Value / 1000)
         dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Extensions.Binarizer.Sauvola(src, grayBin, kernelSize, sliders.TrackBar3.Value / 1000, sliders.TrackBar4.Value)
+        cv.Extensions.Binarizer.Sauvola(src, grayBin, kernelSize, sliders.sliders(2).Value / 1000, sliders.sliders(3).Value)
         dst2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
@@ -84,24 +84,24 @@ Public Class Binarize_Niblack_Nick
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Label1.Text = "Kernel Size"
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar2("Niblack k", -1000, 1000, -200)
-        sliders.setupTrackBar3("Nick k", -1000, 1000, 100)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
+        sliders.setupTrackBar(1, "Niblack k", -1000, 1000, -200)
+        sliders.setupTrackBar(2, "Nick k", -1000, 1000, 100)
 
         ocvb.desc = "Binarize an image using Niblack and Nick"
         label1 = "Binarize Niblack"
         label2 = "Binarize Nick"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = sliders.TrackBar1.Value
+        Dim kernelSize = sliders.sliders(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayBin As New cv.Mat
-        cv.Extensions.Binarizer.Niblack(src, grayBin, kernelSize, sliders.TrackBar2.Value / 1000)
+        cv.Extensions.Binarizer.Niblack(src, grayBin, kernelSize, sliders.sliders(1).Value / 1000)
         dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Extensions.Binarizer.Nick(src, grayBin, kernelSize, sliders.TrackBar3.Value / 1000)
+        cv.Extensions.Binarizer.Nick(src, grayBin, kernelSize, sliders.sliders(2).Value / 1000)
         dst2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
@@ -113,10 +113,10 @@ Public Class Binarize_Bernson
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Label1.Text = "Kernel Size"
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar2("Contrast min", 0, 255, 50)
-        sliders.setupTrackBar3("bg Threshold", 0, 255, 100)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
+        sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
+        sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
 
         label1 = "Binarize Bernson (Draw Enabled)"
 
@@ -124,15 +124,15 @@ Public Class Binarize_Bernson
         ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = sliders.TrackBar1.Value
+        Dim kernelSize = sliders.sliders(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayBin = gray.Clone()
         If ocvb.drawRect = New cv.Rect() Then
-            cv.Extensions.Binarizer.Bernsen(gray, grayBin, kernelSize, sliders.TrackBar2.Value, sliders.TrackBar3.Value)
+            cv.Extensions.Binarizer.Bernsen(gray, grayBin, kernelSize, sliders.sliders(1).Value, sliders.sliders(2).Value)
         Else
-            cv.Extensions.Binarizer.Bernsen(gray(ocvb.drawRect), grayBin(ocvb.drawRect), kernelSize, sliders.TrackBar2.Value, sliders.TrackBar3.Value)
+            cv.Extensions.Binarizer.Bernsen(gray(ocvb.drawRect), grayBin(ocvb.drawRect), kernelSize, sliders.sliders(1).Value, sliders.sliders(2).Value)
         End If
         dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
@@ -147,24 +147,24 @@ Public Class Binarize_Bernson_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = 32
-        grid.sliders.TrackBar2.Value = 32
+        grid.sliders.sliders(0).Value = 32
+        grid.sliders.sliders(1).Value = 32
 
-        sliders.Label1.Text = "Kernel Size"
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar2("Contrast min", 0, 255, 50)
-        sliders.setupTrackBar3("bg Threshold", 0, 255, 100)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
+        sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
+        sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
 
         ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
         label1 = "Binarize Bernson"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = sliders.TrackBar1.Value
+        Dim kernelSize = sliders.sliders(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
         grid.Run(ocvb)
-        Dim contrastMin = sliders.TrackBar2.Value
-        Dim bgThreshold = sliders.TrackBar3.Value
+        Dim contrastMin = sliders.sliders(1).Value
+        Dim bgThreshold = sliders.sliders(2).Value
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,

@@ -9,7 +9,8 @@ Public Class LineDetector_Basics
     Dim ld As cv.XImgProc.FastLineDetector
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "LineDetector thickness of line", 1, 20, 2)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "LineDetector thickness of line", 1, 20, 2)
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         label1 = "Manually drawn"
@@ -19,7 +20,7 @@ Public Class LineDetector_Basics
         Dim vectors = ld.Detect(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         src.CopyTo(dst1)
         src.CopyTo(dst2)
-        Dim thickness = sliders.TrackBar1.Value
+        Dim thickness = sliders.sliders(0).Value
 
         For Each v In vectors
             If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
@@ -214,14 +215,13 @@ Public Class lineDetector_FLD_CPP
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        sliders2.setupTrackBar1(ocvb, caller, "FLD - canny Threshold1", 1, 100, 50)
-        sliders2.setupTrackBar2("FLD - canny Threshold2", 1, 100, 50)
-        If ocvb.parms.ShowOptions Then sliders2.Show()
-
-        sliders.setupTrackBar1(ocvb, caller, "FLD - Min Length", 1, 200, 30)
-        sliders.setupTrackBar2("FLD - max distance", 1, 100, 14)
-        sliders.setupTrackBar3("FLD - Canny Aperture", 3, 7, 7)
-        sliders.setupTrackBar4("FLD - Line Thickness", 1, 7, 3)
+        sliders.Setup(ocvb, caller, 6)
+        sliders.setupTrackBar(0, "FLD - Min Length", 1, 200, 30)
+        sliders.setupTrackBar(1, "FLD - max distance", 1, 100, 14)
+        sliders.setupTrackBar(2, "FLD - Canny Aperture", 3, 7, 7)
+        sliders.setupTrackBar(3, "FLD - Line Thickness", 1, 7, 3)
+        sliders.setupTrackBar(4, "FLD - canny Threshold1", 1, 100, 50)
+        sliders.setupTrackBar(5, "FLD - canny Threshold2", 1, 100, 50)
 
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "FLD - incremental merge"
@@ -233,12 +233,12 @@ Public Class lineDetector_FLD_CPP
     Public Sub Run(ocvb As AlgorithmData)
         sortedLines.Clear()
 
-        Dim length_threshold = sliders.TrackBar1.Value
-        Dim distance_threshold = sliders.TrackBar2.Value / 10
-        Dim canny_aperture_size = sliders.TrackBar3.Value
+        Dim length_threshold = sliders.sliders(0).Value
+        Dim distance_threshold = sliders.sliders(1).Value / 10
+        Dim canny_aperture_size = sliders.sliders(2).Value
         If canny_aperture_size Mod 2 = 0 Then canny_aperture_size += 1
-        Dim canny_th1 = sliders2.TrackBar1.Value
-        Dim canny_th2 = sliders2.TrackBar2.Value
+        Dim canny_th1 = sliders.sliders(4).Value
+        Dim canny_th2 = sliders.sliders(5).Value
         Dim do_merge = check.Box(0).Checked
 
         src.CopyTo(dst1)
@@ -252,7 +252,7 @@ Public Class lineDetector_FLD_CPP
         Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, rows, cols, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
         handle.Free()
 
-        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, sliders.TrackBar4.Value)
+        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, sliders.sliders(3).Value)
     End Sub
 End Class
 
@@ -268,14 +268,15 @@ Public Class LineDetector_3D_LongestLine
         setCaller(ocvb)
         lines = New lineDetector_FLD_CPP(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Mask Line Width", 1, 20, 1)
-        sliders.setupTrackBar2("Update frequency (in frames)", 1, 100, 1)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
+        sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
 
         ocvb.desc = "Identify planes using the lines present in the rgb image."
         label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod sliders.TrackBar2.Value Then Exit Sub
+        If ocvb.frameCount Mod sliders.sliders(1).Value Then Exit Sub
         lines.src = src
         lines.Run(ocvb)
         src.CopyTo(dst1)
@@ -284,7 +285,7 @@ Public Class LineDetector_3D_LongestLine
 
         If lines.sortedLines.Count > 0 Then
             ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
-            Dim maskLineWidth As Int32 = sliders.TrackBar1.Value
+            Dim maskLineWidth As Int32 = sliders.sliders(0).Value
             Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
             find3DLineSegment(ocvb, dst1, mask, depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth)
         End If
@@ -301,14 +302,15 @@ Public Class LineDetector_3D_FLD_MT
         setCaller(ocvb)
         lines = New lineDetector_FLD_CPP(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Mask Line Width", 1, 20, 1)
-        sliders.setupTrackBar2("Update frequency (in frames)", 1, 100, 1)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
+        sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
 
         ocvb.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
         label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod sliders.TrackBar2.Value Then Exit Sub
+        If ocvb.frameCount Mod sliders.sliders(1).Value Then Exit Sub
         lines.src = src
         lines.Run(ocvb)
         src.CopyTo(dst1)
@@ -316,7 +318,7 @@ Public Class LineDetector_3D_FLD_MT
         Dim depth32f = getDepth32f(ocvb)
 
         ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
-        Dim maskLineWidth As Int32 = sliders.TrackBar1.Value
+        Dim maskLineWidth As Int32 = sliders.sliders(0).Value
         Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
         Parallel.For(lines.sortedLines.Count - 20, lines.sortedLines.Count,
             Sub(i)
@@ -336,9 +338,10 @@ Public Class LineDetector_3D_FitLineZ
         setCaller(ocvb)
         linesFLD = New lineDetector_FLD_CPP(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Mask Line Width", 1, 20, 3)
-        sliders.setupTrackBar2("Point count threshold", 5, 500, 50)
-        sliders.setupTrackBar3("Update frequency (in frames)", 1, 100, 1)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 3)
+        sliders.setupTrackBar(1, "Point count threshold", 5, 500, 50)
+        sliders.setupTrackBar(2, "Update frequency (in frames)", 1, 100, 1)
 
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Fitline using x and z (unchecked it will use y and z)"
@@ -349,7 +352,7 @@ Public Class LineDetector_3D_FitLineZ
         label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod sliders.TrackBar3.Value Then Exit Sub
+        If ocvb.frameCount Mod sliders.sliders(2).Value Then Exit Sub
         Dim useX As Boolean = check.Box(0).Checked
         linesFLD.src = src
         linesFLD.Run(ocvb)
@@ -362,11 +365,11 @@ Public Class LineDetector_3D_FitLineZ
 
         If sortedlines.Count > 0 Then
             ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will likely get full length.
-            Dim maskLineWidth As Int32 = sliders.TrackBar1.Value
+            Dim maskLineWidth As Int32 = sliders.sliders(0).Value
             Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
 
             Dim longestLineOnly As Boolean = check.Box(1).Checked
-            Dim pointCountThreshold = sliders.TrackBar2.Value
+            Dim pointCountThreshold = sliders.sliders(1).Value
             Parallel.For(0, sortedlines.Count,
                 Sub(i)
                     If longestLineOnly And i < sortedlines.Count - 1 Then Exit Sub

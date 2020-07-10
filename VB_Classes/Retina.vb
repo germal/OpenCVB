@@ -23,7 +23,8 @@ Public Class Retina_Basics_CPP
     Dim srcData(0) As Byte
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Retina Sample Factor", 1, 10, 2)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Retina Sample Factor", 1, 10, 2)
 
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Use log sampling"
@@ -47,12 +48,12 @@ Public Class Retina_Basics_CPP
         End If
         Static useLogSampling As Int32 = check.Box(0).Checked
         Static samplingFactor As Single = -1 ' force open
-        If useLogSampling <> check.Box(0).Checked Or samplingFactor <> sliders.TrackBar1.Value Then
+        If useLogSampling <> check.Box(0).Checked Or samplingFactor <> sliders.sliders(0).Value Then
             If Retina <> 0 Then Retina_Basics_Close(Retina)
             ReDim magnoData(src.Total - 1)
             ReDim srcData(src.Total * src.ElemSize - 1)
             useLogSampling = check.Box(0).Checked
-            samplingFactor = sliders.TrackBar1.Value
+            samplingFactor = sliders.sliders(0).Value
             Retina = Retina_Basics_Open(src.Rows, src.Cols, useLogSampling, samplingFactor)
         End If
         Dim handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned)

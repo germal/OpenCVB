@@ -8,8 +8,9 @@ Public Class OilPaint_Pointilism
     Dim myRNG As New cv.RNG
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Stroke Scale", 1, 5, 3)
-        sliders.setupTrackBar2("Smoothing Radius", 0, 100, 32)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Stroke Scale", 1, 5, 3)
+        sliders.setupTrackBar(1, "Smoothing Radius", 0, 100, 32)
         radio.Setup(ocvb, caller, 2)
         radio.check(0).Text = "Use Elliptical stroke"
         radio.check(1).Text = "Use Circular stroke"
@@ -45,11 +46,11 @@ Public Class OilPaint_Pointilism
         cv.Cv2.Scharr(gray, fieldx, cv.MatType.CV_32FC1, 1, 0, 1 / 15.36)
         cv.Cv2.Scharr(gray, fieldy, cv.MatType.CV_32FC1, 0, 1, 1 / 15.36)
 
-        Dim smoothingRadius = sliders.TrackBar2.Value * 2 + 1
+        Dim smoothingRadius = sliders.sliders(1).Value * 2 + 1
         cv.Cv2.GaussianBlur(fieldx, fieldx, New cv.Size(smoothingRadius, smoothingRadius), 0, 0)
         cv.Cv2.GaussianBlur(fieldy, fieldy, New cv.Size(smoothingRadius, smoothingRadius), 0, 0)
 
-        Dim strokeSize = sliders.TrackBar1.Value
+        Dim strokeSize = sliders.sliders(0).Value
         For y = 0 To img.Height - 1
             For x = 0 To img.Width - 1
                 Dim nPt = rand.Get(Of cv.Point)(y, x)
@@ -85,8 +86,8 @@ Public Class OilPaint_ColorProbability
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         km = New kMeans_RGBFast(ocvb)
-        km.sliders.TrackBar1.Value = 12 ' we would like a dozen colors or so in the color image.
-        ReDim color_probability(km.sliders.TrackBar1.Value - 1)
+        km.sliders.sliders(0).Value = 12 ' we would like a dozen colors or so in the color image.
+        ReDim color_probability(km.sliders.sliders(0).Value - 1)
         ocvb.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -121,14 +122,15 @@ Public Class OilPaint_Manual
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Filter Size", 3, 15, 3)
-        sliders.setupTrackBar2("Intensity", 5, 150, 25)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Filter Size", 3, 15, 3)
+        sliders.setupTrackBar(1, "Intensity", 5, 150, 25)
         ocvb.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
         ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim filtersize = sliders.TrackBar1.Value
-        Dim levels = sliders.TrackBar2.Value
+        Dim filtersize = sliders.sliders(0).Value
+        Dim levels = sliders.sliders(1).Value
 
         If filtersize Mod 2 = 0 Then filtersize += 1 ' must be odd
         Dim roi = ocvb.drawRect
@@ -178,19 +180,20 @@ Public Class OilPaint_Manual_CS
     Dim oilPaint As New CS_Classes.OilPaintManual
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 2, 10, 4)
-        sliders.setupTrackBar2("Intensity", 1, 250, 20)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Kernel Size", 2, 10, 4)
+        sliders.setupTrackBar(1, "Intensity", 1, 250, 20)
         ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
         label2 = "Selected area only"
 
         ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = sliders.TrackBar1.Value
+        Dim kernelSize = sliders.sliders(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         Dim roi = ocvb.drawRect
         src.CopyTo(dst1)
-        oilPaint.Start(src(roi), dst1(roi), kernelSize, sliders.TrackBar2.Value)
+        oilPaint.Start(src(roi), dst1(roi), kernelSize, sliders.sliders(1).Value)
         dst2 = src.EmptyClone.SetTo(0)
         Dim factor As Int32 = Math.Min(Math.Floor(dst2.Width / roi.Width), Math.Floor(dst2.Height / roi.Height))
         Dim s = New cv.Size(roi.Width * factor, roi.Height * factor)
@@ -213,7 +216,7 @@ Public Class OilPaint_Cartoon
         oil = New OilPaint_Manual_CS(ocvb)
         ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
 
-        oil.sliders.setupTrackBar3("Threshold", 0, 200, 25) ' add the third slider for the threshold.
+        oil.sliders.setupTrackBar(2, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
         ocvb.desc = "Alter an image so it appears more like a cartoon - Painterly Effect"
         label1 = "OilPaint_Cartoon"
         label2 = "Laplacian Edges"
@@ -228,7 +231,7 @@ Public Class OilPaint_Cartoon
         oil.Run(ocvb)
         dst1 = oil.dst1
 
-        Dim threshold = oil.sliders.TrackBar3.Value
+        Dim threshold = oil.sliders.sliders(2).Value
         Dim vec000 = New cv.Vec3b(0, 0, 0)
         For y = 0 To roi.Height - 1
             For x = 0 To roi.Width - 1

@@ -91,7 +91,8 @@ Public Class WarpAffine_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Angle", 0, 360, 10)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Angle", 0, 360, 10)
 
         SetInterpolationRadioButtons(ocvb, caller, radio, "WarpAffine")
 
@@ -101,7 +102,7 @@ Public Class WarpAffine_Basics
         Dim warpFlag = getInterpolationRadioButtons(radio)
 
         Dim pt = New cv.Point2f(src.Cols / 2, src.Rows / 2)
-        Dim angle = sliders.TrackBar1.Value
+        Dim angle = sliders.sliders(0).Value
         Dim rotationMatrix = cv.Cv2.GetRotationMatrix2D(pt, angle, 1.0)
         cv.Cv2.WarpAffine(src, dst1, rotationMatrix, src.Size(), warpFlag)
         angle *= -1
@@ -123,8 +124,8 @@ Public Class WarpAffine_3Points
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         triangle = New Area_MinTriangle_CPP(ocvb)
-        triangle.sliders.TrackBar1.Value = 20
-        triangle.sliders.TrackBar2.Value = 150
+        triangle.sliders.sliders(0).Value = 20
+        triangle.sliders.sliders(1).Value = 150
 
         ocvb.desc = "Use 3 non-colinear points to build an affine transform and apply it to the color image."
         label1 = "Triangles define the affine transform"

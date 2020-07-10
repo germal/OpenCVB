@@ -14,22 +14,23 @@ Public Class Area_MinTriangle_CPP
     Public dstData() As Byte
     Public triangle As cv.Mat
     Private Sub setup(ocvb As AlgorithmData)
-        numberOfPoints = sliders.TrackBar1.Value
+        numberOfPoints = sliders.sliders(0).Value
         ReDim srcPoints(numberOfPoints)
         ReDim srcData(numberOfPoints * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' input is a list of points.
         ReDim dstData(3 * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' minTriangle returns 3 points
     End Sub
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Area Number of Points", 1, 30, 5)
-        sliders.setupTrackBar2("Area size", 10, 300, 200)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
+        sliders.setupTrackBar(1, "Area size", 10, 300, 200)
         setup(ocvb)
 
         ocvb.desc = "Find minimum containing triangle for a set of points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If numberOfPoints <> sliders.TrackBar1.Value Then setup(ocvb)
-        Dim squareWidth = sliders.TrackBar2.Value / 2
+        If numberOfPoints <> sliders.sliders(0).Value Then setup(ocvb)
+        Dim squareWidth = sliders.sliders(1).Value / 2
 
         dst1.SetTo(0)
         For i = 0 To srcPoints.Length - 1
@@ -64,20 +65,21 @@ Public Class Area_MinRect
     Public srcPoints() As cv.Point2f
     Public minRect As cv.RotatedRect
     Private Sub setup(ocvb As AlgorithmData)
-        numberOfPoints = sliders.TrackBar1.Value
+        numberOfPoints = sliders.sliders(0).Value
         ReDim srcPoints(numberOfPoints)
     End Sub
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Area Number of Points", 1, 200, 5)
-        sliders.setupTrackBar2("Area size", 10, 300, 200)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Area Number of Points", 1, 200, 5)
+        sliders.setupTrackBar(1, "Area size", 10, 300, 200)
         setup(ocvb)
 
         ocvb.desc = "Find minimum containing rectangle for a set of points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If numberOfPoints <> sliders.TrackBar1.Value Then setup(ocvb)
-        Dim squareWidth = sliders.TrackBar2.Value / 2
+        If numberOfPoints <> sliders.sliders(0).Value Then setup(ocvb)
+        Dim squareWidth = sliders.sliders(1).Value / 2
 
         dst1.SetTo(0)
         For i = 0 To srcPoints.Length - 1
@@ -101,7 +103,7 @@ Public Class Area_MinMotionRect
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         input = New BGSubtract_MOG(ocvb)
-        input.sliders.TrackBar1.Value = 100 ' low threshold to maximize motion
+        input.sliders.sliders(0).Value = 100 ' low threshold to maximize motion
         ocvb.desc = "Use minRectArea to encompass detected motion"
         label1 = "MinRectArea of MOG motion"
     End Sub

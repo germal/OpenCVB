@@ -226,8 +226,8 @@ Public Class Puzzle_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = ocvb.color.cols / 10
-        grid.sliders.TrackBar2.Value = ocvb.color.Rows / 8
+        grid.sliders.sliders(0).Value = ocvb.color.cols / 10
+        grid.sliders.sliders(1).Value = ocvb.color.Rows / 8
         grid.Run(ocvb)
         ocvb.desc = "Create the puzzle pieces for toy genetic or annealing algorithm."
     End Sub
@@ -238,7 +238,7 @@ Public Class Puzzle_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Static width As Int32
         Static height As Int32
-        If width <> grid.sliders.TrackBar1.Value Or height <> grid.sliders.TrackBar2.Value Or ocvb.frameCount = 0 Or restartRequested Then
+        If width <> grid.sliders.sliders(0).Value Or height <> grid.sliders.sliders(1).Value Or ocvb.frameCount = 0 Or restartRequested Then
             restartRequested = False
             grid.Run(ocvb)
             width = grid.roiList(0).Width
@@ -329,26 +329,26 @@ Public Class Puzzle_Solver
             saveResolution = ocvb.parms.resolution
             If ocvb.parms.resolution = resMed Then factor = 2
             If radio.check(0).Checked Then
-                puzzle.grid.sliders.TrackBar1.Value = 256 / factor
-                puzzle.grid.sliders.TrackBar2.Value = 180 / factor
+                puzzle.grid.sliders.sliders(0).Value = 256 / factor
+                puzzle.grid.sliders.sliders(1).Value = 180 / factor
                 fontsize = 0.9
-                xxOffset = puzzle.grid.sliders.TrackBar1.Value / 2
-                yxOffset = puzzle.grid.sliders.TrackBar1.Value * 3 / 4
+                xxOffset = puzzle.grid.sliders.sliders(0).Value / 2
+                yxOffset = puzzle.grid.sliders.sliders(0).Value * 3 / 4
             ElseIf radio.check(1).Checked Then
-                puzzle.grid.sliders.TrackBar1.Value = 128 / factor
-                puzzle.grid.sliders.TrackBar2.Value = 90 / factor
+                puzzle.grid.sliders.sliders(0).Value = 128 / factor
+                puzzle.grid.sliders.sliders(1).Value = 90 / factor
                 fontsize = 0.7
-                xxOffset = puzzle.grid.sliders.TrackBar1.Value / 3
-                yxOffset = puzzle.grid.sliders.TrackBar1.Value * 3 / 4
+                xxOffset = puzzle.grid.sliders.sliders(0).Value / 3
+                yxOffset = puzzle.grid.sliders.sliders(0).Value * 3 / 4
             Else
-                puzzle.grid.sliders.TrackBar1.Value = 64 / factor
-                puzzle.grid.sliders.TrackBar2.Value = 90 / factor
+                puzzle.grid.sliders.sliders(0).Value = 64 / factor
+                puzzle.grid.sliders.sliders(1).Value = 90 / factor
                 fontsize = 0.5
-                xxOffset = puzzle.grid.sliders.TrackBar1.Value / 4
-                yxOffset = puzzle.grid.sliders.TrackBar1.Value / 2
+                xxOffset = puzzle.grid.sliders.sliders(0).Value / 4
+                yxOffset = puzzle.grid.sliders.sliders(0).Value / 2
             End If
-            xyOffset = puzzle.grid.sliders.TrackBar2.Value * 9 / 10
-            yyOffset = puzzle.grid.sliders.TrackBar2.Value / 2
+            xyOffset = puzzle.grid.sliders.sliders(1).Value * 9 / 10
+            yyOffset = puzzle.grid.sliders.sliders(1).Value / 2
             puzzle.restartRequested = True
             puzzle.src = src
             puzzle.Run(ocvb)

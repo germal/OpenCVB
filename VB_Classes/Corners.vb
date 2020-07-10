@@ -5,9 +5,10 @@ Public Class Corners_Harris
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Corner block size", 1, 21, 3)
-        sliders.setupTrackBar2("Corner aperture size", 1, 21, 3)
-        sliders.setupTrackBar3("Corner quality level", 1, 100, 50)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
+        sliders.setupTrackBar(1, "Corner aperture size", 1, 21, 3)
+        sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)
         ocvb.desc = "Find corners using Eigen values and vectors"
         label2 = "Corner Eigen values"
     End Sub
@@ -20,9 +21,9 @@ Public Class Corners_Harris
         gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mc = New cv.Mat(gray.Size(), cv.MatType.CV_32FC1, 0)
         dst1 = New cv.Mat(gray.Size(), cv.MatType.CV_8U, 0)
-        Dim blocksize = sliders.TrackBar1.Value
+        Dim blocksize = sliders.sliders(0).Value
         If blocksize Mod 2 = 0 Then blocksize += 1
-        Dim aperture = sliders.TrackBar2.Value
+        Dim aperture = sliders.sliders(1).Value
         If aperture Mod 2 = 0 Then aperture += 1
         cv.Cv2.CornerEigenValsAndVecs(gray, dst1, blocksize, aperture, cv.BorderTypes.Default)
 
@@ -39,7 +40,7 @@ Public Class Corners_Harris
         src.CopyTo(dst1)
         For j = 0 To gray.Rows - 1
             For i = 0 To gray.Cols - 1
-                If mc.Get(Of Single)(j, i) > minval + (maxval - minval) * sliders.TrackBar3.Value / sliders.TrackBar3.Maximum Then
+                If mc.Get(Of Single)(j, i) > minval + (maxval - minval) * sliders.sliders(2).Value / sliders.sliders(2).Maximum Then
                     dst1.Circle(New cv.Point(i, j), 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
                     dst1.Circle(New cv.Point(i, j), 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
                 End If
@@ -61,7 +62,8 @@ Public Class Corners_SubPix
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         good = New Features_GoodFeatures(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "SubPix kernel Size", 1, 20, 3)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "SubPix kernel Size", 1, 20, 3)
         label1 = "Output of GoodFeatures"
         ocvb.desc = "Use PreCornerDetect to find features in the image."
     End Sub
@@ -70,7 +72,7 @@ Public Class Corners_SubPix
         good.Run(ocvb)
         If good.goodFeatures.Count = 0 Then Exit Sub ' no good features right now...
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim winSize = New cv.Size(sliders.TrackBar1.Value, sliders.TrackBar1.Value)
+        Dim winSize = New cv.Size(sliders.sliders(0).Value, sliders.sliders(0).Value)
         cv.Cv2.CornerSubPix(gray, good.goodFeatures, winSize, New cv.Size(-1, -1), term)
 
         src.CopyTo(dst1)
@@ -92,13 +94,14 @@ Public Class Corners_PreCornerDetect
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         median = New Math_Median_CDF(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "kernel Size", 1, 20, 19)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "kernel Size", 1, 20, 19)
 
         ocvb.desc = "Use PreCornerDetect to find features in the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim ksize = sliders.TrackBar1.Value
+        Dim ksize = sliders.sliders(0).Value
         If ksize Mod 2 = 0 Then ksize += 1
         Dim prob As New cv.Mat
         cv.Cv2.PreCornerDetect(gray, prob, ksize)
@@ -128,18 +131,19 @@ Public Class Corners_ShiTomasi_CPP
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Corner block size", 1, 21, 3)
-        sliders.setupTrackBar2("Corner aperture size", 1, 21, 3)
-        sliders.setupTrackBar3("Corner quality level", 1, 100, 50)
-        sliders.setupTrackBar4("Corner normalize alpha", 1, 255, 127)
+        sliders.Setup(ocvb, caller, 4)
+        sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
+        sliders.setupTrackBar(1, "Corner aperture size", 1, 21, 3)
+        sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)
+        sliders.setupTrackBar(3, "Corner normalize alpha", 1, 255, 127)
         ocvb.desc = "Find corners using Eigen values and vectors"
         label2 = "Corner Eigen values"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim data(src.Total - 1) As Byte
 
-        Dim blocksize = If(sliders.TrackBar1.Value Mod 2, sliders.TrackBar1.Value, sliders.TrackBar1.Value + 1)
-        Dim aperture = If(sliders.TrackBar2.Value Mod 2, sliders.TrackBar2.Value, sliders.TrackBar2.Value + 1)
+        Dim blocksize = If(sliders.sliders(0).Value Mod 2, sliders.sliders(0).Value, sliders.sliders(0).Value + 1)
+        Dim aperture = If(sliders.sliders(1).Value Mod 2, sliders.sliders(1).Value, sliders.sliders(1).Value + 1)
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -151,7 +155,7 @@ Public Class Corners_ShiTomasi_CPP
         Dim output As New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr)
 
         Dim stNormal As New cv.Mat
-        cv.Cv2.Normalize(output, stNormal, sliders.TrackBar4.Value, 255, cv.NormTypes.MinMax)
+        cv.Cv2.Normalize(output, stNormal, sliders.sliders(3).Value, 255, cv.NormTypes.MinMax)
         stNormal.ConvertTo(dst2, cv.MatType.CV_8U)
     End Sub
 End Class

@@ -78,13 +78,14 @@ Public Class Resize_Percentage
         setCaller(ocvb)
         resizeOptions = New Resize_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Resize Percentage (%)", 1, 100, 3)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Resize Percentage (%)", 1, 100, 3)
 
         ocvb.desc = "Resize by a percentage of the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim percent As Double = CDbl(sliders.TrackBar1.Value / 100)
-        Dim resizePercent = sliders.TrackBar1.Value / 100
+        Dim percent As Double = CDbl(sliders.sliders(0).Value / 100)
+        Dim resizePercent = sliders.sliders(0).Value / 100
         resizePercent = Math.Sqrt(resizePercent)
         resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * resizePercent), Math.Ceiling(src.Height * resizePercent))
         resizeOptions.src = src
@@ -93,7 +94,7 @@ Public Class Resize_Percentage
         If standalone Then
             Dim roi As New cv.Rect(0, 0, resizeOptions.dst1.Width, resizeOptions.dst1.Height)
             dst1 = resizeOptions.dst1(roi).Resize(resizeOptions.dst1.Size())
-            label1 = "Image after resizing to " + Format(sliders.TrackBar1.Value, "#0.0") + "% of original size"
+            label1 = "Image after resizing to " + Format(sliders.sliders(0).Value, "#0.0") + "% of original size"
             label2 = ""
         Else
             dst1 = resizeOptions.dst1

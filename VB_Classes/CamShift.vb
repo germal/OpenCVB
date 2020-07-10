@@ -15,10 +15,11 @@ Public Class CamShift_Basics
         plotHist = New Plot_Histogram(ocvb)
         plotHist.sliders.Visible = False
 
-        sliders.setupTrackBar1(ocvb, caller, "CamShift vMin", 0, 255, 32)
-        sliders.setupTrackBar2("CamShift vMax", 0, 255, 255)
-        sliders.setupTrackBar3("CamShift Smin", 0, 255, 60)
-        sliders.setupTrackBar4("CamShift Histogram bins", 16, 255, 32)
+        sliders.Setup(ocvb, caller, 4)
+        sliders.setupTrackBar(0, "CamShift vMin", 0, 255, 32)
+        sliders.setupTrackBar(1, "CamShift vMax", 0, 255, 255)
+        sliders.setupTrackBar(2, "CamShift Smin", 0, 255, 60)
+        sliders.setupTrackBar(3, "CamShift Histogram bins", 16, 255, 32)
 
         label1 = "Draw anywhere to create histogram and start camshift"
         label2 = "Histogram of targeted region (hue only)"
@@ -32,12 +33,12 @@ Public Class CamShift_Basics
         Static roi_hist As New cv.Mat
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim hue = hsv.EmptyClone()
-        Dim bins = sliders.TrackBar4.Value
+        Dim bins = sliders.sliders(3).Value
         Dim hsize() As Int32 = {bins, bins, bins}
         Dim ranges() = {New cv.Rangef(0, 180)}
-        Dim min = Math.Min(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
-        Dim max = Math.Max(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
-        Dim sbins = New cv.Scalar(0, sliders.TrackBar3.Value, min)
+        Dim min = Math.Min(sliders.sliders(0).Value, sliders.sliders(1).Value)
+        Dim max = Math.Max(sliders.sliders(0).Value, sliders.sliders(1).Value)
+        Dim sbins = New cv.Scalar(0, sliders.sliders(2).Value, min)
 
         cv.Cv2.MixChannels({hsv}, {hue}, {0, 0})
         Dim mask = hsv.InRange(sbins, New cv.Scalar(180, 255, max))
@@ -88,12 +89,12 @@ Public Class CamShift_Foreground
         Static depthMin As Int32
         Static depthMax As Int32
         If camshift.trackBox.Size.Width < 50 Then restartRequested = True
-        If fore.trim.sliders.TrackBar1.Value <> depthMin Then
-            depthMin = fore.trim.sliders.TrackBar1.Value
+        If fore.trim.sliders.sliders(0).Value <> depthMin Then
+            depthMin = fore.trim.sliders.sliders(0).Value
             restartRequested = True
         End If
-        If fore.trim.sliders.TrackBar2.Value <> depthMax Then
-            depthMax = fore.trim.sliders.TrackBar2.Value
+        If fore.trim.sliders.sliders(1).Value <> depthMax Then
+            depthMax = fore.trim.sliders.sliders(1).Value
             restartRequested = True
         End If
         If restartRequested Then fore.Run(ocvb)
@@ -163,14 +164,15 @@ Public Class Camshift_TopObjects
         Next
 
         ocvb.suppressOptions = False
-        sliders.setupTrackBar1(ocvb, caller, "Reinitialize camshift after x frames", 1, 500, 100)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Reinitialize camshift after x frames", 1, 500, 100)
         ocvb.desc = "Track - Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blob.Run(ocvb)
         dst1 = blob.dst2
 
-        Dim updateFrequency = sliders.TrackBar1.Value
+        Dim updateFrequency = sliders.sliders(0).Value
         Dim trackBoxes As New List(Of cv.RotatedRect)
         For i = 0 To cams.Length - 1
             If blob.flood.fBasics.maskSizes.Count > i Then

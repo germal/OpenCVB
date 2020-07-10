@@ -207,8 +207,8 @@ Public Class Mat_ImageXYZ_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = 32
-        grid.sliders.TrackBar2.Value = 32
+        grid.sliders.sliders(0).Value = 32
+        grid.sliders.sliders(1).Value = 32
 
         xyDepth = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32FC3, 0)
         Dim xyz As New cv.Point3f

@@ -7,8 +7,9 @@ Public Class GrabCut_Basics
         setCaller(ocvb)
         contours = New Contours_Depth(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Erode iterations", 1, 20, 3)
-        sliders.setupTrackBar2("Erode kernel size", 1, 21, 3)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Erode iterations", 1, 20, 3)
+        sliders.setupTrackBar(1, "Erode kernel size", 1, 21, 3)
 
         ocvb.desc = "Use grabcut to isolate what is in the foreground and background.  "
     End Sub
@@ -16,8 +17,8 @@ Public Class GrabCut_Basics
         contours.src = src
         contours.Run(ocvb)
         dst2 = contours.dst2
-        Dim iterations = sliders.TrackBar1.Value
-        Dim kernelsize = sliders.TrackBar2.Value
+        Dim iterations = sliders.sliders(0).Value
+        Dim kernelsize = sliders.sliders(1).Value
         If kernelsize Mod 2 = 0 Then kernelsize += 1
         Dim morphShape = cv.MorphShapes.Cross
 

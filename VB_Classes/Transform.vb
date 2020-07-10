@@ -4,11 +4,12 @@ Public Class Transform_Resize
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Resize Percent", 50, 1000, 50)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Resize Percent", 50, 1000, 50)
         ocvb.desc = "Resize an image based on the slider value."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim resizeFactor = sliders.TrackBar1.Value / 100
+        Dim resizeFactor = sliders.sliders(0).Value / 100
         Dim w = CInt(resizeFactor * src.Width)
         Dim h = CInt(resizeFactor * src.Height)
         If resizeFactor > 1 Then
@@ -30,15 +31,16 @@ Public Class Transform_Rotate
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Angle", 0, 360, 30)
-        sliders.setupTrackBar2("Scale Factor", 1, 100, 100)
-        sliders.setupTrackBar3("Rotation center X", 1, src.Width, src.Width / 2)
-        sliders.setupTrackBar4("Rotation center Y", 1, src.Height, src.Height / 2)
+        sliders.Setup(ocvb, caller, 4)
+        sliders.setupTrackBar(0, "Angle", 0, 360, 30)
+        sliders.setupTrackBar(1, "Scale Factor", 1, 100, 100)
+        sliders.setupTrackBar(2, "Rotation center X", 1, src.Width, src.Width / 2)
+        sliders.setupTrackBar(3, "Rotation center Y", 1, src.Height, src.Height / 2)
         ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim imageCenter = New cv.Point2f(sliders.TrackBar3.Value, sliders.TrackBar4.Value)
-        Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.TrackBar1.Value, sliders.TrackBar2.Value / 100)
+        Dim imageCenter = New cv.Point2f(sliders.sliders(2).Value, sliders.sliders(3).Value)
+        Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.sliders(0).Value, sliders.sliders(1).Value / 100)
         cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
         dst1.Circle(imageCenter, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         dst1.Circle(imageCenter, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)

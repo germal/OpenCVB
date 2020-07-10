@@ -4,8 +4,9 @@ Public Class TransformationMatrix_Basics
     Dim topLocations As New List(Of cv.Point3d)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "TMatrix Top View multiplier", 1, 1000, 500)
-        If ocvb.parms.cameraIndex = StereoLabsZED2 Then sliders.TrackBar1.Value = 1 ' need a smaller multiplier...
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "TMatrix Top View multiplier", 1, 1000, 500)
+        If ocvb.parms.cameraIndex = StereoLabsZED2 Then sliders.sliders(0).Value = 1 ' need a smaller multiplier...
 
         label1 = "View from above the camera"
         label2 = "View from side of the camera"
@@ -14,7 +15,7 @@ Public Class TransformationMatrix_Basics
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.transformationMatrix IsNot Nothing Then
             Dim t = ocvb.parms.transformationMatrix
-            Dim mul = sliders.TrackBar1.Value
+            Dim mul = sliders.sliders(0).Value
             topLocations.Add(New cv.Point3d(-t(12) * mul + dst1.Width / 2,
                                             -t(13) * mul + dst1.Height / 2,
                                              t(14) * mul + dst1.Height / 2))

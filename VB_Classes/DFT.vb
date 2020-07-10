@@ -127,8 +127,9 @@ Public Class DFT_ButterworthFilter_MT
     Public dft As DFT_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "DFT B Filter - Radius", 1, ocvb.color.Rows, ocvb.color.Rows)
-        sliders.setupTrackBar2("DFT B Filter - Order", 1, ocvb.color.Rows, 2)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, ocvb.color.Rows, ocvb.color.Rows)
+        sliders.setupTrackBar(1, "DFT B Filter - Order", 1, ocvb.color.Rows, 2)
 
         radio.Setup(ocvb, caller, 6)
         radio.check(0).Text = "DFT Flags ComplexOutput"
@@ -152,9 +153,9 @@ Public Class DFT_ButterworthFilter_MT
         Static order As Int32
         Static butterworthFilter(1) As cv.Mat
         ' only create the filter if radius or order has changed.
-        If radius <> sliders.TrackBar1.Value Or order <> sliders.TrackBar2.Value Then
-            radius = sliders.TrackBar1.Value
-            order = sliders.TrackBar2.Value
+        If radius <> sliders.sliders(0).Value Or order <> sliders.sliders(1).Value Then
+            radius = sliders.sliders(0).Value
+            order = sliders.sliders(1).Value
 
             Parallel.For(0, 2,
             Sub(k)

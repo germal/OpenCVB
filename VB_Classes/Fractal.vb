@@ -12,7 +12,8 @@ Public Class Fractal_Mandelbrot
     Public incrY As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Mandelbrot iterations", 1, 50, 34)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Mandelbrot iterations", 1, 50, 34)
         ocvb.desc = "Run the classic Mandalbrot algorithm"
         dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         saveIterations = 0
@@ -32,7 +33,7 @@ Public Class Fractal_Mandelbrot
         Next
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim iterations = sliders.TrackBar1.Value
+        Dim iterations = sliders.sliders(0).Value
         If saveIterations <> iterations Then
             saveIterations = iterations
             For y = 0 To src.Height - 1
@@ -56,7 +57,7 @@ Public Class Fractal_Mandelbrot_MT
         ocvb.desc = "Run a multi-threaded version of the Mandalbrot algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim iterations = mandel.sliders.TrackBar1.Value
+        Dim iterations = mandel.sliders.sliders(0).Value
         Parallel.For(0, src.Height,
         Sub(y)
             mandel.mandelbrotLoop(y, iterations)
@@ -82,7 +83,7 @@ Public Class Fractal_MandelbrotZoom
         ocvb.desc = "Run the classic Mandalbrot algorithm and allow zooming in"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim iterations = mandel.sliders.TrackBar1.Value
+        Dim iterations = mandel.sliders.sliders(0).Value
 
         If check.Box(0).Checked Then
             mandel.Dispose()

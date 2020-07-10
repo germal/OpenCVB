@@ -4,16 +4,17 @@ Public Class Laplacian_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Laplacian Kernel size", 1, 21, 3)
-        sliders.setupTrackBar2("Laplacian Scale", 0, 100, 100)
-        sliders.setupTrackBar3("Laplacian Delta", 0, 1000, 0)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Laplacian Kernel size", 1, 21, 3)
+        sliders.setupTrackBar(1, "Laplacian Scale", 0, 100, 100)
+        sliders.setupTrackBar(2, "Laplacian Delta", 0, 1000, 0)
         ocvb.desc = "Laplacian filter - the second derivative."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = sliders.TrackBar1.Value()
+        Dim kernelSize = sliders.sliders(0).Value()
         If kernelSize Mod 2 = 0 Then kernelSize += 1
-        Dim scale = sliders.TrackBar2.Value / 100
-        Dim delta = sliders.TrackBar3.Value / 100
+        Dim scale = sliders.sliders(1).Value / 100
+        Dim delta = sliders.sliders(2).Value / 100
         Dim ddepth = cv.MatType.CV_16S
 
         If standalone Then src = ocvb.color.GaussianBlur(New cv.Size(kernelSize, kernelSize), 0, 0)
@@ -29,9 +30,10 @@ Public Class Laplacian_Blur
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Laplacian Kernel size", 1, 21, 3)
-        sliders.setupTrackBar2("Laplacian Scale", 0, 100, 100)
-        sliders.setupTrackBar3("Laplacian Delta", 0, 1000, 0)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Laplacian Kernel size", 1, 21, 3)
+        sliders.setupTrackBar(1, "Laplacian Scale", 0, 100, 100)
+        sliders.setupTrackBar(2, "Laplacian Delta", 0, 1000, 0)
 
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Add Gaussian Blur"
@@ -41,10 +43,10 @@ Public Class Laplacian_Blur
         ocvb.desc = "Laplacian filter - the second derivative - with different bluring techniques"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = sliders.TrackBar1.Value()
+        Dim kernelSize = sliders.sliders(0).Value()
         If kernelSize Mod 2 = 0 Then kernelSize += 1
-        Dim scale = sliders.TrackBar2.Value / 100
-        Dim delta = sliders.TrackBar3.Value / 100
+        Dim scale = sliders.sliders(1).Value / 100
+        Dim delta = sliders.sliders(2).Value / 100
         Dim ddepth = cv.MatType.CV_16S
 
         Dim blurText As String

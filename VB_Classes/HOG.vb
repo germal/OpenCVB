@@ -6,9 +6,10 @@ Public Class HOG_Basics
     Dim staticImageProcessed As Boolean
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Threshold", 0, 100, 0)
-        sliders.setupTrackBar2("Stride", 1, 100, 1)
-        sliders.setupTrackBar3("Scale", 0, 2000, 300)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Threshold", 0, 100, 0)
+        sliders.setupTrackBar(1, "Stride", 1, 100, 1)
+        sliders.setupTrackBar(2, "Scale", 0, 2000, 300)
         ocvb.desc = "Find people with Histogram of Gradients (HOG) 2D feature"
         staticImage = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
         dst2 = staticImage.Resize(dst2.Size)
@@ -37,9 +38,9 @@ Public Class HOG_Basics
         ' run the detector with default parameters. to get a higher hit-rate
         ' (and more false alarms, respectively), decrease the hitThreshold and
         ' groupThreshold (set groupThreshold to 0 to turn off the grouping completely).
-        Dim threshold = sliders.TrackBar1.Value
-        Dim stride = sliders.TrackBar2.Value
-        Dim scale = sliders.TrackBar3.Value / 1000
+        Dim threshold = sliders.sliders(0).Value
+        Dim stride = sliders.sliders(1).Value
+        Dim scale = sliders.sliders(2).Value / 1000
         Dim found() As cv.Rect = hog.DetectMultiScale(src, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)
         label1 = String.Format("{0} region(s) found", found.Length)
         src.CopyTo(dst1)
@@ -51,7 +52,7 @@ Public Class HOG_Basics
             If found.Length > 0 Then
                 staticImageProcessed = True
                 label2 = String.Format("{0} region(s) found", found.Length)
-                sliders.TrackBar2.Value = 30 ' this will speed up the frame rate.  This algorithm is way too slow!  It won't find much at this rate...
+                sliders.sliders(1).Value = 30 ' this will speed up the frame rate.  This algorithm is way too slow!  It won't find much at this rate...
             Else
                 label2 = "Try adjusting slider bars."
             End If

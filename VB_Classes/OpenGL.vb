@@ -123,28 +123,27 @@ End Class
 
 
 Module OpenGL_Sliders_Module
-    Public Sub setOpenGLsliders(ocvb As AlgorithmData, caller As String, sliders As OptionsSliders, sliders1 As OptionsSliders, sliders2 As OptionsSliders, sliders3 As OptionsSliders)
-        sliders1.setupTrackBar1(ocvb, caller, "OpenGL zNear", 0, 100, 0)
-        sliders1.setupTrackBar2("OpenGL zFar", -50, 200, 20)
-        sliders1.setupTrackBar3("OpenGL Point Size", 1, 20, 2)
-        sliders1.setupTrackBar4("zTrans", -1000, 1000, 50)
+    Public Sub setOpenGLsliders(ocvb As AlgorithmData, caller As String, sliders As OptionsSliders)
+        sliders.Setup(ocvb, caller, 15)
 
-        sliders2.setupTrackBar1(ocvb, caller, "OpenGL Eye X", -180, 180, 0)
-        sliders2.setupTrackBar2("OpenGL Eye Y", -180, 180, 0)
-        sliders2.setupTrackBar3("OpenGL Eye Z", -180, 180, -40)
-        If ocvb.parms.ShowOptions Then sliders2.Show()
+        sliders.setupTrackBar(0, "OpenGL FOV", 1, 180, 150)
+        If ocvb.parms.cameraIndex = D435i Then sliders.sliders(0).Value = 135
+        sliders.setupTrackBar(1, "OpenGL yaw (degrees)", -180, 180, -3)
+        sliders.setupTrackBar(2, "OpenGL pitch (degrees)", -180, 180, 3)
+        sliders.setupTrackBar(3, "OpenGL roll (degrees)", -180, 180, 0)
 
-        sliders3.setupTrackBar1(ocvb, caller, "OpenGL Scale X", 1, 100, 10)
-        sliders3.setupTrackBar2("OpenGL Scale Y", 1, 100, 10)
-        sliders3.setupTrackBar3("OpenGL Scale Z", 1, 100, 1)
-        If ocvb.parms.ShowOptions Then sliders3.Show()
+        sliders.setupTrackBar(4, "OpenGL zNear", 0, 100, 0)
+        sliders.setupTrackBar(5, "OpenGL zFar", -50, 200, 20)
+        sliders.setupTrackBar(6, "OpenGL Point Size", 1, 20, 2)
+        sliders.setupTrackBar(7, "zTrans", -1000, 1000, 50)
 
-        ' this is last so it shows up on top of all the others.
-        sliders.setupTrackBar1(ocvb, caller, "OpenGL FOV", 1, 180, 150)
-        If ocvb.parms.cameraIndex = D435i Then sliders.TrackBar1.Value = 135
-        sliders.setupTrackBar2("OpenGL yaw (degrees)", -180, 180, -3)
-        sliders.setupTrackBar3("OpenGL pitch (degrees)", -180, 180, 3)
-        sliders.setupTrackBar4("OpenGL roll (degrees)", -180, 180, 0)
+        sliders.setupTrackBar(8, "OpenGL Eye X", -180, 180, 0)
+        sliders.setupTrackBar(9, "OpenGL Eye Y", -180, 180, 0)
+        sliders.setupTrackBar(10, "OpenGL Eye Z", -180, 180, -40)
+
+        sliders.setupTrackBar(11, "OpenGL Scale X", 1, 100, 10)
+        sliders.setupTrackBar(12, "OpenGL Scale Y", 1, 100, 10)
+        sliders.setupTrackBar(13, "OpenGL Scale Z", 1, 100, 1)
     End Sub
 End Module
 
@@ -157,28 +156,28 @@ Public Class OpenGL_Options
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         OpenGL = New OpenGL_Basics(ocvb)
-        setOpenGLsliders(ocvb, caller, sliders, sliders1, sliders2, sliders3)
+        setOpenGLsliders(ocvb, caller, sliders)
         ocvb.desc = "Adjust point size and FOV in OpenGL"
         label1 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        OpenGL.FOV = sliders.TrackBar1.Value
-        OpenGL.yaw = sliders.TrackBar2.Value
-        OpenGL.pitch = sliders.TrackBar3.Value
-        OpenGL.roll = sliders.TrackBar4.Value
+        OpenGL.FOV = sliders.sliders(0).Value
+        OpenGL.yaw = sliders.sliders(1).Value
+        OpenGL.pitch = sliders.sliders(2).Value
+        OpenGL.roll = sliders.sliders(3).Value
 
-        OpenGL.zNear = sliders1.TrackBar1.Value
-        OpenGL.zFar = sliders1.TrackBar2.Value
-        OpenGL.pointSize = sliders1.TrackBar3.Value
-        OpenGL.zTrans = sliders1.TrackBar4.Value / 100
+        OpenGL.zNear = sliders.sliders(4).Value
+        OpenGL.zFar = sliders.sliders(5).Value
+        OpenGL.pointSize = sliders.sliders(6).Value
+        OpenGL.zTrans = sliders.sliders(7).Value / 100
 
-        OpenGL.eye.Item0 = sliders2.TrackBar1.Value
-        OpenGL.eye.Item1 = sliders2.TrackBar2.Value
-        OpenGL.eye.Item2 = sliders2.TrackBar3.Value
+        OpenGL.eye.Item0 = sliders.sliders(8).Value
+        OpenGL.eye.Item1 = sliders.sliders(9).Value
+        OpenGL.eye.Item2 = sliders.sliders(10).Value
 
-        OpenGL.scaleXYZ.Item0 = sliders3.TrackBar1.Value
-        OpenGL.scaleXYZ.Item1 = sliders3.TrackBar2.Value
-        OpenGL.scaleXYZ.Item2 = sliders3.TrackBar3.Value
+        OpenGL.scaleXYZ.Item0 = sliders.sliders(11).Value
+        OpenGL.scaleXYZ.Item1 = sliders.sliders(12).Value
+        OpenGL.scaleXYZ.Item2 = sliders.sliders(13).Value
 
         OpenGL.src = src
         OpenGL.pointCloudInput = ocvb.pointCloud
@@ -221,9 +220,9 @@ Public Class OpenGL_IMU
         ocvb.parms.ShowOptions = False
         ogl = New OpenGL_Options(ocvb)
         ogl.OpenGL.OpenGLTitle = "OpenGL_IMU"
-        ogl.sliders.TrackBar2.Value = 0 ' pitch
-        ogl.sliders.TrackBar3.Value = 0 ' yaw
-        ogl.sliders.TrackBar4.Value = 0 ' roll
+        ogl.sliders.sliders(1).Value = 0 ' pitch
+        ogl.sliders.sliders(2).Value = 0 ' yaw
+        ogl.sliders.sliders(3).Value = 0 ' roll
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud in this example.
         ocvb.desc = "Show how to use IMU coordinates in OpenGL"
     End Sub
@@ -259,13 +258,14 @@ Public Class OpenGL_3Ddata
     Dim histInput() As Byte
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
 
         ogl = New OpenGL_Options(ocvb)
         ogl.OpenGL.OpenGLTitle = "OpenGL_3Ddata"
-        ogl.sliders.TrackBar2.Value = -10
-        ogl.sliders1.TrackBar3.Value = 5
-        ogl.sliders.TrackBar3.Value = 10
+        ogl.sliders.sliders(1).Value = -10
+        ogl.sliders.sliders(6).Value = 5
+        ogl.sliders.sliders(2).Value = 10
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud when displaying data.
 
         colors = New Palette_Gradient(ocvb)
@@ -278,7 +278,7 @@ Public Class OpenGL_3Ddata
         ocvb.desc = "Plot the results of a 3D histogram in OpenGL."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim bins = sliders.TrackBar1.Value
+        Dim bins = sliders.sliders(0).Value
 
         If histInput Is Nothing Then ReDim histInput(src.Total * src.ElemSize - 1)
         Marshal.Copy(src.Data, histInput, 0, histInput.Length)
@@ -307,15 +307,15 @@ Public Class OpenGL_Draw3D
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         circle = New Draw_Circles(ocvb)
-        circle.sliders.TrackBar1.Value = 5
+        circle.sliders.sliders(0).Value = 5
 
         ogl = New OpenGL_Options(ocvb)
         ogl.OpenGL.OpenGLTitle = "OpenGL_3DShapes"
-        ogl.sliders.TrackBar1.Value = 80
-        ogl.sliders2.TrackBar1.Value = -140
-        ogl.sliders2.TrackBar2.Value = -180
-        ogl.sliders1.TrackBar3.Value = 16
-        ogl.sliders2.TrackBar3.Value = -30
+        ogl.sliders.sliders(0).Value = 80
+        ogl.sliders.sliders(8).Value = -140
+        ogl.sliders.sliders(9).Value = -180
+        ogl.sliders.sliders(6).Value = 16
+        ogl.sliders.sliders(10).Value = -30
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud when displaying data.
         label2 = "Grayscale image sent to OpenGL"
         ocvb.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"

@@ -12,13 +12,11 @@ Public Class Entropy_Basics
         flow.result1or2 = RESULT1
 
         hist = New Histogram_Basics(ocvb)
-        hist.sliders.GroupBox2.Visible = False
-        hist.sliders.GroupBox3.Visible = False
 
         ocvb.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        simple.bins = hist.sliders.TrackBar1.Value
+        simple.bins = hist.sliders.sliders(0).Value
         simple.run(src)
         entropy = 0
         Dim entropyChannels As String = ""
@@ -49,12 +47,10 @@ Public Class Entropy_Highest_MT
         setCaller(ocvb)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = 64
-        grid.sliders.TrackBar2.Value = 80
+        grid.sliders.sliders(0).Value = 64
+        grid.sliders.sliders(1).Value = 80
 
         hist = New Histogram_Basics(ocvb)
-        hist.sliders.GroupBox2.Visible = False
-        hist.sliders.GroupBox3.Visible = False
 
         label1 = "Highest entropy marked with red rectangle"
         ocvb.desc = "Find the highest entropy section of the color image."

@@ -108,17 +108,18 @@ Public Class Plot_OverTime
         check.Box(0).Text = "Reset the plot scale"
         check.Box(0).Checked = True
 
-        sliders.setupTrackBar1(ocvb, caller, "Plot Pixel Height", 1, 40, 4)
-        sliders.setupTrackBar2("Plot Pixel Width", 1, 40, 4)
-        sliders.setupTrackBar3("Plot (time) Font Size x10", 1, 20, 10)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Plot Pixel Height", 1, 40, 4)
+        sliders.setupTrackBar(1, "Plot Pixel Width", 1, 40, 4)
+        sliders.setupTrackBar(2, "Plot (time) Font Size x10", 1, 20, 10)
         ocvb.desc = "Plot an input variable over time"
         myStopWatch = Stopwatch.StartNew()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
-        Dim pixelHeight = CInt(sliders.TrackBar1.Value)
-        Dim pixelWidth = CInt(sliders.TrackBar2.Value)
+        Dim pixelHeight = CInt(sliders.sliders(0).Value)
+        Dim pixelWidth = CInt(sliders.sliders(1).Value)
         If ocvb.frameCount = 0 Then dst1.SetTo(0)
         If columnIndex + pixelWidth >= ocvb.color.Width Then
             dst1.ColRange(columnIndex, ocvb.color.Width).SetTo(backColor)
@@ -186,7 +187,7 @@ Public Class Plot_OverTime
         columnIndex += pixelWidth
         dst1.Col(columnIndex).SetTo(0)
         If standalone Then label1 = "RGB Means: blue = " + Format(plotData.Item(0), "#0.0") + " green = " + Format(plotData.Item(1), "#0.0") + " red = " + Format(plotData.Item(2), "#0.0")
-        AddPlotScale(dst1, minScale - topBottomPad, maxScale + topBottomPad, sliders.TrackBar3.Value / 10)
+        AddPlotScale(dst1, minScale - topBottomPad, maxScale + topBottomPad, sliders.sliders(2).Value / 10)
     End Sub
 End Class
 
@@ -204,7 +205,8 @@ Public Class Plot_Histogram
     Public fixedMaxVal As Integer
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Histogram Font Size x10", 1, 20, 10)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Histogram Font Size x10", 1, 20, 10)
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -238,7 +240,7 @@ Public Class Plot_Histogram
                 If hist.Rows <= 255 Then color = cv.Scalar.All((i Mod 255) * incr)
                 cv.Cv2.Rectangle(dst1, New cv.Rect(i * barWidth, dst1.Height - h, barWidth, h), color, -1)
             Next
-            AddPlotScale(dst1, 0, maxVal, sliders.TrackBar1.Value / 10)
+            AddPlotScale(dst1, 0, maxVal, sliders.sliders(0).Value / 10)
         End If
     End Sub
 End Class
@@ -280,9 +282,9 @@ Public Class Plot_Depth
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         hist = New Histogram_Depth(ocvb)
-        hist.sliders.TrackBar1.Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!
-        hist.sliders.TrackBar1.Value = 200 ' a lot more bins in a plot than a bar chart.
-        hist.trim.sliders.TrackBar2.Value = 5000 ' up to x meters.
+        hist.sliders.sliders(0).Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!
+        hist.sliders.sliders(0).Value = 200 ' a lot more bins in a plot than a bar chart.
+        hist.trim.sliders.sliders(1).Value = 5000 ' up to x meters.
 
         plot = New Plot_Basics_CPP(ocvb)
 
@@ -290,8 +292,8 @@ Public Class Plot_Depth
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        Dim inRangeMin = hist.trim.sliders.TrackBar1.Value
-        Dim inRangeMax = hist.trim.sliders.TrackBar2.Value
+        Dim inRangeMin = hist.trim.sliders.sliders(0).Value
+        Dim inRangeMax = hist.trim.sliders.sliders(1).Value
         ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
         ReDim plot.srcY(hist.plotHist.hist.Rows - 1)
         For i = 0 To plot.srcX.Length - 1

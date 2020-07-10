@@ -3,14 +3,15 @@ Public Class Math_Subtract
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Red", 0, 255, 255)
-        sliders.setupTrackBar2("Green", 0, 255, 255)
-        sliders.setupTrackBar3("Blue", 0, 255, 255)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Red", 0, 255, 255)
+        sliders.setupTrackBar(1, "Green", 0, 255, 255)
+        sliders.setupTrackBar(2, "Blue", 0, 255, 255)
         ocvb.desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim tmp = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-        tmp.SetTo(New cv.Scalar(sliders.TrackBar3.Value, sliders.TrackBar2.Value, sliders.TrackBar1.Value))
+        tmp.SetTo(New cv.Scalar(sliders.sliders(2).Value, sliders.sliders(1).Value, sliders.sliders(0).Value))
         cv.Cv2.Subtract(tmp, src, dst1)
     End Sub
 End Class
@@ -49,12 +50,13 @@ Public Class Math_Median_CDF
     Public bins As Int32 = 10
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Histogram Bins", 4, 1000, 100)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Histogram Bins", 4, 1000, 100)
         ocvb.desc = "Compute the src image median"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If standalone Then bins = sliders.TrackBar1.Value
+        If standalone Then bins = sliders.sliders(0).Value
 
         medianVal = computeMedian(src, New cv.Mat, src.Total, bins, rangeMin, rangeMax)
 

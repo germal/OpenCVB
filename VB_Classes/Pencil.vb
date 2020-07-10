@@ -4,15 +4,16 @@ Public Class Pencil_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Pencil Sigma_s", 0, 200, 60)
-        sliders.setupTrackBar2("Pencil Sigma_r", 1, 100, 7)
-        sliders.setupTrackBar3("Pencil Shade Factor", 1, 200, 40)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Pencil Sigma_s", 0, 200, 60)
+        sliders.setupTrackBar(1, "Pencil Sigma_r", 1, 100, 7)
+        sliders.setupTrackBar(2, "Pencil Shade Factor", 1, 200, 40)
         ocvb.desc = "Convert image to a pencil sketch - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim sigma_s = sliders.TrackBar1.Value
-        Dim sigma_r = sliders.TrackBar2.Value / sliders.TrackBar2.Maximum
-        Dim shadowFactor = sliders.TrackBar3.Value / 1000
+        Dim sigma_s = sliders.sliders(0).Value
+        Dim sigma_r = sliders.sliders(1).Value / sliders.sliders(1).Maximum
+        Dim shadowFactor = sliders.sliders(2).Value / 1000
         cv.Cv2.PencilSketch(src, dst2, dst1, sigma_s, sigma_r, shadowFactor)
     End Sub
 End Class
@@ -25,14 +26,15 @@ Public Class Pencil_Manual
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Blur kernel size", 2, 100, 10)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Blur kernel size", 2, 100, 10)
         ocvb.desc = "Break down the process of converting an image to a sketch - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayinv As New cv.Mat
         cv.Cv2.BitwiseNot(src, grayinv)
-        Dim ksize = sliders.TrackBar1.Value
+        Dim ksize = sliders.sliders(0).Value
         If ksize Mod 2 = 0 Then ksize += 1
         Dim blur = grayinv.Blur(New cv.Size(ksize, ksize), New cv.Point(ksize / 2, ksize / 2))
         cv.Cv2.Divide(src, 255 - blur, dst1, 256)

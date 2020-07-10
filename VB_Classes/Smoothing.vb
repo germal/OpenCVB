@@ -41,9 +41,10 @@ Public Class Smoothing_Exterior
 	Public Sub New(ocvb As AlgorithmData)
 		setCaller(ocvb)
 		hull = New Hull_Basics(ocvb)
-		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
+		hull.sliders.sliders(0).Minimum = 4 ' required minimum number of points for the algorithm.
 
-		sliders.setupTrackBar1(ocvb, caller, "Smoothing iterations", 1, 20, 10)
+		sliders.Setup(ocvb, caller, 1)
+		sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 10)
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
@@ -59,7 +60,7 @@ Public Class Smoothing_Exterior
 		dst1.SetTo(0)
 		Dim points = drawPoly(dst1, nextHull, cv.Scalar.White)
 
-		Dim smoothPoints = getSplineInterpolationCatmullRom(points, sliders.TrackBar1.Value)
+		Dim smoothPoints = getSplineInterpolationCatmullRom(points, sliders.sliders(0).Value)
 		If smoothPoints.Count > 0 Then drawPoly(dst1, smoothPoints.ToArray, cv.Scalar.Yellow)
 	End Sub
 End Class
@@ -113,11 +114,12 @@ Public Class Smoothing_Interior
 	Public Sub New(ocvb As AlgorithmData)
 		setCaller(ocvb)
 		hull = New Hull_Basics(ocvb)
-		hull.sliders.TrackBar1.Minimum = 4 ' required minimum number of points for the algorithm.
-		hull.sliders.TrackBar1.Value = 16
+		hull.sliders.sliders(0).Minimum = 4 ' required minimum number of points for the algorithm.
+		hull.sliders.sliders(0).Value = 16
 
-		sliders.setupTrackBar1(ocvb, caller, "Smoothing iterations", 1, 20, 1)
-		sliders.setupTrackBar2("Smoothing tension X100", 1, 100, 50)
+		sliders.Setup(ocvb, caller, 2)
+		sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 1)
+		sliders.setupTrackBar(1, "Smoothing tension X100", 1, 100, 50)
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
@@ -133,7 +135,7 @@ Public Class Smoothing_Interior
 		dst1.SetTo(0)
 		Dim points = drawPoly(dst1, nextHull, cv.Scalar.White)
 
-		Dim smoothPoints2d = getCurveSmoothingChaikin(points, sliders.TrackBar2.Value / 100, sliders.TrackBar1.Value)
+		Dim smoothPoints2d = getCurveSmoothingChaikin(points, sliders.sliders(1).Value / 100, sliders.sliders(0).Value)
 		Dim smoothPoints As New List(Of cv.Point)
 		For i = 0 To smoothPoints2d.Count - 1
 			smoothPoints.Add(New cv.Point(CInt(smoothPoints2d.ElementAt(i).X), CInt(smoothPoints2d.ElementAt(i).Y)))

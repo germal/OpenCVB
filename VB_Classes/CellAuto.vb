@@ -34,15 +34,15 @@ Public Class CellAuto_Life
 
         random = New Random_Points(ocvb)
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
-        random.sliders.TrackBar1.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
+        random.sliders.sliders(0).Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         ocvb.desc = "Use OpenCV to implement the Game of Life"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static savePointCount As Integer
-        If random.sliders.TrackBar1.Value <> savePointCount Or generation = 0 Then
+        If random.sliders.sliders(0).Value <> savePointCount Or generation = 0 Then
             random.Run(ocvb)
             generation = 0
-            savePointCount = random.sliders.TrackBar1.Value
+            savePointCount = random.sliders.sliders(0).Value
             For i = 0 To random.Points.Count - 1
                 grid.Set(Of Byte)(random.Points(i).Y, random.Points(i).X, 1)
             Next
@@ -258,7 +258,8 @@ Public Class CellAuto_All256
         cell = New CellAuto_Basics(ocvb)
         cell.combo.Visible = False ' won't need this...
 
-        sliders.setupTrackBar1(ocvb, caller, "Current Rule", 0, 255, 0)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Current Rule", 0, 255, 0)
         ocvb.desc = "Run through all 256 combinations of outcomes"
     End Sub
     Private Function createOutcome(val As Integer) As String
@@ -270,7 +271,7 @@ Public Class CellAuto_All256
         Return outstr
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        Dim index = sliders.TrackBar1.Value
+        Dim index = sliders.sliders(0).Value
         Dim mtOn = cell.check.Box(0).Checked
 
         cell.src = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
@@ -289,7 +290,7 @@ Public Class CellAuto_All256
                       dst2 = cell.createCells(label2)
               End Select
           End Sub)
-        sliders.TrackBar1.Value = index
+        sliders.sliders(0).Value = index
     End Sub
 End Class
 

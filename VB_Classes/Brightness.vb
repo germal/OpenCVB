@@ -4,16 +4,17 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Clip Limit", 1, 100, 10)
-        sliders.setupTrackBar2("Grid Size", 1, 100, 8)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Clip Limit", 1, 100, 10)
+        sliders.setupTrackBar(1, "Grid Size", 1, 100, 8)
         ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
-        claheObj.TilesGridSize() = New cv.Size(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
-        claheObj.ClipLimit = sliders.TrackBar1.Value
+        claheObj.TilesGridSize() = New cv.Size(sliders.sliders(0).Value, sliders.sliders(1).Value)
+        claheObj.ClipLimit = sliders.sliders(0).Value
         claheObj.Apply(src, dst2)
 
         label1 = "GrayScale"
@@ -49,11 +50,12 @@ Public Class Brightness_AlphaBeta
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         ocvb.desc = "Use alpha and beta with ConvertScaleAbs."
-        sliders.setupTrackBar1(ocvb, caller, "Brightness Alpha (contrast)", 0, 500, 300)
-        sliders.setupTrackBar2("Brightness Beta (brightness)", -100, 100, 0)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 500, 300)
+        sliders.setupTrackBar(1, "Brightness Beta (brightness)", -100, 100, 0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst1 = src.ConvertScaleAbs(sliders.TrackBar1.Value / 500, sliders.TrackBar2.Value)
+        dst1 = src.ConvertScaleAbs(sliders.sliders(0).Value / 500, sliders.sliders(1).Value)
     End Sub
 End Class
 
@@ -66,14 +68,15 @@ Public Class Brightness_Gamma
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         ocvb.desc = "Use gamma with ConvertScaleAbs."
-        sliders.setupTrackBar1(ocvb, caller, "Brightness Gamma correction", 0, 200, 100)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Brightness Gamma correction", 0, 200, 100)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static lastGamma As Int32 = -1
-        If lastGamma <> sliders.TrackBar1.Value Then
-            lastGamma = sliders.TrackBar1.Value
+        If lastGamma <> sliders.sliders(0).Value Then
+            lastGamma = sliders.sliders(0).Value
             For i = 0 To lookupTable.Length - 1
-                lookupTable(i) = Math.Pow(i / 255, sliders.TrackBar1.Value / 100) * 255
+                lookupTable(i) = Math.Pow(i / 255, sliders.sliders(0).Value / 100) * 255
             Next
         End If
         dst1 = src.LUT(lookupTable)
@@ -105,7 +108,8 @@ Public Class Brightness_WhiteBalance_CPP
     Dim wPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "White balance threshold X100", 1, 100, 10)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "White balance threshold X100", 1, 100, 10)
 
         wPtr = WhiteBalance_Open()
         label1 = "Image with auto white balance"
@@ -117,7 +121,7 @@ Public Class Brightness_WhiteBalance_CPP
         Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
         Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
 
-        Dim thresholdVal As Single = sliders.TrackBar1.Value / 100
+        Dim thresholdVal As Single = sliders.sliders(0).Value / 100
         Dim rgbPtr = WhiteBalance_Run(wPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, thresholdVal)
         handleSrc.Free()
 
@@ -147,7 +151,8 @@ Public Class Brightness_WhiteBalance
         hist.maxRange = hist.bins
         If standalone = False Then hist.sliders.Visible = False
 
-        sliders.setupTrackBar1(ocvb, caller, "White balance threshold X100", 1, 100, 10)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "White balance threshold X100", 1, 100, 10)
 
         label1 = "Image with auto white balance"
         ocvb.desc = "Automate getting the right white balance - faster than the C++ version (in debug mode)"
@@ -164,7 +169,7 @@ Public Class Brightness_WhiteBalance
         hist.src = sum32f
         hist.Run(ocvb)
 
-        Dim thresholdVal = sliders.TrackBar1.Value / 100
+        Dim thresholdVal = sliders.sliders(0).Value / 100
         Dim sum As Single
         Dim threshold As Int32
         For i = hist.histRaw(0).Rows - 1 To 0 Step -1

@@ -4,18 +4,19 @@ Public Class Coherence_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Coherence Sigma", 1, 15, 9)
-        sliders.setupTrackBar2("Coherence Blend", 1, 10, 10)
-        sliders.setupTrackBar3("Coherence str_sigma", 1, 15, 15)
-        sliders.setupTrackBar4("Coherence eigen kernel", 1, 31, 1)
+        sliders.Setup(ocvb, caller, 4)
+        sliders.setupTrackBar(0, "Coherence Sigma", 1, 15, 9)
+        sliders.setupTrackBar(1, "Coherence Blend", 1, 10, 10)
+        sliders.setupTrackBar(2, "Coherence str_sigma", 1, 15, 15)
+        sliders.setupTrackBar(3, "Coherence eigen kernel", 1, 31, 1)
         label1 = "Coherence - draw rectangle to apply"
         ocvb.desc = "Find lines that are artistically coherent in the image - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim sigma = sliders.TrackBar1.Value * 2 + 1
-        Dim blend = sliders.TrackBar2.Value / 10
-        Dim str_sigma = sliders.TrackBar3.Value * 2 + 1
-        Dim eigenKernelSize = sliders.TrackBar4.Value * 2 + 1
+        Dim sigma = sliders.sliders(0).Value * 2 + 1
+        Dim blend = sliders.sliders(1).Value / 10
+        Dim str_sigma = sliders.sliders(2).Value * 2 + 1
+        Dim eigenKernelSize = sliders.sliders(3).Value * 2 + 1
 
         Dim side = 512
         If src.Height < side Then side = 256

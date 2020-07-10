@@ -9,10 +9,11 @@ Public Class KLT_Basics
     Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "KLT - MaxCorners", 1, 200, 100)
-        sliders.setupTrackBar2("KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
-        sliders.setupTrackBar3("KLT - minDistance", 1, 100, 7)
-        sliders.setupTrackBar4("KLT - BlockSize", 1, 100, 7)
+        sliders.Setup(ocvb, caller, 4)
+        sliders.setupTrackBar(0, "KLT - MaxCorners", 1, 200, 100)
+        sliders.setupTrackBar(1, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
+        sliders.setupTrackBar(2, "KLT - minDistance", 1, 100, 7)
+        sliders.setupTrackBar(3, "KLT - BlockSize", 1, 100, 7)
 
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "KLT - Night Mode"
@@ -28,10 +29,10 @@ Public Class KLT_Basics
             check.Box(1).Checked = False
         End If
 
-        Dim maxCorners = sliders.TrackBar1.Value
-        Dim qualityLevel = sliders.TrackBar2.Value / 100
-        Dim minDistance = sliders.TrackBar3.Value
-        Dim blockSize = sliders.TrackBar4.Value
+        Dim maxCorners = sliders.sliders(0).Value
+        Dim qualityLevel = sliders.sliders(1).Value / 100
+        Dim minDistance = sliders.sliders(2).Value
+        Dim blockSize = sliders.sliders(3).Value
         Dim winSize As New cv.Size(3, 3)
         Dim subPixWinSize As New cv.Size(10, 10)
         Dim nightMode = check.Box(0).Checked

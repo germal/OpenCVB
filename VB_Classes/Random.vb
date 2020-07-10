@@ -9,18 +9,19 @@ Public Class Random_Points
     Public plotPoints As Boolean = False
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Random Pixel Count", 1, ocvb.color.cols * ocvb.color.Rows, 20)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Random Pixel Count", 1, ocvb.color.Cols * ocvb.color.Rows, 20)
 
-        ReDim Points(sliders.TrackBar1.Value - 1)
-        ReDim Points2f(sliders.TrackBar1.Value - 1)
+        ReDim Points(sliders.sliders(0).Value - 1)
+        ReDim Points2f(sliders.sliders(0).Value - 1)
 
         rangeRect = New cv.Rect(0, 0, ocvb.color.cols, ocvb.color.Rows)
         ocvb.desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If Points.Length <> sliders.TrackBar1.Value Then
-            ReDim Points(sliders.TrackBar1.Value - 1)
-            ReDim Points2f(sliders.TrackBar1.Value - 1)
+        If Points.Length <> sliders.sliders(0).Value Then
+            ReDim Points(sliders.sliders(0).Value - 1)
+            ReDim Points2f(sliders.sliders(0).Value - 1)
         End If
         dst1.SetTo(0)
         For i = 0 To Points.Length - 1
@@ -105,14 +106,15 @@ Public Class Random_NormalDist
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Random_NormalDist Blue Mean", 0, 255, 25)
-        sliders.setupTrackBar2("Random_NormalDist Green Mean", 0, 255, 127)
-        sliders.setupTrackBar3("Random_NormalDist Red Mean", 0, 255, 180)
-        sliders.setupTrackBar4("Random_NormalDist Stdev", 0, 255, 50)
+        sliders.Setup(ocvb, caller, 4)
+        sliders.setupTrackBar(0, "Random_NormalDist Blue Mean", 0, 255, 25)
+        sliders.setupTrackBar(1, "Random_NormalDist Green Mean", 0, 255, 127)
+        sliders.setupTrackBar(2, "Random_NormalDist Red Mean", 0, 255, 180)
+        sliders.setupTrackBar(3, "Random_NormalDist Stdev", 0, 255, 50)
         ocvb.desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        cv.Cv2.Randn(dst1, New cv.Scalar(sliders.TrackBar1.Value, sliders.TrackBar2.Value, sliders.TrackBar3.Value), cv.Scalar.All(sliders.TrackBar4.Value))
+        cv.Cv2.Randn(dst1, New cv.Scalar(sliders.sliders(0).Value, sliders.sliders(1).Value, sliders.sliders(2).Value), cv.Scalar.All(sliders.sliders(3).Value))
     End Sub
 End Class
 
@@ -125,7 +127,7 @@ Public Class Random_CheckUniformSmoothed
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         histogram = New Histogram_KalmanSmoothed(ocvb)
-        histogram.sliders.TrackBar1.Value = 255
+        histogram.sliders.sliders(0).Value = 255
 
         rUniform = New Random_UniformDist(ocvb)
 
@@ -154,7 +156,7 @@ Public Class Random_CheckUniformDist
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         histogram = New Histogram_Basics(ocvb)
-        histogram.sliders.TrackBar1.Value = 255
+        histogram.sliders.sliders(0).Value = 255
 
         rUniform = New Random_UniformDist(ocvb)
 
@@ -183,7 +185,7 @@ Public Class Random_CheckNormalDist
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         histogram = New Histogram_Basics(ocvb)
-        histogram.sliders.TrackBar1.Value = 255
+        histogram.sliders.sliders(0).Value = 255
         normalDist = New Random_NormalDist(ocvb)
         ocvb.desc = "Display the histogram for a Normal distribution."
     End Sub
@@ -209,7 +211,7 @@ Public Class Random_CheckNormalDistSmoothed
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         histogram = New Histogram_KalmanSmoothed(ocvb)
-        histogram.sliders.TrackBar1.Value = 255
+        histogram.sliders.sliders(0).Value = 255
         histogram.plotHist.minRange = 1
         normalDist = New Random_NormalDist(ocvb)
         ocvb.desc = "Display the histogram for a Normal distribution."
@@ -333,11 +335,12 @@ Public Class Random_MonteCarlo
         plotHist = New Plot_Histogram(ocvb)
         plotHist.fixedMaxVal = 100
 
-        sliders.setupTrackBar1(ocvb, caller, "Number of bins", 1, 255, 91)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Number of bins", 1, 255, 91)
         ocvb.desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim dimension = sliders.TrackBar1.Value
+        Dim dimension = sliders.sliders(0).Value
         Dim histogram = New cv.Mat(dimension, 1, cv.MatType.CV_32F, 0)
         For i = 0 To outputRandom.rows - 1
             While (1)
@@ -377,7 +380,7 @@ Public Class Random_CustomHistogram
         random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, 0)
 
         hist = New Histogram_Simple(ocvb)
-        hist.sliders.TrackBar1.Value = 255
+        hist.sliders.sliders(0).Value = 255
 
         label1 = "Histogram of the grayscale image"
         label2 = "Histogram of the resulting random numbers"
@@ -388,8 +391,8 @@ Public Class Random_CustomHistogram
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static saveBins As Integer
-        If hist.sliders.TrackBar1.Value <> saveBins Then
-            saveBins = hist.sliders.TrackBar1.Value
+        If hist.sliders.sliders(0).Value <> saveBins Then
+            saveBins = hist.sliders.sliders(0).Value
             hist.src = src
             hist.plotHist.fixedMaxVal = 0 ' we are sharing the plothist with the code below...
             hist.Run(ocvb)

@@ -32,11 +32,13 @@ Public Class Harris_Features_CPP
     Dim srcData() As Byte
     Dim Harris_Features As IntPtr
     Public Sub New(ocvb As AlgorithmData)
-                setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Harris Threshold", 1, 100, 1)
-        sliders.setupTrackBar2("Harris Neighborhood", 1, 41, 21)
-        sliders.setupTrackBar3("Harris aperture", 1, 33, 21)
-        sliders.setupTrackBar4( "Harris Parameter", 1, 100, 1)
+        setCaller(ocvb)
+
+        sliders.Setup(ocvb, caller, 4)
+        sliders.setupTrackBar(0, "Harris Threshold", 1, 100, 1)
+        sliders.setupTrackBar(1, "Harris Neighborhood", 1, 41, 21)
+        sliders.setupTrackBar(2, "Harris aperture", 1, 33, 21)
+        sliders.setupTrackBar(3,  "Harris Parameter", 1, 100, 1)
         
         ocvb.desc = "Use Harris feature detectors to identify interesting points."
 
@@ -47,12 +49,12 @@ Public Class Harris_Features_CPP
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
-        Dim threshold = sliders.TrackBar1.Value / 10000
-        Dim neighborhood = sliders.TrackBar2.Value
+        Dim threshold = sliders.sliders(0).Value / 10000
+        Dim neighborhood = sliders.sliders(1).Value
         If neighborhood Mod 2 = 0 Then neighborhood += 1
-        Dim aperture = sliders.TrackBar3.Value
+        Dim aperture = sliders.sliders(2).Value
         If aperture Mod 2 = 0 Then aperture += 1
-        Dim HarrisParm = sliders.TrackBar4.Value / 100
+        Dim HarrisParm = sliders.sliders(3).Value / 100
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim imagePtr = Harris_Features_Run(Harris_Features, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, threshold,
                                            neighborhood, aperture, HarrisParm)
@@ -80,7 +82,8 @@ Public Class Harris_Detector_CPP
     Public FeaturePoints As New List(Of cv.Point2f)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Harris qualityLevel", 1, 100, 2)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Harris qualityLevel", 1, 100, 2)
 
         ocvb.desc = "Use Harris detector to identify interesting points."
 
@@ -90,7 +93,7 @@ Public Class Harris_Detector_CPP
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
-        Dim qualityLevel = sliders.TrackBar1.Value / 100
+        Dim qualityLevel = sliders.sliders(0).Value / 100
 
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned) 
         Dim handleCount = GCHandle.Alloc(ptCount, GCHandleType.Pinned)

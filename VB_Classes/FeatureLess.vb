@@ -9,16 +9,17 @@ Public Class Featureless_Basics_MT
     Public objectSize As New List(Of Int32)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "FeatureLess rho", 1, 100, 1)
-        sliders.setupTrackBar2("FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar3("FeatureLess threshold", 1, 100, 3)
-        sliders.setupTrackBar4("FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
+        sliders.Setup(ocvb, caller, 4)
+        sliders.setupTrackBar(0, "FeatureLess rho", 1, 100, 1)
+        sliders.setupTrackBar(1, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
+        sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
+        sliders.setupTrackBar(3, "FeatureLess Flood Threshold", 100, 10000, If(ocvb.color.Width > 1000, 1000, 500))
 
         edges = New Edges_Canny(ocvb)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = If(ocvb.color.Width > 1000, 16, 8)
-        grid.sliders.TrackBar2.Value = If(ocvb.color.Width > 1000, 16, 8)
+        grid.sliders.sliders(0).Value = If(ocvb.color.Width > 1000, 16, 8)
+        grid.sliders.sliders(1).Value = If(ocvb.color.Width > 1000, 16, 8)
 
         ocvb.desc = "Multithread Houghlines to find featureless regions in an image."
         label1 = "Featureless regions with mask in depth color"
@@ -30,10 +31,10 @@ Public Class Featureless_Basics_MT
         edges.src = src
         edges.Run(ocvb)
 
-        Dim rhoIn = sliders.TrackBar1.Value
-        Dim thetaIn = sliders.TrackBar2.Value / 1000
-        Dim threshold = sliders.TrackBar3.Value
-        Dim floodCountThreshold = sliders.TrackBar4.Value
+        Dim rhoIn = sliders.sliders(0).Value
+        Dim thetaIn = sliders.sliders(1).Value / 1000
+        Dim threshold = sliders.sliders(2).Value
+        Dim floodCountThreshold = sliders.sliders(3).Value
 
         src.CopyTo(dst1)
         mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
@@ -80,7 +81,8 @@ Public Class FeatureLess_Prediction
     Dim fLess As Featureless_Basics_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "FeatureLess Resize Percent", 1, 100, 1)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "FeatureLess Resize Percent", 1, 100, 1)
 
         fLess = New Featureless_Basics_MT(ocvb)
 
@@ -94,7 +96,7 @@ Public Class FeatureLess_Prediction
         Dim labels = fLess.mask.Clone()
         fLess.mask = fLess.mask.Threshold(1, 255, cv.ThresholdTypes.Binary)
 
-        Dim percent = Math.Sqrt(sliders.TrackBar1.Value / 100)
+        Dim percent = Math.Sqrt(sliders.sliders(0).Value / 100)
         Dim newSize = New cv.Size(src.Width * percent, src.Height * percent)
 
         Dim rgb = src.Clone(), depth32f = getDepth32f(ocvb).Resize(newSize), mask = fLess.mask

@@ -9,15 +9,15 @@ Public Class SVM_Options
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        sliders1.setupTrackBar1(ocvb, caller, "SVM Coef0 X100", 1, 200, 100)
-        sliders1.setupTrackBar2("SVM C X100", 0, 100, 100)
-        sliders1.setupTrackBar3("SVM Nu X100", 1, 85, 50)
-        sliders1.setupTrackBar4("SVM P X100", 0, 100, 10)
-
-        sliders.setupTrackBar1(ocvb, caller, "SampleCount", 5, 1000, 500)
-        sliders.setupTrackBar2("Granularity", 1, 50, 5)
-        sliders.setupTrackBar3("SVM Degree", 1, 200, 100)
-        sliders.setupTrackBar4("SVM Gamma ", 1, 200, 100)
+        sliders.Setup(ocvb, caller, 8)
+        sliders.setupTrackBar(0, "SampleCount", 5, 1000, 500)
+        sliders.setupTrackBar(1, "Granularity", 1, 50, 5)
+        sliders.setupTrackBar(2, "SVM Degree", 1, 200, 100)
+        sliders.setupTrackBar(3, "SVM Gamma ", 1, 200, 100)
+        sliders.setupTrackBar(3, "SVM Coef0 X100", 1, 200, 100)
+        sliders.setupTrackBar(4, "SVM C X100", 0, 100, 100)
+        sliders.setupTrackBar(5, "SVM Nu X100", 1, 85, 50)
+        sliders.setupTrackBar(6, "SVM P X100", 0, 100, 10)
 
         radio.Setup(ocvb, caller, 4)
         radio.check(0).Text = "kernel Type = Linear"
@@ -58,12 +58,12 @@ Public Class SVM_Options
         svmx.Type = SVMType
         svmx.KernelType = kernelType
         svmx.TermCriteria = cv.TermCriteria.Both(1000, 0.000001)
-        svmx.Degree = CSng(sliders.TrackBar3.Value)
-        svmx.Gamma = CSng(sliders.TrackBar4.Value)
-        svmx.Coef0 = sliders1.TrackBar1.Value / 100
-        svmx.C = sliders1.TrackBar2.Value / 100
-        svmx.Nu = sliders1.TrackBar3.Value / 100
-        svmx.P = sliders1.TrackBar4.Value / 100
+        svmx.Degree = CSng(sliders.sliders(2).Value)
+        svmx.Gamma = CSng(sliders.sliders(3).Value)
+        svmx.Coef0 = sliders.sliders(4).Value / 100
+        svmx.C = sliders.sliders(5).Value / 100
+        svmx.Nu = sliders.sliders(6).Value / 100
+        svmx.P = sliders.sliders(7).Value / 100
 
         Return svmx
     End Function
@@ -71,7 +71,7 @@ Public Class SVM_Options
         Return x + 50 * Math.Sin(x / 15.0)
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        ReDim points(sliders.TrackBar1.Value)
+        ReDim points(sliders.sliders(0).Value)
         ReDim responses(points.Length - 1)
         For i = 0 To points.Length - 1
             Dim x = msRNG.Next(0, src.Height - 1)
@@ -116,7 +116,7 @@ Public Class SVM_Basics
 
         svmx.Train(dataMat, cv.ML.SampleTypes.RowSample, resMat)
 
-        Dim granularity = svmOptions.sliders.TrackBar2.Value
+        Dim granularity = svmOptions.sliders.sliders(1).Value
         Dim sampleMat As New cv.Mat(1, 2, cv.MatType.CV_32F)
         For x = 0 To src.Height - 1 Step granularity
             For y = 0 To src.Height - 1 Step granularity
@@ -151,7 +151,7 @@ Public Class SVM_Random
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         svmOptions = New SVM_Options(ocvb)
-        svmOptions.sliders.TrackBar2.Value = 15
+        svmOptions.sliders.sliders(1).Value = 15
 
         ocvb.drawRect = New cv.Rect(ocvb.color.Cols / 4, ocvb.color.Rows / 4, ocvb.color.Cols / 2, ocvb.color.Rows / 2)
 
@@ -168,7 +168,7 @@ Public Class SVM_Random
 
         Dim rect = ocvb.drawRect
 
-        Dim dataSize = svmOptions.sliders.TrackBar1.Value ' get the sample count
+        Dim dataSize = svmOptions.sliders.sliders(0).Value ' get the sample count
         Dim trainData As New cv.Mat(dataSize, 2, cv.MatType.CV_32F)
         Dim response = New cv.Mat(dataSize, 1, cv.MatType.CV_32S)
         Dim width = src.Width
@@ -199,7 +199,7 @@ Public Class SVM_Random
             svmx.Train(trainData, cv.ML.SampleTypes.RowSample, response)
 
             Dim sampleMat As New cv.Mat(1, 2, cv.MatType.CV_32F)
-            Dim granularity = svmOptions.sliders.TrackBar2.Value
+            Dim granularity = svmOptions.sliders.sliders(1).Value
             Dim blueCount As Integer = 0
             For y = 0 To dst2.Height - 1 Step granularity
                 For x = 0 To width - 1 Step granularity
@@ -244,7 +244,7 @@ Public Class SVM_TestCase
         labelsMat = New cv.Mat(4, 1, cv.MatType.CV_32SC1, labels)
 
         svmOptions = New SVM_Options(ocvb)
-        svmOptions.sliders.TrackBar2.Value = 15
+        svmOptions.sliders.sliders(1).Value = 15
         svmOptions.radio.check(3).Enabled = False
 
         ocvb.desc = "Text book example on SVM"
@@ -258,7 +258,7 @@ Public Class SVM_TestCase
         svmx.Train(trainMat, cv.ML.SampleTypes.RowSample, labelsMat)
 
         Dim sampleMat As New cv.Mat(1, 2, cv.MatType.CV_32F)
-        Dim granularity = svmOptions.sliders.TrackBar2.Value
+        Dim granularity = svmOptions.sliders.sliders(1).Value
         For y = 0 To dst1.Height - 1 Step granularity
             For x = 0 To dst1.Width - 1 Step granularity
                 sampleMat.Set(Of Single)(0, 0, x)

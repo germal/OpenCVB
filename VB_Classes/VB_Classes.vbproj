@@ -274,10 +274,10 @@
     <Compile Include="OptionsRecordPlayback.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OptionsSlider.Designer.vb">
-      <DependentUpon>OptionsSlider.vb</DependentUpon>
+    <Compile Include="OptionsSliders.Designer.vb">
+      <DependentUpon>OptionsSliders.vb</DependentUpon>
     </Compile>
-    <Compile Include="OptionsSlider.vb">
+    <Compile Include="OptionsSliders.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="OptionsVideoName.Designer.vb">
@@ -332,12 +332,6 @@
     <Compile Include="OptionsRadioButtons.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OptionsSliders.Designer.vb">
-      <DependentUpon>OptionsSliders.vb</DependentUpon>
-    </Compile>
-    <Compile Include="OptionsSliders.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Palette.vb" />
     <Compile Include="PCA.vb" />
     <Compile Include="Random.vb" />
@@ -382,17 +376,14 @@
     <EmbeddedResource Include="OptionsRecordPlayback.resx">
       <DependentUpon>OptionsRecordPlayback.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="OptionsSlider.resx">
-      <DependentUpon>OptionsSlider.vb</DependentUpon>
+    <EmbeddedResource Include="OptionsSliders.resx">
+      <DependentUpon>OptionsSliders.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsVideoName.resx">
       <DependentUpon>OptionsVideoName.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsRadioButtons.resx">
       <DependentUpon>OptionsRadioButtons.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OptionsSliders.resx">
-      <DependentUpon>OptionsSliders.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -129,9 +129,10 @@ Public Class VTK_Histogram3D
     Dim random As Random_NormalDist
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Random Number Stdev", 0, 255, 10)
-        sliders.setupTrackBar2("Hist 3D bins", 1, 100, 32)
-        sliders.setupTrackBar3("Hist 3D bin Threshold X1000000", 10, 100, 20)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Random Number Stdev", 0, 255, 10)
+        sliders.setupTrackBar(1, "Hist 3D bins", 1, 100, 32)
+        sliders.setupTrackBar(2, "Hist 3D bin Threshold X1000000", 10, 100, 20)
 
         mats = New Mat_4to1(ocvb)
 
@@ -150,27 +151,27 @@ Public Class VTK_Histogram3D
         End If
 
         Static lastStdev As Int32 = -1
-        If vtk.memMapUserData(0) <> sliders.TrackBar2.Value Or vtk.memMapUserData(1) <> sliders.TrackBar3.Value / 1000000 Or
-                lastStdev <> sliders.TrackBar1.Value Then
+        If vtk.memMapUserData(0) <> sliders.sliders(1).Value Or vtk.memMapUserData(1) <> sliders.sliders(2).Value / 1000000 Or
+                lastStdev <> sliders.sliders(0).Value Then
             vtk.memMapUserData(2) = 1 ' trigger a recompute of the 3D histogram.
         Else
             vtk.memMapUserData(2) = 0 ' no need to recompute 3D histogram.
         End If
 
-        vtk.memMapUserData(0) = sliders.TrackBar2.Value ' number of bins
-        vtk.memMapUserData(1) = sliders.TrackBar3.Value / 1000000 ' threshold
+        vtk.memMapUserData(0) = sliders.sliders(1).Value ' number of bins
+        vtk.memMapUserData(1) = sliders.sliders(2).Value / 1000000 ' threshold
 
-        If lastStdev <> sliders.TrackBar1.Value Then
+        If lastStdev <> sliders.sliders(0).Value Then
             For i = 0 To 3
-                random.sliders.TrackBar1.Value = Choose(i + 1, 25, 187, 25, 25)
-                random.sliders.TrackBar2.Value = Choose(i + 1, 127, 127, 65, 65)
-                random.sliders.TrackBar3.Value = Choose(i + 1, 180, 180, 180, 244)
-                random.sliders.TrackBar4.Value = sliders.TrackBar1.Value
+                random.sliders.sliders(0).Value = Choose(i + 1, 25, 187, 25, 25)
+                random.sliders.sliders(1).Value = Choose(i + 1, 127, 127, 65, 65)
+                random.sliders.sliders(2).Value = Choose(i + 1, 180, 180, 180, 244)
+                random.sliders.sliders(3).Value = sliders.sliders(0).Value
                 random.src = src
                 random.Run(ocvb)
                 mats.mat(i) = random.dst1
             Next
-            lastStdev = sliders.TrackBar1.Value
+            lastStdev = sliders.sliders(0).Value
         End If
 
         mats.Run(ocvb)

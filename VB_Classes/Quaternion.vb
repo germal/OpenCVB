@@ -16,23 +16,25 @@ Public Class Quaterion_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders1.setupTrackBar1(ocvb, caller, "quaternion A.x X100", -100, 100, -50)
-        sliders1.setupTrackBar2("quaternion A.y X100", -100, 100, 10)
-        sliders1.setupTrackBar3("quaternion A.z X100", -100, 100, 20)
-        sliders1.setupTrackBar4("quaternion Theta X100", -100, 100, 100)
 
-        sliders2.setupTrackBar1(ocvb, caller, "quaternion B.x X100", -100, 100, -10)
-        sliders2.setupTrackBar2("quaternion B.y X100", -100, 100, -10)
-        sliders2.setupTrackBar3("quaternion B.z X100", -100, 100, -10)
-        sliders2.setupTrackBar4("quaternion Theta X100", -100, 100, 100)
+        sliders.Setup(ocvb, caller, 8)
+        sliders.setupTrackBar(0, "quaternion A.x X100", -100, 100, -50)
+        sliders.setupTrackBar(1, "quaternion A.y X100", -100, 100, 10)
+        sliders.setupTrackBar(2, "quaternion A.z X100", -100, 100, 20)
+        sliders.setupTrackBar(3, "quaternion Theta X100", -100, 100, 100)
+
+        sliders.setupTrackBar(4, "quaternion B.x X100", -100, 100, -10)
+        sliders.setupTrackBar(5, "quaternion B.y X100", -100, 100, -10)
+        sliders.setupTrackBar(6, "quaternion B.z X100", -100, 100, -10)
+        sliders.setupTrackBar(7, "quaternion Theta X100", -100, 100, 100)
 
         ocvb.desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim q1 = New Quaternion(CSng(sliders1.TrackBar1.Value / 100), CSng(sliders1.TrackBar2.Value / 100),
-                                    CSng(sliders1.TrackBar3.Value / 100), CSng(sliders1.TrackBar4.Value / 100))
-        Dim q2 = New Quaternion(CSng(sliders2.TrackBar1.Value / 100), CSng(sliders2.TrackBar2.Value / 100),
-                                    CSng(sliders2.TrackBar3.Value / 100), CSng(sliders2.TrackBar4.Value / 100))
+        Dim q1 = New Quaternion(CSng(sliders.sliders(0).Value / 100), CSng(sliders.sliders(1).Value / 100),
+                                    CSng(sliders.sliders(2).Value / 100), CSng(sliders.sliders(3).Value / 100))
+        Dim q2 = New Quaternion(CSng(sliders.sliders(4).Value / 100), CSng(sliders.sliders(5).Value / 100),
+                                    CSng(sliders.sliders(6).Value / 100), CSng(sliders.sliders(7).Value / 100))
 
         Dim quatmul = Quaternion.Multiply(q1, q2)
         ocvb.putText(New TTtext("q1 = " + q1.ToString() + vbCrLf +

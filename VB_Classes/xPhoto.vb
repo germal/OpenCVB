@@ -70,8 +70,9 @@ Public Class xPhoto_OilPaint_CPP
     Dim xPhoto_OilPaint As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "xPhoto Dynamic Ratio", 1, 127, 7)
-        sliders.setupTrackBar2("xPhoto Block Size", 1, 100, 3)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "xPhoto Dynamic Ratio", 1, 127, 7)
+        sliders.setupTrackBar(1, "xPhoto Block Size", 1, 100, 3)
 
         radio.Setup(ocvb, caller, 5)
         radio.check(0).Text = "BGR2GRAY"
@@ -99,7 +100,7 @@ Public Class xPhoto_OilPaint_CPP
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim imagePtr = xPhoto_OilPaint_Run(xPhoto_OilPaint, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                           sliders.TrackBar2.Value, sliders.TrackBar1.Value, colorCode)
+                                           sliders.sliders(1).Value, sliders.sliders(0).Value, colorCode)
         handleSrc.Free()
 
         If imagePtr <> 0 Then dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)

@@ -3,8 +3,9 @@ Public Class Encode_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
-        sliders.setupTrackBar2("Encode Output Scaling", 1, 100, 7)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
+        sliders.setupTrackBar(1, "Encode Output Scaling", 1, 100, 7)
 
         ocvb.desc = "Error Level Analysis - to verify a jpg image has not been modified."
         label1 = "absDiff with original"
@@ -12,7 +13,7 @@ Public Class Encode_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim buf(ocvb.color.Width * ocvb.color.Height * ocvb.color.ElemSize) As Byte
-        Dim encodeParams() As Int32 = {cv.ImwriteFlags.JpegQuality, sliders.TrackBar1.Value}
+        Dim encodeParams() As Int32 = {cv.ImwriteFlags.JpegQuality, sliders.sliders(0).Value}
 
         cv.Cv2.ImEncode(".jpg", ocvb.color, buf, encodeParams)
         dst2 = cv.Cv2.ImDecode(buf, 1)
@@ -20,7 +21,7 @@ Public Class Encode_Basics
         Dim output As New cv.Mat
         cv.Cv2.Absdiff(ocvb.color, dst2, output)
 
-        Dim scale = sliders.TrackBar2.Value
+        Dim scale = sliders.sliders(1).Value
         output.ConvertTo(dst1, cv.MatType.CV_8UC3, scale)
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
         label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
@@ -33,8 +34,9 @@ Public Class Encode_Options
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
-        sliders.setupTrackBar2("Encode Output Scaling", 1, 100, 85)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
+        sliders.setupTrackBar(1, "Encode Output Scaling", 1, 100, 85)
 
         radio.Setup(ocvb, caller, 6)
         radio.check(0).Text = "JpegChromaQuality"
@@ -60,7 +62,7 @@ Public Class Encode_Options
         Next
 
         Dim fileExtension = ".jpg"
-        Dim qualityLevel = sliders.TrackBar1.Value
+        Dim qualityLevel = sliders.sliders(0).Value
         If encodeOption = cv.ImwriteFlags.JpegProgressive Then qualityLevel = 1 ' just on or off
         If encodeOption = cv.ImwriteFlags.JpegOptimize Then qualityLevel = 1 ' just on or off
         Dim encodeParams() As Int32 = {encodeOption, qualityLevel}
@@ -71,7 +73,7 @@ Public Class Encode_Options
         Dim output As New cv.Mat
         cv.Cv2.Absdiff(ocvb.color, dst2, output)
 
-        Dim scale = sliders.TrackBar2.Value
+        Dim scale = sliders.sliders(1).Value
         output.ConvertTo(dst1, cv.MatType.CV_8UC3, scale)
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
         label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.0%") + ")"

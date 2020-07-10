@@ -6,17 +6,18 @@ Public Class Features_GoodFeatures
     Public goodFeatures As New List(Of cv.Point2f)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Number of Points", 10, 1000, 200)
-        sliders.setupTrackBar2("Quality Level", 1, 100, 1)
-        sliders.setupTrackBar3("Distance", 1, 100, 30)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Number of Points", 10, 1000, 200)
+        sliders.setupTrackBar(1, "Quality Level", 1, 100, 1)
+        sliders.setupTrackBar(2, "Distance", 1, 100, 30)
 
         ocvb.desc = "Find good features to track in an RGB image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim numPoints = sliders.TrackBar1.Value
-        Dim quality = sliders.TrackBar2.Value / 100
-        Dim minDistance = sliders.TrackBar3.Value
+        Dim numPoints = sliders.sliders(0).Value
+        Dim quality = sliders.sliders(1).Value / 100
+        Dim minDistance = sliders.sliders(2).Value
         Dim features = cv.Cv2.GoodFeaturesToTrack(src, numPoints, quality, minDistance, Nothing, 7, True, 3)
 
         If standalone Then src.CopyTo(dst1)

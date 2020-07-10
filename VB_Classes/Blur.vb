@@ -4,11 +4,12 @@ Public Class Blur_Gaussian
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 32, 5)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Kernel Size", 1, 32, 5)
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize As Int32 = sliders.TrackBar1.Value
+        Dim kernelSize As Int32 = sliders.sliders(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         cv.Cv2.GaussianBlur(src, dst1, New cv.Size(kernelSize, kernelSize), 0, 0)
     End Sub
@@ -20,11 +21,12 @@ Public Class Blur_Gaussian_CS
     Dim CS_BlurGaussian As New CS_BlurGaussian
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 32, 5)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Kernel Size", 1, 32, 5)
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        CS_BlurGaussian.Run(src, dst1, sliders.TrackBar1.Value)
+        CS_BlurGaussian.Run(src, dst1, sliders.sliders(0).Value)
     End Sub
 End Class
 
@@ -35,11 +37,12 @@ Public Class Blur_Median_CS
     Dim CS_BlurMedian As New CS_BlurMedian
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 32, 5)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Kernel Size", 1, 32, 5)
         ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        CS_BlurMedian.Run(src, dst1, sliders.TrackBar1.Value)
+        CS_BlurMedian.Run(src, dst1, sliders.sliders(0).Value)
     End Sub
 End Class
 
@@ -49,11 +52,12 @@ Public Class Blur_Homogeneous
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 32, 5)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Kernel Size", 1, 32, 5)
         ocvb.desc = "Smooth each pixel with a kernel of 1's of different sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize As Int32 = sliders.TrackBar1.Value
+        Dim kernelSize As Int32 = sliders.sliders(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         dst1 = src.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
         dst2 = ocvb.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
@@ -66,11 +70,12 @@ Public Class Blur_Median
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 32, 5)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Kernel Size", 1, 32, 5)
         ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize As Int32 = sliders.TrackBar1.Value
+        Dim kernelSize As Int32 = sliders.sliders(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         cv.Cv2.MedianBlur(src, dst1, kernelSize)
     End Sub
@@ -82,11 +87,12 @@ Public Class Blur_Bilateral
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Kernel Size", 1, 32, 5)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Kernel Size", 1, 32, 5)
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize As Int32 = sliders.TrackBar1.Value
+        Dim kernelSize As Int32 = sliders.sliders(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
 
         cv.Cv2.BilateralFilter(src, dst1, kernelSize, kernelSize * 2, kernelSize / 2)
@@ -118,7 +124,7 @@ Public Class Blur_PlusHistogram
         mat2to1.mat(0) = myhist.dst2.Clone()
 
         blur.src = myhist.src
-        blur.sliders.TrackBar1.Value = 15 ' kernel size is big to get a blur...
+        blur.sliders.sliders(0).Value = 15 ' kernel size is big to get a blur...
         blur.Run(ocvb)
 
         myhist.src = blur.dst1

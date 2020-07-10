@@ -7,9 +7,10 @@ Public Class BlockMatching_Basics
         setCaller(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Blockmatch max disparity", 2, 5, 2)
-        sliders.setupTrackBar2("Blockmatch block size", 5, 255, 15)
-        sliders.setupTrackBar3("Blockmatch distance factor (approx) X1000", 1, 100, 20)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Blockmatch max disparity", 2, 5, 2)
+        sliders.setupTrackBar(1, "Blockmatch block size", 5, 255, 15)
+        sliders.setupTrackBar(2, "Blockmatch distance factor (approx) X1000", 1, 100, 20)
         ocvb.desc = "Use OpenCV's block matching on left and right views"
         label1 = "Block matching disparity colorized like depth"
         label2 = "Right Image (used with left image)"
@@ -19,8 +20,8 @@ Public Class BlockMatching_Basics
             ocvb.putText(New TTtext("For the Kinect 4 Azure camera, the left and right views are the same.", 10, 50, RESULT1))
         End If
 
-        Dim numDisparity = sliders.TrackBar1.Value * 16 ' must be a multiple of 16
-        Dim blockSize = sliders.TrackBar2.Value
+        Dim numDisparity = sliders.sliders(0).Value * 16 ' must be a multiple of 16
+        Dim blockSize = sliders.sliders(1).Value
         If blockSize Mod 2 = 0 Then blockSize += 1 ' must be odd
 
         Static blockMatch = cv.StereoBM.Create()
@@ -43,7 +44,7 @@ Public Class BlockMatching_Basics
         Dim topMargin = 10, sideMargin = 8
         Dim rect = New cv.Rect(numDisparity + sideMargin, topMargin, src.Width - numDisparity - sideMargin * 2, src.Height - topMargin * 2)
         Dim tmp = New cv.Mat(src.Size(), cv.MatType.CV_32F, 0)
-        Dim distance = sliders.TrackBar3.Value * 1000
+        Dim distance = sliders.sliders(2).Value * 1000
         cv.Cv2.Divide(distance, colorizer.src(rect), colorizer.src(rect)) ' this needs much more refinement.  The trackbar3 value is just an approximation.
         colorizer.src(rect) = colorizer.src(rect).Threshold(10000, 10000, cv.ThresholdTypes.Trunc)
         colorizer.Run(ocvb)

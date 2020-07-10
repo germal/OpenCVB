@@ -85,8 +85,9 @@ Public Class DNN_Basics
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "dnn Scale Factor", 1, 10000, 78)
-        sliders.setupTrackBar2("dnn MeanVal", 1, 255, 127)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "dnn Scale Factor", 1, 10000, 78)
+        sliders.setupTrackBar(1, "dnn MeanVal", 1, 255, 127)
 
         dnnWidth = ocvb.color.Height ' height is always smaller than width...
         dnnHeight = ocvb.color.Height
@@ -108,8 +109,8 @@ Public Class DNN_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If dnnPrepared Then
-            Dim inScaleFactor = sliders.TrackBar1.Value / sliders.TrackBar1.Maximum ' should be 0.0078 by default...
-            Dim meanVal = CSng(sliders.TrackBar2.Value)
+            Dim inScaleFactor = sliders.sliders(0).Value / sliders.sliders(0).Maximum ' should be 0.0078 by default...
+            Dim meanVal = CSng(sliders.sliders(1).Value)
             Dim inputBlob = CvDnn.BlobFromImage(ocvb.color(crop), inScaleFactor, New cv.Size(300, 300), meanVal, False)
             ocvb.color.CopyTo(dst2)
             ocvb.color(crop).CopyTo(dst1(crop))

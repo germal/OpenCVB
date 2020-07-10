@@ -4,16 +4,17 @@ Public Class Stitch_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Number of random images", 10, 50, 10)
-        sliders.setupTrackBar2("Rectangle width", ocvb.color.Width / 4, ocvb.color.Width - 1, ocvb.color.Width / 2)
-        sliders.setupTrackBar3("Rectangle height", ocvb.color.Height / 4, ocvb.color.Height - 1, ocvb.color.Height / 2)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Number of random images", 10, 50, 10)
+        sliders.setupTrackBar(1, "Rectangle width", ocvb.color.Width / 4, ocvb.color.Width - 1, ocvb.color.Width / 2)
+        sliders.setupTrackBar(2, "Rectangle height", ocvb.color.Height / 4, ocvb.color.Height - 1, ocvb.color.Height / 2)
         ocvb.desc = "Stitch together random parts of a color image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mats As New List(Of cv.Mat)
-        Dim imageCount = sliders.TrackBar1.Value
-        Dim width = sliders.TrackBar2.Value
-        Dim height = sliders.TrackBar3.Value
+        Dim imageCount = sliders.sliders(0).Value
+        Dim width = sliders.sliders(1).Value
+        Dim height = sliders.sliders(2).Value
         dst1 = src.Clone()
         For i = 0 To imageCount - 1
             Dim x1 = CInt(msRNG.next(0, src.Width - width))

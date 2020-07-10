@@ -14,10 +14,10 @@ Public Class Blob_Input
         ellipses = New Draw_Ellipses(ocvb)
         poly = New Draw_Polygon(ocvb)
 
-        rectangles.rect.sliders.TrackBar1.Value = 5
-        circles.sliders.TrackBar1.Value = 5
-        ellipses.sliders.TrackBar1.Value = 5
-        poly.sliders.TrackBar1.Value = 5
+        rectangles.rect.sliders.sliders(0).Value = 5
+        circles.sliders.sliders(0).Value = 5
+        ellipses.sliders.sliders(0).Value = 5
+        poly.sliders.sliders(0).Value = 5
 
         rectangles.rect.updateFrequency = 1
         circles.updateFrequency = 1
@@ -71,9 +71,10 @@ Public Class Blob_Detector_CS
         check.Box(4).Text = "FilterByColor"
         check.Box(4).Checked = True ' filter by color...
 
-        sliders.setupTrackBar1(ocvb, caller, "min Threshold", 0, 255, 100)
-        sliders.setupTrackBar2("max Threshold", 0, 255, 255)
-        sliders.setupTrackBar3("Threshold Step", 1, 50, 5)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "min Threshold", 0, 255, 100)
+        sliders.setupTrackBar(1, "max Threshold", 0, 255, 255)
+        sliders.setupTrackBar(2, "Threshold Step", 1, 50, 5)
 
         label1 = "Blob_Detector_CS Input"
     End Sub
@@ -88,9 +89,9 @@ Public Class Blob_Detector_CS
         blobParams.MaxArea = 100
         blobParams.MinArea = 0.001
 
-        blobParams.MinThreshold = sliders.TrackBar1.Value
-        blobParams.MaxThreshold = sliders.TrackBar2.Value
-        blobParams.ThresholdStep = sliders.TrackBar3.Value
+        blobParams.MinThreshold = sliders.sliders(0).Value
+        blobParams.MaxThreshold = sliders.sliders(1).Value
+        blobParams.ThresholdStep = sliders.sliders(2).Value
 
         blobParams.MinDistBetweenBlobs = 10
         blobParams.MinRepeatability = 1
@@ -163,8 +164,8 @@ Public Class Blob_DepthClusters
         histBlobs = New Histogram_DepthClusters(ocvb)
 
         flood = New FloodFill_RelativeRange(ocvb)
-        flood.fBasics.sliders.TrackBar2.Value = 1 ' pixels are exact.
-        flood.fBasics.sliders.TrackBar3.Value = 1 ' pixels are exact.
+        flood.fBasics.sliders.sliders(1).Value = 1 ' pixels are exact.
+        flood.fBasics.sliders.sliders(2).Value = 1 ' pixels are exact.
 
         label2 = "Backprojection of identified histogram depth clusters."
         ocvb.desc = "Highlight the distinct histogram blobs found with depth clustering."

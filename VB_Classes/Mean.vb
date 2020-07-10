@@ -4,13 +4,14 @@ Public Class Mean_Basics
     Dim images As New List(Of cv.Mat)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "Mean - number of input images", 1, 100, 10)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Mean - number of input images", 1, 100, 10)
         ocvb.desc = "Create an image that is the mean of x number of previous images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static saveImageCount = sliders.TrackBar1.Value
-        If sliders.TrackBar1.Value <> saveImageCount Then
-            saveImageCount = sliders.TrackBar1.Value
+        Static saveImageCount = sliders.sliders(0).Value
+        If sliders.sliders(0).Value <> saveImageCount Then
+            saveImageCount = sliders.sliders(0).Value
             images.Clear()
         End If
         Dim nextImage As New cv.Mat

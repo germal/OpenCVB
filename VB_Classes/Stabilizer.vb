@@ -122,7 +122,7 @@ Public Class Stabilizer_BriskFeatures
         stabilizer = New Stabilizer_Basics(ocvb)
 
         brisk = New BRISK_Basics(ocvb)
-        brisk.sliders.TrackBar1.Value = 10
+        brisk.sliders.sliders(0).Value = 10
 
         ocvb.desc = "Stabilize the video stream using BRISK features (not GoodFeaturesToTrack)"
     End Sub

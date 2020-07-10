@@ -66,15 +66,16 @@ Public Class Undistort_Basics
     Dim stereo_cy As Int32
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "undistort intrinsics Left", 1, 200, 100)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "undistort intrinsics Left", 1, 200, 100)
 
         If ocvb.parms.cameraIndex = T265Camera Then
-            sliders.setupTrackBar2("undistort intrinsics coeff's", -100000, 100000, 100)
+            sliders.setupTrackBar(1, "undistort intrinsics coeff's", -100000, 100000, 100)
         Else
-            sliders.setupTrackBar2("undistort intrinsics coeff's", -1000, 1000, 100)
+            sliders.setupTrackBar(1, "undistort intrinsics coeff's", -1000, 1000, 100)
         End If
-        sliders.setupTrackBar3("undistort stereo height", 1, ocvb.color.Rows, ocvb.color.Rows)
-        sliders.setupTrackBar4("undistort Offset left/right", 1, 200, 112)
+        sliders.setupTrackBar(2, "undistort stereo height", 1, ocvb.color.Rows, ocvb.color.Rows)
+        sliders.setupTrackBar(3, "undistort Offset left/right", 1, 200, 112)
 
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Restore Original matrices"
@@ -91,11 +92,11 @@ Public Class Undistort_Basics
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
 
-            sliders.TrackBar1.Value = 100
-            sliders.TrackBar2.Value = 100
+            sliders.sliders(0).Value = 100
+            sliders.sliders(1).Value = 100
 
-            maxDisp = sliders.TrackBar4.Value
-            Dim stereo_height_px = sliders.TrackBar3.Value
+            maxDisp = sliders.sliders(3).Value
+            Dim stereo_height_px = sliders.sliders(2).Value
             undistortSetup(ocvb, kMatLeft, dMatLeft, rMatLeft, pMatLeft, maxDisp, stereo_height_px, ocvb.parms.intrinsicsLeft)
 
             ' the intrinsic coeff's on the Intel RS2 series are always zero.  Here we just make up some numbers so we can show the impact.
@@ -104,18 +105,18 @@ Public Class Undistort_Basics
                 dMatLeft = New cv.Mat(1, 4, cv.MatType.CV_64F, d)
             End If
         End If
-        If saveK <> sliders.TrackBar1.Value Then
-            saveK = sliders.TrackBar1.Value
-            kMat = kMatLeft * sliders.TrackBar1.Value / 100
+        If saveK <> sliders.sliders(0).Value Then
+            saveK = sliders.sliders(0).Value
+            kMat = kMatLeft * sliders.sliders(0).Value / 100
         End If
-        If saveD <> sliders.TrackBar2.Value Then
-            saveD = sliders.TrackBar2.Value
-            dMat = dMatLeft * sliders.TrackBar2.Value / 100
+        If saveD <> sliders.sliders(1).Value Then
+            saveD = sliders.sliders(1).Value
+            dMat = dMatLeft * sliders.sliders(1).Value / 100
         End If
-        If saveP <> sliders.TrackBar4.Value Or saveR <> sliders.TrackBar3.Value Then
-            saveP = sliders.TrackBar4.Value
+        If saveP <> sliders.sliders(3).Value Or saveR <> sliders.sliders(2).Value Then
+            saveP = sliders.sliders(3).Value
             maxDisp = saveP
-            saveR = sliders.TrackBar3.Value
+            saveR = sliders.sliders(2).Value
             Dim stereo_height_px = saveR ' heightXheight pixel stereo output
             Dim stereo_fov_rad = CDbl(90 * (Math.PI / 180))  ' 90 degree desired fov
             Dim stereo_focal_px = CDbl(stereo_height_px / 2 / Math.Tan(stereo_fov_rad / 2))

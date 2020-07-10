@@ -8,7 +8,8 @@ Public Class IMU_Basics
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
 
         flow = New Font_FlowText(ocvb)
         flow.result1or2 = RESULT1
@@ -17,7 +18,7 @@ Public Class IMU_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.IMU_Present Then
-            Dim alpha As Double = sliders.TrackBar1.Value / 1000
+            Dim alpha As Double = sliders.sliders(0).Value / 1000
             If ocvb.frameCount = 0 Then
                 lastTimeStamp = ocvb.parms.IMU_TimeStamp
             Else
@@ -194,8 +195,9 @@ Public Class IMU_FrameTime
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.setupTrackBar1(ocvb, caller, "Minimum IMU to Capture time (ms)", 1, 10, 2)
-        sliders.setupTrackBar2("Number of Plot Values", 5, 30, 25)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Minimum IMU to Capture time (ms)", 1, 10, 2)
+        sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 25)
 
         label2 = "IMU FT (blue) Host FT (green) Latency est. (red)"
         ocvb.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
@@ -227,7 +229,7 @@ Public Class IMU_FrameTime
 
         Dim imuFrameTime = CInt(ocvb.parms.IMU_FrameTime)
         If IMUanchor <> 0 Then imuFrameTime = imuFrameTime Mod IMUanchor
-        Dim minDelay = sliders.TrackBar1.Value
+        Dim minDelay = sliders.sliders(0).Value
         IMUtoCaptureEstimate = IMUanchor - imuFrameTime + minDelay
         If IMUtoCaptureEstimate > IMUanchor Then IMUtoCaptureEstimate -= IMUanchor
         If IMUtoCaptureEstimate < minDelay Then IMUtoCaptureEstimate = minDelay
@@ -254,7 +256,7 @@ Public Class IMU_FrameTime
 
             If plot.maxScale - plot.minScale > histogramIMU.Count Then ReDim histogramIMU(plot.maxScale - plot.minScale)
 
-            Dim plotLastX = sliders.TrackBar2.Value
+            Dim plotLastX = sliders.sliders(1).Value
             If plot.lastXdelta.Count > plotLastX Then
                 Dim allText As String = ""
                 For i = 0 To plot.plotCount - 1
@@ -288,8 +290,9 @@ Public Class IMU_HostFrameTimes
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.setupTrackBar1(ocvb, caller, "Minimum Host interrupt delay (ms)", 1, 10, 4)
-        sliders.setupTrackBar2("Number of Plot Values", 5, 30, 25)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Minimum Host interrupt delay (ms)", 1, 10, 4)
+        sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 25)
 
         label2 = "IMU FT (blue) Host FT (green) Latency est. (red)"
         ocvb.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
@@ -310,7 +313,7 @@ Public Class IMU_HostFrameTimes
 
         Dim cpuFrameTime = CInt(ocvb.parms.CPU_FrameTime)
         If CPUanchor <> 0 Then cpuFrameTime = cpuFrameTime Mod CPUanchor
-        Dim minDelay = sliders.TrackBar1.Value
+        Dim minDelay = sliders.sliders(0).Value
         HostInterruptDelayEstimate = CPUanchor - cpuFrameTime + minDelay
         If HostInterruptDelayEstimate > CPUanchor Then HostInterruptDelayEstimate -= CPUanchor
         If HostInterruptDelayEstimate < 0 Then HostInterruptDelayEstimate = minDelay
@@ -337,7 +340,7 @@ Public Class IMU_HostFrameTimes
 
             If plot.maxScale - plot.minScale > hist.Count Then ReDim hist(plot.maxScale - plot.minScale)
 
-            Dim plotLastX = sliders.TrackBar2.Value
+            Dim plotLastX = sliders.sliders(1).Value
             If plot.lastXdelta.Count > plotLastX Then
                 Dim allText As String = ""
                 For i = 0 To plot.plotCount - 1

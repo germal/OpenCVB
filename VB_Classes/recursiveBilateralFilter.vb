@@ -21,7 +21,8 @@ Public Class RecursiveBilateralFilter_CPP
     Dim rbf As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "RBF Recursion count", 1, 20, 2)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "RBF Recursion count", 1, 20, 2)
         rbf = RecursiveBilateralFilter_Open()
         ocvb.desc = "Apply the recursive bilateral filter"
     End Sub
@@ -29,7 +30,7 @@ Public Class RecursiveBilateralFilter_CPP
         If srcData.Length <> src.Total * src.ElemSize Then ReDim srcData(src.Total * src.ElemSize - 1)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
-        Dim imagePtr = RecursiveBilateralFilter_Run(rbf, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, sliders.TrackBar1.Value)
+        Dim imagePtr = RecursiveBilateralFilter_Run(rbf, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, sliders.sliders(0).Value)
         handleSrc.Free() ' free the pinned memory...
 
         dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)

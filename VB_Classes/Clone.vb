@@ -45,9 +45,10 @@ Public Class Clone_ColorChange
         setCaller(ocvb)
         clone = New Clone_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Color Change - Red", 5, 25, 15)
-        sliders.setupTrackBar2("Color Change - Green", 5, 25, 5)
-        sliders.setupTrackBar3("Color Change - Blue", 5, 25, 5)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Color Change - Red", 5, 25, 15)
+        sliders.setupTrackBar(1, "Color Change - Green", 5, 25, 5)
+        sliders.setupTrackBar(2, "Color Change - Blue", 5, 25, 5)
 
         label1 = "Draw anywhere to select different clone region"
         label2 = "Mask used for clone"
@@ -55,7 +56,7 @@ Public Class Clone_ColorChange
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 0
-        clone.colorChangeValues = New cv.Point3f(sliders.TrackBar1.Value / 10, sliders.TrackBar2.Value / 10, sliders.TrackBar1.Value / 10)
+        clone.colorChangeValues = New cv.Point3f(sliders.sliders(0).Value / 10, sliders.sliders(1).Value / 10, sliders.sliders(0).Value / 10)
         clone.Run(ocvb)
         dst1 = clone.dst1
         dst2 = clone.dst2
@@ -72,8 +73,9 @@ Public Class Clone_IlluminationChange
         setCaller(ocvb)
         clone = New Clone_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Alpha", 0, 20, 2)
-        sliders.setupTrackBar2("Beta", 0, 20, 2)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Alpha", 0, 20, 2)
+        sliders.setupTrackBar(1, "Beta", 0, 20, 2)
 
         label1 = "Draw anywhere to select different clone region"
         label2 = "Mask used for clone"
@@ -81,7 +83,7 @@ Public Class Clone_IlluminationChange
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 1
-        clone.illuminationChangeValues = New cv.Vec2f(sliders.TrackBar1.Value / 10, sliders.TrackBar2.Value / 10)
+        clone.illuminationChangeValues = New cv.Vec2f(sliders.sliders(0).Value / 10, sliders.sliders(1).Value / 10)
         clone.Run(ocvb)
         dst1 = clone.dst1
         dst2 = clone.dst2
@@ -99,8 +101,9 @@ Public Class Clone_TextureFlattening
         setCaller(ocvb)
         clone = New Clone_Basics(ocvb)
 
-        sliders.setupTrackBar1(ocvb, caller, "Low Threshold", 0, 100, 10)
-        sliders.setupTrackBar2("High Threshold", 0, 100, 50)
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Low Threshold", 0, 100, 10)
+        sliders.setupTrackBar(1, "High Threshold", 0, 100, 50)
 
         label1 = "Draw anywhere to select different clone region"
         label2 = "mask used for clone"
@@ -108,7 +111,7 @@ Public Class Clone_TextureFlattening
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 2
-        clone.textureFlatteningValues = New cv.Vec2f(sliders.TrackBar1.Value, sliders.TrackBar2.Value)
+        clone.textureFlatteningValues = New cv.Vec2f(sliders.sliders(0).Value, sliders.sliders(1).Value)
         clone.Run(ocvb)
         dst1 = clone.dst1
         dst2 = clone.dst2

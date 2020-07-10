@@ -24,7 +24,8 @@ Public Class Salience_Basics_CPP
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders = New OptionsSliders
-        sliders.setupTrackBar1(ocvb, caller, "Salience numScales", 1, 6, 6)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Salience numScales", 1, 6, 6)
 
         salience = Salience_Open()
         ocvb.desc = "Show results of Salience algorithm when using C++"
@@ -34,7 +35,7 @@ Public Class Salience_Basics_CPP
         If src.Total <> grayData.Length Then ReDim grayData(src.Total - 1)
         Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, grayData, 0, grayData.Length)
-        Dim imagePtr = Salience_Run(salience, sliders.TrackBar1.Value, grayHandle.AddrOfPinnedObject, src.Height, src.Width)
+        Dim imagePtr = Salience_Run(salience, sliders.sliders(0).Value, grayHandle.AddrOfPinnedObject, src.Height, src.Width)
         grayHandle.Free()
 
         dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.cols, cv.MatType.CV_8U, imagePtr)
@@ -52,14 +53,14 @@ Public Class Salience_Basics_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         salience = New Salience_Basics_CPP(ocvb)
-        salience.sliders.TrackBar2.Value = 2
+        salience.sliders.sliders(1).Value = 2
 
         ocvb.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim numScales = salience.sliders.TrackBar1.Value
-        Dim threads = salience.sliders.TrackBar2.Value
+        Dim numScales = salience.sliders.sliders(0).Value
+        Dim threads = salience.sliders.sliders(1).Value
         Dim h = CInt(src.Height / threads)
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U)
         Parallel.For(0, threads,

@@ -26,9 +26,10 @@ Public Class Thread_Grid
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         src = ocvb.color
-        sliders.setupTrackBar1(ocvb, caller, "ThreadGrid Width", 5, src.Width, 32)
-        sliders.setupTrackBar2("ThreadGrid Height", 5, src.Height, 32)
-        sliders.setupTrackBar3("ThreadGrid Border", 0, 20, 0)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "ThreadGrid Width", 5, src.Width, 32)
+        sliders.setupTrackBar(1, "ThreadGrid Height", 5, src.Height, 32)
+        sliders.setupTrackBar(2, "ThreadGrid Border", 0, 20, 0)
         roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)
         gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
@@ -39,23 +40,23 @@ Public Class Thread_Grid
         Static lastHeight As Int32
         Static lastBorder As Int32
 
-        Dim borderSize = sliders.TrackBar3.Value
-        If lastWidth <> sliders.TrackBar1.Value Or lastHeight <> sliders.TrackBar2.Value Or lastBorder <> borderSize Then
+        Dim borderSize = sliders.sliders(2).Value
+        If lastWidth <> sliders.sliders(0).Value Or lastHeight <> sliders.sliders(1).Value Or lastBorder <> borderSize Then
             roiList.Clear()
             borderList.Clear()
 
             gridMask.SetTo(0)
             incompleteRegions = 0
-            For y = 0 To src.Height - 1 Step sliders.TrackBar2.Value
-                For x = 0 To src.Width - 1 Step sliders.TrackBar1.Value
-                    Dim roi = New cv.Rect(x, y, sliders.TrackBar1.Value, sliders.TrackBar2.Value)
+            For y = 0 To src.Height - 1 Step sliders.sliders(1).Value
+                For x = 0 To src.Width - 1 Step sliders.sliders(0).Value
+                    Dim roi = New cv.Rect(x, y, sliders.sliders(0).Value, sliders.sliders(1).Value)
                     If x + roi.Width >= src.Width Then roi.Width = src.Width - x
                     If y + roi.Height >= src.Height Then roi.Height = src.Height - y
                     If roi.Width > 0 And roi.Height > 0 Then
                         If y = 0 Then tilesPerRow += 1
                         If x = 0 Then tilesPerCol += 1
                         roiList.Add(roi)
-                        If roi.Width <> sliders.TrackBar1.Value Or roi.Height <> sliders.TrackBar2.Value Then incompleteRegions += 1
+                        If roi.Width <> sliders.sliders(0).Value Or roi.Height <> sliders.sliders(1).Value Then incompleteRegions += 1
                     End If
                 Next
                 drawGrid(roiList)
@@ -82,8 +83,8 @@ Public Class Thread_Grid
 
             If standalone Then drawGrid(borderList)
 
-            lastWidth = sliders.TrackBar1.Value
-            lastHeight = sliders.TrackBar2.Value
+            lastWidth = sliders.sliders(0).Value
+            lastHeight = sliders.sliders(1).Value
             lastBorder = borderSize
         End If
 
@@ -107,8 +108,8 @@ Public Class Thread_GridTest
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = 64
-        grid.sliders.TrackBar2.Value = 40
+        grid.sliders.sliders(0).Value = 64
+        grid.sliders.sliders(1).Value = 40
         label1 = ""
         ocvb.desc = "Validation test for thread_grid algorithm"
     End Sub

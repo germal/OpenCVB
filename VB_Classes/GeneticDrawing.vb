@@ -24,7 +24,7 @@ Public Class GeneticDrawing_Basics
     Dim stage As Integer
     Dim generation As Integer
     Dim generationTotal As Integer
-    Dim stageTotal = sliders.TrackBar2.Value
+    Dim stageTotal As Integer
     Dim cachedImage As New cv.Mat
     Dim mats As Mat_4to1
     Dim random As Random_CustomHistogram
@@ -46,15 +46,11 @@ Public Class GeneticDrawing_Basics
         random.random.outputRandom = New cv.Mat(1, 1, cv.MatType.CV_32S, 0)
         random.hist.plotHist.backColor = cv.Scalar.White
 
-        sliders.setupTrackBar1(ocvb, caller, "Number of Generations", 1, 100, 20)
-        sliders.setupTrackBar2("Number of Stages", 1, 200, 100)
-        sliders.setupTrackBar3("Brushstroke count ", 1, 100, 10)
-
-        slider.Setup(ocvb, caller, 4)
-        slider.setupTrackBar1("Number of Generations", 1, 100, 20)
-        slider.setupTrackBar2("Number of Stages", 1, 200, 100)
-        slider.setupTrackBar3("Brushstroke count ", 1, 100, 10)
-
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Number of Generations", 1, 100, 20)
+        sliders.setupTrackBar(1, "Number of Stages", 1, 200, 100)
+        sliders.setupTrackBar(2, "Brushstroke count ", 1, 100, 10)
+        stageTotal = sliders.sliders(1).Value
 
         label1 = "(clkwise) img, smaplingMask, histogram, magnitude"
         label2 = "Current result"
@@ -102,7 +98,7 @@ Public Class GeneticDrawing_Basics
         maxSize = calcBrushSize(maxBrush)
         padding = CInt(brushSide * maxSize / 2 + 5)
 
-        Dim brushstrokeCount = sliders.TrackBar3.Value
+        Dim brushstrokeCount = sliders.sliders(2).Value
         For i = 0 To brushstrokeCount - 1
             Dim e = New DNAentry
             e.color = msRNG.Next(0, 255)
@@ -119,13 +115,13 @@ Public Class GeneticDrawing_Basics
         totalError = calculateError(dst2)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        stageTotal = sliders.TrackBar2.Value
+        stageTotal = sliders.sliders(1).Value
         If stage >= stageTotal Then Exit Sub ' request is complete...
-        If generationTotal <> sliders.TrackBar1.Value Or stageTotal <> sliders.TrackBar2.Value Or check.Box(0).Checked Then
+        If generationTotal <> sliders.sliders(0).Value Or stageTotal <> sliders.sliders(1).Value Or check.Box(0).Checked Then
             dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
             check.Box(0).Checked = False
-            generationTotal = sliders.TrackBar1.Value
-            stageTotal = sliders.TrackBar2.Value
+            generationTotal = sliders.sliders(0).Value
+            stageTotal = sliders.sliders(1).Value
             generation = 0
             stage = 0
             samplingMask = Nothing

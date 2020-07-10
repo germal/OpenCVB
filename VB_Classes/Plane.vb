@@ -100,8 +100,8 @@ Public Class Plane_Detect
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = 64
-        grid.sliders.TrackBar2.Value = 64
+        grid.sliders.sliders(0).Value = 64
+        grid.sliders.sliders(1).Value = 64
 
         ocvb.desc = "Identify planes in each segment."
         label2 = "Blue, green, and red show different planes"
@@ -173,8 +173,8 @@ Public Class Plane_DetectDebug
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.TrackBar1.Value = 32
-        grid.sliders.TrackBar2.Value = 32
+        grid.sliders.sliders(0).Value = 32
+        grid.sliders.sliders(1).Value = 32
 
         ocvb.desc = "Debug code to identify planes in just one segment."
         label2 = "Blue, green, and red show different planes"

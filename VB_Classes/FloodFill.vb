@@ -17,19 +17,20 @@ Public Class FloodFill_Basics
     End Class
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 5000, 2500)
-        sliders.setupTrackBar2("FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar3("FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar4("Step Size", 1, ocvb.color.cols / 2, 20)
+        sliders.Setup(ocvb, caller, 4)
+        sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
+        sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 5)
+        sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
+        sliders.setupTrackBar(3, "Step Size", 1, ocvb.color.cols / 2, 20)
 
         label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        minFloodSize = sliders.TrackBar1.Value
-        Dim loDiff = cv.Scalar.All(sliders.TrackBar2.Value)
-        Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
-        Dim stepSize = sliders.TrackBar4.Value
+        minFloodSize = sliders.sliders(0).Value
+        Dim loDiff = cv.Scalar.All(sliders.sliders(1).Value)
+        Dim hiDiff = cv.Scalar.All(sliders.sliders(2).Value)
+        Dim stepSize = sliders.sliders(3).Value
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src
@@ -82,16 +83,17 @@ Public Class FloodFill_Top16_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 5000, 2000)
-        sliders.setupTrackBar2("FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar3("FloodFill HiDiff", 1, 255, 5)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2000)
+        sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 5)
+        sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
 
         ocvb.desc = "Use floodfill to build image segments with a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim minFloodSize = sliders.TrackBar1.Value
-        Dim loDiff = cv.Scalar.All(sliders.TrackBar2.Value)
-        Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
+        Dim minFloodSize = sliders.sliders(0).Value
+        Dim loDiff = cv.Scalar.All(sliders.sliders(1).Value)
+        Dim hiDiff = cv.Scalar.All(sliders.sliders(2).Value)
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Clone()
@@ -128,9 +130,9 @@ Public Class FloodFill_Color_MT
         ocvb.desc = "Use floodfill to build image segments in an RGB image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim minFloodSize = flood.sliders.TrackBar1.Value
-        Dim loDiff = cv.Scalar.All(flood.sliders.TrackBar2.Value)
-        Dim hiDiff = cv.Scalar.All(flood.sliders.TrackBar3.Value)
+        Dim minFloodSize = flood.sliders.sliders(0).Value
+        Dim loDiff = cv.Scalar.All(flood.sliders.sliders(1).Value)
+        Dim hiDiff = cv.Scalar.All(flood.sliders.sliders(2).Value)
 
         dst1 = src.Clone()
         grid.Run(ocvb)
@@ -240,7 +242,7 @@ Public Class FloodFill_CComp
         dst1 = range.dst1
         dst2 = range.dst2
         label2 = CStr(ccomp.connectedComponents.blobs.length) + " blobs found. " + CStr(range.fBasics.maskRects.Count) + " were more than " +
-                      CStr(range.fBasics.sliders.TrackBar1.Value) + " pixels"
+                      CStr(range.fBasics.sliders.sliders(0).Value) + " pixels"
     End Sub
 End Class
 
@@ -338,19 +340,20 @@ Public Class FloodFill_Projection
     Public minFloodSize As Integer
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "FloodFill Minimum Size", 1, 5000, 2500)
-        sliders.setupTrackBar2("FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar3("FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar4("Step Size", 1, ocvb.color.Cols / 2, 20)
+        sliders.Setup(ocvb, caller, 4)
+        sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
+        sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 5)
+        sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
+        sliders.setupTrackBar(3, "Step Size", 1, ocvb.color.Cols / 2, 20)
 
         label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        minFloodSize = sliders.TrackBar1.Value
-        Dim loDiff = cv.Scalar.All(sliders.TrackBar2.Value)
-        Dim hiDiff = cv.Scalar.All(sliders.TrackBar3.Value)
-        Dim stepSize = sliders.TrackBar4.Value
+        minFloodSize = sliders.sliders(0).Value
+        Dim loDiff = cv.Scalar.All(sliders.sliders(1).Value)
+        Dim hiDiff = cv.Scalar.All(sliders.sliders(2).Value)
+        Dim stepSize = sliders.sliders(3).Value
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Clone()

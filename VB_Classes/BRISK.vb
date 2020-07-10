@@ -5,7 +5,8 @@ Public Class BRISK_Basics
     Public features As New List(Of cv.Point2f)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.setupTrackBar1(ocvb, caller, "BRISK Radius Threshold", 1, 100, 50)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "BRISK Radius Threshold", 1, 100, 50)
         ocvb.desc = "Detect features with BRISK"
         Brisk = cv.BRISK.Create()
     End Sub
@@ -16,7 +17,7 @@ Public Class BRISK_Basics
         features.Clear()
         For Each pt In keyPoints
             Dim r = pt.Size
-            If r > sliders.TrackBar1.Value Then
+            If r > sliders.sliders(0).Value Then
                 features.Add(New cv.Point2f(pt.Pt.X, pt.Pt.Y))
                 dst1.Circle(pt.Pt, 2, cv.Scalar.Green, r / 2, cv.LineTypes.AntiAlias)
             End If
