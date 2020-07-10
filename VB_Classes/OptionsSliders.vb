@@ -67,8 +67,4 @@ Public Class OptionsSliders
         If slidersOffset.X > offsetMax Then slidersOffset.X = 0
         If slidersOffset.Y > offsetMax Then slidersOffset.Y = 0
     End Sub
-
-    Private Sub OptionsSliders_Resize(sender As Object, e As EventArgs) Handles Me.Resize
-        Console.WriteLine("testing")
-    End Sub
 End Class
