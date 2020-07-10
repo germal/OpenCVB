@@ -180,9 +180,10 @@ Public Class OilPaint_Manual_CS
     Dim oilPaint As New CS_Classes.OilPaintManual
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller, 3)
         sliders.setupTrackBar(0, "Kernel Size", 2, 10, 4)
         sliders.setupTrackBar(1, "Intensity", 1, 250, 20)
+        sliders.setupTrackBar(2, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
         ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
         label2 = "Selected area only"
 
@@ -216,7 +217,6 @@ Public Class OilPaint_Cartoon
         oil = New OilPaint_Manual_CS(ocvb)
         ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
 
-        oil.sliders.setupTrackBar(2, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
         ocvb.desc = "Alter an image so it appears more like a cartoon - Painterly Effect"
         label1 = "OilPaint_Cartoon"
         label2 = "Laplacian Edges"
