@@ -276,39 +276,45 @@ End Class
 
 Public Class Random_CustomDistribution
     Inherits ocvbClass
-    Dim cdf As cv.Mat
-    Dim histogram As cv.Mat
+    Public inputCDF As cv.Mat ' place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
+    Public outputRandom = New cv.Mat(10000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
+    Public outputHistogram As cv.Mat
     Public plotHist As Plot_Histogram
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        Dim loadedDice() As Single = {1, 3, 0.5, 0.5, 0.5, 0.5}
-        cdf = New cv.Mat(loadedDice.Length, 1, cv.MatType.CV_32F, loadedDice)
-        cdf *= 1 / 6
+        Dim loadedDice() As Single = {1, 3, 0.5, 0.5, 0.75, 0.25}
+        inputCDF = New cv.Mat(loadedDice.Length, 1, cv.MatType.CV_32F, loadedDice)
 
         plotHist = New Plot_Histogram(ocvb)
 
         ocvb.desc = "Create a custom random number distribution from any histogram"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If cdf.Get(Of Single)(cdf.Rows - 1, 0) < 0.9 Then ' convert the input histogram to a cdf.
-            For i = 1 To cdf.Rows - 1
-                cdf.Set(Of Single)(i, 0, cdf.Get(Of Single)(i - 1, 0) + cdf.Get(Of Single)(i, 0))
+        Dim lastValue = inputCDF.Get(Of Single)(inputCDF.Rows - 1, 0)
+        If Not (lastValue > 0.99 And lastValue <= 1.0) Then ' convert the input histogram to a cdf.
+            inputCDF *= 1 / (inputCDF.Sum().Item(0))
+            For i = 1 To inputCDF.Rows - 1
+                inputCDF.Set(Of Single)(i, 0, inputCDF.Get(Of Single)(i - 1, 0) + inputCDF.Get(Of Single)(i, 0))
             Next
         End If
-        histogram = New cv.Mat(cdf.Size(), cv.MatType.CV_32F, 0)
-        Dim size = histogram.Rows
-        For i = 0 To 1000
+        outputHistogram = New cv.Mat(inputCDF.Size(), cv.MatType.CV_32F, 0)
+        Dim size = outputHistogram.Rows
+        For i = 0 To outputRandom.rows - 1
             Dim uniformR1 = msRNG.NextDouble()
-            For j = 1 To size - 1S
-                If uniformR1 > cdf.Get(Of Single)(j, 0) Then
-                    histogram.Set(Of Single)(j - 1, 0, histogram.Get(Of Single)(j - 1, 0) + 1)
+            For j = 0 To size - 1
+                If uniformR1 < inputCDF.Get(Of Single)(j, 0) Then
+                    outputHistogram.Set(Of Single)(j, 0, outputHistogram.Get(Of Single)(j, 0) + 1)
+                    outputRandom.set(Of Integer)(i, 0, j) ' the output is an integer reflecting a bin in the histogram.
+                    Exit For
                 End If
             Next
         Next
 
-        plotHist.hist = histogram
-        plotHist.Run(ocvb)
-        dst1 = plotHist.dst1
+        If standalone Then
+            plotHist.hist = outputHistogram
+            plotHist.Run(ocvb)
+            dst1 = plotHist.dst1
+        End If
     End Sub
 End Class
 
@@ -321,28 +327,83 @@ End Class
 Public Class Random_MonteCarlo
     Inherits ocvbClass
     Public plotHist As Plot_Histogram
+    Public outputRandom = New cv.Mat(4000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         plotHist = New Plot_Histogram(ocvb)
-        ocvb.desc = "Generate random numbers but prefer higher values"
+        plotHist.fixedMaxVal = 100
+
+        sliders.setupTrackBar1(ocvb, caller, "Number of bins", 1, 255, 91)
+        ocvb.desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim dimension = 100
+        Dim dimension = sliders.TrackBar1.Value
         Dim histogram = New cv.Mat(dimension, 1, cv.MatType.CV_32F, 0)
-        For i = 0 To 20000
+        For i = 0 To outputRandom.rows - 1
             While (1)
                 Dim r1 = msRNG.NextDouble()
                 Dim r2 = msRNG.NextDouble()
                 If r2 < r1 Then
                     Dim index = CInt(dimension * r1)
                     histogram.Set(Of Single)(index, 0, histogram.Get(Of Single)(index, 0) + 1)
+                    outputRandom.set(Of Integer)(i, 0, index)
                     Exit While
                 End If
             End While
         Next
 
-        plotHist.hist = histogram
-        plotHist.Run(ocvb)
-        dst1 = plotHist.dst1
+        If standalone Then
+            plotHist.hist = histogram
+            plotHist.Run(ocvb)
+            dst1 = plotHist.dst1
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class random_CustomHistogram
+    Inherits ocvbClass
+    Public plotHist As Plot_Histogram
+    Public random As Random_CustomDistribution
+    Public hist As Histogram_KalmanSmoothed
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        plotHist = New Plot_Histogram(ocvb)
+        plotHist.fixedMaxVal = 100
+
+        random = New Random_CustomDistribution(ocvb)
+        random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, 0)
+
+        hist = New Histogram_KalmanSmoothed(ocvb)
+        hist.sliders.TrackBar1.Value = 255
+
+        label1 = "Histogram of the grayscale image"
+        label2 = "histogram of the resulting random numbers"
+
+        ocvb.desc = "Create a random number distribution that reflects histogram of a grayscale image"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static saveBins As Integer
+        If hist.sliders.TrackBar1.Value <> saveBins Then
+            saveBins = hist.sliders.TrackBar1.Value
+            hist.src = src
+            hist.Run(ocvb)
+            dst1 = hist.dst1
+        End If
+
+        random.inputCDF = hist.histogram ' it will convert the histogram into a cdf - the last value must be near one.
+        random.Run(ocvb)
+
+        If standalone Then
+            plotHist.hist = random.outputHistogram
+            plotHist.Run(ocvb)
+            dst2 = plotHist.dst1
+        End If
     End Sub
 End Class

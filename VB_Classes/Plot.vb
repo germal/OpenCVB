@@ -201,6 +201,7 @@ Public Class Plot_Histogram
     Public minRange As Int32 = 0
     Public maxRange As Int32 = 255
     Public backColor As cv.Scalar = cv.Scalar.Red
+    Public fixedMaxVal As Integer
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders.setupTrackBar1(ocvb, caller, "Histogram Font Size x10", 1, 20, 10)
@@ -218,7 +219,7 @@ Public Class Plot_Histogram
         Dim minVal As Single, maxVal As Single
         hist.MinMaxLoc(minVal, maxVal)
 
-        maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000
+        If fixedMaxVal = 0 Then maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000 Else maxVal = fixedMaxVal
 
         Static savedMaxVal = maxVal
         If maxVal < 0 Then maxVal = savedMaxVal
