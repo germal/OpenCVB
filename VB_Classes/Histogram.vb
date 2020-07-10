@@ -244,6 +244,9 @@ End Class
 
 
 
+
+
+
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
 Public Class Histogram_BackProjection
     Inherits ocvbClass
@@ -280,48 +283,6 @@ End Class
 
 
 
-
-Public Class Histogram_ColorsAndGray
-    Inherits ocvbClass
-    Dim histogram As Histogram_KalmanSmoothed
-    Dim mats As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        mats = New Mat_4to1(ocvb)
-
-        sliders.setupTrackBar1(ocvb, caller, "Min Gray", 0, 255, 0)
-        sliders.setupTrackBar2("Max Gray", 0, 255, 255)
-
-        histogram = New Histogram_KalmanSmoothed(ocvb)
-        histogram.kalman.check.Box(0).Checked = False
-        histogram.kalman.check.Box(0).Enabled = False
-        histogram.sliders.TrackBar1.Value = 40
-
-        check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Normalize Before Histogram"
-        check.Box(0).Checked = True
-        ocvb.desc = "Create a histogram of a normalized image"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Dim split = src.Split()
-        ReDim Preserve split(4 - 1)
-        split(4 - 1) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        histogram.src = New cv.Mat
-        For i = 0 To split.Length - 1
-            If check.Box(0).Checked Then
-                cv.Cv2.Normalize(split(i), histogram.src, sliders.TrackBar1.Value, sliders.TrackBar2.Value, cv.NormTypes.MinMax) ' only minMax is working...
-            Else
-                histogram.src = split(i).Clone()
-            End If
-            histogram.plotHist.backColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.PowderBlue)
-            histogram.Run(ocvb)
-            mats.mat(i) = histogram.dst1.Clone()
-        Next
-
-        mats.Run(ocvb)
-        dst1 = mats.dst1
-    End Sub
-End Class
 
 
 
@@ -888,11 +849,64 @@ Public Class Histogram_Simple
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         plotHist.bins = sliders.TrackBar1.Value
 
-        Dim histSize() = {plotHist.bins}
+        Dim histSize() = {sliders.TrackBar1.Value}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
         plotHist.Run(ocvb)
         dst1 = plotHist.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+
+Public Class Histogram_ColorsAndGray
+    Inherits ocvbClass
+    Dim histogram As Histogram_KalmanSmoothed
+    Dim mats As Mat_4to1
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        mats = New Mat_4to1(ocvb)
+
+        sliders.setupTrackBar1(ocvb, caller, "Min Gray", 0, 255, 0)
+        sliders.setupTrackBar2("Max Gray", 0, 255, 255)
+
+        histogram = New Histogram_KalmanSmoothed(ocvb)
+        histogram.kalman.check.Box(0).Checked = False
+        histogram.kalman.check.Box(0).Enabled = False
+        histogram.sliders.TrackBar1.Value = 40
+
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Normalize Before Histogram"
+        check.Box(0).Checked = True
+        ocvb.desc = "Create a histogram of a normalized image"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim split = src.Split()
+        ReDim Preserve split(4 - 1)
+        split(4 - 1) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) ' add a 4th image - the grayscale image to the R G and B images.
+        histogram.src = New cv.Mat
+        For i = 0 To split.Length - 1
+            If check.Box(0).Checked Then
+                cv.Cv2.Normalize(split(i), histogram.src, sliders.TrackBar1.Value, sliders.TrackBar2.Value, cv.NormTypes.MinMax) ' only minMax is working...
+            Else
+                histogram.src = split(i).Clone()
+            End If
+            histogram.plotHist.backColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.PowderBlue)
+            histogram.Run(ocvb)
+            mats.mat(i) = histogram.dst1.Clone()
+        Next
+
+        mats.Run(ocvb)
+        dst1 = mats.dst1
     End Sub
 End Class

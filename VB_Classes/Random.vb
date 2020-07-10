@@ -285,7 +285,7 @@ Public Class Random_CustomDistribution
         Dim loadedDice() As Single = {1, 3, 0.5, 0.5, 0.75, 0.25}
         inputCDF = New cv.Mat(loadedDice.Length, 1, cv.MatType.CV_32F, loadedDice)
 
-        plotHist = New Plot_Histogram(ocvb)
+        If standalone Then plotHist = New Plot_Histogram(ocvb)
 
         ocvb.desc = "Create a custom random number distribution from any histogram"
     End Sub
@@ -365,24 +365,22 @@ End Class
 
 
 
-Public Class random_CustomHistogram
+Public Class Random_CustomHistogram
     Inherits ocvbClass
-    Public plotHist As Plot_Histogram
     Public random As Random_CustomDistribution
-    Public hist As Histogram_KalmanSmoothed
+    Public hist As Histogram_Simple
+    Public saveHist As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        plotHist = New Plot_Histogram(ocvb)
-        plotHist.fixedMaxVal = 100
 
         random = New Random_CustomDistribution(ocvb)
         random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, 0)
 
-        hist = New Histogram_KalmanSmoothed(ocvb)
+        hist = New Histogram_Simple(ocvb)
         hist.sliders.TrackBar1.Value = 255
 
         label1 = "Histogram of the grayscale image"
-        label2 = "histogram of the resulting random numbers"
+        label2 = "Histogram of the resulting random numbers"
 
         ocvb.desc = "Create a random number distribution that reflects histogram of a grayscale image"
     End Sub
@@ -393,17 +391,20 @@ Public Class random_CustomHistogram
         If hist.sliders.TrackBar1.Value <> saveBins Then
             saveBins = hist.sliders.TrackBar1.Value
             hist.src = src
+            hist.plotHist.fixedMaxVal = 0 ' we are sharing the plothist with the code below...
             hist.Run(ocvb)
-            dst1 = hist.dst1
+            dst1 = hist.dst1.Clone()
+            saveHist = hist.plotHist.hist.Clone()
         End If
 
-        random.inputCDF = hist.histogram ' it will convert the histogram into a cdf - the last value must be near one.
+        random.inputCDF = saveHist ' it will convert the histogram into a cdf where the last value must be near one.
         random.Run(ocvb)
 
         If standalone Then
-            plotHist.hist = random.outputHistogram
-            plotHist.Run(ocvb)
-            dst2 = plotHist.dst1
+            hist.plotHist.fixedMaxVal = 100
+            hist.plotHist.hist = random.outputHistogram
+            hist.plotHist.Run(ocvb)
+            dst2 = hist.plotHist.dst1
         End If
     End Sub
 End Class

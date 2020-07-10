@@ -219,11 +219,15 @@ Public Class Plot_Histogram
         Dim minVal As Single, maxVal As Single
         hist.MinMaxLoc(minVal, maxVal)
 
-        If fixedMaxVal = 0 Then maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000 Else maxVal = fixedMaxVal
+        If fixedMaxVal = 0 Then
+            Static savedMaxVal = maxVal
+            maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000
+            If maxVal < 0 Then maxVal = savedMaxVal
+            If Math.Abs((maxVal - savedMaxVal)) / maxVal < 0.2 Then maxVal = savedMaxVal Else savedMaxVal = Math.Max(maxVal, savedMaxVal)
+        Else
+            maxVal = fixedMaxVal
+        End If
 
-        Static savedMaxVal = maxVal
-        If maxVal < 0 Then maxVal = savedMaxVal
-        If Math.Abs((maxVal - savedMaxVal)) / maxVal < 0.2 Then maxVal = savedMaxVal Else savedMaxVal = Math.Max(maxVal, savedMaxVal)
         If maxVal > 0 And hist.Rows > 0 Then
             Dim incr = CInt(255 / hist.Rows)
             For i = 0 To hist.Rows - 1

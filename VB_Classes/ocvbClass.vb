@@ -28,6 +28,7 @@ Public Class ocvbClass : Implements IDisposable
     Public combo As New OptionsCombo
     Public radio As New OptionsRadioButtons
     Public radio1 As New OptionsRadioButtons
+    Public slider As New OptionsSliders
     Public sliders As New OptionsSliders
     Public sliders1 As New OptionsSliders
     Public sliders2 As New OptionsSliders

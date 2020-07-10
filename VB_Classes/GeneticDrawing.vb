@@ -27,12 +27,9 @@ Public Class GeneticDrawing_Basics
     Dim stageTotal = sliders.TrackBar2.Value
     Dim cachedImage As New cv.Mat
     Dim mats As Mat_4to1
+    Dim random As Random_CustomHistogram
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-
-        sliders.setupTrackBar1(ocvb, caller, "Number of Generations", 1, 100, 20)
-        sliders.setupTrackBar2("Number of Stages", 1, 200, 100)
-        sliders.setupTrackBar3("Brushstroke count ", 1, 100, 10)
 
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Snapshot Video input to initialize genetic drawing"
@@ -45,7 +42,21 @@ Public Class GeneticDrawing_Basics
 
         mats = New Mat_4to1(ocvb)
 
-        label1 = "(clkwise) Original, samplingMask, childImg, magnitude"
+        random = New Random_CustomHistogram(ocvb)
+        random.random.outputRandom = New cv.Mat(1, 1, cv.MatType.CV_32S, 0)
+        random.hist.plotHist.backColor = cv.Scalar.White
+
+        sliders.setupTrackBar1(ocvb, caller, "Number of Generations", 1, 100, 20)
+        sliders.setupTrackBar2("Number of Stages", 1, 200, 100)
+        sliders.setupTrackBar3("Brushstroke count ", 1, 100, 10)
+
+        slider.Setup(ocvb, caller, 4)
+        slider.setupTrackBar1("Number of Generations", 1, 100, 20)
+        slider.setupTrackBar2("Number of Stages", 1, 200, 100)
+        slider.setupTrackBar3("Brushstroke count ", 1, 100, 10)
+
+
+        label1 = "(clkwise) img, smaplingMask, histogram, magnitude"
         label2 = "Current result"
         ocvb.desc = "Create a painting from the current video input using a genetic algorithm - painterly"
     End Sub
@@ -122,12 +133,16 @@ Public Class GeneticDrawing_Basics
             If standalone Then
                 src = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size())
             End If
-
+            src = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
             mats.mat(0) = src
-            mats.mat(0) = If(mats.mat(0).Channels = 3, mats.mat(0).CvtColor(cv.ColorConversionCodes.BGR2GRAY), mats.mat(0))
             gradient.src = mats.mat(0)
             gradient.Run(ocvb)
             mats.mat(2) = gradient.magnitude.ConvertScaleAbs(255)
+
+            random.src = src
+            random.Run(ocvb) ' create a custom random number generator that reflects the histogram of the src image.
+            mats.mat(3) = random.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
             startNewStage()
         End If
 
@@ -175,7 +190,6 @@ Public Class GeneticDrawing_Basics
                 totalError = nextError
             End If
         Next
-        mats.mat(3) = childImg
 
         DNAseq = nextDNA
         generation += 1
