@@ -10,15 +10,15 @@ Public Class MSER_Basics
         setCaller(ocvb)
         sliders.Setup(ocvb, caller, 9)
 
-        sliders.setupTrackBar(0, "MSER Delta", 1, 100, 5)
+        sliders.setupTrackBar(0, "MSER Delta", 1, 100, 9)
         sliders.setupTrackBar(1, "MSER Min Area", 1, 10000, 60)
         sliders.setupTrackBar(2, "MSER Max Area", 1000, 100000, 100000)
         sliders.setupTrackBar(3, "MSER Max Variation", 1, 100, 25)
-        sliders.setupTrackBar(3, "Min Diversity", 0, 100, 20)
-        sliders.setupTrackBar(4, "MSER Max Evolution", 1, 1000, 200)
-        sliders.setupTrackBar(5, "MSER Area Threshold", 1, 101, 101)
-        sliders.setupTrackBar(6, "MSER Min Margin", 1, 100, 3)
-        sliders.setupTrackBar(7, "MSER Edge Blursize", 1, 20, 5)
+        sliders.setupTrackBar(4, "Min Diversity", 0, 100, 20)
+        sliders.setupTrackBar(5, "MSER Max Evolution", 1, 1000, 200)
+        sliders.setupTrackBar(6, "MSER Area Threshold", 1, 101, 101)
+        sliders.setupTrackBar(7, "MSER Min Margin", 1, 100, 3)
+        sliders.setupTrackBar(8, "MSER Edge Blursize", 1, 20, 5)
 
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Pass2Only"
