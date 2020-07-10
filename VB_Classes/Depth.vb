@@ -732,6 +732,7 @@ Public Class Depth_ColorizerVB_MT
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
+        sliders.Setup(ocvb, caller, 2)
         sliders.setupTrackBar(0, "Min Depth", 0, 1000, 0)
         sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
 
@@ -798,6 +799,7 @@ Public Class Depth_Colorizer_MT
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
+        sliders.Setup(ocvb, caller, 2)
         sliders.setupTrackBar(0, "Min Depth", 100, 1000, 100)
         sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
 
@@ -960,6 +962,7 @@ Public Class Depth_ColorMap
     Dim Palette As Palette_ColorMap
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
+        sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "Depth ColorMap Alpha X100", 1, 100, 3)
 
         Palette = New Palette_ColorMap(ocvb)
@@ -984,6 +987,7 @@ Public Class Depth_Holes
     Dim element As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
+        sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "Amount of dilation around depth holes", 1, 10, 1)
 
         label2 = "Shadow Edges (use sliders to expand)"
