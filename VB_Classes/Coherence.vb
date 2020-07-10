@@ -4,7 +4,7 @@ Public Class Coherence_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Coherence Sigma", 1, 15, 9)
         sliders.setupTrackBar(1, "Coherence Blend", 1, 10, 10)
         sliders.setupTrackBar(2, "Coherence str_sigma", 1, 15, 15)

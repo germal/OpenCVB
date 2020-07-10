@@ -15,7 +15,7 @@ Public Class EMax_Basics
         grid.sliders.sliders(0).Value = src.Width / 3 ' 270
         grid.sliders.sliders(1).Value = src.Height / 3 ' 150
 
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "EMax Number of Samples", 1, 200, 100)
         sliders.setupTrackBar(1, "EMax Prediction Step Size", 1, 20, 5)
         sliders.setupTrackBar(2, "EMax Sigma (spread)", 1, 100, 30)

@@ -40,7 +40,7 @@ Public Class Depth_Flatland
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Region Count", 1, 250, 10)
 
         label2 = "Grayscale version"
@@ -87,7 +87,7 @@ Public Class Depth_HolesRect
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "shadowRect Min Size", 1, 20000, 2000)
 
         shadow = New Depth_Holes(ocvb)
@@ -201,7 +201,7 @@ Public Class Depth_FlatData
         setCaller(ocvb)
         shadow = New Depth_Holes(ocvb)
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "FlatData Region Count", 1, 250, 200)
 
         label1 = "Reduced resolution RGBDepth"
@@ -236,7 +236,7 @@ Public Class Depth_FlatBackground
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         shadow = New Depth_Holes(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "FlatBackground Max Depth", 200, 10000, 2000)
 
         ocvb.desc = "Simplify the depth image with a flat background"
@@ -362,7 +362,7 @@ Public Class Depth_MeanStdev_MT
         grid.sliders.sliders(0).Value = 64
         grid.sliders.sliders(1).Value = 40
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "MeanStdev Max Depth Range", 1, 20000, 3500)
         sliders.setupTrackBar(1, "MeanStdev Frame Series", 1, 100, 5)
         ocvb.desc = "Collect a time series of depth and measure where the stdev is unstable.  Plan is to avoid depth where unstable."
@@ -488,7 +488,7 @@ Public Class Depth_Uncertainty
         setCaller(ocvb)
         retina = New Retina_Basics_CPP(ocvb)
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Uncertainty threshold", 1, 255, 100)
 
         label2 = "Mask of areas with unstable depth"
@@ -617,7 +617,7 @@ Public Class Depth_ManualTrim
     Public Mask As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Min Depth", 200, 1000, 200)
         sliders.setupTrackBar(1, "Max Depth", 200, 10000, 1400)
         ocvb.desc = "Manually show depth with varying min and max depths."
@@ -734,7 +734,7 @@ Public Class Depth_ColorizerVB_MT
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Min Depth", 0, 1000, 0)
         sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
 
@@ -801,7 +801,7 @@ Public Class Depth_Colorizer_MT
     Dim grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Min Depth", 100, 1000, 100)
         sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
 
@@ -964,7 +964,7 @@ Public Class Depth_ColorMap
     Dim Palette As Palette_ColorMap
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Depth ColorMap Alpha X100", 1, 100, 3)
 
         Palette = New Palette_ColorMap(ocvb)
@@ -989,7 +989,7 @@ Public Class Depth_Holes
     Dim element As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Amount of dilation around depth holes", 1, 10, 1)
 
         label2 = "Shadow Edges (use sliders to expand)"
@@ -1080,7 +1080,7 @@ Public Class Depth_Decreasing
     Public Increasing As Boolean
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Threshold in millimeters", 0, 1000, 8)
 
         ocvb.desc = "Identify where depth is decreasing - coming toward the camera."
@@ -1155,7 +1155,7 @@ Public Class Depth_SmoothingMat
         setCaller(ocvb)
         trim = New Depth_InRange(ocvb)
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Threshold in millimeters", 1, 1000, 100)
         label2 = "Depth pixels after smoothing"
         ocvb.desc = "Use depth rate of change to smooth the depth values beyond close range"
@@ -1229,7 +1229,7 @@ Public Class Depth_InRange
     Public inputInMeters As Boolean
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "InRange Min Depth", 0, 1000, 200)
         sliders.setupTrackBar(1, "InRange Max Depth", 200, 10000, 1400)
         label1 = "Depth values that are in-range"

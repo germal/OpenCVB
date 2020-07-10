@@ -9,7 +9,7 @@ Public Class KLT_Basics
     Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "KLT - MaxCorners", 1, 200, 100)
         sliders.setupTrackBar(1, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
         sliders.setupTrackBar(2, "KLT - minDistance", 1, 100, 7)

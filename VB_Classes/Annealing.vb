@@ -153,7 +153,7 @@ Public Class Annealing_CPP_MT
         mats = New Mat_4to1(ocvb)
 
         ReDim anneal(Environment.ProcessorCount - 1)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Anneal Number of Cities", 5, 500, 25)
         sliders.setupTrackBar(1, "Success = top X threads agree on energy level.", 2, anneal.Count, anneal.Count)
 

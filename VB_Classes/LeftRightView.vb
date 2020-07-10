@@ -3,7 +3,7 @@ Public Class LeftRightView_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "brightness", 0, 255, 100)
         ocvb.desc = "Show the left and right views from the 3D Camera"
         Select Case ocvb.parms.cameraIndex
@@ -41,7 +41,7 @@ Public Class LeftRightView_CompareUndistorted
         setCaller(ocvb)
         fisheye = New FishEye_Rectified(ocvb)
 
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "brightness", 0, 255, 0)
         sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
         sliders.setupTrackBar(2, "Slice Height", 1, (ocvb.color.Rows - 100) / 2, 50)
@@ -97,7 +97,7 @@ Public Class LeftRightView_CompareRaw
     Dim lrView As LeftRightView_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "brightness", 0, 255, 100)
         sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
         sliders.setupTrackBar(2, "Slice Height", 1, (ocvb.color.Rows - 100) / 2, 50)

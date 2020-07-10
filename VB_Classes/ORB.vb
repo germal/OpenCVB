@@ -6,7 +6,7 @@ Public Class ORB_Basics
     Dim orb As cv.ORB
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "ORB - desired point count", 10, 2000, 100)
 
         ocvb.desc = "Find keypoints using ORB"

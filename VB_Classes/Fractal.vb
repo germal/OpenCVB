@@ -12,7 +12,7 @@ Public Class Fractal_Mandelbrot
     Public incrY As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Mandelbrot iterations", 1, 50, 34)
         ocvb.desc = "Run the classic Mandalbrot algorithm"
         dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)

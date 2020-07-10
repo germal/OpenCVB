@@ -66,7 +66,7 @@ Public Class Undistort_Basics
     Dim stereo_cy As Int32
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "undistort intrinsics Left", 1, 200, 100)
 
         If ocvb.parms.cameraIndex = T265Camera Then

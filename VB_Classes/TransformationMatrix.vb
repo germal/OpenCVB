@@ -4,7 +4,7 @@ Public Class TransformationMatrix_Basics
     Dim topLocations As New List(Of cv.Point3d)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "TMatrix Top View multiplier", 1, 1000, 500)
         If ocvb.parms.cameraIndex = StereoLabsZED2 Then sliders.sliders(0).Value = 1 ' need a smaller multiplier...
 

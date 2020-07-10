@@ -9,7 +9,7 @@ Public Class Featureless_Basics_MT
     Public objectSize As New List(Of Int32)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "FeatureLess rho", 1, 100, 1)
         sliders.setupTrackBar(1, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
@@ -81,7 +81,7 @@ Public Class FeatureLess_Prediction
     Dim fLess As Featureless_Basics_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "FeatureLess Resize Percent", 1, 100, 1)
 
         fLess = New Featureless_Basics_MT(ocvb)

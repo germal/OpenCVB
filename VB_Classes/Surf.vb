@@ -18,7 +18,7 @@ Public Class Surf_Basics_CS
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Hessian threshold", 1, 5000, 2000)
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
@@ -83,7 +83,7 @@ Public Class Surf_DrawMatchManual_CS
         surf = New Surf_Basics_CS(ocvb)
         surf.CS_SurfBasics.drawPoints = False
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Surf Vertical Range to Search", 0, 50, 10)
 
         ocvb.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."

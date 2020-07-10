@@ -8,7 +8,7 @@ Public Class OilPaint_Pointilism
     Dim myRNG As New cv.RNG
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Stroke Scale", 1, 5, 3)
         sliders.setupTrackBar(1, "Smoothing Radius", 0, 100, 32)
         radio.Setup(ocvb, caller, 2)
@@ -122,7 +122,7 @@ Public Class OilPaint_Manual
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Filter Size", 3, 15, 3)
         sliders.setupTrackBar(1, "Intensity", 5, 150, 25)
         ocvb.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
@@ -180,7 +180,7 @@ Public Class OilPaint_Manual_CS
     Dim oilPaint As New CS_Classes.OilPaintManual
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel Size", 2, 10, 4)
         sliders.setupTrackBar(1, "Intensity", 1, 250, 20)
         sliders.setupTrackBar(2, "Threshold", 0, 200, 25) ' add the third slider for the threshold.

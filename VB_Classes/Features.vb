@@ -6,7 +6,7 @@ Public Class Features_GoodFeatures
     Public goodFeatures As New List(Of cv.Point2f)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of Points", 10, 1000, 200)
         sliders.setupTrackBar(1, "Quality Level", 1, 100, 1)
         sliders.setupTrackBar(2, "Distance", 1, 100, 30)

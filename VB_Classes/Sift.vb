@@ -16,7 +16,7 @@ Public Class Sift_Basics_CS
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Points to Match", 1, 1000, 200)
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."

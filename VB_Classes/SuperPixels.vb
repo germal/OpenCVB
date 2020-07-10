@@ -25,7 +25,7 @@ Public Class SuperPixel_Basics_CPP
     Dim spPtr As IntPtr = 0
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of SuperPixels", 1, 1000, 400)
         sliders.setupTrackBar(1, "Iterations", 0, 10, 4)
         sliders.setupTrackBar(2, "Prior", 1, 10, 2)

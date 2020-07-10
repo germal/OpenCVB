@@ -6,7 +6,7 @@ Public Class Palette_Color
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "blue", 0, 255, msRNG.Next(0, 255))
         sliders.setupTrackBar(1, "green", 0, 255, msRNG.Next(0, 255))
         sliders.setupTrackBar(2, "red", 0, 255, msRNG.Next(0, 255))
@@ -33,7 +33,7 @@ Public Class Palette_LinearPolar
         ocvb.desc = "Use LinearPolar to create gradient image"
         SetInterpolationRadioButtons(ocvb, caller, radio, "LinearPolar")
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "LinearPolar radius", 0, ocvb.color.Cols, ocvb.color.Cols / 2)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -107,7 +107,7 @@ Public Class Palette_Map
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "inRange offset", 1, 100, 10)
         ocvb.desc = "Map colors to different palette - Painterly Effect."
         label1 = "Reduced Colors"
@@ -247,7 +247,7 @@ Public Class Palette_BuildGradientColorMap
     Public gradientColorMap As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 30, 5)
 
         label2 = "Generated colormap"

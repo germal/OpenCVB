@@ -3,7 +3,7 @@ Public Class Contrast_POW
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
         label1 = "Original Image"
         label2 = "Contrast reduced"
@@ -28,7 +28,7 @@ Public Class Contrast_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Brightness", 1, 100, 50)
         sliders.setupTrackBar(1, "Contrast", 1, 100, 50)
         ocvb.desc = "Show image with varying contrast and brightness."

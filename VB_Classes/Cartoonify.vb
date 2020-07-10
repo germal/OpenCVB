@@ -4,7 +4,7 @@ Public Class CartoonifyImage_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Cartoon Median Blur kernel", 1, 21, 7)
         sliders.setupTrackBar(1, "Cartoon Median Blur kernel 2", 1, 21, 3)
         sliders.setupTrackBar(2, "Cartoon threshold", 1, 255, 80)

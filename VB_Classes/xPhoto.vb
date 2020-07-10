@@ -70,7 +70,7 @@ Public Class xPhoto_OilPaint_CPP
     Dim xPhoto_OilPaint As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "xPhoto Dynamic Ratio", 1, 127, 7)
         sliders.setupTrackBar(1, "xPhoto Block Size", 1, 100, 3)
 

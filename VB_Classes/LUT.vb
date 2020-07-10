@@ -5,7 +5,7 @@ Public Class LUT_Gray
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "LUT zero through xxx", 1, 255, 65)
         sliders.setupTrackBar(1, "LUT xxx through yyy", 1, 255, 110)
         sliders.setupTrackBar(2, "LUT xxx through yyy", 1, 255, 160)
@@ -40,7 +40,7 @@ Public Class LUT_Color
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         paletteMap = rColors
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Reduction for color image", 1, 256, 32)
         ocvb.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub

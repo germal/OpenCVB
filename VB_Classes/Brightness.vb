@@ -4,7 +4,7 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Clip Limit", 1, 100, 10)
         sliders.setupTrackBar(1, "Grid Size", 1, 100, 8)
         ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
@@ -50,7 +50,7 @@ Public Class Brightness_AlphaBeta
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         ocvb.desc = "Use alpha and beta with ConvertScaleAbs."
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 500, 300)
         sliders.setupTrackBar(1, "Brightness Beta (brightness)", -100, 100, 0)
     End Sub
@@ -68,7 +68,7 @@ Public Class Brightness_Gamma
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         ocvb.desc = "Use gamma with ConvertScaleAbs."
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Brightness Gamma correction", 0, 200, 100)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -108,7 +108,7 @@ Public Class Brightness_WhiteBalance_CPP
     Dim wPtr As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "White balance threshold X100", 1, 100, 10)
 
         wPtr = WhiteBalance_Open()
@@ -151,7 +151,7 @@ Public Class Brightness_WhiteBalance
         hist.maxRange = hist.bins
         If standalone = False Then hist.sliders.Visible = False
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "White balance threshold X100", 1, 100, 10)
 
         label1 = "Image with auto white balance"

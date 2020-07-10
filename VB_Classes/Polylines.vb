@@ -6,7 +6,7 @@ Public Class Polylines_IEnumerableExample
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Polyline closed if checked"
         check.Box(0).Checked = True
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Polyline Count", 2, 500, 100)
         sliders.setupTrackBar(1, "Polyline Thickness", 0, 10, 1)
         ocvb.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."

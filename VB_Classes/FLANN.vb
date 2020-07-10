@@ -52,7 +52,7 @@ Public Class FLANN_Basics
         setCaller(ocvb)
         random = New Random_Points(ocvb)
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Query Count", 1, 10000, 10)
 
         ocvb.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"

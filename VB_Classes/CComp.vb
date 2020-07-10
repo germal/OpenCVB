@@ -11,7 +11,7 @@ Public Class CComp_Basics
     Public drawRectangles As Boolean = True
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "CComp Threshold", 0, 255, 10)
         sliders.setupTrackBar(1, "CComp Min Area", 0, src.Width * src.Height, 500)
 
@@ -180,7 +180,7 @@ Public Class CComp_InRange_MT
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "InRange # of ranges", 2, 255, 15)
         sliders.setupTrackBar(1, "InRange Max Depth", 150, 10000, 3000)
         sliders.setupTrackBar(2, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
@@ -234,7 +234,7 @@ Public Class CComp_InRange
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "InRange # of ranges", 1, 20, 15)
         sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
 

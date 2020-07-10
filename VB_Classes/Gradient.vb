@@ -64,7 +64,7 @@ Public Class Gradient_Flatland
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grade = New Gradient_Basics(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Reduction Factor", 1, 64, 16)
         ocvb.desc = "Reduced grayscale shows isobars in depth."
     End Sub
@@ -96,7 +96,7 @@ Public Class Gradient_CartToPolar
         gradient = New Gradient_Basics(ocvb)
         gradient.sobel.sliders.sliders(0).Value = 1
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
         label1 = "CartToPolar Magnitude Output Normalized"
         label2 = "CartToPolar Angle Output"
@@ -134,7 +134,7 @@ Public Class Gradient_NumPy
         gradient = New Gradient_Basics(ocvb)
         gradient.sobel.sliders.sliders(0).Value = 1
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
 
         label1 = "CartToPolar Magnitude Output Normalized"

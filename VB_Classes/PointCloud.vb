@@ -132,7 +132,7 @@ Public Class PointCloud_Colorize
         palette.frameModulo = 1
         If ocvb.parms.resolution <> resHigh Then arcSize = 50
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Top View angle for FOV", 0, 180, hFOVangles(ocvb.parms.cameraIndex))
         sliders.setupTrackBar(1, "Side View angle for FOV", 0, 180, vFOVangles(ocvb.parms.cameraIndex))
 

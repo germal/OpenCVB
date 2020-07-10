@@ -4,7 +4,7 @@ Public Class DilateErode_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Dilate/Erode Kernel Size", 1, 32, 5)
         sliders.setupTrackBar(1, "Erode (-) to Dilate (+)", -32, 32, 1)
         ocvb.desc = "Dilate and Erode the RGB and Depth image."
@@ -61,7 +61,7 @@ Public Class DilateErode_DepthSeed
         setCaller(ocvb)
         dilate = New DilateErode_Basics(ocvb)
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "DepthSeed flat depth", 1, 200, 100)
         sliders.setupTrackBar(1, "DepthSeed max Depth", 1, 5000, 3000)
         ocvb.desc = "Erode depth to build a depth mask for inrange data."
@@ -102,7 +102,7 @@ Public Class DilateErode_OpenClose
         radio.check(2).Text = "Open/Close shape: Rect"
         radio.check(2).Checked = True
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Dilate Open/Close Iterations", -10, 10, 10)
         ocvb.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
     End Sub

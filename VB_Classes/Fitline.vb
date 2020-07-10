@@ -9,7 +9,7 @@ Public Class Fitline_Basics
         draw = New Draw_Line(ocvb)
         draw.sliders.sliders(0).Value = 2
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Accuracy for the radius X100", 0, 100, 10)
         sliders.setupTrackBar(1, "Accuracy for the angle X100", 0, 100, 10)
 
@@ -116,7 +116,7 @@ Public Class Fitline_RawInput
     Public bb As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Random point count", 0, 500, 100)
         sliders.setupTrackBar(1, "Line Point Count", 0, 500, 20)
         sliders.setupTrackBar(2, "Line Noise", 1, 100, 10)

@@ -258,7 +258,7 @@ Public Class CellAuto_All256
         cell = New CellAuto_Basics(ocvb)
         cell.combo.Visible = False ' won't need this...
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Current Rule", 0, 255, 0)
         ocvb.desc = "Run through all 256 combinations of outcomes"
     End Sub

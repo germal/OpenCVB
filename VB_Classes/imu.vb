@@ -8,7 +8,7 @@ Public Class IMU_Basics
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
 
         flow = New Font_FlowText(ocvb)
@@ -195,7 +195,7 @@ Public Class IMU_FrameTime
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Minimum IMU to Capture time (ms)", 1, 10, 2)
         sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 25)
 
@@ -290,7 +290,7 @@ Public Class IMU_HostFrameTimes
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Minimum Host interrupt delay (ms)", 1, 10, 4)
         sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 25)
 

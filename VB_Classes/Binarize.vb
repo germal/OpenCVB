@@ -54,7 +54,7 @@ Public Class Binarize_Niblack_Sauvola
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
         sliders.setupTrackBar(1, "Niblack k", -1000, 1000, -200)
         sliders.setupTrackBar(2, "Sauvola k", -1000, 1000, 100)
@@ -84,7 +84,7 @@ Public Class Binarize_Niblack_Nick
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
         sliders.setupTrackBar(1, "Niblack k", -1000, 1000, -200)
         sliders.setupTrackBar(2, "Nick k", -1000, 1000, 100)
@@ -113,7 +113,7 @@ Public Class Binarize_Bernson
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
         sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
         sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
@@ -150,7 +150,7 @@ Public Class Binarize_Bernson_MT
         grid.sliders.sliders(0).Value = 32
         grid.sliders.sliders(1).Value = 32
 
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
         sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
         sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)

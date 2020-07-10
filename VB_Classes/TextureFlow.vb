@@ -3,7 +3,7 @@ Public Class TextureFlow_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Texture Flow Delta", 2, 100, 12)
         sliders.setupTrackBar(1, "Texture Eigen BlockSize", 1, 100, 20)
         sliders.setupTrackBar(2, "Texture Eigen Ksize", 1, 15, 1)

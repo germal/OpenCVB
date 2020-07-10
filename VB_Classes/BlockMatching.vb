@@ -7,7 +7,7 @@ Public Class BlockMatching_Basics
         setCaller(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
 
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Blockmatch max disparity", 2, 5, 2)
         sliders.setupTrackBar(1, "Blockmatch block size", 5, 255, 15)
         sliders.setupTrackBar(2, "Blockmatch distance factor (approx) X1000", 1, 100, 20)

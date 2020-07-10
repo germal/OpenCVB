@@ -162,7 +162,7 @@ Public Class OpticalFlow_DenseBasics_MT
         flow = New OpticalFlow_DenseOptions(ocvb)
         flow.sliders.sliders(0).Value = 75
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 1000)
 
         ocvb.desc = "MultiThread dense optical flow algorithm  "
@@ -220,7 +220,7 @@ Public Class OpticalFlow_Sparse
         setCaller(ocvb)
         good = New Features_GoodFeatures(ocvb)
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "OpticalFlow window", 1, 20, 3)
         sliders.setupTrackBar(1, "OpticalFlow Max Pixels Distance", 1, 100, 30)
 

@@ -91,7 +91,7 @@ Public Class WarpAffine_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Angle", 0, 360, 10)
 
         SetInterpolationRadioButtons(ocvb, caller, radio, "WarpAffine")

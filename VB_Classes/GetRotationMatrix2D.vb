@@ -37,7 +37,7 @@ Public Class GetRotationMatrix2D_Basics
     Public warpFlag As Int32
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "GetRotationMatrix2D Angle", 0, 360, 24)
         SetInterpolationRadioButtons(ocvb, caller, radio, "Rotation2D")
 

@@ -3,7 +3,7 @@ Public Class Sharpen_UnsharpMask
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "sigma", 1, 2000, 100)
         sliders.setupTrackBar(1, "threshold", 0, 255, 5)
         sliders.setupTrackBar(2, "Shift Amount", 0, 5000, 1000)
@@ -32,7 +32,7 @@ Public Class Sharpen_DetailEnhance
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "DetailEnhance Sigma_s", 0, 200, 60)
         sliders.setupTrackBar(1, "DetailEnhance Sigma_r", 1, 100, 7)
         ocvb.desc = "Enhance detail on an image - Painterly Effect"
@@ -52,7 +52,7 @@ Public Class Sharpen_Stylize
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Stylize Sigma_s", 0, 200, 60)
         sliders.setupTrackBar(1, "Stylize Sigma_r", 1, 100, 7)
         ocvb.desc = "Stylize an image - Painterly Effect"

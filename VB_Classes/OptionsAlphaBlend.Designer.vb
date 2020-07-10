@@ -31,6 +31,7 @@ Partial Class OptionsAlphaBlend
         Me.AlphaPic.Location = New System.Drawing.Point(3, 4)
         Me.AlphaPic.Name = "AlphaPic"
         Me.AlphaPic.Size = New System.Drawing.Size(1195, 394)
+        Me.AlphaPic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize
         Me.AlphaPic.TabIndex = 0
         Me.AlphaPic.TabStop = False
         '
@@ -38,12 +39,13 @@ Partial Class OptionsAlphaBlend
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1204, 401)
+        Me.ClientSize = New System.Drawing.Size(1440, 997)
         Me.Controls.Add(Me.AlphaPic)
         Me.Name = "OptionsAlphaBlend"
         Me.Text = "OptionsAlphaBlend"
         CType(Me.AlphaPic, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

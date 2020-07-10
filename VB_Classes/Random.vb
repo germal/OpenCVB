@@ -9,7 +9,7 @@ Public Class Random_Points
     Public plotPoints As Boolean = False
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Random Pixel Count", 1, ocvb.color.Cols * ocvb.color.Rows, 20)
 
         ReDim Points(sliders.sliders(0).Value - 1)
@@ -106,7 +106,7 @@ Public Class Random_NormalDist
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Random_NormalDist Blue Mean", 0, 255, 25)
         sliders.setupTrackBar(1, "Random_NormalDist Green Mean", 0, 255, 127)
         sliders.setupTrackBar(2, "Random_NormalDist Red Mean", 0, 255, 180)
@@ -335,7 +335,7 @@ Public Class Random_MonteCarlo
         plotHist = New Plot_Histogram(ocvb)
         plotHist.fixedMaxVal = 100
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of bins", 1, 255, 91)
         ocvb.desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
     End Sub

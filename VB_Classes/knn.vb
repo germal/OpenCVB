@@ -13,7 +13,7 @@ Public Class knn_Basics
         If standalone Then
             random = New Random_Points(ocvb)
         End If
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "knn Query Points", 1, 10000, 10)
         sliders.setupTrackBar(1, "knn output Points", 1, 10, If(standalone, 3, 1))
         ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
@@ -126,7 +126,7 @@ Public Class knn_Cluster2D
         knn = New knn_Point2d(ocvb)
         knn.sliders.Visible = False
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "knn - number of cities", 10, 1000, 100)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Demo Mode (continuous update)"
@@ -222,7 +222,7 @@ Public Class knn_Point2d
     Dim knn As cv.ML.KNearest
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "knn Query Points", 1, 50, 10)
         sliders.setupTrackBar(1, "knn k nearest points", 1, 5, 1)
 
@@ -287,7 +287,7 @@ Public Class knn_Point3d
         Public findXnearest As Int32
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "knn Query Points", 1, 500, 10)
         sliders.setupTrackBar(1, "knn k nearest points", 0, 500, 1)
 

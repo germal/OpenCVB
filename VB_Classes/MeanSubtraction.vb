@@ -4,7 +4,7 @@ Public Class MeanSubtraction_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Scaling Factor = mean/scaling factor X100", 1, 500, 100)
         ocvb.desc = "Subtract the mean from the image with a scaling factor"
     End Sub

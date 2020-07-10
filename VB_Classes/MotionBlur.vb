@@ -5,7 +5,7 @@ Public Class MotionBlur_Basics
     Public showDirection As Boolean = True
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Motion Blur Length", 1, 101, 51)
         sliders.setupTrackBar(1, "Motion Blur Angle", -90, 90, 0)
         ocvb.desc = "Use Filter2D to create a motion blur"
@@ -122,7 +122,7 @@ Public Class MotionBlur_Deblur
 
         mblur = New MotionBlur_Basics(ocvb)
 
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Deblur Restore Vector", 1, mblur.sliders.sliders(0).Maximum, 10)
         sliders.setupTrackBar(1, "Deblur Angle of Restore Vector", mblur.sliders.sliders(1).Minimum, mblur.sliders.sliders(1).Maximum, 0)
         sliders.setupTrackBar(2, "Deblur Signal to Noise Ratio", 1, 1000, 700)

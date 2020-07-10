@@ -31,7 +31,7 @@ Public Class Filter_NormalizedKernel
         radio.check(1).Checked = True
         radio.check(2).Text = "L2"
         radio.check(3).Text = "MinMax"
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Normalize alpha X10", 1, 100, 10)
         ocvb.desc = "Create a normalized kernel and use it."
     End Sub
@@ -64,7 +64,7 @@ Public Class Filter_Normalized2D
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Filter_Normalized2D kernel size", 1, 21, 3)
         ocvb.desc = "Create and apply a normalized kernel."
     End Sub
@@ -88,7 +88,7 @@ Public Class Filter_SepFilter2D
         check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"
         check.Box(0).Checked = True
 
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel X size", 1, 21, 5)
         sliders.setupTrackBar(1, "Kernel Y size", 1, 21, 11)
         sliders.setupTrackBar(2, "SepFilter2D Sigma X10", 0, 100, 17)

@@ -46,7 +46,7 @@ Public Class GeneticDrawing_Basics
         random.random.outputRandom = New cv.Mat(1, 1, cv.MatType.CV_32S, 0)
         random.hist.plotHist.backColor = cv.Scalar.White
 
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of Generations", 1, 100, 20)
         sliders.setupTrackBar(1, "Number of Stages", 1, 200, 100)
         sliders.setupTrackBar(2, "Brushstroke count ", 1, 100, 10)

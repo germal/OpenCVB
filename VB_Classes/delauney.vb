@@ -197,7 +197,7 @@ Public Class Delauney_Coverage
         setCaller(ocvb)
         delauney = New Delauney_Subdiv2D(ocvb)
         delauney.updateFrequency = 1
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Clear image after x frames", 1, 100, 50)
         label1 = "Coverage of space"
         ocvb.desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."

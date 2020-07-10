@@ -84,7 +84,7 @@ Public Class Dither_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Bits per color plane (Nbpp only)", 1, 5, 1)
 
         radio.Setup(ocvb, caller, 24)

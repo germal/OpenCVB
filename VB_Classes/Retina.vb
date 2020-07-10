@@ -23,7 +23,7 @@ Public Class Retina_Basics_CPP
     Dim srcData(0) As Byte
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Retina Sample Factor", 1, 10, 2)
 
         check.Setup(ocvb, caller, 2)

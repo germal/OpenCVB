@@ -3,7 +3,7 @@ Public Class Math_Subtract
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Red", 0, 255, 255)
         sliders.setupTrackBar(1, "Green", 0, 255, 255)
         sliders.setupTrackBar(2, "Blue", 0, 255, 255)
@@ -50,7 +50,7 @@ Public Class Math_Median_CDF
     Public bins As Int32 = 10
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Bins", 4, 1000, 100)
         ocvb.desc = "Compute the src image median"
     End Sub

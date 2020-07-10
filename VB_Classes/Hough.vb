@@ -77,7 +77,7 @@ Public Class Hough_Lines
         setCaller(ocvb)
         edges = New Edges_Canny(ocvb)
 
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "rho", 1, 100, 1)
         sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar(2, "threshold", 1, 100, 50)
@@ -121,7 +121,7 @@ Public Class Hough_Lines_MT
     Public grid As Thread_Grid
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "rho", 1, 100, 1)
         sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar(2, "threshold", 1, 100, 3)

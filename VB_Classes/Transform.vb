@@ -4,7 +4,7 @@ Public Class Transform_Resize
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Resize Percent", 50, 1000, 50)
         ocvb.desc = "Resize an image based on the slider value."
     End Sub
@@ -31,7 +31,7 @@ Public Class Transform_Rotate
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Angle", 0, 360, 30)
         sliders.setupTrackBar(1, "Scale Factor", 1, 100, 100)
         sliders.setupTrackBar(2, "Rotation center X", 1, src.Width, src.Width / 2)

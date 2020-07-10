@@ -129,7 +129,7 @@ Public Class VTK_Histogram3D
     Dim random As Random_NormalDist
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Random Number Stdev", 0, 255, 10)
         sliders.setupTrackBar(1, "Hist 3D bins", 1, 100, 32)
         sliders.setupTrackBar(2, "Hist 3D bin Threshold X1000000", 10, 100, 20)

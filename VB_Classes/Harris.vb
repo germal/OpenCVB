@@ -34,7 +34,7 @@ Public Class Harris_Features_CPP
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Harris Threshold", 1, 100, 1)
         sliders.setupTrackBar(1, "Harris Neighborhood", 1, 41, 21)
         sliders.setupTrackBar(2, "Harris aperture", 1, 33, 21)
@@ -82,7 +82,7 @@ Public Class Harris_Detector_CPP
     Public FeaturePoints As New List(Of cv.Point2f)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Harris qualityLevel", 1, 100, 2)
 
         ocvb.desc = "Use Harris detector to identify interesting points."

@@ -5,7 +5,7 @@ Public Class Corners_Harris
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar(1, "Corner aperture size", 1, 21, 3)
         sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)
@@ -62,7 +62,7 @@ Public Class Corners_SubPix
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         good = New Features_GoodFeatures(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "SubPix kernel Size", 1, 20, 3)
         label1 = "Output of GoodFeatures"
         ocvb.desc = "Use PreCornerDetect to find features in the image."
@@ -94,7 +94,7 @@ Public Class Corners_PreCornerDetect
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         median = New Math_Median_CDF(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "kernel Size", 1, 20, 19)
 
         ocvb.desc = "Use PreCornerDetect to find features in the image."
@@ -131,7 +131,7 @@ Public Class Corners_ShiTomasi_CPP
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar(1, "Corner aperture size", 1, 21, 3)
         sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)

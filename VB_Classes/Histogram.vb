@@ -13,7 +13,7 @@ Public Class Histogram_Basics
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Bins", 2, 256, 256)
         sliders.setupTrackBar(1, "Histogram line thickness", 1, 20, 3)
         sliders.setupTrackBar(2, "Histogram Font Size x10", 1, 20, 10)
@@ -133,7 +133,7 @@ Public Class Histogram_NormalizeGray
     Public histogram As Histogram_KalmanSmoothed
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
         sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
 
@@ -167,7 +167,7 @@ Public Class Histogram_2D_HueSaturation
 
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
         sliders.setupTrackBar(1, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
         ocvb.desc = "Create a histogram for hue and saturation."
@@ -201,7 +201,7 @@ Public Class Histogram_BackProjectionGrayScale
         hist.dst1 = dst2
         hist.kalman.check.Box(0).Checked = False
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Bins", 1, 255, 50)
         sliders.setupTrackBar(1, "Number of neighbors to include", 0, 10, 1)
 
@@ -257,7 +257,7 @@ Public Class Histogram_BackProjection
     Dim hist As Histogram_2D_HueSaturation
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Backprojection Mask Threshold", 0, 255, 10)
 
         hist = New Histogram_2D_HueSaturation(ocvb)
@@ -307,7 +307,7 @@ Public Class Histogram_KalmanSmoothed
 
         kalman = New Kalman_Basics(ocvb)
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Bins", 1, 255, 50)
 
         label2 = "Histogram - x=bins/y=count"
@@ -366,7 +366,7 @@ Public Class Histogram_Depth
         plotHist = New Plot_Histogram(ocvb)
 
         trim = New Depth_InRange(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Depth Bins", 2, ocvb.color.Cols, 50)
 
         ocvb.desc = "Show depth data as a histogram."
@@ -537,7 +537,7 @@ Public Class Histogram_2D_XZ_YZ
         trim = New Depth_InRange(ocvb)
         trim.sliders.sliders(1).Value = 1500 ' up to x meters away
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram X bins", 1, ocvb.color.Cols / 2, 30)
         sliders.setupTrackBar(1, "Histogram Z bins", 1, 200, 100)
 
@@ -576,7 +576,7 @@ Public Class Histogram_ProjectionOptions
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram threshold", 0, 1000, 3)
         sliders.setupTrackBar(1, "InRange Max Depth (mm)", 0, 10000, 4000)
         If standalone Then sliders.sliders(0).Value = 1
@@ -850,7 +850,7 @@ Public Class Histogram_Simple
         setCaller(ocvb)
         plotHist = New Plot_Histogram(ocvb)
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Bins", 2, ocvb.color.Cols, 50)
 
         ocvb.desc = "Build a simple and reusable histogram for grayscale images."
@@ -887,7 +887,7 @@ Public Class Histogram_ColorsAndGray
         setCaller(ocvb)
         mats = New Mat_4to1(ocvb)
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
         sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
 

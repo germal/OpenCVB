@@ -3,7 +3,7 @@ Public Class DCT_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Remove Frequencies < x", 0, 100, 1)
         sliders.setupTrackBar(1, "Run Length Minimum", 1, 100, 15)
         radio.Setup(ocvb, caller, 3)

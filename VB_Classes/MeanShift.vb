@@ -90,7 +90,7 @@ Public Class MeanShift_PyrFilter
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "MeanShift Spatial Radius", 1, 100, 10)
         sliders.setupTrackBar(1, "MeanShift color Radius", 1, 100, 15)
         sliders.setupTrackBar(2, "MeanShift Max Pyramid level", 1, 8, 3)
@@ -122,7 +122,7 @@ Public Class Meanshift_TopObjects
         mats2 = New Mat_4to1(ocvb)
 
         blob = New Blob_DepthClusters(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "How often should meanshift be reinitialized", 1, 500, 100)
         For i = 0 To cams.Length - 1
             cams(i) = New MeanShift_Basics(ocvb)

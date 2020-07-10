@@ -4,7 +4,7 @@ Public Class Laplacian_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Laplacian Kernel size", 1, 21, 3)
         sliders.setupTrackBar(1, "Laplacian Scale", 0, 100, 100)
         sliders.setupTrackBar(2, "Laplacian Delta", 0, 1000, 0)
@@ -30,7 +30,7 @@ Public Class Laplacian_Blur
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Laplacian Kernel size", 1, 21, 3)
         sliders.setupTrackBar(1, "Laplacian Scale", 0, 100, 100)
         sliders.setupTrackBar(2, "Laplacian Delta", 0, 1000, 0)

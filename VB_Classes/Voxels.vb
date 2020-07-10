@@ -16,7 +16,7 @@ Public Class Voxels_Basics_MT
         trim = New Depth_InRange(ocvb)
         trim.sliders.sliders(1).Value = 5000
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Bins", 2, 200, 100)
 
         grid = New Thread_Grid(ocvb)

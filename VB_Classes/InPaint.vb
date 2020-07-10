@@ -6,7 +6,7 @@ Public Class InPaint_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Thickness", 1, 25, 2)
 
         radio.Setup(ocvb, caller, 2)

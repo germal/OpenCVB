@@ -8,7 +8,7 @@ Public Class OptionsSliders
     Public countLabel() As Label
     Dim heightSetting = 260
     Dim widthSetting = 630
-    Public Sub Setup(ocvb As AlgorithmData, caller As String, count As Int32)
+    Public Sub Setup(ocvb As AlgorithmData, caller As String, Optional count As Integer = 4)
         ReDim sliders(count - 1)
         ReDim sLabels(count - 1)
         ReDim countLabel(count - 1)

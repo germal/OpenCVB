@@ -3,7 +3,7 @@ Public Class Encode_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
         sliders.setupTrackBar(1, "Encode Output Scaling", 1, 100, 7)
 
@@ -34,7 +34,7 @@ Public Class Encode_Options
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
         sliders.setupTrackBar(1, "Encode Output Scaling", 1, 100, 85)
 

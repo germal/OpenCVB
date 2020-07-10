@@ -43,7 +43,7 @@ Public Class Smoothing_Exterior
 		hull = New Hull_Basics(ocvb)
 		hull.sliders.sliders(0).Minimum = 4 ' required minimum number of points for the algorithm.
 
-		sliders.Setup(ocvb, caller, 1)
+		sliders.Setup(ocvb, caller)
 		sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 10)
 
 		label1 = "Original Points (white) Smoothed (yellow)"
@@ -117,7 +117,7 @@ Public Class Smoothing_Interior
 		hull.sliders.sliders(0).Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.sliders.sliders(0).Value = 16
 
-		sliders.Setup(ocvb, caller, 2)
+		sliders.Setup(ocvb, caller)
 		sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 1)
 		sliders.setupTrackBar(1, "Smoothing tension X100", 1, 100, 50)
 

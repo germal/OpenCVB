@@ -88,7 +88,7 @@ Public Class KAZE_LeftAligned_CS
     Dim CS_KazeRight As New CS_Classes.Kaze_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Max number of points to match", 1, 300, 100)
         sliders.setupTrackBar(1, "When matching, max possible distance", 1, 200, 100)
 

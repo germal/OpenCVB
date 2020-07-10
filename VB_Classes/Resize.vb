@@ -78,7 +78,7 @@ Public Class Resize_Percentage
         setCaller(ocvb)
         resizeOptions = New Resize_Basics(ocvb)
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Resize Percentage (%)", 1, 100, 3)
 
         ocvb.desc = "Resize by a percentage of the image."

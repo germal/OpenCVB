@@ -45,7 +45,7 @@ Public Class Clone_ColorChange
         setCaller(ocvb)
         clone = New Clone_Basics(ocvb)
 
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Color Change - Red", 5, 25, 15)
         sliders.setupTrackBar(1, "Color Change - Green", 5, 25, 5)
         sliders.setupTrackBar(2, "Color Change - Blue", 5, 25, 5)
@@ -73,7 +73,7 @@ Public Class Clone_IlluminationChange
         setCaller(ocvb)
         clone = New Clone_Basics(ocvb)
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Alpha", 0, 20, 2)
         sliders.setupTrackBar(1, "Beta", 0, 20, 2)
 
@@ -101,7 +101,7 @@ Public Class Clone_TextureFlattening
         setCaller(ocvb)
         clone = New Clone_Basics(ocvb)
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Low Threshold", 0, 100, 10)
         sliders.setupTrackBar(1, "High Threshold", 0, 100, 50)
 

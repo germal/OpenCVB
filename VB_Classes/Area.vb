@@ -21,7 +21,7 @@ Public Class Area_MinTriangle_CPP
     End Sub
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
         sliders.setupTrackBar(1, "Area size", 10, 300, 200)
         setup(ocvb)
@@ -70,7 +70,7 @@ Public Class Area_MinRect
     End Sub
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Area Number of Points", 1, 200, 5)
         sliders.setupTrackBar(1, "Area size", 10, 300, 200)
         setup(ocvb)

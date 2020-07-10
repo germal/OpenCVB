@@ -127,7 +127,7 @@ Public Class DFT_ButterworthFilter_MT
     Public dft As DFT_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, ocvb.color.Rows, ocvb.color.Rows)
         sliders.setupTrackBar(1, "DFT B Filter - Order", 1, ocvb.color.Rows, 2)
 

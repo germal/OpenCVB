@@ -5,7 +5,7 @@ Public Class WarpPerspective_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Warped Width", 0, ocvb.color.Cols, ocvb.color.Cols - 50)
         sliders.setupTrackBar(1, "Warped Height", 0, ocvb.color.Rows, ocvb.color.Rows - 50)
         sliders.setupTrackBar(2, "Warped Angle", 0, 360, 0)

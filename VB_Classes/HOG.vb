@@ -6,7 +6,7 @@ Public Class HOG_Basics
     Dim staticImageProcessed As Boolean
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Threshold", 0, 100, 0)
         sliders.setupTrackBar(1, "Stride", 1, 100, 1)
         sliders.setupTrackBar(2, "Scale", 0, 2000, 300)

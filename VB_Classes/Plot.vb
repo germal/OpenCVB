@@ -108,7 +108,7 @@ Public Class Plot_OverTime
         check.Box(0).Text = "Reset the plot scale"
         check.Box(0).Checked = True
 
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Plot Pixel Height", 1, 40, 4)
         sliders.setupTrackBar(1, "Plot Pixel Width", 1, 40, 4)
         sliders.setupTrackBar(2, "Plot (time) Font Size x10", 1, 20, 10)
@@ -205,7 +205,7 @@ Public Class Plot_Histogram
     Public fixedMaxVal As Integer
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Font Size x10", 1, 20, 10)
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub

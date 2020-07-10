@@ -44,7 +44,7 @@ Public Class Draw_rectangles
     Public drawRotatedRectangles As Boolean
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Rectangle Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of rotated rectangles."
     End Sub
@@ -79,7 +79,7 @@ Public Class Draw_Noise
     Public noiseMask As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Noise Count", 1, 1000, 100)
         sliders.setupTrackBar(1, "Noise Width", 1, 10, 3)
         ocvb.desc = "Add Noise to the color image"
@@ -126,7 +126,7 @@ Public Class Draw_Ellipses
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Ellipse Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of ellipses."
     End Sub
@@ -151,7 +151,7 @@ Public Class Draw_Circles
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Circle Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of circles."
     End Sub
@@ -175,7 +175,7 @@ Public Class Draw_Line
     Public updateFrequency = 30
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Line Count", 1, 255, 1)
         ocvb.desc = "Draw the requested number of Lines."
     End Sub
@@ -198,7 +198,7 @@ Public Class Draw_Polygon
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Poly Count", 1, 255, 1)
         ocvb.desc = "Draw Polygon figures"
         label2 = "Convex Hull for the same polygon"
@@ -295,7 +295,7 @@ Public Class Draw_SymmetricalShapes
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 4)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of points", 200, 1000, 500)
         sliders.setupTrackBar(1, "Radius 1", 1, ocvb.color.Rows / 2, ocvb.color.Rows / 4)
         sliders.setupTrackBar(2, "Radius 2", 1, ocvb.color.Rows / 2, ocvb.color.Rows / 8)
@@ -455,7 +455,7 @@ Public Class Draw_Arc
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(7 - 1)
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Clearance from image edge (margin size)", 5, ocvb.color.Width / 8, ocvb.color.Width / 16)
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Draw Full Ellipse"

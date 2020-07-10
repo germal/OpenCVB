@@ -71,7 +71,7 @@ Public Class Blob_Detector_CS
         check.Box(4).Text = "FilterByColor"
         check.Box(4).Checked = True ' filter by color...
 
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "min Threshold", 0, 255, 100)
         sliders.setupTrackBar(1, "max Threshold", 0, 255, 255)
         sliders.setupTrackBar(2, "Threshold Step", 1, 50, 5)

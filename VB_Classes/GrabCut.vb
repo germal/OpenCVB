@@ -7,7 +7,7 @@ Public Class GrabCut_Basics
         setCaller(ocvb)
         contours = New Contours_Depth(ocvb)
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Erode iterations", 1, 20, 3)
         sliders.setupTrackBar(1, "Erode kernel size", 1, 21, 3)
 

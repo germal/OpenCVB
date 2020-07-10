@@ -9,7 +9,7 @@ Public Class LineDetector_Basics
     Dim ld As cv.XImgProc.FastLineDetector
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "LineDetector thickness of line", 1, 20, 2)
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
@@ -268,7 +268,7 @@ Public Class LineDetector_3D_LongestLine
         setCaller(ocvb)
         lines = New lineDetector_FLD_CPP(ocvb)
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
         sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
 
@@ -302,7 +302,7 @@ Public Class LineDetector_3D_FLD_MT
         setCaller(ocvb)
         lines = New lineDetector_FLD_CPP(ocvb)
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
         sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
 
@@ -338,7 +338,7 @@ Public Class LineDetector_3D_FitLineZ
         setCaller(ocvb)
         linesFLD = New lineDetector_FLD_CPP(ocvb)
 
-        sliders.Setup(ocvb, caller, 3)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 3)
         sliders.setupTrackBar(1, "Point count threshold", 5, 500, 50)
         sliders.setupTrackBar(2, "Update frequency (in frames)", 1, 100, 1)

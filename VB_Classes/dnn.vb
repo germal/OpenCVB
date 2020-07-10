@@ -85,7 +85,7 @@ Public Class DNN_Basics
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "dnn Scale Factor", 1, 10000, 78)
         sliders.setupTrackBar(1, "dnn MeanVal", 1, 255, 127)
 
