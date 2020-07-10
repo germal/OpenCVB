@@ -488,6 +488,7 @@ Public Class Depth_Uncertainty
         setCaller(ocvb)
         retina = New Retina_Basics_CPP(ocvb)
 
+        sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "Uncertainty threshold", 1, 255, 100)
 
         label2 = "Mask of areas with unstable depth"
