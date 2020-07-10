@@ -112,7 +112,6 @@ Public Class Delaunay_GoodFeatures
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         features = New Features_GoodFeatures(ocvb)
-        features.sliders.setupTrackBar(3, "Image mix percentage X100", 0, 100, 50)
         label2 = "Voronoi facets of delauney good features"
         ocvb.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
