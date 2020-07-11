@@ -6,8 +6,8 @@ Public Class OptionsSliders
     Public sliders() As TrackBar
     Public sLabels() As Label
     Public countLabel() As Label
-    Dim heightSetting = 260
-    Dim widthSetting = 630
+    Dim defaultHeight = 260
+    Dim defaultWidth = 630
     Public Sub Setup(ocvb As AlgorithmData, caller As String, Optional count As Integer = 4)
         ReDim sliders(count - 1)
         ReDim sLabels(count - 1)
@@ -35,14 +35,14 @@ Public Class OptionsSliders
             FlowLayoutPanel1.SetFlowBreak(countLabel(i), True)
         Next
         If count > 4 Then
-            heightSetting = count * 58 ' add space for the additional unexpected sliders.
-            FlowLayoutPanel1.Height = heightSetting - 30
+            defaultHeight = count * 58 ' add space for the additional unexpected sliders.
+            FlowLayoutPanel1.Height = defaultHeight - 30
         End If
         If ocvb.parms.ShowOptions Then
             If ocvb.suppressOptions = False Then Me.Show()
         End If
     End Sub
-    Private Sub setTrackbar(index As Integer, label As String, min As Integer, max As Integer, value As Integer)
+    Public Sub setupTrackBar(index As Integer, label As String, min As Integer, max As Integer, value As Integer)
         sLabels(index).Text = label
         sliders(index).Minimum = min
         sliders(index).Maximum = max
@@ -52,15 +52,12 @@ Public Class OptionsSliders
         countLabel(index).Text = CStr(value)
         countLabel(index).Visible = True
     End Sub
-    Public Sub setupTrackBar(index As Integer, label As String, min As Integer, max As Integer, value As Integer)
-        setTrackbar(index, label, min, max, value)
-    End Sub
     Private Sub TrackBar_ValueChanged(sender As Object, e As EventArgs)
         countLabel(sender.tag).Text = CStr(sliders(sender.tag).Value)
     End Sub
     Private Sub OptionsSlider_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Width = widthSetting
-        Me.Height = heightSetting
+        Me.Width = defaultWidth
+        Me.Height = defaultHeight
         Me.SetDesktopLocation(applocation.Left + slidersOffset.X, applocation.Top + applocation.Height + slidersOffset.Y)
         slidersOffset.X += offsetIncr
         slidersOffset.Y += offsetIncr

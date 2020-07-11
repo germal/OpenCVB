@@ -1,8 +1,7 @@
-# https://github.com/anopara/genetic-drawing
-# painterly
 import cv2
 import numpy as np
 import time
+import matplotlib.pyplot as plt
 import string
 import random
 
@@ -17,9 +16,9 @@ class GeneticDrawing:
         self.sampling_mask = None
         
         #start with an empty black img
-        self.imgBuffer = [np.zeros((self.img_grey.shape[0], self.img_grey.shape[1]), np.uint8)]
+        self.imgBuffer = np.zeros((self.img_grey.shape[0], self.img_grey.shape[1]), np.uint8)
         
-    def generate(self, stages=10, generations=100, brushstrokesCount=10):
+    def generate(self, stages=10, generations=100, brushstrokesCount=10, show_progress_imgs=True):
         for s in range(stages):
             #initialize new DNA
             if self.sampling_mask is not None:
@@ -29,24 +28,29 @@ class GeneticDrawing:
             self.myDNA = DNA(self.img_grey.shape, 
                              self.img_grads, 
                              self.calcBrushRange(s, stages), 
-                             canvas=self.imgBuffer[-1], 
+                             canvas=self.imgBuffer, 
                              sampling_mask=sampling_mask)
             self.myDNA.initRandom(self.img_grey, brushstrokesCount, self.seed + time.time() + s)
             #evolve DNA
             for g in range(generations):
                 self.myDNA.evolveDNASeq(self.img_grey, self.seed + time.time() + g)
-                print("Stage ", s+1, ". Generation ", g+1, "/", generations)
-                cv2.imshow("cached image", self.myDNA.get_cached_image())
+                print("Stage ", s+1, ". Generation ", g+1, "/", generations, "   error = ", self.myDNA.cached_error)
+                images = np.empty((self.img_grey.shape[0], self.img_grey.shape[1] * 2), self.img_grey.dtype)
+                images = cv2.hconcat([self.img_grey, self.myDNA.cached_image])
+                cv2.imshow("original + cached image", images)
                 cv2.waitKey(1)
-            self.imgBuffer.append(self.myDNA.get_cached_image())
- 
-        return self.myDNA.get_cached_image()
+
+            self.imgBuffer = self.myDNA.cached_image
+        return self.myDNA.cached_image
     
     def calcBrushRange(self, stage, total_stages):
         return [self._calcBrushSize(self.brushesRange[0], stage, total_stages), self._calcBrushSize(self.brushesRange[1], stage, total_stages)]
         
     def set_brush_range(self, ranges):
         self.brushesRange = ranges
+        
+    def set_sampling_mask(self, img_path):
+        self.sampling_mask = cv2.cvtColor(cv2.imread(img_path),cv2.COLOR_BGR2GRAY)
         
     def create_sampling_mask(self, s, stages):
         percent = 0.2
@@ -89,7 +93,6 @@ class GeneticDrawing:
             mag = cv2.GaussianBlur(mag,(0,0), w, cv2.BORDER_DEFAULT)
         #ensure range from 0-255 (mostly for visual debugging, since in sampling we will renormalize it anyway)
         scale = 255.0/mag.max()
-        
         return mag*scale
         
     
@@ -142,11 +145,6 @@ class DNA:
     
     def gen_new_positions(self):
         if self.sampling_mask is not None:
-            rows = self.sampling_mask.shape[0]
-            cols = self.sampling_mask.shape[1]
-            test = self.sampling_mask[0:rows, 0:cols].astype(np.uint8)
-            cv2.imshow("test", test)
-            #cv2.waitKey(1)
             pos = util_sample_from_img(self.sampling_mask)
             posY = pos[0][0]
             posX = pos[1][0]
@@ -155,15 +153,14 @@ class DNA:
             posX = int(random.randrange(0, self.bound[1]))
         return [posY, posX]
      
-    def initRandom(self, img_grey, count, seed):
+    def initRandom(self, target_image, count, seed):
         #initialize random DNA sequence
         for i in range(count):
             #random color
             color = random.randrange(0, 255)
             #random size
             random.seed(seed-i+4)
-            test = random.random()
-            size = test*(self.maxSize-self.minSize) + self.minSize
+            size = random.random()*(self.maxSize-self.minSize) + self.minSize
             #random pos
             posY, posX = self.gen_new_positions()
             #random rotation
@@ -182,15 +179,9 @@ class DNA:
             #append data
             self.DNASeq.append([color, posY, posX, size, rotation, brushNumber])
         #calculate cache error and image
-        self.cached_error, self.cached_image = self.calcTotalError(img_grey)
+        self.cached_error, self.cached_image = self.calcTotalError(self.DNASeq, target_image)
         
-    def get_cached_image(self):
-        return self.cached_image
-            
-    def calcTotalError(self, inImg):
-        return self.__calcError(self.DNASeq, inImg)
-        
-    def __calcError(self, DNASeq, inImg):
+    def calcTotalError(self, DNASeq, inImg):
         #draw the DNA
         myImg = self.drawAll(DNASeq)
 
@@ -200,10 +191,20 @@ class DNA:
         totalDiff = cv2.add(diff1, diff2)
         totalDiff = np.sum(totalDiff)
         return (totalDiff, myImg)
+            
+    def draw(self):
+        myImg = self.drawAll(self.DNASeq)
+        return myImg
         
     def drawAll(self, DNASeq):
+        #set image to pre generated
+        if self.canvas is None: #if we do not have an image specified
+            inImg = np.zeros((self.bound[0], self.bound[1]), np.uint8)
+        else:
+            inImg = np.copy(self.canvas)
+        #apply padding
         p = self.padding
-        inImg = cv2.copyMakeBorder(self.canvas, p,p,p,p,cv2.BORDER_CONSTANT,value=[0,0,0])
+        inImg = cv2.copyMakeBorder(inImg, p,p,p,p,cv2.BORDER_CONSTANT,value=[0,0,0])
         #draw every DNA
         for i in range(len(DNASeq)):
             inImg = self.__drawDNA(DNASeq[i], inImg)
@@ -236,6 +237,7 @@ class DNA:
         myClr[:, :] = color
 
         #find ROI
+        inImg_rows, inImg_cols = inImg.shape
         y_min = int(posY - rows/2)
         y_max = int(posY + (rows - rows/2))
         x_min = int(posX - cols/2)
@@ -269,8 +271,6 @@ class DNA:
             print('bg: ', background.shape)
             print('alpha: ', alpha.shape)
         
-        cv2.imshow("__drawDNA inImg", inImg)
-        cv2.waitKey(1)
         return inImg
 
         
@@ -298,7 +298,7 @@ class DNA:
             #move it the change list
             changeIndices.append(indexOptions.pop(indexToTake))
         #mutate selected items
-        #np.sort(changeIndices)
+        np.sort(changeIndices)
         changeIndices[:] = changeIndices[::-1]
         for changeIndex in changeIndices:
             if changeIndex == 0:# if color
@@ -322,29 +322,28 @@ class DNA:
                 #print('new brush: ', child[5])
         #if child performs better replace parent
         #print('---\n', 'newchild: \n', child)
-        child_error, child_img = self.__calcError(DNASeqCopy, inImg)
+        child_error, child_img = self.calcTotalError(DNASeqCopy, inImg)
         if  child_error < self.cached_error:
             #print('mutation!', changeIndices)
             self.DNASeq[index] = child[:]
             self.cached_image = child_img
             self.cached_error = child_error
-            cv2.imshow("child_img", child_img)
-            cv2.waitKey(1)
         
     def evolveDNASeq(self, inImg, seed):
         for i in range(len(self.DNASeq)):
             self.__evolveDNA(i, inImg, seed)
 
+
 if __name__ == '__main__':
     #load the example image and set the generator for 100 stages with 20 generations each
     gen = GeneticDrawing('../../Data/GeneticDrawingExample.jpg', seed=time.time())
-    out = gen.generate(10, 20)
+    out = gen.generate(100, 20)
     
     #load a custom mask and set a smaller brush size for finer details
-    #gen.sampling_mask = cv2.cvtColor(cv2.imread("../../Data/GeneticDrawingMask.jpg"), cv2.COLOR_BGR2GRAY)
-    #gen.brushesRange = [[0.05, 0.1], [0.1, 0.2]]
-    ##keep drawing on top of our previous result
-    #out = gen.generate(40, 30)
+    gen.sampling_mask = cv2.cvtColor(cv2.imread("../../Data/GeneticDrawingMask.jpg"), cv2.COLOR_BGR2GRAY)
+    gen.brushesRange = [[0.05, 0.1], [0.1, 0.2]]
+    #keep drawing on top of our previous result
+    out = gen.generate(40, 30)
     #save all the images from the image buffer
     #if not os.path.exists('out'):
     #    os.mkdir("out")
@@ -354,3 +353,4 @@ if __name__ == '__main__':
     # cv2.imwrite("out/final.png', out)
     cv2.imshow("Final Image", out)
     cv2.waitKey()
+

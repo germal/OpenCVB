@@ -8,6 +8,10 @@ Public Structure DNAentry
     Dim rotation As Single
     Dim brushNumber As Integer
 End Structure
+
+
+
+' https://github.com/anopara/genetic-drawing
 Public Class GeneticDrawing_Basics
     Inherits ocvbClass
     Dim samplingMask As cv.Mat
@@ -17,7 +21,7 @@ Public Class GeneticDrawing_Basics
     Dim minSize As Single
     Dim maxSize As Single
     Dim brushes(4 - 1) As cv.Mat
-    Dim DNAseq As New List(Of DNAentry)
+    Dim DNAseq() As DNAentry
     Dim totalError As Single
     Dim brushSide = 300
     Dim padding As Integer
@@ -26,8 +30,10 @@ Public Class GeneticDrawing_Basics
     Dim generationTotal As Integer
     Dim stageTotal As Integer
     Dim cachedImage As New cv.Mat
+    Dim canvas As cv.Mat
+    Dim imgBuffer As cv.Mat
     Dim mats As Mat_4to1
-    Dim random As Random_CustomHistogram
+    Dim changes As Integer
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
@@ -42,24 +48,21 @@ Public Class GeneticDrawing_Basics
 
         mats = New Mat_4to1(ocvb)
 
-        random = New Random_CustomHistogram(ocvb)
-        random.random.outputRandom = New cv.Mat(1, 1, cv.MatType.CV_32S, 0)
-        random.hist.plotHist.backColor = cv.Scalar.White
-
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of Generations", 1, 100, 20)
         sliders.setupTrackBar(1, "Number of Stages", 1, 200, 100)
-        sliders.setupTrackBar(2, "Brushstroke count ", 1, 100, 10)
+        sliders.setupTrackBar(2, "Brushstroke count per generation", 1, 100, 10)
         stageTotal = sliders.sliders(1).Value
 
         label1 = "(clkwise) img, smaplingMask, histogram, magnitude"
         label2 = "Current result"
         ocvb.desc = "Create a painting from the current video input using a genetic algorithm - painterly"
     End Sub
-    Private Function runDNAseq() As cv.Mat
+    Private Function runDNAseq(dna() As DNAentry) As cv.Mat
         Dim nextImage = New cv.Mat(New cv.Size(dst1.Width + 2 * padding, dst1.Height + 2 * padding), cv.MatType.CV_8U, 0)
-        nextImage(New cv.Rect(padding, padding, dst2.Width, dst2.Height)) = dst2.Clone()
-        For Each d In DNAseq
+        nextImage(New cv.Rect(padding, padding, canvas.Width, canvas.Height)) = canvas
+        For i = 0 To dna.Count - 1
+            Dim d = dna(i)
             Dim brushImg = brushes(d.brushNumber)
 
             Dim br = brushImg.Resize(New cv.Size(brushImg.Width * d.size + 1, brushImg.Height * d.size + 1))
@@ -78,7 +81,7 @@ Public Class GeneticDrawing_Basics
             cv.Cv2.Add(foreground, background, foreground)
             foreground.ConvertTo(nextImage(rect), cv.MatType.CV_8U)
         Next
-        Return nextImage(New cv.Rect(padding, padding, dst2.Width, dst2.Height))
+        Return nextImage(New cv.Rect(padding, padding, canvas.Width, canvas.Height))
     End Function
     Private Function calcBrushSize(range As cv.Vec2f) As Single
         Dim t = stage / Math.Max(stageTotal - 1, 1)
@@ -93,12 +96,13 @@ Public Class GeneticDrawing_Basics
         Return diff1.Sum()
     End Function
     Private Sub startNewStage()
-        DNAseq.Clear()
+        canvas = imgBuffer
+        Dim brushstrokeCount = sliders.sliders(2).Value
+        ReDim DNAseq(brushstrokeCount - 1)
         minSize = calcBrushSize(minBrush)
         maxSize = calcBrushSize(maxBrush)
         padding = CInt(brushSide * maxSize / 2 + 5)
 
-        Dim brushstrokeCount = sliders.sliders(2).Value
         For i = 0 To brushstrokeCount - 1
             Dim e = New DNAentry
             e.color = msRNG.Next(0, 255)
@@ -108,17 +112,20 @@ Public Class GeneticDrawing_Basics
             Dim localAngle = gradient.angle.Get(Of Single)(e.pt.Y, e.pt.X) + 90
             e.rotation = (msRNG.Next(-180, 180) * (1 - localMagnitude) + localAngle)
             e.brushNumber = CInt(msRNG.Next(0, brushes.Length - 1))
-            DNAseq.Add(e)
+            DNAseq(i) = e
         Next
 
-        dst2 = runDNAseq()
-        totalError = calculateError(dst2)
+        mats.mat(3) = runDNAseq(DNAseq)
+        totalError = calculateError(mats.mat(3))
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         stageTotal = sliders.sliders(1).Value
         If stage >= stageTotal Then Exit Sub ' request is complete...
         If generationTotal <> sliders.sliders(0).Value Or stageTotal <> sliders.sliders(1).Value Or check.Box(0).Checked Then
             dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+            cachedImage = dst2.Clone
+            canvas = dst2.Clone
+            imgBuffer = dst2.Clone
             check.Box(0).Checked = False
             generationTotal = sliders.sliders(0).Value
             stageTotal = sliders.sliders(1).Value
@@ -134,10 +141,6 @@ Public Class GeneticDrawing_Basics
             gradient.src = mats.mat(0)
             gradient.Run(ocvb)
             mats.mat(2) = gradient.magnitude.ConvertScaleAbs(255)
-
-            random.src = src
-            random.Run(ocvb) ' create a custom random number generator that reflects the histogram of the src image.
-            mats.mat(3) = random.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
             startNewStage()
         End If
@@ -157,39 +160,49 @@ Public Class GeneticDrawing_Basics
 
         ' evolve!
         Dim maxOption = 5
-        Dim nextDNA = DNAseq
-        Dim childImg As New cv.Mat
+        Dim nextDNA(DNAseq.Count - 1) As DNAentry
         For i = 0 To DNAseq.Count - 1
-            Dim child = DNAseq.ElementAt(i)
-            Dim changeCount = msRNG.Next(0, maxOption)
+            nextDNA(i) = DNAseq(i)
+        Next
+        Dim childImg As New cv.Mat
+        Dim saveTotalError = totalerror
+        For i = 0 To nextDNA.Count - 1
+            Dim changeCount = msRNG.Next(0, maxOption) + 1
             For j = 0 To changeCount - 1
                 Select Case msRNG.Next(0, maxOption)
                     Case 0
-                        child.color = CInt(msRNG.Next(0, 255))
+                        nextDNA(i).color = CInt(msRNG.Next(0, 255))
                     Case 1, 2
-                        child.pt = New cv.Point(msRNG.Next(src.Width), msRNG.Next(src.Height))
+                        nextDNA(i).pt = New cv.Point(msRNG.Next(src.Width), msRNG.Next(src.Height))
                     Case 3
-                        child.size = msRNG.NextDouble() * (maxSize - minSize) + minSize
+                        nextDNA(i).size = msRNG.NextDouble() * (maxSize - minSize) + minSize
                     Case 4
-                        Dim localMagnitude = gradient.magnitude.Get(Of Single)(child.pt.Y, child.pt.X)
-                        Dim localAngle = gradient.angle.Get(Of Single)(child.pt.Y, child.pt.X) + 90
-                        child.rotation = (msRNG.Next(-180, 180) * (1 - localMagnitude) + localAngle)
+                        Dim localMagnitude = gradient.magnitude.Get(Of Single)(nextDNA(i).pt.Y, nextDNA(i).pt.X)
+                        Dim localAngle = gradient.angle.Get(Of Single)(nextDNA(i).pt.Y, nextDNA(i).pt.X) + 90
+                        nextDNA(i).rotation = (msRNG.Next(-180, 180) * (1 - localMagnitude) + localAngle)
                     Case Else
-                        child.brushNumber = CInt(msRNG.Next(0, brushes.Length - 1))
+                        nextDNA(i).brushNumber = CInt(msRNG.Next(0, brushes.Length - 1))
                 End Select
             Next
-            childImg = runDNAseq()
+
+            childImg = runDNAseq(nextDNA)
             Dim nextError = calculateError(childImg)
             If nextError < totalError Then
-                nextDNA.RemoveAt(i)
-                nextDNA.Add(child)
                 totalError = nextError
+                changes += 1
+            Else
+                nextDNA(i) = DNAseq(i)
             End If
         Next
 
-        DNAseq = nextDNA
+        If saveTotalError <> totalError Then
+            cachedImage = runDNAseq(nextDNA)
+            dst2 = cachedImage
+            DNAseq = nextDNA
+        End If
         generation += 1
         If generation = generationTotal Then
+            imgBuffer = cachedImage
             generation = 0
             samplingMask = Nothing
             stage += 1
@@ -198,6 +211,6 @@ Public Class GeneticDrawing_Basics
 
         mats.Run(ocvb)
         dst1 = mats.dst1
-        label2 = " stage " + CStr(stage) + " Generation " + CStr(generation)
+        label2 = " stage " + CStr(stage) + " Gen " + Format(generation, "00") + " changes = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
     End Sub
 End Class
