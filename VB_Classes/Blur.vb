@@ -115,6 +115,7 @@ Public Class Blur_PlusHistogram
 
         myhist = New Histogram_EqualizeGray(ocvb)
 
+        label2 = "Top is before, Bottom is after"
         ocvb.desc = "Compound algorithms Blur and Histogram"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -133,7 +134,6 @@ Public Class Blur_PlusHistogram
         mat2to1.Run(ocvb)
         dst2 = mat2to1.dst1
         dst1 = myhist.src
-        label2 = "Top is before, Bottom is after"
     End Sub
 End Class
 

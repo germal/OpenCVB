@@ -14,7 +14,6 @@ End Structure
 ' https://github.com/anopara/genetic-drawing
 Public Class GeneticDrawing_Basics
     Inherits ocvbClass
-    Dim samplingMask As cv.Mat
     Dim gradient As Gradient_CartToPolar
     Dim minBrush = New cv.Vec2f(0.1, 0.3)
     Dim maxBrush = New cv.Vec2f(0.3, 0.7)
@@ -23,17 +22,15 @@ Public Class GeneticDrawing_Basics
     Dim brushes(4 - 1) As cv.Mat
     Dim DNAseq() As DNAentry
     Dim totalError As Single
-    Dim brushSide = 300
+    Dim brushSize = 300
     Dim padding As Integer
     Dim stage As Integer
     Dim generation As Integer
     Dim generationTotal As Integer
     Dim stageTotal As Integer
-    Dim cachedImage As New cv.Mat
     Dim canvas As cv.Mat
     Dim imgBuffer As cv.Mat
     Dim mats As Mat_4to1
-    Dim changes As Integer
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
@@ -54,7 +51,7 @@ Public Class GeneticDrawing_Basics
         sliders.setupTrackBar(2, "Brushstroke count per generation", 1, 100, 10)
         stageTotal = sliders.trackbar(1).Value
 
-        label1 = "(clkwise) img, samplingMask, histogram, magnitude"
+        label1 = "(clkwise) original, tbd, canvas, magnitude"
         label2 = "Current result"
         ocvb.desc = "Create a painting from the current video input using a genetic algorithm - painterly"
     End Sub
@@ -101,7 +98,7 @@ Public Class GeneticDrawing_Basics
         ReDim DNAseq(brushstrokeCount - 1)
         minSize = calcBrushSize(minBrush)
         maxSize = calcBrushSize(maxBrush)
-        padding = CInt(brushSide * maxSize / 2 + 5)
+        padding = CInt(brushSize * maxSize / 2 + 5)
 
         For i = 0 To brushstrokeCount - 1
             Dim e = New DNAentry
@@ -123,19 +120,18 @@ Public Class GeneticDrawing_Basics
         If stage >= stageTotal Then Exit Sub ' request is complete...
         If generationTotal <> sliders.trackbar(0).Value Or stageTotal <> sliders.trackbar(1).Value Or check.Box(0).Checked Then
             dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
-            cachedImage = dst2.Clone
             canvas = dst2.Clone
             imgBuffer = dst2.Clone
-            check.Box(0).Checked = False
             generationTotal = sliders.trackbar(0).Value
             stageTotal = sliders.trackbar(1).Value
             generation = 0
             stage = 0
-            samplingMask = Nothing
 
             If standalone Then
-                src = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size())
+                src = If(check.Box(0).Checked, ocvb.color.Clone, cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
             End If
+            check.Box(0).Checked = False
+
             src = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
             mats.mat(0) = src
             gradient.src = mats.mat(0)
@@ -145,27 +141,12 @@ Public Class GeneticDrawing_Basics
             startNewStage()
         End If
 
-        If samplingMask IsNot Nothing Then
-            samplingMask = Nothing
-        Else
-            Dim startStage = 0 ' stageTotal * 0.2
-            Dim blurPercent = (1.0 - (stage - startStage) / Math.Max(stageTotal - startStage - 1, 1)) * 0.25 + 0.005
-            Dim kernelSize = CInt(blurPercent * src.Width)
-            If kernelSize Mod 2 = 0 Then kernelSize += 1
-            samplingMask = New cv.Mat
-            If kernelSize > 1 Then cv.Cv2.GaussianBlur(gradient.magnitude, samplingMask, New cv.Size(kernelSize, kernelSize), 0, 0)
-            samplingMask = samplingMask.Normalize(255)
-            mats.mat(1) = samplingMask.ConvertScaleAbs(255)
-        End If
-
         ' evolve!
-        Dim maxOption = 5
         Dim nextDNA(DNAseq.Count - 1) As DNAentry
         For i = 0 To DNAseq.Count - 1
             nextDNA(i) = DNAseq(i)
         Next
-        Dim childImg As New cv.Mat
-        Dim saveTotalError = totalerror
+        Dim changes As Integer, childImg As New cv.Mat, maxOption = 5, saveTotalError = totalError, bestError As Single
         For i = 0 To nextDNA.Count - 1
             Dim changeCount = msRNG.Next(0, maxOption) + 1
             For j = 0 To changeCount - 1
@@ -188,23 +169,27 @@ Public Class GeneticDrawing_Basics
             childImg = runDNAseq(nextDNA)
             Dim nextError = calculateError(childImg)
             If nextError < totalError Then
-                totalError = nextError
+                bestError = nextError
+                Console.WriteLine("besterror = " + CStr(bestError))
                 changes += 1
             Else
                 nextDNA(i) = DNAseq(i)
             End If
         Next
 
-        If saveTotalError <> totalError Then
-            cachedImage = runDNAseq(nextDNA)
-            dst2 = cachedImage
+        If changes Then
+            totalError = bestError
+            dst2 = runDNAseq(nextDNA)
             DNAseq = nextDNA
         End If
+
+        If saveTotalError < totalError Then saveTotalError = saveTotalError
+        saveTotalError = totalError
+
         generation += 1
         If generation = generationTotal Then
-            imgBuffer = cachedImage
+            imgBuffer = dst2
             generation = 0
-            samplingMask = Nothing
             stage += 1
             startNewStage()
         End If
