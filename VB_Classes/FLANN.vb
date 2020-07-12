@@ -62,7 +62,7 @@ Public Class FLANN_Basics
         random.Run(ocvb) ' fill result1 with random points in x and y range of the image.
         Dim features As New cv.Mat(random.Points2f.Length, 2, cv.MatType.CV_32F, random.Points2f)
 
-        Dim knnCount = sliders.sliders(0).Value
+        Dim knnCount = sliders.trackbar(0).Value
         dst1.SetTo(0)
         ' knnSearch
         Using nnIndex As New cv.Flann.Index(features, New cv.Flann.KDTreeIndexParams(4))

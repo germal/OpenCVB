@@ -30,24 +30,24 @@ Public Class MSER_Basics
         ocvb.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim delta = sliders.sliders(0).Value
-        Dim minArea = sliders.sliders(1).Value
-        Dim maxArea = sliders.sliders(2).Value
-        Dim maxVariation = sliders.sliders(3).Value / 100
+        Dim delta = sliders.trackbar(0).Value
+        Dim minArea = sliders.trackbar(1).Value
+        Dim maxArea = sliders.trackbar(2).Value
+        Dim maxVariation = sliders.trackbar(3).Value / 100
 
-        Dim minDiversity = sliders.sliders(4).Value / 100
-        Dim maxEvolution = sliders.sliders(5).Value
-        Dim areaThreshold = sliders.sliders(6).Value / 100
-        Dim minMargin = sliders.sliders(7).Value / 1000
+        Dim minDiversity = sliders.trackbar(4).Value / 100
+        Dim maxEvolution = sliders.trackbar(5).Value
+        Dim areaThreshold = sliders.trackbar(6).Value / 100
+        Dim minMargin = sliders.trackbar(7).Value / 1000
 
-        Dim edgeBlurSize = sliders.sliders(8).Value
+        Dim edgeBlurSize = sliders.trackbar(8).Value
         If edgeBlurSize Mod 2 = 0 Then edgeBlurSize += 1 ' must be odd.
 
         Dim changedParms As Boolean
         For i = 0 To saveParms.Length - 1
-            Dim nextVal = Choose(i + 1, sliders.sliders(0).Value, sliders.sliders(1).Value, sliders.sliders(2).Value, sliders.sliders(3).Value,
-                                          sliders.sliders(4).Value, sliders.sliders(5).Value, sliders.sliders(6).Value, sliders.sliders(7).Value,
-                                          sliders.sliders(8).Value, check.Box(0).Checked)
+            Dim nextVal = Choose(i + 1, sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value, sliders.trackbar(3).Value,
+                                          sliders.trackbar(4).Value, sliders.trackbar(5).Value, sliders.trackbar(6).Value, sliders.trackbar(7).Value,
+                                          sliders.trackbar(8).Value, check.Box(0).Checked)
             If nextVal <> saveParms(i) Then changedParms = True
             saveParms(i) = nextVal
         Next
@@ -129,7 +129,7 @@ Public Class MSER_TestSynthetic
     Dim synth As MSER_Synthetic
     Private Function testSynthetic(ocvb As AlgorithmData, img As cv.Mat, pass2Only As Boolean, delta As Int32) As String
         mser.check.Box(0).Checked = pass2Only
-        mser.sliders.sliders(0).Value = delta
+        mser.sliders.trackbar(0).Value = delta
         mser.src = img
         mser.Run(ocvb)
 
@@ -148,11 +148,11 @@ Public Class MSER_TestSynthetic
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         mser = New MSER_Basics(ocvb)
-        mser.sliders.sliders(0).Value = 10
-        mser.sliders.sliders(1).Value = 100
-        mser.sliders.sliders(2).Value = 5000
-        mser.sliders.sliders(3).Value = 2
-        mser.sliders.sliders(4).Value = 0
+        mser.sliders.trackbar(0).Value = 10
+        mser.sliders.trackbar(1).Value = 100
+        mser.sliders.trackbar(2).Value = 5000
+        mser.sliders.trackbar(3).Value = 2
+        mser.sliders.trackbar(4).Value = 0
         mser.check.Box(1).Checked = False ' the grayscale result is quite unimpressive.
 
         synth = New MSER_Synthetic(ocvb)
@@ -219,7 +219,7 @@ Public Class MSER_Contours
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         mser = New MSER_Basics(ocvb)
-        mser.sliders.sliders(1).Value = 4000
+        mser.sliders.trackbar(1).Value = 4000
         ocvb.desc = "Use MSER but show the contours of each region."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

@@ -12,9 +12,9 @@ Public Class Stitch_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mats As New List(Of cv.Mat)
-        Dim imageCount = sliders.sliders(0).Value
-        Dim width = sliders.sliders(1).Value
-        Dim height = sliders.sliders(2).Value
+        Dim imageCount = sliders.trackbar(0).Value
+        Dim width = sliders.trackbar(1).Value
+        Dim height = sliders.trackbar(2).Value
         dst1 = src.Clone()
         For i = 0 To imageCount - 1
             Dim x1 = CInt(msRNG.next(0, src.Width - width))

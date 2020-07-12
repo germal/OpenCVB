@@ -94,12 +94,12 @@ Public Class OpticalFlow_DenseOptions
         ocvb.desc = "Use dense optical flow algorithm options"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        pyrScale = sliders.sliders(0).Value / sliders.sliders(0).Maximum
-        levels = sliders.sliders(1).Value
-        winSize = sliders.sliders(2).Value
-        iterations = sliders.sliders(3).Value
+        pyrScale = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum
+        levels = sliders.trackbar(1).Value
+        winSize = sliders.trackbar(2).Value
+        iterations = sliders.trackbar(3).Value
         If winSize Mod 2 = 0 Then winSize += 1
-        polyN = sliders.sliders(4).Value
+        polyN = sliders.trackbar(4).Value
         If polyN Mod 2 = 0 Then polyN += 1
         polySigma = 1.5
         If polyN <= 5 Then polySigma = 1.1
@@ -111,7 +111,7 @@ Public Class OpticalFlow_DenseOptions
                 Exit For
             End If
         Next
-        outputScaling = sliders.sliders(5).Value
+        outputScaling = sliders.trackbar(5).Value
     End Sub
 End Class
 
@@ -155,12 +155,12 @@ Public Class OpticalFlow_DenseBasics_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = ocvb.color.Cols / 4
-        grid.sliders.sliders(1).Value = ocvb.color.Rows / 4
-        grid.sliders.sliders(2).Value = 5
+        grid.sliders.trackbar(0).Value = ocvb.color.Cols / 4
+        grid.sliders.trackbar(1).Value = ocvb.color.Rows / 4
+        grid.sliders.trackbar(2).Value = 5
 
         flow = New OpticalFlow_DenseOptions(ocvb)
-        flow.sliders.sliders(0).Value = 75
+        flow.sliders.trackbar(0).Value = 75
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 1000)
@@ -174,7 +174,7 @@ Public Class OpticalFlow_DenseBasics_MT
             grid.Run(ocvb)
             flow.Run(ocvb)
 
-            Dim CCthreshold = CSng(sliders.sliders(0).Value / sliders.sliders(0).Maximum)
+            Dim CCthreshold = CSng(sliders.trackbar(0).Value / sliders.trackbar(0).Maximum)
             Parallel.For(0, grid.borderList.Count,
             Sub(i)
                 Dim broi = grid.borderList(i)

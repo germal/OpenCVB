@@ -127,7 +127,7 @@ Module OpenGL_Sliders_Module
         sliders.Setup(ocvb, caller, 15)
 
         sliders.setupTrackBar(0, "OpenGL FOV", 1, 180, 150)
-        If ocvb.parms.cameraIndex = D435i Then sliders.sliders(0).Value = 135
+        If ocvb.parms.cameraIndex = D435i Then sliders.trackbar(0).Value = 135
         sliders.setupTrackBar(1, "OpenGL yaw (degrees)", -180, 180, -3)
         sliders.setupTrackBar(2, "OpenGL pitch (degrees)", -180, 180, 3)
         sliders.setupTrackBar(3, "OpenGL roll (degrees)", -180, 180, 0)
@@ -161,23 +161,23 @@ Public Class OpenGL_Options
         label1 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        OpenGL.FOV = sliders.sliders(0).Value
-        OpenGL.yaw = sliders.sliders(1).Value
-        OpenGL.pitch = sliders.sliders(2).Value
-        OpenGL.roll = sliders.sliders(3).Value
+        OpenGL.FOV = sliders.trackbar(0).Value
+        OpenGL.yaw = sliders.trackbar(1).Value
+        OpenGL.pitch = sliders.trackbar(2).Value
+        OpenGL.roll = sliders.trackbar(3).Value
 
-        OpenGL.zNear = sliders.sliders(4).Value
-        OpenGL.zFar = sliders.sliders(5).Value
-        OpenGL.pointSize = sliders.sliders(6).Value
-        OpenGL.zTrans = sliders.sliders(7).Value / 100
+        OpenGL.zNear = sliders.trackbar(4).Value
+        OpenGL.zFar = sliders.trackbar(5).Value
+        OpenGL.pointSize = sliders.trackbar(6).Value
+        OpenGL.zTrans = sliders.trackbar(7).Value / 100
 
-        OpenGL.eye.Item0 = sliders.sliders(8).Value
-        OpenGL.eye.Item1 = sliders.sliders(9).Value
-        OpenGL.eye.Item2 = sliders.sliders(10).Value
+        OpenGL.eye.Item0 = sliders.trackbar(8).Value
+        OpenGL.eye.Item1 = sliders.trackbar(9).Value
+        OpenGL.eye.Item2 = sliders.trackbar(10).Value
 
-        OpenGL.scaleXYZ.Item0 = sliders.sliders(11).Value
-        OpenGL.scaleXYZ.Item1 = sliders.sliders(12).Value
-        OpenGL.scaleXYZ.Item2 = sliders.sliders(13).Value
+        OpenGL.scaleXYZ.Item0 = sliders.trackbar(11).Value
+        OpenGL.scaleXYZ.Item1 = sliders.trackbar(12).Value
+        OpenGL.scaleXYZ.Item2 = sliders.trackbar(13).Value
 
         OpenGL.src = src
         OpenGL.pointCloudInput = ocvb.pointCloud
@@ -220,9 +220,9 @@ Public Class OpenGL_IMU
         ocvb.parms.ShowOptions = False
         ogl = New OpenGL_Options(ocvb)
         ogl.OpenGL.OpenGLTitle = "OpenGL_IMU"
-        ogl.sliders.sliders(1).Value = 0 ' pitch
-        ogl.sliders.sliders(2).Value = 0 ' yaw
-        ogl.sliders.sliders(3).Value = 0 ' roll
+        ogl.sliders.trackbar(1).Value = 0 ' pitch
+        ogl.sliders.trackbar(2).Value = 0 ' yaw
+        ogl.sliders.trackbar(3).Value = 0 ' roll
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud in this example.
         ocvb.desc = "Show how to use IMU coordinates in OpenGL"
     End Sub
@@ -263,9 +263,9 @@ Public Class OpenGL_3Ddata
 
         ogl = New OpenGL_Options(ocvb)
         ogl.OpenGL.OpenGLTitle = "OpenGL_3Ddata"
-        ogl.sliders.sliders(1).Value = -10
-        ogl.sliders.sliders(6).Value = 5
-        ogl.sliders.sliders(2).Value = 10
+        ogl.sliders.trackbar(1).Value = -10
+        ogl.sliders.trackbar(6).Value = 5
+        ogl.sliders.trackbar(2).Value = 10
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud when displaying data.
 
         colors = New Palette_Gradient(ocvb)
@@ -278,7 +278,7 @@ Public Class OpenGL_3Ddata
         ocvb.desc = "Plot the results of a 3D histogram in OpenGL."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim bins = sliders.sliders(0).Value
+        Dim bins = sliders.trackbar(0).Value
 
         If histInput Is Nothing Then ReDim histInput(src.Total * src.ElemSize - 1)
         Marshal.Copy(src.Data, histInput, 0, histInput.Length)
@@ -307,15 +307,15 @@ Public Class OpenGL_Draw3D
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         circle = New Draw_Circles(ocvb)
-        circle.sliders.sliders(0).Value = 5
+        circle.sliders.trackbar(0).Value = 5
 
         ogl = New OpenGL_Options(ocvb)
         ogl.OpenGL.OpenGLTitle = "OpenGL_3DShapes"
-        ogl.sliders.sliders(0).Value = 80
-        ogl.sliders.sliders(8).Value = -140
-        ogl.sliders.sliders(9).Value = -180
-        ogl.sliders.sliders(6).Value = 16
-        ogl.sliders.sliders(10).Value = -30
+        ogl.sliders.trackbar(0).Value = 80
+        ogl.sliders.trackbar(8).Value = -140
+        ogl.sliders.trackbar(9).Value = -180
+        ogl.sliders.trackbar(6).Value = 16
+        ogl.sliders.trackbar(10).Value = -30
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud when displaying data.
         label2 = "Grayscale image sent to OpenGL"
         ocvb.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"

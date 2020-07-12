@@ -9,7 +9,7 @@ Public Class Blur_Gaussian
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize As Int32 = sliders.sliders(0).Value
+        Dim kernelSize As Int32 = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         cv.Cv2.GaussianBlur(src, dst1, New cv.Size(kernelSize, kernelSize), 0, 0)
     End Sub
@@ -26,7 +26,7 @@ Public Class Blur_Gaussian_CS
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        CS_BlurGaussian.Run(src, dst1, sliders.sliders(0).Value)
+        CS_BlurGaussian.Run(src, dst1, sliders.trackbar(0).Value)
     End Sub
 End Class
 
@@ -42,7 +42,7 @@ Public Class Blur_Median_CS
         ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        CS_BlurMedian.Run(src, dst1, sliders.sliders(0).Value)
+        CS_BlurMedian.Run(src, dst1, sliders.trackbar(0).Value)
     End Sub
 End Class
 
@@ -57,7 +57,7 @@ Public Class Blur_Homogeneous
         ocvb.desc = "Smooth each pixel with a kernel of 1's of different sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize As Int32 = sliders.sliders(0).Value
+        Dim kernelSize As Int32 = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         dst1 = src.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
         dst2 = ocvb.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
@@ -75,7 +75,7 @@ Public Class Blur_Median
         ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize As Int32 = sliders.sliders(0).Value
+        Dim kernelSize As Int32 = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
         cv.Cv2.MedianBlur(src, dst1, kernelSize)
     End Sub
@@ -92,7 +92,7 @@ Public Class Blur_Bilateral
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize As Int32 = sliders.sliders(0).Value
+        Dim kernelSize As Int32 = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
 
         cv.Cv2.BilateralFilter(src, dst1, kernelSize, kernelSize * 2, kernelSize / 2)
@@ -124,7 +124,7 @@ Public Class Blur_PlusHistogram
         mat2to1.mat(0) = myhist.dst2.Clone()
 
         blur.src = myhist.src
-        blur.sliders.sliders(0).Value = 15 ' kernel size is big to get a blur...
+        blur.sliders.trackbar(0).Value = 15 ' kernel size is big to get a blur...
         blur.Run(ocvb)
 
         myhist.src = blur.dst1
@@ -137,3 +137,51 @@ Public Class Blur_PlusHistogram
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Blur_TopoMap
+    Inherits ocvbClass
+    Dim gradient As Gradient_CartToPolar
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        gradient = New Gradient_CartToPolar(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Percent of Blurring", 0, 100, 20)
+        sliders.setupTrackBar(1, "Reduction Factor", 2, 64, 20)
+        sliders.setupTrackBar(2, "Frame Count Cycle", 1, 200, 50)
+
+        label1 = "Image Gradient"
+        ocvb.desc = "Create a topo map from the blurred image"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static savePercent As Single
+        Static nextPercent As Single
+        If savePercent <> sliders.trackbar(0).Value Then
+            savePercent = sliders.trackbar(0).Value
+            nextPercent = savePercent
+        End If
+
+        Dim kernelSize = CInt(nextPercent / 100 * src.Width)
+        If kernelSize Mod 2 = 0 Then kernelSize += 1
+
+        gradient.src = src
+        gradient.Run(ocvb)
+        dst1 = gradient.magnitude
+
+        If kernelSize > 1 Then cv.Cv2.GaussianBlur(dst1, dst2, New cv.Size(kernelSize, kernelSize), 0, 0)
+        dst2 = dst2.Normalize(255)
+        dst2 = dst2.ConvertScaleAbs(255)
+
+        dst2 = dst2 / sliders.trackbar(1).Value
+        dst2 *= sliders.trackbar(1).Value
+
+        label2 = "Blur = " + CStr(nextPercent) + "% Reduction Factor = " + CStr(sliders.trackbar(1).Value)
+        If ocvb.frameCount Mod sliders.trackbar(2).Value = 0 Then nextPercent -= 1
+        If nextPercent <= 0 Then nextPercent = savePercent
+    End Sub
+End Class

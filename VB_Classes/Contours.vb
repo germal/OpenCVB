@@ -25,7 +25,7 @@ Public Class Contours_Basics
         If ocvb.parms.ShowOptions Then radio1.Show()
 
         rotatedRect = New Draw_rotatedRectangles(ocvb)
-        rotatedRect.rect.sliders.sliders(0).Value = 5
+        rotatedRect.rect.sliders.trackbar(0).Value = 5
         ocvb.desc = "Demo options on FindContours."
         label2 = "FindContours output"
     End Sub
@@ -94,7 +94,7 @@ Public Class Contours_FindandDraw
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         rotatedRect = New Draw_rotatedRectangles(ocvb)
-        rotatedRect.rect.sliders.sliders(0).Value = 5
+        rotatedRect.rect.sliders.trackbar(0).Value = 5
         label1 = "FindandDraw input"
         label2 = "FindandDraw output"
         ocvb.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."

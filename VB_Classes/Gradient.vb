@@ -69,7 +69,7 @@ Public Class Gradient_Flatland
         ocvb.desc = "Reduced grayscale shows isobars in depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim reductionFactor = sliders.sliders(0).Maximum - sliders.sliders(0).Value
+        Dim reductionFactor = sliders.trackbar(0).Maximum - sliders.trackbar(0).Value
         dst1 = ocvb.RGBDepth.Clone()
         dst1 /= reductionFactor
         dst1 *= reductionFactor
@@ -94,7 +94,7 @@ Public Class Gradient_CartToPolar
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         gradient = New Gradient_Basics(ocvb)
-        gradient.sobel.sliders.sliders(0).Value = 1
+        gradient.sobel.sliders.trackbar(0).Value = 1
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
@@ -111,7 +111,7 @@ Public Class Gradient_CartToPolar
 
         cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
         magnitude = magnitude.Normalize()
-        Dim exponent = sliders.sliders(0).Value / 100
+        Dim exponent = sliders.trackbar(0).Value / 100
         magnitude = magnitude.Pow(exponent)
 
         dst1 = magnitude
@@ -132,7 +132,7 @@ Public Class Gradient_NumPy
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         gradient = New Gradient_Basics(ocvb)
-        gradient.sobel.sliders.sliders(0).Value = 1
+        gradient.sobel.sliders.trackbar(0).Value = 1
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
@@ -152,7 +152,7 @@ Public Class Gradient_NumPy
             cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
             magnitude = magnitude.Normalize()
             Dim npMag = MatToNumPyFloat(magnitude)
-            Dim exponent = sliders.sliders(0).Value / 100
+            Dim exponent = sliders.trackbar(0).Value / 100
             Numpy.np.power(npMag, exponent, npMag)
             NumPyFloatToMat(npMag, dst1)
         Else

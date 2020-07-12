@@ -153,9 +153,9 @@ Public Class DFT_ButterworthFilter_MT
         Static order As Int32
         Static butterworthFilter(1) As cv.Mat
         ' only create the filter if radius or order has changed.
-        If radius <> sliders.sliders(0).Value Or order <> sliders.sliders(1).Value Then
-            radius = sliders.sliders(0).Value
-            order = sliders.sliders(1).Value
+        If radius <> sliders.trackbar(0).Value Or order <> sliders.trackbar(1).Value Then
+            radius = sliders.trackbar(0).Value
+            order = sliders.trackbar(1).Value
 
             Parallel.For(0, 2,
             Sub(k)

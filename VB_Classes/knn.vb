@@ -21,7 +21,7 @@ Public Class knn_Basics
         knn = cv.ML.KNearest.Create()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim qPointCount = sliders.sliders(1).Value
+        Dim qPointCount = sliders.trackbar(1).Value
         If standalone Then
             dst1.SetTo(0)
             random.Run(ocvb)
@@ -79,7 +79,7 @@ Public Class KNN_Centroids
         emax.emaxCPP.showInput = False
 
         knn = New knn_Basics(ocvb)
-        knn.sliders.sliders(1).Value = 1
+        knn.sliders.trackbar(1).Value = 1
 
         ocvb.desc = "Reorder the centroids from the Emax distribution so they are in the same order every time."
     End Sub
@@ -179,8 +179,8 @@ Public Class knn_Cluster2D
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ' If they changed Then number of elements in the set
-        If sliders.sliders(0).Value <> numberofCities Or check.Box(0).Checked Then
-            numberofCities = sliders.sliders(0).Value
+        If sliders.trackbar(0).Value <> numberofCities Or check.Box(0).Checked Then
+            numberofCities = sliders.trackbar(0).Value
             knn.findXnearest = numberofCities
 
             ReDim cityPositions(numberofCities - 1)
@@ -232,8 +232,8 @@ Public Class knn_Point2d
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
-            ReDim lastSet(sliders.sliders(0).Value - 1)
-            ReDim querySet(sliders.sliders(0).Value - 1)
+            ReDim lastSet(sliders.trackbar(0).Value - 1)
+            ReDim querySet(sliders.trackbar(0).Value - 1)
             For i = 0 To lastSet.Count - 1
                 lastSet(i) = New cv.Point2f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows))
             Next
@@ -258,7 +258,7 @@ Public Class knn_Point2d
             Next
         End If
 
-        If standalone Then findXnearest = sliders.sliders(1).Value
+        If standalone Then findXnearest = sliders.trackbar(1).Value
         ReDim responseSet(querySet.Length * findXnearest - 1)
         For i = 0 To querySet.Count - 1
             query.Set(Of cv.Point2f)(0, 0, querySet(i))
@@ -299,7 +299,7 @@ Public Class knn_Point3d
         Dim maxDepth As Int32 = 4000 ' this is an arbitrary max dept    h
         Dim knn = cv.ML.KNearest.Create()
         If standalone Then
-            ReDim lastSet(sliders.sliders(0).Value - 1)
+            ReDim lastSet(sliders.trackbar(0).Value - 1)
             ReDim querySet(lastSet.Count - 1)
             For i = 0 To lastSet.Count - 1
                 lastSet(i) = New cv.Point3f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows), msRNG.Next(0, maxDepth))
@@ -327,7 +327,7 @@ Public Class knn_Point3d
             dst2.Circle(p, 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
         Next
 
-        if standalone Then findXnearest = sliders.sliders(1).Value
+        if standalone Then findXnearest = sliders.trackbar(1).Value
         ReDim responseSet(querySet.Length * findXnearest - 1)
         For i = 0 To querySet.Count - 1
             query.Set(Of cv.Point3f)(0, 0, querySet(i))
@@ -375,14 +375,14 @@ Public Class knn_ClusterNoisyLine
         Static lineNoise As Int32
         Static highlight As Boolean
         ' If the number of elements in the set changes, then recompute...
-        If (noisyLine.sliders.sliders(0).Value + noisyLine.sliders.sliders(1).Value) <> numberofCities Or noisyLine.sliders.sliders(2).Value <> lineNoise Or
+        If (noisyLine.sliders.trackbar(0).Value + noisyLine.sliders.trackbar(1).Value) <> numberofCities Or noisyLine.sliders.trackbar(2).Value <> lineNoise Or
             noisyLine.check.Box(0).Checked <> highlight Or noisyLine.check.Box(1).Checked = True Then
 
-            linePointCount = noisyLine.sliders.sliders(1).Value
-            lineNoise = noisyLine.sliders.sliders(2).Value
+            linePointCount = noisyLine.sliders.trackbar(1).Value
+            lineNoise = noisyLine.sliders.trackbar(2).Value
             highlight = noisyLine.check.Box(0).Checked
             noisyLine.check.Box(1).Checked = True
-            numberofCities = noisyLine.sliders.sliders(0).Value + linePointCount
+            numberofCities = noisyLine.sliders.trackbar(0).Value + linePointCount
             ReDim cityOrder(numberofCities - 1)
             noisyLine.Run(ocvb)
             dst1 = noisyLine.dst1

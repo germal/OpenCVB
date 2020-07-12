@@ -92,11 +92,11 @@ Public Class Undistort_Basics
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
 
-            sliders.sliders(0).Value = 100
-            sliders.sliders(1).Value = 100
+            sliders.trackbar(0).Value = 100
+            sliders.trackbar(1).Value = 100
 
-            maxDisp = sliders.sliders(3).Value
-            Dim stereo_height_px = sliders.sliders(2).Value
+            maxDisp = sliders.trackbar(3).Value
+            Dim stereo_height_px = sliders.trackbar(2).Value
             undistortSetup(ocvb, kMatLeft, dMatLeft, rMatLeft, pMatLeft, maxDisp, stereo_height_px, ocvb.parms.intrinsicsLeft)
 
             ' the intrinsic coeff's on the Intel RS2 series are always zero.  Here we just make up some numbers so we can show the impact.
@@ -105,18 +105,18 @@ Public Class Undistort_Basics
                 dMatLeft = New cv.Mat(1, 4, cv.MatType.CV_64F, d)
             End If
         End If
-        If saveK <> sliders.sliders(0).Value Then
-            saveK = sliders.sliders(0).Value
-            kMat = kMatLeft * sliders.sliders(0).Value / 100
+        If saveK <> sliders.trackbar(0).Value Then
+            saveK = sliders.trackbar(0).Value
+            kMat = kMatLeft * sliders.trackbar(0).Value / 100
         End If
-        If saveD <> sliders.sliders(1).Value Then
-            saveD = sliders.sliders(1).Value
-            dMat = dMatLeft * sliders.sliders(1).Value / 100
+        If saveD <> sliders.trackbar(1).Value Then
+            saveD = sliders.trackbar(1).Value
+            dMat = dMatLeft * sliders.trackbar(1).Value / 100
         End If
-        If saveP <> sliders.sliders(3).Value Or saveR <> sliders.sliders(2).Value Then
-            saveP = sliders.sliders(3).Value
+        If saveP <> sliders.trackbar(3).Value Or saveR <> sliders.trackbar(2).Value Then
+            saveP = sliders.trackbar(3).Value
             maxDisp = saveP
-            saveR = sliders.sliders(2).Value
+            saveR = sliders.trackbar(2).Value
             Dim stereo_height_px = saveR ' heightXheight pixel stereo output
             Dim stereo_fov_rad = CDbl(90 * (Math.PI / 180))  ' 90 degree desired fov
             Dim stereo_focal_px = CDbl(stereo_height_px / 2 / Math.Tan(stereo_fov_rad / 2))

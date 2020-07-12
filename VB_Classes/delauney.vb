@@ -127,7 +127,7 @@ Public Class Delaunay_GoodFeatures
             subdiv.Insert(features.goodFeatures(i))
         Next
 
-        Dim mixPercent = features.sliders.sliders(3).Value / 100
+        Dim mixPercent = features.sliders.trackbar(3).Value / 100
         paint_voronoi(scalarColors, dst2, subdiv)
         cv.Cv2.AddWeighted(dst2, 1 - mixPercent, src, mixPercent, 0, dst2)
     End Sub
@@ -203,7 +203,7 @@ Public Class Delauney_Coverage
         ocvb.desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod sliders.sliders(0).Value = 0 Then dst1.SetTo(0)
+        If ocvb.frameCount Mod sliders.trackbar(0).Value = 0 Then dst1.SetTo(0)
         delauney.src = src
         delauney.Run(ocvb)
         cv.Cv2.BitwiseOr(delauney.dst1, dst1, dst1)

@@ -31,11 +31,11 @@ Public Class OpenCVGL_Image_CPP
 
         If ocvb.parms.testAllRunning = False Then
             setOpenGLsliders(ocvb, caller, sliders)
-            sliders.sliders(10).Value = -10 ' eye.z
-            sliders.sliders(0).Value = 30 ' FOV
-            sliders.sliders(1).Value = 0 ' Yaw
-            sliders.sliders(2).Value = 0 ' pitch
-            sliders.sliders(3).Value = 0 ' roll
+            sliders.trackbar(10).Value = -10 ' eye.z
+            sliders.trackbar(0).Value = 30 ' FOV
+            sliders.trackbar(1).Value = 0 ' Yaw
+            sliders.trackbar(2).Value = 0 ' pitch
+            sliders.trackbar(3).Value = 0 ' roll
 
             OpenCVGL_Image_Open(ocvb.color.Cols, ocvb.color.Rows)
         End If
@@ -51,15 +51,15 @@ Public Class OpenCVGL_Image_CPP
         End If
 
         imu.Run(ocvb)
-        Dim FOV = sliders.sliders(0).Value
-        Dim yaw = sliders.sliders(1).Value
-        Dim pitch = sliders.sliders(2).Value
-        Dim roll = sliders.sliders(3).Value
-        Dim zNear = sliders.sliders(4).Value
-        Dim zFar = sliders.sliders(5).Value
-        Dim pointSize = sliders.sliders(6).Value
-        Dim eye As New cv.Vec3f(sliders.sliders(8).Value, sliders.sliders(9).Value, sliders.sliders(10).Value)
-        Dim zTrans = sliders.sliders(7).Value / 100
+        Dim FOV = sliders.trackbar(0).Value
+        Dim yaw = sliders.trackbar(1).Value
+        Dim pitch = sliders.trackbar(2).Value
+        Dim roll = sliders.trackbar(3).Value
+        Dim zNear = sliders.trackbar(4).Value
+        Dim zFar = sliders.trackbar(5).Value
+        Dim pointSize = sliders.trackbar(6).Value
+        Dim eye As New cv.Vec3f(sliders.trackbar(8).Value, sliders.trackbar(9).Value, sliders.trackbar(10).Value)
+        Dim zTrans = sliders.trackbar(7).Value / 100
 
         OpenCVGL_Image_Control(ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy,
                                FOV, zNear, zFar, eye, yaw, roll, pitch, pointSize, zTrans, src.Width, src.Height)

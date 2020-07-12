@@ -26,9 +26,9 @@ Public Class Sift_Basics_CS
 
         If ocvb.parms.cameraIndex = T265Camera Then
             fisheye.Run(ocvb)
-            siftCS.Run(fisheye.leftView, fisheye.rightView, doubleSize, radio.check(0).Checked, sliders.sliders(0).Value)
+            siftCS.Run(fisheye.leftView, fisheye.rightView, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
         Else
-            siftCS.Run(ocvb.leftView, ocvb.rightView, doubleSize, radio.check(0).Checked, sliders.sliders(0).Value)
+            siftCS.Run(ocvb.leftView, ocvb.rightView, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
         End If
 
         doubleSize(New cv.Rect(0, 0, dst1.Width, dst1.Height)).CopyTo(dst1)
@@ -51,9 +51,9 @@ Public Class Sift_Basics_CS_MT
         setCaller(ocvb)
         fisheye = New FishEye_Rectified(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Maximum = ocvb.color.cols * 2
-        grid.sliders.sliders(0).Value = ocvb.color.cols * 2 ' we are just taking horizontal slices of the image.
-        grid.sliders.sliders(1).Value = 10
+        grid.sliders.trackbar(0).Maximum = ocvb.color.cols * 2
+        grid.sliders.trackbar(0).Value = ocvb.color.cols * 2 ' we are just taking horizontal slices of the image.
+        grid.sliders.trackbar(1).Value = 10
 
         siftBasics = New Sift_Basics_CS(ocvb)
 
@@ -74,7 +74,7 @@ Public Class Sift_Basics_CS_MT
 
         Dim output As New cv.Mat(src.Rows, src.Cols * 2, cv.MatType.CV_8UC3)
 
-        Dim numFeatures = siftBasics.sliders.sliders(0).Value
+        Dim numFeatures = siftBasics.sliders.trackbar(0).Value
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             Dim left = leftView(roi).Clone()  ' sift wants the inputs to be continuous and roi-modified Mats are not continuous.

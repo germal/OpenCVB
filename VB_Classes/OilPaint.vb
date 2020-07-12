@@ -46,11 +46,11 @@ Public Class OilPaint_Pointilism
         cv.Cv2.Scharr(gray, fieldx, cv.MatType.CV_32FC1, 1, 0, 1 / 15.36)
         cv.Cv2.Scharr(gray, fieldy, cv.MatType.CV_32FC1, 0, 1, 1 / 15.36)
 
-        Dim smoothingRadius = sliders.sliders(1).Value * 2 + 1
+        Dim smoothingRadius = sliders.trackbar(1).Value * 2 + 1
         cv.Cv2.GaussianBlur(fieldx, fieldx, New cv.Size(smoothingRadius, smoothingRadius), 0, 0)
         cv.Cv2.GaussianBlur(fieldy, fieldy, New cv.Size(smoothingRadius, smoothingRadius), 0, 0)
 
-        Dim strokeSize = sliders.sliders(0).Value
+        Dim strokeSize = sliders.trackbar(0).Value
         For y = 0 To img.Height - 1
             For x = 0 To img.Width - 1
                 Dim nPt = rand.Get(Of cv.Point)(y, x)
@@ -86,8 +86,8 @@ Public Class OilPaint_ColorProbability
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         km = New kMeans_RGBFast(ocvb)
-        km.sliders.sliders(0).Value = 12 ' we would like a dozen colors or so in the color image.
-        ReDim color_probability(km.sliders.sliders(0).Value - 1)
+        km.sliders.trackbar(0).Value = 12 ' we would like a dozen colors or so in the color image.
+        ReDim color_probability(km.sliders.trackbar(0).Value - 1)
         ocvb.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -129,8 +129,8 @@ Public Class OilPaint_Manual
         ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim filtersize = sliders.sliders(0).Value
-        Dim levels = sliders.sliders(1).Value
+        Dim filtersize = sliders.trackbar(0).Value
+        Dim levels = sliders.trackbar(1).Value
 
         If filtersize Mod 2 = 0 Then filtersize += 1 ' must be odd
         Dim roi = ocvb.drawRect
@@ -190,11 +190,11 @@ Public Class OilPaint_Manual_CS
         ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = sliders.sliders(0).Value
+        Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         Dim roi = ocvb.drawRect
         src.CopyTo(dst1)
-        oilPaint.Start(src(roi), dst1(roi), kernelSize, sliders.sliders(1).Value)
+        oilPaint.Start(src(roi), dst1(roi), kernelSize, sliders.trackbar(1).Value)
         dst2 = src.EmptyClone.SetTo(0)
         Dim factor As Int32 = Math.Min(Math.Floor(dst2.Width / roi.Width), Math.Floor(dst2.Height / roi.Height))
         Dim s = New cv.Size(roi.Width * factor, roi.Height * factor)
@@ -231,7 +231,7 @@ Public Class OilPaint_Cartoon
         oil.Run(ocvb)
         dst1 = oil.dst1
 
-        Dim threshold = oil.sliders.sliders(2).Value
+        Dim threshold = oil.sliders.trackbar(2).Value
         Dim vec000 = New cv.Vec3b(0, 0, 0)
         For y = 0 To roi.Height - 1
             For x = 0 To roi.Width - 1

@@ -13,12 +13,12 @@ Public Class LUT_Gray
         ocvb.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        sliders.sLabels(0).Text = "LUT zero through " + CStr(sliders.sliders(0).Value)
-        sliders.sLabels(1).Text = "LUT " + CStr(sliders.sliders(0).Value) + " through " + CStr(sliders.sliders(1).Value)
-        sliders.sLabels(2).Text = "LUT " + CStr(sliders.sliders(1).Value) + " through " + CStr(sliders.sliders(2).Value)
-        sliders.sLabels(3).Text = "LUT " + CStr(sliders.sliders(2).Value) + " through 255"
-        Dim splits = {sliders.sliders(0).Value, sliders.sliders(1).Value, sliders.sliders(2).Value, sliders.sliders(3).Value, 255}
-        Dim vals = {0, sliders.sliders(0).Value, sliders.sliders(1).Value, sliders.sliders(2).Value, 255}
+        sliders.sLabels(0).Text = "LUT zero through " + CStr(sliders.trackbar(0).Value)
+        sliders.sLabels(1).Text = "LUT " + CStr(sliders.trackbar(0).Value) + " through " + CStr(sliders.trackbar(1).Value)
+        sliders.sLabels(2).Text = "LUT " + CStr(sliders.trackbar(1).Value) + " through " + CStr(sliders.trackbar(2).Value)
+        sliders.sLabels(3).Text = "LUT " + CStr(sliders.trackbar(2).Value) + " through 255"
+        Dim splits = {sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value, sliders.trackbar(3).Value, 255}
+        Dim vals = {0, sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value, 255}
         Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
         Dim splitIndex As Int32
@@ -45,7 +45,7 @@ Public Class LUT_Color
         ocvb.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim reduction = sliders.sliders(0).Value
+        Dim reduction = sliders.trackbar(0).Value
         If standalone Then
             src /= reduction
             src *= reduction

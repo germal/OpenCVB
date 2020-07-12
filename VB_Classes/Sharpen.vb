@@ -12,9 +12,9 @@ Public Class Sharpen_UnsharpMask
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim blurred As New cv.Mat
-        Dim sigma As Double = sliders.sliders(0).Value / 100
-        Dim threshold As Double = sliders.sliders(1).Value
-        Dim amount As Double = sliders.sliders(2).Value / 1000
+        Dim sigma As Double = sliders.trackbar(0).Value / 100
+        Dim threshold As Double = sliders.trackbar(1).Value
+        Dim amount As Double = sliders.trackbar(2).Value / 1000
         cv.Cv2.GaussianBlur(src, dst2, New cv.Size(), sigma, sigma)
 
         Dim diff As New cv.Mat
@@ -38,8 +38,8 @@ Public Class Sharpen_DetailEnhance
         ocvb.desc = "Enhance detail on an image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim sigma_s = sliders.sliders(0).Value
-        Dim sigma_r = sliders.sliders(1).Value / sliders.sliders(1).Maximum
+        Dim sigma_s = sliders.trackbar(0).Value
+        Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         cv.Cv2.DetailEnhance(src, dst1, sigma_s, sigma_r)
     End Sub
 End Class
@@ -58,8 +58,8 @@ Public Class Sharpen_Stylize
         ocvb.desc = "Stylize an image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim sigma_s = sliders.sliders(0).Value
-        Dim sigma_r = sliders.sliders(1).Value / sliders.sliders(1).Maximum
+        Dim sigma_s = sliders.trackbar(0).Value
+        Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         cv.Cv2.DetailEnhance(src, dst1, sigma_s, sigma_r)
     End Sub
 End Class

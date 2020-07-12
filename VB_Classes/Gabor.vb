@@ -26,12 +26,12 @@ Public Class Gabor_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
-            ksize = sliders.sliders(0).Value * 2 + 1
-            Sigma = sliders.sliders(1).Value
-            lambda = sliders.sliders(3).Value
-            gamma = sliders.sliders(4).Value / 10
-            phaseOffset = sliders.sliders(5).Value / 1000
-            theta = Math.PI * sliders.sliders(2).Value / 180
+            ksize = sliders.trackbar(0).Value * 2 + 1
+            Sigma = sliders.trackbar(1).Value
+            lambda = sliders.trackbar(3).Value
+            gamma = sliders.trackbar(4).Value / 10
+            phaseOffset = sliders.trackbar(5).Value / 1000
+            theta = Math.PI * sliders.trackbar(2).Value / 180
         End If
         gKernel = cv.Cv2.GetGaborKernel(New cv.Size(ksize, ksize), Sigma, theta, lambda, gamma, phaseOffset, cv.MatType.CV_32F)
         Dim multiplier = gKernel.Sum()
@@ -52,15 +52,15 @@ Public Class Gabor_Basics_MT
         setCaller(ocvb)
         label2 = "The 32 kernels used"
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = ocvb.color.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
-        grid.sliders.sliders(1).Value = ocvb.color.Height / 4
+        grid.sliders.trackbar(0).Value = ocvb.color.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
+        grid.sliders.trackbar(1).Value = ocvb.color.Height / 4
         grid.Run(ocvb) ' we only run this one time!  It needs to be 32 Gabor filters only.
         grid.sliders.Visible = False
 
         ocvb.suppressOptions = True
         For i = 0 To gabor.Length - 1
             gabor(i) = New Gabor_Basics(ocvb)
-            gabor(i).sliders.sliders(2).Value = i * 180 / gabor.Length
+            gabor(i).sliders.trackbar(2).Value = i * 180 / gabor.Length
         Next
 
         gabor(0).sliders.Visible = True
@@ -68,11 +68,11 @@ Public Class Gabor_Basics_MT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         For i = 0 To gabor.Count - 1
-            gabor(i).ksize = gabor(0).sliders.sliders(0).Value * 2 + 1
-            gabor(i).Sigma = gabor(0).sliders.sliders(1).Value
-            gabor(i).lambda = gabor(0).sliders.sliders(3).Value
-            gabor(i).gamma = gabor(0).sliders.sliders(4).Value / 10
-            gabor(i).phaseOffset = gabor(0).sliders.sliders(5).Value / 1000
+            gabor(i).ksize = gabor(0).sliders.trackbar(0).Value * 2 + 1
+            gabor(i).Sigma = gabor(0).sliders.trackbar(1).Value
+            gabor(i).lambda = gabor(0).sliders.trackbar(3).Value
+            gabor(i).gamma = gabor(0).sliders.trackbar(4).Value / 10
+            gabor(i).phaseOffset = gabor(0).sliders.trackbar(5).Value / 1000
             gabor(i).theta = Math.PI * i / gabor.Length
         Next
 

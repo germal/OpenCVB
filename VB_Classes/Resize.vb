@@ -84,8 +84,8 @@ Public Class Resize_Percentage
         ocvb.desc = "Resize by a percentage of the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim percent As Double = CDbl(sliders.sliders(0).Value / 100)
-        Dim resizePercent = sliders.sliders(0).Value / 100
+        Dim percent As Double = CDbl(sliders.trackbar(0).Value / 100)
+        Dim resizePercent = sliders.trackbar(0).Value / 100
         resizePercent = Math.Sqrt(resizePercent)
         resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * resizePercent), Math.Ceiling(src.Height * resizePercent))
         resizeOptions.src = src
@@ -94,7 +94,7 @@ Public Class Resize_Percentage
         If standalone Then
             Dim roi As New cv.Rect(0, 0, resizeOptions.dst1.Width, resizeOptions.dst1.Height)
             dst1 = resizeOptions.dst1(roi).Resize(resizeOptions.dst1.Size())
-            label1 = "Image after resizing to " + Format(sliders.sliders(0).Value, "#0.0") + "% of original size"
+            label1 = "Image after resizing to " + Format(sliders.trackbar(0).Value, "#0.0") + "% of original size"
             label2 = ""
         Else
             dst1 = resizeOptions.dst1

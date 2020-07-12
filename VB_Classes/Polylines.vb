@@ -12,7 +12,7 @@ Public Class Polylines_IEnumerableExample
         ocvb.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim points = Enumerable.Range(0, sliders.sliders(0).Value).Select(Of cv.Point)(
+        Dim points = Enumerable.Range(0, sliders.trackbar(0).Value).Select(Of cv.Point)(
             Function(i)
                 Return New cv.Point(CInt(msRNG.Next(0, src.Width)), CInt(msRNG.Next(0, src.Height)))
             End Function).ToList
@@ -21,7 +21,7 @@ Public Class Polylines_IEnumerableExample
 
         dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         ' NOTE: when there are 2 points, there will be 1 line.
-        dst1.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, sliders.sliders(1).Value, cv.LineTypes.AntiAlias)
+        dst1.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, sliders.trackbar(1).Value, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 

@@ -11,10 +11,10 @@ Public Class Laplacian_Basics
         ocvb.desc = "Laplacian filter - the second derivative."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = sliders.sliders(0).Value()
+        Dim kernelSize = sliders.trackbar(0).Value()
         If kernelSize Mod 2 = 0 Then kernelSize += 1
-        Dim scale = sliders.sliders(1).Value / 100
-        Dim delta = sliders.sliders(2).Value / 100
+        Dim scale = sliders.trackbar(1).Value / 100
+        Dim delta = sliders.trackbar(2).Value / 100
         Dim ddepth = cv.MatType.CV_16S
 
         If standalone Then src = ocvb.color.GaussianBlur(New cv.Size(kernelSize, kernelSize), 0, 0)
@@ -43,10 +43,10 @@ Public Class Laplacian_Blur
         ocvb.desc = "Laplacian filter - the second derivative - with different bluring techniques"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = sliders.sliders(0).Value()
+        Dim kernelSize = sliders.trackbar(0).Value()
         If kernelSize Mod 2 = 0 Then kernelSize += 1
-        Dim scale = sliders.sliders(1).Value / 100
-        Dim delta = sliders.sliders(2).Value / 100
+        Dim scale = sliders.trackbar(1).Value / 100
+        Dim delta = sliders.trackbar(2).Value / 100
         Dim ddepth = cv.MatType.CV_16S
 
         Dim blurText As String

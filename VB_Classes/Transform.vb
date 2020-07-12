@@ -9,7 +9,7 @@ Public Class Transform_Resize
         ocvb.desc = "Resize an image based on the slider value."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim resizeFactor = sliders.sliders(0).Value / 100
+        Dim resizeFactor = sliders.trackbar(0).Value / 100
         Dim w = CInt(resizeFactor * src.Width)
         Dim h = CInt(resizeFactor * src.Height)
         If resizeFactor > 1 Then
@@ -39,8 +39,8 @@ Public Class Transform_Rotate
         ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim imageCenter = New cv.Point2f(sliders.sliders(2).Value, sliders.sliders(3).Value)
-        Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.sliders(0).Value, sliders.sliders(1).Value / 100)
+        Dim imageCenter = New cv.Point2f(sliders.trackbar(2).Value, sliders.trackbar(3).Value)
+        Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.trackbar(0).Value, sliders.trackbar(1).Value / 100)
         cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
         dst1.Circle(imageCenter, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         dst1.Circle(imageCenter, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)

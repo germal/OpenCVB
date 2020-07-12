@@ -8,6 +8,8 @@ Public Class CellAuto_Life
     Dim factor = 8
     Dim generation As Integer
     Public population As Integer
+    Public nodeColor = cv.Scalar.White
+    Public backColor = cv.Scalar.Black
     Private Function CountNeighbors(cellX As Integer, cellY As Integer) As Integer
         If cellX > 0 And cellY > 0 Then
             If grid.Get(Of Byte)(cellY - 1, cellX - 1) Then CountNeighbors += 1
@@ -34,15 +36,15 @@ Public Class CellAuto_Life
 
         random = New Random_Points(ocvb)
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
-        random.sliders.sliders(0).Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
+        random.sliders.trackbar(0).Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         ocvb.desc = "Use OpenCV to implement the Game of Life"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static savePointCount As Integer
-        If random.sliders.sliders(0).Value <> savePointCount Or generation = 0 Then
+        If random.sliders.trackbar(0).Value <> savePointCount Or generation = 0 Then
             random.Run(ocvb)
             generation = 0
-            savePointCount = random.sliders.sliders(0).Value
+            savePointCount = random.sliders.trackbar(0).Value
             For i = 0 To random.Points.Count - 1
                 grid.Set(Of Byte)(random.Points(i).Y, random.Points(i).X, 1)
             Next
@@ -50,7 +52,7 @@ Public Class CellAuto_Life
         generation += 1
 
         population = 0
-        dst1.SetTo(0)
+        dst1.SetTo(backColor)
         For y = 0 To grid.Height - 1
             For x = 0 To grid.Width - 1
                 Dim neighbors = CountNeighbors(x, y)
@@ -65,7 +67,7 @@ Public Class CellAuto_Life
                 End If
                 If nextgrid.Get(Of Byte)(y, x) Then
                     Dim pt = New cv.Point(x, y) * factor
-                    dst1.Circle(pt, factor / 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                    dst1.Circle(pt, factor / 2, nodeColor, -1, cv.LineTypes.AntiAlias)
                     population += 1
                 End If
             Next
@@ -90,6 +92,42 @@ Public Class CellAuto_Life
     End Sub
 End Class
 
+
+
+
+
+
+
+' https://natureofcode.com/book/chapter-7-cellular-automata/
+Public Class CellAuto_LifeColor
+    Inherits ocvbClass
+    Dim game As CellAuto_Life
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        game = New CellAuto_Life(ocvb)
+        game.backColor = cv.Scalar.White
+        game.nodeColor = cv.Scalar.Black
+
+        label1 = "Births are blue, deaths are red"
+        ocvb.desc = "Game of Life but with color added"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        game.Run(ocvb)
+        dst1 = game.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Static lastBoard = dst1.Clone
+
+        Dim deaths As New cv.Mat, births As New cv.Mat
+
+        cv.Cv2.Subtract(dst1, lastBoard, births)
+        cv.Cv2.Subtract(lastBoard, dst1, deaths)
+        births = births.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        deaths = deaths.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        lastBoard = dst1.Clone
+        dst1 = game.dst1.Clone()
+        dst1.SetTo(cv.Scalar.Blue, births)
+        dst1.SetTo(cv.Scalar.Red, deaths)
+    End Sub
+End Class
 
 
 
@@ -271,7 +309,7 @@ Public Class CellAuto_All256
         Return outstr
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        Dim index = sliders.sliders(0).Value
+        Dim index = sliders.trackbar(0).Value
         Dim mtOn = cell.check.Box(0).Checked
 
         cell.src = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
@@ -290,7 +328,7 @@ Public Class CellAuto_All256
                       dst2 = cell.createCells(label2)
               End Select
           End Sub)
-        sliders.sliders(0).Value = index
+        sliders.trackbar(0).Value = index
     End Sub
 End Class
 

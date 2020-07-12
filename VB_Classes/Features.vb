@@ -16,9 +16,9 @@ Public Class Features_GoodFeatures
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim numPoints = sliders.sliders(0).Value
-        Dim quality = sliders.sliders(1).Value / 100
-        Dim minDistance = sliders.sliders(2).Value
+        Dim numPoints = sliders.trackbar(0).Value
+        Dim quality = sliders.trackbar(1).Value / 100
+        Dim minDistance = sliders.trackbar(2).Value
         Dim features = cv.Cv2.GoodFeaturesToTrack(src, numPoints, quality, minDistance, Nothing, 7, True, 3)
 
         If standalone Then src.CopyTo(dst1)

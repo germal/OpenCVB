@@ -14,10 +14,10 @@ Public Class Blob_Input
         ellipses = New Draw_Ellipses(ocvb)
         poly = New Draw_Polygon(ocvb)
 
-        rectangles.rect.sliders.sliders(0).Value = 5
-        circles.sliders.sliders(0).Value = 5
-        ellipses.sliders.sliders(0).Value = 5
-        poly.sliders.sliders(0).Value = 5
+        rectangles.rect.sliders.trackbar(0).Value = 5
+        circles.sliders.trackbar(0).Value = 5
+        ellipses.sliders.trackbar(0).Value = 5
+        poly.sliders.trackbar(0).Value = 5
 
         rectangles.rect.updateFrequency = 1
         circles.updateFrequency = 1
@@ -89,9 +89,9 @@ Public Class Blob_Detector_CS
         blobParams.MaxArea = 100
         blobParams.MinArea = 0.001
 
-        blobParams.MinThreshold = sliders.sliders(0).Value
-        blobParams.MaxThreshold = sliders.sliders(1).Value
-        blobParams.ThresholdStep = sliders.sliders(2).Value
+        blobParams.MinThreshold = sliders.trackbar(0).Value
+        blobParams.MaxThreshold = sliders.trackbar(1).Value
+        blobParams.ThresholdStep = sliders.trackbar(2).Value
 
         blobParams.MinDistBetweenBlobs = 10
         blobParams.MinRepeatability = 1
@@ -164,8 +164,8 @@ Public Class Blob_DepthClusters
         histBlobs = New Histogram_DepthClusters(ocvb)
 
         flood = New FloodFill_RelativeRange(ocvb)
-        flood.fBasics.sliders.sliders(1).Value = 1 ' pixels are exact.
-        flood.fBasics.sliders.sliders(2).Value = 1 ' pixels are exact.
+        flood.fBasics.sliders.trackbar(1).Value = 1 ' pixels are exact.
+        flood.fBasics.sliders.trackbar(2).Value = 1 ' pixels are exact.
 
         label2 = "Backprojection of identified histogram depth clusters."
         ocvb.desc = "Highlight the distinct histogram blobs found with depth clustering."

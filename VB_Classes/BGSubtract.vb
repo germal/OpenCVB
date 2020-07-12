@@ -84,7 +84,7 @@ Public Class BGSubtract_MotionDetect_MT
         Dim taskArray(threadCount - 1) As Task
         Dim xfactor = CInt(src.Width / width)
         Dim yfactor = Math.Max(CInt(src.Height / height), CInt(src.Width / width))
-        Dim CCthreshold = CSng(sliders.sliders(0).Value / sliders.sliders(0).Maximum)
+        Dim CCthreshold = CSng(sliders.trackbar(0).Value / sliders.trackbar(0).Maximum)
         For i = 0 To threadCount - 1
             Dim section = i
             taskArray(i) = Task.Factory.StartNew(
@@ -123,7 +123,7 @@ Public Class BGSubtract_Basics_MT
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.EmptyClone.SetTo(0)
         If ocvb.frameCount = 0 Then dst2 = src.Clone()
-        Dim CCthreshold = CSng(sliders.sliders(0).Value / sliders.sliders(0).Maximum)
+        Dim CCthreshold = CSng(sliders.trackbar(0).Value / sliders.trackbar(0).Maximum)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             Dim correlation As New cv.Mat
@@ -178,7 +178,7 @@ Public Class BGSubtract_MOG
         Else
             gray = src
         End If
-        MOG.Apply(gray, gray, sliders.sliders(0).Value / 1000)
+        MOG.Apply(gray, gray, sliders.trackbar(0).Value / 1000)
         dst1 = gray
     End Sub
 End Class
@@ -199,7 +199,7 @@ Public Class BGSubtract_MOG2
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOG2.Apply(src, dst1, sliders.sliders(0).Value / 1000)
+        MOG2.Apply(src, dst1, sliders.trackbar(0).Value / 1000)
     End Sub
 End Class
 
@@ -226,8 +226,8 @@ Public Class BGSubtract_GMG_KNN
         End If
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        gmg.Apply(dst1, dst1, sliders.sliders(0).Value / 1000)
-        knn.Apply(dst1, dst1, sliders.sliders(0).Value / 1000)
+        gmg.Apply(dst1, dst1, sliders.trackbar(0).Value / 1000)
+        knn.Apply(dst1, dst1, sliders.trackbar(0).Value / 1000)
     End Sub
 End Class
 
@@ -253,11 +253,11 @@ Public Class BGSubtract_MOG_RGBDepth
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOGDepth.Apply(gray, gray, sliders.sliders(0).Value / 1000)
+        MOGDepth.Apply(gray, gray, sliders.trackbar(0).Value / 1000)
         dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOGRGB.Apply(src, src, sliders.sliders(0).Value / 1000)
+        MOGRGB.Apply(src, src, sliders.trackbar(0).Value / 1000)
     End Sub
 End Class
 
@@ -270,7 +270,7 @@ Public Class BGSubtract_MOG_Retina
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         mog = New BGSubtract_MOG(ocvb)
-        mog.sliders.sliders(0).Value = 100
+        mog.sliders.trackbar(0).Value = 100
 
         retina = New Retina_Basics_CPP(ocvb)
 
@@ -394,15 +394,15 @@ Public Class BGSubtract_Synthetic_CPP
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount < 10 Then Exit Sub ' darker images at the start?
-        If amplitude <> sliders.sliders(0).Value Or magnitude <> sliders.sliders(1).Value Or waveSpeed <> sliders.sliders(2).Value Or
-            objectSpeed <> sliders.sliders(3).Value Then
+        If amplitude <> sliders.trackbar(0).Value Or magnitude <> sliders.trackbar(1).Value Or waveSpeed <> sliders.trackbar(2).Value Or
+            objectSpeed <> sliders.trackbar(3).Value Then
 
             If ocvb.frameCount <> 0 Then BGSubtract_Synthetic_Close(synthPtr)
 
-            amplitude = sliders.sliders(0).Value
-            magnitude = sliders.sliders(1).Value
-            waveSpeed = sliders.sliders(2).Value
-            objectSpeed = sliders.sliders(3).Value
+            amplitude = sliders.trackbar(0).Value
+            magnitude = sliders.trackbar(1).Value
+            waveSpeed = sliders.trackbar(2).Value
+            objectSpeed = sliders.trackbar(3).Value
 
             Dim srcData(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, srcData, 0, srcData.Length)

@@ -97,9 +97,9 @@ Public Class MeanShift_PyrFilter
         ocvb.desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim spatialRadius = sliders.sliders(0).Value
-        Dim colorRadius = sliders.sliders(1).Value
-        Dim maxPyrLevel = sliders.sliders(2).Value
+        Dim spatialRadius = sliders.trackbar(0).Value
+        Dim colorRadius = sliders.trackbar(1).Value
+        Dim maxPyrLevel = sliders.trackbar(2).Value
         cv.Cv2.PyrMeanShiftFiltering(src, dst1, spatialRadius, colorRadius, maxPyrLevel)
     End Sub
 End Class
@@ -134,7 +134,7 @@ Public Class Meanshift_TopObjects
         blob.src = src
         blob.Run(ocvb)
 
-        Dim updateFrequency = sliders.sliders(0).Value
+        Dim updateFrequency = sliders.trackbar(0).Value
         Dim trackBoxes As New List(Of cv.Rect)
         For i = 0 To cams.Length - 1
             If blob.flood.fBasics.maskSizes.Count > i Then

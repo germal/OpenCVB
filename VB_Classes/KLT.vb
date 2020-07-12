@@ -29,10 +29,10 @@ Public Class KLT_Basics
             check.Box(1).Checked = False
         End If
 
-        Dim maxCorners = sliders.sliders(0).Value
-        Dim qualityLevel = sliders.sliders(1).Value / 100
-        Dim minDistance = sliders.sliders(2).Value
-        Dim blockSize = sliders.sliders(3).Value
+        Dim maxCorners = sliders.trackbar(0).Value
+        Dim qualityLevel = sliders.trackbar(1).Value / 100
+        Dim minDistance = sliders.trackbar(2).Value
+        Dim blockSize = sliders.trackbar(3).Value
         Dim winSize As New cv.Size(3, 3)
         Dim subPixWinSize As New cv.Size(10, 10)
         Dim nightMode = check.Box(0).Checked

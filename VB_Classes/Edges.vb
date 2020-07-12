@@ -16,9 +16,9 @@ Public Class Edges_Canny
         label2 = "Canny using L2 Norm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim threshold1 As Int32 = sliders.sliders(0).Value
-        Dim threshold2 As Int32 = sliders.sliders(1).Value
-        Dim aperture = If(sliders.sliders(2).Value Mod 2, sliders.sliders(2).Value, sliders.sliders(2).Value + 1)
+        Dim threshold1 As Int32 = sliders.trackbar(0).Value
+        Dim threshold2 As Int32 = sliders.trackbar(1).Value
+        Dim aperture = If(sliders.trackbar(2).Value Mod 2, sliders.trackbar(2).Value, sliders.trackbar(2).Value + 1)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Canny(threshold1, threshold2, aperture, False)
         dst2 = src.Canny(threshold1, threshold2, aperture, True)
@@ -38,8 +38,8 @@ Public Class Edges_DepthAndColor
         dilate.radio.check(2).Checked = True
 
         canny = New Edges_Canny(ocvb)
-        canny.sliders.sliders(0).Value = 100
-        canny.sliders.sliders(1).Value = 100
+        canny.sliders.trackbar(0).Value = 100
+        canny.sliders.trackbar(1).Value = 100
 
         shadow = New Depth_Holes(ocvb)
 
@@ -78,8 +78,8 @@ Public Class Edges_Laplacian
         ocvb.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim gaussiankernelSize = If(sliders.sliders(0).Value Mod 2, sliders.sliders(0).Value, sliders.sliders(0).Value - 1)
-        Dim laplaciankernelSize = If(sliders.sliders(1).Value Mod 2, sliders.sliders(1).Value, sliders.sliders(1).Value - 1)
+        Dim gaussiankernelSize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value - 1)
+        Dim laplaciankernelSize = If(sliders.trackbar(1).Value Mod 2, sliders.trackbar(1).Value, sliders.trackbar(1).Value - 1)
 
         dst1 = src.GaussianBlur(New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
         dst1 = dst1.Laplacian(cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
@@ -108,7 +108,7 @@ Public Class Edges_Scharr
         Dim xField = gray.Scharr(cv.MatType.CV_32FC1, 1, 0)
         Dim yField = gray.Scharr(cv.MatType.CV_32FC1, 0, 1)
         cv.Cv2.Add(xField, yField, dst2)
-        dst2.ConvertTo(dst1, cv.MatType.CV_8U, sliders.sliders(0).Value / 100)
+        dst2.ConvertTo(dst1, cv.MatType.CV_8U, sliders.trackbar(0).Value / 100)
     End Sub
 End Class
 
@@ -132,8 +132,8 @@ Public Class Edges_Preserving
         ocvb.desc = "OpenCV's edge preserving filter."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim sigma_s = sliders.sliders(0).Value
-        Dim sigma_r = sliders.sliders(1).Value / sliders.sliders(1).Maximum
+        Dim sigma_s = sliders.trackbar(0).Value
+        Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         If radio.check(0).Checked Then
             cv.Cv2.EdgePreservingFilter(ocvb.color, dst1, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
         Else
@@ -199,7 +199,7 @@ Public Class Edges_RandomForest_CPP
             Dim gray8u = Edges_RandomForest_Run(EdgesPtr, handleRGB.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols)
             handleRGB.Free() ' free the pinned memory...
 
-            dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, gray8u).Threshold(sliders.sliders(0).Value, 255, cv.ThresholdTypes.Binary)
+            dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, gray8u).Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
         End If
     End Sub
     Public Sub Close()
@@ -220,7 +220,7 @@ Public Class Edges_LeftView
         setCaller(ocvb)
         red = New LeftRightView_Basics(ocvb)
         sobel = New Edges_Sobel(ocvb)
-        sobel.sliders.sliders(0).Value = 5
+        sobel.sliders.trackbar(0).Value = 5
 
         ocvb.desc = "Find the edges in the LeftViewimages."
         label1 = "Edges in Left Image"
@@ -256,11 +256,11 @@ Public Class Edges_ResizeAdd
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim newFrame = gray(New cv.Range(sliders.sliders(0).Value, gray.Rows - sliders.sliders(0).Value),
-                            New cv.Range(sliders.sliders(1).Value, gray.Cols - sliders.sliders(1).Value))
+        Dim newFrame = gray(New cv.Range(sliders.trackbar(0).Value, gray.Rows - sliders.trackbar(0).Value),
+                            New cv.Range(sliders.trackbar(1).Value, gray.Cols - sliders.trackbar(1).Value))
         newFrame = newFrame.Resize(gray.Size())
         cv.Cv2.Absdiff(gray, newFrame, dst1)
-        dst1 = dst1.Threshold(sliders.sliders(2).Value, 255, cv.ThresholdTypes.Binary)
+        dst1 = dst1.Threshold(sliders.trackbar(2).Value, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.Add(gray, dst1, dst2)
     End Sub
 End Class
@@ -286,13 +286,13 @@ Public Class Edges_DCTfrequency
         gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
         cv.Cv2.Dct(src32f, frequencies, cv.DctFlags.None)
 
-        Dim roi As New cv.Rect(0, 0, sliders.sliders(0).Value, src32f.Height)
+        Dim roi As New cv.Rect(0, 0, sliders.trackbar(0).Value, src32f.Height)
         If roi.Width > 0 Then frequencies(roi).SetTo(0)
-        label1 = "Highest " + CStr(sliders.sliders(0).Value) + " frequencies removed from RGBDepth"
+        label1 = "Highest " + CStr(sliders.trackbar(0).Value) + " frequencies removed from RGBDepth"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
         src32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)
-        dst2 = dst1.Threshold(sliders.sliders(1).Value, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst1.Threshold(sliders.trackbar(1).Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -334,8 +334,8 @@ Public Class Edges_Deriche_CPP
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
-        Dim alpha = sliders.sliders(0).Value / 100
-        Dim omega = sliders.sliders(1).Value / 1000
+        Dim alpha = sliders.trackbar(0).Value / 100
+        Dim omega = sliders.trackbar(1).Value / 1000
         Dim imagePtr = Edges_Deriche_Run(Edges_Deriche, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, alpha, omega)
         handleSrc.Free()
 
@@ -369,7 +369,7 @@ Public Class Edges_Sobel
         ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = If(sliders.sliders(0).Value Mod 2, sliders.sliders(0).Value, sliders.sliders(0).Value - 1)
+        Dim kernelSize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value - 1)
         dst1 = New cv.Mat(src.Rows, src.Cols, src.Type)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         grayX = src.Sobel(cv.MatType.CV_32F, 1, 0, kernelSize)

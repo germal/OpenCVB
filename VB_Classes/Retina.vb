@@ -48,12 +48,12 @@ Public Class Retina_Basics_CPP
         End If
         Static useLogSampling As Int32 = check.Box(0).Checked
         Static samplingFactor As Single = -1 ' force open
-        If useLogSampling <> check.Box(0).Checked Or samplingFactor <> sliders.sliders(0).Value Then
+        If useLogSampling <> check.Box(0).Checked Or samplingFactor <> sliders.trackbar(0).Value Then
             If Retina <> 0 Then Retina_Basics_Close(Retina)
             ReDim magnoData(src.Total - 1)
             ReDim srcData(src.Total * src.ElemSize - 1)
             useLogSampling = check.Box(0).Checked
-            samplingFactor = sliders.sliders(0).Value
+            samplingFactor = sliders.trackbar(0).Value
             Retina = Retina_Basics_Open(src.Rows, src.Cols, useLogSampling, samplingFactor)
         End If
         Dim handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned)

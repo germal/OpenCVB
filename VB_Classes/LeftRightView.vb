@@ -13,19 +13,19 @@ Public Class LeftRightView_Basics
             Case Kinect4AzureCam, L515
                 label1 = "Infrared Image"
                 label2 = "There is only one infrared image"
-                sliders.sliders(0).Value = 0
+                sliders.trackbar(0).Value = 0
             Case T265Camera
                 label1 = "Raw Left View Image (clipped to fit)"
                 label2 = "Raw Right Right Image (clipped to fit)"
-                sliders.sliders(0).Value = 0
+                sliders.trackbar(0).Value = 0
         End Select
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1 = ocvb.leftView
         dst2 = ocvb.rightView
 
-        dst1 += sliders.sliders(0).Value
-        dst2 += sliders.sliders(0).Value
+        dst1 += sliders.trackbar(0).Value
+        dst2 += sliders.trackbar(0).Value
     End Sub
 End Class
 
@@ -53,17 +53,17 @@ Public Class LeftRightView_CompareUndistorted
             Case Kinect4AzureCam, L515
                 label1 = "Infrared Image"
                 label2 = "There is only one infrared image"
-                sliders.sliders(0).Value = 0
+                sliders.trackbar(0).Value = 0
             Case T265Camera
                 label1 = "Undistorted Slices of Left and Right Views"
                 label2 = "Undistorted Right Image"
-                sliders.sliders(0).Value = 50
+                sliders.trackbar(0).Value = 50
         End Select
         ocvb.desc = "Show slices of the left and right view next to each other for visual comparison - right view needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim sliceY = sliders.sliders(1).Value
-        Dim slideHeight = sliders.sliders(2).Value
+        Dim sliceY = sliders.trackbar(1).Value
+        Dim slideHeight = sliders.trackbar(2).Value
         Dim leftInput As cv.Mat, rightInput As cv.Mat
         If ocvb.parms.cameraIndex = T265Camera Then
             fisheye.src = src
@@ -83,8 +83,8 @@ Public Class LeftRightView_CompareUndistorted
         rightInput(rSrc).CopyTo(dst1(New cv.Rect(0, 100 + slideHeight, leftInput.Width, slideHeight)))
 
         dst2 = leftInput
-        dst1 += sliders.sliders(0).Value
-        dst2 += sliders.sliders(0).Value
+        dst1 += sliders.trackbar(0).Value
+        dst2 += sliders.trackbar(0).Value
     End Sub
 End Class
 
@@ -108,11 +108,11 @@ Public Class LeftRightView_CompareRaw
             Case Kinect4AzureCam, L515
                 label1 = "Infrared Image"
                 label2 = "There is only one infrared image"
-                sliders.sliders(0).Value = 0
+                sliders.trackbar(0).Value = 0
             Case T265Camera
                 label1 = "Raw Left View Image"
                 label2 = "Raw Right Right Image"
-                sliders.sliders(0).Value = 50
+                sliders.trackbar(0).Value = 50
         End Select
         lrView = New LeftRightView_Basics(ocvb)
         lrView.sliders.Hide()
@@ -123,8 +123,8 @@ Public Class LeftRightView_CompareRaw
 
         dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, 0)
 
-        Dim sliceY = sliders.sliders(1).Value
-        Dim slideHeight = sliders.sliders(2).Value
+        Dim sliceY = sliders.trackbar(1).Value
+        Dim slideHeight = sliders.trackbar(2).Value
         Dim r1 = New cv.Rect(0, sliceY, lrView.dst1.Width, slideHeight)
         Dim r2 = New cv.Rect(0, 100, lrView.dst1.Width, slideHeight)
         lrView.dst1(r1).CopyTo(dst1(r2))
@@ -215,7 +215,7 @@ Public Class LeftRightView_BRISK
         label2 = "Infrared Right Image"
 
         brisk = New BRISK_Basics(ocvb)
-        brisk.sliders.sliders(0).Value = 20
+        brisk.sliders.trackbar(0).Value = 20
 
         lrView = New LeftRightView_Basics(ocvb)
     End Sub

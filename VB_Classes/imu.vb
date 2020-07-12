@@ -18,7 +18,7 @@ Public Class IMU_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.IMU_Present Then
-            Dim alpha As Double = sliders.sliders(0).Value / 1000
+            Dim alpha As Double = sliders.trackbar(0).Value / 1000
             If ocvb.frameCount = 0 Then
                 lastTimeStamp = ocvb.parms.IMU_TimeStamp
             Else
@@ -229,7 +229,7 @@ Public Class IMU_FrameTime
 
         Dim imuFrameTime = CInt(ocvb.parms.IMU_FrameTime)
         If IMUanchor <> 0 Then imuFrameTime = imuFrameTime Mod IMUanchor
-        Dim minDelay = sliders.sliders(0).Value
+        Dim minDelay = sliders.trackbar(0).Value
         IMUtoCaptureEstimate = IMUanchor - imuFrameTime + minDelay
         If IMUtoCaptureEstimate > IMUanchor Then IMUtoCaptureEstimate -= IMUanchor
         If IMUtoCaptureEstimate < minDelay Then IMUtoCaptureEstimate = minDelay
@@ -256,7 +256,7 @@ Public Class IMU_FrameTime
 
             If plot.maxScale - plot.minScale > histogramIMU.Count Then ReDim histogramIMU(plot.maxScale - plot.minScale)
 
-            Dim plotLastX = sliders.sliders(1).Value
+            Dim plotLastX = sliders.trackbar(1).Value
             If plot.lastXdelta.Count > plotLastX Then
                 Dim allText As String = ""
                 For i = 0 To plot.plotCount - 1
@@ -313,7 +313,7 @@ Public Class IMU_HostFrameTimes
 
         Dim cpuFrameTime = CInt(ocvb.parms.CPU_FrameTime)
         If CPUanchor <> 0 Then cpuFrameTime = cpuFrameTime Mod CPUanchor
-        Dim minDelay = sliders.sliders(0).Value
+        Dim minDelay = sliders.trackbar(0).Value
         HostInterruptDelayEstimate = CPUanchor - cpuFrameTime + minDelay
         If HostInterruptDelayEstimate > CPUanchor Then HostInterruptDelayEstimate -= CPUanchor
         If HostInterruptDelayEstimate < 0 Then HostInterruptDelayEstimate = minDelay
@@ -340,7 +340,7 @@ Public Class IMU_HostFrameTimes
 
             If plot.maxScale - plot.minScale > hist.Count Then ReDim hist(plot.maxScale - plot.minScale)
 
-            Dim plotLastX = sliders.sliders(1).Value
+            Dim plotLastX = sliders.trackbar(1).Value
             If plot.lastXdelta.Count > plotLastX Then
                 Dim allText As String = ""
                 For i = 0 To plot.plotCount - 1

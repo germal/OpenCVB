@@ -7,7 +7,7 @@ Public Class Fitline_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         draw = New Draw_Line(ocvb)
-        draw.sliders.sliders(0).Value = 2
+        draw.sliders.trackbar(0).Value = 2
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Accuracy for the radius X100", 0, 100, 10)
@@ -28,8 +28,8 @@ Public Class Fitline_Basics
 
         Dim contours As cv.Point()()
         contours = cv.Cv2.FindContoursAsArray(src, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-        Dim radiusAccuracy = sliders.sliders(0).Value / 100
-        Dim angleAccuracy = sliders.sliders(1).Value / 100
+        Dim radiusAccuracy = sliders.trackbar(0).Value / 100
+        Dim angleAccuracy = sliders.trackbar(1).Value / 100
         For i = 0 To contours.Length - 1
             Dim cnt = contours(i)
             Dim line2d = cv.Cv2.FitLine(cnt, cv.DistanceTypes.L2, 0, radiusAccuracy, angleAccuracy)
@@ -138,7 +138,7 @@ Public Class Fitline_RawInput
             Dim height = ocvb.color.Height
 
             points.Clear()
-            For i = 0 To sliders.sliders(0).Value - 1
+            For i = 0 To sliders.trackbar(0).Value - 1
                 Dim pt = New cv.Point2f(Rnd() * width, Rnd() * height)
                 If pt.X < 0 Then pt.X = 0
                 If pt.X > width Then pt.X = width
@@ -162,15 +162,15 @@ Public Class Fitline_RawInput
             m = (p2.Y - p1.Y) / (p2.X - p1.X)
             bb = p2.Y - p2.X * m
             Dim startx = Math.Min(p1.X, p2.X)
-            Dim incr = (Math.Max(p1.X, p2.X) - startx) / sliders.sliders(1).Value
+            Dim incr = (Math.Max(p1.X, p2.X) - startx) / sliders.trackbar(1).Value
             Dim highLight = cv.Scalar.White
             If check.Box(0).Checked Then
                 highLight = cv.Scalar.Gray
                 dotSize = 5
             End If
-            For i = 0 To sliders.sliders(1).Value - 1
-                Dim noiseOffsetX = (Rnd() * 2 - 1) * sliders.sliders(2).Value
-                Dim noiseOffsetY = (Rnd() * 2 - 1) * sliders.sliders(2).Value
+            For i = 0 To sliders.trackbar(1).Value - 1
+                Dim noiseOffsetX = (Rnd() * 2 - 1) * sliders.trackbar(2).Value
+                Dim noiseOffsetY = (Rnd() * 2 - 1) * sliders.trackbar(2).Value
                 Dim pt = New cv.Point(startx + i * incr + noiseOffsetX, Math.Max(0, Math.Min(m * (startx + i * incr) + bb + noiseOffsetY, height)))
                 If pt.X < 0 Then pt.X = 0
                 If pt.X > width Then pt.X = width
@@ -193,8 +193,8 @@ Public Class Fitline_EigenFit
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         noisyLine = New Fitline_RawInput(ocvb)
-        noisyLine.sliders.sliders(0).Value = 30
-        noisyLine.sliders.sliders(1).Value = 400
+        noisyLine.sliders.trackbar(0).Value = 30
+        noisyLine.sliders.trackbar(1).Value = 400
         label1 = "Raw input (use sliders below to explore)"
         label2 = "blue=GT, red=fitline, yellow=EigenFit"
         ocvb.desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
@@ -206,8 +206,8 @@ Public Class Fitline_EigenFit
         Static linePointCount As Int32
         Static lineNoise As Int32
         Static highlight As Boolean
-        'If noisyLine.sliders.sliders(0).Value <> noisePointCount Or noisyLine.sliders.sliders(1).Value <> linePointCount Or
-        '    noisyLine.sliders.sliders(2).Value <> lineNoise Or noisyLine.check.Box(0).Checked <> highlight Or noisyLine.check.Box(1).Checked Then
+        'If noisyLine.sliders.trackbar(0).Value <> noisePointCount Or noisyLine.sliders.trackbar(1).Value <> linePointCount Or
+        '    noisyLine.sliders.trackbar(2).Value <> lineNoise Or noisyLine.check.Box(0).Checked <> highlight Or noisyLine.check.Box(1).Checked Then
         noisyLine.check.Box(1).Checked = True
         noisyLine.Run(ocvb)
         dst1 = noisyLine.dst1
@@ -215,9 +215,9 @@ Public Class Fitline_EigenFit
         noisyLine.check.Box(1).Checked = False
         'End If
 
-        noisePointCount = noisyLine.sliders.sliders(0).Value
-        linePointCount = noisyLine.sliders.sliders(1).Value
-        lineNoise = noisyLine.sliders.sliders(2).Value
+        noisePointCount = noisyLine.sliders.trackbar(0).Value
+        linePointCount = noisyLine.sliders.trackbar(1).Value
+        lineNoise = noisyLine.sliders.trackbar(2).Value
         highlight = noisyLine.check.Box(0).Checked
 
         Dim width = src.Width

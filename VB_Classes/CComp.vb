@@ -29,7 +29,7 @@ Public Class CComp_Basics
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim threshold = sliders.sliders(0).Value
+        Dim threshold = sliders.trackbar(0).Value
         Dim binary As New cv.Mat
         If threshold < 128 Then
             binary = src.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
@@ -47,7 +47,7 @@ Public Class CComp_Basics
         centroids.Clear()
         masks.Clear()
         For Each blob In connectedComponents.Blobs
-            If blob.Area < sliders.sliders(1).Value Then Continue For ' skip it if too small...
+            If blob.Area < sliders.trackbar(1).Value Then Continue For ' skip it if too small...
             Dim rect = blob.Rect
             ' if it covers everything, then forget it...
             If rect.Width = src.Width And rect.Height = src.Height Then Continue For
@@ -191,9 +191,9 @@ Public Class CComp_InRange_MT
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim rangeCount As Int32 = sliders.sliders(0).Value
-        Dim maxDepth = sliders.sliders(1).Value
-        Dim minBlobSize = sliders.sliders(2).Value * 1000
+        Dim rangeCount As Int32 = sliders.trackbar(0).Value
+        Dim maxDepth = sliders.trackbar(1).Value
+        Dim minBlobSize = sliders.trackbar(2).Value * 1000
 
         Dim depth32f = getDepth32f(ocvb)
         Dim mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -243,8 +243,8 @@ Public Class CComp_InRange
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim rangeCount As Int32 = sliders.sliders(0).Value
-        Dim minBlobSize = sliders.sliders(1).Value * 1000
+        Dim rangeCount As Int32 = sliders.trackbar(0).Value
+        Dim minBlobSize = sliders.trackbar(1).Value * 1000
 
         Dim mask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
@@ -325,7 +325,7 @@ Public Class CComp_OverlappingRectangles
         setCaller(ocvb)
 
         ccomp = New CComp_Basics(ocvb)
-        ccomp.sliders.sliders(1).Value = 10 ' allow very small regions.
+        ccomp.sliders.trackbar(1).Value = 10 ' allow very small regions.
 
         overlap = New Draw_OverlappingRectangles(ocvb)
 

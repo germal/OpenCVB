@@ -15,7 +15,7 @@ Public Class Diff_Basics
         If ocvb.frameCount > 0 Then
             dst1 = lastFrame
             cv.Cv2.Absdiff(gray, lastFrame, dst2)
-            dst2 = dst2.Threshold(sliders.sliders(0).Value, 255, cv.ThresholdTypes.Binary)
+            dst2 = dst2.Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
             dst1 = ocvb.color.Clone().SetTo(0, dst2)
         End If
         lastFrame = gray.Clone()
@@ -33,7 +33,7 @@ Public Class Diff_UnstableDepthAndColor
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         diff = New Diff_Basics(ocvb)
-        diff.sliders.sliders(0).Value = 20 ' this is color threshold - low means detecting more motion.
+        diff.sliders.trackbar(0).Value = 20 ' this is color threshold - low means detecting more motion.
 
         depth = New Depth_Stable(ocvb)
 

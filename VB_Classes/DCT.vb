@@ -28,9 +28,9 @@ Public Class DCT_Basics
         Next
         cv.Cv2.Dct(src32f, frequencies, dctFlag)
 
-        Dim roi As New cv.Rect(0, 0, sliders.sliders(0).Value, src32f.Height)
+        Dim roi As New cv.Rect(0, 0, sliders.trackbar(0).Value, src32f.Height)
         If roi.Width > 0 Then frequencies(roi).SetTo(0)
-        label1 = "Highest " + CStr(sliders.sliders(0).Value) + " frequencies removed"
+        label1 = "Highest " + CStr(sliders.trackbar(0).Value) + " frequencies removed"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
         src32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)
@@ -49,7 +49,7 @@ Public Class DCT_RGB
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         dct = New DCT_Basics(ocvb)
-        dct.sliders.sliders(0).Value = 1
+        dct.sliders.trackbar(0).Value = 1
 
         label1 = "Reconstituted RGB image"
         label2 = "Difference from original"
@@ -73,13 +73,13 @@ Public Class DCT_RGB
             freqPlanes(i) = New cv.Mat
             cv.Cv2.Dct(src32f, freqPlanes(i), cv.DctFlags.None)
 
-            Dim roi As New cv.Rect(0, 0, dct.sliders.sliders(0).Value, src32f.Height)
+            Dim roi As New cv.Rect(0, 0, dct.sliders.trackbar(0).Value, src32f.Height)
             If roi.Width > 0 Then freqPlanes(i)(roi).SetTo(0)
 
             cv.Cv2.Dct(freqPlanes(i), src32f, dctFlag)
             src32f.ConvertTo(srcPlanes(i), cv.MatType.CV_8UC1, 255)
         Next
-        label1 = "Highest " + CStr(dct.sliders.sliders(0).Value) + " frequencies removed"
+        label1 = "Highest " + CStr(dct.sliders.trackbar(0).Value) + " frequencies removed"
 
         cv.Cv2.Merge(srcPlanes, dst1)
 
@@ -96,7 +96,7 @@ Public Class DCT_Depth
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         dct = New DCT_Basics(ocvb)
-        dct.sliders.sliders(0).Value = 1
+        dct.sliders.trackbar(0).Value = 1
         label2 = "Subtract DCT inverse from Grayscale depth"
         ocvb.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub
@@ -107,9 +107,9 @@ Public Class DCT_Depth
         gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
         cv.Cv2.Dct(src32f, frequencies, cv.DctFlags.None)
 
-        Dim roi As New cv.Rect(0, 0, dct.sliders.sliders(0).Value, src32f.Height)
+        Dim roi As New cv.Rect(0, 0, dct.sliders.trackbar(0).Value, src32f.Height)
         If roi.Width > 0 Then frequencies(roi).SetTo(0)
-        label1 = "Highest " + CStr(dct.sliders.sliders(0).Value) + " frequencies removed"
+        label1 = "Highest " + CStr(dct.sliders.trackbar(0).Value) + " frequencies removed"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
         src32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)
@@ -129,14 +129,14 @@ Public Class DCT_FeatureLess_MT
         setCaller(ocvb)
 
         dct = New DCT_Basics(ocvb)
-        dct.sliders.sliders(0).Value = 1
+        dct.sliders.trackbar(0).Value = 1
         ocvb.desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
         label2 = "FeatureLess RGB regions"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dct.src = src
         dct.Run(ocvb)
-        Dim runLenMin = dct.sliders.sliders(1).Value
+        Dim runLenMin = dct.sliders.trackbar(1).Value
         dst1 = dct.dst1
         dst2 = dct.dst2
 
@@ -185,10 +185,10 @@ Public Class DCT_Surfaces_debug
         flow.result1or2 = RESULT1
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = 100
-        grid.sliders.sliders(1).Value = 150
+        grid.sliders.trackbar(0).Value = 100
+        grid.sliders.trackbar(1).Value = 150
         dct = New DCT_FeatureLess_MT(ocvb)
-        dct.dct.sliders.sliders(0).Value = 1
+        dct.dct.sliders.trackbar(0).Value = 1
         Mats = New Mat_4to1(ocvb)
 
         label1 = "Largest flat surface segment stats"

@@ -9,9 +9,9 @@ Public Class Mean_Basics
         ocvb.desc = "Create an image that is the mean of x number of previous images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static saveImageCount = sliders.sliders(0).Value
-        If sliders.sliders(0).Value <> saveImageCount Then
-            saveImageCount = sliders.sliders(0).Value
+        Static saveImageCount = sliders.trackbar(0).Value
+        If sliders.trackbar(0).Value <> saveImageCount Then
+            saveImageCount = sliders.trackbar(0).Value
             images.Clear()
         End If
         Dim nextImage As New cv.Mat

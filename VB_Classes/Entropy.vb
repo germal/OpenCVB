@@ -16,7 +16,7 @@ Public Class Entropy_Basics
         ocvb.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        simple.bins = hist.sliders.sliders(0).Value
+        simple.bins = hist.sliders.trackbar(0).Value
         simple.run(src)
         entropy = 0
         Dim entropyChannels As String = ""
@@ -47,8 +47,8 @@ Public Class Entropy_Highest_MT
         setCaller(ocvb)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = 64
-        grid.sliders.sliders(1).Value = 80
+        grid.sliders.trackbar(0).Value = 64
+        grid.sliders.trackbar(1).Value = 80
 
         hist = New Histogram_Basics(ocvb)
 

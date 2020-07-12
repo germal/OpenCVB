@@ -52,9 +52,9 @@ Public Class GeneticDrawing_Basics
         sliders.setupTrackBar(0, "Number of Generations", 1, 100, 20)
         sliders.setupTrackBar(1, "Number of Stages", 1, 200, 100)
         sliders.setupTrackBar(2, "Brushstroke count per generation", 1, 100, 10)
-        stageTotal = sliders.sliders(1).Value
+        stageTotal = sliders.trackbar(1).Value
 
-        label1 = "(clkwise) img, smaplingMask, histogram, magnitude"
+        label1 = "(clkwise) img, samplingMask, histogram, magnitude"
         label2 = "Current result"
         ocvb.desc = "Create a painting from the current video input using a genetic algorithm - painterly"
     End Sub
@@ -97,7 +97,7 @@ Public Class GeneticDrawing_Basics
     End Function
     Private Sub startNewStage()
         canvas = imgBuffer
-        Dim brushstrokeCount = sliders.sliders(2).Value
+        Dim brushstrokeCount = sliders.trackbar(2).Value
         ReDim DNAseq(brushstrokeCount - 1)
         minSize = calcBrushSize(minBrush)
         maxSize = calcBrushSize(maxBrush)
@@ -119,16 +119,16 @@ Public Class GeneticDrawing_Basics
         totalError = calculateError(mats.mat(3))
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        stageTotal = sliders.sliders(1).Value
+        stageTotal = sliders.trackbar(1).Value
         If stage >= stageTotal Then Exit Sub ' request is complete...
-        If generationTotal <> sliders.sliders(0).Value Or stageTotal <> sliders.sliders(1).Value Or check.Box(0).Checked Then
+        If generationTotal <> sliders.trackbar(0).Value Or stageTotal <> sliders.trackbar(1).Value Or check.Box(0).Checked Then
             dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
             cachedImage = dst2.Clone
             canvas = dst2.Clone
             imgBuffer = dst2.Clone
             check.Box(0).Checked = False
-            generationTotal = sliders.sliders(0).Value
-            stageTotal = sliders.sliders(1).Value
+            generationTotal = sliders.trackbar(0).Value
+            stageTotal = sliders.trackbar(1).Value
             generation = 0
             stage = 0
             samplingMask = Nothing
@@ -148,7 +148,7 @@ Public Class GeneticDrawing_Basics
         If samplingMask IsNot Nothing Then
             samplingMask = Nothing
         Else
-            Dim startStage = stageTotal * 0.2
+            Dim startStage = 0 ' stageTotal * 0.2
             Dim blurPercent = (1.0 - (stage - startStage) / Math.Max(stageTotal - startStage - 1, 1)) * 0.25 + 0.005
             Dim kernelSize = CInt(blurPercent * src.Width)
             If kernelSize Mod 2 = 0 Then kernelSize += 1

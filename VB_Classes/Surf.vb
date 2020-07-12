@@ -33,7 +33,7 @@ Public Class Surf_Basics_CS
             srcRight = ocvb.rightView
         End If
         Dim doubleSize As New cv.Mat
-        CS_SurfBasics.Run(srcLeft, srcRight, doubleSize, sliders.sliders(0).Value, radio.check(0).Checked)
+        CS_SurfBasics.Run(srcLeft, srcRight, doubleSize, sliders.trackbar(0).Value, radio.check(0).Checked)
 
         doubleSize(New cv.Rect(0, 0, src.Width, src.Height)).CopyTo(dst1)
         doubleSize(New cv.Rect(src.Width, 0, src.Width, src.Height)).CopyTo(dst2)
@@ -104,7 +104,7 @@ Public Class Surf_DrawMatchManual_CS
         For i = 0 To keys1.Count - 1
             Dim pt = keys1(i).Pt
             For j = 0 To keys2.Count - 1
-                If Math.Abs(keys2(j).Pt.X - pt.X) < sliders.sliders(0).Value And Math.Abs(keys2(j).Pt.Y - pt.Y) < sliders.sliders(0).Value Then
+                If Math.Abs(keys2(j).Pt.X - pt.X) < sliders.trackbar(0).Value And Math.Abs(keys2(j).Pt.Y - pt.Y) < sliders.trackbar(0).Value Then
                     dst2.Circle(keys2(j).Pt, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
                     keys2(j).Pt.Y = -1 ' so we don't match it again.
                     matchCount += 1

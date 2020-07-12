@@ -11,9 +11,9 @@ Public Class TextureFlow_Basics
         ocvb.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim TFdelta = sliders.sliders(0).Value
-        Dim TFblockSize = sliders.sliders(1).Value * 2 + 1
-        Dim TFksize = sliders.sliders(2).Value * 2 + 1
+        Dim TFdelta = sliders.trackbar(0).Value
+        Dim TFblockSize = sliders.trackbar(1).Value * 2 + 1
+        Dim TFksize = sliders.trackbar(2).Value * 2 + 1
         Dim gray = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Clone
         Dim eigen = gray.CornerEigenValsAndVecs(TFblockSize, TFksize)

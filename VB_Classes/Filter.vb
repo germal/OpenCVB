@@ -45,7 +45,7 @@ Public Class Filter_NormalizedKernel
             End If
         Next
 
-        kernel = kernel.Normalize(sliders.sliders(0).Value / 10, 0, normType)
+        kernel = kernel.Normalize(sliders.trackbar(0).Value / 10, 0, normType)
 
         Dim sum As Double
         For i = 0 To kernel.Width - 1
@@ -69,7 +69,7 @@ Public Class Filter_Normalized2D
         ocvb.desc = "Create and apply a normalized kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = If(standalone, (ocvb.frameCount Mod 20) + 1, sliders.sliders(0).Value)
+        Dim kernelSize = If(standalone, (ocvb.frameCount Mod 20) + 1, sliders.trackbar(0).Value)
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
         dst1 = src.Filter2D(-1, kernel)
         label1 = "Normalized KernelSize = " + CStr(kernelSize)
@@ -96,9 +96,9 @@ Public Class Filter_SepFilter2D
         ocvb.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim xDim = If(sliders.sliders(0).Value Mod 2, sliders.sliders(0).Value, sliders.sliders(0).Value + 1)
-        Dim yDim = If(sliders.sliders(1).Value Mod 2, sliders.sliders(1).Value, sliders.sliders(1).Value + 1)
-        Dim sigma = sliders.sliders(2).Value / 10
+        Dim xDim = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value + 1)
+        Dim yDim = If(sliders.trackbar(1).Value Mod 2, sliders.trackbar(1).Value, sliders.trackbar(1).Value + 1)
+        Dim sigma = sliders.trackbar(2).Value / 10
         Dim kernel = cv.Cv2.GetGaussianKernel(xDim, sigma)
         dst1 = src.GaussianBlur(New cv.Size(xDim, yDim), sigma)
         dst2 = src.SepFilter2D(cv.MatType.CV_8UC3, kernel, kernel)

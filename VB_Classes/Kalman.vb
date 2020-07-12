@@ -367,7 +367,7 @@ Public Class Kalman_Depth32f
         kalman = New Kalman_CVMat(ocvb)
 
         resize = New Resize_Percentage(ocvb)
-        resize.sliders.sliders(0).Value = 4
+        resize.sliders.trackbar(0).Value = 4
 
         label1 = "Mask of non-zero depth after Kalman smoothing"
         label2 = "Difference from original depth"

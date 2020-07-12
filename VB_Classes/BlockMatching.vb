@@ -20,8 +20,8 @@ Public Class BlockMatching_Basics
             ocvb.putText(New TTtext("For the Kinect 4 Azure camera, the left and right views are the same.", 10, 50, RESULT1))
         End If
 
-        Dim numDisparity = sliders.sliders(0).Value * 16 ' must be a multiple of 16
-        Dim blockSize = sliders.sliders(1).Value
+        Dim numDisparity = sliders.trackbar(0).Value * 16 ' must be a multiple of 16
+        Dim blockSize = sliders.trackbar(1).Value
         If blockSize Mod 2 = 0 Then blockSize += 1 ' must be odd
 
         Static blockMatch = cv.StereoBM.Create()
@@ -44,7 +44,7 @@ Public Class BlockMatching_Basics
         Dim topMargin = 10, sideMargin = 8
         Dim rect = New cv.Rect(numDisparity + sideMargin, topMargin, src.Width - numDisparity - sideMargin * 2, src.Height - topMargin * 2)
         Dim tmp = New cv.Mat(src.Size(), cv.MatType.CV_32F, 0)
-        Dim distance = sliders.sliders(2).Value * 1000
+        Dim distance = sliders.trackbar(2).Value * 1000
         cv.Cv2.Divide(distance, colorizer.src(rect), colorizer.src(rect)) ' this needs much more refinement.  The trackbar3 value is just an approximation.
         colorizer.src(rect) = colorizer.src(rect).Threshold(10000, 10000, cv.ThresholdTypes.Trunc)
         colorizer.Run(ocvb)

@@ -44,7 +44,7 @@ Public Class Hough_Circles
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         circles = New Draw_Circles(ocvb)
-        circles.sliders.sliders(0).Value = 3
+        circles.sliders.trackbar(0).Value = 3
         ocvb.desc = "Find circles using HoughCircles."
         label1 = "Input circles to Hough"
         label2 = "Hough Circles found"
@@ -89,9 +89,9 @@ Public Class Hough_Lines
         edges.src = src.Clone()
         edges.Run(ocvb)
 
-        Dim rhoIn = sliders.sliders(0).Value
-        Dim thetaIn = sliders.sliders(1).Value / 1000
-        Dim threshold = sliders.sliders(2).Value
+        Dim rhoIn = sliders.trackbar(0).Value
+        Dim thetaIn = sliders.trackbar(1).Value / 1000
+        Dim threshold = sliders.trackbar(2).Value
 
         segments = cv.Cv2.HoughLines(edges.dst1, rhoIn, thetaIn, threshold)
         label1 = "Found " + CStr(segments.Length) + " Lines"
@@ -100,9 +100,9 @@ Public Class Hough_Lines
             src.CopyTo(dst1)
             dst1.SetTo(cv.Scalar.White, edges.dst1)
             src.CopyTo(dst2)
-            houghShowLines(dst1, segments, sliders.sliders(3).Value)
+            houghShowLines(dst1, segments, sliders.trackbar(3).Value)
             Dim probSegments = cv.Cv2.HoughLinesP(edges.dst1, rhoIn, thetaIn, threshold)
-            For i = 0 To Math.Min(probSegments.Length, sliders.sliders(3).Value) - 1
+            For i = 0 To Math.Min(probSegments.Length, sliders.trackbar(3).Value) - 1
                 Dim line = probSegments(i)
                 dst2.Line(line.P1, line.P2, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
             Next
@@ -129,8 +129,8 @@ Public Class Hough_Lines_MT
         edges = New Edges_Canny(ocvb)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = 16
-        grid.sliders.sliders(1).Value = 16
+        grid.sliders.trackbar(0).Value = 16
+        grid.sliders.trackbar(1).Value = 16
         ocvb.desc = "Multithread Houghlines to find lines in image fragments."
         label1 = "Hough_Lines_MT"
         label2 = "Hough_Lines_MT"
@@ -143,9 +143,9 @@ Public Class Hough_Lines_MT
         edges.Run(ocvb)
         dst1 = edges.dst1
 
-        Dim rhoIn = sliders.sliders(0).Value
-        Dim thetaIn = sliders.sliders(1).Value / 1000
-        Dim threshold = sliders.sliders(2).Value
+        Dim rhoIn = sliders.trackbar(0).Value
+        Dim thetaIn = sliders.trackbar(1).Value / 1000
+        Dim threshold = sliders.trackbar(2).Value
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)

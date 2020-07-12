@@ -9,7 +9,7 @@ Public Class Pyramid_Basics
         ocvb.desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim zoom = sliders.sliders(0).Value
+        Dim zoom = sliders.trackbar(0).Value
         If zoom <> 0 Then
             If zoom < 0 Then
                 Dim tmp = src.PyrDown(New cv.Size(src.Cols / 2, src.Rows / 2))

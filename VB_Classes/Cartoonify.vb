@@ -14,13 +14,13 @@ Public Class CartoonifyImage_Basics
         ocvb.desc = "Create a cartoon from a color image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim medianBlur = If(sliders.sliders(0).Value Mod 2, sliders.sliders(0).Value, sliders.sliders(0).Value + 1)
-        Dim medianBlur2 = If(sliders.sliders(1).Value Mod 2, sliders.sliders(1).Value, sliders.sliders(1).Value + 1)
-        Dim kernelSize = If(sliders.sliders(3).Value Mod 2, sliders.sliders(3).Value, sliders.sliders(3).Value + 1)
+        Dim medianBlur = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value + 1)
+        Dim medianBlur2 = If(sliders.trackbar(1).Value Mod 2, sliders.trackbar(1).Value, sliders.trackbar(1).Value + 1)
+        Dim kernelSize = If(sliders.trackbar(3).Value Mod 2, sliders.trackbar(3).Value, sliders.trackbar(3).Value + 1)
         Dim gray8u = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         gray8u = gray8u.MedianBlur(medianBlur)
         Dim edges = gray8u.Laplacian(cv.MatType.CV_8U, kernelSize)
-        Dim mask = edges.Threshold(sliders.sliders(2).Value, 255, cv.ThresholdTypes.Binary)
+        Dim mask = edges.Threshold(sliders.trackbar(2).Value, 255, cv.ThresholdTypes.Binary)
         dst1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = src.MedianBlur(medianBlur2).MedianBlur(medianBlur2)
         src.CopyTo(dst2, mask)

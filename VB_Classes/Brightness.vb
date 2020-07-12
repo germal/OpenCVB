@@ -13,8 +13,8 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
-        claheObj.TilesGridSize() = New cv.Size(sliders.sliders(0).Value, sliders.sliders(1).Value)
-        claheObj.ClipLimit = sliders.sliders(0).Value
+        claheObj.TilesGridSize() = New cv.Size(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
+        claheObj.ClipLimit = sliders.trackbar(0).Value
         claheObj.Apply(src, dst2)
 
         label1 = "GrayScale"
@@ -55,7 +55,7 @@ Public Class Brightness_AlphaBeta
         sliders.setupTrackBar(1, "Brightness Beta (brightness)", -100, 100, 0)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst1 = src.ConvertScaleAbs(sliders.sliders(0).Value / 500, sliders.sliders(1).Value)
+        dst1 = src.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
     End Sub
 End Class
 
@@ -73,10 +73,10 @@ Public Class Brightness_Gamma
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static lastGamma As Int32 = -1
-        If lastGamma <> sliders.sliders(0).Value Then
-            lastGamma = sliders.sliders(0).Value
+        If lastGamma <> sliders.trackbar(0).Value Then
+            lastGamma = sliders.trackbar(0).Value
             For i = 0 To lookupTable.Length - 1
-                lookupTable(i) = Math.Pow(i / 255, sliders.sliders(0).Value / 100) * 255
+                lookupTable(i) = Math.Pow(i / 255, sliders.trackbar(0).Value / 100) * 255
             Next
         End If
         dst1 = src.LUT(lookupTable)
@@ -121,7 +121,7 @@ Public Class Brightness_WhiteBalance_CPP
         Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
         Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
 
-        Dim thresholdVal As Single = sliders.sliders(0).Value / 100
+        Dim thresholdVal As Single = sliders.trackbar(0).Value / 100
         Dim rgbPtr = WhiteBalance_Run(wPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, thresholdVal)
         handleSrc.Free()
 
@@ -169,7 +169,7 @@ Public Class Brightness_WhiteBalance
         hist.src = sum32f
         hist.Run(ocvb)
 
-        Dim thresholdVal = sliders.sliders(0).Value / 100
+        Dim thresholdVal = sliders.trackbar(0).Value / 100
         Dim sum As Single
         Dim threshold As Int32
         For i = hist.histRaw(0).Rows - 1 To 0 Step -1

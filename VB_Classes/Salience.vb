@@ -35,7 +35,7 @@ Public Class Salience_Basics_CPP
         If src.Total <> grayData.Length Then ReDim grayData(src.Total - 1)
         Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, grayData, 0, grayData.Length)
-        Dim imagePtr = Salience_Run(salience, sliders.sliders(0).Value, grayHandle.AddrOfPinnedObject, src.Height, src.Width)
+        Dim imagePtr = Salience_Run(salience, sliders.trackbar(0).Value, grayHandle.AddrOfPinnedObject, src.Height, src.Width)
         grayHandle.Free()
 
         dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.cols, cv.MatType.CV_8U, imagePtr)
@@ -53,14 +53,14 @@ Public Class Salience_Basics_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         salience = New Salience_Basics_CPP(ocvb)
-        salience.sliders.sliders(1).Value = 2
+        salience.sliders.trackbar(1).Value = 2
 
         ocvb.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim numScales = salience.sliders.sliders(0).Value
-        Dim threads = salience.sliders.sliders(1).Value
+        Dim numScales = salience.sliders.trackbar(0).Value
+        Dim threads = salience.sliders.trackbar(1).Value
         Dim h = CInt(src.Height / threads)
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U)
         Parallel.For(0, threads,

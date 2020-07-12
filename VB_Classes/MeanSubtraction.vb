@@ -11,7 +11,7 @@ Public Class MeanSubtraction_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Dim mean = cv.Cv2.Mean(ocvb.color)
         cv.Cv2.Subtract(mean, ocvb.color, dst1)
-        Dim scalingFactor = sliders.sliders(0).Value / 100
+        Dim scalingFactor = sliders.trackbar(0).Value / 100
         dst1 *= 1 / scalingFactor
     End Sub
 End Class

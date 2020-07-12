@@ -14,7 +14,7 @@ Public Class Contrast_POW
         dst1.ConvertTo(dst2, cv.MatType.CV_32FC3)
         dst2 = dst2.Normalize()
 
-        Dim exponent = sliders.sliders(0).Value / 100
+        Dim exponent = sliders.trackbar(0).Value / 100
         dst2 = dst2.Pow(exponent)
     End Sub
 End Class
@@ -34,7 +34,7 @@ Public Class Contrast_Basics
         ocvb.desc = "Show image with varying contrast and brightness."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        src.ConvertTo(dst1, -1, sliders.sliders(1).Value / 50, sliders.sliders(0).Value)
+        src.ConvertTo(dst1, -1, sliders.trackbar(1).Value / 50, sliders.trackbar(0).Value)
         label1 = "Brightness/Contrast"
         label2 = ""
     End Sub

@@ -11,7 +11,7 @@ Public Class Math_Subtract
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim tmp = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-        tmp.SetTo(New cv.Scalar(sliders.sliders(2).Value, sliders.sliders(1).Value, sliders.sliders(0).Value))
+        tmp.SetTo(New cv.Scalar(sliders.trackbar(2).Value, sliders.trackbar(1).Value, sliders.trackbar(0).Value))
         cv.Cv2.Subtract(tmp, src, dst1)
     End Sub
 End Class
@@ -56,7 +56,7 @@ Public Class Math_Median_CDF
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If standalone Then bins = sliders.sliders(0).Value
+        If standalone Then bins = sliders.trackbar(0).Value
 
         medianVal = computeMedian(src, New cv.Mat, src.Total, bins, rangeMin, rangeMax)
 

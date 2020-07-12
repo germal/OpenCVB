@@ -13,7 +13,7 @@ Public Class Encode_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim buf(ocvb.color.Width * ocvb.color.Height * ocvb.color.ElemSize) As Byte
-        Dim encodeParams() As Int32 = {cv.ImwriteFlags.JpegQuality, sliders.sliders(0).Value}
+        Dim encodeParams() As Int32 = {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value}
 
         cv.Cv2.ImEncode(".jpg", ocvb.color, buf, encodeParams)
         dst2 = cv.Cv2.ImDecode(buf, 1)
@@ -21,7 +21,7 @@ Public Class Encode_Basics
         Dim output As New cv.Mat
         cv.Cv2.Absdiff(ocvb.color, dst2, output)
 
-        Dim scale = sliders.sliders(1).Value
+        Dim scale = sliders.trackbar(1).Value
         output.ConvertTo(dst1, cv.MatType.CV_8UC3, scale)
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
         label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
@@ -62,7 +62,7 @@ Public Class Encode_Options
         Next
 
         Dim fileExtension = ".jpg"
-        Dim qualityLevel = sliders.sliders(0).Value
+        Dim qualityLevel = sliders.trackbar(0).Value
         If encodeOption = cv.ImwriteFlags.JpegProgressive Then qualityLevel = 1 ' just on or off
         If encodeOption = cv.ImwriteFlags.JpegOptimize Then qualityLevel = 1 ' just on or off
         Dim encodeParams() As Int32 = {encodeOption, qualityLevel}
@@ -73,7 +73,7 @@ Public Class Encode_Options
         Dim output As New cv.Mat
         cv.Cv2.Absdiff(ocvb.color, dst2, output)
 
-        Dim scale = sliders.sliders(1).Value
+        Dim scale = sliders.trackbar(1).Value
         output.ConvertTo(dst1, cv.MatType.CV_8UC3, scale)
         Dim compressionRatio = buf.Length / (ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize)
         label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.0%") + ")"

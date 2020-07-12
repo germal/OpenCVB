@@ -12,8 +12,8 @@ Public Class EMax_Basics
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
 
-        grid.sliders.sliders(0).Value = src.Width / 3 ' 270
-        grid.sliders.sliders(1).Value = src.Height / 3 ' 150
+        grid.sliders.trackbar(0).Value = src.Width / 3 ' 270
+        grid.sliders.trackbar(1).Value = src.Height / 3 ' 150
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "EMax Number of Samples", 1, 200, 100)
@@ -37,11 +37,11 @@ Public Class EMax_Basics
                                                   "The EMax_Basics_CPP works fine and they are functionally identical.", 20, 100, RESULT2))
         End If
 
-        samples = New cv.Mat(sliders.sliders(0).Value, 2, cv.MatType.CV_32FC1, 0)
+        samples = New cv.Mat(sliders.trackbar(0).Value, 2, cv.MatType.CV_32FC1, 0)
         If regionCount > samples.Rows / 2 Then regionCount = samples.Rows / 2
-        labels = New cv.Mat(sliders.sliders(0).Value, 1, cv.MatType.CV_32S, 0)
+        labels = New cv.Mat(sliders.trackbar(0).Value, 1, cv.MatType.CV_32S, 0)
         samples = samples.Reshape(2, 0)
-        Dim sigma = sliders.sliders(2).Value
+        Dim sigma = sliders.trackbar(2).Value
         For i = 0 To regionCount - 1
             Dim samples_part = samples.RowRange(i * samples.Rows / regionCount, (i + 1) * samples.Rows / regionCount)
             labels.RowRange(i * samples.Rows / regionCount, (i + 1) * samples.Rows / regionCount).SetTo(i)
@@ -125,7 +125,7 @@ Public Class EMax_Basics_CPP
     Public Sub Run(ocvb As AlgorithmData)
         basics.Run(ocvb)
         dst1 = basics.dst1
-        Dim srcCount = basics.sliders.sliders(0).Value
+        Dim srcCount = basics.sliders.trackbar(0).Value
         label1 = CStr(srcCount) + " Random samples in " + CStr(basics.regionCount) + " clusters"
 
         Dim covarianceMatrixType As Int32 = 0
@@ -146,7 +146,7 @@ Public Class EMax_Basics_CPP
         Marshal.Copy(basics.labels.Data, labelData, 0, labelData.Length)
 
         Dim imagePtr = EMax_Basics_Run(EMax_Basics, handleSrc.AddrOfPinnedObject(), handleLabels.AddrOfPinnedObject(), srcCount, 2,
-                                       dst1.Rows, dst1.Cols, basics.regionCount, basics.sliders.sliders(1).Value, covarianceMatrixType)
+                                       dst1.Rows, dst1.Cols, basics.regionCount, basics.sliders.trackbar(1).Value, covarianceMatrixType)
         handleLabels.Free() ' free the pinned memory...
         handleSrc.Free() ' free the pinned memory...
 
@@ -179,12 +179,12 @@ Public Class EMax_PaletteConsistencyCentroid
         dilate = New DilateErode_Basics(ocvb)
 
         canny = New Edges_Canny(ocvb)
-        canny.sliders.sliders(0).Value = 1
-        canny.sliders.sliders(1).Value = 1
+        canny.sliders.trackbar(0).Value = 1
+        canny.sliders.trackbar(1).Value = 1
 
         emaxCPP = New EMax_Basics_CPP(ocvb)
         emaxCPP.showInput = False
-        emaxCPP.basics.sliders.sliders(1).Value = 15
+        emaxCPP.basics.sliders.trackbar(1).Value = 15
 
         ocvb.desc = "Try to display EMax results with a consistent palette from frame to frame - not successful for > 3 rows"
     End Sub

@@ -65,14 +65,14 @@ Public Class Binarize_Niblack_Sauvola
         label2 = "Binarize Sauvola"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = sliders.sliders(0).Value
+        Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim grayBin As New cv.Mat
-        cv.Extensions.Binarizer.Niblack(src, grayBin, kernelSize, sliders.sliders(1).Value / 1000)
+        cv.Extensions.Binarizer.Niblack(src, grayBin, kernelSize, sliders.trackbar(1).Value / 1000)
         dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Extensions.Binarizer.Sauvola(src, grayBin, kernelSize, sliders.sliders(2).Value / 1000, sliders.sliders(3).Value)
+        cv.Extensions.Binarizer.Sauvola(src, grayBin, kernelSize, sliders.trackbar(2).Value / 1000, sliders.trackbar(3).Value)
         dst2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
@@ -94,14 +94,14 @@ Public Class Binarize_Niblack_Nick
         label2 = "Binarize Nick"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = sliders.sliders(0).Value
+        Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayBin As New cv.Mat
-        cv.Extensions.Binarizer.Niblack(src, grayBin, kernelSize, sliders.sliders(1).Value / 1000)
+        cv.Extensions.Binarizer.Niblack(src, grayBin, kernelSize, sliders.trackbar(1).Value / 1000)
         dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Extensions.Binarizer.Nick(src, grayBin, kernelSize, sliders.sliders(2).Value / 1000)
+        cv.Extensions.Binarizer.Nick(src, grayBin, kernelSize, sliders.trackbar(2).Value / 1000)
         dst2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
@@ -124,15 +124,15 @@ Public Class Binarize_Bernson
         ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = sliders.sliders(0).Value
+        Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayBin = gray.Clone()
         If ocvb.drawRect = New cv.Rect() Then
-            cv.Extensions.Binarizer.Bernsen(gray, grayBin, kernelSize, sliders.sliders(1).Value, sliders.sliders(2).Value)
+            cv.Extensions.Binarizer.Bernsen(gray, grayBin, kernelSize, sliders.trackbar(1).Value, sliders.trackbar(2).Value)
         Else
-            cv.Extensions.Binarizer.Bernsen(gray(ocvb.drawRect), grayBin(ocvb.drawRect), kernelSize, sliders.sliders(1).Value, sliders.sliders(2).Value)
+            cv.Extensions.Binarizer.Bernsen(gray(ocvb.drawRect), grayBin(ocvb.drawRect), kernelSize, sliders.trackbar(1).Value, sliders.trackbar(2).Value)
         End If
         dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
@@ -147,8 +147,8 @@ Public Class Binarize_Bernson_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = 32
-        grid.sliders.sliders(1).Value = 32
+        grid.sliders.trackbar(0).Value = 32
+        grid.sliders.trackbar(1).Value = 32
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
@@ -159,12 +159,12 @@ Public Class Binarize_Bernson_MT
         label1 = "Binarize Bernson"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim kernelSize = sliders.sliders(0).Value
+        Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
         grid.Run(ocvb)
-        Dim contrastMin = sliders.sliders(1).Value
-        Dim bgThreshold = sliders.sliders(2).Value
+        Dim contrastMin = sliders.trackbar(1).Value
+        Dim bgThreshold = sliders.trackbar(2).Value
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,

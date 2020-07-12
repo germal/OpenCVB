@@ -46,7 +46,7 @@ Public Class GetRotationMatrix2D_Basics
     Public Sub Run(ocvb As AlgorithmData)
         warpFlag = getInterpolationRadioButtons(radio)
 
-        Dim angle = sliders.sliders(0).Value
+        Dim angle = sliders.trackbar(0).Value
         M = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), angle, 1)
         dst1 = src.WarpAffine(M, src.Size(), warpFlag)
         If warpFlag = cv.InterpolationFlags.WarpInverseMap Then Mflip = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), -angle, 1)

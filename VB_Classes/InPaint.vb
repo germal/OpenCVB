@@ -24,7 +24,7 @@ Public Class InPaint_Basics
         src.CopyTo(dst1)
         Dim p1 = New cv.Point2f(msRNG.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), msRNG.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
         Dim p2 = New cv.Point2f(msRNG.Next(ocvb.color.Cols / 4, ocvb.color.Cols * 3 / 4), msRNG.Next(ocvb.color.Rows / 4, ocvb.color.Rows * 3 / 4))
-        Dim thickness = sliders.sliders(0).Value
+        Dim thickness = sliders.trackbar(0).Value
         dst1.Line(p1, p2, New cv.Scalar(0, 0, 0), thickness, cv.LineTypes.AntiAlias)
         Dim mask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
         mask.SetTo(0)

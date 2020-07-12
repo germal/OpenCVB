@@ -31,10 +31,10 @@ Public Class Quaterion_Basics
         ocvb.desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim q1 = New Quaternion(CSng(sliders.sliders(0).Value / 100), CSng(sliders.sliders(1).Value / 100),
-                                    CSng(sliders.sliders(2).Value / 100), CSng(sliders.sliders(3).Value / 100))
-        Dim q2 = New Quaternion(CSng(sliders.sliders(4).Value / 100), CSng(sliders.sliders(5).Value / 100),
-                                    CSng(sliders.sliders(6).Value / 100), CSng(sliders.sliders(7).Value / 100))
+        Dim q1 = New Quaternion(CSng(sliders.trackbar(0).Value / 100), CSng(sliders.trackbar(1).Value / 100),
+                                    CSng(sliders.trackbar(2).Value / 100), CSng(sliders.trackbar(3).Value / 100))
+        Dim q2 = New Quaternion(CSng(sliders.trackbar(4).Value / 100), CSng(sliders.trackbar(5).Value / 100),
+                                    CSng(sliders.trackbar(6).Value / 100), CSng(sliders.trackbar(7).Value / 100))
 
         Dim quatmul = Quaternion.Multiply(q1, q2)
         ocvb.putText(New TTtext("q1 = " + q1.ToString() + vbCrLf +

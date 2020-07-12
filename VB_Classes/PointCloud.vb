@@ -67,7 +67,7 @@ Public Class PointCloud_Colorize
         Next
 
         ' draw the arc showing the camera FOV
-        Dim startAngle = sliders.sliders(0).Value
+        Dim startAngle = sliders.trackbar(0).Value
         Dim x = dst.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
         Dim xloc = cameraPt.X + x
 
@@ -98,7 +98,7 @@ Public Class PointCloud_Colorize
         Next
 
         ' draw the arc showing the camera FOV
-        Dim startAngle = sliders.sliders(1).Value
+        Dim startAngle = sliders.trackbar(1).Value
         Dim y = (dst.Width - shift) / Math.Tan(startAngle * cv.Cv2.PI / 180)
         Dim yloc = cameraPt.Y - y
 
@@ -160,12 +160,12 @@ Public Class PointCloud_Raw_CPP
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = 64
-        grid.sliders.sliders(1).Value = 32
+        grid.sliders.trackbar(0).Value = 64
+        grid.sliders.trackbar(1).Value = 32
 
         foreground = New Depth_ManualTrim(ocvb)
-        foreground.sliders.sliders(0).Value = 300  ' fixed distance to keep the images stable.
-        foreground.sliders.sliders(1).Value = 4000 ' fixed distance to keep the images stable.
+        foreground.sliders.trackbar(0).Value = 300  ' fixed distance to keep the images stable.
+        foreground.sliders.trackbar(1).Value = 4000 ' fixed distance to keep the images stable.
         label1 = "Top View"
         label2 = "Side View"
         ocvb.desc = "Project the depth data onto a top view and side view."
@@ -178,8 +178,8 @@ Public Class PointCloud_Raw_CPP
 
         Dim h = src.Height
         Dim w = src.Width
-        Dim desiredMin = CSng(foreground.sliders.sliders(0).Value)
-        Dim desiredMax = CSng(foreground.sliders.sliders(1).Value)
+        Dim desiredMin = CSng(foreground.sliders.trackbar(0).Value)
+        Dim desiredMax = CSng(foreground.sliders.trackbar(1).Value)
         Dim range = CSng(desiredMax - desiredMin)
         Dim depth32f = getDepth32f(ocvb)
         If depthBytes Is Nothing Then
@@ -216,12 +216,12 @@ Public Class PointCloud_Raw
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = 64
-        grid.sliders.sliders(1).Value = 32
+        grid.sliders.trackbar(0).Value = 64
+        grid.sliders.trackbar(1).Value = 32
 
         foreground = New Depth_ManualTrim(ocvb)
-        foreground.sliders.sliders(0).Value = 300  ' fixed distance to keep the images stable.
-        foreground.sliders.sliders(1).Value = 4000 ' fixed distance to keep the images stable.
+        foreground.sliders.trackbar(0).Value = 300  ' fixed distance to keep the images stable.
+        foreground.sliders.trackbar(1).Value = 4000 ' fixed distance to keep the images stable.
         label1 = "Top View"
         label2 = "Side View"
         ocvb.desc = "Project the depth data onto a top view and side view - using only VB code (too slow.)"
@@ -234,8 +234,8 @@ Public Class PointCloud_Raw
 
         Dim h = src.Height
         Dim w = src.Width
-        Dim desiredMin = CSng(foreground.sliders.sliders(0).Value)
-        Dim desiredMax = CSng(foreground.sliders.sliders(1).Value)
+        Dim desiredMin = CSng(foreground.sliders.trackbar(0).Value)
+        Dim desiredMax = CSng(foreground.sliders.trackbar(1).Value)
         Dim range = CSng(desiredMax - desiredMin)
         Dim depth32f = getDepth32f(ocvb)
 
@@ -317,10 +317,10 @@ Public Class PointCloud_GVector_TopView
 
         view = New PointCloud_TopView(ocvb)
         If ocvb.parms.cameraIndex <> L515 And ocvb.parms.cameraIndex <> T265Camera Then view.hist.histOpts.check.Box(0).Checked = True ' we want the IMU to rotate the data.
-        view.hist.histOpts.sliders.sliders(0).Value = 5 ' a better default for flood fill
+        view.hist.histOpts.sliders.trackbar(0).Value = 5 ' a better default for flood fill
 
         flood = New FloodFill_Projection(ocvb)
-        flood.sliders.sliders(0).Value = 100
+        flood.sliders.trackbar(0).Value = 100
 
         label1 = "Isolated objects"
         ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings)"
@@ -334,7 +334,7 @@ Public Class PointCloud_GVector_TopView
         view.src = src
         view.Run(ocvb)
         dst1 = view.dst1
-        flood.src = view.hist.histOutput.Threshold(view.hist.histOpts.sliders.sliders(0).Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        flood.src = view.hist.histOutput.Threshold(view.hist.histOpts.sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
         dst2 = flood.dst2
         label2 = flood.label2
@@ -390,9 +390,9 @@ Public Class PointCloud_GVector_SideView
 
         view = New PointCloud_SideView(ocvb)
         view.hist.histOpts.check.Box(0).Checked = True ' we want the IMU to rotate the data.
-        view.hist.histOpts.sliders.sliders(0).Value = 5 ' a better default for flood fill
+        view.hist.histOpts.sliders.trackbar(0).Value = 5 ' a better default for flood fill
         flood = New FloodFill_Projection(ocvb)
-        flood.sliders.sliders(0).Value = 100
+        flood.sliders.trackbar(0).Value = 100
 
         label1 = "Isolated objects"
         ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings)"
@@ -406,7 +406,7 @@ Public Class PointCloud_GVector_SideView
         view.src = src
         view.Run(ocvb)
         dst1 = view.dst1
-        flood.src = view.hist.histOutput.Threshold(view.hist.histOpts.sliders.sliders(0).Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        flood.src = view.hist.histOutput.Threshold(view.hist.histOpts.sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
         dst2 = flood.dst2
         label2 = flood.label2
@@ -435,7 +435,7 @@ Public Class PointCloud_View_SideObjects
 
         If gVec.dst1.channels = 1 Then dst1 = gVec.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR) Else dst1 = gVec.dst1
         If ocvb.parms.resolution = resMed Then fontSize = 0.6
-        maxZ = gVec.view.hist.histOpts.sliders.sliders(1).Value / 1000
+        maxZ = gVec.view.hist.histOpts.sliders.trackbar(1).Value / 1000
         Dim mmPerPixel = maxZ * 1000 / src.Height
         Dim maxCount = Math.Min(gVec.flood.Rects.Count, 3)
         dst2 = dst1.Clone
@@ -515,7 +515,7 @@ Public Class PointCloud_SideView
         If hist.histOpts.check.Box(0).Checked Then
             dst1 = hist.dst1
         Else
-            dst1 = cMats.CameraLocationSide(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.sliders(1).Value / 1000)
+            dst1 = cMats.CameraLocationSide(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.trackbar(1).Value / 1000)
         End If
     End Sub
 End Class
@@ -548,7 +548,7 @@ Public Class PointCloud_TopView
         If hist.histOpts.check.Box(0).Checked Then
             dst1 = hist.dst1
         Else
-            dst1 = cMats.CameraLocationBot(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.sliders(1).Value / 1000)
+            dst1 = cMats.CameraLocationBot(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.trackbar(1).Value / 1000)
         End If
     End Sub
 End Class

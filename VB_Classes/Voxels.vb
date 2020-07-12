@@ -14,14 +14,14 @@ Public Class Voxels_Basics_MT
         check.Box(0).Checked = True
 
         trim = New Depth_InRange(ocvb)
-        trim.sliders.sliders(1).Value = 5000
+        trim.sliders.trackbar(1).Value = 5000
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Bins", 2, 200, 100)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = 16
-        grid.sliders.sliders(1).Value = 16
+        grid.sliders.trackbar(0).Value = 16
+        grid.sliders.trackbar(1).Value = 16
 
         label2 = "Voxels labeled with their median distance"
         ocvb.desc = "Use multi-threading to get median depth values as voxels."
@@ -29,8 +29,8 @@ Public Class Voxels_Basics_MT
     Public Sub Run(ocvb As AlgorithmData)
         trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
-        minDepth = trim.sliders.sliders(0).Value
-        maxDepth = trim.sliders.sliders(1).Value
+        minDepth = trim.sliders.trackbar(0).Value
+        maxDepth = trim.sliders.trackbar(1).Value
 
         grid.Run(ocvb)
 
@@ -40,7 +40,7 @@ Public Class Voxels_Basics_MT
             ReDim voxels(saveVoxelCount - 1)
         End If
 
-        Dim bins = sliders.sliders(0).Value
+        Dim bins = sliders.trackbar(0).Value
         Dim depth32f = getDepth32f(ocvb)
         ' putting the calcHist into a parallel.for (inside computeMedian below) seems to cause a memory leak.  Avoiding it here...
         'Parallel.For(0, grid.roiList.Count,

@@ -13,7 +13,7 @@ Public Class ORB_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        orb = cv.ORB.Create(sliders.sliders(0).Value)
+        orb = cv.ORB.Create(sliders.trackbar(0).Value)
         keypoints = orb.Detect(src)
         If standalone Then
             dst1 = src.Clone()

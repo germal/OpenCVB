@@ -109,8 +109,8 @@ Public Class DNN_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If dnnPrepared Then
-            Dim inScaleFactor = sliders.sliders(0).Value / sliders.sliders(0).Maximum ' should be 0.0078 by default...
-            Dim meanVal = CSng(sliders.sliders(1).Value)
+            Dim inScaleFactor = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum ' should be 0.0078 by default...
+            Dim meanVal = CSng(sliders.trackbar(1).Value)
             Dim inputBlob = CvDnn.BlobFromImage(ocvb.color(crop), inScaleFactor, New cv.Size(300, 300), meanVal, False)
             ocvb.color.CopyTo(dst2)
             ocvb.color(crop).CopyTo(dst1(crop))

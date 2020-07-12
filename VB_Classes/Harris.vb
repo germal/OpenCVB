@@ -49,12 +49,12 @@ Public Class Harris_Features_CPP
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
-        Dim threshold = sliders.sliders(0).Value / 10000
-        Dim neighborhood = sliders.sliders(1).Value
+        Dim threshold = sliders.trackbar(0).Value / 10000
+        Dim neighborhood = sliders.trackbar(1).Value
         If neighborhood Mod 2 = 0 Then neighborhood += 1
-        Dim aperture = sliders.sliders(2).Value
+        Dim aperture = sliders.trackbar(2).Value
         If aperture Mod 2 = 0 Then aperture += 1
-        Dim HarrisParm = sliders.sliders(3).Value / 100
+        Dim HarrisParm = sliders.trackbar(3).Value / 100
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim imagePtr = Harris_Features_Run(Harris_Features, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, threshold,
                                            neighborhood, aperture, HarrisParm)
@@ -93,7 +93,7 @@ Public Class Harris_Detector_CPP
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
-        Dim qualityLevel = sliders.sliders(0).Value / 100
+        Dim qualityLevel = sliders.trackbar(0).Value / 100
 
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned) 
         Dim handleCount = GCHandle.Alloc(ptCount, GCHandleType.Pinned)

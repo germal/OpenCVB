@@ -13,10 +13,10 @@ Public Class Coherence_Basics
         ocvb.desc = "Find lines that are artistically coherent in the image - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim sigma = sliders.sliders(0).Value * 2 + 1
-        Dim blend = sliders.sliders(1).Value / 10
-        Dim str_sigma = sliders.sliders(2).Value * 2 + 1
-        Dim eigenKernelSize = sliders.sliders(3).Value * 2 + 1
+        Dim sigma = sliders.trackbar(0).Value * 2 + 1
+        Dim blend = sliders.trackbar(1).Value / 10
+        Dim str_sigma = sliders.trackbar(2).Value * 2 + 1
+        Dim eigenKernelSize = sliders.trackbar(3).Value * 2 + 1
 
         Dim side = 512
         If src.Height < side Then side = 256

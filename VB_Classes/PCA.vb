@@ -23,7 +23,7 @@ Public Class PCA_Basics
                 images32f(i).CopyTo(data.Row(i))
             Next
 
-            Dim retainedVariance = sliders.sliders(0).Value / 100
+            Dim retainedVariance = sliders.trackbar(0).Value / 100
             Dim pca = New cv.PCA(data, New cv.Mat, cv.PCA.Flags.DataAsRow, retainedVariance)  ' the pca inputarray cannot be static so we reallocate each time.
 
             Dim point = pca.Project(data.Row(0))

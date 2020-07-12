@@ -17,7 +17,7 @@ Public Class BRISK_Basics
         features.Clear()
         For Each pt In keyPoints
             Dim r = pt.Size
-            If r > sliders.sliders(0).Value Then
+            If r > sliders.trackbar(0).Value Then
                 features.Add(New cv.Point2f(pt.Pt.X, pt.Pt.Y))
                 dst1.Circle(pt.Pt, 2, cv.Scalar.Green, r / 2, cv.LineTypes.AntiAlias)
             End If

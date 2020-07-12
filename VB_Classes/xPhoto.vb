@@ -100,7 +100,7 @@ Public Class xPhoto_OilPaint_CPP
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim imagePtr = xPhoto_OilPaint_Run(xPhoto_OilPaint, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                           sliders.sliders(1).Value, sliders.sliders(0).Value, colorCode)
+                                           sliders.trackbar(1).Value, sliders.trackbar(0).Value, colorCode)
         handleSrc.Free()
 
         If imagePtr <> 0 Then dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)

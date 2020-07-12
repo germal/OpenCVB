@@ -105,14 +105,14 @@ Public Class Dither_Basics
         Next
         Select Case radioIndex
             Case 5, 12, 20, 22
-                sliders.sliders(0).Enabled = True
+                sliders.trackbar(0).Enabled = True
             Case Else
-                sliders.sliders(0).Enabled = False
+                sliders.trackbar(0).Enabled = False
         End Select
 
         Dim w = dst1.Width
         Dim h = dst1.Height
-        Dim nColors = Choose(sliders.sliders(0).Value, 1, 3, 7, 15, 31) ' indicate 3, 6, 9, 12, 15 bits per pixel.
+        Dim nColors = Choose(sliders.trackbar(0).Value, 1, 3, 7, 15, 31) ' indicate 3, 6, 9, 12, 15 bits per pixel.
         Dim pixels(dst1.Total * dst1.ElemSize - 1) As Byte
         Dim hpixels = GCHandle.Alloc(pixels, GCHandleType.Pinned)
         For i = 0 To 1

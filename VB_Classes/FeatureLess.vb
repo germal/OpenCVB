@@ -18,8 +18,8 @@ Public Class Featureless_Basics_MT
         edges = New Edges_Canny(ocvb)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = If(ocvb.color.Width > 1000, 16, 8)
-        grid.sliders.sliders(1).Value = If(ocvb.color.Width > 1000, 16, 8)
+        grid.sliders.trackbar(0).Value = If(ocvb.color.Width > 1000, 16, 8)
+        grid.sliders.trackbar(1).Value = If(ocvb.color.Width > 1000, 16, 8)
 
         ocvb.desc = "Multithread Houghlines to find featureless regions in an image."
         label1 = "Featureless regions with mask in depth color"
@@ -31,10 +31,10 @@ Public Class Featureless_Basics_MT
         edges.src = src
         edges.Run(ocvb)
 
-        Dim rhoIn = sliders.sliders(0).Value
-        Dim thetaIn = sliders.sliders(1).Value / 1000
-        Dim threshold = sliders.sliders(2).Value
-        Dim floodCountThreshold = sliders.sliders(3).Value
+        Dim rhoIn = sliders.trackbar(0).Value
+        Dim thetaIn = sliders.trackbar(1).Value / 1000
+        Dim threshold = sliders.trackbar(2).Value
+        Dim floodCountThreshold = sliders.trackbar(3).Value
 
         src.CopyTo(dst1)
         mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
@@ -96,7 +96,7 @@ Public Class FeatureLess_Prediction
         Dim labels = fLess.mask.Clone()
         fLess.mask = fLess.mask.Threshold(1, 255, cv.ThresholdTypes.Binary)
 
-        Dim percent = Math.Sqrt(sliders.sliders(0).Value / 100)
+        Dim percent = Math.Sqrt(sliders.trackbar(0).Value / 100)
         Dim newSize = New cv.Size(src.Width * percent, src.Height * percent)
 
         Dim rgb = src.Clone(), depth32f = getDepth32f(ocvb).Resize(newSize), mask = fLess.mask

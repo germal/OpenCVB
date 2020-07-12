@@ -17,8 +17,8 @@ Public Class GrabCut_Basics
         contours.src = src
         contours.Run(ocvb)
         dst2 = contours.dst2
-        Dim iterations = sliders.sliders(0).Value
-        Dim kernelsize = sliders.sliders(1).Value
+        Dim iterations = sliders.trackbar(0).Value
+        Dim kernelsize = sliders.trackbar(1).Value
         If kernelsize Mod 2 = 0 Then kernelsize += 1
         Dim morphShape = cv.MorphShapes.Cross
 

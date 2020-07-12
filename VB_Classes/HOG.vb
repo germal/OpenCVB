@@ -38,9 +38,9 @@ Public Class HOG_Basics
         ' run the detector with default parameters. to get a higher hit-rate
         ' (and more false alarms, respectively), decrease the hitThreshold and
         ' groupThreshold (set groupThreshold to 0 to turn off the grouping completely).
-        Dim threshold = sliders.sliders(0).Value
-        Dim stride = sliders.sliders(1).Value
-        Dim scale = sliders.sliders(2).Value / 1000
+        Dim threshold = sliders.trackbar(0).Value
+        Dim stride = sliders.trackbar(1).Value
+        Dim scale = sliders.trackbar(2).Value / 1000
         Dim found() As cv.Rect = hog.DetectMultiScale(src, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)
         label1 = String.Format("{0} region(s) found", found.Length)
         src.CopyTo(dst1)
@@ -52,7 +52,7 @@ Public Class HOG_Basics
             If found.Length > 0 Then
                 staticImageProcessed = True
                 label2 = String.Format("{0} region(s) found", found.Length)
-                sliders.sliders(1).Value = 30 ' this will speed up the frame rate.  This algorithm is way too slow!  It won't find much at this rate...
+                sliders.trackbar(1).Value = 30 ' this will speed up the frame rate.  This algorithm is way too slow!  It won't find much at this rate...
             Else
                 label2 = "Try adjusting slider bars."
             End If

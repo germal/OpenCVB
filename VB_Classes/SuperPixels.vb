@@ -37,10 +37,10 @@ Public Class SuperPixel_Basics_CPP
         Static numSuperPixels As Int32
         Static numIterations As Int32
         Static prior As Int32
-        If numSuperPixels <> sliders.sliders(0).Value Or numIterations <> sliders.sliders(1).Value Or prior <> sliders.sliders(2).Value Then
-            numSuperPixels = sliders.sliders(0).Value
-            numIterations = sliders.sliders(1).Value
-            prior = sliders.sliders(2).Value
+        If numSuperPixels <> sliders.trackbar(0).Value Or numIterations <> sliders.trackbar(1).Value Or prior <> sliders.trackbar(2).Value Then
+            numSuperPixels = sliders.trackbar(0).Value
+            numIterations = sliders.trackbar(1).Value
+            prior = sliders.trackbar(2).Value
             If spPtr <> 0 Then SuperPixel_Close(spPtr)
             spPtr = SuperPixel_Open(src.Width, src.Height, numSuperPixels, numIterations, prior)
         End If

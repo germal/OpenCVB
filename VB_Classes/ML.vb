@@ -65,8 +65,8 @@ Public Class ML_FillRGBDepth_MT
         setCaller(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = ocvb.color.cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
-        grid.sliders.sliders(1).Value = ocvb.color.Rows / 4
+        grid.sliders.trackbar(0).Value = ocvb.color.cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
+        grid.sliders.trackbar(1).Value = ocvb.color.Rows / 4
         shadow = New Depth_Holes(ocvb)
         label1 = "ML filled shadow"
         label2 = ""
@@ -102,14 +102,14 @@ Public Class ML_FillRGBDepth
         sliders.setupTrackBar(0, "ML Min Learn Count", 2, 100, 5)
 
         shadow = New Depth_Holes(ocvb)
-        shadow.sliders.sliders(0).Value = 3
+        shadow.sliders.trackbar(0).Value = 3
 
         label2 = "ML filled shadow"
         ocvb.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
-        Dim minLearnCount = sliders.sliders(0).Value
+        Dim minLearnCount = sliders.trackbar(0).Value
         ocvb.RGBDepth.CopyTo(dst1)
         Dim depth32f = getDepth32f(ocvb)
         depth32f = detectAndFillShadow(shadow.holeMask, shadow.borderMask, depth32f, src, minLearnCount)
@@ -130,14 +130,14 @@ Public Class ML_DepthFromColor_MT
         colorizer = New Depth_Colorizer_CPP(ocvb)
 
         dilate = New DilateErode_Basics(ocvb)
-        dilate.sliders.sliders(1).Value = 2
+        dilate.sliders.trackbar(1).Value = 2
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Prediction Max Depth", 500, 5000, 1000)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = 16
-        grid.sliders.sliders(1).Value = 16
+        grid.sliders.trackbar(0).Value = 16
+        grid.sliders.trackbar(1).Value = 16
 
         label1 = "Predicted Depth"
         label2 = "Mask of color and depth input"
@@ -148,8 +148,8 @@ Public Class ML_DepthFromColor_MT
 
         Dim depth32f = getDepth32f(ocvb)
 
-        Dim mask = depth32f.Threshold(sliders.sliders(0).Value, sliders.sliders(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        depth32f.SetTo(sliders.sliders(0).Value, mask)
+        Dim mask = depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        depth32f.SetTo(sliders.trackbar(0).Value, mask)
 
         Dim predictedDepth As New cv.Mat(depth32f.Size(), cv.MatType.CV_32F, 0)
 
@@ -205,7 +205,7 @@ Public Class ML_DepthFromColor
         sliders.setupTrackBar(0, "Prediction Max Depth", 1000, 5000, 1500)
 
         resized = New Resize_Percentage(ocvb)
-        resized.sliders.sliders(0).Value = 2 ' 2% of the image.
+        resized.sliders.trackbar(0).Value = 2 ' 2% of the image.
 
         ocvb.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
@@ -224,12 +224,12 @@ Public Class ML_DepthFromColor
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
         Dim depth32f = getDepth32f(ocvb).Resize(color32f.Size())
 
-        Dim mask = depth32f.Threshold(sliders.sliders(0).Value, sliders.sliders(0).Value, cv.ThresholdTypes.Binary)
+        Dim mask = depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
         mats.mat(2) = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         cv.Cv2.BitwiseNot(mask, mask)
-        depth32f.SetTo(sliders.sliders(0).Value, mask)
+        depth32f.SetTo(sliders.trackbar(0).Value, mask)
 
         colorizer.src = depth32f
         colorizer.Run(ocvb)
@@ -259,7 +259,7 @@ Public Class ML_DepthFromColor
         mats.Run(ocvb)
         dst2 = mats.dst1
         label1 = "Predicted Depth"
-        label2 = "shadow, empty, Depth Mask < " + CStr(sliders.sliders(0).Value) + ", Learn Input"
+        label2 = "shadow, empty, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
     End Sub
 End Class
 
@@ -283,7 +283,7 @@ Public Class ML_DepthFromXYColor
         sliders.setupTrackBar(0, "Prediction Max Depth", 1000, 5000, 1500)
 
         resized = New Resize_Percentage(ocvb)
-        resized.sliders.sliders(0).Value = 2
+        resized.sliders.trackbar(0).Value = 2
 
         label1 = "Predicted Depth"
         ocvb.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
@@ -303,13 +303,13 @@ Public Class ML_DepthFromXYColor
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
         Dim depth32f = getDepth32f(ocvb).Resize(color32f.Size())
 
-        Dim mask = depth32f.Threshold(sliders.sliders(0).Value, sliders.sliders(0).Value, cv.ThresholdTypes.BinaryInv)
+        Dim mask = depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.BinaryInv)
         mask.SetTo(0, shadowSmall) ' remove the unknown depth...
         mask.ConvertTo(mask, cv.MatType.CV_8U)
         mats.mat(2) = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         cv.Cv2.BitwiseNot(mask, mask)
-        depth32f.SetTo(sliders.sliders(0).Value, mask)
+        depth32f.SetTo(sliders.trackbar(0).Value, mask)
 
         colorizer.src = depth32f
         colorizer.Run(ocvb)
@@ -354,7 +354,7 @@ Public Class ML_DepthFromXYColor
 
         mats.Run(ocvb)
         dst2 = mats.dst1
-        label2 = "shadow, empty, Depth Mask < " + CStr(sliders.sliders(0).Value) + ", Learn Input"
+        label2 = "shadow, empty, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
     End Sub
 End Class
 
@@ -371,14 +371,14 @@ Public Class ML_EdgeDepth_MT
         colorizer = New Depth_Colorizer_CPP(ocvb)
 
         dilate = New DilateErode_Basics(ocvb)
-        dilate.sliders.sliders(1).Value = 5
+        dilate.sliders.trackbar(1).Value = 5
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Prediction Max Depth", 500, 5000, 1000)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = 16
-        grid.sliders.sliders(1).Value = 16
+        grid.sliders.trackbar(0).Value = 16
+        grid.sliders.trackbar(1).Value = 16
 
         label1 = "Depth Shadow (inverse of color and depth)"
         label2 = "Predicted Depth"
@@ -389,8 +389,8 @@ Public Class ML_EdgeDepth_MT
 
         Dim depth32f = getDepth32f(ocvb)
 
-        Dim mask = depth32f.Threshold(sliders.sliders(0).Value, sliders.sliders(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        depth32f.SetTo(sliders.sliders(0).Value, mask)
+        Dim mask = depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        depth32f.SetTo(sliders.trackbar(0).Value, mask)
 
         Dim predictedDepth As New cv.Mat(depth32f.Size(), cv.MatType.CV_32F, 0)
 
@@ -444,8 +444,8 @@ Public Class ML_Simple
 
         If standalone Then
             emax = New EMax_PaletteConsistencyCentroid(ocvb)
-            emax.emaxCPP.basics.grid.sliders.sliders(0).Value = 270
-            emax.emaxCPP.basics.grid.sliders.sliders(1).Value = 150
+            emax.emaxCPP.basics.grid.sliders.trackbar(0).Value = 270
+            emax.emaxCPP.basics.grid.sliders.trackbar(1).Value = 150
         End If
 
         label1 = ""

@@ -151,27 +151,27 @@ Public Class VTK_Histogram3D
         End If
 
         Static lastStdev As Int32 = -1
-        If vtk.memMapUserData(0) <> sliders.sliders(1).Value Or vtk.memMapUserData(1) <> sliders.sliders(2).Value / 1000000 Or
-                lastStdev <> sliders.sliders(0).Value Then
+        If vtk.memMapUserData(0) <> sliders.trackbar(1).Value Or vtk.memMapUserData(1) <> sliders.trackbar(2).Value / 1000000 Or
+                lastStdev <> sliders.trackbar(0).Value Then
             vtk.memMapUserData(2) = 1 ' trigger a recompute of the 3D histogram.
         Else
             vtk.memMapUserData(2) = 0 ' no need to recompute 3D histogram.
         End If
 
-        vtk.memMapUserData(0) = sliders.sliders(1).Value ' number of bins
-        vtk.memMapUserData(1) = sliders.sliders(2).Value / 1000000 ' threshold
+        vtk.memMapUserData(0) = sliders.trackbar(1).Value ' number of bins
+        vtk.memMapUserData(1) = sliders.trackbar(2).Value / 1000000 ' threshold
 
-        If lastStdev <> sliders.sliders(0).Value Then
+        If lastStdev <> sliders.trackbar(0).Value Then
             For i = 0 To 3
-                random.sliders.sliders(0).Value = Choose(i + 1, 25, 187, 25, 25)
-                random.sliders.sliders(1).Value = Choose(i + 1, 127, 127, 65, 65)
-                random.sliders.sliders(2).Value = Choose(i + 1, 180, 180, 180, 244)
-                random.sliders.sliders(3).Value = sliders.sliders(0).Value
+                random.sliders.trackbar(0).Value = Choose(i + 1, 25, 187, 25, 25)
+                random.sliders.trackbar(1).Value = Choose(i + 1, 127, 127, 65, 65)
+                random.sliders.trackbar(2).Value = Choose(i + 1, 180, 180, 180, 244)
+                random.sliders.trackbar(3).Value = sliders.trackbar(0).Value
                 random.src = src
                 random.Run(ocvb)
                 mats.mat(i) = random.dst1
             Next
-            lastStdev = sliders.sliders(0).Value
+            lastStdev = sliders.trackbar(0).Value
         End If
 
         mats.Run(ocvb)

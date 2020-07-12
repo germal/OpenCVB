@@ -20,7 +20,7 @@ Public Class LineDetector_Basics
         Dim vectors = ld.Detect(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         src.CopyTo(dst1)
         src.CopyTo(dst2)
-        Dim thickness = sliders.sliders(0).Value
+        Dim thickness = sliders.trackbar(0).Value
 
         For Each v In vectors
             If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
@@ -233,12 +233,12 @@ Public Class lineDetector_FLD_CPP
     Public Sub Run(ocvb As AlgorithmData)
         sortedLines.Clear()
 
-        Dim length_threshold = sliders.sliders(0).Value
-        Dim distance_threshold = sliders.sliders(1).Value / 10
-        Dim canny_aperture_size = sliders.sliders(2).Value
+        Dim length_threshold = sliders.trackbar(0).Value
+        Dim distance_threshold = sliders.trackbar(1).Value / 10
+        Dim canny_aperture_size = sliders.trackbar(2).Value
         If canny_aperture_size Mod 2 = 0 Then canny_aperture_size += 1
-        Dim canny_th1 = sliders.sliders(4).Value
-        Dim canny_th2 = sliders.sliders(5).Value
+        Dim canny_th1 = sliders.trackbar(4).Value
+        Dim canny_th2 = sliders.trackbar(5).Value
         Dim do_merge = check.Box(0).Checked
 
         src.CopyTo(dst1)
@@ -252,7 +252,7 @@ Public Class lineDetector_FLD_CPP
         Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, rows, cols, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
         handle.Free()
 
-        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, sliders.sliders(3).Value)
+        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, sliders.trackbar(3).Value)
     End Sub
 End Class
 
@@ -276,7 +276,7 @@ Public Class LineDetector_3D_LongestLine
         label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod sliders.sliders(1).Value Then Exit Sub
+        If ocvb.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.src = src
         lines.Run(ocvb)
         src.CopyTo(dst1)
@@ -285,7 +285,7 @@ Public Class LineDetector_3D_LongestLine
 
         If lines.sortedLines.Count > 0 Then
             ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
-            Dim maskLineWidth As Int32 = sliders.sliders(0).Value
+            Dim maskLineWidth As Int32 = sliders.trackbar(0).Value
             Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
             find3DLineSegment(ocvb, dst1, mask, depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth)
         End If
@@ -310,7 +310,7 @@ Public Class LineDetector_3D_FLD_MT
         label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod sliders.sliders(1).Value Then Exit Sub
+        If ocvb.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.src = src
         lines.Run(ocvb)
         src.CopyTo(dst1)
@@ -318,7 +318,7 @@ Public Class LineDetector_3D_FLD_MT
         Dim depth32f = getDepth32f(ocvb)
 
         ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
-        Dim maskLineWidth As Int32 = sliders.sliders(0).Value
+        Dim maskLineWidth As Int32 = sliders.trackbar(0).Value
         Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
         Parallel.For(lines.sortedLines.Count - 20, lines.sortedLines.Count,
             Sub(i)
@@ -352,7 +352,7 @@ Public Class LineDetector_3D_FitLineZ
         label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod sliders.sliders(2).Value Then Exit Sub
+        If ocvb.frameCount Mod sliders.trackbar(2).Value Then Exit Sub
         Dim useX As Boolean = check.Box(0).Checked
         linesFLD.src = src
         linesFLD.Run(ocvb)
@@ -365,11 +365,11 @@ Public Class LineDetector_3D_FitLineZ
 
         If sortedlines.Count > 0 Then
             ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will likely get full length.
-            Dim maskLineWidth As Int32 = sliders.sliders(0).Value
+            Dim maskLineWidth As Int32 = sliders.trackbar(0).Value
             Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
 
             Dim longestLineOnly As Boolean = check.Box(1).Checked
-            Dim pointCountThreshold = sliders.sliders(1).Value
+            Dim pointCountThreshold = sliders.trackbar(1).Value
             Parallel.For(0, sortedlines.Count,
                 Sub(i)
                     If longestLineOnly And i < sortedlines.Count - 1 Then Exit Sub

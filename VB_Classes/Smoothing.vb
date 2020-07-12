@@ -41,7 +41,7 @@ Public Class Smoothing_Exterior
 	Public Sub New(ocvb As AlgorithmData)
 		setCaller(ocvb)
 		hull = New Hull_Basics(ocvb)
-		hull.sliders.sliders(0).Minimum = 4 ' required minimum number of points for the algorithm.
+		hull.sliders.trackbar(0).Minimum = 4 ' required minimum number of points for the algorithm.
 
 		sliders.Setup(ocvb, caller)
 		sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 10)
@@ -60,7 +60,7 @@ Public Class Smoothing_Exterior
 		dst1.SetTo(0)
 		Dim points = drawPoly(dst1, nextHull, cv.Scalar.White)
 
-		Dim smoothPoints = getSplineInterpolationCatmullRom(points, sliders.sliders(0).Value)
+		Dim smoothPoints = getSplineInterpolationCatmullRom(points, sliders.trackbar(0).Value)
 		If smoothPoints.Count > 0 Then drawPoly(dst1, smoothPoints.ToArray, cv.Scalar.Yellow)
 	End Sub
 End Class
@@ -114,8 +114,8 @@ Public Class Smoothing_Interior
 	Public Sub New(ocvb As AlgorithmData)
 		setCaller(ocvb)
 		hull = New Hull_Basics(ocvb)
-		hull.sliders.sliders(0).Minimum = 4 ' required minimum number of points for the algorithm.
-		hull.sliders.sliders(0).Value = 16
+		hull.sliders.trackbar(0).Minimum = 4 ' required minimum number of points for the algorithm.
+		hull.sliders.trackbar(0).Value = 16
 
 		sliders.Setup(ocvb, caller)
 		sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 1)
@@ -135,7 +135,7 @@ Public Class Smoothing_Interior
 		dst1.SetTo(0)
 		Dim points = drawPoly(dst1, nextHull, cv.Scalar.White)
 
-		Dim smoothPoints2d = getCurveSmoothingChaikin(points, sliders.sliders(1).Value / 100, sliders.sliders(0).Value)
+		Dim smoothPoints2d = getCurveSmoothingChaikin(points, sliders.trackbar(1).Value / 100, sliders.trackbar(0).Value)
 		Dim smoothPoints As New List(Of cv.Point)
 		For i = 0 To smoothPoints2d.Count - 1
 			smoothPoints.Add(New cv.Point(CInt(smoothPoints2d.ElementAt(i).X), CInt(smoothPoints2d.ElementAt(i).Y)))

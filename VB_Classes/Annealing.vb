@@ -123,18 +123,18 @@ Public Class Annealing_CPP_MT
         End Function
     End Class
     Private Sub setup(ocvb As AlgorithmData)
-        random.sliders.sliders(0).Value = sliders.sliders(0).Value
+        random.sliders.trackbar(0).Value = sliders.trackbar(0).Value
         random.Run(ocvb) ' get the city positions (may or may not be used below.)
 
         anneal(0) = New Annealing_Basics_CPP(ocvb)
-        anneal(0).numberOfCities = sliders.sliders(0).Value
+        anneal(0).numberOfCities = sliders.trackbar(0).Value
         anneal(0).circularPattern = check.Box(2).Checked
         If check.Box(2).Checked = False Then anneal(0).cityPositions = random.Points2f.Clone()
         anneal(0).setup(ocvb)
         anneal(0).Open() ' this will initialize the C++ copy of the city positions.
         For i = 1 To anneal.Length - 1
             anneal(i) = New Annealing_Basics_CPP(ocvb)
-            anneal(i).numberOfCities = sliders.sliders(0).Value
+            anneal(i).numberOfCities = sliders.trackbar(0).Value
             anneal(i).setup(ocvb)
             anneal(i).cityPositions = anneal(0).cityPositions.Clone() ' duplicate for all threads - working on the same set of points.
             anneal(i).Open() ' this will initialize the C++ copy of the city positions.
@@ -174,7 +174,7 @@ Public Class Annealing_CPP_MT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If anneal(0) Is Nothing Then setup(ocvb) ' setup here rather than in algorithm so all threads work on the same problem.
-        If anneal(0).numberOfCities <> sliders.sliders(0).Value Or check.Box(0).Checked Or check.Box(2).Checked <> anneal(0).circularPattern Then setup(ocvb)
+        If anneal(0).numberOfCities <> sliders.trackbar(0).Value Or check.Box(0).Checked Or check.Box(2).Checked <> anneal(0).circularPattern Then setup(ocvb)
         check.Box(0).Checked = False
         Dim allClosed As Boolean = True
         Parallel.For(0, anneal.Length,
@@ -200,10 +200,10 @@ Public Class Annealing_CPP_MT
         ' if the top 4 are all the same energy, then we are done.
         If bestList.Count > 1 Then
             Dim sameEnergy As Int32 = 1
-            For i = 1 To sliders.sliders(1).Value - 1
+            For i = 1 To sliders.trackbar(1).Value - 1
                 If anneal(CInt(bestList.ElementAt(i).Value)).energy = anneal(CInt(bestList.ElementAt(0).Value)).energy Then sameEnergy += 1
             Next
-            If sameEnergy = sliders.sliders(1).Value Then allClosed = True
+            If sameEnergy = sliders.trackbar(1).Value Then allClosed = True
             If sameEnergy = 1 Then
                 label1 = "There is only " + CStr(sameEnergy) + " thread at the best energy level."
             Else
@@ -244,7 +244,7 @@ Public Class Annealing_Options
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         random = New Random_Points(ocvb)
-        random.sliders.sliders(0).Value = 25 ' change the default number of cities here.
+        random.sliders.trackbar(0).Value = 25 ' change the default number of cities here.
         random.Run(ocvb) ' get the city positions (may or may not be used below.)
 
         check.Setup(ocvb, caller, 2)
@@ -259,7 +259,7 @@ Public Class Annealing_Options
 
 
         anneal = New Annealing_Basics_CPP(ocvb)
-        anneal.numberOfCities = random.sliders.sliders(0).Value
+        anneal.numberOfCities = random.sliders.trackbar(0).Value
         anneal.circularPattern = check.Box(1).Checked
         If check.Box(1).Checked = False Then anneal.cityPositions = random.Points2f.Clone()
         anneal.setup(ocvb)
@@ -267,7 +267,7 @@ Public Class Annealing_Options
         ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim numberOfCities = random.sliders.sliders(0).Value
+        Dim numberOfCities = random.sliders.trackbar(0).Value
         Dim circularPattern = check.Box(1).Checked ' do they want a circular pattern?
         If numberOfCities <> anneal.numberOfCities Or circularPattern <> anneal.circularPattern Then
             anneal.circularPattern = circularPattern

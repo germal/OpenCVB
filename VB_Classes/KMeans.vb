@@ -15,7 +15,7 @@ Public Class kMeans_Basics
         columnVector = rectMat.Reshape(src.Channels, small.Height * small.Width)
         Dim rgb32f As New cv.Mat
         columnVector.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
-        Dim clusterCount = sliders.sliders(0).Value
+        Dim clusterCount = sliders.trackbar(0).Value
         Dim labels = New cv.Mat()
         Dim colors As New cv.Mat
 
@@ -54,14 +54,14 @@ Public Class kMeans_Clusters
         Static saveRect = ocvb.drawRect
         ocvb.drawRect = saveRect
         For i = 0 To 3
-            km.sliders.sliders(0).Value = (i + 1) * 2
+            km.sliders.trackbar(0).Value = (i + 1) * 2
             km.src = src
             km.Run(ocvb)
             Mats.mat(i) = dst1.Resize(New cv.Size(dst1.Cols / 2, dst1.Rows / 2))
         Next
         Mats.Run(ocvb)
         dst2 = Mats.dst1
-        km.sliders.sliders(0).Value = 10 ' this will show kmeans with 10 clusters in Result1.
+        km.sliders.trackbar(0).Value = 10 ' this will show kmeans with 10 clusters in Result1.
         km.Run(ocvb)
         dst1 = km.dst1
     End Sub
@@ -90,7 +90,7 @@ Public Class kMeans_RGBFast
         columnVector.ConvertTo(columnVectorRGB32f, cv.MatType.CV_32FC3)
         Dim labels = New cv.Mat()
         Dim centers As New cv.Mat
-        Dim clusterCount = sliders.sliders(0).Value
+        Dim clusterCount = sliders.trackbar(0).Value
 
         cv.Cv2.Kmeans(columnVectorRGB32f, clusterCount, labels, term, 3, cv.KMeansFlags.PpCenters, centers)
         Dim labelImage = labels.Reshape(1, small8uC3.Rows)
@@ -148,7 +148,7 @@ Public Class kMeans_RGB_Plus_XYDepth
         columnVector = all32f.Reshape(all32f.Channels, all32f.Rows * all32f.Cols)
         Dim labels = New cv.Mat()
         Dim centers As New cv.Mat
-        Dim clusterCount = sliders.sliders(0).Value
+        Dim clusterCount = sliders.trackbar(0).Value
 
         cv.Cv2.Kmeans(columnVector, clusterCount, labels, term, 3, cv.KMeansFlags.PpCenters, centers)
         Dim labelImage = labels.Reshape(1, all32f.Rows)
@@ -183,11 +183,11 @@ Public Class kMeans_ReducedRGB
         ocvb.desc = "Reduce each pixel by the reduction factor and then run kmeans."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst2 = src / sliders.sliders(0).Value
-        dst2 *= sliders.sliders(0).Value
+        dst2 = src / sliders.trackbar(0).Value
+        dst2 *= sliders.trackbar(0).Value
 
         src = dst2
-        Dim k = sliders.sliders(1).Value
+        Dim k = sliders.trackbar(1).Value
         Dim n = src.Rows * src.Cols
         Dim data = src.Reshape(1, n)
         data.ConvertTo(data, cv.MatType.CV_32F)
@@ -233,7 +233,7 @@ Public Class kMeans_XYDepth
         columnVector = xyDepth32f.Reshape(xyDepth32f.Channels, xyDepth32f.Rows * xyDepth32f.Cols)
         Dim labels = New cv.Mat()
         Dim colors As New cv.Mat
-        cv.Cv2.Kmeans(columnVector, sliders.sliders(0).Value, labels, term, 3, cv.KMeansFlags.PpCenters, colors)
+        cv.Cv2.Kmeans(columnVector, sliders.trackbar(0).Value, labels, term, 3, cv.KMeansFlags.PpCenters, colors)
         For i = 0 To columnVector.Rows - 1
             columnVector.Set(Of cv.Vec3f)(i, 0, colors.Get(Of cv.Vec3f)(labels.Get(Of Int32)(i)))
         Next
@@ -298,7 +298,7 @@ Public Class kMeans_LAB
         columnVector = labMat.Reshape(src.Channels, roi.Height * roi.Width)
         Dim lab32f As New cv.Mat
         columnVector.ConvertTo(lab32f, cv.MatType.CV_32FC3)
-        Dim clusterCount = sliders.sliders(0).Value
+        Dim clusterCount = sliders.trackbar(0).Value
         Dim labels = New cv.Mat()
         Dim colors As New cv.Mat
 
@@ -331,7 +331,7 @@ Public Class kMeans_Color
         Dim columnVector = src.Reshape(src.Channels, src.Height * src.Width)
         Dim rgb32f As New cv.Mat
         columnVector.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
-        Dim clusterCount = sliders.sliders(0).Value
+        Dim clusterCount = sliders.trackbar(0).Value
         Dim labels = New cv.Mat()
         Dim colors As New cv.Mat
 
@@ -359,14 +359,14 @@ Public Class kMeans_Color_MT
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 2)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = 128
-        grid.sliders.sliders(1).Value = 160
+        grid.sliders.trackbar(0).Value = 128
+        grid.sliders.trackbar(1).Value = 160
 
         ocvb.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
-        Dim clusterCount = sliders.sliders(0).Value
+        Dim clusterCount = sliders.trackbar(0).Value
         Dim depth32f = getDepth32f(ocvb)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
@@ -417,7 +417,7 @@ Public Class kMeans_ColorDepth
         cv.Cv2.Merge(srcPlanes, rgbDepth)
 
         Dim columnVector = rgbDepth.Reshape(srcPlanes.Length, rgbDepth.Height * rgbDepth.Width)
-        Dim clusterCount = sliders.sliders(0).Value
+        Dim clusterCount = sliders.trackbar(0).Value
         Dim labels = New cv.Mat()
         Dim colors As New cv.Mat
 
@@ -446,15 +446,15 @@ Public Class kMeans_ColorDepth_MT
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 3)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.sliders(0).Value = 32
-        grid.sliders.sliders(1).Value = 32
+        grid.sliders.trackbar(0).Value = 32
+        grid.sliders.trackbar(1).Value = 32
 
         ocvb.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
 
-        Dim clusterCount = sliders.sliders(0).Value
+        Dim clusterCount = sliders.trackbar(0).Value
         Dim depth32f = getDepth32f(ocvb)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
        Sub(roi)

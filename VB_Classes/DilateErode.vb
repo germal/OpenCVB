@@ -17,8 +17,8 @@ Public Class DilateErode_Basics
         radio.check(0).Checked = True
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim iterations = sliders.sliders(1).Value
-        Dim kernelsize = sliders.sliders(0).Value
+        Dim iterations = sliders.trackbar(1).Value
+        Dim kernelsize = sliders.trackbar(0).Value
         If kernelsize Mod 2 = 0 Then kernelsize += 1
         Dim morphShape = cv.MorphShapes.Cross
         If radio.check(1).Checked Then morphShape = cv.MorphShapes.Ellipse
@@ -67,8 +67,8 @@ Public Class DilateErode_DepthSeed
         ocvb.desc = "Erode depth to build a depth mask for inrange data."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim iterations = dilate.sliders.sliders(1).Value
-        Dim kernelsize = If(dilate.sliders.sliders(0).Value Mod 2, dilate.sliders.sliders(0).Value, dilate.sliders.sliders(0).Value + 1)
+        Dim iterations = dilate.sliders.trackbar(1).Value
+        Dim kernelsize = If(dilate.sliders.trackbar(0).Value Mod 2, dilate.sliders.trackbar(0).Value, dilate.sliders.trackbar(0).Value + 1)
         Dim morphShape = cv.MorphShapes.Cross
         If dilate.radio.check(0).Checked Then morphShape = cv.MorphShapes.Cross
         If dilate.radio.check(1).Checked Then morphShape = cv.MorphShapes.Ellipse
@@ -79,11 +79,11 @@ Public Class DilateErode_DepthSeed
         Dim mat As New cv.Mat
         cv.Cv2.Erode(depth32f, mat, element)
         mat = depth32f - mat
-        Dim seeds = mat.LessThan(sliders.sliders(0).Value).ToMat
+        Dim seeds = mat.LessThan(sliders.trackbar(0).Value).ToMat
         dst2 = seeds
 
         Dim validImg = depth32f.GreaterThan(0).ToMat
-        validImg.SetTo(0, depth32f.GreaterThan(sliders.sliders(1).Value)) ' max distance
+        validImg.SetTo(0, depth32f.GreaterThan(sliders.trackbar(1).Value)) ' max distance
         cv.Cv2.BitwiseAnd(seeds, validImg, seeds)
         ocvb.result1.SetTo(0)
         ocvb.RGBDepth.CopyTo(ocvb.result1, seeds)
@@ -107,7 +107,7 @@ Public Class DilateErode_OpenClose
         ocvb.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim n = sliders.sliders(0).Value
+        Dim n = sliders.trackbar(0).Value
         Dim an As Int32 = If(n > 0, n, -n)
         Dim morphShape = cv.MorphShapes.Rect
         If radio.check(0).Checked Then morphShape = cv.MorphShapes.Cross

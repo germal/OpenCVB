@@ -27,10 +27,10 @@ Public Class FloodFill_Basics
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        minFloodSize = sliders.sliders(0).Value
-        Dim loDiff = cv.Scalar.All(sliders.sliders(1).Value)
-        Dim hiDiff = cv.Scalar.All(sliders.sliders(2).Value)
-        Dim stepSize = sliders.sliders(3).Value
+        minFloodSize = sliders.trackbar(0).Value
+        Dim loDiff = cv.Scalar.All(sliders.trackbar(1).Value)
+        Dim hiDiff = cv.Scalar.All(sliders.trackbar(2).Value)
+        Dim stepSize = sliders.trackbar(3).Value
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src
@@ -91,9 +91,9 @@ Public Class FloodFill_Top16_MT
         ocvb.desc = "Use floodfill to build image segments with a grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim minFloodSize = sliders.sliders(0).Value
-        Dim loDiff = cv.Scalar.All(sliders.sliders(1).Value)
-        Dim hiDiff = cv.Scalar.All(sliders.sliders(2).Value)
+        Dim minFloodSize = sliders.trackbar(0).Value
+        Dim loDiff = cv.Scalar.All(sliders.trackbar(1).Value)
+        Dim hiDiff = cv.Scalar.All(sliders.trackbar(2).Value)
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Clone()
@@ -130,9 +130,9 @@ Public Class FloodFill_Color_MT
         ocvb.desc = "Use floodfill to build image segments in an RGB image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim minFloodSize = flood.sliders.sliders(0).Value
-        Dim loDiff = cv.Scalar.All(flood.sliders.sliders(1).Value)
-        Dim hiDiff = cv.Scalar.All(flood.sliders.sliders(2).Value)
+        Dim minFloodSize = flood.sliders.trackbar(0).Value
+        Dim loDiff = cv.Scalar.All(flood.sliders.trackbar(1).Value)
+        Dim hiDiff = cv.Scalar.All(flood.sliders.trackbar(2).Value)
 
         dst1 = src.Clone()
         grid.Run(ocvb)
@@ -242,7 +242,7 @@ Public Class FloodFill_CComp
         dst1 = range.dst1
         dst2 = range.dst2
         label2 = CStr(ccomp.connectedComponents.blobs.length) + " blobs found. " + CStr(range.fBasics.maskRects.Count) + " were more than " +
-                      CStr(range.fBasics.sliders.sliders(0).Value) + " pixels"
+                      CStr(range.fBasics.sliders.trackbar(0).Value) + " pixels"
     End Sub
 End Class
 
@@ -350,10 +350,10 @@ Public Class FloodFill_Projection
         ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        minFloodSize = sliders.sliders(0).Value
-        Dim loDiff = cv.Scalar.All(sliders.sliders(1).Value)
-        Dim hiDiff = cv.Scalar.All(sliders.sliders(2).Value)
-        Dim stepSize = sliders.sliders(3).Value
+        minFloodSize = sliders.trackbar(0).Value
+        Dim loDiff = cv.Scalar.All(sliders.trackbar(1).Value)
+        Dim hiDiff = cv.Scalar.All(sliders.trackbar(2).Value)
+        Dim stepSize = sliders.trackbar(3).Value
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Clone()

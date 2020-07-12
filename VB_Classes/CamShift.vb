@@ -33,12 +33,12 @@ Public Class CamShift_Basics
         Static roi_hist As New cv.Mat
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim hue = hsv.EmptyClone()
-        Dim bins = sliders.sliders(3).Value
+        Dim bins = sliders.trackbar(3).Value
         Dim hsize() As Int32 = {bins, bins, bins}
         Dim ranges() = {New cv.Rangef(0, 180)}
-        Dim min = Math.Min(sliders.sliders(0).Value, sliders.sliders(1).Value)
-        Dim max = Math.Max(sliders.sliders(0).Value, sliders.sliders(1).Value)
-        Dim sbins = New cv.Scalar(0, sliders.sliders(2).Value, min)
+        Dim min = Math.Min(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
+        Dim max = Math.Max(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
+        Dim sbins = New cv.Scalar(0, sliders.trackbar(2).Value, min)
 
         cv.Cv2.MixChannels({hsv}, {hue}, {0, 0})
         Dim mask = hsv.InRange(sbins, New cv.Scalar(180, 255, max))
@@ -89,12 +89,12 @@ Public Class CamShift_Foreground
         Static depthMin As Int32
         Static depthMax As Int32
         If camshift.trackBox.Size.Width < 50 Then restartRequested = True
-        If fore.trim.sliders.sliders(0).Value <> depthMin Then
-            depthMin = fore.trim.sliders.sliders(0).Value
+        If fore.trim.sliders.trackbar(0).Value <> depthMin Then
+            depthMin = fore.trim.sliders.trackbar(0).Value
             restartRequested = True
         End If
-        If fore.trim.sliders.sliders(1).Value <> depthMax Then
-            depthMax = fore.trim.sliders.sliders(1).Value
+        If fore.trim.sliders.trackbar(1).Value <> depthMax Then
+            depthMax = fore.trim.sliders.trackbar(1).Value
             restartRequested = True
         End If
         If restartRequested Then fore.Run(ocvb)
@@ -172,7 +172,7 @@ Public Class Camshift_TopObjects
         blob.Run(ocvb)
         dst1 = blob.dst2
 
-        Dim updateFrequency = sliders.sliders(0).Value
+        Dim updateFrequency = sliders.trackbar(0).Value
         Dim trackBoxes As New List(Of cv.RotatedRect)
         For i = 0 To cams.Length - 1
             If blob.flood.fBasics.maskSizes.Count > i Then
