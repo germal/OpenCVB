@@ -201,6 +201,7 @@ End Class
 
 
 
+' https://github.com/anopara/genetic-drawing
 Public Class GeneticDrawing_Color
     Inherits ocvbClass
     Dim gDraw(3 - 1) As GeneticDrawing_Basics
@@ -214,7 +215,6 @@ Public Class GeneticDrawing_Color
         gDraw(2) = New GeneticDrawing_Basics(ocvb) ' options for the red channel are visible and will be sync below with the other channels if changed.
 
         label1 = "Intermediate results for the Red channel"
-        label2 = "Combined RGB results"
         ocvb.desc = "Use the GeneticDrawing_Basics to create a color painting.  Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -252,5 +252,6 @@ Public Class GeneticDrawing_Color
 
         dst1 = gDraw(2).dst1
         cv.Cv2.Merge(split, dst2)
+        label2 = gDraw(2).label2
     End Sub
 End Class
