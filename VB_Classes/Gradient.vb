@@ -88,13 +88,13 @@ End Class
 ' https://github.com/anopara/genetic-drawing
 Public Class Gradient_CartToPolar
     Inherits ocvbClass
-    Public gradient As Gradient_Basics
+    Public basics As Gradient_Basics
     Public magnitude As New cv.Mat
     Public angle As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        gradient = New Gradient_Basics(ocvb)
-        gradient.sobel.sliders.trackbar(0).Value = 1
+        basics = New Gradient_Basics(ocvb)
+        basics.sobel.sliders.trackbar(0).Value = 1
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
@@ -103,11 +103,11 @@ Public Class Gradient_CartToPolar
         ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        src.ConvertTo(gradient.src, cv.MatType.CV_32FC3, 1 / 255)
-        gradient.Run(ocvb)
+        src.ConvertTo(basics.src, cv.MatType.CV_32FC3, 1 / 255)
+        basics.Run(ocvb)
 
-        gradient.sobel.grayX.ConvertTo(dst1, cv.MatType.CV_32F)
-        gradient.sobel.grayY.ConvertTo(dst2, cv.MatType.CV_32F)
+        basics.sobel.grayX.ConvertTo(dst1, cv.MatType.CV_32F)
+        basics.sobel.grayY.ConvertTo(dst2, cv.MatType.CV_32F)
 
         cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
         magnitude = magnitude.Normalize()

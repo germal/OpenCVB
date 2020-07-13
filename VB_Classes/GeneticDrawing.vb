@@ -1,6 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports py = Python.Runtime
-Imports Numpy
 Public Structure DNAentry
     Dim color As Byte
     Dim pt As cv.Point
@@ -8,28 +6,26 @@ Public Structure DNAentry
     Dim rotation As Single
     Dim brushNumber As Integer
 End Structure
-
-
-
 ' https://github.com/anopara/genetic-drawing
 Public Class GeneticDrawing_Basics
     Inherits ocvbClass
-    Dim gradient As Gradient_CartToPolar
-    Dim minBrush = New cv.Vec2f(0.1, 0.3)
-    Dim maxBrush = New cv.Vec2f(0.3, 0.7)
+    Public gradient As Gradient_CartToPolar
+    Public minBrushRange = New cv.Rangef(0.1, 0.3)
+    Public maxBrushRange = New cv.Rangef(0.3, 0.7)
     Dim minSize As Single
     Dim maxSize As Single
-    Dim brushes(4 - 1) As cv.Mat
+    Public brushes(4 - 1) As cv.Mat
     Dim DNAseq() As DNAentry
     Dim totalError As Single
-    Dim brushSize = 300
-    Dim padding As Integer
+    Public brushSize = 300
     Dim stage As Integer
-    Dim generation As Integer
+    Public generation As Integer
     Dim generationTotal As Integer
+    Dim gradientMagContrast As Integer
+    Dim sobelKernel As Integer
     Dim stageTotal As Integer
-    Dim canvas As cv.Mat
-    Dim imgBuffer As cv.Mat
+    Dim imgGeneration As cv.Mat
+    Dim imgStage As cv.Mat
     Dim mats As Mat_4to1
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -51,13 +47,14 @@ Public Class GeneticDrawing_Basics
         sliders.setupTrackBar(2, "Brushstroke count per generation", 1, 100, 10)
         stageTotal = sliders.trackbar(1).Value
 
-        label1 = "(clkwise) original, tbd, canvas, magnitude"
+        label1 = "(clkwise) original, imgStage, imgGeneration, magnitude"
         label2 = "Current result"
         ocvb.desc = "Create a painting from the current video input using a genetic algorithm - painterly"
     End Sub
     Private Function runDNAseq(dna() As DNAentry) As cv.Mat
+        Dim padding = CInt(brushSize * maxSize / 2 + 5)
         Dim nextImage = New cv.Mat(New cv.Size(dst1.Width + 2 * padding, dst1.Height + 2 * padding), cv.MatType.CV_8U, 0)
-        nextImage(New cv.Rect(padding, padding, canvas.Width, canvas.Height)) = canvas
+        nextImage(New cv.Rect(padding, padding, imgGeneration.Width, imgGeneration.Height)) = imgGeneration
         For i = 0 To dna.Count - 1
             Dim d = dna(i)
             Dim brushImg = brushes(d.brushNumber)
@@ -78,11 +75,11 @@ Public Class GeneticDrawing_Basics
             cv.Cv2.Add(foreground, background, foreground)
             foreground.ConvertTo(nextImage(rect), cv.MatType.CV_8U)
         Next
-        Return nextImage(New cv.Rect(padding, padding, canvas.Width, canvas.Height))
+        Return nextImage(New cv.Rect(padding, padding, imgGeneration.Width, imgGeneration.Height))
     End Function
-    Private Function calcBrushSize(range As cv.Vec2f) As Single
+    Private Function calcBrushSize(range As cv.Rangef) As Single
         Dim t = stage / Math.Max(stageTotal - 1, 1)
-        Return (range.Item1 - range.Item0) * (-t * t + 1) + range.Item0
+        Return (range.End - range.Start) * (-t * t + 1) + range.Start
     End Function
     Private Function calculateError(ByRef img As cv.Mat) As Single
         ' compute error for resulting image.
@@ -93,12 +90,10 @@ Public Class GeneticDrawing_Basics
         Return diff1.Sum()
     End Function
     Private Sub startNewStage()
-        canvas = imgBuffer
         Dim brushstrokeCount = sliders.trackbar(2).Value
         ReDim DNAseq(brushstrokeCount - 1)
-        minSize = calcBrushSize(minBrush)
-        maxSize = calcBrushSize(maxBrush)
-        padding = CInt(brushSize * maxSize / 2 + 5)
+        minSize = calcBrushSize(minBrushRange)
+        maxSize = calcBrushSize(maxBrushRange)
 
         For i = 0 To brushstrokeCount - 1
             Dim e = New DNAentry
@@ -112,18 +107,21 @@ Public Class GeneticDrawing_Basics
             DNAseq(i) = e
         Next
 
+        imgGeneration = imgStage
         mats.mat(3) = runDNAseq(DNAseq)
         totalError = calculateError(mats.mat(3))
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         stageTotal = sliders.trackbar(1).Value
         If stage >= stageTotal Then Exit Sub ' request is complete...
-        If generationTotal <> sliders.trackbar(0).Value Or stageTotal <> sliders.trackbar(1).Value Or check.Box(0).Checked Then
+        If generationTotal <> sliders.trackbar(0).Value Or stageTotal <> sliders.trackbar(1).Value Or check.Box(0).Checked Or
+            gradientMagContrast <> gradient.sliders.trackbar(0).Value Or sobelKernel <> gradient.basics.sobel.sliders.trackbar(0).Value Then
             dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
-            canvas = dst2.Clone
-            imgBuffer = dst2.Clone
+            imgStage = dst2.Clone
             generationTotal = sliders.trackbar(0).Value
             stageTotal = sliders.trackbar(1).Value
+            gradientMagContrast = gradient.sliders.trackbar(0).Value
+            sobelKernel = gradient.basics.sobel.sliders.trackbar(0).Value
             generation = 0
             stage = 0
 
@@ -146,7 +144,7 @@ Public Class GeneticDrawing_Basics
         For i = 0 To DNAseq.Count - 1
             nextDNA(i) = DNAseq(i)
         Next
-        Dim changes As Integer, childImg As New cv.Mat, maxOption = 5, saveTotalError = totalError, bestError As Single
+        Dim changes As Integer, childImg = imgGeneration.Clone, maxOption = 5, bestError As Single
         For i = 0 To nextDNA.Count - 1
             Dim changeCount = msRNG.Next(0, maxOption) + 1
             For j = 0 To changeCount - 1
@@ -168,9 +166,8 @@ Public Class GeneticDrawing_Basics
 
             childImg = runDNAseq(nextDNA)
             Dim nextError = calculateError(childImg)
-            If nextError < totalError Then
-                bestError = nextError
-                Console.WriteLine("besterror = " + CStr(bestError))
+            If nextError <totalError Then
+                bestError= nextError
                 changes += 1
             Else
                 nextDNA(i) = DNAseq(i)
@@ -183,12 +180,10 @@ Public Class GeneticDrawing_Basics
             DNAseq = nextDNA
         End If
 
-        If saveTotalError < totalError Then saveTotalError = saveTotalError
-        saveTotalError = totalError
-
         generation += 1
         If generation = generationTotal Then
-            imgBuffer = dst2
+            imgStage = dst2
+            mats.mat(1) = imgStage
             generation = 0
             stage += 1
             startNewStage()
@@ -197,5 +192,65 @@ Public Class GeneticDrawing_Basics
         mats.Run(ocvb)
         dst1 = mats.dst1
         label2 = " stage " + CStr(stage) + " Gen " + Format(generation, "00") + " changes = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GeneticDrawing_Color
+    Inherits ocvbClass
+    Dim gDraw(3 - 1) As GeneticDrawing_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        ocvb.suppressOptions = True
+        gDraw(0) = New GeneticDrawing_Basics(ocvb)
+        gDraw(1) = New GeneticDrawing_Basics(ocvb)
+        ocvb.suppressOptions = False
+        gDraw(2) = New GeneticDrawing_Basics(ocvb) ' options for the red channel are visible and will be sync below with the other channels if changed.
+
+        label1 = "Intermediate results for the Red channel"
+        label2 = "Combined RGB results"
+        ocvb.desc = "Use the GeneticDrawing_Basics to create a color painting.  Painterly"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim split() As cv.Mat
+        split = cv.Cv2.Split(src)
+
+        Dim resetAll3 As Boolean
+        For i = 0 To split.Count - 1
+            If gDraw(i).sliders.trackbar(0).Value <> gDraw(2).sliders.trackbar(0).Value Or gDraw(i).sliders.trackbar(1).Value <> gDraw(2).sliders.trackbar(1).Value Or
+                    gDraw(i).sliders.trackbar(2).Value <> gDraw(2).sliders.trackbar(2).Value Or gDraw(2).check.Box(0).Checked Or
+                    gDraw(i).gradient.sliders.trackbar(0).Value <> gDraw(2).gradient.sliders.trackbar(0).Value Or
+                    gDraw(i).gradient.basics.sobel.sliders.trackbar(0).Value <> gDraw(2).gradient.basics.sobel.sliders.trackbar(0).Value Then
+                resetAll3 = True
+                Exit For
+            End If
+        Next
+
+        If resetAll3 Then
+            For i = 0 To split.Count - 1
+                gDraw(i).sliders.trackbar(0).Value = gDraw(2).sliders.trackbar(0).Value
+                gDraw(i).sliders.trackbar(1).Value = gDraw(2).sliders.trackbar(1).Value
+                gDraw(i).sliders.trackbar(2).Value = gDraw(2).sliders.trackbar(2).Value
+                gDraw(i).check.Box(0).Checked = gDraw(2).check.Box(0).Checked
+
+                gDraw(i).gradient.sliders.trackbar(0).Value = gDraw(2).gradient.sliders.trackbar(0).Value
+                gDraw(i).gradient.basics.sobel.sliders.trackbar(0).Value = gDraw(2).gradient.basics.sobel.sliders.trackbar(0).Value
+            Next
+        End If
+
+        For i = 0 To split.Count - 1
+            gDraw(i).src = split(i)
+            gDraw(i).Run(ocvb)
+            split(i) = gDraw(i).dst2
+        Next
+
+        dst1 = gDraw(2).dst1
+        cv.Cv2.Merge(split, dst2)
     End Sub
 End Class
