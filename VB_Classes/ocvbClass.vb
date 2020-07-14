@@ -29,7 +29,6 @@ Public Class ocvbClass : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Public radio1 As New OptionsRadioButtons
     Public sliders As New OptionsSliders
-    Public videoOptions As New OptionsVideoName
     Public pyStream As PyStream_Basics = Nothing
     Public standalone As Boolean
     Public src As New cv.Mat
@@ -132,7 +131,6 @@ Public Class ocvbClass : Implements IDisposable
         sliders.Dispose()
         check.Dispose()
         radio1.Dispose()
-        videoOptions.Dispose()
         combo.Dispose()
     End Sub
 End Class

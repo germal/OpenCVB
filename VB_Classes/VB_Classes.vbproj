@@ -268,12 +268,6 @@
     <Compile Include="OptionsSliders.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OptionsVideoName.Designer.vb">
-      <DependentUpon>OptionsVideoName.vb</DependentUpon>
-    </Compile>
-    <Compile Include="OptionsVideoName.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="ORB.vb" />
     <Compile Include="Pencil.vb" />
     <Compile Include="PointCloud.vb" />
@@ -360,9 +354,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsSliders.resx">
       <DependentUpon>OptionsSliders.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OptionsVideoName.resx">
-      <DependentUpon>OptionsVideoName.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsRadioButtons.resx">
       <DependentUpon>OptionsRadioButtons.vb</DependentUpon>
