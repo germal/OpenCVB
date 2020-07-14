@@ -110,7 +110,9 @@ Public Class ActiveClass : Implements IDisposable
         Dim openFileFilterIndex As Integer
         Dim openFileDialogName As String
         Dim openFileDialogTitle As String
-        Dim PlayStop As Boolean
+        Dim openFileSliderPercent As Single
+        Dim fileStarted As Boolean
+        Dim initialStartSetting As Boolean
     End Structure
     Public Sub New(parms As algorithmParameters, _width As Integer, _height As Integer, location As cv.Rect)
         slidersOffset = New cv.Point(10, 10)

@@ -1,12 +1,11 @@
-﻿Imports cv = OpenCvSharp
-Imports cvext = OpenCvSharp.Extensions
-Imports System.IO
-Imports System.ComponentModel
-Imports System.Threading
-Imports System.Globalization
-Imports System.Text.RegularExpressions
+﻿Imports System.ComponentModel
 Imports System.Environment
-Imports Numpy
+Imports System.Globalization
+Imports System.IO
+Imports System.Text.RegularExpressions
+Imports System.Threading
+Imports cv = OpenCvSharp
+Imports cvext = OpenCvSharp.Extensions
 Imports py = Python.Runtime
 Module opencv_module
     Public bufferLock As New PictureBox ' this is a global lock on the camera buffers.
@@ -59,6 +58,7 @@ Public Class OpenCVB
     Dim openCVKeywords As New List(Of String)
     Dim OptionsBringToFront As Boolean
     Dim optionsForm As OptionsDialog
+    Dim openForm As OpenFilename
     Dim picLabels() = {"RGB", "Depth", "Result1", "Result2"}
     Dim RefreshAvailable As Boolean = True ' This variable allows us to dodge a refresh from the system after a move.  There is no synclock around that system refresh.
     Dim regWidth As Int32 = 1280, regHeight As Int32 = 720
@@ -71,13 +71,15 @@ Public Class OpenCVB
     Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.TTtext)
 
     Dim openFileDialogRequested As Boolean
+    Dim openFileinitialStartSetting As Boolean
     Dim openFileInitialDirectory As String
     Dim openFileTitle As String
     Dim openFileFilter As String
     Dim openFileFilterIndex As Integer
     Dim openFileDialogName As String
-    Dim openfileDialogPlayStop As Boolean
+    Dim openfileDialogfileStarted As Boolean
     Dim openfileDialogTitle As String
+    Dim openfileSliderPercent As Single
 
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -139,6 +141,8 @@ Public Class OpenCVB
             End If
         End While
         sr.Close()
+
+        openForm = New OpenFilename
 
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
@@ -326,22 +330,31 @@ Public Class OpenCVB
 
 
         ' only the main task can have an openfiledialog box run interactively.  The data will be moved when altered to the algorithm task.
-        If openFileDialogRequested Then
-            openFileDialogRequested = False
-            OpenFilename.OpenFileDialog1.InitialDirectory = openFileInitialDirectory
-            OpenFilename.OpenFileDialog1.Filter = openFileFilter
-            OpenFilename.OpenFileDialog1.FilterIndex = openFileFilterIndex
-            OpenFilename.filename.Text = openFileDialogName
-            OpenFilename.Text = openfileDialogTitle
-            OpenFilename.Label1.Text = "Select a file for use with the " + AvailableAlgorithms.Text + " algorithm."
-            OpenFilename.Show()
-            OpenFilename.PlayButton.PerformClick()
-        Else
-            If OpenFilename.OpenFileDialog1.InitialDirectory <> "" Or OpenFilename.Location.X <> Me.Left Or OpenFilename.Location.Y <> Me.Top + Me.Height Then
-                OpenFilename.Location = New Point(Me.Left, Me.Top + Me.Height)
+        If openFileInitialDirectory <> "" Then
+            If openFileDialogRequested Then
+                openFileDialogRequested = False
+                openForm.OpenFileDialog1.InitialDirectory = openFileInitialDirectory
+                openForm.OpenFileDialog1.Filter = openFileFilter
+                openForm.OpenFileDialog1.FilterIndex = openFileFilterIndex
+                openForm.filename.Text = openFileDialogName
+                openForm.Text = openfileDialogTitle
+                openForm.Label1.Text = "Select a file for use with the " + AvailableAlgorithms.Text + " algorithm."
+                openForm.Show()
+                openfileDialogfileStarted = openFileinitialStartSetting
+                If openFileinitialStartSetting Then
+                    openForm.PlayButton.PerformClick()
+                Else
+                    openForm.fileStarted = False
+                    openForm.PlayButton.Text = "Start"
+                End If
+            Else
+                If openForm.Location.X <> Me.Left Or openForm.Location.Y <> Me.Top + Me.Height Then
+                    openForm.Location = New Point(Me.Left, Me.Top + Me.Height)
+                End If
+                If openFileDialogName <> openForm.filename.Text Then openFileDialogName = openForm.filename.Text
+                If openForm.fileStarted <> openfileDialogfileStarted Then openfileDialogfileStarted = openForm.fileStarted
+                If openfileSliderPercent >= 0 And openfileSliderPercent <= 1 Then openForm.TrackBar1.Value = openfileSliderPercent * 10000
             End If
-            If openFileDialogName <> OpenFilename.filename.Text Then openFileDialogName = OpenFilename.filename.Text
-            If OpenFilename.playStarted <> openfileDialogPlayStop Then openfiledialogplaystop = OpenFilename.playStarted
         End If
 
         AlgorithmDesc.Text = textDesc
@@ -759,7 +772,6 @@ Public Class OpenCVB
             TestAllButton.Image = Image.FromFile("../../OpenCVB/Data/testall.png")
         End If
     End Sub
-
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
         OptionsBringToFront = True
     End Sub
@@ -956,8 +968,11 @@ Public Class OpenCVB
     End Function
     Private Sub StartAlgorithmTask()
         stopAlgorithmThread = True
-        OpenFilename.Hide()
-        OpenFilename.PlayButton.Text = "Play"
+        openForm.Hide()
+        openForm.PlayButton.Text = "Start"
+        openFileDialogName = ""
+        openFileInitialDirectory = ""
+        openForm.fileStarted = False
         ' there may be a long-running algorithmtask that doesn't see that the algorithm has been stopped.
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
 
@@ -1035,11 +1050,14 @@ Public Class OpenCVB
             Console.WriteLine(vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested: ")
         Else
             openFileDialogRequested = OpenCVB.ocvb.parms.openFileDialogRequested
-            openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
+            openFileinitialStartSetting = OpenCVB.ocvb.parms.initialStartSetting
+            OpenCVB.ocvb.parms.fileStarted = OpenCVB.ocvb.parms.initialStartSetting
+            openfileDialogfileStarted = OpenCVB.ocvb.parms.initialStartSetting
             openFileFilterIndex = OpenCVB.ocvb.parms.openFileFilterIndex
             openFileFilter = OpenCVB.ocvb.parms.openFileFilter
             openFileDialogName = OpenCVB.ocvb.parms.openFileDialogName
             openfileDialogTitle = OpenCVB.ocvb.parms.openFileDialogTitle
+            openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
         End If
 
         ' Here we check to see if the algorithm constructor changed lowResolution.
@@ -1165,10 +1183,14 @@ Public Class OpenCVB
                     OpenCVB.ocvb.drawRectClear = False
                 End If
 
-                If openFileDialogName <> "" And (openFileDialogName <> OpenCVB.ocvb.parms.openFileDialogName Or openfileDialogPlayStop <> OpenCVB.ocvb.parms.PlayStop) Then
-                    OpenCVB.ocvb.parms.PlayStop = openfileDialogPlayStop
-                    OpenCVB.ocvb.parms.openFileDialogName = openFileDialogName
+                If openFileDialogName <> "" Then
+                    If openFileDialogName <> OpenCVB.ocvb.parms.openFileDialogName Or openfileDialogfileStarted <> OpenCVB.ocvb.parms.fileStarted Then
+                        OpenCVB.ocvb.parms.fileStarted = openfileDialogfileStarted
+                        OpenCVB.ocvb.parms.openFileDialogName = openFileDialogName
+                    End If
+                    openfileSliderPercent = OpenCVB.ocvb.parms.openFileSliderPercent
                 End If
+
 
                 picLabels(2) = OpenCVB.ocvb.label1
                 picLabels(3) = OpenCVB.ocvb.label2
@@ -1212,3 +1234,4 @@ Public Class OpenCVB
         End While
     End Sub
 End Class
+

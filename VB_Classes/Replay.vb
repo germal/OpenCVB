@@ -66,21 +66,32 @@ End Module
 
 Public Class Replay_Record
     Inherits ocvbClass
-    Dim recording As New OptionsRecordPlayback
     Dim binWrite As BinaryWriter
     Dim recordingActive As Boolean
     Dim colorBytes() As Byte
     Dim RGBDepthBytes() As Byte
     Dim depth16Bytes() As Byte
     Dim cloudBytes() As Byte
+    Dim maxBytes As Single = 20000000000
+    Dim recordingFilename As FileInfo
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        If ocvb.parms.ShowOptions Then recording.Show()
+
+        ocvb.parms.openFileDialogRequested = True
+        ocvb.parms.openFileInitialDirectory = ocvb.parms.HomeDir + "/Data/"
+        ocvb.parms.openFileTitle = "Open OpenCVB bag (RGB, RGB Depth, point cloud) file"
+        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.parms.HomeDir + "Recording.ocvb")
+        ocvb.parms.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
+        ocvb.parms.openFileFilterIndex = 1
+        ocvb.parms.openFileTitle = "Select an OpenCVB bag file to create"
+        ocvb.parms.initialStartSetting = False
+
         ocvb.desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static bytesTotal As Int64
-        If recording.startRecordPlayback Then
+        recordingFilename = New FileInfo(ocvb.parms.openFileDialogName)
+        If ocvb.parms.fileStarted Then
             If recordingActive = False Then
                 bytesPerColor = ocvb.color.Total * ocvb.color.ElemSize
                 bytesPerRGBDepth = ocvb.RGBDepth.Total * ocvb.RGBDepth.ElemSize
@@ -92,7 +103,7 @@ Public Class Replay_Record
                 Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
                 ReDim cloudBytes(pcSize - 1)
 
-                binWrite = New BinaryWriter(File.Open(recording.fileinfo.FullName, FileMode.Create))
+                binWrite = New BinaryWriter(File.Open(recordingFilename.FullName, FileMode.Create))
                 recordingActive = True
                 writeHeader(ocvb, binWrite)
             Else
@@ -112,11 +123,11 @@ Public Class Replay_Record
                 binWrite.Write(cloudBytes)
                 bytesTotal += cloudBytes.Length
 
-                If bytesTotal >= 20000000000 Then
-                    recording.Button2_Click(New Object, New EventArgs)
+                If bytesTotal >= maxBytes Then
+                    ocvb.parms.fileStarted = False
                     recordingActive = False
                 Else
-                    recording.BytesMovedTrackbar.Value = bytesTotal / 1000000
+                    ocvb.parms.openFileSliderPercent = bytesTotal / maxBytes
                 End If
             End If
         Else
@@ -128,6 +139,7 @@ Public Class Replay_Record
         End If
     End Sub
     Public Sub Close()
+        SaveSetting("OpenCVB", "ReplayFileName", "ReplayFileName", recordingFilename.FullName)
         If recordingActive Then binWrite.Close()
     End Sub
 End Class
@@ -138,7 +150,6 @@ End Class
 
 Public Class Replay_Play
     Inherits ocvbClass
-    Dim playback As New OptionsRecordPlayback
     Dim binRead As BinaryReader
     Dim playbackActive As Boolean
     Dim colorBytes() As Byte
@@ -147,17 +158,26 @@ Public Class Replay_Play
     Dim cloudBytes() As Byte
     Dim fh As New fileHeader
     Dim fs As FileStream
+    Dim recordingFilename As FileInfo
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        playback.startButton.Text = "Start Playback"
-        playback.Show() ' showing this options form is not optional (ha!)  The fileinfo is needed in Run so always initialize it.
-        playback.Button2_Click(New Object, New EventArgs) ' autoplay the recorded data (if it exists.)
+        ocvb.parms.openFileDialogRequested = True
+        ocvb.parms.openFileInitialDirectory = ocvb.parms.HomeDir + "/Data/"
+        ocvb.parms.openFileTitle = "Open OpenCVB bag (RGB, RGB Depth, point cloud) file"
+        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.parms.HomeDir + "Recording.ocvb")
+        ocvb.parms.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
+        ocvb.parms.openFileFilterIndex = 1
+        ocvb.parms.openFileTitle = "Select an OpenCVB bag file to create"
+        ocvb.parms.initialStartSetting = True
 
         ocvb.desc = "Playback a file recorded by OpenCVB"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static bytesTotal As Int64
-        If playback.startRecordPlayback Then
+        recordingFilename = New FileInfo(ocvb.parms.openFileDialogName)
+        If recordingFilename.Exists = False Then ocvb.putText(New TTtext("File not found: " + recordingFilename.FullName, 10, 125))
+        If ocvb.parms.fileStarted And recordingFilename.Exists Then
+            Dim maxBytes = recordingFilename.Length
             If playbackActive Then
                 colorBytes = binRead.ReadBytes(bytesPerColor)
                 Dim tmpMat = New cv.Mat(fh.colorHeight, fh.colorWidth, cv.MatType.CV_8UC3, colorBytes)
@@ -183,17 +203,12 @@ Public Class Replay_Play
                     playbackActive = False
                     bytesTotal = 0
                 End If
-                playback.BytesMovedTrackbar.Value = bytesTotal / 1000000
+                ocvb.parms.openFileSliderPercent = bytesTotal / recordingFilename.Length
                 dst1 = ocvb.color.Clone()
                 dst2 = ocvb.RGBDepth.Clone()
             Else
-                If playback.fileinfo.Exists = False Then
-                    ocvb.putText(New TTtext("File not found: " + playback.fileinfo.FullName, 10, 125))
-                    playback.Button2_Click(New Object, New EventArgs)
-                    Exit Sub
-                End If
                 ' start playback...
-                fs = New FileStream(playback.fileinfo.FullName, FileMode.Open, FileAccess.Read)
+                fs = New FileStream(recordingFilename.FullName, FileMode.Open, FileAccess.Read)
                 binRead = New BinaryReader(fs)
                 playbackActive = True
                 readHeader(fh, binRead)
@@ -216,6 +231,7 @@ Public Class Replay_Play
         End If
     End Sub
     Public Sub Close()
+        SaveSetting("OpenCVB", "ReplayFileName", "ReplayFileName", recordingFilename.FullName)
         If playbackActive Then binRead.Close()
     End Sub
 End Class

@@ -7,6 +7,7 @@ VB_Classes/Python/.vs/PythonDebug/v16/.suo
 *.lock
 *.ide
 *.pdb
+*.ocvb
 *.ide-shm
 *.ide-wal
 *.ipch

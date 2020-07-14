@@ -67,15 +67,17 @@ Partial Class OpenFilename
         Me.PlayButton.Name = "PlayButton"
         Me.PlayButton.Size = New System.Drawing.Size(83, 42)
         Me.PlayButton.TabIndex = 4
-        Me.PlayButton.Text = "Play"
+        Me.PlayButton.Text = "Start"
         Me.PlayButton.UseVisualStyleBackColor = True
         '
         'TrackBar1
         '
         Me.TrackBar1.Location = New System.Drawing.Point(105, 110)
+        Me.TrackBar1.Maximum = 10000
         Me.TrackBar1.Name = "TrackBar1"
         Me.TrackBar1.Size = New System.Drawing.Size(772, 69)
         Me.TrackBar1.TabIndex = 5
+        Me.TrackBar1.TickStyle = System.Windows.Forms.TickStyle.None
         '
         'OpenFilename
         '

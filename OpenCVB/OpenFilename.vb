@@ -1,19 +1,17 @@
 ﻿Imports System.Windows.Forms
 Public Class OpenFilename
-    Public playStarted As Boolean
+    Public fileStarted As Boolean
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        If OpenFileDialog1.ShowDialog() = DialogResult.OK Then
-            filename.Text = OpenFileDialog1.FileName
-        End If
+        If OpenFileDialog1.ShowDialog() = DialogResult.OK Then filename.Text = OpenFileDialog1.FileName
     End Sub
 
     Private Sub PlayButton_Click(sender As Object, e As EventArgs) Handles PlayButton.Click
-        If PlayButton.Text = "Play" Then
+        If PlayButton.Text = "Start" Then
             PlayButton.Text = "Stop"
-            playStarted = True
+            fileStarted = True
         Else
-            PlayButton.Text = "Play"
-            playStarted = False
+            PlayButton.Text = "Start"
+            fileStarted = False
         End If
     End Sub
 End Class

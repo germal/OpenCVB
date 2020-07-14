@@ -262,12 +262,6 @@
     <Compile Include="OptionsCombo.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OptionsRecordPlayback.Designer.vb">
-      <DependentUpon>OptionsRecordPlayback.vb</DependentUpon>
-    </Compile>
-    <Compile Include="OptionsRecordPlayback.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="OptionsSliders.Designer.vb">
       <DependentUpon>OptionsSliders.vb</DependentUpon>
     </Compile>
@@ -363,9 +357,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsCombo.resx">
       <DependentUpon>OptionsCombo.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OptionsRecordPlayback.resx">
-      <DependentUpon>OptionsRecordPlayback.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsSliders.resx">
       <DependentUpon>OptionsSliders.vb</DependentUpon>
