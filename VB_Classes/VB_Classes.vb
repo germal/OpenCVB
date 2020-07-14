@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-
+Imports System.Drawing
 Module Algorithm_Module
     ' these are all global settings that are updated by individual algorithms.  
     Public Const offsetIncr = 25
@@ -102,6 +102,15 @@ Public Class ActiveClass : Implements IDisposable
         Dim transformationMatrix() As Single
         Dim useRecordedData As Boolean
         Dim NumPyEnabled As Boolean
+
+        Dim openFileDialogRequested As Boolean
+        Dim openFileInitialDirectory As String
+        Dim openFileTitle As String
+        Dim openFileFilter As String
+        Dim openFileFilterIndex As Integer
+        Dim openFileDialogName As String
+        Dim openFileDialogTitle As String
+        Dim PlayStop As Boolean
     End Structure
     Public Sub New(parms As algorithmParameters, _width As Integer, _height As Integer, location As cv.Rect)
         slidersOffset = New cv.Point(10, 10)

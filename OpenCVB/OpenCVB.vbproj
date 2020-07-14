@@ -146,6 +146,12 @@
     <Compile Include="CameraD400VB.vb" />
     <Compile Include="CameraMyntD.vb" />
     <Compile Include="CameraT265.vb" />
+    <Compile Include="OpenFilename.Designer.vb">
+      <DependentUpon>OpenFilename.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OpenFilename.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="OptionsDialog.Designer.vb">
       <DependentUpon>OptionsDialog.vb</DependentUpon>
     </Compile>
@@ -183,6 +189,9 @@
     <Compile Include="CameraZED2.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="OpenFilename.resx">
+      <DependentUpon>OpenFilename.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="OptionsDialog.resx">
       <DependentUpon>OptionsDialog.vb</DependentUpon>
     </EmbeddedResource>

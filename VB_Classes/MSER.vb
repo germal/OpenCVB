@@ -182,7 +182,7 @@ Public Class MSER_CPPStyle
         label1 = "Contour regions from MSER"
         label2 = "Box regions from MSER"
         ocvb.desc = "Maximally Stable Extremal Regions example - still image"
-        image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/01.jpg", cv.ImreadModes.Color)
+        image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

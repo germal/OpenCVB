@@ -69,6 +69,16 @@ Public Class OpenCVB
     Dim textDesc As String = ""
     Dim totalBytesOfMemoryUsed As Integer
     Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.TTtext)
+
+    Dim openFileDialogRequested As Boolean
+    Dim openFileInitialDirectory As String
+    Dim openFileTitle As String
+    Dim openFileFilter As String
+    Dim openFileFilterIndex As Integer
+    Dim openFileDialogName As String
+    Dim openfileDialogPlayStop As Boolean
+    Dim openfileDialogTitle As String
+
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -313,6 +323,27 @@ Public Class OpenCVB
                 g.DrawString(picLabels(pic.Tag), optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.Black), 0, 0)
             End If
         End SyncLock
+
+
+        ' only the main task can have an openfiledialog box run interactively.  The data will be moved when altered to the algorithm task.
+        If openFileDialogRequested Then
+            openFileDialogRequested = False
+            OpenFilename.OpenFileDialog1.InitialDirectory = openFileInitialDirectory
+            OpenFilename.OpenFileDialog1.Filter = openFileFilter
+            OpenFilename.OpenFileDialog1.FilterIndex = openFileFilterIndex
+            OpenFilename.filename.Text = openFileDialogName
+            OpenFilename.Text = openfileDialogTitle
+            OpenFilename.Label1.Text = "Select a file for use with the " + AvailableAlgorithms.Text + " algorithm."
+            OpenFilename.Show()
+            OpenFilename.PlayButton.PerformClick()
+        Else
+            If OpenFilename.OpenFileDialog1.InitialDirectory <> "" Or OpenFilename.Location.X <> Me.Left Or OpenFilename.Location.Y <> Me.Top + Me.Height Then
+                OpenFilename.Location = New Point(Me.Left, Me.Top + Me.Height)
+            End If
+            If openFileDialogName <> OpenFilename.filename.Text Then openFileDialogName = OpenFilename.filename.Text
+            If OpenFilename.playStarted <> openfileDialogPlayStop Then openfiledialogplaystop = OpenFilename.playStarted
+        End If
+
         AlgorithmDesc.Text = textDesc
     End Sub
     Private Sub RestartCamera()
@@ -925,6 +956,8 @@ Public Class OpenCVB
     End Function
     Private Sub StartAlgorithmTask()
         stopAlgorithmThread = True
+        OpenFilename.Hide()
+        OpenFilename.PlayButton.Text = "Play"
         ' there may be a long-running algorithmtask that doesn't see that the algorithm has been stopped.
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
 
@@ -1000,6 +1033,13 @@ Public Class OpenCVB
 
         If parms.testAllRunning Then
             Console.WriteLine(vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested: ")
+        Else
+            openFileDialogRequested = OpenCVB.ocvb.parms.openFileDialogRequested
+            openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
+            openFileFilterIndex = OpenCVB.ocvb.parms.openFileFilterIndex
+            openFileFilter = OpenCVB.ocvb.parms.openFileFilter
+            openFileDialogName = OpenCVB.ocvb.parms.openFileDialogName
+            openfileDialogTitle = OpenCVB.ocvb.parms.openFileDialogTitle
         End If
 
         ' Here we check to see if the algorithm constructor changed lowResolution.
@@ -1123,6 +1163,11 @@ Public Class OpenCVB
                     drawRect = New cv.Rect
                     OpenCVB.ocvb.drawRect = drawRect
                     OpenCVB.ocvb.drawRectClear = False
+                End If
+
+                If openFileDialogName <> "" And (openFileDialogName <> OpenCVB.ocvb.parms.openFileDialogName Or openfileDialogPlayStop <> OpenCVB.ocvb.parms.PlayStop) Then
+                    OpenCVB.ocvb.parms.PlayStop = openfileDialogPlayStop
+                    OpenCVB.ocvb.parms.openFileDialogName = openFileDialogName
                 End If
 
                 picLabels(2) = OpenCVB.ocvb.label1

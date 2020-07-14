@@ -256,12 +256,6 @@
     <Compile Include="OptionsAlphaBlend.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OptionsAudio.Designer.vb">
-      <DependentUpon>OptionsAudio.vb</DependentUpon>
-    </Compile>
-    <Compile Include="OptionsAudio.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="OptionsCombo.Designer.vb">
       <DependentUpon>OptionsCombo.vb</DependentUpon>
     </Compile>
@@ -363,9 +357,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsAlphaBlend.resx">
       <DependentUpon>OptionsAlphaBlend.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OptionsAudio.resx">
-      <DependentUpon>OptionsAudio.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsCheckbox.resx">
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>
