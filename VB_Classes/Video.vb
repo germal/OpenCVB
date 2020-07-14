@@ -50,6 +50,8 @@ End Class
 
 
 
+
+
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_CarCounting
     Inherits ocvbClass

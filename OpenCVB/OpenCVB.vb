@@ -872,12 +872,6 @@ Public Class OpenCVB
             cameraRefresh = True
             Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
             totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
-            'Static warningIssued As Boolean = False
-            'If totalBytesOfMemoryUsed > 4000 And warningIssued = False Then
-            '    MsgBox("OpenCVB appears to have a memory leak in the " + saveAlgorithmName + " algorithm" + vbCrLf +
-            '           "The memory footprint has grown above 4Gb which is more than expected.")
-            '    warningIssued = True
-            'End If
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
         End While
         camera.frameCount = 0
@@ -1049,18 +1043,18 @@ Public Class OpenCVB
         textDesc = OpenCVB.ocvb.desc
 
         If parms.testAllRunning Then
-            Console.WriteLine(vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested: ")
-        Else
-            openFileDialogRequested = OpenCVB.ocvb.parms.openFileDialogRequested
-            openFileinitialStartSetting = OpenCVB.ocvb.parms.initialStartSetting
-            OpenCVB.ocvb.parms.fileStarted = OpenCVB.ocvb.parms.initialStartSetting
-            openfileDialogfileStarted = OpenCVB.ocvb.parms.initialStartSetting
-            openFileFilterIndex = OpenCVB.ocvb.parms.openFileFilterIndex
-            openFileFilter = OpenCVB.ocvb.parms.openFileFilter
-            openFileDialogName = OpenCVB.ocvb.parms.openFileDialogName
-            openfileDialogTitle = OpenCVB.ocvb.parms.openFileDialogTitle
-            openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
+            Console.WriteLine(vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
+            Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + parms.activeAlgorithm)
         End If
+        openFileDialogRequested = OpenCVB.ocvb.parms.openFileDialogRequested
+        openFileinitialStartSetting = OpenCVB.ocvb.parms.initialStartSetting
+        OpenCVB.ocvb.parms.fileStarted = OpenCVB.ocvb.parms.initialStartSetting
+        openfileDialogfileStarted = OpenCVB.ocvb.parms.initialStartSetting
+        openFileFilterIndex = OpenCVB.ocvb.parms.openFileFilterIndex
+        openFileFilter = OpenCVB.ocvb.parms.openFileFilter
+        openFileDialogName = OpenCVB.ocvb.parms.openFileDialogName
+        openfileDialogTitle = OpenCVB.ocvb.parms.openFileDialogTitle
+        openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
 
         ' Here we check to see if the algorithm constructor changed lowResolution.
         If OpenCVB.ocvb.parms.resolution <> saveLowResSetting Then
