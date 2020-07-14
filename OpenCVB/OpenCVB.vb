@@ -334,6 +334,8 @@ Public Class OpenCVB
             If openFileDialogRequested Then
                 openFileDialogRequested = False
                 openForm.OpenFileDialog1.InitialDirectory = openFileInitialDirectory
+                openForm.OpenFileDialog1.FileName = "*.*"
+                openForm.OpenFileDialog1.CheckFileExists = False
                 openForm.OpenFileDialog1.Filter = openFileFilter
                 openForm.OpenFileDialog1.FilterIndex = openFileFilterIndex
                 openForm.filename.Text = openFileDialogName
