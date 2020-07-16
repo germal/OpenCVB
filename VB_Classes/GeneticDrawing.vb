@@ -259,6 +259,11 @@ Public Class GeneticDrawing_Color
 
         label2 = gDraw(2).label2
     End Sub
+    Public Sub close()
+        For i = 0 To gDraw.Count - 1
+            gDraw(i).Dispose()
+        Next
+    End Sub
 End Class
 
 
@@ -274,11 +279,10 @@ Public Class GeneticDrawing_Photo
 
         ocvb.parms.openFileDialogRequested = True
         ocvb.parms.openFileInitialDirectory = ocvb.parms.HomeDir + "Data\"
-        ocvb.parms.openFileTitle = "Open Image File"
         ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "PhotoFileName", "PhotoFileName", ocvb.parms.HomeDir + "Data/GeneticDrawingExample.jpg")
         ocvb.parms.openFileFilter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
         ocvb.parms.openFileFilterIndex = 1
-        ocvb.parms.openFileTitle = "Select an image file to create a paint version"
+        ocvb.parms.openFileDialogTitle = "Select an image file to create a paint version"
         ocvb.parms.initialStartSetting = True
 
         ocvb.desc = "Apply genetic drawing technique to any still photo."
@@ -290,11 +294,16 @@ Public Class GeneticDrawing_Photo
                 label1 = "No input file.  Use dialogbox below..."
                 Exit Sub
             End If
+
+            Dim fullsizeImage = cv.Cv2.ImRead(fileinfo.FullName)
+            If fullsizeImage.Channels <> 3 Then
+                label1 = "Input file must be RGB 3-channel image!"
+                Exit Sub
+            End If
             saveFileName = ocvb.parms.openFileDialogName
 
             If gDraw IsNot Nothing Then gDraw.Dispose()
             gDraw = New GeneticDrawing_Color(ocvb)
-            Dim fullsizeImage = cv.Cv2.ImRead(FileInfo.FullName)
             If fullsizeImage.Width <> dst1.Width Or fullsizeImage.Height <> dst1.Height Then
                 Dim newSize = New cv.Size(dst1.Height * fullsizeImage.Width / fullsizeImage.Height, dst1.Height)
                 If newSize.Width > dst1.Width Then

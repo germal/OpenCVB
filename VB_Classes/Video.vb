@@ -11,11 +11,10 @@ Public Class Video_Basics
 
         ocvb.parms.openFileDialogRequested = True
         ocvb.parms.openFileInitialDirectory = ocvb.parms.HomeDir + "/Data/"
-        ocvb.parms.openFileTitle = "Open a video file as input"
         ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4")
         ocvb.parms.openFileFilter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
         ocvb.parms.openFileFilterIndex = 1
-        ocvb.parms.openFileTitle = "Select a video file for input"
+        ocvb.parms.openFileDialogTitle = "Select a video file for input"
         ocvb.parms.initialStartSetting = False
 
         Dim fileInfo = New FileInfo(ocvb.parms.openFileDialogName)

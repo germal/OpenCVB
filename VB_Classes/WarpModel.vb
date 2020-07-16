@@ -39,7 +39,7 @@ Public Class WarpModel_Input
                 Dim photo As New FileInfo(ocvb.parms.HomeDir + "Data\Prokudin\" + nextRadio.Text)
                 img = cv.Cv2.ImRead(photo.FullName, cv.ImreadModes.Grayscale)
                 label1 = photo.Name + " - red image"
-                label2 = photo.Name + " - Misaligned merge"
+                label2 = photo.Name + " - Naively aligned merge"
                 Exit For
             End If
         Next

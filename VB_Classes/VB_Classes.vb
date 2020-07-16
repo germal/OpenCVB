@@ -105,7 +105,6 @@ Public Class ActiveClass : Implements IDisposable
 
         Dim openFileDialogRequested As Boolean
         Dim openFileInitialDirectory As String
-        Dim openFileTitle As String
         Dim openFileFilter As String
         Dim openFileFilterIndex As Integer
         Dim openFileDialogName As String

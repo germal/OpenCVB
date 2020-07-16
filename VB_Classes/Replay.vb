@@ -79,11 +79,10 @@ Public Class Replay_Record
 
         ocvb.parms.openFileDialogRequested = True
         ocvb.parms.openFileInitialDirectory = ocvb.parms.HomeDir + "/Data/"
-        ocvb.parms.openFileTitle = "Open OpenCVB bag (RGB, RGB Depth, point cloud) file"
         ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.parms.HomeDir + "Recording.ocvb")
         ocvb.parms.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
         ocvb.parms.openFileFilterIndex = 1
-        ocvb.parms.openFileTitle = "Select an OpenCVB bag file to create"
+        ocvb.parms.openFileDialogTitle = "Select an OpenCVB bag file to create"
         ocvb.parms.initialStartSetting = False
 
         ocvb.desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
@@ -163,11 +162,10 @@ Public Class Replay_Play
         setCaller(ocvb)
         ocvb.parms.openFileDialogRequested = True
         ocvb.parms.openFileInitialDirectory = ocvb.parms.HomeDir + "/Data/"
-        ocvb.parms.openFileTitle = "Open OpenCVB bag (RGB, RGB Depth, point cloud) file"
         ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.parms.HomeDir + "Recording.ocvb")
         ocvb.parms.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
         ocvb.parms.openFileFilterIndex = 1
-        ocvb.parms.openFileTitle = "Select an OpenCVB bag file to create"
+        ocvb.parms.openFileDialogTitle = "Select an OpenCVB bag file to create"
         ocvb.parms.initialStartSetting = True
 
         ocvb.desc = "Playback a file recorded by OpenCVB"

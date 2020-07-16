@@ -73,13 +73,13 @@ Public Class OpenCVB
     Dim openFileDialogRequested As Boolean
     Dim openFileinitialStartSetting As Boolean
     Dim openFileInitialDirectory As String
-    Dim openFileTitle As String
     Dim openFileFilter As String
     Dim openFileFilterIndex As Integer
     Dim openFileDialogName As String
     Dim openfileDialogfileStarted As Boolean
     Dim openfileDialogTitle As String
     Dim openfileSliderPercent As Single
+    Dim openformLocated As Boolean
 
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -350,7 +350,9 @@ Public Class OpenCVB
                     openForm.PlayButton.Text = "Start"
                 End If
             Else
-                If openForm.Location.X <> Me.Left Or openForm.Location.Y <> Me.Top + Me.Height Then
+                If openformLocated = False Then openForm.BringToFront()
+                If (openForm.Location.X <> Me.Left Or openForm.Location.Y <> Me.Top + Me.Height) And openformLocated = False Then
+                    openformLocated = True
                     openForm.Location = New Point(Me.Left, Me.Top + Me.Height)
                 End If
                 If openFileDialogName <> openForm.filename.Text Then openFileDialogName = openForm.filename.Text
@@ -358,7 +360,6 @@ Public Class OpenCVB
                 If openfileSliderPercent >= 0 And openfileSliderPercent <= 1 Then openForm.TrackBar1.Value = openfileSliderPercent * 10000
             End If
         End If
-
         AlgorithmDesc.Text = textDesc
     End Sub
     Private Sub RestartCamera()
@@ -969,6 +970,7 @@ Public Class OpenCVB
         openFileDialogName = ""
         openFileInitialDirectory = ""
         openForm.fileStarted = False
+        openformLocated = False
         ' there may be a long-running algorithmtask that doesn't see that the algorithm has been stopped.
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
 
@@ -1220,6 +1222,7 @@ Public Class OpenCVB
                     Catch ex As Exception ' ignoring exceptions here.  It is a transition to another class and form was activated...
                         Console.WriteLine("Error in OptionsBringToFront: " + ex.Message)
                     End Try
+                    openformLocated = False
                 End If
                 If Me.IsDisposed Then Exit While
             Catch ex As Exception
