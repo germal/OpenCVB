@@ -833,11 +833,11 @@ same environment. Here is a look at how the cameras were setup:
 
 Using the “PointCloud_GVector_TopView”, all the above cameras were used to
 measure the distance to the wall approximately 2.5 meters from the cameras. The
-results are before.
+results are below.
 
 ![](media/a2bdd27cd813f1c37d92db977fc74a00.png)
 
-Microsoft Kinect 4 Azure results.
+Microsoft Kinect 4 Azure results – these were the best results.
 
 ![](media/528653ce39895622cffe3622778a5e21.png)
 
@@ -849,8 +849,10 @@ Intel RealSense D435i camera. (Distance to the wall looks incorrect.)
 
 ![](media/ed464a9db22610b7e3dfd5ed1057d238.png)
 
-StereoLabs Zed 2 camera. FOV looks a little skewed to the right.
+StereoLabs Zed 2 camera. FOV looks a little skewed to the right. The problem
+could be specific this camera but there was no available second camera to test
+(the camera is a little expensive.)
 
 ![](media/1e2803ceab3c74d9cbd59249369035b1.png)
 
-Mynt Eye D 1000 camera
+Mynt Eye D 1000 camera.
