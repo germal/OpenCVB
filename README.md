@@ -538,6 +538,12 @@ projections are available with cameras that include an IMU.*
 objects in the field of view. Each object can be isolated with a floodfill to
 find size and distance.*
 
+![](media/916a4f7e3b53633c63bf7243a8a8a1ae.png)
+
+*A genetic drawing experiment that translates any image or camera screen grab
+into painting. The algorithm randomly alters DNA sequences describing brush
+strokes.*
+
 ![](media/cd7e699a6192e4daf1d540a15e35005a.png)
 
 *Histogram Valleys are used to create clusters in depth data. The bottom left is

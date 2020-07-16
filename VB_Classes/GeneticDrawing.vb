@@ -285,12 +285,12 @@ Public Class GeneticDrawing_Photo
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If saveFileName <> ocvb.parms.openFileDialogName Or ocvb.frameCount = 0 Then
-            saveFileName = ocvb.parms.openFileDialogName
-            Dim fileinfo = New FileInfo(saveFileName)
+            Dim fileinfo = New FileInfo(ocvb.parms.openFileDialogName)
             If fileinfo.Exists = False Then
                 label1 = "No input file.  Use dialogbox below..."
                 Exit Sub
             End If
+            saveFileName = ocvb.parms.openFileDialogName
 
             If gDraw IsNot Nothing Then gDraw.Dispose()
             gDraw = New GeneticDrawing_Color(ocvb)
