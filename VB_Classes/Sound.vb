@@ -18,6 +18,7 @@ Public Class Sound_ToPCM
     Private Sub LoadSoundData(ocvb As AlgorithmData)
         saveFileName = New FileInfo(ocvb.parms.openFileDialogName)
         If saveFileName.Exists Then
+            SaveSetting("OpenCVB", "AudioFileName", "AudioFileName", saveFileName.FullName)
             If reader IsNot Nothing Then reader.Dispose()
             Dim settings = New MediaFoundationReader.MediaFoundationReaderSettings()
             reader = New MediaFoundationReader(saveFileName.FullName, settings)
@@ -84,7 +85,6 @@ Public Class Sound_ToPCM
         If ocvb.parms.openFileSliderPercent > 1 Then savefileStarted = False
     End Sub
     Public Sub Close()
-        SaveSetting("OpenCVB", "AudioFileName", "AudioFileName", saveFileName.FullName)
         If savefileStarted Then player.Stop()
         player.Dispose()
         reader.Dispose()
