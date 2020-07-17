@@ -3,31 +3,31 @@
 There is no better documentation of an algorithm than a working example. Now
 imagine hundreds of OpenCV examples in a single app where each algorithm is less
 than a page of code and is in a familiar language – C++, C\#, Python, or VB.Net.
-That is what "OpenCVB" Version 1.0 provides. And each algorithm is just the
-algorithm without the baggage from a user interface or implementation.
+That is what "OpenCVB" Version 1.0 provides. And each algorithm is *just the
+algorithm* without the baggage from a user interface.
 
-Any of the hundreds of algorithms can be selected from the first combo box at
-the top of the form. The second combo box is used to group the different
-algorithms by what OpenCV API’s or other OpenCVB algorithms are used. The
-default grouping is to select “\<All\>” algorithms while other special groupings
-allow selecting Python or C++ or Multi-threaded algorithms. The text at the
-right side of the toolbar is a brief description of the algorithm. The icons on
-the left of the toolbar: stop/start the algorithm, change global settings for
-OpenCVB, test all cameras with all algorithms, and take a picture of the current
-images.
+In the sample output below, any of the hundreds of algorithms can be selected
+from the first combo box at the top of the form. The second combo box is used to
+group the different algorithms by what OpenCV API’s or other OpenCVB algorithms
+are used. The default grouping is to select “\<All\>” algorithms while other
+special groupings allow selecting Python or C++ or Multi-threaded algorithms.
+The text at the right side of the toolbar is a brief description of the
+algorithm. The icons on the left of the toolbar: stop/start the algorithm,
+change global settings for OpenCVB, test all cameras with all algorithms, and
+take a picture of the current output.
 
 ![](media/b1e011f4681611111d7a7c752e274599.png)
 
-The output images are: the RGB output (upper left), the colorized depth image
-(upper right), the output of the current algorithm (lower left) and an optional
-second image output from the algorithm (lower right). In this example the
-“PointCloud_GVector_TopView” algorithm renders the camera point cloud as if seen
-from directly above – a useful view to find walls and objects. The data is
+The output images above are: the RGB output (upper left), the colorized depth
+image (upper right), the output of the current algorithm (lower left) and an
+optional second image output from the algorithm (lower right). In this example
+the “PointCloud_GVector_TopView” algorithm renders the camera point cloud as if
+seen from directly above – a useful view to find walls and objects. The data is
 colored the same as the RGB Depth data in the upper right image. The lower right
 image has isolated the objects found with a rectangle that measures the width
 and breadth of each object in the field of view.
 
-The “Sample Results” section below provides numerous examples.
+The “Sample Results” section below provides numerous additional examples.
 
 **Pre-Install Requirements**
 
@@ -53,15 +53,16 @@ Here are the requirements:
 
 Most of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft
 Kinect for Azure has the best depth accuracy but requires more power and is not
-as portable as the Intel D435i camera.
+as portable as the Intel D435i camera. All the cameras use USB 3 to provide data
+to the host platform.
 
 **The Objective**
 
-OpenCVB is targeting only cameras that produce depth as well as color. These
-newer cameras have prompted a review of existing vision algorithms to see how
-they can be improved if depth is known. To enable revisiting many existing
-algorithms, this software provides a single application that can run over 600
-OpenCV algorithms on any of the cameras listed above.
+OpenCVB is targeting only cameras that produce depth and color. These newer
+cameras have prompted a review of existing vision algorithms to see how they can
+be improved if depth is known. To enable revisiting many existing algorithms,
+this software provides a single application that can run hundreds of OpenCV
+algorithms on any of the cameras listed above.
 
 There are many computer vision examples on the web but too often something is
 missing. OpenCVB is designed to collect these algorithms into a single
