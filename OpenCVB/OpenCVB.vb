@@ -350,7 +350,6 @@ Public Class OpenCVB
                     openForm.PlayButton.Text = "Start"
                 End If
             Else
-                If openformLocated = False Then openForm.BringToFront()
                 If (openForm.Location.X <> Me.Left Or openForm.Location.Y <> Me.Top + Me.Height) And openformLocated = False Then
                     openformLocated = True
                     openForm.Location = New Point(Me.Left, Me.Top + Me.Height)

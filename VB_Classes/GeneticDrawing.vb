@@ -47,18 +47,17 @@ Public Class GeneticDrawing_Basics
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of Generations", 1, 200, 20)
         sliders.setupTrackBar(1, "Number of Stages", 1, 2000, 100)
-        sliders.setupTrackBar(2, "Brushstroke count per generation", 1, 100, 10)
+        sliders.setupTrackBar(2, "Brushstroke count per generation", 1, 20, 10)
         sliders.setupTrackBar(3, "Brush size Percentage", 5, 100, 100)
         stageTotal = sliders.trackbar(1).Value
 
         label1 = "(clkwise) original, imgStage, imgGeneration, magnitude"
         label2 = "Current result"
-        ocvb.desc = "Create a painting from the current video input using a genetic algorithm - painterly"
+        ocvb.desc = "Create a painting from the current video input using a genetic algorithm. Draw anywhere to focus brushes. Painterly"
     End Sub
     Private Function runDNAseq(dna() As DNAentry) As cv.Mat
-        Dim padding = 110
-        Dim nextImage = New cv.Mat(New cv.Size(dst1.Width + 2 * padding, dst1.Height + 2 * padding), cv.MatType.CV_8U, 0)
-        nextImage(New cv.Rect(padding, padding, imgGeneration.Width, imgGeneration.Height)) = imgGeneration
+        Dim nextImage = imgGeneration.Clone()
+
         For i = 0 To dna.Count - 1
             Dim d = dna(i)
             Dim brushImg = brushes(d.brushNumber)
@@ -67,19 +66,28 @@ Public Class GeneticDrawing_Basics
             Dim m = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(br.Cols / 2, br.Rows / 2), d.rotation, 1)
             cv.Cv2.WarpAffine(br, br, m, New cv.Size(br.Cols, br.Rows))
 
-            Dim foreground = New cv.Mat(br.Size(), cv.MatType.CV_32F, CSng(d.color))
+            If d.rotation < 0 Then
+                d.pt = New cv.Point(d.pt.X - br.Width, d.pt.Y - br.Height)
+                If d.pt.X < 0 Then d.pt.X = 0
+                If d.pt.Y < 0 Then d.pt.Y = 0
+            End If
+
             Dim background As New cv.Mat, alpha As New cv.Mat
             Dim rect = New cv.Rect(d.pt.X, d.pt.Y, br.Width, br.Height)
+            If d.pt.X + rect.Width > nextImage.Width Then rect.Width = nextImage.Width - d.pt.X
+            If d.pt.Y + rect.Height > nextImage.Height Then rect.Height = nextImage.Height - d.pt.Y
+            If br.Width <> rect.Width Or br.Height <> rect.Height Then br = br(New cv.Rect(0, 0, rect.Width, rect.Height))
             nextImage(rect).ConvertTo(background, cv.MatType.CV_32F)
 
             br.ConvertTo(alpha, cv.MatType.CV_32F, 1 / 255)
+            Dim foreground = New cv.Mat(New cv.Size(rect.Width, rect.Height), cv.MatType.CV_32F, CSng(d.color))
             cv.Cv2.Multiply(alpha, foreground, foreground)
-
             cv.Cv2.Multiply((1.0 - alpha).ToMat, background, background)
+
             cv.Cv2.Add(foreground, background, foreground)
             foreground.ConvertTo(nextImage(rect), cv.MatType.CV_8U)
         Next
-        Return nextImage(New cv.Rect(padding, padding, imgGeneration.Width, imgGeneration.Height))
+        Return nextImage
     End Function
     Private Function calcBrushSize(range As cv.Rangef) As Single
         Dim t = stage / Math.Max(stageTotal - 1, 1)
@@ -93,7 +101,7 @@ Public Class GeneticDrawing_Basics
         cv.Cv2.Add(diff1, diff2, diff1)
         Return diff1.Sum()
     End Function
-    Private Sub startNewStage()
+    Private Sub startNewStage(r As cv.Rect)
         Dim brushstrokeCount = sliders.trackbar(2).Value
 
         ReDim DNAseq(brushstrokeCount - 1)
@@ -104,7 +112,7 @@ Public Class GeneticDrawing_Basics
             Dim e = New DNAentry
             e.color = msRNG.Next(0, 255)
             e.size = msRNG.NextDouble() * (maxSize - minSize) + minSize
-            e.pt = New cv.Point(msRNG.Next(src.Width), msRNG.Next(src.Height))
+            e.pt = New cv.Point(r.X + msRNG.Next(r.Width), r.Y + msRNG.Next(r.Height))
             Dim localMagnitude = gradient.magnitude.Get(Of Single)(e.pt.Y, e.pt.X)
             Dim localAngle = gradient.angle.Get(Of Single)(e.pt.Y, e.pt.X) + 90
             e.rotation = (msRNG.Next(-180, 180) * (1 - localMagnitude) + localAngle)
@@ -122,6 +130,8 @@ Public Class GeneticDrawing_Basics
         generationTotal = sliders.trackbar(0).Value
         gradientMagContrast = gradient.sliders.trackbar(0).Value
         sobelKernel = gradient.basics.sobel.sliders.trackbar(0).Value
+        Static r = New cv.Rect(0, 0, src.Width, src.Height)
+        If ocvb.drawRect.Width > 0 Then r = ocvb.drawRect
         If check.Box(1).Checked Then
             check.Box(1).Checked = False
             stageTotal = sliders.trackbar(1).Value
@@ -145,7 +155,7 @@ Public Class GeneticDrawing_Basics
             gradient.Run(ocvb)
             mats.mat(2) = gradient.magnitude.ConvertScaleAbs(255)
 
-            startNewStage()
+            startNewStage(r)
         End If
         If stage >= stageTotal Then Exit Sub ' request is complete...
 
@@ -162,7 +172,7 @@ Public Class GeneticDrawing_Basics
                     Case 0
                         nextDNA(i).color = CInt(msRNG.Next(0, 255))
                     Case 1, 2
-                        nextDNA(i).pt = New cv.Point(msRNG.Next(src.Width), msRNG.Next(src.Height))
+                        nextDNA(i).pt = New cv.Point(msRNG.Next(r.x, r.X + r.width), msRNG.Next(r.y, r.y + r.height))
                     Case 3
                         nextDNA(i).size = msRNG.NextDouble() * (maxSize - minSize) + minSize
                     Case 4
@@ -196,7 +206,7 @@ Public Class GeneticDrawing_Basics
             mats.mat(1) = imgStage
             generation = 0
             stage += 1
-            startNewStage()
+            startNewStage(r)
         End If
 
         mats.Run(ocvb)
@@ -226,7 +236,7 @@ Public Class GeneticDrawing_Color
         gDraw(2) = New GeneticDrawing_Basics(ocvb) ' options for the red channel are visible and will be sync below with the other channels if changed.
 
         label1 = "Intermediate results - original+2 partial+Mag"
-        ocvb.desc = "Use the GeneticDrawing_Basics to create a color painting.  Painterly"
+        ocvb.desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim split() As cv.Mat
@@ -259,11 +269,6 @@ Public Class GeneticDrawing_Color
 
         label2 = gDraw(2).label2
     End Sub
-    Public Sub close()
-        For i = 0 To gDraw.Count - 1
-            gDraw(i).Dispose()
-        Next
-    End Sub
 End Class
 
 
@@ -285,7 +290,7 @@ Public Class GeneticDrawing_Photo
         ocvb.parms.openFileDialogTitle = "Select an image file to create a paint version"
         ocvb.parms.initialStartSetting = True
 
-        ocvb.desc = "Apply genetic drawing technique to any still photo."
+        ocvb.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If saveFileName <> ocvb.parms.openFileDialogName Or ocvb.frameCount = 0 Then

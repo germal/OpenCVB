@@ -3,16 +3,29 @@
 There is no better documentation of an algorithm than a working example. Now
 imagine hundreds of OpenCV examples in a single app where each algorithm is less
 than a page of code and is in a familiar language – C++, C\#, Python, or VB.Net.
-That is what "OpenCVB" Version 1.0 provides. Here is what it looks like:
+That is what "OpenCVB" Version 1.0 provides. And each algorithm is just the
+algorithm without the baggage from a user interface or implementation.
+
+Any of the hundreds of algorithms can be selected from the first combo box at
+the top of the form. The second combo box is used to group the different
+algorithms by what OpenCV API’s or other OpenCVB algorithms are used. The
+default grouping is to select “\<All\>” algorithms while other special groupings
+allow selecting Python or C++ or Multi-threaded algorithms. The text at the
+right side of the toolbar is a brief description of the algorithm. The icons on
+the left of the toolbar: stop/start the algorithm, change global settings for
+OpenCVB, test all cameras with all algorithms, and take a picture of the current
+images.
 
 ![](media/b1e011f4681611111d7a7c752e274599.png)
 
-*The lower left image shows the “PointCloud_GVector_TopView” algorithm which
-renders the point cloud as if seen from directly above – a useful view to find
-walls and objects. The data is colored the same as the RGB Depth data in the
-upper right image. The upper left image is the RGB output. The lower right image
-has isolated the objects found and with each rectangle has a measure of the
-width and breadth of each object in the field of view.*
+The output images are: the RGB output (upper left), the colorized depth image
+(upper right), the output of the current algorithm (lower left) and an optional
+second image output from the algorithm (lower right). In this example the
+“PointCloud_GVector_TopView” algorithm renders the camera point cloud as if seen
+from directly above – a useful view to find walls and objects. The data is
+colored the same as the RGB Depth data in the upper right image. The lower right
+image has isolated the objects found with a rectangle that measures the width
+and breadth of each object in the field of view.
 
 The “Sample Results” section below provides numerous examples.
 
@@ -831,9 +844,11 @@ same environment. Here is a look at how the cameras were setup:
 
 ![](media/e15606605299f00d6ae1f4fb8da73c09.jpg)
 
-Using the “PointCloud_GVector_TopView”, all the above cameras were used to
-measure the distance to the wall approximately 2.5 meters from the cameras. The
-results are below.
+The cast of characters – (left to right) Intel D435i, Intel L515, StereoLabs Zed
+2, Mynt Eye D1000, and Microsoft Kinect 4 Azure. Using the
+“PointCloud_GVector_TopView”, all the above cameras were used to measure the
+distance to the wall approximately 2.5 meters from the cameras. The results are
+below.
 
 ![](media/a2bdd27cd813f1c37d92db977fc74a00.png)
 
