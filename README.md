@@ -836,11 +836,11 @@ Fremont, California
 
 Summer 2020
 
-Addendum 1: Comparing Cameras
+**Addendum 1: Comparing Cameras**
 
 There are 5 supported cameras that generate a point cloud – Intel RealSense
 D435i, Intel RealSense L515, Microsoft Kinect4Azure, StereoLabs Zed 2, and Mynt
-Eye D1000. The ameras are setup to measure the distance to the same wall in the
+Eye D1000. The cameras are setup to measure the distance to the same wall in the
 same environment. Here is a look at how the cameras were setup:
 
 ![](media/e15606605299f00d6ae1f4fb8da73c09.jpg)
@@ -866,8 +866,8 @@ Intel RealSense D435i camera. (Distance to the wall looks incorrect.)
 ![](media/ed464a9db22610b7e3dfd5ed1057d238.png)
 
 StereoLabs Zed 2 camera. FOV looks a little skewed to the right. The problem
-could be specific this camera but there was no available second camera to test
-(the camera is a little expensive.)
+could be specific to this camera but there was no available second camera to
+test (the camera is a little expensive.)
 
 ![](media/1e2803ceab3c74d9cbd59249369035b1.png)
 
