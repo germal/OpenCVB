@@ -289,6 +289,7 @@ Public Class GeneticDrawing_Photo
         ocvb.parms.openFileFilterIndex = 1
         ocvb.parms.openFileDialogTitle = "Select an image file to create a paint version"
         ocvb.parms.initialStartSetting = True
+        ocvb.parms.openFileSliderPercent = -1
 
         ocvb.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
     End Sub

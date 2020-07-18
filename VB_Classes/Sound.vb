@@ -5,7 +5,7 @@ Imports NAudio.Wave
 ' http://ismir2002.ismir.net/proceedings/02-FP04-2.pdf
 Public Class Sound_ToPCM
     Inherits ocvbClass
-    Dim reader As MediaFoundationReader
+    Public reader As MediaFoundationReader
     Dim memData As WaveBuffer
     Dim pcmData() As Short
     Dim pcmDuration As Single ' in seconds.
@@ -13,7 +13,7 @@ Public Class Sound_ToPCM
     Dim startTime As Date
     Dim saveFileName As fileinfo
     Public pcm32f As New cv.Mat
-    Dim player As IWavePlayer
+    Public player As IWavePlayer
     Dim savefileStarted As Boolean
     Private Sub LoadSoundData(ocvb As AlgorithmData)
         saveFileName = New FileInfo(ocvb.parms.openFileDialogName)
@@ -87,5 +87,23 @@ Public Class Sound_ToPCM
         If savefileStarted Then player.Stop()
         player.Dispose()
         reader.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Sound_PolylineDisplay
+    Inherits ocvbClass
+    Dim sound As Sound_ToPCM
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sound = New Sound_ToPCM(ocvb)
+
+        ocvb.desc = "Play a file and display the sound as polyline output"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
     End Sub
 End Class
