@@ -278,7 +278,7 @@ End Class
 Public Class GeneticDrawing_Photo
     Inherits ocvbClass
     Dim gDraw As GeneticDrawing_Color
-    Dim saveFileName As String
+    Dim inputFileName As String
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
@@ -294,7 +294,7 @@ Public Class GeneticDrawing_Photo
         ocvb.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If saveFileName <> ocvb.parms.openFileDialogName Or ocvb.frameCount = 0 Then
+        If inputFileName <> ocvb.parms.openFileDialogName Or ocvb.frameCount = 0 Then
             Dim fileinfo = New FileInfo(ocvb.parms.openFileDialogName)
             If fileinfo.Exists = False Then
                 label1 = "No input file.  Use dialogbox below..."
@@ -306,7 +306,7 @@ Public Class GeneticDrawing_Photo
                 label1 = "Input file must be RGB 3-channel image!"
                 Exit Sub
             End If
-            saveFileName = ocvb.parms.openFileDialogName
+            inputFileName = ocvb.parms.openFileDialogName
 
             If gDraw IsNot Nothing Then gDraw.Dispose()
             gDraw = New GeneticDrawing_Color(ocvb)
@@ -320,7 +320,7 @@ Public Class GeneticDrawing_Photo
             Else
                 src = fullsizeImage
             End If
-            SaveSetting("OpenCVB", "PhotoFileName", "PhotoFileName", FileInfo.FullName)
+            SaveSetting("OpenCVB", "PhotoFileName", "PhotoFileName", fileinfo.FullName)
             gDraw.src = src
         End If
 
