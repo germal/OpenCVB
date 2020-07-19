@@ -12,9 +12,9 @@ group the different algorithms by what OpenCV API’s or other OpenCVB algorithm
 are used. The default grouping is to select “\<All\>” algorithms while other
 special groupings allow selecting Python or C++ or Multi-threaded algorithms.
 The text at the right side of the toolbar is a brief description of the
-algorithm. The icons on the left of the toolbar: stop/start the algorithm,
-change global settings for OpenCVB, test all cameras with all algorithms, and
-take a picture of the current output.
+algorithm. Icons on the left side are to: stop/start the algorithm, change
+global settings for OpenCVB, test all cameras with all algorithms, and take a
+picture of the current output.
 
 ![](media/b1e011f4681611111d7a7c752e274599.png)
 
@@ -25,7 +25,7 @@ the “PointCloud_GVector_TopView” algorithm renders the camera point cloud as
 seen from directly above – a useful view to find walls and objects. The data is
 colored the same as the RGB Depth data in the upper right image. The lower right
 image has isolated the objects found with a rectangle that measures the width
-and breadth of each object in the field of view.
+and breadth of each object in the camera’s field of view.
 
 The “Sample Results” section below provides numerous additional examples.
 
