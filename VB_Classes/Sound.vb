@@ -1,6 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.IO
 Imports NAudio.Wave
+Imports NAudio.Wave.SampleProviders.SignalGeneratorType
 ' https://archive.codeplex.com/?p=naudio
 ' http://ismir2002.ismir.net/proceedings/02-FP04-2.pdf
 Public Class Sound_ToPCM
@@ -94,16 +95,45 @@ End Class
 
 
 
-
-Public Class Sound_PolylineDisplay
+' https://github.com/naudio/sinegenerator-sample
+Public Class Sound_SignalGenerator
     Inherits ocvbClass
-    Dim sound As Sound_ToPCM
+    Dim player As NAudio.Wave.IWavePlayer
+    Dim wGen As New NAudio.Wave.SampleProviders.SignalGenerator
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sound = New Sound_ToPCM(ocvb)
 
-        ocvb.desc = "Play a file and display the sound as polyline output"
+        sliders.Setup(ocvb, caller, 2)
+        sliders.setupTrackBar(0, "Sine Wave Frequency", 10, 4000, 1000)
+        sliders.setupTrackBar(1, "Decibels", -100, 0, -20)
+
+        radio.Setup(ocvb, caller, 7)
+        For i = 0 To radio.check.Count - 1
+            radio.check(i).Text = Choose(i + 1, "Pink", "White", "Sweep", "Sin", "Square", "Triangle", "SawTooth")
+        Next
+        radio.check(0).Checked = True
+
+        check.Setup(ocvb, caller, 2)
+        check.Box(0).Text = "PhaseReverse Left"
+        check.Box(1).Text = "PhaseReverse Right"
+
+        Dim waveoutEvent = New NAudio.Wave.WaveOutEvent
+        waveoutEvent.NumberOfBuffers = 2
+        waveoutEvent.DesiredLatency = 100
+        player = waveoutEvent
+        player.Init(wGen)
+        ocvb.desc = "Generate sound with a sine waveform."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        For i = 0 To radio.check.Count - 1
+            If radio.check(i).Checked Then wGen.Type = Choose(i + 1, Pink, White, Sweep, Sin, Square, Triangle, SawTooth)
+        Next
+
+        wGen.PhaseReverse(0) = check.Box(0).Checked
+        wGen.PhaseReverse(1) = check.Box(1).Checked
+
+        wGen.Frequency = sliders.trackbar(0).Value
+        wGen.Gain = NAudio.Utils.Decibels.DecibelsToLinear(sliders.trackbar(1).Value)
+        If ocvb.frameCount = 0 Then player.Play()
     End Sub
 End Class
