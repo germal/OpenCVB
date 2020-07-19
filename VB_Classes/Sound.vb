@@ -103,9 +103,11 @@ Public Class Sound_SignalGenerator
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        sliders.Setup(ocvb, caller, 2)
+        sliders.Setup(ocvb, caller, 4)
         sliders.setupTrackBar(0, "Sine Wave Frequency", 10, 4000, 1000)
         sliders.setupTrackBar(1, "Decibels", -100, 0, -20)
+        sliders.setupTrackBar(2, "Sweep Only - End Frequency", 20, 4000, 1000)
+        sliders.setupTrackBar(3, "Sweep Only - duration secs", 0, 10, 1)
 
         radio.Setup(ocvb, caller, 7)
         For i = 0 To radio.check.Count - 1
@@ -134,6 +136,11 @@ Public Class Sound_SignalGenerator
 
         wGen.Frequency = sliders.trackbar(0).Value
         wGen.Gain = NAudio.Utils.Decibels.DecibelsToLinear(sliders.trackbar(1).Value)
+
+        If wGen.Type = Sweep Then
+            wGen.FrequencyEnd = sliders.trackbar(2).Value
+            wGen.SweepLengthSecs = sliders.trackbar(3).Value
+        End If
         If ocvb.frameCount = 0 Then player.Play()
     End Sub
 End Class
