@@ -42,7 +42,7 @@ Public Class AlphaChannel_Blend
         fg = New Depth_InRange(ocvb)
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Transparency amount", 0, 255, 255)
+        sliders.setupTrackBar(0, "Transparency amount", 0, 255, 100)
 
         ocvb.desc = "Use alpha blending to smoothly separate background from foreground"
     End Sub

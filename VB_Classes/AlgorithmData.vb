@@ -4,8 +4,7 @@ Public Class AlgorithmData
     ' all the items here are used to communicate to/from the host user interface.  Other variables common to all algorithms should be ocvbClass.vb
     Public color As cv.Mat
     Public RGBDepth As cv.Mat
-    Public result1 As New cv.Mat
-    Public result2 As New cv.Mat
+    Public result As New cv.Mat
     Public pointCloud As cv.Mat
     Public depth16 As cv.Mat
     Public leftView As cv.Mat
@@ -33,8 +32,7 @@ Public Class AlgorithmData
     Public Sub New(parms As ActiveClass.algorithmParameters, width As Integer, height As Integer)
         color = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        result1 = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        result2 = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        result = New cv.Mat(height, width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         For i = 0 To TTtextData.Count - 1
             TTtextData(i) = New List(Of TTtext)
         Next

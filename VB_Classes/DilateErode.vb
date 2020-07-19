@@ -85,8 +85,8 @@ Public Class DilateErode_DepthSeed
         Dim validImg = depth32f.GreaterThan(0).ToMat
         validImg.SetTo(0, depth32f.GreaterThan(sliders.trackbar(1).Value)) ' max distance
         cv.Cv2.BitwiseAnd(seeds, validImg, seeds)
-        ocvb.result1.SetTo(0)
-        ocvb.RGBDepth.CopyTo(ocvb.result1, seeds)
+        dst1.SetTo(0)
+        ocvb.RGBDepth.CopyTo(dst1, seeds)
     End Sub
 End Class
 

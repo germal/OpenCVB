@@ -91,7 +91,7 @@ Public Class ocvbClass : Implements IDisposable
             scalarColors(i) = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)
         Next
     End Sub
-    Private Sub MakeSureImage8uC3(ByRef src As cv.Mat)
+    Private Function MakeSureImage8uC3(ByVal src As cv.Mat) As cv.Mat
         If src.Type = cv.MatType.CV_32F Then
             ' it must be a 1 channel 32f image so convert it to 8-bit and let it get converted to RGB below
             src = src.Normalize(0, 255, cv.NormTypes.MinMax)
@@ -100,20 +100,17 @@ Public Class ocvbClass : Implements IDisposable
         If src.Channels = 1 And src.Type = cv.MatType.CV_8UC1 Then
             src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
-    End Sub
+        Return src
+    End Function
     Public Sub NextFrame(ocvb As AlgorithmData)
         If standalone Then src = ocvb.color
         If ocvb.drawRect.Width <> 0 Then ocvb.drawRect = validateRect(ocvb.drawRect)
         algorithm.Run(ocvb)
         If standalone Then
-            If dst1.Width <> 0 Then
-                ocvb.result1 = dst1
-                MakeSureImage8uC3(ocvb.result1)
-            End If
-            If dst2.Width <> 0 Then
-                ocvb.result2 = dst2
-                MakeSureImage8uC3(ocvb.result2)
-            End If
+            If dst1.Width <> src.Width Then dst1 = dst1.Resize(New cv.Size(src.Width, src.Height))
+            If dst2.Width <> src.Width Then dst2 = dst2.Resize(New cv.Size(src.Width, src.Height))
+            ocvb.result(New cv.Rect(0, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst1)
+            ocvb.result(New cv.Rect(src.Width, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst2)
             ocvb.label1 = label1
             ocvb.label2 = label2
             ocvb.frameCount += 1

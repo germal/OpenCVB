@@ -28,7 +28,7 @@ Public Class OpenCVB
     Dim cameraZed2 As Object
     Dim cameraT265 As Object
     Dim cameraTaskHandle As Thread
-    Public camPic(displayFrames - 1) As PictureBox
+    Dim camPic(3 - 1) As PictureBox
     Dim cameraRefresh As Boolean
     Dim algorithmRefresh As Boolean
     Dim CodeLineCount As Int32
@@ -36,7 +36,7 @@ Public Class OpenCVB
     Dim drawRect As New cv.Rect(0, 0, 0, 0)
     Dim externalPythonInvocation As Boolean
     Dim fps As Int32 = 30
-    Dim formResult1 As New cv.Mat, formResult2 As New cv.Mat
+    Dim imgResult As New cv.Mat
     Dim frameCount As Int32
     Dim GrabRectangleData As Boolean
     Dim HomeDir As DirectoryInfo
@@ -263,18 +263,13 @@ Public Class OpenCVB
         End If
         If algorithmRefresh And (pic.Tag = 2 Or pic.Tag = 3) Then
             algorithmRefresh = False
-            SyncLock formResult1
+            SyncLock imgResult
                 Try
-                    If formResult1.Width <> camPic(2).Width Or formResult1.Height <> camPic(2).Height Then
-                        Dim result1 = formResult1
-                        Dim result2 = formResult2
-                        result1 = result1.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
-                        result2 = result2.Resize(New cv.Size(camPic(3).Size.Width, camPic(3).Size.Height))
-                        cvext.BitmapConverter.ToBitmap(result1, camPic(2).Image)
-                        cvext.BitmapConverter.ToBitmap(result2, camPic(3).Image)
+                    If imgResult.Width <> camPic(2).Width Then
+                        Dim result = imgResult.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
+                        cvext.BitmapConverter.ToBitmap(result, camPic(2).Image)
                     Else
-                        cvext.BitmapConverter.ToBitmap(formResult1, camPic(2).Image)
-                        cvext.BitmapConverter.ToBitmap(formResult2, camPic(3).Image)
+                        cvext.BitmapConverter.ToBitmap(imgResult, camPic(2).Image)
                     End If
                 Catch ex As Exception
                     Console.WriteLine("Error in form result update: " + ex.Message)
@@ -385,7 +380,7 @@ Public Class OpenCVB
     End Sub
     Private Sub OpenCVB_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         If camPic Is Nothing Then Exit Sub ' when first opening, campic may not be built yet
-        If camPic(3) Is Nothing Then Exit Sub ' individual pictureboxes need to be ready as well.
+        If camPic(2) Is Nothing Then Exit Sub ' individual pictureboxes need to be ready as well.
         LineUpCamPics()
     End Sub
     Private Sub LineUpCamPics()
@@ -395,13 +390,16 @@ Public Class OpenCVB
         If Math.Abs(height - regHeight / 2) < 2 Then height = regHeight / 2
         Dim padX = 12
         Dim padY = 40
-        For i = 0 To camPic.Length - 1
-            camPic(i).Size = New Size(width, height)
-            camPic(i).Image = New Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
-            Dim picleft = Choose(i + 1, padX, camPic(0).Left + camPic(i).Width, padX, camPic(0).Left + camPic(i).Width)
-            Dim picTop = Choose(i + 1, padY, padY, camPic(0).Top + camPic(i).Height, camPic(0).Top + camPic(i).Height)
-            camPic(i).Location = New Point(picleft, picTop)
-        Next
+        camPic(0).Size = New Size(width, height)
+        camPic(1).Size = New Size(width, height)
+        camPic(2).Size = New Size(width * 2, height)
+
+        camPic(0).Image = New Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+        camPic(1).Image = New Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+        camPic(2).Image = New Bitmap(width * 2, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+        camPic(0).Location = New Point(padX, padY)
+        camPic(1).Location = New Point(camPic(0).Left + camPic(0).Width, padY)
+        camPic(2).Location = New Point(padX, camPic(0).Top + camPic(0).Height)
         saveLayout()
     End Sub
     Public Function USBenumeration(searchName As String) As Int32
@@ -472,7 +470,7 @@ Public Class OpenCVB
 
         For i = 0 To camPic.Length - 1
             If camPic(i) Is Nothing Then camPic(i) = New PictureBox()
-            camPic(i).Size = New Size(regWidth / resizeForDisplay, regHeight / resizeForDisplay)
+            camPic(i).Size = New Size(If(i < 2, regWidth / resizeForDisplay, regWidth * 2 / resizeForDisplay), regHeight / resizeForDisplay)
             AddHandler camPic(i).DoubleClick, AddressOf campic_DoubleClick
             AddHandler camPic(i).Click, AddressOf campic_Click
             AddHandler camPic(i).Paint, AddressOf campic_Paint
@@ -635,7 +633,7 @@ Public Class OpenCVB
                 DrawingRectangle = False
 
                 Dim pic = DirectCast(sender, PictureBox)
-                Dim src = Choose(pic.Tag + 1, camera.Color, camera.RGBDepth, formResult1, formResult2)
+                Dim src = Choose(pic.Tag + 1, camera.Color, camera.RGBDepth, imgResult)
                 drawRect = validateRect(src, drawRect)
                 Dim srcROI = New cv.Mat
                 srcROI = src(drawRect).clone()
@@ -859,9 +857,9 @@ Public Class OpenCVB
                         Case 2 ' depth RGB
                             resultMat = camera.RGBDepth.Clone()
                         Case 3 ' result1
-                            resultMat = formResult1.Clone()
+                            resultMat = imgResult(New cv.Rect(0, 0, camera.color.width, camera.color.height)).Clone()
                         Case 4 ' result2
-                            resultMat = formResult2.Clone()
+                            resultMat = imgResult(New cv.Rect(camera.color.width, 0, camera.color.width, camera.color.height)).Clone()
                     End Select
                     Exit For
                 End SyncLock
@@ -1015,8 +1013,7 @@ Public Class OpenCVB
 
         stopAlgorithmThread = False
 
-        formResult1 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
-        formResult2 = New cv.Mat(fastSize, cv.MatType.CV_8UC3, 0)
+        imgResult = New cv.Mat(New cv.Size(fastSize.Width * 2, fastSize.Height), cv.MatType.CV_8UC3, 0)
 
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
 
@@ -1201,8 +1198,7 @@ Public Class OpenCVB
                     SyncLock TTtextData
                         If OpenCVB.ocvb.parms.keyInputAccepted Then keyboardInput = ""
                         algorithmRefresh = True
-                        formResult1 = OpenCVB.ocvb.result1.Clone()
-                        formResult2 = OpenCVB.ocvb.result2.Clone()
+                        imgResult = OpenCVB.ocvb.result.Clone()
                         For i = VB_Classes.ActiveClass.RESULT1 To VB_Classes.ActiveClass.RESULT2
                             If OpenCVB.ocvb.TTtextData(i).Count Then
                                 TTtextData(i).Clear()
