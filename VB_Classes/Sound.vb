@@ -169,9 +169,9 @@ Public Class Sound_SignalGenerator
 
             Dim count = wGen.Read(pcmData, 0, pcmData.Length)
             pcm32f = New cv.Mat(pcmData.Length, 1, cv.MatType.CV_32F, pcmData)
+            player.Play()
         End If
         If standalone Then ocvb.putText(New TTtext("Requested sound data is in the pcm32f cv.Mat", 10, 50, RESULT1))
-        If ocvb.frameCount = 0 Then player.Play()
 
         ocvb.parms.openFileSliderPercent = ((Now - startTime).TotalSeconds Mod pcmDuration) / pcmDuration
         If ocvb.parms.openFileSliderPercent >= 0.99 Then ocvb.parms.openFileSliderPercent = 0
@@ -213,7 +213,6 @@ Public Class Sound_Display
         Static useGenerated As Boolean
         If useGenerated <> check.Box(0).Checked Or sound Is Nothing Then
             useGenerated = check.Box(0).Checked
-            label1 = ""
             If sound IsNot Nothing Then sound.dispose()
             If check.Box(0).Checked Then
                 sound = New Sound_SignalGenerator(ocvb)
@@ -225,46 +224,48 @@ Public Class Sound_Display
             starttime = Now
         End If
 
-        sound.Run(ocvb)
+        If check.Box(0).Checked Or ocvb.parms.fileStarted Then
+            sound.Run(ocvb)
 
-        Dim halfHeight As Integer = dst1.Height / 2
-        If sound.pcm32f.width = 0 Then Exit Sub ' sound hasn't loaded yet.
+            Dim halfHeight As Integer = dst1.Height / 2
+            If sound.pcm32f.width = 0 Then Exit Sub ' sound hasn't loaded yet.
 
-        dst1 = New cv.Mat(src.Height, src.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.Beige)
-        Dim totalSamples = sound.pcm32f.Rows
-        Dim samplesPerLine = If(sound.stereo, totalSamples / 2 / dst1.Width, totalSamples / dst1.Width)
-        Dim formatIndex As Integer
-        For i = 0 To check.Box.Count - 1
-            If check.Box(i).Checked Then formatIndex = i
-        Next
+            dst1 = New cv.Mat(src.Height, src.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.Beige)
+            Dim totalSamples = sound.pcm32f.Rows
+            Dim samplesPerLine = If(sound.stereo, totalSamples / 2 / dst1.Width, totalSamples / dst1.Width)
+            Dim formatIndex As Integer
+            For i = 0 To check.Box.Count - 1
+                If check.Box(i).Checked Then formatIndex = i
+            Next
 
-        Dim absMinVal As Double, absMaxVal As Double
-        Select Case formatIndex
-            Case 0
-                Dim pcm = sound.pcm32f
-                pcm.MinMaxLoc(absMinVal, absMaxVal)
-                If Double.IsNaN(absMaxVal) Or Double.IsNaN(absMinVal) Then Exit Sub ' bad input data...
-                If Double.IsNegativeInfinity(absMinVal) Or Double.IsInfinity(absMaxVal) Then Exit Sub ' bad input data...
-                Dim minVal As Double, maxVal As Double
-                For i = 0 To dst1.Width - 1
-                    Dim rect = New cv.Rect(0, i * samplesPerLine, 1, samplesPerLine)
-                    If rect.Y + rect.Height > pcm.height Then rect.Height = pcm.Height - rect.Y ' rounding possible when changing buffer size...
-                    pcm(rect).MinMaxLoc(minVal, maxVal)
-                    If minVal > 0 Then minVal = 0
-                    If maxVal < 0 Then maxVal = 0
+            Dim absMinVal As Double, absMaxVal As Double
+            Select Case formatIndex
+                Case 0
+                    Dim pcm = sound.pcm32f
+                    pcm.MinMaxLoc(absMinVal, absMaxVal)
+                    If Double.IsNaN(absMaxVal) Or Double.IsNaN(absMinVal) Then Exit Sub ' bad input data...
+                    If Double.IsNegativeInfinity(absMinVal) Or Double.IsInfinity(absMaxVal) Then Exit Sub ' bad input data...
+                    Dim minVal As Double, maxVal As Double
+                    For i = 0 To dst1.Width - 1
+                        Dim rect = New cv.Rect(0, i * samplesPerLine, 1, samplesPerLine)
+                        If rect.Y + rect.Height > pcm.height Then rect.Height = pcm.Height - rect.Y ' rounding possible when changing buffer size...
+                        pcm(rect).MinMaxLoc(minVal, maxVal)
+                        If minVal > 0 Then minVal = 0
+                        If maxVal < 0 Then maxVal = 0
 
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red, 1)
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / absMaxVal)), cv.Scalar.Gray, 1)
-                Next
-                label1 = CStr(CInt(sound.pcmDuration)) + " seconds displayed with Max Absolute Value"
-            Case 1
-            Case 2
-            Case 3
-        End Select
+                        dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red, 1)
+                        dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / absMaxVal)), cv.Scalar.Gray, 1)
+                    Next
+                    label1 = CStr(CInt(sound.pcmDuration)) + " seconds displayed with Max Absolute Value"
+                Case 1
+                Case 2
+                Case 3
+            End Select
+        End If
         If check.Box(0).Checked = False Then
             ocvb.parms.openFileSliderPercent = If(ocvb.parms.fileStarted, (Now - starttime).TotalSeconds / sound.pcmduration, 0)
             ' when playing back an audio file, restart at the beginning when it is over...
-            If ocvb.parms.openFileSliderPercent > 0.99 And check.Box(0).Checked = False Then
+            If ocvb.parms.openFileSliderPercent > 0.99 Or ocvb.parms.fileStarted = False Then
                 sound.close()
                 sound = Nothing ' this will restart the audio
             End If
