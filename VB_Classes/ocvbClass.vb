@@ -131,6 +131,7 @@ Public Class ocvbClass : Implements IDisposable
         algorithm.Close()  ' Close any unmanaged classes...
         sliders.Dispose()
         check.Dispose()
+        radio.Dispose()
         radio1.Dispose()
         combo.Dispose()
     End Sub

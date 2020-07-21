@@ -76,7 +76,7 @@ Public Class OpenCVB
     Dim openFileFilter As String
     Dim openFileFilterIndex As Integer
     Dim openFileDialogName As String
-    Dim openfileDialogfileStarted As Boolean
+    Dim openFileStarted As Boolean
     Dim openfileDialogTitle As String
     Dim openfileSliderPercent As Single
     Dim openformLocated As Boolean
@@ -342,7 +342,7 @@ Public Class OpenCVB
                 openForm.Text = openfileDialogTitle
                 openForm.Label1.Text = "Select a file for use with the " + AvailableAlgorithms.Text + " algorithm."
                 openForm.Show()
-                openfileDialogfileStarted = openFileinitialStartSetting
+                openFileStarted = openFileinitialStartSetting
                 If openFileinitialStartSetting And openForm.PlayButton.Text = "Start" Then
                     openForm.PlayButton.PerformClick()
                 Else
@@ -357,13 +357,13 @@ Public Class OpenCVB
                     openForm.Location = New Point(Me.Left, Me.Top + Me.Height)
                 End If
                 If openFileDialogName <> openForm.filename.Text Then openFileDialogName = openForm.filename.Text
-                If openForm.fileStarted <> openfileDialogfileStarted Then openfileDialogfileStarted = openForm.fileStarted
                 If openfileSliderPercent >= 0 And openfileSliderPercent <= 1 Then openForm.TrackBar1.Value = openfileSliderPercent * 10000
                 If openfileSliderPercent < 0 Then
                     openForm.PlayButton.Visible = False
                     openForm.TrackBar1.Visible = False
                 End If
             End If
+            openFileStarted = openForm.fileStarted
         End If
         AlgorithmDesc.Text = textDesc
     End Sub
@@ -1053,7 +1053,7 @@ Public Class OpenCVB
         openFileDialogRequested = OpenCVB.ocvb.parms.openFileDialogRequested
         openFileinitialStartSetting = OpenCVB.ocvb.parms.initialStartSetting
         OpenCVB.ocvb.parms.fileStarted = OpenCVB.ocvb.parms.initialStartSetting
-        openfileDialogfileStarted = OpenCVB.ocvb.parms.initialStartSetting
+        openFileStarted = OpenCVB.ocvb.parms.initialStartSetting
         openFileFilterIndex = OpenCVB.ocvb.parms.openFileFilterIndex
         openFileFilter = OpenCVB.ocvb.parms.openFileFilter
         openFileDialogName = OpenCVB.ocvb.parms.openFileDialogName
@@ -1180,6 +1180,8 @@ Public Class OpenCVB
                 OpenCVB.ocvb.mouseClickPoint = mouseClickPoint
                 mouseClickFlag = False
 
+                OpenCVB.ocvb.parms.fileStarted = openFileStarted ' UI may have stopped play.
+
                 OpenCVB.RunAlgorithm()
 
                 If OpenCVB.ocvb.drawRectClear Then
@@ -1189,8 +1191,8 @@ Public Class OpenCVB
                 End If
 
                 If openFileDialogName <> "" Then
-                    If openFileDialogName <> OpenCVB.ocvb.parms.openFileDialogName Or openfileDialogfileStarted <> OpenCVB.ocvb.parms.fileStarted Then
-                        OpenCVB.ocvb.parms.fileStarted = openfileDialogfileStarted
+                    If openFileDialogName <> OpenCVB.ocvb.parms.openFileDialogName Or openFileStarted <> OpenCVB.ocvb.parms.fileStarted Then
+                        OpenCVB.ocvb.parms.fileStarted = openFileStarted
                         OpenCVB.ocvb.parms.openFileDialogName = openFileDialogName
                     End If
                     openfileSliderPercent = OpenCVB.ocvb.parms.openFileSliderPercent
@@ -1201,9 +1203,7 @@ Public Class OpenCVB
                     inputFile = OpenCVB.ocvb.parms.openFileDialogName
                     openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
                     openFileDialogRequested = OpenCVB.ocvb.parms.openFileDialogRequested
-                    openFileinitialStartSetting = OpenCVB.ocvb.parms.initialStartSetting
-                    OpenCVB.ocvb.parms.fileStarted = OpenCVB.ocvb.parms.initialStartSetting
-                    openfileDialogfileStarted = OpenCVB.ocvb.parms.initialStartSetting
+                    openFileinitialStartSetting = True ' if the file playing changes while the algorithm is running, automatically start playing the new file.
                     openFileFilterIndex = OpenCVB.ocvb.parms.openFileFilterIndex
                     openFileFilter = OpenCVB.ocvb.parms.openFileFilter
                     openFileDialogName = OpenCVB.ocvb.parms.openFileDialogName

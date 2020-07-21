@@ -59,16 +59,15 @@ Public Class Sound_ToPCM
 
                 reader = New MediaFoundationReader(fileinfo.FullName)
                 LoadSoundData(ocvb)
+                reader = New MediaFoundationReader(fileinfo.FullName)
                 SaveSetting("OpenCVB", "AudioFileName", "AudioFileName", fileinfo.FullName)
-                Dim readerTest = New MediaFoundationReader(fileinfo.FullName)
 
-                player = New WaveOut()
-                player.Init(readerTest)
+                player = New WaveOut
+                player.Init(reader)
                 player.Play()
-                startTime = Now
 
-                Dim channels = readerTest.WaveFormat.Channels
-                Dim bpSample = readerTest.WaveFormat.BitsPerSample
+                Dim channels = reader.WaveFormat.Channels
+                Dim bpSample = reader.WaveFormat.BitsPerSample
                 Dim mattype = cv.MatType.CV_16SC2
                 If bpSample = 8 And channels = 1 Then mattype = cv.MatType.CV_8U
                 If bpSample = 8 And channels = 2 Then mattype = cv.MatType.CV_8UC2
@@ -80,12 +79,14 @@ Public Class Sound_ToPCM
                     input = New cv.Mat(pcmData8.Length, 1, mattype, pcmData8)
                 End If
                 input.ConvertTo(pcm32f, cv.MatType.CV_32F)
+                startTime = Now
             End If
         End If
         If ocvb.parms.fileStarted Then
             ocvb.parms.openFileSliderPercent = (Now - startTime).TotalSeconds / pcmDuration
         Else
             inputFileName = ""
+            player?.Stop()
         End If
         If standalone Then ocvb.putText(New TTtext("Requested sound data is in the pcm32f cv.Mat", 10, 50, RESULT1))
     End Sub
@@ -120,7 +121,7 @@ Public Class Sound_SignalGenerator
         sliders.setupTrackBar(1, "Decibels", -100, 0, -20)
         sliders.setupTrackBar(2, "Sweep Only - End Frequency", 20, 4000, 1000)
         sliders.setupTrackBar(3, "Sweep Only - duration secs", 0, 10, 1)
-        sliders.setupTrackBar(4, "Retain Data for x seconds", 1, 10, 2)
+        sliders.setupTrackBar(4, "Retain Data for x seconds", 1, 100, 2)
 
         radio.Setup(ocvb, caller, 7)
         For i = 0 To radio.check.Count - 1
@@ -132,37 +133,40 @@ Public Class Sound_SignalGenerator
         check.Box(0).Text = "PhaseReverse Left"
         check.Box(1).Text = "PhaseReverse Right"
 
-        Dim waveoutEvent = New NAudio.Wave.WaveOutEvent
-        waveoutEvent.NumberOfBuffers = 2
-        waveoutEvent.DesiredLatency = 100
-        player = waveoutEvent
+        player = New WaveOut
         player.Init(wGen)
 
         ocvb.desc = "Generate sound with a sine waveform."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If pcmDuration <> sliders.trackbar(4).Value Then
-            pcmDuration = sliders.trackbar(4).Value
-            ReDim pcmData(pcmDuration * generatedSamplesPerSecond - 1) ' enough for about 10 seconds of audio.
-            startTime = Now
-        End If
+        Static radioIndex As Integer
+        If ocvb.parms.openFileSliderPercent = 0 Or sliders.trackbar(0).Value <> wGen.Frequency Or sliders.trackbar(4).Value <> pcmDuration Or
+            radio.check(radioIndex).Checked = False Then
+            If pcmDuration <> sliders.trackbar(4).Value Then
+                pcmDuration = sliders.trackbar(4).Value
+                ReDim pcmData(pcmDuration * generatedSamplesPerSecond - 1) ' enough for about 10 seconds of audio.
+                startTime = Now
+            End If
 
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then wGen.Type = Choose(i + 1, Pink, White, Sweep, Sin, Square, Triangle, SawTooth)
-        Next
+            For i = 0 To radio.check.Count - 1
+                If radio.check(i).Checked Then
+                    wGen.Type = Choose(i + 1, Pink, White, Sweep, Sin, Square, Triangle, SawTooth)
+                    radioIndex = i
+                    Exit For
+                End If
+            Next
 
-        wGen.PhaseReverse(0) = check.Box(0).Checked
-        wGen.PhaseReverse(1) = check.Box(1).Checked
+            wGen.PhaseReverse(0) = check.Box(0).Checked
+            wGen.PhaseReverse(1) = check.Box(1).Checked
 
-        wGen.Frequency = sliders.trackbar(0).Value
-        wGen.Gain = NAudio.Utils.Decibels.DecibelsToLinear(sliders.trackbar(1).Value)
+            wGen.Frequency = sliders.trackbar(0).Value
+            wGen.Gain = NAudio.Utils.Decibels.DecibelsToLinear(sliders.trackbar(1).Value)
 
-        If wGen.Type = Sweep Then
-            wGen.FrequencyEnd = sliders.trackbar(2).Value
-            wGen.SweepLengthSecs = sliders.trackbar(3).Value
-        End If
+            If wGen.Type = Sweep Then
+                wGen.FrequencyEnd = sliders.trackbar(2).Value
+                wGen.SweepLengthSecs = sliders.trackbar(3).Value
+            End If
 
-        If ocvb.parms.openFileSliderPercent = 0 Then
             Dim count = wGen.Read(pcmData, 0, pcmData.Length)
             pcm32f = New cv.Mat(pcmData.Length, 1, cv.MatType.CV_32F, pcmData)
         End If
@@ -187,6 +191,7 @@ Public Class Sound_Display
     Inherits ocvbClass
     Dim sound As Object
     Public pcm32f As cv.Mat
+    Public starttime As Date
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
@@ -201,11 +206,12 @@ Public Class Sound_Display
         check.Box(0).Text = "Use generated sound (unchecked will use latest audio file)"
         check.Box(0).Checked = True
 
+        label2 = "Black shows approximation of what is heard"
         ocvb.desc = "Display a sound buffer in several styles"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static useGenerated As Boolean
-        If useGenerated <> check.Box(0).Checked Or ocvb.frameCount = 0 Then
+        If useGenerated <> check.Box(0).Checked Or sound Is Nothing Then
             useGenerated = check.Box(0).Checked
             label1 = ""
             If sound IsNot Nothing Then sound.dispose()
@@ -216,6 +222,7 @@ Public Class Sound_Display
             Else
                 sound = New Sound_ToPCM(ocvb)
             End If
+            starttime = Now
         End If
 
         sound.Run(ocvb)
@@ -225,7 +232,7 @@ Public Class Sound_Display
 
         dst1 = New cv.Mat(src.Height, src.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.Beige)
         Dim totalSamples = sound.pcm32f.Rows
-        Dim samplesPerLine = If(sound.stereo, CInt(totalSamples / 2 / dst1.Width), CInt(totalSamples / dst1.Width))
+        Dim samplesPerLine = If(sound.stereo, totalSamples / 2 / dst1.Width, totalSamples / dst1.Width)
         Dim formatIndex As Integer
         For i = 0 To check.Box.Count - 1
             If check.Box(i).Checked Then formatIndex = i
@@ -241,6 +248,7 @@ Public Class Sound_Display
                 Dim minVal As Double, maxVal As Double
                 For i = 0 To dst1.Width - 1
                     Dim rect = New cv.Rect(0, i * samplesPerLine, 1, samplesPerLine)
+                    If rect.Y + rect.Height > pcm.height Then rect.Height = pcm.Height - rect.Y ' rounding possible when changing buffer size...
                     pcm(rect).MinMaxLoc(minVal, maxVal)
                     If minVal > 0 Then minVal = 0
                     If maxVal < 0 Then maxVal = 0
@@ -253,6 +261,14 @@ Public Class Sound_Display
             Case 2
             Case 3
         End Select
+        If check.Box(0).Checked = False Then
+            ocvb.parms.openFileSliderPercent = If(ocvb.parms.fileStarted, (Now - starttime).TotalSeconds / sound.pcmduration, 0)
+            ' when playing back an audio file, restart at the beginning when it is over...
+            If ocvb.parms.openFileSliderPercent > 0.99 And check.Box(0).Checked = False Then
+                sound.close()
+                sound = Nothing ' this will restart the audio
+            End If
+        End If
         Dim x = dst1.Width * ocvb.parms.openFileSliderPercent
         dst1.Line(New cv.Point(x, 0), New cv.Point(x, dst1.Height), cv.Scalar.Black, 2)
     End Sub
