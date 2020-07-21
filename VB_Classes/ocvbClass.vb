@@ -107,10 +107,14 @@ Public Class ocvbClass : Implements IDisposable
         If ocvb.drawRect.Width <> 0 Then ocvb.drawRect = validateRect(ocvb.drawRect)
         algorithm.Run(ocvb)
         If standalone Then
-            If dst1.Width <> src.Width Then dst1 = dst1.Resize(New cv.Size(src.Width, src.Height))
-            If dst2.Width <> src.Width Then dst2 = dst2.Resize(New cv.Size(src.Width, src.Height))
-            ocvb.result(New cv.Rect(0, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst1)
-            ocvb.result(New cv.Rect(src.Width, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst2)
+            If dst1.Width = ocvb.result.Width Then
+                ocvb.result = dst1.Clone()
+            Else
+                If dst1.Width <> src.Width Then dst1 = dst1.Resize(New cv.Size(src.Width, src.Height))
+                If dst2.Width <> src.Width Then dst2 = dst2.Resize(New cv.Size(src.Width, src.Height))
+                ocvb.result(New cv.Rect(0, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst1)
+                ocvb.result(New cv.Rect(src.Width, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst2)
+            End If
             ocvb.label1 = label1
             ocvb.label2 = label2
             ocvb.frameCount += 1

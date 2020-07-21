@@ -317,9 +317,14 @@ Public Class OpenCVB
 
             If optionsForm.ShowLabels.Checked Then
                 ' with the low resolution display, we need to use the entire width of the image to display the RGB and Depth text area.
-                Dim textRect As New Rectangle(0, 0, pic.Width / 2, If(resizeForDisplay = 4, 12, 20))
+                Dim textRect As New Rectangle(0, 0, camPic(0).Width / 2, If(resizeForDisplay = 4, 12, 20))
                 If Len(picLabels(pic.Tag)) Then g.FillRectangle(myBrush, textRect)
                 g.DrawString(picLabels(pic.Tag), optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.Black), 0, 0)
+                If Len(picLabels(3)) Then
+                    textRect = New Rectangle(camPic(0).Width, 0, camPic(0).Width / 2, If(resizeForDisplay = 4, 12, 20))
+                    g.FillRectangle(myBrush, textRect)
+                    g.DrawString(picLabels(3), optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.Black), camPic(0).Width, 0)
+                End If
             End If
         End SyncLock
 
@@ -338,11 +343,13 @@ Public Class OpenCVB
                 openForm.Label1.Text = "Select a file for use with the " + AvailableAlgorithms.Text + " algorithm."
                 openForm.Show()
                 openfileDialogfileStarted = openFileinitialStartSetting
-                If openFileinitialStartSetting Then
+                If openFileinitialStartSetting And openForm.PlayButton.Text = "Start" Then
                     openForm.PlayButton.PerformClick()
                 Else
-                    openForm.fileStarted = False
-                    openForm.PlayButton.Text = "Start"
+                    If openFileinitialStartSetting = False Then
+                        openForm.fileStarted = False
+                        openForm.PlayButton.Text = "Start"
+                    End If
                 End If
             Else
                 If (openForm.Location.X <> Me.Left Or openForm.Location.Y <> Me.Top + Me.Height) And openformLocated = False Then
@@ -356,7 +363,6 @@ Public Class OpenCVB
                     openForm.PlayButton.Visible = False
                     openForm.TrackBar1.Visible = False
                 End If
-
             End If
         End If
         AlgorithmDesc.Text = textDesc
@@ -939,13 +945,12 @@ Public Class OpenCVB
             RefreshTimer.Interval = CInt(1000 / optionsForm.RefreshRate.Value)
 
             If optionsForm.SnapToGrid.Checked Then
-                For i = 0 To 3
-                    camPic(i).Size = New Size(regWidth / 2, regHeight / 2)
-                Next
+                camPic(0).Size = New Size(regWidth / 2, regHeight / 2)
+                camPic(1).Size = New Size(regWidth / 2, regHeight / 2)
+                camPic(2).Size = New Size(regWidth, regHeight / 2)
+
                 camPic(1).Left = camPic(0).Left + camPic(0).Width
                 camPic(2).Top = camPic(0).Top + camPic(0).Height
-                camPic(3).Left = camPic(2).Left + camPic(2).Width
-                camPic(3).Top = camPic(0).Top + camPic(0).Height
 
                 Me.Width = camPic(0).Width * 2 + 40
                 Me.Height = camPic(0).Height * 2 + 90
@@ -1044,11 +1049,7 @@ Public Class OpenCVB
         Dim saveLowResSetting As Boolean = parms.resolution
         Dim OpenCVB = New VB_Classes.ActiveClass(parms, regWidth / parms.speedFactor, regHeight / parms.speedFactor, New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
         textDesc = OpenCVB.ocvb.desc
-
-        If parms.testAllRunning Then
-            Console.WriteLine(vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
-            Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + parms.activeAlgorithm)
-        End If
+        openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
         openFileDialogRequested = OpenCVB.ocvb.parms.openFileDialogRequested
         openFileinitialStartSetting = OpenCVB.ocvb.parms.initialStartSetting
         OpenCVB.ocvb.parms.fileStarted = OpenCVB.ocvb.parms.initialStartSetting
@@ -1057,7 +1058,11 @@ Public Class OpenCVB
         openFileFilter = OpenCVB.ocvb.parms.openFileFilter
         openFileDialogName = OpenCVB.ocvb.parms.openFileDialogName
         openfileDialogTitle = OpenCVB.ocvb.parms.openFileDialogTitle
-        openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
+
+        If parms.testAllRunning Then
+            Console.WriteLine(vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
+            Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + parms.activeAlgorithm)
+        End If
 
         ' Here we check to see if the algorithm constructor changed lowResolution.
         If OpenCVB.ocvb.parms.resolution <> saveLowResSetting Then
@@ -1165,6 +1170,7 @@ Public Class OpenCVB
                     Dim ratio = camPic(0).Width / OpenCVB.ocvb.color.Width ' relative size of displayed image and algorithm size image.
                     OpenCVB.ocvb.drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
                     If OpenCVB.ocvb.drawRect.Width <= 2 Then OpenCVB.ocvb.drawRect.Width = 0 ' too small?
+                    If OpenCVB.ocvb.drawRect.X > OpenCVB.ocvb.color.Width Then OpenCVB.ocvb.drawRect.X -= OpenCVB.ocvb.color.Width
                     BothFirstAndLastReady = False
                 End If
 
@@ -1190,6 +1196,19 @@ Public Class OpenCVB
                     openfileSliderPercent = OpenCVB.ocvb.parms.openFileSliderPercent
                 End If
 
+                Static inputFile As String = OpenCVB.ocvb.parms.openFileDialogName
+                If inputFile <> OpenCVB.ocvb.parms.openFileDialogName Then
+                    inputFile = OpenCVB.ocvb.parms.openFileDialogName
+                    openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
+                    openFileDialogRequested = OpenCVB.ocvb.parms.openFileDialogRequested
+                    openFileinitialStartSetting = OpenCVB.ocvb.parms.initialStartSetting
+                    OpenCVB.ocvb.parms.fileStarted = OpenCVB.ocvb.parms.initialStartSetting
+                    openfileDialogfileStarted = OpenCVB.ocvb.parms.initialStartSetting
+                    openFileFilterIndex = OpenCVB.ocvb.parms.openFileFilterIndex
+                    openFileFilter = OpenCVB.ocvb.parms.openFileFilter
+                    openFileDialogName = OpenCVB.ocvb.parms.openFileDialogName
+                    openfileDialogTitle = OpenCVB.ocvb.parms.openFileDialogTitle
+                End If
 
                 picLabels(2) = OpenCVB.ocvb.label1
                 picLabels(3) = OpenCVB.ocvb.label2
