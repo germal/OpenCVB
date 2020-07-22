@@ -501,7 +501,6 @@ Public Class ML_Simple
         End If
 
         rtree.Train(trainData, cv.ML.SampleTypes.RowSample, response) ' use the latest results to train the next iteration.
-        cv.Cv2.ImShow("lastColors", lastColors)
         lastColors = emax.dst1.Clone()
     End Sub
 End Class
