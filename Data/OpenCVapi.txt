@@ -498,6 +498,7 @@ Stitcher_create
 stylization
 Subdiv2D
 subtract
+sum
 sumElems
 SVBackSubst
 SVDecomp

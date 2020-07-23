@@ -70,12 +70,12 @@ End Class
 
 Public Class KNN_Centroids
     Inherits ocvbClass
-    Dim emax As EMax_PaletteConsistencyCentroid
+    Dim emax As EMax_ColorConsistencyCentroid
     Public originalCentroids As New cv.Mat
     Dim knn As knn_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        emax = New EMax_PaletteConsistencyCentroid(ocvb)
+        emax = New EMax_ColorConsistencyCentroid(ocvb)
         emax.emaxCPP.showInput = False
 
         knn = New knn_Basics(ocvb)

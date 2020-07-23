@@ -1,356 +1,179 @@
-import cv2
+'''
+SVM and KNearest digit recognition.
+
+Sample loads a dataset of handwritten digits from 'digits.png'.
+Then it trains a SVM and KNearest classifiers on it and evaluates
+their accuracy.
+
+Following preprocessing is applied to the dataset:
+ - Moment-based image deskew (see deskew())
+ - Digit images are split into 4 10x10 cells and 16-bin
+   histogram of oriented gradients is computed for each
+   cell
+ - Transform histograms to space with Hellinger metric (see [1] (RootSIFT))
+
+
+[1] R. Arandjelovic, A. Zisserman
+    "Three things everyone should know to improve object retrieval"
+    http://www.robots.ox.ac.uk/~vgg/publications/2012/Arandjelovic12/arandjelovic12.pdf
+
+Usage:
+   Digits_SVM_KNearest.py
+'''
 import numpy as np
-import time
-import matplotlib.pyplot as plt
-import string
-import random
+import cv2 as cv
+title_window = 'Digits_SVM_KNearest.py'
 
-class GeneticDrawing:
-    def __init__(self, img_path, seed=0, brushesRange=[[0.1, 0.3], [0.3, 0.7]]):
-        self.original_img = cv2.imread(img_path)
-        self.img_grey = cv2.cvtColor(self.original_img,cv2.COLOR_BGR2GRAY)
-        self.img_grads = self._imgGradient(self.img_grey)
-        self.myDNA = None
-        self.seed = seed
-        self.brushesRange = brushesRange
-        self.sampling_mask = None
-        
-        #start with an empty black img
-        self.imgBuffer = np.zeros((self.img_grey.shape[0], self.img_grey.shape[1]), np.uint8)
-        
-    def generate(self, stages=10, generations=100, brushstrokesCount=10, show_progress_imgs=True):
-        for s in range(stages):
-            #initialize new DNA
-            if self.sampling_mask is not None:
-                sampling_mask = self.sampling_mask
-            else:
-                sampling_mask = self.create_sampling_mask(s, stages)
-            self.myDNA = DNA(self.img_grey.shape, 
-                             self.img_grads, 
-                             self.calcBrushRange(s, stages), 
-                             canvas=self.imgBuffer, 
-                             sampling_mask=sampling_mask)
-            self.myDNA.initRandom(self.img_grey, brushstrokesCount, self.seed + time.time() + s)
-            #evolve DNA
-            for g in range(generations):
-                self.myDNA.evolveDNASeq(self.img_grey, self.seed + time.time() + g)
-                print("Stage ", s+1, ". Generation ", g+1, "/", generations, "   error = ", self.myDNA.cached_error)
-                images = np.empty((self.img_grey.shape[0], self.img_grey.shape[1] * 2), self.img_grey.dtype)
-                images = cv2.hconcat([self.img_grey, self.myDNA.cached_image])
-                cv2.imshow("original + cached image", images)
-                cv2.waitKey(1)
+# built-in modules
+from multiprocessing.pool import ThreadPool
 
-            self.imgBuffer = self.myDNA.cached_image
-        return self.myDNA.cached_image
-    
-    def calcBrushRange(self, stage, total_stages):
-        return [self._calcBrushSize(self.brushesRange[0], stage, total_stages), self._calcBrushSize(self.brushesRange[1], stage, total_stages)]
-        
-    def set_brush_range(self, ranges):
-        self.brushesRange = ranges
-        
-    def set_sampling_mask(self, img_path):
-        self.sampling_mask = cv2.cvtColor(cv2.imread(img_path),cv2.COLOR_BGR2GRAY)
-        
-    def create_sampling_mask(self, s, stages):
-        percent = 0.2
-        start_stage = int(stages*percent)
-        sampling_mask = None
-        if s >= start_stage:
-            t = (1.0 - (s-start_stage)/max(stages-start_stage-1,1)) * 0.25 + 0.005
-            sampling_mask = self.calc_sampling_mask(t)
-        return sampling_mask
-        
-    '''
-    we'd like to "guide" the brushtrokes along the image gradient direction, if such direction has large magnitude
-    in places of low magnitude, we allow for more deviation from the direction. 
-    this function precalculates angles and their magnitudes for later use inside DNA class
-    '''
-    def _imgGradient(self, img):
-        #convert to 0 to 1 float representation
-        img = np.float32(img) / 255.0 
-        # Calculate gradient 
-        gx = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=1)
-        gy = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=1)
-        # Python Calculate gradient magnitude and direction ( in degrees ) 
-        mag, angle = cv2.cartToPolar(gx, gy, angleInDegrees=True)
-        #normalize magnitudes
-        mag /= np.max(mag)
-        #lower contrast
-        mag = np.power(mag, 0.3)
-        return mag, angle
-    
-    def calc_sampling_mask(self, blur_percent):
-        img = np.copy(self.img_grey)
-        # Calculate gradient 
-        gx = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=1)
-        gy = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=1)
-        # Python Calculate gradient magnitude and direction ( in degrees ) 
-        mag, angle = cv2.cartToPolar(gx, gy, angleInDegrees=True)
-        #calculate blur level
-        w = img.shape[0] * blur_percent
-        if w > 1:
-            mag = cv2.GaussianBlur(mag,(0,0), w, cv2.BORDER_DEFAULT)
-        #ensure range from 0-255 (mostly for visual debugging, since in sampling we will renormalize it anyway)
-        scale = 255.0/mag.max()
-        return mag*scale
-        
-    
-    def _calcBrushSize(self, brange, stage, total_stages):
-        bmin = brange[0]
-        bmax = brange[1]
-        t = stage/max(total_stages-1, 1)
-        return (bmax-bmin)*(-t*t+1)+bmin
+from numpy.linalg import norm
+
+# local modules
+from common import clock, mosaic
+
+SZ = 20 # size of each digit is SZ x SZ
+CLASS_N = 10
+DIGITS_FN = '../../Data/digits.png'
+
+def split2d(img, cell_size, flatten=True):
+    h, w = img.shape[:2]
+    sx, sy = cell_size
+    cells = [np.hsplit(row, w//sx) for row in np.vsplit(img, h//sy)]
+    cells = np.array(cells)
+    if flatten:
+        cells = cells.reshape(-1, sy, sx)
+    return cells
+
+def load_digits(fn):
+    fn = cv.samples.findFile(fn)
+    print('loading "%s" ...' % fn)
+    digits_img = cv.imread(fn, cv.IMREAD_GRAYSCALE)
+    digits = split2d(digits_img, (SZ, SZ))
+    labels = np.repeat(np.arange(CLASS_N), len(digits)/CLASS_N)
+    return digits, labels
+
+def deskew(img):
+    m = cv.moments(img)
+    if abs(m['mu02']) < 1e-2:
+        return img.copy()
+    skew = m['mu11']/m['mu02']
+    M = np.float32([[1, skew, -0.5*SZ*skew], [0, 1, 0]])
+    img = cv.warpAffine(img, M, (SZ, SZ), flags=cv.WARP_INVERSE_MAP | cv.INTER_LINEAR)
+    return img
+
+class StatModel(object):
+    def load(self, fn):
+        self.model.load(fn)  # Known bug: https://github.com/opencv/opencv/issues/4969
+    def save(self, fn):
+        self.model.save(fn)
+
+class KNearest(StatModel):
+    def __init__(self, k = 3):
+        self.k = k
+        self.model = cv.ml.KNearest_create()
+
+    def train(self, samples, responses):
+        self.model.train(samples, cv.ml.ROW_SAMPLE, responses)
+
+    def predict(self, samples):
+        _retval, results, _neigh_resp, _dists = self.model.findNearest(samples, self.k)
+        return results.ravel()
+
+class SVM(StatModel):
+    def __init__(self, C = 1, gamma = 0.5):
+        self.model = cv.ml.SVM_create()
+        self.model.setGamma(gamma)
+        self.model.setC(C)
+        self.model.setKernel(cv.ml.SVM_RBF)
+        self.model.setType(cv.ml.SVM_C_SVC)
+
+    def train(self, samples, responses):
+        self.model.train(samples, cv.ml.ROW_SAMPLE, responses)
+
+    def predict(self, samples):
+        return self.model.predict(samples)[1].ravel()
 
 
-def util_sample_from_img(img):
-    #possible positions to sample
-    pos = np.indices(dimensions=img.shape)
-    pos = pos.reshape(2, pos.shape[1]*pos.shape[2])
-    img_flat = np.clip(img.flatten() / img.flatten().sum(), 0.0, 1.0)
-    return pos[:, np.random.choice(np.arange(pos.shape[1]), 1, p=img_flat)]
+def evaluate_model(model, digits, samples, labels):
+    resp = model.predict(samples)
+    err = (labels != resp).mean()
+    print('error: %.2f %%' % (err*100))
 
-class DNA:
+    confusion = np.zeros((10, 10), np.int32)
+    for i, j in zip(labels, resp):
+        confusion[i, int(j)] += 1
+    print('confusion matrix:')
+    print(confusion)
+    print()
 
-    def __init__(self, bound, img_gradient, brushstrokes_range, canvas=None, sampling_mask=None):
-        self.DNASeq = []
-        self.bound = bound
-        
-        #CTRLS
-        self.minSize = brushstrokes_range[0] #0.1 #0.3
-        self.maxSize = brushstrokes_range[1] #0.3 # 0.7
-        self.maxBrushNumber = 4
-        self.brushSide = 300 #brush image resolution in pixels
-        self.padding = int(self.brushSide*self.maxSize / 2 + 5)
-        
-        self.canvas = canvas
-        
-        #IMG GRADIENT
-        self.imgMag = img_gradient[0]
-        self.imgAngles = img_gradient[1]
-        
-        #OTHER
-        self.brushes = self.preload_brushes('../../Data/GeneticDrawingBrushes/', self.maxBrushNumber)
-        self.sampling_mask = sampling_mask
-        
-        #CACHE
-        self.cached_image = None
-        self.cached_error = None
-        
-    def preload_brushes(self, path, maxBrushNumber):
-        imgs = []
-        for i in range(maxBrushNumber):
-            imgs.append(cv2.imread(path + str(i) +'.jpg'))
-        return imgs
-    
-    def gen_new_positions(self):
-        if self.sampling_mask is not None:
-            pos = util_sample_from_img(self.sampling_mask)
-            posY = pos[0][0]
-            posX = pos[1][0]
-        else:
-            posY = int(random.randrange(0, self.bound[0]))
-            posX = int(random.randrange(0, self.bound[1]))
-        return [posY, posX]
-     
-    def initRandom(self, target_image, count, seed):
-        #initialize random DNA sequence
-        for i in range(count):
-            #random color
-            color = random.randrange(0, 255)
-            #random size
-            random.seed(seed-i+4)
-            size = random.random()*(self.maxSize-self.minSize) + self.minSize
-            #random pos
-            posY, posX = self.gen_new_positions()
-            #random rotation
-            '''
-            start with the angle from image gradient
-            based on magnitude of that angle direction, adjust the random angle offset.
-            So in places of high magnitude, we are more likely to follow the angle with our brushstroke.
-            In places of low magnitude, we can have a more random brushstroke direction.
-            '''
-            random.seed(seed*i/4.0-5)
-            localMag = self.imgMag[posY][posX]
-            localAngle = self.imgAngles[posY][posX] + 90 #perpendicular to the dir
-            rotation = random.randrange(-180, 180)*(1-localMag) + localAngle
-            #random brush number
-            brushNumber = random.randrange(1, self.maxBrushNumber)
-            #append data
-            self.DNASeq.append([color, posY, posX, size, rotation, brushNumber])
-        #calculate cache error and image
-        self.cached_error, self.cached_image = self.calcTotalError(self.DNASeq, target_image)
-        
-    def calcTotalError(self, DNASeq, inImg):
-        #draw the DNA
-        myImg = self.drawAll(DNASeq)
+    vis = []
+    for img, flag in zip(digits, resp == labels):
+        img = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
+        if not flag:
+            img[...,:2] = 0
+        vis.append(img)
+    return mosaic(25, vis)
 
-        #compare the DNA to img and calc fitness only in the ROI
-        diff1 = cv2.subtract(inImg, myImg) #values are too low
-        diff2 = cv2.subtract(myImg,inImg) #values are too high
-        totalDiff = cv2.add(diff1, diff2)
-        totalDiff = np.sum(totalDiff)
-        return (totalDiff, myImg)
-            
-    def draw(self):
-        myImg = self.drawAll(self.DNASeq)
-        return myImg
-        
-    def drawAll(self, DNASeq):
-        #set image to pre generated
-        if self.canvas is None: #if we do not have an image specified
-            inImg = np.zeros((self.bound[0], self.bound[1]), np.uint8)
-        else:
-            inImg = np.copy(self.canvas)
-        #apply padding
-        p = self.padding
-        inImg = cv2.copyMakeBorder(inImg, p,p,p,p,cv2.BORDER_CONSTANT,value=[0,0,0])
-        #draw every DNA
-        for i in range(len(DNASeq)):
-            inImg = self.__drawDNA(DNASeq[i], inImg)
-        #remove padding
-        y = inImg.shape[0]
-        x = inImg.shape[1]
-        return inImg[p:(y-p), p:(x-p)]       
-        
-    def __drawDNA(self, DNA, inImg):
-        #get DNA data
-        color = DNA[0]
-        posX = int(DNA[2]) + self.padding #add padding since indices have shifted
-        posY = int(DNA[1]) + self.padding
-        size = DNA[3]
-        rotation = DNA[4]
-        brushNumber = int(DNA[5])
+def preprocess_simple(digits):
+    return np.float32(digits).reshape(-1, SZ*SZ) / 255.0
 
-        #load brush alpha
-        brushImg = self.brushes[brushNumber]
-        #resize the brush
-        brushImg = cv2.resize(brushImg,None,fx=size, fy=size, interpolation = cv2.INTER_CUBIC)
-        #rotate
-        brushImg = self.__rotateImg(brushImg, rotation)
-        #brush img data
-        brushImg = cv2.cvtColor(brushImg,cv2.COLOR_BGR2GRAY)
-        rows, cols = brushImg.shape
-        
-        #create a colored canvas
-        myClr = np.copy(brushImg)
-        myClr[:, :] = color
+def preprocess_hog(digits):
+    samples = []
+    for img in digits:
+        gx = cv.Sobel(img, cv.CV_32F, 1, 0)
+        gy = cv.Sobel(img, cv.CV_32F, 0, 1)
+        mag, ang = cv.cartToPolar(gx, gy)
+        bin_n = 16
+        bin = np.int32(bin_n*ang/(2*np.pi))
+        bin_cells = bin[:10,:10], bin[10:,:10], bin[:10,10:], bin[10:,10:]
+        mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
+        hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]
+        hist = np.hstack(hists)
 
-        #find ROI
-        inImg_rows, inImg_cols = inImg.shape
-        y_min = int(posY - rows/2)
-        y_max = int(posY + (rows - rows/2))
-        x_min = int(posX - cols/2)
-        x_max = int(posX + (cols - cols/2))
-        
-        # Convert uint8 to float
-        foreground = myClr[0:rows, 0:cols].astype(float)
-        background = inImg[y_min:y_max,x_min:x_max].astype(float) #get ROI
-        # Normalize the alpha mask to keep intensity between 0 and 1
-        alpha = brushImg.astype(float)/255.0
-        
+        # transform to Hellinger kernel
+        eps = 1e-7
+        hist /= hist.sum() + eps
+        hist = np.sqrt(hist)
+        hist /= norm(hist) + eps
 
-        try:
-            # Multiply the foreground with the alpha matte
-            foreground = cv2.multiply(alpha, foreground)
-            
-            # Multiply the background with ( 1 - alpha )
-            background = cv2.multiply(np.clip((1.0 - alpha), 0.0, 1.0), background)
-            # Add the masked foreground and background.
-            outImage = (np.clip(cv2.add(foreground, background), 0.0, 255.0)).astype(np.uint8)
-            
-            inImg[y_min:y_max, x_min:x_max] = outImage
-        except:
-            print('------ \n', 'in image ',inImg.shape)
-            print('pivot: ', posY, posX)
-            print('brush size: ', self.brushSide)
-            print('brush shape: ', brushImg.shape)
-            print(" Y range: ", rangeY, 'X range: ', rangeX)
-            print('bg coord: ', posY, posY+rangeY, posX, posX+rangeX)
-            print('fg: ', foreground.shape)
-            print('bg: ', background.shape)
-            print('alpha: ', alpha.shape)
-        
-        return inImg
-
-        
-    def __rotateImg(self, img, angle):
-        rows,cols, channels = img.shape
-        M = cv2.getRotationMatrix2D((cols/2,rows/2),angle,1)
-        dst = cv2.warpAffine(img,M,(cols,rows))
-        return dst
-        
-              
-    def __evolveDNA(self, index, inImg, seed):
-        #create a copy of the list and get its child  
-        DNASeqCopy = np.copy(self.DNASeq)           
-        child = DNASeqCopy[index]
-        
-        #mutate the child
-        #select which items to mutate
-        random.seed(seed + index)
-        indexOptions = [0,1,2,3,4,5]
-        changeIndices = []
-        changeCount = random.randrange(1, len(indexOptions)+1)
-        for i in range(changeCount):
-            random.seed(seed + index + i + changeCount)
-            indexToTake = random.randrange(0, len(indexOptions))
-            #move it the change list
-            changeIndices.append(indexOptions.pop(indexToTake))
-        #mutate selected items
-        np.sort(changeIndices)
-        changeIndices[:] = changeIndices[::-1]
-        for changeIndex in changeIndices:
-            if changeIndex == 0:# if color
-                child[0] = int(random.randrange(0, 255))
-                #print('new color: ', child[0])
-            elif changeIndex == 1 or changeIndex == 2:#if pos Y or X
-                child[1], child[2] = self.gen_new_positions()
-                #print('new posY: ', child[1], ' / ', self.bound[0])
-                #print('new posX: ', child[2],  ' / ', self.bound[1])  
-            elif changeIndex == 3: #if size
-                child[3] = random.random()*(self.maxSize-self.minSize) + self.minSize
-                #print('new size: ', child[3])
-            elif changeIndex == 4: #if rotation
-                #print("trying to mutate rotatino with child[1]", child[1], " and child[2] ", child[2])
-                localMag = self.imgMag[int(child[1])][int(child[2])]
-                localAngle = self.imgAngles[int(child[1])][int(child[2])] + 90 #perpendicular
-                child[4] = random.randrange(-180, 180)*(1-localMag) + localAngle
-                #print('new rot: ', child[4])
-            elif changeIndex == 5: #if  brush number
-                child[5] = random.randrange(1, self.maxBrushNumber)
-                #print('new brush: ', child[5])
-        #if child performs better replace parent
-        #print('---\n', 'newchild: \n', child)
-        child_error, child_img = self.calcTotalError(DNASeqCopy, inImg)
-        if  child_error < self.cached_error:
-            #print('mutation!', changeIndices)
-            self.DNASeq[index] = child[:]
-            self.cached_image = child_img
-            self.cached_error = child_error
-        
-    def evolveDNASeq(self, inImg, seed):
-        for i in range(len(self.DNASeq)):
-            self.__evolveDNA(i, inImg, seed)
+        samples.append(hist)
+    return np.float32(samples)
 
 
 if __name__ == '__main__':
-    #load the example image and set the generator for 100 stages with 20 generations each
-    gen = GeneticDrawing('../../Data/GeneticDrawingExample.jpg', seed=time.time())
-    out = gen.generate(100, 20)
-    
-    #load a custom mask and set a smaller brush size for finer details
-    gen.sampling_mask = cv2.cvtColor(cv2.imread("../../Data/GeneticDrawingMask.jpg"), cv2.COLOR_BGR2GRAY)
-    gen.brushesRange = [[0.05, 0.1], [0.1, 0.2]]
-    #keep drawing on top of our previous result
-    out = gen.generate(40, 30)
-    #save all the images from the image buffer
-    #if not os.path.exists('out'):
-    #    os.mkdir("out")
-    #for i in range(len(gen.imgBuffer)):
-    #    cv2.imwrite(os.path.join("out", f"{i:06d}.png"), gen.imgBuffer[i])
-    #if you want to save only last image, run below
-    # cv2.imwrite("out/final.png', out)
-    cv2.imshow("Final Image", out)
-    cv2.waitKey()
+    print(__doc__)
 
+    digits, labels = load_digits(DIGITS_FN)
+
+    print('preprocessing...')
+    # shuffle digits
+    rand = np.random.RandomState(321)
+    shuffle = rand.permutation(len(digits))
+    digits, labels = digits[shuffle], labels[shuffle]
+
+    digits2 = list(map(deskew, digits))
+    samples = preprocess_hog(digits2)
+
+    train_n = int(0.9*len(samples))
+    cv.imshow('test set', mosaic(25, digits[train_n:]))
+    digits_train, digits_test = np.split(digits2, [train_n])
+    samples_train, samples_test = np.split(samples, [train_n])
+    labels_train, labels_test = np.split(labels, [train_n])
+
+
+    print('training KNearest...')
+    model = KNearest(k=4)
+    model.train(samples_train, labels_train)
+    vis = evaluate_model(model, digits_test, samples_test, labels_test)
+    cv.imshow('KNearest test', vis)
+
+    print('training SVM...')
+    model = SVM(C=2.67, gamma=5.383)
+    model.train(samples_train, labels_train)
+    vis = evaluate_model(model, digits_test, samples_test, labels_test)
+    cv.imshow('SVM test', vis)
+    print('saving SVM as "digits_svm.dat"...')
+    #model.save('digits_svm.dat')
+
+    cv.waitKey(0)

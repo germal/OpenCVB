@@ -18,7 +18,7 @@ Following preprocessing is applied to the dataset:
     http://www.robots.ox.ac.uk/~vgg/publications/2012/Arandjelovic12/arandjelovic12.pdf
 
 Usage:
-   digits.py
+   Digits_SVM_KNearest.py
 '''
 import numpy as np
 import cv2 as cv

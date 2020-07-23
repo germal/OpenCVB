@@ -438,12 +438,12 @@ Public Class ML_Simple
     Public response As cv.Mat
     Dim rtree = cv.ML.RTrees.Create()
     Public predictions As New cv.Mat
-    Dim emax As EMax_PaletteConsistencyCentroid
+    Dim emax As EMax_ColorConsistencyCentroid
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         If standalone Then
-            emax = New EMax_PaletteConsistencyCentroid(ocvb)
+            emax = New EMax_ColorConsistencyCentroid(ocvb)
             emax.emaxCPP.basics.grid.sliders.trackbar(0).Value = 270
             emax.emaxCPP.basics.grid.sliders.trackbar(1).Value = 150
         End If
@@ -458,8 +458,6 @@ Public Class ML_Simple
         tmp.ConvertTo(vec, cv.MatType.CV_8UC3)
         Return New cv.Vec3b(vec.Get(Of Byte)(0, 0), vec.Get(Of Byte)(0, 1), vec.Get(Of Byte)(0, 2))
     End Function
-
-
     Public Sub Run(ocvb As AlgorithmData)
         Static lastColors As New cv.Mat
         If standalone Then

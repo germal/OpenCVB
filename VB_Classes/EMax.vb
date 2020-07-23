@@ -165,7 +165,7 @@ End Class
 
 
 
-Public Class EMax_PaletteConsistencyCentroid
+Public Class EMax_ColorConsistencyCentroid
     Inherits ocvbClass
     Public emaxCPP As EMax_Basics_CPP
     Public dilate As DilateErode_Basics
