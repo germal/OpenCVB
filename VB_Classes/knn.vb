@@ -2,10 +2,9 @@ Imports cv = OpenCvSharp
 Public Class KNN_Basics
     Inherits ocvbClass
     Dim random As Random_Points
-    Public trainData As cv.Mat
-    Public queryPoints As cv.Mat
-    Public matchedPoints(1) As cv.Point2f
-    Public matchedIndex() As Integer
+    Public trainingPoints As New List(Of cv.Point2f)
+    Public queryPoints As New List(Of cv.Point2f)
+    Public matchedPoints() As cv.Point2f
     Dim knn As cv.ML.KNearest
     Public retrainNeeded As Boolean = True
     Public Sub New(ocvb As AlgorithmData)
@@ -15,51 +14,52 @@ Public Class KNN_Basics
         End If
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "knn Query Points", 1, 10000, 10)
-        sliders.setupTrackBar(1, "knn output Points", 1, 10, If(standalone, 3, 1))
+        sliders.setupTrackBar(1, "knn output Points", 1, 1000, If(standalone, 3, 1))
         ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
         label2 = "Query points"
         knn = cv.ML.KNearest.Create()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim qPointCount = sliders.trackbar(1).Value
+        Dim trainData As cv.Mat
+        Dim queries As cv.Mat
         If standalone Then
-            dst1.SetTo(0)
+            dst1.SetTo(cv.Scalar.Beige)
             random.Run(ocvb)
             trainData = New cv.Mat(random.Points2f.Count, 2, cv.MatType.CV_32F, random.Points2f)
 
-            queryPoints = New cv.Mat(qPointCount, 1, cv.MatType.CV_32FC2, 0)
-            For i = 0 To qPointCount - 1
-                queryPoints.Set(Of cv.Point2f)(i, 0, New cv.Point2f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows)))
-            Next
+            random.Run(ocvb)
+            queries = New cv.Mat(sliders.trackbar(0).Value, 2, cv.MatType.CV_32F, random.Points2f)
+        Else
+            queries = New cv.Mat(queryPoints.Count, 2, cv.MatType.CV_32F, queryPoints.ToArray)
+            trainData = New cv.Mat(trainingPoints.Count, 2, cv.MatType.CV_32F, trainingPoints.ToArray)
         End If
 
-        If retrainNeeded Or trainData.Rows <> matchedPoints.Length Then
+        If retrainNeeded Then
             Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S)
             For i = 0 To trainData.Rows - 1
                 response.Set(Of Integer)(i, 0, i)
                 cv.Cv2.Circle(dst1, trainData.Get(Of cv.Point2f)(i, 0), 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
             Next
             knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
-            If trainData.Rows <> matchedPoints.Count Then
-                ReDim matchedPoints(trainData.Rows - 1)
-                ReDim matchedIndex(trainData.Rows - 1)
-            End If
         End If
+        ReDim matchedPoints(queries.Rows - 1)
 
-        label1 = "Yellow is query, nearest " + CStr(qPointCount) + " blue points to query"
+        label1 = "Yellow is query, nearest " + CStr(queries.Rows) + " blue points to query"
 
-        Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
-        For i = 0 To queryPoints.Rows - 1
-            query.Set(Of cv.Point2f)(0, 0, queryPoints.Get(Of cv.Point2f)(i, 0))
-            knn.FindNearest(query, qPointCount, results, neighbors)
-            Dim qPoint = queryPoints.Get(Of cv.Point2f)(i, 0)
-            For j = 0 To Math.Min(qPointCount, neighbors.Cols) - 1
-                matchedIndex(i) = CInt(neighbors.Get(Of Single)(0, j))
-                matchedPoints(i) = trainData.Get(Of cv.Point2f)(matchedIndex(i), 0)
-                cv.Cv2.Circle(dst1, matchedPoints(i), 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
-                dst1.Line(matchedPoints(i), qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+        Dim results As New cv.Mat
+        Dim neighbors As New cv.Mat
+        Dim matchCount = sliders.trackbar(1).Value
+        For i = 0 To queries.Rows - 1
+            Dim query = queries(New cv.Rect(0, i, 2, 1))
+            knn.FindNearest(query, matchCount, results, neighbors)
+            Dim qPoint = query.Get(Of cv.Point2f)(0, 0)
+            For j = 0 To Math.Min(matchCount, neighbors.Cols) - 1
+                Dim matchedIndex = CInt(neighbors.Get(Of Single)(0, j))
+                matchedPoints(i) = trainData.Get(Of cv.Point2f)(matchedIndex, 0)
+                cv.Cv2.Circle(dst1, matchedPoints(i), 3, cv.Scalar.Black, -1, cv.LineTypes.AntiAlias, 0)
+                dst1.Line(matchedPoints(i), qPoint, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
             Next
-            cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+            cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
         Next
     End Sub
 End Class
@@ -68,40 +68,81 @@ End Class
 
 
 
-Public Class KNN_Centroids
+Public Class KNN_Test
     Inherits ocvbClass
-    Dim emax As EMax_ColorConsistencyCentroid
-    Public originalCentroids As New cv.Mat
-    Dim knn As knn_Basics
+    Public grid As Thread_Grid
+    Dim knn As KNN_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        emax = New EMax_ColorConsistencyCentroid(ocvb)
-        emax.emaxCPP.showInput = False
+        grid = New Thread_Grid(ocvb)
+        grid.sliders.trackbar(0).Value = 100
+        grid.sliders.trackbar(1).Value = 100
 
-        knn = New knn_Basics(ocvb)
-        knn.sliders.trackbar(1).Value = 1
+        knn = New KNN_Basics(ocvb)
+        knn.sliders.trackbar(1).Value = 1 ' query one point at a time.
 
-        ocvb.desc = "Reorder the centroids from the Emax distribution so they are in the same order every time."
+        label1 = "KNN_Basics: black=nearest, query=red, unmatched=blue"
+        ocvb.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst1.SetTo(0)
-        knn.trainData = emax.descriptors
+        grid.Run(ocvb)
 
-        If standalone Then emax.Run(ocvb)
-
-        If knn.trainData.Rows <> emax.descriptors.Rows Then knn.trainData = emax.descriptors
-
-        knn.queryPoints = emax.descriptors
-        knn.dst1 = emax.dst1.Clone
-        knn.Run(ocvb)
-        dst1 = knn.dst1
-
-        For i = 0 To knn.matchedIndex.Count - 1
-            knn.matchedPoints(i).X += 10
-            cv.Cv2.PutText(dst1, "Is " + CStr(i) + " was " + CStr(knn.matchedIndex(i)), knn.matchedPoints(i), cv.HersheyFonts.HersheyComplex, 0.5, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
+        Dim queries As New List(Of cv.Point2f)
+        For i = 0 To grid.roiList.Count - 1
+            Dim roi = grid.roiList.ElementAt(i)
+            Dim pt = New cv.Point2f(roi.X + msRNG.Next(roi.Width), roi.Y + msRNG.Next(roi.Height))
+            queries.Add(pt)
         Next
+        knn.queryPoints = queries
+
+        If ocvb.frameCount > 0 Then
+            knn.retrainNeeded = True
+            knn.dst1.SetTo(cv.Scalar.Beige)
+            knn.Run(ocvb)
+            dst1 = knn.dst1
+            dst1.SetTo(cv.Scalar.Black, grid.gridMask)
+        End If
+        knn.trainingPoints = knn.queryPoints
     End Sub
 End Class
+
+
+
+
+
+'Public Class KNN_Centroids
+'    Inherits ocvbClass
+'    Dim emax As EMax_ColorConsistencyCentroid
+'    Dim knn As KNN_Basics
+'    Public Sub New(ocvb As AlgorithmData)
+'        setCaller(ocvb)
+'        emax = New EMax_ColorConsistencyCentroid(ocvb)
+'        emax.emaxCPP.showInput = False
+
+'        knn = New KNN_Basics(ocvb)
+'        knn.sliders.trackbar(1).Value = 1
+
+'        ocvb.desc = "Reorder the centroids from the Emax distribution so they are in the same order every time."
+'    End Sub
+'    Public Sub Run(ocvb As AlgorithmData)
+'        dst1.SetTo(0)
+'        knn.trainData = emax.descriptors
+
+'        If standalone Then emax.Run(ocvb)
+
+'        If knn.trainData.Rows <> emax.descriptors.Rows Then knn.trainData = emax.descriptors
+
+'        knn.queryPoints = emax.descriptors
+'        knn.dst1 = emax.dst1.Clone
+'        knn.Run(ocvb)
+'        dst1 = knn.dst1
+
+'        For i = 0 To knn.matchedIndex.Count - 1
+'            knn.matchedPoints(i).X += 10
+'            cv.Cv2.PutText(dst1, "Is " + CStr(i) + " was " + CStr(knn.matchedIndex(i)), knn.matchedPoints(i), cv.HersheyFonts.HersheyComplex, 0.5, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
+'        Next
+'    End Sub
+'End Class
 
 
 

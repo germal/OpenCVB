@@ -206,7 +206,7 @@ Public Class Sound_Display
         check.Box(0).Text = "Use generated sound (unchecked will use latest audio file)"
         check.Box(0).Checked = True
 
-        label2 = "Black shows approximation of what is heard"
+        label2 = "Black shows approximately what is currently playing"
         ocvb.desc = "Display a sound buffer in several styles"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
