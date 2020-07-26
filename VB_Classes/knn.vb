@@ -10,7 +10,6 @@ Public Class KNN_Basics
     Public responseColor As cv.Mat
     Dim knn As cv.ML.KNearest
     Public retrainNeeded As Boolean = True
-    Public noDuplicates As Boolean
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         If standalone Then
@@ -66,17 +65,6 @@ Public Class KNN_Basics
                 matchedIndex(i) = CInt(neighbors.Get(Of Single)(0, j))
                 trainPointsUsed(matchedIndex(i)) = True
                 matchedPoints(i) = trainData.Get(Of cv.Point2f)(matchedIndex(i), 0)
-                If noDuplicates Then
-                    For k = 0 To i - 1
-                        If matchedIndex(i) = matchedIndex(k) Then
-                            ' pick the closest one 
-                            Dim distance1 = Math.Sqrt((matchedPoints(i).X - qPoint.X) * (matchedPoints(i).X - qPoint.X) + (matchedPoints(i).Y - qPoint.Y) * (matchedPoints(i).Y - qPoint.Y))
-                            Dim pt2 = queryPoints.ElementAt(k)
-                            Dim distance2 = Math.Sqrt((matchedPoints(i).X - pt2.X) * (matchedPoints(i).X - pt2.X) + (matchedPoints(i).Y - pt2.Y) * (matchedPoints(i).Y - pt2.Y))
-                            If distance1 < distance2 Then matchedIndex(k) = -1 Else matchedIndex(i) = -1
-                        End If
-                    Next
-                End If
             Next
         Next
 
@@ -154,7 +142,7 @@ Public Class KNN_Centroids
         knn.responseColor = New cv.Mat(scalarColors.Count, 3, cv.MatType.CV_32F, scalarColors.ToArray)
 
         label1 = "Current image"
-        label2 = "Query=Red nearest=white unmatched=blue"
+        label2 = "Query is Red, nearest is white, unmatched is blue"
         ocvb.desc = "Map the current centroids to the previous generation and match the color used."
     End Sub
     Private Sub copyList(a As List(Of cv.Point2f), b As List(Of cv.Point2f))
@@ -175,14 +163,10 @@ Public Class KNN_Centroids
 
         knn.Run(ocvb)
 
-        Dim maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
         Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
-        maskPlus.Rectangle(maskRect, cv.Scalar.White, 2)
-
         Dim rect As New cv.Rect
         Static lastImage = emax.emaxCPP.dst2.Clone
         For i = 0 To knn.matchedPoints.Count - 1
-            knn.matchedPoints(i).X += 10
             Dim nextVec = lastImage.Get(Of cv.Vec3b)(knn.matchedPoints(i).Y, knn.matchedPoints(i).X)
             Dim nextColor = New cv.Scalar(nextVec.Item0, nextVec.Item1, nextVec.Item2)
             cv.Cv2.FloodFill(dst1, maskPlus, knn.matchedPoints(i), nextColor, rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
@@ -460,7 +444,7 @@ Public Class KNN_ClusterNoisyLine
         knn = New KNN_Point2d(ocvb)
         knn.sliders.Visible = False
 
-        ocvb.desc = "Use knn to cluster the output of noisyline class."
+        ocvb.desc = "Use KNN to cluster the output of noisyline class."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static linePointCount As Int32

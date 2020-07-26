@@ -194,7 +194,6 @@ Public Class EMax_Centroids
 
         Dim maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
         Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
-        maskPlus.Rectangle(maskRect, cv.Scalar.White, 2)
 
         Dim rect As New cv.Rect
 
@@ -202,7 +201,7 @@ Public Class EMax_Centroids
         rects.Clear()
         For y = 0 To dst1.Height - 1 Step stepsize
             For x = 0 To dst1.Width - 1 Step stepsize
-                If maskPlus.Get(Of Byte)(y, x) = 0 Then
+                If maskPlus(maskRect).Get(Of Byte)(y, x) = 0 Then
                     Dim color = lastImage.Get(Of cv.Vec3b)(y, x)
                     cv.Cv2.FloodFill(dst1, maskPlus, New cv.Point2f(x, y), color, rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
                     If rect.Width > 0 Then
@@ -214,6 +213,5 @@ Public Class EMax_Centroids
                 End If
             Next
         Next
-        dst2 = lastImage
     End Sub
 End Class

@@ -123,7 +123,7 @@ Public Class Fitline_RawInput
 
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Highlight Line Data"
-        check.Box(1).Text = "Demo mode (Recompute with new random data)"
+        check.Box(1).Text = "Recompute with new random data"
         check.Box(0).Checked = True
         check.Box(1).Checked = True
 
