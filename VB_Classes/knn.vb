@@ -151,11 +151,10 @@ Public Class KNN_Centroids
         knn = New KNN_Basics(ocvb)
         knn.retrainNeeded = True
         knn.sliders.trackbar(1).Value = 1
-        knn.noDuplicates = True
         knn.responseColor = New cv.Mat(scalarColors.Count, 3, cv.MatType.CV_32F, scalarColors.ToArray)
 
         label1 = "Current image"
-        label2 = "Query=Red nearest=white"
+        label2 = "Query=Red nearest=white unmatched=blue"
         ocvb.desc = "Map the current centroids to the previous generation and match the color used."
     End Sub
     Private Sub copyList(a As List(Of cv.Point2f), b As List(Of cv.Point2f))
@@ -174,22 +173,7 @@ Public Class KNN_Centroids
 
         copyList(emax.centroids, knn.queryPoints)
 
-        Dim lastKNNresults = knn.dst1.Clone()
         knn.Run(ocvb)
-
-        ' we need 1-1 knn for this algorithm.  When trainingpoints.count <> querypoints.count, make them equal and rerun knn.
-        If knn.queryPoints.Count > knn.trainingPoints.Count Then
-            knn.queryPoints.Clear()
-            For i = 0 To emax.centroids.Count - 1
-                If knn.matchedIndex(i) >= 0 Then knn.queryPoints.Add(emax.centroids(i)) Else i = i
-            Next
-            knn.Run(ocvb)
-        ElseIf knn.queryPoints.Count < knn.trainingPoints.Count Then
-            For i = 0 To knn.trainPointsUsed.Count - 1
-                If knn.trainPointsUsed(i) = False Then knn.queryPoints.Add(knn.trainingPoints(i))
-            Next
-            knn.Run(ocvb)
-        End If
 
         Dim maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
         Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
@@ -199,20 +183,14 @@ Public Class KNN_Centroids
         Static lastImage = emax.emaxCPP.dst2.Clone
         For i = 0 To knn.matchedPoints.Count - 1
             knn.matchedPoints(i).X += 10
-            Dim nextVec = lastImage.Get(Of cv.Vec3b)(knn.queryPoints(i).Y, knn.queryPoints(i).X)
-            If knn.matchedIndex(i) < 0 Then
-                nextVec = emax.emaxCPP.dst2.Get(Of cv.Vec3b)(knn.queryPoints(i).Y, knn.queryPoints(i).X)
-            End If
+            Dim nextVec = lastImage.Get(Of cv.Vec3b)(knn.matchedPoints(i).Y, knn.matchedPoints(i).X)
             Dim nextColor = New cv.Scalar(nextVec.Item0, nextVec.Item1, nextVec.Item2)
             cv.Cv2.FloodFill(dst1, maskPlus, knn.matchedPoints(i), nextColor, rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
             Dim fontSize = If(ocvb.parms.resolution = resHigh, 0.8, 0.5)
-            'cv.Cv2.PutText(dst1, "Is " + CStr(i) + " was " + CStr(knn.matchedIndex(i)), knn.matchedPoints(i), cv.HersheyFonts.HersheyComplex, fontSize,
-            '               cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
         lastImage = dst1.Clone
         dst2 = lastImage.Clone()
-        cv.Cv2.BitwiseOr(dst2, lastKNNresults, dst2)
-        System.Threading.Thread.Sleep(100)
+        cv.Cv2.BitwiseOr(dst2, knn.dst1, dst2)
     End Sub
 End Class
 

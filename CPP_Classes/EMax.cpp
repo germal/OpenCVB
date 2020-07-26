@@ -50,11 +50,10 @@ public:
 				sample.at<float>(1) = (float)i;
 				int response = cvRound(em_model->predict2(sample, noArray())[1]);
 				Scalar c = colors[response];
-
-				circle(output, Point(j, i), stepSize, c*0.75, FILLED);
+				circle(output, Point(j, i), stepSize, c * 0.75, FILLED);
 			}
 		}
-    }
+	}
 };
 
 extern "C" __declspec(dllexport)

@@ -177,45 +177,43 @@ Public Class EMax_Centroids
     Public stepsize = 50
     Public centroids As New List(Of cv.Point2f)
     Public rects As New List(Of cv.Rect)
-    Public colors As New List(Of cv.Vec3b)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         emaxCPP = New EMax_Basics_CPP(ocvb)
         emaxCPP.basics.check.Box(0).Checked = False
         emaxCPP.basics.sliders.trackbar(1).Value = 15
+        emaxCPP.Run(ocvb)
 
-        ocvb.desc = "Get the centroids of the Emax clusters"
+        ocvb.desc = "Get the Emax cluster centroids using floodfill "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        Dim lastImage = emaxCPP.dst2.Clone()
         emaxCPP.Run(ocvb)
-        emaxCPP.dst2.Rectangle(New cv.Rect(0, 0, src.Width, src.Height), cv.Scalar.White, 1)
         dst1 = emaxCPP.dst2.Clone
 
         Dim maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
         Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
         maskPlus.Rectangle(maskRect, cv.Scalar.White, 2)
 
-        Dim cIndex As Integer
         Dim rect As New cv.Rect
 
         centroids.Clear()
         rects.Clear()
-        colors.Clear()
         For y = 0 To dst1.Height - 1 Step stepsize
             For x = 0 To dst1.Width - 1 Step stepsize
                 If maskPlus.Get(Of Byte)(y, x) = 0 Then
-                    Dim color = rColors(cIndex) ' dst1.Get(Of cv.Vec3b)(y, x)
+                    Dim color = lastImage.Get(Of cv.Vec3b)(y, x)
                     cv.Cv2.FloodFill(dst1, maskPlus, New cv.Point2f(x, y), color, rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
                     If rect.Width > 0 Then
-                        colors.Add(color)
                         Dim m = cv.Cv2.Moments(maskPlus(rect), True)
                         Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
                         centroids.Add(centroid)
-                        cIndex += 1
+                        rects.Add(rect)
                     End If
                 End If
             Next
         Next
+        dst2 = lastImage
     End Sub
 End Class
