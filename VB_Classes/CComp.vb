@@ -105,9 +105,12 @@ Public Class CComp_ColorDepth
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Color connected components based on their depth"
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Min Blob size", 0, 10000, 100)
+
         label1 = "Color by Mean Depth"
         label2 = "Binary image using threshold binary+Otsu"
+        ocvb.desc = "Color connected components based on their depth"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -122,7 +125,7 @@ Public Class CComp_ColorDepth
         Next
 
         For Each blob In cc.Blobs.Skip(1)
-            dst1.Rectangle(blob.Rect, cv.Scalar.White, 2)
+            If blob.Area > sliders.trackbar(0).Value Then dst1.Rectangle(blob.Rect, cv.Scalar.White, 2)
         Next
     End Sub
 End Class
