@@ -21,7 +21,7 @@ Public Class FloodFill_Basics
         sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar(3, "Step Size", 1, ocvb.color.cols / 2, 20)
+        sliders.setupTrackBar(3, "Step Size", 1, ocvb.color.Cols / 2, 20)
 
         label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."
@@ -73,6 +73,48 @@ Public Class FloodFill_Basics
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Floodfill_Objects
+    Inherits ocvbClass
+    Dim flood As FloodFill_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        flood = New FloodFill_Basics(ocvb)
+        flood.sliders.trackbar(0).Value = If(ocvb.parms.resolution = resHigh, 1000, 500)
+
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Desired number of objects", 1, 100, 40)
+
+        ocvb.desc = "Use floodfill to identify the desired number of objects"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        flood.src = src
+        flood.Run(ocvb)
+        dst1 = flood.dst2
+
+        label1 = CStr(flood.masks.Count) + " objects with more than " + CStr(flood.sliders.trackbar(0).Value) + " bytes"
+        Static lastSetting As Integer = flood.sliders.trackbar(1).Value
+        If dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero() < 0.9 * flood.src.Total And flood.sliders.trackbar(0).Value > 500 Then
+            flood.sliders.trackbar(0).Value -= 10
+        Else
+            If flood.masks.Count >= sliders.trackbar(0).Value Then
+                If flood.sliders.trackbar(1).Value < flood.sliders.trackbar(1).Maximum Then flood.sliders.trackbar(1).Value += 1
+                If flood.sliders.trackbar(2).Value < flood.sliders.trackbar(2).Maximum Then flood.sliders.trackbar(2).Value += 1
+            Else
+                If flood.sliders.trackbar(1).Value > 1 Then
+                    flood.sliders.trackbar(1).Value -= 1
+                    flood.sliders.trackbar(2).Value -= 1
+                End If
+            End If
+            lastSetting = flood.sliders.trackbar(1).Value
+        End If
+    End Sub
+End Class
 
 
 

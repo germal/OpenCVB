@@ -12,7 +12,7 @@ Module opencv_module
 End Module
 Public Class OpenCVB
 #Region "Globals"
-    Const displayFrames As Int32 = 4
+    Const displayFrames As Int32 = 3
     Dim AlgorithmCount As Int32
     Dim AlgorithmTestCount As Int32
     Dim algorithmTaskHandle As Thread
@@ -28,7 +28,7 @@ Public Class OpenCVB
     Dim cameraZed2 As Object
     Dim cameraT265 As Object
     Dim cameraTaskHandle As Thread
-    Dim camPic(3 - 1) As PictureBox
+    Dim camPic(displayFrames - 1) As PictureBox
     Dim cameraRefresh As Boolean
     Dim algorithmRefresh As Boolean
     Dim CodeLineCount As Int32
@@ -68,7 +68,7 @@ Public Class OpenCVB
     Dim stopCameraThread As Boolean
     Dim textDesc As String = ""
     Dim totalBytesOfMemoryUsed As Integer
-    Dim TTtextData(displayFrames - 1) As List(Of VB_Classes.TTtext)
+    Dim TTtextData As List(Of VB_Classes.TTtext)
 
     Dim openFileDialogRequested As Boolean
     Dim openFileinitialStartSetting As Boolean
@@ -300,13 +300,10 @@ Public Class OpenCVB
         Dim maxline = 21
         SyncLock TTtextData
             Try
-                For i = 0 To TTtextData(pic.Tag).Count - 1
-                    Dim tt = TTtextData(pic.Tag)(i)
+                For i = 0 To TTtextData.Count - 1
+                    Dim tt = TTtextData(i)
                     If tt IsNot Nothing Then
                         g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White), tt.x, tt.y)
-                        If tt.x >= camPic(pic.Tag).Width Or tt.y >= camPic(pic.Tag).Height Then
-                            Console.WriteLine("TrueType text off image!  " + tt.text + " is being written to " + CStr(tt.x) + " and " + CStr(tt.y))
-                        End If
                         maxline -= 1
                         If maxline <= 0 Then Exit For
                     End If
@@ -470,9 +467,7 @@ Public Class OpenCVB
             Me.Height = defaultHeight
         End If
 
-        For i = 0 To TTtextData.Count - 1
-            TTtextData(i) = New List(Of VB_Classes.TTtext)
-        Next
+        TTtextData = New List(Of VB_Classes.TTtext)
 
         For i = 0 To camPic.Length - 1
             If camPic(i) Is Nothing Then camPic(i) = New PictureBox()
@@ -1078,9 +1073,8 @@ Public Class OpenCVB
             drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
         End If
 
-        For i = VB_Classes.ActiveClass.RESULT1 To VB_Classes.ActiveClass.RESULT2
-            TTtextData(i).Clear()
-        Next
+        TTtextData.Clear()
+
         BothFirstAndLastReady = False
         frameCount = 0 ' restart the count...
         If OpenCVB.ocvb.parms.NumPyEnabled Then
@@ -1218,15 +1212,22 @@ Public Class OpenCVB
                         If OpenCVB.ocvb.parms.keyInputAccepted Then keyboardInput = ""
                         algorithmRefresh = True
                         imgResult = OpenCVB.ocvb.result.Clone()
-                        For i = VB_Classes.ActiveClass.RESULT1 To VB_Classes.ActiveClass.RESULT2
-                            If OpenCVB.ocvb.TTtextData(i).Count Then
-                                TTtextData(i).Clear()
-                                For j = 0 To OpenCVB.ocvb.TTtextData(i).Count - 1
-                                    TTtextData(i).Add(OpenCVB.ocvb.TTtextData(i)(j)) ' pull over any truetype text data so paint can access it.
-                                Next
-                                OpenCVB.ocvb.TTtextData(i).Clear()
-                            End If
-                        Next
+                        TTtextData.Clear()
+                        Dim i = VB_Classes.ActiveClass.RESULT2
+                        If OpenCVB.ocvb.TTtextData(i).Count Then
+                            For j = 0 To OpenCVB.ocvb.TTtextData(i).Count - 1
+                                OpenCVB.ocvb.TTtextData(i)(j).x += OpenCVB.ocvb.color.Width
+                                OpenCVB.ocvb.TTtextData(2).Add(OpenCVB.ocvb.TTtextData(i)(j)) ' add any dst2 text to dst1 which is just double-wide
+                            Next
+                            OpenCVB.ocvb.TTtextData(i).Clear()
+                        End If
+                        i = VB_Classes.ActiveClass.RESULT1
+                        If OpenCVB.ocvb.TTtextData(i).Count Then
+                            For j = 0 To OpenCVB.ocvb.TTtextData(i).Count - 1
+                                TTtextData.Add(OpenCVB.ocvb.TTtextData(i)(j)) ' pull over any truetype text data so paint can access it.
+                            Next
+                            OpenCVB.ocvb.TTtextData(i).Clear()
+                        End If
                     End SyncLock
                 End If
                 If OptionsBringToFront And TestAllTimer.Enabled = False Then

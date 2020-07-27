@@ -119,8 +119,6 @@ Public Class kMeans_RGB_Plus_XYDepth
     Dim clusterColors() As cv.Vec6i
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         km = New kMeans_Basics(ocvb)
         label1 = "kmeans - RGB, XY, and Depth Raw"
         ocvb.desc = "Cluster with kMeans RGB, x, y, and depth."
@@ -148,7 +146,7 @@ Public Class kMeans_RGB_Plus_XYDepth
         columnVector = all32f.Reshape(all32f.Channels, all32f.Rows * all32f.Cols)
         Dim labels = New cv.Mat()
         Dim centers As New cv.Mat
-        Dim clusterCount = sliders.trackbar(0).Value
+        Dim clusterCount = km.sliders.trackbar(0).Value
 
         cv.Cv2.Kmeans(columnVector, clusterCount, labels, term, 3, cv.KMeansFlags.PpCenters, centers)
         Dim labelImage = labels.Reshape(1, all32f.Rows)
