@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Drawing
+Imports System.IO
 Module Algorithm_Module
     ' these are all global settings that are updated by individual algorithms.  
     Public Const offsetIncr = 25
@@ -141,7 +142,14 @@ Public Class ActiveClass : Implements IDisposable
     End Sub
     Public Sub RunAlgorithm()
         Try
-            If ocvb.parms.useRecordedData Then recordedData.Run(ocvb)
+            If ocvb.parms.useRecordedData Then
+                Dim recordingFilename = New FileInfo(ocvb.parms.openFileDialogName)
+                If ocvb.parms.useRecordedData And recordingFilename.Exists = False Then
+                    ocvb.putText(New TTtext("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125))
+                    Exit Sub
+                End If
+                recordedData.Run(ocvb)
+            End If
             ActiveAlgorithm.NextFrame(ocvb)
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)

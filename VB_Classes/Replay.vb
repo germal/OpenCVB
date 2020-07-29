@@ -90,6 +90,11 @@ Public Class Replay_Record
     Public Sub Run(ocvb As AlgorithmData)
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(ocvb.parms.openFileDialogName)
+        If ocvb.parms.useRecordedData And recordingFilename.Exists = False Then
+            ocvb.putText(New TTtext("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125))
+            Exit Sub
+        End If
+
         If ocvb.parms.fileStarted Then
             If recordingActive = False Then
                 bytesPerColor = ocvb.color.Total * ocvb.color.ElemSize
@@ -229,7 +234,7 @@ Public Class Replay_Play
         End If
     End Sub
     Public Sub Close()
-        SaveSetting("OpenCVB", "ReplayFileName", "ReplayFileName", recordingFilename.FullName)
+        If recordingFilename IsNot Nothing Then SaveSetting("OpenCVB", "ReplayFileName", "ReplayFileName", recordingFilename.FullName)
         If playbackActive Then binRead.Close()
     End Sub
 End Class
