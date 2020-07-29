@@ -189,7 +189,7 @@ Public Class OpenCVB
             If optionsForm.cameraDeviceCount(OptionsDialog.D435i) Then optionsForm.cameraIndex = OptionsDialog.D435i
             If optionsForm.cameraDeviceCount(OptionsDialog.L515) Then optionsForm.cameraIndex = OptionsDialog.L515
             If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
-                MsgBox("There are no supported cameras present.  Connect a RS2series, Kinect 4 Azure, T265, MyntEyeD 1000, or StereoLabs Zed2.")
+                MsgBox("There are no supported cameras present.  Connect an Intel RealSense2 series camera (D435i, D415, D435, L515, Kinect 4 Azure, T265, MyntEyeD 1000, or StereoLabs Zed2.")
                 End
             End If
         End If
@@ -300,14 +300,16 @@ Public Class OpenCVB
         Dim maxline = 21
         SyncLock TTtextData
             Try
-                For i = 0 To TTtextData.Count - 1
-                    Dim tt = TTtextData(i)
-                    If tt IsNot Nothing Then
-                        g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White), tt.x, tt.y)
-                        maxline -= 1
-                        If maxline <= 0 Then Exit For
-                    End If
-                Next
+                If pic.Tag = 2 Then
+                    For i = 0 To TTtextData.Count - 1
+                        Dim tt = TTtextData(i)
+                        If tt IsNot Nothing Then
+                            g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White), tt.x, tt.y)
+                            maxline -= 1
+                            If maxline <= 0 Then Exit For
+                        End If
+                    Next
+                End If
             Catch ex As Exception
                 Console.WriteLine("Error in ttextData update: " + ex.Message)
             End Try
