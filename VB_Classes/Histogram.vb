@@ -189,106 +189,6 @@ End Class
 
 
 
-Public Class Histogram_BackProjectionGrayScale
-    Inherits ocvbClass
-    Dim hist As Histogram_KalmanSmoothed
-    Dim edges As Edges_Canny
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        edges = New Edges_Canny(ocvb)
-
-        hist = New Histogram_KalmanSmoothed(ocvb)
-        hist.dst1 = dst2
-        hist.kalman.check.Box(0).Checked = False
-
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Histogram Bins", 1, 255, 50)
-        sliders.setupTrackBar(1, "Number of neighbors to include", 0, 10, 1)
-
-        ocvb.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
-        label2 = "Grayscale Histogram"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        hist.sliders.trackbar(0).Value = sliders.trackbar(0).Value ' reflect the number of bins into the histogram code.
-
-        hist.src = src
-        hist.Run(ocvb)
-        dst2 = hist.dst1
-
-        Dim minVal As Single, maxVal As Single
-        Dim minIdx(3 - 1) As Int32, maxIdx(3 - 1) As Int32
-        hist.histogram.MinMaxIdx(minVal, maxVal, minIdx, maxIdx)
-        Dim pixelMin = CInt(255 * maxIdx(0) / hist.sliders.trackbar(0).Value)
-        Dim pixelMax = CInt(255 * (maxIdx(0) + 1) / hist.sliders.trackbar(0).Value)
-        Dim incr = pixelMax - pixelMin
-        Dim neighbors = sliders.trackbar(1).Value
-        If neighbors Mod 2 = 0 Then
-            pixelMin -= incr * neighbors / 2
-            pixelMax += incr * neighbors / 2
-        Else
-            pixelMin -= incr * ((neighbors / 2) + 1)
-            pixelMax += incr * ((neighbors - 1) / 2)
-        End If
-        dst1.SetTo(0)
-        Dim count As Integer
-        For y = 0 To hist.src.Rows - 1
-            For x = 0 To hist.src.Cols - 1
-                If hist.src.Get(Of Byte)(y, x) < pixelMax Then count += 1
-            Next
-        Next
-        Dim mask = hist.src.InRange(If(pixelMin >= 0, pixelMin, 0), pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        src.CopyTo(dst1, mask)
-        edges.src = dst1
-        edges.Run(ocvb)
-        cv.Cv2.BitwiseOr(edges.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR), dst1, dst1)
-
-        label1 = "BackProjection of most frequent pixel + " + CStr(neighbors) + " neighbor" + If(neighbors <> 1, "s", "")
-    End Sub
-End Class
-
-
-
-
-
-
-' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
-Public Class Histogram_BackProjection
-    Inherits ocvbClass
-    Dim hist As Histogram_2D_HueSaturation
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Backprojection Mask Threshold", 0, 255, 10)
-
-        hist = New Histogram_2D_HueSaturation(ocvb)
-        hist.dst1 = dst2
-
-        ocvb.desc = "Backproject from a hue and saturation histogram."
-        label1 = "Backprojection of detected hue and saturation."
-        label2 = "2D Histogram for Hue (X) vs. Saturation (Y)"
-
-        If standalone Then ocvb.drawRect = New cv.Rect(100, 100, 200, 100)  ' an arbitrary rectangle to use for the backprojection.
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        hist.src = src(ocvb.drawRect)
-        hist.Run(ocvb)
-        Dim histogram = hist.histogram.Normalize(0, 255, cv.NormTypes.MinMax)
-        Dim bins() = {0, 1}
-        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        Dim mat() As cv.Mat = {hsv}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256)}
-        Dim mask As New cv.Mat
-        cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
-
-        dst1.SetTo(0)
-        mask = mask.Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
-        src.CopyTo(dst1, mask)
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -919,5 +819,141 @@ Public Class Histogram_ColorsAndGray
 
         mats.Run(ocvb)
         dst1 = mats.dst1
+    End Sub
+End Class
+
+
+
+
+
+Public Class Histogram_BackProjectionPeak
+    Inherits ocvbClass
+    Dim hist As Histogram_KalmanSmoothed
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        hist = New Histogram_KalmanSmoothed(ocvb)
+        hist.kalman.check.Box(0).Checked = False
+
+        ocvb.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
+        label2 = "Grayscale Histogram"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        hist.src = src
+        hist.Run(ocvb)
+        dst2 = hist.dst1
+
+        Dim minVal As Single, maxVal As Single
+        Dim minIdx As cv.Point, maxIdx As cv.Point
+        hist.histogram.MinMaxLoc(minVal, maxVal, minIdx, maxIdx)
+        Dim barWidth = dst1.Width / hist.sliders.trackbar(0).Value
+        Dim barRange = 255 / hist.sliders.trackbar(0).Value
+        Dim histindex = maxIdx.Y
+        Dim pixelMin = CInt((histindex) * barRange)
+        Dim pixelMax = CInt((histindex + 1) * barRange)
+
+        Dim mask = hist.src.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst1.SetTo(0)
+        src.CopyTo(dst1, mask)
+        label1 = "BackProjection of most frequent gray pixel"
+        dst2.Rectangle(New cv.Rect(barWidth * histindex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
+Public Class Histogram_BackProjection
+    Inherits ocvbClass
+    Dim hist As Histogram_2D_HueSaturation
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Backprojection Mask Threshold", 0, 255, 10)
+
+        hist = New Histogram_2D_HueSaturation(ocvb)
+        hist.dst1 = dst2
+
+        ocvb.desc = "Backproject from a hue and saturation histogram."
+        label1 = "Backprojection of detected hue and saturation."
+        label2 = "2D Histogram for Hue (X) vs. Saturation (Y)"
+
+        If standalone Then ocvb.drawRect = New cv.Rect(100, 100, 200, 100)  ' an arbitrary rectangle to use for the backprojection.
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        hist.src = src(ocvb.drawRect)
+        hist.Run(ocvb)
+        Dim histogram = hist.histogram.Normalize(0, 255, cv.NormTypes.MinMax)
+        Dim bins() = {0, 1}
+        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        Dim mat() As cv.Mat = {hsv}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256)}
+        Dim mask As New cv.Mat
+        cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
+
+        dst1.SetTo(0)
+        mask = mask.Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
+        src.CopyTo(dst1, mask)
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
+Public Class Histogram_BackProjectionGrayscale
+    Inherits ocvbClass
+    Dim hist As Histogram_KalmanSmoothed
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        hist = New Histogram_KalmanSmoothed(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Histogram index to backproject", 0, 255, 0)
+
+        label2 = "Histogram - yellow is selected for backprojection"
+        ocvb.desc = "Explore Backprojection of each element of a grayscale histogram."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        hist.src = src
+        hist.Run(ocvb)
+        dst2 = hist.dst1
+
+        Dim minVal As Single, maxVal As Single
+        Dim minIdx As cv.Point, maxIdx As cv.Point
+        hist.histogram.MinMaxLoc(minVal, maxVal, minIdx, maxIdx)
+        Static prevBins = -1
+        If hist.sliders.trackbar(0).Value <> prevBins Then
+            sliders.trackbar(0).Value = maxIdx.Y
+            prevBins = hist.sliders.trackbar(0).Value
+        End If
+        If sliders.trackbar(0).Value >= hist.sliders.trackbar(0).Value Then
+            sliders.trackbar(0).Value = hist.sliders.trackbar(0).Value - 1
+        End If
+        Dim histIndex = sliders.trackbar(0).Value
+        Dim barWidth = dst1.Width / hist.sliders.trackbar(0).Value
+        Dim barRange = 255 / hist.sliders.trackbar(0).Value
+
+        Dim histogram = hist.histogram.Normalize(0, 255, cv.NormTypes.MinMax)
+        Dim bins() = {0}
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim mat() As cv.Mat = {gray}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(histIndex * barRange, (histIndex + 1) * barRange)}
+        Dim mask As New cv.Mat
+        cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
+
+        dst1.SetTo(0)
+        mask = mask.Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
+        src.CopyTo(dst1, mask)
+        label1 = "Backprojection index " + CStr(histIndex) + " with " + CStr(maxVal) + " samples"
+        dst2.Rectangle(New cv.Rect(barWidth * histIndex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 1)
     End Sub
 End Class

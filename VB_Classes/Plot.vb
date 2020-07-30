@@ -217,7 +217,7 @@ Public Class Plot_Histogram
             cv.Cv2.CalcHist(New cv.Mat() {gray}, New Integer() {0}, New cv.Mat(), hist, 1, dimensions, ranges)
         End If
         dst1.SetTo(backColor)
-        Dim barWidth = Int(dst1.Width / hist.Rows)
+        Dim barWidth = dst1.Width / hist.Rows
         Dim minVal As Single, maxVal As Single
         hist.MinMaxLoc(minVal, maxVal)
 
