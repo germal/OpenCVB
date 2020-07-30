@@ -61,17 +61,17 @@ End Class
 
 
 Module histogram_Functions
-    Public Sub histogram2DPlot(histogram As cv.Mat, dst1 As cv.Mat, aBins As Int32, bBins As Int32)
+    Public Sub histogram2DPlot(histogram As cv.Mat, dst1 As cv.Mat, xBins As Int32, yBins As Int32)
         Dim maxVal As Double
         histogram.MinMaxLoc(0, maxVal)
-        Dim hScale = CInt(Math.Ceiling(dst1.Rows / aBins))
-        Dim sScale = CInt(Math.Ceiling(dst1.Cols / bBins))
-        For h = 0 To aBins - 1
-            For s = 0 To bBins - 1
-                Dim binVal = histogram.Get(Of Single)(h, s)
+        Dim xScale = dst1.Cols / xBins ' Math.Ceiling(dst1.Cols / bBins)
+        Dim yScale = dst1.Rows / yBins ' Math.Ceiling(dst1.Rows / aBins)
+        For y = 0 To yBins - 1
+            For x = 0 To xBins - 1
+                Dim binVal = histogram.Get(Of Single)(y, x)
                 Dim intensity = Math.Round(binVal * 255 / maxVal)
-                Dim pt1 = New cv.Point(s * sScale, h * hScale)
-                Dim pt2 = New cv.Point((s + 1) * sScale - 1, (h + 1) * hScale - 1)
+                Dim pt1 = New cv.Point(x * xScale, y * yScale)
+                Dim pt2 = New cv.Point((x + 1) * xScale - 1, (y + 1) * yScale - 1)
                 If pt1.X >= dst1.Cols Then pt1.X = dst1.Cols - 1
                 If pt1.Y >= dst1.Rows Then pt1.Y = dst1.Rows - 1
                 If pt2.X >= dst1.Cols Then pt2.X = dst1.Cols - 1
@@ -174,9 +174,9 @@ Public Class Histogram_2D_HueSaturation
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hsv = src.CvtColor(cv.ColorConversionCodes.RGB2HSV)
-        Dim sbins = sliders.trackbar(0).Value
-        Dim hbins = sliders.trackbar(1).Value
-        Dim histSize() = {hbins, sbins}
+        Dim hbins = sliders.trackbar(0).Value
+        Dim sbins = sliders.trackbar(1).Value
+        Dim histSize() = {sbins, hbins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, sliders.trackbar(0).Maximum - 1), New cv.Rangef(0, sliders.trackbar(1).Maximum - 1)} ' hue ranges from 0-179
 
         cv.Cv2.CalcHist(New cv.Mat() {hsv}, New Integer() {0, 1}, New cv.Mat(), histogram, 2, histSize, ranges)
@@ -866,48 +866,6 @@ End Class
 
 
 
-
-' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
-Public Class Histogram_BackProjection
-    Inherits ocvbClass
-    Dim hist As Histogram_2D_HueSaturation
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Backprojection Mask Threshold", 0, 255, 10)
-
-        hist = New Histogram_2D_HueSaturation(ocvb)
-        hist.dst1 = dst2
-
-        ocvb.desc = "Backproject from a hue and saturation histogram."
-        label1 = "Backprojection of detected hue and saturation."
-        label2 = "2D Histogram for Hue (X) vs. Saturation (Y)"
-
-        If standalone Then ocvb.drawRect = New cv.Rect(100, 100, 200, 100)  ' an arbitrary rectangle to use for the backprojection.
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        hist.src = src(ocvb.drawRect)
-        hist.Run(ocvb)
-        Dim histogram = hist.histogram.Normalize(0, 255, cv.NormTypes.MinMax)
-        Dim bins() = {0, 1}
-        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        Dim mat() As cv.Mat = {hsv}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256)}
-        Dim mask As New cv.Mat
-        cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
-
-        dst1.SetTo(0)
-        mask = mask.Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
-        src.CopyTo(dst1, mask)
-    End Sub
-End Class
-
-
-
-
-
-
-
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
 Public Class Histogram_BackProjectionGrayscale
     Inherits ocvbClass
@@ -955,5 +913,62 @@ Public Class Histogram_BackProjectionGrayscale
         src.CopyTo(dst1, mask)
         label1 = "Backprojection index " + CStr(histIndex) + " with " + CStr(maxVal) + " samples"
         dst2.Rectangle(New cv.Rect(barWidth * histIndex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
+Public Class Histogram_BackProjection2D
+    Inherits ocvbClass
+    Dim hist As Histogram_2D_HueSaturation
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Backprojection Mask Threshold", 0, 255, 10)
+
+        hist = New Histogram_2D_HueSaturation(ocvb)
+
+        ocvb.desc = "Backproject from a hue and saturation histogram."
+        label1 = "Backprojection of detected hue and saturation."
+        label2 = "X-axis is Hue, Y-axis is Sat.  Draw rectangle to isolate ranges"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        hist.src = src
+        hist.Run(ocvb)
+        dst1 = hist.dst1
+        Static hueBins = sliders.trackbar(0).Value
+        Static satBins = sliders.trackbar(1).Value
+        If hueBins <> sliders.trackbar(0).Value Or satBins <> sliders.trackbar(1).Value Then
+            ocvb.drawRectClear = True
+            hueBins = sliders.trackbar(0).Value
+            satBins = sliders.trackbar(1).Value
+        End If
+
+        Dim minHue = 0, maxHue = 180, minSat = 0, maxSat = 256
+        If ocvb.drawRect.Width <> 0 And ocvb.drawRect.Height <> 0 Then
+            minHue = 180 * ocvb.drawRect.X / dst2.Width
+            maxHue = 180 * (ocvb.drawRect.X + ocvb.drawRect.Width) / dst2.Width
+            minSat = 256 * ocvb.drawRect.Y / dst2.Height
+            maxSat = 256 * (ocvb.drawRect.Y + ocvb.drawRect.Height) / dst2.Height
+            If minHue = maxHue Then maxHue = minHue + 1
+            If minSat = maxSat Then maxSat = minSat + 1
+        End If
+        Dim histogram = hist.histogram.Normalize(0, 255, cv.NormTypes.MinMax)
+        Dim bins() = {0, 1}
+        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        Dim mat() As cv.Mat = {hsv}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(minHue, maxHue), New cv.Rangef(minSat, maxSat)}
+        Dim mask As New cv.Mat
+        cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
+
+        dst2.SetTo(0)
+        mask = mask.Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
+        src.CopyTo(dst2, mask)
     End Sub
 End Class

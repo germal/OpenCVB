@@ -24,7 +24,7 @@ End Class
 
 
 
-Public Class Brightness_hue
+Public Class Brightness_Hue
     Inherits ocvbClass
     Public hsv_planes(2) As cv.Mat
     Public Sub New(ocvb As AlgorithmData)

@@ -613,15 +613,21 @@ Public Class OpenCVB
             MsgBox("DisplayOfficeFile failed with error = " + ex.Message)
         End Try
     End Sub
-    Public Function validateRect(src As cv.Mat, r As cv.Rect) As cv.Rect
+    Public Function validateRect(r As cv.Rect) As cv.Rect
+        Dim width = 1280, height = 720
+        If lowResolution Then
+            width = 640
+            height = 360
+        End If
         If r.Width < 0 Then r.Width = 1
         If r.Height < 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X > src.Width Then r.X = src.Width
-        If r.Y > src.Height Then r.Y = src.Height
-        If r.X + r.Width > src.Width Then r.Width = src.Width - r.X
-        If r.Y + r.Height > src.Height Then r.Height = src.Height - r.Y
+        If r.X > Width Then r.X = Width
+        If r.Y > Height Then r.Y = Height
+        If r.X + r.Width > Width Then r.Width = Width - r.X
+        If r.Y + r.Height > Height Then r.Height = Height - r.Y
+
         Return r
     End Function
     Private Sub camPic_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
@@ -637,7 +643,7 @@ Public Class OpenCVB
 
                 Dim pic = DirectCast(sender, PictureBox)
                 Dim src = Choose(pic.Tag + 1, camera.Color, camera.RGBDepth, imgResult)
-                drawRect = validateRect(src, drawRect)
+                drawRect = validateRect(drawRect)
                 Dim srcROI = New cv.Mat
                 srcROI = src(drawRect).clone()
                 Dim csvName As New FileInfo(System.IO.Path.GetTempFileName() + ".csv")
@@ -1167,6 +1173,11 @@ Public Class OpenCVB
                     OpenCVB.ocvb.drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
                     If OpenCVB.ocvb.drawRect.Width <= 2 Then OpenCVB.ocvb.drawRect.Width = 0 ' too small?
                     If OpenCVB.ocvb.drawRect.X > OpenCVB.ocvb.color.Width Then OpenCVB.ocvb.drawRect.X -= OpenCVB.ocvb.color.Width
+                    Dim w = OpenCVB.ocvb.color.Width
+                    If OpenCVB.ocvb.drawRect.X < w And OpenCVB.ocvb.drawRect.X + OpenCVB.ocvb.drawRect.Width > w Then
+                        OpenCVB.ocvb.drawRect.Width -= w - OpenCVB.ocvb.drawRect.X
+                        OpenCVB.ocvb.drawRect.X = 0
+                    End If
                     BothFirstAndLastReady = False
                 End If
 
