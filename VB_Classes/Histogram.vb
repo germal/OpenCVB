@@ -929,46 +929,46 @@ Public Class Histogram_BackProjection2D
     Dim hist As Histogram_2D_HueSaturation
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Backprojection Mask Threshold", 0, 255, 10)
 
         hist = New Histogram_2D_HueSaturation(ocvb)
 
         ocvb.desc = "Backproject from a hue and saturation histogram."
-        label1 = "Backprojection of detected hue and saturation."
-        label2 = "X-axis is Hue, Y-axis is Sat.  Draw rectangle to isolate ranges"
+        label1 = "X-axis is Hue, Y-axis is Sat.  Draw rectangle to isolate ranges"
+        label2 = "Backprojection of detected hue and saturation."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.src = src
         hist.Run(ocvb)
         dst1 = hist.dst1
-        Static hueBins = sliders.trackbar(0).Value
-        Static satBins = sliders.trackbar(1).Value
-        If hueBins <> sliders.trackbar(0).Value Or satBins <> sliders.trackbar(1).Value Then
+        Static hueBins = hist.sliders.trackbar(0).Value
+        Static satBins = hist.sliders.trackbar(1).Value
+        If hueBins <> hist.sliders.trackbar(0).Value Or satBins <> hist.sliders.trackbar(1).Value Then
             ocvb.drawRectClear = True
-            hueBins = sliders.trackbar(0).Value
-            satBins = sliders.trackbar(1).Value
+            hueBins = hist.sliders.trackbar(0).Value
+            satBins = hist.sliders.trackbar(1).Value
         End If
 
+        Dim PerHueBin = 180 / hueBins
+        Dim PerSatBin = 255 / satBins
         Dim minHue = 0, maxHue = 180, minSat = 0, maxSat = 256
         If ocvb.drawRect.Width <> 0 And ocvb.drawRect.Height <> 0 Then
-            minHue = 180 * ocvb.drawRect.X / dst2.Width
-            maxHue = 180 * (ocvb.drawRect.X + ocvb.drawRect.Width) / dst2.Width
-            minSat = 256 * ocvb.drawRect.Y / dst2.Height
-            maxSat = 256 * (ocvb.drawRect.Y + ocvb.drawRect.Height) / dst2.Height
+            minHue = hueBins * ocvb.drawRect.X / dst1.Width * PerHueBin
+            maxHue = hueBins * (ocvb.drawRect.X + ocvb.drawRect.Width) / dst1.Width * PerHueBin
+            minSat = satBins * ocvb.drawRect.Y / dst1.Height * PerSatBin
+            maxSat = satBins * (ocvb.drawRect.Y + ocvb.drawRect.Height) / dst1.Height * PerSatBin
             If minHue = maxHue Then maxHue = minHue + 1
             If minSat = maxSat Then maxSat = minSat + 1
+            label2 = "Selection: min/max Hue " + Format(minHue, "0") + "/" + Format(maxHue, "0") + " min/max Sat " + Format(minSat, "0") + "/" + Format(maxSat, "0")
         End If
         Dim histogram = hist.histogram.Normalize(0, 255, cv.NormTypes.MinMax)
         Dim bins() = {0, 1}
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim mat() As cv.Mat = {hsv}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(minHue, maxHue), New cv.Rangef(minSat, maxSat)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(minHue, maxHue), New cv.Rangef(0, 255)} 'minSat, maxSat)}
         Dim mask As New cv.Mat
         cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
 
         dst2.SetTo(0)
-        mask = mask.Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
         src.CopyTo(dst2, mask)
     End Sub
 End Class
