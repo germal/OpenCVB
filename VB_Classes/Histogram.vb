@@ -948,14 +948,20 @@ Public Class Histogram_BackProjection2D
             satBins = hist.sliders.trackbar(1).Value
         End If
 
-        Dim PerHueBin = 180 / hueBins
-        Dim PerSatBin = 255 / satBins
+        Dim unitsPerHueBin = 180 / hueBins
+        Dim unitsPerSatBin = 255 / satBins
         Dim minHue = 0, maxHue = 180, minSat = 0, maxSat = 256
         If ocvb.drawRect.Width <> 0 And ocvb.drawRect.Height <> 0 Then
-            minHue = hueBins * ocvb.drawRect.X / dst1.Width * PerHueBin
-            maxHue = hueBins * (ocvb.drawRect.X + ocvb.drawRect.Width) / dst1.Width * PerHueBin
-            minSat = satBins * ocvb.drawRect.Y / dst1.Height * PerSatBin
-            maxSat = satBins * (ocvb.drawRect.Y + ocvb.drawRect.Height) / dst1.Height * PerSatBin
+            Dim intBin = Math.Floor(hueBins * ocvb.drawRect.X / dst1.Width)
+            minHue = intBin * unitsPerHueBin
+            intBin = Math.Ceiling(hueBins * (ocvb.drawRect.X + ocvb.drawRect.Width) / dst1.Width)
+            maxHue = intBin * unitsPerHueBin
+
+            intBin = Math.Floor(satBins * ocvb.drawRect.Y / dst1.Height)
+            minSat = intBin * unitsPerSatBin
+            intBin = Math.Ceiling(satBins * (ocvb.drawRect.Y + ocvb.drawRect.Height) / dst1.Height)
+            maxSat = intBin * unitsPerSatBin
+
             If minHue = maxHue Then maxHue = minHue + 1
             If minSat = maxSat Then maxSat = minSat + 1
             label2 = "Selection: min/max Hue " + Format(minHue, "0") + "/" + Format(maxHue, "0") + " min/max Sat " + Format(minSat, "0") + "/" + Format(maxSat, "0")
@@ -964,7 +970,7 @@ Public Class Histogram_BackProjection2D
         Dim bins() = {0, 1}
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim mat() As cv.Mat = {hsv}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(minHue, maxHue), New cv.Rangef(0, 255)} 'minSat, maxSat)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(minHue, maxHue), New cv.Rangef(minSat, maxSat)}
         Dim mask As New cv.Mat
         cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
 
