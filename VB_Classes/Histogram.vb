@@ -64,8 +64,8 @@ Module histogram_Functions
     Public Sub histogram2DPlot(histogram As cv.Mat, dst1 As cv.Mat, xBins As Int32, yBins As Int32)
         Dim maxVal As Double
         histogram.MinMaxLoc(0, maxVal)
-        Dim xScale = dst1.Cols / xBins ' Math.Ceiling(dst1.Cols / bBins)
-        Dim yScale = dst1.Rows / yBins ' Math.Ceiling(dst1.Rows / aBins)
+        Dim xScale = dst1.Cols / xBins
+        Dim yScale = dst1.Rows / yBins
         For y = 0 To yBins - 1
             For x = 0 To xBins - 1
                 Dim binVal = histogram.Get(Of Single)(y, x)
@@ -78,7 +78,8 @@ Module histogram_Functions
                 If pt2.Y >= dst1.Rows Then pt2.Y = dst1.Rows - 1
                 If pt1.X <> pt2.X And pt1.Y <> pt2.Y Then
                     Dim value = cv.Scalar.All(255 - intensity)
-                    value = New cv.Scalar(pt1.X * 255 / dst1.Cols, pt1.Y * 255 / dst1.Rows, 255 - intensity)
+                    'value = New cv.Scalar(pt1.X * 255 / dst1.Cols, pt1.Y * 255 / dst1.Rows, 255 - intensity)
+                    value = New cv.Scalar(intensity, intensity, intensity)
                     dst1.Rectangle(pt1, pt2, value, -1, cv.LineTypes.AntiAlias)
                 End If
             Next
@@ -428,42 +429,43 @@ End Class
 
 Public Class Histogram_2D_XZ_YZ
     Inherits ocvbClass
-    Dim xyDepth As Mat_ImageXYZ_MT
     Dim trim As Depth_InRange
+    Dim xyz As Mat_ImageXYZ_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        xyDepth = New Mat_ImageXYZ_MT(ocvb)
+        xyz = New Mat_ImageXYZ_MT(ocvb)
 
         trim = New Depth_InRange(ocvb)
         trim.sliders.trackbar(1).Value = 1500 ' up to x meters away
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Histogram X bins", 1, ocvb.color.Cols / 2, 30)
-        sliders.setupTrackBar(1, "Histogram Z bins", 1, 200, 100)
+        sliders.setupTrackBar(0, "Histogram X bins", 1, ocvb.color.Cols, 30)
+        sliders.setupTrackBar(1, "Histogram Y bins", 1, ocvb.color.Rows, 30)
+        sliders.setupTrackBar(2, "Histogram Z bins", 1, 200, 100)
 
         ocvb.desc = "Create a 2D histogram for depth in XZ and YZ."
         label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        xyDepth.src = src
-        xyDepth.Run(ocvb) ' get xyDepth coordinates - note: in image coordinates not physical coordinates.
         Dim xbins = sliders.trackbar(0).Value
-        Dim zbins = sliders.trackbar(1).Value
-        Dim histSize() = {xbins, zbins}
-        trim.src = getDepth32f(ocvb)
-        trim.Run(ocvb)
+        Dim ybins = sliders.trackbar(1).Value
+        Dim zbins = sliders.trackbar(2).Value
         Dim minRange = trim.sliders.trackbar(0).Value
         Dim maxRange = trim.sliders.trackbar(1).Value
 
         Dim histogram As New cv.Mat
 
         Dim rangesX() = New cv.Rangef() {New cv.Rangef(0, src.Width - 1), New cv.Rangef(minRange, maxRange)}
-        cv.Cv2.CalcHist(New cv.Mat() {xyDepth.xyDepth}, New Integer() {2, 0}, New cv.Mat(), histogram, 2, histSize, rangesX)
-        histogram2DPlot(histogram, dst1, xbins, zbins)
+        Dim rangesY() = New cv.Rangef() {New cv.Rangef(0, src.Width - 1), New cv.Rangef(minRange, maxRange)}
 
-        Dim rangesY() = New cv.Rangef() {New cv.Rangef(0, src.Height - 1), New cv.Rangef(minRange, maxRange)}
-        cv.Cv2.CalcHist(New cv.Mat() {xyDepth.xyDepth}, New Integer() {1, 2}, New cv.Mat(), histogram, 2, histSize, rangesY)
-        histogram2DPlot(histogram, dst2, xbins, zbins)
+        xyz.Run(ocvb)
+        Dim sizesX() = {xbins, zbins}
+        cv.Cv2.CalcHist(New cv.Mat() {xyz.xyDepth}, New Integer() {0, 2}, New cv.Mat(), histogram, 2, sizesX, rangesX)
+        histogram2DPlot(histogram, dst1, zbins, xbins)
+
+        Dim sizesY() = {ybins, zbins}
+        cv.Cv2.CalcHist(New cv.Mat() {xyz.xyDepth}, New Integer() {1, 2}, New cv.Mat(), histogram, 2, sizesY, rangesY)
+        histogram2DPlot(histogram, dst2, zbins, ybins)
     End Sub
 End Class
 
@@ -950,7 +952,7 @@ Public Class Histogram_BackProjection2D
 
         Dim unitsPerHueBin = 180 / hueBins
         Dim unitsPerSatBin = 255 / satBins
-        Dim minHue = 0, maxHue = 180, minSat = 0, maxSat = 256
+        Dim minHue = 0, maxHue = 180, minSat = 0, maxSat = 255
         If ocvb.drawRect.Width <> 0 And ocvb.drawRect.Height <> 0 Then
             Dim intBin = Math.Floor(hueBins * ocvb.drawRect.X / dst1.Width)
             minHue = intBin * unitsPerHueBin
@@ -966,15 +968,49 @@ Public Class Histogram_BackProjection2D
             If minSat = maxSat Then maxSat = minSat + 1
             label2 = "Selection: min/max Hue " + Format(minHue, "0") + "/" + Format(maxHue, "0") + " min/max Sat " + Format(minSat, "0") + "/" + Format(maxSat, "0")
         End If
-        Dim histogram = hist.histogram.Normalize(0, 255, cv.NormTypes.MinMax)
+        ' Dim histogram = hist.histogram.Normalize(0, 255, cv.NormTypes.MinMax)
         Dim bins() = {0, 1}
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim mat() As cv.Mat = {hsv}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minHue, maxHue), New cv.Rangef(minSat, maxSat)}
         Dim mask As New cv.Mat
-        cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
+        cv.Cv2.CalcBackProject(mat, bins, hist.histogram, mask, ranges)
 
         dst2.SetTo(0)
         src.CopyTo(dst2, mask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Histogram_HueSaturation2DPlot
+    Inherits ocvbClass
+    Dim hueSat As Brightness_Hue
+    Dim hist2d As Histogram_BackProjection2D
+    Dim mats As Mat_4to1
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        hueSat = New Brightness_Hue(ocvb)
+        hist2d = New Histogram_BackProjection2D(ocvb)
+        mats = New Mat_4to1(ocvb)
+        ocvb.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        hueSat.src = src
+        hueSat.Run(ocvb)
+        mats.mat(0) = hueSat.dst1
+        mats.mat(1) = hueSat.dst2
+
+        hist2d.src = src
+        hist2d.Run(ocvb)
+        mats.mat(2) = hist2d.dst2
+        dst1 = hist2d.dst1
+
+        mats.Run(ocvb)
+        dst2 = mats.dst1
     End Sub
 End Class
