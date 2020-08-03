@@ -22,6 +22,7 @@ Public Class OpenCVB
     Dim camera As Object
     Dim cameraRS2Generic As Object ' used only to initialize D435i and L515
     Dim cameraD435i As Object
+    Dim cameraD455 As Object
     Dim cameraL515 As Object
     Dim cameraKinect As Object
     Dim cameraMyntD As Object
@@ -149,6 +150,7 @@ Public Class OpenCVB
 
         optionsForm.cameraDeviceCount(OptionsDialog.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
         optionsForm.cameraDeviceCount(OptionsDialog.L515) = USBenumeration("Intel(R) RealSense(TM) 515 RGB")
+        optionsForm.cameraDeviceCount(OptionsDialog.D455) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
         optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
         optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = USBenumeration("T265")
         If optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = 0 Then optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = USBenumeration("Movidius MA2X5X")
@@ -188,8 +190,9 @@ Public Class OpenCVB
             If optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) Then optionsForm.cameraIndex = OptionsDialog.MyntD1000
             If optionsForm.cameraDeviceCount(OptionsDialog.D435i) Then optionsForm.cameraIndex = OptionsDialog.D435i
             If optionsForm.cameraDeviceCount(OptionsDialog.L515) Then optionsForm.cameraIndex = OptionsDialog.L515
+            If optionsForm.cameraDeviceCount(OptionsDialog.D455) Then optionsForm.cameraIndex = OptionsDialog.D455
             If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
-                MsgBox("There are no supported cameras present.  Connect an Intel RealSense2 series camera (D435i, D415, D435, L515, Kinect 4 Azure, T265, MyntEyeD 1000, or StereoLabs Zed2.")
+                MsgBox("There are no supported cameras present.  Connect an Intel RealSense2 series camera (D435i, D455, D415, D435, L515, Kinect 4 Azure, T265, MyntEyeD 1000, or StereoLabs Zed2.")
                 End
             End If
         End If
@@ -226,6 +229,10 @@ Public Class OpenCVB
         For i = 0 To RS2count - 1
             Dim deviceName = cameraRS2Generic.queryDevice(i)
             Select Case deviceName
+                Case "Intel RealSense D455"
+                    cameraD455 = New CameraRS2
+                    cameraD455.IMU_Present = True
+                    cameraD455.deviceName = deviceName
                 Case "Intel RealSense D435I"
                     cameraD435i = New CameraRS2
                     cameraD435i.IMU_Present = True
@@ -374,7 +381,8 @@ Public Class OpenCVB
         updateCamera()
     End Sub
     Public Sub updateCamera()
-        camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraT265, cameraZed2, cameraMyntD, cameraD435i, cameraL515) ' order is same as in optionsdialog enum
+        ' order is same as in optionsdialog enum
+        camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraT265, cameraZed2, cameraMyntD, cameraD435i, cameraL515, cameraD455)
         If camera.devicename = "" Or camera.devicename.startswith("Intel RealSense") Then
             camera.width = regWidth
             camera.height = regHeight

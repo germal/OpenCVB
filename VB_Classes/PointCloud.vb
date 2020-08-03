@@ -84,8 +84,8 @@ Public Class PointCloud_Colorize
     Dim fontSize As Single
     Dim radius As Integer
     Dim arcSize As Integer = 100
-    Dim hFOVangles() As Single = {45, 0, 40, 51, 55, 55}  ' T265 has no point cloud so there is a 0 where it would have been.
-    Dim vFOVangles() As Single = {60, 0, 55, 65, 69, 67}  ' T265 has no point cloud so there is a 0 where it would have been.
+    Dim hFOVangles() As Single = {45, 0, 40, 51, 55, 55, 47}  ' T265 has no point cloud so there is a 0 where it would have been.
+    Dim vFOVangles() As Single = {60, 0, 55, 65, 69, 67, 60}  ' T265 has no point cloud so there is a 0 where it would have been.
     Public Function CameraLocationBot(ocvb As AlgorithmData, mask As cv.Mat, maxZ As Single) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
         dst1.CopyTo(dst, mask)

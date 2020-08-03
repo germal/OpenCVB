@@ -22,6 +22,7 @@ Module Algorithm_Module
     Public Const MyntD1000 As Int32 = 3 ' Must be defined in OptionDialog.vb the same way!
     Public Const D435i As Int32 = 4 ' Must be defined in OptionDialog.vb the same way!
     Public Const L515 As Int32 = 5 ' Must be defined in OptionDialog.vb the same way!
+    Public Const D455 As Int32 = 6 ' Must be defined in OptionDialog.vb the same way!
 
     Public term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public recordedData As Replay_Play
