@@ -250,7 +250,8 @@ Some typical problems with new installations:
     installed. Test Python scripts independently using \<OpenCVB Home
     Directory\>/VB_Classes/Python/PythonDebug.sln.
 
-**Build New Experiments**
+Build New Experiments
+=====================
 
 OpenCVB is a WinForms application and most of the algorithms are written using
 Microsoft's managed code but C++ examples are provided as well (with appropriate
@@ -275,7 +276,8 @@ each C++ algorithm has a VB.Net entry that includes both the C++ and the VB.Net
 code in the snippet. The C++ portion is to be cut and pasted anywhere in the
 “CPP_Classes” Visual Studio project included with OpenCVB.
 
-**Experimental Subsets**
+Experimental Subsets
+====================
 
 The complete list of algorithms may be grouped into smaller subsets to study
 some shared OpenCV API reference or to switch quickly between algorithms.
@@ -299,7 +301,8 @@ instance, selecting “\<OpenGL\>” will select only the algorithms that use
 OpenGL. The “\<All\>” entry in the Subset Combo Box will restore the complete
 list of algorithms.
 
-**Regression Testing All Experiments**
+Regression Testing All Experiments
+==================================
 
 Testing is integrated into OpenCVB. Clicking the icon below runs through a
 checklist of all the algorithms at all the resolutions with all the supported
@@ -319,7 +322,8 @@ One side benefit of the “Test All” feature is that is provides a way to visu
 review all the algorithms. When used in combination with the subset feature, it
 can make it easier to search for a desired effect.
 
-**Why VB.Net?**
+Why VB.Net?
+===========
 
 VB.Net is not a language associated with computer vision algorithms. But the
 proliferation of examples in OpenCVB suggests this may be an oversight. Even the
@@ -347,7 +351,8 @@ different platform. Confining development to OpenCVB’s C++ interface should
 provide the most portable version of any algorithm but even VB.Net code is also
 easily ported to a variety of non-Windows platforms.
 
-**Camera Interface**
+Camera Interface
+================
 
 All the camera code is isolated in the “camera” class – see cameraD400Series.vb,
 cameraKinect.vb, cameraMynt.vb, cameraZed2.vb or cameraT265.vb. There are no
@@ -365,7 +370,8 @@ Optimizations enable a higher framerate than when running the Debug
 configuration of the Kinect camera DLL. As a result, the VB.Net code in Debug
 mode often runs as fast as the Release configuration.
 
-**OpenGL Interface**
+OpenGL Interface
+================
 
 There have been several attempts to provide OpenGL interfaces into managed code,
 but none is used here. OpenGL is simply run in a separate process. To
@@ -389,7 +395,8 @@ and make sure that the “OpenCVB” project depends on any new OpenGL projects.
 This ensures that the new project will always be rebuilt when OpenCVB is
 restarted.
 
-**OpenCV’s OpenGL Interface**
+OpenCV’s OpenGL Interface
+=========================
 
 The “PrepareTree.bat” script will have configured OpenCV with OpenGL support.
 OpenCVB can use this OpenGL interface – see the OpenCVGL algorithm. The
@@ -408,7 +415,8 @@ For those that prefer using the mouse to adjust the OpenGL display, the OpenGL
 code snippet provides sample code. To test a working example of OpenGL using
 just the mouse interface, see the OpenGL_Callbacks algorithm.
 
-**Python Interface**
+Python Interface
+================
 
 OpenCV has numerous examples of Python scripts and Python is often used for
 computer vision experiments. To add a new Python script for use with OpenCVB,
@@ -433,7 +441,8 @@ change which version of Python is used, open the “Options” dialog and in the
 “Python” section, there is a browse button to select any Python.exe available on
 the system.
 
-**Python Packages**
+Python Packages
+===============
 
 The Python libraries “opencv-python” or “NumPy” are required for many of the
 OpenCVB Python scripts but are not installed by default. To update missing
