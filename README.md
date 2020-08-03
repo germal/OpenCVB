@@ -30,7 +30,8 @@ and breadth of each object in the camera’s field of view.
 
 The “Sample Results” section below provides numerous additional examples.
 
-**Pre-Install Requirements**
+Pre-Install Requirements
+========================
 
 Here are the requirements:
 
@@ -60,7 +61,8 @@ Kinect for Azure has the best depth accuracy but requires more power and is not
 as portable as the Intel D435i camera. All the cameras use USB 3 to provide data
 to the host platform.
 
-**The Objective**
+The Objective
+=============
 
 The objective is to solve many small computer vision problems and do so in a way
 that enables the solution to be reused. The resulting toolkit can solve bigger
@@ -113,7 +115,8 @@ just the algorithm separate from any camera dependencies and will work with each
 of the supported cameras. Isolating just the algorithm functionality enables
 easy adaptation to other environments or platforms.
 
-**Pre-Install Notes**
+Pre-Install Notes
+=================
 
 You will need to download and install the following before starting:
 
@@ -131,7 +134,8 @@ You will need to download and install the following before starting:
 
     -   <https://git-scm.com/downloads>
 
-**Installation – Quick Reference**
+Installation – Quick Reference
+==============================
 
 -   <https://github.com/bobdavies2000/OpenCVB> - download OpenCVB from GitHub
 
@@ -161,7 +165,8 @@ You will need to download and install the following before starting:
     -   Edit “Cameras/CameraDefines.hpp” to turn on support for Mynt Eye D1000
         or StereoLabs Zed 2
 
-**Full Installation Description with Discussion**
+Full Installation Description with Discussion
+=============================================
 
 The first step is to download OpenCVB from GitHub:
 
@@ -223,7 +228,8 @@ Support for some optional cameras can be easily added:
 -   Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for
     StereoLabs Zed 2 or Mynt Eye D 1000 support.
 
-**Trouble-Shooting New Install**
+Trouble-Shooting New Install
+============================
 
 Some typical problems with new installations:
 
