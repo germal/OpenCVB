@@ -874,9 +874,9 @@ Public Class OpenCVB
                         Case 2 ' depth RGB
                             resultMat = camera.RGBDepth.Clone()
                         Case 3 ' result1
-                            resultMat = imgResult(New cv.Rect(0, 0, camera.color.width, camera.color.height)).Clone()
+                            resultMat = imgResult(New cv.Rect(0, 0, imgResult.Width / 2, imgResult.Height)).Clone()
                         Case 4 ' result2
-                            resultMat = imgResult(New cv.Rect(camera.color.width, 0, camera.color.width, camera.color.height)).Clone()
+                            resultMat = imgResult(New cv.Rect(imgResult.Width / 2, 0, imgResult.Width / 2, imgResult.Height)).Clone()
                     End Select
                     Exit For
                 End SyncLock
