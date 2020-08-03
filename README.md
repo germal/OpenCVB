@@ -1,4 +1,5 @@
-**Introduction**
+Introduction
+============
 
 There is no better documentation of an algorithm than a working example. Now
 imagine hundreds of OpenCV examples in a single app where each algorithm is less
@@ -447,7 +448,8 @@ elsewhere. There is a check box in the Global Options dialog box to allow new
 versions of NumPy to be tested with the existing NumPy algorithms. Because it
 has been unreliable, the enabled setting is not saved when OpenCVB is closed.
 
-**Python Debugging**
+Python Debugging
+================
 
 Python scripts are run in a separate address space when invoked by OpenCVB so
 Visual Studio’s Python debug environment is not available. When a Python script
@@ -464,7 +466,8 @@ requiring a stream of images or point clouds, OpenCVB is opened in a separate
 address space with the requested Python script. Images and point clouds will
 then be streamed to the failing Python script running in the debugger.
 
-**Visual Studio Debugging**
+Visual Studio Debugging
+=======================
 
 The Visual Studio projects can be configured to simultaneously debug both
 managed and unmanaged code seamlessly. The property “Enable Native Code
@@ -477,7 +480,8 @@ course, if there is a problem in the C++ code that is best handled with a debug
 session, turn on the “Enable Native Code Debugging” property in the OpenCVB
 VB.Net project and invoke the algorithm requiring C++ debugging.
 
-**Record and Playback**
+Record and Playback
+===================
 
 The ability to record and playback is provided with OpenCVB – see Replay_Record
 and Replay_Play algorithms. RGB, Depth, point cloud, and IMU data are written to
@@ -487,7 +491,8 @@ the option: “\<All using recorded data\>”. Running the regression tests with
 that setting will run all the algorithms with recorded data instead of a live
 camera feed.
 
-**StereoLabs Zed 2 Support**
+StereoLabs Zed 2 Support
+========================
 
 The StereoLabs Zed 2 camera is supported but the support is turned off by
 default. To enable this support:
@@ -502,7 +507,8 @@ The Zed 2 camera support is always installed in C:\\Program Files (x86)\\ZED SDK
 (regardless of the version) so no additional changes are required to the
 supporting C++ project.
 
-**Mynt Eye D 1000 Support**
+Mynt Eye D 1000 Support
+=======================
 
 The Mynt Eye D 1000 camera is supported but the support is turned off by
 default. To enable this support:
@@ -517,7 +523,8 @@ The Mynt D SDK creates a system environmental variable MYNTEYED_SDK_ROOT that
 allows the OpenCVB build to locate the Mynt D camera support no matter where it
 was installed.
 
-**VTK Support**
+VTK Support
+===========
 
 VTK (the Visualization ToolKit) is supported through OpenCV but it takes a
 non-trivial amount of time and effort to install and build it. The support is
@@ -534,7 +541,8 @@ steps:
 
 -   Edit mainVTK.cpp (project VTKDataExample) and modify the first line
 
-**Sample Results**
+Sample Results
+==============
 
 The following images are a preview of some algorithms’ output.
 
@@ -806,7 +814,8 @@ matrices is displayed as well. The option to use gradients for alignment
 (instead of RGB values) is available. There are 4 possible OpenCV parameters to
 define the extent of the search for alignment in the user interface.*
 
-**Future Work**
+Future Work
+===========
 
 The plan is to continue adding more algorithms. There are numerous published
 algorithms on the web but there is also the task to combine the different
@@ -817,7 +826,8 @@ or check boxes suggests reusing an existing class rather than provide another
 with similar set of sliders and check boxes. The options forms for combined
 algorithms are automatically cascaded for easy selection.
 
-**Acknowledgements**
+Acknowledgements
+================
 
 The list of people who have made OpenCVB possible is long but starts with the
 OpenCV contributors – particularly, Gary Bradski, Victor Erukhimov, and Vadim
@@ -835,7 +845,8 @@ the computer vision developers who posted algorithms where Google could find
 them. All these varied organizations deserve most of the credit for this
 software.
 
-**MIT License**
+MIT License
+===========
 
 <https://opensource.org/licenses/mit-license.php> - explicit license statement
 
@@ -843,7 +854,8 @@ Fremont, California
 
 Summer 2020
 
-**Addendum 1: Comparing Cameras**
+Addendum 1: Comparing Cameras
+=============================
 
 There are 5 supported cameras that generate a point cloud – Intel RealSense
 D435i, Intel RealSense L515, Microsoft Kinect4Azure, StereoLabs Zed 2, and Mynt
