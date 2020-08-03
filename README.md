@@ -51,12 +51,19 @@ Here are the requirements:
 
     -   Intel RealSense L515 – a Lidar-based camera without an IMU
 
+    -   Intel RealSense D455 – the latest in the series of Intel RealSense
+        cameras
+
 Most of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft
 Kinect for Azure has the best depth accuracy but requires more power and is not
 as portable as the Intel D435i camera. All the cameras use USB 3 to provide data
 to the host platform.
 
 **The Objective**
+
+The objective is to solve many small computer vision problems and do so in a way
+that enables the solution to be reused. The resulting toolkit can solve bigger
+and more important problems.
 
 OpenCVB is targeting only cameras that produce depth and color. These newer
 cameras have prompted a review of existing vision algorithms to see how they can
@@ -849,7 +856,8 @@ The cast of characters – (left to right) Intel D435i, Intel L515, StereoLabs Z
 2, Mynt Eye D1000, and Microsoft Kinect 4 Azure. Using the
 “PointCloud_GVector_TopView”, all the above cameras were used to measure the
 distance to the wall approximately 2.5 meters from the cameras. The results are
-below.
+below. Not shown above is the latest Intel RealSense camera – the D455. The
+output is shown below and looks good.
 
 ![](media/a2bdd27cd813f1c37d92db977fc74a00.png)
 
@@ -872,3 +880,7 @@ test (the camera is a little expensive.)
 ![](media/1e2803ceab3c74d9cbd59249369035b1.png)
 
 Mynt Eye D 1000 camera.
+
+![](media/e4879903e5aff609e28fff60fcb01f0f.png)
+
+Intel RealSense D455 camera.
