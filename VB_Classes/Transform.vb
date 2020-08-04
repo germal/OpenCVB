@@ -90,8 +90,8 @@ Public Class Transform_SortReshape
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim sortOption = cv.SortFlags.Ascending
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
-        src = src.Reshape(1, src.Rows * src.Cols)
-        Dim sorted = src.Sort(sortOption + cv.SortFlags.EveryColumn)
+        Dim tmp = src.Reshape(1, src.Rows * src.Cols)
+        Dim sorted = tmp.Sort(sortOption + cv.SortFlags.EveryColumn)
         dst1 = sorted.Reshape(1, src.Rows)
     End Sub
 End Class

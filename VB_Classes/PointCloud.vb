@@ -173,6 +173,8 @@ Public Class PointCloud_Colorize
         rect = New cv.Rect(shift, 0, dst1.Height, dst1.Height)
         cv.Cv2.Rotate(dst1(rect), dst2(rect), cv.RotateFlags.Rotate90Clockwise)
 
+        label1 = "Colorize mask for top down view"
+        label2 = "Colorize mask for side view"
         ocvb.desc = "Create the colorizeMat's used for projections"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
