@@ -364,7 +364,7 @@ Public Class OpenCVB
                 End If
                 If openFileDialogName <> openForm.filename.Text Then openFileDialogName = openForm.filename.Text
                 If openfileSliderPercent >= 0 And openfileSliderPercent <= 1 Then openForm.TrackBar1.Value = openfileSliderPercent * 10000
-                openForm.PlayButton.Visible = Not (openfileSliderPercent < 0)
+                openForm.PlayButton.Visible = openfileSliderPercent >= 0 ' negative indicates it should not be shown.
                 openForm.TrackBar1.Visible = openForm.PlayButton.Visible
             End If
             openFileStarted = openForm.fileStarted

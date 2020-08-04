@@ -788,6 +788,13 @@ they are fully supported.*
 using OpenCV’s WarpPerspective transform. This example is from the OpenCVSharp
 Sample programs.*
 
+![](media/fe5d5b60aee4b1159d61f964a2bfff40.png)
+
+*OpenCV can be used to display audio data using the NAudio package from NuGet.
+The interface can play any available audio data or generate synthetic sound in a
+variety of patterns – pink/white noise, square waves, sawtooth waves, etc. The
+black vertical bar shows tracks the currently playing sound.*
+
 ![](media/08085bb3df8c48de755fc8e9e10074e7.png)
 
 *This synthetic problem demonstrates how to use the Python SciKit package to
