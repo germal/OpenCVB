@@ -12,9 +12,7 @@ Public Class KNN_Basics
     Public retrainNeeded As Boolean = True
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        If standalone Then
-            random = New Random_Points(ocvb)
-        End If
+        If standalone Then random = New Random_Points(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "knn Query Points", 1, 10000, 10)
         sliders.setupTrackBar(1, "knn output Points", 1, 1000, 1)
@@ -27,9 +25,7 @@ Public Class KNN_Basics
         Dim trainData As cv.Mat
         Dim queries As cv.Mat
         dst1.SetTo(cv.Scalar.Black)
-        If trainingPoints.Count <> queryPoints.Count Then
-            Dim i = 0
-        End If
+
         If standalone Then
             random.Run(ocvb)
             trainData = New cv.Mat(random.Points2f.Count, 2, cv.MatType.CV_32F, random.Points2f).Clone()
@@ -51,7 +47,7 @@ Public Class KNN_Basics
         End If
         ReDim matchedPoints(queries.Rows - 1)
         ReDim matchedIndex(queries.Rows - 1)
-        ReDim trainPointsUsed(trainingPoints.Count - 1)
+        ReDim trainPointsUsed(trainData.Rows - 1)
 
         Dim desiredMatches = sliders.trackbar(1).Value
 
@@ -70,9 +66,9 @@ Public Class KNN_Basics
 
         For i = 0 To matchedPoints.Count - 1
             If matchedIndex(i) >= 0 Then
-                Dim qPoint = queryPoints.ElementAt(i)
+                Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
                 cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
-                Dim result = trainingPoints.ElementAt(matchedIndex(i))
+                Dim result = trainData.Get(Of cv.Point2f)(matchedIndex(i), 0)
                 cv.Cv2.Circle(dst1, result, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
                 dst1.Line(result, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
             End If
