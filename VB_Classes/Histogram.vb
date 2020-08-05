@@ -484,7 +484,7 @@ Public Class Histogram_ProjectionOptions
         If standalone Then sliders.trackbar(0).Value = 1
 
         check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Use IMU gravity vector to rotate around the x-axis."
+        check.Box(0).Text = "Use IMU gravity vector to rotate around the axis."
         check.Box(0).Checked = True
         If ocvb.parms.cameraIndex = L515 Or ocvb.parms.cameraIndex = T265Camera Then
             check.Box(0).Checked = False

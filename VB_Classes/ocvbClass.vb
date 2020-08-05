@@ -1,5 +1,5 @@
 ﻿Imports Numpy
-Imports py = Python.Runtime
+Imports System.Windows.Forms
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class TTtext
@@ -53,6 +53,29 @@ Public Class ocvbClass : Implements IDisposable
         End If
         caller += Me.GetType.Name
     End Sub
+    Public Function findCheckBox(opt As String) As CheckBox
+        For Each frm In Application.OpenForms
+            If frm.text.endswith(" CheckBox Options") Then
+                For i = 0 To frm.Box.length - 1
+                    If frm.box(i).text.contains(opt) Then Return frm.box(i)
+                Next
+            End If
+        Next
+        MsgBox("A checkbox was not found!  Very likely the requested checkbox was mistyped.")
+        Return Nothing
+    End Function
+    Public Function findSlider(opt As String) As TrackBar
+        Application.DoEvents()
+        For Each frm In Application.OpenForms
+            If frm.text.endswith(" Slider Options") Then
+                For i = 0 To frm.trackbar.length - 1
+                    If frm.sLabels(i).text.contains(opt) Then Return frm.trackbar(i)
+                Next
+            End If
+        Next
+        MsgBox("A slider was not found!  Very likely the requested slider text was mistyped.")
+        Return Nothing
+    End Function
     Public Function validateRect(r As cv.Rect) As cv.Rect
         If r.Width < 0 Then r.Width = 1
         If r.Height < 0 Then r.Height = 1

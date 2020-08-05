@@ -3,7 +3,7 @@ Public Class OptionsCheckbox
     Public Box() As CheckBox
     Public Sub Setup(ocvb As AlgorithmData, caller As String, count As Int32)
         ReDim Box(count - 1)
-        Me.Text = caller + " Options"
+        Me.Text = caller + " CheckBox Options"
         For i = 0 To Box.Count - 1
             Box(i) = New CheckBox
             Box(i).AutoSize = True

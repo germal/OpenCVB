@@ -12,7 +12,7 @@ Public Class OptionsSliders
         ReDim trackbar(count - 1)
         ReDim sLabels(count - 1)
         ReDim countLabel(count - 1)
-        Me.Text = caller + " Options"
+        Me.Text = caller + " Slider Options"
         Dim yIncr = 100
         For i = 0 To trackbar.Count - 1
             FlowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight
@@ -59,9 +59,19 @@ Public Class OptionsSliders
         Me.Width = defaultWidth
         Me.Height = defaultHeight
         Me.SetDesktopLocation(applocation.Left + slidersOffset.X, applocation.Top + applocation.Height + slidersOffset.Y)
-        slidersOffset.X += offsetIncr
-        slidersOffset.Y += offsetIncr
-        If slidersOffset.X > offsetMax Then slidersOffset.X = 0
-        If slidersOffset.Y > offsetMax Then slidersOffset.Y = 0
+        If Me.Visible Then
+            slidersOffset.X += offsetIncr
+            slidersOffset.Y += offsetIncr
+            If slidersOffset.X > offsetMax Then slidersOffset.X = 0
+            If slidersOffset.Y > offsetMax Then slidersOffset.Y = 0
+        End If
+    End Sub
+    Public Sub SetVisible(standalone As Boolean)
+        If standalone = False Then
+            slidersOffset.X -= offsetIncr
+            slidersOffset.Y -= offsetIncr
+            If slidersOffset.X < 0 Then slidersOffset.X = offsetMax
+            If slidersOffset.Y < 0 Then slidersOffset.Y = offsetMax
+        End If
     End Sub
 End Class

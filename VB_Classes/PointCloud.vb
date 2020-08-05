@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.IO
+Imports System.Windows.Forms
 Module PointCloud
     ' for performance we are putting this in an optimized C++ interface to the Kinect camera for convenience...
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -40,7 +40,8 @@ Module PointCloud
     Public Function showDistances(ocvb As AlgorithmData, dst As cv.Mat, rects As List(Of cv.Rect), maxZ As Single, imuActive As Boolean) As cv.Mat
         If dst.Channels = 1 Then dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If imuActive Then
-            ocvb.putText(New TTtext("The rotated and projected point cloud image does not have valid distance.", 10, 60, RESULT2))
+            ocvb.putText(New TTtext("Uncheck the 'Use IMU gravity vector' to see distances.", 10, 60, RESULT2))
+            ocvb.putText(New TTtext("The distances are not correct in the rotated and projected image", 10, 90, RESULT2))
         Else
             Dim fontSize As Single = 1.0
             If ocvb.parms.resolution = resMed Then fontSize = 0.6
@@ -166,6 +167,7 @@ Public Class PointCloud_Colorize
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Top View angle for FOV", 0, 180, hFOVangles(ocvb.parms.cameraIndex))
         sliders.setupTrackBar(1, "Side View angle for FOV", 0, 180, vFOVangles(ocvb.parms.cameraIndex))
+        sliders.SetVisible(standalone)
 
         palette.Run(ocvb)
         dst1 = palette.dst1
@@ -326,12 +328,15 @@ Public Class PointCloud_Plane_Walls
         dst2 = objects.dst2
         label2 = objects.label2
 
-        dilate.src = dst1
-        dilate.Run(ocvb)
+        Static checkIMU = findCheckBox("Use IMU gravity vector")
+        If checkIMU?.Checked Then
+            dilate.src = dst1
+            dilate.Run(ocvb)
 
-        'lines.src = If(dilate.dst1.Channels = 3, dilate.dst1.Clone(), dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
-        'lines.Run(ocvb)
-        'dst1 = lines.dst1.Clone()
+            lines.src = If(dilate.dst1.Channels = 3, dilate.dst1, dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+            lines.Run(ocvb)
+            dst1 = lines.dst1
+        End If
     End Sub
 End Class
 
@@ -362,12 +367,15 @@ Public Class PointCloud_Planes_CeilingFloor
         dst2 = objects.dst2
         label2 = objects.label2
 
-        'dilate.src = dst1
-        'dilate.Run(ocvb)
+        Static checkIMU = findCheckBox("Use IMU gravity vector")
+        If checkIMU?.Checked Then
+            dilate.src = dst1
+            dilate.Run(ocvb)
 
-        'lines.src = dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        'lines.Run(ocvb)
-        'dst1 = lines.dst1.Clone()
+            lines.src = If(dilate.dst1.Channels = 3, dilate.dst1, dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+            lines.Run(ocvb)
+            dst1 = lines.dst1
+        End If
     End Sub
 End Class
 
@@ -395,7 +403,8 @@ Public Class PointCloud_SideView
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        If hist.histOpts.check.Box(0).Checked Then
+        Static checkIMU = findCheckBox("Use IMU gravity vector")
+        If checkIMU?.Checked Then
             dst1 = hist.dst1
         Else
             dst1 = cMats.CameraLocationSide(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.trackbar(1).Value / 1000)
@@ -416,8 +425,7 @@ Public Class PointCloud_SideView_Objects
         setCaller(ocvb)
 
         view = New PointCloud_SideView(ocvb)
-        view.hist.histOpts.check.Box(0).Checked = True ' we want the IMU to rotate the data.
-        view.hist.histOpts.sliders.trackbar(0).Value = 5 ' a better default for flood fill
+
         flood = New FloodFill_Projection(ocvb)
         flood.sliders.trackbar(0).Value = 100
 
@@ -433,7 +441,8 @@ Public Class PointCloud_SideView_Objects
         view.src = src
         view.Run(ocvb)
         dst1 = view.dst1
-        flood.src = view.hist.histOutput.Threshold(view.hist.histOpts.sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        Static sliderHistThreshold = findSlider("Histogram threshold")
+        flood.src = view.hist.histOutput.Threshold(sliderHistThreshold?.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
         dst2 = flood.dst2
         label2 = flood.label2
@@ -458,7 +467,8 @@ Public Class PointCloud_SideView_Distances
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         gVec.Run(ocvb)
-        maxZ = gVec.view.hist.histOpts.sliders.trackbar(1).Value / 1000
+        Static sliderMaxDepth = findSlider("InRange Max Depth")
+        maxZ = sliderMaxDepth.Value / 1000
         dst1 = showDistances(ocvb, gVec.dst1, gVec.flood.rects, maxZ, gVec.view.hist.histOpts.check.Box(0).Checked)
         label1 = CStr(CInt(gVec.flood.rects.Count)) + " objects > " + CStr(gVec.flood.minFloodSize) + " pixels"
     End Sub
@@ -481,13 +491,13 @@ Public Class PointCloud_TopView
         cMats.Run(ocvb)
 
         hist = New Histogram_2D_TopView(ocvb)
-        hist.histOpts.check.Box(0).Checked = False
 
         ocvb.desc = "Display the histogram with and without adjusting for gravity"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
-        If hist.histOpts.check.Box(0).Checked Then
+        Static checkIMU = findCheckBox("Use IMU gravity vector")
+        If checkIMU?.Checked Then
             dst1 = hist.dst1
         Else
             dst1 = cMats.CameraLocationBot(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.trackbar(1).Value / 1000)
@@ -525,7 +535,8 @@ Public Class PointCloud_TopView_Objects
         view.src = src
         view.Run(ocvb)
         dst1 = view.dst1
-        flood.src = view.hist.histOutput.Threshold(view.hist.histOpts.sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        Static sliderHistThreshold = findSlider("Histogram threshold")
+        flood.src = view.hist.histOutput.Threshold(sliderHistThreshold?.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
         dst2 = flood.dst2
         label2 = flood.label2
@@ -546,7 +557,7 @@ Public Class PointCloud_TopView_Distances
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         gVec = New PointCloud_TopView_Objects(ocvb)
-        gVec.view.hist.histOpts.check.Box(0).Checked = False ' no imu means the distance can be obtained from the image representation.
+
         ocvb.suppressOptions = True
         gSide = New PointCloud_SideView_Distances(ocvb)
 
@@ -554,7 +565,8 @@ Public Class PointCloud_TopView_Distances
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         gVec.Run(ocvb)
-        maxZ = gVec.view.hist.histOpts.sliders.trackbar(1).Value / 1000
+        Static sliderMaxDepth = findSlider("InRange Max Depth")
+        maxZ = sliderMaxDepth.Value / 1000
         dst1 = showDistances(ocvb, gVec.dst1, gVec.flood.rects, maxZ, gVec.view.hist.histOpts.check.Box(0).Checked)
         label1 = CStr(CInt(gVec.flood.rects.Count)) + " objects > " + CStr(gVec.flood.minFloodSize) + " pixels"
     End Sub
@@ -572,25 +584,23 @@ Public Class PointCloud_TrimDepth
     Dim objects As PointCloud_TopView_Distances
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ' ocvb.suppressOptions = True
         cMats = New PointCloud_Colorize(ocvb)
-        cMats.sliders.Visible = standalone
         cMats.shift = 0
         cMats.Run(ocvb)
-
-        hist = New Histogram_2D_TopView(ocvb)
-        hist.histOpts.check.Box(0).Checked = False
 
         objects = New PointCloud_TopView_Distances(ocvb)
         objects.gVec.flood.sliders.trackbar(0).Value = 1 ' we want all possible objects in view.
         objects.gVec.view.hist.histOpts.sliders.trackbar(0).Value = 20 ' should be substantial object...
+
+        ocvb.suppressOptions = True
+        hist = New Histogram_2D_TopView(ocvb)
+        hist.histOpts.check.Box(0).Checked = False
 
         ocvb.desc = "Trim the depth data to identified depth objects"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
         objects.Run(ocvb)
-        dst2 = objects.dst1
-        dst1 = cMats.CameraLocationBot(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.trackbar(1).Value / 1000)
+        dst1 = objects.dst1
     End Sub
 End Class
