@@ -174,7 +174,8 @@ Public Class Annealing_CPP_MT
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If anneal(0) Is Nothing Then setup(ocvb) ' setup here rather than in algorithm so all threads work on the same problem.
-        If anneal(0).numberOfCities <> sliders.trackbar(0).Value Or check.Box(0).Checked Or check.Box(2).Checked <> anneal(0).circularPattern Then setup(ocvb)
+        Static CityCountSlider = findSlider("Anneal Number of Cities")
+        If anneal(0).numberOfCities <> CityCountSlider.Value Or check.Box(0).Checked Or check.Box(2).Checked <> anneal(0).circularPattern Then setup(ocvb)
         check.Box(0).Checked = False
         Dim allClosed As Boolean = True
         Parallel.For(0, anneal.Length,
@@ -200,10 +201,11 @@ Public Class Annealing_CPP_MT
         ' if the top 4 are all the same energy, then we are done.
         If bestList.Count > 1 Then
             Dim sameEnergy As Int32 = 1
-            For i = 1 To sliders.trackbar(1).Value - 1
+            Dim successCounter = sliders.trackbar(1).Value
+            For i = 1 To successCounter - 1
                 If anneal(CInt(bestList.ElementAt(i).Value)).energy = anneal(CInt(bestList.ElementAt(0).Value)).energy Then sameEnergy += 1
             Next
-            If sameEnergy = sliders.trackbar(1).Value Then allClosed = True
+            If sameEnergy = successCounter Then allClosed = True
             If sameEnergy = 1 Then
                 label1 = "There is only " + CStr(sameEnergy) + " thread at the best energy level."
             Else

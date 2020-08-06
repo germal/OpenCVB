@@ -84,7 +84,9 @@ Public Class BGSubtract_MotionDetect_MT
         Dim taskArray(threadCount - 1) As Task
         Dim xfactor = CInt(src.Width / width)
         Dim yfactor = Math.Max(CInt(src.Height / height), CInt(src.Width / width))
-        Dim CCthreshold = CSng(sliders.trackbar(0).Value / sliders.trackbar(0).Maximum)
+        Static correlationSlider = findSlider("Correlation Threshold")
+        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
+        dst1.SetTo(0)
         For i = 0 To threadCount - 1
             Dim section = i
             taskArray(i) = Task.Factory.StartNew(
@@ -123,7 +125,9 @@ Public Class BGSubtract_Basics_MT
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.EmptyClone.SetTo(0)
         If ocvb.frameCount = 0 Then dst2 = src.Clone()
-        Dim CCthreshold = CSng(sliders.trackbar(0).Value / sliders.trackbar(0).Maximum)
+        Static correlationSlider = findSlider("Correlation Threshold")
+        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
+        dst1.SetTo(0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             Dim correlation As New cv.Mat
@@ -178,7 +182,8 @@ Public Class BGSubtract_MOG
         Else
             gray = src
         End If
-        MOG.Apply(gray, gray, sliders.trackbar(0).Value / 1000)
+        Static learnRateSlider = findSlider("MOG Learn Rate")
+        MOG.Apply(gray, gray, learnRateSlider.Value / 1000)
         dst1 = gray
     End Sub
 End Class
@@ -199,7 +204,8 @@ Public Class BGSubtract_MOG2
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOG2.Apply(src, dst1, sliders.trackbar(0).Value / 1000)
+        Static learnRateSlider = findSlider("MOG Learn Rate")
+        MOG2.Apply(src, dst1, learnRateSlider.Value / 1000)
     End Sub
 End Class
 
@@ -226,8 +232,9 @@ Public Class BGSubtract_GMG_KNN
         End If
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        gmg.Apply(dst1, dst1, sliders.trackbar(0).Value / 1000)
-        knn.Apply(dst1, dst1, sliders.trackbar(0).Value / 1000)
+        Static learnRateSlider = findSlider("Learn Rate")
+        gmg.Apply(dst1, dst1, learnRateSlider.Value / 1000)
+        knn.Apply(dst1, dst1, learnRateSlider.Value / 1000)
     End Sub
 End Class
 
@@ -253,11 +260,12 @@ Public Class BGSubtract_MOG_RGBDepth
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOGDepth.Apply(gray, gray, sliders.trackbar(0).Value / 1000)
+        Static learnRateSlider = findSlider("Learn Rate")
+        MOGDepth.Apply(gray, gray, learnRateSlider.Value / 1000)
         dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOGRGB.Apply(src, src, sliders.trackbar(0).Value / 1000)
+        MOGRGB.Apply(src, src, learnRateSlider.Value / 1000)
     End Sub
 End Class
 
@@ -274,12 +282,9 @@ Public Class BGSubtract_MOG_Retina
 
         retina = New Retina_Basics_CPP(ocvb)
 
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Uncertainty threshold", 1, 255, 100)
-
-        ocvb.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
         label1 = "MOG results of depth motion"
         label2 = "Difference from retina depth motion."
+        ocvb.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         retina.src = ocvb.RGBDepth

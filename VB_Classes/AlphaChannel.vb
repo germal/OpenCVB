@@ -52,7 +52,8 @@ Public Class AlphaChannel_Blend
         dst2.SetTo(0)
         src.CopyTo(dst2, mask)
 
-        Dim alpha = sliders.trackbar(0).Value / 255
+        Static transparencySlider = findSlider("Transparency amount")
+        Dim alpha = transparencySlider.Value / 255
         cv.Cv2.AddWeighted(src, alpha, dst2, 1.0 - alpha, 0, dst1)
     End Sub
 End Class

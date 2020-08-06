@@ -13,6 +13,8 @@ Public Class Area_MinTriangle_CPP
     Public srcData() As Byte
     Public dstData() As Byte
     Public triangle As cv.Mat
+    Public pointCountSlider As System.Windows.Forms.TrackBar
+    Public sizeSlider As System.Windows.Forms.TrackBar
     Private Sub setup(ocvb As AlgorithmData)
         numberOfPoints = sliders.trackbar(0).Value
         ReDim srcPoints(numberOfPoints)
@@ -25,12 +27,14 @@ Public Class Area_MinTriangle_CPP
         sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
         sliders.setupTrackBar(1, "Area size", 10, 300, 200)
         setup(ocvb)
+        pointCountSlider = findSlider("Area Number of Points")
+        sizeSlider = findSlider("Area size")
 
         ocvb.desc = "Find minimum containing triangle for a set of points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If numberOfPoints <> sliders.trackbar(0).Value Then setup(ocvb)
-        Dim squareWidth = sliders.trackbar(1).Value / 2
+        If numberOfPoints <> pointCountSlider.Value Then setup(ocvb)
+        Dim squareWidth = sizeSlider.Value / 2
 
         dst1.SetTo(0)
         For i = 0 To srcPoints.Length - 1
@@ -64,22 +68,21 @@ Public Class Area_MinRect
     Dim numberOfPoints As Int32
     Public srcPoints() As cv.Point2f
     Public minRect As cv.RotatedRect
+    Dim area As Area_MinTriangle_CPP
     Private Sub setup(ocvb As AlgorithmData)
-        numberOfPoints = sliders.trackbar(0).Value
+        numberOfPoints = area.pointCountSlider.Value
         ReDim srcPoints(numberOfPoints)
     End Sub
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Area Number of Points", 1, 200, 5)
-        sliders.setupTrackBar(1, "Area size", 10, 300, 200)
+        area = New Area_MinTriangle_CPP(ocvb)
         setup(ocvb)
 
         ocvb.desc = "Find minimum containing rectangle for a set of points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If numberOfPoints <> sliders.trackbar(0).Value Then setup(ocvb)
-        Dim squareWidth = sliders.trackbar(1).Value / 2
+        If numberOfPoints <> area.pointCountSlider.Value Then setup(ocvb)
+        Dim squareWidth = area.sizeSlider.Value / 2
 
         dst1.SetTo(0)
         For i = 0 To srcPoints.Length - 1

@@ -61,7 +61,7 @@ Public Class ocvbClass : Implements IDisposable
                 Next
             End If
         Next
-        MsgBox("A checkbox was not found!  Very likely the requested checkbox was mistyped.")
+        MsgBox("A checkbox was not found!  Very likely the requested checkbox was mistyped or the original text '" + opt + "' was changed.")
         Return Nothing
     End Function
     Public Function findSlider(opt As String) As TrackBar
@@ -73,7 +73,7 @@ Public Class ocvbClass : Implements IDisposable
                 Next
             End If
         Next
-        MsgBox("A slider was not found!  Very likely the requested slider text was mistyped.")
+        MsgBox("A slider was not found!  Very likely the requested slider text was mistyped or the original label '" + opt + "' has been changed.")
         Return Nothing
     End Function
     Public Function validateRect(r As cv.Rect) As cv.Rect
