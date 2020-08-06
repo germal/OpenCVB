@@ -184,7 +184,7 @@ Public Class KNN_Cluster2D
     Public cityPositions() As cv.Point
     Public cityOrder() As Int32
     Public distances() As Int32
-    Dim numberofCities As Int32
+    Dim numberOfCities As Int32
     Dim closedRegions As Int32
     Dim totalClusters As Int32
     Public Sub drawMap(result As cv.Mat)
@@ -199,20 +199,20 @@ Public Class KNN_Cluster2D
         knn.sliders.Visible = False
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "knn - number of cities", 10, 1000, 100)
+        sliders.setupTrackBar(0, "KNN - number of cities", 10, 1000, 100)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Demo Mode (continuous update)"
         If ocvb.parms.testAllRunning Then check.Box(0).Checked = True
 
         ocvb.desc = "Use knn to cluster cities as preparation for a solution to the traveling salesman problem."
     End Sub
-    Private Sub cluster(rColors() As cv.Vec3b, result As cv.Mat)
+    Private Sub cluster(result As cv.Mat)
         Dim alreadyTaken As New List(Of Int32)
-        For i = 0 To numberofCities - 1
-            For j = 1 To numberofCities - 1
+        For i = 0 To numberOfCities - 1
+            For j = 1 To numberOfCities - 1
                 Dim nearestCity = knn.responseSet(i * knn.findXnearest + j)
                 ' the last entry will never have a city to connect to so just connect with the nearest.
-                If i = numberofCities - 1 Then
+                If i = numberOfCities - 1 Then
                     cityOrder(i) = nearestCity
                     Exit For
                 End If
@@ -251,24 +251,26 @@ Public Class KNN_Cluster2D
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ' If they changed Then number of elements in the set
-        If sliders.trackbar(0).Value <> numberofCities Or check.Box(0).Checked Then
-            numberofCities = sliders.trackbar(0).Value
-            knn.findXnearest = numberofCities
+        Static demoModeCheck = findCheckBox("Demo Mode")
+        Static cityCountSlider = findSlider("KNN - number of cities")
+        If cityCountSlider.Value <> numberOfCities Or demoModeCheck.Checked Then
+            numberOfCities = cityCountSlider.Value
+            knn.findXnearest = numberOfCities
 
-            ReDim cityPositions(numberofCities - 1)
-            ReDim cityOrder(numberofCities - 1)
+            ReDim cityPositions(numberOfCities - 1)
+            ReDim cityOrder(numberOfCities - 1)
 
             Dim gen As New System.Random()
             Dim r As New cv.RNG(gen.Next(0, 1000000))
-            For i = 0 To numberofCities - 1
+            For i = 0 To numberOfCities - 1
                 cityPositions(i).X = r.Uniform(0, src.Width)
                 cityPositions(i).Y = r.Uniform(0, src.Height)
             Next
 
             ' find the nearest neighbor for each city - first will be the current city, next will be nearest real neighbors in order
-            ReDim knn.lastSet(numberofCities - 1)
-            ReDim knn.querySet(numberofCities - 1)
-            For i = 0 To numberofCities - 1
+            ReDim knn.lastSet(numberOfCities - 1)
+            ReDim knn.querySet(numberOfCities - 1)
+            For i = 0 To numberOfCities - 1
                 knn.lastSet(i) = New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y))
                 knn.querySet(i) = New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y))
             Next
@@ -276,7 +278,7 @@ Public Class KNN_Cluster2D
             dst1.SetTo(0)
             totalClusters = 0
             closedRegions = 0
-            cluster(rColors, dst1)
+            cluster(dst1)
             label1 = "knn clusters total=" + CStr(totalClusters) + " closedRegions=" + CStr(closedRegions)
         End If
     End Sub
