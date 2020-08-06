@@ -13,7 +13,7 @@ Public Class Contours_Basics
         radio.check(3).Text = "List"
         radio.check(4).Text = "Tree"
         radio.check(4).Checked = True
-        If ocvb.parms.ShowOptions Then radio.Show()
+        If ocvb.suppressOptions = False Then radio.Show()
 
         radio1.Setup(ocvb, caller, 4)
         radio1.Text = "ContourApproximation Mode"
@@ -22,7 +22,7 @@ Public Class Contours_Basics
         radio1.check(2).Text = "ApproxTC89KCOS"
         radio1.check(3).Text = "ApproxTC89L1"
         radio1.check(1).Checked = True
-        If ocvb.parms.ShowOptions Then radio1.Show()
+        If ocvb.suppressOptions = False Then radio1.Show()
 
         rotatedRect = New Draw_rotatedRectangles(ocvb)
         rotatedRect.rect.sliders.trackbar(0).Value = 5

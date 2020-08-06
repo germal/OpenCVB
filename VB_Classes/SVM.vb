@@ -33,7 +33,7 @@ Public Class SVM_Options
         radio1.check(2).Text = "SVM Type = NuSvc"
         radio1.check(3).Text = "SVM Type = NuSvr"
         radio1.check(4).Text = "SVM Type = OneClass"
-        If ocvb.parms.ShowOptions Then radio.Show()
+        If ocvb.suppressOptions = False Then radio.Show()
 
 
         label1 = "SVM_Options - only options, no output"

@@ -202,7 +202,6 @@ Public Class Blob_Rectangles
     End Class
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.parms.ShowOptions = False
         blobs = New Blob_Largest(ocvb)
         ocvb.desc = "Get the blobs and their masks and outline them with a rectangle."
     End Sub

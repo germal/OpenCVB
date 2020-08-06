@@ -9,9 +9,7 @@ Public Class OptionsCombo
     End Sub
     Public Sub Setup(ocvb As AlgorithmData, caller As String, label As String, comboList As List(Of String))
         Me.Text = caller + " ComboBox Options"
-        If ocvb.parms.ShowOptions Then
-            If ocvb.suppressOptions = False Then Me.Show()
-        End If
+        If ocvb.suppressOptions = False Then Me.Show()
         Label1.Text = label
         For i = 0 To comboList.Count - 1
             Box.Items.Add(comboList.ElementAt(i))

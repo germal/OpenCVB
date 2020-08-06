@@ -98,7 +98,6 @@ Public Class ActiveClass : Implements IDisposable
         Dim OpenCVfullPath As String
         Dim PythonExe As String
         Dim ShowConsoleLog As Boolean
-        Dim ShowOptions As Boolean
         Dim speedFactor As Integer
         Dim testAllRunning As Boolean
         Dim transformationMatrix() As Single

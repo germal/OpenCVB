@@ -162,7 +162,7 @@ Public Class MatchTemplate_BestEntropy_MT
 
         entropy = New Entropy_Highest_MT(ocvb)
 
-        ocvb.parms.ShowOptions = False ' we won't need the options...
+        ocvb.suppressOptions = True ' we won't need the options...
 
         label1 = "Probabilities that the template matches image"
         label2 = "Red is the best template to match (highest entropy)"
