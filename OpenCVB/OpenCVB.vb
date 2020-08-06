@@ -1267,9 +1267,9 @@ Public Class OpenCVB
                 Console.WriteLine("Error in AlgorithmTask: " + ex.Message)
                 Exit While
             End Try
-            Static delegateX As New delegateEvent(AddressOf raiseEventRefresh)
+            Dim delegateX As New delegateEvent(AddressOf raiseEventRefresh)
             'Makes the sub threadsafe (i.e. the event will only be raised in the UI Thread)
-            If Me.InvokeRequired Then Me.Invoke(delegateX)
+            If stopAlgorithmThread = False Then If Me.InvokeRequired Then Me.Invoke(delegateX)
 
             frameCount += 1
         End While
