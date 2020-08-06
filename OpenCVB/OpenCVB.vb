@@ -887,6 +887,9 @@ Public Class OpenCVB
     Private Sub CameraTask()
         While stopCameraThread = False
             camera.GetNextFrame()
+            Static delegateX As New delegateEvent(AddressOf raiseEventRefresh)
+            'Makes the sub threadsafe (i.e. the event will only be raised in the UI Thread)
+            If stopCameraThread = False Then If Me.InvokeRequired Then Me.Invoke(delegateX)
 
             cameraRefresh = True
             Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
@@ -1267,7 +1270,7 @@ Public Class OpenCVB
                 Console.WriteLine("Error in AlgorithmTask: " + ex.Message)
                 Exit While
             End Try
-            Dim delegateX As New delegateEvent(AddressOf raiseEventRefresh)
+            Static delegateX As New delegateEvent(AddressOf raiseEventRefresh)
             'Makes the sub threadsafe (i.e. the event will only be raised in the UI Thread)
             If stopAlgorithmThread = False Then If Me.InvokeRequired Then Me.Invoke(delegateX)
 
