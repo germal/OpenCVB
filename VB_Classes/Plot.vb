@@ -265,7 +265,7 @@ Module Plot_OpenCV_Module
             dst1.Line(pt1, pt2, cv.Scalar.White, 1)
             If i = 0 Then pt2.Y += 10
             cv.Cv2.PutText(dst1, Format(maxVal - spaceVal * i, "###,###,##0"), New cv.Point(pt1.X + 5, pt1.Y - 4),
-                           cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.Black, 2)
+                           cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.Beige, 2)
         Next
     End Sub
 End Module

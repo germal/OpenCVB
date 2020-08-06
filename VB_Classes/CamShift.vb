@@ -150,7 +150,7 @@ End Class
 Public Class Camshift_TopObjects
     Inherits ocvbClass
     Dim blob As Blob_DepthClusters
-    Dim cams(3) As CamShift_Basics
+    Dim cams(4 - 1) As CamShift_Basics
     Dim mats As Mat_4to1
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)

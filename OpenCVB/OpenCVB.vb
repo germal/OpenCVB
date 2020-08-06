@@ -892,7 +892,7 @@ Public Class OpenCVB
             cameraRefresh = True
 
             Static delegateX As New delegateEvent(AddressOf raiseEventRefresh)
-            Me.Invoke(delegateX)
+            If stopCameraThread = False Then Me.Invoke(delegateX)
 
             Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
             totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
@@ -1276,7 +1276,7 @@ Public Class OpenCVB
                 Exit While
             End Try
             Static delegateX As New delegateEvent(AddressOf raiseEventRefresh)
-            If stopAlgorithmThread = False Then If Me.InvokeRequired Then Me.Invoke(delegateX)
+            If stopAlgorithmThread = False Then Me.Invoke(delegateX)
 
             frameCount += 1
         End While
