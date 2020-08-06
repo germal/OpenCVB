@@ -13,8 +13,6 @@ Public Class Area_MinTriangle_CPP
     Public srcData() As Byte
     Public dstData() As Byte
     Public triangle As cv.Mat
-    Public pointCountSlider As System.Windows.Forms.TrackBar
-    Public sizeSlider As System.Windows.Forms.TrackBar
     Private Sub setup(ocvb As AlgorithmData)
         numberOfPoints = sliders.trackbar(0).Value
         ReDim srcPoints(numberOfPoints)
@@ -27,12 +25,11 @@ Public Class Area_MinTriangle_CPP
         sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
         sliders.setupTrackBar(1, "Area size", 10, 300, 200)
         setup(ocvb)
-        pointCountSlider = findSlider("Area Number of Points")
-        sizeSlider = findSlider("Area size")
-
         ocvb.desc = "Find minimum containing triangle for a set of points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        Static pointCountSlider = findSlider("Area Number of Points")
+        Static sizeSlider = findSlider("Area size")
         If numberOfPoints <> pointCountSlider.Value Then setup(ocvb)
         Dim squareWidth = sizeSlider.Value / 2
 
@@ -65,24 +62,29 @@ End Class
 
 Public Class Area_MinRect
     Inherits ocvbClass
-    Dim numberOfPoints As Int32
+    Dim numberOfPoints As Integer
     Public srcPoints() As cv.Point2f
     Public minRect As cv.RotatedRect
-    Dim area As Area_MinTriangle_CPP
-    Private Sub setup(ocvb As AlgorithmData)
-        numberOfPoints = area.pointCountSlider.Value
+    Private Sub setup(ocvb As AlgorithmData, _numberOfPoints As Integer)
+        numberOfPoints = _numberOfPoints
         ReDim srcPoints(numberOfPoints)
     End Sub
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        area = New Area_MinTriangle_CPP(ocvb)
-        setup(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
+        sliders.setupTrackBar(1, "Area size", 10, 300, 200)
+
+        setup(ocvb, sliders.trackbar(0).Value)
 
         ocvb.desc = "Find minimum containing rectangle for a set of points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If numberOfPoints <> area.pointCountSlider.Value Then setup(ocvb)
-        Dim squareWidth = area.sizeSlider.Value / 2
+        Static pointCountSlider = findSlider("Area Number of Points")
+        Static sizeSlider = findSlider("Area size")
+        If numberOfPoints <> pointCountSlider.Value Then setup(ocvb, pointCountSlider.value)
+        Dim squareWidth = sizeSlider.Value / 2
 
         dst1.SetTo(0)
         For i = 0 To srcPoints.Length - 1
