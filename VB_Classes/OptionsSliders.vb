@@ -38,9 +38,8 @@ Public Class OptionsSliders
             defaultHeight = count * 58 ' add space for the additional unexpected trackbars.
             FlowLayoutPanel1.Height = defaultHeight - 30
         End If
-        If ocvb.parms.ShowOptions Then
-            If ocvb.suppressOptions = False Then Me.Show()
-        End If
+        ' If ocvb.parms.ShowOptions Then If ocvb.suppressOptions = False Then Me.Show()
+        If ocvb.suppressOptions = False Then Me.Show()
     End Sub
     Public Sub setupTrackBar(index As Integer, label As String, min As Integer, max As Integer, value As Integer)
         sLabels(index).Text = label

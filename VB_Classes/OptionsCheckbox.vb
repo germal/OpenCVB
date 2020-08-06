@@ -9,7 +9,8 @@ Public Class OptionsCheckbox
             Box(i).AutoSize = True
             FlowLayoutPanel1.Controls.Add(Box(i))
         Next
-        If ocvb.parms.ShowOptions Then If ocvb.suppressOptions = False Then Me.Show()
+        'If ocvb.parms.ShowOptions Then If ocvb.suppressOptions = False Then Me.Show()
+        If ocvb.suppressOptions = False Then Me.Show()
     End Sub
     Private Sub OptionsCheckbox_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.SetDesktopLocation(midFormX + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
