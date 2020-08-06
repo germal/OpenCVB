@@ -9,6 +9,7 @@ Imports cvext = OpenCvSharp.Extensions
 Imports py = Python.Runtime
 Module opencv_module
     Public bufferLock As New PictureBox ' this is a global lock on the camera buffers.
+    Public delegateLock As New PictureBox
 End Module
 Public Class OpenCVB
 #Region "Globals"
@@ -81,9 +82,8 @@ Public Class OpenCVB
     Dim openfileDialogTitle As String
     Dim openfileSliderPercent As Single
     Dim openformLocated As Boolean
-
-#End Region
     Private Delegate Sub delegateEvent()
+#End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
         Dim args() = Environment.GetCommandLineArgs()
@@ -630,10 +630,10 @@ Public Class OpenCVB
         If r.Height < 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X > Width Then r.X = Width
-        If r.Y > Height Then r.Y = Height
-        If r.X + r.Width > Width Then r.Width = Width - r.X
-        If r.Y + r.Height > Height Then r.Height = Height - r.Y
+        If r.X > width Then r.X = width
+        If r.Y > height Then r.Y = height
+        If r.X + r.Width > width Then r.Width = width - r.X
+        If r.Y + r.Height > height Then r.Height = height - r.Y
 
         Return r
     End Function
@@ -811,7 +811,9 @@ Public Class OpenCVB
         RefreshAvailable = True
     End Sub
     Public Sub raiseEventRefresh()
-        Me.Refresh()
+        SyncLock delegateLock
+            Me.Refresh()
+        End SyncLock
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastFrame As Int32
@@ -887,11 +889,11 @@ Public Class OpenCVB
     Private Sub CameraTask()
         While stopCameraThread = False
             camera.GetNextFrame()
-            Static delegateX As New delegateEvent(AddressOf raiseEventRefresh)
-            'Makes the sub threadsafe (i.e. the event will only be raised in the UI Thread)
-            If stopCameraThread = False Then If Me.InvokeRequired Then Me.Invoke(delegateX)
-
             cameraRefresh = True
+
+            Static delegateX As New delegateEvent(AddressOf raiseEventRefresh)
+            Me.Invoke(delegateX)
+
             Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
             totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
@@ -974,12 +976,15 @@ Public Class OpenCVB
     Private Function threadStop(ByRef frame As Int32) As Boolean
         Dim sleepCount As Int32
         ' some algorithms can take a long time to finish a single iteration.  
-        ' Each algorithm must run dispose() - to kill options forms and external Python or OpenGL taskes.  Wait until exit...
-        While frame
-            Thread.Sleep(10)  ' to allow the algorithm task to gracefully end and dispose OpenCVB.
-            sleepCount += 1
-            If sleepCount > 1000 Then Return False
-        End While
+        ' Each algorithm must run dispose() - to kill options forms and external Python or OpenGL taskes.  Wait until thread exit and framecount = 0...
+        SyncLock delegateLock
+            While 1
+                If frame = 0 Then Exit While
+                Thread.Sleep(10)  ' to allow the algorithm task to gracefully end and dispose OpenCVB.
+                sleepCount += 1
+                If sleepCount > 1000 Then Return False
+            End While
+        End SyncLock
         Return True
     End Function
     Private Sub StartAlgorithmTask()
@@ -1271,7 +1276,6 @@ Public Class OpenCVB
                 Exit While
             End Try
             Static delegateX As New delegateEvent(AddressOf raiseEventRefresh)
-            'Makes the sub threadsafe (i.e. the event will only be raised in the UI Thread)
             If stopAlgorithmThread = False Then If Me.InvokeRequired Then Me.Invoke(delegateX)
 
             frameCount += 1
