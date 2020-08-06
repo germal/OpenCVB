@@ -31,7 +31,6 @@ Public Class OptionsDialog
         SaveSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", ShowConsoleLog.Checked)
         SaveSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", AvoidDNNCrashes.Checked)
         SaveSetting("OpenCVB", "EnableNumPy", "EnableNumPy", EnableNumPy.Checked)
-        SaveSetting("OpenCVB", "RefreshRate", "RefreshRate", RefreshRate.Value)
         SaveSetting("OpenCVB", "FontName", "FontName", fontInfo.Font.Name)
         SaveSetting("OpenCVB", "FontSize", "FontSize", fontInfo.Font.Size)
 
@@ -88,7 +87,6 @@ Public Class OptionsDialog
         ShowConsoleLog.Checked = GetSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", False)
         EnableNumPy.Checked = False ' GetSetting("OpenCVB", "EnableNumPy", "EnableNumPy", False)
         AvoidDNNCrashes.Checked = GetSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", False)
-        RefreshRate.Value = GetSetting("OpenCVB", "RefreshRate", "RefreshRate", 15)
 
         Dim defaultSize = GetSetting("OpenCVB", "FontSize", "FontSize", 8)
         Dim DefaultFont = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")

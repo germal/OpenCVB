@@ -29,8 +29,6 @@ Partial Class OptionsDialog
         Me.AccurateProcessing = New System.Windows.Forms.RadioButton()
         Me.lowResolution = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.RefreshRate = New System.Windows.Forms.NumericUpDown()
         Me.AvoidDNNCrashes = New System.Windows.Forms.CheckBox()
         Me.ShowConsoleLog = New System.Windows.Forms.CheckBox()
         Me.ShowLabels = New System.Windows.Forms.CheckBox()
@@ -53,7 +51,6 @@ Partial Class OptionsDialog
         Me.CameraGroup.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
-        CType(Me.RefreshRate, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox4.SuspendLayout()
         CType(Me.TestAllDuration, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox6.SuspendLayout()
@@ -128,8 +125,6 @@ Partial Class OptionsDialog
         '
         'GroupBox2
         '
-        Me.GroupBox2.Controls.Add(Me.Label3)
-        Me.GroupBox2.Controls.Add(Me.RefreshRate)
         Me.GroupBox2.Controls.Add(Me.AvoidDNNCrashes)
         Me.GroupBox2.Controls.Add(Me.ShowConsoleLog)
         Me.GroupBox2.Controls.Add(Me.ShowLabels)
@@ -139,26 +134,6 @@ Partial Class OptionsDialog
         Me.GroupBox2.TabIndex = 5
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Global Options"
-        '
-        'Label3
-        '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(112, 153)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(289, 20)
-        Me.Label3.TabIndex = 5
-        Me.Label3.Text = "Number of screen refreshes per second"
-        '
-        'RefreshRate
-        '
-        Me.RefreshRate.Increment = New Decimal(New Integer() {5, 0, 0, 0})
-        Me.RefreshRate.Location = New System.Drawing.Point(16, 147)
-        Me.RefreshRate.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
-        Me.RefreshRate.Name = "RefreshRate"
-        Me.RefreshRate.ReadOnly = True
-        Me.RefreshRate.Size = New System.Drawing.Size(89, 26)
-        Me.RefreshRate.TabIndex = 4
-        Me.RefreshRate.Value = New Decimal(New Integer() {15, 0, 0, 0})
         '
         'AvoidDNNCrashes
         '
@@ -357,7 +332,6 @@ Partial Class OptionsDialog
         Me.GroupBox1.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
-        CType(Me.RefreshRate, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox4.ResumeLayout(False)
         Me.GroupBox4.PerformLayout()
         CType(Me.TestAllDuration, System.ComponentModel.ISupportInitialize).EndInit()
@@ -387,8 +361,6 @@ Partial Class OptionsDialog
     Friend WithEvents AvoidDNNCrashes As CheckBox
     Friend WithEvents OKButton As Button
     Friend WithEvents Cancel_Button As Button
-    Friend WithEvents Label3 As Label
-    Friend WithEvents RefreshRate As NumericUpDown
     Friend WithEvents GroupBox3 As GroupBox
     Friend WithEvents Button1 As Button
     Friend WithEvents Label4 As Label

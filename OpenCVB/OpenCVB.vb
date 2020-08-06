@@ -83,6 +83,7 @@ Public Class OpenCVB
     Dim openformLocated As Boolean
 
 #End Region
+    Private Delegate Sub delegateEvent()
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
         Dim args() = Environment.GetCommandLineArgs()
@@ -809,8 +810,8 @@ Public Class OpenCVB
         If TestAllButton.Text <> "Stop Test" Then Me.Activate()
         RefreshAvailable = True
     End Sub
-    Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
-        If camera IsNot Nothing Then If camera.color.width Then Me.Refresh()
+    Public Sub raiseEventRefresh()
+        Me.Refresh()
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastFrame As Int32
@@ -951,7 +952,6 @@ Public Class OpenCVB
             optionsForm.TestEnableNumPy()
             If saveCurrentCamera <> optionsForm.cameraIndex Then RestartCamera()
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
-            RefreshTimer.Interval = CInt(1000 / optionsForm.RefreshRate.Value)
 
             If optionsForm.SnapToGrid.Checked Then
                 camPic(0).Size = New Size(regWidth / 2, regHeight / 2)
@@ -1267,6 +1267,10 @@ Public Class OpenCVB
                 Console.WriteLine("Error in AlgorithmTask: " + ex.Message)
                 Exit While
             End Try
+            Static delegateX As New delegateEvent(AddressOf raiseEventRefresh)
+            'Makes the sub threadsafe (i.e. the event will only be raised in the UI Thread)
+            If Me.InvokeRequired Then Me.Invoke(delegateX)
+
             frameCount += 1
         End While
     End Sub
