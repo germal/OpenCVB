@@ -273,7 +273,7 @@ Public Class OpenCVB
             algorithmRefresh = False
             SyncLock imgResult
                 Try
-                    If imgResult.Width <> camPic(2).Width Then
+                    If imgResult.Width <> camPic(2).Width Or imgResult.Height <> camPic(2).Height Then
                         Dim result = imgResult.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
                         cvext.BitmapConverter.ToBitmap(result, camPic(2).Image)
                     Else

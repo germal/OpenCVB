@@ -71,9 +71,10 @@ Public Class Video_CarCounting
     Public Sub Run(ocvb As AlgorithmData)
         video.Run(ocvb)
         If video.dst1.Empty() = False And video.image.Empty() = False Then
+            dst1.SetTo(0)
             mog.src = video.image
             mog.Run(ocvb)
-            dst1 = mog.gray
+            Dim videoImage = mog.dst1
             dst2 = video.dst1
 
             ' there are 5 lanes of traffic so setup 5 regions
@@ -84,10 +85,10 @@ Public Class Video_CarCounting
             Static carCount As Int32
             For i = 1 To activeState.Length - 1
                 Dim lane = New cv.Rect(Choose(i, 230, 460, 680, 900, 1110), finishLine, 40, activeHeight)
-                Dim cellCount = dst1(lane).CountNonZero()
+                Dim cellCount = videoImage(lane).CountNonZero()
                 If cellCount Then
                     activeState(i) = True
-                    dst1.Rectangle(lane, cv.Scalar.Red, -1)
+                    videoImage.Rectangle(lane, cv.Scalar.Red, -1)
                     dst2.Rectangle(lane, cv.Scalar.Red, -1)
                 End If
                 If cellCount = 0 And activeState(i) = True Then
@@ -97,10 +98,10 @@ Public Class Video_CarCounting
                 dst2.Rectangle(lane, cv.Scalar.White, 2)
             Next
 
-            Dim tmp = dst1.Clone()
+            Dim tmp = videoImage.Resize(src.Size())
             flow.msgs.Add("  Cars " + CStr(carCount))
             flow.Run(ocvb)
-            cv.Cv2.BitwiseOr(dst1, tmp, dst1)
+            cv.Cv2.BitwiseOr(dst1, tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR), dst1)
         End If
     End Sub
 End Class
