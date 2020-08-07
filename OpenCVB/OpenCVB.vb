@@ -82,6 +82,7 @@ Public Class OpenCVB
     Dim openfileDialogTitle As String
     Dim openfileSliderPercent As Single
     Dim openformLocated As Boolean
+    Dim activeThreadID As Integer
     Private Delegate Sub delegateEvent()
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -1060,9 +1061,13 @@ Public Class OpenCVB
         fpsTimer.Enabled = True
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
-        If parms.testAllRunning Then AlgorithmTestCount += 1
+        AlgorithmTestCount += 1
         drawRect = New cv.Rect
         Dim saveLowResSetting As Boolean = parms.resolution
+
+        activeThreadID = AlgorithmTestCount
+        parms.activeThreadID = AlgorithmTestCount
+
         Dim OpenCVB = New VB_Classes.ActiveClass(parms, regWidth / parms.speedFactor, regHeight / parms.speedFactor, New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
         textDesc = OpenCVB.ocvb.desc
         openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
@@ -1074,11 +1079,10 @@ Public Class OpenCVB
         openFileFilter = OpenCVB.ocvb.parms.openFileFilter
         openFileDialogName = OpenCVB.ocvb.parms.openFileDialogName
         openfileDialogTitle = OpenCVB.ocvb.parms.openFileDialogTitle
+        Console.WriteLine("active thread id = " + CStr(OpenCVB.ocvb.parms.activeThreadID))
 
-        If parms.testAllRunning Then
-            Console.WriteLine(vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
-            Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + parms.activeAlgorithm)
-        End If
+        Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
+        Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + parms.activeAlgorithm + vbCrLf + vbCrLf)
 
         ' Here we check to see if the algorithm constructor changed lowResolution.
         If OpenCVB.ocvb.parms.resolution <> saveLowResSetting Then
@@ -1107,11 +1111,12 @@ Public Class OpenCVB
         End If
 
         ' remove all options forms.  They can only be made topmost (see OptionsBringToFront above) when created on the same thread.
-        ' This deletes the options forms for the current thread so they will be created again with the next thread.
+        ' This deletes the options forms for the current thread so they can be created (if needed) with the next algorithm thread.
         Try
             Dim frmlist As New List(Of Form)
             For Each frm In Application.OpenForms
-                If frm.name.startswith("Option") Then frmlist.Add(frm)
+                If frm.name.startswith("Option") And OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frmlist.Add(frm)
+                Console.WriteLine("close name = " + frm.name + " tag = " + CStr(frm.tag) + " threadid = " + CStr(OpenCVB.ocvb.parms.activeThreadID))
             Next
             For Each frm In frmlist
                 frm.Close()
@@ -1127,16 +1132,13 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub Run(OpenCVB As VB_Classes.ActiveClass)
-        Dim saveAlgorithmTestCount = AlgorithmTestCount ' use this to confirm that this task is to terminate.
         While 1
             ' wait until we have the latest camera data.
             While 1
-                If stopAlgorithmThread Then Exit While ' really exit the while loop below...
+                If OpenCVB.ocvb.parms.activeThreadID <> activeThreadID Or stopAlgorithmThread Then Exit Sub
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 If camera.newImagesAvailable Then Exit While
             End While
-            If stopAlgorithmThread Then Exit While
-            If saveAlgorithmTestCount <> AlgorithmTestCount Then Exit While ' a failsafe provision.  This task needs to exit.
 
             If camera.color.width = 0 Or camera.RGBDepth.width = 0 Or camera.leftView.width = 0 Or camera.rightView.width = 0 Then Continue While
 
@@ -1260,12 +1262,13 @@ Public Class OpenCVB
                     OptionsBringToFront = False
                     Try
                         For Each frm In Application.OpenForms
-                            If frm.name.startswith("Option") Then frm.topmost = True
+                            If frm.name.startswith("Option") And OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frm.topmost = True
+                            Console.WriteLine("name = " + frm.name + " tag = " + CStr(frm.tag) + " threadid = " + CStr(OpenCVB.ocvb.parms.activeThreadID))
                         Next
                         For Each frm In Application.OpenForms
-                            If frm.name.startswith("Option") Then frm.topmost = False
+                            If frm.name.startswith("Option") And OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frm.topmost = False
                         Next
-                    Catch ex As Exception ' ignoring exceptions here.  It is a transition to another class and form was activated...
+                    Catch ex As Exception
                         Console.WriteLine("Error in OptionsBringToFront: " + ex.Message)
                     End Try
                     openformLocated = False

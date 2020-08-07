@@ -112,6 +112,7 @@ Public Class ActiveClass : Implements IDisposable
         Dim openFileDialogTitle As String
         Dim openFileSliderPercent As Single
         Dim fileStarted As Boolean
+        Dim activeThreadID As Integer
         Dim initialStartSetting As Boolean
     End Structure
     Public Sub New(parms As algorithmParameters, _width As Integer, _height As Integer, location As cv.Rect)

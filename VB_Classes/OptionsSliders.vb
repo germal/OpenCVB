@@ -39,6 +39,7 @@ Public Class OptionsSliders
             FlowLayoutPanel1.Height = defaultHeight - 30
         End If
         If ocvb.suppressOptions = False Then Me.Show()
+        Tag = ocvb.parms.activeThreadID
     End Sub
     Public Sub setupTrackBar(index As Integer, label As String, min As Integer, max As Integer, value As Integer)
         sLabels(index).Text = label

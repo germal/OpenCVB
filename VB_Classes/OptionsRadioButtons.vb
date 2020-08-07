@@ -10,6 +10,7 @@ Public Class OptionsRadioButtons
             FlowLayoutPanel1.Controls.Add(check(i))
         Next
         If ocvb.suppressOptions = False Then Me.Show()
+        Tag = ocvb.parms.activeThreadID
     End Sub
     Private Sub OptionsRadioButtons_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.SetDesktopLocation(midFormX + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
