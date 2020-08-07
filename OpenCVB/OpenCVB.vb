@@ -983,7 +983,7 @@ Public Class OpenCVB
                 If frame = 0 Then Exit While
                 Thread.Sleep(10)  ' to allow the algorithm task to gracefully end and dispose OpenCVB.
                 sleepCount += 1
-                If sleepCount > 1000 Then Return False
+                If sleepCount > 200 Then Return False
             End While
         End SyncLock
         Return True
@@ -1115,8 +1115,10 @@ Public Class OpenCVB
         Try
             Dim frmlist As New List(Of Form)
             For Each frm In Application.OpenForms
-                If frm.name.startswith("Option") And OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frmlist.Add(frm)
-                Console.WriteLine("close name = " + frm.name + " tag = " + CStr(frm.tag) + " threadid = " + CStr(OpenCVB.ocvb.parms.activeThreadID))
+                If frm.name.startswith("Option") Then
+                    If OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frmlist.Add(frm)
+                    Console.WriteLine("Close: tag = " + CStr(frm.tag) + " threadid = " + CStr(OpenCVB.ocvb.parms.activeThreadID) + " form heading = " + frm.text)
+                End If
             Next
             For Each frm In frmlist
                 frm.Close()
@@ -1262,8 +1264,10 @@ Public Class OpenCVB
                     OptionsBringToFront = False
                     Try
                         For Each frm In Application.OpenForms
-                            If frm.name.startswith("Option") And OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frm.topmost = True
-                            Console.WriteLine("name = " + frm.name + " tag = " + CStr(frm.tag) + " threadid = " + CStr(OpenCVB.ocvb.parms.activeThreadID))
+                            If frm.name.startswith("Option") Then
+                                If OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frm.topmost = True
+                                Console.WriteLine("BringToFont: tag = " + CStr(frm.tag) + " threadid = " + CStr(OpenCVB.ocvb.parms.activeThreadID) + " form heading = " + frm.text)
+                            End If
                         Next
                         For Each frm In Application.OpenForms
                             If frm.name.startswith("Option") And OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frm.topmost = False
