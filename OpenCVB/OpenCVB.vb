@@ -1117,7 +1117,7 @@ Public Class OpenCVB
                 frm.Close()
             Next
         Catch ex As Exception
-            Console.WriteLine("Error in ttextData update: " + ex.Message)
+            Console.WriteLine("Error removing an Options form: " + ex.Message)
         End Try
 
         OpenCVB.Dispose()
