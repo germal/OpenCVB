@@ -849,6 +849,7 @@ Public Class OpenCVB
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopCameraThread = True
+        saveAlgorithmName = "" ' this will stop the current algorithm.
         Application.DoEvents()
         camera.closePipe()
         If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
