@@ -10,6 +10,7 @@ Imports py = Python.Runtime
 Module opencv_module
     Public bufferLock As New PictureBox ' this is a global lock on the camera buffers.
     Public delegateLock As New PictureBox
+    Public algorithmThreadLock As New PictureBox
 End Module
 Public Class OpenCVB
 #Region "Globals"
@@ -996,8 +997,6 @@ Public Class OpenCVB
         openFileInitialDirectory = ""
         openForm.fileStarted = False
         openformLocated = False
-        ' there may be a long-running algorithmtask that doesn't see that the algorithm has been stopped.
-        If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
 
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
         ReDim parms.IMU_RotationMatrix(9 - 1)
@@ -1053,7 +1052,7 @@ Public Class OpenCVB
         parms.extrinsics = camera.Extrinsics_VB
 
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
-        algorithmTaskHandle.Name = "AlgorithmTask"
+        algorithmTaskHandle.Name = saveAlgorithmName
         algorithmTaskHandle.Priority = ThreadPriority.Lowest
         algorithmTaskHandle.Start(parms)
 
@@ -1061,82 +1060,86 @@ Public Class OpenCVB
         fpsTimer.Enabled = True
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
-        AlgorithmTestCount += 1
-        drawRect = New cv.Rect
-        Dim saveLowResSetting As Boolean = parms.resolution
+        SyncLock algorithmThreadLock
 
-        activeThreadID = AlgorithmTestCount
-        parms.activeThreadID = AlgorithmTestCount
+            AlgorithmTestCount += 1
+            drawRect = New cv.Rect
+            Dim saveLowResSetting As Boolean = parms.resolution
 
-        Dim OpenCVB = New VB_Classes.ActiveClass(parms, regWidth / parms.speedFactor, regHeight / parms.speedFactor, New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
-        textDesc = OpenCVB.ocvb.desc
-        openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
-        openFileDialogRequested = OpenCVB.ocvb.parms.openFileDialogRequested
-        openFileinitialStartSetting = OpenCVB.ocvb.parms.initialStartSetting
-        OpenCVB.ocvb.parms.fileStarted = OpenCVB.ocvb.parms.initialStartSetting
-        openFileStarted = OpenCVB.ocvb.parms.initialStartSetting
-        openFileFilterIndex = OpenCVB.ocvb.parms.openFileFilterIndex
-        openFileFilter = OpenCVB.ocvb.parms.openFileFilter
-        openFileDialogName = OpenCVB.ocvb.parms.openFileDialogName
-        openfileDialogTitle = OpenCVB.ocvb.parms.openFileDialogTitle
-        Console.WriteLine("active thread id = " + CStr(OpenCVB.ocvb.parms.activeThreadID))
+            activeThreadID = AlgorithmTestCount
+            parms.activeThreadID = AlgorithmTestCount
 
-        Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
-        Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + parms.activeAlgorithm + vbCrLf + vbCrLf)
+            Dim OpenCVB = New VB_Classes.ActiveClass(parms, regWidth / parms.speedFactor, regHeight / parms.speedFactor, New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
+            textDesc = OpenCVB.ocvb.desc
+            openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
+            openFileDialogRequested = OpenCVB.ocvb.parms.openFileDialogRequested
+            openFileinitialStartSetting = OpenCVB.ocvb.parms.initialStartSetting
+            OpenCVB.ocvb.parms.fileStarted = OpenCVB.ocvb.parms.initialStartSetting
+            openFileStarted = OpenCVB.ocvb.parms.initialStartSetting
+            openFileFilterIndex = OpenCVB.ocvb.parms.openFileFilterIndex
+            openFileFilter = OpenCVB.ocvb.parms.openFileFilter
+            openFileDialogName = OpenCVB.ocvb.parms.openFileDialogName
+            openfileDialogTitle = OpenCVB.ocvb.parms.openFileDialogTitle
+            Console.WriteLine("active thread id = " + CStr(OpenCVB.ocvb.parms.activeThreadID))
 
-        ' Here we check to see if the algorithm constructor changed lowResolution.
-        If OpenCVB.ocvb.parms.resolution <> saveLowResSetting Then
-            If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
-            OpenCVB.ocvb.parms.imageTTTtextLoc = 1 / resizeForDisplay
-            If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.imageTTTtextLoc *= OpenCVB.ocvb.parms.speedFactor
-        End If
+            Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
+            Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + parms.activeAlgorithm + vbCrLf + vbCrLf)
 
-        ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
-        If OpenCVB.ocvb.drawRect <> New cv.Rect(0, 0, 0, 0) Then ' the constructor defined drawrect.  Adjust it because lowResolution selected
-            drawRect = OpenCVB.ocvb.drawRect
-            Dim ratio = OpenCVB.ocvb.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
-            drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
-        End If
+            ' Here we check to see if the algorithm constructor changed lowResolution.
+            If OpenCVB.ocvb.parms.resolution <> saveLowResSetting Then
+                If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
+                OpenCVB.ocvb.parms.imageTTTtextLoc = 1 / resizeForDisplay
+                If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.imageTTTtextLoc *= OpenCVB.ocvb.parms.speedFactor
+            End If
 
-        TTtextData.Clear()
+            ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
+            If OpenCVB.ocvb.drawRect <> New cv.Rect(0, 0, 0, 0) Then ' the constructor defined drawrect.  Adjust it because lowResolution selected
+                drawRect = OpenCVB.ocvb.drawRect
+                Dim ratio = OpenCVB.ocvb.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
+                drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
+            End If
 
-        BothFirstAndLastReady = False
-        frameCount = 0 ' restart the count...
-        If OpenCVB.ocvb.parms.NumPyEnabled Then
-            Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ and https://github.com/SciSharp/Numpy.NET (see multi-threading (Must read!))
+            TTtextData.Clear()
+
+            BothFirstAndLastReady = False
+            frameCount = 0 ' restart the count...
+            If OpenCVB.ocvb.parms.NumPyEnabled Then
+                Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ and https://github.com/SciSharp/Numpy.NET (see multi-threading (Must read!))
+                    Run(OpenCVB)
+                End Using
+            Else
                 Run(OpenCVB)
-            End Using
-        Else
-            Run(OpenCVB)
-        End If
+            End If
 
-        ' remove all options forms.  They can only be made topmost (see OptionsBringToFront above) when created on the same thread.
-        ' This deletes the options forms for the current thread so they can be created (if needed) with the next algorithm thread.
-        Try
-            Dim frmlist As New List(Of Form)
-            For Each frm In Application.OpenForms
-                If frm.name.startswith("Option") Then
-                    If OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frmlist.Add(frm)
-                    Console.WriteLine("Close: tag = " + CStr(frm.tag) + " threadid = " + CStr(OpenCVB.ocvb.parms.activeThreadID) + " form heading = " + frm.text)
-                End If
-            Next
-            For Each frm In frmlist
-                frm.Close()
-            Next
-        Catch ex As Exception
-            Console.WriteLine("Error removing an Options form: " + ex.Message)
-        End Try
+            ' remove all options forms.  They can only be made topmost (see OptionsBringToFront above) when created on the same thread.
+            ' This deletes the options forms for the current thread so they can be created (if needed) with the next algorithm thread.
+            Try
+                Dim frmlist As New List(Of Form)
+                For Each frm In Application.OpenForms
+                    If frm.name.startswith("Option") Then
+                        If OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frmlist.Add(frm)
+                        Console.WriteLine("Close: tag = " + CStr(frm.tag) + " threadid = " + CStr(OpenCVB.ocvb.parms.activeThreadID) + " form heading = " + frm.text)
+                    End If
+                Next
+                For Each frm In frmlist
+                    frm.Close()
+                Next
+            Catch ex As Exception
+                Console.WriteLine("Error removing an Options form: " + ex.Message)
+            End Try
 
-        OpenCVB.Dispose()
-        frameCount = 0
-        If parms.testAllRunning Then
-            Console.WriteLine(vbTab + "Ending " + parms.activeAlgorithm)
-        End If
+            OpenCVB.Dispose()
+            frameCount = 0
+            If parms.testAllRunning Then
+                Console.WriteLine(vbTab + "Ending " + parms.activeAlgorithm)
+            End If
+        End SyncLock
     End Sub
     Private Sub Run(OpenCVB As VB_Classes.ActiveClass)
         While 1
             ' wait until we have the latest camera data.
             While 1
+                If OpenCVB.ocvb.parms.activeAlgorithm <> saveAlgorithmName Then Exit Sub
                 If OpenCVB.ocvb.parms.activeThreadID <> activeThreadID Or stopAlgorithmThread Then Exit Sub
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 If camera.newImagesAvailable Then Exit While
