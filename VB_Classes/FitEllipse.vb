@@ -51,7 +51,6 @@ Public Class FitEllipse_Basics_CPP
 
             FitEllipse_Direct(srcHandle.AddrOfPinnedObject(), area.srcPoints.Count - 1, dstHandle.AddrOfPinnedObject)
             dstHandle.Free()
-            area.Dispose()
 
             angle = output.Get(Of Single)(0)
             center = New cv.Point2f(output.Get(Of Single)(1), output.Get(Of Single)(2))
