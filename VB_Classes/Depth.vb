@@ -300,6 +300,9 @@ Public Class Depth_WorldXYZ
         Next
         ocvb.putText(New TTtext("OpenGL data prepared.", 10, 50, RESULT1))
     End Sub
+    Public Sub Close()
+        xyzFrame.Dispose()
+    End Sub
 End Class
 
 
@@ -1281,7 +1284,7 @@ Public Class Depth_PointCloudInRange
         Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
         Mask = Mask.SetTo(0, zeroDepth)
 
-        dst1 = Mask
+        dst1 = Mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -1349,7 +1352,7 @@ Public Class Depth_PointCloudInRange_IMU
             cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxMeters), Mask)
             Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
             Mask = Mask.SetTo(0, zeroDepth)
-            If standalone Then dst1 = Mask
+            If standalone Then dst1 = Mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
     End Sub
 End Class

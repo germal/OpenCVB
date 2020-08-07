@@ -29,9 +29,10 @@ Public Class Retina_Basics_CPP
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Use log sampling"
         check.Box(1).Text = "Open resulting xml file"
-        ocvb.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
+
         label1 = "Retina Parvo"
         label2 = "Retina Magno"
+        ocvb.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(1).Checked Then
@@ -59,7 +60,13 @@ Public Class Retina_Basics_CPP
         Dim handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
-        Dim magnoPtr = Retina_Basics_Run(Retina, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleMagno.AddrOfPinnedObject(), useLogSampling)
+        Dim magnoPtr As IntPtr = 0
+        If ocvb.parms.testAllRunning = False Then
+            magnoPtr = Retina_Basics_Run(Retina, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleMagno.AddrOfPinnedObject(), useLogSampling)
+        Else
+            ocvb.putText(New TTtext("Retina_Basics_CPP runs fine but during 'Test All' it is not run because it can waste a lot of memory.", 10, 60, RESULT1))
+            dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1, 0)
+        End If
         handleSrc.Free()
 
         If magnoPtr <> 0 Then

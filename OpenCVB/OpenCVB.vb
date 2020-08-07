@@ -63,7 +63,6 @@ Public Class OpenCVB
     Dim optionsForm As OptionsDialog
     Dim openForm As OpenFilename
     Dim picLabels() = {"RGB", "Depth", "Result1", "Result2"}
-    Dim RefreshAvailable As Boolean = True ' This variable allows us to dodge a refresh from the system after a move.  There is no synclock around that system refresh.
     Dim regWidth As Int32 = 1280, regHeight As Int32 = 720
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Dim fastSize As cv.Size
@@ -811,8 +810,10 @@ Public Class OpenCVB
     End Sub
     Private Sub ActivateTimer_Tick(sender As Object, e As EventArgs) Handles ActivateTimer.Tick
         ActivateTimer.Enabled = False
-        If TestAllButton.Text <> "Stop Test" Then Me.Activate()
-        RefreshAvailable = True
+        If TestAllButton.Text <> "Stop Test" Then
+            Me.Activate()
+            AvailableAlgorithms.Select(AvailableAlgorithms.SelectedIndex, 1)
+        End If
     End Sub
     Public Sub raiseEventRefresh()
         SyncLock delegateLock
@@ -1234,30 +1235,28 @@ Public Class OpenCVB
 
                 picLabels(2) = OpenCVB.ocvb.label1
                 picLabels(3) = OpenCVB.ocvb.label2
-                If RefreshAvailable Then
-                    ' share the results of the algorithm task.
-                    SyncLock TTtextData
-                        If OpenCVB.ocvb.parms.keyInputAccepted Then keyboardInput = ""
-                        algorithmRefresh = True
-                        imgResult = OpenCVB.ocvb.result.Clone()
-                        TTtextData.Clear()
-                        Dim i = VB_Classes.ActiveClass.RESULT2
-                        If OpenCVB.ocvb.TTtextData(i).Count Then
-                            For j = 0 To OpenCVB.ocvb.TTtextData(i).Count - 1
-                                OpenCVB.ocvb.TTtextData(i)(j).x += OpenCVB.ocvb.color.Width
-                                OpenCVB.ocvb.TTtextData(2).Add(OpenCVB.ocvb.TTtextData(i)(j)) ' add any dst2 text to dst1 which is just double-wide
-                            Next
-                            OpenCVB.ocvb.TTtextData(i).Clear()
-                        End If
-                        i = VB_Classes.ActiveClass.RESULT1
-                        If OpenCVB.ocvb.TTtextData(i).Count Then
-                            For j = 0 To OpenCVB.ocvb.TTtextData(i).Count - 1
-                                TTtextData.Add(OpenCVB.ocvb.TTtextData(i)(j)) ' pull over any truetype text data so paint can access it.
-                            Next
-                            OpenCVB.ocvb.TTtextData(i).Clear()
-                        End If
-                    End SyncLock
-                End If
+                ' share the results of the algorithm task.
+                SyncLock TTtextData
+                    If OpenCVB.ocvb.parms.keyInputAccepted Then keyboardInput = ""
+                    algorithmRefresh = True
+                    imgResult = OpenCVB.ocvb.result.Clone()
+                    TTtextData.Clear()
+                    Dim i = VB_Classes.ActiveClass.RESULT2
+                    If OpenCVB.ocvb.TTtextData(i).Count Then
+                        For j = 0 To OpenCVB.ocvb.TTtextData(i).Count - 1
+                            OpenCVB.ocvb.TTtextData(i)(j).x += OpenCVB.ocvb.color.Width
+                            OpenCVB.ocvb.TTtextData(2).Add(OpenCVB.ocvb.TTtextData(i)(j)) ' add any dst2 text to dst1 which is just double-wide
+                        Next
+                        OpenCVB.ocvb.TTtextData(i).Clear()
+                    End If
+                    i = VB_Classes.ActiveClass.RESULT1
+                    If OpenCVB.ocvb.TTtextData(i).Count Then
+                        For j = 0 To OpenCVB.ocvb.TTtextData(i).Count - 1
+                            TTtextData.Add(OpenCVB.ocvb.TTtextData(i)(j)) ' pull over any truetype text data so paint can access it.
+                        Next
+                        OpenCVB.ocvb.TTtextData(i).Clear()
+                    End If
+                End SyncLock
                 If OptionsBringToFront And TestAllTimer.Enabled = False Then
                     OptionsBringToFront = False
                     Try

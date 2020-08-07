@@ -35,7 +35,6 @@ Partial Class OpenCVB
         Me.fpsTimer = New System.Windows.Forms.Timer(Me.components)
         Me.AlgorithmDesc = New System.Windows.Forms.Label()
         Me.OpenCVkeyword = New System.Windows.Forms.ComboBox()
-        Me.RestartCameraTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.keyholdTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1.SuspendLayout()
@@ -110,6 +109,7 @@ Partial Class OpenCVB
         '
         'ActivateTimer
         '
+        Me.ActivateTimer.Interval = 500
         '
         'fpsTimer
         '
@@ -132,10 +132,6 @@ Partial Class OpenCVB
         Me.OpenCVkeyword.Name = "OpenCVkeyword"
         Me.OpenCVkeyword.Size = New System.Drawing.Size(328, 28)
         Me.OpenCVkeyword.TabIndex = 3
-        '
-        'RestartCameraTimer
-        '
-        Me.RestartCameraTimer.Interval = 1000
         '
         'keyholdTimer
         '
@@ -171,7 +167,6 @@ Partial Class OpenCVB
     Friend WithEvents PausePlayButton As ToolStripButton
     Friend WithEvents SnapShotButton As ToolStripButton
     Friend WithEvents OpenCVkeyword As ComboBox
-    Friend WithEvents RestartCameraTimer As Timer
     Friend WithEvents ToolTip1 As ToolTip
     Friend WithEvents keyholdTimer As Timer
 End Class
