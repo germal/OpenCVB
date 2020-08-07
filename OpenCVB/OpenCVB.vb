@@ -67,7 +67,6 @@ Public Class OpenCVB
     Dim regWidth As Int32 = 1280, regHeight As Int32 = 720
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Dim fastSize As cv.Size
-    Dim stopAlgorithmThread As Boolean
     Dim stopCameraThread As Boolean
     Dim textDesc As String = ""
     Dim totalBytesOfMemoryUsed As Integer
@@ -83,6 +82,7 @@ Public Class OpenCVB
     Dim openfileDialogTitle As String
     Dim openfileSliderPercent As Single
     Dim openformLocated As Boolean
+    Dim pauseAlgorithmThread As Boolean
     Dim activeThreadID As Integer
     Private Delegate Sub delegateEvent()
 #End Region
@@ -553,7 +553,6 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "OpenCVkeyword", "OpenCVkeyword", OpenCVkeyword.Text)
     End Sub
     Private Sub OpenCVkeyword_SelectedIndexChanged(sender As Object, e As EventArgs) Handles OpenCVkeyword.SelectedIndexChanged
-        stopAlgorithmThread = True
         If OpenCVkeyword.Text = "<All>" Or OpenCVkeyword.Text = "<All using recorded data>" Then
             Dim AlgorithmListFileInfo = New FileInfo("../../Data/AlgorithmList.txt")
             Dim sr = New StreamReader(AlgorithmListFileInfo.FullName)
@@ -772,14 +771,17 @@ Public Class OpenCVB
     End Sub
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
         Static saveTestAllState As Boolean
-        If stopAlgorithmThread Then
-            stopAlgorithmThread = False
+        Static algorithmRunning = True
+        If PausePlayButton.Text = "Run" Then
+            PausePlayButton.Text = "Pause"
+            pauseAlgorithmThread = False
             If saveTestAllState Then testAllButton_Click(sender, e) Else StartAlgorithmTask()
             PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
         Else
+            PausePlayButton.Text = "Run"
+            pauseAlgorithmThread = True
             saveTestAllState = TestAllTimer.Enabled
             If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
-            stopAlgorithmThread = True
             PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButtonRun.png")
         End If
     End Sub
@@ -846,7 +848,6 @@ Public Class OpenCVB
         picLabels(1) = "Depth " + details
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        stopAlgorithmThread = True
         stopCameraThread = True
         Application.DoEvents()
         camera.closePipe()
@@ -904,8 +905,6 @@ Public Class OpenCVB
     End Sub
 
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-        If stopAlgorithmThread = True Then Exit Sub ' they have paused.
-
         ' if lowresolution is active and all the algorithms are covered, then switch to high res or vice versa...
         If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
             optionsForm.lowResolution.Checked = Not optionsForm.lowResolution.Checked
@@ -950,7 +949,6 @@ Public Class OpenCVB
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
         TestAllTimer.Enabled = False
-        stopAlgorithmThread = True
         Dim saveCurrentCamera = optionsForm.cameraIndex
 
         Dim OKcancel = optionsForm.ShowDialog()
@@ -990,7 +988,6 @@ Public Class OpenCVB
         Return True
     End Function
     Private Sub StartAlgorithmTask()
-        stopAlgorithmThread = True
         openForm.Hide()
         openForm.PlayButton.Text = "Start"
         openFileDialogName = ""
@@ -1031,8 +1028,6 @@ Public Class OpenCVB
         If parms.resolution = OptionsDialog.resMed Then parms.imageTTTtextLoc *= parms.speedFactor
 
         PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
-
-        stopAlgorithmThread = False
 
         imgResult = New cv.Mat(New cv.Size(fastSize.Width * 2, fastSize.Height), cv.MatType.CV_8UC3, 0)
 
@@ -1118,7 +1113,7 @@ Public Class OpenCVB
                 For Each frm In Application.OpenForms
                     If frm.name.startswith("Option") Then
                         If OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frmlist.Add(frm)
-                        Console.WriteLine("Close: tag = " + CStr(frm.tag) + " threadid = " + CStr(OpenCVB.ocvb.parms.activeThreadID) + " form heading = " + frm.text)
+                        ' Console.WriteLine("Close: tag = " + CStr(frm.tag) + " threadid = " + CStr(OpenCVB.ocvb.parms.activeThreadID) + " form heading = " + frm.text)
                     End If
                 Next
                 For Each frm In frmlist
@@ -1140,9 +1135,8 @@ Public Class OpenCVB
             ' wait until we have the latest camera data.
             While 1
                 If OpenCVB.ocvb.parms.activeAlgorithm <> saveAlgorithmName Then Exit Sub
-                If OpenCVB.ocvb.parms.activeThreadID <> activeThreadID Or stopAlgorithmThread Then Exit Sub
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
-                If camera.newImagesAvailable Then Exit While
+                If camera.newImagesAvailable And pauseAlgorithmThread = False Then Exit While
             End While
 
             If camera.color.width = 0 Or camera.RGBDepth.width = 0 Or camera.leftView.width = 0 Or camera.rightView.width = 0 Then Continue While
@@ -1269,7 +1263,7 @@ Public Class OpenCVB
                         For Each frm In Application.OpenForms
                             If frm.name.startswith("Option") Then
                                 If OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frm.topmost = True
-                                Console.WriteLine("BringToFont: tag = " + CStr(frm.tag) + " threadid = " + CStr(OpenCVB.ocvb.parms.activeThreadID) + " form heading = " + frm.text)
+                                'Console.WriteLine("BringToFont: tag = " + CStr(frm.tag) + " threadid = " + CStr(OpenCVB.ocvb.parms.activeThreadID) + " form heading = " + frm.text)
                             End If
                         Next
                         For Each frm In Application.OpenForms
@@ -1286,7 +1280,7 @@ Public Class OpenCVB
                 Exit While
             End Try
             Static delegateX As New delegateEvent(AddressOf raiseEventRefresh)
-            If stopAlgorithmThread = False Then Me.Invoke(delegateX)
+            Me.Invoke(delegateX)
 
             frameCount += 1
         End While
