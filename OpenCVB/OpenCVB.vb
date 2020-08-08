@@ -84,6 +84,8 @@ Public Class OpenCVB
     Dim pauseAlgorithmThread As Boolean
     Dim activeThreadID As Integer
     Private Delegate Sub delegateEvent()
+    Dim logAlgorithms As StreamWriter
+    Dim logActive As Boolean = True ' turn this on/off to collect data on algorithms and memory use.
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -788,11 +790,13 @@ Public Class OpenCVB
         If TestAllButton.Text = "Test All" Then
             TestAllButton.Text = "Stop Test"
             TestAllButton.Image = Image.FromFile("../../OpenCVB/Data/StopTest.png")
+            If logActive Then logAlgorithms = New StreamWriter("C:\Temp\logAlgorithms.csv")
             TestAllTimer_Tick(sender, e)
             TestAllTimer.Enabled = True
         Else
             TestAllTimer.Enabled = False
             TestAllButton.Text = "Test All"
+            If logActive Then logAlgorithms.Close()
             TestAllButton.Image = Image.FromFile("../../OpenCVB/Data/testall.png")
         End If
     End Sub
@@ -1080,6 +1084,8 @@ Public Class OpenCVB
 
             Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
             Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + parms.activeAlgorithm + vbCrLf + vbCrLf)
+
+            If logActive And TestAllTimer.Enabled Then logAlgorithms.WriteLine(parms.activeAlgorithm + "," + CStr(totalBytesOfMemoryUsed))
 
             ' Here we check to see if the algorithm constructor changed lowResolution.
             If OpenCVB.ocvb.parms.resolution <> saveLowResSetting Then
