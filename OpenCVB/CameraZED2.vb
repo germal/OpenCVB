@@ -86,7 +86,7 @@ Module Zed2_Interface
 End Module
 Public Class CameraZED2
     Inherits Camera
-
+    Public cameraName As String
     Structure intrinsicsLeftZed
         Dim fx As Single ' Focal length x */
         Dim fy As Single ' Focal length y */
@@ -107,6 +107,7 @@ Public Class CameraZED2
     Public Sub initialize(fps As Int32)
         cPtr = Zed2Open(width, height, 60)
         deviceName = "StereoLabs ZED 2"
+        cameraName = deviceName
         IMU_Present = True
         If cPtr <> 0 Then
             deviceCount = 1

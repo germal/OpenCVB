@@ -67,6 +67,7 @@ Structure T265IMUdata
 End Structure
 Public Class CameraT265
     Inherits Camera
+    Public cameraName As String
     Dim rawHeight As Int32
     Dim rawWidth As Int32
 
@@ -78,6 +79,7 @@ Public Class CameraT265
     End Sub
     Public Sub initialize(fps As Int32)
         deviceName = "Intel T265"
+        cameraName = deviceName
         deviceCount = 1
         IMU_Present = True
 

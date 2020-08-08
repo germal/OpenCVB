@@ -41,6 +41,7 @@ Module Kinect_Interface
 End Module
 Public Class CameraKinect
     Inherits Camera
+    Public cameraName As String
     Structure imuData
         Dim temperature As Single
         Dim imuAccel As cv.Point3f
@@ -69,6 +70,7 @@ Public Class CameraKinect
     Public Sub initialize(fps As Int32)
         cPtr = KinectOpen()
         deviceName = "Kinect for Azure"
+        cameraName = deviceName
         IMU_Present = True
         If cPtr <> 0 Then
             deviceCount = KinectDeviceCount(cPtr)

@@ -17,7 +17,7 @@ End Module
 'https://docs.opencv.org/3.4/d3/d86/tutorial_bioinspired_retina_model.html
 Public Class Retina_Basics_CPP
     Inherits ocvbClass
-    Dim Retina As IntPtr
+    Dim Retina As IntPtr = 0
     Dim startInfo As New ProcessStartInfo
     Dim magnoData(0) As Byte
     Dim srcData(0) As Byte
@@ -55,19 +55,20 @@ Public Class Retina_Basics_CPP
             ReDim srcData(src.Total * src.ElemSize - 1)
             useLogSampling = check.Box(0).Checked
             samplingFactor = sliders.trackbar(0).Value
-            Retina = Retina_Basics_Open(src.Rows, src.Cols, useLogSampling, samplingFactor)
+            If ocvb.parms.testAllRunning = False Then Retina = Retina_Basics_Open(src.Rows, src.Cols, useLogSampling, samplingFactor)
         End If
         Dim handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
-        Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim magnoPtr As IntPtr = 0
         If ocvb.parms.testAllRunning = False Then
+            Marshal.Copy(src.Data, srcData, 0, srcData.Length)
             magnoPtr = Retina_Basics_Run(Retina, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleMagno.AddrOfPinnedObject(), useLogSampling)
         Else
-            ocvb.putText(New TTtext("Retina_Basics_CPP runs fine but during 'Test All' it is not run because it can waste a lot of memory.", 10, 60, RESULT1))
+            ocvb.putText(New TTtext("Retina_Basics_CPP runs fine but during 'Test All' it is not run because it can oversubscribe OpenCL memory.", 10, 60, RESULT1))
             dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1, 0)
         End If
         handleSrc.Free()
+        handleMagno.Free()
 
         If magnoPtr <> 0 Then
             Dim nextFactor = samplingFactor
@@ -77,7 +78,7 @@ Public Class Retina_Basics_CPP
         End If
     End Sub
     Public Sub Close()
-        Retina_Basics_Close(Retina)
+        If Retina <> 0 Then Retina_Basics_Close(Retina)
     End Sub
 End Class
 

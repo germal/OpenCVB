@@ -10,7 +10,8 @@ Imports py = Python.Runtime
 Module opencv_module
     Public bufferLock As New PictureBox ' this is a global lock on the camera buffers.
     Public delegateLock As New PictureBox
-    Public algorithmThreadLock As New PictureBox
+    Public algorithmThreadLock As New List(Of Integer)
+    Public cameraThreadLock As New List(Of Integer)
 End Module
 Public Class OpenCVB
 #Region "Globals"
@@ -84,6 +85,7 @@ Public Class OpenCVB
     Dim pauseAlgorithmThread As Boolean
     Dim activeThreadID As Integer
     Private Delegate Sub delegateEvent()
+    Dim delegateX As New delegateEvent(AddressOf raiseEventCamera)
     Dim logAlgorithms As StreamWriter
     Dim logActive As Boolean = True ' turn this on/off to collect data on algorithms and memory use.
 #End Region
@@ -236,17 +238,17 @@ Public Class OpenCVB
                 Case "Intel RealSense D455"
                     cameraD455 = New CameraRS2
                     cameraD455.IMU_Present = True
-                    cameraD455.deviceName = deviceName
+                    cameraD455.cameraName = deviceName
                 Case "Intel RealSense D435I"
                     cameraD435i = New CameraRS2
                     cameraD435i.IMU_Present = True
-                    cameraD435i.deviceName = deviceName
+                    cameraD435i.cameraName = deviceName
                 Case "Intel RealSense L515"
                     cameraL515 = New CameraRS2
-                    cameraL515.deviceName = deviceName
+                    cameraL515.cameraName = deviceName
                 Case "Intel RealSense T265"
                     cameraT265 = New CameraT265
-                    cameraT265.deviceName = deviceName
+                    cameraL515.cameraName = deviceName
             End Select
         Next
         cameraKinect = New CameraKinect
@@ -377,15 +379,13 @@ Public Class OpenCVB
     End Sub
     Private Sub RestartCamera()
         camera.closePipe()
-        stopCameraThread = True
-        If threadStop(camera.frameCount) = False Then cameraTaskHandle.Abort()
         cameraTaskHandle = Nothing
         updateCamera()
     End Sub
     Public Sub updateCamera()
         ' order is same as in optionsdialog enum
         camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraT265, cameraZed2, cameraMyntD, cameraD435i, cameraL515, cameraD455)
-        If camera.devicename = "" Or camera.devicename.startswith("Intel RealSense") Then
+        If camera.devicename = "" Then
             camera.width = regWidth
             camera.height = regHeight
             camera.initialize(fps)
@@ -819,9 +819,11 @@ Public Class OpenCVB
             AvailableAlgorithms.Select(AvailableAlgorithms.SelectedIndex, 1)
         End If
     End Sub
-    Public Sub raiseEventRefresh()
+    Public Sub raiseEventCamera()
         SyncLock delegateLock
-            Me.Refresh()
+            For i = 0 To displayFrames - 1
+                camPic(i).Refresh()
+            Next
         End SyncLock
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
@@ -855,9 +857,9 @@ Public Class OpenCVB
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopCameraThread = True
         saveAlgorithmName = "" ' this will stop the current algorithm.
+        If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
         Application.DoEvents()
         camera.closePipe()
-        If threadStop(frameCount) = False Then algorithmTaskHandle.Abort()
         textDesc = ""
         saveLayout()
     End Sub
@@ -896,18 +898,21 @@ Public Class OpenCVB
         Clipboard.SetImage(img)
     End Sub
     Private Sub CameraTask()
-        While stopCameraThread = False
-            camera.GetNextFrame()
-            cameraRefresh = True
+        stopCameraThread = True ' stop the current camera task
+        SyncLock cameraThreadLock
+            stopCameraThread = False
+            While stopCameraThread = False
+                camera.GetNextFrame()
+                cameraRefresh = True
 
-            Static delegateX As New delegateEvent(AddressOf raiseEventRefresh)
-            If stopCameraThread = False Then Me.Invoke(delegateX)
+                Me.Invoke(delegateX)
 
-            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
-            totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
-            GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
-        End While
-        camera.frameCount = 0
+                Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+                totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
+                GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
+            End While
+            camera.frameCount = 0
+        End SyncLock
     End Sub
 
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
@@ -979,20 +984,6 @@ Public Class OpenCVB
         End If
         StartAlgorithmTask()
     End Sub
-    Private Function threadStop(ByRef frame As Int32) As Boolean
-        Dim sleepCount As Int32
-        ' some algorithms can take a long time to finish a single iteration.  
-        ' Each algorithm must run dispose() - to kill options forms and external Python or OpenGL taskes.  Wait until thread exit and framecount = 0...
-        SyncLock delegateLock
-            While 1
-                If frame = 0 Then Exit While
-                Thread.Sleep(10)  ' to allow the algorithm task to gracefully end and dispose OpenCVB.
-                sleepCount += 1
-                If sleepCount > 200 Then Return False
-            End While
-        End SyncLock
-        Return True
-    End Function
     Private Sub StartAlgorithmTask()
         openForm.Hide()
         openForm.PlayButton.Text = "Start"
@@ -1040,7 +1031,6 @@ Public Class OpenCVB
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
 
         If cameraTaskHandle Is Nothing Then
-            stopCameraThread = False
             cameraTaskHandle = New Thread(AddressOf CameraTask)
             cameraTaskHandle.Name = "CameraTask"
             cameraTaskHandle.Priority = ThreadPriority.Highest
@@ -1284,8 +1274,6 @@ Public Class OpenCVB
                 Console.WriteLine("Error in AlgorithmTask: " + ex.Message)
                 Exit While
             End Try
-            Static delegateX As New delegateEvent(AddressOf raiseEventRefresh)
-            Me.Invoke(delegateX)
 
             frameCount += 1
         End While

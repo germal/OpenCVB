@@ -70,6 +70,7 @@ Module MyntD_Interface
 End Module
 Public Class CameraMyntD
     Inherits Camera
+    Public cameraName As String
     Structure MyntIntrinsics
         Dim width As UShort
         Dim height As UShort
@@ -95,7 +96,8 @@ Public Class CameraMyntD
     End Sub
     Public Sub initialize(fps As Int32)
         cPtr = MyntDOpen(width, height, 30)
-        MyBase.deviceName = "MyntEyeD 1000"
+        deviceName = "MyntEyeD 1000"
+        cameraName = deviceName
         If cPtr <> 0 Then
             deviceCount = 1
 

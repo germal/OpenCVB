@@ -143,7 +143,6 @@
   <ItemGroup>
     <Compile Include="Camera.vb" />
     <Compile Include="CameraRS2.vb" />
-    <Compile Include="CameraD400VB.vb" />
     <Compile Include="CameraMyntD.vb" />
     <Compile Include="CameraT265.vb" />
     <Compile Include="OpenFilename.Designer.vb">

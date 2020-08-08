@@ -75,6 +75,7 @@ Public Class CameraRS2
     Dim intrinsicsLeft As rs.Intrinsics
     Public pc As New rs.PointCloud
     Dim lidarCam As Boolean
+    Public cameraName As String
     Dim lidarRect As New cv.Rect
     Dim lidarWidth = 1024
     Dim depthScale As Single
@@ -89,6 +90,7 @@ Public Class CameraRS2
         Return Devices(index).Info(0)
     End Function
     Public Sub initialize(fps As Int32)
+        deviceName = cameraName ' devicename is used to determine that the camera has been initialized.
         lidarCam = If(deviceName = "Intel RealSense L515", True, False)
         cPtr = RS2Open(width, height, IMU_Present, lidarCam)
         depthScale = RS2DepthScale(cPtr) * 1000
