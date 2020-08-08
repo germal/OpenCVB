@@ -85,7 +85,6 @@ Public Class OpenCVB
     Dim pauseAlgorithmThread As Boolean
     Dim activeThreadID As Integer
     Private Delegate Sub delegateEvent()
-    Dim delegateX As New delegateEvent(AddressOf raiseEventCamera)
     Dim logAlgorithms As StreamWriter
     Dim logActive As Boolean = True ' turn this on/off to collect data on algorithms and memory use.
 #End Region
@@ -905,6 +904,7 @@ Public Class OpenCVB
                 camera.GetNextFrame()
                 cameraRefresh = True
 
+                Static delegateX As New delegateEvent(AddressOf raiseEventCamera)
                 Me.Invoke(delegateX)
 
                 Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
