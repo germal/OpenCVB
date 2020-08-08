@@ -120,7 +120,7 @@ Public Class Binarize_Bernson
 
         label1 = "Binarize Bernson (Draw Enabled)"
 
-        ' ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
+        ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
         ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
