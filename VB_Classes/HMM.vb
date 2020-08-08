@@ -19,14 +19,18 @@ End Module
 'https://github.com/omidsakhi/cv-hmm
 Public Class HMM_Example_CPP
     Inherits ocvbClass
-    Dim HMM As IntPtr
+    Dim HMM As IntPtr = 0
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        HMM = HMM_Open()
+        If ocvb.parms.testAllRunning = False Then HMM = HMM_Open()
         label1 = "Text output with explanation will appear in the Visual Studio output."
         ocvb.desc = "Simple test of Hidden Markov Model - text output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.parms.testAllRunning Then
+            ocvb.putText(New TTtext("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.", 10, 60, RESULT1))
+            Exit Sub
+        End If
         Dim src = ocvb.color
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
@@ -37,7 +41,7 @@ Public Class HMM_Example_CPP
         If imagePtr <> 0 Then dst1 = New cv.Mat(src.Rows, src.Cols, IIf(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr)
     End Sub
     Public Sub Close()
-        HMM_Close(HMM)
+        If HMM <> 0 Then HMM_Close(HMM)
     End Sub
 End Class
 
