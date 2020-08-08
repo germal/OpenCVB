@@ -217,7 +217,7 @@ Public Class Blob_Rectangles
         Next
         Static blobCount As Int32
         Dim blobsToShow = Math.Min(3, blobs.rects.Count - 1)
-        If blobCount <> blobsToShow Then
+        If blobCount <> blobsToShow And blobsToShow > 0 Then
             blobCount = blobsToShow
             ReDim kalman(blobsToShow - 1)
             For i = 0 To blobsToShow - 1
