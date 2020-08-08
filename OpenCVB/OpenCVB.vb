@@ -1057,7 +1057,7 @@ Public Class OpenCVB
         fpsTimer.Enabled = True
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
-        SyncLock algorithmThreadLock
+        SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
 
             AlgorithmTestCount += 1
             drawRect = New cv.Rect
@@ -1077,7 +1077,6 @@ Public Class OpenCVB
             openFileFilter = OpenCVB.ocvb.parms.openFileFilter
             openFileDialogName = OpenCVB.ocvb.parms.openFileDialogName
             openfileDialogTitle = OpenCVB.ocvb.parms.openFileDialogTitle
-            Console.WriteLine("active thread id = " + CStr(OpenCVB.ocvb.parms.activeThreadID))
 
             Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
             Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + parms.activeAlgorithm + vbCrLf + vbCrLf)

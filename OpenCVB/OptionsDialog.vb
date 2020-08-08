@@ -82,7 +82,7 @@ Public Class OptionsDialog
 
         ShowLabels.Checked = GetSetting("OpenCVB", "ShowLabels", "ShowLabels", False)
 
-        TestAllDuration.Value = GetSetting("OpenCVB", "TestAllDuration", "TestAllDuration", 10)
+        TestAllDuration.Value = GetSetting("OpenCVB", "TestAllDuration", "TestAllDuration", 1)
         SnapToGrid.Checked = GetSetting("OpenCVB", "SnapToGrid", "SnapToGrid", True)
         ShowConsoleLog.Checked = GetSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", False)
         EnableNumPy.Checked = False ' GetSetting("OpenCVB", "EnableNumPy", "EnableNumPy", False)
@@ -127,7 +127,7 @@ Public Class OptionsDialog
     End Sub
 
     Private Sub TestAllDuration_ValueChanged(sender As Object, e As EventArgs) Handles TestAllDuration.ValueChanged
-        If TestAllDuration.Value < 5 Then TestAllDuration.Value = 5
+        If TestAllDuration.Value < 1 Then TestAllDuration.Value = 1
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
