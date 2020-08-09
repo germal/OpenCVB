@@ -733,12 +733,6 @@ Public Class OpenCVB
             Console.WriteLine("Error in camPic_MouseMove: " + ex.Message)
         End Try
     End Sub
-    'Private Sub AvailableAlgorithms_KeyDown(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyDown
-    '    e.SuppressKeyPress = True
-    'End Sub
-    'Private Sub OpenCVkeyword_KeyDown(sender As Object, e As KeyEventArgs) Handles OpenCVkeyword.KeyDown
-    '    e.SuppressKeyPress = True
-    'End Sub
     Private Sub keyholdTimer_Tick(sender As Object, e As EventArgs) Handles keyholdTimer.Tick
         keyboardInput += keyboardLastInput ' press and hold means send this key again...
     End Sub
@@ -807,6 +801,7 @@ Public Class OpenCVB
     End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If AvailableAlgorithms.Enabled Then
+            If PausePlayButton.Text = "Run" Then ToolStripButton1_Click(sender, e) ' if paused, then restart.
             SaveSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Text)
             StartAlgorithmTask()
         End If

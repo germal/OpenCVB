@@ -84,7 +84,6 @@ Public Class SuperPixel_BinarizedImage
         setCaller(ocvb)
 
         binarize = New Binarize_Basics(ocvb)
-        binarize.blurRequest = True
 
         pixels = New SuperPixel_Basics_CPP(ocvb)
         pixels.gridColor = cv.Scalar.Red
@@ -101,6 +100,7 @@ Public Class SuperPixel_BinarizedImage
         pixels.Run(ocvb)
         dst1 = pixels.dst1
         dst2 = pixels.dst2
+        dst2.SetTo(cv.Scalar.White, pixels.wireGrid)
     End Sub
 End Class
 

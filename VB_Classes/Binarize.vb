@@ -11,23 +11,29 @@ Public Class Binarize_Basics
     Public maxRange = 255
     Public histogram As cv.Mat
     Public meanScalar As cv.Scalar
-    Public blurRequest As Boolean
+    Dim blur As Blur_Gaussian
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
+        blur = New Blur_Gaussian(ocvb)
+
         ocvb.desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then
-            meanScalar = cv.Cv2.Mean(src)
-            blurRequest = True
-        End If
+        Static blurKernelSlider = findSlider("Blur Kernel Size")
+        If standalone Then meanScalar = cv.Cv2.Mean(src)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim dimensions() = New Integer() {maxRange}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-        If blurRequest Then src = src.Blur(New cv.Size(5, 5), New cv.Point(3, 3)) ' just blur the last one...
         histogram = New cv.Mat
-        cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat(), histogram, 1, dimensions, ranges)
-        dst1 = src.Threshold(meanScalar(0), 255, thresholdType).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim histInput = src
+        If blurKernelSlider.value > 0 Then
+            blur.src = src
+            blur.Run(ocvb)
+            histInput = blur.dst1
+            cv.Cv2.ImShow("Blur", blur.dst1)
+        End If
+        cv.Cv2.CalcHist(New cv.Mat() {histInput}, New Integer() {0}, New cv.Mat(), histogram, 1, dimensions, ranges)
+        dst1 = histInput.Threshold(meanScalar(0), 255, thresholdType).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -60,10 +66,13 @@ Public Class Binarize_OTSU
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         binarize.meanScalar = cv.Cv2.Mean(src)
         binarize.src = src
+        Static blurkernelslider = findSlider("Blur Kernel Size")
+        Dim kernelsize = blurkernelslider.value
+        blurkernelslider.value = 0
         For i = 0 To 4 - 1
             binarize.thresholdType = Choose(i + 1, cv.ThresholdTypes.Binary, cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu,
                                             cv.ThresholdTypes.Otsu, cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu)
-            If i = 3 Then binarize.blurRequest = True
+            If i = 3 Then blurkernelslider.value = kernelsize ' only blur the last request 
             binarize.Run(ocvb)
             mats1.mat(i) = binarize.dst1.Clone()
             plotHist.hist = binarize.histogram.Clone()
