@@ -1,43 +1,74 @@
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.XImgProc
 
+' https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
+' https://www.learnopencv.com/otsu-thresholding-with-opencv/?ck_subscriber_id=785741175
+' https://github.com/spmallick/learnopencv/tree/master/otsu-method?ck_subscriber_id=785741175
+Public Class Binarize_Basics
+    Inherits ocvbClass
+    Public thresholdType = cv.ThresholdTypes.Otsu
+    Public minRange = 0
+    Public maxRange = 255
+    Public histogram As cv.Mat
+    Public meanScalar As cv.Scalar
+    Public blurRequest As Boolean
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        ocvb.desc = "Binarize an image using Threshold with OTSU."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If standalone Then
+            meanScalar = cv.Cv2.Mean(src)
+            blurRequest = True
+        End If
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim dimensions() = New Integer() {maxRange}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
+        If blurRequest Then src = src.Blur(New cv.Size(5, 5), New cv.Point(3, 3)) ' just blur the last one...
+        histogram = New cv.Mat
+        cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat(), histogram, 1, dimensions, ranges)
+        dst1 = src.Threshold(meanScalar(0), 255, thresholdType).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+    End Sub
+End Class
+
+
+
+
+
 'https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
 Public Class Binarize_OTSU
     Inherits ocvbClass
     Dim mats1 As Mat_4to1
     Dim mats2 As Mat_4to1
     Dim plotHist As Plot_Histogram
+    Dim binarize As Binarize_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
+        binarize = New Binarize_Basics(ocvb)
+
         plotHist = New Plot_Histogram(ocvb)
 
         mats1 = New Mat_4to1(ocvb)
         mats2 = New Mat_4to1(ocvb)
 
-        ocvb.desc = "Binarize an image using Threshold with OTSU."
+        label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
         label2 = "Histograms correspond to images on the left"
+        ocvb.desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst2.SetTo(0)
-        Dim width = src.Width, height = src.Height
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim meanScalar = cv.Cv2.Mean(src)
-        label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
-        plotHist.bins = 255
-        Dim dimensions() = New Integer() {plotHist.bins}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.bins)}
-        Dim histogram(3) As cv.Mat
-
-        For i = 0 To histogram.Length - 1
-            histogram(i) = New cv.Mat
-            If i = histogram.Length - 1 Then src = src.Blur(New cv.Size(5, 5), New cv.Point(3, 3)) ' just blur the last one...
-            cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat(), histogram(i), 1, dimensions, ranges)
-            plotHist.hist = histogram(i).Clone()
+        binarize.meanScalar = cv.Cv2.Mean(src)
+        binarize.src = src
+        For i = 0 To 4 - 1
+            binarize.thresholdType = Choose(i + 1, cv.ThresholdTypes.Binary, cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu,
+                                            cv.ThresholdTypes.Otsu, cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu)
+            If i = 3 Then binarize.blurRequest = True
+            binarize.Run(ocvb)
+            mats1.mat(i) = binarize.dst1.Clone()
+            plotHist.hist = binarize.histogram.Clone()
             plotHist.Run(ocvb)
-            mats2.mat(i) = plotHist.dst1
-            Dim thresholdType = Choose(i + 1, cv.ThresholdTypes.Binary, cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu,
-                                              cv.ThresholdTypes.Otsu, cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu)
-            mats1.mat(i) = src.Threshold(meanScalar(0), 255, thresholdType).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            mats2.mat(i) = plotHist.dst1.Clone()
         Next
 
         mats1.Run(ocvb)
@@ -46,6 +77,7 @@ Public Class Binarize_OTSU
         dst2 = mats2.dst1
     End Sub
 End Class
+
 
 
 

@@ -23,6 +23,8 @@ End Module
 Public Class SuperPixel_Basics_CPP
     Inherits ocvbClass
     Dim spPtr As IntPtr = 0
+    Public wireGrid As cv.Mat
+    Public gridColor = cv.Scalar.White
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
@@ -53,8 +55,8 @@ Public Class SuperPixel_Basics_CPP
 
         If imagePtr <> 0 Then
             dst1 = src
-            dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
-            dst1.SetTo(cv.Scalar.White, dst2)
+            wireGrid = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
+            dst1.SetTo(gridColor, wireGrid)
         End If
 
         Dim labelData(src.Total * 4 - 1) As Byte ' labels are 32-bit integers.
@@ -66,6 +68,39 @@ Public Class SuperPixel_Basics_CPP
     End Sub
     Public Sub Close()
         SuperPixel_Close(spPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class SuperPixel_BinarizedImage
+    Inherits ocvbClass
+    Dim pixels As SuperPixel_Basics_CPP
+    Dim binarize As Binarize_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        binarize = New Binarize_Basics(ocvb)
+        binarize.blurRequest = True
+
+        pixels = New SuperPixel_Basics_CPP(ocvb)
+        pixels.gridColor = cv.Scalar.Red
+        Static pixelCountSlider = findSlider("Number of SuperPixels")
+        pixelCountSlider.value = 20 ' find the top 20 super pixels.
+
+        ocvb.desc = "Create SuperPixels from a binary image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        binarize.src = src
+        binarize.Run(ocvb)
+
+        pixels.src = binarize.dst1
+        pixels.Run(ocvb)
+        dst1 = pixels.dst1
+        dst2 = pixels.dst2
     End Sub
 End Class
 
