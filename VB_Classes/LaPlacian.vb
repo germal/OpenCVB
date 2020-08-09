@@ -25,6 +25,9 @@ Public Class Laplacian_Basics
 End Class
 
 
+
+
+
 ' https://docs.opencv.org/3.2.0/de/db2/laplace_8cpp-example.html
 Public Class Laplacian_Blur
     Inherits ocvbClass
@@ -66,3 +69,41 @@ Public Class Laplacian_Blur
     End Sub
 End Class
 
+
+
+
+
+
+' http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.54.299
+Public Class Laplacian_PyramidFilter
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.Setup(ocvb, caller, 6)
+        sliders.setupTrackBar(0, "Sharpest", 0, 10, 1)
+        sliders.setupTrackBar(1, "blurryMin", 0, 10, 1)
+        sliders.setupTrackBar(2, "blurryMed1", 0, 10, 1)
+        sliders.setupTrackBar(3, "blurryMed2", 0, 10, 1)
+        sliders.setupTrackBar(4, "blurryMax", 0, 10, 1)
+        sliders.setupTrackBar(5, "Saturate", 0, 10, 1)
+        ocvb.desc = "VB.Net version of the Laplacian Pyramid Filter - see reference."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim levelMat(sliders.trackbar.Length - 1) As cv.Mat
+        Dim img As New cv.Mat
+        src.ConvertTo(img, cv.MatType.CV_32F)
+        For i = 0 To sliders.trackbar.Length - 2
+            Dim nextImg = img.PyrDown()
+            levelMat(i) = (img - nextImg.PyrUp(img.Size)) * sliders.trackbar(i).Value
+            img = nextImg
+        Next
+        levelMat(sliders.trackbar.Length - 1) = img * sliders.trackbar(sliders.trackbar.Length - 1).Value
+
+        img = levelMat(sliders.trackbar.Length - 1)
+        For i = sliders.trackbar.Length - 1 To 1 Step -1
+            img = img.PyrUp(levelMat(i - 1).Size)
+            img += levelMat(i - 1)
+        Next
+        img.ConvertTo(dst1, cv.MatType.CV_8UC3)
+    End Sub
+End Class

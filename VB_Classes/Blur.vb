@@ -172,7 +172,7 @@ Public Class Blur_PlusHistogram
         blur = New Blur_Bilateral(ocvb)
         myhist = New Histogram_EqualizeGray(ocvb)
 
-        label1 = "Use Blue slider to see impact on top histogram"
+        label1 = "Use Blur slider to see impact on histograms"
         label2 = "Top is before equalize, Bottom is after Equalize"
         ocvb.desc = "Compound algorithms Blur and Histogram"
     End Sub
