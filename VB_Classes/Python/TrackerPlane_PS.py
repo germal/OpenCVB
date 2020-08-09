@@ -59,25 +59,26 @@ TrackedTarget = namedtuple('TrackedTarget', 'target, p0, p1, H, quad')
 
 class PlaneTracker:
     def __init__(self):
-        self.detector = cv.ORB_create( nfeatures = 1000 )
+        self.detector = cv.ORB_create( nfeatures = 100 )
         self.matcher = cv.FlannBasedMatcher(flann_params, {})  # bug : need to pass empty dict (#1329)
         self.targets = []
         self.frame_points = []
 
     def add_target(self, image, rect, data=None):
+        print("Flann has been failing here recently.  Not sure why.  Needs work here.")
         '''Add a new tracking target.'''
-        x0, y0, x1, y1 = rect
-        raw_points, raw_descrs = self.detect_features(image)
-        points, descs = [], []
-        for kp, desc in zip(raw_points, raw_descrs):
-            x, y = kp.pt
-            if x0 <= x <= x1 and y0 <= y <= y1:
-                points.append(kp)
-                descs.append(desc)
-        descs = np.uint8(descs)
-        self.matcher.add([descs])
-        target = PlanarTarget(image = image, rect=rect, keypoints = points, descrs=descs, data=data)
-        self.targets.append(target)
+        #x0, y0, x1, y1 = rect
+        #raw_points, raw_descrs = self.detect_features(image)
+        #points, descs = [], []
+        #for kp, desc in zip(raw_points, raw_descrs):
+        #    x, y = kp.pt
+        #    if x0 <= x <= x1 and y0 <= y <= y1:
+        #        points.append(kp)
+        #        descs.append(desc)
+        #descs = np.uint8(descs)
+        #self.matcher.add([descs])
+        #target = PlanarTarget(image = image, rect=rect, keypoints = points, descrs=descs, data=data)
+        #self.targets.append(target)
 
     def clear(self):
         '''Remove all targets'''
@@ -136,7 +137,7 @@ class App:
         cv.namedWindow(title_window)
         self.rect_sel = common.RectSelector(title_window, self.on_rect)
         from PyStream import PyStreamRun
-        PyStreamRun(self.OpenCVCode, 'PlaneTracker_PS.py')
+        PyStreamRun(self.OpenCVCode, 'TrackerPlane_PS.py')
 
     def on_rect(self, rect):
         self.tracker.add_target(self.frame, rect)

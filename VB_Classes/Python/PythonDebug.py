@@ -1,179 +1,167 @@
 '''
-SVM and KNearest digit recognition.
+Multitarget planar tracking
+==================
 
-Sample loads a dataset of handwritten digits from 'digits.png'.
-Then it trains a SVM and KNearest classifiers on it and evaluates
-their accuracy.
+Example of using features2d framework for interactive video homography matching.
+ORB features and FLANN matcher are used. This sample provides PlaneTracker class
+and an example of its usage.
 
-Following preprocessing is applied to the dataset:
- - Moment-based image deskew (see deskew())
- - Digit images are split into 4 10x10 cells and 16-bin
-   histogram of oriented gradients is computed for each
-   cell
- - Transform histograms to space with Hellinger metric (see [1] (RootSIFT))
+video: http://www.youtube.com/watch?v=pzVbhxx6aog
 
+Usage
+-----
+PlaneTracker_PS.py 
 
-[1] R. Arandjelovic, A. Zisserman
-    "Three things everyone should know to improve object retrieval"
-    http://www.robots.ox.ac.uk/~vgg/publications/2012/Arandjelovic12/arandjelovic12.pdf
+Keys:
+   SPACE  -  pause video
+   c      -  clear targets
 
-Usage:
-   Digits_SVM_KNearest.py
+Select a textured planar object to track by drawing a box with a mouse.
 '''
+
+import sys
 import numpy as np
 import cv2 as cv
-title_window = 'Digits_SVM_KNearest.py'
+title_window = "PlaneDetector_PS.py"
 
 # built-in modules
-from multiprocessing.pool import ThreadPool
-
-from numpy.linalg import norm
+from collections import namedtuple
 
 # local modules
-from common import clock, mosaic
+import common
 
-SZ = 20 # size of each digit is SZ x SZ
-CLASS_N = 10
-DIGITS_FN = '../../Data/digits.png'
+FLANN_INDEX_KDTREE = 1
+FLANN_INDEX_LSH    = 6
+flann_params= dict(algorithm = FLANN_INDEX_LSH,
+                   table_number = 6, # 12
+                   key_size = 12,     # 20
+                   multi_probe_level = 1) #2
 
-def split2d(img, cell_size, flatten=True):
-    h, w = img.shape[:2]
-    sx, sy = cell_size
-    cells = [np.hsplit(row, w//sx) for row in np.vsplit(img, h//sy)]
-    cells = np.array(cells)
-    if flatten:
-        cells = cells.reshape(-1, sy, sx)
-    return cells
+MIN_MATCH_COUNT = 10
 
-def load_digits(fn):
-    fn = cv.samples.findFile(fn)
-    print('loading "%s" ...' % fn)
-    digits_img = cv.imread(fn, cv.IMREAD_GRAYSCALE)
-    digits = split2d(digits_img, (SZ, SZ))
-    labels = np.repeat(np.arange(CLASS_N), len(digits)/CLASS_N)
-    return digits, labels
+'''
+  image     - image to track
+  rect      - tracked rectangle (x1, y1, x2, y2)
+  keypoints - keypoints detected inside rect
+  descrs    - their descriptors
+  data      - some user-provided data
+'''
+PlanarTarget = namedtuple('PlaneTarget', 'image, rect, keypoints, descrs, data')
 
-def deskew(img):
-    m = cv.moments(img)
-    if abs(m['mu02']) < 1e-2:
-        return img.copy()
-    skew = m['mu11']/m['mu02']
-    M = np.float32([[1, skew, -0.5*SZ*skew], [0, 1, 0]])
-    img = cv.warpAffine(img, M, (SZ, SZ), flags=cv.WARP_INVERSE_MAP | cv.INTER_LINEAR)
-    return img
+'''
+  target - reference to PlanarTarget
+  p0     - matched points coords in target image
+  p1     - matched points coords in input frame
+  H      - homography matrix from p0 to p1
+  quad   - target boundary quad in input frame
+'''
+TrackedTarget = namedtuple('TrackedTarget', 'target, p0, p1, H, quad')
 
-class StatModel(object):
-    def load(self, fn):
-        self.model.load(fn)  # Known bug: https://github.com/opencv/opencv/issues/4969
-    def save(self, fn):
-        self.model.save(fn)
+class PlaneTracker:
+    def __init__(self):
+        self.detector = cv.ORB_create( nfeatures = 100 )
+        self.matcher = cv.FlannBasedMatcher(flann_params, {})  # bug : need to pass empty dict (#1329)
+        self.targets = []
+        self.frame_points = []
 
-class KNearest(StatModel):
-    def __init__(self, k = 3):
-        self.k = k
-        self.model = cv.ml.KNearest_create()
+    def add_target(self, image, rect, data=None):
+        print("Flann has been failing here recently.  Not sure why.  Needs work here.")
+        '''Add a new tracking target.'''
+        #x0, y0, x1, y1 = rect
+        #raw_points, raw_descrs = self.detect_features(image)
+        #points, descs = [], []
+        #for kp, desc in zip(raw_points, raw_descrs):
+        #    x, y = kp.pt
+        #    if x0 <= x <= x1 and y0 <= y <= y1:
+        #        points.append(kp)
+        #        descs.append(desc)
+        #descs = np.uint8(descs)
+        #self.matcher.add([descs])
+        #target = PlanarTarget(image = image, rect=rect, keypoints = points, descrs=descs, data=data)
+        #self.targets.append(target)
 
-    def train(self, samples, responses):
-        self.model.train(samples, cv.ml.ROW_SAMPLE, responses)
+    def clear(self):
+        '''Remove all targets'''
+        self.targets = []
+        self.matcher.clear()
 
-    def predict(self, samples):
-        _retval, results, _neigh_resp, _dists = self.model.findNearest(samples, self.k)
-        return results.ravel()
+    def track(self, frame):
+        '''Returns a list of detected TrackedTarget objects'''
+        self.frame_points, frame_descrs = self.detect_features(frame)
+        if len(self.frame_points) < MIN_MATCH_COUNT:
+            return []
+        matches = self.matcher.knnMatch(frame_descrs, k = 2)
+        matches = [m[0] for m in matches if len(m) == 2 and m[0].distance < m[1].distance * 0.75]
+        if len(matches) < MIN_MATCH_COUNT:
+            return []
+        matches_by_id = [[] for _ in range(len(self.targets))]
+        for m in matches:
+            matches_by_id[m.imgIdx].append(m)
+        tracked = []
+        for imgIdx, matches in enumerate(matches_by_id):
+            if len(matches) < MIN_MATCH_COUNT:
+                continue
+            target = self.targets[imgIdx]
+            p0 = [target.keypoints[m.trainIdx].pt for m in matches]
+            p1 = [self.frame_points[m.queryIdx].pt for m in matches]
+            p0, p1 = np.float32((p0, p1))
+            H, status = cv.findHomography(p0, p1, cv.RANSAC, 3.0)
+            status = status.ravel() != 0
+            if status.sum() < MIN_MATCH_COUNT:
+                continue
+            p0, p1 = p0[status], p1[status]
 
-class SVM(StatModel):
-    def __init__(self, C = 1, gamma = 0.5):
-        self.model = cv.ml.SVM_create()
-        self.model.setGamma(gamma)
-        self.model.setC(C)
-        self.model.setKernel(cv.ml.SVM_RBF)
-        self.model.setType(cv.ml.SVM_C_SVC)
+            x0, y0, x1, y1 = target.rect
+            quad = np.float32([[x0, y0], [x1, y0], [x1, y1], [x0, y1]])
+            quad = cv.perspectiveTransform(quad.reshape(1, -1, 2), H).reshape(-1, 2)
 
-    def train(self, samples, responses):
-        self.model.train(samples, cv.ml.ROW_SAMPLE, responses)
+            track = TrackedTarget(target=target, p0=p0, p1=p1, H=H, quad=quad)
+            tracked.append(track)
+        tracked.sort(key = lambda t: len(t.p0), reverse=True)
+        return tracked
 
-    def predict(self, samples):
-        return self.model.predict(samples)[1].ravel()
+    def detect_features(self, frame):
+        '''detect_features(self, frame) -> keypoints, descrs'''
+        keypoints, descrs = self.detector.detectAndCompute(frame, None)
+        if descrs is None:  # detectAndCompute returns descs=None if not keypoints found
+            descrs = []
+        return keypoints, descrs
 
 
-def evaluate_model(model, digits, samples, labels):
-    resp = model.predict(samples)
-    err = (labels != resp).mean()
-    print('error: %.2f %%' % (err*100))
+class App:
+    def Open(self):
+        self.frame = None
+        self.paused = False
+        self.tracker = PlaneTracker()
 
-    confusion = np.zeros((10, 10), np.int32)
-    for i, j in zip(labels, resp):
-        confusion[i, int(j)] += 1
-    print('confusion matrix:')
-    print(confusion)
-    print()
+        cv.namedWindow(title_window)
+        self.rect_sel = common.RectSelector(title_window, self.on_rect)
+        from PyStream import PyStreamRun
+        PyStreamRun(self.OpenCVCode, 'TrackerPlane_PS.py')
 
-    vis = []
-    for img, flag in zip(digits, resp == labels):
-        img = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
-        if not flag:
-            img[...,:2] = 0
-        vis.append(img)
-    return mosaic(25, vis)
+    def on_rect(self, rect):
+        self.tracker.add_target(self.frame, rect)
 
-def preprocess_simple(digits):
-    return np.float32(digits).reshape(-1, SZ*SZ) / 255.0
+    def OpenCVCode(self, imgRGB, depth_colormap):
+        playing = not self.paused and not self.rect_sel.dragging
+        self.frame = imgRGB.copy()
 
-def preprocess_hog(digits):
-    samples = []
-    for img in digits:
-        gx = cv.Sobel(img, cv.CV_32F, 1, 0)
-        gy = cv.Sobel(img, cv.CV_32F, 0, 1)
-        mag, ang = cv.cartToPolar(gx, gy)
-        bin_n = 16
-        bin = np.int32(bin_n*ang/(2*np.pi))
-        bin_cells = bin[:10,:10], bin[10:,:10], bin[:10,10:], bin[10:,10:]
-        mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
-        hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]
-        hist = np.hstack(hists)
+        vis = self.frame.copy()
+        if playing:
+            tracked = self.tracker.track(self.frame)
+            for tr in tracked:
+                cv.polylines(vis, [np.int32(tr.quad)], True, (255, 255, 255), 2)
+                for (x, y) in np.int32(tr.p1):
+                    cv.circle(vis, (x, y), 2, (255, 255, 255))
 
-        # transform to Hellinger kernel
-        eps = 1e-7
-        hist /= hist.sum() + eps
-        hist = np.sqrt(hist)
-        hist /= norm(hist) + eps
-
-        samples.append(hist)
-    return np.float32(samples)
-
+        self.rect_sel.draw(vis)
+        cv.imshow(title_window, vis)
+        ch = cv.waitKey(1)
+        if ch == ord(' '):
+            self.paused = not self.paused
+        if ch == ord('c'):
+            self.tracker.clear()
 
 if __name__ == '__main__':
     print(__doc__)
-
-    digits, labels = load_digits(DIGITS_FN)
-
-    print('preprocessing...')
-    # shuffle digits
-    rand = np.random.RandomState(321)
-    shuffle = rand.permutation(len(digits))
-    digits, labels = digits[shuffle], labels[shuffle]
-
-    digits2 = list(map(deskew, digits))
-    samples = preprocess_hog(digits2)
-
-    train_n = int(0.9*len(samples))
-    cv.imshow('test set', mosaic(25, digits[train_n:]))
-    digits_train, digits_test = np.split(digits2, [train_n])
-    samples_train, samples_test = np.split(samples, [train_n])
-    labels_train, labels_test = np.split(labels, [train_n])
-
-
-    print('training KNearest...')
-    model = KNearest(k=4)
-    model.train(samples_train, labels_train)
-    vis = evaluate_model(model, digits_test, samples_test, labels_test)
-    cv.imshow('KNearest test', vis)
-
-    print('training SVM...')
-    model = SVM(C=2.67, gamma=5.383)
-    model.train(samples_train, labels_train)
-    vis = evaluate_model(model, digits_test, samples_test, labels_test)
-    cv.imshow('SVM test', vis)
-    print('saving SVM as "digits_svm.dat"...')
-    #model.save('digits_svm.dat')
-
-    cv.waitKey(0)
+    App().Open()

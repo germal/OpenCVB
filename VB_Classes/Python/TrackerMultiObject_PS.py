@@ -26,5 +26,5 @@ def OpenCVCode(image, depth_colormap):
     cv.imshow(title_window, image)
 
 from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'MultiTracker_PS.py')
+PyStreamRun(OpenCVCode, 'TrackerMultiObject_PS.py')
 
