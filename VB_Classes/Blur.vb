@@ -170,10 +170,10 @@ Public Class Blur_PlusHistogram
         mat2to1 = New Mat_2to1(ocvb)
 
         blur = New Blur_Bilateral(ocvb)
-
         myhist = New Histogram_EqualizeGray(ocvb)
 
-        label2 = "Top is before equalize, Bottom is after Eq+Blur"
+        label1 = "Use Blue slider to see impact on top histogram"
+        label2 = "Top is before equalize, Bottom is after Equalize"
         ocvb.desc = "Compound algorithms Blur and Histogram"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
