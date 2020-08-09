@@ -11,10 +11,10 @@ Public Class Binarize_Basics
     Public maxRange = 255
     Public histogram As cv.Mat
     Public meanScalar As cv.Scalar
-    Dim blur As Blur_Gaussian
+    Dim blur As Blur_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        blur = New Blur_Gaussian(ocvb)
+        blur = New Blur_Basics(ocvb)
 
         ocvb.desc = "Binarize an image using Threshold with OTSU."
     End Sub

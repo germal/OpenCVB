@@ -637,8 +637,10 @@ Public Class Histogram_EqualizeColor
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         kalmanEq = New Histogram_KalmanSmoothed(ocvb)
-        kalman = New Histogram_KalmanSmoothed(ocvb)
         kalmanEq.sliders.trackbar(0).Value = 40
+
+        ocvb.suppressOptions = True
+        kalman = New Histogram_KalmanSmoothed(ocvb)
         kalman.sliders.trackbar(0).Value = 40
 
         mats = New Mat_2to1(ocvb)
@@ -647,6 +649,7 @@ Public Class Histogram_EqualizeColor
         label1 = "Image Enhanced with Equalized Histogram"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        kalman.sliders.trackbar(0).Value = kalmanEq.sliders.trackbar(0).Value
         Dim rgb(2) As cv.Mat
         Dim rgbEq(2) As cv.Mat
         cv.Cv2.Split(src, rgbEq)
@@ -688,6 +691,8 @@ Public Class Histogram_EqualizeGray
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         histogramEq = New Histogram_KalmanSmoothed(ocvb)
+
+        ocvb.suppressOptions = True
         histogram = New Histogram_KalmanSmoothed(ocvb)
 
         label1 = "Before EqualizeHist"
@@ -695,6 +700,8 @@ Public Class Histogram_EqualizeGray
         ocvb.desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        histogram.sliders.trackbar(0).Value = histogramEq.sliders.trackbar(0).Value
+
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         histogram.src = src.Clone
         histogram.Run(ocvb)
