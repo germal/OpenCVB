@@ -306,16 +306,16 @@ End Class
 
 
 
-Public Class PointCloud_Plane_Walls
+Public Class PointCloud_WallPlane
     Inherits ocvbClass
-    Dim objects As PointCloud_TopView_Distances
+    Dim objects As PointCloud_Distance_TopView
     Dim lines As lineDetector_FLD_CPP
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         lines = New lineDetector_FLD_CPP(ocvb)
-        objects = New PointCloud_TopView_Distances(ocvb)
+        objects = New PointCloud_Distance_TopView(ocvb)
         dilate = New DilateErode_Basics(ocvb)
 
         label1 = "Top View: walls in red"
@@ -345,16 +345,16 @@ End Class
 
 
 
-Public Class PointCloud_Planes_CeilingFloor
+Public Class PointCloud_FloorPlane
     Inherits ocvbClass
-    Dim objects As PointCloud_SideView_Objects
+    Dim objects As PointCloud_Object_SideView
     Dim lines As lineDetector_FLD_CPP
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         lines = New lineDetector_FLD_CPP(ocvb)
-        objects = New PointCloud_SideView_Objects(ocvb)
+        objects = New PointCloud_Object_SideView(ocvb)
         dilate = New DilateErode_Basics(ocvb)
 
         label1 = "Top View: walls in red"
@@ -417,7 +417,7 @@ End Class
 
 
 
-Public Class PointCloud_SideView_Objects
+Public Class PointCloud_Object_SideView
     Inherits ocvbClass
     Public flood As FloodFill_Projection
     Public view As PointCloud_SideView
@@ -446,6 +446,8 @@ Public Class PointCloud_SideView_Objects
         flood.Run(ocvb)
         dst2 = flood.dst2
         label2 = flood.label2
+
+
     End Sub
 End Class
 
@@ -455,13 +457,13 @@ End Class
 
 
 
-Public Class PointCloud_SideView_Distances
+Public Class PointCloud_Distance_SideView
     Inherits ocvbClass
-    Public gVec As PointCloud_SideView_Objects
+    Public gVec As PointCloud_Object_SideView
     Public maxZ As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        gVec = New PointCloud_SideView_Objects(ocvb)
+        gVec = New PointCloud_Object_SideView(ocvb)
 
         ocvb.desc = "Show identified clusters of depth data in a side view"
     End Sub
@@ -510,7 +512,7 @@ End Class
 
 
 
-Public Class PointCloud_TopView_Objects
+Public Class PointCloud_Object_TopView
     Inherits ocvbClass
     Public flood As FloodFill_Projection
     Public view As PointCloud_TopView
@@ -549,17 +551,13 @@ End Class
 
 
 
-Public Class PointCloud_TopView_Distances
+Public Class PointCloud_Distance_TopView
     Inherits ocvbClass
-    Public gVec As PointCloud_TopView_Objects
-    Public gSide As PointCloud_SideView_Distances
+    Public gVec As PointCloud_Object_TopView
     Public maxZ As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        gVec = New PointCloud_TopView_Objects(ocvb)
-
-        ocvb.suppressOptions = True
-        gSide = New PointCloud_SideView_Distances(ocvb)
+        gVec = New PointCloud_Object_TopView(ocvb)
 
         ocvb.desc = "Show identified clusters of depth data in a top view"
     End Sub
@@ -581,14 +579,14 @@ Public Class PointCloud_TrimDepth
     Inherits ocvbClass
     Public hist As Histogram_2D_TopView
     Public cMats As PointCloud_Colorize
-    Dim objects As PointCloud_TopView_Distances
+    Dim objects As PointCloud_Distance_TopView
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         cMats = New PointCloud_Colorize(ocvb)
         cMats.shift = 0
         cMats.Run(ocvb)
 
-        objects = New PointCloud_TopView_Distances(ocvb)
+        objects = New PointCloud_Distance_TopView(ocvb)
         objects.gVec.flood.sliders.trackbar(0).Value = 1 ' we want all possible objects in view.
         objects.gVec.view.hist.histOpts.sliders.trackbar(0).Value = 20 ' should be substantial object...
 
