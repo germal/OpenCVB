@@ -55,11 +55,12 @@ Public Class Font_FlowText
         ocvb.desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If standalone And ocvb.frameCount = 0 Then
+        If standalone Then
+            msgs.Add("-------------------------------------------------------------------------------------------------------------------")
             msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText(ocvb)' to the class constructor.")
-        msgs.Add("Also optionally indicate if you want result1 or result2 for text (the default is result1.)")
-            msgs.Add("Then in the Run method, flow.msgs.add('your next line of text') - for as many msgs as you need on each pass.")
-            msgs.Add("Then at the end of the Run method, invoke flow.Run(ocvb)")
+            msgs.Add("Also optionally indicate if you want result1 or result2 for text (the default is result1.)")
+            msgs.Add("Then in your Run method, add a line 'flow.msgs.add('your next line of text')' - for as many msgs as you need on each pass.")
+            msgs.Add("Then at the end of your Run method, invoke flow.Run(ocvb)")
         End If
         Static lastCount As Int32
         Dim maxLines As Int32 = 21

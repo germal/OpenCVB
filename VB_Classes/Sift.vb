@@ -47,15 +47,19 @@ Public Class Sift_Basics_CS_MT
     Dim siftCS As New CS_SiftBasics
     Dim siftBasics As Sift_Basics_CS
     Dim fisheye As FishEye_Rectified
+    Dim numPointSlider As System.Windows.Forms.TrackBar
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         fisheye = New FishEye_Rectified(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Maximum = ocvb.color.cols * 2
-        grid.sliders.trackbar(0).Value = ocvb.color.cols * 2 ' we are just taking horizontal slices of the image.
+        grid.sliders.trackbar(0).Maximum = ocvb.color.Cols * 2
+        grid.sliders.trackbar(0).Value = ocvb.color.Cols * 2 ' we are just taking horizontal slices of the image.
         grid.sliders.trackbar(1).Value = 10
+        grid.Run(ocvb)
 
         siftBasics = New Sift_Basics_CS(ocvb)
+        numPointSlider = findSlider("Points to Match")
+        numPointSlider.Value = 1
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
     End Sub
@@ -74,7 +78,7 @@ Public Class Sift_Basics_CS_MT
 
         Dim output As New cv.Mat(src.Rows, src.Cols * 2, cv.MatType.CV_8UC3)
 
-        Dim numFeatures = siftBasics.sliders.trackbar(0).Value
+        Dim numFeatures = numPointSlider.Value
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             Dim left = leftView(roi).Clone()  ' sift wants the inputs to be continuous and roi-modified Mats are not continuous.

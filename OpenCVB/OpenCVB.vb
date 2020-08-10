@@ -86,7 +86,7 @@ Public Class OpenCVB
     Dim activeThreadID As Integer
     Private Delegate Sub delegateEvent()
     Dim logAlgorithms As StreamWriter
-    Dim logActive As Boolean = True ' turn this on/off to collect data on algorithms and memory use.
+    Dim logActive As Boolean = False ' turn this on/off to collect data on algorithms and memory use.
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -809,6 +809,7 @@ Public Class OpenCVB
     Private Sub ActivateTimer_Tick(sender As Object, e As EventArgs) Handles ActivateTimer.Tick
         ActivateTimer.Enabled = False
         If TestAllButton.Text <> "Stop Test" Then
+            If AvailableAlgorithms.SelectedIndex < 0 Then AvailableAlgorithms.SelectedIndex = 0
             Me.Activate()
             AvailableAlgorithms.Select(AvailableAlgorithms.SelectedIndex, 1)
         End If

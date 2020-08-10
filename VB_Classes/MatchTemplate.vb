@@ -6,7 +6,6 @@ Public Class MatchTemplate_Basics
     Public sample2 As cv.Mat
     Public matchText As String = ""
     Public correlationMat As New cv.Mat
-    Public reportFreq = 10 ' report the results every x number of iterations.
     Public matchOption As cv.TemplateMatchModes
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -26,7 +25,7 @@ Public Class MatchTemplate_Basics
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        if standalone Then
+        If standalone Then
             sample1 = New cv.Mat(New cv.Size(sliders.trackbar(0).Value, 1), cv.MatType.CV_32FC1)
             sample2 = New cv.Mat(New cv.Size(sliders.trackbar(0).Value, 1), cv.MatType.CV_32FC1)
             cv.Cv2.Randn(sample1, 100, 25)
@@ -45,14 +44,13 @@ Public Class MatchTemplate_Basics
             End If
         Next
         cv.Cv2.MatchTemplate(sample1, sample2, correlationMat, matchOption)
-        If ocvb.frameCount Mod reportFreq = 0 Then
-            Dim correlation = correlationMat.Get(Of Single)(0, 0)
-            label1 = "Correlation = " + Format(correlation, "#,##0.000")
-            if standalone Then
-                label1 = matchText + " for " + CStr(sample1.Cols) + " samples = " + Format(correlation, "#,##0.00")
-                flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
-                flow.Run(ocvb)
-            End If
+        Dim correlation = correlationMat.Get(Of Single)(0, 0)
+        label1 = "Correlation = " + Format(correlation, "#,##0.000")
+        If standalone Then
+            dst1.SetTo(0)
+            label1 = matchText + " for " + CStr(sample1.Cols) + " samples = " + Format(correlation, "#,##0.00")
+            flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
+            flow.Run(ocvb)
         End If
     End Sub
 End Class
