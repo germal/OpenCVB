@@ -26,3 +26,24 @@ Public Class Pyramid_Basics
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Pyramid_Filter
+    Inherits ocvbClass
+    Dim laplace As Laplacian_PyramidFilter
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        laplace = New Laplacian_PyramidFilter(ocvb)
+
+        ocvb.desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        laplace.src = src
+        laplace.Run(ocvb)
+        dst1 = laplace.dst1
+    End Sub
+End Class
+
