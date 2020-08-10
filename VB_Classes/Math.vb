@@ -119,8 +119,6 @@ Public Class Math_RGBCorrelation
         flow.result1or2 = RESULT1
 
         corr = New MatchTemplate_Basics(ocvb)
-        corr.reportFreq = 1
-
         ocvb.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
