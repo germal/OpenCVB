@@ -8,7 +8,7 @@ import sys
 from vcam import vcam,meshGen
 saveMode=0
 
-title_window = 'Distort video stream'
+title_window = 'FunnyMirror_PS.py - Distort video stream'
 def on_trackbar(val):
 	global saveMode 
 	saveMode = val 

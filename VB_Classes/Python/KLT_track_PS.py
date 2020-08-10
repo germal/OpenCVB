@@ -16,7 +16,7 @@ lk_track.py
 import numpy as np
 import cv2 as cv
 import sys
-title_window = 'lk_track_PS.py'
+title_window = 'KLT_track_PS.py'
 
 from common import anorm2, draw_str
 
