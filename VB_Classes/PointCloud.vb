@@ -32,39 +32,6 @@ Module PointCloud
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Project_GravityHist_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
     End Function
-
-
-
-
-
-    Public Function showDistances(ocvb As AlgorithmData, dst As cv.Mat, rects As List(Of cv.Rect), maxZ As Single, imuActive As Boolean) As cv.Mat
-        If dst.Channels = 1 Then dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        If imuActive Then
-            ocvb.putText(New TTtext("Uncheck the 'Use IMU gravity vector' to see distances.", 10, 60, RESULT2))
-            ocvb.putText(New TTtext("The distances are not correct in the rotated and projected image", 10, 90, RESULT2))
-        Else
-            Dim fontSize As Single = 1.0
-            If ocvb.parms.resolution = resMed Then fontSize = 0.6
-            Dim mmPerPixel = maxZ * 1000 / dst.Height
-            For i = 0 To rects.Count - 1
-                Dim rect = rects(i)
-                Dim minDistanceFromCamera = (dst.Height - rect.Y - rect.Height) * mmPerPixel
-                Dim maxDistanceFromCamera = (dst.Height - rect.Y) * mmPerPixel
-                Dim objectWidth = rect.Width * mmPerPixel
-
-                dst.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.resolution = resMed, 6, 10),
-                           cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-                dst.Circle(New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), If(ocvb.parms.resolution = resMed, 3, 5),
-                           cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-                Dim text = "depth=" + Format(minDistanceFromCamera / 1000, "#0.0") + "-" + Format(maxDistanceFromCamera / 1000, "0.0") +
-                           "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
-                dst.Rectangle(rect, cv.Scalar.Red, 1)
-                Dim pt = New cv.Point(rect.X, rect.Y - 10)
-                cv.Cv2.PutText(dst, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-            Next
-        End If
-        Return dst
-    End Function
 End Module
 
 
@@ -313,12 +280,9 @@ Public Class PointCloud_WallPlane
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-
+        dilate = New DilateErode_Basics(ocvb)
         lines = New lineDetector_FLD_CPP(ocvb)
         objects = New PointCloud_Distance_TopView(ocvb)
-        dilate = New DilateErode_Basics(ocvb)
-
-        label1 = "Top View: walls in red"
         ocvb.desc = "Use the top down view to detect walls with a line detector algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -330,12 +294,15 @@ Public Class PointCloud_WallPlane
 
         Static checkIMU = findCheckBox("Use IMU gravity vector")
         If checkIMU?.Checked Then
+            label1 = "Top View: walls in red"
             dilate.src = dst1
             dilate.Run(ocvb)
 
             lines.src = If(dilate.dst1.Channels = 3, dilate.dst1, dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
             lines.Run(ocvb)
             dst1 = lines.dst1
+        Else
+            label1 = "Top View of pointcloud data"
         End If
     End Sub
 End Class
@@ -347,17 +314,14 @@ End Class
 
 Public Class PointCloud_FloorPlane
     Inherits ocvbClass
-    Dim objects As PointCloud_Object_SideView
+    Dim objects As PointCloud_Distance_SideView
     Dim lines As lineDetector_FLD_CPP
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-
-        lines = New lineDetector_FLD_CPP(ocvb)
-        objects = New PointCloud_Object_SideView(ocvb)
         dilate = New DilateErode_Basics(ocvb)
-
-        label1 = "Top View: walls in red"
+        lines = New lineDetector_FLD_CPP(ocvb)
+        objects = New PointCloud_Distance_SideView(ocvb)
         ocvb.desc = "Use the side view to detect ceilings and floors with a line detector algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -369,16 +333,50 @@ Public Class PointCloud_FloorPlane
 
         Static checkIMU = findCheckBox("Use IMU gravity vector")
         If checkIMU?.Checked Then
+            label1 = "Top View: floors (and some walls) in red"
             dilate.src = dst1
             dilate.Run(ocvb)
 
             lines.src = If(dilate.dst1.Channels = 3, dilate.dst1, dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
             lines.Run(ocvb)
             dst1 = lines.dst1
+        Else
+            label1 = "Side View of pointcloud data"
         End If
     End Sub
 End Class
 
+
+
+
+
+
+Public Class PointCloud_TopView
+    Inherits ocvbClass
+    Public hist As Histogram_2D_TopView
+    Public cMats As PointCloud_Colorize
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        cMats = New PointCloud_Colorize(ocvb)
+        cMats.shift = 0
+        cMats.Run(ocvb)
+
+        hist = New Histogram_2D_TopView(ocvb)
+        hist.histOpts.check.Box(0).Checked = False
+
+        ocvb.desc = "Display the histogram with and without adjusting for gravity"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        hist.Run(ocvb)
+        Static checkIMU = findCheckBox("Use IMU gravity vector")
+        If checkIMU?.Checked Then
+            dst1 = hist.dst1
+        Else
+            dst1 = cMats.CameraLocationBot(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.trackbar(1).Value / 1000)
+        End If
+    End Sub
+End Class
 
 
 
@@ -425,7 +423,6 @@ Public Class PointCloud_Object_SideView
         setCaller(ocvb)
 
         view = New PointCloud_SideView(ocvb)
-
         flood = New FloodFill_Projection(ocvb)
         flood.sliders.trackbar(0).Value = 100
 
@@ -433,11 +430,6 @@ Public Class PointCloud_Object_SideView
         ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.cameraIndex = T265Camera Then
-            ocvb.putText(New TTtext("There is no point cloud available on the T265 camera", 10, 60, RESULT1))
-            Exit Sub
-        End If
-
         view.src = src
         view.Run(ocvb)
         dst1 = view.dst1
@@ -446,66 +438,10 @@ Public Class PointCloud_Object_SideView
         flood.Run(ocvb)
         dst2 = flood.dst2
         label2 = flood.label2
-
-
     End Sub
 End Class
 
 
-
-
-
-
-
-Public Class PointCloud_Distance_SideView
-    Inherits ocvbClass
-    Public gVec As PointCloud_Object_SideView
-    Public maxZ As Single
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        gVec = New PointCloud_Object_SideView(ocvb)
-
-        ocvb.desc = "Show identified clusters of depth data in a side view"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        gVec.Run(ocvb)
-        Static sliderMaxDepth = findSlider("InRange Max Depth")
-        maxZ = sliderMaxDepth.Value / 1000
-        dst1 = showDistances(ocvb, gVec.dst1, gVec.flood.rects, maxZ, gVec.view.hist.histOpts.check.Box(0).Checked)
-        label1 = CStr(CInt(gVec.flood.rects.Count)) + " objects > " + CStr(gVec.flood.minFloodSize) + " pixels"
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class PointCloud_TopView
-    Inherits ocvbClass
-    Public hist As Histogram_2D_TopView
-    Public cMats As PointCloud_Colorize
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-
-        cMats = New PointCloud_Colorize(ocvb)
-        cMats.shift = 0
-        cMats.Run(ocvb)
-
-        hist = New Histogram_2D_TopView(ocvb)
-
-        ocvb.desc = "Display the histogram with and without adjusting for gravity"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        hist.Run(ocvb)
-        Static checkIMU = findCheckBox("Use IMU gravity vector")
-        If checkIMU?.Checked Then
-            dst1 = hist.dst1
-        Else
-            dst1 = cMats.CameraLocationBot(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.trackbar(1).Value / 1000)
-        End If
-    End Sub
-End Class
 
 
 
@@ -520,8 +456,6 @@ Public Class PointCloud_Object_TopView
         setCaller(ocvb)
 
         view = New PointCloud_TopView(ocvb)
-        view.hist.histOpts.check.Box(0).Checked = True ' we want the IMU to rotate the data.
-        view.hist.histOpts.sliders.trackbar(0).Value = 5 ' a better default for flood fill
         flood = New FloodFill_Projection(ocvb)
         flood.sliders.trackbar(0).Value = 100
 
@@ -529,11 +463,6 @@ Public Class PointCloud_Object_TopView
         ocvb.desc = "Threshold the histogram to find the significant 3D objects in the field of view (not floors or ceilings)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.cameraIndex = T265Camera Then
-            ocvb.putText(New TTtext("There is no point cloud available on the T265 camera", 10, 60, RESULT1))
-            Exit Sub
-        End If
-
         view.src = src
         view.Run(ocvb)
         dst1 = view.dst1
@@ -554,22 +483,56 @@ End Class
 Public Class PointCloud_Distance_TopView
     Inherits ocvbClass
     Public gVec As PointCloud_Object_TopView
-    Public maxZ As Single
+    Dim showDist As PointCloud_ShowDistance
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
+        showDist = New PointCloud_ShowDistance(ocvb)
         gVec = New PointCloud_Object_TopView(ocvb)
 
         ocvb.desc = "Show identified clusters of depth data in a top view"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         gVec.Run(ocvb)
-        Static sliderMaxDepth = findSlider("InRange Max Depth")
-        maxZ = sliderMaxDepth.Value / 1000
-        dst1 = showDistances(ocvb, gVec.dst1, gVec.flood.rects, maxZ, gVec.view.hist.histOpts.check.Box(0).Checked)
+
+        showDist.src = gVec.dst1
+        showDist.rects = gVec.flood.rects
+        showDist.centroids = gVec.flood.centroids
+        showDist.Run(ocvb)
+        dst1 = showDist.dst1
+
         label1 = CStr(CInt(gVec.flood.rects.Count)) + " objects > " + CStr(gVec.flood.minFloodSize) + " pixels"
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class PointCloud_Distance_SideView
+    Inherits ocvbClass
+    Public gVec As PointCloud_Object_SideView
+    Dim showDist As PointCloud_ShowDistance
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        showDist = New PointCloud_ShowDistance(ocvb)
+        gVec = New PointCloud_Object_SideView(ocvb)
+
+        ocvb.desc = "Show identified clusters of depth data in a side view"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        gVec.Run(ocvb)
+
+        showDist.src = gVec.dst1
+        showDist.rects = gVec.flood.rects
+        showDist.centroids = gVec.flood.centroids
+        showDist.Run(ocvb)
+        dst1 = showDist.dst1
+
+        label1 = CStr(CInt(gVec.flood.rects.Count)) + " objects > " + CStr(gVec.flood.minFloodSize) + " pixels"
+    End Sub
+End Class
 
 
 
@@ -600,5 +563,59 @@ Public Class PointCloud_TrimDepth
         hist.Run(ocvb)
         objects.Run(ocvb)
         dst1 = objects.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_ShowDistance
+    Inherits ocvbClass
+    Dim distance As PointCloud_Distance_TopView
+    Public rects As List(Of cv.Rect)
+    Public centroids As List(Of cv.Point)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        If standalone Then distance = New PointCloud_Distance_TopView(ocvb)
+        ocvb.desc = "Given a list of centroids, display the results"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If standalone Then
+            distance.run(ocvb)
+            dst1 = distance.dst1
+            dst2 = distance.dst2
+        Else
+            src.CopyTo(dst1)
+            If rects.Count = 0 Or centroids.Count = 0 Then Exit Sub
+            Static imuCheckBox = findCheckBox("Use IMU gravity vector")
+            If imuCheckBox.checked Then
+                ocvb.putText(New TTtext("Uncheck the 'Use IMU gravity vector' to see distances.", 10, 60, RESULT2))
+                ocvb.putText(New TTtext("Distance may look correct if camera is level but a rotated and projected image distorts distance.", 10, 90, RESULT2))
+            Else
+                Dim fontSize As Single = 1.0
+                If ocvb.parms.resolution = resMed Then fontSize = 0.6
+                Static sliderMaxDepth = findSlider("InRange Max Depth")
+                Dim maxZ = sliderMaxDepth.Value / 1000
+                Dim mmPerPixel = maxZ * 1000 / dst1.Height
+                For i = 0 To centroids.Count - 1
+                    Dim rect = rects(i)
+                    Dim minDistanceFromCamera = (dst1.Height - rect.Y - rect.Height) * mmPerPixel
+                    Dim maxDistanceFromCamera = (dst1.Height - rect.Y) * mmPerPixel
+                    Dim objectWidth = rect.Width * mmPerPixel
+
+                    Dim center = centroids(i)
+                    dst1.Circle(center, If(ocvb.parms.resolution = resMed, 6, 10), cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                    dst1.Circle(center, If(ocvb.parms.resolution = resMed, 3, 5), cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+                    Dim text = "depth=" + Format(minDistanceFromCamera / 1000, "#0.0") + "-" + Format(maxDistanceFromCamera / 1000, "0.0") +
+                               "m Width=" + Format(objectWidth / 1000, "#0.0") + " m"
+                    dst1.Rectangle(rect, cv.Scalar.Red, 1)
+                    Dim pt = New cv.Point2f(rect.X, rect.Y - 10)
+                    cv.Cv2.PutText(dst1, text, pt, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                Next
+            End If
+        End If
     End Sub
 End Class

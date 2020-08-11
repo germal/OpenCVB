@@ -379,7 +379,7 @@ Public Class FloodFill_Projection
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
-    Public centroids As New List(Of cv.Mat)
+    Public centroids As New List(Of cv.Point)
     Public minFloodSize As Integer
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -403,6 +403,7 @@ Public Class FloodFill_Projection
         Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1)
 
         rects.Clear()
+        centroids.Clear()
         masks.Clear()
         dst2.SetTo(0)
         cv.Cv2.BitwiseNot(src, src)
@@ -416,9 +417,9 @@ Public Class FloodFill_Projection
                     If count > minFloodSize Then
                         rects.Add(rect)
                         masks.Add(maskPlus(rect).Clone())
-                        'Dim centroids As New cv.Mat
-                        'Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
-                        'Dim labelCount = cv.Cv2.ConnectedComponentsWithStats(binary, labelView, stats, centroids)
+                        Dim m = cv.Cv2.Moments(maskPlus(rect), True)
+                        Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
+                        centroids.Add(centroid)
                     End If
                 End If
             Next

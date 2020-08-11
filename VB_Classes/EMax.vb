@@ -113,6 +113,10 @@ Module EMax_Exports
     End Function
 End Module
 
+
+
+
+
 Public Class EMax_Basics_CPP
     Inherits ocvbClass
     Public basics As EMax_Basics

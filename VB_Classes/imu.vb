@@ -501,3 +501,43 @@ Public Class IMU_GVector
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class IMU_IsCameraLevel
+    Inherits ocvbClass
+    Public angleX As Single ' in radians.
+    Public angleY As Single ' in radians.
+    Public angleZ As Single ' in radians.
+    Public cameraLevel As Boolean
+    Dim flow As Font_FlowText
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        If standalone Then flow = New Font_FlowText(ocvb)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Threshold in degrees X10", 1, 100, 20) ' default is a 20/10 or 2 degrees from 0...
+        ocvb.desc = "Answer the question: Is the camera level?"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim gx = ocvb.parms.IMU_Acceleration.X
+        Dim gy = ocvb.parms.IMU_Acceleration.Y
+        Dim gz = ocvb.parms.IMU_Acceleration.Z
+
+        angleX = (Math.Atan2(gy, gx) + cv.Cv2.PI / 2) * 57.2958
+        angleY = (Math.Atan2(gx, gy) - cv.Cv2.PI / 2) * 57.2958
+        angleZ = (Math.Atan2(gy, gz) + cv.Cv2.PI / 2) * 57.2958
+
+        Dim degreesThreshold = sliders.trackbar(0).Value / 10 ' 0-100 --> 0-10 degrees
+        If Math.Abs(angleX) > degreesThreshold Or Math.Abs(angleZ) > degreesThreshold Then cameraLevel = False Else cameraLevel = True
+        If standalone Then
+            flow.msgs.Add(" Angle X = " + Format(angleX, "0.00") + " degrees" +
+                          " Angle Y = " + Format(angleY, "0.00") + " degrees" +
+                          " Angle Z = " + Format(angleZ, "0.00") + " degrees" +
+                          If(cameraLevel, " - Camera is level", " - Camera is NOT level"))
+            flow.Run(ocvb)
+        End If
+    End Sub
+End Class

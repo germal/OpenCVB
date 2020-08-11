@@ -531,12 +531,14 @@ Public Class Histogram_2D_TopView
     Public Sub Run(ocvb As AlgorithmData)
         Dim histSize() = {src.Height, src.Width}
 
-        If useIMU <> histOpts.check.Box(0).Checked Or ocvb.frameCount = 0 Then
-            useIMU = histOpts.check.Box(0).Checked
+        Static imuCheckBox = findCheckBox("Use IMU gravity vector")
+        If useIMU <> imuCheckBox?.Checked Or ocvb.frameCount = 0 Then
+            useIMU = imuCheckBox.Checked
             trimPC = If(useIMU, trimPCGravity, trimPCStatic)
         End If
 
-        Dim zRange = histOpts.sliders.trackbar(1).Value / 1000
+        Static inRangeSlider = findSlider("InRange Max Depth")
+        Dim zRange = inRangeSlider?.Value / 1000
         trimPC.Run(ocvb)
         dst2 = trimPC.dst1
 
@@ -550,7 +552,8 @@ Public Class Histogram_2D_TopView
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, src.Height), New cv.Rangef(0, src.Width)}
         cv.Cv2.CalcHist(New cv.Mat() {histinput}, New Integer() {Zdata, XorYdata}, New cv.Mat, histOutput, 2, histSize, ranges)
         histOutput = histOutput.Flip(cv.FlipMode.X)
-        dst1 = histOutput.Threshold(histOpts.sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
+        Static histThresholdSlider = findSlider("Histogram threshold")
+        dst1 = histOutput.Threshold(histThresholdSlider?.Value, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

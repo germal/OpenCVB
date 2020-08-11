@@ -6,17 +6,18 @@ Public Class KNN_Basics
     Public trainPointsUsed() As Integer
     Public queryPoints As New List(Of cv.Point2f)
     Public matchedPoints() As cv.Point2f
+    Public unMatchedPoints As New List(Of cv.Point2f)
     Public matchedIndex() As Integer
-    Public responseColor As cv.Mat
     Dim knn As cv.ML.KNearest
     Public retrainNeeded As Boolean = True
+
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         If standalone Then random = New Random_Points(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "knn Query Points", 1, 10000, 10)
         sliders.setupTrackBar(1, "knn output Points", 1, 1000, 1)
-        label1 = "Query=Red nearest=white blue=unmatched"
+        label1 = "Query=Red nearest=white yellow=unmatched"
         label2 = "Query points"
         knn = cv.ML.KNearest.Create()
         ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
@@ -41,7 +42,7 @@ Public Class KNN_Basics
             Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S)
             For i = 0 To trainData.Rows - 1
                 response.Set(Of Integer)(i, 0, i)
-                cv.Cv2.Circle(dst1, trainData.Get(Of cv.Point2f)(i, 0), 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+                cv.Cv2.Circle(dst1, trainData.Get(Of cv.Point2f)(i, 0), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
             Next
             knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
         End If
@@ -65,12 +66,37 @@ Public Class KNN_Basics
         Next
 
         For i = 0 To matchedPoints.Count - 1
+            Dim pt3 = matchedPoints(i)
+            For j = i + 1 To matchedPoints.Count - 1
+                Dim pt1 = matchedPoints(j)
+                If pt1 = pt3 Then
+                    pt1 = queryPoints(i)
+                    Dim pt2 = queryPoints(j)
+                    Dim distance1 = Math.Sqrt((pt1.X - pt3.X) * (pt1.X - pt3.X) + (pt1.Y - pt3.Y) * (pt1.Y - pt3.Y))
+                    Dim distance2 = Math.Sqrt((pt2.X - pt3.X) * (pt2.X - pt3.X) + (pt2.Y - pt3.Y) * (pt2.Y - pt3.Y))
+                    If distance1 > distance2 Then matchedIndex(i) = -1 Else matchedIndex(j) = -1
+                End If
+            Next
+        Next
+
+        For i = 0 To matchedPoints.Count - 1
+            Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
+            cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
             If matchedIndex(i) >= 0 Then
-                Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
-                cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
                 Dim result = trainData.Get(Of cv.Point2f)(matchedIndex(i), 0)
                 cv.Cv2.Circle(dst1, result, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
                 dst1.Line(result, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            Else
+                cv.Cv2.Circle(dst1, qPoint, 10, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias, 0)
+            End If
+        Next
+
+        unMatchedPoints.Clear()
+        For i = 0 To trainData.Rows - 1
+            Dim pt = trainData.Get(Of cv.Point2f)(i, 0)
+            If dst1.Get(Of cv.Vec3b)(pt.Y, pt.X) = cv.Scalar.Yellow Then
+                unMatchedPoints.Add(pt)
+                cv.Cv2.Circle(dst1, pt, 10, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias, 0)
             End If
         Next
     End Sub
@@ -135,10 +161,9 @@ Public Class KNN_Centroids
         knn = New KNN_Basics(ocvb)
         knn.retrainNeeded = True
         knn.sliders.trackbar(1).Value = 1
-        knn.responseColor = New cv.Mat(scalarColors.Count, 3, cv.MatType.CV_32F, scalarColors.ToArray)
 
         label1 = "Current image"
-        label2 = "Query is Red, nearest is white, unmatched is blue"
+        label2 = "Query is Red, nearest is white, unmatched is yellow"
         ocvb.desc = "Map the current centroids to the previous generation and match the color used."
     End Sub
     Private Sub copyList(a As List(Of cv.Point2f), b As List(Of cv.Point2f))
