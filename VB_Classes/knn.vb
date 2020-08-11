@@ -1,6 +1,97 @@
 Imports cv = OpenCvSharp
 Public Class KNN_Basics
     Inherits ocvbClass
+    Dim randomTrain As Random_Points
+    Dim randomQuery As Random_Points
+    Public trainingPoints As New List(Of cv.Point2f)
+    Public queryPoints As New List(Of cv.Point2f)
+    Public matchedPoints() As cv.Point2f
+    Public matchedIndex() As Integer
+    Public neighborList As New List(Of cv.Mat)
+    Dim knn As cv.ML.KNearest
+    Public retrainNeeded As Boolean = True
+
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        If standalone Then
+            randomTrain = New Random_Points(ocvb)
+            randomTrain.sliders.sLabels(0).Text = "Training input count"
+            randomTrain.sliders.trackbar(0).Maximum = 100
+            randomQuery = New Random_Points(ocvb)
+            randomQuery.sliders.sLabels(0).Text = "Query input count"
+            randomQuery.sliders.trackbar(0).Maximum = 100
+        End If
+
+        label1 = "White=TrainingData, Red=queries"
+        knn = cv.ML.KNearest.Create()
+        ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim trainData As cv.Mat
+        Dim queries As cv.Mat
+        dst1.SetTo(cv.Scalar.Black)
+
+        If standalone Then
+            Dim trainCountSlider = randomTrain.sliders.trackbar(0)
+            Dim trainCount = Math.Floor(trainCountSlider.Value / 2)
+            randomTrain.Run(ocvb)
+            trainData = New cv.Mat(trainCount, 2, cv.MatType.CV_32F, randomTrain.Points2f).Clone()
+
+            Static queryCountSlider = randomQuery.sliders.trackbar(0)
+            Dim queryCount = Math.Floor(queryCountSlider.value / 2)
+            randomQuery.Run(ocvb)
+            queries = New cv.Mat(queryCount, 2, cv.MatType.CV_32F, randomQuery.Points2f)
+        Else
+            queries = New cv.Mat(queryPoints.Count, 2, cv.MatType.CV_32F, queryPoints.ToArray)
+            trainData = New cv.Mat(trainingPoints.Count, 2, cv.MatType.CV_32F, trainingPoints.ToArray)
+        End If
+
+        If retrainNeeded Then
+            Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S)
+            For i = 0 To trainData.Rows - 1
+                response.Set(Of Integer)(i, 0, i)
+                cv.Cv2.Circle(dst1, trainData.Get(Of cv.Point2f)(i, 0), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+            Next
+            knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
+        End If
+        ReDim matchedPoints(queries.Rows - 1)
+        ReDim matchedIndex(queries.Rows - 1)
+
+        Dim desiredMatches = trainData.Rows
+
+        Dim neighbors As New cv.Mat
+        neighborList.Clear()
+        For i = 0 To queries.Rows - 1
+            Dim query = queries(New cv.Rect(0, i, 2, 1))
+            knn.FindNearest(query, desiredMatches, New cv.Mat, neighbors)
+            neighborList.Add(neighbors) ' save for external use to find 1:1 relationships.
+            Dim qPoint = query.Get(Of cv.Point2f)(0, 0)
+            matchedIndex(i) = CInt(neighbors.Get(Of Single)(0, 0)) ' the first neighbor is the closest
+            matchedPoints(i) = trainData.Get(Of cv.Point2f)(matchedIndex(i), 0)
+        Next
+
+        For i = 0 To matchedPoints.Count - 1
+            Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
+            cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+            If matchedIndex(i) >= 0 Then
+                Dim pt = trainData.Get(Of cv.Point2f)(matchedIndex(i), 0)
+                If Math.Abs(pt.X - qPoint.X) > src.Width / 2 Then i = i
+                dst1.Line(pt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            Else
+                cv.Cv2.Circle(dst1, qPoint, 10, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias, 0)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class KNN_Basics1to1
+    Inherits ocvbClass
     Dim random As Random_Points
     Public trainingPoints As New List(Of cv.Point2f)
     Public trainPointsUsed() As Integer
@@ -14,9 +105,12 @@ Public Class KNN_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         If standalone Then random = New Random_Points(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "knn Query Points", 1, 10000, 10)
-        sliders.setupTrackBar(1, "knn output Points", 1, 1000, 1)
+        If standalone Then
+            sliders.Setup(ocvb, caller)
+            sliders.setupTrackBar(0, "knn Query Points", 1, 10000, 10)
+            sliders.setupTrackBar(1, "knn output Points", 1, 1000, 1)
+        End If
+
         label1 = "Query=Red nearest=white yellow=unmatched"
         label2 = "Query points"
         knn = cv.ML.KNearest.Create()
@@ -50,7 +144,7 @@ Public Class KNN_Basics
         ReDim matchedIndex(queries.Rows - 1)
         ReDim trainPointsUsed(trainData.Rows - 1)
 
-        Dim desiredMatches = sliders.trackbar(1).Value
+        Dim desiredMatches = trainData.Rows ' If(standalone, sliders.trackbar(1).Value, trainData.Rows) ' match 1:1 between generations unless stanalone
 
         Dim results As New cv.Mat
         Dim neighbors As New cv.Mat
@@ -58,26 +152,24 @@ Public Class KNN_Basics
             Dim query = queries(New cv.Rect(0, i, 2, 1))
             knn.FindNearest(query, desiredMatches, results, neighbors)
             Dim qPoint = query.Get(Of cv.Point2f)(0, 0)
-            For j = 0 To Math.Min(desiredMatches, neighbors.Cols) - 1
-                matchedIndex(i) = CInt(neighbors.Get(Of Single)(0, j))
-                trainPointsUsed(matchedIndex(i)) = True
-                matchedPoints(i) = trainData.Get(Of cv.Point2f)(matchedIndex(i), 0)
-            Next
+            matchedIndex(i) = CInt(neighbors.Get(Of Single)(0, 0)) ' the first neighbor is the closest
+            trainPointsUsed(matchedIndex(i)) = True
+            matchedPoints(i) = trainData.Get(Of cv.Point2f)(matchedIndex(i), 0)
         Next
 
-        For i = 0 To matchedPoints.Count - 1
-            Dim pt3 = matchedPoints(i)
-            For j = i + 1 To matchedPoints.Count - 1
-                Dim pt1 = matchedPoints(j)
-                If pt1 = pt3 Then
-                    pt1 = queryPoints(i)
-                    Dim pt2 = queryPoints(j)
-                    Dim distance1 = Math.Sqrt((pt1.X - pt3.X) * (pt1.X - pt3.X) + (pt1.Y - pt3.Y) * (pt1.Y - pt3.Y))
-                    Dim distance2 = Math.Sqrt((pt2.X - pt3.X) * (pt2.X - pt3.X) + (pt2.Y - pt3.Y) * (pt2.Y - pt3.Y))
-                    If distance1 > distance2 Then matchedIndex(i) = -1 Else matchedIndex(j) = -1
-                End If
-            Next
-        Next
+        'For i = 0 To matchedPoints.Count - 1
+        '    Dim pt3 = matchedPoints(i)
+        '    For j = i + 1 To matchedPoints.Count - 1
+        '        Dim pt1 = matchedPoints(j)
+        '        If pt1 = pt3 Then
+        '            pt1 = queries.Get(Of cv.Point2f)(i, 0) 'queryPoints(i)
+        '            Dim pt2 = queries.Get(Of cv.Point2f)(j, 0)
+        '            Dim distance1 = Math.Sqrt((pt1.X - pt3.X) * (pt1.X - pt3.X) + (pt1.Y - pt3.Y) * (pt1.Y - pt3.Y))
+        '            Dim distance2 = Math.Sqrt((pt2.X - pt3.X) * (pt2.X - pt3.X) + (pt2.Y - pt3.Y) * (pt2.Y - pt3.Y))
+        '            If distance1 > distance2 Then matchedIndex(i) = -1 Else matchedIndex(j) = -1
+        '        End If
+        '    Next
+        'Next
 
         For i = 0 To matchedPoints.Count - 1
             Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
@@ -101,10 +193,6 @@ Public Class KNN_Basics
         Next
     End Sub
 End Class
-
-
-
-
 
 Public Class KNN_Test
     Inherits ocvbClass
@@ -160,7 +248,6 @@ Public Class KNN_Centroids
 
         knn = New KNN_Basics(ocvb)
         knn.retrainNeeded = True
-        knn.sliders.trackbar(1).Value = 1
 
         label1 = "Current image"
         label2 = "Query is Red, nearest is white, unmatched is yellow"
