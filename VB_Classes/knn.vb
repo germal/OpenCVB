@@ -138,6 +138,10 @@ Public Class KNN_Basics1to1
             emax.Run(ocvb) ' set the first generation of points.
         End If
 
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Map queries to training data 1:1 (Off means many:1)"
+        check.Box(0).Checked = True
+
         knn = New KNN_Basics(ocvb)
         label1 = "Output from Emax"
         label2 = "White=TrainingData, Red=queries yellow=unmatched"
@@ -164,41 +168,43 @@ Public Class KNN_Basics1to1
             neighborOffset(i) = 0
         Next
 
-        ' map the points 1 to 1: find duplicate best fits, choose which is better, loser must relinquish the training data element and use the next neighbor
-        Dim changedNeighbors As Boolean = True
-        While changedNeighbors
-            changedNeighbors = False
-            For i = 0 To matchedPoints.Count - 1
-                Dim m1 = matchedPoints(i)
-                For j = i + 1 To matchedPoints.Count - 1
-                    Dim m2 = matchedPoints(j)
-                    If m1 = m2 And m1.X <> -1 And m2.X <> -1 Then
-                        changedNeighbors = True
-                        Dim pt1 = knn.queryPoints(i)
-                        Dim pt2 = knn.queryPoints(j)
-                        Dim distance1 = Math.Sqrt((pt1.X - m1.X) * (pt1.X - m1.X) + (pt1.Y - m1.Y) * (pt1.Y - m1.Y))
-                        Dim distance2 = Math.Sqrt((pt2.X - m1.X) * (pt2.X - m1.X) + (pt2.Y - m1.Y) * (pt2.Y - m1.Y))
-                        If distance1 > distance2 Then
-                            Dim index = knn.neighbors.Get(Of Single)(neighborOffset(i))
-                            If neighborOffset(i) >= knn.neighbors.Cols - 1 Or index > knn.trainingPoints.Count - 1 Then
-                                matchedPoints(i) = New cv.Point2f(-1, -1)
+        If check.Box(0).Checked Then
+            ' map the points 1 to 1: find duplicate best fits, choose which is better, loser must relinquish the training data element and use the next neighbor
+            Dim changedNeighbors As Boolean = True
+            While changedNeighbors
+                changedNeighbors = False
+                For i = 0 To matchedPoints.Count - 1
+                    Dim m1 = matchedPoints(i)
+                    For j = i + 1 To matchedPoints.Count - 1
+                        Dim m2 = matchedPoints(j)
+                        If m1 = m2 And m1.X <> -1 And m2.X <> -1 Then
+                            changedNeighbors = True
+                            Dim pt1 = knn.queryPoints(i)
+                            Dim pt2 = knn.queryPoints(j)
+                            Dim distance1 = Math.Sqrt((pt1.X - m1.X) * (pt1.X - m1.X) + (pt1.Y - m1.Y) * (pt1.Y - m1.Y))
+                            Dim distance2 = Math.Sqrt((pt2.X - m1.X) * (pt2.X - m1.X) + (pt2.Y - m1.Y) * (pt2.Y - m1.Y))
+                            If distance1 > distance2 Then
+                                Dim index = knn.neighbors.Get(Of Single)(neighborOffset(i))
+                                If neighborOffset(i) >= knn.neighbors.Cols - 1 Or index > knn.trainingPoints.Count - 1 Then
+                                    matchedPoints(i) = New cv.Point2f(-1, -1)
+                                Else
+                                    matchedPoints(i) = knn.trainingPoints(index)
+                                    neighborOffset(i) += 1
+                                End If
                             Else
-                                matchedPoints(i) = knn.trainingPoints(Index)
-                                neighborOffset(i) += 1
-                            End If
-                        Else
-                            Dim index = knn.neighbors.Get(Of Single)(neighborOffset(j))
-                            If neighborOffset(j) >= knn.neighbors.Cols - 1 Or index > knn.trainingPoints.Count - 1 Then
-                                matchedPoints(j) = New cv.Point2f(-1, -1)
-                            Else
-                                matchedPoints(j) = knn.trainingPoints(Index)
-                                neighborOffset(j) += 1
+                                Dim index = knn.neighbors.Get(Of Single)(neighborOffset(j))
+                                If neighborOffset(j) >= knn.neighbors.Cols - 1 Or index > knn.trainingPoints.Count - 1 Then
+                                    matchedPoints(j) = New cv.Point2f(-1, -1)
+                                Else
+                                    matchedPoints(j) = knn.trainingPoints(index)
+                                    neighborOffset(j) += 1
+                                End If
                             End If
                         End If
-                    End If
+                    Next
                 Next
-            Next
-        End While
+            End While
+        End If
 
         dst1.SetTo(0)
         unmatchedPoints.Clear()
@@ -223,8 +229,7 @@ End Class
 Public Class KNN_Test
     Inherits ocvbClass
     Public grid As Thread_Grid
-    Dim knn1to1 As KNN_Basics1to1
-    Dim knnManyto1 As KNN_Basics
+    Dim knn As KNN_Basics1to1
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
@@ -233,49 +238,27 @@ Public Class KNN_Test
         grid.sliders.trackbar(0).Value = 100
         grid.sliders.trackbar(1).Value = 100
 
-        knn1to1 = New KNN_Basics1to1(ocvb)
-        knnManyto1 = New KNN_Basics(ocvb)
+        knn = New KNN_Basics1to1(ocvb)
 
-        radio.Setup(ocvb, caller, 2)
-        radio.check(0).Text = "Map queries to training data 1:1"
-        radio.check(1).Text = "Map queries to training data Many:1"
-        radio.check(0).Checked = True
-
-        label1 = knn1to1.label2
+        label1 = knn.label2
         ocvb.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
 
-        If radio.check(0).Checked Then
-            knn1to1.queryPoints.Clear()
-            For i = 0 To grid.roiList.Count - 1
-                Dim roi = grid.roiList.ElementAt(i)
-                Dim pt = New cv.Point2f(roi.X + msRNG.Next(roi.Width), roi.Y + msRNG.Next(roi.Height))
-                knn1to1.queryPoints.Add(pt)
-            Next
+        knn.queryPoints.Clear()
+        For i = 0 To grid.roiList.Count - 1
+            Dim roi = grid.roiList.ElementAt(i)
+            Dim pt = New cv.Point2f(roi.X + msRNG.Next(roi.Width), roi.Y + msRNG.Next(roi.Height))
+            knn.queryPoints.Add(pt)
+        Next
 
-            If ocvb.frameCount > 0 Then
-                knn1to1.dst1.SetTo(cv.Scalar.Beige)
-                knn1to1.Run(ocvb)
-                dst1 = knn1to1.dst1
-            End If
-            knn1to1.trainingPoints = New List(Of cv.Point2f)(knn1to1.queryPoints)
-        Else
-            knnManyto1.queryPoints.Clear()
-            For i = 0 To grid.roiList.Count - 1
-                Dim roi = grid.roiList.ElementAt(i)
-                Dim pt = New cv.Point2f(roi.X + msRNG.Next(roi.Width), roi.Y + msRNG.Next(roi.Height))
-                knnManyto1.queryPoints.Add(pt)
-            Next
-
-            If ocvb.frameCount > 0 Then
-                knnManyto1.dst1.SetTo(cv.Scalar.Beige)
-                knnManyto1.Run(ocvb)
-                dst1 = knnManyto1.dst1
-            End If
-            knnManyto1.trainingPoints = New List(Of cv.Point2f)(knnManyto1.queryPoints)
+        If ocvb.frameCount > 0 Then
+            knn.dst1.SetTo(cv.Scalar.Beige)
+            knn.Run(ocvb)
+            dst1 = knn.dst1
         End If
+        knn.trainingPoints = New List(Of cv.Point2f)(knn.queryPoints)
     End Sub
 End Class
 
