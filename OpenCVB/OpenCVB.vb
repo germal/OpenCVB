@@ -769,7 +769,7 @@ Public Class OpenCVB
         If PausePlayButton.Text = "Run" Then
             PausePlayButton.Text = "Pause"
             pauseAlgorithmThread = False
-            If saveTestAllState Then testAllButton_Click(sender, e) Else StartAlgorithmTask()
+            If saveTestAllState Then testAllButton_Click(sender, e)
             PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
         Else
             PausePlayButton.Text = "Run"
@@ -1126,9 +1126,9 @@ Public Class OpenCVB
     Private Sub Run(OpenCVB As VB_Classes.ActiveClass)
         While 1
             While 1
-                If OpenCVB.ocvb.parms.activeAlgorithm <> saveAlgorithmName Or pauseAlgorithmThread Then Exit Sub ' pause will stop the current algorithm as well.
+                If OpenCVB.ocvb.parms.activeAlgorithm <> saveAlgorithmName Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
-                If camera.newImagesAvailable Then Exit While
+                If camera.newImagesAvailable And pauseAlgorithmThread = False Then Exit While
             End While
 
             ' bring the data into the algorithm task.
