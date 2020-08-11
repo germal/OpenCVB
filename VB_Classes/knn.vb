@@ -179,19 +179,19 @@ Public Class KNN_Basics1to1
                         Dim distance1 = Math.Sqrt((pt1.X - m1.X) * (pt1.X - m1.X) + (pt1.Y - m1.Y) * (pt1.Y - m1.Y))
                         Dim distance2 = Math.Sqrt((pt2.X - m1.X) * (pt2.X - m1.X) + (pt2.Y - m1.Y) * (pt2.Y - m1.Y))
                         If distance1 > distance2 Then
-                            If neighborOffset(i) >= knn.neighbors.Cols - 1 Then
+                            Dim index = knn.neighbors.Get(Of Single)(neighborOffset(i))
+                            If neighborOffset(i) >= knn.neighbors.Cols - 1 Or index > knn.trainingPoints.Count - 1 Then
                                 matchedPoints(i) = New cv.Point2f(-1, -1)
                             Else
-                                Dim index = knn.neighbors.Get(Of Single)(neighborOffset(i))
-                                matchedPoints(i) = knn.trainingPoints(index)
+                                matchedPoints(i) = knn.trainingPoints(Index)
                                 neighborOffset(i) += 1
                             End If
                         Else
-                            If neighborOffset(j) >= knn.neighbors.Cols - 1 Then
+                            Dim index = knn.neighbors.Get(Of Single)(neighborOffset(j))
+                            If neighborOffset(j) >= knn.neighbors.Cols - 1 Or index > knn.trainingPoints.Count - 1 Then
                                 matchedPoints(j) = New cv.Point2f(-1, -1)
                             Else
-                                Dim index = knn.neighbors.Get(Of Single)(neighborOffset(j))
-                                matchedPoints(j) = knn.trainingPoints(index)
+                                matchedPoints(j) = knn.trainingPoints(Index)
                                 neighborOffset(j) += 1
                             End If
                         End If
@@ -228,6 +228,8 @@ Public Class KNN_Test
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
+        grid.sliders.trackbar(0).Minimum = 50 ' limit the number of centroids - KNN can't handle more than a few thousand without rework.
+        grid.sliders.trackbar(1).Minimum = 50
         grid.sliders.trackbar(0).Value = 100
         grid.sliders.trackbar(1).Value = 100
 
@@ -257,7 +259,6 @@ Public Class KNN_Test
                 knn1to1.dst1.SetTo(cv.Scalar.Beige)
                 knn1to1.Run(ocvb)
                 dst1 = knn1to1.dst1
-                dst1.SetTo(cv.Scalar.Black, grid.gridMask)
             End If
             knn1to1.trainingPoints = New List(Of cv.Point2f)(knn1to1.queryPoints)
         Else
@@ -272,7 +273,6 @@ Public Class KNN_Test
                 knnManyto1.dst1.SetTo(cv.Scalar.Beige)
                 knnManyto1.Run(ocvb)
                 dst1 = knnManyto1.dst1
-                dst1.SetTo(cv.Scalar.Black, grid.gridMask)
             End If
             knnManyto1.trainingPoints = New List(Of cv.Point2f)(knnManyto1.queryPoints)
         End If
