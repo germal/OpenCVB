@@ -1125,11 +1125,10 @@ Public Class OpenCVB
     End Sub
     Private Sub Run(OpenCVB As VB_Classes.ActiveClass)
         While 1
-            ' wait until we have the latest camera data.
             While 1
-                If OpenCVB.ocvb.parms.activeAlgorithm <> saveAlgorithmName Then Exit Sub
+                If OpenCVB.ocvb.parms.activeAlgorithm <> saveAlgorithmName Or pauseAlgorithmThread Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
-                If camera.newImagesAvailable And pauseAlgorithmThread = False Then Exit While
+                If camera.newImagesAvailable Then Exit While
             End While
 
             ' bring the data into the algorithm task.
