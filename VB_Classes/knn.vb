@@ -168,7 +168,8 @@ Public Class KNN_Basics1to1
             neighborOffset(i) = 0
         Next
 
-        If check.Box(0).Checked Then
+        Static mapOneToOneCheck = findCheckBox("Map queries to training data 1:1")
+        If mapOneToOneCheck.Checked Then
             ' map the points 1 to 1: find duplicate best fits, choose which is better, loser must relinquish the training data element and use the next neighbor
             Dim changedNeighbors As Boolean = True
             While changedNeighbors
