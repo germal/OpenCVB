@@ -32,13 +32,14 @@ Public Class EMax_Basics
         ocvb.desc = "OpenCV expectation maximization example."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        grid.Run(ocvb)
-        regionCount = grid.roiList.Count - 1
-
         If standalone Then
             ocvb.putText(New TTtext("The EMax ocvbClass fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
-                                                  "The EMax_Basics_CPP works fine and they are functionally identical.", 20, 100, RESULT2))
+                                    "The EMax_Basics_CPP works fine and they are functionally identical.", 20, 100, RESULT1))
+            Exit Sub
         End If
+
+        grid.Run(ocvb)
+        regionCount = grid.roiList.Count - 1
 
         samples = New cv.Mat(sliders.trackbar(0).Value, 2, cv.MatType.CV_32FC1, 0)
         If regionCount > samples.Rows / 2 Then regionCount = samples.Rows / 2
@@ -87,12 +88,10 @@ Public Class EMax_Basics
         End If
 
         ' draw the clustered samples
-        If check.Box(0).Checked Then
-            For i = 0 To samples.Rows - 1
-                Dim pt = New cv.Point(Math.Round(samples.Get(Of Single)(i, 0)), Math.Round(samples.Get(Of Single)(i, 1)))
-                dst1.Circle(pt, 4, rColors(labels.Get(Of Int32)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
-            Next
-        End If
+        For i = 0 To samples.Rows - 1
+            Dim pt = New cv.Point(Math.Round(samples.Get(Of Single)(i, 0)), Math.Round(samples.Get(Of Single)(i, 1)))
+            dst1.Circle(pt, 4, rColors(labels.Get(Of Int32)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
+        Next
     End Sub
 End Class
 
@@ -162,7 +161,8 @@ Public Class EMax_Basics_CPP
         If imagePtr <> 0 Then dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
 
         inputDataMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        If basics.check.Box(0).Checked Then dst1.CopyTo(dst2, inputDataMask)
+        Static showInputCheck = findCheckBox("Show input in output")
+        If showInputCheck.Checked Then dst1.CopyTo(dst2, inputDataMask)
     End Sub
     Public Sub Close()
         EMax_Basics_Close(EMax_Basics)
@@ -185,8 +185,6 @@ Public Class EMax_Centroids
         setCaller(ocvb)
 
         emaxCPP = New EMax_Basics_CPP(ocvb)
-        emaxCPP.basics.check.Box(0).Checked = False
-        emaxCPP.basics.sliders.trackbar(1).Value = 15
         emaxCPP.Run(ocvb)
 
         ocvb.desc = "Get the Emax cluster centroids using floodfill "
@@ -217,5 +215,30 @@ Public Class EMax_Centroids
                 End If
             Next
         Next
+        If standalone Then
+            For i = 0 To centroids.Count - 1
+                cv.Cv2.Circle(dst1, centroids(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+            Next
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class EMax_ConsistentColor
+    Inherits ocvbClass
+    Dim knn As KNN_Centroids
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        knn = New KNN_Centroids(ocvb)
+        ocvb.desc = "Same as KNN_Centroids - to show consistent EMax color regions"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        knn.Run(ocvb)
+        dst1 = knn.dst1.Clone()
     End Sub
 End Class
