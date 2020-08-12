@@ -316,6 +316,7 @@ Public Class OpenCVB
                     For i = 0 To TTtextData.Count - 1
                         Dim tt = TTtextData(i)
                         If tt IsNot Nothing Then
+                            If g.VisibleClipBounds.Width <= tt.x Then tt.x /= 2 ' if this was supposed to go to dst2's portion of campic(2)
                             g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White), tt.x, tt.y)
                             maxline -= 1
                             If maxline <= 0 Then Exit For

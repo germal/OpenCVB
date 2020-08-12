@@ -160,7 +160,7 @@ Public Class ocvbClass : Implements IDisposable
             proc(i).Kill()
         Next i
         If pyStream IsNot Nothing Then pyStream.Dispose()
-        Console.WriteLine("The following System.MissingMemberException is harmless if algorithm has no 'Close' method.")
+        Console.WriteLine("The following System.MissingMemberException indicates the algorithm has no 'Close' method (harmless notification).")
         algorithm.Close()  ' Close any unmanaged classes...
         sliders.Dispose()
         check.Dispose()

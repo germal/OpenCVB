@@ -180,41 +180,45 @@ End Class
 Public Class KNN_Centroids
     Inherits ocvbClass
     Dim emax As EMax_Centroids
-    Dim knn As KNN_Basics
+    Public basics As KNN_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         emax = New EMax_Centroids(ocvb)
-        emax.Run(ocvb)
+        basics = New KNN_Basics(ocvb)
 
-        knn = New KNN_Basics(ocvb)
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Display centroids"
+        If standalone Then check.Box(0).Checked = True
 
         label1 = "Query is Red, nearest is white, unmatched is yellow"
         label2 = "Current image without correcting colors"
         ocvb.desc = "Map the current centroids to the previous generation to match the color used."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        knn.trainingPoints = New List(Of cv.Point2f)(emax.centroids)
+        basics.trainingPoints = New List(Of cv.Point2f)(emax.centroids)
 
         emax.Run(ocvb)
 
-        knn.queryPoints = New List(Of cv.Point2f)(emax.centroids)
-        knn.Run(ocvb)
+        basics.queryPoints = New List(Of cv.Point2f)(emax.centroids)
+        basics.Run(ocvb)
 
         Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
         Dim rect As New cv.Rect
         Static lastImage = emax.emaxCPP.dst2.Clone
         dst1 = emax.emaxCPP.dst2.Clone()
-        For Each pt In knn.matchedPoints
-            If pt.X >= 0 Then
-                Dim nextVec = lastImage.Get(Of cv.Vec3b)(pt.Y, pt.X)
-                Dim nextColor = New cv.Scalar(nextVec.item0, nextVec.item1, nextVec.item2)
-                cv.Cv2.FloodFill(dst1, maskPlus, pt, nextColor, rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
-                Dim fontSize = If(ocvb.parms.resolution = resHigh, 0.8, 0.5)
-            End If
-        Next
+        If basics.matchedPoints IsNot Nothing Then ' no centroids are matched on the first pass.
+            For Each pt In basics.matchedPoints
+                If pt.X >= 0 Then
+                    Dim nextVec = lastImage.Get(Of cv.Vec3b)(pt.Y, pt.X)
+                    Dim nextColor = New cv.Scalar(nextVec.item0, nextVec.item1, nextVec.item2)
+                    cv.Cv2.FloodFill(dst1, maskPlus, pt, nextColor, rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
+                    Dim fontSize = If(ocvb.parms.resolution = resHigh, 0.8, 0.5)
+                End If
+            Next
+        End If
         lastImage = dst1.Clone
         dst2 = emax.emaxCPP.dst2
-        cv.Cv2.BitwiseOr(dst1, knn.dst2, dst1)
+        cv.Cv2.BitwiseOr(dst1, basics.dst2, dst1)
     End Sub
 End Class
 

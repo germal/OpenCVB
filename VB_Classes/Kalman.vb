@@ -477,3 +477,35 @@ Public Class Kalman_Simple : Implements IDisposable
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Kalman_Centroids
+    Inherits ocvbClass
+    Dim knn As KNN_Centroids
+    Dim kalman As Kalman_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        kalman = New Kalman_Basics(ocvb)
+        knn = New KNN_Centroids(ocvb)
+
+        label1 = "Centroids without stabilization"
+        ocvb.desc = "Use Kalman to stabilize the EMax Centroids"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim trainingPoints = New List(Of cv.Point2f)(knn.basics.trainingPoints)
+        knn.Run(ocvb)
+        dst1 = knn.dst1
+
+        For Each pt1 In trainingPoints
+            For Each pt2 In knn.basics.matchedPoints
+                If pt1 = pt2 Then
+
+                End If
+            Next
+        Next
+    End Sub
+End Class

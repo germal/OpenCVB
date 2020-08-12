@@ -46,3 +46,4 @@ Data/svm_data.dat
 packages/EMGU*
 MYNT-EYE-D-SDK
 ~$README.md
+*.recipe
