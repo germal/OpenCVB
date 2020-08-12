@@ -956,6 +956,8 @@ Public Class OpenCVB
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
         TestAllTimer.Enabled = False
+        saveAlgorithmName = "" ' this will shut down the currently running algorithm
+
         Dim saveCurrentCamera = optionsForm.cameraIndex
 
         Dim OKcancel = optionsForm.ShowDialog()
@@ -1048,7 +1050,6 @@ Public Class OpenCVB
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
-
             AlgorithmTestCount += 1
             drawRect = New cv.Rect
             Dim saveLowResSetting As Boolean = parms.resolution
