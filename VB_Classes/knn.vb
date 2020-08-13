@@ -218,7 +218,7 @@ Public Class KNN_Centroids
         End If
         lastImage = dst1.Clone
         dst2 = emax.emaxCPP.dst2
-        cv.Cv2.BitwiseOr(dst1, basics.dst2, dst1)
+        If check.Box(0).Checked Then cv.Cv2.BitwiseOr(dst1, basics.dst2, dst1)
     End Sub
 End Class
 
