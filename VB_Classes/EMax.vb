@@ -10,18 +10,17 @@ Public Class EMax_Basics
     Public regionCount As Int32
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        grid = New Thread_Grid(ocvb)
-
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Show EMax input in output"
-
-        grid.sliders.trackbar(0).Value = src.Width / 3 ' 270
-        grid.sliders.trackbar(1).Value = src.Height / 3 ' 150
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "EMax Number of Samples", 1, 200, 100)
         sliders.setupTrackBar(1, "EMax Prediction Step Size", 1, 20, 5)
         sliders.setupTrackBar(2, "EMax Sigma (spread)", 1, 100, 30)
+
+        grid = New Thread_Grid(ocvb)
+        grid.sliders.trackbar(0).Value = src.Width / 3 ' 270
+        grid.sliders.trackbar(1).Value = src.Height / 3 ' 150
 
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "EMax matrix type Spherical"

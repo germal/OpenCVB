@@ -14,13 +14,15 @@ Public Class KNN_Basics
             emax.Run(ocvb) ' set the first generation of points.
         End If
 
-        check.Setup(ocvb, caller, 3)
+        check.Setup(ocvb, caller, 4)
         check.Box(0).Text = "Map queries to training data 1:1 (Off means many:1)"
         check.Box(1).Text = "Display queries"
         check.Box(2).Text = "Display training input and connecting line"
+        check.Box(3).Text = "Floodfill the identified region"
         check.Box(0).Checked = True
         check.Box(1).Checked = True
         check.Box(2).Checked = True
+        If standalone Then check.Box(3).Enabled = False Else check.Box(3).Checked = True
 
         knn = New KNN_BasicsManyToOne(ocvb)
         label1 = "Output from Emax"
@@ -98,9 +100,6 @@ Public Class KNN_Basics
                 If showLastQuery Then
                     cv.Cv2.Circle(dst2, matchedPoints(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
                     dst2.Line(matchedPoints(i), queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
-                    'If Math.Sqrt((matchedPoints(i).X - queryPoints(i).X) * (matchedPoints(i).X - queryPoints(i).X) + (matchedPoints(i).Y - queryPoints(i).Y) * (matchedPoints(i).Y - queryPoints(i).Y)) > src.Width / 2 Then
-                    '    i = i
-                    'End If
                 End If
             Else
                 unmatchedPoints.Add(queryPoints(i))
@@ -209,13 +208,14 @@ Public Class KNN_Centroids
         Dim rect As New cv.Rect
         Static lastImage = emax.emaxCPP.dst2.Clone
         dst1 = emax.emaxCPP.dst2.Clone()
+        Static floodfillCheckBox = findCheckBox("Floodfill the identified region")
+        Dim floodfill = floodfillCheckBox.checked
         If basics.matchedPoints IsNot Nothing Then ' no centroids are matched on the first pass.
             For Each pt In basics.matchedPoints
-                If pt.X >= 0 Then
+                If pt.X >= 0 And floodfill Then
                     Dim nextVec = lastImage.Get(Of cv.Vec3b)(pt.Y, pt.X)
                     Dim nextColor = New cv.Scalar(nextVec.item0, nextVec.item1, nextVec.item2)
                     cv.Cv2.FloodFill(dst1, maskPlus, pt, nextColor, rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
-                    Dim fontSize = If(ocvb.parms.resolution = resHigh, 0.8, 0.5)
                 End If
             Next
         End If
