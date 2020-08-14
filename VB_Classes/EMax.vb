@@ -13,7 +13,7 @@ Public Class EMax_Basics
         grid = New Thread_Grid(ocvb)
 
         check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Show input in output"
+        check.Box(0).Text = "Show EMax input in output"
 
         grid.sliders.trackbar(0).Value = src.Width / 3 ' 270
         grid.sliders.trackbar(1).Value = src.Height / 3 ' 150
@@ -119,7 +119,7 @@ End Module
 Public Class EMax_Basics_CPP
     Inherits ocvbClass
     Public basics As EMax_Basics
-    Public inputDataMask As cv.Mat
+    Dim inputDataMask As cv.Mat
     Dim EMax_Basics As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -135,6 +135,7 @@ Public Class EMax_Basics_CPP
         dst1 = basics.dst1
         Dim srcCount = basics.sliders.trackbar(0).Value
         label1 = CStr(srcCount) + " Random samples in " + CStr(basics.regionCount) + " clusters"
+        If basics.regionCount <= 0 Then Exit Sub
 
         Dim covarianceMatrixType As Int32 = 0
         For i = 0 To 3 - 1
@@ -160,9 +161,11 @@ Public Class EMax_Basics_CPP
 
         If imagePtr <> 0 Then dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
 
-        inputDataMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        Static showInputCheck = findCheckBox("Show input in output")
-        If showInputCheck.Checked Then dst1.CopyTo(dst2, inputDataMask)
+        Static showInputCheck = findCheckBox("Show EMax input in output")
+        If showInputCheck.Checked Then
+            inputDataMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+            dst1.CopyTo(dst2, inputDataMask)
+        End If
     End Sub
     Public Sub Close()
         EMax_Basics_Close(EMax_Basics)
@@ -238,6 +241,7 @@ Public Class EMax_ConsistentColor
         ocvb.desc = "Same as KNN_Centroids - to show consistent EMax color regions"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        knn.basics.trainingPoints = New List(Of cv.Point2f)(knn.emax.centroids)
         knn.Run(ocvb)
         dst1 = knn.dst1.Clone()
     End Sub

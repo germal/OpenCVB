@@ -1,9 +1,4 @@
 Imports cv = OpenCvSharp
-
-
-
-
-
 Public Class KNN_Basics
     Inherits ocvbClass
     Dim knn As KNN_BasicsManyToOne
@@ -19,9 +14,13 @@ Public Class KNN_Basics
             emax.Run(ocvb) ' set the first generation of points.
         End If
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(ocvb, caller, 3)
         check.Box(0).Text = "Map queries to training data 1:1 (Off means many:1)"
+        check.Box(1).Text = "Display queries"
+        check.Box(2).Text = "Display training input and connecting line"
         check.Box(0).Checked = True
+        check.Box(1).Checked = True
+        check.Box(2).Checked = True
 
         knn = New KNN_BasicsManyToOne(ocvb)
         label1 = "Output from Emax"
@@ -65,22 +64,21 @@ Public Class KNN_Basics
                             Dim pt2 = knn.queryPoints(j)
                             Dim distance1 = Math.Sqrt((pt1.X - m1.X) * (pt1.X - m1.X) + (pt1.Y - m1.Y) * (pt1.Y - m1.Y))
                             Dim distance2 = Math.Sqrt((pt2.X - m1.X) * (pt2.X - m1.X) + (pt2.Y - m1.Y) * (pt2.Y - m1.Y))
-                            If distance1 > distance2 Then
-                                Dim index = knn.neighbors.Get(Of Single)(neighborOffset(i))
-                                If neighborOffset(i) >= knn.neighbors.Cols - 1 Or index > knn.trainingPoints.Count - 1 Or index < 0 Then
-                                    matchedPoints(i) = New cv.Point2f(-1, -1)
-                                Else
-                                    matchedPoints(i) = knn.trainingPoints(index)
-                                    neighborOffset(i) += 1
+                            Dim ij = If(distance1 > distance2, i, j)
+                            Dim unresolved = True
+                            If ij < neighborOffset.Length Then
+                                If neighborOffset(ij) < knn.neighbors.Rows - 1 Then
+                                    neighborOffset(ij) += 1
+                                    Dim index = knn.neighbors.Get(Of Single)(neighborOffset(ij))
+                                    If index < knn.trainingPoints.Count And index >= 0 Then
+                                        unresolved = False
+                                        matchedPoints(ij) = knn.trainingPoints(index)
+                                    End If
                                 End If
-                            Else
-                                Dim index = knn.neighbors.Get(Of Single)(neighborOffset(j))
-                                If neighborOffset(j) >= knn.neighbors.Cols - 1 Or index > knn.trainingPoints.Count - 1 Or index < 0 Then
-                                    matchedPoints(j) = New cv.Point2f(-1, -1)
-                                Else
-                                    matchedPoints(j) = knn.trainingPoints(index)
-                                    neighborOffset(j) += 1
-                                End If
+                            End If
+                            If unresolved Then
+                                matchedPoints(ij) = New cv.Point2f(-1, -1)
+                                Exit For
                             End If
                         End If
                     Next
@@ -90,11 +88,20 @@ Public Class KNN_Basics
 
         If standalone Then dst2 = dst1.Clone Else dst2.SetTo(0)
         unmatchedPoints.Clear()
+        Static displayQueryCheckbox = findCheckBox("Display queries")
+        Dim showQuery = displayQueryCheckbox.checked
+        Static displayLastQueryCheckbox = findCheckBox("Display training input")
+        Dim showLastQuery = displayLastQueryCheckbox.checked
         For i = 0 To queryPoints.Count - 1
-            cv.Cv2.Circle(dst2, queryPoints(i), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+            If showQuery Then cv.Cv2.Circle(dst2, queryPoints(i), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
             If matchedPoints(i).X >= 0 Then
-                cv.Cv2.Circle(dst2, matchedPoints(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
-                dst2.Line(matchedPoints(i), queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+                If showLastQuery Then
+                    cv.Cv2.Circle(dst2, matchedPoints(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+                    dst2.Line(matchedPoints(i), queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+                    'If Math.Sqrt((matchedPoints(i).X - queryPoints(i).X) * (matchedPoints(i).X - queryPoints(i).X) + (matchedPoints(i).Y - queryPoints(i).Y) * (matchedPoints(i).Y - queryPoints(i).Y)) > src.Width / 2 Then
+                    '    i = i
+                    'End If
+                End If
             Else
                 unmatchedPoints.Add(queryPoints(i))
                 cv.Cv2.Circle(dst2, queryPoints(i), 10, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias, 0)
@@ -179,23 +186,19 @@ End Class
 
 Public Class KNN_Centroids
     Inherits ocvbClass
-    Dim emax As EMax_Centroids
+    Public emax As EMax_Centroids
     Public basics As KNN_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         emax = New EMax_Centroids(ocvb)
         basics = New KNN_Basics(ocvb)
 
-        check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Display centroids"
-        If standalone Then check.Box(0).Checked = True
-
         label1 = "Query is Red, nearest is white, unmatched is yellow"
         label2 = "Current image without correcting colors"
         ocvb.desc = "Map the current centroids to the previous generation to match the color used."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        basics.trainingPoints = New List(Of cv.Point2f)(emax.centroids)
+        If standalone Then basics.trainingPoints = New List(Of cv.Point2f)(emax.centroids)
 
         emax.Run(ocvb)
 
@@ -218,7 +221,10 @@ Public Class KNN_Centroids
         End If
         lastImage = dst1.Clone
         dst2 = emax.emaxCPP.dst2
-        If check.Box(0).Checked Then cv.Cv2.BitwiseOr(dst1, basics.dst2, dst1)
+
+        Static displayQueryCheckbox = findCheckBox("Display queries")
+        Static displayLastQueryCheckbox = findCheckBox("Display training input")
+        If displayQueryCheckbox.checked Or displayLastQueryCheckbox.Checked Then cv.Cv2.BitwiseOr(dst1, basics.dst2, dst1)
     End Sub
 End Class
 

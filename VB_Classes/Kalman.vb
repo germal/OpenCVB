@@ -486,69 +486,98 @@ Public Class Kalman_Centroids
     Inherits ocvbClass
     Dim knn As KNN_Centroids
     Dim kalman(0) As Kalman_Basics
+    Dim newQueries As New List(Of cv.Point2f)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         knn = New KNN_Centroids(ocvb)
 
         label1 = "Centroids in yellow"
+        label2 = "Original EMax output - unregistered colors"
         ocvb.desc = "Use Kalman to stabilize the EMax Centroids"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        System.Threading.Thread.Sleep(1000)
         Static useKalmanCheck As Windows.Forms.CheckBox
-        knn.Run(ocvb)
-        dst1 = knn.dst1
+        Dim kalmanActive = useKalmanCheck?.Checked
 
-        If knn.basics.trainingPoints.Count = 0 Then Exit Sub ' first pass has not training data.
+        Dim trainingPoints = New List(Of cv.Point2f)(knn.emax.centroids)
+        If trainingPoints.Count = 0 Then
+            knn.Run(ocvb)
+            Exit Sub ' first pass has no training data.
+        End If
 
-        If kalman.Length < knn.basics.trainingPoints.Count Then
-            ReDim kalman(knn.basics.trainingPoints.Count + 10) ' pad a little to keep more info
+        If kalman.Length < trainingPoints.Count Then
+            ReDim kalman(trainingPoints.Count + 10) ' pad a little to keep more info
             For i = 0 To kalman.Count - 1
                 If i > 0 Then ocvb.suppressOptions = True
                 kalman(i) = New Kalman_Basics(ocvb)
-                If i < knn.basics.trainingPoints.Count Then
-                    kalman(i).input = {knn.basics.trainingPoints(i).X, knn.basics.trainingPoints(i).Y}
+                If i < trainingPoints.Count Then
+                    kalman(i).input = {trainingPoints(i).X, trainingPoints(i).Y}
                 Else
                     kalman(i).input = {-1, -1}
                 End If
             Next
             ocvb.suppressOptions = False
             useKalmanCheck = findCheckBox("Turn Kalman filtering on")
-            useKalmanCheck.Visible = True
         End If
 
-        If useKalmanCheck.Checked = False Then Exit Sub
-        For i = 0 To knn.basics.trainingPoints.Count - 1
-            Dim pt1 = New cv.Point2f(kalman(i).input(0), kalman(i).input(1))
-            Dim foundKalman As Boolean
-            For j = 0 To knn.basics.matchedPoints.Count - 1
-                Dim pt2 = knn.basics.matchedPoints(j)
-                If pt1 = pt2 Then
-                    foundKalman = True
-                    kalman(i).input = {knn.basics.trainingPoints(i).X, knn.basics.trainingPoints(i).Y}
-                    kalman(i).Run(ocvb)
-                    Dim pt3 = New cv.Point(kalman(i).output(0), kalman(i).output(1))
-                    cv.Cv2.Circle(dst1, pt1, 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
-                    cv.Cv2.Circle(dst1, pt3, 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
-                    dst1.Line(pt1, pt3, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
-                    kalman(i).input = {knn.basics.queryPoints(j).X, knn.basics.queryPoints(j).Y}
-                    Exit For
+        knn.basics.trainingPoints.Clear()
+        For i = 0 To kalman.Count - 1
+            If kalman(i).input(0) >= 0 Then knn.basics.trainingPoints.Add(New cv.Point2f(kalman(i).input(0), kalman(i).input(1)))
+        Next
+
+        If newQueries.Count > 0 Then
+            Dim qIndex As Integer
+            For i = knn.basics.trainingPoints.Count To kalman.Count - 1
+                If qIndex >= newQueries.Count Then Exit For
+                knn.basics.trainingPoints.Add(newQueries(qIndex))
+                kalman(i).input = {newQueries(qIndex).X, newQueries(qIndex).Y}
+                qIndex += 1
+                If qIndex >= kalman.Count Then ' we don't have enough kalman filters to handle this level of queries
+                    ReDim kalman(0)
+                    Exit Sub
                 End If
             Next
-            If foundKalman = False Then
+        End If
+
+        knn.Run(ocvb)
+        dst1 = knn.dst1
+
+        For i = 0 To knn.basics.matchedPoints.Count - 1
+            If knn.basics.matchedPoints(i).X < 0 Then
                 For j = 0 To kalman.Count - 1
-                    If kalman(j).input(0) = -1 Then
-                        kalman(j).input = {knn.basics.trainingPoints(i).X, knn.basics.trainingPoints(i).Y}
-                        kalman(i).Run(ocvb)
-                        Dim pt3 = New cv.Point(kalman(i).output(0), kalman(i).output(1))
-                        cv.Cv2.Circle(dst1, pt1, 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
-                        cv.Cv2.Circle(dst1, pt3, 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
-                        dst1.Line(pt1, knn.basics.queryPoints(j), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+                    If kalman(j).input(0) < 0 Then
+                        kalman(j).input = {knn.basics.queryPoints(i).X, knn.basics.queryPoints(i).Y}
                         Exit For
                     End If
                 Next
             End If
         Next
+
+        For i = 0 To knn.basics.trainingPoints.Count - 1
+            'If i >= knn.basics.queryPoints.Count Then Exit For
+            Dim pt1 = knn.basics.trainingPoints(i)
+            For j = 0 To knn.basics.matchedPoints.Count - 1
+                Dim pt2 = knn.basics.matchedPoints(j)
+                If pt1 = pt2 Then
+                    kalman(i).input = {knn.basics.queryPoints(j).X, knn.basics.queryPoints(j).Y}
+                    If kalmanActive Then
+                        kalman(i).Run(ocvb)
+                    Else
+                        kalman(i).output = {knn.basics.queryPoints(j).X, knn.basics.queryPoints(j).Y}
+                    End If
+                    Dim pt3 = New cv.Point(kalman(i).output(0), kalman(i).output(1))
+                    cv.Cv2.Circle(dst1, pt3, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+                    Exit For
+                End If
+            Next
+        Next
+
+        newQueries.Clear()
+        For i = 0 To knn.basics.matchedPoints.Count - 1
+            Dim pt1 = knn.basics.matchedPoints(i)
+            If pt1.X = -1 And pt1.X = -1 Then newQueries.Add(pt1)
+        Next
+        dst2 = knn.emax.emaxCPP.dst2
     End Sub
 End Class

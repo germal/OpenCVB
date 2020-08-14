@@ -13,20 +13,20 @@ group the different algorithms by what OpenCV API’s or other OpenCVB algorithm
 are used. The default grouping is to select “\<All\>” algorithms while other
 special groupings allow selecting Python or C++ or Multi-threaded algorithms.
 The text at the right side of the toolbar is a brief description of the
-algorithm. Icons on the left side are to: stop/start the algorithm, change
-global settings for OpenCVB, test all cameras with all algorithms, and take a
-picture of the current output.
+algorithm. Icons on the left side are to (l. to r.): pause/resume the algorithm,
+change global settings for OpenCVB, run regression tests, and take a picture of
+the current output.
 
 ![](media/b1e011f4681611111d7a7c752e274599.png)
 
 The output images above are: the RGB output (upper left), the colorized depth
 image (upper right), the output of the current algorithm (lower left) and an
 optional second image output from the algorithm (lower right). In this example
-the “PointCloud_GVector_TopView” algorithm renders the camera point cloud as if
-seen from directly above – a useful view to find walls and objects. The data is
-colored the same as the RGB Depth data in the upper right image. The lower right
-image has isolated the objects found with a rectangle that measures the width
-and breadth of each object in the camera’s field of view.
+the algorithm renders the camera point cloud as if seen from directly above – a
+useful view to find walls and objects. The data is colored the same as the RGB
+Depth data in the upper right image. The lower right image has isolated the
+objects found with a rectangle that measures the width and breadth of each
+object in the camera’s field of view.
 
 The “Sample Results” section below provides numerous additional examples.
 
@@ -65,8 +65,8 @@ The Objective
 =============
 
 The objective is to solve many small computer vision problems and do so in a way
-that enables the solution to be reused. The resulting toolkit can solve bigger
-and more important problems.
+that enables any of the solutions to be reused. The resulting toolkit can solve
+bigger and more important problems.
 
 OpenCVB is targeting only cameras that produce depth and color. These newer
 cameras have prompted a review of existing vision algorithms to see how they can
