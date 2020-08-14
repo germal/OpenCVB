@@ -193,3 +193,49 @@ Public Class Contours_RGB
     End Sub
 End Class
 
+
+
+
+
+' https://github.com/SciSharp/SharpCV/blob/master/src/SharpCV.Examples/Program.cs
+Public Class Contours_RemoveLines
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.Setup(ocvb, caller, 3)
+        sliders.setupTrackBar(0, "Morphology width/height", 1, 100, 20)
+        sliders.setupTrackBar(1, "MorphologyEx iterations", 1, 5, 1)
+        sliders.setupTrackBar(2, "Contour thickness", 1, 10, 3)
+        label1 = "Original image"
+        label2 = "Original with horizontal/vertical lines removed"
+        ocvb.desc = "Remove the lines from an invoice image"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim tmp = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/invoice.jpg")
+        Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
+        Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)
+        dst1(dstRect) = tmp.Resize(dstSize)
+        Dim gray = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim thresh = gray.Threshold(0, 255, cv.ThresholdTypes.BinaryInv Or cv.ThresholdTypes.Otsu)
+
+        ' remove horizontal lines
+        Dim hkernel = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(sliders.trackbar(0).Value, 1))
+        Dim removedH As New cv.Mat
+        cv.Cv2.MorphologyEx(thresh, removedH, cv.MorphTypes.Open, hkernel,, sliders.trackbar(1).Value)
+        Dim cnts = cv.Cv2.FindContoursAsArray(removedH, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
+        For i = 0 To cnts.Count - 1
+            cv.Cv2.DrawContours(tmp, cnts, i, cv.Scalar.White, sliders.trackbar(2).Value)
+        Next
+
+        Dim vkernel = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(1, sliders.trackbar(0).Value))
+        Dim removedV As New cv.Mat
+        cv.Cv2.MorphologyEx(thresh, removedV, cv.MorphTypes.Open, vkernel,, sliders.trackbar(1).Value)
+        cnts = cv.Cv2.FindContoursAsArray(removedV, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
+        For i = 0 To cnts.Count - 1
+            cv.Cv2.DrawContours(tmp, cnts, i, cv.Scalar.White, sliders.trackbar(2).Value)
+        Next
+
+        dst2(dstRect) = tmp.Resize(dstSize)
+        cv.Cv2.ImShow("Altered image at original resolution", tmp)
+    End Sub
+End Class

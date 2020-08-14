@@ -521,6 +521,7 @@ Public Class Kalman_Centroids
             useKalmanCheck = findCheckBox("Turn Kalman filtering on")
         End If
 
+        ' when the queries outnumber the trainingpoints and we are 1:1, some new queries can appear.
         knn.basics.trainingPoints.Clear()
         For i = 0 To kalman.Count - 1
             If kalman(i).input(0) >= 0 Then knn.basics.trainingPoints.Add(New cv.Point2f(kalman(i).input(0), kalman(i).input(1)))
@@ -533,7 +534,7 @@ Public Class Kalman_Centroids
                 knn.basics.trainingPoints.Add(newQueries(qIndex))
                 kalman(i).input = {newQueries(qIndex).X, newQueries(qIndex).Y}
                 qIndex += 1
-                If qIndex >= kalman.Count Then ' we don't have enough kalman filters to handle this level of queries
+                If qIndex >= kalman.Count Then ' we don't have enough kalman filters to handle this level of queries so restart
                     ReDim kalman(0)
                     Exit Sub
                 End If
@@ -555,7 +556,6 @@ Public Class Kalman_Centroids
         Next
 
         For i = 0 To knn.basics.trainingPoints.Count - 1
-            'If i >= knn.basics.queryPoints.Count Then Exit For
             Dim pt1 = knn.basics.trainingPoints(i)
             For j = 0 To knn.basics.matchedPoints.Count - 1
                 Dim pt2 = knn.basics.matchedPoints(j)
