@@ -512,9 +512,9 @@ Public Class Kalman_Centroids
                 If i > 0 Then ocvb.suppressOptions = True
                 kalman(i) = New Kalman_Basics(ocvb)
                 If i < trainingPoints.Count Then
-                    kalman(i).input = {trainingPoints(i).X, trainingPoints(i).Y}
+                    kalman(i).input = New Single() {trainingPoints(i).X, trainingPoints(i).Y}
                 Else
-                    kalman(i).input = {-1, -1}
+                    kalman(i).input = New Single() {-1, -1, 0, 0, 0}
                 End If
             Next
             ocvb.suppressOptions = False
@@ -543,6 +543,7 @@ Public Class Kalman_Centroids
 
         knn.Run(ocvb)
         dst1 = knn.dst1
+        dst2 = knn.emax.emaxCPP.dst2
 
         For i = 0 To knn.basics.matchedPoints.Count - 1
             If knn.basics.matchedPoints(i).X < 0 Then
@@ -555,6 +556,8 @@ Public Class Kalman_Centroids
             End If
         Next
 
+        Dim rect As New cv.Rect
+        Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
         For i = 0 To knn.basics.trainingPoints.Count - 1
             Dim pt1 = knn.basics.trainingPoints(i)
             For j = 0 To knn.basics.matchedPoints.Count - 1
@@ -578,6 +581,5 @@ Public Class Kalman_Centroids
             Dim pt1 = knn.basics.matchedPoints(i)
             If pt1.X = -1 And pt1.X = -1 Then newQueries.Add(pt1)
         Next
-        dst2 = knn.emax.emaxCPP.dst2
     End Sub
 End Class

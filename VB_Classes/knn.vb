@@ -187,6 +187,7 @@ Public Class KNN_Centroids
     Inherits ocvbClass
     Public emax As EMax_Centroids
     Public basics As KNN_Basics
+    Public lastImage As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         emax = New EMax_Centroids(ocvb)
@@ -206,7 +207,7 @@ Public Class KNN_Centroids
 
         Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
         Dim rect As New cv.Rect
-        Static lastImage = emax.emaxCPP.dst2.Clone
+        if ocvb.frameCount = 0 Then lastImage = emax.emaxCPP.dst2.Clone
         dst1 = emax.emaxCPP.dst2.Clone()
         Static floodfillCheckBox = findCheckBox("Floodfill the identified region")
         Dim floodfill = floodfillCheckBox.checked
