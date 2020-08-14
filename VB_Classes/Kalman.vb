@@ -484,13 +484,13 @@ End Class
 
 Public Class Kalman_Centroids
     Inherits ocvbClass
-    Dim knn As KNN_Centroids
+    Dim knn As KNN_CentroidsEMax
     Dim kalman(0) As Kalman_Basics
     Dim newQueries As New List(Of cv.Point2f)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        knn = New KNN_Centroids(ocvb)
+        knn = New KNN_CentroidsEMax(ocvb)
 
         label1 = "Centroids in yellow"
         label2 = "Original EMax output - unregistered colors"
@@ -506,6 +506,7 @@ Public Class Kalman_Centroids
             Exit Sub ' first pass has no training data.
         End If
 
+        ' allocate the kalman filters for each centroid with some additional filters for objects that come and go...
         If kalman.Length < trainingPoints.Count Then
             ReDim kalman(trainingPoints.Count + 10) ' pad a little to keep more info
             For i = 0 To kalman.Count - 1
@@ -514,20 +515,20 @@ Public Class Kalman_Centroids
                 If i < trainingPoints.Count Then
                     kalman(i).input = New Single() {trainingPoints(i).X, trainingPoints(i).Y}
                 Else
-                    kalman(i).input = New Single() {-1, -1, 0, 0, 0}
+                    kalman(i).input = New Single() {-1, -1}
                 End If
             Next
             ocvb.suppressOptions = False
             useKalmanCheck = findCheckBox("Turn Kalman filtering on")
         End If
 
-        ' when the queries outnumber the trainingpoints and we are 1:1, some new queries can appear.
         knn.basics.trainingPoints.Clear()
         For i = 0 To kalman.Count - 1
             If kalman(i).input(0) >= 0 Then knn.basics.trainingPoints.Add(New cv.Point2f(kalman(i).input(0), kalman(i).input(1)))
         Next
 
         If newQueries.Count > 0 Then
+            ' when the queries outnumber the trainingpoints and we are 1:1, some new queries can appear.
             Dim qIndex As Integer
             For i = knn.basics.trainingPoints.Count To kalman.Count - 1
                 If qIndex >= newQueries.Count Then Exit For
@@ -556,8 +557,7 @@ Public Class Kalman_Centroids
             End If
         Next
 
-        Dim rect As New cv.Rect
-        Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
+
         For i = 0 To knn.basics.trainingPoints.Count - 1
             Dim pt1 = knn.basics.trainingPoints(i)
             For j = 0 To knn.basics.matchedPoints.Count - 1

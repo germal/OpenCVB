@@ -232,11 +232,11 @@ End Class
 
 Public Class EMax_ConsistentColor
     Inherits ocvbClass
-    Dim knn As KNN_Centroids
+    Dim knn As KNN_CentroidsEMax
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        knn = New KNN_Centroids(ocvb)
+        knn = New KNN_CentroidsEMax(ocvb)
         ocvb.desc = "Same as KNN_Centroids - to show consistent EMax color regions"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

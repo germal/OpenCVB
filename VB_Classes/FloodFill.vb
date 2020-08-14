@@ -379,7 +379,7 @@ Public Class FloodFill_Projection
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
-    Public centroids As New List(Of cv.Point)
+    Public centroids As New List(Of cv.Point2f)
     Public minFloodSize As Integer
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -388,6 +388,10 @@ Public Class FloodFill_Projection
         sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
         sliders.setupTrackBar(3, "Step Size", 1, ocvb.color.Cols / 2, 20)
+
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Draw rectangle for each mask"
+        check.Box(0).Checked = True
 
         label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
@@ -425,12 +429,14 @@ Public Class FloodFill_Projection
             Next
         Next
 
+        label2 = CStr(rects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+
+        Dim drawRectanglesRequested = check.Box(0).Checked
         For i = 0 To masks.Count - 1
             Dim rect = rects(i)
-            nextColor = rColors(rects.Count Mod 255)
+            nextColor = rColors(i Mod 255)
             dst2(rect).SetTo(nextColor, masks(i))
-            dst2.Rectangle(rect, cv.Scalar.White, 1)
+            If drawRectanglesRequested Then dst2.Rectangle(rect, cv.Scalar.White, 1)
         Next
-        label2 = CStr(rects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
 End Class
