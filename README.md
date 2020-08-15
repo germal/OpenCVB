@@ -918,3 +918,95 @@ Mynt Eye D 1000 camera.
 ![](media/e4879903e5aff609e28fff60fcb01f0f.png)
 
 Intel RealSense D455 camera.
+
+Addendum 2: Some Thoughts
+=========================
+
+1.  The user interface is the documentation. The user interface should make it
+    clear how the algorithm works and what parameters will tweak it.
+
+2.  There are few comments in the code. Documenting code is a second, parallel
+    explanation of the algorithm. There is no need for a second explanation when
+    the code can be easily debugged. There are comments but they are isolated
+    non-intuitive instructions. Most code comments are padded with spaces and
+    too often pompous and unnecessary.
+
+3.  Sliders and checkboxes are located by the text for the slider or checkbox,
+    not by the name of some variable. The user interface is the documentation –
+    see Thought \#1. If the text in the user interface changes and the slider or
+    checkbox is not found, an error will appear in the regression tests
+    describing the missing label and the name of the failing algorithm.
+
+4.  All algorithms are run through a regression test with a single click.
+    Algorithms can still fail when sliders or settings are changed but every
+    effort is made to test with abrupt and reckless changes. Room for
+    improvement: test combinations of settings automatically.
+
+5.  Each algorithm is short. The application caption contains the average number
+    of lines – currently around 33. Short algorithms are easier to write and
+    test. Short algorithms may be easily rewritten in another language.
+
+6.  Algorithms should run standalone. This enables testing and isolates
+    problems. The “standalone” variable is available to all algorithms to
+    control behavior when running by itself or as a companion to another
+    algorithm.
+
+7.  Every algorithm is designed for reuse by other algorithms. Each algorithm
+    has at least one source (labeled src) and 2 default destinations (labeled
+    dst1 and dst2). Any additional inputs or outputs are made available with
+    public variables in the algorithm’s object.
+
+8.  Camera interfaces are run in their own task and are always running and
+    presented in the user interface whether the data is consumed or not.
+
+9.  Cameras are always run at 1280x720. Requesting a lower resolution simply
+    resizes the camera input before sharing with the algorithm task. The goal is
+    to keep the camera interface simple. Room for improvement: support a full
+    camera interface with different resolutions and settings.
+
+10. The user interface is the main task. The camera task is independent of the
+    user interface.
+
+11. Algorithms are run in their own task as well. All threads are labeled for
+    the “Threads” debugging use. The algorithm will wait on camera data if
+    camera frame rate does not keep up.
+
+12. Algorithm groupings are subsets organized by specific OpenCV and OpenCVB
+    API’s or objects. Changes made to an OpenCVB algorithm can be easily
+    validated by selecting the group of algorithms that use the OpenCVB
+    algorithm and running the regression test.
+
+13. OpenCV API’s can always be found with an editor but selecting an OpenCV API
+    group will show how each algorithm uses the OpenCV API.
+
+14. Every time that OpenCVB is compiled, the groupings are reorganized.
+
+15. Every time OpenCVB is compiled, the list of all algorithms is created and
+    provided to the user interface. The user interface is aware of the code used
+    to create the user interface.
+
+16. The last algorithm to execute is automatically run when starting OpenCVB.
+    There is only a “Pause” button, no “Stop” button. When developing, a
+    crashing algorithm has only to be renamed to allow OpenCVB to come back up.
+    When the last algorithm is not found, the first algorithm is run.
+
+17. Regression tests run every algorithm with all resolutions and with each
+    available camera. Setting the algorithm group to “\<non-Python\>” will run
+    10’s of thousands of times without incident. Adding the Python scripts
+    (using “\<All\>” instead of “\<non-Python\>”) will bring that down to 1000’s
+    of times. The repeated invocation of Python as a separate task seems to
+    produce problems despite each of the algorithms working in isolation. Room
+    for improvement: run just the “\<Python\>” group of algorithms repeatedly
+    and figure out how to avoid the problem.
+
+18. Algorithms can run for extremely long durations. Not a problem normally, it
+    was a problem for the regression tests when algorithm B is started before
+    algorithm A is finished. This was fixed with Synclock around the algorithm
+    thread – only one algorithm can run at a time. Algorithm B waits until
+    algorithm A completes and relinquishes the lock.
+
+19. Options for each algorithm are presented by the algorithm itself and are
+    automatically part of the algorithm task. The appearance is that of an MDI –
+    Multiple Document Interface – application and seems the share the
+    inconveniences. However, click the main form and all the options will
+    conveniently reappear.
