@@ -625,127 +625,79 @@ End Class
 
 
 
+
 Public Class PointCloud_Centroids_TopView
     Inherits ocvbClass
-    Dim knn As KNN_Basics
-    Dim kalman(0) As Kalman_Basics
     Dim gvec As PointCloud_Object_TopView
-    Dim newObjects As New List(Of cv.Point2f)
+    Dim pTrack As Kalman_PointTracker
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        knn = New KNN_Basics(ocvb)
+
+        pTrack = New Kalman_PointTracker(ocvb)
 
         gvec = New PointCloud_Object_TopView(ocvb)
         Dim thresholdSlider = findSlider("Histogram threshold")
-        thresholdSlider.value = 10 ' better default for this usage.
+        thresholdSlider.Value = 10 ' better default for this usage.
         Dim imuCheckbox = findCheckBox("Use IMU gravity vector")
-        imuCheckbox.Checked = True
+        imuCheckbox.Enabled = False
         Dim rectDrawCheck = findCheckBox("Draw rectangle for each mask")
         rectDrawCheck.Checked = False
         rectDrawCheck.Enabled = False
 
         label1 = "Objects isolated by histogram threshold"
-        ocvb.desc = "Find and track centroids for the objects in a top view"
+        ocvb.desc = "Find and track centroids for the objects in a side view"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static useKalmanCheck As Windows.Forms.CheckBox
-
         gvec.Run(ocvb)
-        dst1 = gvec.dst2
 
         For Each pt In gvec.flood.centroids
-            dst1.Circle(pt, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            gvec.dst2.Circle(pt, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
-        Dim trainingPoints = New List(Of cv.Point2f)(gvec.flood.centroids)
-        If ocvb.frameCount = 0 Then
-            knn.Run(ocvb)
-            Exit Sub ' first pass has no training data.
-        End If
+        pTrack.queryPoints = New List(Of cv.Point2f)(gvec.flood.centroids)
+        pTrack.queryRects = New List(Of cv.Rect)(gvec.flood.rects)
+        pTrack.queryMasks = New List(Of cv.Mat)(gvec.flood.masks)
+        pTrack.Run(ocvb)
+        dst1 = pTrack.dst1
+    End Sub
+End Class
 
-        ' allocate the kalman filters for each centroid with some additional filters for objects that come and go...
-        If kalman.Length < trainingPoints.Count Then
-            ReDim kalman(trainingPoints.Count + 10) ' pad a little to keep more info
-            For i = 0 To kalman.Count - 1
-                If i > 0 Then ocvb.suppressOptions = True
-                kalman(i) = New Kalman_Basics(ocvb)
-                If i < trainingPoints.Count Then
-                    kalman(i).input = New Single() {trainingPoints(i).X, trainingPoints(i).Y, 0, 0, 0, 0}
-                Else
-                    kalman(i).input = New Single() {-1, -1, 0, 0, 0, 0}
-                End If
-            Next
-            ocvb.suppressOptions = False
-            useKalmanCheck = findCheckBox("Turn Kalman filtering on") ' we left one of these visible...
-        End If
-        Dim kalmanActive = useKalmanCheck?.Checked
 
-        knn.trainingPoints.Clear()
-        For i = 0 To kalman.Count - 1
-            If kalman(i).input(0) >= 0 Then knn.trainingPoints.Add(New cv.Point2f(kalman(i).input(0), kalman(i).input(1)))
+
+
+
+Public Class PointCloud_Centroids_SideView
+    Inherits ocvbClass
+    Dim gvec As PointCloud_Object_SideView
+    Dim pTrack As Kalman_PointTracker
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        pTrack = New Kalman_PointTracker(ocvb)
+
+        gvec = New PointCloud_Object_SideView(ocvb)
+        Dim thresholdSlider = findSlider("Histogram threshold")
+        thresholdSlider.Value = 10 ' better default for this usage.
+        Dim imuCheckbox = findCheckBox("Use IMU gravity vector")
+        imuCheckbox.Enabled = False
+        Dim rectDrawCheck = findCheckBox("Draw rectangle for each mask")
+        rectDrawCheck.Checked = False
+        rectDrawCheck.Enabled = False
+
+        label1 = "Objects isolated by histogram threshold"
+        ocvb.desc = "Find and track centroids for the objects in a side view"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        gvec.Run(ocvb)
+
+        For Each pt In gvec.flood.centroids
+            gvec.dst2.Circle(pt, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
-        If newObjects.Count > 0 Then
-            ' when the queries outnumber the trainingpoints and we are 1:1, some new queries can appear.
-            Dim qIndex As Integer
-            For i = knn.trainingPoints.Count To kalman.Count - 1
-                If qIndex >= newObjects.Count Then Exit For
-                knn.trainingPoints.Add(newObjects(qIndex))
-                kalman(i).input = {newObjects(qIndex).X, newObjects(qIndex).Y, 0, 0, 0, 0}
-                qIndex += 1
-                If qIndex >= kalman.Count Then ' we don't have enough kalman filters to handle this level of queries so restart
-                    ReDim kalman(0)
-                    Exit Sub
-                End If
-            Next
-        End If
-
-        knn.queryPoints = New List(Of cv.Point2f)(gvec.flood.centroids)
-        knn.Run(ocvb)
-
-        For i = 0 To knn.matchedPoints.Count - 1
-            If knn.matchedPoints(i).X < 0 Then
-                For j = 0 To kalman.Count - 1
-                    If kalman(j).input(0) < 0 Then
-                        kalman(j).input = {knn.queryPoints(i).X, knn.queryPoints(i).Y, 0, 0, 0, 0}
-                        Exit For
-                    End If
-                Next
-            End If
-        Next
-
-        For i = 0 To knn.trainingPoints.Count - 1
-            Dim pt1 = knn.trainingPoints(i)
-            For j = 0 To knn.matchedPoints.Count - 1
-                Dim pt2 = knn.matchedPoints(j)
-                If pt1 = pt2 Then
-                    Dim rect = New cv.Rect(kalman(i).input(2), kalman(i).input(3), kalman(i).input(4), kalman(i).input(5))
-                    Dim qpt = knn.queryPoints(j)
-                    For k = 0 To gvec.flood.rects.Count - 1
-                        If gvec.flood.centroids(k) = qpt Then
-                            rect = gvec.flood.rects(k)
-                            Exit For
-                        End If
-                    Next
-                    kalman(i).input = {knn.queryPoints(j).X, knn.queryPoints(j).Y, rect.X, rect.Y, rect.Width, rect.Height}
-                    If kalmanActive Then
-                        kalman(i).Run(ocvb)
-                    Else
-                        kalman(i).output = {knn.queryPoints(j).X, knn.queryPoints(j).Y}
-                    End If
-                    Dim pt3 = New cv.Point(kalman(i).output(0), kalman(i).output(1))
-                    cv.Cv2.Circle(dst1, pt3, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
-                    rect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
-                    dst1.Rectangle(rect, cv.Scalar.White, 1)
-                    Exit For
-                End If
-            Next
-        Next
-
-        newObjects.Clear()
-        For i = 0 To knn.matchedPoints.Count - 1
-            Dim pt1 = knn.matchedPoints(i)
-            If pt1.X = -1 And pt1.X = -1 Then newObjects.Add(pt1)
-        Next
+        pTrack.queryPoints = New List(Of cv.Point2f)(gvec.flood.centroids)
+        pTrack.queryRects = New List(Of cv.Rect)(gvec.flood.rects)
+        pTrack.queryMasks = New List(Of cv.Mat)(gvec.flood.masks)
+        pTrack.Run(ocvb)
+        dst1 = pTrack.dst1
     End Sub
 End Class
