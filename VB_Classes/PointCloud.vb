@@ -52,45 +52,50 @@ Public Class PointCloud_Colorize
     Dim fontSize As Single
     Dim radius As Integer
     Dim arcSize As Integer = 100
-    Dim hFOVangles() As Single = {45, 0, 40, 51, 55, 55, 47}  ' T265 has no point cloud so there is a 0 where it would have been.
-    Dim vFOVangles() As Single = {60, 0, 55, 65, 69, 67, 60}  ' T265 has no point cloud so there is a 0 where it would have been.
+    Public hFOVangles() As Single = {45, 0, 40, 51, 55, 55, 47}  ' T265 has no point cloud so there is a 0 where it would have been.
+    Public vFOVangles() As Single = {60, 0, 55, 65, 69, 67, 60}  ' T265 has no point cloud so there is a 0 where it would have been.
+    Public cameraPoint As cv.Point
+    Public startangle As Integer
+
     Public Function CameraLocationBot(ocvb As AlgorithmData, mask As cv.Mat, maxZ As Single) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
-        dst1.CopyTo(dst, mask)
-        Dim cameraPt = New cv.Point(dst.Height, dst.Height)
+        ' if not a mask, then the image is already colorized.
+        If mask.Channels = 1 Then dst2.CopyTo(dst, mask) Else dst = mask.Clone()
+        cameraPoint = New cv.Point(dst.Height, dst.Height)
         Dim cameraLocation = New cv.Point(shift + dst.Height / 2, dst.Height - 5)
-        dst.Circle(cameraPt, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(cameraPoint, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         For i = maxZ - 1 To 0 Step -1
             Dim ymeter = dst.Height * i / maxZ
-            dst.Line(New cv.Point(shift, ymeter), New cv.Point(dst.Width - shift, ymeter), cv.Scalar.AliceBlue, 1)
+            dst.Line(New cv.Point(0, ymeter), New cv.Point(dst.Width, ymeter), cv.Scalar.AliceBlue, 1)
             cv.Cv2.PutText(dst, CStr(maxZ - i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
         ' draw the arc showing the camera FOV
-        Dim startAngle = sliders.trackbar(0).Value
+        Dim startAngle = If(standalone, sliders.trackbar(0).Value, hFOVangles(ocvb.parms.cameraIndex))
         Dim x = dst.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
-        Dim xloc = cameraPt.X + x
+        Dim xloc = cameraPoint.X + x
 
         Dim fovRight = New cv.Point(xloc, 0)
-        Dim fovLeft = New cv.Point(cameraPt.X - x, fovRight.Y)
+        Dim fovLeft = New cv.Point(cameraPoint.X - x, fovRight.Y)
 
-        dst.Ellipse(cameraPt, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Ellipse(cameraPt, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Line(cameraPt, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Ellipse(cameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Ellipse(cameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Line(cameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Dim labelLocation = New cv.Point(dst.Width / 2 + labelShift * 3 / 4, dst.Height * 7 / 8)
         If ocvb.parms.resolution = resHigh Then labelLocation = New cv.Point(dst.Width / 2 + labelShift * 3 / 8, dst.Height * 15 / 16)
         cv.Cv2.PutText(dst, CStr(startAngle) + " degrees" + " FOV=" + CStr(180 - startAngle * 2), labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        dst.Line(cameraPt, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Line(cameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst
     End Function
     Public Function CameraLocationSide(ocvb As AlgorithmData, ByRef mask As cv.Mat, maxZ As Single) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
-        dst2.CopyTo(dst, mask)
-        Dim cameraPt = New cv.Point(shift, src.Height - (src.Width - src.Height) / 2)
+        ' if not a mask, then the image is already colorized.
+        If mask.Channels = 1 Then dst2.CopyTo(dst, mask) Else dst = mask.Clone()
+        cameraPoint = New cv.Point(shift, src.Height - (src.Width - src.Height) / 2)
         dst.Rectangle(New cv.Rect(shift, 0, src.Height, src.Height), cv.Scalar.White, 1)
-        dst.Circle(cameraPt, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(cameraPoint, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         For i = 0 To maxZ
             Dim xmeter = dst.Height * i / maxZ
             dst.Line(New cv.Point(shift + xmeter, 0), New cv.Point(shift + xmeter, dst.Height), cv.Scalar.AliceBlue, 1)
@@ -98,21 +103,21 @@ Public Class PointCloud_Colorize
         Next
 
         ' draw the arc showing the camera FOV
-        Dim startAngle = sliders.trackbar(1).Value
+        Dim startAngle = If(standalone, sliders.trackbar(1).Value, vFOVangles(ocvb.parms.cameraIndex))
         Dim y = (dst.Width - shift) / Math.Tan(startAngle * cv.Cv2.PI / 180)
-        Dim yloc = cameraPt.Y - y
+        Dim yloc = cameraPoint.Y - y
 
         Dim fovTop = New cv.Point(dst.Width, yloc)
-        Dim fovBot = New cv.Point(dst.Width, cameraPt.Y + y)
+        Dim fovBot = New cv.Point(dst.Width, cameraPoint.Y + y)
 
-        dst.Ellipse(cameraPt, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Ellipse(cameraPt, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Line(cameraPt, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Ellipse(cameraPoint, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Ellipse(cameraPoint, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Line(cameraPoint, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Dim labelLocation = New cv.Point(10, dst.Height * 3 / 4)
         ' If ocvb.parms.resolution = resHigh Then labelLocation = New cv.Point(labelShift * 3 / 8, dst.Height * 15 / 16)
         cv.Cv2.PutText(dst, CStr(startAngle) + " degrees" + " FOV=" + CStr(180 - startAngle * 2), labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        dst.Line(cameraPt, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Line(cameraPoint, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst
     End Function
@@ -131,10 +136,12 @@ Public Class PointCloud_Colorize
         palette.frameModulo = 1
         If ocvb.parms.resolution <> resHigh Then arcSize = 50
 
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Top View angle for FOV", 0, 180, hFOVangles(ocvb.parms.cameraIndex))
-        sliders.setupTrackBar(1, "Side View angle for FOV", 0, 180, vFOVangles(ocvb.parms.cameraIndex))
-        sliders.SetVisible(standalone)
+
+        If standalone Then
+            sliders.Setup(ocvb, caller)
+            sliders.setupTrackBar(0, "Top View angle for FOV", 0, 180, hFOVangles(ocvb.parms.cameraIndex))
+            sliders.setupTrackBar(1, "Side View angle for FOV", 0, 180, vFOVangles(ocvb.parms.cameraIndex))
+        End If
 
         palette.Run(ocvb)
         dst1 = palette.dst1
@@ -373,7 +380,8 @@ Public Class PointCloud_TopView
         If checkIMU?.Checked Then
             dst1 = hist.dst1
         Else
-            dst1 = cMats.CameraLocationBot(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.trackbar(1).Value / 1000)
+            Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+            dst1 = cMats.CameraLocationBot(ocvb, hist.dst1.ConvertScaleAbs(255), inRangeSlider.Value / 1000)
         End If
     End Sub
 End Class
@@ -405,7 +413,8 @@ Public Class PointCloud_SideView
         If checkIMU?.Checked Then
             dst1 = hist.dst1
         Else
-            dst1 = cMats.CameraLocationSide(ocvb, hist.dst1.ConvertScaleAbs(255), hist.histOpts.sliders.trackbar(1).Value / 1000)
+            Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+            dst1 = cMats.CameraLocationSide(ocvb, hist.dst1.ConvertScaleAbs(255), inRangeSlider.Value / 1000)
         End If
     End Sub
 End Class
@@ -628,16 +637,14 @@ End Class
 
 Public Class PointCloud_Centroids_TopView
     Inherits ocvbClass
-    Dim gvec As PointCloud_Object_TopView
-    Dim pTrack As Kalman_PointTracker
+    Public gvec As PointCloud_Object_TopView
+    Public pTrack As Kalman_PointTracker
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         pTrack = New Kalman_PointTracker(ocvb)
 
         gvec = New PointCloud_Object_TopView(ocvb)
-        Dim thresholdSlider = findSlider("Histogram threshold")
-        thresholdSlider.Value = 10 ' better default for this usage.
         Dim imuCheckbox = findCheckBox("Use IMU gravity vector")
         imuCheckbox.Enabled = False
         Dim rectDrawCheck = findCheckBox("Draw rectangle for each mask")
@@ -676,8 +683,6 @@ Public Class PointCloud_Centroids_SideView
         pTrack = New Kalman_PointTracker(ocvb)
 
         gvec = New PointCloud_Object_SideView(ocvb)
-        Dim thresholdSlider = findSlider("Histogram threshold")
-        thresholdSlider.Value = 10 ' better default for this usage.
         Dim imuCheckbox = findCheckBox("Use IMU gravity vector")
         imuCheckbox.Enabled = False
         Dim rectDrawCheck = findCheckBox("Draw rectangle for each mask")
@@ -699,5 +704,161 @@ Public Class PointCloud_Centroids_SideView
         pTrack.queryMasks = New List(Of cv.Mat)(gvec.flood.masks)
         pTrack.Run(ocvb)
         dst1 = pTrack.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_Measured_TopView
+    Inherits ocvbClass
+    Dim measure As PointCloud_Centroids_TopView
+    Dim pixMeter As PointCloud_PixelFormula_TopView
+    Dim cMats As PointCloud_Colorize
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        measure = New PointCloud_Centroids_TopView(ocvb)
+        cMats = New PointCloud_Colorize(ocvb)
+        pixMeter = New PointCloud_PixelFormula_TopView(ocvb)
+
+        ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        pixMeter.Run(ocvb) ' why run all the time?  Because the inrange maxZ can change and that changes the pixels per meter value
+        label1 = pixMeter.label1
+        measure.Run(ocvb)
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        dst1 = cMats.CameraLocationBot(ocvb, measure.dst1, inRangeSlider.Value / 1000)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class PointCloud_Measured_SideView
+    Inherits ocvbClass
+    Dim measure As PointCloud_Centroids_SideView
+    Dim pixMeter As PointCloud_PixelFormula_SideView
+    Dim cMats As PointCloud_Colorize
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        measure = New PointCloud_Centroids_SideView(ocvb)
+        cMats = New PointCloud_Colorize(ocvb)
+        pixMeter = New PointCloud_PixelFormula_SideView(ocvb)
+
+        ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        pixMeter.Run(ocvb) ' why run all the time?  Because the inrange maxZ can change and that changes the pixels per meter value
+        label1 = pixMeter.label1
+        measure.Run(ocvb)
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        dst1 = cMats.CameraLocationSide(ocvb, measure.dst1, inRangeSlider.Value / 1000)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PointCloud_PixelFormula_TopView
+    Inherits ocvbClass
+    Dim measure As PointCloud_Centroids_TopView
+    Dim cMats As PointCloud_Colorize
+    Public pixelsPerMeter As Single
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        If standalone = False Then ocvb.suppressOptions = True
+        measure = New PointCloud_Centroids_TopView(ocvb)
+        cMats = New PointCloud_Colorize(ocvb)
+        If standalone = False Then ocvb.suppressOptions = False
+
+        If standalone Then
+            sliders.Setup(ocvb, caller, 1)
+            sliders.setupTrackBar(0, "Distance from camera in mm", 0, 10000, 1500)
+        End If
+        ocvb.desc = "Validate the formula for pixel width as a function of distance"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        Dim maxZ = inRangeSlider.Value / 1000
+
+        Dim FOV = 90 - cMats.hFOVangles(ocvb.parms.cameraIndex)
+        If standalone Then sliders.trackbar(0).Maximum = maxZ * 1000
+        Dim cameraDistance = If(standalone, sliders.trackbar(0).Value / 1000, maxZ)
+        Dim pixelDistance = src.Height * cameraDistance / maxZ
+        Dim lineLen = CInt(Math.Tan(FOV * 0.0174533) * pixelDistance)
+
+        If standalone Then
+            measure.Run(ocvb)
+            dst1 = cMats.CameraLocationBot(ocvb, measure.dst1, maxZ)
+
+            Dim cameraPoint = New cv.Point(src.Height, src.Height)
+            Dim pt1 = New cv.Point(cameraPoint.X - lineLen, CInt(src.Height - pixelDistance))
+            Dim pt2 = New cv.Point(cameraPoint.X + lineLen, CInt(src.Height - pixelDistance))
+            dst1.Line(pt1, pt2, cv.Scalar.Red, 2)
+        End If
+        pixelsPerMeter = lineLen / cameraDistance
+        label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(cameraDistance, "0.0") + " meters"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PointCloud_PixelFormula_SideView
+    Inherits ocvbClass
+    Dim measure As PointCloud_Centroids_SideView
+    Dim cMats As PointCloud_Colorize
+    Public pixelsPerMeter As Single
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        If standalone = False Then ocvb.suppressOptions = True
+        measure = New PointCloud_Centroids_SideView(ocvb)
+        cMats = New PointCloud_Colorize(ocvb)
+        If standalone = False Then ocvb.suppressOptions = False
+
+        If standalone Then
+            sliders.Setup(ocvb, caller, 1)
+            sliders.setupTrackBar(0, "Distance from camera in mm", 0, 10000, 1500)
+        End If
+        ocvb.desc = "Validate the formula for pixel width as a function of distance"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        Dim maxZ = inRangeSlider.Value / 1000
+
+        Dim FOV = 90 - cMats.vFOVangles(ocvb.parms.cameraIndex)
+        If standalone Then sliders.trackbar(0).Maximum = maxZ * 1000
+        Dim cameraDistance = If(standalone, sliders.trackbar(0).Value / 1000, maxZ)
+        Dim pixelDistance = src.Height * cameraDistance / maxZ
+        Dim lineLen = CInt(Math.Tan(FOV * 0.0174533) * pixelDistance)
+
+        If standalone Then
+            measure.Run(ocvb)
+            dst1 = cMats.CameraLocationSide(ocvb, measure.dst1, maxZ)
+            Dim cameraPoint = cMats.cameraPoint
+            Dim pt1 = New cv.Point(CInt(cameraPoint.X + pixelDistance), CInt(cameraPoint.Y - lineLen))
+            Dim pt2 = New cv.Point(CInt(cameraPoint.X + pixelDistance), CInt(cameraPoint.Y + lineLen))
+            dst1.Line(pt1, pt2, cv.Scalar.Red, 2)
+        End If
+        pixelsPerMeter = lineLen / cameraDistance
+        label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(cameraDistance, "0.0") + " meters"
     End Sub
 End Class

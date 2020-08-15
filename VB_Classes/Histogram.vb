@@ -480,7 +480,7 @@ Public Class Histogram_ProjectionOptions
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram threshold", 0, 1000, 3)
-        sliders.setupTrackBar(1, "InRange Max Depth (mm)", 0, 10000, 4000)
+        sliders.setupTrackBar(1, "InRange Max Depth (mm)", 10, 10000, 4000)
         If standalone Then sliders.trackbar(0).Value = 1
 
         check.Setup(ocvb, caller, 1)

@@ -395,8 +395,8 @@ Public Class Draw_ClipLine
         dst1 = src
         kalman.input = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
         kalman.Run(ocvb)
-        Dim p1 = New cv.Point(kalman.output(0), kalman.output(1))
-        Dim p2 = New cv.Point(kalman.output(2), kalman.output(3))
+        Dim p1 = New cv.Point(CInt(kalman.output(0)), CInt(kalman.output(1)))
+        Dim p2 = New cv.Point(CInt(kalman.output(2)), CInt(kalman.output(3)))
 
         If kalman.output(6) < 5 Then kalman.output(6) = 5 ' don't let the width/height get too small...
         If kalman.output(7) < 5 Then kalman.output(7) = 5
@@ -413,7 +413,7 @@ Public Class Draw_ClipLine
         Static hitCount = 0
         hitCount += If(clipped, 1, 0)
         ocvb.putText(New TTtext("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
-                                              CInt(ocvb.color.Width / 2), 200, RESULT2))
+                     CInt(ocvb.color.Width / 2), 200, RESULT2))
         If r = rect Then setup()
         flow.Run(ocvb)
     End Sub
