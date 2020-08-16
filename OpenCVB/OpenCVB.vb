@@ -83,7 +83,6 @@ Public Class OpenCVB
     Dim openfileSliderPercent As Single
     Dim openformLocated As Boolean
     Dim pauseAlgorithmThread As Boolean
-    Dim activeThreadID As Integer
     Private Delegate Sub delegateEvent()
     Dim logAlgorithms As StreamWriter
     Dim logActive As Boolean = False ' turn this on/off to collect data on algorithms and memory use.
@@ -1055,9 +1054,6 @@ Public Class OpenCVB
             drawRect = New cv.Rect
             Dim saveLowResSetting As Boolean = parms.resolution
 
-            activeThreadID = AlgorithmTestCount
-            parms.activeThreadID = AlgorithmTestCount
-
             Dim OpenCVB = New VB_Classes.ActiveClass(parms, regWidth / parms.speedFactor, regHeight / parms.speedFactor, New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
             textDesc = OpenCVB.ocvb.desc
             openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
@@ -1106,10 +1102,7 @@ Public Class OpenCVB
             Try
                 Dim frmlist As New List(Of Form)
                 For Each frm In Application.OpenForms
-                    If frm.name.startswith("Option") Then
-                        If OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frmlist.Add(frm)
-                        ' Console.WriteLine("Close: tag = " + CStr(frm.tag) + " threadid = " + CStr(OpenCVB.ocvb.parms.activeThreadID) + " form heading = " + frm.text)
-                    End If
+                    If frm.name.startswith("Option") Then frmlist.Add(frm)
                 Next
                 For Each frm In frmlist
                     frm.Close()
@@ -1252,13 +1245,10 @@ Public Class OpenCVB
                     OptionsBringToFront = False
                     Try
                         For Each frm In Application.OpenForms
-                            If frm.name.startswith("Option") Then
-                                If OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frm.topmost = True
-                                'Console.WriteLine("BringToFont: tag = " + CStr(frm.tag) + " threadid = " + CStr(OpenCVB.ocvb.parms.activeThreadID) + " form heading = " + frm.text)
-                            End If
+                            If frm.name.startswith("Option") Then frm.topmost = True
                         Next
                         For Each frm In Application.OpenForms
-                            If frm.name.startswith("Option") And OpenCVB.ocvb.parms.activeThreadID = frm.tag Then frm.topmost = False
+                            If frm.name.startswith("Option") Then frm.topmost = False
                         Next
                     Catch ex As Exception
                         Console.WriteLine("Error in OptionsBringToFront: " + ex.Message)

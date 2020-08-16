@@ -11,7 +11,6 @@ Public Class AlphaChannel_Basics
 
         fg = New Depth_InRange(ocvb)
 
-        alpha.Setup(ocvb)
         alpha.Show()
         alpha.Size = New System.Drawing.Size(src.Width + 10, src.Height + 10)
 

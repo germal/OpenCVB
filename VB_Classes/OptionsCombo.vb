@@ -15,6 +15,5 @@ Public Class OptionsCombo
             Box.Items.Add(comboList.ElementAt(i))
         Next
         Box.SelectedIndex = 0
-        Tag = ocvb.parms.activeThreadID
     End Sub
 End Class
