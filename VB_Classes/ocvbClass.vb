@@ -65,7 +65,7 @@ Public Class ocvbClass : Implements IDisposable
         Catch ex As Exception
             Console.WriteLine("findCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
         End Try
-        MsgBox("A checkbox was not found!  Very likely the requested checkbox was mistyped or the original text '" + opt + "' was changed.")
+        MsgBox("A checkbox was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request in '" + vbCrLf + vbCrLf + "'" + caller + "'")
         Return Nothing
     End Function
     Public Function findSlider(opt As String) As TrackBar
@@ -80,8 +80,36 @@ Public Class ocvbClass : Implements IDisposable
         Catch ex As Exception
             Console.WriteLine("findSlider failed.  The application list of forms changed while iterating.  Not critical.")
         End Try
-        MsgBox("A slider was not found!  Very likely the requested slider text was mistyped or the original label '" + opt + "' has been changed.")
+        MsgBox("A slider was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request in '" + vbCrLf + vbCrLf + "'" + caller + "'")
         Return Nothing
+    End Function
+    Public Function countCheckBox(opt As String) As Integer
+        Dim count As Integer = 0
+        Try
+            For Each frm In Application.OpenForms
+                If frm.text.endswith(" CheckBox Options") Then
+                    For i = 0 To frm.Box.length - 1
+                        If frm.box(i).text.contains(opt) Then count += 1
+                    Next
+                End If
+            Next
+        Catch ex As Exception
+        End Try
+        Return count
+    End Function
+    Public Function countSlider(opt As String) As Integer
+        Dim count As Integer = 0
+        Try
+            For Each frm In Application.OpenForms
+                If frm.text.endswith(" Slider Options") Then
+                    For i = 0 To frm.trackbar.length - 1
+                        If frm.sLabels(i).text.contains(opt) Then count += 1
+                    Next
+                End If
+            Next
+        Catch ex As Exception
+        End Try
+        Return count
     End Function
     Public Function validateRect(r As cv.Rect) As cv.Rect
         If r.Width < 0 Then r.Width = 1

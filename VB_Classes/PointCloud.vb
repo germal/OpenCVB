@@ -717,6 +717,8 @@ Public Class PointCloud_Measured_TopView
 
         measure = New PointCloud_Centroids_TopView(ocvb)
         cMats = New PointCloud_Colorize(ocvb)
+
+        If standalone Then ocvb.suppressOptions = True
         pixMeter = New PointCloud_PixelFormula_TopView(ocvb)
 
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
@@ -745,6 +747,8 @@ Public Class PointCloud_Measured_SideView
 
         measure = New PointCloud_Centroids_SideView(ocvb)
         cMats = New PointCloud_Colorize(ocvb)
+
+        If standalone Then ocvb.suppressOptions = True
         pixMeter = New PointCloud_PixelFormula_SideView(ocvb)
 
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
@@ -773,10 +777,8 @@ Public Class PointCloud_PixelFormula_TopView
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        If standalone = False Then ocvb.suppressOptions = True
         measure = New PointCloud_Centroids_TopView(ocvb)
         cMats = New PointCloud_Colorize(ocvb)
-        If standalone = False Then ocvb.suppressOptions = False
 
         If standalone Then
             sliders.Setup(ocvb, caller, 1)
@@ -823,10 +825,8 @@ Public Class PointCloud_PixelFormula_SideView
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        If standalone = False Then ocvb.suppressOptions = True
         measure = New PointCloud_Centroids_SideView(ocvb)
         cMats = New PointCloud_Colorize(ocvb)
-        If standalone = False Then ocvb.suppressOptions = False
 
         If standalone Then
             sliders.Setup(ocvb, caller, 1)
@@ -863,25 +863,42 @@ End Class
 
 
 
-Public Class PointCloud_PixelClipped_TopView1
+Public Class PointCloud_PixelClipped_TopView
     Inherits ocvbClass
     Dim topView As PointCloud_PixelFormula_TopView
-    Dim measure As PointCloud_Centroids_TopView
+    Dim hMeasure As PointCloud_Centroids_TopView
+    Dim vMeasure As PointCloud_Centroids_SideView
     Dim cMats As PointCloud_Colorize
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         topView = New PointCloud_PixelFormula_TopView(ocvb)
-        measure = New PointCloud_Centroids_TopView(ocvb)
+        hMeasure = New PointCloud_Centroids_TopView(ocvb)
+        vMeasure = New PointCloud_Centroids_SideView(ocvb)
         cMats = New PointCloud_Colorize(ocvb)
 
-        ocvb.desc = "Validate the formula for pixel width as a function of distance"
+        ocvb.desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         topView.Run(ocvb)
-        measure.Run(ocvb)
+        hMeasure.Run(ocvb)
+
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         Dim maxZ = inRangeSlider.Value / 1000
-        dst1 = cMats.CameraLocationBot(ocvb, measure.dst1, maxZ)
+
+        dst1 = cMats.CameraLocationBot(ocvb, hMeasure.dst1, maxZ)
+        vMeasure.Run(ocvb)
+        dst2 = cMats.CameraLocationSide(ocvb, vMeasure.dst1, maxZ)
+
+        For Each rect In hMeasure.pTrack.matchedRects
+            Dim p1 = New cv.Point(0, rect.Y)
+            Dim p2 = New cv.Point(src.Width, rect.Y)
+            Dim clipped = cv.Cv2.ClipLine(rect, p1, p2) ' Returns false when the line and the rectangle don't intersect.
+            dst1.Line(p1, p2, If(clipped, cv.Scalar.Red, cv.Scalar.Black), 2)
+        Next
+
+        ' dst2 = ocvb.RGBDepth.Clone
+
+
     End Sub
 End Class

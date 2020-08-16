@@ -927,9 +927,12 @@ Addendum 2: Some Thoughts
 
 2.  There are few comments in the code. Documenting code is a second, parallel
     explanation of the algorithm. There is no need for a second explanation when
-    the code can be easily debugged. There are comments but they are isolated
-    non-intuitive instructions. Most code comments are padded with spaces and
-    too often pompous and unnecessary.
+    the code is short and can be easily debugged. There are comments but they
+    explain settings or assumptions from external algorithms. In common practice
+    elsewhere, code comments are padded with spaces and too often out-of-date.
+    Automated comments are a waste of screen space. Room for improvement: allow
+    images in the code. The algorithm output can go a long way toward explaining
+    the algorithm.
 
 3.  Sliders and checkboxes are located by the text for the slider or checkbox,
     not by the name of some variable. The user interface is the documentation –

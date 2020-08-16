@@ -636,6 +636,9 @@ Public Class Kalman_PointTracker
             ReDim kalman(trainingPoints.Count + 10) ' pad a little to keep more info
             ReDim kalmanAging(kalman.Count - 1)
             ReDim lastMask(kalman.Count - 1)
+            Dim saveSuppress = ocvb.suppressOptions
+            Dim checkCount = countCheckBox("Turn Kalman filtering on")
+            If checkCount > 0 Then ocvb.suppressOptions = True
             For i = 0 To kalman.Count - 1
                 If i > 0 Then ocvb.suppressOptions = True
                 kalman(i) = New Kalman_Basics(ocvb)
@@ -645,7 +648,7 @@ Public Class Kalman_PointTracker
                     kalman(i).input = New Single() {-1, -1, 0, 0, 0, 0}
                 End If
             Next
-            ocvb.suppressOptions = False
+            ocvb.suppressOptions = saveSuppress
             useKalmanCheck = findCheckBox("Turn Kalman filtering on") ' we left one of these visible...
         End If
         Dim kalmanActive = useKalmanCheck?.Checked
