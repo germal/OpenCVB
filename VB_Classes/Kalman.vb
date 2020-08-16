@@ -36,6 +36,7 @@ Public Class Kalman_Basics
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = input(i)
                 kalman(i).Run(ocvb)
+                If Double.IsNaN(kalman(i).stateResult) Then kalman(i).stateResult = kalman(i).inputReal ' kalman failure...
                 output(i) = kalman(i).stateResult
             Next
         Else
@@ -727,7 +728,9 @@ Public Class Kalman_PointTracker
                 If rect.Width = lastMask(i).Cols And rect.Height = lastMask(i).Rows Then dst1(rect).SetTo(scalarColors(i), lastMask(i))
                 cv.Cv2.Circle(dst1, pt3, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
                 rect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
-                dst1.Rectangle(rect, cv.Scalar.White, 1)
+
+                Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
+                If drawRectangleCheck.checked Then dst1.Rectangle(rect, scalarColors(i), 1)
                 matchedRects.Add(rect)
                 matchedMasks.Add(lastMask(i))
                 matchedPoints.Add(pt3)

@@ -94,7 +94,7 @@ Public Class PointCloud_Colorize
         ' if not a mask, then the image is already colorized.
         If mask.Channels = 1 Then dst2.CopyTo(dst, mask) Else dst = mask.Clone()
         cameraPoint = New cv.Point(shift, src.Height - (src.Width - src.Height) / 2)
-        dst.Rectangle(New cv.Rect(shift, 0, src.Height, src.Height), cv.Scalar.White, 1)
+        'dst.Rectangle(New cv.Rect(shift, 0, src.Height, src.Height), cv.Scalar.White, 1)
         dst.Circle(cameraPoint, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         For i = 0 To maxZ
             Dim xmeter = dst.Height * i / maxZ
@@ -647,9 +647,6 @@ Public Class PointCloud_Centroids_TopView
         gvec = New PointCloud_Object_TopView(ocvb)
         Dim imuCheckbox = findCheckBox("Use IMU gravity vector")
         imuCheckbox.Enabled = False
-        Dim rectDrawCheck = findCheckBox("Draw rectangle for each mask")
-        rectDrawCheck.Checked = False
-        rectDrawCheck.Enabled = False
 
         label1 = "Objects isolated by histogram threshold"
         ocvb.desc = "Find and track centroids for the objects in a side view"
@@ -685,9 +682,6 @@ Public Class PointCloud_Centroids_SideView
         gvec = New PointCloud_Object_SideView(ocvb)
         Dim imuCheckbox = findCheckBox("Use IMU gravity vector")
         imuCheckbox.Enabled = False
-        Dim rectDrawCheck = findCheckBox("Draw rectangle for each mask")
-        rectDrawCheck.Checked = False
-        rectDrawCheck.Enabled = False
 
         label1 = "Objects isolated by histogram threshold"
         ocvb.desc = "Find and track centroids for the objects in a side view"
@@ -838,7 +832,7 @@ Public Class PointCloud_PixelFormula_SideView
             sliders.Setup(ocvb, caller, 1)
             sliders.setupTrackBar(0, "Distance from camera in mm", 0, 10000, 1500)
         End If
-        ocvb.desc = "Validate the formula for pixel width as a function of distance"
+        ocvb.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
@@ -860,5 +854,34 @@ Public Class PointCloud_PixelFormula_SideView
         End If
         pixelsPerMeter = lineLen / cameraDistance
         label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(cameraDistance, "0.0") + " meters"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_PixelClipped_TopView1
+    Inherits ocvbClass
+    Dim topView As PointCloud_PixelFormula_TopView
+    Dim measure As PointCloud_Centroids_TopView
+    Dim cMats As PointCloud_Colorize
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        topView = New PointCloud_PixelFormula_TopView(ocvb)
+        measure = New PointCloud_Centroids_TopView(ocvb)
+        cMats = New PointCloud_Colorize(ocvb)
+
+        ocvb.desc = "Validate the formula for pixel width as a function of distance"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        topView.Run(ocvb)
+        measure.Run(ocvb)
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        Dim maxZ = inRangeSlider.Value / 1000
+        dst1 = cMats.CameraLocationBot(ocvb, measure.dst1, maxZ)
     End Sub
 End Class

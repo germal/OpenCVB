@@ -988,7 +988,8 @@ Addendum 2: Some Thoughts
 16. The last algorithm to execute is automatically run when starting OpenCVB.
     There is only a “Pause” button, no “Stop” button. When developing, a
     crashing algorithm has only to be renamed to allow OpenCVB to come back up.
-    When the last algorithm is not found, the first algorithm is run.
+    When the last algorithm is not found, the first algorithm in the algorithm
+    list is run.
 
 17. Regression tests run every algorithm with all resolutions and with each
     available camera. Setting the algorithm group to “\<non-Python\>” will run
@@ -1010,3 +1011,9 @@ Addendum 2: Some Thoughts
     Multiple Document Interface – application and seems the share the
     inconveniences. However, click the main form and all the options will
     conveniently reappear.
+
+20. With multiple tasks for camera, user interface, and algorithm, there is no
+    guarantee that all 4 images are for the same instant. However, the left and
+    right destination images are for the same iteration. Room for improvement:
+    sync the presentation of the RGB and RGB Depth images like the dst1 and dst2
+    images.
