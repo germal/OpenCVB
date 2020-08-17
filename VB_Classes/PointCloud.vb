@@ -822,11 +822,13 @@ Public Class PointCloud_PixelClipped_TopView
     Inherits ocvbClass
     Dim topView As PointCloud_Measured_TopView
     Dim sideView As PointCloud_Measured_SideView
+    Dim levelCheck As IMU_IsCameraLevel
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         topView = New PointCloud_Measured_TopView(ocvb)
         sideView = New PointCloud_Measured_SideView(ocvb)
+        levelCheck = New IMU_IsCameraLevel(ocvb)
 
         ocvb.desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
@@ -836,6 +838,20 @@ Public Class PointCloud_PixelClipped_TopView
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         Dim maxZ = inRangeSlider.Value / 1000
 
+        Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
+        If useIMUcheckbox Is Nothing Then useIMUcheckbox = findCheckBox("Use IMU gravity vector")
+        label1 = "TopView - distances are accurate"
+        label2 = "SideView - distances are accurate"
+        If useIMUcheckbox.checked Then
+            levelCheck.Run(ocvb)
+            If levelCheck.cameraLevel Then
+                label1 = "TopView - distances are APPROXIMATE - level cam"
+                label2 = "SideView - distances are APPROXIMATE - level cam"
+            Else
+                label1 = "TopView - distances are NOT accurate"
+                label2 = "SideView - distances are NOT accurate"
+            End If
+        End If
         dst1 = topView.cMats.CameraLocationBot(ocvb, topView.dst1, maxZ)
         For Each rect In topView.pTrack.matchedRects
             Dim p1 = New cv.Point(0, rect.Y)
@@ -851,5 +867,31 @@ Public Class PointCloud_PixelClipped_TopView
             Dim clipped = cv.Cv2.ClipLine(rect, p1, p2) ' Returns false when the line and the rectangle don't intersect.
             dst2.Line(p1, p2, If(clipped, cv.Scalar.Red, cv.Scalar.Black), 2)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_BackProject
+    Inherits ocvbClass
+    Dim clipped As PointCloud_PixelClipped_TopView
+    Dim mats As Mat_4to1
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        clipped = New PointCloud_PixelClipped_TopView(ocvb)
+        mats = New Mat_4to1(ocvb)
+        ocvb.desc = "Backproject the selected object"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        clipped.Run(ocvb)
+        mats.mat(0) = clipped.dst1
+        mats.mat(1) = clipped.dst2
+        mats.Run(ocvb)
+        dst1 = mats.dst1
     End Sub
 End Class

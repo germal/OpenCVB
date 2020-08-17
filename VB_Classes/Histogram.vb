@@ -594,8 +594,9 @@ Public Class Histogram_2D_SideView
     Public Sub Run(ocvb As AlgorithmData)
         Dim histSize() = {src.Height, src.Width}
 
-        Dim useIMUcheckbox = findCheckBox("Use IMU gravity vector")
-        If useIMU <> useIMUcheckbox.Checked Or ocvb.frameCount = 0 Then
+        Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
+        If useIMUcheckbox Is Nothing Then useIMUcheckbox = findCheckBox("Use IMU gravity vector")
+        If useIMU <> useIMUcheckbox?.Checked Or ocvb.frameCount = 0 Then
             useIMU = useIMUcheckbox.Checked
             trimPC = If(useIMU, trimPCGravity, trimPCStatic)
         End If
