@@ -9,10 +9,19 @@ Public Class OptionsCheckbox
             Box(i).AutoSize = True
             FlowLayoutPanel1.Controls.Add(Box(i))
         Next
-        If ocvb.suppressOptions = False Then Me.Show()
+        If lookupAlgorithm(caller) = 1 Then Me.Show() ' only the first one gets to be visible...
     End Sub
+    Private Function lookupAlgorithm(caller As String) As Integer
+        For i = 0 To callerNames.Length - 1
+            If callerNames(i) = caller Then
+                callerCheckboxCounts(i) += 1
+                Return callerCheckboxCounts(i)
+            End If
+        Next
+        Return 0
+    End Function
     Private Sub OptionsCheckbox_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.SetDesktopLocation(midFormX + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
+        Me.SetDesktopLocation(midFormX + radioOffset.X, applocation.Top + applocation.Height + radioOffset.Y)
         radioOffset.X += offsetIncr
         radioOffset.Y += offsetIncr
         If radioOffset.X > offsetMax Then radioOffset.X = 0

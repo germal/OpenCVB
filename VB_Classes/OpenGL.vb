@@ -217,8 +217,6 @@ Public Class OpenGL_IMU
         setCaller(ocvb)
         imu = New IMU_GVector(ocvb)
 
-        ocvb.suppressOptions = True
-
         ogl = New OpenGL_Options(ocvb)
         ogl.OpenGL.OpenGLTitle = "OpenGL_IMU"
         ogl.sliders.trackbar(1).Value = 0 ' pitch

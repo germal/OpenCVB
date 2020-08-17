@@ -57,7 +57,6 @@ Public Class Gabor_Basics_MT
         grid.Run(ocvb) ' we only run this one time!  It needs to be 32 Gabor filters only.
         grid.sliders.Visible = False
 
-        ocvb.suppressOptions = True
         For i = 0 To gabor.Length - 1
             gabor(i) = New Gabor_Basics(ocvb)
             gabor(i).sliders.trackbar(2).Value = i * 180 / gabor.Length

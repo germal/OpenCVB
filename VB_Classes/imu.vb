@@ -367,13 +367,10 @@ Public Class IMU_TotalDelay
     Dim kalman As Kalman_Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.suppressOptions = True
 
         host = New IMU_HostFrameTimes(ocvb)
         imu = New IMU_FrameTime(ocvb)
         kalman = New Kalman_Single(ocvb)
-
-        ocvb.suppressOptions = False ' just show plot options...
 
         plot = New Plot_OverTime(ocvb)
         plot.dst1 = dst2

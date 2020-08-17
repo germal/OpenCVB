@@ -160,8 +160,6 @@ Public Class MatchTemplate_BestEntropy_MT
 
         entropy = New Entropy_Highest_MT(ocvb)
 
-        ocvb.suppressOptions = True ' we won't need the options...
-
         label1 = "Probabilities that the template matches image"
         label2 = "Red is the best template to match (highest entropy)"
         ocvb.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"

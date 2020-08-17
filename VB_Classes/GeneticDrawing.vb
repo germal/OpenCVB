@@ -229,10 +229,8 @@ Public Class GeneticDrawing_Color
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        ocvb.suppressOptions = True
         gDraw(0) = New GeneticDrawing_Basics(ocvb)
         gDraw(1) = New GeneticDrawing_Basics(ocvb)
-        ocvb.suppressOptions = False
         gDraw(2) = New GeneticDrawing_Basics(ocvb) ' options for the red channel are visible and will be sync below with the other channels if changed.
 
         label1 = "Intermediate results - original+2 partial+Mag"

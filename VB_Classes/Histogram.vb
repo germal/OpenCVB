@@ -484,7 +484,7 @@ Public Class Histogram_ProjectionOptions
         If standalone Then sliders.trackbar(0).Value = 1
 
         check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Use IMU gravity vector to rotate around the axis."
+        check.Box(0).Text = "Use IMU gravity vector"
         check.Box(0).Checked = True
         If ocvb.parms.cameraIndex = L515 Or ocvb.parms.cameraIndex = T265Camera Then
             check.Box(0).Checked = False
@@ -533,7 +533,7 @@ Public Class Histogram_2D_TopView
 
         Static imuCheckBox = findCheckBox("Use IMU gravity vector")
         If useIMU <> imuCheckBox?.Checked Or ocvb.frameCount = 0 Then
-            useIMU = imuCheckBox.Checked
+            useIMU = imuCheckBox?.Checked
             trimPC = If(useIMU, trimPCGravity, trimPCStatic)
         End If
 
@@ -594,17 +594,19 @@ Public Class Histogram_2D_SideView
     Public Sub Run(ocvb As AlgorithmData)
         Dim histSize() = {src.Height, src.Width}
 
-        If useIMU <> histOpts.check.Box(0).Checked Or ocvb.frameCount = 0 Then
-            useIMU = histOpts.check.Box(0).Checked
+        Dim useIMUcheckbox = findCheckBox("Use IMU gravity vector")
+        If useIMU <> useIMUcheckbox.Checked Or ocvb.frameCount = 0 Then
+            useIMU = useIMUcheckbox.Checked
             trimPC = If(useIMU, trimPCGravity, trimPCStatic)
         End If
 
-        Dim zRange = histOpts.sliders.trackbar(1).Value / 1000
+        Dim inRangeSlider = findSlider("InRange Max Depth (mm)")
+        Dim maxZ = inrangeSlider.Value / 1000
         trimPC.Run(ocvb)
         dst2 = trimPC.dst1
 
-        pixelsPerMeter = src.Height / zRange
-        trimPC.split(XorYdata).ConvertTo(trimPC.split(XorYdata), cv.MatType.CV_32F, pixelsPerMeter, pixelsPerMeter * zRange)
+        pixelsPerMeter = src.Height / maxZ
+        trimPC.split(XorYdata).ConvertTo(trimPC.split(XorYdata), cv.MatType.CV_32F, pixelsPerMeter, pixelsPerMeter * maxZ)
         trimPC.split(Zdata).ConvertTo(trimPC.split(Zdata), cv.MatType.CV_32F, pixelsPerMeter)
 
         Dim histinput As New cv.Mat
@@ -642,7 +644,6 @@ Public Class Histogram_EqualizeColor
         kalmanEq = New Histogram_KalmanSmoothed(ocvb)
         kalmanEq.sliders.trackbar(0).Value = 40
 
-        ocvb.suppressOptions = True
         kalman = New Histogram_KalmanSmoothed(ocvb)
         kalman.sliders.trackbar(0).Value = 40
 
@@ -695,7 +696,6 @@ Public Class Histogram_EqualizeGray
         setCaller(ocvb)
         histogramEq = New Histogram_KalmanSmoothed(ocvb)
 
-        ocvb.suppressOptions = True
         histogram = New Histogram_KalmanSmoothed(ocvb)
 
         label1 = "Before EqualizeHist"

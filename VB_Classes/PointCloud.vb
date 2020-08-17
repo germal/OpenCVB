@@ -398,7 +398,6 @@ Public Class PointCloud_SideView
         setCaller(ocvb)
 
         cMats = New PointCloud_Colorize(ocvb)
-        cMats.sliders.Visible = standalone
         cMats.shift = (src.Width - src.Height) / 2
         cMats.Run(ocvb)
 
@@ -424,6 +423,39 @@ End Class
 
 
 
+
+
+Public Class PointCloud_Object_TopView
+    Inherits ocvbClass
+    Public flood As FloodFill_Projection
+    Public view As PointCloud_TopView
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        flood = New FloodFill_Projection(ocvb)
+        flood.sliders.trackbar(0).Value = 100
+        view = New PointCloud_TopView(ocvb)
+
+        label1 = "Isolated objects"
+        ocvb.desc = "Threshold the histogram to find the significant 3D objects in the field of view (not floors or ceilings)"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        view.src = src
+        view.Run(ocvb)
+        dst1 = view.dst1
+        Static sliderHistThreshold = findSlider("Histogram threshold")
+        flood.src = view.hist.histOutput.Threshold(sliderHistThreshold?.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        flood.Run(ocvb)
+        dst2 = flood.dst2
+        label2 = flood.label2
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class PointCloud_Object_SideView
     Inherits ocvbClass
     Public flood As FloodFill_Projection
@@ -431,9 +463,9 @@ Public Class PointCloud_Object_SideView
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        view = New PointCloud_SideView(ocvb)
         flood = New FloodFill_Projection(ocvb)
         flood.sliders.trackbar(0).Value = 100
+        view = New PointCloud_SideView(ocvb)
 
         label1 = "Isolated objects"
         ocvb.desc = "Floodfill the histogram to find the significant 3D objects in the field of view (not floors or ceilings)"
@@ -450,38 +482,6 @@ Public Class PointCloud_Object_SideView
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class PointCloud_Object_TopView
-    Inherits ocvbClass
-    Public flood As FloodFill_Projection
-    Public view As PointCloud_TopView
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-
-        view = New PointCloud_TopView(ocvb)
-        flood = New FloodFill_Projection(ocvb)
-        flood.sliders.trackbar(0).Value = 100
-
-        label1 = "Isolated objects"
-        ocvb.desc = "Threshold the histogram to find the significant 3D objects in the field of view (not floors or ceilings)"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        view.src = src
-        view.Run(ocvb)
-        dst1 = view.dst1
-        Static sliderHistThreshold = findSlider("Histogram threshold")
-        flood.src = view.hist.histOutput.Threshold(sliderHistThreshold?.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
-        flood.Run(ocvb)
-        dst2 = flood.dst2
-        label2 = flood.label2
-    End Sub
-End Class
 
 
 
@@ -562,7 +562,6 @@ Public Class PointCloud_TrimDepth
         objects.gVec.flood.sliders.trackbar(0).Value = 1 ' we want all possible objects in view.
         objects.gVec.view.hist.histOpts.sliders.trackbar(0).Value = 20 ' should be substantial object...
 
-        ocvb.suppressOptions = True
         hist = New Histogram_2D_TopView(ocvb)
         hist.histOpts.check.Box(0).Checked = False
 
@@ -635,100 +634,47 @@ End Class
 
 
 
-Public Class PointCloud_Centroids_TopView
-    Inherits ocvbClass
-    Public gvec As PointCloud_Object_TopView
-    Public pTrack As Kalman_PointTracker
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-
-        pTrack = New Kalman_PointTracker(ocvb)
-
-        gvec = New PointCloud_Object_TopView(ocvb)
-        Dim imuCheckbox = findCheckBox("Use IMU gravity vector")
-        imuCheckbox.Enabled = False
-
-        label1 = "Objects isolated by histogram threshold"
-        ocvb.desc = "Find and track centroids for the objects in a side view"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        gvec.Run(ocvb)
-
-        For Each pt In gvec.flood.centroids
-            gvec.dst2.Circle(pt, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-        Next
-
-        pTrack.queryPoints = New List(Of cv.Point2f)(gvec.flood.centroids)
-        pTrack.queryRects = New List(Of cv.Rect)(gvec.flood.rects)
-        pTrack.queryMasks = New List(Of cv.Mat)(gvec.flood.masks)
-        pTrack.Run(ocvb)
-        dst1 = pTrack.dst1
-    End Sub
-End Class
-
-
-
-
-
-Public Class PointCloud_Centroids_SideView
-    Inherits ocvbClass
-    Dim gvec As PointCloud_Object_SideView
-    Dim pTrack As Kalman_PointTracker
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-
-        pTrack = New Kalman_PointTracker(ocvb)
-
-        gvec = New PointCloud_Object_SideView(ocvb)
-        Dim imuCheckbox = findCheckBox("Use IMU gravity vector")
-        imuCheckbox.Enabled = False
-
-        label1 = "Objects isolated by histogram threshold"
-        ocvb.desc = "Find and track centroids for the objects in a side view"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        gvec.Run(ocvb)
-
-        For Each pt In gvec.flood.centroids
-            gvec.dst2.Circle(pt, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-        Next
-
-        pTrack.queryPoints = New List(Of cv.Point2f)(gvec.flood.centroids)
-        pTrack.queryRects = New List(Of cv.Rect)(gvec.flood.rects)
-        pTrack.queryMasks = New List(Of cv.Mat)(gvec.flood.masks)
-        pTrack.Run(ocvb)
-        dst1 = pTrack.dst1
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class PointCloud_Measured_TopView
     Inherits ocvbClass
-    Dim measure As PointCloud_Centroids_TopView
-    Dim pixMeter As PointCloud_PixelFormula_TopView
-    Dim cMats As PointCloud_Colorize
+    Public cMats As PointCloud_Colorize
+    Public gvec As PointCloud_Object_TopView
+    Public pTrack As Kalman_PointTracker
+    Public pixelsPerMeter As Single
+    Public maxZ As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        measure = New PointCloud_Centroids_TopView(ocvb)
         cMats = New PointCloud_Colorize(ocvb)
-
-        If standalone Then ocvb.suppressOptions = True
-        pixMeter = New PointCloud_PixelFormula_TopView(ocvb)
+        gvec = New PointCloud_Object_TopView(ocvb)
+        pTrack = New Kalman_PointTracker(ocvb)
 
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
+    Public Function computePixelLength(ocvb As AlgorithmData, pixelDistance As Single) As Single
+        Dim FOV = 90 - cMats.hFOVangles(ocvb.parms.cameraIndex)
+        Dim cameraDistance = pixelDistance / src.Height / maxZ
+        Dim lineLen = CInt(Math.Tan(FOV * 0.0174533) * pixelDistance)
+        pixelsPerMeter = src.Height / maxZ
+        Return lineLen
+    End Function
     Public Sub Run(ocvb As AlgorithmData)
-        pixMeter.Run(ocvb) ' why run all the time?  Because the inrange maxZ can change and that changes the pixels per meter value
-        label1 = pixMeter.label1
-        measure.Run(ocvb)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        dst1 = cMats.CameraLocationBot(ocvb, measure.dst1, inRangeSlider.Value / 1000)
+        maxZ = inRangeSlider.Value / 1000
+
+        gvec.Run(ocvb)
+
+        For Each pt In gvec.flood.centroids
+            gvec.dst2.Circle(pt, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        Next
+
+        pTrack.queryPoints = New List(Of cv.Point2f)(gvec.flood.centroids)
+        pTrack.queryRects = New List(Of cv.Rect)(gvec.flood.rects)
+        pTrack.queryMasks = New List(Of cv.Mat)(gvec.flood.masks)
+        pTrack.Run(ocvb)
+
+        dst1 = cMats.CameraLocationBot(ocvb, pTrack.dst1, maxZ)
+        computePixelLength(ocvb, src.Height)
+        label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -739,26 +685,45 @@ End Class
 
 Public Class PointCloud_Measured_SideView
     Inherits ocvbClass
-    Dim measure As PointCloud_Centroids_SideView
-    Dim pixMeter As PointCloud_PixelFormula_SideView
-    Dim cMats As PointCloud_Colorize
+    Public cMats As PointCloud_Colorize
+    Public gvec As PointCloud_Object_SideView
+    Public pTrack As Kalman_PointTracker
+    Public pixelsPerMeter As Single
+    Public maxZ As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        measure = New PointCloud_Centroids_SideView(ocvb)
         cMats = New PointCloud_Colorize(ocvb)
-
-        If standalone Then ocvb.suppressOptions = True
-        pixMeter = New PointCloud_PixelFormula_SideView(ocvb)
+        gvec = New PointCloud_Object_SideView(ocvb)
+        pTrack = New Kalman_PointTracker(ocvb)
 
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
+    Public Function computePixelLength(ocvb As AlgorithmData, pixelDistance As Single) As Single
+        Dim FOV = 90 - cMats.vFOVangles(ocvb.parms.cameraIndex)
+        Dim cameraDistance = pixelDistance / src.Height / maxZ
+        pixelsPerMeter = src.Height / maxZ
+        Dim lineLen = CInt(Math.Tan(FOV * 0.0174533) * pixelDistance)
+        Return lineLen
+    End Function
     Public Sub Run(ocvb As AlgorithmData)
-        pixMeter.Run(ocvb) ' why run all the time?  Because the inrange maxZ can change and that changes the pixels per meter value
-        label1 = pixMeter.label1
-        measure.Run(ocvb)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        dst1 = cMats.CameraLocationSide(ocvb, measure.dst1, inRangeSlider.Value / 1000)
+        maxZ = inRangeSlider.Value / 1000
+
+        gvec.Run(ocvb)
+
+        For Each pt In gvec.flood.centroids
+            gvec.dst2.Circle(pt, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        Next
+
+        pTrack.queryPoints = New List(Of cv.Point2f)(gvec.flood.centroids)
+        pTrack.queryRects = New List(Of cv.Rect)(gvec.flood.rects)
+        pTrack.queryMasks = New List(Of cv.Mat)(gvec.flood.masks)
+        pTrack.Run(ocvb)
+
+        dst1 = cMats.CameraLocationSide(ocvb, pTrack.dst1, maxZ)
+        computePixelLength(ocvb, src.Height)
+        label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -771,42 +736,26 @@ End Class
 
 Public Class PointCloud_PixelFormula_TopView
     Inherits ocvbClass
-    Dim measure As PointCloud_Centroids_TopView
-    Dim cMats As PointCloud_Colorize
-    Public pixelsPerMeter As Single
+    Public measure As PointCloud_Measured_TopView
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        measure = New PointCloud_Centroids_TopView(ocvb)
-        cMats = New PointCloud_Colorize(ocvb)
+        measure = New PointCloud_Measured_TopView(ocvb)
 
-        If standalone Then
-            sliders.Setup(ocvb, caller, 1)
-            sliders.setupTrackBar(0, "Distance from camera in mm", 0, 10000, 1500)
-        End If
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Distance from camera in pixels", 0, src.Height, 100)
         ocvb.desc = "Validate the formula for pixel width as a function of distance"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        Dim maxZ = inRangeSlider.Value / 1000
-
-        Dim FOV = 90 - cMats.hFOVangles(ocvb.parms.cameraIndex)
-        If standalone Then sliders.trackbar(0).Maximum = maxZ * 1000
-        Dim cameraDistance = If(standalone, sliders.trackbar(0).Value / 1000, maxZ)
-        Dim pixelDistance = src.Height * cameraDistance / maxZ
-        Dim lineLen = CInt(Math.Tan(FOV * 0.0174533) * pixelDistance)
-
-        If standalone Then
-            measure.Run(ocvb)
-            dst1 = cMats.CameraLocationBot(ocvb, measure.dst1, maxZ)
-
-            Dim cameraPoint = New cv.Point(src.Height, src.Height)
-            Dim pt1 = New cv.Point(cameraPoint.X - lineLen, CInt(src.Height - pixelDistance))
-            Dim pt2 = New cv.Point(cameraPoint.X + lineLen, CInt(src.Height - pixelDistance))
-            dst1.Line(pt1, pt2, cv.Scalar.Red, 2)
-        End If
-        pixelsPerMeter = lineLen / cameraDistance
-        label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(cameraDistance, "0.0") + " meters"
+        measure.Run(ocvb)
+        dst1 = measure.cMats.CameraLocationBot(ocvb, measure.dst1, measure.maxZ)
+        Dim cameraPoint = New cv.Point(src.Height, src.Height)
+        Dim pixelDistance = sliders.trackbar(0).Value
+        Dim lineLen = measure.computePixelLength(ocvb, pixelDistance)
+        Dim pt1 = New cv.Point(cameraPoint.X - lineLen, CInt(src.Height - pixelDistance))
+        Dim pt2 = New cv.Point(cameraPoint.X + lineLen, CInt(src.Height - pixelDistance))
+        dst1.Line(pt1, pt2, cv.Scalar.Red, 2)
+        label1 = Format(measure.pixelsPerMeter, "0") + " pixels per meter at " + Format(measure.maxZ * sliders.trackbar(0).Value / src.Height, "0.0") + " meters"
     End Sub
 End Class
 
@@ -819,41 +768,27 @@ End Class
 
 Public Class PointCloud_PixelFormula_SideView
     Inherits ocvbClass
-    Dim measure As PointCloud_Centroids_SideView
-    Dim cMats As PointCloud_Colorize
+    Public measure As PointCloud_Measured_SideView
     Public pixelsPerMeter As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        measure = New PointCloud_Centroids_SideView(ocvb)
-        cMats = New PointCloud_Colorize(ocvb)
+        measure = New PointCloud_Measured_SideView(ocvb)
 
-        If standalone Then
-            sliders.Setup(ocvb, caller, 1)
-            sliders.setupTrackBar(0, "Distance from camera in mm", 0, 10000, 1500)
-        End If
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Distance from camera in pixels", 0, src.Height, 100)
         ocvb.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        Dim maxZ = inRangeSlider.Value / 1000
-
-        Dim FOV = 90 - cMats.vFOVangles(ocvb.parms.cameraIndex)
-        If standalone Then sliders.trackbar(0).Maximum = maxZ * 1000
-        Dim cameraDistance = If(standalone, sliders.trackbar(0).Value / 1000, maxZ)
-        Dim pixelDistance = src.Height * cameraDistance / maxZ
-        Dim lineLen = CInt(Math.Tan(FOV * 0.0174533) * pixelDistance)
-
-        If standalone Then
-            measure.Run(ocvb)
-            dst1 = cMats.CameraLocationSide(ocvb, measure.dst1, maxZ)
-            Dim cameraPoint = cMats.cameraPoint
-            Dim pt1 = New cv.Point(CInt(cameraPoint.X + pixelDistance), CInt(cameraPoint.Y - lineLen))
-            Dim pt2 = New cv.Point(CInt(cameraPoint.X + pixelDistance), CInt(cameraPoint.Y + lineLen))
-            dst1.Line(pt1, pt2, cv.Scalar.Red, 2)
-        End If
-        pixelsPerMeter = lineLen / cameraDistance
-        label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(cameraDistance, "0.0") + " meters"
+        measure.Run(ocvb)
+        dst1 = measure.cMats.CameraLocationSide(ocvb, measure.dst1, measure.maxZ)
+        Dim cameraPoint = measure.cMats.cameraPoint
+        Dim pixeldistance = sliders.trackbar(0).Value
+        Dim linelen = measure.computePixelLength(ocvb, pixeldistance)
+        Dim pt1 = New cv.Point(CInt(cameraPoint.X + pixelDistance), CInt(cameraPoint.Y - lineLen))
+        Dim pt2 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y + linelen))
+        dst1.Line(pt1, pt2, cv.Scalar.Red, 2)
+        label1 = Format(measure.pixelsPerMeter, "0") + " pixels per meter at " + Format(measure.maxZ * sliders.trackbar(0).Value / src.Height, "0.0") + " meters"
     End Sub
 End Class
 
@@ -865,40 +800,36 @@ End Class
 
 Public Class PointCloud_PixelClipped_TopView
     Inherits ocvbClass
-    Dim topView As PointCloud_PixelFormula_TopView
-    Dim hMeasure As PointCloud_Centroids_TopView
-    Dim vMeasure As PointCloud_Centroids_SideView
-    Dim cMats As PointCloud_Colorize
+    Dim topView As PointCloud_Measured_TopView
+    Dim sideView As PointCloud_Measured_SideView
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        topView = New PointCloud_PixelFormula_TopView(ocvb)
-        hMeasure = New PointCloud_Centroids_TopView(ocvb)
-        vMeasure = New PointCloud_Centroids_SideView(ocvb)
-        cMats = New PointCloud_Colorize(ocvb)
+        topView = New PointCloud_Measured_TopView(ocvb)
+        sideView = New PointCloud_Measured_SideView(ocvb)
 
         ocvb.desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         topView.Run(ocvb)
-        hMeasure.Run(ocvb)
-
+        sideView.Run(ocvb)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         Dim maxZ = inRangeSlider.Value / 1000
 
-        dst1 = cMats.CameraLocationBot(ocvb, hMeasure.dst1, maxZ)
-        vMeasure.Run(ocvb)
-        dst2 = cMats.CameraLocationSide(ocvb, vMeasure.dst1, maxZ)
-
-        For Each rect In hMeasure.pTrack.matchedRects
+        dst1 = topView.cMats.CameraLocationBot(ocvb, topView.dst1, maxZ)
+        For Each rect In topView.pTrack.matchedRects
             Dim p1 = New cv.Point(0, rect.Y)
             Dim p2 = New cv.Point(src.Width, rect.Y)
             Dim clipped = cv.Cv2.ClipLine(rect, p1, p2) ' Returns false when the line and the rectangle don't intersect.
             dst1.Line(p1, p2, If(clipped, cv.Scalar.Red, cv.Scalar.Black), 2)
         Next
 
-        ' dst2 = ocvb.RGBDepth.Clone
-
-
+        dst2 = sideView.cMats.CameraLocationSide(ocvb, sideView.dst1, maxZ)
+        For Each rect In sideView.pTrack.matchedRects
+            Dim p1 = New cv.Point(rect.X + rect.Width - 1, 0)
+            Dim p2 = New cv.Point(rect.X + rect.Width - 1, src.Height)
+            Dim clipped = cv.Cv2.ClipLine(rect, p1, p2) ' Returns false when the line and the rectangle don't intersect.
+            dst2.Line(p1, p2, If(clipped, cv.Scalar.Red, cv.Scalar.Black), 2)
+        Next
     End Sub
 End Class

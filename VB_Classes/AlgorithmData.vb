@@ -25,8 +25,9 @@ Public Class AlgorithmData
 
     Public PythonExe As String
     Public PythonFileName As String
-    Public suppressOptions As Boolean
     Public TTtextData(4 - 1) As List(Of TTtext)
+
+    Public algorithmIndex As Integer
 
     Public caller As String
     Public Sub New(parms As ActiveClass.algorithmParameters, width As Integer, height As Integer)

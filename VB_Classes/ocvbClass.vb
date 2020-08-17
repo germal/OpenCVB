@@ -83,20 +83,6 @@ Public Class ocvbClass : Implements IDisposable
         MsgBox("A slider was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request in '" + vbCrLf + vbCrLf + "'" + caller + "'")
         Return Nothing
     End Function
-    Public Function countCheckBox(opt As String) As Integer
-        Dim count As Integer = 0
-        Try
-            For Each frm In Application.OpenForms
-                If frm.text.endswith(" CheckBox Options") Then
-                    For i = 0 To frm.Box.length - 1
-                        If frm.box(i).text.contains(opt) Then count += 1
-                    Next
-                End If
-            Next
-        Catch ex As Exception
-        End Try
-        Return count
-    End Function
     Public Function countSlider(opt As String) As Integer
         Dim count As Integer = 0
         Try

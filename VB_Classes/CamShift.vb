@@ -156,14 +156,12 @@ Public Class Camshift_TopObjects
         setCaller(ocvb)
         mats = New Mat_4to1(ocvb)
 
-        ocvb.suppressOptions = True
         blob = New Blob_DepthClusters(ocvb)
         blob.sliders.Visible = False
         For i = 0 To cams.Length - 1
             cams(i) = New CamShift_Basics(ocvb)
         Next
 
-        ocvb.suppressOptions = False
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Reinitialize camshift after x frames", 1, 500, 100)
         ocvb.desc = "Track - Tracker Algorithm"

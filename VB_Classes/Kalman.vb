@@ -511,7 +511,6 @@ Public Class Kalman_Centroids
         If kalman.Length < trainingPoints.Count Then
             ReDim kalman(trainingPoints.Count + 10) ' pad a little to keep more info
             For i = 0 To kalman.Count - 1
-                If i > 0 Then ocvb.suppressOptions = True
                 kalman(i) = New Kalman_Basics(ocvb)
                 If i < trainingPoints.Count Then
                     kalman(i).input = New Single() {trainingPoints(i).X, trainingPoints(i).Y}
@@ -519,7 +518,6 @@ Public Class Kalman_Centroids
                     kalman(i).input = New Single() {-1, -1}
                 End If
             Next
-            ocvb.suppressOptions = False
             useKalmanCheck = findCheckBox("Turn Kalman filtering on")
         End If
 
@@ -596,7 +594,7 @@ Public Class Kalman_PointTracker
     Dim knn As KNN_Basics
     Dim kalman(0) As Kalman_Basics
     Dim newObjects As New List(Of cv.Point2f)
-    Dim topView As PointCloud_Centroids_TopView
+    Dim topView As PointCloud_Measured_TopView
     Dim kalmanAging() As Integer
     Dim lastMask() As cv.Mat
     Public maskAvailable As Boolean = True
@@ -609,11 +607,9 @@ Public Class Kalman_PointTracker
     Public matchedPoints As New List(Of cv.Point2f)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        If standalone Then topView = New PointCloud_Centroids_TopView(ocvb)
+        If standalone Then topView = New PointCloud_Measured_TopView(ocvb)
 
-        If standalone Then ocvb.suppressOptions = True
         knn = New KNN_Basics(ocvb)
-        If standalone Then ocvb.suppressOptions = False
 
         ocvb.desc = "Use KNN to track points and Kalman to smooth the results"
     End Sub
@@ -636,11 +632,7 @@ Public Class Kalman_PointTracker
             ReDim kalman(trainingPoints.Count + 10) ' pad a little to keep more info
             ReDim kalmanAging(kalman.Count - 1)
             ReDim lastMask(kalman.Count - 1)
-            Dim saveSuppress = ocvb.suppressOptions
-            Dim checkCount = countCheckBox("Turn Kalman filtering on")
-            If checkCount > 0 Then ocvb.suppressOptions = True
             For i = 0 To kalman.Count - 1
-                If i > 0 Then ocvb.suppressOptions = True
                 kalman(i) = New Kalman_Basics(ocvb)
                 If i < trainingPoints.Count Then
                     kalman(i).input = New Single() {trainingPoints(i).X, trainingPoints(i).Y, 0, 0, 0, 0}
@@ -648,7 +640,6 @@ Public Class Kalman_PointTracker
                     kalman(i).input = New Single() {-1, -1, 0, 0, 0, 0}
                 End If
             Next
-            ocvb.suppressOptions = saveSuppress
             useKalmanCheck = findCheckBox("Turn Kalman filtering on") ' we left one of these visible...
         End If
         Dim kalmanActive = useKalmanCheck?.Checked
@@ -733,7 +724,7 @@ Public Class Kalman_PointTracker
                 rect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
 
                 Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
-                If drawRectangleCheck.checked Then dst1.Rectangle(rect, scalarColors(i), 1)
+                If drawRectangleCheck?.checked Then dst1.Rectangle(rect, scalarColors(i), 1)
                 matchedRects.Add(rect)
                 matchedMasks.Add(lastMask(i))
                 matchedPoints.Add(pt3)

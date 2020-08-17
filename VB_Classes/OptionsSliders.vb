@@ -38,7 +38,7 @@ Public Class OptionsSliders
             defaultHeight = count * 58 ' add space for the additional unexpected trackbars.
             FlowLayoutPanel1.Height = defaultHeight - 30
         End If
-        If ocvb.suppressOptions = False Then Me.Show()
+        If lookupAlgorithm(caller) = 1 Then Me.Show() ' only the first one gets to be visible...
     End Sub
     Public Sub setupTrackBar(index As Integer, label As String, min As Integer, max As Integer, value As Integer)
         sLabels(index).Text = label
@@ -64,6 +64,15 @@ Public Class OptionsSliders
             If slidersOffset.Y > offsetMax Then slidersOffset.Y = 0
         End If
     End Sub
+    Private Function lookupAlgorithm(caller As String) As Integer
+        For i = 0 To callerNames.Length - 1
+            If callerNames(i) = caller Then
+                callerSliderCounts(i) += 1
+                Return callerSliderCounts(i)
+            End If
+        Next
+        Return 0
+    End Function
     Public Sub SetVisible(standalone As Boolean)
         If standalone = False Then
             slidersOffset.X -= offsetIncr
