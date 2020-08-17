@@ -706,6 +706,7 @@ Public Class PointCloud_Measured_SideView
         Dim lineLen = CInt(Math.Tan(FOV * 0.0174533) * pixelDistance)
         Return lineLen
     End Function
+
     Public Sub Run(ocvb As AlgorithmData)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
@@ -743,19 +744,37 @@ Public Class PointCloud_PixelFormula_TopView
         measure = New PointCloud_Measured_TopView(ocvb)
 
         sliders.Setup(ocvb, caller, 1)
-        sliders.setupTrackBar(0, "Distance from camera in pixels", 0, src.Height, 100)
+        sliders.setupTrackBar(0, "Distance from camera in mm", 0, 4000, 100)
         ocvb.desc = "Validate the formula for pixel width as a function of distance"
     End Sub
+    Public Function moveLine(cameraLoc As Integer, mouse As Integer, maxLoc As Integer, maxZ As Single) As Integer
+        Static lastSlider = sliders.trackbar(0).Value
+        Static pixelDistance = lastSlider
+        If lastSlider <> sliders.trackbar(0).Value Then
+            lastSlider = sliders.trackbar(0).Value
+            pixelDistance = src.Height * sliders.trackbar(0).Value / maxZ / 1000
+        Else
+            Static lastMouse = mouse
+            If lastMouse <> mouse Then
+                If mouse > cameraLoc And mouse < cameraLoc + maxLoc Then pixelDistance = mouse - cameraLoc
+                If mouse >= 0 And mouse < -maxLoc Then pixelDistance = cameraLoc - mouse
+                lastMouse = mouse
+            End If
+        End If
+        Return pixelDistance
+    End Function
     Public Sub Run(ocvb As AlgorithmData)
         measure.Run(ocvb)
+        sliders.trackbar(0).Maximum = measure.maxZ * 1000
         dst1 = measure.cMats.CameraLocationBot(ocvb, measure.dst1, measure.maxZ)
         Dim cameraPoint = New cv.Point(src.Height, src.Height)
-        Dim pixelDistance = sliders.trackbar(0).Value
+        Dim pixelDistance = moveLine(cameraPoint.Y, ocvb.mousePoint.Y, -src.Height, measure.maxZ)
+
         Dim lineLen = measure.computePixelLength(ocvb, pixelDistance)
         Dim pt1 = New cv.Point(cameraPoint.X - lineLen, CInt(src.Height - pixelDistance))
         Dim pt2 = New cv.Point(cameraPoint.X + lineLen, CInt(src.Height - pixelDistance))
         dst1.Line(pt1, pt2, cv.Scalar.Red, 2)
-        label1 = Format(measure.pixelsPerMeter, "0") + " pixels per meter at " + Format(measure.maxZ * sliders.trackbar(0).Value / src.Height, "0.0") + " meters"
+        label1 = Format(measure.pixelsPerMeter, "0") + " pixels per meter at " + Format(measure.maxZ * pixelDistance / src.Height, "0.0") + " meters"
     End Sub
 End Class
 
@@ -769,26 +788,27 @@ End Class
 Public Class PointCloud_PixelFormula_SideView
     Inherits ocvbClass
     Public measure As PointCloud_Measured_SideView
+    Public top As PointCloud_PixelFormula_TopView
     Public pixelsPerMeter As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         measure = New PointCloud_Measured_SideView(ocvb)
+        top = New PointCloud_PixelFormula_TopView(ocvb)
 
-        sliders.Setup(ocvb, caller, 1)
-        sliders.setupTrackBar(0, "Distance from camera in pixels", 0, src.Height, 100)
         ocvb.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         measure.Run(ocvb)
+        top.sliders.trackbar(0).Maximum = measure.maxZ * 1000
         dst1 = measure.cMats.CameraLocationSide(ocvb, measure.dst1, measure.maxZ)
         Dim cameraPoint = measure.cMats.cameraPoint
-        Dim pixeldistance = sliders.trackbar(0).Value
+        Dim pixeldistance = top.moveLine(cameraPoint.X, ocvb.mousePoint.X, src.Height, measure.maxZ)
         Dim linelen = measure.computePixelLength(ocvb, pixeldistance)
-        Dim pt1 = New cv.Point(CInt(cameraPoint.X + pixelDistance), CInt(cameraPoint.Y - lineLen))
+        Dim pt1 = New cv.Point(CInt(cameraPoint.X + pixelDistance), CInt(cameraPoint.Y - linelen))
         Dim pt2 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y + linelen))
-        dst1.Line(pt1, pt2, cv.Scalar.Red, 2)
-        label1 = Format(measure.pixelsPerMeter, "0") + " pixels per meter at " + Format(measure.maxZ * sliders.trackbar(0).Value / src.Height, "0.0") + " meters"
+        dst1.Line(pt1, pt2, cv.Scalar.Red, 3)
+        label1 = Format(measure.pixelsPerMeter, "0") + " pixels per meter at " + Format(measure.maxZ * pixeldistance / src.Height, "0.0") + " meters"
     End Sub
 End Class
 
