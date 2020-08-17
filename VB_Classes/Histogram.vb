@@ -813,6 +813,8 @@ Public Class Histogram_ColorsAndGray
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Normalize Before Histogram"
         check.Box(0).Checked = True
+
+        label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -833,6 +835,7 @@ Public Class Histogram_ColorsAndGray
 
         mats.Run(ocvb)
         dst1 = mats.dst1
+        dst2 = mats.mat(clickQuadrant(ocvb))
     End Sub
 End Class
 
@@ -1009,6 +1012,7 @@ Public Class Histogram_HueSaturation2DPlot
         hueSat = New Brightness_Hue(ocvb)
         hist2d = New Histogram_BackProjection2D(ocvb)
         mats = New Mat_4to1(ocvb)
+        label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -1020,9 +1024,10 @@ Public Class Histogram_HueSaturation2DPlot
         hist2d.src = src
         hist2d.Run(ocvb)
         mats.mat(2) = hist2d.dst2
-        dst1 = hist2d.dst1
+        mats.mat(3) = hist2d.dst1
 
         mats.Run(ocvb)
-        dst2 = mats.dst1
+        dst1 = mats.dst1
+        dst2 = mats.mat(clickQuadrant(ocvb, 3))
     End Sub
 End Class

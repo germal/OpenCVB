@@ -9,8 +9,8 @@ Public Class Pixel_GetSet
         setCaller(ocvb)
         mats = New Mat_4to1(ocvb)
 
-        label1 = "Log of times for each method"
-        label2 = "GetSet/Generic Indexer/Marshal.Copy"
+        label1 = "Time to copy using get/set,Generic Index, Marshal Copy"
+        label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -53,9 +53,11 @@ Public Class Pixel_GetSet
         watch.Stop()
         output += "Marshal Copy took " + CStr(watch.ElapsedMilliseconds) + "ms" + vbCrLf
 
-        ocvb.putText(New TTtext(output, 10, 60, RESULT1))
+        Dim f = If(ocvb.parms.resolution = resHigh, 4, 2)
+        ocvb.putText(New TTtext(output, src.Width / f + 10, src.Height / f + 20, RESULT1))
 
         mats.Run(ocvb)
-        dst2 = mats.dst1
+        dst1 = mats.dst1
+        dst2 = mats.mat(clickQuadrant(ocvb))
     End Sub
 End Class

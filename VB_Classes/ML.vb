@@ -207,11 +207,12 @@ Public Class ML_DepthFromColor
         resized = New Resize_Percentage(ocvb)
         resized.sliders.trackbar(0).Value = 2 ' 2% of the image.
 
+        label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
-        mats.mat(0) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        mats.mat(1) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat
 
@@ -220,7 +221,7 @@ Public Class ML_DepthFromColor
 
         Dim colorROI As New cv.Rect(0, 0, resized.resizeOptions.newSize.Width, resized.resizeOptions.newSize.Height)
         resized.dst1.ConvertTo(color32f, cv.MatType.CV_32FC3)
-        Dim shadowSmall = mats.mat(0).Resize(color32f.Size()).Clone()
+        Dim shadowSmall = mats.mat(1).Resize(color32f.Size()).Clone()
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
         Dim depth32f = getDepth32f(ocvb).Resize(color32f.Size())
 
@@ -254,12 +255,12 @@ Public Class ML_DepthFromColor
 
         colorizer.src = predictedDepth
         colorizer.Run(ocvb)
-        dst1 = colorizer.dst1.Clone()
+        mats.mat(0) = colorizer.dst1.Clone()
 
         mats.Run(ocvb)
-        dst2 = mats.dst1
-        label1 = "Predicted Depth"
-        label2 = "shadow, empty, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
+        dst1 = mats.dst1
+        label1 = "prediction, shadow, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
+        dst2 = mats.mat(clickQuadrant(ocvb))
     End Sub
 End Class
 

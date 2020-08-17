@@ -885,6 +885,8 @@ Public Class PointCloud_BackProject
 
         clipped = New PointCloud_PixelClipped_TopView(ocvb)
         mats = New Mat_4to1(ocvb)
+        label1 = "Top/Side views with corresponding backprojection"
+        label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Backproject the selected object"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -893,5 +895,6 @@ Public Class PointCloud_BackProject
         mats.mat(1) = clipped.dst2
         mats.Run(ocvb)
         dst1 = mats.dst1
+        dst2 = mats.mat(clickQuadrant(ocvb))
     End Sub
 End Class

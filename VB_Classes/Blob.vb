@@ -27,29 +27,28 @@ Public Class Blob_Input
 
         Mats = New Mat_4to1(ocvb)
 
+        label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Test simple Blob Detector."
-        label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod updateFrequency = 0 Then
-            rectangles.src = src
-            rectangles.Run(ocvb)
-            Mats.mat(0) = rectangles.dst1
+        rectangles.src = src
+        rectangles.Run(ocvb)
+        Mats.mat(0) = rectangles.dst1
 
-            circles.src = src
-            circles.Run(ocvb)
-            Mats.mat(1) = circles.dst1
+        circles.src = src
+        circles.Run(ocvb)
+        Mats.mat(1) = circles.dst1
 
-            ellipses.src = src
-            ellipses.Run(ocvb)
-            Mats.mat(2) = ellipses.dst1
+        ellipses.src = src
+        ellipses.Run(ocvb)
+        Mats.mat(2) = ellipses.dst1
 
-            poly.src = src
-            poly.Run(ocvb)
-            Mats.mat(3) = poly.dst2
-            Mats.Run(ocvb)
-            Mats.dst1.CopyTo(dst1)
-        End If
+        poly.src = src
+        poly.Run(ocvb)
+        Mats.mat(3) = poly.dst2
+        Mats.Run(ocvb)
+        Mats.dst1.CopyTo(dst1)
+        dst2 = Mats.mat(clickQuadrant(ocvb))
     End Sub
 End Class
 

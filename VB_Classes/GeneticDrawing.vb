@@ -196,13 +196,13 @@ Public Class GeneticDrawing_Basics
 
         If changes Then
             totalError = bestError
-            dst2 = runDNAseq(nextDNA)
+            mats.mat(3) = runDNAseq(nextDNA)
             DNAseq = nextDNA
         End If
 
         generation += 1
         If generation = generationTotal Then
-            imgStage = dst2
+            imgStage = mats.mat(3)
             mats.mat(1) = imgStage
             generation = 0
             stage += 1
@@ -212,7 +212,7 @@ Public Class GeneticDrawing_Basics
         mats.Run(ocvb)
         dst1 = mats.dst1
         label2 = " stage " + CStr(stage) + "/" + CStr(stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
-
+        dst2 = mats.mat(clickQuadrant(ocvb, 3))
     End Sub
 End Class
 

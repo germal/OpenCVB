@@ -160,6 +160,7 @@ Public Class Clone_Eagle
         dst1 = src.Clone()
         If ocvb.mouseClickFlag Then
             pt = ocvb.mouseClickPoint ' pt corresponds to the center of the source image.  Roi can't be outside image boundary.
+            pt = ocvb.mouseClickPoint * If(ocvb.parms.resolution = resHigh, 2, 1)
             If pt.X + srcROI.Width / 2 >= src.Width Then pt.X = src.Width - srcROI.Width / 2
             If pt.X - srcROI.Width / 2 < 0 Then pt.X = srcROI.Width / 2
             If pt.Y + srcROI.Height >= src.Height Then pt.Y = src.Height - srcROI.Height / 2

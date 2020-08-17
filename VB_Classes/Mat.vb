@@ -129,6 +129,8 @@ Public Class Mat_4to1
         mat3 = mat1.Clone()
         mat4 = mat1.Clone()
         mat = {mat1, mat2, mat3, mat4}
+        label1 = "Combining 4 images into one"
+        label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Use one Mat for up to 4 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -153,6 +155,7 @@ Public Class Mat_4to1
             dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, 2)
             dst1.Line(New cv.Point(dst1.Width / 2, 0), New cv.Point(dst1.Width / 2, dst1.Height), cv.Scalar.White, 2)
         End If
+        dst2 = mat(clickQuadrant(ocvb))
     End Sub
 End Class
 

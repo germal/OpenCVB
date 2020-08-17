@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class kMeans_Basics
     Inherits ocvbClass
+    Public kmeansK As Integer
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
@@ -15,15 +16,19 @@ Public Class kMeans_Basics
         columnVector = rectMat.Reshape(src.Channels, small.Height * small.Width)
         Dim rgb32f As New cv.Mat
         columnVector.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
-        Dim clusterCount = sliders.trackbar(0).Value
+        Static lastClusterCount As Integer
+        If lastClusterCount <> sliders.trackbar(0).Value Then
+            lastClusterCount = sliders.trackbar(0).Value
+            kmeansK = lastClusterCount
+        End If
         Dim labels = New cv.Mat()
         Dim colors As New cv.Mat
 
-        cv.Cv2.Kmeans(rgb32f, clusterCount, labels, term, 1, cv.KMeansFlags.PpCenters, colors)
+        cv.Cv2.Kmeans(rgb32f, kmeansK, labels, term, 1, cv.KMeansFlags.PpCenters, colors)
         labels.Reshape(1, small.Height).ConvertTo(labels, cv.MatType.CV_8U)
         labels = labels.Resize(New cv.Size(src.Width, src.Height))
 
-        For i = 0 To clusterCount - 1
+        For i = 0 To kmeansK - 1
             Dim mask = labels.InRange(i, i)
             Dim mean = ocvb.RGBDepth.Mean(mask)
             dst1.SetTo(mean, mask)
@@ -46,24 +51,22 @@ Public Class kMeans_Clusters
 
         km = New kMeans_Basics(ocvb)
 
-        label1 = "kmeans - k=10"
-        label2 = "kmeans - k=2,4,6,8"
+        label1 = "kmeans - k=2,4,6,8"
+        label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static saveRect = ocvb.drawRect
         ocvb.drawRect = saveRect
+        km.src = src
         For i = 0 To 3
-            km.sliders.trackbar(0).Value = (i + 1) * 2
-            km.src = src
+            km.kmeansK = Choose(i + 1, 2, 4, 6, 8)
             km.Run(ocvb)
-            Mats.mat(i) = dst1.Resize(New cv.Size(dst1.Cols / 2, dst1.Rows / 2))
+            Mats.mat(i) = km.dst1.Clone
         Next
         Mats.Run(ocvb)
-        dst2 = Mats.dst1
-        km.sliders.trackbar(0).Value = 10 ' this will show kmeans with 10 clusters in Result1.
-        km.Run(ocvb)
-        dst1 = km.dst1
+        dst1 = Mats.dst1
+        dst2 = Mats.mat(clickQuadrant(ocvb))
     End Sub
 End Class
 
