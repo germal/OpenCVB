@@ -51,6 +51,7 @@ Public Class Sift_Basics_CS_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         fisheye = New FishEye_Rectified(ocvb)
+
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -58,8 +59,6 @@ Public Class Sift_Basics_CS_MT
         gridWidthSlider.Value = ocvb.color.Cols * 2 ' we are just taking horizontal slices of the image.
         gridHeightSlider.Value = 10
 
-        grid.sliders.trackbar(0).Value =
-        grid.sliders.trackbar(1).Value = 10
         grid.Run(ocvb)
 
         siftBasics = New Sift_Basics_CS(ocvb)
