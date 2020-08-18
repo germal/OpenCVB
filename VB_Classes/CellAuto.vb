@@ -116,15 +116,17 @@ Public Class CellAuto_Life
 
         random = New Random_Points(ocvb)
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
-        random.sliders.trackbar(0).Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
+        Static randomSlider = findSlider("Random Pixel Count")
+        randomSlider.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         ocvb.desc = "Use OpenCV to implement the Game of Life"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static savePointCount As Integer
-        If random.sliders.trackbar(0).Value <> savePointCount Or generation = 0 Then
+        Static randomSlider = findSlider("Random Pixel Count")
+        If randomSlider.Value <> savePointCount Or generation = 0 Then
             random.Run(ocvb)
             generation = 0
-            savePointCount = random.sliders.trackbar(0).Value
+            savePointCount = randomSlider.Value
             For i = 0 To random.Points.Count - 1
                 grid.Set(Of Byte)(random.Points(i).Y, random.Points(i).X, 1)
             Next

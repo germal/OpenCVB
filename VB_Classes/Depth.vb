@@ -318,8 +318,10 @@ Public Class Depth_WorldXYZ_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = 32
-        grid.sliders.trackbar(1).Value = 32
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = 32
+        gridHeightSlider.Value = 32
 
         trim = New Depth_InRange(ocvb)
 
@@ -362,8 +364,10 @@ Public Class Depth_MeanStdev_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = 64
-        grid.sliders.trackbar(1).Value = 40
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = 64
+        gridHeightSlider.Value = 40
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "MeanStdev Max Depth Range", 1, 20000, 3500)
@@ -904,8 +908,10 @@ Public Class Depth_LocalMinMax_Kalman_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = 128
-        grid.sliders.trackbar(1).Value = 90
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = 128
+        gridHeightSlider.Value = 90
 
         kalman = New Kalman_Basics(ocvb)
 

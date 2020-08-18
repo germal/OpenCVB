@@ -47,8 +47,10 @@ Public Class Entropy_Highest_MT
         setCaller(ocvb)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = 64
-        grid.sliders.trackbar(1).Value = 80
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = 64
+        gridHeightSlider.Value = 80
 
         hist = New Histogram_Basics(ocvb)
 

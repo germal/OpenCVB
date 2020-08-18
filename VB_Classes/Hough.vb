@@ -129,8 +129,11 @@ Public Class Hough_Lines_MT
         edges = New Edges_Canny(ocvb)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = 16
-        grid.sliders.trackbar(1).Value = 16
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = 16
+        gridHeightSlider.Value = 16
+
         ocvb.desc = "Multithread Houghlines to find lines in image fragments."
         label1 = "Hough_Lines_MT"
         label2 = "Hough_Lines_MT"

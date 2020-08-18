@@ -360,8 +360,10 @@ Public Class kMeans_Color_MT
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 2)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = 128
-        grid.sliders.trackbar(1).Value = 160
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = 128
+        gridHeightSlider.Value = 160
 
         ocvb.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub

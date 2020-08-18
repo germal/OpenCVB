@@ -155,9 +155,12 @@ Public Class OpticalFlow_DenseBasics_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = ocvb.color.Cols / 4
-        grid.sliders.trackbar(1).Value = ocvb.color.Rows / 4
-        grid.sliders.trackbar(2).Value = 5
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        Static gridBorderSlider = findSlider("ThreadGrid Border")
+        gridWidthSlider.Value = ocvb.color.Cols / 4
+        gridHeightSlider.Value = ocvb.color.Rows / 4
+        gridHeightSlider.Value = 5
 
         flow = New OpticalFlow_DenseOptions(ocvb)
         flow.sliders.trackbar(0).Value = 75

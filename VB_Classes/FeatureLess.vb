@@ -18,8 +18,11 @@ Public Class Featureless_Basics_MT
         edges = New Edges_Canny(ocvb)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = If(ocvb.color.Width > 1000, 16, 8)
-        grid.sliders.trackbar(1).Value = If(ocvb.color.Width > 1000, 16, 8)
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = If(ocvb.color.Width > 1000, 16, 8)
+        gridHeightSlider.Value = If(ocvb.color.Width > 1000, 16, 8)
+
 
         ocvb.desc = "Multithread Houghlines to find featureless regions in an image."
         label1 = "Featureless regions with mask in depth color"

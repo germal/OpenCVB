@@ -52,8 +52,11 @@ Public Class Gabor_Basics_MT
         setCaller(ocvb)
         label2 = "The 32 kernels used"
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = ocvb.color.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
-        grid.sliders.trackbar(1).Value = ocvb.color.Height / 4
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = ocvb.color.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
+        gridHeightSlider.Value = ocvb.color.Height / 4
+
         grid.Run(ocvb) ' we only run this one time!  It needs to be 32 Gabor filters only.
         grid.sliders.Visible = False
 

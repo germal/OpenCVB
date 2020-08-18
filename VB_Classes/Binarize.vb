@@ -188,8 +188,10 @@ Public Class Binarize_Bernson_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = 32
-        grid.sliders.trackbar(1).Value = 32
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = 32
+        gridHeightSlider.Value = 32
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)

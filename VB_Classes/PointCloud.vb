@@ -169,8 +169,10 @@ Public Class PointCloud_Raw_CPP
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = 64
-        grid.sliders.trackbar(1).Value = 32
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = 64
+        gridHeightSlider.Value = 32
 
         foreground = New Depth_ManualTrim(ocvb)
         foreground.sliders.trackbar(0).Value = 300  ' fixed distance to keep the images stable.
@@ -225,8 +227,10 @@ Public Class PointCloud_Raw
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = 64
-        grid.sliders.trackbar(1).Value = 32
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = 64
+        gridHeightSlider.Value = 32
 
         foreground = New Depth_ManualTrim(ocvb)
         foreground.sliders.trackbar(0).Value = 300  ' fixed distance to keep the images stable.

@@ -65,8 +65,11 @@ Public Class ML_FillRGBDepth_MT
         setCaller(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = ocvb.color.cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
-        grid.sliders.trackbar(1).Value = ocvb.color.Rows / 4
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = ocvb.color.Cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
+        gridHeightSlider.Value = ocvb.color.Rows / 4
+
         shadow = New Depth_Holes(ocvb)
         label1 = "ML filled shadow"
         label2 = ""
@@ -136,8 +139,10 @@ Public Class ML_DepthFromColor_MT
         sliders.setupTrackBar(0, "Prediction Max Depth", 500, 5000, 1000)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = 16
-        grid.sliders.trackbar(1).Value = 16
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = 16
+        gridHeightSlider.Value = 16
 
         label1 = "Predicted Depth"
         label2 = "Mask of color and depth input"
@@ -378,8 +383,10 @@ Public Class ML_EdgeDepth_MT
         sliders.setupTrackBar(0, "Prediction Max Depth", 500, 5000, 1000)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = 16
-        grid.sliders.trackbar(1).Value = 16
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = 16
+        gridHeightSlider.Value = 16
 
         label1 = "Depth Shadow (inverse of color and depth)"
         label2 = "Predicted Depth"

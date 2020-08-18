@@ -223,11 +223,16 @@ Public Class Puzzle_Basics
     Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public restartRequested As Boolean
+    Dim gridWidthSlider As System.Windows.Forms.TrackBar
+    Dim gridHeightSlider = findSlider("ThreadGrid Height")
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = ocvb.color.cols / 10
-        grid.sliders.trackbar(1).Value = ocvb.color.Rows / 8
+        gridWidthSlider = findSlider("ThreadGrid Width")
+        gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = ocvb.color.Cols / 10
+        gridHeightSlider.Value = ocvb.color.Rows / 8
+
         grid.Run(ocvb)
         ocvb.desc = "Create the puzzle pieces for toy genetic or annealing algorithm."
     End Sub
@@ -238,7 +243,7 @@ Public Class Puzzle_Basics
     Public Sub Run(ocvb As AlgorithmData)
         Static width As Int32
         Static height As Int32
-        If width <> grid.sliders.trackbar(0).Value Or height <> grid.sliders.trackbar(1).Value Or ocvb.frameCount = 0 Or restartRequested Then
+        If width <> gridWidthSlider.Value Or height <> gridHeightSlider.Value Or ocvb.frameCount = 0 Or restartRequested Then
             restartRequested = False
             grid.Run(ocvb)
             width = grid.roiList(0).Width

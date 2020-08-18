@@ -19,8 +19,10 @@ Public Class EMax_Basics
         sliders.setupTrackBar(2, "EMax Sigma (spread)", 1, 100, 30)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = src.Width / 3 ' 270
-        grid.sliders.trackbar(1).Value = src.Height / 3 ' 150
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = src.Width / 3
+        gridHeightSlider.Value = src.Height / 3
 
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "EMax matrix type Spherical"

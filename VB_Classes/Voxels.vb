@@ -20,8 +20,10 @@ Public Class Voxels_Basics_MT
         sliders.setupTrackBar(0, "Histogram Bins", 2, 200, 100)
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = 16
-        grid.sliders.trackbar(1).Value = 16
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = 16
+        gridHeightSlider.Value = 16
 
         label2 = "Voxels labeled with their median distance"
         ocvb.desc = "Use multi-threading to get median depth values as voxels."

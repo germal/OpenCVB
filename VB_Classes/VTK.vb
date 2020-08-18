@@ -162,11 +162,12 @@ Public Class VTK_Histogram3D
         vtk.memMapUserData(1) = sliders.trackbar(2).Value / 1000000 ' threshold
 
         If lastStdev <> sliders.trackbar(0).Value Then
+            Static randomSlider = findSlider("Random Pixel Count")
             For i = 0 To 3
-                random.sliders.trackbar(0).Value = Choose(i + 1, 25, 187, 25, 25)
-                random.sliders.trackbar(1).Value = Choose(i + 1, 127, 127, 65, 65)
-                random.sliders.trackbar(2).Value = Choose(i + 1, 180, 180, 180, 244)
-                random.sliders.trackbar(3).Value = sliders.trackbar(0).Value
+                randomSlider.Value = Choose(i + 1, 25, 187, 25, 25)
+                randomSlider.Value = Choose(i + 1, 127, 127, 65, 65)
+                randomSlider.Value = Choose(i + 1, 180, 180, 180, 244)
+                randomSlider.Value = sliders.trackbar(0).Value
                 random.src = src
                 random.Run(ocvb)
                 mats.mat(i) = random.dst1

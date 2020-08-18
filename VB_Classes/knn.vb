@@ -235,10 +235,12 @@ Public Class KNN_Test
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Minimum = 50 ' limit the number of centroids - KNN can't handle more than a few thousand without rework.
-        grid.sliders.trackbar(1).Minimum = 50
-        grid.sliders.trackbar(0).Value = 100
-        grid.sliders.trackbar(1).Value = 100
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Minimum = 50 ' limit the number of centroids - KNN can't handle more than a few thousand without rework.
+        gridHeightSlider.Minimum = 50
+        gridWidthSlider.Value = 100
+        gridHeightSlider.Value = 100
 
         knn = New KNN_Basics(ocvb)
 

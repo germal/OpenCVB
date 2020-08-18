@@ -74,6 +74,7 @@ Public Class Annealing_Basics_CPP
         ocvb.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If closed = True Then Exit Sub
         If standalone Then
             If ocvb.frameCount = 0 Then
                 setup(ocvb)
@@ -123,7 +124,8 @@ Public Class Annealing_CPP_MT
         End Function
     End Class
     Private Sub setup(ocvb As AlgorithmData)
-        random.sliders.trackbar(0).Value = sliders.trackbar(0).Value
+        Static randomSlider = findSlider("Random Pixel Count")
+        randomSlider.Value = sliders.trackbar(0).Value
         random.Run(ocvb) ' get the city positions (may or may not be used below.)
 
         anneal(0) = New Annealing_Basics_CPP(ocvb)
@@ -246,7 +248,8 @@ Public Class Annealing_Options
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         random = New Random_Points(ocvb)
-        random.sliders.trackbar(0).Value = 25 ' change the default number of cities here.
+        Static randomSlider = findSlider("Random Pixel Count")
+        randomSlider.Value = 25 ' change the default number of cities here.
         random.Run(ocvb) ' get the city positions (may or may not be used below.)
 
         check.Setup(ocvb, caller, 2)
@@ -261,7 +264,7 @@ Public Class Annealing_Options
 
 
         anneal = New Annealing_Basics_CPP(ocvb)
-        anneal.numberOfCities = random.sliders.trackbar(0).Value
+        anneal.numberOfCities = randomSlider.Value
         anneal.circularPattern = check.Box(1).Checked
         If check.Box(1).Checked = False Then anneal.cityPositions = random.Points2f.Clone()
         anneal.setup(ocvb)
@@ -269,7 +272,8 @@ Public Class Annealing_Options
         ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim numberOfCities = random.sliders.trackbar(0).Value
+        Static randomSlider = findSlider("Random Pixel Count")
+        Dim numberOfCities = randomSlider.Value
         Dim circularPattern = check.Box(1).Checked ' do they want a circular pattern?
         If numberOfCities <> anneal.numberOfCities Or circularPattern <> anneal.circularPattern Then
             anneal.circularPattern = circularPattern

@@ -185,8 +185,10 @@ Public Class DCT_Surfaces_debug
         flow.result1or2 = RESULT1
 
         grid = New Thread_Grid(ocvb)
-        grid.sliders.trackbar(0).Value = 100
-        grid.sliders.trackbar(1).Value = 150
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = 100
+        gridHeightSlider.Value = 150
         dct = New DCT_FeatureLess_MT(ocvb)
         dct.dct.sliders.trackbar(0).Value = 1
         Mats = New Mat_4to1(ocvb)
