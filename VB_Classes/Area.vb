@@ -104,11 +104,12 @@ End Class
 
 Public Class Area_MinMotionRect
     Inherits ocvbClass
-    Dim input As BGSubtract_MOG
+    Dim bgSub As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        input = New BGSubtract_MOG(ocvb)
-        input.sliders.trackbar(0).Value = 100 ' low threshold to maximize motion
+        bgSub = New BGSubtract_MOG(ocvb)
+        Static bgSubLearnRate = findSlider("MOG Learn Rate")
+        bgSubLearnRate.Value = 100 ' low threshold to maximize motion
         ocvb.desc = "Use minRectArea to encompass detected motion"
         label1 = "MinRectArea of MOG motion"
     End Sub
@@ -125,10 +126,10 @@ Public Class Area_MinMotionRect
         Return gray
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        input.src = src
-        input.Run(ocvb)
+        bgSub.src = src
+        bgSub.Run(ocvb)
         Dim gray As cv.Mat
-        If input.dst1.Channels = 1 Then gray = input.dst1 Else gray = input.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If bgSub.dst1.Channels = 1 Then gray = bgSub.dst1 Else gray = bgSub.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = motionRectangles(gray, rColors)
         dst1.SetTo(cv.Scalar.All(255), gray)
     End Sub

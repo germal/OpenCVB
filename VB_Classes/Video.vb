@@ -56,10 +56,10 @@ Public Class Video_CarCounting
     Inherits ocvbClass
     Dim flow As Font_FlowText
     Dim video As Video_Basics
-    Dim mog As BGSubtract_MOG
+    Dim bgSub As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        mog = New BGSubtract_MOG(ocvb)
+        bgSub = New BGSubtract_MOG(ocvb)
 
         video = New Video_Basics(ocvb)
 
@@ -72,15 +72,15 @@ Public Class Video_CarCounting
         video.Run(ocvb)
         If video.dst1.Empty() = False And video.image.Empty() = False Then
             dst1.SetTo(0)
-            mog.src = video.image
-            mog.Run(ocvb)
-            Dim videoImage = mog.dst1
+            bgSub.src = video.image
+            bgSub.Run(ocvb)
+            Dim videoImage = bgSub.dst1
             dst2 = video.dst1
 
             ' there are 5 lanes of traffic so setup 5 regions
             ' NOTE: if long shadows are present this approach will not work without provision for the width of a car.  Needs more sample data.
             Dim activeHeight = 30
-            Dim finishLine = mog.dst1.Height - activeHeight * 8
+            Dim finishLine = bgSub.dst1.Height - activeHeight * 8
             Static activeState(5) As Boolean
             Static carCount As Int32
             For i = 1 To activeState.Length - 1
@@ -115,10 +115,10 @@ Public Class Video_CarCComp
     Dim cc As CComp_Basics
     Dim flow As Font_FlowText
     Dim video As Video_Basics
-    Dim mog As BGSubtract_MOG
+    Dim bgSub As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        mog = New BGSubtract_MOG(ocvb)
+        bgSub = New BGSubtract_MOG(ocvb)
 
         cc = New CComp_Basics(ocvb)
 
@@ -132,9 +132,9 @@ Public Class Video_CarCComp
     Public Sub Run(ocvb As AlgorithmData)
         video.Run(ocvb)
         If video.dst1.Empty() = False Then
-            mog.src = video.dst1
-            mog.Run(ocvb)
-            cc.src = mog.dst1
+            bgSub.src = video.dst1
+            bgSub.Run(ocvb)
+            cc.src = bgSub.dst1
             cc.Run(ocvb)
             dst1 = cc.dst1
             dst2 = cc.dst2
@@ -149,7 +149,7 @@ End Class
 Public Class Video_MinRect
     Inherits ocvbClass
     Public video As Video_Basics
-    Public mog As BGSubtract_MOG
+    Public bgSub As BGSubtract_MOG
     Public contours As cv.Point()()
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -157,17 +157,17 @@ Public Class Video_MinRect
         video.srcVideo = ocvb.parms.HomeDir + "Data/CarsDrivingUnderBridge.mp4"
         video.Run(ocvb)
 
-        mog = New BGSubtract_MOG(ocvb)
+        bgSub = New BGSubtract_MOG(ocvb)
         ocvb.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         video.Run(ocvb)
         If video.dst1.Empty() = False Then
-            mog.src = video.dst1
-            mog.Run(ocvb)
+            bgSub.src = video.dst1
+            bgSub.Run(ocvb)
 
-            contours = cv.Cv2.FindContoursAsArray(mog.dst1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-            dst1 = mog.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            contours = cv.Cv2.FindContoursAsArray(bgSub.dst1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+            dst1 = bgSub.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             If standalone Then
                 For i = 0 To contours.Length - 1
                     Dim minRect = cv.Cv2.MinAreaRect(contours(i))

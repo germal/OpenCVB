@@ -224,7 +224,7 @@ Public Class Puzzle_Basics
     Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public restartRequested As Boolean
     Dim gridWidthSlider As System.Windows.Forms.TrackBar
-    Dim gridHeightSlider = findSlider("ThreadGrid Height")
+    Dim gridHeightSlider As System.Windows.Forms.TrackBar
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)

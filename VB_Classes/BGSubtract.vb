@@ -273,12 +273,13 @@ End Class
 
 Public Class BGSubtract_MOG_Retina
     Inherits ocvbClass
-    Dim mog As BGSubtract_MOG
+    Dim bgSub As BGSubtract_MOG
     Dim retina As Retina_Basics_CPP
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        mog = New BGSubtract_MOG(ocvb)
-        mog.sliders.trackbar(0).Value = 100
+        bgSub = New BGSubtract_MOG(ocvb)
+        Static bgSubLearnRate = findSlider("MOG Learn Rate")
+        bgSubLearnRate.Value = 100
 
         retina = New Retina_Basics_CPP(ocvb)
 
@@ -289,10 +290,10 @@ Public Class BGSubtract_MOG_Retina
     Public Sub Run(ocvb As AlgorithmData)
         retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
-        mog.src = retina.dst2.Clone()
-        mog.Run(ocvb)
-        dst1 = mog.dst1
-        cv.Cv2.Subtract(mog.dst1, retina.dst2, dst2)
+        bgSub.src = retina.dst2.Clone()
+        bgSub.Run(ocvb)
+        dst1 = bgSub.dst1
+        cv.Cv2.Subtract(bgSub.dst1, retina.dst2, dst2)
     End Sub
 End Class
 
