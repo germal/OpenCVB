@@ -7,20 +7,13 @@ Public Class TTtext
     Public Const RESULT2 = 3
     Public text As String
 
-    Public picTag As Int32
+    Public picTag = 2 ' campic(2) only.  Too much bookkeeping to put it in dst2...
     Public x As Int32
     Public y As Int32
-    Public Sub New(_text As String, _x As Int32, _y As Int32, Optional _picTag As Int32 = RESULT1)
-        text = _text
-        x = _x
-        y = _y
-        picTag = _picTag
-    End Sub
     Public Sub New(_text As String, _x As Int32, _y As Int32)
         text = _text
         x = _x
         y = _y
-        picTag = RESULT1
     End Sub
 End Class
 Public Class ocvbClass : Implements IDisposable
@@ -66,33 +59,50 @@ Public Class ocvbClass : Implements IDisposable
         Return quadrantIndex
     End Function
     Public Function findCheckBox(opt As String) As CheckBox
-        Try
-            For Each frm In Application.OpenForms
-                If frm.text.endswith(" CheckBox Options") Then
-                    For i = 0 To frm.Box.length - 1
-                        If frm.box(i).text.contains(opt) Then Return frm.box(i)
-                    Next
-                End If
-            Next
-        Catch ex As Exception
-            Console.WriteLine("findCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
-        End Try
-        MsgBox("A checkbox was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request in '" + vbCrLf + vbCrLf + "'" + caller + "'")
+        While 1
+            Try
+                For Each frm In Application.OpenForms
+                    If frm.text.endswith(" CheckBox Options") Then
+                        For i = 0 To frm.Box.length - 1
+                            If frm.box(i).text.contains(opt) Then Return frm.box(i)
+                        Next
+                    End If
+                Next
+            Catch ex As Exception
+                Console.WriteLine("findCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
+            End Try
+            Application.DoEvents()
+            Static retryCount As Integer
+            retryCount += 1
+            If retryCount >= 5 Then
+                MsgBox("A checkbox was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request in '" + vbCrLf + vbCrLf + "'" + caller + "'")
+                Exit While
+            End If
+        End While
         Return Nothing
     End Function
     Public Function findSlider(opt As String) As TrackBar
-        Try
-            For Each frm In Application.OpenForms
-                If frm.text.endswith(" Slider Options") Then
-                    For i = 0 To frm.trackbar.length - 1
-                        If frm.sLabels(i).text.contains(opt) Then Return frm.trackbar(i)
-                    Next
-                End If
-            Next
-        Catch ex As Exception
-            Console.WriteLine("findSlider failed.  The application list of forms changed while iterating.  Not critical.")
-        End Try
-        MsgBox("A slider was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request in '" + vbCrLf + vbCrLf + "'" + caller + "'")
+        While 1
+            Try
+                For Each frm In Application.OpenForms
+                    If frm.text.endswith(" Slider Options") Then
+                        For i = 0 To frm.trackbar.length - 1
+                            If frm.sLabels(i).text.contains(opt) Then Return frm.trackbar(i)
+                        Next
+                    End If
+                Next
+            Catch ex As Exception
+                Console.WriteLine("findSlider failed.  The application list of forms changed while iterating.  Not critical.")
+            End Try
+            Application.DoEvents()
+            Static retryCount As Integer
+            retryCount += 1
+            If retryCount >= 5 Then
+                MsgBox("A slider was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request in '" + vbCrLf + vbCrLf + "'" + caller + "'")
+                Exit While
+            End If
+        End While
+
         Return Nothing
     End Function
     Public Function validateRect(r As cv.Rect) As cv.Rect

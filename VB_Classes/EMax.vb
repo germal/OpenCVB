@@ -34,8 +34,8 @@ Public Class EMax_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
-            ocvb.putText(New TTtext("The EMax ocvbClass fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
-                                    "The EMax_Basics_CPP works fine and they are functionally identical.", 20, 100, RESULT1))
+            ocvb.trueText(New TTtext("The EMax ocvbClass fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
+                                    "The C++ version works fine (EMax_Basics_CPP) and the 2 are functionally identical.", 20, 100))
             Exit Sub
         End If
 

@@ -37,7 +37,7 @@ Public Class Quaterion_Basics
                                     CSng(sliders.trackbar(6).Value / 100), CSng(sliders.trackbar(7).Value / 100))
 
         Dim quatmul = Quaternion.Multiply(q1, q2)
-        ocvb.putText(New TTtext("q1 = " + q1.ToString() + vbCrLf +
+        ocvb.trueText(New TTtext("q1 = " + q1.ToString() + vbCrLf +
                                                   "q2 = " + q2.ToString() + vbCrLf +
                                                   "Multiply q1 * q2" + quatmul.ToString(), 10, 60))
     End Sub
@@ -60,7 +60,6 @@ Public Class Quaterion_IMUPrediction
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod 30 Then Exit Sub ' slow this down so it can be read!
         host.Run(ocvb)
 
         Dim dt = host.HostInterruptDelayEstimate
@@ -79,7 +78,7 @@ Public Class Quaterion_IMUPrediction
 
         Dim diffq = Quaternion.Subtract(ocvb.parms.IMU_Rotation, predictedRotation)
 
-        ocvb.putText(New TTtext("IMU_Acceleration = " + vbTab +
+        ocvb.trueText(New TTtext("IMU_Acceleration = " + vbTab +
                                                   Format(ocvb.parms.IMU_Acceleration.X, "0.0000") + ", " + vbTab +
                                                   Format(ocvb.parms.IMU_Acceleration.Y, "0.0000") + ", " + vbTab +
                                                   Format(ocvb.parms.IMU_Acceleration.Z, "0.0000") + ", " + vbTab + vbCrLf +

@@ -604,8 +604,8 @@ Public Class PointCloud_ShowDistance
             If rects.Count = 0 Or centroids.Count = 0 Then Exit Sub
             Static imuCheckBox = findCheckBox("Use IMU gravity vector")
             If imuCheckBox.checked Then
-                ocvb.putText(New TTtext("Uncheck the 'Use IMU gravity vector' to see distances.", 10, 60, RESULT2))
-                ocvb.putText(New TTtext("Distance may look correct if camera is level but a rotated and projected image distorts distance.", 10, 90, RESULT2))
+                ocvb.trueText(New TTtext("Uncheck the 'Use IMU gravity vector' to see distances.", 10, 60))
+                ocvb.trueText(New TTtext("Distance may look correct if camera is level but a rotated and projected image distorts distance.", 10, 90))
             Else
                 Dim fontSize As Single = 1.0
                 If ocvb.parms.resolution = resMed Then fontSize = 0.6
@@ -809,7 +809,7 @@ Public Class PointCloud_PixelFormula_SideView
         Dim cameraPoint = measure.cMats.cameraPoint
         Dim pixeldistance = top.moveLine(cameraPoint.X, ocvb.mousePoint.X, src.Height, measure.maxZ)
         Dim linelen = measure.computePixelLength(ocvb, pixeldistance)
-        Dim pt1 = New cv.Point(CInt(cameraPoint.X + pixelDistance), CInt(cameraPoint.Y - linelen))
+        Dim pt1 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y - linelen))
         Dim pt2 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y + linelen))
         dst1.Line(pt1, pt2, cv.Scalar.Red, 3)
         label1 = Format(measure.pixelsPerMeter, "0") + " pixels per meter at " + Format(measure.maxZ * pixeldistance / src.Height, "0.0") + " meters"
@@ -824,8 +824,8 @@ End Class
 
 Public Class PointCloud_PixelClipped_TopView
     Inherits ocvbClass
-    Dim topView As PointCloud_Measured_TopView
-    Dim sideView As PointCloud_Measured_SideView
+    Public topView As PointCloud_Measured_TopView
+    Public sideView As PointCloud_Measured_SideView
     Dim levelCheck As IMU_IsCameraLevel
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
@@ -900,5 +900,24 @@ Public Class PointCloud_BackProject
         mats.Run(ocvb)
         dst1 = mats.dst1
         dst2 = mats.mat(clickQuadrant(ocvb))
+
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        Dim maxZ = inRangeSlider.value
+        Select Case clickQuadrant(ocvb)
+            Case 0
+                Dim topRects = New List(Of cv.Rect)(clipped.topView.pTrack.matchedRects)
+                Dim f = If(ocvb.parms.resolution = resHigh, 2, 1)
+                For Each r In topRects
+                    ocvb.trueText(New TTtext("test", r.X, r.Y / f))
+                Next
+            Case 1
+                Dim sideRects = New List(Of cv.Rect)(clipped.topView.pTrack.matchedRects)
+                For Each r In sideRects
+                    ocvb.trueText(New TTtext("test", r.X, r.Y - 20))
+                Next
+            Case Else
+
+        End Select
+
     End Sub
 End Class

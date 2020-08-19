@@ -10,9 +10,9 @@ Public Class Tracker_Basics
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Stop tracking selected object"
         ocvb.desc = "Track an object using cv.Tracking API - tracker algorithm"
-        ocvb.putText(New TTtext("Draw a rectangle around object to be tracked.", 10, 140, RESULT2))
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        ocvb.trueText(New TTtext("Draw a rectangle around object to be tracked.", 10, 140))
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
             If tracker IsNot Nothing Then tracker.Dispose()
@@ -43,13 +43,13 @@ Public Class Tracker_Basics
             End Select
         End If
 
-        dst1 = src.Clone()
+        dst2 = src.Clone()
         If tracker IsNot Nothing Then
             tracker.Update(src)
             boxObject = tracker.GetObjects() ' just track one.  Tracking multiple is buggy.  Returns a lot of 0 width/height rect2d's.
             Dim p1 = New cv.Point(boxObject(0).X, boxObject(0).Y)
             Dim p2 = New cv.Point(boxObject(0).X + bbox.Width, boxObject(0).Y + bbox.Height)
-            dst1.Rectangle(p1, p2, cv.Scalar.Blue, 2)
+            dst2.Rectangle(p1, p2, cv.Scalar.Blue, 2)
         End If
     End Sub
 End Class

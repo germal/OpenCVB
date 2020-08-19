@@ -85,7 +85,7 @@ Public Class OpenGL_Basics
         If ocvb.frameCount > 0 And pipe IsNot Nothing Then
             Dim bytesRead = pipe.Read(readPipe, 0, 4)
             If bytesRead = 0 Then
-                ocvb.putText(New TTtext("The OpenGL process appears to have stopped.", 20, 100))
+                ocvb.trueText(New TTtext("The OpenGL process appears to have stopped.", 20, 100))
             End If
         End If
 
@@ -232,7 +232,7 @@ Public Class OpenGL_IMU
             ogl.src = src
             ogl.Run(ocvb) ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
         Else
-            ocvb.putText(New TTtext("No IMU present on this RealSense device", 20, 100))
+            ocvb.trueText(New TTtext("No IMU present on this RealSense device", 20, 100))
         End If
     End Sub
 End Class

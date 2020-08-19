@@ -38,7 +38,7 @@ Public Class AlgorithmData
             TTtextData(i) = New List(Of TTtext)
         Next
     End Sub
-    Public Sub putText(tt As TTtext)
+    Public Sub trueText(tt As TTtext)
         TTtextData(tt.picTag).Add(tt)
     End Sub
 End Class

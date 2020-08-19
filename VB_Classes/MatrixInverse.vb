@@ -38,7 +38,7 @@ End Module
 '    End Sub
 '    Public Sub Run(ocvb As AlgorithmData)
 '        If input.Width <> input.Height Then
-'            ocvb.putText(New TTtext("The src matrix must be square!", 10, 60, RESULT1))
+'            ocvb.trueText(New TTtext("The src matrix must be square!", 10, 60))
 '            Exit Sub
 '        End If
 
@@ -47,7 +47,7 @@ End Module
 '        Dim result = matrix.Run(input) ' C# class Run - not ocvbClass...
 
 '        Dim outstr = printMatrixResults(input, result)
-'        ocvb.putText(New TTtext(outstr + vbCrLf + "Intermediate results are optionally available in the console log.", 10, 60, RESULT1))
+'        ocvb.trueText(New TTtext(outstr + vbCrLf + "Intermediate results are optionally available in the console log.", 10, 60))
 '    End Sub
 'End Class
 
@@ -67,13 +67,13 @@ Public Class MatrixInverse_OpenCV
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If Input.Width <> Input.Height Then
-            ocvb.putText(New TTtext("The input matrix must be square!", 10, 60, RESULT1))
+            ocvb.trueText(New TTtext("The input matrix must be square!", 10, 60))
             Exit Sub
         End If
 
         Dim result As New cv.Mat
         cv.Cv2.Invert(input, result, cv.DecompTypes.LU)
         Dim outstr = printMatrixResults(input, result)
-        ocvb.putText(New TTtext(outstr, 10, 60, RESULT1))
+        ocvb.trueText(New TTtext(outstr, 10, 60))
     End Sub
 End Class

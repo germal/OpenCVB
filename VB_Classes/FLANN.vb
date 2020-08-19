@@ -9,9 +9,6 @@ Public Class FLANN_Test
         label1 = "FLANN Basics"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount > 0 Then Exit Sub ' we are already done - it is a one-pass algorithm.
-        Console.WriteLine(Environment.NewLine & String.Format(("===== FlannTest =====")))
-
         ' creates data set
         Using features As New cv.Mat(10000, 2, cv.MatType.CV_32FC1)
             cv.Cv2.Randu(features, 0, msRNG.Next(9900, 10000))
@@ -19,8 +16,6 @@ Public Class FLANN_Test
             ' query
             Dim queryPoint As New cv.Point2f(msRNG.Next(0, 10000), msRNG.Next(0, 10000))
             Dim queries As New cv.Mat(1, 2, cv.MatType.CV_32FC1, queryPoint)
-            Console.WriteLine(String.Format("query:({0}, {1})", queryPoint.X, queryPoint.Y))
-            Console.WriteLine(String.Format("-----"))
 
             ' knnSearch
             Using nnIndex As New cv.Flann.Index(features, New cv.Flann.KDTreeIndexParams(4))
@@ -33,10 +28,10 @@ Public Class FLANN_Test
                     Dim index As Integer = indices(i)
                     Dim dist As Single = dists(i)
                     Dim pt As New cv.Point2f(features.Get(Of Single)(index, 0), features.Get(Of Single)(index, 1))
-                    ocvb.putText(New TTtext(String.Format("No.{0}" & vbTab, i), 10 + i * 30, 30 + i * 15))
-                    ocvb.putText(New TTtext(String.Format("index:{0}", index), 10 + i * 30, 30 + i * 15 + 30))
-                    ocvb.putText(New TTtext(String.Format("distance:{0}", dist), 10 + i * 30, 30 + i * 15 + 60))
-                    ocvb.putText(New TTtext(String.Format("data:({0}, {1})", pt.X, pt.Y), 10, 30 + i * 15 + 90))
+                    ocvb.trueText(New TTtext(String.Format("No.{0}" & vbTab, i), 10 + i * 30, 30 + i * 15))
+                    ocvb.trueText(New TTtext(String.Format("index:{0}", index), 10 + i * 30, 30 + i * 15 + 30))
+                    ocvb.trueText(New TTtext(String.Format("distance:{0}", dist), 10 + i * 30, 30 + i * 15 + 60))
+                    ocvb.trueText(New TTtext(String.Format("data:({0}, {1})", pt.X, pt.Y), 10, 30 + i * 15 + 90))
                 Next i
             End Using
         End Using

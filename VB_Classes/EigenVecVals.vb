@@ -19,7 +19,7 @@ Public Class EigenVecVals_Basics
         cv.Cv2.Eigen(mat, eigenVal, eigenVec)
         Dim solution(mat.Cols) As Double
 
-        ocvb.putText(New TTtext("Eigen Vals" + vbTab + "Eigen Vectors" + vbTab + vbTab + vbTab + vbTab + vbTab + "Original Matrix" + vbCrLf, 10, 25))
+        ocvb.trueText(New TTtext("Eigen Vals" + vbTab + "Eigen Vectors" + vbTab + vbTab + vbTab + vbTab + vbTab + "Original Matrix" + vbCrLf, 10, 25))
         Dim nextLine As String = ""
         Dim scalar As cv.Scalar
         For i = 0 To eigenVal.Rows - 1
@@ -33,7 +33,7 @@ Public Class EigenVecVals_Basics
             For j = 0 To eigenVec.Rows - 1
                 nextLine += vbTab + Format(a(i * 5 + j), "#0.00")
             Next
-            ocvb.putText(New TTtext(nextLine, 10, 50 + i * 30))
+            ocvb.trueText(New TTtext(nextLine, 10, 50 + i * 30))
         Next
 
         For i = 0 To eigenVec.Rows - 1
@@ -45,7 +45,7 @@ Public Class EigenVecVals_Basics
                 nextLine += Format(scalar.Val0, "#0.00") + " * " + Format(solution(j), "#0.00") + plusSign
             Next
             nextLine += " = " + vbTab + "0.0"
-            ocvb.putText(New TTtext(nextLine, 10, 50 + i * 30, RESULT2))
+            ocvb.trueText(New TTtext(nextLine, 10, 50 + (eigenVal.Rows + i) * 30))
         Next
     End Sub
 End Class

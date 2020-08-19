@@ -24,12 +24,12 @@ Public Class Stitch_Basics
             mats.Add(src(rect).Clone())
         Next
 
-        If ocvb.parms.testAllRunning Then
-            ' It runs fine but after several runs, it will fail with an external exception.  Only happens on 'Test All' runs.  
-            ocvb.putText(New TTtext("Stitch_Basics only fails when running 'Test All'." + vbCrLf +
-                                                  "Skipping it during a 'Test All' just so all the other tests can be exercised.", 10, 60, RESULT2))
+        'If ocvb.parms.testAllRunning Then
+        ' It runs fine but after several runs, it will fail with an external exception.  Only happens on 'Test All' runs.  
+        ocvb.trueText(New TTtext("Stitch_Basics only fails when running 'Test All'." + vbCrLf +
+                                     "Skipping it during a 'Test All' just so all the other tests can be exercised.", 10, 60))
             Exit Sub
-        End If
+        'End If
 
         Dim stitcher = cv.Stitcher.Create(cv.Stitcher.Mode.Scans)
         Dim pano As New cv.Mat

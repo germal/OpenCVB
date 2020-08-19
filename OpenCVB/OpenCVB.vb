@@ -315,7 +315,6 @@ Public Class OpenCVB
                     For i = 0 To TTtextData.Count - 1
                         Dim tt = TTtextData(i)
                         If tt IsNot Nothing Then
-                            If g.VisibleClipBounds.Width <= tt.x Then tt.x /= 2 ' if this was supposed to go to dst2's portion of campic(2)
                             g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White), tt.x, tt.y)
                             maxline -= 1
                             If maxline <= 0 Then Exit For
@@ -351,7 +350,7 @@ Public Class OpenCVB
                 openForm.OpenFileDialog1.FilterIndex = openFileFilterIndex
                 openForm.filename.Text = openFileDialogName
                 openForm.Text = openfileDialogTitle
-                openForm.Label1.Text = "Select a file for use with the " + AvailableAlgorithms.Text + " algorithm."
+                openForm.Label1.Text = "Select a file for use with the " + AvailableAlgorithms1.Text + " algorithm."
                 openForm.Show()
                 openFileStarted = openFileinitialStartSetting
                 If openFileinitialStartSetting And openForm.PlayButton.Text = "Start" Then
@@ -560,27 +559,27 @@ Public Class OpenCVB
             Dim infoLine = sr.ReadLine
             Dim Split = Regex.Split(infoLine, "\W+")
             CodeLineCount = Split(1)
-            AvailableAlgorithms.Items.Clear()
+            AvailableAlgorithms1.Items.Clear()
             While sr.EndOfStream = False
                 infoLine = sr.ReadLine
                 infoLine = UCase(Mid(infoLine, 1, 1)) + Mid(infoLine, 2)
-                AvailableAlgorithms.Items.Add(infoLine)
+                AvailableAlgorithms1.Items.Add(infoLine)
             End While
             sr.Close()
         Else
-            AvailableAlgorithms.Enabled = False
+            AvailableAlgorithms1.Enabled = False
             Dim keyIndex = OpenCVkeyword.Items.IndexOf(OpenCVkeyword.Text)
             Dim openCVkeys = openCVKeywords(keyIndex)
             Dim split = Regex.Split(openCVkeys, ",")
-            AvailableAlgorithms.Items.Clear()
+            AvailableAlgorithms1.Items.Clear()
             For i = 1 To split.Length - 1
-                AvailableAlgorithms.Items.Add(split(i))
+                AvailableAlgorithms1.Items.Add(split(i))
             Next
-            AvailableAlgorithms.Enabled = True
+            AvailableAlgorithms1.Enabled = True
         End If
-        AvailableAlgorithms.Text = GetSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Items(0))
-        Dim index = AvailableAlgorithms.Items.IndexOf(AvailableAlgorithms.Text)
-        If index < 0 Then AvailableAlgorithms.SelectedIndex = 0 Else AvailableAlgorithms.SelectedIndex = index
+        AvailableAlgorithms1.Text = GetSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms1.Items(0))
+        Dim index = AvailableAlgorithms1.Items.IndexOf(AvailableAlgorithms1.Text)
+        If index < 0 Then AvailableAlgorithms1.SelectedIndex = 0 Else AvailableAlgorithms1.SelectedIndex = index
         SaveSetting("OpenCVB", "OpenCVkeyword", "OpenCVkeyword", OpenCVkeyword.Text)
     End Sub
     Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
@@ -733,29 +732,6 @@ Public Class OpenCVB
             Console.WriteLine("Error in camPic_MouseMove: " + ex.Message)
         End Try
     End Sub
-    Private Sub keyholdTimer_Tick(sender As Object, e As EventArgs) Handles keyholdTimer.Tick
-        keyboardInput += keyboardLastInput ' press and hold means send this key again...
-    End Sub
-    Private Sub OpenCVB_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-        Dim repeated = keyholdTimer.Enabled
-        keyholdTimer.Enabled = False
-        If e.KeyCode = Keys.Escape Then
-            keyboardInput = ""
-            Exit Sub
-        End If
-
-        SyncLock bufferLock
-            If repeated Then
-                keyboardInput = (e.KeyData.ToString()).ToLower ' just the last key if we were repeating characters.
-            Else
-                keyboardInput += (e.KeyData.ToString()).ToLower
-            End If
-        End SyncLock
-    End Sub
-    Private Sub OpenCVB_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        keyholdTimer.Enabled = True
-        keyboardLastInput = (e.KeyData.ToString()).ToLower
-    End Sub
     Private Sub campic_DoubleClick(sender As Object, e As EventArgs)
         DrawingRectangle = False
     End Sub
@@ -799,19 +775,59 @@ Public Class OpenCVB
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         saveLayout()
     End Sub
-    Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
-        If AvailableAlgorithms.Enabled Then
+    'Private Sub keyholdTimer_Tick(sender As Object, e As EventArgs) Handles keyholdTimer.Tick
+    '    keyboardInput += keyboardLastInput ' press and hold means send this key again...
+    'End Sub
+    'Private Sub OpenCVB_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles Me.PreviewKeyDown
+    '    e.IsInputKey = False
+    'End Sub
+    'Private Sub OpenCVB_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+    '    Dim repeated = keyholdTimer.Enabled
+    '    keyholdTimer.Enabled = False
+    '    If e.KeyCode = Keys.Escape Then
+    '        keyboardInput = ""
+    '        Exit Sub
+    '    End If
+
+    '    SyncLock bufferLock
+    '        If repeated Then
+    '            keyboardInput = (e.KeyData.ToString()).ToLower ' just the last key if we were repeating characters.
+    '        Else
+    '            keyboardInput += (e.KeyData.ToString()).ToLower
+    '        End If
+    '    End SyncLock
+    'End Sub
+    'Private Sub OpenCVB_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+    '    keyholdTimer.Enabled = True
+    '    keyboardLastInput = (e.KeyData.ToString()).ToLower
+    'End Sub
+    'Private Sub AvailableAlgorithms_KeyUp(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyUp
+    '    If e.KeyCode <> Keys.Down And e.KeyCode <> Keys.Up And e.KeyCode <> Keys.PageDown And e.KeyCode <> Keys.PageUp Then e.Handled = False
+    'End Sub
+    'Private Sub AvailableAlgorithms_KeyDown(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyDown
+    '    e.Handled = False
+    'End Sub
+    Protected Overrides Sub OnKeyDown(ByVal e As System.Windows.Forms.KeyEventArgs)
+        e.Handled = True
+        If e.KeyCode = Keys.Down Or e.KeyCode = Keys.Up Then e.Handled = False
+        MyBase.OnKeyDown(e)
+    End Sub
+    'Private Sub AvailableAlgorithms_KeyPress(sender As Object, e As KeyPressEventArgs) Handles AvailableAlgorithms.KeyPress
+    '    '  If e.KeyChar.ToString <> 34 And e.KeyChar <> 33 And e.KeyChar <> 38 And e.KeyChar <> 40 Then e.Handled = False
+    'End Sub
+    Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms1.SelectedIndexChanged
+        If AvailableAlgorithms1.Enabled Then
             If PausePlayButton.Text = "Run" Then ToolStripButton1_Click(sender, e) ' if paused, then restart.
-            SaveSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Text)
+            SaveSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms1.Text)
             StartAlgorithmTask()
         End If
     End Sub
     Private Sub ActivateTimer_Tick(sender As Object, e As EventArgs) Handles ActivateTimer.Tick
         ActivateTimer.Enabled = False
         If TestAllButton.Text <> "Stop Test" Then
-            If AvailableAlgorithms.SelectedIndex < 0 Then AvailableAlgorithms.SelectedIndex = 0
+            If AvailableAlgorithms1.SelectedIndex < 0 Then AvailableAlgorithms1.SelectedIndex = 0
             Me.Activate()
-            AvailableAlgorithms.Select(AvailableAlgorithms.SelectedIndex, 1)
+            AvailableAlgorithms1.Select(AvailableAlgorithms1.SelectedIndex, 1)
         End If
     End Sub
     Public Sub raiseEventCamera()
@@ -913,15 +929,15 @@ Public Class OpenCVB
 
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         ' if lowresolution is active and all the algorithms are covered, then switch to high res or vice versa...
-        If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
+        If AlgorithmTestCount Mod AvailableAlgorithms1.Items.Count = 0 And AlgorithmTestCount > 0 Then
             optionsForm.lowResolution.Checked = Not optionsForm.lowResolution.Checked
             saveLayout()
         End If
 
         Static changeCameras As Integer
-        If AvailableAlgorithms.Items.Count = 1 Then changeCameras += 1
+        If AvailableAlgorithms1.Items.Count = 1 Then changeCameras += 1
         ' after sweeping through low and high resolution, sweep through the cameras as well...
-        If (AlgorithmTestCount Mod (AvailableAlgorithms.Items.Count * 2) = 0 And AlgorithmTestCount > 0) Or changeCameras >= 2 Then
+        If (AlgorithmTestCount Mod (AvailableAlgorithms1.Items.Count * 2) = 0 And AlgorithmTestCount > 0) Or changeCameras >= 2 Then
             changeCameras = 0
             Dim cameraIndex = optionsForm.cameraIndex
             Dim saveCameraIndex = optionsForm.cameraIndex
@@ -942,13 +958,13 @@ Public Class OpenCVB
             End If
         End If
 
-        If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
-            AvailableAlgorithms.SelectedIndex += 1
+        If AvailableAlgorithms1.SelectedIndex < AvailableAlgorithms1.Items.Count - 1 Then
+            AvailableAlgorithms1.SelectedIndex += 1
         Else
-            If AvailableAlgorithms.Items.Count = 1 Then ' selection index won't change if there is only one algorithm in the list.
+            If AvailableAlgorithms1.Items.Count = 1 Then ' selection index won't change if there is only one algorithm in the list.
                 StartAlgorithmTask()
             Else
-                AvailableAlgorithms.SelectedIndex = 0
+                AvailableAlgorithms1.SelectedIndex = 0
             End If
         End If
     End Sub
@@ -994,8 +1010,8 @@ Public Class OpenCVB
         ReDim parms.IMU_RotationMatrix(9 - 1)
         lowResolution = optionsForm.lowResolution.Checked
 
-        saveAlgorithmName = AvailableAlgorithms.Text ' to share with the camera task...
-        parms.activeAlgorithm = AvailableAlgorithms.Text
+        saveAlgorithmName = AvailableAlgorithms1.Text ' to share with the camera task...
+        parms.activeAlgorithm = AvailableAlgorithms1.Text
         ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
         If parms.activeAlgorithm.Contains("OpenGL") Or parms.activeAlgorithm.Contains("OpenCVGL") Then lowResolution = False
         fastSize = If(lowResolution, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
@@ -1079,7 +1095,7 @@ Public Class OpenCVB
             End If
 
             ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
-            If OpenCVB.ocvb.drawRect <> New cv.Rect(0, 0, 0, 0) Then ' the constructor defined drawrect.  Adjust it because lowResolution selected
+            If OpenCVB.ocvb.drawRect <> New cv.Rect(0, 0, 0, 0) Then
                 drawRect = OpenCVB.ocvb.drawRect
                 Dim ratio = OpenCVB.ocvb.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
                 drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
@@ -1172,11 +1188,10 @@ Public Class OpenCVB
                     Dim ratio = camPic(0).Width / OpenCVB.ocvb.color.Width ' relative size of displayed image and algorithm size image.
                     OpenCVB.ocvb.drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
                     If OpenCVB.ocvb.drawRect.Width <= 2 Then OpenCVB.ocvb.drawRect.Width = 0 ' too small?
-                    If OpenCVB.ocvb.drawRect.X > OpenCVB.ocvb.color.Width Then OpenCVB.ocvb.drawRect.X -= OpenCVB.ocvb.color.Width
                     Dim w = OpenCVB.ocvb.color.Width
+                    If OpenCVB.ocvb.drawRect.X > w Then OpenCVB.ocvb.drawRect.X -= w
                     If OpenCVB.ocvb.drawRect.X < w And OpenCVB.ocvb.drawRect.X + OpenCVB.ocvb.drawRect.Width > w Then
-                        OpenCVB.ocvb.drawRect.Width -= w - OpenCVB.ocvb.drawRect.X
-                        OpenCVB.ocvb.drawRect.X = 0
+                        OpenCVB.ocvb.drawRect.Width = w - OpenCVB.ocvb.drawRect.X
                     End If
                     BothFirstAndLastReady = False
                 End If

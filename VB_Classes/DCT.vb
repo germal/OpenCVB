@@ -182,7 +182,6 @@ Public Class DCT_Surfaces_debug
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         flow = New Font_FlowText(ocvb)
-        flow.result1or2 = RESULT1
 
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")

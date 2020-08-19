@@ -28,7 +28,7 @@ Public Class Video_Basics
         Dim fileInfo = New FileInfo(ocvb.parms.openFileDialogName)
         If srcVideo <> ocvb.parms.openFileDialogName Then
             If fileInfo.Exists = False Then
-                ocvb.putText(New TTtext("File not found: " + fileInfo.FullName, 10, 125))
+                ocvb.trueText(New TTtext("File not found: " + fileInfo.FullName, 10, 125))
                 Exit Sub
             End If
             srcVideo = ocvb.parms.openFileDialogName
@@ -64,7 +64,6 @@ Public Class Video_CarCounting
         video = New Video_Basics(ocvb)
 
         flow = New Font_FlowText(ocvb)
-        flow.result1or2 = RESULT1
 
         ocvb.desc = "Count cars in a video file"
     End Sub
@@ -125,7 +124,6 @@ Public Class Video_CarCComp
         video = New Video_Basics(ocvb)
 
         flow = New Font_FlowText(ocvb)
-        flow.result1or2 = RESULT1
 
         ocvb.desc = "Outline cars with a rectangle"
     End Sub

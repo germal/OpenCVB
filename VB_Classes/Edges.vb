@@ -175,18 +175,10 @@ Public Class Edges_RandomForest_CPP
 
         ocvb.desc = "Detect edges using structured forests - Opencv Contrib"
         ReDim rgbData(ocvb.color.Total * ocvb.color.ElemSize - 1)
-        label1 = "Thresholded Edge Mask (use slider to adjust)"
+        label2 = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.testAllRunning Then
-            ocvb.putText(New TTtext("When 'Test All' is running, the database load can take longer than the test time" + vbCrLf +
-                                                  "This test is not run during a 'Test All' run but runs fine otherwise.", 10, 100, RESULT2))
-            Exit Sub
-        End If
-        If ocvb.frameCount < 10 Then
-            ocvb.putText(New TTtext("On the first call only, it takes a few seconds to load the randomForest model." + vbCrLf +
-                                                  "If running 'Test All' and the duration of each test < load time, it will finish loading before continuing to the next algorithm.", 10, 100, RESULT2))
-        End If
+        If ocvb.frameCount < 100 Then ocvb.trueText(New TTtext("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100))
 
         ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
         If ocvb.frameCount = 5 Then
@@ -199,7 +191,7 @@ Public Class Edges_RandomForest_CPP
             Dim gray8u = Edges_RandomForest_Run(EdgesPtr, handleRGB.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols)
             handleRGB.Free() ' free the pinned memory...
 
-            dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, gray8u).Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
+            dst2 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, gray8u).Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
         End If
     End Sub
     Public Sub Close()

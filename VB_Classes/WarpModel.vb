@@ -166,7 +166,7 @@ Public Class WarpModel_FindTransformECC_CPP
         If radio.check(2).Checked Or radio.check(3).Checked Then
             outStr += vbCrLf + "NOTE: input resized for performance." + vbCrLf + "Results are probably distorted." + vbCrLf + "Gradients may give better results."
         End If
-        ocvb.putText(New TTtext(outStr, aligned.Width + 10, 220, RESULT1))
+        ocvb.trueText(New TTtext(outStr, aligned.Width + 10, 220))
     End Sub
     Public Sub Close()
         WarpModel_Close(cPtr)
@@ -209,9 +209,9 @@ Public Class WarpModel_AlignImages
         cv.Cv2.Merge(mergeInput, merged)
         dst1(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
         label1 = "Aligned image"
-        ocvb.putText(New TTtext("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
+        ocvb.trueText(New TTtext("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
                                               "Other than that, images look the same." + vbCrLf +
-                                              "Displacement increases with Sobel" + vbCrLf + "kernel size", merged.Width + 10, 100, RESULT1))
+                                              "Displacement increases with Sobel" + vbCrLf + "kernel size", merged.Width + 10, 100))
     End Sub
 End Class
 

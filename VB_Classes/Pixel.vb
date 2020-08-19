@@ -54,7 +54,7 @@ Public Class Pixel_GetSet
         output += "Marshal Copy took " + CStr(watch.ElapsedMilliseconds) + "ms" + vbCrLf
 
         Dim f = If(ocvb.parms.resolution = resHigh, 4, 2)
-        ocvb.putText(New TTtext(output, src.Width / f + 10, src.Height / f + 20, RESULT1))
+        ocvb.trueText(New TTtext(output, src.Width / f + 10, src.Height / f + 20))
 
         mats.Run(ocvb)
         dst1 = mats.dst1

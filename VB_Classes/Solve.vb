@@ -17,7 +17,7 @@ Public Class Solve_ByMat
         Dim x As New cv.Mat
         cv.Cv2.Solve(a, y, x, cv.DecompTypes.LU)
 
-        ocvb.putText(New TTtext("Solution ByMat: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125))
+        ocvb.trueText(New TTtext("Solution ByMat: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125))
     End Sub
 End Class
 
@@ -40,6 +40,6 @@ Public Class Solve_ByArray
         Dim x As New cv.Mat
         cv.Cv2.Solve(cv.InputArray.Create(av), cv.InputArray.Create(yv), x, cv.DecompTypes.LU)
 
-        ocvb.putText(New TTtext("Solution ByArray: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125))
+        ocvb.trueText(New TTtext("Solution ByArray: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125))
     End Sub
 End Class

@@ -494,7 +494,7 @@ Public Class Histogram_ProjectionOptions
         ocvb.desc = "The options for the histogram projections with and without using the gravity vector"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        ocvb.putText(New TTtext("This algorithm only has options used by several other algorithms", 10, 50, RESULT1))
+        ocvb.trueText(New TTtext("This algorithm only has options used by several other algorithms", 10, 50))
     End Sub
 End Class
 

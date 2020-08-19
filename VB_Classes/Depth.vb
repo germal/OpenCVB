@@ -298,7 +298,7 @@ Public Class Depth_WorldXYZ
                 End If
             Next
         Next
-        ocvb.putText(New TTtext("OpenGL data prepared.", 10, 50, RESULT1))
+        ocvb.trueText(New TTtext("OpenGL data prepared.", 10, 50))
     End Sub
     Public Sub Close()
         xyzFrame.Dispose()
@@ -348,7 +348,7 @@ Public Class Depth_WorldXYZ_MT
                 Next
             Next
         End Sub)
-        ocvb.putText(New TTtext("OpenGL data prepared.", 10, 50, RESULT1))
+        ocvb.trueText(New TTtext("OpenGL data prepared.", 10, 50))
     End Sub
 End Class
 
@@ -1317,7 +1317,6 @@ Public Class Depth_PointCloudInRange_IMU
         setCaller(ocvb)
 
         imu = New IMU_GVector(ocvb)
-        If standalone = False Then imu.result = RESULT2
 
         If standalone Then histOpts = New Histogram_ProjectionOptions(ocvb)
         label2 = "Mask for depth values that are in-range"
@@ -1329,7 +1328,7 @@ Public Class Depth_PointCloudInRange_IMU
         split = tSplit
 
         If ocvb.parms.cameraIndex = T265Camera Or ocvb.parms.cameraIndex = L515 Then
-            ocvb.putText(New TTtext("IMU unavailable (?) for this camera", 10, 50, RESULT1))
+            ocvb.trueText(New TTtext("IMU unavailable (?) for this camera", 10, 50))
         Else
             imu.Run(ocvb)
             If zRotation Then

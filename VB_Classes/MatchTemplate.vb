@@ -10,7 +10,6 @@ Public Class MatchTemplate_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         flow = New Font_FlowText(ocvb)
-        flow.result1or2 = RESULT1
 
         radio.Setup(ocvb, caller, 6)
         radio.check(0).Text = "CCoeff"
@@ -65,7 +64,6 @@ Public Class MatchTemplate_RowCorrelation
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         flow = New Font_FlowText(ocvb)
-        flow.result1or2 = RESULT1
 
         corr = New MatchTemplate_Basics(ocvb)
         corr.sliders.Visible = False

@@ -16,7 +16,7 @@ Imports cv = OpenCvSharp
 '    Public Sub Run(ocvb As AlgorithmData)
 '        Dim data(ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize) As Byte
 '        If ocvb.parms.testAllRunning Then
-'            ocvb.putText(New TTtext("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll." + vbCrLf +
+'            ocvb.trueText(New TTtext("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll." + vbCrLf +
 '                                                  "The algorithm is working fine so it is turned off during testing.", 10, 125))
 '        Else
 '            Emgu_Classes.DrawSubdivision.Draw(ocvb.color.Rows, ocvb.color.Cols, 20, data)
@@ -37,7 +37,7 @@ Imports cv = OpenCvSharp
 '    End Sub
 '    Public Sub Run(ocvb As AlgorithmData)
 '        If ocvb.parms.testAllRunning Then
-'            ocvb.putText(New TTtext("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll." + vbCrLf +
+'            ocvb.trueText(New TTtext("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll." + vbCrLf +
 '                                                  "The algorithm is working fine so it is turned off during testing.", 10, 125))
 '        Else
 '            Dim lena = New cv.Mat(ocvb.parms.HomeDir + "Data/Lena.jpg", cv.ImreadModes.Color)

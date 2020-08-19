@@ -9,9 +9,11 @@ Public Class AddWeighted_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static weightSlider = findSlider("Weight")
-        Dim alpha = weightSlider.Value / weightSlider.Maximum
-        cv.Cv2.AddWeighted(src, alpha, ocvb.RGBDepth, 1.0 - alpha, 0, dst1)
-        label1 = "depth " + Format(1 - weightSlider.Value / 100, "#0%") + " RGB " + Format(weightSlider.Value / 100, "#0%")
+        If weightSlider IsNot Nothing Then
+            Dim alpha = weightSlider.Value / weightSlider.Maximum
+            cv.Cv2.AddWeighted(src, alpha, ocvb.RGBDepth, 1.0 - alpha, 0, dst1)
+            label1 = "depth " + Format(1 - weightSlider.Value / 100, "#0%") + " RGB " + Format(weightSlider.Value / 100, "#0%")
+        End If
     End Sub
 End Class
 

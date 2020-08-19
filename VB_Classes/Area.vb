@@ -145,8 +145,8 @@ Public Class Area_FindNonZero
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        label1 = "Non-zero original points"
-        label2 = "Coordinates of non-zero points"
+        label1 = "Coordinates of non-zero points"
+        label2 = "Non-zero original points"
         ocvb.desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -160,10 +160,10 @@ Public Class Area_FindNonZero
 
         Dim nonzero = gray.FindNonZero()
 
-        dst1 = gray.EmptyClone().SetTo(0)
+        dst2 = gray.EmptyClone().SetTo(0)
         ' mark the points so they are visible...
         For i = 0 To srcPoints.Length - 1
-            dst1.Circle(srcPoints(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(srcPoints(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
         Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf
@@ -171,6 +171,6 @@ Public Class Area_FindNonZero
             Dim pt = nonzero.Get(Of cv.Point)(0, i)
             outstr += "X = " + vbTab + CStr(pt.X) + vbTab + " y = " + vbTab + CStr(pt.Y) + vbCrLf
         Next
-        ocvb.putText(New TTtext(outstr, 10, 50, RESULT2))
+        ocvb.trueText(New TTtext(outstr, 10, 50))
     End Sub
 End Class

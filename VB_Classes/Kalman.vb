@@ -592,12 +592,12 @@ End Class
 Public Class Kalman_PointTracker
     Inherits ocvbClass
     Dim knn As KNN_Basics
-    Dim kalman(0) As Kalman_Basics
     Dim newObjects As New List(Of cv.Point2f)
     Dim topView As PointCloud_Measured_TopView
     Dim kalmanAging() As Integer
     Dim lastMask() As cv.Mat
     Public maskAvailable As Boolean = True
+    Dim kalman As New List(Of Kalman_Basics)
     Public queryPoints As New List(Of cv.Point2f)
     Public queryRects As New List(Of cv.Rect)
     Public queryMasks As New List(Of cv.Mat)
@@ -628,18 +628,17 @@ Public Class Kalman_PointTracker
         End If
 
         ' allocate the kalman filters for each centroid with some additional filters for objects that come and go...
-        If kalman.Length < trainingPoints.Count Then
-            ReDim kalman(trainingPoints.Count + 10) ' pad a little to keep more info
-            ReDim kalmanAging(kalman.Count - 1)
-            ReDim lastMask(kalman.Count - 1)
-            For i = 0 To kalman.Count - 1
-                kalman(i) = New Kalman_Basics(ocvb)
+        If kalman.Count < trainingPoints.Count Then
+            For i = kalman.Count To trainingPoints.Count - 1
+                kalman.Add(New Kalman_Basics(ocvb))
                 If i < trainingPoints.Count Then
                     kalman(i).input = New Single() {trainingPoints(i).X, trainingPoints(i).Y, 0, 0, 0, 0}
                 Else
                     kalman(i).input = New Single() {-1, -1, 0, 0, 0, 0}
                 End If
             Next
+            ReDim kalmanAging(kalman.Count - 1)
+            ReDim lastMask(kalman.Count - 1)
             useKalmanCheck = findCheckBox("Turn Kalman filtering on") ' we left one of these visible...
         End If
         Dim kalmanActive = useKalmanCheck?.Checked
@@ -657,10 +656,7 @@ Public Class Kalman_PointTracker
                 knn.trainingPoints.Add(newObjects(qIndex))
                 kalman(i).input = {newObjects(qIndex).X, newObjects(qIndex).Y, 0, 0, 0, 0}
                 qIndex += 1
-                If qIndex >= kalman.Count Then ' we don't have enough kalman filters to handle this level of queries so restart
-                    ReDim kalman(0)
-                    Exit Sub
-                End If
+                If qIndex >= kalman.Count Then Exit Sub ' we don't have enough kalman filters to handle this level of queries so restart
             Next
         End If
 

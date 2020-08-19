@@ -9,7 +9,6 @@ Public Class Entropy_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         flow = New Font_FlowText(ocvb)
-        flow.result1or2 = RESULT1
 
         hist = New Histogram_Basics(ocvb)
 

@@ -195,91 +195,93 @@ Public Class Fitline_EigenFit
         noisyLine = New Fitline_RawInput(ocvb)
         noisyLine.sliders.trackbar(0).Value = 30
         noisyLine.sliders.trackbar(1).Value = 400
-        label1 = "Raw input (use sliders below to explore)"
-        label2 = "blue=GT, red=fitline, yellow=EigenFit"
+        label1 = "blue=GT, red=fitline, yellow=EigenFit"
+        label2 = "Raw input (use sliders below to explore)"
         ocvb.desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.frameCount Mod 30 Then Exit Sub ' it updates too much to review the results without this.
+        Static eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, 0), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, 0)
+        Static theta As Single
+        Static len As Single
+        Static m2 As Single
+        If ocvb.frameCount Mod 30 = 0 Then
 
-        Static noisePointCount As Int32
-        Static linePointCount As Int32
-        Static lineNoise As Int32
-        Static highlight As Boolean
-        'If noisyLine.sliders.trackbar(0).Value <> noisePointCount Or noisyLine.sliders.trackbar(1).Value <> linePointCount Or
-        '    noisyLine.sliders.trackbar(2).Value <> lineNoise Or noisyLine.check.Box(0).Checked <> highlight Or noisyLine.check.Box(1).Checked Then
-        noisyLine.check.Box(1).Checked = True
-        noisyLine.Run(ocvb)
-        dst1 = noisyLine.dst1
-        dst2.SetTo(0)
-        noisyLine.check.Box(1).Checked = False
-        'End If
+            Static noisePointCount As Int32
+            Static linePointCount As Int32
+            Static lineNoise As Int32
+            Static highlight As Boolean
+            'If noisyLine.sliders.trackbar(0).Value <> noisePointCount Or noisyLine.sliders.trackbar(1).Value <> linePointCount Or
+            '    noisyLine.sliders.trackbar(2).Value <> lineNoise Or noisyLine.check.Box(0).Checked <> highlight Or noisyLine.check.Box(1).Checked Then
+            noisyLine.check.Box(1).Checked = True
+            noisyLine.Run(ocvb)
+            dst2 = noisyLine.dst1
+            dst1.SetTo(0)
+            noisyLine.check.Box(1).Checked = False
+            'End If
 
-        noisePointCount = noisyLine.sliders.trackbar(0).Value
-        linePointCount = noisyLine.sliders.trackbar(1).Value
-        lineNoise = noisyLine.sliders.trackbar(2).Value
-        highlight = noisyLine.check.Box(0).Checked
+            noisePointCount = noisyLine.sliders.trackbar(0).Value
+            linePointCount = noisyLine.sliders.trackbar(1).Value
+            lineNoise = noisyLine.sliders.trackbar(2).Value
+            highlight = noisyLine.check.Box(0).Checked
 
-        Dim width = src.Width
+            Dim width = src.Width
 
-        Dim line = cv.Cv2.FitLine(noisyLine.points, cv.DistanceTypes.L2, 1, 0.01, 0.01)
-        Dim m = line.Vy / line.Vx
-        Dim bb = line.Y1 - m * line.X1
-        Dim p1 = New cv.Point(0, bb)
-        Dim p2 = New cv.Point(width, m * width + bb)
-        dst2.Line(p1, p2, cv.Scalar.Red, 20, cv.LineTypes.AntiAlias)
+            Dim line = cv.Cv2.FitLine(noisyLine.points, cv.DistanceTypes.L2, 1, 0.01, 0.01)
+            Dim m = line.Vy / line.Vx
+            Dim bb = line.Y1 - m * line.X1
+            Dim p1 = New cv.Point(0, bb)
+            Dim p2 = New cv.Point(width, m * width + bb)
+            dst1.Line(p1, p2, cv.Scalar.Red, 20, cv.LineTypes.AntiAlias)
 
-        Dim pointMat = New cv.Mat(noisyLine.points.Count, 1, cv.MatType.CV_32FC2, noisyLine.points.ToArray)
-        Dim mean = pointMat.Mean()
-        Dim split() = pointMat.Split()
-        Dim minX As Single, maxX As Single, minY As Single, maxY As Single
-        split(0).MinMaxLoc(minX, maxX)
-        split(1).MinMaxLoc(minY, maxY)
+            Dim pointMat = New cv.Mat(noisyLine.points.Count, 1, cv.MatType.CV_32FC2, noisyLine.points.ToArray)
+            Dim mean = pointMat.Mean()
+            Dim split() = pointMat.Split()
+            Dim minX As Single, maxX As Single, minY As Single, maxY As Single
+            split(0).MinMaxLoc(minX, maxX)
+            split(1).MinMaxLoc(minY, maxY)
 
-        Dim eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, 0), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, 0)
 
-        Dim eigenInput As New cv.Vec4f
-        For i = 0 To noisyLine.points.Count - 1
-            Dim pt = noisyLine.points.Item(i)
-            Dim x = pt.X - mean.Val0
-            Dim y = pt.Y - mean.Val1
-            eigenInput.Item0 += x * x
-            eigenInput.Item1 += x * y
-            eigenInput.Item3 += y * y
-        Next
-        eigenInput.Item2 = eigenInput.Item1
+            Dim eigenInput As New cv.Vec4f
+            For i = 0 To noisyLine.points.Count - 1
+                Dim pt = noisyLine.points.Item(i)
+                Dim x = pt.X - mean.Val0
+                Dim y = pt.Y - mean.Val1
+                eigenInput.Item0 += x * x
+                eigenInput.Item1 += x * y
+                eigenInput.Item3 += y * y
+            Next
+            eigenInput.Item2 = eigenInput.Item1
 
-        Dim vec4f As New List(Of cv.Point2f)
-        vec4f.Add(New cv.Point2f(eigenInput.Item0, eigenInput.Item1))
-        vec4f.Add(New cv.Point2f(eigenInput.Item1, eigenInput.Item3))
+            Dim vec4f As New List(Of cv.Point2f)
+            vec4f.Add(New cv.Point2f(eigenInput.Item0, eigenInput.Item1))
+            vec4f.Add(New cv.Point2f(eigenInput.Item1, eigenInput.Item3))
 
-        Dim D = New cv.Mat(2, 2, cv.MatType.CV_32FC1, vec4f.ToArray)
-        cv.Cv2.Eigen(D, eigenVal, eigenVec)
-        Dim theta = Math.Atan2(eigenVec.Get(Of Single)(1, 0), eigenVec.Get(Of Single)(0, 0))
+            Dim D = New cv.Mat(2, 2, cv.MatType.CV_32FC1, vec4f.ToArray)
+            cv.Cv2.Eigen(D, eigenVal, eigenVec)
+            theta = Math.Atan2(eigenVec.Get(Of Single)(1, 0), eigenVec.Get(Of Single)(0, 0))
 
-        Dim Len = Math.Sqrt(Math.Pow(maxX - minX, 2) + Math.Pow(maxY - minY, 2))
+            len = Math.Sqrt(Math.Pow(maxX - minX, 2) + Math.Pow(maxY - minY, 2))
 
-        p1 = New cv.Point2f(mean.Val0 - Math.Cos(theta) * Len / 2, mean.Val1 - Math.Sin(theta) * Len / 2)
-        p2 = New cv.Point2f(mean.Val0 + Math.Cos(theta) * Len / 2, mean.Val1 + Math.Sin(theta) * Len / 2)
-        Dim m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
-
-        If Math.Abs(m2) > 1.0 Then
-            dst2.Line(p1, p2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
-        Else
-            p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * Len / 2, mean.Val1 - Math.Sin(-theta) * Len / 2)
-            p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * Len / 2, mean.Val1 + Math.Sin(-theta) * Len / 2)
+            p1 = New cv.Point2f(mean.Val0 - Math.Cos(theta) * Len / 2, mean.Val1 - Math.Sin(theta) * Len / 2)
+            p2 = New cv.Point2f(mean.Val0 + Math.Cos(theta) * Len / 2, mean.Val1 + Math.Sin(theta) * Len / 2)
             m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
-            dst2.Line(p1, p2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
-        End If
 
-        ocvb.putText(New TTtext("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(Len)) + vbCrLf +
+            If Math.Abs(m2) > 1.0 Then
+                dst1.Line(p1, p2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
+            Else
+                p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * Len / 2, mean.Val1 - Math.Sin(-theta) * Len / 2)
+                p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * Len / 2, mean.Val1 + Math.Sin(-theta) * Len / 2)
+                m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
+                dst1.Line(p1, p2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
+            End If
+            p1 = New cv.Point(0, noisyLine.bb)
+            p2 = New cv.Point(width, noisyLine.m * width + noisyLine.bb)
+            dst1.Line(p1, p2, cv.Scalar.Blue, 3, cv.LineTypes.AntiAlias)
+        End If
+        ocvb.trueText(New TTtext("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(Len)) + vbCrLf +
                                               "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), "#0.0") + vbCrLf +
                                               "theta: atan2(" + Format(eigenVec.Get(Of Single)(1, 0), "#0.0") + ", " + Format(eigenVec.Get(Of Single)(0, 0), "#0.0") + ") = " +
-                                              Format(theta, "#0.0000"), 10, 22, RESULT2))
-
-        p1 = New cv.Point(0, noisyLine.bb)
-        p2 = New cv.Point(width, noisyLine.m * width + noisyLine.bb)
-        dst2.Line(p1, p2, cv.Scalar.Blue, 3, cv.LineTypes.AntiAlias)
+                                              Format(theta, "#0.0000"), 10, 60))
     End Sub
 End Class
 

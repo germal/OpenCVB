@@ -374,17 +374,16 @@ Public Class Draw_ClipLine
     Dim rect As cv.Rect
     Private Sub setup()
         ReDim kalman.input(8)
-        Dim r = initRandomRect(dst1.Width, dst1.Height, 25)
+        Dim r = initRandomRect(dst2.Width, dst2.Height, 25)
         pt1 = New cv.Point(r.X, r.Y)
         pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
-        rect = initRandomRect(dst1.Width, dst1.Height, 25)
+        rect = initRandomRect(dst2.Width, dst2.Height, 25)
         If kalman.check.Box(0).Checked Then flow.msgs.Add("--------------------------- setup ---------------------------")
     End Sub
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
         flow = New Font_FlowText(ocvb)
-        flow.result1or2 = RESULT2
 
         kalman = New Kalman_Basics(ocvb)
         setup()
@@ -392,7 +391,7 @@ Public Class Draw_ClipLine
         ocvb.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        dst1 = src
+        dst2 = src
         kalman.input = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
         kalman.Run(ocvb)
         Dim p1 = New cv.Point(CInt(kalman.output(0)), CInt(kalman.output(1)))
@@ -403,8 +402,8 @@ Public Class Draw_ClipLine
         Dim r = New cv.Rect(kalman.output(4), kalman.output(5), kalman.output(6), kalman.output(7))
 
         Dim clipped = cv.Cv2.ClipLine(r, p1, p2) ' Returns false when the line and the rectangle don't intersect.
-        dst1.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), 2, cv.LineTypes.AntiAlias)
-        dst1.Rectangle(r, If(clipped, cv.Scalar.Yellow, cv.Scalar.Red), 2, cv.LineTypes.AntiAlias)
+        dst2.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), 2, cv.LineTypes.AntiAlias)
+        dst2.Rectangle(r, If(clipped, cv.Scalar.Yellow, cv.Scalar.Red), 2, cv.LineTypes.AntiAlias)
 
         Static linenum = 0
         flow.msgs.Add("(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle"))
@@ -412,8 +411,8 @@ Public Class Draw_ClipLine
 
         Static hitCount = 0
         hitCount += If(clipped, 1, 0)
-        ocvb.putText(New TTtext("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
-                     CInt(ocvb.color.Width / 2), 200, RESULT2))
+        ocvb.trueText(New TTtext("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
+                     CInt(ocvb.color.Width / 2), 200))
         If r = rect Then setup()
         flow.Run(ocvb)
     End Sub

@@ -28,7 +28,7 @@ Public Class HMM_Example_CPP
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.testAllRunning Then
-            ocvb.putText(New TTtext("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.", 10, 60, RESULT1))
+            ocvb.trueText(New TTtext("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.", 10, 60))
             Exit Sub
         End If
         Dim src = ocvb.color

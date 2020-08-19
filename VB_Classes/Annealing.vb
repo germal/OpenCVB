@@ -167,7 +167,6 @@ Public Class Annealing_CPP_MT
         check.Box(2).Checked = True
 
         flow = New Font_FlowText(ocvb)
-        flow.result1or2 = RESULT1
 
         label1 = "Log of Annealing progress"
         label2 = "Top 2 are best solutions, bottom 2 are worst."
@@ -258,7 +257,6 @@ Public Class Annealing_Options
         check.Box(1).Checked = True
 
         flow = New Font_FlowText(ocvb)
-        flow.result1or2 = RESULT2
 
         label1 = "Log of Annealing progress"
 
