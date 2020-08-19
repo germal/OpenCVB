@@ -151,6 +151,12 @@
     <Compile Include="Etch.vb" />
     <Compile Include="FeatureLess.vb" />
     <Compile Include="FishEye.vb" />
+    <Compile Include="OptionsKeyboardInput.Designer.vb">
+      <DependentUpon>OptionsKeyboardInput.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsKeyboardInput.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Fractal.vb" />
     <Compile Include="FREAK.vb" />
     <Compile Include="Gabor.vb" />
@@ -337,6 +343,9 @@
     <Compile Include="XPhoto.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="OptionsKeyboardInput.resx">
+      <DependentUpon>OptionsKeyboardInput.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>

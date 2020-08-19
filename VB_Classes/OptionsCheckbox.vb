@@ -14,8 +14,8 @@ Public Class OptionsCheckbox
     Private Function lookupAlgorithm(caller As String) As Integer
         For i = 0 To callerNames.Length - 1
             If callerNames(i) = caller Then
-                callerCheckboxCounts(i) += 1
-                Return callerCheckboxCounts(i)
+                callerCheckBoxCounts(i) += 1
+                Return callerCheckBoxCounts(i)
             End If
         Next
         Return 0

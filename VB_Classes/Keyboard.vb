@@ -2,23 +2,26 @@
 Imports cv = OpenCvSharp
 Public Class Keyboard_Basics
     Inherits ocvbClass
-    Public input As String
-        Public Sub New(ocvb As AlgorithmData)
+    Public input As New List(Of String)
+    Dim flow As Font_FlowText
+    Public checkKeys As New OptionsKeyboardInput
+    Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        label1 = "Type in text to add to image"
+        checkKeys.Setup(caller)
+        flow = New Font_FlowText(ocvb)
+        label1 = "Keyboard data will flow to algorithm"
         ocvb.desc = "Test the keyboard interface available to all algorithms"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.keyboardInput <> "" Then
-            input = ocvb.parms.keyboardInput
+        Input = New List(Of String)(checkKeys.inputText)
+        checkKeys.inputText.Clear()
+        If standalone Then
+            Dim inputText As String = ""
+            For i = 0 To input.Count - 1
+                inputText += input(i).ToString()
+            Next
+            If inputText <> "" Then flow.msgs.Add(inputText)
+            flow.Run(ocvb)
         End If
-        if standalone Then
-            If input = "" Then
-                ocvb.trueText(New TTtext("Any text entered will appear here." + input, 10, 50))
-            Else
-                ocvb.trueText(New TTtext("The last key that was hit was: " + input, 10, 50))
-            End If
-        End If
-        ocvb.parms.keyInputAccepted = True
     End Sub
 End Class

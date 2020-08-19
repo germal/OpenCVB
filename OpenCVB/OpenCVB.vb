@@ -44,8 +44,6 @@ Public Class OpenCVB
     Dim frameCount As Int32
     Dim GrabRectangleData As Boolean
     Dim HomeDir As DirectoryInfo
-    Dim keyboardInput As String
-    Dim keyboardLastInput As String
 
     Dim LastX As Int32
     Dim LastY As Int32
@@ -582,6 +580,13 @@ Public Class OpenCVB
         If index < 0 Then AvailableAlgorithms.SelectedIndex = 0 Else AvailableAlgorithms.SelectedIndex = index
         SaveSetting("OpenCVB", "OpenCVkeyword", "OpenCVkeyword", OpenCVkeyword.Text)
     End Sub
+    Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
+        If AvailableAlgorithms.Enabled Then
+            If PausePlayButton.Text = "Run" Then ToolStripButton1_Click(sender, e) ' if paused, then restart.
+            SaveSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Text)
+            StartAlgorithmTask()
+        End If
+    End Sub
     Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
         Dim systemPath = Environment.GetEnvironmentVariable("Path")
         Dim curDirectory = CurDir()
@@ -774,13 +779,6 @@ Public Class OpenCVB
     End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         saveLayout()
-    End Sub
-    Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
-        If AvailableAlgorithms.Enabled Then
-            If PausePlayButton.Text = "Run" Then ToolStripButton1_Click(sender, e) ' if paused, then restart.
-            SaveSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Text)
-            StartAlgorithmTask()
-        End If
     End Sub
     Private Sub ActivateTimer_Tick(sender As Object, e As EventArgs) Handles ActivateTimer.Tick
         ActivateTimer.Enabled = False
@@ -989,7 +987,6 @@ Public Class OpenCVB
         parms.imageTTTtextLoc = 1 / resizeForDisplay
         parms.useRecordedData = OpenCVkeyword.Text = "<All using recorded data>"
         parms.testAllRunning = TestAllButton.Text = "Stop Test"
-        parms.keyboardInput = keyboardInput
         parms.externalPythonInvocation = externalPythonInvocation
         parms.ShowConsoleLog = optionsForm.ShowConsoleLog.Checked
         parms.AvoidDNNCrashes = optionsForm.AvoidDNNCrashes.Checked
@@ -1137,7 +1134,6 @@ Public Class OpenCVB
                 OpenCVB.ocvb.parms.IMU_FrameTime = camera.IMU_FrameTime
                 OpenCVB.ocvb.parms.CPU_TimeStamp = camera.CPU_TimeStamp
                 OpenCVB.ocvb.parms.CPU_FrameTime = camera.CPU_FrameTime
-                OpenCVB.ocvb.parms.keyboardInput = keyboardInput
             End SyncLock
 
             OpenCVB.UpdateHostLocation(New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
@@ -1196,7 +1192,6 @@ Public Class OpenCVB
                 picLabels(3) = OpenCVB.ocvb.label2
                 ' share the results of the algorithm task.
                 SyncLock TTtextData
-                    If OpenCVB.ocvb.parms.keyInputAccepted Then keyboardInput = ""
                     algorithmRefresh = True
                     imgResult = OpenCVB.ocvb.result.Clone()
                     TTtextData.Clear()
@@ -1239,56 +1234,5 @@ Public Class OpenCVB
             frameCount += 1
         End While
     End Sub
-
-    Private Sub AvailableAlgorithms_KeyDown(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyDown
-        SyncLock bufferLock
-            'If repeated Then
-            '    keyboardInput = (e.KeyData.ToString()).ToLower ' just the last key if we were repeating characters.
-            'Else
-            keyboardInput += (e.KeyData.ToString()).ToLower
-            ' End If
-        End SyncLock
-    End Sub
-    'Private Sub keyholdTimer_Tick(sender As Object, e As EventArgs) Handles keyholdTimer.Tick
-    '    keyboardInput += keyboardLastInput ' press and hold means send this key again...
-    'End Sub
-    'Private Sub OpenCVB_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles Me.PreviewKeyDown
-    '    e.IsInputKey = False
-    'End Sub
-    'Private Sub OpenCVB_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-    '    Dim repeated = keyholdTimer.Enabled
-    '    keyholdTimer.Enabled = False
-    '    If e.KeyCode = Keys.Escape Then
-    '        keyboardInput = ""
-    '        Exit Sub
-    '    End If
-
-    '    SyncLock bufferLock
-    '        If repeated Then
-    '            keyboardInput = (e.KeyData.ToString()).ToLower ' just the last key if we were repeating characters.
-    '        Else
-    '            keyboardInput += (e.KeyData.ToString()).ToLower
-    '        End If
-    '    End SyncLock
-    'End Sub
-    'Private Sub OpenCVB_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-    '    keyholdTimer.Enabled = True
-    '    keyboardLastInput = (e.KeyData.ToString()).ToLower
-    'End Sub
-    'Private Sub AvailableAlgorithms_KeyUp(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyUp
-    '    If e.KeyCode <> Keys.Down And e.KeyCode <> Keys.Up And e.KeyCode <> Keys.PageDown And e.KeyCode <> Keys.PageUp Then e.Handled = False
-    'End Sub
-    'Private Sub AvailableAlgorithms_KeyDown(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyDown
-    '    e.Handled = False
-    ''End Sub
-    'Protected Overrides Sub OnKeyDown(ByVal e As System.Windows.Forms.KeyEventArgs)
-    '    e.Handled = True
-    '    If e.KeyCode = Keys.Down Or e.KeyCode = Keys.Up Then e.Handled = False
-    '    MyBase.OnKeyDown(e)
-
-    'End Sub
-    'Private Sub AvailableAlgorithms_KeyPress(sender As Object, e As KeyPressEventArgs) Handles AvailableAlgorithms.KeyPress
-    '    '  If e.KeyChar.ToString <> 34 And e.KeyChar <> 33 And e.KeyChar <> 38 And e.KeyChar <> 40 Then e.Handled = False
-    'End Sub
 End Class
 

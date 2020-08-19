@@ -35,7 +35,6 @@ Partial Class OpenCVB
         Me.AlgorithmDesc = New System.Windows.Forms.Label()
         Me.OpenCVkeyword = New System.Windows.Forms.ComboBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.keyholdTimer = New System.Windows.Forms.Timer(Me.components)
         Me.AvailableAlgorithms = New System.Windows.Forms.ComboBox()
         Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -111,31 +110,29 @@ Partial Class OpenCVB
         '
         Me.AlgorithmDesc.AutoSize = True
         Me.AlgorithmDesc.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.AlgorithmDesc.Location = New System.Drawing.Point(888, 15)
+        Me.AlgorithmDesc.Location = New System.Drawing.Point(891, 15)
         Me.AlgorithmDesc.Name = "AlgorithmDesc"
         Me.AlgorithmDesc.Size = New System.Drawing.Size(119, 22)
-        Me.AlgorithmDesc.TabIndex = 2
+        Me.AlgorithmDesc.TabIndex = 0
         Me.AlgorithmDesc.Text = "Algorithm Desc"
         '
         'OpenCVkeyword
         '
+        Me.OpenCVkeyword.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.OpenCVkeyword.FormattingEnabled = True
-        Me.OpenCVkeyword.Location = New System.Drawing.Point(554, 12)
+        Me.OpenCVkeyword.Location = New System.Drawing.Point(557, 12)
         Me.OpenCVkeyword.Name = "OpenCVkeyword"
         Me.OpenCVkeyword.Size = New System.Drawing.Size(328, 28)
-        Me.OpenCVkeyword.TabIndex = 3
-        '
-        'keyholdTimer
-        '
-        Me.keyholdTimer.Interval = 50
+        Me.OpenCVkeyword.TabIndex = 1
         '
         'AvailableAlgorithms
         '
+        Me.AvailableAlgorithms.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.AvailableAlgorithms.FormattingEnabled = True
         Me.AvailableAlgorithms.Location = New System.Drawing.Point(189, 10)
         Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
         Me.AvailableAlgorithms.Size = New System.Drawing.Size(363, 28)
-        Me.AvailableAlgorithms.TabIndex = 4
+        Me.AvailableAlgorithms.TabIndex = 0
         '
         'OpenCVB
         '
@@ -167,6 +164,5 @@ Partial Class OpenCVB
     Friend WithEvents SnapShotButton As ToolStripButton
     Friend WithEvents OpenCVkeyword As ComboBox
     Friend WithEvents ToolTip1 As ToolTip
-    Friend WithEvents keyholdTimer As Timer
     Friend WithEvents AvailableAlgorithms As ComboBox
 End Class

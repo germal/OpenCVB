@@ -72,8 +72,6 @@ Public Class ActiveClass : Implements IDisposable
         Dim HomeDir As String
         Dim VBTestInterface As Object
         Dim imageTTTtextLoc As Single
-        Dim keyboardInput As String
-        Dim keyInputAccepted As Boolean
         Dim IMU_Barometer As Single
         Dim IMU_Magnetometer As cv.Point3f
         Dim IMU_Present As Boolean

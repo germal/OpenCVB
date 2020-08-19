@@ -26,11 +26,16 @@ Public Class Etch_ASketch
         ocvb.desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim directionCount = 1
+        keys.Run(ocvb)
+        Dim Input = New List(Of String)(keys.input)
+
         If check.Box(1).Checked Then
-            keys.input = Choose(ms_rng.Next(1, 5), "down", "up", "left", "right")
+            Input.Clear() ' ignore any keyboard input when in Demo mode.
+            Dim nextKey = Choose(ms_rng.Next(1, 5), "Down", "Up", "Left", "Right")
             label1 = "Etch_ASketch demo mode - moving randomly"
-            directionCount = ms_rng.Next(10, 50)
+            For i = 0 To ms_rng.Next(10, 50)
+                Input.Add(nextKey)
+            Next
         Else
             label1 = "Use Up/Down/Left/Right keys to create image"
         End If
@@ -39,16 +44,16 @@ Public Class Etch_ASketch
             cursor = randomCursor(ocvb)
             dst1.SetTo(slateColor)
         End If
-        keys.Run(ocvb)
-        For i = 0 To directionCount - 1
-            Select Case keys.input
-                Case "down"
+
+        For i = 0 To Input.Count - 1
+            Select Case Input(i)
+                Case "Down"
                     cursor.Y += 1
-                Case "up"
+                Case "Up"
                     cursor.Y -= 1
-                Case "left"
+                Case "Left"
                     cursor.X -= 1
-                Case "right"
+                Case "Right"
                     cursor.X += 1
             End Select
             If cursor.X < 0 Then cursor.X = 0
@@ -62,6 +67,5 @@ Public Class Etch_ASketch
             If lastCursor = cursor And ocvb.frameCount <> 0 Then cursor = randomCursor(ocvb)
             lastCursor = cursor
         End If
-        keys.input = ""
     End Sub
 End Class
