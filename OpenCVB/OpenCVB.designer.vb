@@ -29,7 +29,6 @@ Partial Class OpenCVB
         Me.OptionsButton = New System.Windows.Forms.ToolStripButton()
         Me.TestAllButton = New System.Windows.Forms.ToolStripButton()
         Me.SnapShotButton = New System.Windows.Forms.ToolStripButton()
-        Me.AvailableAlgorithms2 = New System.Windows.Forms.ComboBox()
         Me.TestAllTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ActivateTimer = New System.Windows.Forms.Timer(Me.components)
         Me.fpsTimer = New System.Windows.Forms.Timer(Me.components)
@@ -37,7 +36,7 @@ Partial Class OpenCVB
         Me.OpenCVkeyword = New System.Windows.Forms.ComboBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.keyholdTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.AvailableAlgorithms1 = New System.Windows.Forms.ListBox()
+        Me.AvailableAlgorithms = New System.Windows.Forms.ComboBox()
         Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -96,14 +95,6 @@ Partial Class OpenCVB
         Me.SnapShotButton.Size = New System.Drawing.Size(34, 53)
         Me.SnapShotButton.Text = "Snapshot"
         '
-        'AvailableAlgorithms2
-        '
-        Me.AvailableAlgorithms2.FormattingEnabled = True
-        Me.AvailableAlgorithms2.Location = New System.Drawing.Point(194, 12)
-        Me.AvailableAlgorithms2.Name = "AvailableAlgorithms2"
-        Me.AvailableAlgorithms2.Size = New System.Drawing.Size(354, 28)
-        Me.AvailableAlgorithms2.TabIndex = 1
-        '
         'TestAllTimer
         '
         Me.TestAllTimer.Interval = 5000
@@ -138,24 +129,22 @@ Partial Class OpenCVB
         '
         Me.keyholdTimer.Interval = 50
         '
-        'AvailableAlgorithms1
+        'AvailableAlgorithms
         '
-        Me.AvailableAlgorithms1.FormattingEnabled = True
-        Me.AvailableAlgorithms1.ItemHeight = 20
-        Me.AvailableAlgorithms1.Location = New System.Drawing.Point(1087, 11)
-        Me.AvailableAlgorithms1.Name = "AvailableAlgorithms1"
-        Me.AvailableAlgorithms1.Size = New System.Drawing.Size(300, 24)
-        Me.AvailableAlgorithms1.TabIndex = 4
+        Me.AvailableAlgorithms.FormattingEnabled = True
+        Me.AvailableAlgorithms.Location = New System.Drawing.Point(177, 12)
+        Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
+        Me.AvailableAlgorithms.Size = New System.Drawing.Size(363, 28)
+        Me.AvailableAlgorithms.TabIndex = 4
         '
         'OpenCVB
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1779, 1062)
-        Me.Controls.Add(Me.AvailableAlgorithms1)
+        Me.Controls.Add(Me.AvailableAlgorithms)
         Me.Controls.Add(Me.OpenCVkeyword)
         Me.Controls.Add(Me.AlgorithmDesc)
-        Me.Controls.Add(Me.AvailableAlgorithms2)
         Me.Controls.Add(Me.ToolStrip1)
         Me.KeyPreview = True
         Me.Name = "OpenCVB"
@@ -168,7 +157,6 @@ Partial Class OpenCVB
     End Sub
 
     Friend WithEvents ToolStrip1 As ToolStrip
-    Friend WithEvents AvailableAlgorithms2 As ComboBox
     Friend WithEvents TestAllButton As ToolStripButton
     Friend WithEvents TestAllTimer As Timer
     Friend WithEvents ActivateTimer As Timer
@@ -180,5 +168,5 @@ Partial Class OpenCVB
     Friend WithEvents OpenCVkeyword As ComboBox
     Friend WithEvents ToolTip1 As ToolTip
     Friend WithEvents keyholdTimer As Timer
-    Friend WithEvents AvailableAlgorithms1 As ListBox
+    Friend WithEvents AvailableAlgorithms As ComboBox
 End Class
