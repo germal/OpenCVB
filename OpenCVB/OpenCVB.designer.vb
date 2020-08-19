@@ -132,7 +132,7 @@ Partial Class OpenCVB
         'AvailableAlgorithms
         '
         Me.AvailableAlgorithms.FormattingEnabled = True
-        Me.AvailableAlgorithms.Location = New System.Drawing.Point(177, 12)
+        Me.AvailableAlgorithms.Location = New System.Drawing.Point(189, 10)
         Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
         Me.AvailableAlgorithms.Size = New System.Drawing.Size(363, 28)
         Me.AvailableAlgorithms.TabIndex = 4

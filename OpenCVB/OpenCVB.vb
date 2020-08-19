@@ -775,46 +775,6 @@ Public Class OpenCVB
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         saveLayout()
     End Sub
-    'Private Sub keyholdTimer_Tick(sender As Object, e As EventArgs) Handles keyholdTimer.Tick
-    '    keyboardInput += keyboardLastInput ' press and hold means send this key again...
-    'End Sub
-    'Private Sub OpenCVB_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles Me.PreviewKeyDown
-    '    e.IsInputKey = False
-    'End Sub
-    'Private Sub OpenCVB_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-    '    Dim repeated = keyholdTimer.Enabled
-    '    keyholdTimer.Enabled = False
-    '    If e.KeyCode = Keys.Escape Then
-    '        keyboardInput = ""
-    '        Exit Sub
-    '    End If
-
-    '    SyncLock bufferLock
-    '        If repeated Then
-    '            keyboardInput = (e.KeyData.ToString()).ToLower ' just the last key if we were repeating characters.
-    '        Else
-    '            keyboardInput += (e.KeyData.ToString()).ToLower
-    '        End If
-    '    End SyncLock
-    'End Sub
-    'Private Sub OpenCVB_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-    '    keyholdTimer.Enabled = True
-    '    keyboardLastInput = (e.KeyData.ToString()).ToLower
-    'End Sub
-    'Private Sub AvailableAlgorithms_KeyUp(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyUp
-    '    If e.KeyCode <> Keys.Down And e.KeyCode <> Keys.Up And e.KeyCode <> Keys.PageDown And e.KeyCode <> Keys.PageUp Then e.Handled = False
-    'End Sub
-    'Private Sub AvailableAlgorithms_KeyDown(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyDown
-    '    e.Handled = False
-    'End Sub
-    Protected Overrides Sub OnKeyDown(ByVal e As System.Windows.Forms.KeyEventArgs)
-        e.Handled = True
-        If e.KeyCode = Keys.Down Or e.KeyCode = Keys.Up Then e.Handled = False
-        MyBase.OnKeyDown(e)
-    End Sub
-    'Private Sub AvailableAlgorithms_KeyPress(sender As Object, e As KeyPressEventArgs) Handles AvailableAlgorithms.KeyPress
-    '    '  If e.KeyChar.ToString <> 34 And e.KeyChar <> 33 And e.KeyChar <> 38 And e.KeyChar <> 40 Then e.Handled = False
-    'End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If AvailableAlgorithms.Enabled Then
             If PausePlayButton.Text = "Run" Then ToolStripButton1_Click(sender, e) ' if paused, then restart.
@@ -1279,5 +1239,56 @@ Public Class OpenCVB
             frameCount += 1
         End While
     End Sub
+
+    Private Sub AvailableAlgorithms_KeyDown(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyDown
+        SyncLock bufferLock
+            'If repeated Then
+            '    keyboardInput = (e.KeyData.ToString()).ToLower ' just the last key if we were repeating characters.
+            'Else
+            keyboardInput += (e.KeyData.ToString()).ToLower
+            ' End If
+        End SyncLock
+    End Sub
+    'Private Sub keyholdTimer_Tick(sender As Object, e As EventArgs) Handles keyholdTimer.Tick
+    '    keyboardInput += keyboardLastInput ' press and hold means send this key again...
+    'End Sub
+    'Private Sub OpenCVB_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles Me.PreviewKeyDown
+    '    e.IsInputKey = False
+    'End Sub
+    'Private Sub OpenCVB_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+    '    Dim repeated = keyholdTimer.Enabled
+    '    keyholdTimer.Enabled = False
+    '    If e.KeyCode = Keys.Escape Then
+    '        keyboardInput = ""
+    '        Exit Sub
+    '    End If
+
+    '    SyncLock bufferLock
+    '        If repeated Then
+    '            keyboardInput = (e.KeyData.ToString()).ToLower ' just the last key if we were repeating characters.
+    '        Else
+    '            keyboardInput += (e.KeyData.ToString()).ToLower
+    '        End If
+    '    End SyncLock
+    'End Sub
+    'Private Sub OpenCVB_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+    '    keyholdTimer.Enabled = True
+    '    keyboardLastInput = (e.KeyData.ToString()).ToLower
+    'End Sub
+    'Private Sub AvailableAlgorithms_KeyUp(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyUp
+    '    If e.KeyCode <> Keys.Down And e.KeyCode <> Keys.Up And e.KeyCode <> Keys.PageDown And e.KeyCode <> Keys.PageUp Then e.Handled = False
+    'End Sub
+    'Private Sub AvailableAlgorithms_KeyDown(sender As Object, e As KeyEventArgs) Handles AvailableAlgorithms.KeyDown
+    '    e.Handled = False
+    ''End Sub
+    'Protected Overrides Sub OnKeyDown(ByVal e As System.Windows.Forms.KeyEventArgs)
+    '    e.Handled = True
+    '    If e.KeyCode = Keys.Down Or e.KeyCode = Keys.Up Then e.Handled = False
+    '    MyBase.OnKeyDown(e)
+
+    'End Sub
+    'Private Sub AvailableAlgorithms_KeyPress(sender As Object, e As KeyPressEventArgs) Handles AvailableAlgorithms.KeyPress
+    '    '  If e.KeyChar.ToString <> 34 And e.KeyChar <> 33 And e.KeyChar <> 38 And e.KeyChar <> 40 Then e.Handled = False
+    'End Sub
 End Class
 
