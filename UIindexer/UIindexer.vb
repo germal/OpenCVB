@@ -44,8 +44,13 @@ Module IndexMain
         While srAPI.EndOfStream = False
             line = srAPI.ReadLine()
             If line <> "" Then
-                apiList.Add(line + "(") ' it needs the parenthesis to make sure it is a function.
-                apiListLCase.Add(LCase(line) + "(") ' it needs the parenthesis to make sure it is a function.
+                If line = "testAllRunning" Then
+                    apiList.Add(line)
+                    apiListLCase.Add(LCase(line))
+                Else
+                    apiList.Add(line + "(") ' it needs the parenthesis to make sure it is a function.
+                    apiListLCase.Add(LCase(line) + "(") ' it needs the parenthesis to make sure it is a function.
+                End If
             End If
         End While
         srAPI.Close()

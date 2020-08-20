@@ -502,6 +502,7 @@ sum
 sumElems
 SVBackSubst
 SVDecomp
+testAllRunning
 textureFlattening
 threshold
 TickMeter

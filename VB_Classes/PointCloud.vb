@@ -59,6 +59,7 @@ Public Class PointCloud_Colorize
 
     Public Function CameraLocationBot(ocvb As AlgorithmData, mask As cv.Mat, maxZ As Single) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
+
         ' if not a mask, then the image is already colorized.
         If mask.Channels = 1 Then dst2.CopyTo(dst, mask) Else dst = mask.Clone()
         cameraPoint = New cv.Point(dst.Height, dst.Height)
@@ -82,8 +83,7 @@ Public Class PointCloud_Colorize
         dst.Ellipse(cameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         dst.Line(cameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        Dim labelLocation = New cv.Point(dst.Width / 2 + labelShift * 3 / 4, dst.Height * 7 / 8)
-        If ocvb.parms.resolution = resHigh Then labelLocation = New cv.Point(dst.Width / 2 + labelShift * 3 / 8, dst.Height * 15 / 16)
+        Dim labelLocation = New cv.Point(dst.Width / 2 + labelShift * 3 / 4, dst.Height * 15 / 16)
         cv.Cv2.PutText(dst, CStr(startAngle) + " degrees" + " FOV=" + CStr(180 - startAngle * 2), labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(cameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
@@ -91,10 +91,10 @@ Public Class PointCloud_Colorize
     End Function
     Public Function CameraLocationSide(ocvb As AlgorithmData, ByRef mask As cv.Mat, maxZ As Single) As cv.Mat
         Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
+
         ' if not a mask, then the image is already colorized.
         If mask.Channels = 1 Then dst2.CopyTo(dst, mask) Else dst = mask.Clone()
         cameraPoint = New cv.Point(shift, src.Height - (src.Width - src.Height) / 2)
-        'dst.Rectangle(New cv.Rect(shift, 0, src.Height, src.Height), cv.Scalar.White, 1)
         dst.Circle(cameraPoint, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         For i = 0 To maxZ
             Dim xmeter = dst.Height * i / maxZ
@@ -115,7 +115,6 @@ Public Class PointCloud_Colorize
         dst.Line(cameraPoint, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Dim labelLocation = New cv.Point(10, dst.Height * 3 / 4)
-        ' If ocvb.parms.resolution = resHigh Then labelLocation = New cv.Point(labelShift * 3 / 8, dst.Height * 15 / 16)
         cv.Cv2.PutText(dst, CStr(startAngle) + " degrees" + " FOV=" + CStr(180 - startAngle * 2), labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(cameraPoint, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
@@ -793,7 +792,6 @@ Public Class PointCloud_PixelFormula_SideView
     Inherits ocvbClass
     Public measure As PointCloud_Measured_SideView
     Public top As PointCloud_PixelFormula_TopView
-    Public pixelsPerMeter As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
@@ -822,14 +820,18 @@ End Class
 
 
 
-Public Class PointCloud_PixelClipped_TopView
+Public Class PointCloud_PixelClipped_BothViews
     Inherits ocvbClass
     Public topView As PointCloud_Measured_TopView
     Public sideView As PointCloud_Measured_SideView
+    Public sidePixel As PointCloud_PixelFormula_SideView
+    Public topPixel As PointCloud_PixelFormula_TopView
     Dim levelCheck As IMU_IsCameraLevel
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
+        sidePixel = New PointCloud_PixelFormula_SideView(ocvb)
+        topPixel = New PointCloud_PixelFormula_TopView(ocvb)
         topView = New PointCloud_Measured_TopView(ocvb)
         sideView = New PointCloud_Measured_SideView(ocvb)
         levelCheck = New IMU_IsCameraLevel(ocvb)
@@ -837,6 +839,8 @@ Public Class PointCloud_PixelClipped_TopView
         ocvb.desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        sidePixel.run(ocvb)
+        topPixel.run(ocvb)
         topView.Run(ocvb)
         sideView.Run(ocvb)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
@@ -882,12 +886,12 @@ End Class
 
 Public Class PointCloud_BackProject
     Inherits ocvbClass
-    Dim clipped As PointCloud_PixelClipped_TopView
+    Dim clipped As PointCloud_PixelClipped_BothViews
     Dim mats As Mat_4to1
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        clipped = New PointCloud_PixelClipped_TopView(ocvb)
+        clipped = New PointCloud_PixelClipped_BothViews(ocvb)
         mats = New Mat_4to1(ocvb)
         label1 = "Top/Side views with corresponding backprojection"
         label2 = "Click any quadrant at left to view it below"
@@ -901,19 +905,29 @@ Public Class PointCloud_BackProject
         dst1 = mats.dst1
         dst2 = mats.mat(clickQuadrant(ocvb))
 
+        If ocvb.mouseClickFlag Then
+            Console.WriteLine("test " + CStr(ocvb.mouseClickPoint.X))
+        End If
+
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        Dim maxZ = inRangeSlider.value
+        Dim maxZ = inRangeSlider.value / 1000
+        Dim fontsize = If(ocvb.parms.resolution = resHigh, 1.0, 0.6)
         Select Case clickQuadrant(ocvb)
             Case 0
-                Dim topRects = New List(Of cv.Rect)(clipped.topView.pTrack.matchedRects)
-                Dim f = If(ocvb.parms.resolution = resHigh, 2, 1)
-                For Each r In topRects
-                    ocvb.trueText(New TTtext("test", r.X, r.Y / f))
+                Dim pixelPerMeter = clipped.topPixel.measure.pixelsPerMeter
+                Dim rects = New List(Of cv.Rect)(clipped.topView.pTrack.matchedRects)
+                For Each r In rects
+                    Dim dText = Format(maxZ * (src.Height - r.Y - r.Height) / src.Height, "#0.0") + "-" + Format(maxZ * (src.Height - r.Y) / src.Height, "#0.0") + "m & " +
+                                CStr(r.Width) + " pixels or " + Format(r.Width / pixelPerMeter, "0.0") + "m"
+                    cv.Cv2.PutText(dst2, dText, New cv.Point(r.X, r.Y), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 Next
             Case 1
-                Dim sideRects = New List(Of cv.Rect)(clipped.topView.pTrack.matchedRects)
-                For Each r In sideRects
-                    ocvb.trueText(New TTtext("test", r.X, r.Y - 20))
+                Dim pixelPerMeter = clipped.sidePixel.measure.pixelsPerMeter
+                Dim rects = New List(Of cv.Rect)(clipped.topView.pTrack.matchedRects)
+                For Each r In rects
+                    Dim dText = Format(maxZ * (src.Height - r.Y - r.Height) / src.Height, "#0.0") + "-" + Format(maxZ * (src.Height - r.Y) / src.Height, "#0.0") + "m & " +
+                                CStr(r.Width) + " pixels or " + Format(r.Width / pixelPerMeter, "0.0") + "m"
+                    cv.Cv2.PutText(dst2, "test", New cv.Point(r.X, r.Y), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 Next
             Case Else
 

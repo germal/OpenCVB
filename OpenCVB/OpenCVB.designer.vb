@@ -110,7 +110,7 @@ Partial Class OpenCVB
         '
         Me.AlgorithmDesc.AutoSize = True
         Me.AlgorithmDesc.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.AlgorithmDesc.Location = New System.Drawing.Point(891, 15)
+        Me.AlgorithmDesc.Location = New System.Drawing.Point(939, 16)
         Me.AlgorithmDesc.Name = "AlgorithmDesc"
         Me.AlgorithmDesc.Size = New System.Drawing.Size(119, 22)
         Me.AlgorithmDesc.TabIndex = 0
@@ -120,9 +120,9 @@ Partial Class OpenCVB
         '
         Me.OpenCVkeyword.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.OpenCVkeyword.FormattingEnabled = True
-        Me.OpenCVkeyword.Location = New System.Drawing.Point(557, 12)
+        Me.OpenCVkeyword.Location = New System.Drawing.Point(557, 10)
         Me.OpenCVkeyword.Name = "OpenCVkeyword"
-        Me.OpenCVkeyword.Size = New System.Drawing.Size(328, 28)
+        Me.OpenCVkeyword.Size = New System.Drawing.Size(363, 28)
         Me.OpenCVkeyword.TabIndex = 1
         '
         'AvailableAlgorithms

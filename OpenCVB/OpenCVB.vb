@@ -1190,25 +1190,17 @@ Public Class OpenCVB
 
                 picLabels(2) = OpenCVB.ocvb.label1
                 picLabels(3) = OpenCVB.ocvb.label2
+
                 ' share the results of the algorithm task.
                 SyncLock TTtextData
                     algorithmRefresh = True
                     imgResult = OpenCVB.ocvb.result.Clone()
                     TTtextData.Clear()
-                    Dim i = VB_Classes.ActiveClass.RESULT2
-                    If OpenCVB.ocvb.TTtextData(i).Count Then
-                        For j = 0 To OpenCVB.ocvb.TTtextData(i).Count - 1
-                            OpenCVB.ocvb.TTtextData(i)(j).x += OpenCVB.ocvb.color.Width
-                            OpenCVB.ocvb.TTtextData(2).Add(OpenCVB.ocvb.TTtextData(i)(j)) ' add any dst2 text to dst1 which is just double-wide
+                    If OpenCVB.ocvb.TTtextData.Count Then
+                        For i = 0 To OpenCVB.ocvb.TTtextData.Count - 1
+                            TTtextData.Add(OpenCVB.ocvb.TTtextData(i)) ' pull over any truetype text data so paint can access it.
                         Next
-                        OpenCVB.ocvb.TTtextData(i).Clear()
-                    End If
-                    i = VB_Classes.ActiveClass.RESULT1
-                    If OpenCVB.ocvb.TTtextData(i).Count Then
-                        For j = 0 To OpenCVB.ocvb.TTtextData(i).Count - 1
-                            TTtextData.Add(OpenCVB.ocvb.TTtextData(i)(j)) ' pull over any truetype text data so paint can access it.
-                        Next
-                        OpenCVB.ocvb.TTtextData(i).Clear()
+                        OpenCVB.ocvb.TTtextData.Clear()
                     End If
                 End SyncLock
                 If OptionsBringToFront And TestAllTimer.Enabled = False Then

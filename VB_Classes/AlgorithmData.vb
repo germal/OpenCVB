@@ -25,7 +25,7 @@ Public Class AlgorithmData
 
     Public PythonExe As String
     Public PythonFileName As String
-    Public TTtextData(4 - 1) As List(Of TTtext)
+    Public TTtextData As List(Of TTtext)
 
     Public algorithmIndex As Integer
 
@@ -34,11 +34,9 @@ Public Class AlgorithmData
         color = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         result = New cv.Mat(height, width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        For i = 0 To TTtextData.Count - 1
-            TTtextData(i) = New List(Of TTtext)
-        Next
+        TTtextData = New List(Of TTtext)
     End Sub
     Public Sub trueText(tt As TTtext)
-        TTtextData(tt.picTag).Add(tt)
+        TTtextData.Add(tt)
     End Sub
 End Class

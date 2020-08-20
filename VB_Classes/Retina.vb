@@ -60,8 +60,13 @@ Public Class Retina_Basics_CPP
         Dim handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim magnoPtr As IntPtr = 0
-        Marshal.Copy(src.Data, srcData, 0, srcData.Length)
-        magnoPtr = Retina_Basics_Run(Retina, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleMagno.AddrOfPinnedObject(), useLogSampling)
+        If ocvb.parms.testAllRunning = False Then
+            Marshal.Copy(src.Data, srcData, 0, srcData.Length)
+            magnoPtr = Retina_Basics_Run(Retina, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleMagno.AddrOfPinnedObject(), useLogSampling)
+        Else
+            ocvb.trueText(New TTtext("Retina_Basics_CPP runs fine but during 'Test All' it is not run because it can oversubscribe OpenCL memory.", 10, 60))
+            dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1, 0)
+        End If
         handleSrc.Free()
         handleMagno.Free()
 
