@@ -84,7 +84,7 @@ Public Class PointCloud_Colorize
         dst.Line(cameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Dim labelLocation = New cv.Point(dst.Width / 2 + labelShift * 3 / 4, dst.Height * 15 / 16)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " degrees" + " FOV=" + CStr(180 - startAngle * 2), labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(cameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst
@@ -114,8 +114,10 @@ Public Class PointCloud_Colorize
         dst.Ellipse(cameraPoint, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         dst.Line(cameraPoint, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        Dim labelLocation = New cv.Point(10, dst.Height * 3 / 4)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " degrees" + " FOV=" + CStr(180 - startAngle * 2), labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        Dim labelLocation = New cv.Point(10, cameraPoint.Y)
+        cv.Cv2.PutText(dst, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(cameraPoint.X - 50, cameraPoint.Y + 30), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(cameraPoint.X - 50, cameraPoint.Y - 30), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(cameraPoint, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst
@@ -123,7 +125,7 @@ Public Class PointCloud_Colorize
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        fontSize = 1.0
+        fontSize = 0.9
         If ocvb.parms.resolution = resMed Then fontSize = 0.6
         radius = If(ocvb.parms.resolution = resMed, 5, 12)
         shift = (src.Width - src.Height) / 2
@@ -919,7 +921,7 @@ Public Class PointCloud_BackProject
                 For Each r In rects
                     Dim dText = Format(maxZ * (src.Height - r.Y - r.Height) / src.Height, "#0.0") + "-" + Format(maxZ * (src.Height - r.Y) / src.Height, "#0.0") + "m & " +
                                 CStr(r.Width) + " pixels or " + Format(r.Width / pixelPerMeter, "0.0") + "m"
-                    cv.Cv2.PutText(dst2, dText, New cv.Point(r.X, r.Y), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    ocvb.trueText(New TTtext(dText, r.X + src.Width, r.Y))  ' Add src.width to r.x to make this appear in dst2...
                 Next
             Case 1
                 Dim pixelPerMeter = clipped.sidePixel.measure.pixelsPerMeter
@@ -927,7 +929,7 @@ Public Class PointCloud_BackProject
                 For Each r In rects
                     Dim dText = Format(maxZ * (src.Height - r.Y - r.Height) / src.Height, "#0.0") + "-" + Format(maxZ * (src.Height - r.Y) / src.Height, "#0.0") + "m & " +
                                 CStr(r.Width) + " pixels or " + Format(r.Width / pixelPerMeter, "0.0") + "m"
-                    cv.Cv2.PutText(dst2, "test", New cv.Point(r.X, r.Y), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    ocvb.trueText(New TTtext(dText, r.X + src.Width, src.Height - r.Y))
                 Next
             Case Else
 

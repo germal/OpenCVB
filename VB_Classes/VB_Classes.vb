@@ -11,8 +11,6 @@ Module Algorithm_Module
     Public midFormX As Integer
     Public PipeTaskIndex As Integer
     Public vtkTaskIndex As Integer
-    Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
-    Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
     Public colorCols As Integer
     Public colorRows As Integer
 
@@ -45,8 +43,6 @@ End Module
 
 Public Class ActiveClass : Implements IDisposable
     Public ocvb As AlgorithmData
-    Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
-    Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
 
     Dim algoList As New algorithmList
     Dim ActiveAlgorithm As Object

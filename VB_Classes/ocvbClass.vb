@@ -3,8 +3,6 @@ Imports System.Windows.Forms
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class TTtext
-    Public Const RESULT1 = 2
-    Public Const RESULT2 = 3
     Public text As String
 
     Public picTag = 2 ' campic(2) only.  Too much bookkeeping to put it in dst2...

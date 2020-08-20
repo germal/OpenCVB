@@ -311,14 +311,16 @@ Public Class OpenCVB
             Try
                 Dim xFactor = camPic(2).Width / imgResult.Width * If(mediumResolution, 1, 2)
                 Dim yFactor = camPic(2).Height / imgResult.Height * If(mediumResolution, 1, 2)
-                For i = 0 To TTtextData.Count - 1
-                    Dim tt = TTtextData(i)
-                    If tt IsNot Nothing Then
-                        g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White), tt.x * xFactor, tt.y * yFactor)
-                        maxline -= 1
-                        If maxline <= 0 Then Exit For
-                    End If
-                Next
+                If pic.Tag = 2 Then ' campic(2) is the width of the RGB and RGBdepth images combined.  
+                    For i = 0 To TTtextData.Count - 1
+                        Dim tt = TTtextData(i)
+                        If tt IsNot Nothing Then
+                            g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White), tt.x * xFactor, tt.y * yFactor)
+                            maxline -= 1
+                            If maxline <= 0 Then Exit For
+                        End If
+                    Next
+                End If
             Catch ex As Exception
                 Console.WriteLine("Error in ttextData update: " + ex.Message)
             End Try
