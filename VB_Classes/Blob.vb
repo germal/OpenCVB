@@ -27,6 +27,7 @@ Public Class Blob_Input
 
         Mats = New Mat_4to1(ocvb)
 
+        label1 = "Click any quadrant below to view it on the right"
         label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Test simple Blob Detector."
     End Sub

@@ -27,7 +27,7 @@ Partial Class OptionsDialog
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.RadioButton1 = New System.Windows.Forms.RadioButton()
         Me.AccurateProcessing = New System.Windows.Forms.RadioButton()
-        Me.lowResolution = New System.Windows.Forms.RadioButton()
+        Me.mediumResolution = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.AvoidDNNCrashes = New System.Windows.Forms.CheckBox()
         Me.ShowConsoleLog = New System.Windows.Forms.CheckBox()
@@ -81,7 +81,7 @@ Partial Class OptionsDialog
         '
         Me.GroupBox1.Controls.Add(Me.RadioButton1)
         Me.GroupBox1.Controls.Add(Me.AccurateProcessing)
-        Me.GroupBox1.Controls.Add(Me.lowResolution)
+        Me.GroupBox1.Controls.Add(Me.mediumResolution)
         Me.GroupBox1.Location = New System.Drawing.Point(21, 303)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(936, 128)
@@ -112,16 +112,16 @@ Partial Class OptionsDialog
         Me.AccurateProcessing.Text = "1280x720 - High resolution"
         Me.AccurateProcessing.UseVisualStyleBackColor = True
         '
-        'lowResolution
+        'mediumResolution
         '
-        Me.lowResolution.AutoSize = True
-        Me.lowResolution.Location = New System.Drawing.Point(18, 55)
-        Me.lowResolution.Name = "lowResolution"
-        Me.lowResolution.Size = New System.Drawing.Size(237, 24)
-        Me.lowResolution.TabIndex = 0
-        Me.lowResolution.TabStop = True
-        Me.lowResolution.Text = "640x360 - Medium resolution"
-        Me.lowResolution.UseVisualStyleBackColor = True
+        Me.mediumResolution.AutoSize = True
+        Me.mediumResolution.Location = New System.Drawing.Point(18, 55)
+        Me.mediumResolution.Name = "mediumResolution"
+        Me.mediumResolution.Size = New System.Drawing.Size(237, 24)
+        Me.mediumResolution.TabIndex = 0
+        Me.mediumResolution.TabStop = True
+        Me.mediumResolution.Text = "640x360 - Medium resolution"
+        Me.mediumResolution.UseVisualStyleBackColor = True
         '
         'GroupBox2
         '
@@ -346,7 +346,7 @@ Partial Class OptionsDialog
     Friend WithEvents SnapToGrid As CheckBox
     Friend WithEvents GroupBox1 As GroupBox
     Friend WithEvents AccurateProcessing As RadioButton
-    Friend WithEvents lowResolution As RadioButton
+    Friend WithEvents mediumResolution As RadioButton
     Friend WithEvents GroupBox2 As GroupBox
     Friend WithEvents ShowLabels As CheckBox
     Friend WithEvents GroupBox4 As GroupBox

@@ -49,14 +49,16 @@ Public Class ocvbClass : Implements IDisposable
     Public Function clickQuadrant(ocvb As AlgorithmData, Optional quadrant As Integer = 0) As Integer
         Static quadrantIndex As Integer = quadrant
         If ocvb.mouseClickFlag Then
-            Dim pt = ocvb.mouseClickPoint * If(ocvb.parms.resolution = resHigh, 2, 1)
-            If pt.Y < src.Height / 2 Then
-                If pt.X < src.Width / 2 Then quadrantIndex = 0 Else quadrantIndex = 1
-            Else
-                If pt.X < src.Width / 2 Then quadrantIndex = 2 Else quadrantIndex = 3
+            Dim pt = ocvb.mouseClickPoint
+            If ocvb.mouseClickPoint.X <= src.Width Then ' all mat_4to1 displays must be in the lower left image.
+                If pt.Y < src.Height / 2 Then
+                    If pt.X < src.Width / 2 Then quadrantIndex = 0 Else quadrantIndex = 1
+                Else
+                    If pt.X < src.Width / 2 Then quadrantIndex = 2 Else quadrantIndex = 3
+                End If
             End If
         End If
-        Return quadrantIndex
+            Return quadrantIndex
     End Function
     Public Function findCheckBox(opt As String) As CheckBox
         While 1

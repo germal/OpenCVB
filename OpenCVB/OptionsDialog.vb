@@ -20,7 +20,7 @@ Public Class OptionsDialog
     Public cameraTotalCount As Integer = 0
     Dim numPyEnabled As Boolean = False
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
-        SaveSetting("OpenCVB", "FastAccurate", "FastAccurate", lowResolution.Checked)
+        SaveSetting("OpenCVB", "FastAccurate", "FastAccurate", mediumResolution.Checked)
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", cameraIndex)
 
         SaveSetting("OpenCVB", "ShowLabels", "ShowLabels", ShowLabels.Checked)
@@ -72,7 +72,7 @@ Public Class OptionsDialog
         Next
 
         If GetSetting("OpenCVB", "FastAccurate", "FastAccurate", True) Then
-            lowResolution.Checked = True
+            mediumResolution.Checked = True
         Else
             AccurateProcessing.Checked = True
         End If
