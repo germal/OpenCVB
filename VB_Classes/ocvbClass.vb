@@ -42,7 +42,7 @@ Public Class ocvbClass : Implements IDisposable
         Else
             standalone = False
         End If
-        caller += Me.GetType.Name
+        caller = Me.GetType.Name
     End Sub
     Public Function clickQuadrant(ocvb As AlgorithmData, Optional quadrant As Integer = 0) As Integer
         Static quadrantIndex As Integer = quadrant

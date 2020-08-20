@@ -8,10 +8,10 @@ Public Class Kalman_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Turn Kalman filtering on" + If(ocvb.caller = "", "", " in " + ocvb.caller)
+        check.Box(0).Text = "Turn Kalman filtering on"
         check.Box(0).Checked = True
 
-        ocvb.desc = "Use Kalman to stabilize a set of value (such as a cv.rect.)"
+        ocvb.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
         input = New Single() {0, 0, 0, 0}
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

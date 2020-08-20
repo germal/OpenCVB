@@ -114,10 +114,10 @@ Public Class PointCloud_Colorize
         dst.Ellipse(cameraPoint, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         dst.Line(cameraPoint, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        Dim labelLocation = New cv.Point(10, cameraPoint.Y)
+        Dim labelLocation = New cv.Point(100, cameraPoint.Y)
         cv.Cv2.PutText(dst, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(cameraPoint.X - 50, cameraPoint.Y + 30), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(cameraPoint.X - 50, cameraPoint.Y - 30), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(cameraPoint.X - 80, cameraPoint.Y + 50), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(cameraPoint.X - 80, cameraPoint.Y - 50), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(cameraPoint, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst

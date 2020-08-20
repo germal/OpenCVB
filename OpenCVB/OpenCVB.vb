@@ -61,7 +61,7 @@ Public Class OpenCVB
     Dim OptionsBringToFront As Boolean
     Dim optionsForm As OptionsDialog
     Dim openForm As OpenFilename
-    Dim picLabels() = {"RGB", "Depth", "Result1", "Result2"}
+    Dim picLabels() = {"RGB", "Depth", "", ""}
     Dim regWidth As Int32 = 1280, regHeight As Int32 = 720
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Dim fastSize As cv.Size
