@@ -714,7 +714,7 @@ Public Class Kalman_PointTracker
                 kalmanAging(i) -= 1
             End If
 
-            If matched And kalman(i).output IsNot Nothing Then
+            If matched And kalman(i).output IsNot Nothing And lastMask(i) IsNot Nothing Then
                 Dim pt3 = New cv.Point(kalman(i).output(0), kalman(i).output(1))
                 If rect.Width = lastMask(i).Cols And rect.Height = lastMask(i).Rows Then dst1(rect).SetTo(scalarColors(i), lastMask(i))
                 cv.Cv2.Circle(dst1, pt3, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
