@@ -208,6 +208,7 @@ drawKeypoints
 drawMarker
 drawMatches
 drawMatchesKnn
+drawRect
 edgePreservingFilter
 eigen
 eigenNonSymmetric
@@ -386,6 +387,7 @@ ml_SVMSGD
 ml_TrainData
 moments
 morphologyEx
+mousePoint
 moveWindow
 MSER
 MSER_create

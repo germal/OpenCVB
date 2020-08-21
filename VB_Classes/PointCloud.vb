@@ -52,7 +52,7 @@ Public Class PointCloud_Colorize
     Dim fontSize As Single
     Dim radius As Integer
     Dim arcSize As Integer = 100
-    Public hFOVangles() As Single = {45, 0, 40, 51, 55, 55, 47}  ' T265 has no point cloud so there is a 0 where it would have been.
+    Public hFOVangles() As Single = {90, 0, 100, 78, 70, 70, 86}  ' T265 has no point cloud so there is a 0 where it would have been.
     Public vFOVangles() As Single = {60, 0, 55, 65, 69, 67, 60}  ' T265 has no point cloud so there is a 0 where it would have been.
     Public cameraPoint As cv.Point
     Public startangle As Integer
@@ -72,7 +72,7 @@ Public Class PointCloud_Colorize
         Next
 
         ' draw the arc showing the camera FOV
-        Dim startAngle = If(standalone, sliders.trackbar(0).Value, hFOVangles(ocvb.parms.cameraIndex))
+        Dim startAngle = If(standalone, sliders.trackbar(0).Value, 90 - hFOVangles(ocvb.parms.cameraIndex) / 2)
         Dim x = dst.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
         Dim xloc = cameraPoint.X + x
 
@@ -83,8 +83,10 @@ Public Class PointCloud_Colorize
         dst.Ellipse(cameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         dst.Line(cameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        Dim labelLocation = New cv.Point(dst.Width / 2 + labelShift * 3 / 4, dst.Height * 15 / 16)
+        Dim labelLocation = New cv.Point(dst.Width / 2 + labelShift, dst.Height * 15 / 16)
         cv.Cv2.PutText(dst, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(cameraPoint.X - 100, cameraPoint.Y - 5), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(cameraPoint.X + 60, cameraPoint.Y - 5), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(cameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst
@@ -140,7 +142,7 @@ Public Class PointCloud_Colorize
 
         If standalone Then
             sliders.Setup(ocvb, caller)
-            sliders.setupTrackBar(0, "Top View angle for FOV", 0, 180, hFOVangles(ocvb.parms.cameraIndex))
+            sliders.setupTrackBar(0, "Top View angle for FOV", 0, 180, 90 - hFOVangles(ocvb.parms.cameraIndex) / 2)
             sliders.setupTrackBar(1, "Side View angle for FOV", 0, 180, vFOVangles(ocvb.parms.cameraIndex))
         End If
 
@@ -655,11 +657,16 @@ Public Class PointCloud_Measured_TopView
 
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
-    Public Function computePixelLength(ocvb As AlgorithmData, pixelDistance As Single) As Single
-        Dim FOV = 90 - cMats.hFOVangles(ocvb.parms.cameraIndex)
-        Dim cameraDistance = pixelDistance / src.Height / maxZ
+    Public Function computeHPixelLength(ocvb As AlgorithmData, pixelDistance As Single) As Integer
+        Dim FOV = cMats.hFOVangles(ocvb.parms.cameraIndex)
+        Dim lineLen = CInt(Math.Tan((90 - FOV / 2) * 0.0174533) * pixelDistance)
+        pixelsPerMeter = lineLen / maxZ
+        Return lineLen
+    End Function
+    Public Function computeVPixelLength(ocvb As AlgorithmData, pixelDistance As Single) As Integer
+        Dim FOV = 90 - cMats.vFOVangles(ocvb.parms.cameraIndex)
         Dim lineLen = CInt(Math.Tan(FOV * 0.0174533) * pixelDistance)
-        pixelsPerMeter = src.Height / maxZ
+        pixelsPerMeter = lineLen / maxZ
         Return lineLen
     End Function
     Public Sub Run(ocvb As AlgorithmData)
@@ -678,8 +685,8 @@ Public Class PointCloud_Measured_TopView
         pTrack.Run(ocvb)
 
         dst1 = cMats.CameraLocationBot(ocvb, pTrack.dst1, maxZ)
-        computePixelLength(ocvb, src.Height)
-        label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(maxZ, "0.0") + " meters"
+        computeHPixelLength(ocvb, src.Height)
+        label1 = Format(pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -733,88 +740,6 @@ Public Class PointCloud_Measured_SideView
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class PointCloud_PixelFormula_TopView
-    Inherits ocvbClass
-    Public measure As PointCloud_Measured_TopView
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-
-        measure = New PointCloud_Measured_TopView(ocvb)
-
-        sliders.Setup(ocvb, caller, 1)
-        sliders.setupTrackBar(0, "Distance from camera in mm", 0, 4000, 100)
-        ocvb.desc = "Validate the formula for pixel width as a function of distance"
-    End Sub
-    Public Function moveLine(cameraLoc As Integer, mouse As Integer, maxLoc As Integer, maxZ As Single) As Integer
-        Static lastSlider = sliders.trackbar(0).Value
-        Static pixelDistance = lastSlider
-        If lastSlider <> sliders.trackbar(0).Value Then
-            lastSlider = sliders.trackbar(0).Value
-            pixelDistance = src.Height * sliders.trackbar(0).Value / maxZ / 1000
-        Else
-            Static lastMouse = mouse
-            If lastMouse <> mouse Then
-                If mouse > cameraLoc And mouse < cameraLoc + maxLoc Then pixelDistance = mouse - cameraLoc
-                If mouse >= 0 And mouse < -maxLoc Then pixelDistance = cameraLoc - mouse
-                lastMouse = mouse
-            End If
-        End If
-        Return pixelDistance
-    End Function
-    Public Sub Run(ocvb As AlgorithmData)
-        measure.Run(ocvb)
-        sliders.trackbar(0).Maximum = measure.maxZ * 1000
-        dst1 = measure.cMats.CameraLocationBot(ocvb, measure.dst1, measure.maxZ)
-        Dim cameraPoint = New cv.Point(src.Height, src.Height)
-        Dim pixelDistance = moveLine(cameraPoint.Y, ocvb.mousePoint.Y, -src.Height, measure.maxZ)
-
-        Dim lineLen = measure.computePixelLength(ocvb, pixelDistance)
-        Dim pt1 = New cv.Point(cameraPoint.X - lineLen, CInt(src.Height - pixelDistance))
-        Dim pt2 = New cv.Point(cameraPoint.X + lineLen, CInt(src.Height - pixelDistance))
-        dst1.Line(pt1, pt2, cv.Scalar.Red, 2)
-        label1 = Format(measure.pixelsPerMeter, "0") + " pixels per meter at " + Format(measure.maxZ * pixelDistance / src.Height, "0.0") + " meters"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class PointCloud_PixelFormula_SideView
-    Inherits ocvbClass
-    Public measure As PointCloud_Measured_SideView
-    Public top As PointCloud_PixelFormula_TopView
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-
-        measure = New PointCloud_Measured_SideView(ocvb)
-        top = New PointCloud_PixelFormula_TopView(ocvb)
-
-        ocvb.desc = "Validate the formula for pixel height as a function of distance"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        measure.Run(ocvb)
-        top.sliders.trackbar(0).Maximum = measure.maxZ * 1000
-        dst1 = measure.cMats.CameraLocationSide(ocvb, measure.dst1, measure.maxZ)
-        Dim cameraPoint = measure.cMats.cameraPoint
-        Dim pixeldistance = top.moveLine(cameraPoint.X, ocvb.mousePoint.X, src.Height, measure.maxZ)
-        Dim linelen = measure.computePixelLength(ocvb, pixeldistance)
-        Dim pt1 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y - linelen))
-        Dim pt2 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y + linelen))
-        dst1.Line(pt1, pt2, cv.Scalar.Red, 3)
-        label1 = Format(measure.pixelsPerMeter, "0") + " pixels per meter at " + Format(measure.maxZ * pixeldistance / src.Height, "0.0") + " meters"
-    End Sub
-End Class
 
 
 
@@ -899,6 +824,19 @@ Public Class PointCloud_BackProject
         label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Backproject the selected object"
     End Sub
+    Private Function setDetails(detailPoint As cv.Point, centroids As List(Of cv.Point2f)) As Integer
+        Dim minIndex As Integer
+        Dim minDistance As Single = Single.MaxValue
+        For i = 0 To centroids.Count - 1
+            Dim pt = centroids(i)
+            Dim distance = Math.Sqrt((detailPoint.X - pt.X) * (detailPoint.X - pt.X) + (detailPoint.Y - pt.Y) * (detailPoint.Y - pt.Y))
+            If distance < minDistance Then
+                minIndex = i
+                minDistance = distance
+            End If
+        Next
+        Return minIndex
+    End Function
     Public Sub Run(ocvb As AlgorithmData)
         clipped.Run(ocvb)
         mats.mat(0) = clipped.dst1
@@ -907,33 +845,172 @@ Public Class PointCloud_BackProject
         dst1 = mats.dst1
         dst2 = mats.mat(clickQuadrant(ocvb))
 
-        If ocvb.mouseClickFlag Then
-            Console.WriteLine("test " + CStr(ocvb.mouseClickPoint.X))
+        Static showDetails As Boolean
+        Static detailPoint As cv.Point
+        If ocvb.mouseClickFlag And ocvb.mouseClickPoint.X > src.Width Then
+            showDetails = True
+            ' we are using dst2 for the display and mouse click will have coordinates of the wide result2
+            detailPoint = New cv.Point(ocvb.mouseClickPoint.X - src.Width, ocvb.mouseClickPoint.Y)
         End If
+        ocvb.trueText(New TTtext("Click any centroid to get details", New cv.Point(src.Width + 10, src.Height - 50)))
 
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         Dim maxZ = inRangeSlider.value / 1000
         Dim fontsize = If(ocvb.parms.resolution = resHigh, 1.0, 0.6)
+        Dim dText As String = ""
+        Dim textPoint As cv.Point
         Select Case clickQuadrant(ocvb)
             Case 0
                 Dim pixelPerMeter = clipped.topPixel.measure.pixelsPerMeter
                 Dim rects = New List(Of cv.Rect)(clipped.topView.pTrack.matchedRects)
-                For Each r In rects
-                    Dim dText = Format(maxZ * (src.Height - r.Y - r.Height) / src.Height, "#0.0") + "-" + Format(maxZ * (src.Height - r.Y) / src.Height, "#0.0") + "m & " +
-                                CStr(r.Width) + " pixels or " + Format(r.Width / pixelPerMeter, "0.0") + "m"
-                    ocvb.trueText(New TTtext(dText, r.X + src.Width, r.Y))  ' Add src.width to r.x to make this appear in dst2...
-                Next
+                If rects.Count > 0 And showDetails Then
+                    Dim minIndex = setDetails(detailPoint, clipped.topView.pTrack.matchedPoints)
+                    Dim r = rects(minIndex)
+                    dText = Format(maxZ * (src.Height - r.Y - r.Height) / src.Height, "#0.0") + "-" + Format(maxZ * (src.Height - r.Y) / src.Height, "#0.0") + "m & " +
+                            CStr(r.Width) + " pixels or " + Format(r.Width / pixelPerMeter, "0.0") + "m"
+                    textPoint = New cv.Point(r.X + src.Width, r.Y) ' Add src.width to r.x to make this appear in dst2...
+                End If
             Case 1
                 Dim pixelPerMeter = clipped.sidePixel.measure.pixelsPerMeter
-                Dim rects = New List(Of cv.Rect)(clipped.topView.pTrack.matchedRects)
-                For Each r In rects
-                    Dim dText = Format(maxZ * (src.Height - r.Y - r.Height) / src.Height, "#0.0") + "-" + Format(maxZ * (src.Height - r.Y) / src.Height, "#0.0") + "m & " +
-                                CStr(r.Width) + " pixels or " + Format(r.Width / pixelPerMeter, "0.0") + "m"
-                    ocvb.trueText(New TTtext(dText, r.X + src.Width, src.Height - r.Y))
-                Next
+                Dim rects = New List(Of cv.Rect)(clipped.sideView.pTrack.matchedRects)
+                If rects.Count > 0 And showDetails Then
+                    Dim minIndex = setDetails(detailPoint, clipped.sideView.pTrack.matchedPoints)
+                    Dim r = rects(minIndex)
+                    dText = Format(maxZ * (src.Height - r.Y - r.Height) / src.Height, "#0.0") + "-" + Format(maxZ * (src.Height - r.Y) / src.Height, "#0.0") + "m & " +
+                            CStr(r.Width) + " pixels or " + Format(r.Width / pixelPerMeter, "0.0") + "m"
+                    textPoint = New cv.Point(r.X + src.Width, r.Y) ' Add src.width to r.x to make this appear in dst2...
+                End If
             Case Else
-
         End Select
+        ocvb.trueText(New TTtext(dText, textPoint))
+    End Sub
+End Class
 
+
+
+
+
+
+Public Class PointCloud_BackProject_TopView
+    Inherits ocvbClass
+    Dim clipped As PointCloud_PixelClipped_BothViews
+    Dim inrange As Depth_InRange
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        clipped = New PointCloud_PixelClipped_BothViews(ocvb)
+        inrange = New Depth_InRange(ocvb)
+        ocvb.desc = "BackProject the top view into the front looking view"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        Dim maxZ = inRangeSlider.value / 1000
+
+        clipped.Run(ocvb)
+        dst1 = clipped.dst1
+        dst2.SetTo(0)
+        Dim depth32f = getDepth32f(ocvb)
+        Dim mask As New cv.Mat
+        For i = 0 To clipped.topView.pTrack.matchedRects.Count - 1
+            Dim r = clipped.topView.pTrack.matchedRects(i)
+            Dim mindepth = 1000 * maxZ * (src.Height - r.Y - r.Height) / src.Height
+            Dim maxDepth = 1000 * maxZ * (src.Height - r.Y) / src.Height
+            Dim topRect = New cv.Rect(r.X, 0, r.Width, src.Height)
+            If topRect.X + topRect.Width >= src.Width Then topRect.Width = src.Width - topRect.X
+            If topRect.Width > 0 Then
+                cv.Cv2.InRange(depth32f(topRect), cv.Scalar.All(mindepth), cv.Scalar.All(maxDepth), mask)
+                dst2(topRect).SetTo(clipped.topView.pTrack.matchedColors(i), mask)
+            End If
+        Next
+
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_PixelFormula_TopView
+    Inherits ocvbClass
+    Public measure As PointCloud_Measured_TopView
+    Public matchedPixelWidth As New List(Of Integer) ' matches the ptrack.matchedxxx data.
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        measure = New PointCloud_Measured_TopView(ocvb)
+
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Distance from camera in mm", 0, 4000, 1500)
+        ocvb.desc = "Validate the formula for pixel width as a function of distance"
+    End Sub
+
+    Public Sub Run(ocvb As AlgorithmData)
+        measure.Run(ocvb)
+        sliders.trackbar(0).Maximum = measure.maxZ * 1000
+        Dim pixeldistance = src.Height * sliders.trackbar(0).Value / 1000 / measure.maxZ
+        dst1 = measure.cMats.CameraLocationBot(ocvb, measure.dst1, measure.maxZ)
+        Dim cameraPoint = New cv.Point(src.Height, src.Height)
+        Dim lineLen = measure.computeHPixelLength(ocvb, pixeldistance)
+        Dim xpt1 = New cv.Point(cameraPoint.X - lineLen, src.Height - pixeldistance)
+        Dim xpt2 = New cv.Point(cameraPoint.X + lineLen, src.Height - pixeldistance)
+
+        matchedPixelWidth.Clear()
+        For i = 0 To measure.pTrack.matchedRects.Count - 1
+            Dim r = measure.pTrack.matchedRects(i)
+            Dim fullLength = measure.computeHPixelLength(ocvb, src.Height - (r.Y + r.Height))
+            Dim pt1 = New cv.Point(cameraPoint.X - fullLength, r.Y + r.Height)
+            Dim pt2 = New cv.Point(cameraPoint.X + fullLength, r.Y + r.Height)
+            Dim leftX = Math.Max(pt1.X, r.X)
+            Dim rightX = Math.Min(pt2.X, r.X + r.Width)
+            dst1.Line(New cv.Point(leftX, pt1.Y), New cv.Point(rightX, pt1.Y), cv.Scalar.Yellow, 3)
+            If Math.Abs(rightX - leftX) < fullLength Then
+                ' need to add a small amount based on the angle of the camera.
+                ' additional pixels = r.height * tan(angle to camera of back corner) - first find which corner is nearest the centerline.
+                Dim c1 = Math.Abs(cameraPoint.X - r.X)
+                Dim c2 = Math.Abs(cameraPoint.X - r.X - r.Width)
+                Dim cp1 = New cv.Point(r.X, r.Y)
+                If c2 < c1 Then cp1 = New cv.Point(r.X + r.Width, r.Y)
+                Dim addLen = r.Height * Math.Abs(cp1.X - cameraPoint.X) / (src.Height - cp1.Y) * If(cp1.X < cameraPoint.X, 1, -1)
+                dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(cp1.X + addLen, r.Y + r.Height), cv.Scalar.Yellow, 3)
+                dst1.Line(cameraPoint, cp1, cv.Scalar.Red, 1)
+                matchedPixelWidth.Add(src.Width * (addLen + Math.Abs(rightX - leftX)) / pixeldistance)
+            End If
+        Next
+        label1 = Format(measure.pixelsPerMeter, "0") + " pixels per meter with maxZ = " + Format(measure.maxZ, "0.0") + " meters"
+        dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PointCloud_PixelFormula_SideView
+    Inherits ocvbClass
+    Public measure As PointCloud_Measured_SideView
+    Public top As PointCloud_PixelFormula_TopView
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        measure = New PointCloud_Measured_SideView(ocvb)
+        top = New PointCloud_PixelFormula_TopView(ocvb)
+
+        ocvb.desc = "Validate the formula for pixel height as a function of distance"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        measure.Run(ocvb)
+        top.sliders.trackbar(0).Maximum = measure.maxZ * 1000
+        Dim pixeldistance = src.Height * top.sliders.trackbar(0).Value / measure.maxZ / 1000
+        dst1 = measure.cMats.CameraLocationSide(ocvb, measure.dst1, measure.maxZ)
+        Dim cameraPoint = measure.cMats.cameraPoint
+        Dim linelen = measure.computePixelLength(ocvb, pixeldistance)
+        Dim pt1 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y - linelen))
+        Dim pt2 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y + linelen))
+        dst1.Line(pt1, pt2, cv.Scalar.Red, 3)
+        label1 = Format(measure.pixelsPerMeter, "0") + " pixels per meter at " + Format(measure.maxZ * pixeldistance / src.Height, "0.0") + " meters"
     End Sub
 End Class

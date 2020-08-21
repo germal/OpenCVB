@@ -605,6 +605,7 @@ Public Class Kalman_PointTracker
     Public matchedMasks As New List(Of cv.Mat)
     Public matchedRects As New List(Of cv.Rect)
     Public matchedPoints As New List(Of cv.Point2f)
+    Public matchedColors As New List(Of cv.Scalar)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         If standalone Then topView = New PointCloud_Measured_TopView(ocvb)
@@ -720,10 +721,13 @@ Public Class Kalman_PointTracker
                 rect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
 
                 Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
-                If drawRectangleCheck?.checked Then dst1.Rectangle(rect, scalarColors(i), 1)
-                matchedRects.Add(rect)
-                matchedMasks.Add(lastMask(i))
-                matchedPoints.Add(pt3)
+                If drawRectangleCheck?.checked Then dst1.Rectangle(rect, scalarColors(i), 2)
+                If rect.Width > 0 Then
+                    matchedRects.Add(rect)
+                    matchedMasks.Add(lastMask(i))
+                    matchedPoints.Add(pt3)
+                    matchedColors.Add(scalarColors(i))
+                End If
             End If
         Next
 

@@ -1145,9 +1145,9 @@ Public Class OpenCVB
             OpenCVB.UpdateHostLocation(New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
 
             Try
+                Dim ratio = camPic(0).Width / OpenCVB.ocvb.color.Width ' relative size of displayed image and algorithm size image.
                 If GrabRectangleData Then
                     GrabRectangleData = False
-                    Dim ratio = camPic(0).Width / OpenCVB.ocvb.color.Width ' relative size of displayed image and algorithm size image.
                     OpenCVB.ocvb.drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
                     If OpenCVB.ocvb.drawRect.Width <= 2 Then OpenCVB.ocvb.drawRect.Width = 0 ' too small?
                     Dim w = OpenCVB.ocvb.color.Width
@@ -1158,10 +1158,10 @@ Public Class OpenCVB
                     BothFirstAndLastReady = False
                 End If
 
-                OpenCVB.ocvb.mousePoint = mousePoint
+                OpenCVB.ocvb.mousePoint = mousePoint * (1 / ratio)
                 OpenCVB.ocvb.mousePicTag = mousePicTag
                 OpenCVB.ocvb.mouseClickFlag = mouseClickFlag
-                OpenCVB.ocvb.mouseClickPoint = mouseClickPoint
+                OpenCVB.ocvb.mouseClickPoint = mouseClickPoint * (1 / ratio)
                 mouseClickFlag = False
 
                 OpenCVB.ocvb.parms.fileStarted = openFileStarted ' UI may have stopped play.

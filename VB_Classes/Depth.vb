@@ -1156,72 +1156,69 @@ End Class
 
 
 
-Public Class Depth_SmoothingMat
-    Inherits ocvbClass
-    Public trim As Depth_InRange
-    Public inputInMeters As Boolean
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        trim = New Depth_InRange(ocvb)
+'Public Class Depth_SmoothingMat
+'    Inherits ocvbClass
+'    Public trim As Depth_InRange
+'    Public Sub New(ocvb As AlgorithmData)
+'        setCaller(ocvb)
+'        trim = New Depth_InRange(ocvb)
 
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Threshold in millimeters", 1, 1000, 100)
-        label2 = "Depth pixels after smoothing"
-        ocvb.desc = "Use depth rate of change to smooth the depth values beyond close range"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        If standalone Then src = getDepth32f(ocvb)
-        trim.inputInMeters = inputInMeters
-        Dim rect = If(ocvb.drawRect.Width <> 0, ocvb.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
-        trim.src = getDepth32f(ocvb)
-        trim.src = trim.src(rect)
-        trim.Run(ocvb)
-        Static lastDepth = trim.dst2 ' the far depth needs to be smoothed
-        If lastDepth.Size <> trim.dst2.Size Then lastDepth = trim.dst2
+'        sliders.Setup(ocvb, caller)
+'        sliders.setupTrackBar(0, "Threshold in millimeters", 1, 1000, 100)
+'        label2 = "Depth pixels after smoothing"
+'        ocvb.desc = "Use depth rate of change to smooth the depth values beyond close range"
+'    End Sub
+'    Public Sub Run(ocvb As AlgorithmData)
+'        If standalone Then src = getDepth32f(ocvb)
+'        Dim rect = If(ocvb.drawRect.Width <> 0, ocvb.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
+'        trim.src = getDepth32f(ocvb)
+'        trim.src = trim.src(rect)
+'        trim.Run(ocvb)
+'        Static lastDepth = trim.dst2 ' the far depth needs to be smoothed
+'        If lastDepth.Size <> trim.dst2.Size Then lastDepth = trim.dst2
 
-        dst1 = New cv.Mat
-        cv.Cv2.Subtract(lastDepth, trim.dst2, dst1)
+'        dst1 = New cv.Mat
+'        cv.Cv2.Subtract(lastDepth, trim.dst2, dst1)
 
-        Dim mmThreshold = CSng(sliders.trackbar(0).Value)
-        If inputInMeters Then mmThreshold /= 1000
-        dst1 = dst1.Threshold(mmThreshold, 0, cv.ThresholdTypes.TozeroInv)
-        dst1 = dst1.Threshold(-mmThreshold, 0, cv.ThresholdTypes.Tozero)
-        cv.Cv2.Add(trim.dst2, dst1, dst2)
-        lastDepth = trim.dst2
-        label1 = "Smoothing Mat: range from -" + CStr(sliders.trackbar(0).Value) + " to +" + CStr(sliders.trackbar(0).Value)
-    End Sub
-End Class
+'        Dim mmThreshold = CSng(sliders.trackbar(0).Value)
+'        dst1 = dst1.Threshold(mmThreshold, 0, cv.ThresholdTypes.TozeroInv)
+'        dst1 = dst1.Threshold(-mmThreshold, 0, cv.ThresholdTypes.Tozero)
+'        cv.Cv2.Add(trim.dst2, dst1, dst2)
+'        lastDepth = trim.dst2
+'        label1 = "Smoothing Mat: range from -" + CStr(sliders.trackbar(0).Value) + " to +" + CStr(sliders.trackbar(0).Value)
+'    End Sub
+'End Class
 
 
 
 
 
-Public Class Depth_Smoothing
-    Inherits ocvbClass
-    Dim smooth As Depth_SmoothingMat
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
+'Public Class Depth_Smoothing
+'    Inherits ocvbClass
+'    Dim smooth As Depth_SmoothingMat
+'    Public Sub New(ocvb As AlgorithmData)
+'        setCaller(ocvb)
 
-        smooth = New Depth_SmoothingMat(ocvb)
-        check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Smooth the dst2 output "
-        check.Box(0).Checked = True
+'        smooth = New Depth_SmoothingMat(ocvb)
+'        check.Setup(ocvb, caller, 1)
+'        check.Box(0).Text = "Smooth the dst2 output "
+'        check.Box(0).Checked = True
 
-        ocvb.desc = "This attempt to get the depth data to 'calm' down (for the D435i) is not working well enough to be useful - needs more work"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        smooth.src = getDepth32f(ocvb)
-        smooth.Run(ocvb)
-        dst1 = smooth.dst1
-        If check.Box(0).Checked Then
-            cv.Cv2.Add(smooth.dst2, dst1, dst2)
-            label2 = "Depth with smoothing applied"
-        Else
-            dst2 = smooth.dst2
-            label2 = "Depth without smoothing "
-        End If
-    End Sub
-End Class
+'        ocvb.desc = "This attempt to get the depth data to 'calm' down (for the D435i) is not working well enough to be useful - needs more work"
+'    End Sub
+'    Public Sub Run(ocvb As AlgorithmData)
+'        smooth.src = getDepth32f(ocvb)
+'        smooth.Run(ocvb)
+'        dst1 = smooth.dst1
+'        If check.Box(0).Checked Then
+'            cv.Cv2.Add(smooth.dst2, dst1, dst2)
+'            label2 = "Depth with smoothing applied"
+'        Else
+'            dst2 = smooth.dst2
+'            label2 = "Depth without smoothing "
+'        End If
+'    End Sub
+'End Class
 
 
 
@@ -1235,7 +1232,6 @@ Public Class Depth_InRange
     Public depth32f As New cv.Mat
     Public minDepth As Double
     Public maxDepth As Double
-    Public inputInMeters As Boolean
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
@@ -1247,19 +1243,17 @@ Public Class Depth_InRange
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If sliders.trackbar(0).Value >= sliders.trackbar(1).Value Then sliders.trackbar(1).Value = sliders.trackbar(0).Value + 1
-        minDepth = cv.Scalar.All(sliders.trackbar(0).Value)
-        maxDepth = cv.Scalar.All(sliders.trackbar(1).Value)
-        If inputInMeters Then
-            minDepth /= 1000
-            maxDepth /= 1000
-        End If
+        minDepth = sliders.trackbar(0).Value
+        maxDepth = sliders.trackbar(1).Value
         If src.Type = cv.MatType.CV_32F Then depth32f = src Else depth32f = getDepth32f(ocvb)
-        cv.Cv2.InRange(depth32f, minDepth, maxDepth, Mask)
+        cv.Cv2.InRange(depth32f, cv.Scalar.All(minDepth), cv.Scalar.All(maxDepth), Mask)
         cv.Cv2.BitwiseNot(Mask, zeroMask)
         dst1 = depth32f.Clone.SetTo(0, zeroMask)
-        dst2 = depth32f.Clone.SetTo(0, Mask)
-        depth32f.SetTo(0, zeroMask)
-        dst2 = dst2.Threshold(8000, 8000, cv.ThresholdTypes.Trunc) ' the data beyond 8 meters is suspect and will distort the image output
+        If standalone Then
+            dst2 = depth32f.Clone.SetTo(0, Mask)
+            depth32f.SetTo(0, zeroMask)
+            dst2 = dst2.Threshold(8000, 8000, cv.ThresholdTypes.Trunc)
+        End If
     End Sub
 End Class
 

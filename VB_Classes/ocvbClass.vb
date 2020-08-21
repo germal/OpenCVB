@@ -13,6 +13,11 @@ Public Class TTtext
         x = _x
         y = _y
     End Sub
+    Public Sub New(_text As String, pt As cv.Point)
+        text = _text
+        x = pt.X
+        y = pt.Y 
+    End Sub
 End Class
 Public Class ocvbClass : Implements IDisposable
     Public check As New OptionsCheckbox
