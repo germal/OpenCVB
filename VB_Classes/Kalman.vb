@@ -723,7 +723,7 @@ Public Class Kalman_PointTracker
                 rect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
 
                 Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
-                If drawRectangleCheck?.checked Then dst1.Rectangle(rect, scalarColors(i), 2)
+                If drawRectangleCheck?.checked Then dst1.Rectangle(rect, cv.Scalar.White, 1)
                 If rect.Width > 0 Then
                     Dim vo = New viewObject
                     vo.centroid = pt3

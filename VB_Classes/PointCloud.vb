@@ -773,13 +773,16 @@ Public Class PointCloud_PixelFormula_TopView
         For i = 0 To measure.pTrack.viewObjects.Count - 1
             Dim r = measure.pTrack.viewObjects.Values(i).rect
             lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (src.Height - (r.Y + r.Height)))
+            If lineHalf = 0 Then Continue For
+            pixeldistance = src.Height - r.Y - r.Height
+            xpt1 = New cv.Point(cameraPoint.X - lineHalf, src.Height - pixeldistance)
+            xpt2 = New cv.Point(cameraPoint.X + lineHalf, src.Height - pixeldistance)
             Dim pt1 = New cv.Point(cameraPoint.X - lineHalf, r.Y + r.Height)
             Dim pt2 = New cv.Point(cameraPoint.X + lineHalf, r.Y + r.Height)
-            Dim leftX = Math.Max(xpt1.X, r.X)
-            Dim rightX = Math.Min(xpt2.X, r.X + r.Width)
+            Dim leftX = Math.Max(Math.Max(xpt1.X, r.X), pt1.X)
+            Dim rightX = Math.Min(Math.Min(xpt2.X, r.X + r.Width), pt2.X)
             dst1.Line(New cv.Point(leftX, pt1.Y), New cv.Point(rightX, pt1.Y), cv.Scalar.Yellow, 3)
             Dim addlen As Single
-            pixeldistance = src.Height - r.Y - r.Height
             If cameraPoint.X > r.X And cameraPoint.X < r.X + r.Width Then
                 addlen = 0
             Else
@@ -843,14 +846,17 @@ Public Class PointCloud_PixelFormula_SideView
         viewObjects.Clear()
         For i = 0 To measure.pTrack.viewObjects.Count - 1
             Dim r = measure.pTrack.viewObjects.Values(i).rect
-            lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (cameraPoint.X - r.X))
-            Dim pt1 = New cv.Point(r.X, cameraPoint.Y + lineHalf)
-            Dim pt2 = New cv.Point(r.X, cameraPoint.Y - lineHalf)
-            Dim topY = Math.Max(xpt1.Y, r.Y)
-            Dim botY = Math.Min(xpt2.Y, r.Y + r.Height)
+            lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (r.X - cameraPoint.X))
+            If lineHalf = 0 Then Continue For
+            pixeldistance = r.X - cameraPoint.X
+            xpt1 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y - lineHalf))
+            xpt2 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y + lineHalf))
+            Dim pt1 = New cv.Point(r.X, cameraPoint.Y - lineHalf)
+            Dim pt2 = New cv.Point(r.X, cameraPoint.Y + lineHalf)
+            Dim topY = Math.Max(Math.Max(xpt1.Y, r.Y), pt1.Y)
+            Dim botY = Math.Min(Math.Min(xpt2.Y, r.Y + r.Height), pt2.Y)
             dst1.Line(New cv.Point(r.X, topY), New cv.Point(r.X, botY), cv.Scalar.Yellow, 3)
             Dim addlen As Single
-            pixeldistance = r.X - cameraPoint.X
             If cameraPoint.Y > r.Y And cameraPoint.Y < r.Y + r.Height Then
                 addlen = 0
             Else
@@ -858,10 +864,10 @@ Public Class PointCloud_PixelFormula_SideView
                 ' additional pixels = r.height * tan(angle to camera of back corner) - first find which corner is nearest the centerline.
                 If r.Y > cameraPoint.Y Then
                     addlen = r.Width * (r.Y - cameraPoint.Y) / (r.X + r.Width - cameraPoint.X)
-                    dst1.Line(New cv.Point(r.X, r.Y), New cv.Point(r.X - addlen, r.Y), cv.Scalar.Yellow, 3)
+                    dst1.Line(New cv.Point(r.X, r.Y), New cv.Point(r.X, r.Y - addlen), cv.Scalar.Yellow, 3)
                 Else
                     addlen = r.Width * (cameraPoint.Y - r.Y) / (r.X + r.Width - cameraPoint.X)
-                    dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(r.X + addlen, r.Y), cv.Scalar.Yellow, 3)
+                    dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(r.X, r.Y + r.Height + addlen), cv.Scalar.Yellow, 3)
                 End If
             End If
             Dim vo = measure.pTrack.viewObjects.Values(i)
