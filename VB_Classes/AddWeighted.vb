@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 Public Class AddWeighted_Basics
     Inherits ocvbClass
-    Public src1 As cv.Mat
-    Public src2 As cv.Mat
+    Public src1 As New cv.Mat
+    Public src2 As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)

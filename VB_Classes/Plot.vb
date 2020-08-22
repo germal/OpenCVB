@@ -240,7 +240,8 @@ Public Class Plot_Histogram
                 If hist.Rows <= 255 Then color = cv.Scalar.All((i Mod 255) * incr)
                 cv.Cv2.Rectangle(dst1, New cv.Rect(i * barWidth, dst1.Height - h, barWidth, h), color, -1)
             Next
-            AddPlotScale(dst1, 0, maxVal, sliders.trackbar(0).Value / 10)
+            Dim fontSlider = findSlider("Histogram Font Size x10")
+            AddPlotScale(dst1, 0, maxVal, fontSlider.Value / 10)
         End If
     End Sub
 End Class
