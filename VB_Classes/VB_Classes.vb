@@ -109,8 +109,8 @@ Public Class ActiveClass : Implements IDisposable
         Dim initialStartSetting As Boolean
     End Structure
     Public Sub New(parms As algorithmParameters, _width As Integer, _height As Integer, location As cv.Rect)
-        slidersOffset = New cv.Point(25, 25)
-        radioOffset = New cv.Point(25, 25)
+        slidersOffset = New cv.Point(0, 0)
+        radioOffset = New cv.Point(0, 0)
         Randomize() ' just in case anyone uses VB.Net's Rnd
         ocvb = New AlgorithmData(parms, _width, _height)
         UpdateHostLocation(location)

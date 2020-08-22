@@ -35,7 +35,7 @@ Public Class Mat_PointToMat
         dst2.SetTo(0)
         Dim white = New cv.Vec3b(255, 255, 255)
         For i = 0 To rows - 1
-            dst2.Set(Of cv.Vec3b)(indexer(i).Item1, indexer(i).Item0, white)
+            dst2.Set(Of cv.Vec3b)(indexer(i).Item1, indexer(i).Item0, White)
         Next
     End Sub
 End Class
@@ -93,9 +93,9 @@ Public Class Mat_Tricks
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Show some Mat tricks."
         label1 = "Image squeezed into square Mat"
         label2 = "Mat transposed around the diagonal"
+        ocvb.desc = "Show some Mat tricks."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mat = src.Resize(New cv.Size(200, 200))
@@ -123,12 +123,12 @@ Public Class Mat_4to1
     Public noLines As Boolean ' if they want lines or not...
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        label1 = ""
-        mat1 = New cv.Mat(ocvb.color.Rows, ocvb.color.cols, cv.MatType.CV_8UC3, 0)
+        mat1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat3 = mat1.Clone()
         mat4 = mat1.Clone()
         mat = {mat1, mat2, mat3, mat4}
+
         label1 = "Combining 4 images into one"
         label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Use one Mat for up to 4 images"
@@ -170,12 +170,12 @@ Public Class Mat_2to1
     Public noLines As Boolean ' if they want lines or not...
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        label1 = ""
-        mat1 = New cv.Mat(New cv.Size(ocvb.color.Rows, ocvb.color.cols), cv.MatType.CV_8UC3, 0)
+        mat1 = New cv.Mat(New cv.Size(ocvb.color.Rows, ocvb.color.Cols), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
         dst1 = dst2
 
+        label1 = ""
         ocvb.desc = "Fill a Mat with 2 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -223,6 +223,7 @@ Public Class Mat_ImageXYZ_MT
             Next
         Next
         cv.Cv2.Split(xyDepth, xyzPlanes)
+
         ocvb.desc = "Create a cv.Point3f vector with x, y, and z."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -268,8 +269,8 @@ Public Class Mat_Managed
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "There is a limited ability to use Mat data in Managed code directly."
         label1 = "Color change is in the managed cv.vec3b array"
+        ocvb.desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static autoRand As New Random()

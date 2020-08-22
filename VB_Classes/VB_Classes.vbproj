@@ -138,6 +138,7 @@
     <Compile Include="..\UI_Generator\AlgorithmList.vb" />
     <Compile Include="AlphaChannel.vb" />
     <Compile Include="Aruco.vb" />
+    <Compile Include="Benford.vb" />
     <Compile Include="Bitmap.vb" />
     <Compile Include="Bitwise.vb" />
     <Compile Include="Cartoonify.vb" />
