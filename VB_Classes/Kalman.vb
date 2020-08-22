@@ -556,7 +556,6 @@ Public Class Kalman_Centroids
             End If
         Next
 
-
         For i = 0 To knn.basics.trainingPoints.Count - 1
             Dim pt1 = knn.basics.trainingPoints(i)
             For j = 0 To knn.basics.matchedPoints.Count - 1
@@ -586,6 +585,14 @@ End Class
 
 
 
+Public Structure viewObject
+    Dim centroid As cv.Point2f
+    Dim rect As cv.Rect
+    Dim mask As cv.Mat
+    Dim width As Integer ' width in pixels for the color and RGBdepth images.
+End Structure
+
+
 
 
 
@@ -602,10 +609,7 @@ Public Class Kalman_PointTracker
     Public queryRects As New List(Of cv.Rect)
     Public queryMasks As New List(Of cv.Mat)
 
-    Public matchedMasks As New List(Of cv.Mat)
-    Public matchedRects As New List(Of cv.Rect)
-    Public matchedPoints As New List(Of cv.Point2f)
-    Public matchedColors As New List(Of cv.Scalar)
+    Public viewObjects As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         If standalone Then topView = New PointCloud_Measured_TopView(ocvb)
@@ -678,9 +682,7 @@ Public Class Kalman_PointTracker
         dst1.SetTo(0)
         Dim matched As Boolean
         Dim rect = New cv.Rect
-        matchedMasks.Clear()
-        matchedRects.Clear()
-        matchedPoints.Clear()
+        viewObjects.Clear()
         For i = 0 To knn.trainingPoints.Count - 1
             Dim pt1 = knn.trainingPoints(i)
             For j = 0 To knn.matchedPoints.Count - 1
@@ -723,10 +725,11 @@ Public Class Kalman_PointTracker
                 Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
                 If drawRectangleCheck?.checked Then dst1.Rectangle(rect, scalarColors(i), 2)
                 If rect.Width > 0 Then
-                    matchedRects.Add(rect)
-                    matchedMasks.Add(lastMask(i))
-                    matchedPoints.Add(pt3)
-                    matchedColors.Add(scalarColors(i))
+                    Dim vo = New viewObject
+                    vo.centroid = pt3
+                    vo.mask = lastMask(i)
+                    vo.rect = rect
+                    viewObjects.Add(pt3.X, vo)
                 End If
             End If
         Next

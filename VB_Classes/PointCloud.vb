@@ -32,6 +32,14 @@ Module PointCloud
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Project_GravityHist_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
     End Function
+
+    Public Class compareAllowIdenticalIntInverted : Implements IComparer(Of Integer)
+        Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
+            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            If a <= b Then Return 1
+            Return -1
+        End Function
+    End Class
 End Module
 
 
@@ -640,291 +648,6 @@ End Class
 
 
 
-
-
-Public Class PointCloud_PixelClipped_BothViews
-    Inherits ocvbClass
-    Public topView As PointCloud_Measured_TopView
-    Public sideView As PointCloud_Measured_SideView
-    Public sidePixel As PointCloud_PixelFormula_SideView
-    Public topPixel As PointCloud_PixelFormula_TopView
-    Dim levelCheck As IMU_IsCameraLevel
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-
-        sidePixel = New PointCloud_PixelFormula_SideView(ocvb)
-        topPixel = New PointCloud_PixelFormula_TopView(ocvb)
-        topView = New PointCloud_Measured_TopView(ocvb)
-        sideView = New PointCloud_Measured_SideView(ocvb)
-        levelCheck = New IMU_IsCameraLevel(ocvb)
-
-        ocvb.desc = "Find the actual width in pixels for the objects detected in the top view"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        sidePixel.run(ocvb)
-        topPixel.run(ocvb)
-        topView.Run(ocvb)
-        sideView.Run(ocvb)
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        Dim maxZ = inRangeSlider.Value / 1000
-
-        Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
-        If useIMUcheckbox Is Nothing Then useIMUcheckbox = findCheckBox("Use IMU gravity vector")
-        label1 = "TopView - distances are accurate"
-        label2 = "SideView - distances are accurate"
-        If useIMUcheckbox.checked Then
-            levelCheck.Run(ocvb)
-            If levelCheck.cameraLevel Then
-                label1 = "TopView - distances are APPROXIMATE - level cam"
-                label2 = "SideView - distances are APPROXIMATE - level cam"
-            Else
-                label1 = "TopView - distances are NOT accurate"
-                label2 = "SideView - distances are NOT accurate"
-            End If
-        End If
-        dst1 = topView.cMats.CameraLocationBot(ocvb, topView.dst1, maxZ)
-        For Each rect In topView.pTrack.matchedRects
-            Dim p1 = New cv.Point(0, rect.Y)
-            Dim p2 = New cv.Point(src.Width, rect.Y)
-            Dim clipped = cv.Cv2.ClipLine(rect, p1, p2) ' Returns false when the line and the rectangle don't intersect.
-            dst1.Line(p1, p2, If(clipped, cv.Scalar.Red, cv.Scalar.Black), 2)
-        Next
-
-        dst2 = sideView.cMats.CameraLocationSide(ocvb, sideView.dst1, maxZ)
-        For Each rect In sideView.pTrack.matchedRects
-            Dim p1 = New cv.Point(rect.X + rect.Width - 1, 0)
-            Dim p2 = New cv.Point(rect.X + rect.Width - 1, src.Height)
-            Dim clipped = cv.Cv2.ClipLine(rect, p1, p2) ' Returns false when the line and the rectangle don't intersect.
-            dst2.Line(p1, p2, If(clipped, cv.Scalar.Red, cv.Scalar.Black), 2)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class PointCloud_BackProject
-    Inherits ocvbClass
-    Dim clipped As PointCloud_PixelClipped_BothViews
-    Dim mats As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-
-        clipped = New PointCloud_PixelClipped_BothViews(ocvb)
-        mats = New Mat_4to1(ocvb)
-        label1 = "Top/Side views with corresponding backprojection"
-        label2 = "Click any quadrant at left to view it below"
-        ocvb.desc = "Backproject the selected object"
-    End Sub
-    Private Function setDetails(detailPoint As cv.Point, centroids As List(Of cv.Point2f)) As Integer
-        Dim minIndex As Integer
-        Dim minDistance As Single = Single.MaxValue
-        For i = 0 To centroids.Count - 1
-            Dim pt = centroids(i)
-            Dim distance = Math.Sqrt((detailPoint.X - pt.X) * (detailPoint.X - pt.X) + (detailPoint.Y - pt.Y) * (detailPoint.Y - pt.Y))
-            If distance < minDistance Then
-                minIndex = i
-                minDistance = distance
-            End If
-        Next
-        Return minIndex
-    End Function
-    Public Sub Run(ocvb As AlgorithmData)
-        clipped.Run(ocvb)
-        mats.mat(0) = clipped.dst1
-        mats.mat(1) = clipped.dst2
-        mats.Run(ocvb)
-        dst1 = mats.dst1
-        dst2 = mats.mat(clickQuadrant(ocvb))
-
-        Static showDetails As Boolean
-        Static detailPoint As cv.Point
-        If ocvb.mouseClickFlag And ocvb.mouseClickPoint.X > src.Width Then
-            showDetails = True
-            ' we are using dst2 for the display and mouse click will have coordinates of the wide result2
-            detailPoint = New cv.Point(ocvb.mouseClickPoint.X - src.Width, ocvb.mouseClickPoint.Y)
-        End If
-        ocvb.trueText(New TTtext("Click any centroid to get details", New cv.Point(src.Width + 10, src.Height - 50)))
-
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        Dim maxZ = inRangeSlider.value / 1000
-        Dim fontsize = If(ocvb.parms.resolution = resHigh, 1.0, 0.6)
-        Dim dText As String = ""
-        Dim textPoint As cv.Point
-        Select Case clickQuadrant(ocvb)
-            Case 0
-                Dim pixelPerMeter = clipped.topPixel.measure.pixelsPerMeter
-                Dim rects = New List(Of cv.Rect)(clipped.topView.pTrack.matchedRects)
-                If rects.Count > 0 And showDetails Then
-                    Dim minIndex = setDetails(detailPoint, clipped.topView.pTrack.matchedPoints)
-                    Dim r = rects(minIndex)
-                    dText = Format(maxZ * (src.Height - r.Y - r.Height) / src.Height, "#0.0") + "-" + Format(maxZ * (src.Height - r.Y) / src.Height, "#0.0") + "m & " +
-                            CStr(r.Width) + " pixels or " + Format(r.Width / pixelPerMeter, "0.0") + "m"
-                    textPoint = New cv.Point(r.X + src.Width, r.Y) ' Add src.width to r.x to make this appear in dst2...
-                End If
-            Case 1
-                Dim pixelPerMeter = clipped.sidePixel.measure.pixelsPerMeter
-                Dim rects = New List(Of cv.Rect)(clipped.sideView.pTrack.matchedRects)
-                If rects.Count > 0 And showDetails Then
-                    Dim minIndex = setDetails(detailPoint, clipped.sideView.pTrack.matchedPoints)
-                    Dim r = rects(minIndex)
-                    dText = Format(maxZ * (src.Height - r.Y - r.Height) / src.Height, "#0.0") + "-" + Format(maxZ * (src.Height - r.Y) / src.Height, "#0.0") + "m & " +
-                            CStr(r.Width) + " pixels or " + Format(r.Width / pixelPerMeter, "0.0") + "m"
-                    textPoint = New cv.Point(r.X + src.Width, r.Y) ' Add src.width to r.x to make this appear in dst2...
-                End If
-            Case Else
-        End Select
-        ocvb.trueText(New TTtext(dText, textPoint))
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class PointCloud_BackProject_TopView
-    Inherits ocvbClass
-    Dim clipped As PointCloud_PixelClipped_BothViews
-    Dim inrange As Depth_InRange
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        clipped = New PointCloud_PixelClipped_BothViews(ocvb)
-        inrange = New Depth_InRange(ocvb)
-        ocvb.desc = "BackProject the top view into the front looking view"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        Dim maxZ = inRangeSlider.value / 1000
-
-        clipped.Run(ocvb)
-        dst1 = clipped.dst1
-        dst2.SetTo(0)
-        Dim depth32f = getDepth32f(ocvb)
-        Dim mask As New cv.Mat
-        For i = 0 To clipped.topView.pTrack.matchedRects.Count - 1
-            Dim r = clipped.topView.pTrack.matchedRects(i)
-            Dim mindepth = 1000 * maxZ * (src.Height - r.Y - r.Height) / src.Height
-            Dim maxDepth = 1000 * maxZ * (src.Height - r.Y) / src.Height
-            Dim topRect = New cv.Rect(r.X, 0, r.Width, src.Height)
-            If topRect.X + topRect.Width >= src.Width Then topRect.Width = src.Width - topRect.X
-            If topRect.Width > 0 Then
-                cv.Cv2.InRange(depth32f(topRect), cv.Scalar.All(mindepth), cv.Scalar.All(maxDepth), mask)
-                dst2(topRect).SetTo(clipped.topView.pTrack.matchedColors(i), mask)
-            End If
-        Next
-
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class PointCloud_PixelFormula_TopView
-    Inherits ocvbClass
-    Public measure As PointCloud_Measured_TopView
-    Public matchedPixelWidth As New List(Of Integer) ' matches the ptrack.matchedxxx data.
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-
-        measure = New PointCloud_Measured_TopView(ocvb)
-
-        sliders.Setup(ocvb, caller, 1)
-        sliders.setupTrackBar(0, "Distance from camera in mm", 1, 4000, 1500)
-        ocvb.desc = "Validate the formula for pixel width as a function of distance"
-    End Sub
-
-    Public Sub Run(ocvb As AlgorithmData)
-        measure.Run(ocvb)
-        label1 = measure.label1
-
-        sliders.trackbar(0).Maximum = measure.maxZ * 1000
-
-        dst1 = measure.cMats.CameraLocationBot(ocvb, measure.dst1, measure.maxZ)
-        Dim cameraPoint = New cv.Point(src.Height, src.Height)
-        Dim pixeldistance = src.Height * ((sliders.trackbar(0).Value / 1000) / measure.maxZ)
-        Dim FOV = measure.cMats.hFOVangles(ocvb.parms.cameraIndex)
-        Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * pixeldistance)
-        Dim xpt1 = New cv.Point(cameraPoint.X - lineHalf, src.Height - pixeldistance)
-        Dim xpt2 = New cv.Point(cameraPoint.X + lineHalf, src.Height - pixeldistance)
-        dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
-
-        matchedPixelWidth.Clear()
-        For i = 0 To measure.pTrack.matchedRects.Count - 1
-            Dim r = measure.pTrack.matchedRects(i)
-            lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (src.Height - (r.Y + r.Height)))
-            Dim pt1 = New cv.Point(cameraPoint.X - lineHalf, r.Y + r.Height)
-            Dim pt2 = New cv.Point(cameraPoint.X + lineHalf, r.Y + r.Height)
-            Dim leftX = Math.Max(pt1.X, r.X)
-            Dim rightX = Math.Min(pt2.X, r.X + r.Width)
-            dst1.Line(New cv.Point(leftX, pt1.Y), New cv.Point(rightX, pt1.Y), cv.Scalar.Yellow, 3)
-            If Math.Abs(rightX - leftX) < lineHalf Then
-                ' need to add a small amount based on the angle of the camera.
-                ' additional pixels = r.height * tan(angle to camera of back corner) - first find which corner is nearest the centerline.
-                Dim c1 = Math.Abs(cameraPoint.X - r.X)
-                Dim c2 = Math.Abs(cameraPoint.X - r.X - r.Width)
-                Dim cp1 = New cv.Point(r.X, r.Y)
-                If c2 < c1 Then cp1 = New cv.Point(r.X + r.Width, r.Y)
-                Dim addLen = r.Height * Math.Abs(cp1.X - cameraPoint.X) / (src.Height - cp1.Y) * If(cp1.X < cameraPoint.X, 1, -1)
-                dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(cp1.X + addLen, r.Y + r.Height), cv.Scalar.Yellow, 3)
-                dst1.Line(cameraPoint, cp1, cv.Scalar.Red, 1)
-                matchedPixelWidth.Add(src.Width * (addLen + Math.Abs(rightX - leftX)) / pixeldistance)
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class PointCloud_PixelFormula_SideView
-    Inherits ocvbClass
-    Public measure As PointCloud_Measured_SideView
-    Public top As PointCloud_PixelFormula_TopView
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-
-        measure = New PointCloud_Measured_SideView(ocvb)
-        top = New PointCloud_PixelFormula_TopView(ocvb)
-
-        ocvb.desc = "Validate the formula for pixel height as a function of distance"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        Dim maxZ = inRangeSlider.Value / 1000
-
-        measure.Run(ocvb)
-        label1 = measure.label1
-
-        top.sliders.trackbar(0).Maximum = maxZ * 1000
-        dst1 = measure.cMats.CameraLocationSide(ocvb, measure.dst1, maxZ)
-        Dim cameraPoint = measure.cMats.cameraPoint
-        Dim pixeldistance = src.Height * ((top.sliders.trackbar(0).Value / 1000) / maxZ)
-        Dim FOV = measure.cMats.vFOVangles(ocvb.parms.cameraIndex)
-        Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * pixeldistance)
-
-        Dim pt1 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y - lineHalf))
-        Dim pt2 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y + lineHalf))
-        dst1.Line(pt1, pt2, cv.Scalar.Red, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class PointCloud_Measured_TopView
     Inherits ocvbClass
     Public cMats As PointCloud_Colorize
@@ -1008,3 +731,381 @@ Public Class PointCloud_Measured_SideView
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class PointCloud_PixelFormula_TopView
+    Inherits ocvbClass
+    Public measure As PointCloud_Measured_TopView
+    Public viewObjects As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        measure = New PointCloud_Measured_TopView(ocvb)
+
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Distance from camera in mm", 1, 4000, 1500)
+        ocvb.desc = "Validate the formula for pixel width as a function of distance"
+    End Sub
+
+    Public Sub Run(ocvb As AlgorithmData)
+        measure.Run(ocvb)
+        label1 = measure.label1
+
+        sliders.trackbar(0).Maximum = measure.maxZ * 1000
+
+        dst1 = measure.cMats.CameraLocationBot(ocvb, measure.dst1, measure.maxZ)
+        Dim cameraPoint = measure.cMats.cameraPoint
+        Dim pixeldistance = src.Height * ((sliders.trackbar(0).Value / 1000) / measure.maxZ)
+        Dim FOV = measure.cMats.hFOVangles(ocvb.parms.cameraIndex)
+
+        Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * pixeldistance)
+        Dim xpt1 = New cv.Point(cameraPoint.X - lineHalf, src.Height - pixeldistance)
+        Dim xpt2 = New cv.Point(cameraPoint.X + lineHalf, src.Height - pixeldistance)
+
+        If standalone Then dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
+
+        viewObjects.Clear()
+        For i = 0 To measure.pTrack.viewObjects.Count - 1
+            Dim r = measure.pTrack.viewObjects.Values(i).rect
+            lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (src.Height - (r.Y + r.Height)))
+            Dim pt1 = New cv.Point(cameraPoint.X - lineHalf, r.Y + r.Height)
+            Dim pt2 = New cv.Point(cameraPoint.X + lineHalf, r.Y + r.Height)
+            Dim leftX = Math.Max(xpt1.X, r.X)
+            Dim rightX = Math.Min(xpt2.X, r.X + r.Width)
+            dst1.Line(New cv.Point(leftX, pt1.Y), New cv.Point(rightX, pt1.Y), cv.Scalar.Yellow, 3)
+            Dim addlen As Single
+            pixeldistance = src.Height - r.Y - r.Height
+            If cameraPoint.X > r.X And cameraPoint.X < r.X + r.Width Then
+                addlen = 0
+            Else
+                ' need to add a small amount to the object width in pixels based on the angle of the camera.
+                ' additional pixels = r.height * tan(angle to camera of back corner) - first find which corner is nearest the centerline.
+                If r.X > cameraPoint.X Then
+                    addlen = r.Height * Math.Abs(r.X - cameraPoint.X) / (src.Height - r.Y)
+                    dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(r.X - addLen, r.Y + r.Height), cv.Scalar.Yellow, 3)
+                Else
+                    addlen = r.Height * (cameraPoint.X - (r.X + r.Width)) / (src.Height - r.Y)
+                    dst1.Line(New cv.Point(r.X + r.Width, r.Y + r.Height), New cv.Point(r.X + r.Width + addLen, r.Y + r.Height), cv.Scalar.Yellow, 3)
+                End If
+            End If
+            Dim vo = measure.pTrack.viewObjects.Values(i)
+            vo.width = CInt(src.Width * (addLen + Math.Abs(rightX - leftX)) / pixeldistance)
+            viewObjects.Add(vo.centroid.X, vo)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PointCloud_PixelFormula_SideView
+    Inherits ocvbClass
+    Public measure As PointCloud_Measured_SideView
+    Public viewObjects As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        measure = New PointCloud_Measured_SideView(ocvb)
+
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Distance from camera in mm", 1, 4000, 1500)
+
+        ocvb.desc = "Validate the formula for pixel height as a function of distance"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        Dim maxZ = inRangeSlider.Value / 1000
+
+        measure.Run(ocvb)
+        label1 = measure.label1
+
+        dst1 = measure.cMats.CameraLocationSide(ocvb, measure.dst1, maxZ)
+        Dim cameraPoint = measure.cMats.cameraPoint ' camerapoint is a tricky computation for side views.  Use the original and hopefully only one.
+        Static distanceSlider = findSlider("Distance from camera in mm")
+        Dim pixeldistance = src.Height * ((distanceSlider.Value / 1000) / maxZ)
+        Dim FOV = measure.cMats.vFOVangles(ocvb.parms.cameraIndex)
+
+        Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * pixeldistance)
+        Dim xpt1 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y - lineHalf))
+        Dim xpt2 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y + lineHalf))
+
+        If standalone Then dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
+
+        viewObjects.Clear()
+        For i = 0 To measure.pTrack.viewObjects.Count - 1
+            Dim r = measure.pTrack.viewObjects.Values(i).rect
+            lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (cameraPoint.X - r.X))
+            Dim pt1 = New cv.Point(r.X, cameraPoint.Y + lineHalf)
+            Dim pt2 = New cv.Point(r.X, cameraPoint.Y - lineHalf)
+            Dim topY = Math.Max(xpt1.Y, r.Y)
+            Dim botY = Math.Min(xpt2.Y, r.Y + r.Height)
+            dst1.Line(New cv.Point(r.X, topY), New cv.Point(r.X, botY), cv.Scalar.Yellow, 3)
+            Dim addlen As Single
+            pixeldistance = r.X - cameraPoint.X
+            If cameraPoint.Y > r.Y And cameraPoint.Y < r.Y + r.Height Then
+                addlen = 0
+            Else
+                ' need to add a small amount to the object width in pixels based on the angle of the camera.
+                ' additional pixels = r.height * tan(angle to camera of back corner) - first find which corner is nearest the centerline.
+                If r.Y > cameraPoint.Y Then
+                    addlen = r.Width * (r.Y - cameraPoint.Y) / (r.X + r.Width - cameraPoint.X)
+                    dst1.Line(New cv.Point(r.X, r.Y), New cv.Point(r.X - addlen, r.Y), cv.Scalar.Yellow, 3)
+                Else
+                    addlen = r.Width * (cameraPoint.Y - r.Y) / (r.X + r.Width - cameraPoint.X)
+                    dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(r.X + addlen, r.Y), cv.Scalar.Yellow, 3)
+                End If
+            End If
+            Dim vo = measure.pTrack.viewObjects.Values(i)
+            vo.width = CInt(src.Width * (addlen + Math.Abs(botY - topY)) / pixeldistance)
+            viewObjects.Add(vo.centroid.X, vo)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_BackProject_TopView
+    Inherits ocvbClass
+    Dim clipped As PointCloud_PixelClipped_BothViews
+    Dim inrange As Depth_InRange
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        clipped = New PointCloud_PixelClipped_BothViews(ocvb)
+        inrange = New Depth_InRange(ocvb)
+        ocvb.desc = "BackProject the top view into the front looking view"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        Dim maxZ = inRangeSlider.value / 1000
+
+        clipped.Run(ocvb)
+        dst1 = clipped.dst1
+        dst2.SetTo(0)
+        Dim depth32f = getDepth32f(ocvb)
+        Dim mask As New cv.Mat
+        For i = 0 To clipped.topView.pTrack.viewObjects.Count - 1
+            Dim r = clipped.topView.pTrack.viewObjects.Values(i).rect
+            Dim mindepth = 1000 * maxZ * (src.Height - r.Y - r.Height) / src.Height
+            Dim maxDepth = 1000 * maxZ * (src.Height - r.Y) / src.Height
+            Dim topRect = New cv.Rect(r.X, 0, r.Width, src.Height)
+            If topRect.X + topRect.Width >= src.Width Then topRect.Width = src.Width - topRect.X
+            If topRect.Width > 0 Then
+                cv.Cv2.InRange(depth32f(topRect), cv.Scalar.All(mindepth), cv.Scalar.All(maxDepth), mask)
+                dst2(topRect).SetTo(scalarColors(i), mask)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class PointCloud_BackProject_SideView
+    Inherits ocvbClass
+    Dim clipped As PointCloud_PixelClipped_BothViews
+    Dim inrange As Depth_InRange
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        clipped = New PointCloud_PixelClipped_BothViews(ocvb)
+        inrange = New Depth_InRange(ocvb)
+        ocvb.desc = "BackProject the side view into the front looking view"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        Dim maxZ = inRangeSlider.value / 1000
+
+        clipped.Run(ocvb)
+        dst1 = clipped.dst1
+        dst2.SetTo(0)
+        Dim depth32f = getDepth32f(ocvb)
+        Dim mask As New cv.Mat
+        For i = 0 To clipped.sideView.pTrack.viewObjects.Count - 1
+            Dim r = clipped.sideView.pTrack.viewObjects.Values(i).rect
+            Dim mindepth = 1000 * maxZ * (src.Height - r.Y - r.Height) / src.Height
+            Dim maxDepth = 1000 * maxZ * (src.Height - r.Y) / src.Height
+            Dim topRect = New cv.Rect(r.X, 0, r.Width, src.Height)
+            If topRect.X + topRect.Width >= src.Width Then topRect.Width = src.Width - topRect.X
+            If topRect.Width > 0 Then
+                cv.Cv2.InRange(depth32f(topRect), cv.Scalar.All(mindepth), cv.Scalar.All(maxDepth), mask)
+                dst2(topRect).SetTo(scalarColors(i), mask)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class PointCloud_PixelClipped_BothViews
+    Inherits ocvbClass
+    Public topView As PointCloud_Measured_TopView
+    Public sideView As PointCloud_Measured_SideView
+    Public topPixel As PointCloud_PixelFormula_TopView
+    Public sidePixel As PointCloud_PixelFormula_SideView
+    Dim levelCheck As IMU_IsCameraLevel
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        topPixel = New PointCloud_PixelFormula_TopView(ocvb)
+        sidePixel = New PointCloud_PixelFormula_SideView(ocvb)
+
+        topView = New PointCloud_Measured_TopView(ocvb)
+        sideView = New PointCloud_Measured_SideView(ocvb)
+
+        levelCheck = New IMU_IsCameraLevel(ocvb)
+
+        ocvb.desc = "Find the actual width in pixels for the objects detected in the top view"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        topPixel.Run(ocvb)
+        sidePixel.Run(ocvb)
+
+        topView.Run(ocvb)
+        sideView.Run(ocvb)
+
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        Dim maxZ = inRangeSlider.Value / 1000
+
+        Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
+        If useIMUcheckbox Is Nothing Then useIMUcheckbox = findCheckBox("Use IMU gravity vector")
+        label1 = "TopView - distances are accurate"
+        label2 = "SideView - distances are accurate"
+        If useIMUcheckbox.checked Then
+            levelCheck.Run(ocvb)
+            If levelCheck.cameraLevel Then
+                label1 = "TopView - distances are APPROXIMATE - level cam"
+                label2 = "SideView - distances are APPROXIMATE - level cam"
+            Else
+                label1 = "TopView - distances are NOT accurate"
+                label2 = "SideView - distances are NOT accurate"
+            End If
+        End If
+        dst1 = topView.cMats.CameraLocationBot(ocvb, topView.dst1, maxZ)
+        For i = 0 To topPixel.viewObjects.Count - 1
+            Dim rect = topPixel.viewObjects.Values(i).rect
+            Dim p1 = New cv.Point(0, rect.Y)
+            Dim p2 = New cv.Point(src.Width, rect.Y)
+            Dim clipped = cv.Cv2.ClipLine(rect, p1, p2) ' Returns false when the line and the rectangle don't intersect.
+            dst1.Line(p1, p2, If(clipped, cv.Scalar.Red, cv.Scalar.Black), 2)
+        Next
+
+        dst2 = sideView.cMats.CameraLocationSide(ocvb, sideView.dst1, maxZ)
+        For i = 0 To sidePixel.viewObjects.Count - 1
+            Dim rect = sidePixel.viewObjects.Values(i).rect
+            Dim p1 = New cv.Point(rect.X + rect.Width - 1, 0)
+            Dim p2 = New cv.Point(rect.X + rect.Width - 1, src.Height)
+            Dim clipped = cv.Cv2.ClipLine(rect, p1, p2) ' Returns false when the line and the rectangle don't intersect.
+            dst2.Line(p1, p2, If(clipped, cv.Scalar.Red, cv.Scalar.Black), 2)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_BackProject
+    Inherits ocvbClass
+    Dim clipped As PointCloud_PixelClipped_BothViews
+    Dim mats As Mat_4to1
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        clipped = New PointCloud_PixelClipped_BothViews(ocvb)
+        mats = New Mat_4to1(ocvb)
+        label1 = "Top/Side views with corresponding backprojection"
+        label2 = "Click any quadrant at left to view it below"
+        ocvb.desc = "Backproject the selected object"
+    End Sub
+    Private Function setDetails(detailPoint As cv.Point, viewObjects As SortedList(Of Integer, viewObject)) As Integer
+        Dim minIndex As Integer
+        Dim minDistance As Single = Single.MaxValue
+        For i = 0 To viewObjects.Count - 1
+            Dim pt = viewObjects.Values(i).centroid
+            Dim distance = Math.Sqrt((detailPoint.X - pt.X) * (detailPoint.X - pt.X) + (detailPoint.Y - pt.Y) * (detailPoint.Y - pt.Y))
+            If distance < minDistance Then
+                minIndex = i
+                minDistance = distance
+            End If
+        Next
+        Return minIndex
+    End Function
+    Public Sub Run(ocvb As AlgorithmData)
+        clipped.Run(ocvb)
+        mats.mat(0) = clipped.dst1
+        mats.mat(1) = clipped.dst2
+        mats.Run(ocvb)
+        dst1 = mats.dst1
+        dst2 = mats.mat(clickQuadrant(ocvb))
+
+        Static showDetails As Boolean
+        Static detailPoint As cv.Point
+        If ocvb.mouseClickFlag And ocvb.mouseClickPoint.X > src.Width Then
+            showDetails = True
+            ' we are using dst2 for the display and mouse click will have coordinates of the wide result2
+            detailPoint = New cv.Point(ocvb.mouseClickPoint.X - src.Width, ocvb.mouseClickPoint.Y)
+        End If
+        ocvb.trueText(New TTtext("Click any centroid to get details" + vbCrLf + "Click any quadrant at left to enlarge it", New cv.Point(src.Width + 10, src.Height - 50)))
+
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        Dim maxZ = inRangeSlider.value / 1000
+        Dim fontsize = If(ocvb.parms.resolution = resHigh, 1.0, 0.6)
+        Dim dText As String = ""
+        Dim textPoint As cv.Point
+        Select Case clickQuadrant(ocvb)
+            Case 0
+                Dim pixelPerMeter = clipped.topPixel.measure.pixelsPerMeter
+                Dim vw = clipped.topView.pTrack.viewObjects
+                If vw.Count > 0 And showDetails Then
+                    Dim minIndex = setDetails(detailPoint, vw)
+                    Dim vo = vw.Values(minIndex)
+                    Dim r = vo.rect
+                    dText = "Clicked: " + Format(maxZ * (src.Height - r.Y - r.Height) / src.Height, "#0.0") + "-" + Format(maxZ * (src.Height - r.Y) / src.Height, "#0.0") + "m & " +
+                            CStr(vo.width) + " pixels wide or " + Format(r.Width / pixelPerMeter, "0.0") + "m"
+                    textPoint = New cv.Point(r.X + src.Width, r.Y) ' Add src.width to r.x to make this appear in dst2...
+                End If
+            Case 1
+                Dim pixelPerMeter = clipped.sidePixel.measure.pixelsPerMeter
+                Dim cameraX = (src.Width - src.Height) / 2
+
+                Dim vw = clipped.sideView.pTrack.viewObjects
+                If vw.Count > 0 And showDetails Then
+                    Dim minIndex = setDetails(detailPoint, vw)
+                    Dim vo = vw.Values(minIndex)
+                    Dim r = vo.rect
+                    dText = "Clicked: " + Format(maxZ * (r.X - cameraX) / src.Height, "#0.0") + "-" + Format(maxZ * (r.X + r.Width - cameraX) / src.Height, "#0.0") + "m & " +
+                            CStr(vo.width) + " pixels wide or " + Format(r.Height / pixelPerMeter, "0.0") + "m"
+                    textPoint = New cv.Point(r.X + src.Width, r.Y) ' Add src.width to r.x to make this appear in dst2...
+                End If
+            Case Else
+        End Select
+        If dText.Length > 0 Then label2 = dText
+        ocvb.trueText(New TTtext(dText, textPoint))
+    End Sub
+End Class
