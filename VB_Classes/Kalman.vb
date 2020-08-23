@@ -589,7 +589,6 @@ Public Structure viewObject
     Dim centroid As cv.Point2f
     Dim rect As cv.Rect
     Dim mask As cv.Mat
-    Dim width As Integer ' width in pixels for the color and RGBdepth images.
 End Structure
 
 

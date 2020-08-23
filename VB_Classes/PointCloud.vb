@@ -645,20 +645,22 @@ Public Class PointCloud_PixelFormula_TopView
             dst1.Line(New cv.Point(leftX, pt1.Y), New cv.Point(rightX, pt1.Y), cv.Scalar.Yellow, 3)
             Dim addlen As Single
             If cameraPoint.X > r.X And cameraPoint.X < r.X + r.Width Then
-                addlen = 0
+                addlen = 0 ' r is unchanged.
             Else
                 ' need to add a small amount to the object width in pixels based on the angle of the camera.
                 ' additional pixels = r.height * tan(angle to camera of back corner) - first find which corner is nearest the centerline.
                 If r.X > cameraPoint.X Then
                     addlen = r.Height * Math.Abs(r.X - cameraPoint.X) / (src.Height - r.Y)
-                    dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(r.X - addLen, r.Y + r.Height), cv.Scalar.Yellow, 3)
+                    dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(r.X - addlen, r.Y + r.Height), cv.Scalar.Yellow, 3)
+                    r = New cv.Rect(r.X - addlen, r.Y, addlen + Math.Abs(rightX - leftX), r.Height)
                 Else
                     addlen = r.Height * (cameraPoint.X - (r.X + r.Width)) / (src.Height - r.Y)
                     dst1.Line(New cv.Point(r.X + r.Width, r.Y + r.Height), New cv.Point(r.X + r.Width + addLen, r.Y + r.Height), cv.Scalar.Yellow, 3)
+                    r = New cv.Rect(r.X, r.Y, addlen + Math.Abs(rightX - leftX), r.Height)
                 End If
             End If
             Dim vo = measure.pTrack.viewObjects.Values(i)
-            vo.width = CInt(src.Width * (addLen + Math.Abs(rightX - leftX)) / pixeldistance)
+            vo.rect = r
             viewObjects.Add(vo.centroid.X, vo)
         Next
     End Sub
@@ -726,13 +728,16 @@ Public Class PointCloud_PixelFormula_SideView
                 If r.Y > cameraPoint.Y Then
                     addlen = r.Width * (r.Y - cameraPoint.Y) / (r.X + r.Width - cameraPoint.X)
                     dst1.Line(New cv.Point(r.X, r.Y), New cv.Point(r.X, r.Y - addlen), cv.Scalar.Yellow, 3)
+                    r = New cv.Rect(r.X, r.Y - addlen, r.Width, Math.Abs(botY - topY) + addlen)
+
                 Else
                     addlen = r.Width * (cameraPoint.Y - r.Y) / (r.X + r.Width - cameraPoint.X)
                     dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(r.X, r.Y + r.Height + addlen), cv.Scalar.Yellow, 3)
+                    r = New cv.Rect(r.X, r.Y + addlen, r.Width, Math.Abs(botY - topY) + addlen)
                 End If
             End If
             Dim vo = measure.pTrack.viewObjects.Values(i)
-            vo.width = CInt(src.Width * (addlen + Math.Abs(botY - topY)) / pixeldistance)
+            vo.rect = r
             viewObjects.Add(vo.centroid.X, vo)
         Next
     End Sub
@@ -834,6 +839,10 @@ Public Class PointCloud_BothViews
     Public topPixel As PointCloud_PixelFormula_TopView
     Public sidePixel As PointCloud_PixelFormula_SideView
     Dim levelCheck As IMU_IsCameraLevel
+    Public clickOffset As Integer
+    Public detailText As String
+    Public bpTop As New cv.Mat
+    Public bpSide As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
@@ -845,56 +854,9 @@ Public Class PointCloud_BothViews
 
         levelCheck = New IMU_IsCameraLevel(ocvb)
 
+        label1 = "Top View - click for details"
+        label2 = "Side View - click for details"
         ocvb.desc = "Find the actual width in pixels for the objects detected in the top view"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        topPixel.Run(ocvb)
-        sidePixel.Run(ocvb)
-
-        topView.Run(ocvb)
-        sideView.Run(ocvb)
-
-        Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
-        If useIMUcheckbox Is Nothing Then useIMUcheckbox = findCheckBox("Use IMU gravity vector")
-        label1 = "TopView - distances are accurate"
-        label2 = "SideView - distances are accurate"
-        If useIMUcheckbox.checked Then
-            levelCheck.Run(ocvb)
-            If levelCheck.cameraLevel Then
-                label1 = "TopView - distances are APPROXIMATE - level cam"
-                label2 = "SideView - distances are APPROXIMATE - level cam"
-            Else
-                label1 = "TopView - distances are NOT accurate"
-                label2 = "SideView - distances are NOT accurate"
-            End If
-        End If
-
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        Dim maxZ = inRangeSlider.Value / 1000
-
-        dst1 = topView.cMats.CameraLocationBot(ocvb, topView.dst1, maxZ)
-        dst2 = sideView.cMats.CameraLocationSide(ocvb, sideView.dst1, maxZ)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class PointCloud_BackProject
-    Inherits ocvbClass
-    Dim clipped As PointCloud_BothViews
-    Dim mats As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-
-        clipped = New PointCloud_BothViews(ocvb)
-        mats = New Mat_4to1(ocvb)
-        label1 = "Top/Side views with corresponding backprojection"
-        label2 = "Click any quadrant at left to view it below"
-        ocvb.desc = "Backproject the selected object"
     End Sub
     Private Function setDetails(detailPoint As cv.Point, viewObjects As SortedList(Of Integer, viewObject)) As Integer
         Dim minIndex As Integer
@@ -910,56 +872,148 @@ Public Class PointCloud_BackProject
         Return minIndex
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        clipped.Run(ocvb)
-        mats.mat(0) = clipped.dst1
-        mats.mat(1) = clipped.dst2
-        mats.Run(ocvb)
-        dst1 = mats.dst1
-        dst2 = mats.mat(clickQuadrant(ocvb))
+        topPixel.Run(ocvb)
+        sidePixel.Run(ocvb)
 
-        Static showDetails As Boolean
-        Static detailPoint As cv.Point
-        If ocvb.mouseClickFlag And ocvb.mouseClickPoint.X > src.Width Then
-            showDetails = True
-            ' we are using dst2 for the display and mouse click will have coordinates of the wide result2
-            detailPoint = New cv.Point(ocvb.mouseClickPoint.X - src.Width, ocvb.mouseClickPoint.Y)
+        topView.Run(ocvb)
+        sideView.Run(ocvb)
+
+        If standalone Then
+            Dim instructions = "Click any centroid to get details"
+            Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
+            If useIMUcheckbox Is Nothing Then useIMUcheckbox = findCheckBox("Use IMU gravity vector")
+            Dim accMsg1 = "TopView - distances are accurate"
+            Dim accMsg2 = "SideView - distances are accurate"
+            If useIMUcheckbox.checked Then
+                levelCheck.Run(ocvb)
+                If levelCheck.cameraLevel Then
+                    accMsg1 = "TopView - distances are APPROXIMATE - level cam"
+                    accMsg2 = "SideView - distances are APPROXIMATE - level cam"
+                Else
+                    accMsg1 = "TopView - distances are NOT accurate"
+                    accMsg2 = "SideView - distances are NOT accurate"
+                End If
+            End If
+
+            ocvb.trueText(New TTtext(accMsg1 + vbCrLf + instructions, New cv.Point(10, src.Height - 50)))
+            ocvb.trueText(New TTtext(accMsg2 + vbCrLf + instructions, New cv.Point(src.Width + 10, src.Height - 50)))
         End If
-        ocvb.trueText(New TTtext("Click any centroid to get details" + vbCrLf + "Click any quadrant at left to enlarge it", New cv.Point(src.Width + 10, src.Height - 50)))
 
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        Dim maxZ = inRangeSlider.value / 1000
-        Dim fontsize = If(ocvb.parms.resolution = resHigh, 1.0, 0.6)
-        Dim dText As String = ""
-        Dim textPoint As cv.Point
-        Select Case clickQuadrant(ocvb)
-            Case 0
-                Dim pixelPerMeter = clipped.topPixel.measure.pixelsPerMeter
-                Dim vw = clipped.topPixel.viewObjects
-                If vw.Count > 0 And showDetails Then
-                    Dim minIndex = setDetails(detailPoint, vw)
-                    Dim vo = vw.Values(minIndex)
-                    Dim r = vo.rect
-                    dText = "Clicked: " + Format(maxZ * (src.Height - r.Y - r.Height) / src.Height, "#0.0") + "-" + Format(maxZ * (src.Height - r.Y) / src.Height, "#0.0") + "m & " +
-                            CStr(vo.width) + " pixels wide or " + Format(r.Width / pixelPerMeter, "0.0") + "m"
-                    textPoint = New cv.Point(r.X + src.Width, r.Y) ' Add src.width to r.x to make this appear in dst2...
-                End If
-            Case 1
-                Dim pixelPerMeter = clipped.sidePixel.measure.pixelsPerMeter
-                Dim cameraX = (src.Width - src.Height) / 2
+        Dim maxZ = inRangeSlider.Value / 1000
 
-                Dim vw = clipped.sidePixel.viewObjects
-                If vw.Count > 0 And showDetails Then
-                    Dim minIndex = setDetails(detailPoint, vw)
-                    Dim vo = vw.Values(minIndex)
-                    Dim r = vo.rect
-                    dText = "Clicked: " + Format(maxZ * (r.X - cameraX) / src.Height, "#0.0") + "-" + Format(maxZ * (r.X + r.Width - cameraX) / src.Height, "#0.0") + "m & " +
-                            CStr(vo.width) + " pixels wide or " + Format(r.Height / pixelPerMeter, "0.0") + "m"
-                    textPoint = New cv.Point(r.X + src.Width, r.Y) ' Add src.width to r.x to make this appear in dst2...
+        dst1 = topView.cMats.CameraLocationBot(ocvb, topView.dst1, maxZ)
+        dst2 = sideView.cMats.CameraLocationSide(ocvb, sideView.dst1, maxZ)
+
+        Dim fontsize = If(ocvb.parms.resolution = resHigh, 1.0, 0.6)
+        detailText = ""
+        Dim textPoint As cv.Point
+        Static detailPoint As cv.Point
+        If ocvb.mouseClickFlag Then detailPoint = New cv.Point(ocvb.mouseClickPoint.X, ocvb.mouseClickPoint.Y)
+        Dim vwTop = topPixel.viewObjects
+        Dim vwSide = sidePixel.viewObjects
+        If detailPoint.X < src.Width Then
+            Dim pixelPerMeter = topPixel.measure.pixelsPerMeter
+            If vwTop.Count > 0 And detailPoint.X > 0 Then
+                Dim minIndex = setDetails(detailPoint, vwTop)
+                Dim vo = vwTop.Values(minIndex)
+                Dim r = vo.rect
+                detailText = "Clicked: " + Format(maxZ * (src.Height - r.Y - r.Height) / src.Height, "#0.0") + "-" + Format(maxZ * (src.Height - r.Y) / src.Height, "#0.0") + "m & " +
+                            CStr(vo.rect.Width) + " pixels wide or " + Format(r.Width / pixelPerMeter, "0.0") + "m"
+                textPoint = New cv.Point(r.X + clickOffset, r.Y) ' Add src.width to r.x to make this appear in dst2...
+                label1 = detailText
+            End If
+        Else
+            Dim pixelPerMeter = sidePixel.measure.pixelsPerMeter
+            Dim cameraX = (src.Width - src.Height) / 2
+
+            If vwSide.Count > 0 And detailPoint.X > 0 Then
+                Dim minIndex = setDetails(New cv.Point(detailPoint.X - src.Width, detailPoint.Y), vwSide)
+                Dim vo = vwSide.Values(minIndex)
+                Dim r = vo.rect
+                detailText = "Clicked: " + Format(maxZ * (r.X - cameraX) / src.Height, "#0.0") + "-" + Format(maxZ * (r.X + r.Width - cameraX) / src.Height, "#0.0") + "m & " +
+                                CStr(vo.rect.Width) + " pixels wide or " + Format(r.Height / pixelPerMeter, "0.0") + "m"
+                textPoint = New cv.Point(r.X + src.Width, r.Y) ' Add src.width to r.x to make this appear in dst2...
+                label2 = detailText
+            End If
+        End If
+
+        bpTop = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
+        Dim depth32f = getDepth32f(ocvb)
+        Dim mask As New cv.Mat
+        For i = 0 To vwTop.Count - 1
+            Dim r = vwTop.Values(i).rect
+            Dim mindepth = 1000 * maxZ * (src.Height - r.Y - r.Height) / src.Height
+            Dim maxDepth = 1000 * maxZ * (src.Height - r.Y) / src.Height
+            Dim topRect = New cv.Rect(r.X, 0, r.Width, src.Height)
+            If topRect.X + topRect.Width >= src.Width Then topRect.Width = src.Width - topRect.X
+            If topRect.Width > 0 Then
+                cv.Cv2.InRange(depth32f(topRect), cv.Scalar.All(mindepth), cv.Scalar.All(maxDepth), mask)
+                bpTop(topRect).SetTo(scalarColors(i), mask)
+            End If
+        Next
+
+        bpSide = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
+        For i = 0 To vwSide.Count - 1
+            Dim r = vwSide.Values(i).rect
+            Dim mindepth = 1000 * maxZ * (src.Height - r.Y - r.Height) / src.Height
+            Dim maxDepth = 1000 * maxZ * (src.Height - r.Y) / src.Height
+            Dim sideRect = New cv.Rect(0, r.Y, src.Width, r.Y + r.Height)
+            If sideRect.Y + sideRect.Height >= src.Height Then sideRect.Height = src.Height - sideRect.Y
+            If sideRect.Width > 0 Then
+                cv.Cv2.InRange(depth32f(sideRect), cv.Scalar.All(mindepth), cv.Scalar.All(maxDepth), mask)
+                bpSide(sideRect).SetTo(scalarColors(i), mask)
+            End If
+        Next
+
+        ocvb.trueText(New TTtext(detailText, textPoint))
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_BackProject
+    Inherits ocvbClass
+    Dim both As PointCloud_BothViews
+    Dim mats As Mat_4to1
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        both = New PointCloud_BothViews(ocvb)
+        mats = New Mat_4to1(ocvb)
+        label1 = "Click any quadrant at left to view it below"
+        label2 = "Click any centroid to display details"
+        ocvb.desc = "Backproject the selected object"
+    End Sub
+
+    Public Sub Run(ocvb As AlgorithmData)
+        Static quadrant As Integer
+        If ocvb.mouseClickFlag Then
+            If ocvb.mouseClickPoint.X < src.Width Then
+                quadrant = clickQuadrant(ocvb)
+                ocvb.mouseClickFlag = False ' they clicked on a quadrant so both can ignore
+            Else
+                If quadrant = 0 Then
+                    ocvb.mouseClickPoint.X -= src.Width
+                    both.clickOffset = src.Width
+                Else
+                    both.clickOffset = 0
                 End If
-            Case Else
-        End Select
-        If dText.Length > 0 Then label2 = dText
-        ocvb.trueText(New TTtext(dText, textPoint))
+            End If
+        End If
+        both.Run(ocvb)
+        mats.mat(0) = both.dst1
+        mats.mat(1) = both.dst2
+        mats.mat(2) = both.bpTop
+        mats.mat(3) = both.bpSide
+        mats.Run(ocvb)
+        dst1 = mats.dst1
+        dst2 = mats.mat(quadrant)
+        label2 = both.detailText
     End Sub
 End Class
 
