@@ -662,7 +662,6 @@ Public Class OpenCVB
         mouseClickFlag = True
         Dim pic = DirectCast(sender, PictureBox)
         mouseClickPoint = setMousePoint()
-        Console.WriteLine("x = " + CStr(mouseClickPoint.X) + " y = " + CStr(mouseClickPoint.Y))
     End Sub
     Private Sub camPic_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Try

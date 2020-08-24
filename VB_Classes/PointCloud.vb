@@ -820,12 +820,6 @@ Public Class PointCloud_BothViews
         Static detailPoint As cv.Point
         If ocvb.mouseClickFlag Then detailPoint = ocvb.mouseClickPoint
 
-        Static saveQuad = ocvb.quadrantIndex
-        If saveQuad <> ocvb.quadrantIndex Then
-            detailPoint = New cv.Point
-            saveQuad = ocvb.quadrantIndex
-        End If
-
         Static minDepth As Single, maxDepth As Single
         Static activeView = ocvb.quadrantIndex
         Static vw = topPixel.viewObjects
@@ -839,6 +833,7 @@ Public Class PointCloud_BothViews
         If detailPoint.X = 0 And detailPoint.Y = 0 Then detailPoint = New cv.Point(CInt(rView.x), CInt(rView.y))
         Dim roiTop = New cv.Rect(0, 0, dst1.Width, dst1.Height)
         Dim roiSide = New cv.Rect(0, 0, dst1.Width, dst1.Height)
+
         If vw.Count > 0 And (activeView = QUAD0 Or activeView = QUAD2) Then
             Dim pixelPerMeter = topPixel.measure.pixelsPerMeter
             minDepth = maxZ * (src.Height - rView.Y - rView.Height) / src.Height
@@ -848,6 +843,7 @@ Public Class PointCloud_BothViews
             label1 = detailText
             Dim rFront = vw.Values(minIndex).rectFront
             roiTop = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
+            If roiTop.Y + roiTop.Width > src.Width Then roiTop.Width = src.Width - roiTop.Y
         End If
 
         If vw.Count > 0 And (activeView = QUAD1 Or activeView = QUAD3) Then
@@ -860,7 +856,9 @@ Public Class PointCloud_BothViews
             label2 = detailText
             Dim rFront = vw.Values(minIndex).rectFront
             roiSide = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)
+            If roiSide.Y + roiSide.Height > src.Height Then roiSide.Height = src.Height - roiSide.Y
         End If
+
         Dim mask As New cv.Mat
         bpTop = ocvb.color.Clone()
         bpSide = ocvb.color.Clone()
