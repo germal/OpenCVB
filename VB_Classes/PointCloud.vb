@@ -716,7 +716,7 @@ Public Class PointCloud_BackProject
 
         both = New PointCloud_BothViews(ocvb)
         mats = New Mat_4to1(ocvb)
-        label1 = "Click any quadrant at left to view it below"
+        label1 = "Click any quadrant below to enlarge i"
         label2 = "Click any centroid to display details"
         ocvb.desc = "Backproject the selected object"
     End Sub
@@ -732,8 +732,8 @@ Public Class PointCloud_BackProject
         both.Run(ocvb)
         mats.mat(0) = both.dst1
         mats.mat(1) = both.dst2
-        mats.mat(2) = both.bpTop
-        mats.mat(3) = both.bpSide
+        mats.mat(2) = both.backMat
+        mats.mat(3) = both.backMatMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         mats.Run(ocvb)
         dst1 = mats.dst1
         dst2 = mats.mat(ocvb.quadrantIndex)
@@ -754,8 +754,8 @@ Public Class PointCloud_BothViews
     Public sidePixel As PointCloud_PixelFormula_SideView
     Dim levelCheck As IMU_IsCameraLevel
     Public detailText As String
-    Public bpTop As New cv.Mat
-    Public bpSide As New cv.Mat
+    Public backMat As New cv.Mat
+    Public backMatMask As New cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
@@ -764,11 +764,9 @@ Public Class PointCloud_BothViews
 
         levelCheck = New IMU_IsCameraLevel(ocvb)
 
-        bpTop = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
-        bpSide = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3, 0)
+        backMat = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3)
+        backMatMask = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
 
-        label1 = "Top View - click for details"
-        label2 = "Side View - click for details"
         ocvb.desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
     Private Function setDetails(detailPoint As cv.Point, viewObjects As SortedList(Of Integer, viewObject)) As Integer
@@ -826,13 +824,13 @@ Public Class PointCloud_BothViews
         If vw.count = 0 Then Exit Sub
         If activeView <> ocvb.quadrantIndex Then
             activeView = ocvb.quadrantIndex
+            detailPoint = New cv.Point
             vw = If(activeView = QUAD0 Or activeView = QUAD2, topPixel.viewObjects, sidePixel.viewObjects)
         End If
         Dim minIndex = setDetails(detailPoint, vw)
         Dim rView = vw.Values(minIndex).rectView
         If detailPoint.X = 0 And detailPoint.Y = 0 Then detailPoint = New cv.Point(CInt(rView.x), CInt(rView.y))
-        Dim roiTop = New cv.Rect(0, 0, dst1.Width, dst1.Height)
-        Dim roiSide = New cv.Rect(0, 0, dst1.Width, dst1.Height)
+        Dim roi = New cv.Rect(0, 0, dst1.Width, dst1.Height)
 
         If vw.Count > 0 And (activeView = QUAD0 Or activeView = QUAD2) Then
             Dim pixelPerMeter = topPixel.measure.pixelsPerMeter
@@ -840,13 +838,12 @@ Public Class PointCloud_BothViews
             maxDepth = maxZ * (src.Height - rView.Y) / src.Height
             detailText = "Clicked: " + Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m & " +
                          CStr(vw.Values(minIndex).rectView.Width) + " pixels wide or " + Format(rView.Width / pixelPerMeter, "0.0") + "m"
-            label1 = detailText
+            label2 = detailText
             Dim rFront = vw.Values(minIndex).rectFront
-            roiTop = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
-            If roiTop.Y + roiTop.Width > src.Width Then roiTop.Width = src.Width - roiTop.Y
+            roi = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
         End If
 
-        If vw.Count > 0 And (activeView = QUAD1 Or activeView = QUAD3) Then
+        If vw.Count > 0 And (activeView = QUAD1) Then
             Dim pixelPerMeter = sidePixel.measure.pixelsPerMeter
             Dim cameraX = (src.Width - src.Height) / 2
             minDepth = maxZ * (rView.X - cameraX) / src.Height
@@ -855,18 +852,17 @@ Public Class PointCloud_BothViews
                              CStr(vw.Values(minIndex).rectView.Width) + " pixels wide or " + Format(rView.Height / pixelPerMeter, "0.0") + "m"
             label2 = detailText
             Dim rFront = vw.Values(minIndex).rectFront
-            roiSide = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)
-            If roiSide.Y + roiSide.Height > src.Height Then roiSide.Height = src.Height - roiSide.Y
+            roi = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)
         End If
 
-        Dim mask As New cv.Mat
-        bpTop = ocvb.color.Clone()
-        bpSide = ocvb.color.Clone()
-        cv.Cv2.InRange(depth32f(roiTop), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), mask)
-        bpTop(roiTop).SetTo(vw.Values(minIndex).color, mask)
-        cv.Cv2.InRange(depth32f(roiSide), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), mask)
-        bpSide(roiSide).SetTo(vw.Values(minIndex).color, mask)
-
-        ocvb.trueText(New TTtext(detailText, detailPoint, 3))
+        backMat = ocvb.color
+        If roi.X + roi.Width > src.Width Then roi.Width = src.Width - roi.X
+        If roi.Y + roi.Height > src.Height Then roi.Height = src.Height - roi.Y
+        If roi.Width > 0 And roi.Height > 0 Then
+            backMatMask.SetTo(0)
+            cv.Cv2.InRange(depth32f(roi), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), backMatMask(roi))
+            backMat(roi).SetTo(vw.Values(minIndex).color, backMatMask(roi))
+        End If
+        If (activeView = QUAD0 Or activeView = QUAD1) Then ocvb.trueText(New TTtext(detailText, detailPoint, 3))
     End Sub
 End Class
