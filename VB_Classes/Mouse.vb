@@ -8,7 +8,7 @@ Public Class Mouse_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static lastPoint = New cv.Point
-        ' we are only interested in mouse movements in Result1 (tag = 2)
+        ' only display mouse movement in the lower left image (pic.tag = 2)
         If lastPoint = ocvb.mousePoint Or ocvb.mousePicTag <> 2 Then Exit Sub
         lastPoint = ocvb.mousePoint
         Dim radius = 10

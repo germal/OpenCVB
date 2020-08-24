@@ -835,7 +835,8 @@ Public Class Histogram_ColorsAndGray
 
         mats.Run(ocvb)
         dst1 = mats.dst1
-        dst2 = mats.mat(clickQuadrant(ocvb))
+        If ocvb.mouseClickFlag And ocvb.mousePicTag = RESULT1 Then setQuadrant(ocvb)
+        dst2 = mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
 
@@ -1012,6 +1013,7 @@ Public Class Histogram_HueSaturation2DPlot
         hueSat = New Brightness_Hue(ocvb)
         hist2d = New Histogram_BackProjection2D(ocvb)
         mats = New Mat_4to1(ocvb)
+        ocvb.quadrantIndex = QUAD3
         label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
     End Sub
@@ -1028,6 +1030,7 @@ Public Class Histogram_HueSaturation2DPlot
 
         mats.Run(ocvb)
         dst1 = mats.dst1
-        dst2 = mats.mat(clickQuadrant(ocvb, 3))
+        If ocvb.mouseClickFlag And ocvb.mousePicTag = RESULT1 Then setQuadrant(ocvb)
+        dst2 = mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class

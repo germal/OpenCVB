@@ -49,7 +49,8 @@ Public Class Blob_Input
         Mats.mat(3) = poly.dst2
         Mats.Run(ocvb)
         Mats.dst1.CopyTo(dst1)
-        dst2 = Mats.mat(clickQuadrant(ocvb))
+        If ocvb.mouseClickFlag And ocvb.mousePicTag = RESULT1 Then setQuadrant(ocvb)
+        dst2 = Mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
 

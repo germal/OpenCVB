@@ -50,9 +50,9 @@ Public Class OpenCVB
     Dim mediumResolution As Boolean
     Dim mouseClickFlag As Boolean
     Dim mouseClickPoint As New cv.Point
+    Dim mousePicTag As Integer
     Dim mouseDownPoint As New cv.Point
     Dim mouseMovePoint As New cv.Point
-    Dim mousePicTag As Int32
     Dim mousePoint As New cv.Point
     Dim myBrush = New SolidBrush(System.Drawing.Color.White)
     Dim myPen As New System.Drawing.Pen(System.Drawing.Color.White)
@@ -311,11 +311,17 @@ Public Class OpenCVB
             Try
                 Dim xFactor = camPic(2).Width / imgResult.Width * If(mediumResolution, 1, 2)
                 Dim yFactor = camPic(2).Height / imgResult.Height * If(mediumResolution, 1, 2)
-                If pic.Tag = 2 Then ' campic(2) is the width of the RGB and RGBdepth images combined.  
+                If pic.Tag = 2 Then
                     For i = 0 To TTtextData.Count - 1
                         Dim tt = TTtextData(i)
                         If tt IsNot Nothing Then
-                            g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White), tt.x * xFactor, tt.y * yFactor)
+                            If TTtextData(i).picTag = 3 Then
+                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
+                                             tt.x * xFactor + camPic(0).Size.Width, tt.y * yFactor)
+                            Else
+                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
+                                                 tt.x * xFactor, tt.y * yFactor)
+                            End If
                             maxline -= 1
                             If maxline <= 0 Then Exit For
                         End If
@@ -644,13 +650,19 @@ Public Class OpenCVB
 
         Return r
     End Function
+    Private Function setMousePoint() As cv.Point
+        Dim width = If(mediumResolution, fastSize.Width, camera.color.width)
+        If mousePoint.X > width Then
+            mousePoint.X -= width
+            mousePicTag = 3
+        End If
+        Return mousePoint
+    End Function
     Private Sub campic_Click(sender As Object, e As EventArgs)
         mouseClickFlag = True
-        If mediumResolution Then
-            mouseClickPoint = New cv.Point2f(CInt(2 * fastSize.Width * mousePoint.X / camPic(2).Width), CInt(fastSize.Height * mousePoint.Y / camPic(2).Height))
-        Else
-            mouseClickPoint = New cv.Point2f(CInt(2 * camera.color.width * mousePoint.X / camPic(2).Width), CInt(camera.color.height * mousePoint.Y / camPic(2).Height))
-        End If
+        Dim pic = DirectCast(sender, PictureBox)
+        mouseClickPoint = setMousePoint()
+        Console.WriteLine("x = " + CStr(mouseClickPoint.X) + " y = " + CStr(mouseClickPoint.Y))
     End Sub
     Private Sub camPic_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Try
@@ -741,8 +753,10 @@ Public Class OpenCVB
                 BothFirstAndLastReady = True
             End If
             mousePicTag = pic.Tag
+            If mousePicTag = 2 And mousePoint.X > camPic(0).Width Then mousePicTag = 3 ' pretend this is coming from the fictional campic(3) which was dst2
             mousePoint.X = e.X
             mousePoint.Y = e.Y
+            mousePoint = setMousePoint() ' might have to change the x and y location if it is the fictional campic(3)
         Catch ex As Exception
             Console.WriteLine("Error in camPic_MouseMove: " + ex.Message)
         End Try
@@ -990,7 +1004,7 @@ Public Class OpenCVB
         parms.OpenCVfullPath = OpenCVfullPath
         parms.transformationMatrix = camera.transformationmatrix
         parms.OpenCV_Version_ID = Environment.GetEnvironmentVariable("OpenCV_Version")
-        parms.imageTTTtextLoc = 1 / resizeForDisplay
+        parms.trueTextLoc = 1 / resizeForDisplay
         parms.useRecordedData = OpenCVkeyword.Text = "<All using recorded data>"
         parms.testAllRunning = TestAllButton.Text = "Stop Test"
         parms.externalPythonInvocation = externalPythonInvocation
@@ -999,7 +1013,7 @@ Public Class OpenCVB
         parms.NumPyEnabled = optionsForm.EnableNumPy.Checked
 
         If parms.resolution = OptionsDialog.resMed Then parms.speedFactor = 2 Else parms.speedFactor = 1
-        If parms.resolution = OptionsDialog.resMed Then parms.imageTTTtextLoc *= parms.speedFactor
+        If parms.resolution = OptionsDialog.resMed Then parms.trueTextLoc *= parms.speedFactor
 
         PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
 
@@ -1053,8 +1067,8 @@ Public Class OpenCVB
             ' Here we check to see if the algorithm constructor changed mediumResolution.
             If OpenCVB.ocvb.parms.resolution <> saveLowResSetting Then
                 If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
-                OpenCVB.ocvb.parms.imageTTTtextLoc = 1 / resizeForDisplay
-                If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.imageTTTtextLoc *= OpenCVB.ocvb.parms.speedFactor
+                OpenCVB.ocvb.parms.trueTextLoc = 1 / resizeForDisplay
+                If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.trueTextLoc *= OpenCVB.ocvb.parms.speedFactor
             End If
 
             ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.

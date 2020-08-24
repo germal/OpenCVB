@@ -139,7 +139,7 @@ Public Class DNN_Basics
                         rect.Width = 100
                         rect.Height = 30
                         dst2.Rectangle(rect, cv.Scalar.Black, -1)
-                        ocvb.trueText(New TTtext(nextName, CInt(rect.X * ocvb.parms.imageTTTtextLoc), CInt(rect.Y * ocvb.parms.imageTTTtextLoc)))
+                        ocvb.trueText(New TTtext(nextName, CInt(rect.X * ocvb.parms.trueTextLoc), CInt(rect.Y * ocvb.parms.trueTextLoc)))
                     End If
                 Next
             Else

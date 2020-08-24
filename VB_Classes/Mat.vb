@@ -155,7 +155,7 @@ Public Class Mat_4to1
             dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, 2)
             dst1.Line(New cv.Point(dst1.Width / 2, 0), New cv.Point(dst1.Width / 2, dst1.Height), cv.Scalar.White, 2)
         End If
-        dst2 = mat(clickQuadrant(ocvb))
+        dst2 = mat(ocvb.quadrantIndex)
     End Sub
 End Class
 

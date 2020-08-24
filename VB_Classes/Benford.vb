@@ -40,7 +40,6 @@ Public Class Benford_Basics
         ReDim counts(expectedDistribution.Count - 1)
         use99 = True
     End Sub
-
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
             benford.src = src
@@ -248,5 +247,25 @@ Public Class Benford_PNG
         benford.Run(ocvb)
         dst2 = benford.dst1
         label2 = benford.label2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Benford_Depth
+    Inherits ocvbClass
+    Public benford As Benford_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        benford = New Benford_Basics(ocvb)
+        ocvb.desc = "Apply Benford to the depth data"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        benford.src = getDepth32f(ocvb)
+        benford.Run(ocvb)
+        dst1 = benford.dst1
     End Sub
 End Class

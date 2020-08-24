@@ -50,6 +50,7 @@ Public Class GeneticDrawing_Basics
         sliders.setupTrackBar(2, "Brushstroke count per generation", 1, 20, 10)
         sliders.setupTrackBar(3, "Brush size Percentage", 5, 100, 100)
         stageTotal = sliders.trackbar(1).Value
+        ocvb.quadrantIndex = QUAD3
 
         label1 = "(clkwise) original, imgStage, imgGeneration, magnitude"
         label2 = "Current result"
@@ -212,7 +213,8 @@ Public Class GeneticDrawing_Basics
         mats.Run(ocvb)
         dst1 = mats.dst1
         label2 = " stage " + CStr(stage) + "/" + CStr(stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
-        dst2 = mats.mat(clickQuadrant(ocvb, 3))
+        If ocvb.mouseClickFlag And ocvb.mousePicTag = RESULT1 Then setQuadrant(ocvb)
+        dst2 = mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
 

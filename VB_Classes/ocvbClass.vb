@@ -5,18 +5,27 @@ Imports cv = OpenCvSharp
 Public Class TTtext
     Public text As String
 
-    Public picTag = 2 ' campic(2) only.  Too much bookkeeping to put it in dst2...
+    Public picTag = 2
     Public x As Int32
     Public y As Int32
-    Public Sub New(_text As String, _x As Int32, _y As Int32)
+    Private Sub setup(_text As String, _x As Integer, _y As Integer, camPicIndex As Integer)
         text = _text
         x = _x
         y = _y
+        If camPicIndex <> 2 And camPicIndex <> 3 Then MsgBox("Pic.Tag can only be 2 or 3!  Time to fix this oversight...")
+        picTag = camPicIndex
+    End Sub
+    Public Sub New(_text As String, _x As Integer, _y As Integer, camPicIndex As Integer)
+        setup(_text, _x, _y, camPicIndex)
+    End Sub
+    Public Sub New(_text As String, _x As Integer, _y As Integer)
+        setup(_text, _x, _y, 2)
+    End Sub
+    Public Sub New(_text As String, pt As cv.Point, camPicIndex As Integer)
+        setup(_text, pt.X, pt.Y, camPicIndex)
     End Sub
     Public Sub New(_text As String, pt As cv.Point)
-        text = _text
-        x = pt.X
-        y = pt.Y 
+        setup(_text, pt.X, pt.Y, 2)
     End Sub
 End Class
 Public Class ocvbClass : Implements IDisposable
@@ -49,20 +58,20 @@ Public Class ocvbClass : Implements IDisposable
         End If
         caller = Me.GetType.Name
     End Sub
-    Public Function clickQuadrant(ocvb As AlgorithmData, Optional quadrant As Integer = 0) As Integer
-        Static quadrantIndex As Integer = quadrant
+    Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.
+    Public Const QUAD1 = 1
+    Public Const QUAD2 = 2
+    Public Const QUAD3 = 3
+    Public Sub setQuadrant(ocvb As AlgorithmData)
         If ocvb.mouseClickFlag Then
             Dim pt = ocvb.mouseClickPoint
-            If ocvb.mouseClickPoint.X <= src.Width Then ' all mat_4to1 displays must be in the lower left image.
-                If pt.Y < src.Height / 2 Then
-                    If pt.X < src.Width / 2 Then quadrantIndex = 0 Else quadrantIndex = 1
-                Else
-                    If pt.X < src.Width / 2 Then quadrantIndex = 2 Else quadrantIndex = 3
-                End If
+            If pt.Y < src.Height / 2 Then
+                If pt.X < src.Width / 2 Then ocvb.quadrantIndex = 0 Else ocvb.quadrantIndex = 1
+            Else
+                If pt.X < src.Width / 2 Then ocvb.quadrantIndex = 2 Else ocvb.quadrantIndex = 3
             End If
         End If
-            Return quadrantIndex
-    End Function
+    End Sub
     Public Function findCheckBox(opt As String) As CheckBox
         While 1
             Try

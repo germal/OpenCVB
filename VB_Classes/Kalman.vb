@@ -587,8 +587,11 @@ End Class
 
 Public Structure viewObject
     Dim centroid As cv.Point2f
-    Dim rect As cv.Rect
-    Dim mask As cv.Mat
+    Dim rectFront As cv.Rect ' this is the rect describing the object in the color and RGB depth views.
+    Dim rectView As cv.Rect ' rectangle in the top/side view (see previous rect.) 
+    Dim maskView As cv.Mat
+    Dim color As cv.Scalar
+    Dim active As Boolean
 End Structure
 
 
@@ -689,7 +692,7 @@ Public Class Kalman_PointTracker
                 Dim pt2 = knn.matchedPoints(j)
                 If pt1 = pt2 Then
                     matched = True
-                    kalmanAging(i) = 5 ' if not found for x generations, then discard this kalman filter.
+                    kalmanAging(i) = 10 ' if not found for x generations, then discard this kalman filter.
                     rect = New cv.Rect(kalman(i).input(2), kalman(i).input(3), kalman(i).input(4), kalman(i).input(5))
                     Dim qpt = knn.queryPoints(j)
                     For k = 0 To queryRects.Count - 1
@@ -726,9 +729,10 @@ Public Class Kalman_PointTracker
                 If rect.Width > 0 Then
                     Dim vo = New viewObject
                     vo.centroid = pt3
-                    vo.mask = lastMask(i)
-                    vo.rect = rect
-                    viewObjects.Add(pt3.X, vo)
+                    vo.maskView = lastMask(i)
+                    vo.rectView = rect
+                    vo.color = scalarColors(i)
+                    viewObjects.Add(vo.rectView.Width * vo.rectView.Height, vo)
                 End If
             End If
         Next

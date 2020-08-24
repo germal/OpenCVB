@@ -66,7 +66,8 @@ Public Class kMeans_Clusters
         Next
         Mats.Run(ocvb)
         dst1 = Mats.dst1
-        dst2 = Mats.mat(clickQuadrant(ocvb))
+        If ocvb.mouseClickFlag And ocvb.mousePicTag = RESULT1 Then setQuadrant(ocvb)
+        dst2 = Mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
 

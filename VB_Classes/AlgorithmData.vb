@@ -16,6 +16,7 @@ Public Class AlgorithmData
     Public frameCount As Int32 = 0
     Public label1 As String
     Public label2 As String
+    Public quadrantIndex As Integer = 0
     Public parms As ActiveClass.algorithmParameters
 
     Public mouseClickFlag As Boolean

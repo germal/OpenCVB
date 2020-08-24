@@ -58,6 +58,7 @@ Public Class Pixel_GetSet
 
         mats.Run(ocvb)
         dst1 = mats.dst1
-        dst2 = mats.mat(clickQuadrant(ocvb))
+        If ocvb.mouseClickFlag And ocvb.mousePicTag = RESULT1 Then setQuadrant(ocvb)
+        dst2 = mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class

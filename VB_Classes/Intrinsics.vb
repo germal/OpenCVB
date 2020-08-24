@@ -34,11 +34,11 @@ Public Class intrinsicsLeft_Basics
         dst2.Line(New cv.Point(0, src.Height / 2), New cv.Point(src.Width, src.Height / 2), cv.Scalar.White, 1)
 
         nextLine = "(" + CStr(ocvb.parms.intrinsicsLeft.ppx) + ", " + CStr(ocvb.parms.intrinsicsLeft.ppy) + ")"
-        Dim ttLocation = New cv.Point(CInt(ocvb.parms.imageTTTtextLoc * src.Width / 2) + 20, CInt(ocvb.parms.imageTTTtextLoc * src.Height / 2) + 20)
+        Dim ttLocation = New cv.Point(CInt(ocvb.parms.trueTextLoc * src.Width / 2) + 20, CInt(ocvb.parms.trueTextLoc * src.Height / 2) + 20)
         cv.Cv2.PutText(dst2, nextLine, ttLocation, cv.HersheyFonts.HersheyComplex, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Dim ptLoc = New cv.Point(src.Width / 2 + 4, src.Height / 2 + 4)
-        dst2.Line(ptLoc, New cv.Point(ttLocation.X / ocvb.parms.imageTTTtextLoc, ttLocation.Y / ocvb.parms.imageTTTtextLoc), cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+        dst2.Line(ptLoc, New cv.Point(ttLocation.X / ocvb.parms.trueTextLoc, ttLocation.Y / ocvb.parms.trueTextLoc), cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
