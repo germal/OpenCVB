@@ -44,13 +44,13 @@ Module IndexMain
         While srAPI.EndOfStream = False
             line = srAPI.ReadLine()
             If line <> "" Then
-                If line = "testAllRunning" Then
-                    apiList.Add(line)
+                ' add any custom keywords here.  These are OpenCVB terms not OpenCV API's (so no right parenthesis) - case sensitive!
+                If line = "testAllRunning" Or line = "mouseClickPoint" Or line = "mousePoint" Or line = "mouseClickFlag" Then
                     apiListLCase.Add(LCase(line))
                 Else
-                    apiList.Add(line + "(") ' it needs the parenthesis to make sure it is a function.
                     apiListLCase.Add(LCase(line) + "(") ' it needs the parenthesis to make sure it is a function.
                 End If
+                apiList.Add(line + "(") ' it needs the parenthesis to make sure it is a function.
             End If
         End While
         srAPI.Close()

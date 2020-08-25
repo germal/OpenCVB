@@ -269,3 +269,25 @@ Public Class Benford_Depth
         dst1 = benford.dst1
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Benford_DepthRGB
+    Inherits ocvbClass
+    Public benford As Benford_JPEG
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        benford = New Benford_JPEG(ocvb)
+        ocvb.desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim jpeg = ocvb.RGBDepth.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, benford.sliders.trackbar(0).Value})
+        benford.src = ocvb.RGBDepth
+        benford.Run(ocvb)
+        dst1 = cv.Cv2.ImDecode(jpeg, cv.ImreadModes.Color)
+        dst2 = benford.dst2
+    End Sub
+End Class

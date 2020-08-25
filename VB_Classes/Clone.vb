@@ -164,7 +164,6 @@ Public Class Clone_Eagle
             If pt.X - srcROI.Width / 2 < 0 Then pt.X = srcROI.Width / 2
             If pt.Y + srcROI.Height >= src.Height Then pt.Y = src.Height - srcROI.Height / 2
             If pt.Y - srcROI.Height < 0 Then pt.Y = srcROI.Height / 2
-            ocvb.mouseClickFlag = False
         End If
 
         Dim cloneFlag As New cv.SeamlessCloneMethods

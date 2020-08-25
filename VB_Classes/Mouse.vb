@@ -15,7 +15,6 @@ Public Class Mouse_Basics
         Static colorIndex As Int32
         Dim nextColor = scalarColors(colorIndex)
         Dim nextPt = ocvb.mousePoint
-        If ocvb.parms.resolution = resHigh Then nextPt = ocvb.mousePoint * 2
         dst1.Circle(nextPt, radius, nextColor, -1, cv.LineTypes.AntiAlias)
         colorIndex += 1
         If colorIndex >= scalarColors.Count Then colorIndex = 0

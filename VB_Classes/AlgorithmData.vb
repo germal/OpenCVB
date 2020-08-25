@@ -21,7 +21,7 @@ Public Class AlgorithmData
 
     Public mouseClickFlag As Boolean
     Public mouseClickPoint As cv.Point
-    Public mousePicTag As Int32 ' which image was the mouse in?
+    Public mousePicTag As Integer ' which image was the mouse in?
     Public mousePoint As cv.Point ' trace any mouse movements using this.
 
     Public PythonExe As String

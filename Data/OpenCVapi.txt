@@ -388,6 +388,7 @@ ml_TrainData
 moments
 morphologyEx
 mousePoint
+mouseClickPoint
 moveWindow
 MSER
 MSER_create

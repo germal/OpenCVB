@@ -12,7 +12,6 @@ Public Class TTtext
         text = _text
         x = _x
         y = _y
-        If camPicIndex <> 2 And camPicIndex <> 3 Then MsgBox("Pic.Tag can only be 2 or 3!  Time to fix this oversight...")
         picTag = camPicIndex
     End Sub
     Public Sub New(_text As String, _x As Integer, _y As Integer, camPicIndex As Integer)
@@ -66,9 +65,9 @@ Public Class ocvbClass : Implements IDisposable
         If ocvb.mouseClickFlag Then
             Dim pt = ocvb.mouseClickPoint
             If pt.Y < src.Height / 2 Then
-                If pt.X < src.Width / 2 Then ocvb.quadrantIndex = 0 Else ocvb.quadrantIndex = 1
+                If pt.X < src.Width / 2 Then ocvb.quadrantIndex = QUAD0 Else ocvb.quadrantIndex = QUAD1
             Else
-                If pt.X < src.Width / 2 Then ocvb.quadrantIndex = 2 Else ocvb.quadrantIndex = 3
+                If pt.X < src.Width / 2 Then ocvb.quadrantIndex = QUAD2 Else ocvb.quadrantIndex = QUAD3
             End If
         End If
     End Sub

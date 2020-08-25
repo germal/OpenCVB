@@ -62,7 +62,7 @@ Public Class OpenCVB
     Dim optionsForm As OptionsDialog
     Dim openForm As OpenFilename
     Dim picLabels() = {"RGB", "Depth", "", ""}
-    Dim regWidth As Int32 = 1280, regHeight As Int32 = 720
+    Dim camWidth As Int32 = 1280, camHeight As Int32 = 720
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Dim fastSize As cv.Size
     Dim stopCameraThread As Boolean
@@ -309,18 +309,17 @@ Public Class OpenCVB
         Dim maxline = 21
         SyncLock TTtextData
             Try
-                Dim xFactor = camPic(2).Width / imgResult.Width * If(mediumResolution, 1, 2)
-                Dim yFactor = camPic(2).Height / imgResult.Height * If(mediumResolution, 1, 2)
-                If pic.Tag = 2 Then
+                Dim ratio = camPic(2).Width / imgResult.Width
+                If pic.Tag = 2 Or pic.Tag = 3 Then
                     For i = 0 To TTtextData.Count - 1
                         Dim tt = TTtextData(i)
                         If tt IsNot Nothing Then
                             If TTtextData(i).picTag = 3 Then
                                 g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
-                                             tt.x * xFactor + camPic(0).Size.Width, tt.y * yFactor)
+                                             tt.x * ratio + camPic(0).width, tt.y * ratio)
                             Else
                                 g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
-                                                 tt.x * xFactor, tt.y * yFactor)
+                                             tt.x * ratio, tt.y * ratio)
                             End If
                             maxline -= 1
                             If maxline <= 0 Then Exit For
@@ -332,7 +331,6 @@ Public Class OpenCVB
             End Try
 
             If optionsForm.ShowLabels.Checked Then
-                ' with the low resolution display, we need to use the entire width of the image to display the RGB and Depth text area.
                 Dim textRect As New Rectangle(0, 0, camPic(0).Width / 2, If(resizeForDisplay = 4, 12, 20))
                 If Len(picLabels(pic.Tag)) Then g.FillRectangle(myBrush, textRect)
                 g.DrawString(picLabels(pic.Tag), optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.Black), 0, 0)
@@ -344,8 +342,7 @@ Public Class OpenCVB
             End If
         End SyncLock
 
-
-        ' only the main task can have an openfiledialog box run interactively.  The data will be moved when altered to the algorithm task.
+        ' only the main task can have an openfiledialog box!  Move results to the algorithm task from specified locations in this form.
         If openFileInitialDirectory <> "" Then
             If openFileDialogRequested Then
                 openFileDialogRequested = False
@@ -390,8 +387,8 @@ Public Class OpenCVB
         ' order is same as in optionsdialog enum
         camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraT265, cameraZed2, cameraMyntD, cameraD435i, cameraL515, cameraD455)
         If camera.devicename = "" Then
-            camera.width = regWidth
-            camera.height = regHeight
+            camera.width = camWidth
+            camera.height = camHeight
             camera.initialize(fps)
         End If
         camera.pipelineclosed = False
@@ -404,9 +401,9 @@ Public Class OpenCVB
     End Sub
     Private Sub LineUpCamPics()
         Dim width = CInt((Me.Width - 38) / 2)
-        Dim height = CInt(width * regHeight / regWidth)
-        If Math.Abs(width - regWidth / 2) < 2 Then width = regWidth / 2
-        If Math.Abs(height - regHeight / 2) < 2 Then height = regHeight / 2
+        Dim height = CInt(width * camHeight / camWidth)
+        If Math.Abs(width - camWidth / 2) < 2 Then width = camWidth / 2
+        If Math.Abs(height - camHeight / 2) < 2 Then height = camHeight / 2
         Dim padX = 12
         Dim padY = 40
         camPic(0).Size = New Size(width, height)
@@ -474,8 +471,8 @@ Public Class OpenCVB
         If goodPoint.X > Me.Left Then Me.Left = goodPoint.X
         If goodPoint.Y > Me.Top Then Me.Top = goodPoint.Y
 
-        Dim defaultWidth = regWidth * 2 / resizeForDisplay + border * 7
-        Dim defaultHeight = regHeight * 2 / resizeForDisplay + ToolStrip1.Height + border * 12
+        Dim defaultWidth = camWidth * 2 / resizeForDisplay + border * 7
+        Dim defaultHeight = camHeight * 2 / resizeForDisplay + ToolStrip1.Height + border * 12
         Me.Width = GetSetting("OpenCVB", "OpenCVBWidth", "OpenCVBWidth", defaultWidth)
         Me.Height = GetSetting("OpenCVB", "OpenCVBHeight", "OpenCVBHeight", defaultHeight)
         If Me.Height < 50 Then
@@ -487,7 +484,7 @@ Public Class OpenCVB
 
         For i = 0 To camPic.Length - 1
             If camPic(i) Is Nothing Then camPic(i) = New PictureBox()
-            camPic(i).Size = New Size(If(i < 2, regWidth / resizeForDisplay, regWidth * 2 / resizeForDisplay), regHeight / resizeForDisplay)
+            camPic(i).Size = New Size(If(i < 2, camWidth / resizeForDisplay, camWidth * 2 / resizeForDisplay), camHeight / resizeForDisplay)
             AddHandler camPic(i).DoubleClick, AddressOf campic_DoubleClick
             AddHandler camPic(i).Click, AddressOf campic_Click
             AddHandler camPic(i).Paint, AddressOf campic_Paint
@@ -650,18 +647,8 @@ Public Class OpenCVB
 
         Return r
     End Function
-    Private Function setMousePoint() As cv.Point
-        Dim width = If(mediumResolution, fastSize.Width, camera.color.width)
-        If mousePoint.X > width Then
-            mousePoint.X -= width
-            mousePicTag = 3
-        End If
-        Return mousePoint
-    End Function
     Private Sub campic_Click(sender As Object, e As EventArgs)
         mouseClickFlag = True
-        Dim pic = DirectCast(sender, PictureBox)
-        mouseClickPoint = setMousePoint()
     End Sub
     Private Sub camPic_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Try
@@ -752,10 +739,14 @@ Public Class OpenCVB
                 BothFirstAndLastReady = True
             End If
             mousePicTag = pic.Tag
-            If mousePicTag = 2 And mousePoint.X > camPic(0).Width Then mousePicTag = 3 ' pretend this is coming from the fictional campic(3) which was dst2
             mousePoint.X = e.X
             mousePoint.Y = e.Y
-            mousePoint = setMousePoint() ' might have to change the x and y location if it is the fictional campic(3)
+            If mousePicTag = 2 And mousePoint.X > camPic(0).Width Then
+                mousePoint.X -= camPic(0).Width
+                mousePicTag = 3 ' pretend this is coming from the fictional campic(3) which was dst2
+            End If
+            'Dim resizeFactor = camPic(0).Width / camera.color.width
+            'mousePoint *= resizeFactor
         Catch ex As Exception
             Console.WriteLine("Error in camPic_MouseMove: " + ex.Message)
         End Try
@@ -837,7 +828,7 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "OpenCVBWidth", "OpenCVBWidth", Me.Width)
         SaveSetting("OpenCVB", "OpenCVBHeight", "OpenCVBHeight", Me.Height)
 
-        Dim details = CStr(regWidth) + "x" + CStr(regHeight) + " display " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + " Resolution="
+        Dim details = CStr(camWidth) + "x" + CStr(camHeight) + " display " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + " Resolution="
         If optionsForm.mediumResolution.Checked Then details += "Medium" Else details += "High"
         picLabels(0) = "Input " + details
         picLabels(1) = "Depth " + details
@@ -961,9 +952,9 @@ Public Class OpenCVB
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
 
             If optionsForm.SnapToGrid.Checked Then
-                camPic(0).Size = New Size(regWidth / 2, regHeight / 2)
-                camPic(1).Size = New Size(regWidth / 2, regHeight / 2)
-                camPic(2).Size = New Size(regWidth, regHeight / 2)
+                camPic(0).Size = New Size(camWidth / 2, camHeight / 2)
+                camPic(1).Size = New Size(camWidth / 2, camHeight / 2)
+                camPic(2).Size = New Size(camWidth, camHeight / 2)
 
                 camPic(1).Left = camPic(0).Left + camPic(0).Width
                 camPic(2).Top = camPic(0).Top + camPic(0).Height
@@ -991,7 +982,7 @@ Public Class OpenCVB
         parms.activeAlgorithm = AvailableAlgorithms.Text
         ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
         If parms.activeAlgorithm.Contains("OpenGL") Or parms.activeAlgorithm.Contains("OpenCVGL") Then mediumResolution = False
-        fastSize = If(mediumResolution, New cv.Size(regWidth / 2, regHeight / 2), New cv.Size(regWidth, regHeight))
+        fastSize = If(mediumResolution, New cv.Size(camWidth / 2, camHeight / 2), New cv.Size(camWidth, camHeight))
 
         parms.resolution = If(mediumResolution, OptionsDialog.resMed, OptionsDialog.resHigh)
         parms.cameraIndex = optionsForm.cameraIndex ' index of active camera
@@ -1046,7 +1037,7 @@ Public Class OpenCVB
             drawRect = New cv.Rect
             Dim saveLowResSetting As Boolean = parms.resolution
 
-            Dim OpenCVB = New VB_Classes.ActiveClass(parms, regWidth / parms.speedFactor, regHeight / parms.speedFactor, New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
+            Dim OpenCVB = New VB_Classes.ActiveClass(parms, camWidth / parms.speedFactor, camHeight / parms.speedFactor, New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
             textDesc = OpenCVB.ocvb.desc
             openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
             openFileDialogRequested = OpenCVB.ocvb.parms.openFileDialogRequested
@@ -1158,10 +1149,10 @@ Public Class OpenCVB
             OpenCVB.UpdateHostLocation(New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
 
             Try
-                Dim ratio = camPic(0).Width / OpenCVB.ocvb.color.Width ' relative size of displayed image and algorithm size image.
+                Dim ratio = OpenCVB.ocvb.color.Width / camPic(0).Width  ' relative size of displayed image and algorithm size image.
                 If GrabRectangleData Then
                     GrabRectangleData = False
-                    OpenCVB.ocvb.drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
+                    OpenCVB.ocvb.drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
                     If OpenCVB.ocvb.drawRect.Width <= 2 Then OpenCVB.ocvb.drawRect.Width = 0 ' too small?
                     Dim w = OpenCVB.ocvb.color.Width
                     If OpenCVB.ocvb.drawRect.X > w Then OpenCVB.ocvb.drawRect.X -= w
@@ -1171,10 +1162,10 @@ Public Class OpenCVB
                     BothFirstAndLastReady = False
                 End If
 
-                OpenCVB.ocvb.mousePoint = mousePoint * (1 / ratio)
+                OpenCVB.ocvb.mousePoint = mousePoint * ratio
                 OpenCVB.ocvb.mousePicTag = mousePicTag
                 OpenCVB.ocvb.mouseClickFlag = mouseClickFlag
-                OpenCVB.ocvb.mouseClickPoint = mouseClickPoint * (1 / ratio)
+                If mouseClickFlag Then OpenCVB.ocvb.mouseClickPoint = mousePoint
                 mouseClickFlag = False
 
                 OpenCVB.ocvb.parms.fileStarted = openFileStarted ' UI may have stopped play.

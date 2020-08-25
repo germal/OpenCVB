@@ -122,7 +122,7 @@ Public Class ActiveClass : Implements IDisposable
         ActiveAlgorithm = algoList.createAlgorithm(ocvb, parms.activeAlgorithm)
         If ActiveAlgorithm Is Nothing Then
             MsgBox("The algorithm: " + parms.activeAlgorithm + " was not found in the algorithmList.vb code." + vbCrLf +
-                   "Review the code to determine why.")
+                   "Problem likely originated with the UIindexer.")
         End If
         If ActiveAlgorithm Is Nothing And parms.activeAlgorithm.EndsWith(".py") Then
             parms.activeAlgorithm = parms.activeAlgorithm.Substring(0, Len(parms.activeAlgorithm) - 3)
