@@ -323,7 +323,6 @@ Public Class Puzzle_Solver
         Next
         Static saveRadioIndex As Integer
         Static saveResolution As Integer
-        Static fontsize = 0.9
         Static xxOffset As Integer
         Static xyOffset As Integer
         Static yxOffset As Integer

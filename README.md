@@ -9,24 +9,22 @@ interface. That is what "OpenCVB" Version 1.0 provides.
 
 In the sample output below, any of the hundreds of algorithms can be selected
 from the first combo box at the top of the form. The second combo box is used to
-group the different algorithms by what OpenCV API’s or other OpenCVB algorithms
-are used. The default grouping is to select “\<All\>” algorithms while other
-special groupings allow selecting Python or C++ or Multi-threaded algorithms.
-The text at the right side of the toolbar is a brief description of the
-algorithm. Icons on the left side are to (l. to r.): pause/resume the algorithm,
-change global settings for OpenCVB, run regression tests, and take a picture of
-the current output.
+group the different algorithms by OpenCV API or OpenCVB algorithm. The default
+grouping is to select “\<All\>” algorithms while other special groupings allow
+selecting Python or C++ or Multi-threaded algorithms. The text at the right side
+of the toolbar is a brief description of the algorithm. Icons on the left side
+are to (l. to r.): pause/resume the algorithm, change global settings for
+OpenCVB, run regression tests, and take a picture of the current output.
 
-![](media/b1e011f4681611111d7a7c752e274599.png)
+![](media/aeec548511d99538594068b76ca4b49b.png)
 
-The output images above are: the RGB output (upper left), the colorized depth
+The output images above are the RGB output (upper left), the colorized depth
 image (upper right), the output of the current algorithm (lower left) and an
 optional second image output from the algorithm (lower right). In this example
-the algorithm renders the camera point cloud as if seen from directly above – a
-useful view to find walls and objects. The data is colored the same as the RGB
-Depth data in the upper right image. The lower right image has isolated the
-objects found with a rectangle that measures the width and breadth of each
-object in the camera’s field of view.
+the algorithm renders the camera point cloud as if seen from directly above in
+the lower left image while the lower right has the view from the side. Both
+perspectives show the camera field of view (FOV) and the distance to each of the
+objects.
 
 The “Sample Results” section below provides numerous additional examples.
 
@@ -565,16 +563,16 @@ In the OpenCVB user interface, the top left image is the RGB and top right is
 depth. Algorithm results are in the bottom left and right or additional OpenGL,
 Python, or HighGUI windows.
 
-![](media/82e8b583dbbef2d7b590f319eda0dca7.png)
+![](media/e377133fbea5d03a0c3d83299aa994bd.png)
 
 *OpenGL has an infinite number of ways to view a point cloud but visualizing top
-down and side views may add the most value. The “Projection_Gravity” algorithm
-provides a top down view (bottom left) and a side view (bottom right.) The
-images are colored in the same way as the RGB depth image (upper right) with
-yellow indicating proximity to the camera. The aspect ratio of both top and side
-views is 1:1 to provide realistic dimensions and sharp, straight edges. The red
-dot in both the bottom images represents the location of the camera. These
-projections are available with cameras that include an IMU.*
+down and side views may add the most value. The “Projection_Backproject”
+algorithm provides both a top down view and a side view and back projects the
+objects clicked into the color image in the lower left corner. A mask is also
+provided for the object. The aspect ratio of both top and side views is 1:1 to
+provide realistic dimensions and sharp, straight edges. The camera can be
+located with the red dot. These projections are available with cameras that
+include an IMU.*
 
 ![](media/ac533603224f4ec5b4ac97c16dc22330.png)
 
