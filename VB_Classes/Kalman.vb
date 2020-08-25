@@ -189,7 +189,8 @@ End Class
 
 
 
-'http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
+' http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
+' https://www.codeproject.com/Articles/865935/Object-Tracking-Kalman-Filter-with-Ease
 Public Class Kalman_MousePredict
     Inherits ocvbClass
     Dim kalman As Kalman_Basics

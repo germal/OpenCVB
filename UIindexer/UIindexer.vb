@@ -45,7 +45,7 @@ Module IndexMain
             line = srAPI.ReadLine()
             If line <> "" Then
                 ' add any custom keywords here.  These are OpenCVB terms not OpenCV API's (so no right parenthesis) - case sensitive!
-                If line = "testAllRunning" Or line = "mouseClickPoint" Or line = "mousePoint" Or line = "mouseClickFlag" Then
+                If line = "testAllRunning" Or line = "mouseClickPoint" Or line = "mousePoint" Or line = "mouseClickFlag" Or line = "resolution" Then
                     apiListLCase.Add(LCase(line))
                 Else
                     apiListLCase.Add(LCase(line) + "(") ' it needs the parenthesis to make sure it is a function.
