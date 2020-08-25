@@ -246,8 +246,8 @@ Public Class DCT_Surfaces_debug
                 Dim plane = computePlaneEquation(worldPoints)
                 If Single.IsNaN(plane.Item0) = False Then
                     flow.msgs.Add("a=" + Format(plane.Item0, "#0.00") + " b=" + Format(plane.Item1, "#0.00") + " c=" + Format(Math.Abs(plane.Item2), "#0.00") +
-                              vbTab + "depth=" + Format(-plane.Item3 / 1000, "#0.00") + "m" + vbTab + "roi.x = " + Format(roi.X, "000") + vbTab + " roi.y = " +
-                              Format(roi.Y, "000") + vbTab + "MinDepth = " + Format(minDepth / 1000, "#0.00") + "m" + vbTab + " MaxDepth = " + Format(maxDepth / 1000, "#0.00") + "m")
+                              vbTab + "depth=" + Format(-plane.Item3 / 1000, "#0.00") + "m " + "roi(x,y) = " + Format(roi.X, "000") + "," +
+                              Format(roi.Y, "000") + vbTab + "Min=" + Format(minDepth / 1000, "#0.0") + "m " + " Max=" + Format(maxDepth / 1000, "#0.0") + "m")
                 End If
             End If
         End If

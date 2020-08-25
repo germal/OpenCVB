@@ -47,6 +47,7 @@ Public Class ocvbClass : Implements IDisposable
     Public rColors(255) As cv.Vec3b
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
+    Public fontsize As Single
 
     Public Sub setCaller(ocvb As AlgorithmData)
         If ocvb.caller = "" Then
@@ -56,6 +57,11 @@ Public Class ocvbClass : Implements IDisposable
             standalone = False
         End If
         caller = Me.GetType.Name
+        If ocvb.parms.resolution = resHigh Then
+            fontsize = 0.9
+        Else
+            fontsize = 0.6
+        End If
     End Sub
     Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.
     Public Const QUAD1 = 1

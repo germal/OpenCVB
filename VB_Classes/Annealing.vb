@@ -36,9 +36,7 @@ Public Class Annealing_Basics_CPP
             dst1.Circle(cityPositions(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             dst1.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
-        Dim fontSize = 1.5
-        If ocvb.parms.resolution = resMed Then fontSize = 1.0
-        cv.Cv2.PutText(dst1, "Energy", New cv.Point(10, 100), cv.HersheyFonts.HersheyComplex, fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst1, "Energy", New cv.Point(10, 100), cv.HersheyFonts.HersheyComplex, fontsize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
         cv.Cv2.PutText(dst1, Format(energy, "#0"), New cv.Point(10, 160), cv.HersheyFonts.HersheyComplex, fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub setup(ocvb As AlgorithmData)
@@ -195,7 +193,7 @@ Public Class Annealing_CPP_MT
         flow.msgs.Clear()
         For i = 0 To anneal.Length - 1
             bestList.Add(anneal(i).energy, i)
-            flow.msgs.Add(Format(i, "00") + " " + anneal(i).msg)
+            flow.msgs.Add("CPU=" + Format(i, "00") + " " + anneal(i).msg)
         Next
         flow.Run(ocvb)
 
@@ -283,7 +281,7 @@ Public Class Annealing_Options
         End If
 
         anneal.Run(ocvb)
-        dst1 = anneal.dst1
+        dst2 = anneal.dst1
 
         If anneal.restartComputation Then
             anneal.restartComputation = False
@@ -299,5 +297,6 @@ Public Class Annealing_Options
 
         flow.msgs.Add(anneal.msg)
         flow.Run(ocvb)
+
     End Sub
 End Class

@@ -112,7 +112,6 @@ End Class
 Public Class Video_CarCComp
     Inherits ocvbClass
     Dim cc As CComp_Basics
-    Dim flow As Font_FlowText
     Dim video As Video_Basics
     Dim bgSub As BGSubtract_MOG
     Public Sub New(ocvb As AlgorithmData)
@@ -122,8 +121,6 @@ Public Class Video_CarCComp
         cc = New CComp_Basics(ocvb)
 
         video = New Video_Basics(ocvb)
-
-        flow = New Font_FlowText(ocvb)
 
         ocvb.desc = "Outline cars with a rectangle"
     End Sub

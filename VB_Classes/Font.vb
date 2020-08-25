@@ -62,18 +62,19 @@ Public Class Font_FlowText
             msgs.Add("Then at the end of your Run method, invoke flow.Run(ocvb)")
         End If
         Static lastCount As Int32
-        Dim maxLines As Int32 = 21
 
+        Dim maxlines = 22
         Dim firstLine = If(msgs.Count - maxLines < 0, 0, msgs.Count - maxLines)
+        Dim fullText As String = ""
         For i = firstLine To msgs.Count - 1
-            ocvb.trueText(New TTtext(msgs(i), 10, (i - firstLine) * 15 + 20))
+            fullText += msgs(i) + vbCrLf
         Next
+        ocvb.trueText(New TTtext(fullText, 10, 20))
 
-        If ocvb.color.Width > 1000 Then maxLines = 29 ' larger mat gets more lines.
         If msgs.Count >= maxLines Then
             Dim index As Int32
             For i = 0 To lastCount - maxLines - 1
-                msgs.RemoveAt(index) ' maxlines was tested with the font specified above. 
+                msgs.RemoveAt(index)
                 index += 1
             Next
         End If

@@ -734,8 +734,8 @@ Public Class OpenCVB
                 drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
                 drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
                 drawRect.Height = Math.Abs(mouseDownPoint.Y - mouseMovePoint.Y)
-                If drawRect.X + drawRect.Width > camera.Color.Width Then drawRect.Width = camera.Color.Width - drawRect.X
-                If drawRect.Y + drawRect.Height > camera.Color.Height Then drawRect.Height = camera.Color.Height - drawRect.Y
+                If drawRect.X + drawRect.Width > camWidth Then drawRect.Width = camWidth - drawRect.X
+                If drawRect.Y + drawRect.Height > camHeight Then drawRect.Height = camHeight - drawRect.Y
                 BothFirstAndLastReady = True
             End If
             mousePicTag = pic.Tag
@@ -745,8 +745,9 @@ Public Class OpenCVB
                 mousePoint.X -= camPic(0).Width
                 mousePicTag = 3 ' pretend this is coming from the fictional campic(3) which was dst2
             End If
-            'Dim resizeFactor = camPic(0).Width / camera.color.width
-            'mousePoint *= resizeFactor
+            Dim resizeFactor = camWidth / camPic(0).Width
+            mousePoint *= resizeFactor * If(mediumResolution, 0.5, 1)
+
         Catch ex As Exception
             Console.WriteLine("Error in camPic_MouseMove: " + ex.Message)
         End Try
@@ -1162,7 +1163,7 @@ Public Class OpenCVB
                     BothFirstAndLastReady = False
                 End If
 
-                OpenCVB.ocvb.mousePoint = mousePoint * ratio
+                OpenCVB.ocvb.mousePoint = mousePoint
                 OpenCVB.ocvb.mousePicTag = mousePicTag
                 OpenCVB.ocvb.mouseClickFlag = mouseClickFlag
                 If mouseClickFlag Then OpenCVB.ocvb.mouseClickPoint = mousePoint

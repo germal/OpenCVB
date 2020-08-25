@@ -69,7 +69,6 @@ Public Class PointCloud_Colorize
     Public rect As cv.Rect
     Public shift As Integer
     Public labelShift As Integer
-    Dim fontSize As Single
     Dim radius As Integer
     Dim arcSize As Integer = 100
     Public hFOVangles() As Single = {90, 0, 100, 78, 70, 70, 86}  ' T265 has no point cloud so there is a 0 where it would have been.
@@ -136,7 +135,7 @@ Public Class PointCloud_Colorize
         dst.Ellipse(cameraPoint, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         dst.Line(cameraPoint, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        Dim labelLocation = If(ocvb.parms.resolution = resHigh, New cv.Point(100, cameraPoint.Y), New cv.Point(40, cameraPoint.Y))
+        Dim labelLocation = New cv.Point(src.Width * 0.1, cameraPoint.Y)
         cv.Cv2.PutText(dst, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize,
                        cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(cameraPoint.X - 80, cameraPoint.Y + 50), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
@@ -148,8 +147,6 @@ Public Class PointCloud_Colorize
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        fontSize = 0.9
-        If ocvb.parms.resolution = resMed Then fontSize = 0.6
         radius = If(ocvb.parms.resolution = resMed, 5, 12)
         shift = (src.Width - src.Height) / 2
         labelShift = shift
@@ -461,8 +458,10 @@ Public Class PointCloud_PixelFormula_TopView
 
         measure = New PointCloud_Measured_TopView(ocvb)
 
-        sliders.Setup(ocvb, caller, 1)
-        sliders.setupTrackBar(0, "Distance from camera in mm", 1, 4000, 1500)
+        If standalone Then
+            sliders.Setup(ocvb, caller, 1)
+            sliders.setupTrackBar(0, "Distance from camera in mm", 1, 4000, 1500)
+        End If
         ocvb.desc = "Validate the formula for pixel width as a function of distance"
     End Sub
 
@@ -470,25 +469,28 @@ Public Class PointCloud_PixelFormula_TopView
         measure.Run(ocvb)
         label1 = measure.label1
 
-        sliders.trackbar(0).Maximum = measure.maxZ * 1000
 
         dst1 = measure.cMats.CameraLocationBot(ocvb, measure.dst1, measure.maxZ)
         Dim cameraPoint = measure.cMats.cameraPoint
-        Dim pixeldistance = src.Height * ((sliders.trackbar(0).Value / 1000) / measure.maxZ)
         Dim FOV = measure.cMats.hFOVangles(ocvb.parms.cameraIndex)
 
-        Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * pixeldistance)
-        Dim xpt1 = New cv.Point(cameraPoint.X - lineHalf, src.Height - pixeldistance)
-        Dim xpt2 = New cv.Point(cameraPoint.X + lineHalf, src.Height - pixeldistance)
+        Dim xpt1 As cv.Point, xpt2 As cv.Point
+        If standalone Then
+            Dim pixeldistance = src.Height * ((sliders.trackbar(0).Value / 1000) / measure.maxZ)
+            Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * pixeldistance)
+            xpt1 = New cv.Point(cameraPoint.X - lineHalf, src.Height - pixeldistance)
+            xpt2 = New cv.Point(cameraPoint.X + lineHalf, src.Height - pixeldistance)
 
-        If standalone Then dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
+            sliders.trackbar(0).Maximum = measure.maxZ * 1000
+            dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
+        End If
 
         viewObjects.Clear()
         For i = 0 To measure.pTrack.viewObjects.Count - 1
             Dim r = measure.pTrack.viewObjects.Values(i).rectView
-            lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (src.Height - (r.Y + r.Height)))
+            Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (src.Height - (r.Y + r.Height)))
             If lineHalf = 0 Then Continue For
-            pixeldistance = src.Height - r.Y - r.Height
+            Dim pixeldistance = src.Height - r.Y - r.Height
             xpt1 = New cv.Point(cameraPoint.X - lineHalf, src.Height - pixeldistance)
             xpt2 = New cv.Point(cameraPoint.X + lineHalf, src.Height - pixeldistance)
             Dim pt1 = New cv.Point(cameraPoint.X - lineHalf, r.Y + r.Height)
@@ -536,9 +538,10 @@ Public Class PointCloud_PixelFormula_SideView
 
         measure = New PointCloud_Measured_SideView(ocvb)
 
-        sliders.Setup(ocvb, caller, 1)
-        sliders.setupTrackBar(0, "Distance from camera in mm", 1, 4000, 1500)
-
+        If standalone Then
+            sliders.Setup(ocvb, caller, 1)
+            sliders.setupTrackBar(0, "Distance from camera in mm", 1, 4000, 1500)
+        End If
         ocvb.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -549,23 +552,27 @@ Public Class PointCloud_PixelFormula_SideView
         label1 = measure.label1
 
         dst1 = measure.cMats.CameraLocationSide(ocvb, measure.dst1, maxZ)
-        Dim cameraPoint = measure.cMats.cameraPoint ' camerapoint is a tricky computation for side views.  Use the original and hopefully only one.
-        Static distanceSlider = findSlider("Distance from camera in mm")
-        Dim pixeldistance = src.Height * ((distanceSlider.Value / 1000) / maxZ)
+        Dim cameraPoint = measure.cMats.cameraPoint ' camerapoint is a tricky computation for side views.  Use the only one we have.
         Dim FOV = measure.cMats.vFOVangles(ocvb.parms.cameraIndex)
 
-        Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * pixeldistance)
-        Dim xpt1 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y - lineHalf))
-        Dim xpt2 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y + lineHalf))
+        Dim xpt1 As cv.Point, xpt2 As cv.Point
+        If standalone Then
+            Static distanceSlider = findSlider("Distance from camera in mm")
+            Dim pixeldistance = src.Height * ((distanceSlider.Value / 1000) / maxZ)
+            Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * pixeldistance)
+            xpt1 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y - lineHalf))
+            xpt2 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y + lineHalf))
 
-        If standalone Then dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
+            sliders.trackbar(0).Maximum = measure.maxZ * 1000
+            dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
+        End If
 
         viewObjects.Clear()
         For i = 0 To measure.pTrack.viewObjects.Count - 1
             Dim r = measure.pTrack.viewObjects.Values(i).rectView
-            lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (r.X - cameraPoint.X))
+            Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (r.X - cameraPoint.X))
             If lineHalf = 0 Then Continue For
-            pixeldistance = r.X - cameraPoint.X
+            Dim pixeldistance = r.X - cameraPoint.X
             xpt1 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y - lineHalf))
             xpt2 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y + lineHalf))
             Dim pt1 = New cv.Point(r.X, cameraPoint.Y - lineHalf)
@@ -815,7 +822,6 @@ Public Class PointCloud_BothViews
         dst1 = topPixel.dst1
         dst2 = sidePixel.dst1
 
-        Dim fontsize = If(ocvb.parms.resolution = resHigh, 1.0, 0.6)
         Static detailPoint As cv.Point
         If ocvb.mouseClickFlag Then detailPoint = ocvb.mouseClickPoint
 
@@ -829,6 +835,10 @@ Public Class PointCloud_BothViews
         End If
         Dim minIndex = setDetails(detailPoint)
         Dim rView = vw.Values(minIndex).rectView
+
+        ' *****TEMP ****
+        detailPoint = New cv.Point(rView.X, rView.Y)
+
         Dim rFront = vw.Values(minIndex).rectFront
         Dim pixelPerMeter = If(activeView = QUAD0 Or activeView = QUAD2, topPixel.measure.pixelsPerMeter, sidePixel.measure.pixelsPerMeter)
         If detailPoint.X = 0 And detailPoint.Y = 0 Then detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
@@ -843,7 +853,8 @@ Public Class PointCloud_BothViews
         End If
 
         If vw.Count > 0 And (activeView = QUAD1 Or activeView = QUAD3) Then
-            Dim cameraX = (src.Width - src.Height) / 2
+            Dim cameraPoint = topPixel.measure.cMats.cameraPoint ' camerapoint is a tricky computation for side views.  Defined only here...
+            Dim cameraX = cameraPoint.X
             minDepth = maxZ * (rView.X - cameraX) / src.Height
             maxDepth = maxZ * (rView.X + rView.Width - cameraX) / src.Height
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m & " +
