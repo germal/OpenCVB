@@ -73,7 +73,8 @@ Public Class PointCloud_Colorize
     Dim arcSize As Integer = 100
     Public hFOVangles() As Single = {90, 0, 100, 78, 70, 70, 86}  ' T265 has no point cloud so there is a 0 where it would have been.
     Public vFOVangles() As Single = {60, 0, 55, 65, 69, 67, 60}  ' T265 has no point cloud so there is a 0 where it would have been.
-    Public cameraPoint As cv.Point
+    Public topCameraPoint As cv.Point
+    Public sideCameraPoint As cv.Point
     Public startangle As Integer
 
     Public Function CameraLocationBot(ocvb As AlgorithmData, mask As cv.Mat, maxZ As Single) As cv.Mat
@@ -81,9 +82,9 @@ Public Class PointCloud_Colorize
 
         ' if not a mask, then the image is already colorized.
         If mask.Channels = 1 Then dst2.CopyTo(dst, mask) Else dst = mask.Clone()
-        cameraPoint = New cv.Point(dst.Height, dst.Height)
+        topCameraPoint = New cv.Point(dst.Height, dst.Height)
         Dim cameraLocation = New cv.Point(shift + dst.Height / 2, dst.Height - 5)
-        dst.Circle(cameraPoint, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(topCameraPoint, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         For i = maxZ - 1 To 0 Step -1
             Dim ymeter = dst.Height * i / maxZ
             dst.Line(New cv.Point(0, ymeter), New cv.Point(dst.Width, ymeter), cv.Scalar.AliceBlue, 1)
@@ -93,20 +94,20 @@ Public Class PointCloud_Colorize
         ' draw the arc showing the camera FOV
         Dim startAngle = If(standalone, sliders.trackbar(0).Value, 90 - hFOVangles(ocvb.parms.cameraIndex) / 2)
         Dim x = dst.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
-        Dim xloc = cameraPoint.X + x
+        Dim xloc = topCameraPoint.X + x
 
         Dim fovRight = New cv.Point(xloc, 0)
-        Dim fovLeft = New cv.Point(cameraPoint.X - x, fovRight.Y)
+        Dim fovLeft = New cv.Point(topCameraPoint.X - x, fovRight.Y)
 
-        dst.Ellipse(cameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Ellipse(cameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Line(cameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Ellipse(topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Ellipse(topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Line(topCameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Dim labelLocation = New cv.Point(dst.Width / 2 + labelShift, dst.Height * 15 / 16)
         cv.Cv2.PutText(dst, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(cameraPoint.X - 100, cameraPoint.Y - 5), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(cameraPoint.X + 60, cameraPoint.Y - 5), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        dst.Line(cameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(topCameraPoint.X - 100, topCameraPoint.Y - 5), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(topCameraPoint.X + 60, topCameraPoint.Y - 5), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Line(topCameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst
     End Function
@@ -115,8 +116,8 @@ Public Class PointCloud_Colorize
 
         ' if not a mask, then the image is already colorized.
         If mask.Channels = 1 Then dst2.CopyTo(dst, mask) Else dst = mask.Clone()
-        cameraPoint = New cv.Point(shift, src.Height - (src.Width - src.Height) / 2)
-        dst.Circle(cameraPoint, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        sideCameraPoint = New cv.Point(shift, src.Height - (src.Width - src.Height) / 2)
+        dst.Circle(sideCameraPoint, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         For i = 0 To maxZ
             Dim xmeter = dst.Height * i / maxZ
             dst.Line(New cv.Point(shift + xmeter, 0), New cv.Point(shift + xmeter, dst.Height), cv.Scalar.AliceBlue, 1)
@@ -126,21 +127,21 @@ Public Class PointCloud_Colorize
         ' draw the arc showing the camera FOV
         Dim startAngle = If(standalone, sliders.trackbar(1).Value, vFOVangles(ocvb.parms.cameraIndex))
         Dim y = (dst.Width - shift) / Math.Tan(startAngle * cv.Cv2.PI / 180)
-        Dim yloc = cameraPoint.Y - y
+        Dim yloc = sideCameraPoint.Y - y
 
         Dim fovTop = New cv.Point(dst.Width, yloc)
-        Dim fovBot = New cv.Point(dst.Width, cameraPoint.Y + y)
+        Dim fovBot = New cv.Point(dst.Width, sideCameraPoint.Y + y)
 
-        dst.Ellipse(cameraPoint, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Ellipse(cameraPoint, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Line(cameraPoint, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Ellipse(sideCameraPoint, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Ellipse(sideCameraPoint, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Line(sideCameraPoint, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        Dim labelLocation = New cv.Point(src.Width * 0.1, cameraPoint.Y)
+        Dim labelLocation = New cv.Point(src.Width * 0.1, sideCameraPoint.Y)
         cv.Cv2.PutText(dst, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize,
                        cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(cameraPoint.X - 80, cameraPoint.Y + 50), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(cameraPoint.X - 80, cameraPoint.Y - 50), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        dst.Line(cameraPoint, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(sideCameraPoint.X - 80, sideCameraPoint.Y + 50), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(sideCameraPoint.X - 80, sideCameraPoint.Y - 50), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Line(sideCameraPoint, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst
     End Function
@@ -471,7 +472,7 @@ Public Class PointCloud_PixelFormula_TopView
 
 
         dst1 = measure.cMats.CameraLocationBot(ocvb, measure.dst1, measure.maxZ)
-        Dim cameraPoint = measure.cMats.cameraPoint
+        Dim cameraPoint = measure.cMats.topCameraPoint
         Dim FOV = measure.cMats.hFOVangles(ocvb.parms.cameraIndex)
 
         Dim xpt1 As cv.Point, xpt2 As cv.Point
@@ -552,7 +553,7 @@ Public Class PointCloud_PixelFormula_SideView
         label1 = measure.label1
 
         dst1 = measure.cMats.CameraLocationSide(ocvb, measure.dst1, maxZ)
-        Dim cameraPoint = measure.cMats.cameraPoint ' camerapoint is a tricky computation for side views.  Use the only one we have.
+        Dim cameraPoint = measure.cMats.sideCameraPoint ' camerapoint is a tricky computation for side views.  Use the only one we have.
         Dim FOV = measure.cMats.vFOVangles(ocvb.parms.cameraIndex)
 
         Dim xpt1 As cv.Point, xpt2 As cv.Point
@@ -822,22 +823,14 @@ Public Class PointCloud_BothViews
         dst1 = topPixel.dst1
         dst2 = sidePixel.dst1
 
-        Static detailPoint As cv.Point
-        If ocvb.mouseClickFlag Then detailPoint = ocvb.mouseClickPoint
-
         Static minDepth As Single, maxDepth As Single
-        Static activeView = ocvb.quadrantIndex
+        Dim activeView = ocvb.quadrantIndex
         vw = If(activeView = QUAD0 Or activeView = QUAD2, topPixel.viewObjects, sidePixel.viewObjects)
         If vw.Count = 0 Then Exit Sub
-        If activeView <> ocvb.quadrantIndex Then
-            activeView = ocvb.quadrantIndex
-            detailPoint = New cv.Point
-        End If
-        Dim minIndex = setDetails(detailPoint)
+        Dim minIndex = setDetails(ocvb.mouseClickPoint)
         Dim rView = vw.Values(minIndex).rectView
 
-        ' *****TEMP ****
-        detailPoint = New cv.Point(rView.X, rView.Y)
+        Dim detailPoint = New cv.Point(rView.X, rView.Y)
 
         Dim rFront = vw.Values(minIndex).rectFront
         Dim pixelPerMeter = If(activeView = QUAD0 Or activeView = QUAD2, topPixel.measure.pixelsPerMeter, sidePixel.measure.pixelsPerMeter)
@@ -845,18 +838,18 @@ Public Class PointCloud_BothViews
         Dim roi = New cv.Rect(0, 0, dst1.Width, dst1.Height)
 
         If vw.Count > 0 And (activeView = QUAD0 Or activeView = QUAD2) Then
-            minDepth = maxZ * (src.Height - rView.Y - rView.Height) / src.Height
-            maxDepth = maxZ * (src.Height - rView.Y) / src.Height
+            Dim cameraPoint = topPixel.measure.cMats.topCameraPoint ' camerapoint is a tricky computation for side views.  Defined only here...
+            minDepth = maxZ * (cameraPoint.Y - rView.Y - rView.Height) / src.Height
+            maxDepth = maxZ * (cameraPoint.Y - rView.Y) / src.Height
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m & " +
                          CStr(rView.Width) + " pixels wide or " + Format(rView.Width / pixelPerMeter, "0.0") + "m"
             roi = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
         End If
 
         If vw.Count > 0 And (activeView = QUAD1 Or activeView = QUAD3) Then
-            Dim cameraPoint = topPixel.measure.cMats.cameraPoint ' camerapoint is a tricky computation for side views.  Defined only here...
-            Dim cameraX = cameraPoint.X
-            minDepth = maxZ * (rView.X - cameraX) / src.Height
-            maxDepth = maxZ * (rView.X + rView.Width - cameraX) / src.Height
+            Dim cameraPoint = sidePixel.measure.cMats.sideCameraPoint ' camerapoint is a tricky computation for side views.  Defined only here...
+            minDepth = maxZ * (rView.X - cameraPoint.X) / src.Height
+            maxDepth = maxZ * (rView.X + rView.Width - cameraPoint.X) / src.Height
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m & " +
                          CStr(rView.Width) + " pixels wide or " + Format(rView.Height / pixelPerMeter, "0.0") + "m"
             roi = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)

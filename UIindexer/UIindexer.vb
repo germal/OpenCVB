@@ -44,16 +44,18 @@ Module IndexMain
         While srAPI.EndOfStream = False
             line = srAPI.ReadLine()
             If line <> "" Then
-                ' add any custom keywords here.  These are OpenCVB terms not OpenCV API's (so no right parenthesis) - case sensitive!
-                If line = "testAllRunning" Or line = "mouseClickPoint" Or line = "mousePoint" Or line = "mouseClickFlag" Or line = "resolution" Then
-                    apiListLCase.Add(LCase(line))
-                Else
-                    apiListLCase.Add(LCase(line) + "(") ' it needs the parenthesis to make sure it is a function.
-                End If
+                apiListLCase.Add(LCase(line) + "(") ' it needs the parenthesis to make sure it is a function.
                 apiList.Add(line + "(") ' it needs the parenthesis to make sure it is a function.
             End If
         End While
         srAPI.Close()
+
+        ' add any custom keywords here.  These are OpenCVB terms not OpenCV API's (so no right parenthesis) - case sensitive!
+        Dim ocvbKeywords() As String = {"testAllRunning", "mouseClickPoint", "mousePoint", "mouseClickFlag", "resolution", "mousePicTag"}
+        For i = 0 To ocvbKeywords.Length - 1
+            apiListLCase.Add(LCase(ocvbKeywords(i))) ' no "(" in the lower case edition - these are not function calls.
+            apiList.Add(ocvbKeywords(i) + "(")
+        Next
 
         Dim apiOCVB = New System.IO.StreamReader(directoryInfo.FullName + "\..\Data\AlgorithmList.txt")
         line = apiOCVB.ReadLine() ' toss the codeline count...

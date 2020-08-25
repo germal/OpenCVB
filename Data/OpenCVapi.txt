@@ -387,8 +387,6 @@ ml_SVMSGD
 ml_TrainData
 moments
 morphologyEx
-mousePoint
-mouseClickPoint
 moveWindow
 MSER
 MSER_create
@@ -505,7 +503,6 @@ sum
 sumElems
 SVBackSubst
 SVDecomp
-testAllRunning
 textureFlattening
 threshold
 TickMeter
