@@ -59,4 +59,4 @@ def PyStreamRun(OpenCVCode, scriptName):
                     
     except Exception as exception:
         print(exception)
-        Mbox('PipeStream.py', 'Failure - see console output', 1)    
+        Mbox('PyStream.py', 'Failure - see console output', 1)    
