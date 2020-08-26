@@ -158,7 +158,6 @@ Public Class PointCloud_Colorize
         palette.frameModulo = 1
         arcSize = src.Width / 10
 
-
         If standalone Then
             sliders.Setup(ocvb, caller)
             sliders.setupTrackBar(0, "Top View angle for FOV", 0, 180, 90 - hFOVangles(ocvb.parms.cameraIndex) / 2)
@@ -306,84 +305,6 @@ End Class
 
 
 
-'Public Class PointCloud_WallPlane
-'    Inherits ocvbClass
-'    Dim objects As PointCloud_Distance_TopView
-'    Dim lines As lineDetector_FLD_CPP
-'    Dim dilate As DilateErode_Basics
-'    Public Sub New(ocvb As AlgorithmData)
-'        setCaller(ocvb)
-'        dilate = New DilateErode_Basics(ocvb)
-'        lines = New lineDetector_FLD_CPP(ocvb)
-'        objects = New PointCloud_Distance_TopView(ocvb)
-'        ocvb.desc = "Use the top down view to detect walls with a line detector algorithm"
-'    End Sub
-'    Public Sub Run(ocvb As AlgorithmData)
-'        objects.src = src
-'        objects.Run(ocvb)
-'        dst1 = objects.dst1
-'        dst2 = objects.dst2
-'        label2 = objects.label2
-
-'        Static checkIMU = findCheckBox("Use IMU gravity vector")
-'        If checkIMU?.Checked Then
-'            label1 = "Top View: walls in red"
-'            dilate.src = dst1
-'            dilate.Run(ocvb)
-
-'            lines.src = If(dilate.dst1.Channels = 3, dilate.dst1, dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
-'            lines.Run(ocvb)
-'            dst1 = lines.dst1
-'        Else
-'            label1 = "Top View of pointcloud data"
-'        End If
-'    End Sub
-'End Class
-
-
-
-
-
-
-'Public Class PointCloud_FloorPlane
-'    Inherits ocvbClass
-'    Dim objects As PointCloud_Distance_SideView
-'    Dim lines As lineDetector_FLD_CPP
-'    Dim dilate As DilateErode_Basics
-'    Public Sub New(ocvb As AlgorithmData)
-'        setCaller(ocvb)
-'        dilate = New DilateErode_Basics(ocvb)
-'        lines = New lineDetector_FLD_CPP(ocvb)
-'        objects = New PointCloud_Distance_SideView(ocvb)
-'        ocvb.desc = "Use the side view to detect ceilings and floors with a line detector algorithm"
-'    End Sub
-'    Public Sub Run(ocvb As AlgorithmData)
-'        objects.src = src
-'        objects.Run(ocvb)
-'        dst1 = objects.dst1
-'        dst2 = objects.dst2
-'        label2 = objects.label2
-
-'        Static checkIMU = findCheckBox("Use IMU gravity vector")
-'        If checkIMU?.Checked Then
-'            label1 = "Top View: floors (and some walls) in red"
-'            dilate.src = dst1
-'            dilate.Run(ocvb)
-
-'            lines.src = If(dilate.dst1.Channels = 3, dilate.dst1, dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
-'            lines.Run(ocvb)
-'            dst1 = lines.dst1
-'        Else
-'            label1 = "Side View of pointcloud data"
-'        End If
-'    End Sub
-'End Class
-
-
-
-
-
-
 Public Class PointCloud_TopView
     Inherits ocvbClass
     Public hist As Histogram_2D_TopView
@@ -450,7 +371,7 @@ End Class
 
 
 
-Public Class PointCloud_PixelFormula_TopView
+Public Class PointCloud_Objects_TopView
     Inherits ocvbClass
     Public measure As PointCloud_Measured_TopView
     Public viewObjects As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
@@ -467,13 +388,14 @@ Public Class PointCloud_PixelFormula_TopView
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
+        Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
+        Dim drawLines = showRectanglesCheck.checked
         measure.Run(ocvb)
+        dst1 = measure.dst1
         label1 = measure.label1
 
-
-        dst1 = measure.cMats.CameraLocationBot(ocvb, measure.dst1, measure.maxZ)
-        Dim cameraPoint = measure.cMats.topCameraPoint
-        Dim FOV = measure.cMats.hFOVangles(ocvb.parms.cameraIndex)
+        Dim cameraPoint = measure.view.cMats.topCameraPoint
+        Dim FOV = measure.view.cMats.hFOVangles(ocvb.parms.cameraIndex)
 
         Dim xpt1 As cv.Point, xpt2 As cv.Point
         If standalone Then
@@ -483,7 +405,7 @@ Public Class PointCloud_PixelFormula_TopView
             xpt2 = New cv.Point(cameraPoint.X + lineHalf, src.Height - pixeldistance)
 
             sliders.trackbar(0).Maximum = measure.maxZ * 1000
-            dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
+            If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
         End If
 
         viewObjects.Clear()
@@ -498,7 +420,7 @@ Public Class PointCloud_PixelFormula_TopView
             Dim pt2 = New cv.Point(cameraPoint.X + lineHalf, r.Y + r.Height)
             Dim leftX = Math.Max(Math.Max(xpt1.X, r.X), pt1.X)
             Dim rightX = Math.Min(Math.Min(xpt2.X, r.X + r.Width), pt2.X)
-            dst1.Line(New cv.Point(leftX, pt1.Y), New cv.Point(rightX, pt1.Y), cv.Scalar.Yellow, 3)
+            If drawLines Then dst1.Line(New cv.Point(leftX, pt1.Y), New cv.Point(rightX, pt1.Y), cv.Scalar.Yellow, 3)
             Dim addlen As Single
             If cameraPoint.X > r.X And cameraPoint.X < r.X + r.Width Then
                 addlen = 0
@@ -506,11 +428,11 @@ Public Class PointCloud_PixelFormula_TopView
                 ' need to add a small amount to the object width in pixels based on the angle to the camera of the back edge.
                 If r.X > cameraPoint.X Then
                     addlen = r.Height * Math.Abs(r.X - cameraPoint.X) / (src.Height - r.Y)
-                    dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(r.X - addlen, r.Y + r.Height), cv.Scalar.Yellow, 3)
+                    If drawLines Then dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(r.X - addlen, r.Y + r.Height), cv.Scalar.Yellow, 3)
                     leftX -= addlen
                 Else
                     addlen = r.Height * (cameraPoint.X - (r.X + r.Width)) / (src.Height - r.Y)
-                    dst1.Line(New cv.Point(r.X + r.Width, r.Y + r.Height), New cv.Point(r.X + r.Width + addLen, r.Y + r.Height), cv.Scalar.Yellow, 3)
+                    If drawLines Then dst1.Line(New cv.Point(r.X + r.Width, r.Y + r.Height), New cv.Point(r.X + r.Width + addlen, r.Y + r.Height), cv.Scalar.Yellow, 3)
                     If leftX - addlen >= xpt1.X Then leftX -= addlen
                 End If
             End If
@@ -530,7 +452,7 @@ End Class
 
 
 
-Public Class PointCloud_PixelFormula_SideView
+Public Class PointCloud_Objects_SideView
     Inherits ocvbClass
     Public measure As PointCloud_Measured_SideView
     Public viewObjects As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
@@ -546,26 +468,26 @@ Public Class PointCloud_PixelFormula_SideView
         ocvb.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        Dim maxZ = inRangeSlider.Value / 1000
+        Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
+        Dim drawLines = showRectanglesCheck.checked
 
         measure.Run(ocvb)
+        dst1 = measure.dst1
         label1 = measure.label1
 
-        dst1 = measure.cMats.CameraLocationSide(ocvb, measure.dst1, maxZ)
-        Dim cameraPoint = measure.cMats.sideCameraPoint ' camerapoint is a tricky computation for side views.  Use the only one we have.
-        Dim FOV = measure.cMats.vFOVangles(ocvb.parms.cameraIndex)
+        Dim cameraPoint = measure.view.cMats.sideCameraPoint ' camerapoint is a tricky computation for side views.  Use the only one we have.
+        Dim FOV = measure.view.cMats.vFOVangles(ocvb.parms.cameraIndex)
 
         Dim xpt1 As cv.Point, xpt2 As cv.Point
         If standalone Then
             Static distanceSlider = findSlider("Distance from camera in mm")
-            Dim pixeldistance = src.Height * ((distanceSlider.Value / 1000) / maxZ)
+            Dim pixeldistance = src.Height * ((distanceSlider.Value / 1000) / measure.maxZ)
             Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * pixeldistance)
             xpt1 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y - lineHalf))
             xpt2 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y + lineHalf))
 
             sliders.trackbar(0).Maximum = measure.maxZ * 1000
-            dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
+            If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
         End If
 
         viewObjects.Clear()
@@ -580,7 +502,7 @@ Public Class PointCloud_PixelFormula_SideView
             Dim pt2 = New cv.Point(r.X, cameraPoint.Y + lineHalf)
             Dim topY = Math.Max(Math.Max(xpt1.Y, r.Y), pt1.Y)
             Dim botY = Math.Min(Math.Min(xpt2.Y, r.Y + r.Height), pt2.Y)
-            dst1.Line(New cv.Point(r.X, topY), New cv.Point(r.X, botY), cv.Scalar.Yellow, 3)
+            If drawLines Then dst1.Line(New cv.Point(r.X, topY), New cv.Point(r.X, botY), cv.Scalar.Yellow, 3)
             Dim addlen As Single
             If cameraPoint.Y > r.Y And cameraPoint.Y < r.Y + r.Height Then
                 addlen = 0
@@ -588,12 +510,12 @@ Public Class PointCloud_PixelFormula_SideView
                 ' need to add a small amount to the object width in pixels based on the angle to the camera of the back edge
                 If r.Y > cameraPoint.Y Then
                     addlen = r.Width * (r.Y - cameraPoint.Y) / (r.X + r.Width - cameraPoint.X)
-                    dst1.Line(New cv.Point(r.X, r.Y), New cv.Point(r.X, r.Y - addlen), cv.Scalar.Yellow, 3)
+                    If drawLines Then dst1.Line(New cv.Point(r.X, r.Y), New cv.Point(r.X, r.Y - addlen), cv.Scalar.Yellow, 3)
                     r = New cv.Rect(r.X, r.Y - addlen, r.Width, botY - topY - addlen)
                     If botY - addlen >= xpt2.Y Then botY -= addlen
                 Else
                     addlen = r.Width * (cameraPoint.Y - r.Y) / (r.X + r.Width - cameraPoint.X)
-                    dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(r.X, r.Y + r.Height + addlen), cv.Scalar.Yellow, 3)
+                    If drawLines Then dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(r.X, r.Y + r.Height + addlen), cv.Scalar.Yellow, 3)
                     r = New cv.Rect(r.X, r.Y + addlen, r.Width, botY - topY + addlen)
                     topY += addlen
                 End If
@@ -616,7 +538,6 @@ End Class
 
 Public Class PointCloud_Measured_TopView
     Inherits ocvbClass
-    Public cMats As PointCloud_Colorize
     Public pTrack As Kalman_PointTracker
     Public flood As FloodFill_Projection
     Public view As PointCloud_TopView
@@ -627,7 +548,6 @@ Public Class PointCloud_Measured_TopView
 
         flood = New FloodFill_Projection(ocvb)
         flood.sliders.trackbar(0).Value = 100
-        cMats = New PointCloud_Colorize(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
         view = New PointCloud_TopView(ocvb)
 
@@ -639,18 +559,19 @@ Public Class PointCloud_Measured_TopView
 
         view.src = src
         view.Run(ocvb)
-        dst1 = view.dst1
+
         Static sliderHistThreshold = findSlider("Histogram threshold")
         flood.src = view.hist.histOutput.Threshold(sliderHistThreshold?.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
 
+        pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         pTrack.queryPoints = New List(Of cv.Point2f)(flood.centroids)
         pTrack.queryRects = New List(Of cv.Rect)(flood.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(flood.masks)
         pTrack.Run(ocvb)
+        dst1 = pTrack.dst1
 
-        dst1 = cMats.CameraLocationBot(ocvb, pTrack.dst1, maxZ)
-        Dim FOV = cMats.hFOVangles(ocvb.parms.cameraIndex)
+        Dim FOV = view.cMats.hFOVangles(ocvb.parms.cameraIndex)
         Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
         pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * maxZ)
         label1 = Format(pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(maxZ, "0.0") + " meters"
@@ -664,7 +585,6 @@ End Class
 
 Public Class PointCloud_Measured_SideView
     Inherits ocvbClass
-    Public cMats As PointCloud_Colorize
     Public flood As FloodFill_Projection
     Public view As PointCloud_SideView
     Public pTrack As Kalman_PointTracker
@@ -673,7 +593,6 @@ Public Class PointCloud_Measured_SideView
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        cMats = New PointCloud_Colorize(ocvb)
         flood = New FloodFill_Projection(ocvb)
         flood.sliders.trackbar(0).Value = 100
         view = New PointCloud_SideView(ocvb)
@@ -688,18 +607,19 @@ Public Class PointCloud_Measured_SideView
 
         view.src = src
         view.Run(ocvb)
-        dst1 = view.dst1
+
         Static sliderHistThreshold = findSlider("Histogram threshold")
         flood.src = view.hist.histOutput.Threshold(sliderHistThreshold?.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
 
+        pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         pTrack.queryPoints = New List(Of cv.Point2f)(flood.centroids)
         pTrack.queryRects = New List(Of cv.Rect)(flood.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(flood.masks)
         pTrack.Run(ocvb)
+        dst1 = pTrack.dst1
 
-        dst1 = cMats.CameraLocationSide(ocvb, pTrack.dst1, maxZ)
-        Dim FOV = cMats.vFOVangles(ocvb.parms.cameraIndex)
+        Dim FOV = view.cMats.vFOVangles(ocvb.parms.cameraIndex)
         Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
         pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * maxZ)
         label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(maxZ, "0.0") + " meters"
@@ -758,18 +678,19 @@ End Class
 
 Public Class PointCloud_BothViews
     Inherits ocvbClass
-    Public topPixel As PointCloud_PixelFormula_TopView
-    Public sidePixel As PointCloud_PixelFormula_SideView
+    Public topPixel As PointCloud_Objects_TopView
+    Public sidePixel As PointCloud_Objects_SideView
     Dim levelCheck As IMU_IsCameraLevel
     Public detailText As String
     Public backMat As New cv.Mat
     Public backMatMask As New cv.Mat
-    Public vw As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
+    Public vwTop As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
+    Public vwSide As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        topPixel = New PointCloud_PixelFormula_TopView(ocvb)
-        sidePixel = New PointCloud_PixelFormula_SideView(ocvb)
+        topPixel = New PointCloud_Objects_TopView(ocvb)
+        sidePixel = New PointCloud_Objects_SideView(ocvb)
 
         levelCheck = New IMU_IsCameraLevel(ocvb)
 
@@ -778,7 +699,7 @@ Public Class PointCloud_BothViews
 
         ocvb.desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
-    Private Function setDetails(detailPoint As cv.Point) As Integer
+    Private Function setDetails(detailPoint As cv.Point, vw As SortedList(Of Integer, viewObject)) As Integer
         Dim minIndex As Integer = 0
         Dim minDistance As Single = Single.MaxValue
         For i = 0 To vw.Count - 1
@@ -792,12 +713,14 @@ Public Class PointCloud_BothViews
         Return minIndex
     End Function
     Public Sub Run(ocvb As AlgorithmData)
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        Dim maxZ = inRangeSlider.Value / 1000
+        Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
+        Dim showDetails = showRectanglesCheck.checked
+
         Dim depth32f = getDepth32f(ocvb)
 
         topPixel.Run(ocvb)
         sidePixel.Run(ocvb)
+        Dim maxZ = topPixel.measure.maxZ
 
         If standalone Then
             Dim instructions = "Click any centroid to get details"
@@ -826,45 +749,107 @@ Public Class PointCloud_BothViews
 
         Static minDepth As Single, maxDepth As Single
         Dim activeView = ocvb.quadrantIndex
-        vw = If(activeView = QUAD0 Or activeView = QUAD2, topPixel.viewObjects, sidePixel.viewObjects)
-        If vw.Count = 0 Then Exit Sub
-        Dim minIndex = setDetails(ocvb.mouseClickPoint)
-        Dim rView = vw.Values(minIndex).rectView
-
-        Dim detailPoint = New cv.Point(rView.X, rView.Y)
-
-        Dim rFront = vw.Values(minIndex).rectFront
-        Dim pixelPerMeter = If(activeView = QUAD0 Or activeView = QUAD2, topPixel.measure.pixelsPerMeter, sidePixel.measure.pixelsPerMeter)
-        If detailPoint.X = 0 And detailPoint.Y = 0 Then detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
+        vwTop = topPixel.viewObjects
+        vwSide = sidePixel.viewObjects
         Dim roi = New cv.Rect(0, 0, dst1.Width, dst1.Height)
+        Dim minIndex As Integer
+        Dim detailPoint As cv.Point
+        Dim vw As New SortedList(Of Integer, viewObject)
+        If vwTop.Count And (activeView = QUAD0 Or activeView = QUAD2) Then
+            minIndex = setDetails(ocvb.mouseClickPoint, vwTop)
+            Dim rView = vwTop.Values(minIndex).rectView
+            detailPoint = New cv.Point(rView.X, rView.Y)
+            Dim rFront = vwTop.Values(minIndex).rectFront
+            Dim pixelPerMeter = topPixel.measure.pixelsPerMeter
 
-        If vw.Count > 0 And (activeView = QUAD0 Or activeView = QUAD2) Then
-            Dim cameraPoint = topPixel.measure.cMats.topCameraPoint ' camerapoint is a tricky computation for side views.  Defined only here...
+            If detailPoint.X = 0 And detailPoint.Y = 0 Then detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
+            Dim cameraPoint = topPixel.measure.view.cMats.topCameraPoint ' camerapoint is a tricky computation for side views.  Defined only here...
             minDepth = maxZ * (cameraPoint.Y - rView.Y - rView.Height) / src.Height
             maxDepth = maxZ * (cameraPoint.Y - rView.Y) / src.Height
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m & " +
-                         CStr(rView.Width) + " pixels wide or " + Format(rView.Width / pixelPerMeter, "0.0") + "m"
+                     CStr(rView.Width) + " pixels wide or " + Format(rView.Width / pixelPerMeter, "0.0") + "m"
             roi = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
+            vw = vwTop
         End If
 
-        If vw.Count > 0 And (activeView = QUAD1 Or activeView = QUAD3) Then
-            Dim cameraPoint = sidePixel.measure.cMats.sideCameraPoint ' camerapoint is a tricky computation for side views.  Defined only here...
+        If vwSide.Count And (activeView = QUAD1 Or activeView = QUAD3) Then
+            minIndex = setDetails(ocvb.mouseClickPoint, vwSide)
+            Dim rView = vwSide.Values(minIndex).rectView
+            detailPoint = New cv.Point(rView.X, rView.Y)
+            Dim rFront = vwSide.Values(minIndex).rectFront
+            Dim pixelPerMeter = sidePixel.measure.pixelsPerMeter
+
+            Dim cameraPoint = sidePixel.measure.view.cMats.sideCameraPoint ' camerapoint is a tricky computation for side views.  Defined only here...
             minDepth = maxZ * (rView.X - cameraPoint.X) / src.Height
             maxDepth = maxZ * (rView.X + rView.Width - cameraPoint.X) / src.Height
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m & " +
-                         CStr(rView.Width) + " pixels wide or " + Format(rView.Height / pixelPerMeter, "0.0") + "m"
+                             CStr(rView.Width) + " pixels wide or " + Format(rView.Height / pixelPerMeter, "0.0") + "m"
             roi = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)
+            vw = vwSide
         End If
 
         backMat = ocvb.color
-        label2 = "Clicked: " + detailText
-        If roi.X + roi.Width > src.Width Then roi.Width = src.Width - roi.X
-        If roi.Y + roi.Height > src.Height Then roi.Height = src.Height - roi.Y
-        If roi.Width > 0 And roi.Height > 0 Then
-            backMatMask.SetTo(0)
-            cv.Cv2.InRange(depth32f(roi), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), backMatMask(roi))
-            backMat(roi).SetTo(vw.Values(minIndex).color, backMatMask(roi))
+        If vw.Count > 0 Then
+            If roi.X + roi.Width > src.Width Then roi.Width = src.Width - roi.X
+            If roi.Y + roi.Height > src.Height Then roi.Height = src.Height - roi.Y
+            If roi.Width > 0 And roi.Height > 0 Then
+                backMatMask.SetTo(0)
+                cv.Cv2.InRange(depth32f(roi), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), backMatMask(roi))
+                backMat(roi).SetTo(vw.Values(minIndex).color, backMatMask(roi))
+            End If
+            If showDetails Then
+                ocvb.trueText(New TTtext(detailText, detailPoint, If(standalone, ocvb.mousePicTag, 3)))
+                label2 = "Clicked: " + detailText
+            End If
         End If
-        ocvb.trueText(New TTtext(detailText, detailPoint, If(standalone, ocvb.mousePicTag, 3)))
     End Sub
 End Class
+
+
+
+
+
+
+Public Class PointCloud_WallsFloorsCeilings
+    Inherits ocvbClass
+    Dim objects As PointCloud_BothViews
+    Dim lDetect As lineDetector_FLD
+    Dim dilate As DilateErode_Basics
+    Public walls As List(Of cv.Vec4f)
+    Public floorsCeilings As List(Of cv.Vec4f)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        dilate = New DilateErode_Basics(ocvb)
+        lDetect = New lineDetector_FLD(ocvb)
+        objects = New PointCloud_BothViews(ocvb)
+        label1 = "Top View: wall candidates in red"
+        label2 = "Side View: floors/ceiling candidates in red"
+        ocvb.desc = "Use the top down view to detect walls with a line detector algorithm"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
+        If ocvb.frameCount = 0 Then showRectanglesCheck.checked = False
+        Static imuGravityCheck = findCheckBox("Use IMU gravity vector")
+        If ocvb.frameCount = 0 Then imuGravityCheck.checked = True
+        objects.src = src
+        objects.Run(ocvb)
+        dst1 = objects.dst1
+        dst2 = objects.dst2
+
+        For i = 0 To 1
+            Dim dst = Choose(i + 1, dst1, dst2)
+            dilate.src = dst
+            dilate.Run(ocvb)
+            lDetect.src = If(dilate.dst1.Channels = 3, dilate.dst1, dilate.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+            lDetect.Run(ocvb)
+            If i = 0 Then walls = lDetect.lines Else floorsCeilings = lDetect.lines
+            Dim vec4 = If(i = 0, walls, floorsCeilings)
+            For j = 0 To vec4.Count - 1 Step 4
+                Dim v = vec4(j)
+                Dim pt1 = New cv.Point(v(0), v(1))
+                dst.line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
+            Next
+        Next
+    End Sub
+End Class
+

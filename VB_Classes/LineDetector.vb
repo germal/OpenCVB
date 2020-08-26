@@ -164,7 +164,7 @@ Module fastLineDetector_Exports
     Public Function drawSegments(dst1 As cv.Mat, lineCount As Int32, thickness As Integer) As SortedList(Of cv.Vec6f, Integer)
         Dim sortedLines As New SortedList(Of cv.Vec6f, Integer)(New CompareVec6f)
 
-        Dim lines(lineCount * 4 - 1) As Single ' there are 4 floats per line
+        Dim lines(lineCount * 4 - 1) As Single
         Dim linePtr = lineDetector_Lines()
         If linePtr = 0 Then Return Nothing ' it happened!
         Marshal.Copy(linePtr, lines, 0, lines.Length)
@@ -211,7 +211,7 @@ End Module
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
 Public Class lineDetector_FLD_CPP
     Inherits ocvbClass
-    Public sortedLines As SortedList(Of cv.Vec6f, Integer)
+    Public sortedLines As New SortedList(Of cv.Vec6f, Integer)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
@@ -227,8 +227,6 @@ Public Class lineDetector_FLD_CPP
         check.Box(0).Text = "FLD - incremental merge"
         check.Box(0).Checked = True
         ocvb.desc = "Basics for a Fast Line Detector"
-
-        sortedLines = New SortedList(Of cv.Vec6f, Integer)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         sortedLines.Clear()
@@ -433,3 +431,61 @@ Public Class LineDetector_3D_FitLineZ
     End Sub
 End Class
 
+
+
+
+
+' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
+Public Class lineDetector_FLD
+    Inherits ocvbClass
+    Public lines As New List(Of cv.Vec4f)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        sliders.Setup(ocvb, caller, 6)
+        sliders.setupTrackBar(0, "FLD - Min Length", 1, 200, 30)
+        sliders.setupTrackBar(1, "FLD - max distance", 1, 100, 14)
+        sliders.setupTrackBar(2, "FLD - Canny Aperture", 3, 7, 7)
+        sliders.setupTrackBar(3, "FLD - Line Thickness", 1, 7, 3)
+        sliders.setupTrackBar(4, "FLD - canny Threshold1", 1, 100, 50)
+        sliders.setupTrackBar(5, "FLD - canny Threshold2", 1, 100, 50)
+
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "FLD - incremental merge"
+        check.Box(0).Checked = True
+        ocvb.desc = "A Fast Line Detector"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        lines.Clear()
+
+        Dim length_threshold = sliders.trackbar(0).Value
+        Dim distance_threshold = sliders.trackbar(1).Value / 10
+        Dim canny_aperture_size = sliders.trackbar(2).Value
+        If canny_aperture_size Mod 2 = 0 Then canny_aperture_size += 1
+        Dim canny_th1 = sliders.trackbar(4).Value
+        Dim canny_th2 = sliders.trackbar(5).Value
+        Dim do_merge = check.Box(0).Checked
+
+        src.CopyTo(dst1)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim cols = src.Width
+        Dim rows = src.Height
+        Dim data(src.Total - 1) As Byte
+
+        Marshal.Copy(src.Data, data, 0, data.Length)
+        Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
+        Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, rows, cols, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
+        handle.Free()
+
+        If lineCount > 0 Then
+            Dim pts(4 * (lineCount - 1)) As Single
+            Dim linePtr = lineDetector_Lines()
+            If linePtr <> 0 Then
+                Marshal.Copy(linePtr, pts, 0, pts.Length)
+                For i = 0 To lineCount - 1
+                    lines.Add(New cv.Vec4f(pts(i), pts(i + 1), pts(i + 2), pts(i + 3)))
+                Next
+            End If
+        End If
+    End Sub
+End Class
