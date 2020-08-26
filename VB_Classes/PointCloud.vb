@@ -69,8 +69,8 @@ Public Class PointCloud_Colorize
     Public rect As cv.Rect
     Public shift As Integer
     Public labelShift As Integer
-    Dim radius As Integer
-    Dim arcSize As Integer = 100
+    Dim centroidRadius As Integer
+    Dim arcSize As Integer
     Public hFOVangles() As Single = {90, 0, 100, 78, 70, 70, 86}  ' T265 has no point cloud so there is a 0 where it would have been.
     Public vFOVangles() As Single = {60, 0, 55, 65, 69, 67, 60}  ' T265 has no point cloud so there is a 0 where it would have been.
     Public topCameraPoint As cv.Point
@@ -84,7 +84,7 @@ Public Class PointCloud_Colorize
         If mask.Channels = 1 Then dst2.CopyTo(dst, mask) Else dst = mask.Clone()
         topCameraPoint = New cv.Point(dst.Height, dst.Height)
         Dim cameraLocation = New cv.Point(shift + dst.Height / 2, dst.Height - 5)
-        dst.Circle(topCameraPoint, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(topCameraPoint, centroidRadius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         For i = maxZ - 1 To 0 Step -1
             Dim ymeter = dst.Height * i / maxZ
             dst.Line(New cv.Point(0, ymeter), New cv.Point(dst.Width, ymeter), cv.Scalar.AliceBlue, 1)
@@ -117,7 +117,7 @@ Public Class PointCloud_Colorize
         ' if not a mask, then the image is already colorized.
         If mask.Channels = 1 Then dst2.CopyTo(dst, mask) Else dst = mask.Clone()
         sideCameraPoint = New cv.Point(shift, src.Height - (src.Width - src.Height) / 2)
-        dst.Circle(sideCameraPoint, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(sideCameraPoint, centroidRadius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         For i = 0 To maxZ
             Dim xmeter = dst.Height * i / maxZ
             dst.Line(New cv.Point(shift + xmeter, 0), New cv.Point(shift + xmeter, dst.Height), cv.Scalar.AliceBlue, 1)
@@ -148,7 +148,7 @@ Public Class PointCloud_Colorize
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        radius = If(ocvb.parms.resolution = resMed, 5, 12)
+        centroidRadius = src.Width / 100
         shift = (src.Width - src.Height) / 2
         labelShift = shift
 
@@ -156,7 +156,7 @@ Public Class PointCloud_Colorize
         palette.color1 = cv.Scalar.Yellow
         palette.color2 = cv.Scalar.Blue
         palette.frameModulo = 1
-        If ocvb.parms.resolution <> resHigh Then arcSize = 50
+        arcSize = src.Width / 10
 
 
         If standalone Then
@@ -816,8 +816,9 @@ Public Class PointCloud_BothViews
                 End If
             End If
 
-            ocvb.trueText(New TTtext(accMsg1 + vbCrLf + instructions, New cv.Point(10, src.Height - 50)))
-            ocvb.trueText(New TTtext(accMsg2 + vbCrLf + instructions, New cv.Point(10, src.Height - 50), 3))
+            Dim pad = src.Width / 15
+            ocvb.trueText(New TTtext(accMsg1 + vbCrLf + instructions, New cv.Point(10, src.Height - pad)))
+            ocvb.trueText(New TTtext(accMsg2 + vbCrLf + instructions, New cv.Point(10, src.Height - pad), 3))
         End If
 
         dst1 = topPixel.dst1

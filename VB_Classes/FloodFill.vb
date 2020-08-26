@@ -54,7 +54,7 @@ Public Class FloodFill_Basics
                     If count > minFloodSize Then
                         masks.Add(maskPlus(maskRect).Clone().SetTo(0, ignoreMasks))
                         masks(masks.Count - 1).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
-                        maskSizes.Add(masks(masks.Count - 1).CountNonZero(), masks.Count - 1)
+                        maskSizes.Add(rect.Width * rect.Height, masks.Count - 1)
                         maskRects.Add(rect)
                     End If
                     ' Mask off any object that is too small or previously identified
@@ -84,11 +84,11 @@ Public Class Floodfill_Objects
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        flood = New FloodFill_Basics(ocvb)
-        flood.sliders.trackbar(0).Value = If(ocvb.parms.resolution = resHigh, 1000, 500)
-
         sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "Desired number of objects", 1, 100, 40)
+
+        flood = New FloodFill_Basics(ocvb)
+        flood.sliders.trackbar(0).Value = (src.Width Mod 100) * 25
 
         ocvb.desc = "Use floodfill to identify the desired number of objects"
     End Sub

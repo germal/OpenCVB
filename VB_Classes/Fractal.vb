@@ -182,11 +182,9 @@ Public Class Fractal_Julia
             Dim depth = 100
             Dim r = 2
             dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
-            Dim pt = ocvb.mousePoint
-            If ocvb.parms.resolution = resHigh Then pt = New cv.Point(pt.X * 2, pt.Y * 2)
             Dim m = mandel.mandel.mandel
-            rt = m.startX + (m.endX - m.startX) * pt.X / src.Width
-            mt = m.startY + (m.endY - m.startY) * pt.Y / src.Height
+            rt = m.startX + (m.endX - m.startX) * ocvb.mousePoint.X / src.Width
+            mt = m.startY + (m.endY - m.startY) * ocvb.mousePoint.Y / src.Height
             Dim c = New Complex(rt, mt)
             Parallel.For(CInt(src.Width / 2 - src.Height / 2), CInt(src.Width / 2 + src.Height / 2),
                 Sub(x)

@@ -57,11 +57,7 @@ Public Class ocvbClass : Implements IDisposable
             standalone = False
         End If
         caller = Me.GetType.Name
-        If ocvb.parms.resolution = resHigh Then
-            fontsize = 0.9
-        Else
-            fontsize = 0.6
-        End If
+        fontsize = ocvb.color.Width / 1280
     End Sub
     Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.
     Public Const QUAD1 = 1

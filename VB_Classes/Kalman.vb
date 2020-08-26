@@ -194,14 +194,14 @@ End Class
 Public Class Kalman_MousePredict
     Inherits ocvbClass
     Dim kalman As Kalman_Basics
-    Dim locMultiplier = 1
+    Dim lineWidth As Integer
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(1)
         ReDim kalman.output(1)
 
-        If ocvb.parms.resolution = resHigh Then locMultiplier = 2 ' twice the size in both dimensions.
+        lineWidth = src.Width / 300
         label1 = "Red is real mouse, white is prediction"
         ocvb.desc = "Use kalman filter to predict the next mouse location."
     End Sub
@@ -213,10 +213,8 @@ Public Class Kalman_MousePredict
         kalman.input(1) = ocvb.mousePoint.Y
         Dim lastStateResult = New cv.Point(kalman.output(0), kalman.output(1))
         kalman.Run(ocvb)
-        cv.Cv2.Line(dst1, New cv.Point(lastStateResult.X, lastStateResult.Y) * locMultiplier,
-                                  New cv.Point(kalman.output(0), kalman.output(1)) * locMultiplier,
-                                  cv.Scalar.All(255), 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.Line(dst1, ocvb.mousePoint * locMultiplier, lastRealMouse * locMultiplier, New cv.Scalar(0, 0, 255), 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.Line(dst1, New cv.Point(kalman.output(0), kalman.output(1)), lastStateResult, cv.Scalar.All(255), lineWidth, cv.LineTypes.AntiAlias)
+        cv.Cv2.Line(dst1, ocvb.mousePoint, lastRealMouse, New cv.Scalar(0, 0, 255), lineWidth, cv.LineTypes.AntiAlias)
         lastRealMouse = ocvb.mousePoint
     End Sub
 End Class
