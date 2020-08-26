@@ -32,43 +32,6 @@ End Class
 
 
 
-Public Class Resize_After8uc3
-    Inherits ocvbClass
-    Dim colorizer As Depth_Colorizer_CPP
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-        colorizer = New Depth_Colorizer_CPP(ocvb)
-        SetInterpolationRadioButtons(ocvb, caller, radio, "Resize")
-        ' warp is not allowed in resize
-        radio.check(5).Enabled = False
-        radio.check(6).Enabled = False
-
-        label1 = "Resized depth16 before running thru colorizer"
-        label2 = "Resized depth8UC3 after running thru colorizer"
-        ocvb.desc = "When you resize depth16 is important.  Use depth16 at high resolution and resize the 8UC3 result"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        Dim resizeFlag = getInterpolationRadioButtons(radio)
-        Dim newSize = src.Size()
-        If ocvb.parms.resolution = resHigh Then newSize = New cv.Size(src.Height / 2, src.Width / 2)
-
-        Dim depth32f As New cv.Mat
-        ocvb.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
-        colorizer.src = depth32f
-        colorizer.Run(ocvb)
-        dst2 = colorizer.dst1.Resize(newSize, 0, resizeFlag)
-
-        Dim depth16 = ocvb.depth16.Resize(newSize, 0, resizeFlag)
-        depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
-        colorizer.src = depth32f
-        colorizer.Run(ocvb)
-        dst1 = colorizer.dst1
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class Resize_Percentage
