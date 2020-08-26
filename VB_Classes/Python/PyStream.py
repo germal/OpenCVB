@@ -50,10 +50,18 @@ def PyStreamRun(OpenCVCode, scriptName):
                     rgb = pipeIn.read(int(rgbBufferSize))
                     depthData = pipeIn.read(int(depthBufferSize))
                     depthSize = rows, cols, 1
-                    depth = np.array(np.frombuffer(depthData, np.float32).reshape(depthSize))
+                    try:
+                        depth = np.array(np.frombuffer(depthData, np.float32).reshape(depthSize))
+                    except:
+                        print("unable to reshape the depth data")
+                        continue
                     depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth, alpha=0.03), cv.COLORMAP_HSV)
                     rgbSize = rows, cols, 3
-                    imgRGB = np.array(np.frombuffer(rgb, np.uint8).reshape(rgbSize))
+                    try:
+                        imgRGB = np.array(np.frombuffer(rgb, np.uint8).reshape(rgbSize))
+                    except:
+                        print("Unable to reshape the RGB data")
+                        continue
                     OpenCVCode(imgRGB, depth_colormap)
                     cv.waitKey(1)
                     

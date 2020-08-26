@@ -33,7 +33,7 @@ Public Class PyStream_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim depth32f = getDepth32f(ocvb)
-        If pythonReady And src.Width > 0 And src.Height > 0 And depth32f.Width > 0 And depth32f.Height > 0 Then
+        If pythonReady Then
             For i = 0 To memMap.memMapValues.Length - 1
                 memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, src.Total * src.ElemSize,
                                                 depth32f.Total * depth32f.ElemSize, src.Rows, src.Cols)
