@@ -8,37 +8,35 @@ Public Class intrinsicsLeft_Basics
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim ttStart = 40
-
-        Dim nextLine = "Width = " + CStr(ocvb.color.Width) + vbTab + " height = " + CStr(ocvb.color.Height)
-        ocvb.trueText(New TTtext(nextLine, 10, ttStart))
-
-        nextLine = "fx = " + CStr(ocvb.parms.intrinsicsLeft.fx) + vbTab + " fy = " + CStr(ocvb.parms.intrinsicsLeft.fy)
-        ocvb.trueText(New TTtext(nextLine, 10, ttStart + 30))
-
-        nextLine = "ppx = " + CStr(ocvb.parms.intrinsicsLeft.ppx) + vbTab + " ppy = " + CStr(ocvb.parms.intrinsicsLeft.ppy)
-        ocvb.trueText(New TTtext(nextLine, 10, ttStart + 60))
-
-        nextLine = ""
+        Dim ttStr As String = "Width = " + CStr(ocvb.color.Width) + vbTab + " height = " + CStr(ocvb.color.Height) + vbCrLf
+        ttStr += "fx = " + CStr(ocvb.parms.intrinsicsLeft.fx) + vbTab + " fy = " + CStr(ocvb.parms.intrinsicsLeft.fy) + vbCrLf
+        ttStr += "ppx = " + CStr(ocvb.parms.intrinsicsLeft.ppx) + vbTab + " ppy = " + CStr(ocvb.parms.intrinsicsLeft.ppy) + vbCrLf + vbCrLf
         For i = 0 To ocvb.parms.intrinsicsLeft.coeffs.Length - 1
-            nextLine += "coeffs(" + CStr(i) + ") = " + Format(ocvb.parms.intrinsicsLeft.coeffs(i), "#0.000") + "   "
+            ttStr += "coeffs(" + CStr(i) + ") = " + Format(ocvb.parms.intrinsicsLeft.coeffs(i), "#0.000") + "   " + vbCrLf
         Next
-        ocvb.trueText(New TTtext(nextLine, 10, ttStart + 90))
-
         If ocvb.parms.intrinsicsLeft.FOV IsNot Nothing Then
-            nextLine = "FOV in x = " + CStr(ocvb.parms.intrinsicsLeft.FOV(0)) + vbTab + "FOV in y = " + CStr(ocvb.parms.intrinsicsLeft.FOV(1))
+            If ocvb.parms.intrinsicsLeft.FOV(0) = 0 Then
+                ttStr += "Approximate FOV in x = " + CStr(hFOVangles(ocvb.parms.cameraIndex)) + vbCrLf +
+                         "Approximate FOV in y = " + CStr(vFOVangles(ocvb.parms.cameraIndex)) + vbCrLf
+            Else
+                ttStr += "FOV in x = " + CStr(ocvb.parms.intrinsicsLeft.FOV(0)) + vbCrLf + "FOV in y = " + CStr(ocvb.parms.intrinsicsLeft.FOV(1)) + vbCrLf
+            End If
+        Else
+            ttStr += "Approximate FOV in x = " + CStr(hFOVangles(ocvb.parms.cameraIndex)) + vbCrLf +
+                     "Approximate FOV in y = " + CStr(vFOVangles(ocvb.parms.cameraIndex)) + vbCrLf
         End If
-        ocvb.trueText(New TTtext(nextLine, 10, ttStart + 120))
+        ocvb.trueText(New TTtext(ttStr, 10, 50))
 
         dst2.SetTo(0)
         dst2.Line(New cv.Point(src.Width / 2, 0), New cv.Point(src.Width / 2, src.Height), cv.Scalar.White, 1)
         dst2.Line(New cv.Point(0, src.Height / 2), New cv.Point(src.Width, src.Height / 2), cv.Scalar.White, 1)
 
-        nextLine = "(" + CStr(ocvb.parms.intrinsicsLeft.ppx) + ", " + CStr(ocvb.parms.intrinsicsLeft.ppy) + ")"
-        Dim ttLocation = New cv.Point(CInt(ocvb.parms.trueTextLoc * src.Width / 2) + 20, CInt(ocvb.parms.trueTextLoc * src.Height / 2) + 20)
-        cv.Cv2.PutText(dst2, nextLine, ttLocation, cv.HersheyFonts.HersheyComplex, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        Dim nextline = "(" + CStr(ocvb.parms.intrinsicsLeft.ppx) + ", " + CStr(ocvb.parms.intrinsicsLeft.ppy) + ")"
+        Dim ttLocation = New cv.Point(CInt(src.Width / 2) + 20, CInt(src.Height / 2) + 40)
+        cv.Cv2.PutText(dst2, nextLine, ttLocation, cv.HersheyFonts.HersheyComplex, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Dim ptLoc = New cv.Point(src.Width / 2 + 4, src.Height / 2 + 4)
-        dst2.Line(ptLoc, New cv.Point(ttLocation.X / ocvb.parms.trueTextLoc, ttLocation.Y / ocvb.parms.trueTextLoc), cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+        dst2.Line(ptLoc, ttLocation, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 

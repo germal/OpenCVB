@@ -72,14 +72,22 @@ Public Class DNN_Basics
     Dim crop As cv.Rect
     Dim dnnWidth As Int32, dnnHeight As Int32
     Dim testImage As cv.Mat
+    Dim kalman(10) As Kalman_Basics
     Public rect As cv.Rect
     Dim classNames() = {"background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse",
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "dnn Scale Factor", 1, 10000, 78)
-        sliders.setupTrackBar(1, "dnn MeanVal", 1, 255, 127)
+        sliders.setupTrackBar(0, "DNN Scale Factor", 1, 10000, 78)
+        sliders.setupTrackBar(1, "DNN MeanVal", 1, 255, 127)
+        sliders.setupTrackBar(2, "DNN Confidence Threshold", 1, 100, 80)
+
+        For i = 0 To kalman.Count - 1
+            kalman(i) = New Kalman_Basics(ocvb)
+            ReDim kalman(i).input(4 - 1)
+            ReDim kalman(i).output(4 - 1)
+        Next
 
         dnnWidth = ocvb.color.Height ' height is always smaller than width...
         dnnHeight = ocvb.color.Height
@@ -111,10 +119,26 @@ Public Class DNN_Basics
             Dim detection = net.Forward("detection_out")
             Dim detectionMat = New cv.Mat(detection.Size(2), detection.Size(3), cv.MatType.CV_32F, detection.Data)
 
-            Dim confidenceThreshold = 0.8F
+            Dim confidenceThreshold = sliders.trackbar(2).Value / 100
             Dim rows = ocvb.color(crop).Rows
             Dim cols = ocvb.color(crop).Cols
             label2 = ""
+
+            Dim kPoints As New List(Of cv.Point)
+            For i = 0 To detectionMat.Rows - 1
+                Dim confidence = detectionMat.Get(Of Single)(i, 2)
+                If confidence > confidenceThreshold Then
+                    Dim vec = detectionMat.Get(Of cv.Vec4f)(i, 3)
+                    If kalman(i).input(0) = 0 And kalman(i).input(1) = 0 Then
+                        kPoints.Add(New cv.Point2f(vec.Item0 * cols + crop.Left, vec.Item1 * rows + crop.Top))
+                    Else
+                        kPoints.Add(New cv.Point2f(kalman(i).input(0), kalman(i).input(1)))
+                    End If
+                End If
+            Next
+
+            Static activeKalman As Integer
+            If kPoints.Count > activeKalman Then activeKalman = kPoints.Count
             For i = 0 To detectionMat.Rows - 1
                 Dim confidence = detectionMat.Get(Of Single)(i, 2)
                 If confidence > confidenceThreshold Then
@@ -123,14 +147,40 @@ Public Class DNN_Basics
                     Dim vec = detectionMat.Get(Of cv.Vec4f)(i, 3)
                     rect = New cv.Rect(vec.Item0 * cols + crop.Left, vec.Item1 * rows + crop.Top, (vec.Item2 - vec.Item0) * cols, (vec.Item3 - vec.Item1) * rows)
                     rect = New cv.Rect(rect.X, rect.Y, Math.Min(dnnWidth, rect.Width), Math.Min(dnnHeight, rect.Height))
+
+                    Dim pt = New cv.Point(rect.X, rect.Y)
+                    Dim minIndex As Integer
+                    Dim minDistance As Single = Single.MaxValue
+                    For j = 0 To kPoints.Count - 1
+                        Dim distance = Math.Sqrt((pt.X - kPoints(j).X) * (pt.X - kPoints(j).X) + (pt.Y - kPoints(j).Y) * (pt.Y - kPoints(j).Y))
+                        If minDistance > distance Then
+                            minIndex = j
+                            minDistance = distance
+                        End If
+                    Next
+
+                    If minIndex < kalman.Count Then
+                        kalman(minIndex).input = {rect.X, rect.Y, rect.Width, rect.Height}
+                        kalman(minIndex).Run(ocvb)
+                        rect = New cv.Rect(kalman(minIndex).output(0), kalman(minIndex).output(1), kalman(minIndex).output(2), kalman(minIndex).output(3))
+                    End If
                     dst2.Rectangle(rect, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)
-                    rect.Width = 100
-                    rect.Height = 30
+                    rect.Width = src.Width / 12
+                    rect.Height = src.Height / 16
                     dst2.Rectangle(rect, cv.Scalar.Black, -1)
-                    ocvb.trueText(New TTtext(nextName, CInt(rect.X * ocvb.parms.trueTextLoc), CInt(rect.Y * ocvb.parms.trueTextLoc)))
+                    ocvb.trueText(New TTtext(nextName, CInt(rect.X), CInt(rect.Y), 3))
+                End If
+            Next
+
+            ' reinitialize any unused kalman filters.
+            For i = kPoints.Count To activeKalman - 1
+                If i < kalman.Count Then
+                    kalman(i).input(0) = 0
+                    kalman(i).input(1) = 0
                 End If
             Next
         End If
     End Sub
 End Class
+
 

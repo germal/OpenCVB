@@ -198,8 +198,8 @@ Public Class Kalman_MousePredict
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         kalman = New Kalman_Basics(ocvb)
-        ReDim kalman.input(1)
-        ReDim kalman.output(1)
+        ReDim kalman.input(2 - 1)
+        ReDim kalman.output(2 - 1)
 
         lineWidth = src.Width / 300
         label1 = "Red is real mouse, white is prediction"

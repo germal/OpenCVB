@@ -53,6 +53,8 @@ Module PointCloud
         Next
         Return minIndex
     End Function
+    Public hFOVangles() As Single = {90, 0, 100, 78, 70, 70, 86}  ' T265 has no point cloud so there is a 0 where it would have been.
+    Public vFOVangles() As Single = {60, 0, 55, 65, 69, 67, 60}  ' T265 has no point cloud so there is a 0 where it would have been.
 End Module
 
 
@@ -70,8 +72,6 @@ Public Class PointCloud_Colorize
     Public shift As Integer
     Dim centroidRadius As Integer
     Dim arcSize As Integer
-    Public hFOVangles() As Single = {90, 0, 100, 78, 70, 70, 86}  ' T265 has no point cloud so there is a 0 where it would have been.
-    Public vFOVangles() As Single = {60, 0, 55, 65, 69, 67, 60}  ' T265 has no point cloud so there is a 0 where it would have been.
     Public topCameraPoint As cv.Point
     Public sideCameraPoint As cv.Point
     Public startangle As Integer
@@ -391,7 +391,7 @@ Public Class PointCloud_Objects_TopView
         dst1 = measure.dst1
         label1 = measure.label1
 
-        Dim FOV = measure.view.cMats.hFOVangles(ocvb.parms.cameraIndex)
+        Dim FOV = hFOVangles(ocvb.parms.cameraIndex)
 
         Dim xpt1 As cv.Point, xpt2 As cv.Point
         If standalone Then
@@ -474,7 +474,7 @@ Public Class PointCloud_Objects_SideView
         dst1 = measure.dst1
         label1 = measure.label1
 
-        Dim FOV = measure.view.cMats.vFOVangles(ocvb.parms.cameraIndex)
+        Dim FOV = vFOVangles(ocvb.parms.cameraIndex)
 
         Dim xpt1 As cv.Point, xpt2 As cv.Point
         If standalone Then
@@ -575,7 +575,7 @@ Public Class PointCloud_Kalman_TopView
         If standalone Then
             Static checkIMU = findCheckBox("Use IMU gravity vector")
             If checkIMU?.Checked = False Then dst1 = cmats.CameraLocationBot(ocvb, dst1)
-            Dim FOV = cmats.hFOVangles(ocvb.parms.cameraIndex)
+            Dim FOV = hFOVangles(ocvb.parms.cameraIndex)
             Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
             pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * maxZ)
             label1 = Format(pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(maxZ, "0.0") + " meters"
@@ -629,7 +629,7 @@ Public Class PointCloud_Kalman_SideView
         If standalone Then
             Static checkIMU = findCheckBox("Use IMU gravity vector")
             If checkIMU?.Checked = False Then dst1 = cmats.CameraLocationSide(ocvb, dst1)
-            Dim FOV = cmats.vFOVangles(ocvb.parms.cameraIndex)
+            Dim FOV = vFOVangles(ocvb.parms.cameraIndex)
             Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
             pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * maxZ)
             label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(maxZ, "0.0") + " meters"

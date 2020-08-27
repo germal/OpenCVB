@@ -270,7 +270,7 @@ Public Class OpenCVB
         If drawRect.Width > 0 And drawRect.Height > 0 Then
             g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
         End If
-        If algorithmRefresh And (pic.Tag = 2 Or pic.Tag = 3) Then
+        If algorithmRefresh And (pic.Tag = 2) Then
             algorithmRefresh = False
             SyncLock imgResult
                 Try
@@ -310,13 +310,13 @@ Public Class OpenCVB
         SyncLock TTtextData
             Try
                 Dim ratio = camPic(2).Width / imgResult.Width
-                If pic.Tag = 2 Or pic.Tag = 3 Then
+                If pic.Tag = 2 Then
                     For i = 0 To TTtextData.Count - 1
                         Dim tt = TTtextData(i)
                         If tt IsNot Nothing Then
                             If TTtextData(i).picTag = 3 Then
                                 g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
-                                             tt.x * ratio + camPic(0).width, tt.y * ratio)
+                                             tt.x * ratio + camPic(0).Width, tt.y * ratio)
                             Else
                                 g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
                                              tt.x * ratio, tt.y * ratio)
@@ -995,7 +995,6 @@ Public Class OpenCVB
         parms.OpenCVfullPath = OpenCVfullPath
         parms.transformationMatrix = camera.transformationmatrix
         parms.OpenCV_Version_ID = Environment.GetEnvironmentVariable("OpenCV_Version")
-        parms.trueTextLoc = 1 / resizeForDisplay
         parms.useRecordedData = OpenCVkeyword.Text = "<All using recorded data>"
         parms.testAllRunning = TestAllButton.Text = "Stop Test"
         parms.externalPythonInvocation = externalPythonInvocation
@@ -1003,7 +1002,6 @@ Public Class OpenCVB
         parms.NumPyEnabled = optionsForm.EnableNumPy.Checked
 
         If parms.resolution = OptionsDialog.resMed Then parms.speedFactor = 2 Else parms.speedFactor = 1
-        If parms.resolution = OptionsDialog.resMed Then parms.trueTextLoc *= parms.speedFactor
 
         PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
 
@@ -1057,8 +1055,6 @@ Public Class OpenCVB
             ' Here we check to see if the algorithm constructor changed mediumResolution.
             If OpenCVB.ocvb.parms.resolution <> saveLowResSetting Then
                 If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
-                OpenCVB.ocvb.parms.trueTextLoc = 1 / resizeForDisplay
-                If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.trueTextLoc *= OpenCVB.ocvb.parms.speedFactor
             End If
 
             ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
