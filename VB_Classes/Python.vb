@@ -33,8 +33,12 @@ Module Python_Module
         If ocvb.parms.testAllRunning Then
             For Each p In Process.GetProcesses
                 If p.ProcessName.ToUpper.Contains("PYTHON") Then
-                    ' if it is not our process, we won't be able to kill it.
-                    p.Kill()
+                    Try
+                        ' if it is not our process, we won't be able to kill it.
+                        p.Kill()
+                    Catch ex As Exception
+                        Console.WriteLine("Out of sync 'Test All' tried to kill algorithm that was already terminated.")
+                    End Try
                 End If
             Next
         End If
