@@ -82,7 +82,8 @@ Public Class OptionsDialog
 
         ShowLabels.Checked = GetSetting("OpenCVB", "ShowLabels", "ShowLabels", False)
 
-        TestAllDuration.Value = GetSetting("OpenCVB", "TestAllDuration", "TestAllDuration", 1)
+        TestAllDuration.Value = If(GetSetting("OpenCVB", "TestAllDuration", "TestAllDuration", 2) < 2, 2,
+                                   GetSetting("OpenCVB", "TestAllDuration", "TestAllDuration", 2))
         SnapToGrid.Checked = GetSetting("OpenCVB", "SnapToGrid", "SnapToGrid", True)
         ShowConsoleLog.Checked = GetSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", False)
         EnableNumPy.Checked = False ' GetSetting("OpenCVB", "EnableNumPy", "EnableNumPy", False)
