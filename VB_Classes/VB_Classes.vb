@@ -60,7 +60,6 @@ Public Class ActiveClass : Implements IDisposable
     End Structure
     Public Structure algorithmParameters
         Dim activeAlgorithm As Object
-        Dim AvoidDNNCrashes As Boolean
         Dim cameraIndex As Integer
         Dim cameraName As String
         Dim externalPythonInvocation As Boolean

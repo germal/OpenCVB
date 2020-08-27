@@ -21,23 +21,19 @@ namespace CS_Classes
             Console.WriteLine();
             Console.WriteLine("Preparation complete");
         }
-        public string Run(Mat image, bool AvoidDNNCrashes)
+        public string Run(Mat image)
         {
             // Convert Mat to batch of images
             using (var inputBlob = CvDnn.BlobFromImage(image, 1, new Size(224, 224), new Scalar(104, 117, 123)))
             {
                 net.SetInput(inputBlob, "data");
-                if (AvoidDNNCrashes == false)
+                using (var prob = net.Forward("prob"))
                 {
-                    using (var prob = net.Forward("prob"))
-                    {
-                        // find the best class
-                        GetMaxClass(prob, out int classId, out double classProb);
-                        return String.Format("Best class: #{0} '{1}' Probability: {0:P2}", classId, classNames[classId], classProb);
-                    }
+                    // find the best class
+                    GetMaxClass(prob, out int classId, out double classProb);
+                    return String.Format("Best class: #{0} '{1}' Probability: {0:P2}", classId, classNames[classId], classProb);
                 }
             }
-            return "Failed to identify object.";
         }
 
         private static byte[] DownloadBytes(string url)

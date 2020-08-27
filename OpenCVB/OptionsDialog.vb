@@ -29,7 +29,6 @@ Public Class OptionsDialog
         SaveSetting("OpenCVB", "SnapToGrid", "SnapToGrid", SnapToGrid.Checked)
         SaveSetting("OpenCVB", "PythonExe", "PythonExe", PythonExeName.Text)
         SaveSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", ShowConsoleLog.Checked)
-        SaveSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", AvoidDNNCrashes.Checked)
         SaveSetting("OpenCVB", "EnableNumPy", "EnableNumPy", EnableNumPy.Checked)
         SaveSetting("OpenCVB", "FontName", "FontName", fontInfo.Font.Name)
         SaveSetting("OpenCVB", "FontSize", "FontSize", fontInfo.Font.Size)
@@ -87,7 +86,6 @@ Public Class OptionsDialog
         SnapToGrid.Checked = GetSetting("OpenCVB", "SnapToGrid", "SnapToGrid", True)
         ShowConsoleLog.Checked = GetSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", False)
         EnableNumPy.Checked = False ' GetSetting("OpenCVB", "EnableNumPy", "EnableNumPy", False)
-        AvoidDNNCrashes.Checked = GetSetting("OpenCVB", "AvoidDNNCrashes", "AvoidDNNCrashes", False)
 
         Dim defaultSize = GetSetting("OpenCVB", "FontSize", "FontSize", 8)
         Dim DefaultFont = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")

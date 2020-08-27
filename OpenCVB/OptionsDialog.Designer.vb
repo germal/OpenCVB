@@ -29,7 +29,6 @@ Partial Class OptionsDialog
         Me.AccurateProcessing = New System.Windows.Forms.RadioButton()
         Me.mediumResolution = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.AvoidDNNCrashes = New System.Windows.Forms.CheckBox()
         Me.ShowConsoleLog = New System.Windows.Forms.CheckBox()
         Me.ShowLabels = New System.Windows.Forms.CheckBox()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
@@ -125,25 +124,14 @@ Partial Class OptionsDialog
         '
         'GroupBox2
         '
-        Me.GroupBox2.Controls.Add(Me.AvoidDNNCrashes)
         Me.GroupBox2.Controls.Add(Me.ShowConsoleLog)
         Me.GroupBox2.Controls.Add(Me.ShowLabels)
         Me.GroupBox2.Location = New System.Drawing.Point(21, 435)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(936, 192)
+        Me.GroupBox2.Size = New System.Drawing.Size(936, 143)
         Me.GroupBox2.TabIndex = 5
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Global Options"
-        '
-        'AvoidDNNCrashes
-        '
-        Me.AvoidDNNCrashes.AutoSize = True
-        Me.AvoidDNNCrashes.Location = New System.Drawing.Point(16, 100)
-        Me.AvoidDNNCrashes.Name = "AvoidDNNCrashes"
-        Me.AvoidDNNCrashes.Size = New System.Drawing.Size(449, 24)
-        Me.AvoidDNNCrashes.TabIndex = 3
-        Me.AvoidDNNCrashes.Text = "DNN's crash some machines.  Check this to not run DNN's."
-        Me.AvoidDNNCrashes.UseVisualStyleBackColor = True
         '
         'ShowConsoleLog
         '
@@ -170,7 +158,7 @@ Partial Class OptionsDialog
         '
         Me.GroupBox4.Controls.Add(Me.TestAllDuration)
         Me.GroupBox4.Controls.Add(Me.Label1)
-        Me.GroupBox4.Location = New System.Drawing.Point(22, 642)
+        Me.GroupBox4.Location = New System.Drawing.Point(22, 584)
         Me.GroupBox4.Name = "GroupBox4"
         Me.GroupBox4.Size = New System.Drawing.Size(935, 139)
         Me.GroupBox4.TabIndex = 8
@@ -203,7 +191,7 @@ Partial Class OptionsDialog
         Me.GroupBox6.Controls.Add(Me.PythonExeName)
         Me.GroupBox6.Controls.Add(Me.SelectPythonFile)
         Me.GroupBox6.Controls.Add(Me.Label2)
-        Me.GroupBox6.Location = New System.Drawing.Point(21, 782)
+        Me.GroupBox6.Location = New System.Drawing.Point(21, 729)
         Me.GroupBox6.Name = "GroupBox6"
         Me.GroupBox6.Size = New System.Drawing.Size(936, 146)
         Me.GroupBox6.TabIndex = 9
@@ -272,7 +260,7 @@ Partial Class OptionsDialog
         Me.GroupBox3.Controls.Add(Me.fontInfo)
         Me.GroupBox3.Controls.Add(Me.Button1)
         Me.GroupBox3.Controls.Add(Me.Label4)
-        Me.GroupBox3.Location = New System.Drawing.Point(22, 948)
+        Me.GroupBox3.Location = New System.Drawing.Point(18, 881)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(936, 116)
         Me.GroupBox3.TabIndex = 12
@@ -310,7 +298,7 @@ Partial Class OptionsDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1008, 1073)
+        Me.ClientSize = New System.Drawing.Size(1008, 1010)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.Cancel_Button)
         Me.Controls.Add(Me.OKButton)
@@ -358,7 +346,6 @@ Partial Class OptionsDialog
     Friend WithEvents Label2 As Label
     Friend WithEvents OpenFileDialog1 As OpenFileDialog
     Friend WithEvents ShowConsoleLog As CheckBox
-    Friend WithEvents AvoidDNNCrashes As CheckBox
     Friend WithEvents OKButton As Button
     Friend WithEvents Cancel_Button As Button
     Friend WithEvents GroupBox3 As GroupBox

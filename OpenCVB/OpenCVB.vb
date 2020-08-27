@@ -1000,7 +1000,6 @@ Public Class OpenCVB
         parms.testAllRunning = TestAllButton.Text = "Stop Test"
         parms.externalPythonInvocation = externalPythonInvocation
         parms.ShowConsoleLog = optionsForm.ShowConsoleLog.Checked
-        parms.AvoidDNNCrashes = optionsForm.AvoidDNNCrashes.Checked
         parms.NumPyEnabled = optionsForm.EnableNumPy.Checked
 
         If parms.resolution = OptionsDialog.resMed Then parms.speedFactor = 2 Else parms.speedFactor = 1
