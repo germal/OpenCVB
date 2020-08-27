@@ -583,7 +583,7 @@ actually 2 plots – a count of the leading digits pulled from a compressed imag
 combined with a plot of the expected distribution of those leading digits
 derived from Benford’s Law. The values are so close that you cannot see the
 difference. The code contains some links explaining Benford’s Law and examples
-of when it works and when it does not.f10*
+of when it works and when it does not.*
 
 ![](media/ac533603224f4ec5b4ac97c16dc22330.png)
 
