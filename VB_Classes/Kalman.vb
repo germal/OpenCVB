@@ -600,7 +600,7 @@ Public Class Kalman_PointTracker
     Inherits ocvbClass
     Dim knn As KNN_Basics
     Dim newObjects As New List(Of cv.Point2f)
-    Dim topView As PointCloud_Measured_TopView
+    Dim topView As PointCloud_Kalman_TopView
     Dim kalmanAging() As Integer
     Dim lastMask() As cv.Mat
     Public maskAvailable As Boolean = True
@@ -612,7 +612,7 @@ Public Class Kalman_PointTracker
     Public viewObjects As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        If standalone Then topView = New PointCloud_Measured_TopView(ocvb)
+        If standalone Then topView = New PointCloud_Kalman_TopView(ocvb)
 
         knn = New KNN_Basics(ocvb)
 
@@ -719,11 +719,13 @@ Public Class Kalman_PointTracker
             If matched And kalman(i).output IsNot Nothing And lastMask(i) IsNot Nothing Then
                 Dim pt3 = New cv.Point(kalman(i).output(0), kalman(i).output(1))
                 If rect.Width = lastMask(i).Cols And rect.Height = lastMask(i).Rows Then dst1(rect).SetTo(scalarColors(i), lastMask(i))
-                cv.Cv2.Circle(dst1, pt3, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
                 rect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
 
                 Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
-                If drawRectangleCheck?.checked Then dst1.Rectangle(rect, cv.Scalar.White, 1)
+                If drawRectangleCheck?.checked Then
+                    cv.Cv2.Circle(dst1, pt3, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+                    dst1.Rectangle(rect, cv.Scalar.White, 1)
+                End If
                 If rect.Width > 0 Then
                     Dim vo = New viewObject
                     vo.centroid = pt3

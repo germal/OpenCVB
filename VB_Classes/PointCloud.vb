@@ -68,7 +68,6 @@ Public Class PointCloud_Colorize
     Dim palette As Palette_Gradient
     Public rect As cv.Rect
     Public shift As Integer
-    Public labelShift As Integer
     Dim centroidRadius As Integer
     Dim arcSize As Integer
     Public hFOVangles() As Single = {90, 0, 100, 78, 70, 70, 86}  ' T265 has no point cloud so there is a 0 where it would have been.
@@ -77,18 +76,16 @@ Public Class PointCloud_Colorize
     Public sideCameraPoint As cv.Point
     Public startangle As Integer
 
-    Public Function CameraLocationBot(ocvb As AlgorithmData, mask As cv.Mat, maxZ As Single) As cv.Mat
-        Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
+    Public Function CameraLocationBot(ocvb As AlgorithmData, dst As cv.Mat) As cv.Mat
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        Dim maxZ = inRangeSlider.Value / 1000
 
-        ' if not a mask, then the image is already colorized.
-        If mask.Channels = 1 Then dst2.CopyTo(dst, mask) Else dst = mask.Clone()
-        topCameraPoint = New cv.Point(dst.Height, dst.Height)
-        Dim cameraLocation = New cv.Point(shift + dst.Height / 2, dst.Height - 5)
+        Dim cameraLocation = New cv.Point(src.Width / 2, dst.Height - 5)
         dst.Circle(topCameraPoint, centroidRadius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         For i = maxZ - 1 To 0 Step -1
-            Dim ymeter = dst.Height * i / maxZ
+            Dim ymeter = CInt(dst.Height * i / maxZ)
             dst.Line(New cv.Point(0, ymeter), New cv.Point(dst.Width, ymeter), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst, CStr(maxZ - i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            cv.Cv2.PutText(dst, CStr(maxZ - i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
         ' draw the arc showing the camera FOV
@@ -103,25 +100,24 @@ Public Class PointCloud_Colorize
         dst.Ellipse(topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         dst.Line(topCameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        Dim labelLocation = New cv.Point(dst.Width / 2 + labelShift, dst.Height * 15 / 16)
-        cv.Cv2.PutText(dst, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        Dim labelLocation = New cv.Point(dst.Width / 2 + shift, dst.Height * 15 / 16)
+        cv.Cv2.PutText(dst, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(topCameraPoint.X - 100, topCameraPoint.Y - 5), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(topCameraPoint.X + 60, topCameraPoint.Y - 5), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(topCameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst
     End Function
-    Public Function CameraLocationSide(ocvb As AlgorithmData, ByRef mask As cv.Mat, maxZ As Single) As cv.Mat
-        Dim dst As New cv.Mat(mask.Size, cv.MatType.CV_8UC3, 0)
+    Public Function CameraLocationSide(ocvb As AlgorithmData, ByRef dst As cv.Mat) As cv.Mat
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        Dim maxZ = inRangeSlider.Value / 1000
 
-        ' if not a mask, then the image is already colorized.
-        If mask.Channels = 1 Then dst2.CopyTo(dst, mask) Else dst = mask.Clone()
-        sideCameraPoint = New cv.Point(shift, src.Height - (src.Width - src.Height) / 2)
+        Dim shift = (src.Width - src.Height) / 2
         dst.Circle(sideCameraPoint, centroidRadius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         For i = 0 To maxZ
-            Dim xmeter = dst.Height * i / maxZ
+            Dim xmeter = CInt(dst.Height * i / maxZ)
             dst.Line(New cv.Point(shift + xmeter, 0), New cv.Point(shift + xmeter, dst.Height), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(shift + xmeter + 10, dst.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(shift + xmeter + 10, dst.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
         ' draw the arc showing the camera FOV
@@ -137,7 +133,7 @@ Public Class PointCloud_Colorize
         dst.Line(sideCameraPoint, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Dim labelLocation = New cv.Point(src.Width * 0.1, sideCameraPoint.Y)
-        cv.Cv2.PutText(dst, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontSize,
+        cv.Cv2.PutText(dst, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fontsize,
                        cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(sideCameraPoint.X - 80, sideCameraPoint.Y + 50), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(sideCameraPoint.X - 80, sideCameraPoint.Y - 50), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
@@ -149,8 +145,6 @@ Public Class PointCloud_Colorize
         setCaller(ocvb)
 
         centroidRadius = src.Width / 100
-        shift = (src.Width - src.Height) / 2
-        labelShift = shift
 
         palette = New Palette_Gradient(ocvb)
         palette.color1 = cv.Scalar.Yellow
@@ -167,8 +161,11 @@ Public Class PointCloud_Colorize
         palette.Run(ocvb)
         dst1 = palette.dst1
         dst2 = dst1.Clone
-        rect = New cv.Rect(shift, 0, dst1.Height, dst1.Height)
+        rect = New cv.Rect((src.Width - src.Height) / 2, 0, dst1.Height, dst1.Height)
         cv.Cv2.Rotate(dst1(rect), dst2(rect), cv.RotateFlags.Rotate90Clockwise)
+
+        topCameraPoint = New cv.Point(src.Height, src.Height)
+        sideCameraPoint = New cv.Point((src.Width - src.Height) / 2, src.Height - (src.Width - src.Height) / 2)
 
         label1 = "Colorize mask for top down view"
         label2 = "Colorize mask for side view"
@@ -327,8 +324,7 @@ Public Class PointCloud_TopView
         If checkIMU?.Checked Then
             dst1 = hist.dst1
         Else
-            Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-            dst1 = cMats.CameraLocationBot(ocvb, hist.dst1.ConvertScaleAbs(255), inRangeSlider.Value / 1000)
+            dst1 = cMats.CameraLocationBot(ocvb, hist.dst1)
         End If
     End Sub
 End Class
@@ -359,8 +355,7 @@ Public Class PointCloud_SideView
         If checkIMU?.Checked Then
             dst1 = hist.dst1
         Else
-            Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-            dst1 = cMats.CameraLocationSide(ocvb, hist.dst1.ConvertScaleAbs(255), inRangeSlider.Value / 1000)
+            dst1 = cMats.CameraLocationSide(ocvb, hist.dst1)
         End If
     End Sub
 End Class
@@ -373,12 +368,14 @@ End Class
 
 Public Class PointCloud_Objects_TopView
     Inherits ocvbClass
-    Public measure As PointCloud_Measured_TopView
+    Public measure As PointCloud_Kalman_TopView
     Public viewObjects As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
+    Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        measure = New PointCloud_Measured_TopView(ocvb)
+        cmats = New PointCloud_Colorize(ocvb)
+        measure = New PointCloud_Kalman_TopView(ocvb)
 
         If standalone Then
             sliders.Setup(ocvb, caller, 1)
@@ -394,15 +391,14 @@ Public Class PointCloud_Objects_TopView
         dst1 = measure.dst1
         label1 = measure.label1
 
-        Dim cameraPoint = measure.view.cMats.topCameraPoint
         Dim FOV = measure.view.cMats.hFOVangles(ocvb.parms.cameraIndex)
 
         Dim xpt1 As cv.Point, xpt2 As cv.Point
         If standalone Then
             Dim pixeldistance = src.Height * ((sliders.trackbar(0).Value / 1000) / measure.maxZ)
             Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * pixeldistance)
-            xpt1 = New cv.Point(cameraPoint.X - lineHalf, src.Height - pixeldistance)
-            xpt2 = New cv.Point(cameraPoint.X + lineHalf, src.Height - pixeldistance)
+            xpt1 = New cv.Point(cmats.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
+            xpt2 = New cv.Point(cmats.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
 
             sliders.trackbar(0).Maximum = measure.maxZ * 1000
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
@@ -414,24 +410,24 @@ Public Class PointCloud_Objects_TopView
             Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (src.Height - (r.Y + r.Height)))
             If lineHalf = 0 Then Continue For
             Dim pixeldistance = src.Height - r.Y - r.Height
-            xpt1 = New cv.Point(cameraPoint.X - lineHalf, src.Height - pixeldistance)
-            xpt2 = New cv.Point(cameraPoint.X + lineHalf, src.Height - pixeldistance)
-            Dim pt1 = New cv.Point(cameraPoint.X - lineHalf, r.Y + r.Height)
-            Dim pt2 = New cv.Point(cameraPoint.X + lineHalf, r.Y + r.Height)
+            xpt1 = New cv.Point(cmats.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
+            xpt2 = New cv.Point(cmats.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
+            Dim pt1 = New cv.Point(cmats.topCameraPoint.X - lineHalf, r.Y + r.Height)
+            Dim pt2 = New cv.Point(cmats.topCameraPoint.X + lineHalf, r.Y + r.Height)
             Dim leftX = Math.Max(Math.Max(xpt1.X, r.X), pt1.X)
             Dim rightX = Math.Min(Math.Min(xpt2.X, r.X + r.Width), pt2.X)
             If drawLines Then dst1.Line(New cv.Point(leftX, pt1.Y), New cv.Point(rightX, pt1.Y), cv.Scalar.Yellow, 3)
             Dim addlen As Single
-            If cameraPoint.X > r.X And cameraPoint.X < r.X + r.Width Then
+            If cmats.topCameraPoint.X > r.X And cmats.topCameraPoint.X < r.X + r.Width Then
                 addlen = 0
             Else
                 ' need to add a small amount to the object width in pixels based on the angle to the camera of the back edge.
-                If r.X > cameraPoint.X Then
-                    addlen = r.Height * Math.Abs(r.X - cameraPoint.X) / (src.Height - r.Y)
+                If r.X > cmats.topCameraPoint.X Then
+                    addlen = r.Height * Math.Abs(r.X - cmats.topCameraPoint.X) / (src.Height - r.Y)
                     If drawLines Then dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(r.X - addlen, r.Y + r.Height), cv.Scalar.Yellow, 3)
                     leftX -= addlen
                 Else
-                    addlen = r.Height * (cameraPoint.X - (r.X + r.Width)) / (src.Height - r.Y)
+                    addlen = r.Height * (cmats.topCameraPoint.X - (r.X + r.Width)) / (src.Height - r.Y)
                     If drawLines Then dst1.Line(New cv.Point(r.X + r.Width, r.Y + r.Height), New cv.Point(r.X + r.Width + addlen, r.Y + r.Height), cv.Scalar.Yellow, 3)
                     If leftX - addlen >= xpt1.X Then leftX -= addlen
                 End If
@@ -442,6 +438,7 @@ Public Class PointCloud_Objects_TopView
             vo.rectFront = New cv.Rect(newX, r.Y, newWidth, r.Height)
             viewObjects.Add(vo.rectFront.Width * vo.rectFront.Height, vo)
         Next
+        If standalone Then dst1 = cmats.CameraLocationBot(ocvb, dst1)
     End Sub
 End Class
 
@@ -454,12 +451,14 @@ End Class
 
 Public Class PointCloud_Objects_SideView
     Inherits ocvbClass
-    Public measure As PointCloud_Measured_SideView
+    Public measure As PointCloud_Kalman_SideView
     Public viewObjects As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
+    Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        measure = New PointCloud_Measured_SideView(ocvb)
+        cmats = New PointCloud_Colorize(ocvb)
+        measure = New PointCloud_Kalman_SideView(ocvb)
 
         If standalone Then
             sliders.Setup(ocvb, caller, 1)
@@ -475,7 +474,6 @@ Public Class PointCloud_Objects_SideView
         dst1 = measure.dst1
         label1 = measure.label1
 
-        Dim cameraPoint = measure.view.cMats.sideCameraPoint ' camerapoint is a tricky computation for side views.  Use the only one we have.
         Dim FOV = measure.view.cMats.vFOVangles(ocvb.parms.cameraIndex)
 
         Dim xpt1 As cv.Point, xpt2 As cv.Point
@@ -483,8 +481,8 @@ Public Class PointCloud_Objects_SideView
             Static distanceSlider = findSlider("Distance from camera in mm")
             Dim pixeldistance = src.Height * ((distanceSlider.Value / 1000) / measure.maxZ)
             Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * pixeldistance)
-            xpt1 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y - lineHalf))
-            xpt2 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y + lineHalf))
+            xpt1 = New cv.Point(CInt(cmats.sideCameraPoint.X + pixeldistance), CInt(cmats.sideCameraPoint.Y - lineHalf))
+            xpt2 = New cv.Point(CInt(cmats.sideCameraPoint.X + pixeldistance), CInt(cmats.sideCameraPoint.Y + lineHalf))
 
             sliders.trackbar(0).Maximum = measure.maxZ * 1000
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
@@ -493,28 +491,28 @@ Public Class PointCloud_Objects_SideView
         viewObjects.Clear()
         For i = 0 To measure.pTrack.viewObjects.Count - 1
             Dim r = measure.pTrack.viewObjects.Values(i).rectView
-            Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (r.X - cameraPoint.X))
+            Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (r.X - cmats.sideCameraPoint.X))
             If lineHalf = 0 Then Continue For
-            Dim pixeldistance = r.X - cameraPoint.X
-            xpt1 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y - lineHalf))
-            xpt2 = New cv.Point(CInt(cameraPoint.X + pixeldistance), CInt(cameraPoint.Y + lineHalf))
-            Dim pt1 = New cv.Point(r.X, cameraPoint.Y - lineHalf)
-            Dim pt2 = New cv.Point(r.X, cameraPoint.Y + lineHalf)
+            Dim pixeldistance = r.X - cmats.sideCameraPoint.X
+            xpt1 = New cv.Point(CInt(cmats.sideCameraPoint.X + pixeldistance), CInt(cmats.sideCameraPoint.Y - lineHalf))
+            xpt2 = New cv.Point(CInt(cmats.sideCameraPoint.X + pixeldistance), CInt(cmats.sideCameraPoint.Y + lineHalf))
+            Dim pt1 = New cv.Point(r.X, cmats.sideCameraPoint.Y - lineHalf)
+            Dim pt2 = New cv.Point(r.X, cmats.sideCameraPoint.Y + lineHalf)
             Dim topY = Math.Max(Math.Max(xpt1.Y, r.Y), pt1.Y)
             Dim botY = Math.Min(Math.Min(xpt2.Y, r.Y + r.Height), pt2.Y)
             If drawLines Then dst1.Line(New cv.Point(r.X, topY), New cv.Point(r.X, botY), cv.Scalar.Yellow, 3)
             Dim addlen As Single
-            If cameraPoint.Y > r.Y And cameraPoint.Y < r.Y + r.Height Then
+            If cmats.sideCameraPoint.Y > r.Y And cmats.sideCameraPoint.Y < r.Y + r.Height Then
                 addlen = 0
             Else
                 ' need to add a small amount to the object width in pixels based on the angle to the camera of the back edge
-                If r.Y > cameraPoint.Y Then
-                    addlen = r.Width * (r.Y - cameraPoint.Y) / (r.X + r.Width - cameraPoint.X)
+                If r.Y > cmats.sideCameraPoint.Y Then
+                    addlen = r.Width * (r.Y - cmats.sideCameraPoint.Y) / (r.X + r.Width - cmats.sideCameraPoint.X)
                     If drawLines Then dst1.Line(New cv.Point(r.X, r.Y), New cv.Point(r.X, r.Y - addlen), cv.Scalar.Yellow, 3)
                     r = New cv.Rect(r.X, r.Y - addlen, r.Width, botY - topY - addlen)
                     If botY - addlen >= xpt2.Y Then botY -= addlen
                 Else
-                    addlen = r.Width * (cameraPoint.Y - r.Y) / (r.X + r.Width - cameraPoint.X)
+                    addlen = r.Width * (cmats.sideCameraPoint.Y - r.Y) / (r.X + r.Width - cmats.sideCameraPoint.X)
                     If drawLines Then dst1.Line(New cv.Point(r.X, r.Y + r.Height), New cv.Point(r.X, r.Y + r.Height + addlen), cv.Scalar.Yellow, 3)
                     r = New cv.Rect(r.X, r.Y + addlen, r.Width, botY - topY + addlen)
                     topY += addlen
@@ -526,6 +524,7 @@ Public Class PointCloud_Objects_SideView
             vo.rectFront = New cv.Rect(r.X, newY, r.Width, newHeight)
             viewObjects.Add(vo.centroid.X, vo)
         Next
+        If standalone Then dst1 = cmats.CameraLocationSide(ocvb, dst1)
     End Sub
 End Class
 
@@ -536,16 +535,18 @@ End Class
 
 
 
-Public Class PointCloud_Measured_TopView
+Public Class PointCloud_Kalman_TopView
     Inherits ocvbClass
     Public pTrack As Kalman_PointTracker
     Public flood As FloodFill_Projection
     Public view As PointCloud_TopView
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Public maxZ As Single
+    Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
+        cmats = New PointCloud_Colorize(ocvb)
         flood = New FloodFill_Projection(ocvb)
         flood.sliders.trackbar(0).Value = 100
         pTrack = New Kalman_PointTracker(ocvb)
@@ -571,10 +572,14 @@ Public Class PointCloud_Measured_TopView
         pTrack.Run(ocvb)
         dst1 = pTrack.dst1
 
-        Dim FOV = view.cMats.hFOVangles(ocvb.parms.cameraIndex)
-        Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
-        pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * maxZ)
-        label1 = Format(pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(maxZ, "0.0") + " meters"
+        If standalone Then
+            Static checkIMU = findCheckBox("Use IMU gravity vector")
+            If checkIMU?.Checked = False Then dst1 = cmats.CameraLocationBot(ocvb, dst1)
+            Dim FOV = cmats.hFOVangles(ocvb.parms.cameraIndex)
+            Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
+            pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * maxZ)
+            label1 = Format(pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(maxZ, "0.0") + " meters"
+        End If
     End Sub
 End Class
 
@@ -583,16 +588,18 @@ End Class
 
 
 
-Public Class PointCloud_Measured_SideView
+Public Class PointCloud_Kalman_SideView
     Inherits ocvbClass
     Public flood As FloodFill_Projection
     Public view As PointCloud_SideView
     Public pTrack As Kalman_PointTracker
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Public maxZ As Single
+    Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
+        cmats = New PointCloud_Colorize(ocvb)
         flood = New FloodFill_Projection(ocvb)
         flood.sliders.trackbar(0).Value = 100
         view = New PointCloud_SideView(ocvb)
@@ -619,10 +626,14 @@ Public Class PointCloud_Measured_SideView
         pTrack.Run(ocvb)
         dst1 = pTrack.dst1
 
-        Dim FOV = view.cMats.vFOVangles(ocvb.parms.cameraIndex)
-        Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
-        pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * maxZ)
-        label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(maxZ, "0.0") + " meters"
+        If standalone Then
+            Static checkIMU = findCheckBox("Use IMU gravity vector")
+            If checkIMU?.Checked = False Then dst1 = cmats.CameraLocationSide(ocvb, dst1)
+            Dim FOV = cmats.vFOVangles(ocvb.parms.cameraIndex)
+            Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
+            pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * maxZ)
+            label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(maxZ, "0.0") + " meters"
+        End If
     End Sub
 End Class
 
@@ -658,6 +669,7 @@ Public Class PointCloud_BackProject
             End If
         End If
         both.Run(ocvb)
+
         mats.mat(0) = both.dst1
         mats.mat(1) = both.dst2
         mats.mat(2) = both.backMat
@@ -686,9 +698,11 @@ Public Class PointCloud_BothViews
     Public backMatMask As New cv.Mat
     Public vwTop As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
     Public vwSide As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
+    Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
+        cmats = New PointCloud_Colorize(ocvb)
         topPixel = New PointCloud_Objects_TopView(ocvb)
         sidePixel = New PointCloud_Objects_SideView(ocvb)
 
@@ -755,7 +769,10 @@ Public Class PointCloud_BothViews
         Dim minIndex As Integer
         Dim detailPoint As cv.Point
         Dim vw As New SortedList(Of Integer, viewObject)
-        If vwTop.Count And (activeView = QUAD0 Or activeView = QUAD2) Then
+        Dim topActive = If(standalone, True, (activeView = QUAD0 Or activeView = QUAD2))
+        Dim sideActive = If(standalone, True, (activeView = QUAD1 Or activeView = QUAD3))
+
+        If vwTop.Count And topActive Then
             minIndex = setDetails(ocvb.mouseClickPoint, vwTop)
             Dim rView = vwTop.Values(minIndex).rectView
             detailPoint = New cv.Point(rView.X, rView.Y)
@@ -770,9 +787,13 @@ Public Class PointCloud_BothViews
                      CStr(rView.Width) + " pixels wide or " + Format(rView.Width / pixelPerMeter, "0.0") + "m"
             roi = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
             vw = vwTop
+            If showDetails Then
+                ocvb.trueText(New TTtext(detailText, detailPoint, If(standalone, 2, 3)))
+                If standalone Then label1 = "Clicked: " + detailText Else label2 = "Clicked: " + detailText
+            End If
         End If
 
-        If vwSide.Count And (activeView = QUAD1 Or activeView = QUAD3) Then
+        If vwSide.Count And sideActive Then
             minIndex = setDetails(ocvb.mouseClickPoint, vwSide)
             Dim rView = vwSide.Values(minIndex).rectView
             detailPoint = New cv.Point(rView.X, rView.Y)
@@ -786,6 +807,10 @@ Public Class PointCloud_BothViews
                              CStr(rView.Width) + " pixels wide or " + Format(rView.Height / pixelPerMeter, "0.0") + "m"
             roi = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)
             vw = vwSide
+            If showDetails Then
+                ocvb.trueText(New TTtext(detailText, detailPoint, 3))
+                label2 = "Clicked: " + detailText
+            End If
         End If
 
         backMat = ocvb.color
@@ -797,10 +822,12 @@ Public Class PointCloud_BothViews
                 cv.Cv2.InRange(depth32f(roi), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), backMatMask(roi))
                 backMat(roi).SetTo(vw.Values(minIndex).color, backMatMask(roi))
             End If
-            If showDetails Then
-                ocvb.trueText(New TTtext(detailText, detailPoint, If(standalone, ocvb.mousePicTag, 3)))
-                label2 = "Clicked: " + detailText
-            End If
+        End If
+
+        Static checkIMU = findCheckBox("Use IMU gravity vector")
+        If checkIMU?.Checked = False Then
+            dst1 = cmats.CameraLocationBot(ocvb, dst1)
+            dst2 = cmats.CameraLocationSide(ocvb, dst2)
         End If
     End Sub
 End Class
@@ -812,7 +839,7 @@ End Class
 
 Public Class PointCloud_WallsFloorsCeilings
     Inherits ocvbClass
-    Dim objects As PointCloud_BothViews
+    Dim both As PointCloud_BothViews
     Dim lDetect As lineDetector_FLD
     Dim dilate As DilateErode_Basics
     Public walls As List(Of cv.Vec4f)
@@ -821,7 +848,7 @@ Public Class PointCloud_WallsFloorsCeilings
         setCaller(ocvb)
         dilate = New DilateErode_Basics(ocvb)
         lDetect = New lineDetector_FLD(ocvb)
-        objects = New PointCloud_BothViews(ocvb)
+        both = New PointCloud_BothViews(ocvb)
         label1 = "Top View: wall candidates in red"
         label2 = "Side View: floors/ceiling candidates in red"
         ocvb.desc = "Use the top down view to detect walls with a line detector algorithm"
@@ -829,12 +856,12 @@ Public Class PointCloud_WallsFloorsCeilings
     Public Sub Run(ocvb As AlgorithmData)
         Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
         If ocvb.frameCount = 0 Then showRectanglesCheck.checked = False
-        Static imuGravityCheck = findCheckBox("Use IMU gravity vector")
-        If ocvb.frameCount = 0 Then imuGravityCheck.checked = True
-        objects.src = src
-        objects.Run(ocvb)
-        dst1 = objects.dst1
-        dst2 = objects.dst2
+        Static checkIMU = findCheckBox("Use IMU gravity vector")
+        If ocvb.frameCount = 0 Then checkIMU.checked = True
+        both.src = src
+        both.Run(ocvb)
+        dst1 = both.dst1
+        dst2 = both.dst2
 
         For i = 0 To 1
             Dim dst = Choose(i + 1, dst1, dst2)
