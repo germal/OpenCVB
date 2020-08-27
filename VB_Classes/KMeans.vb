@@ -2,6 +2,8 @@ Imports cv = OpenCvSharp
 Public Class kMeans_Basics
     Inherits ocvbClass
     Public kmeansK As Integer
+    Public resizeRequest As Boolean = True
+    Public useDepthColor As Boolean = True
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
@@ -10,7 +12,8 @@ Public Class kMeans_Basics
         ocvb.desc = "Cluster the rgb image pixels using kMeans."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim small = src.Resize(New cv.Size(src.Width / 4, src.Height / 4))
+        Dim resizeVal = If(resizeRequest, 4, 1)
+        Dim small = src.Resize(New cv.Size(src.Width / resizeVal, src.Height / resizeVal))
         Dim rectMat = small.Clone
         Dim columnVector As New cv.Mat
         columnVector = rectMat.Reshape(src.Channels, small.Height * small.Width)
@@ -28,12 +31,16 @@ Public Class kMeans_Basics
         labels.Reshape(1, small.Height).ConvertTo(labels, cv.MatType.CV_8U)
         labels = labels.Resize(New cv.Size(src.Width, src.Height))
 
-        For i = 0 To kmeansK - 1
-            Dim mask = labels.InRange(i, i)
-            Dim mean = ocvb.RGBDepth.Mean(mask)
-            dst1.SetTo(mean, mask)
-        Next
-        dst2 = dst1
+        ' color the result with the mean depth value for each label k
+        If useDepthColor Then
+            For i = 0 To kmeansK - 1
+                Dim mask = labels.InRange(i, i)
+                Dim mean = ocvb.RGBDepth.Mean(mask)
+                dst1.SetTo(mean, mask)
+            Next
+        Else
+            dst1 = labels ' they just want the labels.
+        End If
     End Sub
 End Class
 
@@ -486,5 +493,97 @@ Public Class kMeans_ColorDepth_MT
                dst1(roi).SetTo(mean, mask)
            Next
        End Sub)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class KMeans_Subdivision
+    Inherits ocvbClass
+    Dim kmeans As kMeans_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        kmeans = New kMeans_Basics(ocvb)
+        kmeans.resizeRequest = False
+        ocvb.desc = "Use KMeans to subdivide an image and then subdivide it again."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static kmeansKslider = findSlider("kMeans k")
+        kmeansKslider.value = 2
+
+        kmeans.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        kmeans.Run(ocvb)
+        dst1 = kmeans.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Dim mean = dst1.Mean()
+        Dim maskDark = dst1.Threshold(mean.Item(0), 255, cv.ThresholdTypes.BinaryInv)
+        kmeans.src.SetTo(0)
+        src.CopyTo(kmeans.src, maskDark)
+        kmeansKslider.value = 3
+        kmeans.Run(ocvb)
+        dst2 = kmeans.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Dim maskLite = dst1.Threshold(mean.Item(0), 255, cv.ThresholdTypes.Binary)
+        kmeans.src.SetTo(0)
+        src.CopyTo(kmeans.src, maskLite)
+        kmeansKslider.value = 3
+        kmeans.Run(ocvb)
+        kmeans.dst1.CopyTo(dst2, maskLite)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class KMeans_Subdivision1
+    Inherits ocvbClass
+    Dim kmeans As kMeans_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        kmeans = New kMeans_Basics(ocvb)
+        kmeans.resizeRequest = False
+        kmeans.useDepthColor = False
+        ocvb.desc = "Use KMeans to subdivide an image and then subdivide it again."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Static kmeansKslider = findSlider("kMeans k")
+        kmeansKslider.value = 2
+
+        kmeans.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        kmeans.Run(ocvb)
+        Dim gray1 = kmeans.dst1.Clone
+
+        Dim maskDark = gray1.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        kmeans.src.SetTo(0)
+        src.CopyTo(kmeans.src, maskDark)
+        kmeansKslider.value = 3
+        kmeans.Run(ocvb)
+        Dim gray2 = kmeans.dst1.Clone
+
+        Dim maskLite = gray1.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        kmeans.src.SetTo(0)
+        src.CopyTo(kmeans.src, maskLite)
+        kmeansKslider.value = 3
+        kmeans.Run(ocvb)
+        kmeans.dst1.CopyTo(gray2, maskLite)
+
+        Dim centroids As New List(Of cv.Point)
+        For i = 0 To kmeans.kmeansK - 1
+            Dim mask = gray1.InRange(i, i)
+            Dim m = cv.Cv2.Moments(mask, True)
+            centroids.Add(New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00))
+            dst1.SetTo(scalarColors(i), mask)
+        Next
+
+        For i = 0 To centroids.Count - 1
+            dst1.Circle(centroids(i), 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        Next
     End Sub
 End Class

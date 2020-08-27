@@ -630,12 +630,9 @@ Public Class OpenCVB
             MsgBox("DisplayOfficeFile failed with error = " + ex.Message)
         End Try
     End Sub
-    Public Function validateRect(r As cv.Rect) As cv.Rect
-        Dim width = 1280, height = 720
-        If mediumResolution Then
-            width = 640
-            height = 360
-        End If
+    Public Function validateRect(r As cv.Rect, width As Integer, height As Integer) As cv.Rect
+        Dim ratio = imgResult.Width / camPic(2).Width
+        r = New cv.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio)
         If r.Width < 0 Then r.Width = 1
         If r.Height < 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
@@ -663,7 +660,9 @@ Public Class OpenCVB
 
                 Dim pic = DirectCast(sender, PictureBox)
                 Dim src = Choose(pic.Tag + 1, camera.Color, camera.RGBDepth, imgResult)
-                drawRect = validateRect(drawRect)
+                drawRect = validateRect(drawRect, src.width, src.height)
+                Dim offset = 0
+                If drawRect.X > camPic(0).Width Then offset = camPic(0).Width
                 Dim srcROI = New cv.Mat
                 srcROI = src(drawRect).clone()
                 Dim csvName As New FileInfo(System.IO.Path.GetTempFileName() + ".csv")
@@ -672,7 +671,7 @@ Public Class OpenCVB
                 sw.WriteLine(vbCrLf + "width = " + CStr(drawRect.Width) + vbCrLf + "height = " + CStr(drawRect.Height))
                 sw.Write("Row," + vbTab)
                 For i = 0 To drawRect.Width - 1
-                    sw.Write("B" + Format(drawRect.X + i, "000") + "," + "G" + Format(drawRect.X + i, "000") + "," + "R" + Format(drawRect.X + i, "000") + ",")
+                    sw.Write("B" + Format(drawRect.X - offset + i, "000") + "," + "G" + Format(drawRect.X - offset + i, "000") + "," + "R" + Format(drawRect.X - offset + i, "000") + ",")
                 Next
                 sw.WriteLine()
                 For y = 0 To drawRect.Height - 1
