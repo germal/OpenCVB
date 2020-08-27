@@ -565,6 +565,8 @@ Python, or HighGUI windows.
 
 ![](media/e377133fbea5d03a0c3d83299aa994bd.png)
 
+s
+
 *OpenGL has an infinite number of ways to view a point cloud but visualizing top
 down and side views may add the most value. The “Projection_Backproject”
 algorithm provides both a top down view and a side view and back projects the
@@ -573,6 +575,15 @@ provided for the object. The aspect ratio of both top and side views is 1:1 to
 provide realistic dimensions and sharp, straight edges. The camera can be
 located with the red dot. These projections are available with cameras that
 include an IMU.*
+
+![](media/d7ca291698e8ffd637a2d6df554e00ca.png)
+
+*Benford’s Law is an interesting empirical hypothesis. The plot above is
+actually 2 plots – a count of the leading digits pulled from a compressed image
+combined with a plot of the expected distribution of those leading digits
+derived from Benford’s Law. The values are so close that you cannot see the
+difference. The code contains some links explaining Benford’s Law and examples
+of when it works and when it does not.f10*
 
 ![](media/ac533603224f4ec5b4ac97c16dc22330.png)
 
@@ -993,13 +1004,8 @@ Addendum 2: Some Thoughts
     list is run.
 
 17. Regression tests run every algorithm with all resolutions and with each
-    available camera. Setting the algorithm group to “\<non-Python\>” will run
-    10’s of thousands of times without incident. Adding the Python scripts
-    (using “\<All\>” instead of “\<non-Python\>”) will bring that down to 1000’s
-    of times. The repeated invocation of Python as a separate task seems to
-    produce problems despite each of the algorithms working in isolation. Room
-    for improvement: run just the “\<Python\>” group of algorithms repeatedly
-    and figure out how to avoid the problem.
+    available camera. Setting the algorithm group to “\<All\>” will run 10’s of
+    thousands of tests without incident.
 
 18. Algorithms can run for extremely long durations. Not a problem normally, it
     was a problem for the regression tests when algorithm B is started before
