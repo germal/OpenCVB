@@ -565,8 +565,6 @@ Python, or HighGUI windows.
 
 ![](media/e377133fbea5d03a0c3d83299aa994bd.png)
 
-s
-
 *OpenGL has an infinite number of ways to view a point cloud but visualizing top
 down and side views may add the most value. The “Projection_Backproject”
 algorithm provides both a top down view and a side view and back projects the
