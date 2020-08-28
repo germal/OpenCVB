@@ -587,3 +587,108 @@ Public Class KMeans_Subdivision1
         Next
     End Sub
 End Class
+
+
+
+
+
+
+Public Class kMeans_Basics1
+    Inherits ocvbClass
+    Public kmeansK As Integer
+    Public resizeFactor = 1 ' update this to 2 or 4 to speed up the kmeans performance.
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
+
+        ocvb.desc = "Cluster the rgb image pixels using kMeans."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        Dim kInput = src.Resize(New cv.Size(CInt(src.Width / resizeFactor), CInt(src.Height / resizeFactor)))
+        Dim columnVector = kInput.Reshape(src.Channels, kInput.Height * kInput.Width)
+        Dim src32f As New cv.Mat
+        columnVector.ConvertTo(src32f, cv.MatType.CV_32FC3)
+        Static lastClusterCount As Integer
+        If lastClusterCount <> sliders.trackbar(0).Value Then
+            lastClusterCount = sliders.trackbar(0).Value
+            kmeansK = lastClusterCount
+        End If
+
+        Dim labels = New cv.Mat()
+        Dim colors As New cv.Mat
+        cv.Cv2.Kmeans(src32f, kmeansK, labels, term, 1, cv.KMeansFlags.PpCenters, colors)
+        labels.Reshape(1, kInput.Height).ConvertTo(labels, cv.MatType.CV_8U)
+        labels = labels.Resize(New cv.Size(src.Width, src.Height))
+
+        Dim centroids As New List(Of cv.Point)
+        For i = 0 To kmeansK - 1
+            Dim mask = labels.InRange(i, i)
+            Dim m = cv.Cv2.Moments(mask, True)
+            centroids.Add(New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00))
+            dst1.SetTo(scalarColors(i), mask)
+        Next
+
+        For i = 0 To centroids.Count - 1
+            dst1.Circle(centroids(i), 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class kMeans_Reduction
+    Inherits ocvbClass
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Grayscale reduction factor (power of 2)", 1, 6, 6)
+
+        ocvb.desc = "The simplest kmeans is to just reduce the resolution."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Dim reductionFactor = Math.Pow(2, sliders.trackbar(0).Value)
+        src = src / reductionFactor
+        src *= reductionFactor
+        dst1 = src.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class kMeans_ReductionEdges
+    Inherits ocvbClass
+    Dim edges As Edges_Laplacian
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Grayscale reduction factor (power of 2)", 1, 6, 6)
+
+        edges = New Edges_Laplacian(ocvb)
+        label1 = "Reduced image"
+        label2 = "Laplacian edges of reduced image"
+        ocvb.desc = "The simplest kmeans is to just reduce the resolution."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Dim reductionFactor = Math.Pow(2, sliders.trackbar(0).Value)
+        src = src / reductionFactor
+        src *= reductionFactor
+        dst1 = src.Clone
+
+        edges.src = src
+        edges.Run(ocvb)
+        dst2 = edges.dst1
+    End Sub
+End Class
