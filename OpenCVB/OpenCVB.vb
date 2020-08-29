@@ -1096,6 +1096,9 @@ Public Class OpenCVB
             End If
         End SyncLock
     End Sub
+    Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+
+    End Sub
     Private Sub Run(OpenCVB As VB_Classes.ActiveClass)
         While 1
             While 1
