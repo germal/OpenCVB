@@ -1,4 +1,4 @@
-﻿Imports System.Numerics
+Imports System.Numerics
 Imports cv = OpenCvSharp
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_Mandelbrot
@@ -14,7 +14,7 @@ Public Class Fractal_Mandelbrot
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Mandelbrot iterations", 1, 50, 34)
-        ocvb.desc = "Run the classic Mandalbrot algorithm"
+        setDescription(ocvb, "Run the classic Mandalbrot algorithm")
         dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         saveIterations = 0
     End Sub
@@ -54,7 +54,7 @@ Public Class Fractal_Mandelbrot_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         mandel = New Fractal_Mandelbrot(ocvb)
-        ocvb.desc = "Run a multi-threaded version of the Mandalbrot algorithm"
+        setDescription(ocvb, "Run a multi-threaded version of the Mandalbrot algorithm")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim iterations = mandel.sliders.trackbar(0).Value
@@ -80,7 +80,7 @@ Public Class Fractal_MandelbrotZoom
         mandel = New Fractal_Mandelbrot(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Reset to original Mandelbrot"
-        ocvb.desc = "Run the classic Mandalbrot algorithm and allow zooming in"
+        setDescription(ocvb, "Run the classic Mandalbrot algorithm and allow zooming in")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim iterations = mandel.sliders.trackbar(0).Value
@@ -130,7 +130,7 @@ Public Class Fractal_MandelbrotZoomColor
         mandel = New Fractal_MandelbrotZoom(ocvb)
         palette = New Palette_ColorMap(ocvb)
         palette.radio.check(5).Checked = True
-        ocvb.desc = "Classic Mandelbrot in color"
+        setDescription(ocvb, "Classic Mandelbrot in color")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         mandel.Run(ocvb)
@@ -159,7 +159,7 @@ Public Class Fractal_Julia
         setCaller(ocvb)
         mandel = New Fractal_MandelbrotZoomColor(ocvb)
         label2 = "Mouse selects different Julia Sets - zoom for detail"
-        ocvb.desc = "Build Julia set from any point in the Mandelbrot fractal"
+        setDescription(ocvb, "Build Julia set from any point in the Mandelbrot fractal")
     End Sub
     Private Function julia_point(x As Single, y As Single, r As Integer, depth As Integer, max As Integer, c As Complex, z As Complex)
         If Complex.Abs(z) > r Then

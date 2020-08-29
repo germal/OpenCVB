@@ -3,7 +3,7 @@ Imports System.IO
 Imports OpenCvSharp
 Imports System.Runtime.InteropServices
 
-Public Class MyFrameSource 
+Public Class MyFrameSource
     Inherits cv.FrameSource
     Public origFrame_ As New cv.Mat
     Public Sub New(fs As cv.FrameSource)
@@ -32,7 +32,7 @@ Public Class SuperRes_Basics : Implements IDisposable
     Public Sub New(ocvb As AlgorithmData)
         fs = cv.FrameSource.CreateFrameSource_Empty()
         myfs = New MyFrameSource(fs)
-        ocvb.desc = "Enhance resolution with SuperRes API in OpenCV"
+        setDescription(ocvb, "Enhance resolution with SuperRes API in OpenCV")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src = ocvb.color.Clone()
@@ -59,7 +59,7 @@ Public Class SuperRes_Video : Implements IDisposable
         fs.NextFrame(ocvb.result2) ' skip the first frame.
         sr = cv.SuperResolution.CreateBTVL1()
         sr.SetInput(fs)
-        ocvb.desc = "Enhance resolution with SuperRes API in OpenCV"
+        setDescription(ocvb, "Enhance resolution with SuperRes API in OpenCV")
         ocvb.label1 = "Original Video"
         ocvb.label2 = "SuperRes video"
     End Sub
@@ -102,7 +102,7 @@ Public Class SuperRes_CPP : Implements IDisposable
     Dim SuperRes As IntPtr
     Public Sub New(ocvb As AlgorithmData)
         SuperRes = SuperRes_Open()
-        ocvb.desc = "description of class"
+        setDescription(ocvb, "description of class")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src = ocvb.color

@@ -43,7 +43,7 @@ Public Class VTK_Basics
         setCaller(ocvb)
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
         Dispose() ' make sure there wasn't an old VTKWindow sitting around...
-        ocvb.desc = "Create VTK window and update it with images"
+        setDescription(ocvb, "Create VTK window and update it with images")
     End Sub
     Private Sub memMapUpdate(ocvb As AlgorithmData)
         ' setup the memory mapped area and initialize the intrinsicsLeft needed to convert imageXYZ to worldXYZ and for command/control of the interface.
@@ -142,7 +142,7 @@ Public Class VTK_Histogram3D
         vtk.usingDepthAndRGB = False
 
         random = New Random_NormalDist(ocvb)
-        ocvb.desc = "Create the test pattern and send it to VTK for 3D display."
+        setDescription(ocvb, "Create the test pattern and send it to VTK for 3D display.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If vtk.vtkPresent = False Then

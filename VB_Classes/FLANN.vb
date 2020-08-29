@@ -5,7 +5,7 @@ Public Class FLANN_Test
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
+        setDescription(ocvb, "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. ")
         label1 = "FLANN Basics"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -50,7 +50,7 @@ Public Class FLANN_Basics
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Query Count", 1, 10000, 10)
 
-        ocvb.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
+        setDescription(ocvb, "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor")
         label1 = "Yellow is query, Nearest points blue"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

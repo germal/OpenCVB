@@ -24,7 +24,7 @@ Public Class Featureless_Basics_MT
         gridHeightSlider.Value = If(ocvb.color.Width > 1000, 16, 8)
 
 
-        ocvb.desc = "Multithread Houghlines to find featureless regions in an image."
+        setDescription(ocvb, "Multithread Houghlines to find featureless regions in an image.")
         label1 = "Featureless regions with mask in depth color"
     End Sub
 
@@ -89,7 +89,7 @@ Public Class FeatureLess_Prediction
 
         fLess = New Featureless_Basics_MT(ocvb)
 
-        ocvb.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
+        setDescription(ocvb, "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         fLess.src = src
@@ -170,7 +170,7 @@ Public Class Featureless_DCT_MT
         setCaller(ocvb)
         dct = New DCT_FeatureLess_MT(ocvb)
 
-        ocvb.desc = "Use DCT to find largest featureless region."
+        setDescription(ocvb, "Use DCT to find largest featureless region.")
         label2 = "Largest FeatureLess Region"
     End Sub
 

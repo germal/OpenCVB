@@ -6,7 +6,7 @@ Public Class Aruco_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Show how to use the Aruco markers and rotate the image accordingly."
+        setDescription(ocvb, "Show how to use the Aruco markers and rotate the image accordingly.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim tmp = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/aruco_markers_photo.jpg")
@@ -35,7 +35,7 @@ Public Class Aruco_CS
         setCaller(ocvb)
         label1 = "Original Image with marker ID's"
         label2 = "Normalized image after WarpPerspective."
-        ocvb.desc = "Testing the Aruco marker detection in C#"
+        setDescription(ocvb, "Testing the Aruco marker detection in C#")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim tmp = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/aruco_markers_photo.jpg")

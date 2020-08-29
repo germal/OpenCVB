@@ -16,7 +16,7 @@ Module undistort_Mats
         ' We need To determine what focal length our undistorted images should have
         ' In order To Set up the camera matrices For initUndistortRectifyMap.  We
         ' could use stereoRectify, but here we show how To derive these projection
-        ' matrices from the calibration And a desired height And field Of view      
+        ' matrices from the calibration And a desired height And field Of view
         ' We calculate the undistorted focal length:
         '
         '         h
@@ -44,7 +44,7 @@ Module undistort_Mats
         kMatLeft = New cv.Mat(3, 3, cv.MatType.CV_64F, kLeft)
         dMatLeft = New cv.Mat(1, 4, cv.MatType.CV_64F, dLeft)
 
-        rMatLeft = cv.Mat.Eye(3, 3, cv.MatType.CV_64F).ToMat() ' We Set the left rotation to identity 
+        rMatLeft = cv.Mat.Eye(3, 3, cv.MatType.CV_64F).ToMat() ' We Set the left rotation to identity
         pMatLeft = New cv.Mat(3, 4, cv.MatType.CV_64F, pLeft)
     End Sub
 End Module
@@ -82,7 +82,7 @@ Public Class Undistort_Basics
         check.Box(0).Checked = True
 
         label1 = "Left Image with sliders applied"
-        ocvb.desc = "Use sliders to control the undistort OpenCV API - Painterly"
+        setDescription(ocvb, "Use sliders to control the undistort OpenCV API - Painterly")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static kMatLeft As cv.Mat, dMatLeft As cv.Mat, rMatLeft As cv.Mat, pMatLeft As cv.Mat

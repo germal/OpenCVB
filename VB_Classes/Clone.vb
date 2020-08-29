@@ -11,7 +11,7 @@ Public Class Clone_Basics
 
         label1 = "Clone result - draw anywhere to clone a region"
         label2 = "Clone Region Mask"
-        ocvb.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
+        setDescription(ocvb, "Clone a portion of one image into another.  Draw on any image to change selected area.")
         ocvb.drawRect = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -52,7 +52,7 @@ Public Class Clone_ColorChange
 
         label1 = "Draw anywhere to select different clone region"
         label2 = "Mask used for clone"
-        ocvb.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
+        setDescription(ocvb, "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 0
@@ -79,7 +79,7 @@ Public Class Clone_IlluminationChange
 
         label1 = "Draw anywhere to select different clone region"
         label2 = "Mask used for clone"
-        ocvb.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
+        setDescription(ocvb, "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 1
@@ -107,7 +107,7 @@ Public Class Clone_TextureFlattening
 
         label1 = "Draw anywhere to select different clone region"
         label2 = "mask used for clone"
-        ocvb.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
+        setDescription(ocvb, "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         clone.cloneSpec = 2
@@ -154,7 +154,7 @@ Public Class Clone_Eagle
         pt = New cv.Point(src.Width / 2, src.Height / 2)
         label1 = "Move Eagle by clicking in any location."
         label2 = "Source image and source mask."
-        ocvb.desc = "Clone an eagle into the video stream."
+        setDescription(ocvb, "Clone an eagle into the video stream.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1 = src.Clone()
@@ -192,7 +192,7 @@ Public Class Clone_Seamless
         radio.check(0).Checked = True
         label1 = "Results for SeamlessClone"
         label2 = "Mask for Clone"
-        ocvb.desc = "Use the seamlessclone API to merge color and depth..."
+        setDescription(ocvb, "Use the seamlessclone API to merge color and depth...")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim center As New cv.Point(src.Width / 2, src.Height / 2)

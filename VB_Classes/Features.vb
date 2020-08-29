@@ -12,7 +12,7 @@ Public Class Features_GoodFeatures
         sliders.setupTrackBar(2, "Distance", 1, 100, 30)
         sliders.setupTrackBar(3, "Image mix percentage X100", 0, 100, 50)
 
-        ocvb.desc = "Find good features to track in an RGB image."
+        setDescription(ocvb, "Find good features to track in an RGB image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

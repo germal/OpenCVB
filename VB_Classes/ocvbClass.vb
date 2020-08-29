@@ -41,28 +41,46 @@ Public Class ocvbClass : Implements IDisposable
     Public label1 As String
     Public label2 As String
     Public msRNG As New System.Random
-    Public caller As String = ""
-    Public previousCaller As String = ""
     Dim algorithm As Object
     Public scalarColors(255) As cv.Scalar
     Public rColors(255) As cv.Vec3b
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
     Public fontsize As Single
+    Public caller As String
+    Public topCameraPoint As cv.Point
+    Public sideCameraPoint As cv.Point
+    Public Const MAXZ_DEFAULT = 4
+    Public maxZ As Single = MAXZ_DEFAULT
     Public Sub setCaller(ocvb As AlgorithmData)
-        If ocvb.caller = "" Then
+        caller = Me.GetType.Name
+        Dim stackTrace = Environment.StackTrace
+        Dim lines() = stackTrace.Split(vbCrLf)
+        Dim callStack = ""
+        For i = 0 To lines.Count - 1
+            lines(i) = Trim(lines(i))
+            Dim offset = InStr(lines(i), "VB_Classes.")
+            If offset > 0 Then
+                Dim partLine = Mid(lines(i), offset + 11)
+                If partLine.StartsWith("algorithmList.createAlgorithm") Then Exit For
+                Dim split() = partLine.Split("\")
+                partLine = Mid(partLine, 1, InStr(partLine, ".") - 1)
+                If Not (partLine.StartsWith("ocvbClass") Or partLine.StartsWith("ActiveClass")) Then
+                    callStack = partLine + " " + split(split.Count - 1) + vbTab + callStack
+                End If
+            End If
+        Next
+        If ocvb.callTrace.Count = 0 Then
             standalone = True
-            ocvb.caller = Me.GetType.Name
-            ocvb.callstack.Clear()
-            ocvb.parentRoot = ocvb.caller
+            ocvb.callTrace.Add(callStack)
         Else
             standalone = False
-            ocvb.callstack.Add(ocvb.parentAlgorithm + " uses " + Me.GetType.Name)
-            Console.WriteLine(ocvb.callstack(ocvb.callstack.Count - 1))
+            ocvb.callTrace.Add(callStack)
         End If
-        caller = Me.GetType.Name
-        ocvb.parentAlgorithm = caller
         fontsize = ocvb.color.Width / 1280
+
+        topCameraPoint = New cv.Point(ocvb.color.Height, ocvb.color.Height)
+        sideCameraPoint = New cv.Point((ocvb.color.Width - ocvb.color.Height) / 2, ocvb.color.Height - (ocvb.color.Width - ocvb.color.Height) / 2)
     End Sub
     Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.
     Public Const QUAD1 = 1
@@ -77,6 +95,10 @@ Public Class ocvbClass : Implements IDisposable
                 If pt.X < src.Width / 2 Then ocvb.quadrantIndex = QUAD2 Else ocvb.quadrantIndex = QUAD3
             End If
         End If
+    End Sub
+    Public Sub setDescription(ocvb As AlgorithmData, desc As String)
+        ' at the end of every constructor for an algorithm, setDescription is called.  Might be useful for something.
+        ocvb.desc = desc
     End Sub
     Public Function findCheckBox(opt As String) As CheckBox
         While 1
@@ -157,7 +179,7 @@ Public Class ocvbClass : Implements IDisposable
         dst1 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
         algorithm = Me
-        label1 = Me.GetType.Name
+        label1 = caller
         For i = 0 To rColors.Length - 1
             rColors(i) = New cv.Vec3b(msRNG.Next(100, 255), msRNG.Next(100, 255), msRNG.Next(100, 255))
             scalarColors(i) = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)

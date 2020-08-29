@@ -60,6 +60,7 @@ Public Class OpenCVB
     Dim openCVKeywords As New List(Of String)
     Dim OptionsBringToFront As Boolean
     Dim optionsForm As OptionsDialog
+    Dim TreeViewDialog As TreeviewForm
     Dim openForm As OpenFilename
     Dim picLabels() = {"RGB", "Depth", "", ""}
     Dim camWidth As Int32 = 1280, camHeight As Int32 = 720
@@ -84,6 +85,7 @@ Public Class OpenCVB
     Private Delegate Sub delegateEvent()
     Dim logAlgorithms As StreamWriter
     Dim logActive As Boolean = False ' turn this on/off to collect data on algorithms and memory use.
+    Dim callTrace As New List(Of String)
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -147,6 +149,7 @@ Public Class OpenCVB
 
         openForm = New OpenFilename
 
+        TreeViewDialog = New TreeviewForm
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
@@ -1096,9 +1099,6 @@ Public Class OpenCVB
             End If
         End SyncLock
     End Sub
-    Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
-
-    End Sub
     Private Sub Run(OpenCVB As VB_Classes.ActiveClass)
         While 1
             While 1
@@ -1231,8 +1231,16 @@ Public Class OpenCVB
                 Exit While
             End Try
 
+            If frameCount = 15 Then ' prepare the callTrace for the user interface
+                For i = 0 To OpenCVB.ocvb.callTrace.Count - 1
+                    callTrace.Add(OpenCVB.ocvb.callTrace(i))
+                Next
+            End If
             frameCount += 1
         End While
+    End Sub
+    Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+        TreeViewDialog.ShowDialog()
     End Sub
 End Class
 

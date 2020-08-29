@@ -8,7 +8,7 @@ Public Class Laplacian_Basics
         sliders.setupTrackBar(0, "Laplacian Kernel size", 1, 21, 3)
         sliders.setupTrackBar(1, "Laplacian Scale", 0, 100, 100)
         sliders.setupTrackBar(2, "Laplacian Delta", 0, 1000, 0)
-        ocvb.desc = "Laplacian filter - the second derivative."
+        setDescription(ocvb, "Laplacian filter - the second derivative.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize = sliders.trackbar(0).Value()
@@ -43,7 +43,7 @@ Public Class Laplacian_Blur
         radio.check(1).Text = "Add boxfilter Blur"
         radio.check(2).Text = "Add median Blur"
         radio.check(0).Checked = True
-        ocvb.desc = "Laplacian filter - the second derivative - with different bluring techniques"
+        setDescription(ocvb, "Laplacian filter - the second derivative - with different bluring techniques")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize = sliders.trackbar(0).Value()
@@ -86,7 +86,7 @@ Public Class Laplacian_PyramidFilter
         sliders.setupTrackBar(3, "blurryMed2", 0, 10, 1)
         sliders.setupTrackBar(4, "blurryMax", 0, 10, 1)
         sliders.setupTrackBar(5, "Saturate", 0, 10, 1)
-        ocvb.desc = "VB.Net version of the Laplacian Pyramid Filter - see reference."
+        setDescription(ocvb, "VB.Net version of the Laplacian Pyramid Filter - see reference.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim levelMat(sliders.trackbar.Length - 1) As cv.Mat

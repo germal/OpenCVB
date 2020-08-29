@@ -24,7 +24,7 @@ Public Class HMM_Example_CPP
         setCaller(ocvb)
         If ocvb.parms.testAllRunning = False Then HMM = HMM_Open()
         label1 = "Text output with explanation will appear in the Visual Studio output."
-        ocvb.desc = "Simple test of Hidden Markov Model - text output"
+        setDescription(ocvb, "Simple test of Hidden Markov Model - text output")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.testAllRunning Then

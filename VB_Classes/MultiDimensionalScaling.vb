@@ -3,20 +3,20 @@ Imports cv = OpenCvSharp
 Public Class MultiDimensionScaling_Cities
     Inherits ocvbClass
     Dim CityDistance() As Double = { ' 10x10 array of distances for 10 cities
-        0, 587, 1212, 701, 1936, 604, 748, 2139, 2182, 543,       ' Atlanta  
-        587, 0, 920, 940, 1745, 1188, 713, 1858, 1737, 597,       ' Chicago  
-        1212, 920, 0, 879, 831, 1726, 1631, 949, 1021, 1494,      ' Denver  
-        701, 940, 879, 0, 1734, 968, 1420, 1645, 1891, 1220,      ' Houston  
-        1936, 1745, 831, 1734, 0, 2339, 2451, 347, 959, 2300,     ' Los Angeles     
-        604, 1188, 1726, 968, 2339, 0, 1092, 2594, 2734, 923,     ' Miami           
-        748, 713, 1631, 1420, 2451, 1092, 0, 2571, 2408, 205,     ' New York  
-        2139, 1858, 949, 1645, 347, 2594, 2571, 0, 678, 2442,     ' San Francisco   
-        2182, 1737, 1021, 1891, 959, 2734, 2408, 678, 0, 2329,    ' Seattle         
-        543, 597, 1494, 1220, 2300, 923, 205, 2442, 2329, 0}      ' Washington D.C. 
+        0, 587, 1212, 701, 1936, 604, 748, 2139, 2182, 543,       ' Atlanta
+        587, 0, 920, 940, 1745, 1188, 713, 1858, 1737, 597,       ' Chicago
+        1212, 920, 0, 879, 831, 1726, 1631, 949, 1021, 1494,      ' Denver
+        701, 940, 879, 0, 1734, 968, 1420, 1645, 1891, 1220,      ' Houston
+        1936, 1745, 831, 1734, 0, 2339, 2451, 347, 959, 2300,     ' Los Angeles
+        604, 1188, 1726, 968, 2339, 0, 1092, 2594, 2734, 923,     ' Miami
+        748, 713, 1631, 1420, 2451, 1092, 0, 2571, 2408, 205,     ' New York
+        2139, 1858, 949, 1645, 347, 2594, 2571, 0, 678, 2442,     ' San Francisco
+        2182, 1737, 1021, 1891, 959, 2734, 2408, 678, 0, 2329,    ' Seattle
+        543, 597, 1494, 1220, 2300, 923, 205, 2442, 2329, 0}      ' Washington D.C.
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         label1 = "Resulting solution using cv.Eigen"
-        ocvb.desc = "Use OpenCV's Eigen function to solve a system of equations"
+        setDescription(ocvb, "Use OpenCV's Eigen function to solve a system of equations")
     End Sub
     Private Function Torgerson(src As cv.Mat) As Double
         Dim rows = src.Rows

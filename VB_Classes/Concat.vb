@@ -5,7 +5,7 @@ Public Class Concat_Basics
         setCaller(ocvb)
         label1 = "Horizontal concatenation"
         label2 = "Vertical concatenation"
-        ocvb.desc = "Concatenate 2 images - horizontally and vertically"
+        setDescription(ocvb, "Concatenate 2 images - horizontally and vertically")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim tmp As New cv.Mat
@@ -28,7 +28,7 @@ Public Class Concat_4way
             img(i) = New cv.Mat
         Next
         label1 = "Color/RGBDepth/Left/Right views"
-        ocvb.desc = "Concatenate 4 images - horizontally and vertically"
+        setDescription(ocvb, "Concatenate 4 images - horizontally and vertically")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         if standalone Then

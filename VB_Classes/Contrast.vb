@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Contrast_POW
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
@@ -7,7 +7,7 @@ Public Class Contrast_POW
         sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
         label1 = "Original Image"
         label2 = "Contrast reduced"
-        ocvb.desc = "Reduce contrast with POW function"
+        setDescription(ocvb, "Reduce contrast with POW function")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -31,7 +31,7 @@ Public Class Contrast_Basics
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Brightness", 1, 100, 50)
         sliders.setupTrackBar(1, "Contrast", 1, 100, 50)
-        ocvb.desc = "Show image with varying contrast and brightness."
+        setDescription(ocvb, "Show image with varying contrast and brightness.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         src.ConvertTo(dst1, -1, sliders.trackbar(1).Value / 50, sliders.trackbar(0).Value)

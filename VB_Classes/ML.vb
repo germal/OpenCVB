@@ -73,7 +73,7 @@ Public Class ML_FillRGBDepth_MT
         shadow = New Depth_Holes(ocvb)
         label1 = "ML filled shadow"
         label2 = ""
-        ocvb.desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
+        setDescription(ocvb, "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
@@ -108,7 +108,7 @@ Public Class ML_FillRGBDepth
         shadow.sliders.trackbar(0).Value = 3
 
         label2 = "ML filled shadow"
-        ocvb.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
+        setDescription(ocvb, "Predict depth based on color and display colorized depth to confirm correctness of model.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
@@ -146,7 +146,7 @@ Public Class ML_DepthFromColor_MT
 
         label1 = "Predicted Depth"
         label2 = "Mask of color and depth input"
-        ocvb.desc = "Use RGB, X, and Y to predict depth across the entire image, maxDepth = slider value."
+        setDescription(ocvb, "Use RGB, X, and Y to predict depth across the entire image, maxDepth = slider value.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
@@ -213,7 +213,7 @@ Public Class ML_DepthFromColor
         resized.sliders.trackbar(0).Value = 2 ' 2% of the image.
 
         label2 = "Click any quadrant at left to view it below"
-        ocvb.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
+        setDescription(ocvb, "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
@@ -293,7 +293,7 @@ Public Class ML_DepthFromXYColor
         resized.sliders.trackbar(0).Value = 2
 
         label1 = "Predicted Depth"
-        ocvb.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
+        setDescription(ocvb, "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
@@ -391,7 +391,7 @@ Public Class ML_EdgeDepth_MT
 
         label1 = "Depth Shadow (inverse of color and depth)"
         label2 = "Predicted Depth"
-        ocvb.desc = "Use RGB to predict depth near edges."
+        setDescription(ocvb, "Use RGB to predict depth near edges.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
@@ -459,7 +459,7 @@ End Class
 
 '        label1 = ""
 '        label2 = ""
-'        ocvb.desc = "Simplest form for using RandomForest in OpenCV"
+'        setDescription(ocvb, "Simplest form for using RandomForest in OpenCV")
 '    End Sub
 '    Private Function convertScalarToVec3b(s As cv.Scalar) As cv.Vec3b
 '        Dim vec As New cv.Mat

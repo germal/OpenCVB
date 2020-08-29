@@ -46,7 +46,7 @@ Public Class Draw_rectangles
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Rectangle Count", 1, 255, 3)
-        ocvb.desc = "Draw the requested number of rotated rectangles."
+        setDescription(ocvb, "Draw the requested number of rotated rectangles.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency = 0 Then
@@ -82,7 +82,7 @@ Public Class Draw_Noise
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Noise Count", 1, 1000, 100)
         sliders.setupTrackBar(1, "Noise Width", 1, 10, 3)
-        ocvb.desc = "Add Noise to the color image"
+        setDescription(ocvb, "Add Noise to the color image")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         maxNoiseWidth = sliders.trackbar(1).Value
@@ -110,7 +110,7 @@ Public Class Draw_rotatedRectangles
         setCaller(ocvb)
         rect = New Draw_rectangles(ocvb)
         rect.drawRotatedRectangles = True
-        ocvb.desc = "Draw the requested number of rectangles."
+        setDescription(ocvb, "Draw the requested number of rectangles.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         rect.src = src
@@ -128,7 +128,7 @@ Public Class Draw_Ellipses
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Ellipse Count", 1, 255, 3)
-        ocvb.desc = "Draw the requested number of ellipses."
+        setDescription(ocvb, "Draw the requested number of ellipses.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency = 0 Then
@@ -153,7 +153,7 @@ Public Class Draw_Circles
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Circle Count", 1, 255, 3)
-        ocvb.desc = "Draw the requested number of circles."
+        setDescription(ocvb, "Draw the requested number of circles.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency = 0 Then
@@ -177,7 +177,7 @@ Public Class Draw_Line
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Line Count", 1, 255, 1)
-        ocvb.desc = "Draw the requested number of Lines."
+        setDescription(ocvb, "Draw the requested number of Lines.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency Then Exit Sub
@@ -200,7 +200,7 @@ Public Class Draw_Polygon
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Poly Count", 1, 255, 1)
-        ocvb.desc = "Draw Polygon figures"
+        setDescription(ocvb, "Draw Polygon figures")
         label2 = "Convex Hull for the same polygon"
 
         radio.Setup(ocvb, caller, 2) ' ask for 2 radio buttons
@@ -254,7 +254,7 @@ Public Class Draw_RngImage
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Use RNG to draw the same set of shapes every time"
+        setDescription(ocvb, "Use RNG to draw the same set of shapes every time")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim offsetX = 50, offsetY = 25, lineLength = 50, thickness = 2
@@ -308,7 +308,7 @@ Public Class Draw_SymmetricalShapes
         check.Box(3).Text = "Reverse In/Out"
         check.Box(4).Text = "Use demo mode"
         check.Box(4).Checked = True
-        ocvb.desc = "Generate shapes programmatically"
+        setDescription(ocvb, "Generate shapes programmatically")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static rotateAngle As Single = 0
@@ -388,7 +388,7 @@ Public Class Draw_ClipLine
         kalman = New Kalman_Basics(ocvb)
         setup()
 
-        ocvb.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
+        setDescription(ocvb, "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst2 = src
@@ -464,7 +464,7 @@ Public Class Draw_Arc
 
         setup(ocvb)
 
-        ocvb.desc = "Use OpenCV's ellipse function to draw an arc"
+        setDescription(ocvb, "Use OpenCV's ellipse function to draw an arc")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If kalman.check.Box(0).Checked Then
@@ -514,7 +514,7 @@ Public Class Draw_OverlappingRectangles
 
         label1 = "Redundant rectangles are yellow"
         label2 = "Unique rectangles with their respective masks"
-        ocvb.desc = "Use Clipline to find rectangles that are completely overlapping - one contained in the other."
+        setDescription(ocvb, "Use Clipline to find rectangles that are completely overlapping - one contained in the other.")
     End Sub
     Private Class CompareMasks : Implements IComparer(Of cv.Rect)
         Public Function Compare(ByVal a As cv.Rect, ByVal b As cv.Rect) As Integer Implements IComparer(Of cv.Rect).Compare

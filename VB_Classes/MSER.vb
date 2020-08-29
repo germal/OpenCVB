@@ -27,7 +27,7 @@ Public Class MSER_Basics
         check.Box(1).Checked = True
 
         ReDim saveParms(11 - 1) ' 4 sliders + 4 sliders + 1 slider + 2 checkboxes
-        ocvb.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
+        setDescription(ocvb, "Extract the Maximally Stable Extremal Region (MSER) for an image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim delta = sliders.trackbar(0).Value
@@ -98,7 +98,7 @@ Public Class MSER_Synthetic
     End Sub
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
+        setDescription(ocvb, "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim img = New cv.Mat(800, 800, cv.MatType.CV_8U, 0)
@@ -158,7 +158,7 @@ Public Class MSER_TestSynthetic
         synth = New MSER_Synthetic(ocvb)
         label1 = "Input image to MSER"
         label1 = "Output image from MSER"
-        ocvb.desc = "Test MSER with the synthetic image."
+        setDescription(ocvb, "Test MSER with the synthetic image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         synth.Run(ocvb)
@@ -181,7 +181,7 @@ Public Class MSER_CPPStyle
         setCaller(ocvb)
         label1 = "Contour regions from MSER"
         label2 = "Box regions from MSER"
-        ocvb.desc = "Maximally Stable Extremal Regions example - still image"
+        setDescription(ocvb, "Maximally Stable Extremal Regions example - still image")
         image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
@@ -220,7 +220,7 @@ Public Class MSER_Contours
         setCaller(ocvb)
         mser = New MSER_Basics(ocvb)
         mser.sliders.trackbar(1).Value = 4000
-        ocvb.desc = "Use MSER but show the contours of each region."
+        setDescription(ocvb, "Use MSER but show the contours of each region.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         mser.src = src

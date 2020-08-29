@@ -32,7 +32,7 @@ Public Class Retina_Basics_CPP
 
         label1 = "Retina Parvo"
         label2 = "Retina Magno"
-        ocvb.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
+        setDescription(ocvb, "Use the bio-inspired retina algorithm to adjust color and monitor motion.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(1).Checked Then
@@ -94,7 +94,7 @@ Public Class Retina_Depth
         setCaller(ocvb)
         retina = New Retina_Basics_CPP(ocvb)
 
-        ocvb.desc = "Use the bio-inspired retina algorithm with the depth data."
+        setDescription(ocvb, "Use the bio-inspired retina algorithm with the depth data.")
         label1 = "Last result || current result"
         label2 = "Current depth motion result"
     End Sub

@@ -25,7 +25,7 @@ Public Class KNN_Basics
         knn = New KNN_BasicsManyToOne(ocvb)
         label1 = "Output from Emax"
         label2 = "White=TrainingData, Red=queries yellow=unmatched"
-        ocvb.desc = "Use KNN to match points 1 for 1"
+        setDescription(ocvb, "Use KNN to match points 1 for 1")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
@@ -133,7 +133,7 @@ Public Class KNN_BasicsManyToOne
 
         label1 = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()
-        ocvb.desc = "Test knn with random points in the image.  Find the nearest to a random point."
+        setDescription(ocvb, "Test knn with random points in the image.  Find the nearest to a random point.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim trainData As cv.Mat
@@ -192,7 +192,7 @@ Public Class KNN_CentroidsEMax
 
         label1 = "Query is Red, nearest is white, unmatched is yellow"
         label2 = "Current image without correcting colors"
-        ocvb.desc = "Map the current centroids to the previous generation to match the color used."
+        setDescription(ocvb, "Map the current centroids to the previous generation to match the color used.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then basics.trainingPoints = New List(Of cv.Point2f)(emax.centroids)
@@ -245,7 +245,7 @@ Public Class KNN_Test
         knn = New KNN_Basics(ocvb)
 
         label1 = knn.label2
-        ocvb.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
+        setDescription(ocvb, "Assign random values inside a thread grid to test that KNN is properly tracking them.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
@@ -273,7 +273,7 @@ End Class
 
 Public Class KNN_Cluster2D
     Inherits ocvbClass
-    Dim knn As knn_Point2d
+    Dim knn As KNN_Point2d
     Public cityPositions() As cv.Point
     Public cityOrder() As Int32
     Public distances() As Int32
@@ -288,7 +288,7 @@ Public Class KNN_Cluster2D
     End Sub
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        knn = New knn_Point2d(ocvb)
+        knn = New KNN_Point2d(ocvb)
         knn.sliders.Visible = False
 
         sliders.Setup(ocvb, caller)
@@ -297,7 +297,7 @@ Public Class KNN_Cluster2D
         check.Box(0).Text = "Demo Mode (continuous update)"
         If ocvb.parms.testAllRunning Then check.Box(0).Checked = True
 
-        ocvb.desc = "Use knn to cluster cities as preparation for a solution to the traveling salesman problem."
+        setDescription(ocvb, "Use knn to cluster cities as preparation for a solution to the traveling salesman problem.")
     End Sub
     Private Sub cluster(result As cv.Mat)
         Dim alreadyTaken As New List(Of Int32)
@@ -393,7 +393,7 @@ Public Class KNN_Point2d
         sliders.setupTrackBar(0, "knn Query Points", 1, 50, 10)
         sliders.setupTrackBar(1, "knn k nearest points", 1, 5, 1)
 
-        ocvb.desc = "Use KNN to connect 2D points."
+        setDescription(ocvb, "Use KNN to connect 2D points.")
         label1 = "Yellow=Queries, Blue=Best Responses"
         knn = cv.ML.KNearest.Create()
     End Sub
@@ -458,7 +458,7 @@ Public Class KNN_Point3d
         sliders.setupTrackBar(0, "knn Query Points", 1, 500, 10)
         sliders.setupTrackBar(1, "knn k nearest points", 0, 500, 1)
 
-        ocvb.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
+        setDescription(ocvb, "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results.")
         label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
         label2 = "Top Down View to confirm 3D KNN is correct"
     End Sub
@@ -535,7 +535,7 @@ Public Class KNN_ClusterNoisyLine
         knn = New KNN_Point2d(ocvb)
         knn.sliders.Visible = False
 
-        ocvb.desc = "Use KNN to cluster the output of noisyline class."
+        setDescription(ocvb, "Use KNN to cluster the output of noisyline class.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static linePointCount As Int32

@@ -8,7 +8,7 @@ Public Class Gradient_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sobel = New Edges_Sobel(ocvb)
-        ocvb.desc = "Use phase to compute gradient"
+        setDescription(ocvb, "Use phase to compute gradient")
         label2 = "Phase Output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -35,7 +35,7 @@ Public Class Gradient_Depth
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sobel = New Edges_Sobel(ocvb)
-        ocvb.desc = "Use phase to compute gradient on depth image"
+        setDescription(ocvb, "Use phase to compute gradient on depth image")
         label2 = "Phase Output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -66,7 +66,7 @@ Public Class Gradient_Flatland
         grade = New Gradient_Basics(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Reduction Factor", 1, 64, 16)
-        ocvb.desc = "Reduced grayscale shows isobars in depth."
+        setDescription(ocvb, "Reduced grayscale shows isobars in depth.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim reductionFactor = sliders.trackbar(0).Maximum - sliders.trackbar(0).Value
@@ -100,7 +100,7 @@ Public Class Gradient_CartToPolar
         sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
         label1 = "CartToPolar Magnitude Output Normalized"
         label2 = "CartToPolar Angle Output"
-        ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
+        setDescription(ocvb, "Compute the gradient and use CartToPolar to image the magnitude and angle")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         src.ConvertTo(basics.src, cv.MatType.CV_32FC3, 1 / 255)
@@ -139,7 +139,7 @@ Public Class Gradient_NumPy
 
         label1 = "CartToPolar Magnitude Output Normalized"
         label2 = "CartToPolar Angle Output"
-        ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
+        setDescription(ocvb, "Compute the gradient and use CartToPolar to image the magnitude and angle")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         src.ConvertTo(gradient.src, cv.MatType.CV_32FC3, 1 / 255)

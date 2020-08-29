@@ -21,7 +21,7 @@ Public Class MatchTemplate_Basics
         radio.check(1).Checked = True
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Sample Size", 2, 10000, 100)
-        ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
+        setDescription(ocvb, "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
@@ -68,7 +68,7 @@ Public Class MatchTemplate_RowCorrelation
         corr = New MatchTemplate_Basics(ocvb)
         corr.sliders.Visible = False
 
-        ocvb.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
+        setDescription(ocvb, "Find correlation coefficients for 2 random rows in the RGB image to show variability")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim line1 = msRNG.Next(0, src.Height - 1)
@@ -116,7 +116,7 @@ Public Class MatchTemplate_DrawRect
 
         label1 = "Probabilities (draw rectangle to test again)"
         label2 = "White is input, Red circle centers highest probability"
-        ocvb.desc = "Find the requested template in an image.  Tracker Algorithm"
+        setDescription(ocvb, "Find the requested template in an image.  Tracker Algorithm")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
@@ -160,7 +160,7 @@ Public Class MatchTemplate_BestEntropy_MT
 
         label1 = "Probabilities that the template matches image"
         label2 = "Red is the best template to match (highest entropy)"
-        ocvb.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"
+        setDescription(ocvb, "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 30 = 0 Then

@@ -1,4 +1,4 @@
-﻿Imports Numpy
+Imports Numpy
 Imports System.Text
 Imports cv = OpenCvSharp
 Imports epy = Python.Runtime
@@ -10,7 +10,7 @@ Public Class NumPy_FFT
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Test Numpy interface for FFT"
+        setDescription(ocvb, "Test Numpy interface for FFT")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.NumPyEnabled Then
@@ -37,7 +37,7 @@ Public Class NumPy_EmbeddedTest_CS
     Dim embed = New CS_Classes.NumPy_EmbeddedTest
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Run an embedded Python script"
+        setDescription(ocvb, "Run an embedded Python script")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.NumPyEnabled Then
@@ -60,7 +60,7 @@ Public Class NumPy_EmbeddedMat_CS
     Dim embed = New CS_Classes.NumPy_EmbeddedMat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Run an embedded Python script to display an image"
+        setDescription(ocvb, "Run an embedded Python script to display an image")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.NumPyEnabled Then
@@ -86,7 +86,7 @@ Public Class NumPy_CmdLine
     Dim embed = New CS_Classes.NumPy_Cmds
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Run an embedded Python string of commands"
+        setDescription(ocvb, "Run an embedded Python string of commands")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.NumPyEnabled Then
@@ -109,7 +109,7 @@ Public Class NumPy_EmbeddedCmd
     Dim embed = New CS_Classes.NumPy_EmbeddedCmd
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Install a package on the embedded Python with Pip"
+        setDescription(ocvb, "Install a package on the embedded Python with Pip")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.NumPyEnabled Then

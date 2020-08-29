@@ -10,7 +10,7 @@ Public Class TransformationMatrix_Basics
 
         label1 = "View from above the camera"
         label2 = "View from side of the camera"
-        ocvb.desc = "Show the contents of the transformation matrix"
+        setDescription(ocvb, "Show the contents of the transformation matrix")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.transformationMatrix IsNot Nothing Then

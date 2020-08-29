@@ -6,7 +6,7 @@ Public Class Mean_Basics
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Mean - number of input images", 1, 100, 10)
-        ocvb.desc = "Create an image that is the mean of x number of previous images."
+        setDescription(ocvb, "Create an image that is the mean of x number of previous images.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static saveImageCount = sliders.trackbar(0).Value

@@ -26,7 +26,7 @@ Public Class Voxels_Basics_MT
         gridHeightSlider.Value = 16
 
         label2 = "Voxels labeled with their median distance"
-        ocvb.desc = "Use multi-threading to get median depth values as voxels."
+        setDescription(ocvb, "Use multi-threading to get median depth values as voxels.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.src = getDepth32f(ocvb)

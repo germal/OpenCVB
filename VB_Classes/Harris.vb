@@ -39,8 +39,8 @@ Public Class Harris_Features_CPP
         sliders.setupTrackBar(1, "Harris Neighborhood", 1, 41, 21)
         sliders.setupTrackBar(2, "Harris aperture", 1, 33, 21)
         sliders.setupTrackBar(3,  "Harris Parameter", 1, 100, 1)
-        
-        ocvb.desc = "Use Harris feature detectors to identify interesting points."
+
+        setDescription(ocvb, "Use Harris feature detectors to identify interesting points.")
 
         ReDim srcData(ocvb.color.Total - 1)
         Harris_Features = Harris_Features_Open()
@@ -85,7 +85,7 @@ Public Class Harris_Detector_CPP
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Harris qualityLevel", 1, 100, 2)
 
-        ocvb.desc = "Use Harris detector to identify interesting points."
+        setDescription(ocvb, "Use Harris detector to identify interesting points.")
 
         ReDim srcData(ocvb.color.Total - 1)
         Harris_Detector = Harris_Detector_Open()
@@ -95,7 +95,7 @@ Public Class Harris_Detector_CPP
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim qualityLevel = sliders.trackbar(0).Value / 100
 
-        Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned) 
+        Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim handleCount = GCHandle.Alloc(ptCount, GCHandleType.Pinned)
         Dim ptPtr = Harris_Detector_Run(Harris_Detector, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, qualityLevel, handleCount.AddrOfPinnedObject())
         handleSrc.Free()

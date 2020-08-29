@@ -21,7 +21,7 @@ Public Class FitEllipse_Basics_CPP
         area = New Area_MinTriangle_CPP(ocvb)
 
         label1 = "Green FitEllipse, Yellow=AMS, Red=Direct"
-        ocvb.desc = "Use FitEllipse to draw around a set of points"
+        setDescription(ocvb, "Use FitEllipse to draw around a set of points")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         area.Run(ocvb)  ' get some random clusters of points

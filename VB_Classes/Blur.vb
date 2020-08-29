@@ -6,7 +6,7 @@ Public Class Blur_Basics
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Blur Kernel Size", 0, 32, 5)
-        ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
+        setDescription(ocvb, "Smooth each pixel with a Gaussian kernel of different sizes.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize As Int32 = sliders.trackbar(0).Value
@@ -32,7 +32,7 @@ Public Class Blur_Gaussian_CS
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         blur = New Blur_Basics(ocvb)
-        ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
+        setDescription(ocvb, "Smooth each pixel with a Gaussian kernel of different sizes.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -59,7 +59,7 @@ Public Class Blur_Median_CS
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         blur = New Blur_Basics(ocvb)
-        ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
+        setDescription(ocvb, "Replace each pixel with the median of neighborhood of varying sizes.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -85,7 +85,7 @@ Public Class Blur_Homogeneous
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         blur = New Blur_Basics(ocvb)
-        ocvb.desc = "Smooth each pixel with a kernel of 1's of different sizes."
+        setDescription(ocvb, "Smooth each pixel with a kernel of 1's of different sizes.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -96,7 +96,7 @@ Public Class Blur_Homogeneous
             If standalone Then dst2 = ocvb.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
         Else
             dst1 = src
-            dst2 = ocvb.rgbdepth
+            dst2 = ocvb.RGBDepth
         End If
     End Sub
 End Class
@@ -113,7 +113,7 @@ Public Class Blur_Median
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         blur = New Blur_Basics(ocvb)
-        ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
+        setDescription(ocvb, "Replace each pixel with the median of neighborhood of varying sizes.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -141,7 +141,7 @@ Public Class Blur_Bilateral
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         blur = New Blur_Basics(ocvb)
-        ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
+        setDescription(ocvb, "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -174,7 +174,7 @@ Public Class Blur_PlusHistogram
 
         label1 = "Use Blur slider to see impact on histograms"
         label2 = "Top is before equalize, Bottom is after Equalize"
-        ocvb.desc = "Compound algorithms Blur and Histogram"
+        setDescription(ocvb, "Compound algorithms Blur and Histogram")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         myhist.src = src
@@ -214,7 +214,7 @@ Public Class Blur_TopoMap
         sliders.setupTrackBar(2, "Frame Count Cycle", 1, 200, 50)
 
         label1 = "Image Gradient"
-        ocvb.desc = "Create a topo map from the blurred image"
+        setDescription(ocvb, "Create a topo map from the blurred image")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static savePercent As Single

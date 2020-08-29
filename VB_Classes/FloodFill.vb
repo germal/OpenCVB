@@ -24,7 +24,7 @@ Public Class FloodFill_Basics
         sliders.setupTrackBar(3, "Step Size", 1, ocvb.color.Cols / 2, 20)
 
         label1 = "Input image to floodfill"
-        ocvb.desc = "Use floodfill to build image segments in a grayscale image."
+        setDescription(ocvb, "Use floodfill to build image segments in a grayscale image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         minFloodSize = sliders.trackbar(0).Value
@@ -88,7 +88,7 @@ Public Class FloodFill_Top16_MT
         sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
 
-        ocvb.desc = "Use floodfill to build image segments with a grayscale image."
+        setDescription(ocvb, "Use floodfill to build image segments with a grayscale image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim minFloodSize = sliders.trackbar(0).Value
@@ -127,7 +127,7 @@ Public Class FloodFill_Color_MT
         grid = New Thread_Grid(ocvb)
         flood = New FloodFill_Top16_MT(ocvb)
 
-        ocvb.desc = "Use floodfill to build image segments in an RGB image."
+        setDescription(ocvb, "Use floodfill to build image segments in an RGB image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim minFloodSize = flood.sliders.trackbar(0).Value
@@ -170,7 +170,7 @@ Public Class FloodFill_DCT
         flood = New FloodFill_Color_MT(ocvb)
 
         dct = New DCT_FeatureLess_MT(ocvb)
-        ocvb.desc = "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces."
+        setDescription(ocvb, "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dct.src = src
@@ -197,7 +197,7 @@ Public Class FloodFill_WithDepth
         range = New FloodFill_RelativeRange(ocvb)
 
         label2 = "Floodfill results after removing unknown depth"
-        ocvb.desc = "Floodfill only the areas where there is depth"
+        setDescription(ocvb, "Floodfill only the areas where there is depth")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
@@ -228,7 +228,7 @@ Public Class FloodFill_CComp
         range = New FloodFill_RelativeRange(ocvb)
 
         label1 = "Input to Floodfill "
-        ocvb.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
+        setDescription(ocvb, "Use Floodfill with the output of the connected components to stabilize the colors used.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
@@ -263,7 +263,7 @@ Public Class FloodFill_RelativeRange
         check.Box(2).Text = "Use 'Mask Only'"
         label1 = "Input to floodfill basics"
         label2 = "Output of floodfill basics"
-        ocvb.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
+        setDescription(ocvb, "Experiment with 'relative' range option to floodfill.  Compare to fixed range option.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         fBasics.floodFlag = 0
@@ -294,7 +294,7 @@ Public Class FloodFill_Top16
         flood = New FloodFill_Basics(ocvb)
 
         label1 = "Input image to floodfill"
-        ocvb.desc = "Use floodfill to build image segments in a grayscale image."
+        setDescription(ocvb, "Use floodfill to build image segments in a grayscale image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -344,7 +344,7 @@ Public Class Floodfill_Identifiers
         setCaller(ocvb)
         basics = New FloodFill_Basics(ocvb)
         label1 = "Input image to floodfill"
-        ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
+        setDescription(ocvb, "Use floodfill on a projection to determine how many objects and where they are - needs more work")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         minFloodSize = basics.sliders.trackbar(0).Value
@@ -404,7 +404,7 @@ Public Class FloodFill_Black
         pFlood = New Floodfill_Identifiers(ocvb)
 
         label1 = ""
-        ocvb.desc = "Use floodfill to identify each of the black regions of the src image."
+        setDescription(ocvb, "Use floodfill to identify each of the black regions of the src image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         pFlood.src = src
@@ -448,7 +448,7 @@ Public Class Floodfill_Objects
         basics = New FloodFill_Basics(ocvb)
         basics.sliders.trackbar(0).Value = (src.Width Mod 100) * 25
 
-        ocvb.desc = "Use floodfill to identify the desired number of objects"
+        setDescription(ocvb, "Use floodfill to identify the desired number of objects")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         basics.src = src

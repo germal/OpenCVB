@@ -41,7 +41,7 @@ Public Class GetRotationMatrix2D_Basics
         sliders.setupTrackBar(0, "GetRotationMatrix2D Angle", 0, 360, 24)
         SetInterpolationRadioButtons(ocvb, caller, radio, "Rotation2D")
 
-        ocvb.desc = "Rotate a rectangle of a specified angle"
+        setDescription(ocvb, "Rotate a rectangle of a specified angle")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         warpFlag = getInterpolationRadioButtons(radio)
@@ -68,7 +68,7 @@ Public Class GetRotationMatrix2D_Box
 
         label1 = "Original Rectangle in the original perspective"
         label2 = "Same Rectangle in the new warped perspective"
-        ocvb.desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
+        setDescription(ocvb, "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         rotation.src = src

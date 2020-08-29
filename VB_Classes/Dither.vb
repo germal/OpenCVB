@@ -96,7 +96,7 @@ Public Class Dither_Basics
         Next
         radio.check(4).Checked = True ' this one was interesting...
 
-        ocvb.desc = "Explore all the varieties of dithering"
+        setDescription(ocvb, "Explore all the varieties of dithering")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim radioIndex As Integer

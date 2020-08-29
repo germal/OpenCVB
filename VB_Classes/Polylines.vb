@@ -9,7 +9,7 @@ Public Class Polylines_IEnumerableExample
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Polyline Count", 2, 500, 100)
         sliders.setupTrackBar(1, "Polyline Thickness", 0, 10, 1)
-        ocvb.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
+        setDescription(ocvb, "Manually create an ienumerable(of ienumerable(of cv.point)).")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim points = Enumerable.Range(0, sliders.trackbar(0).Value).Select(Of cv.Point)(
@@ -29,7 +29,7 @@ End Class
 
 
 
-' VB.Net implementation of the browse example in OpenCV. 
+' VB.Net implementation of the browse example in OpenCV.
 ' https://github.com/opencv/opencv/blob/master/samples/python/browse.py
 Public Class Polylines_Random
     Inherits ocvbClass
@@ -37,7 +37,7 @@ Public Class Polylines_Random
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         label1 = CStr(zoomFactor) + "X zoom around mouse movement on image"
-        ocvb.desc = "Create a random procedural image - Painterly Effect"
+        setDescription(ocvb, "Create a random procedural image - Painterly Effect")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 150 = 0 Then ' every x frames.

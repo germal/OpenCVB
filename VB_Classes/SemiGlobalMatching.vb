@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
 Module SemiGlobalMatching_Exports
@@ -25,7 +25,7 @@ End Module
 '    Dim cPtr As IntPtr
 '    Public Sub New(ocvb As AlgorithmData)
 '        setCaller(ocvb)
-'        ocvb.desc = "Find depth using the semi-global matching algorithm."
+'        setDescription(ocvb, "Find depth using the semi-global matching algorithm.")
 '    End Sub
 '    Public Sub Run(ocvb As AlgorithmData)
 '        If ocvb.frameCount < 10 Then Exit Sub

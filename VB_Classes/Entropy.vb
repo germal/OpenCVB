@@ -12,7 +12,7 @@ Public Class Entropy_Basics
 
         hist = New Histogram_Basics(ocvb)
 
-        ocvb.desc = "Compute the entropy in an image - a measure of contrast(iness)"
+        setDescription(ocvb, "Compute the entropy in an image - a measure of contrast(iness)")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         simple.bins = hist.sliders.trackbar(0).Value
@@ -54,7 +54,7 @@ Public Class Entropy_Highest_MT
         hist = New Histogram_Basics(ocvb)
 
         label1 = "Highest entropy marked with red rectangle"
-        ocvb.desc = "Find the highest entropy section of the color image."
+        setDescription(ocvb, "Find the highest entropy section of the color image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
@@ -111,7 +111,7 @@ Public Class Entropy_FAST
         setCaller(ocvb)
         fast = New FAST_Basics(ocvb)
         entropy = New Entropy_Highest_MT(ocvb)
-        ocvb.desc = "Use FAST markings to add to entropy"
+        setDescription(ocvb, "Use FAST markings to add to entropy")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         fast.src = ocvb.color

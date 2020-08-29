@@ -6,7 +6,7 @@ Public Class MeanSubtraction_Basics
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Scaling Factor = mean/scaling factor X100", 1, 500, 100)
-        ocvb.desc = "Subtract the mean from the image with a scaling factor"
+        setDescription(ocvb, "Subtract the mean from the image with a scaling factor")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mean = cv.Cv2.Mean(ocvb.color)

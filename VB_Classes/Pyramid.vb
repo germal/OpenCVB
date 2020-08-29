@@ -6,7 +6,7 @@ Public Class Pyramid_Basics
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Zoom in and out", -1, 1, 0)
-        ocvb.desc = "Use pyrup and pyrdown to zoom in and out of an image."
+        setDescription(ocvb, "Use pyrup and pyrdown to zoom in and out of an image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim zoom = sliders.trackbar(0).Value
@@ -38,7 +38,7 @@ Public Class Pyramid_Filter
         setCaller(ocvb)
         laplace = New Laplacian_PyramidFilter(ocvb)
 
-        ocvb.desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"
+        setDescription(ocvb, "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         laplace.src = src

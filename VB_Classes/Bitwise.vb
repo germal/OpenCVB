@@ -5,7 +5,7 @@ Public Class Bitwise_Not
         setCaller(ocvb)
         label1 = "Color BitwiseNot"
         label2 = "Gray BitwiseNot"
-        ocvb.desc = "Gray and color bitwise_not"
+        setDescription(ocvb, "Gray and color bitwise_not")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         cv.Cv2.BitwiseNot(src, dst1)

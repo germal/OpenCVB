@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Text.RegularExpressions
 ' Benford's Law is pretty cool but I don't think it is a phenomenon of nature.  It is produced from bringing real world measurements to a human scale.
 ' Reducing an image with compression occur because human understanding maps the data within reach of the understanding embedded in our number system.
@@ -6,7 +6,7 @@ Imports System.Text.RegularExpressions
 ' If real world measurements do not conform to Benford's Law, it is likely because the measurement is not a good one or has been manipulated.
 ' Benford's law is a good indicator that the scale for the measurement is appropriate.
 ' Below are 2 types of examples - one just takes the grayscale image and applies Benford's analysis, the other uses jpeg/PNG before applying Benford.
-' Only the JPEG/PNG examples match Benford while the grayscale image does not.  
+' Only the JPEG/PNG examples match Benford while the grayscale image does not.
 ' Note that with the 10-99 Benford JPEG example, the results match Benford and then stop matching and abruptly fall off in the middle of the plot.
 ' This impact is likely the result of how JPEG compression truncates values as insignificant - a definite manipulation of the data.
 
@@ -30,7 +30,7 @@ Public Class Benford_Basics
 
         weight = New AddWeighted_Basics(ocvb)
 
-        ocvb.desc = "Build the capability to perform a Benford analysis."
+        setDescription(ocvb, "Build the capability to perform a Benford analysis.")
     End Sub
     Public Sub setup99()
         ReDim expectedDistribution(100 - 1)
@@ -116,7 +116,7 @@ Public Class Benford_NormalizedImage
 
         benford = New Benford_Basics(ocvb)
 
-        ocvb.desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
+        setDescription(ocvb, "Perform a Benford analysis of an image normalized to between 0 and 1")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -145,7 +145,7 @@ Public Class Benford_NormalizedImage99
         benford = New Benford_Basics(ocvb)
         benford.setup99()
 
-        ocvb.desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
+        setDescription(ocvb, "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -176,7 +176,7 @@ Public Class Benford_JPEG
         sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
 
-        ocvb.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
+        setDescription(ocvb, "Perform a Benford analysis for 1-9 of a JPEG compressed image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim jpeg = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value})
@@ -206,7 +206,7 @@ Public Class Benford_JPEG99
         sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
 
-        ocvb.desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
+        setDescription(ocvb, "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static qualitySlider = findSlider("JPEG Quality")
@@ -237,7 +237,7 @@ Public Class Benford_PNG
         sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "PNG Compression", 1, 100, 90)
 
-        ocvb.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
+        setDescription(ocvb, "Perform a Benford analysis for 1-9 of a JPEG compressed image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static compressionSlider = findSlider("PNG Compression")
@@ -261,7 +261,7 @@ Public Class Benford_Depth
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         benford = New Benford_Basics(ocvb)
-        ocvb.desc = "Apply Benford to the depth data"
+        setDescription(ocvb, "Apply Benford to the depth data")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         benford.src = getDepth32f(ocvb)
@@ -281,7 +281,7 @@ Public Class Benford_DepthRGB
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         benford = New Benford_JPEG(ocvb)
-        ocvb.desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
+        setDescription(ocvb, "Apply Benford to the depth RGB image that is compressed with JPEG")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim jpeg = ocvb.RGBDepth.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, benford.sliders.trackbar(0).Value})

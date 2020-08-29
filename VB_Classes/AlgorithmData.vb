@@ -31,8 +31,7 @@ Public Class AlgorithmData
     Public algorithmIndex As Integer
     Public parentRoot As String
     Public parentAlgorithm As String
-    Public callstack As New List(Of String)
-    Public caller As String = ""
+    Public callTrace As New List(Of String)
     Public Sub New(parms As ActiveClass.algorithmParameters, width As Integer, height As Integer)
         color = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))

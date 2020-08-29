@@ -3,7 +3,7 @@ Public Class intrinsicsLeft_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Show the depth camera intrinsicsLeft."
+        setDescription(ocvb, "Show the depth camera intrinsicsLeft.")
         label2 = "ppx/ppy location"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

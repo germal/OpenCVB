@@ -3,7 +3,7 @@ Public Class Extrinsics_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Show the depth camera extrinsics."
+        setDescription(ocvb, "Show the depth camera extrinsics.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim ttStart = 40

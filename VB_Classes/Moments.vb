@@ -17,7 +17,7 @@ Public Class Moments_Basics
         ReDim kalman.input(2 - 1) ' 2 elements - cv.point
 
         label1 = "Red dot = Kalman smoothed centroid"
-        ocvb.desc = "Compute the centroid of the provided mask file."
+        setDescription(ocvb, "Compute the centroid of the provided mask file.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
@@ -57,7 +57,7 @@ Public Class Moments_CentroidKalman
         foreground = New kMeans_Depth_FG_BG(ocvb)
 
         label1 = "Red dot = Kalman smoothed centroid"
-        ocvb.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
+        setDescription(ocvb, "Compute the centroid of the foreground depth and smooth with Kalman filter.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         foreground.Run(ocvb)

@@ -105,7 +105,7 @@ Public Class Plane_Detect
         gridWidthSlider.Value = 64
         gridHeightSlider.Value = 64
 
-        ocvb.desc = "Identify planes in each segment."
+        setDescription(ocvb, "Identify planes in each segment.")
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -180,7 +180,7 @@ Public Class Plane_DetectDebug
         gridWidthSlider.Value = 32
         gridHeightSlider.Value = 32
 
-        ocvb.desc = "Debug code to identify planes in just one segment."
+        setDescription(ocvb, "Debug code to identify planes in just one segment.")
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

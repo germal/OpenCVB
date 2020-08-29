@@ -8,7 +8,7 @@ Public Class Stitch_Basics
         sliders.setupTrackBar(0, "Number of random images", 10, 50, 10)
         sliders.setupTrackBar(1, "Rectangle width", ocvb.color.Width / 4, ocvb.color.Width - 1, ocvb.color.Width / 2)
         sliders.setupTrackBar(2, "Rectangle height", ocvb.color.Height / 4, ocvb.color.Height - 1, ocvb.color.Height / 2)
-        ocvb.desc = "Stitch together random parts of a color image."
+        setDescription(ocvb, "Stitch together random parts of a color image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mats As New List(Of cv.Mat)
@@ -25,7 +25,7 @@ Public Class Stitch_Basics
         Next
 
         'If ocvb.parms.testAllRunning Then
-        ' It runs fine but after several runs, it will fail with an external exception.  Only happens on 'Test All' runs.  
+        ' It runs fine but after several runs, it will fail with an external exception.  Only happens on 'Test All' runs.
         ocvb.trueText(New TTtext("Stitch_Basics only fails when running 'Test All'." + vbCrLf +
                                      "Skipping it during a 'Test All' just so all the other tests can be exercised.", 10, 60))
             Exit Sub

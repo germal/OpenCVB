@@ -29,7 +29,7 @@ Public Class Blob_Input
 
         label1 = "Click any quadrant below to view it on the right"
         label2 = "Click any quadrant at left to view it below"
-        ocvb.desc = "Test simple Blob Detector."
+        setDescription(ocvb, "Test simple Blob Detector.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         rectangles.src = src
@@ -117,7 +117,7 @@ Public Class Blob_RenderBlobs
         input = New Blob_Input(ocvb)
         input.updateFrequency = 1
 
-        ocvb.desc = "Use connected components to find blobs."
+        setDescription(ocvb, "Use connected components to find blobs.")
         label1 = "Input blobs"
         label2 = "Showing only the largest blob in test data"
     End Sub
@@ -169,7 +169,7 @@ Public Class Blob_DepthClusters
         flood.fBasics.sliders.trackbar(2).Value = 1 ' pixels are exact.
 
         label2 = "Backprojection of identified histogram depth clusters."
-        ocvb.desc = "Highlight the distinct histogram blobs found with depth clustering."
+        setDescription(ocvb, "Highlight the distinct histogram blobs found with depth clustering.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         shadow.Run(ocvb)
@@ -204,7 +204,7 @@ Public Class Blob_Rectangles
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         blobs = New Blob_Largest(ocvb)
-        ocvb.desc = "Get the blobs and their masks and outline them with a rectangle."
+        setDescription(ocvb, "Get the blobs and their masks and outline them with a rectangle.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blobs.Run(ocvb)
@@ -223,6 +223,7 @@ Public Class Blob_Rectangles
             ReDim kalman(blobsToShow - 1)
             For i = 0 To blobsToShow - 1
                 kalman(i) = New Kalman_Basics(ocvb)
+                ReDim kalman(i).input(4 - 1)
             Next
         End If
 
@@ -252,9 +253,10 @@ Public Class Blob_Largest
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         kalman = New Kalman_Basics(ocvb)
+        ReDim kalman.input(4 - 1)
 
         blobs = New Blob_DepthClusters(ocvb)
-        ocvb.desc = "Gather all the blob data and display the largest."
+        setDescription(ocvb, "Gather all the blob data and display the largest.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blobs.Run(ocvb)
@@ -287,7 +289,7 @@ Public Class Blob_LargestDepthCluster
         setCaller(ocvb)
         blobs = New Blob_DepthClusters(ocvb)
 
-        ocvb.desc = "Display only the largest depth cluster (might not be contiguous.)"
+        setDescription(ocvb, "Display only the largest depth cluster (might not be contiguous.)")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blobs.src = src

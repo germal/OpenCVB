@@ -9,7 +9,7 @@ Public Class Resize_Basics
         radio.check(5).Enabled = False
         radio.check(6).Enabled = False
 
-        ocvb.desc = "Resize with different options and compare them"
+        setDescription(ocvb, "Resize with different options and compare them")
         label1 = "Rectangle highlight above resized"
         label2 = "Difference from Cubic Resize (Best)"
     End Sub
@@ -44,7 +44,7 @@ Public Class Resize_Percentage
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Resize Percentage (%)", 1, 100, 3)
 
-        ocvb.desc = "Resize by a percentage of the image."
+        setDescription(ocvb, "Resize by a percentage of the image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim percent As Double = CDbl(sliders.trackbar(0).Value / 100)

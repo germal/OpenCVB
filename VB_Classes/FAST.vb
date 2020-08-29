@@ -11,7 +11,7 @@ Public Class FAST_Basics
         check.Box(0).Text = "Use Non-Max = True"
         check.Box(0).Checked = True
 
-        ocvb.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
+        setDescription(ocvb, "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -39,7 +39,7 @@ Public Class FAST_Centroid
         ReDim kalman.input(1) ' 2 elements - cv.point
 
         fast = New FAST_Basics(ocvb)
-        ocvb.desc = "Find interesting points with the FAST and smooth the centroid with kalman"
+        setDescription(ocvb, "Find interesting points with the FAST and smooth the centroid with kalman")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         fast.src = src

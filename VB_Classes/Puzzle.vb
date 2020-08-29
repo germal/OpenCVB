@@ -234,7 +234,7 @@ Public Class Puzzle_Basics
         gridHeightSlider.Value = ocvb.color.Rows / 8
 
         grid.Run(ocvb)
-        ocvb.desc = "Create the puzzle pieces for toy genetic or annealing algorithm."
+        setDescription(ocvb, "Create the puzzle pieces for toy genetic or annealing algorithm.")
     End Sub
     Function Shuffle(Of T)(collection As IEnumerable(Of T)) As List(Of T)
         Dim r As Random = New Random()
@@ -298,7 +298,7 @@ Public Class Puzzle_Solver
         check.Box(0).Checked = True
         check.Box(1).Checked = True
 
-        ocvb.desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."
+        setDescription(ocvb, "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI.")
     End Sub
     Private Function checkUsedList(best As List(Of Integer)) As bestFit
         Dim bfit As New bestFit

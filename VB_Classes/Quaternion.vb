@@ -28,7 +28,7 @@ Public Class Quaterion_Basics
         sliders.setupTrackBar(6, "quaternion B.z X100", -100, 100, -10)
         sliders.setupTrackBar(7, "quaternion Theta X100", -100, 100, 100)
 
-        ocvb.desc = "Use the quaternion values to multiply and compute conjugate"
+        setDescription(ocvb, "Use the quaternion values to multiply and compute conjugate")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim q1 = New Quaternion(CSng(sliders.trackbar(0).Value / 100), CSng(sliders.trackbar(1).Value / 100),
@@ -56,7 +56,7 @@ Public Class Quaterion_IMUPrediction
 
         label1 = "Quaternion_IMUPrediction"
         label2 = ""
-        ocvb.desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
+        setDescription(ocvb, "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data.")
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)

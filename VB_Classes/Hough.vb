@@ -45,7 +45,7 @@ Public Class Hough_Circles
         setCaller(ocvb)
         circles = New Draw_Circles(ocvb)
         circles.sliders.trackbar(0).Value = 3
-        ocvb.desc = "Find circles using HoughCircles."
+        setDescription(ocvb, "Find circles using HoughCircles.")
         label1 = "Input circles to Hough"
         label2 = "Hough Circles found"
     End Sub
@@ -82,7 +82,7 @@ Public Class Hough_Lines
         sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar(2, "threshold", 1, 100, 50)
         sliders.setupTrackBar(3, "Lines to Plot", 1, 1000, 25)
-        ocvb.desc = "Use Houghlines to find lines in the image."
+        setDescription(ocvb, "Use Houghlines to find lines in the image.")
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
@@ -134,7 +134,7 @@ Public Class Hough_Lines_MT
         gridWidthSlider.Value = 16
         gridHeightSlider.Value = 16
 
-        ocvb.desc = "Multithread Houghlines to find lines in image fragments."
+        setDescription(ocvb, "Multithread Houghlines to find lines in image fragments.")
         label1 = "Hough_Lines_MT"
         label2 = "Hough_Lines_MT"
     End Sub

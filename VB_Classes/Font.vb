@@ -3,7 +3,7 @@ Public Class Font_OpenCV
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Display different font options available in OpenCV"
+        setDescription(ocvb, "Display different font options available in OpenCV")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 30 Then Exit Sub
@@ -32,7 +32,7 @@ Public Class Font_TrueType
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Display different TrueType fonts"
+        setDescription(ocvb, "Display different TrueType fonts")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
@@ -51,7 +51,7 @@ Public Class Font_FlowText
     Public msgs As New List(Of String)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Show TrueType text flowing through an image."
+        setDescription(ocvb, "Show TrueType text flowing through an image.")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
