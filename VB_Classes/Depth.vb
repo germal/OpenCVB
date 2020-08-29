@@ -916,6 +916,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
         gridHeightSlider.Value = 90
 
         kalman = New Kalman_Basics(ocvb)
+        ReDim kalman.input(4 - 1)
 
         label1 = "Red is min distance, blue is max distance"
         setDescription(ocvb, "Find minimum depth in each segment.")
