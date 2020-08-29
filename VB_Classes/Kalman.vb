@@ -614,6 +614,10 @@ Public Class Kalman_PointTracker
         setCaller(ocvb)
         If standalone Then topView = New PointCloud_Kalman_TopView(ocvb)
 
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Draw rectangle for each mask"
+        check.Box(0).Checked = True
+
         knn = New KNN_Basics(ocvb)
 
         ocvb.desc = "Use KNN to track points and Kalman to smooth the results"

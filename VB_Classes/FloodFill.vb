@@ -389,10 +389,6 @@ Public Class FloodFill_Projection
         sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
         sliders.setupTrackBar(3, "Step Size", 1, ocvb.color.Cols / 2, 20)
 
-        check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Draw rectangle for each mask"
-        check.Box(0).Checked = True
-
         label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
     End Sub
@@ -431,12 +427,51 @@ Public Class FloodFill_Projection
 
         label2 = CStr(rects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
 
-        Dim drawRectanglesRequested = check.Box(0).Checked
         For i = 0 To masks.Count - 1
             Dim rect = rects(i)
             nextColor = rColors(i Mod 255)
             dst2(rect).SetTo(nextColor, masks(i))
-            If drawRectanglesRequested Then dst2.Rectangle(rect, cv.Scalar.White, 1)
         Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class FloodFill_Black
+    Inherits ocvbClass
+    Public pFlood As FloodFill_Projection
+    Public rects As New List(Of cv.Rect)
+    Public masks As New List(Of cv.Mat)
+    Public centroids As New List(Of cv.Point2f)
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+        pFlood = New FloodFill_Projection(ocvb)
+
+        label1 = ""
+        ocvb.desc = "Use floodfill to identify each of the black regions of the src image."
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        pFlood.src = src
+        pFlood.Run(ocvb)
+
+        masks = New List(Of cv.Mat)(pFlood.masks)
+        rects = New List(Of cv.Rect)(pFlood.rects)
+        centroids = New List(Of cv.Point2f)(pFlood.centroids)
+
+        src = pFlood.dst2
+        dst1 = pFlood.dst2.Clone
+        Dim mask = src.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        pFlood.src = mask.Clone
+        pFlood.Run(ocvb)
+
+        For i = 0 To pFlood.masks.Count - 1
+            masks.Add(pFlood.masks(i))
+            rects.Add(pFlood.rects(i))
+            centroids.Add(pFlood.centroids(i))
+        Next
+
+        pFlood.dst2.CopyTo(dst1, mask)
     End Sub
 End Class
