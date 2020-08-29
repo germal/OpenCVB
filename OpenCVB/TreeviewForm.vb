@@ -8,8 +8,4 @@ Public Class TreeviewForm
         Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.Hide()
     End Sub
-
-    Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
-    End Sub
 End Class

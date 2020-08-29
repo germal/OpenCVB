@@ -1240,6 +1240,31 @@ Public Class OpenCVB
         End While
     End Sub
     Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+        Dim tv = TreeViewDialog.TreeView1
+        tv.Nodes.Clear()
+        Dim rootcall = Trim(callTrace(0))
+        TreeViewDialog.Text = Mid(callTrace(0), 1, InStr(callTrace(0), " ") - 1)
+        Dim root = New TreeNode(callTrace(0))
+        tv.Nodes.Add(root)
+        Dim calls As New List(Of String)
+        For i = 1 To callTrace.Count - 1
+            Dim nextRoot = Trim(Mid(callTrace(i), 1, InStr(callTrace(i), " ") - 1))
+            If nextRoot <> rootcall Then
+                root = New TreeNode(callTrace(i))
+                tv.Nodes.Add(root)
+                rootcall = nextRoot
+            End If
+            Dim nextStr = Mid(callTrace(i), Len(nextRoot))
+            Dim nextCall = Mid(nextStr, 1, InStr(nextStr, " ") - 1)
+            If calls.Contains(Trim(nextCall)) = False Then calls.Add(Trim(nextCall))
+        Next
+        For i = 0 To calls.Count - 1
+            tv.Nodes(0).Nodes.Add(New TreeNode(calls(i)))
+        Next
+
+        'For i = 1 To callTrace.Count - 1
+        '    tv.Nodes(0).Nodes(0).Nodes.Add(New TreeNode(callTrace(i)))
+        'Next
         TreeViewDialog.ShowDialog()
     End Sub
 End Class
