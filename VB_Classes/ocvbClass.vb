@@ -48,13 +48,15 @@ Public Class ocvbClass : Implements IDisposable
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
     Public fontsize As Single
-
     Public Sub setCaller(ocvb As AlgorithmData)
         If ocvb.caller = "" Then
             standalone = True
             ocvb.caller = Me.GetType.Name
+            ocvb.callstack = ""
         Else
             standalone = False
+            'ocvb.callstack += ocvb.caller + " uses " + Me.GetType.Name + " "
+            'Console.WriteLine(ocvb.caller + " uses " + Me.GetType.Name + " ")
         End If
         caller = Me.GetType.Name
         fontsize = ocvb.color.Width / 1280

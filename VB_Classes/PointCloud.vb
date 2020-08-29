@@ -548,7 +548,7 @@ Public Class PointCloud_Kalman_TopView
 
         cmats = New PointCloud_Colorize(ocvb)
         flood = New Floodfill_Identifiers(ocvb)
-        flood.sliders.trackbar(0).Value = 100
+        flood.basics.sliders.trackbar(0).Value = 100
         pTrack = New Kalman_PointTracker(ocvb)
         view = New PointCloud_TopView(ocvb)
 
