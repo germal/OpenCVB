@@ -42,6 +42,7 @@ Public Class ocvbClass : Implements IDisposable
     Public label2 As String
     Public msRNG As New System.Random
     Public caller As String = ""
+    Public previousCaller As String = ""
     Dim algorithm As Object
     Public scalarColors(255) As cv.Scalar
     Public rColors(255) As cv.Vec3b
@@ -52,13 +53,15 @@ Public Class ocvbClass : Implements IDisposable
         If ocvb.caller = "" Then
             standalone = True
             ocvb.caller = Me.GetType.Name
-            ocvb.callstack = ""
+            ocvb.callstack.Clear()
+            ocvb.parentRoot = ocvb.caller
         Else
             standalone = False
-            'ocvb.callstack += ocvb.caller + " uses " + Me.GetType.Name + " "
-            'Console.WriteLine(ocvb.caller + " uses " + Me.GetType.Name + " ")
+            ocvb.callstack.Add(ocvb.parentAlgorithm + " uses " + Me.GetType.Name)
+            Console.WriteLine(ocvb.callstack(ocvb.callstack.Count - 1))
         End If
         caller = Me.GetType.Name
+        ocvb.parentAlgorithm = caller
         fontsize = ocvb.color.Width / 1280
     End Sub
     Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.

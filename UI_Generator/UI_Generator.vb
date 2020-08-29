@@ -46,28 +46,30 @@ Module UI_GeneratorMain
                 sIndex += 1
                 fileName = fileinfo.FullName
             Else
-                Dim nextFile As New System.IO.StreamReader(fileName)
-                While nextFile.Peek() <> -1
-                    Dim line = Trim(nextFile.ReadLine())
-                    line = Replace(line, vbTab, "")
-                    If line IsNot Nothing Then
-                        If line.Substring(0, 1) <> "'" Then
-                            If Len(line) > 0 Then CodeLineCount += 1
-                            If LCase(line).StartsWith("public class") Then
-                                Dim split As String() = Regex.Split(line, "\W+")
-                                ' next line must be "Inherits ocvbClass"
-                                Dim line2 = Trim(nextFile.ReadLine())
-                                CodeLineCount += 1
-                                If line2.StartsWith(vbTab) Then line2 = Mid(line2, 2)
-                                If LCase(line2) = "inherits ocvbclass" Then className = split(2) ' public class <classname>
-                            End If
-                            If LCase(line).StartsWith("public sub new(ocvb as algorithmdata") Then
-                                sortedNames.Add(className, sIndex)
-                                sIndex += 1
+                If fileName.EndsWith("ocvbClass.vb") = False Then
+                    Dim nextFile As New System.IO.StreamReader(fileName)
+                    While nextFile.Peek() <> -1
+                        Dim line = Trim(nextFile.ReadLine())
+                        line = Replace(line, vbTab, "")
+                        If line IsNot Nothing Then
+                            If line.Substring(0, 1) <> "'" Then
+                                If Len(line) > 0 Then CodeLineCount += 1
+                                If LCase(line).StartsWith("public class") Then
+                                    Dim split As String() = Regex.Split(line, "\W+")
+                                    ' next line must be "Inherits ocvbClass"
+                                    Dim line2 = Trim(nextFile.ReadLine())
+                                    CodeLineCount += 1
+                                    If line2.StartsWith(vbTab) Then line2 = Mid(line2, 2)
+                                    If LCase(line2) = "inherits ocvbclass" Then className = split(2) ' public class <classname>
+                                End If
+                                If LCase(line).StartsWith("public sub new(ocvb as algorithmdata") Then
+                                    sortedNames.Add(className, sIndex)
+                                    sIndex += 1
+                                End If
                             End If
                         End If
-                    End If
-                End While
+                    End While
+                End If
             End If
         Next
 

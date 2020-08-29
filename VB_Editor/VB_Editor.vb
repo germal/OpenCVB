@@ -2,9 +2,10 @@
 Module VB_EditorMain
     Dim changeLines As Integer
     Private Function makeChange(line As String) As String
-        If line.Contains(" = New ") And line.Contains("(ocvb, """) Then
+        If line.Contains("ocvb.desc = ") Then
             Console.WriteLine(line)
-            line = Mid(line, 1, InStr(line, "ocvb, ") + 5) + "caller)"
+            line = line.Replace("ocvb.desc = ", "setDescription(ocvb, ")
+            line += ")"
             Console.WriteLine("Change to: " + line)
             changeLines += 1
         End If
@@ -34,6 +35,10 @@ Module VB_EditorMain
     Sub Main()
         ' Regular expression are great but can be too complicated.  This app is just a simpler way to make global changes that 
         ' would normally be accomplished with regular expressions.
+        ' There are 3 operations - delete a line, change a line, or insertline.
+        ' The first loop displays what the change would look like
+        ' The second loop makes the change
+        ' Run without the second loop until you see the desired results then run the second loop.
         Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../../VB_Classes")
         Dim fileEntries As String() = Directory.GetFiles(VBcodeDir.FullName)
 
@@ -44,9 +49,9 @@ Module VB_EditorMain
             While nextFile.Peek() <> -1
                 Dim line As String
                 line = nextFile.ReadLine()
-                deleteLine(line)
-                ' makeChange(line)
-                'insertLine(line)
+                ' deleteLine(line)
+                makeChange(line)
+                ' insertLine(line)
             End While
             nextFile.Close()
             If saveChangeLines <> changeLines Then changeFiles.Add(fileName)
@@ -64,9 +69,9 @@ Module VB_EditorMain
                 If lines.Count = 1 Then
                     lines = code.Split(vbLf) ' just in case they don't have CR.
                 End If
-                'For i = 0 To lines.Count - 1
-                '    lines(i) = makeChange(Trim(lines(i)))
-                'Next
+                For i = 0 To lines.Count - 1
+                    lines(i) = makeChange(Trim(lines(i)))
+                Next
 
                 Dim sw = New StreamWriter(filename)
                 For i = 0 To lines.Count - 1
