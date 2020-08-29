@@ -468,7 +468,7 @@ End Class
 '    Inherits ocvbClass
 '    Dim emax As EMax_Basics_CPP
 '    Dim lut As LUT_Basics
-'    Dim flood As FloodFill_Projection
+'    Dim flood As Floodfill_Identifiers
 '    Dim knn As knn_Basics
 '    Dim scaleFactor = 1
 '    Dim moment() As Moments_Basics
@@ -480,7 +480,7 @@ End Class
 
 '        lut = New LUT_Basics(ocvb)
 
-'        flood = New FloodFill_Projection(ocvb)
+'        flood = New Floodfill_Identifiers(ocvb)
 '        flood.sliders.trackbar(0).Value /= scaleFactor
 '        knn = New knn_Basics(ocvb)
 '        ReDim knn.input(1)

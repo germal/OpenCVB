@@ -229,8 +229,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Data/PauseButton.png" />
-    <EmbeddedResource Include="Data/PauseButtonRun.png" />
+    <None Include="Data\Tree.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

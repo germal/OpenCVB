@@ -501,7 +501,7 @@ End Class
 
 Public Class Draw_OverlappingRectangles
     Inherits ocvbClass
-    Dim flood As FloodFill_Projection
+    Dim flood As Floodfill_Identifiers
     Public inputRects As New List(Of cv.Rect)
     Public inputMasks As New List(Of cv.Mat)
     Public rects As New List(Of cv.Rect)
@@ -510,7 +510,7 @@ Public Class Draw_OverlappingRectangles
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 
-        If standalone Then flood = New FloodFill_Projection(ocvb)
+        If standalone Then flood = New Floodfill_Identifiers(ocvb)
 
         label1 = "Redundant rectangles are yellow"
         label2 = "Unique rectangles with their respective masks"

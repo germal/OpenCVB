@@ -77,48 +77,6 @@ End Class
 
 
 
-
-Public Class Floodfill_Objects
-    Inherits ocvbClass
-    Dim flood As FloodFill_Basics
-    Public Sub New(ocvb As AlgorithmData)
-        setCaller(ocvb)
-
-        sliders.Setup(ocvb, caller, 1)
-        sliders.setupTrackBar(0, "Desired number of objects", 1, 100, 40)
-
-        flood = New FloodFill_Basics(ocvb)
-        flood.sliders.trackbar(0).Value = (src.Width Mod 100) * 25
-
-        ocvb.desc = "Use floodfill to identify the desired number of objects"
-    End Sub
-    Public Sub Run(ocvb As AlgorithmData)
-        flood.src = src
-        flood.Run(ocvb)
-        dst1 = flood.dst2
-
-        label1 = CStr(flood.masks.Count) + " objects with more than " + CStr(flood.sliders.trackbar(0).Value) + " bytes"
-        Static lastSetting As Integer = flood.sliders.trackbar(1).Value
-        If dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero() < 0.9 * flood.src.Total And flood.sliders.trackbar(0).Value > 500 Then
-            flood.sliders.trackbar(0).Value -= 10
-        Else
-            If flood.masks.Count >= sliders.trackbar(0).Value Then
-                If flood.sliders.trackbar(1).Value < flood.sliders.trackbar(1).Maximum Then flood.sliders.trackbar(1).Value += 1
-                If flood.sliders.trackbar(2).Value < flood.sliders.trackbar(2).Maximum Then flood.sliders.trackbar(2).Value += 1
-            Else
-                If flood.sliders.trackbar(1).Value > 1 Then
-                    flood.sliders.trackbar(1).Value -= 1
-                    flood.sliders.trackbar(2).Value -= 1
-                End If
-            End If
-            lastSetting = flood.sliders.trackbar(1).Value
-        End If
-    End Sub
-End Class
-
-
-
-
 Public Class FloodFill_Top16_MT
     Inherits ocvbClass
     Dim grid As Thread_Grid
@@ -374,29 +332,25 @@ End Class
 
 
 
-Public Class FloodFill_Projection
+Public Class Floodfill_Identifiers
     Inherits ocvbClass
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
     Public minFloodSize As Integer
+    Public basics As FloodFill_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
-        sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar(3, "Step Size", 1, ocvb.color.Cols / 2, 20)
-
+        basics = New FloodFill_Basics(ocvb)
         label1 = "Input image to floodfill"
         ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        minFloodSize = sliders.trackbar(0).Value
-        Dim loDiff = cv.Scalar.All(sliders.trackbar(1).Value)
-        Dim hiDiff = cv.Scalar.All(sliders.trackbar(2).Value)
-        Dim stepSize = sliders.trackbar(3).Value
+        minFloodSize = basics.sliders.trackbar(0).Value
+        Dim loDiff = cv.Scalar.All(basics.sliders.trackbar(1).Value)
+        Dim hiDiff = cv.Scalar.All(basics.sliders.trackbar(2).Value)
+        Dim stepSize = basics.sliders.trackbar(3).Value
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Clone()
@@ -441,13 +395,13 @@ End Class
 
 Public Class FloodFill_Black
     Inherits ocvbClass
-    Public pFlood As FloodFill_Projection
+    Public pFlood As Floodfill_Identifiers
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        pFlood = New FloodFill_Projection(ocvb)
+        pFlood = New Floodfill_Identifiers(ocvb)
 
         label1 = ""
         ocvb.desc = "Use floodfill to identify each of the black regions of the src image."
@@ -455,6 +409,7 @@ Public Class FloodFill_Black
     Public Sub Run(ocvb As AlgorithmData)
         pFlood.src = src
         pFlood.Run(ocvb)
+        dst2 = pFlood.dst2.Clone
 
         masks = New List(Of cv.Mat)(pFlood.masks)
         rects = New List(Of cv.Rect)(pFlood.rects)
@@ -475,3 +430,48 @@ Public Class FloodFill_Black
         pFlood.dst2.CopyTo(dst1, mask)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Floodfill_Objects
+    Inherits ocvbClass
+    Dim basics As FloodFill_Basics
+    Public Sub New(ocvb As AlgorithmData)
+        setCaller(ocvb)
+
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Desired number of objects", 1, 100, 30)
+
+        basics = New FloodFill_Basics(ocvb)
+        basics.sliders.trackbar(0).Value = (src.Width Mod 100) * 25
+
+        ocvb.desc = "Use floodfill to identify the desired number of objects"
+    End Sub
+    Public Sub Run(ocvb As AlgorithmData)
+        basics.src = src
+        basics.Run(ocvb)
+        dst1 = basics.dst2
+
+        label1 = CStr(basics.masks.Count) + " objects with more than " + CStr(basics.sliders.trackbar(0).Value) + " bytes"
+        Static lastSetting As Integer = basics.sliders.trackbar(1).Value
+        If dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero() < 0.9 * basics.src.Total And basics.sliders.trackbar(0).Value > 500 Then
+            basics.sliders.trackbar(0).Value -= 10
+        Else
+            If basics.masks.Count >= sliders.trackbar(0).Value Then
+                If basics.sliders.trackbar(1).Value < basics.sliders.trackbar(1).Maximum Then basics.sliders.trackbar(1).Value += 1
+                If basics.sliders.trackbar(2).Value < basics.sliders.trackbar(2).Maximum Then basics.sliders.trackbar(2).Value += 1
+            Else
+                If basics.sliders.trackbar(1).Value > 1 Then
+                    basics.sliders.trackbar(1).Value -= 1
+                    basics.sliders.trackbar(2).Value -= 1
+                End If
+            End If
+            lastSetting = basics.sliders.trackbar(1).Value
+        End If
+    End Sub
+End Class
+
+

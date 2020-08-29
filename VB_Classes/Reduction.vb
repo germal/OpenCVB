@@ -4,7 +4,7 @@ Public Class Reduction_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Reduction factor", 1, 64, 64)
+        sliders.setupTrackBar(0, "Reduction factor", 1, 255, 64)
         label1 = "Reduced color image."
         ocvb.desc = "Reduction: a simple way to get KMeans with much less work"
     End Sub
@@ -49,11 +49,11 @@ End Class
 
 Public Class Reduction_Floodfill
     Inherits ocvbClass
-    Public bflood As FloodFill_Projection
+    Public bflood As Floodfill_Identifiers
     Public kReduce As Reduction_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        bflood = New FloodFill_Projection(ocvb)
+        bflood = New Floodfill_Identifiers(ocvb)
         kReduce = New Reduction_Basics(ocvb)
         ocvb.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
     End Sub
@@ -92,6 +92,7 @@ Public Class Reduction_KNN
 
         bflood.src = kReduce.dst1
         bflood.Run(ocvb)
+        dst2 = bflood.dst2
 
         pTrack.queryPoints = New List(Of cv.Point2f)(bflood.centroids)
         pTrack.queryRects = New List(Of cv.Rect)(bflood.rects)

@@ -538,7 +538,7 @@ End Class
 Public Class PointCloud_Kalman_TopView
     Inherits ocvbClass
     Public pTrack As Kalman_PointTracker
-    Public flood As FloodFill_Projection
+    Public flood As Floodfill_Identifiers
     Public view As PointCloud_TopView
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Public maxZ As Single
@@ -547,7 +547,7 @@ Public Class PointCloud_Kalman_TopView
         setCaller(ocvb)
 
         cmats = New PointCloud_Colorize(ocvb)
-        flood = New FloodFill_Projection(ocvb)
+        flood = New Floodfill_Identifiers(ocvb)
         flood.sliders.trackbar(0).Value = 100
         pTrack = New Kalman_PointTracker(ocvb)
         view = New PointCloud_TopView(ocvb)
@@ -590,7 +590,7 @@ End Class
 
 Public Class PointCloud_Kalman_SideView
     Inherits ocvbClass
-    Public flood As FloodFill_Projection
+    Public flood As Floodfill_Identifiers
     Public view As PointCloud_SideView
     Public pTrack As Kalman_PointTracker
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
@@ -600,7 +600,7 @@ Public Class PointCloud_Kalman_SideView
         setCaller(ocvb)
 
         cmats = New PointCloud_Colorize(ocvb)
-        flood = New FloodFill_Projection(ocvb)
+        flood = New Floodfill_Identifiers(ocvb)
         flood.sliders.trackbar(0).Value = 100
         view = New PointCloud_SideView(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
