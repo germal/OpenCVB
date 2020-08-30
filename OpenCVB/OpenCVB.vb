@@ -1231,7 +1231,9 @@ Public Class OpenCVB
                 Exit While
             End Try
 
-            If frameCount = 15 Then ' prepare the callTrace for the user interface
+            If frameCount Mod 100 = 0 Then
+                ' this allows for dynamic allocation of new algorithms.
+                callTrace.Clear()
                 For i = 0 To OpenCVB.ocvb.callTrace.Count - 1
                     callTrace.Add(OpenCVB.ocvb.callTrace(i))
                 Next
@@ -1267,7 +1269,7 @@ Public Class OpenCVB
         Dim tv = TreeViewDialog.TreeView1
         tv.Nodes.Clear()
         Dim rootcall = Trim(callTrace(0))
-        TreeViewDialog.Text = rootcall
+        TreeViewDialog.Text = rootcall + " - Click on any node to review the algorithm's input and output."
         tv.Nodes.Add(rootcall)
 
         For nodeLevel = 0 To 100 ' this loop will terminate after the depth of the nesting.  100 is excessive insurance deep nesting may occur.
