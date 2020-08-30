@@ -3,8 +3,8 @@ Imports cv = OpenCvSharp
 Public Class Kalman_Basics
     Inherits ocvbClass
     Dim kalman() As Kalman_Simple
-    Public input() As Single
-    Public output() As Single
+    Public input(4 - 1) As Single
+    Public output(4 - 1) As Single
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         check.Setup(ocvb, caller, 1)
