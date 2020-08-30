@@ -77,15 +77,6 @@ Public Class Reduction_KNN
     Inherits ocvbClass
     Dim kReduce As Reduction_Basics
     Dim bflood As FloodFill_Black
-
-
-
-
-
-
-
-
-
     Dim pTrack As Kalman_PointTracker
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)

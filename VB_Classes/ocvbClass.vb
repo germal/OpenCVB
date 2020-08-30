@@ -66,16 +66,17 @@ Public Class ocvbClass : Implements IDisposable
                 Dim split() = partLine.Split("\")
                 partLine = Mid(partLine, 1, InStr(partLine, ".") - 1)
                 If Not (partLine.StartsWith("ocvbClass") Or partLine.StartsWith("ActiveClass")) Then
-                    callStack = partLine + " " + split(split.Count - 1) + vbTab + callStack
+                    callStack = partLine + " " + callStack
                 End If
             End If
         Next
         If ocvb.callTrace.Count = 0 Then
             standalone = True
+            ocvb.callTrace.Clear()
             ocvb.callTrace.Add(callStack)
         Else
             standalone = False
-            ocvb.callTrace.Add(callStack)
+            If ocvb.callTrace.Contains(callStack) = False Then ocvb.callTrace.Add(callStack)
         End If
         fontsize = ocvb.color.Width / 1280
 

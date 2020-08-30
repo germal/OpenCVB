@@ -1239,33 +1239,61 @@ Public Class OpenCVB
             frameCount += 1
         End While
     End Sub
+    Private Function FindRecursive(ByVal tNode As TreeNode, name As String) As TreeNode
+        Dim tn As TreeNode
+        For Each tn In tNode.Nodes
+            If tn.Text = name Then Return tn
+            Dim rnode = FindRecursive(tn, name)
+            If rnode IsNot Nothing Then Return rnode
+        Next
+        Return Nothing
+    End Function
+    Private Function getNode(tv As TreeView, name As String) As TreeNode
+        For Each n In tv.Nodes
+            If n.text = name Then Return n
+            Dim rnode = FindRecursive(n, name)
+            If rnode IsNot Nothing Then Return rnode
+        Next
+        Return Nothing
+    End Function
+    Private Function modifyCallTrace(calls As List(Of String), name As String) As List(Of String)
+        Dim result As New List(Of String)
+        For i = 0 To calls.Count - 1
+            If calls(i).StartsWith(name) Then result.Add(Trim(Mid(name, Len(name) + 1)))
+        Next
+        Return result
+    End Function
     Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
         Dim tv = TreeViewDialog.TreeView1
         tv.Nodes.Clear()
         Dim rootcall = Trim(callTrace(0))
-        TreeViewDialog.Text = Mid(callTrace(0), 1, InStr(callTrace(0), " ") - 1)
-        Dim root = New TreeNode(callTrace(0))
-        tv.Nodes.Add(root)
-        Dim calls As New List(Of String)
-        For i = 1 To callTrace.Count - 1
-            Dim nextRoot = Trim(Mid(callTrace(i), 1, InStr(callTrace(i), " ") - 1))
-            If nextRoot <> rootcall Then
-                root = New TreeNode(callTrace(i))
-                tv.Nodes.Add(root)
-                rootcall = nextRoot
-            End If
-            Dim nextStr = Mid(callTrace(i), Len(nextRoot))
-            Dim nextCall = Mid(nextStr, 1, InStr(nextStr, " ") - 1)
-            If calls.Contains(Trim(nextCall)) = False Then calls.Add(Trim(nextCall))
-        Next
-        For i = 0 To calls.Count - 1
-            tv.Nodes(0).Nodes.Add(New TreeNode(calls(i)))
-        Next
+        TreeViewDialog.Text = rootcall
+        tv.Nodes.Add(rootcall)
 
-        'For i = 1 To callTrace.Count - 1
-        '    tv.Nodes(0).Nodes(0).Nodes.Add(New TreeNode(callTrace(i)))
-        'Next
+        For nodeLevel = 0 To 100 ' this loop will terminate after the depth of the nesting.  100 is excessive insurance deep nesting may occur.
+            Dim alldone = True
+            For i = 1 To callTrace.Count - 1
+                Dim split() = callTrace(i).Split
+                If split.Count = nodeLevel + 3 Then
+                    alldone = False
+                    Dim node = getNode(tv, split(nodeLevel))
+                    If node Is Nothing Then
+                        If nodeLevel = 0 Then
+                            tv.Nodes(nodeLevel).Nodes.Add(split(nodeLevel))
+                        Else
+                            node = getNode(tv, split(nodeLevel - 1))
+                            node.Nodes.Add(split(nodeLevel))
+                        End If
+                    Else
+                        node.Nodes.Add(split(nodeLevel + 1))
+                    End If
+                End If
+            Next
+            If alldone Then Exit For ' we didn't find any more nodes to add.
+        Next
+        tv.ExpandAll()
         TreeViewDialog.ShowDialog()
+        AvailableAlgorithms.Text = rootcall
     End Sub
 End Class
 

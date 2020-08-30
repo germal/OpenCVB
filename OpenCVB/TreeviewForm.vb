@@ -8,4 +8,9 @@ Public Class TreeviewForm
         Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.Hide()
     End Sub
+
+    Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
+        Console.WriteLine(e.Node.Text)
+        OpenCVB.AvailableAlgorithms.Text = e.Node.Text
+    End Sub
 End Class
