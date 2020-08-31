@@ -707,8 +707,11 @@ Public Class Kalman_PointTracker
                         End If
                     Next
                     kalman(i).input = {knn.queryPoints(j).X, knn.queryPoints(j).Y, rect.X, rect.Y, rect.Width, rect.Height}
-                    If kalmanActive Then kalman(i).Run(ocvb) Else kalman(i).output = {knn.queryPoints(j).X, knn.queryPoints(j).Y,
-                                                                                      rect.X, rect.Y, rect.Width, rect.Height}
+                    If kalmanActive Then
+                        kalman(i).Run(ocvb)
+                    Else
+                        kalman(i).output = {knn.queryPoints(j).X, knn.queryPoints(j).Y, rect.X, rect.Y, rect.Width, rect.Height}
+                    End If
                     Exit For
                 End If
             Next
@@ -723,12 +726,14 @@ Public Class Kalman_PointTracker
                 kalmanAging(i) -= 1
             End If
 
-            If matched And kalman(i).output IsNot Nothing And lastMask(i) IsNot Nothing Then
-                Dim pt3 = New cv.Point(kalman(i).output(0), kalman(i).output(1))
-                If rect.Width = lastMask(i).Cols And rect.Height = lastMask(i).Rows Then dst1(rect).SetTo(scalarColors(i), lastMask(i))
+            If matched And kalman(i).output IsNot Nothing Then
+                If maskAvailable And lastMask(i) IsNot Nothing Then
+                    If rect.Width = lastMask(i).Cols And rect.Height = lastMask(i).Rows Then dst1(rect).SetTo(scalarColors(i), lastMask(i))
+                End If
                 rect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
 
                 Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
+                Dim pt3 = New cv.Point(kalman(i).output(0), kalman(i).output(1))
                 If drawRectangleCheck?.checked Then
                     cv.Cv2.Circle(dst1, pt3, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
                     dst1.Rectangle(rect, cv.Scalar.White, 1)
@@ -736,8 +741,23 @@ Public Class Kalman_PointTracker
                 If rect.Width > 0 Then
                     Dim vo = New viewObject
                     vo.centroid = pt3
+
+                    If rect.X < 0 Then rect.X = 0
+                    If rect.Y < 0 Then rect.Y = 0
+                    If rect.X + rect.Width > src.Width Then rect.Width = src.Width - rect.X
+                    If rect.Y + rect.Height > src.Height Then rect.Height = src.Height - rect.Y
+                    If rect.Width <= 0 Then
+                        rect.X = src.Width - 1
+                        rect.Width = 1
+                    End If
+
+                    If rect.Height <= 0 Then
+                        rect.Y = src.Height - 1
+                        rect.Height = 1
+                    End If
+
                     vo.rectView = rect
-                    vo.color = scalarColors(i)
+                    vo.color = scalarColors(i Mod 255)
                     viewObjects.Add(vo.rectView.Width * vo.rectView.Height, vo)
                 End If
             End If
@@ -750,3 +770,6 @@ Public Class Kalman_PointTracker
         Next
     End Sub
 End Class
+
+
+

@@ -70,7 +70,7 @@ Public Class AnyName_CPP
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
 		    anyname = Anyname_Open()
-        ocvb.desc = "description of class"
+        setDescription(ocvb, "New class description")
 	  End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src = ocvb.color

@@ -17,7 +17,7 @@ Public Class OpenGL_MyOpenGLtest
         setCaller(ocvb)
 		    ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_MyOpenGLtest"
-        ocvb.desc = "Describe your algorithm"
+        setDescription(ocvb, "New class description")
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ogl.rgbInput = ocvb.color

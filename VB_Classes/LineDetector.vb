@@ -478,7 +478,7 @@ Public Class lineDetector_FLD
         handle.Free()
 
         If lineCount > 0 Then
-            Dim pts(4 * (lineCount - 1)) As Single
+            Dim pts(4 * lineCount - 1) As Single
             Dim linePtr = lineDetector_Lines()
             If linePtr <> 0 Then
                 Marshal.Copy(linePtr, pts, 0, pts.Length)
