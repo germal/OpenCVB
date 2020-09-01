@@ -9,8 +9,6 @@ Public Class OptionsSliders
     Dim defaultHeight = 260
     Dim defaultWidth = 630
     Public Sub Setup(ocvb As AlgorithmData, caller As String, Optional count As Integer = 4)
-        Me.Width = defaultWidth
-        Me.Height = defaultHeight
 
         'Me.SetDesktopLocation(applocation.Left + ocvb.slidersOffset.X, applocation.Top + applocation.Height + ocvb.slidersOffset.Y)
         'ocvb.slidersOffset.X += offsetIncr
@@ -73,6 +71,8 @@ Public Class OptionsSliders
     End Function
 
     Private Sub OptionsSliders_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.Width = defaultWidth
+        Me.Height = defaultHeight
         Me.SetDesktopLocation(applocation.Left + ocvbX.slidersOffset.X, applocation.Top + applocation.Height + ocvbX.slidersOffset.Y)
         ocvbX.slidersOffset.X += offsetIncr
         ocvbX.slidersOffset.Y += offsetIncr

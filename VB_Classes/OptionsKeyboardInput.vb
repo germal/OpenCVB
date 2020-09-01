@@ -4,11 +4,6 @@ Public Class OptionsKeyboardInput
     Public inputText As New List(Of String)
     Dim keyboardLastInput As String
     Public Sub Setup(ocvb As AlgorithmData, caller As String)
-        Me.SetDesktopLocation(midFormX + ocvb.radioOffset.X, applocation.Top + applocation.Height + ocvb.radioOffset.Y)
-        ocvb.radioOffset.X += offsetIncr
-        ocvb.radioOffset.Y += offsetIncr
-        If ocvb.radioOffset.X > offsetMax Then ocvb.radioOffset.X = 0
-        If ocvb.radioOffset.Y > offsetMax Then ocvb.radioOffset.Y = 0
         Me.Text = caller + " CheckBox Options"
         Me.Show() ' only the first one   gets to be visible...
     End Sub
@@ -31,5 +26,13 @@ Public Class OptionsKeyboardInput
     End Sub
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles HoldKeyTimer.Tick
         inputText.Add(keyboardLastInput) ' press and hold means send this key again...
+    End Sub
+
+    Private Sub OptionsKeyboardInput_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.SetDesktopLocation(midFormX + ocvbX.radioOffset.X, applocation.Top + applocation.Height + ocvbX.radioOffset.Y)
+        ocvbX.radioOffset.X += offsetIncr
+        ocvbX.radioOffset.Y += offsetIncr
+        If ocvbX.radioOffset.X > offsetMax Then ocvbX.radioOffset.X = 0
+        If ocvbX.radioOffset.Y > offsetMax Then ocvbX.radioOffset.Y = 0
     End Sub
 End Class

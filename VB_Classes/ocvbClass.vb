@@ -85,9 +85,6 @@ Public Class ocvbClass : Implements IDisposable
         dst1 = New cv.Mat(ocvb.parms.resolution, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(ocvb.parms.resolution, cv.MatType.CV_8UC3, 0)
 
-        sliders = New OptionsSliders
-        sliders.Visible = True
-
         topCameraPoint = New cv.Point(ocvb.color.Height, ocvb.color.Height)
         sideCameraPoint = New cv.Point((ocvb.color.Width - ocvb.color.Height) / 2, ocvb.color.Height - (ocvb.color.Width - ocvb.color.Height) / 2)
     End Sub
