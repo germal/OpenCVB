@@ -16,7 +16,7 @@ Public Class BlockMatching_Basics
         label2 = "Right Image (used with left image)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.cameraIndex = Kinect4AzureCam Then
+        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.Kinect4AzureCam Then
             ocvb.trueText(New TTtext("For the Kinect 4 Azure camera, the left and right views are the same.", 10, 50))
         End If
 

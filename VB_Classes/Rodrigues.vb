@@ -14,7 +14,7 @@ Public Class Rodrigues_ValidateKinect
         ocvb.desc = "Validate the Rodrigues calibration for Kinect camera (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.cameraIndex <> Kinect4AzureCam Then
+        If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algorithmParameters.Kinect4AzureCam Then
             dst2.SetTo(0)
             ocvb.trueText(New TTtext("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140))
             Exit Sub
@@ -40,7 +40,8 @@ Public Class Rodrigues_ValidateVector
         ocvb.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.cameraIndex <> StereoLabsZED2 And ocvb.parms.cameraIndex <> T265Camera Then
+        If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algorithmParameters.StereoLabsZED2 And
+            ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algorithmParameters.T265Camera Then
             dst2.SetTo(0)
             ocvb.trueText(New TTtext("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation", 10, 140))
             Exit Sub
@@ -69,7 +70,7 @@ Public Class Rodrigues_ValidateVector
         output += vbTab + Format(ocvb.parms.IMU_RotationVector.Z, "#0.000000000") + vbTab
         ocvb.trueText(New TTtext(output, 10, 190))
 
-        If ocvb.parms.cameraIndex = T265Camera Then
+        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.T265Camera Then
             ocvb.trueText(New TTtext("The T265 does not provide the Rotation Matrix but it is calculated from the Rotation Vector.", 10, 220))
         End If
     End Sub

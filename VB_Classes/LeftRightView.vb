@@ -7,14 +7,14 @@ Public Class LeftRightView_Basics
         sliders.setupTrackBar(0, "brightness", 0, 255, 100)
         ocvb.desc = "Show the left and right views from the 3D Camera"
         Select Case ocvb.parms.cameraIndex
-            Case D435i, StereoLabsZED2
+            Case VB_Classes.ActiveTask.algorithmParameters.D435i, VB_Classes.ActiveTask.algorithmParameters.StereoLabsZED2
                 label1 = "Left Image"
                 label2 = "Right Image"
-            Case Kinect4AzureCam, L515
+            Case VB_Classes.ActiveTask.algorithmParameters.Kinect4AzureCam, VB_Classes.ActiveTask.algorithmParameters.L515
                 label1 = "Infrared Image"
                 label2 = "There is only one infrared image"
                 sliders.trackbar(0).Value = 0
-            Case T265Camera
+            Case VB_Classes.ActiveTask.algorithmParameters.T265Camera
                 label1 = "Raw Left View Image (clipped to fit)"
                 label2 = "Raw Right Right Image (clipped to fit)"
                 sliders.trackbar(0).Value = 0
@@ -47,14 +47,14 @@ Public Class LeftRightView_CompareUndistorted
         sliders.setupTrackBar(2, "Slice Height", 1, (ocvb.color.Rows - 100) / 2, 50)
 
         Select Case ocvb.parms.cameraIndex
-            Case D435i, StereoLabsZED2
+            Case VB_Classes.ActiveTask.algorithmParameters.D435i, VB_Classes.ActiveTask.algorithmParameters.StereoLabsZED2
                 label1 = "Left Image"
                 label2 = "Right Image"
-            Case Kinect4AzureCam, L515
+            Case VB_Classes.ActiveTask.algorithmParameters.Kinect4AzureCam, VB_Classes.ActiveTask.algorithmParameters.L515
                 label1 = "Infrared Image"
                 label2 = "There is only one infrared image"
                 sliders.trackbar(0).Value = 0
-            Case T265Camera
+            Case VB_Classes.ActiveTask.algorithmParameters.T265Camera
                 label1 = "Undistorted Slices of Left and Right Views"
                 label2 = "Undistorted Right Image"
                 sliders.trackbar(0).Value = 50
@@ -65,7 +65,7 @@ Public Class LeftRightView_CompareUndistorted
         Dim sliceY = sliders.trackbar(1).Value
         Dim slideHeight = sliders.trackbar(2).Value
         Dim leftInput As cv.Mat, rightInput As cv.Mat
-        If ocvb.parms.cameraIndex = T265Camera Then
+        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.T265Camera Then
             fisheye.src = src
             fisheye.Run(ocvb)
             leftInput = fisheye.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -102,14 +102,14 @@ Public Class LeftRightView_CompareRaw
         sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
         sliders.setupTrackBar(2, "Slice Height", 1, (ocvb.color.Rows - 100) / 2, 50)
         Select Case ocvb.parms.cameraIndex
-            Case D435i, StereoLabsZED2,
+            Case VB_Classes.ActiveTask.algorithmParameters.D435i, VB_Classes.ActiveTask.algorithmParameters.StereoLabsZED2,
                 label1 = "Left Image"
                 label2 = "Right Image"
-            Case Kinect4AzureCam, L515
+            Case VB_Classes.ActiveTask.algorithmParameters.Kinect4AzureCam, VB_Classes.ActiveTask.algorithmParameters.L515
                 label1 = "Infrared Image"
                 label2 = "There is only one infrared image"
                 sliders.trackbar(0).Value = 0
-            Case T265Camera
+            Case VB_Classes.ActiveTask.algorithmParameters.T265Camera
                 label1 = "Raw Left View Image"
                 label2 = "Raw Right Right Image"
                 sliders.trackbar(0).Value = 50

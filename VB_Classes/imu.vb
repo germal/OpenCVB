@@ -23,7 +23,7 @@ Public Class IMU_Basics
             Else
                 gyroAngle = ocvb.parms.IMU_AngularVelocity
                 Dim dt_gyro = (ocvb.parms.IMU_TimeStamp - lastTimeStamp) / 1000
-                If ocvb.parms.cameraIndex <> D435i Then dt_gyro /= 1000 ' different units in the timestamp?
+                If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algorithmParameters.D435i Then dt_gyro /= 1000 ' different units in the timestamp?
                 lastTimeStamp = ocvb.parms.IMU_TimeStamp
                 gyroAngle = gyroAngle * dt_gyro
                 theta += New cv.Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X)

@@ -7,18 +7,8 @@ Module Algorithm_Module
     Public Const offsetIncr = 25
     Public Const offsetMax = 150
     Public applocation As New cv.Rect
-    Public midFormX As Integer
     Public PipeTaskIndex As Integer
     Public vtkTaskIndex As Integer
-
-    Public Const Kinect4AzureCam As Int32 = 0 ' Must be defined in OptionDialog.vb the same way!
-    Public Const T265Camera As Int32 = 1 ' Must be defined in OptionDialog.vb the same way!
-    Public Const StereoLabsZED2 As Int32 = 2 ' Must be defined in OptionDialog.vb the same way!
-    Public Const MyntD1000 As Int32 = 3 ' Must be defined in OptionDialog.vb the same way!
-    Public Const D435i As Int32 = 4 ' Must be defined in OptionDialog.vb the same way!
-    Public Const L515 As Int32 = 5 ' Must be defined in OptionDialog.vb the same way!
-    Public Const D455 As Int32 = 6 ' Must be defined in OptionDialog.vb the same way!
-
     Public term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public recordedData As Replay_Play
     <System.Runtime.CompilerServices.Extension()>
@@ -34,7 +24,7 @@ Module Algorithm_Module
     End Sub
 End Module
 
-Public Class ActiveClass : Implements IDisposable
+Public Class ActiveTask : Implements IDisposable
     Public ocvb As AlgorithmData
     Dim algoList As New algorithmList
     Dim ActiveAlgorithm As Object
@@ -52,7 +42,7 @@ Public Class ActiveClass : Implements IDisposable
     End Structure
     Public Structure algorithmParameters
         Dim activeAlgorithm As Object
-        Dim cameraIndex As Integer
+        Public cameraIndex As Integer
         Dim cameraName As String
         Dim externalPythonInvocation As Boolean
         Dim extrinsics As Extrinsics_VB
@@ -96,6 +86,14 @@ Public Class ActiveClass : Implements IDisposable
         Dim openFileSliderPercent As Single
         Dim fileStarted As Boolean
         Dim initialStartSetting As Boolean
+
+        Public Const Kinect4AzureCam As Int32 = 0 ' Must be defined in OptionDialog.vb the same way!
+        Public Const T265Camera As Int32 = 1 ' Must be defined in OptionDialog.vb the same way!
+        Public Const StereoLabsZED2 As Int32 = 2 ' Must be defined in OptionDialog.vb the same way!
+        Public Const MyntD1000 As Int32 = 3 ' Must be defined in OptionDialog.vb the same way!
+        Public Const D435i As Int32 = 4 ' Must be defined in OptionDialog.vb the same way!
+        Public Const L515 As Int32 = 5 ' Must be defined in OptionDialog.vb the same way!
+        Public Const D455 As Int32 = 6 ' Must be defined in OptionDialog.vb the same way!
     End Structure
     Public Sub New(parms As algorithmParameters, location As cv.Rect)
         Randomize() ' just in case anyone uses VB.Net's Rnd
@@ -118,7 +116,6 @@ Public Class ActiveClass : Implements IDisposable
     End Sub
     Public Sub UpdateHostLocation(location As cv.Rect)
         applocation = location
-        midFormX = location.Left + location.Width / 2 + 40
     End Sub
     Public Sub RunAlgorithm()
         Try

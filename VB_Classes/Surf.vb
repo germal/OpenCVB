@@ -24,7 +24,7 @@ Public Class Surf_Basics_CS
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.cameraIndex = T265Camera Then
+        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.T265Camera Then
             fisheye.Run(ocvb)
             srcLeft = fisheye.leftView
             srcRight = fisheye.rightView
@@ -61,7 +61,7 @@ Public Class Surf_Basics
         ocvb.desc = "Use left and right views to match points in horizontal slices."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.cameraIndex = T265Camera Then fisheye.Run(ocvb)
+        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.T265Camera Then fisheye.Run(ocvb)
 
         surf.src = src
         surf.Run(ocvb)

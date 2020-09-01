@@ -6,7 +6,7 @@ Public Class TransformationMatrix_Basics
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "TMatrix Top View multiplier", 1, 1000, 500)
-        If ocvb.parms.cameraIndex = StereoLabsZED2 Then sliders.trackbar(0).Value = 1 ' need a smaller multiplier...
+        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.StereoLabsZED2 Then sliders.trackbar(0).Value = 1 ' need a smaller multiplier...
 
         label1 = "View from above the camera"
         label2 = "View from side of the camera"

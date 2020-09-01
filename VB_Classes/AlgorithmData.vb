@@ -17,7 +17,7 @@ Public Class AlgorithmData
     Public label1 As String
     Public label2 As String
     Public quadrantIndex As Integer = 0
-    Public parms As ActiveClass.algorithmParameters
+    Public parms As ActiveTask.algorithmParameters
 
     Public mouseClickFlag As Boolean
     Public mouseClickPoint As cv.Point
@@ -35,7 +35,7 @@ Public Class AlgorithmData
 
     Public slidersOffset As New cv.Point(0, 5)
     Public radioOffset As New cv.Point(0, 5)
-    Public Sub New(parms As ActiveClass.algorithmParameters, location As cv.Rect)
+    Public Sub New(parms As ActiveTask.algorithmParameters, location As cv.Rect)
         color = New cv.Mat(parms.resolution.Height, parms.resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(parms.resolution.Height, parms.resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         result = New cv.Mat(parms.resolution.Height, parms.resolution.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))

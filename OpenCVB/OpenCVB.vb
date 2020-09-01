@@ -155,7 +155,7 @@ Public Class OpenCVB
         optionsForm.cameraDeviceCount(OptionsDialog.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
         optionsForm.cameraDeviceCount(OptionsDialog.L515) = USBenumeration("Intel(R) RealSense(TM) 515 RGB")
         optionsForm.cameraDeviceCount(OptionsDialog.D455) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
-        optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
         optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = USBenumeration("T265")
         If optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = 0 Then optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) = USBenumeration("Movidius MA2X5X")
 
@@ -188,7 +188,9 @@ Public Class OpenCVB
 
         ' if the default camera is not present, try to find another.
         If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
-            If optionsForm.cameraDeviceCount(OptionsDialog.Kinect4AzureCam) Then optionsForm.cameraIndex = OptionsDialog.Kinect4AzureCam
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.Kinect4AzureCam) Then
+                optionsForm.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.Kinect4AzureCam
+            End If
             If optionsForm.cameraDeviceCount(OptionsDialog.T265Camera) Then optionsForm.cameraIndex = OptionsDialog.T265Camera
             If optionsForm.cameraDeviceCount(OptionsDialog.StereoLabsZED2) Then optionsForm.cameraIndex = OptionsDialog.StereoLabsZED2
             If optionsForm.cameraDeviceCount(OptionsDialog.MyntD1000) Then optionsForm.cameraIndex = OptionsDialog.MyntD1000
@@ -980,13 +982,13 @@ Public Class OpenCVB
         openForm.fileStarted = False
         openformLocated = False
 
-        Dim parms As New VB_Classes.ActiveClass.algorithmParameters
+        Dim parms As New VB_Classes.ActiveTask.algorithmParameters
         ReDim parms.IMU_RotationMatrix(9 - 1)
 
         saveAlgorithmName = AvailableAlgorithms.Text ' to share with the camera task...
         parms.activeAlgorithm = AvailableAlgorithms.Text
         ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
-        If parms.activeAlgorithm.Contains("OpenGL") Or parms.activeAlgorithm.Contains("OpenCVGL") Then OptionsDialog.HighResolution.checked = True
+        If parms.activeAlgorithm.Contains("OpenGL") Or parms.activeAlgorithm.Contains("OpenCVGL") Then OptionsDialog.HighResolution.Checked = True
 
         parms.resolution = resolutionXY
         parms.cameraIndex = optionsForm.cameraIndex ' index of active camera
@@ -1031,14 +1033,14 @@ Public Class OpenCVB
         ActivateTimer.Enabled = True
         fpsTimer.Enabled = True
     End Sub
-    Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveClass.algorithmParameters)
+    Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algorithmParameters)
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
             AlgorithmTestCount += 1
             drawRect = New cv.Rect
             Dim saveResolution = parms.resolution
 
             Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
-            Dim task = New VB_Classes.ActiveClass(parms, myLocation)
+            Dim task = New VB_Classes.ActiveTask(parms, myLocation)
             textDesc = task.ocvb.desc
             openFileInitialDirectory = task.ocvb.parms.openFileInitialDirectory
             openFileDialogRequested = task.ocvb.parms.openFileDialogRequested
@@ -1095,7 +1097,7 @@ Public Class OpenCVB
             End If
         End SyncLock
     End Sub
-    Private Sub Run(task As VB_Classes.ActiveClass)
+    Private Sub Run(task As VB_Classes.ActiveTask)
         While 1
             While 1
                 If task.ocvb.parms.activeAlgorithm <> saveAlgorithmName Then Exit Sub ' pause will stop the current algorithm as well.

@@ -32,10 +32,10 @@ Public Class Camera
 
     Public deviceCount As Int32
     Public deviceName As String = ""
-    Public Extrinsics_VB As VB_Classes.ActiveClass.Extrinsics_VB
+    Public Extrinsics_VB As VB_Classes.ActiveTask.Extrinsics_VB
     Public IMU_Present As Boolean
-    Public intrinsicsLeft_VB As VB_Classes.ActiveClass.intrinsics_VB
-    Public intrinsicsRight_VB As VB_Classes.ActiveClass.intrinsics_VB
+    Public intrinsicsLeft_VB As VB_Classes.ActiveTask.intrinsics_VB
+    Public intrinsicsRight_VB As VB_Classes.ActiveTask.intrinsics_VB
     Public colorBytes() As Byte
     Public vertices() As Byte
     Public depthBytes() As Byte
@@ -77,8 +77,8 @@ Public Class Camera
         Public trackerConfidence As Int32
         Public mapperConfidence As Int32
     End Structure
-    Public Function setintrinsics(intrinsicsHW As rs.Intrinsics) As VB_Classes.ActiveClass.intrinsics_VB
-        Dim intrinsics As New VB_Classes.ActiveClass.intrinsics_VB
+    Public Function setintrinsics(intrinsicsHW As rs.Intrinsics) As VB_Classes.ActiveTask.intrinsics_VB
+        Dim intrinsics As New VB_Classes.ActiveTask.intrinsics_VB
         intrinsics.ppx = intrinsicsHW.ppx
         intrinsics.ppy = intrinsicsHW.ppy
         intrinsics.fx = intrinsicsHW.fx

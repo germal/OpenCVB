@@ -66,7 +66,7 @@ Public Class ocvbClass : Implements IDisposable
                 If partLine.StartsWith("algorithmList.createAlgorithm") Then Exit For
                 Dim split() = partLine.Split("\")
                 partLine = Mid(partLine, 1, InStr(partLine, ".") - 1)
-                If Not (partLine.StartsWith("ocvbClass") Or partLine.StartsWith("ActiveClass")) Then
+                If Not (partLine.StartsWith("ocvbClass") Or partLine.StartsWith("ActiveTask")) Then
                     callStack = partLine + " " + callStack
                 End If
             End If
