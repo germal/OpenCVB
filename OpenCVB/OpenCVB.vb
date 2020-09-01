@@ -85,7 +85,7 @@ Public Class OpenCVB
     Private Delegate Sub delegateEvent()
     Dim logAlgorithms As StreamWriter
     Dim logActive As Boolean = False ' turn this on/off to collect data on algorithms and memory use.
-    Dim callTrace As New List(Of String)
+    Public callTrace As New List(Of String)
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -149,7 +149,6 @@ Public Class OpenCVB
 
         openForm = New OpenFilename
 
-        TreeViewDialog = New TreeviewForm
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
@@ -780,6 +779,7 @@ Public Class OpenCVB
             If logActive Then logAlgorithms = New StreamWriter("C:\Temp\logAlgorithms.csv")
             TestAllTimer_Tick(sender, e)
             TestAllTimer.Enabled = True
+            If TreeViewDialog IsNot Nothing Then TreeViewDialog.Timer1.Enabled = True
         Else
             TestAllTimer.Enabled = False
             TestAllButton.Text = "Test All"
@@ -1241,61 +1241,11 @@ Public Class OpenCVB
             frameCount += 1
         End While
     End Sub
-    Private Function FindRecursive(ByVal tNode As TreeNode, name As String) As TreeNode
-        Dim tn As TreeNode
-        For Each tn In tNode.Nodes
-            If tn.Text = name Then Return tn
-            Dim rnode = FindRecursive(tn, name)
-            If rnode IsNot Nothing Then Return rnode
-        Next
-        Return Nothing
-    End Function
-    Private Function getNode(tv As TreeView, name As String) As TreeNode
-        For Each n In tv.Nodes
-            If n.text = name Then Return n
-            Dim rnode = FindRecursive(n, name)
-            If rnode IsNot Nothing Then Return rnode
-        Next
-        Return Nothing
-    End Function
-    Private Function modifyCallTrace(calls As List(Of String), name As String) As List(Of String)
-        Dim result As New List(Of String)
-        For i = 0 To calls.Count - 1
-            If calls(i).StartsWith(name) Then result.Add(Trim(Mid(name, Len(name) + 1)))
-        Next
-        Return result
-    End Function
     Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
-        Dim tv = TreeViewDialog.TreeView1
-        tv.Nodes.Clear()
-        Dim rootcall = Trim(callTrace(0))
-        TreeViewDialog.Text = rootcall + " - Click on any node to review the algorithm's input and output."
-        tv.Nodes.Add(rootcall)
-
-        For nodeLevel = 0 To 100 ' this loop will terminate after the depth of the nesting.  100 is excessive insurance deep nesting may occur.
-            Dim alldone = True
-            For i = 1 To callTrace.Count - 1
-                Dim split() = callTrace(i).Split
-                If split.Count = nodeLevel + 3 Then
-                    alldone = False
-                    Dim node = getNode(tv, split(nodeLevel))
-                    If node Is Nothing Then
-                        If nodeLevel = 0 Then
-                            tv.Nodes(nodeLevel).Nodes.Add(split(nodeLevel))
-                        Else
-                            node = getNode(tv, split(nodeLevel - 1))
-                            node.Nodes.Add(split(nodeLevel))
-                        End If
-                    Else
-                        node.Nodes.Add(split(nodeLevel + 1))
-                    End If
-                End If
-            Next
-            If alldone Then Exit For ' we didn't find any more nodes to add.
-        Next
-        tv.ExpandAll()
-        TreeViewDialog.ShowDialog()
-        AvailableAlgorithms.Text = rootcall
+        TreeViewDialog = New TreeviewForm
+        TreeViewDialog.updateTree()
+        TreeViewDialog.Show()
+        TreeViewDialog.TreeviewForm_Resize(sender, e)
     End Sub
 End Class
 

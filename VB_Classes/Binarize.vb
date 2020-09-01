@@ -30,7 +30,6 @@ Public Class Binarize_Basics
             blur.src = src
             blur.Run(ocvb)
             histInput = blur.dst1
-            cv.Cv2.ImShow("Blur", blur.dst1)
         End If
         cv.Cv2.CalcHist(New cv.Mat() {histInput}, New Integer() {0}, New cv.Mat(), histogram, 1, dimensions, ranges)
         dst1 = histInput.Threshold(meanScalar(0), 255, thresholdType).CvtColor(cv.ColorConversionCodes.GRAY2BGR)

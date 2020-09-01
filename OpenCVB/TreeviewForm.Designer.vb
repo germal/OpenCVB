@@ -22,10 +22,13 @@ Partial Class TreeviewForm
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.OK_Button = New System.Windows.Forms.Button()
         Me.Cancel_Button = New System.Windows.Forms.Button()
         Me.TreeView1 = New System.Windows.Forms.TreeView()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.TableLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -37,7 +40,7 @@ Partial Class TreeviewForm
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.Cancel_Button, 1, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(1064, 815)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(707, 334)
         Me.TableLayoutPanel1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
@@ -71,8 +74,21 @@ Partial Class TreeviewForm
         Me.TreeView1.Dock = System.Windows.Forms.DockStyle.Top
         Me.TreeView1.Location = New System.Drawing.Point(0, 0)
         Me.TreeView1.Name = "TreeView1"
-        Me.TreeView1.Size = New System.Drawing.Size(1300, 791)
+        Me.TreeView1.Size = New System.Drawing.Size(943, 322)
         Me.TreeView1.TabIndex = 1
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(21, 353)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(199, 20)
+        Me.Label1.TabIndex = 2
+        Me.Label1.Text = "Click any tree entry to run it"
+        '
+        'Timer1
+        '
+        Me.Timer1.Enabled = True
         '
         'TreeviewForm
         '
@@ -80,23 +96,24 @@ Partial Class TreeviewForm
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.Cancel_Button
-        Me.ClientSize = New System.Drawing.Size(1300, 878)
+        Me.ClientSize = New System.Drawing.Size(943, 397)
+        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.TreeView1)
         Me.Controls.Add(Me.TableLayoutPanel1)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.MaximizeBox = False
-        Me.MinimizeBox = False
         Me.Name = "TreeviewForm"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "TreeviewForm"
         Me.TableLayoutPanel1.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
     Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
     Friend WithEvents OK_Button As System.Windows.Forms.Button
     Friend WithEvents Cancel_Button As System.Windows.Forms.Button
     Friend WithEvents TreeView1 As TreeView
+    Friend WithEvents Label1 As Label
+    Friend WithEvents Timer1 As Timer
 End Class
