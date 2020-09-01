@@ -1037,17 +1037,17 @@ Public Class OpenCVB
             drawRect = New cv.Rect
             Dim saveLowResSetting As Boolean = parms.resolution
 
-            Dim OpenCVB = New VB_Classes.ActiveClass(parms, camWidth / parms.speedFactor, camHeight / parms.speedFactor, New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
-            textDesc = OpenCVB.ocvb.desc
-            openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
-            openFileDialogRequested = OpenCVB.ocvb.parms.openFileDialogRequested
-            openFileinitialStartSetting = OpenCVB.ocvb.parms.initialStartSetting
-            OpenCVB.ocvb.parms.fileStarted = OpenCVB.ocvb.parms.initialStartSetting
-            openFileStarted = OpenCVB.ocvb.parms.initialStartSetting
-            openFileFilterIndex = OpenCVB.ocvb.parms.openFileFilterIndex
-            openFileFilter = OpenCVB.ocvb.parms.openFileFilter
-            openFileDialogName = OpenCVB.ocvb.parms.openFileDialogName
-            openfileDialogTitle = OpenCVB.ocvb.parms.openFileDialogTitle
+            Dim task = New VB_Classes.ActiveClass(parms, camWidth / parms.speedFactor, camHeight / parms.speedFactor, New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
+            textDesc = task.ocvb.desc
+            openFileInitialDirectory = task.ocvb.parms.openFileInitialDirectory
+            openFileDialogRequested = task.ocvb.parms.openFileDialogRequested
+            openFileinitialStartSetting = task.ocvb.parms.initialStartSetting
+            task.ocvb.parms.fileStarted = task.ocvb.parms.initialStartSetting
+            openFileStarted = task.ocvb.parms.initialStartSetting
+            openFileFilterIndex = task.ocvb.parms.openFileFilterIndex
+            openFileFilter = task.ocvb.parms.openFileFilter
+            openFileDialogName = task.ocvb.parms.openFileDialogName
+            openfileDialogTitle = task.ocvb.parms.openFileDialogTitle
 
             Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
             Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + parms.activeAlgorithm + vbCrLf + vbCrLf)
@@ -1055,14 +1055,14 @@ Public Class OpenCVB
             If logActive And TestAllTimer.Enabled Then logAlgorithms.WriteLine(parms.activeAlgorithm + "," + CStr(totalBytesOfMemoryUsed))
 
             ' Here we check to see if the algorithm constructor changed mediumResolution.
-            If OpenCVB.ocvb.parms.resolution <> saveLowResSetting Then
-                If OpenCVB.ocvb.parms.resolution = OptionsDialog.resMed Then OpenCVB.ocvb.parms.speedFactor = 2 Else OpenCVB.ocvb.parms.speedFactor = 1
+            If task.ocvb.parms.resolution <> saveLowResSetting Then
+                If task.ocvb.parms.resolution = OptionsDialog.resMed Then task.ocvb.parms.speedFactor = 2 Else task.ocvb.parms.speedFactor = 1
             End If
 
             ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
-            If OpenCVB.ocvb.drawRect <> New cv.Rect(0, 0, 0, 0) Then
-                drawRect = OpenCVB.ocvb.drawRect
-                Dim ratio = OpenCVB.ocvb.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
+            If task.ocvb.drawRect <> New cv.Rect(0, 0, 0, 0) Then
+                drawRect = task.ocvb.drawRect
+                Dim ratio = task.ocvb.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
                 drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
             End If
 
@@ -1070,12 +1070,12 @@ Public Class OpenCVB
 
             BothFirstAndLastReady = False
             frameCount = 0 ' restart the count...
-            If OpenCVB.ocvb.parms.NumPyEnabled Then
+            If task.ocvb.parms.NumPyEnabled Then
                 Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ and https://github.com/SciSharp/Numpy.NET (see multi-threading (Must read!))
-                    Run(OpenCVB)
+                    Run(task)
                 End Using
             Else
-                Run(OpenCVB)
+                Run(task)
             End If
 
             ' remove all options forms.  They can only be made topmost (see OptionsBringToFront above) when created on the same thread.
@@ -1092,17 +1092,17 @@ Public Class OpenCVB
                 Console.WriteLine("Error removing an Options form: " + ex.Message)
             End Try
 
-            OpenCVB.Dispose()
+            task.Dispose()
             frameCount = 0
             If parms.testAllRunning Then
                 Console.WriteLine(vbTab + "Ending " + parms.activeAlgorithm)
             End If
         End SyncLock
     End Sub
-    Private Sub Run(OpenCVB As VB_Classes.ActiveClass)
+    Private Sub Run(task As VB_Classes.ActiveClass)
         While 1
             While 1
-                If OpenCVB.ocvb.parms.activeAlgorithm <> saveAlgorithmName Then Exit Sub ' pause will stop the current algorithm as well.
+                If task.ocvb.parms.activeAlgorithm <> saveAlgorithmName Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 If camera.newImagesAvailable And pauseAlgorithmThread = False Then Exit While
             End While
@@ -1113,102 +1113,102 @@ Public Class OpenCVB
                 camera.newImagesAvailable = False
 
                 If mediumResolution Then
-                    OpenCVB.ocvb.color = camera.color.Resize(fastSize)
-                    OpenCVB.ocvb.RGBDepth = camera.RGBDepth.Resize(fastSize)
-                    OpenCVB.ocvb.leftView = camera.leftView.Resize(fastSize)
-                    OpenCVB.ocvb.rightView = camera.rightView.Resize(fastSize)
+                    task.ocvb.color = camera.color.Resize(fastSize)
+                    task.ocvb.RGBDepth = camera.RGBDepth.Resize(fastSize)
+                    task.ocvb.leftView = camera.leftView.Resize(fastSize)
+                    task.ocvb.rightView = camera.rightView.Resize(fastSize)
                 Else
-                    OpenCVB.ocvb.color = camera.color
-                    OpenCVB.ocvb.RGBDepth = camera.RGBDepth
-                    OpenCVB.ocvb.leftView = camera.leftView
-                    OpenCVB.ocvb.rightView = camera.rightView
+                    task.ocvb.color = camera.color
+                    task.ocvb.RGBDepth = camera.RGBDepth
+                    task.ocvb.leftView = camera.leftView
+                    task.ocvb.rightView = camera.rightView
                 End If
-                OpenCVB.ocvb.pointCloud = camera.PointCloud
-                OpenCVB.ocvb.depth16 = camera.depth16
-                OpenCVB.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
-                OpenCVB.ocvb.parms.transformationMatrix = camera.transformationMatrix
-                OpenCVB.ocvb.parms.IMU_TimeStamp = camera.IMU_TimeStamp
-                OpenCVB.ocvb.parms.IMU_Barometer = camera.IMU_Barometer
-                OpenCVB.ocvb.parms.IMU_Magnetometer = camera.IMU_Magnetometer
-                OpenCVB.ocvb.parms.IMU_Temperature = camera.IMU_Temperature
-                OpenCVB.ocvb.parms.IMU_Rotation = camera.IMU_Rotation
-                OpenCVB.ocvb.parms.IMU_RotationMatrix = camera.IMU_RotationMatrix
-                OpenCVB.ocvb.parms.IMU_RotationVector = camera.IMU_RotationVector
-                OpenCVB.ocvb.parms.IMU_Translation = camera.IMU_Translation
-                OpenCVB.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
-                OpenCVB.ocvb.parms.IMU_Velocity = camera.IMU_Velocity
-                OpenCVB.ocvb.parms.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
-                OpenCVB.ocvb.parms.IMU_AngularVelocity = camera.IMU_AngularVelocity
-                OpenCVB.ocvb.parms.IMU_FrameTime = camera.IMU_FrameTime
-                OpenCVB.ocvb.parms.CPU_TimeStamp = camera.CPU_TimeStamp
-                OpenCVB.ocvb.parms.CPU_FrameTime = camera.CPU_FrameTime
+                task.ocvb.pointCloud = camera.PointCloud
+                task.ocvb.depth16 = camera.depth16
+                task.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
+                task.ocvb.parms.transformationMatrix = camera.transformationMatrix
+                task.ocvb.parms.IMU_TimeStamp = camera.IMU_TimeStamp
+                task.ocvb.parms.IMU_Barometer = camera.IMU_Barometer
+                task.ocvb.parms.IMU_Magnetometer = camera.IMU_Magnetometer
+                task.ocvb.parms.IMU_Temperature = camera.IMU_Temperature
+                task.ocvb.parms.IMU_Rotation = camera.IMU_Rotation
+                task.ocvb.parms.IMU_RotationMatrix = camera.IMU_RotationMatrix
+                task.ocvb.parms.IMU_RotationVector = camera.IMU_RotationVector
+                task.ocvb.parms.IMU_Translation = camera.IMU_Translation
+                task.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
+                task.ocvb.parms.IMU_Velocity = camera.IMU_Velocity
+                task.ocvb.parms.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
+                task.ocvb.parms.IMU_AngularVelocity = camera.IMU_AngularVelocity
+                task.ocvb.parms.IMU_FrameTime = camera.IMU_FrameTime
+                task.ocvb.parms.CPU_TimeStamp = camera.CPU_TimeStamp
+                task.ocvb.parms.CPU_FrameTime = camera.CPU_FrameTime
             End SyncLock
 
-            OpenCVB.UpdateHostLocation(New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
+            task.UpdateHostLocation(New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
 
             Try
-                Dim ratio = OpenCVB.ocvb.color.Width / camPic(0).Width  ' relative size of displayed image and algorithm size image.
+                Dim ratio = task.ocvb.color.Width / camPic(0).Width  ' relative size of displayed image and algorithm size image.
                 If GrabRectangleData Then
                     GrabRectangleData = False
-                    OpenCVB.ocvb.drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-                    If OpenCVB.ocvb.drawRect.Width <= 2 Then OpenCVB.ocvb.drawRect.Width = 0 ' too small?
-                    Dim w = OpenCVB.ocvb.color.Width
-                    If OpenCVB.ocvb.drawRect.X > w Then OpenCVB.ocvb.drawRect.X -= w
-                    If OpenCVB.ocvb.drawRect.X < w And OpenCVB.ocvb.drawRect.X + OpenCVB.ocvb.drawRect.Width > w Then
-                        OpenCVB.ocvb.drawRect.Width = w - OpenCVB.ocvb.drawRect.X
+                    task.ocvb.drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                    If task.ocvb.drawRect.Width <= 2 Then task.ocvb.drawRect.Width = 0 ' too small?
+                    Dim w = task.ocvb.color.Width
+                    If task.ocvb.drawRect.X > w Then task.ocvb.drawRect.X -= w
+                    If task.ocvb.drawRect.X < w And task.ocvb.drawRect.X + task.ocvb.drawRect.Width > w Then
+                        task.ocvb.drawRect.Width = w - task.ocvb.drawRect.X
                     End If
                     BothFirstAndLastReady = False
                 End If
 
-                OpenCVB.ocvb.mousePoint = mousePoint
-                OpenCVB.ocvb.mousePicTag = mousePicTag
-                OpenCVB.ocvb.mouseClickFlag = mouseClickFlag
-                If mouseClickFlag Then OpenCVB.ocvb.mouseClickPoint = mousePoint
+                task.ocvb.mousePoint = mousePoint
+                task.ocvb.mousePicTag = mousePicTag
+                task.ocvb.mouseClickFlag = mouseClickFlag
+                If mouseClickFlag Then task.ocvb.mouseClickPoint = mousePoint
                 mouseClickFlag = False
 
-                OpenCVB.ocvb.parms.fileStarted = openFileStarted ' UI may have stopped play.
+                task.ocvb.parms.fileStarted = openFileStarted ' UI may have stopped play.
 
-                OpenCVB.RunAlgorithm()
+                task.RunAlgorithm()
 
-                If OpenCVB.ocvb.drawRectClear Then
+                If task.ocvb.drawRectClear Then
                     drawRect = New cv.Rect
-                    OpenCVB.ocvb.drawRect = drawRect
-                    OpenCVB.ocvb.drawRectClear = False
+                    task.ocvb.drawRect = drawRect
+                    task.ocvb.drawRectClear = False
                 End If
 
                 If openFileDialogName <> "" Then
-                    If openFileDialogName <> OpenCVB.ocvb.parms.openFileDialogName Or openFileStarted <> OpenCVB.ocvb.parms.fileStarted Then
-                        OpenCVB.ocvb.parms.fileStarted = openFileStarted
-                        OpenCVB.ocvb.parms.openFileDialogName = openFileDialogName
+                    If openFileDialogName <> task.ocvb.parms.openFileDialogName Or openFileStarted <> task.ocvb.parms.fileStarted Then
+                        task.ocvb.parms.fileStarted = openFileStarted
+                        task.ocvb.parms.openFileDialogName = openFileDialogName
                     End If
-                    openfileSliderPercent = OpenCVB.ocvb.parms.openFileSliderPercent
+                    openfileSliderPercent = task.ocvb.parms.openFileSliderPercent
                 End If
 
-                Static inputFile As String = OpenCVB.ocvb.parms.openFileDialogName
-                If inputFile <> OpenCVB.ocvb.parms.openFileDialogName Then
-                    inputFile = OpenCVB.ocvb.parms.openFileDialogName
-                    openFileInitialDirectory = OpenCVB.ocvb.parms.openFileInitialDirectory
-                    openFileDialogRequested = OpenCVB.ocvb.parms.openFileDialogRequested
+                Static inputFile As String = task.ocvb.parms.openFileDialogName
+                If inputFile <> task.ocvb.parms.openFileDialogName Then
+                    inputFile = task.ocvb.parms.openFileDialogName
+                    openFileInitialDirectory = task.ocvb.parms.openFileInitialDirectory
+                    openFileDialogRequested = task.ocvb.parms.openFileDialogRequested
                     openFileinitialStartSetting = True ' if the file playing changes while the algorithm is running, automatically start playing the new file.
-                    openFileFilterIndex = OpenCVB.ocvb.parms.openFileFilterIndex
-                    openFileFilter = OpenCVB.ocvb.parms.openFileFilter
-                    openFileDialogName = OpenCVB.ocvb.parms.openFileDialogName
-                    openfileDialogTitle = OpenCVB.ocvb.parms.openFileDialogTitle
+                    openFileFilterIndex = task.ocvb.parms.openFileFilterIndex
+                    openFileFilter = task.ocvb.parms.openFileFilter
+                    openFileDialogName = task.ocvb.parms.openFileDialogName
+                    openfileDialogTitle = task.ocvb.parms.openFileDialogTitle
                 End If
 
-                picLabels(2) = OpenCVB.ocvb.label1
-                picLabels(3) = OpenCVB.ocvb.label2
+                picLabels(2) = task.ocvb.label1
+                picLabels(3) = task.ocvb.label2
 
                 ' share the results of the algorithm task.
                 SyncLock TTtextData
                     algorithmRefresh = True
-                    imgResult = OpenCVB.ocvb.result.Clone()
+                    imgResult = task.ocvb.result.Clone()
                     TTtextData.Clear()
-                    If OpenCVB.ocvb.TTtextData.Count Then
-                        For i = 0 To OpenCVB.ocvb.TTtextData.Count - 1
-                            TTtextData.Add(OpenCVB.ocvb.TTtextData(i)) ' pull over any truetype text data so paint can access it.
+                    If task.ocvb.TTtextData.Count Then
+                        For i = 0 To task.ocvb.TTtextData.Count - 1
+                            TTtextData.Add(task.ocvb.TTtextData(i)) ' pull over any truetype text data so paint can access it.
                         Next
-                        OpenCVB.ocvb.TTtextData.Clear()
+                        task.ocvb.TTtextData.Clear()
                     End If
                 End SyncLock
                 If OptionsBringToFront And TestAllTimer.Enabled = False Then
@@ -1234,8 +1234,8 @@ Public Class OpenCVB
             If frameCount Mod 100 = 0 Then
                 ' this allows for dynamic allocation of new algorithms.
                 callTrace.Clear()
-                For i = 0 To OpenCVB.ocvb.callTrace.Count - 1
-                    callTrace.Add(OpenCVB.ocvb.callTrace(i))
+                For i = 0 To task.ocvb.callTrace.Count - 1
+                    callTrace.Add(task.ocvb.callTrace(i))
                 Next
             End If
             frameCount += 1

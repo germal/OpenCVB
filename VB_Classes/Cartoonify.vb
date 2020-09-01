@@ -11,7 +11,7 @@ Public Class CartoonifyImage_Basics
         sliders.setupTrackBar(3, "Cartoon Laplacian kernel", 1, 21, 5)
         label1 = "Mask for Cartoon"
         label2 = "Cartoonify Result"
-        setDescription(ocvb, "Create a cartoon from a color image - Painterly Effect")
+        ocvb.desc = "Create a cartoon from a color image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim medianBlur = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value + 1)

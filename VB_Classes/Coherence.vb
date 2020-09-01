@@ -10,7 +10,7 @@ Public Class Coherence_Basics
         sliders.setupTrackBar(2, "Coherence str_sigma", 1, 15, 15)
         sliders.setupTrackBar(3, "Coherence eigen kernel", 1, 31, 1)
         label1 = "Coherence - draw rectangle to apply"
-        setDescription(ocvb, "Find lines that are artistically coherent in the image - Painterly")
+        ocvb.desc = "Find lines that are artistically coherent in the image - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim sigma = sliders.trackbar(0).Value * 2 + 1
@@ -77,7 +77,7 @@ Public Class Coherence_Depth
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         coherent = New Coherence_Basics(ocvb)
-        setDescription(ocvb, "Find coherent lines in the depth image - Painterly")
+        ocvb.desc = "Find coherent lines in the depth image - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         coherent.src = ocvb.RGBDepth

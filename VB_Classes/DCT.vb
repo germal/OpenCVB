@@ -12,7 +12,7 @@ Public Class DCT_Basics
         radio.check(2).Text = "DCT Flags Inverse"
         radio.check(0).Checked = True
 
-        setDescription(ocvb, "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies.")
+        ocvb.desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
         label2 = "Difference from original"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -53,7 +53,7 @@ Public Class DCT_RGB
 
         label1 = "Reconstituted RGB image"
         label2 = "Difference from original"
-        setDescription(ocvb, "Apply OpenCV's Discrete Cosine Transform to an RGB image and use slider to remove the highest frequencies.")
+        ocvb.desc = "Apply OpenCV's Discrete Cosine Transform to an RGB image and use slider to remove the highest frequencies."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim srcPlanes() As cv.Mat = Nothing
@@ -98,7 +98,7 @@ Public Class DCT_Depth
         dct = New DCT_Basics(ocvb)
         dct.sliders.trackbar(0).Value = 1
         label2 = "Subtract DCT inverse from Grayscale depth"
-        setDescription(ocvb, "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera.")
+        ocvb.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -130,7 +130,7 @@ Public Class DCT_FeatureLess_MT
 
         dct = New DCT_Basics(ocvb)
         dct.sliders.trackbar(0).Value = 1
-        setDescription(ocvb, "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image.")
+        ocvb.desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
         label2 = "FeatureLess RGB regions"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -194,7 +194,7 @@ Public Class DCT_Surfaces_debug
 
         label1 = "Largest flat surface segment stats"
         label2 = "Lower right image identifies potential flat surface"
-        setDescription(ocvb, "Find plane equation for a featureless surface - debugging one region for now.")
+        ocvb.desc = "Find plane equation for a featureless surface - debugging one region for now."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
@@ -269,7 +269,7 @@ Public Class DCT_CComponents
 
         label1 = "DCT masks colorized with average depth."
         label2 = "DCT mask"
-        setDescription(ocvb, "Find surfaces that lack texture with DCT (Discrete Cosine Transform) and use connected components to isolate those surfaces.")
+        ocvb.desc = "Find surfaces that lack texture with DCT (Discrete Cosine Transform) and use connected components to isolate those surfaces."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dct.src = src

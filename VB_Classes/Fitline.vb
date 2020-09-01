@@ -13,7 +13,7 @@ Public Class Fitline_Basics
         sliders.setupTrackBar(0, "Accuracy for the radius X100", 0, 100, 10)
         sliders.setupTrackBar(1, "Accuracy for the angle X100", 0, 100, 10)
 
-        setDescription(ocvb, "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found.")
+        ocvb.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
@@ -55,7 +55,7 @@ Public Class Fitline_3DBasics_MT
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         hlines = New Hough_Lines_MT(ocvb)
-        setDescription(ocvb, "Use visual lines to find 3D lines.")
+        ocvb.desc = "Use visual lines to find 3D lines."
         label2 = "White is featureless RGB, blue depth shadow"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -127,7 +127,7 @@ Public Class Fitline_RawInput
         check.Box(0).Checked = True
         check.Box(1).Checked = True
 
-        setDescription(ocvb, "Generate a noisy line in a field of random data.")
+        ocvb.desc = "Generate a noisy line in a field of random data."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(1).Checked Or ocvb.frameCount = 0 Then
@@ -197,7 +197,7 @@ Public Class Fitline_EigenFit
         noisyLine.sliders.trackbar(1).Value = 400
         label1 = "blue=GT, red=fitline, yellow=EigenFit"
         label2 = "Raw input (use sliders below to explore)"
-        setDescription(ocvb, "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result.")
+        ocvb.desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, 0), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, 0)

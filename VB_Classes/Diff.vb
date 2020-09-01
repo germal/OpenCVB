@@ -8,7 +8,7 @@ Public Class Diff_Basics
         sliders.setupTrackBar(0, "Diff - Color Threshold", 1, 255, 5)
         label1 = "Stable Gray Color"
         label2 = "Unstable Color mask"
-        setDescription(ocvb, "Capture an image and compare it to previous frame using absDiff and threshold")
+        ocvb.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -38,7 +38,7 @@ Public Class Diff_UnstableDepthAndColor
         depth = New Depth_Stable(ocvb)
 
         label1 = "Stable depth and color"
-        setDescription(ocvb, "Build a mask for any pixels that have either unstable depth or color")
+        ocvb.desc = "Build a mask for any pixels that have either unstable depth or color"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         diff.src = src

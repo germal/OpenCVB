@@ -11,7 +11,7 @@ Public Class Object_Basics
 
         label1 = "Connected components for objects in the foreground - tracker algorithm"
         label2 = "Mask for background"
-        setDescription(ocvb, "Identify objects in the foreground.")
+        ocvb.desc = "Identify objects in the foreground."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         trim.src = getDepth32f(ocvb)

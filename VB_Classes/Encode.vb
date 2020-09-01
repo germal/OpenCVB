@@ -7,7 +7,7 @@ Public Class Encode_Basics
         sliders.setupTrackBar(0, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
         sliders.setupTrackBar(1, "Encode Output Scaling", 1, 100, 7)
 
-        setDescription(ocvb, "Error Level Analysis - to verify a jpg image has not been modified.")
+        ocvb.desc = "Error Level Analysis - to verify a jpg image has not been modified."
         label1 = "absDiff with original"
         label2 = "Original decompressed"
     End Sub
@@ -47,7 +47,7 @@ Public Class Encode_Options
         radio.check(5).Text = "WebPQuality"
         radio.check(0).Checked = True
 
-        setDescription(ocvb, "Encode options that affect quality.")
+        ocvb.desc = "Encode options that affect quality."
         label1 = "absDiff with original image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

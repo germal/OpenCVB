@@ -4,7 +4,7 @@ Public Class Solve_ByMat
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        setDescription(ocvb, "Solve a set of equations with OpenCV's Solve API.")
+        ocvb.desc = "Solve a set of equations with OpenCV's Solve API."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ' x + y = 10
@@ -29,7 +29,7 @@ Public Class Solve_ByArray
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        setDescription(ocvb, "Solve a set of equations with OpenCV's Solve API with a normal array as input  ")
+        ocvb.desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ' x + y = 10

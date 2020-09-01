@@ -54,7 +54,7 @@ Public Class GeneticDrawing_Basics
 
         label1 = "(clkwise) original, imgStage, imgGeneration, magnitude"
         label2 = "Current result"
-        setDescription(ocvb, "Create a painting from the current video input using a genetic algorithm. Draw anywhere to focus brushes. Painterly")
+        ocvb.desc = "Create a painting from the current video input using a genetic algorithm. Draw anywhere to focus brushes. Painterly"
     End Sub
     Private Function runDNAseq(dna() As DNAentry) As cv.Mat
         Dim nextImage = imgGeneration.Clone()
@@ -236,7 +236,7 @@ Public Class GeneticDrawing_Color
         gDraw(2) = New GeneticDrawing_Basics(ocvb) ' options for the red channel are visible and will be sync below with the other channels if changed.
 
         label1 = "Intermediate results - original+2 partial+Mag"
-        setDescription(ocvb, "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly")
+        ocvb.desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim split() As cv.Mat
@@ -291,7 +291,7 @@ Public Class GeneticDrawing_Photo
         ocvb.parms.initialStartSetting = True
         ocvb.parms.openFileSliderPercent = -1
 
-        setDescription(ocvb, "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly")
+        ocvb.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If inputFileName <> ocvb.parms.openFileDialogName Or ocvb.frameCount = 0 Then

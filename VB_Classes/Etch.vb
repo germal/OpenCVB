@@ -23,7 +23,7 @@ Public Class Etch_ASketch
 
         cursor = randomCursor(ocvb)
         dst1.SetTo(slateColor)
-        setDescription(ocvb, "Use OpenCV to simulate the Etch-a-Sketch Toy")
+        ocvb.desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         keys.Run(ocvb)

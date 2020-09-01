@@ -91,7 +91,7 @@ Public Class OpticalFlow_DenseOptions
         sliders.setupTrackBar(5, "Optical Flow Scaling Output", 1, 100, 50)
 
         label1 = "No output - just option settings..."
-        setDescription(ocvb, "Use dense optical flow algorithm options")
+        ocvb.desc = "Use dense optical flow algorithm options"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         pyrScale = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum
@@ -124,7 +124,7 @@ Public Class OpticalFlow_DenseBasics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         flow = New OpticalFlow_DenseOptions(ocvb)
-        setDescription(ocvb, "Use dense optical flow algorithm  ")
+        ocvb.desc = "Use dense optical flow algorithm  "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static oldGray As New cv.Mat
@@ -168,7 +168,7 @@ Public Class OpticalFlow_DenseBasics_MT
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 1000)
 
-        setDescription(ocvb, "MultiThread dense optical flow algorithm  ")
+        ocvb.desc = "MultiThread dense optical flow algorithm  "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static oldGray As New cv.Mat
@@ -237,7 +237,7 @@ Public Class OpticalFlow_Sparse
         radio.check(5).Enabled = False
         radio.check(0).Checked = True
 
-        setDescription(ocvb, "Show the optical flow of a sparse matrix.")
+        ocvb.desc = "Show the optical flow of a sparse matrix."
         label1 = ""
         label2 = ""
     End Sub

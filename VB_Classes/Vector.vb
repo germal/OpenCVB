@@ -4,7 +4,7 @@ Public Class Vector_Magnitude
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        setDescription(ocvb, "Compute Euclidian and Manhattan Distance on a single vector.")
+        ocvb.desc = "Compute Euclidian and Manhattan Distance on a single vector."
         label1 = "Vector Magnitude"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

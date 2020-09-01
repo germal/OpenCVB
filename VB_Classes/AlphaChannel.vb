@@ -14,7 +14,7 @@ Public Class AlphaChannel_Basics
         alpha.Show()
         alpha.Size = New System.Drawing.Size(src.Width + 10, src.Height + 10)
 
-        setDescription(ocvb, "Use the the Windows 10 alpha channel to separate foreground and background")
+        ocvb.desc = "Use the the Windows 10 alpha channel to separate foreground and background"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         fg.Run(ocvb)
@@ -44,7 +44,7 @@ Public Class AlphaChannel_Blend
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Transparency amount", 0, 255, 100)
 
-        setDescription(ocvb, "Use alpha blending to smoothly separate background from foreground")
+        ocvb.desc = "Use alpha blending to smoothly separate background from foreground"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         fg.Run(ocvb)

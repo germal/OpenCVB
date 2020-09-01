@@ -25,7 +25,7 @@ Public Class Area_MinTriangle_CPP
         sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
         sliders.setupTrackBar(1, "Area size", 10, 300, 200)
         setup(ocvb)
-        setDescription(ocvb, "Find minimum containing triangle for a set of points.")
+        ocvb.desc = "Find minimum containing triangle for a set of points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static pointCountSlider = findSlider("Area Number of Points")
@@ -78,7 +78,7 @@ Public Class Area_MinRect
 
         setup(ocvb, sliders.trackbar(0).Value)
 
-        setDescription(ocvb, "Find minimum containing rectangle for a set of points.")
+        ocvb.desc = "Find minimum containing rectangle for a set of points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static pointCountSlider = findSlider("Area Number of Points")
@@ -110,7 +110,7 @@ Public Class Area_MinMotionRect
         bgSub = New BGSubtract_MOG(ocvb)
         Static bgSubLearnRate = findSlider("MOG Learn Rate")
         bgSubLearnRate.Value = 100 ' low threshold to maximize motion
-        setDescription(ocvb, "Use minRectArea to encompass detected motion")
+        ocvb.desc = "Use minRectArea to encompass detected motion"
         label1 = "MinRectArea of MOG motion"
     End Sub
 
@@ -147,7 +147,7 @@ Public Class Area_FindNonZero
         setCaller(ocvb)
         label1 = "Coordinates of non-zero points"
         label2 = "Non-zero original points"
-        setDescription(ocvb, "Use FindNonZero API to get coordinates of non-zero points.")
+        ocvb.desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)

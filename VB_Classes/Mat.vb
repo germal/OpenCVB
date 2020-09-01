@@ -3,7 +3,7 @@ Public Class Mat_Repeat
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        setDescription(ocvb, "Use the repeat method to replicate data.")
+        ocvb.desc = "Use the repeat method to replicate data."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim small = src.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
@@ -24,7 +24,7 @@ Public Class Mat_PointToMat
         mask.plotPoints = True
         label1 = "Random_Points points (original)"
         label2 = "Random_Points points after format change"
-        setDescription(ocvb, "Convert pointf3 into a mat of points")
+        ocvb.desc = "Convert pointf3 into a mat of points"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         mask.Run(ocvb) ' generates a set of points
@@ -48,7 +48,7 @@ Public Class Mat_MatToPoint
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         mask = New Random_Points(ocvb)
-        setDescription(ocvb, "Convert a mat into a vector of points.")
+        ocvb.desc = "Convert a mat into a vector of points."
         label1 = "Reconstructed RGB Image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -74,7 +74,7 @@ Public Class Mat_Transpose
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        setDescription(ocvb, "Transpose a Mat and show results.")
+        ocvb.desc = "Transpose a Mat and show results."
         label1 = "Color Image Transposed"
         label2 = "Color Image Transposed back (artifacts)"
     End Sub
@@ -95,7 +95,7 @@ Public Class Mat_Tricks
         setCaller(ocvb)
         label1 = "Image squeezed into square Mat"
         label2 = "Mat transposed around the diagonal"
-        setDescription(ocvb, "Show some Mat tricks.")
+        ocvb.desc = "Show some Mat tricks."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mat = src.Resize(New cv.Size(200, 200))
@@ -131,7 +131,7 @@ Public Class Mat_4to1
 
         label1 = "Combining 4 images into one"
         label2 = "Click any quadrant at left to view it below"
-        setDescription(ocvb, "Use one Mat for up to 4 images")
+        ocvb.desc = "Use one Mat for up to 4 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static nSize = New cv.Size(ocvb.color.Width / 2, ocvb.color.Height / 2)
@@ -176,7 +176,7 @@ Public Class Mat_2to1
         dst1 = dst2
 
         label1 = ""
-        setDescription(ocvb, "Fill a Mat with 2 images")
+        ocvb.desc = "Fill a Mat with 2 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static nSize = New cv.Size(ocvb.color.Width, ocvb.color.Height / 2)
@@ -224,7 +224,7 @@ Public Class Mat_ImageXYZ_MT
         Next
         cv.Cv2.Split(xyDepth, xyzPlanes)
 
-        setDescription(ocvb, "Create a cv.Point3f vector with x, y, and z.")
+        ocvb.desc = "Create a cv.Point3f vector with x, y, and z."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)
@@ -250,7 +250,7 @@ Public Class Mat_RowColRange
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         label1 = "BitwiseNot of RowRange and ColRange"
-        setDescription(ocvb, "Perform operation on a range of cols and/or Rows.")
+        ocvb.desc = "Perform operation on a range of cols and/or Rows."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim midX = src.Width / 2
@@ -270,7 +270,7 @@ Public Class Mat_Managed
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         label1 = "Color change is in the managed cv.vec3b array"
-        setDescription(ocvb, "There is a limited ability to use Mat data in Managed code directly.")
+        ocvb.desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static autoRand As New Random()

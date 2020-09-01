@@ -30,7 +30,7 @@ Public Class EMax_Basics
         radio.check(2).Text = "EMax matrix type Generic"
         radio.check(0).Checked = True
 
-        setDescription(ocvb, "OpenCV expectation maximization example.")
+        ocvb.desc = "OpenCV expectation maximization example."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
@@ -129,7 +129,7 @@ Public Class EMax_Basics_CPP
         EMax_Basics = EMax_Basics_Open()
 
         label2 = "Emax regions around clusters"
-        setDescription(ocvb, "Use EMax - Expectation Maximization - to classify a series of points")
+        ocvb.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         basics.Run(ocvb)
@@ -191,7 +191,7 @@ Public Class EMax_Centroids
         emaxCPP = New EMax_Basics_CPP(ocvb)
         emaxCPP.Run(ocvb)
 
-        setDescription(ocvb, "Get the Emax cluster centroids using floodfill ")
+        ocvb.desc = "Get the Emax cluster centroids using floodfill "
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim lastImage = emaxCPP.dst2.Clone()
@@ -239,7 +239,7 @@ Public Class EMax_ConsistentColor
         setCaller(ocvb)
 
         knn = New KNN_CentroidsEMax(ocvb)
-        setDescription(ocvb, "Same as KNN_Centroids - to show consistent EMax color regions")
+        ocvb.desc = "Same as KNN_Centroids - to show consistent EMax color regions"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         knn.basics.trainingPoints = New List(Of cv.Point2f)(knn.emax.centroids)

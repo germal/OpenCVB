@@ -19,7 +19,7 @@ Public Class Sift_Basics_CS
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Points to Match", 1, 1000, 200)
 
-        setDescription(ocvb, "Compare 2 images to get a homography.  We will use left and right images.")
+        ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim doubleSize As New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols * 2, cv.MatType.CV_8UC3)
@@ -65,7 +65,7 @@ Public Class Sift_Basics_CS_MT
         numPointSlider = findSlider("Points to Match")
         numPointSlider.Value = 1
 
-        setDescription(ocvb, "Compare 2 images to get a homography.  We will use left and right images - needs more work")
+        ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim leftView As cv.Mat

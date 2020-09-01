@@ -2,10 +2,10 @@
 Module VB_EditorMain
     Dim changeLines As Integer
     Private Function makeChange(line As String) As String
-        If line.Contains("ocvb.desc = ") Then
+        If line.Contains("setDescription(ocvb, ") Then
             Console.WriteLine(line)
-            line = line.Replace("ocvb.desc = ", "setDescription(ocvb, ")
-            line += ")"
+            line = line.Replace("setDescription(ocvb, ", "ocvb.desc = ")
+            line = Mid(line, 1, Len(line) - 1)
             Console.WriteLine("Change to: " + line)
             changeLines += 1
         End If

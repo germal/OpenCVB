@@ -12,8 +12,13 @@ Public Class TreeviewForm
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         Me.Timer1.Enabled = False
-        Console.WriteLine(e.Node.Text)
         OpenCVB.AvailableAlgorithms.Text = e.Node.Text
+        If OpenCVB.AvailableAlgorithms.Text <> e.Node.Text Then
+            ' the list of active algorithms for this group does not contain the algorithm requested so just add it!
+            OpenCVB.AvailableAlgorithms.Items.Add(e.Node.Text)
+            OpenCVB.AvailableAlgorithms.Text = e.Node.Text
+        End If
+        Console.WriteLine(OpenCVB.AvailableAlgorithms.Text + " should be " + e.Node.Text)
     End Sub
     Private Sub TreeviewForm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         Dim split() = Me.Text.Split()
@@ -78,7 +83,6 @@ Public Class TreeviewForm
         Next
         tv.ExpandAll()
     End Sub
-
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         If Me.Text.StartsWith(OpenCVB.callTrace(0)) = False Then updateTree()
     End Sub

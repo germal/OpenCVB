@@ -7,7 +7,7 @@ Public Class FREAK_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         orb = New ORB_Basics(ocvb)
-        setDescription(ocvb, "Find keypoints using ORB and FREAK algorithm")
+        ocvb.desc = "Find keypoints using ORB and FREAK algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         orb.src = src

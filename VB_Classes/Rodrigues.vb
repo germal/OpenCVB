@@ -11,7 +11,7 @@ Public Class Rodrigues_ValidateKinect
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        setDescription(ocvb, "Validate the Rodrigues calibration for Kinect camera (only)")
+        ocvb.desc = "Validate the Rodrigues calibration for Kinect camera (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex <> Kinect4AzureCam Then
@@ -37,7 +37,7 @@ Public Class Rodrigues_ValidateVector
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        setDescription(ocvb, "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)")
+        ocvb.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex <> StereoLabsZED2 And ocvb.parms.cameraIndex <> T265Camera Then
@@ -83,7 +83,7 @@ Public Class Rodrigues_RotationMatrix
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        setDescription(ocvb, "Display the contents of the IMU Rotation Matrix")
+        ocvb.desc = "Display the contents of the IMU Rotation Matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim rot = ocvb.parms.IMU_RotationMatrix
@@ -115,7 +115,7 @@ Public Class Rodrigues_Extrinsics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        setDescription(ocvb, "Convert Camera extrinsics array to a Vector with Rodrigues")
+        ocvb.desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim rot = ocvb.parms.extrinsics.rotation

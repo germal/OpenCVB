@@ -36,7 +36,7 @@ Public Class SVM_Options
 
 
         label1 = "SVM_Options - only options, no output"
-        setDescription(ocvb, "SVM has many options - enough to make a class for it.")
+        ocvb.desc = "SVM has many options - enough to make a class for it."
     End Sub
     Public Function createSVM() As cv.ML.SVM
         For i = 0 To radio.check.Length - 1
@@ -99,7 +99,7 @@ Public Class SVM_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         svmOptions = New SVM_Options(ocvb)
-        setDescription(ocvb, "Use SVM to classify random points.  Increase the sample count to see the value of more data.")
+        ocvb.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
         label1 = "SVM_Basics input data"
         label2 = "Results - line is ground truth"
     End Sub
@@ -158,7 +158,7 @@ Public Class SVM_Random
         check.Box(0).Text = "Restrict random test to square area"
 
         label1 = "SVM Training data"
-        setDescription(ocvb, "Use SVM to classify random points - testing if height must equal width - needs more work")
+        ocvb.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         svmOptions.Run(ocvb)
@@ -246,7 +246,7 @@ Public Class SVM_TestCase
         svmOptions.sliders.trackbar(1).Value = 15
         svmOptions.radio.check(3).Enabled = False
 
-        setDescription(ocvb, "Text book example on SVM")
+        ocvb.desc = "Text book example on SVM"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1.SetTo(cv.Scalar.White)

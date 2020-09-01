@@ -14,7 +14,7 @@ Public Class Distance_Basics
         foreground = New kMeans_Depth_FG_BG(ocvb)
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"
-        setDescription(ocvb, "Distance algorithm basics.")
+        ocvb.desc = "Distance algorithm basics."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         foreground.Run(ocvb)

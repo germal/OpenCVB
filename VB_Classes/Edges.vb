@@ -11,7 +11,7 @@ Public Class Edges_Canny
         sliders.setupTrackBar(1, "Canny threshold2", 1, 255, 50)
         sliders.setupTrackBar(2, "Canny Aperture", 3, 7, 3)
 
-        setDescription(ocvb, "Show canny edge detection with varying thresholds")
+        ocvb.desc = "Show canny edge detection with varying thresholds"
         label1 = "Canny using L1 Norm"
         label2 = "Canny using L2 Norm"
     End Sub
@@ -43,7 +43,7 @@ Public Class Edges_DepthAndColor
 
         shadow = New Depth_Holes(ocvb)
 
-        setDescription(ocvb, "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow.")
+        ocvb.desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
         label1 = "Edges in color and depth after dilate"
         label2 = "Edges in color and depth no dilate"
     End Sub
@@ -75,7 +75,7 @@ Public Class Edges_Laplacian
         sliders.setupTrackBar(0, "Gaussian Kernel", 1, 32, 7)
         sliders.setupTrackBar(1, "Laplacian Kernel", 1, 32, 5)
         label2 = "Laplacian of Depth Image"
-        setDescription(ocvb, "Show Laplacian edge detection with varying kernel sizes")
+        ocvb.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gaussiankernelSize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value - 1)
@@ -101,7 +101,7 @@ Public Class Edges_Scharr
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Scharr multiplier X100", 1, 500, 50)
         label2 = "x field + y field in CV_32F format"
-        setDescription(ocvb, "Scharr is most accurate with 3x3 kernel.")
+        ocvb.desc = "Scharr is most accurate with 3x3 kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -129,7 +129,7 @@ Public Class Edges_Preserving
         sliders.setupTrackBar(1, "Edge Sigma_r", 1, 100, 40)
 
         label2 = "Edge preserving blur for RGB depth image above"
-        setDescription(ocvb, "OpenCV's edge preserving filter.")
+        ocvb.desc = "OpenCV's edge preserving filter."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim sigma_s = sliders.trackbar(0).Value
@@ -173,7 +173,7 @@ Public Class Edges_RandomForest_CPP
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Edges RF Threshold", 1, 255, 35)
 
-        setDescription(ocvb, "Detect edges using structured forests - Opencv Contrib")
+        ocvb.desc = "Detect edges using structured forests - Opencv Contrib"
         ReDim rgbData(ocvb.color.Total * ocvb.color.ElemSize - 1)
         label2 = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
@@ -214,7 +214,7 @@ Public Class Edges_LeftView
         sobel = New Edges_Sobel(ocvb)
         sobel.sliders.trackbar(0).Value = 5
 
-        setDescription(ocvb, "Find the edges in the LeftViewimages.")
+        ocvb.desc = "Find the edges in the LeftViewimages."
         label1 = "Edges in Left Image"
         label2 = "Edges in Right Image (except on Kinect)"
     End Sub
@@ -242,7 +242,7 @@ Public Class Edges_ResizeAdd
         sliders.setupTrackBar(1, "Border Horizontal in Pixels", 1, 20, 5)
         sliders.setupTrackBar(2, "Threshold for Pixel Difference", 1, 50, 16)
 
-        setDescription(ocvb, "Find edges using a resize, subtract, and threshold.")
+        ocvb.desc = "Find edges using a resize, subtract, and threshold."
         label1 = "Edges found with just resizing"
         label2 = "Found edges added to grayscale image source."
     End Sub
@@ -269,7 +269,7 @@ Public Class Edges_DCTfrequency
         sliders.setupTrackBar(1, "Threshold after Removal", 1, 255, 20)
 
         label2 = "Mask for the isolated frequencies"
-        setDescription(ocvb, "Find edges by removing all the highest frequencies.")
+        ocvb.desc = "Find edges by removing all the highest frequencies."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -319,7 +319,7 @@ Public Class Edges_Deriche_CPP
         sliders.setupTrackBar(1, "Deriche Omega", 1, 1000, 100)
         Edges_Deriche = Edges_Deriche_Open()
         label2 = "Image enhanced with Deriche results"
-        setDescription(ocvb, "Edge detection using the Deriche X and Y gradients - Painterly")
+        ocvb.desc = "Edge detection using the Deriche X and Y gradients - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim src = ocvb.color
@@ -358,7 +358,7 @@ Public Class Edges_Sobel
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 3)
-        setDescription(ocvb, "Show Sobel edge detection with varying kernel sizes")
+        ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value - 1)

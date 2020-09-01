@@ -11,7 +11,7 @@ Public Class BlockMatching_Basics
         sliders.setupTrackBar(0, "Blockmatch max disparity", 2, 5, 2)
         sliders.setupTrackBar(1, "Blockmatch block size", 5, 255, 15)
         sliders.setupTrackBar(2, "Blockmatch distance factor (approx) X1000", 1, 100, 20)
-        setDescription(ocvb, "Use OpenCV's block matching on left and right views")
+        ocvb.desc = "Use OpenCV's block matching on left and right views"
         label1 = "Block matching disparity colorized like depth"
         label2 = "Right Image (used with left image)"
     End Sub

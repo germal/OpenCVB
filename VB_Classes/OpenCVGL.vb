@@ -39,7 +39,7 @@ Public Class OpenCVGL_Image_CPP
 
             OpenCVGL_Image_Open(ocvb.color.Cols, ocvb.color.Rows)
         End If
-        setDescription(ocvb, "Use the OpenCV implementation of OpenGL to render a 3D image with depth.")
+        ocvb.desc = "Use the OpenCV implementation of OpenGL to render a 3D image with depth."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.testAllRunning Then

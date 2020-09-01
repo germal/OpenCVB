@@ -24,7 +24,7 @@ Public Class Contours_Basics
 
         rotatedRect = New Draw_rotatedRectangles(ocvb)
         rotatedRect.rect.sliders.trackbar(0).Value = 5
-        setDescription(ocvb, "Demo options on FindContours.")
+        ocvb.desc = "Demo options on FindContours."
         label2 = "FindContours output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -95,7 +95,7 @@ Public Class Contours_FindandDraw
         rotatedRect.rect.sliders.trackbar(0).Value = 5
         label1 = "FindandDraw input"
         label2 = "FindandDraw output"
-        setDescription(ocvb, "Demo the use of FindContours, ApproxPolyDP, and DrawContours.")
+        ocvb.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim img As New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
@@ -124,7 +124,7 @@ Public Class Contours_Depth
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         trim = New Depth_InRange(ocvb)
-        setDescription(ocvb, "Find and draw the contour of the depth foreground.")
+        ocvb.desc = "Find and draw the contour of the depth foreground."
         label1 = "DepthContour input"
         label2 = "DepthContour output"
     End Sub
@@ -155,7 +155,7 @@ Public Class Contours_RGB
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         trim = New Depth_InRange(ocvb)
-        setDescription(ocvb, "Find and draw the contour of the largest foreground RGB contour.")
+        ocvb.desc = "Find and draw the contour of the largest foreground RGB contour."
         label2 = "Background"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -206,7 +206,7 @@ Public Class Contours_RemoveLines
         sliders.setupTrackBar(2, "Contour thickness", 1, 10, 3)
         label1 = "Original image"
         label2 = "Original with horizontal/vertical lines removed"
-        setDescription(ocvb, "Remove the lines from an invoice image")
+        ocvb.desc = "Remove the lines from an invoice image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim tmp = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/invoice.jpg")

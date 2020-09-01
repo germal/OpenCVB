@@ -4,7 +4,7 @@ Public Class EigenVecVals_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        setDescription(ocvb, "Solve system of equations using OpenCV's EigenVV")
+        ocvb.desc = "Solve system of equations using OpenCV's EigenVV"
         label1 = "EigenVec (solution)"
         label2 = "Relationship between Eigen Vec and Vals"
     End Sub

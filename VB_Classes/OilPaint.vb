@@ -17,7 +17,7 @@ Public Class OilPaint_Pointilism
         radio.check(1).Checked = True
 
         ocvb.drawRect = New cv.Rect(ocvb.color.Cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.Cols * 2 / 8, ocvb.color.Rows * 2 / 8)
-        setDescription(ocvb, "Alter the image to effect the pointilism style - Painterly Effect")
+        ocvb.desc = "Alter the image to effect the pointilism style - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1 = src
@@ -88,7 +88,7 @@ Public Class OilPaint_ColorProbability
         km = New kMeans_RGBFast(ocvb)
         km.sliders.trackbar(0).Value = 12 ' we would like a dozen colors or so in the color image.
         ReDim color_probability(km.sliders.trackbar(0).Value - 1)
-        setDescription(ocvb, "Determine color probabilities on the output of kMeans - Painterly Effect")
+        ocvb.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         km.src = src
@@ -125,7 +125,7 @@ Public Class OilPaint_Manual
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Filter Size", 3, 15, 3)
         sliders.setupTrackBar(1, "Intensity", 5, 150, 25)
-        setDescription(ocvb, "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest.")
+        ocvb.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
         ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -184,7 +184,7 @@ Public Class OilPaint_Manual_CS
         sliders.setupTrackBar(0, "Kernel Size", 2, 10, 4)
         sliders.setupTrackBar(1, "Intensity", 1, 250, 20)
         sliders.setupTrackBar(2, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
-        setDescription(ocvb, "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint.")
+        ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
         label2 = "Selected area only"
 
         ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
@@ -217,7 +217,7 @@ Public Class OilPaint_Cartoon
         oil = New OilPaint_Manual_CS(ocvb)
         ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
 
-        setDescription(ocvb, "Alter an image so it appears more like a cartoon - Painterly Effect")
+        ocvb.desc = "Alter an image so it appears more like a cartoon - Painterly Effect"
         label1 = "OilPaint_Cartoon"
         label2 = "Laplacian Edges"
     End Sub

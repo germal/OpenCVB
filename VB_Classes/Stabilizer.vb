@@ -12,7 +12,7 @@ Public Class Stabilizer_Basics
         setCaller(ocvb)
         good = New Features_GoodFeatures(ocvb)
 
-        setDescription(ocvb, "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!")
+        ocvb.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
         label1 = "Stabilized Image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -124,7 +124,7 @@ Public Class Stabilizer_BriskFeatures
         brisk = New BRISK_Basics(ocvb)
         brisk.sliders.trackbar(0).Value = 10
 
-        setDescription(ocvb, "Stabilize the video stream using BRISK features (not GoodFeaturesToTrack)")
+        ocvb.desc = "Stabilize the video stream using BRISK features (not GoodFeaturesToTrack)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         src.CopyTo(brisk.src)
@@ -151,7 +151,7 @@ Public Class Stabilizer_HarrisFeatures
 
         harris = New Harris_Detector_CPP(ocvb)
 
-        setDescription(ocvb, "Stabilize the video stream using Harris detector features")
+        ocvb.desc = "Stabilize the video stream using Harris detector features"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         harris.src = src
@@ -190,7 +190,7 @@ Public Class Stabilizer_Basics_CPP
         setCaller(ocvb)
         ReDim srcData(src.Total * src.ElemSize - 1)
         sPtr = Stabilizer_Basics_Open()
-        setDescription(ocvb, "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work.  Needs more work.")
+        ocvb.desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work.  Needs more work."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.trueText(New TTtext("this algorithm is not stable.", 10, 100))
@@ -224,7 +224,7 @@ Public Class Stabilizer_SideBySide
         setCaller(ocvb)
         original = New Stabilizer_Basics(ocvb)
         basics = New Stabilizer_HarrisFeatures(ocvb)
-        setDescription(ocvb, "Run both the original and the VB.Net version of the video stabilizer.  Neither is working properly.")
+        ocvb.desc = "Run both the original and the VB.Net version of the video stabilizer.  Neither is working properly."
         label1 = "Stabilizer_Basic (VB.Net)"
         label2 = "Stabilizer_HarrisFeatures"
     End Sub

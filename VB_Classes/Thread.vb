@@ -33,7 +33,7 @@ Public Class Thread_Grid
         roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)
         gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
-        setDescription(ocvb, "Create a grid for use with parallel.ForEach.")
+        ocvb.desc = "Create a grid for use with parallel.ForEach."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static lastWidth As Int32
@@ -113,7 +113,7 @@ Public Class Thread_GridTest
         gridWidthSlider.Value = 64
         gridHeightSlider.Value = 40
         label1 = ""
-        setDescription(ocvb, "Validation test for thread_grid algorithm")
+        ocvb.desc = "Validation test for thread_grid algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         grid.Run(ocvb)

@@ -23,7 +23,7 @@ Public Class Trace_OpenCV_CPP
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         Trace_OpenCV = Trace_OpenCV_Open()
-        setDescription(ocvb, "Use OpenCV's Trace facility - applicable to C++ code - and requires Intel's VTune (see link in code.)")
+        ocvb.desc = "Use OpenCV's Trace facility - applicable to C++ code - and requires Intel's VTune (see link in code.)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim srcData(src.Total * src.ElemSize - 1) As Byte

@@ -34,7 +34,7 @@ End Module
 '    Public Sub New(ocvb As AlgorithmData)
 '        setCaller(ocvb)
 '        input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
-'        setDescription(ocvb, "Manually invert a matrix")
+'        ocvb.desc = "Manually invert a matrix"
 '    End Sub
 '    Public Sub Run(ocvb As AlgorithmData)
 '        If input.Width <> input.Height Then
@@ -63,7 +63,7 @@ Public Class MatrixInverse_OpenCV
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
-        setDescription(ocvb, "Use OpenCV to invert a matrix")
+        ocvb.desc = "Use OpenCV to invert a matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If Input.Width <> Input.Height Then

@@ -48,7 +48,7 @@ Public Class Smoothing_Exterior
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
-		setDescription(ocvb, "Smoothing the line connecting a series of points.")
+		ocvb.desc = "Smoothing the line connecting a series of points."
 	End Sub
 	Public Sub Run(ocvb As AlgorithmData)
 		If ocvb.frameCount Mod 30 Then Exit Sub
@@ -123,7 +123,7 @@ Public Class Smoothing_Interior
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
-		setDescription(ocvb, "Smoothing the line connecting a series of points staying inside the outline.")
+		ocvb.desc = "Smoothing the line connecting a series of points staying inside the outline."
 	End Sub
 	Public Sub Run(ocvb As AlgorithmData)
 		If ocvb.frameCount Mod 30 Then Exit Sub

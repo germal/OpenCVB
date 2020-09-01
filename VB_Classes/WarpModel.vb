@@ -29,7 +29,7 @@ Public Class WarpModel_Input
         check.Box(0).Text = "Use Gradient in WarpInput"
 
         sobel = New Edges_Sobel(ocvb)
-        setDescription(ocvb, "Import the misaligned input.")
+        ocvb.desc = "Import the misaligned input."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim img As New cv.Mat
@@ -105,7 +105,7 @@ Public Class WarpModel_FindTransformECC_CPP
 
         input = New WarpModel_Input(ocvb)
 
-        setDescription(ocvb, "Use FindTransformECC to align 2 images")
+        ocvb.desc = "Use FindTransformECC to align 2 images"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         input.src = src
@@ -187,7 +187,7 @@ Public Class WarpModel_AlignImages
         setCaller(ocvb)
         ecc = New WarpModel_FindTransformECC_CPP(ocvb)
 
-        setDescription(ocvb, "Align the RGB inputs raw images from the Prokudin examples.")
+        ocvb.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim aligned() = {New cv.Mat, New cv.Mat}

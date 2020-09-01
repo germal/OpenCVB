@@ -5,7 +5,7 @@ Public Class LeftRightView_Basics
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "brightness", 0, 255, 100)
-        setDescription(ocvb, "Show the left and right views from the 3D Camera")
+        ocvb.desc = "Show the left and right views from the 3D Camera"
         Select Case ocvb.parms.cameraIndex
             Case D435i, StereoLabsZED2
                 label1 = "Left Image"
@@ -59,7 +59,7 @@ Public Class LeftRightView_CompareUndistorted
                 label2 = "Undistorted Right Image"
                 sliders.trackbar(0).Value = 50
         End Select
-        setDescription(ocvb, "Show slices of the left and right view next to each other for visual comparison - right view needs more work")
+        ocvb.desc = "Show slices of the left and right view next to each other for visual comparison - right view needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim sliceY = sliders.trackbar(1).Value
@@ -116,7 +116,7 @@ Public Class LeftRightView_CompareRaw
         End Select
         lrView = New LeftRightView_Basics(ocvb)
         lrView.sliders.Hide()
-        setDescription(ocvb, "Show slices of the left and right view next to each other for visual comparison")
+        ocvb.desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         lrView.Run(ocvb)
@@ -149,7 +149,7 @@ Public Class LeftRightView_Features
 
         lrView = New LeftRightView_Basics(ocvb)
 
-        setDescription(ocvb, "Find GoodFeatures in the left and right depalettized infrared images")
+        ocvb.desc = "Find GoodFeatures in the left and right depalettized infrared images"
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
@@ -184,7 +184,7 @@ Public Class LeftRightView_Palettized
         lrView = New LeftRightView_Basics(ocvb)
         palette = New Palette_ColorMap(ocvb)
 
-        setDescription(ocvb, "Add color to the 8-bit infrared images.")
+        ocvb.desc = "Add color to the 8-bit infrared images."
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
@@ -210,7 +210,7 @@ Public Class LeftRightView_BRISK
     Dim brisk As BRISK_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        setDescription(ocvb, "Add color to the 8-bit infrared images.")
+        ocvb.desc = "Add color to the 8-bit infrared images."
         label1 = "Infrared Left Image"
         label2 = "Infrared Right Image"
 

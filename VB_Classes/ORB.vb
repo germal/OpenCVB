@@ -9,7 +9,7 @@ Public Class ORB_Basics
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "ORB - desired point count", 10, 2000, 100)
 
-        setDescription(ocvb, "Find keypoints using ORB")
+        ocvb.desc = "Find keypoints using ORB"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

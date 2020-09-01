@@ -69,7 +69,7 @@ Public Class Annealing_Basics_CPP
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         setup(ocvb)
-        setDescription(ocvb, "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution.")
+        ocvb.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If closed = True Then Exit Sub
@@ -169,7 +169,7 @@ Public Class Annealing_CPP_MT
         label1 = "Log of Annealing progress"
         label2 = "Top 2 are best solutions, bottom 2 are worst."
 
-        setDescription(ocvb, "Setup and control finding the optimal route for a traveling salesman")
+        ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If anneal(0) Is Nothing Then setup(ocvb) ' setup here rather than in algorithm so all threads work on the same problem.
@@ -265,7 +265,7 @@ Public Class Annealing_Options
         If check.Box(1).Checked = False Then anneal.cityPositions = random.Points2f.Clone()
         anneal.setup(ocvb)
         anneal.Open()
-        setDescription(ocvb, "Setup and control finding the optimal route for a traveling salesman")
+        ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static randomSlider = findSlider("Random Pixel Count")

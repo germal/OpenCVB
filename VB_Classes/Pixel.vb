@@ -11,7 +11,7 @@ Public Class Pixel_GetSet
 
         label1 = "Time to copy using get/set,Generic Index, Marshal Copy"
         label2 = "Click any quadrant at left to view it below"
-        setDescription(ocvb, "Perform Pixel-level operations in 3 different ways to measure efficiency.")
+        ocvb.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim rows = src.Height

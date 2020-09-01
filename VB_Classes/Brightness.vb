@@ -7,7 +7,7 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Clip Limit", 1, 100, 10)
         sliders.setupTrackBar(1, "Grid Size", 1, 100, 8)
-        setDescription(ocvb, "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)")
+        ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -29,7 +29,7 @@ Public Class Brightness_Hue
     Public hsv_planes(2) As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        setDescription(ocvb, "Show hue (Result1) and Saturation (Result2).")
+        ocvb.desc = "Show hue (Result1) and Saturation (Result2)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim imghsv = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
@@ -49,7 +49,7 @@ Public Class Brightness_AlphaBeta
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        setDescription(ocvb, "Use alpha and beta with ConvertScaleAbs.")
+        ocvb.desc = "Use alpha and beta with ConvertScaleAbs."
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 500, 300)
         sliders.setupTrackBar(1, "Brightness Beta (brightness)", -100, 100, 0)
@@ -67,7 +67,7 @@ Public Class Brightness_Gamma
     Dim lookupTable(255) As Byte
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        setDescription(ocvb, "Use gamma with ConvertScaleAbs.")
+        ocvb.desc = "Use gamma with ConvertScaleAbs."
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Brightness Gamma correction", 0, 200, 100)
     End Sub
@@ -114,7 +114,7 @@ Public Class Brightness_WhiteBalance_CPP
         wPtr = WhiteBalance_Open()
         label1 = "Image with auto white balance"
         label2 = "White pixels were altered from the original"
-        setDescription(ocvb, "Automate getting the right white balance")
+        ocvb.desc = "Automate getting the right white balance"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim rgbData(src.Total * src.ElemSize - 1) As Byte
@@ -155,7 +155,7 @@ Public Class Brightness_WhiteBalance
         sliders.setupTrackBar(0, "White balance threshold X100", 1, 100, 10)
 
         label1 = "Image with auto white balance"
-        setDescription(ocvb, "Automate getting the right white balance - faster than the C++ version (in debug mode)")
+        ocvb.desc = "Automate getting the right white balance - faster than the C++ version (in debug mode)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim rgb32f As New cv.Mat
@@ -213,7 +213,7 @@ Public Class Brightness_ChangeMask
         whiteCPP = New Brightness_WhiteBalance_CPP(ocvb)
         If standalone = False Then whiteCPP.sliders.Visible = False
 
-        setDescription(ocvb, "Create a mask for the changed pixels after white balance")
+        ocvb.desc = "Create a mask for the changed pixels after white balance"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static countdown = 60
@@ -267,7 +267,7 @@ Public Class Brightness_PlotHist
 
         mat2to1 = New Mat_2to1(ocvb)
 
-        setDescription(ocvb, "Plot the histogram of the before and after white balancing")
+        ocvb.desc = "Plot the histogram of the before and after white balancing"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist1.src = src

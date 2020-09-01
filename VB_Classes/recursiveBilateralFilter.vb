@@ -24,7 +24,7 @@ Public Class RecursiveBilateralFilter_CPP
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "RBF Recursion count", 1, 20, 2)
         rbf = RecursiveBilateralFilter_Open()
-        setDescription(ocvb, "Apply the recursive bilateral filter")
+        ocvb.desc = "Apply the recursive bilateral filter"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If srcData.Length <> src.Total * src.ElemSize Then ReDim srcData(src.Total * src.ElemSize - 1)

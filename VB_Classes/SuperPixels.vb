@@ -33,7 +33,7 @@ Public Class SuperPixel_Basics_CPP
         sliders.setupTrackBar(2, "Prior", 1, 10, 2)
 
         label2 = "Superpixel label data (0-255)"
-        setDescription(ocvb, "Sub-divide the image into super pixels.")
+        ocvb.desc = "Sub-divide the image into super pixels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static numSuperPixels As Int32
@@ -90,7 +90,7 @@ Public Class SuperPixel_BinarizedImage
         Static pixelCountSlider = findSlider("Number of SuperPixels")
         pixelCountSlider.value = 20 ' find the top 20 super pixels.
 
-        setDescription(ocvb, "Create SuperPixels from a binary image.")
+        ocvb.desc = "Create SuperPixels from a binary image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         binarize.src = src
@@ -116,7 +116,7 @@ Public Class SuperPixel_Depth
         setCaller(ocvb)
         pixels = New SuperPixel_Basics_CPP(ocvb)
 
-        setDescription(ocvb, "Create SuperPixels using RGBDepth image.")
+        ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         pixels.src = ocvb.RGBDepth.Clone()
@@ -141,7 +141,7 @@ Public Class SuperPixel_WithCanny
 
         pixels = New SuperPixel_Basics_CPP(ocvb)
 
-        setDescription(ocvb, "Create SuperPixels using RGBDepth image.")
+        ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         edges.src = ocvb.color.Clone()
@@ -172,7 +172,7 @@ Public Class SuperPixel_WithLineDetector
         pixels = New SuperPixel_Basics_CPP(ocvb)
 
         label2 = "Input to superpixel basics."
-        setDescription(ocvb, "Create SuperPixels using RGBDepth image.")
+        ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         lines.src = src

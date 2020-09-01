@@ -9,7 +9,7 @@ Public Class Polylines_IEnumerableExample
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Polyline Count", 2, 500, 100)
         sliders.setupTrackBar(1, "Polyline Thickness", 0, 10, 1)
-        setDescription(ocvb, "Manually create an ienumerable(of ienumerable(of cv.point)).")
+        ocvb.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim points = Enumerable.Range(0, sliders.trackbar(0).Value).Select(Of cv.Point)(
@@ -37,7 +37,7 @@ Public Class Polylines_Random
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         label1 = CStr(zoomFactor) + "X zoom around mouse movement on image"
-        setDescription(ocvb, "Create a random procedural image - Painterly Effect")
+        ocvb.desc = "Create a random procedural image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod 150 = 0 Then ' every x frames.

@@ -82,7 +82,7 @@ Public Class Undistort_Basics
         check.Box(0).Checked = True
 
         label1 = "Left Image with sliders applied"
-        setDescription(ocvb, "Use sliders to control the undistort OpenCV API - Painterly")
+        ocvb.desc = "Use sliders to control the undistort OpenCV API - Painterly"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static kMatLeft As cv.Mat, dMatLeft As cv.Mat, rMatLeft As cv.Mat, pMatLeft As cv.Mat

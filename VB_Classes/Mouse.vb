@@ -4,7 +4,7 @@ Public Class Mouse_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         label1 = "Move the mouse below to show mouse tracking."
-        setDescription(ocvb, "Test the mousePoint interface")
+        ocvb.desc = "Test the mousePoint interface"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static lastPoint = New cv.Point
@@ -28,7 +28,7 @@ Public Class Mouse_LeftClick
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         label1 = "Left click and drag to draw a rectangle"
-        setDescription(ocvb, "Demonstrate what the left-click enables")
+        ocvb.desc = "Demonstrate what the left-click enables"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.trueText(New TTtext("Left-click and drag to select a region in any of the images." + vbCrLf +
@@ -48,7 +48,7 @@ Public Class Mouse_RightClick
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         label1 = "Right click and drag to draw a rectangle"
-        setDescription(ocvb, "Demonstrate what the right-click enables")
+        ocvb.desc = "Demonstrate what the right-click enables"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.trueText(New TTtext("Right-click and drag to select a region in one of the images." + vbCrLf +

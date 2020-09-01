@@ -97,10 +97,6 @@ Public Class ocvbClass : Implements IDisposable
             End If
         End If
     End Sub
-    Public Sub setDescription(ocvb As AlgorithmData, desc As String)
-        ' at the end of every constructor for an algorithm, setDescription is called.  Might be useful for something.
-        ocvb.desc = desc
-    End Sub
     Public Function findCheckBox(opt As String) As CheckBox
         While 1
             Try

@@ -10,7 +10,7 @@ Public Class Keyboard_Basics
         checkKeys.Setup(caller)
         flow = New Font_FlowText(ocvb)
         label1 = "Keyboard data will flow to algorithm"
-        setDescription(ocvb, "Test the keyboard interface available to all algorithms")
+        ocvb.desc = "Test the keyboard interface available to all algorithms"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Input = New List(Of String)(checkKeys.inputText)
