@@ -486,8 +486,8 @@ Public Class Histogram_ProjectionOptions
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Use IMU gravity vector"
         check.Box(0).Checked = True
-        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.L515 Or
-            ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.T265Camera Then
+        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.L515 Or
+            ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
             check.Box(0).Checked = False
             check.Box(0).Enabled = False
         End If

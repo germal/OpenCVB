@@ -152,17 +152,17 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.L515) = USBenumeration("Intel(R) RealSense(TM) 515 RGB")
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.D455) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.T265Camera) = USBenumeration("T265")
-        If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.T265Camera) = 0 Then optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.T265Camera) = USBenumeration("Movidius MA2X5X")
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.L515) = USBenumeration("Intel(R) RealSense(TM) 515 RGB")
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D455) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) = USBenumeration("T265")
+        If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) = 0 Then optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) = USBenumeration("Movidius MA2X5X")
 
         ' Some devices may be present but their opencvb camera interface needs to be present as well.
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.MyntD1000) = USBenumeration("MYNT-EYE-D1000")
-        If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.MyntD1000) > 0 And myntSDKready = False Then
-            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.MyntD1000) = 0 ' hardware is there but dll is not installed yet.
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.MyntD1000) = USBenumeration("MYNT-EYE-D1000")
+        If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.MyntD1000) > 0 And myntSDKready = False Then
+            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.MyntD1000) = 0 ' hardware is there but dll is not installed yet.
             If GetSetting("OpenCVB", "myntSDKready", "myntSDKready", True) Then
                 MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
                    "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
@@ -174,9 +174,9 @@ Public Class OpenCVB
                 SaveSetting("OpenCVB", "myntSDKready", "myntSDKready", False)
             End If
         End If
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.StereoLabsZED2) = USBenumeration("ZED 2")
-        If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.StereoLabsZED2) > 0 And zed2SDKready = False Then
-            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.StereoLabsZED2) = 0 ' hardware is present but dll is not installed yet.
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.StereoLabsZED2) = USBenumeration("ZED 2")
+        If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.StereoLabsZED2) > 0 And zed2SDKready = False Then
+            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.StereoLabsZED2) = 0 ' hardware is present but dll is not installed yet.
             If GetSetting("OpenCVB", "zed2SDKready", "zed2SDKready", True) Then
                 MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
                        "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
@@ -188,15 +188,15 @@ Public Class OpenCVB
 
         ' if the default camera is not present, try to find another.
         If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.Kinect4AzureCam) Then
-                optionsForm.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.Kinect4AzureCam
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.Kinect4AzureCam) Then
+                optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.Kinect4AzureCam
             End If
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.T265Camera) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.T265Camera
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.StereoLabsZED2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.StereoLabsZED2
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.MyntD1000) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.MyntD1000
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.D435i) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.D435i
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.L515) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.L515
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.D455) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.D455
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.StereoLabsZED2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.StereoLabsZED2
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.MyntD1000) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.MyntD1000
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D435i) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.D435i
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.L515) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.L515
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D455) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.D455
             If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
                 MsgBox("There are no supported cameras present.  Connect an Intel RealSense2 series camera (D435i, D455, D415, D435, L515, Kinect 4 Azure, T265, MyntEyeD 1000, or StereoLabs Zed2.")
                 End
@@ -220,13 +220,13 @@ Public Class OpenCVB
                    "was not installed in:" + vbCrLf + vbCrLf + kinectDLL.FullName + vbCrLf + vbCrLf +
                    "Did a new Version get installed?" + vbCrLf +
                    "Support for the Kinect camera may not work up you update the code near this message.")
-            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.Kinect4AzureCam) = 0 ' we can't use this device
+            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.Kinect4AzureCam) = 0 ' we can't use this device
         Else
             updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
         End If
         OpenCVfullPath = HomeDir.FullName + "OpenCV\Build\bin\Release\"
 
-        For i = 0 To VB_Classes.ActiveTask.algorithmParameters.MyntD1000
+        For i = 0 To VB_Classes.ActiveTask.algParms.MyntD1000
             If optionsForm.cameraDeviceCount(i) > 0 Then optionsForm.cameraTotalCount += 1
         Next
 
@@ -320,15 +320,15 @@ Public Class OpenCVB
                         If tt IsNot Nothing Then
                             If resolutionSetting = OptionsDialog.lowRes Then tt.y -= 7 ' Fine-tuning the lowRes text.  Default y is too big but good at other resolutions.
                             If TTtextData(i).picTag = 3 Then
-                                    g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
+                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
                                              tt.x * ratio + camPic(0).Width, tt.y * ratio)
-                                Else
-                                    g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
+                            Else
+                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
                                              tt.x * ratio, tt.y * ratio)
-                                End If
-                                maxline -= 1
-                                If maxline <= 0 Then Exit For
                             End If
+                            maxline -= 1
+                            If maxline <= 0 Then Exit For
+                        End If
                     Next
                 End If
             Catch ex As Exception
@@ -982,7 +982,7 @@ Public Class OpenCVB
         openForm.fileStarted = False
         openformLocated = False
 
-        Dim parms As New VB_Classes.ActiveTask.algorithmParameters
+        Dim parms As New VB_Classes.ActiveTask.algParms
         ReDim parms.IMU_RotationMatrix(9 - 1)
 
         saveAlgorithmName = AvailableAlgorithms.Text ' to share with the camera task...
@@ -1033,7 +1033,7 @@ Public Class OpenCVB
         ActivateTimer.Enabled = True
         fpsTimer.Enabled = True
     End Sub
-    Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algorithmParameters)
+    Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
             AlgorithmTestCount += 1
             drawRect = New cv.Rect

@@ -1326,8 +1326,8 @@ Public Class Depth_PointCloudInRange_IMU
         Dim tSplit = cv.Cv2.Split(ocvb.pointCloud)
         split = tSplit
 
-        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.T265Camera Or
-            ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.L515 Then
+        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Or
+            ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.L515 Then
             ocvb.trueText(New TTtext("IMU unavailable (?) for this camera", 10, 50))
         Else
             imu.Run(ocvb)

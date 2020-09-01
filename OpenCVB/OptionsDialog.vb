@@ -7,8 +7,8 @@ Public Class OptionsDialog
 
     Public cameraIndex As Int32 ' an index into the cameraRadioButton array.
 
-    Public cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.D455) As Int32
-    Public cameraRadioButton(VB_Classes.ActiveTask.algorithmParameters.D455) As RadioButton
+    Public cameraDeviceCount(VB_Classes.ActiveTask.algParms.D455) As Int32
+    Public cameraRadioButton(VB_Classes.ActiveTask.algParms.D455) As RadioButton
     Public cameraTotalCount As Integer = 0
 
     Public Const lowRes = 0
@@ -91,7 +91,7 @@ Public Class OptionsDialog
         OpenCVB.resolutionSetting = GetSetting("OpenCVB", "resolutionXY", "resolutionXY", medRes)
         ChangeResolution()
 
-        cameraIndex = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", VB_Classes.ActiveTask.algorithmParameters.D435i)
+        cameraIndex = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", VB_Classes.ActiveTask.algParms.D435i)
         cameraRadioButton(cameraIndex).Checked = True
 
         ShowLabels.Checked = GetSetting("OpenCVB", "ShowLabels", "ShowLabels", False)

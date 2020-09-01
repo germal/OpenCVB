@@ -40,7 +40,7 @@ Public Class ActiveTask : Implements IDisposable
         Public coeffs As Single()
         Public FOV As Single()
     End Structure
-    Public Structure algorithmParameters
+    Public Structure algParms
         Dim activeAlgorithm As Object
         Public cameraIndex As Integer
         Dim cameraName As String
@@ -95,7 +95,7 @@ Public Class ActiveTask : Implements IDisposable
         Public Const L515 As Int32 = 5 ' Must be defined in OptionDialog.vb the same way!
         Public Const D455 As Int32 = 6 ' Must be defined in OptionDialog.vb the same way!
     End Structure
-    Public Sub New(parms As algorithmParameters, location As cv.Rect)
+    Public Sub New(parms As algParms, location As cv.Rect)
         Randomize() ' just in case anyone uses VB.Net's Rnd
         ocvb = New AlgorithmData(parms, location)
         ocvbX = ocvb

@@ -24,7 +24,7 @@ Public Class Sift_Basics_CS
     Public Sub Run(ocvb As AlgorithmData)
         Dim doubleSize As New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols * 2, cv.MatType.CV_8UC3)
 
-        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.T265Camera Then
+        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
             fisheye.Run(ocvb)
             siftCS.Run(fisheye.leftView, fisheye.rightView, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
         Else
@@ -70,7 +70,7 @@ Public Class Sift_Basics_CS_MT
     Public Sub Run(ocvb As AlgorithmData)
         Dim leftView As cv.Mat
         Dim rightView As cv.Mat
-        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.T265Camera Then
+        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
             fisheye.Run(ocvb)
             leftView = fisheye.leftView
             rightView = fisheye.rightView

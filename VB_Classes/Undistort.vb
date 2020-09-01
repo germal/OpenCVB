@@ -69,7 +69,7 @@ Public Class Undistort_Basics
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "undistort intrinsics Left", 1, 200, 100)
 
-        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.T265Camera Then
+        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
             sliders.setupTrackBar(1, "undistort intrinsics coeff's", -100000, 100000, 100)
         Else
             sliders.setupTrackBar(1, "undistort intrinsics coeff's", -1000, 1000, 100)
@@ -100,7 +100,7 @@ Public Class Undistort_Basics
             undistortSetup(ocvb, kMatLeft, dMatLeft, rMatLeft, pMatLeft, maxDisp, stereo_height_px, ocvb.parms.intrinsicsLeft)
 
             ' the intrinsic coeff's on the Intel RS2 series are always zero.  Here we just make up some numbers so we can show the impact.
-            If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algorithmParameters.D435i Then
+            If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.D435i Then
                 Dim d() As Double = {0.5, -2, 1.5, 0.5}
                 dMatLeft = New cv.Mat(1, 4, cv.MatType.CV_64F, d)
             End If
