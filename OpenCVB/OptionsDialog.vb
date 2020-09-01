@@ -6,16 +6,9 @@ Public Class OptionsDialog
     Dim numPyEnabled As Boolean = False
 
     Public cameraIndex As Int32 ' an index into the cameraRadioButton array.
-    Public Const Kinect4AzureCam As Int32 = 0 ' Must be defined in VB_Classes.vb the same way!
-    Public Const T265Camera As Int32 = 1 ' Must be defined in VB_Classes.vb the same way!
-    Public Const StereoLabsZED2 As Int32 = 2 ' Must be defined in VB_Classes.vb the same way!
-    Public Const MyntD1000 As Int32 = 3 ' Must be defined in VB_Classes.vb the same way!
-    Public Const D435i As Int32 = 4 ' Must be defined in VB_Classes.vb the same way!
-    Public Const L515 As Int32 = 5 ' Must be defined in VB_Classes.vb the same way!
-    Public Const D455 As Int32 = 6 ' Must be defined in VB_Classes.vb the same way!
 
-    Public cameraDeviceCount(D455) As Int32
-    Public cameraRadioButton(D455) As RadioButton
+    Public cameraDeviceCount(VB_Classes.ActiveTask.algorithmParameters.D455) As Int32
+    Public cameraRadioButton(VB_Classes.ActiveTask.algorithmParameters.D455) As RadioButton
     Public cameraTotalCount As Integer = 0
 
     Public Const lowRes = 0
@@ -98,7 +91,7 @@ Public Class OptionsDialog
         OpenCVB.resolutionSetting = GetSetting("OpenCVB", "resolutionXY", "resolutionXY", medRes)
         ChangeResolution()
 
-        cameraIndex = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", D435i)
+        cameraIndex = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", VB_Classes.ActiveTask.algorithmParameters.D435i)
         cameraRadioButton(cameraIndex).Checked = True
 
         ShowLabels.Checked = GetSetting("OpenCVB", "ShowLabels", "ShowLabels", False)
